@@ -63,7 +63,7 @@ import org.mycore.frontend.servlets.MCRServletJob;
  * @author Harald Richter
  * @author Thomas Scheffler (yagee)
  * @version $Revision$ $Date$
- * @see org.mycore.frontend.fileupload.MCRMCRUploadHandler
+ * @see org.mycore.frontend.fileupload.MCRUploadHandler
  */
 public final class MCRUploadServlet extends MCRServlet implements Runnable {
     static String serverIP;

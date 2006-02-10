@@ -199,8 +199,6 @@ public class MCROAIDataProvider extends HttpServlet {
      *            servlet request
      * @param response
      *            servlet response
-     * @throws ServletException
-     * @throws IOException
      */
     protected void doGet(HttpServletRequest request, HttpServletResponse response) {
         processRequest(request, response);
@@ -213,8 +211,6 @@ public class MCROAIDataProvider extends HttpServlet {
      *            servlet request
      * @param response
      *            servlet response
-     * @throws ServletException
-     * @throws IOException
      */
     protected void doPost(HttpServletRequest request, HttpServletResponse response) {
         processRequest(request, response);
@@ -228,8 +224,6 @@ public class MCROAIDataProvider extends HttpServlet {
      *            servlet request
      * @param response
      *            servlet response
-     * @throws ServletException
-     * @throws IOException
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response) {
         response.setContentType("text/xml; charset=UTF-8");
@@ -414,7 +408,7 @@ public class MCROAIDataProvider extends HttpServlet {
         }
 
         File directory = new File(dir);
-        File[] tokenList = directory.listFiles(new TokenFileFilter(directory, STR_RESUMPTIONTOKEN_SUFFIX));
+        File[] tokenList = directory.listFiles(new TokenFileFilter(STR_RESUMPTIONTOKEN_SUFFIX));
 
         if (tokenList == null) {
             return null;
@@ -456,7 +450,7 @@ public class MCROAIDataProvider extends HttpServlet {
         }
 
         File directory = new File(dir);
-        File[] tokenList = directory.listFiles(new TokenFileFilter(directory, STR_RESUMPTIONTOKEN_SUFFIX));
+        File[] tokenList = directory.listFiles(new TokenFileFilter(STR_RESUMPTIONTOKEN_SUFFIX));
 
         if (tokenList == null) {
             return;
@@ -619,7 +613,7 @@ public class MCROAIDataProvider extends HttpServlet {
      * Method listToResumptionToken. Add the elements in the list to a
      * resumption token file.
      * 
-     * @param list
+     * @param tokenElements
      *            a list of Element's(!)
      * @return String The resumption token
      */
@@ -827,9 +821,8 @@ public class MCROAIDataProvider extends HttpServlet {
                 logger.info("Anfrage 'listMetadataFormats' wurde wegen falscher ID abgebrochen.");
 
                 return addError(document, "idDoesNotExist", ERR_UNKNOWN_ID);
-            } else {
-                record = query.getRecord(id, "oai_dc", getServletName());
             }
+            record = query.getRecord(id, "oai_dc", getServletName());
         }
 
         // The supported metadata formats are only returned if no identifier was
@@ -1770,7 +1763,7 @@ public class MCROAIDataProvider extends HttpServlet {
     /**
      * @param element
      *            the Header element
-     * @param spec
+     * @param setSpec
      *            the set specs
      * @param ns
      *            the Namespace of <code>element</code>
@@ -1858,7 +1851,7 @@ public class MCROAIDataProvider extends HttpServlet {
     class TokenFileFilter implements FilenameFilter {
         String filter = null;
 
-        public TokenFileFilter(File directory, String filterName) {
+        public TokenFileFilter(String filterName) {
             filter = filterName;
         }
 

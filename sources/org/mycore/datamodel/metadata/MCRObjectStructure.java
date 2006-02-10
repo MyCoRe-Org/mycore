@@ -115,11 +115,10 @@ public class MCRObjectStructure {
      * @return the parent MCRObjectID.
      */
     public final MCRObjectID getParentID() {
-        if (parent != null) {
-            return parent.getXLinkHrefID();
-        } else {
+        if (parent == null) {
             return null;
         }
+        return parent.getXLinkHrefID();
     }
 
     /**
@@ -251,7 +250,6 @@ public class MCRObjectStructure {
      * 
      * @param add_derivate
      *            the link to be added as MCRMetaLinkID
-     * @return boolean true, if successfully completed
      */
     public final void addDerivate(MCRMetaLinkID add_derivate) {
         derivates.add(add_derivate);
@@ -286,7 +284,7 @@ public class MCRObjectStructure {
      * the comparsion of the MCRMetaLinkID input with an item of the derivate
      * array is true.
      * 
-     * @param in_derivate
+     * @param input
      *            the MCRMetaLinkID input
      * @return the index of the derivate in the array or -1 if the link was not
      *         found.
@@ -313,7 +311,6 @@ public class MCRObjectStructure {
      *            the index of the link to be removed
      * @exception IndexOutOfBoundsException
      *                throw this exception, if the index is false
-     * @return boolean true, if successfully completed
      */
     public final void removeDerivate(int index) throws IndexOutOfBoundsException {
         if ((index < 0) || (index > derivates.size())) {

@@ -41,12 +41,12 @@ import org.mycore.frontend.servlets.MCRServletJob;
  * /servlets/MCRAccessCheckservlet?permission=XXX&objid=YYY if no parameter where
  * given, return value will always be true
  * 
- * @param permission:
+ * parameter permission:
  *            access permission to check
- * @param objid:
+ * parameter objid:
  *            MyCoRe objectid as string to check
  * 
- * @return xml: <?xml version="1.0" encoding="UTF-8" ?> <mycoreaccesscheck>
+ * returns xml: <?xml version="1.0" encoding="UTF-8" ?> <mycoreaccesscheck>
  *         <accesscheck return="false" disabled="false" /> </mycoreaccesscheck> -
  *         attribute disabled contains the AccessManagerState (disabled
  *         true/false) - attribute return contains the access check result

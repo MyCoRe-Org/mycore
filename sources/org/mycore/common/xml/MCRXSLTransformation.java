@@ -209,8 +209,6 @@ public class MCRXSLTransformation {
      * Method setParameters. Set some parameters which can be used by the
      * Stylesheet for the transformation.
      * 
-     * @param handler
-     * @param parameters
      */
     public static void setParameters(Transformer transformer, Map parameters) {
         Iterator names = parameters.keySet().iterator();

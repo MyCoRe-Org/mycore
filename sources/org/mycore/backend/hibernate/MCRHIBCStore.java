@@ -50,7 +50,7 @@ public class MCRHIBCStore extends MCRContentStore {
         // MCRConfiguration config = MCRConfiguration.instance();
     }
 
-    private synchronized int getNextFreeID(String tableName) throws Exception {
+    private synchronized int getNextFreeID() throws Exception {
         Session session = MCRHIBConnection.instance().getSession(); 
         Transaction tx = session.beginTransaction();
         List l = session.createQuery("select max(storageid) from MCRCSTORE").list();
@@ -60,14 +60,12 @@ public class MCRHIBCStore extends MCRContentStore {
         if (l.size() > 0) {
         	int max = ((Integer) l.get(0)).intValue();
         	return max + 1;
-        } else {
-        	return 1;
         }
+       	return 1;
     }
 
     protected synchronized String doStoreContent(MCRFileReader file, MCRContentInputStream source) throws Exception {
-        String tableName = file.getContentTypeID();
-        int ID = getNextFreeID(tableName);
+        int ID = getNextFreeID();
         String storageID = String.valueOf(ID);
 
         Session session = MCRHIBConnection.instance().getSession();

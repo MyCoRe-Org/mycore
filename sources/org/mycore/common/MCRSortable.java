@@ -49,7 +49,7 @@ public interface MCRSortable {
      * 
      * @param sorter
      *            Object responsible for sorting
-     * @param order
+     * @param reversed
      *            true if reversed sorting order
      * @see MCRXMLSortInterface#sort(boolean) sorting method.
      * @throws MCRException

@@ -159,7 +159,7 @@ public class MCRClassificationCommands extends MCRAbstractCommands {
     /**
      * Loads an MCRClassification from an XML file.
      * 
-     * @param filename
+     * @param file
      *            the location of the xml file
      * @throws MCRActiveLinkException 
      */
@@ -170,7 +170,7 @@ public class MCRClassificationCommands extends MCRAbstractCommands {
     /**
      * Updates an MCRClassification from an XML file.
      * 
-     * @param filename
+     * @param file
      *            the location of the xml file
      * @throws MCRActiveLinkException 
      */
@@ -181,7 +181,7 @@ public class MCRClassificationCommands extends MCRAbstractCommands {
     /**
      * Loads or updates an MCRClassification from an XML file.
      * 
-     * @param filename
+     * @param file
      *            the location of the xml file
      * @param update
      *            if true, classification will be updated, else classification

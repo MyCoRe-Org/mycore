@@ -322,9 +322,9 @@ public class MCRSQLStatement {
      * @return value with masked '
      */
     private final String mask(String value) {
-        if (value.indexOf(MASK_WHAT) >= 0)
+        if (value.indexOf(MASK_WHAT) >= 0){
             return MCRUtils.replaceString(value, MASK_WHAT, MASK_WITH);
-        else
-            return value;
+        }
+        return value;
     }
 }

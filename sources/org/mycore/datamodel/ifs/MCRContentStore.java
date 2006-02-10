@@ -102,9 +102,8 @@ public abstract class MCRContentStore {
                 msg.append(file.getPath()).append("] in store [");
                 msg.append(storeID).append("]");
                 throw new MCRPersistenceException(msg.toString(), exc);
-            } else {
-                throw (MCRException) exc;
             }
+            throw (MCRException) exc;
         }
     }
 
@@ -138,9 +137,8 @@ public abstract class MCRContentStore {
                 msg.append(storageID).append("] in store [");
                 msg.append(storeID).append("]");
                 throw new MCRPersistenceException(msg.toString(), exc);
-            } else {
-                throw (MCRException) exc;
             }
+            throw (MCRException) exc;
         }
     }
 
@@ -173,9 +171,8 @@ public abstract class MCRContentStore {
                 msg.append(file.getStorageID()).append("] in store [");
                 msg.append(storeID).append("]");
                 throw new MCRPersistenceException(msg.toString(), exc);
-            } else {
-                throw (MCRException) exc;
             }
+            throw (MCRException) exc;
         }
     }
 
@@ -199,8 +196,6 @@ public abstract class MCRContentStore {
      * 
      * @param file
      *            the MCRFile thats content should be retrieved
-     * @param target
-     *            the OutputStream to write the file content to
      */
     public InputStream retrieveContent(MCRFileReader file) throws MCRException, IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();

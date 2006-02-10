@@ -80,8 +80,6 @@ public abstract class MCRSearcher extends MCREventHandlerBase implements MCREven
 
     /**
      * Returns the ID of the index this searcher is configured for.
-     * 
-     * @return
      */
     public String getIndex() {
         return index;

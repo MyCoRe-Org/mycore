@@ -109,9 +109,8 @@ final class MCRQueryCommands extends MCRAbstractCommands {
 
         if (type == null) {
             return;
-        } else {
-            type = type.toLowerCase();
         }
+        type = type.toLowerCase();
 
         if (query == null) {
             query = "";

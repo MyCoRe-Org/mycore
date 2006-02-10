@@ -166,15 +166,13 @@ public class MCRMetaLink extends MCRMetaDefault implements MCRMetaInterface {
 
         if ((set_from == null) || ((set_from = set_from.trim()).length() == 0)) {
             throw new MCRException("The from value is null or empty.");
-        } else {
-            from = set_from.trim();
         }
+        from = set_from.trim();
 
         if ((set_to == null) || ((set_to = set_to.trim()).length() == 0)) {
             throw new MCRException("The to value is null or empty.");
-        } else {
-            to = set_to.trim();
         }
+        to = set_to.trim();
 
         if (set_title == null) {
             title = "";
@@ -249,7 +247,7 @@ public class MCRMetaLink extends MCRMetaDefault implements MCRMetaInterface {
      * </ul>
      * <br>
      * 
-     * @param in_derivate
+     * @param input
      *            the MCRMetaLink input
      * @return true if it is compare, else return false
      */

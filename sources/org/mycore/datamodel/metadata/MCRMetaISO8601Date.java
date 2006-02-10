@@ -188,8 +188,8 @@ public final class MCRMetaISO8601Date extends MCRMetaDefault implements MCRMetaI
     /**
      * sets the date for this meta data object
      * 
-     * @param String
-     *            Date in any form that is a valid xsd:duration
+     * @param isoString
+     *            Date in any form that is a valid W3C dateTime
      */
     public final void setDate(String isoString) {
         DateTime dt = null;
@@ -477,10 +477,9 @@ public final class MCRMetaISO8601Date extends MCRMetaDefault implements MCRMetaI
                 if (test || !isoString.endsWith("Z")) {
                     // YYYY-MM-DDThh:mm[+-]hh:mm
                     return USE_UTC ? UTC_COMPLETE_HH_MM_FORMAT : COMPLETE_HH_MM_FORMAT;
-                } else {
-                    // YYYY-MM-DDThh:mm:ss.s'Z'
-                    return USE_UTC ? UTC_COMPLETE_HH_MM_SS_SSS_FORMAT : COMPLETE_HH_MM_SS_SSS_FORMAT;
                 }
+                // YYYY-MM-DDThh:mm:ss.s'Z'
+                return USE_UTC ? UTC_COMPLETE_HH_MM_SS_SSS_FORMAT : COMPLETE_HH_MM_SS_SSS_FORMAT;
             case 20: // YYYY-MM-DDThh:mm:ss'Z'
             case 25: // YYYY-MM-DDThh:mm:ss[+-]hh:mm
                 return USE_UTC ? UTC_COMPLETE_HH_MM_SS_FORMAT : COMPLETE_HH_MM_SS_FORMAT;
@@ -512,8 +511,8 @@ public final class MCRMetaISO8601Date extends MCRMetaDefault implements MCRMetaI
             boolean result = matcher.find();
             if (result) {
                 return matcher.replaceFirst(isoString.substring(matcher.start(), matcher.start() + 4) + "+");
-            } else
-                return isoString;
+            }
+            return isoString;
         }
 
     }

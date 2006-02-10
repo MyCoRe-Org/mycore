@@ -81,11 +81,10 @@ public interface MCRXMLSortInterface {
      * Interface must know how to handle each Object.
      * 
      * @return must return itself
-     * @throws MCRException
-     *             if doesn't know how to handle <code>sortObjects</code>
      * @param sortObjects
      *            Objects to be sorted
-     * @author Thomas Scheffler
+     * @throws MCRException
+     *             if doesn't know how to handle <code>sortObjects</code>
      */
     public MCRXMLSortInterface add(Object[] sortObjects) throws MCRException;
 
@@ -94,11 +93,10 @@ public interface MCRXMLSortInterface {
      * know how to handle each Object.
      * 
      * @return must return itself
-     * @throws MCRException
-     *             if doesn't know how to handle <code>sortObject</code>
      * @param sortObject
      *            Objects to be sorted
-     * @author Thomas Scheffler
+     * @throws MCRException
+     *             if doesn't know how to handle <code>sortObject</code>
      */
     public MCRXMLSortInterface add(Object sortObject) throws MCRException;
 

@@ -947,7 +947,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
     /**
      * The method remove a privilege from a group.
      * 
-     * @param group
+     * @param groupID
      *            the group name
      * @param priv
      *            the privilege String

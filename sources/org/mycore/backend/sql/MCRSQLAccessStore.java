@@ -116,8 +116,8 @@ public class MCRSQLAccessStore extends MCRAccessStore {
     /**
      * method creates new access definition in db
      * 
-     * @param MCRAccessDefinition
-     *            data-object
+     * @param rulemapping
+     *            rule definition
      */
     public void createAccessDefinition(MCRRuleMapping rulemapping) {
         if (!existAccessDefinition(rulemapping.getRuleId(), rulemapping.getPool(), rulemapping.getObjId())) {
@@ -159,9 +159,8 @@ public class MCRSQLAccessStore extends MCRAccessStore {
 
             if (rs.next()) {
                 return true;
-            } else {
-                return false;
             }
+            return false;
         } catch (Exception e) {
             logger.error(e);
 
@@ -282,10 +281,10 @@ public class MCRSQLAccessStore extends MCRAccessStore {
 
         try {
             int count = Integer.parseInt(MCRSQLConnection.justGetSingleValue(query.toString()));
-            if (count > 0)
+            if (count > 0){
             	return true;
-            else
-            	return false;
+            }
+            return false;
         } catch (Exception e) {
             logger.error("catched error", e);
             return false;        	

@@ -40,9 +40,9 @@ public class MCRRuleMapping {
     }
 
     /**
-     * objid = MCRObjectID as string
+     * returns MCRObjectID as string
      * 
-     * @return
+     * @return MCRObjectID as string
      */
     public String getObjId() {
         return objid;
@@ -52,11 +52,6 @@ public class MCRRuleMapping {
         this.objid = objid;
     }
 
-    /**
-     * pool
-     * 
-     * @return
-     */
     public String getPool() {
         return pool;
     }
@@ -65,11 +60,6 @@ public class MCRRuleMapping {
         this.pool = pool;
     }
 
-    /**
-     * ruleid
-     * 
-     * @return
-     */
     public String getRuleId() {
         return ruleid;
     }
@@ -78,11 +68,6 @@ public class MCRRuleMapping {
         this.ruleid = ruleid;
     }
 
-    /**
-     * creationdate
-     * 
-     * @return
-     */
     public Date getCreationdate() {
         return creationdate;
     }
@@ -91,11 +76,6 @@ public class MCRRuleMapping {
         this.creationdate = creationdate;
     }
 
-    /**
-     * creator
-     * 
-     * @return
-     */
     public String getCreator() {
         return creator;
     }

@@ -54,7 +54,7 @@ public interface MCRFileMetadataStore {
     /**
      * Retrieves the MCRFilesystemNode with that ID from the persistent store.
      * 
-     * @param the
+     * @param ID the
      *            unique ID of the MCRFilesystemNode
      * @return the node with that ID, or null if no such node exists
      */

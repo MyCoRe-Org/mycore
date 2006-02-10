@@ -51,7 +51,6 @@ import org.mycore.common.MCRPersistenceException;
  * </ul>
  * 
  * @see #doQuery( String)
- * @see #justDoQuery( String )
  * @see java.sql.Connection
  * @see MCRSQLConnectionPool
  * @author Frank Lützenkirchen

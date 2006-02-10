@@ -88,17 +88,12 @@ public class MCRAccessRule {
     
     public String getRuleString()
     {
-        if (rule==null)
+        if (rule==null){
             return "";
-        else
-            return rule;
+        }
+        return rule;
     }
 
-    /**
-     * creationtime
-     * 
-     * @return
-     */
     public Date getCreationTime() {
         return creationTime;
     }
@@ -107,11 +102,6 @@ public class MCRAccessRule {
         this.creationTime = creationTime;
     }
 
-    /**
-     * creator
-     * 
-     * @return
-     */
     public String getCreator() {
         return creator;
     }
@@ -120,11 +110,6 @@ public class MCRAccessRule {
         this.creator = creator;
     }
 
-    /**
-     * description
-     * 
-     * @return
-     */
     public String getDescription() {
         return description;
     }
@@ -133,11 +118,6 @@ public class MCRAccessRule {
         this.description = description;
     }
 
-    /**
-     * id
-     * 
-     * @return
-     */
     public String getId() {
         return id;
     }
@@ -146,10 +126,6 @@ public class MCRAccessRule {
         this.id = id;
     }
     
-    /**
-     * method returns element representation of mcraccessrule
-     * @return
-     */
     public Element getRuleElement(){
         Element el = new Element("mcraccessrule");
         el.addContent(new Element("id").setText(this.id));

@@ -38,7 +38,6 @@ import java.util.zip.ZipOutputStream;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import javax.xml.transform.Templates;
 import javax.xml.transform.sax.TransformerHandler;
 
@@ -49,7 +48,6 @@ import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRDefaults;
 import org.mycore.common.MCRException;
-import org.mycore.common.MCRSession;
 import org.mycore.common.xml.MCRLayoutServlet;
 import org.mycore.common.xml.MCRXMLContainer;
 import org.mycore.common.xml.MCRXSLTransformation;
@@ -105,18 +103,6 @@ public class MCRZipServlet extends MCRServlet {
         String id;
         String path;
         ZipOutputStream out = null;
-        HttpSession session = req.getSession(false);
-
-        // get the user
-        String user = MCRConfiguration.instance().getString("MCR.users_guestuser_username");
-
-        if (session != null) {
-            MCRSession mcrSession = (MCRSession) (session.getAttribute("mycore.session"));
-
-            if (mcrSession != null) {
-                user = mcrSession.getCurrentUserID();
-            }
-        }
 
         // get Parameter
         String paramid = getProperty(req, "id");
@@ -162,11 +148,11 @@ public class MCRZipServlet extends MCRServlet {
 
             if (jdom.getRootElement().getChild("mcr_result").getChild("mycorederivate") != null) {
                 out = buildZipOutputStream(res, id, path);
-                sendDerivate(id, path, req, res, out);
+                sendDerivate(id, path, out);
                 out.close();
             } else {
                 out = buildZipOutputStream(res, id, path);
-                sendObject(jdom, req, res, out);
+                sendObject(jdom, req, out);
                 out.close();
             }
         } catch (Exception e) {
@@ -247,7 +233,7 @@ public class MCRZipServlet extends MCRServlet {
      *            relative path zu a special folder, if given, only this folder
      *            is zipped
      */
-    protected void sendDerivate(String ownerID, String dirpath, HttpServletRequest req, HttpServletResponse res, ZipOutputStream out) throws IOException {
+    protected void sendDerivate(String ownerID, String dirpath, ZipOutputStream out) throws IOException {
         MCRFilesystemNode root;
         MCRDirectory rootdirectory;
         MCRFilesystemNode zipdirectory;
@@ -265,36 +251,34 @@ public class MCRZipServlet extends MCRServlet {
             LOGGER.debug("file " + root.getName() + " zipped");
 
             return;
-        } else {
-            // root is a directory
-            if ((dirpath == null) || (dirpath.equals(""))) {
-                sendZipped((MCRDirectory) root, out);
-                LOGGER.debug("directory " + root.getName() + " zipped");
-
-                return;
-            } else {
-                rootdirectory = (MCRDirectory) root;
-                zipdirectory = rootdirectory.getChildByPath(dirpath);
-
-                if (zipdirectory == null) {
-                    String msg = "Error: No such file or directory " + dirpath;
-                    LOGGER.error(msg);
-
-                    return;
-                } else if (zipdirectory instanceof MCRFile) {
-                    sendZipped((MCRFile) zipdirectory, out);
-                } else if (zipdirectory instanceof MCRDirectory) {
-                    sendZipped((MCRDirectory) zipdirectory, out);
-                } else {
-                    String msg = "Error: could not found the dir: " + dirpath;
-                    LOGGER.error(msg);
-
-                    return;
-                }
-
-                return;
-            }
         }
+        // root is a directory
+        if ((dirpath == null) || (dirpath.equals(""))) {
+            sendZipped((MCRDirectory) root, out);
+            LOGGER.debug("directory " + root.getName() + " zipped");
+
+            return;
+        }
+        rootdirectory = (MCRDirectory) root;
+        zipdirectory = rootdirectory.getChildByPath(dirpath);
+
+        if (zipdirectory == null) {
+            String msg = "Error: No such file or directory " + dirpath;
+            LOGGER.error(msg);
+
+            return;
+        } else if (zipdirectory instanceof MCRFile) {
+            sendZipped((MCRFile) zipdirectory, out);
+        } else if (zipdirectory instanceof MCRDirectory) {
+            sendZipped((MCRDirectory) zipdirectory, out);
+        } else {
+            String msg = "Error: could not found the dir: " + dirpath;
+            LOGGER.error(msg);
+
+            return;
+        }
+
+        return;
     }
 
     /**
@@ -303,9 +287,9 @@ public class MCRZipServlet extends MCRServlet {
      * 
      * @param jdom
      *            the JDOM of the given MycoreObject
-     * 
+     *  
      */
-    protected void sendObject(Document jdom, HttpServletRequest req, HttpServletResponse res, ZipOutputStream out) throws IOException {
+    protected void sendObject(Document jdom, HttpServletRequest req, ZipOutputStream out) throws IOException {
         // zip the object's Metadata
         Properties parameters = MCRLayoutServlet.buildXSLParameters(req);
         sendZipped(jdom, parameters, out);
@@ -320,7 +304,7 @@ public class MCRZipServlet extends MCRServlet {
             if (el.getAttributeValue("inherited").equals("0")) {
                 String ownerID = el.getAttributeValue("href", org.jdom.Namespace.getNamespace("xlink", MCRDefaults.XLINK_URL));
                 String dir = null;
-                sendDerivate(ownerID, dir, req, res, out);
+                sendDerivate(ownerID, dir, out);
             }
         }
 

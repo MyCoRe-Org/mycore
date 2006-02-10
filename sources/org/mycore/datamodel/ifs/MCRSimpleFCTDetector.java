@@ -77,7 +77,7 @@ public class MCRSimpleFCTDetector implements MCRFileContentTypeDetector {
      * 
      * @param type
      *            the file content type the rule is for
-     * @param rules
+     * @param xRules
      *            the rules XML element containing the rules for detecting that
      *            type
      */
@@ -215,9 +215,8 @@ public class MCRSimpleFCTDetector implements MCRFileContentTypeDetector {
         double getScore(String filename, byte[] header) {
             if (filename.toLowerCase().endsWith(extension)) {
                 return score;
-            } else {
-                return 0.0;
             }
+            return 0.0;
         }
     }
 
@@ -308,9 +307,8 @@ public class MCRSimpleFCTDetector implements MCRFileContentTypeDetector {
 
             if (type.equals(doctype)) {
                 return score;
-            } else {
-                return 0;
             }
+            return 0;
         } catch (Exception exc) {
             return 0;
         }
@@ -339,10 +337,8 @@ public class MCRSimpleFCTDetector implements MCRFileContentTypeDetector {
           String head = new String(header);
           if (-1 != head.indexOf(string)) {
             return score;
-        } else {
-            return 0;
-        }
-          
+          }
+          return 0;
         }
     }
     
@@ -378,7 +374,12 @@ public class MCRSimpleFCTDetector implements MCRFileContentTypeDetector {
 
             // We would need SAX 2.0 to be able to do this, for later use:
             public void startDTD(String name, String publicId, String systemId) {
-                logger.debug("MCRSimpleFCTDetector detected DOCTYPE declaration = " + name);
+                if (logger.isDebugEnabled()){
+                    logger.debug(new StringBuffer(1024)
+                            .append("MCRSimpleFCTDetector detected DOCTYPE declaration = ").append(name)
+                            .append(" publicId = ").append(publicId)
+                            .append(" systemId = ").append(systemId).toString());
+                }
                 detected.setProperty("docType", name);
                 throw new MCRException(forcedInterrupt);
             }

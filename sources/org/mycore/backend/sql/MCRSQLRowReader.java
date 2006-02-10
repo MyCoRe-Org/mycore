@@ -40,7 +40,6 @@ import org.mycore.common.MCRPersistenceException;
  * @version $Revision$ $Date$
  * @see java.sql.ResultSet
  * @see MCRSQLConnection#doQuery( String )
- * @see MCRSQLConnection#justDoQuery( String )
  */
 public class MCRSQLRowReader {
     protected final static Logger LOGGER = Logger.getLogger(MCRSQLRowReader.class);
@@ -53,7 +52,6 @@ public class MCRSQLRowReader {
      * MCRSQLConnection methods that execute an SQL query.
      * 
      * @see MCRSQLConnection#doQuery( String )
-     * @see MCRSQLConnection#justDoQuery( String )
      */
     MCRSQLRowReader(ResultSet rs) {
         this.rs = rs;

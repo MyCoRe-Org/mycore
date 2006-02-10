@@ -433,9 +433,8 @@ public class MCRSQLNBNManager implements MCRNBNManager {
                 String NISS = set.getString(1);
 
                 return new MCRNBN(MCRNBN.getLocalPrefix() + NISS);
-            } else {
-                return null;
             }
+            return null;
         } catch (Exception exc) {
             String msg = "Error in database while executing query.";
             logger.info(msg);

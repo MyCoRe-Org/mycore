@@ -59,12 +59,11 @@ public class MCREditorDefReader {
 
             if (id.equals(child.getAttributeValue("id"))) {
                 return child;
-            } else {
-                Element found = findElementByID(id, child);
+            }
+            Element found = findElementByID(id, child);
 
-                if (found != null) {
-                    return found;
-                }
+            if (found != null) {
+                return found;
             }
         }
 

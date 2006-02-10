@@ -60,13 +60,7 @@ public class MCRParserXerces implements MCRParserInterface, ErrorHandler {
 
     private static boolean FLAG_NO_SCHEMA_SUPPORT = false;
 
-    private static boolean FLAG_SCHEMA_FULL_SUPPORT = true;
-
     private static boolean FLAG_NO_SCHEMA_FULL_SUPPORT = false;
-
-    private static boolean FLAG_DEFERRED_DOM = true;
-
-    private static String SET_VALIDATION = "http://xml.org/sax/features/validation";
 
     private static String SET_NAMESPACES = "http://xml.org/sax/features/namespaces";
 
@@ -107,8 +101,6 @@ public class MCRParserXerces implements MCRParserInterface, ErrorHandler {
      * 
      * @param uri
      *            the URI of the XML input stream
-     * @param validate
-     *            if true, will validate against XML Schema
      * @throws MCRException
      *             if XML could not be parsed
      * @return the parsed XML stream as a DOM document

@@ -57,7 +57,7 @@ public class MCRCatchException extends Exception {
      * 
      * @param message
      *            the detail message
-     * @param the
+     * @param cause the
      *            cause (A null value is permitted, and indicates that the cause
      *            is nonexistent or unknown.)
      * @see Exception#Exception(java.lang.String, java.lang.Throwable)

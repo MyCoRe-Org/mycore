@@ -30,12 +30,10 @@ import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.util.StringTokenizer;
 
-import org.apache.log4j.Logger;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.datamodel.ifs.MCRAudioVideoExtender;
 import org.mycore.datamodel.ifs.MCRFileReader;
-import org.mycore.datamodel.metadata.MCRObjectID;
 
 /**
  * This class implements the AudioVideoExtender functions for IBM VideoCharger
@@ -56,8 +54,6 @@ import org.mycore.datamodel.metadata.MCRObjectID;
  */
 public class MCRAVExtVideoCharger extends MCRAudioVideoExtender {
     protected static MCRConfiguration CONFIG;
-
-    private static final Logger LOGGER = Logger.getLogger(MCRObjectID.class);
 
     public MCRAVExtVideoCharger() {
         if (CONFIG == null) {

@@ -110,7 +110,7 @@ public class MCRClassificationItem extends MCRClassificationObject {
     /**
      * The method return a MCRCategoryItem for the given category labeltext.
      * 
-     * @param categID
+     * @param labeltext
      *            the category label text
      * @return the MCRCategoryItem
      */
@@ -125,7 +125,7 @@ public class MCRClassificationItem extends MCRClassificationObject {
      * The method return a MCRClassificationItem for the given classification
      * ID.
      * 
-     * @param categID
+     * @param ID
      *            the classification ID
      * @return the MCRClassificationItem
      */
@@ -136,11 +136,8 @@ public class MCRClassificationItem extends MCRClassificationObject {
     }
     
     /**
-     * The method return a MCRClassificationItem for the given classification
-     * ID.
+     * return a MCRClassificationItem as JDOM Element
      * 
-     * @param categID
-     *            the classification ID
      * @return the MCRClassificationItem
      */
      public Element getClassificationItemAsJDom() {

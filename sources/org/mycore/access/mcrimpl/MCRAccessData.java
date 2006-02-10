@@ -43,11 +43,6 @@ public class MCRAccessData {
     public MCRAccessData() {
     }
 
-    /**
-     * date
-     * 
-     * @return
-     */
     public Date getDate() {
         return date;
     }
@@ -56,11 +51,6 @@ public class MCRAccessData {
         this.date = date;
     }
 
-    /**
-     * ip
-     * 
-     * @return
-     */
     public MCRIPAddress getIp() {
         return ip;
     }
@@ -69,11 +59,6 @@ public class MCRAccessData {
         this.ip = ip;
     }
 
-    /**
-     * user
-     * 
-     * @return
-     */
     public MCRUser getUser() {
         return user;
     }

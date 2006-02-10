@@ -122,9 +122,8 @@ public class XmlHtmlPlugin implements TextFilterPlugin {
             String tx = getFullText(ct, input);
 
             return new StringReader(tx);
-        } else {
-            throw new FilterPluginTransformException("ContentType " + ct + " is not supported by " + getName() + "!");
         }
+        throw new FilterPluginTransformException("ContentType " + ct + " is not supported by " + getName() + "!");
     }
 
     /**

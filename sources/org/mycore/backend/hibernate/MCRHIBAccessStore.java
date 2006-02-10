@@ -119,7 +119,7 @@ public class MCRHIBAccessStore extends MCRAccessStore {
     /**
      * method creates a new AccessDefinition in db
      * 
-     * @param MCRAccessData
+     * @param rulemapping
      *            with values
      */
     public void createAccessDefinition(MCRRuleMapping rulemapping) {
@@ -169,9 +169,8 @@ public class MCRHIBAccessStore extends MCRAccessStore {
 
             if (l.size() == 1) {
                 return true;
-            } else {
-                return false;
-            }
+            } 
+            return false;
         } catch (Exception e) {
             tx.rollback();
             logger.error(e);
@@ -199,10 +198,10 @@ public class MCRHIBAccessStore extends MCRAccessStore {
         
         try {
         	int count = ( (Integer) session.createQuery(query.toString()).iterate().next() ).intValue();
-        	if (count > 0)
+        	if (count > 0){
         		return true;
-        	else
-        		return false;
+        	}
+        	return false;
         } catch (Exception e) {
             tx.rollback();
             logger.error("catched error", e);
@@ -215,8 +214,8 @@ public class MCRHIBAccessStore extends MCRAccessStore {
     /**
      * delete given definition in db
      * 
-     * @param accessdata
-     *            MCRAccessData containing key;
+     * @param rulemapping
+     *            rule to be deleted
      */
     public void deleteAccessDefinition(MCRRuleMapping rulemapping) {
 

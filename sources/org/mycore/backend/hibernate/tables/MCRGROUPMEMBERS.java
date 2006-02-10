@@ -26,12 +26,6 @@ package org.mycore.backend.hibernate.tables;
 public class MCRGROUPMEMBERS {
     private MCRGROUPMEMBERSPK key;
 
-    private String gid;
-
-    private String userid;
-
-    private String groupid;
-
     public MCRGROUPMEMBERS() {
         this.key = new MCRGROUPMEMBERSPK();
     }

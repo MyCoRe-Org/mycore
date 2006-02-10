@@ -73,6 +73,7 @@ final public class MCRMetaBoolean extends MCRMetaDefault implements MCRMetaInter
      */
     public MCRMetaBoolean(String set_datapart, String set_subtag, String default_lang, String set_type, int set_inherted, String set_value) throws MCRException {
         super(set_datapart, set_subtag, "en", set_type, set_inherted);
+        LOGGER.debug("default_lang ("+default_lang+") will never used."); //FIXME: use default_lang or remove it
 
         if (set_value != null) {
             set_value = set_value.toLowerCase().trim();
@@ -124,6 +125,7 @@ final public class MCRMetaBoolean extends MCRMetaDefault implements MCRMetaInter
      */
     public MCRMetaBoolean(String set_datapart, String set_subtag, String default_lang, String set_type, int set_inherted, boolean set_value) throws MCRException {
         super(set_datapart, set_subtag, "en", set_type, set_inherted);
+        LOGGER.debug("default_lang ("+default_lang+") will never used."); //FIXME: use default_lang or remove it
         value = set_value;
     }
 

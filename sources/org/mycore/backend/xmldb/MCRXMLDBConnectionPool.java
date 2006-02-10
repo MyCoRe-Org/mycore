@@ -192,7 +192,6 @@ public class MCRXMLDBConnectionPool {
      * returns a collection for a user account if available
      * 
      * @param collection
-     * @return
      * @throws XMLDBException
      */
     private Collection getCollection(String collection) throws XMLDBException {

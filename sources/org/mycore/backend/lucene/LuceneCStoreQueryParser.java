@@ -67,9 +67,6 @@ public class LuceneCStoreQueryParser extends QueryParser {
         field = f;
     }
 
-    /**
-     * @return
-     */
     public String getGroupingValue() {
         return groupingValue;
     }

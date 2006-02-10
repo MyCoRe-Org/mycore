@@ -208,12 +208,16 @@ public class MCRSession implements Cloneable {
     public final void setCurrentIP(String newip) {
         java.util.StringTokenizer st = new java.util.StringTokenizer(newip, ".");
         if (st.countTokens() != 4) return;
+        try {
         while (st.hasMoreTokens()) {
-            try {
                 int i = Integer.parseInt(st.nextToken());
-            } catch ( Exception e) {
-                return;
-            }
+                if ((i<0)||(i>255)){
+                    return;
+                }
+        }
+        } catch ( Exception e) {
+            logger.debug("Exception while parsing new ip "+newip+" using old value.",e);
+            return;
         }
         this.ip = newip;
     }

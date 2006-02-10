@@ -265,7 +265,7 @@ public class MCRAccessControlSystem extends MCRAccessBaseImpl{
     /**
      * Validator methods to validate access definition for given object and pool
      * 
-     * @param pool
+     * @param permission 
      *            poolname as string
      * @param objID
      *            MCRObjectID as string
@@ -273,19 +273,18 @@ public class MCRAccessControlSystem extends MCRAccessBaseImpl{
      *            MCRUser
      * @param ip
      *            ip-Address
-     * @param session
-     *            MCRSession           
      * @return
+     *            true if access is granted according to defined access rules
      */
     public boolean checkAccess(String objID, String permission, MCRUser user, MCRIPAddress ip) {
         Date date = new Date();
         MCRAccessRule rule = getAccess(objID, permission);
         if (rule == null) {
         	// no rule: in read-pool everybody has access
-        	if(permission.equals("read") || user.getID().equals("administrator"))
+        	if(permission.equals("read") || user.getID().equals("administrator")){
         		return true;
-        	else
-        		return false; 
+        	}
+        	return false; 
         }
         return rule.checkAccess(user, date, ip);
     }

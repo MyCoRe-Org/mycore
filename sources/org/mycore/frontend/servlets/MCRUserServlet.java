@@ -227,15 +227,11 @@ public class MCRUserServlet extends MCRServlet {
     }
 
     /**
-     * This method creates a jdom document with elements need by all modes this
+     * creates a jdom document with elements needed by all modes this
      * servlet can run.
      * 
      * @param job
      *            The MCRServletJob instance
-     * @throws IOException
-     *             for java I/O errors.
-     * @throws ServletException
-     *             for errors from the servlet engine.
      * @return jdom document
      */
     protected org.jdom.Document createJdomDocBase(MCRServletJob job) {

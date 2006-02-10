@@ -347,9 +347,8 @@ public class MCRCommandLineInterface {
 
 			if (line.startsWith("#") || (line.length() == 0)) {
 				continue;
-			} else {
-				commandQueue.insertElementAt(line, pos++);
 			}
+			commandQueue.insertElementAt(line, pos++);
 		}
 
 		reader.close();
@@ -423,7 +422,7 @@ public class MCRCommandLineInterface {
 	/**
 	 * This command changes the user of the session context to a new user.
 	 * 
-	 * @param newuser
+	 * @param user
 	 *            the new user ID
 	 * @param password
 	 *            the password of the new user
@@ -446,7 +445,7 @@ public class MCRCommandLineInterface {
 	/**
 	 * This command changes the user of the session context to a new user.
 	 * 
-	 * @param newuser
+	 * @param user
 	 *            the new user ID
 	 */
 	public static void login(String user) {

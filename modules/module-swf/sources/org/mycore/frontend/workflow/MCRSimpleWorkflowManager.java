@@ -360,14 +360,14 @@ public class MCRSimpleWorkflowManager {
      * 
      * @param type
      *            the MCRObjectID type of the metadata object
-     * @param ID
+     * @param id
      *            the MCRObjectID of the derivate object as String
      */
-    public final void deleteDerivateObject(String type, String DD) {
-        logger.debug("Delete the derivate " + DD);
+    public final void deleteDerivateObject(String type, String id) {
+        logger.debug("Delete the derivate " + id);
 
         // remove the XML file
-        String fn = getDirectoryPath(type) + SLASH + DD;
+        String fn = getDirectoryPath(type) + SLASH + id;
 
         try {
             File fi = new File(fn + ".xml");
@@ -480,7 +480,7 @@ public class MCRSimpleWorkflowManager {
      * 
      * @param type
      *            the MCRObjectID type of the metadata object
-     * @param DD
+     * @param ID
      *            the ID as String of the derivate object
      */
     public final boolean commitDerivateObject(String type, String ID) {

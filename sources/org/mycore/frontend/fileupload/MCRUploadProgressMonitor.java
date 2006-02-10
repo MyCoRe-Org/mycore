@@ -277,7 +277,7 @@ public class MCRUploadProgressMonitor extends JDialog {
         long kb = bytes / 1024L;
         bytes = bytes - (kb * 1024L);
 
-        long nk = Math.round(((double) bytes / 1024d) * 100d);
+        long nk = Math.round((bytes / 1024d) * 100d);
 
         if (kb < 1024) {
             return kb + "," + df.format(nk) + " KB";
@@ -285,7 +285,7 @@ public class MCRUploadProgressMonitor extends JDialog {
 
         long mb = kb / 1024L;
         kb = kb - (mb * 1024L);
-        nk = Math.round(((double) kb / 1024d) * 100d);
+        nk = Math.round((kb / 1024d) * 100d);
 
         return mb + "," + df.format(nk) + " MB";
     }
@@ -313,7 +313,7 @@ public class MCRUploadProgressMonitor extends JDialog {
         final int sec = Math.max((int) (now - startTime) / 1000, 1);
         double secPerPM = ((double) sec / (double) permilleTotal);
         final int rest = (int) (secPerPM * (1000 - permilleTotal));
-        int throughput = Math.round(bytesTotal / (long) sec);
+        int throughput = Math.round(bytesTotal / sec);
 
         final String sTotal = formatSize(bytesTotal) + " von " + formatSize(sizeTotal) + " insgesamt übertragen";
         final String sThrough = formatSize(throughput) + " pro Sekunde";

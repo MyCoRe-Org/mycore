@@ -92,9 +92,8 @@ public class MCREditorSubmission {
 
             if (path.equals(varpath) || path.startsWith(varpath + "/")) {
                 continue;
-            } else {
-                addVariable(path, value);
             }
+            addVariable(path, value);
         }
 
         for (int i = 0; i < submitted.size(); i++) {

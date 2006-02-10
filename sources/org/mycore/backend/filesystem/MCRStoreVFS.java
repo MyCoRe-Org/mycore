@@ -62,7 +62,7 @@ import org.mycore.datamodel.ifs.MCRFileReader;
 public class MCRStoreVFS extends MCRContentStore {
     private String method;
 
-    private String host;
+    //private String host;
 
     private String user;
 
@@ -74,7 +74,7 @@ public class MCRStoreVFS extends MCRContentStore {
 
     private boolean buildSlots;
 
-    private boolean debug;
+    //private boolean debug;
 
     private FileSystemManager fsManager;
 
@@ -136,13 +136,13 @@ public class MCRStoreVFS extends MCRContentStore {
         MCRConfiguration config = MCRConfiguration.instance();
 
         method = config.getString(prefix + "Method");
-        host = config.getString(prefix + "Hostname");
+//        host = config.getString(prefix + "Hostname");
         user = config.getString(prefix + "UserID", "");
         password = config.getString(prefix + "Password", "");
         baseDirectory = config.getString(prefix + "BaseDirectory");
         domain = config.getString(prefix + "Domain", "");
         buildSlots = config.getBoolean(prefix + "buildSlots", false);
-        debug = config.getBoolean(prefix + "Debug", false);
+//        debug = config.getBoolean(prefix + "Debug", false);
 
         try {
             fsManager = VFS.getManager();

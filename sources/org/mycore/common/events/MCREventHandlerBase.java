@@ -277,8 +277,8 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
     }
 
     /** This method does nothing. It is very useful for debugging events. */
-    public void doNothing(MCREvent evt) {
-        logger.debug(getClass().getName() + " does nothing on " + evt.getEventType() + " " + evt.getObjectType());
+    public void doNothing(MCREvent evt, Object obj) {
+        logger.debug(getClass().getName() + " does nothing on " + evt.getEventType() + " " + evt.getObjectType() + " " + obj.getClass().getName());
     }
 
     /**
@@ -291,7 +291,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
      *            the MCRObject that caused the event
      */
     protected void handleObjectCreated(MCREvent evt, MCRObject obj) {
-        doNothing(evt);
+        doNothing(evt, obj);
     }
 
     /**
@@ -304,7 +304,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
      *            the MCRObject that caused the event
      */
     protected void handleObjectUpdated(MCREvent evt, MCRObject obj) {
-        doNothing(evt);
+        doNothing(evt, obj);
     }
 
     /**
@@ -317,7 +317,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
      *            the MCRObject that caused the event
      */
     protected void handleObjectDeleted(MCREvent evt, MCRObject obj) {
-        doNothing(evt);
+        doNothing(evt, obj);
     }
 
     /**
@@ -330,7 +330,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
      *            the MCRObject that caused the event
      */
     protected void handleObjectRepaired(MCREvent evt, MCRObject obj) {
-        doNothing(evt);
+        doNothing(evt, obj);
     }
 
     /**
@@ -343,7 +343,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
      *            the MCRObjectID that caused the event
      */
     protected void handleObjectReceived(MCREvent evt, MCRObjectID objid) {
-        doNothing(evt);
+        doNothing(evt, objid);
     }
 
     /**
@@ -356,7 +356,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
      *            the MCRObjectID that caused the event
      */
     protected void handleObjectExist(MCREvent evt, MCRObjectID objid) {
-        doNothing(evt);
+        doNothing(evt, objid);
     }
 
     /**
@@ -369,7 +369,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
      *            the MCR type that caused the event
      */
     protected void handleObjectListIDs(MCREvent evt, String objtype) {
-        doNothing(evt);
+        doNothing(evt, objtype);
     }
 
     /**
@@ -382,7 +382,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
      *            the MCRDerivate that caused the event
      */
     protected void handleDerivateCreated(MCREvent evt, MCRDerivate der) {
-        doNothing(evt);
+        doNothing(evt, der);
     }
 
     /**
@@ -395,7 +395,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
      *            the MCRDerivate that caused the event
      */
     protected void handleDerivateUpdated(MCREvent evt, MCRDerivate der) {
-        doNothing(evt);
+        doNothing(evt, der);
     }
 
     /**
@@ -408,7 +408,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
      *            the MCRDerivate that caused the event
      */
     protected void handleDerivateDeleted(MCREvent evt, MCRDerivate der) {
-        doNothing(evt);
+        doNothing(evt, der);
     }
 
     /**
@@ -421,7 +421,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
      *            the MCRDerivate that caused the event
      */
     protected void handleDerivateRepaired(MCREvent evt, MCRDerivate der) {
-        doNothing(evt);
+        doNothing(evt, der);
     }
 
     /**
@@ -430,11 +430,11 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
      * 
      * @param evt
      *            the event that occured
-     * @param obj
-     *            the MCRObject that caused the event
+     * @param objid
+     *            the MCRObjectID that caused the event
      */
     protected void handleDerivateReceived(MCREvent evt, MCRObjectID objid) {
-        doNothing(evt);
+        doNothing(evt, objid);
     }
 
     /**
@@ -443,11 +443,11 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
      * 
      * @param evt
      *            the event that occured
-     * @param obj
-     *            the MCRObject that caused the event
+     * @param objid
+     *            the MCRObjectID that caused the event
      */
     protected void handleDerivateExist(MCREvent evt, MCRObjectID objid) {
-        doNothing(evt);
+        doNothing(evt, objid);
     }
 
     /**
@@ -460,7 +460,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
      *            the MCR type that caused the event
      */
     protected void handleDerivateListIDs(MCREvent evt, String objtype) {
-        doNothing(evt);
+        doNothing(evt, objtype);
     }
 
     /**
@@ -473,7 +473,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
      *            the MCRFile that caused the event
      */
     protected void handleFileCreated(MCREvent evt, MCRFile file) {
-        doNothing(evt);
+        doNothing(evt, file);
     }
 
     /**
@@ -486,7 +486,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
      *            the MCRFile that caused the event
      */
     protected void handleFileUpdated(MCREvent evt, MCRFile file) {
-        doNothing(evt);
+        doNothing(evt, file);
     }
 
     /**
@@ -499,7 +499,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
      *            the MCRFile that caused the event
      */
     protected void handleFileDeleted(MCREvent evt, MCRFile file) {
-        doNothing(evt);
+        doNothing(evt, file);
     }
 
     /**
@@ -512,7 +512,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
      *            the MCRObject that caused the event
      */
     protected void undoObjectCreated(MCREvent evt, MCRObject obj) {
-        doNothing(evt);
+        doNothing(evt, obj);
     }
 
     /**
@@ -525,7 +525,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
      *            the MCRObject that caused the event
      */
     protected void undoObjectUpdated(MCREvent evt, MCRObject obj) {
-        doNothing(evt);
+        doNothing(evt, obj);
     }
 
     /**
@@ -538,7 +538,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
      *            the MCRObject that caused the event
      */
     protected void undoObjectDeleted(MCREvent evt, MCRObject obj) {
-        doNothing(evt);
+        doNothing(evt, obj);
     }
 
     /**
@@ -551,7 +551,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
      *            the MCRObject that caused the event
      */
     protected void undoObjectRepaired(MCREvent evt, MCRObject obj) {
-        doNothing(evt);
+        doNothing(evt, obj);
     }
 
     /**
@@ -564,7 +564,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
      *            the MCRObjectID that caused the event
      */
     protected void undoObjectReceived(MCREvent evt, MCRObjectID objid) {
-        doNothing(evt);
+        doNothing(evt, objid);
     }
 
     /**
@@ -577,7 +577,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
      *            the MCRObjectID that caused the event
      */
     protected void undoObjectExist(MCREvent evt, MCRObjectID objid) {
-        doNothing(evt);
+        doNothing(evt, objid);
     }
 
     /**
@@ -586,11 +586,11 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
      * 
      * @param evt
      *            the event that occured
-     * @param objtyle
+     * @param objtype
      *            the MCR type that caused the event
      */
     protected void undoObjectListIDs(MCREvent evt, String objtype) {
-        doNothing(evt);
+        doNothing(evt, objtype);
     }
 
     /**
@@ -603,7 +603,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
      *            the MCRDerivate that caused the event
      */
     protected void undoDerivateCreated(MCREvent evt, MCRDerivate der) {
-        doNothing(evt);
+        doNothing(evt, der);
     }
 
     /**
@@ -616,7 +616,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
      *            the MCRDerivate that caused the event
      */
     protected void undoDerivateUpdated(MCREvent evt, MCRDerivate der) {
-        doNothing(evt);
+        doNothing(evt, der);
     }
 
     /**
@@ -629,7 +629,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
      *            the MCRDerivate that caused the event
      */
     protected void undoDerivateDeleted(MCREvent evt, MCRDerivate der) {
-        doNothing(evt);
+        doNothing(evt, der);
     }
 
     /**
@@ -642,7 +642,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
      *            the MCRDerivate that caused the event
      */
     protected void undoDerivateRepaired(MCREvent evt, MCRDerivate der) {
-        doNothing(evt);
+        doNothing(evt, der);
     }
 
     /**
@@ -655,7 +655,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
      *            the MCRObjectID that caused the event
      */
     protected void undoDerivateReceived(MCREvent evt, MCRObjectID objid) {
-        doNothing(evt);
+        doNothing(evt, objid);
     }
 
     /**
@@ -668,7 +668,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
      *            the MCRObjectID that caused the event
      */
     protected void undoDerivateExist(MCREvent evt, MCRObjectID objid) {
-        doNothing(evt);
+        doNothing(evt, objid);
     }
 
     /**
@@ -681,7 +681,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
      *            the MCR type that caused the event
      */
     protected void undoDerivateListIDs(MCREvent evt, String objtype) {
-        doNothing(evt);
+        doNothing(evt, objtype);
     }
 
     /**
@@ -694,7 +694,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
      *            the MCRFile that caused the event
      */
     protected void undoFileCreated(MCREvent evt, MCRFile file) {
-        doNothing(evt);
+        doNothing(evt, file);
     }
 
     /**
@@ -707,7 +707,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
      *            the MCRFile that caused the event
      */
     protected void undoFileUpdated(MCREvent evt, MCRFile file) {
-        doNothing(evt);
+        doNothing(evt, file);
     }
 
     /**
@@ -720,6 +720,6 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
      *            the MCRFile that caused the event
      */
     protected void undoFileDeleted(MCREvent evt, MCRFile file) {
-        doNothing(evt);
+        doNothing(evt, file);
     }
 }

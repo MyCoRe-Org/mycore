@@ -110,8 +110,10 @@ public abstract class MCRAccessStore {
    
     /**
      * alle Elemente eines Datentypes aufbereiten
-     * @param type
-     * @return
+     * @param type document type
+     * 
+     * @return List of MCRAccessDefinition
+     * @see MCRAccessDefinition
      */
     public List getDefinition(String type) {
         try{

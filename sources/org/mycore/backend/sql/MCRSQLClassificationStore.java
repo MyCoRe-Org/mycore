@@ -269,9 +269,9 @@ public class MCRSQLClassificationStore implements MCRClassificationInterface {
     /**
      * The method remove a MCRCategoryItem from the datastore.
      * 
-     * @param classifID
+     * @param CLID
      *            the ID of the MCRClassificationItem
-     * @param categID
+     * @param ID
      *            the ID of the MCRCategoryItem
      */
     public final void deleteCategoryItem(String CLID, String ID) {

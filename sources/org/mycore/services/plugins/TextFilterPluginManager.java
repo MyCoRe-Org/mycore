@@ -146,7 +146,7 @@ public class TextFilterPluginManager {
     /**
      * returns TextFilterPlugin to corresponding MIME type
      * 
-     * @param supported
+     * @param ct supported
      *            MIME type
      * @return corresponding TextFilterPlugin or null if MIME is emtpy or null
      */
@@ -155,11 +155,11 @@ public class TextFilterPluginManager {
     }
 
     /**
-     * returns true if MIME type is supported
+     * checks whether content type is supported
      * 
-     * @param MIME
+     * @param ct content type
      *            of Inputstream
-     * @return true if MIME type is supported, else false
+     * @return true if content type is supported, else false
      */
     public boolean isSupported(MCRFileContentType ct) {
         return (ct == null) ? false : CONTENT_TYPE_PLUGIN_BAG.containsKey(ct);

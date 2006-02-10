@@ -210,7 +210,6 @@ public class MCRFieldDef {
      * 
      * @param objectType
      *            the type of object
-     * @return
      */
     boolean isUsedForObjectType(String objectType) {
         if (objects == null)

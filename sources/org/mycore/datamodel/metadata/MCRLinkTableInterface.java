@@ -34,11 +34,8 @@ import java.util.Map;
  */
 public interface MCRLinkTableInterface {
 	/**
-	 * The initializer for the class MCRSQLLinkTableStore. It reads the
+	 * initializes the MCRLinkTableInterface implementation. It reads the
 	 * classification configuration and checks the table names.
-	 * 
-	 * @exception throws
-	 *                if the type is not correct
 	 */
 	public void init(String type);
 
@@ -146,7 +143,7 @@ public interface MCRLinkTableInterface {
 	/**
 	 * Returns a List of all link sources of <code>destination</code>
 	 * 
-	 * @param destination
+	 * @param destinations
 	 *            Destination-ID
 	 * @return List of Strings (Source-IDs)
 	 */
@@ -155,7 +152,7 @@ public interface MCRLinkTableInterface {
 	/**
 	 * Returns a List of all link destination of <code>source</code>
 	 * 
-	 * @param source
+	 * @param sources
 	 *            Source-ID
 	 * @return List of Strings (Destination-IDs)
 	 */

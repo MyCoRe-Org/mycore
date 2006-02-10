@@ -70,7 +70,7 @@ public class MCRClassificationEditor {
 	 	   cljdom = MCRClassification.receiveClassificationAsJDOM(clid); 	   
 	 	   categories =cljdom.getRootElement().getChild("categories");
 	 	   
-	 	   if ( !checkUniqueID(categories, newCateg.getAttributeValue("ID"), clid, categid, "create")  ) {
+	 	   if ( !checkUniqueID(newCateg.getAttributeValue("ID"), clid, categid, "create")  ) {
 	 	       return false;
 	 	   }
 	 	   
@@ -99,7 +99,7 @@ public class MCRClassificationEditor {
 	 	   cljdom = MCRClassification.receiveClassificationAsJDOM(clid);
 	 	   categories = cljdom.getRootElement().getChild("categories");
 	 	   
-	 	   if ( !checkUniqueID(categories, newCateg.getAttributeValue("ID"), clid, categid, "modify")  ) {
+	 	   if ( !checkUniqueID(newCateg.getAttributeValue("ID"), clid, categid, "modify")  ) {
 	 	       return false;
 	 	   }	 	   	   
 	 	   //Kategoriedaten setzen
@@ -355,9 +355,8 @@ public class MCRClassificationEditor {
  				  String Scounter = ((Element)children.get(j)).getAttributeValue("counter");
  				  if ( Scounter != null && Integer.parseInt(Scounter)>0 ) { 
  					return false;
- 				  }  else	{	  
- 			        children.remove(j);		     
- 				  }				   
+ 				  }	  
+                  children.remove(j);		     
  			   } else if ( "up".equalsIgnoreCase(todo) ||  "down".equalsIgnoreCase(todo) ) {
  				   // im Baum nach oben/unten verschieben			   
  				   int k = j-1;
@@ -448,7 +447,7 @@ public class MCRClassificationEditor {
  	   return Edest;
     }
     
-    private boolean checkUniqueID(Element category, String newID, String clid, String oldcategid, String todo ) {
+    private boolean checkUniqueID(String newID, String clid, String oldcategid, String todo ) {
  	   boolean bret=false;
  	   if ( "modify".equalsIgnoreCase(todo) && oldcategid.equalsIgnoreCase(newID)) {
  		   // update mit gleicher categID ist OK

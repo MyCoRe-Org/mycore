@@ -102,7 +102,7 @@ public class MCRURIResolver implements javax.xml.transform.URIResolver, EntityRe
      */
     public static synchronized void init(ServletContext ctx, String webAppBase) {
         context = ctx;
-        base = webAppBase;
+        LOGGER.debug("parameter webAppBase ("+webAppBase+") will not be used"); //FIXME: use webAppBase or remove it
     }
 
     private static MCRURIResolver singleton = null;
@@ -119,8 +119,6 @@ public class MCRURIResolver implements javax.xml.transform.URIResolver, EntityRe
     }
 
     private static ServletContext context;
-
-    private static String base;
 
     /** A cache of parsed XML files * */
     private MCRCache fileCache;

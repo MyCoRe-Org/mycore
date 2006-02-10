@@ -101,7 +101,7 @@ public class MCRUser extends MCRUserObject implements MCRPrincipal, Principal {
      * other attributes the default constructor is invoked. This constructor is
      * used by the access control system.
      * 
-     * @param ID
+     * @param id
      *            the named user ID
      */
     public MCRUser(String id) {

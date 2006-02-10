@@ -159,7 +159,6 @@ public class MCRHit {
      *            the first hit from the first searcher
      * @param b
      *            the other hit from the other searcher
-     * @return
      */
     static MCRHit merge(MCRHit a, MCRHit b) {
         // If there is nothing to merge, return existing hit

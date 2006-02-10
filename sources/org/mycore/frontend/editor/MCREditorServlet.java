@@ -121,10 +121,6 @@ public class MCREditorServlet extends MCRServlet {
         sendXML(res, editor.getDocument());
     }
 
-    /**
-     * @param res
-     * @param editor
-     */
     private void sendXML(HttpServletResponse res, Document doc) throws IOException {
         res.setContentType("text/xml");
 
@@ -333,7 +329,7 @@ public class MCREditorServlet extends MCRServlet {
             variables.add(new MCREditorVariable(name, value));
         }
 
-        sendToSubSelect(req, res, parms, variables, root);
+        sendToSubSelect(res, parms, variables, root);
     }
 
     private void processSubmit(HttpServletRequest req, HttpServletResponse res, MCRRequestParameters parms) throws ServletException, java.io.IOException {
@@ -503,13 +499,13 @@ public class MCREditorServlet extends MCRServlet {
         } else if (targetType.equals("url")) {
             sendToURL(req, res);
         } else if (targetType.equals("debug")) {
-            sendToDebug(req, res, sub);
+            sendToDebug(res, sub);
         } else if (targetType.equals("display")) {
             sendToDisplay(req, res, sub.getXML());
         } else if (targetType.equals("subselect")) {
             List variables = sub.getVariables();
             String root = sub.getXML().getRootElement().getName();
-            sendToSubSelect(req, res, parms, variables, root);
+            sendToSubSelect(res, parms, variables, root);
         } else {
             logger.debug("Unknown targettype");
         }
@@ -552,7 +548,7 @@ public class MCREditorServlet extends MCRServlet {
         rd.forward(req, res);
     }
 
-    private void sendToSubSelect(HttpServletRequest req, HttpServletResponse res, MCRRequestParameters parms, List variables, String root) throws IOException {
+    private void sendToSubSelect(HttpServletResponse res, MCRRequestParameters parms, List variables, String root) throws IOException {
         String webpage = parms.getParameter("subselect.webpage");
         String varpath = parms.getParameter("subselect.varpath");
         String sessionID = parms.getParameter("subselect.session");
@@ -575,7 +571,7 @@ public class MCREditorServlet extends MCRServlet {
         res.sendRedirect(res.encodeRedirectURL(sb.toString()));
     }
 
-    private void sendToDebug(HttpServletRequest req, HttpServletResponse res, MCREditorSubmission sub) throws IOException, UnsupportedEncodingException {
+    private void sendToDebug(HttpServletResponse res, MCREditorSubmission sub) throws IOException, UnsupportedEncodingException {
         res.setContentType("text/html; charset=UTF-8");
 
         PrintWriter pw = res.getWriter();

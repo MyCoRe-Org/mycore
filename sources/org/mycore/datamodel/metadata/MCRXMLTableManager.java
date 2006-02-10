@@ -88,8 +88,6 @@ public class MCRXMLTableManager {
      * 
      * @param type
      *            the table type
-     * @exception if
-     *                the store for the given type could not find or loaded.
      */
     private MCRXMLTableInterface getXMLTable(String type) {
         if ((type == null) || (type.length() == 0)) {
@@ -113,7 +111,7 @@ public class MCRXMLTableManager {
      * @param xml
      *            a JDOM Document
      * 
-     * @exception if
+     * @exception MCRException if
      *                the method arguments are not correct
      */
     public void create(MCRObjectID mcrid, org.jdom.Document xml) throws MCRException {
@@ -129,7 +127,7 @@ public class MCRXMLTableManager {
      * @param xml
      *            a byte array with the XML file
      * 
-     * @exception if
+     * @exception MCRException if
      *                the method arguments are not correct
      */
     public void create(MCRObjectID mcrid, byte[] xml) throws MCRException {
@@ -142,7 +140,7 @@ public class MCRXMLTableManager {
      * @param mcrid
      *            a MCRObjectID
      * 
-     * @exception if
+     * @exception MCRException if
      *                the method argument is not correct
      */
     public void delete(MCRObjectID mcrid) throws MCRException {
@@ -158,7 +156,7 @@ public class MCRXMLTableManager {
      * @param xml
      *            a byte array with the XML file
      * 
-     * @exception if
+     * @exception MCRException if
      *                the method arguments are not correct
      */
     public void update(MCRObjectID mcrid, org.jdom.Document xml) throws MCRException {
@@ -174,7 +172,7 @@ public class MCRXMLTableManager {
      * @param xml
      *            a byte array with the XML file
      * 
-     * @exception if
+     * @exception MCRException if
      *                the method arguments are not correct
      */
     public void update(MCRObjectID mcrid, byte[] xml) throws MCRException {
@@ -190,7 +188,7 @@ public class MCRXMLTableManager {
      *            a MCRObjectID
      * 
      * @return the byte array of data or NULL
-     * @exception if
+     * @exception MCRException if
      *                the method arguments are not correct
      */
     public byte[] retrieve(MCRObjectID mcrid) throws MCRException {
@@ -203,9 +201,9 @@ public class MCRXMLTableManager {
      * remembering the highest ID ever returned and comparing it with the
      * highest ID stored in the related index class.
      * 
-     * @param project_ID
+     * @param idproject
      *            the project ID part of the MCRObjectID base
-     * @param type_ID
+     * @param idtype
      *            the type ID part of the MCRObjectID base
      * 
      * @exception MCRPersistenceException

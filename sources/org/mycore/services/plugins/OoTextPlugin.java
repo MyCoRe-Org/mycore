@@ -136,9 +136,8 @@ public class OoTextPlugin implements TextFilterPlugin {
             } catch (IOException e) {
                 throw new FilterPluginTransformException("Error while parsing OpenOffice document.", e);
             }
-        } else {
-            throw new FilterPluginTransformException("ContentType " + ct + " is not supported by " + getName() + "!");
         }
+        throw new FilterPluginTransformException("ContentType " + ct + " is not supported by " + getName() + "!");
     }
 
     /**
@@ -231,15 +230,14 @@ public class OoTextPlugin implements TextFilterPlugin {
         public int read(char[] cbuf, int off, int len) {
             if (pos == buf.length()) {
                 return -1;
-            } else {
-                int start = pos + off;
-                int charsRead = (buf.length() < (start + len)) ? (buf.length() - start) : len;
-                int end = start + charsRead;
-                buf.getChars(start, end, cbuf, 0);
-                pos = end;
-
-                return charsRead;
             }
+            int start = pos + off;
+            int charsRead = (buf.length() < (start + len)) ? (buf.length() - start) : len;
+            int end = start + charsRead;
+            buf.getChars(start, end, cbuf, 0);
+            pos = end;
+
+            return charsRead;
         }
     }
 

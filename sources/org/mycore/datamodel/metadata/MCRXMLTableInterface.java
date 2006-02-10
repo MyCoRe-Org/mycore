@@ -40,7 +40,7 @@ public interface MCRXMLTableInterface {
      * 
      * @param type
      *            the type String of the MCRObjectID
-     * @exception throws
+     * @exception MCRPersistenceException throws
      *                if the type is not correct
      */
     public void init(String type) throws MCRPersistenceException;
@@ -54,7 +54,7 @@ public interface MCRXMLTableInterface {
      *            a byte array with the XML file
      * @param version
      *            the version number as integer
-     * @exception if
+     * @exception MCRPersistenceException if
      *                the method arguments are not correct
      */
     public void create(MCRObjectID mcrid, byte[] xml, int version) throws MCRPersistenceException;
@@ -66,7 +66,7 @@ public interface MCRXMLTableInterface {
      *            a MCRObjectID
      * @param version
      *            the version number as integer
-     * @exception if
+     * @exception MCRPersistenceException if
      *                the method argument is not correct
      */
     public void delete(MCRObjectID mcrid, int version) throws MCRPersistenceException;
@@ -80,7 +80,7 @@ public interface MCRXMLTableInterface {
      *            a byte array with the XML file
      * @param version
      *            the version number as integer
-     * @exception if
+     * @exception MCRPersistenceException if
      *                the method arguments are not correct
      */
     public void update(MCRObjectID mcrid, byte[] xml, int version) throws MCRPersistenceException;
@@ -93,7 +93,7 @@ public interface MCRXMLTableInterface {
      *            a MCRObjectID
      * @param version
      *            the version number as integer
-     * @exception if
+     * @exception MCRPersistenceException if
      *                the method arguments are not correct
      */
     public byte[] retrieve(MCRObjectID mcrid, int version) throws MCRPersistenceException;
@@ -104,9 +104,9 @@ public interface MCRXMLTableInterface {
      * remembering the highest ID ever returned and comparing it with the
      * highest ID stored in the related index class.
      * 
-     * @param project_ID
+     * @param project
      *            the project ID part of the MCRObjectID base
-     * @param type_ID
+     * @param type
      *            the type ID part of the MCRObjectID base
      * 
      * @exception MCRPersistenceException

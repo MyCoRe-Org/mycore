@@ -213,9 +213,8 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
     protected MCRContentStore getContentStore() {
         if (storeID.length() == 0) {
             return null;
-        } else {
-            return MCRContentStoreFactory.getStore(storeID);
         }
+        return MCRContentStoreFactory.getStore(storeID);
     }
 
     /**
@@ -494,9 +493,8 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
 
         if (storeID.length() == 0) {
             return false;
-        } else {
-            return MCRContentStoreFactory.providesAudioVideoExtender(storeID);
         }
+        return MCRContentStoreFactory.providesAudioVideoExtender(storeID);
     }
 
     /**

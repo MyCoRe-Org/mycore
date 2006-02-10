@@ -130,10 +130,9 @@ public abstract class MCRAudioVideoExtender {
         if (bitRate > (1024 * 1024)) {
             double b = Math.round(bitRate / 10485.76) / 100.0;
             return new DecimalFormat("##0.##").format(b) + " MBit";
-        } else {
-            double b = Math.round(bitRate / 102.4) / 10.0;
-            return new DecimalFormat("##0.#").format(b) + " kBit";
         }
+        double b = Math.round(bitRate / 102.4) / 10.0;
+        return new DecimalFormat("##0.#").format(b) + " kBit";
     }
 
     /**

@@ -55,8 +55,6 @@ public class MCRUploadHandlerMyCoRe extends MCRUploadHandler {
 
     private String derId;
 
-    private String mode;
-
     /**
      * Creates MCRUploadHandler for MyCoRe
      * 
@@ -77,17 +75,17 @@ public class MCRUploadHandlerMyCoRe extends MCRUploadHandler {
         logger.debug("MCRUploadHandlerMyCoRe DocID: " + docId + " DerId: " + derId + " Mode: " + mode);
 
         try {
-            MCRObjectID oid = new MCRObjectID(docId);
+            new MCRObjectID(docId);
             this.docId = docId;
         } catch (Exception e) {
+            logger.debug("Error while creating MCRObjectID.",e);
         }
 
         try {
-            MCRObjectID did = new MCRObjectID(derId);
+            new MCRObjectID(derId);
             this.derId = derId;
-            this.mode = mode;
         } catch (Exception e) {
-            this.mode = "create";
+            logger.debug("Error while creating MCRObjectID.",e);
         }
     }
 

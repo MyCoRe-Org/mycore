@@ -190,7 +190,7 @@ public final class MCRObjectID {
     /**
      * This method set a new number in a existing MCRObjectID.
      * 
-     * @param number
+     * @param num
      *            the new number
      */
     public final boolean setNumber(int num) {
@@ -439,9 +439,8 @@ public final class MCRObjectID {
     public boolean equals(Object in) {
         if (!(in instanceof MCRObjectID)) {
             return false;
-        } else {
-            return equals((MCRObjectID) in);
         }
+        return equals((MCRObjectID) in);
     }
 
     /**

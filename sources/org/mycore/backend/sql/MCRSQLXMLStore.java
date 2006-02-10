@@ -68,7 +68,7 @@ public class MCRSQLXMLStore implements MCRXMLTableInterface {
      * 
      * @param type
      *            the type String of the MCRObjectID
-     * @exception throws
+     * @exception MCRPersistenceException
      *                if the type is not correct
      */
     public final void init(String type) throws MCRPersistenceException {
@@ -121,7 +121,7 @@ public class MCRSQLXMLStore implements MCRXMLTableInterface {
      *            a byte array with the XML file
      * @param version
      *            the version of the XML Blob as integer
-     * @exception if
+     * @exception MCRPersistenceException if
      *                the method arguments are not correct
      */
     public synchronized final void create(MCRObjectID mcrid, byte[] xml, int version) throws MCRPersistenceException {
@@ -169,7 +169,7 @@ public class MCRSQLXMLStore implements MCRXMLTableInterface {
      *            a MCRObjectID
      * @param version
      *            the version of the XML Blob as integer
-     * @exception if
+     * @exception MCRPersistenceException if
      *                the method argument is not correct
      */
     public synchronized final void delete(MCRObjectID mcrid, int version) throws MCRPersistenceException {
@@ -213,7 +213,7 @@ public class MCRSQLXMLStore implements MCRXMLTableInterface {
      *            a byte array with the XML file
      * @param version
      *            the version of the XML Blob as integer
-     * @exception if
+     * @exception MCRPersistenceException if
      *                the method arguments are not correct
      */
     public synchronized final void update(MCRObjectID mcrid, byte[] xml, int version) throws MCRPersistenceException {
@@ -265,7 +265,7 @@ public class MCRSQLXMLStore implements MCRXMLTableInterface {
      * @param version
      *            the version of the XML Blob as integer
      * @return the XML-File as byte array or null
-     * @exception if
+     * @exception MCRPersistenceException if
      *                the method arguments are not correct
      */
     public final byte[] retrieve(MCRObjectID mcrid, int version) throws MCRPersistenceException {
@@ -305,9 +305,9 @@ public class MCRSQLXMLStore implements MCRXMLTableInterface {
      * remembering the highest ID ever returned and comparing it with the
      * highest ID stored in the related index class.
      * 
-     * @param project_ID
+     * @param project
      *            the project ID part of the MCRObjectID base
-     * @param type_ID
+     * @param type
      *            the type ID part of the MCRObjectID base
      * 
      * @exception MCRPersistenceException

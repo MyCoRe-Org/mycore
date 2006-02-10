@@ -122,11 +122,10 @@ public class MCRCategoryItem extends MCRClassificationObject {
     public MCRCategoryItem getParent() {
         ensureNotDeleted();
 
-        if (parentID != null) {
-            return getCategoryItem(classifID, parentID);
-        } else {
+        if (parentID == null) {
             return null;
         }
+        return getCategoryItem(classifID, parentID);
     }
 
     public String getParentID() {

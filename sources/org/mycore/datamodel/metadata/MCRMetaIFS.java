@@ -74,6 +74,7 @@ final public class MCRMetaIFS extends MCRMetaDefault implements MCRMetaInterface
      */
     public MCRMetaIFS(String set_datapart, String set_subtag, String default_lang, String set_sourcepath) throws MCRException {
         super(set_datapart, set_subtag, "en", "", 0);
+        LOGGER.debug("default_lang ("+default_lang+") will never used."); //FIXME: use default_lang or remove it
         setSourcePath(set_sourcepath);
         maindoc = "";
         ifsid = "";
@@ -139,7 +140,7 @@ final public class MCRMetaIFS extends MCRMetaDefault implements MCRMetaInterface
     /**
      * This method set the value of derivate IFS ID.
      * 
-     * @param set_maindoc
+     * @param set_ifsid
      *            the derivate IFS ID
      */
     public final void setIFSID(String set_ifsid) {

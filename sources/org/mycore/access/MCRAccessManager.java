@@ -53,9 +53,11 @@ public class MCRAccessManager {
      *            the access permission for the rule
      * @param rule
      *            the access rule
+     * @param description
+     *            description for the given access rule, e.g. "allows public access"
      * @throws MCRException
      *             if an errow was occured
-     * @see MCRAccessInterface#addRule(String, String, org.jdom.Element)
+     * @see MCRAccessInterface#addRule(String, String, org.jdom.Element, String)
      */
     public static void addRule(MCRObjectID id, String permission, org.jdom.Element rule, String description) throws MCRException {
         getAccessImpl().addRule(id.getId(), permission, rule, description);
@@ -98,9 +100,11 @@ public class MCRAccessManager {
      *            the access permission for the rule
      * @param rule
      *            the access rule
+     * @param description
+     *            description for the given access rule, e.g. "allows public access"
      * @throws MCRException
      *             if an errow was occured
-     * @see MCRAccessInterface#updateRule(String, String, Element)
+     * @see MCRAccessInterface#updateRule(String, String, Element, String)
      */
     public static void updateRule(MCRObjectID id, String permission, org.jdom.Element rule, String description) throws MCRException {
         getAccessImpl().updateRule(id.getId(), permission, rule, description);

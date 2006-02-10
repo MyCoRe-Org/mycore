@@ -39,7 +39,7 @@ import java.io.File;
  * 
  * @author Anja Schaar
  * 
- * @see org.mycore.frontend.servlets.MCRClassificationBrowseData
+ * @see org.mycore.datamodel.classifications.MCRClassificationBrowserData
  */
 public class MCRClassificationBrowser extends MCRServlet {
     /**

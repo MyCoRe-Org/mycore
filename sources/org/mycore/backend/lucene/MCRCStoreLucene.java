@@ -105,7 +105,7 @@ public class MCRCStoreLucene extends MCRCStoreLocalFilesystem implements MCRText
      * 
      * </pre>
      * 
-     * @param doctext
+     * @param docTextQuery
      *            query
      * @return Array of DerivateIDs
      */
@@ -435,7 +435,7 @@ public class MCRCStoreLucene extends MCRCStoreLocalFilesystem implements MCRText
      * 
      * @param fieldName
      * @param query
-     * @return
+     * @return a set of search results that matches the biggest subquery of query
      */
     private HashSet getUniqueFieldValues(String fieldName, String query) {
         HashSet collector = new HashSet();

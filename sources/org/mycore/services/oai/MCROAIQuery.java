@@ -48,7 +48,6 @@ public interface MCROAIQuery {
      * Method listSets. Gets a list of classificationId's and Labels for a given
      * ID
      * 
-     * @param classificationId
      * @param instance
      *            the Servletinstance
      * @return List A list that contains an array of three Strings: the category

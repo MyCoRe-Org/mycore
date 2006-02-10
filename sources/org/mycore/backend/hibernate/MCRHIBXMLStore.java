@@ -24,10 +24,8 @@
 package org.mycore.backend.hibernate;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.hibernate.Session;
@@ -244,9 +242,8 @@ public class MCRHIBXMLStore implements MCRXMLTableInterface {
           	if (max == null) return 1;
           	return new
 	          MCRObjectID(max).getNumberAsInteger() + 1;
-          } else {
-          	return 1;
           }
+          return 1;
     }
 
     /**

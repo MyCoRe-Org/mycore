@@ -262,10 +262,10 @@ public class MCRClassificationBrowserData
   }
 
   public MCRNavigTreeLine getLine( int i )  {
-    if( i >= lines.size() )
+    if( i >= lines.size() ){
       return null;
-    else
-      return (MCRNavigTreeLine)( lines.elementAt( i ) );
+    }
+    return (MCRNavigTreeLine)( lines.elementAt( i ) );
   }
 
   public org.jdom.Document loadTreeIntoSite(org.jdom.Document cover,
@@ -545,7 +545,7 @@ public class MCRClassificationBrowserData
 
 	  		if ( activelevel == level ) {
 				if (aktText.compareTo(sText) > 0 ) {
-					changeRows(xDoc, aktRow, child);
+					changeRows(aktRow, child);
 					boolean bjumpOverChilds=true;
 					while ( bjumpOverChilds && j < children.size()-1 )
 					{
@@ -573,7 +573,7 @@ public class MCRClassificationBrowserData
 	  	return  xDoc;
 	  }
 
-  private void changeRows(Element xDoc, Element aktRow, Element child ){
+  private void changeRows(Element aktRow, Element child ){
 
 		Element col1 = (Element)( child.getChildren().get(0) );
 		Element col2 = (Element)( child.getChildren().get(1) );

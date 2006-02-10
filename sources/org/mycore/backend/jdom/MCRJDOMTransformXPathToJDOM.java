@@ -106,7 +106,7 @@ public class MCRJDOMTransformXPathToJDOM implements MCRMetaSearchInterface {
         }
 
         long t2 = System.currentTimeMillis();
-        double diff = (double) (t2 - t1) / 1000.0;
+        double diff = (t2 - t1) / 1000.0;
         logger.debug("Prepare stylesheet in " + diff + " sec");
 
         // execute the query
@@ -133,7 +133,7 @@ public class MCRJDOMTransformXPathToJDOM implements MCRMetaSearchInterface {
         }
 
         long t3 = System.currentTimeMillis();
-        diff = (double) (t3 - t2) / 1000.0;
+        diff = (t3 - t2) / 1000.0;
         logger.debug("Executed the XALAN transformation in " + diff + " s");
 
         return idmeta;
@@ -210,7 +210,7 @@ public class MCRJDOMTransformXPathToJDOM implements MCRMetaSearchInterface {
     /**
      * This is a private routine they trace one condition.
      * 
-     * @param onecond
+     * @param condstr
      * one single condition @ return the transfromed query for XSLT.
      */
     private final String traceOneCondition(String condstr) {

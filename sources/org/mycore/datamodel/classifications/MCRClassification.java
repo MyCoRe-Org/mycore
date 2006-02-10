@@ -334,7 +334,6 @@ public class MCRClassification {
 	 *            document in MyCoRe XML view of a classification
 	 * @param keepIDs
 	 *            IDs that should be kept
-	 * @return
 	 */
 	private static final Document rakeDocument(Document oldDoc, Set keepIDs) {
 		Document raked = (Document) oldDoc.clone();
@@ -485,7 +484,6 @@ public class MCRClassification {
 	 *            new Classification
 	 * @param removedIDs
 	 *            Set to gather if IDs are available in newClass
-	 * @return
 	 */
 	private final Set diff(Document oldClass, Document newClass, Set removedIDs) {
 		Set markedIDs = new HashSet();
@@ -567,7 +565,7 @@ public class MCRClassification {
 	 * @param children
 	 *            a list with elements to hash
 	 * @return a Hashtable with hashed elements of children
-	 * @see #getHashedIDs(Element, Hashtable);
+	 * @see #getHashedIDs(Element, Hashtable)
 	 */
 	private final Map hashIDs(List children) {
 		Hashtable returns = new Hashtable(children.size());
@@ -793,7 +791,7 @@ public class MCRClassification {
 	/**
 	 * The method return the classification as JDOM tree.
 	 * 
-	 * @param ID
+	 * @param classID
 	 *            the classification ID to delete
 	 * @return the classification as JDOM
 	 */
@@ -971,9 +969,8 @@ public class MCRClassification {
 
 		if (cat) {
 			return receiveCategoryAsJDOM(classname, categname);
-		} else {
-			return receiveClassificationAsJDOM(classname);
 		}
+		return receiveClassificationAsJDOM(classname);
 	}
 
 	/**

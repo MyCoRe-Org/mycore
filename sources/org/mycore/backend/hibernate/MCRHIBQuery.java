@@ -29,7 +29,6 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.jdom.Element;
-import org.mycore.common.MCRConfiguration;
 import org.mycore.parsers.bool.MCRCondition;
 import org.mycore.parsers.bool.MCRConditionVisitor;
 import org.mycore.services.fieldquery.MCRQueryCondition;
@@ -107,9 +106,9 @@ public class MCRHIBQuery implements MCRConditionVisitor {
     }
 
     /**
-     * returns the object (reference on Hibernate mapping class)
+     * returns the query object (reference on Hibernate mapping class)
      * 
-     * @return
+     * @return reference on Hibernate mapping class
      */
     public Object getQueryObject() {
         return queryobject;

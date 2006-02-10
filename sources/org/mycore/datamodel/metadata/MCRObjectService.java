@@ -93,7 +93,7 @@ public class MCRObjectService {
      * This methode read the XML input stream part from a DOM part for the
      * structure data of the document.
      * 
-     * @param dom_element_list
+     * @param service_element
      *            a list of relevant DOM elements for the metadata
      */
     public final void setFromDOM(org.jdom.Element service_element) {
@@ -180,10 +180,10 @@ public class MCRObjectService {
      */
     public final Date getDate(String type) {
     	MCRMetaISO8601Date isoDate = getISO8601Date(type);
-    	if(isoDate != null)
-    		return isoDate.getDate();
-    	else
-    		return null;
+    	if(isoDate == null){
+        	return null;
+    	}
+		return isoDate.getDate();
     }
     
     private final MCRMetaISO8601Date getISO8601Date(String type){
@@ -242,8 +242,6 @@ public class MCRObjectService {
      * This methode set a date element in the dates list to a given date value.
      * If the given type exists, the date was update.
      * 
-     * @param type
-     *            the type of the date
      * @param date
      *            set time to this Calendar
      */
@@ -551,9 +549,6 @@ public class MCRObjectService {
      * 
      * @param value
      *            the value of a flag as string
-     * @param type
-     *            the permission if an ip as string
-     * 
      */
     public final int getFlagIndex(String value) {
         if ((value == null) || ((value = value.trim()).length() == 0)) {

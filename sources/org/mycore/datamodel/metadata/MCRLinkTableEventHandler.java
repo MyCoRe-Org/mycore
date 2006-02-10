@@ -46,7 +46,6 @@ public class MCRLinkTableEventHandler extends MCREventHandlerBase {
      *            the event that occured
      * @param obj
      *            the MCRObject that caused the event
-     * @throws MCRActiveLinkException
      */
     protected final void handleObjectCreated(MCREvent evt, MCRObject obj) {
         handleObjectDeleted(evt, obj);

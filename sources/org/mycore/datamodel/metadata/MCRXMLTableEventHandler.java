@@ -45,7 +45,6 @@ public class MCRXMLTableEventHandler extends MCREventHandlerBase {
      *            the event that occured
      * @param obj
      *            the MCRObject that caused the event
-     * @throws MCRActiveLinkException
      */
     protected final void handleObjectCreated(MCREvent evt, MCRObject obj) {
         org.jdom.Document doc = obj.createXML();
@@ -130,9 +129,8 @@ public class MCRXMLTableEventHandler extends MCREventHandlerBase {
      * 
      * @param evt
      *            the event that occured
-     * @param obj
-     *            the MCRObject that caused the event
-     * @throws MCRActiveLinkException
+     * @param der
+     *            the MCRDerivate that caused the event
      */
     protected final void handleDerivateCreated(MCREvent evt, MCRDerivate der) {
         org.jdom.Document doc = der.createXML();
@@ -145,7 +143,7 @@ public class MCRXMLTableEventHandler extends MCREventHandlerBase {
      * 
      * @param evt
      *            the event that occured
-     * @param obj
+     * @param der
      *            the MCRObject that caused the event
      */
     protected final void handleDerivateUpdated(MCREvent evt, MCRDerivate der) {
@@ -159,7 +157,7 @@ public class MCRXMLTableEventHandler extends MCREventHandlerBase {
      * 
      * @param evt
      *            the event that occured
-     * @param obj
+     * @param der
      *            the MCRObject that caused the event
      */
     protected final void handleDerivateDeleted(MCREvent evt, MCRDerivate der) {

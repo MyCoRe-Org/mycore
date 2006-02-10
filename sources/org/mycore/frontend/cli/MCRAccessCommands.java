@@ -142,7 +142,7 @@ public class MCRAccessCommands extends MCRAbstractCommands {
      * 
      * @param filename 
      *            the filename of the file that contains the mcrpermissions
-     * @see same as updatePermissionsFromFile            
+     * @see #updatePermissionsFromFile(String)            
      */
     public static void loadPermissionsFromFile(String filename) throws Exception {
     	updatePermissionsFromFile(filename);
@@ -161,10 +161,7 @@ public class MCRAccessCommands extends MCRAbstractCommands {
     }
     
     /**
-     * This method deletes the old permissions (if given any) 
-     * 
-     * @param filename 
-     *            the filename of the file that contains the mcrpermissions
+     * deletes all permissions 
      */
     public static void deleteAllPermissions() throws Exception {
     	MCRAccessInterface AI = MCRAccessManager.getAccessImpl();

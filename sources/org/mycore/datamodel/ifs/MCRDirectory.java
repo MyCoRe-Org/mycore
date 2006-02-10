@@ -255,7 +255,7 @@ public class MCRDirectory extends MCRFilesystemNode {
      * Returns the direct child of this directory at the given position in the
      * natural order of the children
      * 
-     * @param the
+     * @param index the
      *            index of the child in the list of children
      */
     public MCRFilesystemNode getChild(int index) {
@@ -263,9 +263,8 @@ public class MCRDirectory extends MCRFilesystemNode {
 
         if (childrenIDs == null) {
             return getChildren()[index];
-        } else {
-            return manager.retrieveNode((String) (childrenIDs.get(index)));
         }
+        return manager.retrieveNode((String) (childrenIDs.get(index)));
     }
 
     /**
@@ -311,9 +310,8 @@ public class MCRDirectory extends MCRFilesystemNode {
 
             if (path.equals("/")) {
                 return base;
-            } else {
-                path = path.substring(1);
             }
+            path = path.substring(1);
         }
 
         int index = path.indexOf("/");
@@ -392,16 +390,15 @@ public class MCRDirectory extends MCRFilesystemNode {
             } else {
                 return 0;
             }
+        }
+        if (nodetype == FILES) {
+            return this.numChildFilesHere;
+        } else if (nodetype == DIRECTORIES) {
+            return this.numChildDirsHere;
+        } else if (nodetype == (DIRECTORIES + FILES)) {
+            return this.numChildDirsHere + this.numChildFilesHere;
         } else {
-            if (nodetype == FILES) {
-                return this.numChildFilesHere;
-            } else if (nodetype == DIRECTORIES) {
-                return this.numChildDirsHere;
-            } else if (nodetype == (DIRECTORIES + FILES)) {
-                return this.numChildDirsHere + this.numChildFilesHere;
-            } else {
-                return 0;
-            }
+            return 0;
         }
     }
 

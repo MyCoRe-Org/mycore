@@ -79,9 +79,6 @@ public class MCRBuildLuceneQuery {
     /**
      * Build Lucene Query from XML
      * 
-     * @param query
-     *            as xml
-     * 
      * @return Lucene Query
      * 
      */
@@ -162,9 +159,8 @@ public class MCRBuildLuceneQuery {
 
             if (null != bq) {
                 return bq;
-            } else {
-                return tq;
             }
+            return tq;
         } else if ("text".equals(fieldtype) && "like".equals(operator)) {
             Term te;
             value = fixQuery(value);

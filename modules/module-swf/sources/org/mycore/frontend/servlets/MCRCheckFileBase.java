@@ -134,9 +134,8 @@ abstract public class MCRCheckFileBase extends MCRCheckBase {
                         fname = fname.substring(j, l);
 
                         break;
-                    } else {
-                        j = k + 1;
                     }
+                    j = k + 1;
                 } else {
                     j = k + 1;
                 }

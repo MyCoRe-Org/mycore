@@ -166,9 +166,8 @@ public class MCRSQLRuleStore extends MCRRuleStore {
                 } catch (Exception e) {
                     throw new MCRException("Rule " + ruleid + " can't be parsed", e);
                 }
-            } else {
-                return rule;
             }
+            return rule;
         } catch (Exception e) {
             logger.error(e);
         } finally {

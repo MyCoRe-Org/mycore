@@ -29,8 +29,6 @@ import javax.servlet.ServletException;
 import org.apache.log4j.Logger;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
-import org.mycore.common.MCRSession;
-import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.xml.MCRXMLContainer;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.MCRXMLTableManager;
@@ -102,8 +100,6 @@ public class MCRObjectServlet extends MCRServlet {
         }
 
         // call the LayoutServlet
-        MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
-        String lang = mcrSession.getCurrentLanguage();
 
         if (getProperty(job.getRequest(), "XSL.Style") == null) {
             job.getRequest().setAttribute("XSL.Style", "html");

@@ -93,11 +93,11 @@ public class MCRXMLDBTransformXPathToeXist implements MCRMetaSearchInterface {
         }
 
         if (database.equals("exist") && (query.length() != 0)) {
-            newquery = handleQueryStringExist(root, query, type);
+            newquery = handleQueryStringExist(root, query);
         }
 
         if (database.equals("tamino") && (query.length() != 0)) {
-            newquery = handleQueryStringTamino(root, query, type);
+            newquery = handleQueryStringTamino(root, query);
         }
 
         logger.debug("Transformed query : " + newquery);
@@ -133,7 +133,7 @@ public class MCRXMLDBTransformXPathToeXist implements MCRMetaSearchInterface {
     /**
      * Handle query string for exist
      */
-    private String handleQueryStringExist(String root, String query, String type) {
+    private String handleQueryStringExist(String root, String query) {
         // Normalize the contains operation values
         int i = query.length();
         int j = 0;
@@ -250,7 +250,7 @@ public class MCRXMLDBTransformXPathToeXist implements MCRMetaSearchInterface {
     /**
      * Handle query string for Tamino
      */
-    private String handleQueryStringTamino(String root, String query, String type) {
+    private String handleQueryStringTamino(String root, String query) {
         query = MCRUtils.replaceString(query, "#####", "");
         query = MCRUtils.replaceString(query, "like", "~="); // 030919
         query = MCRUtils.replaceString(query, ")", "");

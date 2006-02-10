@@ -105,9 +105,8 @@ public class PlainTextPlugin implements TextFilterPlugin {
     public Reader transform(MCRFileContentType ct, InputStream input) throws FilterPluginTransformException {
         if (getSupportedContentTypes().contains(ct)) {
             return new InputStreamReader(input);
-        } else {
-            throw new FilterPluginTransformException("ContentType " + ct + " is not supported by " + getName() + "!");
         }
+        throw new FilterPluginTransformException("ContentType " + ct + " is not supported by " + getName() + "!");
     }
 
     /**

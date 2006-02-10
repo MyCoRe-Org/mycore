@@ -63,8 +63,6 @@ public class MCRUserAdminServlet extends MCRUserAdminGUICommons {
      *            The MCRServletJob instance
      * @throws IOException
      *             for java I/O errors.
-     * @throws ServletException
-     *             for errors from the servlet engine.
      */
     public void doGetPost(MCRServletJob job) throws IOException {
         MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
@@ -99,8 +97,6 @@ public class MCRUserAdminServlet extends MCRUserAdminGUICommons {
      *            The MCRServletJob instance
      * @throws IOException
      *             for java I/O errors.
-     * @throws ServletException
-     *             for errors from the servlet engine.
      */
     private void createUser(MCRServletJob job, ArrayList currentPrivs) throws IOException {
         // We first check the privileges for this use case
@@ -130,8 +126,6 @@ public class MCRUserAdminServlet extends MCRUserAdminGUICommons {
      *            The MCRServletJob instance
      * @throws IOException
      *             for java I/O errors.
-     * @throws ServletException
-     *             for errors from the servlet engine.
      */
     private void listallUser(MCRServletJob job, ArrayList currentPrivs) throws IOException {
         // We first check the privileges for this use case

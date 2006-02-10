@@ -120,10 +120,10 @@ public class PdfPlugin implements TextFilterPlugin {
             p2t_info = infofetch.deleteCharAt(infofetch.length() - 2).toString();
         } catch (IOException e) {
             if (e.getMessage().indexOf("not found") > 0) {
+                //NOTE: It is a ugly pain to parse a error message, but at worst we throw the wrong error message
                 throw new FilterPluginInstantiationException(new StringBuffer(testcommand[0]).append(" is not installed or in search path!\n").append("To use this Plugin you have to install XPdf").append("http://www.foolabs.com/xpdf/) and ensure ").append("the pdftotext binary is in your search path.").toString(), e);
-            } else {
-                throw new FilterPluginInstantiationException("Error while excuting " + testcommand, e);
             }
+            throw new FilterPluginInstantiationException("Error while excuting " + testcommand, e);
         } catch (InterruptedException e) {
             throw new FilterPluginInstantiationException("Error while excuting " + testcommand, e);
         }
@@ -155,10 +155,10 @@ public class PdfPlugin implements TextFilterPlugin {
             rc = p.waitFor();
         } catch (IOException e) {
             if (e.getMessage().indexOf("not found") > 0) {
+                //NOTE: It is a ugly pain to parse a error message, but at worst we throw the wrong error message
                 throw new MCRConfigurationException(testcommand[0] + " is not installed or in search path!", e);
-            } else {
-                throw new MCRConfigurationException("Error while excuting " + testcommand, e);
             }
+            throw new MCRConfigurationException("Error while excuting " + testcommand, e);
         } catch (InterruptedException e) {
             throw new MCRConfigurationException("Error while excuting " + testcommand, e);
         }

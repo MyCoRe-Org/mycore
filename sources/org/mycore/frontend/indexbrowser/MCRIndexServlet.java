@@ -289,7 +289,7 @@ public class MCRIndexServlet extends MCRServlet {
     private int calculateStepSize(int numSelectedRows, int maxPerPage) {
         for (int i = 1;; i++) {
             double dNum = numSelectedRows;
-            double dI = 1.0 / ((double) i);
+            double dI = 1.0 / i;
             double root = Math.pow(dNum, dI);
 
             if (root <= maxPerPage) {

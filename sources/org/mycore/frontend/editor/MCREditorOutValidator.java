@@ -125,8 +125,6 @@ public class MCREditorOutValidator {
      * 
      * @param jdom_in
      *            editor input
-     * @param MCRObject
-     *            id
      */
     public MCREditorOutValidator(Document jdom_in, MCRObjectID id) {
         this.errorlog = new ArrayList();
@@ -255,11 +253,6 @@ public class MCREditorOutValidator {
         return checkMetaObjectWithLang(datasubtag, metaClass);
     }
 
-    /**
-     * @param datasubtag
-     * @param metaClass
-     * @return
-     */
     private boolean checkMetaObjectWithLinks(Element datasubtag, Class metaClass) {
         String href = datasubtag.getAttributeValue("href");
         if (href == null) {

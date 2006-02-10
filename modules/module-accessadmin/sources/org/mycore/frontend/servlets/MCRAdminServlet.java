@@ -17,12 +17,12 @@ import org.mycore.frontend.servlets.MCRServlet;
 
 public class MCRAdminServlet extends MCRServlet{
 	
-	private static boolean isDefaultAccessRuleCreated ;
+//	private static boolean isDefaultAccessRuleCreated ;
 	protected final static Logger LOGGER = Logger.getLogger(MCRAdminServlet.class);
 
 	public void init() throws ServletException {
 		super.init();
-		isDefaultAccessRuleCreated = createAdminDefaultRule();
+//		isDefaultAccessRuleCreated = createAdminDefaultRule();
 	}
     
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
@@ -54,9 +54,8 @@ public class MCRAdminServlet extends MCRServlet{
                 String token = st.nextToken();
                 if (token.equals("admin")){
                     break;
-                }else{
-                    stylepath += token + "/";
                 }
+                stylepath += token + "/";
              }
             
             request.setAttribute("basepath", stylepath + "administration/" );
@@ -75,8 +74,6 @@ public class MCRAdminServlet extends MCRServlet{
 	/**
 	 * sets a default-rule for the use of the MCRAdminServlet
 	 * 
-	 * @param objid
-	 * @param userid
 	 * @return boolean  false if there was an Exception
 	 */
 	public static boolean createAdminDefaultRule() {

@@ -228,7 +228,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
     /**
      * Loads an MCRDerivates from an XML file.
      * 
-     * @param filename
+     * @param file
      *            the location of the xml file
      */
     public static boolean loadFromFile(String file) {
@@ -238,7 +238,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
     /**
      * Updates an MCRDerivates from an XML file.
      * 
-     * @param filename
+     * @param file
      *            the location of the xml file
      */
     public static boolean updateFromFile(String file) {
@@ -248,7 +248,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
     /**
      * Loads or updates an MCRDerivates from an XML file.
      * 
-     * @param filename
+     * @param file
      *            the location of the xml file
      * @param update
      *            if true, object will be updated, else object is created
@@ -450,6 +450,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
      *            the type of the stylesheet
      */
     public static void export(String fromID, String toID, String dirname, String style, boolean withIfsID) {
+        LOGGER.debug("withIfsID ("+withIfsID+") will never used"); //FIXME: use or remove withIfsID
         // check fromID and toID
         MCRDerivate obj = new MCRDerivate();
         MCRObjectID fid = null;

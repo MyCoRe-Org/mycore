@@ -257,9 +257,8 @@ public class MCRHIBRuleStore extends MCRRuleStore {
 
             if (l.size() == 1) {
                 return true;
-            } else {
-                return false;
             }
+            return false;
         } catch (Exception ex) {
             throw new MCRException("Error in access-rule-store.", ex);
         }

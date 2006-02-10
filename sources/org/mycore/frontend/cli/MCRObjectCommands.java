@@ -232,7 +232,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
     /**
      * Loads an MCRObjects from an XML file.
      * 
-     * @param filename
+     * @param file
      *            the location of the xml file
      * @throws MCRActiveLinkException
      */
@@ -243,7 +243,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
     /**
      * Updates an MCRObjects from an XML file.
      * 
-     * @param filename
+     * @param file
      *            the location of the xml file
      * @throws MCRActiveLinkException
      */
@@ -254,7 +254,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
     /**
      * Loads or updates an MCRObjects from an XML file.
      * 
-     * @param filename
+     * @param file
      *            the location of the xml file
      * @param update
      *            if true, object will be updated, else object is created
@@ -522,7 +522,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
     /**
      * The method parse and check an XML file.
      * 
-     * @param filename
+     * @param file
      *            the location of the xml file
      */
     public static boolean checkXMLFile(String file) {

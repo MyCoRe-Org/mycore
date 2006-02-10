@@ -107,10 +107,9 @@ public class MCRFileContentTypeFactory {
 
         if (typesTable.containsKey(ID)) {
             return (MCRFileContentType) (typesTable.get(ID));
-        } else {
-            String msg = "There is no file content type with ID = " + ID + " configured";
-            throw new MCRConfigurationException(msg);
         }
+        String msg = "There is no file content type with ID = " + ID + " configured";
+        throw new MCRConfigurationException(msg);
     }
 
     /**

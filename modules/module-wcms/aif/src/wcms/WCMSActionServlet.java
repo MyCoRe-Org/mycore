@@ -876,10 +876,6 @@ public class WCMSActionServlet extends WCMSServlet {
         return reval;
     }
 
-    /**
-     * @param action
-     * @throws IOException
-     */
     public void makeAction(String action) {
         try {
             // /////////////////////////////////////////////////////////////////////////////////////////////
@@ -1085,6 +1081,7 @@ public class WCMSActionServlet extends WCMSServlet {
     }
 
     public void doItAll(File hrefFile, String action, String mode, String addAtPosition) {
+        logger.debug("addAtPosition ("+addAtPosition+") will never be used."); //FIXME: use or remove addAtPosition
         // verify if html form was filled in correctly
         if ((checkInput()) == false) {
             sessionParam = "action";
@@ -1123,6 +1120,7 @@ public class WCMSActionServlet extends WCMSServlet {
     }
 
     public void codeValidation(String validator) {
+        logger.debug("validator ("+validator+") will never be used."); //FIXME: use or remove validator
         try {
             String contentTmp = content;
             String contentCurrentLangTmp = contentCurrentLang;
@@ -1248,23 +1246,14 @@ public class WCMSActionServlet extends WCMSServlet {
         this.request = req;
     }
 
-    /**
-     * @return
-     */
     public HttpServletRequest getReq() {
         return request;
     }
 
-    /**
-     * @param resp
-     */
     public void setResp(HttpServletResponse resp) {
         this.response = resp;
     }
 
-    /**
-     * @return
-     */
     public HttpServletResponse getResp() {
         return response;
     }
@@ -1272,11 +1261,6 @@ public class WCMSActionServlet extends WCMSServlet {
     /* new methods */
 
     // --------------
-    /**
-     * @param fileName
-     * @return
-     * @throws IOException
-     */
     public File getFile(String fileName) throws IOException, FileNotFoundException {
         File loadFile = new File(fileName);
 
@@ -1359,10 +1343,6 @@ public class WCMSActionServlet extends WCMSServlet {
         return jdomDoc;
     }
 
-    /**
-     * @param xmlSource
-     * @return
-     */
     public Document validateSource(Object xmlSource) {
         logger.debug("Trying to build a valid XHTML/XML Document from Source using JTidy.");
 
@@ -1481,11 +1461,6 @@ public class WCMSActionServlet extends WCMSServlet {
         return jdomDoc;
     }
 
-    /**
-     * @param tidy
-     * @param outputFormat
-     * @return
-     */
     public Tidy getTidyConfig(Tidy tidy, String outputFormat) {
         if (outputFormat.equals("xhtml")) {
             logger.debug("Parsing Document using JTidy. Output as XHTML.");

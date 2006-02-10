@@ -71,7 +71,7 @@ public class MCRSQLLinkTableStore implements MCRLinkTableInterface {
 	 * The initializer for the class MCRSQLLinkTableStore. It reads the
 	 * classification configuration and checks the table names.
 	 * 
-	 * @exception throws
+	 * @exception MCRPersistenceException
 	 *                if the type is not correct
 	 */
 	public final void init(String type) throws MCRPersistenceException {

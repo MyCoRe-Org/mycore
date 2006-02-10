@@ -112,9 +112,8 @@ public class MSWordPlugin implements TextFilterPlugin {
             } catch (Exception e) {
                 throw new FilterPluginTransformException("Error while parsing Word Document document.", e);
             }
-        } else {
-            throw new FilterPluginTransformException("ContentType " + ct + " is not supported by " + getName() + "!");
         }
+        throw new FilterPluginTransformException("ContentType " + ct + " is not supported by " + getName() + "!");
     }
 
     /**

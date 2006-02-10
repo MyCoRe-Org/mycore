@@ -278,9 +278,8 @@ public class MCROldFile implements MCRFileReader {
     protected MCRContentStore getContentStore() {
         if (storeID.length() == 0) {
             return null;
-        } else {
-            return MCRContentStoreFactory.getStore(storeID);
         }
+        return MCRContentStoreFactory.getStore(storeID);
     }
 
     /**
@@ -368,9 +367,8 @@ public class MCROldFile implements MCRFileReader {
     public boolean hasAudioVideoExtender() {
         if (storeID.length() == 0) {
             return false;
-        } else {
-            return MCRContentStoreFactory.providesAudioVideoExtender(storeID);
         }
+        return MCRContentStoreFactory.providesAudioVideoExtender(storeID);
     }
 
     /**

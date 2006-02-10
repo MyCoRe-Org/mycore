@@ -23,7 +23,6 @@
 
 package org.mycore.backend.hibernate;
 
-import java.awt.image.IndexColorModel;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
@@ -34,7 +33,6 @@ import org.hibernate.Transaction;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.tool.hbm2ddl.SchemaUpdate;
 import org.hibernate.type.StringType;
-import org.mycore.backend.sql.MCRSQLConnection;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.parsers.bool.MCRCondition;
 import org.mycore.services.fieldquery.MCRFieldDef;
@@ -76,10 +74,10 @@ public class MCRHIBSearcher extends MCRSearcher {
             MCRFieldValue fv = (MCRFieldValue) (fields.get(i));
 
             // Store only first occurrence of field
-            if (used.containsKey(fv.getField()))
+            if (used.containsKey(fv.getField())){
                 continue;
-            else
-                used.put(fv.getField(), fv.getField());
+            }
+            used.put(fv.getField(), fv.getField());
 
             query.setValue("set" + fv.getField().getName(), fv.getValue());
         }

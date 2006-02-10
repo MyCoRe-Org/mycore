@@ -198,7 +198,7 @@ public class MCRGroup extends MCRUserObject implements MCRPrincipal {
      * This constructor creates the data of this object from a given JDOM
      * Element.
      * 
-     * @param the
+     * @param elm the
      *            JDOM Element
      */
     public MCRGroup(org.jdom.Element elm) {

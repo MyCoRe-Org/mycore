@@ -270,7 +270,6 @@ public interface MCRAccessInterface {
      * The parameter <code>id</code> serves as an identifier for the concrete
      * underlying rule, e.g. a MCRObjectID.
      * 
-     * @param id
      * @return a sorted and distinct <code>List</code> of all  <code>String</code> IDs
      */
     public List getAllControlledIDs();    
@@ -292,8 +291,6 @@ public interface MCRAccessInterface {
      * 
      * @param id
      *            the ID-String of the object
-     * @param permission
-     *            the access permission for the rule
      * @return false, if getPermissionsForID(id) would return an empty list,
      *         else true
      */

@@ -178,7 +178,7 @@ public abstract class MCRClassificationObject {
     /**
      * The method returns the text String for a given language.
      * 
-     * @param index
+     * @param lang
      *            a language
      * @exception MCRUsageException
      *                if the classification is deleted.
@@ -266,7 +266,7 @@ public abstract class MCRClassificationObject {
     /**
      * The method returns the description String for a given language.
      * 
-     * @param index
+     * @param lang
      *            a language
      * @exception MCRUsageException
      *                if the classification is deleted.
@@ -437,9 +437,8 @@ public abstract class MCRClassificationObject {
 
         if (childrenIDs != null) {
             return childrenIDs.length;
-        } else {
-            return manager().retrieveNumberOfChildren(getClassificationID(), ID);
         }
+        return manager().retrieveNumberOfChildren(getClassificationID(), ID);
     }
 
     /**
@@ -455,9 +454,8 @@ public abstract class MCRClassificationObject {
 
         if (this.getClassificationID().equals(this.getID())) {
             return mcl.countCategoryReferencesFuzzy(this.getClassificationID(), "", doctypes, restriction);
-        } else {
-            return mcl.countCategoryReferencesFuzzy(this.getClassificationID(), this.getID(), doctypes, restriction);
         }
+        return mcl.countCategoryReferencesFuzzy(this.getClassificationID(), this.getID(), doctypes, restriction);
     }
 
     /**
@@ -491,7 +489,7 @@ public abstract class MCRClassificationObject {
  	   ensureNotDeleted();
         MCRCategoryItem[] children;
         String categID = ( this instanceof MCRCategoryItem ? ID : null );
-        Document cljdom = receiveClassificationAsJDOM(getClassificationID());
+        Document cljdom = receiveClassificationAsJDOM();
  	   Element EFound;	   
  	   if (categID != null){
  	      String cachingID = getClassificationID() + "@@" + categID;	      
@@ -597,7 +595,7 @@ public abstract class MCRClassificationObject {
       }
       
    
-    public Document receiveClassificationAsJDOM(String clid) {
+    public Document receiveClassificationAsJDOM() {
  	   //	 Klassification laden!
  	   //MCRClassification cl = new MCRClassification();
  	   String cachingID = getClassificationID();

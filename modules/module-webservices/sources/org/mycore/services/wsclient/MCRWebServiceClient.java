@@ -23,26 +23,13 @@
 
 package org.mycore.services.wsclient;
 
-import java.io.*;
-import java.net.*;
-import java.text.*;
-import java.util.*;
 import java.util.Properties;
 import java.rmi.Remote;
 
-import javax.xml.parsers.*;
-import javax.xml.transform.*;
-import javax.xml.transform.dom.*;
-import javax.xml.transform.stream.*;
-import javax.xml.rpc.*;
-
 import org.mycore.common.xml.MCRURIResolver;
-import org.w3c.dom.*;
 
 import org.apache.log4j.Logger;
 
-import org.apache.axis.client.Call;
-import org.apache.axis.client.Service;
 import org.apache.axis.AxisFault;
 import org.apache.axis.client.Stub;
 
@@ -100,9 +87,9 @@ public class MCRWebServiceClient
     
     handleParams(args, params);
     
-    String endpoint = (String)params.getProperty("endpoint");
+    String endpoint = params.getProperty("endpoint");
     System.out.println("Endpoint: " + endpoint);
-    String operation = (String)params.getProperty("operation");
+    String operation = params.getProperty("operation");
     System.out.println("Operation: " + operation);
 
     
@@ -134,7 +121,7 @@ public class MCRWebServiceClient
       }
       else if ("query".equals(operation))
       {
-        String file = (String)params.getProperty("file");
+        String file = params.getProperty("file");
         if ( null != file )
         {
           System.out.println("file://" + file );

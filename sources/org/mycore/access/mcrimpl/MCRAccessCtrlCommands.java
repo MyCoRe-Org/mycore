@@ -50,7 +50,7 @@ public class MCRAccessCtrlCommands extends MCRAbstractCommands {
         com = new MCRCommand("create accesstable", "org.mycore.access.MCRAccessCtrlCommands.createTables", "The command creates all tables for the Access Control System.");
         command.add(com);
 
-        com = new MCRCommand("validate objectid {0} in pool {1}", "org.mycore.access.MCRAccessCtrlCommands.validate String String", "Validates access for given object and given pool");
+        com = new MCRCommand("validate objectid {0} in pool {1}", "org.mycore.access.MCRAccessCtrlCommands.validate String String", "Validates access for given object and given permission");
         command.add(com);
     }
 
@@ -62,13 +62,15 @@ public class MCRAccessCtrlCommands extends MCRAbstractCommands {
     }
 
     /**
-     * This method returns the rule as string for a given id
+     * validates access for given object and given permission
      * 
-     * @param ruleID
+     * @param objid
      *            internal database ruleid
+     * @param permission
+     *            the access permission for the rule
      */
-    public static void validate(String objid, String pool) {
+    public static void validate(String objid, String permission) {
     	MCRAccessInterface AI = MCRAccessManager.getAccessImpl();
-        System.out.println("current user has access: " + AI.checkPermission(objid, pool));
+        System.out.println("current user has access: " + AI.checkPermission(objid, permission));
     }
 }

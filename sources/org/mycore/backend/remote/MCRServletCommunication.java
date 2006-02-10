@@ -195,11 +195,12 @@ public class MCRServletCommunication implements MCRRemoteAccessInterface {
     }
 
     /**
-     * @param executes
+     * @param method
      *            the method and returning the status code
-     * @return
+     * @return connection status
      * @throws URIException,
      *             IOException
+     * @see HttpClient#executeMethod(org.apache.commons.httpclient.HttpMethod)
      */
     private int getConnectionStatus(PostMethod method) throws URIException, IOException {
         int statusCode = -1;
@@ -306,8 +307,7 @@ public class MCRServletCommunication implements MCRRemoteAccessInterface {
     public final String getHeaderContent() {
         if (hasifsdata) {
             return headercontext;
-        } else {
-            return "";
         }
+        return "";
     }
 }

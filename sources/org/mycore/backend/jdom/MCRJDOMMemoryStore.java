@@ -175,7 +175,7 @@ public class MCRJDOMMemoryStore {
         }
 
         long stopdate = System.currentTimeMillis();
-        double diff = (double) (stopdate - startdate) / 1000.0;
+        double diff = (stopdate - startdate) / 1000.0;
         logger.debug("Read " + Integer.toString(ar.size()) + " SQL data sets for type " + type + " in " + diff + " seconds");
 
         return objects;

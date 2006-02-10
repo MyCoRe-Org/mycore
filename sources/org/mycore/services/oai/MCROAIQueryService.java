@@ -150,7 +150,6 @@ public class MCROAIQueryService implements MCROAIQuery {
      * Method listSets. Gets a list of classificationId's and Labels for a given
      * ID
      * 
-     * @param classificationId
      * @param instance
      *            the Servletinstance
      * @return List A list that contains an array of three Strings: the category
@@ -251,7 +250,7 @@ public class MCROAIQueryService implements MCROAIQuery {
      *         blank separated list of categories the element is classified in
      */
     public List listIdentifiers(String[] set, String[] from, String[] until, String metadataPrefix, String instance) {
-        return listRecordsOrIdentifiers(set, from, until, metadataPrefix, instance, false);
+        return listRecordsOrIdentifiers(set, from, until, instance, false);
     }
 
     /**
@@ -372,7 +371,7 @@ public class MCROAIQueryService implements MCROAIQuery {
      *         blank separated list of categories the element is classified in
      */
     public List listRecords(String[] set, String[] from, String[] until, String metadataPrefix, String instance) {
-        return listRecordsOrIdentifiers(set, from, until, metadataPrefix, instance, true);
+        return listRecordsOrIdentifiers(set, from, until, instance, true);
     }
 
     /**
@@ -420,7 +419,7 @@ public class MCROAIQueryService implements MCROAIQuery {
         return results;
     }
 
-    private List listRecordsOrIdentifiers(String[] set, String[] from, String[] until, String metadataPrefix, String instance, boolean listRecords) {
+    private List listRecordsOrIdentifiers(String[] set, String[] from, String[] until, String instance, boolean listRecords) {
         List list = new ArrayList();
         List queries = new ArrayList();
         List restrictionQueries = new ArrayList();

@@ -233,7 +233,7 @@ public class MCRNBN {
      * Method MCRNBN. Creates a new NBN object from the given URN. If the urn is
      * local but not in the persistence store, it will be stored.
      * 
-     * @param the
+     * @param urn the
      *            urn to create a NBN from.
      */
     public MCRNBN(String urn) {
@@ -322,7 +322,7 @@ public class MCRNBN {
     /**
      * Method setURL. Sets the URL which is locally attached with the URN
      * 
-     * @param the
+     * @param url the
      *            url which should be set for the URN.
      */
     public void setURL(String url) {
@@ -346,7 +346,7 @@ public class MCRNBN {
      * Method setDocumentId. Sets the document id which is locally attached with
      * the URN
      * 
-     * @param the
+     * @param documentId the
      *            url which should be set for the URN.
      */
     public void setDocumentId(String documentId) {

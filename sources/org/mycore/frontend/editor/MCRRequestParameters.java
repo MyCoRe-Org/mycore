@@ -133,9 +133,8 @@ public class MCRRequestParameters {
 
         if ((values == null) || (values.length == 0)) {
             return null;
-        } else {
-            return values[0];
         }
+        return values[0];
     }
 
     public String[] getParameterValues(String name) {

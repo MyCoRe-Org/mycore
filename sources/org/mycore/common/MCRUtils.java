@@ -411,7 +411,7 @@ public class MCRUtils {
     /**
      * This method convert a JDOM tree to a byte array.
      * 
-     * @param jdom_in
+     * @param jdom
      *            the JDOM tree
      * @return a byte array of the JDOM tree
      */
@@ -453,7 +453,7 @@ public class MCRUtils {
      * 
      * @param objects
      *            Array of Objects to be converted
-     * @param maxitem
+     * @param maxitems
      *            The maximum of items to convert
      * @return Array of Strings representing Objects
      */
@@ -731,7 +731,7 @@ public class MCRUtils {
      * get as many bytes as you asked for unless you get an eof or other
      * exception. Unlike readFully, you find out how many bytes you did get.
      * 
-     * @param b
+     * @param c
      *            the buffer into which the data is read.
      * @param off
      *            the start offset of the data.
@@ -1068,7 +1068,12 @@ public class MCRUtils {
 
           // We would need SAX 2.0 to be able to do this, for later use:
           public void startDTD(String name, String publicId, String systemId) {
-              LOGGER.debug("MCRLayoutServlet detected DOCTYPE declaration = " + name);
+              if (LOGGER.isDebugEnabled()){
+              LOGGER.debug(new StringBuffer(1024)
+                      .append("MCRUtils detected DOCTYPE declaration = ").append(name)
+                      .append(" publicId = ").append(publicId)
+                      .append(" systemId = ").append(systemId).toString());
+              }
               detected.setProperty("docType", name);
               throw new MCRException(forcedInterrupt);
           }

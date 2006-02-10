@@ -154,7 +154,7 @@ final public class MCRDerivate extends MCRBase {
     /**
      * This methode set the object MCRObjectDerivate.
      * 
-     * @param service
+     * @param derivate
      *            the object MCRObjectDerivate part
      */
     public final void setDerivate(MCRObjectDerivate derivate) {

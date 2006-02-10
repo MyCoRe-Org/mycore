@@ -120,9 +120,8 @@ public class PostScriptPlugin implements TextFilterPlugin {
         } catch (IOException e) {
             if (e.getMessage().indexOf("not found") > 0) {
                 throw new FilterPluginInstantiationException(new StringBuffer(testcommand[0]).append(" is not installed or in search path!\n").append("To use this Plugin you have to install GhostScript(").append("http://www.cs.wisc.edu/~ghost/) and ensure ").append("the ps2ascii binary is in your search path.").toString(), e);
-            } else {
-                throw new FilterPluginInstantiationException("Error while excuting " + testcommand, e);
             }
+            throw new FilterPluginInstantiationException("Error while excuting " + testcommand, e);
         } catch (InterruptedException e) {
             throw new FilterPluginInstantiationException("Error while excuting " + testcommand, e);
         }
@@ -153,9 +152,8 @@ public class PostScriptPlugin implements TextFilterPlugin {
         } catch (IOException e) {
             if (e.getMessage().indexOf("not found") > 0) {
                 throw new MCRConfigurationException(testcommand[0] + " is not installed or in search path!", e);
-            } else {
-                throw new MCRConfigurationException("Error while excuting " + testcommand, e);
             }
+            throw new MCRConfigurationException("Error while excuting " + testcommand, e);
         } catch (InterruptedException e) {
             throw new MCRConfigurationException("Error while excuting " + testcommand, e);
         }
@@ -240,15 +238,14 @@ public class PostScriptPlugin implements TextFilterPlugin {
         public int read(char[] cbuf, int off, int len) {
             if (pos == buf.length()) {
                 return -1;
-            } else {
-                int start = pos + off;
-                int charsRead = (buf.length() < (start + len)) ? (buf.length() - start) : len;
-                int end = start + charsRead;
-                buf.getChars(start, end, cbuf, 0);
-                pos = end;
-
-                return charsRead;
             }
+            int start = pos + off;
+            int charsRead = (buf.length() < (start + len)) ? (buf.length() - start) : len;
+            int end = start + charsRead;
+            buf.getChars(start, end, cbuf, 0);
+            pos = end;
+
+            return charsRead;
         }
     }
 }

@@ -172,9 +172,8 @@ public abstract class MCRFilesystemNode {
 
         if (!hasParent()) {
             return null;
-        } else {
-            return MCRDirectory.getDirectory(parentID);
         }
+        return MCRDirectory.getDirectory(parentID);
     }
 
     public boolean hasParent() {
@@ -274,9 +273,8 @@ public abstract class MCRFilesystemNode {
 
         if (hasParent()) {
             return getParent().getPath() + "/" + name;
-        } else {
-            return name;
         }
+        return name;
     }
 
     public String getAbsolutePath() {
@@ -290,9 +288,8 @@ public abstract class MCRFilesystemNode {
             }
 
             return path + name;
-        } else {
-            return "/";
         }
+        return "/";
     }
 
     /**

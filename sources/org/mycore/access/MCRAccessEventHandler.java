@@ -66,7 +66,7 @@ public class MCRAccessEventHandler extends MCREventHandlerBase {
 
         // save the stop time
         long t2 = System.currentTimeMillis();
-        double diff = (double) (t2 - t1) / 1000.0;
+        double diff = (t2 - t1) / 1000.0;
         LOGGER.debug("MCRAccessEventHandler create: done in " + diff + " sec.");
     }
 
@@ -94,7 +94,7 @@ public class MCRAccessEventHandler extends MCREventHandlerBase {
 
         // save the stop time
         long t2 = System.currentTimeMillis();
-        double diff = (double) (t2 - t1) / 1000.0;
+        double diff = (t2 - t1) / 1000.0;
         LOGGER.debug("MCRAccessEventHandler update: done in " + diff + " sec.");
     }
 
@@ -116,7 +116,7 @@ public class MCRAccessEventHandler extends MCREventHandlerBase {
 
         // save the stop time
         long t2 = System.currentTimeMillis();
-        double diff = (double) (t2 - t1) / 1000.0;
+        double diff = (t2 - t1) / 1000.0;
         LOGGER.debug("MCRAccessEventHandler delete: done in " + diff + " sec.");
     }
 

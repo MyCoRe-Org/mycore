@@ -172,9 +172,8 @@ public class MCRHIBUserStore implements MCRUserStore {
 
         if (l.size() > 0) {
             return true;
-        } else {
-            return false;
         }
+        return false;
     }
 
     /**
@@ -202,9 +201,8 @@ public class MCRHIBUserStore implements MCRUserStore {
 
         if (l.size() > 0) {
             return true;
-        } else {
-            return false;
         }
+        return false;
     }
 
     /**
@@ -229,62 +227,62 @@ public class MCRHIBUserStore implements MCRUserStore {
                 tx.rollback();
                 session.close();
                 throw new MCRException("There is no user with ID = " + userID);
+            }
+            user = (MCRUSERS) l.get(0);
+
+            int numID = user.getNumid();
+            String creator = user.getCreator();
+            Timestamp created = user.getCreationdate();
+            Timestamp modified = user.getModifieddate();
+            String description = user.getDescription();
+            String passwd = user.getPasswd();
+            String idEnabled = user.getEnabled();
+            String updateAllowed = user.getUpd();
+            String salutation = user.getSalutation();
+            String firstname = user.getFirstname();
+            String lastname = user.getLastname();
+            String street = user.getStreet();
+            String city = user.getCity();
+            String postalcode = user.getPostalcode();
+            String country = user.getCountry();
+            String state = user.getState();
+            String institution = user.getInstitution();
+            String faculty = user.getFaculty();
+            String department = user.getDepartment();
+            String institute = user.getInstitute();
+            String telephone = user.getTelephone();
+            String fax = user.getFax();
+            String email = user.getEmail();
+            String cellphone = user.getCellphone();
+            String primaryGroupID = user.getPrimgroup();
+
+            // Now lookup the groups this user is a member of
+            ArrayList groups = new ArrayList();
+            l = session.createQuery("from MCRGROUPMEMBERS where USERID = '" + userID + "'").list();
+
+            if (l.size() >= 1) {
+                MCRGROUPMEMBERS group;
+
+                for (int i = 0; i < l.size(); i++) {
+                    group = (MCRGROUPMEMBERS) l.get(i);
+                    groups.add(group.getGid());
+                }
             } else {
-                user = (MCRUSERS) l.get(0);
+                throw new MCRException("User with ID = " + userID + " is no groupmember.");
+            }
 
-                int numID = user.getNumid();
-                String creator = user.getCreator();
-                Timestamp created = user.getCreationdate();
-                Timestamp modified = user.getModifieddate();
-                String description = user.getDescription();
-                String passwd = user.getPasswd();
-                String idEnabled = user.getEnabled();
-                String updateAllowed = user.getUpd();
-                String salutation = user.getSalutation();
-                String firstname = user.getFirstname();
-                String lastname = user.getLastname();
-                String street = user.getStreet();
-                String city = user.getCity();
-                String postalcode = user.getPostalcode();
-                String country = user.getCountry();
-                String state = user.getState();
-                String institution = user.getInstitution();
-                String faculty = user.getFaculty();
-                String department = user.getDepartment();
-                String institute = user.getInstitute();
-                String telephone = user.getTelephone();
-                String fax = user.getFax();
-                String email = user.getEmail();
-                String cellphone = user.getCellphone();
-                String primaryGroupID = user.getPrimgroup();
+            // set some boolean values
+            boolean id_enabled = (idEnabled.equals("true")) ? true : false;
+            boolean update_allowed = (updateAllowed.equals("true")) ? true : false;
 
-                // Now lookup the groups this user is a member of
-                ArrayList groups = new ArrayList();
-                l = session.createQuery("from MCRGROUPMEMBERS where USERID = '" + userID + "'").list();
-
-                if (l.size() >= 1) {
-                    MCRGROUPMEMBERS group;
-
-                    for (int i = 0; i < l.size(); i++) {
-                        group = (MCRGROUPMEMBERS) l.get(i);
-                        groups.add(group.getGid());
-                    }
-                } else {
-                    throw new MCRException("User with ID = " + userID + " is no groupmember.");
-                }
-
-                // set some boolean values
-                boolean id_enabled = (idEnabled.equals("true")) ? true : false;
-                boolean update_allowed = (updateAllowed.equals("true")) ? true : false;
-
-                // We create the user object
-                try {
-                    retuser = new MCRUser(numID, userID, creator, created, modified, id_enabled, update_allowed, description, passwd, primaryGroupID, groups, salutation, firstname, lastname, street, city, postalcode, country, state, institution, faculty, department, institute, telephone, fax, email, cellphone);
-                } catch (MCRException e) {
-                    e.printStackTrace();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+            // We create the user object
+            try {
+                retuser = new MCRUser(numID, userID, creator, created, modified, id_enabled, update_allowed, description, passwd, primaryGroupID, groups, salutation, firstname, lastname, street,
+                        city, postalcode, country, state, institution, faculty, department, institute, telephone, fax, email, cellphone);
+            } catch (MCRException e) {
+                e.printStackTrace();
+            } catch (Exception e) {
+                e.printStackTrace();
             }
 
             tx.commit();
@@ -497,9 +495,8 @@ public class MCRHIBUserStore implements MCRUserStore {
 
         if (l.size() > 0) {
             return true;
-        } else {
-            return false;
         }
+        return false;
     }
 
     /**
@@ -552,9 +549,8 @@ public class MCRHIBUserStore implements MCRUserStore {
             }
 
             return retList;
-        } else {
-            return null;
         }
+        return null;
     }
 
     /**
@@ -823,97 +819,96 @@ public class MCRHIBUserStore implements MCRUserStore {
                 tx.rollback();
                 session.close();
                 throw new MCRException("There is no group with ID = " + groupID);
-            } else {
+            }
                 MCRGROUPS groups = (MCRGROUPS) l.get(0);
 
-                String creator = groups.getCreator();
-                Timestamp created = groups.getCreationdate();
-                Timestamp modified = groups.getModifieddate();
-                String description = groups.getDescription();
+            String creator = groups.getCreator();
+            Timestamp created = groups.getCreationdate();
+            Timestamp modified = groups.getModifieddate();
+            String description = groups.getDescription();
 
-                l = session.createQuery("from MCRPRIVSLOOKUP where GID = '" + groupID + "' and NAME is not null").list();
+            l = session.createQuery("from MCRPRIVSLOOKUP where GID = '" + groupID + "' and NAME is not null").list();
 
-                ArrayList privs = new ArrayList();
+            ArrayList privs = new ArrayList();
 
+            for (int i = 0; i < l.size(); i++) {
+                MCRPRIVSLOOKUP privslookup = (MCRPRIVSLOOKUP) l.get(i);
+                privs.add(privslookup.getName());
+            }
+
+            // Now lookup the lists of admin users, admin groups, users
+            // (members) and privileges
+            l = session.createQuery("from MCRGROUPADMINS where GID = '" + groupID + "'").list();
+
+            ArrayList admUserIDs = new ArrayList();
+            ArrayList admGroupIDs = new ArrayList();
+
+            if (l.size() > 0) {
                 for (int i = 0; i < l.size(); i++) {
-                    MCRPRIVSLOOKUP privslookup = (MCRPRIVSLOOKUP) l.get(i);
-                    privs.add(privslookup.getName());
-                }
+                    MCRGROUPADMINS grpadmins = (MCRGROUPADMINS) l.get(i);
 
-                // Now lookup the lists of admin users, admin groups, users
-                // (members) and privileges
-                l = session.createQuery("from MCRGROUPADMINS where GID = '" + groupID + "'").list();
-
-                ArrayList admUserIDs = new ArrayList();
-                ArrayList admGroupIDs = new ArrayList();
-
-                if (l.size() > 0) {
-                    for (int i = 0; i < l.size(); i++) {
-                        MCRGROUPADMINS grpadmins = (MCRGROUPADMINS) l.get(i);
-
-                        if (grpadmins.getUserid() == null) {
-                        } else {
-                            if (!grpadmins.getUserid().equals("")) {
-                                admUserIDs.add(grpadmins.getUserid());
-                            }
+                    if (grpadmins.getUserid() == null) {
+                    } else {
+                        if (!grpadmins.getUserid().equals("")) {
+                            admUserIDs.add(grpadmins.getUserid());
                         }
+                    }
 
-                        if (grpadmins.getGroupid() == null) {
-                        } else {
-                            if (!grpadmins.getGroupid().equals("")) {
-                                admGroupIDs.add(grpadmins.getGroupid());
-                            }
+                    if (grpadmins.getGroupid() == null) {
+                    } else {
+                        if (!grpadmins.getGroupid().equals("")) {
+                            admGroupIDs.add(grpadmins.getGroupid());
                         }
                     }
                 }
+            }
 
-                l = session.createQuery("from MCRGROUPMEMBERS where GID = '" + groupID + "'").list();
+            l = session.createQuery("from MCRGROUPMEMBERS where GID = '" + groupID + "'").list();
 
-                ArrayList mbrUserIDs = new ArrayList();
-                ArrayList mbrGroupIDs = new ArrayList();
+            ArrayList mbrUserIDs = new ArrayList();
+            ArrayList mbrGroupIDs = new ArrayList();
 
-                if (l.size() > 0) {
-                    for (int i = 0; i < l.size(); i++) {
-                        MCRGROUPMEMBERS grpmembers = (MCRGROUPMEMBERS) l.get(i);
+            if (l.size() > 0) {
+                for (int i = 0; i < l.size(); i++) {
+                    MCRGROUPMEMBERS grpmembers = (MCRGROUPMEMBERS) l.get(i);
 
-                        if (grpmembers.getUserid() == null) {
-                        } else {
-                            if (!grpmembers.getUserid().equals("")) {
-                                mbrUserIDs.add(grpmembers.getUserid());
-                            }
+                    if (grpmembers.getUserid() == null) {
+                    } else {
+                        if (!grpmembers.getUserid().equals("")) {
+                            mbrUserIDs.add(grpmembers.getUserid());
                         }
+                    }
 
-                        if (grpmembers.getGroupid() == null) {
-                        } else {
-                            if (!grpmembers.getGroupid().equals("")) {
-                                mbrGroupIDs.add(grpmembers.getGroupid());
-                            }
+                    if (grpmembers.getGroupid() == null) {
+                    } else {
+                        if (!grpmembers.getGroupid().equals("")) {
+                            mbrGroupIDs.add(grpmembers.getGroupid());
                         }
                     }
                 }
+            }
 
-                l = session.createQuery("from MCRGROUPMEMBERS where GROUPID = '" + groupID + "'").list();
+            l = session.createQuery("from MCRGROUPMEMBERS where GROUPID = '" + groupID + "'").list();
 
-                ArrayList groupIDs = new ArrayList();
+            ArrayList groupIDs = new ArrayList();
 
-                if (l.size() > 0) {
-                    for (int i = 0; i < l.size(); i++) {
-                        MCRGROUPMEMBERS grpmembers = (MCRGROUPMEMBERS) l.get(i);
+            if (l.size() > 0) {
+                for (int i = 0; i < l.size(); i++) {
+                    MCRGROUPMEMBERS grpmembers = (MCRGROUPMEMBERS) l.get(i);
 
-                        if ((grpmembers.getGid() != null) && !grpmembers.getGid().equals("")) {
-                            groupIDs.add(grpmembers.getGid());
-                        }
+                    if ((grpmembers.getGid() != null) && !grpmembers.getGid().equals("")) {
+                        groupIDs.add(grpmembers.getGid());
                     }
                 }
+            }
 
-                // We create the group object
-                try {
-                    group = new MCRGroup(groupID, creator, created, modified, description, admUserIDs, admGroupIDs, mbrUserIDs, mbrGroupIDs, groupIDs, privs);
-                } catch (MCRException e) {
-                    e.printStackTrace();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+            // We create the group object
+            try {
+                group = new MCRGroup(groupID, creator, created, modified, description, admUserIDs, admGroupIDs, mbrUserIDs, mbrGroupIDs, groupIDs, privs);
+            } catch (MCRException e) {
+                e.printStackTrace();
+            } catch (Exception e) {
+                e.printStackTrace();
             }
 
             tx.commit();
@@ -975,9 +970,8 @@ public class MCRHIBUserStore implements MCRUserStore {
 
         if (l.size() > 0) {
             return true;
-        } else {
-            return false;
         }
+        return false;
     }
 
     /**
@@ -991,9 +985,8 @@ public class MCRHIBUserStore implements MCRUserStore {
 
         if (l.size() > 0) {
             return true;
-        } else {
-            return false;
         }
+        return false;
     }
 
     /**
@@ -1058,21 +1051,6 @@ public class MCRHIBUserStore implements MCRUserStore {
         } finally {
             session.close();
         }
-    }
-
-    /**
-     * This private method is a helper method and is called by many of the
-     * public methods of this class. It takes a SELECT statement (which must be
-     * provided as a parameter) and works this out on the database. This method
-     * is only applicable in the case that only one ArrayList of strings is
-     * requested as the result of the SELECT statement.
-     * 
-     * @param select
-     *            String, SELECT statement to be carried out on the database
-     * @return ArrayList of strings - the result of the SELECT statement
-     */
-    private ArrayList getSelectResult(String select) throws MCRException {
-        throw new IllegalStateException("Hibernate backend doesn't support direct SQL queries");
     }
 
     public void createUserTables() {

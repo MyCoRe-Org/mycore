@@ -24,15 +24,8 @@
 package org.mycore.services.webservices;
 
 
-import java.util.*;
-import java.io.*;
-
 import org.apache.log4j.Logger;
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.output.*;
 
-import org.mycore.common.MCRConfiguration;
 import org.mycore.datamodel.metadata.MCRXMLTableManager;
 import org.mycore.common.xml.MCRXMLContainer;
 import org.mycore.datamodel.metadata.MCRObjectID;
@@ -50,7 +43,6 @@ import org.mycore.services.fieldquery.MCRResults;
 public class MCRWebService 
 {
   private static final Logger logger = Logger.getLogger( MCRWebService.class);
-  private static final MCRConfiguration config = MCRConfiguration.instance();
   
   private static MCRXMLTableManager TM = MCRXMLTableManager.instance();
 	

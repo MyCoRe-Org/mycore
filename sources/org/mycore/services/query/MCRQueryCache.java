@@ -73,8 +73,6 @@ public class MCRQueryCache {
 
     /**
      * checks if cache is initialized
-     * 
-     * @return
      */
     public static boolean isInitialized() {
         return initialized;

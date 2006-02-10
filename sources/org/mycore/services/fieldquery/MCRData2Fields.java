@@ -92,7 +92,7 @@ public class MCRData2Fields {
      * Extracts field values for indexing from the given MCRFile's metadata, xml
      * content or text content.
      * 
-     * @param obj
+     * @param file
      *            the MCRFile thats data should be indexed
      * @param index
      *            the ID of the index as defined in searchfields.xml

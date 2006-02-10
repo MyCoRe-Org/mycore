@@ -916,7 +916,7 @@ public class MCRUserMgr {
 	 * the user or group is read from an xml file and was formerly created in a
 	 * different system.
 	 * 
-	 * @param userObject
+	 * @param obj
 	 *            The user or group object which will be imported
 	 */
 	public final synchronized void importUserObject(MCRUserObject obj) throws MCRException {
@@ -1117,7 +1117,7 @@ public class MCRUserMgr {
 	 * The method gets all current privileges for the given user, included all
 	 * privilegs of groups in which his group is member.
 	 * 
-	 * @param username
+	 * @param user
 	 *            the string of the user name
 	 * @return a ArrayList with the privileges
 	 */
@@ -1372,8 +1372,6 @@ public class MCRUserMgr {
 	/**
 	 * This method updates a group in the datastore (and the cache as well).
 	 * 
-	 * @param session
-	 *            the MCRSession object
 	 * @param updGroup
 	 *            The group object which will be updated
 	 */
@@ -1523,7 +1521,7 @@ public class MCRUserMgr {
 	/**
 	 * This method updates a list of new privileges in the datastore.
 	 * 
-	 * @param user
+	 * @param updPriv
 	 *            The privilege ArrayList which will be updated
 	 */
 	public final synchronized void updatePrivileges(ArrayList updPriv) throws MCRException {
@@ -1566,7 +1564,7 @@ public class MCRUserMgr {
 	/**
 	 * This method updates a user in the datastore (and the cache as well).
 	 * 
-	 * @param user
+	 * @param updUser
 	 *            The user object which will be updated
 	 */
 	public final synchronized void updateUser(MCRUser updUser) throws MCRException {

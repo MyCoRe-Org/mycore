@@ -118,10 +118,10 @@ public class MCRSQLSearcher extends MCRSearcher {
             String type = fv.getField().getDataType();
 
             // Store only first occurrence of field
-            if (used.containsKey(name))
+            if (used.containsKey(name)){
                 continue;
-            else
-                used.put(name, name);
+            }
+            used.put(name, name);
 
             MCRSQLColumn col = null;
             if (type.equals("text") || type.equals("name") || type.equals("identifier")) {

@@ -56,14 +56,15 @@ public class MCRSQLQuery implements MCRConditionVisitor {
     
     private String table;
     
+    private int maxResults;
+    
     /**
      * initialise query 
-     * 
-     * @param document
-     *            xml query docuement
      */
     public MCRSQLQuery(String table, MCRCondition condition, List order, int maxResults) {
         this.table = table;
+        this.maxResults = maxResults;
+        LOGGER.debug("maxResults ("+this.maxResults+") will currently not be used"); //FIXME: use or delete maxResults parameter
         try{
             condition.accept(this);
             this.order = order;

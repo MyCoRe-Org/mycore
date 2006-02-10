@@ -101,10 +101,8 @@ public class MCRBooleanClauseParser {
             } else {
                 return parseSimpleCondition(condition);
             }        	
-        } else {
-        	return parseSimpleCondition(condition);
         }
-
+        return parseSimpleCondition(condition);
     }
 
     public MCRCondition parse(String s) throws MCRParseException {

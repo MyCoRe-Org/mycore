@@ -96,9 +96,8 @@ public class MCRResults {
     public MCRHit getHit(int i) {
         if ((i >= 0) && (i < hits.size())) {
             return (MCRHit) hits.get(i);
-        } else {
-            return null;
         }
+        return null;
     }
 
     /**
@@ -111,9 +110,8 @@ public class MCRResults {
     public MCRHit getHit(String ID) {
         if (map.containsKey(ID)) {
             return (MCRHit) (map.get(ID));
-        } else {
-            return null;
         }
+        return null;
     }
 
     /**

@@ -29,10 +29,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 
 import org.jdom.Document;
-import org.jdom.Element;
-import org.mycore.common.MCRException;
 import org.mycore.datamodel.metadata.MCRActiveLinkException;
-import org.mycore.datamodel.metadata.MCRMetaInterface;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.editor.MCREditorOutValidator;
 
@@ -82,12 +79,10 @@ abstract public class MCRCheckBase extends MCRServlet {
     /**
      * A method to handle IO errors.
      * 
-     * @param jab
+     * @param job
      *            the MCRServletJob
-     * @param lang
-     *            the current language
      */
-    protected void errorHandlerIO(MCRServletJob job, String lang) throws Exception {
+    protected void errorHandlerIO(MCRServletJob job) throws Exception {
         String pagedir = CONFIG.getString("MCR.editor_page_dir", "");
         job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + pagedir + "editor_error_store.xml"));
     }
@@ -124,8 +119,6 @@ abstract public class MCRCheckBase extends MCRServlet {
          * 
          * @param jdom_in
          *            editor input
-         * @param MCRObject
-         *            id
          */
         public EditorValidator(Document jdom_in, MCRObjectID id) {
             super(jdom_in, id);

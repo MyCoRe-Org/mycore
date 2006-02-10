@@ -95,10 +95,10 @@ import org.apache.log4j.PropertyConfigurator;
  * 
  * @see #loadFromFile
  * @see #reload
- * @see #list
+ * @see #list(PrintStream)
  * @see #store
  * 
- * @author Frank L?tzenkirchen
+ * @author Frank Lützenkirchen
  * @version $Revision$ $Date$
  */
 public class MCRConfiguration {
@@ -443,8 +443,6 @@ public class MCRConfiguration {
      * 
      * @param name
      *            non-null and non-empty name of the configuration property
-     * @param default
-     *            the default if the configuration for name isn't found
      * @return the instance of the class named by the value of the configuration
      *         propertyl
      * @throws MCRConfigurationException
@@ -517,20 +515,15 @@ public class MCRConfiguration {
      * int</CODE> value, or returns a given default value if the property is
      * not set.
      * 
-     * @return the value of the specified property as an <CODE>int</CODE>
-     *         value
      * @param name
      *            the non-null and non-empty name of the configuration property
      *            /** Returns the configuration property with the specified name
      *            as an <CODE>int</CODE> value, or returns a given default
      *            value if the property is not set.
-     * 
-     * @return the value of the specified property as an <CODE>int</CODE>
-     *         value
-     * @param name
-     *            the non-null and non-empty name of the configuration property
      * @param defaultValue
      *            the value to return if the configuration property is not set
+     * @return the value of the specified property as an <CODE>int</CODE>
+     *         value
      * @throws NumberFormatException
      *             if the configuration property is set but is not an <CODE>int
      *             </CODE> value

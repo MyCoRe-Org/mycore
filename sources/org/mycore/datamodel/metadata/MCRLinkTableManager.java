@@ -366,19 +366,15 @@ public class MCRLinkTableManager {
 	}
 
 	/**
-	 * The method coutn the reference links for a given object ID.
+	 * counts the reference links for a given object ID.
 	 * 
 	 * @param type
 	 *            the table type
-	 * @param to
-	 *            the object ID as String, they was referenced
-	 * @param to
-	 *            document_type Array
-	 * @param to
-	 *            the restricion of a category id
+	 * @param target
+	 *            the reference link target object ID as String
 	 * @return the number of references
 	 */
-	public int countReferenceLinkTo(String type, String to, String[] doctypes, String restriction) {
+	public int countReferenceLinkTo(String type, String target, String[] doctypes, String restriction) {
 		int i = checkType(type);
 
 		if (i == -1) {
@@ -387,7 +383,7 @@ public class MCRLinkTableManager {
 			return 0;
 		}
 
-		if ((to == null) || ((to = to.trim()).length() == 0)) {
+		if ((target == null) || ((target = target.trim()).length() == 0)) {
 			logger.warn("The to value of a reference link is false, the link was " + "not added to the link table");
 
 			return 0;
@@ -401,15 +397,14 @@ public class MCRLinkTableManager {
 
 				for (idt = 0; idt < doctypes.length; idt++) {
 					mydoctype = doctypes[idt];
-					cnt += ((MCRLinkTableInterface) tablelist.get(i)).countTo(to, mydoctype, restriction);
+					cnt += ((MCRLinkTableInterface) tablelist.get(i)).countTo(target, mydoctype, restriction);
 				}
 
 				return cnt;
-			} else {
-				return ((MCRLinkTableInterface) tablelist.get(i)).countTo(to, "", restriction);
 			}
+			return ((MCRLinkTableInterface) tablelist.get(i)).countTo(target, "", restriction);
 		} catch (Exception e) {
-			logger.warn("An error was occured while search for references of " + to + ".");
+			logger.warn("An error was occured while search for references of " + target + ".");
 		}
 
 		return 0;
@@ -448,7 +443,7 @@ public class MCRLinkTableManager {
 	 * 
 	 * @param classid
 	 *            the classification ID as MCRObjectID
-	 * @param caregid
+	 * @param categid
 	 *            the category ID as String
 	 * @return the number of references
 	 */
@@ -462,7 +457,7 @@ public class MCRLinkTableManager {
 	 * 
 	 * @param classid
 	 *            the classification ID as String
-	 * @param caregid
+	 * @param categid
 	 *            the category ID as String
 	 * @return the number of references
 	 */
@@ -476,7 +471,7 @@ public class MCRLinkTableManager {
 	 * 
 	 * @param classid
 	 *            the classification ID as MCRObjectID
-	 * @param caregid
+	 * @param categid
 	 *            the category ID as String
 	 * @return the number of references
 	 */
@@ -490,7 +485,7 @@ public class MCRLinkTableManager {
 	 * 
 	 * @param classid
 	 *            the classification ID as String
-	 * @param caregid
+	 * @param categid
 	 *            the category ID as String
 	 * @return the number of references
 	 */

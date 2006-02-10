@@ -63,7 +63,7 @@ public class MCRJDOMEventHandlerIndexMeta extends MCREventHandlerBase {
 
         // save the stop time
         long t2 = System.currentTimeMillis();
-        double diff = (double) (t2 - t1) / 1000.0;
+        double diff = (t2 - t1) / 1000.0;
         LOGGER.debug("MCRJDOMEventHandlerIndexMeta create: done in " + diff + " sec.");
     }
 
@@ -90,7 +90,7 @@ public class MCRJDOMEventHandlerIndexMeta extends MCREventHandlerBase {
 
         // save the stop time
         long t2 = System.currentTimeMillis();
-        double diff = (double) (t2 - t1) / 1000.0;
+        double diff = (t2 - t1) / 1000.0;
         LOGGER.debug("MCRJDOMEventHandlerIndexMeta update: done in " + diff + " sec.");
     }
 
@@ -114,7 +114,7 @@ public class MCRJDOMEventHandlerIndexMeta extends MCREventHandlerBase {
 
         // save the stop time
         long t2 = System.currentTimeMillis();
-        double diff = (double) (t2 - t1) / 1000.0;
+        double diff = (t2 - t1) / 1000.0;
         LOGGER.debug("MCRJDOMEventHandlerIndexMeta delete: done in " + diff + " sec.");
     }
 
@@ -141,7 +141,7 @@ public class MCRJDOMEventHandlerIndexMeta extends MCREventHandlerBase {
 
         // save the stop time
         long t2 = System.currentTimeMillis();
-        double diff = (double) (t2 - t1) / 1000.0;
+        double diff = (t2 - t1) / 1000.0;
         LOGGER.debug("MCRJDOMEventHandlerIndexMeta repair: done in " + diff + " sec.");
     }
 

@@ -93,12 +93,6 @@ class MCRClassificationManager {
         categoryCache.put(getCachingID(category), category);
     }
 
-    void updateCategoryItem(MCRCategoryItem category) {
-        // store.updateCategoryItem( category );
-        // categoryCache.remove( getCachingID( category ) );
-        // categoryCache.put ( getCachingID( category ), category );
-    }
-
     MCRClassificationItem retrieveClassificationItem(String ID) {
         MCRClassificationItem c = (MCRClassificationItem) (classificationCache.get(ID));
 

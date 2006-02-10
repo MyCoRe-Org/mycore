@@ -117,7 +117,7 @@ public abstract class MCRMetaDefault {
      * @param set_subtag       the name of the subtag
      * @param default_lang     the default language
      * @param set_type         the optional type string
-     * @param set_inherted     a int value , > 0 if the data are inherited,
+     * @param set_inherited     a int value , > 0 if the data are inherited,
      *                         else = 0.
      * @exception MCRException if the set_subtag value is null or empty
      */

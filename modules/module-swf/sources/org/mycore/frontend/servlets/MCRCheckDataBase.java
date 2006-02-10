@@ -131,14 +131,14 @@ abstract public class MCRCheckDataBase extends MCRCheckBase {
         String savedir = CONFIG.getString("MCR.editor_" + ID.getTypeId() + "_directory");
         String NL = System.getProperty("file.separator");
         String fullname = savedir + NL + ID.getId() + ".xml";
-        storeMetadata(outxml, job, ID, fullname, lang);
+        storeMetadata(outxml, job, ID, fullname);
 
         // create a metadata object and prepare it
-        org.jdom.Document outdoc = prepareMetadata((org.jdom.Document) indoc.clone(), ID, job, oldstep, lang);
+        org.jdom.Document outdoc = prepareMetadata((org.jdom.Document) indoc.clone(), ID, job, lang);
         outxml = MCRUtils.getByteArray(outdoc);
 
         // Save the prepared metadata object
-        storeMetadata(outxml, job, ID, fullname, lang);
+        storeMetadata(outxml, job, ID, fullname);
 
         // call the getNextURL and sendMail methods
         String url;
@@ -156,18 +156,16 @@ abstract public class MCRCheckDataBase extends MCRCheckBase {
      * The method stores the data in a working directory dependenced of the
      * type.
      * 
-     * @param outdoc
+     * @param outxml
      *            the prepared JDOM object
      * @param job
      *            the MCRServletJob
-     * @param the
+     * @param ID
      *            MCRObjectID of the MCRObject/MCRDerivate
      * @param fullname
      *            the file name where the JDOM was stored.
-     * @param lang
-     *            the current langauge
      */
-    public final void storeMetadata(byte[] outxml, MCRServletJob job, MCRObjectID ID, String fullname, String lang) throws Exception {
+    public final void storeMetadata(byte[] outxml, MCRServletJob job, MCRObjectID ID, String fullname) throws Exception {
         if (outxml == null) {
             return;
         }
@@ -180,7 +178,7 @@ abstract public class MCRCheckDataBase extends MCRCheckBase {
         } catch (IOException ex) {
             LOGGER.error(ex.getMessage());
             LOGGER.error("Exception while store to file " + fullname);
-            errorHandlerIO(job, lang);
+            errorHandlerIO(job);
 
             return;
         }
@@ -204,22 +202,20 @@ abstract public class MCRCheckDataBase extends MCRCheckBase {
      *            the MCRObjectID of the MCRObject
      * @param job
      *            the MCRServletJob data
-     * @param step
-     *            the current workflow step
      * @param lang
      *            the current language
      */
-    protected org.jdom.Document prepareMetadata(org.jdom.Document jdom_in, MCRObjectID ID, MCRServletJob job, String step, String lang) throws Exception {
+    protected org.jdom.Document prepareMetadata(org.jdom.Document jdom_in, MCRObjectID ID, MCRServletJob job, String lang) throws Exception {
         EditorValidator ev = new EditorValidator(jdom_in, ID);
         Document jdom_out = ev.generateValidMyCoReObject();
-        errorHandlerValid(job, ev.getErrorLog(), ID, step, lang);
+        errorHandlerValid(job, ev.getErrorLog(), ID, lang);
         return jdom_out;
     }
 
     /**
      * A method to handle valid errors.
      */
-    private final void errorHandlerValid(MCRServletJob job, List logtext, MCRObjectID ID, String step, String lang) throws Exception {
+    private final void errorHandlerValid(MCRServletJob job, List logtext, MCRObjectID ID, String lang) throws Exception {
         if (logtext.size() == 0) {
             return;
         }
