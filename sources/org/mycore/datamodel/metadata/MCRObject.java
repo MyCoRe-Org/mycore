@@ -527,7 +527,6 @@ final public class MCRObject extends MCRBase {
         boolean ret = false;
         try {
             ret = Boolean.parseBoolean((String) evt.get("exist"));
-            System.out.println("Retrun = " + ret);
         } catch (RuntimeException e) {
         }
         return ret;
