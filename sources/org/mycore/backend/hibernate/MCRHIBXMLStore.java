@@ -96,13 +96,16 @@ public class MCRHIBXMLStore implements MCRXMLTableInterface {
      * @param version
      *            the version of the XML Blob as integer
      * @exception MCRPersistenceException
+
+     *                
+     *                
+     *                
      *                the method arguments are not correct
      */
     public synchronized final void create(MCRObjectID mcrid, byte[] xml, int version) throws MCRPersistenceException {
         if (mcrid == null) {
             throw new MCRPersistenceException("The MCRObjectID is null.");
         }
-
         if ((xml == null) || (xml.length == 0)) {
             throw new MCRPersistenceException("The XML array is null or empty.");
         }
@@ -117,7 +120,7 @@ public class MCRHIBXMLStore implements MCRXMLTableInterface {
             tab.setType(this.type);
             tab.setXmlByteArray(xml);
 
-            System.out.println("Inserting " + mcrid.getId() + "/" + version + "/" + this.type + " into database");
+            logger.debug("Inserting " + mcrid.getId() + "/" + version + "/" + this.type + " into database");
 
             session.saveOrUpdate(tab);
 
@@ -128,7 +131,7 @@ public class MCRHIBXMLStore implements MCRXMLTableInterface {
         } finally {
             session.close();
         }
-    }
+   }
 
     /**
      * The method remove a item for the MCRObjectID from the datastore.
@@ -338,7 +341,7 @@ public class MCRHIBXMLStore implements MCRXMLTableInterface {
         int t;
 
         for (t = 0; t < l.size(); t++) {
-            System.out.println(l.get(0).toString());
+            logger.debug(l.get(0).toString());
         }
     }
 }
