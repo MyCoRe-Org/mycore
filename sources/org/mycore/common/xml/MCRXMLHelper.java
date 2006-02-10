@@ -232,7 +232,7 @@ public class MCRXMLHelper {
     
         public static boolean equivalentAttributes(Element e1, Element e2) {
             List aList1=e1.getAttributes();
-            List aList2=e1.getAttributes();
+            List aList2=e2.getAttributes();
             if (aList1.size()!=aList2.size()){
                 return false;
             }
