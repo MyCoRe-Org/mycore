@@ -78,13 +78,6 @@ public class MCRClassificationItem extends MCRClassificationObject {
     }
 
     /**
-     * The method call the MCRClassificationManager to update this instance.
-     */
-    public final void update() {
-        manager().updateClassificationItem(this);
-    }
-
-    /**
      * The methode return the classification ID.
      * 
      * @return the classification ID

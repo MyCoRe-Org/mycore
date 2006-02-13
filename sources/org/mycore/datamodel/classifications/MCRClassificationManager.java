@@ -78,12 +78,6 @@ class MCRClassificationManager {
         classificationCache.put(classification.getID(), classification);
     }
 
-    void updateClassificationItem(MCRClassificationItem classification) {
-        // store.updateClassificationItem( classification );
-        // classificationCache.remove( classification.getID() );
-        // classificationCache.put ( classification.getID(), classification );
-    }
-
     void createCategoryItem(MCRCategoryItem category) {
         if (store.categoryItemExists(category.getClassificationID(), category.getID())) {
             throw new MCRPersistenceException("Category " + category.getID() + " already exists");
