@@ -61,7 +61,7 @@ public class MCRAccessRule {
     }
 
     public boolean checkAccess(MCRUser user, Date date, MCRIPAddress ip) {
-    	if(user.getID().equals("administrator"))
+    	if(user.getID().equals(MCRAccessControlSystem.superuserID))
     		return true;
         if (this.parsedRule == null) {
             return false;

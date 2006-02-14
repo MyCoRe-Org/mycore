@@ -59,6 +59,8 @@ public class MCRAccessControlSystem extends MCRAccessBaseImpl{
 	public static final String systemRulePrefix = "SYSTEMRULE" ;
 	public static final String poolPrivilegeID = "POOLPRIVILEGE" ;
 	
+	static String superuserID = MCRConfiguration.instance().getString("MCR.users_superuser_username", "mcradmin");
+	
     MCRCache cache;
 
     MCRAccessStore accessStore;
@@ -284,7 +286,7 @@ public class MCRAccessControlSystem extends MCRAccessBaseImpl{
         MCRAccessRule rule = getAccess(objID, permission);
         if (rule == null) {
         	// no rule: in read-pool everybody has access
-        	if(permission.equals("read") || user.getID().equals("administrator")){
+        	if(permission.equals("read") || user.getID().equals(superuserID)){
         		return true;
         	}
         	return false; 
