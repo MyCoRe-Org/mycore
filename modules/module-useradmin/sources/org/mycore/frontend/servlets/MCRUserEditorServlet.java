@@ -72,9 +72,6 @@ public class MCRUserEditorServlet extends MCRUserAdminGUICommons {
      *             for errors from the servlet engine.
      */
     public void doGetPost(MCRServletJob job) throws IOException, ServletException {
-        MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
-        String currentUserID = mcrSession.getCurrentUserID();
-        ArrayList currentPrivs = MCRUserMgr.instance().retrieveAllPrivsOfTheUser(currentUserID);
 
         String mode = getProperty(job.getRequest(), "mode");
 
@@ -83,11 +80,11 @@ public class MCRUserEditorServlet extends MCRUserAdminGUICommons {
         }
 
         if (mode.equals("getAssignableGroupsForUser")) {
-            getAssignableGroupsForUser(job, currentPrivs);
+            getAssignableGroupsForUser(job);
         } else if (mode.equals("retrieveuserxml")) {
-            retrieveUserXML(job, currentPrivs);
+            retrieveUserXML(job);
         } else if (mode.equals("retrievealluserxml")) {
-            retrieveAllUserXML(job, currentPrivs);
+            retrieveAllUserXML(job);
         } else if (mode.equals("xml")) {
             getEditorSubmission(job);
         } else { // no valid mode
@@ -110,7 +107,7 @@ public class MCRUserEditorServlet extends MCRUserAdminGUICommons {
      * @throws ServletException
      *             for errors from the servlet engine.
      */
-    private void getAssignableGroupsForUser(MCRServletJob job, ArrayList currentPrivs) throws IOException, ServletException {
+    private void getAssignableGroupsForUser(MCRServletJob job) throws IOException, ServletException {
         // Get the MCRSession object for the current thread from the session
         // manager.
         MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
@@ -122,16 +119,16 @@ public class MCRUserEditorServlet extends MCRUserAdminGUICommons {
             // current user.
             MCRUser currentUser = MCRUserMgr.instance().retrieveUser(currentUserID);
 
-            if (currentPrivs.contains("user administrator")) {
+            if (AI.checkPermission("administrate-user")) {
                 groupIDs = MCRUserMgr.instance().getAllGroupIDs();
-            } else if (currentPrivs.contains("create user")) {
+            } else if (AI.checkPermission("create-user")) {
                 groupIDs = currentUser.getAllGroupIDs();
             } else {
-                // There are no privileges to assign any groups to a new user.
+                // There are no permissions to assign any groups to a new user.
                 // Possibly someone tried to call the new user form directly
                 // without
                 // checking the privileges using the MCRUserAdminServlet first.
-                LOGGER.warn("MCRUserEditorServlet: not enough privileges! " + "Someone might have tried to call the new user form directly.");
+                LOGGER.warn("MCRUserEditorServlet: not enough permissions! " + "Someone might have tried to call the new user form directly.");
 
                 // TODO: Hier muss irgendwie eine vernünftige Fehlermeldung her!
                 // Aktuell spielt das MCREditorServlet noch nicht mit. Die
@@ -139,7 +136,7 @@ public class MCRUserEditorServlet extends MCRUserAdminGUICommons {
                 // Zeilen z.B. führen zu einem "impossible to open input stream"
                 // Fehler im MCREditorServlet (weil halt error 403 gesendet
                 // wird)
-                String msg = "You do not have enough privileges for this use case!";
+                String msg = "You do not have enough permissions for this use case!";
                 job.getResponse().sendError(HttpServletResponse.SC_FORBIDDEN, msg);
 
                 return;
@@ -177,9 +174,9 @@ public class MCRUserEditorServlet extends MCRUserAdminGUICommons {
      * @throws ServletException
      *             for errors from the servlet engine.
      */
-    private void retrieveAllUserXML(MCRServletJob job, ArrayList currentPrivs) throws IOException, ServletException {
+    private void retrieveAllUserXML(MCRServletJob job) throws IOException, ServletException {
         // We first check the privileges for this use case
-        if (!currentPrivs.contains("user administrator") && !currentPrivs.contains("list all user")) {
+        if (!AI.checkPermission("administrate-user")) {
             showNoPrivsPage(job);
 
             return;
@@ -201,9 +198,9 @@ public class MCRUserEditorServlet extends MCRUserAdminGUICommons {
      * This method is still experimental! It is needed in the use case "modify
      * user".
      */
-    private void retrieveUserXML(MCRServletJob job, ArrayList currentPrivs) throws IOException, ServletException {
+    private void retrieveUserXML(MCRServletJob job) throws IOException, ServletException {
         // We first check the privileges for this use case
-        if (!currentPrivs.contains("user administrator") && !currentPrivs.contains("modify user")) {
+        if (!AI.checkPermission("modify-user")) {
             showNoPrivsPage(job);
 
             return;

@@ -67,8 +67,6 @@ public class MCRUserAdminServlet extends MCRUserAdminGUICommons {
     public void doGetPost(MCRServletJob job) throws IOException {
         MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
         String currentUserID = mcrSession.getCurrentUserID();
-        ArrayList currentPrivs = MCRUserMgr.instance().retrieveAllPrivsOfTheUser(currentUserID);
-
         // Read the mode from the HTTP request, dispatch to subsequent methods
         String mode = getProperty(job.getRequest(), "mode");
 
@@ -77,11 +75,11 @@ public class MCRUserAdminServlet extends MCRUserAdminGUICommons {
         }
 
         if (mode.equals("newuser")) {
-            createUser(job, currentPrivs);
+            createUser(job);
         } else if (mode.equals("modifyuser")) {
-            modifyUser(job, currentPrivs);
+            modifyUser(job);
         } else if (mode.equals("listalluser")) {
-            listallUser(job, currentPrivs);
+            listallUser(job);
         } else { // no valid mode
 
             String msg = "The request did not contain a valid mode for this servlet!";
@@ -98,9 +96,9 @@ public class MCRUserAdminServlet extends MCRUserAdminGUICommons {
      * @throws IOException
      *             for java I/O errors.
      */
-    private void createUser(MCRServletJob job, ArrayList currentPrivs) throws IOException {
+    private void createUser(MCRServletJob job) throws IOException {
         // We first check the privileges for this use case
-        if (!currentPrivs.contains("user administrator") && !currentPrivs.contains("create user")) {
+        if (!AI.checkPermission("create-user")) {
             showNoPrivsPage(job);
 
             return;
@@ -127,9 +125,9 @@ public class MCRUserAdminServlet extends MCRUserAdminGUICommons {
      * @throws IOException
      *             for java I/O errors.
      */
-    private void listallUser(MCRServletJob job, ArrayList currentPrivs) throws IOException {
+    private void listallUser(MCRServletJob job) throws IOException {
         // We first check the privileges for this use case
-        if (!currentPrivs.contains("user administrator") && !currentPrivs.contains("list all users")) {
+        if (!AI.checkPermission("administrate-user")) {
             showNoPrivsPage(job);
 
             return;
@@ -145,11 +143,10 @@ public class MCRUserAdminServlet extends MCRUserAdminGUICommons {
     /**
      * This method is still experimental !
      */
-    private void modifyUser(MCRServletJob job, ArrayList currentPrivs) throws IOException {
+    private void modifyUser(MCRServletJob job) throws IOException {
         // We first check the privileges for this use case
-        if (!currentPrivs.contains("user administrator") && !currentPrivs.contains("modify user")) {
+        if (!AI.checkPermission("modify-user")) {
             showNoPrivsPage(job);
-
             return;
         }
 
