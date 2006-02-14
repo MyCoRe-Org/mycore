@@ -40,6 +40,7 @@ import org.mycore.frontend.servlets.MCRServletJob;
  * @author Detlev Degenhardt
  * @author Jens Kupferschmidt
  * @version $Revision$ $Date$
+ * @deprecated
  */
 public class MCRUserPrivServlet extends MCRServlet {
     private static Logger LOGGER = Logger.getLogger(MCRUserPrivServlet.class);

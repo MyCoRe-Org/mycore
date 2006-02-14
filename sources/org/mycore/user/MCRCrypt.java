@@ -38,6 +38,7 @@ package org.mycore.user;
  * 
  * @author Detlev Degenhardt
  * @version $Revision$ $Date$
+ * @deprecated
  */
 public class MCRCrypt {
     private MCRCrypt() {

@@ -32,6 +32,7 @@ package org.mycore.user;
  * @author Detlev Degenhardt
  * @author Benno Süselbeck
  * @version $Revision$ $Date$
+ * @deprecated
  */
 public interface MCRPrincipal {
     /** Principals are stored by their identity in ACLs */

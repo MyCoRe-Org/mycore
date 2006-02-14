@@ -36,6 +36,7 @@ import org.mycore.common.MCRException;
  * 
  * @author Detlev Degenhardt
  * @version $Revision$ $Date$
+ * @deprecated
  */
 public interface MCRUserStore {
     /**

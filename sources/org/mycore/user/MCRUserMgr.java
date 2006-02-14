@@ -48,6 +48,7 @@ import org.mycore.common.MCRSessionMgr;
  * @author Detlev Degenhardt
  * @author Jens Kupferschmidt
  * @version $Revision$ $Date$
+ * @deprecated
  */
 public class MCRUserMgr {
 	/** The logger and the configuration */

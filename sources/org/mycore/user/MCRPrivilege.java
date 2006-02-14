@@ -38,6 +38,7 @@ import org.mycore.common.MCRException;
  * @author Detlev Degenhardt
  * @author Jens Kupferschmidt
  * @version $Revision$ $Date$
+ * @deprecated
  */
 public class MCRPrivilege {
     /** The length of the decription */

@@ -46,6 +46,7 @@ import org.mycore.common.MCRSessionMgr;
  * @author Jens Kupferschmidt
  * @author Thomas Scheffler (yagee)
  * @version $Revision$ $Date$
+ * @deprecated
  */
 public class MCRUser extends MCRUserObject implements MCRPrincipal, Principal {
     /** The numerical ID of the MyCoRe user unit (either user ID or group ID) */

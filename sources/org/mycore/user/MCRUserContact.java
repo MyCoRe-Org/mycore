@@ -39,6 +39,7 @@ import org.apache.log4j.Logger;
  * @author Jens Kupferschmidt
  * @author Thomas Scheffler (yagee)
  * @version $Revision$ $Date$
+ * @deprecated
  */
 public class MCRUserContact {
     private static Logger logger = Logger.getLogger(MCRUserContact.class.getName());

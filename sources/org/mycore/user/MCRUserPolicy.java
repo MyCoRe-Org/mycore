@@ -32,6 +32,7 @@ import java.util.ArrayList;
  * 
  * @author Detlev Degenhardt
  * @version $Revision$ $Date$
+ * @deprecated
  */
 public class MCRUserPolicy {
     /** ArrayList with Strings indicating required user fields */

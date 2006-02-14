@@ -46,6 +46,7 @@ import org.mycore.common.MCRSessionMgr;
  * 
  * @author Detlev Degenhardt
  * @author Jens Kupferschmidt
+ * @deprecated
  * @version $Revision$ $Date$
  */
 public class MCRGroup extends MCRUserObject implements MCRPrincipal {

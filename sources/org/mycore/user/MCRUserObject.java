@@ -40,6 +40,7 @@ import org.mycore.common.MCRException;
  * @author Detlev Degenhardt
  * @author Jens Kupferschmidt
  * @version $Revision$ $Date$
+ * @deprecated
  */
 abstract class MCRUserObject {
     protected static Logger logger = Logger.getLogger(MCRUserObject.class.getName());

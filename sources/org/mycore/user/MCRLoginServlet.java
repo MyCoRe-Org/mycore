@@ -42,6 +42,7 @@ import org.mycore.frontend.servlets.MCRServletJob;
  * 
  * @author Detlev Degenhardt
  * @version $Revision$ $Date$
+ * @deprecated
  */
 public class MCRLoginServlet extends MCRServlet {
     // The configuration
