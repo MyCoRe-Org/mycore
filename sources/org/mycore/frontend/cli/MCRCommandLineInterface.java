@@ -430,7 +430,7 @@ public class MCRCommandLineInterface {
 	public static void changeToUser(String user, String password) {
 		System.out.println(system + " The old user ID is " + session.getCurrentUserID());
 
-		if (org.mycore.user.MCRUserMgr.instance().login(user.trim(), password.trim())) {
+		if (org.mycore.user2.MCRUserMgr.instance().login(user.trim(), password.trim())) {
 			session.setCurrentUserID(user);
 			System.out.println(system + " The new user ID is " + session.getCurrentUserID());
 		} else {

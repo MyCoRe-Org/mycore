@@ -42,8 +42,8 @@ import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.user.MCRUser;
-import org.mycore.user.MCRUserMgr;
+import org.mycore.user2.MCRUser;
+import org.mycore.user2.MCRUserMgr;
 
 /**
  * MyCoRe-Standard Implementation of the
@@ -334,6 +334,9 @@ public class MCRAccessControlSystem extends MCRAccessBaseImpl{
      * 		    String
      */
     public String getNormalizedRuleString(Element rule) {
+    	if(rule.getChildren() == null || rule.getChildren().size() == 0) {
+    		return "false" ;
+    	}
     	Element normalizedRule = normalize((Element)rule.getChildren().get(0));
 		MCRRuleParser parser = new MCRRuleParser();
 		return parser.parse(normalizedRule).toString();

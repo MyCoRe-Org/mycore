@@ -28,7 +28,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import org.jdom.Element;
-import org.mycore.user.MCRUser;
+import org.mycore.user2.MCRUser;
 
 import org.mycore.parsers.bool.MCRCondition;
 import org.mycore.parsers.bool.MCRParseException;

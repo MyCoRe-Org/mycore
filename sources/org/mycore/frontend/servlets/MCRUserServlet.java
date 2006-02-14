@@ -32,8 +32,8 @@ import org.jdom.Document;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.user.MCRUser;
-import org.mycore.user.MCRUserMgr;
+import org.mycore.user2.MCRUser;
+import org.mycore.user2.MCRUserMgr;
 
 /**
  * This servlet provides a web interface for the user management of the mycore

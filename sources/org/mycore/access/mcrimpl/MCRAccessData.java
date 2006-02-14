@@ -25,7 +25,7 @@ package org.mycore.access.mcrimpl;
 
 import java.util.Date;
 
-import org.mycore.user.MCRUser;
+import org.mycore.user2.MCRUser;
 
 public class MCRAccessData {
     private MCRUser user;
