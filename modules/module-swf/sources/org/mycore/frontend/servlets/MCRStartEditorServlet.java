@@ -37,8 +37,6 @@ import javax.servlet.ServletException;
 import org.apache.log4j.Logger;
 import org.jdom.Element;
 
-import org.mycore.access.MCRAccessInterface;
-import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRMailer;
 import org.mycore.common.MCRSession;
