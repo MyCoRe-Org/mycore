@@ -24,15 +24,10 @@
 package org.mycore.frontend.servlets;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Properties;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
-
-import org.mycore.common.MCRSession;
-import org.mycore.common.MCRSessionMgr;
-import org.mycore.user.MCRUserMgr;
 
 /**
  * This servlet controls the web interface for the editors of the user
@@ -65,8 +60,6 @@ public class MCRUserAdminServlet extends MCRUserAdminGUICommons {
      *             for java I/O errors.
      */
     public void doGetPost(MCRServletJob job) throws IOException {
-        MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
-        String currentUserID = mcrSession.getCurrentUserID();
         // Read the mode from the HTTP request, dispatch to subsequent methods
         String mode = getProperty(job.getRequest(), "mode");
 
