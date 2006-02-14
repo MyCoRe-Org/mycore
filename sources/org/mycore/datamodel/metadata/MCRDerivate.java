@@ -338,7 +338,7 @@ final public class MCRDerivate extends MCRBase {
         MCREventManager.instance().handleEvent(evt);
         boolean ret = false;
         try {
-            ret = Boolean.getBoolean((String) evt.get("exist"));
+            ret = Boolean.valueOf((String) evt.get("exist")).booleanValue();
         } catch (RuntimeException e) {
         }
         return ret;
