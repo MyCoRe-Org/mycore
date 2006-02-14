@@ -168,7 +168,10 @@ public class MCRAccessControlSystem extends MCRAccessBaseImpl{
     }	
     
     public boolean checkPermission(String permission) {
-    	return checkPermission(poolPrivilegeID, permission);
+        LOGGER.debug("Execute MCRAccessControlSystem checkPermission for permission " + permission);
+        boolean ret = checkPermission(poolPrivilegeID, permission);
+        LOGGER.debug("Execute MCRAccessControlSystem checkPermission result: "+(new Boolean(ret)).toString());
+    return ret;
     }
 
 	public boolean checkPermission(Element rule) {
