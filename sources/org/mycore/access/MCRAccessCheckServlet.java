@@ -86,9 +86,9 @@ public class MCRAccessCheckServlet extends MCRServlet {
 
         boolean result = false;
         if ((objid == null) || (objid.trim().length() == 0))
-        result = AI.checkPermission(objid, permission);
+        	result = AI.checkPermission(permission);
         else
-            result = AI.checkPermission(permission);
+            result = AI.checkPermission(objid, permission);
 
         Document jdom = new Document(new Element("mycoreaccesscheck"));
         jdom.getRootElement().addContent(new Element("accesscheck"));
