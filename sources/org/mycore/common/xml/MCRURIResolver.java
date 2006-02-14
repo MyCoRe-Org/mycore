@@ -34,8 +34,11 @@ import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.StringTokenizer;
 
 import javax.servlet.ServletContext;
@@ -46,6 +49,8 @@ import org.apache.log4j.Logger;
 import org.jdom.Element;
 import org.jdom.input.SAXBuilder;
 import org.jdom.transform.JDOMSource;
+import org.xml.sax.EntityResolver;
+import org.xml.sax.InputSource;
 
 import org.mycore.access.MCRAccessInterface;
 import org.mycore.access.MCRAccessManager;
@@ -59,8 +64,6 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.MCRXMLTableManager;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.services.query.MCRQueryCache;
-import org.xml.sax.EntityResolver;
-import org.xml.sax.InputSource;
 
 /**
  * Reads XML documents from various URI types. This resolver is used to read
@@ -78,19 +81,42 @@ import org.xml.sax.InputSource;
 public class MCRURIResolver implements javax.xml.transform.URIResolver, EntityResolver {
     private static final Logger LOGGER = Logger.getLogger(MCRURIResolver.class);
 
-    private static final String HOST_PARAM = "host";
+    private static Map SUPPORTED_SCHEMES;
 
-    private static final String TYPE_PARAM = "type";
+    private static final MCRURIResolver singleton = new MCRURIResolver();
 
-    private static final String QUERY_PARAM = "query";
+    private static ServletContext context;
 
-    private static final String HOST_DEFAULT = "local";
+    private MCRCache bytesCache;
 
-    private static final String ACTION_PARAM = "action";
-    
-    private static final String OBJECT_ID_PARAM = "object";
+    /**
+     * Creates a new MCRURIResolver
+     */
+    private MCRURIResolver() {
+        MCRConfiguration config = MCRConfiguration.instance();
+        String prefix = "MCR.URIResolver.";
+        int cacheSize = config.getInt(prefix + "StaticFiles.CacheSize", 100);
+        bytesCache = new MCRCache(cacheSize);
+        HashMap supportedSchemes = new HashMap(10, 1);//set to final size, loadfactor: full
+        supportedSchemes.put("webapp", new MCRWebAppResolver());
+        supportedSchemes.put("file", new MCRFileResolver());
+        supportedSchemes.put("query", new MCRQueryResolver());
+        supportedSchemes.put("ifs", new MCRIFSResolver());
+        supportedSchemes.put("mcrobject", new MCRObjectResolver());
+        supportedSchemes.put("http", new MCRHttpResolver());
+        supportedSchemes.put("request", new MCRRequestResolver());
+        supportedSchemes.put("session", new MCRSessionResolver());
+        supportedSchemes.put("access", new MCRACLResolver());
+        supportedSchemes.put("resource", new MCRResourceResolver());
+        SUPPORTED_SCHEMES = Collections.unmodifiableMap(supportedSchemes);
+    }
 
-    private static final String URL_ENCODING = MCRConfiguration.instance().getString("MCR.request_charencoding", "UTF-8");;
+    /**
+     * Returns the MCRURIResolver singleton
+     */
+    public static MCRURIResolver instance() {
+        return singleton;
+    }
 
     /**
      * Initializes the MCRURIResolver for servlet applications.
@@ -102,53 +128,8 @@ public class MCRURIResolver implements javax.xml.transform.URIResolver, EntityRe
      */
     public static synchronized void init(ServletContext ctx, String webAppBase) {
         context = ctx;
-        LOGGER.debug("parameter webAppBase ("+webAppBase+") will not be used"); //FIXME: use webAppBase or remove it
-    }
-
-    private static MCRURIResolver singleton = null;
-
-    /**
-     * Returns the MCRURIResolver singleton
-     */
-    public static synchronized MCRURIResolver instance() {
-        if (singleton == null) {
-            singleton = new MCRURIResolver();
-        }
-
-        return singleton;
-    }
-
-    private static ServletContext context;
-
-    /** A cache of parsed XML files * */
-    private MCRCache fileCache;
-
-    private MCRCache bytesCache;
-
-    /**
-     * Creates a new MCRURIResolver
-     */
-    private MCRURIResolver() {
-        MCRConfiguration config = MCRConfiguration.instance();
-        String prefix = "MCR.URIResolver.";
-        int cacheSize = config.getInt(prefix + "StaticFiles.CacheSize", 100);
-        fileCache = new MCRCache(cacheSize);
-        bytesCache = new MCRCache(cacheSize);
-    }
-
-    /**
-     * Returns the filename part of a path.
-     * 
-     * @param path
-     *            the path of a file
-     * @return the part after the last / or \\
-     */
-    private String getFileName(String path) {
-        int posA = path.lastIndexOf("/");
-        int posB = path.lastIndexOf("\\");
-        int pos = ((posA == -1) ? posB : posA);
-
-        return ((pos == -1) ? path : path.substring(pos + 1));
+        LOGGER.debug("parameter webAppBase (" + webAppBase + ") will not be used");
+        // FIXME: use webAppBase or remove it
     }
 
     /**
@@ -171,7 +152,7 @@ public class MCRURIResolver implements javax.xml.transform.URIResolver, EntityRe
 
         if ("resource request webapp file ifs session query mcrobject access".indexOf(scheme) != -1) {
             return new JDOMSource(resolve(href));
-        } 
+        }
         return null;
     }
 
@@ -184,31 +165,56 @@ public class MCRURIResolver implements javax.xml.transform.URIResolver, EntityRe
      */
     public InputSource resolveEntity(String publicId, String systemId) throws org.xml.sax.SAXException, java.io.IOException {
         LOGGER.debug("Resolving " + publicId + " :: " + systemId);
-
+    
         if (systemId == null) {
             return null; // Use default resolver
         }
-
-        InputStream is = getCachedResource("resource:" + getFileName(systemId));
-
+    
+        InputStream is = getCachedResource(getFileName(systemId));
+    
         if (is == null) {
             return null; // Use default resolver
         }
-
+    
         LOGGER.debug("Reading " + getFileName(systemId));
-
+    
         return new InputSource(is);
     }
 
     /**
-     * Returns the protocol or scheme for the given URI.
+     * Returns the filename part of a path.
      * 
-     * @param uri
-     *            the URI to parse
-     * @return the protocol/scheme part before the ":"
+     * @param path
+     *            the path of a file
+     * @return the part after the last / or \\
      */
-    public String getScheme(String uri) {
-        return new StringTokenizer(uri, ":").nextToken();
+    private String getFileName(String path) {
+        int posA = path.lastIndexOf("/");
+        int posB = path.lastIndexOf("\\");
+        int pos = ((posA == -1) ? posB : posA);
+    
+        return ((pos == -1) ? path : path.substring(pos + 1));
+    }
+
+    private InputStream getCachedResource(String classResource) throws IOException {
+        byte[] bytes = (byte[]) (bytesCache.get(classResource));
+
+        if (bytes == null) {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            InputStream in = this.getClass().getResourceAsStream(classResource);
+
+            if (in == null) {
+                return null;
+            }
+
+            MCRUtils.copyStream(in, baos);
+            baos.close();
+            in.close();
+            bytes = baos.toByteArray();
+            bytesCache.put(classResource, bytes);
+        }
+
+        return new ByteArrayInputStream(bytes);
     }
 
     /**
@@ -222,337 +228,26 @@ public class MCRURIResolver implements javax.xml.transform.URIResolver, EntityRe
         LOGGER.info("Reading xml from uri " + uri);
 
         String scheme = getScheme(uri);
-
-        if ("resource".equals(scheme)) {
-            return readFromResource(uri);
-        } else if ("webapp".equals(scheme)) {
-            return readFromWebapp(uri);
-        } else if ("file".equals(scheme)) {
-            return readFromFile(uri);
-        } else if ("query".equals(scheme)) {
-            return readFromQuery(uri);
-        } else if ("ifs".equals(scheme)) {
-            return readFromIFS(uri);
-        } else if ("mcrobject".equals(scheme)) {
-            return readFromObject(uri);
-        } else if ("http".equals(scheme) || "https".equals(scheme)) {
-            return readFromHTTP(uri);
-        } else if ("request".equals(scheme)) {
-            return readFromRequest(uri);
-        } else if ("session".equals(scheme)) {
-            return readFromSession(uri);
-        } else if ("access".equals(scheme)) {
-            return readFromAccessControll(uri);
-        } else {
-            String msg = "Unsupported URI type: " + uri;
-            throw new MCRUsageException(msg);
-        }
+        return getResolver(scheme).resolveElement(uri);
     }
 
     /**
-     * Reads XML from the CLASSPATH of the application.
+     * Returns the protocol or scheme for the given URI.
      * 
      * @param uri
-     *            the location of the file in the format resource:path/to/file
-     * @return the root element of the XML document
+     *            the URI to parse
+     * @return the protocol/scheme part before the ":"
      */
-    private Element readFromResource(String uri) {
-        Element parsed = parseStream(getResourceStream(uri));
-
-        return parsed;
+    public String getScheme(String uri) {
+        return new StringTokenizer(uri, ":").nextToken();
     }
 
-    private InputStream getResourceStream(String uri) {
-        String path = uri.substring(uri.indexOf(":") + 1);
-        LOGGER.debug("Reading xml from classpath resource " + path);
-
-        return this.getClass().getResourceAsStream("/" + path);
-    }
-
-    private InputStream getCachedResource(String uri) throws IOException {
-        byte[] bytes = (byte[]) (bytesCache.get(uri));
-
-        if (bytes == null) {
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            InputStream in = getResourceStream(uri);
-
-            if (in == null) {
-                return null;
-            }
-
-            MCRUtils.copyStream(in, baos);
-            baos.close();
-            in.close();
-            bytes = baos.toByteArray();
-            bytesCache.put(uri, bytes);
+    MCRResolver getResolver(String scheme) {
+        if (SUPPORTED_SCHEMES.containsKey(scheme)) {
+            return (MCRResolver) SUPPORTED_SCHEMES.get(scheme);
         }
-
-        return new ByteArrayInputStream(bytes);
-    }
-
-    /**
-     * Reads XML from a static file in the current web application.
-     * 
-     * @param uri
-     *            the path to the file in the format webapp:path/to/file
-     * @return the root element of the XML document
-     */
-    private Element readFromWebapp(String uri) {
-        String path = uri.substring(uri.indexOf(":") + 1);
-        LOGGER.debug("Reading xml from webapp " + path);
-        uri = "file://" + context.getRealPath(path);
-
-        return readFromFile(uri);
-    }
-
-    /**
-     * Reads XML from a file URL.
-     * 
-     * @param uri
-     *            the URL of the file in the format file://path/to/file
-     * @return the root element of the xml document
-     */
-    private Element readFromFile(String uri) {
-        String path = uri.substring("file://".length());
-        LOGGER.debug("Reading xml from file " + path);
-
-        File file = new File(path);
-        Element fromCache = (Element) fileCache.getIfUpToDate(path, file.lastModified());
-
-        if (fromCache != null) {
-            return (Element) (fromCache.clone());
-        }
-
-        try {
-            Element parsed = parseStream(new FileInputStream(file));
-            fileCache.put(path, parsed);
-
-            return (Element) (parsed.clone());
-        } catch (FileNotFoundException ex) {
-            String msg = "Could not find file for URI " + uri;
-            throw new MCRUsageException(msg, ex);
-        }
-    }
-
-    /**
-     * Reads XML from a http or https URL.
-     * 
-     * @param url
-     *            the URL of the xml document
-     * @return the root element of the xml document
-     */
-    private Element readFromHTTP(String url) {
-        LOGGER.debug("Reading xml from url " + url);
-
-        try {
-            return parseStream(new URL(url).openStream());
-        } catch (java.net.MalformedURLException ex) {
-            String msg = "Malformed http url: " + url;
-            throw new MCRUsageException(msg, ex);
-        } catch (IOException ex) {
-            String msg = "Unable to open input stream at " + url;
-            throw new MCRUsageException(msg, ex);
-        }
-    }
-
-    /**
-     * Reads XML from a http or https URL.
-     * 
-     * @param uri
-     *            the URL of the xml document
-     * @return the root element of the xml document
-     */
-    private Element readFromIFS(String uri) {
-        LOGGER.debug("Reading xml from url " + uri);
-        
-        String path = uri.substring(uri.indexOf(":") + 1);
-        
-        String hosts=null;
-        int i=path.indexOf("?host");
-        if (i>0){
-            hosts=path.substring(i+1+6);//"?host=".length()
-            path=path.substring(0,i);
-        }
-        return MCRDirectoryXML.getInstance().getDirectory(path,hosts).getRootElement();
-    }
-
-    /**
-     * Reads XML from a HTTP request to this web application.
-     * 
-     * @param uri
-     *            the URI in the format request:path/to/servlet
-     * @return the root element of the xml document
-     */
-    private Element readFromRequest(String uri) {
-        String path = uri.substring(uri.indexOf(":") + 1);
-        LOGGER.debug("Reading xml from request " + path);
-
-        StringBuffer url = new StringBuffer(MCRServlet.getBaseURL());
-        url.append(path);
-
-        if (path.indexOf("?") != -1) {
-            url.append("&");
-        } else {
-            url.append("?");
-        }
-
-        url.append("MCRSessionID=");
-        url.append(MCRSessionMgr.getCurrentSession().getID());
-
-        return readFromHTTP(url.toString());
-    }
-
-    /**
-     * Reads XML from URIs of type session:key. The method MCRSession.get( key )
-     * is called and must return a JDOM element.
-     * 
-     * @see org.mycore.common.MCRSession#get( java.lang.String )
-     * 
-     * @param uri
-     *            the URI in the format session:key
-     * @return the root element of the xml document
-     */
-    private Element readFromSession(String uri) {
-        String key = uri.substring(uri.indexOf(":") + 1);
-
-        LOGGER.debug("Reading xml from session using key " + key);
-
-        Object value = MCRSessionMgr.getCurrentSession().get(key);
-
-        return (Element) (((Element) value).clone());
-    }
-
-    /**
-     * Reads local MCRObject with a given ID from the store.
-     * 
-     * @param uri
-     *            for example, "mcrobject:DocPortal_document_07910401"
-     * @returns XML representation from MCRXMLContainer
-     */
-    private Element readFromObject(String uri) {
-        String id = uri.substring(uri.indexOf(":") + 1);
-        LOGGER.debug("Reading MCRObject with ID " + id);
-
-        try {
-            MCRXMLContainer result = new MCRXMLContainer();
-            MCRObjectID mcrid = new MCRObjectID(id);
-            byte[] xml = MCRXMLTableManager.instance().retrieve(mcrid);
-            result.add("local", id, 0, xml);
-
-            return result.exportAllToDocument().getRootElement();
-        } catch (Exception ex) {
-            LOGGER.debug("Exception while reading MCRObject as XML", ex);
-
-            return null;
-        }
-    }
-
-    /**
-     * Returns access controll rules as XML
-     */
-    private Element readFromAccessControll(String uri) {
-        String key = uri.substring(uri.indexOf(":") + 1);
-        LOGGER.debug("Reading xml from query result using key :" + key);
-
-        String[] param;
-        StringTokenizer tok = new StringTokenizer(key, "&");
-        Hashtable params = new Hashtable();
-
-        while (tok.hasMoreTokens()) {
-            param = tok.nextToken().split("=");
-            params.put(param[0], param[1]);
-        }
-
-        String action = (String) params.get(ACTION_PARAM);
-        String objId = (String) params.get(OBJECT_ID_PARAM);
-
-        if (action == null || objId == null) {
-            return null;
-        }
-
-        // :NOTE: until real export format is defined: start some selfdefined
-        // one access Element per (Object-)ID
-        Element container = new Element("access").setAttribute("id", objId);
-
-        MCRAccessInterface AI = MCRAccessManager.getAccessImpl();
-        
-        if (action.equals("all")) {
-            Iterator it = AI.getPermissionsForID(objId).iterator();
-            while (it.hasNext()) {
-                action = it.next().toString();
-                // one pool Element under access per defined AccessRule in Pool
-                // for (Object-)ID
-                addRule(container, action, AI.getRule(objId, action));
-            }
-        } else {
-            addRule(container, action, AI.getRule(objId, action));
-        }
-
-        return container;
-    }
-
-    private void addRule(Element root, String pool, Element rule) {
-        if (rule != null && pool != null ) {
-            Element poolElement = new Element("pool").setAttribute("id", pool);
-            poolElement.addContent(rule);
-            root.addContent(poolElement);
-        }
-    }
-
-    /**
-     * Returns query results as XML
-     */
-    private Element readFromQuery(String uri) {
-        String key = uri.substring(uri.indexOf(":") + 1);
-        LOGGER.debug("Reading xml from query result using key :" + key);
-
-        String[] param;
-        String host;
-        String type;
-        String query;
-        StringTokenizer tok = new StringTokenizer(key, "&");
-        Hashtable params = new Hashtable();
-
-        while (tok.hasMoreTokens()) {
-            param = tok.nextToken().split("=");
-            params.put(param[0], param[1]);
-        }
-
-        if (params.get(HOST_PARAM) == null) {
-            host = HOST_DEFAULT;
-        } else {
-            host = (String) params.get(HOST_PARAM);
-        }
-
-        type = (String) params.get(TYPE_PARAM);
-        query = (String) params.get(QUERY_PARAM);
-
-        if (type == null) {
-            return null;
-        }
-
-        StringTokenizer hosts = new StringTokenizer(host, ",");
-        MCRXMLContainer results = new MCRXMLContainer();
-
-        while (hosts.hasMoreTokens()) {
-            try {
-                results.importElements(query(hosts.nextToken(), type, query));
-            } catch (NumberFormatException e) {
-                LOGGER.error("Error while processing query: " + key, e);
-            } catch (UnsupportedEncodingException e) {
-                LOGGER.error("Error while processing query: " + key, e);
-            }
-        }
-
-        return results.exportAllToDocument().getRootElement();
-    }
-
-    private MCRXMLContainer query(String host, String type, String query) throws NumberFormatException, UnsupportedEncodingException {
-        if (query == null) {
-            query = "";
-        }
-
-        return MCRQueryCache.getResultList(URLDecoder.decode(host, URL_ENCODING), URLDecoder.decode(query, URL_ENCODING), URLDecoder.decode(type, URL_ENCODING), MCRConfiguration.instance().getInt("MCR.query_max_results", 10));
+        String msg = "Unsupported scheme type: " + scheme;
+        throw new MCRUsageException(msg);
     }
 
     /**
@@ -578,5 +273,370 @@ public class MCRURIResolver implements javax.xml.transform.URIResolver, EntityRe
             String msg = "Exception while reading and parsing XML InputStream: " + ex.getMessage();
             throw new MCRUsageException(msg, ex);
         }
+    }
+
+    private static interface MCRResolver {
+        public Element resolveElement(String URI);
+    }
+
+    private static class MCRObjectResolver implements MCRResolver {
+
+        /**
+         * Reads local MCRObject with a given ID from the store.
+         * 
+         * @param uri
+         *            for example, "mcrobject:DocPortal_document_07910401"
+         * @returns XML representation from MCRXMLContainer
+         */
+        public Element resolveElement(String uri) {
+            String id = uri.substring(uri.indexOf(":") + 1);
+            LOGGER.debug("Reading MCRObject with ID " + id);
+
+            try {
+                MCRXMLContainer result = new MCRXMLContainer();
+                MCRObjectID mcrid = new MCRObjectID(id);
+                byte[] xml = MCRXMLTableManager.instance().retrieve(mcrid);
+                result.add("local", id, 0, xml);
+
+                return result.exportAllToDocument().getRootElement();
+            } catch (Exception ex) {
+                LOGGER.debug("Exception while reading MCRObject as XML", ex);
+
+                return null;
+            }
+        }
+
+    }
+
+    private static class MCRHttpResolver implements MCRResolver {
+
+        /**
+         * Reads XML from a http or https URL.
+         * 
+         * @param url
+         *            the URL of the xml document
+         * @return the root element of the xml document
+         */
+        public Element resolveElement(String url) {
+            LOGGER.debug("Reading xml from url " + url);
+
+            try {
+                return MCRURIResolver.instance().parseStream(new URL(url).openStream());
+            } catch (java.net.MalformedURLException ex) {
+                String msg = "Malformed http url: " + url;
+                throw new MCRUsageException(msg, ex);
+            } catch (IOException ex) {
+                String msg = "Unable to open input stream at " + url;
+                throw new MCRUsageException(msg, ex);
+            }
+        }
+
+    }
+
+    private static class MCRRequestResolver implements MCRResolver {
+        MCRResolver fallback;
+
+        public MCRRequestResolver() {
+            fallback = new MCRHttpResolver();
+        }
+
+        /**
+         * Reads XML from a HTTP request to this web application.
+         * 
+         * @param uri
+         *            the URI in the format request:path/to/servlet
+         * @return the root element of the xml document
+         */
+        public Element resolveElement(String uri) {
+            String path = uri.substring(uri.indexOf(":") + 1);
+            LOGGER.debug("Reading xml from request " + path);
+
+            StringBuffer url = new StringBuffer(MCRServlet.getBaseURL());
+            url.append(path);
+
+            if (path.indexOf("?") != -1) {
+                url.append("&");
+            } else {
+                url.append("?");
+            }
+
+            url.append("MCRSessionID=");
+            url.append(MCRSessionMgr.getCurrentSession().getID());
+
+            return fallback.resolveElement(url.toString());
+        }
+    }
+
+    private static class MCRFileResolver implements MCRResolver {
+
+        /**
+         * A cache of parsed XML files *
+         */
+        private MCRCache fileCache;
+
+        public MCRFileResolver() {
+            String prefix = "MCR.URIResolver.";
+            int cacheSize = MCRConfiguration.instance().getInt(prefix + "StaticFiles.CacheSize", 100);
+            fileCache = new MCRCache(cacheSize);
+        }
+
+        /**
+         * Reads XML from a file URL.
+         * 
+         * @param uri
+         *            the URL of the file in the format file://path/to/file
+         * @return the root element of the xml document
+         */
+        public Element resolveElement(String uri) {
+            String path = uri.substring("file://".length());
+            LOGGER.debug("Reading xml from file " + path);
+
+            File file = new File(path);
+            Element fromCache = (Element) fileCache.getIfUpToDate(path, file.lastModified());
+
+            if (fromCache != null) {
+                return (Element) (fromCache.clone());
+            }
+
+            try {
+                Element parsed = MCRURIResolver.instance().parseStream(new FileInputStream(file));
+                fileCache.put(path, parsed);
+
+                return (Element) (parsed.clone());
+            } catch (FileNotFoundException ex) {
+                String msg = "Could not find file for URI " + uri;
+                throw new MCRUsageException(msg, ex);
+            }
+        }
+
+    }
+
+    private static class MCRWebAppResolver implements MCRResolver {
+        MCRResolver fallback;
+
+        public MCRWebAppResolver() {
+            fallback = new MCRFileResolver();
+        }
+
+        /**
+         * Reads XML from a HTTP request to this web application.
+         * 
+         * @param uri
+         *            the URI in the format request:path/to/servlet
+         * @return the root element of the xml document
+         */
+        public Element resolveElement(String uri) {
+            String path = uri.substring(uri.indexOf(":") + 1);
+            LOGGER.debug("Reading xml from webapp " + path);
+            uri = "file://" + context.getRealPath(path);
+
+            return fallback.resolveElement(uri);
+        }
+    }
+
+    private static class MCRResourceResolver implements MCRResolver {
+
+        private InputStream getResourceStream(String uri) {
+            String path = uri.substring(uri.indexOf(":") + 1);
+            LOGGER.debug("Reading xml from classpath resource " + path);
+
+            return this.getClass().getResourceAsStream("/" + path);
+        }
+
+        /**
+         * Reads XML from the CLASSPATH of the application.
+         * 
+         * @param uri
+         *            the location of the file in the format
+         *            resource:path/to/file
+         * @return the root element of the XML document
+         */
+        public Element resolveElement(String uri) {
+            Element parsed = MCRURIResolver.instance().parseStream(getResourceStream(uri));
+            return parsed;
+        }
+
+    }
+
+    private static class MCRSessionResolver implements MCRResolver {
+
+        /**
+         * Reads XML from URIs of type session:key. The method MCRSession.get(
+         * key ) is called and must return a JDOM element.
+         * 
+         * @see org.mycore.common.MCRSession#get( java.lang.String )
+         * 
+         * @param uri
+         *            the URI in the format session:key
+         * @return the root element of the xml document
+         */
+        public Element resolveElement(String uri) {
+            String key = uri.substring(uri.indexOf(":") + 1);
+
+            LOGGER.debug("Reading xml from session using key " + key);
+
+            Object value = MCRSessionMgr.getCurrentSession().get(key);
+
+            return (Element) (((Element) value).clone());
+        }
+
+    }
+
+    private static class MCRIFSResolver implements MCRResolver {
+
+        /**
+         * Reads XML from a http or https URL.
+         * 
+         * @param uri
+         *            the URL of the xml document
+         * @return the root element of the xml document
+         */
+        public Element resolveElement(String uri) {
+            LOGGER.debug("Reading xml from url " + uri);
+
+            String path = uri.substring(uri.indexOf(":") + 1);
+
+            String hosts = null;
+            int i = path.indexOf("?host");
+            if (i > 0) {
+                hosts = path.substring(i + 1 + 6);// "?host=".length()
+                path = path.substring(0, i);
+            }
+            return MCRDirectoryXML.getInstance().getDirectory(path, hosts).getRootElement();
+        }
+
+    }
+
+    private static class MCRQueryResolver implements MCRResolver {
+
+        private static final String HOST_PARAM = "host";
+
+        private static final String TYPE_PARAM = "type";
+
+        private static final String QUERY_PARAM = "query";
+
+        private static final String HOST_DEFAULT = "local";
+
+        private static final String URL_ENCODING = MCRConfiguration.instance().getString("MCR.request_charencoding", "UTF-8");
+
+        /**
+         * Returns query results as XML
+         */
+        public Element resolveElement(String uri) {
+            String key = uri.substring(uri.indexOf(":") + 1);
+            LOGGER.debug("Reading xml from query result using key :" + key);
+
+            String[] param;
+            String host;
+            String type;
+            String query;
+            StringTokenizer tok = new StringTokenizer(key, "&");
+            Hashtable params = new Hashtable();
+
+            while (tok.hasMoreTokens()) {
+                param = tok.nextToken().split("=");
+                params.put(param[0], param[1]);
+            }
+
+            if (params.get(HOST_PARAM) == null) {
+                host = HOST_DEFAULT;
+            } else {
+                host = (String) params.get(HOST_PARAM);
+            }
+
+            type = (String) params.get(TYPE_PARAM);
+            query = (String) params.get(QUERY_PARAM);
+
+            if (type == null) {
+                return null;
+            }
+
+            StringTokenizer hosts = new StringTokenizer(host, ",");
+            MCRXMLContainer results = new MCRXMLContainer();
+
+            while (hosts.hasMoreTokens()) {
+                try {
+                    results.importElements(query(hosts.nextToken(), type, query));
+                } catch (NumberFormatException e) {
+                    LOGGER.error("Error while processing query: " + key, e);
+                } catch (UnsupportedEncodingException e) {
+                    LOGGER.error("Error while processing query: " + key, e);
+                }
+            }
+
+            return results.exportAllToDocument().getRootElement();
+        }
+
+        private MCRXMLContainer query(String host, String type, String query) throws NumberFormatException, UnsupportedEncodingException {
+            if (query == null) {
+                query = "";
+            }
+
+            return MCRQueryCache.getResultList(URLDecoder.decode(host, URL_ENCODING), URLDecoder.decode(query, URL_ENCODING), URLDecoder.decode(type,
+                    URL_ENCODING), MCRConfiguration.instance().getInt("MCR.query_max_results", 10));
+        }
+
+    }
+
+    private static class MCRACLResolver implements MCRResolver {
+
+        private static final String ACTION_PARAM = "action";
+
+        private static final String OBJECT_ID_PARAM = "object";
+
+        /**
+         * Returns access controll rules as XML
+         */
+        public Element resolveElement(String uri) {
+            String key = uri.substring(uri.indexOf(":") + 1);
+            LOGGER.debug("Reading xml from query result using key :" + key);
+
+            String[] param;
+            StringTokenizer tok = new StringTokenizer(key, "&");
+            Hashtable params = new Hashtable();
+
+            while (tok.hasMoreTokens()) {
+                param = tok.nextToken().split("=");
+                params.put(param[0], param[1]);
+            }
+
+            String action = (String) params.get(ACTION_PARAM);
+            String objId = (String) params.get(OBJECT_ID_PARAM);
+
+            if (action == null || objId == null) {
+                return null;
+            }
+
+            // :NOTE: until real export format is defined: start some
+            // selfdefined
+            // one access Element per (Object-)ID
+            Element container = new Element("access").setAttribute("id", objId);
+
+            MCRAccessInterface AI = MCRAccessManager.getAccessImpl();
+
+            if (action.equals("all")) {
+                Iterator it = AI.getPermissionsForID(objId).iterator();
+                while (it.hasNext()) {
+                    action = it.next().toString();
+                    // one pool Element under access per defined AccessRule in
+                    // Pool
+                    // for (Object-)ID
+                    addRule(container, action, AI.getRule(objId, action));
+                }
+            } else {
+                addRule(container, action, AI.getRule(objId, action));
+            }
+
+            return container;
+        }
+
+        private void addRule(Element root, String pool, Element rule) {
+            if (rule != null && pool != null) {
+                Element poolElement = new Element("pool").setAttribute("id", pool);
+                poolElement.addContent(rule);
+                root.addContent(poolElement);
+            }
+        }
+
     }
 }
