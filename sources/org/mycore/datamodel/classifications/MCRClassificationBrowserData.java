@@ -23,10 +23,9 @@
 
 package org.mycore.datamodel.classifications;
 
+import org.mycore.access.MCRAccessInterface;
+import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRConfiguration;
-import org.mycore.common.MCRSession;
-import org.mycore.common.MCRSessionMgr;
-import org.mycore.user.MCRUserMgr;
 import java.util.*;
 import org.apache.log4j.Logger;
 import org.jdom.*;
@@ -49,6 +48,7 @@ public class MCRClassificationBrowserData
 
   private 	static 	MCRConfiguration 	config;
   private 	static 	Logger 				LOGGER=Logger.getLogger(MCRClassificationBrowserData.class);
+  private static MCRAccessInterface AI = MCRAccessManager.getAccessImpl();
   private   MCRCategoryItem[] 			categItem ;
   private 	Vector         				lines;
   private 	MCRClassificationItem 		classif;
@@ -289,11 +289,13 @@ public class MCRClassificationBrowserData
  	 MCRClassificationItem[] clI = clm.getAllClassification();
  	 
 	 Element xDocument = new Element( "classificationbrowse" );
-	 MCRSession mcrSession 	= MCRSessionMgr.getCurrentSession();
-	 String	userid = mcrSession.getCurrentUserID();         
-	 ArrayList privs = MCRUserMgr.instance().retrieveAllPrivsOfTheUser(userid);
 	 Element EditClassbutton = new Element( "userCanEdit" );
-	 EditClassbutton.addContent( String.valueOf(privs.contains("create-classification" ) || privs.contains("delete-classification")) );	 
+	 if(AI.checkPermission("create-classification")){
+		 EditClassbutton.addContent( "true" );
+	 }else{
+		 EditClassbutton.addContent( "false" );
+	 }
+	 	 
 	 xDocument.addContent( EditClassbutton );
 		 
 	 Element xNavtree = new Element( "classificationlist" );
@@ -365,12 +367,9 @@ public class MCRClassificationBrowserData
 	 xStartPath.addContent(startPath);
 	 xDocument.addContent( xStartPath );
 
-	 // Editierbutton Einfügen - wenn das privieg es erlaubt
-	 MCRSession mcrSession 	= MCRSessionMgr.getCurrentSession();
-	 String	userid = mcrSession.getCurrentUserID();         
-	 ArrayList privs = MCRUserMgr.instance().retrieveAllPrivsOfTheUser(userid);
+	 // Editierbutton Einfügen - wenn die permission es erlaubt
 	 Element Editbutton = new Element( "userCanEdit" );
-	 Editbutton.addContent( String.valueOf( privs.contains("modify-classification")) );	 
+	 Editbutton.addContent( String.valueOf(AI.checkPermission(cl.getClassificationID(),"writedb")) );
 	 xDocument.addContent( Editbutton );
 
 	 // data as XML from outputNavigationTree

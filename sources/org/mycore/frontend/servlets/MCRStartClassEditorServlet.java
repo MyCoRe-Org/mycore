@@ -38,7 +38,7 @@ import org.mycore.common.MCRSessionMgr;
 import org.mycore.datamodel.classifications.MCRClassificationEditor;
 import org.mycore.frontend.editor.MCREditorSubmission;
 import org.mycore.frontend.editor.MCRRequestParameters;
-import org.mycore.user.*;
+import org.mycore.user2.*;
 
 
 /**
@@ -69,7 +69,6 @@ public class MCRStartClassEditorServlet extends MCRServlet  {
 	  
     MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
     String userid = mcrSession.getCurrentUserID();
-    ArrayList privs = MCRUserMgr.instance().retrieveAllPrivsOfTheUser(userid);
     
     // read the XML data if given from Editorsession
     MCREditorSubmission sub = (MCREditorSubmission)(job.getRequest().getAttribute("MCREditorSubmission"));
@@ -112,7 +111,7 @@ public class MCRStartClassEditorServlet extends MCRServlet  {
     String imerrorpage   = pagedir+CONFIG.getString( "MCR.classeditor_page_error_move", "classeditor_error_move.xml" );
     String imperrorpage   = pagedir+CONFIG.getString( "MCR.classeditor_page_error_import", "classeditor_error_import.xml" );
     
-    if (! (privs.contains("modify-classification")) ) {
+    if (! (AI.checkPermission(clid, "writedb")) ) {
         job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL()+usererrorpage));
         return;
     }
