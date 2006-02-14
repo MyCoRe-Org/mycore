@@ -124,15 +124,18 @@ public class MCRFileListWorkflowServlet extends MCRServlet {
 
         for (int i = 0; i < workfiles.size(); i++) {
             String fname = (String) workfiles.get(i);
-            org.jdom.Element category = new org.jdom.Element("category");
-            category.setAttribute("ID", fname.substring(0, fname.length() - 4));
+            String objid = fname.substring(0, fname.length() - 4);
+            if(AI.checkPermission(objid, "writewf")) {
+                org.jdom.Element category = new org.jdom.Element("category");
+                category.setAttribute("ID", objid);
 
-            org.jdom.Element label = new org.jdom.Element("label");
-            label.setAttribute("lang", "en", Namespace.XML_NAMESPACE);
-            label.setAttribute("text", fname.substring(0, fname.length() - 4));
-            label.setAttribute("description", "");
-            category.addContent(label);
-            categories.addContent(category);
+                org.jdom.Element label = new org.jdom.Element("label");
+                label.setAttribute("lang", "en", Namespace.XML_NAMESPACE);
+                label.setAttribute("text", objid);
+                label.setAttribute("description", "");
+                category.addContent(label);
+                categories.addContent(category);            	
+            }
         }
 
         elm.addContent(categories);

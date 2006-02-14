@@ -37,7 +37,6 @@ import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.editor.MCREditorSubmission;
 import org.mycore.frontend.editor.MCRRequestParameters;
-import org.mycore.user.MCRUserMgr;
 
 /**
  * This class is the superclass of servlets which checks the MCREditorServlet
@@ -91,14 +90,8 @@ abstract public class MCRCheckFileBase extends MCRCheckBase {
         // get the MCRSession object for the current thread from the session
         // manager.
         MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
-        String userid = mcrSession.getCurrentUserID();
 
-        // userid = "administrator";
-        LOGGER.debug("Current user for edit check = " + userid);
-
-        ArrayList privs = MCRUserMgr.instance().retrieveAllPrivsOfTheUser(userid);
-
-        if (!hasPrivileg(privs, type)) {
+        if (!AI.checkPermission("create-" + type)) {
             String usererrorpage = CONFIG.getString("MCR.editor_page_dir", "") + CONFIG.getString("MCR.editor_page_error_user", "editor_error_user.xml");
             job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + usererrorpage));
 

@@ -38,13 +38,11 @@ import org.apache.log4j.Logger;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRDefaults;
-import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUtils;
 import org.mycore.common.xml.MCRXMLHelper;
 import org.mycore.common.xml.MCRXSLTransformation;
 import org.mycore.frontend.workflow.MCRSimpleWorkflowManager;
-import org.mycore.user.MCRUserMgr;
 
 /**
  * This class contains a servlet as extention of MCRServlet. The Servlet read
@@ -111,25 +109,11 @@ public class MCRListWorkflowServlet extends MCRServlet {
         String lang = MCRSessionMgr.getCurrentSession().getCurrentLanguage();
         LOGGER.debug("MCRListWorkflowServlet : lang = " + lang);
 
-        // check the privileg
-        boolean haspriv = false;
-        MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
-        String userid = mcrSession.getCurrentUserID();
-
-        // userid = "administrator";
-        LOGGER.debug("Curren user for list workflow = " + userid);
-
-        ArrayList privs = MCRUserMgr.instance().retrieveAllPrivsOfTheUser(userid);
-
-        if (privs.contains("create-" + type)) {
-            haspriv = true;
-        }
-
         // read directory
         ArrayList workfiles = new ArrayList();
         ArrayList derifiles = new ArrayList();
 
-        if (haspriv) {
+        if (AI.checkPermission("create-" + type)) {
             workfiles = WFM.getAllObjectFileNames(type);
             derifiles = WFM.getAllDerivateFileNames(type);
         }

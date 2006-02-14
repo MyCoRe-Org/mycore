@@ -27,7 +27,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.RequestDispatcher;
@@ -43,7 +42,6 @@ import org.mycore.datamodel.metadata.MCRActiveLinkException;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.editor.MCREditorSubmission;
 import org.mycore.frontend.editor.MCRRequestParameters;
-import org.mycore.user.MCRUserMgr;
 
 /**
  * This class is the superclass of servlets which checks the MCREditorServlet
@@ -88,9 +86,8 @@ abstract public class MCRCheckDataBase extends MCRCheckBase {
         LOGGER.debug("Current user for edit check = " + userid);
 
         String usererrorpage = CONFIG.getString("MCR.editor_page_dir", "") + CONFIG.getString("MCR.editor_page_error_user", "editor_error_user.xml");
-        ArrayList privs = MCRUserMgr.instance().retrieveAllPrivsOfTheUser(userid);
 
-        if (!hasPrivileg(privs, oldtype)) {
+        if (!AI.checkPermission("create-" + oldtype)) {
             job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + usererrorpage));
 
             return;
