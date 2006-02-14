@@ -86,9 +86,6 @@ public class MCRStartEditorServlet extends MCRServlet {
     // The workflow manager
     private static MCRSimpleWorkflowManager WFM = null;
 
-    // The Access Manager
-    private static MCRAccessInterface AI = MCRAccessManager.getAccessImpl();
-
     // The file slash
     private static String SLASH = System.getProperty("file.separator");;
 

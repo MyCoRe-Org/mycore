@@ -39,6 +39,8 @@ import org.apache.log4j.Logger;
 import org.jdom.DocType;
 import org.jdom.Document;
 import org.jdom.Element;
+import org.mycore.access.MCRAccessInterface;
+import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
@@ -63,6 +65,8 @@ public class MCRServlet extends HttpServlet {
 
     // Some configuration details
 	protected static MCRConfiguration CONFIG = MCRConfiguration.instance();
+	
+	protected static MCRAccessInterface AI = MCRAccessManager.getAccessImpl();
 
 	private static Logger LOGGER = Logger.getLogger(MCRServlet.class);;
 
