@@ -18,7 +18,7 @@
       </servlet>
       <servlet id="Login">
             <servlet-name>MCRLoginServlet</servlet-name>
-            <servlet-class>org.mycore.user.MCRLoginServlet</servlet-class>
+            <servlet-class>org.mycore.user2.MCRLoginServlet</servlet-class>
       </servlet>
       <servlet id="NBNResolver">
             <servlet-name>MCRNBNResolver</servlet-name>
