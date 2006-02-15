@@ -2,7 +2,7 @@
 
   <!-- =================================================================== -->
   <!-- MyCoRe build file for use with Apache Ant                           -->
-  <!-- $Revision: 1.110 $ $Date: 2006-02-14 20:21:31 $                      -->
+  <!-- $Revision: 1.111 $ $Date: 2006-02-15 10:08:36 $                      -->
   <!-- =================================================================== -->
 
 <project default="usage" basedir=".">
@@ -66,7 +66,7 @@
     <echo>Operating system : ${os.name} Version ${os.version} on ${os.arch} </echo>
     <echo>Java version     : JDK ${ant.java.version} Version ${java.version} from ${java.vendor}</echo>
     <echo>Java home        : ${env.JAVA_HOME}</echo>
-    <echo>Ant build file   : $Revision: 1.110 $ $Date: 2006-02-14 20:21:31 $</echo>
+    <echo>Ant build file   : $Revision: 1.111 $ $Date: 2006-02-15 10:08:36 $</echo>
     <echo>Ant version      : ${ant.version}</echo>
     <echo>Ant home         : ${ant.home}</echo>
     <echo>XML Store type   : ${MCR.XMLStore.Type}</echo>
@@ -220,12 +220,18 @@
   </target>
 
   <target name="compile" description="compiles all sources to classes directory"
-	  depends="compile_common, compile_servlets, compile_user2, compile_metadata, compile_classifications, compile_fieldquery, compile_nbn, compile_workflow, compile_editor, compile_fileupload, compile_cli, compile_ifs, compile_lucene, compile_remote, compile_sql, compile_oai, compile_query, compile_plugins, compile_persistency, compile_zipper, compile_indexbrowser, compile_access, compile_hibernate, compile_querybackend">
+	  depends="compile_oldquery_jdom,compile_common, compile_servlets, compile_user2, compile_metadata, compile_classifications, compile_fieldquery, compile_nbn, compile_workflow, compile_editor, compile_fileupload, compile_cli, compile_ifs, compile_lucene, compile_remote, compile_sql, compile_oai, compile_query, compile_plugins, compile_persistency, compile_zipper, compile_indexbrowser, compile_access, compile_hibernate, compile_querybackend">
     <subant target="compile" inheritall="true" inheritrefs="true">
       <fileset dir="." includes="modules/module-*/build.xml" />
     </subant>
   </target>
 
+  <target name="compile_oldquery_jdom">
+     <echo>Compiling old query jdom classes...</echo>
+     <antcall target="javac">
+      <param name="packages" value="org/mycore/backend/jdom/**"/>
+     </antcall>
+  </target>	
   <target name="compile_common">
     <echo>Compiling common classes...</echo>
     <antcall target="javac">
