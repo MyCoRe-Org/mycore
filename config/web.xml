@@ -44,10 +44,6 @@
             <servlet-name>MCRUserServlet</servlet-name>
             <servlet-class>org.mycore.frontend.servlets.MCRUserServlet</servlet-class>
       </servlet>
-      <servlet id="UserPriv">
-            <servlet-name>MCRUserPrivServlet</servlet-name>
-            <servlet-class>org.mycore.user.MCRUserPrivServlet</servlet-class>
-      </servlet>
       <servlet id="XMLEditor">
             <servlet-name> XMLEditor </servlet-name>
             <servlet-class> org.mycore.frontend.editor.MCREditorServlet </servlet-class>
@@ -140,10 +136,6 @@
       <servlet-mapping>
             <servlet-name>MCRAccessCheckServlet</servlet-name>
             <url-pattern>/servlets/MCRAccessCheckServlet</url-pattern>
-      </servlet-mapping>
-      <servlet-mapping>
-            <servlet-name>MCRUserPrivServlet</servlet-name>
-            <url-pattern>/servlets/MCRUserPrivServlet</url-pattern>
       </servlet-mapping>
       <servlet-mapping>
             <servlet-name> XMLEditor </servlet-name>
