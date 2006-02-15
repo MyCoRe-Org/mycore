@@ -170,7 +170,7 @@ public class MCRURIResolver implements javax.xml.transform.URIResolver, EntityRe
             return null; // Use default resolver
         }
     
-        InputStream is = getCachedResource(getFileName(systemId));
+        InputStream is = getCachedResource("/"+getFileName(systemId));
     
         if (is == null) {
             return null; // Use default resolver
@@ -201,9 +201,11 @@ public class MCRURIResolver implements javax.xml.transform.URIResolver, EntityRe
 
         if (bytes == null) {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            LOGGER.debug("Resolving resource "+classResource);
             InputStream in = this.getClass().getResourceAsStream(classResource);
 
             if (in == null) {
+                LOGGER.debug(classResource+" not found");
                 return null;
             }
 
