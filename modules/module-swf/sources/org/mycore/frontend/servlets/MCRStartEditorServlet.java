@@ -431,7 +431,7 @@ public class MCRStartEditorServlet extends MCRServlet {
 
         // action WADDFILE - create a new file in the derivate
         if (mytodo.equals("waddfile")) {
-            if (!AI.checkPermission(myremcrid, "writewf")) {
+            if (!AI.checkPermission("create-" + mytype)) {
                 job.getResponse().sendRedirect(getBaseURL() + usererrorpage);
 
                 return;
@@ -526,7 +526,8 @@ public class MCRStartEditorServlet extends MCRServlet {
 
         // action WDELDER - delete a derivate from the workflow
         if (mytodo.equals("wdelder")) {
-            if (!AI.checkPermission(mysemcrid, "deletewf")) {
+            org.jdom.Element rule = WFM.getRuleFromFile(mysemcrid, "deletewf");
+            if (!AI.checkPermission(rule)) {
                 job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + usererrorpage));
                 return;
             }
@@ -570,7 +571,6 @@ public class MCRStartEditorServlet extends MCRServlet {
                 job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + usererrorpage));
                 return;
             }
-
             if (mysemcrid.length() == 0) {
                 job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + mcriderrorpage));
                 return;
@@ -619,7 +619,8 @@ public class MCRStartEditorServlet extends MCRServlet {
 
         // action WEDITDER in the database
         if (mytodo.equals("weditder")) {
-            if (!AI.checkPermission(myremcrid, "writewf")) {
+            org.jdom.Element rule = WFM.getRuleFromFile(mysemcrid, "writewf");
+            if (!AI.checkPermission(rule)) {
                 job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + usererrorpage));
                 return;
             }
@@ -662,7 +663,8 @@ public class MCRStartEditorServlet extends MCRServlet {
 
         // action WSETFILE in the database
         if (mytodo.equals("wsetfile")) {
-            if (!AI.checkPermission(myremcrid, "writewf")) {
+            org.jdom.Element rule = WFM.getRuleFromFile(mysemcrid, "writewf");
+            if (!AI.checkPermission(rule)) {
                 job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + usererrorpage));
                 return;
             }
@@ -704,7 +706,8 @@ public class MCRStartEditorServlet extends MCRServlet {
 
         // action WDELFILE in the database
         if (mytodo.equals("wdelfile")) {
-            if (!AI.checkPermission(myremcrid, "deletewf")) {
+            org.jdom.Element rule = WFM.getRuleFromFile(mysemcrid, "deletewf");
+            if (!AI.checkPermission(rule)) {
                 job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + usererrorpage));
                 return;
             }
