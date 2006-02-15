@@ -148,18 +148,6 @@ public class MCRHIBMapping {
             map.addIDColumn("mcrto", "MCRTO", dbString, 194, "assigned", false);
             cfg.addXML(map.getTableXML());
 
-            // Privileges
-            map = new MCRTableGenerator(config.getString("MCR.users_store_sql_table_privileges"), "org.mycore.backend.hibernate.tables.MCRPRIVSM", "", 1);
-            map.addIDColumn("name", "NAME", dbString, 100, "assigned", false);
-            map.addColumn("description", "DESCRIPTION", dbString, 200, false, false, false);
-            cfg.addXML(map.getTableXML());
-
-            // Privilegeslookup
-            map = new MCRTableGenerator(config.getString("MCR.users_store_sql_table_privs_lookup"), "org.mycore.backend.hibernate.tables.MCRPRIVSLOOKUP", "", 2);
-            map.addIDColumn("gid", "GID", dbString, 20, "assigned", false);
-            map.addIDColumn("name", "NAME", dbString, 200, "assigned", false);
-            cfg.addXML(map.getTableXML());
-
             // NBN Manager
             if (!config.getString("MCR.NBN.PersistenceStore.TableName", "").equals("")) {
                 map = new MCRTableGenerator(config.getString("MCR.NBN.PersistenceStore.TableName"), "org.mycore.backend.hibernate.tables.MCRNBNS", "", 1);
