@@ -28,6 +28,10 @@ import java.io.Serializable;
 import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 
+/**
+ * 
+ * @deprecated
+ */
 public class MCRPRIVSLOOKUPPK implements Serializable {
     private String gid;
 

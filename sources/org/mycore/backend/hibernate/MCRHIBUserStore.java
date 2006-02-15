@@ -49,7 +49,8 @@ import org.mycore.user.MCRUserStore;
  * This class implements the interface MCRUserStore
  * 
  * @author Matthias Kramm
- * @version $Revision$ $Date$
+ * @version $Revision$ $Date$ 
+ * @deprecated
  */
 public class MCRHIBUserStore implements MCRUserStore {
     static Logger logger = Logger.getLogger(MCRHIBUserStore.class.getName());

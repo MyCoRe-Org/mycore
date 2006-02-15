@@ -48,6 +48,7 @@ import org.mycore.user.MCRUserStore;
  * 
  * @author Detlev Degenhardt
  * @version $Revision$ $Date$
+ * @deprecated
  */
 public class MCRSQLUserStore implements MCRUserStore {
     /** the logger */

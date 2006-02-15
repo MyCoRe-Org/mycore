@@ -23,6 +23,10 @@
 
 package org.mycore.backend.hibernate.tables;
 
+/**
+ * 
+ * @deprecated
+ */
 public class MCRPRIVSM {
     private String name;
 
