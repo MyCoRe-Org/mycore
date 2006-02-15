@@ -80,19 +80,6 @@ abstract public class MCRCheckDataBase extends MCRCheckBase {
         // get the MCRSession object for the current thread from the session
         // manager.
         MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
-        String userid = mcrSession.getCurrentUserID();
-
-        // userid = "administrator";
-        LOGGER.debug("Current user for edit check = " + userid);
-
-        String usererrorpage = CONFIG.getString("MCR.editor_page_dir", "") + CONFIG.getString("MCR.editor_page_error_user", "editor_error_user.xml");
-
-        if (!AI.checkPermission("create-" + oldtype)) {
-            job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + usererrorpage));
-
-            return;
-        }
-
         String lang = mcrSession.getCurrentLanguage();
         LOGGER.info("LANG = " + lang);
 

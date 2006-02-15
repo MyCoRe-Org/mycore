@@ -29,6 +29,8 @@ import java.util.List;
 import org.apache.log4j.Logger;
 
 import org.jdom.Document;
+import org.mycore.access.MCRAccessInterface;
+import org.mycore.access.MCRAccessManager;
 import org.mycore.datamodel.metadata.MCRActiveLinkException;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.editor.MCREditorOutValidator;
@@ -43,18 +45,13 @@ import org.mycore.frontend.editor.MCREditorOutValidator;
 abstract public class MCRCheckBase extends MCRServlet {
     protected static Logger LOGGER = Logger.getLogger(MCRCheckBase.class);
 
+    // The file separator
     String NL = System.getProperty("file.separator");
 
-    protected List errorlog;
+    // The Access Manager
+    private static MCRAccessInterface AI = MCRAccessManager.getAccessImpl();
 
-    /**
-     * The method check the privileg of this action.
-     * 
-     * @param privs
-     *            the ArrayList of privilegs
-     * @return true if the privileg exist, else return false
-     */
-    abstract public boolean hasPrivileg(ArrayList privs, String type);
+    protected List errorlog;
 
     /**
      * The method is a dummy or works with the data and return an URL with the
@@ -93,7 +90,7 @@ abstract public class MCRCheckBase extends MCRServlet {
      * For a new MetaDataType, e.g. MCRMetaFooBaar, create a method
      * 
      * <pre>
-     *  boolean checkMCRMetaFooBar(Element)
+     *   boolean checkMCRMetaFooBar(Element)
      * </pre>
      * 
      * use the following methods in that method to do common tasks on element

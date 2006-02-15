@@ -91,12 +91,14 @@ abstract public class MCRCheckFileBase extends MCRCheckBase {
         // manager.
         MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
 
+/*
         if (!AI.checkPermission("create-" + type)) {
             String usererrorpage = CONFIG.getString("MCR.editor_page_dir", "") + CONFIG.getString("MCR.editor_page_error_user", "editor_error_user.xml");
             job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + usererrorpage));
 
             return;
         }
+*/
 
         String mylang = mcrSession.getCurrentLanguage();
         LOGGER.info("LANG = " + mylang);

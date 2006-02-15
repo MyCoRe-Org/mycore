@@ -35,7 +35,6 @@ import org.mycore.common.MCRDefaults;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.xml.MCRXMLContainer;
-import org.mycore.user.MCRUserMgr;
 
 /**
  * This servlet create a MyCoRe classification JDOM tree based of a content in a
@@ -71,14 +70,12 @@ public class MCRFileListWorkflowServlet extends MCRServlet {
         MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
         String userid = mcrSession.getCurrentUserID();
 
-        // userid = "administrator";
-        LOGGER.debug("Curren user for list workflow = " + userid);
 
-        ArrayList privs = MCRUserMgr.instance().retrieveAllPrivsOfTheUser(userid);
-
+/*
         if (privs.contains("modify-" + type)) {
             haspriv = true;
         }
+*/
 
         // read directory
         String dirname = CONFIG.getString("MCR.editor_" + type + "_directory", null);

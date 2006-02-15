@@ -35,6 +35,8 @@ import javax.xml.transform.stream.StreamSource;
 
 import org.apache.log4j.Logger;
 
+import org.mycore.access.MCRAccessInterface;
+import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRDefaults;
@@ -42,6 +44,8 @@ import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUtils;
 import org.mycore.common.xml.MCRXMLHelper;
 import org.mycore.common.xml.MCRXSLTransformation;
+import org.mycore.datamodel.metadata.MCRObject;
+import org.mycore.datamodel.metadata.MCRObjectService;
 import org.mycore.frontend.workflow.MCRSimpleWorkflowManager;
 
 /**
@@ -76,6 +80,9 @@ public class MCRListWorkflowServlet extends MCRServlet {
     private static String SLASH = System.getProperty("file.separator");
 
     private static String DefaultLang = null;
+
+    // The Access Manager
+    private static MCRAccessInterface AI = MCRAccessManager.getAccessImpl();
 
     /** Initialisation of the servlet */
     public void init() throws MCRConfigurationException, javax.servlet.ServletException {
@@ -185,7 +192,7 @@ public class MCRListWorkflowServlet extends MCRServlet {
         // create a XML JDOM tree with master tag mcr_workflow
         // prepare the transformer stylesheet
         String xslfile = "mycoreobject-" + type + "-to-workflow.xsl";
-        File styleFile=getStylesheetFile("/WEB-INF/stylesheets/",xslfile);
+        File styleFile = getStylesheetFile("/WEB-INF/stylesheets/", xslfile);
 
         // build the frame of mcr_workflow
         org.jdom.Element root = new org.jdom.Element("mcr_workflow");
@@ -194,14 +201,19 @@ public class MCRListWorkflowServlet extends MCRServlet {
         root.setAttribute("step", step);
 
         org.jdom.Document workflow_in = null;
+        org.jdom.Element writewf = null;
+        org.jdom.Element deletewf = null;
+        org.jdom.Element commitdb = null;
+        boolean bdeletewf = false;
+        boolean bcommitdb = false;
 
-        //initialize transformer 
-        MCRXSLTransformation transform=MCRXSLTransformation.getInstance();
-        TransformerHandler handler=transform.getTransformerHandler(transform.getStylesheet(new StreamSource(styleFile)));
-        Map parameters=new HashMap();
+        // initialize transformer
+        MCRXSLTransformation transform = MCRXSLTransformation.getInstance();
+        TransformerHandler handler = transform.getTransformerHandler(transform.getStylesheet(new StreamSource(styleFile)));
+        Map parameters = new HashMap();
         parameters.put("DefaultLang", DefaultLang);
         parameters.put("CurrentLang", lang);
-        MCRXSLTransformation.setParameters(handler,parameters);
+        MCRXSLTransformation.setParameters(handler, parameters);
         // run the loop over all objects in the workflow
         for (int i = 0; i < workfiles.size(); i++) {
             String wfile = (String) workfiles.get(i);
@@ -210,6 +222,28 @@ public class MCRListWorkflowServlet extends MCRServlet {
 
             try {
                 workflow_in = MCRXMLHelper.parseURI(sb.toString(), false);
+                MCRObject obj = new MCRObject();
+                obj.setFromJDOM(workflow_in);
+                MCRObjectService service = obj.getService();
+                int j = service.getRuleIndex("writewf");
+                if (j != -1) {
+                    writewf = service.getRule(j).getCondition();
+                    if (!AI.checkPermission(writewf)) {
+                        continue;
+                    }
+                } else {
+                    continue;
+                }
+                j = service.getRuleIndex("deletewf");
+                if (j != -1) {
+                    deletewf = service.getRule(j).getCondition();
+                    bdeletewf = AI.checkPermission(deletewf);
+                }
+                j = service.getRuleIndex("commitdb");
+                if (j != -1) {
+                    commitdb = service.getRule(j).getCondition();
+                    bcommitdb = AI.checkPermission(commitdb);
+                }
 
                 // LOGGER.debug("Workflow file "+wfile+" was readed.");
             } catch (Exception ex) {
@@ -219,7 +253,7 @@ public class MCRListWorkflowServlet extends MCRServlet {
             }
 
             try {
-                elm = MCRXSLTransformation.transform(workflow_in,handler.getTransformer()).getRootElement();
+                elm = MCRXSLTransformation.transform(workflow_in, handler.getTransformer()).getRootElement();
                 elm.detach();
             } catch (Exception ex) {
                 LOGGER.error("Error while tranforming XML workflow file " + wfile);
@@ -228,6 +262,8 @@ public class MCRListWorkflowServlet extends MCRServlet {
             }
 
             String ID = elm.getAttributeValue("ID");
+            elm.setAttribute("deletewf", (new Boolean(bdeletewf)).toString());
+            elm.setAttribute("commitdb", (new Boolean(bcommitdb)).toString());
 
             // LOGGER.debug("The data ID is "+ID);
             try {
@@ -300,18 +336,18 @@ public class MCRListWorkflowServlet extends MCRServlet {
     protected File getStylesheetFile(String dir, String name) {
         String path = getServletContext().getRealPath(dir + name);
         File file = new File(path);
-    
+
         if (!file.exists()) {
             LOGGER.debug("MCRListWorkflowServlet did not find stylesheet " + name);
-    
+
             return null;
         }
-    
+
         if (!file.canRead()) {
             String msg = "XSL stylesheet " + path + " not readable";
             throw new MCRConfigurationException(msg);
         }
-    
+
         return file;
     }
 }
