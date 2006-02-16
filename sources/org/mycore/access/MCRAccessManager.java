@@ -22,6 +22,8 @@
  */
 package org.mycore.access;
 
+import java.util.List;
+
 import org.jdom.Element;
 
 import org.mycore.common.MCRConfiguration;
@@ -124,5 +126,17 @@ public class MCRAccessManager {
     public static boolean checkPermission(MCRObjectID id, String permission) {
         return getAccessImpl().checkPermission(id.getId(), permission);
     }
+    
+    /**
+     * lists all permissions defined for the <code>id</code>.
+     * 
+     * @param id
+     *           the MCRObjectID of the object
+     * @return a <code>List</code> of all for <code>id</code> defined
+     *         permissions
+     */ 
+    public static List getPermissionsForID(MCRObjectID id, String permission) {
+        return getAccessImpl().getPermissionsForID(id.getId());
+    }    
 
 }
