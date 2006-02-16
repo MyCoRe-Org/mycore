@@ -60,15 +60,20 @@ public class MCRAccessEventHandler extends MCREventHandlerBase {
         long t1 = System.currentTimeMillis();
 
         // create
+        List li = AI.getPermissionsForID(obj.getId().getId());
+        int aclsize = 0; 
+        if (li != null) { aclsize = li.size(); }
         int rulesize = obj.getService().getRulesSize();
-        if(rulesize == 0) {
+        if((rulesize == 0) && (aclsize == 0)) {
         	setDefaultPermissions(obj, true);
+            LOGGER.warn("The ACL conditions for this object are empty!");
         }
         for (int i = 0; i < rulesize; i++) {
             org.jdom.Element conditions = obj.getService().getRule(i).getCondition();
             String pool = obj.getService().getRule(i).getPermission();
             MCRAccessManager.addRule(obj.getId(), pool, conditions, "");
-            obj.getService().removeRule(i);
+            obj.getService().removeRule(i); 
+            rulesize--; i--;
         }
 
         // save the stop time
@@ -89,17 +94,23 @@ public class MCRAccessEventHandler extends MCREventHandlerBase {
     protected void handleObjectUpdated(MCREvent evt, MCRObject obj) {
         // save the start time
         long t1 = System.currentTimeMillis();
+
         // update
+        List li = AI.getPermissionsForID(obj.getId().getId());
+        int aclsize = 0; 
+        if (li != null) { aclsize = li.size(); }
         int rulesize = obj.getService().getRulesSize();
-        if(rulesize == 0) {
-        	setDefaultPermissions(obj, false);
+        if((rulesize == 0) && (aclsize == 0)) {
+            setDefaultPermissions(obj, false);
+            LOGGER.warn("The ACL conditions for this object are empty!");
         }
         for (int i = 0; i < rulesize; i++) {
             org.jdom.Element conditions = obj.getService().getRule(i).getCondition();
             String pool = obj.getService().getRule(i).getPermission();
             MCRAccessManager.updateRule(obj.getId(), pool, conditions, "");
-            // obj.getService().removeRule(i);
-        }
+            obj.getService().removeRule(i);
+            rulesize--; i--;
+       }
 
         // save the stop time
         long t2 = System.currentTimeMillis();
