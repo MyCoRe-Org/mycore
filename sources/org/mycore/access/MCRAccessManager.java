@@ -135,7 +135,7 @@ public class MCRAccessManager {
      * @return a <code>List</code> of all for <code>id</code> defined
      *         permissions
      */ 
-    public static List getPermissionsForID(MCRObjectID id, String permission) {
+    public static List getPermissionsForID(MCRObjectID id) {
         return getAccessImpl().getPermissionsForID(id.getId());
     }    
 
