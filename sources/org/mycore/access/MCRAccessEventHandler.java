@@ -68,12 +68,12 @@ public class MCRAccessEventHandler extends MCREventHandlerBase {
         	setDefaultPermissions(obj, true);
             LOGGER.warn("The ACL conditions for this object are empty!");
         }
-        for (int i = 0; i < rulesize; i++) {
-            org.jdom.Element conditions = obj.getService().getRule(i).getCondition();
-            String pool = obj.getService().getRule(i).getPermission();
+        while(0 < rulesize) {
+            org.jdom.Element conditions = obj.getService().getRule(0).getCondition();
+            String pool = obj.getService().getRule(0).getPermission();
             MCRAccessManager.addRule(obj.getId(), pool, conditions, "");
-            obj.getService().removeRule(i); 
-            rulesize--; i--;
+            obj.getService().removeRule(0);
+            rulesize--;
         }
 
         // save the stop time
@@ -104,13 +104,13 @@ public class MCRAccessEventHandler extends MCREventHandlerBase {
             setDefaultPermissions(obj, false);
             LOGGER.warn("The ACL conditions for this object are empty!");
         }
-        for (int i = 0; i < rulesize; i++) {
-            org.jdom.Element conditions = obj.getService().getRule(i).getCondition();
-            String pool = obj.getService().getRule(i).getPermission();
+        while(0 < rulesize){
+            org.jdom.Element conditions = obj.getService().getRule(0).getCondition();
+            String pool = obj.getService().getRule(0).getPermission();
             MCRAccessManager.updateRule(obj.getId(), pool, conditions, "");
-            obj.getService().removeRule(i);
-            rulesize--; i--;
-       }
+            obj.getService().removeRule(0);
+            rulesize--;
+        }
 
         // save the stop time
         long t2 = System.currentTimeMillis();
