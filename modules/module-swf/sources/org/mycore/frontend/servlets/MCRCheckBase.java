@@ -23,7 +23,6 @@
 
 package org.mycore.frontend.servlets;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -33,7 +32,7 @@ import org.mycore.access.MCRAccessInterface;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.datamodel.metadata.MCRActiveLinkException;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.frontend.editor.MCREditorOutValidator;
+import org.mycore.frontend.workflow.MCREditorOutValidator;
 
 /**
  * This class is the superclass of servlets which checks the MCREditorServlet
@@ -49,7 +48,7 @@ abstract public class MCRCheckBase extends MCRServlet {
     String NL = System.getProperty("file.separator");
 
     // The Access Manager
-    private static MCRAccessInterface AI = MCRAccessManager.getAccessImpl();
+    protected static MCRAccessInterface AI = MCRAccessManager.getAccessImpl();
 
     protected List errorlog;
 

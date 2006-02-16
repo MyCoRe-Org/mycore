@@ -87,19 +87,17 @@ abstract public class MCRCheckFileBase extends MCRCheckBase {
         LOGGER.debug("XSL.target.param.2 = " + step);
         LOGGER.debug("XSL.target.param.3 = " + re_mcrid);
 
+        if (step.equals("author")) {
+            if (!AI.checkPermission("create-" + type)) {
+                String usererrorpage = CONFIG.getString("MCR.editor_page_dir", "") + CONFIG.getString("MCR.editor_page_error_user", "editor_error_user.xml");
+                job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + usererrorpage));
+                return;
+            }
+        }
+
         // get the MCRSession object for the current thread from the session
         // manager.
         MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
-
-/*
-        if (!AI.checkPermission("create-" + type)) {
-            String usererrorpage = CONFIG.getString("MCR.editor_page_dir", "") + CONFIG.getString("MCR.editor_page_error_user", "editor_error_user.xml");
-            job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + usererrorpage));
-
-            return;
-        }
-*/
-
         String mylang = mcrSession.getCurrentLanguage();
         LOGGER.info("LANG = " + mylang);
 

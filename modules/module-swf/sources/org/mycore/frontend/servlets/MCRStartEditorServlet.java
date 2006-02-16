@@ -526,7 +526,7 @@ public class MCRStartEditorServlet extends MCRServlet {
 
         // action WDELDER - delete a derivate from the workflow
         if (mytodo.equals("wdelder")) {
-            org.jdom.Element rule = WFM.getRuleFromFile(mysemcrid, "deletewf");
+            org.jdom.Element rule = WFM.getRuleFromFile(myremcrid, "deletewf");
             if (!AI.checkPermission(rule)) {
                 job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + usererrorpage));
                 return;
@@ -619,7 +619,7 @@ public class MCRStartEditorServlet extends MCRServlet {
 
         // action WEDITDER in the database
         if (mytodo.equals("weditder")) {
-            org.jdom.Element rule = WFM.getRuleFromFile(mysemcrid, "writewf");
+            org.jdom.Element rule = WFM.getRuleFromFile(myremcrid, "writewf");
             if (!AI.checkPermission(rule)) {
                 job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + usererrorpage));
                 return;
@@ -663,7 +663,7 @@ public class MCRStartEditorServlet extends MCRServlet {
 
         // action WSETFILE in the database
         if (mytodo.equals("wsetfile")) {
-            org.jdom.Element rule = WFM.getRuleFromFile(mysemcrid, "writewf");
+            org.jdom.Element rule = WFM.getRuleFromFile(myremcrid, "writewf");
             if (!AI.checkPermission(rule)) {
                 job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + usererrorpage));
                 return;
@@ -706,7 +706,7 @@ public class MCRStartEditorServlet extends MCRServlet {
 
         // action WDELFILE in the database
         if (mytodo.equals("wdelfile")) {
-            org.jdom.Element rule = WFM.getRuleFromFile(mysemcrid, "deletewf");
+            org.jdom.Element rule = WFM.getRuleFromFile(myremcrid, "deletewf");
             if (!AI.checkPermission(rule)) {
                 job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + usererrorpage));
                 return;

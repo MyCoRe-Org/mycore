@@ -595,6 +595,11 @@ public class MCRSimpleWorkflowManager {
                 logger.warn("Read error of " + workdir + NL + ID.getId() + ".xml");
             }
         }
+        MCRObjectService service = new MCRObjectService();
+        org.jdom.Element elm = service.createXML();
+        MCREditorOutValidator.setDefaultDerivateACLs(elm,DD);
+        service.setFromDOM(elm);
+        der.setService(service);
 
         byte[] outxml = MCRUtils.getByteArray(der.createXML());
 

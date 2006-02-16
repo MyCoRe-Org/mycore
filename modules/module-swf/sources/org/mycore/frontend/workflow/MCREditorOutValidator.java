@@ -21,7 +21,7 @@
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
  */
 
-package org.mycore.frontend.editor;
+package org.mycore.frontend.workflow;
 
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
@@ -130,11 +130,9 @@ public class MCREditorOutValidator {
         this.errorlog = new ArrayList();
         this.input = jdom_in;
         this.id = id;
-        System.out.println("1111111111111111111111111111111");
         byte[] xml = MCRUtils.getByteArray(input);
         System.out.println(new String(xml));
         checkObject();
-        System.out.println("2222222222222222222222222222222");
         xml = MCRUtils.getByteArray(input);
         System.out.println(new String(xml));
     }
@@ -192,7 +190,6 @@ public class MCREditorOutValidator {
                 try {
                     Object returns = m.invoke(this, new Object[] { datasubtag });
                     if (!((Boolean) returns).booleanValue()) {
-                        System.out.println("BBBBBBBBBBBBBBBBBBBBBBBBBB");
                         datatagIt.remove();
                     }
                 } catch (IllegalArgumentException e) {
@@ -209,7 +206,6 @@ public class MCREditorOutValidator {
                     Class metaClass = Class.forName(mcrclass);
                     // just checks if class would validate this element
                     if (!checkMetaObject(datasubtag, metaClass)) {
-                        System.out.println("AAAAAAAAAAAAAAAAAAAAAAA");
                         datatagIt.remove();
                     }
                 } catch (ClassNotFoundException e) {
@@ -390,7 +386,6 @@ public class MCREditorOutValidator {
         // remove the path elements from the incoming
         org.jdom.Element pathes = root.getChild("pathes");
         if (pathes != null) {
-            System.out.println("CCCCCCCCCCCCCCCCC");
             root.removeChildren("pathes");
         }
         org.jdom.Element structure = root.getChild("structure");
@@ -415,7 +410,7 @@ public class MCREditorOutValidator {
         }
         List servicelist = service.getChildren();
         if (servicelist == null) {
-            setDefaultACLs(service);
+            setDefaultObjectACLs(service);
             return;
         }
         Iterator serviceIt = servicelist.iterator();
@@ -458,7 +453,7 @@ public class MCREditorOutValidator {
             }
         }
         if (!hasacls)
-            setDefaultACLs(service);
+            setDefaultObjectACLs(service);
     }
 
     /**
@@ -466,11 +461,11 @@ public class MCREditorOutValidator {
      * 
      * @param service
      */
-    private void setDefaultACLs(org.jdom.Element service) {
+    private void setDefaultObjectACLs(org.jdom.Element service) {
         // Read stylesheet and add user
         InputStream aclxml = MCREditorOutValidator.class.getResourceAsStream("/editor_default_acls_" + id.getTypeId() + ".xml");
         if (aclxml == null) {
-            LOGGER.warn("Can't find default ACL file editor_default_acls_....xml.");
+            LOGGER.warn("Can't find default object ACL file editor_default_acls_....xml.");
         } else {
             try {
                 org.jdom.Document xml = (new org.jdom.input.SAXBuilder()).build(aclxml);
@@ -489,7 +484,6 @@ public class MCREditorOutValidator {
                                         org.jdom.Element bool = condition.getChild("boolean");
                                         if (bool != null) {
                                             org.jdom.Element obool = (org.jdom.Element) bool.detach().clone();
-                                            System.out.println("DDDDDDDDDDDDDDDDDDDDDDDDDD");
                                             condition.removeContent();
                                             org.jdom.Element nbool = new org.jdom.Element("boolean");
                                             nbool.setAttribute("operator", "or");
@@ -510,7 +504,6 @@ public class MCREditorOutValidator {
                     service.addContent(acls);
                 }
             } catch (Exception e) {
-                e.printStackTrace();
                 LOGGER.warn("Error while parsing file editor_default_acls_....xml.");
             }
         }
@@ -546,6 +539,30 @@ public class MCREditorOutValidator {
             if (!checkMetaTags(datatag)) {
                 // e.g. datatag is empty
                 structIt.remove();
+            }
+        }
+    }
+
+    /**
+     * The method add a default ACL-block.
+     * 
+     * @param service
+     */
+    protected static void setDefaultDerivateACLs(org.jdom.Element service, MCRObjectID id) {
+        // Read stylesheet and add user
+        InputStream aclxml = MCREditorOutValidator.class.getResourceAsStream("/editor_default_acls_" + id.getTypeId() + ".xml");
+        if (aclxml == null) {
+            LOGGER.warn("Can't find default derivate ACL file editor_default_acls_....xml.");
+        } else {
+            try {
+                org.jdom.Document xml = (new org.jdom.input.SAXBuilder()).build(aclxml);
+                org.jdom.Element acls = xml.getRootElement().getChild("servacls");
+                if (acls != null) {
+                    acls.detach();
+                    service.addContent(acls);
+                }
+            } catch (Exception e) {
+                LOGGER.warn("Error while parsing file editor_default_acls_....xml.");
             }
         }
     }
