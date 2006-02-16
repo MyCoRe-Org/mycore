@@ -137,6 +137,32 @@ public class MCRAccessManager {
      */ 
     public static List getPermissionsForID(MCRObjectID id) {
         return getAccessImpl().getPermissionsForID(id.getId());
+    } 
+    
+    /**
+     * return a rule, that allows something for everybody
+     * @return
+     */
+    public static Element getTrueRule(){
+    	Element condition = new Element("condition");
+    	condition.setAttribute("format","xml");
+    	Element booleanOp = new Element("boolean");
+    	booleanOp.setAttribute("operator", "true");
+    	condition.addContent(booleanOp);
+    	return condition;
+    }
+    
+    /**
+     * return a rule, that forbids something for all, but superuser
+     * @return
+     */
+    public static Element getFalseRule(){
+    	Element condition = new Element("condition");
+    	condition.setAttribute("format","xml");
+    	Element booleanOp = new Element("boolean");
+    	booleanOp.setAttribute("operator", "false");
+    	condition.addContent(booleanOp);
+    	return condition;
     }    
 
 }

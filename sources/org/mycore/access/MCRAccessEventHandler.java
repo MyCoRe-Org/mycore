@@ -24,6 +24,9 @@
 // package
 package org.mycore.access;
 
+import java.util.Iterator;
+import java.util.List;
+
 import org.apache.log4j.Logger;
 
 import org.mycore.common.events.MCREvent;
@@ -41,7 +44,8 @@ public class MCRAccessEventHandler extends MCREventHandlerBase {
 
     // the logger
     private static Logger LOGGER = Logger.getLogger(MCRAccessEventHandler.class);
-
+    private static MCRAccessInterface AI = MCRAccessManager.getAccessImpl();
+    
     /**
      * This method will be used to create the access rules for SWF for a
      * MCRObject.
@@ -57,11 +61,14 @@ public class MCRAccessEventHandler extends MCREventHandlerBase {
 
         // create
         int rulesize = obj.getService().getRulesSize();
+        if(rulesize == 0) {
+        	setDefaultPermissions(obj, true);
+        }
         for (int i = 0; i < rulesize; i++) {
             org.jdom.Element conditions = obj.getService().getRule(i).getCondition();
             String pool = obj.getService().getRule(i).getPermission();
             MCRAccessManager.addRule(obj.getId(), pool, conditions, "");
-            // obj.getService().removeRule(i);
+            obj.getService().removeRule(i);
         }
 
         // save the stop time
@@ -82,9 +89,11 @@ public class MCRAccessEventHandler extends MCREventHandlerBase {
     protected void handleObjectUpdated(MCREvent evt, MCRObject obj) {
         // save the start time
         long t1 = System.currentTimeMillis();
-
         // update
         int rulesize = obj.getService().getRulesSize();
+        if(rulesize == 0) {
+        	setDefaultPermissions(obj, false);
+        }
         for (int i = 0; i < rulesize; i++) {
             org.jdom.Element conditions = obj.getService().getRule(i).getCondition();
             String pool = obj.getService().getRule(i).getPermission();
@@ -131,6 +140,29 @@ public class MCRAccessEventHandler extends MCREventHandlerBase {
      */
     protected void handleObjectRepaired(MCREvent evt, MCRObject obj) {
         // Do nothing
+    }
+    
+    /**
+     * This method sets Default Rules to all permissions that are configured.
+     * if <i>overwrite</i> = true, then the old permission entries that are in the database 
+     * are overwritten, else not.
+     * @param obj
+     * @param overwrite
+     */
+    private void setDefaultPermissions(MCRObject obj, boolean overwrite) {
+    	List savedPermissions = MCRAccessManager.getPermissionsForID(obj.getId());
+    	List configuredPermissions = AI.getAccessPermissionsFromConfiguration();
+    	for (Iterator it = configuredPermissions.iterator(); it.hasNext();) {
+			String permission = (String) it.next();
+			if(savedPermissions != null && savedPermissions.contains(permission)) {
+				if(overwrite) {
+					MCRAccessManager.removeRule(obj.getId(), permission);
+					MCRAccessManager.addRule(obj.getId(), permission, MCRAccessManager.getFalseRule(),"");					
+				}
+			}else{
+				MCRAccessManager.addRule(obj.getId(), permission, MCRAccessManager.getFalseRule(), "" );
+			}
+		}
     }
 
 }
