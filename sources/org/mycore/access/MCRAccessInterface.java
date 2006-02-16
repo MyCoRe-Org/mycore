@@ -27,6 +27,7 @@ import java.util.List;
 import org.jdom.Element;
 
 import org.mycore.common.MCRException;
+import org.mycore.user2.MCRUser;
 
 /**
  * This serves as an interface to an underlying access controll system.
@@ -163,6 +164,26 @@ public interface MCRAccessInterface {
     public boolean checkPermission(String id, String permission);
     
     /**
+     * determines whether a given user has the permission to perform a
+     * certain action. no session data will be checked here.
+     * 
+     * 
+     * The parameter <code>id</code> serves as an identifier for the concrete
+     * underlying rule, e.g. a MCRObjectID.
+     * 
+     * @param id
+     *            the ID-String of the object
+     * @param permission
+     *            the permission/action to be granted, e.g. "read"
+     * @param user
+     *            the MCRUser, whose permissions are checked           
+     * @return true if the permission is granted, else false
+     * @see org.mycore.common.MCRSessionMgr#getCurrentSession()
+     * @see org.mycore.common.MCRSession
+     */
+    public boolean checkPermission(String id, String permission, MCRUser user);    
+    
+    /**
      * determines whether the current user has the permission to perform a
      * certain action.
      * 
@@ -183,6 +204,23 @@ public interface MCRAccessInterface {
      * @see org.mycore.common.MCRSession
      */
     public boolean checkPermission(String permission);    
+
+    /**
+     * determines whether a given user has the permission to perform a
+     * certain action. no session data will be checked here.
+     * 
+     * This method is used for checking "a priori permissions" like "create-document"
+     *     where a String ID does not exist yet
+     * 
+     * @param permission
+     *            the permission/action to be granted, e.g. "create-document"
+     * @param user
+     *            the MCRUser, whose permissions are checked            
+     * @return true if the permission is granted, else false
+     * @see org.mycore.common.MCRSessionMgr#getCurrentSession()
+     * @see org.mycore.common.MCRSession
+     */
+    public boolean checkPermission(String permission, MCRUser user);     
 
     /**
      * determines whether the current user has the permission to perform a

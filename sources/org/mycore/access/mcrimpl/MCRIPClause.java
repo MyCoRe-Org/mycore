@@ -47,8 +47,7 @@ class MCRIPClause implements MCRCondition {
 
     public boolean evaluate(Object o) {
         MCRAccessData data = (MCRAccessData) o;
-
-        return this.ip.contains(data.getIp());
+        return (data.getIp()!= null)&&(this.ip.contains(data.getIp()));
     }
 
     public String toString() {

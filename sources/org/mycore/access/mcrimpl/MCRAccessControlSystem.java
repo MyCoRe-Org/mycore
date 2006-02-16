@@ -153,11 +153,11 @@ public class MCRAccessControlSystem extends MCRAccessBaseImpl{
     	updateRule(poolPrivilegeID, permission, rule, description);
     }
 
-    public boolean checkPermission(String id, String pool) {
+    public boolean checkPermission(String id, String permission) {
     	MCRSession session = MCRSessionMgr.getCurrentSession();
         MCRUser user = MCRUserMgr.instance().retrieveUser(session.getCurrentUserID());
         try {
-            return checkAccess(id, pool, user, new MCRIPAddress(session.getCurrentIP()));
+            return checkAccess(id, permission, user, new MCRIPAddress(session.getCurrentIP()));
         } catch (MCRException e) {
             // only return true if access is allowed, we dont know this
             LOGGER.debug("Error while checking rule.", e);
@@ -169,11 +169,19 @@ public class MCRAccessControlSystem extends MCRAccessBaseImpl{
         } 
     }	
     
+    public boolean checkPermission(String id, String permission, MCRUser user) {
+    	return checkAccess(id, permission, user, null);
+    }
+    
     public boolean checkPermission(String permission) {
         LOGGER.debug("Execute MCRAccessControlSystem checkPermission for permission " + permission);
         boolean ret = checkPermission(poolPrivilegeID, permission);
         LOGGER.debug("Execute MCRAccessControlSystem checkPermission result: "+(new Boolean(ret)).toString());
     return ret;
+    }
+    
+    public boolean checkPermission(String permission, MCRUser user) {
+		return checkAccess(poolPrivilegeID, permission, user, null);
     }
 
 	public boolean checkPermission(Element rule) {
@@ -285,8 +293,7 @@ public class MCRAccessControlSystem extends MCRAccessBaseImpl{
         Date date = new Date();
         MCRAccessRule rule = getAccess(objID, permission);
         if (rule == null) {
-        	// no rule: in read-pool everybody has access
-        	if(permission.equals("read") || user.getID().equals(superuserID)){
+        	if(user.getID().equals(superuserID)){
         		return true;
         	}
         	return false; 
