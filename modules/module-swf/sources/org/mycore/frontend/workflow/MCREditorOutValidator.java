@@ -39,6 +39,8 @@ import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.Namespace;
+import org.mycore.access.MCRAccessInterface;
+import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRDefaults;
 import org.mycore.common.MCRException;
@@ -96,6 +98,9 @@ public class MCREditorOutValidator {
 
     private static final ArrayList adduserlist;
 
+    // The Access Manager
+    protected static MCRAccessInterface AI = MCRAccessManager.getAccessImpl();
+
     static {
         // save all check methods in a Map for later usage
         HashMap methods = new HashMap();
@@ -131,10 +136,10 @@ public class MCREditorOutValidator {
         this.input = jdom_in;
         this.id = id;
         byte[] xml = MCRUtils.getByteArray(input);
-        System.out.println(new String(xml));
+System.out.println(new String(xml));
         checkObject();
         xml = MCRUtils.getByteArray(input);
-        System.out.println(new String(xml));
+System.out.println(new String(xml));
     }
 
     /**
@@ -452,6 +457,10 @@ public class MCREditorOutValidator {
 
             }
         }
+        List li = AI.getPermissionsForID(id.getId());
+        if ((li != null) && (li.size() > 0)) {
+            hasacls = true;
+        }
         if (!hasacls)
             setDefaultObjectACLs(service);
     }
@@ -469,9 +478,9 @@ public class MCREditorOutValidator {
         } else {
             try {
                 org.jdom.Document xml = (new org.jdom.input.SAXBuilder()).build(aclxml);
-                org.jdom.Element acls = xml.getRootElement().getChild("servacls");
-                if (acls != null) {
-                    acls.detach();
+                org.jdom.Element nacls = xml.getRootElement().getChild("servacls");
+                if (nacls != null) {
+                    org.jdom.Element acls = (org.jdom.Element) nacls.clone();
                     List acllist = acls.getChildren();
                     if (acllist != null) {
                         for (int i = 0; i < acllist.size(); i++) {
@@ -483,7 +492,7 @@ public class MCREditorOutValidator {
                                     if (adduserlist.contains(perm)) {
                                         org.jdom.Element bool = condition.getChild("boolean");
                                         if (bool != null) {
-                                            org.jdom.Element obool = (org.jdom.Element) bool.detach().clone();
+                                            org.jdom.Element obool = (org.jdom.Element) bool.clone();
                                             condition.removeContent();
                                             org.jdom.Element nbool = new org.jdom.Element("boolean");
                                             nbool.setAttribute("operator", "or");
@@ -559,7 +568,7 @@ public class MCREditorOutValidator {
                 org.jdom.Element acls = xml.getRootElement().getChild("servacls");
                 if (acls != null) {
                     acls.detach();
-                    service.addContent(acls);
+                    service.addContent((org.jdom.Element)acls.clone());
                 }
             } catch (Exception e) {
                 LOGGER.warn("Error while parsing file editor_default_acls_....xml.");
