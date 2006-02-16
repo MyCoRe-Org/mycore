@@ -46,7 +46,7 @@ public class MCRAccessBaseImpl implements MCRAccessInterface {
 
     private static MCRAccessInterface SINGLETON;
 
-    final protected static String AccessPermissions = MCRConfiguration.instance().getString("MCR.AccessPermissions", "read");
+    final protected static String AccessPermissions = MCRConfiguration.instance().getString("MCR.AccessPermissions", "read,writedb,commitdb,deletedb");
 
     /** the logger */
     protected static Logger LOGGER = Logger.getLogger(MCRAccessBaseImpl.class.getName());
@@ -247,6 +247,16 @@ public class MCRAccessBaseImpl implements MCRAccessInterface {
      */
     public boolean hasRule(String id) {
         return (getPermissionsForID(id).size() > 0);
+    }
+    
+    /**
+     * just returns the String of Access Permissions configured in
+     * property "MCR.AccessPermissions"
+     * 
+     * @return
+     */
+    public String getAccessPermissionsFromConfiguration(){
+    	return AccessPermissions;
     }
 
     /*
