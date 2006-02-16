@@ -262,7 +262,15 @@ public interface MCRAccessInterface {
      * 
      * @return a <code>List</code> of all defined permissions
      */
-    public List getPermissions();    
+    public List getPermissions();  
+    
+    /**
+     * list all object-related Access Permissions that are defined 
+     * in configuration files
+     * 
+     * @return
+     */
+    public List getAccessPermissionsFromConfiguration();  
     
     /**
      * lists all String IDs, a permission is assigned to.

@@ -24,6 +24,7 @@
 package org.mycore.access;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -255,8 +256,9 @@ public class MCRAccessBaseImpl implements MCRAccessInterface {
      * 
      * @return
      */
-    public String getAccessPermissionsFromConfiguration(){
-    	return AccessPermissions;
+    public List getAccessPermissionsFromConfiguration(){
+    	String[] permissions = AccessPermissions.split(",");
+    	return Arrays.asList(permissions);
     }
 
     /*
