@@ -124,7 +124,7 @@ public class MCRAccessCommands extends MCRAbstractCommands {
 
             for (Iterator it = listelm.iterator(); it.hasNext();) {
             	Element mcrpermission = (Element) it.next();
-            	String permissionName = mcrpermission.getAttributeValue("name");
+            	String permissionName = mcrpermission.getAttributeValue("name").trim().toLowerCase();
             	String ruleDescription = mcrpermission.getAttributeValue("ruledescription");
             	if(ruleDescription == null)
             		ruleDescription = "";
