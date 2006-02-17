@@ -68,9 +68,9 @@ public class MCRBuildLuceneQuery {
     // TODO: read from property file
     static String DATE_FORMAT = "yyyy-MM-dd";
 
-    static String TIME_FORMAT = "hh:mm:ss";
+    static String TIME_FORMAT = "HH:mm:ss";
 
-    static String TIMESTAMP_FORMAT = "yyyy-MM-dd hh:mm:ss";
+    static String TIMESTAMP_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
     static Analyzer analyzer = new GermanAnalyzer();
 

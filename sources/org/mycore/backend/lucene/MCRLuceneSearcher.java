@@ -70,9 +70,9 @@ public class MCRLuceneSearcher extends MCRSearcher {
 
     static String DATE_FORMAT = "yyyy-MM-dd";
 
-    static String TIME_FORMAT = "hh:mm:ss";
+    static String TIME_FORMAT = "HH:mm:ss";
 
-    static String TIMESTAMP_FORMAT = "yyyy-MM-dd hh:mm:ss";
+    static String TIMESTAMP_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
     static int INT_BEFORE = 10;
 
