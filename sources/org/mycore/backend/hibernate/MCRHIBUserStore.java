@@ -712,14 +712,14 @@ public class MCRHIBUserStore implements MCRUserStore {
             // the table
             for (int i = 0; i < oldAdminUserIDs.size(); i++) {
                 if (!newAdminUserIDs.contains(oldAdminUserIDs.get(i))) {
-                    int deletedEntities = session.createQuery("delete MCRGROUPADMINS " + "where GID = '" + group.getID() + "'" + " and GROUPID = '" + (String) oldAdminUserIDs.get(i) + "'").executeUpdate();
+                    int deletedEntities = session.createQuery("delete MCRGROUPADMINS " + "where GID = '" + group.getID() + "'" + " and USERID = '" + (String) oldAdminUserIDs.get(i) + "'").executeUpdate();
                     logger.info(deletedEntities + " groupadmin-entries deleted");
                 }
             }
 
             for (int i = 0; i < oldAdminGroupIDs.size(); i++) {
                 if (!newAdminGroupIDs.contains(oldAdminGroupIDs.get(i))) {
-                    int deletedEntities = session.createQuery("delete MCRGROUPADMINS " + "where GID = '" + group.getID() + "'" + " and USERID = '" + (String) oldAdminGroupIDs.get(i) + "'").executeUpdate();
+                    int deletedEntities = session.createQuery("delete MCRGROUPADMINS " + "where GID = '" + group.getID() + "'" + " and GROUPID = '" + (String) oldAdminGroupIDs.get(i) + "'").executeUpdate();
                     logger.info(deletedEntities + " groupadmin-entries deleted");
                 }
             }

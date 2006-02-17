@@ -701,14 +701,14 @@ public class MCRHIBUserStore2 implements MCRUserStore {
             // the table
             for (int i = 0; i < oldAdminUserIDs.size(); i++) {
                 if (!newAdminUserIDs.contains(oldAdminUserIDs.get(i))) {
-                    int deletedEntities = session.createQuery("delete MCRGROUPADMINS " + "where GID = '" + group.getID() + "'" + " and GROUPID = '" + (String) oldAdminUserIDs.get(i) + "'").executeUpdate();
+                    int deletedEntities = session.createQuery("delete MCRGROUPADMINS " + "where GID = '" + group.getID() + "'" + " and USERID = '" + (String) oldAdminUserIDs.get(i) + "'").executeUpdate();
                     logger.info(deletedEntities + " groupadmin-entries deleted");
                 }
             }
 
             for (int i = 0; i < oldAdminGroupIDs.size(); i++) {
                 if (!newAdminGroupIDs.contains(oldAdminGroupIDs.get(i))) {
-                    int deletedEntities = session.createQuery("delete MCRGROUPADMINS " + "where GID = '" + group.getID() + "'" + " and USERID = '" + (String) oldAdminGroupIDs.get(i) + "'").executeUpdate();
+                    int deletedEntities = session.createQuery("delete MCRGROUPADMINS " + "where GID = '" + group.getID() + "'" + " and GROUPID = '" + (String) oldAdminGroupIDs.get(i) + "'").executeUpdate();
                     logger.info(deletedEntities + " groupadmin-entries deleted");
                 }
             }
@@ -889,22 +889,6 @@ public class MCRHIBUserStore2 implements MCRUserStore {
         }
 
         return group;
-    }
-
-
-    /**
-     * This private method is a helper method and is called by many of the
-     * public methods of this class. It takes a SELECT statement (which must be
-     * provided as a parameter) and works this out on the database. This method
-     * is only applicable in the case that only one ArrayList of strings is
-     * requested as the result of the SELECT statement.
-     * 
-     * @param select
-     *            String, SELECT statement to be carried out on the database
-     * @return ArrayList of strings - the result of the SELECT statement
-     */
-    private ArrayList getSelectResult(String select) throws MCRException {
-        throw new IllegalStateException("Hibernate backend doesn't support direct SQL queries");
     }
 
     public void createUserTables() {
