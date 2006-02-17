@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
 <!-- ============================================== -->
-<!-- $Revision: 1.43 $ $Date: 2006-01-18 15:12:19 $ -->
+<!-- $Revision: 1.44 $ $Date: 2006-02-17 12:08:32 $ -->
 <!-- ============================================== --> 
 
 <xsl:stylesheet 
@@ -31,6 +31,11 @@
 
 <xsl:variable name="editor.list.indent">
   <xsl:text disable-output-escaping="yes">&amp;nbsp;&amp;nbsp;&amp;nbsp;</xsl:text>
+</xsl:variable>
+
+<!-- ======== FCK Editor JavaScript laden ======== -->
+<xsl:variable name="head.additional">
+  <script type="text/javascript" src="{$WebApplicationBaseURL}fck/fckeditor.js" />
 </xsl:variable>
 
 <!-- ========================================================================= -->
@@ -859,6 +864,30 @@
     </input>
   </xsl:if>
   <xsl:if test="local-name() = 'textarea'">
+
+    <!-- ======== Use the WYSIWYG HTML Editor? ======== -->
+    <xsl:if test="@wysiwygEditor='true'">
+      <script type="text/javascript"><xsl:text>
+        window.onload = function()
+        {
+      	  var oFCKeditor = new FCKeditor( '</xsl:text>
+      	  <xsl:value-of select="$var" />
+      	  <xsl:text>' ) ;
+      	  oFCKeditor.BasePath	= '</xsl:text>
+      	  <xsl:value-of select="concat($WebApplicationBaseURL,'fck/')" />
+      	  <xsl:text>' ;
+      	  oFCKeditor.Height = </xsl:text>
+      	  <xsl:value-of select="@editorHeight" />
+      	  <xsl:text> ;
+      	  oFCKeditor.Width = </xsl:text>
+      	  <xsl:value-of select="@editorWidth" />
+      	  <xsl:text> ;
+          oFCKeditor.ToolbarSet = 'mcr' ;
+      	  oFCKeditor.ReplaceTextarea() ;
+        }
+        </xsl:text></script>
+    </xsl:if>
+
     <xsl:variable name="wrap" select="''" />
  
     <xsl:text disable-output-escaping="yes">&lt;textarea </xsl:text>
