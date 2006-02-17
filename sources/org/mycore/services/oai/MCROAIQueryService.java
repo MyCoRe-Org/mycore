@@ -54,6 +54,7 @@ import org.mycore.services.query.MCRQueryCollector;
  * @author Thomas Scheffler (yagee)
  * 
  * @version $Revision: 1.10 $ $Date: 2003/01/31 11:56:25 $
+ * @deprecated
  * 
  * This is the MyCoRe-Implementation of the <i>MCROAIQuery </i>-Interface.
  */

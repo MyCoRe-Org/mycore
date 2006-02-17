@@ -24,9 +24,9 @@
             <servlet-name>MCRNBNResolver</servlet-name>
             <servlet-class>org.mycore.services.nbn.MCRNBNResolver</servlet-class>
       </servlet>
-      <servlet id="OAIDataProvider">
-            <servlet-name>MCROAIDataProvider</servlet-name>
-            <servlet-class>org.mycore.services.oai.MCROAIDataProvider</servlet-class>
+      <servlet id="OAIProvider">
+            <servlet-name>MCROAIProvider</servlet-name>
+            <servlet-class>org.mycore.services.oai.MCROAIProvider</servlet-class>
       </servlet>
       <servlet id="Query">
             <servlet-name>MCRQueryServlet</servlet-name>
@@ -118,8 +118,8 @@
             <url-pattern>/servlets/MCRNBNResolver/*</url-pattern>
       </servlet-mapping>
       <servlet-mapping>
-            <servlet-name>MCROAIDataProvider</servlet-name>
-            <url-pattern>/servlets/MCROAIDataProvider</url-pattern>
+            <servlet-name>MCROAIProvider</servlet-name>
+            <url-pattern>/servlets/MCROAIProvider</url-pattern>
       </servlet-mapping>
       <servlet-mapping>
             <servlet-name>MCRQueryServlet</servlet-name>
