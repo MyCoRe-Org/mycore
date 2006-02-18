@@ -598,19 +598,19 @@ public class MCRSQLUserStore2 implements MCRUserStore {
             // Now lookup the lists of admin users, admin groups, users
             // (members)
             // and privileges
-            select = "SELECT USERID FROM " + SQLGroupAdminsTable + " WHERE GID = '" + groupID + "' AND USERID IS NOT NULL";
+            select = "SELECT USERID FROM " + SQLGroupAdminsTable + " WHERE GID = '" + groupID + "' AND USERID IS NOT NULL AND USERID != ''";
 
             ArrayList admUserIDs = getSelectResult(select);
 
-            select = "SELECT GROUPID FROM " + SQLGroupAdminsTable + " WHERE GID = '" + groupID + "' AND GROUPID IS NOT NULL";
+            select = "SELECT GROUPID FROM " + SQLGroupAdminsTable + " WHERE GID = '" + groupID + "' AND GROUPID IS NOT NULL AND GROUPID != ''";
 
             ArrayList admGroupIDs = getSelectResult(select);
 
-            select = "SELECT USERID FROM " + SQLGroupMembersTable + " WHERE GID = '" + groupID + "' AND USERID IS NOT NULL";
+            select = "SELECT USERID FROM " + SQLGroupMembersTable + " WHERE GID = '" + groupID + "' AND USERID IS NOT NULL AND USERID != ''";
 
             ArrayList mbrUserIDs = getSelectResult(select);
 
-            select = "SELECT GROUPID FROM " + SQLGroupMembersTable + " WHERE GID = '" + groupID + "' AND GROUPID IS NOT NULL";
+            select = "SELECT GROUPID FROM " + SQLGroupMembersTable + " WHERE GID = '" + groupID + "' AND GROUPID IS NOT NULL AND GROUPID != ''";
 
             ArrayList mbrGroupIDs = getSelectResult(select);
 
