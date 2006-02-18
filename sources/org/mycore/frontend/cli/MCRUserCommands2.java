@@ -175,10 +175,9 @@ public class MCRUserCommands2 extends MCRAbstractCommands {
             if (MCRUserMgr.instance().retrieveUser(suser) != null) {
                 if (MCRUserMgr.instance().retrieveGroup(sgroup) != null) {
                     LOGGER.error("The superuser already exists!");
+                    return;
                 }
             }
-
-            return;
         } catch (Exception e) {
         }
 

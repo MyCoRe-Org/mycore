@@ -1010,8 +1010,12 @@ public class MCRUserMgr {
 		reqGroup = (bFromDataStore) ? null : (MCRGroup) groupCache.get(groupID);
 
 		if (reqGroup == null) { // We do not have this group in the cache.
-			reqGroup = mcrUserStore.retrieveGroup(groupID);
-
+			try{
+				reqGroup = mcrUserStore.retrieveGroup(groupID);
+			}catch(MCRException e) {
+				throw new MCRException("MCRUserMgr.retrieveGroup(): Unknown group '" + groupID + "'!");
+			}
+			
 			if (reqGroup == null) {
 				throw new MCRException("MCRUserMgr.retrieveGroup(): Unknown group '" + groupID + "'!");
 			}
@@ -1097,7 +1101,7 @@ public class MCRUserMgr {
 				reqUser = mcrUserStore.retrieveUser(userID);
 			} catch (MCRException e) {
 				logger.warn(e.getMessage());
-				reqUser = new MCRUser();
+				throw new MCRException("user can't be found in the database");
 			}
 
 			if (reqUser != null) {

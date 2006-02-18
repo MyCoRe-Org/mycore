@@ -442,7 +442,13 @@ public class MCRGroup extends MCRUserObject implements MCRPrincipal {
      *         ID 'matchID'.
      */
     public static boolean isImplicitMemberOf(MCRGroup group, String matchID) throws MCRException {
-        MCRGroup matchGroup = MCRUserMgr.instance().retrieveGroup(matchID, true);
+    	MCRGroup matchGroup;
+    	try{
+    		matchGroup = MCRUserMgr.instance().retrieveGroup(matchID, true);
+    	}catch(MCRException e){
+    		logger.warn(e.getMessage());
+    		return false;
+    	}
         ArrayList matchMemberGroupIDs = matchGroup.getMemberGroupIDs();
 
         if (matchMemberGroupIDs.contains(group.getID())) {
