@@ -30,10 +30,11 @@ public class MCRLINKCLASS {
         this.key = new MCRLINKCLASSPK();
     }
 
-    public MCRLINKCLASS(String from, String to) {
+    public MCRLINKCLASS(String from, String to, String type) {
         this.key = new MCRLINKCLASSPK();
         key.setMcrfrom(from);
         key.setMcrto(to);
+        key.setMcrtype(type);
     }
 
     /**
@@ -71,5 +72,16 @@ public class MCRLINKCLASS {
      */
     public void setMcrto(String mcrto) {
         key.setMcrto(mcrto);
+    }
+
+    /**
+     * @hibernate.property column="MCRTYPE" not-null="true" update="true"
+     */
+    public String getMcrtype() {
+        return key.getMcrtype();
+    }
+
+    public void setMcrtype(String mcrtype) {
+        key.setMcrtype(mcrtype);
     }
 }

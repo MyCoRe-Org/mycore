@@ -126,7 +126,7 @@ public class MCRHIBLinkTableStore implements MCRLinkTableInterface {
 
         try {
             if (mtype.equals("class")) {
-                MCRLINKCLASS l = new MCRLINKCLASS(from, to);
+                MCRLINKCLASS l = new MCRLINKCLASS(from, to, type);
                 session.saveOrUpdate(l);
             } else {
                 MCRLINKHREF l = new MCRLINKHREF(from, to, type);
@@ -171,7 +171,7 @@ public class MCRHIBLinkTableStore implements MCRLinkTableInterface {
         try {
             for (int i = 0; i < to.length; i++) {
                 if (mtype.equals("class")) {
-                    MCRLINKCLASS l = new MCRLINKCLASS(from, to[i]);
+                    MCRLINKCLASS l = new MCRLINKCLASS(from, to[i], type[i]);
                     session.saveOrUpdate(l);
                 } else {
                     MCRLINKHREF l = new MCRLINKHREF(from, to[i], type[i]);
@@ -243,7 +243,7 @@ public class MCRHIBLinkTableStore implements MCRLinkTableInterface {
         try {
             for (int i = 0; i < to.length; i++) {
                 if (mtype.equals("class")) {
-                    MCRLINKCLASS l = new MCRLINKCLASS(from, to[i]);
+                    MCRLINKCLASS l = new MCRLINKCLASS(from, to[i], type[i]);
                     session.delete(l);
                 } else {
                     MCRLINKHREF l = new MCRLINKHREF(from, to[i], type[i]);
@@ -288,7 +288,7 @@ public class MCRHIBLinkTableStore implements MCRLinkTableInterface {
 
         try {
             if (mtype.equals("class")) {
-                MCRLINKCLASS l = new MCRLINKCLASS(from, to);
+                MCRLINKCLASS l = new MCRLINKCLASS(from, to, type);
                 session.delete(l);
             } else {
                 MCRLINKHREF l = new MCRLINKHREF(from, to, type);

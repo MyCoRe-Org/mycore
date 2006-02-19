@@ -140,12 +140,14 @@ public class MCRHIBMapping {
             map = new MCRTableGenerator(config.getString("MCR.linktable_store_sql_table_class"), "org.mycore.backend.hibernate.tables.MCRLINKCLASS", "", 2);
             map.addIDColumn("mcrfrom", "MCRFROM", dbString, 64, "assigned", false);
             map.addIDColumn("mcrto", "MCRTO", dbString, 194, "assigned", false);
+            map.addIDColumn("mcrtype", "MCRTYPE", dbString, 194, "assigned", false);
             cfg.addXML(map.getTableXML());
 
             // Link Href
             map = new MCRTableGenerator(config.getString("MCR.linktable_store_sql_table_href"), "org.mycore.backend.hibernate.tables.MCRLINKHREF", "", 2);
             map.addIDColumn("mcrfrom", "MCRFROM", dbString, 64, "assigned", false);
             map.addIDColumn("mcrto", "MCRTO", dbString, 194, "assigned", false);
+            map.addIDColumn("mcrtype", "MCRTYPE", dbString, 194, "assigned", false);
             cfg.addXML(map.getTableXML());
 
             // NBN Manager

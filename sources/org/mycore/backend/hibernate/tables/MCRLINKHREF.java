@@ -34,7 +34,7 @@ public class MCRLINKHREF {
         this.key = new MCRLINKHREFPK();
         key.setMcrfrom(from);
         key.setMcrto(to);
-        key.setMcrto(type);
+        key.setMcrtype(type);
     }
 
     /**
@@ -69,6 +69,7 @@ public class MCRLINKHREF {
     public void setMcrto(String mcrto) {
         key.setMcrto(mcrto);
     }
+    
     /**
      * @hibernate.property column="MCRTYPE" not-null="true" update="true"
      */
