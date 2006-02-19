@@ -103,6 +103,14 @@ public class MCRLinkTableEventHandler extends MCREventHandlerBase {
                 }
             }
         }
+        MCRObjectStructure struct = obj.getStructure();
+        int dersize = struct.getDerivateSize();
+        for (int i = 0; i < dersize; i++) {
+            MCRMetaLinkID lid = struct.getDerivate(i);
+            mcr_linktable.deleteReferenceLink("href", lid.getXLinkToID());
+            mcr_linktable.addReferenceLink(MCRLinkTableManager.TYPE_HREF, lid.getXLinkToID(), lid.getXLinkFromID(),mcr_linktable.ENTRY_TYPE_DERIVATE);
+        }
+       
     }
 
     /**
