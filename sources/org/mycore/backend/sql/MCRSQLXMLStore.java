@@ -42,6 +42,7 @@ import org.mycore.datamodel.metadata.MCRXMLTableInterface;
  * 
  * @author Jens Kupferschmidt
  * @version $Revision$ $Date$
+ * @deprecated
  */
 public class MCRSQLXMLStore implements MCRXMLTableInterface {
     // logger

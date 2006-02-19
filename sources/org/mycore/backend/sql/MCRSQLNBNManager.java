@@ -49,6 +49,7 @@ import org.mycore.services.nbn.MCRNBNManager;
  * @author Frank Lützenkirchen
  * @author Werner Greßhoff
  * @version $Revision$ $Date$
+ * @deprecated
  */
 public class MCRSQLNBNManager implements MCRNBNManager {
     // logger

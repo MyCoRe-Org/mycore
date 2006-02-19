@@ -40,6 +40,7 @@ import org.mycore.datamodel.metadata.MCRMetaClassification;
  * @author Frank Lützenkirchen
  * @author Jens Kupferschmidt
  * @version $Revision$ $Date$
+ * @deprecated
  */
 public class MCRSQLClassificationStore implements MCRClassificationInterface {
     // logger

@@ -46,8 +46,10 @@ public interface MCRLinkTableInterface {
 	 *            a string with the link ID MCRFROM
 	 * @param to
 	 *            a string with the link ID MCRTO
+     * @param type
+     *            a string with the link ID MCRTYPE
 	 */
-	public void create(String from, String to);
+	public void create(String from, String to, String type);
 
 	/**
 	 * The method create a new item in the datastore.
@@ -55,9 +57,11 @@ public interface MCRLinkTableInterface {
 	 * @param from
 	 *            a string with the link ID MCRFROM
 	 * @param to
-	 *            a string with the link ID MCRTO
+	 *            an array of strings with the link ID MCRTO
+     * @param type
+     *            an array of strings with the link ID MCRTYPE
 	 */
-	public void create(String from, String[] to);
+	public void create(String from, String[] to, String[] type);
 
 	/**
 	 * The method remove a item for the from ID from the datastore.
@@ -74,8 +78,10 @@ public interface MCRLinkTableInterface {
 	 *            a string with the link ID MCRFROM
 	 * @param to
 	 *            an array of strings with the link ID MCRTO
+     * @param type
+     *            an array of strings with the link ID MCRTYPE
 	 */
-	public void delete(String from, String[] to);
+	public void delete(String from, String[] to, String[] type);
 
 	/**
 	 * The method remove a item for the from ID from the datastore.
@@ -84,8 +90,10 @@ public interface MCRLinkTableInterface {
 	 *            a string with the link ID MCRFROM
 	 * @param to
 	 *            an array of strings with the link ID MCRTO
+     * @param type
+     *            an array of strings with the link ID MCRTYPE
 	 */
-	public void delete(String from, String to);
+	public void delete(String from, String to, String type);
 
 	/**
 	 * The method count the number of references to the 'to' value of the table.
@@ -96,6 +104,18 @@ public interface MCRLinkTableInterface {
 	 */
 	public int countTo(String to);
 
+    /**
+     * The method count the number of references to the 'to' and the 'type'
+     * value of the table.
+     * 
+     * @param to
+     *            the object ID as String, they was referenced
+     * @param type
+     *            the refernce type
+     * @return the number of references
+     */
+    public int countTo(String to, String type);
+    
 	/**
 	 * The method count the number of references to the 'to' value of the table
 	 * with condition of a special doctype.

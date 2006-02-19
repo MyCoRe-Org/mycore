@@ -48,7 +48,9 @@ public class MCRLinkTableEventHandler extends MCREventHandlerBase {
      *            the MCRObject that caused the event
      */
     protected final void handleObjectCreated(MCREvent evt, MCRObject obj) {
+        // delete old entries
         handleObjectDeleted(evt, obj);
+        // set new entries
         MCRObjectID mcr_id = obj.getId();
         MCRObjectMetadata meta = obj.getMetadata();
         MCRMetaElement elm = null;
@@ -96,7 +98,7 @@ public class MCRLinkTableEventHandler extends MCREventHandlerBase {
                     continue;
                 }
                 if (inf instanceof MCRMetaLinkID) {
-                    mcr_linktable.addReferenceLink(MCRLinkTableManager.TYPE_HREF, mcr_id.toString(), ((MCRMetaLink) inf).getXLinkHref());
+                    mcr_linktable.addReferenceLink(MCRLinkTableManager.TYPE_HREF, mcr_id.toString(), ((MCRMetaLink) inf).getXLinkHref(),mcr_linktable.ENTRY_TYPE_REFERNCE);
                     continue;
                 }
             }
@@ -113,7 +115,7 @@ public class MCRLinkTableEventHandler extends MCREventHandlerBase {
      *            the MCRObject that caused the event
      */
     protected final void handleObjectUpdated(MCREvent evt, MCRObject obj) {
-        handleObjectDeleted(evt, obj);
+        //handleObjectDeleted(evt, obj);
         handleObjectCreated(evt, obj);
     }
 
@@ -142,7 +144,7 @@ public class MCRLinkTableEventHandler extends MCREventHandlerBase {
      *            the MCRObject that caused the event
      */
     protected final void handleObjectRepair(MCREvent evt, MCRObject obj) {
-        handleObjectDeleted(evt, obj);
+        //handleObjectDeleted(evt, obj);
         handleObjectCreated(evt, obj);
     }
 

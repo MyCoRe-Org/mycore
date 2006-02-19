@@ -33,6 +33,8 @@ public class MCRLINKHREFPK implements Serializable {
 
     private String mcrto;
 
+    private String mcrtype;
+
     /**
      * @return Returns the mcrfrom.
      */
@@ -63,6 +65,21 @@ public class MCRLINKHREFPK implements Serializable {
         this.mcrto = mcrto;
     }
 
+    /**
+     * @return Returns the mcrtype.
+     */
+    public String getMcrtype() {
+        return mcrtype;
+    }
+
+    /**
+     * @param mcrtype
+     *            The mcrtype to set.
+     */
+    public void setMcrtype(String mcrtype) {
+        this.mcrtype = mcrtype;
+    }
+
     public boolean equals(Object other) {
         if (!(other instanceof MCRLINKHREFPK)) {
             return false;
@@ -70,10 +87,10 @@ public class MCRLINKHREFPK implements Serializable {
 
         MCRLINKHREFPK castother = (MCRLINKHREFPK) other;
 
-        return new EqualsBuilder().append(this.getMcrfrom(), castother.getMcrfrom()).append(this.getMcrto(), castother.getMcrto()).isEquals();
+        return new EqualsBuilder().append(this.getMcrfrom(), castother.getMcrfrom()).append(this.getMcrto(), castother.getMcrto()).append(this.getMcrtype(), castother.getMcrtype()).isEquals();
     }
 
     public int hashCode() {
-        return new HashCodeBuilder().append(getMcrfrom()).append(getMcrto()).toHashCode();
+        return new HashCodeBuilder().append(getMcrfrom()).append(getMcrto()).append(getMcrtype()).toHashCode();
     }
 }
