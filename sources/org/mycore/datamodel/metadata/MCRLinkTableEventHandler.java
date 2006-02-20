@@ -93,24 +93,24 @@ public class MCRLinkTableEventHandler extends MCREventHandlerBase {
             for (int j = 0; j < elm.size(); j++) {
                 inf = elm.getElement(j);
                 if (inf instanceof MCRMetaClassification) {
-                    mcr_linktable.addClassificationLink(mcr_id, new MCRObjectID(((MCRMetaClassification) inf).getClassId()), ((MCRMetaClassification) inf)
-                            .getCategId());
+                    mcr_linktable.addClassificationLink(mcr_id, new MCRObjectID(((MCRMetaClassification) inf).getClassId()), ((MCRMetaClassification) inf).getCategId());
                     continue;
                 }
                 if (inf instanceof MCRMetaLinkID) {
-                    mcr_linktable.addReferenceLink(MCRLinkTableManager.TYPE_HREF, mcr_id.toString(), ((MCRMetaLink) inf).getXLinkHref(),mcr_linktable.ENTRY_TYPE_REFERNCE);
+                    mcr_linktable.addReferenceLink(MCRLinkTableManager.TYPE_HREF, mcr_id.toString(), ((MCRMetaLink) inf).getXLinkHref(), MCRLinkTableManager.ENTRY_TYPE_REFERNCE);
                     continue;
                 }
             }
         }
+        // add derivate referece
         MCRObjectStructure struct = obj.getStructure();
         int dersize = struct.getDerivateSize();
         for (int i = 0; i < dersize; i++) {
             MCRMetaLinkID lid = struct.getDerivate(i);
-            mcr_linktable.deleteReferenceLink("href", lid.getXLinkToID());
-            mcr_linktable.addReferenceLink(MCRLinkTableManager.TYPE_HREF, lid.getXLinkToID(), lid.getXLinkFromID(),mcr_linktable.ENTRY_TYPE_DERIVATE);
+            mcr_linktable.deleteReferenceLink(MCRLinkTableManager.TYPE_HREF, lid.getXLinkHrefID());
+            mcr_linktable.addReferenceLink(MCRLinkTableManager.TYPE_HREF, lid.getXLinkHrefID(), obj.getId(), MCRLinkTableManager.ENTRY_TYPE_DERIVATE);
         }
-       
+
     }
 
     /**
@@ -123,7 +123,7 @@ public class MCRLinkTableEventHandler extends MCREventHandlerBase {
      *            the MCRObject that caused the event
      */
     protected final void handleObjectUpdated(MCREvent evt, MCRObject obj) {
-        //handleObjectDeleted(evt, obj);
+        // handleObjectDeleted(evt, obj);
         handleObjectCreated(evt, obj);
     }
 
@@ -152,7 +152,7 @@ public class MCRLinkTableEventHandler extends MCREventHandlerBase {
      *            the MCRObject that caused the event
      */
     protected final void handleObjectRepair(MCREvent evt, MCRObject obj) {
-        //handleObjectDeleted(evt, obj);
+        // handleObjectDeleted(evt, obj);
         handleObjectCreated(evt, obj);
     }
 
