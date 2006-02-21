@@ -559,6 +559,29 @@ public class MCRLinkTableManager {
             return new LinkedList();
         }
     }
+    
+    public List getSourceOf(String type, String destination, String referenceType) {
+        int i = checkType(type);
+
+        if (i == -1) {
+            logger.warn("The type value of a reference link is false, the link was found in the link table");
+
+            return new LinkedList();
+        }
+
+        if ((destination == null) || (destination.length() == 0)) {
+            logger.warn("The to value of a reference link is false, the link was not found in the link table");
+
+            return new LinkedList();
+        }
+
+        try {
+            return ((MCRLinkTableInterface) tablelist.get(i)).getSourcesOf(destination,referenceType);
+        } catch (Exception e) {
+            logger.warn("An error was occured while search for references to " + destination + ".");
+            return new LinkedList();
+        }
+    }    
 
     public List getSourceOf(String type, String[] destinations) {
         int i = checkType(type);
@@ -605,6 +628,29 @@ public class MCRLinkTableManager {
             return new LinkedList();
         }
     }
+    
+    public List getDestinationOf(String type, String source, String referenceType) {
+        int i = checkType(type);
+
+        if (i == -1) {
+            logger.warn("The type value of a reference link is false, the link was found in the link table");
+
+            return new LinkedList();
+        }
+
+        if ((source == null) || (source.length() == 0)) {
+            logger.warn("The to value of a reference link is false, the link was not found in the link table");
+
+            return new LinkedList();
+        }
+
+        try {
+            return ((MCRLinkTableInterface) tablelist.get(i)).getDestinationsOf(source, referenceType);
+        } catch (Exception e) {
+            logger.warn("An error was occured while search for references from " + source + ".");
+            return new LinkedList();
+        }
+    }    
 
     public List getDestinationOf(String type, String[] sources) {
         int i = checkType(type);
