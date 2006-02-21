@@ -44,6 +44,7 @@ import javax.xml.transform.sax.TransformerHandler;
 import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
+import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRDefaults;
@@ -78,6 +79,7 @@ import org.mycore.frontend.servlets.MCRServletJob;
 public class MCRZipServlet extends MCRServlet {
     // The Log4J logger
     private static Logger LOGGER = Logger.getLogger(MCRZipServlet.class.getName());
+    private static String accessErrorPage = CONFIG.getString("MCR.AccessErrorPage");
 
     protected MCRXMLTableManager xmltable = null;
 
@@ -147,10 +149,20 @@ public class MCRZipServlet extends MCRServlet {
             Document jdom = result.exportAllToDocument();
 
             if (jdom.getRootElement().getChild("mcr_result").getChild("mycorederivate") != null) {
+            	if(!MCRAccessManager.checkPermissionForReadingDerivate(id)) {
+                    LOGGER.info("MCRFileNodeServlet: AccessForbidden to " + id);
+            		res.sendRedirect(getBaseURL() + accessErrorPage);
+            		return;
+            	}            	
                 out = buildZipOutputStream(res, id, path);
                 sendDerivate(id, path, out);
                 out.close();
             } else {
+            	if(!AI.checkPermission(id, "read")) {
+                    LOGGER.info("MCRFileNodeServlet: AccessForbidden to " + id);
+            		res.sendRedirect(getBaseURL() + accessErrorPage);
+            		return;
+            	}             	
                 out = buildZipOutputStream(res, id, path);
                 sendObject(jdom, req, out);
                 out.close();
@@ -234,6 +246,7 @@ public class MCRZipServlet extends MCRServlet {
      *            is zipped
      */
     protected void sendDerivate(String ownerID, String dirpath, ZipOutputStream out) throws IOException {
+    	
         MCRFilesystemNode root;
         MCRDirectory rootdirectory;
         MCRFilesystemNode zipdirectory;
@@ -303,8 +316,11 @@ public class MCRZipServlet extends MCRServlet {
 
             if (el.getAttributeValue("inherited").equals("0")) {
                 String ownerID = el.getAttributeValue("href", org.jdom.Namespace.getNamespace("xlink", MCRDefaults.XLINK_URL));
-                String dir = null;
-                sendDerivate(ownerID, dir, out);
+                // here the access check is tested only against the derivate
+                if(AI.checkPermission(ownerID,"read")) {
+                	String dir = null;
+                    sendDerivate(ownerID, dir, out);	
+                }
             }
         }
 

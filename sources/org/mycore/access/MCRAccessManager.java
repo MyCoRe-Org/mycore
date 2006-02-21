@@ -24,10 +24,12 @@ package org.mycore.access;
 
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.jdom.Element;
 
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
+import org.mycore.datamodel.metadata.MCRLinkTableManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 
 
@@ -125,6 +127,28 @@ public class MCRAccessManager {
      */
     public static boolean checkPermission(MCRObjectID id, String permission) {
         return getAccessImpl().checkPermission(id.getId(), permission);
+    }
+    
+    /**
+     * checks whether the current user has the permission to read/see a derivate
+     *        check is also against the mcrobject, the derivate belongs to
+     *        both checks must return true
+     * @param derID
+     *        String ID of a MyCoRe-Derivate
+     * @return true if the access is allowed otherwise it return false
+     * @see is needed in MCRFileNodeServlet and MCRZipServlet
+     */
+    public static boolean checkPermissionForReadingDerivate(String derID){
+    	// derID must be a derivate ID
+    	boolean accessAllowed = false;
+    	List l = MCRLinkTableManager.instance().getSourceOf("href",derID,"derivate");
+		if(l != null && l.size() > 0) {
+			accessAllowed = getAccessImpl().checkPermission((String)l.get(0),"read") && getAccessImpl().checkPermission(derID,"read");
+		}else {
+			accessAllowed = getAccessImpl().checkPermission(derID,"read");
+			Logger.getLogger("MCRAccessManager.class").warn("no mcrobject could be found for derivate: " + derID);
+		}
+		return accessAllowed;
     }
     
     /**

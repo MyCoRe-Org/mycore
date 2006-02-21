@@ -41,6 +41,7 @@ import org.jdom.Document;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 
+import org.mycore.access.MCRAccessManager;
 import org.mycore.backend.remote.MCRRemoteAccessInterface;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRException;
@@ -75,6 +76,7 @@ public class MCRFileNodeServlet extends MCRServlet {
 
     // The Log4J logger
     private static Logger LOGGER = Logger.getLogger(MCRFileNodeServlet.class.getName());
+    private static String accessErrorPage = CONFIG.getString("MCR.AccessErrorPage");
 
     // The list of hosts from the configuration
     private ArrayList remoteAliasList = null;
@@ -292,6 +294,12 @@ public class MCRFileNodeServlet extends MCRServlet {
      * streaming.
      */
     private void sendFile(HttpServletRequest req, HttpServletResponse res, MCRFile file) throws IOException {
+    	if(!MCRAccessManager.checkPermissionForReadingDerivate(file.getOwnerID())) {
+            LOGGER.info("MCRFileNodeServlet: AccessForbidden to " + file.getName());
+    		res.sendRedirect(getBaseURL() + accessErrorPage);
+    		return;
+    	}
+		
         LOGGER.info("MCRFileNodeServlet: Sending file " + file.getName());
 
         if (file.hasAudioVideoExtender()) // Start streaming player
