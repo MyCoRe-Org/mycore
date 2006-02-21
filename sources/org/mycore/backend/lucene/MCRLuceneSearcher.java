@@ -113,7 +113,7 @@ public class MCRLuceneSearcher extends MCRSearcher {
             String msg = lockDir + " is not writeable!";
             throw new org.mycore.common.MCRConfigurationException(msg);
         }
-        System.setProperty("org.apache.lucene.lockdir", lockDir);
+        System.setProperty("org.apache.lucene.lockDir", lockDir);
     }
 
     protected void addToIndex(String entryID, List fields) {
@@ -125,7 +125,8 @@ public class MCRLuceneSearcher extends MCRSearcher {
 
         try {
             Document doc = buildLuceneDocument(fields);
-            doc.add(Field.Keyword("mcrid", entryID));
+//            doc.add(Field.Keyword("mcrid", entryID));
+            doc.add(new Field("mcrid", entryID, Field.Store.YES, Field.Index.UN_TOKENIZED));
             LOGGER.debug("lucene document build " + entryID);
             addDocumentToLucene(doc);
         } catch (Exception e) {
@@ -161,7 +162,8 @@ public class MCRLuceneSearcher extends MCRSearcher {
                     LOGGER.debug("####### Index MCRFile: " + mcrfile.getPath());
 
                     BufferedReader in = new BufferedReader(PLUGIN_MANAGER.transform(mcrfile.getContentType(), mcrfile.getContentAsInputStream()));
-                    Field f = Field.Text(name, in);
+//                    Field f = Field.Text(name, in);
+                    Field f = new Field(name, in);
                     doc.add(f);
                 }
             } else {
@@ -186,13 +188,16 @@ public class MCRLuceneSearcher extends MCRSearcher {
                 }
 
                 if (type.equals("identifier")) {
-                    doc.add(Field.Keyword(name, content));
+//                  doc.add(Field.Keyword(name, content));
+                  doc.add(new Field(name, content, Field.Store.YES, Field.Index.UN_TOKENIZED));
                 }
 
                 if (type.equals("Text") || type.equals("name") || (type.equals("text") && field.getField().isSortable())) {
-                    doc.add(Field.Text(name, content));
+//                    doc.add(Field.Text(name, content));
+                    doc.add(new Field(name, content, Field.Store.YES, Field.Index.TOKENIZED));
                 } else if (type.equals("text")) {
-                    doc.add(Field.UnStored(name, content));
+//                    doc.add(Field.UnStored(name, content));
+                    doc.add(new Field(name, content, Field.Store.NO, Field.Index.TOKENIZED));
                 }
             }
         }
@@ -281,8 +286,10 @@ public class MCRLuceneSearcher extends MCRSearcher {
         } // if ( first
 
         writer = new IndexWriter(indexDir, analyzer, false);
-        writer.mergeFactor = 200;
-        writer.maxMergeDocs = 2000;
+//        writer.mergeFactor = 200;
+        writer.setMergeFactor( 200 );
+//        writer.maxMergeDocs = 2000;
+        writer.setMaxMergeDocs( 2000 );
 
         return writer;
     }
@@ -328,7 +335,8 @@ public class MCRLuceneSearcher extends MCRSearcher {
         if (hits.length() > 0) {
             IndexReader reader = IndexReader.open(indexDir);
             for (int i = 0; i < hits.length(); i++) {
-                reader.delete(hits.id(i));
+//              reader.delete(hits.id(i));
+              reader.deleteDocument(hits.id(i));
             }
             LOGGER.info("DELETE: " + id);
             reader.close();

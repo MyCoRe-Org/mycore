@@ -123,7 +123,16 @@ public class MCRBuildLuceneQuery {
                     r = new BooleanQuery();
                 }
 
-                BooleanClause bq = new BooleanClause(x, reqfn, prof);
+                //BooleanClause bq = new BooleanClause(x, reqfn, prof);
+                BooleanClause.Occur occur = BooleanClause.Occur.MUST;
+                
+                if (reqfn && !prof )
+                  ;
+                else if ( !reqfn && !prof)
+                  occur = BooleanClause.Occur.SHOULD; 
+                else if ( !reqfn && prof)
+                  occur = BooleanClause.Occur.MUST_NOT; 
+                BooleanClause bq = new BooleanClause(x, occur);
                 r.add(bq);
             }
         } // for
@@ -147,13 +156,21 @@ public class MCRBuildLuceneQuery {
                 if ((null != tq) && (null == bq)) // not first token
                 {
                     bq = new BooleanQuery();
-                    bq.add(tq, reqf, false);
+                    //bq.add(tq, reqf, false);
+                    if (reqf)
+                      bq.add(tq, BooleanClause.Occur.MUST);
+                    else
+                      bq.add(tq, BooleanClause.Occur.SHOULD);
                 }
 
                 tq = new TermQuery(te);
 
                 if (null != bq) {
-                    bq.add(tq, reqf, false);
+                    //bq.add(tq, reqf, false);
+                    if (reqf)
+                      bq.add(tq, BooleanClause.Occur.MUST);
+                    else
+                      bq.add(tq, BooleanClause.Occur.SHOULD);
                 }
             }
 
@@ -237,7 +254,10 @@ public class MCRBuildLuceneQuery {
                                                                             // lucene,
         // use query parser
         {
-            Query query = QueryParser.parse(field + ":(" + fixQuery(value) + ")", "", analyzer);
+//            Query query = QueryParser.parse(field + ":(" + fixQuery(value) + ")", "", analyzer);
+            QueryParser qp = new QueryParser(field, analyzer);
+            Query query = qp.parse( fixQuery(value) );
+            
             LOGGER.debug("Lucene query: " + query.toString());
 
             return query;
