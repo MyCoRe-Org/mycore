@@ -50,9 +50,9 @@ public class MCRLinkTableManager {
 
     public static final String ENTRY_TYPE_DERIVATE = "derivate";
 
-    public static final String ENTRY_TYPE_PARTENT = "parent";
+    public static final String ENTRY_TYPE_PARENT = "parent";
 
-    public static final String ENTRY_TYPE_REFERNCE = "reference";
+    public static final String ENTRY_TYPE_REFERENCE = "reference";
 
     /** The list of the table types */
     public static final String TYPE_CLASS = "class";
