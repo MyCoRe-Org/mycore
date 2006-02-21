@@ -426,6 +426,25 @@ public class MCRHIBLinkTableStore implements MCRLinkTableInterface {
         }
         return returns;
     }
+    
+    public List getSourcesOf(String destination, String referenceType) {
+        Session session = getSession();
+        StringBuffer querySB = new StringBuffer("select key.mcrfrom from ")
+        	.append(classname).append(" where MCRTO='").append(destination).append("'")
+        	.append(" and MCRTYPE = '").append(referenceType).append("'");
+        String query = querySB.toString();
+        logger.debug("HQL-Statement: " + query);
+        List returns;
+        try {
+            returns = session.createQuery(query).list();
+        } catch (Exception e) {
+            logger.error("catched error@getSourceOf:", e);
+            throw new MCRException("Error during getSourceOf", e);
+        } finally {
+            session.close();
+        }
+        return returns;
+    }    
 
     /**
      * Returns a List of all link sources of <code>destination</code>
@@ -451,11 +470,11 @@ public class MCRHIBLinkTableStore implements MCRLinkTableInterface {
     }
 
     /**
-     * Returns a List of all link sources of <code>destination</code>
+     * Returns a List of all link destinations of <code>destination</code>
      * 
-     * @param destinations
-     *            Destination-ID
-     * @return List of Strings (Source-IDs)
+     * @param source
+     *            source-ID
+     * @return List of Strings (Destination-IDs)
      */
     public List getDestinationsOf(String source) {
         Session session = getSession();
@@ -472,6 +491,34 @@ public class MCRHIBLinkTableStore implements MCRLinkTableInterface {
         }
         return returns;
     }
+    
+    /**
+     * Returns a List of all link destinations of <code>destination</code>
+     * 
+     * @param source
+     *            source-ID
+     * @param referenceType
+     * 			   reference type of the link            
+     * @return List of Strings (Destination-IDs)
+     */
+    public List getDestinationsOf(String source, String referenceType) {
+        Session session = getSession();
+        StringBuffer querySB = new StringBuffer("select key.mcrto from ")
+        	.append(classname).append(" where MCRFROM='").append(source).append("'")
+        	.append(" and MCRTYPE = '").append(referenceType).append("'");
+        String query = querySB.toString();
+        logger.debug("HQL-Statement: " + query);
+        List returns;
+        try {
+            returns = session.createQuery(query).list();
+        } catch (Exception e) {
+            logger.error("catched error@getDestinationOf:", e);
+            throw new MCRException("Error during getDestinationOf", e);
+        } finally {
+            session.close();
+        }
+        return returns;
+    }    
 
     /**
      * Returns a List of all link destination of <code>source</code>

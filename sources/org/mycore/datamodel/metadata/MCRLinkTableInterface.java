@@ -150,6 +150,18 @@ public interface MCRLinkTableInterface {
 	 * @return List of Strings (Source-IDs)
 	 */
 	public List getSourcesOf(String destination);
+	
+	/**
+	 * Returns a List of all link sources of <code>destination</code>
+	 *     and a special <code>referenceType</code>
+	 * 
+	 * @param destination
+	 *            Destination-ID
+	 * @param referenceType
+	 *            link reference type
+	 * @return List of Strings (Source-IDs)
+	 */
+	public List getSourcesOf(String destination, String referenceType);	
 
 	/**
 	 * Returns a List of all link destination of <code>source</code>
@@ -159,6 +171,18 @@ public interface MCRLinkTableInterface {
 	 * @return List of Strings (Destination-IDs)
 	 */
 	public List getDestinationsOf(String source);
+	
+	/**
+	 * Returns a List of all link destination of <code>source</code>
+	 *     and a special <code>referenceType</code>
+	 *      
+	 * @param source
+	 *            Source-ID
+	 * @param referenceType
+	 *            link referenceType           
+	 * @return List of Strings (Destination-IDs)
+	 */
+	public List getDestinationsOf(String source, String referenceType);	
 
 	/**
 	 * Returns a List of all link sources of <code>destination</code>

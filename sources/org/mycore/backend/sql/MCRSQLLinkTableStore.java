@@ -464,6 +464,28 @@ public class MCRSQLLinkTableStore implements MCRLinkTableInterface {
         }
         return returns;
     }
+    
+    public List getSourcesOf(String destination, String referenceType) {
+        StringBuffer select = new StringBuffer();
+        select.append("SELECT A.MCRFROM FROM TABLE ").append(tableName).append(" A WHERE A.MCRTO='").append(destination).append("'")
+        	.append(" AND A.MCRTYPE='").append(referenceType).append("'");
+        logger.debug("STATEMENT: " + select);
+        MCRSQLConnection conn = MCRSQLConnectionPool.instance().getConnection();
+        List returns = new LinkedList();
+
+        try {
+            MCRSQLRowReader reader = conn.doQuery(select.toString());
+            while (reader.next()) {
+                returns.add(reader.getString(1));
+            }
+            reader.close();
+        } catch (Exception e) {
+            throw new MCRException("SQL counter error", e);
+        } finally {
+            conn.release();
+        }
+        return returns;
+    }    
 
     public List getSourcesOf(String[] destinations) {
         StringBuffer select = new StringBuffer();
@@ -506,6 +528,28 @@ public class MCRSQLLinkTableStore implements MCRLinkTableInterface {
         }
         return returns;
     }
+    
+    public List getDestinationsOf(String source, String referenceType) {
+        StringBuffer select = new StringBuffer();
+        select.append("SELECT A.MCRTO FROM TABLE ").append(tableName).append(" A WHERE A.MCRFROM='").append(source).append("'")
+        	.append(" AND A.MCRTYPE='").append(referenceType).append("'");
+        logger.debug("STATEMENT: " + select);
+        MCRSQLConnection conn = MCRSQLConnectionPool.instance().getConnection();
+        List returns = new LinkedList();
+
+        try {
+            MCRSQLRowReader reader = conn.doQuery(select.toString());
+            while (reader.next()) {
+                returns.add(reader.getString(1));
+            }
+            reader.close();
+        } catch (Exception e) {
+            throw new MCRException("SQL counter error", e);
+        } finally {
+            conn.release();
+        }
+        return returns;
+    }    
 
     public List getDestinationsOf(String[] sources) {
         StringBuffer select = new StringBuffer();
