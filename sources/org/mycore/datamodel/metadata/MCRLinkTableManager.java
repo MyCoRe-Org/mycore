@@ -24,6 +24,7 @@
 package org.mycore.datamodel.metadata;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -238,6 +239,44 @@ public class MCRLinkTableManager {
             logger.warn("An error was occured while delete a dataset from the" + " reference link table, deleting is not succesful.");
         }
     }
+    
+    /**
+     * The method deletes all reference link pairs for the given type of a special source from the store.
+     * 
+     * @param table
+     *            the table type
+     * @param from
+     *            the source of the reference as String
+     * @param referenceType
+     *            the type of the reference as String           
+     */
+    public void deleteReferenceLink(String table, String from, String referenceType) {
+        int i = checkType(table);
+
+        if (i == -1) {
+            logger.warn("The type value of a reference link is false, the link was " + "not deleted from the link table");
+            return;
+        }
+
+        if ((from == null) || ((from = from.trim()).length() == 0)) {
+            logger.warn("The from value of a reference link is false, the link was " + "not deleted from the link table");
+            return;
+        }
+        
+        if ((referenceType == null) || ((referenceType = referenceType.trim()).length() == 0)) {
+            logger.warn("The type value of a reference link is false, the link was " + "not deleted from the link table");
+            return;
+        }        
+
+        try {
+        	for (Iterator it = getDestinationOf(table,from,referenceType).iterator(); it.hasNext();) {
+				String to = (String) it.next();
+				((MCRLinkTableInterface) tablelist.get(i)).delete(from, to, referenceType);
+			}
+        } catch (Exception e) {
+            logger.warn("An error was occured while delete a dataset from the" + " reference link table, deleting is not succesful.");
+        }
+    }    
 
     /**
      * The method delete a reference link pair for the given type to the store.
