@@ -108,6 +108,16 @@ public class MCRMetaISO8601DateTest extends MCRTestCase {
         ts.setDate(timeString);
         assertNull("Date is not null", ts.getDate());
         LOGGER.debug(ts.getISOString());
+        timeString = "01.12.1986";
+        ts.setFormat(null);
+        ts.setDate(timeString);
+        assertNull("Date is not null", ts.getDate());
+        setProperty("MCR.SimpleDateFormat.strictParsing","false",true);
+        ts.setFormat(null);
+        ts.setDate(timeString);
+        LOGGER.debug(ts.getISOString());
+        //assertNotNull("Date is null", ts.getDate());
+        setProperty("MCR.SimpleDateFormat.strictParsing","true",true);
     }
 
     /*

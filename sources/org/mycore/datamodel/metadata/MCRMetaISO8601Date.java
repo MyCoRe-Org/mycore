@@ -25,9 +25,12 @@ package org.mycore.datamodel.metadata;
 
 import java.io.IOException;
 import java.io.StringWriter;
+import java.text.DateFormat;
+import java.text.ParseException;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -41,6 +44,7 @@ import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 
+import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 
 /**
@@ -63,6 +67,8 @@ public final class MCRMetaISO8601Date extends MCRMetaDefault implements MCRMetaI
     private boolean changed = true;
 
     private static final Namespace DEFAULT_NAMESPACE = Namespace.NO_NAMESPACE;
+    
+    private static final MCRConfiguration CONFIG=MCRConfiguration.instance();
 
     private DateTime dt;
 
@@ -196,10 +202,33 @@ public final class MCRMetaISO8601Date extends MCRMetaDefault implements MCRMetaI
         try {
             dt = getDateTime(FormatChooser.cropSecondFractions(isoString));
         } catch (RuntimeException e) {
-            LOGGER.debug("Error while parsing date, set date to NULL.", e);
-            dt = null;
+            boolean strictParsingEnabled=CONFIG.getBoolean("MCR.SimpleDateFormat.strictParsing",true);
+            if (!strictParsingEnabled){
+                /*
+                 * Last line of defence against the worst dates of the universe ;o)
+                 */
+                LOGGER.warn("Strict date parsing is disabled. This may result in incorrect dates.");
+                dt = guessDateTime(isoString);
+            } else {
+                LOGGER.debug("Error while parsing date, set date to NULL.", e);
+                dt = null;
+            }
         }
         setDateTime(dt);
+    }
+    
+    private DateTime guessDateTime(String date){
+        DateFormat df= DateFormat.getDateInstance(DateFormat.SHORT);
+        df.setTimeZone(TimeZone.getTimeZone("UTC"));
+        df.setLenient(true);
+        DateTime result=null;
+        try {
+            Date pDate=df.parse(date);
+            result=new DateTime(pDate.getTime());
+        } catch (ParseException e) {
+            LOGGER.error("Error trying to guess date for string: "+date,e);
+        }
+        return result;
     }
 
     /**
