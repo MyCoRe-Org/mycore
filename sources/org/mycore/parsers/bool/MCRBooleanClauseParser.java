@@ -38,8 +38,6 @@ import org.jdom.Element;
 public class MCRBooleanClauseParser {
     private static Pattern bracket = Pattern.compile("\\([^)(]*\\)");
     
-    private static Pattern singleBracket = Pattern.compile("\\(|\\)");
-
     private static Pattern and = Pattern.compile("\\b[aA][nN][dD]\\b");
 
     private static Pattern or = Pattern.compile("\\b[oO][rR]\\b");
@@ -125,25 +123,9 @@ public class MCRBooleanClauseParser {
         /* replace all bracket expressions with $n */
         while (true) {
             /* remove outer brackets () */
-            while ((s.charAt(0) == '(') && (s.charAt(s.length() - 1) == ')') ) {
-         	   String tmp = s.substring(1, s.length() -1);
-         	   Matcher tmpMatcher = singleBracket.matcher(tmp);
-         	   int left=0;
-         	   int right=0;
-         	   while(tmpMatcher.find()) {
-         		   if(tmpMatcher.group().equals("("))
-         			   left++;
-         		   else
-         			   right++;
-         		   if(right > left) break;
-         	   }
-         	   if(right > left)
-         		   break;
-         	   else if (right == left)
-         		   s = tmp.trim();
-         	   else
-         		   break;
-            }        	
+            while ((s.charAt(0) == '(') && (s.charAt(s.length() - 1) == ')') && (s.substring(1, s.length() - 1).indexOf('(') < 0) && (s.substring(1, s.length() - 1).indexOf(')') < 0)) {
+                s = s.substring(1, s.length() - 1).trim();
+            }
 
             Matcher m = bracket.matcher(s);
 
@@ -201,7 +183,11 @@ public class MCRBooleanClauseParser {
             return new MCRNotCondition(inverse);
         }
 
-        return parseSimpleCondition(s);
+        s = extendClauses(s,l);
+        if(s.indexOf('(') >= 0)
+            return parse(s,l);
+        else
+            return parseSimpleCondition(s);
     }
 
     protected MCRCondition parseSimpleCondition(String s) throws MCRParseException {
@@ -236,5 +222,12 @@ public class MCRBooleanClauseParser {
 
     protected MCRCondition defaultRule() {
         return new MCRTrueCondition();
+    }
+
+    public static void main(String[] args)
+    {
+        MCRBooleanClauseParser p = new MCRBooleanClauseParser();
+        System.out.println(p.parse("((true))").toString());
+        System.out.println(p.parse("(true ) or  ( ((false) or (true)))").toString());
     }
 }
