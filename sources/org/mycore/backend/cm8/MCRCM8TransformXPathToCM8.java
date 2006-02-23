@@ -457,15 +457,17 @@ public class MCRCM8TransformXPathToCM8 implements MCRMetaSearchInterface, DKCons
 
             while (j < k) {
                 l = pathout[counter].indexOf("/", j);
-
+                String iType=itemtypeprefix;
+                if(pathout[counter].substring(j, k).startsWith("*")) 
+                	iType="";
+                	
                 if (l == -1) {
-                    sbpath.append(itemtypeprefix).append(pathout[counter].substring(j, k));
-                    pathout[counter] = sbpath.toString();
-
+                 	sbpath.append(iType).append(pathout[counter].substring(j, k));	
+                 	pathout[counter] = sbpath.toString();
                     break;
                 }
-
-                sbpath.append(itemtypeprefix).append(pathout[counter].substring(j, l + 1));
+                
+                sbpath.append(iType).append(pathout[counter].substring(j, l + 1));
                 j = l + 1;
             }
 
