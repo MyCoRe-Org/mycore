@@ -223,7 +223,6 @@ public class MCRHIBUserStore2 implements MCRUserStore {
 
             if (l.size() == 0) {
                 tx.rollback();
-                session.close();
                 throw new MCRException("There is no user with ID = " + userID);
             } else {
                 user = (MCRUSERS) l.get(0);
