@@ -40,7 +40,7 @@ public class MCRFalseCondition implements MCRCondition {
     }
 
     public String toString() {
-        return "false\n";
+        return "false";
     }
 
     public Element toXML() {
