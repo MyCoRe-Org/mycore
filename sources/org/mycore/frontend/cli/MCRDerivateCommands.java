@@ -217,7 +217,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
                 continue;
             }
 
-            if (processFromFile(new File(dir, list[i]), update)) {
+            if (processFromFile(new File(dir, list[i]), update, true)) {
                 numProcessed++;
             }
         }
@@ -232,9 +232,21 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
      *            the location of the xml file
      */
     public static boolean loadFromFile(String file) {
-        return processFromFile(new File(file), false);
+        return loadFromFile(file, true);
     }
 
+    /**
+     * Loads an MCRDerivates from an XML file.
+     * 
+     * @param file
+     *            the location of the xml file
+     * @param importMode
+     *            if true, servdates are taken from xml file
+     */
+    public static boolean loadFromFile(String file, boolean importMode) {
+        return processFromFile(new File(file), false, importMode);
+    }    
+    
     /**
      * Updates an MCRDerivates from an XML file.
      * 
@@ -242,9 +254,21 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
      *            the location of the xml file
      */
     public static boolean updateFromFile(String file) {
-        return processFromFile(new File(file), true);
+        return updateFromFile(file,true);
     }
 
+    /**
+     * Updates an MCRDerivates from an XML file.
+     * 
+     * @param file
+     *            the location of the xml file
+     * @param importMode
+     *            if true, servdates are taken from xml file
+     */
+    public static boolean updateFromFile(String file, boolean importMode) {
+        return processFromFile(new File(file), true, importMode);
+    }    
+    
     /**
      * Loads or updates an MCRDerivates from an XML file.
      * 
@@ -252,8 +276,10 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
      *            the location of the xml file
      * @param update
      *            if true, object will be updated, else object is created
+     * @param importMode
+     *            if true, servdates are taken from xml file
      */
-    private static boolean processFromFile(File file, boolean update) {
+    private static boolean processFromFile(File file, boolean update, boolean importMode) {
         if (!file.getName().endsWith(".xml")) {
             LOGGER.warn(file + " ignored, does not end with *.xml");
 
@@ -270,7 +296,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
 
         try {
             MCRDerivate mycore_obj = new MCRDerivate();
-            mycore_obj.setImportMode(true);
+            mycore_obj.setImportMode(importMode);
             mycore_obj.setFromURI(file.getAbsolutePath());
 
             // Replace relative path with absolute path of files

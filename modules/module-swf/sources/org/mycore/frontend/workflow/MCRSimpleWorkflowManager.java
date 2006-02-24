@@ -444,9 +444,9 @@ public class MCRSimpleWorkflowManager {
         String fn = getDirectoryPath(type) + SLASH + ID + ".xml";
 
         if (MCRObject.existInDatastore(ID)) {
-            MCRObjectCommands.updateFromFile(fn);
+            MCRObjectCommands.updateFromFile(fn, false);
         } else {
-            MCRObjectCommands.loadFromFile(fn);
+            MCRObjectCommands.loadFromFile(fn, false);
         }
 
         logger.info("The metadata objekt was " + fn + " loaded.");
@@ -491,9 +491,9 @@ public class MCRSimpleWorkflowManager {
 
     private boolean loadDerivate(String ID, String filename) {
         if (MCRDerivate.existInDatastore(ID)) {
-            MCRDerivateCommands.updateFromFile(filename);
+            MCRDerivateCommands.updateFromFile(filename, false);
         } else {
-            MCRDerivateCommands.loadFromFile(filename);
+            MCRDerivateCommands.loadFromFile(filename, false);
         }
 
         if (!MCRDerivate.existInDatastore(ID)) {
