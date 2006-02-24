@@ -299,8 +299,12 @@ final public class MCRObject extends MCRBase {
         }
 
         // create this object in datastore
-        mcr_service.setDate("createdate");
-        mcr_service.setDate("modifydate");
+        if (mcr_service.getDate("createdate") == null) {
+            mcr_service.setDate("createdate");
+        }
+        if (mcr_service.getDate("modifydate") == null) {
+            mcr_service.setDate("modifydate");
+        }
 
         // prepare this object with parent metadata
         MCRObjectID parent_id = mcr_struct.getParentID();
@@ -363,7 +367,9 @@ final public class MCRObject extends MCRBase {
     public final void addDerivateInDatastore(String id, MCRMetaLinkID link) throws MCRPersistenceException {
         mcr_id = new MCRObjectID(id);
         setFromJDOM(mcr_xmltable.readDocument(mcr_id));
-        mcr_service.setDate("modifydate");
+        if(!importMode) {
+        	mcr_service.setDate("modifydate");	
+        }
         getStructure().addDerivate(link);
         mcr_persist.update(this);
         mcr_xmltable.update(mcr_id, createXML());
@@ -689,8 +695,10 @@ final public class MCRObject extends MCRBase {
             }
         }
 
-        // set the date
-        mcr_service.setDate("createdate", old.getService().getDate("createdate"));
+        // if not imported via cli, createdate remains unchanged
+        if(!importMode || mcr_service.getDate("createdate") == null ){
+        	mcr_service.setDate("createdate", old.getService().getDate("createdate"));	
+        }
 
         // update this dataset
         updateThisInDatastore();
@@ -723,7 +731,9 @@ final public class MCRObject extends MCRBase {
      * The method updates this object in the persistence layer.
      */
     private final void updateThisInDatastore() throws MCRPersistenceException {
-        mcr_service.setDate("modifydate");
+    	if(!importMode || mcr_service.getDate("modifydate") == null){
+    		mcr_service.setDate("modifydate");
+    	}
         mcr_xmltable.update(mcr_id, createXML());
         deleteLinksFromTable();
         addLinksToTable();

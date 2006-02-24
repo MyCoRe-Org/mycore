@@ -75,6 +75,8 @@ public abstract class MCRBase {
     protected static String NL;
 
     protected static String SLASH;
+    
+    protected boolean importMode = false;
 
     // logger
     static Logger logger = Logger.getLogger(MCRBase.class.getPackage().getName());
@@ -368,4 +370,12 @@ public abstract class MCRBase {
 
         return true;
     }
+
+	public boolean isImportMode() {
+		return importMode;
+	}
+
+	public void setImportMode(boolean importMode) {
+		this.importMode = importMode;
+	}
 }

@@ -245,8 +245,12 @@ final public class MCRDerivate extends MCRBase {
         }
 
         // prepare the derivate metadata and store under the XML table
-        mcr_service.setDate("createdate");
-        mcr_service.setDate("modifydate");
+        if (mcr_service.getDate("createdate") == null || !importMode) {
+        	mcr_service.setDate("createdate");
+        }
+        if (mcr_service.getDate("modifydate") == null || !importMode) {
+        	mcr_service.setDate("modifydate");	
+        }
         mcr_xmltable.create(mcr_id, createXML());
 
         // create data in IFS
@@ -558,7 +562,9 @@ final public class MCRDerivate extends MCRBase {
      *                if a persistence problem is occured
      */
     public final void updateXMLInDatastore() throws MCRPersistenceException {
-        mcr_service.setDate("modifydate");
+    	if(!importMode || mcr_service.getDate("modifydate") == null){
+    		mcr_service.setDate("modifydate");	
+    	}
         mcr_xmltable.update(mcr_id, createXML());
         mcr_persist.update(this);
     }
