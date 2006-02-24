@@ -223,7 +223,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
                 continue;
             }
 
-            if (processFromFile(new File(dir, list[i]), update)) {
+            if (processFromFile(new File(dir, list[i]), update, true)) {
                 numProcessed++;
             }
         }
@@ -238,7 +238,27 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
      *            the location of the xml file
      */
     public static boolean loadFromFile(String file) {
-        return processFromFile(new File(file), false);
+        return loadFromFile(file,true);
+    }
+
+    /**
+     * Loads an MCRDerivates from an XML file.
+     * 
+     * @param filename
+     *            the location of the xml file
+     */
+    public static boolean loadFromFile(String file, boolean importMode) {
+        return processFromFile(new File(file), false, importMode);
+    }    
+    
+    /**
+     * Updates an MCRDerivates from an XML file.
+     * 
+     * @param filename
+     *            the location of the xml file
+     */
+    public static boolean updateFromFile(String file) {
+        return updateFromFile(file,true);
     }
 
     /**
@@ -247,10 +267,10 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
      * @param filename
      *            the location of the xml file
      */
-    public static boolean updateFromFile(String file) {
-        return processFromFile(new File(file), true);
-    }
-
+    public static boolean updateFromFile(String file, boolean importMode) {
+        return processFromFile(new File(file), true, importMode);
+    }    
+    
     /**
      * Loads or updates an MCRDerivates from an XML file.
      * 
@@ -259,7 +279,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
      * @param update
      *            if true, object will be updated, else object is created
      */
-    private static boolean processFromFile(File file, boolean update) {
+    private static boolean processFromFile(File file, boolean update, boolean importMode) {
         if (!file.getName().endsWith(".xml")) {
             LOGGER.warn(file + " ignored, does not end with *.xml");
 
@@ -276,7 +296,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
 
         try {
             MCRDerivate mycore_obj = new MCRDerivate();
-            mycore_obj.setImportMode(true);
+            mycore_obj.setImportMode(importMode);
             mycore_obj.setFromURI(file.getAbsolutePath());
 
             // Replace relative path with absolute path of files

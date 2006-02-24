@@ -37,6 +37,7 @@ import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRDefaults;
 import org.mycore.common.MCRUtils;
 import org.mycore.common.xml.MCRXMLHelper;
+import org.mycore.datamodel.metadata.MCRActiveLinkException;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRMetaIFS;
 import org.mycore.datamodel.metadata.MCRMetaLinkID;
@@ -427,15 +428,16 @@ public class MCRWorkflowManager {
      *            the MCRObjectID type of the metadata object
      * @param ID
      *            the ID of the metadata object
+     * @throws MCRActiveLinkException 
      */
-    public final boolean commitMetadataObject(String type, String ID) {
+    public final boolean commitMetadataObject(String type, String ID) throws MCRActiveLinkException {
         // commit metadata
         String fn = getDirectoryPath(type) + SLASH + ID + ".xml";
 
         if (MCRObject.existInDatastore(ID)) {
-            MCRObjectCommands.updateFromFile(fn);
+            MCRObjectCommands.updateFromFile(fn,false);
         } else {
-            MCRObjectCommands.loadFromFile(fn);
+            MCRObjectCommands.loadFromFile(fn,false);
         }
 
         logger.info("The metadata objekt was " + fn + " loaded.");
@@ -480,9 +482,9 @@ public class MCRWorkflowManager {
 
     private boolean loadDerivate(String ID, String filename) {
         if (MCRDerivate.existInDatastore(ID)) {
-            MCRDerivateCommands.updateFromFile(filename);
+            MCRDerivateCommands.updateFromFile(filename,false);
         } else {
-            MCRDerivateCommands.loadFromFile(filename);
+            MCRDerivateCommands.loadFromFile(filename,false);
         }
 
         if (!MCRDerivate.existInDatastore(ID)) {

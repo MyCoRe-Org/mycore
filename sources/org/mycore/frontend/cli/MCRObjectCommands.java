@@ -221,14 +221,14 @@ public class MCRObjectCommands extends MCRAbstractCommands {
                 continue;
             }
 
-            if (processFromFile(new File(dir, list[i]), update)) {
+            if (processFromFile(new File(dir, list[i]), update, true)) {
                 numProcessed++;
             }
         }
 
         LOGGER.info("Processed " + numProcessed + " files.");
     }
-
+    
     /**
      * Loads an MCRObjects from an XML file.
      * 
@@ -237,7 +237,20 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      * @throws MCRActiveLinkException
      */
     public static boolean loadFromFile(String file) throws MCRActiveLinkException {
-        return processFromFile(new File(file), false);
+        return loadFromFile(file, true);
+    }    
+
+    /**
+     * Loads an MCRObjects from an XML file.
+     * 
+     * @param filename
+     *            the location of the xml file
+     * @param importMode
+     *            if true, servdates are taken from the xml file           
+     * @throws MCRActiveLinkException
+     */
+    public static boolean loadFromFile(String file, boolean importMode) throws MCRActiveLinkException {
+        return processFromFile(new File(file), false, importMode);
     }
 
     /**
@@ -248,7 +261,20 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      * @throws MCRActiveLinkException
      */
     public static boolean updateFromFile(String file) throws MCRActiveLinkException {
-        return processFromFile(new File(file), true);
+        return updateFromFile(file, true);
+    }    
+    
+    /**
+     * Updates an MCRObjects from an XML file.
+     * 
+     * @param filename
+     *            the location of the xml file
+     * @param importMode
+     *            if true, servdates are taken from the xml file            
+     * @throws MCRActiveLinkException
+     */
+    public static boolean updateFromFile(String file, boolean importMode) throws MCRActiveLinkException {
+        return processFromFile(new File(file), true, importMode);
     }
 
     /**
@@ -260,7 +286,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      *            if true, object will be updated, else object is created
      * @throws MCRActiveLinkException
      */
-    private static boolean processFromFile(File file, boolean update) throws MCRActiveLinkException {
+    private static boolean processFromFile(File file, boolean update, boolean importMode) throws MCRActiveLinkException {
         if (!file.getName().endsWith(".xml")) {
             LOGGER.warn(file + " ignored, does not end with *.xml");
 
@@ -277,7 +303,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
 
         try {
             MCRObject mycore_obj = new MCRObject();
-            mycore_obj.setImportMode(true);            
+            mycore_obj.setImportMode(importMode);            
             mycore_obj.setFromURI(file.getAbsolutePath());
             LOGGER.info("Label --> " + mycore_obj.getLabel());
 
