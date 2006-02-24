@@ -177,8 +177,7 @@ public class MCRCM8TransformXPathToCM8 implements MCRMetaSearchInterface, DKCons
 
             MCRXMLTableManager xmltable = MCRXMLTableManager.instance();
             String id = "";
-            int rank = 0;
-            byte[] xml = null;
+
             short dataId = 0;
 
             while (iter.more()) {
@@ -195,7 +194,7 @@ public class MCRCM8TransformXPathToCM8 implements MCRMetaSearchInterface, DKCons
         }
 
         for (Iterator it = idmeta.iterator(); it.hasNext();) {
-            logger.debug("IDMETA = " + ((String) ((MCRObjectID) it.next()).getId()));
+            logger.debug("IDMETA = " + ((MCRObjectID) it.next()).getId());
         }
 
         return idmeta;
@@ -458,15 +457,17 @@ public class MCRCM8TransformXPathToCM8 implements MCRMetaSearchInterface, DKCons
 
             while (j < k) {
                 l = pathout[counter].indexOf("/", j);
-
+                String iType=itemtypeprefix;
+                if(pathout[counter].substring(j, k).startsWith("*")) 
+                	iType="";
+                	
                 if (l == -1) {
-                    sbpath.append(itemtypeprefix).append(pathout[counter].substring(j, k));
-                    pathout[counter] = sbpath.toString();
-
+                 	sbpath.append(iType).append(pathout[counter].substring(j, k));	
+                 	pathout[counter] = sbpath.toString();
                     break;
                 }
-
-                sbpath.append(itemtypeprefix).append(pathout[counter].substring(j, l + 1));
+                
+                sbpath.append(iType).append(pathout[counter].substring(j, l + 1));
                 j = l + 1;
             }
 
