@@ -370,7 +370,9 @@ final public class MCRObject extends MCRBase {
      */
     public final void addDerivateInDatastore(String id, MCRMetaLinkID link) throws MCRPersistenceException {
         receiveFromDatastore(id);
-        mcr_service.setDate("modifydate");
+        if(!importMode) {
+        	mcr_service.setDate("modifydate");	
+        }
         getStructure().addDerivate(link);
         updateThisInDatastore();
     }
@@ -734,8 +736,11 @@ final public class MCRObject extends MCRBase {
             }
         }
 
-        // set the date
-        mcr_service.setDate("createdate", old.getService().getDate("createdate"));
+        // if not imported via cli, createdate remains unchanged
+        if(!importMode || mcr_service.getDate("createdate") == null ){
+        	mcr_service.setDate("createdate", old.getService().getDate("createdate"));	
+        }
+        
 
         // update this dataset
         updateThisInDatastore();
@@ -774,7 +779,9 @@ final public class MCRObject extends MCRBase {
      * The method updates this object in the persistence layer.
      */
     private final void updateThisInDatastore() throws MCRPersistenceException {
-        mcr_service.setDate("modifydate");
+    	if(!importMode || mcr_service.getDate("modifydate") == null){
+    		mcr_service.setDate("modifydate");
+    	}
         // handle events
         MCREvent evt = new MCREvent(MCREvent.OBJECT_TYPE, MCREvent.UPDATE_EVENT);
         evt.put("object", this);

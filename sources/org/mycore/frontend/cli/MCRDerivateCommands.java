@@ -270,6 +270,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
 
         try {
             MCRDerivate mycore_obj = new MCRDerivate();
+            mycore_obj.setImportMode(true);
             mycore_obj.setFromURI(file.getAbsolutePath());
 
             // Replace relative path with absolute path of files

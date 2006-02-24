@@ -201,8 +201,13 @@ final public class MCRDerivate extends MCRBase {
         }
 
         // prepare the derivate metadata and store under the XML table
-        mcr_service.setDate("createdate");
-        mcr_service.setDate("modifydate");
+        if (mcr_service.getDate("createdate") == null || !importMode) {
+        	mcr_service.setDate("createdate");
+        }
+        if (mcr_service.getDate("modifydate") == null || !importMode) {
+        	mcr_service.setDate("modifydate");	
+        }
+        
         // handle events
         MCREvent evt = new MCREvent(MCREvent.DERIVATE_TYPE, MCREvent.CREATE_EVENT);
         evt.put("derivate", this);
@@ -511,7 +516,9 @@ final public class MCRDerivate extends MCRBase {
      *                if a persistence problem is occured
      */
     public final void updateXMLInDatastore() throws MCRPersistenceException {
-        mcr_service.setDate("modifydate");
+    	if(!importMode || mcr_service.getDate("modifydate") == null){
+    		mcr_service.setDate("modifydate");	
+    	}
         MCREvent evt = new MCREvent(MCREvent.DERIVATE_TYPE, MCREvent.UPDATE_EVENT);
         evt.put("derivate", this);
         MCREventManager.instance().handleEvent(evt);

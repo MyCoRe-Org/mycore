@@ -277,6 +277,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
 
         try {
             MCRObject mycore_obj = new MCRObject();
+            mycore_obj.setImportMode(true);
             mycore_obj.setFromURI(file.getAbsolutePath());
             LOGGER.info("Label --> " + mycore_obj.getLabel());
 
