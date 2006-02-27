@@ -459,18 +459,19 @@ public class MCROAIProvider extends MCRServlet {
 	                            "datestamp", ns, identifier[1]));
 	                    eHeader = setSpec(eHeader, identifier[2], ns);
 	
-	                    Element eRecord = new Element("record", ns);
-	                    eRecord.addContent(eHeader);
-	
-	                    if(listType.equals("records")) {
+	                    if(!listType.equals("records")) {
+	                    	//listType == identifiers
+	                    	list.addContent(eHeader);
+	                    }else {
+	                    	Element eRecord = new Element("record", ns);
+		                    eRecord.addContent(eHeader);
 	                        MCRObject object = new MCRObject();
 	                        object.receiveFromDatastore(identifier[3]);
 	                        Element eMetadata = (Element) object.createXML()
 	                              .getRootElement().clone();                    
-	                        eRecord.addContent(eMetadata);                        
+	                        eRecord.addContent(eMetadata);
+	                        list.addContent(eRecord);
 	                    }
-	
-	                    list.addContent(eRecord);
 	                }
 	            }
             }
@@ -1017,7 +1018,13 @@ public class MCROAIProvider extends MCRServlet {
             prefix = metadataPrefix[0];
             eRequest.setAttribute("metadataPrefix", prefix);
         } else {
-            prefix = resStore.getPrefix(resumptionToken[0].substring(0,resumptionToken[0].indexOf("x")));
+        	try{
+        		prefix = resStore.getPrefix(resumptionToken[0].substring(0,resumptionToken[0].indexOf("x")));
+        	} catch(StringIndexOutOfBoundsException ex){
+        		logger.info("Error in resumption token.", ex);
+                return addError(document, "badResumptionToken",
+                        ERR_BAD_RESUMPTION_TOKEN);
+        	}
             if (prefix == null) {
                 logger.info("Error in resumption token.");
                 return addError(document, "badResumptionToken",
@@ -1383,7 +1390,13 @@ public class MCROAIProvider extends MCRServlet {
             prefix = metadataPrefix[0];
             eRequest.setAttribute("metadataPrefix", prefix);
         } else {
-            prefix = resStore.getPrefix(resumptionToken[0].substring(0,resumptionToken[0].indexOf("x")));
+        	try{
+        		prefix = resStore.getPrefix(resumptionToken[0].substring(0,resumptionToken[0].indexOf("x")));
+        	} catch(StringIndexOutOfBoundsException ex) {
+        		logger.info("Error in resumption token.", ex);
+                return addError(document, "badResumptionToken",
+                        ERR_BAD_RESUMPTION_TOKEN);
+        	}
             if (prefix == null) {
                 logger.info("Error in resumption token.");
                 return addError(document, "badResumptionToken",
