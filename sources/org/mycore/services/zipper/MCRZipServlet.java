@@ -79,7 +79,7 @@ import org.mycore.frontend.servlets.MCRServletJob;
 public class MCRZipServlet extends MCRServlet {
     // The Log4J logger
     private static Logger LOGGER = Logger.getLogger(MCRZipServlet.class.getName());
-    private static String accessErrorPage = CONFIG.getString("MCR.AccessErrorPage");
+    private static String accessErrorPage = CONFIG.getString("MCR.access_page_error");
 
     protected MCRXMLTableManager xmltable = null;
 

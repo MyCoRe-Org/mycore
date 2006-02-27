@@ -76,7 +76,7 @@ public class MCRFileNodeServlet extends MCRServlet {
 
     // The Log4J logger
     private static Logger LOGGER = Logger.getLogger(MCRFileNodeServlet.class.getName());
-    private static String accessErrorPage = CONFIG.getString("MCR.AccessErrorPage");
+    private static String accessErrorPage = CONFIG.getString("MCR.access_page_error");
 
     // The list of hosts from the configuration
     private ArrayList remoteAliasList = null;
