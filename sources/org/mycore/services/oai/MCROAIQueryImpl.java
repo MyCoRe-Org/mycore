@@ -147,7 +147,7 @@ public class MCROAIQueryImpl implements MCROAIQuery {
 
             //We should better have a look if the set is empty...
             MCRLinkTableManager ltm = MCRLinkTableManager.instance();
-            int numberOfLinks = ltm.countCategoryReferencesSharp(categories[i]
+            int numberOfLinks = ltm.countReferenceCategory(categories[i]
                     .getClassificationID(), categories[i].getID());
 
             if (numberOfLinks > 0) {

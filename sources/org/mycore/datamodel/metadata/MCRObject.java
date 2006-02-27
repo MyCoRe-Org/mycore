@@ -291,7 +291,7 @@ final public class MCRObject extends MCRBase {
         }
 
         // check if document allready refer to this id
-        List sources = MCRLinkTableManager.instance().getSourceOf(MCRLinkTableManager.TYPE_HREF, mcr_id.toString());
+        List sources = MCRLinkTableManager.instance().getSourceOf(mcr_id);
         if (sources.size() > 0) {
             MCRActiveLinkException activeLinks = new MCRActiveLinkException(new StringBuffer("Error while adding object ").append(mcr_id.toString()).append(". The ID of this object is already referenced by other objects so this object can not be added until all links are corrected.").toString());
             String curSource;
@@ -429,7 +429,7 @@ final public class MCRObject extends MCRBase {
         }
 
         // check for active links
-        List sources = MCRLinkTableManager.instance().getSourceOf(MCRLinkTableManager.TYPE_HREF, mcr_id.toString());
+        List sources = MCRLinkTableManager.instance().getSourceOf(mcr_id);
         logger.debug("Sources size:" + sources.size());
         if (sources.size() > 0) {
             MCRActiveLinkException activeLinks = new MCRActiveLinkException(new StringBuffer("Error while deleting object ").append(mcr_id.toString()).append(". This object is still referenced by other objects and can not be removed until all links are released.").toString());

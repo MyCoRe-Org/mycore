@@ -66,41 +66,9 @@ public class MCRSQLLinkTableStore implements MCRLinkTableInterface {
      * The constructor for the class MCRSQLLinkTableStore.
      */
     public MCRSQLLinkTableStore() {
-    }
-
-    /**
-     * The initializer for the class MCRSQLLinkTableStore. It reads the
-     * classification configuration and checks the table names.
-     * 
-     * @exception MCRPersistenceException
-     *                if the type is not correct
-     */
-    public final void init(String type) throws MCRPersistenceException {
         MCRConfiguration config = MCRConfiguration.instance();
-
-        // Check the parameter
-        if ((type == null) || ((type = type.trim()).length() == 0)) {
-            throw new MCRPersistenceException("The type of the constructor" + " is null or empty.");
-        }
-
-        boolean test = false;
-
-        for (int i = 0; i < MCRLinkTableManager.LINK_TABLE_TYPES.length; i++) {
-            if (type.equals(MCRLinkTableManager.LINK_TABLE_TYPES[i])) {
-                test = true;
-
-                break;
-            }
-        }
-
-        if (!test) {
-            throw new MCRPersistenceException("The type of the constructor" + " is false.");
-        }
-
-        mytype = type;
-
         // set configuration
-        tableName = config.getString("MCR.linktable_store_sql_table_" + type, "MCRLINKTABLE");
+        tableName = config.getString("MCR.linktable_store_sql_table_href","MCRLINKTABLE");
 
         if (!MCRSQLConnection.doesTableExist(tableName)) {
             logger.info("Create table " + tableName);
@@ -129,13 +97,8 @@ public class MCRSQLLinkTableStore implements MCRLinkTableInterface {
         MCRSQLConnection c = MCRSQLConnectionPool.instance().getConnection();
 
         try {
-            if (mytype.equals("class")) {
-                c.doUpdate(new MCRSQLStatement(tableName).addColumn("MCRFROM VARCHAR(" + Integer.toString(lengthObjectID) + ") NOT NULL").addColumn("MCRTO VARCHAR(" + Integer.toString(lengthClassID + lengthCategID + 2) + ") NOT NULL").addColumn("MCRTYPE VARCHAR(64) NOT NULL").addColumn("PRIMARY KEY (MCRFROM,MCRTO,MCRTY)").toCreateTableStatement());
-                c.doUpdate(new MCRSQLStatement(tableName).addColumn("MCRFROM").addColumn("MCRTO").toIndexStatement());
-            } else {
-                c.doUpdate(new MCRSQLStatement(tableName).addColumn("MCRFROM VARCHAR(" + Integer.toString(lengthObjectID) + ") NOT NULL").addColumn("MCRTO VARCHAR(" + Integer.toString(lengthObjectID) + ") NOT NULL").addColumn("MCRTYPE VARCHAR(64) NOT NULL").addColumn("PRIMARY KEY (MCRFROM,MCRTO,MCRTYPE)").toCreateTableStatement());
-                c.doUpdate(new MCRSQLStatement(tableName).addColumn("MCRFROM").addColumn("MCRTO").toIndexStatement());
-            }
+               c.doUpdate(new MCRSQLStatement(tableName).addColumn("MCRFROM VARCHAR(" + Integer.toString(lengthObjectID) + ") NOT NULL").addColumn("MCRTO VARCHAR(" + Integer.toString(lengthObjectID) + ") NOT NULL").addColumn("MCRTYPE VARCHAR(64) NOT NULL").addColumn("MCRATTR VARCHAR(64)").addColumn("PRIMARY KEY (MCRFROM,MCRTO,MCRTYPE)").toCreateTableStatement());
+                c.doUpdate(new MCRSQLStatement(tableName).addColumn("MCRFROM").addColumn("MCRTO").addColumn("MCRTYPE").toIndexStatement());
         } finally {
             c.release();
         }
@@ -150,75 +113,28 @@ public class MCRSQLLinkTableStore implements MCRLinkTableInterface {
      *            a string with the link ID TO
      * @param type
      *            a string with the link ID MCRTYPE
-     */
-    public final void create(String from, String to, String type) {
+      * @param attr
+     *            a string with the link ID MCRATTR
+    */
+    public final void create(String from, String to, String type, String attr) {
         if ((from == null) || ((from = from.trim()).length() == 0)) {
             throw new MCRPersistenceException("The from value is null or empty.");
         }
-
         if ((to == null) || ((to = to.trim()).length() == 0)) {
             throw new MCRPersistenceException("The to value is null or empty.");
         }
-
         if ((type == null) || ((type = type.trim()).length() == 0)) {
             throw new MCRPersistenceException("The type value is null or empty.");
         }
-
-        try {
-            MCRSQLConnection.justDoUpdate(new MCRSQLStatement(tableName).setValue("MCRFROM", from).setValue("MCRTO", to).setValue("MCRTYPE", type).toInsertStatement());
-        } catch (Exception e) {
-            logger.debug("SQL Exception while store link table with message : " + e.getMessage());
-        }
-    }
-
-    /**
-     * The method creates a new item in the datastore.
-     * 
-     * @param from
-     *            a string with the link ID MCRFROM
-     * @param to
-     *            a string with the link ID TO
-     * @param type
-     *            a string with the link ID MCRTYPE
-     */
-    public final void create(String from, String[] to, String[] type) {
-        if ((from == null) || ((from = from.trim()).length() == 0)) {
-            throw new MCRPersistenceException("The from value is null or empty.");
-        }
-        if (to == null) {
-            throw new MCRPersistenceException("The to value is null.");
-        }
-        if (type == null) {
-            throw new MCRPersistenceException("The type value is null.");
+        if ((attr == null) || ((attr = attr.trim()).length() == 0)) {
+            throw new MCRPersistenceException("The attr value is null or empty.");
         }
 
         try {
-            StringBuffer statement = new StringBuffer("INSERT INTO ").append(tableName);
-            statement.append(" (MCRFROM, MCRTO, MCRTYPE) VALUES ");
-            for (int i = 0; i < to.length; i++) {
-                statement.append("( '").append(from).append("', '").append(to[i]).append("', '").append(type[i]).append("' )");
-                if (i < (to.length - 1)) {
-                    statement.append(" , ");
-                }
-            }
-            MCRSQLConnection.justDoUpdate(statement.toString());
+            MCRSQLConnection.justDoUpdate(new MCRSQLStatement(tableName).setValue("MCRFROM", from).setValue("MCRTO", to).setValue("MCRTYPE", type).setValue("MCRATTR", attr).toInsertStatement());
         } catch (Exception e) {
             logger.debug("SQL Exception while store link table with message : " + e.getMessage());
         }
-    }
-
-    /**
-     * The method remove a item for the from ID from the datastore.
-     * 
-     * @param from
-     *            a string with the link ID MCRFROM
-     */
-    public final void delete(String from) {
-        if ((from == null) || ((from = from.trim()).length() == 0)) {
-            throw new MCRPersistenceException("The from value is null or empty.");
-        }
-
-        MCRSQLConnection.justDoUpdate(new MCRSQLStatement(tableName).setCondition("MCRFROM", from).toDeleteStatement());
     }
 
     /**
@@ -240,7 +156,7 @@ public class MCRSQLLinkTableStore implements MCRLinkTableInterface {
             throw new MCRPersistenceException("The to value is null or empty.");
         }
 
-        if (type == null) {
+        if ((type == null) || ((type = type.trim()).length() == 0)) {
             throw new MCRPersistenceException("The type value is null or empty.");
         }
 
@@ -248,120 +164,20 @@ public class MCRSQLLinkTableStore implements MCRLinkTableInterface {
     }
 
     /**
-     * The method creates a new item in the datastore.
+     * The method count the number of references with '%from%' and 'to' and
+     * optional 'type' and optional 'restriction%' values of the table.
      * 
-     * @param from
-     *            a string with the link ID MCRFROM
+     * @param fromtype
+     *            a substing in the from ID as String, it can be null
      * @param to
-     *            a string with the link ID TO
+     *            the object ID as String, which is referenced
      * @param type
-     *            a string with the link ID MCRTYPE
-     */
-    public final void delete(String from, String[] to, String[] type) {
-        if ((from == null) || ((from = from.trim()).length() == 0)) {
-            throw new MCRPersistenceException("The from value is null or empty.");
-        }
-
-        if (to == null) {
-            throw new MCRPersistenceException("The to value is null.");
-        }
-
-        if (type == null) {
-            throw new MCRPersistenceException("The type value is null.");
-        }
-
-        try {
-            StringBuffer statement = new StringBuffer("DELETE FROM ").append(tableName);
-            statement.append(" WHERE MCRFROM='").append(from).append("' AND MCRTO IN (");
-            for (int i = 0; i < to.length; i++) {
-                statement.append(" '").append(to).append('\'');
-                if (i < (to.length - 1)) {
-                    statement.append(",");
-                }
-            }
-            statement.append(" )");
-            statement.append("' AND MCRTYPE IN (");
-            for (int i = 0; i < to.length; i++) {
-                statement.append(" '").append(to).append('\'');
-                if (i < (type.length - 1)) {
-                    statement.append(",");
-                }
-            }
-            statement.append(" )");
-            MCRSQLConnection.justDoUpdate(statement.toString());
-        } catch (Exception e) {
-            logger.debug("SQL Exception while store link table with message : " + e.getMessage());
-        }
-    }
-
-    /**
-     * The method count the number of references to the 'to' value of the table.
-     * 
-     * @param to
-     *            the object ID as String, they was referenced
+     *            the refernce type, it can be null
+     * @param restriction
+     *            a first part of the to ID as String, it can be null
      * @return the number of references
      */
-    public final int countTo(String to) {
-        String sql = new MCRSQLStatement(tableName).setCondition("MCRTO", to).toCountStatement("MCRFROM");
-        MCRSQLConnection conn = MCRSQLConnectionPool.instance().getConnection();
-        int num = 0;
-
-        try {
-            MCRSQLRowReader reader = conn.doQuery(sql);
-            if (reader.next()) {
-                num = reader.getInt("NUMBER");
-            }
-            reader.close();
-            return num;
-        } catch (Exception e) {
-            throw new MCRException("SQL counter error", e);
-        } finally {
-            conn.release();
-        }
-    }
-
-    /**
-     * The method count the number of references to the 'to' and the 'type'
-     * value of the table.
-     * 
-     * @param to
-     *            the object ID as String, they was referenced
-     * @param type
-     *            the refernce type
-     * @return the number of references
-     */
-    public final int countTo(String to, String type) {
-        String sql = new MCRSQLStatement(tableName).setCondition("MCRTO", to).setCondition("MCRTYPE", type).toCountStatement("MCRFROM");
-        MCRSQLConnection conn = MCRSQLConnectionPool.instance().getConnection();
-        int num = 0;
-
-        try {
-            MCRSQLRowReader reader = conn.doQuery(sql);
-            if (reader.next()) {
-                num = reader.getInt("NUMBER");
-            }
-            reader.close();
-            return num;
-        } catch (Exception e) {
-            throw new MCRException("SQL counter error", e);
-        } finally {
-            conn.release();
-        }
-    }
-
-    /**
-     * The method count the number of references to the 'to' value of the table.
-     * 
-     * @param to
-     *            the object ID as String, they was referenced
-     * @return the number of references
-     * 
-     */
-    public final int countTo(String to, String doctype, String restriction) {
-        if (((doctype == null) || (doctype.trim().length() == 0)) && ((restriction == null) || (restriction.trim().length() == 0))) {
-            return countTo(to);
-        }
-
+    public final int countTo(String fromtype, String to, String type, String restriction) {
         StringBuffer select = new StringBuffer();
 
         select.append("SELECT COUNT( DISTINCT A.MCRFROM ) AS NUMBER FROM ");
@@ -381,8 +197,8 @@ public class MCRSQLLinkTableStore implements MCRLinkTableInterface {
             select.append(" AND ( A.MCRFROM = B.MCRFROM )");
         }
 
-        if (doctype != null) {
-            select.append(" AND A.MCRFROM like '%_" + doctype + "_%'");
+        if (type != null) {
+            select.append(" AND A.MCRFROM like '%_" + type + "_%'");
         }
 
         logger.info("STATEMENT:    " + select);
@@ -444,31 +260,22 @@ public class MCRSQLLinkTableStore implements MCRLinkTableInterface {
         return map;
     }
 
-    public List getSourcesOf(String destination) {
+    /**
+     * Returns a List of all link sources of <code>to</code> and a special
+     * <code>type</code>
+     * 
+     * @param to
+     *            Destination-ID
+     * @param type
+     *            link reference type
+     * @return List of Strings (Source-IDs)
+     */
+    public List getSourcesOf(String to, String type) {
         StringBuffer select = new StringBuffer();
-        select.append("SELECT A.MCRFROM FROM TABLE ").append(tableName).append(" A WHERE A.MCRTO='").append(destination).append("'");
-        logger.debug("STATEMENT: " + select);
-        MCRSQLConnection conn = MCRSQLConnectionPool.instance().getConnection();
-        List returns = new LinkedList();
-
-        try {
-            MCRSQLRowReader reader = conn.doQuery(select.toString());
-            while (reader.next()) {
-                returns.add(reader.getString(1));
-            }
-            reader.close();
-        } catch (Exception e) {
-            throw new MCRException("SQL counter error", e);
-        } finally {
-            conn.release();
+        select.append("SELECT A.MCRFROM FROM TABLE ").append(tableName).append(" A WHERE A.MCRTO='").append(to).append("'");
+        if ((type != null) && (type.trim().length() != 0)) {
+        	select.append(" AND A.MCRTYPE='").append(type).append("'");
         }
-        return returns;
-    }
-    
-    public List getSourcesOf(String destination, String referenceType) {
-        StringBuffer select = new StringBuffer();
-        select.append("SELECT A.MCRFROM FROM TABLE ").append(tableName).append(" A WHERE A.MCRTO='").append(destination).append("'")
-        	.append(" AND A.MCRTYPE='").append(referenceType).append("'");
         logger.debug("STATEMENT: " + select);
         MCRSQLConnection conn = MCRSQLConnectionPool.instance().getConnection();
         List returns = new LinkedList();
@@ -487,52 +294,22 @@ public class MCRSQLLinkTableStore implements MCRLinkTableInterface {
         return returns;
     }    
 
-    public List getSourcesOf(String[] destinations) {
-        StringBuffer select = new StringBuffer();
-        select.append("SELECT A.MCRFROM FROM TABLE ").append(tableName).append(" A WHERE A.MCRTO IN").append(getSQLArray(destinations));
-        logger.debug("STATEMENT: " + select);
-        MCRSQLConnection conn = MCRSQLConnectionPool.instance().getConnection();
-        List returns = new LinkedList();
-
-        try {
-            MCRSQLRowReader reader = conn.doQuery(select.toString());
-            while (reader.next()) {
-                returns.add(reader.getString(1));
-            }
-            reader.close();
-        } catch (Exception e) {
-            throw new MCRException("SQL counter error", e);
-        } finally {
-            conn.release();
-        }
-        return returns;
-    }
-
-    public List getDestinationsOf(String source) {
+    /**
+     * Returns a List of all link destination of <code>source</code> and a
+     * special <code>type</code>
+     * 
+     * @param source
+     *            Source-ID
+     * @param type
+     *            link referenceType
+     * @return List of Strings (Destination-IDs)
+     */
+    public List getDestinationsOf(String source, String type) {
         StringBuffer select = new StringBuffer();
         select.append("SELECT A.MCRTO FROM TABLE ").append(tableName).append(" A WHERE A.MCRFROM='").append(source).append("'");
-        logger.debug("STATEMENT: " + select);
-        MCRSQLConnection conn = MCRSQLConnectionPool.instance().getConnection();
-        List returns = new LinkedList();
-
-        try {
-            MCRSQLRowReader reader = conn.doQuery(select.toString());
-            while (reader.next()) {
-                returns.add(reader.getString(1));
-            }
-            reader.close();
-        } catch (Exception e) {
-            throw new MCRException("SQL counter error", e);
-        } finally {
-            conn.release();
+        if ((type != null) && (type.trim().length() != 0)) {
+            select.append(" AND A.MCRTYPE='").append(type).append("'");
         }
-        return returns;
-    }
-    
-    public List getDestinationsOf(String source, String referenceType) {
-        StringBuffer select = new StringBuffer();
-        select.append("SELECT A.MCRTO FROM TABLE ").append(tableName).append(" A WHERE A.MCRFROM='").append(source).append("'")
-        	.append(" AND A.MCRTYPE='").append(referenceType).append("'");
         logger.debug("STATEMENT: " + select);
         MCRSQLConnection conn = MCRSQLConnectionPool.instance().getConnection();
         List returns = new LinkedList();
@@ -550,27 +327,6 @@ public class MCRSQLLinkTableStore implements MCRLinkTableInterface {
         }
         return returns;
     }    
-
-    public List getDestinationsOf(String[] sources) {
-        StringBuffer select = new StringBuffer();
-        select.append("SELECT A.MCRTO FROM TABLE ").append(tableName).append(" A WHERE A.MCRFROM IN").append(getSQLArray(sources));
-        logger.debug("STATEMENT: " + select);
-        MCRSQLConnection conn = MCRSQLConnectionPool.instance().getConnection();
-        List returns = new LinkedList();
-
-        try {
-            MCRSQLRowReader reader = conn.doQuery(select.toString());
-            while (reader.next()) {
-                returns.add(reader.getString(1));
-            }
-            reader.close();
-        } catch (Exception e) {
-            throw new MCRException("SQL counter error", e);
-        } finally {
-            conn.release();
-        }
-        return returns;
-    }
 
     private static final String getSQLArray(String[] values) {
         StringBuffer returns = new StringBuffer();

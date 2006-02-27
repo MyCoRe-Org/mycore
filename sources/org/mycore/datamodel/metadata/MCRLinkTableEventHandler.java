@@ -97,19 +97,19 @@ public class MCRLinkTableEventHandler extends MCREventHandlerBase {
                     continue;
                 }
                 if (inf instanceof MCRMetaLinkID) {
-                    mcr_linktable.addReferenceLink(MCRLinkTableManager.TYPE_HREF, mcr_id.toString(), ((MCRMetaLink) inf).getXLinkHref(), MCRLinkTableManager.ENTRY_TYPE_REFERENCE);
+                    mcr_linktable.addReferenceLink(mcr_id.toString(), ((MCRMetaLink) inf).getXLinkHref(), MCRLinkTableManager.ENTRY_TYPE_REFERENCE, "");
                     continue;
                 }
             }
         }
         // delete all derivate references
-        mcr_linktable.deleteReferenceLink(MCRLinkTableManager.TYPE_HREF, obj.getId().toString(),MCRLinkTableManager.ENTRY_TYPE_DERIVATE);
+        mcr_linktable.deleteReferenceLink(obj.getId().toString(),MCRLinkTableManager.ENTRY_TYPE_DERIVATE,"");
         // add derivate referece
         MCRObjectStructure struct = obj.getStructure();
         int dersize = struct.getDerivateSize();
         for (int i = 0; i < dersize; i++) {
             MCRMetaLinkID lid = struct.getDerivate(i);
-            mcr_linktable.addReferenceLink(MCRLinkTableManager.TYPE_HREF, obj.getId(), lid.getXLinkHrefID(), MCRLinkTableManager.ENTRY_TYPE_DERIVATE);
+            mcr_linktable.addReferenceLink(obj.getId(), lid.getXLinkHrefID(), MCRLinkTableManager.ENTRY_TYPE_DERIVATE,"");
         }
 
     }
@@ -139,7 +139,7 @@ public class MCRLinkTableEventHandler extends MCREventHandlerBase {
      */
     protected final void handleObjectDeleted(MCREvent evt, MCRObject obj) {
         MCRObjectID mcr_id = obj.getId();
-        mcr_linktable.deleteReferenceLink("href", mcr_id);
+        mcr_linktable.deleteReferenceLink(mcr_id);
         mcr_linktable.deleteClassificationLink(mcr_id);
     }
 

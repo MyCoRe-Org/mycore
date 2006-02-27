@@ -27,178 +27,91 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * This interface is designed to choose the Persistence for the link tables.
+ * This interface is designed to choose the persistence for the link tables.
  * 
  * @author Jens Kupferschmidt
  * @version $Revision$ $Date$
  */
 public interface MCRLinkTableInterface {
-	/**
-	 * initializes the MCRLinkTableInterface implementation. It reads the
-	 * classification configuration and checks the table names.
-	 */
-	public void init(String type);
-
-	/**
-	 * The method create a new item in the datastore.
-	 * 
-	 * @param from
-	 *            a string with the link ID MCRFROM
-	 * @param to
-	 *            a string with the link ID MCRTO
-     * @param type
-     *            a string with the link ID MCRTYPE
-	 */
-	public void create(String from, String to, String type);
-
-	/**
-	 * The method create a new item in the datastore.
-	 * 
-	 * @param from
-	 *            a string with the link ID MCRFROM
-	 * @param to
-	 *            an array of strings with the link ID MCRTO
-     * @param type
-     *            an array of strings with the link ID MCRTYPE
-	 */
-	public void create(String from, String[] to, String[] type);
-
-	/**
-	 * The method remove a item for the from ID from the datastore.
-	 * 
-	 * @param from
-	 *            a string with the link ID MCRFROM
-	 */
-	public void delete(String from);
-
-	/**
-	 * The method remove a item for the from ID from the datastore.
-	 * 
-	 * @param from
-	 *            a string with the link ID MCRFROM
-	 * @param to
-	 *            an array of strings with the link ID MCRTO
-     * @param type
-     *            an array of strings with the link ID MCRTYPE
-	 */
-	public void delete(String from, String[] to, String[] type);
-
-	/**
-	 * The method remove a item for the from ID from the datastore.
-	 * 
-	 * @param from
-	 *            a string with the link ID MCRFROM
-	 * @param to
-	 *            an array of strings with the link ID MCRTO
-     * @param type
-     *            an array of strings with the link ID MCRTYPE
-	 */
-	public void delete(String from, String to, String type);
-
-	/**
-	 * The method count the number of references to the 'to' value of the table.
-	 * 
-	 * @param to
-	 *            the object ID as String, they was referenced
-	 * @return the number of references
-	 */
-	public int countTo(String to);
 
     /**
-     * The method count the number of references to the 'to' and the 'type'
-     * value of the table.
+     * The method create a new item in the datastore.
      * 
+     * @param from
+     *            a string with the link ID MCRFROM
      * @param to
-     *            the object ID as String, they was referenced
+     *            a string with the link ID MCRTO
      * @param type
-     *            the refernce type
+     *            a string with the link ID MCRTYPE
+     * @param attr
+     *            a string with the link ID MCRATTR
+     */
+    public void create(String from, String to, String type, String attr);
+
+    /**
+     * The method remove a item for the from ID from the datastore.
+     * 
+     * @param from
+     *            a string with the link ID MCRFROM
+     * @param to
+     *            an array of strings with the link ID MCRTO
+     * @param type
+     *            an array of strings with the link ID MCRTYPE
+     */
+    public void delete(String from, String to, String type);
+
+    /**
+     * The method count the number of references with '%from%' and 'to' and
+     * optional 'type' and optional 'restriction%' values of the table.
+     * 
+     * @param fromtype
+     *            a substing in the from ID as String, it can be null
+     * @param to
+     *            the object ID as String, which is referenced
+     * @param type
+     *            the refernce type, it can be null
+     * @param restriction
+     *            a first part of the to ID as String, it can be null
      * @return the number of references
      */
-    public int countTo(String to, String type);
-    
-	/**
-	 * The method count the number of references to the 'to' value of the table
-	 * with condition of a special doctype.
-	 * 
-	 * @param to
-	 *            the object ID as String, they was referenced
-	 * @param doctype
-	 *            the type of the from document f.e. document, disshab, ...
-	 * @return the number of references
-	 */
-	public int countTo(String to, String doctype, String to2);
+    public int countTo(String fromtype, String to, String type, String restriction);
 
-	/**
-	 * The method returns a Map of all counted distinct references
-	 * 
-	 * @param mcrtoPrefix
-	 * @return
-	 * 
-	 * the result-map of (key,value)-pairs can be visualized as <br />
-	 * select count(mcrfrom) as value, mcrto as key from
-	 * mcrlinkclass|mcrlinkhref where mcrto like mcrtoPrefix + '%' group by
-	 * mcrto;
-	 * 
-	 */
-	public Map getCountedMapOfMCRTO(String mcrtoPrefix);
+    /**
+     * The method returns a Map of all counted distinct references
+     * 
+     * @param mcrtoPrefix
+     * @return
+     * 
+     * the result-map of (key,value)-pairs can be visualized as <br />
+     * select count(mcrfrom) as value, mcrto as key from
+     * mcrlinkclass|mcrlinkhref where mcrto like mcrtoPrefix + '%' group by
+     * mcrto;
+     * 
+     */
+    public Map getCountedMapOfMCRTO(String mcrtoPrefix);
 
-	/**
-	 * Returns a List of all link sources of <code>destination</code>
-	 * 
-	 * @param destination
-	 *            Destination-ID
-	 * @return List of Strings (Source-IDs)
-	 */
-	public List getSourcesOf(String destination);
-	
-	/**
-	 * Returns a List of all link sources of <code>destination</code>
-	 *     and a special <code>referenceType</code>
-	 * 
-	 * @param destination
-	 *            Destination-ID
-	 * @param referenceType
-	 *            link reference type
-	 * @return List of Strings (Source-IDs)
-	 */
-	public List getSourcesOf(String destination, String referenceType);	
+    /**
+     * Returns a List of all link sources of <code>to</code> and a special
+     * <code>type</code>
+     * 
+     * @param to
+     *            Destination-ID
+     * @param type
+     *            link reference type
+     * @return List of Strings (Source-IDs)
+     */
+    public List getSourcesOf(String to, String type);
 
-	/**
-	 * Returns a List of all link destination of <code>source</code>
-	 * 
-	 * @param source
-	 *            Source-ID
-	 * @return List of Strings (Destination-IDs)
-	 */
-	public List getDestinationsOf(String source);
-	
-	/**
-	 * Returns a List of all link destination of <code>source</code>
-	 *     and a special <code>referenceType</code>
-	 *      
-	 * @param source
-	 *            Source-ID
-	 * @param referenceType
-	 *            link referenceType           
-	 * @return List of Strings (Destination-IDs)
-	 */
-	public List getDestinationsOf(String source, String referenceType);	
+    /**
+     * Returns a List of all link destination of <code>source</code> and a
+     * special <code>type</code>
+     * 
+     * @param source
+     *            Source-ID
+     * @param type
+     *            link referenceType
+     * @return List of Strings (Destination-IDs)
+     */
+    public List getDestinationsOf(String source, String type);
 
-	/**
-	 * Returns a List of all link sources of <code>destination</code>
-	 * 
-	 * @param destinations
-	 *            Destination-ID
-	 * @return List of Strings (Source-IDs)
-	 */
-	public List getSourcesOf(String[] destinations);
-
-	/**
-	 * Returns a List of all link destination of <code>source</code>
-	 * 
-	 * @param sources
-	 *            Source-ID
-	 * @return List of Strings (Destination-IDs)
-	 */
-	public List getDestinationsOf(String[] sources);
 }

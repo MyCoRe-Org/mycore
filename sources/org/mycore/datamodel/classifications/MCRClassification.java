@@ -804,7 +804,7 @@ public class MCRClassification {
 			LOGGER.error("Oops", e);
 		}
 
-		Map map = MCRLinkTableManager.instance().countCategoryReferencesSharp(classID);
+		Map map = MCRLinkTableManager.instance().countReferenceCategory(classID);
 		// in map we've got the sharp number for every categoryID (without
 		// children)
 		// now we add to every categoryID the numbers of the children
@@ -869,7 +869,7 @@ public class MCRClassification {
 				org.jdom.Element cat = new org.jdom.Element("category");
 				cat.setAttribute(ID_ATTR, ci.getID());
 
-				int cou = mcr_linktable.countCategoryReferencesFuzzy(classID, categID);
+				int cou = mcr_linktable.countReferenceCategory(classID, categID);
 				cat.setAttribute("counter", Integer.toString(cou));
 
 				for (int i = 0; i < ci.getSize(); i++) {

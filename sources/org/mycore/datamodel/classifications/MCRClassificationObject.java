@@ -453,9 +453,9 @@ public abstract class MCRClassificationObject {
         MCRLinkTableManager mcl = MCRLinkTableManager.instance();
 
         if (this.getClassificationID().equals(this.getID())) {
-            return mcl.countCategoryReferencesFuzzy(this.getClassificationID(), "", doctypes, restriction);
+            return mcl.countReferenceCategory(this.getClassificationID(), "", doctypes, restriction);
         }
-        return mcl.countCategoryReferencesFuzzy(this.getClassificationID(), this.getID(), doctypes, restriction);
+        return mcl.countReferenceCategory(this.getClassificationID(), this.getID(), doctypes, restriction);
     }
 
     /**

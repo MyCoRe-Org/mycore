@@ -141,7 +141,7 @@ public class MCRAccessManager {
     public static boolean checkPermissionForReadingDerivate(String derID){
     	// derID must be a derivate ID
     	boolean accessAllowed = false;
-    	List l = MCRLinkTableManager.instance().getSourceOf("href",derID,"derivate");
+    	List l = MCRLinkTableManager.instance().getSourceOf(derID,"derivate");
 		if(l != null && l.size() > 0) {
 			accessAllowed = getAccessImpl().checkPermission((String)l.get(0),"read") && getAccessImpl().checkPermission(derID,"read");
 		}else {
