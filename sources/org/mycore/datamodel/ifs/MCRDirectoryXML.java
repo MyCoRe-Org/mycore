@@ -265,6 +265,11 @@ public class MCRDirectoryXML {
             // root node is a directory
             int pos = ownerID.length() + 1;
             String path = requestPath.substring(pos);
+            
+            if (path.length()==0){
+                //only owner ID submitted
+                return getDirectoryXML((MCRDirectory) root);
+            }
 
             MCRDirectory dir = (MCRDirectory) root;
             MCRFilesystemNode node = dir.getChildByPath(path);
