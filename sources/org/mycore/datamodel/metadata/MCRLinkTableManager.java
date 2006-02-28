@@ -156,6 +156,7 @@ public class MCRLinkTableManager {
         try {
             persistenceclass.create(from, to, type, attr);
         } catch (Exception e) {
+            e.printStackTrace();
             logger.warn("An error was occured while add a dataset from the reference link table, add not succesful.");
         }
     }
@@ -401,38 +402,6 @@ public class MCRLinkTableManager {
     public Map countReferenceCategory(String classid) {
         return persistenceclass.getCountedMapOfMCRTO(classid);
     }
-
-    /**
-     * The method count the number of references to a category of a
-     * classification without sub ID's.
-     * 
-     * @param classid
-     *            the classification ID as MCRObjectID
-     * @param categid
-     *            the category ID as String
-     * @return the number of references
-     */
-    /*
-    public int countCategoryReferencesSharp(MCRObjectID classid, String categid) {
-        return countReferenceLinkTo(TYPE_CLASS, classid.getId() + "##" + categid);
-    }
-*/
-
-    /**
-     * The method count the number of references to a category of a
-     * classification without sub ID's.
-     * 
-     * @param classid
-     *            the classification ID as String
-     * @param categid
-     *            the category ID as String
-     * @return the number of references
-     */
-    /*
-    public int countCategoryReferencesSharp(String classid, String categid) {
-        return countReferenceLinkTo(TYPE_CLASS, classid + "##" + categid);
-    }
-    */
 
     /**
      * The method count the number of references to a category of a

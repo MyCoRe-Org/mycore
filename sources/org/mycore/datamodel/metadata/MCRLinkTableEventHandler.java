@@ -124,7 +124,6 @@ public class MCRLinkTableEventHandler extends MCREventHandlerBase {
      *            the MCRObject that caused the event
      */
     protected final void handleObjectUpdated(MCREvent evt, MCRObject obj) {
-        // handleObjectDeleted(evt, obj);
         handleObjectCreated(evt, obj);
     }
 
@@ -140,7 +139,6 @@ public class MCRLinkTableEventHandler extends MCREventHandlerBase {
     protected final void handleObjectDeleted(MCREvent evt, MCRObject obj) {
         MCRObjectID mcr_id = obj.getId();
         mcr_linktable.deleteReferenceLink(mcr_id);
-        mcr_linktable.deleteClassificationLink(mcr_id);
     }
 
     /**
@@ -152,8 +150,7 @@ public class MCRLinkTableEventHandler extends MCREventHandlerBase {
      * @param obj
      *            the MCRObject that caused the event
      */
-    protected final void handleObjectRepair(MCREvent evt, MCRObject obj) {
-        // handleObjectDeleted(evt, obj);
+    protected final void handleObjectRepaired(MCREvent evt, MCRObject obj) {
         handleObjectCreated(evt, obj);
     }
 
