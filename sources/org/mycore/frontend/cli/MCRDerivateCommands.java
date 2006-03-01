@@ -36,6 +36,7 @@ import javax.xml.transform.stream.StreamSource;
 import org.apache.log4j.Logger;
 
 import org.mycore.common.MCRException;
+import org.mycore.common.MCRUtils;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventManager;
 import org.mycore.common.xml.MCRURIResolver;
@@ -541,7 +542,14 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
                 byte[] xml = null;
 
                 try {
-                    xml = obj.receiveXMLFromDatastore(nid.toString());
+                    obj.receiveFromDatastore(nid.toString());
+                    String path = obj.getDerivate().getInternals().getSourcePath();
+                    // reset from the absolute to relative path, for later reload
+                    LOGGER.info("Old Internal Path ====>" + path);
+                    obj.getDerivate().getInternals().setSourcePath(nid.toString());
+                    LOGGER.info("New Internal Path ====>" + nid.toString());
+                    xml = MCRUtils.getByteArray(obj.createXML());
+                    
                 } catch (MCRException ex) {
                     LOGGER.warn("Could not read " + nid.toString() + ", continue with next ID");
                     continue;
