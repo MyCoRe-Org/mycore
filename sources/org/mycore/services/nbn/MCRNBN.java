@@ -23,6 +23,7 @@
 
 package org.mycore.services.nbn;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
@@ -153,6 +154,34 @@ public class MCRNBN {
 
         return (last = niss);
     }
+    
+	/**
+	 * Method getLocalPrefix. Creates a new NISS, the local ID of the ressource.
+	 * This implementation creates a NISS of eight digits
+	 * length that is derived from the current time measured
+	 * in seconds. The method guarantees uniqueness and therefore
+	 * will block to produce only one NISS per millisecond.
+	 *
+	 * @param nissPrefix a prefix for a speaking urn: like diss
+	 * @return a new NISS
+	 */
+	protected static synchronized String produceNISS(String nissPrefix) {
+		String niss;
+
+		do {
+			Calendar now = new GregorianCalendar();
+			SimpleDateFormat fmt = new SimpleDateFormat("yyyyMMdd-HHmmssSSS");
+			StringBuffer buffer = new StringBuffer();
+			buffer.append(nissPrefix);
+			buffer.append(fmt.format(now.getTime()));
+			niss = buffer.toString();
+		}
+
+		while (niss.equals(last));
+
+		logger.info("New NISS created: " + niss);
+		return (last = niss);
+	}    
 
     /**
      * Calculates the checksum for the given URN. The algorithm is specified by
@@ -212,45 +241,55 @@ public class MCRNBN {
         buffer.append(buildChecksum(buffer.toString()));
         urn = buffer.toString();
 
-        valid = Boolean.TRUE;
-        author = new String("");
-        manager.reserveURN(this);
-    }
+		valid = Boolean.TRUE;
+		author = new String("");
+		manager.reserveURN(this);
+	}
 
-    public MCRNBN(String author, String comment) {
-        StringBuffer buffer = new StringBuffer(prefix);
-        buffer.append(produceNISS());
-        buffer.append(buildChecksum(buffer.toString()));
-        urn = buffer.toString();
+	public MCRNBN(String author, String comment) {
+		StringBuffer buffer = new StringBuffer(prefix);
+		buffer.append(produceNISS());
+		buffer.append(buildChecksum(buffer.toString()));
+		urn = buffer.toString();
 
-        valid = Boolean.TRUE;
-        this.author = author;
-        this.comment = comment;
-        manager.reserveURN(this);
-    }
+		valid = Boolean.TRUE;
+		this.author = author;
+		this.comment = comment;
+		manager.reserveURN(this);
+	}
 
-    /**
-     * Method MCRNBN. Creates a new NBN object from the given URN. If the urn is
-     * local but not in the persistence store, it will be stored.
-     * 
-     * @param urn the
-     *            urn to create a NBN from.
-     */
-    public MCRNBN(String urn) {
-        MCRArgumentChecker.ensureNotEmpty(urn, "urn");
-        this.urn = urn;
+	public MCRNBN(String author, String comment, String nissPrefix) {
+		StringBuffer buffer = new StringBuffer(prefix);
+		buffer.append(produceNISS(nissPrefix));
+		buffer.append(buildChecksum(buffer.toString()));
+		urn = buffer.toString();
 
-        if (isLocal()) {
-            HashMap map = (HashMap) manager.listURNs(getNISSandChecksum());
+		valid = Boolean.TRUE;
+		this.author = author;
+		this.comment = comment;
+		manager.reserveURN(this);
+	}
 
-            if (map.isEmpty()) {
-                manager.reserveURN(this);
-            } else {
-                author = manager.getAuthor(this);
-                comment = manager.getComment(this);
-            }
-        }
-    }
+	/**
+	 * Method MCRNBN. Creates a new NBN object from the given URN. If the
+	 * urn is local but not in the persistence store, it will be stored.
+	 *
+	 * @param the urn to create a NBN from.
+	 */
+	public MCRNBN(String urn) {
+		MCRArgumentChecker.ensureNotEmpty(urn, "urn");
+		this.urn = urn;
+
+		if (isLocal()) {
+			HashMap map = (HashMap) manager.listURNs(getNISSandChecksum());
+			if (map.isEmpty()) {
+				manager.reserveURN(this);
+			} else {
+				author = manager.getAuthor(this);
+				comment = manager.getComment(this);
+			}
+		}
+	}
 
     public static boolean exists(String urn) {
         MCRArgumentChecker.ensureNotEmpty(urn, "urn");
@@ -360,7 +399,12 @@ public class MCRNBN {
      * the last "-" in the URN. Returns null if this NBN is not valid.
      */
     public String getNamespace() {
-        return (isValid() ? urn.substring(4, urn.lastIndexOf("-")) : null);
+    	if(isLocal()) {
+    		return (isValid() ? prefix.substring(4) : null);
+    	}else{
+    		logger.warn("just guessing the namespace of the remote urn " + getURN());
+    		return (isValid() ? urn.substring(4, urn.lastIndexOf("-")) : null);
+    	}
     }
 
     /**
@@ -368,7 +412,13 @@ public class MCRNBN {
      * NBN is not valid.
      */
     public String getNISSandChecksum() {
-        return (isValid() ? urn.substring(urn.lastIndexOf("-") + 1) : null);
+    	if(isLocal()) {
+    		return (isValid() ? urn.substring(prefix.length()) : null);
+    	}else{
+    		logger.warn("just guessing nissAndChecksum from  [" + getURN() + 
+    				"] ist: [" + urn.substring(urn.lastIndexOf("-") + 1) + "]");
+    		return (isValid() ? urn.substring(urn.lastIndexOf("-") + 1) : null);
+    	}
     }
 
     /**
@@ -440,6 +490,16 @@ public class MCRNBN {
         System.out.println(" is local : " + urn.isLocal());
         System.out.println("      nbn : " + urn.getNBN());
         System.out.println("   niss+p : " + urn.getNISSandChecksum());
+        //System.out.println("namespace : " + urn.getNamespace());
+        
+        urn = new MCRNBN("","","diss");       
+        System.out.println("  NBN URN : " + urn);
+        System.out.println(" is valid : " + urn.isValid());
+        System.out.println(" is local : " + urn.isLocal());
+        System.out.println("      nbn : " + urn.getNBN());
+        System.out.println("   niss+p : " + urn.getNISSandChecksum());
         System.out.println("namespace : " + urn.getNamespace());
+        System.out.println();
+        
     }
 }
