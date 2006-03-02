@@ -235,7 +235,7 @@ public class MCRHIBXMLStore implements MCRXMLTableInterface {
         tx.commit(); 
         session.close();
         
-        if (l.size() > 0) {
+        if (l.size() > 0 && l.get(0) != null) {
         	String max = (String) l.get(0);
         	return new
 	          MCRObjectID(max).getNumberAsInteger() + 1;
