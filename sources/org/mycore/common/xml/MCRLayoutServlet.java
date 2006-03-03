@@ -354,8 +354,8 @@ public class MCRLayoutServlet extends MCRServlet {
 
         parameters.put("CurrentUser", user);
         parameters.put("RequestURL", getCompleteURL(request));
-        parameters.put("WebApplicationBaseURL", getBaseURL());
-        parameters.put("ServletsBaseURL", getServletBaseURL());
+        parameters.put("WebApplicationBaseURL", getBaseURL(request));
+        parameters.put("ServletsBaseURL", getServletBaseURL(request));
         parameters.put("DefaultLang", defaultLang);
         parameters.put("CurrentLang", lang);
         parameters.put("Referer", referer);
@@ -556,5 +556,41 @@ public class MCRLayoutServlet extends MCRServlet {
         }
 
         return map;
+    }
+    
+    private static String getBaseURL(HttpServletRequest req){
+        boolean relative=CONFIG.getBoolean("MCR.LayoutServlet.Links.relative",true);
+        if (relative){
+            String requestURI=req.getRequestURI();
+            String contextPath=req.getContextPath();
+            int contextLength=contextPath.length()+1; //add trailing slash
+            String stub=requestURI.substring(contextLength); //remove the context info
+            int slashCount=countStringOccurrences(stub,"/");
+            StringBuffer baseURL=new StringBuffer(slashCount*3);
+            for (int i=0;i<slashCount;i++){
+                baseURL.append("../");
+            }
+            return baseURL.toString();
+        }
+        return getBaseURL();
+    }
+    
+    private static String getServletBaseURL(HttpServletRequest req){
+        boolean relative=CONFIG.getBoolean("MCR.LayoutServlet.Links.relative",true);
+        if (relative){
+            return getBaseURL(req)+"servlets/";
+        }
+        return getServletBaseURL();
+    }
+    
+    private static int countStringOccurrences(String str, String s){
+        int f=0;
+        int pos=str.indexOf(s);
+        while (pos!=-1){
+            LOGGER.debug("f:"+f+" pos:"+pos);
+            f++;
+            pos=str.indexOf(s,pos+2);
+        }
+        return f;
     }
 }
