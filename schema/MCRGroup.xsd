@@ -50,39 +50,6 @@
        </xsd:simpleContent>
       </xsd:complexType>
      </xsd:element>
-     <xsd:element maxOccurs="unbounded" minOccurs="0" name="members.groupID">
-      <xsd:complexType>
-       <xsd:simpleContent>
-        <xsd:extension base="xsd:string"/>
-       </xsd:simpleContent>
-      </xsd:complexType>
-     </xsd:element>
-    </xsd:sequence>
-   </xsd:complexType>
-  </xsd:element>
-  <xsd:element maxOccurs="1" minOccurs="0" name="group.groups">
-   <xsd:complexType>
-    <xsd:sequence>
-     <xsd:element maxOccurs="unbounded" minOccurs="0" name="groups.groupID">
-      <xsd:complexType>
-       <xsd:simpleContent>
-        <xsd:extension base="xsd:string"/>
-       </xsd:simpleContent>
-      </xsd:complexType>
-     </xsd:element>
-    </xsd:sequence>
-   </xsd:complexType>
-  </xsd:element>
-  <xsd:element maxOccurs="1" minOccurs="0" name="group.privileges">
-   <xsd:complexType>
-    <xsd:sequence>
-     <xsd:element maxOccurs="unbounded" minOccurs="0" name="privileges.privilege">
-      <xsd:complexType>
-       <xsd:simpleContent>
-        <xsd:extension base="xsd:string"/>
-       </xsd:simpleContent>
-      </xsd:complexType>
-     </xsd:element>
     </xsd:sequence>
    </xsd:complexType>
   </xsd:element>
