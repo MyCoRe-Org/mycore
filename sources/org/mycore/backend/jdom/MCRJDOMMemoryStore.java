@@ -186,8 +186,10 @@ public class MCRJDOMMemoryStore {
     /**
      * Adds an objects xml metadata to the memory store.
      */
-    void addElement(MCRObjectID id, org.jdom.Element elm) {
-        getObjects(id.getTypeId()).put(id, elm);
+    void addElement(MCRObjectID id, org.jdom.Document doc) {
+        org.jdom.Document jdom_document = (org.jdom.Document)doc.clone();
+        MCRNormalizeText.normalizeJDOM(jdom_document);
+        getObjects(id.getTypeId()).put(id, jdom_document.detachRootElement());
         logger.debug("MRJDOMMemoryStore addElement " + id.getTypeId());
         debug(id.getTypeId());
     }

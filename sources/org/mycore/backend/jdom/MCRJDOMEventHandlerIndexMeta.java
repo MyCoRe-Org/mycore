@@ -58,8 +58,8 @@ public class MCRJDOMEventHandlerIndexMeta extends MCREventHandlerBase {
         MCRObjectID mcr_id = obj.getId();
         LOGGER.debug("MCRJDOMEventHandlerIndexMeta create: MCRObjectID : " + mcr_id.getId());
 
-        org.jdom.Element root = obj.createXML().detachRootElement();
-        store.addElement(mcr_id, root);
+        org.jdom.Document doc = obj.createXML();
+        store.addElement(mcr_id, doc);
 
         // save the stop time
         long t2 = System.currentTimeMillis();
@@ -84,9 +84,9 @@ public class MCRJDOMEventHandlerIndexMeta extends MCREventHandlerBase {
         MCRObjectID mcr_id = obj.getId();
         LOGGER.debug("MCRJDOMEventHandlerIndexMeta update: MCRObjectID : " + mcr_id.getId());
 
-        org.jdom.Element root = obj.createXML().detachRootElement();
+        org.jdom.Document doc = obj.createXML();
         store.removeElement(mcr_id);
-        store.addElement(mcr_id, root);
+        store.addElement(mcr_id, doc);
 
         // save the stop time
         long t2 = System.currentTimeMillis();

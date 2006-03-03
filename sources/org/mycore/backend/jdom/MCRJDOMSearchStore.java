@@ -62,8 +62,8 @@ public final class MCRJDOMSearchStore implements MCRObjectSearchStoreInterface {
         MCRObjectID mcr_id = obj.getId();
         MCRNormalizeText.normalizeMCRObject(obj);
 
-        org.jdom.Element root = obj.createXML().detachRootElement();
-        store.addElement(mcr_id, root);
+        org.jdom.Document doc = obj.createXML();
+        store.addElement(mcr_id, doc);
         logger.debug("MCRJDOMSearchStore create: MCRObjectID : " + mcr_id.getId());
     }
 
@@ -89,9 +89,9 @@ public final class MCRJDOMSearchStore implements MCRObjectSearchStoreInterface {
         MCRObjectID mcr_id = obj.getId();
         MCRNormalizeText.normalizeMCRObject(obj);
 
-        org.jdom.Element root = obj.createXML().detachRootElement();
+        org.jdom.Document doc = obj.createXML();
         store.removeElement(mcr_id);
-        store.addElement(mcr_id, root);
+        store.addElement(mcr_id, doc);
         logger.debug("MCRJDOMSearchStore update: MCRObjectID : " + mcr_id.getId());
     }
 
