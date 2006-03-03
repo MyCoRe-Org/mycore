@@ -3,7 +3,7 @@
 
 <editor id="createuser">
 
-    <target type="servlet" name="MCRUserEditorServlet" method="post" format="xml" /> -->
+    <target type="servlet" name="MCRUserEditorServlet" method="post" format="xml" /> 
     <components root="create-user" var="/mycoreuser">
         <include uri="webapp:editor/imports-common-user.xml" />
         <headline anchor="CENTER">

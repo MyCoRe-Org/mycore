@@ -73,6 +73,10 @@ public class MCRUserAdminServlet extends MCRUserAdminGUICommons {
             modifyUser(job);
         } else if (mode.equals("listalluser")) {
             listallUser(job);
+        }else if (mode.equals("newgroup")) {
+        	createGroup(job);
+        }else if (mode.equals("modifygroup")){
+        	modifyGroup(job);
         } else { // no valid mode
 
             String msg = "The request did not contain a valid mode for this servlet!";
@@ -108,6 +112,34 @@ public class MCRUserAdminServlet extends MCRUserAdminGUICommons {
 
         return;
     }
+    
+    /**
+     * This method handles the create group use case. The MyCoRe editor framework
+     * is used to obtain an XML representation of a new group account.
+     * 
+     * @param job
+     *            The MCRServletJob instance
+     * @throws IOException
+     *             for java I/O errors.
+     */
+    private void createGroup(MCRServletJob job) throws IOException {
+        // We first check the privileges for this use case
+        if (!AI.checkPermission("create-group")) {
+            showNoPrivsPage(job);
+            return;
+        }
+
+        // Now we redirect the browser to the create-user formular
+        String editorFormular = pageDir + "editor_form_create-group.xml";
+        String base = getBaseURL() + editorFormular;
+        Properties params = new Properties();
+        params.put("XSL.editor.source.new", "true");
+        params.put("XSL.editor.cancel.url", getBaseURL() + cancelPage);
+        params.put("usecase", "create-group");
+        job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(buildRedirectURL(base, params)));
+
+        return;
+    }    
 
     /**
      * This method handles the list all users use case. The result is the XML of
@@ -155,4 +187,27 @@ public class MCRUserAdminServlet extends MCRUserAdminGUICommons {
 
         return;
     }
+    
+    /**
+     * This method is still experimental !
+     */
+    private void modifyGroup(MCRServletJob job) throws IOException {
+        // We first check the privileges for this use case
+        if (!AI.checkPermission("modify-user")) {
+            showNoPrivsPage(job);
+            return;
+        }
+
+        // Now we redirect the browser to the modify-user formular
+        String editorFormular = pageDir + "editor_form_create-group.xml";
+        String gid = getProperty(job.getRequest(), "gid");
+        String base = getBaseURL() + editorFormular;
+        Properties params = new Properties();
+        params.put("XSL.editor.source.url", "servlets/MCRUserEditorServlet?mode=retrievegroupxml&gid=" + gid);
+        params.put("XSL.editor.cancel.url", getBaseURL() + cancelPage);
+        params.put("usecase", "modify-user");
+        job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(buildRedirectURL(base, params)));
+
+        return;
+    }    
 }

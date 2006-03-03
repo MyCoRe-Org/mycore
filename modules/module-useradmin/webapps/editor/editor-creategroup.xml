@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE editor>
+
+<editor id="creategroup">
+
+    <target type="servlet" name="MCRUserEditorServlet" method="post" format="xml" />
+    <components root="create-group" var="/mycoregroup">
+        <include uri="webapp:editor/imports-common-user.xml" />
+        <headline anchor="CENTER">
+            <text>
+                <label xml:lang="de">Die mit * gekennzeichneten Felder sind Plichtfelder.<p/></label>
+                <label xml:lang="en">Required fields are labeled with a star (*).<p/></label>
+            </text>
+        </headline>
+
+        <panel id="create-group" lines="off">
+            <cell row="1" col="1" ref="VSpace5" anchor="EAST" />
+
+            <!-- *** User group data *** -->
+            <cell row="2" col="1" anchor="EAST">
+                <text id="LAccount">
+                    <label xml:lang="de">
+                        <span class="editorlabel">&#160;&#160;Benutzergruppe&#160;(*):</span>
+                    </label>
+                    <label xml:lang="en">
+                        <span class="editorlabel">&#160;&#160;User&#160;group&#160;(*):</span>
+                    </label>
+                </text>
+            </cell>
+            <cell row="2" col="2" anchor="WEST" ref="TFzeile20" var="group/@ID" sortnr="1" />
+            <cell row="2" col="3" anchor="EAST" >
+                <helpPopup id="HAccount" width="400px" height="200px">
+                    <label xml:lang="de">
+                        In diesem Feld geben Sie bitte die Benutzergruppe (group-ID) der neu
+                        anzulegenden Benutzergruppe ein. Die ID darf nicht länger als 20 Zeichen sein.
+                    </label>
+                    <label xml:lang="en">
+                        Please specify the account (group-ID) of the new group. This ID must not
+                        be larger than 20 characters.
+                    </label>
+                </helpPopup>
+            </cell>
+
+            <!-- *** Description *** -->
+            <cell row="4" col="1" anchor="EAST">
+                <text id="LDescription">
+                    <label xml:lang="de">
+                        <span class="editorlabel">Beschreibung:</span>
+                    </label>
+                    <label xml:lang="en">
+                        <span class="editorlabel">Description:</span>
+                    </label>
+                </text>
+            </cell>
+            <cell row="4" col="2" anchor="WEST" ref="TFzeile48" var="group/group.description" sortnr="3"/>
+            <cell row="4" col="3" anchor="EAST">
+                <helpPopup id="HDescription" width="400px" height="200px">
+                    <label xml:lang="de">
+                        In diesem Feld können Sie einen Text zur Beschreibung der neuen
+                        Benutzergruppe eingeben.
+                    </label>
+                    <label xml:lang="en">
+                        Here you can specify a description of the new user group account.
+                    </label>
+                </helpPopup>
+            </cell>
+
+
+            <!-- *** Group Amins *** -->
+            <cell row="6" col="1" anchor="EAST">
+                <text id="LAdminUsers">
+                    <label xml:lang="de">
+                        <span class="editorlabel">Adminstratoren der Gruppe&#160;:</span>
+                    </label>
+                    <label xml:lang="en">
+                        <span class="editorlabel">Admins of the group&#160;:</span>
+                    </label>
+                </text>
+            </cell>
+            <cell row="6" col="2" anchor="WEST" var="group/group.admins/admins.userID" sortnr="20">
+                <list width="150" type="multirow" multiple="true" rows="5">
+                    <item value="">
+                        <label xml:lang="de">(Mehrfachauswahl)</label>
+                        <label xml:lang="en">(multiple choice)</label>
+                    </item>
+                    <include uri="request:servlets/MCRUserEditorServlet?mode=getAllUsers"  cacheable="false" />
+                </list>
+            </cell>
+            <cell row="6" col="3" anchor="EAST">
+                <helpPopup id="HGroupAdminUsers" width="400px" height="200px">
+                    <label xml:lang="de">
+                        Hier können Sie die Administratoren der Gruppe festlegen
+                    </label>
+                    <label xml:lang="en">
+                        Here you define the admins of the group
+                    </label>
+                </helpPopup>
+            </cell>            
+            
+            
+            <cell row="8" col="1" anchor="EAST">
+                <text id="LAdminGroups">
+                    <label xml:lang="de">
+                        <span class="editorlabel">Adminstrationsgruppen der Gruppe&#160;:</span>
+                    </label>
+                    <label xml:lang="en">
+                        <span class="editorlabel">Admin groups of the group&#160;:</span>
+                    </label>
+                </text>
+            </cell>
+            <cell row="8" col="2" anchor="WEST" var="group/group.admins/admins.groupID" sortnr="20">
+                <list width="150" type="multirow" multiple="true" rows="5">
+                    <item value="">
+                        <label xml:lang="de">(Mehrfachauswahl)</label>
+                        <label xml:lang="en">(multiple choice)</label>
+                    </item>
+                    <include uri="request:servlets/MCRUserEditorServlet?mode=getAllGroups"  cacheable="false" />
+                </list>
+            </cell>
+            <cell row="8" col="3" anchor="EAST">
+                <helpPopup id="HGroupAdminGroups" width="400px" height="200px">
+                    <label xml:lang="de">
+                        Hier können Sie die Administratorengruppen der Gruppe festlegen
+                    </label>
+                    <label xml:lang="en">
+                        Here you define the admin groups of the group
+                    </label>
+                </helpPopup>
+            </cell>
+            
+            
+            
+            <!-- *** Group Members *** -->
+            <cell row="10" col="1" anchor="EAST">
+                <text id="LGroupMembers">
+                    <label xml:lang="de">
+                        <span class="editorlabel">Mitglieder Gruppe&#160;:</span>
+                    </label>
+                    <label xml:lang="en">
+                        <span class="editorlabel">Members of the group&#160;:</span>
+                    </label>
+                </text>
+            </cell>
+            <cell row="10" col="2" anchor="WEST" var="group/group.members/members.userID" sortnr="20">
+                <list width="150" type="multirow" multiple="true" rows="5">
+                    <item value="">
+                        <label xml:lang="de">(Mehrfachauswahl)</label>
+                        <label xml:lang="en">(multiple choice)</label>
+                    </item>
+                    <include uri="request:servlets/MCRUserEditorServlet?mode=getAllUsers"  cacheable="false" />
+                </list>
+            </cell>
+            <cell row="10" col="3" anchor="EAST">
+                <helpPopup id="HGroupAdminUsers" width="400px" height="200px">
+                    <label xml:lang="de">
+                        Hier können Sie die Mitglieder der Gruppe festlegen
+                    </label>
+                    <label xml:lang="en">
+                        Here you define the members of the group
+                    </label>
+                </helpPopup>
+            </cell>                        
+            
+            <!-- *** Buttons *** -->
+            <cell row="99"  col="1" ref="VSpace25" anchor="WEST" />
+            <cell row="100" col="1" ref="BSubmit"  anchor="EAST" />
+            <cell row="100" col="2" ref="BCancel"  anchor="WEST" />
+            <cell row="101" col="1" ref="VSpace5"  anchor="WEST" />
+        </panel>
+    </components>
+</editor>
+ 
