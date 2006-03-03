@@ -58,9 +58,6 @@ public class MCRGroup extends MCRUserObject implements MCRPrincipal {
     /** A list of users (IDs) which are members of this group */
     private ArrayList mbrUserIDs = null;
 
-    /** A list of other groups (IDs) which are members of this group */
-    private ArrayList mbrGroupIDs = null;
-
 
     /**
      * Default constructor. It is used to create a group object with empty
@@ -73,7 +70,6 @@ public class MCRGroup extends MCRUserObject implements MCRPrincipal {
         admUserIDs = new ArrayList();
         admGroupIDs = new ArrayList();
         mbrUserIDs = new ArrayList();
-        mbrGroupIDs = new ArrayList();
     }
 
     /* copy contructor */
@@ -82,13 +78,11 @@ public class MCRGroup extends MCRUserObject implements MCRPrincipal {
         this.admUserIDs = new ArrayList(other.admUserIDs);
         this.admGroupIDs = new ArrayList(other.admGroupIDs);
         this.mbrUserIDs = new ArrayList(other.mbrUserIDs);
-        this.mbrGroupIDs = new ArrayList(other.mbrGroupIDs);
         this.ID = other.ID;
         this.creator = other.creator;
         this.creationDate = other.creationDate;
         this.modifiedDate = other.modifiedDate;
         this.description = other.description;
-        this.groupIDs = new ArrayList(other.groupIDs);
     }
 
     /**
@@ -124,12 +118,8 @@ public class MCRGroup extends MCRUserObject implements MCRPrincipal {
      *            for the group
      * @param mbrUserIDs
      *            ArrayList of user IDs this group has as members
-     * @param mbrGroupIDs
-     *            ArrayList of group IDs this group has as members
-     * @param groupIDs
-     *            ArrayList of group IDs this group is a member of
      */
-    public MCRGroup(String ID, String creator, Timestamp creationDate, Timestamp modifiedDate, String description, ArrayList admUserIDs, ArrayList admGroupIDs, ArrayList mbrUserIDs, ArrayList mbrGroupIDs, ArrayList groupIDs) throws MCRException, Exception {
+    public MCRGroup(String ID, String creator, Timestamp creationDate, Timestamp modifiedDate, String description, ArrayList admUserIDs, ArrayList admGroupIDs, ArrayList mbrUserIDs) throws MCRException, Exception {
         super.ID = trim(ID, id_len);
         super.creator = trim(creator, id_len);
 
@@ -164,18 +154,6 @@ public class MCRGroup extends MCRUserObject implements MCRPrincipal {
 
         if (mbrUserIDs != null) {
             this.mbrUserIDs = mbrUserIDs;
-        }
-
-        this.mbrGroupIDs = new ArrayList();
-
-        if (mbrGroupIDs != null) {
-            this.mbrGroupIDs = mbrGroupIDs;
-        }
-
-        this.groupIDs = new ArrayList();
-
-        if (groupIDs != null) {
-            this.groupIDs = groupIDs;
         }
     }
 
@@ -257,27 +235,6 @@ public class MCRGroup extends MCRUserObject implements MCRPrincipal {
 
                     continue;
                 }
-
-                if (newID.getName().equals("members.groupID")) {
-                    if (!id.equals("")) {
-                        addMemberGroupID(id);
-                    }
-                }
-            }
-        }
-
-        org.jdom.Element userGroupElement = elm.getChild("group.groups");
-
-        if (userGroupElement != null) {
-            List groupIDList = userGroupElement.getChildren();
-
-            for (int j = 0; j < groupIDList.size(); j++) {
-                org.jdom.Element groupID = (org.jdom.Element) groupIDList.get(j);
-                String id = trim(groupID.getTextTrim(), id_len);
-
-                if (!id.equals("")) {
-                    this.groupIDs.add(id);
-                }
             }
         }
     }
@@ -304,17 +261,6 @@ public class MCRGroup extends MCRUserObject implements MCRPrincipal {
     }
 
     /**
-     * This method adds a group to the list of member groups of the group. Do
-     * not confuse with the list of groups the group itself is a member of.
-     * 
-     * @param groupID
-     *            ID of the group added to the group member list
-     */
-    public void addMemberGroupID(String groupID) throws MCRException {
-        addAndUpdate(groupID, mbrGroupIDs);
-    }
-
-    /**
      * This method adds a user (ID) to the users list of the group
      * 
      * @param userID
@@ -338,15 +284,6 @@ public class MCRGroup extends MCRUserObject implements MCRPrincipal {
      */
     public final ArrayList getAdminUserIDs() {
         return admUserIDs;
-    }
-
-    /**
-     * @return This method returns the list of group members (groups) as a
-     *         ArrayList of strings. Do not confuse with the list of groups the
-     *         group itself is a member of.
-     */
-    public final ArrayList getMemberGroupIDs() {
-        return mbrGroupIDs;
     }
 
     /**
@@ -401,88 +338,6 @@ public class MCRGroup extends MCRUserObject implements MCRPrincipal {
     }
 
     /**
-     * This method checks if a group is a member of this group.
-     * 
-     * @param group
-     *            Is this group a member of the group?
-     * @return Returns true if the given group is a member of this group.
-     */
-    public boolean hasGroupMember(MCRGroup group) {
-        if ((admGroupIDs.contains(group.getID())) || (mbrGroupIDs.contains(group.getID()))) {
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * This method checks if a group is a member of this group.
-     * 
-     * @param group
-     *            Is this group a member of the group?
-     * @return Returns true if the given group is a member of this group.
-     */
-    public boolean hasGroupMember(String group) {
-        if ((admGroupIDs.contains(group)) || (mbrGroupIDs.contains(group))) {
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * This method checks whether a group implicitly is a member of a given
-     * group. It is a recursive method.
-     * 
-     * @param group
-     *            The group to be checked
-     * @param matchID
-     *            ID of the group to check if 'group' is a member of it
-     * @return returns true if 'group' is an implicit member of the group with
-     *         ID 'matchID'.
-     */
-    public static boolean isImplicitMemberOf(MCRGroup group, String matchID) throws MCRException {
-    	MCRGroup matchGroup;
-    	try{
-    		matchGroup = MCRUserMgr.instance().retrieveGroup(matchID, true);
-    	}catch(MCRException e){
-    		logger.warn(e.getMessage());
-    		return false;
-    	}
-        ArrayList matchMemberGroupIDs = matchGroup.getMemberGroupIDs();
-
-        if (matchMemberGroupIDs.contains(group.getID())) {
-            return true;
-        }
-
-        for (int i = 0; i < matchMemberGroupIDs.size(); i++) {
-            if (MCRGroup.isImplicitMemberOf(group, (String) matchMemberGroupIDs.get(i))) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * This method checks whether this group is a member of a given group. It
-     * not only considers the groups list of the given group but recursively
-     * checks the group lists of all groups the given group is a member of.
-     * 
-     * @param groupID
-     *            ID of the group to check if this group is a member of
-     * @return returns true if the group is an implicit member of the given
-     *         group
-     */
-    public boolean isMemberOf(String groupID) throws MCRException {
-        if (super.groupIDs.contains(groupID)) {
-            return true;
-        }
-
-        return MCRGroup.isImplicitMemberOf(this, groupID);
-    }
-
-    /**
      * This method checks if all required fields have been provided. In a later
      * stage of the software development a User Policy object will be asked,
      * which fields exactly are the required fields. This will be configurable.
@@ -498,19 +353,10 @@ public class MCRGroup extends MCRUserObject implements MCRPrincipal {
         }
 
         if (requiredGroupAttributes.contains("creator")) {
-            test = test && (super.ID.length() > 0);
+            test = test && (super.creator.length() > 0);
         }
 
         return test;
-    }
-
-    /**
-     * This method cleans the list of member groups.
-     */
-    protected final void cleanMemberGroupID() throws MCRException {
-        if (modificationIsAllowed()) {
-            mbrGroupIDs.clear();
-        }
     }
 
     /**
@@ -541,17 +387,6 @@ public class MCRGroup extends MCRUserObject implements MCRPrincipal {
      */
     public void removeAdminUserID(String userID) throws MCRException {
         removeAndUpdate(userID, admUserIDs);
-    }
-
-    /**
-     * This method removes a group from the list of group members (groups). Do
-     * not confuse with the list of groups the group itself is a member of.
-     * 
-     * @param groupID
-     *            ID of the group removed from the group
-     */
-    public void removeMemberGroupID(String groupID) throws MCRException {
-        removeAndUpdate(groupID, mbrGroupIDs);
     }
 
     /**
@@ -592,8 +427,6 @@ public class MCRGroup extends MCRUserObject implements MCRPrincipal {
         org.jdom.Element Description = new org.jdom.Element("group.description").setText(super.description);
         org.jdom.Element admins = new org.jdom.Element("group.admins");
         org.jdom.Element members = new org.jdom.Element("group.members");
-        org.jdom.Element groups = new org.jdom.Element("group.groups");
-        org.jdom.Element Privileges = new org.jdom.Element("group.privileges");
 
         // Loop over all admin user IDs
         for (int i = 0; i < admUserIDs.size(); i++) {
@@ -613,20 +446,8 @@ public class MCRGroup extends MCRUserObject implements MCRPrincipal {
             members.addContent(mbrUserID);
         }
 
-        // Loop over all group IDs (members of this group!)
-        for (int i = 0; i < mbrGroupIDs.size(); i++) {
-            org.jdom.Element mbrGroupID = new org.jdom.Element("members.groupID").setText((String) mbrGroupIDs.get(i));
-            members.addContent(mbrGroupID);
-        }
-
-        // Loop over all group IDs (where this group is a member of!)
-        for (int i = 0; i < groupIDs.size(); i++) {
-            org.jdom.Element groupID = new org.jdom.Element("groups.groupID").setText((String) groupIDs.get(i));
-            groups.addContent(groupID);
-        }
-
         // Aggregate group element
-        group.addContent(Creator).addContent(CreationDate).addContent(ModifiedDate).addContent(Description).addContent(admins).addContent(members).addContent(groups).addContent(Privileges);
+        group.addContent(Creator).addContent(CreationDate).addContent(ModifiedDate).addContent(Description).addContent(admins).addContent(members);
 
         return group;
     }
@@ -643,10 +464,6 @@ public class MCRGroup extends MCRUserObject implements MCRPrincipal {
 
         for (int i = 0; i < admUserIDs.size(); i++) {
             logger.debug("admUserIDs         = " + (String) admUserIDs.get(i));
-        }
-
-        for (int i = 0; i < mbrGroupIDs.size(); i++) {
-            logger.debug("mbrGroupIDs        = " + (String) mbrGroupIDs.get(i));
         }
 
         for (int i = 0; i < mbrUserIDs.size(); i++) {

@@ -37,10 +37,10 @@ import org.mycore.common.MCRSessionMgr;
 /**
  * Instances of this class represent MyCoRe users.
  * 
- * @see org.mycore.user.MCRUserMgr
- * @see org.mycore.user.MCRUserObject
- * @see org.mycore.user.MCRUserContact
- * @see org.mycore.user.MCRUserMgr
+ * @see org.mycore.user2.MCRUserMgr
+ * @see org.mycore.user2.MCRUserObject
+ * @see org.mycore.user2.MCRUserContact
+ * @see org.mycore.user2.MCRUserMgr
  * 
  * @author Detlev Degenhardt
  * @author Jens Kupferschmidt
@@ -66,6 +66,9 @@ public class MCRUser extends MCRUserObject implements MCRPrincipal, Principal {
 
     /** Object representing user address information */
     protected MCRUserContact userContact;
+    
+    /** A list of groups (IDs) where this user is a member of */
+    protected ArrayList groupIDs = null;    
 
     /**
      * Default constructor. It is used to create a user object with empty
@@ -82,20 +85,11 @@ public class MCRUser extends MCRUserObject implements MCRPrincipal, Principal {
         updateAllowed = false;
         passwd = "";
         primaryGroupID = "";
+        groupIDs = new ArrayList();
         userContact = new MCRUserContact();
     }
 
-    /**
-     * Copy contructor- creates a copy of a given MCRUser object.
-     */
-    public MCRUser(MCRUser u) {
-        this.numID = u.getNumID();
-        this.idEnabled = u.idEnabled;
-        this.updateAllowed = u.updateAllowed;
-        this.passwd = u.passwd;
-        this.primaryGroupID = u.primaryGroupID;
-        this.userContact = u.getUserContact();
-    }
+
 
     /**
      * This minimal constructor only takes the user ID as a parameter. For all
@@ -192,7 +186,7 @@ public class MCRUser extends MCRUserObject implements MCRPrincipal, Principal {
         super.description = trim(description, description_len);
         this.passwd = trim(passwd, password_len);
         this.primaryGroupID = trim(primaryGroupID, id_len);
-        super.groupIDs = groupIDs;
+        this.groupIDs = groupIDs;
 
         this.userContact = new MCRUserContact(salutation, firstname, lastname, street, city, postalcode, country, state, institution, faculty, department, institute, telephone, fax, email, cellphone);
     }
@@ -302,6 +296,42 @@ public class MCRUser extends MCRUserObject implements MCRPrincipal, Principal {
     public final String getID() {
         return ID;
     }
+    
+    /**
+     * This method removes a group from the groups list of the user object. This
+     * list is the list of group IDs where this user or group itself is a member
+     * of, not the list of groups this user or group has as members.
+     * 
+     * @param groupID
+     *            ID of the group removed from the user object
+     */
+    public void removeGroupID(String groupID) throws MCRException {
+        // Since this operation is a modification of the group with ID groupID
+        // and not of
+        // the current group we do not need to check if the modification is
+        // allowed.
+        if (groupIDs.contains(groupID)) {
+            groupIDs.remove(groupID);
+        }
+    }   
+    
+    /**
+     * This method adds a group to the groups list of the user object. This is
+     * the list of group IDs where this user or group itself is a member of, not
+     * the list of groups this user or group has as members.
+     * 
+     * @param groupID
+     *            ID of the group added to the user object
+     */
+    public void addGroupID(String groupID) throws MCRException {
+        // Since this operation is a modification of the group with ID groupID
+        // and not of
+        // the current group we do not need to check if the modification is
+        // allowed.
+        if (!groupIDs.contains(groupID)) {
+            groupIDs.add(groupID);
+        }
+    }    
 
     /**
      * This method determines the list of all groups the user is a member of,
@@ -312,22 +342,7 @@ public class MCRUser extends MCRUserObject implements MCRPrincipal, Principal {
      * @return list of all groups the user is a member of
      */
     public final ArrayList getAllGroupIDs() {
-        ArrayList allGroupIDs = new ArrayList();
-        allGroupIDs.addAll(groupIDs);
-        try {
-            for (int i = 0; i < groupIDs.size(); i++) {
-                ArrayList implicitGroupIDs = MCRUserMgr.instance().getAllImplicitGroupIDsOfGroup((String) groupIDs.get(i));
-
-                for (int k = 0; k < implicitGroupIDs.size(); k++) {
-                    if (!allGroupIDs.contains(implicitGroupIDs.get(k))) {
-                        allGroupIDs.add(implicitGroupIDs.get(k));
-                    }
-                }
-            }
-        } catch (MCRException ex) {
-            return null;
-        }
-        return allGroupIDs;
+    	return groupIDs;
     }
 
     /**
@@ -540,6 +555,10 @@ public class MCRUser extends MCRUserObject implements MCRPrincipal, Principal {
     public final void debug() {
         debugDefault();
         logger.debug("primaryGroupID     = " + primaryGroupID);
+        logger.debug("groupIDs #         = " + groupIDs.size());
+        for (int i = 0; i < groupIDs.size(); i++) {
+            logger.debug("groupIDs           = " + ((String) groupIDs.get(i)));
+        }        
         userContact.debug();
     }
 
@@ -578,6 +597,14 @@ public class MCRUser extends MCRUserObject implements MCRPrincipal, Principal {
 
         throw new MCRException("The current user " + currentUserID + " has no right to modify the user " + this.ID + ".");
     }
+    
+    /**
+     * @return This method returns the list of groups as a ArrayList of strings.
+     *         These are the groups where the object itself is a member of.
+     */
+    public final ArrayList getGroupIDs() {
+        return groupIDs;
+    }    
     
     public final int getGroupCount(){
            try{

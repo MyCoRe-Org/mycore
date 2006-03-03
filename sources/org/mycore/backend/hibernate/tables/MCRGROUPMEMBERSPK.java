@@ -35,15 +35,12 @@ public class MCRGROUPMEMBERSPK implements Serializable {
 
     private String userid;
 
-    private String groupid;
-
     public MCRGROUPMEMBERSPK() {
     }
 
-    public MCRGROUPMEMBERSPK(String gid, String userid, String groupid) {
+    public MCRGROUPMEMBERSPK(String gid, String userid) {
         this.gid = gid;
         this.userid = userid;
-        this.groupid = groupid;
     }
 
     public MCRGROUPMEMBERSPK(long id) {
@@ -63,21 +60,6 @@ public class MCRGROUPMEMBERSPK implements Serializable {
      */
     public void setGid(String gid) {
         this.gid = gid;
-    }
-
-    /**
-     * @return Returns the groupid.
-     */
-    public String getGroupid() {
-        return groupid;
-    }
-
-    /**
-     * @param groupid
-     *            The groupid to set.
-     */
-    public void setGroupid(String groupid) {
-        this.groupid = groupid;
     }
 
     /**
@@ -102,10 +84,10 @@ public class MCRGROUPMEMBERSPK implements Serializable {
 
         MCRGROUPMEMBERSPK castother = (MCRGROUPMEMBERSPK) other;
 
-        return new EqualsBuilder().append(this.getGid(), castother.getGid()).append(this.getUserid(), castother.getUserid()).append(this.getGroupid(), castother.getGroupid()).isEquals();
+        return new EqualsBuilder().append(this.getGid(), castother.getGid()).append(this.getUserid(), castother.getUserid()).isEquals();
     }
 
     public int hashCode() {
-        return new HashCodeBuilder().append(getGid()).append(getUserid()).append(getGroupid()).toHashCode();
+        return new HashCodeBuilder().append(getGid()).append(getUserid()).toHashCode();
     }
 }

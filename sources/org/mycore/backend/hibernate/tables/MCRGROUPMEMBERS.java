@@ -31,7 +31,7 @@ public class MCRGROUPMEMBERS {
     }
 
     public MCRGROUPMEMBERS(String gid, String userid, String groupid) {
-        this.key = new MCRGROUPMEMBERSPK(gid, userid, groupid);
+        this.key = new MCRGROUPMEMBERSPK(gid, userid);
     }
 
     public MCRGROUPMEMBERS(long id) {
@@ -71,14 +71,4 @@ public class MCRGROUPMEMBERS {
         key.setUserid(userid);
     }
 
-    /**
-     * @hibernate.property column="GROUPID" not-null="true" update="true"
-     */
-    public String getGroupid() {
-        return key.getGroupid();
-    }
-
-    public void setGroupid(String groupid) {
-        key.setGroupid(groupid);
-    }
 }

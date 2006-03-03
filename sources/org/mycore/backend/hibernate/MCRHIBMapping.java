@@ -124,7 +124,6 @@ public class MCRHIBMapping {
             map = new MCRTableGenerator(config.getString("MCR.users_store_sql_table_group_members"), "org.mycore.backend.hibernate.tables.MCRGROUPMEMBERS", "", 3);
             map.addIDColumn("gid", "GID", dbString, 20, "native", false);
             map.addIDColumn("userid", "USERID", dbString, 20, "native", false);
-            map.addIDColumn("groupid", "GROUPID", dbString, 20, "native", false);
             cfg.addXML(map.getTableXML());
 
             // Group

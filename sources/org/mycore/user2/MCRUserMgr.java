@@ -202,32 +202,6 @@ public class MCRUserMgr {
 					logger.error("group: '" + currentGroup.getID() + "' error: unknown user '" + (String) mbrUserIDs.get(j) + "'!");
 				}
 			}
-
-			// check the groups (members)
-			ArrayList mbrGroupIDs = currentGroup.getMemberGroupIDs();
-
-			for (int j = 0; j < mbrGroupIDs.size(); j++) {
-				if (!mcrUserStore.existsGroup((String) mbrGroupIDs.get(j))) {
-					logger.error("group: '" + currentGroup.getID() + "' error: unknown member" + " group '" + (String) mbrGroupIDs.get(j) + "'!");
-				} else if (currentGroup.getID().equals(mbrGroupIDs.get(j))) {
-					logger.error("group: '" + currentGroup.getID() + "' error: the group " + "must not contain itself as a member group!");
-				}
-			}
-
-			// check the existence of the groups where the current group is a
-			// member of
-			ArrayList groupIDs = currentGroup.getGroupIDs();
-
-			for (int j = 0; j < groupIDs.size(); j++) {
-				if (!mcrUserStore.existsGroup((String) groupIDs.get(j))) {
-					logger.error("group: '" + currentGroup.getID() + "' error: unknown group '" + (String) groupIDs.get(j) + "'!");
-				}
-			}
-
-			// check if the current group implicitly is a member of itself
-			if (currentGroup.isMemberOf(currentGroup.getID())) {
-				logger.error("group: '" + currentGroup.getID() + "' error: the group " + "implicitly is a member of itself. Check the affiliations!");
-			}
 		}
 
 		logger.info("done.");
@@ -296,26 +270,6 @@ public class MCRUserMgr {
 			}
 		}
 
-		// Clear the member user and group array list.
-		group.cleanMemberUserID(); // Detlev asks Jens: why ????????????
-		group.cleanMemberGroupID(); // Detlev asks Jens: why ????????????
-
-		ArrayList groupIDs = group.getGroupIDs();
-
-		for (int j = 0; j < groupIDs.size(); j++) {
-			if (!mcrUserStore.existsGroup((String) groupIDs.get(j))) {
-				throw new MCRException("MCRUserMgr.createGroup(): unknown groupID: " + (String) groupIDs.get(j));
-			}
-
-			// With the following we test if the current user may modify the
-			// groups this group
-			// will be a member of. It is important to check this prior to
-			// creating the group
-			// such that we do not have to make a rollback.
-			MCRGroup linkedGroup = this.retrieveGroup((String) groupIDs.get(j), true);
-			linkedGroup.modificationIsAllowed();
-		}
-
 		try {
 			// Set some data by the manager
 			group.setCreationDate();
@@ -328,14 +282,6 @@ public class MCRUserMgr {
 			// checked while
 			// updating the groups.
 			mcrUserStore.createGroup(group);
-
-			// We finally update the groups this group will be a member of
-			for (int i = 0; i < groupIDs.size(); i++) {
-				MCRGroup membergroup = retrieveGroup((String) groupIDs.get(i), true);
-				membergroup.addMemberGroupID(group.getID());
-				membergroup.setModifiedDate();
-				mcrUserStore.updateGroup(membergroup);
-			}
 		} catch (Exception ex) {
 			// Since something went wrong we delete the previously created
 			// group. We do this
@@ -347,6 +293,7 @@ public class MCRUserMgr {
 			} catch (MCRException e) {
 			}
 
+			logger.error("Can't create MCRGroup", ex);
 			throw new MCRException("Can't create MCRGroup.", ex);
 		}
 	}
@@ -483,20 +430,11 @@ public class MCRUserMgr {
 		}
 
 		try {
-			// It is sufficient to remove the members (users and groups,
-			// respectively) from the
+			// It is sufficient to remove the members from the
 			// caches. The next time they will be used they will be rebuild from
 			// the datastore and
 			// hence no longer have this group in their group lists.
 			MCRGroup delGroup = retrieveGroup(groupID);
-
-			for (int i = 0; i < delGroup.getMemberGroupIDs().size(); i++) {
-				groupCache.remove(delGroup.getMemberGroupIDs().get(i));
-
-				MCRGroup ugroup = retrieveGroup((String) delGroup.getMemberGroupIDs().get(i));
-				ugroup.removeGroupID(groupID);
-				mcrUserStore.updateGroup(ugroup);
-			}
 
 			for (int i = 0; i < delGroup.getMemberUserIDs().size(); i++) {
 				userCache.remove(delGroup.getMemberUserIDs().get(i));
@@ -504,15 +442,6 @@ public class MCRUserMgr {
 				MCRUser uuser = retrieveUser((String) delGroup.getMemberUserIDs().get(i), false);
 				uuser.removeGroupID(groupID);
 				mcrUserStore.updateUser(uuser);
-			}
-
-			// Remove this group from the memberIDs of other groups
-			for (int i = 0; i < delGroup.getGroupIDs().size(); i++) {
-				groupCache.remove(delGroup.getGroupIDs().get(i));
-
-				MCRGroup ggroup = retrieveGroup((String) delGroup.getGroupIDs().get(i));
-				ggroup.removeMemberGroupID(groupID);
-				mcrUserStore.updateGroup(ggroup);
 			}
 
 			// Remove all admin items from other groups
@@ -616,30 +545,6 @@ public class MCRUserMgr {
 	 */
 	public final synchronized ArrayList getAllGroupIDs() throws MCRException {
 		return mcrUserStore.getAllGroupIDs();
-	}
-
-	/**
-	 * This method gets all group IDs of a given group where the group under
-	 * consideraton is a member of, including the implicit membership.
-	 * 
-	 * @param groupID
-	 *            The group under consideration
-	 * @return ArrayList of strings containing the group IDs the group is a
-	 *         member of (including the implicit ones).
-	 */
-	public final synchronized ArrayList getAllImplicitGroupIDsOfGroup(String groupID) throws MCRException {
-		// Checking the permissions is done in the subsequent methods
-		ArrayList allGroupIDs = getAllGroupIDs();
-		ArrayList allImplicitGroupIDs = new ArrayList();
-		MCRGroup currentGroup = retrieveGroup(groupID);
-
-		for (int i = 0; i < allGroupIDs.size(); i++) {
-			if (MCRGroup.isImplicitMemberOf(currentGroup, (String) allGroupIDs.get(i))) {
-				allImplicitGroupIDs.add(allGroupIDs.get(i));
-			}
-		}
-
-		return allImplicitGroupIDs;
 	}
 
 	/**
@@ -1280,34 +1185,6 @@ public class MCRUserMgr {
 				}
 			}
 
-			// We look for newly added member groupIDs in this group:
-			for (int i = 0; i < updGroup.getMemberGroupIDs().size(); i++) {
-				String gid = (String) updGroup.getMemberGroupIDs().get(i);
-
-				if (!mcrUserStore.existsGroup(gid)) {
-					throw new MCRException("You tried to add the unknown member group '" + gid + "' to the group '" + groupID + "'.");
-				}
-			}
-
-			// We do not look for newly added groupIDs in this group because
-			// this will
-			// be done later (in update()). 
-
-			// We now know that all newly added objects exist. In the next step
-			// we check
-			// if the group implicitly would be a member of itself.
-			if (MCRGroup.isImplicitMemberOf(updGroup, groupID)) {
-				throw new MCRException("Update failed: the group '" + groupID + "' implicitly is a member of itself. Check the affiliations!");
-			}
-
-			// We now check if there are groups this group has been a member of
-			// but no longer
-			// is. If so, we must notify those groups. However, the current user
-			// may not have
-			// the right to modify some of the groups. If so, an exception will
-			// be thrown and
-			// the whole modification of the current group is invalid.
-			update(updGroup, oldGroup);
 
 			// Some values are taken from the old version, they cannot be
 			// updated. Then we
@@ -1319,7 +1196,7 @@ public class MCRUserMgr {
 			groupCache.put(groupID, updGroup);
 
 			// We finally look again for recently added and deleted members
-			// (users and groups). If
+			// (users). If
 			// so, we do not have to notify them, since the users and groups get
 			// their membership
 			// information when they are constructed from the datastore.
@@ -1332,21 +1209,9 @@ public class MCRUserMgr {
 				}
 			}
 
-			for (int i = 0; i < oldGroup.getMemberGroupIDs().size(); i++) {
-				if (!updGroup.getMemberGroupIDs().contains(oldGroup.getMemberGroupIDs().get(i))) {
-					groupCache.remove(oldGroup.getMemberGroupIDs().get(i));
-				}
-			}
-
 			for (int i = 0; i < updGroup.getMemberUserIDs().size(); i++) {
 				if (!oldGroup.getMemberUserIDs().contains(updGroup.getMemberUserIDs().get(i))) {
 					userCache.remove(updGroup.getMemberUserIDs().get(i));
-				}
-			}
-
-			for (int i = 0; i < updGroup.getMemberGroupIDs().size(); i++) {
-				if (!oldGroup.getMemberGroupIDs().contains(updGroup.getMemberGroupIDs().get(i))) {
-					groupCache.remove(updGroup.getMemberGroupIDs().get(i));
 				}
 			}
 		} catch (MCRException ex) {
@@ -1414,7 +1279,7 @@ public class MCRUserMgr {
 			// Now we come back to the primary group.
 			if (!updUser.getPrimaryGroupID().equals(oldUser.getPrimaryGroupID())) {
 				MCRGroup primGroup = retrieveGroup(oldUser.getPrimaryGroupID());
-				primGroup.removeMemberGroupID(oldUser.getID());
+				primGroup.removeMemberUserID(oldUser.getID());
 				this.updateGroup(primGroup);
 				primGroup = retrieveGroup(updUser.getPrimaryGroupID());
 				primGroup.addMemberUserID(updUser.getID());
@@ -1438,6 +1303,68 @@ public class MCRUserMgr {
 			throw new MCRException("Error while updating user " + updUser.getID() + ", the user has been deleted.");
 		}
 	}
+	
+	/**
+	 * This method updates groups where a given user is a new
+	 * member of or is no longer a member of, respectively. The groups are
+	 * determined by comparing the user to be updated with the version
+	 * out of the datastore, i.e. before the update request.
+	 * 
+	 * @param updObject
+	 *            The user object which is to be updated
+	 * @param oldObject
+	 *            The same user object as it was before the update request.
+	 */
+	private final void update(MCRUser updUser, MCRUser oldUser) throws MCRException {
+		// It is important to first check whether *all* groups where the current
+		// object is a new member of
+		// exist at all. Furthermore it is very important that the current user
+		// (session) has the right
+		// to update the groups. Hence we must check this, too. If something
+		// goes wrong here an exception
+		// will be thrown and we do not have to care about a rollback of data
+		// already modified. Hence do
+		// not combine the following two loops!
+		String ID = updUser.getID();
+
+		for (int i = 0; i < updUser.getGroupIDs().size(); i++) {
+			String gid = (String) updUser.getGroupIDs().get(i);
+
+			if (!mcrUserStore.existsGroup(gid)) {
+				StringBuffer msg = new StringBuffer("You tried to update ");
+				msg.append((updUser instanceof MCRUser) ? "user '" : "group '").append(ID).append("' with the unknown group '").append(gid).append("'.");
+				throw new MCRException(msg.toString());
+			}
+
+			MCRGroup linkedGroup = retrieveGroup(gid);
+			linkedGroup.modificationIsAllowed(); // If the modification is
+			// not
+
+			// allowed an exception will be
+			// thrown.
+		}
+
+		// update groups where this User is a new member of
+		for (int i = 0; i < updUser.getGroupIDs().size(); i++) {
+			MCRGroup updGroup = retrieveGroup((String) updUser.getGroupIDs().get(i));
+
+			if (!oldUser.getGroupIDs().contains(updGroup.getID())) {
+				updGroup.addMemberUserID(ID);
+				this.updateGroup(updGroup);
+			}
+		}
+
+		// update groups where this object is no longer a member of
+		for (int i = 0; i < oldUser.getGroupIDs().size(); i++) {
+			MCRGroup updGroup = retrieveGroup((String) oldUser.getGroupIDs().get(i));
+
+			if (!updUser.getGroupIDs().contains(updGroup.getID())) { 
+				// The object is no longer member of this group
+				updGroup.removeMemberUserID(ID);
+				this.updateGroup(updGroup);
+			}
+		}
+	}	
 
 	/**
 	 * This method enables the user.
@@ -1477,75 +1404,4 @@ public class MCRUserMgr {
 		}
 	}
 
-	/**
-	 * This method updates groups where a given user or group object is a new
-	 * member of or is no longer a member of, respectively. The groups are
-	 * determined by comparing the user or group to be updated with the version
-	 * out of the datastore, i.e. before the update request.
-	 * 
-	 * @param updObject
-	 *            The user object which is to be updated
-	 * @param oldObject
-	 *            The same user object as it was before the update request.
-	 */
-	private final void update(MCRUserObject updObject, MCRUserObject oldObject) throws MCRException {
-		// It is important to first check whether *all* groups where the current
-		// object is a new member of
-		// exist at all. Furthermore it is very important that the current user
-		// (session) has the right
-		// to update the groups. Hence we must check this, too. If something
-		// goes wrong here an exception
-		// will be thrown and we do not have to care about a rollback of data
-		// already modified. Hence do
-		// not combine the following two loops!
-		String ID = updObject.getID();
-
-		for (int i = 0; i < updObject.getGroupIDs().size(); i++) {
-			String gid = (String) updObject.getGroupIDs().get(i);
-
-			if (!mcrUserStore.existsGroup(gid)) {
-				StringBuffer msg = new StringBuffer("You tried to update ");
-				msg.append((updObject instanceof MCRUser) ? "user '" : "group '").append(ID).append("' with the unknown group '").append(gid).append("'.");
-				throw new MCRException(msg.toString());
-			}
-
-			MCRGroup linkedGroup = retrieveGroup(gid);
-			linkedGroup.modificationIsAllowed(); // If the modification is
-			// not
-
-			// allowed an exception will be
-			// thrown.
-		}
-
-		// update groups where this object is a new member of
-		for (int i = 0; i < updObject.getGroupIDs().size(); i++) {
-			MCRGroup updGroup = retrieveGroup((String) updObject.getGroupIDs().get(i));
-
-			if (!oldObject.getGroupIDs().contains(updGroup.getID())) {
-				if (updObject instanceof MCRUser) {
-					updGroup.addMemberUserID(ID);
-				} else { // it's a MCRGroup object
-					updGroup.addMemberGroupID(ID);
-				}
-
-				this.updateGroup(updGroup);
-			}
-		}
-
-		// update groups where this object is no longer a member of
-		for (int i = 0; i < oldObject.getGroupIDs().size(); i++) {
-			MCRGroup updGroup = retrieveGroup((String) oldObject.getGroupIDs().get(i));
-
-			if (!updObject.getGroupIDs().contains(updGroup.getID())) { 
-				// The object is no longer member of this group
-				if (updObject instanceof MCRUser) {
-					updGroup.removeMemberUserID(ID);
-				} else { // it's a MCRGroup object
-					updGroup.removeMemberGroupID(ID);
-				}
-
-				this.updateGroup(updGroup);
-			}
-		}
-	}
 }

@@ -62,12 +62,6 @@ public class MCRSQLUserStore2 implements MCRUserStore {
     /** name of the sql table containing group admin information */
     private String SQLGroupAdminsTable;
 
-    /** name of the sql table containing privilege information */
-    private String SQLPrivilegesTable;
-
-    /** name of the sql table containing group-privilege information */
-    private String SQLPrivsLookupTable;
-
     /**
      * The constructor reads the names of the SQL tables which hold the user
      * information data from mycore.properties. The existence of the tables is
@@ -80,8 +74,6 @@ public class MCRSQLUserStore2 implements MCRUserStore {
         SQLGroupsTable = config.getString("MCR.users_store_sql_table_groups", "MCRGROUPS");
         SQLGroupMembersTable = config.getString("MCR.users_store_sql_table_group_members", "MCRGROUPMEMBERS");
         SQLGroupAdminsTable = config.getString("MCR.users_store_sql_table_group_admins", "MCRGROUPADMINS");
-        SQLPrivilegesTable = config.getString("MCR.users_store_sql_table_privileges", "MCRPRIVS");
-        SQLPrivsLookupTable = config.getString("MCR.users_store_sql_table_privs_lookup", "MCRPRIVSLOOKUP");
 
         // create tables
         if (!MCRSQLConnection.doesTableExist(SQLUsersTable)) {
@@ -165,7 +157,7 @@ public class MCRSQLUserStore2 implements MCRUserStore {
         MCRSQLConnection c = MCRSQLConnectionPool.instance().getConnection();
 
         try {
-            c.doUpdate(new MCRSQLStatement(SQLGroupMembersTable).addColumn("GID VARCHAR(" + Integer.toString(MCRUser.id_len) + ") NOT NULL").addColumn("USERID VARCHAR(" + Integer.toString(MCRUser.id_len) + ")").addColumn("GROUPID VARCHAR(" + Integer.toString(MCRUser.id_len) + ")").toCreateTableStatement());
+            c.doUpdate(new MCRSQLStatement(SQLGroupMembersTable).addColumn("GID VARCHAR(" + Integer.toString(MCRUser.id_len) + ") NOT NULL").addColumn("USERID VARCHAR(" + Integer.toString(MCRUser.id_len) + ")").toCreateTableStatement());
         } finally {
             c.release();
         }
@@ -270,17 +262,6 @@ public class MCRSQLUserStore2 implements MCRUserStore {
             }
 
             statement.close();
-            insert = "INSERT INTO " + SQLGroupMembersTable + "(GID, GROUPID) VALUES (?,?)";
-            statement = connection.getJDBCConnection().prepareStatement(insert);
-
-            for (int i = 0; i < newGroup.getMemberGroupIDs().size(); i++) {
-                statement.setString(1, newGroup.getID());
-                statement.setString(2, (String) newGroup.getMemberGroupIDs().get(i));
-                statement.execute();
-                statement.clearParameters();
-            }
-
-            statement.close();
 
             // now update the group admins table.
             insert = "INSERT INTO " + SQLGroupAdminsTable + "(GID, USERID) VALUES (?,?)";
@@ -358,7 +339,6 @@ public class MCRSQLUserStore2 implements MCRUserStore {
             sql = "DELETE FROM " + SQLGroupMembersTable + " WHERE GID = '" + delGroupID + "'";
             MCRSQLConnection.justDoUpdate(sql);
 
-            sql = "DELETE FROM " + SQLPrivsLookupTable + " WHERE GID = '" + delGroupID + "'";
             MCRSQLConnection.justDoUpdate(sql);
         } catch (Exception ex) {
             throw new MCRException("Error in UserStore.", ex);
@@ -610,16 +590,8 @@ public class MCRSQLUserStore2 implements MCRUserStore {
 
             ArrayList mbrUserIDs = getSelectResult(select);
 
-            select = "SELECT GROUPID FROM " + SQLGroupMembersTable + " WHERE GID = '" + groupID + "' AND GROUPID IS NOT NULL AND GROUPID != ''";
-
-            ArrayList mbrGroupIDs = getSelectResult(select);
-
-            select = "SELECT GID FROM " + SQLGroupMembersTable + " WHERE GROUPID = '" + groupID + "'";
-
-            ArrayList groupIDs = getSelectResult(select);
-
             // We create the group object
-            MCRGroup group = new MCRGroup(groupID, creator, created, modified, description, admUserIDs, admGroupIDs, mbrUserIDs, mbrGroupIDs, groupIDs);
+            MCRGroup group = new MCRGroup(groupID, creator, created, modified, description, admUserIDs, admGroupIDs, mbrUserIDs);
 
             return group;
         } catch (Exception ex) {
@@ -815,44 +787,7 @@ public class MCRSQLUserStore2 implements MCRUserStore {
                     MCRSQLConnection.justDoUpdate(sql);
                 }
             }
-
-            // Now we collect information about which groups have been added or
-            // removed.
-            // Therefore we compare the list of groups this group has as members
-            // before and
-            // after the update.
-            select = "SELECT GROUPID FROM " + SQLGroupMembersTable + " WHERE GID = '" + group.getID() + "' AND GROUPID IS NOT NULL";
-
-            ArrayList oldGroupIDs = getSelectResult(select);
-            ArrayList newGroupIDs = group.getMemberGroupIDs();
-
-            // We search for the new members and insert them into the lookup
-            // table
-            insert = "INSERT INTO " + SQLGroupMembersTable + "(GID, GROUPID) VALUES (?,?)";
-            statement = connection.getJDBCConnection().prepareStatement(insert);
-
-            for (int i = 0; i < newGroupIDs.size(); i++) {
-                if (!oldGroupIDs.contains(newGroupIDs.get(i))) {
-                    statement.setString(1, group.getID());
-                    statement.setString(2, (String) newGroupIDs.get(i));
-                    statement.execute();
-                    statement.clearParameters();
-                }
-            }
-
-            statement.close();
-
-            // We search for the groups which have been removed from this group
-            // and delete the
-            // entries from the member lookup table
-            for (int i = 0; i < oldGroupIDs.size(); i++) {
-                if (!newGroupIDs.contains(oldGroupIDs.get(i))) {
-                    String sql = "DELETE FROM " + SQLGroupMembersTable + " WHERE GID = '" + group.getID() + "' AND GROUPID = '" + (String) oldGroupIDs.get(i) + "'";
-                    MCRSQLConnection.justDoUpdate(sql);
-                }
-            }
-
-            // connection.getJDBCConnection().commit();
+             // connection.getJDBCConnection().commit();
             // connection.getJDBCConnection().setAutoCommit(true);
         } catch (Exception ex) {
             // try{ connection.getJDBCConnection().rollback(); }

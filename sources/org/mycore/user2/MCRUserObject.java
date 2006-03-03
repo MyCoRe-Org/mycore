@@ -24,7 +24,6 @@
 package org.mycore.user2;
 
 import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.GregorianCalendar;
 
 import org.apache.log4j.Logger;
@@ -36,8 +35,8 @@ import org.mycore.common.MCRException;
 /**
  * This is the abstract super class of MCRUser and MCRGroup
  * 
- * @see org.mycore.user.MCRUser
- * @see org.mycore.user.MCRGroup
+ * @see org.mycore.user2.MCRUser
+ * @see org.mycore.user2.MCRGroup
  * 
  * @author Detlev Degenhardt
  * @author Jens Kupferschmidt
@@ -77,9 +76,6 @@ abstract class MCRUserObject {
     /** Description of the user object */
     protected String description = "";
 
-    /** A list of groups (IDs) where this object is a member of */
-    protected ArrayList groupIDs = null;
-
     /**
      * The constructor for an empty object. Only the logger is defined.
      */
@@ -89,7 +85,6 @@ abstract class MCRUserObject {
         creationDate = new Timestamp(new GregorianCalendar().getTime().getTime());
         modifiedDate = new Timestamp(new GregorianCalendar().getTime().getTime());
         description = "";
-        groupIDs = new ArrayList();
         config = MCRConfiguration.instance();
     }
 
@@ -187,50 +182,6 @@ abstract class MCRUserObject {
     }
 
     /**
-     * @return This method returns the list of groups as a ArrayList of strings.
-     *         These are the groups where the object itself is a member of.
-     */
-    public final ArrayList getGroupIDs() {
-        return groupIDs;
-    }
-
-    /**
-     * This method adds a group to the groups list of the user object. This is
-     * the list of group IDs where this user or group itself is a member of, not
-     * the list of groups this user or group has as members.
-     * 
-     * @param groupID
-     *            ID of the group added to the user object
-     */
-    public void addGroupID(String groupID) throws MCRException {
-        // Since this operation is a modification of the group with ID groupID
-        // and not of
-        // the current group we do not need to check if the modification is
-        // allowed.
-        if (!groupIDs.contains(groupID)) {
-            groupIDs.add(groupID);
-        }
-    }
-
-    /**
-     * This method removes a group from the groups list of the user object. This
-     * list is the list of group IDs where this user or group itself is a member
-     * of, not the list of groups this user or group has as members.
-     * 
-     * @param groupID
-     *            ID of the group removed from the user object
-     */
-    public void removeGroupID(String groupID) throws MCRException {
-        // Since this operation is a modification of the group with ID groupID
-        // and not of
-        // the current group we do not need to check if the modification is
-        // allowed.
-        if (groupIDs.contains(groupID)) {
-            groupIDs.remove(groupID);
-        }
-    }
-
-    /**
      * This method must be implemented by a subclass and then returns the user
      * or group object as a JDOM document.
      */
@@ -292,11 +243,6 @@ abstract class MCRUserObject {
         logger.debug("creationDate       = " + String.valueOf(creationDate));
         logger.debug("modifiedDate       = " + String.valueOf(modifiedDate));
         logger.debug("description        = " + description);
-        logger.debug("groupIDs #         = " + groupIDs.size());
-
-        for (int i = 0; i < groupIDs.size(); i++) {
-            logger.debug("groupIDs           = " + ((String) groupIDs.get(i)));
-        }
     }
 
     /**

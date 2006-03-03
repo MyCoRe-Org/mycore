@@ -95,12 +95,6 @@ public class MCRUserCommands2 extends MCRAbstractCommands {
         com = new MCRCommand("delete group {0}", "org.mycore.frontend.cli.MCRUserCommands2.deleteGroup String", "");
         command.add(com);
 
-        com = new MCRCommand("add group {0} as member to group {1}", "org.mycore.frontend.cli.MCRUserCommands2.addMemberGroupToGroup String String", "");
-        command.add(com);
-
-        com = new MCRCommand("remove group {0} as member from group {1}", "org.mycore.frontend.cli.MCRUserCommands2.removeMemberGroupFromGroup String String", "");
-        command.add(com);
-
         com = new MCRCommand("create user data from file {0}", "org.mycore.frontend.cli.MCRUserCommands2.createUserFromFile String", "");
         command.add(com);
 
@@ -190,10 +184,7 @@ public class MCRUserCommands2 extends MCRAbstractCommands {
             ArrayList mbrUserIDs = new ArrayList();
             mbrUserIDs.add(suser);
 
-            ArrayList mbrGroupIDs = new ArrayList();
-            ArrayList groupIDs = new ArrayList();
-
-            MCRGroup g = new MCRGroup(sgroup, suser, null, null, "The superuser group", admUserIDs, admGroupIDs, mbrUserIDs, mbrGroupIDs, groupIDs);
+            MCRGroup g = new MCRGroup(sgroup, suser, null, null, "The superuser group", admUserIDs, admGroupIDs, mbrUserIDs);
 
             MCRUserMgr.instance().initializeGroup(g, suser);
         } catch (Exception e) {
@@ -214,12 +205,7 @@ public class MCRUserCommands2 extends MCRAbstractCommands {
             mbrUserIDs.add(guser);
             mbrUserIDs.add(suser);
 
-            ArrayList mbrGroupIDs = new ArrayList();
-            mbrGroupIDs.add(sgroup);
-
-            ArrayList groupIDs = new ArrayList();
-
-            MCRGroup g = new MCRGroup(ggroup, suser, null, null, "The guest group", admUserIDs, admGroupIDs, mbrUserIDs, mbrGroupIDs, groupIDs);
+            MCRGroup g = new MCRGroup(ggroup, suser, null, null, "The guest group", admUserIDs, admGroupIDs, mbrUserIDs);
 
             MCRUserMgr.instance().initializeGroup(g, suser);
         } catch (Exception e) {
@@ -509,15 +495,7 @@ public class MCRUserCommands2 extends MCRAbstractCommands {
         sb.append("       group=").append(group.getID());
         System.out.println(sb.toString());
 
-        ArrayList ar = group.getMemberGroupIDs();
-
-        for (int i = 0; i < ar.size(); i++) {
-            sb = new StringBuffer();
-            sb.append("          groups in this group=").append((String) ar.get(i));
-            System.out.println(sb.toString());
-        }
-
-        ar = group.getMemberUserIDs();
+        ArrayList ar = group.getMemberUserIDs();
 
         for (int i = 0; i < ar.size(); i++) {
             sb = new StringBuffer();
@@ -776,49 +754,6 @@ public class MCRUserCommands2 extends MCRAbstractCommands {
             throw new MCRException("Error while updating a user from file.", e);
         }
     }
-
-    /**
-     * This method adds a group as a member to another group
-     * 
-     * @param mbrGroupID
-     *            the ID of the group which will be a member of the group
-     *            represented by groupID
-     * @param groupID
-     *            the ID of the group to which the group with ID mbrGroupID will
-     *            be added
-     * @throws MCRException
-     */
-    public static final void addMemberGroupToGroup(String mbrGroupID, String groupID) throws MCRException {
-        try {
-            MCRGroup group = MCRUserMgr.instance().retrieveGroup(groupID);
-            group.addMemberGroupID(mbrGroupID);
-            MCRUserMgr.instance().updateGroup(group);
-        } catch (Exception e) {
-            throw new MCRException("Error while adding group " + mbrGroupID + " to group " + groupID + ".", e);
-        }
-    }
-
-    /**
-     * This method removes a member group from another group
-     * 
-     * @param mbrGroupID
-     *            the ID of the group which will be removed from the group
-     *            represented by groupID
-     * @param groupID
-     *            the ID of the group from which the group with ID mbrGroupID
-     *            will be removed
-     * @throws MCRException
-     */
-    public static final void removeMemberGroupFromGroup(String mbrGroupID, String groupID) throws MCRException {
-        try {
-            MCRGroup group = MCRUserMgr.instance().retrieveGroup(groupID);
-            group.removeMemberGroupID(mbrGroupID);
-            MCRUserMgr.instance().updateGroup(group);
-        } catch (Exception e) {
-            throw new MCRException("Error while removing group " + mbrGroupID + " from group " + groupID + ".", e);
-        }
-    }
-
 
     /**
      * This method adds a user as a member to a group

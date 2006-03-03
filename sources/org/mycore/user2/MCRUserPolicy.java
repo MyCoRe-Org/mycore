@@ -55,7 +55,7 @@ public class MCRUserPolicy {
 
         reqGroupAttributes = new ArrayList();
         reqGroupAttributes.add("groupID");
-        reqGroupAttributes.add("creator");
+        //reqGroupAttributes.add("creator");
     }
 
     /**
