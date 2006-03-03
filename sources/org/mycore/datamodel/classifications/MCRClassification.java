@@ -597,6 +597,8 @@ public class MCRClassification {
 	private final void saveOldLinks(String classId, String categid, Map sink, Map idMap) {
 		LOGGER.debug("saving old links for " + classId + "##" + categid);
 		Element el = (Element) idMap.get(categid);
+		if ( el == null ) 
+			return;
 		String attr = el.getAttributeValue(OBJ_COUNT_ATTR);
 		if (attr != null && attr.equals("0")) {
 			return;
