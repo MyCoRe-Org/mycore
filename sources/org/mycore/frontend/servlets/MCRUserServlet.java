@@ -237,11 +237,11 @@ public class MCRUserServlet extends MCRServlet {
     protected org.jdom.Document createJdomDocBase(MCRServletJob job) {
         // Get the MCRSession object for the current thread from the session
         // manager.
-        String backto_url = getProperty(job.getRequest(), "url").trim();
-
-        if (backto_url.length() == 0) {
-            backto_url = null;
-        }
+    	String backto_url = null;
+    	String url = job.getRequest().getParameter("url");
+    	if(url != null && url.trim().length() > 0) {
+    		backto_url = url.trim();
+    	}
 
         org.jdom.Element root = new org.jdom.Element("mcr_user");
         org.jdom.Document jdomDoc = new org.jdom.Document(root);
