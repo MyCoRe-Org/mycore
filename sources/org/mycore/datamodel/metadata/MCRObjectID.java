@@ -334,7 +334,7 @@ public final class MCRObjectID {
      * @return the validation value, true if the MCRObjectId is correct,
      *         otherwise return false
      */
-    private final boolean setID(String id) {
+    public final boolean setID(String id) {
         mcr_valid_id = false;
 
         if ((id == null) || ((id = id.trim()).length() == 0)) {
