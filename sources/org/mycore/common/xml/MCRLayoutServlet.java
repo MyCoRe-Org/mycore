@@ -559,7 +559,7 @@ public class MCRLayoutServlet extends MCRServlet {
     }
     
     private static String getBaseURL(HttpServletRequest req){
-        boolean relative=CONFIG.getBoolean("MCR.LayoutServlet.Links.relative",true);
+        boolean relative=CONFIG.getBoolean("MCR.LayoutServlet.Links.relative",false);
         if (relative){
             String requestURI=req.getRequestURI();
             String contextPath=req.getContextPath();
