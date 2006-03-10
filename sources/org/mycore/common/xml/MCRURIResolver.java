@@ -108,6 +108,7 @@ public class MCRURIResolver implements javax.xml.transform.URIResolver, EntityRe
         supportedSchemes.put("session", new MCRSessionResolver());
         supportedSchemes.put("access", new MCRACLResolver());
         supportedSchemes.put("resource", new MCRResourceResolver());
+        supportedSchemes.put("localclass", new MCRLocalClassResolver());
         SUPPORTED_SCHEMES = Collections.unmodifiableMap(supportedSchemes);
     }
 
@@ -277,7 +278,7 @@ public class MCRURIResolver implements javax.xml.transform.URIResolver, EntityRe
         }
     }
 
-    private static interface MCRResolver {
+    public static interface MCRResolver {
         public Element resolveElement(String URI);
     }
 
@@ -459,6 +460,44 @@ public class MCRURIResolver implements javax.xml.transform.URIResolver, EntityRe
         }
 
     }
+    
+    private static class MCRLocalClassResolver implements MCRResolver {
+
+        /**
+         * Reads XML from the CLASSPATH of the application.
+         * 
+         * @param uri
+         *            the class name of the file in the format
+         *            localclass:org.mycore.ClassName?mode=getAll
+         *            
+         * @return the root element of the XML document
+         */
+        public Element resolveElement(String uri) {
+        	String classname = uri.substring(uri.indexOf(":") + 1,uri.indexOf("?"));
+        	Class cl = null;
+            Logger.getLogger(this.getClass()).debug("Loading Class: " + classname);
+            try {
+                cl = Class.forName(classname);
+            } catch (Exception ex) {
+            	LOGGER.error("Could not load class " + classname, ex);
+            }
+            Object o = null;
+            try {
+                try {
+                    o = cl.newInstance();
+                } catch (Exception ex) {
+                	LOGGER.error("Could not instantiate class " + classname, ex);
+                	return new Element("error");
+                }
+                MCRResolver resolver = (MCRResolver) o;
+                return resolver.resolveElement(uri);
+            }catch(Exception ex) {
+            	LOGGER.error("Could not resolve uri " + uri, ex);
+            	return new Element("error");
+            }
+        }
+
+    }    
 
     private static class MCRSessionResolver implements MCRResolver {
 
