@@ -464,7 +464,8 @@ public class MCRURIResolver implements javax.xml.transform.URIResolver, EntityRe
     private static class MCRLocalClassResolver implements MCRResolver {
 
         /**
-         * Reads XML from the CLASSPATH of the application.
+         * Delivers a jdom Element created by any local class that
+         *   implements MCRResolver
          * 
          * @param uri
          *            the class name of the file in the format
