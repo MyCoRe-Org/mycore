@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
 <!-- ============================================== -->
-<!-- $Revision: 1.1 $ $Date: 2005-12-14 13:33:01 $ -->
+<!-- $Revision: 1.2 $ $Date: 2006-03-14 11:18:54 $ -->
 <!-- ============================================== --> 
 
 <xsl:stylesheet 
@@ -12,7 +12,7 @@
   indent="yes"
   method="xml" 
   encoding="UTF-8"
-  doctype-system="http://java.sun.com/dtd/web-app_2_3.dtd"  
+  doctype-system="web-app_2_3.dtd"  
   doctype-public="-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
 />
 <xsl:strip-space elements="*" />
