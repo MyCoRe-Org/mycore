@@ -200,42 +200,37 @@ final public class MCRDerivate extends MCRBase {
             throw new MCRPersistenceException("The derivate " + mcr_id.getId() + " allready exists, nothing done.");
         }
 
-        // prepare the derivate metadata and store under the XML table
-        if (mcr_service.getDate("createdate") == null || !importMode) {
-        	mcr_service.setDate("createdate");
-        }
-        if (mcr_service.getDate("modifydate") == null || !importMode) {
-        	mcr_service.setDate("modifydate");	
-        }
-        
-        // handle events
-        MCREvent evt = new MCREvent(MCREvent.DERIVATE_TYPE, MCREvent.CREATE_EVENT);
-        evt.put("derivate", this);
-        MCREventManager.instance().handleEvent(evt);
-
         // create data in IFS
         if (getDerivate().getInternals() != null) {
             File f = new File(getDerivate().getInternals().getSourcePath());
 
             if ((!f.isDirectory()) && (!f.isFile())) {
-                // handle events
-                evt = new MCREvent(MCREvent.DERIVATE_TYPE, MCREvent.DELETE_EVENT);
-                evt.put("derivate", this);
-                MCREventManager.instance().handleEvent(evt);
                 throw new MCRPersistenceException("The File or Directory on " + getDerivate().getInternals().getSourcePath() + " was not found.");
             }
-
+            MCRDirectory difs = null;
             try {
-                MCRDirectory difs = MCRFileImportExport.importFiles(f, mcr_id.getId());
+                difs = MCRFileImportExport.importFiles(f, mcr_id.getId());
                 getDerivate().getInternals().setIFSID(difs.getID());
             } catch (Exception e) {
-                // handle events
-                evt = new MCREvent(MCREvent.DERIVATE_TYPE, MCREvent.DELETE_EVENT);
-                evt.put("derivate", this);
-                MCREventManager.instance().handleEvent(evt);
-                throw new MCRPersistenceException("Error while creating " + getDerivate().getInternals().getSourcePath() + " in the IFS.", e);
+                if (difs != null) {
+                    difs.delete();
+                }
+                    throw new MCRPersistenceException("Can't add derivate to the IFS",e);
             }
         }
+
+        // prepare the derivate metadata and store under the XML table
+        if (mcr_service.getDate("createdate") == null || !importMode) {
+            mcr_service.setDate("createdate");
+        }
+        if (mcr_service.getDate("modifydate") == null || !importMode) {
+            mcr_service.setDate("modifydate");
+        }
+
+        // handle events
+        MCREvent evt = new MCREvent(MCREvent.DERIVATE_TYPE, MCREvent.CREATE_EVENT);
+        evt.put("derivate", this);
+        MCREventManager.instance().handleEvent(evt);
 
         // add the link to metadata
         MCRObject obj;
@@ -516,9 +511,9 @@ final public class MCRDerivate extends MCRBase {
      *                if a persistence problem is occured
      */
     public final void updateXMLInDatastore() throws MCRPersistenceException {
-    	if(!importMode || mcr_service.getDate("modifydate") == null){
-    		mcr_service.setDate("modifydate");	
-    	}
+        if (!importMode || mcr_service.getDate("modifydate") == null) {
+            mcr_service.setDate("modifydate");
+        }
         MCREvent evt = new MCREvent(MCREvent.DERIVATE_TYPE, MCREvent.UPDATE_EVENT);
         evt.put("derivate", this);
         MCREventManager.instance().handleEvent(evt);
