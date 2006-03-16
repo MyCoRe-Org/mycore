@@ -2,7 +2,7 @@
 
   <!-- =================================================================== -->
   <!-- MyCoRe build file for use with Apache Ant                           -->
-  <!-- $Revision: 1.112 $ $Date: 2006-02-28 10:34:27 $                      -->
+  <!-- $Revision: 1.113 $ $Date: 2006-03-16 17:11:32 $                      -->
   <!-- =================================================================== -->
 
 <project default="usage" basedir=".">
@@ -66,7 +66,7 @@
     <echo>Operating system : ${os.name} Version ${os.version} on ${os.arch} </echo>
     <echo>Java version     : JDK ${ant.java.version} Version ${java.version} from ${java.vendor}</echo>
     <echo>Java home        : ${env.JAVA_HOME}</echo>
-    <echo>Ant build file   : $Revision: 1.112 $ $Date: 2006-02-28 10:34:27 $</echo>
+    <echo>Ant build file   : $Revision: 1.113 $ $Date: 2006-03-16 17:11:32 $</echo>
     <echo>Ant version      : ${ant.version}</echo>
     <echo>Ant home         : ${ant.home}</echo>
     <echo>XML Store type   : ${MCR.XMLStore.Type}</echo>
@@ -182,6 +182,11 @@
     <antcall target="create_service">
       <param name="service" value="org.mycore.services.plugins.TextFilterPlugin"/>
       <param name="provider" value="org.mycore.services.plugins.XmlHtmlPlugin"/>
+      <param name="append" value="true"/>
+    </antcall>
+    <antcall target="create_service">
+      <param name="service" value="org.mycore.services.plugins.TextFilterPlugin"/>
+      <param name="provider" value="org.mycore.services.plugins.OpenDocumentTextPlugin"/>
       <param name="append" value="true"/>
     </antcall>
     <jar 

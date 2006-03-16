@@ -30,16 +30,16 @@ package org.mycore.services.plugins;
  * Need to insert some things here
  * 
  */
-public class OoTextPlugin extends OpenOfficeBasePlugin {
+public class OpenDocumentTextPlugin extends OpenOfficeBasePlugin {
     private static final int MAJOR = 0;
 
-    private static final int MINOR = 5;
+    private static final int MINOR = 1;
 
-    public OoTextPlugin() {
-        this("sxw");
+    public OpenDocumentTextPlugin() {
+        this("odt");
     }
 
-    private OoTextPlugin(String contentType) {
+    private OpenDocumentTextPlugin(String contentType) {
         super(contentType);
     }
 
@@ -49,7 +49,7 @@ public class OoTextPlugin extends OpenOfficeBasePlugin {
      * @see org.mycore.services.plugins.TextFilterPlugin#getName()
      */
     public String getName() {
-        return "Yagee's amazing OpenOffice.org Text Filter";
+        return "Yagee's amazing OpenDocument Text Filter";
     }
 
     /*
@@ -58,7 +58,7 @@ public class OoTextPlugin extends OpenOfficeBasePlugin {
      * @see org.mycore.services.plugins.TextFilterPlugin#getInfo()
      */
     public String getInfo() {
-        return "This filter extracts the text out of a OpenOffice.org Text Document";
+        return "This filter extracts the text out of a OpenDocument Text Document";
     }
 
     /**
@@ -76,10 +76,10 @@ public class OoTextPlugin extends OpenOfficeBasePlugin {
     }
 
     String getTextNameSpace() {
-        return "http://openoffice.org/2000/text";
+        return "urn:oasis:names:tc:opendocument:xmlns:text:1.0";
     }
 
     String getDocumentName() {
-        return "OpenOffice.org Text Document";
+        return "OpenDocument Text Document";
     }
 }
