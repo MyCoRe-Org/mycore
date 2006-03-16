@@ -96,13 +96,13 @@ public class MCRCStoreLucene extends MCRCStoreLocalFilesystem implements MCRText
      * Syntax:
      * 
      * <pre>
-     * 
-     * 
-     *    foo bar   : search for foo AND bar anywhere across the files of the derivate
-     *    foo -bar  : search for foo and no file of the derivate may contain bar
-     *    &quot;foo bar&quot; : any file of the derivate must contain the phrase foo bar.
-     * 
-     * 
+     *  
+     *  
+     *     foo bar   : search for foo AND bar anywhere across the files of the derivate
+     *     foo -bar  : search for foo and no file of the derivate may contain bar
+     *     &quot;foo bar&quot; : any file of the derivate must contain the phrase foo bar.
+     *  
+     *  
      * </pre>
      * 
      * @param docTextQuery
@@ -282,8 +282,7 @@ public class MCRCStoreLucene extends MCRCStoreLocalFilesystem implements MCRText
      */
     protected String doStoreContent(MCRFileReader file, MCRContentInputStream source) throws Exception {
         if (!PLUGIN_MANAGER.isSupported(file.getContentType())) {
-            throw new MCRPersistenceException(new StringBuffer(file.getContentTypeID()).append(" is not supported by any TextFilterPlugin detected").append(" by the TextFilterPluginManager.\n").append("Make sure you have a Plugin installed in the proper directory:").append(CONF.getString("MCR.PluginDirectory", "(not configured yet)")).append(
-                    "\nIf you don't have the right Plugin ready, reasign \"").append(file.getContentTypeID()).append("\" to another ContentStore.\n").append("Read the manual on how to do this!").toString());
+            throw new MCRPersistenceException(new StringBuffer(file.getContentTypeID()).append(" is not supported by any TextFilterPlugin detected").append(" by the TextFilterPluginManager.\n").append("Make sure you have a Plugin installed in the proper directory:").append(CONF.getString("MCR.PluginDirectory", "(not configured yet)")).append("\nIf you don't have the right Plugin ready, reasign \"").append(file.getContentTypeID()).append("\" to another ContentStore.\n").append("Read the manual on how to do this!").toString());
         }
 
         String returns = super.doStoreContent(file, source);
@@ -291,6 +290,7 @@ public class MCRCStoreLucene extends MCRCStoreLocalFilesystem implements MCRText
             throw new MCRPersistenceException("Failed to store file " + file.getID() + " to local file system!");
         }
 
+        file.setStorageID(returns);
         Document doc = getDocument(file);
 
         Field storageID = new Field(STORAGE_FIELD, returns, true, true, false);
@@ -333,12 +333,12 @@ public class MCRCStoreLucene extends MCRCStoreLocalFilesystem implements MCRText
 
         // reader is instance of MCRFile
         // ownerID is derivate ID for all mycore files
-            MCRFile file = (MCRFile) reader;
-            Field derivateID = new Field(DERIVATE_FIELD, file.getOwnerID(), true, true, false);
-            Field fileID = new Field("FileID", file.getID(), true, true, false);
-            LOGGER.debug("adding fields to document");
-            returns.add(derivateID);
-            returns.add(fileID);
+        MCRFile file = (MCRFile) reader;
+        Field derivateID = new Field(DERIVATE_FIELD, file.getOwnerID(), true, true, false);
+        Field fileID = new Field("FileID", file.getID(), true, true, false);
+        LOGGER.debug("adding fields to document");
+        returns.add(derivateID);
+        returns.add(fileID);
 
         try {
             InputStream stream = file.getContentAsInputStream();
@@ -435,7 +435,8 @@ public class MCRCStoreLucene extends MCRCStoreLocalFilesystem implements MCRText
      * 
      * @param fieldName
      * @param query
-     * @return a set of search results that matches the biggest subquery of query
+     * @return a set of search results that matches the biggest subquery of
+     *         query
      */
     private HashSet getUniqueFieldValues(String fieldName, String query) {
         HashSet collector = new HashSet();

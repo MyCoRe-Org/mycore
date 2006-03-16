@@ -205,6 +205,16 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
     }
 
     /**
+     * The methodset the storage ID that identifies the place where the
+     * MCRContentStore has stored the content of this file
+     */
+    public void setStorageID(String storageID) {
+        if (storageID == null)
+            return;
+        this.storageID = storageID;
+    }
+
+    /**
      * Returns the MCRContentStore instance that holds the content of this file
      * 
      * @return the MCRContentStore instance that holds the content of this file,
@@ -263,7 +273,7 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
         MCRArgumentChecker.ensureNotNull(source, "source file");
         MCRArgumentChecker.ensureIsTrue(source.exists(), "source file does not exist:" + source.getPath());
         MCRArgumentChecker.ensureIsTrue(source.canRead(), "source file not readable:" + source.getPath());
-
+        System.out.println("#################" + source.getPath());
         FileInputStream fin = null;
 
         try {
@@ -332,8 +342,9 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
         {
             MCRContentStore store = MCRContentStoreFactory.selectStore(this);
 
-            storageID = store.storeContent(this, cis);
             storeID = store.getID();
+            storageID = store.storeContent(this, cis);
+            // storeID = store.getID();
         }
 
         size = cis.getLength();
