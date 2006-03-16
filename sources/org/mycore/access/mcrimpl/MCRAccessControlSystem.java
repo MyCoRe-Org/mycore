@@ -58,6 +58,7 @@ public class MCRAccessControlSystem extends MCRAccessBaseImpl{
 	
 	public static final String systemRulePrefix = "SYSTEMRULE" ;
 	public static final String poolPrivilegeID = "POOLPRIVILEGE" ;
+	public static final String lexicographicalPattern = "0000000000" ;
 	
 	static String superuserID = MCRConfiguration.instance().getString("MCR.users_superuser_username", "mcradmin");
 	
@@ -324,13 +325,17 @@ public class MCRAccessControlSystem extends MCRAccessBaseImpl{
      */
     public synchronized String getNextFreeRuleID(String prefix) {
     	int nextFreeID;
+    	String sNextFreeID;
     	if(nextFreeRuleID.containsKey(prefix)) {
-    		nextFreeID = ((Integer)nextFreeRuleID.get(prefix)).intValue();
+    		sNextFreeID =  (String) nextFreeRuleID.get(prefix);
+    			//((Integer)nextFreeRuleID.get(prefix)).intValue();
     	}else {
     		nextFreeID = ruleStore.getNextFreeRuleID(prefix);
-    	}
-    	nextFreeRuleID.put(prefix, new Integer(nextFreeID + 1));
-    	return prefix + String.valueOf(nextFreeID);
+    		sNextFreeID = lexicographicalPattern + String.valueOf(nextFreeID+1);
+    		sNextFreeID = sNextFreeID.substring(sNextFreeID.length()-lexicographicalPattern.length());
+    	}    	    	
+    	nextFreeRuleID.put(prefix, sNextFreeID);
+    	return prefix + sNextFreeID;
 	}
     
     /**
