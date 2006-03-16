@@ -203,7 +203,7 @@ public class TextFilterPluginManager {
         File[] plugins = pluginDir.listFiles();
 
         for (int i = 0; i < plugins.length; i++) {
-            LOGGER.debug(plugins[i].getName());
+            // LOGGER.debug(plugins[i].getName());
 
             if (plugins[i].isFile() && plugins[i].getName().toUpperCase().endsWith(".JAR")) {
                 // This Jar file possibly contains a text filter plugin
