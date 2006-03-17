@@ -273,7 +273,6 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
         MCRArgumentChecker.ensureNotNull(source, "source file");
         MCRArgumentChecker.ensureIsTrue(source.exists(), "source file does not exist:" + source.getPath());
         MCRArgumentChecker.ensureIsTrue(source.canRead(), "source file not readable:" + source.getPath());
-        System.out.println("#################" + source.getPath());
         FileInputStream fin = null;
 
         try {
