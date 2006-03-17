@@ -281,15 +281,18 @@ public class MCRCStoreLucene extends MCRCStoreLocalFilesystem implements MCRText
      *      org.mycore.datamodel.ifs.MCRContentInputStream)
      */
     protected String doStoreContent(MCRFileReader file, MCRContentInputStream source) throws Exception {
-        if (!PLUGIN_MANAGER.isSupported(file.getContentType())) {
-            throw new MCRPersistenceException(new StringBuffer(file.getContentTypeID()).append(" is not supported by any TextFilterPlugin detected").append(" by the TextFilterPluginManager.\n").append("Make sure you have a Plugin installed in the proper directory:").append(CONF.getString("MCR.PluginDirectory", "(not configured yet)")).append("\nIf you don't have the right Plugin ready, reasign \"").append(file.getContentTypeID()).append("\" to another ContentStore.\n").append("Read the manual on how to do this!").toString());
-        }
 
+        // store the data file
         String returns = super.doStoreContent(file, source);
         if ((returns == null) || (returns.length() == 0)) {
             throw new MCRPersistenceException("Failed to store file " + file.getID() + " to local file system!");
         }
 
+        // extract text data
+        if (!PLUGIN_MANAGER.isSupported(file.getContentType())) {
+            LOGGER.warn(new StringBuffer(file.getContentTypeID()).append(" is not supported by any TextFilterPlugin detected").append(" by the TextFilterPluginManager.\n").append("Make sure you have a Plugin installed in the proper directory:").append(CONF.getString("MCR.PluginDirectory", "(not configured yet)")).append("\nIf you don't have the right Plugin ready, reasign \"").append(file.getContentTypeID()).append("\" to another ContentStore.\n").append("Read the manual on how to do this!").toString());
+        }
+        
         file.setStorageID(returns);
         Document doc = getDocument(file);
 
