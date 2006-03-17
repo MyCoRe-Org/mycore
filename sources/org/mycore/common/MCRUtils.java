@@ -826,7 +826,7 @@ public class MCRUtils {
         // Put all class names matching Service in nameSet
         while (services.hasMoreElements()) {
             URL url = (URL) services.nextElement();
-            System.out.println(url);
+            LOGGER.debug(url);
 
             InputStream input = null;
             BufferedReader reader = null;
