@@ -56,7 +56,7 @@ abstract class OpenOfficeBasePlugin implements TextFilterPlugin {
 
     private static final String SAXparser = "org.apache.xerces.parsers.SAXParser";
 
-    private static HashSet contentTypes;
+    private HashSet contentTypes;
 
     private static int DEF_BYTE_SZ = 1024 * 63;
 
