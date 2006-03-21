@@ -69,7 +69,7 @@ import org.mycore.datamodel.metadata.MCRObjectID;
  * For a new MetaDataType, e.g. MCRMetaFooBaar, create a method
  * 
  * <pre>
- *         boolean checkMCRMetaFooBar(Element)
+ *           boolean checkMCRMetaFooBar(Element)
  * </pre>
  * 
  * use the following methods in that method to do common tasks on element
@@ -116,7 +116,7 @@ public class MCREditorOutValidator {
         // read the list of user add to ACL's
         adduserlist = new ArrayList();
         String inline = MCRConfiguration.instance().getString("MCR.AccessAddUser", "read");
-        StringTokenizer st = new StringTokenizer(inline,",");
+        StringTokenizer st = new StringTokenizer(inline, ",");
         while (st.hasMoreTokens()) {
             adduserlist.add(st.nextToken());
         }
@@ -136,10 +136,10 @@ public class MCREditorOutValidator {
         this.input = jdom_in;
         this.id = id;
         byte[] xml = MCRUtils.getByteArray(input);
-System.out.println(new String(xml));
+        System.out.println(new String(xml));
         checkObject();
         xml = MCRUtils.getByteArray(input);
-System.out.println(new String(xml));
+        System.out.println(new String(xml));
     }
 
     /**
@@ -487,23 +487,27 @@ System.out.println(new String(xml));
                             org.jdom.Element acl = (org.jdom.Element) acllist.get(i);
                             if (acl != null) {
                                 String perm = acl.getAttributeValue("permission");
-                                org.jdom.Element condition = acl.getChild("condition");
-                                if (condition != null) {
-                                    if (adduserlist.contains(perm)) {
-                                        org.jdom.Element bool = condition.getChild("boolean");
-                                        if (bool != null) {
-                                            org.jdom.Element obool = (org.jdom.Element) bool.clone();
+                                if (adduserlist.contains(perm)) {
+                                    org.jdom.Element condition = acl.getChild("condition");
+                                    if (condition != null) {
+                                        org.jdom.Element rootbool = condition.getChild("boolean");
+                                        if (rootbool != null) {
+                                            org.jdom.Element andbool = (org.jdom.Element) rootbool.clone();
                                             condition.removeContent();
-                                            org.jdom.Element nbool = new org.jdom.Element("boolean");
-                                            nbool.setAttribute("operator", "or");
-                                            org.jdom.Element user = new org.jdom.Element("condition");
-                                            user.setAttribute("field", "user");
-                                            user.setAttribute("operator", "=");
-                                            String thisuser = MCRSessionMgr.getCurrentSession().getCurrentUserID();
-                                            user.setAttribute("value", thisuser);
-                                            nbool.addContent(user);
-                                            nbool.addContent(obool);
-                                            condition.addContent(nbool);
+                                            List orbool = andbool.getChildren("boolean");
+                                            for (int j = 0; j < orbool.size(); j++) {
+                                                org.jdom.Element oneorbool = (org.jdom.Element) orbool.get(j);
+                                                org.jdom.Element firstcond = oneorbool.getChild("condition");
+                                                if (firstcond != null) {
+                                                    String field = firstcond.getAttributeValue("field");
+                                                    if (field == null)
+                                                        continue;
+                                                    if (!field.equals("user") && !field.equals("group"))
+                                                        continue;
+                                                    oneorbool.addContent(getCurrentUser());
+                                                }
+                                            }
+                                            condition.addContent(andbool);
                                         }
                                     }
                                 }
@@ -513,9 +517,24 @@ System.out.println(new String(xml));
                     service.addContent(acls);
                 }
             } catch (Exception e) {
+                e.printStackTrace();
                 LOGGER.warn("Error while parsing file editor_default_acls_....xml.");
             }
         }
+    }
+
+    /**
+     * The method build the condition element of the current user
+     * 
+     * @return a JDOM Element
+     */
+    private final org.jdom.Element getCurrentUser() {
+        org.jdom.Element user = new org.jdom.Element("condition");
+        user.setAttribute("field", "user");
+        user.setAttribute("operator", "=");
+        String thisuser = MCRSessionMgr.getCurrentSession().getCurrentUserID();
+        user.setAttribute("value", thisuser);
+        return user;
     }
 
     /**
@@ -568,7 +587,7 @@ System.out.println(new String(xml));
                 org.jdom.Element acls = xml.getRootElement().getChild("servacls");
                 if (acls != null) {
                     acls.detach();
-                    service.addContent((org.jdom.Element)acls.clone());
+                    service.addContent((org.jdom.Element) acls.clone());
                 }
             } catch (Exception e) {
                 LOGGER.warn("Error while parsing file editor_default_acls_....xml.");
