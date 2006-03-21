@@ -108,48 +108,54 @@ public class MCRStartEditorServlet extends MCRServlet {
      * <tr>
      * <th>TODO</th>
      * <th>MCRObjectID from</th>
-     * <th>used privileg</th>
+     * <th>permissions</th>
      * <th>description</th>
      * </tr>
      * <tr>
      * <td>seditobj</td>
      * <td>tf_mcrid</td>
-     * <td>modify-type</td>
+     * <td>writedb</td>
      * <td>edit an object in the server</td>
      * </tr>
      * <tr>
      * <td>sdelobj</td>
      * <td>tf_mcrid</td>
-     * <td>delete-type</td>
+     * <td>deletedb</td>
      * <td>delete an object from the server</tr>
      * <tr>
      * <td>snewder</td>
      * <td>tf_mcrid</td>
-     * <td>create-type</td>
+     * <td>writedb</td>
      * <td>create a new derivate in the server</tr>
      * <tr>
      * <td>sdelder</td>
      * <td>tf_mcrid</td>
-     * <td>delete-type</td>
+     * <td>deletedb</td>
      * <td>delete a derivate from the server</tr>
      * <tr>
      * <td>seditder</td>
      * <td>tf_mcrid</td>
-     * <td>modify-type</td>
+     * <td>writedb</td>
      * <td>change a derivate in the server</tr>
      * <tr>
      * <td>saddfile</td>
      * <td>tf_mcrid <br />
      * re_mcrid</td>
-     * <td>modify-type</td>
+     * <td>writedb</td>
      * <td>add a new file to a derivate in the server</td>
      * </tr>
      * <tr>
      * <td>sdelfile</td>
      * <td>tf_mcrid <br />
      * re_mcrid</td>
-     * <td>modify-type</td>
+     * <td>writedb</td>
      * <td>remove a file from a derivate in the server</td>
+     * </tr>
+     * <tr>
+     * <td>seditacl</td>
+     * <td>se_mcrid</td>
+     * <td>writedb</td>
+     * <td>edit the ACL's of an object in the workflow</td>
      * </tr>
      * </table> <br />
      * 
@@ -158,7 +164,7 @@ public class MCRStartEditorServlet extends MCRServlet {
      * <tr>
      * <th>TODO</th>
      * <th>MCRObjectID from</th>
-     * <th>used privileg</th>
+     * <th>permission</th>
      * <th>description</th>
      * </tr>
      * <tr>
@@ -170,47 +176,53 @@ public class MCRStartEditorServlet extends MCRServlet {
      * <tr>
      * <td>wnewder</td>
      * <td>se_mcrid</td>
-     * <td>create-type</td>
+     * <td>writewf</td>
      * <td>add a new derivate to the workflow</td>
      * </tr>
      * <tr>
      * <td>waddfile</td>
      * <td>se_mcrid <br />
      * re_mcrid</td>
-     * <td>create-type</td>
+     * <td>writewf</td>
      * <td>add a new file to a derivate in the workflow</td>
      * </tr>
      * <tr>
      * <td>weditobj</td>
      * <td>se_mcrid</td>
-     * <td>modify-type</td>
+     * <td>writewf</td>
      * <td>edit an object in the workflow</td>
      * </tr>
      * <tr>
      * <td>weditder</td>
      * <td>se_mcrid (Der) <br />
      * re_mcrid (Obj)</td>
-     * <td>modify-type</td>
+     * <td>writewf</td>
      * <td>edit an derivate in the workflow</td>
      * </tr>
      * <tr>
      * <td>wcommit</td>
      * <td>se_mcrid</td>
-     * <td>commit-type</td>
+     * <td>commitdb</td>
      * <td>commit a document to the server</td>
      * </tr>
      * <tr>
      * <td>wdelobj</td>
      * <td>se_mcrid</td>
-     * <td>delete-type</td>
+     * <td>deletewf</td>
      * <td>delete an object from the workflow</td>
      * </tr>
      * <tr>
      * <td>wdelder</td>
      * <td>se_mcrid <br />
      * re_mcrid</td>
-     * <td>delete-type</td>
+     * <td>deletewf</td>
      * <td>delete a derivate from the workflow</td>
+     * </tr>
+     * <tr>
+     * <td>weditacl</td>
+     * <td>se_mcrid</td>
+     * <td>writewf</td>
+     * <td>edit the ACL's of an object in the workflow</td>
      * </tr>
      * </table> <br />
      * <li>If the privileg is not correct it calls
@@ -277,7 +289,7 @@ public class MCRStartEditorServlet extends MCRServlet {
             mytodo = "wrongtodo";
         }
 
-        if (!mytodo.equals("wnewobj") && !mytodo.equals("wnewder") && !mytodo.equals("waddfile") && !mytodo.equals("wdelfile") && !mytodo.equals("weditobj") && !mytodo.equals("weditder") && !mytodo.equals("wdelobj") && !mytodo.equals("wdelder") && !mytodo.equals("wsetfile") && !mytodo.equals("wsetlabel") && !mytodo.equals("wcommit") && !mytodo.equals("seditobj") && !mytodo.equals("seditder") && !mytodo.equals("sdelobj") && !mytodo.equals("sdelder") && !mytodo.equals("snewder") && !mytodo.equals("scommitder") && !mytodo.equals("saddfile") && !mytodo.equals("snewfile") && !mytodo.equals("sdelfile") && !mytodo.equals("ssetlabel") && !mytodo.equals("ssetfile")) {
+        if (!mytodo.equals("wnewobj") && !mytodo.equals("wnewder") && !mytodo.equals("waddfile") && !mytodo.equals("wdelfile") && !mytodo.equals("weditobj") && !mytodo.equals("weditder") && !mytodo.equals("wdelobj") && !mytodo.equals("wdelder") && !mytodo.equals("wsetfile") && !mytodo.equals("wsetlabel") && !mytodo.equals("wcommit") && !mytodo.equals("weditacl") && !mytodo.equals("seditobj") && !mytodo.equals("seditder") && !mytodo.equals("sdelobj") && !mytodo.equals("sdelder") && !mytodo.equals("snewder") && !mytodo.equals("scommitder") && !mytodo.equals("saddfile") && !mytodo.equals("snewfile") && !mytodo.equals("sdelfile") && !mytodo.equals("ssetlabel") && !mytodo.equals("ssetfile") && !mytodo.equals("seditacl")) {
             mytodo = "wrongtodo";
         }
 
@@ -336,11 +348,12 @@ public class MCRStartEditorServlet extends MCRServlet {
         // get the MCRObjectID from the selcet field (SE)
         String mysemcrid = getProperty(job.getRequest(), "se_mcrid");
 
+        MCRObjectID mcrmysemcrid = null;
         if (mysemcrid == null) {
             mysemcrid = "";
         } else {
             try {
-                new MCRObjectID(mysemcrid);
+                mcrmysemcrid = new MCRObjectID(mysemcrid);
             } catch (Exception e) {
                 mysemcrid = "";
             }
@@ -752,6 +765,49 @@ public class MCRStartEditorServlet extends MCRServlet {
             sb = new StringBuffer();
             sb.append(getBaseURL()).append(pagedir).append("editor_").append(mytype).append("_editor.xml");
             job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(sb.toString()));
+
+            return;
+        }
+
+        // action WEDITACL in the database
+        if (mytodo.equals("weditacl")) {
+            org.jdom.Element rule = WFM.getRuleFromFile(mysemcrid, "writewf");
+            if (!AI.checkPermission(rule)) {
+                job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + usererrorpage));
+                return;
+            }
+            if (mysemcrid.length() == 0) {
+                job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + mcriderrorpage));
+                return;
+            }
+            
+            // read file
+            sb = new StringBuffer();
+            sb.append(CONFIG.getString("MCR.editor_" + mcrmysemcrid.getTypeId() + "_directory")).append(SLASH).append(mysemcrid).append(".xml");
+            org.jdom.Element service = null;
+            try {
+                File fi = new File(sb.toString());
+                if (fi.isFile() && fi.canRead()) {
+                    MCRObject obj = new MCRObject();
+                    obj.setFromURI(sb.toString());
+                    service = obj.getService().createXML();
+                } else {
+                    LOGGER.error("Can't read file " + sb.toString());
+                }
+            } catch (Exception ex) {
+                LOGGER.error("Can't read file " + sb.toString());
+            }
+
+            MCRSession session = MCRSessionMgr.getCurrentSession();
+            session.put("service",service);
+            String base = getBaseURL() + myfile;
+            Properties params = new Properties();
+            params.put("XSL.editor.source.url", "session:service");
+            params.put("XSL.editor.cancel.url", getBaseURL() + cancelpage);
+            params.put("mcrid", mysemcrid);
+            params.put("type", mytype);
+            params.put("step", mystep);
+            job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(buildRedirectURL(base, params)));
 
             return;
         }
