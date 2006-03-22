@@ -197,10 +197,42 @@ public class MCRConfiguration {
 
         String fn = System.getProperty("MCR.configuration.file", "mycore.properties");
         loadFromFile(fn);
+        substituteReferences();
 
         if (clear) {
             configureLogging();
         }
+    }
+
+    /**
+     * Substitute any %reference% in any property value with the value of the
+     * referenced property, recursively.
+     */
+    private void substituteReferences() {
+        boolean found;
+        do {
+            found = false;
+            Enumeration keys = properties.keys();
+            while (keys.hasMoreElements()) {
+                String key = (String) (keys.nextElement());
+                String value = properties.getProperty(key, "");
+                int pos1 = value.indexOf("%");
+                if (pos1 >= 0) {
+                    int pos2 = value.indexOf("%", pos1 + 1);
+                    if (pos2 == -1)
+                        continue;
+
+                    String ref = value.substring(pos1 + 1, pos2);
+                    String refValue = properties.getProperty(ref, null);
+                    if (refValue == null)
+                        continue;
+
+                    found = true;
+                    value = value.substring(0, pos1) + refValue + value.substring(pos2 + 1);
+                    properties.setProperty(key, value);
+                }
+            }
+        } while (found);
     }
 
     /**
@@ -217,17 +249,17 @@ public class MCRConfiguration {
      * @throws MCRConfigurationException
      *             if the file can not be loaded
      */
-    public void loadFromFile(String filename) {
+    private void loadFromFile(String filename) {
         MCRArgumentChecker.ensureNotEmpty(filename, "filename");
-        File mycoreProperties=new File(filename);
+        File mycoreProperties = new File(filename);
         InputStream in;
-        if (mycoreProperties.canRead()){
+        if (mycoreProperties.canRead()) {
             try {
                 in = new FileInputStream(mycoreProperties);
             } catch (FileNotFoundException e) {
-                //should never happend, because we verified it allready with canRead() above
+                // should never happend, because we verified it allready with canRead() above
                 String msg = "Could not find configuration file " + filename;
-                throw new MCRConfigurationException(msg,e);
+                throw new MCRConfigurationException(msg, e);
             }
         } else {
             in = this.getClass().getResourceAsStream("/" + filename);
@@ -421,16 +453,13 @@ public class MCRConfiguration {
      */
     public Object getSingleInstanceOf(String name, String defaultname) throws MCRConfigurationException {
         if (instanceHolder == null) {
-            instanceHolder = new Hashtable(); // initialize the hashtable if
+            instanceHolder = new Hashtable(); // initialize the hashtable if it's not yet
         }
-        // it's not yet
         else if (instanceHolder.containsKey(name)) {
-            return instanceHolder.get(name); // we have an instance allready,
+            return instanceHolder.get(name); // we have an instance allready, return it
         }
 
-        // return it
-        Object inst = getInstanceOf(name, defaultname); // we need a new
-                                                        // instance, get it
+        Object inst = getInstanceOf(name, defaultname); // we need a new instance, get it
         instanceHolder.put(name, inst); // save the instance in the hashtable
 
         return inst;
