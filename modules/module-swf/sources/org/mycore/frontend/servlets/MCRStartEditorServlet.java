@@ -78,6 +78,9 @@ import org.mycore.frontend.workflow.MCRSimpleWorkflowManager;
  * @version $Revision$ $Date$
  */
 public class MCRStartEditorServlet extends MCRServlet {
+
+    private static final long serialVersionUID = 1L;
+
     // The configuration
     private static Logger LOGGER = Logger.getLogger(MCRStartEditorServlet.class);
 
@@ -610,11 +613,7 @@ public class MCRStartEditorServlet extends MCRServlet {
                         }
                     }
 
-                    sb = (new StringBuffer("MCR.type_")).append(mytype).append("_in");
-
-                    String searchtype = CONFIG.getString(sb.toString(), mytype);
-                    sb = new StringBuffer("servlets/MCRQueryServlet?mode=ObjectMetadata&type=");
-                    sb.append(searchtype).append("&hosts=local&query=%2Fmycoreobject[%40ID%3D\'").append(mysemcrid).append("\']");
+                    sb = new StringBuffer("receive/").append(mysemcrid);
                     myfile = sb.toString();
                 } else {
                     myfile = storeerrorpage;
@@ -824,7 +823,7 @@ public class MCRStartEditorServlet extends MCRServlet {
             }
 
             sb = new StringBuffer();
-            sb.append(getBaseURL()).append("servlets/MCRQueryServlet").append("?XSL.Style=editor").append("&mode=ObjectMetadata").append("&type=").append(mytype).append("&hosts=").append(CONFIG.getString("MCR.editor_baseurl", "local")).append("&query=/mycoreobject%5b@ID=%22").append(mytfmcrid).append("%22%5d");
+            sb.append(getBaseURL()).append("receive/").append(mytfmcrid).append("?XSL.Style=editor");
 
             String base = getBaseURL() + myfile;
             Properties params = new Properties();
@@ -901,8 +900,7 @@ public class MCRStartEditorServlet extends MCRServlet {
 
                 String searchtype = CONFIG.getString(sb.toString(), ID.getTypeId());
                 sb = new StringBuffer();
-                sb.append("servlets/MCRQueryServlet?mode=ObjectMetadata&type=");
-                sb.append(searchtype).append("&hosts=local&query=%2Fmycoreobject[%40ID%3D\'").append(myremcrid).append("\']");
+                sb.append("receive/").append(myremcrid);
                 myfile = sb.toString();
             } catch (Exception e) {
                 myfile = deleteerrorpage;
@@ -1015,8 +1013,7 @@ public class MCRStartEditorServlet extends MCRServlet {
 
                 String searchtype = CONFIG.getString(sb.toString(), ID.getTypeId());
                 sb = new StringBuffer(getBaseURL());
-                sb.append("servlets/MCRQueryServlet?mode=ObjectMetadata&type=");
-                sb.append(searchtype).append("&hosts=local&query=%2Fmycoreobject[%40ID%3D\'").append(myremcrid).append("\']");
+                sb.append("receive/").append(myremcrid);
                 job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(sb.toString()));
 
                 return;
@@ -1087,10 +1084,8 @@ public class MCRStartEditorServlet extends MCRServlet {
             sb = new StringBuffer();
             sb = (new StringBuffer("MCR.type_")).append(ID.getTypeId()).append("_in");
 
-            String searchtype = CONFIG.getString(sb.toString(), ID.getTypeId());
             sb = new StringBuffer(getBaseURL());
-            sb.append("servlets/MCRQueryServlet?mode=ObjectMetadata&type=");
-            sb.append(searchtype).append("&hosts=local&query=%2Fmycoreobject[%40ID%3D\'").append(myremcrid).append("\']");
+            sb.append("receive/").append(myremcrid);
             job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(sb.toString()));
 
             return;
