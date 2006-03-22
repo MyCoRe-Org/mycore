@@ -90,10 +90,6 @@ public class MCRIPAddress {
     }
     
     public String toString(){
-//        String s = "";
-//        for (int i=0; i<address.length; i++)
-//            s+=(address[i]&255) + ".";
-//        return s.substring(0,s.length()-1);
         StringBuffer sb = new StringBuffer("");
         for (int i=0; i<address.length; i++){
         	if(i > 0) 
