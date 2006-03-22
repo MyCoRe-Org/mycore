@@ -45,22 +45,22 @@ import org.apache.log4j.PropertyConfigurator;
  * MyCoRe configuration files. The class is implemented using the singleton
  * pattern. Using this class is very easy, here is an example:
  * 
- * <PRE>// Get a configuration property as a String: String driver =
- * MCRConfiguration.instance().getString( "MCR.jdbc.driver" ); // Get a
- * configuration property as an int, use 500 as default if not set: int max =
- * MCRConfiguration.instance().getInt( "MCR.cache.size", 500 );
- * 
+ * <PRE>
+ * // Get a configuration property as a String: 
+ * String driver = MCRConfiguration.instance().getString( "MCR.jdbc.driver" ); 
+ * // Get a configuration property as an int, use 500 as default if not set: 
+ * int max = MCRConfiguration.instance().getInt( "MCR.cache.size", 500 );
  * </PRE>
  * 
  * As you see, the class provides methods to get configuration properties as
  * different data types and allows you to specify defaults. All MyCoRe
  * configuration properties should start with "<CODE>MCR.</CODE>" When
- * <CODE>instance()</CODE> is called first, the file <B><CODE>
+ * <CODE>instance()</CODE> is called the first time, the file <B><CODE>
  * mycore.properties</CODE> </B> is read. It can be located somewhere in the
  * <CODE>CLASSPATH</CODE>, even in a jar or zip file. The properties file may
  * have a property called <B><CODE>MCR.configuration.include</CODE> </B> that
  * contains a comma-separated list of other configuration files to read
- * subsequently. The class also reads any Java <B>system properties </B> that
+ * subsequently. The class also reads any Java <B>system properties</B> that
  * start with "<CODE>MCR.</CODE>" and that are set when the application
  * starts. System properties will override properties read from the
  * configuration files. Furthermore, the name of the main configuration file can
@@ -68,10 +68,15 @@ import org.apache.log4j.PropertyConfigurator;
  * MCR.configuration.file</CODE> </B>. Here is an example:
  * 
  * <PRE>
+ * java -DMCR.configuration.file=some_other.properties -DMCR.foo=bar MyCoReSample
+ * </PRE>
  * 
- * java -DMCR.configuration.file=some_other.properties -DMCR.foo=bar
- * MyCoReSample
+ * Property values may include the values of other properties, recursively, by
+ * referencing the other property. Example:
  * 
+ * <PRE>
+ * MCR.Foo1=FooValue
+ * MCR.Foo2=Some %MCR.Foo1% more information
  * </PRE>
  * 
  * The class also provides methods for <B>listing or saving </B> all properties
@@ -88,9 +93,7 @@ import org.apache.log4j.PropertyConfigurator;
  * system property <CODE>MCR.configuration.class</CODE>, e. g.
  * 
  * <PRE>
- * 
  * java -DMCR.configuration.class=MCRConfigurationSubclass MyCoReSample
- * 
  * </PRE>
  * 
  * @see #loadFromFile
