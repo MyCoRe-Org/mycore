@@ -34,6 +34,7 @@ import org.mycore.datamodel.metadata.MCRActiveLinkException;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.workflow.MCREditorOutValidator;
 import org.mycore.frontend.workflow.MCRSimpleWorkflowManager;
+import org.mycore.user2.MCRUserMgr;
 
 /**
  * This class is the superclass of servlets which checks the MCREditorServlet
@@ -53,6 +54,9 @@ abstract public class MCRCheckBase extends MCRServlet {
     
     // The Workflow Manager
     protected static MCRSimpleWorkflowManager WFM = MCRSimpleWorkflowManager.instance();
+
+    // The User Manager
+    protected static MCRUserMgr UM = MCRUserMgr.instance();
 
     protected List errorlog;
 

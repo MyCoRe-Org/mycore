@@ -23,8 +23,6 @@
 
 package org.mycore.frontend.servlets;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
@@ -159,19 +157,37 @@ abstract public class MCRCheckACLBase extends MCRCheckBase {
                                 if (inbool.size() != 0 && outoper != null && !outoper.equals("true")) {
                                     for (int j = 0; j < inbool.size(); j++) {
                                         List incondlist = ((org.jdom.Element) inbool.get(j)).getChildren("condition");
-                                        int k = 0;
-                                        if (incondlist.size() != 0) {
-                                            for (int l = 0; l < incondlist.size(); l++) {
+                                        int k = incondlist.size();
+                                        if (k != 0) {
+                                            for (int l = 0; l < k; l++) {
                                                 org.jdom.Element incond = (org.jdom.Element) incondlist.get(l);
                                                 String condvalue = incond.getAttributeValue("value");
                                                 if (condvalue == null || (condvalue = condvalue.trim()).length() == 0) {
                                                     ((org.jdom.Element) inbool.get(j)).removeContent(incond);
-                                                } else {
-                                                    k++;
-                                                }                                     
+                                                    k--;
+                                                    l--;
+                                                    continue;                                                    
+                                                }
+                                                String condfield = incond.getAttributeValue("field");
+                                                if (condfield.equals("user")) {
+                                                    if(!UM.existUser(condvalue)) {
+                                                        ((org.jdom.Element) inbool.get(j)).removeContent(incond);
+                                                        k--;
+                                                        l--;
+                                                        continue;                                                                                                           
+                                                    }
+                                                }
+                                                if (condfield.equals("group")) {
+                                                    if(!UM.existGroup(condvalue)) {
+                                                        ((org.jdom.Element) inbool.get(j)).removeContent(incond);
+                                                        k--;
+                                                        l--;
+                                                        continue;                                                                                                           
+                                                    }
+                                                }
                                             }
                                             if (k == 0) {
-                                                ((org.jdom.Element) inbool.get(j)).setAttribute("operator","true");
+                                                ((org.jdom.Element) inbool.get(j)).setAttribute("operator", "true");
                                             }
                                         } else {
                                             logtext.add("Can't find an inner condition element.");

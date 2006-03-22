@@ -33,7 +33,6 @@ import org.mycore.common.MCRUtils;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.MCRObjectService;
-import org.mycore.frontend.workflow.MCRSimpleWorkflowManager;
 
 /**
  * The servlet store the MCREditorServlet output XML in a file of a MCR type
