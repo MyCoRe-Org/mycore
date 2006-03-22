@@ -40,20 +40,6 @@ import org.mycore.frontend.workflow.MCRSimpleWorkflowManager;
  * @version $Revision$ $Date$
  */
 public class MCRCheckEditDataServlet extends MCRCheckDataBase {
-	/**
-	 * The method check the privileg of this action.
-	 * 
-	 * @param privs
-	 *            the ArrayList of privilegs
-	 * @return true if the privileg exist, else return false
-	 */
-	public final boolean hasPrivileg(ArrayList privs, String type) {
-		if (!(privs.contains("modify-" + type))) {
-			return false;
-		}
-
-		return true;
-	}
 
 	/**
 	 * The method is a dummy and return an URL with the next working step.

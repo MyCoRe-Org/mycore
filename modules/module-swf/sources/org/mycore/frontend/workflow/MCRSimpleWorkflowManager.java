@@ -62,8 +62,6 @@ import org.mycore.frontend.cli.MCRObjectCommands;
  * 
  */
 public class MCRSimpleWorkflowManager {
-    /** New line */
-    static String NL = System.getProperty("file.separator");
 
     /** The link table manager singleton */
     protected static MCRSimpleWorkflowManager singleton;
@@ -81,9 +79,6 @@ public class MCRSimpleWorkflowManager {
     private Hashtable ht = null;
 
     private Hashtable mt = null;
-
-    // The file slash
-    private static String SLASH = System.getProperty("file.separator");;
 
     /**
      * Returns the workflow manager singleton.
@@ -274,7 +269,7 @@ public class MCRSimpleWorkflowManager {
      */
     public final boolean isDerivateOfObject(String type, String filename, String ID) {
         String dirname = getDirectoryPath(type);
-        String fname = dirname + SLASH + filename;
+        String fname = dirname + File.separator + filename;
         org.jdom.Document workflow_in = null;
 
         try {
@@ -327,7 +322,7 @@ public class MCRSimpleWorkflowManager {
      */
     public final void deleteMetadataObject(String type, String ID) {
         // remove metadate
-        String fn = getDirectoryPath(type) + SLASH + ID + ".xml";
+        String fn = getDirectoryPath(type) + File.separator + ID + ".xml";
 
         try {
             File fi = new File(fn);
@@ -367,7 +362,7 @@ public class MCRSimpleWorkflowManager {
         logger.debug("Delete the derivate " + id);
 
         // remove the XML file
-        String fn = getDirectoryPath(type) + SLASH + id;
+        String fn = getDirectoryPath(type) + File.separator + id;
 
         try {
             File fi = new File(fn + ".xml");
@@ -392,7 +387,7 @@ public class MCRSimpleWorkflowManager {
 
                 for (int j = 0; j < dellist.size(); j++) {
                     String na = (String) dellist.get(j);
-                    File fl = new File(fn + SLASH + na);
+                    File fl = new File(fn + File.separator + na);
 
                     if (fl.delete()) {
                         logger.debug("File " + na + " removed.");
@@ -406,7 +401,7 @@ public class MCRSimpleWorkflowManager {
 
                 for (int j = dellist.size() - 1; j > -1; j--) {
                     String na = (String) dellist.get(j);
-                    File fl = new File(fn + SLASH + na);
+                    File fl = new File(fn + File.separator + na);
 
                     if (fl.delete()) {
                         logger.debug("Directory " + na + " removed.");
@@ -441,7 +436,7 @@ public class MCRSimpleWorkflowManager {
      */
     public final boolean commitMetadataObject(String type, String ID) throws MCRActiveLinkException {
         // commit metadata
-        String fn = getDirectoryPath(type) + SLASH + ID + ".xml";
+        String fn = getDirectoryPath(type) + File.separator + ID + ".xml";
 
         if (MCRObject.existInDatastore(ID)) {
             MCRObjectCommands.updateFromFile(fn, false);
@@ -463,7 +458,7 @@ public class MCRSimpleWorkflowManager {
             logger.debug("Check the derivate file " + dername);
 
             if (isDerivateOfObject(type, dername, ID)) {
-                fn = getDirectoryPath(type) + SLASH + dername;
+                fn = getDirectoryPath(type) + File.separator + dername;
 
                 if (!loadDerivate(ID, fn)) {
                     return false;
@@ -484,7 +479,7 @@ public class MCRSimpleWorkflowManager {
      *            the ID as String of the derivate object
      */
     public final boolean commitDerivateObject(String type, String ID) {
-        String fn = getDirectoryPath(type) + SLASH + ID + ".xml";
+        String fn = getDirectoryPath(type) + File.separator + ID + ".xml";
 
         return loadDerivate(ID, fn);
     }
@@ -555,7 +550,7 @@ public class MCRSimpleWorkflowManager {
         logger.debug("New derivate ID " + DD.getId());
 
         // create a new directory
-        String dirname = workdir + NL + DD.getId();
+        String dirname = workdir + File.separator + DD.getId();
         File dir = new File(dirname);
         dir.mkdir();
         logger.debug("Directory " + dirname + " created.");
@@ -580,7 +575,7 @@ public class MCRSimpleWorkflowManager {
             if (server) {
                 obj.receiveFromDatastore(ID);
             } else {
-                obj.setFromURI(workdir + NL + ID.getId() + ".xml");
+                obj.setFromURI(workdir +File.separator  + ID.getId() + ".xml");
             }
 
             MCRObjectService serv = obj.getService();
@@ -592,7 +587,7 @@ public class MCRSimpleWorkflowManager {
                 MCRObjectService serv = obj.getService();
                 der.setService(serv);
             } catch (Exception e2) {
-                logger.warn("Read error of " + workdir + NL + ID.getId() + ".xml");
+                logger.warn("Read error of " + workdir + File.separator + ID.getId() + ".xml");
             }
         }
         MCRObjectService service = new MCRObjectService();
@@ -604,7 +599,7 @@ public class MCRSimpleWorkflowManager {
         byte[] outxml = MCRUtils.getByteArray(der.createXML());
 
         // Save the prepared MCRDerivate to a file
-        String fullname = workdir + NL + DD.getId() + ".xml";
+        String fullname = workdir + File.separator + DD.getId() + ".xml";
 
         try {
             FileOutputStream out = new FileOutputStream(fullname);
@@ -635,7 +630,7 @@ public class MCRSimpleWorkflowManager {
     public final org.jdom.Element getRuleFromFile(String id, String permission) {
         // read data
         MCRObjectID mcrid = new MCRObjectID(id);
-        String fn = getDirectoryPath(mcrid.getTypeId()) + SLASH + id + ".xml";
+        String fn = getDirectoryPath(mcrid.getTypeId()) + File.separator + id + ".xml";
         org.jdom.Element condition = new org.jdom.Element("condition");
         condition.setAttribute("format","xml");
         try {
