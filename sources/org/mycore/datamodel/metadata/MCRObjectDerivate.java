@@ -63,7 +63,7 @@ public class MCRObjectDerivate {
     public final void setFromDOM(org.jdom.Element derivate_element) {
         // Link to Metadata part
         org.jdom.Element linkmetas_element = derivate_element.getChild("linkmetas");
-
+        linkmetas.clear();
         if (linkmetas_element != null) {
             List linkmeta_element_list = linkmetas_element.getChildren();
             int linkmeta_len = linkmeta_element_list.size();
@@ -79,7 +79,7 @@ public class MCRObjectDerivate {
 
         // External part
         org.jdom.Element externals_element = derivate_element.getChild("externals");
-
+        externals.clear();
         if (externals_element != null) {
             List external_element_list = externals_element.getChildren();
             int external_len = external_element_list.size();
