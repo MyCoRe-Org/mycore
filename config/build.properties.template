@@ -114,15 +114,4 @@
 # MCR.WebAppServer.SharedJarsDir=
 
 #######################################################################
-# Experimental state DO NOT USE THIS !!!
-#######################################################################
-
-# XML:DB Tamino
-# MCR.XMLStore.Type=tamino
-# MCR.XMLStore.BaseDir=d:\\_Kannweg\\taminomcr\\libs
-# MCR.XMLStore.Jars=tamino_xmldb.jar TaminoAPI4J.jar
-
-#######################################################################
-# End of Experimental state DO NOT USE THIS !!!
-#######################################################################
 
