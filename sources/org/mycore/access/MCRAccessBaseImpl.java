@@ -194,7 +194,7 @@ public class MCRAccessBaseImpl implements MCRAccessInterface {
      * @see org.mycore.access.MCRAccessInterface#getAccessRule(java.lang.String,
      *      java.lang.String)
      */
-    public Element getRule(String objID, String pool) {
+    public Element getRule(String objID, String permission) {
         return null;
     }
 
@@ -203,7 +203,7 @@ public class MCRAccessBaseImpl implements MCRAccessInterface {
      * 
      * @see org.mycore.access.MCRAccessInterface#getAccessRule(java.lang.String)
      */
-    public Element getRule(String pool) {
+    public Element getRule(String permission) {
         return null;
     }
 
