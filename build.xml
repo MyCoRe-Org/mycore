@@ -2,10 +2,10 @@
 
   <!-- =================================================================== -->
   <!-- MyCoRe build file for use with Apache Ant                           -->
-  <!-- $Revision: 1.113 $ $Date: 2006-03-16 17:11:32 $                      -->
+  <!-- $Revision: 1.114 $ $Date: 2006-03-23 09:16:49 $                      -->
   <!-- =================================================================== -->
 
-<project default="usage" basedir=".">
+<project name="MyCoRe" default="usage" basedir=".">
 
   <!-- =================================================================== -->
   <!-- Global properties you normally should not change                    -->
@@ -66,7 +66,7 @@
     <echo>Operating system : ${os.name} Version ${os.version} on ${os.arch} </echo>
     <echo>Java version     : JDK ${ant.java.version} Version ${java.version} from ${java.vendor}</echo>
     <echo>Java home        : ${env.JAVA_HOME}</echo>
-    <echo>Ant build file   : $Revision: 1.113 $ $Date: 2006-03-16 17:11:32 $</echo>
+    <echo>Ant build file   : $Revision: 1.114 $ $Date: 2006-03-23 09:16:49 $</echo>
     <echo>Ant version      : ${ant.version}</echo>
     <echo>Ant home         : ${ant.home}</echo>
     <echo>XML Store type   : ${MCR.XMLStore.Type}</echo>
