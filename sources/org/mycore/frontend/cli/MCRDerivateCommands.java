@@ -43,6 +43,7 @@ import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.common.xml.MCRXMLHelper;
 import org.mycore.datamodel.ifs.MCRFileImportExport;
 import org.mycore.datamodel.metadata.MCRDerivate;
+import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 
 /**
@@ -152,8 +153,11 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
             }
 
             for (int i = from_i; i < (to_i + 1); i++) {
+           	
                 now.setNumber(i);
-                delete(now.getId());
+            	if ( MCRObject.existInDatastore(now) ) { 
+            		delete(now.getId());
+            	}
             }
         } catch (MCRException ex) {
             LOGGER.debug(ex.getStackTraceAsString());
@@ -542,7 +546,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
                 byte[] xml = null;
 
                 try {
-                    obj.receiveFromDatastore(nid.toString());
+                	obj.receiveFromDatastore(nid.toString());
                     String path = obj.getDerivate().getInternals().getSourcePath();
                     // reset from the absolute to relative path, for later reload
                     LOGGER.info("Old Internal Path ====>" + path);
