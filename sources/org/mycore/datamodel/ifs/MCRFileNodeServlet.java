@@ -76,7 +76,11 @@ public class MCRFileNodeServlet extends MCRServlet {
 
     // The Log4J logger
     private static Logger LOGGER = Logger.getLogger(MCRFileNodeServlet.class.getName());
-    private static String accessErrorPage = CONFIG.getString("MCR.access_page_error");
+    
+    // initialize it with an empty string -if propertie is missing, 
+    // because in a case of MCRConfigurationException, 
+    // no Servlet will be instantiated, and thats more bad then a missing property! 
+    private static String accessErrorPage = CONFIG.getString("MCR.access_page_error","");
 
     // The list of hosts from the configuration
     private ArrayList remoteAliasList = null;
