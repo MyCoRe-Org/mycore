@@ -84,7 +84,7 @@ public class MCRAndCondition implements MCRCondition {
 
     public Element toXML() {
     	Element cond = new Element("boolean");
-    	cond.setAttribute("operator", "AND");
+    	cond.setAttribute("operator", "and");
 
         for (int i = 0; i < children.size(); i++) {
             MCRCondition child = (MCRCondition) (children.get(i));
@@ -96,7 +96,7 @@ public class MCRAndCondition implements MCRCondition {
 
     public Element info() {
         Element el = new Element("info");
-        el.setAttribute(new Attribute("type", "AND"));
+        el.setAttribute(new Attribute("type", "and"));
         el.setAttribute(new Attribute("children", "" + children.size()));
 
         return el;

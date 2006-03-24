@@ -51,7 +51,7 @@ public class MCRFalseCondition implements MCRCondition {
 
     public Element info() {
         Element el = new Element("info");
-        el.setAttribute(new Attribute("type", "FALSE"));
+        el.setAttribute(new Attribute("type", "false"));
 
         return el;
     }

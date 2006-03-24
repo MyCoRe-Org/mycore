@@ -51,7 +51,7 @@ public class MCRTrueCondition implements MCRCondition {
 
     public Element info() {
         Element el = new Element("info");
-        el.setAttribute(new Attribute("type", "TRUE"));
+        el.setAttribute(new Attribute("type", "true"));
 
         return el;
     }
