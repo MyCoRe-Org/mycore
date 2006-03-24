@@ -153,7 +153,9 @@ public class MCRObjectCommands extends MCRAbstractCommands {
 
             for (int i = from_i; i < (to_i + 1); i++) {
                 now.setNumber(i);
-                delete(now.getId());
+            	if ( MCRObject.existInDatastore(now) ) { 
+            		delete(now.getId());
+            	}
             }
         } catch (MCRException ex) {
             LOGGER.debug(ex.getStackTraceAsString());
@@ -480,7 +482,11 @@ public class MCRObjectCommands extends MCRAbstractCommands {
 
                 byte[] xml = null;
 
+            	if ( ! MCRObject.existInDatastore(nid) ) 
+            		continue;
+
                 try {
+                	// if object do'snt exist - no exception is catched! 
                     xml = obj.receiveXMLFromDatastore(nid.toString());
                 } catch (MCRException ex) {
                     continue;
