@@ -23,6 +23,7 @@
 
 package org.mycore.backend.hibernate;
 
+import java.io.ByteArrayInputStream;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.Properties;
@@ -67,6 +68,8 @@ public class MCRHIBConnection {
     private static String driver;
 
     private static int maxUsages = Integer.MAX_VALUE;
+    
+    private static Logger logger = Logger.getLogger(MCRHIBConnection.class);
 
     MCRConfiguration config = MCRConfiguration.instance();
 
@@ -153,16 +156,26 @@ public class MCRHIBConnection {
      */
     private static void buildSessionFactory() {
         if (sessions == null) {
+        	configEhcache();
             sessions = cfg.buildSessionFactory();
         }
     }
 
     public void buildSessionFactory(Configuration config) {
         sessions.close();
+        configEhcache();
         sessions = config.buildSessionFactory();
         cfg = config;
     }
 
+    private static void configEhcache(){
+    	try{
+    		net.sf.ehcache.CacheManager.create(new ByteArrayInputStream("<?xml version=\"1.0\"?><ehcache><defaultCache maxElementsInMemory=\"10000\" eternal=\"false\" timeToIdleSeconds=\"120\" timeToLiveSeconds=\"120\" overflowToDisk=\"true\" diskPersistent=\"false\" diskExpiryThreadIntervalSeconds=\"120\"/></ehcache>".getBytes()));
+    	}catch(Exception e){
+    		logger.error("could not configure ehcache", e);
+    	}     	
+    }
+    
     /**
      * This method returns the current session for queries on the database
      * through hibernate

@@ -23,7 +23,6 @@
 
 package org.mycore.backend.hibernate;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -85,7 +84,6 @@ public class MCRTableGenerator {
             this.docOut = new Document(rootOut, dType);
             this.elclass = new Element("class");
 
-            net.sf.ehcache.CacheManager.create(new ByteArrayInputStream("<?xml version=\"1.0\"?><ehcache><defaultCache maxElementsInMemory=\"10000\" eternal=\"false\" timeToIdleSeconds=\"120\" timeToLiveSeconds=\"120\" overflowToDisk=\"true\" diskPersistent=\"false\" diskExpiryThreadIntervalSeconds=\"120\"/></ehcache>".getBytes()));
             this.intPKColumns = intPKColumns;
             this.classname = sqlName;
 
@@ -97,7 +95,7 @@ public class MCRTableGenerator {
                 docOut.getRootElement().setAttribute("package", Package);
             }
         } catch (Exception e) {
-            System.out.println(e.toString());
+            logger.error("table generator error", e);
         }
     }
 
