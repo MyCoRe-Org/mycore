@@ -534,11 +534,11 @@ public class MCRObjectService {
      */
     public final boolean isValid() {
         if (getISO8601Date("createdate") == null) {
-            return false;
+            setDate("createdate");
         }
 
         if (getISO8601Date("modifydate") == null) {
-            return false;
+            setDate("modifydate");
         }
 
         return true;
