@@ -140,38 +140,40 @@ public class MCRBooleanClauseParser {
 
         /* handle OR */
         Matcher m = or.matcher(s);
-
-        if (m.find()) {
-            if (m.start() <= 0) {
-                throw new MCRParseException("left side of OR missing while parsing \"" + s + "\"");
+        int last = 0;
+        MCROrCondition orclause = new MCROrCondition();
+        while(m.find()) {
+            int l1 = m.start();
+            if (last >= l1) {
+                throw new MCRParseException("subclause of OR missing while parsing \"" + s + "\"");
             }
-
-            if (m.end() >= (s.length() - 1)) {
-                throw new MCRParseException("right side of OR missing while parsing \"" + s + "\"");
-            }
-
-            MCRCondition left = parse(extendClauses(s.substring(0, m.start()), l), l);
-            MCRCondition right = parse(extendClauses(s.substring(m.end()), l), l);
-
-            return new MCROrCondition(left, right);
+            MCRCondition c = parse(extendClauses(s.substring(last, l1), l) , l);
+            last = m.end();
+            orclause.addChild(c);
+        }
+        if(last!=0) {
+            MCRCondition c = parse(extendClauses(s.substring(last), l) , l);
+            orclause.addChild(c);
+            return orclause;
         }
 
         /* handle AND */
         m = and.matcher(s);
-
-        if (m.find()) {
-            if (m.start() <= 0) {
-                throw new MCRParseException("left side of AND missing while parsing \"" + s + "\"");
+        last = 0;
+        MCRAndCondition andclause = new MCRAndCondition();
+        while(m.find()) {
+            int l1 = m.start();
+            if (last >= l1) {
+                throw new MCRParseException("subclause of AND missing while parsing \"" + s + "\"");
             }
-
-            if (m.end() >= (s.length() - 1)) {
-                throw new MCRParseException("right side of AND missing while parsing \"" + s + "\"");
-            }
-
-            MCRCondition left = parse(extendClauses(s.substring(0, m.start()), l), l);
-            MCRCondition right = parse(extendClauses(s.substring(m.end()), l), l);
-
-            return new MCRAndCondition(left, right);
+            MCRCondition c = parse(extendClauses(s.substring(last, l1), l) , l);
+            last = m.end();
+            andclause.addChild(c);
+        }
+        if(last!=0) {
+            MCRCondition c = parse(extendClauses(s.substring(last), l) , l);
+            andclause.addChild(c);
+            return andclause;
         }
 
         /* handle NOT */
@@ -227,6 +229,11 @@ public class MCRBooleanClauseParser {
     public static void main(String[] args)
     {
         MCRBooleanClauseParser p = new MCRBooleanClauseParser();
+        System.out.println(p.parse("true or false or true").toString());
+        System.out.println(p.parse("(true) or (false) or (true)").toString());
+        System.out.println(p.parse("true and false and true").toString());
+        System.out.println(p.parse("true or false and true").toString());
+        System.out.println(p.parse("true or true or (true or true)").toString());
         System.out.println(p.parse("((true))").toString());
         System.out.println(p.parse("(true ) or  ( ((false) or (true)))").toString());
     }
