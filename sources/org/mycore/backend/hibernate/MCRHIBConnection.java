@@ -170,7 +170,7 @@ public class MCRHIBConnection {
 
     private static void configEhcache(){
     	try{
-    		net.sf.ehcache.CacheManager.create(new ByteArrayInputStream("<?xml version=\"1.0\"?><ehcache><defaultCache maxElementsInMemory=\"10000\" eternal=\"false\" timeToIdleSeconds=\"120\" timeToLiveSeconds=\"120\" overflowToDisk=\"true\" diskPersistent=\"false\" diskExpiryThreadIntervalSeconds=\"120\"/></ehcache>".getBytes()));
+    		net.sf.ehcache.CacheManager.create(new ByteArrayInputStream("<?xml version=\"1.0\"?><ehcache><diskStore path=\"java.io.tmpdir\"/><defaultCache maxElementsInMemory=\"10000\" eternal=\"false\" timeToIdleSeconds=\"120\" timeToLiveSeconds=\"120\" overflowToDisk=\"true\" diskPersistent=\"false\" diskExpiryThreadIntervalSeconds=\"120\"/></ehcache>".getBytes()));
     	}catch(Exception e){
     		logger.error("could not configure ehcache", e);
     	}     	
