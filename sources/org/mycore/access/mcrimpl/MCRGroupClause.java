@@ -58,7 +58,7 @@ class MCRGroupClause implements MCRCondition {
     public Element toXML() {
     	Element cond = new Element("condition");
     	cond.setAttribute("field", "group");
-    	cond.setAttribute("operator", "=");
+    	cond.setAttribute("operator", (this.not? "!=": "="));
     	cond.setAttribute("value", groupname);
         return cond;
     }

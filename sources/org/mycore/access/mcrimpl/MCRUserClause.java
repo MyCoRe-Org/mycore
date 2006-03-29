@@ -54,7 +54,7 @@ class MCRUserClause implements MCRCondition {
     public Element toXML() {
     	Element cond = new Element("condition");
     	cond.setAttribute("field", "user");
-    	cond.setAttribute("operator", "=");
+    	cond.setAttribute("operator", (this.not? "!=": "="));
     	cond.setAttribute("value", user);
         return cond;
     }
