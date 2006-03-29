@@ -181,6 +181,11 @@ abstract public class MCRCheckACLBase extends MCRCheckBase {
                                                     }
                                                 }
                                             }
+                                            if (k == 1) {
+                                                org.jdom.Element newtrue = new org.jdom.Element("boolean");
+                                                newtrue.setAttribute("operator","true");
+                                                ((org.jdom.Element) inbool.get(j)).addContent(newtrue);
+                                            }
                                         } else {
                                             logtext.add("Can't find an inner condition element.");
                                         }
