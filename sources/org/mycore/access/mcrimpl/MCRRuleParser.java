@@ -62,11 +62,12 @@ class MCRRuleParser extends MCRBooleanClauseParser {
             String field = e.getAttributeValue("field").toLowerCase().trim();
             String operator = e.getAttributeValue("operator").trim();
             String value = e.getAttributeValue("value").trim();
+            boolean not = "!=".equals(operator);
 
             if (field.equals("group")) {
-            	return new MCRGroupClause(value, false);
+            	return new MCRGroupClause(value, not);
             } else if (field.equals("user")) {
-            	return new MCRUserClause(value, false);
+            	return new MCRUserClause(value, not);
             }else if (field.equals("ip")) {
             	return new MCRIPClause(value);
             }else if (field.equals("date")) {
