@@ -42,9 +42,6 @@ import org.mycore.datamodel.ifs.MCRFileContentType;
 import org.mycore.datamodel.ifs.MCRFileContentTypeFactory;
 import org.w3c.tidy.Tidy;
 
-// import org.xml.sax.InputSource;
-// import org.xml.sax.SAXException;
-
 /**
  * Converts XML, XTHML and HTML to plain text for indexing
  * 
@@ -63,9 +60,6 @@ public class XmlHtmlPlugin implements TextFilterPlugin {
 
     private static String info = null;
 
-    /**
-     * 
-     */
     public XmlHtmlPlugin() {
         super();
 
@@ -86,36 +80,28 @@ public class XmlHtmlPlugin implements TextFilterPlugin {
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * 
+    /**
      * @see org.mycore.services.plugins.TextFilterPlugin#getName()
      */
     public String getName() {
         return "hfwri's and fluetze's amazing xml and html Filter";
     }
 
-    /*
-     * (non-Javadoc)
-     * 
+    /**
      * @see org.mycore.services.plugins.TextFilterPlugin#getInfo()
      */
     public String getInfo() {
         return info;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
+    /**
      * @see org.mycore.services.plugins.XmlHtmlPlugin#getSupportedContentTypes()
      */
     public HashSet getSupportedContentTypes() {
         return contentTypes;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
+    /**
      * @see org.mycore.services.plugins.TextFilterPlugin#transform(org.mycore.datamodel.ifs.MCRFileContentType,org.mycore.datamodel.ifs.MCRContentInputStream,
      *      java.io.OutputStream)
      */
@@ -163,28 +149,15 @@ public class XmlHtmlPlugin implements TextFilterPlugin {
 
     /** Converts HTML string to XML to be able to extract text nodes * */
     public static String getFullText(String html) {
-        try {
-            org.jdom.Document xml = tidy(new ByteArrayInputStream(html.getBytes()));
-            return getText(xml);
-        } catch (Exception ex) {
-            ex.printStackTrace();
-
+        org.jdom.Document xml = tidy(new ByteArrayInputStream(html.getBytes()));
+        if (xml == null)
             return null;
-        }
+        else
+            return getText(xml);
     }
 
     /** Converts HTML files to XML to be able to extract text nodes * */
     private static org.jdom.Document tidy(InputStream input) {
-        /*
-         * org.cyberneko.html.parsers.DOMParser parser = new
-         * org.cyberneko.html.parsers.DOMParser();
-         * 
-         * try { parser.parse( new InputSource(input) ); } catch (SAXException
-         * e) { // TODO Auto-generated catch block e.printStackTrace(); }
-         * 
-         * DOMBuilder builder = new DOMBuilder(); org.jdom.Document document =
-         * builder.build( parser.getDocument() ); return document;
-         */
         Tidy tidy = new Tidy();
         tidy.setForceOutput(true);
         tidy.setFixComments(true);
@@ -193,18 +166,23 @@ public class XmlHtmlPlugin implements TextFilterPlugin {
         tidy.setShowWarnings(LOGGER.isDebugEnabled());
         tidy.setXmlOut(true);
         tidy.setXmlTags(false);
+        tidy.setPrintBodyOnly(true);
+        tidy.setNumEntities(true);
 
         try {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            baos.write("<html><body>".getBytes());
             tidy.parseDOM(input, baos);
+            baos.write("</body></html>".getBytes());
             baos.close();
-            byte[] tidied = baos.toByteArray();
-            LOGGER.info(new String(tidied));
-            ByteArrayInputStream bais = new ByteArrayInputStream(tidied);
+            byte[] bytes = baos.toByteArray();
+            LOGGER.debug("------ after JTidy: ------");
+            LOGGER.debug(new String(bytes, tidy.getOutputEncoding()));
+            ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
             SAXBuilder builder = new SAXBuilder();
+            builder.setExpandEntities(false);
             builder.setValidation(false);
             org.jdom.Document jdoc = builder.build(bais);
-            LOGGER.info(new XMLOutputter().outputString(jdoc));
             return jdoc;
         } catch (Exception ex) {
             LOGGER.info("Exception while tidying HTML to XML: " + ex.getClass().getName() + ": " + ex.getMessage());
@@ -217,7 +195,8 @@ public class XmlHtmlPlugin implements TextFilterPlugin {
     private static String getText(org.jdom.Document xml) {
         StringBuffer buffer = new StringBuffer();
         xml2txt(buffer, xml.getContent());
-
+        LOGGER.debug("------ after xml2txt ------" );
+        LOGGER.debug(buffer.toString());
         return buffer.toString();
     }
 
