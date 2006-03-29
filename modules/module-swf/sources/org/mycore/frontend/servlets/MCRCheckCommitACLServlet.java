@@ -23,13 +23,13 @@
 
 package org.mycore.frontend.servlets;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.mycore.common.MCRMailer;
 import org.mycore.datamodel.metadata.MCRActiveLinkException;
+import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.frontend.workflow.MCRSimpleWorkflowManager;
+import org.mycore.datamodel.metadata.MCRObjectService;
 
 /**
  * The servlet store the MCREditorServlet output XML in a file of a MCR type
@@ -40,12 +40,13 @@ import org.mycore.frontend.workflow.MCRSimpleWorkflowManager;
  * @author Jens Kupferschmidt
  * @version $Revision$ $Date$
  */
-public class MCRCheckCommitDataServlet extends MCRCheckDataBase {
+public class MCRCheckCommitACLServlet extends MCRCheckACLBase {
 
     private static final long serialVersionUID = 1L;
 
     /**
-     * The method is a dummy and return an URL with the next working step.
+     * The method return an URL with the next working step. If okay flag is
+     * true, the object will present else it shows the error page.
      * 
      * @param ID
      *            the MCRObjectID of the MCRObject
@@ -53,16 +54,9 @@ public class MCRCheckCommitDataServlet extends MCRCheckDataBase {
      *            the return value of the store operation
      * @return the next URL as String
      */
-    public final String getNextURL(MCRObjectID ID, boolean okay) throws MCRActiveLinkException {
-        // commit to the server
-        MCRSimpleWorkflowManager wfm = MCRSimpleWorkflowManager.instance();
-        okay = wfm.commitMetadataObject(ID.getTypeId(), ID.getId());
-
+    protected String getNextURL(MCRObjectID ID, boolean okay) throws MCRActiveLinkException {
         StringBuffer sb = new StringBuffer();
         if (okay) {
-            // then delete the data
-            wfm.deleteMetadataObject(ID.getTypeId(), ID.getId());
-            // return all is ready
             sb.append("receive/").append(ID.getId());
         } else {
             sb.append(CONFIG.getString("MCR.editor_page_dir", "")).append(CONFIG.getString("MCR.editor_page_error_store", "editor_error_store.xml"));
@@ -77,18 +71,17 @@ public class MCRCheckCommitDataServlet extends MCRCheckDataBase {
      *            the MCRObjectID of the MCRObject
      */
     public final void sendMail(MCRObjectID ID) {
-        MCRSimpleWorkflowManager wfm = MCRSimpleWorkflowManager.instance();
-        List addr = wfm.getMailAddress(ID.getTypeId(), "wcommit");
+        List addr = WFM.getMailAddress(ID.getTypeId(), "seditacl");
 
         if (addr.size() == 0) {
             return;
         }
 
-        String sender = wfm.getMailSender();
+        String sender = WFM.getMailSender();
         String appl = CONFIG.getString("MCR.editor_mail_application_id", "DocPortal");
         String subject = "Automaticaly message from " + appl;
         StringBuffer text = new StringBuffer();
-        text.append("Es wurde ein Objekt vom Typ ").append(ID.getTypeId()).append(" mit der ID ").append(ID.getId()).append(" aus dem Workflow in das System geladen.");
+        text.append("The ACL data of the MyCoRe object of type ").append(ID.getTypeId()).append(" with the ID ").append(ID.getId()).append(" in the server was changes.");
         LOGGER.info(text.toString());
 
         try {
@@ -96,5 +89,42 @@ public class MCRCheckCommitDataServlet extends MCRCheckDataBase {
         } catch (Exception ex) {
             LOGGER.error("Can't send a mail to " + addr);
         }
+    }
+
+    /**
+     * The method store the incoming service data from the ACL editor to the
+     * workflow.
+     * 
+     * @param outelm
+     *            the service subelement of an MCRObject
+     * @param job
+     *            the MCRServletJob instance
+     * @param ID
+     *            the MCRObjectID
+     */
+    public final boolean storeService(org.jdom.Element outelm, MCRServletJob job, MCRObjectID ID) {
+        MCRObject obj = new MCRObject();
+        obj.receiveFromDatastore(ID);
+        MCRObjectService service = new MCRObjectService();
+        service.setFromDOM(outelm);
+        obj.setService(service);
+
+        // Save the prepared MCRObject/MCRDerivate to a file
+        try {
+            obj.updateInDatastore();
+        } catch (Exception ex) {
+            LOGGER.error(ex.getMessage());
+            LOGGER.error("Exception while store " + ID.getId() + "to server.");
+            try {
+                errorHandlerIO(job);
+            } catch (Exception ioe) {
+                ioe.printStackTrace();
+            }
+
+            return false;
+        }
+
+        LOGGER.info("Object " + ID.getId() + " stored in the server.");
+        return true;
     }
 }

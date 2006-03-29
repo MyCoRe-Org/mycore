@@ -48,6 +48,7 @@ import org.mycore.datamodel.metadata.MCRActiveLinkException;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.datamodel.metadata.MCRObjectService;
 import org.mycore.frontend.editor.MCREditorServletHelper;
 import org.mycore.frontend.fileupload.MCRUploadHandlerMyCoRe;
 import org.mycore.frontend.workflow.MCRSimpleWorkflowManager;
@@ -794,6 +795,7 @@ public class MCRStartEditorServlet extends MCRServlet {
                     LOGGER.error("Can't read file " + sb.toString());
                 }
             } catch (Exception ex) {
+                ex.printStackTrace();
                 LOGGER.error("Can't read file " + sb.toString());
             }
 
@@ -1169,7 +1171,52 @@ public class MCRStartEditorServlet extends MCRServlet {
             return;
         }
 
-        sb = new StringBuffer();
+        // action SEDITACL in the database
+        if (mytodo.equals("seditacl")) {
+            if (!AI.checkPermission(mysemcrid, "writedb")) {
+                job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + usererrorpage));
+                return;
+            }
+            if (mysemcrid.length() == 0) {
+                job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + mcriderrorpage));
+                return;
+            }
+            
+            // read object
+            org.jdom.Element serviceelm = null;
+            MCRObject obj = new MCRObject();
+            obj.receiveFromDatastore(mysemcrid);
+            List permlist = AI.getPermissionsForID(mysemcrid);
+            for (int i=0; i<permlist.size();i++) {
+                org.jdom.Element ruleelm = AI.getRule(mysemcrid,(String)permlist.get(i));
+                
+                System.out.println("################### "+ (String)permlist.get(i));
+                org.jdom.Document dof = new org.jdom.Document();
+                org.jdom.Element eof = new org.jdom.Element("test");
+                dof.addContent(eof);
+                eof.addContent((org.jdom.Element) ruleelm.detach().clone());
+                byte [] xml = MCRUtils.getByteArray(dof);
+                System.out.println(new String(xml));
+                System.out.println("################### ");
+                obj.getService().addRule((String)permlist.get(i),ruleelm);
+            }
+            serviceelm = obj.getService().createXML();
+            
+            MCRSession session = MCRSessionMgr.getCurrentSession();
+            session.put("service",serviceelm);
+            String base = getBaseURL() + myfile;
+            Properties params = new Properties();
+            params.put("XSL.editor.source.url", "session:service");
+            params.put("XSL.editor.cancel.url", getBaseURL() + cancelpage);
+            params.put("mcrid", mysemcrid);
+            params.put("type", mytype);
+            params.put("step", mystep);
+            job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(buildRedirectURL(base, params)));
+
+            return;
+        }
+        
+     sb = new StringBuffer();
         sb.append(getBaseURL()).append("index.html");
         job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(sb.toString()));
     }

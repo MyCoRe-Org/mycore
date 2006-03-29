@@ -23,8 +23,7 @@
 
 package org.mycore.frontend.servlets;
 
-import java.util.ArrayList;
-
+import org.mycore.datamodel.metadata.MCRActiveLinkException;
 import org.mycore.datamodel.metadata.MCRObjectID;
 
 /**
@@ -36,35 +35,29 @@ import org.mycore.datamodel.metadata.MCRObjectID;
  * @version $Revision$ $Date$
  */
 public class MCRCheckNewFileServlet extends MCRCheckFileBase {
-	/**
-	 * The method check the privileg of this action.
-	 * 
-	 * @param privs
-	 *            the ArrayList of privilegs
-	 * @return true if the privileg exist, else return false
-	 */
-	public final boolean hasPrivileg(ArrayList privs, String type) {
-		if (!privs.contains("create-" + type)) {
-			return false;
-		}
 
-		return true;
-	}
+    private static final long serialVersionUID = 1L;
 
-	/**
-	 * The method is a dummy and return an URL with the next working step.
-	 * 
-	 * @param ID
-	 *            the MCRObjectID of the MCRObject
-	 * @return the next URL as String
-	 */
-	public final String getNextURL(MCRObjectID ID) {
-		// return all is ready
-		StringBuffer sb = new StringBuffer();
-		sb.append(CONFIG.getString("MCR.editor_page_dir", "")).append("editor_").append(ID.getTypeId()).append("_editor.xml");
+    /**
+     * The method return an URL with the next working step. If okay flag is
+     * true, the object will present else it shows the error page.
+     * 
+     * @param ID
+     *            the MCRObjectID of the MCRObject
+     * @param okay
+     *            the return value of the store operation
+     * @return the next URL as String
+     */
+    protected String getNextURL(MCRObjectID ID, boolean okay) throws MCRActiveLinkException {
+        StringBuffer sb = new StringBuffer();
+        if (okay) {
+            sb.append(CONFIG.getString("MCR.editor_page_dir", "")).append("editor_").append(ID.getTypeId()).append("_editor.xml");
+        } else {
 
-		return sb.toString();
-	}
+            sb.append(CONFIG.getString("MCR.editor_page_dir", "")).append(CONFIG.getString("MCR.editor_page_error_store", "editor_error_store.xml"));
+        }
+        return sb.toString();
+    }
 
 	/**
 	 * The method is a dummy and return an URL with the next working step.

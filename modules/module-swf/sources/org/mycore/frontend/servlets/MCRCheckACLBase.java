@@ -96,17 +96,12 @@ abstract public class MCRCheckACLBase extends MCRCheckBase {
         System.out.println("##################################################");
 
         // Save the prepared metadata object
-        storeService(outelm, job, ID);
+        boolean okay = storeService(outelm, job, ID);
 
         // call the getNextURL and sendMail methods
-        String url;
-        try {
-            url = getNextURL(ID);
-        } catch (MCRActiveLinkException e) {
-            generateActiveLinkErrorpage(job.getRequest(), job.getResponse(), "Error in the workflow component.", e);
-            return;
-        }
+        String url = getNextURL(ID, okay);
         sendMail(ID);
+        
         job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + url));
     }
 
@@ -121,7 +116,7 @@ abstract public class MCRCheckACLBase extends MCRCheckBase {
      * @param ID
      *            the MCRObjectID
      */
-    abstract public void storeService(org.jdom.Element outelm, MCRServletJob job, MCRObjectID ID);
+    abstract public boolean storeService(org.jdom.Element outelm, MCRServletJob job, MCRObjectID ID);
 
     /**
      * The method read the incoming JDOM tree in a MCRObject and prepare this by
@@ -185,9 +180,6 @@ abstract public class MCRCheckACLBase extends MCRCheckBase {
                                                         continue;                                                                                                           
                                                     }
                                                 }
-                                            }
-                                            if (k == 0) {
-                                                ((org.jdom.Element) inbool.get(j)).setAttribute("operator", "true");
                                             }
                                         } else {
                                             logtext.add("Can't find an inner condition element.");

@@ -30,6 +30,7 @@ import java.util.List;
 
 import org.mycore.common.MCRMailer;
 import org.mycore.common.MCRUtils;
+import org.mycore.datamodel.metadata.MCRActiveLinkException;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.MCRObjectService;
@@ -48,17 +49,23 @@ public class MCRCheckEditACLServlet extends MCRCheckACLBase {
     private static final long serialVersionUID = 1L;
 
     /**
-     * The method is a dummy and return an URL with the next working step.
+     * The method return an URL with the next working step. If okay flag is
+     * true, the object will present else it shows the error page.
      * 
      * @param ID
      *            the MCRObjectID of the MCRObject
+     * @param okay
+     *            the return value of the store operation
      * @return the next URL as String
      */
-    public final String getNextURL(MCRObjectID ID) {
-        // return all is ready
+    protected String getNextURL(MCRObjectID ID, boolean okay) throws MCRActiveLinkException {
         StringBuffer sb = new StringBuffer();
-        sb.append(CONFIG.getString("MCR.editor_page_dir", "")).append("editor_").append(ID.getTypeId()).append("_editor.xml");
+        if (okay) {
+            sb.append(CONFIG.getString("MCR.editor_page_dir", "")).append("editor_").append(ID.getTypeId()).append("_editor.xml");
+        } else {
 
+            sb.append(CONFIG.getString("MCR.editor_page_dir", "")).append(CONFIG.getString("MCR.editor_page_error_store", "editor_error_store.xml"));
+        }
         return sb.toString();
     }
 
@@ -100,7 +107,7 @@ public class MCRCheckEditACLServlet extends MCRCheckACLBase {
      * @param ID
      *            the MCRObjectID
      */
-    public final void storeService(org.jdom.Element outelm, MCRServletJob job, MCRObjectID ID) {
+    public final boolean storeService(org.jdom.Element outelm, MCRServletJob job, MCRObjectID ID) {
         String fn = WFM.getDirectoryPath(ID.getTypeId()) + File.separator + ID.getId() + ".xml";
         MCRObject obj = new MCRObject();
         obj.setFromURI(fn);
@@ -122,9 +129,10 @@ public class MCRCheckEditACLServlet extends MCRCheckACLBase {
                 ioe.printStackTrace();
             }
 
-            return;
+            return false;
         }
 
         LOGGER.info("Object " + ID.getId() + " stored under " + fn + ".");
+        return true;
     }
 }

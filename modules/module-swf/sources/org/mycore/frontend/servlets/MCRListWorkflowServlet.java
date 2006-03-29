@@ -247,6 +247,7 @@ public class MCRListWorkflowServlet extends MCRServlet {
 
                 // LOGGER.debug("Workflow file "+wfile+" was readed.");
             } catch (Exception ex) {
+                // ex.printStackTrace();
                 LOGGER.warn("Can't parse workflow file " + wfile);
 
                 continue;

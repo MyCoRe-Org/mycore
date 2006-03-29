@@ -23,8 +23,6 @@
 
 package org.mycore.frontend.servlets;
 
-import java.util.ArrayList;
-
 import org.mycore.datamodel.metadata.MCRObjectID;
 
 /**
@@ -37,28 +35,20 @@ import org.mycore.datamodel.metadata.MCRObjectID;
  */
 public class MCRCheckCommitFileServlet extends MCRCheckFileBase {
 	/**
-	 * The method check the privileg of this action.
-	 * 
-	 * @param privs
-	 *            the ArrayList of privilegs
-	 * @return true if the privileg exist, else return false
-	 */
-	public final boolean hasPrivileg(ArrayList privs, String type) {
-		if (!privs.contains("modify-" + type)) {
-			return false;
-		}
+     * 
+     */
+    private static final long serialVersionUID = 1L;
 
-		return true;
-	}
-
-	/**
+    /**
 	 * The method is a dummy and return an URL with the next working step.
 	 * 
 	 * @param ID
 	 *            the MCRObjectID of the MCRObject
+     * @param okay
+     *            the return value of the store operation
 	 * @return the next URL as String
 	 */
-	public final String getNextURL(MCRObjectID ID) {
+	public final String getNextURL(MCRObjectID ID, boolean okay) {
 		// return all is ready
 		return "";
 	}

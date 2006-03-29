@@ -51,7 +51,7 @@ abstract public class MCRCheckBase extends MCRServlet {
 
     // The Access Manager
     protected static MCRAccessInterface AI = MCRAccessManager.getAccessImpl();
-    
+
     // The Workflow Manager
     protected static MCRSimpleWorkflowManager WFM = MCRSimpleWorkflowManager.instance();
 
@@ -61,16 +61,16 @@ abstract public class MCRCheckBase extends MCRServlet {
     protected List errorlog;
 
     /**
-     * The method is a dummy or works with the data and return an URL with the
-     * next working step.
+     * The method return an URL with the next working step. If okay flag is
+     * true, the object will present else it shows the error page.
      * 
      * @param ID
      *            the MCRObjectID of the MCRObject
+     * @param okay
+     *            the return value of the store operation
      * @return the next URL as String
-     * @throws MCRActiveLinkException
-     *             if links preventing the next step in the workflow
      */
-    abstract public String getNextURL(MCRObjectID ID) throws MCRActiveLinkException;
+    abstract protected String getNextURL(MCRObjectID ID, boolean okay) throws MCRActiveLinkException;
 
     /**
      * The method send a message to the mail address for the MCRObjectType.
@@ -78,7 +78,7 @@ abstract public class MCRCheckBase extends MCRServlet {
      * @param ID
      *            the MCRObjectID of the MCRObject
      */
-    abstract public void sendMail(MCRObjectID ID);
+    abstract protected void sendMail(MCRObjectID ID);
 
     /**
      * A method to handle IO errors.
@@ -97,7 +97,7 @@ abstract public class MCRCheckBase extends MCRServlet {
      * For a new MetaDataType, e.g. MCRMetaFooBaar, create a method
      * 
      * <pre>
-     *   boolean checkMCRMetaFooBar(Element)
+     *     boolean checkMCRMetaFooBar(Element)
      * </pre>
      * 
      * use the following methods in that method to do common tasks on element

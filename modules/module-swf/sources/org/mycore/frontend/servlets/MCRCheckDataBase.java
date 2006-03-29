@@ -122,16 +122,10 @@ abstract public class MCRCheckDataBase extends MCRCheckBase {
         outxml = MCRUtils.getByteArray(outdoc);
 
         // Save the prepared metadata object
-        storeMetadata(outxml, job, ID, fullname);
+        boolean okay = storeMetadata(outxml, job, ID, fullname);
 
         // call the getNextURL and sendMail methods
-        String url;
-        try {
-            url = getNextURL(ID);
-        } catch (MCRActiveLinkException e) {
-            generateActiveLinkErrorpage(job.getRequest(), job.getResponse(), "Error in the workflow component.", e);
-            return;
-        }
+        String url = getNextURL(ID, okay);
         sendMail(ID);
         job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + url));
     }
@@ -149,9 +143,9 @@ abstract public class MCRCheckDataBase extends MCRCheckBase {
      * @param fullname
      *            the file name where the JDOM was stored.
      */
-    public final void storeMetadata(byte[] outxml, MCRServletJob job, MCRObjectID ID, String fullname) throws Exception {
+    public final boolean storeMetadata(byte[] outxml, MCRServletJob job, MCRObjectID ID, String fullname) throws Exception {
         if (outxml == null) {
-            return;
+            return false;
         }
 
         // Save the prepared MCRObject/MCRDerivate to a file
@@ -164,10 +158,11 @@ abstract public class MCRCheckDataBase extends MCRCheckBase {
             LOGGER.error("Exception while store to file " + fullname);
             errorHandlerIO(job);
 
-            return;
+            return false;
         }
 
         LOGGER.info("Object " + ID.getId() + " stored under " + fullname + ".");
+        return true;
     }
 
     /**
