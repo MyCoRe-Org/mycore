@@ -31,6 +31,10 @@
     <servlet-name>MCRCheckCommitFileServlet</servlet-name>
     <servlet-class>org.mycore.frontend.servlets.MCRCheckCommitFileServlet</servlet-class>
   </servlet>
+  <servlet id="MCRCheckCommitACLServlet">
+    <servlet-name>MCRCheckCommitACLServlet</servlet-name>
+    <servlet-class>org.mycore.frontend.servlets.MCRCheckCommitACLServlet</servlet-class>
+  </servlet>
   <servlet id="MCRCheckEditACLServlet">
     <servlet-name>MCRCheckEditACLServlet</servlet-name>
     <servlet-class>org.mycore.frontend.servlets.MCRCheckEditACLServlet</servlet-class>
@@ -71,6 +75,10 @@
   <servlet-mapping>
     <servlet-name>MCRCheckCommitFileServlet</servlet-name>
     <url-pattern>/servlets/MCRCheckCommitFileServlet</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>MCRCheckCommitACLServlet</servlet-name>
+    <url-pattern>/servlets/MCRCheckCommitACLServlet</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
     <servlet-name>MCRCheckEditACLServlet</servlet-name>
