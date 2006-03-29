@@ -64,9 +64,9 @@ class MCRRuleParser extends MCRBooleanClauseParser {
             String value = e.getAttributeValue("value").trim();
 
             if (field.equals("group")) {
-            	return new MCRGroupClause(value);
+            	return new MCRGroupClause(value, false);
             } else if (field.equals("user")) {
-            	return new MCRUserClause(value);
+            	return new MCRUserClause(value, false);
             }else if (field.equals("ip")) {
             	return new MCRIPClause(value);
             }else if (field.equals("date")) {
