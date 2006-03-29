@@ -100,12 +100,22 @@ class MCRRuleParser extends MCRBooleanClauseParser {
             return new MCRTrueCondition();
         }
 
-        if (s.startsWith("group ")) {
-            return new MCRGroupClause(s.substring(6).trim());
+        if (s.startsWith("group")) {
+            s = s.substring(5).trim();
+            if (s.startsWith("!=")) {
+                return new MCRGroupClause(s.substring(2).trim(), true);
+            } else if(s.startsWith("=")) {
+                return new MCRGroupClause(s.substring(1).trim(), false);
+            } else throw new MCRParseException("syntax error: " + s);
         }
 
-        if (s.startsWith("user ")) {
-            return new MCRUserClause(s.substring(5).trim());
+        if (s.startsWith("user")) {
+            s = s.substring(4).trim();
+            if (s.startsWith("!=")) {
+                return new MCRUserClause(s.substring(2).trim(), true);
+            } else if(s.startsWith("=")) {
+                return new MCRUserClause(s.substring(1).trim(), false);
+            } else throw new MCRParseException("syntax error: " + s);
         }
 
         if (s.startsWith("ip ")) {
@@ -114,7 +124,6 @@ class MCRRuleParser extends MCRBooleanClauseParser {
 
         if (s.startsWith("date ")) {
             s = s.substring(5).trim();
-
             if (s.startsWith(">=")) {
                 return new MCRDateAfterClause(parseDate(s.substring(2).trim(), false));
             } else if (s.startsWith("<=")) {
@@ -123,7 +132,7 @@ class MCRRuleParser extends MCRBooleanClauseParser {
                 return new MCRDateAfterClause(parseDate(s.substring(1).trim(), true));
             } else if (s.startsWith("<")) {
                 return new MCRDateBeforeClause(parseDate(s.substring(1).trim(), false));
-            }
+            } else throw new MCRParseException("syntax error: " + s);
         }
 
         throw new MCRParseException("syntax error: " + s);

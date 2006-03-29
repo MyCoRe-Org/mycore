@@ -35,19 +35,20 @@ import org.mycore.parsers.bool.MCRConditionVisitor;
  */
 class MCRUserClause implements MCRCondition {
     private String user;
+    private boolean not;
 
-    MCRUserClause(String user) {
+    MCRUserClause(String user, boolean not) {
         this.user = user;
+        this.not = not;
     }
 
     public boolean evaluate(Object o) {
         MCRAccessData data = (MCRAccessData) o;
-
-        return this.user.equals(data.getUser().getID());
+        return this.user.equals(data.getUser().getID()) ^ this.not;
     }
 
     public String toString() {
-        return "user " + user + " ";
+        return "user" + (this.not? " != ": " = ") + user + " ";
     }
 
     public Element toXML() {

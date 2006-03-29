@@ -38,20 +38,21 @@ class MCRGroupClause implements MCRCondition {
     private MCRGroup group;
 
     private String groupname;
+    private boolean not;
 
-    MCRGroupClause(String group) {
+    MCRGroupClause(String group, boolean not) {
         this.groupname = group;
         this.group = new MCRGroup(group);
+        this.not = not;
     }
 
     public boolean evaluate(Object o) {
         MCRAccessData data = (MCRAccessData) o;
-
-        return data.getUser().isMemberOf(group);
+        return data.getUser().isMemberOf(group) ^ this.not;
     }
 
     public String toString() {
-        return "group " + groupname + " ";
+        return "group"+ (this.not?" != ":" = ") + groupname + " ";
     }
 
     public Element toXML() {
