@@ -1,5 +1,4 @@
 /*
- * $RCSfile$
  * $Revision$ $Date$
  *
  * This file is part of ***  M y C o R e  ***
@@ -24,6 +23,7 @@
 package org.mycore.services.plugins;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.Reader;
 import java.io.StringReader;
@@ -34,10 +34,11 @@ import org.apache.log4j.Logger;
 import org.jdom.Comment;
 import org.jdom.Element;
 import org.jdom.Text;
-import org.jdom.input.DOMBuilder;
+import org.jdom.input.SAXBuilder;
+import org.jdom.output.XMLOutputter;
+import org.mycore.common.MCRException;
 import org.mycore.datamodel.ifs.MCRFileContentType;
 import org.mycore.datamodel.ifs.MCRFileContentTypeFactory;
-import org.w3c.dom.Document;
 import org.w3c.tidy.Tidy;
 
 // import org.xml.sax.InputSource;
@@ -148,7 +149,7 @@ public class XmlHtmlPlugin implements TextFilterPlugin {
                 return getText(builder.build(input)); // file.getContentAsJDOM()
             } else if (ct.getID().equals("html")) {
                 org.jdom.Document xml = tidy(input);
-                return getText(xml);
+                return (xml == null ? "" : getText(xml));
             } else {
                 return null;
             }
@@ -187,19 +188,27 @@ public class XmlHtmlPlugin implements TextFilterPlugin {
         tidy.setForceOutput(true);
         tidy.setFixComments(true);
         tidy.setHideEndTags(false);
-        tidy.setPrintBodyOnly(true);
         tidy.setQuiet(!LOGGER.isDebugEnabled());
         tidy.setShowWarnings(LOGGER.isDebugEnabled());
         tidy.setXmlOut(true);
         tidy.setXmlTags(false);
 
         try {
-            Document dom = tidy.parseDOM(input, null);
-            DOMBuilder builder = new org.jdom.input.DOMBuilder();
-            return builder.build(dom);
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            tidy.parseDOM(input, baos);
+            baos.close();
+            byte[] tidied = baos.toByteArray();
+            LOGGER.info(new String(tidied));
+            ByteArrayInputStream bais = new ByteArrayInputStream(tidied);
+            SAXBuilder builder = new SAXBuilder();
+            builder.setValidation(false);
+            org.jdom.Document jdoc = builder.build(bais);
+            LOGGER.info(new XMLOutputter().outputString(jdoc));
+            return jdoc;
         } catch (Exception ex) {
             LOGGER.info("Exception while tidying HTML to XML: " + ex.getClass().getName() + ": " + ex.getMessage());
-            return new org.jdom.Document(new Element("dummy"));
+            LOGGER.debug(MCRException.getStackTraceAsString(ex));
+            return null;
         }
     }
 
