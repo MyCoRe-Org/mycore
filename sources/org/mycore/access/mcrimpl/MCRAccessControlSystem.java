@@ -62,7 +62,7 @@ public class MCRAccessControlSystem extends MCRAccessBaseImpl{
 	
 	static String superuserID = MCRConfiguration.instance().getString("MCR.users_superuser_username", "mcradmin");
 	
-    MCRCache cache;
+    static MCRCache cache;
 
     MCRAccessStore accessStore;
 
