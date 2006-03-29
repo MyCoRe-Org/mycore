@@ -72,13 +72,13 @@ class MCRRuleParser extends MCRBooleanClauseParser {
             	return new MCRIPClause(value);
             }else if (field.equals("date")) {
             	if(operator.equals("<")) {
-            		return new MCRDateBeforeClause(parseDate(value, true));
+            		return new MCRDateBeforeClause(parseDate(value, false));
             	}else if(operator.equals("<=")) {
             		return new MCRDateBeforeClause(parseDate(value, true));
             	}else if(operator.equals(">")) {
             		return new MCRDateAfterClause(parseDate(value, true));
             	}else if(operator.equals(">=")) {
-            		return new MCRDateAfterClause(parseDate(value, true));
+            		return new MCRDateAfterClause(parseDate(value, false));
             	}
             	else {
             		throw new MCRParseException("Not a valid operator <" + operator + ">");
