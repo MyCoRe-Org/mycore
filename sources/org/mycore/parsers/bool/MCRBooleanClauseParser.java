@@ -106,7 +106,7 @@ public class MCRBooleanClauseParser {
     public MCRCondition parse(String s) throws MCRParseException {
         s = s.replaceAll("\t", " ").replaceAll("\n", " ").replaceAll("\r", " ");
 
-        if (s.trim().length() == 0) {
+        if ((s.trim().length() == 0) || s.equals("()")) {
             return defaultRule();
         }
 
@@ -119,6 +119,7 @@ public class MCRBooleanClauseParser {
         }
 
         s = s.trim();
+        if (s.equals("()")) { s = "(true)"; }
 
         /* replace all bracket expressions with $n */
         while (true) {
