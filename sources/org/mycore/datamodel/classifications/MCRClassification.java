@@ -842,7 +842,7 @@ public class MCRClassification {
 	 *            the category ID
 	 * @return the classification as XML
 	 */
-	public final org.jdom.Document receiveCategoryAsJDOM(String classID, String categID) {
+	public static final org.jdom.Document receiveCategoryAsJDOM(String classID, String categID) {
 		MCRLinkTableManager mcr_linktable = MCRLinkTableManager.instance();
 		org.jdom.Element elm = new org.jdom.Element("mycoreclass");
 		org.jdom.Document doc = new org.jdom.Document(elm);
@@ -851,7 +851,7 @@ public class MCRClassification {
 		elm.setAttribute(ID_ATTR, classID);
 
 		org.jdom.Element cats = new org.jdom.Element("categories");
-
+		MCRClassificationItem cl;
 		// get the classification
 		try {
 			cl = MCRClassificationItem.getClassificationItem(classID);
