@@ -226,7 +226,7 @@ public class MCRJDOMSearcher extends MCRSearcher {
         stylesheet.addContent(output);
 
         Element template = new Element("template", MCRFieldDef.xslns);
-        template.setAttribute("match", "/mcr:values");
+        template.setAttribute("match", "/data");
         stylesheet.addContent(template);
 
         Element choose = new Element("choose", MCRFieldDef.xslns);
