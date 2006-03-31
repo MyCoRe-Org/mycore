@@ -27,6 +27,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+import java.util.TimeZone;
 
 import org.apache.log4j.Logger;
 
@@ -102,10 +103,15 @@ public class MCRXMLFunctions {
 		return returns;
 	}
     
-    public static String formatISODate(String isoDate,String isoFormat, String simpleFormat, String iso639Language) throws ParseException{
+    public static String formatISODate(String isoDate, String simpleFormat, String iso639Language) throws ParseException{
+        return formatISODate(isoDate,null, simpleFormat,iso639Language);
+    }
+
+    public static String formatISODate(String isoDate, String isoFormat, String simpleFormat, String iso639Language) throws ParseException{
         if (LOGGER.isDebugEnabled()){
             StringBuffer sb=new StringBuffer("isoDate=");
-            sb.append(isoDate).append(", simpleFormat=").append(simpleFormat).append(", iso649Language=").append(iso639Language);
+            sb.append(isoDate).append(", simpleFormat=").append(simpleFormat)
+            .append(", isoFormat=").append(isoFormat).append(", iso649Language=").append(iso639Language);
             LOGGER.debug(sb.toString());
         }
         Locale locale=new Locale(iso639Language);
@@ -117,12 +123,18 @@ public class MCRXMLFunctions {
         return df.format(date);
     }
 
-    public static String getISODate(String simpleDate,String simpleFormat) throws ParseException{
+    public static String getISODate(String simpleDate,String simpleFormat, String isoFormat) throws ParseException{
         SimpleDateFormat df=new SimpleDateFormat(simpleFormat);
+        df.setTimeZone(TimeZone.getTimeZone("UTC")); // or else testcase "1964-02-24" would result "1964-02-23"
         Date date=df.parse(simpleDate);
         MCRMetaISO8601Date mcrdate=new MCRMetaISO8601Date();
         mcrdate.setDate(date);
+        mcrdate.setFormat(isoFormat);
         return mcrdate.getISOString();
+    }
+
+    public static String getISODate(String simpleDate,String simpleFormat) throws ParseException{
+        return getISODate(simpleDate,simpleFormat,null);
     }
 
 }
