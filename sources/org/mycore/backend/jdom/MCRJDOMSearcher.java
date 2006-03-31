@@ -87,16 +87,18 @@ public class MCRJDOMSearcher extends MCRSearcher {
     public void init(String ID) {
         super.init(ID);
 
+        MCRXMLTableManager mcr_xml = MCRXMLTableManager.instance();
+
         // Find all types of MCRObject data:
         String cfgPrefix = "MCR.persistence_config_";
         Properties props = MCRConfiguration.instance().getProperties(cfgPrefix);
         for (Enumeration keys = props.keys(); keys.hasMoreElements();) {
             String key = (String) (keys.nextElement());
             String type = key.substring(cfgPrefix.length());
+            if( "derivate".equals( type ) ) continue;
 
             LOGGER.debug("Now indexing metadata of all stored MCRObjects from type " + type);
 
-            MCRXMLTableManager mcr_xml = MCRXMLTableManager.instance();
             List IDs = mcr_xml.retrieveAllIDs(type);
             for (int i = 0; i < IDs.size(); i++) {
                 String sid = (String) (IDs.get(i));
