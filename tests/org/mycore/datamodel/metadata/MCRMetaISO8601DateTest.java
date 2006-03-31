@@ -18,7 +18,7 @@ public class MCRMetaISO8601DateTest extends MCRTestCase {
 
     protected void setUp() throws Exception {
         super.setUp();//org.mycore.datamodel.metadata.MCRMetaISO8601Date
-        if (setProperty("MCR.log4j.logger.org.mycore.datamodel.metadata.MCRMetaISO8601Date","INFO, stdout", false)){
+        if (setProperty("MCR.log4j.logger.org.mycore.datamodel.metadata.MCRMetaISO8601Date","INFO", false)){
             //DEBUG will print a Stacktrace if we test for errors, but that's O.K.
             MCRConfiguration.instance().configureLogging();
         }
@@ -113,7 +113,11 @@ public class MCRMetaISO8601DateTest extends MCRTestCase {
         ts.setDate(timeString);
         assertNull("Date is not null", ts.getDate());
         setProperty("MCR.SimpleDateFormat.strictParsing","false",true);
+        setProperty("MCR.SimpleDateFormat.locales","de_DE,en_US",true);
         ts.setFormat(null);
+        ts.setDate(timeString);
+        LOGGER.debug(ts.getISOString());
+        timeString = "12/01/1986";
         ts.setDate(timeString);
         LOGGER.debug(ts.getISOString());
         //assertNotNull("Date is null", ts.getDate());
@@ -177,7 +181,7 @@ public class MCRMetaISO8601DateTest extends MCRTestCase {
         assertNull("Date should be null", ts.getDate());
         assertEquals("Format should be set by jdom", MCRMetaISO8601Date.COMPLETE_HH_MM, ts.getFormat());
     }
-
+    
     private String getFormat(DateTimeFormatter df) {
         if ((df == null) || (df == MCRMetaISO8601Date.FormatChooser.COMPLETE_HH_MM_SS_SSS_FORMAT)
                 || (df == MCRMetaISO8601Date.FormatChooser.UTC_COMPLETE_HH_MM_SS_SSS_FORMAT)) {

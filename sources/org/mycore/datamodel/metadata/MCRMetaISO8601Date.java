@@ -29,7 +29,9 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Set;
+import java.util.StringTokenizer;
 import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -218,17 +220,36 @@ public final class MCRMetaISO8601Date extends MCRMetaDefault implements MCRMetaI
     }
     
     private DateTime guessDateTime(String date){
-        DateFormat df= DateFormat.getDateInstance(DateFormat.SHORT);
-        df.setTimeZone(TimeZone.getTimeZone("UTC"));
-        df.setLenient(true);
-        DateTime result=null;
-        try {
-            Date pDate=df.parse(date);
-            result=new DateTime(pDate.getTime());
-        } catch (ParseException e) {
-            LOGGER.error("Error trying to guess date for string: "+date,e);
+        String locales=CONFIG.getString("MCR.SimpleDateFormat.locales","de_DE");
+        StringTokenizer tok=new StringTokenizer(locales,",");
+        while (tok.hasMoreTokens()){
+            Locale locale= getLocale(tok.nextToken());
+            DateFormat df= DateFormat.getDateInstance(DateFormat.SHORT,locale);
+            df.setTimeZone(TimeZone.getTimeZone("UTC"));
+            df.setLenient(true);
+            DateTime result=null;
+            try {
+                Date pDate=df.parse(date);
+                result=new DateTime(pDate.getTime());
+                return result;
+            } catch (ParseException e) {
+                LOGGER.debug("Date guess failed for locale: "+locale,e);
+            }
         }
-        return result;
+        LOGGER.error("Error trying to guess date for string: "+date);
+        return null;
+    }
+    
+    private static Locale getLocale(String locale){
+        String lang="",country="";
+        int pos=locale.indexOf("_");
+        if (pos>0){
+            lang=locale.substring(0,pos);
+            country=locale.substring(pos+1);
+        } else {
+            lang=locale;
+        }
+        return new Locale(lang,country);
     }
 
     /**
