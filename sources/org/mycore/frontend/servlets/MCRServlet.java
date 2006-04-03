@@ -335,12 +335,18 @@ public class MCRServlet extends HttpServlet {
 
 		request.setAttribute(MCRLayoutServlet.JDOM_ATTR, errorDoc);
 		request.setAttribute("XSL.Style", style);
-
-        if (!response.isCommitted()){
+        
+        final String requestAttr="MCRServlet.generateErrorPage";
+        if ((!response.isCommitted()) && (request.getAttribute(requestAttr)==null)){
             RequestDispatcher rd = getServletContext().getNamedDispatcher("MCRLayoutServlet");
+            request.setAttribute(requestAttr,msg);
             rd.forward(request, response);
         } else {
-            LOGGER.warn("Could not send error page. Response allready commited. The following message was given:\n"+msg,ex);
+            if (request.getAttribute(requestAttr)!=null){
+                LOGGER.warn("Could not send error page. Generating error page failed. The original message:\n"+request.getAttribute(requestAttr));
+            } else {
+                LOGGER.warn("Could not send error page. Response allready commited. The following message was given:\n"+msg,ex);
+            }
         }
 	}
 
