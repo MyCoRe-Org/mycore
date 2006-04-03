@@ -26,7 +26,7 @@ package org.mycore.datamodel.classifications.query;
 /**
  * 
  * @author Thomas Scheffler (yagee)
- *
+ * 
  * @version $Revision$ $Date$
  */
 public class Category extends ClassificationObject {

@@ -29,50 +29,55 @@ import java.util.List;
 /**
  * 
  * @author Thomas Scheffler (yagee)
- *
+ * 
  * @version $Revision$ $Date$
  */
 public class ClassificationObject {
-    
+
     String id;
-    List labels,catgegories;
-    
+
+    List labels, catgegories;
+
     public List getCatgegories() {
-        if (catgegories==null){
-            catgegories=new ArrayList();
+        if (catgegories == null) {
+            catgegories = new ArrayList();
         }
         return catgegories;
     }
+
     public void setCatgegories(List catgegories) {
         this.catgegories = catgegories;
     }
+
     public String getId() {
         return id;
     }
+
     public void setId(String id) {
         this.id = id;
     }
+
     public List getLabels() {
-        if (labels==null){
-            labels=new ArrayList();
+        if (labels == null) {
+            labels = new ArrayList();
         }
         return labels;
     }
+
     public void setLabels(List labels) {
         this.labels = labels;
     }
-    
+
     public boolean equals(Object arg0) {
-        if (!(arg0 instanceof ClassificationObject)){
+        if (!(arg0 instanceof ClassificationObject)) {
             return false;
         }
-        ClassificationObject o=(ClassificationObject)arg0;
+        ClassificationObject o = (ClassificationObject) arg0;
         return o.getId().equals(getId());
     }
+
     public int hashCode() {
         return getId().hashCode();
     }
-    
-    
 
 }

@@ -26,12 +26,12 @@ package org.mycore.datamodel.classifications.query;
 /**
  * 
  * @author Thomas Scheffler (yagee)
- *
+ * 
  * @version $Revision$ $Date$
  */
 public class Label {
-    
-    String lang,text,description;
+
+    String lang, text, description;
 
     public String getLang() {
         return lang;
