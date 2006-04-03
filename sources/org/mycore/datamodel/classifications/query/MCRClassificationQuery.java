@@ -23,6 +23,7 @@
 
 package org.mycore.datamodel.classifications.query;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -30,6 +31,8 @@ import java.util.List;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.Namespace;
+import org.jdom.output.Format;
+import org.jdom.output.XMLOutputter;
 
 import org.mycore.datamodel.classifications.MCRCategoryItem;
 import org.mycore.datamodel.classifications.MCRClassification;
@@ -37,35 +40,69 @@ import org.mycore.datamodel.classifications.MCRClassification;
 /**
  * 
  * @author Thomas Scheffler (yagee)
- *
+ * 
  * @version $Revision$ $Date$
  */
 public class MCRClassificationQuery {
-    
-    public static Classification getClassification(String ID, int levels){
-        Document cl=MCRClassification.receiveClassificationAsJDOM(ID);
+
+    /**
+     * returns a classification as POJO.
+     * 
+     * @param ID
+     *            MCR classification ID.
+     * @param levels
+     *            of category depth.
+     * @return
+     */
+    public static Classification getClassification(String ID, int levels) {
+        Document cl = MCRClassification.receiveClassificationAsJDOM(ID);
         return getClassification(cl, levels);
     }
 
-    public static Classification getClassification(String classID, String categID, int levels){
-        Classification returns=getClassification(classID,categID);
-        MCRCategoryItem catItem=MCRCategoryItem.getCategoryItem(classID,categID);
-        Category cat=(Category)returns.getCatgegories().get(0);
-        fillCategory(cat,catItem,levels);
+    /**
+     * returns a classification as POJO. Only the given Category (and its
+     * children to <code>levels</code> depth) is returned.
+     * 
+     * @param ID
+     *            MCR classification ID.
+     * @param categID
+     *            MCR category ID.
+     * @param levels
+     *            of category depth.
+     * @return
+     */
+    public static Classification getClassification(String classID, String categID, int levels) {
+        Classification returns = getClassification(classID, categID);
+        MCRCategoryItem catItem = MCRCategoryItem.getCategoryItem(classID, categID);
+        Category cat = (Category) returns.getCatgegories().get(0);
+        fillCategory(cat, catItem, levels);
         return returns;
     }
 
-    public static Classification getClassification(String classID, String categID){
-        Document doc=MCRClassification.receiveCategoryAsJDOM(classID,categID);
-        Classification returns=getClassification(doc,-1);
+    /**
+     * returns a classification as POJO. Only the given Category is returned.
+     * 
+     * @param ID
+     *            MCR classification ID.
+     * @param categID
+     *            MCR category ID.
+     * @return
+     */
+    public static Classification getClassification(String classID, String categID) {
+        Document doc = MCRClassification.receiveCategoryAsJDOM(classID, categID);
+        Classification returns = getClassification(doc, -1);
         return returns;
     }
 
-    public static void main(String[] arg){
-        Classification c=MCRClassificationQuery.getClassification(arg[0],1);
-        print(c,0);
-        c=MCRClassificationQuery.getClassification(arg[0],arg[1],-1);
-        print(c,0);
+    public static void main(String[] arg) {
+        Classification c = MCRClassificationQuery.getClassification(arg[0], 1);
+        print(c, 0);
+        c = MCRClassificationQuery.getClassification(arg[0], arg[1], -1);
+        print(c, 0);
+        Document doc = ClassificationTransformer.getMetaDataDocument(c);
+        print(doc);
+        doc = ClassificationTransformer.getEditorDocument(c);
+        print(doc);
     }
 
     /**
@@ -74,98 +111,106 @@ public class MCRClassificationQuery {
      * @return
      */
     private static Classification getClassification(Document cl, int levels) {
-        Classification returns=new Classification();
+        Classification returns = new Classification();
         returns.setId(cl.getRootElement().getAttributeValue("ID"));
         returns.getLabels().addAll(LabelFactory.getLabels(cl.getRootElement().getChildren("label")));
-        fillCategory(returns,cl.getRootElement().getChild("categories"),levels);
+        fillCategory(returns, cl.getRootElement().getChild("categories"), levels);
         return returns;
     }
-    
-    private static void fillCategory(ClassificationObject c,MCRCategoryItem item, int levels){
-        if (levels !=0){
-            MCRCategoryItem[] children=item.getChildren();
-            for (int i=0;i<children.length;i++){
-                MCRCategoryItem child=children[i];
-                Category childC=CategoryFactory.getCategory(child);
+
+    private static void fillCategory(ClassificationObject c, MCRCategoryItem item, int levels) {
+        if (levels != 0) {
+            MCRCategoryItem[] children = item.getChildren();
+            for (int i = 0; i < children.length; i++) {
+                MCRCategoryItem child = children[i];
+                Category childC = CategoryFactory.getCategory(child);
                 c.getCatgegories().add(childC);
-                fillCategory(childC,child,levels-1);
+                fillCategory(childC, child, levels - 1);
             }
         }
     }
-    
-    private static void fillCategory(ClassificationObject c,Element e, int levels){
-        if (levels !=0){
-            List children=e.getChildren("category");
-            Iterator it=children.iterator();
-            while (it.hasNext()){
-                Element child=(Element)it.next();
-                Category childC=CategoryFactory.getCategory(child);
+
+    private static void fillCategory(ClassificationObject c, Element e, int levels) {
+        if (levels != 0) {
+            List children = e.getChildren("category");
+            Iterator it = children.iterator();
+            while (it.hasNext()) {
+                Element child = (Element) it.next();
+                Category childC = CategoryFactory.getCategory(child);
                 c.getCatgegories().add(childC);
-                fillCategory(childC,child,levels-1);
+                fillCategory(childC, child, levels - 1);
             }
         }
     }
-    
-    private static void print(ClassificationObject c,int depth){
+
+    private static void print(ClassificationObject c, int depth) {
         intend(depth);
-        System.out.println("ID: "+c.getId());
-        Iterator it=c.getCatgegories().iterator();
-        while (it.hasNext()){
-            print((ClassificationObject)it.next(),depth+1);
+        System.out.println("ID: " + c.getId());
+        Iterator it = c.getCatgegories().iterator();
+        while (it.hasNext()) {
+            print((ClassificationObject) it.next(), depth + 1);
         }
     }
-    
-    private static void intend(int a){
-        for (int i=0;i<a;i++){
+
+    private static void print(Document doc) {
+        XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat());
+        try {
+            xout.output(doc, System.out);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private static void intend(int a) {
+        for (int i = 0; i < a; i++) {
             System.out.print(' ');
         }
     }
-    
-    
-    private static class CategoryFactory{
-        static Category getCategory(Element e){
-            Category c=new Category();
+
+    private static class CategoryFactory {
+        static Category getCategory(Element e) {
+            Category c = new Category();
             c.setId(e.getAttributeValue("ID"));
             c.getLabels().addAll(LabelFactory.getLabels(e.getChildren("label")));
             return c;
         }
-        static Category getCategory(MCRCategoryItem i){
-            Category c=new Category();
+
+        static Category getCategory(MCRCategoryItem i) {
+            Category c = new Category();
             c.setId(i.getID());
-            c.getLabels().addAll(LabelFactory.getLabels(i.getLangArray(),i.getTextArray(),i.getDescriptionArray()));
+            c.getLabels().addAll(LabelFactory.getLabels(i.getLangArray(), i.getTextArray(), i.getDescriptionArray()));
             return c;
         }
     }
-    
-    private static class LabelFactory{
-        static Label getLabel(Element e){
-            return getLabel(e.getAttributeValue("lang",Namespace.XML_NAMESPACE),
-                    e.getAttributeValue("text"),
-                    e.getAttributeValue("description"));
+
+    private static class LabelFactory {
+        static Label getLabel(Element e) {
+            return getLabel(e.getAttributeValue("lang", Namespace.XML_NAMESPACE), e.getAttributeValue("text"), e.getAttributeValue("description"));
         }
-        static Label getLabel(String lang, String text, String description){
-            Label label=new Label();
+
+        static Label getLabel(String lang, String text, String description) {
+            Label label = new Label();
             label.setText(text);
             label.setDescription(description);
             label.setLang(lang);
             return label;
         }
-       static List getLabels(List labels){
-           List returns=new ArrayList(labels.size());
-           Iterator it=labels.iterator();
-           while (it.hasNext()){
-               returns.add(getLabel((Element)it.next()));
-           }
-           return returns;
-       }
-       static List getLabels(List lang,List text,List description){
-           List returns=new ArrayList(lang.size());
-           for (int i=0;i<lang.size();i++){
-               returns.add(getLabel(lang.get(i).toString(),
-                       text.get(i).toString(),
-                       description.get(i).toString()));
-           }
-           return returns;
-       }
-   }
+
+        static List getLabels(List labels) {
+            List returns = new ArrayList(labels.size());
+            Iterator it = labels.iterator();
+            while (it.hasNext()) {
+                returns.add(getLabel((Element) it.next()));
+            }
+            return returns;
+        }
+
+        static List getLabels(List lang, List text, List description) {
+            List returns = new ArrayList(lang.size());
+            for (int i = 0; i < lang.size(); i++) {
+                returns.add(getLabel(lang.get(i).toString(), text.get(i).toString(), description.get(i).toString()));
+            }
+            return returns;
+        }
+    }
 }
