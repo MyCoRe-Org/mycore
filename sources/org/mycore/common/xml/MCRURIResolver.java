@@ -59,6 +59,9 @@ import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUsageException;
 import org.mycore.common.MCRUtils;
+import org.mycore.datamodel.classifications.query.Classification;
+import org.mycore.datamodel.classifications.query.ClassificationTransformer;
+import org.mycore.datamodel.classifications.query.MCRClassificationQuery;
 import org.mycore.datamodel.ifs.MCRDirectoryXML;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.MCRXMLTableManager;
@@ -109,6 +112,7 @@ public class MCRURIResolver implements javax.xml.transform.URIResolver, EntityRe
         supportedSchemes.put("access", new MCRACLResolver());
         supportedSchemes.put("resource", new MCRResourceResolver());
         supportedSchemes.put("localclass", new MCRLocalClassResolver());
+        supportedSchemes.put("classification", new MCRClassificationResolver());
         SUPPORTED_SCHEMES = Collections.unmodifiableMap(supportedSchemes);
     }
 
@@ -474,27 +478,27 @@ public class MCRURIResolver implements javax.xml.transform.URIResolver, EntityRe
          * @return the root element of the XML document
          */
         public Element resolveElement(String uri) {
-        	String classname = uri.substring(uri.indexOf(":") + 1,uri.indexOf("?"));
-        	Class cl = null;
+            String classname = uri.substring(uri.indexOf(":") + 1,uri.indexOf("?"));
+            Class cl = null;
             Logger.getLogger(this.getClass()).debug("Loading Class: " + classname);
             try {
                 cl = Class.forName(classname);
             } catch (Exception ex) {
-            	LOGGER.error("Could not load class " + classname, ex);
+                LOGGER.error("Could not load class " + classname, ex);
             }
             Object o = null;
             try {
                 try {
                     o = cl.newInstance();
                 } catch (Exception ex) {
-                	LOGGER.error("Could not instantiate class " + classname, ex);
-                	return new Element("error");
+                    LOGGER.error("Could not instantiate class " + classname, ex);
+                    return new Element("error");
                 }
                 MCRResolver resolver = (MCRResolver) o;
                 return resolver.resolveElement(uri);
             }catch(Exception ex) {
-            	LOGGER.error("Could not resolve uri " + uri, ex);
-            	return new Element("error");
+                LOGGER.error("Could not resolve uri " + uri, ex);
+                return new Element("error");
             }
         }
 
@@ -681,4 +685,51 @@ public class MCRURIResolver implements javax.xml.transform.URIResolver, EntityRe
         }
 
     }
+
+    private static class MCRClassificationResolver implements MCRResolver {
+        
+        /**
+         * returns a classification in a specific format.
+         * 
+         * Syntax: <code>classification:{editor|metadata}:{ClassID}:{Levels}:[CategID]
+         * 
+         * @param uri
+         *            URI in the syntax above
+         *            
+         * @return the root element of the XML document
+         */
+        public Element resolveElement(String uri) {
+            String[] parameters=uri.split(":");
+            String format=parameters[1];
+            String classID=parameters[2];
+            int levels=Integer.parseInt(parameters[3]);
+            StringBuffer categID=new StringBuffer();
+            for (int i=4;i<parameters.length;i++){
+                categID.append(':').append(parameters[i]);
+            }
+            if (categID.length()>0){
+                //categID was specified
+                //remove leading ":" from the for block above
+                categID.deleteCharAt(0);
+            }
+            String categ=categID.toString();
+            Classification cl;
+            if (categ.length()>0){
+                cl=MCRClassificationQuery.getClassification(classID,categ,levels);
+            } else {
+                cl=MCRClassificationQuery.getClassification(classID,levels);
+            }
+            Element returns;
+            if (format.equals("editor")){
+                returns=ClassificationTransformer.getEditorDocument(cl).getRootElement();
+            } else if (format.equals("metadata")){
+                returns=ClassificationTransformer.getMetaDataDocument(cl).getRootElement();
+            } else {
+                returns=new Element(format);
+            }
+            return returns;
+        }
+    
+    }
+
 }
