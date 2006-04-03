@@ -1686,12 +1686,14 @@ public class MCROAIProvider extends MCRServlet {
         int pos = request.getRequestURL().indexOf(contextPath, 9);
         String servletsBaseURL = request.getRequestURL().substring(0, pos)
                 + contextPath + "servlets/";
+        String webApplicationBaseURL = request.getRequestURL().substring(0, pos) + contextPath ;        
         HttpSession session = request.getSession(false);
         Properties parameters = new Properties();
         if (session != null) {
             parameters.put("JSessionID", ";jsessionid=" + session.getId());
         }
         parameters.put("ServletsBaseURL", servletsBaseURL);
+        parameters.put("WebApplicationBaseURL", webApplicationBaseURL);
         return MCRXSLTransformation.transform(document, getServletContext()
                 .getRealPath("/WEB-INF/stylesheets/" + format), parameters);
     }
