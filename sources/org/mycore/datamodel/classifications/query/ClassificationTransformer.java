@@ -138,9 +138,9 @@ public class ClassificationTransformer {
                 le.setAttribute("lang", label.getLang(), Namespace.XML_NAMESPACE);
             }
             if (stringNotEmpty(label.getText())) {
-                le.setAttribute("text", label.getText());
+                le.setText(label.getText());
             } else if (stringNotEmpty(label.getDescription())) {
-                le.setAttribute("text", label.getDescription());
+                le.setText(label.getDescription());
             }
             return le;
         }
