@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
 <!-- ============================================== -->
-<!-- $Revision: 1.45 $ $Date: 2006-03-31 11:28:11 $ -->
+<!-- $Revision: 1.46 $ $Date: 2006-04-04 13:48:51 $ -->
 <!-- ============================================== --> 
 
 <xsl:stylesheet 
@@ -63,7 +63,7 @@
     </xsl:choose>
   </xsl:variable>
   <xsl:variable name="url">
-    <xsl:value-of select="concat($ServletsBaseURL,'XMLEditor',$JSessionID,$query)" />
+    <xsl:value-of select="concat('request:servlets/XMLEditor',$JSessionID,$query)" />
   </xsl:variable>
 
   <!-- ======== build nested panel structure ======== -->
