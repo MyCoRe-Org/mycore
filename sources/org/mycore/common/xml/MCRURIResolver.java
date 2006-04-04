@@ -155,12 +155,12 @@ public class MCRURIResolver implements javax.xml.transform.URIResolver, EntityRe
 
         String scheme = getScheme(href);
 
-        if ("resource request webapp file ifs session query mcrobject access".indexOf(scheme) != -1) {
+        if (SUPPORTED_SCHEMES.containsKey(scheme)) {
             return new JDOMSource(resolve(href));
         }
         return null;
     }
-
+    
     /**
      * Implements the SAX EntityResolver interface. This resolver type is used
      * to read DTDs and XML Schema files when parsing XML documents. This
