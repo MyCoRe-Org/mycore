@@ -23,7 +23,10 @@
 
 package org.mycore.datamodel.classifications.query;
 
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Iterator;
+import java.util.List;
 import java.util.regex.Pattern;
 
 import org.jdom.DocType;
@@ -164,7 +167,31 @@ public class ClassificationTransformer {
                 // add child categories
                 cd.getRootElement().addContent(getElement((Category) it.next(), labelFormat));
             }
+            sortItems(cd.getRootElement().getChildren("item"));
             return cd;
+        }
+
+        private static void sortItems(List items) {
+            sort(items, EditorItemComparator.CURRENT_LANG_TEXT_ORDER);
+            Iterator it = items.iterator();
+            while (it.hasNext()) {
+                Element item = (Element) it.next();
+                List children = item.getChildren("item");
+                if (children.size() > 0) {
+                    sortItems(children);
+                }
+            }
+        }
+
+        private static void sort(List list, Comparator c) {
+            Element[] a = (Element[]) list.toArray(new Element[list.size()]);
+            Arrays.sort(a, c);
+            for (int i = 0; i < a.length; i++) {
+                a[i].detach();
+            }
+            for (int i = 0; i < a.length; i++) {
+                list.add(a[i]);
+            }
         }
 
         static Element getElement(Label label, Category cat, String labelFormat) {
