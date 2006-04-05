@@ -735,7 +735,7 @@ public class MCRURIResolver implements javax.xml.transform.URIResolver, EntityRe
             Element returns;
             if (format.startsWith("editor")) {
                 String labelFormat = getLabelFormat(format);
-                if (format == null) {
+                if (labelFormat == null) {
                     returns = ClassificationTransformer.getEditorDocument(cl).getRootElement();
                 } else {
                     returns = ClassificationTransformer.getEditorDocument(cl, labelFormat).getRootElement();
