@@ -41,7 +41,7 @@ import org.mycore.common.MCRDefaults;
  */
 public class ClassificationTransformer {
 
-    private static final String STANDARD_LABEL = "{id}: {text} [{count}]";
+    private static final String STANDARD_LABEL = "{text}";
 
     /**
      * transforms a <code>Classification</code> into a MCR Classification.
