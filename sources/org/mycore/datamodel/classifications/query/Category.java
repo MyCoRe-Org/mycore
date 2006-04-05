@@ -31,4 +31,24 @@ package org.mycore.datamodel.classifications.query;
  */
 public class Category extends ClassificationObject {
 
+    private int numberOfObjects;
+
+    private String classID;
+
+    public String getClassID() {
+        return classID;
+    }
+
+    public void setClassID(String classID) {
+        this.classID = classID;
+    }
+
+    public int getNumberOfObjects() {
+        return numberOfObjects;
+    }
+
+    public void setNumberOfObjects(int numberOfObjects) {
+        this.numberOfObjects = numberOfObjects;
+    }
+
 }

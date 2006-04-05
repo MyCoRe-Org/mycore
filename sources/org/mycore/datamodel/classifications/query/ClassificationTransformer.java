@@ -24,6 +24,7 @@
 package org.mycore.datamodel.classifications.query;
 
 import java.util.Iterator;
+import java.util.regex.Pattern;
 
 import org.jdom.DocType;
 import org.jdom.Document;
@@ -39,6 +40,8 @@ import org.mycore.common.MCRDefaults;
  * @version $Revision$ $Date$
  */
 public class ClassificationTransformer {
+
+    private static final String STANDARD_LABEL = "{id}: {text} [{count}]";
 
     /**
      * transforms a <code>Classification</code> into a MCR Classification.
@@ -59,7 +62,11 @@ public class ClassificationTransformer {
      * @return
      */
     public static Document getEditorDocument(Classification cl) {
-        return ItemElementFactory.getDocument(cl);
+        return ItemElementFactory.getDocument(cl, STANDARD_LABEL);
+    }
+
+    public static Document getEditorDocument(Classification cl, String labelFormat) {
+        return ItemElementFactory.getDocument(cl, labelFormat);
     }
 
     private static class MetaDataElementFactory {
@@ -122,41 +129,53 @@ public class ClassificationTransformer {
     }
 
     private static class ItemElementFactory {
-        static Document getDocument(Classification cl) {
+        private static final Pattern TEXT_PATTERN = Pattern.compile("\\{text\\}");
+
+        private static final Pattern ID_PATTERN = Pattern.compile("\\{id\\}");
+
+        private static final Pattern DESCR_PATTERN = Pattern.compile("\\{description\\}");
+
+        private static final Pattern COUNT_PATTERN = Pattern.compile("\\{count\\}");
+
+        static Document getDocument(Classification cl, String labelFormat) {
             Document cd = new Document(new Element("items"));
             Iterator it = cl.getCatgegories().iterator();
             while (it.hasNext()) {
                 // add child categories
-                cd.getRootElement().addContent(getElement((Category) it.next()));
+                cd.getRootElement().addContent(getElement((Category) it.next(), labelFormat));
             }
             return cd;
         }
 
-        static Element getElement(Label label) {
+        static Element getElement(Label label, Category cat, String labelFormat) {
             Element le = new Element("label");
             if (stringNotEmpty(label.getLang())) {
                 le.setAttribute("lang", label.getLang(), Namespace.XML_NAMESPACE);
             }
-            if (stringNotEmpty(label.getText())) {
-                le.setText(label.getText());
-            } else if (stringNotEmpty(label.getDescription())) {
-                le.setText(label.getDescription());
-            }
+            le.setText(getLabelText(label, cat, labelFormat));
             return le;
         }
 
-        static Element getElement(Category category) {
+        static String getLabelText(Label label, Category cat, String labelFormat) {
+            String text = TEXT_PATTERN.matcher(labelFormat).replaceAll(label.getText());
+            text = ID_PATTERN.matcher(text).replaceAll(cat.getId());
+            text = DESCR_PATTERN.matcher(text).replaceAll(label.description);
+            text = COUNT_PATTERN.matcher(text).replaceAll(Integer.toString(cat.getNumberOfObjects()));
+            return text;
+        }
+
+        static Element getElement(Category category, String labelFormat) {
             Element ce = new Element("item");
             ce.setAttribute("value", category.getId());
             Iterator it = category.getLabels().iterator();
             while (it.hasNext()) {
                 // add labels
-                ce.addContent(getElement((Label) it.next()));
+                ce.addContent(getElement((Label) it.next(), category, labelFormat));
             }
             it = category.getCatgegories().iterator();
             while (it.hasNext()) {
                 // add child categories
-                ce.addContent(getElement((Category) it.next()));
+                ce.addContent(getElement((Category) it.next(), labelFormat));
             }
             return ce;
         }
