@@ -40,6 +40,8 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.StringTokenizer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.servlet.ServletContext;
 import javax.xml.transform.Source;
@@ -100,7 +102,8 @@ public class MCRURIResolver implements javax.xml.transform.URIResolver, EntityRe
         String prefix = "MCR.URIResolver.";
         int cacheSize = config.getInt(prefix + "StaticFiles.CacheSize", 100);
         bytesCache = new MCRCache(cacheSize);
-        HashMap supportedSchemes = new HashMap(10, 1);//set to final size, loadfactor: full
+        HashMap supportedSchemes = new HashMap(10, 1);// set to final size,
+                                                        // loadfactor: full
         supportedSchemes.put("webapp", new MCRWebAppResolver());
         supportedSchemes.put("file", new MCRFileResolver());
         supportedSchemes.put("query", new MCRQueryResolver());
@@ -160,7 +163,7 @@ public class MCRURIResolver implements javax.xml.transform.URIResolver, EntityRe
         }
         return null;
     }
-    
+
     /**
      * Implements the SAX EntityResolver interface. This resolver type is used
      * to read DTDs and XML Schema files when parsing XML documents. This
@@ -170,19 +173,19 @@ public class MCRURIResolver implements javax.xml.transform.URIResolver, EntityRe
      */
     public InputSource resolveEntity(String publicId, String systemId) throws org.xml.sax.SAXException, java.io.IOException {
         LOGGER.debug("Resolving " + publicId + " :: " + systemId);
-    
+
         if (systemId == null) {
             return null; // Use default resolver
         }
-    
-        InputStream is = getCachedResource("/"+getFileName(systemId));
-    
+
+        InputStream is = getCachedResource("/" + getFileName(systemId));
+
         if (is == null) {
             return null; // Use default resolver
         }
-    
+
         LOGGER.debug("Reading " + getFileName(systemId));
-    
+
         return new InputSource(is);
     }
 
@@ -197,7 +200,7 @@ public class MCRURIResolver implements javax.xml.transform.URIResolver, EntityRe
         int posA = path.lastIndexOf("/");
         int posB = path.lastIndexOf("\\");
         int pos = ((posA == -1) ? posB : posA);
-    
+
         return ((pos == -1) ? path : path.substring(pos + 1));
     }
 
@@ -206,11 +209,11 @@ public class MCRURIResolver implements javax.xml.transform.URIResolver, EntityRe
 
         if (bytes == null) {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            LOGGER.debug("Resolving resource "+classResource);
+            LOGGER.debug("Resolving resource " + classResource);
             InputStream in = this.getClass().getResourceAsStream(classResource);
 
             if (in == null) {
-                LOGGER.debug(classResource+" not found");
+                LOGGER.debug(classResource + " not found");
                 return null;
             }
 
@@ -464,21 +467,21 @@ public class MCRURIResolver implements javax.xml.transform.URIResolver, EntityRe
         }
 
     }
-    
+
     private static class MCRLocalClassResolver implements MCRResolver {
 
         /**
-         * Delivers a jdom Element created by any local class that
-         *   implements MCRResolver
+         * Delivers a jdom Element created by any local class that implements
+         * MCRResolver
          * 
          * @param uri
          *            the class name of the file in the format
          *            localclass:org.mycore.ClassName?mode=getAll
-         *            
+         * 
          * @return the root element of the XML document
          */
         public Element resolveElement(String uri) {
-            String classname = uri.substring(uri.indexOf(":") + 1,uri.indexOf("?"));
+            String classname = uri.substring(uri.indexOf(":") + 1, uri.indexOf("?"));
             Class cl = null;
             Logger.getLogger(this.getClass()).debug("Loading Class: " + classname);
             try {
@@ -496,13 +499,13 @@ public class MCRURIResolver implements javax.xml.transform.URIResolver, EntityRe
                 }
                 MCRResolver resolver = (MCRResolver) o;
                 return resolver.resolveElement(uri);
-            }catch(Exception ex) {
+            } catch (Exception ex) {
                 LOGGER.error("Could not resolve uri " + uri, ex);
                 return new Element("error");
             }
         }
 
-    }    
+    }
 
     private static class MCRSessionResolver implements MCRResolver {
 
@@ -687,49 +690,73 @@ public class MCRURIResolver implements javax.xml.transform.URIResolver, EntityRe
     }
 
     private static class MCRClassificationResolver implements MCRResolver {
-        
+
+        private static final Pattern EDITORFORMAT_PATTERN = Pattern.compile("(\\[)([^\\]]*)(\\])");
+
+        private static final MCRConfiguration CONFIG = MCRConfiguration.instance();
+
+        private static final String FORMAT_CONFIG_PREFIX = "MCR.UriResolver.classification.format.";
+
         /**
          * returns a classification in a specific format.
          * 
-         * Syntax: <code>classification:{editor|metadata}:{ClassID}:{Levels}:[CategID]
+         * Syntax:
+         * <code>classification:{editor['['formatAlias']']|metadata}:{ClassID}:{Levels}:[CategID]
+         * 
+         * formatAlias: MCRConfiguration property MCR.UriResolver.classification.format.formatAlias
          * 
          * @param uri
          *            URI in the syntax above
          *            
          * @return the root element of the XML document
+         * @see ClassificationTransformer#getEditorDocument(Classification, String)
          */
         public Element resolveElement(String uri) {
-            String[] parameters=uri.split(":");
-            String format=parameters[1];
-            String classID=parameters[2];
-            int levels=Integer.parseInt(parameters[3]);
-            StringBuffer categID=new StringBuffer();
-            for (int i=4;i<parameters.length;i++){
+            String[] parameters = uri.split(":");
+            String format = parameters[1];
+            String classID = parameters[2];
+            int levels = Integer.parseInt(parameters[3]);
+            StringBuffer categID = new StringBuffer();
+            for (int i = 4; i < parameters.length; i++) {
                 categID.append(':').append(parameters[i]);
             }
-            if (categID.length()>0){
-                //categID was specified
-                //remove leading ":" from the for block above
+            if (categID.length() > 0) {
+                // categID was specified
+                // remove leading ":" from the for block above
                 categID.deleteCharAt(0);
             }
-            String categ=categID.toString();
+            String categ = categID.toString();
             Classification cl;
-            if (categ.length()>0){
-                cl=MCRClassificationQuery.getClassification(classID,categ,levels);
+            if (categ.length() > 0) {
+                cl = MCRClassificationQuery.getClassification(classID, categ, levels);
             } else {
-                cl=MCRClassificationQuery.getClassification(classID,levels);
+                cl = MCRClassificationQuery.getClassification(classID, levels);
             }
             Element returns;
-            if (format.equals("editor")){
-                returns=ClassificationTransformer.getEditorDocument(cl).getRootElement();
-            } else if (format.equals("metadata")){
-                returns=ClassificationTransformer.getMetaDataDocument(cl).getRootElement();
+            if (format.startsWith("editor")) {
+                String labelFormat = getLabelFormat(format);
+                if (format == null) {
+                    returns = ClassificationTransformer.getEditorDocument(cl).getRootElement();
+                } else {
+                    returns = ClassificationTransformer.getEditorDocument(cl, labelFormat).getRootElement();
+                }
+            } else if (format.equals("metadata")) {
+                returns = ClassificationTransformer.getMetaDataDocument(cl).getRootElement();
             } else {
-                returns=new Element(format);
+                returns = new Element(format);
             }
             return returns;
         }
-    
+
+        private static String getLabelFormat(String editorString) {
+            Matcher m = EDITORFORMAT_PATTERN.matcher(editorString);
+            if ((m.find()) && (m.groupCount() == 3)) {
+                String formatDef = m.group(2);
+                return CONFIG.getString(FORMAT_CONFIG_PREFIX + formatDef);
+            }
+            return null;
+        }
+
     }
 
 }
