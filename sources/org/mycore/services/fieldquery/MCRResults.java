@@ -28,6 +28,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Random;
 
 import org.jdom.Element;
 import org.jdom.output.Format;
@@ -38,8 +39,9 @@ import org.jdom.output.XMLOutputter;
  * Searchers add the hits using the addHit() method. Clients can get the hits,
  * sort the entries and do merge/and/or operations on two different result sets.
  * 
- * Searches may add the same hit (hit with the same ID) more than once. If the hit
- * already is contained in the result set, the data of both objects is merged. 
+ * Searches may add the same hit (hit with the same ID) more than once. If the
+ * hit already is contained in the result set, the data of both objects is
+ * merged.
  * 
  * @see MCRHit
  * 
@@ -50,16 +52,34 @@ public class MCRResults {
     /** The list of MCRHit objects */
     private List hits = new ArrayList();
 
-    /** A map containing MCRHit IDs used for and/or operations on two different MCRResult objects */
+    /**
+     * A map containing MCRHit IDs used for and/or operations on two different
+     * MCRResult objects
+     */
     private HashMap map = new HashMap();
 
     /** If true, this results are already sorted */
     private boolean isSorted = false;
 
+    /** The unique ID of this result set */
+    private String id;
+
+    private static Random random = new Random(System.currentTimeMillis());
+
     /**
      * Creates a new, empty MCRResults.
      */
     public MCRResults() {
+        id = Long.toString(random.nextLong(), 36) + Long.toString(System.currentTimeMillis(), 36);
+    }
+
+    /**
+     * Returns the unique ID of this result set
+     * 
+     * @return the unique ID of this result set
+     */
+    public String getID() {
+        return id;
     }
 
     /**
@@ -122,20 +142,18 @@ public class MCRResults {
     public int getNumHits() {
         return hits.size();
     }
-    
+
     /**
-     * Cuts the result list to the given maximum size, if more
-     * hits are present.
-     *  
-     * @param maxResults the number of results to be left
+     * Cuts the result list to the given maximum size, if more hits are present.
+     * 
+     * @param maxResults
+     *            the number of results to be left
      */
-    public void cutResults( int maxResults )
-    {
-      while( ( hits.size() > maxResults  ) && (maxResults >= 0) )
-      {
-        MCRHit hit = (MCRHit)( hits.remove( hits.size() - 1 ) );
-        map.remove( hit.getID() );
-      }
+    public void cutResults(int maxResults) {
+        while ((hits.size() > maxResults) && (maxResults >= 0)) {
+            MCRHit hit = (MCRHit) (hits.remove(hits.size() - 1));
+            map.remove(hit.getID());
+        }
     }
 
     /**
@@ -159,13 +177,16 @@ public class MCRResults {
     }
 
     /**
-     * Convenience method to sort results by up to three differend fields.
-     * Each parameter may be null, so you can sort by only one or two fields
-     * if you like.
+     * Convenience method to sort results by up to three differend fields. Each
+     * parameter may be null, so you can sort by only one or two fields if you
+     * like.
      * 
-     * @param first the first field to sort by
-     * @param second the second field to sort by
-     * @param third the third field to sort by
+     * @param first
+     *            the first field to sort by
+     * @param second
+     *            the second field to sort by
+     * @param third
+     *            the third field to sort by
      */
     public void sortBy(MCRSortBy first, MCRSortBy second, MCRSortBy third) {
         List sortByList = new ArrayList();
@@ -181,7 +202,8 @@ public class MCRResults {
     /**
      * Sorts this results by the given sort criteria.
      * 
-     * @param sortByList a List of MCRSortBy objects
+     * @param sortByList
+     *            a List of MCRSortBy objects
      */
     public void sortBy(final List sortByList) {
         Collections.sort(this.hits, new Comparator() {
@@ -207,19 +229,35 @@ public class MCRResults {
     }
 
     /**
-     * Returns a XML element containing all hits and their data
+     * Returns a XML element containing hits and their data
      * 
-     * @return a 'results' element with attributes 'sorted' and 'numHits' and hit child elements
+     * @param min
+     *            the position of the first hit to include in output
+     * @param max
+     *            the position of the last hit to include in output
+     * @return a 'results' element with attributes 'sorted' and 'numHits' and
+     *         hit child elements
      */
-    public Element buildXML() {
+    public Element buildXML(int min, int max) {
         Element results = new Element("results", MCRFieldDef.mcrns);
+        results.setAttribute("id", getID());
         results.setAttribute("sorted", Boolean.toString(isSorted()));
         results.setAttribute("numHits", String.valueOf(getNumHits()));
 
-        for (int i = 0; i < getNumHits(); i++)
+        for (int i = min; i <= max; i++)
             results.addContent(((MCRHit) hits.get(i)).buildXML());
 
         return results;
+    }
+
+    /**
+     * Returns a XML element containing all hits and their data
+     * 
+     * @return a 'results' element with attributes 'sorted' and 'numHits' and
+     *         hit child elements
+     */
+    public Element buildXML() {
+        return buildXML(0, getNumHits() - 1);
     }
 
     public String toString() {
@@ -229,7 +267,7 @@ public class MCRResults {
     /**
      * Returns a new MCRResults that only contains those hits that are members
      * of both source MCRResults objects. The compare is based on the ID of the
-     * hits. The data of each single hit is merged from both results. 
+     * hits. The data of each single hit is merged from both results.
      * 
      * @param a
      *            the first result list
