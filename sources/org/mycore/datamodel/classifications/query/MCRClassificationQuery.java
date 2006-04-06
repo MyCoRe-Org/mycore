@@ -118,15 +118,18 @@ public class MCRClassificationQuery {
     public static void main(String[] arg) throws IOException {
         Classification c = MCRClassificationQuery.getClassification(arg[0], 1);
         print(c, 0);
-        c = MCRClassificationQuery.getClassification(arg[0], arg[1], -1);
+        c = MCRClassificationQuery.getClassification(arg[0], arg[1], 0);
         print(c, 0);
         Document doc = ClassificationTransformer.getMetaDataDocument(c);
         print(doc);
         doc = ClassificationTransformer.getEditorDocument(c);
         print(doc);
-        Document cl = MCRClassification.receiveCategoryAsJDOM(arg[0], arg[1]);
-        XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat());
-        xout.output(cl, System.out);
+//        Document cl = MCRClassification.receiveCategoryAsJDOM(arg[0], arg[1]);
+        doc = MCRClassification.receiveClassificationAsJDOM(arg[0]);
+        print(doc);
+        c = MCRClassificationQuery.getClassification(arg[0], -1);
+        doc = ClassificationTransformer.getMetaDataDocument(c);
+        print(doc);
     }
 
     /**
@@ -164,7 +167,7 @@ public class MCRClassificationQuery {
             while (it.hasNext()) {
                 Element child = (Element) it.next();
                 Category childC = CategoryFactory.getCategory(child);
-                childC.setNumberOfObjects(getNumberOfObjects(e));
+                childC.setNumberOfObjects(getNumberOfObjects(child));
                 childC.setClassID(classID);
                 c.getCatgegories().add(childC);
                 fillCategory(classID, childC, child, levels - 1);
