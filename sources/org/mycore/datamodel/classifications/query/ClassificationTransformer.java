@@ -95,7 +95,6 @@ public class ClassificationTransformer {
     private static class MetaDataElementFactory {
         static Document getDocument(Classification cl) {
             Document cd = new Document(new Element("mycoreclass"));
-            cd.setDocType(new DocType("mycoreclass"));
             cd.getRootElement().setAttribute("noNamespaceSchemaLocation", "MCRClassification.xsd", Namespace.getNamespace("xsi", MCRDefaults.XSI_URL));
             cd.getRootElement().setAttribute("ID", cl.getId());
             Iterator it = cl.getLabels().iterator();
@@ -130,6 +129,7 @@ public class ClassificationTransformer {
         static Element getElement(Category category) {
             Element ce = new Element("category");
             ce.setAttribute("ID", category.getId());
+            ce.setAttribute("counter",Integer.toString(category.getNumberOfObjects()));
             Iterator it = category.getLabels().iterator();
             while (it.hasNext()) {
                 // add labels
