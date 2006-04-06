@@ -147,8 +147,8 @@ public class MCRSearchServlet extends MCRServlet {
 
         // The query condition, to show together with the results
         MCRCondition cond = (MCRCondition) (conds.get(id));
-        xml.addContent(new Element("condition").setAttribute("format", "xml").setText(cond.toString()));
-        xml.addContent(new Element("condition").setAttribute("format", "text").addContent(cond.toXML()));
+        xml.addContent(new Element("condition").setAttribute("format", "text").setText(cond.toString()));
+        xml.addContent(new Element("condition").setAttribute("format", "xml").addContent(cond.toXML()));
 
         // Send output to LayoutServlet
         request.setAttribute("MCRLayoutServlet.Input.JDOM", new Document(xml));
