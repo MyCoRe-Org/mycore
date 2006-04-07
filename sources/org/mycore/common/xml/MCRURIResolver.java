@@ -48,6 +48,7 @@ import javax.xml.transform.Source;
 import javax.xml.transform.TransformerException;
 
 import org.apache.log4j.Logger;
+import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.input.SAXBuilder;
 import org.jdom.transform.JDOMSource;
@@ -290,6 +291,8 @@ public class MCRURIResolver implements javax.xml.transform.URIResolver, EntityRe
     }
 
     private static class MCRObjectResolver implements MCRResolver {
+        protected static final SAXBuilder SAX_BUILDER = new org.jdom.input.SAXBuilder();
+
 
         /**
          * Reads local MCRObject with a given ID from the store.
@@ -303,14 +306,13 @@ public class MCRURIResolver implements javax.xml.transform.URIResolver, EntityRe
             LOGGER.debug("Reading MCRObject with ID " + id);
 
             try {
-                MCRXMLContainer result = new MCRXMLContainer();
                 MCRObjectID mcrid = new MCRObjectID(id);
                 byte[] xml = MCRXMLTableManager.instance().retrieve(mcrid);
-                result.add("local", id, 0, xml);
+                Document doc=SAX_BUILDER.build(new ByteArrayInputStream(xml));
 
-                return result.exportAllToDocument().getRootElement();
+                return doc.getRootElement();
             } catch (Exception ex) {
-                LOGGER.debug("Exception while reading MCRObject as XML", ex);
+                LOGGER.warn("Exception while reading MCRObject as XML", ex);
 
                 return null;
             }
