@@ -338,6 +338,7 @@ public class MCRServlet extends HttpServlet {
         
         final String requestAttr="MCRServlet.generateErrorPage";
         if ((!response.isCommitted()) && (request.getAttribute(requestAttr)==null)){
+            response.setStatus(error);
             RequestDispatcher rd = getServletContext().getNamedDispatcher("MCRLayoutServlet");
             request.setAttribute(requestAttr,msg);
             rd.forward(request, response);
