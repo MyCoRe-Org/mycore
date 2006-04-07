@@ -25,8 +25,10 @@ package org.mycore.frontend.servlets;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
+
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 import org.mycore.common.xml.MCRXMLContainer;
@@ -91,10 +93,15 @@ public class MCRObjectServlet extends MCRServlet {
             mcrid = new MCRObjectID(id);
 
             byte[] xml = TM.retrieve(mcrid);
+            if (xml == null){
+                LOGGER.warn("Could not load MCRObject with ID: "+id);
+                generateErrorPage(job.getRequest(),job.getResponse(),HttpServletResponse.SC_NOT_FOUND,"MCRObject with ID "+id+ " is not known.",null,false);
+                return;
+            }
             result.add("local", id, 0, xml);
         } catch (MCRException e) {
             LOGGER.warn(this.getClass() + " The ID " + id + " is not a MCRObjectID!");
-            job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + "editor_error_mcrid.xml"));
+            generateErrorPage(job.getRequest(),job.getResponse(),HttpServletResponse.SC_INTERNAL_SERVER_ERROR,"Error while retrieving MCRObject with ID: "+id,e,false);
 
             return;
         }
