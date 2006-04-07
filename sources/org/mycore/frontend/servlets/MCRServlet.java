@@ -102,8 +102,8 @@ public class MCRServlet extends HttpServlet {
 
         String requestURL = req.getRequestURL().toString();
         int pos = requestURL.indexOf(contextPath, 9);
-        BASE_URL = CONFIG.getString("MCR.basurl",requestURL.substring(0, pos) + contextPath);
-
+        BASE_URL = CONFIG.getString("MCR.baseurl",requestURL.substring(0, pos) + contextPath);
+        LOGGER.info("The base URL is "+BASE_URL);
         SERVLET_URL = BASE_URL + "servlets/";
     }
 
