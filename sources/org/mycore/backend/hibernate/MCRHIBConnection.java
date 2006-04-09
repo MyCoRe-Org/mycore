@@ -67,8 +67,6 @@ public class MCRHIBConnection {
 
     private static String driver;
 
-    private static int maxUsages = Integer.MAX_VALUE;
-    
     private static Logger logger = Logger.getLogger(MCRHIBConnection.class);
 
     MCRConfiguration config = MCRConfiguration.instance();
@@ -79,8 +77,6 @@ public class MCRHIBConnection {
         userID = config.getString("MCR.persistence_sql_database_userid", "");
         password = config.getString("MCR.persistence_sql_database_passwd", "");
         driver = config.getString("MCR.persistence_sql_driver", "");
-
-        maxUsages = config.getInt("MCR.persistence_sql_database_connection_max_usages", Integer.MAX_VALUE);
     }
 
     public static synchronized MCRHIBConnection instance() throws MCRPersistenceException {
@@ -133,8 +129,18 @@ public class MCRHIBConnection {
         	.setProperty("hibernate.connection.url", url)
         	.setProperty("hibernate.connection.username", userID)
         	.setProperty("hibernate.connection.password", password)
-        	.setProperty("hibernate.connection.pool_size", "" + maxUsages)
         	.setProperty("hibernate.show_sql","" + config.getBoolean("MCR.hibernate.show_sql", false));
+        // set connection pooling
+        // you can overload every hibernate property by defining 
+        // in mycore.properties a property with
+        // MCR.hibernate prefix
+        cfg.setProperty("hibernate.c3p0.max_size", "1")
+        	.setProperty("hibernate.c3p0.min_size","0")
+        	.setProperty("hibernate.c3p0.timeout","5000")
+        	.setProperty("hibernate.c3p0.max_statements","100")
+        	.setProperty("hibernate.c3p0.idle_test_period","300")
+        	.setProperty("hibernate.c3p0.acquire_increment","2")
+        	.setProperty("hibernate.c3p0.validate","false");
         
         Properties hibProperties = config.getProperties("MCR.hibernate.");
         for (Enumeration e = hibProperties.keys(); e.hasMoreElements();) {
