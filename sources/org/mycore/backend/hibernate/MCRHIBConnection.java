@@ -134,10 +134,10 @@ public class MCRHIBConnection {
         // you can overload every hibernate property by defining 
         // in mycore.properties a property with
         // MCR.hibernate prefix
-        cfg.setProperty("hibernate.c3p0.max_size", "1")
-        	.setProperty("hibernate.c3p0.min_size","0")
-        	.setProperty("hibernate.c3p0.timeout","5000")
-        	.setProperty("hibernate.c3p0.max_statements","100")
+        cfg.setProperty("hibernate.c3p0.max_size", "100")
+        	.setProperty("hibernate.c3p0.min_size","10")
+        	.setProperty("hibernate.c3p0.timeout","100")
+        	.setProperty("hibernate.c3p0.max_statements","0")
         	.setProperty("hibernate.c3p0.idle_test_period","300")
         	.setProperty("hibernate.c3p0.acquire_increment","2")
         	.setProperty("hibernate.c3p0.validate","false");
