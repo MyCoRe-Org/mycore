@@ -253,8 +253,7 @@ public class MCRHIBClassificationStore implements MCRClassificationInterface {
             List l = session.createQuery("from MCRCATEG where ID = '" + ID + "' AND CLID = '" + CLID + "'").list();
 
             if (l.size() < 1) {
-                session.close();
-                logger.error("no such category: " + ID + "/" + CLID);
+              logger.error("no such category: " + ID + "/" + CLID);
 
                 return null;
             }
@@ -267,7 +266,6 @@ public class MCRHIBClassificationStore implements MCRClassificationInterface {
             List la = session.createQuery("from MCRCATEGLABEL where ID = '" + ID + "' and CLID = '" + CLID + "'").list();
 
             if (la.size() < 1) {
-                session.close();
                 logger.error("no such category: " + ID + "/" + CLID);
 
                 return null;
