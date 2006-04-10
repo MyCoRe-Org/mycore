@@ -337,8 +337,10 @@ public class MCROAIQueryService implements MCROAIQuery {
             repositoryId = config.getString(STR_OAI_REPOSITORY_IDENTIFIER + "." + instance);
             object.receiveFromDatastore(id);
         } catch (MCRConfigurationException mcrx) {
+        	logger.error("catched error", mcrx);
             return null;
         } catch (MCRException e) {
+        	logger.error("catched error", e);
             return null;
         }
 
@@ -431,7 +433,12 @@ public class MCROAIQueryService implements MCROAIQuery {
             for (int i = deliveredResults; i < Math.min(maxReturns + deliveredResults, numResults); i++) {
                 String objectId = (String) resultArray[i];
                 MCRObject object = new MCRObject();
-                object.receiveFromDatastore(objectId);
+                try {
+                    repositoryId = config.getString(STR_OAI_REPOSITORY_IDENTIFIER + "." + instance);
+                    object.receiveFromDatastore(objectId);
+                } catch (Exception e) {
+                    logger.error("error stacktrace", e);
+                }                
 
                 String[] identifier = getHeader(object, objectId, repositoryId, instance);
                 list.add(identifier);
