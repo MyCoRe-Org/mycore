@@ -27,6 +27,7 @@ package org.mycore.services.webservices;
 import org.apache.log4j.Logger;
 
 import org.mycore.datamodel.metadata.MCRXMLTableManager;
+import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.common.xml.MCRXMLContainer;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.services.fieldquery.MCRQueryManager;
@@ -76,6 +77,54 @@ public class MCRWebService
         logger.warn(this.getClass() + " The ID " + ID + " is not a MCRObjectID!");
         org.jdom.Element root = new org.jdom.Element("MCRWebServiceError");
         root.setAttribute("type", "MCRDoRetrieveObject");
+        d = new org.jdom.Document(root);
+
+        root.addContent(ex.getMessage());
+      }
+
+      org.jdom.output.DOMOutputter doo = new org.jdom.output.DOMOutputter();
+
+      if (logger.isDebugEnabled())
+      {
+        org.jdom.output.XMLOutputter outputter = new org.jdom.output.XMLOutputter();
+        logger.debug(outputter.outputString(d));
+      }
+
+      return doo.output(d);
+    } catch (Exception ex)
+    {
+      ex.printStackTrace();
+    }
+    return null;
+  }
+  
+  /**
+   * Retrieves MyCoRe Classification   
+   *
+   * @param classID The ID of the classification   
+   * @param level   number of levels to retrievwe   
+   * @param catID   categroryID where retrievel with level starts   
+   * 
+   * @return data of miless document
+   * 
+   **/  
+  public org.w3c.dom.Document MCRDoRetrieveClassification(String classID, String level, String catID)
+  {
+    try
+    {
+      String uri  = "classification:metadata:" + classID + ":" + level + ":" + catID;
+      org.jdom.Document d = null;
+
+      try
+      {
+        org.jdom.Element cl = MCRURIResolver.instance().resolve( uri );
+        d                   = cl.getDocument(); //new org.jdom.Document( cl );
+      } catch (Exception ex)
+      {
+        ex.printStackTrace();
+        logger.warn(this.getClass() + " Classification  '" + classID + "' with level '" + level + "' and category '" + catID + "' not found");
+        org.jdom.Element root = new org.jdom.Element("MCRWebServiceError");
+        root.setAttribute("type", "MCRDoRetrieveClassification");
         d = new org.jdom.Document(root);
 
         root.addContent(ex.getMessage());
