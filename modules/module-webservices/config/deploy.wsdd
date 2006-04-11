@@ -3,10 +3,12 @@
             xmlns:xsi="http://www.w3.org/2000/10/XMLSchema-instance">
   <service name="MCRWebService" provider="java:RPC">
     <requestFlow>
+<!-- used in combination with wss4j to send userid and password    
       <handler type="java:org.apache.ws.axis.security.WSDoAllReceiver">
         <parameter name="passwordCallbackClass" value="org.mycore.services.webservices.MCRPWCallback"/>
         <parameter name="action" value="UsernameToken"/>
       </handler>
+-->      
     </requestFlow>
     <parameter name="className" value="org.mycore.services.webservices.MCRWebService" />
 
@@ -17,6 +19,20 @@
                      Result is org.w3c.dom.Document</documentation>
       <parameter name="id" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema">
         <documentation>id of mycore object</documentation>
+      </parameter>
+    </operation>
+
+    <operation name="MCRDoRetrieveClassification">
+      <documentation>This operation retrieves a mycore classification
+                     Result is org.w3c.dom.Document</documentation>
+      <parameter name="classID" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema">
+        <documentation>The ID of mycore classification</documentation>
+      </parameter>
+      <parameter name="level" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema">
+        <documentation>Levels of categories to retrieve</documentation>
+      </parameter>
+      <parameter name="catID" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema">
+        <documentation>The ID of the category within classification</documentation>
       </parameter>
     </operation>
 
