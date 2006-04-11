@@ -55,7 +55,8 @@ public class MCRWebServiceClient
     System.out.println( "usage: parameter of MCRWebServicClient\n" );
     System.out.println( "-endpoint     url of webservice" );
     System.out.println( "-operation    valid opartions are:" );
-    System.out.println( "                 retrieve, parameter -mcrid required" );
+    System.out.println( "                 retrieve (mycore object), parameter -mcrid required" );
+    System.out.println( "                 retrievecl (mycore classification), parameters -classID, -level and -catID rquired" );
     System.out.println( "                 query, parameter -file required" );
     System.out.println( "-mcrid        id of MyCoRe-Object" );
     System.out.println( "-file         xml file with query" );
@@ -75,6 +76,12 @@ public class MCRWebServiceClient
         params.setProperty("mcrid", value);
       else if ( "-file".equals(op))
         params.setProperty("file", value);
+      else if ( "-classID".equals(op))
+        params.setProperty("classID", value);
+      else if ( "-level".equals(op))
+        params.setProperty("level", value);
+      else if ( "-catID".equals(op))
+        params.setProperty("catID", value);
     }
   }
   
@@ -82,9 +89,10 @@ public class MCRWebServiceClient
   {
     Properties params = new Properties();
     params.setProperty("endpoint", "http://localhost:8080/docportal/services/MCRWebService");
+/*    
     params.setProperty("mcrid", "DocPortal_document_00410901");
     params.setProperty("operation", "retrieve");
-    
+*/    
     handleParams(args, params);
     
     String endpoint = params.getProperty("endpoint");
@@ -112,12 +120,18 @@ public class MCRWebServiceClient
       
       if ("retrieve".equals(operation))
       {
-        org.w3c.dom.Document result = stub.MCRDoRetrieveObject((String)params.getProperty("mcrid"));
+        String mcrid = params.getProperty("mcrid");
+        if ( null != mcrid )
+        {
+          org.w3c.dom.Document result = stub.MCRDoRetrieveObject( mcrid );
 
-        org.jdom.input.DOMBuilder d = new org.jdom.input.DOMBuilder();
-        org.jdom.Document doc = d.build(result);
-        org.jdom.output.XMLOutputter outputter = new org.jdom.output.XMLOutputter();
-        logger.info( outputter.outputString(doc ) );
+          org.jdom.input.DOMBuilder d = new org.jdom.input.DOMBuilder();
+          org.jdom.Document doc = d.build(result);
+          org.jdom.output.XMLOutputter outputter = new org.jdom.output.XMLOutputter();
+          logger.info( outputter.outputString(doc ) );
+        }
+        else
+          System.out.println("parameter -mcrid missing");
       }
       else if ("query".equals(operation))
       {
@@ -137,6 +151,22 @@ public class MCRWebServiceClient
           logger.info( outputter.outputString(doc ) );
         } else
           System.out.println("xml file with query missing");
+      }
+      else if ("retrievecl".equals(operation))
+      {
+        String classID = params.getProperty("classID");
+        String level   = params.getProperty("level");
+        String catID   = params.getProperty("catID");
+        if ( null != classID && null != level && null != catID )
+        {
+          org.w3c.dom.Document result = stub.MCRDoRetrieveClassification(classID, level, catID);
+
+          org.jdom.input.DOMBuilder d = new org.jdom.input.DOMBuilder();
+          org.jdom.Document doc = d.build(result);
+          org.jdom.output.XMLOutputter outputter = new org.jdom.output.XMLOutputter();
+          logger.info( outputter.outputString(doc ) );
+        } else
+          System.out.println("parameter(s) for retrieve classification missing");
       }
       else
       {
