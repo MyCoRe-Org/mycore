@@ -34,6 +34,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
+import java.text.ParseException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Hashtable;
@@ -715,15 +716,24 @@ public class MCRURIResolver implements javax.xml.transform.URIResolver, EntityRe
          */
         public Element resolveElement(String uri) {
             String[] parameters = uri.split(":");
+            if (parameters.length<4){
+                //sanity check
+                throw new IllegalArgumentException("Invalid format of uri for retrieval of classification: "+uri);
+            }
             String format = parameters[1];
             String levelS=parameters[2];
             String axis=parameters[3];
             String classID = parameters[4];
             int levels;
-            if (levelS.equals("all")){
-                levels=-1;
-            } else {
-                levels = Integer.parseInt(levelS);    
+            try {
+                if (levelS.equals("all")){
+                    levels=-1;
+                } else {
+                    levels = Integer.parseInt(levelS);    
+                }
+            } catch (NumberFormatException e) {
+                LOGGER.error("Error while parsing numLevels ("+levelS+") uri may have been malformed: "+uri);
+                throw new IllegalArgumentException("Invalid format of uri for retrieval of classification: "+uri);
             }
             StringBuffer categID = new StringBuffer();
             for (int i = 5; i < parameters.length; i++) {
@@ -745,7 +755,7 @@ public class MCRURIResolver implements javax.xml.transform.URIResolver, EntityRe
             } else if (axis.equals("parents")){
                 if (categ.length()==0){
                     LOGGER.error("Cannot resolve parent axis without a CategID. URI: "+uri);
-                    return null;
+                    throw new IllegalArgumentException("Invalid format (categID is required in mode 'parents') of uri for retrieval of classification: "+uri);
                 }
                 cl = MCRClassificationQuery.getClassificationHierarchie(classID,categ,levels);
             }
@@ -761,7 +771,8 @@ public class MCRURIResolver implements javax.xml.transform.URIResolver, EntityRe
             } else if (format.equals("metadata")) {
                 returns = ClassificationTransformer.getMetaDataDocument(cl).getRootElement();
             } else {
-                returns = new Element(format);
+                LOGGER.error("Unknown target format given. URI: "+uri);
+                throw new IllegalArgumentException("Invalid target format ("+format+ ") in uri for retrieval of classification: "+uri);
             }
             return returns;
         }
