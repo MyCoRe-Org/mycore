@@ -102,13 +102,13 @@ public class MCRWebServiceClient
 
     
     EngineConfiguration config = new FileProvider("client_deploy.wsdd");
-    MCRWebServiceServiceLocator l = new MCRWebServiceServiceLocator(config);
+    MCRWSServiceLocator l = new MCRWSServiceLocator(config);
     
     try 
     {
       l.setMCRWebServiceEndpointAddress(endpoint);
       
-      Remote remote = l.getPort(MCRWebService.class);
+      Remote remote = l.getPort(MCRWS.class);
       Stub axisPort = (Stub)remote;
       axisPort._setProperty(WSHandlerConstants.ACTION, WSHandlerConstants.USERNAME_TOKEN);
       axisPort._setProperty(UsernameToken.PASSWORD_TYPE, WSConstants.PASSWORD_DIGEST);
@@ -116,7 +116,7 @@ public class MCRWebServiceClient
       axisPort._setProperty(WSHandlerConstants.PW_CALLBACK_CLASS, "org.mycore.services.wsclient.MCRPWCallback");
 
       //Need to cast 
-      MCRWebService stub          = (MCRWebServiceSoapBindingStub)axisPort;
+      MCRWS stub          = (MCRWebServiceSoapBindingStub)axisPort;
       
       if ("retrieve".equals(operation))
       {
@@ -156,10 +156,10 @@ public class MCRWebServiceClient
       {
         String classID = params.getProperty("classID");
         String level   = params.getProperty("level");
-        String catID   = params.getProperty("catID");
-        if ( null != classID && null != level && null != catID )
+        String catID   = params.getProperty("catID", "");
+        if ( null != classID && null != level )
         {
-          org.w3c.dom.Document result = stub.MCRDoRetrieveClassification(classID, level, catID);
+          org.w3c.dom.Document result = stub.MCRDoRetrieveClassification(level, "children", classID,  catID);
 
           org.jdom.input.DOMBuilder d = new org.jdom.input.DOMBuilder();
           org.jdom.Document doc = d.build(result);
