@@ -25,11 +25,14 @@
     <operation name="MCRDoRetrieveClassification">
       <documentation>This operation retrieves a mycore classification
                      Result is org.w3c.dom.Document</documentation>
-      <parameter name="classID" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema">
-        <documentation>The ID of mycore classification</documentation>
-      </parameter>
       <parameter name="level" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema">
         <documentation>Levels of categories to retrieve</documentation>
+      </parameter>
+      <parameter name="type" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema">
+        <documentation>Retrieve children with 'children', retrieve parents and children with 'parents' The ID of mycore classification</documentation>
+      </parameter>
+      <parameter name="classID" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema">
+        <documentation>The ID of mycore classification</documentation>
       </parameter>
       <parameter name="catID" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema">
         <documentation>The ID of the category within classification</documentation>
