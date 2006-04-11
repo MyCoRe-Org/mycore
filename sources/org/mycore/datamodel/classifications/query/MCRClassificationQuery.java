@@ -26,6 +26,7 @@ package org.mycore.datamodel.classifications.query;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -37,6 +38,7 @@ import org.jdom.output.XMLOutputter;
 
 import org.mycore.datamodel.classifications.MCRCategoryItem;
 import org.mycore.datamodel.classifications.MCRClassification;
+import org.mycore.datamodel.classifications.MCRClassificationItem;
 import org.mycore.datamodel.metadata.MCRLinkTableManager;
 
 /**
@@ -84,7 +86,21 @@ public class MCRClassificationQuery {
         fillCategory(cat, catItem, map, levels);
         return returns;
     }
-
+    
+    public static Classification getClassificationHierarchie (String classID, String categID, int levels) {
+        MCRCategoryItem catItem = MCRCategoryItem.getCategoryItem(classID,categID);
+        MCRCategoryItem parent = catItem.getParent();
+        LinkedList list=new LinkedList();
+        list.add(0,catItem);
+        while (parent!=null){
+            //build the ancestor axis
+            list.add(0,parent);
+            parent=parent.getParent();
+        }
+        return getClassification(catItem,list,levels);
+        
+    }
+    
     private static void printMap(Map map) {
         Iterator it = map.entrySet().iterator();
         System.out.println("Print Map:");
@@ -124,10 +140,9 @@ public class MCRClassificationQuery {
         print(doc);
         doc = ClassificationTransformer.getEditorDocument(c);
         print(doc);
-//        Document cl = MCRClassification.receiveCategoryAsJDOM(arg[0], arg[1]);
         doc = MCRClassification.receiveClassificationAsJDOM(arg[0]);
         print(doc);
-        c = MCRClassificationQuery.getClassification(arg[0], -1);
+        c = MCRClassificationQuery.getClassificationHierarchie(arg[0],arg[1],-1);
         doc = ClassificationTransformer.getMetaDataDocument(c);
         print(doc);
     }
@@ -143,6 +158,29 @@ public class MCRClassificationQuery {
         returns.getLabels().addAll(LabelFactory.getLabels(cl.getRootElement().getChildren("label")));
         fillCategory(returns.getId(), returns, cl.getRootElement().getChild("categories"), levels);
         return returns;
+    }
+
+    private static Classification getClassification(MCRCategoryItem catItem,List ancestors, int levels){
+        Classification cl=ClassificationFactory.getClassification(catItem.getClassificationItem());
+        // map of every categID with numberofObjects
+        Map map = MCRLinkTableManager.instance().countReferenceCategory(cl.getId());
+        Category cat=fillCategoryWithParents(cl,ancestors,map);
+        fillCategory(cat, catItem, map, levels);
+        return cl;
+    }
+
+    private static Category fillCategoryWithParents(ClassificationObject c,List ancestor, Map numDocs){
+        ClassificationObject co=c;
+        Category cat=null;
+        Iterator it = ancestor.iterator();
+        while (it.hasNext()){
+            MCRCategoryItem item=(MCRCategoryItem)it.next();
+            cat=CategoryFactory.getCategory(item);
+            cat.setNumberOfObjects(getNumberOfObjects(cat.getClassID(),cat.getId(),numDocs));
+            co.getCatgegories().add(cat);
+            co=cat;
+        }
+        return cat;
     }
 
     private static void fillCategory(ClassificationObject c, MCRCategoryItem item, Map map, int levels) {
@@ -205,6 +243,15 @@ public class MCRClassificationQuery {
     private static void intend(int a) {
         for (int i = 0; i < a; i++) {
             System.out.print(' ');
+        }
+    }
+
+    private static class ClassificationFactory {
+        static Classification getClassification(MCRClassificationItem i) {
+            Classification c = new Classification();
+            c.setId(i.getID());
+            c.getLabels().addAll(LabelFactory.getLabels(i.getLangArray(), i.getTextArray(), i.getDescriptionArray()));
+            return c;
         }
     }
 
