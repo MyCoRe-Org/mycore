@@ -2,7 +2,7 @@
 
 <!-- ============================================== -->
 <!--      MyCoRe-WebService build file for use with ANT        -->
-<!-- $Revision: 1.9 $ $Date: 2006-02-24 12:11:46 $ -->
+<!-- $Revision: 1.10 $ $Date: 2006-04-11 13:05:09 $ -->
 <!-- ============================================== -->
 
 <project name="MyCoReModule - WebService" default="usage" basedir=".">
@@ -34,14 +34,16 @@
       Usage: ant [target] [target] [target] ...
 
       Available targets for MyCoRe-WebService are:
-        compile                         compiles the Java Sources
-        webapps                         copy files to webapps
-        deploy                          deploy webservices
-        undeploy                        undeploy webservices
-        wsdl2java                       generate stub from wsdl
-        compile.client                  compile webservice client
-        wsclient.cmd                    build wsclient command
-        clean                           delete directory build
+        compile            compiles the Java Sources
+        webapps            copy files to webapps
+        deploy             deploy webservices
+        undeploy           undeploy webservices
+        compile.ws         compile WebServices interface (MCRWS.java)
+        java2wsdl          build MCRWebService.wsdl from MCRWS.class
+        wsdl2java          generate stubs from MCRWebService.wsdl
+        compile.client     compile webservice client and stubs
+        wsclient.cmd       build wsclient command
+        clean              delete directory build
 		</echo>
 	</target>
 	
@@ -128,7 +130,48 @@
 
   <!-- ============================================== -->
 
-  <target name="wsdl2java">
+  <target name="compile.ws">
+    <echo>
+      Compiling WebServices interface
+    </echo>
+    <mkdir dir="build/classes" />
+    <javac destdir="build/classes" encoding="ISO-8859-1">
+      <src path="sources/org/mycore/services/webservices" />
+      <include name="**/MCRWS.java" /> 
+    </javac>
+  </target>
+  
+  <!-- ============================================== -->
+
+  <target name="java2wsdl" depends="compile.ws">
+    <echo>
+      Building wsdl from MCRWS.class
+    </echo>
+    <delete file="build/MCRWebService.wsdl" />
+    <path id="wsdl2java.classpath">
+      <fileset dir="../../lib" includes="*.jar" />
+      <fileset dir="lib" includes="*.jar" />
+      <pathelement location="build/classes" />
+    </path>
+    <taskdef name="axis-java2wsdl" classname="org.apache.axis.tools.ant.wsdl.Java2WsdlAntTask" classpathref="wsdl2java.classpath" />	
+    <axis-java2wsdl 
+      classname="org.mycore.services.webservices.MCRWS"
+      namespace="wsclient.services.mycore.org"
+      location="http://${hostname}:${port}/services/MCRWebService" 
+      output="build/MCRWebService.wsdl"
+      style="RPC"
+    >
+      <classpath refid="wsdl2java.classpath" />       
+      <mapping namespace="http://${hostname}:${port}/services/MCRWebService" package="org.mycore.services.wsclient" />
+    </axis-java2wsdl>
+  </target>
+  
+  <!-- ============================================== -->
+
+  <target name="wsdl2java" depends="java2wsdl">
+    <echo>
+      Building stubs from build/MCRWebService.wsdl
+    </echo>
     <path id="wsdl2java.classpath">
       <fileset dir="../../lib" includes="*.jar" />
       <fileset dir="lib" includes="*.jar"/>
@@ -142,7 +185,7 @@
       testcase="false"
       verbose="true"
       serverside="true"
-      url="http://${hostname}:${port}${webservice}?wsdl" 
+      url="build/MCRWebService.wsdl" 
     >
       <mapping namespace="http://${hostname}:${port}${webservice}" package="org.mycore.services.wsclient" /> 
     </axis-wsdl2java>
@@ -160,8 +203,8 @@
       <fileset dir="lib" includes="*.jar"/>
     </path>
     <javac destdir="build/classes" classpathref="axis.classpath" encoding="ISO-8859-1">
+      <src path="build/src/org/mycore/services/wsclient" />
       <src path="sources/org/mycore/services/wsclient" />
-      <src path="build/src" />
     </javac>
   </target>
   
