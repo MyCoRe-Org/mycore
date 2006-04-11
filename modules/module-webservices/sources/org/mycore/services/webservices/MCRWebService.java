@@ -41,20 +41,15 @@ import org.mycore.services.fieldquery.MCRResults;
  * @version $Revision$ $Date$
  *
  */
-public class MCRWebService 
+public class MCRWebService implements MCRWS 
 {
   private static final Logger logger = Logger.getLogger( MCRWebService.class);
   
   private static MCRXMLTableManager TM = MCRXMLTableManager.instance();
 	
-  /**
-   * Retrieves MyCoRe object   
-   *
-   * @param ID The ID of the document to retrieve   
-   * 
-   * @return data of miless document
-   * 
-   **/  
+  /* (non-Javadoc)
+   * @see MCRWS#MCRDoRetrieveObject(java.lang.String)
+   */  
   public org.w3c.dom.Document MCRDoRetrieveObject(String ID)
   {
     try
@@ -98,21 +93,15 @@ public class MCRWebService
     return null;
   }
   
-  /**
-   * Retrieves MyCoRe Classification   
-   *
-   * @param classID The ID of the classification   
-   * @param level   number of levels to retrievwe   
-   * @param catID   categroryID where retrievel with level starts   
-   * 
-   * @return data of miless document
-   * 
-   **/  
-  public org.w3c.dom.Document MCRDoRetrieveClassification(String classID, String level, String catID)
+  /* (non-Javadoc)
+   * @see MCRWS#MCRDoRetrieveClassification(java.lang.String, java.lang.String, java.lang.String)
+   */  
+  public org.w3c.dom.Document MCRDoRetrieveClassification( String level, String type,
+      String classID, String categID)
   {
     try
     {
-      String uri  = "classification:metadata:" + classID + ":" + level + ":" + catID;
+      String uri  = "classification:metadata:" + level + ":" + type + ":" + classID + ":" + categID;
       org.jdom.Document d = null;
 
       try
@@ -122,7 +111,7 @@ public class MCRWebService
       } catch (Exception ex)
       {
         ex.printStackTrace();
-        logger.warn(this.getClass() + " Classification  '" + classID + "' with level '" + level + "' and category '" + catID + "' not found");
+        logger.warn(this.getClass() + " Classification  '" + classID + "' with level '" + level + "' and category '" + categID + "' not found");
         org.jdom.Element root = new org.jdom.Element("MCRWebServiceError");
         root.setAttribute("type", "MCRDoRetrieveClassification");
         d = new org.jdom.Document(root);
@@ -146,14 +135,8 @@ public class MCRWebService
     return null;
   }
   
-  /**
-   * Search for MyCoRe objects
-   * 
-   * @param query
-   *          as mycore xml query
-   * 
-   * @return resultset of search
-   * 
+  /* (non-Javadoc)
+   * @see MCRWS#MCRDoQuery(org.w3c.dom.Document)
    */  
   public org.w3c.dom.Document MCRDoQuery(org.w3c.dom.Document query)
   {
