@@ -703,7 +703,7 @@ public class MCRURIResolver implements javax.xml.transform.URIResolver, EntityRe
          * returns a classification in a specific format.
          * 
          * Syntax:
-         * <code>classification:{editor['['formatAlias']']|metadata}:{ClassID}:{Levels}:[CategID]
+         * <code>classification:{editor['['formatAlias']']|metadata}:{Levels}:{parents|children}:{ClassID}[:CategID]
          * 
          * formatAlias: MCRConfiguration property MCR.UriResolver.classification.format.formatAlias
          * 
@@ -716,10 +716,17 @@ public class MCRURIResolver implements javax.xml.transform.URIResolver, EntityRe
         public Element resolveElement(String uri) {
             String[] parameters = uri.split(":");
             String format = parameters[1];
-            String classID = parameters[2];
-            int levels = Integer.parseInt(parameters[3]);
+            String levelS=parameters[2];
+            String axis=parameters[3];
+            String classID = parameters[4];
+            int levels;
+            if (levelS.equals("all")){
+                levels=-1;
+            } else {
+                levels = Integer.parseInt(levelS);    
+            }
             StringBuffer categID = new StringBuffer();
-            for (int i = 4; i < parameters.length; i++) {
+            for (int i = 5; i < parameters.length; i++) {
                 categID.append(':').append(parameters[i]);
             }
             if (categID.length() > 0) {
@@ -728,12 +735,21 @@ public class MCRURIResolver implements javax.xml.transform.URIResolver, EntityRe
                 categID.deleteCharAt(0);
             }
             String categ = categID.toString();
-            Classification cl;
-            if (categ.length() > 0) {
-                cl = MCRClassificationQuery.getClassification(classID, categ, levels);
-            } else {
-                cl = MCRClassificationQuery.getClassification(classID, levels);
+            Classification cl=null;
+            if (axis.equals("children")) {
+                if (categ.length() > 0) {
+                    cl = MCRClassificationQuery.getClassification(classID, categ, levels);
+                } else {
+                    cl = MCRClassificationQuery.getClassification(classID, levels);
+                }
+            } else if (axis.equals("parents")){
+                if (categ.length()==0){
+                    LOGGER.error("Cannot resolve parent axis without a CategID. URI: "+uri);
+                    return null;
+                }
+                cl = MCRClassificationQuery.getClassificationHierarchie(classID,categ,levels);
             }
+            
             Element returns;
             if (format.startsWith("editor")) {
                 String labelFormat = getLabelFormat(format);
