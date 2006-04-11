@@ -35,6 +35,7 @@ import org.mycore.backend.hibernate.tables.MCRCATEGLABEL;
 import org.mycore.backend.hibernate.tables.MCRCLASS;
 import org.mycore.backend.hibernate.tables.MCRCLASSLABEL;
 import org.mycore.common.MCRException;
+import org.mycore.common.MCRUsageException;
 import org.mycore.datamodel.classifications.MCRCategoryItem;
 import org.mycore.datamodel.classifications.MCRClassificationInterface;
 import org.mycore.datamodel.classifications.MCRClassificationItem;
@@ -135,24 +136,23 @@ public class MCRHIBClassificationStore implements MCRClassificationInterface {
         try {
             List l = session.createQuery("FROM MCRCLASS WHERE id = '" + ID + "'").list();
 
-            if (l.size() < 1) {
-                session.close();
-                logger.error("no classfication with id " + ID);
-
-                return null;
-            }
-
-            l = session.createQuery("from MCRCLASSLABEL where ID = '" + ID + "'").list();
-
-            for (int t = 0; t < l.size(); t++) {
+            if (l.size() > 0) {
+              l = session.createQuery("from MCRCLASSLABEL where ID = '" + ID + "'").list();
+              
+              for (int t = 0; t < l.size(); t++) {
                 MCRCLASSLABEL cl = (MCRCLASSLABEL) l.get(t);
                 c.addData(cl.getLang(), cl.getText(), cl.getMcrdesc());
-            }
+              }
+            } else c = null;
+
         } catch (Exception e) {
             logger.error(e);
         } finally {
             session.close();
         }
+        
+        if ( null == c )
+          throw new MCRUsageException("no classfication with ID '" + ID + "' found");
 
         return c;
     }
@@ -252,31 +252,22 @@ public class MCRHIBClassificationStore implements MCRClassificationInterface {
         try {
             List l = session.createQuery("from MCRCATEG where ID = '" + ID + "' AND CLID = '" + CLID + "'").list();
 
-            if (l.size() < 1) {
-              logger.error("no such category: " + ID + "/" + CLID);
-
-                return null;
+            if (l.size() > 0) {
+              MCRCATEG c = (MCRCATEG) l.get(0);
+              
+              ci = new MCRCategoryItem(ID, CLID, c.getPid());
+              ci.setURL(c.getUrl());
+              
+              List la = session.createQuery("from MCRCATEGLABEL where ID = '" + ID + "' and CLID = '" + CLID + "'").list();
+              
+              if (la.size() > 0) {
+                for (int t = 0; t < la.size(); t++) {
+                  MCRCATEGLABEL cl = (MCRCATEGLABEL) la.get(t);
+                  ci.addData(cl.getLang(), cl.getText(), cl.getMcrdesc());
+                }
+              } else ci = null;
             }
 
-            MCRCATEG c = (MCRCATEG) l.get(0);
-
-            ci = new MCRCategoryItem(ID, CLID, c.getPid());
-            ci.setURL(c.getUrl());
-
-            List la = session.createQuery("from MCRCATEGLABEL where ID = '" + ID + "' and CLID = '" + CLID + "'").list();
-
-            if (la.size() < 1) {
-                logger.error("no such category: " + ID + "/" + CLID);
-
-                return null;
-            }
-
-            int t;
-
-            for (t = 0; t < la.size(); t++) {
-                MCRCATEGLABEL cl = (MCRCATEGLABEL) la.get(t);
-                ci.addData(cl.getLang(), cl.getText(), cl.getMcrdesc());
-            }
         } catch (Exception e) {
             logger.error(e);
             throw new MCRException("error while reading category item", e);
@@ -284,6 +275,9 @@ public class MCRHIBClassificationStore implements MCRClassificationInterface {
             session.close();
         }
 
+        if ( null == ci )
+          throw new MCRUsageException("no such category '" + ID + "' in classification '" + CLID + "' found");
+        
         return ci;
     }
 
@@ -302,35 +296,32 @@ public class MCRHIBClassificationStore implements MCRClassificationInterface {
         try {
             List l = session.createQuery("FROM MCRCATEG WHERE TEXT = '" + labeltext + "' AND CLID = '" + CLID + "'").list();
 
-            if (l.size() < 1) {
-                session.close();
-
-                return null;
+            if (l.size() > 0) {
+              MCRCATEG c = (MCRCATEG) l.get(0);
+              String ID = c.getId();
+              ci = new MCRCategoryItem(ID, CLID, c.getPid());
+              ci.setURL(c.getUrl());
+              
+              List la = session.createQuery("FROM MCRCATEGLABEL WHERE ID = '" + ID + "' AND CLID = '" + CLID + "'").list();
+              
+              if (la.size() > 0) {
+                for (int t = 0; t < la.size(); t++) {
+                  MCRCATEGLABEL cl = (MCRCATEGLABEL) la.get(t);
+                  ci.addData(cl.getLang(), cl.getText(), cl.getMcrdesc());
+                }
+              } else ci = null;
+              
             }
 
-            MCRCATEG c = (MCRCATEG) l.get(0);
-            String ID = c.getId();
-            ci = new MCRCategoryItem(ID, CLID, c.getPid());
-            ci.setURL(c.getUrl());
-
-            List la = session.createQuery("FROM MCRCATEGLABEL WHERE ID = '" + ID + "' AND CLID = '" + CLID + "'").list();
-
-            if (la.size() < 1) {
-                session.close();
-
-                return null;
-            }
-
-            for (int t = 0; t < la.size(); t++) {
-                MCRCATEGLABEL cl = (MCRCATEGLABEL) la.get(t);
-                ci.addData(cl.getLang(), cl.getText(), cl.getMcrdesc());
-            }
         } catch (Exception e) {
             logger.error(e);
             throw new MCRException("error while reading categories", e);
         } finally {
             session.close();
         }
+        
+        if ( null == ci )
+          throw new MCRUsageException("no such category with label'" + labeltext + "' in classification '" + CLID + "' found");
 
         return ci;
     }
