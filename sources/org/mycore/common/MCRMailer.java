@@ -301,8 +301,8 @@ public class MCRMailer {
 
     /**
      * Builds email address from a string. The string may be a single email
-     * address or a combination of a personal name and address, like "John Doe
-     * <john@doe.com>"
+     * address or a combination of a personal name and address, like 
+     * "John Doe" <john@doe.com>
      */
     private static InternetAddress buildAddress(String s) throws Exception {
         if (!s.endsWith(">")) {
