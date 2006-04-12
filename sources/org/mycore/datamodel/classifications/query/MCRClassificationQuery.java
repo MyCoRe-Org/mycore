@@ -80,13 +80,23 @@ public class MCRClassificationQuery {
         MCRCategoryItem catItem = MCRCategoryItem.getCategoryItem(classID, categID);
         // map of every categID with numberofObjects
         Map map = MCRLinkTableManager.instance().countReferenceCategory(classID);
-        // FIXME: remove debugMethod after tests
-        printMap(map);
         Category cat = (Category) returns.getCatgegories().get(0);
         fillCategory(cat, catItem, map, levels);
         return returns;
     }
     
+    /**
+     * returns a classification as POJO. Only the given Category, its ancestors
+     * (and its children to <code>levels</code> depth) is returned.
+     * 
+     * @param ID
+     *            MCR classification ID.
+     * @param categID
+     *            MCR category ID.
+     * @param levels
+     *            of category depth.
+     * @return
+     */
     public static Classification getClassificationHierarchie (String classID, String categID, int levels) {
         MCRCategoryItem catItem = MCRCategoryItem.getCategoryItem(classID,categID);
         MCRCategoryItem parent = catItem.getParent();
@@ -101,21 +111,6 @@ public class MCRClassificationQuery {
         
     }
     
-    private static void printMap(Map map) {
-        Iterator it = map.entrySet().iterator();
-        System.out.println("Print Map:");
-        while (it.hasNext()) {
-            Map.Entry entry = (Map.Entry) it.next();
-            System.out.println(entry.getKey() + ":" + entry.getValue());
-        }
-    }
-
-    private static int getNumberOfObjects(String classID, String categID, Map map) {
-        String mapKey = classID + "##" + categID;
-        int count = (map.get(mapKey) != null) ? ((Integer) map.get(mapKey)).intValue() : 0;
-        return count;
-    }
-
     /**
      * returns a classification as POJO. Only the given Category is returned.
      * 
@@ -133,18 +128,18 @@ public class MCRClassificationQuery {
 
     public static void main(String[] arg) throws IOException {
         Classification c = MCRClassificationQuery.getClassification(arg[0], 1);
-        print(c, 0);
+        MainHelper.print(c, 0);
         c = MCRClassificationQuery.getClassification(arg[0], arg[1], 0);
-        print(c, 0);
+        MainHelper.print(c, 0);
         Document doc = ClassificationTransformer.getMetaDataDocument(c);
-        print(doc);
+        MainHelper.print(doc);
         doc = ClassificationTransformer.getEditorDocument(c);
-        print(doc);
+        MainHelper.print(doc);
         doc = MCRClassification.receiveClassificationAsJDOM(arg[0]);
-        print(doc);
+        MainHelper.print(doc);
         c = MCRClassificationQuery.getClassificationHierarchie(arg[0],arg[1],-1);
         doc = ClassificationTransformer.getMetaDataDocument(c);
-        print(doc);
+        MainHelper.print(doc);
     }
 
     /**
@@ -153,9 +148,7 @@ public class MCRClassificationQuery {
      * @return
      */
     private static Classification getClassification(Document cl, int levels) {
-        Classification returns = new Classification();
-        returns.setId(cl.getRootElement().getAttributeValue("ID"));
-        returns.getLabels().addAll(LabelFactory.getLabels(cl.getRootElement().getChildren("label")));
+        Classification returns = ClassificationFactory.getClassification(cl.getRootElement());
         fillCategory(returns.getId(), returns, cl.getRootElement().getChild("categories"), levels);
         return returns;
     }
@@ -213,6 +206,12 @@ public class MCRClassificationQuery {
         }
     }
 
+    private static int getNumberOfObjects(String classID, String categID, Map map) {
+        String mapKey = classID + "##" + categID;
+        int count = (map.get(mapKey) != null) ? ((Integer) map.get(mapKey)).intValue() : 0;
+        return count;
+    }
+
     private static int getNumberOfObjects(Element e) {
         String counter = e.getAttributeValue("counter");
         int returns = 0;
@@ -222,31 +221,14 @@ public class MCRClassificationQuery {
         return returns;
     }
 
-    private static void print(ClassificationObject c, int depth) {
-        intend(depth);
-        System.out.println("ID: " + c.getId());
-        Iterator it = c.getCatgegories().iterator();
-        while (it.hasNext()) {
-            print((ClassificationObject) it.next(), depth + 1);
-        }
-    }
-
-    private static void print(Document doc) {
-        XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat());
-        try {
-            xout.output(doc, System.out);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private static void intend(int a) {
-        for (int i = 0; i < a; i++) {
-            System.out.print(' ');
-        }
-    }
-
     private static class ClassificationFactory {
+        static Classification getClassification(Element e) {
+            Classification c = new Classification();
+            c.setId(e.getAttributeValue("ID"));
+            c.getLabels().addAll(LabelFactory.getLabels(e.getChildren("label")));
+            return c;
+        }
+
         static Classification getClassification(MCRClassificationItem i) {
             Classification c = new Classification();
             c.setId(i.getID());
@@ -300,5 +282,41 @@ public class MCRClassificationQuery {
             }
             return returns;
         }
+    }
+    
+    /**
+     * 
+     * @author Thomas Scheffler (yagee)
+     * 
+     * This class provides some helper methods, that the main() method depend on.
+     *
+     */
+    private static final class MainHelper{
+        //TODO: After setting up JUnit persitence test remove this class
+
+        private static void print(ClassificationObject c, int depth) {
+            intend(depth);
+            System.out.println("ID: " + c.getId());
+            Iterator it = c.getCatgegories().iterator();
+            while (it.hasNext()) {
+                print((ClassificationObject) it.next(), depth + 1);
+            }
+        }
+
+        private static void print(Document doc) {
+            XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat());
+            try {
+                xout.output(doc, System.out);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        private static void intend(int a) {
+            for (int i = 0; i < a; i++) {
+                System.out.print(' ');
+            }
+        }
+        
     }
 }
