@@ -65,11 +65,24 @@ public class MCRWebService implements MCRWS
         mcrid = new MCRObjectID(ID);
 
         byte[] xml = TM.retrieve(mcrid);
-        result.add("local", ID, 0, xml);
-        d = result.exportAllToDocument();
+        if ( null != xml )
+        {
+          result.add("local", ID, 0, xml);
+          d = result.exportAllToDocument();
+        }
+        else
+        {
+          String msg = this.getClass() + " MCRobject with ID '" + ID + "' not found";
+          logger.warn( msg );
+          org.jdom.Element root = new org.jdom.Element("MCRWebServiceError");
+          root.setAttribute("type", "MCRDoRetrieveObject");
+          d = new org.jdom.Document(root);
+
+          root.addContent( msg );
+        }
       } catch (Exception ex)
       {
-        logger.warn(this.getClass() + " The ID " + ID + " is not a MCRObjectID!");
+        logger.warn(this.getClass() + " MCRobject with ID '" + ID + "' not found");
         org.jdom.Element root = new org.jdom.Element("MCRWebServiceError");
         root.setAttribute("type", "MCRDoRetrieveObject");
         d = new org.jdom.Document(root);
