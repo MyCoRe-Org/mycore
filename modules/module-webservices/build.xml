@@ -2,7 +2,7 @@
 
 <!-- ============================================== -->
 <!--      MyCoRe-WebService build file for use with ANT        -->
-<!-- $Revision: 1.10 $ $Date: 2006-04-11 13:05:09 $ -->
+<!-- $Revision: 1.11 $ $Date: 2006-04-12 08:31:08 $ -->
 <!-- ============================================== -->
 
 <project name="MyCoReModule - WebService" default="usage" basedir=".">
@@ -42,7 +42,8 @@
         java2wsdl          build MCRWebService.wsdl from MCRWS.class
         wsdl2java          generate stubs from MCRWebService.wsdl
         compile.client     compile webservice client and stubs
-        wsclient.cmd       build wsclient command
+        wsclient.cmd       build wsclient command (Windows)
+        wsclient.sh        build wsclient command (Linux/Unix)
         clean              delete directory build
 		</echo>
 	</target>
@@ -237,6 +238,36 @@
 SET AXISCLASSPATH=${path};%CLASSPATH% 
 java -Xms128m -Xmx512m -classpath "%AXISCLASSPATH%" org.mycore.services.wsclient.MCRWebServiceClient %1 %2 %3 %4 %5 %6 %7 %8 %9
     </echo>
+  </target>
+  
+    <target name="wsclient.sh" depends="compile.client" description="Generates wsclient.sh for starting wsclient from Command Line">
+    <echo>
+
+      Generating wsclient.sh for starting wsclient from Command Line
+    </echo>
+    
+    <mkdir dir="build/bin" />
+
+    <echo file="build/bin/mycore.properties"/>
+    
+    <path id="wsclient.classpath">
+      <fileset dir="../../lib" includes="*.jar" />
+      <fileset dir="lib" includes="*.jar"/>
+      <pathelement location="build/bin" />
+      <pathelement location="build/classes" />
+    </path>
+    
+    <copy todir="build/bin" preservelastmodified="yes">
+      <fileset dir="config"        includes="client_deploy.wsdd" />
+    </copy>
+    
+   <property name="path"           refid="wsclient.classpath"/>
+
+    <echo file="build/bin/wsclient.sh">#!/bin/sh
+export AXISCLASSPATH=${path}:${CLASSPATH}
+java -Xms128m -Xmx512m -classpath "${AXISCLASSPATH}" org.mycore.services.wsclient.MCRWebServiceClient $@
+    </echo>
+    <chmod file="build/bin/wsclient.sh" perm="755" />
   </target>
   
   <!-- ============================================== -->
