@@ -32,7 +32,6 @@ import java.util.Properties;
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
 import javax.activation.URLDataSource;
-import javax.mail.BodyPart;
 import javax.mail.Message;
 import javax.mail.Multipart;
 import javax.mail.Session;
@@ -59,11 +58,14 @@ public class MCRMailer {
     static Logger logger = Logger.getLogger(MCRMailer.class);
 
     protected static Session mailSession;
+    
+    protected static String encoding;
 
     /** Initializes the class */
     static {
         MCRConfiguration config = MCRConfiguration.instance();
-
+        encoding = config.getString( "MCR.mail.encoding", "ISO-8859-1" );
+        
         Properties mailProperties = new Properties();
 
         try {
@@ -266,16 +268,16 @@ public class MCRMailer {
             }
 
             msg.setSentDate(new Date());
-            msg.setSubject(subject);
+            msg.setSubject( subject, encoding );
 
             if ((parts == null) || (parts.size() == 0)) {
-                msg.setText(body);
+                msg.setText( body, encoding );
             } else {
                 // Create the message part
-                BodyPart messagePart = new MimeBodyPart();
+                MimeBodyPart messagePart = new MimeBodyPart();
 
                 // Fill the message
-                messagePart.setText(body);
+                messagePart.setText( body, encoding );
 
                 Multipart multipart = new MimeMultipart();
                 multipart.addBodyPart(messagePart);
@@ -311,6 +313,10 @@ public class MCRMailer {
 
         String name = s.substring(0, s.lastIndexOf("<")).trim();
         String addr = s.substring(s.lastIndexOf("<") + 1, s.length() - 1).trim();
+        
+        // Name must be quoted if it contains umlauts or special characters
+        if( ! name.startsWith( "\"" ) ) name = "\"" + name;
+        if( ! name.endsWith( "\"" ) ) name = name + "\"";
 
         return new InternetAddress(addr, name);
     }
