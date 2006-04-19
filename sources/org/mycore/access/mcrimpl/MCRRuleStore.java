@@ -50,7 +50,7 @@ public abstract class MCRRuleStore {
     
     public abstract ArrayList retrieveAllIDs();
     
-    public abstract ArrayList retrieveRuleIDs(String ruleExpression);
+    public abstract ArrayList retrieveRuleIDs(String ruleExpression, String description);
     
     public abstract int getNextFreeRuleID(String prefix);
 

@@ -198,12 +198,14 @@ public class MCRSQLRuleStore extends MCRRuleStore {
         return ret;
     }
 
-	public ArrayList retrieveRuleIDs(String ruleExpression) {
+	public ArrayList retrieveRuleIDs(String ruleExpression, String description) {
         MCRSQLConnection c = MCRSQLConnectionPool.instance().getConnection();
         ArrayList ret = new ArrayList();
 
         try {
-            String select = "SELECT RID FROM " + ruletablename + " WHERE RULE LIKE '" + ruleExpression + "'";
+            String select = "SELECT RID FROM " + ruletablename + " WHERE " + 
+            	"RULE LIKE '" + ruleExpression + "' OR" +
+            	"DESCRIPTION LIKE '" + description + "'";
             Statement statement = c.getJDBCConnection().createStatement();
             ResultSet rs = statement.executeQuery(select);
 

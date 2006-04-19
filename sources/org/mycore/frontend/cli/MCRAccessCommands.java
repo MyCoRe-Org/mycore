@@ -24,7 +24,10 @@
 package org.mycore.frontend.cli;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -38,6 +41,8 @@ import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRDefaults;
 import org.mycore.common.MCRException;
 import org.mycore.common.xml.MCRXMLHelper;
+import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.datamodel.metadata.MCRXMLTableManager;
 
 /**
  * This class provides a set of commands for the org.mycore.access management
@@ -72,6 +77,18 @@ public class MCRAccessCommands extends MCRAbstractCommands {
         
         com = new MCRCommand("save all permissions to file {0}", "org.mycore.frontend.cli.MCRAccessCommands.saveAllPermissionsToFile String", "");
         command.add(com);
+        
+        com = new MCRCommand("update permission {0} for id {1} with rulefile {2} described by {3}", "org.mycore.frontend.cli.MCRAccessCommands.permissionUpdateForID String String String String", "The command updates access rule for a given id of a given permission with a given special rule");
+        command.add(com);
+
+        com = new MCRCommand("update permission {0} for id {1} with rulefile {2}", "org.mycore.frontend.cli.MCRAccessCommands.permissionUpdateForID String String String", "The command updates access rule for a given id of a given permission with a given special rule");
+        command.add(com);        
+        
+        com = new MCRCommand("update permission {0} for documentType {1} with rulefile {2} described by {3}", "org.mycore.frontend.cli.MCRAccessCommands.permissionUpdateForDocumentType String String String String", "The command updates access rule for a given permission and all ids of a given MCRObject-Type with a given special rule");
+        command.add(com);
+        
+        com = new MCRCommand("update permission {0} for documentType {1} with rulefile {2}", "org.mycore.frontend.cli.MCRAccessCommands.permissionUpdateForDocumentType String String String", "The command updates access rule for a given permission and all ids of a given MCRObject-Type with a given special rule");
+        command.add(com);        
     }
 
     /**
@@ -235,4 +252,94 @@ public class MCRAccessCommands extends MCRAbstractCommands {
             throw new MCRException("Error while loading permissions data.", e);
         }   
     }
+    
+    private static Element getRuleFromFile(String strFileRule){
+    	if(!checkFilename(strFileRule)){
+    		System.out.println("wrong file format or file doesn't exist");
+    		return null;
+    	}
+    	Document ruleDom = MCRXMLHelper.parseURI(strFileRule);
+    	Element rule = ruleDom.getRootElement();
+    	if(!rule.getName().equals("condition")){
+    		System.out.println("root element is not valid");
+    		System.out.println("a valid rule would be for example:");
+    		System.out.println("<condition format=\"xml\"><boolean operator=\"true\" /></condition>");
+    		return null;
+    	}    	
+    	return rule;
+    }
+    
+    /**
+     * updates the permission for a given id and a given permission type with a given rule
+     * @param permission 
+     * 	        String type of permission like read, writedb, etc.
+     * @param id
+     *			String the id of the object the rule is assigned to
+     * @param strFileRule
+     * 			String the path to the xml file, that contains the rule
+     */
+    public static void permissionUpdateForID(String permission, String id, String strFileRule){
+    	permissionUpdateForID(permission, id, strFileRule, "");
+    }
+
+    /**
+     * updates the permission for a given id and a given permission type with a given rule
+     * 		
+     * @param permission 
+     * 	        String type of permission like read, writedb, etc.
+     * @param id
+     *			String the id of the object the rule is assigned to
+     * @param strFileRule
+     * 			String the path to the xml file, that contains the rule
+     * @param description
+     * 			String give a special description, if the semantics of your rule is multiple used
+     */    
+    public static void permissionUpdateForID(String permission, String id, String strFileRule, String description){
+    	MCRAccessInterface AI = MCRAccessManager.getAccessImpl();
+    	Element rule = getRuleFromFile(strFileRule);
+    	if(rule == null)
+    		return;
+    	AI.addRule(id, permission, rule, description);
+    	return;
+    }
+
+    /**
+     * updates the permissions for all ids of a given MCRObjectID-Type 
+     * 			with a given rule and a given permission
+     * @param permission 
+     * 	        String type of permission like read, writedb, etc.
+     * @param documentType
+     *			String a MCRObjectID-Type like document, disshab, etc.
+     * @param strFileRule
+     * 			String the path to the xml file, that contains the rule
+     */       
+    public static void permissionUpdateForDocumentType(String permission, String documentType, String strFileRule){
+    	permissionUpdateForDocumentType(permission, documentType, strFileRule, "");
+    }
+
+    /**
+     * updates the permissions for all ids of a given MCRObjectID-Type 
+     * 	and for a given permission type with a given rule
+     * @param permission 
+     * 	        String type of permission like read, writedb, etc.
+     * @param documentType
+     *			String a MCRObjectID-Type like document, disshab, etc.
+     * @param strFileRule
+     * 			String the path to the xml file, that contains the rule
+     * @param description
+     * 			String give a special description, if the semantics of your rule is multiple used
+     */    
+    public static void permissionUpdateForDocumentType(String permission, String documentType, String strFileRule, String description){
+    	MCRAccessInterface AI = MCRAccessManager.getAccessImpl();
+    	Element rule = getRuleFromFile(strFileRule);
+    	if(rule == null)
+    		return;
+    	ArrayList list = MCRXMLTableManager.instance().retrieveAllIDs(documentType);
+    	for (Iterator it = list.iterator(); it.hasNext();) {
+			String id = (String) it.next();
+			AI.addRule(id, permission, rule, description);
+		}
+    	return;
+    }    
+    
 }

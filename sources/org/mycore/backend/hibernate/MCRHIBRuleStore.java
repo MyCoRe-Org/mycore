@@ -90,12 +90,14 @@ public class MCRHIBRuleStore extends MCRRuleStore {
      * Method retrieves the ruleIDs of rules, whose string-representation starts with given data
      * 
      */
-    public ArrayList retrieveRuleIDs(String ruleExpression) {
+    public ArrayList retrieveRuleIDs(String ruleExpression, String description) {
     	ArrayList ret = new ArrayList();
     	Session session = MCRHIBConnection.instance().getSession();
         Transaction tx = session.beginTransaction();
         try{
-        	List l = session.createCriteria(MCRACCESSRULE.class).add(Restrictions.like("rule", ruleExpression)).list();
+        	List l = session.createCriteria(MCRACCESSRULE.class)
+        		.add(Restrictions.like("rule", ruleExpression))
+        		.add(Restrictions.like("description", description)).list();
             tx.commit();
             for (int i = 0; i < l.size(); i++) {
                 ret.add(((MCRACCESSRULE) l.get(i)).getRid());
