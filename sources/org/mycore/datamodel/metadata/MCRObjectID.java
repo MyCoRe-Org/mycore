@@ -48,9 +48,6 @@ public final class MCRObjectID {
      */
     public static final int MAX_LENGTH = 64;
 
-    // constant definitions
-    private static final String NL = new String((System.getProperties()).getProperty("line.separator"));
-
     // configuration values
     protected static MCRConfiguration CONFIG;
 
@@ -193,7 +190,7 @@ public final class MCRObjectID {
     /**
      * This method set a new number in a existing MCRObjectID.
      * 
-     * @param number
+     * @param num
      *            the new number
      */
     public final boolean setNumber(int num) {
@@ -250,7 +247,7 @@ public final class MCRObjectID {
             return "";
         }
 
-        return number_format.format((long) mcr_number);
+        return number_format.format(mcr_number);
     }
 
     /**
@@ -295,7 +292,7 @@ public final class MCRObjectID {
         }
 
         if (mcr_id == null) {
-            mcr_id = new StringBuffer(MAX_LENGTH).append(mcr_project_id).append('_').append(mcr_type_id).append('_').append(number_format.format((long) mcr_number)).toString();
+            mcr_id = new StringBuffer(MAX_LENGTH).append(mcr_project_id).append('_').append(mcr_type_id).append('_').append(number_format.format(mcr_number)).toString();
         }
 
         return mcr_id;
@@ -415,8 +412,7 @@ public final class MCRObjectID {
      *             if ID is not valid
      */
     public static void isValidOrDie(String id) {
-        MCRObjectID obj = new MCRObjectID(id);
-        obj = null;
+        new MCRObjectID(id);
     }
 
     /**
@@ -443,9 +439,8 @@ public final class MCRObjectID {
     public boolean equals(Object in) {
         if (!(in instanceof MCRObjectID)) {
             return false;
-        } else {
-            return equals((MCRObjectID) in);
         }
+        return equals((MCRObjectID) in);
     }
 
     /**
