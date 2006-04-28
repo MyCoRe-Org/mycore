@@ -86,19 +86,18 @@ public class MCRObjectServlet extends MCRServlet {
         }
 
         // check the ID and retrive the data
-        MCRXMLContainer result = new MCRXMLContainer();
         MCRObjectID mcrid = null;
+        byte[] xml;
 
         try {
             mcrid = new MCRObjectID(id);
 
-            byte[] xml = TM.retrieve(mcrid);
+            xml = TM.retrieve(mcrid);
             if (xml == null){
                 LOGGER.warn("Could not load MCRObject with ID: "+id);
                 generateErrorPage(job.getRequest(),job.getResponse(),HttpServletResponse.SC_NOT_FOUND,"MCRObject with ID "+id+ " is not known.",null,false);
                 return;
             }
-            result.add("local", id, 0, xml);
         } catch (MCRException e) {
             LOGGER.warn(this.getClass() + " The ID " + id + " is not a MCRObjectID!");
             generateErrorPage(job.getRequest(),job.getResponse(),HttpServletResponse.SC_INTERNAL_SERVER_ERROR,"Error while retrieving MCRObject with ID: "+id,e,false);
@@ -107,19 +106,7 @@ public class MCRObjectServlet extends MCRServlet {
         }
 
         // call the LayoutServlet
-
-        if (getProperty(job.getRequest(), "XSL.Style") == null) {
-            job.getRequest().setAttribute("XSL.Style", "html");
-        }
-
-        job.getRequest().setAttribute("mode", "ObjectMetadata");
-
-        String type = mcrid.getTypeId();
-        job.getRequest().setAttribute("type", type);
-
-        String layout = CONFIG.getString("MCR.type_" + type + "_in", type);
-        job.getRequest().setAttribute("layout", layout);
-        job.getRequest().setAttribute("MCRLayoutServlet.Input.JDOM", result.exportAllToDocument());
+        job.getRequest().setAttribute("MCRLayoutServlet.Input.BYTES", xml);
 
         RequestDispatcher rd = getServletContext().getNamedDispatcher("MCRLayoutServlet");
         rd.forward(job.getRequest(), job.getResponse());
