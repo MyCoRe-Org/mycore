@@ -53,16 +53,7 @@ public class MCRWebService implements MCRWS
   public org.w3c.dom.Document MCRDoRetrieveObject(String ID) throws Exception
   {
       // check the ID and retrieve the data
-      MCRObjectID mcrid = null;
-      org.jdom.Document d = null;
-
-        mcrid = new MCRObjectID(ID);
-
-        d = TM.readDocument( mcrid );
-        if ( null == d)
-        {
-          throw new Exception("MCRobject with ID '" + ID + "' not found");
-        }
+      org.jdom.Document d = TM.readDocument( new MCRObjectID(ID) );
 
       org.jdom.output.DOMOutputter doo = new org.jdom.output.DOMOutputter();
 
@@ -85,7 +76,7 @@ public class MCRWebService implements MCRWS
     org.jdom.Document d = null;
 
     org.jdom.Element cl = MCRURIResolver.instance().resolve( uri );
-    d                   = cl.getDocument(); //new org.jdom.Document( cl );
+    d                   = cl.getDocument();
 
     org.jdom.output.DOMOutputter doo = new org.jdom.output.DOMOutputter();
 

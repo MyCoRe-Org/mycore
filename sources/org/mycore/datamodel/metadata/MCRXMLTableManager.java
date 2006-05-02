@@ -301,9 +301,9 @@ public class MCRXMLTableManager {
             byte[] xml = retrieve(id);
 
             if ((xml == null) || (xml.length == 0)) {
-                LOGGER.error(new StringBuffer("Error while retrieving XML with id ").append(id).append(" from MCRXMLTableInterface."));
-
-                return null;
+                StringBuffer sb = new StringBuffer("Error while retrieving XML with id ").append(id).append(" from MCRXMLTableInterface.");
+                LOGGER.error(sb);
+                throw new MCRException(sb.toString());
             }
 
             // read from MCRXMLTable
