@@ -800,11 +800,7 @@ public class MCRClassification {
 	public static final Document receiveClassificationAsJDOM(String classID) {
 		Document classification = null;
 
-		try {
-			classification = getClassification(classID);
-		} catch (MCRException e) {
-			LOGGER.error("Oops", e);
-		}
+		classification = getClassification(classID);
 
 		Map map = MCRLinkTableManager.instance().countReferenceCategory(classID);
 		// in map we've got the sharp number for every categoryID (without
