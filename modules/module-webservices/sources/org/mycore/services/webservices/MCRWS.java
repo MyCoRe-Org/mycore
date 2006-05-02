@@ -34,7 +34,7 @@ public interface MCRWS
    * @return data of mycore object
    * 
    **/
-  public abstract org.w3c.dom.Document MCRDoRetrieveObject(String ID);
+  public abstract org.w3c.dom.Document MCRDoRetrieveObject(String ID) throws Exception;
 
   /**
    * Retrieves MyCoRe Classification   
@@ -48,7 +48,7 @@ public interface MCRWS
    * 
    **/
   public abstract org.w3c.dom.Document MCRDoRetrieveClassification( String level, String type,
-      String classID, String categID);
+      String classID, String categID) throws Exception;
 
   /**
    * Search for MyCoRe objects
@@ -59,6 +59,6 @@ public interface MCRWS
    * @return resultset of search
    * 
    */
-  public abstract org.w3c.dom.Document MCRDoQuery(org.w3c.dom.Document query);
+  public abstract org.w3c.dom.Document MCRDoQuery(org.w3c.dom.Document query) throws Exception;
 
 }

@@ -50,45 +50,19 @@ public class MCRWebService implements MCRWS
   /* (non-Javadoc)
    * @see MCRWS#MCRDoRetrieveObject(java.lang.String)
    */  
-  public org.w3c.dom.Document MCRDoRetrieveObject(String ID)
+  public org.w3c.dom.Document MCRDoRetrieveObject(String ID) throws Exception
   {
-    try
-    {
-
       // check the ID and retrieve the data
-      MCRXMLContainer result = new MCRXMLContainer();
       MCRObjectID mcrid = null;
       org.jdom.Document d = null;
 
-      try
-      {
         mcrid = new MCRObjectID(ID);
 
-        byte[] xml = TM.retrieve(mcrid);
-        if ( null != xml )
+        d = TM.readDocument( mcrid );
+        if ( null == d)
         {
-          result.add("local", ID, 0, xml);
-          d = result.exportAllToDocument();
+          throw new Exception("MCRobject with ID '" + ID + "' not found");
         }
-        else
-        {
-          String msg = this.getClass() + " MCRobject with ID '" + ID + "' not found";
-          logger.warn( msg );
-          org.jdom.Element root = new org.jdom.Element("MCRWebServiceError");
-          root.setAttribute("type", "MCRDoRetrieveObject");
-          d = new org.jdom.Document(root);
-
-          root.addContent( msg );
-        }
-      } catch (Exception ex)
-      {
-        logger.warn(this.getClass() + " MCRobject with ID '" + ID + "' not found");
-        org.jdom.Element root = new org.jdom.Element("MCRWebServiceError");
-        root.setAttribute("type", "MCRDoRetrieveObject");
-        d = new org.jdom.Document(root);
-
-        root.addContent(ex.getMessage());
-      }
 
       org.jdom.output.DOMOutputter doo = new org.jdom.output.DOMOutputter();
 
@@ -99,97 +73,55 @@ public class MCRWebService implements MCRWS
       }
 
       return doo.output(d);
-    } catch (Exception ex)
-    {
-      ex.printStackTrace();
-    }
-    return null;
   }
   
   /* (non-Javadoc)
    * @see MCRWS#MCRDoRetrieveClassification(java.lang.String, java.lang.String, java.lang.String)
    */  
   public org.w3c.dom.Document MCRDoRetrieveClassification( String level, String type,
-      String classID, String categID)
+      String classID, String categID) throws Exception
   {
-    try
+    String uri  = "classification:metadata:" + level + ":" + type + ":" + classID + ":" + categID;
+    org.jdom.Document d = null;
+
+    org.jdom.Element cl = MCRURIResolver.instance().resolve( uri );
+    d                   = cl.getDocument(); //new org.jdom.Document( cl );
+
+    org.jdom.output.DOMOutputter doo = new org.jdom.output.DOMOutputter();
+
+    if (logger.isDebugEnabled())
     {
-      String uri  = "classification:metadata:" + level + ":" + type + ":" + classID + ":" + categID;
-      org.jdom.Document d = null;
-
-      try
-      {
-        org.jdom.Element cl = MCRURIResolver.instance().resolve( uri );
-        d                   = cl.getDocument(); //new org.jdom.Document( cl );
-      } catch (Exception ex)
-      {
-        ex.printStackTrace();
-        logger.warn(this.getClass() + " Classification  '" + classID + "' with level '" + level + "' and category '" + categID + "' not found");
-        org.jdom.Element root = new org.jdom.Element("MCRWebServiceError");
-        root.setAttribute("type", "MCRDoRetrieveClassification");
-        d = new org.jdom.Document(root);
-
-        root.addContent(ex.getMessage());
-      }
-
-      org.jdom.output.DOMOutputter doo = new org.jdom.output.DOMOutputter();
-
-      if (logger.isDebugEnabled())
-      {
-        org.jdom.output.XMLOutputter outputter = new org.jdom.output.XMLOutputter();
-        logger.debug(outputter.outputString(d));
-      }
-
-      return doo.output(d);
-    } catch (Exception ex)
-    {
-      ex.printStackTrace();
+      org.jdom.output.XMLOutputter outputter = new org.jdom.output.XMLOutputter();
+      logger.debug(outputter.outputString(d));
     }
-    return null;
+
+    return doo.output(d);
   }
   
   /* (non-Javadoc)
    * @see MCRWS#MCRDoQuery(org.w3c.dom.Document)
    */  
-  public org.w3c.dom.Document MCRDoQuery(org.w3c.dom.Document query)
+  public org.w3c.dom.Document MCRDoQuery(org.w3c.dom.Document query)  throws Exception
   {
     org.jdom.Document doc    = null;
     org.jdom.Document result = null;
-    try
-    {
-      org.jdom.input.DOMBuilder d = new org.jdom.input.DOMBuilder();
-      doc = d.build(query);
+    
+    org.jdom.input.DOMBuilder d = new org.jdom.input.DOMBuilder();
+    doc = d.build(query);
 
-      if (logger.isDebugEnabled())
-      {
-        org.jdom.output.XMLOutputter outputter = new org.jdom.output.XMLOutputter();
-        logger.debug(outputter.outputString(doc));
-      }
+    if (logger.isDebugEnabled())
+    {
+      org.jdom.output.XMLOutputter outputter = new org.jdom.output.XMLOutputter();
+      logger.debug(outputter.outputString(doc));
+    }
       
-      // Execute query
-      MCRResults res = MCRQueryManager.search(doc);
+    // Execute query
+    MCRResults res = MCRQueryManager.search(doc);
 
-      result = new org.jdom.Document(res.buildXML());
+    result = new org.jdom.Document(res.buildXML());
 
-    } catch (Exception ex)
-    {
-      org.jdom.Element root = new org.jdom.Element("MCRWebServiceError");
-      root.setAttribute("type", "MCRDoQuery");
-      result = new org.jdom.Document(root);
-
-      root.addContent(ex.toString());
-      root.addContent(doc.detachRootElement());
-    }
-
-    try
-    {
-      org.jdom.output.DOMOutputter doo = new org.jdom.output.DOMOutputter();
-      return doo.output(result);
-    } catch (Exception ex)
-    {
-      ex.printStackTrace();
-    }
-    return null;
+    org.jdom.output.DOMOutputter doo = new org.jdom.output.DOMOutputter();
+    return doo.output(result);
   }
 
 }
