@@ -25,13 +25,12 @@ package org.mycore.frontend.servlets;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 
-import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
-import org.mycore.common.xml.MCRXMLContainer;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.MCRXMLTableManager;
 
@@ -46,9 +45,9 @@ import org.mycore.datamodel.metadata.MCRXMLTableManager;
  * @see org.mycore.frontend.servlets.MCRServlet
  */
 public class MCRObjectServlet extends MCRServlet {
-    private static Logger LOGGER = Logger.getLogger(MCRObjectServlet.class);
+    private static final long serialVersionUID = 1L;
 
-    private static MCRConfiguration CONFIG = null;
+    private static Logger LOGGER = Logger.getLogger(MCRObjectServlet.class);
 
     private static MCRXMLTableManager TM = null;
 
@@ -59,7 +58,6 @@ public class MCRObjectServlet extends MCRServlet {
      */
     public void init() throws ServletException {
         super.init();
-        CONFIG = MCRConfiguration.instance();
         TM = MCRXMLTableManager.instance();
     }
 
@@ -71,44 +69,42 @@ public class MCRObjectServlet extends MCRServlet {
      *            the MCRServletJob instance
      */
     public void doGetPost(MCRServletJob job) throws ServletException, Exception {
-        // the urn with information about the MCRObjectID
-        String uri = job.getRequest().getPathInfo();
-        String id = "";
-
-        if (uri != null) {
-            LOGGER.debug(this.getClass() + " Path = " + uri);
-
-            int j = uri.length();
-            LOGGER.debug(this.getClass() + " " + uri.substring(1, j));
-            id = uri.substring(1, j);
-        } else {
-            id = getProperty(job.getRequest(), "id");
-        }
-
-        // check the ID and retrive the data
-        MCRObjectID mcrid = null;
-        byte[] xml;
+        String id = getObjectID(job.getRequest());
 
         try {
-            mcrid = new MCRObjectID(id);
+            MCRObjectID mcrid = new MCRObjectID(id);
 
-            xml = TM.retrieve(mcrid);
-            if (xml == null){
-                LOGGER.warn("Could not load MCRObject with ID: "+id);
-                generateErrorPage(job.getRequest(),job.getResponse(),HttpServletResponse.SC_NOT_FOUND,"MCRObject with ID "+id+ " is not known.",null,false);
+            byte[] xml = TM.retrieve(mcrid);
+            if (xml == null) {
+                LOGGER.warn("Could not load MCRObject with ID: " + id);
+                generateErrorPage(job.getRequest(), job.getResponse(), HttpServletResponse.SC_NOT_FOUND, "MCRObject with ID " + id + " is not known.", null, false);
                 return;
             }
+            // call the LayoutServlet
+            job.getRequest().setAttribute("MCRLayoutServlet.Input.BYTES", xml);
+            RequestDispatcher rd = getServletContext().getNamedDispatcher("MCRLayoutServlet");
+            rd.forward(job.getRequest(), job.getResponse());
         } catch (MCRException e) {
             LOGGER.warn(this.getClass() + " The ID " + id + " is not a MCRObjectID!");
-            generateErrorPage(job.getRequest(),job.getResponse(),HttpServletResponse.SC_INTERNAL_SERVER_ERROR,"Error while retrieving MCRObject with ID: "+id,e,false);
-
+            generateErrorPage(job.getRequest(), job.getResponse(), HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error while retrieving MCRObject with ID: " + id, e, false);
             return;
         }
+    }
 
-        // call the LayoutServlet
-        job.getRequest().setAttribute("MCRLayoutServlet.Input.BYTES", xml);
+    /**
+     * @param job
+     * @return requested MCRObjectID
+     */
+    private static final String getObjectID(HttpServletRequest request) {
+        // the urn with information about the MCRObjectID
+        String uri = request.getPathInfo();
 
-        RequestDispatcher rd = getServletContext().getNamedDispatcher("MCRLayoutServlet");
-        rd.forward(job.getRequest(), job.getResponse());
+        if (uri != null) {
+            int j = uri.length();
+            LOGGER.debug("Path = " + uri + "-->" + uri.substring(1, j));
+            return uri.substring(1, j);
+        } else {
+            return getProperty(request, "id");
+        }
     }
 }
