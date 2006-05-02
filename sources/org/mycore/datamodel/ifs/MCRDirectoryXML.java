@@ -37,7 +37,6 @@ import org.jdom.Element;
 
 import org.mycore.backend.remote.MCRRemoteAccessInterface;
 import org.mycore.common.MCRConfiguration;
-import org.mycore.common.xml.MCRXMLContainer;
 
 /**
  * @author Thomas Scheffler (yagee)
@@ -142,11 +141,7 @@ public class MCRDirectoryXML {
             }
         }
 
-        // put it in an MCRXMLContainer
-        MCRXMLContainer resarray = new MCRXMLContainer();
-        resarray.add("local", dir.getOwnerID(), 1, doc.getRootElement());
-
-        return resarray.exportAllToDocument();
+        return doc;
 
     }
 
