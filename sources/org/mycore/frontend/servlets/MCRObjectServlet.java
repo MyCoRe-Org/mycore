@@ -30,7 +30,9 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 
+import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRException;
+import org.mycore.common.MCRSessionMgr;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.MCRXMLTableManager;
 
@@ -74,10 +76,20 @@ public class MCRObjectServlet extends MCRServlet {
         try {
             MCRObjectID mcrid = new MCRObjectID(id);
 
+            if (!MCRAccessManager.checkPermission(mcrid, "read")) {
+                StringBuffer msg = new StringBuffer(1024);
+                msg.append("Access denied reading MCRObject with ID: ").append(mcrid.getId());
+                msg.append(".\nCurrent User: ").append(MCRSessionMgr.getCurrentSession().getCurrentUserName());
+                msg.append("\nRemote IP: ").append(MCRSessionMgr.getCurrentSession().getCurrentIP());
+                generateErrorPage(job.getRequest(),job.getResponse(),HttpServletResponse.SC_FORBIDDEN,msg.toString(),null,false);
+                return;
+            }
+
             byte[] xml = TM.retrieve(mcrid);
             if (xml == null) {
                 LOGGER.warn("Could not load MCRObject with ID: " + id);
-                generateErrorPage(job.getRequest(), job.getResponse(), HttpServletResponse.SC_NOT_FOUND, "MCRObject with ID " + id + " is not known.", null, false);
+                generateErrorPage(job.getRequest(), job.getResponse(), HttpServletResponse.SC_NOT_FOUND, "MCRObject with ID " + id + " is not known.", null,
+                        false);
                 return;
             }
             // call the LayoutServlet
@@ -86,7 +98,8 @@ public class MCRObjectServlet extends MCRServlet {
             rd.forward(job.getRequest(), job.getResponse());
         } catch (MCRException e) {
             LOGGER.warn(this.getClass() + " The ID " + id + " is not a MCRObjectID!");
-            generateErrorPage(job.getRequest(), job.getResponse(), HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error while retrieving MCRObject with ID: " + id, e, false);
+            generateErrorPage(job.getRequest(), job.getResponse(), HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error while retrieving MCRObject with ID: "
+                    + id, e, false);
             return;
         }
     }
