@@ -130,6 +130,18 @@ public class MCRAccessManager {
     }
     
     /**
+     * determines whether the current user has the permission to perform a
+     * certain action.
+     * 
+     * @param id
+     * @param permission
+     * @return
+     */
+    public static boolean checkPermission(String id, String permission) {
+        return getAccessImpl().checkPermission(id, permission);
+    }
+    
+    /**
      * checks whether the current user has the permission to read/see a derivate
      *        check is also against the mcrobject, the derivate belongs to
      *        both checks must return true
