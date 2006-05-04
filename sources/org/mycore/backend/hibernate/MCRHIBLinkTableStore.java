@@ -25,11 +25,11 @@ package org.mycore.backend.hibernate;
 
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
@@ -37,7 +37,6 @@ import org.mycore.backend.hibernate.tables.MCRLINKHREF;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.datamodel.metadata.MCRLinkTableInterface;
-import org.mycore.datamodel.metadata.MCRLinkTableManager;
 
 /**
  * This class implements the MCRLinkTableInterface.
@@ -165,21 +164,37 @@ public class MCRHIBLinkTableStore implements MCRLinkTableInterface {
      */
     public final int countTo(String fromtype, String to, String type, String restriction) {
         Session session = getSession();
-        List l = new LinkedList();
+        Integer returns;
+        StringBuffer qBf = new StringBuffer(1024);
+        qBf.append("select count(key.mcrfrom) from ").append(classname).append(" where MCRTO = :to");
+        boolean tset = false, rset = false, fset = false;
 
-        String query = "from " + classname + " where MCRTO like '" + to + "'";
         if ((type != null) && (type.length() != 0)) {
-            query += (" and MCRTYPE like '" + type + "'");
+            tset = true;
+            qBf.append(" and MCRTYPE = :type");
         }
         if ((restriction != null) && (restriction.length() != 0)) {
-            query += (" and MCRTO like '" + restriction + "%'");
+            rset = true;
+            qBf.append(" and MCRTO like :restriction");
         }
         if ((fromtype != null) && (fromtype.length() != 0)) {
-            query += (" and MCRFROM like '%_" + fromtype + "_%'");
+            fset = true;
+            qBf.append(" and MCRFROM like %_:fromtype_%");
         }
 
         try {
-            l = session.createQuery(query).list();
+            Query q = session.createQuery(qBf.toString());
+            q.setString("to", to);
+            if (tset) {
+                q.setString("type", type);
+            }
+            if (rset) {
+                q.setString("restriction", restriction);
+            }
+            if (fset) {
+                q.setString("fromtype", fromtype);
+            }
+            returns=(Integer)q.uniqueResult();
         } catch (Exception e) {
             logger.error(e);
             throw new MCRException("Error during countTo(" + fromtype + "," + to + "," + type + "," + restriction + ")", e);
@@ -187,7 +202,7 @@ public class MCRHIBLinkTableStore implements MCRLinkTableInterface {
             session.close();
         }
 
-        return l.size();
+        return returns.intValue();
     }
 
     /**
