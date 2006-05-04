@@ -30,6 +30,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.Namespace;
@@ -48,6 +49,8 @@ import org.mycore.datamodel.metadata.MCRLinkTableManager;
  * @version $Revision$ $Date$
  */
 public class MCRClassificationQuery {
+    
+    private static final Logger LOGGER=Logger.getLogger(MCRClassificationQuery.class);
 
     /**
      * returns a classification as POJO.
@@ -76,12 +79,20 @@ public class MCRClassificationQuery {
      * @return
      */
     public static Classification getClassification(String classID, String categID, int levels) {
+        LOGGER.debug("start ClassCategSearch");
         Classification returns = getClassification(classID, categID);
-        MCRCategoryItem catItem = MCRCategoryItem.getCategoryItem(classID, categID);
-        // map of every categID with numberofObjects
-        Map map = MCRLinkTableManager.instance().countReferenceCategory(classID);
-        Category cat = (Category) returns.getCatgegories().get(0);
-        fillCategory(cat, catItem, map, levels);
+        if (levels != 0) {
+            LOGGER.debug("getCategoryItem");
+            MCRCategoryItem catItem = MCRCategoryItem.getCategoryItem(classID, categID);
+            // map of every categID with numberofObjects
+            LOGGER.debug("countReferenceCategory");
+            Map map = MCRLinkTableManager.instance().countReferenceCategory(classID);
+            LOGGER.debug("select category");
+            Category cat = (Category) returns.getCatgegories().get(0);
+            LOGGER.debug("fillCategory");
+            fillCategory(cat, catItem, map, levels);
+            LOGGER.debug("finished ClassCategSearch");
+        }
         return returns;
     }
     
@@ -121,8 +132,11 @@ public class MCRClassificationQuery {
      * @return
      */
     public static Classification getClassification(String classID, String categID) {
+        LOGGER.debug("-receiveCategoryAsJDOM");
         Document doc = MCRClassification.receiveCategoryAsJDOM(classID, categID);
+        LOGGER.debug("-getClassification");
         Classification returns = getClassification(doc, -1);
+        LOGGER.debug("-getClassification finished");
         return returns;
     }
 
