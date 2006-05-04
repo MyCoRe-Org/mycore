@@ -28,6 +28,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 
@@ -45,6 +47,7 @@ import org.mycore.common.MCRSessionMgr;
 public class MCRTranslation {
 
     private static final Logger LOGGER = Logger.getLogger(MCRTranslation.class);
+    private static final Pattern ARRAY_DETECTOR = Pattern.compile(";");
 
     /**
      * provides translation for the given label (property key).
@@ -88,9 +91,8 @@ public class MCRTranslation {
      * provides translation for the given label (property key).
      * 
      * The current locale that is needed for translation is gathered by the
-     * language of the current MCRSession. Be aware that any occurence of '(' ,
-     * ')' and '\' in <code>argument</code> has to be masked by '\'. You can
-     * use '(' and ')' to build an array of arguments: "(foo)(bar)" would result
+     * language of the current MCRSession. Be aware that any occurence of ';' and '\' in <code>argument</code> has to be masked by '\'. You can
+     * use ';' to build an array of arguments: "foo;bar" would result
      * in {"foo","bar"} (the array)
      * 
      * @param label
@@ -108,32 +110,23 @@ public class MCRTranslation {
         return new Locale(MCRSessionMgr.getCurrentSession().getCurrentLanguage());
     }
 
-    private static String[] getStringArray(String masked) {
+    static String[] getStringArray(String masked) {
         List a = new LinkedList();
-        boolean mask = false, element = false;
+        boolean mask = false;
         StringBuffer buf = new StringBuffer();
         if (masked == null) {
             return new String[0];
         }
-        if (masked.charAt(0) != '(') {
+        if (!isArray(masked)) {
             a.add(masked);
         } else {
             for (int i = 0; i < masked.length(); i++) {
                 switch (masked.charAt(i)) {
-                case '(':
+                case ';':
                     if (mask) {
-                        buf.append('(');
+                        buf.append(';');
                         mask = false;
                     } else {
-                        element = true;
-                    }
-                    break;
-                case ')':
-                    if (mask) {
-                        buf.append(')');
-                        mask = false;
-                    } else {
-                        element = false;
                         a.add(buf.toString());
                         buf.setLength(0);
                     }
@@ -147,14 +140,31 @@ public class MCRTranslation {
                     }
                     break;
                 default:
-                    if (element) {
-                        buf.append(masked.charAt(i));
-                    }
+                    buf.append(masked.charAt(i));
                     break;
                 }
             }
+            a.add(buf.toString());
         }
         return (String[]) a.toArray(new String[a.size()]);
+    }
+
+    static boolean isArray(String masked) {
+        Matcher m=ARRAY_DETECTOR.matcher(masked);
+        while (m.find()){
+            int pos=m.start();
+            int count=0;
+            for (int i=pos-1;i>0;i--){
+                if (masked.charAt(i)=='\\')
+                    count++;
+                else
+                    break;
+            }
+            if (count % 2 == 0){
+                return true;
+            }
+        }
+        return false;
     }
 
 }
