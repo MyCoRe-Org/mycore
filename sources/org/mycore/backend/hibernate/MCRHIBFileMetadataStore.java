@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
+import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.mycore.backend.hibernate.tables.MCRFSNODES;
@@ -159,7 +160,9 @@ public class MCRHIBFileMetadataStore implements MCRFileMetadataStore {
         List l = new LinkedList();
 
         try {
-            l = session.createQuery("from MCRFSNODES where PID = '" + parentID + "' and NAME = '" + name + "'").list();
+            Query q= session.createQuery("from MCRFSNODES where PID = :pid and NAME = :name");
+            q.setString("pid",parentID).setString("name",name);
+            l = q.list();
 
             if (l.size() < 1) {
                 return null;
