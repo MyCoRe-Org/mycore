@@ -414,7 +414,7 @@ public class MCRLinkTableManager {
      * @return the number of references
      */
     public int countReferenceCategory(String classid, String categid) {
-        return countReferenceLinkTo(classid + "##" + categid + "%",null,null);
+        return countReferenceLinkTo(classid + "##" + categid,null,null);
     }
 
     /**
