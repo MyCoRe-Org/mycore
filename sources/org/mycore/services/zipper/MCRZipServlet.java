@@ -50,7 +50,6 @@ import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRDefaults;
 import org.mycore.common.MCRException;
 import org.mycore.common.xml.MCRLayoutServlet;
-import org.mycore.common.xml.MCRXMLContainer;
 import org.mycore.common.xml.MCRXSLTransformation;
 import org.mycore.datamodel.ifs.MCRDirectory;
 import org.mycore.datamodel.ifs.MCRFile;
@@ -77,6 +76,7 @@ import org.mycore.frontend.servlets.MCRServletJob;
  * @version $Revision$ $Date$
  */
 public class MCRZipServlet extends MCRServlet {
+    private static final long serialVersionUID = 1L;
     // The Log4J logger
     private static Logger LOGGER = Logger.getLogger(MCRZipServlet.class.getName());
     private static String accessErrorPage = CONFIG.getString("MCR.access_page_error");
@@ -119,10 +119,6 @@ public class MCRZipServlet extends MCRServlet {
             path = null;
         }
 
-        // TODO
-        // ACCESS-CONTROL-CHECK
-        // WARTEN AUF ACLs
-        // Momentan werden alle Files gezipped ausgeliefert
         MCRObjectID mcrid = null;
 
         try {
@@ -141,38 +137,31 @@ public class MCRZipServlet extends MCRServlet {
             return;
         }
 
-        MCRXMLContainer result = new MCRXMLContainer();
-
         try {
-            result.add("local", mcrid.getId(), 0, (Element) xmltable.readDocument(mcrid).getRootElement().clone());
-
-            Document jdom = result.exportAllToDocument();
-
-            if (jdom.getRootElement().getChild("mcr_result").getChild("mycorederivate") != null) {
-            	if(!MCRAccessManager.checkPermissionForReadingDerivate(id)) {
+            if (id.indexOf("_derivate_") > 0) {
+                if (!MCRAccessManager.checkPermissionForReadingDerivate(id)) {
                     LOGGER.info("MCRFileNodeServlet: AccessForbidden to " + id);
-            		res.sendRedirect(getBaseURL() + accessErrorPage);
-            		return;
-            	}            	
+                    res.sendRedirect(getBaseURL() + accessErrorPage);
+                    return;
+                }
                 out = buildZipOutputStream(res, id, path);
                 sendDerivate(id, path, out);
                 out.close();
             } else {
-            	if(!AI.checkPermission(id, "read")) {
+                Document jdom = xmltable.readDocument(mcrid);
+                if (!AI.checkPermission(id, "read")) {
                     LOGGER.info("MCRFileNodeServlet: AccessForbidden to " + id);
-            		res.sendRedirect(getBaseURL() + accessErrorPage);
-            		return;
-            	}             	
+                    res.sendRedirect(getBaseURL() + accessErrorPage);
+                    return;
+                }
                 out = buildZipOutputStream(res, id, path);
                 sendObject(jdom, req, out);
                 out.close();
             }
         } catch (Exception e) {
-            LOGGER.warn(e.getMessage());
-
             String msg = "Das Zip-File konnte nicht ordnungsgemäss erstellt werden, " + "Bitte überprüfen Sie die eingegebenen Parameter";
             res.reset();
-            generateErrorPage(req, res, HttpServletResponse.SC_BAD_REQUEST, msg, new MCRException("zip-Error!"), false);
+            generateErrorPage(req, res, HttpServletResponse.SC_BAD_REQUEST, msg, new MCRException("zip-Error!",e), false);
         }
     }
 
@@ -183,6 +172,7 @@ public class MCRZipServlet extends MCRServlet {
      *            MCRFile, that has to be zipped
      */
     protected void sendZipped(MCRFile file, ZipOutputStream out) throws IOException {
+        LOGGER.debug("zipping "+file.getPath());
         ZipEntry ze = new ZipEntry(file.getPath());
         ze.setTime(file.getLastModified().getTime().getTime());
         out.putNextEntry(ze);
@@ -308,7 +298,7 @@ public class MCRZipServlet extends MCRServlet {
         sendZipped(jdom, parameters, out);
 
         // zip all derivates
-        List li = jdom.getRootElement().getChild("mcr_result").getChild("mycoreobject").getChild("structure").getChild("derobjects").getChildren("derobject");
+        List li = jdom.getRootElement().getChild("structure").getChild("derobjects").getChildren("derobject");
 
         for (Iterator it = li.iterator(); it.hasNext();) {
             Element el = (Element) it.next();
