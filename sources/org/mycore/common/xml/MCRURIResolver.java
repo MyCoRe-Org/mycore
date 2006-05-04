@@ -34,7 +34,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
-import java.text.ParseException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Hashtable;
@@ -308,9 +307,9 @@ public class MCRURIResolver implements javax.xml.transform.URIResolver, EntityRe
 
             try {
                 MCRObjectID mcrid = new MCRObjectID(id);
-                byte[] xml = MCRXMLTableManager.instance().retrieve(mcrid);
-                Document doc=SAX_BUILDER.build(new ByteArrayInputStream(xml));
+                Document doc = MCRXMLTableManager.instance().readDocument(mcrid);
 
+                LOGGER.debug("end resolving "+uri);
                 return doc.getRootElement();
             } catch (Exception ex) {
                 LOGGER.warn("Exception while reading MCRObject as XML", ex);
@@ -715,6 +714,7 @@ public class MCRURIResolver implements javax.xml.transform.URIResolver, EntityRe
          * @see ClassificationTransformer#getEditorDocument(Classification, String)
          */
         public Element resolveElement(String uri) {
+            LOGGER.debug("start resolving "+uri);
             String[] parameters = uri.split(":");
             if (parameters.length<4){
                 //sanity check
@@ -746,6 +746,7 @@ public class MCRURIResolver implements javax.xml.transform.URIResolver, EntityRe
             }
             String categ = categID.toString();
             Classification cl=null;
+            LOGGER.debug("start ClassificationQuery");
             if (axis.equals("children")) {
                 if (categ.length() > 0) {
                     cl = MCRClassificationQuery.getClassification(classID, categ, levels);
@@ -761,6 +762,7 @@ public class MCRURIResolver implements javax.xml.transform.URIResolver, EntityRe
             }
             
             Element returns;
+            LOGGER.debug("start transformation of ClassificationQuery");
             if (format.startsWith("editor")) {
                 String labelFormat = getLabelFormat(format);
                 if (labelFormat == null) {
@@ -774,6 +776,7 @@ public class MCRURIResolver implements javax.xml.transform.URIResolver, EntityRe
                 LOGGER.error("Unknown target format given. URI: "+uri);
                 throw new IllegalArgumentException("Invalid target format ("+format+ ") in uri for retrieval of classification: "+uri);
             }
+            LOGGER.debug("end resolving "+uri);
             return returns;
         }
 
