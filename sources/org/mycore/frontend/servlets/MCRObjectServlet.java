@@ -30,6 +30,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 
+import org.jdom.Document;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
@@ -43,6 +44,7 @@ import org.mycore.datamodel.metadata.MCRXMLTableManager;
  * 
  * @author Jens Kupferschmidt
  * @author Anja Schaar
+ * @author Thomas Scheffler (yagee)
  * 
  * @see org.mycore.frontend.servlets.MCRServlet
  */
@@ -85,19 +87,12 @@ public class MCRObjectServlet extends MCRServlet {
                 return;
             }
 
-            byte[] xml = TM.retrieve(mcrid);
-            if (xml == null) {
-                LOGGER.warn("Could not load MCRObject with ID: " + id);
-                generateErrorPage(job.getRequest(), job.getResponse(), HttpServletResponse.SC_NOT_FOUND, "MCRObject with ID " + id + " is not known.", null,
-                        false);
-                return;
-            }
+            Document doc=TM.readDocument(mcrid);
             // call the LayoutServlet
-            job.getRequest().setAttribute("MCRLayoutServlet.Input.BYTES", xml);
+            job.getRequest().setAttribute("MCRLayoutServlet.Input.JDOM", doc);
             RequestDispatcher rd = getServletContext().getNamedDispatcher("MCRLayoutServlet");
             rd.forward(job.getRequest(), job.getResponse());
         } catch (MCRException e) {
-            LOGGER.warn(this.getClass() + " The ID " + id + " is not a MCRObjectID!");
             generateErrorPage(job.getRequest(), job.getResponse(), HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error while retrieving MCRObject with ID: "
                     + id, e, false);
             return;
@@ -116,8 +111,7 @@ public class MCRObjectServlet extends MCRServlet {
             int j = uri.length();
             LOGGER.debug("Path = " + uri + "-->" + uri.substring(1, j));
             return uri.substring(1, j);
-        } else {
-            return getProperty(request, "id");
         }
+        return getProperty(request, "id");
     }
 }
