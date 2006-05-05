@@ -102,25 +102,27 @@ public class MCRTableGenerator {
     private static String doctype_url;
 
     private DocType createDoctype() {
-      if (doctype_url == null) {
-	      try {
-	    	  String strDir = MCRConfiguration.instance().getString("MCR.dtd.directory",System.getProperties().getProperty("java.io.tmpdir"));
-	    	  File dir = new File(strDir);
-	    	  if(!dir.exists()) {
-	    		  dir.mkdirs();
-	    	  }
-	    	  File docFile = new File(strDir + File.separator + "hibernate-mapping.dtd");
-	          InputStream input = this.getClass().getResourceAsStream("/hibernate-mapping.dtd");
-	          FileOutputStream output = new FileOutputStream(docFile);
-	          MCRUtils.copyStream(input, output);
-	          output.close();
-	          input.close();
-	          doctype_url = "" + docFile;
-	      } catch (IOException e) {
-	          throw new MCRException("couldn't create temporary hibernate docType file", e);
-	      }
-      }
-      return new DocType("hibernate-mapping", "-//Hibernate/Hibernate Mapping DTD//EN", doctype_url);    	
+        if (doctype_url == null) {
+            try {
+                String strDir = MCRConfiguration.instance().getString("MCR.dtd.directory", System.getProperties().getProperty("java.io.tmpdir"));
+                File dir = new File(strDir);
+                if (!dir.exists()) {
+                    dir.mkdirs();
+                }
+                File docFile = new File(strDir + File.separator + "hibernate-mapping.dtd");
+                if (!docFile.isFile()) {
+                    InputStream input = this.getClass().getResourceAsStream("/hibernate-mapping.dtd");
+                    FileOutputStream output = new FileOutputStream(docFile);
+                    MCRUtils.copyStream(input, output);
+                    output.close();
+                    input.close();
+                }
+                doctype_url = "" + docFile;
+            } catch (IOException e) {
+                throw new MCRException("couldn't create temporary hibernate docType file", e);
+            }
+        }
+        return new DocType("hibernate-mapping", "-//Hibernate/Hibernate Mapping DTD//EN", doctype_url);
     }
 
     /**
