@@ -60,6 +60,7 @@ public class MCRSQLSearcher extends MCRSearcher {
     private void createSQLQueryTable() {
         MCRSQLStatement sQuery = new MCRSQLStatement(table);
         sQuery.addColumn("MCRID VARCHAR(64) NOT NULL");
+        sQuery.addColumn("RETURNID VARCHAR(64) NOT NULL");
 
         List fds = MCRFieldDef.getFieldDefs(getIndex());
         for (int i = 0; i < fds.size(); i++) {
@@ -106,8 +107,11 @@ public class MCRSQLSearcher extends MCRSearcher {
     }
 
     // TODO: store all values, not just the first for each repeated field
-    protected void addToIndex(String entryID, List fields) {
+    protected void addToIndex(String entryID, String returnID, List fields) {
         MCRSQLStatement query = new MCRSQLStatement(table);
+        query.setValue(new MCRSQLColumn("MCRID", entryID, "string"));
+        query.setValue(new MCRSQLColumn("RETURNID", returnID, "string"));
+
         Hashtable used = new Hashtable();
 
         for (int i = 0; i < fields.size(); i++) {
@@ -118,7 +122,7 @@ public class MCRSQLSearcher extends MCRSearcher {
             String type = fv.getField().getDataType();
 
             // Store only first occurrence of field
-            if (used.containsKey(name)){
+            if (used.containsKey(name)) {
                 continue;
             }
             used.put(name, name);
@@ -161,8 +165,8 @@ public class MCRSQLSearcher extends MCRSearcher {
             LOGGER.debug(sql);
             MCRSQLRowReader reader = c.doQuery(sql);
 
-            while (reader.next() && ( maxResults <= 0 ? true: result.getNumHits() < maxResults)) {
-                String id = reader.getString("MCRID");
+            while (reader.next() && (maxResults <= 0 ? true : result.getNumHits() < maxResults)) {
+                String id = reader.getString("RETURNID");
 
                 MCRHit hit = new MCRHit(id);
 
