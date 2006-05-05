@@ -24,12 +24,17 @@
 package org.mycore.frontend.cli;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
@@ -42,6 +47,7 @@ import org.mycore.common.xml.MCRXMLHelper;
 import org.mycore.datamodel.metadata.MCRActiveLinkException;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.datamodel.metadata.MCRXMLTableManager;
 
 /**
  * Provides static methods that implement commands for the MyCoRe command line
@@ -90,6 +96,9 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         command.add(com);
 
         com = new MCRCommand("export object {0} to directory {1} with {2}", "org.mycore.frontend.cli.MCRObjectCommands.export String String String", "The command store the MCRObject with the MCRObjectID {0} to the directory {1} with the stylesheet mcr_{2}-object.xsl. For {2} save is the default.");
+        command.add(com);
+
+        com = new MCRCommand("export all objects of type {0} to directory {1} with {2}", "org.mycore.frontend.cli.MCRObjectCommands.exportAllObjects String String String", "Store all MCRObjects of type {0} to directory {1} with the stylesheet mcr_{2}-object.xsl. For {2} save is the default.");
         command.add(com);
 
         com = new MCRCommand("get last object ID for base {0}", "org.mycore.frontend.cli.MCRObjectCommands.getLastID String", "The command return the last used MCRObjectID for the ID base.");
@@ -422,7 +431,6 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      */
     public static void export(String fromID, String toID, String dirname, String style) {
         // check fromID and toID
-        MCRObject obj = new MCRObject();
         MCRObjectID fid = null;
         MCRObjectID tid = null;
 
@@ -454,6 +462,65 @@ public class MCRObjectCommands extends MCRAbstractCommands {
             return;
         }
 
+        Transformer trans = getTransformer(style);
+
+        MCRObjectID nid = fid;
+        int k = 0;
+
+        try {
+            for (int i = fid.getNumberAsInteger(); i < (tid.getNumberAsInteger() + 1); i++) {
+                nid.setNumber(i);
+
+            	if ( ! MCRObject.existInDatastore(nid) ) 
+            		continue;
+
+                if (exportMCRObject(dir, trans, nid))
+                    continue;
+
+                k++;
+            }
+        } catch (Exception ex) {
+            LOGGER.error(ex.getMessage());
+            LOGGER.error("Exception while store file to " + dir.getAbsolutePath());
+            LOGGER.error("");
+
+            return;
+        }
+
+        LOGGER.info(k + " Object's stored under " + dir.getAbsolutePath() + ".");
+    }
+
+    public static void exportAllObjects(String type, String dirname, String style) {
+        // check dirname
+        File dir = new File(dirname);
+
+        if (dir.isFile()) {
+            LOGGER.error(dirname + " is not a dirctory.");
+            return;
+        }
+        Transformer trans = getTransformer(style);
+        MCRXMLTableManager tm=MCRXMLTableManager.instance();
+        ArrayList ids=tm.retrieveAllIDs(type);
+        Iterator it=ids.iterator();
+        while (it.hasNext()){
+            String id=it.next().toString();
+            MCRObjectID oid=new MCRObjectID(id);
+            try {
+                exportMCRObject(dir,trans,oid);
+            } catch (Exception ex) {
+                LOGGER.error(ex.getMessage());
+                LOGGER.error("Exception while store file to " + dir.getAbsolutePath());
+                return;
+            }
+        }
+    }
+
+    /**
+     * @param style
+     * @return
+     * @throws TransformerFactoryConfigurationError
+     */
+    private static Transformer getTransformer(String style) throws TransformerFactoryConfigurationError {
         String xslfile = "mcr_save-object.xsl";
         if ((style != null) && (style.trim().length() != 0))
             xslfile = "mcr_" + style + "-object.xsl";
@@ -472,49 +539,42 @@ public class MCRObjectCommands extends MCRAbstractCommands {
             }
         } catch (Exception e) {
         }
+        return trans;
+    }
 
-        MCRObjectID nid = fid;
-        int k = 0;
+    /**
+     * @param obj
+     * @param dir
+     * @param trans
+     * @param nid
+     * @return
+     * @throws FileNotFoundException
+     * @throws TransformerException
+     * @throws IOException
+     */
+    private static boolean exportMCRObject(File dir, Transformer trans, MCRObjectID nid) throws FileNotFoundException, TransformerException, IOException {
+        MCRObject obj = new MCRObject();
+        byte[] xml = null;
 
         try {
-            for (int i = fid.getNumberAsInteger(); i < (tid.getNumberAsInteger() + 1); i++) {
-                nid.setNumber(i);
-
-                byte[] xml = null;
-
-            	if ( ! MCRObject.existInDatastore(nid) ) 
-            		continue;
-
-                try {
-                	// if object do'snt exist - no exception is catched! 
-                    xml = obj.receiveXMLFromDatastore(nid.toString());
-                } catch (MCRException ex) {
-                    continue;
-                }
-
-                File xmlOutput = new File(dir, nid.toString() + ".xml");
-                FileOutputStream out = new FileOutputStream(xmlOutput);
-
-                if (trans != null) {
-                    StreamResult sr = new StreamResult(out);
-                    trans.transform(new org.jdom.transform.JDOMSource(MCRXMLHelper.parseXML(xml, false)), sr);
-                } else {
-                    out.write(xml);
-                    out.flush();
-                }
-
-                k++;
-                LOGGER.info("Object " + nid.toString() + " saved to " + xmlOutput.getCanonicalPath() + ".");
-            }
-        } catch (Exception ex) {
-            LOGGER.error(ex.getMessage());
-            LOGGER.error("Exception while store file to " + dir.getAbsolutePath());
-            LOGGER.error("");
-
-            return;
+        	// if object do'snt exist - no exception is catched! 
+            xml = obj.receiveXMLFromDatastore(nid.toString());
+        } catch (MCRException ex) {
+            return false;
         }
 
-        LOGGER.info(k + " Object's stored under " + dir.getAbsolutePath() + ".");
+        File xmlOutput = new File(dir, nid.toString() + ".xml");
+        FileOutputStream out = new FileOutputStream(xmlOutput);
+
+        if (trans != null) {
+            StreamResult sr = new StreamResult(out);
+            trans.transform(new org.jdom.transform.JDOMSource(MCRXMLHelper.parseXML(xml, false)), sr);
+        } else {
+            out.write(xml);
+            out.flush();
+        }
+        LOGGER.info("Object " + nid.toString() + " saved to " + xmlOutput.getCanonicalPath() + ".");
+        return true;
     }
 
     /**
