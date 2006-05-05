@@ -31,6 +31,7 @@ import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandler;
 import org.mycore.common.events.MCREventHandlerBase;
 import org.mycore.datamodel.ifs.MCRFile;
+import org.mycore.datamodel.metadata.MCRLinkTableManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.parsers.bool.MCRCondition;
 
@@ -85,17 +86,28 @@ public abstract class MCRSearcher extends MCREventHandlerBase implements MCREven
         return index;
     }
 
+    private String getReturnID(MCRFile file) {
+        String ownerID = file.getOwnerID();
+        List list = MCRLinkTableManager.instance().getSourceOf(ownerID, MCRLinkTableManager.ENTRY_TYPE_DERIVATE);
+        if ((list == null) || (list.size() == 0))
+            return file.getID();
+        String objectID = (String) (list.get(0));
+        return objectID;
+    }
+
     protected void handleFileCreated(MCREvent evt, MCRFile file) {
         String entryID = file.getID();
+        String returnID = getReturnID(file);
         List fields = MCRData2Fields.buildFields(file, index);
-        addToIndex(entryID, fields);
+        addToIndex(entryID, returnID, fields);
     }
 
     protected void handleFileUpdated(MCREvent evt, MCRFile file) {
         String entryID = file.getID();
+        String returnID = getReturnID(file);
         List fields = MCRData2Fields.buildFields(file, index);
         removeFromIndex(entryID);
-        addToIndex(entryID, fields);
+        addToIndex(entryID, returnID, fields);
     }
 
     protected void handleFileDeleted(MCREvent evt, MCRFile file) {
@@ -106,14 +118,14 @@ public abstract class MCRSearcher extends MCREventHandlerBase implements MCREven
     protected void handleObjectCreated(MCREvent evt, MCRObject obj) {
         String entryID = obj.getId().getId();
         List fields = MCRData2Fields.buildFields(obj, index);
-        addToIndex(entryID, fields);
+        addToIndex(entryID, entryID, fields);
     }
 
     protected void handleObjectUpdated(MCREvent evt, MCRObject obj) {
         String entryID = obj.getId().getId();
         List fields = MCRData2Fields.buildFields(obj, index);
         removeFromIndex(entryID);
-        addToIndex(entryID, fields);
+        addToIndex(entryID, entryID, fields);
     }
 
     protected void handleObjectDeleted(MCREvent evt, MCRObject obj) {
@@ -134,10 +146,12 @@ public abstract class MCRSearcher extends MCREventHandlerBase implements MCREven
      * 
      * @param entryID
      *            the unique ID of this entry in the index
+     * @param returnID
+     *            the ID to return as result of a search (MCRHit ID)
      * @param fields
      *            a List of MCRFieldValue objects
      */
-    protected void addToIndex(String entryID, List fields) {
+    protected void addToIndex(String entryID, String returnID, List fields) {
     }
 
     /**
@@ -153,17 +167,22 @@ public abstract class MCRSearcher extends MCREventHandlerBase implements MCREven
     }
 
     /**
-     * Executes a query on this searcher. The query MUST only refer to fields that are
-     * managed by this searcher.
+     * Executes a query on this searcher. The query MUST only refer to fields
+     * that are managed by this searcher.
      * 
-     * @param query the parsed query
-     * @param sortBy a List of MCRSortBy objects that defines the sort order of the results, may be null
-     * @param maxResults the maximum number of results to return, a value &lt; 1 means to return all results.
+     * @param query
+     *            the parsed query
+     * @param sortBy
+     *            a List of MCRSortBy objects that defines the sort order of the
+     *            results, may be null
+     * @param maxResults
+     *            the maximum number of results to return, a value &lt; 1 means
+     *            to return all results.
      * @return the query results
      * 
      * @see MCRQueryParser
      * @see MCRQueryManager
      * @see MCRSortBy
      */
-    public abstract MCRResults search( MCRCondition query, List sortBy, int maxResults );
+    public abstract MCRResults search(MCRCondition query, List sortBy, int maxResults);
 }

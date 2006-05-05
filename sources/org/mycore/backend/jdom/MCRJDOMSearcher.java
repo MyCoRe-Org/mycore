@@ -95,7 +95,8 @@ public class MCRJDOMSearcher extends MCRSearcher {
         for (Enumeration keys = props.keys(); keys.hasMoreElements();) {
             String key = (String) (keys.nextElement());
             String type = key.substring(cfgPrefix.length());
-            if( "derivate".equals( type ) ) continue;
+            if ("derivate".equals(type))
+                continue;
 
             LOGGER.debug("Now indexing metadata of all stored MCRObjects from type " + type);
 
@@ -107,18 +108,19 @@ public class MCRJDOMSearcher extends MCRSearcher {
                 obj.setId(oid);
                 obj.setFromXML(mcr_xml.retrieve(oid), false);
                 List fields = MCRData2Fields.buildFields(obj, index);
-                addToIndex(sid, fields);
+                addToIndex(sid, sid, fields);
             }
         }
     }
 
-    protected void addToIndex(String entryID, List fields) {
+    protected void addToIndex(String entryID, String returnID, List fields) {
         if ((fields == null) || (fields.size() == 0)) {
             return;
         }
 
         LOGGER.info("MCRJDOMSearcher indexing data of " + entryID);
         Element data = new Element("data");
+        data.setAttribute("returnID", returnID);
 
         for (int i = 0; i < fields.size(); i++) {
             MCRFieldValue fv = (MCRFieldValue) (fields.get(i));
@@ -155,7 +157,8 @@ public class MCRJDOMSearcher extends MCRSearcher {
             Document xml = (Document) (map.get(entryID));
 
             if (matches(xml, xsl)) {
-                MCRHit hit = new MCRHit(entryID);
+                String returnID = xml.getRootElement().getAttributeValue("returnID");
+                MCRHit hit = new MCRHit(returnID);
                 results.addHit(hit);
 
                 // Add values of all fields that may be sort criteria

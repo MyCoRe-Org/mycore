@@ -46,6 +46,7 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
 import org.mycore.common.MCRConfiguration;
+import org.mycore.common.MCRException;
 import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.parsers.bool.MCRCondition;
 import org.mycore.services.fieldquery.MCRFieldDef;
@@ -116,7 +117,7 @@ public class MCRLuceneSearcher extends MCRSearcher {
         System.setProperty("org.apache.lucene.lockDir", lockDir);
     }
 
-    protected void addToIndex(String entryID, List fields) {
+    protected void addToIndex(String entryID, String returnID, List fields) {
         LOGGER.info("MCRLuceneSearcher indexing data of " + entryID);
 
         if ((fields == null) || (fields.size() == 0)) {
@@ -125,13 +126,13 @@ public class MCRLuceneSearcher extends MCRSearcher {
 
         try {
             Document doc = buildLuceneDocument(fields);
-//            doc.add(Field.Keyword("mcrid", entryID));
             doc.add(new Field("mcrid", entryID, Field.Store.YES, Field.Index.UN_TOKENIZED));
+            doc.add(new Field("returnid", returnID, Field.Store.YES, Field.Index.UN_TOKENIZED));
             LOGGER.debug("lucene document build " + entryID);
             addDocumentToLucene(doc);
         } catch (Exception e) {
-            e.printStackTrace();
-            LOGGER.warn("xxxxx " + e.getMessage());
+            LOGGER.error(e.getClass().getName() + ": " + e.getMessage());
+            LOGGER.error(MCRException.getStackTraceAsString(e));
         }
     }
 
@@ -162,7 +163,7 @@ public class MCRLuceneSearcher extends MCRSearcher {
                     LOGGER.debug("####### Index MCRFile: " + mcrfile.getPath());
 
                     BufferedReader in = new BufferedReader(PLUGIN_MANAGER.transform(mcrfile.getContentType(), mcrfile.getContentAsInputStream()));
-//                    Field f = Field.Text(name, in);
+                    // Field f = Field.Text(name, in);
                     Field f = new Field(name, in);
                     doc.add(f);
                 }
@@ -188,15 +189,15 @@ public class MCRLuceneSearcher extends MCRSearcher {
                 }
 
                 if (type.equals("identifier")) {
-//                  doc.add(Field.Keyword(name, content));
-                  doc.add(new Field(name, content, Field.Store.YES, Field.Index.UN_TOKENIZED));
+                    // doc.add(Field.Keyword(name, content));
+                    doc.add(new Field(name, content, Field.Store.YES, Field.Index.UN_TOKENIZED));
                 }
 
                 if (type.equals("Text") || type.equals("name") || (type.equals("text") && field.getField().isSortable())) {
-//                    doc.add(Field.Text(name, content));
+                    // doc.add(Field.Text(name, content));
                     doc.add(new Field(name, content, Field.Store.YES, Field.Index.TOKENIZED));
                 } else if (type.equals("text")) {
-//                    doc.add(Field.UnStored(name, content));
+                    // doc.add(Field.UnStored(name, content));
                     doc.add(new Field(name, content, Field.Store.NO, Field.Index.TOKENIZED));
                 }
             }
@@ -286,10 +287,10 @@ public class MCRLuceneSearcher extends MCRSearcher {
         } // if ( first
 
         writer = new IndexWriter(indexDir, analyzer, false);
-//        writer.mergeFactor = 200;
-        writer.setMergeFactor( 200 );
-//        writer.maxMergeDocs = 2000;
-        writer.setMaxMergeDocs( 2000 );
+        // writer.mergeFactor = 200;
+        writer.setMergeFactor(200);
+        // writer.maxMergeDocs = 2000;
+        writer.setMaxMergeDocs(2000);
 
         return writer;
     }
@@ -335,8 +336,8 @@ public class MCRLuceneSearcher extends MCRSearcher {
         if (hits.length() > 0) {
             IndexReader reader = IndexReader.open(indexDir);
             for (int i = 0; i < hits.length(); i++) {
-//              reader.delete(hits.id(i));
-              reader.deleteDocument(hits.id(i));
+                // reader.delete(hits.id(i));
+                reader.deleteDocument(hits.id(i));
             }
             LOGGER.info("DELETE: " + id);
             reader.close();
@@ -350,11 +351,11 @@ public class MCRLuceneSearcher extends MCRSearcher {
         MCRResults results = new MCRResults();
 
         try {
-             List f = new ArrayList();
-             f.add(cond.toXML());
+            List f = new ArrayList();
+            f.add(cond.toXML());
 
-             boolean reqf = true; // required flag Term with AND (true) or OR
-                                  // (false) combined
+            boolean reqf = true; // required flag Term with AND (true) or OR
+            // (false) combined
             Query luceneQuery = MCRBuildLuceneQuery.buildLuceneQuery(null, reqf, f);
             LOGGER.debug("Lucene Query: " + luceneQuery.toString());
             results = getLuceneHits(luceneQuery, maxResults);
@@ -368,17 +369,17 @@ public class MCRLuceneSearcher extends MCRSearcher {
 
         return results;
     }
-  
+
     /**
      * method does lucene query
      * 
      * @return result set
      */
     private MCRResults getLuceneHits(Query luceneQuery, int maxResults) throws Exception {
-        IndexSearcher searcher = new IndexSearcher(IndexDir);
+        if (maxResults <= 0)
+            maxResults = 100000;
 
-        // Hits hits = searcher.search( luceneQuery );
-        // int found = hits.length();
+        IndexSearcher searcher = new IndexSearcher(IndexDir);
         TopDocs hits = searcher.search(luceneQuery, null, maxResults);
         int found = hits.scoreDocs.length;
 
@@ -389,11 +390,11 @@ public class MCRLuceneSearcher extends MCRSearcher {
         for (int i = 0; i < found; i++) {
             // org.apache.lucene.document.Document doc = hits.doc(i);
             org.apache.lucene.document.Document doc = searcher.doc(hits.scoreDocs[i].doc);
-            String id;
 
-            id = doc.get("mcrid");
-            if ( null == id )         //TODO: temporary used, field name of aleph index is id and NOT mcrid
-              id = doc.get("id");
+            String id = doc.get("returnid");
+            if (null == id) // TODO: temporary used, field name of aleph index
+                            // is id and NOT mcrid
+                id = doc.get("id");
             /*
              * TODO if (MCRAccessManager.checkReadAccess( id,
              * MCRSessionMgr.getCurrentSession()))
@@ -401,20 +402,19 @@ public class MCRLuceneSearcher extends MCRSearcher {
                 MCRHit hit = new MCRHit(id);
 
                 Enumeration fields = doc.fields();
-                while (fields.hasMoreElements()) 
-                {
-                  Field field = (Field) fields.nextElement();
-                  if ( field.isStored() && !"mcrid".equals(field.name()) )
-                  {
-                    MCRFieldDef fd = MCRFieldDef.getDef( field.name() );
-                    MCRFieldValue fv = new MCRFieldValue( fd, field.stringValue() );
-                    hit.addMetaData( fv );
-                    if (fd.isSortable()) hit.addSortData( fv );
-                  }
+                while (fields.hasMoreElements()) {
+                    Field field = (Field) fields.nextElement();
+                    if (field.isStored() && !("mcrid".equals(field.name()) || "returnid".equals(field.name()))) {
+                        MCRFieldDef fd = MCRFieldDef.getDef(field.name());
+                        MCRFieldValue fv = new MCRFieldValue(fd, field.stringValue());
+                        hit.addMetaData(fv);
+                        if (fd.isSortable())
+                            hit.addSortData(fv);
+                    }
                 }
 
                 result.addHit(hit);
-             } // MCRAccessManager
+            } // MCRAccessManager
         }
 
         searcher.close();
