@@ -658,10 +658,7 @@ public class MCRURIResolver implements javax.xml.transform.URIResolver, EntityRe
                 return null;
             }
 
-            // :NOTE: until real export format is defined: start some
-            // selfdefined
-            // one access Element per (Object-)ID
-            Element container = new Element("access").setAttribute("id", objId);
+            Element container = new Element("servacls").setAttribute("class", "MCRMetaAccessRule");
 
             MCRAccessInterface AI = MCRAccessManager.getAccessImpl();
 
@@ -683,7 +680,7 @@ public class MCRURIResolver implements javax.xml.transform.URIResolver, EntityRe
 
         private void addRule(Element root, String pool, Element rule) {
             if (rule != null && pool != null) {
-                Element poolElement = new Element("pool").setAttribute("id", pool);
+                Element poolElement = new Element("servacl").setAttribute("permission", pool);
                 poolElement.addContent(rule);
                 root.addContent(poolElement);
             }
