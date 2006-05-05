@@ -64,11 +64,12 @@ public class MCRHIBSearcher extends MCRSearcher {
         updateConfiguration();
     }
     
-    protected void addToIndex(String entryID, List fields) {
+    protected void addToIndex(String entryID, String returnID, List fields) {
         MCRHIBQuery query = new MCRHIBQuery((String)indexClassMapping.get(index));
         Hashtable used = new Hashtable();
 
         query.setValue("setmcrid", entryID);
+        query.setValue("setreturnid", returnID );
 
         for (int i = 0; i < fields.size(); i++) {
             MCRFieldValue fv = (MCRFieldValue) (fields.get(i));
@@ -126,7 +127,7 @@ public class MCRHIBSearcher extends MCRSearcher {
 
             for (int i = 0; (i < l.size()) && ( maxResults <= 0 ? true: results.getNumHits() < maxResults); i++) {
                 MCRHIBQuery tmpquery = new MCRHIBQuery(l.get(i)); // ?
-                MCRHit hit = new MCRHit((String) (tmpquery.getValue("getmcrid")));
+                MCRHit hit = new MCRHit((String) (tmpquery.getValue("getreturnid")));
 
                 // Add hit sort data
                 if (order != null)
@@ -177,6 +178,7 @@ public class MCRHIBSearcher extends MCRSearcher {
             if (!hibconnection.containsMapping(tableName)) {
                 MCRTableGenerator map = new MCRTableGenerator(tableName, "org.mycore.backend.query." + mappedClass, "", 1);
                 map.addIDColumn("mcrid", "MCRID", new StringType(), 64, "assigned", false);
+                map.addColumn("returnid", "RETURNID", new StringType(), 64, true, false, false ); 
                 List fds = MCRFieldDef.getFieldDefs( getIndex() );
                 for( int i = 0; i < fds.size(); i++ )
                 {
