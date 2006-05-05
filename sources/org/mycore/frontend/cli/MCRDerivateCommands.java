@@ -24,12 +24,17 @@
 package org.mycore.frontend.cli;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.TransformerFactoryConfigurationError;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
@@ -45,6 +50,7 @@ import org.mycore.datamodel.ifs.MCRFileImportExport;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.datamodel.metadata.MCRXMLTableManager;
 
 /**
  * Provides static methods that implement commands for the MyCoRe command line
@@ -94,6 +100,9 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
         command.add(com);
 
         com = new MCRCommand("export derivate from {0} to {1} to directory {2} with {3}", "org.mycore.frontend.cli.MCRDerivateCommands.export String String String String", "The command store all derivates with MCRObjectID's between {0} and {1} to the directory {2} with the stylesheet mcr_{3}-object.xsl. For {3} save is the default.");
+        command.add(com);
+
+        com = new MCRCommand("export all derivates to directory {0} with {1}", "org.mycore.frontend.cli.MCRDerivateCommands.exportAllDerivates String String", "Stores all derivates to the directory {0} with the stylesheet mcr_{1}-derivate.xsl. For {1} save is the default.");
         command.add(com);
 
         com = new MCRCommand("show loadable derivate of {0} to directory {1}", "org.mycore.frontend.cli.MCRDerivateCommands.show String String", "The command store the derivate with the MCRObjectID {0} to the directory {1}, without ifs-metadata");
@@ -484,7 +493,6 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
     public static void export(String fromID, String toID, String dirname, String style, boolean withIfsID) {
         LOGGER.debug("withIfsID ("+withIfsID+") will never used"); //FIXME: use or remove withIfsID
         // check fromID and toID
-        MCRDerivate obj = new MCRDerivate();
         MCRObjectID fid = null;
         MCRObjectID tid = null;
 
@@ -492,7 +500,6 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
             fid = new MCRObjectID(fromID);
         } catch (Exception ex) {
             LOGGER.error("FromID : " + ex.getMessage());
-            LOGGER.error("");
 
             return;
         }
@@ -501,7 +508,6 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
             tid = new MCRObjectID(toID);
         } catch (Exception ex) {
             LOGGER.error("ToID : " + ex.getMessage());
-            LOGGER.error("");
 
             return;
         }
@@ -511,11 +517,126 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
 
         if (dir.isFile()) {
             LOGGER.error(dirname + " is not a dirctory.");
-            LOGGER.error("");
 
             return;
         }
 
+        Transformer trans = getTransformer(style);
+
+        MCRObjectID nid = fid;
+        int k = 0;
+
+        try {
+            for (int i = fid.getNumberAsInteger(); i < (tid.getNumberAsInteger() + 1); i++) {
+                nid.setNumber(i);
+
+                exportDerivate(dir, trans, nid);
+
+                k++;
+            }
+        } catch (Exception ex) {
+            LOGGER.error(ex.getMessage());
+            LOGGER.error("Exception while store file or objects to " + dir.getAbsolutePath(), ex);
+
+            return;
+        }
+
+        LOGGER.info(k + " Object's stored under " + dir.getAbsolutePath() + ".");
+    }
+    
+    public static void exportAllDerivates(String dirname, String style){
+        // check dirname
+        File dir = new File(dirname);
+
+        if (dir.isFile()) {
+            LOGGER.error(dirname + " is not a dirctory.");
+
+            return;
+        }
+
+        Transformer trans = getTransformer(style);
+        
+        MCRXMLTableManager tm=MCRXMLTableManager.instance();
+        ArrayList ids=tm.retrieveAllIDs("derivate");
+        Iterator it=ids.iterator();
+        while (it.hasNext()){
+            String id=it.next().toString();
+            MCRObjectID oid=new MCRObjectID(id);
+            try {
+                exportDerivate(dir,trans,oid);
+            } catch (Exception ex) {
+                LOGGER.error(ex.getMessage());
+                LOGGER.error("Exception while store file to " + dir.getAbsolutePath());
+                return;
+            }
+        }
+    }
+
+    /**
+     * @param dirname
+     * @param dir
+     * @param trans
+     * @param nid
+     * @throws FileNotFoundException
+     * @throws TransformerException
+     * @throws IOException
+     */
+    private static void exportDerivate(File dir, Transformer trans, MCRObjectID nid) throws FileNotFoundException, TransformerException, IOException {
+        // store the XML file
+        byte[] xml = null;
+        MCRDerivate obj = new MCRDerivate();
+
+        try {
+        	obj.receiveFromDatastore(nid.toString());
+            String path = obj.getDerivate().getInternals().getSourcePath();
+            // reset from the absolute to relative path, for later reload
+            LOGGER.info("Old Internal Path ====>" + path);
+            obj.getDerivate().getInternals().setSourcePath(nid.toString());
+            LOGGER.info("New Internal Path ====>" + nid.toString());
+            xml = MCRUtils.getByteArray(obj.createXML());
+            
+        } catch (MCRException ex) {
+            LOGGER.warn("Could not read " + nid.toString() + ", continue with next ID");
+            return;
+        }
+        File xmlOutput = new File(dir, nid.toString() + ".xml");
+        FileOutputStream out = new FileOutputStream(xmlOutput);
+        dir = new File(dir, nid.toString());
+
+        if (trans != null) {
+            trans.setParameter("dirname", dir.getPath());
+            StreamResult sr = new StreamResult(out);
+            trans.transform(new org.jdom.transform.JDOMSource(MCRXMLHelper.parseXML(xml, false)), sr);
+        } else {
+            out.write(xml);
+            out.close();
+        }
+
+        LOGGER.info("Object " + nid.toString() + " stored under " + xmlOutput + ".");
+
+        // store the derivate file under dirname
+        try {
+
+            if (!dir.isDirectory()) {
+                dir.mkdir();
+            }
+
+            MCRFileImportExport.exportFiles(obj.receiveDirectoryFromIFS(nid.toString()), dir);
+        } catch (MCRException ex) {
+            LOGGER.error(ex.getMessage());
+            LOGGER.error("Exception while store to object in " + dir.getAbsolutePath());
+            return;
+        }
+
+        LOGGER.info("Derivate " + nid.toString() + " saved under " + dir.toString() + " and " + xmlOutput.toString() + ".");
+    }
+
+    /**
+     * @param style
+     * @return
+     * @throws TransformerFactoryConfigurationError
+     */
+    private static Transformer getTransformer(String style) throws TransformerFactoryConfigurationError {
         String xslfile = "mcr_save-derivate.xsl";
         if ((style != null) && (style.trim().length() != 0)) {
             xslfile = "mcr_" + style + "-derivate.xsl";
@@ -534,73 +655,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
         } catch (Exception e) {
             LOGGER.debug("Cannot build Transformer.", e);
         }
-
-        MCRObjectID nid = fid;
-        int k = 0;
-
-        try {
-            for (int i = fid.getNumberAsInteger(); i < (tid.getNumberAsInteger() + 1); i++) {
-                nid.setNumber(i);
-
-                // store the XML file
-                byte[] xml = null;
-
-                try {
-                	obj.receiveFromDatastore(nid.toString());
-                    String path = obj.getDerivate().getInternals().getSourcePath();
-                    // reset from the absolute to relative path, for later reload
-                    LOGGER.info("Old Internal Path ====>" + path);
-                    obj.getDerivate().getInternals().setSourcePath(nid.toString());
-                    LOGGER.info("New Internal Path ====>" + nid.toString());
-                    xml = MCRUtils.getByteArray(obj.createXML());
-                    
-                } catch (MCRException ex) {
-                    LOGGER.warn("Could not read " + nid.toString() + ", continue with next ID");
-                    continue;
-                }
-                File xmlOutput = new File(dirname, nid.toString() + ".xml");
-                FileOutputStream out = new FileOutputStream(xmlOutput);
-                dir = new File(dirname, nid.toString());
-
-                if (trans != null) {
-                    trans.setParameter("dirname", dir.getPath());
-                    StreamResult sr = new StreamResult(out);
-                    trans.transform(new org.jdom.transform.JDOMSource(MCRXMLHelper.parseXML(xml, false)), sr);
-                } else {
-                    out.write(xml);
-                    out.close();
-                }
-
-                LOGGER.info("Object " + nid.toString() + " stored under " + xmlOutput + ".");
-
-                // store the derivate file under dirname
-                try {
-
-                    if (!dir.isDirectory()) {
-                        dir.mkdir();
-                    }
-
-                    MCRFileImportExport.exportFiles(obj.receiveDirectoryFromIFS(nid.toString()), dir);
-                } catch (MCRException ex) {
-                    LOGGER.error(ex.getMessage());
-                    LOGGER.error("Exception while store to object in " + dir.getAbsolutePath());
-                    LOGGER.error("");
-
-                    return;
-                }
-
-                LOGGER.info("Derivate " + nid.toString() + " saved under " + dir.toString() + " and " + xmlOutput.toString() + ".");
-
-                k++;
-            }
-        } catch (Exception ex) {
-            LOGGER.error(ex.getMessage());
-            LOGGER.error("Exception while store file or objects to " + dir.getAbsolutePath(), ex);
-
-            return;
-        }
-
-        LOGGER.info(k + " Object's stored under " + dir.getAbsolutePath() + ".");
+        return trans;
     }
 
     /**
