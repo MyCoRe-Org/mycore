@@ -62,7 +62,7 @@ public class MCRFieldDef {
     public final static Namespace xalanns = Namespace.getNamespace("xalan", "http://xml.apache.org/xalan");
 
     private final static Namespace extns = Namespace.getNamespace("ext", "xalan://org.mycore.services.fieldquery.MCRData2Fields");
-    
+
     private final static String configFile = "searchfields.xml";
 
     /**
@@ -82,7 +82,7 @@ public class MCRFieldDef {
             List fields = index.getChildren("field", mcrns);
 
             for (int j = 0; j < fields.size(); j++)
-            	new MCRFieldDef(id, (Element)fields.get(j));
+                new MCRFieldDef(id, (Element) fields.get(j));
         }
     }
 
@@ -117,14 +117,13 @@ public class MCRFieldDef {
     private String source;
 
     /**
-     * @return the searchfields-configuration file as 
-     * 			jdom-element
+     * @return the searchfields-configuration file as jdom-element
      */
     public static Element getConfigFile() {
-    	String uri = "resource:" + configFile ;
+        String uri = "resource:" + configFile;
         return MCRURIResolver.instance().resolve(uri);
     }
-    
+
     public MCRFieldDef(String index, Element def) {
         this.index = index;
         this.name = def.getAttributeValue("name");
@@ -203,10 +202,10 @@ public class MCRFieldDef {
     }
 
     /**
-     * Returns true if this field is used for this type of object.
-     * For MCRObject, the type is the same as in MCRObject.getId().getTypeId().
-     * For MCRFile, the type is the same as in MCRFile.getContentTypeID().
-     * For plain XML data, the type is the name of the root element. 
+     * Returns true if this field is used for this type of object. For
+     * MCRObject, the type is the same as in MCRObject.getId().getTypeId(). For
+     * MCRFile, the type is the same as in MCRFile.getContentTypeID(). For plain
+     * XML data, the type is the name of the root element.
      * 
      * @param objectType
      *            the type of object
@@ -227,6 +226,14 @@ public class MCRFieldDef {
      * @see org.mycore.datamodel.metadata.MCRObject#createXML()
      */
     public final static String OBJECT_METADATA = "objectMetadata";
+
+    /**
+     * A keyword identifying that the source of the values of this field is a
+     * classification category that a MCRObject belongs to
+     * 
+     * @see org.mycore.datamodel.metadata.MCRObject#createXML()
+     */
+    public final static String OBJECT_CATEGORY = "objectCategory";
 
     /**
      * A keyword identifying that the source of the values of this field is the
@@ -278,6 +285,7 @@ public class MCRFieldDef {
      * @see #FILE_TEXT_CONTENT
      * @see #FILE_XML_CONTENT
      * @see #OBJECT_METADATA
+     * @see #OBJECT_CATEGORY
      * @see #SEARCHER_HIT_METADATA
      * @see #XML
      */
@@ -331,6 +339,17 @@ public class MCRFieldDef {
         // <xsl:for-each select="{@xpath}">
         Element forEach = stylesheet.getChild("template", xslns).getChild("fieldValues", mcrns).getChild("for-each", xslns);
         forEach.setAttribute("select", xpath);
+
+        if (MCRFieldDef.OBJECT_CATEGORY.equals(fieldDef.getAttributeValue("source"))) {
+            // current(): <format classid="DocPortal_class_00000006"
+            // categid="FORMAT0002"/>
+            // URI: classification:metadata:levels:parents:{class}:{categ}
+            Element forEach2 = new Element("for-each", xslns);
+            forEach.addContent(forEach2);
+            String uri = "document(concat('classification:metadata:0:parents:',current()/@classid,':',current()/@categid))//category";
+            forEach2.setAttribute("select", uri);
+            forEach = forEach2;
+        }
 
         // <mcr:fieldValue>
         Element fieldValue = new Element("fieldValue", mcrns);

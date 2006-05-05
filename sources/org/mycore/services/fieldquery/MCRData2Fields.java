@@ -40,17 +40,18 @@ import org.jdom.transform.JDOMResult;
 import org.jdom.transform.JDOMSource;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRUtils;
+import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.metadata.MCRObject;
 
 /**
  * Provides methods to automatically extract field values for indexing from
- * MCRObject, MCRFile or any XML document using the definition in searchfields.xml. 
- * The buildFields method returns a list of MCRFieldValue objects with values
- * extracted from the object for the given search index. This class supports
- * extracting values from MCRObject metadata, MCRFile metadata, MCRFile xml
- * content. MCRFile additional data, MCRFile text content using the text filter 
- * plug-ins, and any plain XML document.
+ * MCRObject, MCRFile or any XML document using the definition in
+ * searchfields.xml. The buildFields method returns a list of MCRFieldValue
+ * objects with values extracted from the object for the given search index.
+ * This class supports extracting values from MCRObject metadata, MCRFile
+ * metadata, MCRFile xml content. MCRFile additional data, MCRFile text content
+ * using the text filter plug-ins, and any plain XML document.
  * 
  * @see MCRSearcher#addToIndex(String, List)
  * @author Frank Lützenkirchen
@@ -78,11 +79,12 @@ public class MCRData2Fields {
 
             if (!fieldDef.isUsedForObjectType(obj.getId().getTypeId()))
                 continue;
-            if (!MCRFieldDef.OBJECT_METADATA.equals(fieldDef.getSource()))
+            if (!(MCRFieldDef.OBJECT_METADATA.equals(fieldDef.getSource()) || MCRFieldDef.OBJECT_CATEGORY.equals(fieldDef.getSource())))
                 continue;
 
             if (xml == null)
                 xml = obj.createXML();
+
             addValues(fieldDef, xml, values);
         }
         return values;
@@ -196,6 +198,7 @@ public class MCRData2Fields {
         try {
             JDOMResult xmlres = new JDOMResult();
             TransformerFactory factory = TransformerFactory.newInstance();
+            factory.setURIResolver(MCRURIResolver.instance());
             Transformer transformer = factory.newTransformer(new JDOMSource(xsl));
             transformer.transform(new JDOMSource(xml), xmlres);
 
