@@ -1,0 +1,19 @@
+## ============================================== 
+##  												
+## Module-Imaging 1.0, 05-2006  		
+## +++++++++++++++++++++++++++++++++++++			
+##  												
+## Andreas Trappe 	- idea, concept
+## Chi Vu Huu		- concept, development
+##
+## $Revision$ $Date$ 
+## ============================================== 
+
+Install Guide for JAI
+================
+1. Download JAI(JDK) and JAI Image I/O (JDK) .bin files from
+	http://java.sun.com/products/java-media/jai/index.jsp to your Java Home Directory
+
+2. Install them and set execute permition if necessary (chmod 755)
+
+3. Have fun!!
