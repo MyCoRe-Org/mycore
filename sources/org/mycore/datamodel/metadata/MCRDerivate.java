@@ -93,11 +93,16 @@ final public class MCRDerivate extends MCRBase {
 
         // get object ID from DOM
         org.jdom.Element jdom_element_root = jdom_document.getRootElement();
-        mcr_id = new MCRObjectID(jdom_element_root.getAttribute("ID").getValue());
-        mcr_label = jdom_element_root.getAttribute("label").getValue().trim();
+        mcr_id = new MCRObjectID(jdom_element_root.getAttributeValue("ID"));
+        mcr_label = jdom_element_root.getAttributeValue("label").trim();
 
         if (mcr_label.length() > MAX_LABEL_LENGTH) {
             mcr_label = mcr_label.substring(0, MAX_LABEL_LENGTH);
+        }
+
+        mcr_version = jdom_element_root.getAttributeValue("version");
+        if ((mcr_version == null) || ((mcr_version = mcr_version.trim()).length() == 0)) {
+            setVersion();
         }
 
         mcr_schema = jdom_element_root.getAttribute("noNamespaceSchemaLocation", org.jdom.Namespace.getNamespace("xsi", MCRDefaults.XSI_URL)).getValue().trim();
@@ -182,6 +187,7 @@ final public class MCRDerivate extends MCRBase {
         elm.setAttribute("noNamespaceSchemaLocation", mcr_schema, org.jdom.Namespace.getNamespace("xsi", MCRDefaults.XSI_URL));
         elm.setAttribute("ID", mcr_id.getId());
         elm.setAttribute("label", mcr_label);
+        elm.setAttribute("version", mcr_version);
         elm.addContent(mcr_derivate.createXML());
         elm.addContent(mcr_service.createXML());
 

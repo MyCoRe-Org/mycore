@@ -60,6 +60,8 @@ public abstract class MCRBase {
 
     protected String mcr_label = null;
 
+    protected String mcr_version = null;
+
     protected String mcr_schema = null;
 
     protected MCRObjectService mcr_service = null;
@@ -68,7 +70,7 @@ public abstract class MCRBase {
     protected static String NL;
 
     protected static String SLASH;
-    
+
     protected boolean importMode = false;
 
     // logger
@@ -106,6 +108,7 @@ public abstract class MCRBase {
     public MCRBase() throws MCRException, MCRConfigurationException {
         mcr_id = new MCRObjectID();
         mcr_label = new String("");
+        mcr_version = new String("Version 1.3");
         mcr_schema = new String("");
 
         // Service class
@@ -129,6 +132,15 @@ public abstract class MCRBase {
      */
     public final String getLabel() {
         return mcr_label;
+    }
+
+    /**
+     * This methode return the MyCoRe version of the data structure.
+     * 
+     * @return the version as a string
+     */
+    public final String getVersion() {
+        return mcr_version;
     }
 
     /**
@@ -197,6 +209,13 @@ public abstract class MCRBase {
         if (mcr_label.length() > MAX_LABEL_LENGTH) {
             mcr_label = mcr_label.substring(0, MAX_LABEL_LENGTH);
         }
+    }
+
+    /**
+     * This methode set the MyCoRe version to the string 'Version 1.3'.
+     */
+    public final void setVersion() {
+        mcr_version = "Version 1.3";
     }
 
     /**
@@ -331,11 +350,11 @@ public abstract class MCRBase {
         return true;
     }
 
-	public boolean isImportMode() {
-		return importMode;
-	}
+    public boolean isImportMode() {
+        return importMode;
+    }
 
-	public void setImportMode(boolean importMode) {
-		this.importMode = importMode;
-	}
+    public void setImportMode(boolean importMode) {
+        this.importMode = importMode;
+    }
 }
