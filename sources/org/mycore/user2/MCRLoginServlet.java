@@ -44,9 +44,9 @@ import org.mycore.frontend.servlets.MCRServletJob;
  * @version $Revision$ $Date$
  */
 public class MCRLoginServlet extends MCRServlet {
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	// The configuration
+    // The configuration
     private static Logger LOGGER = Logger.getLogger(MCRLoginServlet.class);
 
     // user ID and password of the guest user
@@ -151,7 +151,7 @@ public class MCRLoginServlet extends MCRServlet {
                 root.setAttribute("invalid_password", "true");
             }
         } catch (MCRException e) {
-            if (e.getMessage().equals("Error in UserStore.")) {
+            if (e.getMessage().equals("user can't be found in the database")) {
                 root.setAttribute("unknown_user", "true");
                 LOGGER.info("MCRLoginServlet: unknown user: " + uid);
             } else if (e.getMessage().equals("Login denied. User is disabled.")) {
