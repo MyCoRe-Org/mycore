@@ -95,4 +95,16 @@ public class MCRQueryParser extends MCRBooleanClauseParser {
 
         return new MCRQueryCondition(def, operator, value);
     }
+    
+    /** Used for input validation in editor search form */
+    public static boolean validateQueryExpression( String query )
+    {
+      try
+      {  
+        MCRCondition cond = new MCRQueryParser().parse( query );
+        return( cond != null );
+      }
+      catch( Exception ex )
+      { return false; }
+    }
 }
