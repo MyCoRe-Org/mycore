@@ -49,6 +49,7 @@
     </xsd:sequence>
     <xsd:attribute name="ID" type="xsd:string" use="required" />
     <xsd:attribute name="label" type="xsd:string" use="required" />
+    <xsd:attribute name="version" type="xsd:string" use="optional" />
    </xsd:complexType>
    <xsl:apply-templates select="/configuration/derivate"/>
    <xsl:apply-templates select="/configuration/service"/>
