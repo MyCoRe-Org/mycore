@@ -24,6 +24,7 @@
 package org.mycore.services.fieldquery;
 
 import java.io.IOException;
+import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
@@ -39,6 +40,7 @@ import org.jdom.Element;
 import org.jdom.filter.ElementFilter;
 import org.jdom.output.XMLOutputter;
 import org.mycore.common.MCRCache;
+import org.mycore.common.MCRConfiguration;
 import org.mycore.frontend.editor.MCREditorSubmission;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
@@ -56,13 +58,27 @@ public class MCRSearchServlet extends MCRServlet {
     private static Logger LOGGER = Logger.getLogger(MCRSearchServlet.class);
 
     /** Cached query results */
-    private static MCRCache results = new MCRCache(50);
+    private MCRCache results = new MCRCache(50);
 
     /** Cached queries as XML, for re-use in editor form */
-    private static MCRCache queries = new MCRCache(50);
+    private MCRCache queries = new MCRCache(50);
 
     /** Cached queries as parsed MCRCondition, for output with results */
-    private static MCRCache conds = new MCRCache(50);
+    private MCRCache conds = new MCRCache(50);
+
+    /** Default search field */
+    private String defaultSearchField;
+
+    /** Default search operator */
+    private String defaultSearchOperator;
+
+    public void init() throws ServletException {
+        super.init();
+        MCRConfiguration config = MCRConfiguration.instance();
+        String prefix = "MCR.SearchServlet.";
+        defaultSearchField = config.getString(prefix + "DefaultSearchField", "allMeta");
+        defaultSearchOperator = config.getString(prefix + "DefaultSearchOperator", "contains");
+    }
 
     public void doGetPost(MCRServletJob job) throws IOException, ServletException {
         HttpServletRequest request = job.getRequest();
@@ -78,9 +94,8 @@ public class MCRSearchServlet extends MCRServlet {
     }
 
     /**
-     * Returns a query that was previously submitted, 
-     * to reload it into the editor search mask. 
-     * Usage: MCRSearchServlet?mode=load&id=XXXXX
+     * Returns a query that was previously submitted, to reload it into the
+     * editor search mask. Usage: MCRSearchServlet?mode=load&id=XXXXX
      */
     private void loadQuery(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String id = request.getParameter("id");
@@ -94,8 +109,8 @@ public class MCRSearchServlet extends MCRServlet {
     }
 
     /**
-     * Shows a results page.
-     * Usage: MCRSearchServlet?mode=results&numPerPage=10&page=1
+     * Shows a results page. Usage:
+     * MCRSearchServlet?mode=results&numPerPage=10&page=1
      */
     private void showResults(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
@@ -136,12 +151,12 @@ public class MCRSearchServlet extends MCRServlet {
 
         // Build result hits as XML document
         Element xml = result.buildXML(first, last);
-        
+
         // Add additional data for output
         xml.setAttribute("numPerPage", String.valueOf(npp));
         xml.setAttribute("numPages", String.valueOf(numPages));
         xml.setAttribute("page", String.valueOf(page));
-        
+
         // The URL of the search mask that was used
         xml.setAttribute("mask", query.getRootElement().getAttributeValue("mask"));
 
@@ -156,12 +171,96 @@ public class MCRSearchServlet extends MCRServlet {
         rd.forward(request, response);
     }
 
+    private String getReqParameter(HttpServletRequest req, String name, String defaultValue) {
+        String value = req.getParameter(name);
+        if ((value == null) || (value.trim().length() == 0))
+            return defaultValue;
+        else
+            return value.trim();
+    }
+
     /**
      * Executes a query that comes from editor search mask, and redirects the
      * browser to the first results page
      */
     private void doQuery(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        Document input = ((MCREditorSubmission) (request.getAttribute("MCREditorSubmission"))).getXML();
+        MCREditorSubmission sub = (MCREditorSubmission) (request.getAttribute("MCREditorSubmission"));
+        Document input = null;
+        if (sub != null) // query comes from editor search mask
+        {
+            input = sub.getXML();
+        } else // query comes from HTTP request parameters
+        {
+            Element query = new Element("query");
+            query.setAttribute("mask", getReqParameter(request, "mask", "-"));
+            query.setAttribute("maxResults", getReqParameter(request, "maxResults", "0"));
+            query.setAttribute("numPerPage", getReqParameter(request, "numPerPage", "0"));
+            input = new Document(query);
+
+            Element conditions = new Element("conditions");
+            query.addContent(conditions);
+
+            if (request.getParameter("search") != null) {
+                // Search in default field with default operator
+
+                Element cond = new Element("condition");
+                cond.setAttribute("field", defaultSearchField);
+                cond.setAttribute("operator", defaultSearchOperator);
+                cond.setAttribute("value", getReqParameter(request, "search", null));
+
+                Element b = new Element("boolean");
+                b.setAttribute("operator", "and");
+                b.addContent(cond);
+
+                conditions.setAttribute("format", "xml");
+                conditions.addContent(b);
+            } else if (request.getParameter("query") != null) {
+                // Search for a complex query expression
+
+                conditions.setAttribute("format", "text");
+                conditions.addContent(request.getParameter("query"));
+            } else {
+                // Search for name-operator-value conditions given as request
+                // parameters
+
+                conditions.setAttribute("format", "xml");
+                Element b = new Element("boolean");
+                b.setAttribute("operator", "and");
+                conditions.addContent(b);
+
+                Enumeration names = request.getParameterNames();
+                while (names.hasMoreElements()) {
+                    String name = (String) (names.nextElement());
+                    if (name.endsWith(".operator"))
+                        continue;
+                    if (" maxResults numPerPage mask ".indexOf(" " + name + " ") >= 0)
+                        continue;
+
+                    String operator = request.getParameter(name + ".operator");
+                    if (operator == null)
+                        operator = defaultSearchOperator;
+
+                    Element parent = b;
+
+                    String[] values = request.getParameterValues(name);
+                    if (values.length > 1) // Multiple fields with same name,
+                                            // combine with OR
+                    {
+                        parent = new Element("boolean");
+                        parent.setAttribute("operator", "or");
+                        b.addContent(parent);
+                    }
+                    for (int i = 0; i < values.length; i++) {
+                        Element cond = new Element("condition");
+                        cond.setAttribute("field", name);
+                        cond.setAttribute("operator", operator);
+                        cond.setAttribute("value", values[i].trim());
+                        parent.addContent(cond);
+                    }
+                }
+            }
+        }
+
         Object clonedQuery = input.clone(); // Keep for later re-use
 
         // Show incoming query document
@@ -171,31 +270,41 @@ public class MCRSearchServlet extends MCRServlet {
         }
 
         org.jdom.Element root = input.getRootElement();
+        MCRCondition cond = null;
 
-        // Rename condition elements from search mask: condition1 -> condition
-        List ch = root.getChild("conditions").getChild("boolean").getChildren();
-        for (int i = 0; i < ch.size(); i++) {
-            Element condition = (Element) (ch.get(i));
-            condition.setName("condition");
-        }
+        if (root.getChild("conditions").getAttributeValue("format", "xml").equals("xml")) {
+            // Query is in XML format
 
-        // Find condition fields without values
-        Iterator it = root.getDescendants(new ElementFilter("condition"));
-        Vector help = new Vector();
-        while (it.hasNext()) {
-            Element condition = (Element) it.next();
-            if (condition.getAttribute("value") == null) {
-                help.add(condition);
+            // Rename condition elements from search mask: condition1 ->
+            // condition
+            List ch = root.getChild("conditions").getChild("boolean").getChildren();
+            for (int i = 0; i < ch.size(); i++) {
+                Element condition = (Element) (ch.get(i));
+                if (condition.getName().startsWith("condition"))
+                    condition.setName("condition");
             }
+
+            // Find condition fields without values
+            Iterator it = root.getDescendants(new ElementFilter("condition"));
+            Vector help = new Vector();
+            while (it.hasNext()) {
+                Element condition = (Element) it.next();
+                if (condition.getAttribute("value") == null) {
+                    help.add(condition);
+                }
+            }
+
+            // Remove found conditions without values
+            for (int i = help.size() - 1; i >= 0; i--)
+                ((Element) (help.get(i))).detach();
+
+            Element condElem = (Element) (root.getChild("conditions").getChildren().get(0));
+            cond = new MCRQueryParser().parse(condElem);
+        } else {
+            // Query is in String format
+            String query = root.getChild("conditions").getTextTrim();
+            cond = new MCRQueryParser().parse(query);
         }
-
-        // Remove found conditions without values
-        for (int i = help.size() - 1; i >= 0; i--)
-            ((Element) (help.get(i))).detach();
-
-        // Cache parsed query for later output together with results
-        Element condElem = (Element) (root.getChild("conditions").getChildren().get(0));
-        MCRCondition cond = new MCRQueryParser().parse(condElem);
 
         // Execute query
         long start = System.currentTimeMillis();
