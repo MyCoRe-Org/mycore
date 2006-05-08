@@ -20,5 +20,5 @@ public class MCRXMLFunctionsTest extends MCRTestCase {
         assertEquals("1964-02-24",MCRXMLFunctions.getISODate("24.02.1964","dd.MM.yyyy","YYYY-MM-DD"));
         assertEquals("Timezone was not correctly detected","1964-02-23T22:00:00Z",MCRXMLFunctions.getISODate("24.02.1964 00:00:00 +0200","dd.MM.yyyy HH:mm:ss Z","YYYY-MM-DDThh:mm:ssTZD"));
     }
-
+    
 }
