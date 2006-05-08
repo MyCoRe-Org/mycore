@@ -71,8 +71,15 @@ public class MCRQueryManager {
             }
         }
 
-        Element condElem = (Element) (root.getChild("conditions").getChildren().get(0));
-        MCRCondition cond = new MCRQueryParser().parse(condElem);
+        Element conditions = root.getChild("conditions");
+        MCRCondition cond = null;
+        if (conditions.getAttributeValue("format", "xml").equals("xml")) {
+            Element condElem = (Element) (conditions.getChildren().get(0));
+            cond = new MCRQueryParser().parse(condElem);
+        } else {
+            String queryString = conditions.getTextTrim();
+            cond = new MCRQueryParser().parse(queryString);
+        }
 
         return search(cond, sortBy, maxResults);
     }
@@ -141,7 +148,7 @@ public class MCRQueryManager {
     private static MCRResults buildResults(MCRCondition cond, List sortBy, int maxResults) {
         String index = getIndex(cond);
         if (index != mixed) { // All fields are from same index, just one
-                                // searcher
+            // searcher
             MCRSearcher searcher = MCRSearcherFactory.getSearcherForIndex(index);
             return searcher.search(cond, sortBy, maxResults);
         } else if ((cond instanceof MCRAndCondition) || (cond instanceof MCROrCondition)) {
