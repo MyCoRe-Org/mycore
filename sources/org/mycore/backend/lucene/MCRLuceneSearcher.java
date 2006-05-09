@@ -25,11 +25,13 @@ package org.mycore.backend.lucene;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Enumeration;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -69,6 +71,7 @@ public class MCRLuceneSearcher extends MCRSearcher {
 
     boolean FIRST = true;
 
+    static String LOCK_DIR = "";
     static String DATE_FORMAT = "yyyy-MM-dd";
 
     static String TIME_FORMAT = "HH:mm:ss";
@@ -101,21 +104,64 @@ public class MCRLuceneSearcher extends MCRSearcher {
             throw new org.mycore.common.MCRConfigurationException(msg);
         }
 
-        String lockDir = config.getString("MCR.Lucene.LockDir");
-        LOGGER.info("MCR.Lucene.LockDir: " + lockDir);
-        f = new File(lockDir);
+        LOCK_DIR = config.getString("MCR.Lucene.LockDir");
+        LOGGER.info("MCR.Lucene.LockDir: " + LOCK_DIR);
+        f = new File(LOCK_DIR);
         if (!f.exists())
             f.mkdirs();
         if (!f.isDirectory()) {
-            String msg = lockDir + " is not a directory!";
+            String msg = LOCK_DIR + " is not a directory!";
             throw new org.mycore.common.MCRConfigurationException(msg);
         }
         if (!f.canWrite()) {
-            String msg = lockDir + " is not writeable!";
+            String msg = LOCK_DIR + " is not writeable!";
             throw new org.mycore.common.MCRConfigurationException(msg);
         }
-        System.setProperty("org.apache.lucene.lockDir", lockDir);
+        
+        System.setProperty("org.apache.lucene.lockDir", LOCK_DIR);
+        deleteLuceneLocks( LOCK_DIR, 0);
+        
+        try
+        {
+          IndexWriter writer = getLuceneWriter(IndexDir, FIRST);
+          FIRST = false;
+          writer.close();
+        } catch (IOException e)
+        {
+          LOGGER.error(e.getClass().getName() + ": " + e.getMessage());
+          LOGGER.error(MCRException.getStackTraceAsString(e));
+        } catch (Exception e)
+        {
+          LOGGER.error(e.getClass().getName() + ": " + e.getMessage());
+          LOGGER.error(MCRException.getStackTraceAsString(e));
+        }
     }
+    
+    private static void deleteLuceneLocks(String lockDir, long age)
+    {
+      File file = new File(lockDir);
+
+      GregorianCalendar cal = new GregorianCalendar();
+      
+      File f[] = file.listFiles();
+      for (int i=0; i<f.length;i++)
+      {
+        if (!f[i].isDirectory())
+        {
+          String n = f[i].getName().toLowerCase();
+          if (n.startsWith("lucene") && n.endsWith(".lock"))
+          {
+            long l = (cal.getTimeInMillis() - f[i].lastModified())/1000;   // age of file in seconds
+            if ( l > age )
+            {
+              LOGGER.info("Delete lucene lock file " + f[i].getAbsolutePath() + " Age " + l  );
+              f[i].delete();
+            }
+          }
+        }
+      }
+    }
+    
 
     protected void addToIndex(String entryID, String returnID, List fields) {
         LOGGER.info("MCRLuceneSearcher indexing data of " + entryID);
@@ -379,7 +425,17 @@ public class MCRLuceneSearcher extends MCRSearcher {
         if (maxResults <= 0)
             maxResults = 100000;
 
-        IndexSearcher searcher = new IndexSearcher(IndexDir);
+        IndexSearcher searcher = null;
+        try
+        {
+          searcher = new IndexSearcher(IndexDir);
+        } catch (IOException e)
+        {
+          LOGGER.error(e.getClass().getName() + ": " + e.getMessage());
+          LOGGER.error(MCRException.getStackTraceAsString(e));
+          deleteLuceneLocks( LOCK_DIR, 100);
+        }
+        
         TopDocs hits = searcher.search(luceneQuery, null, maxResults);
         int found = hits.scoreDocs.length;
 
