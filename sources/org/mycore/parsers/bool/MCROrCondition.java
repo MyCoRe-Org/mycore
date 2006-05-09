@@ -59,12 +59,13 @@ public class MCROrCondition implements MCRCondition {
     }
 
     public boolean evaluate(Object o) {
+        if (children.size() == 0) return true;
         for (int i = 0; i < children.size(); i++) {
             if (((MCRCondition) children.get(i)).evaluate(o)) {
                 return true;
             }
         }
-
+        
         return false;
     }
 
