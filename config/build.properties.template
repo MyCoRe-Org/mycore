@@ -58,7 +58,7 @@
 # Persistent Store for XML data of MCRObject and MCRDerivate 
 #
 # MCR.XMLStore.Type
-#   one of [jdom lucene cm8 xmldb]
+#   set to cm8 if you want to use the cm8 backend
 # MCR.XMLStore.BaseDir
 #   base directory where jar's, class files and libraries are installed
 # MCR.XMLStore.Jars
@@ -72,12 +72,6 @@
 #   relative to BaseDir, separated by blanks
 #
 #######################################################################
-
-# Native JDOM store in memory (only for metadata)
-# MCR.XMLStore.Type=jdom
-
-# Native Lucene store for metadata and content
-  MCR.XMLStore.Type=lucene
 
 # IBM Content Manager Version 8.3 under IBM AIX for metadata and content
 # MCR.XMLStore.Type=cm8
