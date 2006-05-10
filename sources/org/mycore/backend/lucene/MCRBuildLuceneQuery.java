@@ -38,7 +38,6 @@ import org.apache.log4j.Logger;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.Token;
 import org.apache.lucene.analysis.TokenStream;
-import org.apache.lucene.analysis.de.GermanAnalyzer;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.BooleanClause;
@@ -72,8 +71,6 @@ public class MCRBuildLuceneQuery {
 
     static String TIMESTAMP_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
-    static Analyzer analyzer = new GermanAnalyzer();
-
     static Hashtable search = null;
 
     /**
@@ -82,7 +79,7 @@ public class MCRBuildLuceneQuery {
      * @return Lucene Query
      * 
      */
-    public static Query buildLuceneQuery(BooleanQuery r, boolean reqf, List f) throws Exception {
+    public static Query buildLuceneQuery(BooleanQuery r, boolean reqf, List f, Analyzer analyzer) throws Exception {
         for (int i = 0; i < f.size(); i++) {
             org.jdom.Element xEle = (org.jdom.Element) (f.get(i));
             String name = xEle.getName();
@@ -94,11 +91,11 @@ public class MCRBuildLuceneQuery {
             boolean prof = false;
 
             if (name.equals("and")) {
-                x = buildLuceneQuery(null, true, xEle.getChildren());
+                x = buildLuceneQuery(null, true, xEle.getChildren(), analyzer);
             } else if (name.equalsIgnoreCase("or")) {
-                x = buildLuceneQuery(null, false, xEle.getChildren());
+                x = buildLuceneQuery(null, false, xEle.getChildren(), analyzer);
             } else if (name.equalsIgnoreCase("not")) {
-                x = buildLuceneQuery(null, false, xEle.getChildren());
+                x = buildLuceneQuery(null, false, xEle.getChildren(), analyzer);
                 reqfn = false; // javadoc lucene: It is an error to specify a
                                 // clause as both required and prohibited
                 prof = true;
@@ -115,7 +112,7 @@ public class MCRBuildLuceneQuery {
                     fieldtype = "text";
                 }
 
-                x = handleCondition(field, operator, value, fieldtype, reqf);
+                x = handleCondition(field, operator, value, fieldtype, reqf, analyzer);
             }
 
             if (null != x) {
@@ -140,14 +137,14 @@ public class MCRBuildLuceneQuery {
         return r;
     }
 
-    private static Query handleCondition(String field, String operator, String value, String fieldtype, boolean reqf) throws Exception {
+    private static Query handleCondition(String field, String operator, String value, String fieldtype, boolean reqf, Analyzer analyzer) throws Exception {
         if ("text".equals(fieldtype) && "contains".equals(operator)) {
             BooleanQuery bq = null;
 
             Term te;
             TermQuery tq = null;
 
-            TokenStream ts = analyzer.tokenStream(null, new StringReader(value));
+            TokenStream ts = analyzer.tokenStream(field, new StringReader(value));
             Token to;
 
             while ((to = ts.next()) != null) {
@@ -197,7 +194,7 @@ public class MCRBuildLuceneQuery {
         } else if ("text".equals(fieldtype) && ("phrase".equals(operator) || "=".equals(operator))) {
             Term te;
             PhraseQuery pq = new PhraseQuery();
-            TokenStream ts = analyzer.tokenStream(null, new StringReader(value));
+            TokenStream ts = analyzer.tokenStream(field, new StringReader(value));
             Token to;
 
             while ((to = ts.next()) != null) {
@@ -221,7 +218,7 @@ public class MCRBuildLuceneQuery {
         {
             Term lower = null;
             Term upper = null;
-            TokenStream ts = analyzer.tokenStream(null, new StringReader(value));
+            TokenStream ts = analyzer.tokenStream(field, new StringReader(value));
             Token to;
 
             to = ts.next();

@@ -36,6 +36,8 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.PerFieldAnalyzerWrapper;
+import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.analysis.de.GermanAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
@@ -85,6 +87,8 @@ public class MCRLuceneSearcher extends MCRSearcher {
     static int DEC_AFTER = 4;
 
     private static TextFilterPluginManager PLUGIN_MANAGER = null;
+    
+    static Analyzer analyzer = new PerFieldAnalyzerWrapper(new GermanAnalyzer());
 
     public void init(String ID) {
         super.init(ID);
@@ -135,6 +139,18 @@ public class MCRLuceneSearcher extends MCRSearcher {
           LOGGER.error(e.getClass().getName() + ": " + e.getMessage());
           LOGGER.error(MCRException.getStackTraceAsString(e));
         }
+        
+        StandardAnalyzer standardAnalyzer = new StandardAnalyzer(); // should work like GermanAnalyzer without stemming
+        List fds = MCRFieldDef.getFieldDefs( getIndex() );
+        for( int i = 0; i < fds.size(); i++ )
+        {
+          MCRFieldDef fd = (MCRFieldDef)( fds.get( i ) );
+          if ("name".equals(fd.getDataType()))                     
+          {
+            ((PerFieldAnalyzerWrapper)analyzer).addAnalyzer(fd.getName(), standardAnalyzer);
+          }
+        }
+        
     }
     
     private static void deleteLuceneLocks(String lockDir, long age)
@@ -296,7 +312,7 @@ public class MCRLuceneSearcher extends MCRSearcher {
         IndexWriter writer = getLuceneWriter(IndexDir, FIRST);
         FIRST = false;
 
-        writer.addDocument(doc);
+        writer.addDocument(doc, analyzer);
         writer.close();
     }
 
@@ -402,7 +418,7 @@ public class MCRLuceneSearcher extends MCRSearcher {
 
             boolean reqf = true; // required flag Term with AND (true) or OR
             // (false) combined
-            Query luceneQuery = MCRBuildLuceneQuery.buildLuceneQuery(null, reqf, f);
+            Query luceneQuery = MCRBuildLuceneQuery.buildLuceneQuery(null, reqf, f, analyzer);
             LOGGER.debug("Lucene Query: " + luceneQuery.toString());
             results = getLuceneHits(luceneQuery, maxResults);
         } catch (Exception e) {
