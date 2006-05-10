@@ -180,15 +180,19 @@ public class MCRBuildLuceneQuery {
             return tq;
         } else if (("text".equals(fieldtype) || "identifier".equals(fieldtype)) && "like".equals(operator)) {
             Term te;
-            value = fixQuery(value);
-            te = new Term(field, value);
+            if ("text".equals(fieldtype))
+              value = fixQuery(value);
+            
+            String help = value.endsWith("*") ? value.substring(0, value.length()-1) : value;
 
-            if ((-1 != value.indexOf("*")) || (-1 != value.indexOf("?"))) {
+            if ((-1 != help.indexOf("*")) || (-1 != help.indexOf("?"))) {
                 LOGGER.debug("WILDCARD");
 
+                te = new Term(field, value);
                 return new WildcardQuery(te);
             }
 
+            te = new Term(field, help);
             return new PrefixQuery(te);
         } else if ("text".equals(fieldtype) && ("phrase".equals(operator) || "=".equals(operator))) {
             Term te;
