@@ -178,7 +178,7 @@ public class MCRBuildLuceneQuery {
                 return bq;
             }
             return tq;
-        } else if ("text".equals(fieldtype) && "like".equals(operator)) {
+        } else if (("text".equals(fieldtype) || "identifier".equals(fieldtype)) && "like".equals(operator)) {
             Term te;
             value = fixQuery(value);
             te = new Term(field, value);
