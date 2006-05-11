@@ -370,13 +370,9 @@ public abstract class MCRMetaDefault {
      */
     public boolean isValid() {
         if ((subtag == null) || ((subtag = subtag.trim()).length() == 0)) {
+            LOGGER.warn("Error while checking subtag: "+subtag);
             return false;
         }
-
-        if (!MCRUtils.isSupportedLang(lang)) {
-            return false;
-        }
-
         return true;
     }
 

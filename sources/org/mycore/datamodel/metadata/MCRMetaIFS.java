@@ -112,14 +112,8 @@ final public class MCRMetaIFS extends MCRMetaDefault implements MCRMetaInterface
      * 
      * @param set_sourcepath
      *            the derivate source path
-     * @exception MCRException
-     *                if the set_sourcepath value is null or empty
      */
-    public final void setSourcePath(String set_sourcepath) throws MCRException {
-        if ((set_sourcepath == null) || ((set_sourcepath = set_sourcepath.trim()).length() == 0)) {
-            throw new MCRException("The sourcepath is empty.");
-        }
-
+    public final void setSourcePath(String set_sourcepath) {
         sourcepath = set_sourcepath;
     }
 
@@ -181,7 +175,9 @@ final public class MCRMetaIFS extends MCRMetaDefault implements MCRMetaInterface
         }
 
         org.jdom.Element elm = new org.jdom.Element(subtag);
-        elm.setAttribute("sourcepath", sourcepath);
+        if (sourcepath!=null){
+            elm.setAttribute("sourcepath", sourcepath);
+        }
         elm.setAttribute("maindoc", maindoc);
         elm.setAttribute("ifsid", ifsid);
 
@@ -217,7 +213,7 @@ final public class MCRMetaIFS extends MCRMetaDefault implements MCRMetaInterface
             return false;
         }
 
-        if ((sourcepath == null) || ((sourcepath = sourcepath.trim()).length() == 0)) {
+        if ((sourcepath != null) && ((sourcepath = sourcepath.trim()).length() == 0)) {
             return false;
         }
 

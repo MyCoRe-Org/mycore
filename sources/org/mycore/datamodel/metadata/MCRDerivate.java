@@ -208,20 +208,25 @@ final public class MCRDerivate extends MCRBase {
 
         // create data in IFS
         if (getDerivate().getInternals() != null) {
-            File f = new File(getDerivate().getInternals().getSourcePath());
-
-            if ((!f.isDirectory()) && (!f.isFile())) {
-                throw new MCRPersistenceException("The File or Directory on " + getDerivate().getInternals().getSourcePath() + " was not found.");
-            }
-            MCRDirectory difs = null;
-            try {
-                difs = MCRFileImportExport.importFiles(f, mcr_id.getId());
+            if (getDerivate().getInternals().getSourcePath() == null) {
+                MCRDirectory difs=new MCRDirectory(mcr_id.getId(),mcr_id.getId());
                 getDerivate().getInternals().setIFSID(difs.getID());
-            } catch (Exception e) {
-                if (difs != null) {
-                    difs.delete();
+            } else {
+                File f = new File(getDerivate().getInternals().getSourcePath());
+
+                if ((!f.isDirectory()) && (!f.isFile())) {
+                    throw new MCRPersistenceException("The File or Directory on " + getDerivate().getInternals().getSourcePath() + " was not found.");
                 }
-                    throw new MCRPersistenceException("Can't add derivate to the IFS",e);
+                MCRDirectory difs = null;
+                try {
+                    difs = MCRFileImportExport.importFiles(f, mcr_id.getId());
+                    getDerivate().getInternals().setIFSID(difs.getID());
+                } catch (Exception e) {
+                    if (difs != null) {
+                        difs.delete();
+                    }
+                    throw new MCRPersistenceException("Can't add derivate to the IFS", e);
+                }
             }
         }
 
@@ -474,7 +479,7 @@ final public class MCRDerivate extends MCRBase {
         }
 
         // update to IFS
-        if (getDerivate().getInternals() != null) {
+        if ((getDerivate().getInternals() != null) && (getDerivate().getInternals().getSourcePath() != null)) {
             File f = new File(getDerivate().getInternals().getSourcePath());
 
             if ((!f.isDirectory()) && (!f.isFile())) {
