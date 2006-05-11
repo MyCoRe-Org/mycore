@@ -148,6 +148,8 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
                     handleFileUpdated(evt, file);
                 } else if (evt.getEventType().equals(MCREvent.DELETE_EVENT)) {
                     handleFileDeleted(evt, file);
+                } else if (evt.getEventType().equals(MCREvent.REPAIR_EVENT)) {
+                    handleFileRepaired(evt, file);
                 } else {
                     logger.warn("Can't find method for file data handler for event type " + evt.getEventType());
                 }
@@ -266,6 +268,8 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
                     undoFileUpdated(evt, file);
                 } else if (evt.getEventType().equals(MCREvent.DELETE_EVENT)) {
                     undoFileDeleted(evt, file);
+                } else if (evt.getEventType().equals(MCREvent.REPAIR_EVENT)) {
+                    undoFileRepaired(evt, file);
                 } else {
                     logger.warn("Can't find method for file data handler for event type " + evt.getEventType());
                 }
@@ -503,6 +507,19 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
     }
 
     /**
+     * Handles file repair events. This implementation does nothing and should
+     * be overwritted by subclasses.
+     * 
+     * @param evt
+     *            the event that occured
+     * @param file
+     *            the MCRFile that caused the event
+     */
+    protected void handleFileRepaired(MCREvent evt, MCRFile file) {
+        doNothing(evt, file);
+    }
+
+    /**
      * Handles undo of object created events. This implementation does nothing
      * and should be overwritted by subclasses.
      * 
@@ -720,6 +737,19 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
      *            the MCRFile that caused the event
      */
     protected void undoFileDeleted(MCREvent evt, MCRFile file) {
+        doNothing(evt, file);
+    }
+
+    /**
+     * Handles undo of file repair events. This implementation does nothing and
+     * should be overwritted by subclasses.
+     * 
+     * @param evt
+     *            the event that occured
+     * @param file
+     *            the MCRFile that caused the event
+     */
+    protected void undoFileRepaired(MCREvent evt, MCRFile file) {
         doNothing(evt, file);
     }
 }
