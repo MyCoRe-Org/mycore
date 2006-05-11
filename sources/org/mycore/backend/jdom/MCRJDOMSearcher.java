@@ -100,15 +100,19 @@ public class MCRJDOMSearcher extends MCRSearcher {
 
             LOGGER.debug("Now indexing metadata of all stored MCRObjects from type " + type);
 
-            List IDs = mcr_xml.retrieveAllIDs(type);
-            for (int i = 0; i < IDs.size(); i++) {
-                String sid = (String) (IDs.get(i));
-                MCRObject obj = new MCRObject();
-                MCRObjectID oid = new MCRObjectID(sid);
-                obj.setId(oid);
-                obj.setFromXML(mcr_xml.retrieve(oid), false);
-                List fields = MCRData2Fields.buildFields(obj, index);
-                addToIndex(sid, sid, fields);
+            try {
+                List IDs = mcr_xml.retrieveAllIDs(type);
+                for (int i = 0; i < IDs.size(); i++) {
+                    String sid = (String) (IDs.get(i));
+                    MCRObject obj = new MCRObject();
+                    MCRObjectID oid = new MCRObjectID(sid);
+                    obj.setId(oid);
+                    obj.setFromXML(mcr_xml.retrieve(oid), false);
+                    List fields = MCRData2Fields.buildFields(obj, index);
+                    addToIndex(sid, sid, fields);
+                }
+            } catch (Exception ex) {
+                LOGGER.error(ex);
             }
         }
     }
