@@ -341,11 +341,9 @@ public class MCRJDOMSearcher extends MCRSearcher {
         }
 
         StringTokenizer st = new StringTokenizer(words);
-
-        String valuelow = value.toLowerCase();
         while (st.hasMoreTokens())
 
-            if (valuelow.indexOf(st.nextToken().toLowerCase()) == -1) {
+            if (value.indexOf(st.nextToken()) == -1) {
                 return false;
             }
 
