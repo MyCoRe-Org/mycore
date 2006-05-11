@@ -36,8 +36,10 @@ import javax.xml.transform.TransformerFactory;
 import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
+import org.jdom.output.XMLOutputter;
 import org.jdom.transform.JDOMResult;
 import org.jdom.transform.JDOMSource;
+import org.mycore.common.MCRCache;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRUtils;
 import org.mycore.common.xml.MCRURIResolver;
@@ -60,6 +62,67 @@ public class MCRData2Fields {
     /** The logger */
     private static final Logger LOGGER = Logger.getLogger(MCRData2Fields.class);
 
+    /** A template element to be used for building individual stylesheet */
+    private static Element xslTemplate;
+
+    /** Builds a template element to be used for building individual stylesheet */
+    private static void buildXSLTemplate() {
+        xslTemplate = new Element("stylesheet");
+        xslTemplate.setAttribute("version", "1.0");
+        xslTemplate.setNamespace(MCRFieldDef.xslns);
+        xslTemplate.addNamespaceDeclaration(MCRFieldDef.xmlns);
+        xslTemplate.addNamespaceDeclaration(MCRFieldDef.xlinkns);
+        xslTemplate.addNamespaceDeclaration(MCRFieldDef.xalanns);
+        xslTemplate.addNamespaceDeclaration(MCRFieldDef.extns);
+        xslTemplate.setAttribute("extension-element-prefixes", "ext");
+
+        Element param = new Element("param", MCRFieldDef.xslns);
+        param.setAttribute("name", "objectType");
+        xslTemplate.addContent(param);
+
+        Element template = new Element("template", MCRFieldDef.xslns);
+        template.setAttribute("match", "/");
+        xslTemplate.addContent(template);
+
+        Element fieldValues = new Element("fieldValues", MCRFieldDef.mcrns);
+        template.addContent(fieldValues);
+    }
+
+    private static MCRCache stylesheets = new MCRCache(10);
+
+    private static Document buildStylesheet(String index, String source) {
+        String key = index + "//" + source;
+        Document xsl = (Document) (stylesheets.get(key));
+
+        if (xsl == null) {
+            if (xslTemplate == null)
+                buildXSLTemplate();
+            Element root = (Element) (xslTemplate.clone());
+            Element fv = root.getChild("template", MCRFieldDef.xslns).getChild("fieldValues", MCRFieldDef.mcrns);
+
+            List fieldDefs = MCRFieldDef.getFieldDefs(index);
+            for (int i = 0; i < fieldDefs.size(); i++) {
+                MCRFieldDef fieldDef = (MCRFieldDef) (fieldDefs.get(i));
+                if (source.indexOf(fieldDef.getSource()) == -1)
+                    continue;
+                Element fragment = fieldDef.getXSL();
+                if (fragment != null)
+                    fv.addContent(fragment);
+            }
+
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("---------- Stylesheet for \"" + index + "\" / " + source + " ----------");
+                XMLOutputter out = new XMLOutputter(org.jdom.output.Format.getPrettyFormat());
+                LOGGER.debug("\n" + out.outputString(root));
+            }
+
+            xsl = new Document(root);
+            stylesheets.put(key, xsl);
+        }
+
+        return xsl;
+    }
+
     /**
      * Extracts field values for indexing from the given MCRObject's metadata.
      * 
@@ -70,24 +133,10 @@ public class MCRData2Fields {
      * @return a List of MCRFieldValue objects that contain field and value
      */
     public static List buildFields(MCRObject obj, String index) {
-        List values = new ArrayList();
-        List fieldDefList = MCRFieldDef.getFieldDefs(index);
-
-        Document xml = null;
-        for (int i = 0; i < fieldDefList.size(); i++) {
-            MCRFieldDef fieldDef = (MCRFieldDef) (fieldDefList.get(i));
-
-            if (!fieldDef.isUsedForObjectType(obj.getId().getTypeId()))
-                continue;
-            if (!(MCRFieldDef.OBJECT_METADATA.equals(fieldDef.getSource()) || MCRFieldDef.OBJECT_CATEGORY.equals(fieldDef.getSource())))
-                continue;
-
-            if (xml == null)
-                xml = obj.createXML();
-
-            addValues(fieldDef, xml, values);
-        }
-        return values;
+        String source = MCRFieldDef.OBJECT_METADATA + " " + MCRFieldDef.OBJECT_CATEGORY;
+        Document xsl = buildStylesheet(index, source);
+        Document xml = obj.createXML();
+        return buildValues(xsl, xml, obj.getId().getTypeId());
     }
 
     /**
@@ -102,47 +151,64 @@ public class MCRData2Fields {
      */
     public static List buildFields(MCRFile file, String index) {
         List values = new ArrayList();
+
+        boolean foundSourceXMLContent = false;
+        boolean foundSourceFileMetadata = false;
+        boolean foundSourceFileAdditional = false;
+
+        // Handle source FILE_TEXT_CONTENT
         List fieldDefList = MCRFieldDef.getFieldDefs(index);
-
-        Document xmlContent = null;
-        Document xmlMetadata = null;
-        Document xmlAdditional = null;
-
         for (int i = 0; i < fieldDefList.size(); i++) {
             MCRFieldDef fieldDef = (MCRFieldDef) (fieldDefList.get(i));
             if (!fieldDef.isUsedForObjectType(file.getContentTypeID()))
                 continue;
 
-            if (MCRFieldDef.FILE_TEXT_CONTENT.equals(fieldDef.getSource())) {
+            if (MCRFieldDef.FILE_TEXT_CONTENT.equals(fieldDef.getSource()))
                 values.add(new MCRFieldValue(fieldDef, file));
-            } else if (MCRFieldDef.FILE_XML_CONTENT.equals(fieldDef.getSource())) {
-                if (xmlContent == null) {
-                    try {
-                        xmlContent = file.getContentAsJDOM();
-                    } catch (Exception ex) {
-                        String msg = "Exception while building XML content of MCRFile " + file.getOwnerID() + " " + file.getAbsolutePath();
-                        LOGGER.error(msg, ex);
-                    }
-                }
-                if (xmlContent != null)
-                    addValues(fieldDef, xmlContent, values);
-            } else if (MCRFieldDef.FILE_METADATA.equals(fieldDef.getSource())) {
-                if (xmlMetadata == null)
-                    xmlMetadata = file.createXML();
-                addValues(fieldDef, xmlMetadata, values);
-            } else if (MCRFieldDef.FILE_ADDITIONAL_DATA.equals(fieldDef.getSource())) {
-                if (xmlAdditional == null) {
-                    try {
-                        xmlAdditional = file.getAdditionalData();
-                    } catch (Exception ex) {
-                        String msg = "Exception while reading additional XML data of MCRFile " + file.getOwnerID() + " " + file.getAbsolutePath();
-                        LOGGER.error(msg, ex);
-                    }
-                }
-                if (xmlAdditional != null)
-                    addValues(fieldDef, xmlAdditional, values);
-            }
+
+            if (MCRFieldDef.FILE_XML_CONTENT.equals(fieldDef.getSource()))
+                foundSourceXMLContent = true;
+            if (MCRFieldDef.FILE_METADATA.equals(fieldDef.getSource()))
+                foundSourceFileMetadata = true;
+            if (MCRFieldDef.FILE_ADDITIONAL_DATA.equals(fieldDef.getSource()))
+                foundSourceFileAdditional = true;
         }
+
+        // Handle source FILE_XML_CONTENT
+        if (foundSourceXMLContent) {
+            Document xsl = buildStylesheet(index, MCRFieldDef.FILE_XML_CONTENT);
+            Document xml = null;
+            try {
+                xml = file.getContentAsJDOM();
+            } catch (Exception ex) {
+                String msg = "Exception while building XML content of MCRFile " + file.getOwnerID() + " " + file.getAbsolutePath();
+                LOGGER.error(msg, ex);
+            }
+            if (xml != null)
+                values.addAll(buildValues(xsl, xml, file.getContentTypeID()));
+        }
+
+        // Handle source FILE_METADATA
+        if (foundSourceFileMetadata) {
+            Document xsl = buildStylesheet(index, MCRFieldDef.FILE_METADATA);
+            Document xml = file.createXML();
+            values.addAll(buildValues(xsl, xml, file.getContentTypeID()));
+        }
+
+        // Handle source FILE_ADDITIONAL_DATA
+        if (foundSourceFileAdditional) {
+            Document xsl = buildStylesheet(index, MCRFieldDef.FILE_ADDITIONAL_DATA);
+            Document xml = null;
+            try {
+                xml = file.getAdditionalData();
+            } catch (Exception ex) {
+                String msg = "Exception while reading additional XML data of MCRFile " + file.getOwnerID() + " " + file.getAbsolutePath();
+                LOGGER.error(msg, ex);
+            }
+            if (xml != null)
+                values.addAll(buildValues(xsl, xml, file.getContentTypeID()));
+        }
+
         return values;
     }
 
@@ -156,59 +222,44 @@ public class MCRData2Fields {
      * @return a List of MCRFieldValue objects that contain name, type and value
      */
     public static List buildFields(Document doc, String index) {
-        List values = new ArrayList();
-        List fieldDefList = MCRFieldDef.getFieldDefs(index);
-
-        for (int i = 0; i < fieldDefList.size(); i++) {
-            MCRFieldDef fieldDef = (MCRFieldDef) (fieldDefList.get(i));
-            if (!fieldDef.isUsedForObjectType(doc.getRootElement().getName()))
-                continue;
-            if (!MCRFieldDef.XML.equals(fieldDef.getSource()))
-                continue;
-            addValues(fieldDef, doc, values);
-        }
-        return values;
+        Document xsl = buildStylesheet(index, MCRFieldDef.XML);
+        return buildValues(xsl, doc, doc.getRootElement().getName());
     }
 
     /** Transforms xml input to search field values using XSL * */
-    private static void addValues(MCRFieldDef def, Document xml, List values) {
-        List fieldValues = transform(def, xml);
+    private static List buildValues(Document xsl, Document xml, String objectType) {
+        List values = new ArrayList();
 
-        if (fieldValues != null)
-            for (int i = 0; i < fieldValues.size(); i++) {
-                Element fieldValue = (Element) (fieldValues.get(i));
-                String value = fieldValue.getChildTextTrim("value", MCRFieldDef.mcrns);
-
-                if ((value != null) && (value.length() > 0)) {
-                    LOGGER.debug("MCRData2Fields " + def.getName() + " := " + value);
-                    values.add(new MCRFieldValue(def, value));
-                }
-            }
-    }
-
-    /**
-     * Transforms XML input to a list of field elements that contain name, type
-     * and value of the field.
-     */
-    private static List transform(MCRFieldDef def, Document xml) {
-        Document xsl = def.getStylesheet();
-        if (xsl == null)
-            return null;
-
+        List fieldValues = null;
         try {
             JDOMResult xmlres = new JDOMResult();
             TransformerFactory factory = TransformerFactory.newInstance();
             factory.setURIResolver(MCRURIResolver.instance());
             Transformer transformer = factory.newTransformer(new JDOMSource(xsl));
+            transformer.setParameter("objectType", objectType);
             transformer.transform(new JDOMSource(xml), xmlres);
 
             List resultList = xmlres.getResult();
             Element root = (Element) (resultList.get(0));
-            return root.getChildren();
+            fieldValues = root.getChildren();
         } catch (Exception ex) {
             String msg = "Exception while transforming metadata to search field";
             throw new MCRException(msg, ex);
         }
+
+        if (fieldValues != null)
+            for (int i = 0; i < fieldValues.size(); i++) {
+                Element fieldValue = (Element) (fieldValues.get(i));
+                String value = fieldValue.getChildTextTrim("value", MCRFieldDef.mcrns);
+                String name = fieldValue.getAttributeValue("name");
+                MCRFieldDef def = MCRFieldDef.getDef(name);
+
+                if ((value != null) && (value.length() > 0)) {
+                    LOGGER.debug("MCRData2Fields " + name + " := " + value);
+                    values.add(new MCRFieldValue(def, value));
+                }
+            }
+        return values;
     }
 
     /** Standard format for a date value, as defined in fieldtypes.xml */

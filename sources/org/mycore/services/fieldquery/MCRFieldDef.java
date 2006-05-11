@@ -29,7 +29,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.Namespace;
 import org.jdom.output.XMLOutputter;
@@ -61,7 +60,7 @@ public class MCRFieldDef {
 
     public final static Namespace xalanns = Namespace.getNamespace("xalan", "http://xml.apache.org/xalan");
 
-    private final static Namespace extns = Namespace.getNamespace("ext", "xalan://org.mycore.services.fieldquery.MCRData2Fields");
+    public final static Namespace extns = Namespace.getNamespace("ext", "xalan://org.mycore.services.fieldquery.MCRData2Fields");
 
     private final static String configFile = "searchfields.xml";
 
@@ -69,8 +68,6 @@ public class MCRFieldDef {
      * Read searchfields.xml and build the MCRFiedDef objects
      */
     static {
-        buildXSLTemplate();
-
         Element def = getConfigFile();
 
         List children = def.getChildren("index", mcrns);
@@ -133,7 +130,7 @@ public class MCRFieldDef {
         this.source = def.getAttributeValue("source");
 
         fieldTable.put(name, this);
-        buildStylesheet(def);
+        buildForEachXSL(def);
     }
 
     /**
@@ -293,67 +290,60 @@ public class MCRFieldDef {
         return source;
     }
 
-    /** A template element to be used for building individual stylesheet */
-    private static Element xslTemplate;
-
-    /** Builds a template element to be used for building individual stylesheet */
-    private static void buildXSLTemplate() {
-        xslTemplate = new Element("stylesheet");
-        xslTemplate.setAttribute("version", "1.0");
-        xslTemplate.setNamespace(xslns);
-        xslTemplate.addNamespaceDeclaration(xmlns);
-        xslTemplate.addNamespaceDeclaration(xlinkns);
-        xslTemplate.addNamespaceDeclaration(xalanns);
-        xslTemplate.addNamespaceDeclaration(extns);
-        xslTemplate.setAttribute("extension-element-prefixes", "ext");
-
-        Element template = new Element("template", xslns);
-        template.setAttribute("match", "/");
-        xslTemplate.addContent(template);
-
-        Element fieldValues = new Element("fieldValues", mcrns);
-        template.addContent(fieldValues);
-
-        Element forEach = new Element("for-each", xslns);
-        fieldValues.addContent(forEach);
-    }
-
-    /** The stylesheet to build values for this field from XML source data */
-    private Document xsl = null;
+    /**
+     * The stylesheet fragment to build values for this field from XML source
+     * data
+     */
+    private Element xsl;
 
     /** Returns a stylesheet to build values for this field from XML source data */
-    Document getStylesheet() {
-        return xsl;
+    Element getXSL() {
+        if (xsl == null)
+            return null;
+        else
+            return (Element) (xsl.clone());
     }
 
-    /** Builds the stylesheet to build values for this field from XML source data */
-    private void buildStylesheet(Element fieldDef) {
+    /**
+     * Builds the stylesheet fragment to build values for this field from XML
+     * source data
+     */
+    private void buildForEachXSL(Element fieldDef) {
         String xpath = fieldDef.getAttributeValue("xpath");
         if ((xpath == null) || (xpath.trim().length() == 0)) {
             return;
         }
 
-        Element stylesheet = (Element) (xslTemplate.clone());
-        xsl = new Document(stylesheet);
+        // <xsl:if test="contains(@objects,$objecType)">
+        if (objects != null) {
+            Element xif = new Element("if", xslns);
+            xif.setAttribute("test", "contains('" + objects.trim() + "',$objectType)");
+            xsl = xif;
+        }
 
         // <xsl:for-each select="{@xpath}">
-        Element forEach = stylesheet.getChild("template", xslns).getChild("fieldValues", mcrns).getChild("for-each", xslns);
-        forEach.setAttribute("select", xpath);
+        Element forEach1 = new Element("for-each", xslns);
+        forEach1.setAttribute("select", xpath);
+        if (xsl == null)
+            xsl = forEach1;
+        else
+            xsl.addContent(forEach1);
 
         if (MCRFieldDef.OBJECT_CATEGORY.equals(fieldDef.getAttributeValue("source"))) {
             // current(): <format classid="DocPortal_class_00000006"
             // categid="FORMAT0002"/>
             // URI: classification:metadata:levels:parents:{class}:{categ}
             Element forEach2 = new Element("for-each", xslns);
-            forEach.addContent(forEach2);
+            forEach1.addContent(forEach2);
             String uri = "document(concat('classification:metadata:0:parents:',current()/@classid,':',current()/@categid))//category";
             forEach2.setAttribute("select", uri);
-            forEach = forEach2;
+            forEach1 = forEach2;
         }
 
         // <mcr:fieldValue>
         Element fieldValue = new Element("fieldValue", mcrns);
-        forEach.addContent(fieldValue);
+        fieldValue.setAttribute("name", getName());
+        forEach1.addContent(fieldValue);
 
         // <mcr:value>
         Element valueElem = new Element("value", mcrns);
@@ -382,9 +372,9 @@ public class MCRFieldDef {
         }
 
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("---------- Stylesheet for search field <" + name + "> ----------");
+            LOGGER.debug("---------- XSL for search field \"" + name + "\" ----------");
             XMLOutputter out = new XMLOutputter(org.jdom.output.Format.getPrettyFormat());
-            LOGGER.debug(out.outputString(xsl));
+            LOGGER.debug("\n" + out.outputString(xsl));
         }
     }
 }
