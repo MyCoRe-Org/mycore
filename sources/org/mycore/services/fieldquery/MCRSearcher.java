@@ -114,6 +114,10 @@ public abstract class MCRSearcher extends MCREventHandlerBase implements MCREven
         String entryID = file.getID();
         removeFromIndex(entryID);
     }
+    
+    protected void handleFileRepaired(MCREvent evt, MCRFile file) {
+        handleFileUpdated(evt,file);
+    }
 
     protected void handleObjectCreated(MCREvent evt, MCRObject obj) {
         String entryID = obj.getId().getId();
