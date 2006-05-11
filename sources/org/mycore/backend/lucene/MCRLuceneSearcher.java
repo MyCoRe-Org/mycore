@@ -51,6 +51,7 @@ import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
+import org.mycore.common.MCRNormalizer;
 import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.parsers.bool.MCRCondition;
 import org.mycore.services.fieldquery.MCRFieldDef;
@@ -225,9 +226,17 @@ public class MCRLuceneSearcher extends MCRSearcher {
                     LOGGER.debug("####### Index MCRFile: " + mcrfile.getPath());
 
                     BufferedReader in = new BufferedReader(PLUGIN_MANAGER.transform(mcrfile.getContentType(), mcrfile.getContentAsInputStream()));
-                    // Field f = Field.Text(name, in);
-                    Field f = new Field(name, in);
-                    doc.add(f);
+                    String s;
+                    StringBuffer text = new StringBuffer();
+                    while ((s = in.readLine()) != null) 
+                    {
+                      text.append(s).append(" ");
+                    }
+                    
+                    s = text.toString();
+                    MCRNormalizer.normalizeString(s);
+                    
+                    doc.add(new Field(name, s, Field.Store.NO, Field.Index.TOKENIZED) );
                 }
             } else {
                 if ("date".equals(type)) {
