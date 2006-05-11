@@ -24,17 +24,18 @@
 package org.mycore.services.fieldquery;
 
 import org.jdom.Element;
+import org.mycore.common.MCRNormalizer;
 import org.mycore.datamodel.ifs.MCRFile;
 
 /**
- * Represents the value of a field in a query. This can be a value 
- * that is part of the query results (hit sort data or meta data)
- * or a value that is built when data is indexed.
+ * Represents the value of a field in a query. This can be a value that is part
+ * of the query results (hit sort data or meta data) or a value that is built
+ * when data is indexed.
  * 
  * @author Frank Lützenkirchen
  */
 public class MCRFieldValue {
-    
+
     /**
      * The field this value belongs to
      */
@@ -46,27 +47,34 @@ public class MCRFieldValue {
     private String value;
 
     /**
-     * The MCRFile thats content should become the value
-     * of the field when indexing data
+     * The MCRFile thats content should become the value of the field when
+     * indexing data
      */
     private MCRFile file;
 
     /**
      * Creates a new field value
      * 
-     * @param field the field this value belongs to
-     * @param value the value of the field, as a String
+     * @param field
+     *            the field this value belongs to
+     * @param value
+     *            the value of the field, as a String
      */
     public MCRFieldValue(MCRFieldDef field, String value) {
         this.field = field;
         this.value = value;
+        if (field.getDataType().equals("text") || field.getDataType().equals("name"))
+            this.value = MCRNormalizer.normalizeString(value);
     }
 
     /**
      * Creates a new field value
      * 
-     * @param field the field this value belongs to
-     * @param file the MCRFile thats content should become the value of the field when indexing data
+     * @param field
+     *            the field this value belongs to
+     * @param file
+     *            the MCRFile thats content should become the value of the field
+     *            when indexing data
      */
     MCRFieldValue(MCRFieldDef field, MCRFile file) {
         this.field = field;
@@ -82,7 +90,9 @@ public class MCRFieldValue {
 
     /**
      * Returns the value of the field as a String
-     * @return the value of the field as a String, or null if the value is the content of an MCRFile
+     * 
+     * @return the value of the field as a String, or null if the value is the
+     *         content of an MCRFile
      * @see #getFile()
      */
     public String getValue() {
@@ -90,8 +100,11 @@ public class MCRFieldValue {
     }
 
     /**
-     * Returns the MCRFile thats content should become the value of the field when indexing data
-     * @return the MCRFile to be indexed, or null if the value can be retrieved using the getValue() method
+     * Returns the MCRFile thats content should become the value of the field
+     * when indexing data
+     * 
+     * @return the MCRFile to be indexed, or null if the value can be retrieved
+     *         using the getValue() method
      * @see #getValue()
      */
     public MCRFile getFile() {
@@ -101,10 +114,11 @@ public class MCRFieldValue {
     /**
      * Builds a XML representation of this field's value
      * 
-     * @return a 'field' element with attribute 'name' and the value as element content
+     * @return a 'field' element with attribute 'name' and the value as element
+     *         content
      */
     public Element buildXML() {
-        Element eField = new Element("field", MCRFieldDef.mcrns );
+        Element eField = new Element("field", MCRFieldDef.mcrns);
         eField.setAttribute("name", field.getName());
         eField.addContent(value);
         return eField;
