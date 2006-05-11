@@ -234,7 +234,7 @@ public class MCRLuceneSearcher extends MCRSearcher {
                     }
                     
                     s = text.toString();
-                    MCRNormalizer.normalizeString(s);
+                    s = MCRNormalizer.normalizeString(s);
                     
                     doc.add(new Field(name, s, Field.Store.NO, Field.Index.TOKENIZED) );
                 }
