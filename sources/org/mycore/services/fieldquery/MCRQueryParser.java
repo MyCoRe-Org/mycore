@@ -23,12 +23,18 @@
 
 package org.mycore.services.fieldquery;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.jdom.Element;
+import org.mycore.parsers.bool.MCRAndCondition;
 import org.mycore.parsers.bool.MCRBooleanClauseParser;
 import org.mycore.parsers.bool.MCRCondition;
+import org.mycore.parsers.bool.MCRNotCondition;
+import org.mycore.parsers.bool.MCROrCondition;
 import org.mycore.parsers.bool.MCRParseException;
 
 /**
@@ -57,11 +63,49 @@ public class MCRQueryParser extends MCRBooleanClauseParser {
         String opera = e.getAttributeValue("operator");
         String value = e.getAttributeValue("value");
 
+        return buildConditions(field, opera, value);
+    }
+
+    /**
+     * Builds a new MCRCondition from parsed elements
+     * 
+     * @param field
+     *            one or more field names, separated by comma
+     * @param oper
+     *            the condition operator
+     * @param value
+     *            the condition value
+     * @return
+     */
+    private MCRCondition buildConditions(String field, String oper, String value) {
+        if (field.indexOf(",") == -1)
+            return buildCondition(field, oper, value);
+        else // Multiple fields in one condition, combine with OR
+        {
+            StringTokenizer st = new StringTokenizer(field, ", ");
+            MCROrCondition oc = new MCROrCondition();
+            while (st.hasMoreTokens())
+                oc.addChild(buildCondition(st.nextToken(), oper, value));
+            return oc;
+        }
+    }
+
+    /**
+     * Builds a new MCRQueryCondition
+     * 
+     * @param field
+     *            the name of the search field
+     * @param oper
+     *            the condition operator
+     * @param value
+     *            the condition value
+     * @return
+     */
+    private MCRQueryCondition buildCondition(String field, String oper, String value) {
         MCRFieldDef def = MCRFieldDef.getDef(field);
         if (def == null)
             throw new MCRParseException("Field not defined: <" + field + ">");
-
-        return new MCRQueryCondition(def, opera, value);
+        return new MCRQueryCondition(def, oper, value);
     }
 
     /** Pattern for MCRQueryConditions expressed as String */
@@ -89,22 +133,107 @@ public class MCRQueryParser extends MCRBooleanClauseParser {
             value = value.substring(1, value.length() - 1);
         }
 
-        MCRFieldDef def = MCRFieldDef.getDef(field);
-        if (def == null)
-            throw new MCRParseException("Field not defined: <" + field + ">");
-
-        return new MCRQueryCondition(def, operator, value);
+        return buildConditions(field, operator, value);
     }
-    
+
+    public MCRCondition parse(Element condition) throws MCRParseException {
+        MCRCondition cond = super.parse(condition);
+        return normalizeCondition(cond);
+    }
+
+    public MCRCondition parse(String s) throws MCRParseException {
+        MCRCondition cond = super.parse(s);
+        return normalizeCondition(cond);
+    }
+
+    /**
+     * Normalizes a parsed query condition. AND/OR conditions that just have one
+     * child will be replaced with that child. Conditions that use the operator
+     * "contains" will be splitted into multiple simpler conditions if the
+     * condition value contains phrases surrounded by '...' or wildcard search
+     * with * or ?.
+     */
+    private MCRCondition normalizeCondition(MCRCondition cond) {
+        if (cond instanceof MCRAndCondition) {
+            MCRAndCondition ac = (MCRAndCondition) cond;
+            List children = ac.getChildren();
+            if (children != null)
+                for (int i = 0; i < children.size(); i++)
+                    children.set(i, normalizeCondition((MCRCondition) (children.get(i))));
+            return (children.size() == 1 ? (MCRCondition) (children.get(0)) : ac);
+        } else if (cond instanceof MCROrCondition) {
+            MCROrCondition oc = (MCROrCondition) cond;
+            List children = oc.getChildren();
+            if (children != null)
+                for (int i = 0; i < children.size(); i++)
+                    children.set(i, normalizeCondition((MCRCondition) (children.get(i))));
+            return (children.size() == 1 ? (MCRCondition) (children.get(0)) : oc);
+        } else if (cond instanceof MCRNotCondition) {
+            MCRNotCondition nc = (MCRNotCondition) cond;
+            if (nc.getChild() != null)
+                return new MCRNotCondition(normalizeCondition(nc.getChild()));
+            else
+                return nc;
+        } else if (cond instanceof MCRQueryCondition) {
+            MCRQueryCondition qc = (MCRQueryCondition) cond;
+            if (!qc.getOperator().equals("contains"))
+                return qc;
+
+            List values = new ArrayList();
+
+            String phrase = null;
+            StringTokenizer st = new StringTokenizer(qc.getValue(), " ");
+            while (st.hasMoreTokens()) {
+                String value = st.nextToken();
+                if ((phrase != null)) // we are within phrase
+                {
+                    if (value.endsWith("'")) // end of phrase
+                    {
+                        value = phrase + " " + value;
+                        values.add(value);
+                        phrase = null;
+                    } else // in middle of phrase
+                    {
+                        phrase = " " + value;
+                    }
+                } else if (value.startsWith("'")) // begin of phrase
+                {
+                    if (value.endsWith("'")) // one-word phrase
+                    {
+                        values.add(value.substring(1, value.length() - 1));
+                    } else {
+                        phrase = value;
+                    }
+                } else
+                    values.add(value);
+            }
+
+            MCRAndCondition ac = new MCRAndCondition();
+            for (int i = 0; i < values.size(); i++) {
+                String value = (String) (values.get(i));
+                if (value.startsWith("'")) // phrase
+                    ac.addChild(new MCRQueryCondition(qc.getField(), "phrase", value.substring(1, value.length() - 1)));
+                else if ((value.indexOf("*") >= 0) || (value.indexOf("?") >= 0)) // like
+                    ac.addChild(new MCRQueryCondition(qc.getField(), "like", value));
+                else
+                    ac.addChild(new MCRQueryCondition(qc.getField(), "contains", value));
+            }
+
+            if (values.size() == 1)
+                return (MCRCondition) (ac.getChildren().get(0));
+            else
+                return ac;
+        } else
+            return cond;
+    }
+
     /** Used for input validation in editor search form */
-    public static boolean validateQueryExpression( String query )
-    {
-      try
-      {  
-        MCRCondition cond = new MCRQueryParser().parse( query );
-        return( cond != null );
-      }
-      catch( Exception ex )
-      { return false; }
+    public static boolean validateQueryExpression(String query) {
+        try {
+            MCRCondition cond = new MCRQueryParser().parse(query);
+            return (cond != null);
+        } catch (Exception ex) {
+            return false;
+        }
     }
 }
