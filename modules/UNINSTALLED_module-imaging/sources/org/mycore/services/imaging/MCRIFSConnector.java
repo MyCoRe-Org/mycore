@@ -20,8 +20,8 @@ import org.apache.log4j.Logger;
 import org.mycore.common.MCRException;
 import org.mycore.datamodel.ifs.MCRDirectory;
 import org.mycore.datamodel.ifs.MCRFile;
-import org.mycore.datamodel.ifs.MCRFileNodeServlet;
 import org.mycore.datamodel.ifs.MCRFilesystemNode;
+import org.mycore.datamodel.ifs.MCRFileNodeServlet;
 
 /***
  * The MCRIFSConnector deliver the method for getting
@@ -55,12 +55,17 @@ public class MCRIFSConnector{
 	protected MCRDirectory cacheInIFS = null;
 	
 	public MCRIFSConnector(){
-		if ((cacheInIFS = MCRDirectory.getRootDirectory("imgCache")) == null)
+		try {
+			cacheInIFS = MCRDirectory.getRootDirectory("imgCache");
+		} catch (MCRException e) {
+			cacheInIFS = new MCRDirectory("imgCache", "imgCache");
+		}
+		/*if ((cacheInIFS = MCRDirectory.getRootDirectory("imgCache")) == null)
 			try {
 				cacheInIFS = new MCRDirectory("imgCache", "imgCache");
 			} catch (Exception e) {
 				throw new MCRException(e.getMessage());
-			}
+			}*/
 		/*else
 			cacheInIFS = MCRDirectory.getRootDirectory("imgCache");*/
 	}
