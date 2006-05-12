@@ -360,11 +360,16 @@ public class MCRJDOMSearcher extends MCRSearcher {
             return true;
         }
 
+        if (!pattern.endsWith("*"))
+            pattern = pattern + "*";
+        if (!pattern.startsWith("*"))
+            pattern = "*" + pattern;
+
         pattern = pattern.replaceAll("\\?", ".");
         pattern = pattern.replaceAll("\\*", "(.*)");
 
-        Pattern p = Pattern.compile(pattern);
+        LOGGER.debug("Search regex " + pattern + " in text \"" + value + "\"");
 
-        return p.matcher(value).matches();
+        return Pattern.matches(pattern, value);
     }
 }
