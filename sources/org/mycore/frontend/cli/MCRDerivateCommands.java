@@ -72,6 +72,9 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
 
         MCRCommand com = null;
 
+        com = new MCRCommand("delete all derivates", "org.mycore.frontend.cli.MCRDerivateCommands.deleteAllDerivates", "Removes all derivates from the repository");
+        command.add(com);
+
         com = new MCRCommand("delete derivate from {0} to {1}", "org.mycore.frontend.cli.MCRDerivateCommands.delete String String", "The command remove derivates in the number range between the MCRObjectID {0} and {1}.");
         command.add(com);
 
@@ -116,6 +119,27 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
 
         com = new MCRCommand("repair derivate search of ID {0}", "org.mycore.frontend.cli.MCRDerivateCommands.repairDerivateSearchForID String", "The command read the Content store for MCRObjectID {0} and reindex the derivate search store.");
         command.add(com);
+    }
+
+    /**
+     * deletes all MCRDerivate from the datastore.
+     */
+    public static void deleteAllDerivates() {
+        MCRDerivate der = new MCRDerivate();
+        MCRXMLTableManager tm=MCRXMLTableManager.instance();
+        ArrayList ids=tm.retrieveAllIDs("derivate");
+        Iterator it=ids.iterator();
+        while (it.hasNext()){
+            String id=it.next().toString();
+            try {
+                der.deleteFromDatastore(id);
+                LOGGER.info(der.getId().getId() + " deleted.");
+            } catch (MCRException ex) {
+                LOGGER.error("Can't delete " + der.getId() + ".");
+                LOGGER.error(ex.getMessage());
+                LOGGER.debug(ex.getStackTraceAsString());
+            }
+        }
     }
 
     /**
