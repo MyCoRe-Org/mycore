@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
 <!-- ============================================== -->
-<!-- $Revision: 1.46 $ $Date: 2006-04-04 13:48:51 $ -->
+<!-- $Revision: 1.47 $ $Date: 2006-05-12 07:50:51 $ -->
 <!-- ============================================== --> 
 
 <xsl:stylesheet 
@@ -468,7 +468,7 @@
 
   <xsl:if test="(count($cells[@row=$row.nr]) &gt; 0) and ($cells[@row &gt; $row.nr]) and (@lines='on')">
     <tr>
-      <td width="100%" colspan="2" class="editorHLine">
+      <td width="100%" colspan="10" class="editorHLine">
         <img src="dummy.jpg" height="1" width="1" alt=" " />
       </td>
     </tr>
