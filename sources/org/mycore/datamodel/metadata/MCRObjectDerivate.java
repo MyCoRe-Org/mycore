@@ -26,6 +26,8 @@ package org.mycore.datamodel.metadata;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+
 import org.mycore.common.MCRException;
 
 /**
@@ -35,9 +37,11 @@ import org.mycore.common.MCRException;
  * @version $Revision$ $Date$
  */
 public class MCRObjectDerivate {
+    
+    private static final Logger LOGGER=Logger.getLogger(MCRObjectDerivate.class);
 
     // derivate data
-    private ArrayList linkmetas = null;
+    private MCRMetaLinkID linkmeta = null;
 
     private ArrayList externals = null;
 
@@ -48,7 +52,6 @@ public class MCRObjectDerivate {
      * to null.
      */
     public MCRObjectDerivate() {
-        linkmetas = new ArrayList();
         externals = new ArrayList();
         internals = null;
     }
@@ -62,20 +65,11 @@ public class MCRObjectDerivate {
      */
     public final void setFromDOM(org.jdom.Element derivate_element) {
         // Link to Metadata part
-        org.jdom.Element linkmetas_element = derivate_element.getChild("linkmetas");
-        linkmetas.clear();
-        if (linkmetas_element != null) {
-            List linkmeta_element_list = linkmetas_element.getChildren();
-            int linkmeta_len = linkmeta_element_list.size();
-
-            for (int i = 0; i < linkmeta_len; i++) {
-                org.jdom.Element linkmeta_element = (org.jdom.Element) linkmeta_element_list.get(i);
-                MCRMetaLinkID link = new MCRMetaLinkID();
-                link.setDataPart("linkmeta");
-                link.setFromDOM(linkmeta_element);
-                linkmetas.add(link);
-            }
-        }
+        org.jdom.Element linkmeta_element = derivate_element.getChild("linkmetas").getChild("linkmeta");
+        MCRMetaLinkID link = new MCRMetaLinkID();
+        link.setDataPart("linkmeta");
+        link.setFromDOM(linkmeta_element);
+        linkmeta=link;
 
         // External part
         org.jdom.Element externals_element = derivate_element.getChild("externals");
@@ -86,10 +80,10 @@ public class MCRObjectDerivate {
 
             for (int i = 0; i < external_len; i++) {
                 org.jdom.Element external_element = (org.jdom.Element) external_element_list.get(i);
-                MCRMetaLink link = new MCRMetaLink();
+                MCRMetaLink eLink = new MCRMetaLink();
                 link.setDataPart("external");
                 link.setFromDOM(external_element);
-                externals.add(link);
+                externals.add(eLink);
             }
         }
 
@@ -109,9 +103,11 @@ public class MCRObjectDerivate {
 
     /**
      * This method return the size of the linkmeta array.
+     * @deprecated
+     * @see #getMetaLink()
      */
     public final int getLinkMetaSize() {
-        return linkmetas.size();
+        return 0;
     }
 
     /**
@@ -120,14 +116,23 @@ public class MCRObjectDerivate {
      * 
      * @exception IndexOutOfBoundsException
      *                throw this exception, if the index is false
+     * @deprecated
+     * @see #getMetaLink()
      * @return a metadata link as MCRMetaLinkID
      */
     public final MCRMetaLinkID getLinkMeta(int index) throws IndexOutOfBoundsException {
-        if ((index < 0) || (index > linkmetas.size())) {
+        if ((index != 0)) {
             throw new IndexOutOfBoundsException("Index error in getLinkMeta.");
         }
+        return getMetaLink();
+    }
 
-        return (MCRMetaLinkID) linkmetas.get(index);
+    /**
+     * returns link to the MCRObject.
+     * @return a metadata link as MCRMetaLinkID
+     */
+    public MCRMetaLinkID getMetaLink() {
+        return linkmeta;
     }
 
     /**
@@ -137,11 +142,7 @@ public class MCRObjectDerivate {
      *            the MCRMetaLinkID object
      */
     public final void setLinkMeta(MCRMetaLinkID in_link) {
-        if (in_link == null) {
-            return;
-        }
-
-        linkmetas.add(in_link);
+        linkmeta=in_link;
     }
 
     /**
@@ -203,42 +204,36 @@ public class MCRObjectDerivate {
 
         org.jdom.Element elm = new org.jdom.Element("derivate");
 
-        if (linkmetas.size() != 0) {
-            org.jdom.Element elmm = new org.jdom.Element("linkmetas");
-            elmm.setAttribute("class", "MCRMetaLinkID");
-            elmm.setAttribute("heritable", "false");
-            elmm.setAttribute("parasearch", "true");
-            elmm.setAttribute("textsearch", "false");
-
-            for (int i = 0; i < linkmetas.size(); i++) {
-                elmm.addContent(((MCRMetaLinkID) linkmetas.get(i)).createXML());
-            }
-
-            elm.addContent(elmm);
-        }
+        org.jdom.Element linkmetas = new org.jdom.Element("linkmetas");
+        linkmetas.setAttribute("class", "MCRMetaLinkID");
+        linkmetas.setAttribute("heritable", "false");
+        linkmetas.setAttribute("parasearch", "true");
+        linkmetas.setAttribute("textsearch", "false");
+        linkmetas.addContent(linkmeta.createXML());
+        elm.addContent(linkmetas);
 
         if (externals.size() != 0) {
-            org.jdom.Element elmm = new org.jdom.Element("externals");
-            elmm.setAttribute("class", "MCRMetaLink");
-            elmm.setAttribute("heritable", "false");
-            elmm.setAttribute("parasearch", "true");
-            elmm.setAttribute("textsearch", "false");
+            org.jdom.Element extEl = new org.jdom.Element("externals");
+            extEl.setAttribute("class", "MCRMetaLink");
+            extEl.setAttribute("heritable", "false");
+            extEl.setAttribute("parasearch", "true");
+            extEl.setAttribute("textsearch", "false");
 
             for (int i = 0; i < externals.size(); i++) {
-                elmm.addContent(((MCRMetaLink) externals.get(i)).createXML());
+                extEl.addContent(((MCRMetaLink) externals.get(i)).createXML());
             }
 
-            elm.addContent(elmm);
+            elm.addContent(extEl);
         }
 
         if (internals != null) {
-            org.jdom.Element elmm = new org.jdom.Element("internals");
-            elmm.setAttribute("class", "MCRMetaIFS");
-            elmm.setAttribute("heritable", "false");
-            elmm.setAttribute("parasearch", "false");
-            elmm.setAttribute("textsearch", "false");
-            elmm.addContent(internals.createXML());
-            elm.addContent(elmm);
+            org.jdom.Element intEl = new org.jdom.Element("internals");
+            intEl.setAttribute("class", "MCRMetaIFS");
+            intEl.setAttribute("heritable", "false");
+            intEl.setAttribute("parasearch", "false");
+            intEl.setAttribute("textsearch", "false");
+            intEl.addContent(internals.createXML());
+            elm.addContent(intEl);
         }
 
         return elm;
@@ -255,15 +250,17 @@ public class MCRObjectDerivate {
      * @return a boolean value
      */
     public final boolean isValid() {
-        if (linkmetas.size() != 0) {
-            for (int i = 0; i < linkmetas.size(); i++) {
-                if (!((MCRMetaLinkID) linkmetas.get(i)).getXLinkType().equals("locator")) {
-                    return false;
-                }
-            }
+        if (linkmeta == null){
+            LOGGER.warn("linkmeta == null");
+            return false;
+        }
+        if (!linkmeta.getXLinkType().equals("locator")){
+            LOGGER.warn("linkmeta type != locator");
+            return false;
         }
 
         if ((internals == null) && (externals.size() == 0)) {
+            LOGGER.warn("(internals == null) && (externals.size() == 0)");
             return false;
         }
 
