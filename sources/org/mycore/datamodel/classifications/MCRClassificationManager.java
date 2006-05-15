@@ -52,17 +52,17 @@ class MCRClassificationManager {
     protected MCRCache jDomCache;
     
     protected MCRClassificationInterface store;
+    private static final MCRConfiguration CONFIG = MCRConfiguration.instance();
 
     /**
      * Constructor for a new MCRClassificationManager.
      */
     protected MCRClassificationManager() {
-        MCRConfiguration config = MCRConfiguration.instance();
-        Object object = config.getInstanceOf("MCR.classifications_store_class");
+        Object object = CONFIG.getInstanceOf("MCR.classifications_store_class");
         store = (MCRClassificationInterface) object;
 
-        int classifSize = config.getInt("MCR.classifications_classification_cache_size", 30);
-        int categSize = config.getInt("MCR.classifications_category_cache_size", 500);
+        int classifSize = CONFIG.getInt("MCR.classifications_classification_cache_size", 30);
+        int categSize = CONFIG.getInt("MCR.classifications_category_cache_size", 500);
         classificationCache = new MCRCache(classifSize);
         categoryCache = new MCRCache(categSize);
         jDomCache = new MCRCache(categSize);
@@ -76,6 +76,7 @@ class MCRClassificationManager {
 
         store.createClassificationItem(classification);
         classificationCache.put(classification.getID(), classification);
+        CONFIG.systemModified();
     }
 
     void createCategoryItem(MCRCategoryItem category) {
@@ -85,6 +86,7 @@ class MCRClassificationManager {
 
         store.createCategoryItem(category);
         categoryCache.put(getCachingID(category), category);
+        CONFIG.systemModified();
     }
 
     MCRClassificationItem retrieveClassificationItem(String ID) {
@@ -163,12 +165,14 @@ class MCRClassificationManager {
         classificationCache.remove(classifID);
         jDomCache.remove(classifID);
         store.deleteClassificationItem(classifID);
+        CONFIG.systemModified();
     }
 
     void deleteCategoryItem(String classifID, String categID) {
         categoryCache.remove(classifID + "@@" + categID);
         jDomCache.remove(classifID + "@@" + categID);
         store.deleteCategoryItem(classifID, categID);
+        CONFIG.systemModified();
     }
     
 }

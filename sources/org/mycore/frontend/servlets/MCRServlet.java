@@ -23,6 +23,7 @@
 
 package org.mycore.frontend.servlets;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
@@ -369,7 +370,21 @@ public class MCRServlet extends HttpServlet {
 		generateErrorPage(request, response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, msgBuf.toString(), activeLinks, false);
 	}
 
-	protected static String getProperty(HttpServletRequest request, String name) {
+	/**
+     * allows browser to cache requests.
+     * 
+     * This method is usefull as it allows browsers to cache content that is not changed.
+     * 
+     * Please overwrite this method in every Servlet that depends on "remote" data.
+     *  
+	 */
+    protected long getLastModified(HttpServletRequest request) {
+        //we can cache every (local) request
+        LOGGER.info("LastModified: "+CONFIG.getSystemLastModified());
+        return CONFIG.getSystemLastModified(); 
+    }
+
+    protected static String getProperty(HttpServletRequest request, String name) {
 		String value = (String) request.getAttribute(name);
 
 		// if Attribute not given try Parameter

@@ -111,6 +111,8 @@ public class MCRConfiguration {
     protected static MCRConfiguration singleton;
 
     private static Hashtable instanceHolder;
+    
+    private static long systemLastModified;
 
     /**
      * Returns the single instance of this class that can be used to read and
@@ -146,6 +148,29 @@ public class MCRConfiguration {
         } else {
             singleton = new MCRConfiguration();
         }
+        singleton.systemModified();
+    }
+    
+    /**
+     * returns the last point in time when the MyCoRe system was last modified.
+     * 
+     * This method can help you to validate caches not under your controll, e.g.
+     * client caches.
+     * 
+     * @see System#currentTimeMillis()
+     */
+    public final long getSystemLastModified() {
+        return systemLastModified;
+    }
+
+    /**
+     * signalize that the system state has changed.
+     * 
+     * Call this method when ever you changed the persistency layer.
+     * 
+     */
+    public final void systemModified() {
+        systemLastModified = System.currentTimeMillis();
     }
 
     /**

@@ -117,6 +117,7 @@ public class MCRXMLTableManager {
     public void create(MCRObjectID mcrid, org.jdom.Document xml) throws MCRException {
         getXMLTable(mcrid.getTypeId()).create(mcrid, MCRUtils.getByteArray(xml), 1);
         jdomCache.put(mcrid, xml);
+        CONFIG.systemModified();
     }
 
     /**
@@ -132,6 +133,7 @@ public class MCRXMLTableManager {
      */
     public void create(MCRObjectID mcrid, byte[] xml) throws MCRException {
         getXMLTable(mcrid.getTypeId()).create(mcrid, xml, 1);
+        CONFIG.systemModified();
     }
 
     /**
@@ -146,6 +148,7 @@ public class MCRXMLTableManager {
     public void delete(MCRObjectID mcrid) throws MCRException {
         getXMLTable(mcrid.getTypeId()).delete(mcrid, 1);
         jdomCache.remove(mcrid);
+        CONFIG.systemModified();
     }
 
     /**
@@ -162,6 +165,7 @@ public class MCRXMLTableManager {
     public void update(MCRObjectID mcrid, org.jdom.Document xml) throws MCRException {
         getXMLTable(mcrid.getTypeId()).update(mcrid, MCRUtils.getByteArray(xml), 1);
         jdomCache.put(mcrid, xml);
+        CONFIG.systemModified();
     }
 
     /**
@@ -178,6 +182,7 @@ public class MCRXMLTableManager {
     public void update(MCRObjectID mcrid, byte[] xml) throws MCRException {
         getXMLTable(mcrid.getTypeId()).update(mcrid, xml, 1);
         jdomCache.remove(mcrid);
+        CONFIG.systemModified();
     }
 
     /**
