@@ -43,13 +43,12 @@ import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUtils;
 import org.mycore.datamodel.ifs.MCRDirectory;
-import org.mycore.datamodel.ifs.MCRFileImportExport;
 import org.mycore.datamodel.metadata.MCRActiveLinkException;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.datamodel.metadata.MCRObjectService;
 import org.mycore.frontend.editor.MCREditorServletHelper;
+import org.mycore.frontend.fileupload.MCRUploadHandlerIFS;
 import org.mycore.frontend.fileupload.MCRUploadHandlerMyCoRe;
 import org.mycore.frontend.workflow.MCRSimpleWorkflowManager;
 
@@ -442,7 +441,7 @@ public class MCRStartEditorServlet extends MCRServlet {
             }
 
             myremcrid = mysemcrid;
-            mysemcrid = WFM.createDerivate(myremcrid, false);
+            mysemcrid = WFM.createDerivateInWorkflow(myremcrid);
             mytodo = "waddfile";
         }
 
@@ -465,6 +464,8 @@ public class MCRStartEditorServlet extends MCRServlet {
             params.put("XSL.UploadID", fuhid);
             params.put("XSL.editor.source.new", "true");
             params.put("XSL.editor.cancel.url", getBaseURL() + cancelpage);
+            params.put("XSL.target.param.1", "method=formBasedUpload");
+            params.put("XSL.target.param.2", "uploadId="+fuhid);
             params.put("mcrid", mysemcrid);
             params.put("type", mytype);
             params.put("step", mystep);
@@ -780,7 +781,7 @@ public class MCRStartEditorServlet extends MCRServlet {
                 job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + mcriderrorpage));
                 return;
             }
-            
+
             // read file
             sb = new StringBuffer();
             sb.append(CONFIG.getString("MCR.editor_" + mcrmysemcrid.getTypeId() + "_directory")).append(SLASH).append(mysemcrid).append(".xml");
@@ -800,7 +801,7 @@ public class MCRStartEditorServlet extends MCRServlet {
             }
 
             MCRSession session = MCRSessionMgr.getCurrentSession();
-            session.put("service",service);
+            session.put("service", service);
             String base = getBaseURL() + myfile;
             Properties params = new Properties();
             params.put("XSL.editor.source.url", "session:service");
@@ -937,21 +938,7 @@ public class MCRStartEditorServlet extends MCRServlet {
                 return;
             }
 
-            mysemcrid = WFM.createDerivate(myremcrid, true);
-            mystep = "addder";
-            mytodo = "saddfile";
-        }
-
-        // action SNEWFILE - create a new derivate
-        if (mytodo.equals("snewfile")) {
-            if (!AI.checkPermission(myremcrid, "commitdb")) {
-                job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + usererrorpage));
-                return;
-            }
-
-            String workdir = CONFIG.getString("MCR.editor_" + mytype + "_directory");
-            File ndir = new File(workdir, mysemcrid);
-            ndir.mkdir();
+            mysemcrid = WFM.createDerivateInServer(myremcrid);
             mystep = "addfile";
             mytodo = "saddfile";
         }
@@ -963,10 +950,8 @@ public class MCRStartEditorServlet extends MCRServlet {
                 return;
             }
 
-            sb = new StringBuffer(getBaseURL());
-            sb.append("servlets/MCRStartEditorServlet?").append("se_mcrid=").append(mysemcrid).append("&re_mcrid=").append(myremcrid).append("&type=").append(mytype).append("&step=").append(mystep).append("&todo=scommitder");
-
-            MCRUploadHandlerMyCoRe fuh = new MCRUploadHandlerMyCoRe(myremcrid, mysemcrid, "new", sb.toString());
+            sb = new StringBuffer(getBaseURL()).append("receive/").append(myremcrid);
+            MCRUploadHandlerIFS fuh = new MCRUploadHandlerIFS(myremcrid, mysemcrid, sb.toString());
             String fuhid = fuh.getID();
             myfile = pagedir + "fileupload_commit.xml";
 
@@ -975,54 +960,13 @@ public class MCRStartEditorServlet extends MCRServlet {
             params.put("XSL.UploadID", fuhid);
             params.put("XSL.editor.source.new", "true");
             params.put("XSL.editor.cancel.url", getBaseURL() + cancelpage);
+            params.put("XSL.target.param.1", "method=formBasedUpload");
+            params.put("XSL.target.param.2", "uploadId="+fuhid);
             params.put("mcrid", mysemcrid);
             params.put("type", mytype);
             params.put("step", mystep);
             params.put("remcrid", myremcrid);
             job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(buildRedirectURL(base, params)));
-
-            return;
-        }
-
-        // action SCOMMITDER in the database
-        if (mytodo.equals("scommitder")) {
-            if (!AI.checkPermission(myremcrid, "commitdb")) {
-                job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + usererrorpage));
-                return;
-            }
-
-            if (mytfmcrid.length() == 0) {
-                job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + mcriderrorpage));
-                return;
-            }
-
-            // commit to the server
-            boolean b = false;
-            MCRObjectID ID = new MCRObjectID(myremcrid);
-
-            if (mystep.indexOf("addfile") != -1) {
-                String workdir = CONFIG.getString("MCR.editor_" + mytype + "_directory");
-                File ndir = new File(workdir, mysemcrid);
-                MCRFileImportExport.addFiles(ndir, mysemcrid);
-                b = true;
-            } else {
-                b = WFM.commitDerivateObject(ID.getTypeId(), mysemcrid);
-            }
-
-            if (b) {
-                WFM.deleteDerivateObject(ID.getTypeId(), mysemcrid);
-                sb = (new StringBuffer("MCR.type_")).append(ID.getTypeId()).append("_in");
-
-                String searchtype = CONFIG.getString(sb.toString(), ID.getTypeId());
-                sb = new StringBuffer(getBaseURL());
-                sb.append("receive/").append(myremcrid);
-                job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(sb.toString()));
-
-                return;
-            }
-
-            WFM.deleteDerivateObject(ID.getTypeId(), mysemcrid);
-            job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + storeerrorpage));
 
             return;
         }
@@ -1181,29 +1125,29 @@ public class MCRStartEditorServlet extends MCRServlet {
                 job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + mcriderrorpage));
                 return;
             }
-            
+
             // read object
             org.jdom.Element serviceelm = null;
             MCRObject obj = new MCRObject();
             obj.receiveFromDatastore(mysemcrid);
             List permlist = AI.getPermissionsForID(mysemcrid);
-            for (int i=0; i<permlist.size();i++) {
-                org.jdom.Element ruleelm = AI.getRule(mysemcrid,(String)permlist.get(i));
-                
-                System.out.println("################### "+ (String)permlist.get(i));
+            for (int i = 0; i < permlist.size(); i++) {
+                org.jdom.Element ruleelm = AI.getRule(mysemcrid, (String) permlist.get(i));
+
+                System.out.println("################### " + (String) permlist.get(i));
                 org.jdom.Document dof = new org.jdom.Document();
                 org.jdom.Element eof = new org.jdom.Element("test");
                 dof.addContent(eof);
                 eof.addContent((org.jdom.Element) ruleelm.detach().clone());
-                byte [] xml = MCRUtils.getByteArray(dof);
+                byte[] xml = MCRUtils.getByteArray(dof);
                 System.out.println(new String(xml));
                 System.out.println("################### ");
-                obj.getService().addRule((String)permlist.get(i),ruleelm);
+                obj.getService().addRule((String) permlist.get(i), ruleelm);
             }
             serviceelm = obj.getService().createXML();
-            
+
             MCRSession session = MCRSessionMgr.getCurrentSession();
-            session.put("service",serviceelm);
+            session.put("service", serviceelm);
             String base = getBaseURL() + myfile;
             Properties params = new Properties();
             params.put("XSL.editor.source.url", "session:service");
@@ -1215,8 +1159,8 @@ public class MCRStartEditorServlet extends MCRServlet {
 
             return;
         }
-        
-     sb = new StringBuffer();
+
+        sb = new StringBuffer();
         sb.append(getBaseURL()).append("index.html");
         job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(sb.toString()));
     }
