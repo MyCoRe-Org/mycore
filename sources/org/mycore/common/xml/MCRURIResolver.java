@@ -89,6 +89,8 @@ public class MCRURIResolver implements javax.xml.transform.URIResolver, EntityRe
 
     private static Map SUPPORTED_SCHEMES;
 
+    private static final String CONFIG_PREFIX = "MCR.UriResolver.";
+
     private static final MCRURIResolver singleton = new MCRURIResolver();
 
     private static ServletContext context;
@@ -387,8 +389,7 @@ public class MCRURIResolver implements javax.xml.transform.URIResolver, EntityRe
         private MCRCache fileCache;
 
         public MCRFileResolver() {
-            String prefix = "MCR.URIResolver.";
-            int cacheSize = MCRConfiguration.instance().getInt(prefix + "StaticFiles.CacheSize", 100);
+            int cacheSize = MCRConfiguration.instance().getInt(CONFIG_PREFIX + "StaticFiles.CacheSize", 100);
             fileCache = new MCRCache(cacheSize);
         }
 
@@ -694,7 +695,22 @@ public class MCRURIResolver implements javax.xml.transform.URIResolver, EntityRe
 
         private static final MCRConfiguration CONFIG = MCRConfiguration.instance();
 
-        private static final String FORMAT_CONFIG_PREFIX = "MCR.UriResolver.classification.format.";
+        private static final String FORMAT_CONFIG_PREFIX = CONFIG_PREFIX+"classification.format.";
+        
+        private static MCRCache CLASS_CACHE;
+        
+        private static long CACHE_INIT_TIME;
+
+        
+        public MCRClassificationResolver(){
+            initCache();
+        }
+
+        private void initCache() {
+            int cacheSize = MCRConfiguration.instance().getInt(CONFIG_PREFIX + "classification.CacheSize", 1000);
+            CLASS_CACHE = new MCRCache(cacheSize);
+            CACHE_INIT_TIME=System.currentTimeMillis();
+        }
 
         /**
          * returns a classification in a specific format.
@@ -712,6 +728,22 @@ public class MCRURIResolver implements javax.xml.transform.URIResolver, EntityRe
          */
         public Element resolveElement(String uri) {
             LOGGER.debug("start resolving "+uri);
+            Element returns;
+            if (CONFIG.getSystemLastModified() > CACHE_INIT_TIME){
+                initCache();
+                returns = getClassElement(uri);
+                CLASS_CACHE.put(uri,returns);
+            } else {
+                returns=(Element)CLASS_CACHE.get(uri);
+                if (returns==null){
+                    returns = getClassElement(uri);
+                    CLASS_CACHE.put(uri,returns);
+                }
+            }
+            return returns;
+        }
+
+        private Element getClassElement(String uri) {
             String[] parameters = uri.split(":");
             if (parameters.length<4){
                 //sanity check
