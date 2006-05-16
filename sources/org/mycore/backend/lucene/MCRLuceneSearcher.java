@@ -473,29 +473,8 @@ public class MCRLuceneSearcher extends MCRSearcher {
             org.apache.lucene.document.Document doc = searcher.doc(hits.scoreDocs[i].doc);
 
             String id = doc.get("returnid");
-            if (null == id) // TODO: temporary used, field name of aleph index
-                            // is id and NOT mcrid
-                id = doc.get("id");
-            /*
-             * TODO if (MCRAccessManager.checkReadAccess( id,
-             * MCRSessionMgr.getCurrentSession()))
-             */{
-                MCRHit hit = new MCRHit(id);
-
-                Enumeration fields = doc.fields();
-                while (fields.hasMoreElements()) {
-                    Field field = (Field) fields.nextElement();
-                    if (field.isStored() && !("mcrid".equals(field.name()) || "returnid".equals(field.name()))) {
-                        MCRFieldDef fd = MCRFieldDef.getDef(field.name());
-                        MCRFieldValue fv = new MCRFieldValue(fd, field.stringValue());
-                        hit.addMetaData(fv);
-                        if (fd.isSortable())
-                            hit.addSortData(fv);
-                    }
-                }
-
-                result.addHit(hit);
-            } // MCRAccessManager
+            MCRHit hit = new MCRHit(id);
+            result.addHit(hit);
         }
 
         searcher.close();
