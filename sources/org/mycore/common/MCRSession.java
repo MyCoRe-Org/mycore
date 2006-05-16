@@ -66,6 +66,8 @@ public class MCRSession implements Cloneable {
     private String CurrentDocumentID = null;
 
     private String ip = null;
+    
+    private long loginTime;
 
     /**
      * The constructor of a MCRSession. As default the user ID is set to the
@@ -81,6 +83,11 @@ public class MCRSession implements Cloneable {
         sessions.put(sessionID, this);
 
         logger.debug("MCRSession created " + sessionID);
+        setLoginTime();
+    }
+    
+    public final void setLoginTime(){
+        loginTime=System.currentTimeMillis();
     }
 
     /**
@@ -220,6 +227,10 @@ public class MCRSession implements Cloneable {
             return;
         }
         this.ip = newip;
+    }
+    
+    public final long getLoginTime(){
+        return loginTime;
     }
 
 }

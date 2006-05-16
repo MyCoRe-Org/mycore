@@ -23,7 +23,6 @@
 
 package org.mycore.frontend.servlets;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
@@ -380,8 +379,10 @@ public class MCRServlet extends HttpServlet {
 	 */
     protected long getLastModified(HttpServletRequest request) {
         //we can cache every (local) request
-        LOGGER.info("LastModified: "+CONFIG.getSystemLastModified());
-        return CONFIG.getSystemLastModified(); 
+        long lastModified=(MCRSessionMgr.getCurrentSession().getLoginTime()>CONFIG.getSystemLastModified())?
+                MCRSessionMgr.getCurrentSession().getLoginTime():CONFIG.getSystemLastModified();
+        LOGGER.info("LastModified: "+lastModified);
+        return lastModified; 
     }
 
     protected static String getProperty(HttpServletRequest request, String name) {

@@ -432,6 +432,7 @@ public class MCRCommandLineInterface {
 
 		if (org.mycore.user2.MCRUserMgr.instance().login(user.trim(), password.trim())) {
 			session.setCurrentUserID(user);
+            session.setLoginTime();
 			System.out.println(system + " The new user ID is " + session.getCurrentUserID());
 		} else {
 			String msg = "Wrong password, no changes of user ID in session context!";

@@ -89,7 +89,10 @@ public class MCRLoginServlet extends MCRServlet {
 
         // Do not change login, just redirect to given url:
         if (mcrSession.getCurrentUserID().equals(uid) && (pwd == null) && (backto_url != null)) {
-            job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(backto_url));
+            job.getResponse().setHeader("Cache-Control", "no-cache");
+            job.getResponse().setHeader("Pragma", "no-cache");
+            job.getResponse().setHeader("Expires","0");
+            job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(addParameter(backto_url,"reload","true")));
 
             return;
         }
@@ -116,6 +119,7 @@ public class MCRLoginServlet extends MCRServlet {
             // forwarded to the UserServlet.
             if (loginOk) {
                 mcrSession.setCurrentUserID(uid);
+                mcrSession.setLoginTime();
                 LOGGER.info("MCRLoginServlet: user " + uid + " logged in successfully.");
 
                 // We here put the list of groups separated by blanks as a
@@ -195,5 +199,12 @@ public class MCRLoginServlet extends MCRServlet {
 
         RequestDispatcher rd = getServletContext().getNamedDispatcher("MCRLayoutServlet");
         rd.forward(job.getRequest(), job.getResponse());
+    }
+    
+    private static final String addParameter(String url, String name, String value){
+        if (url.indexOf("?")==-1){
+            return url+"?"+name+"="+value;
+        }
+        return url+"&"+name+"="+value;
     }
 }
