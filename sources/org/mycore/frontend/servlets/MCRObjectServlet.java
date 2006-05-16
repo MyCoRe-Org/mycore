@@ -23,6 +23,10 @@
 
 package org.mycore.frontend.servlets;
 
+import java.util.Hashtable;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -32,10 +36,14 @@ import org.apache.log4j.Logger;
 
 import org.jdom.Document;
 import org.mycore.access.MCRAccessManager;
+import org.mycore.common.MCRCache;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.MCRXMLTableManager;
+import org.mycore.services.fieldquery.MCRHit;
+import org.mycore.services.fieldquery.MCRResults;
+import org.mycore.services.fieldquery.MCRSearchServlet;
 
 /**
  * This servlet response the MCRObject certain by the call path
@@ -54,6 +62,10 @@ public class MCRObjectServlet extends MCRServlet {
     private static Logger LOGGER = Logger.getLogger(MCRObjectServlet.class);
 
     private static MCRXMLTableManager TM = null;
+
+    private static final Pattern SEARCH_ID_PATTERN = Pattern.compile("[\\?&]id=([^&]+)");
+
+    private static final String EDITOR_ID_TABLE_KEY = "MCRObjectServlet.editorIds";
 
     /**
      * The initalization of the servlet.
@@ -90,6 +102,8 @@ public class MCRObjectServlet extends MCRServlet {
             Document doc=TM.readDocument(mcrid);
             // call the LayoutServlet
             job.getRequest().setAttribute("MCRLayoutServlet.Input.JDOM", doc);
+            String editorID=getEditorID(job.getRequest());
+            setBrowseParameters(job, mcrid, editorID);
             RequestDispatcher rd = getServletContext().getNamedDispatcher("MCRLayoutServlet");
             rd.forward(job.getRequest(), job.getResponse());
         } catch (MCRException e) {
@@ -99,19 +113,104 @@ public class MCRObjectServlet extends MCRServlet {
         }
     }
 
-    /**
-     * @param job
-     * @return requested MCRObjectID
-     */
+    private void setBrowseParameters(MCRServletJob job, MCRObjectID mcrid, String editorID) {
+        if (editorID!=null){
+            storeEditorID(mcrid.toString(),editorID);
+            job.getRequest().setAttribute("XSL.resultListEditorID",editorID);
+            MCRSearchServlet.SearchParameters sp = (MCRSearchServlet.SearchParameters) ((MCRCache) MCRSessionMgr.getCurrentSession().get(
+                    MCRSearchServlet.getParametersKey())).get(editorID);
+            job.getRequest().setAttribute("XSL.numPerPage",String.valueOf(sp.numPerPage));
+            job.getRequest().setAttribute("XSL.page",String.valueOf(sp.page));
+            MCRResults results= (MCRResults)((MCRCache)MCRSessionMgr.getCurrentSession().get(MCRSearchServlet.getResultsKey())).get(editorID);
+            MCRHit previousObject=null, nextObject=null;
+            int numHits=results.getNumHits();
+            for (int i=0;i<numHits;i++){
+                LOGGER.debug("Hit: "+results.getHit(i).getID());
+                if (results.getHit(i).getID().equals(mcrid.toString())){
+                    //hit allocated
+                    //search for next and previous object readable by user
+                    for (int j=i-1;j>=0;j--){
+                        if (MCRAccessManager.getAccessImpl().checkPermission(results.getHit(j).getID(), "read")) {
+                            previousObject=results.getHit(j);
+                            break;
+                        }
+                    }
+                    for (int j=i+1;j<numHits;j++){
+                        if (MCRAccessManager.getAccessImpl().checkPermission(results.getHit(j).getID(), "read")) {
+                            nextObject=results.getHit(j);
+                            break;
+                        }
+                    }
+                    break;
+                }
+            }
+            if (previousObject!=null){
+                job.getRequest().setAttribute("XSL.previousObject",previousObject.getID());
+            }
+            if (nextObject!=null){
+                job.getRequest().setAttribute("XSL.nextObject",nextObject.getID());
+            }
+        }
+    }
+
     private static final String getObjectID(HttpServletRequest request) {
         // the urn with information about the MCRObjectID
         String uri = request.getPathInfo();
 
         if (uri != null) {
-            int j = uri.length();
-            LOGGER.debug("Path = " + uri + "-->" + uri.substring(1, j));
-            return uri.substring(1, j);
+            return getIDFromPathInfo(uri);
         }
         return getProperty(request, "id");
+    }
+
+    private static String getIDFromPathInfo(String pathInfo) {
+        int j = pathInfo.length();
+        LOGGER.debug("Path = " + pathInfo + "-->" + pathInfo.substring(1, j));
+        return pathInfo.substring(1, j);
+    }
+    
+    private final String getEditorID(HttpServletRequest request) {
+        String referer=request.getHeader("Referer");
+        if (referer==null){
+            return null;
+        }
+        if (referer.contains("MCRSearchServlet")){
+            return getEditorIDFromSearch(referer);
+        }
+        return getEditorIDFromObjectID(request, referer);
+    }
+    
+    protected static final String getEditorIDFromSearch(String referer){
+        Matcher m=SEARCH_ID_PATTERN.matcher(referer);
+        m.find();
+        LOGGER.debug("Group count: "+m.groupCount());
+        String editorID=m.group(1);
+        return editorID;
+    }
+
+    protected final String getEditorIDFromObjectID(HttpServletRequest request, String referer){
+        String servletPath=request.getServletPath();
+        Pattern p=Pattern.compile(servletPath+"([^;\\?]*)");
+        Matcher m=p.matcher(referer);
+        if (m.find()){
+            return resolveEditorID(getIDFromPathInfo(m.group(1)));
+        }
+        LOGGER.debug("Didn't found ID in referer: "+p.toString());
+        return null;
+    }
+    
+    protected final static String resolveEditorID(String objectID){
+        Hashtable h=(Hashtable)MCRSessionMgr.getCurrentSession().get(EDITOR_ID_TABLE_KEY);
+        return h.get(objectID).toString();
+    }
+
+    protected final static void storeEditorID(String objectID, String editorID){
+        Hashtable h=(Hashtable)MCRSessionMgr.getCurrentSession().get(EDITOR_ID_TABLE_KEY);
+        if (h==null){
+            h=new Hashtable();
+            MCRSessionMgr.getCurrentSession().put(EDITOR_ID_TABLE_KEY,h);
+        }
+        LOGGER.debug("Storing editorID: "+editorID+" to MCRObjectID: "+objectID);
+        h.put(objectID,editorID);
     }
 }
