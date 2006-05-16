@@ -368,7 +368,7 @@ public class MCRLayoutServlet extends MCRServlet {
         StringBuffer buffer = request.getRequestURL();
         String queryString = request.getQueryString();
 
-        if (queryString != null) {
+        if (queryString != null && queryString.length()>0) {
             buffer.append("?").append(queryString);
         }
 
