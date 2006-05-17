@@ -307,10 +307,6 @@ public class MCRServlet extends HttpServlet {
 			throws IOException, ServletException {
 		LOGGER.error(getClass().getName() + ": Error " + error + " occured. The following message was given: " + msg, ex);
 
-		String defaultLang = CONFIG.getString("MCR.metadata_default_lang", "de");
-		String lang = (getProperty(request, "lang") != null) ? getProperty(request, "lang") : defaultLang;
-		String style = (xmlstyle) ? "xml" : ("query-" + lang);
-
 		String rootname = "mcr_error";
 		Element root = new Element(rootname);
 		root.setAttribute("HttpError", Integer.toString(error)).setText(msg);
@@ -334,7 +330,6 @@ public class MCRServlet extends HttpServlet {
 		}
 
 		request.setAttribute(MCRLayoutServlet.JDOM_ATTR, errorDoc);
-		request.setAttribute("XSL.Style", style);
         
         final String requestAttr="MCRServlet.generateErrorPage";
         if ((!response.isCommitted()) && (request.getAttribute(requestAttr)==null)){
