@@ -137,13 +137,16 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
      * 
      */
     public void finishUpload() throws Exception {
+        String mainfile = getMainFilePath(rootDir);
         if (newDerivate) {
             MCRDerivate derivate = new MCRDerivate();
             derivate.receiveFromDatastore(this.derivate.getId());
-            String mainfile = getMainFilePath(rootDir);
             derivate.getDerivate().getInternals().setMainDoc(mainfile);
             derivate.updateInDatastore();
             setDefaultPermissions(derivate.getId());
+        } else {
+            derivate.getDerivate().getInternals().setMainDoc(mainfile);
+            derivate.updateXMLInDatastore();
         }
     }
 
@@ -205,7 +208,7 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
     private static MCRDirectory getRootDir(String derID) {
         MCRFilesystemNode root = MCRFilesystemNode.getRootNode(derID);
         if (!(root instanceof MCRDirectory)) {
-            return null;
+            root = new MCRDirectory(derID, derID);
         }
         MCRDirectory rootDir = (MCRDirectory) root;
         return rootDir;

@@ -53,7 +53,8 @@ final public class MCRDerivate extends MCRBase {
 
     // the object content
     private MCRObjectDerivate mcr_derivate = null;
-    private static final Logger LOGGER=Logger.getLogger(MCRDerivate.class);
+
+    private static final Logger LOGGER = Logger.getLogger(MCRDerivate.class);
 
     /**
      * This is the constructor of the MCRDerivate class. It make an instance of
@@ -208,8 +209,8 @@ final public class MCRDerivate extends MCRBase {
         if (existInDatastore(mcr_id.getId())) {
             throw new MCRPersistenceException("The derivate " + mcr_id.getId() + " allready exists, nothing done.");
         }
-        
-        if (!isValid()){
+
+        if (!isValid()) {
             throw new MCRPersistenceException("The derivate " + mcr_id.getId() + " is not valid.");
         }
 
@@ -232,7 +233,7 @@ final public class MCRDerivate extends MCRBase {
         MCRMetaLinkID der = new MCRMetaLinkID();
         der.setReference(mcr_id.getId(), mcr_label, "");
         der.setSubTag("derobject");
-        byte[] backup=MCRXMLTableManager.instance().retrieve(meta.getXLinkHrefID());
+        byte[] backup = MCRXMLTableManager.instance().retrieve(meta.getXLinkHrefID());
 
         try {
             MCRObject obj = new MCRObject();
@@ -247,25 +248,26 @@ final public class MCRDerivate extends MCRBase {
         // create data in IFS
         if (getDerivate().getInternals() != null) {
             if (getDerivate().getInternals().getSourcePath() == null) {
-                MCRDirectory difs=new MCRDirectory(mcr_id.getId(),mcr_id.getId());
+                MCRDirectory difs = new MCRDirectory(mcr_id.getId(), mcr_id.getId());
                 getDerivate().getInternals().setIFSID(difs.getID());
             } else {
-                File f = new File(getDerivate().getInternals().getSourcePath());
-
-                if (!f.exists()) {
-                    throw new MCRPersistenceException("The File or Directory " + getDerivate().getInternals().getSourcePath() + " was not found.");
-                }
-                MCRDirectory difs = null;
-                try {
-                    LOGGER.debug("Starting File-Import");
-                    difs = MCRFileImportExport.importFiles(f, mcr_id.getId());
-                    getDerivate().getInternals().setIFSID(difs.getID());
-                } catch (Exception e) {
-                    if (difs != null) {
-                        difs.delete();
+                String sourcepath = getDerivate().getInternals().getSourcePath();
+                File f = new File(sourcepath);
+                if (f.exists()) {
+                    MCRDirectory difs = null;
+                    try {
+                        LOGGER.debug("Starting File-Import");
+                        difs = MCRFileImportExport.importFiles(f, mcr_id.getId());
+                        getDerivate().getInternals().setIFSID(difs.getID());
+                    } catch (Exception e) {
+                        if (difs != null) {
+                            difs.delete();
+                        }
+                        restoreMCRObject(backup);
+                        throw new MCRPersistenceException("Can't add derivate to the IFS", e);
                     }
-                    restoreMCRObject(backup);
-                    throw new MCRPersistenceException("Can't add derivate to the IFS", e);
+                } else {
+                    LOGGER.warn("Empty derivate, the File or Directory -->" + sourcepath + "<--  was not found.");
                 }
             }
         }
@@ -274,12 +276,12 @@ final public class MCRDerivate extends MCRBase {
     private void restoreMCRObject(byte[] backup) {
         MCREvent evt;
         // restore original instance of MCRObject
-        MCRObject obj=new MCRObject();
-        obj.setFromXML(backup,false);
+        MCRObject obj = new MCRObject();
+        obj.setFromXML(backup, false);
         try {
             obj.updateInDatastore();
         } catch (MCRActiveLinkException e1) {
-            LOGGER.warn("Error while restoring "+obj.getId(),e1);
+            LOGGER.warn("Error while restoring " + obj.getId(), e1);
         } finally {
             // delete from the XML table
             // handle events
@@ -574,13 +576,13 @@ final public class MCRDerivate extends MCRBase {
         LOGGER.debug("MCRDerivate Schema : " + mcr_schema);
         LOGGER.debug("");
     }
-    
-    public boolean isValid(){
-        if (!super.isValid()){
+
+    public boolean isValid() {
+        if (!super.isValid()) {
             LOGGER.warn("MCRBase.isValid() == false;");
             return false;
         }
-        if (!getDerivate().isValid()){
+        if (!getDerivate().isValid()) {
             LOGGER.warn("MCRObjectDerivate.isValid() == false;");
             return false;
         }
