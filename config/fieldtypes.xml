@@ -39,7 +39,7 @@ fieldtypes.xsd">
 		<!-- searches a phrase at any position in the text -->
 	</type>
 	<type name="date">
-		<!-- date value in fixed format "yyyy-MM-dd" -->
+		<!-- date value in ISO-8601 format "yyyy-MM-dd" -->
 		<operator token="="/>
 		<operator token="&gt;"/>
 		<operator token="&lt;"/>
@@ -55,7 +55,7 @@ fieldtypes.xsd">
 		<operator token="&lt;="/>
 	</type>
 	<type name="timestamp">
-		<!-- date and time value in fixed format "yyyy-MM-dd hh:mm:ss" -->
+		<!-- date and time value in ISO-8601 format "yyyy-MM-dd hh:mm:ss" -->
 		<operator token="="/>
 		<operator token="&gt;"/>
 		<operator token="&lt;"/>

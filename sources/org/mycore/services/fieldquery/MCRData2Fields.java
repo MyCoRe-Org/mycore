@@ -23,10 +23,6 @@
 
 package org.mycore.services.fieldquery;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.GregorianCalendar;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,9 +37,9 @@ import org.jdom.transform.JDOMResult;
 import org.jdom.transform.JDOMSource;
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRException;
-import org.mycore.common.MCRUtils;
 import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.datamodel.ifs.MCRFile;
+import org.mycore.datamodel.metadata.MCRMetaISO8601Date;
 import org.mycore.datamodel.metadata.MCRObject;
 
 /**
@@ -262,36 +258,24 @@ public class MCRData2Fields {
         return values;
     }
 
-    /** Standard format for a date value, as defined in fieldtypes.xml */
-    private static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-
     /**
      * Xalan XSL extension to convert MyCoRe date values to standard format. To
      * be used in a stylesheet or searchfields.xml configuration. Usage example:
      * &lt;field name="date" type="date"
      * xpath="/mycoreobject/metadata/dates/date"
-     * value="ext:normalizeDate(string(normalize-space(text())),string(@xml:lang))"
-     * &gt;
+     * value="ext:normalizeDate(string(text()))" &gt;
      * 
      * @param date
      *            the date string in a locale-dependent format
-     * @param lang
-     *            the xml:lang attribute of the date element
      */
-    public static String normalizeDate(String date, String lang) {
-        GregorianCalendar cal = new GregorianCalendar();
-
+    public static String normalizeDate(String sDate) {
         try {
-            DateFormat df = MCRUtils.getDateFormat(lang);
-            cal.setTime(df.parse(date));
-        } catch (ParseException e) {
-            try {
-                cal.setTime(sdf.parse(date));
-            } catch (ParseException ex) {
-                return "";
-            }
+            MCRMetaISO8601Date iDate = new MCRMetaISO8601Date();
+            iDate.setDate(sDate.trim());
+            return iDate.getISOString().substring(0, 10);
+        } catch (Exception ex) {
+            LOGGER.debug(ex);
+            return "";
         }
-
-        return sdf.format(cal.getTime());
     }
 }

@@ -35,7 +35,6 @@ import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.security.DigestOutputStream;
 import java.security.MessageDigest;
-import java.text.SimpleDateFormat;
 import java.util.GregorianCalendar;
 
 import org.jdom.Document;
@@ -46,6 +45,7 @@ import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.MCRUsageException;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventManager;
+import org.mycore.datamodel.metadata.MCRMetaISO8601Date;
 
 /**
  * Represents a stored file with its metadata and content.
@@ -565,7 +565,10 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
         root.setAttribute("extension", this.getExtension());
         root.setAttribute("contentTypeID", this.getContentTypeID());
         root.setAttribute("contentType", this.getContentType().getLabel());
-        root.setAttribute("modified", new SimpleDateFormat("yyyy-MM-dd").format(this.getLastModified().getTime()));
+
+        MCRMetaISO8601Date iDate = new MCRMetaISO8601Date();
+        iDate.setDate(this.getLastModified().getTime());
+        root.setAttribute("modified", iDate.getISOString());
 
         if (this.hasAudioVideoExtender()) {
             MCRAudioVideoExtender ext = this.getAudioVideoExtender();
