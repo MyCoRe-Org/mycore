@@ -350,7 +350,7 @@ public class MCRIndexBrowserData {
     	
     	
     	Element query = new Element("query"); 
-    	query.setAttribute("maxResults", "1000");
+    	query.setAttribute("maxResults", "0");
     	
     	Element conditions = new Element("conditions");
     	conditions.setAttribute("format", "xml");
