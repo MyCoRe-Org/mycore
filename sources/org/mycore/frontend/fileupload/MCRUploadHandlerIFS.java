@@ -145,8 +145,11 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
             derivate.updateInDatastore();
             setDefaultPermissions(derivate.getId());
         } else {
-            derivate.getDerivate().getInternals().setMainDoc(mainfile);
-            derivate.updateXMLInDatastore();
+            String mf = derivate.getDerivate().getInternals().getMainDoc();
+            if (mf.trim().length() == 0) {
+                derivate.getDerivate().getInternals().setMainDoc(mainfile);
+                derivate.updateXMLInDatastore();
+            }
         }
     }
 
