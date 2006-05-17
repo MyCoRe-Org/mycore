@@ -48,6 +48,7 @@ import org.mycore.common.MCRConfiguration;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.MCRXMLTableManager;
+import org.mycore.frontend.editor.MCRInputValidator;
 import org.mycore.parsers.bool.MCRAndCondition;
 import org.mycore.parsers.bool.MCRCondition;
 import org.mycore.parsers.bool.MCRNotCondition;
@@ -277,11 +278,11 @@ public class MCRJDOMSearcher extends MCRSearcher {
                     sb.append(" ");
                     sb.append(sc.getValue());
                 } else {
-                    sb.append("text() ");
-                    sb.append(sc.getOperator());
-                    sb.append(" '");
+                    sb.append("ext:compare(text(),'");
                     sb.append(sc.getValue());
-                    sb.append("'");
+                    sb.append("','");
+                    sb.append(sc.getOperator());
+                    sb.append("')");
                 }
             } else if ("phrase".equals(sc.getOperator())) {
                 sb.append("contains(text(),'");
@@ -371,5 +372,10 @@ public class MCRJDOMSearcher extends MCRSearcher {
         LOGGER.debug("Search regex " + pattern + " in text \"" + value + "\"");
 
         return Pattern.matches(pattern, value);
+    }
+
+    /** Implements a string compare operator as Xalan function extension */
+    public static boolean compare(String valueA, String valueB, String operator) {
+        return MCRInputValidator.instance().compare(valueA, valueB, operator, "string", null);
     }
 }
