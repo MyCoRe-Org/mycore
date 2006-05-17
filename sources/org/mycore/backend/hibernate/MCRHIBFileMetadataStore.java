@@ -142,8 +142,8 @@ public class MCRHIBFileMetadataStore implements MCRFileMetadataStore {
             l = session.createQuery("from MCRFSNODES where OWNER = '" + ownerID + "' and PID=NULL").list();
 
             if (l.size() < 1) {
-                String msg = "MCRHIBFileMetadataStore.retrieveRootNodeID(): There is no fsnode with OWNER = " + ownerID;
-                throw new MCRException(msg);
+                logger.warn("There is no fsnode with OWNER = " + ownerID);
+                return "";
             }
         } catch (Exception e) {
             logger.error(e);
@@ -233,8 +233,8 @@ public class MCRHIBFileMetadataStore implements MCRFileMetadataStore {
             l = session.createQuery("from MCRFSNODES where ID = '" + ID + "'").list();
 
             if (l.size() < 1) {
-                String msg = "MCRHIBFileMetadataStore.retrieveNode(): There is no FSNODE with ID = " + ID;
-                throw new MCRException(msg);
+                logger.warn("There is no FSNODE with ID = " + ID);
+                return null;
             }
         } catch (Exception e) {
             logger.error(e);
