@@ -300,8 +300,7 @@ public class MCRJDOMSearcher extends MCRSearcher {
             return sb.toString();
         } else if (cond instanceof MCRNotCondition) {
             MCRNotCondition nc = (MCRNotCondition) cond;
-
-            return "not " + buildXSLCondition(nc.getChild());
+            return "not(" + buildXSLCondition(nc.getChild()) + ")";
         } else if (cond instanceof MCRAndCondition) {
             MCRAndCondition ac = (MCRAndCondition) cond;
             return buildXSLCondition(ac.getChildren(), "and");
