@@ -155,11 +155,11 @@
       </servlet-mapping>
        <servlet-mapping>
          <servlet-name>MCRIndexBrowserServlet</servlet-name>
-         <url-pattern>/servlets/IndexBrowserServlet/*</url-pattern>
+         <url-pattern>/servlets/IndexBrowserServlet</url-pattern>
        </servlet-mapping>
        <servlet-mapping>
          <servlet-name>MCRIndexBrowserServlet</servlet-name>
-         <url-pattern>/indexpage/*</url-pattern>
+         <url-pattern>/indexpage</url-pattern>
        </servlet-mapping>
        <servlet-mapping>
          <servlet-name>MCRIndexServlet</servlet-name>
