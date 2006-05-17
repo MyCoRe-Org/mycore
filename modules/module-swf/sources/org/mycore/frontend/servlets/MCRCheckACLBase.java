@@ -90,12 +90,6 @@ abstract public class MCRCheckACLBase extends MCRCheckBase {
 
         // create a service object and prepare it
         org.jdom.Element outelm = prepareService((org.jdom.Document) indoc.clone(), ID, job, lang);
-        /*
-        org.jdom.Document d = new org.jdom.Document(outelm);
-        System.out.println("##################################################");
-        System.out.println(new String(MCRUtils.getByteArray(d)));
-        System.out.println("##################################################");
-        */
         
         // Save the prepared metadata object
         boolean okay = storeService(outelm, job, ID);
