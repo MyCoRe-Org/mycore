@@ -143,7 +143,7 @@ public class MCRHIBFileMetadataStore implements MCRFileMetadataStore {
 
             if (l.size() < 1) {
                 logger.warn("There is no fsnode with OWNER = " + ownerID);
-                return "";
+                return null;
             }
         } catch (Exception e) {
             logger.error(e);
