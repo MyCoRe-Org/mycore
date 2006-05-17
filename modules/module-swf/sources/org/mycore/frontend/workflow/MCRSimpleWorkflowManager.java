@@ -617,7 +617,7 @@ public class MCRSimpleWorkflowManager {
         der.getDerivate().setLinkMeta(link);
 
         MCRMetaIFS internal = new MCRMetaIFS("internals", "internal", "de", DD.getId());
-        internal.setMainDoc("#####");
+        internal.setMainDoc("");
         der.getDerivate().setInternals(internal);
 
         MCRObject obj = new MCRObject();
