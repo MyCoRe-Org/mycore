@@ -369,7 +369,13 @@ public class MCRClassificationBrowserData
 
 	 // Editierbutton Einfügen - wenn die permission es erlaubt
 	 Element Editbutton = new Element( "userCanEdit" );
-	 Editbutton.addContent( String.valueOf(AI.checkPermission(cl.getClassificationID(),"writedb")) );
+	 
+     //dos'nt exist no mor for classifications??
+	 //Editbutton.addContent( String.valueOf(AI.checkPermission(cl.getClassificationID(),"writedb")) );
+	 
+	 // now we check this right for the current user
+	 String permString = String.valueOf(AI.checkPermission("create-classification"));
+	 Editbutton.addContent( permString );
 	 xDocument.addContent( Editbutton );
 
 	 // data as XML from outputNavigationTree
