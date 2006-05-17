@@ -23,14 +23,6 @@
     <servlet-name>MCRCheckCommitDataServlet</servlet-name>
     <servlet-class>org.mycore.frontend.servlets.MCRCheckCommitDataServlet</servlet-class>
   </servlet>
-  <servlet id="MCRCheckNewFileServlet">
-    <servlet-name>MCRCheckNewFileServlet</servlet-name>
-    <servlet-class>org.mycore.frontend.servlets.MCRCheckNewFileServlet</servlet-class>
-  </servlet>
-  <servlet id="MCRCheckCommitFileServlet">
-    <servlet-name>MCRCheckCommitFileServlet</servlet-name>
-    <servlet-class>org.mycore.frontend.servlets.MCRCheckCommitFileServlet</servlet-class>
-  </servlet>
   <servlet id="MCRCheckCommitACLServlet">
     <servlet-name>MCRCheckCommitACLServlet</servlet-name>
     <servlet-class>org.mycore.frontend.servlets.MCRCheckCommitACLServlet</servlet-class>
@@ -63,14 +55,6 @@
   <servlet-mapping>
     <servlet-name>MCRCheckCommitDataServlet</servlet-name>
     <url-pattern>/servlets/MCRCheckCommitDataServlet</url-pattern>
-  </servlet-mapping>
-  <servlet-mapping>
-    <servlet-name>MCRCheckNewFileServlet</servlet-name>
-    <url-pattern>/servlets/MCRCheckNewFileServlet</url-pattern>
-  </servlet-mapping>
-  <servlet-mapping>
-    <servlet-name>MCRCheckCommitFileServlet</servlet-name>
-    <url-pattern>/servlets/MCRCheckCommitFileServlet</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
     <servlet-name>MCRCheckCommitACLServlet</servlet-name>
