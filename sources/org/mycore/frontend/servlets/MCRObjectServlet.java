@@ -174,7 +174,7 @@ public class MCRObjectServlet extends MCRServlet {
         if (referer==null){
             return null;
         }
-        if (referer.contains("MCRSearchServlet")){
+        if (-1 != referer.indexOf("MCRSearchServlet")){
             return getEditorIDFromSearch(referer);
         }
         return getEditorIDFromObjectID(request, referer);
