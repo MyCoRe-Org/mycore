@@ -29,7 +29,9 @@ import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.log4j.Logger;
 import org.jdom.Element;
+import org.mycore.datamodel.metadata.MCRMetaISO8601Date;
 import org.mycore.parsers.bool.MCRAndCondition;
 import org.mycore.parsers.bool.MCRBooleanClauseParser;
 import org.mycore.parsers.bool.MCRCondition;
@@ -45,6 +47,8 @@ import org.mycore.parsers.bool.MCRParseException;
  * @author Frank Lützenkirchen
  */
 public class MCRQueryParser extends MCRBooleanClauseParser {
+
+    private final static Logger LOGGER = Logger.getLogger(MCRQueryParser.class);
 
     /**
      * Parses XML element containing a simple query condition
@@ -176,9 +180,23 @@ public class MCRQueryParser extends MCRBooleanClauseParser {
                 return nc;
         } else if (cond instanceof MCRQueryCondition) {
             MCRQueryCondition qc = (MCRQueryCondition) cond;
+
+            // Normalize values in date conditions
+            if (qc.getField().getDataType().equals("date")) {
+                try {
+                    MCRMetaISO8601Date iDate = new MCRMetaISO8601Date();
+                    iDate.setDate(qc.getValue());
+                    return new MCRQueryCondition(qc.getField(), qc.getOperator(), iDate.getISOString());
+                } catch (Exception ex) {
+                    LOGGER.debug(ex);
+                    return qc;
+                }
+            }
+
             if (!qc.getOperator().equals("contains"))
                 return qc;
 
+            // Normalize value when contains operator is used
             List values = new ArrayList();
 
             String phrase = null;
