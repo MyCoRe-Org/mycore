@@ -33,6 +33,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Random;
 
+import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
 
@@ -54,6 +55,9 @@ public abstract class MCRContentStore {
     /** The prefix of all properties in mycore.properties for this store */
     protected String prefix;
 
+    /** The depth of slot subdirectories to build */
+    protected int slotDirDepth;
+
     /** Default constructor * */
     public MCRContentStore() {
     }
@@ -70,6 +74,7 @@ public abstract class MCRContentStore {
     public void init(String storeID) {
         this.storeID = storeID;
         this.prefix = "MCR.IFS.ContentStore." + storeID + ".";
+        this.slotDirDepth = MCRConfiguration.instance().getInt(prefix + "SlotDirDepth", 2);
     }
 
     /**
@@ -247,32 +252,25 @@ public abstract class MCRContentStore {
      * hierarchical directory structure of the server's filesystem. Such stores
      * use a directory that contains 100 subdirectories with each 100
      * subsubdirectories, so that the internal directory operations will scale
-     * well for large file collections.
+     * well for large file collections. The depth of this subdirectory structure
+     * can be set by the property SlotDirDepth, default is 2.
      * 
      * This helper method randomly chooses the "slot directory" to be used for
      * the next storage.
      * 
-     * @return two directory names between "00" and "99" that are the "slot"
-     *         where to store the file's content in the filesystem.
+     * @return directory names between "00" and "99" that are the "slot" where
+     *         to store the file's content in the filesystem.
      */
     protected String[] buildSlotPath() {
         Random random = new Random();
-        int na = random.nextInt(100);
-        int nb = random.nextInt(100);
-        String sa = String.valueOf(na);
-        String sb = String.valueOf(nb);
+        String[] slots = new String[slotDirDepth];
 
-        if (na < 10) {
-            sa = "0" + sa;
+        for (int i = 0; i < slotDirDepth; i++) {
+            String slot = String.valueOf(random.nextInt(100));
+            if (slot.length() < 2)
+                slot = "0" + slot;
+            slots[i] = slot;
         }
-
-        if (nb < 10) {
-            sb = "0" + sb;
-        }
-
-        String[] slots = new String[2];
-        slots[0] = sa;
-        slots[1] = sb;
 
         return slots;
     }
