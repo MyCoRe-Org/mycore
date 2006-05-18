@@ -32,7 +32,9 @@ import org.apache.commons.vfs.FileContent;
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileSystemException;
 import org.apache.commons.vfs.FileSystemManager;
+import org.apache.commons.vfs.FileSystemOptions;
 import org.apache.commons.vfs.VFS;
+import org.apache.commons.vfs.provider.sftp.SftpFileSystemConfigBuilder;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRException;
@@ -57,6 +59,9 @@ import org.mycore.datamodel.ifs.MCRFileReader;
  *     sftp://[username[:password]@]hostname[:port][/absolute-path]
  *   CIFS / Samba / Windows share:
  *     smb://[username[:password]@]hostname[:port][/absolute-path]
+ *     
+ *    MCR.IFS.ContentStore.<StoreID>.StrictHostKeyChecking=yes|no 
+ *      for SFTP: controls the use of known_hosts file, default is "no"
  * </code>
  * 
  * @author Werner Greßhoff
@@ -68,7 +73,9 @@ public class MCRCStoreVFS extends MCRContentStore {
 
     private FileSystemManager fsManager;
 
-    private FileObject baseDir;
+    private FileSystemOptions opts;
+
+    private String uri;
 
     protected String doStoreContent(MCRFileReader file, MCRContentInputStream source) throws Exception {
         StringBuffer storageId = new StringBuffer();
@@ -82,7 +89,7 @@ public class MCRCStoreVFS extends MCRContentStore {
         String fileId = buildNextID(file);
         storageId.append(fileId);
 
-        FileObject targetObject = fsManager.resolveFile(baseDir, storageId.toString());
+        FileObject targetObject = fsManager.resolveFile(getBase(), storageId.toString());
         FileContent targetContent = targetObject.getContent();
         OutputStream out = new BufferedOutputStream(targetContent.getOutputStream());
         MCRUtils.copyStream(source, out);
@@ -92,12 +99,12 @@ public class MCRCStoreVFS extends MCRContentStore {
     }
 
     protected void doDeleteContent(String storageId) throws Exception {
-        FileObject targetObject = fsManager.resolveFile(baseDir, storageId);
+        FileObject targetObject = fsManager.resolveFile(getBase(), storageId);
         FileObject parent = targetObject.getParent();
         targetObject.delete();
 
         // Delete parent slot directories, if empty
-        String baseDirPath = baseDir.getName().getPathDecoded();
+        String baseDirPath = getBase().getName().getPathDecoded();
         while (!parent.getName().getPathDecoded().equals(baseDirPath)) {
             if (parent.getChildren().length > 0)
                 break;
@@ -110,26 +117,35 @@ public class MCRCStoreVFS extends MCRContentStore {
     }
 
     protected void doRetrieveContent(MCRFileReader file, OutputStream target) throws Exception {
-        FileObject targetObject = fsManager.resolveFile(baseDir, file.getStorageID());
+        FileObject targetObject = fsManager.resolveFile(getBase(), file.getStorageID());
         FileContent targetContent = targetObject.getContent();
         InputStream in = new BufferedInputStream(targetContent.getInputStream());
         MCRUtils.copyStream(in, target);
     }
 
     protected InputStream doRetrieveContent(MCRFileReader file) throws Exception {
-        FileObject targetObject = fsManager.resolveFile(baseDir, file.getStorageID());
+        FileObject targetObject = fsManager.resolveFile(getBase(), file.getStorageID());
         FileContent targetContent = targetObject.getContent();
         return new BufferedInputStream(targetContent.getInputStream());
+    }
+
+    protected FileObject getBase() throws FileSystemException {
+        return fsManager.resolveFile(uri, opts);
     }
 
     public void init(String storeId) {
         super.init(storeId);
 
-        String uri = MCRConfiguration.instance().getString(prefix + "URI");
+        uri = MCRConfiguration.instance().getString(prefix + "URI");
+        String check = MCRConfiguration.instance().getString(prefix + "StrictHostKeyChecking", "no");
 
         try {
             fsManager = VFS.getManager();
-            baseDir = fsManager.resolveFile(uri);
+
+            opts = new FileSystemOptions();
+            SftpFileSystemConfigBuilder.getInstance().setStrictHostKeyChecking(opts, check);
+
+            FileObject baseDir = getBase();
 
             // Create a folder, if it does not exist or throw an
             // exception, if baseDir is not a folder
