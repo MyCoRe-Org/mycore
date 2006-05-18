@@ -93,11 +93,9 @@ public class MCRUserServlet extends MCRServlet {
             String backto_url = getProperty(job.getRequest(), "url");
 
             if (backto_url.length() == 0) {
-                backto_url = null;
+            	return;
             }
-
-            job.getResponse().sendRedirect(backto_url);
-
+            job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(backto_url));
             return;
         }
     }
@@ -141,7 +139,7 @@ public class MCRUserServlet extends MCRServlet {
                 root.setAttribute("pwd_change_ok", "true");
                 doLayout(job, "SelectTask", jdomDoc); // use the stylesheet
 
-                // mcr_user-SelectTask-*.xsl
+                // mcr_user-SelectTask.xsl
                 return;
             } catch (MCRException e) {
                 root.addContent(new org.jdom.Element("error").addContent(e.getMessage()));
@@ -150,7 +148,7 @@ public class MCRUserServlet extends MCRServlet {
 
         doLayout(job, "ChangePwd", jdomDoc); // use the stylesheet
 
-        // mcr_user-ChangePwd-*.xsl
+        // mcr_user-ChangePwd.xsl
     }
 
     /**
@@ -168,7 +166,7 @@ public class MCRUserServlet extends MCRServlet {
         org.jdom.Document jdomDoc = createJdomDocBase(job);
         doLayout(job, "ChangePwd", jdomDoc); // use the stylesheet
 
-        // mcr_user-ChangePwd-*.xsl
+        // mcr_user-ChangePwd.xsl
     }
 
     /**
@@ -194,7 +192,7 @@ public class MCRUserServlet extends MCRServlet {
         org.jdom.Document jdomDoc = createJdomDocBase(job);
         doLayout(job, "SelectTask", jdomDoc); // use the stylesheet
 
-        // mcr_user-SelectTask-*.xsl
+        // mcr_user-SelectTask.xsl
     }
 
     /**
@@ -223,7 +221,7 @@ public class MCRUserServlet extends MCRServlet {
 
         doLayout(job, "Metadata", jdomDoc); // use the stylesheet
 
-        // mcr_user-Metadata-*.xsl
+        // mcr_user-Metadata.xsl
     }
 
     /**
@@ -260,7 +258,7 @@ public class MCRUserServlet extends MCRServlet {
      * 
      * @param job
      *            The MCRServletJob instance
-     * @param styleBase
+     * @param style
      *            String value to select the correct XSL stylesheet
      * @param jdomDoc
      *            The XML representation to be presented by the LayoutServlet
@@ -269,13 +267,9 @@ public class MCRUserServlet extends MCRServlet {
      * @throws IOException
      *             for java I/O errors.
      */
-    protected void doLayout(MCRServletJob job, String styleBase, Document jdomDoc) throws ServletException, IOException {
-        String language = MCRSessionMgr.getCurrentSession().getCurrentLanguage();
-        String styleSheet = styleBase + "-" + language;
-
-        job.getRequest().getSession().setAttribute("mycore.language", language);
+    protected void doLayout(MCRServletJob job, String style, Document jdomDoc) throws ServletException, IOException {
         job.getRequest().setAttribute("MCRLayoutServlet.Input.JDOM", jdomDoc);
-        job.getRequest().setAttribute("XSL.Style", styleSheet);
+        job.getRequest().setAttribute("XSL.Style", style);
 
         RequestDispatcher rd = getServletContext().getNamedDispatcher("MCRLayoutServlet");
         rd.forward(job.getRequest(), job.getResponse());

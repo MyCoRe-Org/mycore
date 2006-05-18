@@ -180,7 +180,7 @@ public class MCRLoginServlet extends MCRServlet {
      * 
      * @param job
      *            The MCRServletJob instance
-     * @param styleBase
+     * @param style
      *            String value to select the correct XSL stylesheet
      * @param jdomDoc
      *            The XML representation to be presented by the LayoutServlet
@@ -189,13 +189,9 @@ public class MCRLoginServlet extends MCRServlet {
      * @throws IOException
      *             for java I/O errors.
      */
-    protected void doLayout(MCRServletJob job, String styleBase, Document jdomDoc) throws ServletException, IOException {
-        String language = MCRSessionMgr.getCurrentSession().getCurrentLanguage();
-        String styleSheet = styleBase + "-" + language;
-
-        job.getRequest().getSession().setAttribute("mycore.language", language);
+    protected void doLayout(MCRServletJob job, String style, Document jdomDoc) throws ServletException, IOException {
         job.getRequest().setAttribute("MCRLayoutServlet.Input.JDOM", jdomDoc);
-        job.getRequest().setAttribute("XSL.Style", styleSheet);
+        job.getRequest().setAttribute("XSL.Style", style);
 
         RequestDispatcher rd = getServletContext().getNamedDispatcher("MCRLayoutServlet");
         rd.forward(job.getRequest(), job.getResponse());
