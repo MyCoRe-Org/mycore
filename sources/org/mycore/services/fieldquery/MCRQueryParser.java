@@ -186,7 +186,8 @@ public class MCRQueryParser extends MCRBooleanClauseParser {
                 try {
                     MCRMetaISO8601Date iDate = new MCRMetaISO8601Date();
                     iDate.setDate(qc.getValue());
-                    return new MCRQueryCondition(qc.getField(), qc.getOperator(), iDate.getISOString());
+                    String sDate = iDate.getISOString().substring(0, 10);
+                    return new MCRQueryCondition(qc.getField(), qc.getOperator(), sDate);
                 } catch (Exception ex) {
                     LOGGER.debug(ex);
                     return qc;
