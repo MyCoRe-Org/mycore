@@ -308,6 +308,7 @@ public class MCRServlet extends HttpServlet {
 		LOGGER.error(getClass().getName() + ": Error " + error + " occured. The following message was given: " + msg, ex);
 
 		String rootname = "mcr_error";
+        String style=getProperty(request,"XSL.Style").equals("xml")? "xml":null;
 		Element root = new Element(rootname);
 		root.setAttribute("HttpError", Integer.toString(error)).setText(msg);
 
@@ -330,6 +331,7 @@ public class MCRServlet extends HttpServlet {
 		}
 
 		request.setAttribute(MCRLayoutServlet.JDOM_ATTR, errorDoc);
+        request.setAttribute("XSL.Style", style);
         
         final String requestAttr="MCRServlet.generateErrorPage";
         if ((!response.isCommitted()) && (request.getAttribute(requestAttr)==null)){
