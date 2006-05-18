@@ -26,11 +26,7 @@ package org.mycore.backend.lucene;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.Enumeration;
 import java.util.GregorianCalendar;
 import java.util.List;
 
@@ -75,11 +71,6 @@ public class MCRLuceneSearcher extends MCRSearcher {
     boolean FIRST = true;
 
     static String LOCK_DIR = "";
-    static String DATE_FORMAT = "yyyy-MM-dd";
-
-    static String TIME_FORMAT = "HH:mm:ss";
-
-    static String TIMESTAMP_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
     static int INT_BEFORE = 10;
 
@@ -239,15 +230,8 @@ public class MCRLuceneSearcher extends MCRSearcher {
                     doc.add(new Field(name, s, Field.Store.NO, Field.Index.TOKENIZED) );
                 }
             } else {
-                if ("date".equals(type)) {
-                    content = handleDate(content, DATE_FORMAT, "yyyyMMdd");
-                    type = "Text";
-                } else if ("time".equals(type)) {
-                    content = handleDate(content, TIME_FORMAT, "HHmmss");
-                    type = "Text";
-                } else if ("timestamp".equals(type)) {
-                    content = handleDate(content, TIMESTAMP_FORMAT, "yyyyMMddHHmmss");
-                    type = "Text";
+                if ("date".equals(type) || "time".equals(type) || "timestamp".equals(type)  ) {
+                    type = "identifier";
                 } else if ("boolean".equals(type)) {
                     content = "true".equals(content) ? "1" : "0";
                     type = "identifier";
@@ -260,30 +244,18 @@ public class MCRLuceneSearcher extends MCRSearcher {
                 }
 
                 if (type.equals("identifier")) {
-                    // doc.add(Field.Keyword(name, content));
                     doc.add(new Field(name, content, Field.Store.YES, Field.Index.UN_TOKENIZED));
                 }
 
                 if (type.equals("Text") || type.equals("name") || (type.equals("text") && field.getField().isSortable())) {
-                    // doc.add(Field.Text(name, content));
                     doc.add(new Field(name, content, Field.Store.YES, Field.Index.TOKENIZED));
                 } else if (type.equals("text")) {
-                    // doc.add(Field.UnStored(name, content));
                     doc.add(new Field(name, content, Field.Store.NO, Field.Index.TOKENIZED));
                 }
             }
         }
 
         return doc;
-    }
-
-    private static String handleDate(String content, String informat, String outformat) throws Exception {
-        DateFormat f1 = new SimpleDateFormat(informat);
-        DateFormat f2 = new SimpleDateFormat(outformat);
-        Date d;
-        d = f1.parse(content);
-
-        return f2.format(d);
     }
 
     public static String handleNumber(String content, String type, long add) {

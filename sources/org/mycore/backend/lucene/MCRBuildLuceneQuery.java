@@ -24,12 +24,6 @@
 package org.mycore.backend.lucene;
 
 import java.io.StringReader;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -63,13 +57,6 @@ import org.mycore.services.fieldquery.MCRFieldDef;
  */
 public class MCRBuildLuceneQuery {
     private static final Logger LOGGER = Logger.getLogger(MCRBuildLuceneQuery.class);
-
-    // TODO: read from property file
-    static String DATE_FORMAT = "yyyy-MM-dd";
-
-    static String TIME_FORMAT = "HH:mm:ss";
-
-    static String TIMESTAMP_FORMAT = "yyyy-MM-dd HH:mm:ss";
 
     static Hashtable search = null;
 
@@ -177,8 +164,6 @@ public class MCRBuildLuceneQuery {
             return tq;
         } else if (("text".equals(fieldtype) || "identifier".equals(fieldtype)) && "like".equals(operator)) {
             Term te;
-            if ("text".equals(fieldtype))
-              value = fixQuery(value);
             
             String help = value.endsWith("*") ? value.substring(0, value.length()-1) : value;
 
@@ -230,12 +215,8 @@ public class MCRBuildLuceneQuery {
             }
 
             return new RangeQuery(lower, upper, true);
-        } else if ("date".equals(fieldtype)) {
-            return DateQuery(field, DATE_FORMAT, "yyyyMMdd", operator, value);
-        } else if ("time".equals(fieldtype)) {
-            return DateQuery(field, TIME_FORMAT, "HHmmss", operator, value);
-        } else if ("timestamp".equals(fieldtype)) {
-            return DateQuery(field, TIMESTAMP_FORMAT, "yyyyMMddHHmmss", operator, value);
+        } else if ("date".equals(fieldtype) || "time".equals(fieldtype) || "timestamp".equals(fieldtype)) {
+            return DateQuery2(field, operator, value);
         } else if ("identifier".equals(fieldtype) && "=".equals(operator)) {
             Term te = new Term(field, value);
 
@@ -255,7 +236,6 @@ public class MCRBuildLuceneQuery {
                                                                             // lucene,
         // use query parser
         {
-//            Query query = QueryParser.parse(field + ":(" + fixQuery(value) + ")", "", analyzer);
             QueryParser qp = new QueryParser(field, analyzer);
             Query query = qp.parse( fixQuery(value) );
             
@@ -323,73 +303,6 @@ public class MCRBuildLuceneQuery {
     }
 
     /***************************************************************************
-     * DateQuery ()
-     **************************************************************************/
-    public static Query DateQuery(String fieldname, String informat, String outformat, String dateOp, String date) throws Exception {
-        if (date.length() == 0) {
-            return null;
-        }
-
-        dateOp = dateOp.trim();
-
-        if (dateOp.equals("==")) {
-            dateOp = "=";
-        }
-
-        try {
-            DateFormat f1 = new SimpleDateFormat(informat);
-            DateFormat f2 = new SimpleDateFormat(outformat);
-            Date d = f1.parse(date);
-            GregorianCalendar gc = new GregorianCalendar();
-            gc.setTime(d);
-
-            int len = outformat.length();
-
-            String lower = "00000000000000";
-            lower = lower.substring(0, len);
-
-            String upper = "99999999999999";
-            upper = upper.substring(0, len);
-
-            if (dateOp.equals(">")) {
-                if (8 == len) { // date
-                    gc.add(Calendar.DAY_OF_MONTH, 1);
-                } else { // time or timestamp
-                    gc.add(Calendar.SECOND, 1);
-                }
-
-                d = gc.getTime();
-                lower = f2.format(d);
-            } else if (dateOp.equals("<")) {
-                if (8 == len) { // date
-                    gc.add(Calendar.DAY_OF_MONTH, -1);
-                } else { // time or timestamp
-                    gc.add(Calendar.SECOND, -1);
-                }
-
-                d = gc.getTime();
-                upper = f2.format(d);
-            } else if (dateOp.equals("=")) {
-                return new TermQuery(new Term(fieldname, f2.format(d)));
-            } else if (dateOp.equals(">=")) {
-                lower = f2.format(d);
-            } else if (dateOp.equals("<=")) {
-                upper = f2.format(d);
-            } else {
-                LOGGER.info("Invalid operator for date: " + dateOp);
-
-                return null;
-            }
-
-            return new RangeQuery(new Term(fieldname, lower), new Term(fieldname, upper), true);
-        } catch (ParseException e) {
-            LOGGER.info("invalid date: " + date);
-
-            return null;
-        }
-    }
-    
-    /***************************************************************************
      * NumberQuery ()
      **************************************************************************/
     private static Query NumberQuery(String fieldname, String type, String Op, String value) throws Exception {
@@ -415,5 +328,33 @@ public class MCRBuildLuceneQuery {
       }
 
       return new RangeQuery(new Term(fieldname, lower), new Term(fieldname, upper), true);
+    }
+    
+    /***************************************************************************
+     * DateQuery2 ()
+     **************************************************************************/
+    private static Query DateQuery2(String fieldname,  String Op, String value) {
+        if (value.length() == 0) {
+            return null;
+        }
+        
+        Term lower = null;
+        Term upper = null;
+        Term term  = new Term(fieldname, value); 
+        
+        if (Op.equals(">") || Op.equals(">=") ) {
+          lower = term;
+      } else if (Op.equals("<") || Op.equals("<=") ) {
+          upper = term;
+      } else if (Op.equals("=")) {
+          return new TermQuery( term);
+      } else {
+          LOGGER.info("Invalid operator for Number: " + Op);
+
+          return null;
+      }
+
+      boolean incl = Op.equals(">=") || Op.equals("<=") ? true : false;   
+      return new RangeQuery( lower, upper, incl);
     }
 }
