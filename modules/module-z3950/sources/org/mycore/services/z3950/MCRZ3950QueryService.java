@@ -14,11 +14,16 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.log4j.Logger;
 import org.jdom.Element;
 import org.mycore.common.MCRConfiguration;
+import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.common.xml.MCRXMLContainer;
 import org.mycore.datamodel.classifications.MCRCategoryItem;
+import org.mycore.services.fieldquery.MCRQueryManager;
+import org.mycore.services.fieldquery.MCRResults;
 import org.mycore.services.query.MCRQueryCache;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
+
+import org.mycore.services.fieldquery.*;
 
 /**
  * Diese Klasse ist eine Implementierung eines Suchservice für die Z39.50-
@@ -109,6 +114,19 @@ public class MCRZ3950QueryService implements MCRZ3950Query {
 	 */
 	public boolean search() {
 		String meta = null;
+        Element query = new Element("query");
+        query.setAttribute("maxResults", "10");
+        query.setAttribute("numPerPage", "10");
+        
+        Element conditions = new Element("conditions");
+        query.addContent(conditions);
+        
+        conditions.setAttribute("format", "xml");
+        Element b = new Element("boolean");
+        b.setAttribute("operator", "and");
+        conditions.addContent(b);
+        
+        
 		if (prefixString.getAttributeSet().equals("bib-1")) {
 			LinkedList attributes = prefixString.getAttributes(1);
 			Iterator it = attributes.iterator();
@@ -128,6 +146,7 @@ public class MCRZ3950QueryService implements MCRZ3950Query {
 					if (attrValue.equals(mycoreAttr)) {
 						String xpath = CONFIG.getString("MCR.z3950.1." +
 								mycoreAttr);
+/* OLD QUERY                        
 						// Sonderfälle: Dokumenten-Id und Suche in allen Feldern
 						if (xpath.equals("@ID")) {
 							// Dokumenten-Id
@@ -141,13 +160,32 @@ public class MCRZ3950QueryService implements MCRZ3950Query {
 						} else meta = "/mycoreobject[" + xpath + " contains(" +
 						        prefixString.getTerm() + ")]";
 						logger.debug("Aus dem Kern: " + meta);
+*/                        
+                      Element cond = new Element("condition");
+                      cond.setAttribute("field", xpath);
+                      cond.setAttribute("operator", "contains");
+                      cond.setAttribute("value", prefixString.getTerm());
+                      b.addContent(cond);
+                      
+                      if (logger.isDebugEnabled())
+                      {
+                        org.jdom.output.XMLOutputter outputter = new org.jdom.output.XMLOutputter();
+                        logger.debug("Aus dem Kern: " + outputter.outputString(query));
+                      }
 				    }
 				}
 			}
 		}
+        
+        MCRResults result = MCRQueryManager.search( new org.jdom.Document(query));
+        
 		mycoreResults = new MCRXMLContainer();
-		mycoreResults.importElements(MCRQueryCache.getResultList(meta,
-				"alldocs", 10));
+		for (int i=0;i<result.getNumHits();i++)
+		{
+           MCRHit hit = result.getHit(i);
+		   Element ele = MCRURIResolver.instance().resolve("mcrobject:"+hit.getID()); 
+           mycoreResults.add("host", hit.getID(), 1, ele);
+		}
 		if (mycoreResults.size() > 0) return true;
 		else return false;
 	}
