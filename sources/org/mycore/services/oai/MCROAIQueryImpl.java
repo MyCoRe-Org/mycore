@@ -292,12 +292,7 @@ public class MCROAIQueryImpl implements MCROAIQuery {
         }
 
         MCRQuery query = new MCRQuery(cAnd);
-        query.setMaxResults(1000000);
-
-        MCRSortBy sortBy = new MCRSortBy(MCRFieldDef.getDef("id"), MCRSortBy.ASCENDING);
-        List sortCriteria = new ArrayList();
-        sortCriteria.add(sortBy);
-        query.setSortBy(sortCriteria);
+        query.setSortBy(new MCRSortBy(MCRFieldDef.getDef("id"), MCRSortBy.ASCENDING));
 
         logger.debug("OAI-QUERY:" + cAnd);
         MCRResults results = MCRQueryManager.search(query);
