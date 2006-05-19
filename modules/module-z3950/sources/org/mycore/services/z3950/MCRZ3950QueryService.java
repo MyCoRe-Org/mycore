@@ -19,7 +19,6 @@ import org.mycore.common.xml.MCRXMLContainer;
 import org.mycore.datamodel.classifications.MCRCategoryItem;
 import org.mycore.services.fieldquery.MCRQueryManager;
 import org.mycore.services.fieldquery.MCRResults;
-import org.mycore.services.query.MCRQueryCache;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
@@ -113,7 +112,6 @@ public class MCRZ3950QueryService implements MCRZ3950Query {
 	 * @return True falls es Ergebnisse gab, sonst False.
 	 */
 	public boolean search() {
-		String meta = null;
         Element query = new Element("query");
         query.setAttribute("maxResults", "10");
         query.setAttribute("numPerPage", "10");
@@ -177,7 +175,7 @@ public class MCRZ3950QueryService implements MCRZ3950Query {
 			}
 		}
         
-        MCRResults result = MCRQueryManager.search( new org.jdom.Document(query));
+        MCRResults result = MCRQueryManager.search( MCRQuery.parseXML(new org.jdom.Document(query)));
         
 		mycoreResults = new MCRXMLContainer();
 		for (int i=0;i<result.getNumHits();i++)
