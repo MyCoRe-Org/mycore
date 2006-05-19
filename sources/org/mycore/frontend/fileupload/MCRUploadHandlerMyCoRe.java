@@ -165,7 +165,7 @@ public class MCRUploadHandlerMyCoRe extends MCRUploadHandler {
             MCRDerivate der = new MCRDerivate();
             der.setFromURI(dirname + ".xml");
 
-            if (der.getDerivate().getInternals().getMainDoc().equals("#####")) {
+            if (der.getDerivate().getInternals().getMainDoc().length() == 0) {
                 der.getDerivate().getInternals().setMainDoc(mainfile);
 
                 byte[] outxml = MCRUtils.getByteArray(der.createXML());
