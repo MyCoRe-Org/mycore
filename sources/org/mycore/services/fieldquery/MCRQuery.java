@@ -57,19 +57,19 @@ public class MCRQuery {
     public MCRQuery(MCRCondition cond) {
         this.cond = cond;
     }
-    
+
     /**
-     * Builds a new MCRQuery object with sort criteria and limited number of results.
+     * Builds a new MCRQuery object with sort criteria and limited number of
+     * results.
      * 
      * @param cond
      *            the query conditions
      * @param sortBy
      *            a list of MCRSortBy criteria for sorting the results
      * @param maxResults
-     *            the maximum number of results to return 
+     *            the maximum number of results to return
      */
-    public MCRQuery(MCRCondition cond, List sortBy, int maxResults)
-    {
+    public MCRQuery(MCRCondition cond, List sortBy, int maxResults) {
         this.cond = cond;
         this.setSortBy(sortBy);
         this.setMaxResults(maxResults);
@@ -124,6 +124,19 @@ public class MCRQuery {
         if (sortBy == null)
             sortBy = new ArrayList();
         this.sortBy = sortBy;
+        this.doc = null;
+    }
+
+    /**
+     * Sets the sort criteria for the query results
+     * 
+     * @param sortBy
+     *            a MCRSortBy object
+     */
+    public void setSortBy(MCRSortBy sortBy) {
+        this.sortBy.clear();
+        if (sortBy != null)
+            this.sortBy.add(sortBy);
         this.doc = null;
     }
 
