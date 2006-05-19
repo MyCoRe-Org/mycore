@@ -62,7 +62,8 @@ public class MCRQueryCommands implements MCRExternalCommandInterface {
             throw new org.mycore.common.MCRUsageException(msg);
         }
 
-        Document query = new SAXBuilder().build(new File(filename));
+        Document xml = new SAXBuilder().build(new File(filename));
+        MCRQuery query = MCRQuery.parseXML(xml);
         MCRResults results = MCRQueryManager.search(query);
         System.out.println(results);
     }

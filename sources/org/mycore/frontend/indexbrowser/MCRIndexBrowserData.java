@@ -15,6 +15,7 @@ import org.mycore.access.MCRAccessInterface;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.datamodel.metadata.MCRObject;
+import org.mycore.services.fieldquery.MCRQuery;
 import org.mycore.services.fieldquery.MCRQueryManager;
 import org.mycore.services.fieldquery.MCRResults;
 
@@ -401,8 +402,8 @@ public class MCRIndexBrowserData {
     	}
 
     	logger.debug("generated query: \n" + out.outputString(query));	    	
-    	jQuery = new Document(query);    	
-    	mcrResult = MCRQueryManager.search(jQuery);
+    	jQuery = new Document(query); 
+    	mcrResult = MCRQueryManager.search(MCRQuery.parseXML( jQuery ));
     	
     	/**
     	 * <mcrresults sorted="true">
@@ -432,7 +433,7 @@ public class MCRIndexBrowserData {
 
     private int calculateStepSize(int numSelectedRows, int maxPerPage) {
         for (int i = 1;; i++) {
-            double dNum = (double) numSelectedRows;
+            double dNum = numSelectedRows;
             double dI = 1.0 / ((double) i);
             double root = Math.pow(dNum, dI);
             if (root <= maxPerPage)

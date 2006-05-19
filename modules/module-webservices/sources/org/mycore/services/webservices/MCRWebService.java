@@ -28,8 +28,8 @@ import org.apache.log4j.Logger;
 
 import org.mycore.datamodel.metadata.MCRXMLTableManager;
 import org.mycore.common.xml.MCRURIResolver;
-import org.mycore.common.xml.MCRXMLContainer;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.services.fieldquery.MCRQuery;
 import org.mycore.services.fieldquery.MCRQueryManager;
 import org.mycore.services.fieldquery.MCRResults;
 
@@ -107,7 +107,7 @@ public class MCRWebService implements MCRWS
     }
       
     // Execute query
-    MCRResults res = MCRQueryManager.search(doc);
+    MCRResults res = MCRQueryManager.search(MCRQuery.parseXML(doc));
 
     result = new org.jdom.Document(res.buildXML());
 

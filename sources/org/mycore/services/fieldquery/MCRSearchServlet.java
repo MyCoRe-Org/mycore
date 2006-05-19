@@ -57,15 +57,18 @@ public class MCRSearchServlet extends MCRServlet {
     private static final long serialVersionUID = 1L;
 
     private static final Logger LOGGER = Logger.getLogger(MCRSearchServlet.class);
-    
+
     /** Cached query results */
-    private static final String RESULTS_KEY="MCRSearchServlet.results";
+    private static final String RESULTS_KEY = "MCRSearchServlet.results";
+
     /** Cached queries as XML, for re-use in editor form */
-    private static final String QUERIES_KEY="MCRSearchServlet.queries";
+    private static final String QUERIES_KEY = "MCRSearchServlet.queries";
+
     /** Cached queries as parsed MCRCondition, for output with results */
-    private static final String CONDIDTIONS_KEY="MCRSearchServlet.conditions";
-    /** search parameters **/
-    private static final String PARAMS_KEY="MCRSearchServlet.parameters";
+    private static final String CONDIDTIONS_KEY = "MCRSearchServlet.conditions";
+
+    /** search parameters * */
+    private static final String PARAMS_KEY = "MCRSearchServlet.parameters";
 
     /** Default search field */
     private String defaultSearchField;
@@ -157,15 +160,14 @@ public class MCRSearchServlet extends MCRServlet {
         xml.setAttribute("numPerPage", String.valueOf(npp));
         xml.setAttribute("numPages", String.valueOf(numPages));
         xml.setAttribute("page", String.valueOf(page));
-        //save some parameters
-        SearchParameters sp=new SearchParameters();
-        sp.page=page;
-        sp.numPerPage=npp;
-        getCache(PARAMS_KEY).put(id,sp);
+        // save some parameters
+        SearchParameters sp = new SearchParameters();
+        sp.page = page;
+        sp.numPerPage = npp;
+        getCache(PARAMS_KEY).put(id, sp);
 
         // The URL of the search mask that was used
         xml.setAttribute("mask", query.getRootElement().getAttributeValue("mask"));
-        
 
         // The query condition, to show together with the results
         MCRCondition cond = (MCRCondition) (getCache(CONDIDTIONS_KEY).get(id));
@@ -251,7 +253,7 @@ public class MCRSearchServlet extends MCRServlet {
 
                     String[] values = request.getParameterValues(name);
                     if (values.length > 1) // Multiple fields with same name,
-                                            // combine with OR
+                    // combine with OR
                     {
                         parent = new Element("boolean");
                         parent.setAttribute("operator", "or");
@@ -315,7 +317,7 @@ public class MCRSearchServlet extends MCRServlet {
 
         // Execute query
         long start = System.currentTimeMillis();
-        MCRResults result = MCRQueryManager.search(input);
+        MCRResults result = MCRQueryManager.search(MCRQuery.parseXML(input));
         long qtime = System.currentTimeMillis() - start;
         LOGGER.debug("MCRSearchServlet total query time: " + qtime);
 
@@ -342,23 +344,24 @@ public class MCRSearchServlet extends MCRServlet {
     public static String getResultsKey() {
         return RESULTS_KEY;
     }
-    
+
     public static String getParametersKey() {
         return PARAMS_KEY;
     }
-    
-    private static MCRCache getCache(String key){
-        MCRCache c=(MCRCache)MCRSessionMgr.getCurrentSession().get(key);
-        if (c==null){
-            c=new MCRCache(5);
-            MCRSessionMgr.getCurrentSession().put(key,c);
+
+    private static MCRCache getCache(String key) {
+        MCRCache c = (MCRCache) MCRSessionMgr.getCurrentSession().get(key);
+        if (c == null) {
+            c = new MCRCache(5);
+            MCRSessionMgr.getCurrentSession().put(key, c);
         }
         return c;
     }
-    
-    public static class SearchParameters{
+
+    public static class SearchParameters {
         public int numPerPage;
+
         public int page;
     }
-    
+
 }

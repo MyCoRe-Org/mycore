@@ -33,6 +33,7 @@ import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
+import org.mycore.services.fieldquery.MCRQuery;
 import org.mycore.services.fieldquery.MCRQueryManager;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRException;
@@ -257,7 +258,7 @@ public class MCROAIQueryImpl implements MCROAIQuery {
                         .equals("listIdentifiers")))) {
             for (int i = deliveredResults; i < Math.min(maxReturns
                     + deliveredResults, numResults); i++) {
-                list.add((String) resultArray[i]);
+                list.add(resultArray[i]);
             }
             deliveredResults = Math.min(maxReturns + deliveredResults,
                     numResults);
@@ -280,7 +281,6 @@ public class MCROAIQueryImpl implements MCROAIQuery {
         
         Element host = new Element("host");
         host.setAttribute("field","local");
-        
         
         Element sortBy = new Element("sortBy");
         
@@ -351,7 +351,7 @@ public class MCROAIQueryImpl implements MCROAIQuery {
 
         XMLOutputter out = new XMLOutputter(Format.getPrettyFormat());
         logger.debug("OAI-QUERY:" + out.outputString(jdomQuery));
-        MCRResults results = MCRQueryManager.search(jdomQuery);
+        MCRResults results = MCRQueryManager.search(MCRQuery.parseXML(jdomQuery));
        
         numResults = results.getNumHits();
         resultArray = new Object[numResults];
@@ -362,7 +362,7 @@ public class MCROAIQueryImpl implements MCROAIQuery {
 			resultArray[i] = results.getHit(i).getID();
 		}
         for (int i = 0; i < deliveredResults; i++) {
-        	list.add((String) resultArray[i]);
+        	list.add(resultArray[i]);
         }
 
         return list;
