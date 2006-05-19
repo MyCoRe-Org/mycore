@@ -134,7 +134,7 @@ public class MCRQuery {
      *            a MCRSortBy object
      */
     public void setSortBy(MCRSortBy sortBy) {
-        this.sortBy.clear();
+        this.sortBy = new ArrayList();
         if (sortBy != null)
             this.sortBy.add(sortBy);
         this.doc = null;
