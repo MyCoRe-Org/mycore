@@ -28,8 +28,6 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
 
-import org.jdom.Document;
-import org.jdom.Element;
 import org.mycore.parsers.bool.MCRAndCondition;
 import org.mycore.parsers.bool.MCRCondition;
 import org.mycore.parsers.bool.MCRNotCondition;
@@ -43,68 +41,32 @@ import org.mycore.parsers.bool.MCROrCondition;
 public class MCRQueryManager {
 
     /**
-     * Executes a query defined as XML document and returns the query results.
+     * Executes a query and returns the query results. If the query contains
+     * fields from different indexes, the results of multiple searchers are
+     * combined.
      * 
      * @param query
      *            the query
-     * @return the query results
-     */
-    public static MCRResults search(Document query) {
-        Element root = query.getRootElement();
-        int maxResults = Integer.parseInt(root.getAttributeValue("maxResults"));
-
-        List sortBy = null;
-        Element sortByElem = query.getRootElement().getChild("sortBy");
-
-        if (sortByElem != null) {
-            List children = sortByElem.getChildren();
-            sortBy = new ArrayList(children.size());
-
-            for (int i = 0; i < children.size(); i++) {
-                Element sortByChild = (org.jdom.Element) (children.get(i));
-                String name = sortByChild.getAttributeValue("field");
-                String ad = sortByChild.getAttributeValue("order");
-
-                MCRFieldDef fd = MCRFieldDef.getDef(name);
-                boolean direction = ("ascending".equals(ad) ? MCRSortBy.ASCENDING : MCRSortBy.DESCENDING);
-                sortBy.add(new MCRSortBy(fd, direction));
-            }
-        }
-
-        Element conditions = root.getChild("conditions");
-        MCRCondition cond = null;
-        if (conditions.getAttributeValue("format", "xml").equals("xml")) {
-            Element condElem = (Element) (conditions.getChildren().get(0));
-            cond = new MCRQueryParser().parse(condElem);
-        } else {
-            String queryString = conditions.getTextTrim();
-            cond = new MCRQueryParser().parse(queryString);
-        }
-
-        return search(cond, sortBy, maxResults);
-    }
-
-    /**
-     * Executes a query defined as MCRCondition object and returns the query
-     * results. If the query contains fields from different indexes, the results
-     * of multiple searchers are combined.
      * 
-     * @param cond
-     *            the query condition
-     * @param sortBy
-     *            a List of MCRSortBy objects that defines the sort order of the
-     *            results, may be null
-     * @param maxResults
-     *            the maximum number of results to return, a value &lt; 1 means
-     *            to return all results.
      * @return the query results
      */
-    public static MCRResults search(MCRCondition cond, List sortBy, int maxResults) {
-        MCRResults results = buildResults(cond, sortBy, maxResults);
+    public static MCRResults search(MCRQuery query) {
+        List hosts = query.getHosts();
+        int maxResults = query.getMaxResults();
+        query.setHosts(null);
+
+        MCRResults results = buildResults(query);
+
+        // Do remote query if hosts list is not empty
+        for (int i = 0; (hosts != null) && (i < hosts.size()); i++) {
+            String alias = (String) (hosts.get(i));
+            MCRResults remoteResults = MCRQueryClient.search(alias, query);
+            results = MCRResults.merge(remoteResults, results);
+        }
 
         // Sort results if not already sorted
-        if (!results.isSorted() && null != sortBy)
-            results.sortBy(sortBy);
+        if (!results.isSorted() && query.getSortBy().size() > 0)
+            results.sortBy(query.getSortBy());
 
         // After sorting, cut result list to maxResults if not already done
         if ((maxResults > 0) && (results.getNumHits() > maxResults))
@@ -144,13 +106,17 @@ public class MCRQueryManager {
         return index;
     }
 
+    private static MCRResults buildResults(MCRQuery query) {
+        return buildResults(query.getCondition(), query.getSortBy(), query.getMaxResults());
+    }
+
     /** Executes query, if necessary splits into subqueries for each index */
     private static MCRResults buildResults(MCRCondition cond, List sortBy, int maxResults) {
         String index = getIndex(cond);
         if (index != mixed) { // All fields are from same index, just one
             // searcher
             MCRSearcher searcher = MCRSearcherFactory.getSearcherForIndex(index);
-            return searcher.search(cond, sortBy, maxResults);
+            return searcher.search(new MCRQuery(cond, sortBy, maxResults));
         } else if ((cond instanceof MCRAndCondition) || (cond instanceof MCROrCondition)) {
             return buildCombinedResults(cond, sortBy, false);
         } else { // Move not down: not(a and/or b)=(not a) and/or (not b)
