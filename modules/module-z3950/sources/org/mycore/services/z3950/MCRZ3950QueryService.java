@@ -17,6 +17,7 @@ import org.mycore.common.MCRConfiguration;
 import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.common.xml.MCRXMLContainer;
 import org.mycore.datamodel.classifications.MCRCategoryItem;
+import org.mycore.parsers.bool.MCRAndCondition;
 import org.mycore.services.fieldquery.MCRQueryManager;
 import org.mycore.services.fieldquery.MCRResults;
 import org.w3c.dom.Document;
@@ -112,81 +113,61 @@ public class MCRZ3950QueryService implements MCRZ3950Query {
 	 * @return True falls es Ergebnisse gab, sonst False.
 	 */
 	public boolean search() {
-        Element query = new Element("query");
-        query.setAttribute("maxResults", "10");
-        query.setAttribute("numPerPage", "10");
-        
-        Element conditions = new Element("conditions");
-        query.addContent(conditions);
-        
-        conditions.setAttribute("format", "xml");
-        Element b = new Element("boolean");
-        b.setAttribute("operator", "and");
-        conditions.addContent(b);
-        
-        
-		if (prefixString.getAttributeSet().equals("bib-1")) {
-			LinkedList attributes = prefixString.getAttributes(1);
-			Iterator it = attributes.iterator();
-			while (it.hasNext()) {
-				Integer attrValue = (Integer) it.next();
-				//MCR.z3950.1.4
-				// Isoliere alle Mappings für Typ 1
-				Properties p = CONFIG.getProperties("MCR.z3950.1.");
-				//CONFIG.getString("MCR.z3950.1.4");
-				// Iteriere alle Mappings für Typ 1 (auschließend)
-				Enumeration e = p.propertyNames();
-				while (e.hasMoreElements()) {
-					String propertyName = (String) e.nextElement();
-					Integer mycoreAttr = Integer.valueOf(propertyName.substring("MCR.z3950.1.".length(),
-							propertyName.length()));
-					// Vergleich der Konfiguration mit tatsächlicher Anfrage
-					if (attrValue.equals(mycoreAttr)) {
-						String xpath = CONFIG.getString("MCR.z3950.1." +
-								mycoreAttr);
-/* OLD QUERY                        
-						// Sonderfälle: Dokumenten-Id und Suche in allen Feldern
-						if (xpath.equals("@ID")) {
-							// Dokumenten-Id
-							meta = "/mycoreobject[@ID=" + prefixString.getTerm() + "]";
-						} else if (xpath.equals("doctext()")) {
-							meta = "/mycoreobject[" + xpath + " contains(" +
-					                prefixString.getTerm() + ")] or " +
-					                "/mycoreobject[ts() contains(" +
-					                prefixString.getTerm() + ")]";
-							
-						} else meta = "/mycoreobject[" + xpath + " contains(" +
-						        prefixString.getTerm() + ")]";
-						logger.debug("Aus dem Kern: " + meta);
-*/                        
-                      Element cond = new Element("condition");
-                      cond.setAttribute("field", xpath);
-                      cond.setAttribute("operator", "contains");
-                      cond.setAttribute("value", prefixString.getTerm());
-                      b.addContent(cond);
-                      
-                      if (logger.isDebugEnabled())
-                      {
-                        org.jdom.output.XMLOutputter outputter = new org.jdom.output.XMLOutputter();
-                        logger.debug("Aus dem Kern: " + outputter.outputString(query));
-                      }
-				    }
-				}
-			}
-		}
-        
-        MCRResults result = MCRQueryManager.search( MCRQuery.parseXML(new org.jdom.Document(query)));
-        
-		mycoreResults = new MCRXMLContainer();
-		for (int i=0;i<result.getNumHits();i++)
-		{
-           MCRHit hit = result.getHit(i);
-		   Element ele = MCRURIResolver.instance().resolve("mcrobject:"+hit.getID()); 
-           mycoreResults.add("host", hit.getID(), 1, ele);
-		}
-		if (mycoreResults.size() > 0) return true;
-		else return false;
-	}
+        MCRAndCondition cAnd = new MCRAndCondition();
+
+        if (prefixString.getAttributeSet().equals("bib-1")) {
+            LinkedList attributes = prefixString.getAttributes(1);
+            Iterator it = attributes.iterator();
+            while (it.hasNext()) {
+                Integer attrValue = (Integer) it.next();
+                // MCR.z3950.1.4
+                // Isoliere alle Mappings für Typ 1
+                Properties p = CONFIG.getProperties("MCR.z3950.1.");
+                // CONFIG.getString("MCR.z3950.1.4");
+                // Iteriere alle Mappings für Typ 1 (auschließend)
+                Enumeration e = p.propertyNames();
+                while (e.hasMoreElements()) {
+                    String propertyName = (String) e.nextElement();
+                    Integer mycoreAttr = Integer.valueOf(propertyName.substring("MCR.z3950.1.".length(), propertyName.length()));
+                    // Vergleich der Konfiguration mit tatsächlicher Anfrage
+                    if (attrValue.equals(mycoreAttr)) {
+                        String xpath = CONFIG.getString("MCR.z3950.1." + mycoreAttr);
+                        /*
+                         * OLD QUERY // Sonderfälle: Dokumenten-Id und Suche in
+                         * allen Feldern if (xpath.equals("@ID")) { //
+                         * Dokumenten-Id meta = "/mycoreobject[@ID=" +
+                         * prefixString.getTerm() + "]"; } else if
+                         * (xpath.equals("doctext()")) { meta = "/mycoreobject[" +
+                         * xpath + " contains(" + prefixString.getTerm() + ")]
+                         * or " + "/mycoreobject[ts() contains(" +
+                         * prefixString.getTerm() + ")]";
+                         *  } else meta = "/mycoreobject[" + xpath + "
+                         * contains(" + prefixString.getTerm() + ")]";
+                         * logger.debug("Aus dem Kern: " + meta);
+                         */
+                        MCRQueryCondition qc = new MCRQueryCondition(MCRFieldDef.getDef(xpath), "contains", prefixString.getTerm());
+                        cAnd.addChild(qc);
+
+                    }
+                }
+            }
+        }
+        if (logger.isDebugEnabled())
+            logger.debug("Aus dem Kern: " + cAnd);
+
+        MCRResults result = MCRQueryManager.search(new MCRQuery(cAnd));
+
+        mycoreResults = new MCRXMLContainer();
+        for (int i = 0; i < result.getNumHits(); i++) {
+            MCRHit hit = result.getHit(i);
+            Element ele = MCRURIResolver.instance().resolve("mcrobject:" + hit.getID());
+            mycoreResults.add("host", hit.getID(), 1, ele);
+        }
+        if (mycoreResults.size() > 0)
+            return true;
+        else
+            return false;
+    }
 	
 	/**
 	 * Die Methode <code>fillClassificationsWithLabels</code> durchsucht alle
