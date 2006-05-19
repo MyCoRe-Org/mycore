@@ -30,9 +30,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 
+import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
+import org.mycore.common.MCRException;
 
 /**
  * This class represents the results of a query performed by MCRSearcher.
@@ -258,6 +260,31 @@ public class MCRResults {
      */
     public Element buildXML() {
         return buildXML(0, getNumHits() - 1);
+    }
+
+    /**
+     * Parses a XML document of a results object containing all hits and their
+     * data
+     * 
+     * @param xml
+     *            the XML results document
+     * @return the parsed MCRResults object
+     */
+    public static MCRResults parseXML(Document doc) {
+        Element xml = doc.getRootElement();
+        MCRResults results = new MCRResults();
+        results.id = xml.getAttributeValue("id", "");
+        if (results.id.length() == 0)
+            throw new MCRException("MCRResults id attribute is empty");
+
+        results.isSorted = "true".equals(xml.getAttributeValue("sorted"));
+
+        List hitList = xml.getChildren();
+        for (int i = 0; i < hitList.size(); i++) {
+            Element hitElement = (Element) (hitList.get(i));
+            results.addHit(MCRHit.parseXML(hitElement));
+        }
+        return results;
     }
 
     public String toString() {

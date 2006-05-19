@@ -32,6 +32,7 @@ import org.jdom.Attribute;
 import org.jdom.Element;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
+import org.mycore.common.MCRException;
 
 /**
  * Represents a single result hit of a query. The hit has an ID which is the
@@ -231,5 +232,44 @@ public class MCRHit {
         }
 
         return eHit;
+    }
+
+    /**
+     * Parses a XML representation of a hit and its sort data and meta data
+     * 
+     * @param xml
+     *            the XML element
+     * @return the parsed MCRHit object
+     */
+    public static MCRHit parseXML(Element xml) {
+        String id = xml.getAttributeValue("id", "");
+        if (id.length() == 0)
+            throw new MCRException("MCRHit id attribute is empty");
+
+        MCRHit hit = new MCRHit(xml.getAttributeValue("id"));
+
+        Element eSort = xml.getChild("sortData", MCRFieldDef.mcrns);
+        if (eSort != null) {
+            List children = eSort.getChildren();
+            for (int i = 0; i < children.size(); i++) {
+                Element child = (Element) (children.get(i));
+                hit.addSortData(MCRFieldValue.parseXML(child));
+            }
+        }
+
+        List metaList = xml.getChildren("metaData");
+        for (int i = 0; i < metaList.size(); i++) {
+            Element md = (Element) (metaList.get(i));
+            List children = md.getChildren();
+
+            for (int j = 0; j < children.size(); j++) {
+                Element child = (Element) (children.get(j));
+                hit.addMetaData(MCRFieldValue.parseXML(child));
+            }
+            if (i < metaList.size() - 1)
+                hit.metaData.add(null);
+        }
+
+        return hit;
     }
 }

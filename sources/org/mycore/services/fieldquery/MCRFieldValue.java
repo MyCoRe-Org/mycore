@@ -24,6 +24,7 @@
 package org.mycore.services.fieldquery;
 
 import org.jdom.Element;
+import org.mycore.common.MCRException;
 import org.mycore.common.MCRNormalizer;
 import org.mycore.datamodel.ifs.MCRFile;
 
@@ -122,5 +123,24 @@ public class MCRFieldValue {
         eField.setAttribute("name", field.getName());
         eField.addContent(value);
         return eField;
+    }
+
+    /**
+     * Parses a XML representation of a field value
+     * 
+     * @param xml
+     *            the field value as XML element
+     * @return the parsed MCRFieldValue object
+     */
+    public static MCRFieldValue parseXML(Element xml) {
+        String name = xml.getAttributeValue("name", "");
+        String value = xml.getText();
+
+        if (name.length() == 0)
+            throw new MCRException("Field value attribute 'name' is empty");
+        if (value.length() == 0)
+            throw new MCRException("Field value is empty");
+
+        return new MCRFieldValue(MCRFieldDef.getDef(name), value);
     }
 }
