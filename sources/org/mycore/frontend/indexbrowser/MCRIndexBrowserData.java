@@ -1,5 +1,6 @@
 package org.mycore.frontend.indexbrowser;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -15,15 +16,15 @@ import org.mycore.access.MCRAccessInterface;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.datamodel.metadata.MCRObject;
+import org.mycore.parsers.bool.MCRAndCondition;
+import org.mycore.services.fieldquery.MCRFieldDef;
 import org.mycore.services.fieldquery.MCRQuery;
+import org.mycore.services.fieldquery.MCRQueryCondition;
 import org.mycore.services.fieldquery.MCRQueryManager;
 import org.mycore.services.fieldquery.MCRResults;
-
+import org.mycore.services.fieldquery.MCRSortBy;
 
 public class MCRIndexBrowserData {
-	/**
-	 * 
-	 */
 	protected static Logger logger = Logger.getLogger(MCRIndexBrowserData.class);
 	private static final long serialVersionUID = 1L;
 	private String selectedtype = "";
@@ -326,84 +327,28 @@ public class MCRIndexBrowserData {
     //**************************************************************************
 
     private void  buildQuery() {
-        /* 
-         * <?xml version="1.0" encoding="UTF-8"?>
-         * <query maxResults="100">
-         * <conditions format="xml">
-         * <and>
-         * 	<condition value="wendel" field="allMeta" operator="like" />
-         * </and>
-		 * </conditions>
-		 * <types>
-		 *   <type field="alldocs" />
-		 *   <type field="allpers" />
-		 * </types>
-		 * <host>
-		 *   <host field="local" />
-		 * </host>
-		 * <sortBy>
-		 *   <field field="modified" order="descending" />
-		 *   <field field="title" order="ascending" />
-		 *   <field field="author" order="ascending" />
-		 * </sortBy>
-		 * </query>
-        **/
-    	
-    	
-    	Element query = new Element("query"); 
-    	query.setAttribute("maxResults", "0");
-    	
-    	Element conditions = new Element("conditions");
-    	conditions.setAttribute("format", "xml");
-    	query.addContent(conditions);
-    	
-    	Element op = new Element("boolean");
-    	op.setAttribute("operator", "AND");
-    	conditions.addContent(op);
-    	
-    	Element condition = new Element("condition");
-    	
-       	condition.setAttribute("operator", "like");
-   		condition.setAttribute("field", ic.browseField);
-       	if (br.search != null) {
-    		condition.setAttribute("value", br.search+"*");
-    	} else {
-    		condition.setAttribute("value", "*");
-    	}
-       	
-    	op.addContent(condition);
-    	Element types = new Element("types");
-    	query.addContent(types);
-    	Element type = new Element("type");
-    	types.addContent(type);
-    	
-    	type.setAttribute("field", ic.table);
-    	
-    	Element hosts = new Element("hosts");
-    	query.addContent(hosts);
-    	Element host = new Element("host");
-    	hosts.addContent(host);
-    	host.setAttribute("field", "local");
-    	
-    	Element sortBy = new Element("sortBy");
-    	query.addContent(sortBy);
-    	
-    	
-    	Element field = new Element("field");
-    	sortBy.addContent(field);
-    	field.setAttribute("field", ic.browseField);
-    	field.setAttribute("order" ,ic.order);
-    	
-    	for ( int i=0; ic.extraFields != null && i< ic.extraFields.length; i++){    	
-	        field = new Element("field");
-	    	sortBy.addContent(field);
-	    	field.setAttribute("field", ic.extraFields[i]);
-	    	field.setAttribute("order" ,ic.order);
-    	}
+        MCRAndCondition cAnd = new MCRAndCondition();
 
-    	logger.debug("generated query: \n" + out.outputString(query));	    	
-    	jQuery = new Document(query); 
-    	mcrResult = MCRQueryManager.search(MCRQuery.parseXML( jQuery ));
+        MCRFieldDef field = MCRFieldDef.getDef("objectType");
+        cAnd.addChild(new MCRQueryCondition(field,"=",ic.table));
+
+        field = MCRFieldDef.getDef(ic.browseField);
+        String value = br.search == null ? "*" : br.search + "*";
+        cAnd.addChild(new MCRQueryCondition(field,"like",value));
+    	
+        logger.debug("generated query: \n" + cAnd );            
+
+        boolean order = "ascending".equalsIgnoreCase(ic.order); 
+        List sortCriteria = new ArrayList();
+        sortCriteria.add(new MCRSortBy(field,order));
+        
+    	for ( int i=0; ic.extraFields != null && i< ic.extraFields.length; i++){    	
+	        field = MCRFieldDef.getDef(ic.extraFields[i]);
+            sortCriteria.add(new MCRSortBy(field,order));
+    	}
+        
+        MCRQuery query = new MCRQuery(cAnd,sortCriteria,0);
+    	mcrResult = MCRQueryManager.search(query);
     	
     	/**
     	 * <mcrresults sorted="true">
