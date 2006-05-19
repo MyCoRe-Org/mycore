@@ -35,6 +35,7 @@ import org.apache.axis.constants.Style;
 import org.apache.axis.constants.Use;
 import org.apache.axis.description.OperationDesc;
 import org.apache.axis.description.ParameterDesc;
+import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.input.DOMBuilder;
@@ -48,6 +49,8 @@ import org.mycore.common.xml.MCRURIResolver;
  * @author Frank Lützenkirchen
  */
 public class MCRQueryClient {
+    /** The logger */
+    private final static Logger LOGGER = Logger.getLogger(MCRQueryClient.class);
 
     /** A list containing the aliases of all hosts */
     public final static List ALL_HOSTS;
@@ -66,11 +69,12 @@ public class MCRQueryClient {
         Element hosts = MCRURIResolver.instance().resolve("resource:hosts.xml");
 
         ALL_HOSTS = new ArrayList();
-        List children = hosts.getChildren("host");
+        List children = hosts.getChildren();
         for (int i = 0; i < children.size(); i++) {
             Element host = (Element) (children.get(i));
             String alias = host.getAttributeValue("alias");
             String url = host.getAttributeValue("url");
+            LOGGER.debug("Host " + alias + " uses query endpoint at " + url);
             endpoints.put(alias, url);
             ALL_HOSTS.add(alias);
         }
@@ -111,7 +115,8 @@ public class MCRQueryClient {
             Document response = new DOMBuilder().build(outDoc);
             return MCRResults.parseXML(response);
         } catch (Exception ex) {
-            ex.printStackTrace();
+            String msg = "Exception while querying remote host " + hostAlias;
+            LOGGER.error(msg, ex);
             return new MCRResults();
         }
     }
