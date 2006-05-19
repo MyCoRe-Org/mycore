@@ -28,7 +28,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.jdom.Attribute;
 import org.jdom.Element;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
@@ -54,6 +53,12 @@ public class MCRHit {
     /** The ID of this object that matched the query */
     private String id;
 
+    /** Identifies a hit that comes from the local server */
+    public final static String LOCAL = "local";
+
+    /** The alias of the host where this hit comes from */
+    private String host = LOCAL;
+
     /** List of MCRFieldValue objects that are hit metadata */
     private List metaData = new ArrayList();
 
@@ -74,12 +79,43 @@ public class MCRHit {
     }
 
     /**
+     * Creates a new result hit with the given object ID
+     * 
+     * @param id
+     *            the ID of the object that matched the query
+     * @param hostAlias
+     *            the remote host alias (may be null)
+     */
+    public MCRHit(String id, String hostAlias) {
+        this.id = id;
+        this.host = hostAlias;
+    }
+
+    /**
      * Returns the ID of the object that matched the query
      * 
      * @return the ID of the object that matched the query
      */
     public String getID() {
         return id;
+    }
+
+    /**
+     * Returns the alias of the host where this hit comes from
+     * 
+     * @return the remote host alias, or MCRHit.LOCAL
+     */
+    public String getHost() {
+        return host;
+    }
+
+    /**
+     * Returns a combination of ID and host alias to be used as key
+     * 
+     * @return a unique key for this MCRHit
+     */
+    String getKey() {
+        return id + "@" + host;
     }
 
     /**
@@ -171,7 +207,7 @@ public class MCRHit {
         }
 
         // Copy ID
-        MCRHit c = new MCRHit(a.getID());
+        MCRHit c = new MCRHit(a.getID(), a.getHost());
 
         // Copy sortData
         c.sortData.addAll(a.sortData.isEmpty() ? b.sortData : a.sortData);
@@ -199,7 +235,8 @@ public class MCRHit {
      */
     public Element buildXML() {
         Element eHit = new Element("hit", MCRFieldDef.mcrns);
-        eHit.setAttribute(new Attribute("id", this.id));
+        eHit.setAttribute("id", this.id);
+        eHit.setAttribute("host", this.host);
 
         if (!sortData.isEmpty()) {
             Element eSort = new Element("sortData", MCRFieldDef.mcrns);
@@ -239,14 +276,22 @@ public class MCRHit {
      * 
      * @param xml
      *            the XML element
+     * @param hostAlias
+     *            the remote host alias (may be null)
      * @return the parsed MCRHit object
      */
-    public static MCRHit parseXML(Element xml) {
+    public static MCRHit parseXML(Element xml, String hostAlias) {
         String id = xml.getAttributeValue("id", "");
         if (id.length() == 0)
             throw new MCRException("MCRHit id attribute is empty");
 
         MCRHit hit = new MCRHit(xml.getAttributeValue("id"));
+
+        String alias = xml.getAttributeValue("host", "");
+        if (hostAlias != null)
+            hit.host = hostAlias;
+        else if (alias.length() > 0)
+            hit.host = alias;
 
         Element eSort = xml.getChild("sortData", MCRFieldDef.mcrns);
         if (eSort != null) {

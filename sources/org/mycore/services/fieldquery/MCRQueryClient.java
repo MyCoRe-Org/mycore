@@ -118,7 +118,7 @@ public class MCRQueryClient {
 
             // Process xml response
             Document response = new DOMBuilder().build(outDoc);
-            MCRResults results = MCRResults.parseXML(response);
+            MCRResults results = MCRResults.parseXML(response,hostAlias);
             LOGGER.debug("Received " + results.getNumHits() + " hits from host " + hostAlias);
             return results;
         } catch (Exception ex) {

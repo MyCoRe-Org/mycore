@@ -93,17 +93,17 @@ public class MCRResults {
      *            the MCRHit to add
      */
     public void addHit(MCRHit hit) {
-        String ID = hit.getID();
-        if (!map.containsKey(ID)) {
+        String key = hit.getKey();
+        if (!map.containsKey(key)) {
             // This is a new entry with new ID
             hits.add(hit);
-            map.put(ID, hit);
+            map.put(key, hit);
         } else {
             // Merge data of existing hit with new one with the same ID
-            MCRHit existing = getHit(ID);
+            MCRHit existing = getHit(key);
             MCRHit merged = MCRHit.merge(hit, existing);
             hits.set(hits.indexOf(existing), merged);
-            map.put(ID, merged);
+            map.put(key, merged);
         }
     }
 
@@ -123,15 +123,15 @@ public class MCRResults {
     }
 
     /**
-     * Returns the MCRHit with the given ID, if it is in this results.
+     * Returns the MCRHit with the given key, if it is in this results.
      * 
-     * @param ID
-     *            the ID of the hit
+     * @param key
+     *            the key of the hit
      * @return the MCRHit, if it exists
      */
-    public MCRHit getHit(String ID) {
-        if (map.containsKey(ID)) {
-            return (MCRHit) (map.get(ID));
+    private MCRHit getHit(String key) {
+        if (map.containsKey(key)) {
+            return (MCRHit) (map.get(key));
         }
         return null;
     }
@@ -154,7 +154,7 @@ public class MCRResults {
     public void cutResults(int maxResults) {
         while ((hits.size() > maxResults) && (maxResults >= 0)) {
             MCRHit hit = (MCRHit) (hits.remove(hits.size() - 1));
-            map.remove(hit.getID());
+            map.remove(hit.getKey());
         }
     }
 
@@ -176,29 +176,6 @@ public class MCRResults {
      */
     public boolean isSorted() {
         return isSorted;
-    }
-
-    /**
-     * Convenience method to sort results by up to three differend fields. Each
-     * parameter may be null, so you can sort by only one or two fields if you
-     * like.
-     * 
-     * @param first
-     *            the first field to sort by
-     * @param second
-     *            the second field to sort by
-     * @param third
-     *            the third field to sort by
-     */
-    public void sortBy(MCRSortBy first, MCRSortBy second, MCRSortBy third) {
-        List sortByList = new ArrayList();
-        if (first != null)
-            sortByList.add(first);
-        if (second != null)
-            sortByList.add(second);
-        if (third != null)
-            sortByList.add(third);
-        sortBy(sortByList);
     }
 
     /**
@@ -268,9 +245,11 @@ public class MCRResults {
      * 
      * @param xml
      *            the XML results document
+     * @param hostAlias
+     *            the remote host alias (may be null)
      * @return the parsed MCRResults object
      */
-    public static MCRResults parseXML(Document doc) {
+    public static MCRResults parseXML(Document doc, String hostAlias) {
         Element xml = doc.getRootElement();
         MCRResults results = new MCRResults();
         results.id = xml.getAttributeValue("id", "");
@@ -282,7 +261,7 @@ public class MCRResults {
         List hitList = xml.getChildren();
         for (int i = 0; i < hitList.size(); i++) {
             Element hitElement = (Element) (hitList.get(i));
-            results.addHit(MCRHit.parseXML(hitElement));
+            results.addHit(MCRHit.parseXML(hitElement, hostAlias));
         }
         return results;
     }
@@ -307,7 +286,7 @@ public class MCRResults {
 
         for (int i = 0; i < a.getNumHits(); i++) {
             MCRHit hitA = a.getHit(i);
-            MCRHit hitB = b.getHit(hitA.getID());
+            MCRHit hitB = b.getHit(hitA.getKey());
 
             if (hitB != null) {
                 res.addHit(MCRHit.merge(hitA, hitB));
@@ -333,7 +312,7 @@ public class MCRResults {
 
         for (int i = 0; i < a.getNumHits(); i++) {
             MCRHit hitA = a.getHit(i);
-            MCRHit hitB = b.getHit(hitA.getID());
+            MCRHit hitB = b.getHit(hitA.getKey());
 
             MCRHit hitC = MCRHit.merge(hitA, hitB);
             res.addHit(hitC);
