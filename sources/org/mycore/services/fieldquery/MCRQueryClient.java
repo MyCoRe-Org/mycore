@@ -23,6 +23,7 @@
 
 package org.mycore.services.fieldquery;
 
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -84,7 +85,7 @@ public class MCRQueryClient {
         // Build doQuery operation description
         operation = new OperationDesc();
         operation.setName("MCRDoQuery");
-        operation.addParameter(new QName("", "query"), new QName(xmlsoap, "Document"), org.w3c.dom.Document.class, ParameterDesc.IN, false, false);
+        operation.addParameter(new ParameterDesc(new QName("", "in0"), ParameterDesc.IN, new QName("http://xml.apache.org/xml-soap", "Document"), org.w3c.dom.Document.class, false, false));
         operation.setReturnType(new QName(xmlsoap, "Document"));
         operation.setReturnClass(org.w3c.dom.Document.class);
         operation.setReturnQName(new QName("", "MCRDoQueryReturn"));
@@ -98,22 +99,28 @@ public class MCRQueryClient {
             throw new MCRConfigurationException(msg);
         }
 
+        LOGGER.info("Starting remote query at host " + hostAlias);
+
         String endpoint = endpoints.getProperty(hostAlias);
         Document xml = query.buildXML();
 
         try {
             // Build webservice call
             Call call = (Call) (service.createCall());
-            call.setTargetEndpointAddress(endpoint);
+            call.setTargetEndpointAddress(new URL(endpoint));
             call.setOperation(operation);
+            call.setOperationName("MCRDoQuery");
 
             // Call webservice
             org.w3c.dom.Document inDoc = new DOMOutputter().output(xml);
             org.w3c.dom.Document outDoc = (org.w3c.dom.Document) (call.invoke(new Object[] { inDoc }));
+            LOGGER.info("Received remote query results, processing XML now");
 
             // Process xml response
             Document response = new DOMBuilder().build(outDoc);
-            return MCRResults.parseXML(response);
+            MCRResults results = MCRResults.parseXML(response);
+            LOGGER.debug("Received " + results.getNumHits() + " hits from host " + hostAlias);
+            return results;
         } catch (Exception ex) {
             String msg = "Exception while querying remote host " + hostAlias;
             LOGGER.error(msg, ex);
