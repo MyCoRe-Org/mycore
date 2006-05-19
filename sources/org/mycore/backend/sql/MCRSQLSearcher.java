@@ -32,6 +32,7 @@ import org.mycore.parsers.bool.MCRCondition;
 import org.mycore.services.fieldquery.MCRFieldDef;
 import org.mycore.services.fieldquery.MCRFieldValue;
 import org.mycore.services.fieldquery.MCRHit;
+import org.mycore.services.fieldquery.MCRQuery;
 import org.mycore.services.fieldquery.MCRResults;
 import org.mycore.services.fieldquery.MCRSearcher;
 import org.mycore.services.fieldquery.MCRSortBy;
@@ -156,12 +157,15 @@ public class MCRSQLSearcher extends MCRSearcher {
         MCRSQLConnection.justDoUpdate(sql);
     }
 
-    public MCRResults search(MCRCondition query, List sortBy, int maxResults) {
+    public MCRResults search(MCRQuery query) {
         MCRSQLConnection c = MCRSQLConnectionPool.instance().getConnection();
         MCRResults result = new MCRResults();
+        MCRCondition cond = query.getCondition();
+        List sortBy = query.getSortBy();
+        int maxResults = query.getMaxResults();
 
         try {
-            String sql = new MCRSQLQuery(table, query, sortBy, maxResults).getSQLQuery();
+            String sql = new MCRSQLQuery(table, cond, sortBy, maxResults).getSQLQuery();
             LOGGER.debug(sql);
             MCRSQLRowReader reader = c.doQuery(sql);
 

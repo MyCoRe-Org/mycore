@@ -49,10 +49,10 @@ import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRNormalizer;
 import org.mycore.datamodel.ifs.MCRFile;
-import org.mycore.parsers.bool.MCRCondition;
 import org.mycore.services.fieldquery.MCRFieldDef;
 import org.mycore.services.fieldquery.MCRFieldValue;
 import org.mycore.services.fieldquery.MCRHit;
+import org.mycore.services.fieldquery.MCRQuery;
 import org.mycore.services.fieldquery.MCRResults;
 import org.mycore.services.fieldquery.MCRSearcher;
 import org.mycore.services.plugins.TextFilterPluginManager;
@@ -169,7 +169,6 @@ public class MCRLuceneSearcher extends MCRSearcher {
         }
       }
     }
-    
 
     protected void addToIndex(String entryID, String returnID, List fields) {
         LOGGER.info("MCRLuceneSearcher indexing data of " + entryID);
@@ -389,19 +388,19 @@ public class MCRLuceneSearcher extends MCRSearcher {
         searcher.close();
     }
 
-    public MCRResults search(MCRCondition cond, List order, int maxResults) {
+    public MCRResults search(MCRQuery query) {
         long start = System.currentTimeMillis();
         MCRResults results = new MCRResults();
 
         try {
             List f = new ArrayList();
-            f.add(cond.toXML());
+            f.add(query.getCondition().toXML());
 
             boolean reqf = true; // required flag Term with AND (true) or OR
             // (false) combined
             Query luceneQuery = MCRBuildLuceneQuery.buildLuceneQuery(null, reqf, f, analyzer);
             LOGGER.debug("Lucene Query: " + luceneQuery.toString());
-            results = getLuceneHits(luceneQuery, maxResults);
+            results = getLuceneHits(luceneQuery, query.getMaxResults());
         } catch (Exception e) {
             e.printStackTrace();
             LOGGER.error("Exception in MCRLuceneSearcher", e);

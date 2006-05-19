@@ -33,7 +33,6 @@ import org.mycore.common.events.MCREventHandlerBase;
 import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.metadata.MCRLinkTableManager;
 import org.mycore.datamodel.metadata.MCRObject;
-import org.mycore.parsers.bool.MCRCondition;
 
 /**
  * Abstract base class for searchers and indexers. Searcher implementations for
@@ -175,18 +174,8 @@ public abstract class MCRSearcher extends MCREventHandlerBase implements MCREven
      * that are managed by this searcher.
      * 
      * @param query
-     *            the parsed query
-     * @param sortBy
-     *            a List of MCRSortBy objects that defines the sort order of the
-     *            results, may be null
-     * @param maxResults
-     *            the maximum number of results to return, a value &lt; 1 means
-     *            to return all results.
+     *            the query
      * @return the query results
-     * 
-     * @see MCRQueryParser
-     * @see MCRQueryManager
-     * @see MCRSortBy
      */
-    public abstract MCRResults search(MCRCondition query, List sortBy, int maxResults);
+    public abstract MCRResults search(MCRQuery query);
 }

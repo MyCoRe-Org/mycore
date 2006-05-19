@@ -57,6 +57,7 @@ import org.mycore.services.fieldquery.MCRData2Fields;
 import org.mycore.services.fieldquery.MCRFieldDef;
 import org.mycore.services.fieldquery.MCRFieldValue;
 import org.mycore.services.fieldquery.MCRHit;
+import org.mycore.services.fieldquery.MCRQuery;
 import org.mycore.services.fieldquery.MCRResults;
 import org.mycore.services.fieldquery.MCRSearcher;
 import org.mycore.services.fieldquery.MCRQueryCondition;
@@ -149,9 +150,10 @@ public class MCRJDOMSearcher extends MCRSearcher {
         map.remove(entryID);
     }
 
-    public MCRResults search(MCRCondition cond, List order, int maxResults) {
+    public MCRResults search(MCRQuery query) {
+        List order = query.getSortBy();
         boolean doSort = (order != null) && (order.size() > 0);
-        String xslCondition = buildXSLCondition(cond);
+        String xslCondition = buildXSLCondition(query.getCondition());
         LOGGER.debug("MCRJDOMSearcher searching for " + xslCondition);
 
         Document xsl = buildStylesheet(xslCondition);
@@ -176,7 +178,7 @@ public class MCRJDOMSearcher extends MCRSearcher {
                 }
             }
 
-            if ((!doSort) && (maxResults > 0) && (results.getNumHits() >= maxResults)) {
+            if ((!doSort) && (query.getMaxResults() > 0) && (results.getNumHits() >= query.getMaxResults())) {
                 break;
             }
         }

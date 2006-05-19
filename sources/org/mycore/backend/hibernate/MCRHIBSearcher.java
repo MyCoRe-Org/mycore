@@ -38,6 +38,7 @@ import org.mycore.parsers.bool.MCRCondition;
 import org.mycore.services.fieldquery.MCRFieldDef;
 import org.mycore.services.fieldquery.MCRFieldValue;
 import org.mycore.services.fieldquery.MCRHit;
+import org.mycore.services.fieldquery.MCRQuery;
 import org.mycore.services.fieldquery.MCRResults;
 import org.mycore.services.fieldquery.MCRSearcher;
 import org.mycore.services.fieldquery.MCRSortBy;
@@ -115,7 +116,10 @@ public class MCRHIBSearcher extends MCRSearcher {
 
     }
     
-    public MCRResults search(MCRCondition condition, List order, int maxResults) {
+    public MCRResults search(MCRQuery query) {
+        MCRCondition condition = query.getCondition();
+        List order = query.getSortBy();
+        
         Session session = MCRHIBConnection.instance().getSession();
         Transaction tx = session.beginTransaction();
         MCRResults results = new MCRResults();
@@ -125,7 +129,7 @@ public class MCRHIBSearcher extends MCRSearcher {
             MCRHIBQuery hibquery = new MCRHIBQuery(condition, order, (String)indexClassMapping.get(index));
             List l = session.createQuery(hibquery.getHIBQuery()).list();
 
-            for (int i = 0; (i < l.size()) && ( maxResults <= 0 ? true: results.getNumHits() < maxResults); i++) {
+            for (int i = 0; (i < l.size()) && ( query.getMaxResults() <= 0 ? true: results.getNumHits() < query.getMaxResults()); i++) {
                 MCRHIBQuery tmpquery = new MCRHIBQuery(l.get(i)); // ?
                 MCRHit hit = new MCRHit((String) (tmpquery.getValue("getreturnid")));
 
