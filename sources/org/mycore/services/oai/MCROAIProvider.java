@@ -184,7 +184,7 @@ public class MCROAIProvider extends MCRServlet {
      * @throws ServletException
      * @throws IOException
      */
-    protected void doGetPost(MCRServletJob job) throws ServletException, IOException {
+    protected void doGetPost(MCRServletJob job) {
     	HttpServletRequest request = job.getRequest();
     	HttpServletResponse response = job.getResponse();
     	processRequest(request, response);
@@ -201,7 +201,7 @@ public class MCROAIProvider extends MCRServlet {
      * @throws IOException
      */
     protected void processRequest(HttpServletRequest request,
-            HttpServletResponse response) throws ServletException, IOException {
+            HttpServletResponse response) {
         response.setContentType("text/xml; charset=UTF-8");
 
         // Exceptions must be caught...

@@ -29,12 +29,15 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.jdom.Document;
 import org.jdom.Element;
-import org.jdom.output.Format;
-import org.jdom.output.XMLOutputter;
+import org.mycore.parsers.bool.MCRAndCondition;
+import org.mycore.parsers.bool.MCROrCondition;
+import org.mycore.services.fieldquery.MCRFieldDef;
 import org.mycore.services.fieldquery.MCRQuery;
+import org.mycore.services.fieldquery.MCRQueryCondition;
 import org.mycore.services.fieldquery.MCRQueryManager;
+import org.mycore.services.fieldquery.MCRQueryParser;
+import org.mycore.services.fieldquery.MCRSortBy;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRException;
 import org.mycore.datamodel.classifications.MCRCategoryItem;
@@ -42,7 +45,6 @@ import org.mycore.datamodel.classifications.MCRClassificationItem;
 import org.mycore.datamodel.metadata.MCRLinkTableManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.services.fieldquery.MCRResults;
-
 
 /**
  * @author Heiko Helmbrecht
@@ -52,21 +54,24 @@ import org.mycore.services.fieldquery.MCRResults;
  * This is the MyCoRe-Implementation of the <i>MCROAIQuery </i>-Interface.
  */
 public class MCROAIQueryImpl implements MCROAIQuery {
-	
-	private static Logger logger; 
-	//	 maximum number of returned list sets
+
+    private static Logger logger;
+
+    // maximum number of returned list sets
     private static int maxReturns;
-    
+
     static {
-        logger= Logger.getLogger(MCROAIQueryImpl.class.getName());
-        maxReturns = MCROAIProvider.getMaximalHitsize();    	
-    }	
+        logger = Logger.getLogger(MCROAIQueryImpl.class.getName());
+        maxReturns = MCROAIProvider.getMaximalHitsize();
+    }
 
     private int deliveredResults = 0;
-    private int numResults = 0;
-    private String lastQuery = "";
-    private Object[] resultArray;
 
+    private int numResults = 0;
+
+    private String lastQuery = "";
+
+    private Object[] resultArray;
 
     /**
      * Method MCROAIQueryService.
@@ -99,15 +104,11 @@ public class MCROAIQueryImpl implements MCROAIQuery {
         String[] classification = MCROAIProvider.getConfigBean(instance).getClassificationIDs();
         List list = new ArrayList();
         for (int i = 0; i < classification.length; i++) {
-            MCRClassificationItem repository = MCRClassificationItem
-                    .getClassificationItem(classification[i]);
+            MCRClassificationItem repository = MCRClassificationItem.getClassificationItem(classification[i]);
             MCRCategoryItem[] children = repository.getChildren();
-            logger.debug("ClassificationItem "
-                    + repository.getClassificationID() + " hat "
-                    + children.length + " Kinder.");
+            logger.debug("ClassificationItem " + repository.getClassificationID() + " hat " + children.length + " Kinder.");
             if ((repository != null) && (repository.hasChildren())) {
-                logger.debug("ClassificationItem hat "
-                        + repository.getNumChildren() + " Kinder.");
+                logger.debug("ClassificationItem hat " + repository.getNumChildren() + " Kinder.");
                 list.addAll(getSets(repository.getChildren(), "", instance));
             }
         }
@@ -127,8 +128,7 @@ public class MCROAIQueryImpl implements MCROAIQuery {
      * @return List A list that contains an array of three Strings: the category
      *         id, the label and a description
      */
-    private List getSets(MCRCategoryItem[] categories, String parentSpec,
-            String instance) {
+    private List getSets(MCRCategoryItem[] categories, String parentSpec, String instance) {
         List newList = new ArrayList();
 
         for (int i = 0; i < categories.length; i++) {
@@ -140,21 +140,17 @@ public class MCROAIQueryImpl implements MCROAIQuery {
             logger.debug("Suche nach Kategorie: " + categories[i].getID());
 
             if (categories[i].hasChildren()) {
-                logger.debug("Kategorie " + categories[i].getID() + " hat "
-                        + categories[i].getNumChildren() + " Kinder.");
-                newList.addAll(getSets(categories[i].getChildren(), set[0]
-                        + ":", instance));
+                logger.debug("Kategorie " + categories[i].getID() + " hat " + categories[i].getNumChildren() + " Kinder.");
+                newList.addAll(getSets(categories[i].getChildren(), set[0] + ":", instance));
             }
 
-            //We should better have a look if the set is empty...
+            // We should better have a look if the set is empty...
             MCRLinkTableManager ltm = MCRLinkTableManager.instance();
-            int numberOfLinks = ltm.countReferenceCategory(categories[i]
-                    .getClassificationID(), categories[i].getID());
+            int numberOfLinks = ltm.countReferenceCategory(categories[i].getClassificationID(), categories[i].getID());
 
             if (numberOfLinks > 0) {
                 newList.add(set);
-                logger.debug("Der Gruppenliste wurde der Datensatz " + set[0]
-                        + " hinzugefügt.");
+                logger.debug("Der Gruppenliste wurde der Datensatz " + set[0] + " hinzugefügt.");
             }
         }
 
@@ -178,10 +174,8 @@ public class MCROAIQueryImpl implements MCROAIQuery {
      *         identifier, a datestamp (modification date) and a string with a
      *         blank separated list of categories the element is classified in
      */
-    public List listIdentifiers(String[] set, String[] from, String[] until,
-            String metadataPrefix, String instance) {
-        return listRecordsOrIdentifiers(set, from, until, metadataPrefix,
-                instance, false);
+    public List listIdentifiers(String[] set, String[] from, String[] until, String metadataPrefix, String instance) {
+        return listRecordsOrIdentifiers(set, from, until, metadataPrefix, instance, false);
     }
 
     /**
@@ -204,7 +198,7 @@ public class MCROAIQueryImpl implements MCROAIQuery {
         MCRObject object = new MCRObject();
         String repositoryId = null;
         try {
-        	repositoryId = MCROAIProvider.getConfigBean(instance).getRepositoryIdentifier();
+            repositoryId = MCROAIProvider.getConfigBean(instance).getRepositoryIdentifier();
             object.receiveFromDatastore(id);
         } catch (MCRConfigurationException mcrx) {
             return null;
@@ -216,8 +210,7 @@ public class MCROAIQueryImpl implements MCROAIQuery {
         list.add(identifier);
         logger.debug("Identifier hinzugefügt");
 
-        Element eMetadata = (Element) object.createXML().getRootElement()
-                .clone();
+        Element eMetadata = (Element) object.createXML().getRootElement().clone();
 
         list.add(eMetadata);
         logger.debug("Metadaten hinzugefügt");
@@ -242,127 +235,83 @@ public class MCROAIQueryImpl implements MCROAIQuery {
      *         identifier, a datestamp (modification date) and a string with a
      *         blank separated list of categories the element is classified in
      */
-    public List listRecords(String[] set, String[] from, String[] until,
-            String metadataPrefix, String instance) {
-        return listRecordsOrIdentifiers(set, from, until, metadataPrefix,
-                instance, true);
+    public List listRecords(String[] set, String[] from, String[] until, String metadataPrefix, String instance) {
+        return listRecordsOrIdentifiers(set, from, until, metadataPrefix, instance, true);
     }
 
-    private List listRecordsOrIdentifiers(String[] set, String[] from,
-            String[] until, String metadataPrefix, String instance,
-            boolean listRecords) {
+    private List listRecordsOrIdentifiers(String[] set, String[] from, String[] until, String metadataPrefix, String instance, boolean listRecords) {
         List list = new ArrayList();
 
-        if (hasMore()
-                && ((listRecords == lastQuery.equals("listRecords")) || (!listRecords == lastQuery
-                        .equals("listIdentifiers")))) {
-            for (int i = deliveredResults; i < Math.min(maxReturns
-                    + deliveredResults, numResults); i++) {
+        if (hasMore() && ((listRecords == lastQuery.equals("listRecords")) || (!listRecords == lastQuery.equals("listIdentifiers")))) {
+            for (int i = deliveredResults; i < Math.min(maxReturns + deliveredResults, numResults); i++) {
                 list.add(resultArray[i]);
             }
-            deliveredResults = Math.min(maxReturns + deliveredResults,
-                    numResults);
+            deliveredResults = Math.min(maxReturns + deliveredResults, numResults);
             return list;
         }
 
         resetResults(listRecords ? "listRecords" : "listIdentifiers");
-        
-        //create a new query
-        Element query = new Element("query");
-        query.setAttribute("maxResults","1000000");
-        
-        Element conditions = new Element("conditions");
-        conditions.setAttribute("format","xml");
-        
-        Element and = new Element("boolean");
-        and.setAttribute("operator","and");
- 
-        Element hosts = new Element("hosts");
-        
-        Element host = new Element("host");
-        host.setAttribute("field","local");
-        
-        Element sortBy = new Element("sortBy");
-        
-        Element sortfield = new Element("field");
-        sortfield.setAttribute("field","id");
-        sortfield.setAttribute("order","ascending");
 
-        sortBy.addContent(sortfield);
-        
-        hosts.addContent(host);
-      
-        try {
-        	Element restriction = MCROAIProvider.getConfigBean(instance).getQueryRestriction();
-        	if(restriction != null)
-        		and.addContent(restriction);
-        } catch (MCRConfigurationException mcrx) {
-        	logger.warn("error in adding oai restriction", mcrx);
-        }
+        // create query condition
+        MCRAndCondition cAnd = new MCRAndCondition();
+
+        String restriction = MCROAIProvider.getConfigBean(instance).getQueryRestriction();
+        if (restriction != null)
+            try {
+                cAnd.addChild(new MCRQueryParser().parse(restriction));
+            } catch (MCRException mcrx) {
+                logger.warn("Error in adding OAI restriction: " + restriction, mcrx);
+            }
 
         List searchFields = MCROAIProvider.getConfigBean(instance).getSearchFields();
-        Element or = new Element("boolean");
-        or.setAttribute("operator", "or");
+
+        MCROrCondition cOr = new MCROrCondition();
         for (Iterator it = searchFields.iterator(); it.hasNext();) {
-			String searchField = (String) it.next();
+            String searchField = (String) it.next();
+            MCRFieldDef field = MCRFieldDef.getDef(searchField);
             if (set == null) {
-            	Element condition = new Element("condition");
-                condition.setAttribute("field",searchField);
-                condition.setAttribute("value","");
-                condition.setAttribute("operator","like");
-                or.addContent(condition); 
+                cOr.addChild(new MCRQueryCondition(field, "like", ""));
             } else {
-                String categoryId = set[0]
-                        .substring(set[0].lastIndexOf(':') + 1);
-                Element condition = new Element("condition");
-                condition.setAttribute("field", searchField);
-                condition.setAttribute("value",categoryId);
-                condition.setAttribute("operator","like");            
-                or.addContent(condition);                
+                String categoryId = set[0].substring(set[0].lastIndexOf(':') + 1);
+                cOr.addChild(new MCRQueryCondition(field, "like", categoryId));
             }
         }
-        if ( or.getChildren() != null) {
-        	and.addContent(or);
+        if ((cOr.getChildren() != null) && (cOr.getChildren().size() > 0)) {
+            cAnd.addChild(cOr);
         }
+
+        MCRFieldDef field = MCRFieldDef.getDef("modified");
         if (from != null) {
-        	String date = getTimeStamp(from[0]);
-            Element condition = new Element("condition");
-            condition.setAttribute("field","modified");
-            condition.setAttribute("value",date);
-            condition.setAttribute("operator",">=");            
-            and.addContent(condition);         	
+            String date = getTimeStamp(from[0]);
+            cAnd.addChild(new MCRQueryCondition(field, ">=", date));
         }
 
         if (until != null) {
             String date = getTimeStamp(until[0]);
-            Element condition = new Element("condition");
-            condition.setAttribute("field","modified");
-            condition.setAttribute("value",date);
-            condition.setAttribute("operator","<=");            
-            and.addContent(condition);             
+            cAnd.addChild(new MCRQueryCondition(field, "<=", date));
         }
 
-        conditions.addContent(and);
-        query.addContent(conditions);
-        query.addContent(hosts);
-        query.addContent(sortBy);        
-        
-        Document jdomQuery = new Document(query);
+        MCRQuery query = new MCRQuery(cAnd);
+        query.setMaxResults(1000000);
 
-        XMLOutputter out = new XMLOutputter(Format.getPrettyFormat());
-        logger.debug("OAI-QUERY:" + out.outputString(jdomQuery));
-        MCRResults results = MCRQueryManager.search(MCRQuery.parseXML(jdomQuery));
-       
+        MCRSortBy sortBy = new MCRSortBy(MCRFieldDef.getDef("id"), MCRSortBy.ASCENDING);
+        List sortCriteria = new ArrayList();
+        sortCriteria.add(sortBy);
+        query.setSortBy(sortCriteria);
+
+        logger.debug("OAI-QUERY:" + cAnd);
+        MCRResults results = MCRQueryManager.search(query);
+
         numResults = results.getNumHits();
         resultArray = new Object[numResults];
-        logger.debug("OAIQuery found:" + numResults + " hits")   ;     
+        logger.debug("OAIQuery found:" + numResults + " hits");
         deliveredResults = Math.min(maxReturns, numResults);
-        logger.debug("deliveredResults:" + deliveredResults)   ;  
-		for (int i = 0; i < numResults; i++) {
-			resultArray[i] = results.getHit(i).getID();
-		}
+        logger.debug("deliveredResults:" + deliveredResults);
+        for (int i = 0; i < numResults; i++) {
+            resultArray[i] = results.getHit(i).getID();
+        }
         for (int i = 0; i < deliveredResults; i++) {
-        	list.add(resultArray[i]);
+            list.add(resultArray[i]);
         }
 
         return list;
@@ -377,17 +326,17 @@ public class MCROAIQueryImpl implements MCROAIQuery {
         return deliveredResults < numResults;
     }
 
-    private String getTimeStamp(String isoDate){
-    	int len = isoDate.length();
-    	if(len == 10){
-    		return isoDate + " 00:00:00";
-    	}else if(len == 20){
-    		return isoDate.substring(0,10) + " " + isoDate.substring(11,19);
-    	}
-    	logger.warn("unallowed iso date format:" + isoDate);
-    	return null;
+    private String getTimeStamp(String isoDate) {
+        int len = isoDate.length();
+        if (len == 10) {
+            return isoDate + " 00:00:00";
+        } else if (len == 20) {
+            return isoDate.substring(0, 10) + " " + isoDate.substring(11, 19);
+        }
+        logger.warn("unallowed iso date format:" + isoDate);
+        return null;
     }
-    
+
     private void resetResults(String query) {
         deliveredResults = 0;
         numResults = 0;

@@ -4,9 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.jdom.Element;
 import org.mycore.common.MCRConfiguration;
-import org.mycore.common.xml.MCRXMLHelper;
 
 public class MCROAIConfigBean {
 	
@@ -17,7 +15,7 @@ public class MCROAIConfigBean {
 	private String repositoryName;
 	private String repositoryIdentifier;
 	//	 you can define for each instance of your application a special restriction
-	private Element queryRestriction;
+	private String queryRestriction;
 	//	 searchfields from searchfields.xml relevant for oai list set
 	private List searchFields;
 	//	 classificationID relevant for the oai list set
@@ -27,7 +25,7 @@ public class MCROAIConfigBean {
     	this.oaiInstanceName = instance;
     	String restriction = config.getString("MCR.oai.queryRestriction." + instance,"");
     	if(!restriction.equals("")) {
-    		this.queryRestriction = (Element)MCRXMLHelper.parseXML(restriction).getRootElement().detach();
+    		this.queryRestriction = restriction;
     	}
     	String[] searchFieldsAr = config.getString("MCR.oai.setscheme.searchfields." + instance,"format,type").replaceAll(" ","").split(",");
     	this.searchFields = Arrays.asList(searchFieldsAr);
@@ -82,11 +80,11 @@ public class MCROAIConfigBean {
 	}
 
 
-	public Element getQueryRestriction() {
+	public String getQueryRestriction() {
 		return queryRestriction;
 	}
 
-	public void setQueryRestriction(Element queryRestriction) {
+	public void setQueryRestriction(String queryRestriction) {
 		this.queryRestriction = queryRestriction;
 	}
 
