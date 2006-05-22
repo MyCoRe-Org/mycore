@@ -672,11 +672,7 @@ public class MCRUserMgr {
      * @return maximum value of the numerical user IDs
      */
     public final int getMaxUserNumID() throws MCRException {
-        // Check the permissions
-        if (!AI.checkPermission("create-user")) {
-            throw new MCRException("The current user does not have the permission to create a user!");
-        }
-
+    	//whitout checking a permission, because we only want to see it
         return mcrUserStore.getMaxUserNumID();
     }
 
