@@ -1,455 +1,587 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
-<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xalan="http://xml.apache.org/xalan" >
+<?xml version="1.0" encoding="UTF-8"?>
 
-<!-- wcmsAdmin  ============================================================================== -->
-<xsl:template name="wcmsAdministration" >
+<!-- =====================================================================================
+========================================================================================={
 
-  <xsl:choose>	   
-    <xsl:when test=" /cms/session = 'welcome' " >
-	  <xsl:call-template name="wcmsAdministration.welcome" />	  
-	</xsl:when>	
-	
-    <xsl:when test="/cms/session = 'logs' " >  
-	  <xsl:call-template name="wcmsAdministration.logStatistic" />
-    </xsl:when> 		
-  	
-    <xsl:when test=" /cms/session = 'managGlobal' " >
-	<xsl:call-template name="wcmsAdministration.managGlobal" />
-    </xsl:when>                                          	  
-  </xsl:choose>	
+title: wcms_admin.xsl
 
-</xsl:template>
-<!-- END OF: wcmsAdmin  ================================================================================= -->
+Wertet /cms/session aus und erzeugt entsprechende Seite.
 
-<!-- welcome  ============================================================================== -->
-<xsl:template name="wcmsAdministration.welcome" >
+	- Menue (Seitenpflege, globale Einstellungen, Statistik, Abmelden)
+	- globale Einstellung (Template) aendern
+	- Nutzerstatistik anzeigen
 
-<table width="90%" border="0" cellspacing="0" cellpadding="0" align="center">
-      <xsl:call-template name="wcms.headline" >
-            <xsl:with-param name="infoText" 
-                  select="concat(/cms/userRealName,', herzlich Willkommen im Web Content Management System !')"></xsl:with-param>
-            <xsl:with-param name="align" select="'left'"></xsl:with-param>
-      </xsl:call-template>
-      <tr>
-            <td colspan="2"> <br/> Die folgenden Optionen stehen für sie zur Verfügung: <br/><br/> <img 
-                  src="{$WebApplicationBaseURL}images/naviMenu/greenArrow.gif" width="16" 
-                  height="8" border="0" alt="" title=""/> <a href="{$ServletsBaseURL}WCMSAdminServlet?action=choose">Pflege von Webseiten</a> 
-                     
-                     <xsl:if test=" /cms/userClass = 'admin' ">
-                        <br/> 
-                         <img 
-		                  src="{$WebApplicationBaseURL}images/naviMenu/greenArrow.gif" width="16" 
-		                  height="8" border="0" alt="" title=""/> 
-		                    <a href="{$ServletsBaseURL}WCMSAdminServlet?action=managGlobal">Globale Einstellungen</a>                                       
-                     </xsl:if>   
+template:
+	- wcmsAdministration (name)
+	- wcmsAdministration.welcome (name)
+	- wcmsAdministration.logStatistic (name)
+	- wcmsAdministration.managGlobal (name)
+	- wcmsAdministration.managGlobal.defaultTempl(name)
+	- wcmsAdministration.managGlobal.saveButton (name)
 
-		       <br/>                    
-                   <img 
-	                  src="{$WebApplicationBaseURL}images/naviMenu/greenArrow.gif" width="16" 
-	                  height="8" border="0" alt="" title="" />                                       
-                   <a 
-                  href="{$ServletsBaseURL}WCMSAdminServlet?action=logs&amp;sort=date&amp;sortOrder=descending">Nutzungsstatistik einsehen</a> 
-                  <br/><br/> 
+}=========================================================================================
+====================================================================================== -->
 
-                   <img 
-	                  src="{$WebApplicationBaseURL}images/naviMenu/greenArrow.gif" width="16" 
-	                  height="8" border="0" alt="" title="" /> 
-                    <a href="javascript: window.close()">Abmelden</a> 
+<xsl:stylesheet 
+	version="1.0" 
+	xmlns:xsl="http://www.w3.org/1999/XSL/Transform" 
+	xmlns:xalan="http://xml.apache.org/xalan" >
 
-            </td>
-      </tr>
-</table>
+<!-- ====================================================================================={
 
-</xsl:template>
-<!-- END OF: welcome  ================================================================================= -->
+section: Template: name="wcmsAdministration"
 
-<!-- logStatistic  ==================================================================================== -->
-<xsl:template name="wcmsAdministration.logStatistic" >
+	- Startet je nach Inhalt der /cms/session ein Template
 
-<xsl:variable name="sortBy" select="/cms/sort" />
-<xsl:variable name="currentSortOrder" select="/cms/sort/@order" />
+		- welcome - wcmsAdministration.welcome
+		- logs - wcmsAdministration.logStatistic
+		- managGlobal - wcmsAdministration.managGlobal
 
-<xsl:variable name="flipedSortOrder" >
-	<xsl:choose>
-	  <xsl:when test="$currentSortOrder = 'ascending' " >
-	    <xsl:value-of select="'descending'" />
-	  </xsl:when>
-	  <xsl:otherwise>
-	    <xsl:value-of select="'ascending'" />	
-	  </xsl:otherwise>
-	</xsl:choose>	
-</xsl:variable>
 
-<table width="90%" border="0" cellspacing="0" cellpadding="0" align="center">
+}===================================================================================== -->
 
-  <tr>
-    <th width="50%" align="left">MyCoRe-WCMS :: das Web Content Management Modul</th>
-    <th width="50%" align="right">
-WCMS-Nutzer:
-	  '<xsl:value-of select="/cms/userID" />'
-	  (<xsl:value-of select="/cms/userClass" />)	
-	</th>
-  </tr>
-    
-  <!-- sort order information -->
-  <tr>
-    <th align="left" nowrap="yes" class="gray_noBorder">
-      <br/>	
-	   <xsl:value-of select=" count(/cms/loggings/log)" /> Einträge	sortiert nach 
+	<xsl:template name="wcmsAdministration" >
+
+	<xsl:choose>	   
+		<xsl:when test=" /cms/session = 'welcome' " >
+			<xsl:call-template name="wcmsAdministration.welcome" />	  
+		</xsl:when>	
+		
+		<xsl:when test="/cms/session = 'logs' " >  
+			<xsl:call-template name="wcmsAdministration.logStatistic" />
+		</xsl:when> 		
+		
+		<xsl:when test=" /cms/session = 'managGlobal' " >
+			<xsl:call-template name="wcmsAdministration.managGlobal" />
+		</xsl:when>                                          	  
+	  </xsl:choose>	
+
+	</xsl:template>
+
+<!-- ====================================================================================={
+
+section: Template: name="wcmsAdministration.welcome"
+
+	- erzeugt das Menue der Administrationsoberflaeche
+
+		- ruft das Template wcms.headline
+		- verweist auf das WCMSAdminServlet
+		- je nach Aufgabe auf wird entsprechend der Parameter action gesetzt 
+
+}===================================================================================== -->
+
+	<xsl:template name="wcmsAdministration.welcome" >
+
+		<table width="90%" border="0" cellspacing="0" cellpadding="0" align="center">
+
+			<!-- Ueberschrift und Ausrichtung -->
+			<xsl:call-template name="wcms.headline" >
+				<xsl:with-param 
+					name="infoText" 
+					select="concat(/cms/userRealName,', herzlich Willkommen im Web Content Management System !')">
+				</xsl:with-param>
+				<xsl:with-param 
+					name="align" 
+					select="'left'">
+				</xsl:with-param>
+			</xsl:call-template>
+
+			<tr>
+				<td colspan="2">
+					<br/>
+					Die folgenden Optionen stehen fÃ¼r sie zur VerfÃ¼gung:
+					<br/><br/>
+					<img 
+						src="{$WebApplicationBaseURL}templates/master/template_wcms/IMAGES/naviMenu/greenArrow.gif" 
+						width="16" height="8" border="0" alt="" title=""/> 
+					<a href="{$ServletsBaseURL}WCMSAdminServlet?action=choose">
+						Pflege von Webseiten
+					</a>
+
+					<!-- Nur fuer den Administrator -->
+					<xsl:if test=" /cms/userClass = 'admin' ">
+						<br/> 
+						<img 
+							src="{$WebApplicationBaseURL}templates/master/template_wcms/IMAGES/naviMenu/greenArrow.gif" 
+							width="16" height="8" border="0" alt="" title=""/> 
+						<a href="{$ServletsBaseURL}WCMSAdminServlet?action=managGlobal">
+							Globale Einstellungen
+						</a>
+					</xsl:if>
+
+					<br/>
+					<img 
+						src="{$WebApplicationBaseURL}templates/master/template_wcms/IMAGES/naviMenu/greenArrow.gif" 
+						width="16" height="8" border="0" alt="" title="" />
+					<a href="{$ServletsBaseURL}WCMSAdminServlet?action=logs&amp;sort=date&amp;sortOrder=descending">
+						Nutzungsstatistik einsehen
+					</a> 
+					<br/><br/>
+					<img 
+						src="{$WebApplicationBaseURL}templates/master/template_wcms/IMAGES/naviMenu/greenArrow.gif" 
+						width="16" height="8" border="0" alt="" title="" /> 
+					<a href="javascript: window.close()">
+						Abmelden
+					</a>
+				</td>
+			</tr>
+		</table>
+
+	</xsl:template>
+
+<!-- ====================================================================================={
+
+section: Template: name="wcmsAdministration.logStatistic"
+
+	- stellt Anfragen an das wcmsAdminServlet (Nutzerstatistik)
+	- praesentiert die Ergebnisse
+
+}===================================================================================== -->
+
+	<xsl:template name="wcmsAdministration.logStatistic" >
+
+		<xsl:variable name="sortBy" select="/cms/sort" />
+		<xsl:variable name="currentSortOrder" select="/cms/sort/@order" />
+
+		<xsl:variable name="flipedSortOrder" >
+			<xsl:choose>
+				<xsl:when test="$currentSortOrder = 'ascending' " >
+					<xsl:value-of select="'descending'" />
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:value-of select="'ascending'" />	
+				</xsl:otherwise>
+			</xsl:choose>	
+		</xsl:variable>
+
+		<!-- Menueleiste einblenden, Parameter = ausgewaehlter Menuepunkt -->
+		<xsl:call-template name="menuleiste">
+			<xsl:with-param name="menupunkt" select="'Statistik'" />
+		</xsl:call-template>
+
+		<xsl:variable name="wieSortiert" >
+			<xsl:choose>
+				<xsl:when test="count(/cms/loggings/log) > 1">
+					<xsl:text>Ein Eintrag</xsl:text>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:value-of select=" count(/cms/loggings/log)" />
+					<xsl:text> EintrÃ¤ge sortiert nach </xsl:text>
+				</xsl:otherwise>
+			</xsl:choose>
 			<!-- which column -->
 			<xsl:choose>
-			  <xsl:when test=" $sortBy = 'date' " >
-		        Datum, Zeit
-			  </xsl:when>
-			  <xsl:when test="/cms/userClass != 'autor' and $sortBy = 'userRealName' " >
-				Nutzer
-			  </xsl:when>
-			  <xsl:when test=" $sortBy = 'labelPath' " >
-				Seite
-			  </xsl:when>
-			  <xsl:when test=" $sortBy = 'doneAction' " >
-				Aktion
-			  </xsl:when>
-			  <xsl:when test="/cms/userClass = 'admin' and $sortBy = 'backupContentFile' " >
-				Backup Inhalt  		  
-			  </xsl:when>
-			  <xsl:when test="/cms/userClass = 'admin' and $sortBy = 'backupNavigationFile' " >
-				Backup Navigation
-			  </xsl:when>
-			</xsl:choose>			  
+				<xsl:when test=" $sortBy = 'date' " >
+					<xsl:text>Datum</xsl:text>
+				</xsl:when>
+				<xsl:when test="/cms/userClass != 'autor' and $sortBy = 'userRealName' " >
+					<xsl:text>Nutzer</xsl:text>
+				</xsl:when>
+				<xsl:when test=" $sortBy = 'labelPath' " >
+					<xsl:text>Seite</xsl:text>
+				</xsl:when>
+				<xsl:when test=" $sortBy = 'doneAction' " >
+					<xsl:text>Aktion</xsl:text>
+				</xsl:when>
+				<xsl:when test="/cms/userClass = 'admin' and $sortBy = 'backupContentFile' " >
+					<xsl:text>Backup Inhalt</xsl:text>
+				</xsl:when>
+				<xsl:when test="/cms/userClass = 'admin' and $sortBy = 'backupNavigationFile' " >
+					<xsl:text>Backup Navigation</xsl:text>
+				</xsl:when>
+			</xsl:choose>
 			<!-- which order -->
 			<xsl:choose>
-			  <xsl:when test="$currentSortOrder = 'ascending' " >
+				<xsl:when test="$currentSortOrder = 'ascending' " >
 					<xsl:choose>
-					  <xsl:when test="$sortBy = 'date' " >
-						(von alt nach neu)
-					  </xsl:when>
-					  <xsl:otherwise>
-						(aufsteigend)				
-					  </xsl:otherwise>
+						<xsl:when test="$sortBy = 'date' " >
+							[alte EintrÃ¤ge zuerst]
+						</xsl:when>
+						<xsl:otherwise>
+							[aufsteigend]
+						</xsl:otherwise>
 					</xsl:choose>
-			  </xsl:when>
-			  <xsl:otherwise>
+				</xsl:when>
+				<xsl:otherwise>
 					<xsl:choose>
-					  <xsl:when test="$sortBy = 'date' " >
-						(von neu nach alt)
-					  </xsl:when>
-					  <xsl:otherwise>
-						(absteigend)
-					  </xsl:otherwise>
+						<xsl:when test="$sortBy = 'date' " >
+							[neue EintrÃ¤ge zuerst]
+						</xsl:when>
+						<xsl:otherwise>
+							[absteigend]
+						</xsl:otherwise>
 					</xsl:choose>
-			  </xsl:otherwise>
+				</xsl:otherwise>
 			</xsl:choose>
-	</th>
-    <th align="right" class="gray_noBorder">
-      <br/>
-	    Nutzungsprotokoll WCMS-Modul
-	</th>
-  </tr>
-  <!-- END OF: sort order information -->
-    
-  <tr> 
-    <td colspan="2"><br/></td>
-  </tr>
-  
-  <!-- back button -->  
-  <tr>
-    <td colspan="2" align="right" width="100%">
-	    <table cellspacing="0" cellpadding="0" align="right">
-		  <tr>
-				<td align="right">
-					<img src="{$WebApplicationBaseURL}templates/master/template_wcms/IMAGES/box_left.gif" 
-						width="11" height="22" border="0" alt="" title="" />
-				</td>
-				 <td align="right" class="button">
-			       <a href="{$ServletsBaseURL}WCMSLoginServlet">zurück zur WCMS-Startseite</a>
-				 </td>
-				<td align="right">
-					<img 
-						src="{$WebApplicationBaseURL}templates/master/template_wcms/IMAGES/box_right.gif" 
-						width="11" height="22" border="0" alt="" title="" />
-				</td>
-		  </tr>
-		</table>
-    </td>
-  </tr>
-  <!-- END OF: back button -->    
-  
-  <tr> 
-    <td colspan="2"><br/></td>
-  </tr>  
-  
-  <!-- log table -->
-  <tr>
-    <td width="100%" colspan="2" align="center" valign="top">
-	  <table class="table" width="100%" cellspacing="0" cellpadding="0">
-	    <!-- table headline -->
-	    <tr>
-		    <!-- date, time column -->
-			<xsl:choose>
-			  <xsl:when test=" $sortBy = 'date' " >
-		         <td align="center" class="green">
-		           <a href="WCMSAdminServlet?action=logs&amp;sort=date&amp;sortOrder={$flipedSortOrder}">Datum, Zeit</a>
-		         </td>			
-			  </xsl:when>
-			  <xsl:otherwise>
-		        <th><a href="WCMSAdminServlet?action=logs&amp;sort=date&amp;sortOrder={$currentSortOrder}">Datum, Zeit</a></th>						
-			  </xsl:otherwise>
-			</xsl:choose>
-			
-			<!-- user name column -->
-			<xsl:choose>
-			  <xsl:when test="/cms/userClass != 'autor' and $sortBy = 'userRealName' " >
-			    <td align="center" class="green"><a href="WCMSAdminServlet?action=logs&amp;sort=userRealName&amp;sortOrder={$flipedSortOrder}">Nutzer</a></td>
-			  </xsl:when>
-			  <xsl:when test="/cms/userClass != 'autor' and $sortBy != 'userRealName' " >
-			    <th><a href="WCMSAdminServlet?action=logs&amp;sort=userRealName&amp;sortOrder={$currentSortOrder}">Nutzer</a></th>
-			  </xsl:when>
-			</xsl:choose>			
-			
-			<!-- page column -->
-			<xsl:choose>
-			  <xsl:when test=" $sortBy = 'labelPath' " >
-			      <td align="center" class="green">
-			         <a href="WCMSAdminServlet?action=logs&amp;sort=labelPath&amp;sortOrder={$flipedSortOrder}">Seite</a>
-			      </td>
-			  </xsl:when>
-			  <xsl:otherwise>
-			      <th><a href="WCMSAdminServlet?action=logs&amp;sort=labelPath&amp;sortOrder={$currentSortOrder}">Seite</a></th>
+		</xsl:variable>
 
-			  </xsl:otherwise>
-			</xsl:choose>			
-			
-			<!-- done action column -->
-			<xsl:choose>
-			  <xsl:when test=" $sortBy = 'doneAction' " >
-				  <td align="center" class="green"><a href="WCMSAdminServlet?action=logs&amp;sort=doneAction&amp;sortOrder={$flipedSortOrder}">Aktion</a></td>
-			  </xsl:when>
-			  <xsl:otherwise>
-				  <th><a href="WCMSAdminServlet?action=logs&amp;sort=doneAction&amp;sortOrder={$currentSortOrder}">Aktion</a></th>
-			  </xsl:otherwise>
-			</xsl:choose>					  
-			
-			<!-- backup column -->
-			<xsl:choose>
-			  <xsl:when test="/cms/userClass = 'systemAdmin' and ($sortBy = 'backupContentFile' or $sortBy = 'backupNavigationFile') " >
-		        <td align="center" class="green">
-				 <b>
-			      Backup<a href="WCMSAdminServlet?action=logs&amp;sort=backupContentFile&amp;sortOrder={$flipedSortOrder}"> (Inhalt</a>
-				  <a href="WCMSAdminServlet?action=logs&amp;sort=backupNavigationFile&amp;sortOrder={$flipedSortOrder}">, Navigation)</a>
-				 </b>
-			    </td>		  		  		  		  		  
-			  </xsl:when>
-			  <xsl:when test="/cms/userClass = 'systemAdmin' and ($sortBy != 'backupContentFile' and $sortBy != 'backupNavigationFile') " >
-		        <th>
-			      Backup<a href="WCMSAdminServlet?action=logs&amp;sort=backupContentFile&amp;sortOrder={$currentSortOrder}"> (Inhalt</a>
-				  <a href="WCMSAdminServlet?action=logs&amp;sort=backupNavigationFile&amp;sortOrder={$currentSortOrder}">, Navigation)</a>
-			    </th>		  		  		  		  		  
-			  </xsl:when>
-			</xsl:choose>			  
-	    </tr>
-	    <!-- END OF: table headline -->		
-		
-		<!-- content cells -->
-  	    <xsl:choose>
-		  <!-- primary to sort by date -->
-		  <xsl:when test="$sortBy = 'date' " >
-			<xsl:for-each select="/cms/loggings/log">					  			
-	  		  <xsl:sort select="@*[name() = $sortBy] | @*[concat('@',name()) = $sortBy]" order="{$currentSortOrder}" />  	
-			  <xsl:sort select="@time" order="{$currentSortOrder}" />  	
-			    <tr>
-					  <!-- date, time -->
-				      <td valign="top">
-					    <xsl:value-of select="substring(@date,9,2)" />.<xsl:value-of select="substring(@date,6,2)" />.<xsl:value-of select="substring(@date,1,4)" />,
-					     <br/>
-						  <xsl:value-of select="@time" />	Uhr	  
-						 <br/>
-					  </td>
-					  <!-- user -->			  
-					  <xsl:if test="/cms/userClass != 'autor' " >			  
-				        <td valign="top"><xsl:value-of select="@userRealName" /></td>
-					  </xsl:if>				
-					  <!-- label path -->  
-				      <td valign="top"><xsl:value-of select="@labelPath" />
-					
-						 <!-- show given notes -->
-						 <xsl:if test=" note != '' " >
-							 <br/><br/>
-								 Autor: 
-								 <i>
-									 '<xsl:value-of select=" note " />'
-								 </i>
-						 </xsl:if>
-			      
-				      </td>
-					  
-					  <!-- done action -->
-						<xsl:choose>
-						  <xsl:when test="@doneAction = 'add' " >
-						      <td valign="top" style="color:#9C6300;">erstellt</td>							
-						  </xsl:when>
-						  <xsl:when test="@doneAction = 'edit' " >
-						      <td valign="top" >geändert</td>							
-						  </xsl:when>
-						  <xsl:when test="@doneAction = 'delete' " >
-						      <td valign="top" style="color:#AF0101;">gelöscht</td>							
-						  </xsl:when>							  							
-						  <xsl:when test="@doneAction = 'translate' " >
-						      <td valign="top" style="color:#206F20;">übersetzt</td>							
-						  </xsl:when>    
-						</xsl:choose>
-							
-					  <!-- backup location -->
-					  <xsl:if test="/cms/userClass = 'systemAdmin' " >		  
-					    <td valign="top"><xsl:value-of select="@backupContentFile" />		  		  
-							<br/>
-						    <xsl:value-of select="@backupNavigationFile" />		  		  			
-					    </td>		  		  		  		  		  
-				 	  </xsl:if>				  
-			    </tr>				
-			  </xsl:for-each>								  
-			</xsl:when>
-			
-		    <!-- primary NOT to sort by date -->			
-			<xsl:otherwise>
- 			  <xsl:for-each select="/cms/loggings/log">					  						
-	  		    <xsl:sort select="@*[name() = $sortBy] | @*[concat('@',name()) = $sortBy]" order="{$currentSortOrder}" />  		
-			    <xsl:sort select="@date" order="{$flipedSortOrder}" />  	
-			    <xsl:sort select="@time" order="{$flipedSortOrder}" />  	
-				    <tr>
-						  <!-- date, time -->
-					      <td valign="top">
-						    <xsl:value-of select="substring(@date,9,2)" />.<xsl:value-of select="substring(@date,6,2)" />.<xsl:value-of select="substring(@date,1,4)" />,
-						     <br/>
-							  <xsl:value-of select="@time" />	Uhr	  
-							 <br/>
-						  </td>
-						  <!-- user -->			  
-						  <xsl:if test="/cms/userClass != 'autor' " >			  
-					        <td valign="top"><xsl:value-of select="@userRealName" /></td>
-						  </xsl:if>				
-						  <!-- label path -->  
-					      <td valign="top"><xsl:value-of select="@labelPath" /></td>
+	<!-- Seitenname -->
+	<xsl:call-template name="zeigeSeitenname">
+		<xsl:with-param name="seitenname">
+			<xsl:text>WCMS Nutzungsprotokoll</xsl:text>
+			<!-- xsl:text>WCMS Nutzungsprotokoll einsehen [</xsl:text>
+			<xsl:value-of select="$wieSortiert"/>
+			<xsl:text>]</xsl:text-->
+		</xsl:with-param>
+	</xsl:call-template>
 
-						  <!-- done action -->
+	<!-- Inhaltsbereich -->
+	<div id="statistic-width">
+		<div id="statistic">
+			<!-- div class="titel">WCMS Nutzungsprotokoll</div -->
+			<div class="inhalt">
+					<table>
+						<!-- table headline -->
+						<tr>
+							<!-- date, time column -->
 							<xsl:choose>
-							  <xsl:when test="@doneAction = 'add' " >
-							      <td valign="top" style="color:#9C6300;">erstellt</td>							
-							  </xsl:when>
-							  <xsl:when test="@doneAction = 'edit' " >
-							      <td valign="top" >geändert</td>							
-							  </xsl:when>
-							  <xsl:when test="@doneAction = 'delete' " >
-							      <td valign="top" style="color:#AF0101;">gelöscht</td>							
-							  </xsl:when>
-						  <xsl:when test="@doneAction = 'translate' " >
-						      <td valign="top" style="color:#206F20;">übersetzt</td>							
-						  </xsl:when>							    
+								<xsl:when test=" $sortBy = 'date' " >
+									<th id="aktive-row">
+										<a href="WCMSAdminServlet?action=logs&amp;sort=date&amp;sortOrder={$flipedSortOrder}">
+											<xsl:choose>
+												<xsl:when test="$currentSortOrder='descending'">
+													<xsl:text>&#8659; </xsl:text>
+												</xsl:when>
+												<xsl:when test="$currentSortOrder='ascending'">
+													<xsl:text>&#8657; </xsl:text>
+												</xsl:when>
+											</xsl:choose>
+											<xsl:text>Datum</xsl:text>
+										</a>
+									</th>
+								</xsl:when>
+								<xsl:otherwise>
+									<th>
+										<a href="WCMSAdminServlet?action=logs&amp;sort=date&amp;sortOrder={$currentSortOrder}">
+											<xsl:text>Datum</xsl:text>
+										</a>
+									</th>
+								</xsl:otherwise>
 							</xsl:choose>
 
-						  <!-- backup location -->
-						  <xsl:if test="/cms/userClass = 'systemAdmin' " >		  
-						    <td valign="top"><xsl:value-of select="@backupContentFile" />		  		  
-								<br/>
-							    <xsl:value-of select="@backupNavigationFile" />		  		  			
-						    </td>		  		  		  		  		  
-						  </xsl:if>				  
-				    </tr>								  
-			  </xsl:for-each>								  					
-		    </xsl:otherwise>
-	    </xsl:choose>		
-		<!-- END OF : content cells -->		
-		
-	  </table>
-	</td>
-  </tr>
-  <!-- END OF: log table -->
-  
-  <tr> 
-    <td colspan="2"><br/></td>
-  </tr>
+							<!-- user name column -->
+							<xsl:choose>
+								<xsl:when test="/cms/userClass != 'autor' and $sortBy = 'userRealName' " >
+									<th id="aktive-row">
+										<a href="WCMSAdminServlet?action=logs&amp;sort=userRealName&amp;sortOrder={$flipedSortOrder}">
+											<xsl:choose>
+												<xsl:when test="$currentSortOrder='descending'">
+													<xsl:text>&#8659; </xsl:text>
+												</xsl:when>
+												<xsl:when test="$currentSortOrder='ascending'">
+													<xsl:text>&#8657; </xsl:text>
+												</xsl:when>
+											</xsl:choose>
+											<xsl:text>Benutzer</xsl:text>
+										</a>
+									</th>
+								</xsl:when>
+								<xsl:when test="/cms/userClass != 'autor' and $sortBy != 'userRealName' " >
+									<th>										
+										<a href="WCMSAdminServlet?action=logs&amp;sort=userRealName&amp;sortOrder={$currentSortOrder}">
+											<xsl:text>Benutzer</xsl:text>
+										</a>
+									</th>
+								</xsl:when>
+							</xsl:choose>
 
-  <!-- back button -->  
-  <tr>
-    <td colspan="2" align="right" width="100%">
-	    <table cellspacing="0" cellpadding="0" align="right">
-		  <tr>
-				<td align="right">
-					<img src="{$WebApplicationBaseURL}templates/master/template_wcms/IMAGES/box_left.gif" 
-						width="11" height="22" border="0" alt="" title="" />
-				</td>
-				 <td align="right" class="button">
-			       <a href="{$ServletsBaseURL}WCMSLoginServlet">zurück zur WCMS-Startseite</a>
-				 </td>
-				<td align="right">
-					<img 
-						src="{$WebApplicationBaseURL}templates/master/template_wcms/IMAGES/box_right.gif" 
-						width="11" height="22" border="0" alt="" title="" />
-				</td>
-		  </tr>
-		</table>
-    </td>
-  </tr>
-  <!-- END OF: back button -->        
-   
-  <tr> 
-    <td colspan="2"><br/></td>
-  </tr>   
-   
-</table>
- 
-</xsl:template>
-<!-- END OF: logStatistic  ================================================================================= -->
+							<!-- page column -->
+							<xsl:choose>
+								<xsl:when test=" $sortBy = 'labelPath' " >
+									<th id="aktive-row">
+										<a href="WCMSAdminServlet?action=logs&amp;sort=labelPath&amp;sortOrder={$flipedSortOrder}">
+											<xsl:choose>
+											<xsl:when test="$currentSortOrder='descending'">
+													<xsl:text>&#8659; </xsl:text>
+												</xsl:when>
+												<xsl:when test="$currentSortOrder='ascending'">
+													<xsl:text>&#8657; </xsl:text>
+												</xsl:when>
+											</xsl:choose>
+											<xsl:text>Seite</xsl:text>
+										</a>
+									</th>
+								</xsl:when>
+								<xsl:otherwise>
+									<th>
+										<a href="WCMSAdminServlet?action=logs&amp;sort=labelPath&amp;sortOrder={$currentSortOrder}">
+											<xsl:text>Seite</xsl:text>
+										</a>
+									</th>
+								</xsl:otherwise>
+							</xsl:choose>
 
-<!-- wcmsAdministration.managGlobal  ============================================================================== -->
+							<!-- done action column -->
+							<xsl:choose>
+								<xsl:when test=" $sortBy = 'doneAction' " >
+									<th id="aktive-row">
+										<a href="WCMSAdminServlet?action=logs&amp;sort=doneAction&amp;sortOrder={$flipedSortOrder}">
+											<xsl:choose>
+												<xsl:when test="$currentSortOrder='descending'">
+													<xsl:text>&#8659; </xsl:text>
+												</xsl:when>
+												<xsl:when test="$currentSortOrder='ascending'">
+													<xsl:text>&#8657; </xsl:text>
+												</xsl:when>
+											</xsl:choose>											
+											<xsl:text>Aktion</xsl:text>
+										</a>
+									</th>
+								</xsl:when>
+								<xsl:otherwise>
+									<th>
+										<a href="WCMSAdminServlet?action=logs&amp;sort=doneAction&amp;sortOrder={$currentSortOrder}">
+											<xsl:text>Aktion</xsl:text>
+										</a>
+									</th>
+								</xsl:otherwise>
+							</xsl:choose>
+
+							<th>
+								<xsl:text>Kommentar</xsl:text>
+							</th>
+
+							<!-- backup column -->
+							<!-- xsl:choose>
+								<xsl:when test="/cms/userClass = 'systemAdmin' and ($sortBy = 'backupContentFile' or $sortBy = 'backupNavigationFile') " >
+									<th id="aktive-row">
+										<b>Backup
+										<a href="WCMSAdminServlet?action=logs&amp;sort=backupContentFile&amp;sortOrder={$flipedSortOrder}">(Inhalt</a>
+										<a href="WCMSAdminServlet?action=logs&amp;sort=backupNavigationFile&amp;sortOrder={$flipedSortOrder}">, Navigation)</a>
+										</b>
+									</th>
+								</xsl:when>
+								<xsl:when test="/cms/userClass = 'systemAdmin' and ($sortBy != 'backupContentFile' and $sortBy != 'backupNavigationFile') " >
+									<th>
+										Backup
+										<a href="WCMSAdminServlet?action=logs&amp;sort=backupContentFile&amp;sortOrder={$currentSortOrder}"> (Inhalt</a>
+										<a href="WCMSAdminServlet?action=logs&amp;sort=backupNavigationFile&amp;sortOrder={$currentSortOrder}">, Navigation)</a>
+									</th>
+								</xsl:when>
+							</xsl:choose-->
+						</tr>
+						<!-- END OF: table headline -->		
+
+						<!-- content cells -->
+						<xsl:choose>
+							<!-- primary to sort by date -->
+							<xsl:when test="$sortBy = 'date' " >
+								<xsl:for-each select="/cms/loggings/log">
+									<xsl:sort select="@*[name() = $sortBy] | @*[concat('@',name()) = $sortBy]" order="{$currentSortOrder}" />  	
+									<xsl:sort select="@time" order="{$currentSortOrder}" />
+
+									<xsl:variable name="Rest" select="(position() div 2) *2 - round(position() div 2)*2" />
+									<tr>
+
+										<xsl:if test="$Rest != 0">
+											<xsl:attribute name="class">
+												<xsl:value-of select="'zebra'" />
+											</xsl:attribute>
+										</xsl:if>
+
+										<!-- date, time -->
+										<td>
+											<xsl:value-of select="@time"/>
+											<xsl:text> Uhr am </xsl:text>
+											<xsl:value-of select="substring(@date,9,2)" />.<xsl:value-of select="substring(@date,6,2)" />.<xsl:value-of select="substring(@date,1,4)" />
+										</td>
+
+										<!-- user -->
+										<xsl:if test="/cms/userClass != 'autor' " >			  
+											<td valign="top"><xsl:value-of select="@userRealName" /></td>
+										</xsl:if>
+
+										<!-- label path -->
+										<td><xsl:value-of select="@labelPath" />
+
+
+										</td>
+
+										<!-- done action -->
+										<td>
+											<xsl:choose>
+												<xsl:when test="@doneAction = 'add' " >
+													<xsl:text>erstellt</xsl:text>
+												</xsl:when>
+												<xsl:when test="@doneAction = 'edit' " >
+													<xsl:text>geÃ¤ndert</xsl:text>
+												</xsl:when>
+												<xsl:when test="@doneAction = 'delete' " >
+													<xsl:text>gelÃ¶scht</xsl:text>
+												</xsl:when>
+												<xsl:when test="@doneAction = 'translate' " >
+													<xsl:text>Ã¼bersetzt</xsl:text>
+												</xsl:when>
+											</xsl:choose>
+										</td>
+
+										<!-- backup location -->
+										<!-- xsl:if test="/cms/userClass = 'systemAdmin' " >
+											<td><xsl:value-of select="@backupContentFile" />
+												<br/>
+												<xsl:value-of select="@backupNavigationFile" />
+											</td>
+										</xsl:if-->
+										<td class="kommentar">
+											<!-- show given notes -->
+											<xsl:if test=" note != '' " >
+												<xsl:value-of select=" note " />
+											</xsl:if>
+										</td>
+									</tr>
+								</xsl:for-each>
+							</xsl:when>
+
+							<!-- primary NOT to sort by date -->
+							<xsl:otherwise>
+								<xsl:for-each select="/cms/loggings/log">
+								<xsl:sort select="@*[name() = $sortBy] | @*[concat('@',name()) = $sortBy]" order="{$currentSortOrder}" />
+								<xsl:sort select="@date" order="{$flipedSortOrder}" />
+								<xsl:sort select="@time" order="{$flipedSortOrder}" />
+									<xsl:variable name="Rest" select="(position() div 2) *2 - round(position() div 2)*2" />
+									<tr>
+
+										<xsl:if test="$Rest != 0">
+											<xsl:attribute name="class">
+												<xsl:value-of select="'zebra'" />
+											</xsl:attribute>
+										</xsl:if>
+
+										<!-- date, time -->
+										<td>
+											<xsl:value-of select="@time"/>
+											<xsl:text> Uhr am </xsl:text>
+											<xsl:value-of select="substring(@date,9,2)" />.<xsl:value-of select="substring(@date,6,2)" />.<xsl:value-of select="substring(@date,1,4)" />
+										</td>
+
+										<!-- user -->
+										<xsl:if test="/cms/userClass != 'autor' " >			  
+											<td valign="top"><xsl:value-of select="@userRealName" /></td>
+										</xsl:if>
+
+										<!-- label path -->
+										<td><xsl:value-of select="@labelPath" />
+
+
+										</td>
+
+										<!-- done action -->
+										<td>
+											<xsl:choose>
+												<xsl:when test="@doneAction = 'add' " >
+													<xsl:text>erstellt</xsl:text>
+												</xsl:when>
+												<xsl:when test="@doneAction = 'edit' " >
+													<xsl:text>geÃ¤ndert</xsl:text>
+												</xsl:when>
+												<xsl:when test="@doneAction = 'delete' " >
+													<xsl:text>gelÃ¶scht</xsl:text>
+												</xsl:when>
+												<xsl:when test="@doneAction = 'translate' " >
+													<xsl:text>Ã¼bersetzt</xsl:text>
+												</xsl:when>
+											</xsl:choose>
+										</td>
+
+										<!-- backup location -->
+										<!-- xsl:if test="/cms/userClass = 'systemAdmin' " >
+											<td><xsl:value-of select="@backupContentFile" />
+												<br/>
+												<xsl:value-of select="@backupNavigationFile" />
+											</td>
+										</xsl:if-->
+										<td class="kommentar">
+											<!-- show given notes -->
+											<xsl:if test=" note != '' " >
+												<xsl:value-of select=" note " />
+											</xsl:if>
+										</td>
+									</tr>
+							</xsl:for-each>
+						</xsl:otherwise>
+					</xsl:choose>
+					<!-- END OF : content cells -->
+				</table>
+
+			</div>
+		</div>
+	<!-- Ende: Inhaltsbereich -->
+	</div>
+ </xsl:template>
+
+<!-- ====================================================================================={
+
+section: Template: name="wcmsAdministration.managGlobal"
+
+	- Formular zur VerÃ¤nderung des  Seitentemplates
+
+}===================================================================================== -->
+
 <xsl:template name="wcmsAdministration.managGlobal" >
 
-<form action="{$ServletsBaseURL}WCMSAdminServlet?action=saveGlobal" method="post">
-      
-	<table width="90%" class="wcms" border="0" cellspacing="0" cellpadding="0" align="center">
-	      <xsl:call-template name="wcms.headline" >
-	            <xsl:with-param name="infoText" 
-	                  select="concat('Generelle Einstellungen für ',$MainTitle)"></xsl:with-param>
-	            <xsl:with-param name="align" select="'left'"></xsl:with-param>
-	      </xsl:call-template>
+	<xsl:variable name="currentTempl" select="document($navigationBase)/navigation/@template"/>
 
-            <tr>
-                  <th align="left">
-                       <xsl:call-template name="wcmsAdministration.managGlobal.saveButton" />
-                  </th>
-            </tr>                                                                                               
-		<tr>
-	            <td colspan="2"> 
-                        <br/>
-				<table class="table_noGrid" width="100%" cellspacing="0" cellpadding="0" border="0" align="center">            	
-	                        <tr>
-	                              <td class="green_noBorder">
-	                                    <b>Hier können sie Einstellungen vornehmen, die die ganze Seite betreffen</b>
-	                              </td>
-	                        </tr>
+	<!-- Menueleiste einblenden, Parameter = ausgewaehlter Menuepunkt -->
+	<xsl:call-template name="menuleiste">
+		<xsl:with-param name="menupunkt" select="'Einstellungen'" />
+	</xsl:call-template>
 
-	                        <tr>
-	                              <th align="left">
-	                                    <!-- default template -->
-	                                   <xsl:call-template name="wcmsAdministration.managGlobal.defaultTempl" />
-	                              </th>
-	                        </tr>                        
-	                   </table>
-	            </td>
-	      </tr>
-            <tr>
-                  <td>
-                        <br/>
-                        <xsl:call-template name="wcmsAdministration.managGlobal.saveButton" />
-                  </td>
-            </tr>                                                                                                           
-</table>
-      
-</form>
+	<!-- Seitenname -->
+	<xsl:call-template name="zeigeSeitenname">
+		<xsl:with-param name="seitenname" select="'Projekt-Einstellungen vornehmen'" />
+	</xsl:call-template>
+
+	<!-- Inhaltsbereich -->
+	<div id="settings-width">
+
+		<div id="settings">
+			<form name="settings" action="{$ServletsBaseURL}WCMSAdminServlet?action=saveGlobal" method="post">
+				<div class="titel">Gestaltung</div>
+				<div class="inhalt">
+					<fieldset>
+						<p>WÃ¤hle eine allgemeine Gestaltungsvorlage (Standard).<br />
+						Diese wird auf alle statischen Seiten angewendet, die <br /> 
+						keine eigene Gestaltunsvorschrift besitzen.</p>
+
+						<label for="defTempl">Allgemeine Gestaltung</label>
+						<select name="defTempl" size="1">
+							<xsl:for-each select="/cms/templates/master/template">
+								<xsl:choose>
+									<xsl:when test="current() = $currentTempl">
+										<option value="{current()}">
+											<xsl:value-of select="current()" /> (bisher gesetzt)
+										</option>
+									</xsl:when>
+									<xsl:otherwise>
+										<xsl:if test="current() != 'template_wcms'">
+											<option value="{current()}">
+												<xsl:value-of select="current()" />
+											</option>
+										</xsl:if>
+									</xsl:otherwise>
+								</xsl:choose>
+							</xsl:for-each>
+						</select>
+					</fieldset>
+				</div>
+				<div class="knoepfe">
+					<a class="button" href="javascript:document.settings.submit()">Ã„nderungen speichern</a>
+				</div>
+			</form>
+		</div>
+	<!-- Ende: Inhaltsbereich -->
+	</div>
+
 </xsl:template>
-<!-- END OF: wcmsAdministration.managGlobal  ================================================================================= -->
 
-<!-- wcmsAdministration.managGlobal.saveButton  ============================================================================== -->
+<!-- ====================================================================================={
+
+section: Template: name="wcmsAdministration.managGlobal.saveButton"
+
+	- generiert den submit button 
+
+}===================================================================================== -->
+
 <xsl:template name="wcmsAdministration.managGlobal.saveButton">
 	<tr>
 		<td colspan="2" align="right">
@@ -465,34 +597,38 @@ WCMS-Nutzer:
 		</td>
 	</tr>
 </xsl:template>
-<!-- wcmsAdministration.managGlobal.saveButton  ============================================================================== -->
 
-<!-- wcmsAdministration.managGlobal.defaultTempl  ============================================================================== -->
+<!-- ====================================================================================={
+
+section: Template: name="wcmsAdministration.managGlobal.defaultTempl"
+
+	- erzeugt das Auswahlmenue fuer die vorhandenen Templates
+
+}===================================================================================== -->
+
 <xsl:template name="wcmsAdministration.managGlobal.defaultTempl" >
 
 	<xsl:variable name="currentTempl" select="document($navigationBase)/navigation/@template"/>
 
 	<br/>
-      Default-Template:
+	Default-Template:
 	<select name="defTempl" size="1">
 		<xsl:for-each select="/cms/templates/master/template">
-	            <xsl:choose>
-	                  <xsl:when test="current() = $currentTempl">
-	            		<option value="{current()}">
-	                              <xsl:value-of select="current()" /> (bisher gesetzt)
-	            		</option>            
-	                  </xsl:when>
-	                  <xsl:otherwise>
-	            		<option value="{current()}">
-	                              <xsl:value-of select="current()" />
-	            		</option>                                    
-	                  </xsl:otherwise>
-	            </xsl:choose>
+			<xsl:choose>
+				<xsl:when test="current() = $currentTempl">
+					<option value="{current()}">
+						<xsl:value-of select="current()" /> (bisher gesetzt)
+					</option>
+				</xsl:when>
+				<xsl:otherwise>
+					<option value="{current()}">
+						<xsl:value-of select="current()" />
+					</option>
+				</xsl:otherwise>
+			</xsl:choose>
 		</xsl:for-each>
 	</select>
-
 </xsl:template>
-<!-- END OF: wcmsAdministration.managGlobal.defaultTempl  ================================================================================= -->
 
-
+<!-- =================================================================================== -->
 </xsl:stylesheet>

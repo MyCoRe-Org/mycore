@@ -1,139 +1,284 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
-<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xalan="http://xml.apache.org/xalan" >
-	<!-- cmsChooseAction  ============================================================================== -->
-	<xsl:template name="wcmsChooseAction" >
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- =====================================================================================
+========================================================================================={
+title: wcms_choose.xsl
+
+Erzeugt die Auswahlseite einer Aktion.
+
+template:
+	- wcmsChoose (name)
+	- chooseContent (name)
+	- chooseContentInfo (name)
+	- errorOnChoose (name)
+	- hiddenForm (name)
+	- wcmsChoose.action.option
+}=========================================================================================
+====================================================================================== -->
+
+<xsl:stylesheet 
+	version="1.0" 
+	xmlns:xsl="http://www.w3.org/1999/XSL/Transform" 
+	xmlns:xalan="http://xml.apache.org/xalan" >
+
+<!-- ====================================================================================={
+section: Template: name="wcmsChoose"
+
+	- Seitenaufbau
+}===================================================================================== -->
+	<xsl:template name="wcmsChoose" >
+		<xsl:param name="href" />
+
+		<xsl:variable 
+		name="BilderPfad" 
+		select="concat($WebApplicationBaseURL,'templates/master/template_wcms/IMAGES')" />
+
+		<!-- Menueleiste einblenden, Parameter = ausgewaehlter Menuepunkt -->
+		<xsl:call-template name="menuleiste">
+			<xsl:with-param name="menupunkt" select="'Bearbeiten'" />
+		</xsl:call-template>
+
+		<!-- Seitenname -->
+		<xsl:call-template name="zeigeSeitenname">
+			<xsl:with-param name="seitenname" select="'Ziel und Aktion wÃ¤hlen'" />
+		</xsl:call-template>
+
+
 		<form name="choose" action="{$ServletsBaseURL}WCMSChooseServlet" method="post">
-			<table class="wcms" width="90%" border="0" cellspacing="0" cellpadding="0" align="center">
-				<xsl:call-template name="wcms.headline" >
-					<xsl:with-param name="infoText" select="'Aktion und Inhalt festlegen (Schritt 1/3)'" />
-				</xsl:call-template>
-				<!-- "weiter" button -->
-				<xsl:call-template name="next"/>
-				<!-- END OF: "weiter" button -->
-				<!-- error occured - - - - - - - -->
-				<xsl:if 
-					test=" /cms/error = '0' or /cms/error = '5' or /cms/error = '6' or /cms/error = '7' or /cms/error = '8' or /cms/error = '9' ">
-					<xsl:call-template name="error" />
-				</xsl:if>
-				<!-- END OF: error occured - - - - - - - -->
-				<tr>
-					<td colspan="2">
-						<br/>
-					</td>
-				</tr>
-				<!-- main window -->
-				<tr>
-					<td colspan="2">
-						<table class="table_noGrid" width="100%" cellspacing="0" cellpadding="0" border="0" align="center">
-							<colgroup>
-								<col width="50%" />
-								<col width="50%" />
-							</colgroup>
+
+		<!-- Inhaltsbereich -->
+		<div id="auswahl">
+			<!-- Fensterbreite Ziel-->
+			<div id="menu-width">
+				<!-- 
+				<div id="menu_kopf">
+					Ziel
+				</div>
+				-->
+				<div id="menu">
+					<div class="titel">Ziel (MenÃ¼punkt)</div>
+					<div class="inhalt">
+					<xsl:call-template name="chooseContent" />
+					<!-- div class="titel">Legende</div-->
+					<div class="legende">
+						<table>
 							<tr>
-								<td class="green_noBorder" align="center" colspan="2">
-									<b> Bitte legen sie zunächst fest, was sie machen wollen und auf welche Seite sich 
-										diese Aktion beziehen soll </b>
-								</td>
+								<td class="s2">Legende:</td>
+								<td class="s2">&#160;</td>
+							</tr>							<tr>
+								<td class="s1">&#9472;</td>
+								<td class="s2">Unterpunktebene</td>
 							</tr>
 							<tr>
-								<!-- left column -->
-								<th align="left" valign="top"> <xsl:call-template name="chooseAction" /> <xsl:call-template 
-									name="addAtPosition" /> <xsl:call-template name="template" /> <br/><br/> &lt;m&gt; 
-									... neues Menü<br/>
-                                                      &lt;a&gt; ... alle Untermenüpunkte aut. aufklappen<br/>
-                                                       &lt;t&gt; ... neues Template<br/> &lt;d&gt; ... dynamischer 
-									Inhalt zugewiesen<br/> <xsl:if test="$CurrentLang != $DefaultLang"> <br/><br/> 
-									&lt;!&gt; ... Seite bisher nicht übersetzt<br/> </xsl:if> </th>
-								<!-- right column -->
-								<th align="left" valign="top"> Inhalt:<br/> <xsl:call-template name="chooseContent" /> </th>
+								<td class="s1">[m]</td>
+								<td class="s2">Neue MenÃ¼wurzel </td>
 							</tr>
+							<tr>
+								<td class="s1">[t]</td>
+								<td class="s2">Eigenes Template</td>
+							</tr>
+							<tr>
+								<td class="s1">[d]</td>
+								<td class="s2">Dynamischer Inhalt (MyCoRe)</td>
+							</tr>
+							<xsl:if test="$CurrentLang != $DefaultLang">
+								<tr>
+									<td class="s1">[!]</td>
+									<td class="s2">Inhalt nicht Ã¼bersetzt</td>
+								</tr>
+							</xsl:if>
 						</table>
-					</td>
-				</tr>
-				<!-- END OF: main window -->
-				<!-- "weiter" button -->
-				<tr>
-					<td colspan="2">
-						<br/>
-					</td>
-				</tr>
-				<xsl:call-template name="next"/>
-				<!-- END OF: "weiter" button -->
-			</table>
+					</div>
+					</div>
+				</div>
+			</div>
+
+			<!-- Fensterbreite Aktion -->
+			<div id="content-width">
+
+				<xsl:if test="/cms/error != '' or /cms/usedParser != ''">
+					<div id="hinweis-auswahl">
+						Hinweis:
+						<div class="hinweis-auswahl-text">
+							<xsl:if test=" /cms/error = '0' or /cms/error = '5' or /cms/error = '6' or /cms/error = '7' or /cms/error = '8' or /cms/error = '9' ">
+								<xsl:call-template name="errorOnChoose" />
+							</xsl:if>
+							<xsl:if test="/cms/usedParser != ''">
+								<xsl:text>Aktion durchgefuehrt.</xsl:text>
+								<br />
+
+								<xsl:for-each select="document($navigationBase)/navigation//item[@href]">
+									<xsl:if test="@href = $href">
+										<xsl:for-each select="ancestor-or-self::item">
+											<xsl:value-of select="./label" />
+											<xsl:if test="position() != last()"> > </xsl:if>
+										</xsl:for-each>
+									</xsl:if>
+								</xsl:for-each>
+								<xsl:if test="/cms/action = 'delete'" >
+									<xsl:value-of select="/cms/label" /> 
+								</xsl:if>
+								<br />
+
+								<xsl:choose>
+									<xsl:when test=" /cms/action = 'add' and /cms/action[@mode='intern']" >
+										<xsl:text>Seite angelegt</xsl:text>
+									</xsl:when>
+									<xsl:when test=" /cms/action = 'add' and /cms/action[@mode='extern']" >
+										<xsl:text>Link angelegt </xsl:text>
+									</xsl:when>
+									<xsl:when test=" /cms/action = 'edit' and /cms/action[@mode='intern']" >
+										<xsl:text>Seite verÃ¤ndert</xsl:text>
+									</xsl:when>
+									<xsl:when test=" /cms/action = 'edit' and /cms/action[@mode='extern']" > 
+										<xsl:text>Informationen zu Link verÃ¤ndert </xsl:text>
+									</xsl:when>
+									<xsl:when test=" /cms/action = 'delete' and /cms/action[@mode='intern']" >
+										<xsl:text>Seite gelÃ¶scht </xsl:text>
+									</xsl:when>
+									<xsl:when test=" /cms/action = 'delete' and /cms/action[@mode='extern']" >
+										<xsl:text>Link gelÃ¶scht </xsl:text>
+									</xsl:when>
+								</xsl:choose>
+							</xsl:if>
+						</div>
+					</div>
+				</xsl:if>
+
+				<div id="aktion">
+				<div class="titel">Aktion</div>
+				<div class="inhalt">					
+					<table class="aktion">
+						<tr class="aktion">
+							<td class="aktionIcon"><img src="{$BilderPfad}/wahl_dummy.gif" /></td>
+							<td class="aktionBeschreibung"><a href="javascript:starteAktion('edit');">Inhalt bearbeiten</a></td>
+							<td class="aktionOptionLeer"> </td>
+						</tr>
+						<tr>
+							<td colspan="3" class="leerzeile"> </td>
+						</tr>
+						<tr class="aktion">
+							<td class="aktionIcon"><img src="{$BilderPfad}/wahl_dummy.gif" /></td>
+							<td class="aktionBeschreibung"><a href="javascript:starteAktion('predecessor');">MenÃ¼punkt davor anlegen</a></td>
+							<td rowspan="3" class="aktionOption">
+								<xsl:call-template name="wcmsChoose.action.option">
+									<xsl:with-param name="whichAction" select="'add'" />
+								</xsl:call-template>
+								<br />
+							</td>
+						</tr>
+						<tr class="aktion">
+							<td class="aktionIcon"><img src="{$BilderPfad}/wahl_dummy.gif" /></td>
+							<td class="aktionBeschreibung"><a href="javascript:starteAktion('child');">Unterpunkt anlegen</a></td>
+						</tr>
+						<tr class="aktion">
+							<td class="aktionIcon"><img src="{$BilderPfad}/wahl_dummy.gif" /></td>
+							<td class="aktionBeschreibung"><a href="javascript:starteAktion('successor');">MenÃ¼punkt danach anlegen</a></td>
+						</tr>
+						<tr>
+							<td colspan="3" class="leerzeile"> </td>
+						</tr>
+						<!--tr class="aktion">
+							<td class="aktionIcon"><img src="{$BilderPfad}/wahl_dummy.gif" /></td>
+							<td class="aktionBeschreibung"><a href="javascript:starteAktion('translate');">Ãœbersetzen</a></td>
+							<td class="aktionOptionLeer"> </td>
+						</tr>
+						<tr>
+							<td colspan="3" class="leerzeile"> </td>
+						</tr-->
+						<!--
+						<tr class="aktion">
+							<td class="aktionIcon"><img src="{$BilderPfad}/wahl_dummy.gif" /></td>
+							<td class="aktionBeschreibung"><a href="">Nach oben verschieben</a></td>
+							<td rowspan="4" class="aktionOptionLeer"></td>
+						</tr>
+						<tr class="aktion">
+							<td class="aktionIcon"><img src="{$BilderPfad}/wahl_dummy.gif" /></td>
+							<td class="aktionBeschreibung"><a href="">EinrÃ¼cken</a></td>
+						</tr>
+						<tr class="aktion">
+							<td class="aktionIcon"><img src="{$BilderPfad}/wahl_dummy.gif" /></td>
+							<td class="aktionBeschreibung"><a href="">Ausgliedern</a></td>
+						</tr>
+						<tr class="aktion">
+							<td class="aktionIcon"><img src="{$BilderPfad}/wahl_dummy.gif" /></td>
+							<td class="aktionBeschreibung"><a href="">Nach unten verschieben</a></td>
+						</tr>
+						<tr>
+							<td colspan="3" class="leerzeile"> </td>
+						</tr>
+						-->
+						<tr class="aktion">
+							<td class="aktionIcon"><img src="{$BilderPfad}/wahl_dummy.gif" /></td>
+							<td class="aktionBeschreibung"><a href="javascript:starteAktion('delete');">LÃ¶schen</a></td>
+							<td rowspan="2" class="aktionOptionLeer"></td>
+						</tr>
+						<!--
+						<tr class="aktion">
+							<td class="aktionIcon"><img src="{$BilderPfad}/wahl_dummy.gif" /></td>
+							<td class="aktionBeschreibung"><a href="">Letzte Aktion widerrufen</a></td>
+						</tr>
+						-->
+						<tr>
+							<td colspan="3" class="leerzeile"> </td>
+						</tr>
+						<tr class="aktion">
+							<td class="aktionIcon"><img src="{$BilderPfad}/wahl_dummy.gif" /></td>
+							<td class="aktionBeschreibung"><a href="javascript:starteAktion('view');">Ansehen</a></td>
+							<td class="aktionOption">
+								<xsl:call-template name="wcmsChoose.action.option">
+									<xsl:with-param name="whichAction" select="'view'" />
+								</xsl:call-template>
+							</td>
+						</tr>
+					</table>
+					</div>
+				</div>
+
+					<xsl:call-template name="hiddenForm" />
+			</div>
+
+			
+			<!-- Textumfluss wird unterbrochen und unten fortgesetzt -->
+			<div class="clear">
+				&#160;
+			</div>
+
+		</div>
+	<!-- Ende: Inhaltsbereich -->
+
 		</form>
 	</xsl:template>
-	<!-- END OF: cmsChooseAction  ================================================================================= -->
-	<!-- ================================================================================= -->
-	<!-- creates identifiers how the site will be build (template and change menu) -->
-	<xsl:template name="siteStructureInfo"> &lt;<xsl:if test="@replaceMenu='true' " >m</xsl:if><xsl:if test="@constrainPopUp='true' " >a</xsl:if><xsl:if test="@template != '' " >t</xsl:if><xsl:if test=" count(child::dynamicContentBinding) &gt; 0 " >d</xsl:if>&gt; 
-           </xsl:template>
-	<!-- ================================================================================= -->
-	<xsl:template name="error">
-		<tr>
-			<td colspan="2">
-				<br/>
-			</td>
-		</tr>
-		<tr>
-			<th colspan="2" class="red" align="left">
-				<b>
-					<xsl:choose>
-						<xsl:when test=" /cms/error = '0' or /cms/error = '9' " > Fehler aufgetreten: Keine Seite ausgewählt. 
-							<br/><br/> Bitte wählen sie in der 2. Box die Seite aus, die sie bearbeiten wollen. </xsl:when>
-						<xsl:when test=" /cms/error = '5' " > Fehler aufgetreten: Anlegen nicht möglich. <br/><br/> Auf dieser 
-							Ebene können keine weiteren Menüpunkte angelegt werden. Wählen sie beim Erstellen die Position 
-							"darunter" aus. </xsl:when>
-						<xsl:when test=" /cms/error = '6' " > Fehler aufgetreten: Anlegen nicht möglich. <br/><br/> Unterhalb 
-							eines externen Linkes können keine weiteren Menüpunkte angelegt werden. </xsl:when>
-						<xsl:when test=" /cms/error = '7' " > Fehler aufgetreten: Löschen nicht möglich. <br/><br/> Ein 
-							Menüpunkt kann nur gelöscht werden, wenn er keine Untermenüpunkte mehr enthält. </xsl:when>
-						<xsl:when test=" /cms/error = '8' " > Fehler aufgetreten: Keine Berechtigung. <br/><br/> Sie können in 
-							der gewählten Menüebene keinen Inhalt pflegen. </xsl:when>
-					</xsl:choose>
-				</b>
-			</th>
-		</tr>
-		<tr>
-			<td colspan="2">
-				<br/>
-			</td>
-		</tr>
-	</xsl:template>
-	<!-- ================================================================================= -->
-	<xsl:template name="chooseAction"> Aktion:<br/> <select name="action" size="5" onchange="setHelpText()" > <xsl:if 
-		test="(/cms/userClass = 'admin' or /cms/userClass = 'editor') and $CurrentLang=$DefaultLang" > <option selected="selected" 
-		value="edit" >- vorhandenen Inhalt bearbeiten</option> </xsl:if> <xsl:if 
-		test="(/cms/userClass = 'autor'  or /cms/userClass = 'editor' or /cms/userClass = 'admin') and $CurrentLang=$DefaultLang" > 
-		<option value="add_intern">- neue Web-Seite einpflegen</option> </xsl:if> <xsl:if 
-		test="(/cms/userClass = 'autor' or /cms/userClass = 'editor' or /cms/userClass = 'admin') and $CurrentLang=$DefaultLang" > 
-		<option value="add_extern">- neuen Link einpflegen</option> </xsl:if> <xsl:if 
-		test="/cms/userClass = 'admin' and $CurrentLang=$DefaultLang" > <option value="delete">- Inhalt in Archiv verschieben</option> 
-		</xsl:if> <xsl:if test="$DefaultLang != $CurrentLang" > <option value="translate">- Inhalt übersetzen</option> </xsl:if> 
-		</select> </xsl:template>
-	<!-- ================================================================================= -->
+
+<!-- ====================================================================================={
+section: Template: name="chooseContent"
+
+	- Menuestruktur (Fomularfeld)
+}===================================================================================== -->
 	<xsl:template name="chooseContent">
-		<select name="href" size="25">
+		<select name="href" size="20" class="auswahl-ziel">
 			<!-- each root node -->
 			<xsl:for-each select="/cms/rootNode" >
 				<xsl:variable name="myRootNode" select="node()" />
 				<xsl:variable name="myRootNodeTypeHREF" select="@href" />
 				<!-- go through the complete navigation.xml -->
 				<xsl:for-each select="document($navigationBase)//*">
+					<xsl:variable name="firstRootNode" select="position()" />
 					<!-- if the current entry is the rootNode -->
 					<xsl:choose>
 						<xsl:when 
-							test="
-			    ($myRootNodeTypeHREF = 'yes' and $myRootNode = @href )
-			   or
-				($myRootNodeTypeHREF = 'no' and $myRootNode	= name(current())   )
-			   " 
-							>
+							test="	($myRootNodeTypeHREF = 'yes' and $myRootNode = @href )
+									or
+									($myRootNodeTypeHREF = 'no' and $myRootNode	= name(current()))">
 							<!-- display menu name -->
 							<xsl:for-each select="ancestor-or-self::*" >
 								<xsl:if test="position() = 2 " >
+									<!--
 									<option value="9">
 									</option>
+									-->
 									<option value="9">
+										<xsl:value-of select="'======================'" />
 									</option>
 									<!-- test if user is allowed to select this menu point -->
 									<xsl:choose>
@@ -156,7 +301,7 @@
 														</xsl:if>
 													</xsl:for-each>
 												</xsl:variable>
-												<xsl:value-of select="concat(label[lang($DefaultLang)],$labelPath)" />
+												<xsl:value-of select="concat(@label,$labelPath)" />
 											</option>
 										</xsl:otherwise>
 									</xsl:choose>
@@ -171,12 +316,12 @@
 							<xsl:for-each select="descendant-or-self::item" >
 								<xsl:if test="@href" >
 									<option value="1{@href}">
-										<xsl:for-each select="ancestor::item"> - </xsl:for-each>
-										<xsl:if 
-											test=" @replaceMenu = 'true' or @constrainPopUp = 'true' or @template != '' or count(child::dynamicContentBinding) &gt; 0 " 
-											>
-											<xsl:call-template name="siteStructureInfo" />
+										<xsl:if test="concat($firstRootNode, position())='21'">
+											<xsl:attribute name="selected">
+												<xsl:value-of select="'selected'" />
+											</xsl:attribute>
 										</xsl:if>
+										<xsl:for-each select="ancestor::item"><xsl:text> &#9472; </xsl:text></xsl:for-each>
 										<!-- handle different languages -->
 										<xsl:variable name="label_defLang" select="./label[lang($DefaultLang)]!=''"/>
 										<xsl:variable name="label_curLang" select="./label[lang($CurrentLang)]!=''"/>
@@ -193,6 +338,9 @@
 												<xsl:value-of select="./label[lang($DefaultLang)]" />
 											</xsl:otherwise>
 										</xsl:choose>
+										<xsl:if test=" @replaceMenu = 'true' or @template != '' or count(child::dynamicContentBinding) &gt; 0 ">
+											<xsl:call-template name="chooseContentInfo" />
+										</xsl:if>
 									</option>
 								</xsl:if>
 							</xsl:for-each>
@@ -206,48 +354,142 @@
 			<!-- END OF: each root node -->
 		</select>
 	</xsl:template>
-	<!-- ================================================================================= -->
-	<xsl:template name="addAtPosition">
+
+<!-- ====================================================================================={
+section: Template: name="chooseContentInfo"
+
+	- Legende
+}===================================================================================== -->
+	<!-- creates identifiers how the site will be build (template and change menu) -->
+	<xsl:template name="chooseContentInfo">
+		<xsl:text> [</xsl:text>
+		<xsl:if test="@replaceMenu='true' " >
+			<xsl:text>m</xsl:text>
+		</xsl:if>
+		<xsl:if test="@template != '' ">
+			<xsl:text>t</xsl:text>
+		</xsl:if>
+		<xsl:if test=" count(child::dynamicContentBinding) &gt; 0 " >
+			<xsl:text>d</xsl:text>
+		</xsl:if>
+		<xsl:text>]</xsl:text>
+	</xsl:template>
+
+<!-- ====================================================================================={
+section: Template: name="errorOnChoose"
+
+	- Fehlermeldungen
+}===================================================================================== -->
+
+	<xsl:template name="errorOnChoose">
+
 		<xsl:choose>
-			<xsl:when test="$CurrentLang=$DefaultLang"> <br/><br/><br/> An welcher Position: (nur bei neuem Inhalt)<br/> <select 
-				name="addAtPosition" size="3" > <option value="predecessor" > davor </option> <option value="successor"> danach 
-				</option> <option selected="selected" value="child"> darunter </option> </select> </xsl:when>
+			<xsl:when test=" /cms/error = '0' or /cms/error = '9' " > 
+				<script LANGUAGE="JAVASCRIPT">
+					document.write(new Date())
+				</script>
+				Fehler aufgetreten: Keine Seite ausgewÃ¤hlt. 
+				<br/>
+				Bitte wÃ¤hlen sie in der 2. Box die Seite aus, die sie bearbeiten wollen.
+			</xsl:when>
+			<xsl:when test=" /cms/error = '5' " >
+				Fehler aufgetreten: Anlegen nicht mÃ¶glich.
+				<br/>
+				Auf dieser Ebene kÃ¶nnen keine weiteren MenÃ¼punkte angelegt werden. 
+				WÃ¤hlen sie beim Erstellen die Position "darunter" aus. 
+			</xsl:when>
+			<xsl:when test=" /cms/error = '6' " >
+				Fehler aufgetreten: Anlegen nicht mÃ¶glich. 
+				<br/>
+				Unterhalb eines externen Linkes kÃ¶nnen keine weiteren MenÃ¼punkte angelegt werden. 
+			</xsl:when>
+			<xsl:when test=" /cms/error = '7' " >
+				Fehler aufgetreten: LÃ¶schen nicht mÃ¶glich.
+				<br/>
+				Ein MenÃ¼punkt kann nur gelÃ¶scht werden, wenn er keine UntermenÃ¼punkte mehr enthÃ¤lt.
+			</xsl:when>
+			<xsl:when test=" /cms/error = '8' " >
+				Fehler aufgetreten: Keine Berechtigung.
+				<br/>
+				Sie kÃ¶nnen in der gewÃ¤hlten MenÃ¼ebene keinen Inhalt pflegen. 
+			</xsl:when>
 		</xsl:choose>
 	</xsl:template>
-	<!-- ================================================================================= -->
-	<xsl:template name="template"> <!--
-    <xsl:choose>
-        <xsl:when test="$CurrentLang=$DefaultLang">
---> <br/><br/><br/> Content-Template: (nur bei neuem Inhalt)<br/> <select name="template" size="1" > <xsl:for-each 
-		select="/cms/templates/content/template" > <option> <xsl:attribute name="value"><xsl:value-of select="node()" 
-		/></xsl:attribute> <xsl:value-of select="node()" /> </option> </xsl:for-each> </select> <!--    
-        </xsl:when>
-    </xsl:choose>
---> </xsl:template>
-	<!-- ================================================================================= -->
-	<xsl:template name="next">
-		<tr>
-			<td colspan="2" align="right">
-				<table cellspacing="0" border="0" cellpadding="0" align="right" class="wcms">
-					<!-- submit -->
-					<tr>
-						<td align="right">
-							<img 
-								src="{$WebApplicationBaseURL}templates/master/template_wcms/IMAGES/box_left.gif" 
-								width="11" height="22" border="0" alt="" title="" />
-						</td>
-						<td align="right" class="button">
-							<a href="javascript:document.choose.submit()">weiter zum nächsten Schritt</a>
-						</td>
-						<td align="right">
-							<img 
-								src="{$WebApplicationBaseURL}templates/master/template_wcms/IMAGES/box_right.gif" 
-								width="11" height="22" border="0" alt="" title="" />
-						</td>
-					</tr>
-					<!-- END OF: submit -->
-				</table>
-			</td>
-		</tr>
+
+<!-- ====================================================================================={
+section: Template: name="hiddenForm"
+
+	- Art der Aktion (Formularfeld)
+	- Parameter zur Aktion (Formularfeld)
+}===================================================================================== -->
+	<xsl:template name="hiddenForm"> 
+	<!--
+		Moegliche Werte:
+			edit - bearbeiten (admin, editor)
+			add_intern - neue Seite (autor, admin, editor)
+			add_extern - neuer Link (autor, admin, editor)
+			delete - loeschen (admin)
+			translate - uebersetzen
+		Bedingung:
+			/cms/userClass = 'autor'  or /cms/userClass = 'editor' or /cms/userClass = 'admin'
+			$CurrentLang=$DefaultLang
+	-->
+		<input  name="action" type="hidden" value="" />
+	<!--
+		Moegliche Werte:
+			predecessor - darueber
+			successor - darunter
+			child - untergeordnet
+		Bedingung:
+			$CurrentLang=$DefaultLang
+	-->
+		<input name="addAtPosition" type="hidden" value="" />
+		<input name="webBase" type="hidden" value="{$WebApplicationBaseURL}" />
 	</xsl:template>
+
+<!-- ====================================================================================={
+section: Template: name="wcmsChoose.action.option"
+
+	- Vorlage fuer neuen Inhalt (Formularfeld)
+}===================================================================================== -->
+	<xsl:template name="wcmsChoose.action.option">
+		<xsl:param name="whichAction" />
+
+		<xsl:choose>
+			<xsl:when test="$whichAction = 'add'">
+				<xsl:choose>
+					<xsl:when test="$CurrentLang=$DefaultLang">
+						<!--
+						<select name="template" size="1" > 
+							<xsl:for-each select="/cms/templates/content/template">
+								<option>
+									<xsl:attribute name="value">
+										<xsl:value-of select="node()"/>
+									</xsl:attribute>
+									<xsl:value-of select="node()"/>
+								</option>
+							</xsl:for-each>
+						</select>
+						<xsl:text>Als Vorlage benutzen</xsl:text>
+						<br />
+						-->
+						<input type="hidden" name="template" value="dumy.xml" />
+						<input type="checkbox" name="useContent" value="true" checked="checked"  disabled="disabled" />
+						<span class="deaktiviert"><xsl:text> Inhalt der Auswahl Ã¼bernehmen</xsl:text></span>
+						<br />
+						<input type="checkbox" name="createLink" value="true" />
+						<xsl:text> Auf andere Webseite weiterleiten</xsl:text>
+					</xsl:when>
+				</xsl:choose>
+			</xsl:when>
+			<xsl:when test="$whichAction = 'view'">
+				<input type="checkbox" name="openNewWindow" value="true" checked="checked" />
+				<span class="aktionOptionRow"><xsl:text> Im neuen Fenster Ã¶ffnen</xsl:text></span>
+			</xsl:when>
+		</xsl:choose>
+
+
+	</xsl:template>
+<!-- =================================================================================== -->
+
 </xsl:stylesheet>
