@@ -29,7 +29,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import org.jdom.DocType;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.Namespace;
@@ -107,7 +106,7 @@ public class ClassificationTransformer {
             it = cl.getCatgegories().iterator();
             while (it.hasNext()) {
                 // add child categories
-                categories.addContent(getElement((Category) it.next()));
+                categories.addContent(getElement((Category) it.next(),cl.isCounterEnabled()));
             }
             return cd;
         }
@@ -126,10 +125,12 @@ public class ClassificationTransformer {
             return le;
         }
 
-        static Element getElement(Category category) {
+        static Element getElement(Category category, boolean withCounter) {
             Element ce = new Element("category");
             ce.setAttribute("ID", category.getId());
-            ce.setAttribute("counter",Integer.toString(category.getNumberOfObjects()));
+            if (withCounter) {
+                ce.setAttribute("counter", Integer.toString(category.getNumberOfObjects()));
+            }
             Iterator it = category.getLabels().iterator();
             while (it.hasNext()) {
                 // add labels
@@ -138,7 +139,7 @@ public class ClassificationTransformer {
             it = category.getCatgegories().iterator();
             while (it.hasNext()) {
                 // add child categories
-                ce.addContent(getElement((Category) it.next()));
+                ce.addContent(getElement((Category) it.next(),withCounter));
             }
             return ce;
         }
@@ -165,7 +166,7 @@ public class ClassificationTransformer {
             Iterator it = cl.getCatgegories().iterator();
             while (it.hasNext()) {
                 // add child categories
-                cd.getRootElement().addContent(getElement((Category) it.next(), labelFormat));
+                cd.getRootElement().addContent(getElement((Category) it.next(), labelFormat, cl.isCounterEnabled()));
             }
             sortItems(cd.getRootElement().getChildren("item"));
             return cd;
@@ -194,35 +195,37 @@ public class ClassificationTransformer {
             }
         }
 
-        static Element getElement(Label label, Category cat, String labelFormat) {
+        static Element getElement(Label label, Category cat, String labelFormat, boolean withCounter) {
             Element le = new Element("label");
             if (stringNotEmpty(label.getLang())) {
                 le.setAttribute("lang", label.getLang(), Namespace.XML_NAMESPACE);
             }
-            le.setText(getLabelText(label, cat, labelFormat));
+            le.setText(getLabelText(label, cat, labelFormat, withCounter));
             return le;
         }
 
-        static String getLabelText(Label label, Category cat, String labelFormat) {
+        static String getLabelText(Label label, Category cat, String labelFormat, boolean withCounter) {
             String text = TEXT_PATTERN.matcher(labelFormat).replaceAll(label.getText());
             text = ID_PATTERN.matcher(text).replaceAll(cat.getId());
             text = DESCR_PATTERN.matcher(text).replaceAll(label.description);
-            text = COUNT_PATTERN.matcher(text).replaceAll(Integer.toString(cat.getNumberOfObjects()));
+            if (withCounter){
+                text = COUNT_PATTERN.matcher(text).replaceAll(Integer.toString(cat.getNumberOfObjects()));
+            }
             return text;
         }
 
-        static Element getElement(Category category, String labelFormat) {
+        static Element getElement(Category category, String labelFormat, boolean withCounter) {
             Element ce = new Element("item");
             ce.setAttribute("value", category.getId());
             Iterator it = category.getLabels().iterator();
             while (it.hasNext()) {
                 // add labels
-                ce.addContent(getElement((Label) it.next(), category, labelFormat));
+                ce.addContent(getElement((Label) it.next(), category, labelFormat, withCounter));
             }
             it = category.getCatgegories().iterator();
             while (it.hasNext()) {
                 // add child categories
-                ce.addContent(getElement((Category) it.next(), labelFormat));
+                ce.addContent(getElement((Category) it.next(), labelFormat, withCounter));
             }
             return ce;
         }

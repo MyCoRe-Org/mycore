@@ -49,8 +49,8 @@ import org.mycore.datamodel.metadata.MCRLinkTableManager;
  * @version $Revision$ $Date$
  */
 public class MCRClassificationQuery {
-    
-    private static final Logger LOGGER=Logger.getLogger(MCRClassificationQuery.class);
+
+    private static final Logger LOGGER = Logger.getLogger(MCRClassificationQuery.class);
 
     /**
      * returns a classification as POJO.
@@ -61,9 +61,9 @@ public class MCRClassificationQuery {
      *            of category depth.
      * @return
      */
-    public static Classification getClassification(String ID, int levels) {
-        Document cl = MCRClassification.receiveClassificationAsJDOM(ID);
-        return getClassification(cl, levels);
+    public static Classification getClassification(String ID, int levels, boolean withCounter) {
+        Document cl = MCRClassification.receiveClassificationAsJDOM(ID, withCounter);
+        return getClassification(cl, levels, withCounter);
     }
 
     /**
@@ -78,24 +78,24 @@ public class MCRClassificationQuery {
      *            of category depth.
      * @return
      */
-    public static Classification getClassification(String classID, String categID, int levels) {
+    public static Classification getClassification(String classID, String categID, int levels, boolean withCounter) {
         LOGGER.debug("start ClassCategSearch");
-        Classification returns = getClassification(classID, categID);
+        Classification returns = getClassification(classID, categID, withCounter);
         if (levels != 0) {
             LOGGER.debug("getCategoryItem");
             MCRCategoryItem catItem = MCRCategoryItem.getCategoryItem(classID, categID);
             // map of every categID with numberofObjects
             LOGGER.debug("countReferenceCategory");
-            Map map = MCRLinkTableManager.instance().countReferenceCategory(classID);
+            Map map = withCounter ? MCRLinkTableManager.instance().countReferenceCategory(classID) : null;
             LOGGER.debug("select category");
             Category cat = (Category) returns.getCatgegories().get(0);
             LOGGER.debug("fillCategory");
-            fillCategory(cat, catItem, map, levels);
+            fillCategory(cat, catItem, map, levels, withCounter);
             LOGGER.debug("finished ClassCategSearch");
         }
         return returns;
     }
-    
+
     /**
      * returns a classification as POJO. Only the given Category, its ancestors
      * (and its children to <code>levels</code> depth) is returned.
@@ -108,20 +108,20 @@ public class MCRClassificationQuery {
      *            of category depth.
      * @return
      */
-    public static Classification getClassificationHierarchie (String classID, String categID, int levels) {
-        MCRCategoryItem catItem = MCRCategoryItem.getCategoryItem(classID,categID);
+    public static Classification getClassificationHierarchie(String classID, String categID, int levels, boolean withCounter) {
+        MCRCategoryItem catItem = MCRCategoryItem.getCategoryItem(classID, categID);
         MCRCategoryItem parent = catItem.getParent();
-        LinkedList list=new LinkedList();
-        list.add(0,catItem);
-        while (parent!=null){
-            //build the ancestor axis
-            list.add(0,parent);
-            parent=parent.getParent();
+        LinkedList list = new LinkedList();
+        list.add(0, catItem);
+        while (parent != null) {
+            // build the ancestor axis
+            list.add(0, parent);
+            parent = parent.getParent();
         }
-        return getClassification(catItem,list,levels);
-        
+        return getClassification(catItem, list, levels, withCounter);
+
     }
-    
+
     /**
      * returns a classification as POJO. Only the given Category is returned.
      * 
@@ -131,19 +131,20 @@ public class MCRClassificationQuery {
      *            MCR category ID.
      * @return
      */
-    public static Classification getClassification(String classID, String categID) {
+    public static Classification getClassification(String classID, String categID, boolean withCounter) {
         LOGGER.debug("-receiveCategoryAsJDOM");
-        Document doc = MCRClassification.receiveCategoryAsJDOM(classID, categID);
+        Document doc = MCRClassification.receiveCategoryAsJDOM(classID, categID, withCounter);
         LOGGER.debug("-getClassification");
-        Classification returns = getClassification(doc, -1);
+        Classification returns = getClassification(doc, -1, withCounter);
         LOGGER.debug("-getClassification finished");
         return returns;
     }
 
     public static void main(String[] arg) throws IOException {
-        Classification c = MCRClassificationQuery.getClassification(arg[0], 1);
+        boolean withCounter = true;
+        Classification c = MCRClassificationQuery.getClassification(arg[0], 1, withCounter);
         MainHelper.print(c, 0);
-        c = MCRClassificationQuery.getClassification(arg[0], arg[1], 0);
+        c = MCRClassificationQuery.getClassification(arg[0], arg[1], 0, withCounter);
         MainHelper.print(c, 0);
         Document doc = ClassificationTransformer.getMetaDataDocument(c);
         MainHelper.print(doc);
@@ -151,7 +152,7 @@ public class MCRClassificationQuery {
         MainHelper.print(doc);
         doc = MCRClassification.receiveClassificationAsJDOM(arg[0]);
         MainHelper.print(doc);
-        c = MCRClassificationQuery.getClassificationHierarchie(arg[0],arg[1],-1);
+        c = MCRClassificationQuery.getClassificationHierarchie(arg[0], arg[1], -1, withCounter);
         doc = ClassificationTransformer.getMetaDataDocument(c);
         MainHelper.print(doc);
     }
@@ -161,61 +162,68 @@ public class MCRClassificationQuery {
      * @param levels
      * @return
      */
-    private static Classification getClassification(Document cl, int levels) {
+    private static Classification getClassification(Document cl, int levels, boolean withCounter) {
         Classification returns = ClassificationFactory.getClassification(cl.getRootElement());
-        fillCategory(returns.getId(), returns, cl.getRootElement().getChild("categories"), levels);
+        returns.setCounterEnabled(withCounter);
+        fillCategory(returns.getId(), returns, cl.getRootElement().getChild("categories"), levels, withCounter);
         return returns;
     }
 
-    private static Classification getClassification(MCRCategoryItem catItem,List ancestors, int levels){
-        Classification cl=ClassificationFactory.getClassification(catItem.getClassificationItem());
+    private static Classification getClassification(MCRCategoryItem catItem, List ancestors, int levels, boolean withCounter) {
+        Classification cl = ClassificationFactory.getClassification(catItem.getClassificationItem());
         // map of every categID with numberofObjects
-        Map map = MCRLinkTableManager.instance().countReferenceCategory(cl.getId());
-        Category cat=fillCategoryWithParents(cl,ancestors,map);
-        fillCategory(cat, catItem, map, levels);
+        Map map = withCounter ? MCRLinkTableManager.instance().countReferenceCategory(cl.getId()) : null;
+        Category cat = fillCategoryWithParents(cl, ancestors, map, withCounter);
+        fillCategory(cat, catItem, map, levels, withCounter);
         return cl;
     }
 
-    private static Category fillCategoryWithParents(ClassificationObject c,List ancestor, Map numDocs){
-        ClassificationObject co=c;
-        Category cat=null;
+    private static Category fillCategoryWithParents(ClassificationObject c, List ancestor, Map numDocs, boolean withCounter) {
+        ClassificationObject co = c;
+        Category cat = null;
         Iterator it = ancestor.iterator();
-        while (it.hasNext()){
-            MCRCategoryItem item=(MCRCategoryItem)it.next();
-            cat=CategoryFactory.getCategory(item);
-            cat.setNumberOfObjects(getNumberOfObjects(cat.getClassID(),cat.getId(),numDocs));
+        while (it.hasNext()) {
+            MCRCategoryItem item = (MCRCategoryItem) it.next();
+            cat = CategoryFactory.getCategory(item);
+            if (withCounter) {
+                cat.setNumberOfObjects(getNumberOfObjects(cat.getClassID(), cat.getId(), numDocs));
+            }
             co.getCatgegories().add(cat);
-            co=cat;
+            co = cat;
         }
         return cat;
     }
 
-    private static void fillCategory(ClassificationObject c, MCRCategoryItem item, Map map, int levels) {
+    private static void fillCategory(ClassificationObject c, MCRCategoryItem item, Map map, int levels, boolean withCounter) {
         if (levels != 0) {
             MCRCategoryItem[] children = item.getChildren();
             for (int i = 0; i < children.length; i++) {
                 MCRCategoryItem child = children[i];
                 Category childC = CategoryFactory.getCategory(child);
-                int count = getNumberOfObjects(item.getClassificationID(), item.getID(), map);
-                childC.setNumberOfObjects(count);
+                if (withCounter) {
+                    int count = getNumberOfObjects(item.getClassificationID(), item.getID(), map);
+                    childC.setNumberOfObjects(count);
+                }
                 childC.setClassID(item.getClassificationID());
                 c.getCatgegories().add(childC);
-                fillCategory(childC, child, map, levels - 1);
+                fillCategory(childC, child, map, levels - 1, withCounter);
             }
         }
     }
 
-    private static void fillCategory(String classID, ClassificationObject c, Element e, int levels) {
+    private static void fillCategory(String classID, ClassificationObject c, Element e, int levels, boolean withCounter) {
         if (levels != 0) {
             List children = e.getChildren("category");
             Iterator it = children.iterator();
             while (it.hasNext()) {
                 Element child = (Element) it.next();
                 Category childC = CategoryFactory.getCategory(child);
-                childC.setNumberOfObjects(getNumberOfObjects(child));
+                if (withCounter) {
+                    childC.setNumberOfObjects(getNumberOfObjects(child));
+                }
                 childC.setClassID(classID);
                 c.getCatgegories().add(childC);
-                fillCategory(classID, childC, child, levels - 1);
+                fillCategory(classID, childC, child, levels - 1, withCounter);
             }
         }
     }
@@ -297,16 +305,17 @@ public class MCRClassificationQuery {
             return returns;
         }
     }
-    
+
     /**
      * 
      * @author Thomas Scheffler (yagee)
      * 
-     * This class provides some helper methods, that the main() method depend on.
-     *
+     * This class provides some helper methods, that the main() method depend
+     * on.
+     * 
      */
-    private static final class MainHelper{
-        //TODO: After setting up JUnit persitence test remove this class
+    private static final class MainHelper {
+        // TODO: After setting up JUnit persitence test remove this class
 
         private static void print(ClassificationObject c, int depth) {
             intend(depth);
@@ -331,6 +340,6 @@ public class MCRClassificationQuery {
                 System.out.print(' ');
             }
         }
-        
+
     }
 }

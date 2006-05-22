@@ -775,25 +775,29 @@ public class MCRURIResolver implements javax.xml.transform.URIResolver, EntityRe
             }
             String categ = categID.toString();
             Classification cl=null;
+            String labelFormat = getLabelFormat(format);
+            boolean withCounter=false;
+            if ((labelFormat!=null) && (labelFormat.indexOf("counter")!=-1)){
+                withCounter=true;
+            }
             LOGGER.debug("start ClassificationQuery");
             if (axis.equals("children")) {
                 if (categ.length() > 0) {
-                    cl = MCRClassificationQuery.getClassification(classID, categ, levels);
+                    cl = MCRClassificationQuery.getClassification(classID, categ, levels, withCounter);
                 } else {
-                    cl = MCRClassificationQuery.getClassification(classID, levels);
+                    cl = MCRClassificationQuery.getClassification(classID, levels, withCounter);
                 }
             } else if (axis.equals("parents")){
                 if (categ.length()==0){
                     LOGGER.error("Cannot resolve parent axis without a CategID. URI: "+uri);
                     throw new IllegalArgumentException("Invalid format (categID is required in mode 'parents') of uri for retrieval of classification: "+uri);
                 }
-                cl = MCRClassificationQuery.getClassificationHierarchie(classID,categ,levels);
+                cl = MCRClassificationQuery.getClassificationHierarchie(classID,categ,levels, withCounter);
             }
             
             Element returns;
             LOGGER.debug("start transformation of ClassificationQuery");
             if (format.startsWith("editor")) {
-                String labelFormat = getLabelFormat(format);
                 if (labelFormat == null) {
                     returns = ClassificationTransformer.getEditorDocument(cl).getRootElement();
                 } else {

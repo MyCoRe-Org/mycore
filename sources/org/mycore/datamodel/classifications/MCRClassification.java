@@ -790,30 +790,57 @@ public class MCRClassification {
 		return tm.readDocument(classID);
 	}
 
-	/**
-	 * The method return the classification as JDOM tree.
-	 * 
-	 * @param classID
-	 *            the classification ID to delete
-	 * @return the classification as JDOM
-	 */
-	public static final Document receiveClassificationAsJDOM(String classID) {
-		Document classification = null;
+    /**
+     * The method return the classification as JDOM tree.
+     * 
+     * @param classID
+     *            the classification ID to delete
+     * @return the classification as JDOM
+     */
+    public static final Document receiveClassificationAsJDOM(String classID) {
+        Document classification = null;
 
-		classification = getClassification(classID);
+        classification = getClassification(classID);
 
-		Map map = MCRLinkTableManager.instance().countReferenceCategory(classID);
-		// in map we've got the sharp number for every categoryID (without
-		// children)
-		// now we add to every categoryID the numbers of the children
-		for (Iterator it = classification.getDescendants(new ElementFilter("category")); it.hasNext();) {
-			Element category = (Element) it.next();
-			String mapKey = classID + "##" + category.getAttributeValue(ID_ATTR);
-			int count = (map.get(mapKey) != null) ? ((Integer) map.get(mapKey)).intValue() : 0;
-			category.setAttribute(OBJ_COUNT_ATTR, Integer.toString(count));
-		}
-		return classification;
-	}
+        Map map = MCRLinkTableManager.instance().countReferenceCategory(classID);
+        // in map we've got the sharp number for every categoryID (without
+        // children)
+        // now we add to every categoryID the numbers of the children
+        for (Iterator it = classification.getDescendants(new ElementFilter("category")); it.hasNext();) {
+            Element category = (Element) it.next();
+            String mapKey = classID + "##" + category.getAttributeValue(ID_ATTR);
+            int count = (map.get(mapKey) != null) ? ((Integer) map.get(mapKey)).intValue() : 0;
+            category.setAttribute(OBJ_COUNT_ATTR, Integer.toString(count));
+        }
+        return classification;
+    }
+
+    /**
+     * The method return the classification as JDOM tree.
+     * 
+     * @param classID
+     *            the classification ID to delete
+     * @return the classification as JDOM
+     */
+    public static final Document receiveClassificationAsJDOM(String classID, boolean withCounter) {
+        Document classification = null;
+
+        classification = getClassification(classID);
+        
+        if (withCounter) {
+            Map map = MCRLinkTableManager.instance().countReferenceCategory(classID);
+            // in map we've got the sharp number for every categoryID (without
+            // children)
+            // now we add to every categoryID the numbers of the children
+            for (Iterator it = classification.getDescendants(new ElementFilter("category")); it.hasNext();) {
+                Element category = (Element) it.next();
+                String mapKey = classID + "##" + category.getAttributeValue(ID_ATTR);
+                int count = (map.get(mapKey) != null) ? ((Integer) map.get(mapKey)).intValue() : 0;
+                category.setAttribute(OBJ_COUNT_ATTR, Integer.toString(count));
+            }
+        }
+        return classification;
+    }
 
 	/**
 	 * The method return the classification as XML byte array.
@@ -829,65 +856,79 @@ public class MCRClassification {
 		return xml;
 	}
 
-	/**
-	 * The method return the category as XML byte array.
-	 * 
-	 * @param classID
-	 *            the classification ID
-	 * @param categID
-	 *            the category ID
-	 * @return the classification as XML
-	 */
-	public static final org.jdom.Document receiveCategoryAsJDOM(String classID, String categID) {
-		MCRLinkTableManager mcr_linktable = MCRLinkTableManager.instance();
-		org.jdom.Element elm = new org.jdom.Element("mycoreclass");
-		org.jdom.Document doc = new org.jdom.Document(elm);
-		elm.addNamespaceDeclaration(org.jdom.Namespace.getNamespace("xsi", MCRDefaults.XSI_URL));
-		elm.addNamespaceDeclaration(org.jdom.Namespace.getNamespace("xlink", MCRDefaults.XLINK_URL));
-		elm.setAttribute(ID_ATTR, classID);
+    /**
+     * The method return the category as XML byte array.
+     * 
+     * @param classID
+     *            the classification ID
+     * @param categID
+     *            the category ID
+     * @return the classification as XML
+     */
+    public static final org.jdom.Document receiveCategoryAsJDOM(String classID, String categID) {
+        return receiveCategoryAsJDOM(classID, categID, false);
+    }
+    /**
+     * The method return the category as XML byte array.
+     * 
+     * @param classID
+     *            the classification ID
+     * @param categID
+     *            the category ID
+     * @return the classification as XML
+     */
+    public static final org.jdom.Document receiveCategoryAsJDOM(String classID, String categID, boolean withCounter) {
+        MCRLinkTableManager mcr_linktable = MCRLinkTableManager.instance();
+        org.jdom.Element elm = new org.jdom.Element("mycoreclass");
+        org.jdom.Document doc = new org.jdom.Document(elm);
+        elm.addNamespaceDeclaration(org.jdom.Namespace.getNamespace("xsi", MCRDefaults.XSI_URL));
+        elm.addNamespaceDeclaration(org.jdom.Namespace.getNamespace("xlink", MCRDefaults.XLINK_URL));
+        elm.setAttribute(ID_ATTR, classID);
 
-		org.jdom.Element cats = new org.jdom.Element("categories");
-		MCRClassificationItem cl;
-		// get the classification
-		try {
-			cl = MCRClassificationItem.getClassificationItem(classID);
-		} catch (Exception e) {
-			cl = null;
-		}
+        org.jdom.Element cats = new org.jdom.Element("categories");
+        MCRClassificationItem cl;
+        // get the classification
+        try {
+            cl = MCRClassificationItem.getClassificationItem(classID);
+        } catch (Exception e) {
+            cl = null;
+        }
 
-		if (cl != null) {
-			for (int i = 0; i < cl.getSize(); i++) {
-				elm.addContent(cl.getJDOMElement(i));
-			}
+        if (cl != null) {
+            for (int i = 0; i < cl.getSize(); i++) {
+                elm.addContent(cl.getJDOMElement(i));
+            }
 
-			// get the category
-			MCRCategoryItem ci = cl.getCategoryItem(categID);
+            // get the category
+            MCRCategoryItem ci = cl.getCategoryItem(categID);
 
-			if (ci != null) {
-				org.jdom.Element cat = new org.jdom.Element("category");
-				cat.setAttribute(ID_ATTR, ci.getID());
+            if (ci != null) {
+                org.jdom.Element cat = new org.jdom.Element("category");
+                cat.setAttribute(ID_ATTR, ci.getID());
 
-				int cou = mcr_linktable.countReferenceCategory(classID, categID);
-				cat.setAttribute("counter", Integer.toString(cou));
+                if (withCounter) {
+                    int cou = mcr_linktable.countReferenceCategory(classID, categID);
+                    cat.setAttribute("counter", Integer.toString(cou));
+                }
+                
+                for (int i = 0; i < ci.getSize(); i++) {
+                    cat.addContent(ci.getJDOMElement(i));
+                }
 
-				for (int i = 0; i < ci.getSize(); i++) {
-					cat.addContent(ci.getJDOMElement(i));
-				}
+                if (ci.getURL().length() != 0) {
+                    org.jdom.Element u = new org.jdom.Element("url");
+                    u.setAttribute("href", ci.getURL(), org.jdom.Namespace.getNamespace("xlink", MCRDefaults.XLINK_URL));
+                    cat.addContent(u);
+                }
 
-				if (ci.getURL().length() != 0) {
-					org.jdom.Element u = new org.jdom.Element("url");
-					u.setAttribute("href", ci.getURL(), org.jdom.Namespace.getNamespace("xlink", MCRDefaults.XLINK_URL));
-					cat.addContent(u);
-				}
+                cats.addContent(cat);
+            }
+        }
 
-				cats.addContent(cat);
-			}
-		}
+        elm.addContent(cats);
 
-		elm.addContent(cats);
-
-		return doc;
-	}
+        return doc;
+    }
 
 	/**
 	 * The method return the category as XML byte array.

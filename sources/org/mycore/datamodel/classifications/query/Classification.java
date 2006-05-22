@@ -30,5 +30,15 @@ package org.mycore.datamodel.classifications.query;
  * @version $Revision$ $Date$
  */
 public class Classification extends ClassificationObject {
+    
+    private boolean counterEnabled;
+
+    public boolean isCounterEnabled() {
+        return counterEnabled;
+    }
+
+    public void setCounterEnabled(boolean counterEnabled) {
+        this.counterEnabled = counterEnabled;
+    }
 
 }
