@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
@@ -249,12 +250,14 @@ public class MCRResults {
     int merge(Document doc, String hostAlias) {
         Element xml = doc.getRootElement();
         int numHitsBefore = this.getNumHits();
+        int remoteHits=Integer.parseInt(xml.getAttributeValue("numHits"));
 
         List hitList = xml.getChildren();
-        hits.ensureCapacity(numHitsBefore + hitList.size());
+        hits.ensureCapacity(numHitsBefore + remoteHits);
+        Iterator it=hitList.iterator();
         
-        for (int i = 0; i < hitList.size(); i++) {
-            Element hitElement = (Element) (hitList.get(i));
+        while (it.hasNext()) {
+            Element hitElement = (Element) (it.next());
             MCRHit hit = MCRHit.parseXML(hitElement, hostAlias);
             hits.add(hit);
             map.put(hit.getKey(), hit);
