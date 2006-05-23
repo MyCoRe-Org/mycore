@@ -25,6 +25,7 @@ package org.mycore.services.fieldquery;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -52,7 +53,7 @@ import org.mycore.common.MCRException;
 public class MCRHit {
     /** The ID of this object that matched the query */
     private String id;
-    
+
     /** The unique key of this hit */
     private String key;
 
@@ -90,7 +91,7 @@ public class MCRHit {
      * @param hostAlias
      *            the remote host alias (may be null)
      */
-    public MCRHit(String id, String hostAlias) {
+    private MCRHit(String id, String hostAlias) {
         this.id = id;
         this.host = hostAlias;
         this.key = id + "@" + hostAlias;
@@ -268,41 +269,35 @@ public class MCRHit {
      * @param xml
      *            the XML element
      * @param hostAlias
-     *            the remote host alias (may be null)
+     *            the remote host alias
      * @return the parsed MCRHit object
      */
-    public static MCRHit parseXML(Element xml, String hostAlias) {
+    static MCRHit parseXML(Element xml, String hostAlias) {
         String id = xml.getAttributeValue("id", "");
         if (id.length() == 0)
             throw new MCRException("MCRHit id attribute is empty");
 
-        MCRHit hit = new MCRHit(xml.getAttributeValue("id"));
-
-        String alias = xml.getAttributeValue("host", "");
-        if (hostAlias != null)
-            hit.host = hostAlias;
-        else if (alias.length() > 0)
-            hit.host = alias;
+        MCRHit hit = new MCRHit(id, hostAlias);
 
         Element eSort = xml.getChild("sortData", MCRFieldDef.mcrns);
         if (eSort != null) {
             List children = eSort.getChildren();
-            for (int i = 0; i < children.size(); i++) {
-                Element child = (Element) (children.get(i));
+            for (Iterator it = children.iterator(); it.hasNext();) {
+                Element child = (Element) (it.next());
                 hit.addSortData(MCRFieldValue.parseXML(child));
             }
         }
 
         List metaList = xml.getChildren("metaData");
-        for (int i = 0; i < metaList.size(); i++) {
-            Element md = (Element) (metaList.get(i));
+        for (Iterator itm = metaList.iterator(); itm.hasNext();) {
+            Element md = (Element) (itm.next());
             List children = md.getChildren();
 
-            for (int j = 0; j < children.size(); j++) {
-                Element child = (Element) (children.get(j));
+            for (Iterator it = children.iterator(); it.hasNext();) {
+                Element child = (Element) (it.next());
                 hit.addMetaData(MCRFieldValue.parseXML(child));
             }
-            if (i < metaList.size() - 1)
+            if (itm.hasNext())
                 hit.metaData.add(null);
         }
 
