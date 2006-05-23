@@ -51,7 +51,7 @@ import org.jdom.output.XMLOutputter;
  */
 public class MCRResults {
     /** The list of MCRHit objects */
-    private List hits = new ArrayList();
+    private ArrayList hits = new ArrayList();
 
     /**
      * A map containing MCRHit IDs used for and/or operations on two different
@@ -251,6 +251,8 @@ public class MCRResults {
         int numHitsBefore = this.getNumHits();
 
         List hitList = xml.getChildren();
+        hits.ensureCapacity(numHitsBefore + hitList.size());
+        
         for (int i = 0; i < hitList.size(); i++) {
             Element hitElement = (Element) (hitList.get(i));
             MCRHit hit = MCRHit.parseXML(hitElement, hostAlias);
