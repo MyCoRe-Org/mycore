@@ -138,13 +138,13 @@ public class MCRQueryManager {
 
             if (totalResults == null)
                 totalResults = subResults;
-            else if (and)
+            else if (and) {
                 totalResults.and(subResults);
-            else
+                if (totalResults.getNumHits() == 0)
+                    break; // 0 and ? := 0, we do not need to query the rest
+            } else
                 totalResults.or(subResults);
 
-            if ((totalResults.getNumHits() == 0) && and)
-                break; // 0 and ? := 0, we do not need to query the rest
         }
         return totalResults;
     }
