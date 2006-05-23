@@ -60,8 +60,7 @@ public class MCRQueryManager {
         // Do remote query if hosts list is not empty
         for (int i = 0; (hosts != null) && (i < hosts.size()); i++) {
             String alias = (String) (hosts.get(i));
-            MCRResults remoteResults = MCRQueryClient.search(alias, query);
-            results.merge( remoteResults );
+            MCRQueryClient.search(alias, query, results);
         }
 
         // Sort results if not already sorted
@@ -136,7 +135,7 @@ public class MCRQueryManager {
             MCRCondition subCond = buildSubCondition(conditions, and, not);
 
             MCRResults subResults = buildResults(subCond, sortBy, 0);
-            
+
             if (totalResults == null)
                 totalResults = subResults;
             else if (and)

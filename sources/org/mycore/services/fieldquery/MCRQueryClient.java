@@ -93,7 +93,7 @@ public class MCRQueryClient {
         operation.setUse(Use.ENCODED);
     }
 
-    public static MCRResults search(String hostAlias, MCRQuery query) {
+    public static void search(String hostAlias, MCRQuery query, MCRResults results) {
         if (!endpoints.containsKey(hostAlias)) {
             String msg = "No configuration for host " + hostAlias;
             throw new MCRConfigurationException(msg);
@@ -118,13 +118,11 @@ public class MCRQueryClient {
 
             // Process xml response
             Document response = new DOMBuilder().build(outDoc);
-            MCRResults results = MCRResults.parseXML(response,hostAlias);
-            LOGGER.debug("Received " + results.getNumHits() + " hits from host " + hostAlias);
-            return results;
+            int numHits = results.merge(response, hostAlias);
+            LOGGER.debug("Received " + numHits + " hits from host " + hostAlias);
         } catch (Exception ex) {
             String msg = "Exception while querying remote host " + hostAlias;
             LOGGER.error(msg, ex);
-            return new MCRResults();
         }
     }
 }

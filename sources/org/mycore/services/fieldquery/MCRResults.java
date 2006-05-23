@@ -34,7 +34,6 @@ import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
-import org.mycore.common.MCRException;
 
 /**
  * This class represents the results of a query performed by MCRSearcher.
@@ -239,30 +238,26 @@ public class MCRResults {
     }
 
     /**
-     * Parses a XML document of a results object containing all hits and their
-     * data
+     * Merges the hits from a remote query to this results
      * 
-     * @param xml
-     *            the XML results document
+     * @param doc
+     *            the results from the remote query as XML document
      * @param hostAlias
-     *            the remote host alias (may be null)
-     * @return the parsed MCRResults object
+     *            the alias of the host where the hits come from
+     * @return the number of hits added
      */
-    public static MCRResults parseXML(Document doc, String hostAlias) {
+    int merge(Document doc, String hostAlias) {
         Element xml = doc.getRootElement();
-        MCRResults results = new MCRResults();
-        results.id = xml.getAttributeValue("id", "");
-        if (results.id.length() == 0)
-            throw new MCRException("MCRResults id attribute is empty");
-
-        results.isSorted = "true".equals(xml.getAttributeValue("sorted"));
+        int numHitsBefore = this.getNumHits();
 
         List hitList = xml.getChildren();
         for (int i = 0; i < hitList.size(); i++) {
             Element hitElement = (Element) (hitList.get(i));
-            results.addHit(MCRHit.parseXML(hitElement, hostAlias));
+            MCRHit hit = MCRHit.parseXML(hitElement, hostAlias);
+            hits.add(hit);
+            map.put(hit.getKey(), hit);
         }
-        return results;
+        return this.getNumHits() - numHitsBefore;
     }
 
     public String toString() {
@@ -270,12 +265,13 @@ public class MCRResults {
     }
 
     /**
-     * Does a logical and of this results hits and other results hits.
-     * The hits that are contained in both results are kept, the others
-     * are removed from this results list. The data of common hits is combined
-     * from both result lists.
+     * Does a logical and of this results hits and other results hits. The hits
+     * that are contained in both results are kept, the others are removed from
+     * this results list. The data of common hits is combined from both result
+     * lists.
      * 
-     * @param other the other result list
+     * @param other
+     *            the other result list
      */
     public void and(MCRResults other) {
         // x AND {} is always {}
@@ -299,10 +295,11 @@ public class MCRResults {
     }
 
     /**
-     * Adds all hits of another result list that are not yet in
-     * this result list. Combines the MCRHit data of both result lists. 
+     * Adds all hits of another result list that are not yet in this result
+     * list. Combines the MCRHit data of both result lists.
      * 
-     * @param other the other result list
+     * @param other
+     *            the other result list
      */
     public void or(MCRResults other) {
         // Merge the data of all hits that are in BOTH result lists
@@ -323,23 +320,6 @@ public class MCRResults {
                 map.put(key, b);
                 hits.add(b);
             }
-        }
-    }
-
-    /**
-     * Merges the hits of another result list to the data of 
-     * this result list. Can be used to combine the hits of the
-     * two result lists if it is guaranteed that both have NO common
-     * hits (which is the case in distributed search across multiple
-     * servers)
-     * 
-     * @param other the other result list
-     */
-    public void merge(MCRResults other) {
-        for (int i = 0; i < other.getNumHits(); i++) {
-            MCRHit h = other.getHit(i);
-            map.put(h.getKey(), h);
-            hits.add(h);
         }
     }
 }
