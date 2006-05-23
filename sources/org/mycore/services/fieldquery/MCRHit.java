@@ -188,39 +188,25 @@ public class MCRHit {
     }
 
     /**
-     * Combines the data of two MCRHit objects with the same ID, but from
-     * different searchers result sets by copying the sort data and hit metadata
-     * of both objects.
+     * Merges the data of a MCRHit object with the same ID to the data of this
+     * MCRHit object. The sort data and meta data of the other hit is added to
+     * this object's data.
      * 
-     * @param a
-     *            the first hit from the first searcher
-     * @param b
-     *            the other hit from the other searcher
+     * @param other
+     *            the other hit
      */
-    static MCRHit merge(MCRHit a, MCRHit b) {
-        // If there is nothing to merge, return existing hit
-        if (b == null) {
-            return a;
-        }
-        if (a == null) {
-            return b;
+    void merge(MCRHit other) {
+        // Copy other hit sort data
+        if (this.sortData.isEmpty() && !other.sortData.isEmpty()) {
+            this.sortData.addAll(other.sortData);
+            this.sortValues.putAll(other.sortValues);
         }
 
-        // Copy ID
-        MCRHit c = new MCRHit(a.getID(), a.getHost());
-
-        // Copy sortData
-        c.sortData.addAll(a.sortData.isEmpty() ? b.sortData : a.sortData);
-        c.sortValues.putAll(a.sortValues);
-        c.sortValues.putAll(b.sortValues);
-
-        // Copy metaData
-        c.metaData.addAll(a.metaData);
-        if ((a.metaData.size() > 0) && (b.metaData.size() > 0))
-            c.metaData.add(null); // used as a delimiter
-        c.metaData.addAll(b.metaData);
-
-        return c;
+        // Copy other hit meta data
+        if (other.metaData.size() > 0) {
+            this.metaData.add(null); // used as a delimiter
+            this.metaData.addAll(other.metaData);
+        }
     }
 
     public String toString() {

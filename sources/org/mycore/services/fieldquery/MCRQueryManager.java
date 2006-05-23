@@ -61,7 +61,7 @@ public class MCRQueryManager {
         for (int i = 0; (hosts != null) && (i < hosts.size()); i++) {
             String alias = (String) (hosts.get(i));
             MCRResults remoteResults = MCRQueryClient.search(alias, query);
-            results = MCRResults.merge(remoteResults, results);
+            results.merge( remoteResults );
         }
 
         // Sort results if not already sorted
@@ -136,12 +136,13 @@ public class MCRQueryManager {
             MCRCondition subCond = buildSubCondition(conditions, and, not);
 
             MCRResults subResults = buildResults(subCond, sortBy, 0);
+            
             if (totalResults == null)
                 totalResults = subResults;
             else if (and)
-                totalResults = MCRResults.and(totalResults, subResults);
+                totalResults.and(subResults);
             else
-                totalResults = MCRResults.or(totalResults, subResults);
+                totalResults.or(subResults);
 
             if ((totalResults.getNumHits() == 0) && and)
                 break; // 0 and ? := 0, we do not need to query the rest

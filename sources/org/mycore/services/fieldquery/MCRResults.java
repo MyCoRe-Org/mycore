@@ -94,16 +94,15 @@ public class MCRResults {
      */
     public void addHit(MCRHit hit) {
         String key = hit.getKey();
-        if (!map.containsKey(key)) {
+        MCRHit existing = getHit(key);
+
+        if (existing == null) {
             // This is a new entry with new ID
             hits.add(hit);
             map.put(key, hit);
         } else {
             // Merge data of existing hit with new one with the same ID
-            MCRHit existing = getHit(key);
-            MCRHit merged = MCRHit.merge(hit, existing);
-            hits.set(hits.indexOf(existing), merged);
-            map.put(key, merged);
+            existing.merge(hit);
         }
     }
 
@@ -271,81 +270,76 @@ public class MCRResults {
     }
 
     /**
-     * Returns a new MCRResults that only contains those hits that are members
-     * of both source MCRResults objects. The compare is based on the ID of the
-     * hits. The data of each single hit is merged from both results.
+     * Does a logical and of this results hits and other results hits.
+     * The hits that are contained in both results are kept, the others
+     * are removed from this results list. The data of common hits is combined
+     * from both result lists.
      * 
-     * @param a
-     *            the first result list
-     * @param b
-     *            the other result list
-     * @return the new result list
+     * @param other the other result list
      */
-    public static MCRResults and(MCRResults a, MCRResults b) {
-        MCRResults res = new MCRResults();
-
-        for (int i = 0; i < a.getNumHits(); i++) {
-            MCRHit hitA = a.getHit(i);
-            MCRHit hitB = b.getHit(hitA.getKey());
-
-            if (hitB != null) {
-                res.addHit(MCRHit.merge(hitA, hitB));
-            }
+    public void and(MCRResults other) {
+        // x AND {} is always {}
+        if (other.getNumHits() == 0) {
+            map.clear();
+            hits.clear();
+            return;
         }
 
-        return res;
+        for (int i = 0; i < getNumHits(); i++) {
+            MCRHit a = this.getHit(i);
+            String key = a.getKey();
+            MCRHit b = other.getHit(key);
+
+            if (b == null) {
+                map.remove(key);
+                hits.remove(i--);
+            } else
+                a.merge(b);
+        }
     }
 
     /**
-     * Returns a new MCRResults that contains those hits that are members of at
-     * least one of the source MCRResults objects. The compare is based on the
-     * ID of the hits. The data of each single hit is merged from both results.
+     * Adds all hits of another result list that are not yet in
+     * this result list. Combines the MCRHit data of both result lists. 
      * 
-     * @param a
-     *            the first result list
-     * @param b
-     *            the other result list
-     * @return the new result list
+     * @param other the other result list
      */
-    public static MCRResults or(MCRResults a, MCRResults b) {
-        MCRResults res = new MCRResults();
+    public void or(MCRResults other) {
+        // Merge the data of all hits that are in BOTH result lists
+        for (int i = 0; i < getNumHits(); i++) {
+            MCRHit a = this.getHit(i);
+            String key = a.getKey();
+            MCRHit b = other.getHit(key);
 
-        for (int i = 0; i < a.getNumHits(); i++) {
-            MCRHit hitA = a.getHit(i);
-            MCRHit hitB = b.getHit(hitA.getKey());
-
-            MCRHit hitC = MCRHit.merge(hitA, hitB);
-            res.addHit(hitC);
+            if (b != null)
+                a.merge(b);
         }
 
-        for (int i = 0; i < b.getNumHits(); i++)
-            if (!res.map.containsKey(b.getHit(i).getID())) {
-                res.addHit(b.getHit(i));
+        // Add hits from other that are NOT in this result list
+        for (int i = 0; i < other.getNumHits(); i++) {
+            MCRHit b = other.getHit(i);
+            String key = b.getKey();
+            if (!map.containsKey(key)) {
+                map.put(key, b);
+                hits.add(b);
             }
-
-        return res;
+        }
     }
 
     /**
-     * Returns a new MCRResults that contains all hits of both source MCRResults
-     * objects. No compare is done, it is assumed that the two lists do not have
-     * common members.
+     * Merges the hits of another result list to the data of 
+     * this result list. Can be used to combine the hits of the
+     * two result lists if it is guaranteed that both have NO common
+     * hits (which is the case in distributed search across multiple
+     * servers)
      * 
-     * @param a
-     *            the first result list
-     * @param b
-     *            the other result list
-     * @return the new result list
+     * @param other the other result list
      */
-    public static MCRResults merge(MCRResults a, MCRResults b) {
-        MCRResults merged = new MCRResults();
-
-        for (int i = 0; i < a.getNumHits(); i++)
-            merged.addHit(a.getHit(i));
-
-        for (int i = 0; i < b.getNumHits(); i++)
-            merged.addHit(b.getHit(i));
-
-        return merged;
+    public void merge(MCRResults other) {
+        for (int i = 0; i < other.getNumHits(); i++) {
+            MCRHit h = other.getHit(i);
+            map.put(h.getKey(), h);
+            hits.add(h);
+        }
     }
 }
