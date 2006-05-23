@@ -52,6 +52,9 @@ import org.mycore.common.MCRException;
 public class MCRHit {
     /** The ID of this object that matched the query */
     private String id;
+    
+    /** The unique key of this hit */
+    private String key;
 
     /** Identifies a hit that comes from the local server */
     public final static String LOCAL = "local";
@@ -76,6 +79,7 @@ public class MCRHit {
      */
     public MCRHit(String id) {
         this.id = id;
+        this.key = id + "@" + LOCAL;
     }
 
     /**
@@ -89,6 +93,7 @@ public class MCRHit {
     public MCRHit(String id, String hostAlias) {
         this.id = id;
         this.host = hostAlias;
+        this.key = id + "@" + hostAlias;
     }
 
     /**
@@ -115,7 +120,7 @@ public class MCRHit {
      * @return a unique key for this MCRHit
      */
     String getKey() {
-        return id + "@" + host;
+        return key;
     }
 
     /**

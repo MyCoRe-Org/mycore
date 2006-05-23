@@ -281,7 +281,8 @@ public class MCRResults {
             return;
         }
 
-        for (int i = 0; i < getNumHits(); i++) {
+        int numHits = this.getNumHits();
+        for (int i = 0; i < numHits; i++) {
             MCRHit a = this.getHit(i);
             String key = a.getKey();
             MCRHit b = other.getHit(key);
@@ -302,7 +303,8 @@ public class MCRResults {
      *            the other result list
      */
     public void or(MCRResults other) {
-        for (int i = 0; i < other.getNumHits(); i++)
+        int numHits = other.getNumHits();
+        for (int i = 0; i < numHits; i++)
             this.addHit(other.getHit(i));
     }
 }
