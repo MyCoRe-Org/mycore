@@ -302,24 +302,7 @@ public class MCRResults {
      *            the other result list
      */
     public void or(MCRResults other) {
-        // Merge the data of all hits that are in BOTH result lists
-        for (int i = 0; i < getNumHits(); i++) {
-            MCRHit a = this.getHit(i);
-            String key = a.getKey();
-            MCRHit b = other.getHit(key);
-
-            if (b != null)
-                a.merge(b);
-        }
-
-        // Add hits from other that are NOT in this result list
-        for (int i = 0; i < other.getNumHits(); i++) {
-            MCRHit b = other.getHit(i);
-            String key = b.getKey();
-            if (!map.containsKey(key)) {
-                map.put(key, b);
-                hits.add(b);
-            }
-        }
+        for (int i = 0; i < other.getNumHits(); i++)
+            this.addHit(other.getHit(i));
     }
 }
