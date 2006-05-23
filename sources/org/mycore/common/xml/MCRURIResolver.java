@@ -777,7 +777,7 @@ public class MCRURIResolver implements javax.xml.transform.URIResolver, EntityRe
             Classification cl=null;
             String labelFormat = getLabelFormat(format);
             boolean withCounter=false;
-            if ((labelFormat!=null) && (labelFormat.indexOf("counter")!=-1)){
+            if ((labelFormat!=null) && (labelFormat.indexOf("{count}")!=-1)){
                 withCounter=true;
             }
             LOGGER.debug("start ClassificationQuery");
