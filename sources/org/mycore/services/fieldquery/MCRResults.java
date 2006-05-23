@@ -250,13 +250,12 @@ public class MCRResults {
     int merge(Document doc, String hostAlias) {
         Element xml = doc.getRootElement();
         int numHitsBefore = this.getNumHits();
-        int remoteHits=Integer.parseInt(xml.getAttributeValue("numHits"));
+        int numRemoteHits = Integer.parseInt(xml.getAttributeValue("numHits"));
 
         List hitList = xml.getChildren();
-        hits.ensureCapacity(numHitsBefore + remoteHits);
-        Iterator it=hitList.iterator();
-        
-        while (it.hasNext()) {
+        hits.ensureCapacity(numHitsBefore + numRemoteHits);
+
+        for (Iterator it = hitList.iterator(); it.hasNext();) {
             Element hitElement = (Element) (it.next());
             MCRHit hit = MCRHit.parseXML(hitElement, hostAlias);
             hits.add(hit);
