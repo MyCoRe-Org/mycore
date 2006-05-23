@@ -1699,6 +1699,7 @@ public class WCMSActionServlet extends WCMSServlet {
     public void writeJDOMDocumentToFile(Document jdomDoc, File xmlFile) throws IOException, FileNotFoundException {
         XMLOutputter xmlOut = new XMLOutputter();
         xmlOut.output(jdomDoc, new FileOutputStream(xmlFile));
+        CONFIG.systemModified();
     }
 
     /**
