@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.Iterator;
 
 import org.apache.log4j.Logger;
 import org.apache.lucene.analysis.Analyzer;
@@ -396,7 +397,7 @@ public class MCRLuceneSearcher extends MCRSearcher {
             // required flag Term with AND (true) or OR (false) combined
             Query luceneQuery = MCRBuildLuceneQuery.buildLuceneQuery(null, reqf, f, analyzer);
             LOGGER.debug("Lucene Query: " + luceneQuery.toString());
-            results = getLuceneHits(luceneQuery, maxResults);
+            results = getLuceneHits(luceneQuery, maxResults, sortBy, addSortData);
         } catch (Exception e) {
             LOGGER.error("Exception in MCRLuceneSearcher", e);
         }
@@ -409,7 +410,7 @@ public class MCRLuceneSearcher extends MCRSearcher {
      * 
      * @return result set
      */
-    private MCRResults getLuceneHits(Query luceneQuery, int maxResults) throws Exception {
+    private MCRResults getLuceneHits(Query luceneQuery, int maxResults, List sortBy, boolean addSortData) throws Exception {
         if (maxResults <= 0)
             maxResults = 1000000;
 
@@ -435,11 +436,66 @@ public class MCRLuceneSearcher extends MCRSearcher {
 
             String id = doc.get("returnid");
             MCRHit hit = new MCRHit(id);
+            
+            for (int j=0; j<sortBy.size(); j++)
+            {
+              String field = (String)sortBy.get(j);
+              String value = doc.get(field);
+              if ( null != value)
+              {
+                MCRFieldDef fd   = MCRFieldDef.getDef(field);
+                MCRFieldValue fv = new MCRFieldValue(fd, value);
+                hit.addSortData(fv);
+              }
+              
+            }
             result.addHit(hit);
         }
 
         searcher.close();
 
         return result;
+    }
+    
+    public void addSortData(Iterator hits, List sortBy)
+    {
+      try
+      {
+        IndexSearcher searcher = new IndexSearcher(IndexDir);
+
+        if (null == searcher) {
+            return;
+        }
+
+        while(hits.hasNext())
+        {
+          MCRHit hit = (MCRHit)hits.next();
+          String id = hit.getID();
+          Term te1 = new Term("mcrid", id);
+          
+          TermQuery qu = new TermQuery(te1);
+          
+          Hits hitl = searcher.search(qu);
+          if (hitl.length() > 0)
+          {
+            org.apache.lucene.document.Document doc = hitl.doc(0);
+            for (int j=0; j<sortBy.size(); j++)
+            {
+              MCRFieldDef fd = (MCRFieldDef)sortBy.get(j);
+              String value = doc.get(fd.getName());
+              if ( null != value)
+              {
+                MCRFieldValue fv = new MCRFieldValue(fd, value);
+                hit.addSortData(fv);
+              }
+            }
+          }
+        }
+        
+        searcher.close();
+      } catch (IOException e)
+      {
+        LOGGER.error("Exception in MCRLuceneSearcher (addSortData)", e);
+      }
     }
 }
