@@ -1,8 +1,8 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml version="1.0" encoding="UTF-8"?>
 
 <!-- ============================================== -->
 <!--      MyCoRe-WebService build file for use with ANT        -->
-<!-- $Revision: 1.12 $ $Date: 2006-05-23 09:58:22 $ -->
+<!-- $Revision: 1.13 $ $Date: 2006-05-24 08:16:56 $ -->
 <!-- ============================================== -->
 
 <project name="MyCoReModule - WebService" default="usage" basedir=".">
@@ -10,10 +10,7 @@
     <!-- Read in environment variables -->
     <property environment="env" />
   
-    <!-- Provide a default value for DOCPORTAL_HOME if not set in env -->
-    <property name="env.DOCPORTAL_HOME" value="../../../docportal" />
-  
-    <property file="${env.DOCPORTAL_HOME}/config/mycore.properties.private" />
+    <property file="${basedir}/../../config/mycore.properties.private" />
 
     <property name="wsadminurl"    value="${MCR.baseurl}services/AdminService" />
     <property name="wsurl"         value="${MCR.baseurl}services/MCRWebService" />
@@ -121,8 +118,9 @@
 		
   <target name="axis.admin">
     <path id="deploy.classpath">
-      <fileset dir="../../lib" includes="*.jar" />
       <fileset dir="lib" includes="*.jar" />
+      <fileset dir="${env.MYCORE_HOME}/lib" includes="*.jar" />
+      <fileset dir="${env.MYCORE_HOME}/modules/module-webservices/lib" includes="*.jar" />
     </path>
     <taskdef resource="axis-tasks.properties" classpathref="deploy.classpath" />
     <axis-admin 
