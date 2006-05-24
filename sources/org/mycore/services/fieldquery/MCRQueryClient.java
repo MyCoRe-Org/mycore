@@ -39,13 +39,14 @@ import org.apache.axis.description.ParameterDesc;
 import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
+import org.jdom.JDOMException;
 import org.jdom.input.DOMBuilder;
 import org.jdom.output.DOMOutputter;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.xml.MCRURIResolver;
 
 /**
- * Executes a query on a remote host using a webservice
+ * Executes a query on remote hosts using a webservice
  * 
  * @author Frank Lützenkirchen
  */
@@ -93,7 +94,32 @@ public class MCRQueryClient {
         operation.setUse(Use.ENCODED);
     }
 
-    public static void search(String hostAlias, MCRQuery query, MCRResults results) {
+    static void search(MCRQuery query, MCRResults results) {
+        List hosts = query.getHosts();
+        if (hosts.isEmpty())
+            return;
+        query.setHosts(null);
+
+        if (!query.getSortBy().isEmpty())
+            query.setMaxResults(0);
+
+        Document xml = query.buildXML();
+        org.w3c.dom.Document inDoc = null;
+        try {
+            inDoc = new DOMOutputter().output(xml);
+        } catch (JDOMException ex) {
+            String msg = "Could not convert query JDOM to DOM";
+            LOGGER.error(msg, ex);
+        }
+
+        for (int i = 0; i < hosts.size(); i++) {
+            String alias = (String) (hosts.get(i));
+            MCRQueryClient.search(alias, inDoc, results);
+        }
+
+    }
+
+    private static void search(String hostAlias, org.w3c.dom.Document inDoc, MCRResults results) {
         if (!endpoints.containsKey(hostAlias)) {
             String msg = "No configuration for host " + hostAlias;
             throw new MCRConfigurationException(msg);
@@ -102,7 +128,6 @@ public class MCRQueryClient {
         LOGGER.info("Starting remote query at host " + hostAlias);
 
         String endpoint = endpoints.getProperty(hostAlias);
-        Document xml = query.buildXML();
 
         try {
             // Build webservice call
@@ -112,7 +137,6 @@ public class MCRQueryClient {
             call.setOperationName("MCRDoQuery");
 
             // Call webservice
-            org.w3c.dom.Document inDoc = new DOMOutputter().output(xml);
             org.w3c.dom.Document outDoc = (org.w3c.dom.Document) (call.invoke(new Object[] { inDoc }));
             LOGGER.info("Received remote query results, processing XML now");
 

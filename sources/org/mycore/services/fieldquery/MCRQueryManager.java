@@ -51,18 +51,14 @@ public class MCRQueryManager {
      * @return the query results
      */
     public static MCRResults search(MCRQuery query) {
-        List hosts = query.getHosts();
         int maxResults = query.getMaxResults();
-        query.setHosts(null);
-
-        boolean addSortData = ! hosts.isEmpty(); // Never sort if remote query
-        MCRResults results = buildResults(query.getCondition(), query.getMaxResults(), query.getSortBy(), addSortData);
-
-        // Do remote query if hosts list is not empty
-        for (int i = 0; i < hosts.size(); i++) {
-            String alias = (String) (hosts.get(i));
-            MCRQueryClient.search(alias, query, results);
-        }
+        boolean addSortData = ! query.getHosts().isEmpty(); // Never sort remote
+        
+        // Build results of local query
+        MCRResults results = buildResults(query.getCondition(), maxResults, query.getSortBy(), addSortData);
+ 
+        // Add results of remote query
+        MCRQueryClient.search(query,results);
 
         // After sorting, cut result list to maxResults if not already done
         if ((maxResults > 0) && (results.getNumHits() > maxResults))
