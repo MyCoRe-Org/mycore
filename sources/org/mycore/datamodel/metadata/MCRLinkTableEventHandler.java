@@ -55,38 +55,9 @@ public class MCRLinkTableEventHandler extends MCREventHandlerBase {
         MCRObjectMetadata meta = obj.getMetadata();
         MCRMetaElement elm = null;
         MCRMetaInterface inf = null;
-        String classID, categID, destination;
-        for (int i = 0; i < meta.size(); i++) {
-            elm = meta.getMetadataElement(i);
-            for (int j = 0; j < elm.size(); j++) {
-                inf = elm.getElement(j);
-                if (inf instanceof MCRMetaClassification) {
-                    classID = ((MCRMetaClassification) inf).getClassId();
-                    categID = ((MCRMetaClassification) inf).getCategId();
-                    MCRClassificationItem classification = MCRClassificationItem.getClassificationItem(classID);
-                    if (classification != null) {
-                        MCRCategoryItem categ = classification.getCategoryItem(categID);
-                        if (categ != null) {
-                            continue;
-                        }
-                    }
-                    MCRActiveLinkException activeLink = new MCRActiveLinkException("Failure while adding link!. Destination does not exist.");
-                    destination = classID + "##" + categID;
-                    activeLink.addLink(mcr_id.toString(), destination);
-                    // throw activeLink;
-                    // TODO: should trigger undo-Event
-                }
-                if (inf instanceof MCRMetaLinkID) {
-                    destination = ((MCRMetaLinkID) inf).getXLinkHref();
-                    if (!MCRXMLTableManager.instance().exist(new MCRObjectID(destination))) {
-                        continue;
-                    }
-                    MCRActiveLinkException activeLink = new MCRActiveLinkException("Failure while adding link!. Destination does not exist.");
-                    activeLink.addLink(mcr_id.toString(), destination);
-                    // throw activeLink;
-                    // TODO: should trigger undo-Event
-                }
-            }
+        if (false){
+            //TODO: add undo events
+            checkLinkTargets(obj);
         }
         for (int i = 0; i < meta.size(); i++) {
             elm = meta.getMetadataElement(i);
@@ -103,7 +74,8 @@ public class MCRLinkTableEventHandler extends MCREventHandlerBase {
             }
         }
         // delete all derivate references
-        mcr_linktable.deleteReferenceLink(obj.getId().toString(),MCRLinkTableManager.ENTRY_TYPE_DERIVATE,"");
+        // NOTE: Derivates are deleted by handleObjectDeleted() above
+        // mcr_linktable.deleteReferenceLink(obj.getId().toString(),MCRLinkTableManager.ENTRY_TYPE_DERIVATE,"");
         // add derivate referece
         MCRObjectStructure struct = obj.getStructure();
         int dersize = struct.getDerivateSize();
@@ -112,6 +84,45 @@ public class MCRLinkTableEventHandler extends MCREventHandlerBase {
             mcr_linktable.addReferenceLink(obj.getId(), lid.getXLinkHrefID(), MCRLinkTableManager.ENTRY_TYPE_DERIVATE,"");
         }
 
+    }
+
+    private void checkLinkTargets(MCRObject obj) {
+        MCRObjectID mcr_id = obj.getId();
+        MCRObjectMetadata meta = obj.getMetadata();
+        MCRMetaElement elm;
+        MCRMetaInterface inf;
+        for (int i = 0; i < meta.size(); i++) {
+            elm = meta.getMetadataElement(i);
+            for (int j = 0; j < elm.size(); j++) {
+                inf = elm.getElement(j);
+                if (inf instanceof MCRMetaClassification) {
+                    String classID = ((MCRMetaClassification) inf).getClassId();
+                    String categID = ((MCRMetaClassification) inf).getCategId();
+                    MCRClassificationItem classification = MCRClassificationItem.getClassificationItem(classID);
+                    if (classification != null) {
+                        MCRCategoryItem categ = classification.getCategoryItem(categID);
+                        if (categ != null) {
+                            continue;
+                        }
+                    }
+                    MCRActiveLinkException activeLink = new MCRActiveLinkException("Failure while adding link!. Destination does not exist.");
+                    String destination = classID + "##" + categID;
+                    activeLink.addLink(mcr_id.toString(), destination);
+                    // throw activeLink;
+                    // TODO: should trigger undo-Event
+                }
+                if (inf instanceof MCRMetaLinkID) {
+                    String destination = ((MCRMetaLinkID) inf).getXLinkHref();
+                    if (!MCRXMLTableManager.instance().exist(new MCRObjectID(destination))) {
+                        continue;
+                    }
+                    MCRActiveLinkException activeLink = new MCRActiveLinkException("Failure while adding link!. Destination does not exist.");
+                    activeLink.addLink(mcr_id.toString(), destination);
+                    // throw activeLink;
+                    // TODO: should trigger undo-Event
+                }
+            }
+        }
     }
 
     /**
