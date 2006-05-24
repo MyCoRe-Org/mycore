@@ -23,6 +23,7 @@
 
 package org.mycore.services.fieldquery;
 
+import java.util.Iterator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -190,4 +191,7 @@ public abstract class MCRSearcher extends MCREventHandlerBase implements MCREven
      * @return the query results
      */
     public abstract MCRResults search(MCRCondition condition, int maxResults, List sortBy, boolean addSortData);
+
+    public void addSortData(Iterator hits, List sortBy) {
+    }
 }

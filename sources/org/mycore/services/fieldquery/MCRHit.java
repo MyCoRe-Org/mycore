@@ -161,6 +161,10 @@ public class MCRHit {
             sortValues.put(field, value);
         }
     }
+    
+    /** Returns true if this MCRHit has any sort data added */
+    boolean hasSortData()
+    { return ! sortData.isEmpty(); }
 
     /**
      * Compares this hit with another hit by comparing the value of the given

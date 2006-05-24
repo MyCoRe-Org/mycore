@@ -26,7 +26,9 @@ package org.mycore.services.fieldquery;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import org.mycore.parsers.bool.MCRAndCondition;
 import org.mycore.parsers.bool.MCRCondition;
@@ -58,16 +60,58 @@ public class MCRQueryManager {
         int maxResults = query.getMaxResults();
 
         // Build results of local query
-        MCRResults results = buildResults(query.getCondition(), maxResults, query.getSortBy(), comesFromRemoteHost);
+        final MCRResults results = buildResults(query.getCondition(), maxResults, query.getSortBy(), comesFromRemoteHost);
 
         // Add results of remote query
         MCRQueryClient.search(query, results);
 
-        // After sorting, cut result list to maxResults if not already done
-        if ((maxResults > 0) && (results.getNumHits() > maxResults))
-            results.cutResults(maxResults);
+        // Add missing sort data and sort results, if not already sorted
+        sortResults(query, results);
+
+        // After sorting, cut result list to maxResults if needed
+        results.cutResults(maxResults);
 
         return results;
+    }
+
+    private static void sortResults(MCRQuery query, final MCRResults results) {
+        List sortBy = query.getSortBy();
+        if (results.isSorted() || sortBy.isEmpty())
+            return;
+
+        List fields = new ArrayList(sortBy.size());
+        for (int i = 0; i < sortBy.size(); i++)
+            fields.add(((MCRSortBy) (sortBy.get(i))).getField());
+
+        Iterator hitIterator = new Iterator() {
+            private int i = 0;
+
+            private int max = results.getNumHits();
+
+            public void remove() {
+                throw new UnsupportedOperationException();
+            }
+
+            public boolean hasNext() {
+                for (; i < max; i++)
+                    if (!results.getHit(i).hasSortData())
+                        return true;
+
+                return false;
+            }
+
+            public Object next() {
+                if (!hasNext())
+                    throw new NoSuchElementException();
+
+                return results.getHit(i++);
+            }
+        };
+
+        String index = MCRFieldDef.getDef("objectType").getIndex();
+        MCRSearcher searcher = MCRSearcherFactory.getSearcherForIndex(index);
+        searcher.addSortData(hitIterator, fields);
+        results.sortBy(query.getSortBy());
     }
 
     /**
