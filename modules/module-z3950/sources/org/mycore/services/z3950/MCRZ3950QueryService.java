@@ -125,10 +125,12 @@ public class MCRZ3950QueryService implements MCRZ3950Query {
                 Properties p = CONFIG.getProperties("MCR.z3950.1.");
                 // CONFIG.getString("MCR.z3950.1.4");
                 // Iteriere alle Mappings für Typ 1 (auschließend)
+                String operator = "contains";
                 Enumeration e = p.propertyNames();
                 while (e.hasMoreElements()) {
                     String propertyName = (String) e.nextElement();
                     Integer mycoreAttr = Integer.valueOf(propertyName.substring("MCR.z3950.1.".length(), propertyName.length()));
+                    logger.debug("propertyName: " + propertyName + " attrValue: " + attrValue + " mycoreAttr: " + mycoreAttr);
                     // Vergleich der Konfiguration mit tatsächlicher Anfrage
                     if (attrValue.equals(mycoreAttr)) {
                         String xpath = CONFIG.getString("MCR.z3950.1." + mycoreAttr);
@@ -145,7 +147,12 @@ public class MCRZ3950QueryService implements MCRZ3950Query {
                          * contains(" + prefixString.getTerm() + ")]";
                          * logger.debug("Aus dem Kern: " + meta);
                          */
-                        MCRQueryCondition qc = new MCRQueryCondition(MCRFieldDef.getDef(xpath), "contains", prefixString.getTerm());
+                        MCRFieldDef fd = MCRFieldDef.getDef(xpath);
+                        if ("identifier".equals(fd.getDataType()))
+                          operator = "=";
+                        String value = prefixString.getTerm().trim();
+                        value = value.substring(1, value.length()-1);    // remove "'s
+                        MCRQueryCondition qc = new MCRQueryCondition(fd, operator, value);
                         cAnd.addChild(qc);
 
                     }
