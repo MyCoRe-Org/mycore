@@ -49,10 +49,10 @@ import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRNormalizer;
 import org.mycore.datamodel.ifs.MCRFile;
+import org.mycore.parsers.bool.MCRCondition;
 import org.mycore.services.fieldquery.MCRFieldDef;
 import org.mycore.services.fieldquery.MCRFieldValue;
 import org.mycore.services.fieldquery.MCRHit;
-import org.mycore.services.fieldquery.MCRQuery;
 import org.mycore.services.fieldquery.MCRResults;
 import org.mycore.services.fieldquery.MCRSearcher;
 import org.mycore.services.plugins.TextFilterPluginManager;
@@ -79,7 +79,7 @@ public class MCRLuceneSearcher extends MCRSearcher {
     static int DEC_AFTER = 4;
 
     private static TextFilterPluginManager PLUGIN_MANAGER = null;
-    
+
     static Analyzer analyzer = new PerFieldAnalyzerWrapper(new GermanAnalyzer());
 
     public void init(String ID) {
@@ -113,61 +113,59 @@ public class MCRLuceneSearcher extends MCRSearcher {
             String msg = LOCK_DIR + " is not writeable!";
             throw new org.mycore.common.MCRConfigurationException(msg);
         }
-        
-        System.setProperty("org.apache.lucene.lockDir", LOCK_DIR);
-        deleteLuceneLocks( LOCK_DIR, 0);
-        
-        try
-        {
-          IndexWriter writer = getLuceneWriter(IndexDir, FIRST);
-          FIRST = false;
-          writer.close();
-        } catch (IOException e)
-        {
-          LOGGER.error(e.getClass().getName() + ": " + e.getMessage());
-          LOGGER.error(MCRException.getStackTraceAsString(e));
-        } catch (Exception e)
-        {
-          LOGGER.error(e.getClass().getName() + ": " + e.getMessage());
-          LOGGER.error(MCRException.getStackTraceAsString(e));
-        }
-        
-        StandardAnalyzer standardAnalyzer = new StandardAnalyzer(); // should work like GermanAnalyzer without stemming
-        List fds = MCRFieldDef.getFieldDefs( getIndex() );
-        for( int i = 0; i < fds.size(); i++ )
-        {
-          MCRFieldDef fd = (MCRFieldDef)( fds.get( i ) );
-          if ("name".equals(fd.getDataType()))                     
-          {
-            ((PerFieldAnalyzerWrapper)analyzer).addAnalyzer(fd.getName(), standardAnalyzer);
-          }
-        }
-        
-    }
-    
-    private static void deleteLuceneLocks(String lockDir, long age)
-    {
-      File file = new File(lockDir);
 
-      GregorianCalendar cal = new GregorianCalendar();
-      
-      File f[] = file.listFiles();
-      for (int i=0; i<f.length;i++)
-      {
-        if (!f[i].isDirectory())
-        {
-          String n = f[i].getName().toLowerCase();
-          if (n.startsWith("lucene") && n.endsWith(".lock"))
-          {
-            long l = (cal.getTimeInMillis() - f[i].lastModified())/1000;   // age of file in seconds
-            if ( l > age )
-            {
-              LOGGER.info("Delete lucene lock file " + f[i].getAbsolutePath() + " Age " + l  );
-              f[i].delete();
-            }
-          }
+        System.setProperty("org.apache.lucene.lockDir", LOCK_DIR);
+        deleteLuceneLocks(LOCK_DIR, 0);
+
+        try {
+            IndexWriter writer = getLuceneWriter(IndexDir, FIRST);
+            FIRST = false;
+            writer.close();
+        } catch (IOException e) {
+            LOGGER.error(e.getClass().getName() + ": " + e.getMessage());
+            LOGGER.error(MCRException.getStackTraceAsString(e));
+        } catch (Exception e) {
+            LOGGER.error(e.getClass().getName() + ": " + e.getMessage());
+            LOGGER.error(MCRException.getStackTraceAsString(e));
         }
-      }
+
+        StandardAnalyzer standardAnalyzer = new StandardAnalyzer(); // should
+                                                                    // work like
+                                                                    // GermanAnalyzer
+                                                                    // without
+                                                                    // stemming
+        List fds = MCRFieldDef.getFieldDefs(getIndex());
+        for (int i = 0; i < fds.size(); i++) {
+            MCRFieldDef fd = (MCRFieldDef) (fds.get(i));
+            if ("name".equals(fd.getDataType())) {
+                ((PerFieldAnalyzerWrapper) analyzer).addAnalyzer(fd.getName(), standardAnalyzer);
+            }
+        }
+
+    }
+
+    private static void deleteLuceneLocks(String lockDir, long age) {
+        File file = new File(lockDir);
+
+        GregorianCalendar cal = new GregorianCalendar();
+
+        File f[] = file.listFiles();
+        for (int i = 0; i < f.length; i++) {
+            if (!f[i].isDirectory()) {
+                String n = f[i].getName().toLowerCase();
+                if (n.startsWith("lucene") && n.endsWith(".lock")) {
+                    long l = (cal.getTimeInMillis() - f[i].lastModified()) / 1000; // age
+                                                                                    // of
+                                                                                    // file
+                                                                                    // in
+                                                                                    // seconds
+                    if (l > age) {
+                        LOGGER.info("Delete lucene lock file " + f[i].getAbsolutePath() + " Age " + l);
+                        f[i].delete();
+                    }
+                }
+            }
+        }
     }
 
     protected void addToIndex(String entryID, String returnID, List fields) {
@@ -218,18 +216,17 @@ public class MCRLuceneSearcher extends MCRSearcher {
                     BufferedReader in = new BufferedReader(PLUGIN_MANAGER.transform(mcrfile.getContentType(), mcrfile.getContentAsInputStream()));
                     String s;
                     StringBuffer text = new StringBuffer();
-                    while ((s = in.readLine()) != null) 
-                    {
-                      text.append(s).append(" ");
+                    while ((s = in.readLine()) != null) {
+                        text.append(s).append(" ");
                     }
-                    
+
                     s = text.toString();
                     s = MCRNormalizer.normalizeString(s);
-                    
-                    doc.add(new Field(name, s, Field.Store.NO, Field.Index.TOKENIZED) );
+
+                    doc.add(new Field(name, s, Field.Store.NO, Field.Index.TOKENIZED));
                 }
             } else {
-                if ("date".equals(type) || "time".equals(type) || "timestamp".equals(type)  ) {
+                if ("date".equals(type) || "time".equals(type) || "timestamp".equals(type)) {
                     type = "identifier";
                 } else if ("boolean".equals(type)) {
                     content = "true".equals(content) ? "1" : "0";
@@ -388,26 +385,21 @@ public class MCRLuceneSearcher extends MCRSearcher {
         searcher.close();
     }
 
-    public MCRResults search(MCRQuery query) {
-        long start = System.currentTimeMillis();
+    public MCRResults search(MCRCondition condition, int maxResults, List sortBy, boolean addSortData) {
         MCRResults results = new MCRResults();
 
         try {
             List f = new ArrayList();
-            f.add(query.getCondition().toXML());
+            f.add(condition.toXML());
 
-            boolean reqf = true; // required flag Term with AND (true) or OR
-            // (false) combined
+            boolean reqf = true;
+            // required flag Term with AND (true) or OR (false) combined
             Query luceneQuery = MCRBuildLuceneQuery.buildLuceneQuery(null, reqf, f, analyzer);
             LOGGER.debug("Lucene Query: " + luceneQuery.toString());
-            results = getLuceneHits(luceneQuery, query.getMaxResults());
+            results = getLuceneHits(luceneQuery, maxResults);
         } catch (Exception e) {
-            e.printStackTrace();
             LOGGER.error("Exception in MCRLuceneSearcher", e);
         }
-
-        long qtime = System.currentTimeMillis() - start;
-        LOGGER.debug("total query time in MCRLuceneSearcher:    " + qtime);
 
         return results;
     }
@@ -419,19 +411,17 @@ public class MCRLuceneSearcher extends MCRSearcher {
      */
     private MCRResults getLuceneHits(Query luceneQuery, int maxResults) throws Exception {
         if (maxResults <= 0)
-            maxResults = 100000;
+            maxResults = 1000000;
 
         IndexSearcher searcher = null;
-        try
-        {
-          searcher = new IndexSearcher(IndexDir);
-        } catch (IOException e)
-        {
-          LOGGER.error(e.getClass().getName() + ": " + e.getMessage());
-          LOGGER.error(MCRException.getStackTraceAsString(e));
-          deleteLuceneLocks( LOCK_DIR, 100);
+        try {
+            searcher = new IndexSearcher(IndexDir);
+        } catch (IOException e) {
+            LOGGER.error(e.getClass().getName() + ": " + e.getMessage());
+            LOGGER.error(MCRException.getStackTraceAsString(e));
+            deleteLuceneLocks(LOCK_DIR, 100);
         }
-        
+
         TopDocs hits = searcher.search(luceneQuery, null, maxResults);
         int found = hits.scoreDocs.length;
 

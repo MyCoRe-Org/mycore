@@ -57,10 +57,10 @@ import org.mycore.services.fieldquery.MCRData2Fields;
 import org.mycore.services.fieldquery.MCRFieldDef;
 import org.mycore.services.fieldquery.MCRFieldValue;
 import org.mycore.services.fieldquery.MCRHit;
-import org.mycore.services.fieldquery.MCRQuery;
 import org.mycore.services.fieldquery.MCRResults;
 import org.mycore.services.fieldquery.MCRSearcher;
 import org.mycore.services.fieldquery.MCRQueryCondition;
+import org.mycore.services.fieldquery.MCRSortBy;
 
 /**
  * Implements a searcher and indexer for MCRObject metadata using only data in
@@ -150,10 +150,8 @@ public class MCRJDOMSearcher extends MCRSearcher {
         map.remove(entryID);
     }
 
-    public MCRResults search(MCRQuery query) {
-        List order = query.getSortBy();
-        boolean doSort = (order != null) && (order.size() > 0);
-        String xslCondition = buildXSLCondition(query.getCondition());
+    public MCRResults search(MCRCondition condition, int maxResults, List sortBy, boolean addSortData) {
+        String xslCondition = buildXSLCondition(condition);
         LOGGER.debug("MCRJDOMSearcher searching for " + xslCondition);
 
         Document xsl = buildStylesheet(xslCondition);
@@ -166,29 +164,27 @@ public class MCRJDOMSearcher extends MCRSearcher {
             if (matches(xml, xsl)) {
                 String returnID = xml.getRootElement().getAttributeValue("returnID");
                 MCRHit hit = new MCRHit(returnID);
-                results.addHit(hit);
 
                 // Add values of all fields that may be sort criteria
-                List values = xml.getRootElement().getChildren();
-                for (int i = 0; i < values.size(); i++) {
-                    Element value = (Element) (values.get(i));
-                    MCRFieldDef def = MCRFieldDef.getDef(value.getName());
-                    if (def.isSortable())
+                for (int i = 0; addSortData && (i < sortBy.size()); i++) {
+                    MCRSortBy by = (MCRSortBy) (sortBy.get(i));
+
+                    List values = xml.getRootElement().getChildren(by.getField().getName());
+                    for (Iterator itv = values.iterator(); itv.hasNext();) {
+                        Element value = (Element) (itv.next());
+                        MCRFieldDef def = MCRFieldDef.getDef(value.getName());
                         hit.addSortData(new MCRFieldValue(def, value.getText()));
+                    }
                 }
+
+                results.addHit(hit);
             }
 
-            if ((!doSort) && (query.getMaxResults() > 0) && (results.getNumHits() >= query.getMaxResults())) {
+            if (sortBy.isEmpty() && (maxResults > 0) && (results.getNumHits() >= maxResults))
                 break;
-            }
         }
 
-        // Sort results
-        if (doSort)
-            results.sortBy(order);
-
         LOGGER.debug("MCRJDOMSearcher results completed");
-
         return results;
     }
 

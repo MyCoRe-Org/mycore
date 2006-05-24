@@ -55,17 +55,14 @@ public class MCRQueryManager {
         int maxResults = query.getMaxResults();
         query.setHosts(null);
 
-        MCRResults results = buildResults(query);
+        boolean addSortData = ! hosts.isEmpty(); // Never sort if remote query
+        MCRResults results = buildResults(query.getCondition(), query.getMaxResults(), query.getSortBy(), addSortData);
 
         // Do remote query if hosts list is not empty
-        for (int i = 0; (hosts != null) && (i < hosts.size()); i++) {
+        for (int i = 0; i < hosts.size(); i++) {
             String alias = (String) (hosts.get(i));
             MCRQueryClient.search(alias, query, results);
         }
-
-        // Sort results if not already sorted
-        if (!results.isSorted() && query.getSortBy().size() > 0)
-            results.sortBy(query.getSortBy());
 
         // After sorting, cut result list to maxResults if not already done
         if ((maxResults > 0) && (results.getNumHits() > maxResults))
@@ -105,17 +102,13 @@ public class MCRQueryManager {
         return index;
     }
 
-    private static MCRResults buildResults(MCRQuery query) {
-        return buildResults(query.getCondition(), query.getSortBy(), query.getMaxResults());
-    }
-
     /** Executes query, if necessary splits into subqueries for each index */
-    private static MCRResults buildResults(MCRCondition cond, List sortBy, int maxResults) {
+    private static MCRResults buildResults(MCRCondition cond, int maxResults, List sortBy, boolean addSortData) {
         String index = getIndex(cond);
-        if (index != mixed) { // All fields are from same index, just one
-            // searcher
+        if (index != mixed) { 
+            // All fields are from same index, just one searcher
             MCRSearcher searcher = MCRSearcherFactory.getSearcherForIndex(index);
-            return searcher.search(new MCRQuery(cond, sortBy, maxResults));
+            return searcher.search(cond, maxResults, sortBy, addSortData);
         } else if ((cond instanceof MCRAndCondition) || (cond instanceof MCROrCondition)) {
             return buildCombinedResults(cond, sortBy, false);
         } else { // Move not down: not(a and/or b)=(not a) and/or (not b)
@@ -134,7 +127,7 @@ public class MCRQueryManager {
             List conditions = (List) (table.get(indexes.nextElement()));
             MCRCondition subCond = buildSubCondition(conditions, and, not);
 
-            MCRResults subResults = buildResults(subCond, sortBy, 0);
+            MCRResults subResults = buildResults(subCond, 0, sortBy, true);
 
             if (totalResults == null)
                 totalResults = subResults;

@@ -33,6 +33,7 @@ import org.mycore.common.events.MCREventHandlerBase;
 import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.metadata.MCRLinkTableManager;
 import org.mycore.datamodel.metadata.MCRObject;
+import org.mycore.parsers.bool.MCRCondition;
 
 /**
  * Abstract base class for searchers and indexers. Searcher implementations for
@@ -113,9 +114,9 @@ public abstract class MCRSearcher extends MCREventHandlerBase implements MCREven
         String entryID = file.getID();
         removeFromIndex(entryID);
     }
-    
+
     protected void handleFileRepaired(MCREvent evt, MCRFile file) {
-        handleFileUpdated(evt,file);
+        handleFileUpdated(evt, file);
     }
 
     protected void handleObjectCreated(MCREvent evt, MCRObject obj) {
@@ -173,9 +174,20 @@ public abstract class MCRSearcher extends MCREventHandlerBase implements MCREven
      * Executes a query on this searcher. The query MUST only refer to fields
      * that are managed by this searcher.
      * 
-     * @param query
-     *            the query
+     * @param cond
+     *            the query condition
+     * @param maxResults
+     *            the maximum number of results to return, 0 means all results
+     * @param sortBy
+     *            a not-null list of MCRSortBy sort criteria. The list is empty
+     *            if the results should not be sorted
+     * @param addSortData
+     *            if false, backend should sort results itself while executing
+     *            the query. If this is not possible or the parameter is true,
+     *            backend should not sort the results itself, but only store the
+     *            data of the fields in the sortBy list which are needed to sort
+     *            later
      * @return the query results
      */
-    public abstract MCRResults search(MCRQuery query);
+    public abstract MCRResults search(MCRCondition condition, int maxResults, List sortBy, boolean addSortData);
 }

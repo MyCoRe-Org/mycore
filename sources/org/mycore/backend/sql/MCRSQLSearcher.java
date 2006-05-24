@@ -32,7 +32,6 @@ import org.mycore.parsers.bool.MCRCondition;
 import org.mycore.services.fieldquery.MCRFieldDef;
 import org.mycore.services.fieldquery.MCRFieldValue;
 import org.mycore.services.fieldquery.MCRHit;
-import org.mycore.services.fieldquery.MCRQuery;
 import org.mycore.services.fieldquery.MCRResults;
 import org.mycore.services.fieldquery.MCRSearcher;
 import org.mycore.services.fieldquery.MCRSortBy;
@@ -157,39 +156,33 @@ public class MCRSQLSearcher extends MCRSearcher {
         MCRSQLConnection.justDoUpdate(sql);
     }
 
-    public MCRResults search(MCRQuery query) {
+    public MCRResults search(MCRCondition condition, int maxResults, List sortBy, boolean addSortData) {
         MCRSQLConnection c = MCRSQLConnectionPool.instance().getConnection();
-        MCRResults result = new MCRResults();
-        MCRCondition cond = query.getCondition();
-        List sortBy = query.getSortBy();
-        int maxResults = query.getMaxResults();
+        MCRResults results = new MCRResults();
 
         try {
-            String sql = new MCRSQLQuery(table, cond, sortBy, maxResults).getSQLQuery();
+            String sql = new MCRSQLQuery(table, condition, sortBy, maxResults).getSQLQuery();
             LOGGER.debug(sql);
             MCRSQLRowReader reader = c.doQuery(sql);
 
-            while (reader.next() && (maxResults <= 0 ? true : result.getNumHits() < maxResults)) {
-                String id = reader.getString("RETURNID");
-
-                MCRHit hit = new MCRHit(id);
+            while (reader.next()) {
+                MCRHit hit = new MCRHit(reader.getString("RETURNID"));
 
                 // Add hit sort data
-                if (sortBy != null)
-                    for (int j = 0; j < sortBy.size(); j++) {
-                        MCRFieldDef fd = ((MCRSortBy) sortBy.get(j)).getField();
-                        String value = reader.getString(fd.getName());
-                        hit.addSortData(new MCRFieldValue(fd, value));
-                    }
-                result.addHit(hit);
+                for (int j = 0; addSortData && (j < sortBy.size()); j++) {
+                    MCRFieldDef fd = ((MCRSortBy) sortBy.get(j)).getField();
+                    String value = reader.getString(fd.getName());
+                    hit.addSortData(new MCRFieldValue(fd, value));
+                }
+                results.addHit(hit);
+                if ((maxResults > 0) && (results.getNumHits() >= maxResults))
+                    break;
             }
 
-            if ((sortBy != null) && (sortBy.size() > 0)) {
-                result.setSorted(true);
-            }
+            results.setSorted((!addSortData) && (sortBy.size() > 0));
         } finally {
             c.release();
         }
-        return result;
+        return results;
     }
 }
