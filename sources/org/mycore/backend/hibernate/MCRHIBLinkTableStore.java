@@ -119,7 +119,7 @@ public class MCRHIBLinkTableStore implements MCRLinkTableInterface {
             throw new MCRPersistenceException("The from value is null or empty.");
         }
         StringBuffer sb = new StringBuffer();
-        sb.append("from ").append(classname).append(" where MCRFROM = '").append(from).append("'");
+        sb.append("delete from ").append(classname).append(" where MCRFROM = '").append(from).append("'");
 
         if ((to != null) && ((to = to.trim()).length() > 0)) {
             sb.append(" and MCRTO = '").append(to).append("'");
@@ -133,12 +133,8 @@ public class MCRHIBLinkTableStore implements MCRLinkTableInterface {
         Transaction tx = session.beginTransaction();
 
         try {
-            List l = session.createQuery(sb.toString()).list();
-            if (l.size() == 0)
-                return;
-            for (int t = 0; t < l.size(); t++) {
-                session.delete(l.get(t));
-            }
+            int deleted=session.createQuery(sb.toString()).executeUpdate();
+            logger.debug(deleted+" references deleted.");
             tx.commit();
         } catch (Exception e) {
             tx.rollback();
