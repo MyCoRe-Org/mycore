@@ -51,14 +51,17 @@ public class MCRQueryManager {
      * @return the query results
      */
     public static MCRResults search(MCRQuery query) {
+        return search(query, false);
+    }
+
+    public static MCRResults search(MCRQuery query, boolean comesFromRemoteHost) {
         int maxResults = query.getMaxResults();
-        boolean addSortData = ! query.getHosts().isEmpty(); // Never sort remote
-        
+
         // Build results of local query
-        MCRResults results = buildResults(query.getCondition(), maxResults, query.getSortBy(), addSortData);
- 
+        MCRResults results = buildResults(query.getCondition(), maxResults, query.getSortBy(), comesFromRemoteHost);
+
         // Add results of remote query
-        MCRQueryClient.search(query,results);
+        MCRQueryClient.search(query, results);
 
         // After sorting, cut result list to maxResults if not already done
         if ((maxResults > 0) && (results.getNumHits() > maxResults))
@@ -101,7 +104,7 @@ public class MCRQueryManager {
     /** Executes query, if necessary splits into subqueries for each index */
     private static MCRResults buildResults(MCRCondition cond, int maxResults, List sortBy, boolean addSortData) {
         String index = getIndex(cond);
-        if (index != mixed) { 
+        if (index != mixed) {
             // All fields are from same index, just one searcher
             MCRSearcher searcher = MCRSearcherFactory.getSearcherForIndex(index);
             return searcher.search(cond, maxResults, sortBy, addSortData);

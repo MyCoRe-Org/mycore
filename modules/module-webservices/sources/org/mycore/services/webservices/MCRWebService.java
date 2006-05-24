@@ -107,7 +107,7 @@ public class MCRWebService implements MCRWS
     }
       
     // Execute query
-    MCRResults res = MCRQueryManager.search(MCRQuery.parseXML(doc));
+    MCRResults res = MCRQueryManager.search(MCRQuery.parseXML(doc),true);
 
     result = new org.jdom.Document(res.buildXML());
 
