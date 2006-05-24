@@ -101,6 +101,7 @@ public class MCRQuery {
      *            the maximum number of results
      */
     public void setMaxResults(int maxResults) {
+        if(maxResults < 0) maxResults = 0;
         this.maxResults = maxResults;
         this.doc = null;
     }
