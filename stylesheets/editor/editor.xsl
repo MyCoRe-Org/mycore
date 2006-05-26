@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
 <!-- ============================================== -->
-<!-- $Revision: 1.47 $ $Date: 2006-05-12 07:50:51 $ -->
+<!-- $Revision: 1.48 $ $Date: 2006-05-26 15:30:17 $ -->
 <!-- ============================================== --> 
 
 <xsl:stylesheet 
@@ -310,7 +310,7 @@
     <xsl:if test="@lines='on'">
       <tr>
         <td width="100%" colspan="2" class="editorHLine">
-          <img src="dummy.jpg" height="1" width="1" alt="" />
+          <img src="{$WebApplicationBaseURL}images/pmud-blank.png" border="0" height="1" width="1" alt=" "/>
         </td>
       </tr>
     </xsl:if>
@@ -435,9 +435,9 @@
 
   <!-- ======== handle hidden fields ======== -->
   <xsl:apply-templates select="ancestor::components/panel[@id = current()/include/@ref]/hidden|hidden">
-    <xsl:with-param name="num" select="count($cells)" />
-    <xsl:with-param name="var" select="$var" />
-    <xsl:with-param name="pos" select="$pos" />
+    <xsl:with-param name="cells" select="$cells" />
+    <xsl:with-param name="var"   select="$var"   />
+    <xsl:with-param name="pos"   select="$pos"   />
   </xsl:apply-templates>
 
   <!-- ======== handle panel validation conditions ======== -->
@@ -469,7 +469,7 @@
   <xsl:if test="(count($cells[@row=$row.nr]) &gt; 0) and ($cells[@row &gt; $row.nr]) and (@lines='on')">
     <tr>
       <td width="100%" colspan="10" class="editorHLine">
-        <img src="dummy.jpg" height="1" width="1" alt=" " />
+        <img src="{$WebApplicationBaseURL}images/pmud-blank.png" border="0" height="1" width="1" alt=" "/>
       </td>
     </tr>
   </xsl:if>
@@ -733,9 +733,9 @@
 
 <!-- ======== hidden ======== -->
 <xsl:template match="hidden">
-  <xsl:param name="num" />
-  <xsl:param name="var" />
-  <xsl:param name="pos" />
+  <xsl:param name="cells" />
+  <xsl:param name="var"   />
+  <xsl:param name="pos"   />
 
   <xsl:variable name="var.new">
     <xsl:call-template name="editor.build.new.var">
@@ -754,7 +754,7 @@
         <xsl:value-of select="@sortnr"/>
       </xsl:when>
       <xsl:otherwise> 
-        <xsl:value-of select="number($num) + position()" />
+        <xsl:value-of select="count($cells) + position()" />
       </xsl:otherwise>
     </xsl:choose>
   </xsl:variable>
@@ -864,7 +864,7 @@
     </input>
   </xsl:if>
   <xsl:if test="local-name() = 'textarea'">
-
+  
     <!-- ======== Use the WYSIWYG HTML Editor? ======== -->
     <xsl:if test="@wysiwygEditor='true'">
       <script type="text/javascript"><xsl:text>
@@ -887,7 +887,7 @@
         }
         </xsl:text></script>
     </xsl:if>
-
+    
     <xsl:variable name="wrap" select="''" />
  
     <xsl:text disable-output-escaping="yes">&lt;textarea </xsl:text>
@@ -1023,52 +1023,35 @@
 <xsl:template match="list">
   <xsl:param name="var" />
 
-  <!-- ======== get the value of this field from xml source ======== -->
-  <xsl:variable name="source">
-    <xsl:value-of select="ancestor::editor/input/var[@name=$var]/@value" />  
-  </xsl:variable>
-
-  <!-- ======== build the value to display ======== -->
-  <xsl:variable name="value">
-    <xsl:choose>
-      <xsl:when test="string-length($source) &gt; 0">
-        <xsl:value-of select="$source" />
-      </xsl:when>
-      <xsl:otherwise> <!-- use default -->
-        <xsl:value-of select="@default" />
-      </xsl:otherwise>
-    </xsl:choose>
-  </xsl:variable>
-
   <!-- ====== type multirow ======== -->
   <xsl:if test="@type='multirow'">
     <xsl:call-template name="editor.list">
-      <xsl:with-param name="var"   select="$var"      />
-      <xsl:with-param name="value" select="$value"    />
-      <xsl:with-param name="rows"  select="@rows"     />
-      <xsl:with-param name="multi" select="@multiple" />
+      <xsl:with-param name="var"     select="$var"      />
+      <xsl:with-param name="default" select="@default"  />
+      <xsl:with-param name="rows"    select="@rows"     />
+      <xsl:with-param name="multi"   select="@multiple" />
     </xsl:call-template>
   </xsl:if>
   <!-- ====== type dropdown ======== -->
   <xsl:if test="@type='dropdown'">
     <xsl:call-template name="editor.list">
-      <xsl:with-param name="var"   select="$var"      />
-      <xsl:with-param name="value" select="$value"    />
+      <xsl:with-param name="var"     select="$var"      />
+      <xsl:with-param name="default" select="@default"  />
     </xsl:call-template>
   </xsl:if>
   <!-- ====== type radio ======== -->
   <xsl:if test="(@type='radio') or (@type='checkbox')">
     <xsl:call-template name="editor.list.radio.cb">
-      <xsl:with-param name="var"   select="$var"      />
-      <xsl:with-param name="value" select="$value"    />
+      <xsl:with-param name="var"     select="$var"      />
+      <xsl:with-param name="default" select="@default"  />
     </xsl:call-template>
   </xsl:if>
 </xsl:template>
 
 <!-- ======== handle list of radio ======== -->
 <xsl:template name="editor.list.radio.cb">
-  <xsl:param name="var"   />
-  <xsl:param name="value" />
+  <xsl:param name="var"     />
+  <xsl:param name="default" />
 
   <xsl:variable name="last" select="count(item)-1" />
 
@@ -1106,16 +1089,16 @@
       <td class="editorRepeaterButton">
         <xsl:if test="$type='radio'">
           <xsl:call-template name="editor.radio">
-            <xsl:with-param name="var"   select="$var"   />
-            <xsl:with-param name="value" select="$value" />
-            <xsl:with-param name="item"  select="."      />
+            <xsl:with-param name="var"     select="$var"     />
+            <xsl:with-param name="default" select="$default" />
+            <xsl:with-param name="item"    select="."        />
           </xsl:call-template>
         </xsl:if>
         <xsl:if test="$type='checkbox'">
           <xsl:call-template name="editor.checkbox">
-            <xsl:with-param name="var"   select="$var"   />
-            <xsl:with-param name="value" select="$value" />
-            <xsl:with-param name="item"  select="."      />
+            <xsl:with-param name="var"     select="$var"     />
+            <xsl:with-param name="default" select="$default" />
+            <xsl:with-param name="item"    select="."        />
           </xsl:call-template>
         </xsl:if>
       </td>
@@ -1131,14 +1114,19 @@
 
 <!-- ======== output radio button ======== -->
 <xsl:template name="editor.radio">
-  <xsl:param name="var"   />
-  <xsl:param name="value" />
-  <xsl:param name="item"  />
+  <xsl:param name="var"     />
+  <xsl:param name="default" />
+  <xsl:param name="item"    />
 
   <input type="radio" name="{$var}" value="{$item/@value}">
-    <xsl:if test="$item/@value = $value">
-      <xsl:attribute name="checked">checked</xsl:attribute>
-    </xsl:if>
+    <xsl:choose>
+      <xsl:when test="ancestor::editor/input/var[((@name=$var) or starts-with(@name,concat($var,'['))) and (@value=$item/@value)]">
+        <xsl:attribute name="checked">checked</xsl:attribute>
+      </xsl:when>
+      <xsl:when test="$default = $item/@value">
+        <xsl:attribute name="checked">checked</xsl:attribute>
+      </xsl:when>
+    </xsl:choose>
   </input>
   <xsl:for-each select="$item">
     <xsl:call-template name="output.label">
@@ -1150,14 +1138,19 @@
 
 <!-- ======== output checkbox ======== -->
 <xsl:template name="editor.checkbox">
-  <xsl:param name="var"   />
-  <xsl:param name="value" />
-  <xsl:param name="item"  />
+  <xsl:param name="var"     />
+  <xsl:param name="default" />
+  <xsl:param name="item"    />
 
   <input type="checkbox" name="{$var}" value="{$item/@value}">
-    <xsl:if test="$item/@value = $value">
-      <xsl:attribute name="checked">checked</xsl:attribute>
-    </xsl:if>
+    <xsl:choose>
+      <xsl:when test="ancestor::editor/input/var[((@name=$var) or starts-with(@name,concat($var,'['))) and (@value=$item/@value)]">
+        <xsl:attribute name="checked">checked</xsl:attribute>
+      </xsl:when>
+      <xsl:when test="$default = $item/@value">
+        <xsl:attribute name="checked">checked</xsl:attribute>
+      </xsl:when>
+    </xsl:choose>
   </input>
   <xsl:for-each select="$item">
     <xsl:call-template name="output.label">
@@ -1213,8 +1206,8 @@
 
 <!-- ======== handle multirow or dropdown ======== -->
 <xsl:template name="editor.list">
-  <xsl:param name="var"   />
-  <xsl:param name="value" />
+  <xsl:param name="var"     />
+  <xsl:param name="default" />
   <xsl:param name="rows"  select="'1'"/>
   <xsl:param name="multi" select="'false'"/>
 
@@ -1230,8 +1223,13 @@
       </xsl:attribute>
     </xsl:if>
 
+    <xsl:if test="@disabled='true'">
+      <xsl:attribute name="disabled">disabled</xsl:attribute>
+    </xsl:if>
+    
     <xsl:apply-templates select="item" mode="editor.list">
-      <xsl:with-param name="value" select="$value" />
+      <xsl:with-param name="var"     select="$var"     />
+      <xsl:with-param name="default" select="$default" />
     </xsl:apply-templates>
   </select>
 </xsl:template>
@@ -1256,20 +1254,29 @@
 
 <!-- ======== html select list option ======== -->
 <xsl:template match="item" mode="editor.list">
-  <xsl:param name="value"  />
+  <xsl:param name="var"     />
+  <xsl:param name="default" />
   <xsl:param name="indent" select="''"/>
 
   <option value="{@value}">
-    <xsl:if test="@value = $value">
-      <xsl:attribute name="selected">selected</xsl:attribute>
-    </xsl:if>
+  
+    <xsl:choose>
+      <xsl:when test="ancestor::editor/input/var[((@name=$var) or starts-with(@name,concat($var,'['))) and (@value=current()/@value)]">
+        <xsl:attribute name="selected">selected</xsl:attribute>
+      </xsl:when>
+      <xsl:when test="$default=current()/@value">
+        <xsl:attribute name="selected">selected</xsl:attribute>
+      </xsl:when>
+    </xsl:choose>
+    
     <xsl:value-of select="$indent" disable-output-escaping="yes"/>
     <xsl:call-template name="output.label" />
   </option>
 
   <!-- ======== handle nested items ======== -->
   <xsl:apply-templates select="item" mode="editor.list">
-    <xsl:with-param name="value"  select="$value" />
+    <xsl:with-param name="var"     select="$var"     />
+    <xsl:with-param name="default" select="$default" />
     <xsl:with-param name="indent" select="concat($editor.list.indent,$indent)" />
   </xsl:apply-templates>
 </xsl:template>
