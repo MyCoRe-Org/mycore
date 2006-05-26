@@ -44,8 +44,8 @@ public class MCRQueryManager {
 
     /**
      * Executes a query and returns the query results. If the query contains
-     * fields from different indexes, the results of multiple searchers are
-     * combined.
+     * fields from different indexes or should span across multiple hosts, the
+     * results of multiple searchers are combined.
      * 
      * @param query
      *            the query
@@ -56,6 +56,19 @@ public class MCRQueryManager {
         return search(query, false);
     }
 
+    /**
+     * Executes a query and returns the query results. If the query contains
+     * fields from different indexes or should span across multiple hosts, the
+     * results of multiple searchers are combined.
+     * 
+     * @param query
+     *            the query
+     * @param comesFromRemoteHost
+     *            if true, this query is originated from a remote host, so no
+     *            sorting of results is done for performance reasons
+     * 
+     * @return the query results
+     */
     public static MCRResults search(MCRQuery query, boolean comesFromRemoteHost) {
         int maxResults = query.getMaxResults();
 
@@ -74,15 +87,26 @@ public class MCRQueryManager {
         return results;
     }
 
+    /**
+     * Sorts the results if not already done and if the query contains sort
+     * criteria. Data needed for sorting is automatically added to the hits if
+     * not present.
+     * 
+     * @param query
+     *            the original query
+     * @param results
+     *            the result list to be sorted
+     */
     private static void sortResults(MCRQuery query, final MCRResults results) {
         List sortBy = query.getSortBy();
-        if (results.isSorted() || sortBy.isEmpty())
+        if ((results.getNumHits() == 0) || results.isSorted() || sortBy.isEmpty())
             return;
 
         List fields = new ArrayList(sortBy.size());
         for (int i = 0; i < sortBy.size(); i++)
             fields.add(((MCRSortBy) (sortBy.get(i))).getField());
 
+        // Iterator over all MCRHits that have no sort data set
         Iterator hitIterator = new Iterator() {
             private int i = 0;
 

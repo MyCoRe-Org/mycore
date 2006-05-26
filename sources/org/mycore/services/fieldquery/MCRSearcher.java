@@ -192,6 +192,17 @@ public abstract class MCRSearcher extends MCREventHandlerBase implements MCREven
      */
     public abstract MCRResults search(MCRCondition condition, int maxResults, List sortBy, boolean addSortData);
 
+    /**
+     * Adds field values needed for sorting for those hits that do not have sort
+     * data set already. Subclasses must overwrite this method, otherwise
+     * sorting results will not always work correctly. The default
+     * implementation in this class does nothing.
+     * 
+     * @param hits
+     *            the MCRHit objects that do not have sort data set
+     * @param sortBy
+     *            the MCRFieldDef fields that are sort criteria
+     */
     public void addSortData(Iterator hits, List sortBy) {
     }
 }

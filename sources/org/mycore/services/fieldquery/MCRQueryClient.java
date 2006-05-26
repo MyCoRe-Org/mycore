@@ -94,6 +94,13 @@ public class MCRQueryClient {
         operation.setUse(Use.ENCODED);
     }
 
+    /**
+     * Executes a query on the given list of remote hosts
+     * and merges the results to the given result list.
+     * 
+     * @param query the query to execute
+     * @param results the result list to add the hits to
+     */
     static void search(MCRQuery query, MCRResults results) {
         List hosts = query.getHosts();
         if (hosts.isEmpty())
@@ -119,6 +126,13 @@ public class MCRQueryClient {
 
     }
 
+    /**
+     * Executes a query on a single remote host using the webservice.
+     * 
+     * @param hostAlias the alias of the remote host as defined in hosts.xml
+     * @param inDoc the query as W3C DOM document
+     * @param results the result list to add the hits to
+     */
     private static void search(String hostAlias, org.w3c.dom.Document inDoc, MCRResults results) {
         if (!endpoints.containsKey(hostAlias)) {
             String msg = "No configuration for host " + hostAlias;
