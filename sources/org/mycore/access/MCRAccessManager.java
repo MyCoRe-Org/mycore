@@ -23,6 +23,8 @@
 package org.mycore.access;
 
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 import org.jdom.Element;
@@ -43,6 +45,8 @@ public class MCRAccessManager {
 
     private static final MCRAccessInterface ACCESS_IMPL = (MCRAccessInterface) MCRConfiguration.instance().getInstanceOf("MCR.Access_class_name",
             MCRAccessBaseImpl.class.getName());
+    private static final Logger LOGGER=Logger.getLogger(MCRAccessManager.class);
+    private static Pattern TYPE_PATTERN=Pattern.compile("[^_]*_([^_]*)_*");
 
     public static MCRAccessInterface getAccessImpl() {
         return ACCESS_IMPL;
@@ -126,7 +130,7 @@ public class MCRAccessManager {
      * @see MCRAccessInterface#checkPermission(String, String)
      */
     public static boolean checkPermission(MCRObjectID id, String permission) {
-        return getAccessImpl().checkPermission(id.getId(), permission);
+        return checkPermission(id.getId(),permission);
     }
     
     /**
@@ -138,7 +142,25 @@ public class MCRAccessManager {
      * @return
      */
     public static boolean checkPermission(String id, String permission) {
-        return getAccessImpl().checkPermission(id, permission);
+        String objectType=getObjectType(id);
+        
+        if (getAccessImpl().hasRule(id,permission)){
+            LOGGER.debug("using access rule defined for object.");
+            return getAccessImpl().checkPermission(id, permission);
+        } else if (getAccessImpl().hasRule("default_"+objectType,permission)){
+            LOGGER.debug("using access rule defined for object type.");
+            return getAccessImpl().checkPermission("default_"+objectType,permission);
+        }
+        LOGGER.debug("using system default access rule.");
+        return getAccessImpl().checkPermission("default",permission);   
+    }
+
+    private static String getObjectType(String id){
+        Matcher m=TYPE_PATTERN.matcher(id);
+        if (m.find() && (m.groupCount()==1)){
+            return m.group(1);
+        }
+        return "";
     }
     
     /**
