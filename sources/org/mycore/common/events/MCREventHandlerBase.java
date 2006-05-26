@@ -41,7 +41,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
     private static Logger logger = Logger.getLogger(MCREventHandlerBase.class);
 
     /** configuration */
-    private static MCRConfiguration CONFIG = MCRConfiguration.instance();
+    protected static MCRConfiguration CONFIG = MCRConfiguration.instance();
 
     /**
      * This method handle all calls for EventHandler for the event types

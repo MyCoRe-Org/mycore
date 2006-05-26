@@ -46,10 +46,11 @@ public class MCRAccessEventHandler extends MCREventHandlerBase {
 
     // the logger
     private static Logger LOGGER = Logger.getLogger(MCRAccessEventHandler.class);
+
     private static MCRAccessInterface AI = MCRAccessManager.getAccessImpl();
 
-    
-    
+    private static String storedrules = CONFIG.getString("MCR.StorePermissions", "read,write,delete");
+
     /**
      * This method will be used to create the access rules for SWF for a
      * MCRObject.
@@ -60,9 +61,8 @@ public class MCRAccessEventHandler extends MCREventHandlerBase {
      *            the MCRObject that caused the event
      */
     protected void handleObjectCreated(MCREvent evt, MCRObject obj) {
-    	handleBaseCreated(obj);
+        handleBaseCreated(obj);
     }
-    
 
     /**
      * This method will be used to update the access rules for SWF for a
@@ -74,7 +74,7 @@ public class MCRAccessEventHandler extends MCREventHandlerBase {
      *            the MCRObject that caused the event
      */
     protected void handleObjectUpdated(MCREvent evt, MCRObject obj) {
-    	handleBaseUpdated(obj);
+        handleBaseUpdated(obj);
     }
 
     /**
@@ -87,7 +87,7 @@ public class MCRAccessEventHandler extends MCREventHandlerBase {
      *            the MCRObject that caused the event
      */
     protected void handleObjectDeleted(MCREvent evt, MCRObject obj) {
-    	handleBaseDeleted(obj);
+        handleBaseDeleted(obj);
     }
 
     /**
@@ -102,7 +102,7 @@ public class MCRAccessEventHandler extends MCREventHandlerBase {
     protected void handleObjectRepaired(MCREvent evt, MCRObject obj) {
         // Do nothing
     }
-    
+
     /**
      * This method will be used to create the access rules for SWF for a
      * MCRDerivate.
@@ -113,9 +113,8 @@ public class MCRAccessEventHandler extends MCREventHandlerBase {
      *            the MCRDerivate that caused the event
      */
     protected void handleDerivateCreated(MCREvent evt, MCRDerivate der) {
-    	handleBaseCreated(der);
+        handleBaseCreated(der);
     }
-    
 
     /**
      * This method will be used to update the access rules for SWF for a
@@ -127,7 +126,7 @@ public class MCRAccessEventHandler extends MCREventHandlerBase {
      *            the MCRDerivate that caused the event
      */
     protected void handleDerivateUpdated(MCREvent evt, MCRDerivate der) {
-    	handleBaseUpdated(der);
+        handleBaseUpdated(der);
     }
 
     /**
@@ -140,7 +139,7 @@ public class MCRAccessEventHandler extends MCREventHandlerBase {
      *            the MCRDerivate that caused the event
      */
     protected void handleDerivateDeleted(MCREvent evt, MCRDerivate der) {
-    	handleBaseDeleted(der);
+        handleBaseDeleted(der);
     }
 
     /**
@@ -154,25 +153,29 @@ public class MCRAccessEventHandler extends MCREventHandlerBase {
      */
     protected void handleDerivateRepaired(MCREvent evt, MCRDerivate der) {
         // Do nothing
-    }    
-    
+    }
+
     private void handleBaseCreated(MCRBase base) {
         // save the start time
         long t1 = System.currentTimeMillis();
 
         // create
         List li = AI.getPermissionsForID(base.getId().getId());
-        int aclsize = 0; 
-        if (li != null) { aclsize = li.size(); }
+        int aclsize = 0;
+        if (li != null) {
+            aclsize = li.size();
+        }
         int rulesize = base.getService().getRulesSize();
-        if((rulesize == 0) && (aclsize == 0)) {
-        	setDefaultPermissions(base, true);
+        if ((rulesize == 0) && (aclsize == 0)) {
+            setDefaultPermissions(base, true);
             LOGGER.warn("The ACL conditions for this object are empty!");
         }
-        while(0 < rulesize) {
+        while (0 < rulesize) {
             org.jdom.Element conditions = base.getService().getRule(0).getCondition();
             String pool = base.getService().getRule(0).getPermission();
-            MCRAccessManager.addRule(base.getId(), pool, conditions, "");
+            if (storedrules.indexOf(pool) != -1) {
+                MCRAccessManager.addRule(base.getId(), pool, conditions, "");
+            }
             base.getService().removeRule(0);
             rulesize--;
         }
@@ -180,26 +183,30 @@ public class MCRAccessEventHandler extends MCREventHandlerBase {
         // save the stop time
         long t2 = System.currentTimeMillis();
         double diff = (t2 - t1) / 1000.0;
-        LOGGER.debug("MCRAccessEventHandler create: done in " + diff + " sec.");    	
+        LOGGER.debug("MCRAccessEventHandler create: done in " + diff + " sec.");
     }
-    
+
     private void handleBaseUpdated(MCRBase base) {
         // save the start time
         long t1 = System.currentTimeMillis();
 
         // update
         List li = AI.getPermissionsForID(base.getId().getId());
-        int aclsize = 0; 
-        if (li != null) { aclsize = li.size(); }
+        int aclsize = 0;
+        if (li != null) {
+            aclsize = li.size();
+        }
         int rulesize = base.getService().getRulesSize();
-        if((rulesize == 0) && (aclsize == 0)) {
+        if ((rulesize == 0) && (aclsize == 0)) {
             setDefaultPermissions(base, false);
             LOGGER.warn("The ACL conditions for this object are empty!");
         }
-        while(0 < rulesize){
+        while (0 < rulesize) {
             org.jdom.Element conditions = base.getService().getRule(0).getCondition();
             String pool = base.getService().getRule(0).getPermission();
-            MCRAccessManager.updateRule(base.getId(), pool, conditions, "");
+            if (storedrules.indexOf(pool) != -1) {
+                MCRAccessManager.updateRule(base.getId(), pool, conditions, "");
+            }
             base.getService().removeRule(0);
             rulesize--;
         }
@@ -208,8 +215,8 @@ public class MCRAccessEventHandler extends MCREventHandlerBase {
         long t2 = System.currentTimeMillis();
         double diff = (t2 - t1) / 1000.0;
         LOGGER.debug("MCRAccessEventHandler update: done in " + diff + " sec.");
-    }    
-    
+    }
+
     private void handleBaseDeleted(MCRBase base) {
         // save the start time
         long t1 = System.currentTimeMillis();
@@ -221,29 +228,30 @@ public class MCRAccessEventHandler extends MCREventHandlerBase {
         long t2 = System.currentTimeMillis();
         double diff = (t2 - t1) / 1000.0;
         LOGGER.debug("MCRAccessEventHandler delete: done in " + diff + " sec.");
-    }    
-    
+    }
+
     /**
-     * This method sets Default Rules to all permissions that are configured.
-     * if <i>overwrite</i> = true, then the old permission entries that are in the database 
-     * are overwritten, else not.
+     * This method sets Default Rules to all permissions that are configured. if
+     * <i>overwrite</i> = true, then the old permission entries that are in the
+     * database are overwritten, else not.
+     * 
      * @param obj
      * @param overwrite
      */
     private void setDefaultPermissions(MCRBase base, boolean overwrite) {
-    	List savedPermissions = MCRAccessManager.getPermissionsForID(base.getId());
-    	List configuredPermissions = AI.getAccessPermissionsFromConfiguration();
-    	for (Iterator it = configuredPermissions.iterator(); it.hasNext();) {
-			String permission = (String) it.next();
-			if(savedPermissions != null && savedPermissions.contains(permission)) {
-				if(overwrite) {
-					MCRAccessManager.removeRule(base.getId(), permission);
-					MCRAccessManager.addRule(base.getId(), permission, MCRAccessManager.getFalseRule(),"");					
-				}
-			}else{
-				MCRAccessManager.addRule(base.getId(), permission, MCRAccessManager.getFalseRule(), "" );
-			}
-		}
+        List savedPermissions = MCRAccessManager.getPermissionsForID(base.getId());
+        List configuredPermissions = AI.getAccessPermissionsFromConfiguration();
+        for (Iterator it = configuredPermissions.iterator(); it.hasNext();) {
+            String permission = (String) it.next();
+            if (savedPermissions != null && savedPermissions.contains(permission)) {
+                if (overwrite) {
+                    MCRAccessManager.removeRule(base.getId(), permission);
+                    MCRAccessManager.addRule(base.getId(), permission, MCRAccessManager.getFalseRule(), "");
+                }
+            } else {
+                MCRAccessManager.addRule(base.getId(), permission, MCRAccessManager.getFalseRule(), "");
+            }
+        }
     }
 
 }
