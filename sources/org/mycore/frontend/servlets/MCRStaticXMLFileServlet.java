@@ -85,11 +85,6 @@ public class MCRStaticXMLFileServlet extends MCRServlet {
         job.getRequest().setAttribute("XSL.FilePath", file.getPath());
         job.getRequest().setAttribute("MCRLayoutServlet.Input.FILE", file);
 
-        // Set XSL Style to current language if no XSL.Style present in request:
-        if ((job.getRequest().getParameter("XSL.Style") == null) || (job.getRequest().getParameter("XSL.Style").length() == 0)) {
-            job.getRequest().setAttribute("XSL.Style", MCRSessionMgr.getCurrentSession().getCurrentLanguage());
-        }
-
         RequestDispatcher rd = getServletContext().getNamedDispatcher("MCRLayoutServlet");
         rd.forward(job.getRequest(), job.getResponse());
     }
