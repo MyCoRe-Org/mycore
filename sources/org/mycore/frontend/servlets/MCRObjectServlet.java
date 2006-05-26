@@ -93,7 +93,7 @@ public class MCRObjectServlet extends MCRServlet {
             if (!MCRAccessManager.checkPermission(mcrid, "read")) {
                 StringBuffer msg = new StringBuffer(1024);
                 msg.append("Access denied reading MCRObject with ID: ").append(mcrid.getId());
-                msg.append(".\nCurrent User: ").append(MCRSessionMgr.getCurrentSession().getCurrentUserName());
+                msg.append(".\nCurrent User: ").append(MCRSessionMgr.getCurrentSession().getCurrentUserID());
                 msg.append("\nRemote IP: ").append(MCRSessionMgr.getCurrentSession().getCurrentIP());
                 generateErrorPage(job.getRequest(),job.getResponse(),HttpServletResponse.SC_FORBIDDEN,msg.toString(),null,false);
                 return;
@@ -114,11 +114,13 @@ public class MCRObjectServlet extends MCRServlet {
     }
 
     private void setBrowseParameters(MCRServletJob job, MCRObjectID mcrid, String editorID) {
-        if (editorID!=null){
+        MCRCache parameterCache=(MCRCache) MCRSessionMgr.getCurrentSession().get(MCRSearchServlet.getParametersKey());
+        MCRSearchServlet.SearchParameters sp = (parameterCache==null)? null:(MCRSearchServlet.SearchParameters) (parameterCache).get(editorID);
+        
+        if ((editorID!=null) && (sp!=null)){
+            //editorID found and editorSession still valid
             storeEditorID(mcrid.toString(),editorID);
             job.getRequest().setAttribute("XSL.resultListEditorID",editorID);
-            MCRSearchServlet.SearchParameters sp = (MCRSearchServlet.SearchParameters) ((MCRCache) MCRSessionMgr.getCurrentSession().get(
-                    MCRSearchServlet.getParametersKey())).get(editorID);
             job.getRequest().setAttribute("XSL.numPerPage",String.valueOf(sp.numPerPage));
             job.getRequest().setAttribute("XSL.page",String.valueOf(sp.page));
             MCRResults results= (MCRResults)((MCRCache)MCRSessionMgr.getCurrentSession().get(MCRSearchServlet.getResultsKey())).get(editorID);
