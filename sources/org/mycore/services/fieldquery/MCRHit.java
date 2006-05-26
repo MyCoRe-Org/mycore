@@ -142,8 +142,6 @@ public class MCRHit {
      *            the value of a sortable search field
      */
     public void addSortData(MCRFieldValue fieldValue) {
-        sortData.add(fieldValue);
-
         String value = fieldValue.getValue();
         MCRFieldDef field = fieldValue.getField();
 
@@ -151,20 +149,21 @@ public class MCRHit {
         // for text fields, combine all values for sorting
         // for dates and numbers, use only first value for sorting
 
-        if (sortValues.containsKey(field)) {
-            if ("text name identifier".indexOf(field.getDataType()) >= 0) {
-                String oldValue = (String) (sortValues.get(field));
-                String newValue = oldValue.concat(" ").concat(value);
-                sortValues.put(field, newValue);
-            }
-        } else {
+        if (!sortValues.containsKey(field)) {
+            sortData.add(fieldValue);
             sortValues.put(field, value);
+        } else if ("text name identifier".indexOf(field.getDataType()) >= 0) {
+            String oldValue = (String) (sortValues.get(field));
+            String newValue = oldValue.concat(" ").concat(value);
+            sortData.add(fieldValue);
+            sortValues.put(field, newValue);
         }
     }
-    
+
     /** Returns true if this MCRHit has any sort data added */
-    boolean hasSortData()
-    { return ! sortData.isEmpty(); }
+    boolean hasSortData() {
+        return !sortData.isEmpty();
+    }
 
     /**
      * Compares this hit with another hit by comparing the value of the given
