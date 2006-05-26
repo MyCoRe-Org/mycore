@@ -24,6 +24,9 @@
 package org.mycore.backend.sql;
 
 import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
@@ -54,6 +57,9 @@ public class MCRSQLConnectionPool {
 
     /** The maximum number of connections that will be built */
     protected int maxNumConnections;
+
+    /** A SQL select statement configured to test the connection works */
+    protected String testStatement;
 
     /** The logger */
     private static Logger logger = Logger.getLogger("org.mycore.backend.sql");
@@ -88,6 +94,8 @@ public class MCRSQLConnectionPool {
         int initNumConnections = config.getInt("MCR.persistence_sql_init_connections", maxNumConnections);
         String driver = config.getString("MCR.persistence_sql_driver");
         logger.debug("MCR.persistence_sql_driver: " + driver);
+
+        testStatement = config.getString("MCR.persistence_sql_connection_test_query", null);
 
         try {
             Class.forName(driver);
@@ -132,6 +140,24 @@ public class MCRSQLConnectionPool {
         else {
             connection = (MCRSQLConnection) (freeConnections.firstElement());
             freeConnections.removeElement(connection);
+
+            // Ensure connection still works
+            if (testStatement != null) {
+                try {
+                    Statement st = connection.getJDBCConnection().createStatement();
+                    ResultSet rs = st.executeQuery(testStatement);
+                    rs.close();
+                    st.close();
+                } catch (SQLException ex) {
+                    logger.debug("Error while checking existing connection:" + ex.getMessage(), ex);
+                    logger.debug("Connection may be closed, trying to create a new one.");
+                    try {
+                        connection.close();
+                    } catch (Exception ignored) {
+                    }
+                    connection = new MCRSQLConnection();
+                }
+            }
         }
 
         usedConnections.addElement(connection);
