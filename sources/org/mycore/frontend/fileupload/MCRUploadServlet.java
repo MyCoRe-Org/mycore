@@ -74,8 +74,11 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
 
     static Logger LOGGER = Logger.getLogger(MCRUploadServlet.class);
 
-    public void init() throws ServletException {
+    public synchronized void init() throws ServletException {
         super.init();
+
+        if (server != null)
+            return; // already inited?
 
         try {
             String host = new java.net.URL(getBaseURL()).getHost();
