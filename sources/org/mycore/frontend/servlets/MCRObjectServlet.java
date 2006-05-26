@@ -203,6 +203,9 @@ public class MCRObjectServlet extends MCRServlet {
     
     protected final static String resolveEditorID(String objectID){
         Hashtable h=(Hashtable)MCRSessionMgr.getCurrentSession().get(EDITOR_ID_TABLE_KEY);
+        if (h==null){
+            return null;
+        }
         return h.get(objectID).toString();
     }
 
