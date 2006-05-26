@@ -77,7 +77,7 @@ public abstract class MCRAccessStore {
 
     final protected static String SQLAccessCtrlMapping = MCRConfiguration.instance().getString("MCR.access_store_sql_table_map", "MCRACCESS");
 
-    final protected static String AccessPools = MCRConfiguration.instance().getString("MCR.AccessPools", "read,modify,delete");
+    final protected static String AccessPools = MCRConfiguration.instance().getString("MCR.AccessPools", "read,write,delete");
 
     static private MCRAccessStore implementation;
 
