@@ -34,6 +34,7 @@ import java.util.regex.Pattern;
 
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 
@@ -45,6 +46,7 @@ import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.jdom.transform.JDOMSource;
 import org.mycore.common.MCRConfiguration;
+import org.mycore.common.MCRException;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.MCRXMLTableManager;
@@ -104,7 +106,8 @@ public class MCRJDOMSearcher extends MCRSearcher {
 
             try {
                 List IDs = mcr_xml.retrieveAllIDs(type);
-                for (int i = 0; i < IDs.size(); i++) {
+                int numObjects = IDs.size();
+                for (int i = 0; i < numObjects; i++) {
                     String sid = (String) (IDs.get(i));
                     MCRObject obj = new MCRObject();
                     MCRObjectID oid = new MCRObjectID(sid);
@@ -154,19 +157,21 @@ public class MCRJDOMSearcher extends MCRSearcher {
         String xslCondition = buildXSLCondition(condition);
         LOGGER.debug("MCRJDOMSearcher searching for " + xslCondition);
 
-        Document xsl = buildStylesheet(xslCondition);
+        Transformer transformer = buildStylesheet(xslCondition);
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+
         MCRResults results = new MCRResults();
 
         for (Iterator keys = map.keySet().iterator(); keys.hasNext();) {
             String entryID = (String) (keys.next());
             Document xml = (Document) (map.get(entryID));
 
-            if (matches(xml, xsl)) {
+            if (matches(xml, transformer, out)) {
                 String returnID = xml.getRootElement().getAttributeValue("returnID");
                 MCRHit hit = new MCRHit(returnID);
 
                 // Add values of all fields that may be sort criteria
-                for (int i = 0; addSortData && (i < sortBy.size()); i++) {
+                for (int i = 0; i < sortBy.size(); i++) {
                     MCRSortBy by = (MCRSortBy) (sortBy.get(i));
 
                     List values = xml.getRootElement().getChildren(by.getField().getName());
@@ -192,15 +197,13 @@ public class MCRJDOMSearcher extends MCRSearcher {
      * Returns true if the xml input document matches the xsl when condition in
      * the xsl stylesheet.
      */
-    private boolean matches(Document xml, Document xsl) {
+    private boolean matches(Document xml, Transformer transformer, ByteArrayOutputStream out) {
         Source xmlsrc = new JDOMSource(xml);
-        Source xslsrc = new JDOMSource(xsl);
 
         try {
-            Transformer transformer = factory.newTransformer(xslsrc);
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            out.reset();
             transformer.transform(xmlsrc, new StreamResult(out));
-            out.close();
+            out.flush();
 
             return "t".equals(out.toString("UTF-8"));
         } catch (Exception ex) {
@@ -249,15 +252,23 @@ public class MCRJDOMSearcher extends MCRSearcher {
     }
 
     /** Adds the condition as xsl when test attribute to the stylesheet template */
-    private Document buildStylesheet(String condition) {
+    private Transformer buildStylesheet(String condition) {
         if (xslTemplate == null) {
             xslTemplate = prepareStylesheet();
         }
 
         Document xsl = (Document) (xslTemplate.clone());
         xsl.getRootElement().getChild("template", MCRFieldDef.xslns).getChild("choose", MCRFieldDef.xslns).getChild("when", MCRFieldDef.xslns).setAttribute("test", condition);
+        Source xslsrc = new JDOMSource(xsl);
+        Transformer transformer;
+        try {
+            transformer = factory.newTransformer(xslsrc);
+        } catch (TransformerConfigurationException ex) {
+            String msg = "Could not compile XSL stylesheet to be used for searching";
+            throw new MCRException(msg, ex);
+        }
 
-        return xsl;
+        return transformer;
     }
 
     /** Converter from MCRCondition to XSL test condition */
