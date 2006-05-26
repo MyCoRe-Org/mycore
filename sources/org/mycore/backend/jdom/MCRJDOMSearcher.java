@@ -386,4 +386,20 @@ public class MCRJDOMSearcher extends MCRSearcher {
     public static boolean compare(String valueA, String valueB, String operator) {
         return MCRInputValidator.instance().compare(valueA, valueB, operator, "string", null);
     }
+
+    public void addSortData(Iterator hits, List sortBy) {
+        while (hits.hasNext()) {
+            MCRHit hit = (MCRHit) hits.next();
+            Document data = (Document) (map.get(hit.getID()));
+
+            for (int j = 0; j < sortBy.size(); j++) {
+                MCRFieldDef fd = (MCRFieldDef) sortBy.get(j);
+                List values = data.getRootElement().getChildren(fd.getName());
+                for (Iterator itv = values.iterator(); itv.hasNext();) {
+                    Element value = (Element) (itv.next());
+                    hit.addSortData(new MCRFieldValue(fd, value.getText()));
+                }
+            }
+        }
+    }
 }
