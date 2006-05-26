@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema 
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+  elementFormDefault="qualified">
+
+<xsd:import schemaLocation="xml-2001.xsd" namespace="http://www.w3.org/XML/1998/namespace"/>
+ 
+<xsd:element type="MCRCondition" name="condition"/>
+
+<xsd:complexType name="MCRCondition">
+ <xsd:sequence>
+    <xsd:element maxOccurs="unbounded" minOccurs="0" type="MCRBoolean" name="boolean" />
+ </xsd:sequence>
+ <xsd:attribute use="optional" type="xsd:string" name="format"/>
+</xsd:complexType>
+
+<xsd:complexType name="MCRBoolean">
+ <xsd:sequence>
+    <xsd:element maxOccurs="unbounded" minOccurs="0" type="MCRSimpleCondition" name="condition" />
+ </xsd:sequence>
+ <xsd:attribute use="required" type="xsd:string" name="operator"/>
+</xsd:complexType>
+
+<xsd:complexType name="MCRSimpleCondition">
+ <xsd:attribute use="required" type="xsd:string" name="value"/>
+ <xsd:attribute use="required" type="xsd:string" name="operator"/>
+ <xsd:attribute use="required" type="xsd:string" name="field"/>
+</xsd:complexType>
+
+</xsd:schema>
