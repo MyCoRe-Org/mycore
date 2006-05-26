@@ -179,8 +179,8 @@ public class MCRQuery {
                 query.addContent(sortByElem);
                 for (int i = 0; i < sortBy.size(); i++) {
                     MCRSortBy sb = (MCRSortBy) (sortBy.get(i));
-                    Element ref = new Element("ref");
-                    ref.setAttribute("field", sb.getField().getName());
+                    Element ref = new Element("field");
+                    ref.setAttribute("name", sb.getField().getName());
                     ref.setAttribute("order", sb.getSortOrder() == MCRSortBy.ASCENDING ? "ascending" : "descending");
                     sortByElem.addContent(ref);
                 }
@@ -227,7 +227,7 @@ public class MCRQuery {
 
             for (int i = 0; i < children.size(); i++) {
                 Element sortByChild = (org.jdom.Element) (children.get(i));
-                String name = sortByChild.getAttributeValue("field");
+                String name = sortByChild.getAttributeValue("name");
                 String ad = sortByChild.getAttributeValue("order");
 
                 MCRFieldDef fd = MCRFieldDef.getDef(name);
