@@ -205,7 +205,7 @@ public class MCRStartEditorServlet extends MCRServlet {
      * <tr>
      * <td>wcommit</td>
      * <td>se_mcrid</td>
-     * <td>commitdb</td>
+     * <td>writedb</td>
      * <td>commit a document to the server</td>
      * </tr>
      * <tr>
@@ -584,7 +584,7 @@ public class MCRStartEditorServlet extends MCRServlet {
 
         // action WCOMMIT - commit a object from the workflow to the server
         if (mytodo.equals("wcommit")) {
-            org.jdom.Element rule = WFM.getRuleFromFile(mysemcrid, "commitdb");
+            org.jdom.Element rule = WFM.getRuleFromFile(mysemcrid, "writedb");
             if (!AI.checkPermission(rule)) {
                 job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + usererrorpage));
                 return;
@@ -933,7 +933,7 @@ public class MCRStartEditorServlet extends MCRServlet {
 
         // action SNEWDER - create a new derivate
         if (mytodo.equals("snewder")) {
-            if (!AI.checkPermission(myremcrid, "commitdb")) {
+            if (!AI.checkPermission(myremcrid, "writedb")) {
                 job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + usererrorpage));
                 return;
             }
@@ -945,7 +945,7 @@ public class MCRStartEditorServlet extends MCRServlet {
 
         // action SADDFILE - create a new file in the derivate
         if (mytodo.equals("saddfile")) {
-            if (!AI.checkPermission(myremcrid, "commitdb")) {
+            if (!AI.checkPermission(myremcrid, "writedb")) {
                 job.getResponse().sendRedirect(getBaseURL() + usererrorpage);
                 return;
             }
