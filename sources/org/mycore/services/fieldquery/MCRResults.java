@@ -294,6 +294,7 @@ public class MCRResults {
             if (b == null) {
                 map.remove(key);
                 hits.remove(i--);
+                numHits--;
             } else
                 a.merge(b);
         }
