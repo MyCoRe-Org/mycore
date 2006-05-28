@@ -29,6 +29,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.jdom.Element;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
@@ -51,6 +52,9 @@ import org.mycore.common.MCRException;
  * @author Frank Lützenkirchen
  */
 public class MCRHit {
+    /** logger */
+    static Logger LOGGER = Logger.getLogger(MCRHit.class.getName());
+
     /** The ID of this object that matched the query */
     private String id;
 
@@ -305,5 +309,22 @@ public class MCRHit {
         }
 
         return hit;
+    }
+
+    /**
+     * This mehtod print all data of this class for logger DEBUG.
+     */
+    public final void debug() {
+        LOGGER.debug("---- MCRHit ----");
+        LOGGER.debug("ID           = " + id);
+        LOGGER.debug("Key          = " + key);
+        LOGGER.debug("Host         = " + host);
+        for (int i = 0; i < metaData.size(); i++) {
+            LOGGER.debug("metaData     = " + i + " - " + ((String) metaData.get(i)));
+        }
+        for (int i = 0; i < sortData.size(); i++) {
+            LOGGER.debug("sortData     = " + i + " - " + ((String) sortData.get(i)));
+        }
+        LOGGER.debug("----");
     }
 }
