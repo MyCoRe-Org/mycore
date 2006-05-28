@@ -203,7 +203,9 @@ public class MCRListWorkflowServlet extends MCRServlet {
         org.jdom.Document workflow_in = null;
         org.jdom.Element writewf = null;
         org.jdom.Element deletewf = null;
+        org.jdom.Element writedb = null;
         boolean bdeletewf = false;
+        boolean bwritedb = false;
 
         // initialize transformer
         MCRXSLTransformation transform = MCRXSLTransformation.getInstance();
@@ -237,6 +239,11 @@ public class MCRListWorkflowServlet extends MCRServlet {
                     deletewf = service.getRule(j).getCondition();
                     bdeletewf = AI.checkPermission(deletewf);
                 }
+                j = service.getRuleIndex("writedb");
+                if (j != -1) {
+                    writedb = service.getRule(j).getCondition();
+                    bwritedb = AI.checkPermission(writedb);
+                }
 
                 // LOGGER.debug("Workflow file "+wfile+" was readed.");
             } catch (Exception ex) {
@@ -257,6 +264,7 @@ public class MCRListWorkflowServlet extends MCRServlet {
 
             String ID = elm.getAttributeValue("ID");
             elm.setAttribute("deletewf", (new Boolean(bdeletewf)).toString());
+            elm.setAttribute("writedb", (new Boolean(bwritedb)).toString());
 
             // LOGGER.debug("The data ID is "+ID);
             try {
