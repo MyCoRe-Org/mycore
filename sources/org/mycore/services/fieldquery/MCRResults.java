@@ -49,6 +49,8 @@ import org.jdom.output.XMLOutputter;
  * 
  * @author Arne Seifert
  * @author Frank Lützenkirchen
+ * @author Jens Kupferschmidt
+ * @version $Revision$ $Date$
  */
 public class MCRResults {
     /** The list of MCRHit objects */
@@ -151,7 +153,7 @@ public class MCRResults {
      *            the number of results to be left
      */
     public void cutResults(int maxResults) {
-        while ((hits.size() > maxResults) && (maxResults >= 0)) {
+        while ((hits.size() > maxResults) && (maxResults > 0)) {
             MCRHit hit = (MCRHit) (hits.remove(hits.size() - 1));
             map.remove(hit.getKey());
         }
@@ -311,5 +313,14 @@ public class MCRResults {
         int numHits = other.getNumHits();
         for (int i = 0; i < numHits; i++)
             this.addHit(other.getHit(i));
+    }
+
+    /**
+     * The methos debug all hits of this MCRResult.
+     */
+    public final void debug() {
+        for (int i = 0; i < hits.size(); i++) {
+            ((MCRHit) hits.get(i)).debug();
+        }
     }
 }
