@@ -32,24 +32,36 @@ import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
 import org.mycore.frontend.cli.MCRCommand;
 import org.mycore.frontend.cli.MCRExternalCommandInterface;
+import org.mycore.parsers.bool.MCRCondition;
 
 /**
  * Provides commands to test the query classes using the command line interface
  * 
  * @author Frank Lützenkirchen
  * @author Arne Seifert
+ * @author Jens Kupferschmidt
+ * @version $Revision$ $Date$
  */
 public class MCRQueryCommands implements MCRExternalCommandInterface {
 
+    /**
+     * The method return all available commands.
+     * 
+     * @return an ArrayList of MCRCommands
+     */
     public ArrayList getPossibleCommands() {
         ArrayList commands = new ArrayList();
         commands.add(new MCRCommand("run query from file {0}", "org.mycore.services.fieldquery.MCRQueryCommands.runQueryFromFile String", "Runs a query that is specified as XML in the given file"));
+        commands.add(new MCRCommand("run query for local from string {0}", "org.mycore.services.fieldquery.MCRQueryCommands.runLocalQueryFromString String", "Runs a query that is specified as String"));
+        commands.add(new MCRCommand("run query for all from string {0}", "org.mycore.services.fieldquery.MCRQueryCommands.runAllQueryFromString String", "Runs a query that is specified as String"));
         return commands;
     }
 
     /**
      * Runs a query that is specified as XML in the given file. The results are
      * written to stdout.
+     * 
+     * @param filename the name of the XML file with the query condition
      */
     public static void runQueryFromFile(String filename) throws JDOMException, IOException {
         File file = new File(filename);
@@ -64,6 +76,35 @@ public class MCRQueryCommands implements MCRExternalCommandInterface {
 
         Document xml = new SAXBuilder().build(new File(filename));
         MCRQuery query = MCRQuery.parseXML(xml);
+        MCRResults results = MCRQueryManager.search(query);
+        System.out.println(results);
+    }
+    
+    /**
+     * Runs a query that is specified as String against the local host. The results are
+     * written to stdout.
+     * 
+     * @param querystring the string with the query condition
+     */
+    public static void runLocalQueryFromString(String querystring) throws JDOMException, IOException {
+        MCRCondition cond = (new MCRQueryParser()).parse(querystring);
+        MCRQuery query = new MCRQuery(cond);
+        MCRResults results = MCRQueryManager.search(query);
+        System.out.println(results);
+    }
+    
+    /**
+     * Runs a query that is specified as String against the all hosts. The results are
+     * written to stdout.
+     * 
+     * @param querystring the string with the query condition
+     */
+    public static void runAllQueryFromString(String querystring) throws JDOMException, IOException {
+        MCRCondition cond = (new MCRQueryParser()).parse(querystring);
+        MCRQuery query = new MCRQuery(cond);
+        ArrayList ar = new ArrayList();
+        ar.add("remote");
+        query.setHosts(ar);
         MCRResults results = MCRQueryManager.search(query);
         System.out.println(results);
     }
