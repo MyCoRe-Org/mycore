@@ -114,10 +114,13 @@ public class MCRObjectServlet extends MCRServlet {
     }
 
     private void setBrowseParameters(MCRServletJob job, MCRObjectID mcrid, String editorID) {
+        if (editorID==null){
+            return;
+        }
         MCRCache parameterCache=(MCRCache) MCRSessionMgr.getCurrentSession().get(MCRSearchServlet.getParametersKey());
         MCRSearchServlet.SearchParameters sp = (parameterCache==null)? null:(MCRSearchServlet.SearchParameters) (parameterCache).get(editorID);
-        
-        if ((editorID!=null) && (sp!=null)){
+
+        if (sp!=null){
             //editorID found and editorSession still valid
             storeEditorID(mcrid.toString(),editorID);
             job.getRequest().setAttribute("XSL.resultListEditorID",editorID);
@@ -132,13 +135,13 @@ public class MCRObjectServlet extends MCRServlet {
                     //hit allocated
                     //search for next and previous object readable by user
                     for (int j=i-1;j>=0;j--){
-                        if (MCRAccessManager.getAccessImpl().checkPermission(results.getHit(j).getID(), "read")) {
+                        if (MCRAccessManager.checkPermission(results.getHit(j).getID(), "read")) {
                             previousObject=results.getHit(j);
                             break;
                         }
                     }
                     for (int j=i+1;j<numHits;j++){
-                        if (MCRAccessManager.getAccessImpl().checkPermission(results.getHit(j).getID(), "read")) {
+                        if (MCRAccessManager.checkPermission(results.getHit(j).getID(), "read")) {
                             nextObject=results.getHit(j);
                             break;
                         }
@@ -197,8 +200,8 @@ public class MCRObjectServlet extends MCRServlet {
         if (m.find()){
             return resolveEditorID(getIDFromPathInfo(m.group(1)));
         }
-        LOGGER.debug("Didn't found ID in referer: "+p.toString());
-        return null;
+        LOGGER.debug("Didn't found ID in referer: "+m.toString());
+        return resolveEditorID(getObjectID(request));
     }
     
     protected final static String resolveEditorID(String objectID){
