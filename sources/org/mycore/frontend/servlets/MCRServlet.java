@@ -52,7 +52,7 @@ import org.mycore.datamodel.metadata.MCRActiveLinkException;
 /**
  * This is the superclass of all MyCoRe servlets. It provides helper methods for
  * logging and managing the current session data. Part of the code has been
- * taken from MilessServlet.java written by Frank L?tzenkirchen.
+ * taken from MilessServlet.java written by Frank Lützenkirchen.
  * 
  * @author Detlev Degenhardt
  * @author Frank Lützenkirchen
@@ -73,6 +73,8 @@ public class MCRServlet extends HttpServlet {
 	private static String BASE_URL;
 
 	private static String SERVLET_URL;
+    
+    private static final boolean ENABLE_BROWSER_CACHE = CONFIG.getBoolean("MCR.Servlet.BrowserCache.enable", false);
 
 	// These values serve to remember if we have a GET or POST request
 	private final static boolean GET = true;
@@ -378,11 +380,14 @@ public class MCRServlet extends HttpServlet {
      *  
 	 */
     protected long getLastModified(HttpServletRequest request) {
-        //we can cache every (local) request
-        long lastModified=(MCRSessionMgr.getCurrentSession().getLoginTime()>CONFIG.getSystemLastModified())?
-                MCRSessionMgr.getCurrentSession().getLoginTime():CONFIG.getSystemLastModified();
-        LOGGER.info("LastModified: "+lastModified);
-        return lastModified; 
+        if (ENABLE_BROWSER_CACHE) {
+            // we can cache every (local) request
+            long lastModified = (MCRSessionMgr.getCurrentSession().getLoginTime() > CONFIG.getSystemLastModified()) ? MCRSessionMgr.getCurrentSession()
+                    .getLoginTime() : CONFIG.getSystemLastModified();
+            LOGGER.info("LastModified: " + lastModified);
+            return lastModified;
+        }
+        return -1; //time is not know
     }
 
     protected static String getProperty(HttpServletRequest request, String name) {
