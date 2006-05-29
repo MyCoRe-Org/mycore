@@ -54,33 +54,17 @@ public class MCRIFSConnector{
 	
 	protected MCRDirectory cacheInIFS = null;
 	
-	public MCRIFSConnector(){
-		try {
-			cacheInIFS = MCRDirectory.getRootDirectory("imgCache");
-		} catch (MCRException e) {
-			cacheInIFS = new MCRDirectory("imgCache", "imgCache");
-		}
-		/*if ((cacheInIFS = MCRDirectory.getRootDirectory("imgCache")) == null)
-			try {
-				cacheInIFS = new MCRDirectory("imgCache", "imgCache");
-			} catch (Exception e) {
-				throw new MCRException(e.getMessage());
-			}*/
-		/*else
-			cacheInIFS = MCRDirectory.getRootDirectory("imgCache");*/
-	}
-	
-	private MCRDirectory getCacheDir(){
-		MCRDirectory imgCacheDir = MCRDirectory.getRootDirectory("imgCache");
-		if ( imgCacheDir == null)
-			try {
-				return new MCRDirectory("imgCache", "imgCache");
-			} catch (Exception e) {
-				throw new MCRException(e.getMessage());
-			}
-		else
-			return imgCacheDir;
-	}
+    public MCRIFSConnector() {
+        cacheInIFS=getCacheDir();
+    }
+    
+    private static MCRDirectory getCacheDir(){
+        MCRDirectory imgCacheDir;
+        if ((imgCacheDir = MCRDirectory.getRootDirectory("imgCache")) == null) {
+            imgCacheDir = new MCRDirectory("imgCache", "imgCache");
+        }
+        return imgCacheDir;
+    }
 	
 	/**
 	 * create the required path if not exist and create the
