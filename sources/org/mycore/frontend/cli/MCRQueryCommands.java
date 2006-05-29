@@ -48,6 +48,7 @@ import org.mycore.services.query.MCRQueryCollector;
  * @author Mathias Zarick
  * @author Thomas Scheffler (yagee)
  * @version $Revision$ $Date$
+ * @deprecated
  */
 final class MCRQueryCommands extends MCRAbstractCommands {
     // logger
