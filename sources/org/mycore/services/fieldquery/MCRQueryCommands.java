@@ -25,11 +25,20 @@ package org.mycore.services.fieldquery;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
+
+import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
+import org.jdom.transform.JDOMSource;
+import org.mycore.common.MCRConfigurationException;
 import org.mycore.frontend.cli.MCRCommand;
 import org.mycore.frontend.cli.MCRExternalCommandInterface;
 import org.mycore.parsers.bool.MCRCondition;
@@ -59,7 +68,8 @@ public class MCRQueryCommands implements MCRExternalCommandInterface {
 
     /**
      * Runs a query that is specified as XML in the given file. The results are
-     * written to stdout.
+     * written to stdout. To transform the result data it use the stylesheet
+     * results-commandlinequery.xsl.
      * 
      * @param filename the name of the XML file with the query condition
      */
@@ -77,7 +87,7 @@ public class MCRQueryCommands implements MCRExternalCommandInterface {
         Document xml = new SAXBuilder().build(new File(filename));
         MCRQuery query = MCRQuery.parseXML(xml);
         MCRResults results = MCRQueryManager.search(query);
-        System.out.println(results);
+        buildOutput(results);
     }
     
     /**
@@ -90,7 +100,7 @@ public class MCRQueryCommands implements MCRExternalCommandInterface {
         MCRCondition cond = (new MCRQueryParser()).parse(querystring);
         MCRQuery query = new MCRQuery(cond);
         MCRResults results = MCRQueryManager.search(query);
-        System.out.println(results);
+        buildOutput(results);
     }
     
     /**
@@ -106,6 +116,33 @@ public class MCRQueryCommands implements MCRExternalCommandInterface {
         ar.add("remote");
         query.setHosts(ar);
         MCRResults results = MCRQueryManager.search(query);
-        System.out.println(results);
+        buildOutput(results);
+    }
+    
+    /** Transform the results to an output with using stylesheets */
+    private final static void buildOutput(MCRResults results)
+    {
+        // read stylesheet
+        String xslfile = "results-commandlinequery.xsl";
+        InputStream in = MCRQueryCommands.class.getResourceAsStream("/" + xslfile);
+        if (in == null) {
+            throw new MCRConfigurationException("Can't read stylesheet file " + xslfile);
+        }
+        
+        // transform data
+        try {
+            StreamSource source = new StreamSource(in);
+            TransformerFactory transfakt = TransformerFactory.newInstance();
+            Transformer trans = transfakt.newTransformer(source);
+            StreamResult sr = new StreamResult(System.out);
+            trans.transform(new JDOMSource((new org.jdom.Document(results.buildXML()))), sr);
+        } catch (Exception ex) {
+            Logger LOGGER = Logger.getLogger(MCRQueryCommands.class);
+            LOGGER.error("Error while tranforming query result XML using XSLT");
+            LOGGER.debug(ex.getMessage());
+            LOGGER.info("Stop.");
+            LOGGER.info("");
+            return;
+        }
     }
 }
