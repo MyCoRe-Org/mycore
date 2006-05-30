@@ -54,7 +54,7 @@ import org.mycore.parsers.bool.MCRCondition;
 public class MCRQueryCommands implements MCRExternalCommandInterface {
 
     /**
-     * The method return all available commands.
+     * The method returns all available commands.
      * 
      * @return an ArrayList of MCRCommands
      */
@@ -71,7 +71,8 @@ public class MCRQueryCommands implements MCRExternalCommandInterface {
      * written to stdout. To transform the result data it use the stylesheet
      * results-commandlinequery.xsl.
      * 
-     * @param filename the name of the XML file with the query condition
+     * @param filename
+     *            the name of the XML file with the query condition
      */
     public static void runQueryFromFile(String filename) throws JDOMException, IOException {
         File file = new File(filename);
@@ -89,46 +90,45 @@ public class MCRQueryCommands implements MCRExternalCommandInterface {
         MCRResults results = MCRQueryManager.search(query);
         buildOutput(results);
     }
-    
+
     /**
-     * Runs a query that is specified as String against the local host. The results are
-     * written to stdout.
+     * Runs a query that is specified as String against the local host. The
+     * results are written to stdout.
      * 
-     * @param querystring the string with the query condition
+     * @param querystring
+     *            the string with the query condition
      */
-    public static void runLocalQueryFromString(String querystring) throws JDOMException, IOException {
+    public static void runLocalQueryFromString(String querystring) {
         MCRCondition cond = (new MCRQueryParser()).parse(querystring);
         MCRQuery query = new MCRQuery(cond);
         MCRResults results = MCRQueryManager.search(query);
         buildOutput(results);
     }
-    
+
     /**
-     * Runs a query that is specified as String against the all hosts. The results are
-     * written to stdout.
+     * Runs a query that is specified as String against all hosts. The
+     * results are written to stdout.
      * 
-     * @param querystring the string with the query condition
+     * @param querystring
+     *            the string with the query condition
      */
-    public static void runAllQueryFromString(String querystring) throws JDOMException, IOException {
+    public static void runAllQueryFromString(String querystring) {
         MCRCondition cond = (new MCRQueryParser()).parse(querystring);
         MCRQuery query = new MCRQuery(cond);
-        ArrayList ar = new ArrayList();
-        ar.add("remote");
-        query.setHosts(ar);
+        query.setHosts( MCRQueryClient.ALL_HOSTS );
         MCRResults results = MCRQueryManager.search(query);
         buildOutput(results);
     }
-    
-    /** Transform the results to an output with using stylesheets */
-    private final static void buildOutput(MCRResults results)
-    {
+
+    /** Transform the results to an output using stylesheets */
+    private final static void buildOutput(MCRResults results) {
         // read stylesheet
         String xslfile = "results-commandlinequery.xsl";
         InputStream in = MCRQueryCommands.class.getResourceAsStream("/" + xslfile);
         if (in == null) {
             throw new MCRConfigurationException("Can't read stylesheet file " + xslfile);
         }
-        
+
         // transform data
         try {
             StreamSource source = new StreamSource(in);
