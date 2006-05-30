@@ -441,15 +441,18 @@ public class MCRLuceneSearcher extends MCRSearcher {
             for (int j=0; j<sortBy.size(); j++)
             {
               MCRSortBy sb = (MCRSortBy)sortBy.get(j);
-              String field =  sb.getField().getName();
-              String value = doc.get(field);
-              if ( null != value)
+              MCRFieldDef fds = sb.getField();
+              if ( null != fds)
               {
-                MCRFieldDef fd   = MCRFieldDef.getDef(field);
-                MCRFieldValue fv = new MCRFieldValue(fd, value);
-                hit.addSortData(fv);
+                String field =  fds.getName();
+                String value = doc.get(field);
+                if ( null != value)
+                {
+                  MCRFieldDef fd   = MCRFieldDef.getDef(field);
+                  MCRFieldValue fv = new MCRFieldValue(fd, value);
+                  hit.addSortData(fv);
+                }
               }
-              
             }
             result.addHit(hit);
         }
