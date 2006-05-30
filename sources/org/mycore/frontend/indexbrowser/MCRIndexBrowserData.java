@@ -344,7 +344,10 @@ public class MCRIndexBrowserData {
         
     	for ( int i=0; ic.extraFields != null && i< ic.extraFields.length; i++){    	
 	        field = MCRFieldDef.getDef(ic.extraFields[i]);
-            sortCriteria.add(new MCRSortBy(field,order));
+            if (null != field )
+              sortCriteria.add(new MCRSortBy(field,order));
+            else
+              logger.error("MCRFieldDef not available: " + ic.extraFields[i]);
     	}
         
         MCRQuery query = new MCRQuery(cAnd,sortCriteria,0);
