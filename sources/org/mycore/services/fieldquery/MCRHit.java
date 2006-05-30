@@ -31,8 +31,6 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.jdom.Element;
-import org.jdom.output.Format;
-import org.jdom.output.XMLOutputter;
 import org.mycore.common.MCRException;
 
 /**
@@ -222,10 +220,6 @@ public class MCRHit {
         }
     }
 
-    public String toString() {
-        return new XMLOutputter(Format.getPrettyFormat()).outputString(buildXML());
-    }
-
     /**
      * Creates a XML representation of this hit and its sort data and meta data
      * 
@@ -311,20 +305,27 @@ public class MCRHit {
         return hit;
     }
 
-    /**
-     * This mehtod print all data of this class for logger DEBUG.
+    /*
+     * Builds a string representation of this hit for debugging.
+     * 
+     * @see java.lang.Object#toString()
      */
-    public final void debug() {
-        LOGGER.debug("---- MCRHit ----");
-        LOGGER.debug("ID           = " + id);
-        LOGGER.debug("Key          = " + key);
-        LOGGER.debug("Host         = " + host);
+    public String toString() {
+        StringBuffer sb = new StringBuffer();
+        sb.append("---- MCRHit ----");
+        sb.append("\nID       = ").append(id);
+        sb.append("\nHost     = ").append(host);
         for (int i = 0; i < metaData.size(); i++) {
-            LOGGER.debug("metaData     = " + i + " - " + ((String) metaData.get(i)));
+            sb.append("\nMetaData[" + i + "] = ");
+            if (metaData.get(i) == null)
+                sb.append("-----");
+            else
+                sb.append(metaData.get(i));
         }
         for (int i = 0; i < sortData.size(); i++) {
-            LOGGER.debug("sortData     = " + i + " - " + ((String) sortData.get(i)));
+            sb.append("\nSortData[" + i + "] = ").append(sortData.get(i));
         }
-        LOGGER.debug("----");
+        sb.append("\n----------------\n");
+        return sb.toString();
     }
 }

@@ -33,8 +33,6 @@ import java.util.Random;
 
 import org.jdom.Document;
 import org.jdom.Element;
-import org.jdom.output.Format;
-import org.jdom.output.XMLOutputter;
 
 /**
  * This class represents the results of a query performed by MCRSearcher.
@@ -267,7 +265,12 @@ public class MCRResults {
     }
 
     public String toString() {
-        return new XMLOutputter(Format.getPrettyFormat()).outputString(buildXML());
+        StringBuffer sb = new StringBuffer();
+        sb.append("---- MCRResults ----");
+        sb.append("\nNumHits = ").append(this.getNumHits());
+        for (int i = 0; i < hits.size(); i++)
+            sb.append(hits.get(i));
+        return sb.toString();
     }
 
     /**
@@ -313,14 +316,5 @@ public class MCRResults {
         int numHits = other.getNumHits();
         for (int i = 0; i < numHits; i++)
             this.addHit(other.getHit(i));
-    }
-
-    /**
-     * The methos debug all hits of this MCRResult.
-     */
-    public final void debug() {
-        for (int i = 0; i < hits.size(); i++) {
-            ((MCRHit) hits.get(i)).debug();
-        }
     }
 }
