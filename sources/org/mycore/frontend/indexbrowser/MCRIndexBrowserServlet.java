@@ -28,11 +28,8 @@ import java.util.Enumeration;
 import javax.servlet.RequestDispatcher;
 
 import org.jdom.Document;
-import org.jdom.Element;
-import org.mycore.common.MCRSession;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
-import org.mycore.services.fieldquery.MCRResults;
 
 /**
  * @author Anja Schaar
