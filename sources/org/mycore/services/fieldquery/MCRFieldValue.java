@@ -143,4 +143,7 @@ public class MCRFieldValue {
 
         return new MCRFieldValue(MCRFieldDef.getDef(name), value);
     }
+    
+    public String toString()
+    { return this.field.getName() + " = " + this.value; }
 }
