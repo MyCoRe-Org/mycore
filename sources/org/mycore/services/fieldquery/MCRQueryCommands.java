@@ -61,8 +61,8 @@ public class MCRQueryCommands implements MCRExternalCommandInterface {
     public ArrayList getPossibleCommands() {
         ArrayList commands = new ArrayList();
         commands.add(new MCRCommand("run query from file {0}", "org.mycore.services.fieldquery.MCRQueryCommands.runQueryFromFile String", "Runs a query that is specified as XML in the given file"));
-        commands.add(new MCRCommand("run query for local from string {0}", "org.mycore.services.fieldquery.MCRQueryCommands.runLocalQueryFromString String", "Runs a query that is specified as String"));
-        commands.add(new MCRCommand("run query for all from string {0}", "org.mycore.services.fieldquery.MCRQueryCommands.runAllQueryFromString String", "Runs a query that is specified as String"));
+        commands.add(new MCRCommand("run local query {0}", "org.mycore.services.fieldquery.MCRQueryCommands.runLocalQueryFromString String", "Runs a query specified as String on the local host"));
+        commands.add(new MCRCommand("run distributed query {0}", "org.mycore.services.fieldquery.MCRQueryCommands.runAllQueryFromString String", "Runs a query specified as String on the local host and all remote hosts"));
         return commands;
     }
 
