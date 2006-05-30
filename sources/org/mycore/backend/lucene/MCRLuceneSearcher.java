@@ -56,6 +56,7 @@ import org.mycore.services.fieldquery.MCRFieldValue;
 import org.mycore.services.fieldquery.MCRHit;
 import org.mycore.services.fieldquery.MCRResults;
 import org.mycore.services.fieldquery.MCRSearcher;
+import org.mycore.services.fieldquery.MCRSortBy;
 import org.mycore.services.plugins.TextFilterPluginManager;
 
 /**
@@ -439,7 +440,8 @@ public class MCRLuceneSearcher extends MCRSearcher {
             
             for (int j=0; j<sortBy.size(); j++)
             {
-              String field = (String)sortBy.get(j);
+              MCRSortBy sb = (MCRSortBy)sortBy.get(j);
+              String field =  sb.getField().getName();
               String value = doc.get(field);
               if ( null != value)
               {
