@@ -31,6 +31,7 @@ import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.mycore.common.MCRConfiguration;
+import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
 
 /**
@@ -124,13 +125,21 @@ public class MCRSQLConnectionPool {
      *             if there was a problem while building the connection
      */
     public synchronized MCRSQLConnection getConnection() throws MCRPersistenceException {
+        logger.debug("getConnection(), currently " + usedConnections.size() + " used, " + freeConnections.size() + " free");
         // Wait for a free connection
-        while (usedConnections.size() == maxNumConnections)
 
-            try {
-                wait();
-            } catch (InterruptedException ignored) {
-            }
+        int waitCount = 0, maxWaitCount = 20;
+        while ((usedConnections.size() == maxNumConnections) && (waitCount < maxWaitCount))
+            waitCount++;
+        logger.debug("All connections in use, waiting for a free connection, try # " + waitCount);
+        try {
+            wait(1000);
+        } catch (InterruptedException ignored) {
+        }
+        if (waitCount == maxWaitCount) {
+            String msg = "Waited a long time, but no database connection is free for use";
+            throw new MCRException(msg);
+        }
 
         MCRSQLConnection connection;
 
@@ -189,6 +198,7 @@ public class MCRSQLConnectionPool {
             freeConnections.addElement(connection);
         }
 
+        logger.debug("releaseConnection(), currently " + usedConnections.size() + " used, " + freeConnections.size() + " free");
         notifyAll();
     }
 
