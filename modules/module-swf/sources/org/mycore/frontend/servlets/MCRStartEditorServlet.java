@@ -37,6 +37,7 @@ import javax.servlet.ServletException;
 import org.apache.log4j.Logger;
 import org.jdom.Element;
 
+import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRMailer;
 import org.mycore.common.MCRSession;
@@ -816,7 +817,7 @@ public class MCRStartEditorServlet extends MCRServlet {
 
         // action SEDITOBJ in the database
         if (mytodo.equals("seditobj")) {
-            if (!AI.checkPermission(mytfmcrid, "writedb")) {
+            if (!MCRAccessManager.checkPermission(mytfmcrid, "writedb")) {
                 job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + usererrorpage));
                 return;
             }
@@ -842,7 +843,7 @@ public class MCRStartEditorServlet extends MCRServlet {
 
         // action SDELOBJ from the database
         if (mytodo.equals("sdelobj")) {
-            if (!AI.checkPermission(mytfmcrid, "deletedb")) {
+            if (!MCRAccessManager.checkPermission(mytfmcrid, "deletedb")) {
                 job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + usererrorpage));
                 return;
             }
@@ -884,7 +885,7 @@ public class MCRStartEditorServlet extends MCRServlet {
 
         // action SDELDER from the database
         if (mytodo.equals("sdelder")) {
-            if (!AI.checkPermission(myremcrid, "deletedb")) {
+            if (!MCRAccessManager.checkPermission(myremcrid, "deletedb")) {
                 job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + usererrorpage));
                 return;
             }
@@ -933,7 +934,7 @@ public class MCRStartEditorServlet extends MCRServlet {
 
         // action SNEWDER - create a new derivate
         if (mytodo.equals("snewder")) {
-            if (!AI.checkPermission(myremcrid, "writedb")) {
+            if (!MCRAccessManager.checkPermission(myremcrid, "writedb")) {
                 job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + usererrorpage));
                 return;
             }
@@ -945,7 +946,7 @@ public class MCRStartEditorServlet extends MCRServlet {
 
         // action SADDFILE - create a new file in the derivate
         if (mytodo.equals("saddfile")) {
-            if (!AI.checkPermission(myremcrid, "writedb")) {
+            if (!MCRAccessManager.checkPermission(myremcrid, "writedb")) {
                 job.getResponse().sendRedirect(getBaseURL() + usererrorpage);
                 return;
             }
@@ -973,7 +974,7 @@ public class MCRStartEditorServlet extends MCRServlet {
 
         // action SEDITDER in the database
         if (mytodo.equals("seditder")) {
-            if (!AI.checkPermission(mysemcrid, "writedb")) {
+            if (!MCRAccessManager.checkPermission(mysemcrid, "writedb")) {
                 job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + usererrorpage));
                 return;
             }
@@ -1007,7 +1008,7 @@ public class MCRStartEditorServlet extends MCRServlet {
 
         // action SSETLABEL in the database
         if (mytodo.equals("ssetlabel")) {
-            if (!AI.checkPermission(myremcrid, "writedb")) {
+            if (!MCRAccessManager.checkPermission(myremcrid, "writedb")) {
                 job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + usererrorpage));
                 return;
             }
@@ -1039,7 +1040,7 @@ public class MCRStartEditorServlet extends MCRServlet {
 
         // action SSETFILE in the database
         if (mytodo.equals("ssetfile")) {
-            if (!AI.checkPermission(myremcrid, "writedb")) {
+            if (!MCRAccessManager.checkPermission(myremcrid, "writedb")) {
                 job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + usererrorpage));
                 return;
             }
@@ -1067,7 +1068,7 @@ public class MCRStartEditorServlet extends MCRServlet {
 
         // action SDELFILE in the database
         if (mytodo.equals("sdelfile")) {
-            if (!AI.checkPermission(myremcrid, "deletedb")) {
+            if (!MCRAccessManager.checkPermission(myremcrid, "deletedb")) {
                 job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + usererrorpage));
                 return;
             }
@@ -1117,7 +1118,7 @@ public class MCRStartEditorServlet extends MCRServlet {
 
         // action SEDITACL in the database
         if (mytodo.equals("seditacl")) {
-            if (!AI.checkPermission(mysemcrid, "writedb")) {
+            if (!MCRAccessManager.checkPermission(mysemcrid, "writedb")) {
                 job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + usererrorpage));
                 return;
             }
