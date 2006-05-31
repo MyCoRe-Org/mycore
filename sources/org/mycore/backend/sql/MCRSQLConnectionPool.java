@@ -129,12 +129,13 @@ public class MCRSQLConnectionPool {
         // Wait for a free connection
 
         int waitCount = 0, maxWaitCount = 20;
-        while ((usedConnections.size() == maxNumConnections) && (waitCount < maxWaitCount))
+        while ((usedConnections.size() == maxNumConnections) && (waitCount < maxWaitCount)) {
             waitCount++;
-        logger.debug("All connections in use, waiting for a free connection, try # " + waitCount);
-        try {
-            wait(1000);
-        } catch (InterruptedException ignored) {
+            logger.debug("All connections in use, waiting for a free connection, try # " + waitCount);
+            try {
+                wait(1000);
+            } catch (InterruptedException ignored) {
+            }
         }
         if (waitCount == maxWaitCount) {
             String msg = "Waited a long time, but no database connection is free for use";
