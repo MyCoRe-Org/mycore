@@ -2,7 +2,7 @@
 
   <!-- =================================================================== -->
   <!-- MyCoRe build file for use with Apache Ant                           -->
-  <!-- $Revision: 1.117 $ $Date: 2006-05-30 12:16:35 $                      -->
+  <!-- $Revision: 1.118 $ $Date: 2006-05-31 13:00:56 $                      -->
   <!-- =================================================================== -->
 
 <project name="MyCoRe" default="usage" basedir=".">
@@ -69,7 +69,7 @@
     <echo>Operating system : ${os.name} Version ${os.version} on ${os.arch} </echo>
     <echo>Java version     : JDK ${ant.java.version} Version ${java.version} from ${java.vendor}</echo>
     <echo>Java home        : ${env.JAVA_HOME}</echo>
-    <echo>Ant build file   : $Revision: 1.117 $ $Date: 2006-05-30 12:16:35 $</echo>
+    <echo>Ant build file   : $Revision: 1.118 $ $Date: 2006-05-31 13:00:56 $</echo>
     <echo>Ant version      : ${ant.version}</echo>
     <echo>Ant home         : ${ant.home}</echo>
     <echo>XML Store type   : ${MCR.XMLStore.Type}</echo>
@@ -95,8 +95,8 @@
     <path id="mycore.classpath">
       <pathelement location="${basedir}/classes" />
       <fileset dir="${basedir}/lib" includes="*.jar"/>
-      <fileset dir="${ant.home}/lib" includes="*junit*.jar"/>
-      <fileset dir="${ant.home}/lib" includes="ant.jar"/>
+      <fileset dir="${ant.library.dir}" includes="*junit*.jar"/>
+      <fileset dir="${ant.library.dir}" includes="ant.jar"/>
       <path refid="jdbc.classpath" />
       <path refid="xml.classpath"  />
     </path>
