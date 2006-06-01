@@ -268,6 +268,7 @@ public class MCRNBN {
 		this.author = author;
 		this.comment = comment;
 		manager.reserveURN(this);
+		
 	}
 
 	/**
@@ -420,7 +421,11 @@ public class MCRNBN {
     		return (isValid() ? urn.substring(urn.lastIndexOf("-") + 1) : null);
     	}
     }
-
+    
+    public String getURNByDocumentID (String documentID) {
+    	return "urn:" +   	manager.getNBNByDocumentId(documentID);    	
+    }
+    
     /**
      * Returns the NBN part of this URN, that is the part after "urn:", or null
      * if this NBN is not valid.
