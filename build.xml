@@ -2,7 +2,7 @@
 
   <!-- =================================================================== -->
   <!-- MyCoRe build file for use with Apache Ant                           -->
-  <!-- $Revision: 1.118 $ $Date: 2006-05-31 13:00:56 $                      -->
+  <!-- $Revision: 1.119 $ $Date: 2006-06-01 11:21:14 $                      -->
   <!-- =================================================================== -->
 
 <project name="MyCoRe" default="usage" basedir=".">
@@ -69,9 +69,10 @@
     <echo>Operating system : ${os.name} Version ${os.version} on ${os.arch} </echo>
     <echo>Java version     : JDK ${ant.java.version} Version ${java.version} from ${java.vendor}</echo>
     <echo>Java home        : ${env.JAVA_HOME}</echo>
-    <echo>Ant build file   : $Revision: 1.118 $ $Date: 2006-05-31 13:00:56 $</echo>
+    <echo>Ant build file   : $Revision: 1.119 $ $Date: 2006-06-01 11:21:14 $</echo>
     <echo>Ant version      : ${ant.version}</echo>
     <echo>Ant home         : ${ant.home}</echo>
+    <echo>Ant libdir       : ${ant.library.dir}</echo>
     <echo>XML Store type   : ${MCR.XMLStore.Type}</echo>
     <echo>JDBC Store type  : ${MCR.JDBCStore.Type}</echo>
     <echo>System CLASSPATH : ${build.sysclasspath}</echo>
@@ -82,7 +83,7 @@
   <!-- Initialize directories and build CLASSPATH for compiling sources    -->
   <!-- =================================================================== -->
 
-  <target name="init" depends="jdbcstore.path.1, jdbcstore.path.2, xmlstore.path.1, xmlstore.path.2" >
+  <target name="init" depends="jdbcstore.path.1, jdbcstore.path.2, xmlstore.path.1, xmlstore.path.2, system.path.1, system.path.2" >
     <echo>Initializing directories and classpath...</echo>
 
     <mkdir dir="${basedir}/classes" />
@@ -95,10 +96,13 @@
     <path id="mycore.classpath">
       <pathelement location="${basedir}/classes" />
       <fileset dir="${basedir}/lib" includes="*.jar"/>
+		<!--
       <fileset dir="${ant.library.dir}" includes="*junit*.jar"/>
+			-->
       <fileset dir="${ant.library.dir}" includes="ant.jar"/>
       <path refid="jdbc.classpath" />
       <path refid="xml.classpath"  />
+      <path refid="system.classpath"  />
     </path>
   </target>
 
@@ -122,6 +126,16 @@
 
   <target name="xmlstore.path.2" unless="MCR.XMLStore.BaseDir">
     <path id="xml.classpath" />
+  </target>
+
+  <target name="system.path.1" if="MCR.System.SharedJarsDir">
+    <path id="system.classpath">
+      <fileset dir="${MCR.System.SharedJarsDir}" includes="_dummy_ ${MCR.System.Jars}"        />
+    </path>
+  </target>
+
+  <target name="system.path.2" unless="MCR.System.SharedJarsDir">
+    <path id="system.classpath" />
   </target>
 
   <!-- System CLASSPATH is completely ignored! -->

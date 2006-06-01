@@ -81,6 +81,17 @@
 # MCR.XMLStore.LibPath=lib
 
 #######################################################################
+#
+# If you use some OS like SuSE Linux 10.x some *.jar files of system
+# componets are in special directories. For this case uncomment the
+# next line .
+#
+#######################################################################
+
+# MCR.System.SharedJarsDir=/usr/share/java
+# MCR.System.Jars=ant.jar
+
+#######################################################################
 # 
 # MyCoRe will copy the jar files listed under 
 # MCR.JDBCStore.Jars and MCR.XMLStore.Jars 
