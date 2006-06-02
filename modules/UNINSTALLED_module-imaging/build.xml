@@ -9,7 +9,7 @@
 <!-- Andreas Trappe 	- idea, concept				-->
 <!-- Chi Vu Huu		- concept, development			-->
 <!--												-->
-<!-- $Revision: 1.1 $ $Date: 2006-05-08 15:11:43 $ 								-->
+<!-- $Revision: 1.2 $ $Date: 2006-06-02 11:05:07 $ 								-->
 
 
 <project name="MyCoReModule - imaging" default="usage" basedir=".">
@@ -48,11 +48,22 @@
 <!-- Initalization of directories and CLASSPATH, LIBPATH                 -->
 <!-- =================================================================== -->
 
-  <target name="init">
+  <target name="init" depends="system.path.1, system.path.2">
     <mkdir dir="${basedir}/classes" />
     <path id="mycore.classpath">
       <fileset dir="${basedir}/lib" includes="*.jar"/>
+      <path refid="system.classpath"  />
     </path>
+  </target>
+
+  <target name="system.path.1" if="MCR.System.SharedJarsDir">
+    <path id="system.classpath">
+      <fileset dir="${MCR.System.SharedJarsDir}" includes="_dummy_ ${MCR.System.Jars}"        />
+    </path>
+  </target>
+
+  <target name="system.path.2" unless="MCR.System.SharedJarsDir">
+    <path id="system.classpath" />
   </target>
 
 <!-- =================================================================== -->
@@ -60,7 +71,7 @@
 <!-- =================================================================== -->
 
   <target name="javac" depends="init">
-    <echo>Compiling ${packages}</echo>
+    <echo>Compiling ${packages} </echo>
     <javac srcdir="${basedir}/modules/module-imaging/sources"
            destdir="${basedir}/classes"
            includes="${packages}"
