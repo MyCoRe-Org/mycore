@@ -21,17 +21,16 @@ Quick installation guide
 1. Requirements
 ========================
 
-Ensure you have installed "JAI" and "JAI Image I/O":
-MyCoRe Module-Imaging is based on Sun's image library "JAI (Java Advanced Imaging)"
-It provides functions to process images, e.g. scale, crop, caching, 
+Ensure you have installed "JAI (Java Advanced Imaging)":
+MyCoRe Module-Imaging is based on Sun's image library "JAI"
+It provides functions to process images, e.g. scale, crop, cache, 
 stored in a MyCoRe repository.
 
-- www.sun.com: download "JAI" (min. version 1.1.2_01) and "JAI Image I/O API" 
-  (min. version 1.0_01)
-- install "JAI" and "JAI Image I/O" according to your os as instructed by installation 
+- www.sun.com: download "JAI" (min. version 1.1.2_01) 
+- install "JAI" according to your os as instructed by installation 
   notes from Sun's download page
 
---> "JAI" and "JAI Image I/O" have to be installed into the JAVA you will use by MyCoRe
+--> "JAI" have to be installed into the JAVA you will use by MyCoRe
 
 1. Installation
 ========================
