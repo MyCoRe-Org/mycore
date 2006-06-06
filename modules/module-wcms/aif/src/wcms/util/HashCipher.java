@@ -31,22 +31,20 @@ public class HashCipher {
     public HashCipher() {
     }
 
-    public static final void main(String[] args) throws ArrayIndexOutOfBoundsException {
+    public static final void main(String[] args) throws ArrayIndexOutOfBoundsException, NoSuchAlgorithmException {
         try {
-            // System.out.println(crypt(args[0]));
+             System.out.println(crypt(args[0]));
         } catch (ArrayIndexOutOfBoundsException aioobe) {
-            // System.out.println("Usage: java wcms.util.HashCipher
-            // <\"PasswordString\">");
-            // System.out.println("Example: java wcms.util.HashCipher \"tESt
-            // &58y\"");
+             System.out.println("Usage: java wcms.util.HashCipher<\"PasswordString\">");
+             System.out.println("Example: java wcms.util.HashCipher \"tESt&58y\"");
         }
     }
 
     public static String crypt(String string) throws NoSuchAlgorithmException {
         byte[] buffer = new byte[12];
 
-        // DigestInputStream dis = new DigestInputStream(new
-        // InputStream.getInstance());
+        // DigestInputStream dis = new DigestInputStream(new InputStream.getInstance());
+        
         buffer = string.getBytes();
 
         String outstr = new String(hash(buffer));
