@@ -2,7 +2,7 @@
 <!DOCTYPE web-app PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN" "web-app_2_3.dtd">
 <web-app>
 
-      <display-name>MyCoRe DocPortal Application</display-name>
+      <display-name>MyCoRe Application</display-name>
       
       <!-- **************************************************************** -->
       <!-- Servlets and mapping from MyCoRe kernel                          -->
@@ -96,6 +96,10 @@
 	 <servlet-mapping>
             <servlet-name>MCRStartClassEditorServlet</servlet-name>
             <url-pattern>/servlets/MCRStartClassEditorServlet</url-pattern>
+      </servlet-mapping>
+      <servlet-mapping>
+            <servlet-name>MCRClassificationBrowser</servlet-name>
+            <url-pattern>/browse</url-pattern>
       </servlet-mapping>
       <servlet-mapping>
             <servlet-name>MCRClassificationBrowser</servlet-name>
