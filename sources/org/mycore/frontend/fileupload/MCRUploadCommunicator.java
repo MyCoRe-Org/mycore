@@ -163,6 +163,7 @@ public class MCRUploadCommunicator {
         System.out.println("Socket created, connected to server.");
 
         ZipOutputStream zos = new ZipOutputStream(socket.getOutputStream());
+        DataInputStream din = new DataInputStream(socket.getInputStream());
 
         zos.setLevel(Deflater.NO_COMPRESSION);
 
@@ -184,8 +185,12 @@ public class MCRUploadCommunicator {
         }
 
         zos.closeEntry();
+        zos.flush();
         System.out.println("Finished sending file content.");
-
+        
+        String ok = din.readUTF();
+        System.out.println("Server finished storing file content: " + ok );
+        
         socket.close();
         System.out.println("Socket closed, file transfer successfully completed.");
     }
