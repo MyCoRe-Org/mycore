@@ -92,7 +92,7 @@ public class MCRFileMetadataManager {
 
     /**
      * Last number that was used for creating a unique ID for each
-     * MCRFilesystemNode *
+     * MCRFilesystemNode
      */
     private long last_number = System.currentTimeMillis();
 
@@ -138,7 +138,10 @@ public class MCRFileMetadataManager {
     synchronized String createNodeID() {
         String time = "0000000000" + Long.toString(last_number++, 36);
 
-        return getIDPrefix() + time.substring(time.length() - 10);
+        StringBuffer sb = new StringBuffer(getIDPrefix());
+        sb.append(time.substring(time.length() - 10));
+        sb.reverse();
+        return sb.toString();
     }
 
     /**
