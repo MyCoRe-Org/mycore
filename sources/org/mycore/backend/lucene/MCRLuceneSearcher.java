@@ -182,7 +182,8 @@ public class MCRLuceneSearcher extends MCRSearcher {
             doc.add(new Field("mcrid", entryID, Field.Store.YES, Field.Index.UN_TOKENIZED));
             doc.add(new Field("returnid", returnID, Field.Store.YES, Field.Index.UN_TOKENIZED));
             LOGGER.debug("lucene document build " + entryID);
-            addDocumentToLucene(doc);
+            addDocumentToLucene(doc, analyzer, IndexDir, FIRST);
+            FIRST = false;
         } catch (Exception e) {
             LOGGER.error(e.getClass().getName() + ": " + e.getMessage());
             LOGGER.error(MCRException.getStackTraceAsString(e));
@@ -287,10 +288,8 @@ public class MCRLuceneSearcher extends MCRSearcher {
      *            lucene document to add to index
      * 
      */
-    private void addDocumentToLucene(Document doc) throws Exception {
-        IndexWriter writer = getLuceneWriter(IndexDir, FIRST);
-        FIRST = false;
-
+    private static synchronized void addDocumentToLucene(Document doc, Analyzer analyzer, String indexDir, boolean first) throws Exception {
+        IndexWriter writer = getLuceneWriter(indexDir, first);
         writer.addDocument(doc, analyzer);
         writer.close();
     }
@@ -357,7 +356,7 @@ public class MCRLuceneSearcher extends MCRSearcher {
      *            the directory where index is stored
      * 
      */
-    public static void deleteLuceneDocument(String fieldname, String id, String indexDir) throws Exception {
+    public static synchronized void deleteLuceneDocument(String fieldname, String id, String indexDir) throws Exception {
         IndexSearcher searcher = new IndexSearcher(indexDir);
 
         if (null == searcher) {
