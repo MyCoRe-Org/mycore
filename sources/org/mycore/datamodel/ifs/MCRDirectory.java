@@ -208,7 +208,7 @@ public class MCRDirectory extends MCRFilesystemNode {
 
         MCRFilesystemNode[] children = new MCRFilesystemNode[childrenIDs.size()];
 
-        for (int i = 0; i < childrenIDs.size(); i++) {
+        for (int i = 0; i < children.length; i++) {
             String childID = (String) (childrenIDs.get(i));
             children[i] = manager.retrieveNode(childID);
         }
