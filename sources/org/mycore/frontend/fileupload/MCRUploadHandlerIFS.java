@@ -126,7 +126,7 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
      *            InputStream belongs to socket, do not close!
      * 
      */
-    public void receiveFile(String path, InputStream in) throws Exception {
+    public synchronized void receiveFile(String path, InputStream in) throws Exception {
         LOGGER.debug("adding file: " + path);
         MCRFile file = getNewFile(path);
         file.setContentFrom(in);
