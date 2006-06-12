@@ -12,7 +12,7 @@ Die Schaltzentrale der WCMS-Administrationsoberflaeche.
 	- steuert den Aufruf von Templates
 
 include:
-	- MyCoReLayout-de.xsl
+	- MyCoReLayout.xsl
 	- wcms_login.xsl
 	- wcms_admin.xsl
 	- wcms_choose.xsl
