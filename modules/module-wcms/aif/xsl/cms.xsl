@@ -39,7 +39,7 @@ template:
 	</xsl:variable>
 
 	<!-- Einbinden weiterer Stylesheets -->
-	<xsl:include href="MyCoReLayout-de.xsl" />
+	<xsl:include href="MyCoReLayout.xsl" />
 	<xsl:include href="wcms_login.xsl" />
 	<xsl:include href="wcms_admin.xsl" />
 	<xsl:include href="wcms_choose.xsl" />
