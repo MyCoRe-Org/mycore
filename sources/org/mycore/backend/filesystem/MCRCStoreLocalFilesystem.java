@@ -139,12 +139,14 @@ public class MCRCStoreLocalFilesystem extends MCRContentStore {
 
         for (int i = numDirs; i > 0; i--) {
             File dir = new File(baseDir, dirs[i - 1]);
-
-            if (dir.listFiles().length > 0) {
-                break;
+            if (dir.isDirectory()) {
+                // dir is directory and exists
+                // ensures that listFiles below does not throw NPE
+                if (dir.listFiles().length > 0) {
+                    break;
+                }
+                dir.delete();
             }
-
-            dir.delete();
         }
     }
 
