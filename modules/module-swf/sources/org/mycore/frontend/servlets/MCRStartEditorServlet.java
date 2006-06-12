@@ -528,7 +528,7 @@ public class MCRStartEditorServlet extends MCRServlet {
                 String appl = CONFIG.getString("MCR.editor_mail_application_id", "DocPortal");
                 String subject = "Automaticaly message from " + appl;
                 StringBuffer text = new StringBuffer();
-                text.append("Es wurde ein Objekt vom Typ ").append(mytype).append(" mit der ID ").append(mysemcrid).append(" aus dem Workflow gelï¿½scht.");
+                text.append("Es wurde ein Objekt vom Typ ").append(mytype).append(" mit der ID ").append(mysemcrid).append(" aus dem Workflow gelöscht.");
                 LOGGER.info(text.toString());
 
                 try {
@@ -568,7 +568,7 @@ public class MCRStartEditorServlet extends MCRServlet {
                 String appl = CONFIG.getString("MCR.editor_mail_application_id", "DocPortal");
                 String subject = "Automaticaly message from " + appl;
                 StringBuffer text = new StringBuffer();
-                text.append("Es wurde ein Derivate mit der ID ").append(mysemcrid).append(" aus dem Workflow gelï¿½scht.");
+                text.append("Es wurde ein Derivate mit der ID ").append(mysemcrid).append(" aus dem Workflow gelöscht.");
                 LOGGER.info(text.toString());
 
                 try {
@@ -868,7 +868,7 @@ public class MCRStartEditorServlet extends MCRServlet {
                 String appl = CONFIG.getString("MCR.editor_mail_application_id", "DocPortal");
                 String subject = "Automaticaly message from " + appl;
                 StringBuffer text = new StringBuffer();
-                text.append("Es wurde ein Objekt vom Typ ").append(mytype).append(" mit der ID ").append(mytfmcrid).append(" aus dem Server gelï¿½scht.");
+                text.append("Es wurde ein Objekt vom Typ ").append(mytype).append(" mit der ID ").append(mytfmcrid).append(" aus dem Server gelöscht.");
                 LOGGER.info(text.toString());
 
                 try {
@@ -917,7 +917,7 @@ public class MCRStartEditorServlet extends MCRServlet {
                 String appl = CONFIG.getString("MCR.editor_mail_application_id", "DocPortal");
                 String subject = "Automaticaly message from " + appl;
                 StringBuffer text = new StringBuffer();
-                text.append("Es wurde ein Derivate mit der ID ").append(mysemcrid).append(" des Objektes mit der ID ").append(mysemcrid).append(" aus dem Server gelï¿½scht.");
+                text.append("Es wurde ein Derivate mit der ID ").append(mysemcrid).append(" des Objektes mit der ID ").append(mysemcrid).append(" aus dem Server gelöscht.");
                 LOGGER.info(text.toString());
 
                 try {
@@ -1104,7 +1104,7 @@ public class MCRStartEditorServlet extends MCRServlet {
                         MCRDirectory rootdir = MCRDirectory.getRootDirectory(mysemcrid);
                         rootdir.getChildByPath(filename).delete();
                     } catch (Exception ex) {
-                        LOGGER.warn("Can't remove file " + filename);
+                        LOGGER.warn("Can't remove file " + filename, ex);
                     }
                 }
             }
