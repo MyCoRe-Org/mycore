@@ -177,9 +177,9 @@ public class MCRAccessManager {
     	boolean accessAllowed = false;
     	List l = MCRLinkTableManager.instance().getSourceOf(derID,"derivate");
 		if(l != null && l.size() > 0) {
-			accessAllowed = getAccessImpl().checkPermission((String)l.get(0),"read") && getAccessImpl().checkPermission(derID,"read");
+			accessAllowed = checkPermission((String)l.get(0),"read") && checkPermission(derID,"read");
 		}else {
-			accessAllowed = getAccessImpl().checkPermission(derID,"read");
+			accessAllowed = checkPermission(derID,"read");
 			Logger.getLogger("MCRAccessManager.class").warn("no mcrobject could be found for derivate: " + derID);
 		}
 		return accessAllowed;
