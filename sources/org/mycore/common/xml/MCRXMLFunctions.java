@@ -136,5 +136,9 @@ public class MCRXMLFunctions {
     public static String getISODate(String simpleDate,String simpleFormat) throws ParseException{
         return getISODate(simpleDate,simpleFormat,null);
     }
+    
+    public static String maskApostrophe(String source){
+        return source.replaceAll("'","%27");
+    }
 
 }
