@@ -12,7 +12,7 @@ import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.filter.ElementFilter;
 import org.jdom.output.XMLOutputter;
-import org.mycore.access.MCRAccessInterface;
+
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.datamodel.metadata.MCRObject;
@@ -36,7 +36,6 @@ public class MCRIndexBrowserData {
     private Document jResult;
     private Document jQuery;
     private MCRResults mcrResult;
-	private static MCRAccessInterface AI = MCRAccessManager.getAccessImpl();
     
     class MyRangeDelim {
         int pos;
@@ -416,7 +415,7 @@ public class MCRIndexBrowserData {
                 String[] listelm = new String[2 + ( (ic.extraFields !=null)?ic.extraFields.length:0 ) ];                
             	Element child = (Element)(mcrHit.get( i ));   
             	
-            	if ( AI.checkPermission( child.getAttributeValue("id"),"read") ){
+            	if ( MCRAccessManager.checkPermission( child.getAttributeValue("id"),"read") ){
 	            	String[] brFields = new String[1];
 	            	brFields[0]=  ic.sortFields[0];
 	            	           	
