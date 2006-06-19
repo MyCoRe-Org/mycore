@@ -209,7 +209,8 @@ public class MCRObjectServlet extends MCRServlet {
         if (h==null){
             return null;
         }
-        return h.get(objectID).toString();
+        Object o = h.get(objectID);
+        return (o == null) ? null : o.toString();
     }
 
     protected final static void storeEditorID(String objectID, String editorID){
