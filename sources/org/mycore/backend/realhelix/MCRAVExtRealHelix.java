@@ -28,6 +28,7 @@ import java.io.OutputStream;
 import java.net.URLConnection;
 import java.util.StringTokenizer;
 
+import org.apache.log4j.Logger;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.datamodel.ifs.MCRAudioVideoExtender;
@@ -52,6 +53,10 @@ import org.mycore.datamodel.ifs.MCRFileReader;
  * @version $Revision$ $Date$
  */
 public class MCRAVExtRealHelix extends MCRAudioVideoExtender {
+    
+    /** The logger */
+    private final static Logger LOGGER = Logger.getLogger( MCRAVExtRealHelix.class );
+    
     public MCRAVExtRealHelix() {
     }
 
@@ -63,9 +68,9 @@ public class MCRAVExtRealHelix extends MCRAudioVideoExtender {
 
         baseMetadata = config.getString(prefix + "ViewSourceBaseURL");
 
-        String data = getMetadata(baseMetadata + file.getStorageID());
-
         try {
+            String data = getMetadata(baseMetadata + file.getStorageID());
+
             String sSize = getBetween("File Size:</strong>", "Bytes", data, "0");
             String sBitRate = getBetween("Bit Rate:</strong>", "Kbps", data, "0.0");
             String sFrameRate = getBetween("Frame Rate: </strong>", "fps", data, "0.0");
@@ -143,7 +148,7 @@ public class MCRAVExtRealHelix extends MCRAudioVideoExtender {
             playerStarterCT = con.getContentType();
         } catch (Exception exc) {
             String msg = "Error parsing metadata from Real Server ViewSource: " + file.getStorageID();
-            throw new MCRPersistenceException(msg, exc);
+            LOGGER.warn( msg, exc );
         }
     }
 
