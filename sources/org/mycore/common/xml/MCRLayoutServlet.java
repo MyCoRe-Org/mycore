@@ -243,8 +243,8 @@ public class MCRLayoutServlet extends MCRServlet {
             } catch (MCRException ex) {
                 if (errorPage) {
                     String msg = "Error while generating error page!";
-                    LOGGER.warn( msg, ex );
-                    response.sendError( HttpServletResponse.SC_INTERNAL_SERVER_ERROR, msg );
+                    LOGGER.warn(msg, ex);
+                    response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, msg);
                     return;
                 }
 
@@ -255,55 +255,55 @@ public class MCRLayoutServlet extends MCRServlet {
 
     public static Properties buildXSLParameters(HttpServletRequest request) {
 
-		// PROPERTIES: Read all properties from system configuration
-		Properties parameters = (Properties) (MCRConfiguration.instance()
-		        .getProperties().clone());
-		
-		// SESSION: Read all *.xsl attributes that are stored in the browser session
-		HttpSession session = request.getSession(false);
-		if (session != null) {
-		    for (Enumeration e = session.getAttributeNames(); e
-		            .hasMoreElements();) {
-		        String name = (String) (e.nextElement());
-		        if (name.startsWith("XSL."))
-		            parameters.put(name.substring(4), session
-		                    .getAttribute(name));
-		    }
-		}
-		
-		// HTTP-REQUEST-PARAMETER: Read all *.xsl attributes from the client HTTP request parameters
-		for (Enumeration e = request.getParameterNames(); e.hasMoreElements();) {
-		    String name = (String) (e.nextElement());
-		    
-		    if (name.startsWith("XSL.")) {
-		    	if (!name.endsWith(".SESSION")) {
-		    		parameters.put(name.substring(4), request.getParameter(name));	
-		    	}     // store parameter in session if ends with *.SESSION 
-		    	else {
-		    		parameters.put(name.substring(4, name.length()-8), request.getParameter(name));
-		    		session.setAttribute( name.substring(0, name.length()-8), request.getParameter(name));
-		        	LOGGER.debug("MCRLayoutServlet: found HTTP-Req.-Parameter "+name+"="+request.getParameter(name)
-		        			+" that should be saved in session, safed "+name.substring(0, name.length()-8)+"="+request.getParameter(name));
-		    	}
-		    }
-		}
-		
-		// SERVLETS-REQUEST-ATTRIBUTES: Read all *.xsl attributes provided by the invoking servlet
-		for (Enumeration e = request.getAttributeNames(); e.hasMoreElements();) {
-		    String name = (String) (e.nextElement());
-		    if (name.startsWith("XSL.")) {
-		    	if (!name.endsWith(".SESSION")) {
-		            parameters.put(name.substring(4), request.getAttribute(name));
-		       	} // store parameter in session if ends with *.SESSION
-		    	else {
-		    	parameters.put(name.substring(4, name.length()-8), request.getAttribute(name));
-		    	session.setAttribute( name.substring(0, name.length()-8), request.getAttribute(name));
-		    	LOGGER.debug("MCRLayoutServlet: found Req.-Attribut "+name+"="+request.getAttribute(name)
-		    			+" that should be saved in session, safed "+name.substring(0, name.length()-8)+"="+request.getAttribute(name));
-		    	}
-		    }
-		    	
-		}        
+        // PROPERTIES: Read all properties from system configuration
+        Properties parameters = (Properties) (MCRConfiguration.instance().getProperties().clone());
+
+        // SESSION: Read all *.xsl attributes that are stored in the browser
+        // session
+        HttpSession session = request.getSession(false);
+        if (session != null) {
+            for (Enumeration e = session.getAttributeNames(); e.hasMoreElements();) {
+                String name = (String) (e.nextElement());
+                if (name.startsWith("XSL."))
+                    parameters.put(name.substring(4), session.getAttribute(name));
+            }
+        }
+
+        // HTTP-REQUEST-PARAMETER: Read all *.xsl attributes from the client
+        // HTTP request parameters
+        for (Enumeration e = request.getParameterNames(); e.hasMoreElements();) {
+            String name = (String) (e.nextElement());
+
+            if (name.startsWith("XSL.")) {
+                if (!name.endsWith(".SESSION")) {
+                    parameters.put(name.substring(4), request.getParameter(name));
+                } // store parameter in session if ends with *.SESSION
+                else {
+                    parameters.put(name.substring(4, name.length() - 8), request.getParameter(name));
+                    session.setAttribute(name.substring(0, name.length() - 8), request.getParameter(name));
+                    LOGGER.debug("MCRLayoutServlet: found HTTP-Req.-Parameter " + name + "=" + request.getParameter(name) + " that should be saved in session, safed " + name.substring(0, name.length() - 8) + "=" + request.getParameter(name));
+                }
+            }
+        }
+
+        // SERVLETS-REQUEST-ATTRIBUTES: Read all *.xsl attributes provided by
+        // the invoking servlet
+        for (Enumeration e = request.getAttributeNames(); e.hasMoreElements();) {
+            String name = (String) (e.nextElement());
+            if (name.startsWith("XSL.")) {
+                if (!name.endsWith(".SESSION")) {
+                    if (request.getAttribute(name) != null) {
+                        parameters.put(name.substring(4), request.getAttribute(name));
+                    }
+                } // store parameter in session if ends with *.SESSION
+                else {
+                    parameters.put(name.substring(4, name.length() - 8), request.getAttribute(name));
+                    session.setAttribute(name.substring(0, name.length() - 8), request.getAttribute(name));
+                    LOGGER.debug("MCRLayoutServlet: found Req.-Attribut " + name + "=" + request.getAttribute(name) + " that should be saved in session, safed " + name.substring(0, name.length() - 8) + "=" + request.getAttribute(name));
+                }
+            }
+
+        }
 
         // Set some predefined XSL parameters:
         String defaultLang = MCRConfiguration.instance().getString("MCR.metadata_default_lang", "en");
@@ -361,14 +361,14 @@ public class MCRLayoutServlet extends MCRServlet {
         parameters.put("Referer", referer);
         parameters.put("TypeMapping", typeParam.toString());
 
-        return parameters; 
+        return parameters;
     }
 
     protected static final String getCompleteURL(HttpServletRequest request) {
         StringBuffer buffer = request.getRequestURL();
         String queryString = request.getQueryString();
 
-        if (queryString != null && queryString.length()>0) {
+        if (queryString != null && queryString.length() > 0) {
             buffer.append("?").append(queryString);
         }
 
@@ -427,14 +427,13 @@ public class MCRLayoutServlet extends MCRServlet {
      *             if no SAXTransformerFactory was found
      */
     protected static synchronized void buildTransformerFactory() {
-        if(factory == null)
-        {
+        if (factory == null) {
             TransformerFactory tf = TransformerFactory.newInstance();
-    
+
             if (!tf.getFeature(SAXTransformerFactory.FEATURE)) {
                 throw new MCRConfigurationException("Could not load a SAXTransformerFactory for use with XSLT");
             }
-    
+
             factory = (SAXTransformerFactory) (tf);
             factory.setURIResolver(MCRURIResolver.instance());
         }
@@ -557,39 +556,41 @@ public class MCRLayoutServlet extends MCRServlet {
 
         return map;
     }
-    
-    private static String getBaseURL(HttpServletRequest req){
-        boolean relative=CONFIG.getBoolean("MCR.LayoutServlet.Links.relative",false);
-        if (relative){
-            String requestURI=req.getRequestURI();
-            String contextPath=req.getContextPath();
-            int contextLength=contextPath.length()+1; //add trailing slash
-            String stub=requestURI.substring(contextLength); //remove the context info
-            int slashCount=countStringOccurrences(stub,"/");
-            StringBuffer baseURL=new StringBuffer(slashCount*3);
-            for (int i=0;i<slashCount;i++){
+
+    private static String getBaseURL(HttpServletRequest req) {
+        boolean relative = CONFIG.getBoolean("MCR.LayoutServlet.Links.relative", false);
+        if (relative) {
+            String requestURI = req.getRequestURI();
+            String contextPath = req.getContextPath();
+            int contextLength = contextPath.length() + 1; // add trailing
+                                                            // slash
+            String stub = requestURI.substring(contextLength); // remove the
+                                                                // context info
+            int slashCount = countStringOccurrences(stub, "/");
+            StringBuffer baseURL = new StringBuffer(slashCount * 3);
+            for (int i = 0; i < slashCount; i++) {
                 baseURL.append("../");
             }
             return baseURL.toString();
         }
         return getBaseURL();
     }
-    
-    private static String getServletBaseURL(HttpServletRequest req){
-        boolean relative=CONFIG.getBoolean("MCR.LayoutServlet.Links.relative",true);
-        if (relative){
-            return getBaseURL(req)+"servlets/";
+
+    private static String getServletBaseURL(HttpServletRequest req) {
+        boolean relative = CONFIG.getBoolean("MCR.LayoutServlet.Links.relative", true);
+        if (relative) {
+            return getBaseURL(req) + "servlets/";
         }
         return getServletBaseURL();
     }
-    
-    private static int countStringOccurrences(String str, String s){
-        int f=0;
-        int pos=str.indexOf(s);
-        while (pos!=-1){
-            LOGGER.debug("f:"+f+" pos:"+pos);
+
+    private static int countStringOccurrences(String str, String s) {
+        int f = 0;
+        int pos = str.indexOf(s);
+        while (pos != -1) {
+            LOGGER.debug("f:" + f + " pos:" + pos);
             f++;
-            pos=str.indexOf(s,pos+2);
+            pos = str.indexOf(s, pos + 2);
         }
         return f;
     }
