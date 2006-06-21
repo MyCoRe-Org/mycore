@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
 <!-- ============================================== -->
-<!-- $Revision: 1.5.4.1 $ $Date: 2006-06-20 08:24:48 $ -->
+<!-- $Revision: 1.5.4.2 $ $Date: 2006-06-21 09:27:28 $ -->
 <!-- ============================================== --> 
 
 <xsl:stylesheet 
@@ -35,7 +35,7 @@
   
     <!--  If there is a i18n key, output the translation from messages file -->
     <xsl:when test="@i18n">
-      <xsl:copy-of select="i18n:translate(@i18n)" />    
+      <xsl:value-of select="i18n:translate(@i18n)" disable-output-escaping="yes"/>    
     </xsl:when>
 
     <!-- If there is a label with xml:lang = selected lang, output it -->
