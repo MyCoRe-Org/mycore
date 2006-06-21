@@ -25,7 +25,8 @@ template:
 <xsl:stylesheet 
 	version="1.0" 
 	xmlns:xsl="http://www.w3.org/1999/XSL/Transform" 
-	xmlns:xalan="http://xml.apache.org/xalan" >
+	xmlns:xalan="http://xml.apache.org/xalan"
+    xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation" >
 
 <!-- ====================================================================================={
 
@@ -78,7 +79,7 @@ section: Template: name="wcmsAdministration.welcome"
 			<xsl:call-template name="wcms.headline" >
 				<xsl:with-param 
 					name="infoText" 
-					select="concat(/cms/userRealName,', herzlich Willkommen im Web Content Management System !')">
+					select="concat(/cms/userRealName,', ',i18n:translate('wcms.admin.greeting'))">
 				</xsl:with-param>
 				<xsl:with-param 
 					name="align" 
@@ -89,13 +90,13 @@ section: Template: name="wcmsAdministration.welcome"
 			<tr>
 				<td colspan="2">
 					<br/>
-					Die folgenden Optionen stehen für sie zur Verfügung:
+					<xsl:value-of select="concat(i18n:translate('wcms.admin.options.header'),':')"/>
 					<br/><br/>
 					<img 
 						src="{$WebApplicationBaseURL}templates/master/template_wcms/IMAGES/naviMenu/greenArrow.gif" 
 						width="16" height="8" border="0" alt="" title=""/> 
 					<a href="{$ServletsBaseURL}WCMSAdminServlet?action=choose">
-						Pflege von Webseiten
+						<xsl:value-of select="i18n:translate('wcms.admin.options.manage')"/>
 					</a>
 
 					<!-- Nur fuer den Administrator -->
@@ -105,7 +106,7 @@ section: Template: name="wcmsAdministration.welcome"
 							src="{$WebApplicationBaseURL}templates/master/template_wcms/IMAGES/naviMenu/greenArrow.gif" 
 							width="16" height="8" border="0" alt="" title=""/> 
 						<a href="{$ServletsBaseURL}WCMSAdminServlet?action=managGlobal">
-							Globale Einstellungen
+							<xsl:value-of select="i18n:translate('wcms.admin.options.globalSetup')"/>
 						</a>
 					</xsl:if>
 
@@ -114,14 +115,14 @@ section: Template: name="wcmsAdministration.welcome"
 						src="{$WebApplicationBaseURL}templates/master/template_wcms/IMAGES/naviMenu/greenArrow.gif" 
 						width="16" height="8" border="0" alt="" title="" />
 					<a href="{$ServletsBaseURL}WCMSAdminServlet?action=logs&amp;sort=date&amp;sortOrder=descending">
-						Nutzungsstatistik einsehen
+						<xsl:value-of select="i18n:translate('wcms.admin.options.showStats')"/>
 					</a> 
 					<br/><br/>
 					<img 
 						src="{$WebApplicationBaseURL}templates/master/template_wcms/IMAGES/naviMenu/greenArrow.gif" 
 						width="16" height="8" border="0" alt="" title="" /> 
 					<a href="javascript: window.close()">
-						Abmelden
+						<xsl:value-of select="i18n:translate('wcms.labels.logout')"/>
 					</a>
 				</td>
 			</tr>
@@ -162,32 +163,32 @@ section: Template: name="wcmsAdministration.logStatistic"
 		<xsl:variable name="wieSortiert" >
 			<xsl:choose>
 				<xsl:when test="count(/cms/loggings/log) > 1">
-					<xsl:text>Ein Eintrag</xsl:text>
+					<xsl:value-of select="i18n:translate('wcms.admin.sort.element')"/>
 				</xsl:when>
 				<xsl:otherwise>
 					<xsl:value-of select=" count(/cms/loggings/log)" />
-					<xsl:text> Einträge sortiert nach </xsl:text>
+					<xsl:value-of select="i18n:translate('wcms.admin.sort.sortBy')"/>
 				</xsl:otherwise>
 			</xsl:choose>
 			<!-- which column -->
 			<xsl:choose>
 				<xsl:when test=" $sortBy = 'date' " >
-					<xsl:text>Datum</xsl:text>
+					<xsl:value-of select="i18n:translate('wcms.date')"/>
 				</xsl:when>
 				<xsl:when test="/cms/userClass != 'autor' and $sortBy = 'userRealName' " >
-					<xsl:text>Nutzer</xsl:text>
+					<xsl:value-of select="i18n:translate('wcms.user')"/>
 				</xsl:when>
 				<xsl:when test=" $sortBy = 'labelPath' " >
-					<xsl:text>Seite</xsl:text>
+					<xsl:value-of select="i18n:translate('wcms.site')"/>
 				</xsl:when>
 				<xsl:when test=" $sortBy = 'doneAction' " >
-					<xsl:text>Aktion</xsl:text>
+					<xsl:value-of select="i18n:translate('wcms.action')"/>
 				</xsl:when>
 				<xsl:when test="/cms/userClass = 'admin' and $sortBy = 'backupContentFile' " >
-					<xsl:text>Backup Inhalt</xsl:text>
+					<xsl:value-of select="i18n:translate('wcms.backupContent')"/>
 				</xsl:when>
 				<xsl:when test="/cms/userClass = 'admin' and $sortBy = 'backupNavigationFile' " >
-					<xsl:text>Backup Navigation</xsl:text>
+					<xsl:value-of select="i18n:translate('wcms.backupNav')"/>
 				</xsl:when>
 			</xsl:choose>
 			<!-- which order -->
@@ -195,20 +196,20 @@ section: Template: name="wcmsAdministration.logStatistic"
 				<xsl:when test="$currentSortOrder = 'ascending' " >
 					<xsl:choose>
 						<xsl:when test="$sortBy = 'date' " >
-							[alte Einträge zuerst]
+							<xsl:value-of select="i18n:translate('wcms.admin.sort.oldFirst')"/>
 						</xsl:when>
 						<xsl:otherwise>
-							[aufsteigend]
+							<xsl:value-of select="i18n:translate('wcms.admin.sort.ascending')"/>
 						</xsl:otherwise>
 					</xsl:choose>
 				</xsl:when>
 				<xsl:otherwise>
 					<xsl:choose>
 						<xsl:when test="$sortBy = 'date' " >
-							[neue Einträge zuerst]
+							<xsl:value-of select="i18n:translate('wcms.admin.sort.newFirst')"/>
 						</xsl:when>
 						<xsl:otherwise>
-							[absteigend]
+							<xsl:value-of select="i18n:translate('wcms.admin.sort.descending')"/>
 						</xsl:otherwise>
 					</xsl:choose>
 				</xsl:otherwise>
@@ -218,7 +219,7 @@ section: Template: name="wcmsAdministration.logStatistic"
 	<!-- Seitenname -->
 	<xsl:call-template name="zeigeSeitenname">
 		<xsl:with-param name="seitenname">
-			<xsl:text>WCMS Nutzungsprotokoll</xsl:text>
+			<xsl:value-of select="i18n:translate('wcms.admin.WCMSUserProt')"/>
 			<!-- xsl:text>WCMS Nutzungsprotokoll einsehen [</xsl:text>
 			<xsl:value-of select="$wieSortiert"/>
 			<xsl:text>]</xsl:text-->
@@ -246,14 +247,14 @@ section: Template: name="wcmsAdministration.logStatistic"
 													<xsl:text>&#8657; </xsl:text>
 												</xsl:when>
 											</xsl:choose>
-											<xsl:text>Datum</xsl:text>
+											<xsl:value-of select="i18n:translate('wcms.date')"/>
 										</a>
 									</th>
 								</xsl:when>
 								<xsl:otherwise>
 									<th>
 										<a href="WCMSAdminServlet?action=logs&amp;sort=date&amp;sortOrder={$currentSortOrder}">
-											<xsl:text>Datum</xsl:text>
+											<xsl:value-of select="i18n:translate('wcms.date')"/>
 										</a>
 									</th>
 								</xsl:otherwise>
@@ -272,14 +273,14 @@ section: Template: name="wcmsAdministration.logStatistic"
 													<xsl:text>&#8657; </xsl:text>
 												</xsl:when>
 											</xsl:choose>
-											<xsl:text>Benutzer</xsl:text>
+											<xsl:value-of select="i18n:translate('wcms.user')"/>
 										</a>
 									</th>
 								</xsl:when>
 								<xsl:when test="/cms/userClass != 'autor' and $sortBy != 'userRealName' " >
 									<th>										
 										<a href="WCMSAdminServlet?action=logs&amp;sort=userRealName&amp;sortOrder={$currentSortOrder}">
-											<xsl:text>Benutzer</xsl:text>
+											<xsl:value-of select="i18n:translate('wcms.user')"/>
 										</a>
 									</th>
 								</xsl:when>
@@ -298,14 +299,14 @@ section: Template: name="wcmsAdministration.logStatistic"
 													<xsl:text>&#8657; </xsl:text>
 												</xsl:when>
 											</xsl:choose>
-											<xsl:text>Seite</xsl:text>
+											<xsl:value-of select="i18n:translate('wcms.site')"/>
 										</a>
 									</th>
 								</xsl:when>
 								<xsl:otherwise>
 									<th>
 										<a href="WCMSAdminServlet?action=logs&amp;sort=labelPath&amp;sortOrder={$currentSortOrder}">
-											<xsl:text>Seite</xsl:text>
+											<xsl:value-of select="i18n:translate('wcms.site')"/>
 										</a>
 									</th>
 								</xsl:otherwise>
@@ -324,21 +325,21 @@ section: Template: name="wcmsAdministration.logStatistic"
 													<xsl:text>&#8657; </xsl:text>
 												</xsl:when>
 											</xsl:choose>											
-											<xsl:text>Aktion</xsl:text>
+											<xsl:value-of select="i18n:translate('wcms.action')"/>
 										</a>
 									</th>
 								</xsl:when>
 								<xsl:otherwise>
 									<th>
 										<a href="WCMSAdminServlet?action=logs&amp;sort=doneAction&amp;sortOrder={$currentSortOrder}">
-											<xsl:text>Aktion</xsl:text>
+											<xsl:value-of select="i18n:translate('wcms.action')"/>
 										</a>
 									</th>
 								</xsl:otherwise>
 							</xsl:choose>
 
 							<th>
-								<xsl:text>Kommentar</xsl:text>
+								<xsl:value-of select="i18n:translate('wcms.comment')"/>
 							</th>
 
 							<!-- backup column -->
@@ -382,7 +383,7 @@ section: Template: name="wcmsAdministration.logStatistic"
 										<!-- date, time -->
 										<td>
 											<xsl:value-of select="@time"/>
-											<xsl:text> Uhr am </xsl:text>
+											<xsl:value-of select="i18n:translate('wcms.time')"/>
 											<xsl:value-of select="substring(@date,9,2)" />.<xsl:value-of select="substring(@date,6,2)" />.<xsl:value-of select="substring(@date,1,4)" />
 										</td>
 
@@ -401,16 +402,16 @@ section: Template: name="wcmsAdministration.logStatistic"
 										<td>
 											<xsl:choose>
 												<xsl:when test="@doneAction = 'add' " >
-													<xsl:text>erstellt</xsl:text>
+													<xsl:value-of select="i18n:translate('wcms.action.created')"/>
 												</xsl:when>
 												<xsl:when test="@doneAction = 'edit' " >
-													<xsl:text>geändert</xsl:text>
+													<xsl:value-of select="i18n:translate('wcms.action.changed')"/>
 												</xsl:when>
 												<xsl:when test="@doneAction = 'delete' " >
-													<xsl:text>gelöscht</xsl:text>
+													<xsl:value-of select="i18n:translate('wcms.action.deleted')"/>
 												</xsl:when>
 												<xsl:when test="@doneAction = 'translate' " >
-													<xsl:text>übersetzt</xsl:text>
+													<xsl:value-of select="i18n:translate('wcms.action.translated')"/>
 												</xsl:when>
 											</xsl:choose>
 										</td>
@@ -450,7 +451,7 @@ section: Template: name="wcmsAdministration.logStatistic"
 										<!-- date, time -->
 										<td>
 											<xsl:value-of select="@time"/>
-											<xsl:text> Uhr am </xsl:text>
+											<xsl:value-of select="i18n:translate('wcms.time')"/>
 											<xsl:value-of select="substring(@date,9,2)" />.<xsl:value-of select="substring(@date,6,2)" />.<xsl:value-of select="substring(@date,1,4)" />
 										</td>
 
@@ -469,16 +470,16 @@ section: Template: name="wcmsAdministration.logStatistic"
 										<td>
 											<xsl:choose>
 												<xsl:when test="@doneAction = 'add' " >
-													<xsl:text>erstellt</xsl:text>
+													<xsl:value-of select="i18n:translate('wcms.action.created')"/>
 												</xsl:when>
 												<xsl:when test="@doneAction = 'edit' " >
-													<xsl:text>geändert</xsl:text>
+													<xsl:value-of select="i18n:translate('wcms.action.changed')"/>
 												</xsl:when>
 												<xsl:when test="@doneAction = 'delete' " >
-													<xsl:text>gelöscht</xsl:text>
+													<xsl:value-of select="i18n:translate('wcms.action.deleted')"/>
 												</xsl:when>
 												<xsl:when test="@doneAction = 'translate' " >
-													<xsl:text>übersetzt</xsl:text>
+													<xsl:value-of select="i18n:translate('wcms.action.translated')"/>
 												</xsl:when>
 											</xsl:choose>
 										</td>
@@ -523,12 +524,12 @@ section: Template: name="wcmsAdministration.managGlobal"
 
 	<!-- Menueleiste einblenden, Parameter = ausgewaehlter Menuepunkt -->
 	<xsl:call-template name="menuleiste">
-		<xsl:with-param name="menupunkt" select="'Einstellungen'" />
+		<xsl:with-param name="menupunkt" select="i18n:translate('wcms.setup')" />
 	</xsl:call-template>
 
 	<!-- Seitenname -->
 	<xsl:call-template name="zeigeSeitenname">
-		<xsl:with-param name="seitenname" select="'Projekt-Einstellungen vornehmen'" />
+		<xsl:with-param name="seitenname" select="i18n:translate('wcms.projSetup')" />
 	</xsl:call-template>
 
 	<!-- Inhaltsbereich -->
@@ -536,20 +537,18 @@ section: Template: name="wcmsAdministration.managGlobal"
 
 		<div id="settings">
 			<form name="settings" action="{$ServletsBaseURL}WCMSAdminServlet?action=saveGlobal" method="post">
-				<div class="titel">Gestaltung</div>
+				<div class="titel"><xsl:value-of select="i18n:translate('wcms.design')"/></div>
 				<div class="inhalt">
 					<fieldset>
-						<p>Wähle eine allgemeine Gestaltungsvorlage (Standard).<br />
-						Diese wird auf alle statischen Seiten angewendet, die <br /> 
-						keine eigene Gestaltunsvorschrift besitzen.</p>
+						<p><xsl:value-of select="i18n:translate('wcms.design.hint')"/></p>
 
-						<label for="defTempl">Allgemeine Gestaltung</label>
+						<label for="defTempl"><xsl:value-of select="i18n:translate('wcms.design.mainDesign')"/></label>
 						<select name="defTempl" size="1">
 							<xsl:for-each select="/cms/templates/master/template">
 								<xsl:choose>
 									<xsl:when test="current() = $currentTempl">
 										<option value="{current()}">
-											<xsl:value-of select="current()" /> (bisher gesetzt)
+											<xsl:value-of select="current()" /><xsl:value-of select="i18n:translate('wcms.design.currentTempl')"/>
 										</option>
 									</xsl:when>
 									<xsl:otherwise>
@@ -565,7 +564,7 @@ section: Template: name="wcmsAdministration.managGlobal"
 					</fieldset>
 				</div>
 				<div class="knoepfe">
-					<a class="button" href="javascript:document.settings.submit()">Änderungen speichern</a>
+					<a class="button" href="javascript:document.settings.submit()"><xsl:value-of select="i18n:translate('wcms.buttons.saveChanges')"/></a>
 				</div>
 			</form>
 		</div>
@@ -589,7 +588,7 @@ section: Template: name="wcmsAdministration.managGlobal.saveButton"
 				<!-- submit -->
 				<tr>
 					<td align="right" class="button">
-						<input class="button" value="Speichern" type="submit"/>
+						<input class="button" value="{i18n:translate('wcms.buttons.save')}" type="submit"/>
 					</td>
 				</tr>
 				<!-- END OF: submit -->
@@ -611,13 +610,13 @@ section: Template: name="wcmsAdministration.managGlobal.defaultTempl"
 	<xsl:variable name="currentTempl" select="document($navigationBase)/navigation/@template"/>
 
 	<br/>
-	Default-Template:
+	<xsl:value-of select="i18n:translate('wcms.design.defaultTempl')"/>
 	<select name="defTempl" size="1">
 		<xsl:for-each select="/cms/templates/master/template">
 			<xsl:choose>
 				<xsl:when test="current() = $currentTempl">
 					<option value="{current()}">
-						<xsl:value-of select="current()" /> (bisher gesetzt)
+						<xsl:value-of select="current()" /><xsl:value-of select="i18n:translate('wcms.design.currentTempl')"/>
 					</option>
 				</xsl:when>
 				<xsl:otherwise>

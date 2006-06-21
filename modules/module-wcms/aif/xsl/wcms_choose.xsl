@@ -19,11 +19,12 @@ template:
 <xsl:stylesheet 
 	version="1.0" 
 	xmlns:xsl="http://www.w3.org/1999/XSL/Transform" 
-	xmlns:xalan="http://xml.apache.org/xalan" >
+	xmlns:xalan="http://xml.apache.org/xalan"
+    xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation" >
 
 <!-- ====================================================================================={
 section: Template: name="wcmsChoose"
-
+docportal build.xml
 	- Seitenaufbau
 }===================================================================================== -->
 	<xsl:template name="wcmsChoose" >
@@ -35,12 +36,12 @@ section: Template: name="wcmsChoose"
 
 		<!-- Menueleiste einblenden, Parameter = ausgewaehlter Menuepunkt -->
 		<xsl:call-template name="menuleiste">
-			<xsl:with-param name="menupunkt" select="'Bearbeiten'" />
+			<xsl:with-param name="menupunkt" select="i18n:translate('wcms.labels.edit')" />
 		</xsl:call-template>
 
 		<!-- Seitenname -->
 		<xsl:call-template name="zeigeSeitenname">
-			<xsl:with-param name="seitenname" select="'Ziel und Aktion wählen'" />
+			<xsl:with-param name="seitenname" select="i18n:translate('wcms.labels.chooseAction')" />
 		</xsl:call-template>
 
 
@@ -56,35 +57,36 @@ section: Template: name="wcmsChoose"
 				</div>
 				-->
 				<div id="menu">
-					<div class="titel">Ziel (Menüpunkt)</div>
+					<div class="titel"><xsl:value-of select="i18n:translate('wcms.labels.target')"/></div>
 					<div class="inhalt">
 					<xsl:call-template name="chooseContent" />
 					<!-- div class="titel">Legende</div-->
 					<div class="legende">
 						<table>
 							<tr>
-								<td class="s2">Legende:</td>
+								<td class="s2"><xsl:value-of select="concat(i18n:translate('wcms.labels.legend'),' :')"/></td>
 								<td class="s2">&#160;</td>
-							</tr>							<tr>
+							</tr>							
+                            <tr>
 								<td class="s1">&#9472;</td>
-								<td class="s2">Unterpunktebene</td>
+								<td class="s2"><xsl:value-of select="i18n:translate('wcms.labels.subsection')"/></td>
 							</tr>
 							<tr>
 								<td class="s1">[m]</td>
-								<td class="s2">Neue Menüwurzel </td>
+								<td class="s2"><xsl:value-of select="i18n:translate('wcms.labels.newMenu')"/></td>
 							</tr>
 							<tr>
 								<td class="s1">[t]</td>
-								<td class="s2">Eigenes Template</td>
+								<td class="s2"><xsl:value-of select="i18n:translate('wcms.labels.persTemplate')"/></td>
 							</tr>
 							<tr>
 								<td class="s1">[d]</td>
-								<td class="s2">Dynamischer Inhalt (MyCoRe)</td>
+								<td class="s2"><xsl:value-of select="i18n:translate('wcms.labels.dynamicContent')"/></td>
 							</tr>
 							<xsl:if test="$CurrentLang != $DefaultLang">
 								<tr>
 									<td class="s1">[!]</td>
-									<td class="s2">Inhalt nicht übersetzt</td>
+									<td class="s2"><xsl:value-of select="i18n:translate('wcms.labels.notTranslated')"/></td>
 								</tr>
 							</xsl:if>
 						</table>
@@ -98,13 +100,13 @@ section: Template: name="wcmsChoose"
 
 				<xsl:if test="/cms/error != '' or /cms/usedParser != ''">
 					<div id="hinweis-auswahl">
-						Hinweis:
+						<xsl:value-of select="concat(i18n:translate('wcms.hint'),' :')"/>
 						<div class="hinweis-auswahl-text">
 							<xsl:if test=" /cms/error = '0' or /cms/error = '5' or /cms/error = '6' or /cms/error = '7' or /cms/error = '8' or /cms/error = '9' ">
 								<xsl:call-template name="errorOnChoose" />
 							</xsl:if>
 							<xsl:if test="/cms/usedParser != ''">
-								<xsl:text>Aktion durchgefuehrt.</xsl:text>
+								<xsl:value-of select="i18n:translate('wcms.hint.actionComplete')"/>
 								<br />
 
 								<xsl:for-each select="document($navigationBase)/navigation//item[@href]">
@@ -122,22 +124,22 @@ section: Template: name="wcmsChoose"
 
 								<xsl:choose>
 									<xsl:when test=" /cms/action = 'add' and /cms/action[@mode='intern']" >
-										<xsl:text>Seite angelegt</xsl:text>
+										<xsl:value-of select="i18n:translate('wcms.hint.siteCreated')"/>
 									</xsl:when>
 									<xsl:when test=" /cms/action = 'add' and /cms/action[@mode='extern']" >
-										<xsl:text>Link angelegt </xsl:text>
+										<xsl:value-of select="i18n:translate('wcms.hint.linkCreated')"/>
 									</xsl:when>
 									<xsl:when test=" /cms/action = 'edit' and /cms/action[@mode='intern']" >
-										<xsl:text>Seite verändert</xsl:text>
+										<xsl:value-of select="i18n:translate('wcms.hint.siteChanged')"/>
 									</xsl:when>
 									<xsl:when test=" /cms/action = 'edit' and /cms/action[@mode='extern']" > 
-										<xsl:text>Informationen zu Link verändert </xsl:text>
+										<xsl:value-of select="i18n:translate('wcms.hint.linkInfoChanged')"/>
 									</xsl:when>
 									<xsl:when test=" /cms/action = 'delete' and /cms/action[@mode='intern']" >
-										<xsl:text>Seite gelöscht </xsl:text>
+										<xsl:value-of select="i18n:translate('wcms.hint.siteDeleted')"/>
 									</xsl:when>
 									<xsl:when test=" /cms/action = 'delete' and /cms/action[@mode='extern']" >
-										<xsl:text>Link gelöscht </xsl:text>
+										<xsl:value-of select="i18n:translate('wcms.hint.linkDeleted')"/>
 									</xsl:when>
 								</xsl:choose>
 							</xsl:if>
@@ -146,12 +148,12 @@ section: Template: name="wcmsChoose"
 				</xsl:if>
 
 				<div id="aktion">
-				<div class="titel">Aktion</div>
+				<div class="titel"><xsl:value-of select="i18n:translate('wcms.action')"/></div>
 				<div class="inhalt">					
 					<table class="aktion">
 						<tr class="aktion">
 							<td class="aktionIcon"><img src="{$BilderPfad}/wahl_dummy.gif" /></td>
-							<td class="aktionBeschreibung"><a href="javascript:starteAktion('edit');">Inhalt bearbeiten</a></td>
+							<td class="aktionBeschreibung"><a href="javascript:starteAktion('edit');"><xsl:value-of select="i18n:translate('wcms.action.editContent')"/></a></td>
 							<td class="aktionOptionLeer"> </td>
 						</tr>
 						<tr>
@@ -159,7 +161,7 @@ section: Template: name="wcmsChoose"
 						</tr>
 						<tr class="aktion">
 							<td class="aktionIcon"><img src="{$BilderPfad}/wahl_dummy.gif" /></td>
-							<td class="aktionBeschreibung"><a href="javascript:starteAktion('predecessor');">Menüpunkt davor anlegen</a></td>
+							<td class="aktionBeschreibung"><a href="javascript:starteAktion('predecessor');"><xsl:value-of select="i18n:translate('wcms.action.insertMenuBefore')"/></a></td>
 							<td rowspan="3" class="aktionOption">
 								<xsl:call-template name="wcmsChoose.action.option">
 									<xsl:with-param name="whichAction" select="'add'" />
@@ -169,11 +171,11 @@ section: Template: name="wcmsChoose"
 						</tr>
 						<tr class="aktion">
 							<td class="aktionIcon"><img src="{$BilderPfad}/wahl_dummy.gif" /></td>
-							<td class="aktionBeschreibung"><a href="javascript:starteAktion('child');">Unterpunkt anlegen</a></td>
+							<td class="aktionBeschreibung"><a href="javascript:starteAktion('child');"><xsl:value-of select="i18n:translate('wcms.action.submenuInsert')"/></a></td>
 						</tr>
 						<tr class="aktion">
 							<td class="aktionIcon"><img src="{$BilderPfad}/wahl_dummy.gif" /></td>
-							<td class="aktionBeschreibung"><a href="javascript:starteAktion('successor');">Menüpunkt danach anlegen</a></td>
+							<td class="aktionBeschreibung"><a href="javascript:starteAktion('successor');"><xsl:value-of select="i18n:translate('wcms.action.insertMenuAfter')"/></a></td>
 						</tr>
 						<tr>
 							<td colspan="3" class="leerzeile"> </td>
@@ -210,7 +212,7 @@ section: Template: name="wcmsChoose"
 						-->
 						<tr class="aktion">
 							<td class="aktionIcon"><img src="{$BilderPfad}/wahl_dummy.gif" /></td>
-							<td class="aktionBeschreibung"><a href="javascript:starteAktion('delete');">Löschen</a></td>
+							<td class="aktionBeschreibung"><a href="javascript:starteAktion('delete');"><xsl:value-of select="i18n:translate('wcms.delete')"/></a></td>
 							<td rowspan="2" class="aktionOptionLeer"></td>
 						</tr>
 						<!--
@@ -224,7 +226,7 @@ section: Template: name="wcmsChoose"
 						</tr>
 						<tr class="aktion">
 							<td class="aktionIcon"><img src="{$BilderPfad}/wahl_dummy.gif" /></td>
-							<td class="aktionBeschreibung"><a href="javascript:starteAktion('view');">Ansehen</a></td>
+							<td class="aktionBeschreibung"><a href="javascript:starteAktion('view');"><xsl:value-of select="i18n:translate('wcms.view')"/></a></td>
 							<td class="aktionOption">
 								<xsl:call-template name="wcmsChoose.action.option">
 									<xsl:with-param name="whichAction" select="'view'" />
@@ -388,30 +390,19 @@ section: Template: name="errorOnChoose"
 				<script LANGUAGE="JAVASCRIPT">
 					document.write(new Date())
 				</script>
-				Fehler aufgetreten: Keine Seite ausgewählt. 
-				<br/>
-				Bitte wählen sie in der 2. Box die Seite aus, die sie bearbeiten wollen.
+				<xsl:value-of select="i18n:translate('wcms.errors.noSite')"/>
 			</xsl:when>
 			<xsl:when test=" /cms/error = '5' " >
-				Fehler aufgetreten: Anlegen nicht möglich.
-				<br/>
-				Auf dieser Ebene können keine weiteren Menüpunkte angelegt werden. 
-				Wählen sie beim Erstellen die Position "darunter" aus. 
+				<xsl:value-of select="i18n:translate('wcms.errors.noCreation')"/> 
 			</xsl:when>
 			<xsl:when test=" /cms/error = '6' " >
-				Fehler aufgetreten: Anlegen nicht möglich. 
-				<br/>
-				Unterhalb eines externen Linkes können keine weiteren Menüpunkte angelegt werden. 
+				<xsl:value-of select="i18n:translate('wcms.errors.noCreationExtern')"/>
 			</xsl:when>
 			<xsl:when test=" /cms/error = '7' " >
-				Fehler aufgetreten: Löschen nicht möglich.
-				<br/>
-				Ein Menüpunkt kann nur gelöscht werden, wenn er keine Untermenüpunkte mehr enthält.
+				<xsl:value-of select="i18n:translate('wcms.errors.noDelete')"/>
 			</xsl:when>
 			<xsl:when test=" /cms/error = '8' " >
-				Fehler aufgetreten: Keine Berechtigung.
-				<br/>
-				Sie können in der gewählten Menüebene keinen Inhalt pflegen. 
+				<xsl:value-of select="i18n:translate('wcms.errors.noRights')"/> 
 			</xsl:when>
 		</xsl:choose>
 	</xsl:template>
@@ -475,16 +466,16 @@ section: Template: name="wcmsChoose.action.option"
 						-->
 						<input type="hidden" name="template" value="dumy.xml" />
 						<input type="checkbox" name="useContent" value="true" checked="checked"  disabled="disabled" />
-						<span class="deaktiviert"><xsl:text> Inhalt der Auswahl übernehmen</xsl:text></span>
+						<span class="deaktiviert"><xsl:value-of select="i18n:translate('wcms.labels.getContent')"/></span>
 						<br />
 						<input type="checkbox" name="createLink" value="true" />
-						<xsl:text> Auf andere Webseite weiterleiten</xsl:text>
+						<xsl:value-of select="i18n:translate('wcms.labels.linkToOther')"/> 
 					</xsl:when>
 				</xsl:choose>
 			</xsl:when>
 			<xsl:when test="$whichAction = 'view'">
 				<input type="checkbox" name="openNewWindow" value="true" checked="checked" />
-				<span class="aktionOptionRow"><xsl:text> Im neuen Fenster öffnen</xsl:text></span>
+				<span class="aktionOptionRow"><xsl:value-of select="i18n:translate('wcms.labels.newWinOpen')"/></span>
 			</xsl:when>
 		</xsl:choose>
 

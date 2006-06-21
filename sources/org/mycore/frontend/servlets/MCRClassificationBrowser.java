@@ -137,12 +137,14 @@ public class MCRClassificationBrowser extends MCRServlet {
      */
     protected void doLayout(MCRServletJob job, String styleBase,
             Document jdomDoc) throws ServletException, Exception {
-        String styleSheet = styleBase + "-" + lang;
+        //String styleSheet = styleBase + "-" + lang;
 
-        job.getRequest().getSession().setAttribute("mycore.language", lang);
+        //job.getRequest().getSession().setAttribute("mycore.language", lang);
         job.getRequest().setAttribute("MCRLayoutServlet.Input.JDOM", jdomDoc);
-        if (getProperty(job.getRequest(), "XSL.Style") == null)
-            job.getRequest().setAttribute("XSL.Style", styleSheet);
+        if (getProperty(job.getRequest(), "XSL.Style") == null){
+        	LOGGER.info("Set XSL.Style to: "+styleBase);
+            job.getRequest().setAttribute("XSL.Style", styleBase);
+        }
 
         RequestDispatcher rd = getServletContext().getNamedDispatcher(
                 "MCRLayoutServlet");

@@ -125,21 +125,21 @@ Aufruf:
 
 		<!-- Menueleiste einblenden, Parameter = ausgewaehlter Menuepunkt -->
 		<xsl:call-template name="menuleiste">
-			<xsl:with-param name="menupunkt" select="'Bearbeiten'" />
+			<xsl:with-param name="menupunkt" select="i18n:translate('wcms.labels.edit')" />
 		</xsl:call-template>
 
 		<!-- Seitenname -->
 		<xsl:call-template name="zeigeSeitenname">
-			<xsl:with-param name="seitenname" select="'Löschen des Menüpunktes'" />
+			<xsl:with-param name="seitenname" select="i18n:translate('wcms.menus.elementDelete')" />
 		</xsl:call-template>
 
 			<!-- Inhaltsbereich -->
 			<div id="delete-width">
 				<div id="delete">
-					<div class="titel">Löschen</div>
+					<div class="titel"><xsl:value-of select="i18n:translate('wcms.delete')"/></div>
 					<div class="inhalt">
 						<p>
-							<xsl:text>Folgender Menüpunkt wird entfernt:</xsl:text>
+							<xsl:value-of select="i18n:translate('wcms.menus.deletingElement')"/>
 						</p>
 						<p>
 							<span><xsl:value-of select="$labelPath"/></span>
@@ -147,10 +147,10 @@ Aufruf:
 					</div>
 					<div class="knoepfe">
 						<a href="{$ServletsBaseURL}WCMSActionServlet?delete=false&amp;wcmsID=0024" class="button">
-							<xsl:text>Nein, nicht löschen.</xsl:text>
+							<xsl:value-of select="i18n:translate('wcms.menus.deleteCancel')"/>
 						</a>
 						<a href="{$ServletsBaseURL}WCMSActionServlet?delete=true&amp;labelPath={$labelPath}&amp;wcmsID=0024" class="button">
-							<xsl:text>Ja, löschen.</xsl:text>
+							<xsl:value-of select="i18n:translate('wcms.menus.deleteAccept')"/>
 						</a>
 					</div>
 				</div>
@@ -182,18 +182,18 @@ Aufruf:
 
 		<!-- Menueleiste, Parameter = ausgewaehlter Menuepunkt -->
 		<xsl:call-template name="menuleiste">
-			<xsl:with-param name="menupunkt" select="'Bearbeiten'" />
+			<xsl:with-param name="menupunkt" select="i18n:translate('wcms.labels.edit')" />
 		</xsl:call-template>
 
 		<!-- Seitenname -->
 		<xsl:call-template name="zeigeSeitenname">
-			<xsl:with-param name="seitenname" select="'Inhalt bearbeiten'" />
+			<xsl:with-param name="seitenname" select="i18n:translate('wcms.labels.editContent')" />
 		</xsl:call-template>
 
 		<!-- lokale Navigation -->
 		<div id="info">
-			<a href="{$ServletsBaseURL}WCMSAdminServlet?action=choose&amp;wcmsID=0024" class="button">Zurück zur Auswahl</a>
-			<a href="#editor" class="button">Editor zentrieren</a>
+			<a href="{$ServletsBaseURL}WCMSAdminServlet?action=choose&amp;wcmsID=0024" class="button"><xsl:value-of select="i18n:translate('wcms.buttons.backChoice')"/></a>
+			<a href="#editor" class="button"><xsl:value-of select="i18n:translate('wcms.buttons.centerEditor')"/></a>
 		</div>
 
 		<!-- Editor -->
@@ -213,19 +213,19 @@ Aufruf:
 				<!-- Inhalt Menuename-->
 				<div id="menupunkt_info">
 					<fieldset>
-						<label for="position">Position</label>
+						<label for="position"><xsl:value-of select="i18n:translate('wcms.labels.position')"/></label>
 						<span name="position"><xsl:value-of select="$labelPath"/></span>
 						<br/>
-						<label for="label">Name</label>
+						<label for="label"><xsl:value-of select="i18n:translate('wcms.labels.name')"/></label>
 						<xsl:call-template name="menuePunktName"/>
 						<br/>
 						<xsl:if test="/cms/action[@mode = 'intern'] and /cms/action = 'add'">
-							<label for="href">Dateiname</label>
+							<label for="href"><xsl:value-of select="i18n:translate('wcms.labels.fileName')"/></label>
 							<input type="text" size="40" maxlength="35" name="href" value="" />
 							<br/>
 						</xsl:if>
 						<xsl:if test="/cms/action[@mode = 'extern']">
-							<label for="href">Verweis auf URL:</label>
+							<label for="href"><xsl:value-of select="concat(i18n:translate('wmcs.labels.linkTo'),' :')"/></label>
 							<xsl:choose>
 								<!-- external new content -->
 								<xsl:when test="/cms/action = 'add'">
@@ -261,7 +261,7 @@ Aufruf:
 								<div id="kommentar">
 									<!--label for="changeInfo">Kommentar</label-->
 									<textarea name="changeInfo" cols="30" rows="3" onclick="this.select();">
-										<xsl:text>Kein Kommentar abgegeben</xsl:text>
+										<xsl:value-of select="i18n:translate('wcms.hint.noComment')"/>
 									</textarea>
 								</div>
 							</xsl:if>
@@ -269,7 +269,7 @@ Aufruf:
 								<xsl:call-template name="buildInterface.general.safeButton"/>
 								<!-- <a class="button" href="javascript:zeigeElement();">Optionen</a> -->
 								<!-- <a class="button" href="#top">top</a> -->
-								<a class="button" href="{$ServletsBaseURL}WCMSAdminServlet?action=choose&amp;wcmsID=0024">Abbrechen</a>
+								<a class="button" href="{$ServletsBaseURL}WCMSAdminServlet?action=choose&amp;wcmsID=0024"><xsl:value-of select="i18n:translate('wcms.buttons.cancel')"/></a>
 							</div>
 						</fieldset>
 					<!-- streckt div main so daß er seine Kinder umschließt -->
@@ -283,7 +283,7 @@ Aufruf:
 					<div id="optionen">
 						<div id="option-left">
 							<fieldset>
-								<label for="masterTemplate">Gestaltung</label>
+								<label for="masterTemplate"><xsl:value-of select="i18n:translate('wcms.design')"/></label>
 								<xsl:call-template name="buildInterface.general.metaData.selectTemplate">
 									<xsl:with-param name="href" select="$href"/>
 								</xsl:call-template>
@@ -373,15 +373,10 @@ section: Template: name="errorOnBuildInterfaceGeneral"
 				<td>
 					<xsl:choose>
 						<xsl:when test=" /cms/error = 'emptyFormField' ">
-							Beim Speichern trat ein Fehler auf.<br />
-							Es sind weitere Angaben notwendig.<br />
-							Prüfe ob ein Name und ein Dateiname angegeben wurde.
+							<xsl:value-of select="i18n:translate('wcms.errors.emptyFormField')"/>
 						</xsl:when>
 						<xsl:when test=" /cms/error = 'non_valid_xhtml_content' ">
-							Fehler aufgetreten: Eingegebener Content war nicht XHTML/XML konform.
-							<br/>
-							Deaktivieren sie den Haken bei "HTML-Codekorrektur ausschalten" oder 
-							überprüfen sie ihren Content.
+							<xsl:value-of select="i18n:translate('wcms.errors.notValidXHTML')"/>
 						</xsl:when>
 						<xsl:when test=" /cms/error = 'invalidXHTML' ">
 							Der Inhalt der Seite ist nicht XHTML konform! 
