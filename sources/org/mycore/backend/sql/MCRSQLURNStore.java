@@ -40,8 +40,8 @@ public class MCRSQLURNStore implements MCRURNStore {
         table = MCRConfiguration.instance().getString("MCR.URN.SQLStore.TableName");
         if (!MCRSQLConnection.doesTableExist(table)) {
             MCRSQLStatement stmt = new MCRSQLStatement(table);
-            stmt.addColumn("URN   VARCHAR(250) NOT NULL PRIMARY KEY");
-            stmt.addColumn("DOCID VARCHAR(64)  NOT NULL PRIMARY KEY");
+            stmt.addColumn("URN VARCHAR(250) NOT NULL PRIMARY KEY");
+            stmt.addColumn("DOCID VARCHAR(64)");
             MCRSQLConnection.justDoUpdate(stmt.toCreateTableStatement());
         }
     }
