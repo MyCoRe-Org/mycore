@@ -30,39 +30,40 @@ import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
 
 /**
- * Provides methods to create URNs (urn:nbn:de). A URN (uniform
- * resource name) is a special kind of persistent identifier. This
- * class handles URNs from the german subnamespace of NBN 
- * (national bibliographic number), these URNs all start with
- * urn:nbn:de:... More information on persistent identifiers can be 
- * found at 
+ * Provides methods to create URNs (urn:nbn:de) and assign them to documents. A
+ * URN (uniform resource name) is a special kind of persistent identifier. This
+ * class handles URNs from the german subnamespace of NBN (national
+ * bibliographic number), these URNs all start with urn:nbn:de:... More
+ * information on persistent identifiers can be found at
  * 
  * http://www.persistent-identifier.de/
  * 
  * URNs are described by RFC 2141 and have the following syntax:
- * urn:[NID]:[SNID]-[NISS][Checksum]
- * NID = namespace ID, in this implementation always "nbn:de"
- * SNID = subnamespace ID, a unique identifier for an organization or 
- * public library that creates and assigns URNs within its subnamespace
- * NISS = namespace-specific string, a unique ID
- * Checksum: all nbn:de URNs end with one digit that is a checksum  
+ * urn:[NID]:[SNID]-[NISS][Checksum] NID = namespace ID, in this implementation
+ * always "nbn:de" SNID = subnamespace ID, a unique identifier for an
+ * organization or public library that creates and assigns URNs within its
+ * subnamespace NISS = namespace-specific string, a unique ID Checksum: all
+ * nbn:de URNs end with one digit that is a checksum
  * 
  * Example: urn:nbn:de:465-miless-20060622-213404-0017
  * 
- * A MyCoRe systen can generate URNs for more than one subnamespace.
- * There must be one or more configurations that control the prefix 
- * (subnamespace) of generated URNs and the algorithm used to build 
- * new NISS within that subnamespace. Each configuration 
- * has a unique "subnamespace configuration ID" in mycore.properties,
- * and optional additional properties depending on the implementation.
+ * A MyCoRe systen can generate URNs for more than one subnamespace. There must
+ * be one or more configurations that control the prefix (subnamespace) of
+ * generated URNs and the algorithm used to build new NISS within that
+ * subnamespace. Each configuration has a unique "subnamespace configuration ID"
+ * in mycore.properties, and optional additional properties depending on the
+ * implementation.
  * 
  * MCR.URN.SubNamespace.[ConfigID].Prefix=[URNPrefix], for example
  * MCR.URN.SubNamespace.Essen.Prefix=urn.nbn.de:hbz:465-
  * 
  * @author Frank Lützenkirchen
  */
-public class MCRURN {
-    
+public class MCRURNManager {
+
+    /** The MCRURNStore implementation to use */
+    private static MCRURNStore store;
+
     /** The table of character codes for calculating the checksum */
     private static Properties codes;
 
@@ -106,6 +107,9 @@ public class MCRURN {
         codes.put("z", "38");
         codes.put("-", "39");
         codes.put(":", "17");
+
+        Object obj = MCRConfiguration.instance().getSingleInstanceOf("MCR.URN.Store");
+        store = (MCRURNStore) obj;
     }
 
     /**
@@ -182,5 +186,40 @@ public class MCRURN {
 
         String niss = builder.buildNISS();
         return buildURN(configID, niss);
+    }
+
+    /** Returns true if the given urn is assigned to a document ID */
+    public static boolean isAssigned(String urn) {
+        return store.isAssigned(urn);
+    }
+
+    /** Assigns the given urn to the given document ID */
+    public static void assignURN(String urn, String documentID) {
+        store.assignURN(urn, documentID);
+    }
+
+    /**
+     * Retrieves the URN that is assigned to the given document ID
+     * 
+     * @return the urn, or null if no urn is assigned to this ID
+     */
+    public static String getURNforDocument(String documentID) {
+        return store.getURNforDocument(documentID);
+    }
+
+    /**
+     * Retrieves the document ID that is assigned to the given urn
+     * 
+     * @return the ID, or null if no ID is assigned to this urn
+     */
+    public static String getDocumentIDforURN(String urn) {
+        return store.getDocumentIDforURN(urn);
+    }
+
+    /**
+     * Removes the urn (and assigned document ID) from the persistent store
+     */
+    public static void removeURN(String urn) {
+        store.removeURN(urn);
     }
 }
