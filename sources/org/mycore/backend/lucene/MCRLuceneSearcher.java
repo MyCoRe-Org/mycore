@@ -50,7 +50,7 @@ import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRNormalizer;
-import org.mycore.common.events.MCRShutdownThread;
+import org.mycore.common.events.MCRShutdownHandler;
 import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.parsers.bool.MCRCondition;
 import org.mycore.services.fieldquery.MCRFieldDef;
@@ -427,7 +427,7 @@ public class MCRLuceneSearcher extends MCRSearcher {
      * 
      * @author Thomas Scheffler (yagee)
      */
-    private static class IndexModifierThread extends Thread implements MCRShutdownThread.Closeable, Queue.Listener {
+    private static class IndexModifierThread extends Thread implements MCRShutdownHandler.Closeable, Queue.Listener {
         private Queue queue;
 
         private boolean running;
@@ -441,7 +441,7 @@ public class MCRLuceneSearcher extends MCRSearcher {
             this.running = true;
             this.indexDir = indexDir;
             indexModifier = getLuceneModifier(indexDir, true);
-            MCRShutdownThread.addCloseable(this);
+            MCRShutdownHandler.getInstance().addCloseable(this);
         }
 
         public void close() {
@@ -477,7 +477,7 @@ public class MCRLuceneSearcher extends MCRSearcher {
                 }
             }
             closeIndexModifier();
-            MCRShutdownThread.removeCloseable(this);
+            MCRShutdownHandler.getInstance().removeCloseable(this);
             LOGGER.debug("IndexModifierThread stopped");
         }
 
