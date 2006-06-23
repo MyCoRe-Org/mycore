@@ -124,6 +124,7 @@ public class MCRLuceneSearcher extends MCRSearcher {
 
         try {
             indexer = new IndexModifierThread(IndexDir);
+            indexer.setName("indexModifier:"+ID);
         } catch (Exception e) {
             throw new MCRException("Cannot start IndexModifier thread.", e);
         }
@@ -426,16 +427,19 @@ public class MCRLuceneSearcher extends MCRSearcher {
      * 
      * @author Thomas Scheffler (yagee)
      */
-    private static class IndexModifierThread extends Thread implements MCRShutdownThread.Closeable {
+    private static class IndexModifierThread extends Thread implements MCRShutdownThread.Closeable, Queue.Listener {
         private Queue queue;
 
         private boolean running;
 
         private IndexModifier indexModifier;
 
+        private String indexDir;
+
         public IndexModifierThread(String indexDir) throws Exception {
             queue = new Queue();
             this.running = true;
+            this.indexDir = indexDir;
             indexModifier = getLuceneModifier(indexDir, true);
             MCRShutdownThread.addCloseable(this);
         }
@@ -451,7 +455,7 @@ public class MCRLuceneSearcher extends MCRSearcher {
             while (running) {
                 QueueElement qe;
                 try {
-                    qe = queue.poll();
+                    qe = queue.poll(this);
                 } catch (InterruptedException e1) {
                     if (running) {
                         LOGGER.warn("Catched InterruptException.", e1);
@@ -472,22 +476,18 @@ public class MCRLuceneSearcher extends MCRSearcher {
                     }
                 }
             }
-            try {
-                if (indexModifier != null) {
-                    indexModifier.close();
-                }
-            } catch (IOException e) {
-                LOGGER.warn("Error while closing IndexWriter.", e);
-            }
+            closeIndexModifier();
             MCRShutdownThread.removeCloseable(this);
             LOGGER.debug("IndexModifierThread stopped");
         }
 
         private void addDocument(QueueElement qe) throws IOException {
+            LOGGER.debug("add Dcoument:" + qe.toString());
             indexModifier.addDocument(qe.doc, qe.analyzer);
         }
 
         private void deleteDocument(QueueElement qe) throws IOException {
+            LOGGER.debug("delete Dcoument:" + qe.toString());
             indexModifier.deleteDocuments(qe.deleteTerm);
         }
 
@@ -530,6 +530,30 @@ public class MCRLuceneSearcher extends MCRSearcher {
 
             return modifier;
         }
+
+        public void doWait() {
+            closeIndexModifier();
+        }
+
+        private void closeIndexModifier() {
+            try {
+                LOGGER.debug("Writing Lucene index changes to disk.");
+                indexModifier.close();
+            } catch (IOException e) {
+                LOGGER.warn("Error while closing IndexModifier.", e);
+            } catch (IllegalStateException e) {
+                LOGGER.debug("IndexModifier was allready closed.");
+            }
+        }
+
+        public void doWakeUp() {
+            try {
+                LOGGER.debug("Opening Lucene index for writing.");
+                indexModifier = getLuceneModifier(indexDir, false);
+            } catch (Exception e) {
+                LOGGER.warn("Error while reopening IndexModifier.", e);
+            }
+        }
     }
 
     /**
@@ -541,6 +565,18 @@ public class MCRLuceneSearcher extends MCRSearcher {
      * @author Thomas Scheffler (yagee)
      */
     private static class Queue {
+        private static interface Listener {
+            /**
+             * is called when last object is aquired of queue.
+             */
+            public void doWait();
+        
+            /**
+             * is called before first object is aquired of queue.
+             */
+            public void doWakeUp();
+        }
+
         private QueueElement head_;
 
         private QueueElement last_;
@@ -558,22 +594,34 @@ public class MCRLuceneSearcher extends MCRSearcher {
             last_ = head_;
         }
 
-        public QueueElement poll() throws InterruptedException {
+        public QueueElement poll(Queue.Listener ql) throws InterruptedException {
+            boolean listen = (ql != null) ? true : false;
             QueueElement qe = extract();
             if (qe != null) {
+                LOGGER.debug("poll returns in 1st attempt");
                 return qe;
             } else {
                 // we wait until the next element arrives
                 synchronized (lock_) {
                     try {
                         ++waitingForPoll_;
+                        boolean waits = false; // state of QueueListener
                         while (true) {
                             // check for new element
                             qe = extract();
                             if (qe != null) {
                                 --waitingForPoll_;
+                                LOGGER.debug("poll returns in nth attempt.");
+                                if (listen && waits) {
+                                    ql.doWakeUp();
+                                }
                                 return qe;
                             } else {
+                                LOGGER.debug("poll waits");
+                                if (listen && !waits) {
+                                    waits = true;
+                                    ql.doWait();
+                                }
                                 lock_.wait();// wait
                             }
                         }
@@ -596,6 +644,7 @@ public class MCRLuceneSearcher extends MCRSearcher {
                     head_.next = null;
                     head_ = first;
                 }
+                LOGGER.debug("extract: " + o);
                 return o;
             }
         }
@@ -605,6 +654,7 @@ public class MCRLuceneSearcher extends MCRSearcher {
                 synchronized (last_) {
                     last_.next = o;
                     last_ = o;
+                    LOGGER.debug("offer QE: " + o.toString());
                 }
                 if (waitingForPoll_ > 0) {
                     lock_.notify();
