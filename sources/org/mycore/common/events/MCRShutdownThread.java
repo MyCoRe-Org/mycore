@@ -86,6 +86,7 @@ public class MCRShutdownThread extends Thread {
     }
 
     public void run() {
+        LOGGER.info(toString());
         synchronized (requests) {
             shuttingDown = true;
             for (Iterator it = requests.iterator(); it.hasNext();) {
@@ -95,5 +96,9 @@ public class MCRShutdownThread extends Thread {
                 it.remove();
             }
         }
+    }
+    
+    public String toString(){
+        return "requests: "+requests; 
     }
 }
