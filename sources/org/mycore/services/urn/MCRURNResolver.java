@@ -81,6 +81,6 @@ public class MCRURNResolver extends HttpServlet {
         if (docID == null)
             res.sendRedirect(masterURL + urn);
         else
-            res.sendRedirect(documentURL + urn);
+            res.sendRedirect(documentURL + docID);
     }
 }
