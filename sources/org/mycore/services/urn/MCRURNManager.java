@@ -188,6 +188,20 @@ public class MCRURNManager {
         return buildURN(configID, niss);
     }
 
+    /**
+     * Returns true if the given URN has a valid structure and the checksum is
+     * correct.
+     */
+    public boolean isValid(String urn) {
+        if ((urn == null) || (urn.length() < 14) || (!urn.startsWith("urn:nbn:")) || (!urn.toLowerCase().equals(urn))) {
+            return false;
+        } else {
+            String start = urn.substring(0, urn.length() - 1);
+            String check = buildChecksum(start);
+            return urn.endsWith(check);
+        }
+    }
+
     /** Returns true if the given urn is assigned to a document ID */
     public static boolean isAssigned(String urn) {
         return store.isAssigned(urn);
