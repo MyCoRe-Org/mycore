@@ -192,7 +192,7 @@ public class MCRURNManager {
      * Returns true if the given URN has a valid structure and the checksum is
      * correct.
      */
-    public boolean isValid(String urn) {
+    public static boolean isValid(String urn) {
         if ((urn == null) || (urn.length() < 14) || (!urn.startsWith("urn:nbn:")) || (!urn.toLowerCase().equals(urn))) {
             return false;
         } else {
