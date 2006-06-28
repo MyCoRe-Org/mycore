@@ -34,7 +34,8 @@ template:
 <xsl:stylesheet 
 	version="1.0" 
 	xmlns:xsl="http://www.w3.org/1999/XSL/Transform" 
-	xmlns:xalan="http://xml.apache.org/xalan">
+	xmlns:xalan="http://xml.apache.org/xalan"
+    xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation" >
 
 
 <!-- ====================================================================================={
@@ -130,7 +131,7 @@ Aufruf:
 
 		<!-- Seitenname -->
 		<xsl:call-template name="zeigeSeitenname">
-			<xsl:with-param name="seitenname" select="i18n:translate('wcms.menus.elementDelete')" />
+			<xsl:with-param name="seitenname" select="i18n:translate('wcms.menus.deleteElement')" />
 		</xsl:call-template>
 
 			<!-- Inhaltsbereich -->
@@ -225,7 +226,7 @@ Aufruf:
 							<br/>
 						</xsl:if>
 						<xsl:if test="/cms/action[@mode = 'extern']">
-							<label for="href"><xsl:value-of select="concat(i18n:translate('wmcs.labels.linkTo'),' :')"/></label>
+							<label for="href"><xsl:value-of select="concat(i18n:translate('wcms.labels.linkTo'),' :')"/></label>
 							<xsl:choose>
 								<!-- external new content -->
 								<xsl:when test="/cms/action = 'add'">
@@ -288,10 +289,10 @@ Aufruf:
 									<xsl:with-param name="href" select="$href"/>
 								</xsl:call-template>
 								<br />
-								<label for="target">Darstellung</label>
+								<label for="target"><xsl:value-of select="i18n:translate('wcms.design')"/></label>
 								<xsl:call-template name="buildInterface.general.metaData.target"/>
 								<br />
-								<label for="replaceMenu">Menüwurzel</label>
+								<label for="replaceMenu"><xsl:value-of select="i18n:translate('wcms.labels.rootMenu')"/></label>
 								<xsl:call-template name="buildInterface.general.metaData.replaceMenu"/>
 								<br />
 							</fieldset>
@@ -379,14 +380,12 @@ section: Template: name="errorOnBuildInterfaceGeneral"
 							<xsl:value-of select="i18n:translate('wcms.errors.notValidXHTML')"/>
 						</xsl:when>
 						<xsl:when test=" /cms/error = 'invalidXHTML' ">
-							Der Inhalt der Seite ist nicht XHTML konform! 
-							Die Seite wird dadurch zwar gespeichert, kann aber nicht angezeigt werden. 
-							<br/>
-							Tip: Nutzen sie <a target="_blank" href="http://validator.w3.org/">
-							XHTML-Syntaxprüfer</a>, um die Seite XHTL konform zu machen.
+                        <xsl:value-of select="i18n:translate('wcms.errors.invalidXHTML')"/>
+							<a target="_blank" href="http://validator.w3.org/">
+							XHTML-Validator</a>
 						</xsl:when>
 						<xsl:otherwise>
-							Unbekannter Fehler aufgetreten.
+							<xsl:value-of select="i18n:translate('wcms.errors.unknown')"/>
 						</xsl:otherwise>
 					</xsl:choose>
 				</td>
@@ -433,7 +432,7 @@ section: Template: name="buildInterface.general.safeButton"
 	- Knopf zum Speichern der Aenderungen
 }===================================================================================== -->
 	<xsl:template name="buildInterface.general.safeButton">
-		<a  class="button" href="javascript:document.editContent.submit()">Änderungen speichern</a>
+		<a  class="button" href="javascript:document.editContent.submit()"><xsl:value-of select="i18n:translate('wcms.labels.saveChanges')"/></a>
 	</xsl:template>
 
 <!-- ====================================================================================={
@@ -513,7 +512,7 @@ section: Template: name="buildInterface.general.metaData.selectTemplate"
 									<xsl:when test=" node() = $template ">
 										<option selected="selected">
 											<xsl:attribute name="value"><xsl:value-of select="'noAction'"/></xsl:attribute>
-											<xsl:value-of select="node()"/> (Vorlage) </option>
+											<xsl:value-of select="node()"/> <xsl:value-of select="i18n:translate('wcms.template')"/> </option>
 									</xsl:when>
 									<!-- END OF: current template is the valid template -->
 									<xsl:otherwise>
@@ -530,7 +529,7 @@ section: Template: name="buildInterface.general.metaData.selectTemplate"
 									<xsl:when test=" node() = $templateParent ">
 										<option selected="selected">
 											<xsl:attribute name="value"><xsl:value-of select="'noAction'"/></xsl:attribute>
-											<xsl:value-of select="node()"/> (Vorlage) </option>
+											<xsl:value-of select="node()"/> <xsl:value-of select="i18n:translate('wcms.template')"/> </option>
 									</xsl:when>
 									<!-- EN DOF:current template is the valid template -->
 									<xsl:otherwise>
@@ -547,13 +546,13 @@ section: Template: name="buildInterface.general.metaData.selectTemplate"
 									<xsl:when test=" node() = $template ">
 										<option selected="selected">
 											<xsl:attribute name="value"><xsl:value-of select="'noAction'"/></xsl:attribute>
-											<xsl:value-of select="node()"/> [ist aktiv] </option>
+											<xsl:value-of select="node()"/> <xsl:value-of select="i18n:translate('wcms.active')"/> </option>
 									</xsl:when>
 									<!-- END OF: current template is the valid template -->
 									<xsl:when test=" node() = $templateParent ">
 										<option>
 											<xsl:attribute name="value"><xsl:value-of select="'delete'"/></xsl:attribute>
-											<xsl:value-of select="node()"/> [ist aktiv] </option>
+											<xsl:value-of select="node()"/> <xsl:value-of select="i18n:translate('wcms.active')"/> </option>
 									</xsl:when>
 									<xsl:otherwise>
 										<option>
@@ -573,7 +572,7 @@ section: Template: name="buildInterface.general.metaData.selectTemplate"
 							<xsl:when test=" node() = $template ">
 								<option selected="selected">
 									<xsl:attribute name="value"><xsl:value-of select="'noAction'"/></xsl:attribute>
-									<xsl:value-of select="node()"/> (Vorlage) </option>
+									<xsl:value-of select="node()"/> <xsl:value-of select="i18n:translate('wcms.template')"/> </option>
 							</xsl:when>
 							<!-- END OF: current template is the valid template -->
 							<xsl:otherwise>
@@ -626,12 +625,12 @@ section: Template: name="buildInterface.general.metaData.target"
 		<select name="target" size="1" class="auswahl">
 			<xsl:choose>
 				<xsl:when test="/cms/target = '_self' ">
-					<option class="select" selected="selected" value="_self">im selben Fenster</option>
-					<option value="_blank">im neuen Fenster</option>
+					<option class="select" selected="selected" value="_self"><xsl:value-of select="i18n:translate('wcms.labels.sameWindow')"/></option>
+					<option value="_blank"><xsl:value-of select="i18n:translate('wcms.labels.newWindow')"/></option>
 				</xsl:when>
 				<xsl:otherwise>
-					<option class="select" value="_self">im selben Fenster</option>
-					<option selected="selected" value="_blank">im neuen Fenster</option>
+					<option class="select" value="_self"><xsl:value-of select="i18n:translate('wcms.labels.sameWindow')"/></option>
+					<option selected="selected" value="_blank"><xsl:value-of select="i18n:translate('wcms.labels.newWindow')"/></option>
 				</xsl:otherwise>
 			</xsl:choose>
 			<xsl:text> </xsl:text>
@@ -647,11 +646,11 @@ section: Template: name="buildInterface.general.metaData.replaceMenu"
 			<xsl:choose>
 				<xsl:when test="/cms/replaceMenu = 'true' ">
 					<input type="checkbox" name="replaceMenu" value="true" checked="checked" class="box"/>
-					<span><xsl:text> übergeordnete Menüpunkte ausblenden</xsl:text></span>
+					<span><xsl:value-of select="i18n:translate('wcms.labels.hideMenu')"/></span>
 				</xsl:when>
 				<xsl:otherwise>
 					<input type="checkbox" name="replaceMenu" value="true" class="box"/>
-					<span><xsl:text> übergeordnete Menüpunkte ausblenden</xsl:text></span>
+					<span><xsl:value-of select="i18n:translate('wcms.labels.hideMenu')"/></span>
 				</xsl:otherwise>
 			</xsl:choose>
 		</xsl:if>
@@ -667,7 +666,7 @@ section: Template: name="buildInterface.general.metaData.forwardToChildren"
 			<xsl:when test="/cms/action = 'edit' ">
 				<br/>
 				<input type="checkbox" name="" value="" class="box"/>
-				<span style="text-decoration:line-through;"> automatisch auf Unterseite weiterleiten: </span>
+				<span style="text-decoration:line-through;"> <xsl:value-of select="i18n:translate('wcms.labels.forwardToSubsite')"/> </span>
 				<input type="text" size="10" maxlength="40" name=""/>
 			</xsl:when>
 		</xsl:choose>
@@ -683,7 +682,8 @@ section: Template: name="buildInterface.general.metaData.acl"
 			<xsl:when test="/cms/action = 'edit' or /cms/action = 'add' ">
 				<br/>
 				<input type="checkbox" name="" value="" class="ckeckbox"/>
-				<span style="text-decoration:line-through;"><xsl:text> Zugriff auf Gruppe beschränken</xsl:text></span>
+				<span style="text-decoration:line-through;"><xsl:value-of select="i18n:translate('wcms.admin.accessGroup')"/>
+        </span>
 				<input type="text" size="10" maxlength="40" name="" class="text"/>
 			</xsl:when>
 		</xsl:choose>
@@ -704,12 +704,12 @@ section: Template: name="buildInterface.general.content.dynamicContentBinding"
 		</xsl:variable>
 		<!-- END OF: check if dynamicContentBinding exist -> $dcb -->
 
-		<label for="dcbValueAdd">Dynamischer Inhalt</label>
+		<label for="dcbValueAdd"><xsl:value-of select="i18n:translate('wcms.labels.dynamicContent')"/></label>
 		<input type="text" size="30" maxlength="40" name="dcbValueAdd" class="text"/>
 		<br/>
 		<label for="dcbActionAdd">&#160;</label>
 		<input type="checkbox" name="dcbActionAdd" value="dcbActionAdd"  class="box"/>
-		<span><xsl:text> XML-Knoten zuordnen</xsl:text></span>
+		<span><xsl:value-of select="i18n:translate('wcms.labels.xmlNode')"/></span>
 		<br />
 		<xsl:if test=" /cms/action = 'edit' and $dcb = 'yes' ">
 			<label for="dcbValueDeleteSelect">&#160;</label>
@@ -724,7 +724,7 @@ section: Template: name="buildInterface.general.content.dynamicContentBinding"
 			<br />
 			<label for="dcbActionDelete">&#160;</label>
 			<input type="checkbox" name="dcbActionDelete" value="dcbActionDelete" class="box"/>
-			<span><xsl:text> Ausgewählte Zuordnung aufheben</xsl:text></span>
+			<span><xsl:value-of select="i18n:translate('wcms.labels.assignmentRemove')"/></span>
 			<br />
 		</xsl:if>
 	</xsl:template>
@@ -738,12 +738,12 @@ section: Template: name="buildInterface.general.content.multimedia"
 			<table align="right" class="table_noGrid" border="1" cellspacing="0" cellpadding="0">
 				<tr>
 					<td align="center" class="green" colspan="2">
-						<b> Multimedia:</b>
+						<b> <xsl:value-of select="concat(i18n:translate('wcms.multimedia'),':')"/></b>
 					</td>
 				</tr>
 				<tr>
 					<th valign="top" align="left">
-						<!-- list of available imaages --> Bilder:<br/>
+						<!-- list of available imaages --> <xsl:value-of select="concat(i18n:translate('wcms.images'),':')"/><br/>
 						<input type="hidden" name="JavaScriptImagePath_hidden" value="{concat($WebApplicationBaseURL,/cms/imagePath)}"/>
 						<select size="1" name="selectPicturePreview" onchange="previewPicture(document.editContent.JavaScriptImagePath_hidden.value)">
 							<xsl:for-each select="/cms/images/image">
@@ -757,7 +757,7 @@ section: Template: name="buildInterface.general.content.multimedia"
 						<!-- END OF: list of available imaages -->
 						<!-- list of available documents -->
 						<br/>
-						<br/>sonst. Dokumente:<br/>
+						<br/><xsl:value-of select="concat(i18n:translate('wcms.otherDocs'),':')"/><br/>
 						<select size="1">
 							<xsl:for-each select="/cms/documents/document">
 								<option>
@@ -771,8 +771,7 @@ section: Template: name="buildInterface.general.content.multimedia"
 						<!-- upload -->
 						<br/>
 						<br/>
-						<a target="blank" href="{$ServletsBaseURL}WCMSFileUploadServlet?action=select&amp;wcmsID=0024">Bild oder sonst. 
-                                                Dokument hochladen</a>
+						<a target="blank" href="{$ServletsBaseURL}WCMSFileUploadServlet?action=select&amp;wcmsID=0024"><xsl:value-of select="concat(i18n:translate('wcms.uploadImg'),':')"/></a>
 					</th>
 					<!-- picture preview -->
 					<th align="right" valign="top">
@@ -785,12 +784,12 @@ section: Template: name="buildInterface.general.content.multimedia"
 				<tr>
 					<th align="left" colspan="2" style="font-size:10px;font-weight:normal;">
 						<!-- image path -->
-						<b> Pfad für Bilder:</b>
+						<b> <xsl:value-of select="concat(i18n:translate('wcms.imgPath'),':')"/></b>
 						<br/>
 						<xsl:value-of select="concat($WebApplicationBaseURL,substring-after(/cms/imagePath,'/'),'...')"/>
 						<!-- document path -->
 						<br/>
-						<b> Pfad für Dokumente:</b>
+						<b> <xsl:value-of select="concat(i18n:translate('wcms.docPath'),':')"/></b>
 						<br/>
 						<xsl:value-of select="concat($WebApplicationBaseURL,substring-after(/cms/documentPath,'/'),'...')"/>
 					</th>
