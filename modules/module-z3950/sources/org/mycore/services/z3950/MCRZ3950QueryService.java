@@ -2,6 +2,7 @@ package org.mycore.services.z3950;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.StringReader;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -18,6 +19,7 @@ import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.common.xml.MCRXMLContainer;
 import org.mycore.datamodel.classifications.MCRCategoryItem;
 import org.mycore.parsers.bool.MCRAndCondition;
+import org.mycore.parsers.bool.MCRCondition;
 import org.mycore.services.fieldquery.MCRQueryManager;
 import org.mycore.services.fieldquery.MCRResults;
 import org.w3c.dom.Document;
@@ -48,9 +50,6 @@ public class MCRZ3950QueryService implements MCRZ3950Query {
 	// Wir geben immer nur ein Ergebnis zurück, normalerweise das erste
 	private int index;
 	
-	// Der geparste QueryString
-	private MCRZ3950PrefixString prefixString;
-	
 
 	public MCRZ3950QueryService() {
 		this(null);
@@ -58,8 +57,6 @@ public class MCRZ3950QueryService implements MCRZ3950Query {
 	
     public MCRZ3950QueryService(String query) {
 		this.query = query;
-		prefixString = new MCRZ3950PrefixString();
-		prefixString.setQuery(query);
 		index = 0;
 	}
 	
@@ -113,56 +110,13 @@ public class MCRZ3950QueryService implements MCRZ3950Query {
 	 * @return True falls es Ergebnisse gab, sonst False.
 	 */
 	public boolean search() {
-        MCRAndCondition cAnd = new MCRAndCondition();
-
-        if (prefixString.getAttributeSet().equals("bib-1")) {
-            LinkedList attributes = prefixString.getAttributes(1);
-            Iterator it = attributes.iterator();
-            while (it.hasNext()) {
-                Integer attrValue = (Integer) it.next();
-                // MCR.z3950.1.4
-                // Isoliere alle Mappings für Typ 1
-                Properties p = CONFIG.getProperties("MCR.z3950.1.");
-                // CONFIG.getString("MCR.z3950.1.4");
-                // Iteriere alle Mappings für Typ 1 (auschließend)
-                String operator = "contains";
-                Enumeration e = p.propertyNames();
-                while (e.hasMoreElements()) {
-                    String propertyName = (String) e.nextElement();
-                    Integer mycoreAttr = Integer.valueOf(propertyName.substring("MCR.z3950.1.".length(), propertyName.length()));
-                    logger.debug("propertyName: " + propertyName + " attrValue: " + attrValue + " mycoreAttr: " + mycoreAttr);
-                    // Vergleich der Konfiguration mit tatsächlicher Anfrage
-                    if (attrValue.equals(mycoreAttr)) {
-                        String xpath = CONFIG.getString("MCR.z3950.1." + mycoreAttr);
-                        /*
-                         * OLD QUERY // Sonderfälle: Dokumenten-Id und Suche in
-                         * allen Feldern if (xpath.equals("@ID")) { //
-                         * Dokumenten-Id meta = "/mycoreobject[@ID=" +
-                         * prefixString.getTerm() + "]"; } else if
-                         * (xpath.equals("doctext()")) { meta = "/mycoreobject[" +
-                         * xpath + " contains(" + prefixString.getTerm() + ")]
-                         * or " + "/mycoreobject[ts() contains(" +
-                         * prefixString.getTerm() + ")]";
-                         *  } else meta = "/mycoreobject[" + xpath + "
-                         * contains(" + prefixString.getTerm() + ")]";
-                         * logger.debug("Aus dem Kern: " + meta);
-                         */
-                        MCRFieldDef fd = MCRFieldDef.getDef(xpath);
-                        if ("identifier".equals(fd.getDataType()))
-                          operator = "=";
-                        String value = prefixString.getTerm().trim();
-                        value = value.substring(1, value.length()-1);    // remove "'s
-                        MCRQueryCondition qc = new MCRQueryCondition(fd, operator, value);
-                        cAnd.addChild(qc);
-
-                    }
-                }
-            }
-        }
+        MCRZ3950PrefixQueryParser pqs = new MCRZ3950PrefixQueryParser( new StringReader( query ) );
+        MCRCondition condition = pqs.parse();
+        
         if (logger.isDebugEnabled())
-            logger.debug("Aus dem Kern: " + cAnd);
+            logger.debug("Transformed query: " + condition.toString());
 
-        MCRResults result = MCRQueryManager.search(new MCRQuery(cAnd));
+        MCRResults result = MCRQueryManager.search(new MCRQuery( condition ));
 
         mycoreResults = new MCRXMLContainer();
         for (int i = 0; i < result.getNumHits(); i++) {
@@ -231,7 +185,6 @@ public class MCRZ3950QueryService implements MCRZ3950Query {
 	}
 
 	public void setQuery(String query) {
-		prefixString.setQuery(query);
 		this.query = query;
 	}
 
