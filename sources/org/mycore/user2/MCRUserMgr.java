@@ -663,7 +663,7 @@ public class MCRUserMgr {
                 }
             }
         }
-        return a;
+        return o;
     }
 
     /**
