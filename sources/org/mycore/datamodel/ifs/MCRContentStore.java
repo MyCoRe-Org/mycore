@@ -216,13 +216,7 @@ public abstract class MCRContentStore {
      *            the MCRFile thats content should be retrieved
      */
     public InputStream retrieveContent(MCRFileReader file) throws MCRException, IOException {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        retrieveContent(file, baos);
-        baos.close();
-
-        byte[] content = baos.toByteArray();
-
-        return new ByteArrayInputStream(content);
+        return retrieveContent(file);
     }
 
     /** DateFormat used to construct new unique IDs based on timecode */
