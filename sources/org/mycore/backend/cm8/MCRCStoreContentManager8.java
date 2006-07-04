@@ -27,6 +27,7 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
@@ -313,25 +314,23 @@ public class MCRCStoreContentManager8 extends MCRContentStore implements DKConst
     }
 
     protected void doRetrieveContent(MCRFileReader file, OutputStream target) throws Exception {
+        MCRUtils.copyStream(doRetrieveContent(file), target);
+    }
+
+    protected InputStream doRetrieveContent(MCRFileReader file) throws Exception {
         Logger logger = MCRCM8ConnectionPool.getLogger();
         logger.debug("StorageID = " + file.getStorageID());
 
         DKDatastoreICM connection = MCRCM8ConnectionPool.instance().getConnection();
+        DKTextICM ddo = (DKTextICM) connection.createDDO(file.getStorageID());
+        ddo.retrieve(DK_CM_CONTENT_NO);
 
-        try {
-            DKTextICM ddo = (DKTextICM) connection.createDDO(file.getStorageID());
-            ddo.retrieve(DK_CM_CONTENT_NO);
+        String[] url = ddo.getContentURLs(DK_CM_RETRIEVE, DK_CM_CHECKOUT, -1, -1, DK_ICM_GETINITIALRMURL);
+        logger.debug("URL = " + url[0]);
 
-            String[] url = ddo.getContentURLs(DK_CM_RETRIEVE, DK_CM_CHECKOUT, -1, -1, DK_ICM_GETINITIALRMURL);
-            logger.debug("URL = " + url[0]);
-
-            InputStream is = new URL(url[0]).openStream();
-            MCRUtils.copyStream(is, target);
-
-            logger.debug("The file was retrieved from CM8 Ressource Manager.");
-        } finally {
-            MCRCM8ConnectionPool.instance().releaseConnection(connection);
-        }
+        InputStream is = new URL(url[0]).openStream();
+        logger.debug("The file was retrieved from CM8 Ressource Manager.");
+        return new CMInputStream(is, connection);
     }
 
     /**
@@ -852,6 +851,72 @@ public class MCRCStoreContentManager8 extends MCRContentStore implements DKConst
             }
 
             return c;
+        }
+    }
+    private static class CMInputStream extends InputStream{
+        
+        private InputStream source;
+        private DKDatastoreICM connection;
+        boolean closed;
+        
+        public CMInputStream(InputStream source, DKDatastoreICM connection){
+            this.source=source;
+            this.connection=connection;
+            this.closed=false;
+        }
+
+        public int read() throws IOException {
+            assertInputIsOpen();
+            return source.read();
+        }
+
+        public int available() throws IOException {
+            assertInputIsOpen();
+            return source.available();
+        }
+
+        public void close() throws IOException {
+            assertInputIsOpen();
+            source.close();
+            MCRCM8ConnectionPool.instance().releaseConnection(connection);
+            closed=true;
+            source=null;
+        }
+
+        private void assertInputIsOpen() {
+            if (closed){
+            throw new IllegalStateException("Source InputStream allready closed");
+            }
+        }
+
+        public synchronized void mark(int readlimit) {
+            assertInputIsOpen();
+            source.mark(readlimit);
+        }
+
+        public boolean markSupported() {
+            assertInputIsOpen();
+            return source.markSupported();
+        }
+
+        public int read(byte[] b, int off, int len) throws IOException {
+            assertInputIsOpen();
+            return source.read(b, off, len);
+        }
+
+        public int read(byte[] b) throws IOException {
+            assertInputIsOpen();
+            return source.read(b);
+        }
+
+        public synchronized void reset() throws IOException {
+            assertInputIsOpen();
+            source.reset();
+        }
+
+        public long skip(long n) throws IOException {
+            assertInputIsOpen();
+            return source.skip(n);
         }
     }
 }

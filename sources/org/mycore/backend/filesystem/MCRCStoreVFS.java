@@ -117,10 +117,7 @@ public class MCRCStoreVFS extends MCRContentStore {
     }
 
     protected void doRetrieveContent(MCRFileReader file, OutputStream target) throws Exception {
-        FileObject targetObject = fsManager.resolveFile(getBase(), file.getStorageID());
-        FileContent targetContent = targetObject.getContent();
-        InputStream in = new BufferedInputStream(targetContent.getInputStream());
-        MCRUtils.copyStream(in, target);
+        MCRUtils.copyStream(doRetrieveContent(file), target);
     }
 
     protected InputStream doRetrieveContent(MCRFileReader file) throws Exception {

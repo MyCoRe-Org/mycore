@@ -190,8 +190,21 @@ public abstract class MCRContentStore {
      *            the MCRFile thats content should be retrieved
      * @param target
      *            the OutputStream to write the file content to
+     * @deprecated
+     *        use doRetrieveContent(MCRFileReader file) instead
      */
     protected abstract void doRetrieveContent(MCRFileReader file, OutputStream target) throws Exception;
+
+    /**
+     * Retrieves the content of an MCRFile. Uses the
+     * StorageID to indentify the place where the file content was stored in
+     * this store instance.
+     * 
+     * @param file
+     *            the MCRFile thats content should be retrieved
+     * @since 1.3
+     */
+    protected abstract InputStream doRetrieveContent(MCRFileReader file) throws Exception;
 
     /**
      * Retrieves the content of an MCRFile as an InputStream. The default

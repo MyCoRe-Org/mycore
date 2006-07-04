@@ -23,12 +23,15 @@
 
 package org.mycore.backend.hibernate;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+
 import org.mycore.backend.hibernate.tables.MCRCSTORE;
 import org.mycore.common.MCRException;
 import org.mycore.datamodel.ifs.MCRContentInputStream;
@@ -127,6 +130,87 @@ public class MCRHIBCStore extends MCRContentStore {
             logger.error(e);
         } finally {
             session.close();
+        }
+    }
+
+    protected InputStream doRetrieveContent(MCRFileReader file) throws Exception {
+        int storageID = Integer.valueOf(file.getStorageID()).intValue();
+        Session session = MCRHIBConnection.instance().getSession();
+
+        try {
+            MCRCSTORE st = (MCRCSTORE)session.createQuery("from MCRCSTORE where storageid=" + storageID ).uniqueResult();
+            return new HibInputStream(st.getInputStream(),session);
+        } catch (Exception e) {
+            logger.error(e);
+        } finally {
+            session.close();
+        }
+        return null; //in case of error
+    }
+    private static class HibInputStream extends InputStream{
+        
+        private InputStream source;
+        private Session session;
+        boolean closed;
+        
+        public HibInputStream(InputStream source, Session session){
+            this.source=source;
+            this.session=session;
+            this.closed=false;
+        }
+
+        public int read() throws IOException {
+            assertInputIsOpen();
+            return source.read();
+        }
+
+        public int available() throws IOException {
+            assertInputIsOpen();
+            return source.available();
+        }
+
+        public void close() throws IOException {
+            assertInputIsOpen();
+            source.close();
+            session.close();
+            closed=true;
+            source=null;
+        }
+
+        private void assertInputIsOpen() {
+            if (closed){
+            throw new IllegalStateException("Source InputStream allready closed");
+            }
+        }
+
+        public synchronized void mark(int readlimit) {
+            assertInputIsOpen();
+            source.mark(readlimit);
+        }
+
+        public boolean markSupported() {
+            assertInputIsOpen();
+            return source.markSupported();
+        }
+
+        public int read(byte[] b, int off, int len) throws IOException {
+            assertInputIsOpen();
+            return source.read(b, off, len);
+        }
+
+        public int read(byte[] b) throws IOException {
+            assertInputIsOpen();
+            return source.read(b);
+        }
+
+        public synchronized void reset() throws IOException {
+            assertInputIsOpen();
+            source.reset();
+        }
+
+        public long skip(long n) throws IOException {
+            assertInputIsOpen();
+            return source.skip(n);
         }
     }
 }
