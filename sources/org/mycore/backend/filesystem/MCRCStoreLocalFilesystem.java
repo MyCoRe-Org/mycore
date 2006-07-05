@@ -151,9 +151,7 @@ public class MCRCStoreLocalFilesystem extends MCRContentStore {
     }
 
     protected void doRetrieveContent(MCRFileReader file, OutputStream target) throws Exception {
-        File local = new File(baseDir, file.getStorageID());
-        InputStream in = new BufferedInputStream(new FileInputStream(local));
-        MCRUtils.copyStream(in, target);
+        MCRUtils.copyStream(doRetrieveContent(file), target);
     }
 
     protected InputStream doRetrieveContent(MCRFileReader file) throws Exception {
