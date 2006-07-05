@@ -102,13 +102,14 @@ public class MCRStartEditorServlet extends MCRServlet {
 
     /**
      * This method overrides doGetPost of MCRServlet. <br />
-     * The <b>todo </b> value corresponds with <b>tf_mcrid </b> or <b>se_mcrid
-     * </b> and with the type of the data model for the privileges that the user
-     * need. for some actions you need a third value of re_mcrid for relations
-     * (object - derivate). <br />
+     * <br />
+     * The <b>todo </b> value corresponds with <b>tf_mcrid </b> or <b>se_mcridor</b>
+     * value and with the type of the data model for the permissions that the
+     * user need. For some actions you need a third value of re_mcrid for
+     * relations (object - derivate). <br />
      * 
      * The table shows the possible todo's in the server: <br />
-     * <table>
+     * <table cellspacing="2" cellpadding="10" border="1">
      * <tr>
      * <th>TODO</th>
      * <th>MCRObjectID from</th>
@@ -125,28 +126,44 @@ public class MCRStartEditorServlet extends MCRServlet {
      * <td>sdelobj</td>
      * <td>tf_mcrid</td>
      * <td>deletedb</td>
-     * <td>delete an object from the server</tr>
+     * <td>delete an object from the server</td>
+     * </tr>
      * <tr>
      * <td>snewder</td>
      * <td>tf_mcrid</td>
      * <td>writedb</td>
-     * <td>create a new derivate in the server</tr>
-     * <tr>
-     * <td>sdelder</td>
-     * <td>tf_mcrid</td>
-     * <td>deletedb</td>
-     * <td>delete a derivate from the server</tr>
-     * <tr>
-     * <td>seditder</td>
-     * <td>tf_mcrid</td>
-     * <td>writedb</td>
-     * <td>change a derivate in the server</tr>
+     * <td>create a new derivate in the server</td>
+     * </tr>
      * <tr>
      * <td>saddfile</td>
      * <td>tf_mcrid <br />
      * re_mcrid</td>
      * <td>writedb</td>
      * <td>add a new file to a derivate in the server</td>
+     * </tr>
+     * <tr>
+     * <td>sdelder</td>
+     * <td>tf_mcrid</td>
+     * <td>deletedb</td>
+     * <td>delete a derivate from the server</td>
+     * </tr>
+     * <tr>
+     * <td>seditder</td>
+     * <td>tf_mcrid</td>
+     * <td>writedb</td>
+     * <td>change a derivate in the server</td>
+     * </tr>
+     * <tr>
+     * <td>ssetlabel</td>
+     * <td>tf_mcrid</td>
+     * <td>writedb</td>
+     * <td>change the label of a derivate in the server</td>
+     * </tr>
+     * <tr>
+     * <td>ssetfile</td>
+     * <td>tf_mcrid</td>
+     * <td>writedb</td>
+     * <td>set the main file of a derivate in the server</td>
      * </tr>
      * <tr>
      * <td>sdelfile</td>
@@ -159,7 +176,7 @@ public class MCRStartEditorServlet extends MCRServlet {
      * <td>seditacl</td>
      * <td>se_mcrid</td>
      * <td>writedb</td>
-     * <td>edit the ACL's of an object in the workflow</td>
+     * <td>edit the ACL's of an object in the server</td>
      * </tr>
      * </table> <br />
      * 
@@ -223,13 +240,34 @@ public class MCRStartEditorServlet extends MCRServlet {
      * <td>delete a derivate from the workflow</td>
      * </tr>
      * <tr>
+     * <td>wdelfile</td>
+     * <td>se_mcrid <br />
+     * re_mcrid</td>
+     * <td>deletewf</td>
+     * <td>delete a file of a derivate from the workflow</td>
+     * </tr>
+     * <tr>
+     * <td>wsetlabel</td>
+     * <td>se_mcrid <br />
+     * re_mcrid</td>
+     * <td>writewf</td>
+     * <td>cahnge the label of a derivate in the workflow</td>
+     * </tr>
+     * <tr>
+     * <td>wsetfile</td>
+     * <td>se_mcrid <br />
+     * re_mcrid</td>
+     * <td>writewf</td>
+     * <td>set the main file in a derivate in the workflow</td>
+     * </tr>
+     * <tr>
      * <td>weditacl</td>
      * <td>se_mcrid</td>
      * <td>writewf</td>
      * <td>edit the ACL's of an object in the workflow</td>
      * </tr>
      * </table> <br />
-     * <li>If the privileg is not correct it calls
+     * <li>If the permission is not correct it calls
      * <em>editor_error_user.xml</em>.</li>
      * <br />
      * <li>If the MCRObjectID is not correct it calls
@@ -241,7 +279,7 @@ public class MCRStartEditorServlet extends MCRServlet {
      * <li>If <b>CANCEL </b> was pressed it calls <em>editor_cancel.xml</em>.
      * </li>
      * <br />
-     * <li>If the privileg is correct it starts the file editor_form_
+     * <li>If the permission is correct it starts the file editor_form_
      * <em>step-type</em> .xml.</li>
      * <br />
      */
@@ -466,7 +504,7 @@ public class MCRStartEditorServlet extends MCRServlet {
             params.put("XSL.editor.source.new", "true");
             params.put("XSL.editor.cancel.url", getBaseURL() + cancelpage);
             params.put("XSL.target.param.1", "method=formBasedUpload");
-            params.put("XSL.target.param.2", "uploadId="+fuhid);
+            params.put("XSL.target.param.2", "uploadId=" + fuhid);
             params.put("mcrid", mysemcrid);
             params.put("type", mytype);
             params.put("step", mystep);
@@ -962,7 +1000,7 @@ public class MCRStartEditorServlet extends MCRServlet {
             params.put("XSL.editor.source.new", "true");
             params.put("XSL.editor.cancel.url", getBaseURL() + cancelpage);
             params.put("XSL.target.param.1", "method=formBasedUpload");
-            params.put("XSL.target.param.2", "uploadId="+fuhid);
+            params.put("XSL.target.param.2", "uploadId=" + fuhid);
             params.put("mcrid", mysemcrid);
             params.put("type", mytype);
             params.put("step", mystep);

@@ -34,16 +34,13 @@ import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.MCRUtils;
-import org.mycore.datamodel.metadata.MCRActiveLinkException;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.editor.MCREditorSubmission;
 import org.mycore.frontend.editor.MCRRequestParameters;
 
 /**
- * This class is the superclass of servlets which checks the MCREditorServlet
- * output XML and store the XML in a file or if an error was occured start the
- * editor again.
+ * This class is a special to work wit the interactive input from the dialog of
+ * ACL (Access Control List) changes.
  * 
  * @author Jens Kupferschmidt
  * @author Thomas Scheffler (yagee)
@@ -51,7 +48,11 @@ import org.mycore.frontend.editor.MCRRequestParameters;
  */
 abstract public class MCRCheckACLBase extends MCRCheckBase {
     /**
-     * This method overrides doGetPost of MCRServlet. <br />
+     * This method overrides doGetPost of MCRServlet and handels all actions
+     * against the ACL data.
+     * 
+     * @param job
+     *            the MCRServlet job instance
      */
     public void doGetPost(MCRServletJob job) throws Exception {
         // read the XML data
@@ -90,14 +91,14 @@ abstract public class MCRCheckACLBase extends MCRCheckBase {
 
         // create a service object and prepare it
         org.jdom.Element outelm = prepareService((org.jdom.Document) indoc.clone(), ID, job, lang);
-        
+
         // Save the prepared metadata object
         boolean okay = storeService(outelm, job, ID);
 
         // call the getNextURL and sendMail methods
         String url = getNextURL(ID, okay);
         sendMail(ID);
-        
+
         job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + url));
     }
 
@@ -115,9 +116,9 @@ abstract public class MCRCheckACLBase extends MCRCheckBase {
     abstract public boolean storeService(org.jdom.Element outelm, MCRServletJob job, MCRObjectID ID);
 
     /**
-     * The method read the incoming JDOM tree in a MCRObject and prepare this by
-     * the following rules. After them it return a JDOM Element as clone of the
-     * prepared data.
+     * The method read the incoming servacls JDOM tree in a MCRService and
+     * prepare this by the following rules. After them it return a JDOM Element
+     * of servacls as clone of the prepared data.
      * 
      * @param jdom_in
      *            the JDOM tree from the editor
@@ -157,29 +158,29 @@ abstract public class MCRCheckACLBase extends MCRCheckBase {
                                                     ((org.jdom.Element) inbool.get(j)).removeContent(incond);
                                                     k--;
                                                     l--;
-                                                    continue;                                                    
+                                                    continue;
                                                 }
                                                 String condfield = incond.getAttributeValue("field");
                                                 if (condfield.equals("user")) {
-                                                    if(!UM.existUser(condvalue)) {
+                                                    if (!UM.existUser(condvalue)) {
                                                         ((org.jdom.Element) inbool.get(j)).removeContent(incond);
                                                         k--;
                                                         l--;
-                                                        continue;                                                                                                           
+                                                        continue;
                                                     }
                                                 }
                                                 if (condfield.equals("group")) {
-                                                    if(!UM.existGroup(condvalue)) {
+                                                    if (!UM.existGroup(condvalue)) {
                                                         ((org.jdom.Element) inbool.get(j)).removeContent(incond);
                                                         k--;
                                                         l--;
-                                                        continue;                                                                                                           
+                                                        continue;
                                                     }
                                                 }
                                             }
                                             if (k == 1) {
                                                 org.jdom.Element newtrue = new org.jdom.Element("boolean");
-                                                newtrue.setAttribute("operator","true");
+                                                newtrue.setAttribute("operator", "true");
                                                 ((org.jdom.Element) inbool.get(j)).addContent(newtrue);
                                             }
                                         } else {
@@ -215,7 +216,16 @@ abstract public class MCRCheckACLBase extends MCRCheckBase {
     }
 
     /**
-     * A method to handle valid errors.
+     * An internal method to handle validation errors.
+     * 
+     * @param job
+     *            the MCRServletJob instance
+     * @param logtext
+     *            a list of log texts as strings
+     * @param ID
+     *            the current MCRObjectID
+     * @param lang
+     *            the current language
      */
     private final void errorHandlerValid(MCRServletJob job, List logtext, MCRObjectID ID, String lang) throws Exception {
         if (logtext.size() == 0) {
