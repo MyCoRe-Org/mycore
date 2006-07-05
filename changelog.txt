@@ -6,7 +6,13 @@ Version 1.3
  - Redesign the CM8 persitence.
  - Change the search perstence to EventHandler model.
  - Add an EventHandler for the LinkTableManager. 
- - Remove the TypedContent construct from teh datamodel classes.
+ - Remove the TypedContent construct from the datamodel classes.
+ - Add the MCRMetaISO8601Date as replacement for MCRMetaDate.
+ - Add the new Access Controll system as replacement for the old user privilege system.
+ - Build a new small user administartion system without privileges and memberships of groups.
+ - Redesign the query system.
+ - Redesign the remot access. Now we use WebServices, OAI and Z3950.
+ - Separarte the content store from the content indexer and build it in the new search engine. 
 
 Version 1.2
 ===========
