@@ -1,8 +1,13 @@
-<?xml version="1.0" encoding="iso-8859-1"?>
+<?xml version="1.0" encoding="UTF-8"?>
+
 <!-- ============================================== -->
-<!-- $Revision: 1.1 $ $Date: 2005-04-29 10:15:29 $ -->
+<!-- $Revision: 1.2 $ $Date: 2006-07-05 10:45:39 $ -->
 <!-- ============================================== -->
-<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+
+<xsl:stylesheet version="1.0" 
+	xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+	xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation"
+>
 <xsl:output method="xml" encoding="UTF-8" />
 
 <xsl:param name="DefaultLang" />
@@ -42,7 +47,7 @@
    <data>
    <xsl:for-each select="service/servdates/servdate">
     <xsl:if test="@type = 'modifydate'">
-     Zuletzt bearbeitet am <xsl:value-of select="text()|*" />
+     <xsl:value-of select="i18n:translate('swf.converter.modifydate')" /><xsl:value-of select="text()|*" />
     </xsl:if>
    </xsl:for-each>
    </data>

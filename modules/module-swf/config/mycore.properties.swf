@@ -15,11 +15,23 @@ MCR.editor_document_wnewder_mail=
 MCR.editor_document_waddfile_mail=
 MCR.editor_document_weditobj_mail=
 MCR.editor_document_weditder_mail=
+MCR.editor_document_weditacl_mail=
+MCR.editor_document_wsetlabel_mail_
+MCR.editor_document_wsetfile_mail_
 MCR.editor_document_wcommit_mail=user@domain.xyz
 MCR.editor_document_wdelobj_mail=
 MCR.editor_document_wdelder_mail=
-MCR.editor_document_seditobj_mail=user@domain.xyz
-MCR.editor_document_sdelobj_mail=user@domain.xyz
+MCR.editor_document_wdelfile_mail=
+MCR.editor_document_snewder_mail=
+MCR.editor_document_saddfile_mail=
+MCR.editor_document_seditobj_mail=
+MCR.editor_document_seditder_mail=
+MCR.editor_document_seditacl_mail=
+MCR.editor_document_ssetlabel_mail_
+MCR.editor_document_ssetfile_mail_
+MCR.editor_document_sdelobj_mail=
+MCR.editor_document_sdelder_mail=
+MCR.editor_document_sdelfile_mail=
 
 MCR.editor_mail_sender=user@domain.xyz
 MCR.editor_mail_application_id=MyCoReSample
