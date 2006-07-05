@@ -23,9 +23,6 @@
 
 package org.mycore.datamodel.ifs;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.text.DateFormat;
@@ -36,6 +33,7 @@ import java.util.Random;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
+import org.mycore.common.MCRUtils;
 
 /**
  * Stores the content of MCRFiles in a persistent datastore. This can be a
@@ -165,20 +163,11 @@ public abstract class MCRContentStore {
      *            the MCRFile thats content should be retrieved
      * @param target
      *            the OutputStream to write the file content to
+     * @deprecated
+     *        use doRetrieveContent(MCRFileReader file) instead
      */
     public void retrieveContent(MCRFileReader file, OutputStream target) throws MCRException {
-        try {
-            doRetrieveContent(file, target);
-        } catch (Exception exc) {
-            if (!(exc instanceof MCRException)) {
-                StringBuffer msg = new StringBuffer();
-                msg.append("Could not retrieve content of file with storage ID [");
-                msg.append(file.getStorageID()).append("] in store [");
-                msg.append(storeID).append("]");
-                throw new MCRPersistenceException(msg.toString(), exc);
-            }
-            throw (MCRException) exc;
-        }
+        MCRUtils.copyStream(retrieveContent(file), target);
     }
 
     /**
@@ -215,8 +204,19 @@ public abstract class MCRContentStore {
      * @param file
      *            the MCRFile thats content should be retrieved
      */
-    public InputStream retrieveContent(MCRFileReader file) throws MCRException, IOException {
-        return retrieveContent(file);
+    public InputStream retrieveContent(MCRFileReader file) throws MCRException {
+        try {
+            return doRetrieveContent(file);
+        } catch (Exception exc) {
+            if (!(exc instanceof MCRException)) {
+                StringBuffer msg = new StringBuffer();
+                msg.append("Could not retrieve content of file with storage ID [");
+                msg.append(file.getStorageID()).append("] in store [");
+                msg.append(storeID).append("]");
+                throw new MCRPersistenceException(msg.toString(), exc);
+            }
+            throw (MCRException) exc;
+    }
     }
 
     /** DateFormat used to construct new unique IDs based on timecode */
