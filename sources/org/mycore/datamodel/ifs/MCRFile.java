@@ -23,6 +23,7 @@
 
 package org.mycore.datamodel.ifs;
 
+import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -280,7 +281,7 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
         } catch (FileNotFoundException ignored) {
         } // We already checked it exists
 
-        setContentFrom(fin);
+        setContentFrom(new BufferedInputStream(fin));
     }
 
     /**
@@ -316,7 +317,7 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
 
     /**
      * Reads the content of this file from the source InputStream and stores it
-     * in an MCRContentStore.
+     * in an MCRContentStore. InputStream gets closed at end of process.
      * 
      * @param source
      *            the source for the file's content bytes
@@ -348,6 +349,15 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
 
         size = cis.getLength();
         md5 = cis.getMD5String();
+        try {
+            cis.close();
+        } catch (IOException e) {
+           /*
+            * We failed closing the InputStream.
+            * But the rest went well so we just ignore this issue.
+            */
+        }
+        cis=null; //do not use cis after closing InputStream
 
         boolean changed = ((size != old_size) || (!md5.equals(old_md5)));
 
