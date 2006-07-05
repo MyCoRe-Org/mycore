@@ -196,10 +196,7 @@ public abstract class MCRContentStore {
     protected abstract InputStream doRetrieveContent(MCRFileReader file) throws Exception;
 
     /**
-     * Retrieves the content of an MCRFile as an InputStream. The default
-     * implementation buffers all bytes in memory to implement this
-     * functionality, so subclasses should overwrite this method to get better
-     * performance and less memory consumption.
+     * Retrieves the content of an MCRFile as an InputStream.
      * 
      * @param file
      *            the MCRFile thats content should be retrieved
@@ -216,7 +213,7 @@ public abstract class MCRContentStore {
                 throw new MCRPersistenceException(msg.toString(), exc);
             }
             throw (MCRException) exc;
-    }
+        }
     }
 
     /** DateFormat used to construct new unique IDs based on timecode */
