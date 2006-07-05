@@ -27,6 +27,7 @@ import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -853,70 +854,19 @@ public class MCRCStoreContentManager8 extends MCRContentStore implements DKConst
             return c;
         }
     }
-    private static class CMInputStream extends InputStream{
-        
-        private InputStream source;
+
+    private static class CMInputStream extends FilterInputStream {
+
         private DKDatastoreICM connection;
-        boolean closed;
-        
-        public CMInputStream(InputStream source, DKDatastoreICM connection){
-            this.source=source;
-            this.connection=connection;
-            this.closed=false;
-        }
 
-        public int read() throws IOException {
-            assertInputIsOpen();
-            return source.read();
-        }
-
-        public int available() throws IOException {
-            assertInputIsOpen();
-            return source.available();
+        public CMInputStream(InputStream source, DKDatastoreICM connection) {
+            super(source);
+            this.connection = connection;
         }
 
         public void close() throws IOException {
-            assertInputIsOpen();
-            source.close();
+            super.close();
             MCRCM8ConnectionPool.instance().releaseConnection(connection);
-            closed=true;
-            source=null;
-        }
-
-        private void assertInputIsOpen() {
-            if (closed){
-            throw new IllegalStateException("Source InputStream allready closed");
-            }
-        }
-
-        public synchronized void mark(int readlimit) {
-            assertInputIsOpen();
-            source.mark(readlimit);
-        }
-
-        public boolean markSupported() {
-            assertInputIsOpen();
-            return source.markSupported();
-        }
-
-        public int read(byte[] b, int off, int len) throws IOException {
-            assertInputIsOpen();
-            return source.read(b, off, len);
-        }
-
-        public int read(byte[] b) throws IOException {
-            assertInputIsOpen();
-            return source.read(b);
-        }
-
-        public synchronized void reset() throws IOException {
-            assertInputIsOpen();
-            source.reset();
-        }
-
-        public long skip(long n) throws IOException {
-            assertInputIsOpen();
-            return source.skip(n);
         }
     }
 }

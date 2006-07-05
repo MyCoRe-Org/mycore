@@ -23,6 +23,7 @@
 
 package org.mycore.backend.sql;
 
+import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -137,78 +138,27 @@ public class MCRCStoreSQLDB extends MCRContentStore {
         }
     }
 
-    private static class SqlInputStream extends InputStream{
-        
-        private InputStream source;
+    private static class SqlInputStream extends FilterInputStream {
+
         private MCRSQLConnection connection;
+
         private ResultSet rs;
-        boolean closed;
-        
-        public SqlInputStream(InputStream source, ResultSet rs,MCRSQLConnection connection){
-            this.source=source;
-            this.connection=connection;
-            this.rs=rs;
-            this.closed=false;
-        }
 
-        public int read() throws IOException {
-            assertInputIsOpen();
-            return source.read();
-        }
-
-        public int available() throws IOException {
-            assertInputIsOpen();
-            return source.available();
+        public SqlInputStream(InputStream source, ResultSet rs, MCRSQLConnection connection) {
+            super(source);
+            this.connection = connection;
+            this.rs = rs;
         }
 
         public void close() throws IOException {
-            assertInputIsOpen();
-            source.close();
+            super.close();
             try {
                 rs.close();
             } catch (SQLException e) {
-                throw new IOException("Error while closing SQL ResultSet:"+e.getMessage());
+                throw new IOException("Error while closing SQL ResultSet:" + e.getMessage());
             } finally {
-            connection.release();
-            closed=true;
-            source=null;
+                connection.release();
             }
-        }
-
-        private void assertInputIsOpen() {
-            if (closed){
-            throw new IllegalStateException("Source InputStream allready closed");
-            }
-        }
-
-        public synchronized void mark(int readlimit) {
-            assertInputIsOpen();
-            source.mark(readlimit);
-        }
-
-        public boolean markSupported() {
-            assertInputIsOpen();
-            return source.markSupported();
-        }
-
-        public int read(byte[] b, int off, int len) throws IOException {
-            assertInputIsOpen();
-            return source.read(b, off, len);
-        }
-
-        public int read(byte[] b) throws IOException {
-            assertInputIsOpen();
-            return source.read(b);
-        }
-
-        public synchronized void reset() throws IOException {
-            assertInputIsOpen();
-            source.reset();
-        }
-
-        public long skip(long n) throws IOException {
-            assertInputIsOpen();
-            return source.skip(n);
         }
     }
 }
