@@ -52,6 +52,7 @@ public class MCRImgCacheManager implements CacheManager {
 	public static final String ORIG = "Orig";
 
 	private Logger LOGGER = Logger.getLogger(MCRFileNodeServlet.class.getName());
+	private Stopwatch timer = new Stopwatch();
 
 	protected MCRDirectory cacheInIFS = null;
 
@@ -171,7 +172,43 @@ public class MCRImgCacheManager implements CacheManager {
 	}
 
 	public boolean existInCache(MCRFile image) {
-		return existInCache(image, THUMB) && existInCache(image, CACHE) && existInCache(image, ORIG);
+		String name = image.getName();
+		timer.reset();
+		timer.start();
+		int imgWidth = getImgWidth(image);
+		timer.stop();
+		LOGGER.debug("**********************************");
+		LOGGER.debug("* " + name);
+		LOGGER.debug("* getImgWidth Time: " + timer.getElapsedTime());
+		LOGGER.debug("**********************************");
+		
+		timer.reset();
+		timer.start();
+		int imgHeight = getImgHeight(image);
+		timer.stop();
+		LOGGER.debug("**********************************");
+		LOGGER.debug("* " + name);
+		LOGGER.debug("* getImgHeight Time: " + timer.getElapsedTime());
+		LOGGER.debug("**********************************");
+		
+		LOGGER.debug("**********************************");
+		LOGGER.debug("* " + name);
+		LOGGER.debug("* Cached Size: " + imgWidth + "x" + imgHeight);
+		LOGGER.debug("**********************************");
+		if (imgWidth <= 2*1024 && imgHeight <= 2*768){
+			LOGGER.debug("**********************************");
+			LOGGER.debug("* " + name);
+			LOGGER.debug("* exist in Cache IF!");
+			LOGGER.debug("**********************************");
+			return (existInCache(image, THUMB) && existInCache(image, ORIG));
+		}
+		else{
+			LOGGER.debug("**********************************");
+			LOGGER.debug("* " + name);
+			LOGGER.debug("* exist in Cache ELSE!");
+			LOGGER.debug("**********************************");
+			return (existInCache(image, THUMB) && existInCache(image, ORIG) && existInCache(image, CACHE));
+		}
 	}
 
 	public int getImgWidth(MCRFile image) {

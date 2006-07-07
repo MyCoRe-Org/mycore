@@ -163,7 +163,7 @@ public class MCRImgCacheCommands extends MCRAbstractCommands {
 			// **************
 
 			// cache Original
-			if (imgSize.width > 1024 && imgSize.height > 768)
+			if (!cache.existInCache(image, cache.ORIG))
 				try {
 					processor.useEncoder(processor.TIFF_ENC);
 					processor.resize(image.getContentAsInputStream(), imgSize.width, imgSize.height, imgData);
@@ -180,7 +180,7 @@ public class MCRImgCacheCommands extends MCRAbstractCommands {
 				LOGGER.info("Image " + image.getName() + " as version " + cache.ORIG + " allready exists in Cache!");
 			// **************
 
-			if (imgSize.width > 2 * 1024 && imgSize.height > 2 * 768)
+			if ((imgSize.width > 2 * 1024 || imgSize.height > 2 * 768) && !cache.existInCache(image, cache.CACHE))
 				try {
 					processor.useEncoder(processor.TIFF_ENC);
 					processor.resize(image.getContentAsInputStream(), 1024, 768, imgData);
@@ -227,6 +227,15 @@ public class MCRImgCacheCommands extends MCRAbstractCommands {
 			FileOutputStream out = new FileOutputStream("/home/chi/images/filestore/" + image.getName());
 			BufferedOutputStream buffOut = new BufferedOutputStream(out);
 			ByteArrayOutputStream bout = new ByteArrayOutputStream();
+			MCRImgProcessor proz = new MCRImgProcessor();
+			
+			timer.reset();
+			timer.start();
+//			imgService.getImage(image, new Dimension(600, 300), bout);
+			proz.getImageSize(image.getContentAsInputStream());
+			timer.stop();
+			LOGGER.info("Timer get size: " + timer.getElapsedTime());
+			
 			timer.reset();
 			timer.start();
 //			imgService.getImage(image, new Dimension(600, 300), bout);
