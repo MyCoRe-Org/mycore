@@ -17,6 +17,7 @@ import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.parsers.bool.MCRAndCondition;
+import org.mycore.parsers.bool.MCROrCondition;
 import org.mycore.services.fieldquery.MCRFieldDef;
 import org.mycore.services.fieldquery.MCRQuery;
 import org.mycore.services.fieldquery.MCRQueryCondition;
@@ -329,7 +330,16 @@ public class MCRIndexBrowserData {
         MCRAndCondition cAnd = new MCRAndCondition();
 
         MCRFieldDef field = MCRFieldDef.getDef("objectType");
-        cAnd.addChild(new MCRQueryCondition(field,"=",ic.table));
+        if (ic.table.indexOf(",") != -1) {
+            MCROrCondition cOr = new MCROrCondition();
+            StringTokenizer st = new StringTokenizer(ic.table,",");
+            while (st.hasMoreTokens()) {
+              cOr.addChild(new MCRQueryCondition(field, "=", st.nextToken()));
+            }
+            cAnd.addChild(cOr);
+          } else {
+            cAnd.addChild(new MCRQueryCondition(field, "=", ic.table));
+          }
 
         field = MCRFieldDef.getDef(ic.browseField);
         String value = br.search == null ? "*" : br.search + "*";
