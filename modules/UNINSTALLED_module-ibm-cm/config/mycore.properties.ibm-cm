@@ -45,3 +45,13 @@
 # MCR.EventHandler.MCRObject.4.class=org.mycore.backend.cm8.MCRCM8EventHandlerIndexMeta
 
 ##############################################################################
+# Internal Filesystem IBM CM                                                 #
+##############################################################################
+
+# Sample file content store with ID = CM8, use the IBM Content Manager 8
+# MCR.IFS.ContentStore.CM8.Class=org.mycore.backend.cm8.MCRCStoreContentManager8
+# MCR.IFS.ContentStore.CM8.Attribute.File=ifsfile
+# MCR.IFS.ContentStore.CM8.Attribute.Time=ifstime
+# MCR.IFS.ContentStore.CM8.Attribute.Owner=ifsowner
+
+##############################################################################
