@@ -2,7 +2,7 @@
 
 <!-- =================================================================== -->
 <!-- MyCoRe-SimpleWorkflow build file for use with ANT                   -->
-<!-- $Revision: 1.5 $ $Date: 2005-12-14 09:27:30 $                      -->
+<!-- $Revision: 1.6 $ $Date: 2006-07-12 09:03:30 $                      -->
 <!-- =================================================================== -->
 
 <project name="MyCoReModule - SimpleWorkflow" default="usage" basedir=".">
@@ -28,7 +28,7 @@
 	<target name="usage">
 		<echo>
       Usage:
-        build.sh [target] or build.cmd [target] or ant [target]
+        ant [target]
 
       Available targets are:
         info                 --> Shows Java/Ant/Operating System version
