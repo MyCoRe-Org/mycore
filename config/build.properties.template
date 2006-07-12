@@ -90,6 +90,7 @@
 
 # MCR.System.SharedJarsDir=/usr/share/java
 # MCR.System.Jars=ant.jar
+# MCR.System.Jars=ant.jar jai/jai_codec.jar jai/jai_core.jar
 
 #######################################################################
 # 
