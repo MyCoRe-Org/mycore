@@ -13,6 +13,7 @@ Version 1.3
  - Redesign of query system.
  - Redesign of remote access. Now WebServices, OAI and Z3950 is used
  - Separate the content store from the content indexer and build it in the new search engine. 
+ - Move the IBM CM8 code to a separate uninstalled module. 
 
 Version 1.2
 ===========
