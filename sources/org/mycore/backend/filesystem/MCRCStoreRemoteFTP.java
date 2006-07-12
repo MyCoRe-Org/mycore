@@ -23,6 +23,9 @@
 
 package org.mycore.backend.filesystem;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.StringTokenizer;
 
@@ -150,6 +153,13 @@ public class MCRCStoreRemoteFTP extends MCRContentStore {
         } finally {
             disconnect(connection);
         }
+    }
+
+    protected InputStream doRetrieveContent(MCRFileReader file) throws Exception {
+        //FTPClient does not provide GET and InputStreams, we need to copy
+        ByteArrayOutputStream bout=new ByteArrayOutputStream();
+        doRetrieveContent(file, bout);
+        return new ByteArrayInputStream(bout.toByteArray());
     }
 
     /**

@@ -55,7 +55,7 @@ public class MCRSQLNBNManager implements MCRNBNManager {
     // logger
     static Logger logger = Logger.getLogger(MCRSQLNBNManager.class);
 
-    private static String table = MCRConfiguration.instance().getString("MCR.NBN.PersistenceStore.TableName");
+    private static String table = MCRConfiguration.instance().getString("MCR.nbn_store_sql_table","MCRNBN");
 
     /**
      * Method MCRSQLNBNManager. Creates a new MCRNBNManager.

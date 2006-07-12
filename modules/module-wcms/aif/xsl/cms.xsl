@@ -31,7 +31,8 @@ template:
 <xsl:stylesheet 
 	version="1.0" 
 	xmlns:xsl="http://www.w3.org/1999/XSL/Transform" 
-	xmlns:xalan="http://xml.apache.org/xalan" >
+	xmlns:xalan="http://xml.apache.org/xalan"
+    xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation" >
 
 	<!-- Erzeugen des Seitentitels-->
 	<xsl:variable name="PageTitle">
@@ -127,10 +128,10 @@ parameters:
 		<xsl:param name="align"/>
 		<tr>
 			<th width="50%" align="left">
-				<xsl:text>MyCoRe-WCMS :: das Web Content Management Modul</xsl:text>
+				<xsl:value-of select="i18n:translate('wcms.title')" />
 			</th>
 			<th width="50%" align="right">
-				<xsl:text>WCMS-Nutzer: '</xsl:text>
+				<xsl:value-of select="concat(i18n:translate('wcms.admin.WCMSUser'),' :')"/>
 				<xsl:value-of select="/cms/userID" />
 				<xsl:text>' (</xsl:text>
 				<xsl:value-of select="/cms/userClass" />) 

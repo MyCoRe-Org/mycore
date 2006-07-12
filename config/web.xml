@@ -4,6 +4,10 @@
 
       <display-name>MyCoRe Application</display-name>
       
+      <listener>
+            <listener-class>org.mycore.common.events.MCRServletContextListener</listener-class>
+      </listener>
+      
       <!-- **************************************************************** -->
       <!-- Servlets and mapping from MyCoRe kernel                          -->
       <!-- **************************************************************** -->

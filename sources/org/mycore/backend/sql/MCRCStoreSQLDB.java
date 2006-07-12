@@ -23,6 +23,9 @@
 
 package org.mycore.backend.sql;
 
+import java.io.FilterInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -105,7 +108,12 @@ public class MCRCStoreSQLDB extends MCRContentStore {
     }
 
     protected void doRetrieveContent(MCRFileReader file, OutputStream target) throws Exception {
+        MCRUtils.copyStream(doRetrieveContent(file), target);
+    }
+
+    protected InputStream doRetrieveContent(MCRFileReader file) throws Exception {
         MCRSQLConnection connection = MCRSQLConnectionPool.instance().getConnection();
+        ResultSet rs = null;
 
         try {
             String storageID = file.getStorageID();
@@ -114,17 +122,43 @@ public class MCRCStoreSQLDB extends MCRContentStore {
             String ID = storageID.substring(i + 1);
             String select = "SELECT XML FROM " + tableName + " WHERE ID = " + ID;
             Statement statement = connection.getJDBCConnection().createStatement();
-            ResultSet rs = statement.executeQuery(select);
+            rs = statement.executeQuery(select);
 
             if (!rs.next()) {
                 String msg = ID + " is not in table  " + tableName;
                 throw new MCRUsageException(msg);
             }
 
-            MCRUtils.copyStream(rs.getBinaryStream(1), target);
-            rs.close();
+            return new SqlInputStream(rs.getBinaryStream(1), rs, connection);
         } finally {
+            if (rs != null) {
+                rs.close();
+            }
             connection.release();
+        }
+    }
+
+    private static class SqlInputStream extends FilterInputStream {
+
+        private MCRSQLConnection connection;
+
+        private ResultSet rs;
+
+        public SqlInputStream(InputStream source, ResultSet rs, MCRSQLConnection connection) {
+            super(source);
+            this.connection = connection;
+            this.rs = rs;
+        }
+
+        public void close() throws IOException {
+            super.close();
+            try {
+                rs.close();
+            } catch (SQLException e) {
+                throw new IOException("Error while closing SQL ResultSet:" + e.getMessage());
+            } finally {
+                connection.release();
+            }
         }
     }
 }

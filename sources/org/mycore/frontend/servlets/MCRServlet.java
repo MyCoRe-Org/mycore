@@ -233,8 +233,6 @@ public class MCRServlet extends HttpServlet {
 
 			MCRServletJob job = new MCRServletJob(req, res);
 
-			// Uebernahme der gewuenschten Sprache aus dem Request zunaechst mal
-			// nur als Test!!!
 			String lang = getProperty(req, "lang");
 
 			if ((lang != null) && (lang.trim().length() != 0)) {
@@ -387,7 +385,7 @@ public class MCRServlet extends HttpServlet {
             LOGGER.info("LastModified: " + lastModified);
             return lastModified;
         }
-        return -1; //time is not know
+        return -1; //time is not known
     }
 
     protected static String getProperty(HttpServletRequest request, String name) {

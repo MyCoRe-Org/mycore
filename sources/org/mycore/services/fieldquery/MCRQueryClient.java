@@ -163,4 +163,40 @@ public class MCRQueryClient {
             LOGGER.error(msg, ex);
         }
     }
+
+    /**
+     * Retrieves an Object from remote host using the webservice.
+     * 
+     * @param hostAlias the alias of the remote host as defined in hosts.xml
+     * @param ID   the ID of the Object to retrieve
+     * 
+     */
+    public static org.w3c.dom.Document doRetrieveObject(String hostAlias, String ID) {
+        if (!endpoints.containsKey(hostAlias)) {
+            String msg = "No configuration for host " + hostAlias;
+            throw new MCRConfigurationException(msg);
+        }
+
+        LOGGER.info("Starting remote retrieval at host " + hostAlias);
+
+        String endpoint = endpoints.getProperty(hostAlias);
+
+        try {
+            // Build webservice call
+            Call call = (Call) (service.createCall());
+            call.setTargetEndpointAddress(new URL(endpoint));
+            call.setOperation(operation);
+            call.setOperationName("MCRDoRetrieveObject");
+
+            // Call webservice
+            org.w3c.dom.Document outDoc = (org.w3c.dom.Document) (call.invoke(new Object[] { ID }));
+            LOGGER.info("Received remote Object: " + ID);
+            
+            return outDoc;
+        } catch (Exception ex) {
+            String msg = "Exception while retrieving Object '" + ID + "' from remote host " + hostAlias;
+            LOGGER.error(msg, ex);
+        }
+        return null;
+    }
 }

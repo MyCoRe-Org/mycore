@@ -54,25 +54,25 @@ public abstract class MCRAudioVideoExtender {
     public final static boolean AUDIO = false;
 
     /** The bitrate of the asset in number of bits per second */
-    protected int bitRate;
+    protected int bitRate = 0;
 
     /** The framerate of the asset in number of frames per second */
-    protected double frameRate;
+    protected double frameRate = 0;
 
     /** The media type of the asset, either AUDIO or VIDEO */
-    protected boolean mediaType;
+    protected boolean mediaType = VIDEO;
 
     /** The hours part of the duration of the asset */
-    protected int durationHours;
+    protected int durationHours = 0;
 
     /** The minutes part of the duration of the asset */
-    protected int durationMinutes;
+    protected int durationMinutes = 0;
 
     /** The seconds part of the duration of the asset */
-    protected int durationSeconds;
+    protected int durationSeconds = 0;
 
     /** The size of the asset in bytes */
-    protected long size;
+    protected long size = 0;
 
     /** The content type of the asset */
     protected String contentTypeID = "unknown";
@@ -81,13 +81,13 @@ public abstract class MCRAudioVideoExtender {
     protected String playerDownloadURL = "";
 
     /** The MIME type a servlet has to send with the player starter */
-    protected String playerStarterCT;
+    protected String playerStarterCT = "";
 
     /** The base URL where to get a metafile that starts a player in browser */
-    protected String basePlayerStarter;
+    protected String basePlayerStarter = "";
 
     /** The base URL of a cgi that provides technical metadata about the asset */
-    protected String baseMetadata;
+    protected String baseMetadata = "";
 
     /** The asset file this extender belongs to */
     protected MCRFileReader file;

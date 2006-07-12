@@ -23,9 +23,6 @@
 
 package org.mycore.datamodel.ifs;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.text.DateFormat;
@@ -36,6 +33,7 @@ import java.util.Random;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
+import org.mycore.common.MCRUtils;
 
 /**
  * Stores the content of MCRFiles in a persistent datastore. This can be a
@@ -165,20 +163,11 @@ public abstract class MCRContentStore {
      *            the MCRFile thats content should be retrieved
      * @param target
      *            the OutputStream to write the file content to
+     * @deprecated
+     *        use doRetrieveContent(MCRFileReader file) instead
      */
     public void retrieveContent(MCRFileReader file, OutputStream target) throws MCRException {
-        try {
-            doRetrieveContent(file, target);
-        } catch (Exception exc) {
-            if (!(exc instanceof MCRException)) {
-                StringBuffer msg = new StringBuffer();
-                msg.append("Could not retrieve content of file with storage ID [");
-                msg.append(file.getStorageID()).append("] in store [");
-                msg.append(storeID).append("]");
-                throw new MCRPersistenceException(msg.toString(), exc);
-            }
-            throw (MCRException) exc;
-        }
+        MCRUtils.copyStream(retrieveContent(file), target);
     }
 
     /**
@@ -190,26 +179,41 @@ public abstract class MCRContentStore {
      *            the MCRFile thats content should be retrieved
      * @param target
      *            the OutputStream to write the file content to
+     * @deprecated
+     *        use doRetrieveContent(MCRFileReader file) instead
      */
     protected abstract void doRetrieveContent(MCRFileReader file, OutputStream target) throws Exception;
 
     /**
-     * Retrieves the content of an MCRFile as an InputStream. The default
-     * implementation buffers all bytes in memory to implement this
-     * functionality, so subclasses should overwrite this method to get better
-     * performance and less memory consumption.
+     * Retrieves the content of an MCRFile. Uses the
+     * StorageID to indentify the place where the file content was stored in
+     * this store instance.
+     * 
+     * @param file
+     *            the MCRFile thats content should be retrieved
+     * @since 1.3
+     */
+    protected abstract InputStream doRetrieveContent(MCRFileReader file) throws Exception;
+
+    /**
+     * Retrieves the content of an MCRFile as an InputStream.
      * 
      * @param file
      *            the MCRFile thats content should be retrieved
      */
-    public InputStream retrieveContent(MCRFileReader file) throws MCRException, IOException {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        retrieveContent(file, baos);
-        baos.close();
-
-        byte[] content = baos.toByteArray();
-
-        return new ByteArrayInputStream(content);
+    public InputStream retrieveContent(MCRFileReader file) throws MCRException {
+        try {
+            return doRetrieveContent(file);
+        } catch (Exception exc) {
+            if (!(exc instanceof MCRException)) {
+                StringBuffer msg = new StringBuffer();
+                msg.append("Could not retrieve content of file with storage ID [");
+                msg.append(file.getStorageID()).append("] in store [");
+                msg.append(storeID).append("]");
+                throw new MCRPersistenceException(msg.toString(), exc);
+            }
+            throw (MCRException) exc;
+        }
     }
 
     /** DateFormat used to construct new unique IDs based on timecode */

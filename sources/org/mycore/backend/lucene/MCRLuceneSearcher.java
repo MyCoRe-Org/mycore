@@ -20,7 +20,7 @@
  * If not, write to the Free Software Foundation Inc.,
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
  */
- 
+
 package org.mycore.backend.lucene;
 
 import java.io.BufferedReader;
@@ -28,27 +28,29 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
-import java.util.List;
 import java.util.Iterator;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.PerFieldAnalyzerWrapper;
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.analysis.de.GermanAnalyzer;
+import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
-import org.apache.lucene.index.IndexReader;
-import org.apache.lucene.index.IndexWriter;
+import org.apache.lucene.index.IndexModifier;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.Hits;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
+
 import org.mycore.common.MCRConfiguration;
+import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRNormalizer;
+import org.mycore.common.events.MCRShutdownHandler;
 import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.parsers.bool.MCRCondition;
 import org.mycore.services.fieldquery.MCRFieldDef;
@@ -63,14 +65,13 @@ import org.mycore.services.plugins.TextFilterPluginManager;
  * This class builds indexes from mycore meta data.
  * 
  * @author Harald Richter
+ * @author Thomas Scheffler (yagee)
  */
 public class MCRLuceneSearcher extends MCRSearcher {
     /** The logger */
     private final static Logger LOGGER = Logger.getLogger(MCRLuceneSearcher.class);
 
     String IndexDir = "";
-
-    boolean FIRST = true;
 
     static String LOCK_DIR = "";
 
@@ -84,6 +85,8 @@ public class MCRLuceneSearcher extends MCRSearcher {
 
     static Analyzer analyzer = new PerFieldAnalyzerWrapper(new GermanAnalyzer());
 
+    private IndexModifierThread indexer;
+
     public void init(String ID) {
         super.init(ID);
 
@@ -95,11 +98,11 @@ public class MCRLuceneSearcher extends MCRSearcher {
             f.mkdirs();
         if (!f.isDirectory()) {
             String msg = IndexDir + " is not a directory!";
-            throw new org.mycore.common.MCRConfigurationException(msg);
+            throw new MCRConfigurationException(msg);
         }
         if (!f.canWrite()) {
             String msg = IndexDir + " is not writeable!";
-            throw new org.mycore.common.MCRConfigurationException(msg);
+            throw new MCRConfigurationException(msg);
         }
 
         LOCK_DIR = config.getString("MCR.Lucene.LockDir");
@@ -109,33 +112,24 @@ public class MCRLuceneSearcher extends MCRSearcher {
             f.mkdirs();
         if (!f.isDirectory()) {
             String msg = LOCK_DIR + " is not a directory!";
-            throw new org.mycore.common.MCRConfigurationException(msg);
+            throw new MCRConfigurationException(msg);
         }
         if (!f.canWrite()) {
             String msg = LOCK_DIR + " is not writeable!";
-            throw new org.mycore.common.MCRConfigurationException(msg);
+            throw new MCRConfigurationException(msg);
         }
 
         System.setProperty("org.apache.lucene.lockDir", LOCK_DIR);
         deleteLuceneLocks(LOCK_DIR, 0);
 
         try {
-            IndexWriter writer = getLuceneWriter(IndexDir, FIRST);
-            FIRST = false;
-            writer.close();
-        } catch (IOException e) {
-            LOGGER.error(e.getClass().getName() + ": " + e.getMessage());
-            LOGGER.error(MCRException.getStackTraceAsString(e));
+            indexer = new IndexModifierThread(IndexDir);
+            indexer.setName("indexModifier:"+ID);
         } catch (Exception e) {
-            LOGGER.error(e.getClass().getName() + ": " + e.getMessage());
-            LOGGER.error(MCRException.getStackTraceAsString(e));
+            throw new MCRException("Cannot start IndexModifier thread.", e);
         }
-
-        StandardAnalyzer standardAnalyzer = new StandardAnalyzer(); // should
-                                                                    // work like
-                                                                    // GermanAnalyzer
-                                                                    // without
-                                                                    // stemming
+        // should work like GermanAnalyzer without stemming
+        StandardAnalyzer standardAnalyzer = new StandardAnalyzer();
         List fds = MCRFieldDef.getFieldDefs(getIndex());
         for (int i = 0; i < fds.size(); i++) {
             MCRFieldDef fd = (MCRFieldDef) (fds.get(i));
@@ -143,7 +137,7 @@ public class MCRLuceneSearcher extends MCRSearcher {
                 ((PerFieldAnalyzerWrapper) analyzer).addAnalyzer(fd.getName(), standardAnalyzer);
             }
         }
-
+        indexer.start();
     }
 
     private static void deleteLuceneLocks(String lockDir, long age) {
@@ -156,11 +150,8 @@ public class MCRLuceneSearcher extends MCRSearcher {
             if (!f[i].isDirectory()) {
                 String n = f[i].getName().toLowerCase();
                 if (n.startsWith("lucene") && n.endsWith(".lock")) {
-                    long l = (cal.getTimeInMillis() - f[i].lastModified()) / 1000; // age
-                                                                                    // of
-                                                                                    // file
-                                                                                    // in
-                                                                                    // seconds
+                    // age of file in seconds
+                    long l = (cal.getTimeInMillis() - f[i].lastModified()) / 1000;
                     if (l > age) {
                         LOGGER.info("Delete lucene lock file " + f[i].getAbsolutePath() + " Age " + l);
                         f[i].delete();
@@ -168,6 +159,129 @@ public class MCRLuceneSearcher extends MCRSearcher {
                 }
             }
         }
+    }
+
+    public static String handleNumber(String content, String type, long add) {
+        int before, after;
+        int dez;
+        long l;
+        if ("decimal".equals(type)) {
+            before = DEC_BEFORE;
+            after = DEC_AFTER;
+            dez = before + after;
+            double d = Double.parseDouble(content);
+            d = d * Math.pow(10, after) + Math.pow(10, dez);
+            l = (long) d;
+        } else {
+            before = INT_BEFORE;
+            dez = before;
+            l = Long.parseLong(content);
+            l = l + (long) (Math.pow(10, dez) + 0.1);
+        }
+
+        long m = l + add;
+        String n = "0000000000000000000";
+        String h = Long.toString(m);
+        return n.substring(0, dez + 1 - h.length()) + h;
+    }
+
+    protected void removeFromIndex(String entryID) {
+        LOGGER.info("MCRLuceneSearcher removing indexed data of " + entryID);
+
+        try {
+            deleteLuceneDocument("mcrid", entryID);
+        } catch (Exception e) {
+            LOGGER.warn(e.getMessage());
+        }
+    }
+
+    /**
+     * Delete all documents in Lucene with id
+     * 
+     * @param fieldname
+     *            string name of lucene field with stored id
+     * @param id
+     *            string document id
+     * @param indexDir *
+     *            the directory where index is stored
+     * 
+     */
+    public void deleteLuceneDocument(String fieldname, String id) throws Exception {
+        Term deleteTerm = new Term(fieldname, id);
+        QueueElement qe = QueueElement.removeAction(deleteTerm);
+        addQueueElement(qe);
+    }
+
+    public MCRResults search(MCRCondition condition, int maxResults, List sortBy, boolean addSortData) {
+        MCRResults results = new MCRResults();
+
+        try {
+            List f = new ArrayList();
+            f.add(condition.toXML());
+
+            boolean reqf = true;
+            // required flag Term with AND (true) or OR (false) combined
+            Query luceneQuery = MCRBuildLuceneQuery.buildLuceneQuery(null, reqf, f, analyzer);
+            LOGGER.debug("Lucene Query: " + luceneQuery.toString());
+            results = getLuceneHits(luceneQuery, maxResults, sortBy, addSortData);
+        } catch (Exception e) {
+            LOGGER.error("Exception in MCRLuceneSearcher", e);
+        }
+
+        return results;
+    }
+
+    /**
+     * method does lucene query
+     * 
+     * @return result set
+     */
+    private MCRResults getLuceneHits(Query luceneQuery, int maxResults, List sortBy, boolean addSortData) throws Exception {
+        if (maxResults <= 0)
+            maxResults = 1000000;
+
+        IndexSearcher searcher = null;
+        try {
+            searcher = new IndexSearcher(IndexDir);
+        } catch (IOException e) {
+            LOGGER.error(e.getClass().getName() + ": " + e.getMessage());
+            LOGGER.error(MCRException.getStackTraceAsString(e));
+            deleteLuceneLocks(LOCK_DIR, 100);
+        }
+
+        TopDocs hits = searcher.search(luceneQuery, null, maxResults);
+        int found = hits.scoreDocs.length;
+
+        LOGGER.info("Number of Objects found : " + found);
+
+        MCRResults result = new MCRResults();
+
+        for (int i = 0; i < found; i++) {
+            // org.apache.lucene.document.Document doc = hits.doc(i);
+            org.apache.lucene.document.Document doc = searcher.doc(hits.scoreDocs[i].doc);
+
+            String id = doc.get("returnid");
+            MCRHit hit = new MCRHit(id);
+
+            for (int j = 0; j < sortBy.size(); j++) {
+                MCRSortBy sb = (MCRSortBy) sortBy.get(j);
+                MCRFieldDef fds = sb.getField();
+                if (null != fds) {
+                    String field = fds.getName();
+                    String value = doc.get(field);
+                    if (null != value) {
+                        MCRFieldDef fd = MCRFieldDef.getDef(field);
+                        MCRFieldValue fv = new MCRFieldValue(fd, value);
+                        hit.addSortData(fv);
+                    }
+                }
+            }
+            result.addHit(hit);
+        }
+
+        searcher.close();
+
+        return result;
     }
 
     protected void addToIndex(String entryID, String returnID, List fields) {
@@ -182,12 +296,27 @@ public class MCRLuceneSearcher extends MCRSearcher {
             doc.add(new Field("mcrid", entryID, Field.Store.YES, Field.Index.UN_TOKENIZED));
             doc.add(new Field("returnid", returnID, Field.Store.YES, Field.Index.UN_TOKENIZED));
             LOGGER.debug("lucene document build " + entryID);
-            addDocumentToLucene(doc, analyzer, IndexDir, FIRST);
-            FIRST = false;
+            addDocumentToLucene(doc, analyzer);
         } catch (Exception e) {
             LOGGER.error(e.getClass().getName() + ": " + e.getMessage());
             LOGGER.error(MCRException.getStackTraceAsString(e));
         }
+    }
+
+    /**
+     * Adds document to Lucene
+     * 
+     * @param doc
+     *            lucene document to add to index
+     * 
+     */
+    private void addDocumentToLucene(Document doc, Analyzer analyzer) throws Exception {
+        QueueElement qe = QueueElement.addAction(doc, analyzer);
+        addQueueElement(qe);
+    }
+
+    private void addQueueElement(QueueElement qe) {
+        indexer.queue.offer(qe);
     }
 
     /**
@@ -257,249 +386,326 @@ public class MCRLuceneSearcher extends MCRSearcher {
         return doc;
     }
 
-    public static String handleNumber(String content, String type, long add) {
-        int before, after;
-        int dez;
-        long l;
-        if ("decimal".equals(type)) {
-            before = DEC_BEFORE;
-            after = DEC_AFTER;
-            dez = before + after;
-            double d = Double.parseDouble(content);
-            d = d * Math.pow(10, after) + Math.pow(10, dez);
-            l = (long) d;
-        } else {
-            before = INT_BEFORE;
-            dez = before;
-            l = Long.parseLong(content);
-            l = l + (long) (Math.pow(10, dez) + 0.1);
-        }
+    public void addSortData(Iterator hits, List sortBy) {
+        try {
+            IndexSearcher searcher = new IndexSearcher(IndexDir);
 
-        long m = l + add;
-        String n = "0000000000000000000";
-        String h = Long.toString(m);
-        return n.substring(0, dez + 1 - h.length()) + h;
-    }
+            if (null == searcher) {
+                return;
+            }
 
-    /**
-     * Adds document to Lucene
-     * 
-     * @param doc
-     *            lucene document to add to index
-     * 
-     */
-    private static synchronized void addDocumentToLucene(Document doc, Analyzer analyzer, String indexDir, boolean first) throws Exception {
-        IndexWriter writer = getLuceneWriter(indexDir, first);
-        writer.addDocument(doc, analyzer);
-        writer.close();
-    }
+            while (hits.hasNext()) {
+                MCRHit hit = (MCRHit) hits.next();
+                String id = hit.getID();
+                Term te1 = new Term("mcrid", id);
 
-    /**
-     * Get Lucene Writer
-     * 
-     * @param indexDir
-     *            directory where lucene index is store first check existance of
-     *            index directory, if it does nor exist create it
-     * 
-     * @return the lucene writer, calling programm must close writer
-     */
-    public static IndexWriter getLuceneWriter(String indexDir, boolean first) throws Exception {
-        IndexWriter writer;
-        Analyzer analyzer = new GermanAnalyzer();
+                TermQuery qu = new TermQuery(te1);
 
-        // does directory for text index exist, if not build it
-        if (first) {
-            File file = new File(indexDir);
-
-            if (!file.exists()) {
-                LOGGER.info("The Directory doesn't exist: " + indexDir + " try to build it");
-
-                IndexWriter writer2 = new IndexWriter(indexDir, analyzer, true);
-                writer2.close();
-            } else if (file.isDirectory()) {
-                if (0 == file.list().length) {
-                    LOGGER.info("No Entries in Directory, initialize: " + indexDir);
-
-                    IndexWriter writer2 = new IndexWriter(indexDir, analyzer, true);
-                    writer2.close();
+                Hits hitl = searcher.search(qu);
+                if (hitl.length() > 0) {
+                    org.apache.lucene.document.Document doc = hitl.doc(0);
+                    for (int j = 0; j < sortBy.size(); j++) {
+                        MCRFieldDef fd = (MCRFieldDef) sortBy.get(j);
+                        String value = doc.get(fd.getName());
+                        if (null != value) {
+                            MCRFieldValue fv = new MCRFieldValue(fd, value);
+                            hit.addSortData(fv);
+                        }
+                    }
                 }
             }
-        } // if ( first
 
-        writer = new IndexWriter(indexDir, analyzer, false);
-        // writer.mergeFactor = 200;
-        writer.setMergeFactor(200);
-        // writer.maxMergeDocs = 2000;
-        writer.setMaxMergeDocs(2000);
-
-        return writer;
-    }
-
-    protected void removeFromIndex(String entryID) {
-        LOGGER.info("MCRLuceneSearcher removing indexed data of " + entryID);
-
-        try {
-            deleteLuceneDocument("mcrid", entryID, IndexDir);
-        } catch (Exception e) {
-            LOGGER.warn(e.getMessage());
-        }
-    }
-
-    /**
-     * Delete all documents in Lucene with id
-     * 
-     * @param fieldname
-     *            string name of lucene field with stored id
-     * @param id
-     *            string document id
-     * @param indexDir *
-     *            the directory where index is stored
-     * 
-     */
-    public static synchronized void deleteLuceneDocument(String fieldname, String id, String indexDir) throws Exception {
-        IndexSearcher searcher = new IndexSearcher(indexDir);
-
-        if (null == searcher) {
-            return;
-        }
-
-        Term te1 = new Term(fieldname, id);
-
-        TermQuery qu = new TermQuery(te1);
-
-        LOGGER.info("Searching for: " + qu.toString(""));
-
-        Hits hits = searcher.search(qu);
-
-        LOGGER.info("Number of documents found : " + hits.length());
-
-        if (hits.length() > 0) {
-            IndexReader reader = IndexReader.open(indexDir);
-            for (int i = 0; i < hits.length(); i++) {
-                // reader.delete(hits.id(i));
-                reader.deleteDocument(hits.id(i));
-            }
-            LOGGER.info("DELETE: " + id);
-            reader.close();
-        }
-
-        searcher.close();
-    }
-
-    public MCRResults search(MCRCondition condition, int maxResults, List sortBy, boolean addSortData) {
-        MCRResults results = new MCRResults();
-
-        try {
-            List f = new ArrayList();
-            f.add(condition.toXML());
-
-            boolean reqf = true;
-            // required flag Term with AND (true) or OR (false) combined
-            Query luceneQuery = MCRBuildLuceneQuery.buildLuceneQuery(null, reqf, f, analyzer);
-            LOGGER.debug("Lucene Query: " + luceneQuery.toString());
-            results = getLuceneHits(luceneQuery, maxResults, sortBy, addSortData);
-        } catch (Exception e) {
-            LOGGER.error("Exception in MCRLuceneSearcher", e);
-        }
-
-        return results;
-    }
-
-    /**
-     * method does lucene query
-     * 
-     * @return result set
-     */
-    private MCRResults getLuceneHits(Query luceneQuery, int maxResults, List sortBy, boolean addSortData) throws Exception {
-        if (maxResults <= 0)
-            maxResults = 1000000;
-
-        IndexSearcher searcher = null;
-        try {
-            searcher = new IndexSearcher(IndexDir);
+            searcher.close();
         } catch (IOException e) {
-            LOGGER.error(e.getClass().getName() + ": " + e.getMessage());
-            LOGGER.error(MCRException.getStackTraceAsString(e));
-            deleteLuceneLocks(LOCK_DIR, 100);
+            LOGGER.error("Exception in MCRLuceneSearcher (addSortData)", e);
         }
-
-        TopDocs hits = searcher.search(luceneQuery, null, maxResults);
-        int found = hits.scoreDocs.length;
-
-        LOGGER.info("Number of Objects found : " + found);
-
-        MCRResults result = new MCRResults();
-
-        for (int i = 0; i < found; i++) {
-            // org.apache.lucene.document.Document doc = hits.doc(i);
-            org.apache.lucene.document.Document doc = searcher.doc(hits.scoreDocs[i].doc);
-
-            String id = doc.get("returnid");
-            MCRHit hit = new MCRHit(id);
-            
-            for (int j=0; j<sortBy.size(); j++)
-            {
-              MCRSortBy sb = (MCRSortBy)sortBy.get(j);
-              MCRFieldDef fds = sb.getField();
-              if ( null != fds)
-              {
-                String field =  fds.getName();
-                String value = doc.get(field);
-                if ( null != value)
-                {
-                  MCRFieldDef fd   = MCRFieldDef.getDef(field);
-                  MCRFieldValue fv = new MCRFieldValue(fd, value);
-                  hit.addSortData(fv);
-                }
-              }
-            }
-            result.addHit(hit);
-        }
-
-        searcher.close();
-
-        return result;
     }
-    
-    public void addSortData(Iterator hits, List sortBy)
-    {
-      try
-      {
-        IndexSearcher searcher = new IndexSearcher(IndexDir);
 
-        if (null == searcher) {
-            return;
+    /**
+     * a single thread for every <code>indexDir</code> that performs all write
+     * operations.
+     * 
+     * @author Thomas Scheffler (yagee)
+     */
+    private static class IndexModifierThread extends Thread implements MCRShutdownHandler.Closeable, Queue.Listener {
+        private Queue queue;
+
+        private boolean running;
+
+        private IndexModifier indexModifier;
+
+        private String indexDir;
+
+        public IndexModifierThread(String indexDir) throws Exception {
+            queue = new Queue();
+            this.running = true;
+            this.indexDir = indexDir;
+            indexModifier = getLuceneModifier(indexDir, true);
+            MCRShutdownHandler.getInstance().addCloseable(this);
         }
 
-        while(hits.hasNext())
-        {
-          MCRHit hit = (MCRHit)hits.next();
-          String id = hit.getID();
-          Term te1 = new Term("mcrid", id);
-          
-          TermQuery qu = new TermQuery(te1);
-          
-          Hits hitl = searcher.search(qu);
-          if (hitl.length() > 0)
-          {
-            org.apache.lucene.document.Document doc = hitl.doc(0);
-            for (int j=0; j<sortBy.size(); j++)
-            {
-              MCRFieldDef fd = (MCRFieldDef)sortBy.get(j);
-              String value = doc.get(fd.getName());
-              if ( null != value)
-              {
-                MCRFieldValue fv = new MCRFieldValue(fd, value);
-                hit.addSortData(fv);
-              }
+        public void close() {
+            LOGGER.debug("close()");
+            running = false;
+            interrupt();
+        }
+
+        public void run() {
+            LOGGER.debug("IndexModifierThread started");
+            while (running) {
+                QueueElement qe;
+                try {
+                    qe = queue.poll(this);
+                } catch (InterruptedException e1) {
+                    if (running) {
+                        LOGGER.warn("Catched InterruptException.", e1);
+                    }
+                    continue;
+                }
+                if (qe.delete) {
+                    try {
+                        deleteDocument(qe);
+                    } catch (IOException e) {
+                        LOGGER.error("Error while writing Lucene Document: " + qe.doc.toString(), e);
+                    }
+                } else {
+                    try {
+                        addDocument(qe);
+                    } catch (IOException e) {
+                        LOGGER.error("Error while writing Lucene Document: " + qe.doc.toString(), e);
+                    }
+                }
             }
-          }
+            closeIndexModifier();
+            MCRShutdownHandler.getInstance().removeCloseable(this);
+            LOGGER.debug("IndexModifierThread stopped");
         }
+
+        private void addDocument(QueueElement qe) throws IOException {
+            LOGGER.debug("add Dcoument:" + qe.toString());
+            indexModifier.addDocument(qe.doc, qe.analyzer);
+        }
+
+        private void deleteDocument(QueueElement qe) throws IOException {
+            LOGGER.debug("delete Dcoument:" + qe.toString());
+            indexModifier.deleteDocuments(qe.deleteTerm);
+        }
+
+        /**
+         * Get LuceneModifier
+         * 
+         * @param indexDir
+         *            directory where lucene index is store first check
+         *            existance of index directory, if it does nor exist create
+         *            it
+         * 
+         * @return the lucene modifier, calling programm must close modifier
+         */
+        private IndexModifier getLuceneModifier(String indexDir, boolean first) throws Exception {
+            IndexModifier modifier;
+            Analyzer analyzer = new GermanAnalyzer();
+
+            // does directory for text index exist, if not build it
+            if (first) {
+                File file = new File(indexDir);
+
+                if (!file.exists()) {
+                    LOGGER.info("The Directory doesn't exist: " + indexDir + " try to build it");
+
+                    IndexModifier modifier2 = new IndexModifier(indexDir, analyzer, true);
+                    modifier2.close();
+                } else if (file.isDirectory()) {
+                    if (0 == file.list().length) {
+                        LOGGER.info("No Entries in Directory, initialize: " + indexDir);
+
+                        IndexModifier modifier2 = new IndexModifier(indexDir, analyzer, true);
+                        modifier2.close();
+                    }
+                }
+            } // if ( first
+
+            modifier = new IndexModifier(indexDir, analyzer, false);
+            modifier.setMergeFactor(200);
+            modifier.setMaxBufferedDocs(2000);
+
+            return modifier;
+        }
+
+        public void doWait() {
+            closeIndexModifier();
+        }
+
+        private void closeIndexModifier() {
+            try {
+                LOGGER.debug("Writing Lucene index changes to disk.");
+                indexModifier.close();
+            } catch (IOException e) {
+                LOGGER.warn("Error while closing IndexModifier.", e);
+            } catch (IllegalStateException e) {
+                LOGGER.debug("IndexModifier was allready closed.");
+            }
+        }
+
+        public void doWakeUp() {
+            try {
+                LOGGER.debug("Opening Lucene index for writing.");
+                indexModifier = getLuceneModifier(indexDir, false);
+            } catch (Exception e) {
+                LOGGER.warn("Error while reopening IndexModifier.", e);
+            }
+        }
+    }
+
+    /**
+     * a thread safe implementation of a queue.
+     * 
+     * TODO: should be replaced by java.util.concurrent.ConcurrentLinkedQueue<E>
+     * if we switch to J2SE > 5
+     * 
+     * @author Thomas Scheffler (yagee)
+     */
+    private static class Queue {
+        private static interface Listener {
+            /**
+             * is called when last object is aquired of queue.
+             */
+            public void doWait();
         
-        searcher.close();
-      } catch (IOException e)
-      {
-        LOGGER.error("Exception in MCRLuceneSearcher (addSortData)", e);
-      }
+            /**
+             * is called before first object is aquired of queue.
+             */
+            public void doWakeUp();
+        }
+
+        private QueueElement head_;
+
+        private QueueElement last_;
+
+        private final Object lock_ = new Object();
+
+        /**
+         * the number of threads waiting for a poll
+         */
+        private int waitingForPoll_ = 0;
+
+        // LinkedList list;
+        public Queue() {
+            head_ = new QueueElement();
+            last_ = head_;
+        }
+
+        public QueueElement poll(Queue.Listener ql) throws InterruptedException {
+            boolean listen = (ql != null) ? true : false;
+            QueueElement qe = extract();
+            if (qe != null) {
+                LOGGER.debug("poll returns in 1st attempt");
+                return qe;
+            } else {
+                // we wait until the next element arrives
+                synchronized (lock_) {
+                    try {
+                        ++waitingForPoll_;
+                        boolean waits = false; // state of QueueListener
+                        while (true) {
+                            // check for new element
+                            qe = extract();
+                            if (qe != null) {
+                                --waitingForPoll_;
+                                LOGGER.debug("poll returns in nth attempt.");
+                                if (listen && waits) {
+                                    ql.doWakeUp();
+                                }
+                                return qe;
+                            } else {
+                                LOGGER.debug("poll waits");
+                                if (listen && !waits) {
+                                    waits = true;
+                                    ql.doWait();
+                                }
+                                lock_.wait();// wait
+                            }
+                        }
+                    } catch (InterruptedException ex) {
+                        --waitingForPoll_;
+                        lock_.notify();
+                        throw ex;
+                    }
+                }
+            }
+        }
+
+        private synchronized QueueElement extract() {
+            synchronized (head_) {
+                QueueElement o = null;
+                QueueElement first = head_.next;
+                if (first != null) {
+                    o = first;
+                    // delete reference for the gc
+                    head_.next = null;
+                    head_ = first;
+                }
+                LOGGER.debug("extract: " + o);
+                return o;
+            }
+        }
+
+        public boolean offer(QueueElement o) {
+            synchronized (lock_) {
+                synchronized (last_) {
+                    last_.next = o;
+                    last_ = o;
+                    LOGGER.debug("offer QE: " + o.toString());
+                }
+                if (waitingForPoll_ > 0) {
+                    lock_.notify();
+                }
+            }
+            return true;
+        }
+    }
+
+    /**
+     * holds info on what to do with the lucene index.
+     * 
+     * currently this include adding and deleting lucene documents.
+     * 
+     * @author Thomas Scheffler (yagee)
+     */
+    private static class QueueElement {
+        private Document doc;
+
+        private Analyzer analyzer;
+
+        private boolean delete = false;
+
+        private Term deleteTerm;
+
+        // internal Queue structure
+        private QueueElement next;
+
+        private QueueElement() {
+        }
+
+        public static QueueElement addAction(Document doc, Analyzer analyzer) {
+            QueueElement e = new QueueElement();
+            e.doc = doc;
+            e.analyzer = analyzer;
+            return e;
+        }
+
+        public static QueueElement removeAction(Term deleteTerm) {
+            QueueElement e = new QueueElement();
+            e.delete = true;
+            e.deleteTerm = deleteTerm;
+            return e;
+        }
+
+        public String toString() {
+            if (doc != null)
+                return doc.toString();
+            if (deleteTerm != null)
+                return deleteTerm.toString();
+            return "empty QueueElement";
+        }
     }
 }

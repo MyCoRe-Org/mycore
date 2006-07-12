@@ -59,11 +59,19 @@ public class MCRTranslation {
      * @return translated String
      */
     public static String translate(String label) {
+    	String result;
         Locale currentLocale = getCurrentLocale();
         LOGGER.debug("Translation for current locale: " + currentLocale.getLanguage());
         ResourceBundle message = ResourceBundle.getBundle("/messages", currentLocale);
-        String result = message.getString(label);
-        LOGGER.debug("Translation for " + label + "=" + result);
+        
+        try { 
+        	result = message.getString(label);
+            LOGGER.debug("Translation for " + label + "=" + result);
+        } catch (java.util.MissingResourceException mre) {
+        	result = "???" + label + "???";
+        	LOGGER.debug(mre.getMessage());	
+        }
+         
         return result;
     }
 

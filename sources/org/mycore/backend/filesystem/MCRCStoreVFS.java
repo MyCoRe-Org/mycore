@@ -23,8 +23,6 @@
 
 package org.mycore.backend.filesystem;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 
@@ -35,6 +33,7 @@ import org.apache.commons.vfs.FileSystemManager;
 import org.apache.commons.vfs.FileSystemOptions;
 import org.apache.commons.vfs.VFS;
 import org.apache.commons.vfs.provider.sftp.SftpFileSystemConfigBuilder;
+
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRException;
@@ -91,7 +90,7 @@ public class MCRCStoreVFS extends MCRContentStore {
 
         FileObject targetObject = fsManager.resolveFile(getBase(), storageId.toString());
         FileContent targetContent = targetObject.getContent();
-        OutputStream out = new BufferedOutputStream(targetContent.getOutputStream());
+        OutputStream out = targetContent.getOutputStream();
         MCRUtils.copyStream(source, out);
         out.close();
 
@@ -117,16 +116,13 @@ public class MCRCStoreVFS extends MCRContentStore {
     }
 
     protected void doRetrieveContent(MCRFileReader file, OutputStream target) throws Exception {
-        FileObject targetObject = fsManager.resolveFile(getBase(), file.getStorageID());
-        FileContent targetContent = targetObject.getContent();
-        InputStream in = new BufferedInputStream(targetContent.getInputStream());
-        MCRUtils.copyStream(in, target);
+        MCRUtils.copyStream(doRetrieveContent(file), target);
     }
 
     protected InputStream doRetrieveContent(MCRFileReader file) throws Exception {
         FileObject targetObject = fsManager.resolveFile(getBase(), file.getStorageID());
         FileContent targetContent = targetObject.getContent();
-        return new BufferedInputStream(targetContent.getInputStream());
+        return targetContent.getInputStream();
     }
 
     protected FileObject getBase() throws FileSystemException {

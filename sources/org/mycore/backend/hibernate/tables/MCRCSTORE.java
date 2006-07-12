@@ -23,7 +23,9 @@
 
 package org.mycore.backend.hibernate.tables;
 
+import java.io.InputStream;
 import java.sql.Blob;
+import java.sql.SQLException;
 
 public class MCRCSTORE {
     private int storageid;
@@ -52,6 +54,10 @@ public class MCRCSTORE {
 
     public byte[] getContentBytes() {
         return MCRBlob.getBytes(content);
+    }
+
+    public InputStream getInputStream() throws SQLException {
+        return content.getBinaryStream();
     }
 
     public void setContent(Blob content) {

@@ -366,6 +366,14 @@ public abstract class MCRFilesystemNode {
             dataFile = new MCRFile(name, this.ID);
         dataFile.setContentFrom(data);
     }
+    
+    public void removeAdditionalData(Document data) {
+        String name = data.getRootElement().getName() + ".mcrdata";
+        MCRFile dataFile = MCRFile.getRootFile(this.ID);
+        
+        if (dataFile != null)
+            dataFile.delete();
+    }
 
     /**
      * Gets additional XML data stored for this node, if any.

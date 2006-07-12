@@ -30,6 +30,7 @@ import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.util.StringTokenizer;
 
+import org.apache.log4j.Logger;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.datamodel.ifs.MCRAudioVideoExtender;
@@ -53,6 +54,9 @@ import org.mycore.datamodel.ifs.MCRFileReader;
  * @version $Revision$ $Date$
  */
 public class MCRAVExtVideoCharger extends MCRAudioVideoExtender {
+    /** The logger */
+    private final static Logger LOGGER = Logger.getLogger( MCRAVExtVideoCharger.class );
+
     protected static MCRConfiguration CONFIG;
 
     public MCRAVExtVideoCharger() {
@@ -82,13 +86,13 @@ public class MCRAVExtVideoCharger extends MCRAudioVideoExtender {
             throw new MCRPersistenceException("MCR.request_charencoding property does not contain a valid encoding:", e);
         }
 
-        String data1 = getMetadata(baseMetadata + "?" + assetID);
-        String data2 = getMetadata(basePlayerStarter + "?VIDEOID=" + assetID);
-
-        URLConnection con = getConnection(basePlayerStarter + "?VIDEOID=" + assetID);
-        playerStarterCT = con.getContentType();
-
         try {
+            String data1 = getMetadata(baseMetadata + "?" + assetID);
+            String data2 = getMetadata(basePlayerStarter + "?VIDEOID=" + assetID);
+
+            URLConnection con = getConnection(basePlayerStarter + "?VIDEOID=" + assetID);
+            playerStarterCT = con.getContentType();
+
             String sSize = getBetween("filesize64=", "\n", data2, "0,0");
             String sBitRate = getBetween("bitRate=", "\n", data1, "0");
             String sFrameRate = getBetween("frameRate=", "\n", data1, "0");
@@ -128,7 +132,7 @@ public class MCRAVExtVideoCharger extends MCRAudioVideoExtender {
             }
         } catch (Exception exc) {
             String msg = "Error parsing metadata from VideoCharger asset " + file.getStorageID();
-            throw new MCRPersistenceException(msg, exc);
+            LOGGER.warn( msg, exc );
         }
     }
 

@@ -23,8 +23,11 @@
 
 package org.mycore.backend.videocharger;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.io.OutputStream;
 
 import org.apache.log4j.Logger;
@@ -119,6 +122,13 @@ public class MCRCStoreVideoCharger extends MCRContentStore {
 
     protected void doRetrieveContent(MCRFileReader file, OutputStream target) throws Exception {
         retrieveContent(file.getStorageID(), target);
+    }
+
+    protected InputStream doRetrieveContent(MCRFileReader file) throws Exception {
+        //FTPClient does not provide GET and InputStreams, we need to copy
+        ByteArrayOutputStream bout=new ByteArrayOutputStream();
+        doRetrieveContent(file, bout);
+        return new ByteArrayInputStream(bout.toByteArray());
     }
 
     protected void retrieveContent(String assetID, OutputStream target) throws Exception {
