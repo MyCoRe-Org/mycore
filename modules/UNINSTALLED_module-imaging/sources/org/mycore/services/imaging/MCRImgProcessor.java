@@ -111,9 +111,18 @@ public class MCRImgProcessor implements ImgProcessor {
 		else if (useEncoder == TIFF_ENC)
 			tiffEncode(image, output, true, tileWidth, tileHeight);
 	}
-
+	
 	public void scaleROI(InputStream input, int xTopPos, int yTopPos, int boundWidth, int boundHeight, float scaleFactor, OutputStream output) {
-		image = loadImage(input);
+		if (image == null)
+			image = loadImage(input);
+		
+		/*if (scaleFactor == 0)
+			try {
+				scaleFactor = (float)boundWidth / (float)getOrigSize().width;
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}*/
 		
 		Point scaleTopCorner = new Point((int) (xTopPos / scaleFactor), (int) (yTopPos / scaleFactor));
 		Dimension scaleBoundary = new Dimension((int) (boundWidth / scaleFactor), (int) (boundHeight / scaleFactor));
@@ -124,7 +133,7 @@ public class MCRImgProcessor implements ImgProcessor {
 		if (scaleBoundary.height > origSize.height)
 			scaleBoundary.height = origSize.height;
 			
-		if (scaleBoundary.width < origSize.width && scaleBoundary.height < origSize.height)
+		if (scaleBoundary.width < origSize.width * scaleFactor || scaleBoundary.height < origSize.height * scaleFactor)
 			image = crop(image, scaleTopCorner, scaleBoundary);
 		
 		if (scaleFactor != 1) {
