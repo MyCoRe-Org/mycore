@@ -104,9 +104,11 @@ public class MCRImgService {
 		scaleFactor = processor.getScaleFactor();
 	}
 	
+	// fitToWidth
 	public void getImage(MCRFile image, int xTopPos, int yTopPos, int boundWidth, int boundHeight, OutputStream output) throws IOException {
 		ImgProcessor processor = new MCRImgProcessor();
-
+		
+		float scaleHelp = 1;
 		LOGGER.debug("*********************************************");
 		LOGGER.debug("* Get image ROI fit width!!!!");
 		LOGGER.debug("*********************************************");
@@ -120,6 +122,7 @@ public class MCRImgService {
 			InputStream input = null;
 
 			
+			
 			int cacheWidth = Integer.parseInt(config.getString("MCR.Module-iview.cache.size.width"));
 			int cacheHeight = Integer.parseInt(config.getString("MCR.Module-iview.cache.size.height"));
 			
@@ -127,6 +130,9 @@ public class MCRImgService {
 				LOGGER.debug("*********************************************");
 				LOGGER.debug("* Get Cache from ImgCache for " + image.getName());
 				LOGGER.debug("*********************************************");
+				
+				int origW = cache.getImgWidth(image);
+				scaleHelp = (float)cacheWidth / (float)origW;
 				
 				input = cache.getImageAsInputStream(image, MCRImgCacheManager.CACHE);
 			} else if (cache.existInCache(image, MCRImgCacheManager.ORIG)) {
@@ -149,7 +155,7 @@ public class MCRImgService {
 			processor.scaleROI(image.getContentAsInputStream(), xTopPos, yTopPos, boundWidth, boundHeight, MCRImgProcessor.FIT_WIDTH, output);
 		}
 		
-		this.scaleFactor = processor.getScaleFactor();
+		this.scaleFactor = processor.getScaleFactor() * scaleHelp;
 	}
 	
 	public void getImage(MCRFile image, int xTopPos, int yTopPos, int boundWidth, int boundHeight, float scaleFactor, OutputStream output) throws IOException {
