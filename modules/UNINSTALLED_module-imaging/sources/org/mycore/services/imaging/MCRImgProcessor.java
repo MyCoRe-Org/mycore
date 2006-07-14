@@ -12,6 +12,9 @@ import javax.media.jai.InterpolationBicubic2;
 import javax.media.jai.JAI;
 import javax.media.jai.PlanarImage;
 
+import org.apache.log4j.Logger;
+import org.mycore.frontend.cli.MCRClassificationCommands;
+
 import com.sun.media.jai.codec.ImageCodec;
 import com.sun.media.jai.codec.ImageEncoder;
 import com.sun.media.jai.codec.JPEGEncodeParam;
@@ -19,6 +22,7 @@ import com.sun.media.jai.codec.MemoryCacheSeekableStream;
 import com.sun.media.jai.codec.TIFFEncodeParam;
 
 public class MCRImgProcessor implements ImgProcessor {
+	private static Logger LOGGER = Logger.getLogger(MCRClassificationCommands.class.getName());
 	private PlanarImage image = null;
 
 	protected float scaleFactor = 0;
@@ -30,12 +34,16 @@ public class MCRImgProcessor implements ImgProcessor {
 	private int tileWidth = 480;
 
 	private int tileHeight = 480;
-
-	public final int JPEG_ENC = 0;
-
-	public final int TIFF_ENC = 1;
-
+	
 	private int useEncoder = JPEG_ENC;
+
+	static public final int JPEG_ENC = 0;
+
+	static public final int TIFF_ENC = 1;
+	
+	static public final int FIT_WIDTH = 0;
+	
+	static public final int FIT_HEIGHT = 0;
 
 	MCRImgProcessor() {
 		origSize = new Dimension(0, 0);
@@ -112,17 +120,26 @@ public class MCRImgProcessor implements ImgProcessor {
 			tiffEncode(image, output, true, tileWidth, tileHeight);
 	}
 	
+	public void scaleROI(InputStream input, int xTopPos, int yTopPos, int boundWidth, int boundHeight, int fitDirection, OutputStream output) {
+		image = loadImage(input);
+		
+		if (fitDirection == FIT_WIDTH){
+			scaleFactor = (float)boundWidth / (float)origSize.width;
+		}
+		else{
+			scaleFactor = (float)boundHeight / (float)origSize.height;
+		}
+		
+		scaleROI(input, xTopPos, yTopPos, boundWidth, boundHeight, scaleFactor, output);
+	}
+	
 	public void scaleROI(InputStream input, int xTopPos, int yTopPos, int boundWidth, int boundHeight, float scaleFactor, OutputStream output) {
 		if (image == null)
 			image = loadImage(input);
 		
-		/*if (scaleFactor == 0)
-			try {
-				scaleFactor = (float)boundWidth / (float)getOrigSize().width;
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}*/
+		LOGGER.debug("********************************");
+		LOGGER.debug("* Loading Image succesfull!");
+		LOGGER.debug("********************************");
 		
 		Point scaleTopCorner = new Point((int) (xTopPos / scaleFactor), (int) (yTopPos / scaleFactor));
 		Dimension scaleBoundary = new Dimension((int) (boundWidth / scaleFactor), (int) (boundHeight / scaleFactor));
@@ -133,8 +150,9 @@ public class MCRImgProcessor implements ImgProcessor {
 		if (scaleBoundary.height > origSize.height)
 			scaleBoundary.height = origSize.height;
 			
-		if (scaleBoundary.width < origSize.width * scaleFactor || scaleBoundary.height < origSize.height * scaleFactor)
+		if (scaleBoundary.width < origSize.width || scaleBoundary.height < origSize.height)
 			image = crop(image, scaleTopCorner, scaleBoundary);
+		
 		
 		if (scaleFactor != 1) {
 			image = scaleImage(image, scaleFactor);

@@ -12,11 +12,15 @@
 package org.mycore.services.imaging;
 
 import java.awt.Dimension;
+import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
@@ -34,7 +38,7 @@ import org.mycore.frontend.cli.MCRClassificationCommands;
 import org.mycore.frontend.cli.MCRCommand;
 
 public class MCRImgCacheCommands extends MCRAbstractCommands {
-	private static Logger LOGGER = Logger.getLogger(MCRClassificationCommands.class.getName());
+	private static Logger LOGGER = Logger.getLogger(MCRImgCacheCommands.class.getName());
 
 	/**
 	 * The empty constructor.
@@ -46,13 +50,19 @@ public class MCRImgCacheCommands extends MCRAbstractCommands {
 		com = new MCRCommand("clear cache", "org.mycore.services.imaging.MCRImgCacheCommands.clearCache", "The command clear the Image cache.");
 		command.add(com);
 
-		com = new MCRCommand("create cache for derivate {0}", "org.mycore.services.imaging.MCRImgCacheCommands.cacheThumbDeriv String", "The command create Thumbnail for the given Derivate.");
+		com = new MCRCommand("create cache for derivate {0}", "org.mycore.services.imaging.MCRImgCacheCommands.cacheDeriv String", "The command create Thumbnail for the given Derivate.");
 		command.add(com);
 
 		com = new MCRCommand("remove cache for derivate {0}", "org.mycore.services.imaging.MCRImgCacheCommands.removeCachedDeriv String", "The command create Thumbnail for the given Derivate.");
 		command.add(com);
-		
+
 		com = new MCRCommand("test {0}", "org.mycore.services.imaging.MCRImgCacheCommands.test String", "Just testing.");
+		command.add(com);
+
+		com = new MCRCommand("testProz {0} {1} {2} {3} {4} {5} {6} {7}", 
+				"org.mycore.services.imaging.MCRImgCacheCommands.testProz String String String String String String String String", 
+				"testProz(cmd, inFile, outFile, xPos, yPos, width, height, scaleFactor)" + System.getProperty("line.separator") +
+				"cmd = {resizeFitWidth; resizeFitHeight; resize; scale; scaleROI");
 		command.add(com);
 
 		/*
@@ -111,7 +121,7 @@ public class MCRImgCacheCommands extends MCRAbstractCommands {
 		}
 	}
 
-	public static void cacheThumbDeriv(String ID) throws Exception {
+	public static void cacheDeriv(String ID) throws Exception {
 		List list = new Vector();
 		MCRDirectory derivate = null;
 		MCRConfiguration config = MCRConfiguration.instance();
@@ -149,10 +159,10 @@ public class MCRImgCacheCommands extends MCRAbstractCommands {
 					ByteArrayInputStream input = new ByteArrayInputStream(imgData.toByteArray());
 					cache.saveImage(image, cache.THUMB, input);
 					imgData.reset();
-					
+
 					imgSize = processor.getOrigSize();
 					cache.setImgSize(image, imgSize.width, imgSize.height);
-					
+
 					LOGGER.info("Image " + image.getName() + " cached successfull under the name " + cache.THUMB + " !");
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
@@ -201,8 +211,8 @@ public class MCRImgCacheCommands extends MCRAbstractCommands {
 
 		LOGGER.info("Caching supported images from derivate " + derivate.getName() + " finished successfull!");
 	}
-	
-	public static void test(String ID) throws IOException{
+
+	public static void test(String ID) throws IOException {
 		List list = new Vector();
 		MCRDirectory derivate = null;
 		MCRConfiguration config = MCRConfiguration.instance();
@@ -221,27 +231,106 @@ public class MCRImgCacheCommands extends MCRAbstractCommands {
 		MCRFile image = null;
 
 		Stopwatch timer = new Stopwatch();
-		
+
 		for (Iterator iter = list.iterator(); iter.hasNext();) {
 			image = (MCRFile) iter.next();
 			FileOutputStream out = new FileOutputStream("/home/chi/images/filestore/" + image.getName());
 			BufferedOutputStream buffOut = new BufferedOutputStream(out);
 			ByteArrayOutputStream bout = new ByteArrayOutputStream();
 			MCRImgProcessor proz = new MCRImgProcessor();
-			
+
 			timer.reset();
 			timer.start();
-//			imgService.getImage(image, new Dimension(600, 300), bout);
+			// imgService.getImage(image, new Dimension(600, 300), bout);
 			proz.getImageSize(image.getContentAsInputStream());
 			timer.stop();
 			LOGGER.info("Timer get size: " + timer.getElapsedTime());
-			
+
 			timer.reset();
 			timer.start();
-//			imgService.getImage(image, new Dimension(600, 300), bout);
+			// imgService.getImage(image, new Dimension(600, 300), bout);
 			imgService.getImage(image, 300, 400, 600, 300, 0.4F, bout);
 			timer.stop();
 			LOGGER.info("Timer: " + timer.getElapsedTime());
+		}
+	}
+
+	public static void testProz(String cmd, String inFile, String outFile, String xPos, String yPos, String width, String height, String scaleFactor) throws IOException {
+
+		Stopwatch timer = new Stopwatch();
+
+		FileInputStream in = new FileInputStream(inFile);
+		BufferedInputStream buffIn = new BufferedInputStream(in);
+		FileOutputStream out = new FileOutputStream(outFile);
+		BufferedOutputStream buffOut = new BufferedOutputStream(out);
+		ImgProcessor proz = new MCRImgProcessor();
+		
+		LOGGER.info("*****************************");
+		LOGGER.info("* Amazing Test Proz Command *");
+		LOGGER.info("*****************************");
+
+		if (cmd.equals("resizeFitWidth")) {
+			timer.reset();
+			timer.start();
+
+			proz.resizeFitWidth(buffIn, Integer.valueOf(width).intValue(), buffOut);
+
+			timer.stop();
+			LOGGER.info("*******************************************");
+			LOGGER.info("* Timer resizeFitWidth: " + timer.getElapsedTime());
+			LOGGER.info("* Used scale factor: " + proz.getScaleFactor());
+			LOGGER.info("*******************************************");
+		} else if (cmd.equals("resizeFitHeight")) {
+			timer.reset();
+			timer.start();
+
+			proz.resizeFitHeight(buffIn, Integer.valueOf(height).intValue(), buffOut);
+
+			timer.stop();
+			LOGGER.info("*******************************************");
+			LOGGER.info("* Timer resizeFitHeight: " + timer.getElapsedTime());
+			LOGGER.info("* Used scale factor: " + proz.getScaleFactor());
+			LOGGER.info("*******************************************");
+		} else if (cmd.equals("resize")) {
+			timer.reset();
+			timer.start();
+
+			proz.resize(buffIn, Integer.valueOf(width).intValue(), Integer.valueOf(height).intValue(), buffOut);
+
+			timer.stop();
+			LOGGER.info("*******************************************");
+			LOGGER.info("* Timer resize: " + timer.getElapsedTime());
+			LOGGER.info("* Used scale factor: " + proz.getScaleFactor());
+			LOGGER.info("*******************************************");
+		} else if (cmd.equals("scale")) {
+			timer.reset();
+			timer.start();
+
+			proz.scale(buffIn, Float.valueOf(scaleFactor).floatValue(), buffOut);
+
+			timer.stop();
+			LOGGER.info("*******************************************");
+			LOGGER.info("* Timer scale: " + timer.getElapsedTime());
+			LOGGER.info("* Used scale factor: " + proz.getScaleFactor());
+			LOGGER.info("*******************************************");
+		} else if (cmd.equals("scaleROI")) {
+			int xTopPos = Integer.valueOf(xPos).intValue();
+			int yTopPos = Integer.valueOf(yPos).intValue();
+			int boundWidth = Integer.valueOf(width).intValue();
+			int boundHeight = Integer.valueOf(height).intValue();
+			float scaleFact = Float.valueOf(scaleFactor).floatValue();
+			
+			
+			timer.reset();
+			timer.start();
+
+			proz.scaleROI(buffIn, xTopPos, yTopPos, boundWidth, boundHeight, scaleFact, buffOut);
+
+			timer.stop();
+			LOGGER.info("*******************************************");
+			LOGGER.info("* Timer scaleROI: " + timer.getElapsedTime());
+			LOGGER.info("* Used scale factor: " + proz.getScaleFactor());
+			LOGGER.info("*******************************************");
 		}
 	}
 }

@@ -11,6 +11,7 @@
 
 package org.mycore.services.imaging;
 
+import java.awt.Dimension;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -57,15 +58,12 @@ public class MCRImgService {
 			MCRConfiguration config = MCRConfiguration.instance();
 			InputStream input = null;
 			
-			LOGGER.debug("*********************************************");
-			LOGGER.debug("* Thumb: " + cache.existInCache(image, MCRImgCacheManager.THUMB));
-			LOGGER.debug("* Cache: " + cache.existInCache(image, MCRImgCacheManager.CACHE));
-			LOGGER.debug("* Orig: " + cache.existInCache(image, MCRImgCacheManager.ORIG));
-			LOGGER.debug("*********************************************");
-
 			int thumbWidth = Integer.parseInt(config.getString("MCR.Module-iview.thumbnail.size.width"));
 			int thumbHeight = Integer.parseInt(config.getString("MCR.Module-iview.thumbnail.size.height"));
-
+			
+			int cacheWidth = Integer.parseInt(config.getString("MCR.Module-iview.cache.size.width"));
+			int cacheHeight = Integer.parseInt(config.getString("MCR.Module-iview.cache.size.height"));
+			
 			if (newWidth == thumbWidth && newHeight == thumbHeight && cache.existInCache(image, MCRImgCacheManager.THUMB)) {
 				LOGGER.debug("*********************************************");
 				LOGGER.debug("* Get Thumbnail from ImgCache for " + image.getName());
@@ -73,7 +71,7 @@ public class MCRImgService {
 				getThumb = true;
 				
 				cache.getImage(image, MCRImgCacheManager.THUMB, output);
-			} else if (newWidth <= 1024 || newHeight <= 768 && cache.existInCache(image, MCRImgCacheManager.CACHE)) {
+			} else if ((newWidth <= cacheWidth || newHeight <= cacheHeight) && cache.existInCache(image, MCRImgCacheManager.CACHE)) {
 				LOGGER.debug("*********************************************");
 				LOGGER.debug("* Get Cache from ImgCache for " + image.getName());
 				LOGGER.debug("*********************************************");
@@ -112,35 +110,24 @@ public class MCRImgService {
 		LOGGER.debug("*********************************************");
 		LOGGER.debug("* Get image ROI fit width!!!!");
 		LOGGER.debug("*********************************************");
-//		this.scaleFactor = scaleFactor;
 		
 		if (USE_CACHE) {
 			LOGGER.debug("*********************************************");
 			LOGGER.debug("* Get image ROI fit width else - use Cache");
 			LOGGER.debug("*********************************************");
 			CacheManager cache = new MCRImgCacheManager();
+			MCRConfiguration config = MCRConfiguration.instance();
 			InputStream input = null;
 
-			int origWidth = cache.getImgWidth(image);
-			int origHeight = cache.getImgHeight(image);
-
-//			int resWidth = (int) (scaleFactor * origWidth);
-//			int resHeight = (int) (scaleFactor * origHeight);
 			
-			float scaleFactor = (float)boundWidth / (float)origWidth;
-
-			if ((boundWidth <= 1024 && boundHeight <= 768) && cache.existInCache(image, MCRImgCacheManager.CACHE)) {
+			int cacheWidth = Integer.parseInt(config.getString("MCR.Module-iview.cache.size.width"));
+			int cacheHeight = Integer.parseInt(config.getString("MCR.Module-iview.cache.size.height"));
+			
+			if ((boundWidth <= cacheWidth && boundHeight <= cacheHeight) && cache.existInCache(image, MCRImgCacheManager.CACHE)) {
 				LOGGER.debug("*********************************************");
 				LOGGER.debug("* Get Cache from ImgCache for " + image.getName());
 				LOGGER.debug("*********************************************");
 				
-				float scaleHelpW = (float)1024 / (float)origWidth;
-				float scaleHelpH = (float)768 / (float)origHeight;
-				
-				float scaleHelp = (scaleHelpW > scaleHelpH) ? scaleHelpH : scaleHelpW;
-				
-				scaleFactor = scaleFactor / scaleHelp;
-				// get the small cached version
 				input = cache.getImageAsInputStream(image, MCRImgCacheManager.CACHE);
 			} else if (cache.existInCache(image, MCRImgCacheManager.ORIG)) {
 				LOGGER.debug("*********************************************");
@@ -153,13 +140,13 @@ public class MCRImgService {
 				LOGGER.debug("*********************************************");
 				LOGGER.debug("* Get Orig from IFS for " + image.getName());
 				LOGGER.debug("*********************************************");
-
+				
 				input = image.getContentAsInputStream();
 			}
 
-			processor.scaleROI(input, xTopPos, yTopPos, boundWidth, boundHeight, scaleFactor, output);
+			processor.scaleROI(input, xTopPos, yTopPos, boundWidth, boundHeight, MCRImgProcessor.FIT_WIDTH, output);
 		} else {
-			processor.scaleROI(image.getContentAsInputStream(), xTopPos, yTopPos, boundWidth, boundHeight, scaleFactor, output);
+			processor.scaleROI(image.getContentAsInputStream(), xTopPos, yTopPos, boundWidth, boundHeight, MCRImgProcessor.FIT_WIDTH, output);
 		}
 		
 		this.scaleFactor = processor.getScaleFactor();
@@ -178,6 +165,7 @@ public class MCRImgService {
 			LOGGER.debug("* Get image ROI else - use Cache");
 			LOGGER.debug("*********************************************");
 			CacheManager cache = new MCRImgCacheManager();
+			MCRConfiguration config = MCRConfiguration.instance();
 			InputStream input = null;
 
 			int origWidth = cache.getImgWidth(image);
@@ -185,14 +173,17 @@ public class MCRImgService {
 
 			int resWidth = (int) (scaleFactor * origWidth);
 			int resHeight = (int) (scaleFactor * origHeight);
-
-			if ((resWidth <= 1024 && resHeight <= 768) && cache.existInCache(image, MCRImgCacheManager.CACHE)) {
+			
+			int cacheWidth = Integer.parseInt(config.getString("MCR.Module-iview.cache.size.width"));
+			int cacheHeight = Integer.parseInt(config.getString("MCR.Module-iview.cache.size.height"));
+			
+			if ((resWidth <= cacheWidth && resHeight <= cacheHeight) && cache.existInCache(image, MCRImgCacheManager.CACHE)) {
 				LOGGER.debug("*********************************************");
 				LOGGER.debug("* Get Cache from ImgCache for " + image.getName());
 				LOGGER.debug("*********************************************");
 				
-				float scaleHelpW = (float)1024 / (float)origWidth;
-				float scaleHelpH = (float)768 / (float)origHeight;
+				float scaleHelpW = (float)cacheWidth / (float)origWidth;
+				float scaleHelpH = (float)cacheHeight / (float)origHeight;
 				
 				float scaleHelp = (scaleHelpW > scaleHelpH) ? scaleHelpH : scaleHelpW;
 				
@@ -232,9 +223,18 @@ public class MCRImgService {
 
 		if (USE_CACHE) {
 			CacheManager cache = new MCRImgCacheManager();
+			MCRConfiguration config = MCRConfiguration.instance();
 			InputStream input = null;
+			
+			int cacheWidth = Integer.parseInt(config.getString("MCR.Module-iview.cache.size.width"));
+			int cacheHeight = Integer.parseInt(config.getString("MCR.Module-iview.cache.size.height"));
+			
+			LOGGER.debug("*********************************************");
+			LOGGER.debug("* Cache width: " + cacheWidth);
+			LOGGER.debug("* Cache height: " + cacheHeight);
+			LOGGER.debug("*********************************************");
 
-			if (newWidth <= 1024 && cache.existInCache(image, MCRImgCacheManager.CACHE)) {
+			if (newWidth <= cacheWidth && cache.existInCache(image, MCRImgCacheManager.CACHE)) {
 				LOGGER.debug("*********************************************");
 				LOGGER.debug("* Get Cache from ImgCache for " + image.getName());
 				LOGGER.debug("*********************************************");
