@@ -57,7 +57,10 @@ public interface MCRDefaults {
             "x-ara", // arabic
             "x-grc", // old greek
             "x-lat", // latin
-            "x-cop" // coptic
+            "x-cop", // coptic
+           
+            //extension for DINI Specification Labels (OAI-Interface)
+            "x-dini"
     };
 
     /** The date format for the supported languages * */
