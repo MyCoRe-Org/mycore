@@ -54,7 +54,7 @@ public class MCRAccessEventHandler extends MCREventHandlerBase {
     private static String storedrules = CONFIG.getString("MCR.StorePermissions", "read,write,delete");
     // get the standard read rule from config or it's the false rule
     private static String  strRule = CONFIG.getString("MCR.AccessRule.STANDARD-READ-RULE", "<condition format=\"xml\"><boolean operator=\"false\" /></condition>");
-    private static Element readrule = (Element)MCRXMLHelper.parseXML(strRule).getRootElement().detach();
+    private static Element readrule = (Element)MCRXMLHelper.parseXML(strRule,false).getRootElement().detach();
     /**
      * This method will be used to create the access rules for SWF for a
      * MCRObject.
