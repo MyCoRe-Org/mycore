@@ -23,6 +23,7 @@
 
 package org.mycore.frontend.editor;
 
+import java.io.File;
 import java.io.UnsupportedEncodingException;
 import java.util.Enumeration;
 import java.util.Hashtable;
@@ -67,6 +68,8 @@ public class MCRRequestParameters {
         threshold = config.getInt(prefix + "FileUpload.MemoryThreshold", 1000000);
         maxSize = config.getLong(prefix + "FileUpload.MaxSize", 5000000);
         tmpPath = config.getString(prefix + "FileUpload.TempStoragePath");
+        File tmp = new File(tmpPath);
+        if (!tmp.isDirectory()) { tmp.mkdir(); }
     }
 
     public MCRRequestParameters(HttpServletRequest req) {
