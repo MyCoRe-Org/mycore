@@ -245,9 +245,10 @@ public class MCROAIProvider extends MCRServlet {
 			eRoot.addContent(eDate);
 
 			// add "request"...
-			String url = request.getRequestURL().toString();
+			String url = request.getRequestURL().toString().split(";")[0];
 			Element eRequest = new Element("request", ns);
-			eRequest.addContent(response.encodeURL(url));
+			//eRequest.addContent(response.encodeURL(url));
+			eRequest.addContent(url);
 			eRoot.addContent(eRequest);
 
 			org.jdom.Document document = null;
@@ -605,7 +606,7 @@ public class MCROAIProvider extends MCRServlet {
 		eIdentify.addContent(newElementWithContent("repositoryName", ns,
 				repositoryName));
 		eIdentify.addContent(newElementWithContent("baseURL", ns, request
-				.getRequestURL().toString()));
+				.getRequestURL().toString().split(";")[0]));
 		eIdentify.addContent(newElementWithContent("protocolVersion", ns,
 				STR_OAI_VERSION));
 
@@ -1630,6 +1631,11 @@ public class MCROAIProvider extends MCRServlet {
 		}
 		parameters.put("ServletsBaseURL", servletsBaseURL);
 		parameters.put("WebApplicationBaseURL", webApplicationBaseURL);
+//	    DNB erlaubt in Epicur-Beschreibung keinen Inhalt für das Element <resupply>
+//		String email = CONFIG.getString("MCR.oai.epicur.responseemail", "");
+//		if(format.contains("epicur")&& !email.equals("")){
+//			parameters.put("ResponseEmail", email);
+//		}
 		return MCRXSLTransformation.transform(document, getServletContext()
 				.getRealPath("/WEB-INF/stylesheets/" + format), parameters);
 	}
@@ -1690,13 +1696,18 @@ public class MCROAIProvider extends MCRServlet {
 						String categoryId = classification.getCategId();
 						MCRCategoryItem category = MCRCategoryItem
 								.getCategoryItem(classificationId, categoryId);
-						MCRCategoryItem parent;
-						while ((parent = category.getParent()) != null) {
-							categoryId = parent.getID() + ":" + categoryId;
-							category = parent;
+						if(category.getLangArray().contains("x-dini")){
+							setSpec.append(" ").append(category.getText("x-dini"));
 						}
+						else{
+							MCRCategoryItem parent;
+							while ((parent = category.getParent()) != null) {
+								categoryId = parent.getID() + ":" + categoryId;
+								category = parent;
+							}
 
-						setSpec.append(" ").append(categoryId);
+							setSpec.append(" ").append(categoryId);
+						}
 					}
 				}
 
