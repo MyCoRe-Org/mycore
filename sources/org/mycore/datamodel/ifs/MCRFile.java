@@ -349,15 +349,15 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
 
         size = cis.getLength();
         md5 = cis.getMD5String();
-        try {
-            cis.close();
-        } catch (IOException e) {
+        // try {
+        //     cis.close();
+        // } catch (IOException e) {
            /*
             * We failed closing the InputStream.
             * But the rest went well so we just ignore this issue.
             */
-        }
-        cis=null; //do not use cis after closing InputStream
+        // }
+        // cis=null; //do not use cis after closing InputStream
 
         boolean changed = ((size != old_size) || (!md5.equals(old_md5)));
 
