@@ -22,4 +22,16 @@ public interface ImgProcessor {
 	Dimension getImageSize(InputStream input);
 	//void setWatermark(boolean set);
 	//void useImgAsWatermark();
+	
+	// separated Methods
+	void loadImage(InputStream input);
+	boolean hasCorrectTileSize();
+	void resizeFitWidth(int newWidth);
+	void resizeFitHeight(int newHeight);
+	void resize(int newWidth, int newHeight);
+	void scale(float scaleFactor);
+	void scaleROI(int xTopPos, int yTopPos, int boundWidth, int boundHeight, int fitDirection);
+	void scaleROI(int xTopPos, int yTopPos, int boundWidth, int boundHeight, float scaleFactor);
+	void jpegEncode(OutputStream output);
+	void tiffEncode(OutputStream output);
 }

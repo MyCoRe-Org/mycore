@@ -50,6 +50,8 @@ public class MCRImgCacheManager implements CacheManager {
 	public static final String CACHE = "Cache";
 
 	public static final String ORIG = "Orig";
+	
+	public static final String CACHE_FOLDER = "imgCache";
 
 	private Logger LOGGER = Logger.getLogger(MCRFileNodeServlet.class.getName());
 	private Stopwatch timer = new Stopwatch();
@@ -57,9 +59,9 @@ public class MCRImgCacheManager implements CacheManager {
 	protected MCRDirectory cacheInIFS = null;
 
 	public MCRImgCacheManager() {
-		if ((cacheInIFS = MCRDirectory.getRootDirectory("imgCache")) == null)
+		if ((cacheInIFS = MCRDirectory.getRootDirectory(CACHE_FOLDER)) == null)
 			try {
-				cacheInIFS = new MCRDirectory("imgCache", "imgCache");
+				cacheInIFS = new MCRDirectory(CACHE_FOLDER, CACHE_FOLDER);
 			} catch (Exception e) {
 				throw new MCRException(e.getMessage());
 			}
@@ -132,7 +134,8 @@ public class MCRImgCacheManager implements CacheManager {
 		if (cachedImg != null && cachedImg instanceof MCRFile)
 			((MCRFile) cachedImg).delete();
 		else
-			throw new MCRException("Could not delete " + image.getName() + "from cache!");
+			LOGGER.debug("Could not delete " + image.getName() + "from cache!");
+//			throw new MCRException("Could not delete " + image.getName() + "from cache!");
 
 	}
 
@@ -142,7 +145,8 @@ public class MCRImgCacheManager implements CacheManager {
 		if (cachedImg != null && cachedImg instanceof MCRDirectory)
 			((MCRDirectory) cachedImg).delete();
 		else
-			throw new MCRException("Could not delete " + image.getName() + "from cache!");
+			LOGGER.debug("Could not delete " + image.getName() + "from cache!");
+//			throw new MCRException("Could not delete " + image.getName() + "from cache!");
 
 	}
 

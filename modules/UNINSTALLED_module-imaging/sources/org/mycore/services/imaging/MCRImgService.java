@@ -92,8 +92,9 @@ public class MCRImgService {
 				input = image.getContentAsInputStream();
 			}
 			
-			if (!getThumb)
+			if (!getThumb) {
 				processor.resize(input, newWidth, newHeight, output);
+			}
 		} else {
 			LOGGER.debug("*********************************************");
 			LOGGER.debug("* Get image Width x Height - use Processor");
