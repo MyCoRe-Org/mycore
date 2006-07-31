@@ -317,7 +317,8 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
 
     /**
      * Reads the content of this file from the source InputStream and stores it
-     * in an MCRContentStore. InputStream gets closed at end of process.
+     * in an MCRContentStore. InputStream does NOT get closed at end of process,
+     * this must be done by invoking code if required/appropriate.
      * 
      * @param source
      *            the source for the file's content bytes
@@ -349,15 +350,6 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
 
         size = cis.getLength();
         md5 = cis.getMD5String();
-        // try {
-        //     cis.close();
-        // } catch (IOException e) {
-           /*
-            * We failed closing the InputStream.
-            * But the rest went well so we just ignore this issue.
-            */
-        // }
-        // cis=null; //do not use cis after closing InputStream
 
         boolean changed = ((size != old_size) || (!md5.equals(old_md5)));
 
