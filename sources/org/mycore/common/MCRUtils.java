@@ -24,26 +24,21 @@
 package org.mycore.common;
 
 import java.io.BufferedOutputStream;
-import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.io.Writer;
-import java.net.URL;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Enumeration;
 import java.util.GregorianCalendar;
 import java.util.HashSet;
-import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Locale;
 import java.util.Properties;
@@ -797,134 +792,6 @@ public class MCRUtils {
         } // for
 
         return sb.toString();
-    }
-
-    /**
-     * replacement for sun.misc.Service.provider(Class,ClassLoader) which is
-     * only available on sun jdk
-     * 
-     * @param service
-     *            Interface of instance needs to implement
-     * @param loader
-     *            URLClassLoader of Plugin
-     * @return Iterator over instances of service
-     */
-    public static final Iterator getProviders(Class service, ClassLoader loader) {
-        // we use a hashtable for this to keep controll of duplicates
-        Hashtable classMap = new Hashtable();
-        String name = "META-INF/services/" + service.getName();
-        Enumeration services;
-
-        try {
-            services = (loader == null) ? ClassLoader.getSystemResources(name) : loader.getResources(name);
-        } catch (IOException ioe) {
-            LOGGER.error("Service: cannot load " + name);
-
-            return classMap.values().iterator();
-        }
-
-        // Put all class names matching Service in nameSet
-        while (services.hasMoreElements()) {
-            URL url = (URL) services.nextElement();
-            LOGGER.debug(url);
-
-            InputStream input = null;
-            BufferedReader reader = null;
-
-            try {
-                input = url.openStream();
-                reader = new BufferedReader(new InputStreamReader(input, "utf-8"));
-
-                Object classInstance = null;
-
-                for (StringBuffer className = new StringBuffer().append(reader.readLine()); ((className.length() != 4) && (className.toString().indexOf("null") == -1)); className.delete(0, className.length()).append(reader.readLine())) {
-                    // System.out.println("processing String:
-                    // "+className.toString());
-                    // remove any comments
-                    int comPos = className.toString().indexOf("#");
-
-                    if (comPos != -1) {
-                        className.delete(comPos, className.length());
-                    }
-
-                    // trim String
-                    int st = 0;
-                    int sblen = className.length();
-                    int len = sblen - 1;
-
-                    while ((st < sblen) && (className.charAt(st) <= ' '))
-                        st++;
-
-                    while ((st < len) && (className.charAt(len) <= ' '))
-                        len--;
-
-                    className.delete(len + 1, sblen).delete(0, st);
-
-                    // end trim String
-                    // if space letter is included asume first word as class
-                    // name
-                    int spacePos = className.toString().indexOf(" ");
-
-                    if (spacePos != -1) {
-                        className = className.delete(spacePos, className.length());
-                    }
-
-                    // trim String
-                    st = 0;
-                    sblen = className.length();
-                    len = sblen - 1;
-
-                    while ((st < sblen) && (className.charAt(st) <= ' '))
-                        st++;
-
-                    while ((st < len) && (className.charAt(len) <= ' '))
-                        len--;
-
-                    className.delete(len + 1, sblen).delete(0, st);
-
-                    // end trim String
-                    if (className.length() > 0) {
-                        // we should have a proper class name now
-                        try {
-                            classInstance = Class.forName(className.toString(), true, loader).newInstance();
-
-                            if (service.isInstance(classInstance)) {
-                                classMap.put(className.toString(), classInstance);
-                            } else {
-                                classInstance = null;
-                                LOGGER.error(className.toString() + " does not implement " + service.getName() + "! Class instance will not be used.");
-                            }
-                        } catch (ClassNotFoundException e) {
-                            LOGGER.error("Service: cannot find class: " + className);
-                        } catch (InstantiationException e) {
-                            LOGGER.error("Service: cannot instantiate: " + className);
-                        } catch (IllegalAccessException e) {
-                            LOGGER.error("Service: illegal access to: " + className);
-                        } catch (NoClassDefFoundError e) {
-                            LOGGER.error("Service: " + e + " for " + className);
-                        } catch (Exception e) {
-                            LOGGER.error("Service: exception for: " + className + " " + e);
-                        }
-                    }
-                }
-            } catch (IOException ioe) {
-                LOGGER.error("Service: problem with: " + url);
-            } finally {
-                try {
-                    if (input != null) {
-                        input.close();
-                    }
-
-                    if (reader != null) {
-                        reader.close();
-                    }
-                } catch (IOException ioe2) {
-                    LOGGER.error("Service: problem with: " + url);
-                }
-            }
-        }
-
-        return classMap.values().iterator();
     }
 
     public static final void saveJDOM(Document jdom, File xml) throws IOException {

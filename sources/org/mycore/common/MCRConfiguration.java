@@ -40,6 +40,8 @@ import java.util.StringTokenizer;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
+import org.mycore.services.plugins.FilterPluginInstantiationException;
+
 /**
  * Provides methods to manage and read all configuration properties from the
  * MyCoRe configuration files. The class is implemented using the singleton
@@ -415,6 +417,8 @@ public class MCRConfiguration {
             try {
                 o = cl.newInstance();
             } catch (Exception e) {
+                if ( e instanceof FilterPluginInstantiationException)
+                  Logger.getLogger(this.getClass()).info(e.toString());
                 // check for singleton
                 Method[] querymethods = cl.getMethods();
 
