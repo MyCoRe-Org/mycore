@@ -39,7 +39,7 @@ import org.mycore.frontend.cli.MCRCommand;
 
 public class MCRImgCacheCommands extends MCRAbstractCommands {
 	private static Logger LOGGER = Logger.getLogger(MCRImgCacheCommands.class.getName());
-	static org.mycore.services.tilecachetool.TCTool tctool = new org.mycore.services.tilecachetool.TCTool();
+//	static org.mycore.services.tilecachetool.TCTool tctool = new org.mycore.services.tilecachetool.TCTool();
 
 	/**
 	 * The empty constructor.

@@ -15,7 +15,7 @@ import javax.media.jai.PlanarImage;
 
 import org.apache.log4j.Logger;
 import org.mycore.frontend.cli.MCRClassificationCommands;
-import org.mycore.services.tilecachetool.TCTool;
+//import org.mycore.services.tilecachetool.TCTool;
 
 import com.sun.media.jai.codec.FileCacheSeekableStream;
 import com.sun.media.jai.codec.ImageCodec;
