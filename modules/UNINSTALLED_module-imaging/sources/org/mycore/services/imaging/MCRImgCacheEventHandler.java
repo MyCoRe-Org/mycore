@@ -1,6 +1,7 @@
 package org.mycore.services.imaging;
 
 import org.apache.log4j.Logger;
+import org.mycore.common.MCRConfiguration;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandlerBase;
 import org.mycore.datamodel.ifs.MCRFile;
@@ -27,8 +28,11 @@ public class MCRImgCacheEventHandler extends MCREventHandlerBase {
 		LOGGER.debug("* FileName: "+ file.getName());
 		LOGGER.debug("* OwnerID: "+ file.getOwnerID());
 		LOGGER.debug("*************************************************");
+		MCRConfiguration config = MCRConfiguration.instance();
+		boolean useCache = Boolean.getBoolean(config.getString("MCR.Module-iview.useCache"));
 		MCRImgCacheManager imgCache = new MCRImgCacheManager();
-		if (!file.getOwnerID().equals(MCRImgCacheManager.CACHE_FOLDER) && !imgCache.existInCache(file)) {
+		
+		if (useCache && !file.getOwnerID().equals(MCRImgCacheManager.CACHE_FOLDER) && !imgCache.existInCache(file)) {
 			LOGGER.debug("**************************************************");
 			LOGGER.debug("* MCRImgCacheEventHandler.handleFileCreated - IF *");
 			LOGGER.debug("* FileName: "+ file.getName());

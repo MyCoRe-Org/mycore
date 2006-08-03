@@ -13,3 +13,5 @@
 # Properties for MyCoRe Module-Imaging
 ##############################################################################
 
+### handle creating and removing cache files
+MCR.EventHandler.MCRFile.2.class=org.mycore.services.imaging.MCRImgCacheEventHandler

@@ -17,4 +17,7 @@ public interface CacheManager {
 	int getImgWidth(MCRFile image);
 	int getImgHeight(MCRFile image);
 	void setImgSize(MCRFile image, int width, int height);
+	void setLock(MCRFile image);
+	void removeLock(MCRFile image);
+	boolean isLocked(MCRFile image);
 }
