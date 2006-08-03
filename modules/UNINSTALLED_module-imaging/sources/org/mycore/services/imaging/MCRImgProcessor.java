@@ -1,10 +1,12 @@
 package org.mycore.services.imaging;
 
 import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.RenderingHints;
+import java.awt.image.BufferedImage;
 import java.awt.image.renderable.ParameterBlock;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
@@ -15,9 +17,7 @@ import javax.media.jai.PlanarImage;
 
 import org.apache.log4j.Logger;
 import org.mycore.frontend.cli.MCRClassificationCommands;
-//import org.mycore.services.tilecachetool.TCTool;
 
-import com.sun.media.jai.codec.FileCacheSeekableStream;
 import com.sun.media.jai.codec.ImageCodec;
 import com.sun.media.jai.codec.ImageEncoder;
 import com.sun.media.jai.codec.JPEGEncodeParam;
@@ -49,8 +49,6 @@ public class MCRImgProcessor implements ImgProcessor {
 	
 	static public final int FIT_HEIGHT = 0;
 	
-//	static TCTool tctool = new TCTool();
-
 	MCRImgProcessor() {
 		origSize = new Dimension(0, 0);
 		
@@ -275,6 +273,18 @@ public class MCRImgProcessor implements ImgProcessor {
 		tiffEncode(image, output, true, tileWidth, tileHeight);
 	}
 	
+	public void createText(String text, int width, int height, OutputStream output) {
+		image = createText(text, 20, height/2);
+		jpegEncode(image, output, jpegQuality);
+	}
+
+	private PlanarImage createText(String text, int width, int height) {
+		BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+		Graphics pic = img.getGraphics();
+		pic.drawString(text, width, height);
+		return JAI.create("awtimage", pic);
+	}
+
 	
 	// End: Interface implementation
 
@@ -418,6 +428,7 @@ public class MCRImgProcessor implements ImgProcessor {
 		this.scaleFactor = scaleFactor;
 	}
 
+	
 	
 
 }
