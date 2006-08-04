@@ -332,13 +332,20 @@ public class MCRURIResolver implements javax.xml.transform.URIResolver, EntityRe
 
         private static final String OPERATION_KEY = "operation";
 
+        //parameter for MCRDoRetrieveObject
         private static final String OBJECT_KEY = "ID";
+
+        //parameter for MCRDoRetrieveClassification
+        private static final String LEVEL_KEY = "level";
+        private static final String TYPE_KEY = "type";
+        private static final String CLASS_KEY = "classid";
+        private static final String CATEG_KEY = "categid";
 
         private static final DOMBuilder DOM_BUILDER = new DOMBuilder();
 
         public Element resolveElement(String uri) {
             String key = uri.substring(uri.indexOf(":") + 1);
-            LOGGER.debug("Reading xml from query result using key :" + key);
+            LOGGER.debug("Reading xml from WebService using key :" + key);
 
             String[] param;
             StringTokenizer tok = new StringTokenizer(key, "&");
@@ -348,13 +355,24 @@ public class MCRURIResolver implements javax.xml.transform.URIResolver, EntityRe
                 params.put(param[0], param[1]);
             }
             if (!params.containsKey(HOST_KEY) || !params.containsKey(OPERATION_KEY)) {
+                LOGGER.warn("Either 'host' or 'operation' is not defined. Returning NULL.");
                 return null;
             }
             if (params.get(OPERATION_KEY).equals("MCRDoRetrieveObject")) {
                 org.w3c.dom.Document document = MCRQueryClient.doRetrieveObject(params.get(HOST_KEY).toString(), params.get(OBJECT_KEY).toString());
                 return DOM_BUILDER.build(document).detachRootElement();
             }
+            if (params.get(OPERATION_KEY).equals("MCRDoRetrieveClassification")) {
+                String hostAlias=params.get(HOST_KEY).toString();
+                String level=params.get(LEVEL_KEY).toString();
+                String type=params.get(TYPE_KEY).toString();
+                String classId=params.get(CLASS_KEY).toString();
+                String categId=params.get(CATEG_KEY).toString();
+                org.w3c.dom.Document document = MCRQueryClient.doRetrieveClassification(hostAlias, level, type, classId, categId);
+                return DOM_BUILDER.build(document).detachRootElement();
+            }
             // only WS "MCRDoRetrieveObject" implemented yet
+            LOGGER.warn("Unknown 'operation' requested. Returning NULL.");
             return null;
         }
 
