@@ -160,7 +160,7 @@ public class MCRObjectServlet extends MCRServlet {
             int numHits = results.getNumHits();
             for (int i = 0; i < numHits; i++) {
                 LOGGER.debug("Hit: " + results.getHit(i).getID());
-                if (results.getHit(i).getID().equals(mcrid) && results.getHit(i).getHost() == host) {
+                if (results.getHit(i).getID().equals(mcrid) && results.getHit(i).getHost().equals(host)) {
                     // hit allocated
                     // search for next and previous object readable by user
                     for (int j = i - 1; j >= 0; j--) {
