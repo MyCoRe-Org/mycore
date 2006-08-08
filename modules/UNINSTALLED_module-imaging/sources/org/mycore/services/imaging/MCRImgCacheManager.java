@@ -39,7 +39,8 @@ import org.mycore.datamodel.ifs.MCRFilesystemNode;
  * in absolute path the "/" is replaced by "%20"
  * 
  * 
- * @version 0.01pre 03/01/2006
+ * @version 0.01pre 03/01/2006<br>
+ * 			1.00 08/08/2006
  * @author Vu Huu Chi
  * 
  */
@@ -133,8 +134,13 @@ public class MCRImgCacheManager implements CacheManager {
 	public void deleteImage(MCRFile image) {
 		MCRFilesystemNode cachedImg = cacheInIFS.getChildByPath(buildPath(image));
 
-		if (cachedImg != null && cachedImg instanceof MCRDirectory)
+		if (cachedImg != null && cachedImg instanceof MCRDirectory) {
+			LOGGER.debug("****************************************");
+			LOGGER.debug("* MCRImgCacheManager - deleteImage ");
+			LOGGER.debug("* Delte : " + cachedImg.getName());
+			LOGGER.debug("****************************************");
 			((MCRDirectory) cachedImg).delete();
+		}
 		else
 			LOGGER.debug("Could not delete " + image.getName() + "from cache!");
 //			throw new MCRException("Could not delete " + image.getName() + "from cache!");

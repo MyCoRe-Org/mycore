@@ -2,7 +2,6 @@ package org.mycore.services.imaging;
 
 import java.awt.Dimension;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
@@ -24,6 +23,16 @@ import com.sun.media.jai.codec.JPEGEncodeParam;
 import com.sun.media.jai.codec.MemoryCacheSeekableStream;
 import com.sun.media.jai.codec.SeekableStream;
 import com.sun.media.jai.codec.TIFFEncodeParam;
+
+/**
+ * This implementation of ImgProcessor is responsible for the manipulation of image data.
+ * It offers methods for scaling and croping of an image and a two encoding possibility (JPEG, TIFF).
+ * For TIFF-Encoding ones can set the tile size, default tile size is 480.<br>
+ * 
+ * @version 1.00 8/08/2006<br>
+ * @author Vu Huu Chi
+ *
+ */
 
 public class MCRImgProcessor implements ImgProcessor {
 	private static Logger LOGGER = Logger.getLogger(MCRClassificationCommands.class.getName());
@@ -68,10 +77,16 @@ public class MCRImgProcessor implements ImgProcessor {
 		this.tileHeight = tileHeight;
 	}
 
-	public void useEncoder(int Encoder) {
-		useEncoder = Encoder;
+	public void useEncoder(int Encoder) throws Exception {
+		if (Encoder == JPEG_ENC || Encoder == TIFF_ENC)
+			useEncoder = Encoder;
+		else
+			throw new Exception("MCRImgProcessor.useEncoder accept only MCRImgProcessor.JPEG_ENC or MCRImgProcessor.TIFF_ENC as parameter!");
 	}
 
+	/* (non-Javadoc)
+	 * @see org.mycore.services.imaging.ImgProcessor#resizeFitWidth(java.io.InputStream, int, java.io.OutputStream)
+	 */
 	public void resizeFitWidth(InputStream input, int newWidth, OutputStream output) {
 		image = loadmageMEMCache(input);
 
@@ -190,7 +205,7 @@ public class MCRImgProcessor implements ImgProcessor {
 		return new Dimension(image.getWidth(), image.getHeight());
 	}
 
-	public void encode(InputStream input, OutputStream output, int encoder) {
+	public void encode(InputStream input, OutputStream output, int encoder) throws Exception {
 		useEncoder(encoder);
 		resize(input, origSize.width, origSize.height, output);
 	}

@@ -130,6 +130,7 @@ public class MCRImgCacheCommands extends MCRAbstractCommands {
 		MCRFilesystemNode node = MCRFilesystemNode.getNode(ID);
 		
 		LOGGER.debug("****************************************");
+		LOGGER.debug("* MCRImgCacheCommands - removeCachedFile ");
 		LOGGER.debug("* The node: " + node.getAbsolutePath());
 		LOGGER.debug("****************************************");
 
@@ -146,7 +147,9 @@ public class MCRImgCacheCommands extends MCRAbstractCommands {
 			image.removeAdditionalData(new Document(new Element("ImageMetaData")));
 			cache.deleteImage(image);
 		}
-		LOGGER.info("Remove cache version for image " + imgFile.getName() + " finished successfull!");
+		LOGGER.info("******************************************************************************");
+		LOGGER.info("* Remove cache version for image " + imgFile.getName() + " finished successfull!");
+		LOGGER.info("******************************************************************************");
 
 	}
 

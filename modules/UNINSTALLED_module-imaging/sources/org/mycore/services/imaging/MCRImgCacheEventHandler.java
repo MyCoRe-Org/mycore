@@ -5,10 +5,6 @@ import org.mycore.common.MCRConfiguration;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandlerBase;
 import org.mycore.datamodel.ifs.MCRFile;
-import org.mycore.datamodel.ifs.MCRFilesystemNode;
-import org.mycore.datamodel.metadata.MCRDerivate;
-import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.frontend.cli.MCRClassificationCommands;
 
 public class MCRImgCacheEventHandler extends MCREventHandlerBase {
 	private static Logger LOGGER = Logger.getLogger(MCRImgCacheEventHandler.class.getName());
@@ -29,7 +25,7 @@ public class MCRImgCacheEventHandler extends MCREventHandlerBase {
 		LOGGER.debug("* OwnerID: "+ file.getOwnerID());
 		LOGGER.debug("*************************************************");
 		MCRConfiguration config = MCRConfiguration.instance();
-		boolean useCache = Boolean.getBoolean(config.getString("MCR.Module-iview.useCache"));
+		boolean useCache = (new Boolean(config.getString("MCR.Module-iview.useCache"))).booleanValue();
 		MCRImgCacheManager imgCache = new MCRImgCacheManager();
 		
 		if (useCache && !file.getOwnerID().equals(MCRImgCacheManager.CACHE_FOLDER) && !imgCache.existInCache(file)) {
@@ -72,7 +68,7 @@ public class MCRImgCacheEventHandler extends MCREventHandlerBase {
 				e.printStackTrace();
 			}
 			LOGGER.debug("*************************************************");
-			LOGGER.debug("* MCRImgCacheEventHandler.handleFileCreated     *");
+			LOGGER.debug("* MCRImgCacheEventHandler.handleFileDeleted     *");
 			LOGGER.debug("* Remove File: " + file.getName());
 			LOGGER.debug("*************************************************");
 		} else {

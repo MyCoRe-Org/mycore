@@ -15,8 +15,8 @@ public interface ImgProcessor {
 	float getJpegQuality();
 	void setJpegQuality(float jpegQuality);
 	void setTileSize(int tileWidth, int tileHeight);
-	void useEncoder(int encoder);
-	void encode(InputStream input, OutputStream output, int encoder);
+	void useEncoder(int encoder) throws Exception;
+	void encode(InputStream input, OutputStream output, int encoder) throws Exception;
 	void createText(String text, int width, int height, OutputStream output);
 	Dimension getOrigSize() throws Exception;
 	Dimension getCurrentSize() throws Exception;
