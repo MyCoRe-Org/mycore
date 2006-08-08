@@ -446,6 +446,7 @@ public class MCRStartEditorServlet extends MCRServlet {
         // action WNEWOBJ - create a new object
         if (mytodo.equals("wnewobj")) {
             if (!AI.checkPermission("create-" + mytype)) {
+                (new MCRObjectID()).decrementOneFreeId((new MCRObjectID(mytfmcrid)).getBase());
                 job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + usererrorpage));
                 return;
             }
@@ -475,6 +476,7 @@ public class MCRStartEditorServlet extends MCRServlet {
         // action WNEWDER - create a new derivate
         if (mytodo.equals("wnewder")) {
             if (!AI.checkPermission("create-" + mytype)) {
+                (new MCRObjectID()).decrementOneFreeId((new MCRObjectID(mytfmcrid)).getBase());
                 job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + usererrorpage));
                 return;
             }
