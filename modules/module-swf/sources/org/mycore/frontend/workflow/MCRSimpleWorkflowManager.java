@@ -33,9 +33,15 @@ import java.util.List;
 import java.util.StringTokenizer;
 
 import org.apache.log4j.Logger;
+import org.jaxen.XPath;
+import org.jaxen.jdom.JDOMXPath;
+import org.jdom.Document;
+import org.jdom.Element;
+
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRDefaults;
 import org.mycore.common.MCRUtils;
+import org.mycore.common.xml.MCRParserXerces;
 import org.mycore.common.xml.MCRXMLHelper;
 import org.mycore.datamodel.metadata.MCRActiveLinkException;
 import org.mycore.datamodel.metadata.MCRDerivate;
@@ -659,23 +665,21 @@ public class MCRSimpleWorkflowManager {
         // read data
         MCRObjectID mcrid = new MCRObjectID(id);
         String fn = getDirectoryPath(mcrid.getTypeId()) + File.separator + id + ".xml";
-        org.jdom.Element condition = new org.jdom.Element("condition");
-        condition.setAttribute("format", "xml");
         try {
             File fi = new File(fn);
             if (fi.isFile() && fi.canRead()) {
-                MCRObject obj = new MCRObject();
-                obj.setFromURI(fn);
-                int index = obj.getService().getRuleIndex(permission);
-                if (index == -1)
-                    return condition;
-                condition = obj.getService().getRule(index).getCondition();
+                Document wfDoc=MCRXMLHelper.parseURI(fn, false);
+                XPath path = new JDOMXPath("/*/service/servacls/servacl[@permission='"+permission+"']/condition");
+                List results = path.selectNodes(wfDoc);
+                if (results.size()>0){
+                    return (Element)((Element)results.get(0)).detach();
+                }
             } else {
                 logger.error("Can't read file " + fn);
             }
         } catch (Exception ex) {
             logger.error("Can't read file " + fn);
         }
-        return condition;
+        return new org.jdom.Element("condition").setAttribute("format", "xml");
     }
 }
