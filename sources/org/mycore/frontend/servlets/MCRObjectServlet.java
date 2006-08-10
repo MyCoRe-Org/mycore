@@ -23,6 +23,7 @@
 
 package org.mycore.frontend.servlets;
 
+import java.io.IOException;
 import java.util.Hashtable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -39,9 +40,11 @@ import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
+import org.mycore.common.xml.MCRLayoutServlet;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.MCRXMLTableManager;
 import org.mycore.services.fieldquery.MCRHit;
+import org.mycore.services.fieldquery.MCRQueryClient;
 import org.mycore.services.fieldquery.MCRResults;
 import org.mycore.services.fieldquery.MCRSearchServlet;
 
@@ -85,75 +88,107 @@ public class MCRObjectServlet extends MCRServlet {
      *            the MCRServletJob instance
      */
     public void doGetPost(MCRServletJob job) throws ServletException, Exception {
-        String id = getObjectID(job.getRequest());
-
         try {
-            MCRObjectID mcrid = new MCRObjectID(id);
-
-            if (!MCRAccessManager.checkPermission(mcrid, "read")) {
-                StringBuffer msg = new StringBuffer(1024);
-                msg.append("Access denied reading MCRObject with ID: ").append(mcrid.getId());
-                msg.append(".\nCurrent User: ").append(MCRSessionMgr.getCurrentSession().getCurrentUserID());
-                msg.append("\nRemote IP: ").append(MCRSessionMgr.getCurrentSession().getCurrentIP());
-                generateErrorPage(job.getRequest(),job.getResponse(),HttpServletResponse.SC_FORBIDDEN,msg.toString(),null,false);
-                return;
+            String host = getObjectHost(job);
+            String id = (host == MCRHit.LOCAL) ? requestLocalObject(job) : requestRemoteObject(job);
+            if ((id == null) || (id.length() == 0)) {
+                return; // request failed;
             }
-
-            Document doc=TM.readDocument(mcrid);
-            // call the LayoutServlet
-            job.getRequest().setAttribute("MCRLayoutServlet.Input.JDOM", doc);
             String editorID=getEditorID(job.getRequest());
-            setBrowseParameters(job, mcrid, editorID);
+            setBrowseParameters(job, id, host, editorID);
             RequestDispatcher rd = getServletContext().getNamedDispatcher("MCRLayoutServlet");
             rd.forward(job.getRequest(), job.getResponse());
         } catch (MCRException e) {
             generateErrorPage(job.getRequest(), job.getResponse(), HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error while retrieving MCRObject with ID: "
-                    + id, e, false);
+                    + getObjectID(job.getRequest()), e, false);
             return;
         }
     }
+    
+    private String getObjectHost(MCRServletJob job) {
+        String remoteHost = job.getRequest().getParameter("host");
+        if ((remoteHost == null) || (remoteHost.length() == 0)) {
+            remoteHost = MCRHit.LOCAL;
+        }
+        return remoteHost;
+    }
 
-    private void setBrowseParameters(MCRServletJob job, MCRObjectID mcrid, String editorID) {
-        if (editorID==null){
+    private String requestRemoteObject(MCRServletJob job) {
+        String id = getObjectID(job.getRequest());
+        String host = getProperty(job.getRequest(), "host");
+        job.getRequest().setAttribute(MCRLayoutServlet.DOM_ATTR, MCRQueryClient.doRetrieveObject(host, id));
+        return id;
+    }
+
+    private String requestLocalObject(MCRServletJob job) throws IOException, ServletException {
+        String id = getObjectID(job.getRequest());
+        MCRObjectID mcrid = new MCRObjectID(id);
+
+        if (!MCRAccessManager.checkPermission(mcrid, "read")) {
+            StringBuffer msg = new StringBuffer(1024);
+            msg.append("Access denied reading MCRObject with ID: ").append(mcrid.getId());
+            msg.append(".\nCurrent User: ").append(MCRSessionMgr.getCurrentSession().getCurrentUserID());
+            msg.append("\nRemote IP: ").append(MCRSessionMgr.getCurrentSession().getCurrentIP());
+            generateErrorPage(job.getRequest(), job.getResponse(), HttpServletResponse.SC_FORBIDDEN, msg.toString(), null, false);
+            return null;
+        }
+
+        Document doc = TM.readDocument(mcrid);
+        // call the LayoutServlet
+        job.getRequest().setAttribute(MCRLayoutServlet.JDOM_ATTR, doc);
+        return id;
+    }
+
+    private void setBrowseParameters(MCRServletJob job, String mcrid, String host, String editorID) {
+        if (host != MCRHit.LOCAL) {
+            job.getRequest().setAttribute("XSL.objectHost", host);
+        }
+        if (editorID == null) {
             return;
         }
-        MCRCache parameterCache=(MCRCache) MCRSessionMgr.getCurrentSession().get(MCRSearchServlet.getParametersKey());
-        MCRSearchServlet.SearchParameters sp = (parameterCache==null)? null:(MCRSearchServlet.SearchParameters) (parameterCache).get(editorID);
+        MCRCache parameterCache = (MCRCache) MCRSessionMgr.getCurrentSession().get(MCRSearchServlet.getParametersKey());
+        MCRSearchServlet.SearchParameters sp = (parameterCache == null) ? null : (MCRSearchServlet.SearchParameters) (parameterCache).get(editorID);
 
-        if (sp!=null){
-            //editorID found and editorSession still valid
-            storeEditorID(mcrid.toString(),editorID);
-            job.getRequest().setAttribute("XSL.resultListEditorID",editorID);
-            job.getRequest().setAttribute("XSL.numPerPage",String.valueOf(sp.numPerPage));
-            job.getRequest().setAttribute("XSL.page",String.valueOf(sp.page));
-            MCRResults results= (MCRResults)((MCRCache)MCRSessionMgr.getCurrentSession().get(MCRSearchServlet.getResultsKey())).get(editorID);
-            MCRHit previousObject=null, nextObject=null;
-            int numHits=results.getNumHits();
-            for (int i=0;i<numHits;i++){
-                LOGGER.debug("Hit: "+results.getHit(i).getID());
-                if (results.getHit(i).getID().equals(mcrid.toString())){
-                    //hit allocated
-                    //search for next and previous object readable by user
-                    for (int j=i-1;j>=0;j--){
-                        if (MCRAccessManager.checkPermission(results.getHit(j).getID(), "read")) {
-                            previousObject=results.getHit(j);
+        if (sp != null) {
+            // editorID found and editorSession still valid
+            storeEditorID(mcrid, editorID);
+            job.getRequest().setAttribute("XSL.resultListEditorID", editorID);
+            job.getRequest().setAttribute("XSL.numPerPage", String.valueOf(sp.numPerPage));
+            job.getRequest().setAttribute("XSL.page", String.valueOf(sp.page));
+            MCRResults results = (MCRResults) ((MCRCache) MCRSessionMgr.getCurrentSession().get(MCRSearchServlet.getResultsKey())).get(editorID);
+            MCRHit previousObject = null, nextObject = null;
+            int numHits = results.getNumHits();
+            for (int i = 0; i < numHits; i++) {
+                LOGGER.debug("Hit: " + results.getHit(i).getID());
+                if (results.getHit(i).getID().equals(mcrid) && results.getHit(i).getHost().equals(host)) {
+                    // hit allocated
+                    // search for next and previous object readable by user
+                    for (int j = i - 1; j >= 0; j--) {
+                        if ((results.getHit(j).getHost() != MCRHit.LOCAL) || (MCRAccessManager.checkPermission(results.getHit(j).getID(), "read"))) {
+                            previousObject = results.getHit(j);
                             break;
                         }
                     }
-                    for (int j=i+1;j<numHits;j++){
-                        if (MCRAccessManager.checkPermission(results.getHit(j).getID(), "read")) {
-                            nextObject=results.getHit(j);
+                    for (int j = i + 1; j < numHits; j++) {
+                        if ((results.getHit(j).getHost() != MCRHit.LOCAL) || (MCRAccessManager.checkPermission(results.getHit(j).getID(), "read"))) {
+                            nextObject = results.getHit(j);
                             break;
                         }
                     }
                     break;
                 }
             }
-            if (previousObject!=null){
-                job.getRequest().setAttribute("XSL.previousObject",previousObject.getID());
+            if (previousObject != null) {
+                job.getRequest().setAttribute("XSL.previousObject", previousObject.getID());
+                if (previousObject.getHost() != MCRHit.LOCAL) {
+                    job.getRequest().setAttribute("XSL.previousObjectHost", previousObject.getHost());
+                }
             }
-            if (nextObject!=null){
-                job.getRequest().setAttribute("XSL.nextObject",nextObject.getID());
+            if (nextObject != null) {
+                job.getRequest().setAttribute("XSL.nextObject", nextObject.getID());
+                if (nextObject.getHost() != MCRHit.LOCAL) {
+                    job.getRequest().setAttribute("XSL.nextObjectHost", nextObject.getHost());
+                }
             }
         }
     }
