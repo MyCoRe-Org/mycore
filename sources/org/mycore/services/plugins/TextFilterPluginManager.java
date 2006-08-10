@@ -28,16 +28,15 @@ import java.io.InputStream;
 import java.io.Reader;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLClassLoader;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.Properties;
+import java.util.Enumeration;
 
 import org.apache.log4j.Logger;
 import org.mycore.common.MCRConfiguration;
-import org.mycore.common.MCRException;
-import org.mycore.common.MCRUtils;
 import org.mycore.datamodel.ifs.MCRFileContentType;
 
 /**
@@ -86,23 +85,28 @@ public class TextFilterPluginManager {
      * 
      */
     public void loadPlugins() {
-        URLClassLoader classLoader;
-
-        try {
-            classLoader = new URLClassLoader(getPluginURLs(), Thread.currentThread().getContextClassLoader());
-        } catch (MalformedURLException e) {
-            // should "never" happen
-            throw new MCRException("Failure getting URLs from plugins!", e);
+        MCRConfiguration config = MCRConfiguration.instance();
+        String prefix = "MCR.TextFilterPlugin.";
+        Properties props = config.getProperties(prefix);
+        if (props == null) {
+            return;
         }
-
+        
         TextFilterPlugin filter = null;
         MCRFileContentType ct;
-
-        for (Iterator iter = MCRUtils.getProviders(TextFilterPlugin.class, classLoader); iter.hasNext();) {
-            filter = (TextFilterPlugin) iter.next();
-            LOGGER.info(new StringBuffer("Loading TextFilterPlugin: ").append(filter.getName()).append(" v:").append(filter.getMajorNumber()).append('.').append(filter.getMinorNumber()).toString());
-
-            for (Iterator CtIterator = filter.getSupportedContentTypes().iterator(); CtIterator.hasNext();) {
+        
+        Enumeration e = props.propertyNames();
+        while (e.hasMoreElements())
+        {
+          String propertyName = (String) e.nextElement();
+          try
+          {
+            Object o = config.getInstanceOf(propertyName);
+            if (null != o)
+            {
+              filter = (TextFilterPlugin)o;
+              LOGGER.info(new StringBuffer(propertyName + "Loading TextFilterPlugin: ").append(filter.getName()).append(" v:").append(filter.getMajorNumber()).append('.').append(filter.getMinorNumber()).toString());
+              for (Iterator CtIterator = filter.getSupportedContentTypes().iterator(); CtIterator.hasNext();) {
                 // Add MIME Type filters to the basket
                 ct = (MCRFileContentType) CtIterator.next();
 
@@ -112,6 +116,13 @@ public class TextFilterPluginManager {
             }
 
             PLUGINS.put(filter.getClass().getName(), filter);
+            }
+            else LOGGER.info("TextFilterPlugin not available: "+ propertyName + " with property: " + props.getProperty(propertyName));
+          } catch (Exception e1)
+          {
+            LOGGER.info(e1.toString());
+          }
+       
         }
     }
 
@@ -184,42 +195,4 @@ public class TextFilterPluginManager {
         return null;
     }
 
-    /**
-     * returns the URLs of all plugins found in MCR.PluginDirectory
-     * 
-     * @return Array of URL of plugin-JARs
-     * @throws MalformedURLException
-     */
-    private final URL[] getPluginURLs() throws MalformedURLException {
-        HashSet returnS = new HashSet();
-        File pluginDir = new File(CONF.getString("MCR.PluginDirectory"));
-
-        if ((pluginDir == null) || !pluginDir.isDirectory()) {
-            LOGGER.warn("PluginDirectory does not exist! " + pluginDir.getAbsolutePath());
-
-            return new URL[0];
-        }
-
-        File[] plugins = pluginDir.listFiles();
-
-        for (int i = 0; i < plugins.length; i++) {
-            LOGGER.debug(plugins[i].getName());
-
-            if (plugins[i].isFile() && plugins[i].getName().toUpperCase().endsWith(".JAR")) {
-                // This Jar file possibly contains a text filter plugin
-                returnS.add(plugins[i].toURL());
-            }
-        }
-
-        URL[] returnU = new URL[returnS.size()];
-        int i = 0;
-        Iterator it = returnS.iterator();
-
-        while (it.hasNext()) {
-            returnU[i] = (URL) it.next();
-            i++;
-        }
-
-        return returnU;
-    }
 }
