@@ -29,7 +29,16 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.jdom.Attribute;
 import org.jdom.Element;
+import org.jdom.JDOMException;
+import org.jdom.xpath.XPath;
+import org.mycore.common.MCRConfigurationException;
+import org.mycore.common.MCRException;
+import org.mycore.datamodel.classifications.MCRCategoryItem;
+import org.mycore.datamodel.classifications.MCRClassificationItem;
+import org.mycore.datamodel.metadata.MCRLinkTableManager;
+import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.parsers.bool.MCRAndCondition;
 import org.mycore.parsers.bool.MCROrCondition;
 import org.mycore.services.fieldquery.MCRFieldDef;
@@ -37,14 +46,8 @@ import org.mycore.services.fieldquery.MCRQuery;
 import org.mycore.services.fieldquery.MCRQueryCondition;
 import org.mycore.services.fieldquery.MCRQueryManager;
 import org.mycore.services.fieldquery.MCRQueryParser;
-import org.mycore.services.fieldquery.MCRSortBy;
-import org.mycore.common.MCRConfigurationException;
-import org.mycore.common.MCRException;
-import org.mycore.datamodel.classifications.MCRCategoryItem;
-import org.mycore.datamodel.classifications.MCRClassificationItem;
-import org.mycore.datamodel.metadata.MCRLinkTableManager;
-import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.services.fieldquery.MCRResults;
+import org.mycore.services.fieldquery.MCRSortBy;
 
 /**
  * @author Heiko Helmbrecht
@@ -109,7 +112,17 @@ public class MCROAIQueryImpl implements MCROAIQuery {
             logger.debug("ClassificationItem " + repository.getClassificationID() + " hat " + children.length + " Kinder.");
             if ((repository != null) && (repository.hasChildren())) {
                 logger.debug("ClassificationItem hat " + repository.getNumChildren() + " Kinder.");
-                list.addAll(getSets(repository.getChildren(), "", instance));
+                List newSets =getSets(repository.getChildren(), "", instance);
+                if (newSets.size()>0){
+                	list.addAll(newSets);
+                	if(repository.getLangArray().contains("x-dini")){
+                    	String[] set = new String[3];
+                    	set[0]= repository.getText("x-dini");
+                    	set[1]=repository.getText("x-dini");
+                    	set[2]=repository.getDescription("x-dini");
+                    	list.add(set);
+                    }
+                }	
             }
         }
 
@@ -129,18 +142,25 @@ public class MCROAIQueryImpl implements MCROAIQuery {
      *         id, the label and a description
      */
     private List getSets(MCRCategoryItem[] categories, String parentSpec, String instance) {
-        List newList = new ArrayList();
+        
+    	List newList = new ArrayList();
 
         for (int i = 0; i < categories.length; i++) {
             String[] set = new String[3];
-            set[0] = new String(parentSpec + categories[i].getID());
+//          added DINI (OAI) Support
+            if(categories[i].getLangArray().contains("x-dini")){
+               	//ignore parentSpec, since it is specified in the label
+            	set[0] = new String(categories[i].getText("x-dini"));
+            	
+            }
+            else{
+            	set[0] = new String(parentSpec + categories[i].getID());	
+            }            
             set[1] = new String(categories[i].getText("en"));
             set[2] = new String(categories[i].getDescription("en"));
 
-            logger.debug("Suche nach Kategorie: " + categories[i].getID());
-
             if (categories[i].hasChildren()) {
-                logger.debug("Kategorie " + categories[i].getID() + " hat " + categories[i].getNumChildren() + " Kinder.");
+            	logger.debug("Kategorie " + categories[i].getID() + " hat " + categories[i].getNumChildren() + " Kinder.");
                 newList.addAll(getSets(categories[i].getChildren(), set[0] + ":", instance));
             }
 
@@ -149,8 +169,10 @@ public class MCROAIQueryImpl implements MCROAIQuery {
             int numberOfLinks = ltm.countReferenceCategory(categories[i].getClassificationID(), categories[i].getID());
 
             if (numberOfLinks > 0) {
-                newList.add(set);
-                logger.debug("Der Gruppenliste wurde der Datensatz " + set[0] + " hinzugefügt.");
+            	if(!set[0].equals("")){ //emtpy - dini - attributes shall be ignored
+            		newList.add(set);
+            		logger.debug("Der Gruppenliste wurde der Datensatz " + set[0] + " hinzugefügt.");
+            	}
             }
         }
 
@@ -274,6 +296,7 @@ public class MCROAIQueryImpl implements MCROAIQuery {
             } else {
                 String categoryId = set[0].substring(set[0].lastIndexOf(':') + 1);
                 cOr.addChild(new MCRQueryCondition(field, "like", categoryId));
+                generateQueryForDiniLabels(cOr, searchField, set[0], instance);
             }
         }
         if ((cOr.getChildren() != null) && (cOr.getChildren().size() > 0)) {
@@ -338,4 +361,32 @@ public class MCROAIQueryImpl implements MCROAIQuery {
         resultArray = null;
         lastQuery = query;
     }
+    
+    private void generateQueryForDiniLabels(MCROrCondition cOr,
+			String searchField, String set, String instance) {
+		//expected searchfields:  "format",  "type",      "subject"
+		//mapping to DINI sets:   "doc-type", "pub-type", "ddc"
+		MCRFieldDef field = MCRFieldDef.getDef(searchField);
+
+		String[] classification = MCROAIProvider.getConfigBean(instance)
+				.getClassificationIDsForSearchField(searchField);
+
+		for (int i = 0; i < classification.length; i++) {
+			MCRClassificationItem repository = MCRClassificationItem.getClassificationItem(classification[i]);
+			org.jdom.Document jDomDoc = repository.receiveClassificationAsJDOM();
+			try {
+				//could be improved: return only <label> under a <categegory> but //category/label[..] does not work here
+				XPath xpathExpr = XPath.newInstance("//label[@xml:lang='x-dini' and @text='"+ set + "']/..//@ID");
+				List resultList = xpathExpr.selectNodes(jDomDoc);
+				for (int j = 0; j < resultList.size(); j++) {
+					if (resultList.get(j) instanceof Attribute) {
+						cOr.addChild(new MCRQueryCondition(field, "like", ((Attribute) resultList.get(j)).getValue()));
+					}
+				}
+			} catch (JDOMException e) {
+				logger.error(e);
+			}
+
+		}
+	}
 }
