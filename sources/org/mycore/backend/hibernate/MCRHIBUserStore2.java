@@ -37,6 +37,7 @@ import org.mycore.backend.hibernate.tables.MCRGROUPS;
 import org.mycore.backend.hibernate.tables.MCRUSERS;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
+import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.user2.MCRGroup;
 import org.mycore.user2.MCRUser;
 import org.mycore.user2.MCRUserStore;
@@ -389,20 +390,19 @@ public class MCRHIBUserStore2 implements MCRUserStore {
         List l = null;
 
         try {
-            l = session.createQuery("from MCRUSERS").list();
+            l = session.createQuery("select max(key.numid) from MCRUSERS").list();
+            if (l.size() > 0 && l.get(0) != null) {            	
+            	Integer max = (Integer) l.get(0);
+            	if (max != null) 
+            		 ret = max.intValue();
+            }
         } catch (Exception e) {
             logger.error(e);
             throw new MCRException("error during getMaxUserNumID()", e);
         } finally {
             session.close();
         }
-
-        if (l.size() > 0) {
-            MCRUSERS user = (MCRUSERS) l.get(l.size() - 1);
-            ret = user.getNumid();
-        }
-
-        return ret;
+        return ret;                       
     }
 
     /**
