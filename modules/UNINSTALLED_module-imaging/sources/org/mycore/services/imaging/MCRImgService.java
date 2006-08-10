@@ -178,6 +178,9 @@ public class MCRImgService {
 			int cacheWidth = Integer.parseInt(config.getString("MCR.Module-iview.cache.size.width"));
 			int cacheHeight = Integer.parseInt(config.getString("MCR.Module-iview.cache.size.height"));
 			
+			xTopPos = (int)(xTopPos * scaleFactor);
+			yTopPos = (int)(yTopPos * scaleFactor);
+			
 			if (cache.isLocked(image)) {
 				LOGGER.debug("****************************************");
 				LOGGER.debug("* Create Lock Message!");
@@ -197,13 +200,16 @@ public class MCRImgService {
 				
 				scaleFactor = scaleFactor / scaleHelp;
 				
+				xTopPos = (int)(xTopPos / scaleHelp);
+				yTopPos = (int)(yTopPos / scaleHelp);
+				
 				// get the small cached version
 				input = cache.getImageAsInputStream(image, MCRImgCacheManager.CACHE);
 			} else if (cache.existInCache(image, MCRImgCacheManager.ORIG)) {
 				LOGGER.debug("*********************************************");
 				LOGGER.debug("* Get Orig from ImgCache for " + image.getName());
 				LOGGER.debug("*********************************************");
-
+				
 				// get the orig cached version
 				input = cache.getImageAsInputStream(image, MCRImgCacheManager.ORIG);
 			} else {
