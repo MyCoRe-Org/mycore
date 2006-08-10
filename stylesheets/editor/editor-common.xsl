@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
 <!-- ============================================== -->
-<!-- $Revision: 1.5.4.3 $ $Date: 2006-07-12 12:37:58 $ -->
+<!-- $Revision: 1.5.4.4 $ $Date: 2006-08-10 08:19:45 $ -->
 <!-- ============================================== --> 
 
 <xsl:stylesheet 
@@ -27,64 +27,71 @@
 <xsl:template name="output.label">
   <xsl:param name="usefont" select="'no'" />
 
-  <xsl:if test="$usefont = 'yes'">
-    <xsl:text disable-output-escaping="yes">&lt;span class="editorText" &gt;</xsl:text>
-  </xsl:if>
-
   <xsl:choose>
   
-    <!--  If there is a i18n key, output the translation from messages file -->
-    <xsl:when test="@i18n">
+    <!--  If there is a i18n key not in  label (like items from listbox), output the translation from messages file without css stylesheet -->
+    <xsl:when test="@i18n and name() != 'label' ">
       <xsl:value-of select="i18n:translate(@i18n)" disable-output-escaping="yes"/>    
     </xsl:when>
-
-
-    <!-- If there is a label with a i18n key, output the translation from messages file -->
-    <xsl:when test="label[string-length(@i18n)!=0]" >
-      <xsl:value-of select="i18n:translate(label/@i18n)" disable-output-escaping="yes"/>    
+    <xsl:when test="label[string-length(@i18n)!=0 and string-length(@css-style)!=0 ]">
+        <xsl:text disable-output-escaping="yes">&lt;span class=&quot;</xsl:text>
+		<xsl:value-of select="label/@css-style" />
+		<xsl:text disable-output-escaping="yes">&quot;&gt;</xsl:text> 
+		<xsl:value-of select="i18n:translate(label/@i18n)" disable-output-escaping="yes"/> 
+		<xsl:text disable-output-escaping="yes">&lt;/span&gt;</xsl:text> 
     </xsl:when>
 
-    <!-- If there is a label with xml:lang = selected lang, output it -->
-    <xsl:when test="label[lang($CurrentLang) or lang('all')]">
-      <xsl:for-each select="label[lang($CurrentLang) or lang('all')]">
-        <xsl:copy-of select="*|text()" />
-      </xsl:for-each>
-    </xsl:when>
-
-    <!-- Otherwise, if there is a label in the default language, output it -->
-    <xsl:when test="label[lang($DefaultLang)  or lang('all')]">
-      <xsl:for-each select="label[lang($DefaultLang) or lang('all')]">
-        <xsl:copy-of select="*|text()" />
-      </xsl:for-each>
-    </xsl:when>
-
-    <!-- Otherwise, use the language-independent @label attribute, if it exists -->
-    <xsl:when test="@label">
-      <xsl:value-of select="@label" />
-    </xsl:when>
-
-    <!-- Otherwise, use the language-independent nested label elements, if existing -->
-    <xsl:when test="label[string-length(@xml:lang)=0]">
-      <xsl:for-each select="label[string-length(@xml:lang)=0]">
-        <xsl:copy-of select="*|text()" />
-      </xsl:for-each>
-    </xsl:when>
-
-    <!-- Otherwise, use the first label of any language that exists -->
     <xsl:otherwise>
-      <xsl:for-each select="label[1]">
-        <xsl:copy-of select="*|text()" />
-      </xsl:for-each>
-    </xsl:otherwise>
+      <xsl:if test="$usefont = 'yes'">
+        <xsl:text disable-output-escaping="yes">&lt;span class="editorText" &gt;</xsl:text>
+      </xsl:if>
+  
+      <xsl:choose>  
+      <!-- If there is a label with a i18n key, output the translation from messages file -->
+      <xsl:when test="label[string-length(@i18n)!=0]" >
+        <xsl:value-of select="i18n:translate(label/@i18n)" disable-output-escaping="yes"/>    
+      </xsl:when>
+  
+      <!-- If there is a label with xml:lang = selected lang, output it -->
+      <xsl:when test="label[lang($CurrentLang) or lang('all')]">
+        <xsl:for-each select="label[lang($CurrentLang) or lang('all')]">
+          <xsl:copy-of select="*|text()" />
+        </xsl:for-each>
+      </xsl:when>
+  
+      <!-- Otherwise, if there is a label in the default language, output it -->
+      <xsl:when test="label[lang($DefaultLang)  or lang('all')]">
+        <xsl:for-each select="label[lang($DefaultLang) or lang('all')]">
+          <xsl:copy-of select="*|text()" />
+        </xsl:for-each>
+      </xsl:when>
+  
+      <!-- Otherwise, use the language-independent @label attribute, if it exists -->
+      <xsl:when test="@label">
+        <xsl:value-of select="@label" />
+      </xsl:when>
+  
+      <!-- Otherwise, use the language-independent nested label elements, if existing -->
+      <xsl:when test="label[string-length(@xml:lang)=0]">
+        <xsl:for-each select="label[string-length(@xml:lang)=0]">
+          <xsl:copy-of select="*|text()" />
+        </xsl:for-each>
+      </xsl:when>
+  
+      <!-- Otherwise, use the first label of any language that exists -->
+      <xsl:otherwise>
+        <xsl:for-each select="label[1]">
+          <xsl:copy-of select="*|text()" />
+        </xsl:for-each>
+      </xsl:otherwise>
 
-    <!-- Otherwise give up, user is too stupid to configure the editor -->
-
+      <!-- Otherwise give up, user is too stupid to configure the editor -->
+    </xsl:choose>  
+    <xsl:if test="$usefont = 'yes'">
+      <xsl:text disable-output-escaping="yes">&lt;/span&gt;</xsl:text>
+    </xsl:if>
+   </xsl:otherwise>
   </xsl:choose>
-
-  <xsl:if test="$usefont = 'yes'">
-    <xsl:text disable-output-escaping="yes">&lt;/span&gt;</xsl:text>
-  </xsl:if>
-
 </xsl:template>
 
 <!-- ========================================================================= -->
