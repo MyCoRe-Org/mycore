@@ -29,8 +29,10 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
+import org.jdom.Element;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandlerBase;
+import org.mycore.common.xml.MCRXMLHelper;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRObject;
@@ -50,7 +52,9 @@ public class MCRAccessEventHandler extends MCREventHandlerBase {
     private static MCRAccessInterface AI = MCRAccessManager.getAccessImpl();
 
     private static String storedrules = CONFIG.getString("MCR.StorePermissions", "read,write,delete");
-
+    // get the standard read rule from config or it's the false rule
+    private static String  strRule = CONFIG.getString("MCR.AccessRule.STANDARD-READ-RULE", "<condition format=\"xml\"><boolean operator=\"false\" /></condition>");
+    private static Element readrule = (Element)MCRXMLHelper.parseXML(strRule,false).getRootElement().detach();
     /**
      * This method will be used to create the access rules for SWF for a
      * MCRObject.
@@ -246,10 +250,16 @@ public class MCRAccessEventHandler extends MCREventHandlerBase {
             if (savedPermissions != null && savedPermissions.contains(permission)) {
                 if (overwrite) {
                     MCRAccessManager.removeRule(base.getId(), permission);
-                    MCRAccessManager.addRule(base.getId(), permission, MCRAccessManager.getFalseRule(), "");
+                	if ("read".equals(permission))                		
+                        MCRAccessManager.addRule(base.getId(), permission, readrule, "");
+                	else
+                		MCRAccessManager.addRule(base.getId(), permission, MCRAccessManager.getFalseRule(), "");
                 }
             } else {
-                MCRAccessManager.addRule(base.getId(), permission, MCRAccessManager.getFalseRule(), "");
+            	if ("read".equals(permission))
+                    MCRAccessManager.addRule(base.getId(), permission, readrule, "");
+            	else 
+            		MCRAccessManager.addRule(base.getId(), permission, MCRAccessManager.getFalseRule(), "");
             }
         }
     }
