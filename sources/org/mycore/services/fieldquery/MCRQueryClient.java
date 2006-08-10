@@ -199,4 +199,46 @@ public class MCRQueryClient {
         }
         return null;
     }
+    /**
+     * Retrieves an Object from remote host using the webservice.
+     * 
+     * @param hostAlias the alias of the remote host as defined in hosts.xml
+     * @param ID   the ID of the Object to retrieve
+     * 
+     */
+    public static org.w3c.dom.Document doRetrieveClassification(String hostAlias, String level, String type, String classID, String categID) {
+        if (!endpoints.containsKey(hostAlias)) {
+            String msg = "No configuration for host " + hostAlias;
+            throw new MCRConfigurationException(msg);
+        }
+
+        LOGGER.info("Starting remote retrieval at host " + hostAlias);
+
+        String endpoint = endpoints.getProperty(hostAlias);
+        
+        String ID = "level="+level+":type="+type+":classId="+classID+":categId="+categID;
+
+        try {
+            // Build webservice call
+            Call call = (Call) (service.createCall());
+            call.setTargetEndpointAddress(new URL(endpoint));
+            call.setOperation(operation);
+            call.setOperationName("MCRDoRetrieveClassification");
+            call.removeAllParameters();
+            call.addParameter("level", org.apache.axis.Constants.XSD_STRING, javax.xml.rpc.ParameterMode.IN);
+            call.addParameter("type", org.apache.axis.Constants.XSD_STRING, javax.xml.rpc.ParameterMode.IN);
+            call.addParameter("classID", org.apache.axis.Constants.XSD_STRING, javax.xml.rpc.ParameterMode.IN);
+            call.addParameter("categID", org.apache.axis.Constants.XSD_STRING, javax.xml.rpc.ParameterMode.IN);
+            call.setReturnType(new QName("http://xml.apache.org/xml-soap", "Document"));
+            // Call webservice
+            org.w3c.dom.Document outDoc = (org.w3c.dom.Document) (call.invoke(new Object[] { level, type, classID, categID }));
+            LOGGER.info("Received remote Object: " + ID);
+            
+            return outDoc;
+        } catch (Exception ex) {
+            String msg = "Exception while retrieving Object '" + ID + "' from remote host " + hostAlias;
+            LOGGER.error(msg, ex);
+        }
+        return null;
+    }
 }
