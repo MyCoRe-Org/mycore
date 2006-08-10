@@ -116,7 +116,7 @@ public class MCRImgProcessor implements ImgProcessor {
 
 		if (newWidth != origSize.width && newHeight != origSize.height)
 			try {
-				image = resizeImage(image, newWidth, newHeight, true);
+				image = resizeImage(image, newWidth, newHeight);
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -140,19 +140,6 @@ public class MCRImgProcessor implements ImgProcessor {
 			tiffEncode(image, output, true, tileWidth, tileHeight);
 	}
 	
-	public void scaleROI(InputStream input, int xTopPos, int yTopPos, int boundWidth, int boundHeight, int fitDirection, OutputStream output) {
-		image = loadmageMEMCache(input);
-		
-		if (fitDirection == FIT_WIDTH){
-			scaleFactor = (float)boundWidth / (float)origSize.width;
-		}
-		else{
-			scaleFactor = (float)boundHeight / (float)origSize.height;
-		}
-		
-		scaleROI(input, xTopPos, yTopPos, boundWidth, boundHeight, scaleFactor, output);
-	}
-	
 	public void scaleROI(InputStream input, int xTopPos, int yTopPos, int boundWidth, int boundHeight, float scaleFactor, OutputStream output) {
 		if (image == null)
 			image = loadmageMEMCache(input);
@@ -169,7 +156,16 @@ public class MCRImgProcessor implements ImgProcessor {
 		
 		if (scaleBoundary.height > origSize.height)
 			scaleBoundary.height = origSize.height;
-			
+		
+		LOGGER.debug("*********************************************");
+		LOGGER.debug("* MCRImgProcessor - scaleROI#");
+		LOGGER.debug("* ScaleFactor: " + scaleFactor);
+		LOGGER.debug("* scaleBoundary.width: " + scaleBoundary.width);
+		LOGGER.debug("* scaleBoundary.height: " + scaleBoundary.height);
+		LOGGER.debug("* origSize.width: " + origSize.width);
+		LOGGER.debug("* origSize.height: " + origSize.height);
+		LOGGER.debug("*********************************************");
+		
 		if (scaleBoundary.width < origSize.width || scaleBoundary.height < origSize.height)
 			image = crop(image, scaleTopCorner, scaleBoundary);
 		
@@ -238,7 +234,7 @@ public class MCRImgProcessor implements ImgProcessor {
 	public void resize(int newWidth, int newHeight) {
 		if (newWidth != origSize.width && newHeight != origSize.height)
 			try {
-				image = resizeImage(image, newWidth, newHeight, true);
+				image = resizeImage(image, newWidth, newHeight);
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -248,17 +244,6 @@ public class MCRImgProcessor implements ImgProcessor {
 	public void scale(float scaleFactor) {
 		if (scaleFactor != 1)
 			image = scaleImage(image, scaleFactor);
-	}
-
-	public void scaleROI(int xTopPos, int yTopPos, int boundWidth, int boundHeight, int fitDirection) {
-		if (fitDirection == FIT_WIDTH){
-			scaleFactor = (float)boundWidth / (float)origSize.width;
-		}
-		else{
-			scaleFactor = (float)boundHeight / (float)origSize.height;
-		}
-		
-		scaleROI(xTopPos, yTopPos, boundWidth, boundHeight, scaleFactor);
 	}
 
 	public void scaleROI(int xTopPos, int yTopPos, int boundWidth, int boundHeight, float scaleFactor) {
@@ -379,22 +364,33 @@ public class MCRImgProcessor implements ImgProcessor {
 		return scaleImage(img, yScale);
 	}
 
-	private PlanarImage resizeImage(PlanarImage img, int newWidth, int newHeight, boolean keepProportion) throws Exception {
+	private PlanarImage resizeImage(PlanarImage img, int newWidth, int newHeight) throws Exception {
 		if (newWidth <= 0 || newHeight <= 0)
 			throw new Exception("newWidth and newHeight should be > 0!");
 
-		int origWidth = img.getWidth();
-		int origHeight = img.getHeight();
-		float xScale = (float) newWidth / (float) origWidth;
-		float yScale = (float) newHeight / (float) origHeight;
-
-		if (keepProportion)
-			if (yScale < xScale)
-				xScale = yScale;
-			else
-				yScale = xScale;
-
-		return scaleImage(img, xScale);
+		float scaleFactor = 1;
+		
+		LOGGER.debug("*********************************************");
+		LOGGER.debug("* MCRImgProcessor - resizeImage             *");
+		LOGGER.debug("* newWidth: " + newWidth);
+		LOGGER.debug("* newHeight: " + newHeight);
+		LOGGER.debug("* origSize.width: " + origSize.width);
+		LOGGER.debug("* origSize.height: " + origSize.height);
+		LOGGER.debug("*********************************************");
+		
+		if (newWidth != origSize.width || newHeight != origSize.height) {
+			LOGGER.debug("*********************************************");
+			LOGGER.debug("* MCRImgProcessor - resizeImage             *");
+			LOGGER.debug("* in IF                                     *");
+			LOGGER.debug("*********************************************");
+			int origWidth = img.getWidth();
+			int origHeight = img.getHeight();
+			float xScale = (float) newWidth / (float) origWidth;
+			float yScale = (float) newHeight / (float) origHeight;
+			scaleFactor = (yScale < xScale) ? yScale : xScale;
+		}
+		
+		return scaleImage(img, scaleFactor);
 	}
 
 	// Encoding Part

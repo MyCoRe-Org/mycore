@@ -175,7 +175,7 @@ public class MCRImgCacheCommands extends MCRAbstractCommands {
 	public static void cacheFile(MCRFile imgFile) throws Exception {
 		MCRConfiguration config = MCRConfiguration.instance();
 		String suppContTypes = new String(config.getString("MCR.Module-iview.SupportedContentTypes"));
-		boolean cacheOrig = Boolean.getBoolean(config.getString("MCR.Module-iview.cacheOrig"));
+		boolean cacheOrig = (new Boolean(config.getString("MCR.Module-iview.cacheOrig"))).booleanValue();
 		int thumbWidth = Integer.parseInt(config.getString("MCR.Module-iview.thumbnail.size.width"));
 		int thumbHeight = Integer.parseInt(config.getString("MCR.Module-iview.thumbnail.size.height"));
 

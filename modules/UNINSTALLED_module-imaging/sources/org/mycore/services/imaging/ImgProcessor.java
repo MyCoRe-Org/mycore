@@ -9,7 +9,6 @@ public interface ImgProcessor {
 	void resizeFitHeight(InputStream input, int newHeight, OutputStream output);
 	void resize(InputStream input, int newWidth, int newHeight, OutputStream output);
 	void scale(InputStream input, float scaleFactor, OutputStream output);
-	void scaleROI(InputStream input, int xTopPos, int yTopPos, int boundWidth, int boundHeight, int fitDirection, OutputStream output);
 	void scaleROI(InputStream input, int xTopPos, int yTopPos, int boundWidth, int boundHeight, float scaleFactor, OutputStream output);
 	float getScaleFactor();
 	float getJpegQuality();
@@ -31,7 +30,6 @@ public interface ImgProcessor {
 	void resizeFitHeight(int newHeight);
 	void resize(int newWidth, int newHeight);
 	void scale(float scaleFactor);
-	void scaleROI(int xTopPos, int yTopPos, int boundWidth, int boundHeight, int fitDirection);
 	void scaleROI(int xTopPos, int yTopPos, int boundWidth, int boundHeight, float scaleFactor);
 	void jpegEncode(OutputStream output);
 	void tiffEncode(OutputStream output);
