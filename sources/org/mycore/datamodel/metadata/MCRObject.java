@@ -376,11 +376,14 @@ final public class MCRObject extends MCRBase {
      */
     public final void addDerivateInDatastore(String id, MCRMetaLinkID link) throws MCRPersistenceException {
         receiveFromDatastore(id);
+        // don't put the same derivates twice in an object!
+        if(	getStructure().searchForDerivate(link) >= 0)
+        	return;
         if(!importMode) {
         	mcr_service.setDate("modifydate");	
         }
-        getStructure().addDerivate(link);
-        updateThisInDatastore();
+       	getStructure().addDerivate(link);
+       	updateThisInDatastore();
     }
 
     /**
