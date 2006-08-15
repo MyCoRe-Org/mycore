@@ -23,14 +23,12 @@
 
 package org.mycore.services.fieldquery;
 
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
 import javax.xml.namespace.QName;
 
-import org.apache.axis.client.Call;
 import org.apache.axis.client.Service;
 import org.apache.axis.constants.Style;
 import org.apache.axis.constants.Use;
@@ -43,12 +41,13 @@ import org.jdom.JDOMException;
 import org.jdom.input.DOMBuilder;
 import org.jdom.output.DOMOutputter;
 import org.mycore.common.MCRConfigurationException;
+import org.mycore.common.MCRException;
 import org.mycore.common.xml.MCRURIResolver;
 
 /**
  * Executes a query on remote hosts using a webservice
  * 
- * @author Frank Lützenkirchen
+ * @author Frank Lützenkirchen @author Jens Kupferschmidt
  */
 public class MCRQueryClient {
     /** The logger */
@@ -57,14 +56,8 @@ public class MCRQueryClient {
     /** A list containing the aliases of all hosts */
     public final static List ALL_HOSTS;
 
-    /** A map from host alias to endpoint URL */
-    private static Properties endpoints = new Properties();
-
-    /** The AXIS service object */
-    private static Service service = new Service();
-
-    /** The description of the doQuery service operation */
-    private static OperationDesc operation;
+    /** A map from host alias to classes for access types */
+    private static Properties accessclass = new Properties();
 
     static {
         // Read hosts.xml configuration file
@@ -74,24 +67,23 @@ public class MCRQueryClient {
         List children = hosts.getChildren();
         for (int i = 0; i < children.size(); i++) {
             Element host = (Element) (children.get(i));
-            String alias = host.getAttributeValue("alias");
-            String url = host.getAttributeValue("url");
-            LOGGER.debug("Host " + alias + " uses query endpoint at " + url);
-            endpoints.put(alias, url);
+            String classname = host.getAttributeValue("class");
+            MCRQueryClientInterface qi = null;
+            try {
+                qi = (MCRQueryClientInterface) Class.forName(classname).newInstance();
+            } catch (ClassNotFoundException e) {
+                throw new MCRException(classname + " ClassNotFoundException",e);
+            } catch (IllegalAccessException e) {
+                throw new MCRException(classname + " IllegalAccessException",e);
+            } catch (InstantiationException e) {
+                throw new MCRException(classname + " InstantiationException",e);
+            }
+            ((MCRQueryClientInterface)qi).init(host);
+            String alias = ((MCRQueryClientInterface)qi).getAlias();
+            LOGGER.debug("Host " + alias + " uses class "+classname);
+            accessclass.put(alias, qi);
             ALL_HOSTS.add(alias);
         }
-
-        String xmlsoap = "http://xml.apache.org/xml-soap";
-
-        // Build doQuery operation description
-        operation = new OperationDesc();
-        operation.setName("MCRDoQuery");
-        operation.addParameter(new ParameterDesc(new QName("", "in0"), ParameterDesc.IN, new QName("http://xml.apache.org/xml-soap", "Document"), org.w3c.dom.Document.class, false, false));
-        operation.setReturnType(new QName(xmlsoap, "Document"));
-        operation.setReturnClass(org.w3c.dom.Document.class);
-        operation.setReturnQName(new QName("", "MCRDoQueryReturn"));
-        operation.setStyle(Style.RPC);
-        operation.setUse(Use.ENCODED);
     }
 
     /**
@@ -134,34 +126,13 @@ public class MCRQueryClient {
      * @param results the result list to add the hits to
      */
     private static void search(String hostAlias, org.w3c.dom.Document inDoc, MCRResults results) {
-        if (!endpoints.containsKey(hostAlias)) {
+        if (!accessclass.containsKey(hostAlias)) {
             String msg = "No configuration for host " + hostAlias;
             throw new MCRConfigurationException(msg);
         }
-
         LOGGER.info("Starting remote query at host " + hostAlias);
-
-        String endpoint = endpoints.getProperty(hostAlias);
-
-        try {
-            // Build webservice call
-            Call call = (Call) (service.createCall());
-            call.setTargetEndpointAddress(new URL(endpoint));
-            call.setOperation(operation);
-            call.setOperationName("MCRDoQuery");
-
-            // Call webservice
-            org.w3c.dom.Document outDoc = (org.w3c.dom.Document) (call.invoke(new Object[] { inDoc }));
-            LOGGER.info("Received remote query results, processing XML now");
-
-            // Process xml response
-            Document response = new DOMBuilder().build(outDoc);
-            int numHits = results.merge(response, hostAlias);
-            LOGGER.debug("Received " + numHits + " hits from host " + hostAlias);
-        } catch (Exception ex) {
-            String msg = "Exception while querying remote host " + hostAlias;
-            LOGGER.error(msg, ex);
-        }
+        MCRQueryClientInterface qi = (MCRQueryClientInterface) accessclass.get(hostAlias);
+        qi.search(inDoc,results);
     }
 
     /**
@@ -172,73 +143,31 @@ public class MCRQueryClient {
      * 
      */
     public static org.w3c.dom.Document doRetrieveObject(String hostAlias, String ID) {
-        if (!endpoints.containsKey(hostAlias)) {
+        if (!accessclass.containsKey(hostAlias)) {
             String msg = "No configuration for host " + hostAlias;
             throw new MCRConfigurationException(msg);
         }
-
         LOGGER.info("Starting remote retrieval at host " + hostAlias);
-
-        String endpoint = endpoints.getProperty(hostAlias);
-
-        try {
-            // Build webservice call
-            Call call = (Call) (service.createCall());
-            call.setTargetEndpointAddress(new URL(endpoint));
-            call.setOperation(operation);
-            call.setOperationName("MCRDoRetrieveObject");
-
-            // Call webservice
-            org.w3c.dom.Document outDoc = (org.w3c.dom.Document) (call.invoke(new Object[] { ID }));
-            LOGGER.info("Received remote Object: " + ID);
-            
-            return outDoc;
-        } catch (Exception ex) {
-            String msg = "Exception while retrieving Object '" + ID + "' from remote host " + hostAlias;
-            LOGGER.error(msg, ex);
-        }
-        return null;
+        MCRQueryClientInterface qi = (MCRQueryClientInterface) accessclass.get(hostAlias);
+        return qi.doRetrieveObject(ID);
     }
+
     /**
-     * Retrieves an Object from remote host using the webservice.
+     * Retrieves an classification part from remote host using the WebService.
      * 
-     * @param hostAlias the alias of the remote host as defined in hosts.xml
-     * @param ID   the ID of the Object to retrieve
-     * 
+     * @param level   the level of the classification to retrieve
+     * @param type   the type of the classification to retrieve
+     * @param classID   the class ID of the classification to retrieve
+     * @param categID   the category ID of the classification to retrieve
+     * @return the classification document
      */
     public static org.w3c.dom.Document doRetrieveClassification(String hostAlias, String level, String type, String classID, String categID) {
-        if (!endpoints.containsKey(hostAlias)) {
+        if (!accessclass.containsKey(hostAlias)) {
             String msg = "No configuration for host " + hostAlias;
             throw new MCRConfigurationException(msg);
         }
-
         LOGGER.info("Starting remote retrieval at host " + hostAlias);
-
-        String endpoint = endpoints.getProperty(hostAlias);
-        
-        String ID = "level="+level+":type="+type+":classId="+classID+":categId="+categID;
-
-        try {
-            // Build webservice call
-            Call call = (Call) (service.createCall());
-            call.setTargetEndpointAddress(new URL(endpoint));
-            call.setOperation(operation);
-            call.setOperationName("MCRDoRetrieveClassification");
-            call.removeAllParameters();
-            call.addParameter("level", org.apache.axis.Constants.XSD_STRING, javax.xml.rpc.ParameterMode.IN);
-            call.addParameter("type", org.apache.axis.Constants.XSD_STRING, javax.xml.rpc.ParameterMode.IN);
-            call.addParameter("classID", org.apache.axis.Constants.XSD_STRING, javax.xml.rpc.ParameterMode.IN);
-            call.addParameter("categID", org.apache.axis.Constants.XSD_STRING, javax.xml.rpc.ParameterMode.IN);
-            call.setReturnType(new QName("http://xml.apache.org/xml-soap", "Document"));
-            // Call webservice
-            org.w3c.dom.Document outDoc = (org.w3c.dom.Document) (call.invoke(new Object[] { level, type, classID, categID }));
-            LOGGER.info("Received remote Object: " + ID);
-            
-            return outDoc;
-        } catch (Exception ex) {
-            String msg = "Exception while retrieving Object '" + ID + "' from remote host " + hostAlias;
-            LOGGER.error(msg, ex);
-        }
-        return null;
+        MCRQueryClientInterface qi = (MCRQueryClientInterface) accessclass.get(hostAlias);
+        return qi.doRetrieveClassification(level,type,classID,categID);
     }
 }
