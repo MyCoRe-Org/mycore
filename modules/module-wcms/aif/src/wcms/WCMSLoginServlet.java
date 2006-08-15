@@ -98,14 +98,13 @@ public class WCMSLoginServlet extends WCMSServlet {
             userPassword = request.getParameter("userPassword").trim();
             userPassword = HashCipher.crypt(userPassword);
            } catch (Exception e) {
-            System.err.println("catch = "+ e.getMessage());
+            System.err.println(e.getMessage());
         }
                         
         // pssword and userid not set
         if ((userPassword == null) && (userID == null)) {
         	if ((mcrSession.get("status") == null) )
         	  {
-               System.err.println("\n\n\nstatus==null\n\n\n");
                if (flag.equals("true"))
           	     {
           		  response.sendRedirect(mcrConf.getString("MCR.WCMS.sessionError")+"?XSL.Style=xml");	
