@@ -7,7 +7,9 @@
 	  alias="remote" 
 	  url="http://localhost:8291/"
 	  class="org.mycore.services.fieldquery.MCRQueryClientWebService"
-	  access="webservice">
+	  access="webservice"
+	  servicepath="services/MCRWebService"
+	  staticpath="receive/">
     <label xml:lang="de">Lokal via WebService</label>
     <label xml:lang="en">Local via WebService</label>
   </host>
@@ -15,7 +17,9 @@
 	  alias="leipzig" 
 	  url="http://mycoresamplelinux.dl.uni-leipzig.de/"
 	  class="org.mycore.services.fieldquery.MCRQueryClientWebService"
-	  access="webservice">
+	  access="webservice"
+	  servicepath="services/MCRWebService"
+	  staticpath="receive/">
     <label xml:lang="de">DocPortal an der Universität Leipzig</label>
     <label xml:lang="en">DocPortal of the University of Leipzig</label>
   </host>

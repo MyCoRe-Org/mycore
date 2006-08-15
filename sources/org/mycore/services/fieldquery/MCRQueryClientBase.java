@@ -47,6 +47,9 @@ public class MCRQueryClientBase implements MCRQueryClientInterface {
     /** The access mode for the remote host */
     protected String access = "";
 
+    /** The URL path for the remote host service */
+    protected String servicepath = "";
+
     /* The constructor. */
     public MCRQueryClientBase() {
     }
