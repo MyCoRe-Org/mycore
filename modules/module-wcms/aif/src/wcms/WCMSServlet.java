@@ -56,9 +56,9 @@ public abstract class WCMSServlet extends MCRServlet {
      */
     protected void doGetPost(MCRServletJob job) throws Exception {
         if (isValidUser()) {
-            processRequest(job.getRequest(), job.getResponse());
+        	processRequest(job.getRequest(), job.getResponse());
         } else {
-            job.getResponse().sendRedirect(CONFIG.getString("MCR.WCMS.sessionError"));
+       	    job.getResponse().sendRedirect(CONFIG.getString("MCR.WCMS.sessionError"));     	 
         }
     }
 

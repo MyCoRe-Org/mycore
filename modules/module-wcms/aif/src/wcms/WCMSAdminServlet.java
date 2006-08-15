@@ -45,7 +45,15 @@ import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 
 public class WCMSAdminServlet extends WCMSServlet {
-    /**
+	private boolean back;
+	
+	private String backaddr = null;
+	
+	private HttpServletRequest request;
+
+    private HttpServletResponse response;
+    
+     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
      * 
@@ -64,7 +72,13 @@ public class WCMSAdminServlet extends WCMSServlet {
         rootOut.addContent(new Element("session").setText(action));
         rootOut.addContent(new Element("userID").setText(mcrSession.get("userID").toString()));
         rootOut.addContent(new Element("userClass").setText(mcrSession.get("userClass").toString()));
-
+        
+        setReq(request);
+        setResp(response);
+        setback();
+        setbackaddr();
+        
+        
         if (action.equals("choose")) {
             generateXML_managPage(mcrSession, rootOut, rootNodes, contentTemplates);
         } else if (action.equals("logs")) {
@@ -78,9 +92,18 @@ public class WCMSAdminServlet extends WCMSServlet {
         // Transfer content of jdom object to MCRLayoutServlet.
         request.setAttribute("MCRLayoutServlet.Input.JDOM", jdom);
 
-        // request.setAttribute("XSL.Style", "xml");
-        RequestDispatcher rd = getServletContext().getNamedDispatcher("MCRLayoutServlet");
-        rd.forward(request, response);
+        
+        if(getback())
+        {
+         response.sendRedirect( getbackaddr() );
+        }	
+      else
+        {	
+        //request.setAttribute("XSL.Style", "xml");
+          RequestDispatcher rd = getServletContext().getNamedDispatcher("MCRLayoutServlet");
+          rd.forward(request, response);
+        }
+        
     }
 
     public void generateXML_managPage(MCRSession mcrSession, Element rootOut, List rootNodes, File[] contentTemplates) {
@@ -188,4 +211,42 @@ public class WCMSAdminServlet extends WCMSServlet {
             e.printStackTrace();
         }
     }
+
+    public void setReq(HttpServletRequest req) {
+        this.request = req;
+    }
+
+    public HttpServletRequest getReq() {
+        return request;
+    }
+
+    public void setResp(HttpServletResponse resp) {
+        this.response = resp;
+    }
+
+    public HttpServletResponse getResp() {
+        return response;
+    }
+    
+    public boolean getback() {
+		return this.back;
+	}
+
+	public void setback() {
+		if(request.getParameter("back")!=null &&
+				request.getParameter("back").equals("true")	) {
+			this.back=true;
+		}
+		else
+		{	
+			this.back = false;
+		}	
+	}
+	public String getbackaddr() {
+		return this.backaddr;
+	}
+
+	public void setbackaddr() {
+		this.backaddr=request.getParameter("address");
+	}
 }

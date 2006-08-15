@@ -177,6 +177,10 @@ public class WCMSActionServlet extends WCMSServlet {
     private String sessionParam = null;
 
     private String addAtPosition = null;
+    
+    private boolean back;
+    
+    private String backaddr = null;
 
     private File naviFile = new File(CONFIG.getString("MCR.WCMS.navigationFile").replace('/', File.separatorChar));
 
@@ -211,9 +215,13 @@ public class WCMSActionServlet extends WCMSServlet {
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response) {
         mcrSession = MCRSessionMgr.getCurrentSession();
+        
         setReq(request);
         setResp(response);
+        setback();
+        setbackaddr();
         initParam(getReq());
+        
 
         if (!realyDel.equals("false")) {
             doItAll(hrefFile, action, mode, addAtPosition);
@@ -379,11 +387,47 @@ public class WCMSActionServlet extends WCMSServlet {
             }
 
             request.setAttribute("MCRLayoutServlet.Input.JDOM", jdom);
-
-            // request.setAttribute("XSL.Style", "xml");
-            RequestDispatcher rd = getServletContext().getNamedDispatcher("MCRLayoutServlet");
-            rd.forward(request, response);
-        } catch (Exception e) {
+            String jump = null;
+            int filepos = 0;
+            String help = null;
+            
+            // if you used the edittool
+            if(getback())
+              {
+               //if new intern child, predecossor or successor created, go to it	
+               if(action.equals("add") && mode.equals("intern"))
+                 {
+            	  if(addAtPosition.equals("child"))
+            	    {  
+            		 int length = getbackaddr().length();
+                	 help = getbackaddr().substring(0,(length-4));
+                	 filepos = fileName.lastIndexOf("/");
+                	 jump = help.concat(fileName.substring(filepos));  
+            		}
+            	  else
+            	    {
+            		 filepos = fileName.lastIndexOf("/"); 
+            		 int neighbarpos = getbackaddr().lastIndexOf("/");
+            		 help = getbackaddr().substring(0,neighbarpos);
+            		 jump = help.concat(fileName.substring(filepos));
+            		 
+            	    }
+                 }
+               // on edit or external link go back to initiator address
+               else
+                 {
+            	  jump = getbackaddr(); 
+                 }
+            	response.sendRedirect(jump);
+               
+              }	
+            else
+              {	
+             // request.setAttribute("XSL.Style", "xml");
+             RequestDispatcher rd = getServletContext().getNamedDispatcher("MCRLayoutServlet");
+             rd.forward(request, response);
+              }
+          } catch (Exception e) {
             e.printStackTrace();
             error = e.getMessage();
         }
@@ -1508,7 +1552,8 @@ public class WCMSActionServlet extends WCMSServlet {
         dir = (String) mcrSession.get("dir");
         currentLang = (String) mcrSession.get("currentLang");
         defaultLang = (String) mcrSession.get("defaultLang");
-
+        
+                
         if (mcrSession.get("addAtPosition") != null) {
             addAtPosition = (String) mcrSession.get("addAtPosition");
         }
@@ -1655,8 +1700,9 @@ public class WCMSActionServlet extends WCMSServlet {
             attribute = "href";
             avalue = href;
         }
-
-        hrefFile = new File(getServletContext().getRealPath("") + fileName.replace('/', fs));
+        
+                       
+           hrefFile = new File(getServletContext().getRealPath("") + fileName.replace('/', fs));
 
         /*---------------------- Variable Test Output -------------------------*/
 
@@ -1732,4 +1778,26 @@ public class WCMSActionServlet extends WCMSServlet {
             return new InputSource(new StringReader(" "));
         }
     }
+
+	public boolean getback() {
+		return this.back;
+	}
+
+	public void setback() {
+		if(request.getParameter("back")!=null &&
+				request.getParameter("back").equals("true")	) {
+			this.back=true;
+		}
+		else
+		{	
+			this.back = false;
+		}	
+	}
+	public String getbackaddr() {
+		return this.backaddr;
+	}
+
+	public void setbackaddr() {
+		this.backaddr=request.getParameter("address");
+	}
 }

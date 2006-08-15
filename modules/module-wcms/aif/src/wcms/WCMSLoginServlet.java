@@ -77,32 +77,57 @@ public class WCMSLoginServlet extends WCMSServlet {
         String userPassword = null;
         String userRealName = null;
         String userClass = null;
+        String modus = "false";
+        String flag = "false";
         List rootNodes = (List) mcrSession.get("rootNodes");
         boolean loginOk = false;
+        
+        if(request.getParameter("flag")!=null && request.getParameter("flag").equals("true"))
+          {
+           flag="true";	
+          }
+        else
+          {
+           flag="false";	
+          }	
+            
         MCRConfiguration mcrConf = MCRConfiguration.instance();
 
         try {
             userID = request.getParameter("userID").trim();
             userPassword = request.getParameter("userPassword").trim();
             userPassword = HashCipher.crypt(userPassword);
-        } catch (Exception e) {
-            System.err.println(e.getMessage());
+           } catch (Exception e) {
+            System.err.println("catch = "+ e.getMessage());
         }
-
-        if ((mcrSession.get("status") != null) && (userPassword == null) && (userID == null)) {
-            if (mcrSession.get("status").equals("loggedIn")) {
-                userID = (String) mcrSession.get("userID");
-                userRealName = (String) mcrSession.get("userRealName");
-                userClass = (String) mcrSession.get("userClass");
-                loginOk = true;
-            }
-        }
-
-        if ((mcrSession.get("status") == null) && (userPassword == null) && (userID == null)) {
-            System.err.println("\n\n\nstatus==null\n\n\n");
-            response.sendRedirect(mcrConf.getString("MCR.WCMS.sessionError"));
-        }
-
+                        
+        // pssword and userid not set
+        if ((userPassword == null) && (userID == null)) {
+        	if ((mcrSession.get("status") == null) )
+        	  {
+               System.err.println("\n\n\nstatus==null\n\n\n");
+               if (flag.equals("true"))
+          	     {
+          		  response.sendRedirect(mcrConf.getString("MCR.WCMS.sessionError")+"?XSL.Style=xml");	
+          	     }
+               else
+                 {
+                  response.sendRedirect(mcrConf.getString("MCR.WCMS.sessionError"));
+                 }
+              }
+        	else 
+        	  {
+        	   if (mcrSession.get("status").equals("loggedIn")) 
+        	     {
+                  userID = (String) mcrSession.get("userID");
+                  userRealName = (String) mcrSession.get("userRealName");
+                  userClass = (String) mcrSession.get("userClass");
+                  loginOk = true;
+                 }	
+        	}
+       	} 
+        
+        
         /**
          * Look into the WCMSUserDB.xml file and check for the given User. If
          * the check was successful, loginOk is set to true.
@@ -136,7 +161,7 @@ public class WCMSLoginServlet extends WCMSServlet {
          */
         Element rootOut = new Element("cms");
         Document jdom = new Document(rootOut);
-
+        
         /**
          * loginOk: <cms><session>choose </session> <userID>userID <userID>
          * <userRealName>userRealName </userRealName> <userClass>userClass
@@ -172,6 +197,8 @@ public class WCMSLoginServlet extends WCMSServlet {
             rootOut.addContent(new Element("userRealName").setText(userRealName));
             rootOut.addContent(new Element("userClass").setText(userClass));
             rootOut.addContent(new Element("error").setText(""));
+            modus="true"; 
+
 
             Iterator rootNodesIterator = rootNodes.iterator();
 
@@ -179,7 +206,7 @@ public class WCMSLoginServlet extends WCMSServlet {
                 Element rootNode = (Element) rootNodesIterator.next();
                 rootOut.addContent(new Element("rootNode").setAttribute("href", rootNode.getAttributeValue("href")).setText(rootNode.getTextTrim()));
             }
-        }
+        }       
         /**
          * !loginOk: <cms><session>login </session> <error>denied </error>
          * </cms>
@@ -188,7 +215,7 @@ public class WCMSLoginServlet extends WCMSServlet {
             rootOut.addContent(new Element("session").setText("login"));
             rootOut.addContent(new Element("error").setText("denied"));
         }
-
+        rootOut.addContent(new Element("modus").setText(modus));
         /**
          * Transfer content of jdom object to MCRLayoutServlet.
          */
@@ -197,9 +224,12 @@ public class WCMSLoginServlet extends WCMSServlet {
         /**
          * Activate the following Line to see the XML output of the jdom object.
          */
-
-        // req.setAttribute("XSL.Style", "xml");
-        RequestDispatcher rd = getServletContext().getNamedDispatcher("MCRLayoutServlet");
-        rd.forward(request, response);
+        if (mcrSession.get("status")!=null && mcrSession.get("status").equals("loggedIn") )
+          {	
+           // req.setAttribute("XSL.Style", "xml");
+           RequestDispatcher rd = getServletContext().getNamedDispatcher("MCRLayoutServlet");
+           rd.forward(request, response);
+          }
+        flag = "false";
     }
 }
