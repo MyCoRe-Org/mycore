@@ -45,7 +45,6 @@ import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
-import org.hibernate.dialect.FirebirdDialect;
 
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
@@ -435,6 +434,8 @@ public class MCRLuceneSearcher extends MCRSearcher {
 
         private String indexDir;
         
+        private boolean running;
+        
         public IndexModifierThread(String indexDir) throws Exception {
             queue = new Queue();
             this.indexDir = indexDir;
@@ -443,19 +444,25 @@ public class MCRLuceneSearcher extends MCRSearcher {
         }
 
         public void close() {
-            LOGGER.debug("close()");
-            interrupt();
+            LOGGER.debug("close()"+Thread.currentThread().getName()+":"+this.getName());
+            this.interrupt();
+            while (running){
+                //return after thread finished work
+                Thread.yield();
+            }
         }
 
         public void run() {
             LOGGER.debug("IndexModifierThread started");
+            running=true;
             //don't stop as long as elements are in queue
-            while (queue.hasNext() || !isInterrupted()) {
+            while (hasWork()) {
                 QueueElement qe;
                 try {
                     qe = queue.poll(this);
                 } catch (InterruptedException e1) {
                     LOGGER.debug("Interrupted: closing");
+                    Thread.currentThread().interrupt();
                     continue;
                 }
                 if (qe.delete) {
@@ -475,6 +482,18 @@ public class MCRLuceneSearcher extends MCRSearcher {
             closeIndexModifier();
             MCRShutdownHandler.getInstance().removeCloseable(this);
             LOGGER.debug("IndexModifierThread stopped");
+            running=false;
+        }
+
+        private boolean hasWork() {
+            if (!Thread.currentThread().isInterrupted()) {
+                LOGGER.debug("Thread not interrupted! "+Thread.currentThread().getName());
+                return true;
+            }
+            synchronized (queue) {
+                LOGGER.debug("Thread interrupted: Queue empty?"+(!queue.hasNext()));
+                return (queue.hasNext());
+            }
         }
 
         private void addDocument(QueueElement qe) throws IOException {
@@ -669,10 +688,10 @@ public class MCRLuceneSearcher extends MCRSearcher {
             return true;
         }
         
-        public boolean hasNext(){
+        public boolean hasNext() {
             synchronized (lock_) {
                 synchronized (head_) {
-                    return (((head_.doc==null) && (!head_.delete))||(head_.next!=null));
+                    return ((head_.next!=null));
                 }
             }
         }
