@@ -25,10 +25,9 @@ public class MCRImgCacheEventHandler extends MCREventHandlerBase {
 		LOGGER.debug("* OwnerID: "+ file.getOwnerID());
 		LOGGER.debug("*************************************************");
 		MCRConfiguration config = MCRConfiguration.instance();
-		boolean useCache = (new Boolean(config.getString("MCR.Module-iview.useCache"))).booleanValue();
 		MCRImgCacheManager imgCache = new MCRImgCacheManager();
 		
-		if (useCache && !file.getOwnerID().equals(MCRImgCacheManager.CACHE_FOLDER) && !imgCache.existInCache(file)) {
+		if (!file.getOwnerID().equals(MCRImgCacheManager.CACHE_FOLDER) && !imgCache.existInCache(file)) {
 			LOGGER.debug("**************************************************");
 			LOGGER.debug("* MCRImgCacheEventHandler.handleFileCreated - IF *");
 			LOGGER.debug("* FileName: "+ file.getName());

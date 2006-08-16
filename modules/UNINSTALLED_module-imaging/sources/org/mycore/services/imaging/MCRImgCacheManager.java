@@ -20,6 +20,7 @@ import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
+import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 import org.mycore.datamodel.ifs.MCRDirectory;
 import org.mycore.datamodel.ifs.MCRFile;
@@ -54,9 +55,8 @@ public class MCRImgCacheManager implements CacheManager {
 	
 	public static final String CACHE_FOLDER = "imgCache";
 
-	private Logger LOGGER = Logger.getLogger(MCRFileNodeServlet.class.getName());
-	private Stopwatch timer = new Stopwatch();
-
+	private Logger LOGGER = Logger.getLogger(MCRImgCacheManager.class.getName());
+	
 	protected MCRDirectory cacheInIFS = null;
 
 	public MCRImgCacheManager() {
@@ -66,10 +66,6 @@ public class MCRImgCacheManager implements CacheManager {
 			} catch (Exception e) {
 				throw new MCRException(e.getMessage());
 			}
-	}
-
-	public void getImage(MCRFile image, Dimension size, OutputStream imageData) {
-		getImage(image, dimToString(size), imageData);
 	}
 
 	public void getImage(MCRFile image, String filename, OutputStream imageData) {
@@ -102,7 +98,6 @@ public class MCRImgCacheManager implements CacheManager {
 	}
 
 	public void saveImage(MCRFile image, String filename, InputStream imageData) {
-		MCRFilesystemNode node;
 		
 		MCRDirectory cachedImg = getCacheDir(image);
 
@@ -159,41 +154,17 @@ public class MCRImgCacheManager implements CacheManager {
 	}
 
 	public boolean existInCache(MCRFile image) {
-		String name = image.getName();
-		timer.reset();
-		timer.start();
 		int imgWidth = getImgWidth(image);
-		timer.stop();
-		LOGGER.debug("**********************************");
-		LOGGER.debug("* " + name);
-		LOGGER.debug("* getImgWidth Time: " + timer.getElapsedTime());
-		LOGGER.debug("**********************************");
-		
-		timer.reset();
-		timer.start();
 		int imgHeight = getImgHeight(image);
-		timer.stop();
-		LOGGER.debug("**********************************");
-		LOGGER.debug("* " + name);
-		LOGGER.debug("* getImgHeight Time: " + timer.getElapsedTime());
-		LOGGER.debug("**********************************");
 		
-		LOGGER.debug("**********************************");
-		LOGGER.debug("* " + name);
-		LOGGER.debug("* Cached Size: " + imgWidth + "x" + imgHeight);
-		LOGGER.debug("**********************************");
-		if (imgWidth <= 2*1024 && imgHeight <= 2*768){
-			LOGGER.debug("**********************************");
-			LOGGER.debug("* " + name);
-			LOGGER.debug("* exist in Cache IF!");
-			LOGGER.debug("**********************************");
+		MCRConfiguration config = MCRConfiguration.instance();
+		int cacheWidth = Integer.parseInt(config.getString("MCR.Module-iview.cache.size.width"));
+		int cacheHeight = Integer.parseInt(config.getString("MCR.Module-iview.cache.size.height"));
+		
+		if (imgWidth <= 2*cacheWidth && imgHeight <= 2*cacheHeight){
 			return (existInCache(image, THUMB) && existInCache(image, ORIG));
 		}
 		else{
-			LOGGER.debug("**********************************");
-			LOGGER.debug("* " + name);
-			LOGGER.debug("* exist in Cache ELSE!");
-			LOGGER.debug("**********************************");
 			return (existInCache(image, THUMB) && existInCache(image, ORIG) && existInCache(image, CACHE));
 		}
 	}
@@ -250,6 +221,8 @@ public class MCRImgCacheManager implements CacheManager {
 
 				LOGGER.info("Writing additional data for " + image.getName() + " complete!");
 			}
+			else
+				LOGGER.info("Additional data for " + image.getName() + " allready exists!");
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
