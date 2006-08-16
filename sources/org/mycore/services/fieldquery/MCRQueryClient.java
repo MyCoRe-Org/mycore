@@ -68,6 +68,10 @@ public class MCRQueryClient {
         for (int i = 0; i < children.size(); i++) {
             Element host = (Element) (children.get(i));
             String classname = host.getAttributeValue("class");
+            if ((classname == null) || ((classname = classname.trim()).length() == 0)) {
+                classname = "org.mycore.services.fieldquery.MCRQueryClientWebService";
+                LOGGER.warn("The class attribute for the host is null or empty, MCRQueryClientWebService was set.");
+            }
             MCRQueryClientInterface qi = null;
             try {
                 qi = (MCRQueryClientInterface) Class.forName(classname).newInstance();

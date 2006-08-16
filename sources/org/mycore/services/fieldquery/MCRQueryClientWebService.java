@@ -82,13 +82,31 @@ public class MCRQueryClientWebService extends MCRQueryClientBase {
      */
     public void init(org.jdom.Element xmlhost) {
         alias = xmlhost.getAttributeValue("alias");
+        if ((alias == null) || ((alias = alias.trim()).length() == 0)) {
+            alias = "remote";
+            LOGGER.warn("The alias attribute for the host is null or empty, remote was set.");
+        }
         url = xmlhost.getAttributeValue("url");
+        if ((url == null) || ((url = url.trim()).length() == 0)) {
+            url = "http://localhost:8291/";
+            LOGGER.warn("The url attribute for the host is null or empty, http://localhost:8291/ was set.");
+        }
         access = xmlhost.getAttributeValue("access");
+        if ((access == null) || ((access = access.trim()).length() == 0)) {
+            alias = "webservice";
+            LOGGER.warn("The access attribute for the host is null or empty, webservice was set.");
+        }
+        servicepath = xmlhost.getAttributeValue("servicepath");
+        if ((servicepath == null) || ((servicepath = servicepath.trim()).length() == 0)) {
+            alias = "services/MCRWebService";
+            LOGGER.warn("The servicepath attribute for the host is null or empty, services/MCRWebService was set.");
+        }
         StringBuffer sb = new StringBuffer(256);
-        sb.append("Host ").append(alias).append(" with access mode ").append(access).append(" uses host url ").append(url);
+        sb.append("Host ").append(alias).append(" with access mode ").append(access).append(" uses host url ").append(url).append(servicepath);
         LOGGER.debug(sb.toString());
-        if (!url.endsWith("/")) url = url + "/";
-        endpoint = url + "services/MCRWebService";
+        if (!url.endsWith("/"))
+            url = url + "/";
+        endpoint = url + servicepath;
     }
 
     /**
