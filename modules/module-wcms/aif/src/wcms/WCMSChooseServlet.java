@@ -258,8 +258,9 @@ public class WCMSChooseServlet extends WCMSServlet {
                     ed = sax.build(getServletContext().getRealPath("") + fs + href);
                 } else {
                     // if (mode.equals("intern")) {
-                    ed = sax.build((CONFIG.getString("MCR.WCMS.templatePath") + "content/").replace('/', File.separatorChar) + template);
-
+                	String edFiller = (CONFIG.getString("MCR.WCMS.templatePath") + "content/").replace('/', File.separatorChar) + template; 
+                    ed = sax.build(edFiller);
+                    System.out.println(edFiller);
                     // }
                     // else return;
                 }
@@ -647,11 +648,11 @@ public class WCMSChooseServlet extends WCMSServlet {
                     if (action.equals("delete") && !child.getChildren("item").isEmpty()) {
                         c = '7';
                     }
-                    /*
-                     * else if (action.equals("add") &&
-                     * child.getAttributeValue("type").equals("extern") &&
-                     * addAtPosition.equals("child")) c = '6';
-                     */
+                    
+                      else if (action.equals("add") &&
+                      child.getAttributeValue("type").equals("extern") &&
+                      addAtPosition.equals("child")) c = '6';
+                     
                     else {
                         c = d;
                     }

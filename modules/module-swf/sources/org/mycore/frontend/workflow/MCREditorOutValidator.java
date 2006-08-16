@@ -205,7 +205,7 @@ public class MCREditorOutValidator {
                     LOGGER.warn("Error while invoking " + m.getName(), e);
                 }
             } else {
-                LOGGER.warn("To do for type " + mcrclass + " not found, fallback to default behaviour");
+                LOGGER.warn("Tag <"+datatag.getName()+"> of type " + mcrclass + " has no validator defined, fallback to default behaviour");
                 // try to create MCRMetaInterface instance
                 try {
                     Class metaClass = Class.forName(mcrclass);

@@ -37,6 +37,8 @@ template:
 	xmlns:xalan="http://xml.apache.org/xalan"
     xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation" >
 
+   <xsl:param name="check" />
+   <xsl:param name="address" />
 
 <!-- ====================================================================================={
 section: Template: name="wcmsEditContent"
@@ -147,12 +149,24 @@ Aufruf:
 						</p>
 					</div>
 					<div class="knoepfe">
-						<a href="{$ServletsBaseURL}WCMSActionServlet?delete=false&amp;wcmsID=0024" class="button">
-							<xsl:value-of select="i18n:translate('wcms.menus.deleteCancel')"/>
-						</a>
-						<a href="{$ServletsBaseURL}WCMSActionServlet?delete=true&amp;labelPath={$labelPath}&amp;wcmsID=0024" class="button">
-							<xsl:value-of select="i18n:translate('wcms.menus.deleteAccept')"/>
-						</a>
+					<xsl:choose>	
+						<xsl:when test="$check = '1' ">
+							<a href="{$ServletsBaseURL}WCMSActionServlet?delete=false&amp;wcmsID=0024&amp;back=true&amp;address={$address}" class="button">
+								<xsl:value-of select="i18n:translate('wcms.menus.deleteCancel')"/>
+							</a>
+					    	<a href="{$ServletsBaseURL}WCMSActionServlet?delete=true&amp;labelPath={$labelPath}&amp;wcmsID=0024&amp;back=true&amp;address={$address}" class="button">
+								<xsl:value-of select="i18n:translate('wcms.menus.deleteAccept')"/>
+							</a>
+					    </xsl:when>
+						<xsl:otherwise>
+							<a href="{$ServletsBaseURL}WCMSActionServlet?delete=false&amp;wcmsID=0024" class="button">
+								<xsl:value-of select="i18n:translate('wcms.menus.deleteCancel')"/>
+							</a>
+							<a href="{$ServletsBaseURL}WCMSActionServlet?delete=true&amp;labelPath={$labelPath}&amp;wcmsID=0024" class="button">
+								<xsl:value-of select="i18n:translate('wcms.menus.deleteAccept')"/>
+							</a>
+						</xsl:otherwise>
+					</xsl:choose>	
 					</div>
 				</div>
 			<!-- Ende: Inhaltsbereich -->
@@ -199,10 +213,19 @@ Aufruf:
 
 		<!-- Editor -->
 		<div id="editor-width">
-			<form name="editContent" action="{$ServletsBaseURL}WCMSActionServlet?wcmsID=0024" method="post">
-				<input type="hidden" name="labelPath" value="{$labelPath}"/>
-
-
+		<xsl:variable name="ruecksprung">
+			<xsl:choose>	
+				<xsl:when test="$check = '1' ">
+					<xsl:value-of select="concat($ServletsBaseURL,'WCMSActionServlet?wcmsID=0024&amp;back=true&amp;address=',$address)" />
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:value-of select="concat($ServletsBaseURL,'WCMSActionServlet?wcmsID=0024')" />
+				</xsl:otherwise>
+			</xsl:choose>
+		</xsl:variable>
+						
+			<form name="editContent" action="{$ruecksprung}" method="post">
+				<input type="hidden" name="labelPath" value="{$labelPath}"/>		
 
 				<!-- Fehlermeldung -->
 				<xsl:if test="/cms/error !=''">
@@ -270,7 +293,14 @@ Aufruf:
 								<xsl:call-template name="buildInterface.general.safeButton"/>
 								<!-- <a class="button" href="javascript:zeigeElement();">Optionen</a> -->
 								<!-- <a class="button" href="#top">top</a> -->
-								<a class="button" href="{$ServletsBaseURL}WCMSAdminServlet?action=choose&amp;wcmsID=0024"><xsl:value-of select="i18n:translate('wcms.buttons.cancel')"/></a>
+								<xsl:choose>	
+									<xsl:when test="$check = '1' ">
+										<a class="button" href="{$ServletsBaseURL}WCMSAdminServlet?action=choose&amp;wcmsID=0024&amp;back=true&amp;address={$address}"><xsl:value-of select="i18n:translate('wcms.buttons.cancel')"/></a>
+									</xsl:when>
+									<xsl:otherwise>
+										<a class="button" href="{$ServletsBaseURL}WCMSAdminServlet?action=choose&amp;wcmsID=0024"><xsl:value-of select="i18n:translate('wcms.buttons.cancel')"/></a>
+									</xsl:otherwise>
+								</xsl:choose>
 							</div>
 						</fieldset>
 					<!-- streckt div main so daß er seine Kinder umschließt -->
@@ -433,7 +463,7 @@ section: Template: name="buildInterface.general.safeButton"
 }===================================================================================== -->
 	<xsl:template name="buildInterface.general.safeButton">
 		<a  class="button" href="javascript:document.editContent.submit()"><xsl:value-of select="i18n:translate('wcms.labels.saveChanges')"/></a>
-	</xsl:template>
+	</xsl:template>	
 
 <!-- ====================================================================================={
 section: Template: name="buildInterface.general.metaData.selectTemplate"
