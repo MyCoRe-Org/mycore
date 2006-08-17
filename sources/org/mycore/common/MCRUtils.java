@@ -507,6 +507,9 @@ public class MCRUtils {
 
             // C L O S E, done by caller if wanted.
         } catch (IOException e) {
+            LOGGER.debug("IOException caught while copying streams:");
+            LOGGER.debug(e.getClass().getName() + ": " + e.getMessage());
+            LOGGER.debug(e);
             return false;
         }
 
