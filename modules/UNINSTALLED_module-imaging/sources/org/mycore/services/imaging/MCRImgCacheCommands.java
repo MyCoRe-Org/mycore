@@ -12,9 +12,11 @@
 package org.mycore.services.imaging;
 
 import java.awt.Dimension;
+import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Iterator;
@@ -30,11 +32,10 @@ import org.mycore.datamodel.ifs.MCRDirectory;
 import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.ifs.MCRFilesystemNode;
 import org.mycore.frontend.cli.MCRAbstractCommands;
-import org.mycore.frontend.cli.MCRClassificationCommands;
 import org.mycore.frontend.cli.MCRCommand;
 
 public class MCRImgCacheCommands extends MCRAbstractCommands {
-	private static Logger LOGGER = Logger.getLogger(MCRClassificationCommands.class.getName());
+	private static Logger LOGGER = Logger.getLogger(MCRImgCacheCommands.class.getName());
 
 	/**
 	 * The empty constructor.
@@ -46,13 +47,22 @@ public class MCRImgCacheCommands extends MCRAbstractCommands {
 		com = new MCRCommand("clear cache", "org.mycore.services.imaging.MCRImgCacheCommands.clearCache", "The command clear the Image cache.");
 		command.add(com);
 
-		com = new MCRCommand("create cache for derivate {0}", "org.mycore.services.imaging.MCRImgCacheCommands.cacheThumbDeriv String", "The command create Thumbnail for the given Derivate.");
+		com = new MCRCommand("create cache for file {0}", "org.mycore.services.imaging.MCRImgCacheCommands.cacheFile String", "The command create the cache version for the given File.");
 		command.add(com);
 
-		com = new MCRCommand("remove cache for derivate {0}", "org.mycore.services.imaging.MCRImgCacheCommands.removeCachedDeriv String", "The command create Thumbnail for the given Derivate.");
+		com = new MCRCommand("remove cache for file {0}", "org.mycore.services.imaging.MCRImgCacheCommands.removeCachedFile String", "The command remove the cache version for the given File.");
 		command.add(com);
-		
+
+		com = new MCRCommand("create cache for derivate {0}", "org.mycore.services.imaging.MCRImgCacheCommands.cacheDeriv String", "The command create the cache version for the given Derivate.");
+		command.add(com);
+
+		com = new MCRCommand("remove cache for derivate {0}", "org.mycore.services.imaging.MCRImgCacheCommands.removeCachedDeriv String", "The command remove the cache version for the given Derivate.");
+		command.add(com);
+
 		com = new MCRCommand("test {0}", "org.mycore.services.imaging.MCRImgCacheCommands.test String", "Just testing.");
+		command.add(com);
+
+		com = new MCRCommand("testProz {0} {1} {2} {3} {4} {5} {6} {7}", "org.mycore.services.imaging.MCRImgCacheCommands.testProz String String String String String String String String", "testProz(cmd, inFile, outFile, xPos, yPos, width, height, scaleFactor)" + System.getProperty("line.separator") + "cmd = {resizeFitWidth; resizeFitHeight; resize; scale; scaleROI");
 		command.add(com);
 
 		/*
@@ -111,13 +121,174 @@ public class MCRImgCacheCommands extends MCRAbstractCommands {
 		}
 	}
 
-	public static void cacheThumbDeriv(String ID) throws Exception {
+	public static void removeCachedFile(String ID) throws Exception {
+		List list = new Vector();
+		MCRFile imgFile = null;
+		MCRConfiguration config = MCRConfiguration.instance();
+		String suppContTypes = new String(config.getString("MCR.Module-iview.SupportedContentTypes"));
+
+		MCRFilesystemNode node = MCRFilesystemNode.getNode(ID);
+
+		LOGGER.debug("****************************************");
+		LOGGER.debug("* MCRImgCacheCommands - removeCachedFile ");
+		LOGGER.debug("* The node: " + node.getAbsolutePath());
+		LOGGER.debug("****************************************");
+
+		if (node != null && node instanceof MCRFile)
+			imgFile = (MCRFile) node;
+		else
+			throw new MCRException("File " + ID + " does not exist!");
+
+		if (suppContTypes.indexOf(imgFile.getContentTypeID()) > -1) {
+			MCRImgCacheManager cache = new MCRImgCacheManager();
+			MCRFile image = null;
+
+			image = imgFile;
+			image.removeAdditionalData(new Document(new Element("ImageMetaData")));
+			cache.deleteImage(image);
+		}
+		LOGGER.info("******************************************************************************");
+		LOGGER.info("* Remove cache version for image " + imgFile.getName() + " finished successfull!");
+		LOGGER.info("******************************************************************************");
+
+	}
+
+	public static void cacheFile(String ID) throws Exception {
+		MCRFilesystemNode node = MCRFilesystemNode.getNode(ID);
+		MCRFile imgFile = null;
+
+		if (node != null && node instanceof MCRFile) {
+			LOGGER.info("******************************************");
+			LOGGER.info("* File " + ID + " getThem!");
+			LOGGER.info("******************************************");
+			imgFile = (MCRFile) node;
+			cacheFile(imgFile);
+		} else {
+			LOGGER.info("******************************************");
+			LOGGER.info("* File " + ID + " does not exist!");
+			LOGGER.info("******************************************");
+		}
+
+	}
+
+	public static void cacheFile(MCRFile imgFile) throws Exception {
+		cacheFile(imgFile, false);
+	}
+
+	public static void cacheFile(MCRFile image, boolean cacheSizeOnly) throws Exception {
+		MCRConfiguration config = MCRConfiguration.instance();
+		String suppContTypes = new String(config.getString("MCR.Module-iview.SupportedContentTypes"));
+		boolean useCache = (new Boolean(config.getString("MCR.Module-iview.useCache"))).booleanValue();
+		String fileType = image.getContentTypeID();
+
+		if (suppContTypes.indexOf(fileType) > -1) {
+			LOGGER.debug("****************************************");
+			LOGGER.debug("* MCRImgCacheCommands - cacheFile      *");
+			LOGGER.debug("* suppContTypes.indexOf(imgFile.getContentTypeID()) > -1  *");
+			LOGGER.debug("****************************************");
+			MCRImgCacheManager cache = new MCRImgCacheManager();
+			MCRImgProcessor processor = new MCRImgProcessor();
+			ByteArrayOutputStream imgData = new ByteArrayOutputStream();
+
+			if (cacheSizeOnly)
+				processor.loadImage(image.getContentAsInputStream());
+			else
+				processor.loadImageFileCache(image.getContentAsInputStream());
+
+			Dimension imgSize = processor.getOrigSize();
+			cache.setImgSize(image, imgSize.width, imgSize.height);
+
+			if (useCache && !cacheSizeOnly) {
+				cache.setLock(image);
+				boolean cacheOrig = (new Boolean(config.getString("MCR.Module-iview.cacheOrig"))).booleanValue();
+				// cache Original
+				if (cacheOrig && !processor.hasCorrectTileSize() && !cache.existInCache(image, cache.ORIG)) {
+
+					processor.tiffEncode(imgData);
+					if ((fileType.equals("tiff") || fileType.equals("tif"))) {
+						LOGGER.debug("****************************************");
+						LOGGER.debug("* MCRImgCacheCommands - cacheFile      *");
+						LOGGER.debug("* is TIFF						         *");
+						LOGGER.debug("****************************************");
+						image.setContentFrom(imgData.toByteArray());
+					} else {
+						LOGGER.debug("****************************************");
+						LOGGER.debug("* MCRImgCacheCommands - cacheFile      *");
+						LOGGER.debug("* not TIFF						         *");
+						LOGGER.debug("****************************************");
+						ByteArrayInputStream input = new ByteArrayInputStream(imgData.toByteArray());
+						cache.saveImage(image, cache.ORIG, input);
+						imgData.reset();
+					}
+
+				} else {
+					LOGGER.info("****************************************");
+					LOGGER.info("Image " + image.getName() + " as version " + cache.ORIG + " allready exists in Cache!");
+					LOGGER.info("****************************************");
+				}
+				
+				int cacheWidth = Integer.parseInt(config.getString("MCR.Module-iview.cache.size.width"));
+				int cacheHeight = Integer.parseInt(config.getString("MCR.Module-iview.cache.size.height"));
+				// cache small version
+				if ((imgSize.width > 2 * cacheWidth || imgSize.height > 2 * cacheHeight) && !cache.existInCache(image, cache.CACHE)) {
+					LOGGER.debug("****************************************");
+					LOGGER.debug("* MCRImgCacheCommands - cacheFile      *");
+					LOGGER.debug("* (imgSize.width > 2 * 1024 || imgSize.height > 2 * 768)  *");
+					LOGGER.debug("****************************************");
+
+					processor.resize(cacheWidth, cacheHeight);
+					processor.tiffEncode(imgData);
+					ByteArrayInputStream input = new ByteArrayInputStream(imgData.toByteArray());
+					cache.saveImage(image, cache.CACHE, input);
+					imgData.reset();
+
+					LOGGER.info("****************************************");
+					LOGGER.info("Image " + image.getName() + " cached successfull under the name " + cache.CACHE + " !");
+					LOGGER.info("****************************************");
+
+				} else {
+					LOGGER.info("****************************************");
+					LOGGER.info("Image " + image.getName() + " as version " + cache.CACHE + " allready exists in Cache!");
+					LOGGER.info("****************************************");
+				}
+
+				// cache Thumbnail
+				if (!cache.existInCache(image, cache.THUMB)) {
+					int thumbWidth = Integer.parseInt(config.getString("MCR.Module-iview.thumbnail.size.width"));
+					int thumbHeight = Integer.parseInt(config.getString("MCR.Module-iview.thumbnail.size.height"));
+					LOGGER.debug("****************************************");
+					LOGGER.debug("* MCRImgCacheCommands - cacheFile      *");
+					LOGGER.debug("* !cache.existInCache(image, cache.THUMB)  *");
+					LOGGER.debug("****************************************");
+
+					processor.resize(thumbWidth, thumbHeight);
+					processor.jpegEncode(imgData);
+					ByteArrayInputStream input = new ByteArrayInputStream(imgData.toByteArray());
+					cache.saveImage(image, cache.THUMB, input);
+					imgData.reset();
+
+					LOGGER.info("****************************************");
+					LOGGER.info("Image " + image.getName() + " cached successfull under the name " + cache.THUMB + " !");
+					LOGGER.info("****************************************");
+					cache.removeLock(image);
+				} else {
+					LOGGER.info("****************************************");
+					LOGGER.info("Image " + image.getName() + " as version " + cache.THUMB + " allready exists in Cache!");
+					LOGGER.info("****************************************");
+				}
+
+				LOGGER.info("****************************************");
+				LOGGER.info("* Caching image " + image.getName() + " finished successfull!");
+				LOGGER.info("****************************************");
+			}
+		}
+	}
+
+	public static void cacheDeriv(String ID) throws Exception {
 		List list = new Vector();
 		MCRDirectory derivate = null;
 		MCRConfiguration config = MCRConfiguration.instance();
 		String suppContTypes = new String(config.getString("MCR.Module-iview.SupportedContentTypes"));
-		int thumbWidth = Integer.parseInt(config.getString("MCR.Module-iview.thumbnail.size.width"));
-		int thumbHeight = Integer.parseInt(config.getString("MCR.Module-iview.thumbnail.size.height"));
 
 		MCRFilesystemNode node = MCRFilesystemNode.getRootNode(ID);
 
@@ -128,81 +299,19 @@ public class MCRImgCacheCommands extends MCRAbstractCommands {
 
 		getSuppFiles(list, suppContTypes, derivate);
 
-		MCRImgCacheManager cache = new MCRImgCacheManager();
-		MCRImgProcessor processor = new MCRImgProcessor();
 		MCRFile image = null;
-		ByteArrayOutputStream imgData = new ByteArrayOutputStream();
 
 		for (Iterator iter = list.iterator(); iter.hasNext();) {
 			image = (MCRFile) iter.next();
 
-			// TODO test!!! rewrite this to be more useable - Chi 22.6.06 14:51
-			Dimension imgSize = new Dimension(0, 0);
-
-			// -----------------------------------------------------------------
-
-			// cache Thumbnail first
-			if (!cache.existInCache(image, cache.THUMB))
-				try {
-					processor.useEncoder(processor.JPEG_ENC);
-					processor.resize(image.getContentAsInputStream(), thumbWidth, thumbHeight, imgData);
-					ByteArrayInputStream input = new ByteArrayInputStream(imgData.toByteArray());
-					cache.saveImage(image, cache.THUMB, input);
-					imgData.reset();
-					
-					imgSize = processor.getOrigSize();
-					cache.setImgSize(image, imgSize.width, imgSize.height);
-					
-					LOGGER.info("Image " + image.getName() + " cached successfull under the name " + cache.THUMB + " !");
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			else
-				LOGGER.info("Image " + image.getName() + " as version " + cache.THUMB + " allready exists in Cache!");
-			// **************
-
-			// cache Original
-			if (!cache.existInCache(image, cache.ORIG))
-				try {
-					processor.useEncoder(processor.TIFF_ENC);
-					processor.resize(image.getContentAsInputStream(), imgSize.width, imgSize.height, imgData);
-					ByteArrayInputStream input = new ByteArrayInputStream(imgData.toByteArray());
-					cache.saveImage(image, cache.ORIG, input);
-					imgData.reset();
-
-					LOGGER.info("Image " + image.getName() + " cached successfull under the name " + cache.ORIG + " !");
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			else
-				LOGGER.info("Image " + image.getName() + " as version " + cache.ORIG + " allready exists in Cache!");
-			// **************
-
-			if ((imgSize.width > 2 * 1024 || imgSize.height > 2 * 768) && !cache.existInCache(image, cache.CACHE))
-				try {
-					processor.useEncoder(processor.TIFF_ENC);
-					processor.resize(image.getContentAsInputStream(), 1024, 768, imgData);
-					ByteArrayInputStream input = new ByteArrayInputStream(imgData.toByteArray());
-					cache.saveImage(image, cache.CACHE, input);
-					imgData.reset();
-
-					LOGGER.info("Image " + image.getName() + " cached successfull under the name " + cache.CACHE + " !");
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			else
-				LOGGER.info("Image " + image.getName() + " as version " + cache.CACHE + " allready exists in Cache!");
-			// **************
+			cacheFile(image);
 
 		}
 
 		LOGGER.info("Caching supported images from derivate " + derivate.getName() + " finished successfull!");
 	}
-	
-	public static void test(String ID) throws IOException{
+
+	public static void test(String ID) throws IOException {
 		List list = new Vector();
 		MCRDirectory derivate = null;
 		MCRConfiguration config = MCRConfiguration.instance();
@@ -221,27 +330,105 @@ public class MCRImgCacheCommands extends MCRAbstractCommands {
 		MCRFile image = null;
 
 		Stopwatch timer = new Stopwatch();
-		
+
 		for (Iterator iter = list.iterator(); iter.hasNext();) {
 			image = (MCRFile) iter.next();
 			FileOutputStream out = new FileOutputStream("/home/chi/images/filestore/" + image.getName());
 			BufferedOutputStream buffOut = new BufferedOutputStream(out);
 			ByteArrayOutputStream bout = new ByteArrayOutputStream();
 			MCRImgProcessor proz = new MCRImgProcessor();
-			
+
 			timer.reset();
 			timer.start();
-//			imgService.getImage(image, new Dimension(600, 300), bout);
+			// imgService.getImage(image, new Dimension(600, 300), bout);
 			proz.getImageSize(image.getContentAsInputStream());
 			timer.stop();
 			LOGGER.info("Timer get size: " + timer.getElapsedTime());
-			
+
 			timer.reset();
 			timer.start();
-//			imgService.getImage(image, new Dimension(600, 300), bout);
+			// imgService.getImage(image, new Dimension(600, 300), bout);
 			imgService.getImage(image, 300, 400, 600, 300, 0.4F, bout);
 			timer.stop();
 			LOGGER.info("Timer: " + timer.getElapsedTime());
+		}
+	}
+
+	public static void testProz(String cmd, String inFile, String outFile, String xPos, String yPos, String width, String height, String scaleFactor) throws IOException {
+
+		Stopwatch timer = new Stopwatch();
+
+		FileInputStream in = new FileInputStream(inFile);
+		BufferedInputStream buffIn = new BufferedInputStream(in);
+		FileOutputStream out = new FileOutputStream(outFile);
+		BufferedOutputStream buffOut = new BufferedOutputStream(out);
+		ImgProcessor proz = new MCRImgProcessor();
+
+		LOGGER.info("*****************************");
+		LOGGER.info("* Amazing Test Proz Command *");
+		LOGGER.info("*****************************");
+
+		if (cmd.equals("resizeFitWidth")) {
+			timer.reset();
+			timer.start();
+
+			proz.resizeFitWidth(buffIn, Integer.valueOf(width).intValue(), buffOut);
+
+			timer.stop();
+			LOGGER.info("*******************************************");
+			LOGGER.info("* Timer resizeFitWidth: " + timer.getElapsedTime());
+			LOGGER.info("* Used scale factor: " + proz.getScaleFactor());
+			LOGGER.info("*******************************************");
+		} else if (cmd.equals("resizeFitHeight")) {
+			timer.reset();
+			timer.start();
+
+			proz.resizeFitHeight(buffIn, Integer.valueOf(height).intValue(), buffOut);
+
+			timer.stop();
+			LOGGER.info("*******************************************");
+			LOGGER.info("* Timer resizeFitHeight: " + timer.getElapsedTime());
+			LOGGER.info("* Used scale factor: " + proz.getScaleFactor());
+			LOGGER.info("*******************************************");
+		} else if (cmd.equals("resize")) {
+			timer.reset();
+			timer.start();
+
+			proz.resize(buffIn, Integer.valueOf(width).intValue(), Integer.valueOf(height).intValue(), buffOut);
+
+			timer.stop();
+			LOGGER.info("*******************************************");
+			LOGGER.info("* Timer resize: " + timer.getElapsedTime());
+			LOGGER.info("* Used scale factor: " + proz.getScaleFactor());
+			LOGGER.info("*******************************************");
+		} else if (cmd.equals("scale")) {
+			timer.reset();
+			timer.start();
+
+			proz.scale(buffIn, Float.valueOf(scaleFactor).floatValue(), buffOut);
+
+			timer.stop();
+			LOGGER.info("*******************************************");
+			LOGGER.info("* Timer scale: " + timer.getElapsedTime());
+			LOGGER.info("* Used scale factor: " + proz.getScaleFactor());
+			LOGGER.info("*******************************************");
+		} else if (cmd.equals("scaleROI")) {
+			int xTopPos = Integer.valueOf(xPos).intValue();
+			int yTopPos = Integer.valueOf(yPos).intValue();
+			int boundWidth = Integer.valueOf(width).intValue();
+			int boundHeight = Integer.valueOf(height).intValue();
+			float scaleFact = Float.valueOf(scaleFactor).floatValue();
+
+			timer.reset();
+			timer.start();
+
+			proz.scaleROI(buffIn, xTopPos, yTopPos, boundWidth, boundHeight, scaleFact, buffOut);
+
+			timer.stop();
+			LOGGER.info("*******************************************");
+			LOGGER.info("* Timer scaleROI: " + timer.getElapsedTime());
+			LOGGER.info("* Used scale factor: " + proz.getScaleFactor());
+			LOGGER.info("*******************************************");
 		}
 	}
 }

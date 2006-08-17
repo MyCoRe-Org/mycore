@@ -1,8 +1,10 @@
 package org.mycore.services.imaging;
 
 import java.awt.Dimension;
+import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.RenderingHints;
+import java.awt.image.BufferedImage;
 import java.awt.image.renderable.ParameterBlock;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -12,13 +14,28 @@ import javax.media.jai.InterpolationBicubic2;
 import javax.media.jai.JAI;
 import javax.media.jai.PlanarImage;
 
+import org.apache.log4j.Logger;
+import org.mycore.frontend.cli.MCRClassificationCommands;
+
 import com.sun.media.jai.codec.ImageCodec;
 import com.sun.media.jai.codec.ImageEncoder;
 import com.sun.media.jai.codec.JPEGEncodeParam;
 import com.sun.media.jai.codec.MemoryCacheSeekableStream;
+import com.sun.media.jai.codec.SeekableStream;
 import com.sun.media.jai.codec.TIFFEncodeParam;
 
+/**
+ * This implementation of ImgProcessor is responsible for the manipulation of image data.
+ * It offers methods for scaling and croping of an image and a two encoding possibility (JPEG, TIFF).
+ * For TIFF-Encoding ones can set the tile size, default tile size is 480.<br>
+ * 
+ * @version 1.00 8/08/2006<br>
+ * @author Vu Huu Chi
+ *
+ */
+
 public class MCRImgProcessor implements ImgProcessor {
+	private static Logger LOGGER = Logger.getLogger(MCRClassificationCommands.class.getName());
 	private PlanarImage image = null;
 
 	protected float scaleFactor = 0;
@@ -30,15 +47,20 @@ public class MCRImgProcessor implements ImgProcessor {
 	private int tileWidth = 480;
 
 	private int tileHeight = 480;
-
-	public final int JPEG_ENC = 0;
-
-	public final int TIFF_ENC = 1;
-
+	
 	private int useEncoder = JPEG_ENC;
 
+	static public final int JPEG_ENC = 0;
+
+	static public final int TIFF_ENC = 1;
+	
+	static public final int FIT_WIDTH = 0;
+	
+	static public final int FIT_HEIGHT = 0;
+	
 	MCRImgProcessor() {
 		origSize = new Dimension(0, 0);
+		
 	}
 
 	// Interface ImgProcessor
@@ -55,12 +77,18 @@ public class MCRImgProcessor implements ImgProcessor {
 		this.tileHeight = tileHeight;
 	}
 
-	public void useEncoder(int Encoder) {
-		useEncoder = Encoder;
+	public void useEncoder(int Encoder) throws Exception {
+		if (Encoder == JPEG_ENC || Encoder == TIFF_ENC)
+			useEncoder = Encoder;
+		else
+			throw new Exception("MCRImgProcessor.useEncoder accept only MCRImgProcessor.JPEG_ENC or MCRImgProcessor.TIFF_ENC as parameter!");
 	}
 
+	/* (non-Javadoc)
+	 * @see org.mycore.services.imaging.ImgProcessor#resizeFitWidth(java.io.InputStream, int, java.io.OutputStream)
+	 */
 	public void resizeFitWidth(InputStream input, int newWidth, OutputStream output) {
-		image = loadImage(input);
+		image = loadmageMEMCache(input);
 
 		if (newWidth != origSize.width)
 			image = fitWidth(image, newWidth);
@@ -72,7 +100,7 @@ public class MCRImgProcessor implements ImgProcessor {
 	}
 
 	public void resizeFitHeight(InputStream input, int newHeight, OutputStream output) {
-		image = loadImage(input);
+		image = loadmageMEMCache(input);
 
 		if (newHeight != origSize.height)
 			image = fitHeight(image, newHeight);
@@ -84,11 +112,11 @@ public class MCRImgProcessor implements ImgProcessor {
 	}
 
 	public void resize(InputStream input, int newWidth, int newHeight, OutputStream output) {
-		image = loadImage(input);
+		image = loadmageMEMCache(input);
 
 		if (newWidth != origSize.width && newHeight != origSize.height)
 			try {
-				image = resizeImage(image, newWidth, newHeight, true);
+				image = resizeImage(image, newWidth, newHeight);
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -101,7 +129,7 @@ public class MCRImgProcessor implements ImgProcessor {
 	}
 
 	public void scale(InputStream input, float scaleFactor, OutputStream output) {
-		image = loadImage(input);
+		image = loadmageMEMCache(input);
 
 		if (scaleFactor != 1)
 			image = scaleImage(image, scaleFactor);
@@ -111,9 +139,14 @@ public class MCRImgProcessor implements ImgProcessor {
 		else if (useEncoder == TIFF_ENC)
 			tiffEncode(image, output, true, tileWidth, tileHeight);
 	}
-
+	
 	public void scaleROI(InputStream input, int xTopPos, int yTopPos, int boundWidth, int boundHeight, float scaleFactor, OutputStream output) {
-		image = loadImage(input);
+		if (image == null)
+			image = loadmageMEMCache(input);
+		
+		LOGGER.debug("********************************");
+		LOGGER.debug("* Loading Image succesfull!");
+		LOGGER.debug("********************************");
 		
 		Point scaleTopCorner = new Point((int) (xTopPos / scaleFactor), (int) (yTopPos / scaleFactor));
 		Dimension scaleBoundary = new Dimension((int) (boundWidth / scaleFactor), (int) (boundHeight / scaleFactor));
@@ -123,9 +156,19 @@ public class MCRImgProcessor implements ImgProcessor {
 		
 		if (scaleBoundary.height > origSize.height)
 			scaleBoundary.height = origSize.height;
-			
-		if (scaleBoundary.width < origSize.width && scaleBoundary.height < origSize.height)
+		
+		LOGGER.debug("*********************************************");
+		LOGGER.debug("* MCRImgProcessor - scaleROI#");
+		LOGGER.debug("* ScaleFactor: " + scaleFactor);
+		LOGGER.debug("* scaleBoundary.width: " + scaleBoundary.width);
+		LOGGER.debug("* scaleBoundary.height: " + scaleBoundary.height);
+		LOGGER.debug("* origSize.width: " + origSize.width);
+		LOGGER.debug("* origSize.height: " + origSize.height);
+		LOGGER.debug("*********************************************");
+		
+		if (scaleBoundary.width < origSize.width || scaleBoundary.height < origSize.height)
 			image = crop(image, scaleTopCorner, scaleBoundary);
+		
 		
 		if (scaleFactor != 1) {
 			image = scaleImage(image, scaleFactor);
@@ -154,24 +197,122 @@ public class MCRImgProcessor implements ImgProcessor {
 	}
 
 	public Dimension getImageSize(InputStream input) {
-		PlanarImage image = loadImage(input);
+		PlanarImage image = loadmageMEMCache(input);
 		return new Dimension(image.getWidth(), image.getHeight());
 	}
 
-	public void encode(InputStream input, OutputStream output, int encoder) {
+	public void encode(InputStream input, OutputStream output, int encoder) throws Exception {
 		useEncoder(encoder);
 		resize(input, origSize.width, origSize.height, output);
 	}
 
+	//****************************************************************************
+	
+	public void loadImage(InputStream input) {
+		image = loadmageMEMCache(input);
+	}
+
+	public boolean hasCorrectTileSize() {
+		boolean hasCorrectSize = false;
+		
+		if (image.getNumXTiles() > 1 && image.getNumYTiles() >1 && image.getTileWidth() == 480 && image.getTileHeight() == 480)
+			hasCorrectSize = true;
+		
+		return hasCorrectSize;
+	}
+
+	public void resizeFitWidth(int newWidth) {
+		if (newWidth != origSize.width)
+			image = fitWidth(image, newWidth);
+	}
+
+	public void resizeFitHeight(int newHeight) {
+		if (newHeight != origSize.height)
+			image = fitHeight(image, newHeight);
+	}
+
+	public void resize(int newWidth, int newHeight) {
+		if (newWidth != origSize.width && newHeight != origSize.height)
+			try {
+				image = resizeImage(image, newWidth, newHeight);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+	}
+
+	public void scale(float scaleFactor) {
+		if (scaleFactor != 1)
+			image = scaleImage(image, scaleFactor);
+	}
+
+	public void scaleROI(int xTopPos, int yTopPos, int boundWidth, int boundHeight, float scaleFactor) {
+		Point scaleTopCorner = new Point((int) (xTopPos / scaleFactor), (int) (yTopPos / scaleFactor));
+		Dimension scaleBoundary = new Dimension((int) (boundWidth / scaleFactor), (int) (boundHeight / scaleFactor));
+		
+		if (scaleBoundary.width > origSize.width)
+			scaleBoundary.width = origSize.width;
+		
+		if (scaleBoundary.height > origSize.height)
+			scaleBoundary.height = origSize.height;
+			
+		if (scaleBoundary.width < origSize.width || scaleBoundary.height < origSize.height)
+			image = crop(image, scaleTopCorner, scaleBoundary);
+		
+		
+		if (scaleFactor != 1) {
+			image = scaleImage(image, scaleFactor);
+		}
+	}
+
+	public void jpegEncode(OutputStream output) {
+		jpegEncode(image, output, jpegQuality);
+	}
+
+	public void tiffEncode(OutputStream output) {
+		tiffEncode(image, output, true, tileWidth, tileHeight);
+	}
+	
+	public void createText(String text, int width, int height, OutputStream output) {
+		image = createText(text, 20, height/2);
+		jpegEncode(image, output, jpegQuality);
+	}
+
+	private PlanarImage createText(String text, int width, int height) {
+		BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+		Graphics pic = img.getGraphics();
+		pic.drawString(text, width, height);
+		return JAI.create("awtimage", pic);
+	}
+
+	
 	// End: Interface implementation
 
 	/** ************************************************************************ */
-
 	// Image operation using JAI
-	private PlanarImage loadImage(InputStream input) {
+	public PlanarImage loadImageFileCache(InputStream input) {
+		SeekableStream seekStream = SeekableStream.wrapInputStream(input, true);
+		PlanarImage image = JAI.create("stream", seekStream);
+		origSize.width = image.getWidth();
+		origSize.height = image.getHeight();
+		LOGGER.info("******************************************");
+		LOGGER.info("* File loading successfull - FileCache");
+		LOGGER.info("* origSize.width: " + origSize.width);
+		LOGGER.info("* origSize.height: " + origSize.height);
+		LOGGER.info("******************************************");
+		this.image = image;
+		return image;
+	}
+	
+	private PlanarImage loadmageMEMCache(InputStream input) {
 		PlanarImage image = JAI.create("stream", new MemoryCacheSeekableStream(input));
 		origSize.width = image.getWidth();
 		origSize.height = image.getHeight();
+		LOGGER.info("******************************************");
+		LOGGER.info("* File loading successfull - MEM");
+		LOGGER.info("* origSize.width: " + origSize.width);
+		LOGGER.info("* origSize.height: " + origSize.height);
+		LOGGER.info("******************************************");
 		return image;
 	}
 
@@ -223,22 +364,33 @@ public class MCRImgProcessor implements ImgProcessor {
 		return scaleImage(img, yScale);
 	}
 
-	private PlanarImage resizeImage(PlanarImage img, int newWidth, int newHeight, boolean keepProportion) throws Exception {
+	private PlanarImage resizeImage(PlanarImage img, int newWidth, int newHeight) throws Exception {
 		if (newWidth <= 0 || newHeight <= 0)
 			throw new Exception("newWidth and newHeight should be > 0!");
 
-		int origWidth = img.getWidth();
-		int origHeight = img.getHeight();
-		float xScale = (float) newWidth / (float) origWidth;
-		float yScale = (float) newHeight / (float) origHeight;
-
-		if (keepProportion)
-			if (yScale < xScale)
-				xScale = yScale;
-			else
-				yScale = xScale;
-
-		return scaleImage(img, xScale);
+		float scaleFactor = 1;
+		
+		LOGGER.debug("*********************************************");
+		LOGGER.debug("* MCRImgProcessor - resizeImage             *");
+		LOGGER.debug("* newWidth: " + newWidth);
+		LOGGER.debug("* newHeight: " + newHeight);
+		LOGGER.debug("* origSize.width: " + origSize.width);
+		LOGGER.debug("* origSize.height: " + origSize.height);
+		LOGGER.debug("*********************************************");
+		
+		if (newWidth != origSize.width || newHeight != origSize.height) {
+			LOGGER.debug("*********************************************");
+			LOGGER.debug("* MCRImgProcessor - resizeImage             *");
+			LOGGER.debug("* in IF                                     *");
+			LOGGER.debug("*********************************************");
+			int origWidth = img.getWidth();
+			int origHeight = img.getHeight();
+			float xScale = (float) newWidth / (float) origWidth;
+			float yScale = (float) newHeight / (float) origHeight;
+			scaleFactor = (yScale < xScale) ? yScale : xScale;
+		}
+		
+		return scaleImage(img, scaleFactor);
 	}
 
 	// Encoding Part
@@ -286,5 +438,8 @@ public class MCRImgProcessor implements ImgProcessor {
 	public void setScaleFactor(float scaleFactor) {
 		this.scaleFactor = scaleFactor;
 	}
+
+	
+	
 
 }

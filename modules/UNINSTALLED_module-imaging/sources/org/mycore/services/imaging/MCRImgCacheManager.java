@@ -20,6 +20,7 @@ import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
+import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 import org.mycore.datamodel.ifs.MCRDirectory;
 import org.mycore.datamodel.ifs.MCRFile;
@@ -39,7 +40,8 @@ import org.mycore.datamodel.ifs.MCRFilesystemNode;
  * in absolute path the "/" is replaced by "%20"
  * 
  * 
- * @version 0.01pre 03/01/2006
+ * @version 0.01pre 03/01/2006<br>
+ * 			1.00 08/08/2006
  * @author Vu Huu Chi
  * 
  */
@@ -50,23 +52,20 @@ public class MCRImgCacheManager implements CacheManager {
 	public static final String CACHE = "Cache";
 
 	public static final String ORIG = "Orig";
+	
+	public static final String CACHE_FOLDER = "imgCache";
 
-	private Logger LOGGER = Logger.getLogger(MCRFileNodeServlet.class.getName());
-	private Stopwatch timer = new Stopwatch();
-
+	private Logger LOGGER = Logger.getLogger(MCRImgCacheManager.class.getName());
+	
 	protected MCRDirectory cacheInIFS = null;
 
 	public MCRImgCacheManager() {
-		if ((cacheInIFS = MCRDirectory.getRootDirectory("imgCache")) == null)
+		if ((cacheInIFS = MCRDirectory.getRootDirectory(CACHE_FOLDER)) == null)
 			try {
-				cacheInIFS = new MCRDirectory("imgCache", "imgCache");
+				cacheInIFS = new MCRDirectory(CACHE_FOLDER, CACHE_FOLDER);
 			} catch (Exception e) {
 				throw new MCRException(e.getMessage());
 			}
-	}
-
-	public void getImage(MCRFile image, Dimension size, OutputStream imageData) {
-		getImage(image, dimToString(size), imageData);
 	}
 
 	public void getImage(MCRFile image, String filename, OutputStream imageData) {
@@ -99,18 +98,8 @@ public class MCRImgCacheManager implements CacheManager {
 	}
 
 	public void saveImage(MCRFile image, String filename, InputStream imageData) {
-		String path = buildPath(image);
-		MCRFilesystemNode node = cacheInIFS.getChildByPath(path);
-		MCRDirectory cachedImg = null;
-
-		LOGGER.info("****************************************");
-		LOGGER.info("* PATH for img in Cache: " + path);
-		LOGGER.info("****************************************");
 		
-		if (node != null && node instanceof MCRDirectory)
-			cachedImg = (MCRDirectory) node;
-		else
-			cachedImg = new MCRDirectory(path, cacheInIFS);
+		MCRDirectory cachedImg = getCacheDir(image);
 
 		try {
 			MCRFile cachedImgIFS = new MCRFile(filename + "lock", cachedImg);
@@ -132,35 +121,28 @@ public class MCRImgCacheManager implements CacheManager {
 		if (cachedImg != null && cachedImg instanceof MCRFile)
 			((MCRFile) cachedImg).delete();
 		else
-			throw new MCRException("Could not delete " + image.getName() + "from cache!");
+			LOGGER.debug("Could not delete " + image.getName() + "from cache!");
+//			throw new MCRException("Could not delete " + image.getName() + "from cache!");
 
 	}
 
 	public void deleteImage(MCRFile image) {
 		MCRFilesystemNode cachedImg = cacheInIFS.getChildByPath(buildPath(image));
 
-		if (cachedImg != null && cachedImg instanceof MCRDirectory)
+		if (cachedImg != null && cachedImg instanceof MCRDirectory) {
+			LOGGER.debug("****************************************");
+			LOGGER.debug("* MCRImgCacheManager - deleteImage ");
+			LOGGER.debug("* Delte : " + cachedImg.getName());
+			LOGGER.debug("****************************************");
 			((MCRDirectory) cachedImg).delete();
+		}
 		else
-			throw new MCRException("Could not delete " + image.getName() + "from cache!");
+			LOGGER.debug("Could not delete " + image.getName() + "from cache!");
+//			throw new MCRException("Could not delete " + image.getName() + "from cache!");
 
 	}
 
-	private String buildPath(MCRFile image) {
-		String ownerID = image.getOwnerID();
-		String absPath = image.getAbsolutePath().replaceAll("/", "%20");
-		
-		return ownerID + absPath;
-	}
-
-	// return 'width'x'height' as String
-	private String dimToString(Dimension size) {
-		return size.width + "x" + size.height;
-	}
-
-	public boolean existInCache(MCRFile image, Dimension size) {
-		return existInCache(image, dimToString(size));
-	}
+	
 
 	public boolean existInCache(MCRFile image, String filename) {
 		MCRFilesystemNode cachedImg = cacheInIFS.getChildByPath(buildPath(image) + "/" + filename);
@@ -172,41 +154,17 @@ public class MCRImgCacheManager implements CacheManager {
 	}
 
 	public boolean existInCache(MCRFile image) {
-		String name = image.getName();
-		timer.reset();
-		timer.start();
 		int imgWidth = getImgWidth(image);
-		timer.stop();
-		LOGGER.debug("**********************************");
-		LOGGER.debug("* " + name);
-		LOGGER.debug("* getImgWidth Time: " + timer.getElapsedTime());
-		LOGGER.debug("**********************************");
-		
-		timer.reset();
-		timer.start();
 		int imgHeight = getImgHeight(image);
-		timer.stop();
-		LOGGER.debug("**********************************");
-		LOGGER.debug("* " + name);
-		LOGGER.debug("* getImgHeight Time: " + timer.getElapsedTime());
-		LOGGER.debug("**********************************");
 		
-		LOGGER.debug("**********************************");
-		LOGGER.debug("* " + name);
-		LOGGER.debug("* Cached Size: " + imgWidth + "x" + imgHeight);
-		LOGGER.debug("**********************************");
-		if (imgWidth <= 2*1024 && imgHeight <= 2*768){
-			LOGGER.debug("**********************************");
-			LOGGER.debug("* " + name);
-			LOGGER.debug("* exist in Cache IF!");
-			LOGGER.debug("**********************************");
+		MCRConfiguration config = MCRConfiguration.instance();
+		int cacheWidth = Integer.parseInt(config.getString("MCR.Module-iview.cache.size.width"));
+		int cacheHeight = Integer.parseInt(config.getString("MCR.Module-iview.cache.size.height"));
+		
+		if (imgWidth <= 2*cacheWidth && imgHeight <= 2*cacheHeight){
 			return (existInCache(image, THUMB) && existInCache(image, ORIG));
 		}
 		else{
-			LOGGER.debug("**********************************");
-			LOGGER.debug("* " + name);
-			LOGGER.debug("* exist in Cache ELSE!");
-			LOGGER.debug("**********************************");
 			return (existInCache(image, THUMB) && existInCache(image, ORIG) && existInCache(image, CACHE));
 		}
 	}
@@ -263,6 +221,8 @@ public class MCRImgCacheManager implements CacheManager {
 
 				LOGGER.info("Writing additional data for " + image.getName() + " complete!");
 			}
+			else
+				LOGGER.info("Additional data for " + image.getName() + " allready exists!");
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -271,5 +231,111 @@ public class MCRImgCacheManager implements CacheManager {
 			e.printStackTrace();
 		}
 	}
+
+	public void setLock(MCRFile image) {
+		MCRFilesystemNode node;
+		MCRDirectory cachedImg = getCacheDir(image);
+		
+		node = cachedImg.getChild("lock");
+		LOGGER.debug("****************************************");
+		LOGGER.debug("* setLock: " + cachedImg.getName());
+		LOGGER.debug("* setLock: " + cachedImg.getOwnerID());
+		LOGGER.debug("****************************************");
+		
+		if (node == null) {
+			LOGGER.debug("****************************************");
+			LOGGER.debug("* Lock Image!");
+			LOGGER.debug("****************************************");
+			MCRFile lock = new MCRFile("lock", cachedImg);
+		}
+		else {
+			LOGGER.info("****************************************");
+			LOGGER.info("* Image allready locked!");
+			LOGGER.info("****************************************");
+		}
+	}
+
+	public void removeLock(MCRFile image) {
+		MCRFilesystemNode node;
+		MCRDirectory cachedImg = getCacheDir(image);
+		
+		node = cachedImg.getChild("lock");
+		
+		if (node != null) {
+			LOGGER.debug("****************************************");
+			LOGGER.debug("* Remove Lock!");
+			LOGGER.debug("****************************************");
+			((MCRFile)node).delete();
+		}
+		else {
+			LOGGER.info("****************************************");
+			LOGGER.info("* Image is not locked!");
+			LOGGER.info("****************************************");
+		}
+		
+	}
+	
+	public boolean isLocked(MCRFile image) {
+		MCRFilesystemNode node;
+		MCRDirectory cachedImg = getCacheDir(image);
+		
+		node = cachedImg.getChild("lock");
+		LOGGER.debug("****************************************");
+		LOGGER.debug("* setLock: " + cachedImg.getName());
+		LOGGER.debug("* setLock: " + cachedImg.getOwnerID());
+		LOGGER.debug("****************************************");
+		
+		if (node == null) {
+			LOGGER.debug("****************************************");
+			LOGGER.debug("* Not Locked!");
+			LOGGER.debug("****************************************");
+			return false;
+		}
+		else {
+			LOGGER.debug("****************************************");
+			LOGGER.debug("* Is Locked!");
+			LOGGER.debug("****************************************");
+			return true;
+		}
+		
+	}
+	
+	/* *********************************************************************************************** */
+	/* End implement interface																		   */
+	/* *********************************************************************************************** */
+	
+	private MCRDirectory getCacheDir(MCRFile image) {
+		String path = buildPath(image);
+		MCRFilesystemNode node = cacheInIFS.getChildByPath(path);
+		MCRDirectory cachedImg = null;
+
+		LOGGER.info("****************************************");
+		LOGGER.info("* PATH for img in Cache: " + path);
+		LOGGER.info("****************************************");
+		
+		if (node != null && node instanceof MCRDirectory)
+			cachedImg = (MCRDirectory) node;
+		else
+			cachedImg = new MCRDirectory(path, cacheInIFS);
+		return cachedImg;
+	}
+	
+	private String buildPath(MCRFile image) {
+		String ownerID = image.getOwnerID();
+		String absPath = image.getAbsolutePath().replaceAll("/", "%20");
+		
+		return ownerID + absPath;
+	}
+
+	// return 'width'x'height' as String
+	private String dimToString(Dimension size) {
+		return size.width + "x" + size.height;
+	}
+
+	public boolean existInCache(MCRFile image, Dimension size) {
+		return existInCache(image, dimToString(size));
+	}
+
+	
 
 }
