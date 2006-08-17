@@ -34,6 +34,8 @@ import java.awt.event.KeyEvent;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 import javax.swing.BorderFactory;
 import javax.swing.JApplet;
@@ -50,6 +52,8 @@ import javax.swing.UIManager;
  * @author Harald Richter
  * @author Frank Lützenkirchen
  * @author Jens Kupferschmidt
+ * @author Radi Radichev
+ * @author Thomas Scheffler (yagee)
  * 
  * @version $Revision$ $Date$
  */
@@ -74,14 +78,13 @@ public class MCRUploadApplet extends JApplet {
         peerURL = getParameter("ServletsBase") + "MCRUploadServlet";
 
         // TODO: Refactor parameters from web page
-        // TODO: I18N of strings and messages
         // TODO: Refactor thread handling
         try {
             UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
         } catch (Exception ignored) {
         }
 
-        chooserButton = new JButton("ausw\u00e4hlen...");
+        chooserButton = new JButton(translateI18N("MCRUploadApplet.select"));
         chooserButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 handleChooserButton();
@@ -95,7 +98,7 @@ public class MCRUploadApplet extends JApplet {
             }
         });
 
-        locationButton = new JButton("\u00fcbertragen...");
+        locationButton = new JButton(translateI18N("MCRUploadApplet.submit"));
         locationButton.setEnabled(false);
         locationButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -119,10 +122,11 @@ public class MCRUploadApplet extends JApplet {
         GridBagLayout gbl = new GridBagLayout();
         GridBagConstraints gbc = new GridBagConstraints();
         content.setLayout(gbl);
-        content.setBackground( new Color( 0xCA, 0xD9, 0xE0 ) );
+        int col[] = getColor(); 
+        content.setBackground( new Color( col[0], col[1], col[2] ) );
         content.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
-        JLabel jlChoose = new JLabel("Wählen Sie Dateien oder Verzeichnisse aus:");
+        JLabel jlChoose = new JLabel(translateI18N("MCRUploadApplet.dirsel"));
         gbc.insets = new Insets(2, 2, 2, 2);
         gbc.gridx = 1;
         gbc.gridy = 1;
@@ -136,7 +140,7 @@ public class MCRUploadApplet extends JApplet {
         gbl.setConstraints(chooserButton, gbc);
         content.add(chooserButton);
 
-        JLabel jlInput = new JLabel("oder geben Sie einen absoluten Pfad ein:");
+        JLabel jlInput = new JLabel(translateI18N("MCRUploadApplet.altsel"));
         gbc.gridx = 1;
         gbc.gridy = 2;
         gbl.setConstraints(jlInput, gbc);
@@ -162,7 +166,7 @@ public class MCRUploadApplet extends JApplet {
     }
 
     protected void handleChooserButton() {
-        int result = locationChooser.showDialog(this, "Datei(en) oder Verzeichnis(se) w\u00e4hlen");
+        int result = locationChooser.showDialog(this, translateI18N("MCRUploadApplet.choose"));
 
         if (result == JFileChooser.APPROVE_OPTION) {
             doUpload(locationChooser.getSelectedFiles());
@@ -191,4 +195,49 @@ public class MCRUploadApplet extends JApplet {
             System.out.println("MALFORMED URL: " + targetURL);
         }
     }
+    
+    /**
+     * provides translation for the given label (property key).
+     * 
+     * Use the current locale that is needed for translation.
+     * 
+     * @param label
+     * @return translated String
+     */
+    private final String translateI18N(String label) {
+        String result;
+        Locale currentLocale = getLocale();
+        ResourceBundle message = ResourceBundle.getBundle("messages", new Locale(currentLocale.getLanguage()));
+        
+        try { 
+            result = message.getString(label);
+        } catch (java.util.MissingResourceException mre) {
+            result = "???" + label + "???";
+            System.err.println(mre.getMessage()); 
+        }
+         
+        return result;
+    }
+    
+    /**
+     * provides set color defined in mycore.properties.uploadapplet.
+     *
+     * @return an integer array contained red / green / blue
+     */
+    private final int [] getColor() {
+        int result[] = new int [3]; result[0] = 202; result[1] = 217; result[2] = 244;
+        Locale currentLocale = getLocale();
+        ResourceBundle message = ResourceBundle.getBundle("messages", new Locale(currentLocale.getLanguage()));
+        
+        try { 
+            result[0] = Integer.parseInt(message.getString("MCRUploadApplet.color.red"));
+            result[1] = Integer.parseInt(message.getString("MCRUploadApplet.color.green"));
+            result[2] = Integer.parseInt(message.getString("MCRUploadApplet.color.blue"));
+        } catch (java.util.MissingResourceException mre) {
+            System.err.println(mre.getMessage()); 
+        }
+         
+        return result;
+    }
+    
 }
