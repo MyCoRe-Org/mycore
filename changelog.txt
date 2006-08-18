@@ -14,6 +14,8 @@ Version 1.3
  - Redesign of remote access. Now WebServices, OAI and Z3950 is used
  - Separate the content store from the content indexer and build it in the new search engine. 
  - Move the IBM CM8 code to a separate uninstalled module. 
+ - The remote access can serve WebService as default an has an interfece for user access classes.
+ - The UplloadApplet use I18N and has a configurable background color.
 
 Version 1.2
 ===========
