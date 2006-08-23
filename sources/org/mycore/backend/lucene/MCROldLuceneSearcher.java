@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Iterator;
+import java.util.Enumeration;
 
 import org.apache.log4j.Logger;
 import org.apache.lucene.analysis.Analyzer;
@@ -441,6 +442,21 @@ public class MCROldLuceneSearcher extends MCRSearcher {
               id = doc.get("mcrid");
             LOGGER.debug("returnid: " + id);
             MCRHit hit = new MCRHit(id);
+            
+            
+            Enumeration fields = doc.fields();
+            while (fields.hasMoreElements()) {
+                Field field = (Field) fields.nextElement();
+                if (field.isStored() ) { // mainly for scorm search
+                    MCRFieldDef fd = MCRFieldDef.getDef(field.name());
+                    if ( null != fd )
+                    {
+                      MCRFieldValue fv = new MCRFieldValue(fd, field.stringValue());
+                      hit.addMetaData(fv);
+                    }
+                }
+            }
+            
             
             for (int j=0; j<sortBy.size(); j++)
             {
