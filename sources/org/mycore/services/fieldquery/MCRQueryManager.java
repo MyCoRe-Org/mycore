@@ -132,7 +132,7 @@ public class MCRQueryManager {
             }
         };
 
-        String index = MCRFieldDef.getDef("objectType").getIndex();
+        String index = ((MCRSortBy) (sortBy.get(0))).getField().getIndex(); 
         MCRSearcher searcher = MCRSearcherFactory.getSearcherForIndex(index);
         searcher.addSortData(hitIterator, fields);
         results.sortBy(query.getSortBy());
