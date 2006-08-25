@@ -124,7 +124,7 @@ public class MCRFileNodeServlet extends MCRServlet {
         if (!remoteAliasList.contains(hostAlias)) {
             String msg = "Error: HTTP request host is not in the alias list";
             LOGGER.error(msg);
-            generateErrorPage(request, response, HttpServletResponse.SC_BAD_REQUEST, msg, new MCRException(hostAlias + " is not in the host alias list!"),
+            errorPage(request, response, HttpServletResponse.SC_BAD_REQUEST, msg, new MCRException(hostAlias + " is not in the host alias list!"),
                     false);
 
             return false;
@@ -136,7 +136,7 @@ public class MCRFileNodeServlet extends MCRServlet {
         if (requestPath == null) {
             String msg = "Error: HTTP request path is null";
             LOGGER.error(msg);
-            generateErrorPage(request, response, HttpServletResponse.SC_BAD_REQUEST, msg, new MCRException("No path was given in the request"), false);
+            errorPage(request, response, HttpServletResponse.SC_BAD_REQUEST, msg, new MCRException("No path was given in the request"), false);
 
             return false;
         }
@@ -180,7 +180,7 @@ public class MCRFileNodeServlet extends MCRServlet {
         if (root == null) {
             String msg = "Error: No root node found for owner ID " + ownerID;
             LOGGER.error(msg);
-            generateErrorPage(request, response, HttpServletResponse.SC_NOT_FOUND, msg, new MCRException(msg), false);
+            errorPage(request, response, HttpServletResponse.SC_NOT_FOUND, msg, new MCRException(msg), false);
 
             return;
         }
@@ -190,7 +190,7 @@ public class MCRFileNodeServlet extends MCRServlet {
                 // request path is too long
                 String msg = "Error: No such file or directory " + request.getPathInfo();
                 LOGGER.error(msg);
-                generateErrorPage(request, response, HttpServletResponse.SC_NOT_FOUND, msg, new MCRException(msg), false);
+                errorPage(request, response, HttpServletResponse.SC_NOT_FOUND, msg, new MCRException(msg), false);
                 return;
             }
             sendFile(request, response, (MCRFile) root);
@@ -209,7 +209,7 @@ public class MCRFileNodeServlet extends MCRServlet {
         if (node == null) {
             String msg = "Error: No such file or directory " + path;
             LOGGER.error(msg);
-            generateErrorPage(request, response, HttpServletResponse.SC_NOT_FOUND, msg, new MCRException(msg), false);
+            errorPage(request, response, HttpServletResponse.SC_NOT_FOUND, msg, new MCRException(msg), false);
             return;
         } else if (node instanceof MCRFile) {
             sendFile(request, response, (MCRFile) node);
@@ -270,15 +270,13 @@ public class MCRFileNodeServlet extends MCRServlet {
             jdom = SAX_BUILDER.build(in);
         } catch (JDOMException e) {
             LOGGER.warn("Error while parsing remote document", e);
-            generateErrorPage(req, res, HttpServletResponse.SC_EXPECTATION_FAILED, "Error while parsing remote document.", e, false);
+            errorPage(req, res, HttpServletResponse.SC_EXPECTATION_FAILED, "Error while parsing remote document.", e, false);
         } catch (IOException e) {
             LOGGER.warn("Error while parsing remote document", e);
-            generateErrorPage(req, res, HttpServletResponse.SC_EXPECTATION_FAILED, "Error while parsing remote document.", e, false);
+            errorPage(req, res, HttpServletResponse.SC_EXPECTATION_FAILED, "Error while parsing remote document.", e, false);
         }
 
-        req.setAttribute("MCRLayoutServlet.Input.JDOM", jdom);
-        RequestDispatcher rd = getServletContext().getNamedDispatcher("MCRLayoutServlet");
-        rd.forward(req, res);
+        forwardRequest(req, res, jdom);
     }
 
     /**
@@ -324,9 +322,28 @@ public class MCRFileNodeServlet extends MCRServlet {
     private void sendDirectory(HttpServletRequest req, HttpServletResponse res, MCRDirectory dir) throws IOException, ServletException {
         LOGGER.info("MCRFileNodeServlet: Sending listing of directory " + dir.getName());
         Document jdom = MCRDirectoryXML.getInstance().getDirectoryXML(dir);
+        forwardRequest(req, res, jdom);
 
-        req.setAttribute("MCRLayoutServlet.Input.JDOM", jdom);
+    }
+
+    /** 
+     *  Forwards the document to the output
+     *  @author A.Schaar
+     *  @see its overwritten in jspdocportal 
+     */
+    protected void forwardRequest(HttpServletRequest req, HttpServletResponse res, Document jdom) throws IOException, ServletException {
+    	req.setAttribute("MCRLayoutServlet.Input.JDOM", jdom);
         RequestDispatcher rd = getServletContext().getNamedDispatcher("MCRLayoutServlet");
-        rd.forward(req, res);
+        rd.forward(req, res);    	
+    }
+    
+    
+    /** 
+     *  Forwards the error to generate the output
+     *  @author A.Schaar
+     *  @see its overwritten in jspdocportal 
+     */
+    protected void errorPage ( HttpServletRequest req, HttpServletResponse res, int error, String msg, Exception ex, boolean xmlstyle)  throws IOException, ServletException {
+        generateErrorPage(req, res, error,msg, ex, xmlstyle);    	    
     }
 }
