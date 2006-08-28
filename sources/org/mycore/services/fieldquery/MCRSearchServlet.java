@@ -106,10 +106,8 @@ public class MCRSearchServlet extends MCRServlet {
         Document query = (Document) (getCache(QUERIES_KEY).get(id));
 
         // Send query XML to editor
-        request.setAttribute("MCRLayoutServlet.Input.JDOM", query);
         request.setAttribute("XSL.Style", "xml");
-        RequestDispatcher rd = getServletContext().getNamedDispatcher("MCRLayoutServlet");
-        rd.forward(request, response);
+        forwardRequest(request, response, query);
     }
 
     /**
@@ -175,9 +173,7 @@ public class MCRSearchServlet extends MCRServlet {
         xml.addContent(new Element("condition").setAttribute("format", "xml").addContent(cond.toXML()));
 
         // Send output to LayoutServlet
-        request.setAttribute("MCRLayoutServlet.Input.JDOM", new Document(xml));
-        RequestDispatcher rd = getServletContext().getNamedDispatcher("MCRLayoutServlet");
-        rd.forward(request, response);
+        forwardRequest(request, response, new Document(xml));        
     }
 
     private String getReqParameter(HttpServletRequest req, String name, String defaultValue) {
@@ -345,8 +341,7 @@ public class MCRSearchServlet extends MCRServlet {
         getCache(CONDIDTIONS_KEY).put(result.getID(), cond);
 
         // Redirect browser to first results page
-        String url = "MCRSearchServlet?mode=results&id=" + result.getID() + "&numPerPage=" + npp;
-        response.sendRedirect(response.encodeRedirectURL(url));
+        sendRedirect(request, response, result.getID(), npp);
     }
 
     public static String getConditionsKey() {
@@ -365,7 +360,7 @@ public class MCRSearchServlet extends MCRServlet {
         return PARAMS_KEY;
     }
 
-    private static MCRCache getCache(String key) {
+    protected static MCRCache getCache(String key) {
         MCRCache c = (MCRCache) MCRSessionMgr.getCurrentSession().get(key);
         if (c == null) {
             c = new MCRCache(5);
@@ -376,8 +371,29 @@ public class MCRSearchServlet extends MCRServlet {
 
     public static class SearchParameters {
         public int numPerPage;
-
         public int page;
+    }
+    
+    /** 
+     *  Forwards the document to the output
+     *  @author A.Schaar
+     *  @see its overwritten in jspdocportal 
+     */
+    protected void forwardRequest(HttpServletRequest req, HttpServletResponse res, Document jdom) throws IOException, ServletException {
+    	req.setAttribute("MCRLayoutServlet.Input.JDOM", jdom);
+        RequestDispatcher rd = getServletContext().getNamedDispatcher("MCRLayoutServlet");
+        rd.forward(req, res);    	        
+    }
+
+    /** 
+     *  Redirect browser to results page
+     *  @author A.Schaar
+     *  @see its overwritten in jspdocportal 
+     */
+    protected void sendRedirect( HttpServletRequest req, HttpServletResponse res, String id, String numPerPage) throws IOException {
+	    // Redirect browser to first results page
+	    String url = "MCRSearchServlet?mode=results&id=" + id + "&numPerPage=" + numPerPage;
+	    res.sendRedirect(res.encodeRedirectURL(url));
     }
 
 }
