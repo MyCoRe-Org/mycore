@@ -12,25 +12,14 @@ import java.util.Locale;
 import java.util.StringTokenizer;
 import java.util.Vector;
 
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerFactory;
-
 import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
-import org.jdom.Namespace;
 import org.jdom.filter.ElementFilter;
 import org.jdom.output.XMLOutputter;
-import org.jdom.transform.JDOMResult;
-import org.jdom.transform.JDOMSource;
-
-import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRConfiguration;
-import org.mycore.common.xml.MCRURIResolver;
-import org.mycore.datamodel.classifications.MCRCategoryItem;
-import org.mycore.datamodel.metadata.MCRMetaDate;
+import org.mycore.common.MCRSessionMgr;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.parsers.bool.MCRAndCondition;
 import org.mycore.parsers.bool.MCROrCondition;
@@ -153,7 +142,8 @@ public class MCRIndexBrowserData {
 
 		/***
 		 * if you hav in your environment (like ibm powerpc or other) no correct sort, use this lines for a german sort
-		Collections.sort(this.ll1, 
+		 */
+		Collections.sort(ll1, 
 				new Comparator() {
 					public int compare(Object o1, Object o2) {
 						Collator germanCc = Collator.getInstance(Locale.GERMAN);
@@ -175,7 +165,7 @@ public class MCRIndexBrowserData {
 				    }
 				}
 		);
-		***/	
+		/***/	
 		results.setAttribute("numHits", String.valueOf(numRows) );
 		
         if (br.search != null) {
@@ -466,8 +456,9 @@ public class MCRIndexBrowserData {
 	}
     
     protected String getCachingID(String sQuery) {
+    	String sID = MCRSessionMgr.getCurrentSession().getID();
         int hashCode = sQuery.hashCode();
-        return String.valueOf(hashCode);
+    	return sID + "#" + String.valueOf(hashCode);
     }
 
 }
