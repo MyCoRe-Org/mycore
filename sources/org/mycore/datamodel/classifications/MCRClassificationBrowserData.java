@@ -72,9 +72,10 @@ public class MCRClassificationBrowserData
   	uri = u;
 	config = MCRConfiguration.instance();
 
-	LOGGER.info( this.getClass() + " incomming Path " + uri);
+	LOGGER.info(  " incomming Path " + uri);
+	
 	String[] uriParts = uri.split("/");		//	mySplit();
-	LOGGER.info( this.getClass() + " Start" );
+	LOGGER.info( " Start" );
 	String classifID = "";
 	
 	if (uriParts.length <= 1) {
@@ -90,8 +91,8 @@ public class MCRClassificationBrowserData
 		startPath = "default";		
 	}
 	else {
-		LOGGER.debug( this.getClass() + " PathParts - classification " + uriParts[1]);
-		LOGGER.debug( this.getClass() + " Number of PathParts =" + uriParts.length);
+		LOGGER.debug(  " PathParts - classification " + uriParts[1]);
+		LOGGER.debug(  " Number of PathParts =" + uriParts.length);
 		try {
 			classifID    = config.getString( "MCR.ClassificationBrowser."+ uriParts[1] +".Classification" );
 		} catch (org.mycore.common.MCRConfigurationException noClass){
@@ -168,13 +169,13 @@ public class MCRClassificationBrowserData
 	}
 	showComments  = comments.endsWith("true")?true:false;
 
-	LOGGER.info( this.getClass() + " SetClassification " + classifID);
-	LOGGER.info( this.getClass() + " Leere Knoten auslassen: " + emptyLeafs );
-	LOGGER.info( this.getClass() + " Darstellung: " + view );
-	LOGGER.info( this.getClass() + " Kommentare: " + comments );
-	LOGGER.info( this.getClass() + " Doctypes: " + doctype );
-	LOGGER.info( this.getClass() + " Restriction: " + restriction );
-	LOGGER.info( this.getClass() + " Sortiert: " + sort );
+	LOGGER.info(   " SetClassification " + classifID);
+	LOGGER.info(   " Leere Knoten auslassen: " + emptyLeafs );
+	LOGGER.info(   " Darstellung: " + view );
+	LOGGER.info(   " Kommentare: " + comments );
+	LOGGER.info(   " Doctypes: " + doctype );
+	LOGGER.info(   " Restriction: " + restriction );
+	LOGGER.info(   " Sortiert: " + sort );
   }
 	
 
@@ -217,7 +218,7 @@ public class MCRClassificationBrowserData
 		categFields[i]= cati[i];
 		path += categFields[i]+ (i+1<categFields.length?"/":"");
 	}
-	uri = new String( uriParts[1] + "/" + path);
+	uri = new String( "/" + uriParts[1] + "/" + path);
   }
   
 
@@ -237,6 +238,10 @@ public class MCRClassificationBrowserData
   }
 
 
+  public String getUri() {
+	return uri;
+  }
+  
   /**
    * Returns true if category comments for the classification
    * currently displayed should be shown.
@@ -397,10 +402,10 @@ public class MCRClassificationBrowserData
 		 
 	   int numDocs =line.cat.counter;		//line.cat.countDocLinks(doctypeArray,restriction);
 	   //für Sortierung schon mal die leveltiefe bestimmen
-	   LOGGER.info( this.getClass() + " NumDocs - " + numDocs );
+	   LOGGER.info(  " NumDocs - " + numDocs );
 
 	   if ( emptyLeafs.endsWith("no") && numDocs == 0    ) {
-		    LOGGER.debug( this.getClass() + " empty Leaf continue - " + emptyLeafs );
+		    LOGGER.debug(  " empty Leaf continue - " + emptyLeafs );
 	   		continue;
 	   }
 	   Element xRow = new Element( "row" );
@@ -439,9 +444,11 @@ public class MCRClassificationBrowserData
 	   }
 	      
 	   xCol2.setAttribute( "numDocs",  String.valueOf( numDocs ) );
+	   String fmtnumDocs = fillToConstantLength(String.valueOf( numDocs ), " " , 6);
+	   xCol2.setAttribute( "fmtnumDocs", fmtnumDocs );
 
 	   if( numLength > 0 )	   {
-		 String search ="/"+uri;
+		 String search =uri;
 		 if ( line.cat.getID().equalsIgnoreCase(actItemID)	 )			 
 			 	search+= "/..";
 		 else	search+= "/" +line.cat.getID();
@@ -600,6 +607,7 @@ public class MCRClassificationBrowserData
 
 		aktRow.setContent(1, xc2);
 		xc2.setAttribute( "numDocs",  col2.getAttributeValue("numDocs") );
+		xc2.setAttribute( "fmtnumDocs",  col2.getAttributeValue("fmtnumDocs") );
 		xc2.setAttribute( "searchbase",  col2.getAttributeValue("searchbase") );
 		if (col2.getAttributeValue("lineID") != null )
 			xc2.setAttribute( "lineID",  col2.getAttributeValue("lineID") );
@@ -618,10 +626,22 @@ public class MCRClassificationBrowserData
 
 		child.setContent(1,xc4);
 		xc4.setAttribute( "numDocs",  place2.getAttributeValue("numDocs") );
+		xc4.setAttribute( "fmtnumDocs",  place2.getAttributeValue("fmtnumDocs") );
 		xc4.setAttribute( "searchbase",  place2.getAttributeValue("searchbase") );
 		if (place2.getAttributeValue("lineID") != null )
 			xc4.setAttribute( "lineID",  place2.getAttributeValue("lineID") );
 		xc4.addContent( place2.getText());
 	  }
+
+	  private static String fillToConstantLength(String value,String fillsign,int length) {
+		 	 int valueLength = value.length();
+		 	 if (valueLength >= length) return value;
+		 	 StringBuffer ret = new StringBuffer("");
+		 	 for (int i = 0; i < length - valueLength; i++) {
+					ret.append(fillsign);
+		 	 }
+		 	 ret.append(value);
+		 	 return ret.toString();
+		  }
 
 }
