@@ -56,13 +56,16 @@ import org.mycore.parsers.bool.MCRCondition;
 public class MCRSearchServlet extends MCRServlet {
     private static final long serialVersionUID = 1L;
 
-    private static final Logger LOGGER = Logger.getLogger(MCRSearchServlet.class);
+    protected static final Logger LOGGER = Logger.getLogger(MCRSearchServlet.class);
 
     /** Cached query results */
     private static final String RESULTS_KEY = "MCRSearchServlet.results";
 
     /** Cached queries as XML, for re-use in editor form */
     private static final String QUERIES_KEY = "MCRSearchServlet.queries";
+    
+    /** Cached queries as XML, for re-use in editor form */
+    private static final String RESORT_KEY = "MCRSearchServlet.resort";
 
     /** Cached queries as parsed MCRCondition, for output with results */
     private static final String CONDIDTIONS_KEY = "MCRSearchServlet.conditions";
@@ -101,7 +104,7 @@ public class MCRSearchServlet extends MCRServlet {
      * Returns a query that was previously submitted, to reload it into the
      * editor search mask. Usage: MCRSearchServlet?mode=load&id=XXXXX
      */
-    private void loadQuery(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void loadQuery(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String id = request.getParameter("id");
         Document query = (Document) (getCache(QUERIES_KEY).get(id));
 
@@ -114,7 +117,7 @@ public class MCRSearchServlet extends MCRServlet {
      * Shows a results page. Usage:
      * MCRSearchServlet?mode=results&numPerPage=10&page=1
      */
-    private void showResults(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void showResults(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
         // Get cached results
         String id = request.getParameter("id");
@@ -188,7 +191,7 @@ public class MCRSearchServlet extends MCRServlet {
      * Executes a query that comes from editor search mask, and redirects the
      * browser to the first results page
      */
-    private void doQuery(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    protected void doQuery(HttpServletRequest request, HttpServletResponse response) throws IOException {
         MCREditorSubmission sub = (MCREditorSubmission) (request.getAttribute("MCREditorSubmission"));
         Document input = null;
         if (sub != null) // query comes from editor search mask
@@ -338,6 +341,7 @@ public class MCRSearchServlet extends MCRServlet {
         // Store query and results in cache
         getCache(RESULTS_KEY).put(result.getID(), result);
         getCache(QUERIES_KEY).put(result.getID(), clonedQuery);
+        getCache(RESORT_KEY).put(result.getID(), input); 
         getCache(CONDIDTIONS_KEY).put(result.getID(), cond);
 
         // Redirect browser to first results page
@@ -360,6 +364,10 @@ public class MCRSearchServlet extends MCRServlet {
         return PARAMS_KEY;
     }
 
+    public static String getResortKey() {
+		return RESORT_KEY;
+	}
+    
     protected static MCRCache getCache(String key) {
         MCRCache c = (MCRCache) MCRSessionMgr.getCurrentSession().get(key);
         if (c == null) {
