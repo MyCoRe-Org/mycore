@@ -430,36 +430,39 @@ public class MCRLuceneSearcher extends MCRSearcher {
     private static class IndexModifierThread extends Thread implements MCRShutdownHandler.Closeable, Queue.Listener {
         private Queue queue;
 
-        private boolean running;
-
         private IndexModifier indexModifier;
 
         private String indexDir;
-
+        
+        private boolean running;
+        
         public IndexModifierThread(String indexDir) throws Exception {
             queue = new Queue();
-            this.running = true;
             this.indexDir = indexDir;
             indexModifier = getLuceneModifier(indexDir, true);
             MCRShutdownHandler.getInstance().addCloseable(this);
         }
 
         public void close() {
-            LOGGER.debug("close()");
-            running = false;
-            interrupt();
+            LOGGER.debug("close()"+Thread.currentThread().getName()+":"+this.getName());
+            this.interrupt();
+            while (running){
+                //return after thread finished work
+                Thread.yield();
+            }
         }
 
         public void run() {
             LOGGER.debug("IndexModifierThread started");
-            while (running) {
+            running=true;
+            //don't stop as long as elements are in queue
+            while (hasWork()) {
                 QueueElement qe;
                 try {
                     qe = queue.poll(this);
                 } catch (InterruptedException e1) {
-                    if (running) {
-                        LOGGER.warn("Catched InterruptException.", e1);
-                    }
+                    LOGGER.debug("Interrupted: closing");
+                    Thread.currentThread().interrupt();
                     continue;
                 }
                 if (qe.delete) {
@@ -479,15 +482,28 @@ public class MCRLuceneSearcher extends MCRSearcher {
             closeIndexModifier();
             MCRShutdownHandler.getInstance().removeCloseable(this);
             LOGGER.debug("IndexModifierThread stopped");
+            running=false;
+        }
+
+        private boolean hasWork() {
+            if (!Thread.currentThread().isInterrupted()) {
+                LOGGER.debug("Thread not interrupted! "+Thread.currentThread().getName());
+                return true;
+            }
+            synchronized (queue) {
+                LOGGER.debug("Thread interrupted: Queue empty?"+(!queue.hasNext()));
+                return (queue.hasNext());
+            }
         }
 
         private void addDocument(QueueElement qe) throws IOException {
-            LOGGER.debug("add Dcoument:" + qe.toString());
+            LOGGER.debug("add Document:" + qe.toString());
             indexModifier.addDocument(qe.doc, qe.analyzer);
+            LOGGER.debug("adding done.");
         }
 
         private void deleteDocument(QueueElement qe) throws IOException {
-            LOGGER.debug("delete Dcoument:" + qe.toString());
+            LOGGER.debug("delete Document:" + qe.toString());
             indexModifier.deleteDocuments(qe.deleteTerm);
         }
 
@@ -536,22 +552,30 @@ public class MCRLuceneSearcher extends MCRSearcher {
         }
 
         private void closeIndexModifier() {
-            try {
-                LOGGER.debug("Writing Lucene index changes to disk.");
-                indexModifier.close();
-            } catch (IOException e) {
-                LOGGER.warn("Error while closing IndexModifier.", e);
-            } catch (IllegalStateException e) {
-                LOGGER.debug("IndexModifier was allready closed.");
+            synchronized (indexModifier) {
+                try {
+                    LOGGER.debug("Writing Lucene index changes to disk.");
+                    if (isInterrupted()) {
+                        LOGGER.debug("Interrupt detected: optimizing...");
+                        indexModifier.optimize();
+                    }
+                    indexModifier.close();
+                } catch (IOException e) {
+                    LOGGER.warn("Error while closing IndexModifier.", e);
+                } catch (IllegalStateException e) {
+                    LOGGER.debug("IndexModifier was allready closed.");
+                }
             }
         }
 
         public void doWakeUp() {
-            try {
-                LOGGER.debug("Opening Lucene index for writing.");
-                indexModifier = getLuceneModifier(indexDir, false);
-            } catch (Exception e) {
-                LOGGER.warn("Error while reopening IndexModifier.", e);
+            synchronized (indexModifier) {
+                try {
+                    LOGGER.debug("Opening Lucene index for writing.");
+                    indexModifier = getLuceneModifier(indexDir, false);
+                } catch (Exception e) {
+                    LOGGER.warn("Error while reopening IndexModifier.", e);
+                }
             }
         }
     }
@@ -626,6 +650,7 @@ public class MCRLuceneSearcher extends MCRSearcher {
                             }
                         }
                     } catch (InterruptedException ex) {
+                        LOGGER.debug("poll interrupts");
                         --waitingForPoll_;
                         lock_.notify();
                         throw ex;
@@ -661,6 +686,14 @@ public class MCRLuceneSearcher extends MCRSearcher {
                 }
             }
             return true;
+        }
+        
+        public boolean hasNext() {
+            synchronized (lock_) {
+                synchronized (head_) {
+                    return ((head_.next!=null));
+                }
+            }
         }
     }
 
