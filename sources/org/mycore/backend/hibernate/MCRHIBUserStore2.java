@@ -37,7 +37,6 @@ import org.mycore.backend.hibernate.tables.MCRGROUPS;
 import org.mycore.backend.hibernate.tables.MCRUSERS;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
-import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.user2.MCRGroup;
 import org.mycore.user2.MCRUser;
 import org.mycore.user2.MCRUserStore;
@@ -746,7 +745,6 @@ public class MCRHIBUserStore2 implements MCRUserStore {
 
             if (l.size() == 0) {
                 tx.rollback();
-                session.close();
                 throw new MCRException("There is no group with ID = " + groupID);
             } else {
                 MCRGROUPS groups = (MCRGROUPS) l.get(0);
