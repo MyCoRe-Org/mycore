@@ -43,6 +43,7 @@ public class MCRNormalizer {
 
     private static String[] replace;
 
+    private static boolean normalize = true; 
     static {
         StringTokenizer st = new StringTokenizer(rules, "> ");
         int numPatterns = st.countTokens() / 2;
@@ -68,11 +69,28 @@ public class MCRNormalizer {
         if ((in == null) || (in.trim().length() == 0))
             return "";
 
+        if ( !normalize )
+          return in;
+        
         in = in.toLowerCase(Locale.GERMANY).trim();
 
         for (int i = 0; i < patterns.length; i++)
             in = patterns[i].matcher(in).replaceAll(replace[i]);
 
         return in;
+    }
+    
+    /**
+     * This method activatesor deactivates Normalizing
+     * use from miless software to make indexing of scorm and searching possible
+     * 
+     * @param value
+     *            true  normalize strings
+     *            false do not normalize strings
+     *            
+     */
+    public static final void setStatus(boolean value)
+    {
+      normalize = value;
     }
 }

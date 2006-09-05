@@ -56,13 +56,16 @@ import org.mycore.parsers.bool.MCRCondition;
 public class MCRSearchServlet extends MCRServlet {
     private static final long serialVersionUID = 1L;
 
-    private static final Logger LOGGER = Logger.getLogger(MCRSearchServlet.class);
+    protected static final Logger LOGGER = Logger.getLogger(MCRSearchServlet.class);
 
     /** Cached query results */
     private static final String RESULTS_KEY = "MCRSearchServlet.results";
 
     /** Cached queries as XML, for re-use in editor form */
     private static final String QUERIES_KEY = "MCRSearchServlet.queries";
+    
+    /** Cached queries as XML, for re-use in editor form */
+    private static final String RESORT_KEY = "MCRSearchServlet.resort";
 
     /** Cached queries as parsed MCRCondition, for output with results */
     private static final String CONDIDTIONS_KEY = "MCRSearchServlet.conditions";
@@ -101,22 +104,20 @@ public class MCRSearchServlet extends MCRServlet {
      * Returns a query that was previously submitted, to reload it into the
      * editor search mask. Usage: MCRSearchServlet?mode=load&id=XXXXX
      */
-    private void loadQuery(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void loadQuery(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String id = request.getParameter("id");
         Document query = (Document) (getCache(QUERIES_KEY).get(id));
 
         // Send query XML to editor
-        request.setAttribute("MCRLayoutServlet.Input.JDOM", query);
         request.setAttribute("XSL.Style", "xml");
-        RequestDispatcher rd = getServletContext().getNamedDispatcher("MCRLayoutServlet");
-        rd.forward(request, response);
+        forwardRequest(request, response, query);
     }
 
     /**
      * Shows a results page. Usage:
      * MCRSearchServlet?mode=results&numPerPage=10&page=1
      */
-    private void showResults(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void showResults(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
         // Get cached results
         String id = request.getParameter("id");
@@ -175,9 +176,7 @@ public class MCRSearchServlet extends MCRServlet {
         xml.addContent(new Element("condition").setAttribute("format", "xml").addContent(cond.toXML()));
 
         // Send output to LayoutServlet
-        request.setAttribute("MCRLayoutServlet.Input.JDOM", new Document(xml));
-        RequestDispatcher rd = getServletContext().getNamedDispatcher("MCRLayoutServlet");
-        rd.forward(request, response);
+        forwardRequest(request, response, new Document(xml));        
     }
 
     private String getReqParameter(HttpServletRequest req, String name, String defaultValue) {
@@ -192,7 +191,7 @@ public class MCRSearchServlet extends MCRServlet {
      * Executes a query that comes from editor search mask, and redirects the
      * browser to the first results page
      */
-    private void doQuery(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    protected void doQuery(HttpServletRequest request, HttpServletResponse response) throws IOException {
         MCREditorSubmission sub = (MCREditorSubmission) (request.getAttribute("MCREditorSubmission"));
         Document input = null;
         if (sub != null) // query comes from editor search mask
@@ -342,11 +341,11 @@ public class MCRSearchServlet extends MCRServlet {
         // Store query and results in cache
         getCache(RESULTS_KEY).put(result.getID(), result);
         getCache(QUERIES_KEY).put(result.getID(), clonedQuery);
+        getCache(RESORT_KEY).put(result.getID(), input); 
         getCache(CONDIDTIONS_KEY).put(result.getID(), cond);
 
         // Redirect browser to first results page
-        String url = "MCRSearchServlet?mode=results&id=" + result.getID() + "&numPerPage=" + npp;
-        response.sendRedirect(response.encodeRedirectURL(url));
+        sendRedirect(request, response, result.getID(), npp);
     }
 
     public static String getConditionsKey() {
@@ -365,7 +364,11 @@ public class MCRSearchServlet extends MCRServlet {
         return PARAMS_KEY;
     }
 
-    private static MCRCache getCache(String key) {
+    public static String getResortKey() {
+		return RESORT_KEY;
+	}
+    
+    protected static MCRCache getCache(String key) {
         MCRCache c = (MCRCache) MCRSessionMgr.getCurrentSession().get(key);
         if (c == null) {
             c = new MCRCache(5);
@@ -376,8 +379,29 @@ public class MCRSearchServlet extends MCRServlet {
 
     public static class SearchParameters {
         public int numPerPage;
-
         public int page;
+    }
+    
+    /** 
+     *  Forwards the document to the output
+     *  @author A.Schaar
+     *  @see its overwritten in jspdocportal 
+     */
+    protected void forwardRequest(HttpServletRequest req, HttpServletResponse res, Document jdom) throws IOException, ServletException {
+    	req.setAttribute("MCRLayoutServlet.Input.JDOM", jdom);
+        RequestDispatcher rd = getServletContext().getNamedDispatcher("MCRLayoutServlet");
+        rd.forward(req, res);    	        
+    }
+
+    /** 
+     *  Redirect browser to results page
+     *  @author A.Schaar
+     *  @see its overwritten in jspdocportal 
+     */
+    protected void sendRedirect( HttpServletRequest req, HttpServletResponse res, String id, String numPerPage) throws IOException {
+	    // Redirect browser to first results page
+	    String url = "MCRSearchServlet?mode=results&id=" + id + "&numPerPage=" + numPerPage;
+	    res.sendRedirect(res.encodeRedirectURL(url));
     }
 
 }
