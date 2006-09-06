@@ -35,7 +35,7 @@ import com.sun.media.jai.codec.TIFFEncodeParam;
  */
 
 public class MCRImgProcessor implements ImgProcessor {
-	private static Logger LOGGER = Logger.getLogger(MCRClassificationCommands.class.getName());
+	private static Logger LOGGER = Logger.getLogger(MCRImgProcessor.class.getName());
 	private PlanarImage image = null;
 
 	protected float scaleFactor = 0;
@@ -273,23 +273,33 @@ public class MCRImgProcessor implements ImgProcessor {
 		tiffEncode(image, output, true, tileWidth, tileHeight);
 	}
 	
-	public void createText(String text, int width, int height, OutputStream output) {
+	/*public void createText(String text, int width, int height, OutputStream output) {
 		image = createText(text, 20, height/2);
 		jpegEncode(image, output, jpegQuality);
-	}
+	}*/
 
-	private PlanarImage createText(String text, int width, int height) {
+	/*private PlanarImage createText(String text, int width, int height) {
 		BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
 		Graphics pic = img.getGraphics();
 		pic.drawString(text, width, height);
 		return JAI.create("awtimage", pic);
-	}
+	}*/
 
 	
 	// End: Interface implementation
 
 	/** ************************************************************************ */
 	// Image operation using JAI
+	
+	
+	/**
+	 * loadImageFileCache - load an input stream of image data into to JAI.
+	 * JAI use a cache in form of a file on the HDD for the image data.
+	 * This is slower than using the RAM but for large files it's the only solution.
+	 * 
+	 * @param input
+	 * @return PlanarImage
+	 */
 	public PlanarImage loadImageFileCache(InputStream input) {
 		SeekableStream seekStream = SeekableStream.wrapInputStream(input, true);
 		PlanarImage image = JAI.create("stream", seekStream);
@@ -397,7 +407,7 @@ public class MCRImgProcessor implements ImgProcessor {
 	private void jpegEncode(PlanarImage imgInput, OutputStream output, float encodeQuality) {
 		// Encode JPEG
 		JPEGEncodeParam jpegParam = new JPEGEncodeParam();
-		jpegParam.setQuality(0.5F);
+		jpegParam.setQuality(jpegQuality);
 		ImageEncoder enc = ImageCodec.createImageEncoder("JPEG", output, jpegParam);
 		try {
 			enc.encode(imgInput);

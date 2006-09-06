@@ -59,12 +59,6 @@ public class MCRImgCacheCommands extends MCRAbstractCommands {
 		com = new MCRCommand("remove cache for derivate {0}", "org.mycore.services.imaging.MCRImgCacheCommands.removeCachedDeriv String", "The command remove the cache version for the given Derivate.");
 		command.add(com);
 
-		com = new MCRCommand("test {0}", "org.mycore.services.imaging.MCRImgCacheCommands.test String", "Just testing.");
-		command.add(com);
-
-		com = new MCRCommand("testProz {0} {1} {2} {3} {4} {5} {6} {7}", "org.mycore.services.imaging.MCRImgCacheCommands.testProz String String String String String String String String", "testProz(cmd, inFile, outFile, xPos, yPos, width, height, scaleFactor)" + System.getProperty("line.separator") + "cmd = {resizeFitWidth; resizeFitHeight; resize; scale; scaleROI");
-		command.add(com);
-
 		/*
 		 * com = new MCRCommand( "cacheMkdir {0}",
 		 * "org.mycore.services.imaging.MCRImgCacheCommands.cacheMkdir String",
@@ -188,7 +182,7 @@ public class MCRImgCacheCommands extends MCRAbstractCommands {
 			LOGGER.debug("****************************************");
 			MCRImgCacheManager cache = new MCRImgCacheManager();
 			MCRImgProcessor processor = new MCRImgProcessor();
-			ByteArrayOutputStream imgData = new ByteArrayOutputStream();
+//			ByteArrayOutputStream imgData = new ByteArrayOutputStream();
 
 			if (cacheSizeOnly)
 				processor.loadImage(image.getContentAsInputStream());
@@ -199,11 +193,11 @@ public class MCRImgCacheCommands extends MCRAbstractCommands {
 			cache.setImgSize(image, imgSize.width, imgSize.height);
 
 			if (useCache && !cacheSizeOnly) {
-				cache.setLock(image);
+				//cache.setLock(image);
 				boolean cacheOrig = (new Boolean(config.getString("MCR.Module-iview.cacheOrig"))).booleanValue();
 				// cache Original
 				if (cacheOrig && !processor.hasCorrectTileSize() && !cache.existInCache(image, cache.ORIG)) {
-
+					ByteArrayOutputStream imgData = new ByteArrayOutputStream();
 					processor.tiffEncode(imgData);
 					if ((fileType.equals("tiff") || fileType.equals("tif"))) {
 						LOGGER.debug("****************************************");
@@ -235,7 +229,7 @@ public class MCRImgCacheCommands extends MCRAbstractCommands {
 					LOGGER.debug("* MCRImgCacheCommands - cacheFile      *");
 					LOGGER.debug("* (imgSize.width > 2 * 1024 || imgSize.height > 2 * 768)  *");
 					LOGGER.debug("****************************************");
-
+					ByteArrayOutputStream imgData = new ByteArrayOutputStream();
 					processor.resize(cacheWidth, cacheHeight);
 					processor.tiffEncode(imgData);
 					ByteArrayInputStream input = new ByteArrayInputStream(imgData.toByteArray());
@@ -260,7 +254,7 @@ public class MCRImgCacheCommands extends MCRAbstractCommands {
 					LOGGER.debug("* MCRImgCacheCommands - cacheFile      *");
 					LOGGER.debug("* !cache.existInCache(image, cache.THUMB)  *");
 					LOGGER.debug("****************************************");
-
+					ByteArrayOutputStream imgData = new ByteArrayOutputStream();
 					processor.resize(thumbWidth, thumbHeight);
 					processor.jpegEncode(imgData);
 					ByteArrayInputStream input = new ByteArrayInputStream(imgData.toByteArray());
@@ -270,7 +264,7 @@ public class MCRImgCacheCommands extends MCRAbstractCommands {
 					LOGGER.info("****************************************");
 					LOGGER.info("Image " + image.getName() + " cached successfull under the name " + cache.THUMB + " !");
 					LOGGER.info("****************************************");
-					cache.removeLock(image);
+					//cache.removeLock(image);
 				} else {
 					LOGGER.info("****************************************");
 					LOGGER.info("Image " + image.getName() + " as version " + cache.THUMB + " allready exists in Cache!");
@@ -309,126 +303,5 @@ public class MCRImgCacheCommands extends MCRAbstractCommands {
 		}
 
 		LOGGER.info("Caching supported images from derivate " + derivate.getName() + " finished successfull!");
-	}
-
-	public static void test(String ID) throws IOException {
-		List list = new Vector();
-		MCRDirectory derivate = null;
-		MCRConfiguration config = MCRConfiguration.instance();
-		String suppContTypes = new String(config.getString("MCR.Module-iview.SupportedContentTypes"));
-
-		MCRFilesystemNode node = MCRFilesystemNode.getRootNode(ID);
-
-		if (node != null && node instanceof MCRDirectory)
-			derivate = (MCRDirectory) node;
-		else
-			throw new MCRException("Derivate " + ID + " does not exist!");
-
-		getSuppFiles(list, suppContTypes, derivate);
-
-		MCRImgService imgService = new MCRImgService();
-		MCRFile image = null;
-
-		Stopwatch timer = new Stopwatch();
-
-		for (Iterator iter = list.iterator(); iter.hasNext();) {
-			image = (MCRFile) iter.next();
-			FileOutputStream out = new FileOutputStream("/home/chi/images/filestore/" + image.getName());
-			BufferedOutputStream buffOut = new BufferedOutputStream(out);
-			ByteArrayOutputStream bout = new ByteArrayOutputStream();
-			MCRImgProcessor proz = new MCRImgProcessor();
-
-			timer.reset();
-			timer.start();
-			// imgService.getImage(image, new Dimension(600, 300), bout);
-			proz.getImageSize(image.getContentAsInputStream());
-			timer.stop();
-			LOGGER.info("Timer get size: " + timer.getElapsedTime());
-
-			timer.reset();
-			timer.start();
-			// imgService.getImage(image, new Dimension(600, 300), bout);
-			imgService.getImage(image, 300, 400, 600, 300, 0.4F, bout);
-			timer.stop();
-			LOGGER.info("Timer: " + timer.getElapsedTime());
-		}
-	}
-
-	public static void testProz(String cmd, String inFile, String outFile, String xPos, String yPos, String width, String height, String scaleFactor) throws IOException {
-
-		Stopwatch timer = new Stopwatch();
-
-		FileInputStream in = new FileInputStream(inFile);
-		BufferedInputStream buffIn = new BufferedInputStream(in);
-		FileOutputStream out = new FileOutputStream(outFile);
-		BufferedOutputStream buffOut = new BufferedOutputStream(out);
-		ImgProcessor proz = new MCRImgProcessor();
-
-		LOGGER.info("*****************************");
-		LOGGER.info("* Amazing Test Proz Command *");
-		LOGGER.info("*****************************");
-
-		if (cmd.equals("resizeFitWidth")) {
-			timer.reset();
-			timer.start();
-
-			proz.resizeFitWidth(buffIn, Integer.valueOf(width).intValue(), buffOut);
-
-			timer.stop();
-			LOGGER.info("*******************************************");
-			LOGGER.info("* Timer resizeFitWidth: " + timer.getElapsedTime());
-			LOGGER.info("* Used scale factor: " + proz.getScaleFactor());
-			LOGGER.info("*******************************************");
-		} else if (cmd.equals("resizeFitHeight")) {
-			timer.reset();
-			timer.start();
-
-			proz.resizeFitHeight(buffIn, Integer.valueOf(height).intValue(), buffOut);
-
-			timer.stop();
-			LOGGER.info("*******************************************");
-			LOGGER.info("* Timer resizeFitHeight: " + timer.getElapsedTime());
-			LOGGER.info("* Used scale factor: " + proz.getScaleFactor());
-			LOGGER.info("*******************************************");
-		} else if (cmd.equals("resize")) {
-			timer.reset();
-			timer.start();
-
-			proz.resize(buffIn, Integer.valueOf(width).intValue(), Integer.valueOf(height).intValue(), buffOut);
-
-			timer.stop();
-			LOGGER.info("*******************************************");
-			LOGGER.info("* Timer resize: " + timer.getElapsedTime());
-			LOGGER.info("* Used scale factor: " + proz.getScaleFactor());
-			LOGGER.info("*******************************************");
-		} else if (cmd.equals("scale")) {
-			timer.reset();
-			timer.start();
-
-			proz.scale(buffIn, Float.valueOf(scaleFactor).floatValue(), buffOut);
-
-			timer.stop();
-			LOGGER.info("*******************************************");
-			LOGGER.info("* Timer scale: " + timer.getElapsedTime());
-			LOGGER.info("* Used scale factor: " + proz.getScaleFactor());
-			LOGGER.info("*******************************************");
-		} else if (cmd.equals("scaleROI")) {
-			int xTopPos = Integer.valueOf(xPos).intValue();
-			int yTopPos = Integer.valueOf(yPos).intValue();
-			int boundWidth = Integer.valueOf(width).intValue();
-			int boundHeight = Integer.valueOf(height).intValue();
-			float scaleFact = Float.valueOf(scaleFactor).floatValue();
-
-			timer.reset();
-			timer.start();
-
-			proz.scaleROI(buffIn, xTopPos, yTopPos, boundWidth, boundHeight, scaleFact, buffOut);
-
-			timer.stop();
-			LOGGER.info("*******************************************");
-			LOGGER.info("* Timer scaleROI: " + timer.getElapsedTime());
-			LOGGER.info("* Used scale factor: " + proz.getScaleFactor());
-			LOGGER.info("*******************************************");
-		}
 	}
 }
