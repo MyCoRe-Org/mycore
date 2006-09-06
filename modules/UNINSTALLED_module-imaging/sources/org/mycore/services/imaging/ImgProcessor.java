@@ -16,7 +16,7 @@ public interface ImgProcessor {
 	void setTileSize(int tileWidth, int tileHeight);
 	void useEncoder(int encoder) throws Exception;
 	void encode(InputStream input, OutputStream output, int encoder) throws Exception;
-	void createText(String text, int width, int height, OutputStream output);
+	//void createText(String text, int width, int height, OutputStream output);
 	Dimension getOrigSize() throws Exception;
 	Dimension getCurrentSize() throws Exception;
 	Dimension getImageSize(InputStream input);

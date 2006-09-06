@@ -154,19 +154,7 @@ public class MCRImgCacheManager implements CacheManager {
 	}
 
 	public boolean existInCache(MCRFile image) {
-		int imgWidth = getImgWidth(image);
-		int imgHeight = getImgHeight(image);
-		
-		MCRConfiguration config = MCRConfiguration.instance();
-		int cacheWidth = Integer.parseInt(config.getString("MCR.Module-iview.cache.size.width"));
-		int cacheHeight = Integer.parseInt(config.getString("MCR.Module-iview.cache.size.height"));
-		
-		if (imgWidth <= 2*cacheWidth && imgHeight <= 2*cacheHeight){
-			return (existInCache(image, THUMB) && existInCache(image, ORIG));
-		}
-		else{
-			return (existInCache(image, THUMB) && existInCache(image, ORIG) && existInCache(image, CACHE));
-		}
+		return (existInCache(image, THUMB) || existInCache(image, ORIG) || existInCache(image, CACHE));
 	}
 
 	public int getImgWidth(MCRFile image) {
