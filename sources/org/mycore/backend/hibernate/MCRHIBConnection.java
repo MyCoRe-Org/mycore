@@ -43,6 +43,8 @@ import org.hibernate.type.TimestampType;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
+import org.mycore.common.events.MCRShutdownHandler;
+import org.mycore.common.events.MCRShutdownHandler.Closeable;
 
 /**
  * Class for hibernate connection to selected database
@@ -50,7 +52,7 @@ import org.mycore.common.MCRPersistenceException;
  * @author Arne Seifert
  * 
  */
-public class MCRHIBConnection {
+public class MCRHIBConnection implements Closeable {
     protected static Configuration cfg;
 
     protected static SessionFactory sessions;
@@ -100,6 +102,8 @@ public class MCRHIBConnection {
         } catch (Exception exc) {
             String msg = "Could not connect to database";
             throw new MCRPersistenceException(msg, exc);
+        } finally {
+            MCRShutdownHandler.getInstance().addCloseable(this);
         }
     }
 
@@ -238,5 +242,10 @@ public class MCRHIBConnection {
         } else {
             return new StringType();
         }
+    }
+    
+    public void close(){
+        logger.debug("Closing hibernate sessions.");
+        sessions.close();
     }
 }
