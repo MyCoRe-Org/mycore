@@ -1,0 +1,6 @@
+The following JAR-FILES are required to compile this module:
+
+icmsdk81.jar
+cmb81.jar
+
+You can find them by default in you ContentManager installation at /opt/IBM/db2cmv8/lib/
