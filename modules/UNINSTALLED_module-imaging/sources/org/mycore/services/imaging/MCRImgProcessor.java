@@ -31,6 +31,7 @@ import com.sun.media.jai.codec.TIFFEncodeParam;
  * 
  * @version 1.00 8/08/2006<br>
  * @author Vu Huu Chi
+ * @linkplain
  *
  */
 
@@ -50,13 +51,15 @@ public class MCRImgProcessor implements ImgProcessor {
 	
 	private int useEncoder = JPEG_ENC;
 
+	/**
+	 * The JPEG encoder
+	 */
 	static public final int JPEG_ENC = 0;
 
+	/**
+	 * The TIFF encoder
+	 */
 	static public final int TIFF_ENC = 1;
-	
-	static public final int FIT_WIDTH = 0;
-	
-	static public final int FIT_HEIGHT = 0;
 	
 	MCRImgProcessor() {
 		origSize = new Dimension(0, 0);
@@ -215,7 +218,7 @@ public class MCRImgProcessor implements ImgProcessor {
 	public boolean hasCorrectTileSize() {
 		boolean hasCorrectSize = false;
 		
-		if (image.getNumXTiles() > 1 && image.getNumYTiles() >1 && image.getTileWidth() == 480 && image.getTileHeight() == 480)
+		if (image.getNumXTiles() > 1 && image.getNumYTiles() >1 && image.getTileWidth() == tileWidth && image.getTileHeight() == tileHeight)
 			hasCorrectSize = true;
 		
 		return hasCorrectSize;
@@ -272,19 +275,6 @@ public class MCRImgProcessor implements ImgProcessor {
 	public void tiffEncode(OutputStream output) {
 		tiffEncode(image, output, true, tileWidth, tileHeight);
 	}
-	
-	/*public void createText(String text, int width, int height, OutputStream output) {
-		image = createText(text, 20, height/2);
-		jpegEncode(image, output, jpegQuality);
-	}*/
-
-	/*private PlanarImage createText(String text, int width, int height) {
-		BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-		Graphics pic = img.getGraphics();
-		pic.drawString(text, width, height);
-		return JAI.create("awtimage", pic);
-	}*/
-
 	
 	// End: Interface implementation
 

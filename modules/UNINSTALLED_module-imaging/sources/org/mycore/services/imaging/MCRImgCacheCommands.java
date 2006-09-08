@@ -235,7 +235,7 @@ public class MCRImgCacheCommands extends MCRAbstractCommands {
 					ByteArrayInputStream input = new ByteArrayInputStream(imgData.toByteArray());
 					cache.saveImage(image, cache.CACHE, input);
 					imgData.reset();
-
+					
 					LOGGER.info("****************************************");
 					LOGGER.info("Image " + image.getName() + " cached successfull under the name " + cache.CACHE + " !");
 					LOGGER.info("****************************************");

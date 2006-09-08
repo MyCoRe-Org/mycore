@@ -10,8 +10,7 @@ public class MCRImgCacheEventHandler extends MCREventHandlerBase {
 	private static Logger LOGGER = Logger.getLogger(MCRImgCacheEventHandler.class.getName());
 
 	/**
-	 * Handles file created events. This implementation does nothing and should
-	 * be overwritted by subclasses.
+	 * Handles file created events.
 	 * 
 	 * @param evt
 	 *            the event that occured
@@ -49,8 +48,7 @@ public class MCRImgCacheEventHandler extends MCREventHandlerBase {
 	}
 
 	/**
-	 * Handles file deleted events. This implementation does nothing and should
-	 * be overwritted by subclasses.
+	 * Handles file deleted events.
 	 * 
 	 * @param evt
 	 *            the event that occured
