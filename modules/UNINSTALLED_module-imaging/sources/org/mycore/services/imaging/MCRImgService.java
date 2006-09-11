@@ -99,13 +99,7 @@ public class MCRImgService {
 				cacheHeight = (int) (cacheHeight * scaleHelp);
 			}
 
-			/*if (cache.isLocked(image)) {
-				LOGGER.debug("****************************************");
-				LOGGER.debug("* Create Lock Message!");
-				LOGGER.debug("****************************************");
-				processor.createText("Cache wird generiert", newWidth, newHeight, output);
-				outputFilled = true;
-			} else*/ if (newWidth == thumbWidth || newHeight == thumbHeight && cache.existInCache(image, MCRImgCacheManager.THUMB)) {
+			if (newWidth == thumbWidth || newHeight == thumbHeight && cache.existInCache(image, MCRImgCacheManager.THUMB)) {
 				LOGGER.debug("*********************************************");
 				LOGGER.debug("* Get Thumbnail from ImgCache for " + image.getName());
 				LOGGER.debug("*********************************************");
