@@ -36,11 +36,11 @@ import org.apache.lucene.index.Term;
 import org.apache.lucene.queryParser.QueryParser;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
+import org.apache.lucene.search.ConstantScoreRangeQuery;
 import org.apache.lucene.search.FuzzyQuery;
 import org.apache.lucene.search.PhraseQuery;
 import org.apache.lucene.search.PrefixQuery;
 import org.apache.lucene.search.Query;
-import org.apache.lucene.search.RangeQuery;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.WildcardQuery;
 import org.mycore.common.MCRUtils;
@@ -58,6 +58,11 @@ import org.mycore.services.fieldquery.MCRFieldDef;
 public class MCRBuildLuceneQuery {
     private static final Logger LOGGER = Logger.getLogger(MCRBuildLuceneQuery.class);
 
+    static
+    {
+      BooleanQuery.setMaxClauseCount( 10000 );
+    }
+    
     static Hashtable search = null;
 
     /**
@@ -201,20 +206,20 @@ public class MCRBuildLuceneQuery {
                                                                             // future
                                                                             // use
         {
-            Term lower = null;
-            Term upper = null;
+            String lower = null;
+            String upper = null;
             TokenStream ts = analyzer.tokenStream(field, new StringReader(value));
             Token to;
 
             to = ts.next();
-            lower = new Term(field, to.termText());
+            lower = to.termText();
             to = ts.next();
 
             if (null != to) {
-                upper = new Term(field, to.termText());
+                upper = to.termText();
             }
 
-            return new RangeQuery(lower, upper, true);
+            return new ConstantScoreRangeQuery(field, lower, upper, true, true);
         } else if ("date".equals(fieldtype) || "time".equals(fieldtype) || "timestamp".equals(fieldtype)) {
             return DateQuery2(field, operator, value);
         } else if ("identifier".equals(fieldtype) && "=".equals(operator)) {
@@ -327,7 +332,7 @@ public class MCRBuildLuceneQuery {
           return null;
       }
 
-      return new RangeQuery(new Term(fieldname, lower), new Term(fieldname, upper), true);
+      return new ConstantScoreRangeQuery(fieldname, lower, upper, true, true);
     }
     
     /***************************************************************************
@@ -338,16 +343,15 @@ public class MCRBuildLuceneQuery {
             return null;
         }
         
-        Term lower = null;
-        Term upper = null;
-        Term term  = new Term(fieldname, value); 
+        String lower = null;
+        String upper = null;
         
         if (Op.equals(">") || Op.equals(">=") ) {
-          lower = term;
+          lower = value;
       } else if (Op.equals("<") || Op.equals("<=") ) {
-          upper = term;
+          upper = value;
       } else if (Op.equals("=")) {
-          return new TermQuery( term);
+          return new TermQuery( new Term(fieldname, value) );
       } else {
           LOGGER.info("Invalid operator for Number: " + Op);
 
@@ -355,6 +359,7 @@ public class MCRBuildLuceneQuery {
       }
 
       boolean incl = Op.equals(">=") || Op.equals("<=") ? true : false;   
-      return new RangeQuery( lower, upper, incl);
+//      return new RangeQuery( lower, upper, incl);
+      return new ConstantScoreRangeQuery(fieldname, lower, upper, incl, incl);
     }
 }
