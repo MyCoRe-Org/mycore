@@ -36,10 +36,13 @@
             <servlet-name>MCRQueryServlet</servlet-name>
             <servlet-class>org.mycore.services.query.MCRQueryServlet</servlet-class>
       </servlet>
+<!-- This is obsolate for the new query -->
+<!--
       <servlet id="SearchMask">
             <servlet-name>MCRSearchMaskServlet</servlet-name>
             <servlet-class>org.mycore.services.query.MCRSearchMaskServlet</servlet-class>
       </servlet>
+-->
       <servlet id="StaticXMLFile">
             <servlet-name>MCRStaticXMLFileServlet</servlet-name>
             <servlet-class>org.mycore.frontend.servlets.MCRStaticXMLFileServlet</servlet-class>
