@@ -26,7 +26,6 @@ package org.mycore.datamodel.ifs.extractors;
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.InputStream;
-import java.util.HashMap;
 
 import org.apache.log4j.Logger;
 import org.jdom.Document;
@@ -85,7 +84,8 @@ public abstract class MCRDataExtractor extends MCREventHandlerBase {
     }
 
     protected void handleFileCreated(MCREvent evt, MCRFile file) {
-        if (!getSupportedContentTypes().containsKey(file.getContentTypeID()))
+        String supported = " " + getSupportedContentTypeIDs() + " ";
+        if (supported.indexOf(" " + file.getContentTypeID() + " ") == -1)
             return;
 
         try {
@@ -120,11 +120,12 @@ public abstract class MCRDataExtractor extends MCREventHandlerBase {
     protected abstract void extractData(Element container, InputStream in) throws Exception;
 
     /**
-     * Returns the FileContentTypes that are supported by this metadata
-     * extractor. Only if the given file matches one of these types, metadata is
-     * extracted.
+     * Returns the IDs of the FileContentTypes that are supported by this
+     * metadata extractor. Only if the given file matches one of these types,
+     * metadata is extracted.
      * 
-     * @return a HashMap of MCRFileContentType objects, where the type ID is key
+     * @return a String of supported MCRFileContentType ID(s), separated by
+     *         spaces
      */
-    protected abstract HashMap getSupportedContentTypes();
+    protected abstract String getSupportedContentTypeIDs();
 }

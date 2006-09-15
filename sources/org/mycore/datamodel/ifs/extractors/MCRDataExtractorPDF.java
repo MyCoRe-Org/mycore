@@ -25,11 +25,8 @@ package org.mycore.datamodel.ifs.extractors;
 
 import java.io.InputStream;
 import java.util.Calendar;
-import java.util.HashMap;
 
 import org.jdom.Element;
-import org.mycore.datamodel.ifs.MCRFileContentType;
-import org.mycore.datamodel.ifs.MCRFileContentTypeFactory;
 import org.mycore.datamodel.metadata.MCRMetaISO8601Date;
 import org.pdfbox.pdmodel.PDDocument;
 import org.pdfbox.pdmodel.PDDocumentInformation;
@@ -47,15 +44,8 @@ import org.pdfbox.pdmodel.interactive.documentnavigation.outline.PDOutlineItem;
  */
 public class MCRDataExtractorPDF extends MCRDataExtractor {
 
-    /** Table of supported file content types */
-    private final static HashMap map = new HashMap();
-
-    protected HashMap getSupportedContentTypes() {
-        if (map.isEmpty()) {
-            MCRFileContentType ct = MCRFileContentTypeFactory.getType("pdf");
-            map.put(ct.getID(), ct);
-        }
-        return map;
+    protected String getSupportedContentTypeIDs() {
+        return "jpeg";
     }
 
     protected void extractData(Element container, InputStream in) throws Exception {

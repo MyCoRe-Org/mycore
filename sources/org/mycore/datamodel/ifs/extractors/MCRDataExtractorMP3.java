@@ -30,21 +30,17 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Method;
 import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.Properties;
 
 import org.farng.mp3.MP3File;
 import org.jdom.Element;
 import org.mycore.common.MCRUtils;
-import org.mycore.datamodel.ifs.MCRFileContentType;
-import org.mycore.datamodel.ifs.MCRFileContentTypeFactory;
 
 /**
- * Extracts ID3v1, ID3v2 and LyricsV3 metadata from MP3 files.
- * Uses the org.farng.** metadata extraction library.
- * It supports ID3v1, ID3v1.1, Lyrics3v1, Lyrics3v2, 
- * ID3v2.2, ID3v2.3, and ID3v2.4 tags. * 
- * See http://sourceforge.net/projects/javamusictag/ for details.
+ * Extracts ID3v1, ID3v2 and LyricsV3 metadata from MP3 files. Uses the
+ * org.farng.** metadata extraction library. It supports ID3v1, ID3v1.1,
+ * Lyrics3v1, Lyrics3v2, ID3v2.2, ID3v2.3, and ID3v2.4 tags. * See
+ * http://sourceforge.net/projects/javamusictag/ for details.
  * 
  * @author Frank Lützenkirchen
  * @version $Revision$ $Date$
@@ -75,15 +71,8 @@ public class MCRDataExtractorMP3 extends MCRDataExtractor {
         p.put("yearReleased", "getYearReleased");
     }
 
-    /** Table of supported file content types */
-    private final static HashMap map = new HashMap();
-
-    protected HashMap getSupportedContentTypes() {
-        if (map.isEmpty()) {
-            MCRFileContentType ct = MCRFileContentTypeFactory.getType("mp3");
-            map.put(ct.getID(), ct);
-        }
-        return map;
+    protected String getSupportedContentTypeIDs() {
+        return "mp3";
     }
 
     /**

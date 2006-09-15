@@ -24,13 +24,10 @@
 package org.mycore.datamodel.ifs.extractors;
 
 import java.io.InputStream;
-import java.util.HashMap;
 import java.util.Iterator;
 
 import org.apache.log4j.Logger;
 import org.jdom.Element;
-import org.mycore.datamodel.ifs.MCRFileContentType;
-import org.mycore.datamodel.ifs.MCRFileContentTypeFactory;
 
 import com.drew.imaging.jpeg.JpegMetadataReader;
 import com.drew.imaging.jpeg.JpegProcessingException;
@@ -39,10 +36,9 @@ import com.drew.metadata.Metadata;
 import com.drew.metadata.Tag;
 
 /**
- * Extracts EXIF and IPTC metadata from JPEG files.
- * Uses the metadata extraction library from Drew Noakes in
- * the com.drew.** packages.
- * See http://www.drewnoakes.com/code/exif/ for details.
+ * Extracts EXIF and IPTC metadata from JPEG files. Uses the metadata extraction
+ * library from Drew Noakes in the com.drew.** packages. See
+ * http://www.drewnoakes.com/code/exif/ for details.
  * 
  * @author Frank Lützenkirchen
  * @version $Revision$ $Date$
@@ -52,15 +48,8 @@ public class MCRDataExtractorJPEG extends MCRDataExtractor {
     /** The logger */
     private final static Logger LOGGER = Logger.getLogger(MCRDataExtractorJPEG.class);
 
-    /** Table of supported file content types */
-    private final static HashMap map = new HashMap();
-
-    protected HashMap getSupportedContentTypes() {
-        if (map.isEmpty()) {
-            MCRFileContentType ct = MCRFileContentTypeFactory.getType("jpeg");
-            map.put(ct.getID(), ct);
-        }
-        return map;
+    protected String getSupportedContentTypeIDs() {
+        return "jpeg";
     }
 
     protected void extractData(Element container, InputStream in) throws JpegProcessingException {
