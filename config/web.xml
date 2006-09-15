@@ -140,10 +140,12 @@
             <servlet-name>MCRQueryServlet</servlet-name>
             <url-pattern>/servlets/MCRQueryServlet</url-pattern>
       </servlet-mapping>
+<!--
       <servlet-mapping>
             <servlet-name>MCRSearchMaskServlet</servlet-name>
             <url-pattern>/servlets/MCRSearchMaskServlet</url-pattern>
       </servlet-mapping>
+-->
       <servlet-mapping>
             <servlet-name>MCRUserServlet</servlet-name>
             <url-pattern>/servlets/MCRUserServlet</url-pattern>
