@@ -108,7 +108,7 @@ public abstract class MCRBase {
     public MCRBase() throws MCRException, MCRConfigurationException {
         mcr_id = new MCRObjectID();
         mcr_label = new String("");
-        mcr_version = new String("Version 1.3");
+        mcr_version = new String("1.3");
         mcr_schema = new String("");
 
         // Service class
