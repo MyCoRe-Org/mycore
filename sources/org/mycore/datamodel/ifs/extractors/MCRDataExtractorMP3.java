@@ -154,15 +154,6 @@ public class MCRDataExtractorMP3 extends MCRDataExtractor {
     }
 
     /**
-     * Adds extracted metadata value to the resulting XML output, if it is not
-     * null or empty.
-     */
-    private void addDataValue(Element parent, String name, String value) {
-        if ((value != null) && (value.trim().length() > 0) && (!value.trim().equals("0")) && (!value.trim().equals("0.0")))
-            parent.addContent(new Element(name).setText(value.trim()));
-    }
-
-    /**
      * Test application that outputs extracted metadata for a given local file.
      * 
      * @param args

@@ -99,21 +99,6 @@ public class MCRDataExtractorPDF extends MCRDataExtractor {
     }
 
     /**
-     * Adds extracted metadata value to the resulting XML output, if it is not
-     * null or empty.
-     */
-    private void addDataValue(Element parent, String name, String value) {
-        if (value == null)
-            return;
-        value = value.trim();
-        if (value.length() == 0)
-            return;
-        if (value.equals("0"))
-            return;
-        parent.addContent(new Element(name).setText(value));
-    }
-
-    /**
      * Test application that outputs extracted metadata for a given local file.
      * 
      * @param args

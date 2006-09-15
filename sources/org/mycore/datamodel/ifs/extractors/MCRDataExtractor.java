@@ -128,4 +128,19 @@ public abstract class MCRDataExtractor extends MCREventHandlerBase {
      *         spaces
      */
     protected abstract String getSupportedContentTypeIDs();
+
+    /**
+     * Adds extracted metadata value to the resulting XML output, if it is not
+     * null or empty.
+     */
+    protected void addDataValue(Element parent, String name, String value) {
+        if (value == null)
+            return;
+        value = value.trim();
+        if (value.length() == 0)
+            return;
+        if (value.equals("0") || value.equals("0.0"))
+            return;
+        parent.addContent(new Element(name).setText(value));
+    }
 }
