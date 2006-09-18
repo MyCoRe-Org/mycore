@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE web-app PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN" "web-app_2_3.dtd">
+<web-app>
+
+      <display-name>MyCoRe Module ClassHandler</display-name>
+      
+  <!-- **************************************************************** -->
+  <!-- Servlets and mapping from the modules application                -->
+  <!-- **************************************************************** -->
+      
+      <servlet id="MCRClassBrowser">
+            <servlet-name>MCRClassificationBrowser</servlet-name>
+            <servlet-class>org.mycore.frontend.servlets.MCRClassificationBrowser</servlet-class>
+      </servlet>
+	  <servlet id="MCRStartClassEditor">
+            <servlet-name>MCRStartClassEditorServlet</servlet-name>
+            <servlet-class>org.mycore.frontend.servlets.MCRStartClassEditorServlet</servlet-class>
+      </servlet>
+
+	 <servlet-mapping>
+            <servlet-name>MCRStartClassEditorServlet</servlet-name>
+            <url-pattern>/servlets/MCRStartClassEditorServlet</url-pattern>
+      </servlet-mapping>
+      <servlet-mapping>
+            <servlet-name>MCRClassificationBrowser</servlet-name>
+            <url-pattern>/browse</url-pattern>
+      </servlet-mapping>
+      <servlet-mapping>
+            <servlet-name>MCRClassificationBrowser</servlet-name>
+            <url-pattern>/browse/*</url-pattern>
+      </servlet-mapping>
+        
+</web-app>

@@ -50,7 +50,8 @@ import org.mycore.user2.*;
  * <li> name="categid" category id </li>  
  *
  * @author Anja Schaar
- * @version 1.0
+ * @author Jens Kupferschmidt
+ * @version $Revision$ $Date$
  */
 
 public class MCRStartClassEditorServlet extends MCRServlet  {
@@ -109,9 +110,9 @@ public class MCRStartClassEditorServlet extends MCRServlet  {
     String icerrorpage   = pagedir+CONFIG.getString( "MCR.classeditor_page_error_id", "classeditor_error_clid.xml" );
     String iderrorpage   = pagedir+CONFIG.getString( "MCR.classeditor_page_error_delete", "editor_error_delete.xml" );
     String imerrorpage   = pagedir+CONFIG.getString( "MCR.classeditor_page_error_move", "classeditor_error_move.xml" );
-    String imperrorpage   = pagedir+CONFIG.getString( "MCR.classeditor_page_error_import", "classeditor_error_import.xml" );
+    String imperrorpage  = pagedir+CONFIG.getString( "MCR.classeditor_page_error_import", "classeditor_error_import.xml" );
     
-    if (! (AI.checkPermission(clid, "writedb")) ) {
+    if (! (AI.checkPermission("create-classification")) ) {
         job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL()+usererrorpage));
         return;
     }
@@ -121,6 +122,7 @@ public class MCRStartClassEditorServlet extends MCRServlet  {
     	org.jdom.Document indoc = sub.getXML();
     	boolean bret=false;
     	
+        System.out.println("ÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖ");
     	if ( "create-category".equals(todo2) || "modify-category".equals(todo2) ) {
         	if ( "create-category".equals(todo2) )
         		bret = clE.createCategoryInClassification( indoc, clid, categid );
@@ -157,8 +159,9 @@ public class MCRStartClassEditorServlet extends MCRServlet  {
         return;        
     }	
     
+    System.out.println("ÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖÖ");
 
-    else if ( "up-category".equals(todo) || "down-category".equals(todo) ||
+    if ( "up-category".equals(todo) || "down-category".equals(todo) ||
     	 "left-category".equals(todo) || "right-category".equals(todo) )  {
     	boolean bret = clE.moveCategoryInClassification( categid, clid, todo.substring(0,todo.indexOf("-")));
         if ( bret){
@@ -212,8 +215,9 @@ public class MCRStartClassEditorServlet extends MCRServlet  {
         return;
     	
     }
+    
     // erster aufruf, Editor wird aufgebaut
-    else if (	"create-category".equals(todo) || "modify-category".equals(todo)    	      
+    if (	"create-category".equals(todo) || "modify-category".equals(todo)    	      
         ||  "create-classification".equals(todo) || "modify-classification".equals(todo)) {   
     	   
       String base = getBaseURL() + myfile;
@@ -234,13 +238,8 @@ public class MCRStartClassEditorServlet extends MCRServlet  {
       } else if( "create-classification".equals(todo) ){
     	params.put( "XSL.editor.source.new","true" );   	    	
       } else { 
-         // an Editor Categorytype weiterleiten
-         // Exp. servlets/MCRQueryServlet?XSL.Style=classif-editor&type=class&query=/mycoreclass[@ID='atlibri_class_00000002' and categories/category/@ID='UNI.Rostock']
-         sb.append(getBaseURL()).append("servlets/MCRQueryServlet")
-           .append("?XSL.Style=categ-editor")
-           .append("&type=class")        
-           .append("&hosts=").append(CONFIG.getString("MCR.editor_baseurl","local"))
-           .append("&query=/mycoreclass%5b@ID=%22").append(clid).append("%22%A0and%A0categories/category/@ID=%22").append(categid).append("%22%5d");
+         // to editor category type redirect
+         sb.append(getBaseURL()).append("services/MCRWebService?method=MCRDoRetrieveClassification&level=0&type=children&classID=").append(clid).append("&catID=").append(categid);
          params.put( "XSL.editor.source.url", sb.toString() );      
      	 params.put( "categid", categid );
       }
@@ -252,10 +251,11 @@ public class MCRStartClassEditorServlet extends MCRServlet  {
       job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(buildRedirectURL( base, params )));
       return;
     }
-    else { 
-        LOGGER.info("MCRStartClassEditorServlet default Case - Nothing to do ? " + todo);   
-		job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(path));
-    }
+ 
+    /* Wrong input data, write warning log */
+    LOGGER.warn("MCRStartClassEditorServlet default Case - Nothing to do ? " + todo);   
+	job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(path));
+    
    }
 
    
