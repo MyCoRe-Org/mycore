@@ -44,19 +44,19 @@ public class MCRImgCacheCommands extends MCRAbstractCommands {
 		super();
 		MCRCommand com = null;
 
-		com = new MCRCommand("clear cache", "org.mycore.services.imaging.MCRImgCacheCommands.clearCache", "The command clear the Image cache.");
+		com = new MCRCommand("clear image cache", "org.mycore.services.imaging.MCRImgCacheCommands.clearCache", "The command clear the image cache.");
 		command.add(com);
 
-		com = new MCRCommand("create cache for file {0}", "org.mycore.services.imaging.MCRImgCacheCommands.cacheFile String", "The command create the cache version for the given File.");
+		com = new MCRCommand("create image cache for file {0}", "org.mycore.services.imaging.MCRImgCacheCommands.cacheFile String", "The command create the image cache version for the given File.");
 		command.add(com);
 
-		com = new MCRCommand("remove cache for file {0}", "org.mycore.services.imaging.MCRImgCacheCommands.removeCachedFile String", "The command remove the cache version for the given File.");
+		com = new MCRCommand("remove image cache for file {0}", "org.mycore.services.imaging.MCRImgCacheCommands.removeCachedFile String", "The command remove the image cache version for the given File.");
 		command.add(com);
 
-		com = new MCRCommand("create cache for derivate {0}", "org.mycore.services.imaging.MCRImgCacheCommands.cacheDeriv String", "The command create the cache version for the given Derivate.");
+		com = new MCRCommand("create image cache for derivate {0}", "org.mycore.services.imaging.MCRImgCacheCommands.cacheDeriv String", "The command create the image cache version for the given Derivate.");
 		command.add(com);
 
-		com = new MCRCommand("remove cache for derivate {0}", "org.mycore.services.imaging.MCRImgCacheCommands.removeCachedDeriv String", "The command remove the cache version for the given Derivate.");
+		com = new MCRCommand("remove image cache for derivate {0}", "org.mycore.services.imaging.MCRImgCacheCommands.removeCachedDeriv String", "The command remove the image cache version for the given Derivate.");
 		command.add(com);
 
 		/*
