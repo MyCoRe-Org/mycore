@@ -51,6 +51,7 @@ import javax.xml.transform.TransformerException;
 import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
+import org.jdom.JDOMException;
 import org.jdom.input.DOMBuilder;
 import org.jdom.input.SAXBuilder;
 import org.jdom.transform.JDOMSource;
@@ -61,6 +62,7 @@ import org.mycore.access.MCRAccessInterface;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRConfiguration;
+import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUsageException;
@@ -173,7 +175,11 @@ public class MCRURIResolver implements javax.xml.transform.URIResolver, EntityRe
         String scheme = getScheme(href);
 
         if (SUPPORTED_SCHEMES.containsKey(scheme)) {
-            return new JDOMSource(resolve(href));
+            try {
+                return new JDOMSource(resolveURI(href));
+            } catch (Exception e) {
+                throw new TransformerException("Error while resolving: " + href, e);
+            }
         }
         return null;
     }
@@ -260,8 +266,22 @@ public class MCRURIResolver implements javax.xml.transform.URIResolver, EntityRe
      * @return the root element of the XML document
      */
     public Element resolve(String uri) {
-        LOGGER.info("Reading xml from uri " + uri);
+        if (LOGGER.isDebugEnabled()){
+            addDebugInfo(uri, "JAVA method invocation");
+        }
+        try {
+            /**
+             * rethrow Exception as RuntimException
+             * TODO: need to refactor this and declare throw in method signature
+             */
+            return resolveURI(uri);
+        } catch (Exception e) {
+            throw new MCRException("Error while resolving: " + uri, e);
+        }
+    }
 
+    private Element resolveURI(String uri) throws Exception {
+        LOGGER.info("Reading xml from uri " + uri);
         String scheme = getScheme(uri);
         return getResolver(scheme).resolveElement(uri);
     }
@@ -291,27 +311,19 @@ public class MCRURIResolver implements javax.xml.transform.URIResolver, EntityRe
      * @param in
      *            the InputStream that contains the XML document
      * @return the root element of the parsed input stream
+     * @throws IOException 
+     * @throws JDOMException 
      */
-    public Element parseStream(InputStream in) {
+    protected Element parseStream(InputStream in) throws JDOMException, IOException {
         SAXBuilder builder = new SAXBuilder();
         builder.setValidation(false);
         builder.setEntityResolver(this);
 
-        try {
-            return builder.build(in).getRootElement();
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-
-            String msg = "Exception while reading and parsing XML InputStream: " + e.getMessage();
-            throw new MCRUsageException(msg, e);
-        } catch (Exception ex) {
-            String msg = "Exception while reading and parsing XML InputStream: " + ex.getMessage();
-            throw new MCRUsageException(msg, ex);
-        }
+        return builder.build(in).getRootElement();
     }
 
     public static interface MCRResolver {
-        public Element resolveElement(String URI);
+        public Element resolveElement(String URI) throws Exception;
     }
 
     private static class MCRObjectResolver implements MCRResolver {
@@ -329,17 +341,11 @@ public class MCRURIResolver implements javax.xml.transform.URIResolver, EntityRe
             String id = uri.substring(uri.indexOf(":") + 1);
             LOGGER.debug("Reading MCRObject with ID " + id);
 
-            try {
-                MCRObjectID mcrid = new MCRObjectID(id);
-                Document doc = MCRXMLTableManager.instance().readDocument(mcrid);
+            MCRObjectID mcrid = new MCRObjectID(id);
+            Document doc = MCRXMLTableManager.instance().readDocument(mcrid);
 
-                LOGGER.debug("end resolving "+uri);
-                return doc.getRootElement();
-            } catch (Exception ex) {
-                LOGGER.warn("Exception while reading MCRObject as XML", ex);
-
-                return null;
-            }
+            LOGGER.debug("end resolving " + uri);
+            return doc.getRootElement();
         }
 
     }
@@ -405,19 +411,14 @@ public class MCRURIResolver implements javax.xml.transform.URIResolver, EntityRe
          * @param url
          *            the URL of the xml document
          * @return the root element of the xml document
+         * @throws IOException 
+         * @throws JDOMException 
+         * @throws MalformedURLException 
          */
-        public Element resolveElement(String url) {
+        public Element resolveElement(String url) throws MalformedURLException, JDOMException, IOException {
             LOGGER.debug("Reading xml from url " + url);
 
-            try {
-                return MCRURIResolver.instance().parseStream(new URL(url).openStream());
-            } catch (java.net.MalformedURLException ex) {
-                String msg = "Malformed http url: " + url;
-                throw new MCRUsageException(msg, ex);
-            } catch (IOException ex) {
-                String msg = "Unable to open input stream at " + url;
-                throw new MCRUsageException(msg, ex);
-            }
+            return MCRURIResolver.instance().parseStream(new URL(url).openStream());
         }
 
     }
@@ -435,8 +436,9 @@ public class MCRURIResolver implements javax.xml.transform.URIResolver, EntityRe
          * @param uri
          *            the URI in the format request:path/to/servlet
          * @return the root element of the xml document
+         * @throws Exception 
          */
-        public Element resolveElement(String uri) {
+        public Element resolveElement(String uri) throws Exception {
             String path = uri.substring(uri.indexOf(":") + 1);
             LOGGER.debug("Reading xml from request " + path);
 
@@ -474,8 +476,11 @@ public class MCRURIResolver implements javax.xml.transform.URIResolver, EntityRe
          * @param uri
          *            the URL of the file in the format file://path/to/file
          * @return the root element of the xml document
+         * @throws IOException 
+         * @throws JDOMException 
+         * @throws FileNotFoundException 
          */
-        public Element resolveElement(String uri) {
+        public Element resolveElement(String uri) throws FileNotFoundException, JDOMException, IOException {
             String path = uri.substring("file://".length());
             LOGGER.debug("Reading xml from file " + path);
 
@@ -486,15 +491,10 @@ public class MCRURIResolver implements javax.xml.transform.URIResolver, EntityRe
                 return (Element) (fromCache.clone());
             }
 
-            try {
-                Element parsed = MCRURIResolver.instance().parseStream(new FileInputStream(file));
-                fileCache.put(path, parsed);
+            Element parsed = MCRURIResolver.instance().parseStream(new FileInputStream(file));
+            fileCache.put(path, parsed);
 
-                return (Element) (parsed.clone());
-            } catch (FileNotFoundException ex) {
-                String msg = "Could not find file for URI " + uri;
-                throw new MCRUsageException(msg, ex);
-            }
+            return (Element) (parsed.clone());
         }
 
     }
@@ -512,8 +512,9 @@ public class MCRURIResolver implements javax.xml.transform.URIResolver, EntityRe
          * @param uri
          *            the URI in the format request:path/to/servlet
          * @return the root element of the xml document
+         * @throws Exception 
          */
-        public Element resolveElement(String uri) {
+        public Element resolveElement(String uri) throws Exception {
             String path = uri.substring(uri.indexOf(":") + 1);
             LOGGER.debug("Reading xml from webapp " + path);
             uri = "file://" + context.getRealPath(path);
@@ -538,8 +539,10 @@ public class MCRURIResolver implements javax.xml.transform.URIResolver, EntityRe
          *            the location of the file in the format
          *            resource:path/to/file
          * @return the root element of the XML document
+         * @throws IOException 
+         * @throws JDOMException 
          */
-        public Element resolveElement(String uri) {
+        public Element resolveElement(String uri) throws JDOMException, IOException {
             Element parsed = MCRURIResolver.instance().parseStream(getResourceStream(uri));
             return parsed;
         }
@@ -557,30 +560,16 @@ public class MCRURIResolver implements javax.xml.transform.URIResolver, EntityRe
          *            localclass:org.mycore.ClassName?mode=getAll
          * 
          * @return the root element of the XML document
+         * @throws Exception 
          */
-        public Element resolveElement(String uri) {
+        public Element resolveElement(String uri) throws Exception {
             String classname = uri.substring(uri.indexOf(":") + 1, uri.indexOf("?"));
             Class cl = null;
             Logger.getLogger(this.getClass()).debug("Loading Class: " + classname);
-            try {
-                cl = Class.forName(classname);
-            } catch (Exception ex) {
-                LOGGER.error("Could not load class " + classname, ex);
-            }
-            Object o = null;
-            try {
-                try {
-                    o = cl.newInstance();
-                } catch (Exception ex) {
-                    LOGGER.error("Could not instantiate class " + classname, ex);
-                    return new Element("error");
-                }
-                MCRResolver resolver = (MCRResolver) o;
-                return resolver.resolveElement(uri);
-            } catch (Exception ex) {
-                LOGGER.error("Could not resolve uri " + uri, ex);
-                return new Element("error");
-            }
+            cl = Class.forName(classname);
+            Object o = cl.newInstance();
+            MCRResolver resolver = (MCRResolver) o;
+            return resolver.resolveElement(uri);
         }
 
     }
@@ -825,19 +814,14 @@ public class MCRURIResolver implements javax.xml.transform.URIResolver, EntityRe
                 throw new IllegalArgumentException("Invalid format of uri for retrieval of classification: "+uri);
             }
             String format = parameters[1];
-            String levelS=parameters[2];
-            String axis=parameters[3];
+            String levelS = parameters[2];
+            String axis = parameters[3];
             String classID = parameters[4];
             int levels;
-            try {
-                if (levelS.equals("all")){
-                    levels=-1;
-                } else {
-                    levels = Integer.parseInt(levelS);    
-                }
-            } catch (NumberFormatException e) {
-                LOGGER.error("Error while parsing numLevels ("+levelS+") uri may have been malformed: "+uri);
-                throw new IllegalArgumentException("Invalid format of uri for retrieval of classification: "+uri);
+            if (levelS.equals("all")) {
+                levels = -1;
+            } else {
+                levels = Integer.parseInt(levelS);
             }
             StringBuffer categID = new StringBuffer();
             for (int i = 5; i < parameters.length; i++) {
