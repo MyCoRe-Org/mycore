@@ -9,7 +9,7 @@
 <!-- Andreas Trappe 	- idea, concept				-->
 <!-- Chi Vu Huu		- concept, development			-->
 <!--												-->
-<!-- $Revision: 1.3 $ $Date: 2006-09-18 13:56:20 $ 								-->
+<!-- $Revision: 1.4 $ $Date: 2006-09-18 14:22:02 $ 								-->
 
 
 <project name="MyCoReModule - imaging" default="usage" basedir=".">
@@ -82,7 +82,6 @@
 
 	<target name="synch">
 		<echo>Synchronisating Module-imaging to UNISTALLED-folder</echo>
-		<mkdir dir="${env.MYCORE_HOME}/modules/module-imaging" />
 		<copy todir="${env.MYCORE_HOME}/modules/module-imaging" flatten="false">
 			<fileset dir="${env.MYCORE_HOME}/modules/UNINSTALLED_module-imaging" excludes="CVS" />
 		</copy>	
