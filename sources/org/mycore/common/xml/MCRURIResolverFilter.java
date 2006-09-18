@@ -174,6 +174,10 @@ public class MCRURIResolverFilter implements Filter {
         
         private class MyServletOutputStream extends ServletOutputStream{
 
+            public void print(String arg0) throws IOException {
+                output.write(arg0.getBytes(getResponse().getCharacterEncoding()));
+            }
+
             public void write(int b) throws IOException {
                 output.write(b);
             }
