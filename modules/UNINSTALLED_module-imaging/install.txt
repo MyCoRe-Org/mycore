@@ -35,11 +35,12 @@ stored in a MyCoRe repository.
 1. Installation
 ========================
 
-- rename Module-imaging folder from
-  $MYCORE_HOME/modules/UNINSTALLED_module-imaging
-    into 
-  $MYCORE_HOME/modules/module-imaging    
+Go to uninstalled module folder
+- cd $MYCORE_HOME/modules/UNINSTALLED_module-imaging
  
-- rebuild mycore.jar by
+Install
+- ant install
+
+Rebuild mycore.jar by
 -- cd $MYCORE_HOME
 -- ant jar
