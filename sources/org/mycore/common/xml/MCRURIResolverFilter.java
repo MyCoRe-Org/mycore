@@ -23,7 +23,7 @@
  **/
 package org.mycore.common.xml;
 
-import java.io.CharArrayWriter;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Iterator;
@@ -34,13 +34,13 @@ import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
+import javax.servlet.ServletOutputStream;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponseWrapper;
 
 import org.apache.log4j.Logger;
-
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 
@@ -71,24 +71,23 @@ public class MCRURIResolverFilter implements Filter {
             list = new MyLinkedList();
             currentSession.put(MCRURIResolver.SESSION_OBJECT_NAME, list);
         }
-        PrintWriter out = response.getWriter();
-        CharResponseWrapper wrapper = new CharResponseWrapper((HttpServletResponse) response);
+        ServletOutputStream out = response.getOutputStream();
+        MyResponseWrapper wrapper = new MyResponseWrapper((HttpServletResponse) response);
         // process request
         filterChain.doFilter(request, wrapper);
         final String origOutput = wrapper.toString();
         if (LOGGER.isDebugEnabled() && !list.isEmpty() && (response.getContentType().contains("text/html") || response.getContentType().contains("text/xml"))) {
-            CharArrayWriter caw = new CharArrayWriter();
             int pos = getInsertPosition(origOutput);
-            caw.write(origOutput.substring(0, pos));
-            caw.write("\n<!-- \n" + list.toString() + "\n-->");
-            caw.write(origOutput.substring(pos, origOutput.length()));
-            response.setContentLength(caw.toString().length());
-            out.write(caw.toString());
+            out.print(origOutput.substring(0, pos));
+            final String insertString = "\n<!-- \n" + list.toString() + "\n-->";
+            out.print(insertString);
+            out.print(origOutput.substring(pos, origOutput.length()));
+            response.setContentLength(origOutput.length()+insertString.length());
             // delete debuglist
             currentSession.deleteObject(MCRURIResolver.SESSION_OBJECT_NAME);
             LOGGER.debug("end filter");
         } else {
-            out.write(origOutput);
+            out.print(origOutput);
         }
         out.close();
     }
@@ -153,20 +152,32 @@ public class MCRURIResolverFilter implements Filter {
      * 
      * @author Thomas Scheffler (yagee)
      */
-    private class CharResponseWrapper extends HttpServletResponseWrapper {
-        private CharArrayWriter output;
+    private class MyResponseWrapper extends HttpServletResponseWrapper {
+        private ByteArrayOutputStream output;
 
         public String toString() {
             return output.toString();
         }
 
-        public CharResponseWrapper(HttpServletResponse response) {
+        public MyResponseWrapper(HttpServletResponse response) {
             super(response);
-            output = new CharArrayWriter();
+            output = new ByteArrayOutputStream(16*1024);
         }
 
         public PrintWriter getWriter() {
             return new PrintWriter(output);
+        }
+
+        public ServletOutputStream getOutputStream() throws IOException {
+            return new MyServletOutputStream();
+        }
+        
+        private class MyServletOutputStream extends ServletOutputStream{
+
+            public void write(int b) throws IOException {
+                output.write(b);
+            }
+            
         }
     }
 }
