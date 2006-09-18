@@ -26,9 +26,11 @@ package org.mycore.common.xml;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.io.PushbackInputStream;
 import java.util.Enumeration;
 import java.util.Hashtable;
@@ -53,6 +55,7 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
 import org.apache.log4j.Logger;
+
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
@@ -100,7 +103,7 @@ public class MCRLayoutServlet extends MCRServlet {
     protected void forwardXML(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("text/xml");
 
-        OutputStream out = response.getOutputStream();
+        PrintWriter out = response.getWriter();
 
         if (request.getAttribute(JDOM_ATTR) != null) {
             org.jdom.Document jdom = (org.jdom.Document) (request.getAttribute(JDOM_ATTR));
@@ -110,16 +113,18 @@ public class MCRLayoutServlet extends MCRServlet {
             org.jdom.Document jdom = new org.jdom.input.DOMBuilder().build(dom);
             new org.jdom.output.XMLOutputter().output(jdom, out);
         } else if (request.getAttribute(STREAM_ATTR) != null) {
-            InputStream in = (InputStream) (request.getAttribute(STREAM_ATTR));
-            MCRUtils.copyStream(in, out);
+            InputStreamReader in = new InputStreamReader((InputStream) (request.getAttribute(STREAM_ATTR)));
+            MCRUtils.copyReader(in, out);
+            in.close();
         } else if (request.getAttribute(BYTE_ATTR) != null) {
             byte[] bytes = (byte[]) (request.getAttribute(BYTE_ATTR));
-            MCRUtils.copyStream(new ByteArrayInputStream(bytes), out);
+            InputStreamReader in = new InputStreamReader(new ByteArrayInputStream(bytes));
+            MCRUtils.copyReader(in, out);
         } else if (request.getAttribute(FILE_ATTR) != null) {
             File file = (File) (request.getAttribute(FILE_ATTR));
-            FileInputStream fis = new FileInputStream(file);
-            MCRUtils.copyStream(fis, out);
-            fis.close();
+            FileReader in = new FileReader(file);
+            MCRUtils.copyReader(in, out);
+            in.close();
         }
 
         out.close();
@@ -527,7 +532,7 @@ public class MCRLayoutServlet extends MCRServlet {
         response.setContentType(ct + "; charset=" + enc);
         LOGGER.debug("MCRLayoutServlet starts to output " + ct + "; charset=" + enc);
 
-        OutputStream out = response.getOutputStream();
+        PrintWriter out = response.getWriter();
 
         try {
             transformer.transform(xml, new StreamResult(out));

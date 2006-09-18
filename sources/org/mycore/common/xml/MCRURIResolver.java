@@ -38,6 +38,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
@@ -60,6 +61,7 @@ import org.mycore.access.MCRAccessInterface;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRConfiguration;
+import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUsageException;
 import org.mycore.common.MCRUtils;
@@ -96,6 +98,8 @@ public class MCRURIResolver implements javax.xml.transform.URIResolver, EntityRe
     private static final MCRURIResolver singleton = new MCRURIResolver();
 
     private static ServletContext context;
+    
+    final static String SESSION_OBJECT_NAME="URI_RESOLVER_DEBUG";  
 
     private MCRCache bytesCache;
 
@@ -152,12 +156,16 @@ public class MCRURIResolver implements javax.xml.transform.URIResolver, EntityRe
      * @see javax.xml.transform.URIResolver
      */
     public Source resolve(String href, String base) throws TransformerException {
-        if (base != null) {
-            LOGGER.debug("Including " + href + " from " + getFileName(base));
-        } else {
-            LOGGER.debug("Including " + href);
-        }
-
+        if (LOGGER.isDebugEnabled()){
+            if (base != null) {
+                final String baseFileName = getFileName(base);
+                LOGGER.debug("Including " + href + " from " + baseFileName);
+                addDebugInfo(href, baseFileName);
+            } else {
+                LOGGER.debug("Including " + href);
+                addDebugInfo(href, null);
+            }
+        }        
         if (href.indexOf(":") == -1) {
             return null;
         }
@@ -168,6 +176,17 @@ public class MCRURIResolver implements javax.xml.transform.URIResolver, EntityRe
             return new JDOMSource(resolve(href));
         }
         return null;
+    }
+    
+    private void addDebugInfo(String href, String base){
+        final MCRSession session=MCRSessionMgr.getCurrentSession();
+        Object obj=session.get(SESSION_OBJECT_NAME);
+        if (obj==null){
+            LOGGER.debug("Please use MCRURIResolverFilter to add debug informations to HTML pages.");
+            return;
+        }
+        List list=(List)obj;
+        list.add(href+" from "+base);
     }
 
     /**

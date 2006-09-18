@@ -1,187 +1,197 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE web-app PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN" "web-app_2_3.dtd">
-<web-app>
+<web-app xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd" version="2.4">
 
-      <display-name>MyCoRe Application</display-name>
-      
-      <listener>
-            <listener-class>org.mycore.common.events.MCRServletContextListener</listener-class>
-      </listener>
-      
-      <!-- **************************************************************** -->
-      <!-- Servlets and mapping from MyCoRe kernel                          -->
-      <!-- **************************************************************** -->
-      
-      <servlet id="FileNode">
-            <servlet-name>MCRFileNodeServlet</servlet-name>
-            <servlet-class>org.mycore.datamodel.ifs.MCRFileNodeServlet</servlet-class>
-      </servlet>
-      <servlet id="Layout">
-            <servlet-name>MCRLayoutServlet</servlet-name>
-            <servlet-class>org.mycore.common.xml.MCRLayoutServlet</servlet-class>
-      </servlet>
-      <servlet id="Login">
-            <servlet-name>MCRLoginServlet</servlet-name>
-            <servlet-class>org.mycore.user2.MCRLoginServlet</servlet-class>
-      </servlet>
-      <servlet id="NBNResolver">
-            <servlet-name>MCRNBNResolver</servlet-name>
-            <servlet-class>org.mycore.services.nbn.MCRNBNResolver</servlet-class>
-      </servlet>
-      <servlet id="OAIProvider">
-            <servlet-name>MCROAIProvider</servlet-name>
-            <servlet-class>org.mycore.services.oai.MCROAIProvider</servlet-class>
-      </servlet>
-      <servlet id="Query">
-            <servlet-name>MCRQueryServlet</servlet-name>
-            <servlet-class>org.mycore.services.query.MCRQueryServlet</servlet-class>
-      </servlet>
-      <servlet id="StaticXMLFile">
-            <servlet-name>MCRStaticXMLFileServlet</servlet-name>
-            <servlet-class>org.mycore.frontend.servlets.MCRStaticXMLFileServlet</servlet-class>
-      </servlet>
-      <servlet id="User">
-            <servlet-name>MCRUserServlet</servlet-name>
-            <servlet-class>org.mycore.frontend.servlets.MCRUserServlet</servlet-class>
-      </servlet>
-      <servlet id="XMLEditor">
-            <servlet-name> XMLEditor </servlet-name>
-            <servlet-class> org.mycore.frontend.editor.MCREditorServlet </servlet-class>
-      </servlet>
-      <servlet id="MCRUpload">
-            <servlet-name>MCRUploadServlet</servlet-name>
-            <servlet-class>org.mycore.frontend.fileupload.MCRUploadServlet</servlet-class>
-      </servlet>
-      <servlet id="Zip">
-            <servlet-name>MCRZipServlet</servlet-name>
-            <servlet-class>org.mycore.services.zipper.MCRZipServlet</servlet-class>
-      </servlet>    
-      <servlet id="IndexBrowserServlet">
-            <servlet-name>MCRIndexBrowserServlet</servlet-name>
-            <servlet-class>org.mycore.frontend.indexbrowser.MCRIndexBrowserServlet</servlet-class>
-      </servlet>    
-      <servlet id="IndexBrowser">
-            <servlet-name>MCRIndexServlet</servlet-name>
-            <servlet-class>org.mycore.frontend.indexbrowser.MCRIndexServlet</servlet-class>
-      </servlet>    
-      <servlet id="MCRObject">
-            <servlet-name>MCRObjectServlet</servlet-name>
-            <servlet-class>org.mycore.frontend.servlets.MCRObjectServlet</servlet-class>
-      </servlet>
-      <servlet id="MCRAccessCheckServlet">
-            <servlet-name>MCRAccessCheckServlet</servlet-name>
-            <servlet-class>org.mycore.access.MCRAccessCheckServlet</servlet-class>
-      </servlet>
+  <display-name>MyCoRe Application</display-name>
 
-      <servlet id="MCRSearch">
-            <servlet-name>MCRSearchServlet</servlet-name>
-            <servlet-class>org.mycore.services.fieldquery.MCRSearchServlet</servlet-class>
-      </servlet>
-      
-      <!-- uncomment for administration interface -->
-      <!-- <servlet id="MCRAdminServlet"> -->
-      <!--  <servlet-name>MCRAdminServlet</servlet-name> -->
-      <!--  <servlet-class>org.mycore.frontend.servlets.MCRAdminServlet</servlet-class> -->
-      <!--</servlet> -->
-      <!-- administration interface end -->
+  <listener>
+    <listener-class>org.mycore.common.events.MCRServletContextListener</listener-class>
+  </listener>
 
-      <servlet-mapping>
-            <servlet-name>MCRStaticXMLFileServlet</servlet-name>
-            <url-pattern>*.xml</url-pattern>
-      </servlet-mapping>
-      <servlet-mapping>
-            <servlet-name>MCRFileNodeServlet</servlet-name>
-            <url-pattern>/servlets/MCRFileNodeServlet/*</url-pattern>
-      </servlet-mapping>
-      <servlet-mapping>
-            <servlet-name>MCRLoginServlet</servlet-name>
-            <url-pattern>/servlets/MCRLoginServlet</url-pattern>
-      </servlet-mapping>
-      <servlet-mapping>
-            <servlet-name>MCRNBNResolver</servlet-name>
-            <url-pattern>/servlets/MCRNBNResolver</url-pattern>
-      </servlet-mapping>
-      <servlet-mapping>
-            <servlet-name>MCRNBNResolver</servlet-name>
-            <url-pattern>/servlets/MCRNBNResolver/*</url-pattern>
-      </servlet-mapping>
-      <servlet-mapping>
-            <servlet-name>MCROAIProvider</servlet-name>
-            <url-pattern>/servlets/MCROAIProvider</url-pattern>
-      </servlet-mapping>
-      <servlet-mapping>
-            <servlet-name>MCRQueryServlet</servlet-name>
-            <url-pattern>/servlets/MCRQueryServlet</url-pattern>
-      </servlet-mapping>
-      <servlet-mapping>
-            <servlet-name>MCRUserServlet</servlet-name>
-            <url-pattern>/servlets/MCRUserServlet</url-pattern>
-      </servlet-mapping>
-      <servlet-mapping>
-            <servlet-name>MCRAccessCheckServlet</servlet-name>
-            <url-pattern>/servlets/MCRAccessCheckServlet</url-pattern>
-      </servlet-mapping>
-      <servlet-mapping>
-            <servlet-name> XMLEditor </servlet-name>
-            <url-pattern> /servlets/XMLEditor </url-pattern>
-      </servlet-mapping>
-      <servlet-mapping>
-            <servlet-name>MCRUploadServlet</servlet-name>
-            <url-pattern>/servlets/MCRUploadServlet</url-pattern>
-      </servlet-mapping>
-      <servlet-mapping>
-            <servlet-name>MCRZipServlet</servlet-name>
-            <url-pattern>/servlets/MCRZipServlet</url-pattern>
-      </servlet-mapping>
-       <servlet-mapping>
-         <servlet-name>MCRIndexBrowserServlet</servlet-name>
-         <url-pattern>/servlets/IndexBrowserServlet</url-pattern>
-       </servlet-mapping>
-       <servlet-mapping>
-         <servlet-name>MCRIndexBrowserServlet</servlet-name>
-         <url-pattern>/indexpage</url-pattern>
-       </servlet-mapping>
-       <servlet-mapping>
-         <servlet-name>MCRIndexServlet</servlet-name>
-         <url-pattern>/servlets/IndexServlet/*</url-pattern>
-       </servlet-mapping>
-       <servlet-mapping>
-         <servlet-name>MCRIndexServlet</servlet-name>
-         <url-pattern>/index/*</url-pattern>
-       </servlet-mapping>
+  <filter>
+    <filter-name>UriResolverDebugFilter</filter-name>
+    <filter-class>org.mycore.common.xml.MCRURIResolverFilter</filter-class>
+  </filter>
 
-	   <servlet-mapping>
-         <servlet-name>MCRObjectServlet</servlet-name>
-         <url-pattern>/receive/*</url-pattern>
-       </servlet-mapping>
-       <servlet-mapping>
-         <servlet-name>MCRSearchServlet</servlet-name>
-         <url-pattern>/servlets/MCRSearchServlet</url-pattern>
-       </servlet-mapping>
+  <!-- **************************************************************** -->
+  <!-- Servlets and mapping from MyCoRe kernel                          -->
+  <!-- **************************************************************** -->
 
-      <!-- uncomment for administration interface -->
-      <!-- <servlet-mapping> -->
-      <!--         <servlet-name>MCRAdminServlet</servlet-name> -->
-      <!--         <url-pattern>/admin</url-pattern> -->
-	  <!-- </servlet-mapping> -->
-      <!-- administration interface end -->
+  <servlet id="FileNode">
+    <servlet-name>MCRFileNodeServlet</servlet-name>
+    <servlet-class>org.mycore.datamodel.ifs.MCRFileNodeServlet</servlet-class>
+  </servlet>
+  <servlet id="Layout">
+    <servlet-name>MCRLayoutServlet</servlet-name>
+    <servlet-class>org.mycore.common.xml.MCRLayoutServlet</servlet-class>
+  </servlet>
+  <servlet id="Login">
+    <servlet-name>MCRLoginServlet</servlet-name>
+    <servlet-class>org.mycore.user2.MCRLoginServlet</servlet-class>
+  </servlet>
+  <servlet id="NBNResolver">
+    <servlet-name>MCRNBNResolver</servlet-name>
+    <servlet-class>org.mycore.services.nbn.MCRNBNResolver</servlet-class>
+  </servlet>
+  <servlet id="OAIProvider">
+    <servlet-name>MCROAIProvider</servlet-name>
+    <servlet-class>org.mycore.services.oai.MCROAIProvider</servlet-class>
+  </servlet>
+  <servlet id="Query">
+    <servlet-name>MCRQueryServlet</servlet-name>
+    <servlet-class>org.mycore.services.query.MCRQueryServlet</servlet-class>
+  </servlet>
+  <servlet id="StaticXMLFile">
+    <servlet-name>MCRStaticXMLFileServlet</servlet-name>
+    <servlet-class>org.mycore.frontend.servlets.MCRStaticXMLFileServlet</servlet-class>
+  </servlet>
+  <servlet id="User">
+    <servlet-name>MCRUserServlet</servlet-name>
+    <servlet-class>org.mycore.frontend.servlets.MCRUserServlet</servlet-class>
+  </servlet>
+  <servlet id="XMLEditor">
+    <servlet-name>XMLEditor</servlet-name>
+    <servlet-class>org.mycore.frontend.editor.MCREditorServlet</servlet-class>
+  </servlet>
+  <servlet id="MCRUpload">
+    <servlet-name>MCRUploadServlet</servlet-name>
+    <servlet-class>org.mycore.frontend.fileupload.MCRUploadServlet</servlet-class>
+  </servlet>
+  <servlet id="Zip">
+    <servlet-name>MCRZipServlet</servlet-name>
+    <servlet-class>org.mycore.services.zipper.MCRZipServlet</servlet-class>
+  </servlet>
+  <servlet id="IndexBrowserServlet">
+    <servlet-name>MCRIndexBrowserServlet</servlet-name>
+    <servlet-class>org.mycore.frontend.indexbrowser.MCRIndexBrowserServlet</servlet-class>
+  </servlet>
+  <servlet id="IndexBrowser">
+    <servlet-name>MCRIndexServlet</servlet-name>
+    <servlet-class>org.mycore.frontend.indexbrowser.MCRIndexServlet</servlet-class>
+  </servlet>
+  <servlet id="MCRObject">
+    <servlet-name>MCRObjectServlet</servlet-name>
+    <servlet-class>org.mycore.frontend.servlets.MCRObjectServlet</servlet-class>
+  </servlet>
+  <servlet id="MCRAccessCheckServlet">
+    <servlet-name>MCRAccessCheckServlet</servlet-name>
+    <servlet-class>org.mycore.access.MCRAccessCheckServlet</servlet-class>
+  </servlet>
+  <servlet id="MCRSearch">
+    <servlet-name>MCRSearchServlet</servlet-name>
+    <servlet-class>org.mycore.services.fieldquery.MCRSearchServlet</servlet-class>
+  </servlet>
 
-      <!-- **************************************************************** -->
-      <!-- General configuration                                            -->
-      <!-- **************************************************************** -->
-      
-      <session-config>
-            <session-timeout>30</session-timeout>
-      </session-config>
-      
-      <welcome-file-list>
-            <welcome-file>index.html</welcome-file>
-            <welcome-file>index.htm</welcome-file>
-            <welcome-file>index.jsp</welcome-file>
-            <welcome-file>default.html</welcome-file>
-            <welcome-file>default.htm</welcome-file>
-            <welcome-file>default.jsp</welcome-file>
-            <welcome-file>index.xml</welcome-file>
-      </welcome-file-list>    
-        
+  <!-- uncomment for administration interface -->
+  <!-- <servlet id="MCRAdminServlet"> -->
+  <!--  <servlet-name>MCRAdminServlet</servlet-name> -->
+  <!--  <servlet-class>org.mycore.frontend.servlets.MCRAdminServlet</servlet-class> -->
+  <!--</servlet> -->
+  <!-- administration interface end -->
+
+  <filter-mapping>
+    <filter-name>UriResolverDebugFilter</filter-name>
+    <servlet-name>MCRLayoutServlet</servlet-name>
+    <dispatcher>FORWARD</dispatcher>
+  </filter-mapping>
+
+  <servlet-mapping>
+    <servlet-name>MCRStaticXMLFileServlet</servlet-name>
+    <url-pattern>*.xml</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>MCRFileNodeServlet</servlet-name>
+    <url-pattern>/servlets/MCRFileNodeServlet/*</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>MCRLoginServlet</servlet-name>
+    <url-pattern>/servlets/MCRLoginServlet</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>MCRNBNResolver</servlet-name>
+    <url-pattern>/servlets/MCRNBNResolver</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>MCRNBNResolver</servlet-name>
+    <url-pattern>/servlets/MCRNBNResolver/*</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>MCROAIProvider</servlet-name>
+    <url-pattern>/servlets/MCROAIProvider</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>MCRQueryServlet</servlet-name>
+    <url-pattern>/servlets/MCRQueryServlet</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>MCRUserServlet</servlet-name>
+    <url-pattern>/servlets/MCRUserServlet</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>MCRAccessCheckServlet</servlet-name>
+    <url-pattern>/servlets/MCRAccessCheckServlet</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>XMLEditor</servlet-name>
+    <url-pattern>/servlets/XMLEditor</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>MCRUploadServlet</servlet-name>
+    <url-pattern>/servlets/MCRUploadServlet</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>MCRZipServlet</servlet-name>
+    <url-pattern>/servlets/MCRZipServlet</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>MCRIndexBrowserServlet</servlet-name>
+    <url-pattern>/servlets/IndexBrowserServlet</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>MCRIndexBrowserServlet</servlet-name>
+    <url-pattern>/indexpage</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>MCRIndexServlet</servlet-name>
+    <url-pattern>/servlets/IndexServlet/*</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>MCRIndexServlet</servlet-name>
+    <url-pattern>/index/*</url-pattern>
+  </servlet-mapping>
+
+  <servlet-mapping>
+    <servlet-name>MCRObjectServlet</servlet-name>
+    <url-pattern>/receive/*</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>MCRSearchServlet</servlet-name>
+    <url-pattern>/servlets/MCRSearchServlet</url-pattern>
+  </servlet-mapping>
+
+  <!-- uncomment for administration interface -->
+  <!-- <servlet-mapping> -->
+  <!--         <servlet-name>MCRAdminServlet</servlet-name> -->
+  <!--         <url-pattern>/admin</url-pattern> -->
+  <!-- </servlet-mapping> -->
+  <!-- administration interface end -->
+
+  <!-- **************************************************************** -->
+  <!-- General configuration                                            -->
+  <!-- **************************************************************** -->
+
+  <session-config>
+    <session-timeout>30</session-timeout>
+  </session-config>
+
+  <welcome-file-list>
+    <welcome-file>index.html</welcome-file>
+    <welcome-file>index.htm</welcome-file>
+    <welcome-file>index.jsp</welcome-file>
+    <welcome-file>default.html</welcome-file>
+    <welcome-file>default.htm</welcome-file>
+    <welcome-file>default.jsp</welcome-file>
+    <welcome-file>index.xml</welcome-file>
+  </welcome-file-list>
+
 </web-app>
