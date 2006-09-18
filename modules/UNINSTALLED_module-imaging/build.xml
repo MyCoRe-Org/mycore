@@ -9,7 +9,7 @@
 <!-- Andreas Trappe 	- idea, concept				-->
 <!-- Chi Vu Huu		- concept, development			-->
 <!--												-->
-<!-- $Revision: 1.2 $ $Date: 2006-06-02 11:05:07 $ 								-->
+<!-- $Revision: 1.3 $ $Date: 2006-09-18 13:56:20 $ 								-->
 
 
 <project name="MyCoReModule - imaging" default="usage" basedir=".">
@@ -38,9 +38,8 @@
         ant [target]
 
       Available targets are:
-        info                 --> Shows Java/Ant/Operating System version
-        clean                --> Removes all generated files, cleaning up
-        compile              --> Compiles all sources 
+		info                 --> Shows Java/Ant/Operating System version
+		install              --> install Module-Imaging
     </echo>
   </target>
 
@@ -67,6 +66,30 @@
   </target>
 
 <!-- =================================================================== -->
+<!-- Installation													     -->
+<!-- =================================================================== -->
+
+	<target name="install">
+		<mkdir dir="../module-imaging" />
+		<copy todir="../module-imaging" flatten="false">
+			<fileset dir="." excludes="CVS" />
+		</copy>	
+	</target>
+
+<!-- =================================================================== -->
+<!-- Synchronisation												     -->
+<!-- =================================================================== -->
+
+	<target name="synch">
+		<echo>Synchronisating Module-imaging to UNISTALLED-folder</echo>
+		<mkdir dir="${env.MYCORE_HOME}/modules/module-imaging" />
+		<copy todir="${env.MYCORE_HOME}/modules/module-imaging" flatten="false">
+			<fileset dir="${env.MYCORE_HOME}/modules/UNINSTALLED_module-imaging" excludes="CVS" />
+		</copy>	
+	</target>
+	
+	
+<!-- =================================================================== -->
 <!-- Compiles all application classes                                    -->
 <!-- =================================================================== -->
 
@@ -86,14 +109,14 @@
     <echo>---------------------------------------------------------</echo>
   </target>
 
-  <target name="compile">
+  <target name="compile" depends="synch">
     <echo>Compiling module imaging soures</echo>
     <antcall target="javac">
       <param name="packages" value="org/mycore/services/imaging/**"/>
     </antcall>
   </target>
 	
-	<target name="webapps">
+	<target name="webapps" depends="synch">
 		<copy todir="${basedir}/webapps/WEB-INF/classes" flatten="true">
 			<fileset dir="${env.MYCORE_HOME}/modules/module-imaging/config" includes="mycore.properties.imaging" />
 		</copy>
