@@ -76,7 +76,7 @@ public class MCRURIResolverFilter implements Filter {
         // process request
         filterChain.doFilter(request, wrapper);
         final String origOutput = wrapper.toString();
-        if (LOGGER.isDebugEnabled() && !list.isEmpty() && (response.getContentType().contains("text/html") || response.getContentType().contains("text/xml"))) {
+        if (LOGGER.isDebugEnabled() && !list.isEmpty() && (-1 != response.getContentType().indexOf("text/html") || -1 != response.getContentType().indexOf("text/xml"))) {
             int pos = getInsertPosition(origOutput);
             out.print(origOutput.substring(0, pos));
             final String insertString = "\n<!-- \n" + list.toString() + "\n-->";
