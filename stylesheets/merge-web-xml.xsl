@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
 <!-- ============================================== -->
-<!-- $Revision: 1.3 $ $Date: 2006-09-18 12:18:39 $ -->
+<!-- $Revision: 1.4 $ $Date: 2006-09-19 10:13:25 $ -->
 <!-- ============================================== -->
 
-<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns="http://java.sun.com/xml/ns/j2ee"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <xsl:output indent="yes" method="xml" encoding="UTF-8" />
   <xsl:strip-space elements="*" />
   <xsl:preserve-space elements="" />
@@ -17,7 +16,7 @@
     <xsl:variable name="wib" select="*[local-name()='web-app']" />
 
     <web-app version="2.4" xmlns="http://java.sun.com/xml/ns/j2ee"
-      xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
+      xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
       <xsl:copy-of select="$wia/*[local-name()='display-name']" />
 
       <xsl:copy-of select="$wia/*[local-name()='listener']" />
