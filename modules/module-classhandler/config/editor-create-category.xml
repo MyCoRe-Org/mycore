@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE editor>
+
+<editor>
+ <target type="servlet" name="MCRStartClassEditorServlet" method="get" format="xml" />
+ <components root="create-category" var="/mycoreclass">
+  <include uri="webapp:editor/imports-common.xml" />
+  <headline anchor="CENTER">
+   <text>
+    <label xml:lang="de">Klassifikationseditor: Einfügen einer neuen Kategorie<p/></label>
+    <label xml:lang="en">add a new category for a given classification<p/></label>
+   </text>
+  </headline>
+  <panel id="create-category">	  	  
+	<cell col="1" row="1" colspan="2" anchor="NORTHWEST"  ref="Class" />	  	  	  
+	<cell col="1" row="2" colspan="2" ><space width="1px" height="10px" /></cell>		  
+	<cell col="1" row="4" colspan="2" ><space width="1px" height="10px" /></cell>	
+	<cell col="1" row="5" colspan="2" anchor="NORTHWEST"  var="categories" ref="NewCateg" />	  	  	    	  
+    <cell col="1" row="6" colspan="2" anchor="EAST"      ref="TwoButtons"  />
+  </panel>
+	 	 
+  <panel id="Class">
+    <hidden var="@ID" />
+    <hidden var="label/@text" />
+    <hidden var="label/@description" />	  
+    <cell col="1" row="1" colspan="2" anchor="NORTHWEST" ref="AClid" />	  
+    <cell col="1" row="2" anchor="NORTHWEST">	  
+	  <text><label>  <span class="editorlabel">ID:</span>    </label>     </text>		
+	</cell>	
+    <cell col="2" row="2" anchor="NORTHWEST" ><output var="@ID" default=" "/></cell>  
+    <cell col="1" row="3" anchor="NORTHWEST">	  
+	  <text><label>  <span class="editorlabel">Label:</span>    </label>    </text>		
+	</cell>	
+    <cell col="2" row="3" anchor="NORTHWEST" ><output var="label/@text" default=" "/></cell>    
+    <cell col="1" row="4" anchor="NORTHWEST">	  
+	  <text>
+		<label xml:lang="de">  <span class="editorlabel">Beschreibung:</span>    </label>
+		<label xml:lang="en">  <span class="editorlabel">Description:</span>    </label>
+      </text>		
+	</cell>	
+    <cell col="2" row="4" anchor="NORTHWEST" ><output var="label/@description" default=" "/></cell>  	  
+  </panel>
+
+ 
+	 	 
+  <panel id="NewCateg">
+    <hidden var="category/@counter" default="0" />
+    <cell col="1" row="1" colspan="2" anchor="NORTHWEST" ref="BClid" />	  	  	  
+    <cell col="1" row="2" anchor="NORTHWEST">	  
+	  <text><label>  <span class="editorlabel">ID(*):</span>    </label>     </text>		
+	</cell>	
+    <cell col="2" row="2" anchor="NORTHWEST" ref="TFzeile128" var="category/@ID" />
+	  	  
+    <cell col="1" row="3" anchor="NORTHWEST">	  
+	  <text><label><span class="editorlabel">Label(*):</span>    </label>     </text>		
+	</cell>		  
+    <cell col="2" row="3" var="category/label" anchor="NORTHWEST" >
+		   <repeater min="1" max="10" ref="RNewCategLabel" />      
+	</cell>	      	  	
+    <cell col="1" row="4" anchor="NORTHWEST">	  
+	  <text><label><span class="editorlabel">URL:</span>    </label>     </text>		
+	</cell>		  	  
+    <cell col="2" row="4" anchor="NORTHWEST" ref="TFzeile1024" var="category/url/@href" default="de" />   
+	   	 	  	    	  	  
+    <cell col="1" row="5" colspan="2" anchor="NORTHWEST"><space width="1px" height="10px" /></cell>		  
+  </panel>
+	 
+  <panel id="RNewCategLabel">
+	<cell col="1" row="1" anchor="NORTHWEST" ref="Slang" var="@lang" default="de"/>    	  
+    <cell col="2" row="1" anchor="NORTHWEST">	  
+	  <text>
+		  <label xml:lang="de">  <span class="editorlabel">Sprache:</span>    </label>
+		  <label xml:lang="en">  <span class="editorlabel">Language:</span>    </label>
+	  </text>	
+	</cell>
+    <cell col="1" row="2" anchor="NORTHWEST" ref="TFzeile1024" var="@text"  />	  
+    <cell col="2" row="2" anchor="NORTHWEST">	  
+	  <text><label><span class="editorlabel">Text:</span> </label></text>		
+	</cell>	  
+    <cell col="1" row="3" anchor="NORTHWEST" ref="TFzeile1024"  var="@description"  />	  
+    <cell col="2" row="3" anchor="NORTHWEST">	  
+	  <text>
+		<label xml:lang="de">  <span class="editorlabel">Beschreibung:</span>    </label>
+		<label xml:lang="en">  <span class="editorlabel">Description:</span>    </label>
+	 </text>			  
+	</cell>	  
+	  
+  </panel>
+	 	 
+  <text id="AClid">
+    <label xml:lang="de">
+      <span class="editorlabel"><b>ausgewählte Klassifikation</b></span>
+    </label>
+    <label xml:lang="en">
+      <span class="editorlabel"><b>choosen Classification</b></span>
+    </label>
+  </text>
+  <text id="BClid">
+    <label xml:lang="de">
+      <span class="editorlabel"><b>neue Kategorie</b> (Voreinstellung: Daten des Vorgängers )</span>
+    </label>
+    <label xml:lang="en">
+      <span class="editorlabel"><b>new Category</b> (predecessor data)</span>
+    </label>
+  </text>
+<!-- *** End *** -->
+
+ </components>
+</editor>
+
