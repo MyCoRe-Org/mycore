@@ -52,7 +52,6 @@ import javax.swing.UIManager;
  * @author Harald Richter
  * @author Frank Lützenkirchen
  * @author Jens Kupferschmidt
- * @author Radi Radichev
  * @author Thomas Scheffler (yagee)
  * 
  * @version $Revision$ $Date$
@@ -76,11 +75,16 @@ public class MCRUploadApplet extends JApplet {
         uploadId = getParameter("uploadId");
         targetURL = getParameter("url");
         peerURL = getParameter("ServletsBase") + "MCRUploadServlet";
+        setBackground(getColorParameter("background-color"));
 
         // TODO: Refactor parameters from web page
         // TODO: Refactor thread handling
         try {
-            UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
+            if (System.getProperty("os.name","unknown").indexOf("Windows")>=0){
+                UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
+            } else {
+                UIManager.setLookAndFeel("com.sun.java.swing.plaf.gtk.GTKLookAndFeel");
+            }
         } catch (Exception ignored) {
         }
 
@@ -122,8 +126,6 @@ public class MCRUploadApplet extends JApplet {
         GridBagLayout gbl = new GridBagLayout();
         GridBagConstraints gbc = new GridBagConstraints();
         content.setLayout(gbl);
-        int col[] = getColor(); 
-        content.setBackground( new Color( col[0], col[1], col[2] ) );
         content.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
         JLabel jlChoose = new JLabel(translateI18N("MCRUploadApplet.dirsel"));
@@ -219,25 +221,18 @@ public class MCRUploadApplet extends JApplet {
         return result;
     }
     
-    /**
-     * provides set color defined in mycore.properties.uploadapplet.
-     *
-     * @return an integer array contained red / green / blue
-     */
-    private final int [] getColor() {
-        int result[] = new int [3]; result[0] = 202; result[1] = 217; result[2] = 244;
-        Locale currentLocale = getLocale();
-        ResourceBundle message = ResourceBundle.getBundle("messages", new Locale(currentLocale.getLanguage()));
-        
-        try { 
-            result[0] = Integer.parseInt(message.getString("MCRUploadApplet.color.red"));
-            result[1] = Integer.parseInt(message.getString("MCRUploadApplet.color.green"));
-            result[2] = Integer.parseInt(message.getString("MCRUploadApplet.color.blue"));
-        } catch (java.util.MissingResourceException mre) {
-            System.err.println(mre.getMessage()); 
+    private final Color getColorParameter(String name){
+        String value=getParameter(name);
+        if (value == null){
+            return null;
         }
-         
-        return result;
+        int rgbValue;
+        try {
+            rgbValue = Integer.parseInt(value.substring(1),16);
+        } catch (NumberFormatException e) {
+            return null;
+        }
+        return new Color(rgbValue);
     }
     
 }
