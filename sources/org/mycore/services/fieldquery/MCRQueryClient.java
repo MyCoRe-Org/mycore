@@ -163,15 +163,17 @@ public class MCRQueryClient {
      * @param type   the type of the classification to retrieve
      * @param classID   the class ID of the classification to retrieve
      * @param categID   the category ID of the classification to retrieve
+     * @param format
+     *             of retrieved classification, valid values are: editor['['formatAlias']']|metadata
      * @return the classification document
      */
-    public static org.w3c.dom.Document doRetrieveClassification(String hostAlias, String level, String type, String classID, String categID) {
+    public static org.w3c.dom.Document doRetrieveClassification(String hostAlias, String level, String type, String classID, String categID, String format) {
         if (!accessclass.containsKey(hostAlias)) {
             String msg = "No configuration for host " + hostAlias;
             throw new MCRConfigurationException(msg);
         }
         LOGGER.info("Starting remote retrieval at host " + hostAlias);
         MCRQueryClientInterface qi = (MCRQueryClientInterface) accessclass.get(hostAlias);
-        return qi.doRetrieveClassification(level,type,classID,categID);
+        return qi.doRetrieveClassification(level,type,classID,categID,format);
     }
 }

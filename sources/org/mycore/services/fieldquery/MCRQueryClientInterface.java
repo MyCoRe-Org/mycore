@@ -74,7 +74,9 @@ public interface MCRQueryClientInterface {
      *            the class ID of the classification to retrieve
      * @param categID
      *            the category ID of the classification to retrieve
-     * @return the classification document
+     * @param format
+     *             of retrieved classification, valid values are: editor['['formatAlias']']|metadata
+@return the classification document
      */
-    abstract org.w3c.dom.Document doRetrieveClassification(String level, String type, String classID, String categID);
+    abstract org.w3c.dom.Document doRetrieveClassification(String level, String type, String classID, String categID, String format);
 }
