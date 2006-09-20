@@ -24,13 +24,18 @@
 package org.mycore.services.wsclient;
 
 import java.util.Properties;
+import java.net.URL;
 import java.rmi.Remote;
+
+import javax.xml.namespace.QName;
 
 import org.mycore.common.xml.MCRURIResolver;
 
 import org.apache.log4j.Logger;
 
 import org.apache.axis.AxisFault;
+import org.apache.axis.client.Call;
+import org.apache.axis.client.Service;
 import org.apache.axis.client.Stub;
 
 import org.apache.ws.security.handler.WSHandlerConstants;
@@ -39,6 +44,10 @@ import org.apache.ws.security.message.token.UsernameToken;
 
 import org.apache.axis.EngineConfiguration;
 import org.apache.axis.configuration.FileProvider;
+import org.apache.axis.constants.Style;
+import org.apache.axis.constants.Use;
+import org.apache.axis.description.OperationDesc;
+import org.apache.axis.description.ParameterDesc;
 
 /**
  * Test client for MyCoRe MCRWebService
@@ -159,10 +168,64 @@ public class MCRWebServiceClient
         String catID   = params.getProperty("catID", "");
         if ( null != classID && null != level )
         {
-          org.w3c.dom.Document result = stub.MCRDoRetrieveClassification(level, "children", classID,  catID);
+          org.w3c.dom.Document result = stub.MCRDoRetrieveClassification(level, "children", classID,  catID, null);
 
           org.jdom.input.DOMBuilder d = new org.jdom.input.DOMBuilder();
           org.jdom.Document doc = d.build(result);
+          org.jdom.output.XMLOutputter outputter = new org.jdom.output.XMLOutputter();
+          logger.info( outputter.outputString(doc ) );
+        } else
+          System.out.println("parameter(s) for retrieve classification missing");
+      }
+      else if ("retrievecl2".equals(operation))
+      {
+        String classID = params.getProperty("classID");
+        String level   = params.getProperty("level");
+        String categID = params.getProperty("catID", "");
+        String type    = "children";
+        String format  = "editor[textcounter]";
+        if ( null != classID && null != level )
+        {
+//          org.w3c.dom.Document result = stub.MCRDoRetrieveClassification(level, "children", classID,  catID);
+
+          /** The AXIS service object */
+          Service service = new Service();
+
+          /** The description of the doQuery service operation */
+          OperationDesc operation2;
+          
+          String xmlsoap = "http://xml.apache.org/xml-soap";
+
+          // Build doQuery operation description
+          operation2 = new OperationDesc();
+          operation2.setName("MCRDoQuery");
+          operation2.addParameter(new ParameterDesc(new QName("", "in0"), ParameterDesc.IN, new QName("http://xml.apache.org/xml-soap", "Document"), org.w3c.dom.Document.class, false, false));
+          operation2.setReturnType(new QName(xmlsoap, "Document"));
+          operation2.setReturnClass(org.w3c.dom.Document.class);
+          operation2.setReturnQName(new QName("", "MCRDoQueryReturn"));
+          operation2.setStyle(Style.RPC);
+          operation2.setUse(Use.ENCODED);
+          
+          
+          // Build webservice call
+          Call call = (Call) (service.createCall());
+          call.setTargetEndpointAddress(new URL(endpoint));
+          call.setOperation(operation2);
+          call.setOperationName("MCRDoRetrieveClassification");
+          call.removeAllParameters();
+          call.addParameter("level", org.apache.axis.Constants.XSD_STRING, javax.xml.rpc.ParameterMode.IN);
+          call.addParameter("type", org.apache.axis.Constants.XSD_STRING, javax.xml.rpc.ParameterMode.IN);
+          call.addParameter("classID", org.apache.axis.Constants.XSD_STRING, javax.xml.rpc.ParameterMode.IN);
+          call.addParameter("categID", org.apache.axis.Constants.XSD_STRING, javax.xml.rpc.ParameterMode.IN);
+          call.addParameter("format", org.apache.axis.Constants.XSD_STRING, javax.xml.rpc.ParameterMode.IN);
+          call.setReturnType(new QName("http://xml.apache.org/xml-soap", "Document"));
+          // Call webservice
+          org.w3c.dom.Document outDoc = (org.w3c.dom.Document) (call.invoke(new Object[] { level, type, classID, categID, format }));
+          
+          
+          
+          org.jdom.input.DOMBuilder d = new org.jdom.input.DOMBuilder();
+          org.jdom.Document doc = d.build(outDoc);
           org.jdom.output.XMLOutputter outputter = new org.jdom.output.XMLOutputter();
           logger.info( outputter.outputString(doc ) );
         } else

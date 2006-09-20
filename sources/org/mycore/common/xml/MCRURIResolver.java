@@ -365,6 +365,7 @@ public class MCRURIResolver implements javax.xml.transform.URIResolver, EntityRe
         private static final String TYPE_KEY = "type";
         private static final String CLASS_KEY = "classid";
         private static final String CATEG_KEY = "categid";
+        private static final String FORMAT_KEY = "format";
 
         private static final DOMBuilder DOM_BUILDER = new DOMBuilder();
 
@@ -393,7 +394,8 @@ public class MCRURIResolver implements javax.xml.transform.URIResolver, EntityRe
                 String type=params.get(TYPE_KEY).toString();
                 String classId=params.get(CLASS_KEY).toString();
                 String categId=params.get(CATEG_KEY).toString();
-                org.w3c.dom.Document document = MCRQueryClient.doRetrieveClassification(hostAlias, level, type, classId, categId);
+                String format=params.get(FORMAT_KEY).toString();
+                org.w3c.dom.Document document = MCRQueryClient.doRetrieveClassification(hostAlias, level, type, classId, categId, format);
                 return DOM_BUILDER.build(document).detachRootElement();
             }
             // only WS "MCRDoRetrieveObject" implemented yet
