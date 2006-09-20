@@ -2,7 +2,7 @@
 
 <!-- =================================================================== -->
 <!-- MyCoRe-Classification handling build file for use with ANT          -->
-<!-- $Revision: 1.1 $ $Date: 2006-09-18 11:02:18 $                      -->
+<!-- $Revision: 1.2 $ $Date: 2006-09-20 09:18:48 $                      -->
 <!-- =================================================================== -->
 
 <project name="MyCoReModule - ClassHandler" default="usage" basedir=".">
@@ -59,12 +59,19 @@
 		<echo>---------------------------------------------------------</echo>
 	</target>
 
-	<target name="compile" depends="compile_frontend_servlets" />
+	<target name="compile" depends="compile_datamodel_class, compile_frontend_servlets" />
 
 	<target name="compile_frontend_servlets">
 		<echo>Compiling the MyCoRe ClassHandler frontent servlets</echo>
 		<antcall target="javac">
 			<param name="packages" value="org/mycore/frontend/servlets/**" />
+		</antcall>
+	</target>
+
+	<target name="compile_datamodel_class">
+		<echo>Compiling the MyCoRe ClassHandler datamodel classification</echo>
+		<antcall target="javac">
+			<param name="packages" value="org/mycore/datamodel/classification/**" />
 		</antcall>
 	</target>
 
