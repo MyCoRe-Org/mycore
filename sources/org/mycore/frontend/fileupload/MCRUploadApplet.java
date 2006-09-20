@@ -52,7 +52,6 @@ import javax.swing.UIManager;
  * @author Harald Richter
  * @author Frank Lützenkirchen
  * @author Jens Kupferschmidt
- * @author Radi Radichev
  * @author Thomas Scheffler (yagee)
  * 
  * @version $Revision$ $Date$
