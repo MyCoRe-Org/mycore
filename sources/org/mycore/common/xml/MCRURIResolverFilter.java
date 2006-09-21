@@ -26,6 +26,7 @@ package org.mycore.common.xml;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -156,7 +157,11 @@ public class MCRURIResolverFilter implements Filter {
         private ByteArrayOutputStream output;
 
         public String toString() {
-            return output.toString();
+            try {
+                return output.toString(getCharacterEncoding());
+            } catch (UnsupportedEncodingException e) {
+                return output.toString();
+            }
         }
 
         public MyResponseWrapper(HttpServletResponse response) {
