@@ -360,12 +360,12 @@ Aufruf:
 		<xsl:choose>
 			<xsl:when test="/cms/action = 'translate'">
 				<textarea id="fck_editor" name="content_currentLang" width="80" height="20" editorWidth="640" editorHeight="320">
-					<xsl:copy-of select="document(concat($WebApplicationBaseURL,/cms/href,'?XSL.Style=xml'))/MyCoReWebPage/section[@xml:lang=$CurrentLang]/node()" />
+					<xsl:copy-of select="document(concat('webapp:',/cms/href))/MyCoReWebPage/section[@xml:lang=$CurrentLang]/node()" />
 				</textarea>
 			</xsl:when>
 			<xsl:otherwise>
 				<textarea id="fck_editor" name="content" width="80" height="20" editorWidth="640" editorHeight="320">
-					<xsl:copy-of select="document(concat($WebApplicationBaseURL,/cms/href,'?XSL.Style=xml'))/MyCoReWebPage/section[@xml:lang=$CurrentLang]/node()" />				
+					<xsl:copy-of select="document(concat('webapp:',/cms/href))/MyCoReWebPage/section[@xml:lang=$CurrentLang]/node()" />				
 				</textarea>							
 			</xsl:otherwise>
 		</xsl:choose>
