@@ -160,6 +160,13 @@ public class MCRURIResolverFilter implements Filter {
             try {
                 return output.toString(getCharacterEncoding());
             } catch (UnsupportedEncodingException e) {
+                /**
+                 * Definitely this Exception should not occur because we get the
+                 * character encoding from the HttpResponse object where it was
+                 * previously set or it defaults to the system or ISO-8859-1.
+                 * Either way for this rare circumstance we return the String in
+                 * system default encoding here.
+                 */
                 return output.toString();
             }
         }
