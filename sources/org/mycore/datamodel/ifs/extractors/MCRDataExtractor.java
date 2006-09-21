@@ -28,7 +28,6 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 
 import org.apache.log4j.Logger;
-import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
@@ -96,7 +95,7 @@ public abstract class MCRDataExtractor extends MCREventHandlerBase {
             if (LOGGER.isDebugEnabled())
                 LOGGER.debug(outputData(data));
             if (data.getChildren().size() > 0)
-                file.setAdditionalData(new Document(data));
+                file.setAdditionalData(data);
         } catch (Exception ex) {
             ex.printStackTrace();
         }

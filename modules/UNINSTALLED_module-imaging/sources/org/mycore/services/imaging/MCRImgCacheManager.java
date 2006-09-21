@@ -161,10 +161,10 @@ public class MCRImgCacheManager implements CacheManager {
 		int width = 0;
 
 		try {
-			Document addData = image.getAdditionalData();
+			Element addData = image.getAdditionalData("ImageMetaData");
 
 			if (addData != null) {
-				width = (new Integer(addData.getRootElement().getChild("imageSize").getChild("width").getText())).intValue();
+				width = (new Integer(addData.getChild("imageSize").getChild("width").getText())).intValue();
 			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -181,10 +181,10 @@ public class MCRImgCacheManager implements CacheManager {
 		int height = 0;
 
 		try {
-			Document addData = image.getAdditionalData();
+			Element addData = image.getAdditionalData("ImageMetaData");
 
 			if (addData != null) {
-				height = (new Integer(addData.getRootElement().getChild("imageSize").getChild("height").getText())).intValue();
+				height = (new Integer(addData.getChild("imageSize").getChild("height").getText())).intValue();
 			}
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -199,10 +199,10 @@ public class MCRImgCacheManager implements CacheManager {
 
 	public void setImgSize(MCRFile image, int width, int height) {
 		try {
-			Document addData = image.getAdditionalData();
+			Element addData = image.getAdditionalData("ImageMetaData");
 			if (addData == null) {
-				addData = new Document((new Element("ImageMetaData")).addContent((new Element("imageSize"))));
-				Element elem = addData.getRootElement().getChild("imageSize");
+				addData = new Element("ImageMetaData").addContent(new Element("imageSize"));
+				Element elem = addData.getChild("imageSize");
 				elem.addContent((new Element("width")).setText(String.valueOf(width)));
 				elem.addContent((new Element("height")).setText(String.valueOf(height)));
 				image.setAdditionalData(addData);

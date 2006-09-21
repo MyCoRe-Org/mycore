@@ -53,7 +53,7 @@ public class MCRImgService {
 		float scaleHelp = 1;
 
 		try {
-			if (image.getAdditionalData() == null) {
+			if (image.getAdditionalData("ImageMetaData") == null) {
 				LOGGER.debug("*********************************");
 				LOGGER.debug("* MCRImgService create Add-Data *");
 				LOGGER.debug("*********************************");
@@ -163,7 +163,7 @@ public class MCRImgService {
 		this.scaleFactor = scaleFactor;
 
 		try {
-			if (image.getAdditionalData() == null) {
+			if (image.getAdditionalData("ImageMetaData") == null) {
 				LOGGER.debug("*********************************");
 				LOGGER.debug("* MCRImgService create Add-Data *");
 				LOGGER.debug("*********************************");

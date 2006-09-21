@@ -110,7 +110,7 @@ public class MCRImgCacheCommands extends MCRAbstractCommands {
 
 		for (Iterator iter = list.iterator(); iter.hasNext();) {
 			image = (MCRFile) iter.next();
-			image.removeAdditionalData(new Document(new Element("ImageMetaData")));
+			image.removeAdditionalData("ImageMetaData");
 			cache.deleteImage(image);
 		}
 	}
@@ -138,7 +138,7 @@ public class MCRImgCacheCommands extends MCRAbstractCommands {
 			MCRFile image = null;
 
 			image = imgFile;
-			image.removeAdditionalData(new Document(new Element("ImageMetaData")));
+			image.removeAdditionalData("ImageMetaData");
 			cache.deleteImage(image);
 		}
 		LOGGER.info("******************************************************************************");
