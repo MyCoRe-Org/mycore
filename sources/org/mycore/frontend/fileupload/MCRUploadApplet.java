@@ -75,16 +75,25 @@ public class MCRUploadApplet extends JApplet {
         uploadId = getParameter("uploadId");
         targetURL = getParameter("url");
         peerURL = getParameter("ServletsBase") + "MCRUploadServlet";
-        setBackground(getColorParameter("background-color"));
+        Color bg = getColorParameter("background-color");
+        System.out.println(bg.toString());
+        setBackground(bg);
 
         // TODO: Refactor parameters from web page
         // TODO: Refactor thread handling
         try {
-            if (System.getProperty("os.name","unknown").indexOf("Windows")>=0){
-                UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
-            } else {
-                UIManager.setLookAndFeel("com.sun.java.swing.plaf.gtk.GTKLookAndFeel");
-            }
+            UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
+            /*
+             * Comment cause it is a known bug with color under GTKLookAndFeel.
+             * This bug was found under Firefox 7.0.8 with JDK 1.4. The global
+             * color was not set in content too. 
+             */
+             /*
+             * if (System.getProperty("os.name","unknown").indexOf("Windows")>=0){
+             * UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel"); }
+             * else {
+             * UIManager.setLookAndFeel("com.sun.java.swing.plaf.gtk.GTKLookAndFeel"); }
+             */
         } catch (Exception ignored) {
         }
 
@@ -127,6 +136,7 @@ public class MCRUploadApplet extends JApplet {
         GridBagConstraints gbc = new GridBagConstraints();
         content.setLayout(gbl);
         content.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        content.setBackground(bg);
 
         JLabel jlChoose = new JLabel(translateI18N("MCRUploadApplet.dirsel"));
         gbc.insets = new Insets(2, 2, 2, 2);
@@ -197,7 +207,7 @@ public class MCRUploadApplet extends JApplet {
             System.out.println("MALFORMED URL: " + targetURL);
         }
     }
-    
+
     /**
      * provides translation for the given label (property key).
      * 
@@ -210,29 +220,30 @@ public class MCRUploadApplet extends JApplet {
         String result;
         Locale currentLocale = getLocale();
         ResourceBundle message = ResourceBundle.getBundle("messages", new Locale(currentLocale.getLanguage()));
-        
-        try { 
+
+        try {
             result = message.getString(label);
         } catch (java.util.MissingResourceException mre) {
             result = "???" + label + "???";
-            System.err.println(mre.getMessage()); 
+            System.err.println(mre.getMessage());
         }
-         
+
         return result;
     }
-    
-    private final Color getColorParameter(String name){
-        String value=getParameter(name);
-        if (value == null){
+
+    private final Color getColorParameter(String name) {
+        String value = getParameter(name);
+        if (value == null) {
             return null;
         }
         int rgbValue;
         try {
-            rgbValue = Integer.parseInt(value.substring(1),16);
+            rgbValue = Integer.parseInt(value.substring(1), 16);
         } catch (NumberFormatException e) {
-            return null;
+            // in this case return red
+            return new Color((float) 1.0, (float) 0.0, (float) 0.0);
         }
         return new Color(rgbValue);
     }
-    
+
 }
