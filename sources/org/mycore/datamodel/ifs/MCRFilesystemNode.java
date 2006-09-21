@@ -380,7 +380,7 @@ public abstract class MCRFilesystemNode {
         Element child = doc.getRootElement().getChild(data.getName());
         if (child != null)
             child.detach();
-        doc.getRootElement().addContent(data);
+        doc.getRootElement().addContent((Element)(data.clone()));
         dataFile.setContentFrom(doc);
     }
 
