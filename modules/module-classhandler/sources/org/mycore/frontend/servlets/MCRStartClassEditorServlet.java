@@ -225,18 +225,16 @@ public class MCRStartClassEditorServlet extends MCRServlet  {
       StringBuffer sb = new StringBuffer();
       
       if ( "modify-classification".equals(todo)) {   
-        sb.append(getBaseURL()).append("services/MCRWebService?method=MCRDoRetrieveClassification&level=5&type=children&classID=").append(clid).append("&catID=");
+        sb.append("classification:metadata:0:parents:").append(clid);
         params.put( "XSL.editor.source.url", sb.toString() );      
-        params.put( "XSL.layout", "soap" );      
         
       } else if( "create-classification".equals(todo) ){
     	params.put( "XSL.editor.source.new","true" );   	    	
       } else { 
          // to editor category type redirect
-         sb.append(getBaseURL()).append("services/MCRWebService?method=MCRDoRetrieveClassification&level=0&type=children&classID=").append(clid).append("&catID=").append(categid);
+         sb.append("classification:metadata:0:children:").append(clid).append(':').append(categid);
          params.put( "XSL.editor.source.url", sb.toString() );      
      	 params.put( "categid", categid );
-         params.put( "XSL.layout", "soap" );      
       }
       params.put( "XSL.editor.cancel.url", getBaseURL()+ cancelpage);
   	  params.put( "clid", clid);

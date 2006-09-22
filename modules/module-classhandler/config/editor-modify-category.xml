@@ -75,8 +75,8 @@
 	</cell>
   </panel>
 	 	 
-  <text id="AClid" id="AClid" i18n="classedit.label.modcateg.aclid" class="editorlabel"/>
-  <text id="BClid" id="AClid" i18n="classedit.label.modcateg.aclid" class="editorlabel"/>
+  <text id="AClid" i18n="classedit.label.modcateg.aclid" class="editorlabel"/>
+  <text id="BClid" i18n="classedit.label.modcateg.aclid" class="editorlabel"/>
 <!-- *** End *** -->
 
  </components>
