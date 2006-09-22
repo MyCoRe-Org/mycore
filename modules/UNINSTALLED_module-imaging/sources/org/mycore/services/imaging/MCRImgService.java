@@ -98,8 +98,8 @@ public class MCRImgService {
 				scaleHelp = scaleHelpW;
 				cacheHeight = (int) (cacheHeight * scaleHelp);
 			}
-
-			if (newWidth == thumbWidth || newHeight == thumbHeight && cache.existInCache(image, MCRImgCacheManager.THUMB)) {
+			
+			if ((newWidth == thumbWidth || newHeight == thumbHeight) && cache.existInCache(image, MCRImgCacheManager.THUMB)) {
 				LOGGER.debug("*********************************************");
 				LOGGER.debug("* Get Thumbnail from ImgCache for " + image.getName());
 				LOGGER.debug("*********************************************");
