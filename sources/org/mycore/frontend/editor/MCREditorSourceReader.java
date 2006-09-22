@@ -38,7 +38,7 @@ import org.mycore.frontend.servlets.MCRServlet;
  */
 public class MCREditorSourceReader {
     
-    private final static int MAX_URI_PROTOCOL_LENGTH=10;
+    private final static int MAX_URI_PROTOCOL_LENGTH=15;
     
     /**
      * Reads XML input from an url and builds a list of source variable elements

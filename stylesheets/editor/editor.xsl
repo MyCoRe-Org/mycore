@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
 <!-- ============================================== -->
-<!-- $Revision: 1.48 $ $Date: 2006-05-26 15:30:17 $ -->
+<!-- $Revision: 1.49 $ $Date: 2006-09-22 13:01:58 $ -->
 <!-- ============================================== --> 
 
 <xsl:stylesheet 
@@ -1240,6 +1240,9 @@
   <xsl:variable name="return">
     <xsl:choose>
         <xsl:when test="starts-with($url,'http://') or starts-with($url,'https://') or starts-with($url,'file://')">
+            <xsl:value-of select="$url" />
+        </xsl:when>
+        <xsl:when test="starts-with($url,'classification:')">
             <xsl:value-of select="$url" />
         </xsl:when>
         <xsl:otherwise>
