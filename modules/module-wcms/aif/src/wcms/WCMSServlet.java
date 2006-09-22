@@ -58,7 +58,7 @@ public abstract class WCMSServlet extends MCRServlet {
         if (isValidUser()) {
         	processRequest(job.getRequest(), job.getResponse());
         } else {
-       	    job.getResponse().sendRedirect(CONFIG.getString("MCR.WCMS.sessionError"));     	 
+       	    job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(CONFIG.getString("MCR.WCMS.sessionError")));     	 
         }
     }
 

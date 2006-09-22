@@ -290,7 +290,7 @@ public class MCRFileNodeServlet extends MCRServlet {
     private void sendFile(HttpServletRequest req, HttpServletResponse res, MCRFile file) throws IOException {
         if (!MCRAccessManager.checkPermissionForReadingDerivate(file.getOwnerID())) {
             LOGGER.info("MCRFileNodeServlet: AccessForbidden to " + file.getName());
-            res.sendRedirect(getBaseURL() + accessErrorPage);
+            res.sendRedirect(res.encodeRedirectURL(getBaseURL() + accessErrorPage));
             return;
         }
 

@@ -418,7 +418,7 @@ public class WCMSActionServlet extends WCMSServlet {
                  {
             	  jump = getbackaddr(); 
                  }
-            	response.sendRedirect(jump);
+            	response.sendRedirect(response.encodeRedirectURL(jump));
                
               }	
             else
