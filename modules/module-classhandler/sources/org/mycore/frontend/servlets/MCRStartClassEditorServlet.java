@@ -45,7 +45,7 @@ import org.mycore.user2.*;
  * The servlet start the MyCoRe class editor session
  * with some parameters from a HTML form. The parameters are:<br />
  * <li> name="todo" values like 'create-classification, modify-classification, delete-classification, up and down' </li>
- * <li> name="path" uri topage after editactions </li>
+ * <li> name="path" uri to page after editactions </li>
  * <li> name="clid" classification id </li>  
  * <li> name="categid" category id </li>  
  *
@@ -216,7 +216,7 @@ public class MCRStartClassEditorServlet extends MCRServlet  {
     	
     }
     
-    // erster aufruf, Editor wird aufgebaut
+    // first call of editor, build the editor dialogue
     if (	"create-category".equals(todo) || "modify-category".equals(todo)    	      
         ||  "create-classification".equals(todo) || "modify-classification".equals(todo)) {   
     	   
@@ -225,15 +225,9 @@ public class MCRStartClassEditorServlet extends MCRServlet  {
       StringBuffer sb = new StringBuffer();
       
       if ( "modify-classification".equals(todo)) {   
-        // an Editor Classificationtype weiterleiten
-        // Exp. servlets/MCRQueryServlet?XSL.Style=classif-editor&type=class&query=/mycoreclass[@ID='atlibri_class_00000002']
-   	
-        sb.append(getBaseURL()).append("servlets/MCRQueryServlet")
-          .append("?XSL.Style=classif-editor")
-          .append("&type=class")        
-          .append("&hosts=").append(CONFIG.getString("MCR.editor_baseurl","local"))
-          .append("&query=/mycoreclass%5b@ID=%22").append(clid).append("%22%5d");
+        sb.append(getBaseURL()).append("services/MCRWebService?method=MCRDoRetrieveClassification&level=5&type=children&classID=").append(clid).append("&catID=");
         params.put( "XSL.editor.source.url", sb.toString() );      
+        params.put( "XSL.layout", "soap" );      
         
       } else if( "create-classification".equals(todo) ){
     	params.put( "XSL.editor.source.new","true" );   	    	
@@ -242,6 +236,7 @@ public class MCRStartClassEditorServlet extends MCRServlet  {
          sb.append(getBaseURL()).append("services/MCRWebService?method=MCRDoRetrieveClassification&level=0&type=children&classID=").append(clid).append("&catID=").append(categid);
          params.put( "XSL.editor.source.url", sb.toString() );      
      	 params.put( "categid", categid );
+         params.put( "XSL.layout", "soap" );      
       }
       params.put( "XSL.editor.cancel.url", getBaseURL()+ cancelpage);
   	  params.put( "clid", clid);

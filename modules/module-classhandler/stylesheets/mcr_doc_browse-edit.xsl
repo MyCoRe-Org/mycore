@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
 <!-- ============================================== -->
-<!-- $Revision: 1.1 $ $Date: 2006-09-18 11:02:17 $ -->
+<!-- $Revision: 1.2 $ $Date: 2006-09-22 09:45:04 $ -->
 <!-- ============================================== -->
 
 <!-- +
@@ -315,10 +315,10 @@
 			  </form>   
  		    </td><td  width="25" valign="top" >			   
 			<a  target="new" alt="$classifID" 
-				onclick="fensterCodice('{$WebApplicationBaseURL}receive/{$classifID}{$HttpSession}?XSL.Style=xml','{$classifID}');return false;" 
-				href="{$WebApplicationBaseURL}receive/{$classifID}{$HttpSession}?XSL.Style=xml" >
+				onclick="fensterCodice('{$WebApplicationBaseURL}services/MCRWebService{$HttpSession}?method=MCRDoRetrieveClassification&amp;level=3&amp;type=children&amp;classID={$classifID}&amp;categID=');return false;" 
+				href="{$WebApplicationBaseURL}services/MCRWebService{$HttpSession}?method=MCRDoRetrieveClassification&amp;level=3&amp;type=children&amp;classID={$classifID}&amp;categID=" >
  		     <input 
-  				  onclick="fensterCodice('{$WebApplicationBaseURL}receive/{$classifID}{$HttpSession}?XSL.Style=xml','{$classifID}');return false;" 
+  				  onclick="fensterCodice('{$WebApplicationBaseURL}services/MCRWebService{$HttpSession}?method=MCRDoRetrieveClassification&amp;level=3&amp;type=children&amp;classID={$classifID}&amp;categID=');return false;" 
 				  type="image" src='{$classexport}' title="{i18n:translate('Browse.classExport')}" />
  		    </a>			   
  		    </td><td  width="25" valign="top" >			   
@@ -341,8 +341,8 @@
 	  </tr>
   </xsl:for-each>	
 	  <xsl:if test="$canEdit = 'true'">
-	  <tr><td colspan="4" align="right">
-		  <hr/>
+	  <tr><td colspan="4" align="center">
+		  <hr/><br />
 		  <table><tr><td>
 		      <form action="{$WebApplicationBaseURL}servlets/MCRStartClassEditorServlet{$HttpSession}" method="get" >
  				 <input type="hidden" name="path" value='{$path}' />

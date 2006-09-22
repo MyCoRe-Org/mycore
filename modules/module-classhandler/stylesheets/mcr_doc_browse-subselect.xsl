@@ -1,7 +1,7 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml version="1.0" encoding="UTF-8"?>
 
 <!-- ============================================== -->
-<!-- $Revision: 1.1 $ $Date: 2006-09-18 11:02:17 $ -->
+<!-- $Revision: 1.2 $ $Date: 2006-09-22 09:45:04 $ -->
 <!-- ============================================== -->
 
 <!-- +
@@ -142,7 +142,7 @@
   <p>ID der Klassifikation:<xsl:value-of select="classifID" /></p>
   <p>Bezeichnung:<xsl:value-of select="label" /></p>
   <p>Begin:<xsl:value-of select="startPath" /></p>
-  <p>Vorgänger:<xsl:value-of select="navigationtree/@predecessor" /></p>
+  <p>VorgÃ¤nger:<xsl:value-of select="navigationtree/@predecessor" /></p>
   <p>Aktuelle Kategorie:<xsl:value-of select="navigationtree/@categID" /></p>
    -->
 </div>

@@ -1,16 +1,16 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE editor>
 
 <editor>
  <target type="servlet" name="MCRStartClassEditorServlet" method="get" format="xml" />
  <components root="create-classification" var="/mycoreclass">
+
   <include uri="webapp:editor/imports-common.xml" />
+
   <headline anchor="CENTER">
-   <text>
-    <label xml:lang="de">Klassifikationseditor: Erstellen einer neuen Klassifikation<p/></label>
-    <label xml:lang="en">Create a new classification<p/></label>
-   </text>
+   <text i18n="classedit.headline.addclass" />
   </headline>
+
   <panel id="create-classification">	  	  
 	<cell col="1" row="1" colspan="2" anchor="NORTHWEST"  ref="NewClass" />	  	  	  
 	<cell col="1" row="4" colspan="2" ><space width="1px" height="10px" /></cell>	
@@ -21,16 +21,13 @@
     <hidden var="@ID" />
     <cell col="1" row="1" colspan="2" anchor="NORTHWEST" ref="AClid" />	  	  	  
     <cell col="1" row="2" anchor="NORTHWEST">	  
-	  <text><label>  <span class="editorlabel">ID(*):</span>    </label>     </text>		
+	  <text i18n="classedit.label.id.p" class="editorlabel" />
 	</cell>	
     <cell col="2" row="2" anchor="NORTHWEST">
-	  <text>
-		  <label xml:lang="de">  <span class="editorlabel">Systeminterne Vergabe</span>    </label>
-		  <label xml:lang="en">  <span class="editorlabel">system id</span>    </label>
-	  </text>	
+	  <text i18n="classedit.label.sysid" class="editorlabel" />
     </cell> 	  	  
     <cell col="1" row="3" anchor="NORTHWEST">	  
-	  <text><label><span class="editorlabel">Label(*):</span>    </label>     </text>		
+	  <text i18n="classedit.label.label.p" class="editorlabel"/>
 	</cell>		  
     <cell col="2" row="3" var="label" anchor="NORTHWEST" >
 		   <repeater min="1" max="10" ref="RNewClassLabel" />      
@@ -41,33 +38,20 @@
   <panel id="RNewClassLabel">
 	<cell col="1" row="1" anchor="NORTHWEST" ref="Slang" var="@lang" default="de"/>    	  
     <cell col="2" row="1" anchor="NORTHWEST">	  
-	  <text>
-		  <label xml:lang="de">  <span class="editorlabel">Sprache:</span>    </label>
-		  <label xml:lang="en">  <span class="editorlabel">Language:</span>    </label>
-	  </text>	
+	  <text i18n="classedit.label.lang" class="editorlabel"/>
 	</cell>
     <cell col="1" row="2" anchor="NORTHWEST" ref="TFzeile1024" var="@text"  />	  
     <cell col="2" row="2" anchor="NORTHWEST">	  
-	  <text><label><span class="editorlabel">Text:</span> </label></text>		
+	  <text i18n="classedit.label.text.p" class="editorlabel"/>
 	</cell>	  
     <cell col="1" row="3" anchor="NORTHWEST" ref="TFzeile1024"  var="@description"  />	  
     <cell col="2" row="3" anchor="NORTHWEST">	  
-	  <text>
-		<label xml:lang="de">  <span class="editorlabel">Beschreibung:</span>    </label>
-		<label xml:lang="en">  <span class="editorlabel">Description:</span>    </label>
-	 </text>			  
+	  <text i18n="classedit.label.description" class="editorlabel"/>
 	</cell>	  
 	  
   </panel>
 	 	 
-  <text id="AClid">
-    <label xml:lang="de">
-      <span class="editorlabel"><b>neue Klassifikation</b></span>
-    </label>
-    <label xml:lang="en">
-      <span class="editorlabel"><b>new Classification</b></span>
-    </label>
-  </text>
+  <text id="AClid" i18n="classedit.label.addclass.aclid" class="editorlabel"/>
 
 <!-- *** End *** -->
 

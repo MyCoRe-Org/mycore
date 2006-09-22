@@ -1,16 +1,16 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE editor>
 
 <editor>
  <target type="servlet" name="MCRStartClassEditorServlet" method="get" format="xml" />
  <components root="import-classification" var="/mycoreclass">
+
   <include uri="webapp:editor/imports-common.xml" />
+
   <headline anchor="CENTER">
-   <text>
-    <label xml:lang="de">Klassifikationseditor: Importieren einer Klassifikationsdatei zur Erzeugung oder Aktualisierung einer Klassifikation.<p/></label>
-    <label xml:lang="en">import a classification file for create or update <p/></label>
-   </text>
+   <text i18n="classedit.headline.impclass" />
   </headline>
+
   <panel id="import-classification">	  	  
     <cell col="1" row="1" anchor="NORTHWEST" ref="LFileP" />
     <cell col="2" row="1" anchor="NORTHWEST" ref="DFileUploadDoc" />
@@ -31,17 +31,10 @@
 	 
   <panel id="RBupdate" lines="on">
     <cell row="1" col="1" anchor="WEST" var="update">
-	 <list id="Supdate" width="400" type="radio" cols="2" default="true">
-     <item value="true" default="true">
-      <label xml:lang="de">vorhandene Klassifikation</label>
-      <label xml:lang="en">import for update a classification</label>
-    </item>
-    <item value="false">
-      <label xml:lang="de">neue Klassifikation</label>
-      <label xml:lang="en">import a new classification</label>
-    </item>
-  </list>
-		
+	  <list id="Supdate" width="400" type="radio" cols="2" default="true">
+        <item value="true" default="true" i18n="classedit.label.impclass.aclid" />
+        <item value="false" i18n="classedit.label.impclass.bclid" />
+      </list>		
     </cell>  
   </panel>
 
