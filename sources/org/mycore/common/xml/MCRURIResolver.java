@@ -447,16 +447,43 @@ public class MCRURIResolver implements javax.xml.transform.URIResolver, EntityRe
             StringBuffer url = new StringBuffer(MCRServlet.getBaseURL());
             url.append(path);
 
-            if (path.indexOf("?") != -1) {
-                url.append("&");
+            final MCRSession currentSession = MCRSessionMgr.getCurrentSession();
+            final Object httpSessionID = currentSession.get("http.session");
+            final String finalURL;
+            if (httpSessionID == null) {
+                if (path.indexOf("?") != -1) {
+                    url.append("&");
+                } else {
+                    url.append("?");
+                }
+                url.append("MCRSessionID=");
+                url.append(currentSession.getID());
+                finalURL = url.toString();
             } else {
-                url.append("?");
+                finalURL = toEncoded(url.toString(), httpSessionID.toString());
             }
 
-            url.append("MCRSessionID=");
-            url.append(MCRSessionMgr.getCurrentSession().getID());
+            return fallback.resolveElement(finalURL);
+        }
 
-            return fallback.resolveElement(url.toString());
+        private String toEncoded(String url, String sessionId) {
+
+            if ((url == null) || (sessionId == null)) {
+                return (url);
+            }
+            String path = url;
+            String query = "";
+            int queryPos = url.indexOf('?');
+            if (queryPos >= 0) {
+                path = url.substring(0, queryPos);
+                query = url.substring(queryPos);
+            }
+            StringBuffer sb = new StringBuffer(path);
+            sb.append(";jsessionid=");
+            sb.append(sessionId);
+            sb.append(query);
+            return (sb.toString());
+
         }
     }
 

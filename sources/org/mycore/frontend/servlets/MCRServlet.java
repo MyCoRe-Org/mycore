@@ -161,6 +161,9 @@ public class MCRServlet extends HttpServlet {
 		// Create a new session
 		// Store current session in HttpSession
 		theSession.setAttribute("mycore.session", session);
+        //store the HttpSession ID in MCRSession
+        session.put("http.session", theSession.getId());
+       
 
 		// Bind current session to this thread:
 		MCRSessionMgr.setCurrentSession(session);
