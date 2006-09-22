@@ -74,7 +74,9 @@ public class MCRUploadApplet extends JApplet {
     public void init() {
         uploadId = getParameter("uploadId");
         targetURL = getParameter("url");
-        peerURL = getParameter("ServletsBase") + "MCRUploadServlet";
+        String httpSession = getParameter("httpSession");
+        peerURL = addSessionInfo(getParameter("ServletsBase") + "MCRUploadServlet",httpSession);
+        System.out.println("Will connect with: "+peerURL);
         Color bg = getColorParameter("background-color");
         System.out.println(bg.toString());
         setBackground(bg);
@@ -244,6 +246,25 @@ public class MCRUploadApplet extends JApplet {
             return new Color((float) 1.0, (float) 0.0, (float) 0.0);
         }
         return new Color(rgbValue);
+    }
+
+    private String addSessionInfo(String url, String sessionId) {
+    
+        if ((url == null) || (sessionId == null)) {
+            return url;
+        }
+        String path = url;
+        String query = "";
+        int queryPos = url.indexOf('?');
+        if (queryPos >= 0) {
+            path = url.substring(0, queryPos);
+            query = url.substring(queryPos);
+        }
+        StringBuffer sb = new StringBuffer(path);
+        sb.append(";jsessionid=");
+        sb.append(sessionId);
+        sb.append(query);
+        return sb.toString();
     }
 
 }
