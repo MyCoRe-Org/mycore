@@ -19,6 +19,7 @@ Version 1.3
  - Added event handler implementation to extract technical metadata from MCRFile's content
  - Added ID3v1/ID3v2/LyricsV3 metadata extraction from MP3 files
  - Added EXIF/IPTC metadata extraction from JPEG files
+ - Added metadata extraction from PDF files
 
 Version 1.2
 ===========
