@@ -42,13 +42,14 @@ public interface MCRWS
    * @param level   number of levels to retrievwe   
    * @param type    parents|children   
    * @param classID The ID of the classification   
-   * @param categID   categroryID where retrieval with level starts   
+   * @param categID   categroryID where retrieval with level starts
+   * @param format of retrieved classification, valid values are: editor['['formatAlias']']|metadata    
    * 
    * @return data of mycore classification
    * 
    **/
   public abstract org.w3c.dom.Document MCRDoRetrieveClassification( String level, String type,
-      String classID, String categID) throws Exception;
+      String classID, String categID, String format) throws Exception;
 
   /**
    * Search for MyCoRe objects

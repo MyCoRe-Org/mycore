@@ -394,9 +394,15 @@ public class MCRIndexBrowserData {
                 String[] listelm = new String[ ic.outputFields.length + 2];                
             	Element child = (Element)(mcrHit.get( i ));   
                 //logger.debug("\n" + out.outputString(child));
-            	
+            	Document od = new Document(); 
 	       		MCRObject oo = new MCRObject();
-	    	    Document od =  oo.receiveJDOMFromDatastore(child.getAttributeValue("id"));
+	       		try {
+	       			od =  oo.receiveJDOMFromDatastore(child.getAttributeValue("id"));
+	       		} catch (Exception yy) {
+	       			// object dos'nt exist in Database????
+	       			continue;
+	       		}
+	       		
 
 	    	    // List elemente[sortfield, browsefield, extraoutputfields1, extraoutputfield2, ... extrafieldn]
             	

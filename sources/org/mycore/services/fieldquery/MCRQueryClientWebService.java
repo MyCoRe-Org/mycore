@@ -178,9 +178,11 @@ public class MCRQueryClientWebService extends MCRQueryClientBase {
      *            the class ID of the classification to retrieve
      * @param categID
      *            the category ID of the classification to retrieve
+     * @param format
+     *             of retrieved classification, valid values are: editor['['formatAlias']']|metadata
      * @return the classification document
      */
-    public org.w3c.dom.Document doRetrieveClassification(String level, String type, String classID, String categID) {
+    public org.w3c.dom.Document doRetrieveClassification(String level, String type, String classID, String categID, String format) {
         StringBuffer ID = new StringBuffer(256);
         ID.append("level=").append(level).append(":type=").append(type).append(":classId=").append(classID).append(":categId=").append(categID);
         try {
@@ -194,9 +196,10 @@ public class MCRQueryClientWebService extends MCRQueryClientBase {
             call.addParameter("type", org.apache.axis.Constants.XSD_STRING, javax.xml.rpc.ParameterMode.IN);
             call.addParameter("classID", org.apache.axis.Constants.XSD_STRING, javax.xml.rpc.ParameterMode.IN);
             call.addParameter("categID", org.apache.axis.Constants.XSD_STRING, javax.xml.rpc.ParameterMode.IN);
+            call.addParameter("format", org.apache.axis.Constants.XSD_STRING, javax.xml.rpc.ParameterMode.IN);
             call.setReturnType(new QName("http://xml.apache.org/xml-soap", "Document"));
             // Call webservice
-            org.w3c.dom.Document outDoc = (org.w3c.dom.Document) (call.invoke(new Object[] { level, type, classID, categID }));
+            org.w3c.dom.Document outDoc = (org.w3c.dom.Document) (call.invoke(new Object[] { level, type, classID, categID, format }));
             LOGGER.info("Received remote Object: " + ID.toString());
 
             return outDoc;

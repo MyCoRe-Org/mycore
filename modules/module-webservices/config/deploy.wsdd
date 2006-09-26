@@ -37,6 +37,9 @@
       <parameter name="catID" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema">
         <documentation>The ID of the category within classification</documentation>
       </parameter>
+      <parameter name="format" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema">
+        <documentation>Format of Classifcation retrieval, values may be editor['['formatAlias']']|metadata</documentation>
+      </parameter>
     </operation>
 
     <operation name="MCRDoQuery">
