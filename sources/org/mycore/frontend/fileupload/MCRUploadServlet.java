@@ -47,8 +47,11 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.log4j.Logger;
 import org.jdom.Element;
+import org.mycore.common.MCRCache;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRException;
+import org.mycore.common.MCRSession;
+import org.mycore.common.MCRSessionMgr;
 import org.mycore.frontend.editor.MCREditorSubmission;
 import org.mycore.frontend.editor.MCRRequestParameters;
 import org.mycore.frontend.servlets.MCRServlet;
@@ -73,6 +76,8 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
     static ServerSocket server;
 
     static Logger LOGGER = Logger.getLogger(MCRUploadServlet.class);
+
+    static MCRCache sessionIDs = new MCRCache(100);
 
     public synchronized void init() throws ServletException {
         super.init();
@@ -130,6 +135,13 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
             LOGGER.debug("Received path = " + path);
             LOGGER.debug("Received uploadID = " + uploadId);
 
+            // Remember current MCRSession for upload
+            String sessionID = (String) (sessionIDs.get(uploadId));
+            if (sessionID != null) {
+                MCRSession session = MCRSession.getSession(sessionID);
+                if (session != null)
+                    MCRSessionMgr.setCurrentSession(session);
+            }
             MCRUploadHandlerManager.getHandler(uploadId).receiveFile(path, zis);
 
             LOGGER.debug("Stored incoming file content");
@@ -204,6 +216,11 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
             String uploadId = req.getParameter("uploadId");
             int numFiles = Integer.parseInt(req.getParameter("numFiles"));
             MCRUploadHandlerManager.getHandler(uploadId).startUpload(numFiles);
+
+            // Remember current MCRSession for upload
+            String sessionID = MCRSessionMgr.getCurrentSession().getID();
+            sessionIDs.put(uploadId, sessionID);
+
             LOGGER.info("UploadServlet start session " + uploadId);
             sendResponse(res, "OK");
         } else if (method.equals("createFile String")) {

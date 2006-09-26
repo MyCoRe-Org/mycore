@@ -141,7 +141,7 @@ public class MCRZipServlet extends MCRServlet {
             if (id.indexOf("_derivate_") > 0) {
                 if (!MCRAccessManager.checkPermissionForReadingDerivate(id)) {
                     LOGGER.info("MCRFileNodeServlet: AccessForbidden to " + id);
-                    res.sendRedirect(getBaseURL() + accessErrorPage);
+                    res.sendRedirect(res.encodeRedirectURL(getBaseURL() + accessErrorPage));
                     return;
                 }
                 out = buildZipOutputStream(res, id, path);
@@ -151,7 +151,7 @@ public class MCRZipServlet extends MCRServlet {
                 Document jdom = xmltable.readDocument(mcrid);
                 if (!AI.checkPermission(id, "read")) {
                     LOGGER.info("MCRFileNodeServlet: AccessForbidden to " + id);
-                    res.sendRedirect(getBaseURL() + accessErrorPage);
+                    res.sendRedirect(res.encodeRedirectURL(getBaseURL() + accessErrorPage));
                     return;
                 }
                 out = buildZipOutputStream(res, id, path);

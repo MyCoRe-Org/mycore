@@ -196,7 +196,7 @@ public class MCRData2Fields {
             Document xsl = buildStylesheet(index, MCRFieldDef.FILE_ADDITIONAL_DATA);
             Document xml = null;
             try {
-                xml = file.getAdditionalData();
+                xml = file.getAllAdditionalData();
             } catch (Exception ex) {
                 String msg = "Exception while reading additional XML data of MCRFile " + file.getOwnerID() + " " + file.getAbsolutePath();
                 LOGGER.error(msg, ex);

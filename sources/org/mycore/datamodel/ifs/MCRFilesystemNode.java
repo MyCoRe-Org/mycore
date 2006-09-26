@@ -29,6 +29,7 @@ import java.text.SimpleDateFormat;
 import java.util.GregorianCalendar;
 
 import org.jdom.Document;
+import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.mycore.common.MCRArgumentChecker;
 
@@ -118,6 +119,7 @@ public abstract class MCRFilesystemNode {
     }
 
     public void delete() {
+        this.removeAllAdditionalData();
         manager.deleteNode(ID);
 
         if (parentID != null) {
@@ -354,23 +356,63 @@ public abstract class MCRFilesystemNode {
     }
 
     /**
-     * Stores additional XML data for this node.
+     * Stores additional XML data for this node. The name of the data element is
+     * used as unique key for storing data. If data with this name already
+     * exists, it is overwritten.
      * 
      * @param data
      *            the additional XML data to be saved
+     * @throws IOException
+     *             if the XML data can not be retrieved
+     * @throws JDOMException
+     *             if the XML data can not be parsed
      */
-    public void setAdditionalData(Document data) {
-        String name = data.getRootElement().getName() + ".mcrdata";
+    public void setAdditionalData(Element data) throws IOException, JDOMException {
+        MCRFile dataFile = MCRFile.getRootFile(this.ID);
+        Document doc;
+        if (dataFile == null) {
+            String name = "MCRFilesystemNode.additionalData";
+            dataFile = new MCRFile(name, this.ID);
+            doc = new Document(new Element("additionalData"));
+        } else
+            doc = dataFile.getContentAsJDOM();
+
+        Element child = doc.getRootElement().getChild(data.getName());
+        if (child != null)
+            child.detach();
+        doc.getRootElement().addContent((Element)(data.clone()));
+        dataFile.setContentFrom(doc);
+    }
+
+    /**
+     * Removes additional XML data from this node.
+     * 
+     * @param dataName
+     *            the name of the additional XML data element to be removed
+     * @throws IOException
+     *             if the XML data can not be retrieved
+     * @throws JDOMException
+     *             if the XML data can not be parsed
+     */
+    public void removeAdditionalData(String dataName) throws IOException, JDOMException {
         MCRFile dataFile = MCRFile.getRootFile(this.ID);
         if (dataFile == null)
-            dataFile = new MCRFile(name, this.ID);
-        dataFile.setContentFrom(data);
+            return;
+        Document doc = dataFile.getContentAsJDOM();
+        Element child = doc.getRootElement().getChild(dataName);
+        if (child != null)
+            child.detach();
+        if (doc.getRootElement().getChildren().size() == 0)
+            dataFile.delete();
+        else
+            dataFile.setContentFrom(doc);
     }
-    
-    public void removeAdditionalData(Document data) {
-        String name = data.getRootElement().getName() + ".mcrdata";
+
+    /**
+     * Removes all additional XML data stored for this node, if any.
+     */
+    public void removeAllAdditionalData() {
         MCRFile dataFile = MCRFile.getRootFile(this.ID);
-        
         if (dataFile != null)
             dataFile.delete();
     }
@@ -378,17 +420,37 @@ public abstract class MCRFilesystemNode {
     /**
      * Gets additional XML data stored for this node, if any.
      * 
-     * @return the additional XML data that was stored, or null
+     * @param dataName
+     *            the name of the additional XML data element to be retrieved
+     * @return the additional XML data elemet that was stored, or null
      * @throws IOException
      *             if the XML data can not be retrieved
      * @throws JDOMException
      *             if the XML data can not be parsed
      */
-    public Document getAdditionalData() throws IOException, JDOMException {
+    public Element getAdditionalData(String dataName) throws IOException, JDOMException {
         MCRFile dataFile = MCRFile.getRootFile(this.ID);
         if ((dataFile == null) || (dataFile.getSize() == 0))
             return null;
-        return dataFile.getContentAsJDOM();
+        Document doc = dataFile.getContentAsJDOM();
+        return doc.getRootElement().getChild(dataName);
+    }
+
+    /**
+     * Gets all additional XML data stored for this node, if any.
+     * 
+     * @return the additional XML data document that was stored, or null
+     * @throws IOException
+     *             if the XML data can not be retrieved
+     * @throws JDOMException
+     *             if the XML data can not be parsed
+     */
+    public Document getAllAdditionalData() throws IOException, JDOMException {
+        MCRFile dataFile = MCRFile.getRootFile(this.ID);
+        if ((dataFile == null) || (dataFile.getSize() == 0))
+            return null;
+        else
+            return dataFile.getContentAsJDOM();
     }
 
     protected static DateFormat formatter = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss_SSS");

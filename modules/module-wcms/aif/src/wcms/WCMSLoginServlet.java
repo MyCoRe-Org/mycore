@@ -107,11 +107,11 @@ public class WCMSLoginServlet extends WCMSServlet {
         	  {
                if (flag.equals("true"))
           	     {
-          		  response.sendRedirect(mcrConf.getString("MCR.WCMS.sessionError")+"?XSL.Style=xml");	
+          		  response.sendRedirect(response.encodeRedirectURL(mcrConf.getString("MCR.WCMS.sessionError")+"?XSL.Style=xml"));	
           	     }
                else
                  {
-                  response.sendRedirect(mcrConf.getString("MCR.WCMS.sessionError"));
+                  response.sendRedirect(response.encodeRedirectURL(mcrConf.getString("MCR.WCMS.sessionError")));
                  }
               }
         	else 

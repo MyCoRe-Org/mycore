@@ -4,7 +4,3 @@ MCRUploadApplet.submit = submit ...
 MCRUploadApplet.dirsel = Select files or directories:
 MCRUploadApplet.altsel = or enter an absolute path:
 MCRUploadApplet.choose = Select files or directories
-
-MCRUploadApplet.color.red   = 255
-MCRUploadApplet.color.green = 100
-MCRUploadApplet.color.blue  = 100

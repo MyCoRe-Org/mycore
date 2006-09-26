@@ -4,7 +4,3 @@ MCRUploadApplet.submit = absenden ...
 MCRUploadApplet.dirsel = Datei(en) oder Verzeichnis(se) w\u00E4hlen:
 MCRUploadApplet.altsel = oder absoluten Pfad eingeben:
 MCRUploadApplet.choose = Datei(en) oder Verzeichnis(se) w\u00E4hlen
-
-MCRUploadApplet.color.red   = 255
-MCRUploadApplet.color.green = 100
-MCRUploadApplet.color.blue  = 100

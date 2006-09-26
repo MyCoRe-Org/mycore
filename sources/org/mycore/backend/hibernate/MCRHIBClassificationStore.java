@@ -450,13 +450,13 @@ public class MCRHIBClassificationStore implements MCRClassificationInterface {
         	//SELECT count * from MCRCLASS !!! ist redundanzfrei!
             List lcount = session.createQuery("from MCRCLASS").list();
             classList = new MCRClassificationItem[lcount.size()];
-            
+
         	//SELECT id, lang, text, mcrdesc FROM MCRCLASSLABEL M order by id, lang, !! ist mehr als count * from MCRCLASS
             List l = session.createQuery("from MCRCLASSLABEL ORDER BY 1,2").list();
             
             int k = -1;
 
-            for(int i=0; i < classList.length; i++) {
+            for(int i=0; i < l.size(); i++) {
             	MCRCLASSLABEL actual = (MCRCLASSLABEL)l.get(i);
             	if ( k==-1 || !classList[k].getClassificationID().equalsIgnoreCase(actual.getId()) ){
             		k++;
@@ -470,7 +470,7 @@ public class MCRHIBClassificationStore implements MCRClassificationInterface {
             	}
             }
         } catch (Exception e) {
-            logger.error(e);
+            logger.error(e.getMessage());
             throw new MCRException("error while retrieving classifications ", e);
         } finally {
             session.close();

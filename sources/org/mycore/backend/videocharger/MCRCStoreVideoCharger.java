@@ -52,6 +52,7 @@ import com.enterprisedt.net.ftp.FTPTransferType;
  *   MCR.IFS.ContentStore.<StoreID>.UserID     User ID for FTP connections, e. g. vsloader
  *   MCR.IFS.ContentStore.<StoreID>.Password   Password for this user
  *   MCR.IFS.ContentStore.<StoreID>.DebugFTP   If true, FTP debug messages are written to stdout, default is false
+ *   MCR.IFS.ContentStore.<StoreID>.AssetGroup Asset group, default is 'AG'
  * </code>
  * 
  * This class also provides a method to backup all assets stored in VideoCharger
@@ -79,6 +80,9 @@ public class MCRCStoreVideoCharger extends MCRContentStore {
 
     /** If true, FTP debug messages are written to stdout */
     protected boolean debugFTP;
+    
+    /** Asset group **/
+    protected String assetGroup;
 
     /** FTP Return code if "quote site avs attr" is successful */
     protected final static String[] ok = { "200" };
@@ -93,6 +97,7 @@ public class MCRCStoreVideoCharger extends MCRContentStore {
         user = config.getString(prefix + "UserID");
         password = config.getString(prefix + "Password");
         debugFTP = config.getBoolean(prefix + "DebugFTP", false);
+        assetGroup = config.getString(prefix + "AssetGroup", "AG" );
     }
 
     protected String doStoreContent(MCRFileReader file, MCRContentInputStream source) throws Exception {
@@ -101,6 +106,7 @@ public class MCRCStoreVideoCharger extends MCRContentStore {
         FTPClient connection = connect();
 
         try {
+            connection.quote("site avs attr assetgroup=" + assetGroup, ok);
             connection.quote("site avs attr title=" + storageID, ok);
             connection.put(source, storageID);
 
@@ -114,6 +120,7 @@ public class MCRCStoreVideoCharger extends MCRContentStore {
         FTPClient connection = connect();
 
         try {
+            connection.quote("site avs attr assetgroup=" + assetGroup, ok);
             connection.delete(storageID);
         } finally {
             disconnect(connection);
@@ -128,6 +135,7 @@ public class MCRCStoreVideoCharger extends MCRContentStore {
         //FTPClient does not provide GET and InputStreams, we need to copy
         ByteArrayOutputStream bout=new ByteArrayOutputStream();
         doRetrieveContent(file, bout);
+        bout.close();
         return new ByteArrayInputStream(bout.toByteArray());
     }
 
@@ -135,6 +143,7 @@ public class MCRCStoreVideoCharger extends MCRContentStore {
         FTPClient connection = connect();
 
         try {
+            connection.quote("site avs attr assetgroup=" + assetGroup, ok);
             connection.get(target, assetID);
         } finally {
             disconnect(connection);
@@ -154,6 +163,8 @@ public class MCRCStoreVideoCharger extends MCRContentStore {
     public static void backupContentTo(String storeID, String directory) throws MCRPersistenceException, Exception {
         MCRAVExtVideoCharger extender = new MCRAVExtVideoCharger();
         extender.readConfig(storeID);
+        MCRCStoreVideoCharger store = new MCRCStoreVideoCharger();
+        store.init( storeID );
 
         String[] list = extender.listAssets();
 
@@ -167,7 +178,7 @@ public class MCRCStoreVideoCharger extends MCRContentStore {
             }
 
             FileOutputStream target = new FileOutputStream(local);
-            new MCRCStoreVideoCharger().retrieveContent(list[i], target);
+            store.retrieveContent(list[i], target);
             target.close();
         }
     }
