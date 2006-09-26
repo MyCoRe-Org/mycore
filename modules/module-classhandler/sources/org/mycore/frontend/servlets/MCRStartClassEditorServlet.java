@@ -33,6 +33,8 @@ import java.util.Properties;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.log4j.Logger;
 import org.jdom.output.XMLOutputter;
+import org.mycore.common.MCRSession;
+import org.mycore.common.MCRSessionMgr;
 import org.mycore.datamodel.classifications.MCRClassificationEditor;
 import org.mycore.frontend.editor.MCREditorSubmission;
 import org.mycore.frontend.editor.MCRRequestParameters;
@@ -76,6 +78,8 @@ public class MCRStartClassEditorServlet extends MCRServlet {
      */
     public void doGetPost(MCRServletJob job) throws Exception {
 
+        MCRSession session = MCRSessionMgr.getCurrentSession();
+        
         // read the XML data if given from Editorsession
         MCREditorSubmission sub = (MCREditorSubmission) (job.getRequest().getAttribute("MCREditorSubmission"));
 
@@ -139,9 +143,11 @@ public class MCRStartClassEditorServlet extends MCRServlet {
                 if ("create-category".equals(todo2)) {
                     // create
                     bret = clE.createCategoryInClassification(indoc, clid, categid);
+                    session.BData.cleanClassificationFromCache(clid);
                 } else {
                     // modify
                     bret = clE.modifyCategoryInClassification(indoc, clid, categid);
+                    session.BData.cleanClassificationFromCache(clid);
                 }
                 if (bret)
                     job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(path + "&categid=" + categid + "&clid=" + clid));
@@ -167,6 +173,7 @@ public class MCRStartClassEditorServlet extends MCRServlet {
                     }
                 }
                 if (bret)
+                    session.BData.cleanClassificationFromCache(clid);
                     job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(path));
 
             }
@@ -178,6 +185,7 @@ public class MCRStartClassEditorServlet extends MCRServlet {
         if ("up-category".equals(todo) || "down-category".equals(todo) || "left-category".equals(todo) || "right-category".equals(todo)) {
             boolean bret = clE.moveCategoryInClassification(categid, clid, todo.substring(0, todo.indexOf("-")));
             if (bret) {
+                session.BData.cleanClassificationFromCache(clid);
                 job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(path + "&categid=" + categid + "&clid=" + clid));
             } else {
                 job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + imerrorpage));
@@ -185,21 +193,20 @@ public class MCRStartClassEditorServlet extends MCRServlet {
             return;
         }
 
-        // beim ersten Aufruf, direkt ohnen editor
+        // first call, direct without editor
         else if ("delete-category".equals(todo)) {
             // l�schen
             int cnt = clE.deleteCategoryInClassification(clid, categid);
-            if (cnt == 0) { // ok - gel�scht , da keine referenzen auf Category
-                // vorhanden
+            if (cnt == 0) { // deleted, no more references
+                session.BData.cleanClassificationFromCache(clid);
                 job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(path + "&clid=" + clid));
-            } else { // nicht gel�scht, da noch Referenzen auf Category
-                // vorhanden
+            } else { // not delete cause references exist
                 job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + iderrorpage));
             }
             return;
         }
 
-        // first call, direct without beim ersten Aufruf, direkt ohnen editor
+        // first call, direct without editor
         else if ("delete-classification".equals(todo)) {
             boolean cnt = clE.deleteClassification(clid);
             if (cnt) { // deleted, no more references
@@ -207,15 +214,15 @@ public class MCRStartClassEditorServlet extends MCRServlet {
                     // Classification cut
                     path = path.substring(0, path.indexOf("&clid"));
                 }
+                session.BData.cleanClassificationFromCache(clid);
                 job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(path));
-            } else { // nicht gel�scht, da noch Referenzen auf Category
-                // vorhanden
+            } else { // not delete cause references exist
                 job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + iderrorpage));
             }
             return;
         }
 
-        // erster aufruf, Editor wird aufgebaut
+        // first call of editor, build the import dialogue
         else if ("import-classification".equals(todo)) {
             String base = getBaseURL() + myfile;
             Properties params = new Properties();

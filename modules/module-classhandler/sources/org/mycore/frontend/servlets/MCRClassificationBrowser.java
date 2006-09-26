@@ -56,7 +56,7 @@ public class MCRClassificationBrowser extends MCRServlet {
         /*
          * default classification
          */
-        LOGGER.debug(this.getClass() + " Start");
+        LOGGER.debug("Start brwosing in classifications");
         MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
         lang = mcrSession.getCurrentLanguage();
 
@@ -80,8 +80,8 @@ public class MCRClassificationBrowser extends MCRServlet {
         if (job.getRequest().getParameter("categid") != null)
             actcateg = job.getRequest().getParameter("categid");
 
-        LOGGER.debug(this.getClass() + " Path = " + uri);
-        LOGGER.debug(this.getClass() + " Mode = " + mode);
+        LOGGER.debug("Browsing Path = " + uri);
+        LOGGER.debug("Browsing  Mode = " + mode);
 
         try {
             mcrSession.BData = new MCRClassificationBrowserData(uri, mode, actclid, actcateg);
@@ -108,11 +108,11 @@ public class MCRClassificationBrowser extends MCRServlet {
         String path = getServletContext().getRealPath(coverPage);
         File file = new File(path);
         if (!file.exists()) {
-            LOGGER.debug(this.getClass() + " did not find the CoverPage " + path);
+            LOGGER.debug("Did not find the CoverPage " + path);
             return null;
         }
         SAXBuilder sxbuild = new SAXBuilder();
-        LOGGER.debug(this.getClass() + " found CoverPage " + path);
+        LOGGER.debug("Found CoverPage " + path);
         return sxbuild.build(file);
 
     }
