@@ -1,0 +1,6 @@
+http://www.drewnoakes.com/code/exif/
+
+This metadata library is available with Java source code for usage in the public domain.
+
+You're free to use this code as you see fit. Please send me a short email to let me know if you find it useful. If you make interesting changes, mail me a copy and I'll include the details on this site. The continual contact with users and contributors of the library encourages and motivates me to keep making improvements. The code is protected by copyrighted, though only to avoid people selling it unmodified or copyrighting it themselves. You are free to sell work based upon this library, though please consider making a donation. 
+
