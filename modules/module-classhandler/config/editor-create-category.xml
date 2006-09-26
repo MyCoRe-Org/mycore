@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE editor>
+
+<editor>
+ <target type="servlet" name="MCRStartClassEditorServlet" method="get" format="xml" />
+ <components root="create-category" var="/mycoreclass">
+
+  <include uri="webapp:editor/imports-common.xml" />
+
+  <headline anchor="CENTER" >	  
+    <text i18n="classedit.headline.addcateg" />
+  </headline>
+
+  <panel id="create-category">	  	  
+	<cell col="1" row="1" colspan="2" anchor="NORTHWEST"  ref="Class" />	  	  	  
+	<cell col="1" row="2" colspan="2" ><space width="1px" height="10px" /></cell>		  
+	<cell col="1" row="5" colspan="2" anchor="NORTHWEST"  var="categories" ref="NewCateg" />	  	  	    	  
+    <cell col="1" row="6" colspan="2" anchor="EAST"      ref="TwoButtons"  />
+  </panel>
+	 	 
+  <panel id="Class">
+    <hidden var="@ID" />
+    <hidden var="label/@text" />
+    <hidden var="label/@description" />	  
+    <cell col="1" row="1" colspan="2" anchor="NORTHWEST" ref="AClid" />	  
+    <cell col="1" row="2" anchor="NORTHWEST">	  
+	  <text i18n="classedit.label.id" class="editorlabel"/>		
+	</cell>	
+    <cell col="2" row="2" anchor="NORTHWEST" ><output var="@ID" default=" "/></cell>  
+    <cell col="1" row="3" anchor="NORTHWEST">	  
+	  <text i18n="classedit.label.label" class="editorlabel"/>		
+	</cell>	
+    <cell col="2" row="3" anchor="NORTHWEST" ><output var="label/@text" default=" "/></cell>    
+    <cell col="1" row="4" anchor="NORTHWEST">	  
+	  <text i18n="classedit.label.description" class="editorlabel"/>
+	</cell>	
+    <cell col="2" row="4" anchor="NORTHWEST" ><output var="label/@description" default=" "/></cell>  	  
+  </panel>
+	 	 
+  <panel id="NewCateg">
+    <hidden var="category/@counter" default="0" />
+    <cell col="1" row="1" colspan="2" anchor="NORTHWEST" ref="BClid" />	  	  	  
+    <cell col="1" row="2" anchor="NORTHWEST">	  
+	  <text i18n="classedit.label.id.p" class="editorlabel" />
+	</cell>	
+    <cell col="2" row="2" anchor="NORTHWEST" ref="TFzeile128" var="category/@ID" />
+	  	  
+    <cell col="1" row="3" anchor="NORTHWEST">	  
+	  <text i18n="classedit.label.label.p" class="editorlabel"/>
+	</cell>		  
+    <cell col="2" row="3" var="category/label" anchor="NORTHWEST" >
+		   <repeater min="1" max="10" ref="RNewCategLabel" />      
+	</cell>	      	  	
+    <cell col="1" row="4" anchor="NORTHWEST">	  
+	  <text i18n="classedit.label.url" class="editorlabel"/>
+	</cell>		  	  
+    <cell col="2" row="4" anchor="NORTHWEST" ref="TFzeile1024" var="category/url/@href" default="de" />   
+	   	 	  	    	  	  
+    <cell col="1" row="5" colspan="2" anchor="NORTHWEST"><space width="1px" height="10px" /></cell>		  
+  </panel>
+	 
+  <panel id="RNewCategLabel">
+	<cell col="1" row="1" anchor="NORTHWEST" ref="Slang" var="@lang" default="de"/>    	  
+    <cell col="2" row="1" anchor="NORTHWEST">	  
+	  <text i18n="classedit.label.lang" class="editorlabel"/>
+	</cell>
+    <cell col="1" row="2" anchor="NORTHWEST" ref="TFzeile1024" var="@text"  />	  
+    <cell col="2" row="2" anchor="NORTHWEST">	  
+	  <text i18n="classedit.label.text.p" class="editorlabel"/>
+	</cell>	  
+    <cell col="1" row="3" anchor="NORTHWEST" ref="TFzeile1024"  var="@description"  />	  
+    <cell col="2" row="3" anchor="NORTHWEST">	  
+	  <text i18n="classedit.label.description" class="editorlabel"/>
+	</cell>	  
+	  
+  </panel>
+	 	 
+  <text id="AClid" i18n="classedit.label.addcateg.aclid" class="editorlabel"/>
+  <text id="BClid" i18n="classedit.label.addcateg.bclid" class="editorlabel"/>
+<!-- *** End *** -->
+
+ </components>
+</editor>
+

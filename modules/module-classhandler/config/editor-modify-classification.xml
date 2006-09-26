@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE editor>
+
+<editor>
+ <target type="servlet" name="MCRStartClassEditorServlet" method="get" format="xml" />
+ <components root="modify-classification" var="/mycoreclass">
+
+  <include uri="webapp:editor/imports-common.xml" />
+
+  <headline anchor="CENTER">
+   <text i18n="classedit.headline.modclass" />
+  </headline>
+
+  <panel id="modify-classification">	  	  
+	<cell col="1" row="1" colspan="2" anchor="NORTHWEST"  ref="NewClass" />	  	  	  
+	<cell col="1" row="4" colspan="2" ><space width="1px" height="10px" /></cell>	
+    <cell col="1" row="6" colspan="2" anchor="EAST"      ref="TwoButtons"  />
+  </panel>
+	 
+ <panel id="Class">
+    <hidden var="@ID" />
+    <hidden var="label/@text" />
+    <hidden var="label/@description" />
+    <cell col="1" row="1" colspan="2" anchor="NORTHWEST" ref="AClid" />	  
+    <cell col="1" row="2" anchor="NORTHWEST">	  
+	  <text i18n="classedit.label.id" class="editorlabel" />
+	</cell>	
+    <cell col="2" row="2" anchor="NORTHWEST" ><output var="@ID" default=" "/></cell>  
+    <cell col="1" row="3" anchor="NORTHWEST">	  
+	  <text i18n="classedit.label.label" class="editorlabel"/>
+	</cell>	
+    <cell col="2" row="3" anchor="NORTHWEST" ><output var="label/@text" default=" "/></cell>    
+    <cell col="1" row="4" anchor="NORTHWEST">	  
+	  <text i18n="classedit.label.description" class="editorlabel"/>
+	</cell>	
+    <cell col="2" row="4" anchor="NORTHWEST" ><output var="label/@description" default=" "/></cell>  	  
+  </panel>
+  <panel id="NewClass">
+    <hidden var="@ID" />
+    <cell col="1" row="1" colspan="2" anchor="NORTHWEST" ref="AClid" />	  	  	  
+    <cell col="1" row="2" anchor="NORTHWEST">	  
+	  <text i18n="classedit.label.id.p" class="editorlabel" />
+	</cell>	
+    <cell col="2" row="2" anchor="NORTHWEST"><output var="@ID" /></cell>  
+	  	  
+    <cell col="1" row="3" anchor="NORTHWEST">	  
+	  <text i18n="classedit.label.label.p" class="editorlabel"/>
+	</cell>		  
+    <cell col="2" row="3" var="label" anchor="NORTHWEST" >
+		   <repeater min="1" max="10" ref="RNewClassLabel" />      
+	</cell>	      	  	   	 	  	    	  	  
+    <cell col="1" row="5" colspan="2" anchor="NORTHWEST"><space width="1px" height="10px" /></cell>		  
+  </panel>
+	 
+  <panel id="RNewClassLabel">
+	<cell col="1" row="1" anchor="NORTHWEST" ref="Slang" var="@lang" default="de"/>    	  
+    <cell col="2" row="1" anchor="NORTHWEST">	  
+	  <text i18n="classedit.label.lang" class="editorlabel"/>
+	</cell>
+    <cell col="1" row="2" anchor="NORTHWEST" ref="TFzeile1024" var="@text"  />	  
+    <cell col="2" row="2" anchor="NORTHWEST">	  
+	  <text i18n="classedit.label.text.p" class="editorlabel"/>
+	</cell>	  
+    <cell col="1" row="3" anchor="NORTHWEST" ref="TFzeile1024"  var="@description"  />	  
+    <cell col="2" row="3" anchor="NORTHWEST">	  
+	  <text i18n="classedit.label.description" class="editorlabel"/>
+	</cell>	  
+	  
+  </panel>
+	 	 
+  <text id="AClid" i18n="classedit.label.modclass.aclid" class="editorlabel"/>
+<!-- *** End *** -->
+
+ </components>
+</editor>
+

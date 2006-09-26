@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE editor>
+
+<editor>
+ <target type="servlet" name="MCRStartClassEditorServlet" method="get" format="xml" />
+ <components root="import-classification" var="/mycoreclass">
+
+  <include uri="webapp:editor/imports-common.xml" />
+
+  <headline anchor="CENTER">
+   <text i18n="classedit.headline.impclass" />
+  </headline>
+
+  <panel id="import-classification">	  	  
+    <cell col="1" row="1" anchor="NORTHWEST" ref="LFileP" />
+    <cell col="2" row="1" anchor="NORTHWEST" ref="DFileUploadDoc" />
+    <cell col="3" row="1" anchor="NORTHWEST" >
+      <space width="20" height="0" />
+    </cell>
+    <cell col="4" row="1" anchor="WEST" ref="HFile" />
+    <cell col="2" row="2" anchor="NORTHWEST" ref="DFileUploadHint" />
+    <cell col="2" row="3" anchor="NORTHWEST" ref="RBupdate" />
+    <cell col="1" row="4" anchor="EAST"      ref="TwoButtons"  />
+  </panel>
+	 
+  <panel id="DFileUploadDoc" lines="on">
+    <cell row="1" col="1" anchor="WEST" var="pathes/path">
+      <file width="60" maxlength="50000000" />
+    </cell>  
+  </panel>
+	 
+  <panel id="RBupdate" lines="on">
+    <cell row="1" col="1" anchor="WEST" var="update">
+	  <list id="Supdate" width="400" type="radio" cols="2" default="true">
+        <item value="true" default="true" i18n="classedit.label.impclass.aclid" />
+        <item value="false" i18n="classedit.label.impclass.bclid" />
+      </list>		
+    </cell>  
+  </panel>
+
+ </components>
+</editor>
+
