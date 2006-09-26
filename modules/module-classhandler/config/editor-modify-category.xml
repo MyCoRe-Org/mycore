@@ -40,11 +40,12 @@
 	 	 
   <panel id="NewCateg">
     <hidden var="category/@counter" default="0" />	  
+    <hidden var="category/@ID" default="0" />	  
     <cell col="1" row="1" colspan="2" anchor="NORTHWEST" ref="BClid" />	  	  	  
     <cell col="1" row="2" anchor="NORTHWEST">	  
 	  <text i18n="classedit.label.id.p" class="editorlabel" />
 	</cell>	
-    <cell col="2" row="2" anchor="NORTHWEST" ref="TFzeile128" var="category/@ID" />
+    <cell col="2" row="2" anchor="NORTHWEST"><output var="category/@ID" default=" "/></cell>
 	  	  
     <cell col="1" row="3" anchor="NORTHWEST">	  
 	  <text i18n="classedit.label.label.p" class="editorlabel"/>

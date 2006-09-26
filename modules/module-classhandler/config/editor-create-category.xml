@@ -14,7 +14,6 @@
   <panel id="create-category">	  	  
 	<cell col="1" row="1" colspan="2" anchor="NORTHWEST"  ref="Class" />	  	  	  
 	<cell col="1" row="2" colspan="2" ><space width="1px" height="10px" /></cell>		  
-	<cell col="1" row="4" colspan="2" ><space width="1px" height="10px" /></cell>	
 	<cell col="1" row="5" colspan="2" anchor="NORTHWEST"  var="categories" ref="NewCateg" />	  	  	    	  
     <cell col="1" row="6" colspan="2" anchor="EAST"      ref="TwoButtons"  />
   </panel>

@@ -37,464 +37,541 @@ import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRDefaults;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRUtils;
+import org.mycore.datamodel.metadata.MCRActiveLinkException;
 import org.mycore.datamodel.metadata.MCRObjectID;
 
 /**
- * This class implements all methods for a edit, modify delete
- * categories in classification and the classification itself
+ * This class implements all methods for a edit, modify delete categories in
+ * classification and the classification itself
  * 
  * @author Anja Schaar
- * @version 
+ * @author Jens Kupferschmidt
+ * @version
  */
 
 public class MCRClassificationEditor {
 
     // logger
     static Logger LOGGER = Logger.getLogger(MCRClassificationEditor.class);
+
     private MCRClassification cl = new MCRClassification();
-	private Document cljdom;
-	private Element  categories;
-	private MCRConfiguration CONFIG;
-	private File fout;
-	
+
+    private Document cljdom;
+
+    private Element categories;
+
+    private MCRConfiguration CONFIG;
+
+    private File fout;
+
     public MCRClassificationEditor() {
         CONFIG = MCRConfiguration.instance();
     }
-    
-    public boolean  createCategoryInClassification(  org.jdom.Document indoc, String clid, String categid ) {	   
-	 try  { 	   
-	 LOGGER.info("CALL: createCategoryInClassification for Classification:" + clid + " after categid "  + categid);
-	   	   Element clroot = indoc.getRootElement();
-	 	   Element newCateg = (Element) clroot.getChild("categories").getChild("category").clone();
-	
-	 	   cljdom = MCRClassification.receiveClassificationAsJDOM(clid); 	   
-	 	   categories =cljdom.getRootElement().getChild("categories");
-	 	   
-	 	   if ( !checkUniqueID(newCateg.getAttributeValue("ID"), clid, categid, "create")  ) {
-	 	       return false;
-	 	   }
-	 	   
-	 	   newCateg = setNewJDOMCategElement(newCateg);
-	 	   newCateg.setAttribute("counter", "0");	   
-	 	   
-	 	   if( findAndOperateCateg(categories, newCateg, categid, "create", false) ) {		   	   
-	 		   cl.updateFromJDOM(cljdom);		   
-	 	   }else 	   
-	 		    return false;
-		   testwrite();
-	 	   return true;
- 	   } catch ( Exception e1) {
- 		   LOGGER.info("Classification creation fails. Reason is:" + e1.getMessage());
- 		   return false;
- 	   }	   		   
- 	   
-    }
-    
-    public boolean    modifyCategoryInClassification(org.jdom.Document indoc, String clid, String categid )  { 	   
- 	   try {
- 	   LOGGER.info("CALL: modifyCategoryInClassification for Classification:" + clid + " with categid "  + categid);
-	 	   Element clroot = indoc.getRootElement();
-	 	   Element newCateg = (Element) clroot.getChild("categories").getChild("category").clone();
-		 	   	   
-	 	   cljdom = MCRClassification.receiveClassificationAsJDOM(clid);
-	 	   categories = cljdom.getRootElement().getChild("categories");
-	 	   
-	 	   if ( !checkUniqueID(newCateg.getAttributeValue("ID"), clid, categid, "modify")  ) {
-	 	       return false;
-	 	   }	 	   	   
-	 	   //Kategoriedaten setzen
-	 	   newCateg = setNewJDOMCategElement(newCateg);
-	 	   // Kategorie suchen und im Baum setzen
-	 	   if( findAndOperateCateg(categories, newCateg, categid, "modify", false) ) {		   	   
-	 		   cl.updateFromJDOM(cljdom);
-	 	   }
-		   testwrite();
-	 	   return true;
- 	   } catch ( Exception e1) {
- 		   LOGGER.info("Classification creation fails. Reason is:" + e1.getMessage());
- 		   return false;
- 	   }	   		   
-    }
-    
-    
-    public boolean importClassification(  boolean bUpdate, String sFile ) {
-       String clid = "";
-  	   try {
-  	 	   LOGGER.info("CALL: importNewClassification." );
-	        try {
-        		LOGGER.info("Reading file " + sFile + " ...\n");
-	            MCRClassification cl = new MCRClassification();	            
-	            if (bUpdate) {
-	                clid = cl.updateFromURI(sFile);
-	                LOGGER.info(clid + " updated.\n");
-	            } else {
-	                clid = cl.createFromURI(sFile);
-	                LOGGER.info(clid + " loaded.\n");
-	            }
-	  		    LOGGER.info("Classification: " + clid + " successfully imported!");
-	            return true;
-	        } catch (MCRException ex) {
-	            LOGGER.error("Exception while loading from file " + sFile, ex);
-	            return false;
-	        }
- 	   } catch ( Exception e1) {
- 		   LOGGER.info("Classification import fails. Reason is:" + e1.getMessage());
- 		   return false;
- 	   }	   		   
-    	
-    }
-    public boolean createNewClassification(org.jdom.Document indoc ) {
- 	   try {
- 	   LOGGER.info("CALL: createNewClassificationDescription." );
-	 	   Element clroot = indoc.getRootElement();
-	
-	 	   cljdom = new Document();   
-	 	   Element mycoreclass = new Element("mycoreclass");
-	 	   Element categories = new Element("categories");
-	
-	 	   MCRObjectID cli = new MCRObjectID();
-	 	   String base = CONFIG.getString("MCR.default_project_id","DocPortal")+"_class";
-	 	   
-	 	   LOGGER.info("create CLID with base " + base);
-	 	   cli.setNextFreeId(base);
-	 	   
-	 	   if (!cli.isValid()) {
-	 		   LOGGER.info("create a unique CLID failed. " + cli.toString());
-	 		   return false;
-	 	   }
-	 	   
- 		   mycoreclass.addNamespaceDeclaration(org.jdom.Namespace.getNamespace("xsi", MCRDefaults.XSI_URL));
- 		   mycoreclass.setAttribute("noNamespaceSchemaLocation", "MCRClassification.xsd", org.jdom.Namespace.getNamespace("xsi", MCRDefaults.XSI_URL));
- 		   mycoreclass.setAttribute("ID", cli.toString());	   
- 		   mycoreclass.setAttribute("counter","0");
- 		   LOGGER.info("new CLID is: " + cli.toString());     
- 		   List tagList = clroot.getChildren("label");
- 		   Element element; 
- 		   for (int i = 0; i < tagList.size(); i++) {
- 			   element = (Element) tagList.get(i);
- 			   Element newE = new Element("label");
- 			   newE.setAttribute( "lang", element.getAttributeValue("lang"),Namespace.XML_NAMESPACE);
- 			   newE.setAttribute( "text", element.getAttributeValue("text"));
- 			   if ( element.getAttributeValue("description")!= null ) {
- 				   newE.setAttribute( "description", element.getAttributeValue("description"));
- 			   }
- 			   mycoreclass.addContent(newE);
- 		   }
- 		   mycoreclass.addContent(categories);
- 		   cljdom.addContent(mycoreclass);   
- 		   cl.createFromJDOM(cljdom); 		   
- 		   testwrite();
- 		   LOGGER.info("Classification: " + cli.toString() + " successfully created!");
- 		   return true;
- 	   } catch ( Exception e1) {
- 		   LOGGER.info("Classification creation fails. Reason is:" + e1.getMessage());
- 		   return false;
- 	   }	   		   
-    }
-    
-    
-    public boolean    modifyClassificationDescription(org.jdom.Document indoc , String clid ) {
- 	   try {
- 	   LOGGER.info("CALL: modifyClassificationDescription for Classification: " + clid);
-	 	   Element clroot = indoc.getRootElement();
-	 	   cljdom = MCRClassification.receiveClassificationAsJDOM(clid);
- 		   Element element; 	   
- 		   List tagList = clroot.getChildren("label");
- 		   
- 		   cljdom.getRootElement().removeChildren("label");
- 	   
- 		   for (int i = 0; i < tagList.size(); i++) {
- 			   element = (Element) tagList.get(i);
- 			   Element newE = new Element("label");
- 			   newE.setAttribute( "lang", element.getAttributeValue("lang"),Namespace.XML_NAMESPACE);
- 			   newE.setAttribute( "text", element.getAttributeValue("text"));
- 			   newE.setAttribute( "description", element.getAttributeValue("description"));
- 			   cljdom.getRootElement().addContent(newE);
- 		   }
- 		   cl.updateFromJDOM(cljdom);
- 		   testwrite(); 		   
- 		   LOGGER.info("Classification: " + clid + " successfully modified!");
- 		   
- 		   return true;
- 	   } catch ( Exception e1) {
- 		   LOGGER.info("Classification modify fails. Reason is:" + e1.getMessage());
- 		   return false;
- 	   }	   		   
-    }
-    
-    
-    public boolean moveCategoryInClassification(  String categid, String clid, String way ) {
- 	   try {		   	   
- 	   LOGGER.info("CALL: moveCategoryInClassification for Classification: " + clid + " with Category: " + categid + " in direction: " + way );
-	 	   boolean bret = false;
-	 	   Element newCateg = new Element("category");
- 	   
- 		   newCateg.setAttribute("ID",categid);
- 		   cljdom = MCRClassification.receiveClassificationAsJDOM(clid);
- 		   categories =cljdom.getRootElement().getChild("categories");
- 		   
- 		   bret = findAndOperateCateg(categories, newCateg, categid, way, false);
- 		   if (bret){		   	    		   
- 			   cl.updateFromJDOM(cljdom);
- 		   	   LOGGER.info("Category: " + categid + " in Classification: " + clid + " successfull moved!");
- 			   bret=true;
- 		   } else  {
- 		   	   LOGGER.info("Category: " + categid + " in Classification: " + clid + " not found!");
- 		   }		   
- 		   testwrite(); 		   		   
- 		   return bret; 		   
- 	   } catch ( Exception e1) {
- 		   LOGGER.info("Classification modify failed - the Reason is:" + e1.getMessage());
- 		   return false;
- 	   }	   		   
+
+    /**
+     * Create an new category in the category path.
+     * 
+     * @param indoc
+     *            the output from the editor dialogue
+     * @param clid
+     *            the classification ID
+     * @param categid
+     *            the category ID to add after it
+     * @return
+     */
+    public boolean createCategoryInClassification(org.jdom.Document indoc, String clid, String categid) {
+        try {
+            LOGGER.info("Create a new category in classification " + clid + " after categid " + categid);
+            Element clroot = indoc.getRootElement();
+            if (clroot == null)
+                return false;
+            Element categories = (Element) clroot.getChild("categories");
+            if (categories == null)
+                return false;
+            Element newCateg = (Element) categories.getChild("category").clone();
+            String newID = newCateg.getAttributeValue("ID");
+            cljdom = MCRClassification.receiveClassificationAsJDOM(clid);
+            categories = cljdom.getRootElement().getChild("categories");
+
+            // check the new category entry
+            if (newID.equalsIgnoreCase(categid)) {
+                LOGGER.error("The category ID's are not different.");
+                return false;
+            }
+            try {
+                MCRCategoryItem item = new MCRCategoryItem(newID, new MCRClassificationItem(clid));
+                item.existInStore();
+                LOGGER.error("The new category ID is not unique for classification " + clid);
+                return false;
+            } catch (Exception e) {
+            }
+
+            newCateg = setNewJDOMCategElement(newCateg);
+            newCateg.setAttribute("counter", "0");
+
+            if (findAndOperateCateg(categories, newCateg, categid, "create", false)) {
+                cl.updateFromJDOM(cljdom);
+            } else
+                return false;
+            return true;
+        } catch (Exception e1) {
+            e1.printStackTrace();
+            LOGGER.error("Classification creation fails. Reason is:" + e1.getMessage());
+            return false;
+        }
+
     }
 
-    public  int  deleteCategoryInClassification( String clid, String categid)  {
- 	   try {		   	   
- 	   LOGGER.info("CALL: deleteCategoryInClassification for Classification: " + clid + " with Category: " + categid  );
-	 	   boolean bret = false;
-	 	   int cnt = 0;
- 		   cljdom  =  MCRClassification.receiveClassificationAsJDOM(clid);	   
- 		   categories = cljdom.getRootElement().getChild("categories");
- 		   bret = findAndOperateCateg(categories, null, categid, "delete", false);
- 		   if (bret){	
- 		      MCRCategoryItem clc = new MCRCategoryItem(categid,clid,null);
- 		      cnt = clc.countDocLinks(null,null);
- 		      if ( cnt == 0 ) {	   	    		   
- 			  	cl.updateFromJDOM(cljdom);
- 		   	  	LOGGER.info("Category: " + categid + " in Classification: " + clid + " successfull deleted!");
- 		   	  } else { 
- 		   	  	LOGGER.info("Category: " + categid + " in Classification: " + clid + " can't be deleted, there are " + cnt + "refernces of documents to this");
- 		   	  } 		   	  	
- 		   } else  {
- 		   	  LOGGER.info("Category: " + categid + " in Classification: " + clid + " not found! - nothing todo"); 		   	  
- 		   } 		   
- 		   testwrite();
- 		   // 0 ist ok  		   
- 		   return cnt;		   
- 	   } catch ( Exception e1) {
- 		   LOGGER.info("Categorie delete failed - the Reason is:" + e1.getMessage());
- 		   return 1;
- 	   }	   		   
-    }
-    
-    public  int  deleteClassification( String clid)  {
-  	   try {		   	   
-  	   LOGGER.info("CALL: deleteClassification for Classification: " + clid );
- 	 	   int cnt = 0;
-	       MCRClassificationItem clc = new MCRClassificationItem(clid);
-	       cnt = clc.countDocLinks(null,null);
-  		      if ( cnt == 0 ) {	   	    		   
-		        clc.delete(clid);
-  		   	  	LOGGER.info("Classification: " + clid + " successfull deleted!");
-  		   	  } else { 
-  		   	  	LOGGER.info("Classification: " + clid + " can't be deleted, there are " + cnt + "refernces of documents to this");
-  		   	  } 		   	  	
-  		   // 0 ist ok  		   
-  		   return cnt;		   
-  	   } catch ( Exception e1) {
-  		   LOGGER.info("Classification delete failed - the Reason is:" + e1.getMessage());
-  		   return 1;
-  	   }	   		   
-     }
-    
+    /**
+     * Replace category data like label(s) and url.
+     * 
+     * @param indoc
+     *            the output from the editor dialogue
+     * @param clid
+     *            the classification ID
+     * @param categid
+     *            the category ID
+     * @return true if all it's okay, else return false
+     */
+    public final boolean modifyCategoryInClassification(org.jdom.Document indoc, String clid, String categid) {
+        try {
+            LOGGER.debug("Start modify category in classification " + clid + " with categid " + categid);
+            Element clroot = indoc.getRootElement();
+            Element newCateg = (Element) clroot.getChild("categories").getChild("category").clone();
+            String newID = newCateg.getAttributeValue("ID");
+            cljdom = MCRClassification.receiveClassificationAsJDOM(clid);
+            categories = cljdom.getRootElement().getChild("categories");
 
-    private Element setNewJDOMCategElement( Element newCateg) {
-  	   List tagList = newCateg.getChildren("label");
- 	   Element element;
- 	   for (int i = 0; i < tagList.size(); i++) {
- 		   element = (Element) tagList.get(i);
- 		   element.setAttribute( "lang", element.getAttributeValue("lang"),Namespace.XML_NAMESPACE);
- 		   element.removeAttribute("lang");
- 	   }
- 	   //process url, if given
- 	   element = newCateg.getChild("url");
- 	   if (element != null) {    	   
- 		   element.setAttribute("href", element.getAttributeValue("href"),Namespace.getNamespace("xlink", MCRDefaults.XLINK_URL));
- 		   element.removeAttribute("href");
- 	   }
- 	   return newCateg;
+            // check the category entry
+            if (!newID.equalsIgnoreCase(categid)) {
+                LOGGER.error("The category ID's are different.");
+                return false;
+            }
+            try {
+                MCRCategoryItem item = new MCRCategoryItem(newID, new MCRClassificationItem(clid));
+                item.existInStore();
+            } catch (Exception e) {
+                LOGGER.error("The category ID does not exist in classification " + clid);
+                return false;
+            }
+
+            // set new category and replace the old
+            newCateg = setNewJDOMCategElement(newCateg);
+            if (findAndOperateCateg(categories, newCateg, categid, "modify", false)) {
+                cl.updateFromJDOM(cljdom);
+            }
+            LOGGER.info("Update category " + categid + " in classification " + clid + " was successful.");
+            return true;
+        } catch (Exception e1) {
+            LOGGER.error("Category modify fails. Reason is:" + e1.getMessage());
+            return false;
+        }
     }
 
-    private boolean findAndOperateCateg(Element categories, Element newCateg, String categid, String todo, boolean bfound ){
- 	   List children = categories.getChildren("category"); 	   
- 	   if ( children.size() == 0 && "create".equalsIgnoreCase(todo)) {
-		   categories.addContent( (Element)newCateg.clone()  );
- 		   bfound =true;
- 	   }
- 	   for( int j = 0; j < children.size() && bfound == false; j++ )	{
- 		   //LOGGER.info("J= " + j + " ID =" + ((Element)children.get(j)).getAttributeValue("ID"));
- 		   if( ((Element)children.get(j)).getAttributeValue("ID").equalsIgnoreCase(categid)) {
- 			   LOGGER.info(" Found Element!! ID =" + ((Element)children.get(j)).getAttributeValue("ID"));
- 			   bfound = true;
- 			   if ( "create".equalsIgnoreCase(todo)) {
- 				   // ans ende angehangen ->children.size erhöht sich dadurch um eins
- 				   ((Element)children.get(j)).getParentElement().addContent((Element)newCateg.clone());
- 				   // Element nur noch an die Richtige Stelle setzen
- 				   int k = j+1;
- 				   if ( k  < children.size()){
- 					   //ein element ist dazugekommen, neu initialisieren!
- 					   children = categories.getChildren("category");
- 					   // alle elemente runterschieben
- 					   if (  children.get(k) == null ){
- 						   LOGGER.info("Irgendein merkwürdiger sonderfall nach ID=" + ((Element)children.get(j)).getAttributeValue("ID"));
- 						   return false;
- 					   } 						   
- 					   Element E2, E1 = (Element)((Element)children.get(k)).clone();				   
- 					   copyElement((Element)children.get(k),  newCateg, true);			   
- 					   for( j = k; j+1 < children.size(); j++ )	{					   
- 						   E2 = (Element)((Element)children.get(j+1)).clone();
- 						   copyElement((Element)children.get(j+1), E1, true);
- 						   E1 = (Element) E2.clone();
- 					   }
- 				   }
- 			   } else  if ( "modify".equalsIgnoreCase(todo)) {
- 			   	  // neue werte auf die categorie rüberkopieren, Kinderknoten aber nicht anfassen
- 				  copyElement((Element)children.get(j),  newCateg, false);				   
- 			   } else if ( "delete".equalsIgnoreCase(todo)) {
- 				  String Scounter = ((Element)children.get(j)).getAttributeValue("counter");
- 				  if ( Scounter != null && Integer.parseInt(Scounter)>0 ) { 
- 					return false;
- 				  }	  
-                  children.remove(j);		     
- 			   } else if ( "up".equalsIgnoreCase(todo) ||  "down".equalsIgnoreCase(todo) ) {
- 				   // im Baum nach oben/unten verschieben			   
- 				   int k = j-1;
- 				   if ( "up".equalsIgnoreCase(todo)) {			   
- 					   //Stelle gefunden,   nun das aktuelle Element eins nach oben schieben ??
- 					   k=j-1;
- 				   } else if ( "down".equalsIgnoreCase(todo)) {
- 					  //Stelle gefunden,   nun das aktuelle Element eins nach unten schieben ??
- 					   k=j+1;
- 				   }
- 				   // bei up muss es einen vorgänger geben
- 				   // bei down einen nachfolger
- 				   if ( children.get(k) == null )   return false;
- 				   
- 				   Element E2 = (Element)((Element)children.get(j)).clone();
- 				   Element E1 = (Element)((Element)children.get(k)).clone();
- 				   
- 				   //platztausch
- 				   copyElement((Element)children.get(j),  E1, true);
- 				   copyElement((Element)children.get(k),  E2, true);			   
- 			   } else if ( "left".equalsIgnoreCase(todo)) {
- 			   
- 				   // im Baum nach <- verschieben 
- 				   // in der Hierarchie als Sibling dem darüberliegenden Parent anlegen
- 				   Element E1 = (Element)((Element)children.get(j)).clone();
- 				   if ( categories.getParentElement() == null) 
- 				        return false;
- 				   if ( !categories.getParentElement().getName().equalsIgnoreCase("category") 
- 						&& 
- 						!categories.getParentElement().getName().equalsIgnoreCase("categories")  
-					  )
- 				      return false;
- 				      					   
- 				   categories.getParentElement().addContent(E1);
- 				   children.remove(j);				   
- 			   } else if ( "right".equalsIgnoreCase(todo)) {
- 				   // im Baum nach -> verschieben 
- 				   // in der Hierarchie als Kind im darüberliegenden Knoten anlegen
- 				   Element E1 = (Element)((Element)children.get(j)).clone();
- 				   if ( j >0) {					   
- 					   //neues erstes kind des darüberliegenden Siblings
- 					   if ( children.get(j-1) == null )   {
- 						   return false;
- 					   }
- 				   	   ((Element)children.get(j-1)).addContent(E1);				   	   
- 					   children.remove(j);
- 				   } else {
- 					   //ans ende der kinderliste des parents setzen
- 					   if ( categories.getParentElement() == null  || ( !categories.getParentElement().getName().equalsIgnoreCase("category") )){
- 					        return false;						   						   
- 					   }
- 					   categories.addContent(E1);
- 					   children.remove(j);
- 				   }
- 			   }
- 			   return true;
- 		   }
- 		   if (!bfound && !((Element)children.get(j)).getChildren("category").isEmpty())  {
- 			   bfound = findAndOperateCateg((Element)children.get(j), newCateg, categid, todo, bfound);
- 		   }
- 	   }
- 	   return bfound;
+    /**
+     * Create or update a classification form import.
+     * 
+     * @param bUpdate
+     *            true if this operation should be a update, else false
+     * @param sFile
+     *            the name of classification file
+     * @return true if all it's okay, else return false
+     */
+    public boolean importClassification(boolean bUpdate, String sFile) {
+        LOGGER.debug("Start importNewClassification.");
+        String clid = "";
+        try {
+            try {
+                LOGGER.info("Reading file " + sFile + " ...\n");
+                MCRClassification cl = new MCRClassification();
+                if (bUpdate) {
+                    clid = cl.updateFromURI(sFile);
+                    LOGGER.info("Classification: " + clid + " successfully imported with update!");
+                } else {
+                    clid = cl.createFromURI(sFile);
+                    LOGGER.info("Classification: " + clid + " successfully imported with create!");
+                }
+                return true;
+            } catch (MCRException ex) {
+                LOGGER.error("Exception while loading from file " + sFile, ex);
+                return false;
+            }
+        } catch (Exception e1) {
+            LOGGER.error("Classification import fails. Reason is:" + e1.getMessage());
+            return false;
+        }
+
     }
 
+    /**
+     * Create a new classification with the data from the editor dialogue.
+     * 
+     * @param indoc
+     *            the output from the editor dialogue
+     * @return true if all it's okay, else return false
+     */
+    public final boolean createNewClassification(org.jdom.Document indoc) {
+        try {
+            LOGGER.debug("Start create a  new classification.");
+            Element clroot = indoc.getRootElement();
 
-    private Element copyElement(Element Edest, Element Esrc, boolean bdeep) {
- 	   Edest.setAttribute("ID",Esrc.getAttributeValue("ID"));
- 	   Edest.setAttribute("counter",Esrc.getAttributeValue("counter"));
- 	   Edest.removeChildren("label");
-  	   List labelList = Esrc.getChildren("label");
-  	   Element el;
- 	   for (int i = 0; i < labelList.size(); i++) {
- 		    el = (Element)((Element)labelList.get(i)).clone();
- 		    Edest.addContent(el);				   
- 	   }
- 	   Edest.removeChildren("url");				   			  
- 	   if (Esrc.getChild("url")!= null) {
- 		   Edest.addContent(el = (Element)Esrc.getChild("url").clone());				   
- 	   }
- 	   if ( bdeep) {
- 		   Edest.removeChildren("category");
- 		   List categList = Esrc.getChildren("category");
- 		   for (int i = 0; i < categList.size(); i++) {
- 			   el = (Element)((Element)categList.get(i)).clone();
- 		       Edest.addContent(el);				   
- 		   }
- 	   }
- 	   return Edest;
+            cljdom = new Document();
+            Element mycoreclass = new Element("mycoreclass");
+            Element categories = new Element("categories");
+            Element category = new Element("category");
+            category.setAttribute("ID", "empty");
+            Element label = new Element("label");
+            label.setAttribute("text", "empty");
+            label.setAttribute("description", "empty");
+            category.addContent(label);
+            categories.addContent(category);
+
+            MCRObjectID cli = new MCRObjectID();
+            String base = CONFIG.getString("MCR.default_project_id", "DocPortal") + "_class";
+
+            LOGGER.debug("Create a CLID with base " + base);
+            cli.setNextFreeId(base);
+
+            if (!cli.isValid()) {
+                LOGGER.error("Create a unique CLID failed. " + cli.toString());
+                return false;
+            }
+
+            mycoreclass.addNamespaceDeclaration(org.jdom.Namespace.getNamespace("xsi", MCRDefaults.XSI_URL));
+            mycoreclass.setAttribute("noNamespaceSchemaLocation", "MCRClassification.xsd", org.jdom.Namespace.getNamespace("xsi", MCRDefaults.XSI_URL));
+            mycoreclass.setAttribute("ID", cli.toString());
+            mycoreclass.setAttribute("counter", "0");
+            List tagList = clroot.getChildren("label");
+            Element element;
+            for (int i = 0; i < tagList.size(); i++) {
+                element = (Element) tagList.get(i);
+                Element newE = new Element("label");
+                newE.setAttribute("lang", element.getAttributeValue("lang"), Namespace.XML_NAMESPACE);
+                newE.setAttribute("text", element.getAttributeValue("text"));
+                if (element.getAttributeValue("description") != null) {
+                    newE.setAttribute("description", element.getAttributeValue("description"));
+                }
+                mycoreclass.addContent(newE);
+            }
+            mycoreclass.addContent(categories);
+            cljdom.addContent(mycoreclass);
+            cl.createFromJDOM(cljdom);
+            LOGGER.info("Classification " + cli.toString() + " successfully created!");
+            return true;
+        } catch (Exception e1) {
+            LOGGER.error("Classification creation fails. Reason is:" + e1.getMessage());
+            return false;
+        }
     }
-    
-    private boolean checkUniqueID(String newID, String clid, String oldcategid, String todo ) {
- 	   boolean bret=false;
- 	   if ( "modify".equalsIgnoreCase(todo) && oldcategid.equalsIgnoreCase(newID)) {
- 		   // update mit gleicher categID ist OK
- 		   bret= true;
- 	   }else  if ( "create".equalsIgnoreCase(todo) && oldcategid.equalsIgnoreCase(newID)) {
- 		   // neue kategorie braucht neue ID
- 		   bret= false;
- 	   }  else if ( !oldcategid.equalsIgnoreCase(newID)){
- 		   MCRCategoryItem ctest = new MCRCategoryItem(newID,new MCRClassificationItem(clid));
- 		   bret= !(ctest.existInStore());		   
- 	   }
- 	   if ( !bret){
- 		   LOGGER.info("The New Category ID " + newID + " is not unique in the class " + clid);		   
- 	   }
- 	   return true;
+
+    /**
+     * Change the description data of a classification.
+     * 
+     * @param indoc
+     *            the output from the editor dialogue
+     * @param clid
+     *            the classification ID
+     * @return true if all it's okay, else return false
+     */
+    public final boolean modifyClassificationDescription(org.jdom.Document indoc, String clid) {
+        try {
+            LOGGER.debug("Start modify classification description for " + clid);
+            Element clroot = indoc.getRootElement();
+            cljdom = MCRClassification.receiveClassificationAsJDOM(clid);
+            Element element;
+            List tagList = clroot.getChildren("label");
+
+            cljdom.getRootElement().removeChildren("label");
+
+            for (int i = 0; i < tagList.size(); i++) {
+                element = (Element) tagList.get(i);
+                Element newE = new Element("label");
+                newE.setAttribute("lang", element.getAttributeValue("lang"), Namespace.XML_NAMESPACE);
+                newE.setAttribute("text", element.getAttributeValue("text"));
+                newE.setAttribute("description", element.getAttributeValue("description"));
+                cljdom.getRootElement().addContent(newE);
+            }
+            cl.updateFromJDOM(cljdom);
+            LOGGER.info("Classification " + clid + " successfully modified!");
+            return true;
+        } catch (Exception e1) {
+            LOGGER.error("Classification modify fails. Reason is:" + e1.getMessage());
+            return false;
+        }
     }
-    
-    public void deleteTempFile( ) {
-    	if ( fout != null && fout.isFile())
-    		fout.delete();
-    	fout = null;
+
+    /**
+     * Move a category in a classification.
+     * 
+     * @param categid
+     *            the category ID
+     * @param clid
+     *            the classification ID
+     * @param way
+     *            the way to move
+     * @return true if all it's okay, else return false
+     */
+    public boolean moveCategoryInClassification(String categid, String clid, String way) {
+        try {
+            LOGGER.debug("Start move in classification " + clid + " the category " + categid + " in direction: " + way);
+            boolean bret = false;
+            Element newCateg = new Element("category");
+
+            newCateg.setAttribute("ID", categid);
+            cljdom = MCRClassification.receiveClassificationAsJDOM(clid);
+            categories = cljdom.getRootElement().getChild("categories");
+
+            bret = findAndOperateCateg(categories, newCateg, categid, way, false);
+            if (bret) {
+                cl.updateFromJDOM(cljdom);
+                LOGGER.info("Category " + categid + " in classification " + clid + " successfull moved!");
+                bret = true;
+            } else {
+                LOGGER.warn("Category " + categid + " in classification " + clid + " not found!");
+            }
+            return bret;
+        } catch (Exception e1) {
+            LOGGER.error("Classification modify failed - the Reason is:" + e1.getMessage());
+            return false;
+        }
     }
-    
-    public String setTempFile(String name, FileItem fi ) {
-    	String fname = name;
-    	fname.replace(' ','_');   	
-    	try {
-    		fout = new File(CONFIG.getString("MCR.Editor.FileUpload.TempStoragePath"), fname);
-		    FileOutputStream fouts = new FileOutputStream(fout);
-		    MCRUtils.copyStream(fi.getInputStream(),fouts);
-		    fouts.close();
-		    fname = fout.getPath();
-		    LOGGER.info("Classification temporary stored under "+ name);		    
-    	} catch (Exception allE) {
-    		LOGGER.info("Error storing under "+ fname + "  Error: " + allE.getMessage() );
-    		fname =null;
-    	}
-	    return fname;
+
+    /**
+     * Delete a category from a classification.
+     * 
+     * @param clid
+     *            the classification ID
+     * @param categid
+     *            the category ID
+     * @return true if all it's okay, else return false
+     */
+    public final int deleteCategoryInClassification(String clid, String categid) {
+        try {
+            LOGGER.debug("Start delete in classification " + clid + " the category: " + categid);
+            boolean bret = false;
+            int cnt = 0;
+            cljdom = MCRClassification.receiveClassificationAsJDOM(clid);
+            categories = cljdom.getRootElement().getChild("categories");
+            bret = findAndOperateCateg(categories, null, categid, "delete", false);
+            if (bret) {
+                MCRCategoryItem clc = new MCRCategoryItem(categid, clid, null);
+                cnt = clc.countDocLinks(null, null);
+                if (cnt == 0) {
+                    cl.updateFromJDOM(cljdom);
+                    LOGGER.info("Category " + categid + " in classification " + clid + " successfull deleted!");
+                } else {
+                    LOGGER.error("Category " + categid + " in classification " + clid + " can't be deleted, there are " + cnt + "refernces of documents to this");
+                }
+            } else {
+                LOGGER.warn("Category " + categid + " in classification: " + clid + " not found! - nothing todo");
+            }
+            // 0 ist ok
+            return cnt;
+        } catch (Exception e1) {
+            LOGGER.error("Categorie delete failed - the Reason is:" + e1.getMessage());
+            return 1;
+        }
     }
-    
-    private void testwrite() {
-       try { 
- 		   MCRUtils.saveJDOM(cljdom, new File("C:/cljdom.xml"));		   
- 	   } catch (Exception ioe2) {
- 	       LOGGER.error("Only test write on the pladde fails " );           
- 	   }    
-    }    
+
+    /**
+     * Delete a classification from the system.
+     * 
+     * @param clid
+     *            the classification ID
+     * @return
+     */
+    public final boolean deleteClassification(String clid) {
+        LOGGER.debug("Start delete classification " + clid);
+        try {
+            MCRClassification.delete(clid);
+            LOGGER.info("Classification: " + clid + " successfull deleted!");
+            return true;
+        } catch (MCRActiveLinkException ae) {
+            LOGGER.warn("Classification: " + clid + " can't be deleted, there are some refernces of documents to this");
+            return false;
+        } catch (Exception e) {
+            LOGGER.error("Classification delete failed - the Reason is:" + e.getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Here comes private methods
+     */
+
+    private final Element setNewJDOMCategElement(Element newCateg) {
+        List tagList = newCateg.getChildren("label");
+        Element element;
+        for (int i = 0; i < tagList.size(); i++) {
+            element = (Element) tagList.get(i);
+            element.setAttribute("lang", element.getAttributeValue("lang"), Namespace.XML_NAMESPACE);
+            element.removeAttribute("lang");
+        }
+        // process url, if given
+        element = newCateg.getChild("url");
+        if (element != null) {
+            element.setAttribute("href", element.getAttributeValue("href"), Namespace.getNamespace("xlink", MCRDefaults.XLINK_URL));
+            element.removeAttribute("href");
+        }
+        return newCateg;
+    }
+
+    private final boolean findAndOperateCateg(Element categories, Element newCateg, String categid, String todo, boolean bfound) {
+        List children = categories.getChildren("category");
+        if (children.size() == 0 && "create".equalsIgnoreCase(todo)) {
+            categories.addContent((Element) newCateg.clone());
+            bfound = true;
+        }
+        for (int j = 0; j < children.size() && bfound == false; j++) {
+            // LOGGER.info("J= " + j + " ID =" +
+            // ((Element)children.get(j)).getAttributeValue("ID"));
+            if (((Element) children.get(j)).getAttributeValue("ID").equalsIgnoreCase(categid)) {
+                LOGGER.info(" Found Element!! ID =" + ((Element) children.get(j)).getAttributeValue("ID"));
+                bfound = true;
+                if ("create".equalsIgnoreCase(todo)) {
+                    // ans ende angehangen ->children.size erhï¿½ht sich dadurch
+                    // um eins
+                    ((Element) children.get(j)).getParentElement().addContent((Element) newCateg.clone());
+                    // Element nur noch an die Richtige Stelle setzen
+                    int k = j + 1;
+                    if (k < children.size()) {
+                        // ein element ist dazugekommen, neu initialisieren!
+                        children = categories.getChildren("category");
+                        // alle elemente runterschieben
+                        if (children.get(k) == null) {
+                            LOGGER.info("Irgendein merkwï¿½rdiger sonderfall nach ID=" + ((Element) children.get(j)).getAttributeValue("ID"));
+                            return false;
+                        }
+                        Element E2, E1 = (Element) ((Element) children.get(k)).clone();
+                        copyElement((Element) children.get(k), newCateg, true);
+                        for (j = k; j + 1 < children.size(); j++) {
+                            E2 = (Element) ((Element) children.get(j + 1)).clone();
+                            copyElement((Element) children.get(j + 1), E1, true);
+                            E1 = (Element) E2.clone();
+                        }
+                    }
+                } else if ("modify".equalsIgnoreCase(todo)) {
+                    // neue werte auf die categorie rï¿½berkopieren, Kinderknoten
+                    // aber nicht anfassen
+                    copyElement((Element) children.get(j), newCateg, false);
+                } else if ("delete".equalsIgnoreCase(todo)) {
+                    String Scounter = ((Element) children.get(j)).getAttributeValue("counter");
+                    if (Scounter != null && Integer.parseInt(Scounter) > 0) {
+                        return false;
+                    }
+                    children.remove(j);
+                } else if ("up".equalsIgnoreCase(todo) || "down".equalsIgnoreCase(todo)) {
+                    // im Baum nach oben/unten verschieben
+                    int k = j - 1;
+                    if ("up".equalsIgnoreCase(todo)) {
+                        // Stelle gefunden, nun das aktuelle Element eins nach
+                        // oben schieben ??
+                        k = j - 1;
+                    } else if ("down".equalsIgnoreCase(todo)) {
+                        // Stelle gefunden, nun das aktuelle Element eins nach
+                        // unten schieben ??
+                        k = j + 1;
+                    }
+                    // bei up muss es einen vorgï¿½nger geben
+                    // bei down einen nachfolger
+                    if (children.get(k) == null)
+                        return false;
+
+                    Element E2 = (Element) ((Element) children.get(j)).clone();
+                    Element E1 = (Element) ((Element) children.get(k)).clone();
+
+                    // platztausch
+                    copyElement((Element) children.get(j), E1, true);
+                    copyElement((Element) children.get(k), E2, true);
+                } else if ("left".equalsIgnoreCase(todo)) {
+
+                    // im Baum nach <- verschieben
+                    // in der Hierarchie als Sibling dem darï¿½berliegenden Parent
+                    // anlegen
+                    Element E1 = (Element) ((Element) children.get(j)).clone();
+                    if (categories.getParentElement() == null)
+                        return false;
+                    if (!categories.getParentElement().getName().equalsIgnoreCase("category") && !categories.getParentElement().getName().equalsIgnoreCase("categories"))
+                        return false;
+
+                    categories.getParentElement().addContent(E1);
+                    children.remove(j);
+                } else if ("right".equalsIgnoreCase(todo)) {
+                    // im Baum nach -> verschieben
+                    // in der Hierarchie als Kind im darï¿½berliegenden Knoten
+                    // anlegen
+                    Element E1 = (Element) ((Element) children.get(j)).clone();
+                    if (j > 0) {
+                        // neues erstes kind des darï¿½berliegenden Siblings
+                        if (children.get(j - 1) == null) {
+                            return false;
+                        }
+                        ((Element) children.get(j - 1)).addContent(E1);
+                        children.remove(j);
+                    } else {
+                        // ans ende der kinderliste des parents setzen
+                        if (categories.getParentElement() == null || (!categories.getParentElement().getName().equalsIgnoreCase("category"))) {
+                            return false;
+                        }
+                        categories.addContent(E1);
+                        children.remove(j);
+                    }
+                }
+                return true;
+            }
+            if (!bfound && !((Element) children.get(j)).getChildren("category").isEmpty()) {
+                bfound = findAndOperateCateg((Element) children.get(j), newCateg, categid, todo, bfound);
+            }
+        }
+        return bfound;
+    }
+
+    private final Element copyElement(Element Edest, Element Esrc, boolean bdeep) {
+        Edest.setAttribute("ID", Esrc.getAttributeValue("ID"));
+        Edest.setAttribute("counter", Esrc.getAttributeValue("counter"));
+        Edest.removeChildren("label");
+        List labelList = Esrc.getChildren("label");
+        Element el;
+        for (int i = 0; i < labelList.size(); i++) {
+            el = (Element) ((Element) labelList.get(i)).clone();
+            Edest.addContent(el);
+        }
+        Edest.removeChildren("url");
+        if (Esrc.getChild("url") != null) {
+            Edest.addContent(el = (Element) Esrc.getChild("url").clone());
+        }
+        if (bdeep) {
+            Edest.removeChildren("category");
+            List categList = Esrc.getChildren("category");
+            for (int i = 0; i < categList.size(); i++) {
+                el = (Element) ((Element) categList.get(i)).clone();
+                Edest.addContent(el);
+            }
+        }
+        return Edest;
+    }
+
+    public final void deleteTempFile() {
+        if (fout != null && fout.isFile())
+            fout.delete();
+        fout = null;
+    }
+
+    public final String setTempFile(String name, FileItem fi) {
+        String fname = name;
+        fname.replace(' ', '_');
+        try {
+            fout = new File(CONFIG.getString("MCR.Editor.FileUpload.TempStoragePath"), fname);
+            FileOutputStream fouts = new FileOutputStream(fout);
+            MCRUtils.copyStream(fi.getInputStream(), fouts);
+            fouts.close();
+            fname = fout.getPath();
+            LOGGER.info("Classification temporary stored under " + name);
+        } catch (Exception allE) {
+            LOGGER.info("Error storing under " + fname + "  Error: " + allE.getMessage());
+            fname = null;
+        }
+        return fname;
+    }
 
 }
-

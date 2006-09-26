@@ -26,21 +26,16 @@ package org.mycore.frontend.servlets;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.util.ArrayList;
 import java.util.Enumeration;
 
 import java.util.Properties;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.log4j.Logger;
-import org.mycore.common.MCRSession;
-import org.mycore.common.MCRSessionMgr;
-import org.mycore.datamodel.classifications.MCRCategoryItem;
+import org.jdom.output.XMLOutputter;
 import org.mycore.datamodel.classifications.MCRClassificationEditor;
-import org.mycore.datamodel.classifications.MCRClassificationItem;
 import org.mycore.frontend.editor.MCREditorSubmission;
 import org.mycore.frontend.editor.MCRRequestParameters;
-import org.mycore.user2.*;
 
 /**
  * The servlet start the MyCoRe class editor session with some parameters from a
@@ -74,10 +69,12 @@ public class MCRStartClassEditorServlet extends MCRServlet {
 
     private static MCRClassificationEditor clE = new MCRClassificationEditor();
 
+    /**
+     * Replace the doGetPost method of MCRServlet. This method will be called
+     * two times when using the classification editor. Firtst time it prepare
+     * date for the editor and second time it execute the operation.
+     */
     public void doGetPost(MCRServletJob job) throws Exception {
-
-        MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
-        String userid = mcrSession.getCurrentUserID();
 
         // read the XML data if given from Editorsession
         MCREditorSubmission sub = (MCREditorSubmission) (job.getRequest().getAttribute("MCREditorSubmission"));
@@ -134,11 +131,18 @@ public class MCRStartClassEditorServlet extends MCRServlet {
             org.jdom.Document indoc = sub.getXML();
             boolean bret = false;
 
+            // for debug
+            XMLOutputter outputter = new XMLOutputter();
+            LOGGER.debug(outputter.outputString(indoc));
+
             if ("create-category".equals(todo2) || "modify-category".equals(todo2)) {
-                if ("create-category".equals(todo2))
+                if ("create-category".equals(todo2)) {
+                    // create
                     bret = clE.createCategoryInClassification(indoc, clid, categid);
-                else
+                } else {
+                    // modify
                     bret = clE.modifyCategoryInClassification(indoc, clid, categid);
+                }
                 if (bret)
                     job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(path + "&categid=" + categid + "&clid=" + clid));
             } else {
@@ -195,14 +199,12 @@ public class MCRStartClassEditorServlet extends MCRServlet {
             return;
         }
 
-        // beim ersten Aufruf, direkt ohnen editor
+        // first call, direct without beim ersten Aufruf, direkt ohnen editor
         else if ("delete-classification".equals(todo)) {
-            // l�schen
-            int cnt = clE.deleteClassification(clid);
-            if (cnt == 0) { // ok - gel�scht , da keine referenzen auf Category
-                // vorhanden
+            boolean cnt = clE.deleteClassification(clid);
+            if (cnt) { // deleted, no more references
                 if (path.indexOf("&clid") > 0) {
-                    // Classification abschneiden
+                    // Classification cut
                     path = path.substring(0, path.indexOf("&clid"));
                 }
                 job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(path));
@@ -239,17 +241,17 @@ public class MCRStartClassEditorServlet extends MCRServlet {
                 sb.append("classification:metadata:0:children:").append(clid);
                 params.put("XSL.editor.source.url", sb.toString());
 
-            } else if ("create-classification".equals(todo)) {
+            }
+            if ("create-classification".equals(todo)) {
                 params.put("XSL.editor.source.new", "true");
-            } else {
-                // if categid is 'empty' create an empty category
-                if (categid.equals("empty")) {
-                    MCRClassificationItem cl = MCRClassificationItem.getClassificationItem(clid);
-                    MCRCategoryItem category = new MCRCategoryItem("empty", cl);
-                    category.create();
-                }
-                // to editor category type redirect
+            }
+            if ("modify-category".equals(todo)) {
                 sb.append("classification:metadata:0:children:").append(clid).append(':').append(categid);
+                params.put("XSL.editor.source.url", sb.toString());
+                params.put("categid", categid);
+            }
+            if ("create-category".equals(todo)) {
+                sb.append("classification:metadata:0:children:").append(clid);
                 params.put("XSL.editor.source.url", sb.toString());
                 params.put("categid", categid);
             }
@@ -268,7 +270,7 @@ public class MCRStartClassEditorServlet extends MCRServlet {
 
     }
 
-    private String buildRedirectURL(String baseURL, Properties parameters) {
+    private final String buildRedirectURL(String baseURL, Properties parameters) {
         StringBuffer redirectURL = new StringBuffer(baseURL);
         boolean first = true;
         for (Enumeration e = parameters.keys(); e.hasMoreElements();) {

@@ -12,6 +12,8 @@
   </headline>
 
   <panel id="create-classification">	  	  
+	<hidden var="categories/category/@ID" default="empty"/>
+	<hidden var="categories/category/label/@text" default="Empty"/>
 	<cell col="1" row="1" colspan="2" anchor="NORTHWEST"  ref="NewClass" />	  	  	  
 	<cell col="1" row="4" colspan="2" ><space width="1px" height="10px" /></cell>	
     <cell col="1" row="6" colspan="2" anchor="EAST"      ref="TwoButtons"  />
@@ -47,10 +49,9 @@
     <cell col="1" row="3" anchor="NORTHWEST" ref="TFzeile1024"  var="@description"  />	  
     <cell col="2" row="3" anchor="NORTHWEST">	  
 	  <text i18n="classedit.label.description" class="editorlabel"/>
-	</cell>	  
-	  
+	</cell>	  	  
   </panel>
-	 	 
+
   <text id="AClid" i18n="classedit.label.addclass.aclid" class="editorlabel"/>
 
 <!-- *** End *** -->
