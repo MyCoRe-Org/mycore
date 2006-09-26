@@ -77,18 +77,25 @@ public class MCRURIResolverFilter implements Filter {
         // process request
         filterChain.doFilter(request, wrapper);
         final String origOutput = wrapper.toString();
+        final String characterEncoding = wrapper.getCharacterEncoding();
+        /**
+         * NOTE: jetty doesn't correctly implement
+         * ServletOutputStream.print(String). So we must encode it ourself to
+         * byte arrays.
+         */
         if (LOGGER.isDebugEnabled() && !list.isEmpty() && (-1 != response.getContentType().indexOf("text/html") || -1 != response.getContentType().indexOf("text/xml"))) {
             int pos = getInsertPosition(origOutput);
-            out.print(origOutput.substring(0, pos));
+            out.write(origOutput.substring(0, pos).getBytes(characterEncoding));
             final String insertString = "\n<!-- \n" + list.toString() + "\n-->";
-            out.print(insertString);
-            out.print(origOutput.substring(pos, origOutput.length()));
-            response.setContentLength(origOutput.length()+insertString.length());
+            final byte[] insertBytes = insertString.getBytes(characterEncoding);
+            out.write(insertBytes);
+            out.write(origOutput.substring(pos, origOutput.length()).getBytes(characterEncoding));
+            response.setContentLength(origOutput.getBytes(characterEncoding).length+insertBytes.length);
             // delete debuglist
             currentSession.deleteObject(MCRURIResolver.SESSION_OBJECT_NAME);
             LOGGER.debug("end filter");
         } else {
-            out.print(origOutput);
+            out.write(origOutput.getBytes(characterEncoding));
         }
         out.close();
     }
@@ -167,6 +174,7 @@ public class MCRURIResolverFilter implements Filter {
                  * Either way for this rare circumstance we return the String in
                  * system default encoding here.
                  */
+                LOGGER.error("Fall back to DEFAULT encoding.");
                 return output.toString();
             }
         }
@@ -184,6 +192,12 @@ public class MCRURIResolverFilter implements Filter {
             return new MyServletOutputStream();
         }
         
+        public String getCharacterEncoding() {
+            final String encoding=super.getCharacterEncoding();
+            LOGGER.debug("Character Encoding: "+encoding);
+            return encoding;
+        }
+
         private class MyServletOutputStream extends ServletOutputStream{
 
             public void print(String arg0) throws IOException {
