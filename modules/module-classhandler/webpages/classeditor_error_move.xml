@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="ISO_8859-1"?>
+<!DOCTYPE MyCoReWebPage>
+
+<MyCoReWebPage>
+<head>
+ <maintitle xml:lang="de">@libri</maintitle>
+ <maintitle xml:lang="en">@libri</maintitle>
+ <pagetitle xml:lang="de">Klassifikationseditor Fehler</pagetitle>
+ <pagetitle xml:lang="en">Error Class Editor</pagetitle>
+</head>
+<section title="Fehler: Verschieben einer Kategorie im Klassifikationsbaum" xml:lang="de">
+<p></p>
+<br />
+<p></p>
+<center>
+<table width="80%">
+ <tr align="center">
+  <td align="center">
+<font color="red">
+   Beim Verschieben der Kategorie gab es ein Problem.<br/>
+   Die Kategorie wurde nicht verschoben. 
+
+</font>
+  </td>
+ </tr>
+</table>
+</center>
+<p></p>
+<br />
+<p></p>
+</section>
+
+<section title="Error: moving a category in a classificationtree" xml:lang="en">
+<p></p>
+<br />
+<p></p>
+<center>
+<table width="80%">
+ <tr align="center">
+  <td align="center">
+<font color="red">
+   There was a problem moving by the category. <br/>	
+   The category data were not moved. 
+</font>
+  </td>
+ </tr>
+</table>
+</center>
+<p></p>
+<br />
+<p></p>
+</section>
+
+</MyCoReWebPage>
+
+

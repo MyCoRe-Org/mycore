@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="ISO_8859-1"?>
+<!DOCTYPE MyCoReWebPage>
+
+<MyCoReWebPage>
+<head>
+ <maintitle xml:lang="de">@libri</maintitle>
+ <maintitle xml:lang="en">@libri</maintitle>
+ <pagetitle xml:lang="de">Klassifikationseditor Fehler</pagetitle>
+ <pagetitle xml:lang="en">Error Class Editor</pagetitle>
+ <HttpForward>browse?mode=edit</HttpForward>
+</head>
+<section title="Klassifikation Import Fehler" xml:lang="de">
+<p></p>
+<br />
+<p></p>
+<center>
+<table width="80%">
+ <tr align="center">
+  <td align="center">
+<font color="red">
+   Die Klassifikation konnte nicht importiert werden! <br/>
+	   <br/>	
+   Sie werden zur Startseite des Klasseneditors weitergeleitet.	
+
+</font>
+  </td>
+ </tr>
+</table>
+</center>
+<p></p>
+<br />
+<p></p>
+</section>
+
+<section title="Classification Import Error" xml:lang="en">
+<p></p>
+<br />
+<p></p>
+<center>
+<table width="80%">
+ <tr align="center">
+  <td align="center">
+<font color="red">
+   An Error occured, importing the Classification!
+</font>
+	     <br/>	
+   You will be forwarded to the Startpage for the Classeditor.	
+
+  </td>
+ </tr>
+</table>
+</center>
+<p></p>
+<br />
+<p></p>
+</section>
+
+</MyCoReWebPage>
+
+

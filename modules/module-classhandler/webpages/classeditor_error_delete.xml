@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="ISO_8859-1"?>
+<!DOCTYPE MyCoReWebPage>
+
+<MyCoReWebPage>
+<head>
+ <maintitle xml:lang="de">@libri</maintitle>
+ <maintitle xml:lang="en">@libri</maintitle>
+ <pagetitle xml:lang="de">Klassifikationseditor Fehler</pagetitle>
+ <pagetitle xml:lang="en">Error Class Editor</pagetitle>
+</head>
+
+<section title="Fehler: Löschen eienr Klassifikation/Kategorie" xml:lang="de">
+<p></p>
+<br />
+<p></p>
+<center>
+<table width="80%">
+ <tr align="center">
+  <td align="center">
+<font color="red">
+   Beim Löschen der Klassifikation/Kategorie gab es ein Problem.<br/>
+   Die Klassifikation/Kategorie wurden nicht gelöscht. <br/>
+   Es können nur Klassifikationen/Kategorien gelöscht werden, 
+   die noch nicht referenziert sind (Dokumentanzahl=0).
+</font>
+  </td>
+ </tr>
+</table>
+</center>
+<p></p>
+<br />
+<p></p>
+</section>
+
+<section title="error: delete a classification/category" xml:lang="en">
+<p></p>
+<br />
+<p></p>
+<center>
+<table width="80%">
+ <tr align="center">
+  <td align="center">
+<font color="red">
+   The classification/category data were not deleted.<br/>
+   Ensure that no documents referencing this classification/category. 
+   Only classification/categories without any references to documents can be deletetd.
+</font>
+  </td>
+ </tr>
+</table>
+</center>
+<p></p>
+<br />
+<p></p>
+</section>
+
+</MyCoReWebPage>
+
+

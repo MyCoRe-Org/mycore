@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="ISO_8859-1"?>
+<!DOCTYPE MyCoReWebPage>
+
+<MyCoReWebPage>
+<head>
+ <maintitle xml:lang="de">@libri</maintitle>
+ <maintitle xml:lang="en">@libri</maintitle>
+ <pagetitle xml:lang="de">Klassifikationseditor Fehler</pagetitle>
+ <pagetitle xml:lang="en">Error Class Editor</pagetitle>
+</head>
+<section title="CategID/CLID Fehler" xml:lang="de">
+<p></p>
+<br />
+<p></p>
+<center>
+<table width="80%">
+ <tr align="center">
+  <td align="center">
+<font color="red">
+   Die angebene ID der Klassifikation/Kategorie ist nicht eindeutig oder falsch! <br/>
+</font>
+  </td>
+ </tr>
+</table>
+</center>
+<p></p>
+<br />
+<p></p>
+</section>
+
+<section title="CategID/ClID Error" xml:lang="en">
+<p></p>
+<br />
+<p></p>
+<center>
+<table width="80%">
+ <tr align="center">
+  <td align="center">
+<font color="red">
+   The Classification or Category ID is wrong or not unique!
+</font>
+  </td>
+ </tr>
+</table>
+</center>
+<p></p>
+<br />
+<p></p>
+</section>
+
+</MyCoReWebPage>
+
+
