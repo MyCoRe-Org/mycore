@@ -84,7 +84,7 @@ public class MCRSQLSearcher extends MCRSearcher {
      * @return formatted SQL string for table generation
      */
     private String buildColumn(MCRFieldDef fd) {
-        StringBuffer sbRet = new StringBuffer().append(fd.getName().toUpperCase());
+        StringBuffer sbRet = new StringBuffer().append(fd.getName().toUpperCase()).append(' ');
         String type = fd.getDataType().toLowerCase();
 
         if (type.equals("text") || type.equals("name") || type.equals("identifier")) {
