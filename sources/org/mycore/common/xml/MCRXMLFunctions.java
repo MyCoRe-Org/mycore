@@ -136,4 +136,8 @@ public class MCRXMLFunctions {
     public static String getISODate(String simpleDate,String simpleFormat) throws ParseException{
         return getISODate(simpleDate,simpleFormat,null);
     }
+    
+    public static String regexp(String orig, String match, String replace){
+        return orig.replaceAll(match, replace);
+    }
 }
