@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE MyCoReWebPage>
+
+<MyCoReWebPage>
+
+<head>
+ <maintitle xml:lang="de">@libri</maintitle>
+ <maintitle xml:lang="en">@libri</maintitle>
+ <pagetitle xml:lang="de">Klassifikationseditor Abbruch</pagetitle>
+ <pagetitle xml:lang="en">Cancel Class Editor</pagetitle>
+ <HttpForward>browse?mode=edit</HttpForward>
+	
+</head>
+
+<section title="Klassifikationseditor Abbruch" xml:lang="de">
+<p></p>
+<br />
+<p></p>
+<center>
+<table width="80%">
+ <tr align="center">
+  <td align="center">
+<font color="red">
+   Die Arbeit mit dem Klassifikationseditor wurde nutzerseitig abgebrochen.<br/>
+   <br/>	
+   Sie werden zur Startseite des Klasseneditors weitergeleitet.	
+</font>
+  </td>
+ </tr>
+</table>
+</center>
+<p></p>
+<br />
+<p></p>
+</section>
+
+<section title="Classification Editor canceled" xml:lang="en">
+<p></p>
+<br />
+<p></p>
+<center>
+<table width="80%">
+ <tr align="center">
+  <td align="center">
+<font color="red">
+   The job was canceld by the user.<br/>
+   <br/>	
+   You will be forwarded to the Startpage for the Classeditor.	
+</font>
+  </td>
+ </tr>
+</table>
+</center>
+<p></p>
+<br />
+<p></p>
+</section>
+
+</MyCoReWebPage>
+
+
