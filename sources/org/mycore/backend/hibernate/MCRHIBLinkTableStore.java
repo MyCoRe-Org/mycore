@@ -162,34 +162,21 @@ public class MCRHIBLinkTableStore implements MCRLinkTableInterface {
         Session session = getSession();
         Integer returns;
         StringBuffer qBf = new StringBuffer(1024);
-        qBf.append("select count(key.mcrfrom) from ").append(classname).append(" where MCRTO = :to");
-        boolean tset = false, rset = false, fset = false;
+        qBf.append("select count(key.mcrfrom) from ").append(classname).append(" where MCRTO like ")
+        .append('\'').append(to).append('\'');
 
         if ((type != null) && (type.length() != 0)) {
-            tset = true;
-            qBf.append(" and MCRTYPE = :type");
+          qBf.append(" and MCRTYPE = \'").append(type).append('\'');
         }
         if ((restriction != null) && (restriction.length() != 0)) {
-            rset = true;
-            qBf.append(" and MCRTO like :restriction");
+          qBf.append(" and MCRTO like \'").append(restriction).append('\'');
         }
         if ((fromtype != null) && (fromtype.length() != 0)) {
-            fset = true;
-            qBf.append(" and MCRFROM like %_:fromtype_%");
+          qBf.append(" and MCRFROM like \'%_").append(fromtype).append("_%\'");
         }
 
         try {
             Query q = session.createQuery(qBf.toString());
-            q.setString("to", to);
-            if (tset) {
-                q.setString("type", type);
-            }
-            if (rset) {
-                q.setString("restriction", restriction);
-            }
-            if (fset) {
-                q.setString("fromtype", fromtype);
-            }
             returns=(Integer)q.uniqueResult();
         } catch (Exception e) {
             logger.error(e);

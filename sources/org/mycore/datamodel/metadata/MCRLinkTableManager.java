@@ -431,7 +431,30 @@ public class MCRLinkTableManager {
      * @return the number of references
      */
     public int countReferenceCategory(String classid, String categid, String[] types, String restriction) {
-        return countReferenceLinkTo(classid + "##" + categid + "%", types, restriction);
+      if ((classid == null) || ((classid = classid.trim()).length() == 0)) {
+        logger.warn("The to value of classification ID is null or empty.");
+        return 0;
+    }
+      if (categid == null) { categid = ""; }
+      StringBuffer sb = new StringBuffer(classid);
+      sb.append("##").append(categid).append('%');
+
+    try {
+        if (((types != null) && (types.length > 0))) {
+            String mydoctype = "";
+            int cnt = 0;
+            int idt = 0;
+            for (idt = 0; idt < types.length; idt++) {
+                mydoctype = types[idt];
+                cnt += persistenceclass.countTo(mydoctype,sb.toString(), "classid", restriction);
+            }
+            return cnt;
+        }
+        return persistenceclass.countTo(null,sb.toString(), "classid", restriction);
+    } catch (Exception e) {
+        logger.warn("An error was occured while search for references of " + sb.toString() + ".");
+    }
+    return 0;
     }
 
     /**
