@@ -40,7 +40,7 @@ import org.mycore.datamodel.metadata.MCRLinkTableManager;
  * This class is an abstract class for the implementation of the classes
  * classification an category.
  * 
- * @author Frank Lützenkirchen
+ * @author Frank Lï¿½tzenkirchen
  * @author Jens Kupferschmidt
  * @version $Revision$ $Date$
  */
@@ -449,9 +449,7 @@ public abstract class MCRClassificationObject {
      */
     public int countDocLinks(String[] doctypes, String restriction) {
         ensureNotDeleted();
-
         MCRLinkTableManager mcl = MCRLinkTableManager.instance();
-
         if (this.getClassificationID().equals(this.getID())) {
             return mcl.countReferenceCategory(this.getClassificationID(), "", doctypes, restriction);
         }
