@@ -83,7 +83,8 @@ public class MCRURIResolverFilter implements Filter {
          * ServletOutputStream.print(String). So we must encode it ourself to
          * byte arrays.
          */
-        if (LOGGER.isDebugEnabled() && !list.isEmpty() && (-1 != response.getContentType().indexOf("text/html") || -1 != response.getContentType().indexOf("text/xml"))) {
+        if (LOGGER.isDebugEnabled() && !list.isEmpty() && (origOutput.length() > 0)
+                && (-1 != response.getContentType().indexOf("text/html") || -1 != response.getContentType().indexOf("text/xml"))) {
             int pos = getInsertPosition(origOutput);
             out.write(origOutput.substring(0, pos).getBytes(characterEncoding));
             final String insertString = "\n<!-- \n" + list.toString() + "\n-->";
@@ -107,7 +108,7 @@ public class MCRURIResolverFilter implements Filter {
             // for xml output, after <?xml *?>
             pos = origOutput.indexOf("?>") + 2;
         }
-        if (pos < 0) {
+        if (pos < 2) {
             // for the rest
             pos = 0;
         }
