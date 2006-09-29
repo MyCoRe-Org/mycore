@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE MyCoReWebPage>
+
+<MyCoReWebPage>
+
+<section title="Neuanlegen einer Klassifikation" xml:lang="de">
+<p></p>
+<br />
+<p></p>
+<editor id="create-classification-de"><include uri="webapp:editor/editor-create-classification.xml"/></editor>
+<p></p>
+<br />
+<p></p>
+</section>
+
+<section title="Create a new category for the given classification" xml:lang="en">
+<p></p>
+<br />
+<p></p>
+<editor id="create-classification-en"><include uri="webapp:editor/editor-create-classification.xml"/></editor>
+<p></p>
+<br />
+<p></p>
+</section>
+
+</MyCoReWebPage>
+
+

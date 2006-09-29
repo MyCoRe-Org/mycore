@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE MyCoReWebPage>
+
+<MyCoReWebPage>
+
+<section title="Ändern einer Kategorie in einer Klassifikation " xml:lang="de">
+<p></p>
+<br />
+<p></p>
+<editor id="modify-category-de"><include uri="webapp:editor/editor-modify-category.xml"/></editor>
+<p></p>
+<br />
+<p></p>
+</section>
+
+<section title="Update a category for the given classification" xml:lang="en">
+<p></p>
+<br />
+<p></p>
+<editor id="modify-category-en"><include uri="webapp:editor/editor-modify-category.xml"/></editor>
+<p></p>
+<br />
+<p></p>
+</section>
+
+</MyCoReWebPage>
+
+
