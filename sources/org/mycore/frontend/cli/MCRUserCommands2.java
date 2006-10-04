@@ -28,6 +28,7 @@ import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
@@ -46,7 +47,7 @@ import org.mycore.user2.MCRUserMgr;
  * which can be used by the command line interface.
  * 
  * @author Detlev Degenhardt
- * @author Frank Lützenkirchen
+ * @author Frank Lï¿½tzenkirchen
  * @author Jens Kupferschmidt
  * @version $Revision$ $Date$
  */
@@ -255,7 +256,15 @@ public class MCRUserCommands2 extends MCRAbstractCommands {
      * respectively.
      */
     public static void checkConsistency() throws Exception {
-        MCRUserMgr.instance().checkConsistency();
+        try {
+            MCRUserMgr.instance().checkConsistency();
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage());
+            Level level = LOGGER.getLevel();
+            if (level.equals(Level.DEBUG)) {
+                e.printStackTrace();
+            }
+        }
     }
 
     /**
@@ -266,8 +275,15 @@ public class MCRUserCommands2 extends MCRAbstractCommands {
      *            the ID of the group which will be deleted
      */
     public static void deleteGroup(String groupID) throws Exception {
-        MCRUserMgr.instance().deleteGroup(groupID);
-        LOGGER.info("Group ID " + groupID + " deleted!");
+        try {
+            MCRUserMgr.instance().deleteGroup(groupID);
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage());
+            Level level = LOGGER.getLevel();
+            if (level.equals(Level.DEBUG)) {
+                e.printStackTrace();
+            }
+        }
     }
 
     /**
@@ -278,8 +294,15 @@ public class MCRUserCommands2 extends MCRAbstractCommands {
      *            the ID of the user which will be deleted
      */
     public static void deleteUser(String userID) throws Exception {
-        MCRUserMgr.instance().deleteUser(userID);
-        LOGGER.info("User ID " + userID + " deleted!");
+        try {
+            MCRUserMgr.instance().deleteUser(userID);
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage());
+            Level level = LOGGER.getLevel();
+            if (level.equals(Level.DEBUG)) {
+                e.printStackTrace();
+            }
+        }
     }
 
     /**
@@ -289,8 +312,15 @@ public class MCRUserCommands2 extends MCRAbstractCommands {
      *            the ID of the user which will be enabled
      */
     public static void enableUser(String userID) throws Exception {
-        MCRUserMgr.instance().enableUser(userID);
-        LOGGER.info("User ID " + userID + " enabled!");
+        try {
+            MCRUserMgr.instance().enableUser(userID);
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage());
+            Level level = LOGGER.getLevel();
+            if (level.equals(Level.DEBUG)) {
+                e.printStackTrace();
+            }
+        }
     }
 
     /**
@@ -344,8 +374,15 @@ public class MCRUserCommands2 extends MCRAbstractCommands {
      *            the ID of the user which will be enabled
      */
     public static void disableUser(String userID) throws Exception {
-        MCRUserMgr.instance().disableUser(userID);
-        LOGGER.info("User ID " + userID + " disabled!");
+        try {
+            MCRUserMgr.instance().disableUser(userID);
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage());
+            Level level = LOGGER.getLevel();
+            if (level.equals(Level.DEBUG)) {
+                e.printStackTrace();
+            }
+        }
     }
 
     /**
@@ -390,7 +427,6 @@ public class MCRUserCommands2 extends MCRAbstractCommands {
             throw new MCRException("Error while command saveAllGroupsToFile()", e);
         }
     }
-
 
     /**
      * This command takes a file name as a parameter, retrieves all users from
@@ -457,28 +493,45 @@ public class MCRUserCommands2 extends MCRAbstractCommands {
      *            the ID of the user for which the password will be set
      */
     public static void setPassword(String userID, String password) throws MCRException {
-        if (password == null) {
-            return;
+        try {
+            MCRUserMgr.instance().setPassword(userID, password);
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage());
+            Level level = LOGGER.getLevel();
+            if (level.equals(Level.DEBUG)) {
+                e.printStackTrace();
+            }
         }
-
-        MCRUserMgr.instance().setPassword(userID, password);
-        LOGGER.info("The new password was set.");
     }
 
     /**
      * This method sets the user management component to read only mode
      */
     public static void setLock() throws MCRException {
-        MCRUserMgr.instance().setLock(true);
-        LOGGER.info("Write access to the user component persistent database now is denied.");
+        try {
+            MCRUserMgr.instance().setLock(true);
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage());
+            Level level = LOGGER.getLevel();
+            if (level.equals(Level.DEBUG)) {
+                e.printStackTrace();
+            }
+        }
     }
 
     /**
      * This method sets the user management component to read/write access mode
      */
     public static void unLock() throws MCRException {
-        MCRUserMgr.instance().setLock(false);
-        LOGGER.info("Write access to the user component persistent database now is allowed.");
+        try {
+            MCRUserMgr.instance().setLock(false);
+        } catch (Exception e) {
+            LOGGER.error(e.getMessage());
+            Level level = LOGGER.getLevel();
+            if (level.equals(Level.DEBUG)) {
+                e.printStackTrace();
+            }
+        }
     }
 
     /**

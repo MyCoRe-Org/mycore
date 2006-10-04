@@ -52,8 +52,8 @@ import org.mycore.common.MCRSessionMgr;
  * @version $Revision$ $Date$
  */
 public class MCRUserMgr {
-    /** The logger and the configuration */
-    private static Logger logger = Logger.getLogger(MCRUserMgr.class.getName());
+    /** The LOGGER and the configuration */
+    private static Logger LOGGER = Logger.getLogger(MCRUserMgr.class.getName());
 
     private static MCRConfiguration config = null;
 
@@ -145,7 +145,7 @@ public class MCRUserMgr {
         // automatically to the
         // group list in MCRUser, we have to check if this group has the user as
         // one of its members.
-        logger.info("Consistency check is started.");
+        LOGGER.info("Consistency check is started.");
 
         ArrayList allUserIDs = mcrUserStore.getAllUserIDs();
 
@@ -155,7 +155,7 @@ public class MCRUserMgr {
 
             for (int j = 0; j < currentGroupIDs.size(); j++) {
                 if (!mcrUserStore.existsGroup((String) currentGroupIDs.get(j))) {
-                    logger.error("user : '" + currentUser.getID() + "' error: unknown group '" + (String) currentGroupIDs.get(j) + "'!");
+                    LOGGER.error("user : '" + currentUser.getID() + "' error: unknown group '" + (String) currentGroupIDs.get(j) + "'!");
                 }
             }
 
@@ -163,7 +163,7 @@ public class MCRUserMgr {
             ArrayList mbrUserIDs = primaryGroup.getMemberUserIDs();
 
             if (!mbrUserIDs.contains(currentUser.getID())) {
-                logger.error("user : '" + currentUser.getID() + "' error: is not member of" + " primary group '" + currentUser.getPrimaryGroupID() + "'!");
+                LOGGER.error("user : '" + currentUser.getID() + "' error: is not member of" + " primary group '" + currentUser.getPrimaryGroupID() + "'!");
             }
         }
 
@@ -181,7 +181,7 @@ public class MCRUserMgr {
 
             for (int j = 0; j < admUserIDs.size(); j++) {
                 if (!mcrUserStore.existsUser((String) admUserIDs.get(j))) {
-                    logger.error("group: '" + currentGroup.getID() + "' error: unknown admin" + " user '" + (String) admUserIDs.get(j) + "'!");
+                    LOGGER.error("group: '" + currentGroup.getID() + "' error: unknown admin" + " user '" + (String) admUserIDs.get(j) + "'!");
                 }
             }
 
@@ -190,7 +190,7 @@ public class MCRUserMgr {
 
             for (int j = 0; j < admGroupIDs.size(); j++) {
                 if (!mcrUserStore.existsGroup((String) admGroupIDs.get(j))) {
-                    logger.error("group: '" + currentGroup.getID() + "' error: unknown admin" + " group '" + (String) admGroupIDs.get(j) + "'!");
+                    LOGGER.error("group: '" + currentGroup.getID() + "' error: unknown admin" + " group '" + (String) admGroupIDs.get(j) + "'!");
                 }
             }
 
@@ -199,12 +199,12 @@ public class MCRUserMgr {
 
             for (int j = 0; j < mbrUserIDs.size(); j++) {
                 if (!mcrUserStore.existsUser((String) mbrUserIDs.get(j))) {
-                    logger.error("group: '" + currentGroup.getID() + "' error: unknown user '" + (String) mbrUserIDs.get(j) + "'!");
+                    LOGGER.error("group: '" + currentGroup.getID() + "' error: unknown user '" + (String) mbrUserIDs.get(j) + "'!");
                 }
             }
         }
 
-        logger.info("done.");
+        LOGGER.info("done.");
         locked = false; // write access is allowed again
     }
 
@@ -293,7 +293,7 @@ public class MCRUserMgr {
             } catch (MCRException e) {
             }
 
-            logger.error("Can't create MCRGroup", ex);
+            LOGGER.error("Can't create MCRGroup", ex);
             throw new MCRException("Can't create MCRGroup.", ex);
         }
     }
@@ -460,6 +460,7 @@ public class MCRUserMgr {
             groupCache.remove(groupID);
             mcrUserStore.deleteGroup(groupID);
         }
+        LOGGER.info("User with ID " + groupID + " deleted.");
     }
 
     /**
@@ -490,31 +491,34 @@ public class MCRUserMgr {
             throw new MCRException("Delete for user '" + userID + "' is not allowed!");
         }
 
-        try {
-            // We have to notify the groups where this user is an administrative
-            // user
-            ArrayList adminGroups = mcrUserStore.getGroupIDsWithAdminUser(userID);
-
-            for (int i = 0; i < adminGroups.size(); i++) {
+        // We have to notify the groups where this user is an administrative
+        // user
+        ArrayList adminGroups = mcrUserStore.getGroupIDsWithAdminUser(userID);
+        for (int i = 0; i < adminGroups.size(); i++) {
+            try {
                 MCRGroup adminGroup = retrieveGroup((String) adminGroups.get(i));
                 adminGroup.removeAdminUserID(userID);
                 groupCache.remove(adminGroup.getID());
                 mcrUserStore.updateGroup(adminGroup);
+            } catch (Exception ex) {
+                LOGGER.warn("Can't remove " + userID + "from group " + adminGroups.get(i));
             }
+        }
 
-            // We have to notify the groups this user is a member of
-            for (int i = 0; i < user.getGroupIDs().size(); i++) {
+        // We have to notify the groups this user is a member of
+        for (int i = 0; i < user.getGroupIDs().size(); i++) {
+            try {
                 MCRGroup currentGroup = retrieveGroup((String) user.getGroupIDs().get(i));
                 currentGroup.removeMemberUserID(userID);
                 groupCache.remove(currentGroup.getID());
                 mcrUserStore.updateGroup(currentGroup);
+            } catch (Exception ex) {
+                LOGGER.warn("Can't remove " + userID + "from group " + adminGroups.get(i));
             }
-        } catch (Exception ex) {
-            throw new MCRException("Can't delete user " + userID, ex);
-        } finally {
-            userCache.remove(userID);
-            mcrUserStore.deleteUser(userID);
         }
+        userCache.remove(userID);
+        mcrUserStore.deleteUser(userID);
+        LOGGER.info("User with ID " + userID + " deleted.");
     }
 
     /**
@@ -525,6 +529,7 @@ public class MCRUserMgr {
      */
     public final void disableUser(String userID) throws MCRException {
         enable(userID, false);
+        LOGGER.info("User with ID " + userID + " disabled!");
     }
 
     /**
@@ -535,6 +540,7 @@ public class MCRUserMgr {
      */
     public final void enableUser(String userID) throws MCRException {
         enable(userID, true);
+        LOGGER.info("User with ID " + userID + " enabled!");
     }
 
     /**
@@ -672,7 +678,7 @@ public class MCRUserMgr {
      * @return maximum value of the numerical user IDs
      */
     public final int getMaxUserNumID() throws MCRException {
-    	//whitout checking a permission, because we only want to see it
+        // whitout checking a permission, because we only want to see it
         return mcrUserStore.getMaxUserNumID();
     }
 
@@ -709,11 +715,22 @@ public class MCRUserMgr {
      *            The user or group object which will be imported
      */
     public final synchronized void importUserObject(MCRUserObject obj) throws MCRException {
-        if (locked) {
-            throw new MCRException("The user component is locked. At the moment write access is denied.");
-        }
-
         try {
+            // Check that the user system is not locked
+            if (locked) {
+                throw new MCRException("The user component is locked. At the moment write access is denied.");
+            }
+
+            // is it not NULL
+            if (obj == null) {
+                throw new MCRException("The provided user system object is null.");
+            }
+
+            // Check validation
+            if (!obj.isValid()) {
+                throw new MCRException("The data of the provided user or group object is not valid.");
+            }
+
             // backup up creator and dates
             String creator = obj.getCreator();
             java.sql.Timestamp created = obj.getCreationDate();
@@ -721,9 +738,46 @@ public class MCRUserMgr {
 
             // now create the user or group
             if (obj instanceof MCRUser) {
-                initializeUser((MCRUser) obj, creator);
+                // Check exist user
+                if (mcrUserStore.existsUser(((MCRUser) obj).getID())) {
+                    throw new MCRException("The user '" + obj.getID() + "' already exists!");
+                }
+                // Check if the primary group exists
+                String primarygroup = ((MCRUser) obj).getPrimaryGroupID();
+                if (!mcrUserStore.existsGroup(primarygroup)) {
+                    throw new MCRException("The primary group of the user '" + obj.getID() + "' does not exist.");
+                }
+                // Check if the groups the user will be a member of really exist
+                ArrayList groupIDs = ((MCRUser) obj).getGroupIDs();
+                for (int i = 0; i < groupIDs.size(); i++) {
+                    if (!mcrUserStore.existsGroup((String) groupIDs.get(i))) {
+                        throw new MCRException("The user '" + obj.getID() + "' is linked to the unknown group '" + groupIDs.get(i) + "'.");
+                    }
+                }
+                // At first create the user. The user must be created before
+                // updating the groups because the existence of the user will
+                // be checked while updating the groups.
+                mcrUserStore.createUser((MCRUser) obj);
+                // now we update the primary group
+                MCRGroup primGroup = mcrUserStore.retrieveGroup(primarygroup);
+                primGroup.addMemberUserID(((MCRUser) obj).getID());
+                groupCache.remove(primGroup.getID());
+                mcrUserStore.updateGroup(primGroup);
+                // now update the other groups
+                for (int i = 0; i < groupIDs.size(); i++) {
+                    MCRGroup otherGroup = retrieveGroup((String) groupIDs.get(i), true);
+                    otherGroup.addMemberUserID(((MCRUser) obj).getID());
+                    groupCache.remove(otherGroup.getID());
+                    mcrUserStore.updateGroup(otherGroup);
+                }
+
             } else {
-                initializeGroup((MCRGroup) obj, creator);
+                // Check exist group
+                if (mcrUserStore.existsGroup(((MCRGroup) obj).getID())) {
+                    throw new MCRException("The group '" + obj.getID() + "' already exists!");
+                }
+                // create data
+                mcrUserStore.createGroup((MCRGroup) obj);
             }
 
             // finally set the old values and update the user or group
@@ -736,6 +790,7 @@ public class MCRUserMgr {
             } else {
                 mcrUserStore.updateGroup((MCRGroup) obj);
             }
+            LOGGER.info("User or group with ID " + obj.getID() + " imported.");
         } catch (MCRException ex) {
             setLock(false);
             throw new MCRException("Can't import user or group.", ex);
@@ -1001,7 +1056,7 @@ public class MCRUserMgr {
             try {
                 reqUser = mcrUserStore.retrieveUser(userID);
             } catch (MCRException e) {
-                logger.warn(e.getMessage());
+                LOGGER.warn(e.getMessage());
                 throw new MCRException("user can't be found in the database");
             }
 
@@ -1058,6 +1113,10 @@ public class MCRUserMgr {
         }
 
         this.locked = locked;
+        if (locked)
+            LOGGER.info("Write access to the user component persistent database now is denied.");
+        else
+            LOGGER.info("Write access to the user component persistent database now is allowed.");
     }
 
     /**
@@ -1108,6 +1167,7 @@ public class MCRUserMgr {
 
         userCache.remove(userID);
         mcrUserStore.updateUser(user);
+        LOGGER.info("The new password was set.");
     }
 
     /**
@@ -1422,6 +1482,6 @@ public class MCRUserMgr {
     public final boolean existUser(String user) {
         if (user == null)
             return false;
-       return mcrUserStore.existsUser(user);
+        return mcrUserStore.existsUser(user);
     }
 }
