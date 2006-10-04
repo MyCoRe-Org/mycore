@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
@@ -40,12 +41,15 @@ import javax.xml.transform.stream.StreamSource;
 
 import org.apache.log4j.Logger;
 
+import org.jdom.Document;
+import org.jdom.Element;
+import org.mycore.access.MCRAccessBaseImpl;
+import org.mycore.access.MCRAccessInterface;
+import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
-import org.mycore.common.MCRUtils;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventManager;
 import org.mycore.common.xml.MCRURIResolver;
-import org.mycore.common.xml.MCRXMLHelper;
 import org.mycore.datamodel.ifs.MCRFileImportExport;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRObject;
@@ -57,12 +61,15 @@ import org.mycore.datamodel.metadata.MCRXMLTableManager;
  * interface.
  * 
  * @author Jens Kupferschmidt
- * @author Frank Lützenkirchen
+ * @author Frank Luetzenkirchen
  * @version $Revision$ $Date$
  */
 public class MCRDerivateCommands extends MCRAbstractCommands {
     /** The logger */
     private static Logger LOGGER = Logger.getLogger(MCRDerivateCommands.class.getName());
+
+    /** The ACL interface */
+    private static final MCRAccessInterface ACCESS_IMPL = (MCRAccessInterface) MCRConfiguration.instance().getInstanceOf("MCR.Access_class_name", MCRAccessBaseImpl.class.getName());
 
     /**
      * The constructor.
@@ -126,11 +133,11 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
      */
     public static void deleteAllDerivates() {
         MCRDerivate der = new MCRDerivate();
-        MCRXMLTableManager tm=MCRXMLTableManager.instance();
-        ArrayList ids=tm.retrieveAllIDs("derivate");
-        Iterator it=ids.iterator();
-        while (it.hasNext()){
-            String id=it.next().toString();
+        MCRXMLTableManager tm = MCRXMLTableManager.instance();
+        ArrayList ids = tm.retrieveAllIDs("derivate");
+        Iterator it = ids.iterator();
+        while (it.hasNext()) {
+            String id = it.next().toString();
             try {
                 der.deleteFromDatastore(id);
                 LOGGER.info(der.getId().getId() + " deleted.");
@@ -186,11 +193,11 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
             }
 
             for (int i = from_i; i < (to_i + 1); i++) {
-           	
+
                 now.setNumber(i);
-            	if ( MCRObject.existInDatastore(now) ) { 
-            		delete(now.getId());
-            	}
+                if (MCRObject.existInDatastore(now)) {
+                    delete(now.getId());
+                }
             }
         } catch (MCRException ex) {
             LOGGER.debug(ex.getStackTraceAsString());
@@ -283,8 +290,8 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
      */
     public static boolean loadFromFile(String file, boolean importMode) {
         return processFromFile(new File(file), false, importMode);
-    }    
-    
+    }
+
     /**
      * Updates an MCRDerivates from an XML file.
      * 
@@ -292,7 +299,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
      *            the location of the xml file
      */
     public static boolean updateFromFile(String file) {
-        return updateFromFile(file,true);
+        return updateFromFile(file, true);
     }
 
     /**
@@ -305,8 +312,8 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
      */
     public static boolean updateFromFile(String file, boolean importMode) {
         return processFromFile(new File(file), true, importMode);
-    }    
-    
+    }
+
     /**
      * Loads or updates an MCRDerivates from an XML file.
      * 
@@ -341,10 +348,10 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
             if (mycore_obj.getDerivate().getInternals() != null) {
                 String path = mycore_obj.getDerivate().getInternals().getSourcePath();
                 path = path.replace('/', File.separatorChar).replace('\\', File.separatorChar);
-                if (path.trim().length()<=1)
-                	// the path is the path name plus the name of the derivate - 
-                	path = mycore_obj.getId().getId().toLowerCase();
-                
+                if (path.trim().length() <= 1)
+                    // the path is the path name plus the name of the derivate -
+                    path = mycore_obj.getId().getId().toLowerCase();
+
                 File sPath = new File(path);
 
                 if (!sPath.isAbsolute()) {
@@ -518,7 +525,10 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
      *            the type of the stylesheet
      */
     public static void export(String fromID, String toID, String dirname, String style, boolean withIfsID) {
-        LOGGER.debug("withIfsID ("+withIfsID+") will never used"); //FIXME: use or remove withIfsID
+        LOGGER.debug("withIfsID (" + withIfsID + ") will never used"); // FIXME:
+        // use or
+        // remove
+        // withIfsID
         // check fromID and toID
         MCRObjectID fid = null;
         MCRObjectID tid = null;
@@ -570,8 +580,8 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
 
         LOGGER.info(k + " Object's stored under " + dir.getAbsolutePath() + ".");
     }
-    
-    public static void exportAllDerivates(String dirname, String style){
+
+    public static void exportAllDerivates(String dirname, String style) {
         // check dirname
         File dir = new File(dirname);
 
@@ -582,15 +592,15 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
         }
 
         Transformer trans = getTransformer(style);
-        
-        MCRXMLTableManager tm=MCRXMLTableManager.instance();
-        ArrayList ids=tm.retrieveAllIDs("derivate");
-        Iterator it=ids.iterator();
-        while (it.hasNext()){
-            String id=it.next().toString();
-            MCRObjectID oid=new MCRObjectID(id);
+
+        MCRXMLTableManager tm = MCRXMLTableManager.instance();
+        ArrayList ids = tm.retrieveAllIDs("derivate");
+        Iterator it = ids.iterator();
+        while (it.hasNext()) {
+            String id = it.next().toString();
+            MCRObjectID oid = new MCRObjectID(id);
             try {
-                exportDerivate(dir,trans,oid);
+                exportDerivate(dir, trans, oid);
             } catch (Exception ex) {
                 LOGGER.error(ex.getMessage());
                 LOGGER.error("Exception while store file to " + dir.getAbsolutePath());
@@ -610,18 +620,25 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
      */
     private static void exportDerivate(File dir, Transformer trans, MCRObjectID nid) throws FileNotFoundException, TransformerException, IOException {
         // store the XML file
-        byte[] xml = null;
         MCRDerivate obj = new MCRDerivate();
+        Document xml = null;
 
         try {
-        	obj.receiveFromDatastore(nid.toString());
+            obj.receiveFromDatastore(nid.toString());
             String path = obj.getDerivate().getInternals().getSourcePath();
             // reset from the absolute to relative path, for later reload
             LOGGER.info("Old Internal Path ====>" + path);
             obj.getDerivate().getInternals().setSourcePath(nid.toString());
             LOGGER.info("New Internal Path ====>" + nid.toString());
-            xml = MCRUtils.getByteArray(obj.createXML());
-            
+            // add ACL's
+            List l = ACCESS_IMPL.getPermissionsForID(nid.toString());
+            for (int i = 0; i < l.size(); i++) {
+                Element rule = ACCESS_IMPL.getRule(nid.toString(), (String) l.get(i));
+                obj.getService().addRule((String) l.get(i), rule);
+            }
+            // build JDOM
+            xml = obj.createXML();
+
         } catch (MCRException ex) {
             LOGGER.warn("Could not read " + nid.toString() + ", continue with next ID");
             return;
@@ -633,9 +650,10 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
         if (trans != null) {
             trans.setParameter("dirname", dir.getPath());
             StreamResult sr = new StreamResult(out);
-            trans.transform(new org.jdom.transform.JDOMSource(MCRXMLHelper.parseXML(xml, false)), sr);
+            trans.transform(new org.jdom.transform.JDOMSource(xml), sr);
         } else {
-            out.write(xml);
+            new org.jdom.output.XMLOutputter().output(xml, out);
+            out.flush();
             out.close();
         }
 
