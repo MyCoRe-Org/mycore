@@ -179,10 +179,10 @@ public class MCRClassificationBrowserData {
     if (comments == null)
       comments = "false";
 
-    setClassification(classifID);
     clearPath(uriParts);
-    setActualPath(actEditorCategid);
-
+    setClassification(classifID);
+    setActualPath(actEditorCategid);    
+    
     if (doctype != null) {
       try {
         String typelist = config.getString("MCR.type_" + doctype);
@@ -207,8 +207,8 @@ public class MCRClassificationBrowserData {
   }
 
   private final void setClassification(String classifID) throws Exception {
-    lines = (Vector) (linesCache.get(classifID));
-    classif = MCRClassificationItem.getClassificationItem(classifID);
+	lines = (Vector) (linesCache.get(uri));
+	classif = MCRClassificationItem.getClassificationItem(classifID);
 
     if (lines != null) {
       LOGGER.debug("use the lines Vector with the resuls from Cache");
@@ -222,7 +222,7 @@ public class MCRClassificationBrowserData {
         lines.addElement(new MCRNavigTreeLine(categItem[i], 1));
         totalNumOfDocs += categItem[i].counter;
       }
-      linesCache.put(classifID, lines);
+      linesCache.put(uri, lines);
       LOGGER.debug("put Vector of CategItems into Cache");
     }
     LOGGER.debug("Vector of CategItems initialized - Size " + classif.getNumChildren());
@@ -240,7 +240,7 @@ public class MCRClassificationBrowserData {
 
   private void clearPath(String[] uriParts) throws Exception {
     String[] cati = new String[uriParts.length];
-    String path = "";
+    String path = "/" + uriParts[1];
     int len = 0;
     // pfad bereinigen
     for (int k = 2; k < uriParts.length; k++) {
@@ -253,16 +253,33 @@ public class MCRClassificationBrowserData {
           len++;
         }
       }
-      LOGGER.debug(" cati[len]=" + cati[len] + " len=" + len);
     }
-
-    // reinitialisieren
-    categFields = new String[len];
-    for (int i = 0; i < len; i++) {
-      categFields[i] = cati[i];
-      path += categFields[i] + (i + 1 < categFields.length ? "/" : "");
-    }
-    uri = new String("/" + uriParts[1] + "/" + path);
+    
+    //remove double entries from path 
+    //(if an entry appears the 2nd time it will not be displayed -> so we can remove it here)
+    TreeSet result = new TreeSet();
+	  for(int i=0;i<len;i++){
+		  Object x = cati[i];
+		  if(result.contains(x)){
+			  result.remove(x);
+		  }
+		  else{
+			  result.add(x);
+		  }
+	  } 
+	  
+	  //reinitialisieren
+	  categFields=new String[result.size()];
+	  int j=0;
+	  Iterator it = result.iterator();
+	  while(it.hasNext()){
+		  String s = (String)it.next();
+	  	  categFields[j]=s;
+	  	  j++;
+	  	  path +="/"+s;
+	  }   
+	  
+	  this.uri = path;
   }
 
   private void setActualPath(String actEditorCategid) throws Exception {
@@ -280,7 +297,7 @@ public class MCRClassificationBrowserData {
     LOGGER.debug(" setActualPath OK");
   }
 
-  public String getUri() {
+   public String getUri() {
     return uri;
   }
 
