@@ -235,6 +235,15 @@ abstract class MCRUserObject {
     }
 
     /**
+     * This method checks if all required fields have been provided. In a later
+     * stage of the software development a User Policy object will be asked,
+     * which fields exactly are the required fields. This will be configurable.
+     * 
+     * @return returns true if all required fields have been provided
+     */
+    abstract public boolean isValid();
+    
+    /**
      * This method sends debug data to the logger (for the debug mode).
      */
     public final void debugDefault() {

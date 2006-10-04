@@ -266,7 +266,7 @@ public class MCRHIBUserStore2 implements MCRUserStore {
                         groups.add(group.getGid());
                     }
                 } else {
-                    throw new MCRException("User with ID = " + userID + " is no groupmember.");
+                    logger.warn("User with ID = " + userID + " is no groupmember.");
                 }
 
                 // set some boolean values
