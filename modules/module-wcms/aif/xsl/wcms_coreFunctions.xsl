@@ -167,6 +167,17 @@ parameters:
 							</a>
 						</li>
 						<li>
+							<!--<script type="text/javascript">								
+								function OpenWindow (address) {
+								  MyWindow = window.open(address, "Multimedia", "width=500,height=400,scrollbars=yes");
+								  MyWindow.focus();
+								}
+							</script>-->	
+							<a href="{$WebApplicationBaseURL}modules/module-wcms/aif/web/multimedia.xml" target="_blank">
+								<xsl:value-of select="i18n:translate('wcms.multimedia')"/>
+							</a>
+						</li>
+						<li>
 							<a href="{$ServletsBaseURL}WCMSAdminServlet?action=managGlobal">
 								<xsl:if test="$menupunkt='Einstellungen'">
 									<xsl:attribute name="class">
