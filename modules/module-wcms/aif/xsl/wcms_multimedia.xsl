@@ -9,7 +9,8 @@
 		<xsl:variable name="servletAnswer_XML" 
 		select="document(concat('request:','servlets/WCMSChooseServlet?XSL.Style=xml&amp;mode=getMultimedia'))"
     	/>
-	
+	    
+		<form name="wcmsMultimedia" target="">
 		<!--<xsl:if
 			test="/cms/action[@mode='intern'] = 'add' or /cms/action[@mode='intern'] = 'edit'">-->
 			<table align="center" class="table_noGrid" border="1" cellspacing="0"
@@ -29,9 +30,9 @@
 							select="concat(i18n:translate('wcms.images'),':')"/>
 						<br/>
 						<input type="hidden" name="JavaScriptImagePath_hidden"
-							value="{concat($WebApplicationBaseURL,$servletAnswer_XML/cms/imagePath)}"/>
+							value="{concat($WebApplicationBaseURL,substring-after($servletAnswer_XML/cms/imagePath,'/'))}"/>
 						<select size="1" name="selectPicturePreview"
-							onchange="previewPicture(document.editContent.JavaScriptImagePath_hidden.value)">
+							onchange="previewPicture(document.wcmsMultimedia.JavaScriptImagePath_hidden.value)">
 							<xsl:for-each select="$servletAnswer_XML/cms/images/image">
 								<option>
 									<xsl:attribute name="value">
@@ -108,6 +109,6 @@
 				</tr>
 			</table>
 		<!--</xsl:if>-->
-		
+		</form>
 	</xsl:template>	
 </xsl:stylesheet>
