@@ -26,11 +26,6 @@ package wcms;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.net.URLClassLoader;
-import java.net.URLStreamHandlerFactory;
 import java.util.Iterator;
 import java.util.List;
 
@@ -46,10 +41,9 @@ import org.jdom.input.SAXBuilder;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.jdom.xpath.XPath;
+
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
-
-import sun.security.krb5.internal.ac;
 
 public class WCMSAdminServlet extends WCMSServlet {
 	private boolean back;
