@@ -26,8 +26,10 @@ template:
 	version="1.0" 
 	xmlns:xsl="http://www.w3.org/1999/XSL/Transform" 
 	xmlns:xalan="http://xml.apache.org/xalan"
+	xmlns:encodeURL="xalan://java.net.URLEncoder"
     xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation" >
 
+	<xsl:param name="MCR.WCMS.backupPath" />
 <!-- ====================================================================================={
 
 section: Template: name="wcmsAdministration"
@@ -393,9 +395,19 @@ section: Template: name="wcmsAdministration.logStatistic"
 										</xsl:if>
 
 										<!-- label path -->
-										<td><xsl:value-of select="@labelPath" />
-
-
+										<td>
+											<xsl:value-of select="@labelPath" />
+											<xsl:variable name="viewAddress">
+												<xsl:call-template name="get.viewAddress">
+													<xsl:with-param name="backupContentFile" select="@backupContentFile" />
+													<xsl:with-param name="backupNavigationFile" select="@backupNavigationFile" />																												
+													<xsl:with-param name="doneAction" select="@doneAction" />
+												</xsl:call-template>																
+											</xsl:variable>
+											<br/><br/>
+											<a target="_blank" href="{$viewAddress}">
+												anschauen &gt;&gt;
+											</a>
 										</td>
 
 										<!-- done action -->
@@ -417,12 +429,14 @@ section: Template: name="wcmsAdministration.logStatistic"
 										</td>
 
 										<!-- backup location -->
-										<!-- xsl:if test="/cms/userClass = 'systemAdmin' " >
-											<td><xsl:value-of select="@backupContentFile" />
+										<xsl:if test="/cms/userClass = 'systemAdmin' " >
+											<td>
+												<xsl:value-of select="@backupContentFile" />													-->
 												<br/>
 												<xsl:value-of select="@backupNavigationFile" />
 											</td>
-										</xsl:if-->
+										</xsl:if>
+										
 										<td class="kommentar">
 											<!-- show given notes -->
 											<xsl:if test=" note != '' " >
@@ -461,9 +475,19 @@ section: Template: name="wcmsAdministration.logStatistic"
 										</xsl:if>
 
 										<!-- label path -->
-										<td><xsl:value-of select="@labelPath" />
-
-
+										<td>
+											<xsl:value-of select="@labelPath" />
+											<xsl:variable name="viewAddress">
+												<xsl:call-template name="get.viewAddress">
+													<xsl:with-param name="backupContentFile" select="@backupContentFile" />
+													<xsl:with-param name="backupNavigationFile" select="@backupNavigationFile" />																												
+													<xsl:with-param name="doneAction" select="@doneAction" />
+												</xsl:call-template>																
+											</xsl:variable>
+											<br/><br/>
+											<a target="_blank" href="{$viewAddress}">
+												anschauen &gt;&gt;
+											</a>
 										</td>
 
 										<!-- done action -->
@@ -485,12 +509,14 @@ section: Template: name="wcmsAdministration.logStatistic"
 										</td>
 
 										<!-- backup location -->
-										<!-- xsl:if test="/cms/userClass = 'systemAdmin' " >
-											<td><xsl:value-of select="@backupContentFile" />
+										<xsl:if test="/cms/userClass = 'systemAdmin' " >
+											<td>
+												<xsl:value-of select="@backupContentFile" />													-->
 												<br/>
 												<xsl:value-of select="@backupNavigationFile" />
 											</td>
-										</xsl:if-->
+										</xsl:if>
+										
 										<td class="kommentar">
 											<!-- show given notes -->
 											<xsl:if test=" note != '' " >
@@ -510,14 +536,131 @@ section: Template: name="wcmsAdministration.logStatistic"
 	</div>
  </xsl:template>
 
-<!-- ====================================================================================={
+<!-- ===================================================================================== -->	
+	
+<xsl:template name="get.viewAddress">
+	<xsl:param name="backupContentFile" />
+	<xsl:param name="backupNavigationFile" />
+	<xsl:param name="doneAction" />		
+	
+	<!--content-->
+	<xsl:variable name="file">
+		<xsl:variable name="nextFile">
+			<xsl:call-template name="get.nextContentFile">
+				<xsl:with-param name="doneAction" select="$doneAction"/>
+				<xsl:with-param name="backupContentFile" select="$backupContentFile"/>
+			</xsl:call-template>
+		</xsl:variable>
+		<xsl:choose>
+			<xsl:when test="document($nextFile)/MyCoReWebPage!=''">
+				<xsl:value-of select="$nextFile"/>
+			</xsl:when>
+			<!-- archived version not found -> newest version -> watch http:/.. -->
+			<xsl:otherwise>
+				<xsl:variable name="cleanHref">
+					<xsl:call-template name="get.cleanHref">
+						<xsl:with-param name="nextFile" select="$nextFile"/>
+						<xsl:with-param name="frontPath" select="$MCR.WCMS.backupPath"/>						
+					</xsl:call-template>
+				</xsl:variable>
+				<xsl:value-of select="encodeURL:encode(concat($WebApplicationBaseURL,$cleanHref),'UTF-8')"/>
+			</xsl:otherwise>
+		</xsl:choose>		
+	</xsl:variable>
+	<!--navigation base-->
+	<xsl:variable name="navi">
+		<xsl:variable name="nextFile">
+			<xsl:choose>
+				<xsl:when test="$doneAction!='delete'">
+					<xsl:call-template name="get.nextVersion">
+						<xsl:with-param name="current" select="$backupNavigationFile" />
+					</xsl:call-template>									
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:value-of select="$backupNavigationFile"/>
+				</xsl:otherwise>
+			</xsl:choose>
+		</xsl:variable>
+		<xsl:choose>
+			<xsl:when test="document($nextFile)/navigation!=''">
+				<xsl:value-of select="$nextFile"/>
+			</xsl:when>
+			<!-- archived version not found -> newest version -> watch http:/.. -->
+			<xsl:otherwise>
+				<xsl:value-of select="encodeURL:encode(concat($WebApplicationBaseURL,'config/navigation.xml'),'UTF-8')"/>
+			</xsl:otherwise>
+		</xsl:choose>				
+	</xsl:variable>
+	<!--href in navigation.xml to be poped up right-->
+	<xsl:variable name="href">
+		<xsl:variable name="nextFile">
+			<xsl:call-template name="get.nextContentFile">
+				<xsl:with-param name="doneAction" select="$doneAction"/>
+				<xsl:with-param name="backupContentFile" select="$backupContentFile"/>
+			</xsl:call-template>			
+		</xsl:variable>
+		<xsl:variable name="cleanHref">
+			<xsl:call-template name="get.cleanHref">
+				<xsl:with-param name="nextFile" select="$nextFile"/>
+				<xsl:with-param name="frontPath" select="$MCR.WCMS.backupPath"/>				
+			</xsl:call-template>			
+		</xsl:variable>
+		<xsl:value-of select="encodeURL:encode(concat('/',$cleanHref), 'UTF-8')"/>
+	</xsl:variable>
+	
+	<xsl:value-of select="concat($ServletsBaseURL,'WCMSAdminServlet?action=view&amp;file=',$file,'&amp;XSL.navi=',$navi,'&amp;XSL.href=',$href)" />
+</xsl:template>	
 
+<!-- ===================================================================================== -->		
+<xsl:template name="get.cleanHref">
+	<xsl:param name="nextFile"/>
+	<xsl:param name="frontPath"/>	
+	<xsl:variable name="nextFile_backupPathDel">
+		<xsl:value-of select="substring-after($nextFile,$frontPath)"/>
+	</xsl:variable>
+	<xsl:value-of select="concat(substring-before($nextFile_backupPathDel,'.xml'),'.xml')"/>
+</xsl:template>	
+<!-- ===================================================================================== -->			
+<xsl:template name="get.nextContentFile">
+	<xsl:param name="doneAction" />
+	<xsl:param name="backupContentFile" />
+	<xsl:choose>
+		<xsl:when test="$doneAction='add' or $doneAction='delete'">
+			<xsl:value-of select="$backupContentFile"/>
+		</xsl:when>
+		<xsl:otherwise>
+			<xsl:call-template name="get.nextVersion">
+				<xsl:with-param name="current" select="$backupContentFile" />
+			</xsl:call-template>				
+		</xsl:otherwise>
+	</xsl:choose>	
+</xsl:template>	
+<!-- ===================================================================================== -->				
+<xsl:template name="get.nextVersion">
+	<xsl:param name="current"/>
+	
+		<xsl:choose>
+			<xsl:when test="substring-after($current,'.xml')=''">
+				<xsl:value-of select="concat($current,'.1')"/>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:variable name="lastVersion">
+					<xsl:value-of select="substring-after($current,'.xml.')"/>
+				</xsl:variable>							
+				<xsl:value-of select="concat(substring-before($current,'.xml'),'.xml.',number($lastVersion)+1) )"/>					
+			</xsl:otherwise>
+		</xsl:choose>	
+</xsl:template>
+	
+<!-- ====================================================================================={
+	
 section: Template: name="wcmsAdministration.managGlobal"
 
 	- Formular zur Veränderung des  Seitentemplates
 
 }===================================================================================== -->
-
+	
+		
 <xsl:template name="wcmsAdministration.managGlobal" >
 
 	<xsl:variable name="currentTempl" select="document($navigationBase)/navigation/@template"/>

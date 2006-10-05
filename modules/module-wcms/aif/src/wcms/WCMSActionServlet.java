@@ -516,14 +516,30 @@ public class WCMSActionServlet extends WCMSServlet {
             Element root = doc.getRootElement();
 
             if (contentFileBackup == null) {
-                contentFileBackup = "";
+            	
+                contentFileBackup = CONFIG.getString("MCR.WCMS.backupPath").replace('/', File.separatorChar)+fileName.substring(1);
             }
 
             if (changeInfo == null) {
-                root.addContent(new Element("log").setAttribute("date", getDate()).setAttribute("time", getTime()).setAttribute("userRealName", userRealName).setAttribute("labelPath", labelPath).setAttribute("doneAction", action).setAttribute("backupContentFile", contentFileBackup).setAttribute("backupNavigationFile", naviFileBackup));
+                root.addContent(new Element("log")
+                		.setAttribute("date", getDate())
+                		.setAttribute("time", getTime())
+                		.setAttribute("userRealName", userRealName)
+                		.setAttribute("labelPath", labelPath)
+                		.setAttribute("doneAction", action)
+                		.setAttribute("backupContentFile", contentFileBackup)
+                		.setAttribute("backupNavigationFile", naviFileBackup));
             } else {
                 Element log = new Element("log");
-                log.setAttribute("date", getDate()).setAttribute("time", getTime()).setAttribute("userRealName", userRealName).setAttribute("labelPath", labelPath).setAttribute("doneAction", action).setAttribute("backupContentFile", contentFileBackup).setAttribute("backupNavigationFile", naviFileBackup).addContent(new Element("note").setText(changeInfo));
+                log	.setAttribute("date", getDate())
+                	.setAttribute("time", getTime())
+	                .setAttribute("userRealName", userRealName)
+	                .setAttribute("labelPath", labelPath)
+	                .setAttribute("doneAction", action)
+	                .setAttribute("backupContentFile", contentFileBackup)
+	                .setAttribute("backupNavigationFile", naviFileBackup)
+                .addContent(new Element("note").setText(changeInfo));
+                
                 root.addContent(log);
             }
 
