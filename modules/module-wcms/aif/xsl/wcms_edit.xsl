@@ -486,12 +486,38 @@ template:
 							<dd title="accesskey">a</dd>
 						</dl>
 				
-						<h3><xsl:value-of select="i18n:translate('wcms.labels.historylabel')"/></h3>
+<!--						<h3><xsl:value-of select="i18n:translate('wcms.labels.historylabel')"/></h3>-->
 						<br/>
 						<p><!-- Historie der Seite -->
-							
+							<xsl:variable name="servletPath">
+								<xsl:value-of select="concat('request:servlets/WCMSAdminServlet',$JSessionID,'?action=logs&amp;sort=date&amp;sortOrder=descending&amp;XSL.Style=xml')"/>
+							</xsl:variable>
+							<xsl:variable name="logData">
+								<xsl:copy-of select="xalan:nodeset(document($servletPath))"/>
+							</xsl:variable>
+													
+							<p id="statistic-width">
+								<p id="statistic">
+									<!-- div class="titel">WCMS Nutzungsprotokoll</div -->
+									<p class="inhalt">
+											<table>
+													<xsl:call-template name="logs.headLine">
+														<xsl:with-param name="sortBy" select="'date'"/>
+														<xsl:with-param name="currentSortOrder" select="'descending'"/>
+													</xsl:call-template>
+													<xsl:call-template name="logs.generateList">
+														<xsl:with-param name="rootNode" select="$logData"/>
+														<xsl:with-param name="currentSortOrder" select="'descending'"/>
+														<xsl:with-param name="sortBy" select="'date'"/>
+														<xsl:with-param name="onlyCurrentPage" select="/cms/href/text()"/>
+												</xsl:call-template>
+											</table>
+									</p>
+								</p>
+							</p>
+						
+						
 						</p>
-				
 					</div>
 				</div>	
 
@@ -643,6 +669,11 @@ template:
 	
 	
 	}===================================================================================== -->
+		<xsl:template match='@*|node()'>
+		<xsl:copy>
+			<xsl:apply-templates select='@*|node()'/>
+		</xsl:copy>
+	</xsl:template>	
 	<xsl:template name="errorOnBuildInterfaceGeneral">
 		<table>
 			<tr>

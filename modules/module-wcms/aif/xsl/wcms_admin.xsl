@@ -132,31 +132,19 @@ section: Template: name="wcmsAdministration.welcome"
 
 	</xsl:template>
 
-<!-- ====================================================================================={
-
-section: Template: name="wcmsAdministration.logStatistic"
-
-	- stellt Anfragen an das wcmsAdminServlet (Nutzerstatistik)
-	- praesentiert die Ergebnisse
-
-}===================================================================================== -->
+<!-- ===================================================================================== -->
 
 	<xsl:template name="wcmsAdministration.logStatistic" >
 
 		<xsl:variable name="sortBy" select="/cms/sort" />
 		<xsl:variable name="currentSortOrder" select="/cms/sort/@order" />
-
+	
 		<xsl:variable name="flipedSortOrder" >
-			<xsl:choose>
-				<xsl:when test="$currentSortOrder = 'ascending' " >
-					<xsl:value-of select="'descending'" />
-				</xsl:when>
-				<xsl:otherwise>
-					<xsl:value-of select="'ascending'" />	
-				</xsl:otherwise>
-			</xsl:choose>	
-		</xsl:variable>
-
+			<xsl:call-template name="logs.flipSortOrder">
+				<xsl:with-param name="currentSortOrder" select="$currentSortOrder"/>
+			</xsl:call-template>
+		</xsl:variable>	
+	
 		<!-- Menueleiste einblenden, Parameter = ausgewaehlter Menuepunkt -->
 		<xsl:call-template name="menuleiste">
 			<xsl:with-param name="menupunkt" select="'Statistik'" />
@@ -222,9 +210,6 @@ section: Template: name="wcmsAdministration.logStatistic"
 	<xsl:call-template name="zeigeSeitenname">
 		<xsl:with-param name="seitenname">
 			<xsl:value-of select="i18n:translate('wcms.admin.WCMSUserProt')"/>
-			<!-- xsl:text>WCMS Nutzungsprotokoll einsehen [</xsl:text>
-			<xsl:value-of select="$wieSortiert"/>
-			<xsl:text>]</xsl:text-->
 		</xsl:with-param>
 	</xsl:call-template>
 
@@ -235,216 +220,21 @@ section: Template: name="wcmsAdministration.logStatistic"
 			<div class="inhalt">
 					<table>
 						<!-- table headline -->
-						<tr>
-							<!-- date, time column -->
-							<xsl:choose>
-								<xsl:when test=" $sortBy = 'date' " >
-									<th id="aktive-row">
-										<a href="WCMSAdminServlet?action=logs&amp;sort=date&amp;sortOrder={$flipedSortOrder}">
-											<xsl:choose>
-												<xsl:when test="$currentSortOrder='descending'">
-													<xsl:text>&#8659; </xsl:text>
-												</xsl:when>
-												<xsl:when test="$currentSortOrder='ascending'">
-													<xsl:text>&#8657; </xsl:text>
-												</xsl:when>
-											</xsl:choose>
-											<xsl:value-of select="i18n:translate('wcms.date')"/>
-										</a>
-									</th>
-								</xsl:when>
-								<xsl:otherwise>
-									<th>
-										<a href="WCMSAdminServlet?action=logs&amp;sort=date&amp;sortOrder={$currentSortOrder}">
-											<xsl:value-of select="i18n:translate('wcms.date')"/>
-										</a>
-									</th>
-								</xsl:otherwise>
-							</xsl:choose>
-
-							<!-- user name column -->
-							<xsl:choose>
-								<xsl:when test="/cms/userClass != 'autor' and $sortBy = 'userRealName' " >
-									<th id="aktive-row">
-										<a href="WCMSAdminServlet?action=logs&amp;sort=userRealName&amp;sortOrder={$flipedSortOrder}">
-											<xsl:choose>
-												<xsl:when test="$currentSortOrder='descending'">
-													<xsl:text>&#8659; </xsl:text>
-												</xsl:when>
-												<xsl:when test="$currentSortOrder='ascending'">
-													<xsl:text>&#8657; </xsl:text>
-												</xsl:when>
-											</xsl:choose>
-											<xsl:value-of select="i18n:translate('wcms.user')"/>
-										</a>
-									</th>
-								</xsl:when>
-								<xsl:when test="/cms/userClass != 'autor' and $sortBy != 'userRealName' " >
-									<th>										
-										<a href="WCMSAdminServlet?action=logs&amp;sort=userRealName&amp;sortOrder={$currentSortOrder}">
-											<xsl:value-of select="i18n:translate('wcms.user')"/>
-										</a>
-									</th>
-								</xsl:when>
-							</xsl:choose>
-
-							<!-- page column -->
-							<xsl:choose>
-								<xsl:when test=" $sortBy = 'labelPath' " >
-									<th id="aktive-row">
-										<a href="WCMSAdminServlet?action=logs&amp;sort=labelPath&amp;sortOrder={$flipedSortOrder}">
-											<xsl:choose>
-											<xsl:when test="$currentSortOrder='descending'">
-													<xsl:text>&#8659; </xsl:text>
-												</xsl:when>
-												<xsl:when test="$currentSortOrder='ascending'">
-													<xsl:text>&#8657; </xsl:text>
-												</xsl:when>
-											</xsl:choose>
-											<xsl:value-of select="i18n:translate('wcms.site')"/>
-										</a>
-									</th>
-								</xsl:when>
-								<xsl:otherwise>
-									<th>
-										<a href="WCMSAdminServlet?action=logs&amp;sort=labelPath&amp;sortOrder={$currentSortOrder}">
-											<xsl:value-of select="i18n:translate('wcms.site')"/>
-										</a>
-									</th>
-								</xsl:otherwise>
-							</xsl:choose>
-
-							<!-- done action column -->
-							<xsl:choose>
-								<xsl:when test=" $sortBy = 'doneAction' " >
-									<th id="aktive-row">
-										<a href="WCMSAdminServlet?action=logs&amp;sort=doneAction&amp;sortOrder={$flipedSortOrder}">
-											<xsl:choose>
-												<xsl:when test="$currentSortOrder='descending'">
-													<xsl:text>&#8659; </xsl:text>
-												</xsl:when>
-												<xsl:when test="$currentSortOrder='ascending'">
-													<xsl:text>&#8657; </xsl:text>
-												</xsl:when>
-											</xsl:choose>											
-											<xsl:value-of select="i18n:translate('wcms.action')"/>
-										</a>
-									</th>
-								</xsl:when>
-								<xsl:otherwise>
-									<th>
-										<a href="WCMSAdminServlet?action=logs&amp;sort=doneAction&amp;sortOrder={$currentSortOrder}">
-											<xsl:value-of select="i18n:translate('wcms.action')"/>
-										</a>
-									</th>
-								</xsl:otherwise>
-							</xsl:choose>
-
-							<th>
-								<xsl:value-of select="i18n:translate('wcms.comment')"/>
-							</th>
-
-							<!-- backup column -->
-							<!-- xsl:choose>
-								<xsl:when test="/cms/userClass = 'systemAdmin' and ($sortBy = 'backupContentFile' or $sortBy = 'backupNavigationFile') " >
-									<th id="aktive-row">
-										<b>Backup
-										<a href="WCMSAdminServlet?action=logs&amp;sort=backupContentFile&amp;sortOrder={$flipedSortOrder}">(Inhalt</a>
-										<a href="WCMSAdminServlet?action=logs&amp;sort=backupNavigationFile&amp;sortOrder={$flipedSortOrder}">, Navigation)</a>
-										</b>
-									</th>
-								</xsl:when>
-								<xsl:when test="/cms/userClass = 'systemAdmin' and ($sortBy != 'backupContentFile' and $sortBy != 'backupNavigationFile') " >
-									<th>
-										Backup
-										<a href="WCMSAdminServlet?action=logs&amp;sort=backupContentFile&amp;sortOrder={$currentSortOrder}"> (Inhalt</a>
-										<a href="WCMSAdminServlet?action=logs&amp;sort=backupNavigationFile&amp;sortOrder={$currentSortOrder}">, Navigation)</a>
-									</th>
-								</xsl:when>
-							</xsl:choose-->
-						</tr>
+						<xsl:call-template name="logs.headLine">
+							<xsl:with-param name="sortBy" select="$sortBy"/>
+							<xsl:with-param name="currentSortOrder" select="$currentSortOrder"/>
+						</xsl:call-template>
 						<!-- END OF: table headline -->		
 
 						<!-- content cells -->
 						<xsl:choose>
 							<!-- primary to sort by date -->
 							<xsl:when test="$sortBy = 'date' " >
-								<xsl:for-each select="/cms/loggings/log">
-									<xsl:sort select="@*[name() = $sortBy] | @*[concat('@',name()) = $sortBy]" order="{$currentSortOrder}" />  	
-									<xsl:sort select="@time" order="{$currentSortOrder}" />
-
-									<xsl:variable name="Rest" select="(position() div 2) *2 - round(position() div 2)*2" />
-									<tr>
-
-										<xsl:if test="$Rest != 0">
-											<xsl:attribute name="class">
-												<xsl:value-of select="'zebra'" />
-											</xsl:attribute>
-										</xsl:if>
-
-										<!-- date, time -->
-										<td>
-											<xsl:value-of select="@time"/>
-											<xsl:value-of select="i18n:translate('wcms.time')"/>
-											<xsl:value-of select="substring(@date,9,2)" />.<xsl:value-of select="substring(@date,6,2)" />.<xsl:value-of select="substring(@date,1,4)" />
-										</td>
-
-										<!-- user -->
-										<xsl:if test="/cms/userClass != 'autor' " >			  
-											<td valign="top"><xsl:value-of select="@userRealName" /></td>
-										</xsl:if>
-
-										<!-- label path -->
-										<td>
-											<xsl:value-of select="@labelPath" />
-											<xsl:variable name="viewAddress">
-												<xsl:call-template name="get.viewAddress">
-													<xsl:with-param name="backupContentFile" select="@backupContentFile" />
-													<xsl:with-param name="backupNavigationFile" select="@backupNavigationFile" />																												
-													<xsl:with-param name="doneAction" select="@doneAction" />
-												</xsl:call-template>																
-											</xsl:variable>
-											<br/><br/>
-											<a target="_blank" href="{$viewAddress}">
-												anschauen &gt;&gt;
-											</a>
-										</td>
-
-										<!-- done action -->
-										<td>
-											<xsl:choose>
-												<xsl:when test="@doneAction = 'add' " >
-													<xsl:value-of select="i18n:translate('wcms.action.created')"/>
-												</xsl:when>
-												<xsl:when test="@doneAction = 'edit' " >
-													<xsl:value-of select="i18n:translate('wcms.action.changed')"/>
-												</xsl:when>
-												<xsl:when test="@doneAction = 'delete' " >
-													<xsl:value-of select="i18n:translate('wcms.action.deleted')"/>
-												</xsl:when>
-												<xsl:when test="@doneAction = 'translate' " >
-													<xsl:value-of select="i18n:translate('wcms.action.translated')"/>
-												</xsl:when>
-											</xsl:choose>
-										</td>
-
-										<!-- backup location -->
-										<xsl:if test="/cms/userClass = 'systemAdmin' " >
-											<td>
-												<xsl:value-of select="@backupContentFile" />													-->
-												<br/>
-												<xsl:value-of select="@backupNavigationFile" />
-											</td>
-										</xsl:if>
-										
-										<td class="kommentar">
-											<!-- show given notes -->
-											<xsl:if test=" note != '' " >
-												<xsl:value-of select=" note " />
-											</xsl:if>
-										</td>
-									</tr>
-								</xsl:for-each>
+								<xsl:call-template name="logs.generateList">
+										<xsl:with-param name="rootNode" select="/"/>
+										<xsl:with-param name="currentSortOrder" select="$currentSortOrder"/>
+										<xsl:with-param name="sortBy" select="$sortBy"/>	
+								</xsl:call-template>
 							</xsl:when>
 
 							<!-- primary NOT to sort by date -->
@@ -773,4 +563,252 @@ section: Template: name="wcmsAdministration.managGlobal.defaultTempl"
 </xsl:template>
 
 <!-- =================================================================================== -->
+	
+<xsl:template name="logs.generateList">
+	<xsl:param name="rootNode"/>
+	<xsl:param name="currentSortOrder"/>
+	<xsl:param name="sortBy"/>
+	<xsl:param name="onlyCurrentPage" />	
+	
+		<xsl:for-each select="xalan:nodeset($rootNode)/cms/loggings/log">
+			<xsl:sort select="@*[name() = $sortBy] | @*[concat('@',name()) = $sortBy]" order="{$currentSortOrder}" />  	
+			<xsl:sort select="@time" order="{$currentSortOrder}" />
+
+			<xsl:if test="($onlyCurrentPage='') or ($onlyCurrentPage!='' and contains(@backupContentFile, $onlyCurrentPage))" >
+					
+				<xsl:variable name="Rest" select="(position() div 2) *2 - round(position() div 2)*2" />
+				<tr>
+	
+					<xsl:if test="$Rest != 0">
+						<xsl:attribute name="class">
+							<xsl:value-of select="'zebra'" />
+						</xsl:attribute>
+					</xsl:if>
+					
+					<!-- date, time -->	
+					<td>
+						<xsl:value-of select="@time"/>
+						<xsl:value-of select="i18n:translate('wcms.time')"/>
+						<xsl:value-of select="substring(@date,9,2)" />.<xsl:value-of select="substring(@date,6,2)" />.<xsl:value-of select="substring(@date,1,4)" />
+					</td>
+	
+					<!-- user -->
+					<xsl:if test="$rootNode/cms/userClass != 'autor' " >			  
+						<td valign="top"><xsl:value-of select="@userRealName" /></td>
+					</xsl:if>
+	
+					<!-- label path -->
+					<td>
+						<xsl:value-of select="@labelPath" />
+						<xsl:variable name="viewAddress">
+							<xsl:call-template name="get.viewAddress">
+								<xsl:with-param name="backupContentFile" select="@backupContentFile" />
+								<xsl:with-param name="backupNavigationFile" select="@backupNavigationFile" />																												
+								<xsl:with-param name="doneAction" select="@doneAction" />
+							</xsl:call-template>																
+						</xsl:variable>
+						<br/><br/>
+						<a target="_blank" href="{$viewAddress}">
+							anschauen &gt;&gt;
+						</a>
+					</td>
+	
+					<!-- done action -->
+					<td>
+						<xsl:choose>
+							<xsl:when test="@doneAction = 'add' " >
+								<xsl:value-of select="i18n:translate('wcms.action.created')"/>
+							</xsl:when>
+							<xsl:when test="@doneAction = 'edit' " >
+								<xsl:value-of select="i18n:translate('wcms.action.changed')"/>
+							</xsl:when>
+							<xsl:when test="@doneAction = 'delete' " >
+								<xsl:value-of select="i18n:translate('wcms.action.deleted')"/>
+							</xsl:when>
+							<xsl:when test="@doneAction = 'translate' " >
+								<xsl:value-of select="i18n:translate('wcms.action.translated')"/>
+							</xsl:when>
+						</xsl:choose>
+					</td>
+	
+					<!-- backup location -->
+					<xsl:if test="$rootNode/cms/userClass = 'systemAdmin' " >
+						<td>
+							<xsl:value-of select="@backupContentFile" />													
+							<br/>
+							<xsl:value-of select="@backupNavigationFile" />
+						</td>
+					</xsl:if>
+					
+					<td class="kommentar">
+						<!-- show given notes -->
+						<xsl:if test=" note != '' " >
+							<xsl:value-of select=" note " />
+						</xsl:if>
+					</td>
+				</tr>				
+			</xsl:if>
+			
+		</xsl:for-each>	
+</xsl:template>
+	
+<!-- =================================================================================== -->	
+		
+<xsl:template name="logs.headLine">
+	<xsl:param name="sortBy" />
+	<xsl:param name="currentSortOrder" />	
+
+	<xsl:variable name="flipedSortOrder" >
+		<xsl:call-template name="logs.flipSortOrder">
+			<xsl:with-param name="currentSortOrder" select="$currentSortOrder"/>
+		</xsl:call-template>
+	</xsl:variable>	
+	
+	<tr>
+		<!-- date, time column -->
+		<xsl:choose>
+			<xsl:when test=" $sortBy = 'date' " >
+				<th id="aktive-row">
+					<a href="WCMSAdminServlet?action=logs&amp;sort=date&amp;sortOrder={$flipedSortOrder}">
+						<xsl:choose>
+							<xsl:when test="$currentSortOrder='descending'">
+								<xsl:text>&#8659; </xsl:text>
+							</xsl:when>
+							<xsl:when test="$currentSortOrder='ascending'">
+								<xsl:text>&#8657; </xsl:text>
+							</xsl:when>
+						</xsl:choose>
+						<xsl:value-of select="i18n:translate('wcms.date')"/>
+					</a>
+				</th>
+			</xsl:when>
+			<xsl:otherwise>
+				<th>
+					<a href="WCMSAdminServlet?action=logs&amp;sort=date&amp;sortOrder={$currentSortOrder}">
+						<xsl:value-of select="i18n:translate('wcms.date')"/>
+					</a>
+				</th>
+			</xsl:otherwise>
+		</xsl:choose>
+
+		<!-- user name column -->
+		<xsl:choose>
+			<xsl:when test="/cms/userClass != 'autor' and $sortBy = 'userRealName' " >
+				<th id="aktive-row">
+					<a href="WCMSAdminServlet?action=logs&amp;sort=userRealName&amp;sortOrder={$flipedSortOrder}">
+						<xsl:choose>
+							<xsl:when test="$currentSortOrder='descending'">
+								<xsl:text>&#8659; </xsl:text>
+							</xsl:when>
+							<xsl:when test="$currentSortOrder='ascending'">
+								<xsl:text>&#8657; </xsl:text>
+							</xsl:when>
+						</xsl:choose>
+						<xsl:value-of select="i18n:translate('wcms.user')"/>
+					</a>
+				</th>
+			</xsl:when>
+			<xsl:when test="/cms/userClass != 'autor' and $sortBy != 'userRealName' " >
+				<th>										
+					<a href="WCMSAdminServlet?action=logs&amp;sort=userRealName&amp;sortOrder={$currentSortOrder}">
+						<xsl:value-of select="i18n:translate('wcms.user')"/>
+					</a>
+				</th>
+			</xsl:when>
+		</xsl:choose>
+
+		<!-- page column -->
+		<xsl:choose>
+			<xsl:when test=" $sortBy = 'labelPath' " >
+				<th id="aktive-row">
+					<a href="WCMSAdminServlet?action=logs&amp;sort=labelPath&amp;sortOrder={$flipedSortOrder}">
+						<xsl:choose>
+						<xsl:when test="$currentSortOrder='descending'">
+								<xsl:text>&#8659; </xsl:text>
+							</xsl:when>
+							<xsl:when test="$currentSortOrder='ascending'">
+								<xsl:text>&#8657; </xsl:text>
+							</xsl:when>
+						</xsl:choose>
+						<xsl:value-of select="i18n:translate('wcms.site')"/>
+					</a>
+				</th>
+			</xsl:when>
+			<xsl:otherwise>
+				<th>
+					<a href="WCMSAdminServlet?action=logs&amp;sort=labelPath&amp;sortOrder={$currentSortOrder}">
+						<xsl:value-of select="i18n:translate('wcms.site')"/>
+					</a>
+				</th>
+			</xsl:otherwise>
+		</xsl:choose>
+
+		<!-- done action column -->
+		<xsl:choose>
+			<xsl:when test=" $sortBy = 'doneAction' " >
+				<th id="aktive-row">
+					<a href="WCMSAdminServlet?action=logs&amp;sort=doneAction&amp;sortOrder={$flipedSortOrder}">
+						<xsl:choose>
+							<xsl:when test="$currentSortOrder='descending'">
+								<xsl:text>&#8659; </xsl:text>
+							</xsl:when>
+							<xsl:when test="$currentSortOrder='ascending'">
+								<xsl:text>&#8657; </xsl:text>
+							</xsl:when>
+						</xsl:choose>											
+						<xsl:value-of select="i18n:translate('wcms.action')"/>
+					</a>
+				</th>
+			</xsl:when>
+			<xsl:otherwise>
+				<th>
+					<a href="WCMSAdminServlet?action=logs&amp;sort=doneAction&amp;sortOrder={$currentSortOrder}">
+						<xsl:value-of select="i18n:translate('wcms.action')"/>
+					</a>
+				</th>
+			</xsl:otherwise>
+		</xsl:choose>
+
+		<th>
+			<xsl:value-of select="i18n:translate('wcms.comment')"/>
+		</th>
+
+		<!-- backup column -->
+		<!-- xsl:choose>
+			<xsl:when test="/cms/userClass = 'systemAdmin' and ($sortBy = 'backupContentFile' or $sortBy = 'backupNavigationFile') " >
+				<th id="aktive-row">
+					<b>Backup
+					<a href="WCMSAdminServlet?action=logs&amp;sort=backupContentFile&amp;sortOrder={$flipedSortOrder}">(Inhalt</a>
+					<a href="WCMSAdminServlet?action=logs&amp;sort=backupNavigationFile&amp;sortOrder={$flipedSortOrder}">, Navigation)</a>
+					</b>
+				</th>
+			</xsl:when>
+			<xsl:when test="/cms/userClass = 'systemAdmin' and ($sortBy != 'backupContentFile' and $sortBy != 'backupNavigationFile') " >
+				<th>
+					Backup
+					<a href="WCMSAdminServlet?action=logs&amp;sort=backupContentFile&amp;sortOrder={$currentSortOrder}"> (Inhalt</a>
+					<a href="WCMSAdminServlet?action=logs&amp;sort=backupNavigationFile&amp;sortOrder={$currentSortOrder}">, Navigation)</a>
+				</th>
+			</xsl:when>
+		</xsl:choose-->
+	</tr>	
+</xsl:template>	
+	
+<!-- =================================================================================== -->	
+	
+<xsl:template name="logs.flipSortOrder">
+	<xsl:param name="currentSortOrder"/>
+	
+	<xsl:choose>
+		<xsl:when test="$currentSortOrder = 'ascending' " >
+			<xsl:value-of select="'descending'" />
+		</xsl:when>
+		<xsl:otherwise>
+			<xsl:value-of select="'ascending'" />	
+		</xsl:otherwise>
+	</xsl:choose>		
+</xsl:template>
+	
+<!-- =================================================================================== -->		
+	
 </xsl:stylesheet>

@@ -7,7 +7,7 @@
 	<xsl:template name="wcmsMultimedia">
 		
 		<xsl:variable name="servletAnswer_XML" 
-		select="document(concat('request:','servlets/WCMSChooseServlet',$HttpSession,'?XSL.Style=xml&amp;mode=getMultimedia'))"
+		select="document(concat('request:','servlets/WCMSChooseServlet',$JSessionID,'?XSL.Style=xml&amp;mode=getMultimedia'))"
     	/>
 	    
 		<form name="wcmsMultimedia" target="">
