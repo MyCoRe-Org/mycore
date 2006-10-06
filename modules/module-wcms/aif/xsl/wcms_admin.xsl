@@ -593,7 +593,7 @@ section: Template: name="wcmsAdministration.managGlobal.defaultTempl"
 					</td>
 	
 					<!-- user -->
-					<xsl:if test="$rootNode/cms/userClass != 'autor' " >			  
+					<xsl:if test="xalan:nodeset($rootNode)/cms/userClass != 'autor' " >			  
 						<td valign="top"><xsl:value-of select="@userRealName" /></td>
 					</xsl:if>
 	
@@ -632,7 +632,7 @@ section: Template: name="wcmsAdministration.managGlobal.defaultTempl"
 					</td>
 	
 					<!-- backup location -->
-					<xsl:if test="$rootNode/cms/userClass = 'systemAdmin' " >
+					<xsl:if test="xalan:nodeset($rootNode)/cms/userClass = 'systemAdmin' " >
 						<td>
 							<xsl:value-of select="@backupContentFile" />													
 							<br/>
