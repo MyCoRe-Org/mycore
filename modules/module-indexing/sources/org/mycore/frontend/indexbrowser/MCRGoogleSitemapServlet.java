@@ -71,7 +71,7 @@ public final class MCRGoogleSitemapServlet extends MCRServlet {
      */
     public void doGetPost(MCRServletJob job) throws Exception {
         // set baseurl
-        String addr = getServletBaseURL() + "receive/";
+        String addr = getBaseURL() + "receive/";
         // build ducment frame
         Namespace ns = Namespace.getNamespace("http://www.google.com/schemas/sitemap/0.84");
         Element urlset = new Element("urlset", ns);
