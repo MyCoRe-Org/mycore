@@ -6,6 +6,7 @@ import java.awt.Point;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.awt.image.renderable.ParameterBlock;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
@@ -18,9 +19,12 @@ import org.apache.log4j.Logger;
 import org.mycore.frontend.cli.MCRClassificationCommands;
 
 import com.sun.media.jai.codec.ImageCodec;
+import com.sun.media.jai.codec.ImageDecoder;
 import com.sun.media.jai.codec.ImageEncoder;
 import com.sun.media.jai.codec.JPEGEncodeParam;
 import com.sun.media.jai.codec.MemoryCacheSeekableStream;
+import com.sun.media.jai.codec.PNGDecodeParam;
+import com.sun.media.jai.codec.PNGEncodeParam;
 import com.sun.media.jai.codec.SeekableStream;
 import com.sun.media.jai.codec.TIFFEncodeParam;
 
@@ -61,6 +65,11 @@ public class MCRImgProcessor implements ImgProcessor {
 	 */
 	static public final int TIFF_ENC = 1;
 	
+	/**
+	 * The PNG encoder
+	 */
+	static public final int PNG_ENC = 2;
+	
 	MCRImgProcessor() {
 		origSize = new Dimension(0, 0);
 		
@@ -81,7 +90,7 @@ public class MCRImgProcessor implements ImgProcessor {
 	}
 
 	public void useEncoder(int Encoder) throws Exception {
-		if (Encoder == JPEG_ENC || Encoder == TIFF_ENC)
+		if (Encoder == JPEG_ENC || Encoder == TIFF_ENC || Encoder == PNG_ENC)
 			useEncoder = Encoder;
 		else
 			throw new Exception("MCRImgProcessor.useEncoder accept only MCRImgProcessor.JPEG_ENC or MCRImgProcessor.TIFF_ENC as parameter!");
@@ -96,10 +105,7 @@ public class MCRImgProcessor implements ImgProcessor {
 		if (newWidth != origSize.width)
 			image = fitWidth(image, newWidth);
 
-		if (useEncoder == JPEG_ENC)
-			jpegEncode(image, output, jpegQuality);
-		else if (useEncoder == TIFF_ENC)
-			tiffEncode(image, output, true, tileWidth, tileHeight);
+		encode(output);
 	}
 
 	public void resizeFitHeight(InputStream input, int newHeight, OutputStream output) {
@@ -108,10 +114,7 @@ public class MCRImgProcessor implements ImgProcessor {
 		if (newHeight != origSize.height)
 			image = fitHeight(image, newHeight);
 
-		if (useEncoder == JPEG_ENC)
-			jpegEncode(image, output, jpegQuality);
-		else if (useEncoder == TIFF_ENC)
-			tiffEncode(image, output, true, tileWidth, tileHeight);
+		encode(output);
 	}
 
 	public void resize(InputStream input, int newWidth, int newHeight, OutputStream output) {
@@ -125,10 +128,7 @@ public class MCRImgProcessor implements ImgProcessor {
 				e.printStackTrace();
 			}
 
-		if (useEncoder == JPEG_ENC)
-			jpegEncode(image, output, jpegQuality);
-		else if (useEncoder == TIFF_ENC)
-			tiffEncode(image, output, true, tileWidth, tileHeight);
+		encode(output);
 	}
 
 	public void scale(InputStream input, float scaleFactor, OutputStream output) {
@@ -137,10 +137,7 @@ public class MCRImgProcessor implements ImgProcessor {
 		if (scaleFactor != 1)
 			image = scaleImage(image, scaleFactor);
 
-		if (useEncoder == JPEG_ENC)
-			jpegEncode(image, output, jpegQuality);
-		else if (useEncoder == TIFF_ENC)
-			tiffEncode(image, output, true, tileWidth, tileHeight);
+		encode(output);
 	}
 	
 	public void scaleROI(InputStream input, int xTopPos, int yTopPos, int boundWidth, int boundHeight, float scaleFactor, OutputStream output) {
@@ -177,10 +174,7 @@ public class MCRImgProcessor implements ImgProcessor {
 			image = scaleImage(image, scaleFactor);
 		}
 
-		if (useEncoder == JPEG_ENC)
-			jpegEncode(image, output, jpegQuality);
-		else if (useEncoder == TIFF_ENC)
-			tiffEncode(image, output, true, tileWidth, tileHeight);
+		encode(output);
 	}
 
 	public float getScaleFactor() {
@@ -276,6 +270,10 @@ public class MCRImgProcessor implements ImgProcessor {
 		tiffEncode(image, output, true, tileWidth, tileHeight);
 	}
 	
+	public void pngEncode(OutputStream output) {
+		pngEncode(image, output, true);
+	}
+	
 	// End: Interface implementation
 
 	/** ************************************************************************ */
@@ -291,8 +289,29 @@ public class MCRImgProcessor implements ImgProcessor {
 	 * @return PlanarImage
 	 */
 	public PlanarImage loadImageFileCache(InputStream input) {
-		SeekableStream seekStream = SeekableStream.wrapInputStream(input, true);
-		PlanarImage image = JAI.create("stream", seekStream);
+		SeekableStream stream = SeekableStream.wrapInputStream(input, true);
+		String[] decodeArray = ImageCodec.getDecoderNames(stream);
+		
+		if (decodeArray.length == 1 && decodeArray[0].equals("png")){
+			useEncoder = PNG_ENC;
+		}
+		
+		/*if (decodeArray.length == 1 && decodeArray[0].equals("png")){
+			PNGDecodeParam pngParam = new PNGDecodeParam();
+			pngParam.setSuppressAlpha(true);
+			ImageDecoder decoder = ImageCodec.createImageDecoder("png", stream, pngParam);
+			try {
+				image = PlanarImage.wrapRenderedImage(decoder.decodeAsRenderedImage());
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		else
+			image = JAI.create("stream", stream);*/
+		
+		image = JAI.create("stream", stream);
+		
 		origSize.width = image.getWidth();
 		origSize.height = image.getHeight();
 		LOGGER.info("******************************************");
@@ -300,12 +319,33 @@ public class MCRImgProcessor implements ImgProcessor {
 		LOGGER.info("* origSize.width: " + origSize.width);
 		LOGGER.info("* origSize.height: " + origSize.height);
 		LOGGER.info("******************************************");
-		this.image = image;
 		return image;
 	}
 	
 	private PlanarImage loadmageMEMCache(InputStream input) {
-		PlanarImage image = JAI.create("stream", new MemoryCacheSeekableStream(input));
+		MemoryCacheSeekableStream stream = new MemoryCacheSeekableStream(input);
+		String[] decodeArray = ImageCodec.getDecoderNames(stream);
+		
+		if (decodeArray.length == 1 && decodeArray[0].equals("png")){
+			useEncoder = PNG_ENC;
+		}
+		
+		/*if (decodeArray.length == 1 && decodeArray[0].equals("png")){
+			PNGDecodeParam pngParam = new PNGDecodeParam();
+			pngParam.setSuppressAlpha(true);
+			ImageDecoder decoder = ImageCodec.createImageDecoder("png", stream, pngParam);
+			try {
+				image = PlanarImage.wrapRenderedImage(decoder.decodeAsRenderedImage());
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		else
+			image = JAI.create("stream", stream);*/
+		
+		image = JAI.create("stream", stream);
+		
 		origSize.width = image.getWidth();
 		origSize.height = image.getHeight();
 		LOGGER.info("******************************************");
@@ -394,6 +434,30 @@ public class MCRImgProcessor implements ImgProcessor {
 	}
 
 	// Encoding Part
+	private void encode(OutputStream output) {
+		if (useEncoder == JPEG_ENC){
+			LOGGER.debug("*********************************************");
+			LOGGER.debug("* MCRImgProcessor - encode	              *");
+			LOGGER.debug("* JPEG_ENC                                  *");
+			LOGGER.debug("*********************************************");
+			jpegEncode(image, output, jpegQuality);
+		}
+		else if (useEncoder == TIFF_ENC){
+			LOGGER.debug("*********************************************");
+			LOGGER.debug("* MCRImgProcessor - encode	              *");
+			LOGGER.debug("* TIFF_ENC                                  *");
+			LOGGER.debug("*********************************************");
+			tiffEncode(image, output, true, tileWidth, tileHeight);
+		}
+		else if (useEncoder == PNG_ENC){
+			LOGGER.debug("*********************************************");
+			LOGGER.debug("* MCRImgProcessor - encode	              *");
+			LOGGER.debug("* PNG_ENC                                   *");
+			LOGGER.debug("*********************************************");
+			pngEncode(image, output, true);
+		}
+	}
+	
 	private void jpegEncode(PlanarImage imgInput, OutputStream output, float encodeQuality) {
 		// Encode JPEG
 		JPEGEncodeParam jpegParam = new JPEGEncodeParam();
@@ -419,6 +483,25 @@ public class MCRImgProcessor implements ImgProcessor {
 		}
 
 		ImageEncoder enc = ImageCodec.createImageEncoder("TIFF", output, tiffParam);
+		try {
+			enc.encode(imgInput);
+			output.close();
+		} catch (Exception e) {
+			// TODO change Exeption
+			System.out.println("IOException at TIFF encoding..");
+			e.printStackTrace();
+		}
+	}
+	
+	private void pngEncode(PlanarImage imgInput, OutputStream output, boolean transparent) {
+		// Encode TIFF
+		PNGEncodeParam.RGB pngParam = new PNGEncodeParam.RGB();
+
+		if (!transparent) {
+			pngParam.unsetTransparency();
+		}
+
+		ImageEncoder enc = ImageCodec.createImageEncoder("png", output, pngParam);
 		try {
 			enc.encode(imgInput);
 			output.close();

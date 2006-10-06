@@ -174,11 +174,13 @@ public class MCRImgCacheCommands extends MCRAbstractCommands {
 		String suppContTypes = new String(config.getString("MCR.Module-iview.SupportedContentTypes"));
 		boolean useCache = (new Boolean(config.getString("MCR.Module-iview.useCache"))).booleanValue();
 		String fileType = image.getContentTypeID();
+		String filename = image.getName();
 
 		if (suppContTypes.indexOf(fileType) > -1) {
 			LOGGER.debug("****************************************");
-			LOGGER.debug("* MCRImgCacheCommands - cacheFile      *");
-			LOGGER.debug("* suppContTypes.indexOf(imgFile.getContentTypeID()) > -1  *");
+			LOGGER.debug("* MCRImgCacheCommands - " + filename);
+			LOGGER.debug("* File type " + fileType + " supported in file list - " + suppContTypes);
+			LOGGER.debug("* Index in file list: " + suppContTypes.indexOf(fileType));
 			LOGGER.debug("****************************************");
 			MCRImgCacheManager cache = new MCRImgCacheManager();
 			MCRImgProcessor processor = new MCRImgProcessor();
@@ -274,6 +276,13 @@ public class MCRImgCacheCommands extends MCRAbstractCommands {
 				LOGGER.info("****************************************");
 				LOGGER.info("* Caching image " + image.getName() + " finished successfull!");
 				LOGGER.info("****************************************");
+			}
+			else{
+				LOGGER.debug("****************************************");
+				LOGGER.debug("* MCRImgCacheCommands - " + filename);
+				LOGGER.debug("* File type " + fileType + " not supported in file list - " + suppContTypes);
+				LOGGER.debug("* Index in file list: " + suppContTypes.indexOf(fileType));
+				LOGGER.debug("****************************************");
 			}
 		}
 	}
