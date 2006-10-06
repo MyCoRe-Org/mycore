@@ -23,279 +23,112 @@
 
 package wcms;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.Dictionary;
+import java.util.Iterator;
+import java.util.List;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
-import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.FileItemFactory;
+import org.apache.commons.fileupload.disk.DiskFileItemFactory;
+import org.apache.commons.fileupload.servlet.ServletFileUpload;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
+
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 
 public class WCMSFileUploadServlet extends WCMSServlet {
-    char fs = File.separatorChar;
+    private static final long serialVersionUID = 1L;
 
-    private String fileName;
+    private static final File DOCUMENT_DIR = new File(CONFIG.getString("MCR.WCMS.documentPath").replace('/', File.separatorChar));
 
-    private String filePath;
+    private static final File IMAGE_DIR = new File(CONFIG.getString("MCR.WCMS.imagePath").replace('/', File.separatorChar));
 
-    private String contentType;
-
-    private String error;
-
-    private String status;
-
-    private String action = null;
-
-    private String documentPath = CONFIG.getString("MCR.WCMS.documentPath").replace('/', File.separatorChar);
-
-    private String imagePath = CONFIG.getString("MCR.WCMS.imagePath").replace('/', File.separatorChar);
-
-    private String savePath = null;
-
-    private Dictionary fields;
-
-    private int fileSize;
-
-    private int fileMaxSize;
-
-    public String getFilename() {
-        return fileName;
-    }
-
-    public String getFilepath() {
-        return filePath;
-    }
-
-    public void setSavePath(String savePath) {
-        this.savePath = savePath;
-    }
-
-    public String getContentType() {
-        return contentType;
-    }
-
-    public String getFieldValue(String fieldName) {
-        if ((fields == null) || (fieldName == null)) {
-            return null;
-        }
-
-        return (String) fields.get(fieldName);
-    }
+    private static final Logger LOGGER = Logger.getLogger(WCMSFileUploadServlet.class);
 
     /**
      * Main program called by doGet and doPost.
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
-        action = request.getParameter("action");
+        boolean isMultiPart = ServletFileUpload.isMultipartContent(request);
 
-        if (action.equals("upload")) {
-            fileMaxSize = CONFIG.getInt("MCR.WCMS.maxUploadFileSize");
-            fileSize = request.getContentLength();
+        if (isMultiPart) {
+            int fileMaxSize = CONFIG.getInt("MCR.WCMS.maxUploadFileSize");
 
-            if (fileSize == 0) {
-                status = "failed";
-                error = "0";
-                throw new ServletException("No legal request object. Please select a valid File for uploading.");
-            }
+            FileItemFactory factory = new DiskFileItemFactory();
+            ServletFileUpload upload = new ServletFileUpload(factory);
+            upload.setSizeMax(fileMaxSize);
 
-            if (fileSize > fileMaxSize) {
-                status = "failed";
-                error = "2";
-
-                // aborting POST request
-                throw new IOException("Upload File too large");
-            }
-
+            // parse the request
             try {
-                ServletInputStream in = request.getInputStream();
-                byte[] line = new byte[1024];
-                int i = in.readLine(line, 0, 1024);
-
-                if (i < 3) {
-                    return;
-                }
-
-                int boundaryLength = i - 2;
-                String boundary = new String(line, 0, boundaryLength);
-
-                while (i != -1) {
-                    String newLine = new String(line, 0, i);
-
-                    if (newLine.startsWith("Content-Disposition: form-data; name=\"")) {
-                        if (newLine.indexOf("filename=\"") != -1) {
-                            setFilename(new String(line, 0, i - 2));
-
-                            if (fileName == null) {
-                                return;
-                            }
-
-                            // this is the file content
-                            i = in.readLine(line, 0, 1024);
-                            setContentType(new String(line, 0, i - 2));
-                            i = in.readLine(line, 0, 1024);
-
-                            // blank line
-                            i = in.readLine(line, 0, 1024);
-                            newLine = new String(line, 0, i);
-
-                            if (contentType.startsWith("image/")) {
-                                savePath = imagePath;
-                            } else {
-                                savePath = documentPath;
-                            }
-
-                            // System.out.println(savePath+fileName);
-                            PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(savePath + fileName)));
-
-                            while ((i != -1) && !newLine.startsWith(boundary)) {
-                                // the problem is the last line of the file
-                                // content
-                                // contains the new line character.
-                                // So, we need to check if the current line is
-                                // the last line.
-                                i = in.readLine(line, 0, 1024);
-
-                                if (((i == (boundaryLength + 2)) || (i == (boundaryLength + 4))) // + 4
-                                        // is
-                                        // eof
-                                        && (new String(line, 0, i).startsWith(boundary))) {
-                                    pw.print(newLine.substring(0, newLine.length() - 2));
-                                } else {
-                                    pw.print(newLine);
-                                }
-
-                                newLine = new String(line, 0, i);
-                            }
-
-                            pw.close();
-                        } else {
-                            // this is a field
-                            // get the field name
-                            int pos = newLine.indexOf("name=\"");
-                            String fieldName = newLine.substring(pos + 6, newLine.length() - 3);
-
-                            // System.out.println("fieldName:" + fieldName);
-                            // blank line
-                            i = in.readLine(line, 0, 1024);
-                            i = in.readLine(line, 0, 1024);
-                            newLine = new String(line, 0, i);
-
-                            StringBuffer fieldValue = new StringBuffer(1024);
-
-                            while ((i != -1) && !newLine.startsWith(boundary)) {
-                                // The last line of the field
-                                // contains the new line character.
-                                // So, we need to check if the current line is
-                                // the last line.
-                                i = in.readLine(line, 0, 1024);
-
-                                if (((i == (boundaryLength + 2)) || (i == (boundaryLength + 4))) // + 4
-                                        // is
-                                        // eof
-                                        && (new String(line, 0, i).startsWith(boundary))) {
-                                    fieldValue.append(newLine.substring(0, newLine.length() - 2));
-                                } else {
-                                    fieldValue.append(newLine);
-                                }
-
-                                newLine = new String(line, 0, i);
-                            }
-
-                            // System.out.println("fieldValue:" +
-                            // fieldValue.toString());
-                            fields.put(fieldName, fieldValue.toString());
-                        }
+                List items = upload.parseRequest(request);
+                for (Iterator it = items.iterator(); it.hasNext();) {
+                    FileItem item = (FileItem) it.next();
+                    if (item.isFormField()) {
+                        processFormField(item);
+                    } else {
+                        processUploadedFile(item);
                     }
-
-                    i = in.readLine(line, 0, 1024);
-                } // end while
-
-                status = "done";
-            } // end try
-
-            catch (IOException e) {
-                e.printStackTrace();
-
-                // System.out.println(e.getMessage());
+                }
+            } catch (Exception e) {
+                LOGGER.error("Error while getting uploaded file.", e);
+                generateStatusPage(request, response, false, e.getLocalizedMessage());
             }
-
-            /*
-             * Logfile WCMSActionServlet wcms = new WCMSActionServlet();
-             * wcms.writeToLogFile("File upload", fileName);
-             */
-
-            // JDOM Output
-            Element rootOut = new Element("cms");
-            Document jdom = new Document(rootOut);
-            rootOut.addContent(new Element("session").setText("fileUpload"));
-            rootOut.addContent(new Element("userID").setText((String) mcrSession.get("userID")));
-            rootOut.addContent(new Element("userClass").setText((String) mcrSession.get("userClass")));
-            rootOut.addContent(new Element("status").setText(status));
-            rootOut.addContent(new Element("error").setText(error));
-            rootOut.addContent(new Element("contentType").setText(contentType));
-            rootOut.addContent(new Element("path").setText(savePath + fileName));
-            request.setAttribute("MCRLayoutServlet.Input.JDOM", jdom);
-
-            // request.setAttribute("XSL.Style", "xml");
-            RequestDispatcher rd = getServletContext().getNamedDispatcher("MCRLayoutServlet");
-            rd.forward(request, response);
+            generateStatusPage(request, response, true, null);
         } else {
-            Element rootOut = new Element("cms");
-            Document jdom = new Document(rootOut);
-            rootOut.addContent(new Element("session").setText("fileUpload"));
-            rootOut.addContent(new Element("status").setText("upload"));
-            rootOut.addContent(new Element("error").setText(error));
-            request.setAttribute("MCRLayoutServlet.Input.JDOM", jdom);
-
-            // request.setAttribute("XSL.Style", "xml");
-            RequestDispatcher rd = getServletContext().getNamedDispatcher("MCRLayoutServlet");
-            rd.forward(request, response);
+            generateUploadPage(request, response);
         }
     }
 
-    private void setFilename(String s) {
-        if (s == null) {
-            return;
-        }
-
-        int pos = s.indexOf("filename=\"");
-
-        if (pos != -1) {
-            filePath = s.substring(pos + 10, s.length() - 1);
-
-            // Windows browsers include the full path on the client
-            // But Linux/Unix and Mac browsers only send the filename
-            // test if this is from a Windows browser
-            pos = filePath.lastIndexOf("\\");
-
-            if (pos != -1) {
-                fileName = filePath.substring(pos + 1);
-            } else {
-                fileName = filePath;
-            }
-        }
+    private void generateStatusPage(HttpServletRequest request, HttpServletResponse response, boolean success, String message) throws ServletException,
+            IOException {
+        String msg = (message != null) ? message : "";
+        String status = (success) ? "done" : "failed";
+        forwardPage(request, response, status, msg);
     }
 
-    private void setContentType(String s) {
-        if (s == null) {
-            return;
-        }
+    private void generateUploadPage(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        forwardPage(request, response, "upload", "2");
+    }
 
-        int pos = s.indexOf(": ");
+    private void forwardPage(HttpServletRequest request, HttpServletResponse response, String status, String error) throws ServletException, IOException {
+        MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
+        Element rootOut = new Element("cms");
+        Document jdom = new Document(rootOut);
+        rootOut.addContent(new Element("session").setText("fileUpload"));
+        rootOut.addContent(new Element("userID").setText(mcrSession.get("userID").toString()));
+        rootOut.addContent(new Element("userClass").setText(mcrSession.get("userClass").toString()));
+        rootOut.addContent(new Element("status").setText(status));
+        rootOut.addContent(new Element("error").setText(error));
+        request.setAttribute("MCRLayoutServlet.Input.JDOM", jdom);
+        RequestDispatcher rd = getServletContext().getNamedDispatcher("MCRLayoutServlet");
+        rd.forward(request, response);
+    }
 
-        if (pos != -1) {
-            contentType = s.substring(pos + 2, s.length());
+    private void processFormField(FileItem item) {
+        String name = item.getFieldName();
+        String value = item.getString();
+        LOGGER.info("Got form field " + name + "=" + value);
+    }
+
+    private void processUploadedFile(FileItem item) throws Exception {
+        String fileName = FilenameUtils.getName(item.getName());
+        String contentType = item.getContentType();
+        if (contentType.startsWith("image")) {
+            File imageFile = new File(IMAGE_DIR, fileName);
+            item.write(imageFile);
+        } else {
+            File docFile = new File(DOCUMENT_DIR, fileName);
+            item.write(docFile);
         }
+        LOGGER.info("Got file " + fileName);
     }
 }

@@ -7,7 +7,7 @@
 	<xsl:template name="wcmsMultimedia">
 		
 		<xsl:variable name="servletAnswer_XML" 
-		select="document(concat('request:','servlets/WCMSChooseServlet?XSL.Style=xml&amp;mode=getMultimedia'))"
+		select="document(concat('request:','servlets/WCMSChooseServlet',$HttpSession,'?XSL.Style=xml&amp;mode=getMultimedia'))"
     	/>
 	    
 		<form name="wcmsMultimedia" target="">
@@ -68,7 +68,7 @@
 						<br/>
 						<br/>
 						<a target="blank"
-							href="{$ServletsBaseURL}WCMSFileUploadServlet?action=select&amp;wcmsID=0024">
+							href="{$ServletsBaseURL}WCMSFileUploadServlet{$HttpSession}">
 							<xsl:value-of
 								select="concat(i18n:translate('wcms.uploadImg'),':')"/>
 						</a>

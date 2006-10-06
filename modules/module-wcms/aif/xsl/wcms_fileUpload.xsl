@@ -17,7 +17,7 @@
 	<!-- END OF: wcmsAdmin  ================================================================================= -->
 	<!-- upload  ============================================================================== -->
 	<xsl:template name="wcmsFileUpload.upload" >
-		<form name="documentUpload" method="POST" action="{$WebApplicationBaseURL}servlets/WCMSFileUploadServlet?action=upload" 
+		<form name="documentUpload" method="POST" action="{$WebApplicationBaseURL}servlets/WCMSFileUploadServlet{$HttpSession}" 
 			enctype="multipart/form-data">
 			<table width="90%" border="0" cellspacing="0" cellpadding="0" align="center">
 				<xsl:call-template name="wcms.headline" >
