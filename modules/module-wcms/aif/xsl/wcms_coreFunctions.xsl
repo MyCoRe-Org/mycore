@@ -167,13 +167,14 @@ parameters:
 							</a>
 						</li>
 						<li>
-							<!--<script type="text/javascript">								
+							<script type="text/javascript">								
 								function OpenWindow (address) {
-								  MyWindow = window.open(address, "Multimedia", "width=500,height=400,scrollbars=yes");
+								  MyWindow = window.open(address, "Multimedia", "width=400,height=350,scrollbars=yes");
+								  MyWindow.window.moveTo(screen.width*0.5,screen.height*0.2);
 								  MyWindow.focus();
 								}
-							</script>-->	
-							<a href="{$WebApplicationBaseURL}modules/module-wcms/aif/web/multimedia.xml" target="_blank">
+							</script>	
+							<a href="{$WebApplicationBaseURL}modules/module-wcms/aif/web/multimedia.xml" onclick="OpenWindow(this.href); return false">
 								<xsl:value-of select="i18n:translate('wcms.multimedia')"/>
 							</a>
 						</li>

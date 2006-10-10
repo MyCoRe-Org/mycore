@@ -19,23 +19,24 @@
 	<xsl:template name="wcmsFileUpload.upload" >
 		<form name="documentUpload" method="POST" action="{$WebApplicationBaseURL}servlets/WCMSFileUploadServlet{$HttpSession}" 
 			enctype="multipart/form-data">
-			<table width="90%" border="0" cellspacing="0" cellpadding="0" align="center">
-				<xsl:call-template name="wcms.headline" >
+			<table width="40" border="0" cellspacing="0" cellpadding="0" align="center">
+				<!--<xsl:call-template name="wcms.headline" >
 					<xsl:with-param name="infoText" select="'Bild, Datei hochladen (Schritt 1/2)'"/>
-				</xsl:call-template>
+				</xsl:call-template>-->
+				<br/>
 				<tr>
 					<td colspan="2">
 						<br/>
 					</td>
 				</tr>
-				<!-- 		  <tr>
+				 		  <tr>
 
-		    <td align="center" class="green"><b>DBT-WCMS :: Bild, Datei hochladen</b></td>
+		    <td align="center" class="green"><b>'Bild, Datei hochladen (Schritt 1/2)'</b></td>
 
-		  </tr> -->
+		  </tr> 
 				<tr>
-					<td>
-						<input name="document" type="file" size="50" maxlength="100000" accept="text/*" />
+					<td>				
+							<input name="document" type="file" size="25" maxlength="100000" accept="text/*" />
 					</td>
 				</tr>
 				<tr>
@@ -74,11 +75,14 @@
 	<!-- done  ============================================================================== -->
 	<xsl:template name="wcmsFileUpload.done" >
 		<table width="90%" border="0" cellspacing="0" cellpadding="0" align="center">
-			<xsl:call-template name="wcms.headline" >
+			<!--<xsl:call-template name="wcms.headline" >
 				<xsl:with-param name="infoText" select="'Bild, Datei hochladen (Schritt 2/2)'"/>
-			</xsl:call-template>
+			</xsl:call-template>-->
+			<br/>
 			<tr>
 				<td colspan="2">
+					<br/>
+					'Bild, Datei hochladen (Schritt 2/2)'
 					<br/>
 				</td>
 			</tr>
@@ -105,8 +109,8 @@
 				<td colspan="2">
 					<br/>
 					<br/>
-					<a href="javascript:refreshClose()">zurück zum WCMS</a>
-					<!--  	<a href ="Javascript:var URL = unescape(window.opener.location.pathname);window.opener.location.href = URL; window.close();">zurück zum WCMS</a>	   -->
+					<a href="{$WebApplicationBaseURL}modules/module-wcms/aif/web/multimedia.xml">zur?ck zum WCMS</a>
+					<!--  	<a href ="Javascript:var URL = unescape(window.opener.location.pathname);window.opener.location.href = URL; window.close();">zur?ck zum WCMS</a>	   -->
 				</td>
 			</tr>
 		</table>

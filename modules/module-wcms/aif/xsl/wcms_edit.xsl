@@ -31,6 +31,8 @@ template:
 
 }=========================================================================================
 
+
+
 ====================================================================================== -->
 
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
@@ -39,8 +41,7 @@ template:
 	
 	<xsl:param name="check"/>
 	<xsl:param name="address"/>
-	<xsl:param name="MCR.nameOfProject"/>	
-	 
+	<xsl:param name="MCR.nameOfProject"/>
 	
 	<!-- ====================================================================================={
 	section: Template: name="wcmsEditContent"
@@ -51,6 +52,8 @@ template:
 	Aufruf:	
 	- buildInterfaceDelete
 	- buildInterfaceGeneral
+	
+	
 	
 	
 	}===================================================================================== -->
@@ -135,6 +138,8 @@ template:
 	Aufruf:
 	- menuleiste
 	- zeigeSeitenname
+	
+	
 	
 	
 	}===================================================================================== -->
@@ -226,6 +231,8 @@ template:
 	- buildInterface.general.content.multimedia
 	
 	
+	
+	
 	}==================================================================================== -->
 	
 	<xsl:template name="buildInterfaceGeneral">
@@ -266,192 +273,265 @@ template:
 				</xsl:if>
 				
 				
-<!-- ============================= Begin - TAB Manager ============================================ -->				
+				<!-- ============================= Begin - TAB Manager ============================================ -->
 				
-				<div id="tabPane" class="tabPane">	
-    				<xsl:choose>
-						<xsl:when test="/cms/action[@mode = 'intern'] ">	
+				<div id="tabPane" class="tabPane">
+					<xsl:choose>
+						<xsl:when test="/cms/action[@mode = 'intern'] ">
 							<div>
+								
+								
 								<!-- give autoimport some info about this panel -->
 								<dl title="tabinfo" style="display:none;">
-									<dd title="name"><xsl:value-of
-										select="i18n:translate('wcms.labels.content')"/></dd>
-									<dd title="title"><xsl:value-of
-										select="i18n:translate('wcms.labels.contentlabel')"/></dd>
+									<dd title="name">
+										<xsl:value-of
+											select="i18n:translate('wcms.labels.content')"/>
+									</dd>
+									<dd title="title">
+										<xsl:value-of
+											select="i18n:translate('wcms.labels.contentlabel')"/>
+									</dd>
 									<dd title="accesskey">h</dd>
 								</dl>
-	 
+								
 								<p><!-- Inhalt Seiteninhalt -->
-									<!--<div id="editor">-->							
-											<xsl:call-template name="fck"/>
-											<input type="hidden" name="dummy"
-												value="true"/>
+									<!--<div id="editor">-->
+									<xsl:call-template name="fck"/>
+									<input type="hidden" name="dummy"
+										value="true"/>
 									<!--</div>-->
 								</p>
-						
+								
 							</div>
 						</xsl:when>
 						<xsl:otherwise>
 							<script type="text/javascript">
-								<xsl:text> window.onload = function() { 
-											tp = new tabManager('tabPane', true); }
-								</xsl:text>
-							</script>	
-						</xsl:otherwise>			
-					</xsl:choose>			
+								<xsl:text> window.onload = function() { tp = new
+									tabManager('tabPane', true); } </xsl:text>
+							</script>
+						</xsl:otherwise>
+					</xsl:choose>
 					<div id="menupunkt_name">
-				
+						
 						<!-- give autoimport some info about this panel -->
 						<dl title="tabinfo" style="display:none;">
-							<dd title="name"><xsl:value-of
-										select="i18n:translate('wcms.labels.information')"/></dd>
-							<dd title="title"><xsl:value-of
-										select="i18n:translate('wcms.labels.informationlabel')"/></dd>
+							<dd title="name">
+								<xsl:value-of
+									select="i18n:translate('wcms.labels.information')"/>
+							</dd>
+							<dd title="title">
+								<xsl:value-of
+									select="i18n:translate('wcms.labels.informationlabel')"/>
+							</dd>
 							<dd title="accesskey">i</dd>
 						</dl>
-				
-						<h3><xsl:value-of
-										select="i18n:translate('wcms.labels.informationlabel')"/></h3>
+						
+						<h3>
+							<xsl:value-of
+								select="i18n:translate('wcms.labels.informationlabel')"/>
+						</h3>
 						<br/>
-						<p>  
+						<p>
 							<!-- Inhalt Menuename-->
-							<fieldset>
-								<label for="position">
-									<xsl:value-of
-										select="i18n:translate('wcms.labels.position')"/>
-								</label>
-								<span name="position">
-									<xsl:value-of
-										select="$MCR.nameOfProject"/>
-									<xsl:value-of select="$labelPath"/>
-									<xsl:if test="/cms/action = 'add'">
-										<xsl:value-of
-										select="' » ...'"/>
-									</xsl:if>
-								</span>
-								<br/>
-								<label for="label">
-									<xsl:value-of
-										select="i18n:translate('wcms.labels.name')"/>
-								</label>
-								<xsl:call-template name="menuePunktName"/>
-								<br/>
+							<table>
+								<tr>
+									<td>
+										<label for="position">
+											<xsl:value-of
+												select="i18n:translate('wcms.labels.position')"/>
+										</label>
+										<br/>
+									</td>
+									<td>
+										<span name="position">
+											<xsl:value-of
+												select="$MCR.nameOfProject"/>
+											<xsl:value-of select="$labelPath"/>
+											<xsl:if test="/cms/action = 'add'">
+												<xsl:value-of select="' » ...'"/>
+											</xsl:if>
+										</span>
+										<br/>
+									</td>
+								</tr>
+								<tr>
+									<td>
+										<label for="label">
+											<xsl:value-of
+												select="i18n:translate('wcms.labels.name')"/>
+										</label>
+									</td>
+									<td>
+										<xsl:call-template
+											name="menuePunktName"/>
+									</td>
+								</tr>
+								
 								<xsl:if
 									test="/cms/action[@mode = 'intern'] and /cms/action = 'add'">
-									<span>
-									<label for="href">
-										<xsl:value-of
-											select="i18n:translate('wcms.labels.fileName')"/>
-									</label>
-									</span>		
-									<input type="text" size="80" maxlength="35"
-										name="href" value=""/>
-									<br/>
-								</xsl:if>
-								<xsl:if test="/cms/action[@mode = 'extern']">
-									<span>
-									<label for="href">
-										<xsl:value-of
-											select="concat(i18n:translate('wcms.labels.linkTo'),' :')"/>
-									</label>
-									</span>	
-									<xsl:choose>
-										<!-- external new content -->
-										<xsl:when test="/cms/action = 'add'">
-											<input type="text" size="200"
-												maxlength="256" name="href"
-												class="input">
-												<xsl:attribute name="value">
-													http://</xsl:attribute>
-											</input>
-										</xsl:when>
-										<!-- external existing content -->
-										<xsl:when test="/cms/action = 'edit'">
-											<input type="text" size="200"
-												maxlength="256" name="href"
-												class="input">
-												<xsl:attribute name="value">
+									<tr>
+										<td>
+											<span>
+												<label for="href">
 													<xsl:value-of
-														select="$href"/>
-												</xsl:attribute>
-											</input>
-										</xsl:when>
-									</xsl:choose>
-									<br/>
+														select="i18n:translate('wcms.labels.fileName')"/>
+												</label>
+											</span>
+										</td>
+										<td>
+											<input type="text" size="80"
+												maxlength="35" name="href"
+												value=""/>
+										</td>
+									</tr>
 								</xsl:if>
-								<br/>
-								<br/>
+								
+								<xsl:if test="/cms/action[@mode = 'extern']">
+									<tr>
+										<td>
+											<label for="href">
+												<xsl:value-of
+													select="concat(i18n:translate('wcms.labels.linkTo'),':')"/>
+											</label>
+										</td>
+										<td>
+											<xsl:choose>
+												<!-- external new content -->
+												<xsl:when
+													test="/cms/action = 'add'">
+													<input type="text" size="200"
+														maxlength="256"
+														name="href"
+														class="input">
+														<xsl:attribute
+															name="value">
+															http://</xsl:attribute>
+													</input>
+												</xsl:when>
+												
+												
+												<!-- external existing content -->
+												<xsl:when
+													test="/cms/action = 'edit'">
+													<input type="text" size="200"
+														maxlength="256"
+														name="href"
+														class="input">
+														<xsl:attribute
+															name="value">
+															<xsl:value-of
+																select="$href"/>
+														</xsl:attribute>
+													</input>
+												</xsl:when>
+											</xsl:choose>
+										</td>
+									</tr>
+								</xsl:if>
+								
 								<xsl:if test="/cms/action = 'edit'">
-									<p id="comment">
-                                		<!--label for="changeInfo">Kommentar</label-->
-										<textarea name="changeInfo" cols="30"
-											rows="3" onclick="this.select();">
+									<tr>
+										<td valign="top">
+											<label for="comment">
 											<xsl:value-of
-												select="i18n:translate('wcms.hint.noComment')"/>
-										</textarea>
-									</p>
+												select="i18n:translate('wcms.labels.comment')"/>
+											</label>	
+			    						</td>
+										<td>
+											<p id="comment">
+												
+												
+												<!--label for="changeInfo">Kommentar</label-->
+												<textarea name="changeInfo"
+													cols="30" rows="3"
+													onclick="this.select();">
+													<xsl:value-of
+														select="i18n:translate('wcms.hint.noComment')"/>
+												</textarea>
+											</p>
+										</td>
+									</tr>
 								</xsl:if>
-							</fieldset>
+							</table>
 						</p>
-				
+						
 					</div>
 					<div>
-				
+						
 						<!-- give autoimport some info about this panel -->
 						<dl title="tabinfo" style="display:none;">
-							<dd title="name"><xsl:value-of
-											select="i18n:translate('wcms.labels.navi')"/></dd>
-							<dd title="title"><xsl:value-of
-											select="i18n:translate('wcms.labels.navilabel')"/></dd>
+							<dd title="name">
+								<xsl:value-of
+									select="i18n:translate('wcms.labels.navi')"/>
+							</dd>
+							<dd title="title">
+								<xsl:value-of
+									select="i18n:translate('wcms.labels.navilabel')"/>
+							</dd>
 							<dd title="accesskey">n</dd>
 						</dl>
-				
-						<h3><xsl:value-of select="i18n:translate('wcms.labels.navilabel')"/></h3>
+						
+						<h3>
+							<xsl:value-of
+								select="i18n:translate('wcms.labels.navilabel')"/>
+						</h3>
 						<br/>
 						<p><!-- Navigationsverhalten -->
-							<table width="500">								
-								<xsl:call-template name="buildInterface.general.metaData.replaceMenu"/>
+							<table width="500">
+								<xsl:call-template
+									name="buildInterface.general.metaData.replaceMenu"/>
 								<tr></tr>
 								<tr>
 									<td>
-										<xsl:value-of select="i18n:translate('wcms.labels.targetofLink')"/>
+										<xsl:value-of
+											select="i18n:translate('wcms.labels.targetofLink')"/>
 									</td>
-									<td> 
-									    <xsl:call-template name="buildInterface.general.metaData.target"/>
+									<td>
+										<xsl:call-template
+											name="buildInterface.general.metaData.target"/>
 									</td>
 								</tr>
 								<tr></tr>
 								<tr>
 									<td>
-										<xsl:value-of select="i18n:translate('wcms.labels.constrainPopUp')"/>
+										<xsl:value-of
+											select="i18n:translate('wcms.labels.constrainPopUp')"/>
 									</td>
-									<td> 
-									    <xsl:call-template name="buildInterface.general.metaData.constrainPopUp"/>
+									<td>
+										<xsl:call-template
+											name="buildInterface.general.metaData.constrainPopUp"/>
 									</td>
 								</tr>
 							</table>
 						</p>
-				
+						
 					</div>
 					<div>
-				
+						
 						<!-- give autoimport some info about this panel -->
 						<dl title="tabinfo" style="display:none;">
-							<dd title="name"><xsl:value-of
-											select="i18n:translate('wcms.labels.layout')"/></dd>
-							<dd title="title"><xsl:value-of
-											select="i18n:translate('wcms.labels.layoutlabel')"/></dd>
+							<dd title="name">
+								<xsl:value-of
+									select="i18n:translate('wcms.labels.layout')"/>
+							</dd>
+							<dd title="title">
+								<xsl:value-of
+									select="i18n:translate('wcms.labels.layoutlabel')"/>
+							</dd>
 							<dd title="accesskey">l</dd>
 						</dl>
-				
-						<h3><xsl:value-of select="i18n:translate('wcms.labels.layoutlabel')"/></h3>
+						
+						<h3>
+							<xsl:value-of
+								select="i18n:translate('wcms.labels.layoutlabel')"/>
+						</h3>
 						<br/>
 						<p><!-- Layout anpassen -->
 							<table>
 								<tr>
 									<td>
 										<xsl:value-of
-											select="i18n:translate('wcms.labels.selecttemplate')"/>	
+											select="i18n:translate('wcms.labels.selecttemplate')"/>
 									</td>
 									<td>
 										<xsl:call-template
@@ -467,7 +547,7 @@ template:
 									<td>
 										<xsl:value-of
 											select="i18n:translate('wcms.labels.menuPointLayout')"/>
-									</td> 
+									</td>
 									<td>
 										<xsl:call-template
 											name="buildInterface.general.metaData.menuPointLayout"/>
@@ -475,56 +555,69 @@ template:
 								</tr>
 							</table>
 						</p>
-				
+						
 					</div>
 					<div>
-				
+						
 						<!-- give autoimport some info about this panel -->
 						<dl title="tabinfo" style="display:none;">
-							<dd title="name"><xsl:value-of select="i18n:translate('wcms.labels.history')"/></dd>
-							<dd title="title"><xsl:value-of select="i18n:translate('wcms.labels.historylabel')"/></dd>
+							<dd title="name">
+								<xsl:value-of
+									select="i18n:translate('wcms.labels.history')"/>
+							</dd>
+							<dd title="title">
+								<xsl:value-of
+									select="i18n:translate('wcms.labels.historylabel')"/>
+							</dd>
 							<dd title="accesskey">a</dd>
 						</dl>
-				
-<!--						<h3><xsl:value-of select="i18n:translate('wcms.labels.historylabel')"/></h3>-->
+						
+						
+						<!--						<h3><xsl:value-of select="i18n:translate('wcms.labels.historylabel')"/></h3>-->
 						<br/>
-						<p><!-- Historie der Seite -->
-							<xsl:variable name="servletPath">
-								<xsl:value-of select="concat('request:servlets/WCMSAdminServlet',$JSessionID,'?action=logs&amp;sort=date&amp;sortOrder=descending&amp;XSL.Style=xml')"/>
-							</xsl:variable>
-							<xsl:variable name="logData">
-								<xsl:copy-of select="xalan:nodeset(document($servletPath))"/>
-							</xsl:variable>
-													
-							<p id="statistic-width">
-								<p id="statistic">
-									<!-- div class="titel">WCMS Nutzungsprotokoll</div -->
-									<p class="inhalt">
-											<table>
-													<xsl:call-template name="logs.headLine">
-														<xsl:with-param name="sortBy" select="'date'"/>
-														<xsl:with-param name="currentSortOrder" select="'descending'"/>
-													</xsl:call-template>
-													<xsl:call-template name="logs.generateList">
-														<xsl:with-param name="rootNode" select="$logData"/>
-														<xsl:with-param name="currentSortOrder" select="'descending'"/>
-														<xsl:with-param name="sortBy" select="'date'"/>
-														<xsl:with-param name="onlyCurrentPage" select="/cms/href/text()"/>
-												</xsl:call-template>
-											</table>
-									</p>
-								</p>
-							</p>
+						<!-- Historie der Seite -->
+						<xsl:variable name="servletPath">
+							<xsl:value-of
+								select="concat('request:servlets/WCMSAdminServlet',$JSessionID,'?action=logs&amp;sort=date&amp;sortOrder=descending&amp;XSL.Style=xml')"/>
+						</xsl:variable>
+						<xsl:variable name="logData">
+							<xsl:copy-of
+								select="xalan:nodeset(document($servletPath))"/>
+						</xsl:variable>
 						
-						
-						</p>
-					</div>
-				</div>	
-
-				
-<!-- =============================== End - TAB Manager ============================================ -->				
-				
+						<span id="statistic2-width">
+							<span id="statistic2">
 								
+								
+								<!-- div class="titel">WCMS Nutzungsprotokoll</div -->
+								<!--<p class="inhalt">-->
+								<table>
+									<xsl:call-template name="logs.headLine">
+										<xsl:with-param name="sortBy"
+											select="'date'"/>
+										<xsl:with-param name="currentSortOrder"
+											select="'descending'"/>
+									</xsl:call-template>
+									<xsl:call-template name="logs.generateList">
+										<xsl:with-param name="rootNode"
+											select="$logData"/>
+										<xsl:with-param name="currentSortOrder"
+											select="'descending'"/>
+										<xsl:with-param name="sortBy"
+											select="'date'"/>
+										<xsl:with-param name="onlyCurrentPage"
+											select="/cms/href/text()"/>
+									</xsl:call-template>
+								</table>
+								<!--</p>-->
+							</span>
+						</span>
+					</div>
+				</div>
+				
+				
+				<!-- =============================== End - TAB Manager ============================================ -->
+				
 				<!-- Speichern Inhalt -->
 				<div id="speichern">
 					<!-- div class="comment"-->
@@ -581,6 +674,8 @@ template:
 								<label for="replaceMenu"><xsl:value-of select="i18n:translate('wcms.labels.rootMenu')"/></label>
 								
 								
+								
+								
 								<xsl:call-template name="buildInterface.general.metaData.replaceMenu"/>-->
 								<br/>
 							</fieldset>
@@ -633,10 +728,8 @@ template:
 		
 		<script type="text/javascript">
 			
-			<xsl:text> window.onload = function() { 
-				tp = new tabManager('tabPane', true);
-				var oFCKeditor = new FCKeditor(
-				'</xsl:text>
+			<xsl:text> window.onload = function() { tp = new tabManager('tabPane', true);
+				var oFCKeditor = new FCKeditor( '</xsl:text>
 			
 			<xsl:value-of select="'fck_editor'"/>
 			<xsl:text>' ) ; oFCKeditor.BasePath = '</xsl:text>
@@ -646,20 +739,20 @@ template:
 			<xsl:text> ; oFCKeditor.ToolbarSet = 'mcr' ; oFCKeditor.ReplaceTextarea() ;
 				} </xsl:text>
 			<!--	<![CDATA[	
-				{
-					tp = new tabManager('tabPane', true);
-				}
-		
+			{
+			tp = new tabManager('tabPane', true);
+			}
+			
 			var dynamicCounter = 0;
-				function makeDiv()
-				{
-					dynamicCounter++;
-					var dynDiv = document.createElement('div');
-						dynDiv.setAttribute('id', 'dynamicdiv');
-						dynDiv.innerHTML = '<p>Great! This tab was added dynamically. You can <a href="#" onclick="tp.removePanel( tp.getCurrentID() ); tp.switchTo( 2 ); return false;">remove it<'+'/a> now<'+'/p>';
-					return dynDiv;
-				}		
-			]]>	-->				
+			function makeDiv()
+			{
+			dynamicCounter++;
+			var dynDiv = document.createElement('div');
+			dynDiv.setAttribute('id', 'dynamicdiv');
+			dynDiv.innerHTML = '<p>Great! This tab was added dynamically. You can <a href="#" onclick="tp.removePanel( tp.getCurrentID() ); tp.switchTo( 2 ); return false;">remove it<'+'/a> now<'+'/p>';
+			return dynDiv;
+			}		
+			]]>	-->
 		</script>
 	</xsl:template>
 	
@@ -668,12 +761,14 @@ template:
 	- Auswertung erhaltener Fehlermeldungen 
 	
 	
+	
+	
 	}===================================================================================== -->
-		<xsl:template match='@*|node()'>
+	<xsl:template match='@*|node()'>
 		<xsl:copy>
 			<xsl:apply-templates select='@*|node()'/>
 		</xsl:copy>
-	</xsl:template>	
+	</xsl:template>
 	<xsl:template name="errorOnBuildInterfaceGeneral">
 		<table>
 			<tr>
@@ -713,6 +808,8 @@ template:
 	- Anzeige des Namen in der Defaultsprache
 	
 	
+	
+	
 	}===================================================================================== -->
 	<xsl:template name="menuePunktName">
 		<xsl:choose>
@@ -750,6 +847,8 @@ template:
 	- Knopf zum Speichern der Aenderungen
 	
 	
+	
+	
 	}===================================================================================== -->
 	<xsl:template name="buildInterface.general.safeButton">
 		<a class="button" href="javascript:document.editContent.submit()">
@@ -760,6 +859,8 @@ template:
 	<!-- ====================================================================================={
 	section: Template: name="buildInterface.general.metaData.selectTemplate"
 	- Auswahlbox fuer ein eigenes Template
+	
+	
 	
 	
 	}===================================================================================== -->
@@ -909,8 +1010,7 @@ template:
 									
 									
 									<!-- current template is the valid template -->
-									<xsl:when
-										test=" node() = $template ">
+									<xsl:when test=" node() = $template ">
 										<option selected="selected">
 											<xsl:attribute name="value">
 												<xsl:value-of
@@ -987,6 +1087,8 @@ template:
 	- Auswahlbox zur Darstellung des Menuepunktes
 	
 	
+	
+	
 	}===================================================================================== -->
 	<xsl:template name="buildInterface.general.metaData.menuPointLayout">
 		<xsl:choose>
@@ -1008,13 +1110,16 @@ template:
 					</xsl:text>
 				</select>
 				
-				<input name="style" type="hidden" value="normal"/> </xsl:when>
+				<input name="style" type="hidden" value="normal"/>
+			</xsl:when>
 		</xsl:choose>
 	</xsl:template>
 	
 	<!-- ====================================================================================={
 	section: Template: name="buildInterface.general.metaData.target"
 	- Ziel des Verweises festlegen
+	
+	
 	
 	
 	}===================================================================================== -->
@@ -1052,6 +1157,8 @@ template:
 	- Auswahl zum Setzen eines neuen Wurzelmenuepunktes
 	
 	
+	
+	
 	}===================================================================================== -->
 	<xsl:template name="buildInterface.general.metaData.replaceMenu">
 		<xsl:if test="/cms/action[@mode='intern']">
@@ -1059,24 +1166,26 @@ template:
 				<xsl:when test="/cms/replaceMenu = 'true' ">
 					<tr>
 						<td>
-							<xsl:value-of select="i18n:translate('wcms.labels.hideMenu')"/>
+							<xsl:value-of
+								select="i18n:translate('wcms.labels.hideMenu')"/>
 						</td>
 						<td>
 							<input type="checkbox" name="replaceMenu" value="true"
-							checked="checked" class="box"/>			
-						</td>	
-					</tr>		
+								checked="checked" class="box"/>
+						</td>
+					</tr>
 				</xsl:when>
 				<xsl:otherwise>
 					<tr>
 						<td>
-							<xsl:value-of select="i18n:translate('wcms.labels.hideMenu')"/>
+							<xsl:value-of
+								select="i18n:translate('wcms.labels.hideMenu')"/>
 						</td>
 						<td>
 							<input type="checkbox" name="replaceMenu" value="true"
-							class="box"/>
+								class="box"/>
 						</td>
-					</tr>			
+					</tr>
 				</xsl:otherwise>
 			</xsl:choose>
 		</xsl:if>
@@ -1085,6 +1194,8 @@ template:
 	<!-- ====================================================================================={
 	section: Template: name="buildInterface.general.metaData.forwardToChildren"
 	- unbekanntes Feature [deaktiviert]
+	
+	
 	
 	
 	}===================================================================================== -->
@@ -1108,6 +1219,8 @@ template:
 	- Zugriffsberechtigung festlegen [deaktiviert]
 	
 	
+	
+	
 	}===================================================================================== -->
 	<xsl:template name="buildInterface.general.metaData.acl">
 		<xsl:param name="href"/>
@@ -1127,6 +1240,8 @@ template:
 	<!-- ====================================================================================={
 	section: Template: name="buildInterface.general.content.dynamicContentBinding"
 	- Angabe eines Typs zur Zuweisung von dynamischen Seiten
+	
+	
 	
 	
 	}===================================================================================== -->
@@ -1185,6 +1300,8 @@ template:
 	- 
 	
 	
+	
+	
 	}===================================================================================== -->
 	
 	<xsl:template name="buildInterface.general.metaData.constrainPopUp">
@@ -1203,6 +1320,7 @@ template:
 			</xsl:when>
 		</xsl:choose>
 	</xsl:template>
+	
 	
 	<!-- ============================================================================================================ -->
 </xsl:stylesheet>
