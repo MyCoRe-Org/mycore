@@ -148,6 +148,11 @@ parameters:
 							</xsl:choose>
 						</a>
 					</li>
+					<li>
+						<a href="{$WebApplicationBaseURL}">
+							<xsl:value-of select="i18n:translate('wcms.labels.close')"/>
+						</a>
+					</li>					
 				</ul>
 			</div>
 
@@ -198,7 +203,7 @@ parameters:
 								<xsl:value-of select="i18n:translate('wcms.stats')"/>
 							</a>
 						</li>
-						<li>
+<!--						<li>
 							<a href="{$WebApplicationBaseURL}modules/module-wcms/aif/web/help.xml">
 								<xsl:if test="$menupunkt='Hilfe'">
 									<xsl:attribute name="class">
@@ -207,7 +212,7 @@ parameters:
 								</xsl:if>
 								<xsl:value-of select="i18n:translate('wcms.help')"/>
 							</a>
-						</li>
+						</li>-->
 					</ul>
 				</div>
 			</xsl:if>
