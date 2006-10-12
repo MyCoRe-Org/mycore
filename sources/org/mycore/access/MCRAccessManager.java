@@ -23,12 +23,12 @@
 package org.mycore.access;
 
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 import org.jdom.Element;
 
+import org.mycore.access.strategies.MCRAccessCheckStrategy;
+import org.mycore.access.strategies.MCRObjectIDStrategy;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 import org.mycore.datamodel.metadata.MCRLinkTableManager;
@@ -45,8 +45,11 @@ public class MCRAccessManager {
 
     private static final MCRAccessInterface ACCESS_IMPL = (MCRAccessInterface) MCRConfiguration.instance().getInstanceOf("MCR.Access_class_name",
             MCRAccessBaseImpl.class.getName());
-    private static final Logger LOGGER=Logger.getLogger(MCRAccessManager.class);
-    private static Pattern TYPE_PATTERN=Pattern.compile("[^_]*_([^_]*)_*");
+
+    private static final MCRAccessCheckStrategy ACCESS_STRATEGY = (MCRAccessCheckStrategy) MCRConfiguration.instance().getInstanceOf(
+            "MCR.Access_strategy_class_name", MCRObjectIDStrategy.class.getName());
+
+    public static final Logger LOGGER = Logger.getLogger(MCRAccessManager.class);
 
     public static MCRAccessInterface getAccessImpl() {
         return ACCESS_IMPL;
@@ -142,27 +145,9 @@ public class MCRAccessManager {
      * @return
      */
     public static boolean checkPermission(String id, String permission) {
-        String objectType=getObjectType(id);
-        
-        if (getAccessImpl().hasRule(id,permission)){
-            LOGGER.debug("using access rule defined for object.");
-            return getAccessImpl().checkPermission(id, permission);
-        } else if (getAccessImpl().hasRule("default_"+objectType,permission)){
-            LOGGER.debug("using access rule defined for object type.");
-            return getAccessImpl().checkPermission("default_"+objectType,permission);
-        }
-        LOGGER.debug("using system default access rule.");
-        return getAccessImpl().checkPermission("default",permission);   
+        return ACCESS_STRATEGY.checkPermission(id, permission);   
     }
 
-    private static String getObjectType(String id){
-        Matcher m=TYPE_PATTERN.matcher(id);
-        if (m.find() && (m.groupCount()==1)){
-            return m.group(1);
-        }
-        return "";
-    }
-    
     /**
      * checks whether the current user has the permission to read/see a derivate
      *        check is also against the mcrobject, the derivate belongs to
