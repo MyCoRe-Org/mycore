@@ -97,8 +97,7 @@ public class MCRURIResolver implements javax.xml.transform.URIResolver, EntityRe
 
     private static final String CONFIG_PREFIX = "MCR.UriResolver.";
 
-    private static final MCRResolverProvider EXT_RESOLVER = (MCRResolverProvider) MCRConfiguration.instance().getInstanceOf(
-            CONFIG_PREFIX + "externalResolver.class", MCREmptyResolverProvider.class.getName());
+    private static final MCRResolverProvider EXT_RESOLVER = getExternalResolverProvider();
 
     private static final MCRURIResolver singleton = new MCRURIResolver();
 
@@ -117,6 +116,28 @@ public class MCRURIResolver implements javax.xml.transform.URIResolver, EntityRe
         int cacheSize = config.getInt(prefix + "StaticFiles.CacheSize", 100);
         bytesCache = new MCRCache(cacheSize);
         SUPPORTED_SCHEMES = Collections.unmodifiableMap(getResolverMapping());
+    }
+    
+    private static final MCRResolverProvider getExternalResolverProvider() {
+        String externalClassName = MCRConfiguration.instance().getString(CONFIG_PREFIX + "externalResolver.class", null);
+        final MCREmptyResolverProvider emptyResolverProvider = new MCREmptyResolverProvider();
+        if (externalClassName == null) {
+            return emptyResolverProvider;
+        }
+        try {
+            Class cl = Class.forName(externalClassName);
+            final MCRResolverProvider resolverProvider = (MCRResolverProvider) cl.newInstance();
+            return resolverProvider;
+        } catch (ClassNotFoundException e) {
+            LOGGER.warn("Could not find external Resolver class", e);
+            return emptyResolverProvider;
+        } catch (InstantiationException e) {
+            LOGGER.warn("Could not instantiate external Resolver class", e);
+            return emptyResolverProvider;
+        } catch (IllegalAccessException e) {
+            LOGGER.warn("Could not instantiate external Resolver class", e);
+            return emptyResolverProvider;
+        }
     }
 
     private HashMap getResolverMapping() {
