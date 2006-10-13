@@ -18,7 +18,8 @@ template:
 <xsl:stylesheet 
 	version="1.0" 
 	xmlns:xsl="http://www.w3.org/1999/XSL/Transform" 
-	xmlns:xalan="http://xml.apache.org/xalan" >
+	xmlns:xalan="http://xml.apache.org/xalan" 
+    xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation" >
 
 	<xsl:include href="wcms_coreFunctions.xsl" />
 	
@@ -62,12 +63,10 @@ section: Template: wcmsLogin
 								<td>
 									<xsl:choose>
 										<xsl:when test="/cms/error = 'denied'">
-											Zugang verweigert.<br />
-											Logindaten wurden nicht akzeptiert.<br />
-											Prüfe, ob Benutzername und Passwort korrekt eingegeben wurden.<br />
+											<xsl:value-of select="i18n:translate('wcms.login.denied')" />
 										</xsl:when>
 										<xsl:otherwise>
-											Ein nicht bestimmbarer Fehler ist aufgetreten.
+											<xsl:value-of select="i18n:translate('wcms.login.denied.unknown')" />
 										</xsl:otherwise>
 									</xsl:choose>
 								</td>
