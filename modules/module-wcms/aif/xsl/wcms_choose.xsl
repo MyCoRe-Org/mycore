@@ -45,7 +45,7 @@ docportal build.xml
 		</xsl:call-template>
 
 
-		<form name="choose" action="{$ServletsBaseURL}WCMSChooseServlet" method="post">
+		<form name="choose" action="{$ServletsBaseURL}WCMSChooseServlet{$JSessionID}" method="post">
 
 		<!-- Inhaltsbereich -->
 		<div id="auswahl">

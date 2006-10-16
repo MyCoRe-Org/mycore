@@ -180,13 +180,13 @@ template:
 					<xsl:choose>
 						<xsl:when test="$check = '1' ">
 							<a
-								href="{$ServletsBaseURL}WCMSActionServlet?delete=false&amp;wcmsID=0024&amp;back=true&amp;address={$address}"
+								href="{$ServletsBaseURL}WCMSActionServlet{$JSessionID}?delete=false&amp;wcmsID=0024&amp;back=true&amp;address={$address}"
 								class="button">
 								<xsl:value-of
 									select="i18n:translate('wcms.menus.deleteCancel')"/>
 							</a>
 							<a
-								href="{$ServletsBaseURL}WCMSActionServlet?delete=true&amp;labelPath={$labelPath}&amp;wcmsID=0024&amp;back=true&amp;address={$address}"
+								href="{$ServletsBaseURL}WCMSActionServlet{$JSessionID}?delete=true&amp;labelPath={$labelPath}&amp;wcmsID=0024&amp;back=true&amp;address={$address}"
 								class="button">
 								<xsl:value-of
 									select="i18n:translate('wcms.menus.deleteAccept')"/>
@@ -194,13 +194,13 @@ template:
 						</xsl:when>
 						<xsl:otherwise>
 							<a
-								href="{$ServletsBaseURL}WCMSActionServlet?delete=false&amp;wcmsID=0024"
+								href="{$ServletsBaseURL}WCMSActionServlet{$JSessionID}?delete=false&amp;wcmsID=0024"
 								class="button">
 								<xsl:value-of
 									select="i18n:translate('wcms.menus.deleteCancel')"/>
 							</a>
 							<a
-								href="{$ServletsBaseURL}WCMSActionServlet?delete=true&amp;labelPath={$labelPath}&amp;wcmsID=0024"
+								href="{$ServletsBaseURL}WCMSActionServlet{$JSessionID}?delete=true&amp;labelPath={$labelPath}&amp;wcmsID=0024"
 								class="button">
 								<xsl:value-of
 									select="i18n:translate('wcms.menus.deleteAccept')"/>
@@ -253,11 +253,11 @@ template:
 				<xsl:choose>
 					<xsl:when test="$check = '1' ">
 						<xsl:value-of
-							select="concat($ServletsBaseURL,'WCMSActionServlet?wcmsID=0024&amp;back=true&amp;address=',$address)"/>
+							select="concat($ServletsBaseURL,'WCMSActionServlet',$JSessionID,'?wcmsID=0024&amp;back=true&amp;address=',$address)"/>
 					</xsl:when>
 					<xsl:otherwise>
 						<xsl:value-of
-							select="concat($ServletsBaseURL,'WCMSActionServlet?wcmsID=0024')"/>
+							select="concat($ServletsBaseURL,'WCMSActionServlet',$JSessionID,'?wcmsID=0024')"/>
 					</xsl:otherwise>
 				</xsl:choose>
 			</xsl:variable>

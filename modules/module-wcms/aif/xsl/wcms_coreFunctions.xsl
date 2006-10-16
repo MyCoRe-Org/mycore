@@ -162,7 +162,7 @@ parameters:
 				<div class="leftmenu">
 					<ul class="menu">
 						<li>
-							<a href="{$ServletsBaseURL}WCMSAdminServlet?action=choose">
+							<a href="{$ServletsBaseURL}WCMSAdminServlet{$JSessionID}?action=choose">
 								<xsl:if test="$menupunkt='Bearbeiten'">
 									<xsl:attribute name="class">
 										<xsl:value-of select="'current'"/>
@@ -179,12 +179,12 @@ parameters:
 								  MyWindow.focus();
 								}
 							</script>	
-							<a href="{$WebApplicationBaseURL}modules/module-wcms/aif/web/multimedia.xml" onclick="OpenWindow(this.href); return false">
+							<a href="{$WebApplicationBaseURL}modules/module-wcms/aif/web/multimedia.xml{$JSessionID}" onclick="OpenWindow(this.href); return false">
 								<xsl:value-of select="i18n:translate('wcms.multimedia')"/>
 							</a>
 						</li>
 						<li>
-							<a href="{$ServletsBaseURL}WCMSAdminServlet?action=managGlobal">
+							<a href="{$ServletsBaseURL}WCMSAdminServlet{$JSessionID}?action=managGlobal">
 								<xsl:if test="$menupunkt='Einstellungen'">
 									<xsl:attribute name="class">
 										<xsl:value-of select="'current'"/>
@@ -194,7 +194,7 @@ parameters:
 							</a>
 						</li>
 						<li>
-							<a href="{$ServletsBaseURL}WCMSAdminServlet?action=logs&amp;sort=date&amp;sortOrder=descending">
+							<a href="{$ServletsBaseURL}WCMSAdminServlet{$JSessionID}?action=logs&amp;sort=date&amp;sortOrder=descending">
 								<xsl:if test="$menupunkt='Statistik'">
 									<xsl:attribute name="class">
 										<xsl:value-of select="'current'"/>

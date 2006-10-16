@@ -437,7 +437,7 @@ section: Template: name="wcmsAdministration.welcome"
 				<xsl:variable name="lastVersion">
 					<xsl:value-of select="substring-after($current,'.xml.')"/>
 				</xsl:variable>							
-				<xsl:value-of select="concat(substring-before($current,'.xml'),'.xml.',number($lastVersion)+1) )"/>					
+				<xsl:value-of select="concat(substring-before($current,'.xml'),'.xml.',number($lastVersion)+1)"/>					
 			</xsl:otherwise>
 		</xsl:choose>	
 </xsl:template>
@@ -469,7 +469,7 @@ section: Template: name="wcmsAdministration.managGlobal"
 	<div id="settings-width">
 
 		<div id="settings">
-			<form name="settings" action="{$ServletsBaseURL}WCMSAdminServlet?action=saveGlobal" method="post">
+			<form name="settings" action="{$ServletsBaseURL}WCMSAdminServlet{$JSessionID}?action=saveGlobal" method="post">
 				<div class="titel"><xsl:value-of select="i18n:translate('wcms.design')"/></div>
 				<div class="inhalt">
 					<fieldset>
