@@ -109,7 +109,7 @@
 				<td colspan="2">
 					<br/>
 					<br/>
-					<a href="{$WebApplicationBaseURL}modules/module-wcms/aif/web/multimedia.xml">zur?ck zum WCMS</a>
+					<a href="{$WebApplicationBaseURL}modules/module-wcms/aif/web/multimedia.xml">zurück zum WCMS</a>
 					<!--  	<a href ="Javascript:var URL = unescape(window.opener.location.pathname);window.opener.location.href = URL; window.close();">zur?ck zum WCMS</a>	   -->
 				</td>
 			</tr>
