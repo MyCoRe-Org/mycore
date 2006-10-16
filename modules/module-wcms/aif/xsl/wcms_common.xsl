@@ -15,7 +15,7 @@
     />
 
 	<xsl:variable name="servletAnswer_XML" 
-		select="document(servletAnswer_XML_tmp)"
+		select="document($servletAnswer_XML_tmp)"
     />
 	
      <xsl:if test="$servletAnswer_XML/cms/modus/text() = 'true'">
