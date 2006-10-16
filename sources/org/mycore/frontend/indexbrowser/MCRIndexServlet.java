@@ -262,7 +262,7 @@ public class MCRIndexServlet extends MCRServlet {
         Vector conditions = new Vector();
 
         if (br.search != null) {
-            String toSearch = ( ic.normalizeSearch ? MCRNormalizer.normalizeString( br.search ) : br.search );
+            String toSearch = ( ic.normalizeSearch ? MCRNormalizer.normalizeString( br.search, true ) : br.search );
             if (br.mode.equals("contains")) {
                 conditions.addElement(ic.browseField + " like '%" + toSearch + "%'");
             } else if (br.mode.equals("prefix")) {

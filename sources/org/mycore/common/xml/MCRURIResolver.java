@@ -92,10 +92,12 @@ import org.mycore.services.query.MCRQueryCache;
  */
 public class MCRURIResolver implements javax.xml.transform.URIResolver, EntityResolver {
     private static final Logger LOGGER = Logger.getLogger(MCRURIResolver.class);
-
+    
     private static Map SUPPORTED_SCHEMES;
 
     private static final String CONFIG_PREFIX = "MCR.UriResolver.";
+
+    private static final MCRResolverProvider EXT_RESOLVER = getExternalResolverProvider();
 
     private static final MCRURIResolver singleton = new MCRURIResolver();
 
@@ -113,8 +115,37 @@ public class MCRURIResolver implements javax.xml.transform.URIResolver, EntityRe
         String prefix = "MCR.URIResolver.";
         int cacheSize = config.getInt(prefix + "StaticFiles.CacheSize", 100);
         bytesCache = new MCRCache(cacheSize);
-        HashMap supportedSchemes = new HashMap(10, 1);// set to final size,
-                                                        // loadfactor: full
+        SUPPORTED_SCHEMES = Collections.unmodifiableMap(getResolverMapping());
+    }
+    
+    private static final MCRResolverProvider getExternalResolverProvider() {
+        String externalClassName = MCRConfiguration.instance().getString(CONFIG_PREFIX + "externalResolver.class", null);
+        final MCREmptyResolverProvider emptyResolverProvider = new MCREmptyResolverProvider();
+        if (externalClassName == null) {
+            return emptyResolverProvider;
+        }
+        try {
+            Class cl = Class.forName(externalClassName);
+            final MCRResolverProvider resolverProvider = (MCRResolverProvider) cl.newInstance();
+            return resolverProvider;
+        } catch (ClassNotFoundException e) {
+            LOGGER.warn("Could not find external Resolver class", e);
+            return emptyResolverProvider;
+        } catch (InstantiationException e) {
+            LOGGER.warn("Could not instantiate external Resolver class", e);
+            return emptyResolverProvider;
+        } catch (IllegalAccessException e) {
+            LOGGER.warn("Could not instantiate external Resolver class", e);
+            return emptyResolverProvider;
+        }
+    }
+
+    private HashMap getResolverMapping() {
+        final Map extResolverMapping = EXT_RESOLVER.getResolverMapping();
+        // set Map to final size with loadfactor: full
+        HashMap supportedSchemes = new HashMap(10 + extResolverMapping.size(), 1);
+        // don't let interal mapping be overwritten
+        supportedSchemes.putAll(extResolverMapping);
         supportedSchemes.put("webapp", new MCRWebAppResolver());
         supportedSchemes.put("file", new MCRFileResolver());
         supportedSchemes.put("query", new MCRQueryResolver());
@@ -128,7 +159,7 @@ public class MCRURIResolver implements javax.xml.transform.URIResolver, EntityRe
         supportedSchemes.put("resource", new MCRResourceResolver());
         supportedSchemes.put("localclass", new MCRLocalClassResolver());
         supportedSchemes.put("classification", new MCRClassificationResolver());
-        SUPPORTED_SCHEMES = Collections.unmodifiableMap(supportedSchemes);
+        return supportedSchemes;
     }
 
     /**
@@ -322,8 +353,52 @@ public class MCRURIResolver implements javax.xml.transform.URIResolver, EntityRe
         return builder.build(in).getRootElement();
     }
 
+    /**
+     * Resolver interface. use this to implement custom URI schemes.
+     * 
+     * @author Thomas Scheffler (yagee)
+     * 
+     * @version $Revision$ $Date$
+     */
     public static interface MCRResolver {
+        /**
+         * resolves an Element for XSLT process
+         * 
+         * @param URI
+         *            String in URI Syntax
+         * @return
+         * @throws Exception
+         */
         public Element resolveElement(String URI) throws Exception;
+    }
+    
+    /**
+     * provides a URI -- Resolver Mapping
+     * 
+     * One can implement this interface to provide additional URI schemes this MCRURIResolver should handle, too.
+     * To add your mapping you have to set the <code>MCR.UriResolver.externalResolver.class</code> property to the implementing class.
+     * 
+     * @author Thomas Scheffler
+     *
+     * @version $Revision$ $Date$
+     */
+    public static interface MCRResolverProvider {
+        /**
+         * provides a Map of Resolver mappings.
+         * 
+         * Key is the scheme, e.g. <code>http</code>, where value is an instance of MCRResolver.
+         * @see MCRResolver
+         * @return a Map of Resolver mappings
+         */
+        public Map getResolverMapping();
+    }
+    
+    private static class MCREmptyResolverProvider implements MCRResolverProvider{
+        
+        public Map getResolverMapping() {
+            return Collections.EMPTY_MAP;
+        }
+        
     }
 
     private static class MCRObjectResolver implements MCRResolver {

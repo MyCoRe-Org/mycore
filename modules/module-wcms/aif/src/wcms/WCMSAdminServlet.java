@@ -41,6 +41,7 @@ import org.jdom.input.SAXBuilder;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.jdom.xpath.XPath;
+
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 
@@ -77,21 +78,44 @@ public class WCMSAdminServlet extends WCMSServlet {
         setResp(response);
         setback();
         setbackaddr();
-        
-        
-        if (action.equals("choose")) {
-            generateXML_managPage(mcrSession, rootOut, rootNodes, contentTemplates);
-        } else if (action.equals("logs")) {
-            generateXML_logs(request, rootOut);
-        } else if (action.equals("managGlobal") && mcrSession.get("userClass").equals("admin")) {
-            generateXML_managGlobal(rootOut);
-        } else if (action.equals("saveGlobal") && mcrSession.get("userClass").equals("admin")) {
-            generateXML_saveGlobal(request, response);
-        }
 
-        // Transfer content of jdom object to MCRLayoutServlet.
-        request.setAttribute("MCRLayoutServlet.Input.JDOM", jdom);
-
+        if (action!=null) {
+        	if (action.equals("choose")) {
+        		request.setAttribute("MCRLayoutServlet.Input.JDOM", jdom);
+                generateXML_managPage(mcrSession, rootOut, rootNodes, contentTemplates);
+    	        } else if (action.equals("logs")) {
+    	        	request.setAttribute("MCRLayoutServlet.Input.JDOM", jdom);
+    	            generateXML_logs(request, rootOut);
+    		        } else if (action.equals("managGlobal") && mcrSession.get("userClass").equals("admin")) {
+    		        	request.setAttribute("MCRLayoutServlet.Input.JDOM", jdom);
+    		            generateXML_managGlobal(rootOut);
+    			        } else if (action.equals("saveGlobal") && mcrSession.get("userClass").equals("admin")) {
+    			        	request.setAttribute("MCRLayoutServlet.Input.JDOM", jdom);
+    			            generateXML_saveGlobal(request, response);
+    			        }
+    				        else if (action.equals("view") 
+    				        		&& (request.getParameter("file")!=null && !request.getParameter("file").equals(""))) {
+    				        	
+    				        	// live content version requested
+    				            if (request.getParameter("file").toString().subSequence(0,4).equals("http")) {
+    				            	String url = request.getParameter("file");
+    				            	url = url + "?XSL.href=" + request.getParameter("XSL.href");
+    				            	// archived navi version requested
+    				            	if (request.getParameter("XSL.navi")!=null && !request.getParameter("XSL.navi").equals("")
+    				            			&& !request.getParameter("XSL.navi").toString().subSequence(0,4).equals("http")) {
+    				            		url = url + "&XSL.navi=" + request.getParameter("XSL.navi");
+    				            		response.sendRedirect(response.encodeRedirectURL(url));
+									}
+    				            	else {
+    				            		response.sendRedirect(response.encodeRedirectURL(url));
+    				            	}
+    				            } 
+    				            // archived content version requested
+								else {
+									request.setAttribute("MCRLayoutServlet.Input.FILE", new File(request.getParameter("file")));
+								}
+    						}	
+		}
         
         if(getback())
         {

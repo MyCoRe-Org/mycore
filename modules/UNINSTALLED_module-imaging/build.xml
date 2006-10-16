@@ -9,7 +9,7 @@
 <!-- Andreas Trappe 	- idea, concept				-->
 <!-- Chi Vu Huu		- concept, development			-->
 <!--												-->
-<!-- $Revision: 1.2.2.1 $ $Date: 2006-09-18 15:00:13 $ 								-->
+<!-- $Revision: 1.2.2.2 $ $Date: 2006-10-16 16:56:01 $ 								-->
 
 
 <project name="MyCoReModule - imaging" default="usage" basedir=".">

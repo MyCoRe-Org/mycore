@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import org.apache.bcel.generic.IfInstruction;
 import org.apache.log4j.Logger;
 import org.jdom.JDOMException;
 import org.mycore.common.MCRConfiguration;
@@ -48,6 +49,8 @@ public class MCRImgService {
 		ImgProcessor processor = new MCRImgProcessor();
 		float jpegQuality = java.lang.Float.parseFloat(config.getString("MCR.Module-iview.jpegQuality"));
 		processor.setJpegQuality(jpegQuality);
+		
+		String filename = image.getName();
 
 		boolean outputFilled = false;
 		float scaleHelp = 1;
@@ -72,7 +75,7 @@ public class MCRImgService {
 
 		if (USE_CACHE) {
 			LOGGER.debug("*********************************************");
-			LOGGER.debug("* Get image Width x Height - use Cache");
+			LOGGER.debug("* Get " + filename + " Width x Height - use Cache");
 			LOGGER.debug("*********************************************");
 
 			CacheManager cache = new MCRImgCacheManager();
@@ -101,14 +104,14 @@ public class MCRImgService {
 			
 			if ((newWidth == thumbWidth || newHeight == thumbHeight) && cache.existInCache(image, MCRImgCacheManager.THUMB)) {
 				LOGGER.debug("*********************************************");
-				LOGGER.debug("* Get Thumbnail from ImgCache for " + image.getName());
+				LOGGER.debug("* Get Thumbnail from ImgCache for " + filename);
 				LOGGER.debug("*********************************************");
 
 				cache.getImage(image, MCRImgCacheManager.THUMB, output);
 				outputFilled = true;
 			} else if ((newWidth <= cacheWidth && newHeight <= cacheHeight) && cache.existInCache(image, MCRImgCacheManager.CACHE)) {
 				LOGGER.debug("*********************************************");
-				LOGGER.debug("* Get Cache from ImgCache for " + image.getName());
+				LOGGER.debug("* Get Cache from ImgCache for " + filename);
 				LOGGER.debug("*********************************************");
 
 				// scaleFactor = scaleFactor / scalefactor;
@@ -117,14 +120,14 @@ public class MCRImgService {
 				input = cache.getImageAsInputStream(image, MCRImgCacheManager.CACHE);
 			} else if (cache.existInCache(image, MCRImgCacheManager.ORIG)) {
 				LOGGER.debug("*********************************************");
-				LOGGER.debug("* Get Orig from ImgCache for " + image.getName());
+				LOGGER.debug("* Get Orig from ImgCache for " + filename);
 				LOGGER.debug("*********************************************");
 				scaleHelp = 1;
 				input = cache.getImageAsInputStream(image, MCRImgCacheManager.ORIG);
 
 			} else {
 				LOGGER.debug("*********************************************");
-				LOGGER.debug("* Get Orig from IFS for " + image.getName());
+				LOGGER.debug("* Get Orig from IFS for " + filename);
 				LOGGER.debug("*********************************************");
 				input = image.getContentAsInputStream();
 			}
@@ -134,7 +137,7 @@ public class MCRImgService {
 			}
 		} else {
 			LOGGER.debug("*********************************************");
-			LOGGER.debug("* Get image Width x Height - use Processor");
+			LOGGER.debug("* Get " + filename + " Width x Height - use Processor");
 			LOGGER.debug("*********************************************");
 			processor.resize(image.getContentAsInputStream(), newWidth, newHeight, output);
 		}

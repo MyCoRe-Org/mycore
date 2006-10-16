@@ -48,6 +48,7 @@ template:
 	<xsl:include href="wcms_final.xsl" />
 	<xsl:include href="wcms_fileUpload.xsl" />
 	<xsl:include href="wcms_help.xsl" />
+	<xsl:include href="wcms_multimedia.xsl" />	
 
 <!-- ====================================================================================={
 
@@ -105,6 +106,9 @@ section: Template: match="cms"
 				<xsl:when test=" /cms/session = 'fileUpload' " >
 					<xsl:call-template name="wcmsFileUpload" />
 				</xsl:when>
+				<xsl:when test="/cms/session = 'multimedia' " >
+					<xsl:call-template name="wcmsMultimedia" />
+				</xsl:when>
 			</xsl:choose>
 		</span>
 	</xsl:template>
@@ -133,8 +137,8 @@ parameters:
 			<th width="50%" align="right">
 				<xsl:value-of select="concat(i18n:translate('wcms.admin.WCMSUser'),' :')"/>
 				<xsl:value-of select="/cms/userID" />
-				<xsl:text>' (</xsl:text>
-				<xsl:value-of select="/cms/userClass" />) 
+				<xsl:text> (</xsl:text>
+				<xsl:value-of select="/cms/userClass" />
 				<xsl:text>) </xsl:text>
 			</th>
 		</tr>

@@ -100,12 +100,6 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
         com = new MCRCommand("update all derivates from directory {0}", "org.mycore.frontend.cli.MCRDerivateCommands.updateFromDirectory String", "The command update all derivates form the directory {0} in the system.");
         command.add(com);
 
-        com = new MCRCommand("save derivate {0} to directory {1}", "org.mycore.frontend.cli.MCRDerivateCommands.save String String", "The command store the derivate with the MCRObjectID {0} to the directory {1}");
-        command.add(com);
-
-        com = new MCRCommand("save derivate from {0} to {1} to directory {2}", "org.mycore.frontend.cli.MCRDerivateCommands.save String String String", "The command store all derivates with MCRObjectID's between {0} and {1} to the directory {2}");
-        command.add(com);
-
         com = new MCRCommand("export derivate {0} to directory {1} with {2}", "org.mycore.frontend.cli.MCRDerivateCommands.export String String String", "The command store the derivate with the MCRObjectID {0} to the directory {1} with the stylesheet mcr_{2}-object.xsl. For {2} save is the default.");
         command.add(com);
 
@@ -421,21 +415,6 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
     /**
      * Save an MCRDerivate to a file named <em>MCRObjectID</em> .xml in a
      * directory with <em>dirname</em> and store the derivate objects in a
-     * directory under them named <em>MCRObjectID</em>.
-     * 
-     * @param ID
-     *            the ID of the MCRDerivate to be save.
-     * @param dirname
-     *            the dirname to store the derivate
-     * @deprecated
-     */
-    public static void save(String ID, String dirname) {
-        export(ID, ID, dirname, "save", true);
-    }
-
-    /**
-     * Save an MCRDerivate to a file named <em>MCRObjectID</em> .xml in a
-     * directory with <em>dirname</em> and store the derivate objects in a
      * directory under them named <em>MCRObjectID</em>. The method use the
      * converter stylesheet mcr_<em>style</em>_object.xsl.
      * 
@@ -448,26 +427,6 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
      */
     public static void export(String ID, String dirname, String style) {
         export(ID, ID, dirname, style, true);
-    }
-
-    /**
-     * Save any MCRDerivate's to files named <em>MCRObjectID</em> .xml in a
-     * directory and the objects under them named <em>MCRObjectID</em>. The
-     * saving starts with fromID and runs to toID. ID's they was not found will
-     * skiped.
-     * 
-     * @param fromID
-     *            the ID of the MCRObject from be save.
-     * @param toID
-     *            the ID of the MCRObject to be save.
-     * @param dirname
-     *            the filename to store the object
-     * @deprecated
-     */
-    public static void save(String fromID, String toID, String dirname) {
-        export(fromID, toID, dirname, "save", false); // :NOTE: false was the
-        // default, but
-        // is not equal to "single" save
     }
 
     /**
@@ -489,24 +448,6 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
         export(fromID, toID, dirname, style, false); // :NOTE: false was the
         // default, but
         // is not equal to "single" save
-    }
-
-    /**
-     * Save any MCRDerivate's to files named <em>MCRObjectID</em> .xml in a
-     * directory and the objects under them named <em>MCRObjectID</em>. The
-     * saving starts with fromID and runs to toID. ID's they was not found will
-     * skiped.
-     * 
-     * @param fromID
-     *            the ID of the MCRObject from be save.
-     * @param toID
-     *            the ID of the MCRObject to be save.
-     * @param dirname
-     *            the filename to store the object
-     * @deprecated
-     */
-    public static void save(String fromID, String toID, String dirname, boolean withIfsID) {
-        export(fromID, toID, dirname, "save", withIfsID);
     }
 
     /**

@@ -97,12 +97,6 @@ public class MCRObjectCommands extends MCRAbstractCommands {
     com = new MCRCommand("update all objects from directory {0}", "org.mycore.frontend.cli.MCRObjectCommands.updateFromDirectory String", "Updates all MCRObjects form the directory {0} in the system.");
     command.add(com);
 
-    com = new MCRCommand("save object from {0} to {1} to directory {2}", "org.mycore.frontend.cli.MCRObjectCommands.save String String String", "Stores all MCRObjects with MCRObjectID's between {0} and {1} to the directory {2}");
-    command.add(com);
-
-    com = new MCRCommand("save object {0} to directory {1}", "org.mycore.frontend.cli.MCRObjectCommands.save String String", "Stores the MCRObject with the MCRObjectID {0} to the directory {1}");
-    command.add(com);
-
     com = new MCRCommand("export object from {0} to {1} to directory {2} with {3}", "org.mycore.frontend.cli.MCRObjectCommands.export String String String String", "Stores all MCRObjects with MCRObjectID's between {0} and {1} to the directory {2} with the stylesheet mcr_{3}-object.xsl. For {3} save is the default.");
     command.add(com);
 
@@ -406,37 +400,6 @@ public class MCRObjectCommands extends MCRAbstractCommands {
       LOGGER.error(ex.getMessage());
       LOGGER.error("");
     }
-  }
-
-  /**
-   * Save an MCRObject to a file named <em>MCRObjectID</em> .xml in a
-   * directory.
-   * 
-   * @param ID
-   *          the ID of the MCRObject to be save.
-   * @param dirname
-   *          the dirname to store the object
-   * @deprecated
-   */
-  public static final void save(String ID, String dirname) {
-    export(ID, ID, dirname, "save");
-  }
-
-  /**
-   * Save any MCRObject's to files named <em>MCRObjectID</em> .xml in a
-   * directory. The saving starts with fromID and runs to toID. ID's they was
-   * not found will skiped.
-   * 
-   * @param fromID
-   *          the ID of the MCRObject from be save.
-   * @param toID
-   *          the ID of the MCRObject to be save.
-   * @param dirname
-   *          the filename to store the object
-   * @deprecated
-   */
-  public static final void save(String fromID, String toID, String dirname) {
-    export(fromID, toID, dirname, "save");
   }
 
   /**

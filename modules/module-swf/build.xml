@@ -2,7 +2,7 @@
 
 <!-- =================================================================== -->
 <!-- MyCoRe-SimpleWorkflow build file for use with ANT                   -->
-<!-- $Revision: 1.5.2.1 $ $Date: 2006-07-12 12:38:44 $                      -->
+<!-- $Revision: 1.5.2.2 $ $Date: 2006-10-16 16:56:24 $                      -->
 <!-- =================================================================== -->
 
 <project name="MyCoReModule - SimpleWorkflow" default="usage" basedir=".">

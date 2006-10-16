@@ -54,6 +54,7 @@ public class MCRShutdownThread extends Thread {
     }
 
     public void run() {
-        MCRShutdownHandler.getInstance().shutDown();
+    	MCRShutdownHandler sh =MCRShutdownHandler.getInstance(); 
+        if(sh!=null) sh.shutDown();
     }
 }

@@ -45,7 +45,7 @@ docportal build.xml
 		</xsl:call-template>
 
 
-		<form name="choose" action="{$ServletsBaseURL}WCMSChooseServlet" method="post">
+		<form name="choose" action="{$ServletsBaseURL}WCMSChooseServlet{$JSessionID}" method="post">
 
 		<!-- Inhaltsbereich -->
 		<div id="auswahl">
@@ -80,8 +80,8 @@ docportal build.xml
 								<td class="s2"><xsl:value-of select="i18n:translate('wcms.labels.persTemplate')"/></td>
 							</tr>
 							<tr>
-								<td class="s1">[d]</td>
-								<td class="s2"><xsl:value-of select="i18n:translate('wcms.labels.dynamicContent')"/></td>
+								<td class="s1">[o]</td>
+								<td class="s2"><xsl:value-of select="i18n:translate('wcms.labels.constrainPopUp')"/></td>
 							</tr>
 							<xsl:if test="$CurrentLang != $DefaultLang">
 								<tr>
@@ -340,7 +340,7 @@ section: Template: name="chooseContent"
 												<xsl:value-of select="./label[lang($DefaultLang)]" />
 											</xsl:otherwise>
 										</xsl:choose>
-										<xsl:if test=" @replaceMenu = 'true' or @template != '' or count(child::dynamicContentBinding) &gt; 0 ">
+										<xsl:if test=" @replaceMenu = 'true' or @template != '' or @constrainPopUp = 'true' ">
 											<xsl:call-template name="chooseContentInfo" />
 										</xsl:if>
 									</option>
@@ -368,6 +368,9 @@ section: Template: name="chooseContentInfo"
 		<xsl:if test="@replaceMenu='true' " >
 			<xsl:text>m</xsl:text>
 		</xsl:if>
+		<xsl:if test="@constrainPopUp='true' " >
+			<xsl:text>o</xsl:text>
+		</xsl:if>		
 		<xsl:if test="@template != '' ">
 			<xsl:text>t</xsl:text>
 		</xsl:if>

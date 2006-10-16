@@ -2,7 +2,7 @@
 
 <!-- =================================================================== -->
 <!-- MyCoRe-Classification handling build file for use with ANT          -->
-<!-- $Revision: 1.2.2.2 $ $Date: 2006-09-26 12:02:46 $                      -->
+<!-- $Revision: 1.2.2.3 $ $Date: 2006-10-16 16:56:25 $                      -->
 <!-- =================================================================== -->
 
 <project name="MyCoReModule - ClassHandler" default="usage" basedir=".">

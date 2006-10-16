@@ -2,7 +2,7 @@
 
   <!-- =================================================================== -->
   <!-- MyCoRe build file for use with Apache Ant                           -->
-  <!-- $Revision: 1.120.2.2 $ $Date: 2006-09-18 15:00:13 $                      -->
+  <!-- $Revision: 1.120.2.3 $ $Date: 2006-10-16 16:56:36 $                      -->
   <!-- =================================================================== -->
 
 <project name="MyCoRe" default="usage" basedir=".">
@@ -70,7 +70,7 @@
     <echo>Operating system : ${os.name} Version ${os.version} on ${os.arch} </echo>
     <echo>Java version     : JDK ${ant.java.version} Version ${java.version} from ${java.vendor}</echo>
     <echo>Java home        : ${env.JAVA_HOME}</echo>
-    <echo>Ant build file   : $Revision: 1.120.2.2 $ $Date: 2006-09-18 15:00:13 $</echo>
+    <echo>Ant build file   : $Revision: 1.120.2.3 $ $Date: 2006-10-16 16:56:36 $</echo>
     <echo>Ant version      : ${ant.version}</echo>
     <echo>Ant home         : ${ant.home}</echo>
     <echo>Ant libdir       : ${ant.library.dir}</echo>

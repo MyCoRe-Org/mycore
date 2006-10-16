@@ -148,6 +148,11 @@ parameters:
 							</xsl:choose>
 						</a>
 					</li>
+					<li>
+						<a href="{$WebApplicationBaseURL}">
+							<xsl:value-of select="i18n:translate('wcms.labels.close')"/>
+						</a>
+					</li>					
 				</ul>
 			</div>
 
@@ -157,7 +162,7 @@ parameters:
 				<div class="leftmenu">
 					<ul class="menu">
 						<li>
-							<a href="{$ServletsBaseURL}WCMSAdminServlet?action=choose">
+							<a href="{$ServletsBaseURL}WCMSAdminServlet{$JSessionID}?action=choose">
 								<xsl:if test="$menupunkt='Bearbeiten'">
 									<xsl:attribute name="class">
 										<xsl:value-of select="'current'"/>
@@ -167,7 +172,19 @@ parameters:
 							</a>
 						</li>
 						<li>
-							<a href="{$ServletsBaseURL}WCMSAdminServlet?action=managGlobal">
+							<script type="text/javascript">								
+								function OpenWindow (address) {
+								  MyWindow = window.open(address, "Multimedia", "width=400,height=350,scrollbars=yes");
+								  MyWindow.window.moveTo(screen.width*0.5,screen.height*0.2);
+								  MyWindow.focus();
+								}
+							</script>	
+							<a href="{$WebApplicationBaseURL}modules/module-wcms/aif/web/multimedia.xml{$JSessionID}" onclick="OpenWindow(this.href); return false">
+								<xsl:value-of select="i18n:translate('wcms.multimedia')"/>
+							</a>
+						</li>
+						<li>
+							<a href="{$ServletsBaseURL}WCMSAdminServlet{$JSessionID}?action=managGlobal">
 								<xsl:if test="$menupunkt='Einstellungen'">
 									<xsl:attribute name="class">
 										<xsl:value-of select="'current'"/>
@@ -177,7 +194,7 @@ parameters:
 							</a>
 						</li>
 						<li>
-							<a href="{$ServletsBaseURL}WCMSAdminServlet?action=logs&amp;sort=date&amp;sortOrder=descending">
+							<a href="{$ServletsBaseURL}WCMSAdminServlet{$JSessionID}?action=logs&amp;sort=date&amp;sortOrder=descending">
 								<xsl:if test="$menupunkt='Statistik'">
 									<xsl:attribute name="class">
 										<xsl:value-of select="'current'"/>
@@ -186,7 +203,7 @@ parameters:
 								<xsl:value-of select="i18n:translate('wcms.stats')"/>
 							</a>
 						</li>
-						<li>
+<!--						<li>
 							<a href="{$WebApplicationBaseURL}modules/module-wcms/aif/web/help.xml">
 								<xsl:if test="$menupunkt='Hilfe'">
 									<xsl:attribute name="class">
@@ -195,7 +212,7 @@ parameters:
 								</xsl:if>
 								<xsl:value-of select="i18n:translate('wcms.help')"/>
 							</a>
-						</li>
+						</li>-->
 					</ul>
 				</div>
 			</xsl:if>

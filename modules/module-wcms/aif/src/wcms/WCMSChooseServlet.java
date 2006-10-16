@@ -131,6 +131,14 @@ public class WCMSChooseServlet extends WCMSServlet {
      * Main program called by doGet and doPost.
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    	
+    	if (request.getParameter("mode")!=null && request.getParameter("mode").equals("getMultimedia")) {
+    		Element rootOut_2 = new Element("cms");
+    		Document doc_2 = new Document(rootOut_2);
+    		addMultimedia(rootOut_2);
+    		forwardXML(request, response, doc_2);
+		}
+    	
         MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
         String userID = (String) mcrSession.get("userID");
         String userClass = (String) mcrSession.get("userClass");
@@ -513,47 +521,7 @@ public class WCMSChooseServlet extends WCMSServlet {
             }
         }
 
-        imageList = null;
-        documentList = null;
-        templates = new Element("templates");
-
-        Element images = new Element("images");
-        rootOut.addContent(images);
-
-        File imagePath = new File((CONFIG.getString("MCR.WCMS.imagePath").replace('/', File.separatorChar)));
-
-        if (!imagePath.exists()) {
-            imagePath.mkdirs();
-        }
-
-        imageList = new File(imagePath.toString()).listFiles();
-
-        for (int i = 0; i < imageList.length; i++) {
-            if (!imageList[i].isDirectory()) {
-                images.addContent(new Element("image").setText(imageList[i].getName()));
-            }
-        }
-
-        rootOut.addContent(new Element("imagePath").setText(CONFIG.getString("MCR.WCMS.imagePath").substring(CONFIG.getString("MCR.WCMS.imagePath").lastIndexOf("webapps"))));
-
-        Element documents = new Element("documents");
-        rootOut.addContent(documents);
-
-        File documentPath = new File((CONFIG.getString("MCR.WCMS.documentPath").replace('/', File.separatorChar)));
-
-        if (!documentPath.exists()) {
-            documentPath.mkdirs();
-        }
-
-        documentList = new File(documentPath.toString()).listFiles();
-
-        for (int i = 0; i < documentList.length; i++) {
-            if (!documentList[i].isDirectory()) {
-                documents.addContent(new Element("document").setText(documentList[i].getName()));
-            }
-        }
-
-        rootOut.addContent(new Element("documentPath").setText(CONFIG.getString("MCR.WCMS.documentPath").substring(CONFIG.getString("MCR.WCMS.documentPath").lastIndexOf("webapps"))));
+        templates = addMultimedia(rootOut);
 
         Element master = new Element("master");
 
@@ -617,7 +585,11 @@ public class WCMSChooseServlet extends WCMSServlet {
             mcrSession.put("addAtPosition", addAtPosition);
         }
 
-        /**
+        forwardXML(request, response, jdom);
+    }
+
+	private void forwardXML(HttpServletRequest request, HttpServletResponse response, Document jdom) throws ServletException, IOException {
+		/**
          * Transfer content of jdom object to MCRLayoutServlet.
          */
         request.setAttribute("MCRLayoutServlet.Input.JDOM", jdom);
@@ -629,7 +601,53 @@ public class WCMSChooseServlet extends WCMSServlet {
         // request.setAttribute("XSL.Style", "xml");
         RequestDispatcher rd = getServletContext().getNamedDispatcher("MCRLayoutServlet");
         rd.forward(request, response);
-    }
+	}
+
+	private Element addMultimedia(Element rootOut) {
+		Element templates;
+		imageList = null;
+        documentList = null;
+        templates = new Element("templates");
+
+        Element images = new Element("images");
+        rootOut.addContent(images);
+
+        File imagePath = new File((CONFIG.getString("MCR.WCMS.imagePath").replace('/', File.separatorChar)));
+
+        if (!imagePath.exists()) {
+            imagePath.mkdirs();
+        }
+
+        imageList = new File(imagePath.toString()).listFiles();
+
+        for (int i = 0; i < imageList.length; i++) {
+            if (!imageList[i].isDirectory()) {
+                images.addContent(new Element("image").setText(imageList[i].getName()));
+            }
+        }
+
+        rootOut.addContent(new Element("imagePath").setText(CONFIG.getString("MCR.WCMS.imagePath").substring(CONFIG.getString("MCR.WCMS.imagePath").lastIndexOf("webapps"))));
+
+        Element documents = new Element("documents");
+        rootOut.addContent(documents);
+
+        File documentPath = new File((CONFIG.getString("MCR.WCMS.documentPath").replace('/', File.separatorChar)));
+
+        if (!documentPath.exists()) {
+            documentPath.mkdirs();
+        }
+
+        documentList = new File(documentPath.toString()).listFiles();
+
+        for (int i = 0; i < documentList.length; i++) {
+            if (!documentList[i].isDirectory()) {
+                documents.addContent(new Element("document").setText(documentList[i].getName()));
+            }
+        }
+
+        rootOut.addContent(new Element("documentPath").setText(CONFIG.getString("MCR.WCMS.documentPath").substring(CONFIG.getString("MCR.WCMS.documentPath").lastIndexOf("webapps"))));
+		return templates;
+	}
 
     /**
      * Finds the selected element in the navigation.xml and assigns attribute

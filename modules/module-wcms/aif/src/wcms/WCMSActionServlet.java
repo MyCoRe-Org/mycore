@@ -144,6 +144,9 @@ public class WCMSActionServlet extends WCMSServlet {
 
     private String masterTemplate = null; // Represents the action of
                                             // templates
+    
+    private String selfTemplate = null; // Represents the action of
+                                           // templates
 
     // (set, change, remove)
     private String fileName = null; // href attribut for the new element and
@@ -394,32 +397,39 @@ public class WCMSActionServlet extends WCMSServlet {
             // if you used the edittool
             if(getback())
               {
-               //if new intern child, predecossor or successor created, go to it	
-               if(action.equals("add") && mode.equals("intern"))
-                 {
-            	  if(addAtPosition.equals("child"))
-            	    {  
-            		 int length = getbackaddr().length();
-                	 help = getbackaddr().substring(0,(length-4));
-                	 filepos = fileName.lastIndexOf("/");
-                	 jump = help.concat(fileName.substring(filepos));  
-            		}
-            	  else
-            	    {
-            		 filepos = fileName.lastIndexOf("/"); 
-            		 int neighbarpos = getbackaddr().lastIndexOf("/");
-            		 help = getbackaddr().substring(0,neighbarpos);
-            		 jump = help.concat(fileName.substring(filepos));
-            		 
-            	    }
-                 }
-               // on edit or external link go back to initiator address
-               else
-                 {
-            	  jump = getbackaddr(); 
-                 }
-            	response.sendRedirect(response.encodeRedirectURL(jump));
-               
+            	if ((checkInput()) == false) {
+            		// request.setAttribute("XSL.Style", "xml");
+                    RequestDispatcher rd = getServletContext().getNamedDispatcher("MCRLayoutServlet");
+                    rd.forward(request, response); 
+                  }
+            	else
+            	  {
+	               //if new intern child, predecossor or successor created, go to it	
+	               if(action.equals("add") && mode.equals("intern"))
+	                 {
+	            	  if(addAtPosition.equals("child"))
+	            	    {  
+	            		 int length = getbackaddr().length();
+	                	 help = getbackaddr().substring(0,(length-4));
+	                	 filepos = fileName.lastIndexOf("/");
+	                	 jump = help.concat(fileName.substring(filepos));  
+	            		}
+	            	  else
+	            	    {
+	            		 filepos = fileName.lastIndexOf("/"); 
+	            		 int neighbarpos = getbackaddr().lastIndexOf("/");
+	            		 help = getbackaddr().substring(0,neighbarpos);
+	            		 jump = help.concat(fileName.substring(filepos));
+	            		 
+	            	    }
+	                 }
+	               // on edit or external link go back to initiator address
+	               else
+	                 {
+	            	  jump = getbackaddr(); 
+	                 }
+	            	response.sendRedirect(jump);
+            	  }
               }	
             else
               {	
@@ -506,14 +516,30 @@ public class WCMSActionServlet extends WCMSServlet {
             Element root = doc.getRootElement();
 
             if (contentFileBackup == null) {
-                contentFileBackup = "";
+            	
+                contentFileBackup = CONFIG.getString("MCR.WCMS.backupPath").replace('/', File.separatorChar)+fileName.substring(1);
             }
 
             if (changeInfo == null) {
-                root.addContent(new Element("log").setAttribute("date", getDate()).setAttribute("time", getTime()).setAttribute("userRealName", userRealName).setAttribute("labelPath", labelPath).setAttribute("doneAction", action).setAttribute("backupContentFile", contentFileBackup).setAttribute("backupNavigationFile", naviFileBackup));
+                root.addContent(new Element("log")
+                		.setAttribute("date", getDate())
+                		.setAttribute("time", getTime())
+                		.setAttribute("userRealName", userRealName)
+                		.setAttribute("labelPath", labelPath)
+                		.setAttribute("doneAction", action)
+                		.setAttribute("backupContentFile", contentFileBackup)
+                		.setAttribute("backupNavigationFile", naviFileBackup));
             } else {
                 Element log = new Element("log");
-                log.setAttribute("date", getDate()).setAttribute("time", getTime()).setAttribute("userRealName", userRealName).setAttribute("labelPath", labelPath).setAttribute("doneAction", action).setAttribute("backupContentFile", contentFileBackup).setAttribute("backupNavigationFile", naviFileBackup).addContent(new Element("note").setText(changeInfo));
+                log	.setAttribute("date", getDate())
+                	.setAttribute("time", getTime())
+	                .setAttribute("userRealName", userRealName)
+	                .setAttribute("labelPath", labelPath)
+	                .setAttribute("doneAction", action)
+	                .setAttribute("backupContentFile", contentFileBackup)
+	                .setAttribute("backupNavigationFile", naviFileBackup)
+                .addContent(new Element("note").setText(changeInfo));
+                
                 root.addContent(log);
             }
 
@@ -1620,7 +1646,13 @@ public class WCMSActionServlet extends WCMSServlet {
         }
 
         masterTemplate = request.getParameter("masterTemplate");
+        selfTemplate = request.getParameter("selfTemplate");
 
+        if(selfTemplate != "")
+          {
+           masterTemplate = selfTemplate;
+          }	
+        
         fileName = href;
 
         /* -------------------------------------------------------------------- */
