@@ -368,7 +368,7 @@ public class MCRSearchServlet extends MCRServlet {
 		return RESORT_KEY;
 	}
     
-    protected static MCRCache getCache(String key) {
+    public static MCRCache getCache(String key) {
         MCRCache c = (MCRCache) MCRSessionMgr.getCurrentSession().get(key);
         if (c == null) {
             c = new MCRCache(5);
