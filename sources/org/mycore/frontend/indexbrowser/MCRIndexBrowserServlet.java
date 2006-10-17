@@ -49,8 +49,9 @@ public class MCRIndexBrowserServlet extends MCRServlet {
         String mode = job.getRequest().getParameter("mode");		
         String searchclass = job.getRequest().getParameter("searchclass");		  	
         String fromTo = job.getRequest().getParameter("fromTo");		  	     
-            
-        MCRIndexBrowserData indexbrowser = new MCRIndexBrowserData(search, mode, searchclass, fromTo);
+        String path = job.getRequest().getParameter("path");		  	     
+        
+        MCRIndexBrowserData indexbrowser = new MCRIndexBrowserData(search, mode, searchclass, fromTo, path);
         indexbrowser.getQuery();
         indexbrowser.getResultList();        
         Document pageContent = indexbrowser.getXMLContent();   
