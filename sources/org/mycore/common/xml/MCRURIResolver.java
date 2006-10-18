@@ -112,8 +112,7 @@ public class MCRURIResolver implements javax.xml.transform.URIResolver, EntityRe
      */
     private MCRURIResolver() {
         MCRConfiguration config = MCRConfiguration.instance();
-        String prefix = "MCR.URIResolver.";
-        int cacheSize = config.getInt(prefix + "StaticFiles.CacheSize", 100);
+        int cacheSize = config.getInt(CONFIG_PREFIX + "StaticFiles.CacheSize", 100);
         bytesCache = new MCRCache(cacheSize);
         SUPPORTED_SCHEMES = Collections.unmodifiableMap(getResolverMapping());
     }
