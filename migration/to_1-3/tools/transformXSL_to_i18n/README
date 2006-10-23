@@ -1,0 +1,13 @@
+- How to use translate.java?
+
+	You need JDOM to compile translate.java
+	After a successful compilation you can use it with the following parameters
+		translate sourceDir outDir -lang de,en,ru
+		
+		sourceDir is the directory of the stylesheets (XSL)
+		outDir is the directory where the results is stored
+		-lang de,en,ru is the information for the language you use in your docportal
+		
+	For a working docportal after transformed all the stylesheets you can take the stylesheets directory from WEB-INF
+	take out all the *Creaate-Mask*.xsl and the editor.xsl. And of course you have to integrate the i18n java class from
+	Mycore 1.3.
