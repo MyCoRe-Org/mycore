@@ -429,29 +429,6 @@ template:
 									</tr>
 								</xsl:if>
 								
-								<xsl:if test="/cms/action = 'edit'">
-									<tr>
-										<td valign="top">
-											<label for="comment">
-											<xsl:value-of
-												select="i18n:translate('wcms.labels.comment')"/>
-											</label>	
-			    						</td>
-										<td>
-											<p id="comment">
-												
-												
-												<!--label for="changeInfo">Kommentar</label-->
-												<textarea name="changeInfo"
-													cols="30" rows="3"
-													onclick="this.select();">
-													<xsl:value-of
-														select="i18n:translate('wcms.hint.noComment')"/>
-												</textarea>
-											</p>
-										</td>
-									</tr>
-								</xsl:if>
 							</table>
 						</p>
 						
@@ -584,14 +561,10 @@ template:
 							<xsl:copy-of
 								select="xalan:nodeset(document($servletPath))"/>
 						</xsl:variable>
-						
-						<span id="statistic2-width">
-							<span id="statistic2">
-								
-								
+	
 								<!-- div class="titel">WCMS Nutzungsprotokoll</div -->
-								<!--<p class="inhalt">-->
-								<table>
+
+								<table id="statistic2">
 									<xsl:call-template name="logs.headLine">
 										<xsl:with-param name="sortBy"
 											select="'date'"/>
@@ -609,18 +582,48 @@ template:
 											select="/cms/href/text()"/>
 									</xsl:call-template>
 								</table>
-								<!--</p>-->
-							</span>
-						</span>
+
 					</div>
 				</div>
 				
 				
 				<!-- =============================== End - TAB Manager ============================================ -->
-				
+										
 				<!-- Speichern Inhalt -->
 				<div id="speichern">
 					<!-- div class="comment"-->
+					<xsl:if test="/cms/action = 'edit'">
+								<table align="right">	
+									<tr>
+										<xsl:variable name="comment-value">
+											<xsl:value-of select="i18n:translate('wcms.hint.noComment')"/>
+										</xsl:variable>
+													
+										<td width="320"><i>
+											<!--label for="changeInfo">Kommentar</label-->
+											<input type="text" name="changeInfo"
+												size="60" maxlength="255" value="{$comment-value}"
+												onclick="this.select();"/>
+											</i>
+										</td>
+									</tr>
+								</table>
+								<!--<table align="right">	
+									<tr>
+										<td>	
+											<textarea name="changeInfo"
+														cols="30" rows="3"
+														onclick="this.select();">
+														<xsl:value-of
+															select="i18n:translate('wcms.hint.noComment')"/>
+											</textarea>
+										</td>	
+									</tr>
+								</table>-->
+						<br/>
+						<br/>
+						<br/>
+					</xsl:if>
 					<fieldset>
 						<div id="saveSwitches">
 							<xsl:call-template
