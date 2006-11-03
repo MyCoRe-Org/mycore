@@ -46,6 +46,7 @@ import org.mycore.common.MCRConfigurationException;
  * @author Frank L&uuml;tzenkirchen
  * @author Werner Gre&szlig;hoff
  * @version $Revision$ $Date$
+ * @deprecated
  */
 public class MCRNBN {
     /** Logger */

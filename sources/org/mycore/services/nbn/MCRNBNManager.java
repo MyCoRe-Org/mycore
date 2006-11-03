@@ -31,9 +31,10 @@ import java.util.Set;
  * Provides persistency functions for managing NBN URNs. This is still work in
  * progress.
  * 
- * @author Frank Lützenkirchen
- * @author Werner Greßhoff
+ * @author Frank L&uuml;tzenkirchen
+ * @author Werner Gre&szlig;hoff
  * @version $Revision$ $Date$
+ * @deprecated
  */
 public interface MCRNBNManager {
     /**

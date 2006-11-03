@@ -39,8 +39,9 @@ import org.mycore.common.MCRConfiguration;
  * request is redirected to the national URN resolver, as specified by the
  * configuration parameter MCR.NBN.TopLevelResolver.
  * 
- * @author Frank Lützenkirchen
+ * @author Frank L&uuml;tzenkirchen
  * @version $Revision$ $Date$
+ * @deprecated
  */
 public class MCRNBNResolver extends HttpServlet {
     /** Logger */
