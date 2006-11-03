@@ -233,7 +233,8 @@ public final class MCRMetaISO8601Date extends MCRMetaDefault implements MCRMetaI
                 result=new DateTime(pDate.getTime());
                 return result;
             } catch (ParseException e) {
-                LOGGER.debug("Date guess failed for locale: "+locale,e);
+                LOGGER.warn("Date guess failed for locale: "+locale);                
+                //we need no big exception in the logs, if we can't guess what it is, a warning should be enough
             }
         }
         LOGGER.error("Error trying to guess date for string: "+date);
