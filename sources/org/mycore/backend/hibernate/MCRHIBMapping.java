@@ -143,6 +143,12 @@ public class MCRHIBMapping {
             map.addColumn("mcrattr", "MCRATTR", dbString, 194, false, false, false);
             cfg.addXML(map.getTableXML());
 
+            // URN store
+            map = new MCRTableGenerator(config.getString("MCR.urn_store_sql_table", "MCRURN"), "org.mycore.backend.hibernate.tables.MCRURN", "", 2);
+            map.addIDColumn("mcrid", "MCRID", dbString, 64, "assigned", false);
+            map.addIDColumn("mcrurn", "MCRURN", dbString, 194, "assigned", false);
+            cfg.addXML(map.getTableXML());
+
             // NBN Manager
             map = new MCRTableGenerator(config.getString("MCR.nbn_store_sql_table", "MCRNBN"), "org.mycore.backend.hibernate.tables.MCRNBNS", "", 1);
             map.addIDColumn("niss", "NISS", dbString, 32, "assigned", false);

@@ -46,6 +46,8 @@ public class MCRHIBXMLStore implements MCRXMLTableInterface {
     // logger
     static Logger logger = Logger.getLogger(MCRHIBXMLStore.class.getName());
 
+    private String classname = "org.mycore.backend.hibernate.tables.MCRXMLTABLE";
+
     private String type;
 
     /**
@@ -233,7 +235,7 @@ public class MCRHIBXMLStore implements MCRXMLTableInterface {
     	
           Session session = getSession(); 
           Transaction tx = session.beginTransaction();
-          List l = session.createQuery("select max(key.id) from MCRXMLTABLE where MCRID like '"+project+"_"+type+"%'").list();
+          List l = session.createQuery("select max(key.id) from "+classname+" where MCRID like '"+project+"_"+type+"%'").list();
           tx.commit(); 
           session.close();
           
