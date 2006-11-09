@@ -51,6 +51,11 @@
 									<xs:attribute name="source" type="xs:string" use="optional"/>
 									<xs:attribute name="objects" type="xs:string" use="optional"/>
 									<xs:attribute name="sortable" type="xs:string" use="optional"/>
+									<xs:attribute name="i18n" type="xs:string" use="optional">
+										<xs:annotation>
+											<xs:documentation>i18n key of this search field if used in a search mask</xs:documentation>
+										</xs:annotation>
+									</xs:attribute>
 								</xs:complexType>
 							</xs:element>
 						</xs:sequence>
