@@ -11,8 +11,20 @@
 <!--                  XSL Parameters                      -->
 <!-- ==================================================== -->
 
+<!-- Build a webpage file or the included editor file? -->
+<xsl:param name="mode" select="'editor'" />
+
+<!-- Filename of the editor definition file -->
+<xsl:param name="filename.editor" />
+
 <!-- Filename of the webpage that contains the search mask -->
 <xsl:param name="filename.webpage" />
+
+<!-- Title of webpage in german -->
+<xsl:param name="title.de" />
+
+<!-- Title of webpage in english -->
+<xsl:param name="title.en" />
 
 <!-- i18n key of search mask headline -->
 <xsl:param name="headline.i18n" />
@@ -47,10 +59,42 @@
 <xsl:variable name="skiplen" select="string-length(normalize-space($skip.fields))" />
 
 <!-- ==================================================== -->
+<!--                   Transformation                     -->
+<!-- ==================================================== -->
+
+<xsl:template match="/">
+  <xsl:if test="$mode = 'editor'">
+    <xsl:apply-templates select="mcr:searchfields" />
+  </xsl:if>
+  <xsl:if test="$mode = 'webpage'">
+    <xsl:call-template name="webpage" />
+  </xsl:if>
+</xsl:template>
+
+<!-- ==================================================== -->
+<!--                   Build webpage                      -->
+<!-- ==================================================== -->
+
+<xsl:template name="webpage">
+  <MyCoReWebPage>
+    <section title="{$title.de}" xml:lang="de">
+      <editor id="searchmask-de">
+        <include uri="webapp:editor/{$filename.editor}"/>
+      </editor>
+    </section>
+    <section title="{$title.en}" xml:lang="en">
+      <editor id="searchmask-en">
+        <include uri="webapp:editor/{$filename.editor}"/>
+      </editor>
+    </section>
+  </MyCoReWebPage>
+</xsl:template>
+
+<!-- ==================================================== -->
 <!--                    Build editor                      -->
 <!-- ==================================================== -->
 
-<xsl:template match="/mcr:searchfields">
+<xsl:template match="mcr:searchfields">
   <editor id="searchmask">
 
   <xsl:value-of select="$newline" />
