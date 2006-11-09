@@ -356,9 +356,19 @@
     <text i18n="{@i18n}" />
   </cell>
   <xsl:value-of select="$newline" />
-  <cell row="{position()}" col="2" anchor="WEST" 
-    var="conditions/boolean/condition{position()}/@value"
-    ref="input.{@type}" />
+  <cell row="{position()}" col="2" anchor="WEST" var="conditions/boolean/condition{position()}/@value">
+    <xsl:choose>
+      <xsl:when test="@classification and @source='objectCategory'">
+        <list type="dropdown">
+          <item value="" i18n="editor.search.choose" />
+          <include uri="classification:editor[textcounter]:2:children:{@classification}" />
+        </list>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:attribute name="ref">input.<xsl:value-of select="@type" /></xsl:attribute>
+      </xsl:otherwise>
+    </xsl:choose>
+  </cell>
   <xsl:value-of select="$newline" />
 </xsl:template>
 
