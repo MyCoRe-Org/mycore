@@ -283,7 +283,7 @@
   <xsl:if test="@source != 'searcherHitMetadata'">
     <xsl:if test="($fieldlen = 0) or (($fieldlen &gt; 0) and contains(concat(' ',$search.fields,' '),concat(' ',@name,' ')))">
       <xsl:choose>
-        <xsl:when test="$fieldlen = 0">
+        <xsl:when test="$skiplen = 0">
           <xsl:call-template name="build.search" />
         </xsl:when>
         <xsl:when test="contains(concat(' ',$skip.fields,' '),concat(' ',@name,' '))" />
