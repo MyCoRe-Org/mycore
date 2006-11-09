@@ -257,7 +257,9 @@
           <list type="dropdown">
             <item value="" i18n="editor.search.choose" />
             <xsl:for-each select="mcr:index[contains(concat(' ',$search.indexes,' '),concat(' ',@id,' '))]/mcr:field[@sortable='true']">
-              <item value="{@name}" i18n="{@i18n}" />
+              <xsl:if test="($skiplen = 0) or (($skiplen &gt; 0) and not(contains(concat(' ',$skip.fields,' '),concat(' ',@name,' '))))">
+                <item value="{@name}" i18n="{@i18n}" />
+              </xsl:if>
             </xsl:for-each>
           </list>
         </cell>
