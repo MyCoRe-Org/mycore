@@ -30,15 +30,16 @@
 <xsl:param name="headline.i18n" />
 
 <!-- ID of the search index(es) to include, multiple indexes separated by blanks -->
+<!-- If this property is set, by default all fields in those indexes are included -->
 <xsl:param name="search.indexes" />
 
-<!-- Name(s) of the search fields to include, separated by blanks. -->
-<!-- If this property is not set, ALL search fields will be included in search mask -->
-<xsl:param name="search.fields" />
-
 <!-- Name(s) of the search fields to skip, separated by blanks. -->
-<!-- If this property is not set, NO search fields will be skipped in search mask -->
+<!-- If this property and search.indexes is set, the listed fields are NOT included in search mask -->
 <xsl:param name="skip.fields" />
+
+<!-- Name(s) of the search fields to include, separated by blanks. -->
+<!-- If this property is set, ONLY these search fields will be included in search mask -->
+<xsl:param name="search.fields" />
 
 <!-- Optional restriction (hidden condition) for search -->
 <!-- Syntax: "field operator value", separated by blanks -->
@@ -125,8 +126,15 @@
         <hidden var="conditions/@format" default="xml" />
         <hidden var="conditions/boolean/@operator" default="and" />
         <xsl:value-of select="$newline" />
- 
-        <xsl:apply-templates select="mcr:index[contains(concat(' ',$search.indexes,' '),concat(' ',@id,' '))]/mcr:field" />
+
+        <xsl:choose>
+          <xsl:when test="string-length(normalize-space($search.indexes)) &gt;0">
+            <xsl:apply-templates select="mcr:index[contains(concat(' ',$search.indexes,' '),concat(' ',@id,' '))]/mcr:field[@source != 'searcherHitMetadata']" mode="index" />
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:apply-templates select="mcr:index/mcr:field[(@source != 'searcherHitMetadata') and (($fieldlen = 0) or contains(concat(' ',$search.fields,' '),concat(' ',@name,' ')))]" mode="list" />
+          </xsl:otherwise>
+        </xsl:choose>
         
         <xsl:if test="string-length(normalize-space($restriction)) &gt; 0">
           <xsl:call-template name="restriction" />
@@ -322,20 +330,20 @@
 <!--      Input element for a single search field         -->
 <!-- ==================================================== -->
 
-<xsl:template match="mcr:field">
-  <xsl:if test="@source != 'searcherHitMetadata'">
-    <xsl:if test="($fieldlen = 0) or (($fieldlen &gt; 0) and contains(concat(' ',$search.fields,' '),concat(' ',@name,' ')))">
-      <xsl:choose>
-        <xsl:when test="$skiplen = 0">
-          <xsl:call-template name="build.search" />
-        </xsl:when>
-        <xsl:when test="contains(concat(' ',$skip.fields,' '),concat(' ',@name,' '))" />
-        <xsl:otherwise>
-          <xsl:call-template name="build.search" />
-        </xsl:otherwise>
-      </xsl:choose>
-    </xsl:if>
-  </xsl:if>
+<xsl:template match="mcr:field" mode="list">
+  <xsl:call-template name="build.search" />
+</xsl:template>  
+ 
+<xsl:template match="mcr:field" mode="index">
+  <xsl:choose>
+    <xsl:when test="$skiplen = 0">
+      <xsl:call-template name="build.search" />
+    </xsl:when>
+    <xsl:when test="contains(concat(' ',$skip.fields,' '),concat(' ',@name,' '))" />
+    <xsl:otherwise>
+      <xsl:call-template name="build.search" />
+    </xsl:otherwise>
+  </xsl:choose>
 </xsl:template>  
 
 <xsl:template name="build.search">
