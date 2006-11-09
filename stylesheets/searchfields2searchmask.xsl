@@ -44,8 +44,9 @@
 <!-- Syntax: "field operator value", separated by blanks -->
 <xsl:param name="restriction" />
 
-<!-- If 'true', include a panel to select sort criteria of results -->
-<xsl:param name="include.sortByPanel" select="'true'" />
+<!-- List of fields to include as sort criteria of results -->
+<!-- If empty, panel is not displayed -->
+<xsl:param name="sort.fields" />
 
 <!-- If true, include a panel to select hosts to query -->
 <xsl:param name="include.hostsSelectionPanel" select="'true'" />
@@ -135,7 +136,7 @@
           <xsl:call-template name="hosts" />
         </xsl:if>
         
-        <xsl:if test="$include.sortByPanel = 'true'">
+        <xsl:if test="string-length(normalize-space($sort.fields)) &gt; 0">
           <xsl:call-template name="sortBy" />
         </xsl:if>
         
@@ -256,10 +257,8 @@
         <cell row="1" col="1" anchor="WEST" var="@name">
           <list type="dropdown">
             <item value="" i18n="editor.search.choose" />
-            <xsl:for-each select="mcr:index[contains(concat(' ',$search.indexes,' '),concat(' ',@id,' '))]/mcr:field[@sortable='true']">
-              <xsl:if test="($skiplen = 0) or (($skiplen &gt; 0) and not(contains(concat(' ',$skip.fields,' '),concat(' ',@name,' '))))">
-                <item value="{@name}" i18n="{@i18n}" />
-              </xsl:if>
+            <xsl:for-each select="mcr:index[contains(concat(' ',$search.indexes,' '),concat(' ',@id,' '))]/mcr:field[@sortable='true' and contains(concat(' ',$sort.fields,' '),concat(' ',@name,' '))]">
+              <item value="{@name}" i18n="{@i18n}" />
             </xsl:for-each>
           </list>
         </cell>
