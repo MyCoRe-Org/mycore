@@ -129,10 +129,12 @@
 
         <xsl:choose>
           <xsl:when test="string-length(normalize-space($search.indexes)) &gt;0">
-            <xsl:apply-templates select="mcr:index[contains(concat(' ',$search.indexes,' '),concat(' ',@id,' '))]/mcr:field[@source != 'searcherHitMetadata']" mode="index" />
+            <xsl:apply-templates select="mcr:index[contains(concat(' ',$search.indexes,' '),concat(' ',@id,' '))]/mcr:field[@source != 'searcherHitMetadata']" />
           </xsl:when>
           <xsl:otherwise>
-            <xsl:apply-templates select="mcr:index/mcr:field[(@source != 'searcherHitMetadata') and (($fieldlen = 0) or contains(concat(' ',$search.fields,' '),concat(' ',@name,' ')))]" mode="list" />
+            <xsl:call-template name="build.from.list">
+              <xsl:with-param name="fields" select="$search.fields" /> 
+            </xsl:call-template>
           </xsl:otherwise>
         </xsl:choose>
         
@@ -330,11 +332,35 @@
 <!--      Input element for a single search field         -->
 <!-- ==================================================== -->
 
-<xsl:template match="mcr:field" mode="list">
-  <xsl:call-template name="build.search" />
+<xsl:template name="build.from.list">
+  <xsl:param name="fields" />
+  <xsl:param name="pos" select="1" />
+  
+  <xsl:if test="string-length(normalize-space($fields)) &gt; 0">
+    <xsl:choose>
+      <xsl:when test="contains(normalize-space($fields),' ')">
+        <xsl:for-each select="mcr:index/mcr:field[@name=substring-before(normalize-space($fields),' ')]">
+          <xsl:call-template name="build.search">
+            <xsl:with-param name="pos" select="$pos" />
+          </xsl:call-template>
+        </xsl:for-each>
+        <xsl:call-template name="build.from.list">
+          <xsl:with-param name="fields" select="substring-after(normalize-space($fields),' ')" />
+          <xsl:with-param name="pos" select="$pos + 1" />
+        </xsl:call-template>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:for-each select="mcr:index/mcr:field[@name=normalize-space($fields)]">
+          <xsl:call-template name="build.search">
+            <xsl:with-param name="pos" select="$pos" />
+          </xsl:call-template>
+        </xsl:for-each>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:if>
 </xsl:template>  
  
-<xsl:template match="mcr:field" mode="index">
+<xsl:template match="mcr:field">
   <xsl:choose>
     <xsl:when test="$skiplen = 0">
       <xsl:call-template name="build.search" />
@@ -347,6 +373,8 @@
 </xsl:template>  
 
 <xsl:template name="build.search">
+  <xsl:param name="pos" select="position()" />
+
   <xsl:value-of select="$newline" />
   <xsl:comment> Search in field '<xsl:value-of select="@name" />
     <xsl:text>' with operator '</xsl:text>
@@ -355,15 +383,15 @@
   </xsl:comment>
   <xsl:value-of select="$newline" />
 
-  <hidden var="conditions/boolean/condition{position()}/@field" default="{@name}" />
+  <hidden var="conditions/boolean/condition{$pos}/@field" default="{@name}" />
   <xsl:value-of select="$newline" />
-  <hidden var="conditions/boolean/condition{position()}/@operator" default="{$fieldtypes/mcr:type[@name=current()/@type]/@default}" />
+  <hidden var="conditions/boolean/condition{$pos}/@operator" default="{$fieldtypes/mcr:type[@name=current()/@type]/@default}" />
   <xsl:value-of select="$newline" />
-   <cell row="{position()}" col="1" anchor="EAST">
+  <cell row="{position()}" col="1" anchor="EAST">
     <text i18n="{@i18n}" />
   </cell>
   <xsl:value-of select="$newline" />
-  <cell row="{position()}" col="2" anchor="WEST" var="conditions/boolean/condition{position()}/@value">
+  <cell row="{position()}" col="2" anchor="WEST" var="conditions/boolean/condition{$pos}/@value">
     <xsl:choose>
       <xsl:when test="@classification and @source='objectCategory'">
         <list type="dropdown">
