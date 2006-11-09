@@ -2,7 +2,7 @@
 <fieldtypes xmlns="http://www.mycore.org/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mycore.org/
 fieldtypes.xsd">
 
-	<type name="identifier">
+	<type name="identifier" default="=">
 		<!-- exact string or id, should be indexed unchanged -->
 		<operator token="="/>
 		<operator token="&gt;"/>
@@ -12,7 +12,7 @@ fieldtypes.xsd">
 		<operator token="like"/>
 		<!-- allows wildcard search using * and ? -->
 	</type>
-	<type name="name">
+	<type name="name" default="contains">
 		<!-- name of a person or place, umlauts etc. should be normalized -->
 		<operator token="="/>
 		<operator token="&gt;"/>
@@ -24,7 +24,7 @@ fieldtypes.xsd">
 		<operator token="contains"/>
 		<!-- searches words at any position in the text -->
 	</type>
-	<type name="text">
+	<type name="text" default="contains">
 		<!-- free text like title, abstract ect., stemming and linguistic processing applied -->
 		<operator token="="/>
 		<operator token="&gt;"/>
@@ -38,7 +38,7 @@ fieldtypes.xsd">
 		<operator token="phrase"/>
 		<!-- searches a phrase at any position in the text -->
 	</type>
-	<type name="date">
+	<type name="date" default="=">
 		<!-- date value in ISO-8601 format "yyyy-MM-dd" -->
 		<operator token="="/>
 		<operator token="&gt;"/>
@@ -46,7 +46,7 @@ fieldtypes.xsd">
 		<operator token="&gt;="/>
 		<operator token="&lt;="/>
 	</type>
-	<type name="time">
+	<type name="time" default="=">
 		<!-- time or duration value in fixed format "hh:mm:ss" -->
 		<operator token="="/>
 		<operator token="&gt;"/>
@@ -54,7 +54,7 @@ fieldtypes.xsd">
 		<operator token="&gt;="/>
 		<operator token="&lt;="/>
 	</type>
-	<type name="timestamp">
+	<type name="timestamp" default="=">
 		<!-- date and time value in ISO-8601 format "yyyy-MM-dd hh:mm:ss" -->
 		<operator token="="/>
 		<operator token="&gt;"/>
@@ -62,11 +62,11 @@ fieldtypes.xsd">
 		<operator token="&gt;="/>
 		<operator token="&lt;="/>
 	</type>
-	<type name="boolean">
+	<type name="boolean" default="=">
 		<!-- values "true" or "false" -->
 		<operator token="="/>
 	</type>
-	<type name="decimal">
+	<type name="decimal" default="=">
 		<!-- decimal value with "." as separator -->
 		<operator token="="/>
 		<operator token="&gt;"/>
@@ -74,7 +74,7 @@ fieldtypes.xsd">
 		<operator token="&gt;="/>
 		<operator token="&lt;="/>
 	</type>
-	<type name="integer">
+	<type name="integer" default="=">
 		<!-- integer value -->
 		<operator token="="/>
 		<operator token="&gt;"/>
