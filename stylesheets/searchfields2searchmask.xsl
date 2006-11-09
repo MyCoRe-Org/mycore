@@ -162,7 +162,6 @@
 
 <xsl:template name="restriction">
   <xsl:value-of select="$newline" />
-  <xsl:value-of select="$newline" />
 
   <xsl:comment> Search only for <xsl:value-of select="$restriction" />
     <xsl:text> </xsl:text>
@@ -176,7 +175,6 @@
   <hidden var="conditions/boolean/condition94/@value"
     default="{normalize-space(substring-after(normalize-space(substring-after(normalize-space($restriction),' ')),' '))}" />
 
-  <xsl:value-of select="$newline" />
   <xsl:value-of select="$newline" />
 </xsl:template>
 
