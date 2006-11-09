@@ -257,7 +257,7 @@
         <cell row="1" col="1" anchor="WEST" var="@name">
           <list type="dropdown">
             <item value="" i18n="editor.search.choose" />
-            <xsl:for-each select="mcr:index[contains(concat(' ',$search.indexes,' '),concat(' ',@id,' '))]/mcr:field[@sortable='true' and contains(concat(' ',$sort.fields,' '),concat(' ',@name,' '))]">
+            <xsl:for-each select="mcr:index/mcr:field[@sortable='true' and contains(concat(' ',$sort.fields,' '),concat(' ',@name,' '))]">
               <item value="{@name}" i18n="{@i18n}" />
             </xsl:for-each>
           </list>
