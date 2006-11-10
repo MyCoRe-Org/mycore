@@ -524,6 +524,7 @@ public class MCRLayoutServlet extends MCRServlet {
         // Set char encoding from "<xsl:output encoding = "...">
         String ct = xsl.getOutputProperties().getProperty("media-type");
         String enc = xsl.getOutputProperties().getProperty("encoding");
+        response.setCharacterEncoding(enc);
         response.setContentType(ct + "; charset=" + enc);
         LOGGER.debug("MCRLayoutServlet starts to output " + ct + "; charset=" + enc);
 
