@@ -1,12 +1,15 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
 <!-- ============================================== -->
-<!-- $Revision: 1.4 $ $Date: 2006-09-19 10:13:25 $ -->
+<!-- $Revision: 1.5 $ $Date: 2006-11-10 09:58:14 $ -->
 <!-- ============================================== -->
 
-<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <xsl:output indent="yes" method="xml" encoding="UTF-8" />
+<xsl:stylesheet version="1.0"
+  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:xalan="http://xml.apache.org/xalan"
+  exclude-result-prefixes="xalan">
+  <xsl:output indent="yes" method="xml" encoding="UTF-8" xalan:indent-amount="2"/>
   <xsl:strip-space elements="*" />
   <xsl:preserve-space elements="" />
 
