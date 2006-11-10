@@ -3,9 +3,11 @@
 <!-- This stylesheet generates a search mask from searchfields.xml configuration file  -->
 
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-                              xmlns:mcr="http://www.mycore.org/" exclude-result-prefixes="mcr">
+                              xmlns:mcr="http://www.mycore.org/" 
+                              xmlns:xalan="http://xml.apache.org/xalan"
+                              exclude-result-prefixes="mcr xalan">
 
-<xsl:output method="xml" encoding="UTF-8" indent="yes" />
+<xsl:output indent="yes" method="xml" encoding="UTF-8" xalan:indent-amount="2"/>
 
 <!-- ==================================================== -->
 <!--                  XSL Parameters                      -->
@@ -123,34 +125,21 @@
 <xsl:template match="mcr:searchfields">
   <editor id="searchmask">
 
-  <xsl:value-of select="$newline" />
-  <xsl:value-of select="$newline" />
-
     <source url="request:servlets/MCRSearchServlet?mode=load&amp;id=[ID]" token="[ID]" />
     <target type="servlet" name="MCRSearchServlet" method="post" format="xml" />
-
-    <xsl:value-of select="$newline" />
-    <xsl:value-of select="$newline" />
 
     <components root="root" var="/query">
       <headline anchor="LEFT">
         <text i18n="{$headline.i18n}"/>
       </headline>
 
-      <xsl:value-of select="$newline" />
-      <xsl:value-of select="$newline" />
-      
       <panel id="root" lines="off">
       
-        <xsl:value-of select="$newline" />
-        <xsl:value-of select="$newline" />
-
         <hidden var="@mask" default="{$filename.webpage}" />
         <hidden var="conditions/@format" default="xml" />
         <xsl:if test="$layout = 'simple'">
           <hidden var="conditions/boolean/@operator" default="and" />
         </xsl:if>
-        <xsl:value-of select="$newline" />
 
         <xsl:if test="$layout = 'simple'">
           <xsl:call-template name="build.from.list">
@@ -179,9 +168,6 @@
         <cell row="99" col="1" colspan="2" anchor="EAST">
           <submitButton i18n="editor.search.search" width="150px" />
         </cell>
-        
-        <xsl:value-of select="$newline" />
-        <xsl:value-of select="$newline" />
         
       </panel>
  
@@ -246,9 +232,7 @@
 
     <xsl:variable name="type" select="normalize-space(substring-before($tmp,' '))" />    
 
-    <xsl:value-of select="$newline" />
     <xsl:comment> Search for fields of type <xsl:value-of select="$type" /><xsl:text> </xsl:text></xsl:comment>
-    <xsl:value-of select="$newline" />
 
     <xsl:variable name="fields.for.type">
       <xsl:call-template name="build.fields.for.type">
@@ -298,7 +282,6 @@
         </xsl:otherwise>
       </xsl:choose>
     </cell>    
-    <xsl:value-of select="$newline" />
     
     <xsl:call-template name="build.type.selectors">
       <xsl:with-param name="list" select="substring-after($tmp,' ')" />
@@ -358,12 +341,9 @@
 <!-- ==================================================== -->
 
 <xsl:template name="restriction">
-  <xsl:value-of select="$newline" />
-
   <xsl:comment> Search only for <xsl:value-of select="$restriction" />
     <xsl:text> </xsl:text>
   </xsl:comment>
-  <xsl:value-of select="$newline" />
   
   <hidden var="conditions/boolean/condition94/@field"    
     default="{normalize-space(substring-before(normalize-space($restriction),' '))}" />
@@ -371,8 +351,6 @@
     default="{normalize-space(substring-before(normalize-space(substring-after(normalize-space($restriction),' ')),' '))}" />
   <hidden var="conditions/boolean/condition94/@value"
     default="{normalize-space(substring-after(normalize-space(substring-after(normalize-space($restriction),' ')),' '))}" />
-
-  <xsl:value-of select="$newline" />
 </xsl:template>
 
 <!-- ==================================================== -->
@@ -380,11 +358,7 @@
 <!-- ==================================================== -->
 
 <xsl:template name="includes">
-  <xsl:value-of select="$newline" />
-  <xsl:value-of select="$newline" />
-
   <xsl:comment> Input elements included depending on field type </xsl:comment>
-  <xsl:value-of select="$newline" />
   
   <textfield width="40" id="input.text" />
   <textfield width="30" id="input.name" />
@@ -401,9 +375,6 @@
   <textfield width="10" id="input.integer" />
 
   <xsl:if test="$layout='advanced'">
-    <xsl:value-of select="$newline" />
-    <xsl:value-of select="$newline" />
-    
     <xsl:for-each select="$fieldtypes/mcr:type">
       <list type="checkbox" rows="1" default="{@default}" id="operators.{@name}">
         <xsl:for-each select="mcr:operator">
@@ -421,9 +392,6 @@
       </list>
     </xsl:for-each>
   </xsl:if>
-
-  <xsl:value-of select="$newline" />
-  <xsl:value-of select="$newline" />
 </xsl:template>
 
 <!-- ==================================================== -->
@@ -431,10 +399,7 @@
 <!-- ==================================================== -->
 
 <xsl:template name="hosts">
-  <xsl:value-of select="$newline" />
-
   <xsl:comment> Select hosts to query </xsl:comment>
-  <xsl:value-of select="$newline" />
 
   <cell row="95" col="1" anchor="SOUTHEAST" height="50px">
     <text i18n="editor.search.searchon"/>
@@ -452,8 +417,6 @@
       <include uri="request:hosts.xml" />
     </list>
   </cell>
-
-  <xsl:value-of select="$newline" />
 </xsl:template>
 
 <!-- ==================================================== -->
@@ -461,8 +424,6 @@
 <!-- ==================================================== -->
 
 <xsl:template name="choose.and.or">
-  <xsl:value-of select="$newline" />
-
   <cell row="93" col="1" anchor="EAST">
     <text i18n="editor.search.connect" />
   </cell>
@@ -472,8 +433,6 @@
       <item value="or" i18n="editor.search.or" />
     </list>
   </cell>
-
-  <xsl:value-of select="$newline" />
 </xsl:template>
 
 <!-- ==================================================== -->
@@ -481,11 +440,7 @@
 <!-- ==================================================== -->
 
 <xsl:template name="sortBy">
-  <xsl:value-of select="$newline" />
-
   <xsl:comment> Select sort order of results </xsl:comment>
-  <xsl:value-of select="$newline" />
-  
   <cell row="97" col="1" anchor="NORTHEAST">
     <text i18n="editor.search.sortby" />
   </cell>
@@ -509,8 +464,6 @@
       </panel>
     </repeater>
   </cell>
-
-  <xsl:value-of select="$newline" />
 </xsl:template>
 
 <!-- ==================================================== -->
@@ -518,10 +471,7 @@
 <!-- ==================================================== -->
 
 <xsl:template name="maxResultsNumPerPage">
-  <xsl:value-of select="$newline" />
-
   <xsl:comment> Select maximum number of results and num per page </xsl:comment>
-  <xsl:value-of select="$newline" />
 
   <cell row="98" col="1" colspan="2" anchor="SOUTHEAST" height="50px">
     <panel lines="off">
@@ -552,8 +502,6 @@
       </cell>
     </panel>
   </cell>
-
-  <xsl:value-of select="$newline" />
 </xsl:template>
 
 <!-- ==================================================== -->
@@ -591,22 +539,17 @@
 <xsl:template name="build.search">
   <xsl:param name="pos" select="position()" />
 
-  <xsl:value-of select="$newline" />
   <xsl:comment> Search in field '<xsl:value-of select="@name" />
     <xsl:text>' with operator '</xsl:text>
     <xsl:value-of select="$fieldtypes/mcr:type[@name=current()/@type]/@default" />
     <xsl:text>' </xsl:text>
   </xsl:comment>
-  <xsl:value-of select="$newline" />
 
   <hidden var="conditions/boolean/condition{$pos}/@field" default="{@name}" />
-  <xsl:value-of select="$newline" />
   <hidden var="conditions/boolean/condition{$pos}/@operator" default="{$fieldtypes/mcr:type[@name=current()/@type]/@default}" />
-  <xsl:value-of select="$newline" />
   <cell row="{$pos}" col="1" anchor="EAST">
     <text i18n="{@i18n}" />
   </cell>
-  <xsl:value-of select="$newline" />
   <cell row="{$pos}" col="2" anchor="WEST" var="conditions/boolean/condition{$pos}/@value">
     <xsl:choose>
       <xsl:when test="@classification and @source='objectCategory'">
@@ -620,16 +563,6 @@
       </xsl:otherwise>
     </xsl:choose>
   </cell>
-  <xsl:value-of select="$newline" />
 </xsl:template>
-
-<!-- ==================================================== -->
-<!--               Insert new line in output              -->
-<!-- ==================================================== -->
-
-<xsl:variable name="newline">
-<xsl:text>
-</xsl:text>
-</xsl:variable>
 
 </xsl:stylesheet>
