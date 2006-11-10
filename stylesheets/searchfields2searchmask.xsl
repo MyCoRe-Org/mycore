@@ -52,13 +52,37 @@
 <!-- If true, include a panel to select hosts to query -->
 <xsl:param name="include.hostsSelectionPanel" select="'true'" />
 
+<!-- Layout -->
+<xsl:param name="layout" select="'simple'" />
+
 <!-- ==================================================== -->
 <!--                 Global variables                     -->
 <!-- ==================================================== -->
 
 <xsl:variable name="fieldtypes" select="document('fieldtypes.xml',.)/mcr:fieldtypes" />
-<xsl:variable name="fieldlen" select="string-length(normalize-space($search.fields))" />
-<xsl:variable name="skiplen" select="string-length(normalize-space($skip.fields))" />
+
+<xsl:variable name="list.of.fields">
+  <xsl:choose>
+    <xsl:when test="string-length(normalize-space($search.fields)) &gt; 0">
+      <xsl:value-of select="$search.fields" />
+    </xsl:when>
+    <xsl:otherwise>
+      <xsl:for-each select="mcr:index[contains(concat(' ',$search.indexes,' '),concat(' ',@id,' '))]/mcr:field[@source != 'searcherHitMetadata']">
+        <xsl:choose>
+          <xsl:when test="string-length(normalize-space($skip.fields)) = 0">
+            <xsl:value-of select="@name" />
+            <xsl:text> </xsl:text>
+          </xsl:when>
+          <xsl:when test="contains(concat(' ',$skip.fields,' '),concat(' ',@name,' '))" />
+          <xsl:otherwise>
+            <xsl:value-of select="@name" />
+            <xsl:text> </xsl:text>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:for-each>
+    </xsl:otherwise>
+  </xsl:choose>
+</xsl:variable>
 
 <!-- ==================================================== -->
 <!--                   Transformation                     -->
@@ -109,7 +133,6 @@
     <xsl:value-of select="$newline" />
 
     <components root="root" var="/query">
-      <include uri="webapp:editor/imports-common.xml"/>
       <headline anchor="LEFT">
         <text i18n="{$headline.i18n}"/>
       </headline>
@@ -124,19 +147,20 @@
 
         <hidden var="@mask" default="{$filename.webpage}" />
         <hidden var="conditions/@format" default="xml" />
-        <hidden var="conditions/boolean/@operator" default="and" />
+        <xsl:if test="$layout = 'simple'">
+          <hidden var="conditions/boolean/@operator" default="and" />
+        </xsl:if>
         <xsl:value-of select="$newline" />
 
-        <xsl:choose>
-          <xsl:when test="string-length(normalize-space($search.indexes)) &gt;0">
-            <xsl:apply-templates select="mcr:index[contains(concat(' ',$search.indexes,' '),concat(' ',@id,' '))]/mcr:field[@source != 'searcherHitMetadata']" />
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:call-template name="build.from.list">
-              <xsl:with-param name="fields" select="$search.fields" /> 
-            </xsl:call-template>
-          </xsl:otherwise>
-        </xsl:choose>
+        <xsl:if test="$layout = 'simple'">
+          <xsl:call-template name="build.from.list">
+            <xsl:with-param name="fields" select="$list.of.fields" /> 
+          </xsl:call-template>
+        </xsl:if>
+        <xsl:if test="$layout = 'advanced'">
+          <xsl:call-template name="build.advanced" />
+          <xsl:call-template name="choose.and.or" />
+        </xsl:if>
         
         <xsl:if test="string-length(normalize-space($restriction)) &gt; 0">
           <xsl:call-template name="restriction" />
@@ -165,6 +189,168 @@
      
     </components>
   </editor>
+</xsl:template>
+
+<!-- ==================================================== -->
+<!--            Build advanced search mask                -->
+<!-- ==================================================== -->
+
+<xsl:template name="build.advanced">
+  <xsl:variable name="used.types">
+    <xsl:call-template name="build.used.types.list">
+      <xsl:with-param name="list" select="$list.of.fields" />
+    </xsl:call-template>
+  </xsl:variable>
+  
+  <xsl:call-template name="build.type.selectors">
+    <xsl:with-param name="list" select="$used.types" />
+  </xsl:call-template>
+</xsl:template>
+
+<xsl:template name="build.used.types.list">
+  <xsl:param name="list" />
+  <xsl:param name="used" />
+  
+  <xsl:if test="string-length(normalize-space($list)) &gt; 0">
+    <xsl:variable name="tmp" select="concat(normalize-space($list),' ')" />
+    <xsl:variable name="field" select="mcr:index/mcr:field[@name=substring-before($tmp,' ')]" />
+    <xsl:variable name="type">
+      <xsl:choose>
+        <xsl:when test="$field/@type='identifier' and $field/@source='objectCategory'">
+          <xsl:value-of select="concat('@',$field/@classification)" />
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="$field/@type" />
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    
+    <xsl:if test="not(contains(concat(' ',$used,' '),concat(' ',$type,' ')))">
+      <xsl:value-of select="$type" />
+      <xsl:text> </xsl:text>
+    </xsl:if>
+    
+    <xsl:call-template name="build.used.types.list">
+      <xsl:with-param name="list" select="substring-after($tmp,' ')" />
+      <xsl:with-param name="used" select="concat($used,' ',$type)" />
+    </xsl:call-template>
+  </xsl:if>
+</xsl:template>
+
+<xsl:template name="build.type.selectors">
+  <xsl:param name="list" />
+  <xsl:param name="pos" select="1" />
+  
+  <xsl:if test="string-length(normalize-space($list)) &gt; 0">
+    <xsl:variable name="tmp" select="concat(normalize-space($list),' ')" />
+
+    <xsl:variable name="type" select="normalize-space(substring-before($tmp,' '))" />    
+
+    <xsl:value-of select="$newline" />
+    <xsl:comment> Search for fields of type <xsl:value-of select="$type" /><xsl:text> </xsl:text></xsl:comment>
+    <xsl:value-of select="$newline" />
+
+    <xsl:variable name="fields.for.type">
+      <xsl:call-template name="build.fields.for.type">
+        <xsl:with-param name="list" select="$list.of.fields" />
+        <xsl:with-param name="type" select="$type" />
+      </xsl:call-template>        
+    </xsl:variable>
+    
+    <xsl:if test="starts-with($type,'@')">
+      <hidden var="conditions/boolean/condition{$pos}/@operator" default="=" /> 
+    </xsl:if>
+    <xsl:if test="not(contains(normalize-space($fields.for.type),' '))">
+      <hidden var="conditions/boolean/condition{$pos}/@field" default="{normalize-space($fields.for.type)}" /> 
+    </xsl:if>
+    <cell row="{$pos}" col="1" anchor="EAST" var="conditions/boolean/condition{$pos}/@field">
+      <xsl:choose>
+        <xsl:when test="contains(normalize-space($fields.for.type),' ')">
+          <list type="dropdown">
+            <xsl:call-template name="build.field.items">
+              <xsl:with-param name="list" select="$fields.for.type" />
+            </xsl:call-template>        
+          </list>
+        </xsl:when>
+        <xsl:otherwise>
+          <text i18n="{mcr:index/mcr:field[@name=normalize-space($fields.for.type)]/@i18n}" />
+        </xsl:otherwise>
+      </xsl:choose>
+    </cell>    
+    <cell row="{$pos}" col="2" anchor="WEST">
+      <xsl:choose>
+        <xsl:when test="starts-with($type,'@')">
+          <xsl:attribute name="var">
+            <xsl:text>conditions/boolean/condition</xsl:text>
+            <xsl:value-of select="$pos" />
+            <xsl:text>/@value</xsl:text>
+          </xsl:attribute>
+          <list type="dropdown">
+            <item value="" i18n="editor.search.choose" />
+            <include uri="classification:editor[textcounter]:2:children:{substring-after($type,'@')}" />
+          </list>
+        </xsl:when>
+        <xsl:otherwise>
+          <panel lines="off">
+            <cell row="1" col="1" anchor="WEST" var="conditions/boolean/condition{$pos}/@operator" ref="operator.{$type}" />
+            <cell row="1" col="2" anchor="WEST" var="conditions/boolean/condition{$pos}/@value" ref="input.{$type}" />
+          </panel>
+        </xsl:otherwise>
+      </xsl:choose>
+    </cell>    
+    <xsl:value-of select="$newline" />
+    
+    <xsl:call-template name="build.type.selectors">
+      <xsl:with-param name="list" select="substring-after($tmp,' ')" />
+      <xsl:with-param name="pos" select="$pos + 1" />
+    </xsl:call-template>
+  </xsl:if>
+</xsl:template>
+
+<xsl:template name="build.fields.for.type">
+  <xsl:param name="list" />
+  <xsl:param name="type" />
+  
+  <xsl:if test="string-length(normalize-space($list)) &gt; 0">
+    <xsl:variable name="tmp" select="concat(normalize-space($list),' ')" />
+    <xsl:variable name="fname" select="substring-before($tmp,' ')" />
+    <xsl:variable name="field" select="mcr:index/mcr:field[@name=$fname]" />
+    <xsl:variable name="myType">
+      <xsl:choose>
+        <xsl:when test="$field/@type='identifier' and $field/@source='objectCategory'">
+          <xsl:value-of select="concat('@',$field/@classification)" />
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="$field/@type" />
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    
+    <xsl:if test="$myType=$type">
+      <xsl:value-of select="concat($field/@name,' ')" />
+    </xsl:if>
+    
+    <xsl:call-template name="build.fields.for.type">
+      <xsl:with-param name="list" select="substring-after($tmp,' ')" />
+      <xsl:with-param name="type" select="$type" />
+    </xsl:call-template>
+  </xsl:if>
+</xsl:template>
+
+<xsl:template name="build.field.items">
+  <xsl:param name="list" />
+  
+  <xsl:if test="string-length(normalize-space($list)) &gt; 0">
+    <xsl:variable name="tmp" select="concat(normalize-space($list),' ')" />
+    <xsl:variable name="fname" select="substring-before($tmp,' ')" />
+    <xsl:variable name="field" select="mcr:index/mcr:field[@name=$fname]" />
+
+    <item value="{$field/@name}" i18n="{$field/@i18n}" />
+    
+    <xsl:call-template name="build.field.items">
+      <xsl:with-param name="list" select="substring-after($tmp,' ')" />
+    </xsl:call-template>
+  </xsl:if>
 </xsl:template>
 
 <!-- ==================================================== -->
@@ -214,6 +400,28 @@
   <textfield width="10" id="input.decimal" />
   <textfield width="10" id="input.integer" />
 
+  <xsl:if test="$layout='advanced'">
+    <xsl:value-of select="$newline" />
+    <xsl:value-of select="$newline" />
+    
+    <xsl:for-each select="$fieldtypes/mcr:type">
+      <list type="checkbox" rows="1" default="{@default}" id="operators.{@name}">
+        <xsl:for-each select="mcr:operator">
+          <item value="{@token}">
+            <xsl:choose>
+              <xsl:when test="string-length(translate(@token,'&lt;&gt;=','')) = 0">
+                <xsl:attribute name="label"><xsl:value-of select="@token" /></xsl:attribute>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:attribute name="i18n">editor.search.<xsl:value-of select="@token" /></xsl:attribute>
+              </xsl:otherwise>
+            </xsl:choose>
+          </item>
+        </xsl:for-each>
+      </list>
+    </xsl:for-each>
+  </xsl:if>
+
   <xsl:value-of select="$newline" />
   <xsl:value-of select="$newline" />
 </xsl:template>
@@ -242,6 +450,26 @@
   <cell row="96" col="2" anchor="NORTHWEST" var="hosts/host">
     <list type="checkbox" cols="2">
       <include uri="request:hosts.xml" />
+    </list>
+  </cell>
+
+  <xsl:value-of select="$newline" />
+</xsl:template>
+
+<!-- ==================================================== -->
+<!--      Choose AND or OR for combining conditions       -->
+<!-- ==================================================== -->
+
+<xsl:template name="choose.and.or">
+  <xsl:value-of select="$newline" />
+
+  <cell row="93" col="1" anchor="EAST">
+    <text i18n="editor.search.connect" />
+  </cell>
+  <cell row="93" col="2" anchor="WEST" var="conditions/boolean/@operator">
+    <list type="dropdown" default="and">
+      <item value="and" i18n="editor.search.and" />
+      <item value="or" i18n="editor.search.or" />
     </list>
   </cell>
 
@@ -360,18 +588,6 @@
   </xsl:if>
 </xsl:template>  
  
-<xsl:template match="mcr:field">
-  <xsl:choose>
-    <xsl:when test="$skiplen = 0">
-      <xsl:call-template name="build.search" />
-    </xsl:when>
-    <xsl:when test="contains(concat(' ',$skip.fields,' '),concat(' ',@name,' '))" />
-    <xsl:otherwise>
-      <xsl:call-template name="build.search" />
-    </xsl:otherwise>
-  </xsl:choose>
-</xsl:template>  
-
 <xsl:template name="build.search">
   <xsl:param name="pos" select="position()" />
 
@@ -387,11 +603,11 @@
   <xsl:value-of select="$newline" />
   <hidden var="conditions/boolean/condition{$pos}/@operator" default="{$fieldtypes/mcr:type[@name=current()/@type]/@default}" />
   <xsl:value-of select="$newline" />
-  <cell row="{position()}" col="1" anchor="EAST">
+  <cell row="{$pos}" col="1" anchor="EAST">
     <text i18n="{@i18n}" />
   </cell>
   <xsl:value-of select="$newline" />
-  <cell row="{position()}" col="2" anchor="WEST" var="conditions/boolean/condition{$pos}/@value">
+  <cell row="{$pos}" col="2" anchor="WEST" var="conditions/boolean/condition{$pos}/@value">
     <xsl:choose>
       <xsl:when test="@classification and @source='objectCategory'">
         <list type="dropdown">
