@@ -376,18 +376,8 @@ public final class MCRMetaISO8601Date extends MCRMetaDefault implements MCRMetaI
      * @see java.lang.Object#clone()
      */
     public Object clone() {
-        MCRMetaISO8601Date out = null;
-
-        try {
-            out = (MCRMetaISO8601Date) super.clone();
-        } catch (CloneNotSupportedException e) {
-            LOGGER.warn(new StringBuffer(MCRMetaISO8601Date.class.getName()).append(" could not be cloned."), e);
-
-            return null;
-        }
-
-        out.changed = true;
-
+        MCRMetaISO8601Date out = new MCRMetaISO8601Date();
+        out.setFromDOM((Element)createXML().clone());
         return out;
     }
 
