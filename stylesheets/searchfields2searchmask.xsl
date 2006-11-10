@@ -278,7 +278,7 @@
         </xsl:when>
         <xsl:otherwise>
           <panel lines="off">
-            <cell row="1" col="1" anchor="WEST" var="conditions/boolean/condition{$pos}/@operator" ref="operator.{$type}" />
+            <cell row="1" col="1" anchor="WEST" var="conditions/boolean/condition{$pos}/@operator" ref="operators.{$type}" />
             <cell row="1" col="2" anchor="WEST" var="conditions/boolean/condition{$pos}/@value" ref="input.{$type}" />
           </panel>
         </xsl:otherwise>
@@ -378,7 +378,7 @@
 
   <xsl:if test="$layout='advanced'">
     <xsl:for-each select="$fieldtypes/mcr:type">
-      <list type="checkbox" rows="1" default="{@default}" id="operators.{@name}">
+      <list type="dropdown" rows="1" default="{@default}" id="operators.{@name}">
         <xsl:for-each select="mcr:operator">
           <item value="{@token}">
             <xsl:choose>
