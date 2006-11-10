@@ -147,9 +147,11 @@
           <xsl:call-template name="build.from.list">
             <xsl:with-param name="fields" select="$list.of.fields" /> 
           </xsl:call-template>
+          <xsl:call-template name="spacer" />
         </xsl:if>
         <xsl:if test="$layout = 'advanced'">
           <xsl:call-template name="build.advanced" />
+          <xsl:call-template name="spacer" />
           <xsl:call-template name="choose.and.or" />
         </xsl:if>
         
@@ -503,6 +505,16 @@
         <text i18n="editor.search.perpage" />
       </cell>
     </panel>
+  </cell>
+</xsl:template>
+
+<!-- ==================================================== -->
+<!--                  Some vertical space                 -->
+<!-- ==================================================== -->
+
+<xsl:template name="spacer">
+  <cell row="92" col="1" colspan="2" anchor="WEST" height="20px">
+    <text><label> </label></text>
   </cell>
 </xsl:template>
 
