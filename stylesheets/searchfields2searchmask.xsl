@@ -54,7 +54,9 @@
 <!-- If true, include a panel to select hosts to query -->
 <xsl:param name="include.hostsSelectionPanel" select="'true'" />
 
-<!-- Layout -->
+<!-- Layout of search mask: simple or advanced -->
+<!-- simple: one line per field, default operator, combine conditions with and -->
+<!-- advanced: choose fields and operators from drop-down list, choose and/or -->
 <xsl:param name="layout" select="'simple'" />
 
 <!-- ==================================================== -->
