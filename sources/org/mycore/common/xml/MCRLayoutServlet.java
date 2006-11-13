@@ -67,7 +67,7 @@ import org.mycore.frontend.servlets.MCRServletJob;
  * Does the layout for other MyCoRe servlets by transforming XML input to
  * various output formats, using XSL stylesheets.
  * 
- * @author Frank Lützenkirchen
+ * @author Frank Lï¿½tzenkirchen
  * @author Thomas Scheffler (yagee)
  * 
  * @version $Revision$ $Date$
@@ -257,31 +257,40 @@ public class MCRLayoutServlet extends MCRServlet {
 
         // PROPERTIES: Read all properties from system configuration
         Properties parameters = (Properties) (MCRConfiguration.instance().getProperties().clone());
-
-        // SESSION: Read all *.xsl attributes that are stored in the browser
-        // session
-        HttpSession session = request.getSession(false);
-        if (session != null) {
+        
+        // SESSION: Read all *.xsl attributes that are stored in the browser session
+        if (request.getSession(false) != null) {
+        	HttpSession session = request.getSession(false);
             for (Enumeration e = session.getAttributeNames(); e.hasMoreElements();) {
                 String name = (String) (e.nextElement());
                 if (name.startsWith("XSL."))
                     parameters.put(name.substring(4), session.getAttribute(name));
             }
+        }        
+        MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
+        Iterator sessObjKeys = mcrSession.getObjectsKeyList();
+        if (mcrSession != null) {
+        	while (sessObjKeys.hasNext()) {
+        		String name = (String) sessObjKeys.next();
+        		if (name.startsWith("XSL."))
+                    parameters.put(name.substring(4), mcrSession.get(name)); 
+        	}
         }
 
         // HTTP-REQUEST-PARAMETER: Read all *.xsl attributes from the client
         // HTTP request parameters
         for (Enumeration e = request.getParameterNames(); e.hasMoreElements();) {
             String name = (String) (e.nextElement());
-
             if (name.startsWith("XSL.")) {
                 if (!name.endsWith(".SESSION")) {
                     parameters.put(name.substring(4), request.getParameter(name));
                 } // store parameter in session if ends with *.SESSION
                 else {
                     parameters.put(name.substring(4, name.length() - 8), request.getParameter(name));
-                    session.setAttribute(name.substring(0, name.length() - 8), request.getParameter(name));
-                    LOGGER.debug("MCRLayoutServlet: found HTTP-Req.-Parameter " + name + "=" + request.getParameter(name) + " that should be saved in session, safed " + name.substring(0, name.length() - 8) + "=" + request.getParameter(name));
+                    if (mcrSession != null) {
+                    	mcrSession.put(name.substring(0, name.length() - 8), request.getParameter(name));
+                        LOGGER.debug("MCRLayoutServlet: found HTTP-Req.-Parameter " + name + "=" + request.getParameter(name) + " that should be saved in session, safed " + name.substring(0, name.length() - 8) + "=" + request.getParameter(name));
+                    }
                 }
             }
         }
@@ -298,8 +307,10 @@ public class MCRLayoutServlet extends MCRServlet {
                 } // store parameter in session if ends with *.SESSION
                 else {
                     parameters.put(name.substring(4, name.length() - 8), request.getAttribute(name));
-                    session.setAttribute(name.substring(0, name.length() - 8), request.getAttribute(name));
-                    LOGGER.debug("MCRLayoutServlet: found Req.-Attribut " + name + "=" + request.getAttribute(name) + " that should be saved in session, safed " + name.substring(0, name.length() - 8) + "=" + request.getAttribute(name));
+                    if (mcrSession!=null) {
+                    	mcrSession.put(name.substring(0, name.length() - 8), request.getAttribute(name));
+                        LOGGER.debug("MCRLayoutServlet: found Req.-Attribut " + name + "=" + request.getAttribute(name) + " that should be saved in session, safed " + name.substring(0, name.length() - 8) + "=" + request.getAttribute(name));	
+                    }
                 }
             }
 
@@ -317,6 +328,7 @@ public class MCRLayoutServlet extends MCRServlet {
         }
 
         // handle HttpSession
+        HttpSession session = request.getSession(false);
         String jSessionID = CONFIG.getString("MCR.session.param", ";jsessionid=");
 
         if ((session != null) && !request.isRequestedSessionIdFromCookie()) {
@@ -325,9 +337,7 @@ public class MCRLayoutServlet extends MCRServlet {
 
         if (session != null) {
             parameters.put("JSessionID", jSessionID + session.getId());
-
-            MCRSession mcrSession = (MCRSession) (session.getAttribute("mycore.session"));
-
+            //MCRSession mcrSession2 = (MCRSession) (session.getAttribute("mycore.session"));
             if (mcrSession != null) {
                 user = mcrSession.getCurrentUserID();
                 lang = mcrSession.getCurrentLanguage();
