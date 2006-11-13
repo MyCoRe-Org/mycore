@@ -161,7 +161,10 @@ public class MCRStartEditorServlet extends MCRServlet {
         // get the MCRSession object for the current thread from the session
         // manager.
         MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
-
+        
+        //Store Request-Params="*.SESSION" in MCRSession
+        putParamsToSession(job.getRequest());
+        
         // get the current language
         String mylang = mcrSession.getCurrentLanguage();
         LOGGER.info("LANG = " + mylang);
