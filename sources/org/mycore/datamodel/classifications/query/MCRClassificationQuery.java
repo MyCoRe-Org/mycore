@@ -162,7 +162,7 @@ public class MCRClassificationQuery {
      * @param levels
      * @return
      */
-    private static Classification getClassification(Document cl, int levels, boolean withCounter) {
+    static Classification getClassification(Document cl, int levels, boolean withCounter) {
         Classification returns = ClassificationFactory.getClassification(cl.getRootElement());
         returns.setCounterEnabled(withCounter);
         fillCategory(returns.getId(), returns, cl.getRootElement().getChild("categories"), levels, withCounter);

@@ -68,6 +68,23 @@ public class ClassificationTransformer {
     }
 
     /**
+     * transforms a MCR Classification into a <code>Classification</code>.
+     * 
+     * @param cl
+     *            MCR Classification as a JDOM Document
+     * @return
+     *            null if <code>cl</code> is not valid
+     */
+    public static Classification getClassification(Document cl) {
+        Element categories = cl.getRootElement().getChild("categories");
+        if (categories == null) {
+            return null;
+        }
+        boolean withCounter = (categories.getChild("category").getAttribute("counter") != null);
+        return MCRClassificationQuery.getClassification(cl, -1, withCounter);
+    }
+
+    /**
      * transforms a <code>Classification</code> into a MCR Editor definition (<code>&lt;items&gt;</code>).
      * 
      * This method allows you to specify how the labels will look like.
