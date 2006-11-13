@@ -549,6 +549,7 @@ public class MCRObjectService {
      * 
      * @param value
      *            the value of a flag as string
+     * @return the index number or -1 if the value was not found
      */
     public final int getFlagIndex(String value) {
         if ((value == null) || ((value = value.trim()).length() == 0)) {
