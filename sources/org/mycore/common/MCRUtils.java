@@ -59,10 +59,14 @@ import org.xml.sax.helpers.DefaultHandler;
  * programming API.
  * 
  * @author Jens Kupferschmidt
- * @author Frank Lützenkirchen
+ * @author Frank Lï¿½tzenkirchen
  * @author Thomas Scheffler (yagee)
  * 
  * @version $Revision$ $Date$
+ */
+/**
+ * @author dptadmin
+ * 
  */
 public class MCRUtils {
     // The file slash
@@ -797,9 +801,32 @@ public class MCRUtils {
         return sb.toString();
     }
 
-    public static final void saveJDOM(Document jdom, File xml) throws IOException {
+    /**
+     * The method write a given JDOM Document to a file.
+     * 
+     * @param jdom
+     *            the JDOM Document
+     * @param xml
+     *            the File instance
+     * @throws IOException
+     */
+    public static final void writeJDOMToFile(Document jdom, File xml) throws IOException {
         XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat());
         BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(xml));
+        xout.output(jdom, out);
+        out.close();
+    }
+    
+    /**
+     * The method write a given JDOM Document to the system output.
+     * 
+     * @param jdom
+     *            the JDOM Document
+     * @throws IOException
+     */
+    public static final void writeJDOMToSysout(Document jdom) throws IOException {
+        XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat());
+        BufferedOutputStream out = new BufferedOutputStream(System.out);
         xout.output(jdom, out);
         out.close();
     }
@@ -915,51 +942,47 @@ public class MCRUtils {
 
         return buf.toString();
     }
-    
+
     public static String parseDocumentType(InputStream in) {
-      SAXParser parser = null;
+        SAXParser parser = null;
 
-      try {
-          parser = SAXParserFactory.newInstance().newSAXParser();
-      } catch (Exception ex) {
-          String msg = "Could not build a SAX Parser for processing XML input";
-          throw new MCRConfigurationException(msg, ex);
-      }
+        try {
+            parser = SAXParserFactory.newInstance().newSAXParser();
+        } catch (Exception ex) {
+            String msg = "Could not build a SAX Parser for processing XML input";
+            throw new MCRConfigurationException(msg, ex);
+        }
 
-      final Properties detected = new Properties();
-      final String forcedInterrupt = "mcr.forced.interrupt";
+        final Properties detected = new Properties();
+        final String forcedInterrupt = "mcr.forced.interrupt";
 
-      DefaultHandler handler = new DefaultHandler() {
-          public void startElement(String uri, String localName, String qName, Attributes attributes) {
-              LOGGER.debug("MCRLayoutServlet detected root element = " + qName);
-              detected.setProperty("docType", qName);
-              throw new MCRException(forcedInterrupt);
-          }
+        DefaultHandler handler = new DefaultHandler() {
+            public void startElement(String uri, String localName, String qName, Attributes attributes) {
+                LOGGER.debug("MCRLayoutServlet detected root element = " + qName);
+                detected.setProperty("docType", qName);
+                throw new MCRException(forcedInterrupt);
+            }
 
-          // We would need SAX 2.0 to be able to do this, for later use:
-          public void startDTD(String name, String publicId, String systemId) {
-              if (LOGGER.isDebugEnabled()){
-              LOGGER.debug(new StringBuffer(1024)
-                      .append("MCRUtils detected DOCTYPE declaration = ").append(name)
-                      .append(" publicId = ").append(publicId)
-                      .append(" systemId = ").append(systemId).toString());
-              }
-              detected.setProperty("docType", name);
-              throw new MCRException(forcedInterrupt);
-          }
-      };
+            // We would need SAX 2.0 to be able to do this, for later use:
+            public void startDTD(String name, String publicId, String systemId) {
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug(new StringBuffer(1024).append("MCRUtils detected DOCTYPE declaration = ").append(name).append(" publicId = ").append(publicId).append(" systemId = ").append(systemId).toString());
+                }
+                detected.setProperty("docType", name);
+                throw new MCRException(forcedInterrupt);
+            }
+        };
 
-      try {
-          parser.parse(new InputSource(in), handler);
-      } catch (Exception ex) {
-          if (!forcedInterrupt.equals(ex.getMessage())) {
-              String msg = "Error while detecting XML document type from input source";
-              throw new MCRException(msg, ex);
-          }
-      }
+        try {
+            parser.parse(new InputSource(in), handler);
+        } catch (Exception ex) {
+            if (!forcedInterrupt.equals(ex.getMessage())) {
+                String msg = "Error while detecting XML document type from input source";
+                throw new MCRException(msg, ex);
+            }
+        }
 
-      return detected.getProperty("docType");
-  }
+        return detected.getProperty("docType");
+    }
 
-    
 }
