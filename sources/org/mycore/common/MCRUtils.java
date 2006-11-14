@@ -828,7 +828,7 @@ public class MCRUtils {
         XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat());
         BufferedOutputStream out = new BufferedOutputStream(System.out);
         xout.output(jdom, out);
-        out.close();
+        out.flush();
     }
 
     /**
