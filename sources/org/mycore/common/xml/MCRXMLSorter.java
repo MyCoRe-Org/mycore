@@ -386,8 +386,8 @@ public class MCRXMLSorter implements MCRXMLSortInterface {
         if (LOGGER.isDebugEnabled()) {
             File tmpdir = new File(System.getProperty("java.io.tmpdir"));
             LOGGER.debug("Saving XML files for debugging in: " + tmpdir.getAbsolutePath());
-            MCRUtils.saveJDOM(sourceDoc, new File(tmpdir, "unsorted.xml"));
-            MCRUtils.saveJDOM(result, new File(tmpdir, "sorted.xml"));
+            MCRUtils.writeJDOMToFile(sourceDoc, new File(tmpdir, "unsorted.xml"));
+            MCRUtils.writeJDOMToFile(result, new File(tmpdir, "sorted.xml"));
         }
 
         return result;
