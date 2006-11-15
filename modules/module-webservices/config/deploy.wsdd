@@ -1,6 +1,105 @@
-<deployment name="miless" xmlns="http://xml.apache.org/axis/wsdd/" 
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- ==============================================        -->
+<!--   Deployment of MyCoRe-WebServices                    -->
+<!--   derived from axis 1.4 server-config                 -->
+<!--   SimpleAuthenticationHandler added for adminservice  -->
+<!-- $Revision$ $Date$        -->
+<!-- ==============================================        -->
+
+<deployment name="defaultClientConfig"
+            xmlns="http://xml.apache.org/axis/wsdd/"
             xmlns:java="http://xml.apache.org/axis/wsdd/providers/java"
-            xmlns:xsi="http://www.w3.org/2000/10/XMLSchema-instance">
+            xmlns:handler="http://xml.apache.org/axis/wsdd/providers/handler">
+
+ <globalConfiguration>
+   <parameter name="disablePrettyXML" value="true"/>
+   <parameter name="dotNetSoapEncFix" value="true"/>
+   <parameter name="enableNamespacePrefixOptimization" value="false"/>
+   <requestFlow>
+     <!--
+     <handler type="java:org.apache.axis.handlers.JWSHandler">
+        <parameter name="scope" value="session"/>
+     </handler>
+     <handler type="java:org.apache.axis.handlers.JWSHandler">
+        <parameter name="scope" value="request"/>
+        <parameter name="extension" value=".jwr"/>
+     </handler>
+     -->
+     <!-- uncomment this if you want the SOAP monitor -->
+     <!--
+     <handler type="java:org.apache.axis.handlers.SOAPMonitorHandler"/>
+     -->
+   </requestFlow>
+   <!-- uncomment this if you want the SOAP monitor -->
+   <!--
+   <responseFlow>
+     <handler type="java:org.apache.axis.handlers.SOAPMonitorHandler"/>
+   </responseFlow>
+   -->
+
+    <!-- uncomment this if you want incoming messages for all services logged -->
+    <!--
+    <requestFlow>
+      <handler type="log"/>
+    </requestFlow>
+    -->
+ 
+    <!-- uncomment this if you want outgoing messages for all services logged -->
+    <!--
+    <responseFlow>
+      <handler type="log"/>
+    </responseFlow>
+    -->
+ </globalConfiguration>
+
+ <!-- define log-handler and file where log is stored -->
+ <handler name="log" type="java:org.apache.axis.handlers.LogHandler">
+   <parameter name="LogHandler.fileName" value="d:/MyService.log"/>
+ </handler>
+
+ <handler type="java:org.apache.axis.handlers.http.URLMapper" name="URLMapper"/>
+ <handler type="java:org.apache.axis.transport.local.LocalResponder" name="LocalResponder"/>
+
+ <!-- check permission, user and password are read from WEB-INF/users.lst -->
+ <handler type="java:org.apache.axis.handlers.SimpleAuthenticationHandler" name="Authenticate"/>
+
+ <service name="AdminService" provider="java:MSG">
+   <!-- check permission for AdminServices --> 
+   <requestFlow>
+     <handler type="Authenticate"/> 
+   </requestFlow>
+  <namespace>http://xml.apache.org/axis/wsdd/</namespace>
+  <parameter name="allowedMethods" value="AdminService"/>
+  <!-- if tomcat or jetty are behind apache, remote administration is still available?! -->
+  <parameter name="enableRemoteAdmin" value="false"/>
+  <parameter name="className" value="org.apache.axis.utils.Admin"/>
+ </service>
+
+ <service name="Version" provider="java:RPC">
+  <parameter name="allowedMethods" value="getVersion"/>
+  <parameter name="className" value="org.apache.axis.Version"/>
+ </service>
+
+ <transport name="http">
+  <parameter name="qs:list" 
+               value="org.apache.axis.transport.http.QSListHandler"/>
+  <parameter name="qs:method" 
+               value="org.apache.axis.transport.http.QSMethodHandler"/>
+  <parameter name="qs:wsdl" 
+               value="org.apache.axis.transport.http.QSWSDLHandler"/>
+  <requestFlow>
+   <handler type="URLMapper"/>
+   <handler type="java:org.apache.axis.handlers.http.HTTPAuthHandler"/>
+  </requestFlow>
+ </transport>
+
+ <transport name="local">
+  <responseFlow>
+   <handler type="LocalResponder"/>
+  </responseFlow>
+ </transport>
+
   <service name="MCRWebService" provider="java:RPC">
     <requestFlow>
 <!-- used in combination with wss4j to send userid and password    
@@ -51,4 +150,5 @@
     </operation>
 
   </service>
+
 </deployment>
