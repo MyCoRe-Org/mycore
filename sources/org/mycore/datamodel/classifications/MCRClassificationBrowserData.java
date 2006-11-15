@@ -23,17 +23,19 @@
 
 package org.mycore.datamodel.classifications;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.TreeSet;
+
+import org.apache.log4j.Logger;
+import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.xpath.XPath;
 import org.mycore.access.MCRAccessInterface;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRConfiguration;
-import org.mycore.common.MCRDefaults;
-
-import java.util.*;
-
-import org.apache.log4j.Logger;
-import org.jdom.*;
-import org.jdom.xpath.XPath;
 
 /**
  * Instances of MCRClassificationBrowser contain the data of the currently
@@ -94,14 +96,11 @@ public class MCRClassificationBrowserData {
 
   int totalNumOfDocs = 0;
   
-  private String actlang;
   
 
-  public MCRClassificationBrowserData(String u, String mode, String actclid, String actEditorCategid, String lang) throws Exception {
+  public MCRClassificationBrowserData(String u, String mode, String actclid, String actEditorCategid ) throws Exception {
     uri = u;
     config = MCRConfiguration.instance();
-    actlang = lang;
-    
     LOGGER.info(" incomming Path " + uri);
 
     String[] uriParts = uri.split("/"); // mySplit();
