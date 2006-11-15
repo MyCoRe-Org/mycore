@@ -482,12 +482,29 @@ public abstract class MCRClassificationObject {
 
         return children;
     }
-
+    
+    public List getChildrenFromJDomAsList(){
+  	   ensureNotDeleted();
+       String categID = ( this instanceof MCRCategoryItem ? ID : null );
+ 	   Element EFound;	   
+ 	   if (categID != null){
+ 	      String cachingID = getClassificationID() + "@@" + categID;	      
+ 		  EFound =  (Element) (	manager().jDomCache.get(cachingID));
+          if (EFound == null) {
+ 			 EFound = findCategInJDom(categID, receiveClassificationAsJDOM().getRootElement().getChild("categories"));
+            	 manager().jDomCache.put(cachingID, EFound);
+          }		
+ 	   } else {
+ 		  EFound = receiveClassificationAsJDOM().getRootElement().getChild("categories");
+ 	   }
+ 	   return EFound.getChildren("category");    	
+    }
+    
     public MCRCategoryItem[] getChildrenFromJDom(){
  	   ensureNotDeleted();
-        MCRCategoryItem[] children;
-        String categID = ( this instanceof MCRCategoryItem ? ID : null );
-        Document cljdom = receiveClassificationAsJDOM();
+       MCRCategoryItem[] children;
+       String categID = ( this instanceof MCRCategoryItem ? ID : null );
+       Document cljdom = receiveClassificationAsJDOM();
  	   Element EFound;	   
  	   if (categID != null){
  	      String cachingID = getClassificationID() + "@@" + categID;	      
