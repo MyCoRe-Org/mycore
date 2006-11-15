@@ -280,30 +280,6 @@ public class MCRObjectStructure {
     }
 
     /**
-     * <em>searchForDerivate</em> returns the index of the derivate array if
-     * the comparsion of the MCRMetaLinkID input with an item of the derivate
-     * array is true.
-     * 
-     * @param input
-     *            the MCRMetaLinkID input
-     * @return the index of the derivate in the array or -1 if the link was not
-     *         found.
-     */
-    public final int searchForDerivate(MCRMetaLinkID input) {
-        int r = -1;
-
-        for (int i = 0; i < derivates.size(); i++) {
-            if (((MCRMetaLinkID) derivates.get(i)).compare(input)) {
-                r = i;
-
-                break;
-            }
-        }
-
-        return r;
-    }
-
-    /**
      * <em>removeDerivate</em> the derivate link from the derivate vector for
      * the given number.
      * 
