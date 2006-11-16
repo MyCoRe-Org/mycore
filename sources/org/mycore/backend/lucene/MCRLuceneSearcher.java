@@ -262,26 +262,49 @@ public class MCRLuceneSearcher extends MCRSearcher {
 
             String id = doc.get("returnid");
             MCRHit hit = new MCRHit(id);
-
-            for (int j = 0; j < sortBy.size(); j++) {
-                MCRSortBy sb = (MCRSortBy) sortBy.get(j);
-                MCRFieldDef fds = sb.getField();
-                if (null != fds) {
-                    String field = fds.getName();
-                    String value = doc.get(field);
-                    if (null != value) {
-                        MCRFieldDef fd = MCRFieldDef.getDef(field);
-                        MCRFieldValue fv = new MCRFieldValue(fd, value);
-                        hit.addSortData(fv);
-                    }
-                }
-            }
+            String score = Float.toString(hits.scoreDocs[i].score);
+            addSortDataToHit(sortBy, doc, hit, score);
             result.addHit(hit);
         }
 
         searcher.close();
 
         return result;
+    }
+
+    /**
+     * @param sortBy
+     * @param doc
+     *          lucene document to get sortdata from 
+     * @param hit
+     *          sortdata are added 
+     * @param score
+     *          of hit 
+     */
+    private void addSortDataToHit(List sortBy, org.apache.lucene.document.Document doc, MCRHit hit, String score)
+    {
+      for (int j = 0; j < sortBy.size(); j++) {
+          MCRSortBy sb = (MCRSortBy) sortBy.get(j);
+          MCRFieldDef fds = sb.getField();
+          if (null != fds) {
+              String field = fds.getName();
+              String values[] = doc.getValues(field);
+              if (null != values) {
+                  for (int i=0; i < values.length; i++)
+                  {
+                    MCRFieldDef fd = MCRFieldDef.getDef(field);
+                    MCRFieldValue fv = new MCRFieldValue(fd, values[i]);
+                    hit.addSortData(fv);
+                  }
+              }
+              else if ("score".equals(field) && null != score)
+              {
+                MCRFieldDef fd = MCRFieldDef.getDef(field);
+                MCRFieldValue fv = new MCRFieldValue(fd, score);
+                hit.addSortData(fv);
+              }
+          }
+      }
     }
 
     protected void addToIndex(String entryID, String returnID, List fields) {
@@ -404,14 +427,7 @@ public class MCRLuceneSearcher extends MCRSearcher {
                 Hits hitl = searcher.search(qu);
                 if (hitl.length() > 0) {
                     org.apache.lucene.document.Document doc = hitl.doc(0);
-                    for (int j = 0; j < sortBy.size(); j++) {
-                        MCRFieldDef fd = (MCRFieldDef) sortBy.get(j);
-                        String value = doc.get(fd.getName());
-                        if (null != value) {
-                            MCRFieldValue fv = new MCRFieldValue(fd, value);
-                            hit.addSortData(fv);
-                        }
-                    }
+                    addSortDataToHit(sortBy, doc, hit, null);
                 }
             }
 
