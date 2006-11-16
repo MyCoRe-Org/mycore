@@ -34,7 +34,6 @@ import org.jdom.Element;
 import org.jdom.xpath.XPath;
 import org.mycore.access.MCRAccessInterface;
 import org.mycore.access.MCRAccessManager;
-import org.mycore.common.MCRCache;
 import org.mycore.common.MCRConfiguration;
 
 /**
@@ -60,8 +59,6 @@ public class MCRClassificationBrowserData {
   private static Logger LOGGER = Logger.getLogger(MCRClassificationBrowserData.class);
 
   private static MCRAccessInterface AI = MCRAccessManager.getAccessImpl();
-
-  private static MCRCache linesCache = new MCRCache(100);
 
   //private Vector lines;
   private ArrayList lines;
@@ -213,92 +210,9 @@ public class MCRClassificationBrowserData {
     LOGGER.debug(" Sort: " + sort);
   }
 
-  private final void setClassification(String classifID) throws Exception {
-	lines = (ArrayList) (linesCache.get(uri));
-	classif = MCRClassificationItem.getClassificationItem(classifID);
 
-    if (lines != null) {
-      LOGGER.debug("use the lines Arraylist with the resuls from Cache");
-    } else {
-      lines = new ArrayList();      
-      totalNumOfDocs = 0;
-      putCategoriesintoLines(-1, classif.getChildrenFromJDomAsList(), 1);
-      
-    }
-    LOGGER.debug("Arraylist of CategItems initialized - Size " +  lines.size());
-  }
-
-  /**
-   * Remove a classification from cache.
-   * 
-   * @param classifID
-   *          the classification ID
-   */
-  public final void cleanClassificationFromCache(String classifID) {
-    linesCache.remove(classifID);
-  }
-
-  private void clearPath(String[] uriParts) throws Exception {
-    String[] cati = new String[uriParts.length];
-    String path = "/" + uriParts[1];
-    int len = 0;
-    // pfad bereinigen
-    for (int k = 2; k < uriParts.length; k++) {
-      LOGGER.debug(" uriParts[k]=" + uriParts[k] + " k=" + k);
-      if (uriParts[k].length() > 0) {
-        if (uriParts[k].equalsIgnoreCase("..") && len > 0) {
-          len--;
-        } else {
-          cati[len] = uriParts[k];
-          len++;
-        }
-      }
-    }
-    
-    //remove double entries from path 
-    //(if an entry appears the 2nd time it will not be displayed -> so we can remove it here)
-    TreeSet result = new TreeSet();
-	  for(int i=0;i<len;i++){
-		  Object x = cati[i];
-		  if(result.contains(x)){
-			  result.remove(x);
-		  }
-		  else{
-			  result.add(x);
-		  }
-	  } 
-	  
-	  //reinitialisieren
-	  categFields=new String[result.size()];
-	  int j=0;
-	  Iterator it = result.iterator();
-	  while(it.hasNext()){
-		  String s = (String)it.next();
-	  	  categFields[j]=s;
-	  	  j++;
-	  	  path +="/"+s;
-	  }   
-	  
-	  this.uri = path;
-  }
-
-  private void setActualPath(String actEditorCategid) throws Exception {
-    actItemID = lastItemID = "";
-    for (int k = 0; k < categFields.length; k++) {
-      update(categFields[k]);
-      lastItemID = actItemID;
-      actItemID = categFields[k];
-    }
-    if (actEditorCategid != null) {
-      actItemID = lastItemID = actEditorCategid;
-    }
-    LOGGER.debug(" lastItemID " + lastItemID);
-    LOGGER.debug(" actItemID " + actItemID);
-    LOGGER.debug(" setActualPath OK");
-  }
-
-   public String getUri() {
-    return uri;
+  public String getUri() {
+	    return uri;
   }
 
   /**
@@ -327,13 +241,82 @@ public class MCRClassificationBrowserData {
     return classif;
   }
 
-  /*
-  public MCRNavigTreeLine getLine(int i) {
-    if (i >= lines.size()) {
-      return null;
+  public org.jdom.Document loadTreeIntoSite(org.jdom.Document cover, org.jdom.Document browser) {
+	    Element placeholder = cover.getRootElement().getChild("classificationBrowser");
+	    LOGGER.info(" Found Entry at " + placeholder);
+	    if (placeholder != null) {
+	      List children = browser.getRootElement().getChildren();
+	      for (int j = 0; j < children.size(); j++) {
+	        Element child = (Element) ((Element) (children.get(j))).clone();
+	        placeholder.addContent(child);
+	      }
+	    }
+	    LOGGER.debug(cover);
+	    return cover;
+  }
+
+  
+  
+  private final void setClassification(String classifID) throws Exception {
+	classif = MCRClassificationItem.getClassificationItem(classifID);
+    lines = new ArrayList();      
+    totalNumOfDocs = 0;
+    putCategoriesintoLines(-1, classif.getChildrenFromJDomAsList(), 1);
+    LOGGER.debug("Arraylist of CategItems initialized - Size " +  lines.size());
+  }
+
+  private void clearPath(String[] uriParts) throws Exception {
+    String[] cati = new String[uriParts.length];
+    String path = "/" + uriParts[1];
+    int len = 0;
+    // pfad bereinigen
+    for (int k = 2; k < uriParts.length; k++) {
+      LOGGER.debug(" uriParts[k]=" + uriParts[k] + " k=" + k);
+      if (uriParts[k].length() > 0) {
+        if (uriParts[k].equalsIgnoreCase("..") && len > 0) {
+          len--;
+        } else {
+          cati[len] = uriParts[k];
+          len++;
+        }
+      }
     }
-    return (MCRNavigTreeLine) (lines.get(i));
-  }*/
+    
+    //remove double entries from path 
+    //(if an entry appears the 2nd time it will not be displayed -> so we can remove it here)
+    TreeSet result = new TreeSet();
+	for(int i=0;i<len;i++){
+		  Object x = cati[i];
+		  if(result.contains(x)) 
+			  	result.remove(x);
+		  else  result.add(x);		  
+	 } 
+	  
+	 //reinitialisieren
+	 categFields=new String[result.size()];
+	 int j=0;
+	 Iterator it = result.iterator();
+	 while(it.hasNext()){
+		  String s = (String)it.next();
+	  	  categFields[j]=s;
+	  	  j++;
+	  	  path +="/"+s;
+	 }   	  
+	 this.uri = path;
+  }
+
+  
+  private void setActualPath(String actEditorCategid) throws Exception {
+    actItemID = lastItemID = "";
+    for (int k = 0; k < categFields.length; k++) {
+      update(categFields[k]);
+      lastItemID = actItemID;
+      actItemID = categFields[k];
+    }
+    if (actEditorCategid != null) {
+      actItemID = lastItemID = actEditorCategid;
+    }
+  }
 
   private Element setTreeline(Element cat, int level){
 	  cat.setAttribute("level",String.valueOf(level));
@@ -353,35 +336,19 @@ public class MCRClassificationBrowserData {
   }
   
   private void putCategoriesintoLines(int startpos, List children, int level) {
-    //LOGGER.debug("Start Explore Arraylist of CategItems  ");	  
-    int i = startpos;
-	for (int j = 0, k = children.size(); j < k; j++) {
-		Element child = (Element) children.get(j);
-		lines.add( ++i, setTreeline(child, level + 1));              
-        if ( startpos == 0 ) {
-     	   if ( child.getAttributeValue("counter")!= null )
-    		   totalNumOfDocs += Integer.parseInt( child.getAttributeValue("counter"));
-        }
-	}
-    //LOGGER.debug("End Explore - Arraylist of CategItems ");
-	linesCache.put(uri, lines);
-	
+        LOGGER.debug("Start Explore Arraylist of CategItems  ");	  
+	    int i = startpos;
+		for (int j = 0, k = children.size(); j < k; j++) {
+			Element child = (Element) children.get(j);
+			lines.add( ++i, setTreeline(child, level + 1));              
+	        if ( startpos == -1 ) {
+	     	   if ( child.getAttributeValue("counter")!= null )
+	    		   totalNumOfDocs += Integer.parseInt( child.getAttributeValue("counter"));
+	        }
+		}
+	    LOGGER.debug("End Explore - Arraylist of CategItems ");
   }
   
-  public org.jdom.Document loadTreeIntoSite(org.jdom.Document cover, org.jdom.Document browser) {
-
-    Element placeholder = cover.getRootElement().getChild("classificationBrowser");
-    LOGGER.info(" Found Entry at " + placeholder);
-    if (placeholder != null) {
-      List children = browser.getRootElement().getChildren();
-      for (int j = 0; j < children.size(); j++) {
-        Element child = (Element) ((Element) (children.get(j))).clone();
-        placeholder.addContent(child);
-      }
-    }
-    LOGGER.debug(cover);
-    return cover;
-  }
 
   public org.jdom.Document createXmlTreeforAllClassifications() throws Exception {
     MCRClassificationManager clm = new MCRClassificationManager();
@@ -484,11 +451,6 @@ public class MCRClassificationBrowserData {
 
     // Editierbutton Einf�gen - wenn die permission es erlaubt
     Element Editbutton = new Element("userCanEdit");
-
-    // dos'nt exist no mor for classifications??
-    // Editbutton.addContent(
-    // String.valueOf(AI.checkPermission(cl.getClassificationID(),"writedb"))
-    // );
 
     // now we check this right for the current user
     String permString = String.valueOf(AI.checkPermission("create-classification"));
@@ -611,10 +573,8 @@ public class MCRClassificationBrowserData {
     int lastLevel = 0;
     boolean hideLevel = false;
 
-    LOGGER.debug(this.getClass() + " update CategoryTree for: " + categID);
-    
-    Element line;
-    
+    LOGGER.debug(this.getClass() + " update CategoryTree for: " + categID);    
+    Element line;    
     for (int i = 0; i < lines.size(); i++) {
       line = getTreeline(i);
       String catid = line.getAttributeValue("ID");
@@ -628,14 +588,12 @@ public class MCRClassificationBrowserData {
         if (hideLevel) {
           lines.remove(i--);
         } else if (categID.equals( catid)) {
-          if (status.equals("F")) // hide expanded category
-          // children
+          if (status.equals("F")) // hide expanded category -   // children
           {
             line.setAttribute("hasChildren" ,"T");
             hideLevel = true;
             lastLevel = level;
-          } else if (status.equals("T")) // expand category
-          // children
+          } else if (status.equals("T")) // expand category -   // children
           {
             line.setAttribute("hasChildren" ,"F");
             putCategoriesintoLines(i, new MCRCategoryItem(catid, classif.ID,"").getChildrenFromJDomAsList(), level +1);
@@ -656,6 +614,9 @@ public class MCRClassificationBrowserData {
     }
   }  
 
+  
+  // don't use it works not really good 
+  
   private Element sortMyTree(Element xDocument) {
     Element xDoc = (Element) xDocument.clone();
     for (int i = 0; i < maxlevel; i++) {
