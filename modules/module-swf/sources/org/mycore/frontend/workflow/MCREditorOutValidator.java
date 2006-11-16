@@ -247,8 +247,8 @@ public class MCREditorOutValidator {
     }
 
     private boolean checkMetaObjectWithLangNotEmpty(Element datasubtag, Class metaClass) {
-        String text = datasubtag.getTextNormalize();
-        if ((text == null) || ((text = text.trim()).length() == 0)) {
+        String text = datasubtag.getTextTrim();
+        if ((text == null) || (text.length() == 0)) {
             return false;
         }
         return checkMetaObjectWithLang(datasubtag, metaClass);
