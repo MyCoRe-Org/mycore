@@ -420,7 +420,7 @@ public class MCRUtils {
         ByteArrayOutputStream outb = new ByteArrayOutputStream();
 
         try {
-            XMLOutputter outp = new XMLOutputter(Format.getCompactFormat().setEncoding(mcr_encoding));
+            XMLOutputter outp = new XMLOutputter(Format.getRawFormat().setEncoding(mcr_encoding));
             outp.output(jdom, outb);
         } catch (Exception e) {
             throw new MCRPersistenceException("Can't produce byte array.");
