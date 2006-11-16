@@ -134,7 +134,6 @@ public class MCRHit {
      */
     public void addMetaData(MCRFieldValue value) {
         metaData.add(value);
-        sortValues.put(value.getField(), value.getValue());
     }
 
     /**
