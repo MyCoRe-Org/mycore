@@ -553,7 +553,6 @@ public class MCRInputValidator {
             result = m.invoke(null, args);
         } catch (Exception ex) {
             String msg = "Exception while validating input using external method";
-            ex.printStackTrace();
             throw new MCRException(msg, ex);
         }
         return ((Boolean) result).booleanValue();
