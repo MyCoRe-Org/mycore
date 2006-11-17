@@ -313,7 +313,7 @@ public class MCRQueryParser extends MCRBooleanClauseParser {
         try {
             MCRCondition cond = new MCRQueryParser().parse(query);
             return (cond != null);
-        } catch (Exception ex) {
+        } catch (Throwable t) {
             return false;
         }
     }
