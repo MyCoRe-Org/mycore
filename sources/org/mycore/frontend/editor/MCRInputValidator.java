@@ -103,6 +103,10 @@ public class MCRInputValidator {
         }
 
         Document xml = new Document(new Element("input").addContent(input));
+        return validateXSLCondition(xml,condition);
+    }
+
+    private boolean validateXSLCondition(Document xml, String condition) {
         Source xmlsrc = new JDOMSource(xml);
 
         Document xsl = (Document) (xslcondCache.get(condition));
@@ -137,6 +141,11 @@ public class MCRInputValidator {
         }
     }
 
+    public boolean validateXSLCondition(Element input, String condition) {
+        Document xml = new Document( (Element)(input.clone()) );
+        return validateXSLCondition(xml,condition);
+    }
+    
     private Namespace xslns = Namespace.getNamespace("xsl", "http://www.w3.org/1999/XSL/Transform");
 
     /** Prepares a template stylesheet that is used for checking XSL conditions * */
@@ -148,7 +157,7 @@ public class MCRInputValidator {
         output.setAttribute("method", "text");
         stylesheet.addContent(output);
 
-        Element template = new Element("template", xslns).setAttribute("match", "/input");
+        Element template = new Element("template", xslns).setAttribute("match", "/*");
         stylesheet.addContent(template);
 
         Element choose = new Element("choose", xslns);
@@ -450,8 +459,8 @@ public class MCRInputValidator {
                     throw new MCRConfigurationException("Unknown compare operator: " + operator);
                 }
             } else if (type.equals("integer")) {
-                long vA = Long.parseLong(valueA);
-                long vB = Long.parseLong(valueB);
+                long vA = Long.parseLong(valueA.trim());
+                long vB = Long.parseLong(valueB.trim());
 
                 if ("=".equals(operator)) {
                     return (vA == vB);
@@ -471,8 +480,8 @@ public class MCRInputValidator {
             } else if (type.equals("decimal")) {
                 Locale locale = ((format == null) ? Locale.getDefault() : new Locale(format));
                 NumberFormat nf = NumberFormat.getNumberInstance(locale);
-                double vA = nf.parse(valueA).doubleValue();
-                double vB = nf.parse(valueB).doubleValue();
+                double vA = nf.parse(valueA.trim()).doubleValue();
+                double vB = nf.parse(valueB.trim()).doubleValue();
 
                 if ("=".equals(operator)) {
                     return (vA == vB);
@@ -491,8 +500,8 @@ public class MCRInputValidator {
                 }
             } else if (type.equals("datetime")) {
                 DateFormat df = getDateTimeFormat(format);
-                Date vA = df.parse(valueA);
-                Date vB = df.parse(valueB);
+                Date vA = df.parse(valueA.trim());
+                Date vB = df.parse(valueB.trim());
 
                 if ("=".equals(operator)) {
                     return (vA.equals(vB));
@@ -513,6 +522,8 @@ public class MCRInputValidator {
                 throw new MCRConfigurationException("Unknown input data type: " + type);
             }
         } catch (ParseException ex) {
+            return true;
+        } catch (NumberFormatException ex) {
             return true;
         }
     }

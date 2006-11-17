@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
 <!-- ============================================== -->
-<!-- $Revision: 1.49 $ $Date: 2006-09-22 13:01:58 $ -->
+<!-- $Revision: 1.50 $ $Date: 2006-11-17 06:28:06 $ -->
 <!-- ============================================== --> 
 
 <xsl:stylesheet 
@@ -416,13 +416,31 @@
 <!-- ======== handle panel ======== -->
 <xsl:template match="panel">
   <xsl:param name="var"      />
-  <xsl:param name="pos"      />
+  <xsl:param name="pos" select="1" />
   <xsl:param name="num.next" />
 
   <!-- ======== include cells of other panels by include/@ref ======== -->
   <xsl:variable name="cells" select="ancestor::components/panel[@id = current()/include/@ref]/cell|cell" />
 
-  <table border="0" cellpadding="0" cellspacing="0" class="editorPanel">
+  <table border="0" cellpadding="0" cellspacing="0">
+    <xsl:attribute name="class">
+      <xsl:choose>
+        <xsl:when test="/editor/failed/field[@sortnr=$pos]">editorPanelValidationFailed</xsl:when>
+        <xsl:otherwise>editorPanel</xsl:otherwise>
+      </xsl:choose>
+    </xsl:attribute>
+    <xsl:if test="/editor/failed/field[@sortnr=$pos]">
+      <xsl:variable name="message">
+        <xsl:for-each select="//condition[@id=/editor/failed/field[@sortnr=$pos]/@condition]">
+          <xsl:call-template name="output.label" />
+        </xsl:for-each>
+      </xsl:variable>
+      <tr>
+        <td>
+          <img border="0" align="absbottom" src="{$WebApplicationBaseURL}images/validation-error.png" alt="{$message}" title="{$message}" />
+        </td>
+      </tr>
+    </xsl:if>
 
     <!-- ======== iterate rows in panel ======== -->
     <xsl:call-template name="editor.row">
@@ -443,6 +461,7 @@
   <!-- ======== handle panel validation conditions ======== -->
   <xsl:for-each select="ancestor::components/panel[@id = current()/include/@ref]/condition|condition">
     <input type="hidden" name="{$editor.delimiter.internal}cond-{$var}" value="{@id}" />
+    <input type="hidden" name="{$editor.delimiter.internal}sortnr-{$var}" value="{$pos}" />
   </xsl:for-each>
   
 </xsl:template>

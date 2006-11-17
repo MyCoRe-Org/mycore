@@ -34,8 +34,10 @@ import org.apache.log4j.Logger;
 import org.jdom.Attribute;
 import org.jdom.Document;
 import org.jdom.Element;
+import org.jdom.JDOMException;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
+import org.jdom.xpath.XPath;
 
 /**
  * Container class that holds all data and files edited and submitted from an
@@ -282,12 +284,11 @@ public class MCREditorSubmission {
                         String sortNr = parms.getParameter("_sortnr-" + name);
                         failed.put(sortNr, condition);
 
-                        if( LOGGER.isDebugEnabled() )
-                        {
-                          String cond = new XMLOutputter(Format.getCompactFormat()).outputString(condition);
-                          LOGGER.debug("Validation condition failed:");
-                          LOGGER.debug(nname + " = \"" + values[j] + "\"");
-                          LOGGER.debug(cond);
+                        if (LOGGER.isDebugEnabled()) {
+                            String cond = new XMLOutputter(Format.getCompactFormat()).outputString(condition);
+                            LOGGER.debug("Validation condition failed:");
+                            LOGGER.debug(nname + " = \"" + values[j] + "\"");
+                            LOGGER.debug(cond);
                         }
                     }
                 }
@@ -321,16 +322,16 @@ public class MCREditorSubmission {
                     String type = condition.getAttributeValue("type");
                     String oper = condition.getAttributeValue("operator");
                     String format = condition.getAttributeValue("format");
-                    
+
                     String clazz = condition.getAttributeValue("class");
                     String method = condition.getAttributeValue("method");
-                    
+
                     boolean ok = true;
 
-                    if( ( oper != null ) && ( oper.length() > 0 ) )
-                      ok = MCRInputValidator.instance().compare(valueA, valueB, oper, type, format);
-                    if( ( clazz != null ) && ( clazz.length() > 0 ) )
-                      ok = ok && MCRInputValidator.instance().validateExternally( clazz, method, valueA, valueB );
+                    if ((oper != null) && (oper.length() > 0))
+                        ok = MCRInputValidator.instance().compare(valueA, valueB, oper, type, format);
+                    if ((clazz != null) && (clazz.length() > 0))
+                        ok = ok && MCRInputValidator.instance().validateExternally(clazz, method, valueA, valueB);
 
                     if (!ok) {
                         String sortNrA = parms.getParameter("_sortnr-" + pathA);
@@ -339,12 +340,34 @@ public class MCREditorSubmission {
                         String sortNrB = parms.getParameter("_sortnr-" + pathB);
                         failed.put(sortNrB, condition);
 
-                        if( LOGGER.isDebugEnabled() )
-                        {
-                          String cond = new XMLOutputter(Format.getCompactFormat()).outputString(condition);
-                          LOGGER.debug("Validation condition failed:");
-                          LOGGER.debug(pathA + " " + oper + " " + pathB);
-                          LOGGER.debug(cond);
+                        if (LOGGER.isDebugEnabled()) {
+                            String cond = new XMLOutputter(Format.getCompactFormat()).outputString(condition);
+                            LOGGER.debug("Validation condition failed:");
+                            LOGGER.debug(pathA + " " + oper + " " + pathB);
+                            LOGGER.debug(cond);
+                        }
+                    } else {
+                        String xslcond = condition.getAttributeValue("xsl");
+                        if (xslcond == null)
+                            continue;
+                        if (xslcond.length() == 0)
+                            continue;
+                        try {
+                            Element current = (Element) (XPath.selectSingleNode(this.getXML(), path));
+                            if (!MCRInputValidator.instance().validateXSLCondition(current, xslcond)) {
+                                String sortNr = parms.getParameter("_sortnr-" + path);
+                                failed.put(sortNr, condition);
+                                
+                                if (LOGGER.isDebugEnabled()) {
+                                  String cond = new XMLOutputter(Format.getPrettyFormat()).outputString(current);
+                                  LOGGER.debug("Validation condition failed:");
+                                  LOGGER.debug("Context xpath: " + path );
+                                  LOGGER.debug("XSL condition: " + xslcond);
+                                  LOGGER.debug(cond);
+                                }
+                            }
+                        } catch (JDOMException ex) {
+                            LOGGER.debug(ex);
                         }
                     }
                 }
@@ -358,7 +381,7 @@ public class MCREditorSubmission {
         if (required) {
             if (name.endsWith("]") && ((value == null) || (value.trim().length() == 0))) {
                 return true; // repeated field is required but missing, this
-                                // is
+                // is
             }
             // ok
             else if (!MCRInputValidator.instance().validateRequired(value)) {
@@ -374,7 +397,8 @@ public class MCREditorSubmission {
         String format = condition.getAttributeValue("format");
 
         if ((type != null) && !MCRInputValidator.instance().validateMinMaxType(value, type, min, max, format)) {
-            return false; // field type, data format and/or min max value is illegal
+            return false; // field type, data format and/or min max value is
+                            // illegal
         }
 
         String minLength = condition.getAttributeValue("minLength");
@@ -395,11 +419,11 @@ public class MCREditorSubmission {
         if ((xsl != null) && !MCRInputValidator.instance().validateXSLCondition(value, xsl)) {
             return false; // field does not match given xsl condition
         }
-        
+
         String clazz = condition.getAttributeValue("class");
         String method = condition.getAttributeValue("method");
-        
-        if ((clazz != null) && (method != null) && !MCRInputValidator.instance().validateExternally(clazz,method,value)) {
+
+        if ((clazz != null) && (method != null) && !MCRInputValidator.instance().validateExternally(clazz, method, value)) {
             return false; // field does not validate using external method
         }
 
