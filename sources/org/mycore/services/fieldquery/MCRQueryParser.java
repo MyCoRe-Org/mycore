@@ -152,32 +152,80 @@ public class MCRQueryParser extends MCRBooleanClauseParser {
 
     /**
      * Normalizes a parsed query condition. AND/OR conditions that just have one
-     * child will be replaced with that child. Conditions that use the operator
-     * "contains" will be splitted into multiple simpler conditions if the
-     * condition value contains phrases surrounded by '...' or wildcard search
-     * with * or ?.
+     * child will be replaced with that child. NOT(NOT(X)) will be normalized to X.
+     * (A AND (b AND c)) will be normalized to (A AND B AND C), same for nested ORs.
+     * AND/OR/NOT conditions with no child conditions will be removed.
+     * Conditions that use the operator "contains" will be splitted into multiple 
+     * simpler conditions if the condition value contains phrases surrounded 
+     * by '...' or wildcard search with * or ?.
      */
     private MCRCondition normalizeCondition(MCRCondition cond) {
-        if (cond instanceof MCRAndCondition) {
+        if (cond == null) return null;
+        else if (cond instanceof MCRAndCondition) {
             MCRAndCondition ac = (MCRAndCondition) cond;
             List children = ac.getChildren();
-            if (children != null)
-                for (int i = 0; i < children.size(); i++)
-                    children.set(i, normalizeCondition((MCRCondition) (children.get(i))));
-            return (children.size() == 1 ? (MCRCondition) (children.get(0)) : ac);
+            ac = new MCRAndCondition();  
+            for (int i = 0; (children != null) && (i < children.size()); i++)
+            {    
+              MCRCondition child = normalizeCondition((MCRCondition) (children.get(i)));
+              if( child == null ) 
+                continue; // Remove empty child conditions
+              else if ( child instanceof MCRAndCondition )
+              {
+                // Replace (a AND (b AND c)) with (a AND b AND c)  
+                List grandchildren = ((MCRAndCondition)child).getChildren();
+                for (int j = 0; (grandchildren != null) && (j < grandchildren.size()); j++)
+                {
+                  MCRCondition grandchild = (MCRCondition)(grandchildren.get(j));
+                  ac.addChild(grandchild);  
+                }
+              }
+              else ac.addChild( child ); 
+            }
+            children = ac.getChildren();
+            if ((children == null) || (children.size() == 0))
+              return null; // Completely remove empty AND condition
+            else if( children.size() == 1 )
+              return (MCRCondition) (children.get(0)); // Replace AND with just one child
+            else 
+              return ac;  
         } else if (cond instanceof MCROrCondition) {
             MCROrCondition oc = (MCROrCondition) cond;
             List children = oc.getChildren();
-            if (children != null)
-                for (int i = 0; i < children.size(); i++)
-                    children.set(i, normalizeCondition((MCRCondition) (children.get(i))));
-            return (children.size() == 1 ? (MCRCondition) (children.get(0)) : oc);
+            oc = new MCROrCondition();  
+            for (int i = 0; (children != null) && (i < children.size()); i++)
+            {    
+              MCRCondition child = normalizeCondition((MCRCondition) (children.get(i)));
+              if( child == null ) 
+                continue; // Remove empty child conditions
+              else if ( child instanceof MCROrCondition )
+              {
+                // Replace (a OR (b OR c)) with (a OR b OR c)  
+                List grandchildren = ((MCROrCondition)child).getChildren();
+                for (int j = 0; (grandchildren != null) && (j < grandchildren.size()); j++)
+                {
+                  MCRCondition grandchild = (MCRCondition)(grandchildren.get(j));
+                  oc.addChild(grandchild);  
+                }
+              }
+              else oc.addChild( child ); 
+            }
+            children = oc.getChildren();
+            if ((children == null) || (children.size() == 0))
+              return null; // Remove empty OR
+            else if( children.size() == 1 )
+              return (MCRCondition) (children.get(0)); // Replace OR with just one child
+            else 
+              return oc;  
         } else if (cond instanceof MCRNotCondition) {
             MCRNotCondition nc = (MCRNotCondition) cond;
-            if (nc.getChild() != null)
-                return new MCRNotCondition(normalizeCondition(nc.getChild()));
-            else
-                return nc;
+            MCRCondition child = normalizeCondition( nc.getChild() ); 
+            if(child == null )
+              return null; // Remove empty NOT
+            else if( child instanceof MCRNotCondition ) // Replace NOT(NOT(x)) with x
+              return normalizeCondition( ((MCRNotCondition)child).getChild() );
+            else 
+              return new MCRNotCondition(child);
         } else if (cond instanceof MCRQueryCondition) {
             MCRQueryCondition qc = (MCRQueryCondition) cond;
 
@@ -223,6 +271,14 @@ public class MCRQueryParser extends MCRBooleanClauseParser {
                     } else {
                         phrase = value;
                     }
+                } else if (value.startsWith("-'")) // begin of NOT phrase
+                {
+                    if (value.endsWith("'")) // one-word phrase
+                    {
+                        values.add("-" + value.substring(2, value.length() - 1));
+                    } else {
+                        phrase = value;
+                    }
                 } else
                     values.add(value);
             }
@@ -232,6 +288,8 @@ public class MCRQueryParser extends MCRBooleanClauseParser {
                 String value = (String) (values.get(i));
                 if (value.startsWith("'")) // phrase
                     ac.addChild(new MCRQueryCondition(qc.getField(), "phrase", value.substring(1, value.length() - 1)));
+                else if (value.startsWith("-'")) // NOT phrase
+                    ac.addChild( new MCRNotCondition(new MCRQueryCondition(qc.getField(), "phrase", value.substring(2, value.length() - 1))));
                 else if ((value.indexOf("*") >= 0) || (value.indexOf("?") >= 0)) // like
                     ac.addChild(new MCRQueryCondition(qc.getField(), "like", value));
                 else if (value.startsWith("-")) // -word means "NOT word"
