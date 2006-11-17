@@ -283,17 +283,17 @@ public class MCRSearchServlet extends MCRServlet {
         if (root.getChild("conditions").getAttributeValue("format", "xml").equals("xml")) {
             // Query is in XML format
 
-            // Rename condition elements from search mask: condition1 ->
-            // condition
-            List ch = root.getChild("conditions").getChild("boolean").getChildren();
-            for (int i = 0; i < ch.size(); i++) {
-                Element condition = (Element) (ch.get(i));
-                if (condition.getName().startsWith("condition"))
-                    condition.setName("condition");
+            // Rename condition elements from search mask:
+            // condition1 -> condition
+            Iterator it = root.getDescendants(new ElementFilter());
+            while (it.hasNext()) {
+                Element elem = (Element) it.next();
+                if ((!elem.getName().equals("conditions")) && elem.getName().startsWith("condition"))
+                    elem.setName("condition");
             }
 
             // Find condition fields without values
-            Iterator it = root.getDescendants(new ElementFilter("condition"));
+            it = root.getDescendants(new ElementFilter("condition"));
             Vector help = new Vector();
             while (it.hasNext()) {
                 Element condition = (Element) it.next();
