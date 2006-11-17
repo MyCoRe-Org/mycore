@@ -139,9 +139,7 @@
       
         <hidden var="@mask" default="{$filename.webpage}" />
         <hidden var="conditions/@format" default="xml" />
-        <xsl:if test="$layout = 'simple'">
-          <hidden var="conditions/boolean/@operator" default="and" />
-        </xsl:if>
+        <hidden var="conditions/boolean/@operator" default="and" />
 
         <xsl:if test="$layout = 'simple'">
           <xsl:call-template name="build.from.list">
@@ -246,13 +244,13 @@
     </xsl:variable>
     
     <xsl:if test="starts-with($type,'@')">
-      <hidden var="conditions/boolean/condition{$pos}/@operator" default="=" /> 
+      <hidden var="conditions/boolean/boolean/condition{$pos}/@operator" default="=" /> 
     </xsl:if>
     <xsl:if test="not(contains(normalize-space($fields.for.type),' '))">
-      <hidden var="conditions/boolean/condition{$pos}/@field" default="{normalize-space($fields.for.type)}" /> 
+      <hidden var="conditions/boolean/boolean/condition{$pos}/@field" default="{normalize-space($fields.for.type)}" /> 
     </xsl:if>
     
-    <cell row="{$pos}" col="1" colspan="2" anchor="NORTHWEST" var="conditions/boolean/condition{$pos}">
+    <cell row="{$pos}" col="1" colspan="2" anchor="NORTHWEST" var="conditions/boolean/boolean/condition{$pos}">
       <repeater min="1" max="10">
         <panel lines="off">
         
@@ -433,7 +431,7 @@
   <cell row="93" col="1" anchor="EAST">
     <text i18n="editor.search.connect" />
   </cell>
-  <cell row="93" col="2" anchor="WEST" var="conditions/boolean/@operator">
+  <cell row="93" col="2" anchor="WEST" var="conditions/boolean/boolean/@operator">
     <list type="dropdown" default="and">
       <item value="and" i18n="editor.search.and" />
       <item value="or" i18n="editor.search.or" />
