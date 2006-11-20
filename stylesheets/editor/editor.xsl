@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
 <!-- ============================================== -->
-<!-- $Revision: 1.50 $ $Date: 2006-11-17 06:28:06 $ -->
+<!-- $Revision: 1.51 $ $Date: 2006-11-20 07:17:30 $ -->
 <!-- ============================================== --> 
 
 <xsl:stylesheet 
@@ -706,7 +706,34 @@
   <xsl:if test="(string-length($var) &gt; 0) and (string-length(@var) &gt; 0)">
     <xsl:value-of select="$editor.delimiter.element" />
   </xsl:if>
-  <xsl:value-of select="@var" />
+  <xsl:call-template name="subst.cond">
+    <xsl:with-param name="rest" select="@var" />
+  </xsl:call-template>
+</xsl:template>
+
+<!--  title[@type='main'] becomes title__type__main -->
+<xsl:template name="subst.cond">
+  <xsl:param name="rest" />
+  
+  <xsl:variable name="apos">'</xsl:variable>
+  
+  <xsl:choose>
+    <xsl:when test="contains($rest,'[@')">
+      <xsl:value-of select="normalize-space(substring-before($rest,'[@'))" />
+      <xsl:variable name="tmp1" select="substring-after($rest,'[@')" />
+      <xsl:text>__</xsl:text>
+      <xsl:value-of select="normalize-space(substring-before($tmp1,'='))" />
+      <xsl:variable name="tmp2" select="substring-after($tmp1,'=')" />
+      <xsl:text>__</xsl:text>
+      <xsl:value-of select="normalize-space(translate(substring-before($tmp2,']'),$apos,''))" />
+      <xsl:call-template name="subst.cond">
+        <xsl:with-param name="rest" select="substring-after($tmp2,']')" />
+      </xsl:call-template>
+    </xsl:when>
+    <xsl:otherwise>
+      <xsl:value-of select="$rest" />
+    </xsl:otherwise>
+  </xsl:choose>
 </xsl:template>
 
 <!-- ========================================================================= -->
