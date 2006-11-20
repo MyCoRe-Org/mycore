@@ -592,6 +592,37 @@ public class MCRInputValidator {
         return ((Boolean) result).booleanValue();
     }
 
+    /**
+     * Calls a "public static boolean" method in the given class and validates
+     * an XML element
+     * 
+     * @param clazz
+     *            the name of the class that contains the validation method
+     * @param method
+     *            the name of the public static boolean method that should be
+     *            called
+     * @param elem
+     *            the XML element to validate
+     * 
+     * @return true, if the XML element validates
+     */
+    public boolean validateExternally(String clazz, String method, Element elem) {
+        Class[] argTypes = new Class[2];
+        argTypes[0] = String.class;
+        argTypes[1] = String.class;
+        Object[] args = new Object[2];
+        args[0] = elem;
+        Object result = new Boolean(false);
+        try {
+            Method m = Class.forName(clazz).getMethod(method, argTypes);
+            result = m.invoke(null, args);
+        } catch (Exception ex) {
+            String msg = "Exception while validating input using external method";
+            throw new MCRException(msg, ex);
+        }
+        return ((Boolean) result).booleanValue();
+    }
+
     public static void main(String[] args) {
         MCRInputValidator iv = MCRInputValidator.instance();
         System.out.println(true == iv.validateXSLCondition("bingo@bongo.com", "contains(.,'@')"));

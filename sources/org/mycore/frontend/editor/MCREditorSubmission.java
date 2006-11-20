@@ -330,7 +330,7 @@ public class MCREditorSubmission {
 
                     if ((oper != null) && (oper.length() > 0))
                         ok = MCRInputValidator.instance().compare(valueA, valueB, oper, type, format);
-                    if ((clazz != null) && (clazz.length() > 0))
+                    if ((clazz != null) && (clazz.length() > 0) && (condition.getAttributeValue("field1") != null) && (condition.getAttributeValue("field2") != null))
                         ok = ok && MCRInputValidator.instance().validateExternally(clazz, method, valueA, valueB);
 
                     if (!ok) {
@@ -347,27 +347,33 @@ public class MCREditorSubmission {
                             LOGGER.debug(cond);
                         }
                     } else {
-                        String xslcond = condition.getAttributeValue("xsl");
-                        if (xslcond == null)
-                            continue;
-                        if (xslcond.length() == 0)
-                            continue;
+                        Element current = null;
+
                         try {
-                            Element current = (Element) (XPath.selectSingleNode(this.getXML(), path));
-                            if (!MCRInputValidator.instance().validateXSLCondition(current, xslcond)) {
-                                String sortNr = parms.getParameter("_sortnr-" + path);
-                                failed.put(sortNr, condition);
-                                
-                                if (LOGGER.isDebugEnabled()) {
-                                  String cond = new XMLOutputter(Format.getPrettyFormat()).outputString(current);
-                                  LOGGER.debug("Validation condition failed:");
-                                  LOGGER.debug("Context xpath: " + path );
-                                  LOGGER.debug("XSL condition: " + xslcond);
-                                  LOGGER.debug(cond);
+                            String xslcond = condition.getAttributeValue("xsl");
+                            if ((xslcond != null) && (xslcond.length() > 0)) {
+                                current = (Element) (XPath.selectSingleNode(this.getXML(), path));
+                                ok = MCRInputValidator.instance().validateXSLCondition(current, xslcond);
+                                if ((!ok) && LOGGER.isDebugEnabled()) {
+                                    String xml = new XMLOutputter(Format.getPrettyFormat()).outputString(current);
+                                    LOGGER.debug("Validation condition failed:");
+                                    LOGGER.debug("Context xpath: " + path);
+                                    LOGGER.debug("XSL condition: " + xslcond);
+                                    LOGGER.debug(xml);
                                 }
                             }
+                            if ((clazz != null) && (clazz.length() > 0)) {
+                                if (current == null)
+                                    current = (Element) (XPath.selectSingleNode(this.getXML(), path));
+                                ok = ok && MCRInputValidator.instance().validateExternally(clazz, method, current);
+                            }
                         } catch (JDOMException ex) {
-                            LOGGER.debug(ex);
+                            LOGGER.debug("Could not validate, because no element found at xpath " + path);
+                            continue;
+                        }
+                        if (!ok) {
+                            String sortNr = parms.getParameter("_sortnr-" + path);
+                            failed.put(sortNr, condition);
                         }
                     }
                 }
@@ -398,7 +404,7 @@ public class MCREditorSubmission {
 
         if ((type != null) && !MCRInputValidator.instance().validateMinMaxType(value, type, min, max, format)) {
             return false; // field type, data format and/or min max value is
-                            // illegal
+            // illegal
         }
 
         String minLength = condition.getAttributeValue("minLength");
@@ -578,6 +584,15 @@ public class MCREditorSubmission {
 
         if (pos >= 0) {
             element.setName(name.substring(0, pos));
+        }
+
+        pos = name.indexOf("__");
+        if (pos > 0) {
+            element.setName(name.substring(0, pos));
+            int pos2 = name.indexOf("__", pos + 2);
+            String attr = name.substring(pos + 2, pos2);
+            String val = name.substring(pos2 + 2);
+            element.setAttribute(attr, val);
         }
 
         List children = element.getChildren();
