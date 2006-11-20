@@ -32,8 +32,7 @@ import org.mycore.common.MCRException;
 
 /**
  * This class implements all methods for handling with the MCRMetaHistoryDate
- * part of a metadata object. The MCRMetaHistoryDate class is a special class
- * for the datamodel of Papyrus-Project Jena-Halle-Leipzig.
+ * part of a metadata object. 
  * 
  * @author Juergen Vogler
  * @version $Revision$ $Date$
@@ -55,7 +54,7 @@ final public class MCRMetaHistoryDate extends MCRMetaDefault implements MCRMetaI
     private int ibis;
 
     /** The maximal length of 'text' */
-    public static final int PAPANTIKDATE_MAX_TEXT = 128;
+    public static final int MCRHISTORYDATE_MAX_TEXT = 128;
 
     /**
      * This is the constructor. <br>
@@ -109,8 +108,8 @@ final public class MCRMetaHistoryDate extends MCRMetaDefault implements MCRMetaI
         super(set_datapart, set_subtag, default_lang, set_type, set_inherted);
 
         MCRConfiguration config = MCRConfiguration.instance();
-        String min = config.getString("PAP.ancient_date_min");
-        String max = config.getString("PAP.ancient_date_max");
+        String min = config.getString("MCR.ancient_date_min");
+        String max = config.getString("MCR.ancient_date_max");
 
         try {
             default_von = getAntikDate(min, false);
@@ -347,10 +346,10 @@ final public class MCRMetaHistoryDate extends MCRMetaDefault implements MCRMetaI
             return;
         }
 
-        if (set.length() <= PAPANTIKDATE_MAX_TEXT) {
+        if (set.length() <= MCRHISTORYDATE_MAX_TEXT) {
             text = set.trim();
         } else {
-            text = set.substring(0, PAPANTIKDATE_MAX_TEXT);
+            text = set.substring(0, MCRHISTORYDATE_MAX_TEXT);
         }
     }
 
