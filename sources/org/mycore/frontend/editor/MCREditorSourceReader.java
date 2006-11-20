@@ -95,6 +95,6 @@ public class MCREditorSourceReader {
 
         Element input = MCRURIResolver.instance().resolve(url);
 
-        return new MCREditorSubmission(input);
+        return new MCREditorSubmission(input,editor);
     }
 }

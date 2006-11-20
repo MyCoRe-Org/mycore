@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.fileupload.FileItem;
@@ -35,6 +36,7 @@ import org.jdom.Attribute;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
+import org.jdom.filter.ElementFilter;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.jdom.xpath.XPath;
@@ -70,9 +72,12 @@ public class MCREditorSubmission {
      * 
      * @param input
      *            the root element of the XML input
+     * @param editor
+     *            the editor definition
      */
-    MCREditorSubmission(Element input) {
-        setVariablesFromElement(input, "/", "");
+    MCREditorSubmission(Element input, Element editor) {
+        buildAttribTable(editor);
+        setVariablesFromXML("", input, new Hashtable());
         setRepeatsFromVariables();
     }
 
@@ -110,36 +115,76 @@ public class MCREditorSubmission {
         setRepeatsFromVariables();
     }
 
-    private void setVariablesFromElement(Element element, String prefix, String suffix) {
-        String path = prefix + element.getName() + suffix;
-        String text = element.getText();
-
-        addVariable(path, text);
+    private void setVariablesFromXML(String prefix, Element element, Hashtable predecessors) {
+        String key = element.getName();
+        setVariablesFromXML(prefix, key, element, predecessors);
 
         List attributes = element.getAttributes();
-
         for (int i = 0; i < attributes.size(); i++) {
             Attribute attribute = (Attribute) (attributes.get(i));
-            addVariable(path + "/@" + attribute.getName(), attribute.getValue());
+            String name = attribute.getName();
+            String value = attribute.getValue();
+            if ((value == null) || (value.length() == 0))
+                continue;
+            key = element.getName() + "__" + name + "__" + value;
+            if (constraints.containsKey(key))
+                setVariablesFromXML(prefix, key, element, predecessors);
+        }
+    }
+
+    private void setVariablesFromXML(String prefix, String key, Element element, Hashtable predecessors) {
+        int pos = 1;
+        if (predecessors.containsKey(key))
+            pos = ((Integer) (predecessors.get(key))).intValue() + 1;
+        predecessors.put(key, new Integer(pos));
+
+        String path = prefix + "/" + key;
+        if (pos > 1)
+            path = path + "[" + pos + "]";
+
+        // Add element text
+        addVariable(path, element.getText());
+
+        // Add value of all attributes
+        List attributes = element.getAttributes();
+        for (int i = 0; i < attributes.size(); i++) {
+            Attribute attribute = (Attribute) (attributes.get(i));
+            String value = attribute.getValue();
+            if ((value != null) && (value.length() > 0))
+                addVariable(path + "/@" + attribute.getName(), value);
         }
 
+        // Add values of all children
+        predecessors = new Hashtable();
         List children = element.getChildren();
-
-        for (int i = 0, nr = 1; i < children.size(); i++) {
+        for (int i = 0; i < children.size(); i++) {
             Element child = (Element) (children.get(i));
-            suffix = "";
+            setVariablesFromXML(path, child, predecessors);
+        }
+    }
 
-            if (i > 0) {
-                Element before = (Element) (children.get(i - 1));
+    /** Constraints on attributes, e.g. title[@type='main'] */
+    private Hashtable constraints;
 
-                if (child.getName().equals(before.getName())) {
-                    suffix = "[" + String.valueOf(++nr) + "]";
-                } else {
-                    nr = 1;
-                }
+    /** Fills a table of constraints on attributes, e.g. title[@type='main'] */
+    private void buildAttribTable(Element root) {
+        constraints = new Hashtable();
+        Iterator iter = root.getDescendants(new ElementFilter("cell"));
+        while (iter.hasNext()) {
+            Element cell = (Element) (iter.next());
+            String var = cell.getAttributeValue("var");
+            if ((var != null) && (var.indexOf("[@") > 0)) {
+                int pos1 = var.indexOf("[@");
+                int pos2 = var.indexOf("=", pos1);
+                int pos3 = var.indexOf("]", pos2);
+                String name = var.substring(0, pos1).trim();
+                String attr = var.substring(pos1 + 2, pos2).trim();
+                String value = var.substring(pos2 + 2, pos3 - 1).trim();
+                if (name.indexOf("/") >= 0)
+                    name = name.substring(name.lastIndexOf("/") + 1).trim();
+                String key = name + "__" + attr + "__" + value;
+                constraints.put(key, value);
             }
-
-            setVariablesFromElement(child, path + "/", suffix);
         }
     }
 
@@ -583,7 +628,8 @@ public class MCREditorSubmission {
         int pos = name.lastIndexOf("_XXX_");
 
         if (pos >= 0) {
-            element.setName(name.substring(0, pos));
+            name = name.substring(0, pos);
+            element.setName(name);
         }
 
         pos = name.indexOf("__");
