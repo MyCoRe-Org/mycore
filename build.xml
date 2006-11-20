@@ -2,7 +2,7 @@
 
   <!-- =================================================================== -->
   <!-- MyCoRe build file for use with Apache Ant                           -->
-  <!-- $Revision: 1.123 $ $Date: 2006-09-18 14:00:52 $                      -->
+  <!-- $Revision: 1.124 $ $Date: 2006-11-20 16:16:54 $                      -->
   <!-- =================================================================== -->
 
 <project name="MyCoRe" default="usage" basedir=".">
@@ -40,23 +40,10 @@
   <!-- Some help on using ant with this build file                         -->
   <!-- =================================================================== -->
 
-  <target name="usage">
-    <echo>
-      Usage:
-        build.sh [target]          or
-        build.cmd [target]         or
-        ant [target]
-
-      Available targets are:
-        info          --> Shows Java/Ant/Operating System version, CLASSPATH etc.
-        jar           --> Creates file lib/mycore-for-*.jar containing all compiled classes
-        compile       --> Compiles all source code to directory classes
-        compile_[pkg] --> Compiles only a certain package (see build.xml for details)
-        javadocs      --> Generates JavaDoc API documentation as HTML in directory documentation/html
-        clean         --> Removes all compiled classes and javadocs, cleaning up
-
-      Please do not use any of the other targets, they are internal.
-    </echo>
+  <target name="usage" description="Display main targets by running 'ant -projecthelp'">
+    <java classname="org.apache.tools.ant.Main" fork="false">
+      <arg value="-projecthelp" />
+    </java>
   </target>
 
   <!-- =================================================================== -->
@@ -70,7 +57,7 @@
     <echo>Operating system : ${os.name} Version ${os.version} on ${os.arch} </echo>
     <echo>Java version     : JDK ${ant.java.version} Version ${java.version} from ${java.vendor}</echo>
     <echo>Java home        : ${env.JAVA_HOME}</echo>
-    <echo>Ant build file   : $Revision: 1.123 $ $Date: 2006-09-18 14:00:52 $</echo>
+    <echo>Ant build file   : $Revision: 1.124 $ $Date: 2006-11-20 16:16:54 $</echo>
     <echo>Ant version      : ${ant.version}</echo>
     <echo>Ant home         : ${ant.home}</echo>
     <echo>Ant libdir       : ${ant.library.dir}</echo>
