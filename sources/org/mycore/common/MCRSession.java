@@ -29,7 +29,6 @@ import java.util.Iterator;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.hibernate.mapping.Collection;
 import org.mycore.datamodel.classifications.MCRClassificationBrowserData;
 
 /**
@@ -241,6 +240,16 @@ public class MCRSession implements Cloneable {
     
     public final long getLoginTime(){
         return loginTime;
+    }
+
+    public void close() {
+        // clear bound objects
+        logger.debug("Clearing local map.");
+        map.clear();
+        // remove from session list
+        logger.debug("Remove myself from MCRSession list");
+        sessions.remove(getID());
+        this.sessionID=null;
     }
 
 }
