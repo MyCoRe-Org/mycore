@@ -41,6 +41,7 @@ import org.mycore.common.MCRPersistenceException;
  * 
  * @author Frank Lützenkirchen
  * @version $Revision$ $Date$
+ * @deprecated use MCRFile
  */
 public class MCROldFile implements MCRFileReader {
     /** The ID of the store that holds this file's content */

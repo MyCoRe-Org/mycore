@@ -30,7 +30,6 @@ import org.mycore.common.MCRArgumentChecker;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRException;
-import org.mycore.services.query.MCRTextSearchInterface;
 
 /**
  * This class manages instances of MCRContentStore and MCRAudioVideoExtender and
@@ -94,9 +93,6 @@ public class MCRContentStoreFactory {
                 s.init(storeID);
                 STORES.put(storeID, s);
 
-                if (s instanceof MCRTextSearchInterface) {
-                    INDEX_STORES.put(storeID, s);
-                }
             } catch (Exception ex) {
                 String msg = "Could not load MCRContentStore with store ID = " + storeID;
                 throw new MCRConfigurationException(msg, ex);
@@ -104,34 +100,6 @@ public class MCRContentStoreFactory {
         }
 
         return (MCRContentStore) (STORES.get(storeID));
-    }
-
-    /**
-     * returns all ContentStores which implements
-     * {@link org.mycore.services.query.MCRTextSearchInterface}
-     * 
-     * @return Array of {@link org.mycore.services.query.MCRTextSearchInterface}
-     *         ContentStores
-     */
-    public static MCRTextSearchInterface[] getAllIndexables() {
-        if (STORE_SELECTOR == null) {
-            initStoreSelector();
-        }
-
-        String[] s = STORE_SELECTOR.getAvailableStoreIDs();
-
-        if ((s.length == 0) && (INDEX_STORES == null)) {
-            INDEX_STORES = new Hashtable();
-        } else {
-            for (int i = 0; i < s.length; i++)
-                getStore(s[i]);
-        }
-
-        if (INDEX_STORES.size() == 0) {
-            return new MCRTextSearchInterface[0];
-        }
-
-        return (MCRTextSearchInterface[]) INDEX_STORES.values().toArray(new MCRTextSearchInterface[INDEX_STORES.size()]);
     }
 
     /**

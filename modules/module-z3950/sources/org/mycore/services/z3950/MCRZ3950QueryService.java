@@ -16,7 +16,6 @@ import org.apache.log4j.Logger;
 import org.jdom.Element;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.xml.MCRURIResolver;
-import org.mycore.common.xml.MCRXMLContainer;
 import org.mycore.datamodel.classifications.MCRCategoryItem;
 import org.mycore.parsers.bool.MCRAndCondition;
 import org.mycore.parsers.bool.MCRCondition;
@@ -44,9 +43,6 @@ public class MCRZ3950QueryService implements MCRZ3950Query {
 	// Die Z39.50-Anfrage als String
 	private String query;
 	
-	// Das Ergebnis im XMLContainer gespeichert
-	private MCRXMLContainer mycoreResults;
-	
 	// Wir geben immer nur ein Ergebnis zurück, normalerweise das erste
 	private int index;
 	
@@ -61,31 +57,31 @@ public class MCRZ3950QueryService implements MCRZ3950Query {
 	}
 	
 	public void cutDownTo(int maxresults) {
-		if (mycoreResults.size() > 0 && maxresults > 0) 
-			mycoreResults.cutDownTo(maxresults);
+//		if (mycoreResults.size() > 0 && maxresults > 0) 
+//			mycoreResults.cutDownTo(maxresults);
 	}
 	
 	public void sort() {}
 	
 	public Document getDocument() {
 		Document result = null;
-		if (mycoreResults.size() > 0) {
+//		if (mycoreResults.size() > 0) {
 			DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 			// Create the builder and parse the file
-			try {
-				result = factory.newDocumentBuilder().parse(
-						new ByteArrayInputStream(mycoreResults.exportAllToByteArray()));
-			} catch (SAXException se) {
-				logger.error("Error while parsing results.", se);
-				se.printStackTrace();
-			} catch (IOException ioe) {
-				logger.error("I/O Error while parsing results.", ioe);
-				ioe.printStackTrace();
-			} catch (ParserConfigurationException pce) {
-				logger.error("Could not create DocumentBuilder", pce);
-				pce.printStackTrace();
-			}
-		}
+//			try {
+//				result = factory.newDocumentBuilder().parse(
+//						new ByteArrayInputStream(mycoreResults.exportAllToByteArray()));
+//			} catch (SAXException se) {
+//				logger.error("Error while parsing results.", se);
+//				se.printStackTrace();
+//			} catch (IOException ioe) {
+//				logger.error("I/O Error while parsing results.", ioe);
+//				ioe.printStackTrace();
+//			} catch (ParserConfigurationException pce) {
+//				logger.error("Could not create DocumentBuilder", pce);
+//				pce.printStackTrace();
+//			}
+//		}
 		return result;	
 	}
 	
@@ -95,13 +91,13 @@ public class MCRZ3950QueryService implements MCRZ3950Query {
 	 */
 	public byte[] getDocumentAsByteArray() {
 		byte[] result = null;
-		if (mycoreResults.size() > 0)
-			try {
-				result = mycoreResults.exportAllToByteArray();
-			} catch (IOException ioe) {
-				
-				ioe.printStackTrace();
-			}
+//		if (mycoreResults.size() > 0)
+//			try {
+//				result = mycoreResults.exportAllToByteArray();
+//			} catch (IOException ioe) {
+//				
+//				ioe.printStackTrace();
+//			}
 		return result;	
 	}
 	
@@ -118,15 +114,15 @@ public class MCRZ3950QueryService implements MCRZ3950Query {
 
         MCRResults result = MCRQueryManager.search(new MCRQuery( condition ));
 
-        mycoreResults = new MCRXMLContainer();
-        for (int i = 0; i < result.getNumHits(); i++) {
-            MCRHit hit = result.getHit(i);
-            Element ele = MCRURIResolver.instance().resolve("mcrobject:" + hit.getID());
-            mycoreResults.add("host", hit.getID(), 1, ele);
-        }
-        if (mycoreResults.size() > 0)
-            return true;
-        else
+//        mycoreResults = new MCRXMLContainer();
+//        for (int i = 0; i < result.getNumHits(); i++) {
+//            MCRHit hit = result.getHit(i);
+//            Element ele = MCRURIResolver.instance().resolve("mcrobject:" + hit.getID());
+//            mycoreResults.add("host", hit.getID(), 1, ele);
+//        }
+//        if (mycoreResults.size() > 0)
+//            return true;
+//        else
             return false;
     }
 	
@@ -138,12 +134,13 @@ public class MCRZ3950QueryService implements MCRZ3950Query {
 	 */
 	public void fillClassificationsWithLabels() {
 		// Keine Ahnung, ob es 0 sein muss
-    	Element results = mycoreResults.getXML(0);
+//    	Element results = mycoreResults.getXML(0);
     	// Unser Wurzelknoten
-    	Element metadata = results.getChild("metadata");
+//    	Element metadata = results.getChild("metadata");
     	// Alle Kinder des Knotens, also alle Metadaten
-    	List metadataChildren = metadata.getChildren();
-    	Iterator itm = metadataChildren.iterator();
+//    	List metadataChildren = metadata.getChildren();
+//    	Iterator itm = metadataChildren.iterator();
+        Iterator itm=null;
     	// Iteriere über alle Knoten
     	while (itm.hasNext()) {
             // Prüfe, ob der Knoten eine Klassifikation benutzt
@@ -168,7 +165,8 @@ public class MCRZ3950QueryService implements MCRZ3950Query {
 	}
 	
 	public int getSize() {
-		return mycoreResults.size();
+//		return mycoreResults.size();
+        return 0;
 	}
 
 	public int getIndex() {
@@ -177,7 +175,7 @@ public class MCRZ3950QueryService implements MCRZ3950Query {
 
 	public void setIndex(int index) {
 		this.index = index;
-		mycoreResults = mycoreResults.exportElementToContainer(index);
+//		mycoreResults = mycoreResults.exportElementToContainer(index);
 	}
 
 	public String getQuery() {

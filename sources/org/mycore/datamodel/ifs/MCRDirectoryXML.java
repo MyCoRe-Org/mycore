@@ -23,8 +23,6 @@
  **/
 package org.mycore.datamodel.ifs;
 
-import java.io.BufferedInputStream;
-import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -34,8 +32,6 @@ import java.util.StringTokenizer;
 import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
-
-import org.mycore.backend.remote.MCRRemoteAccessInterface;
 import org.mycore.common.MCRConfiguration;
 
 /**
@@ -198,19 +194,9 @@ public class MCRDirectoryXML {
      */
     public Document getDirectory(String requestPath, String hostAlias) {
 
-        if ((hostAlias == null) || (hostAlias.trim().length() == 0)) {
-            hostAlias = "local";
-        }
+        hostAlias = "local"; //TODO remove hostAlias
 
         LOGGER.debug("MCRFileNodeServlet : host = " + hostAlias);
-
-        if (!remoteAliasList.contains(hostAlias)) {
-            String msg = "Error: request host is not in the alias list: " + hostAlias;
-            LOGGER.error(msg);
-
-            return getErrorDocument(msg);
-        }
-
         LOGGER.info("MCRDirectoryResolver: request path = " + requestPath);
 
         if (requestPath == null) {
@@ -231,86 +217,56 @@ public class MCRDirectoryXML {
 
         String ownerID = st.nextToken();
 
-        if (hostAlias.equals("local")) {
-            // local node to be retrieved
-            MCRFilesystemNode root;
+        // local node to be retrieved
+        MCRFilesystemNode root;
 
-            try {
-                root = MCRFilesystemNode.getRootNode(ownerID);
-            } catch (org.mycore.common.MCRPersistenceException e) {
-                // Could not get value from JDBC result set
-                LOGGER.error("MCRFileNodeServlet: Error while getting root node!", e);
-                root = null;
-            }
-
-            if (root == null) {
-                String msg = "Error: No root node found for owner ID " + ownerID;
-                LOGGER.error(msg);
-
-                return getErrorDocument(msg);
-            }
-
-            if (root instanceof MCRFile) {
-                String msg = "Error: root node is a file: " + root.getName();
-                LOGGER.error(msg);
-
-                return getErrorDocument(msg);
-            }
-
-            // root node is a directory
-            int pos = ownerID.length() + 1;
-            String path = requestPath.substring(pos);
-            
-            if (path.length()==0){
-                //only owner ID submitted
-                return getDirectoryXML((MCRDirectory) root);
-            }
-
-            MCRDirectory dir = (MCRDirectory) root;
-            MCRFilesystemNode node = dir.getChildByPath(path);
-
-            if (node == null) {
-                String msg = "Error: No such file or directory " + path;
-                LOGGER.error(msg);
-
-                return getErrorDocument(msg);
-            } else if (node instanceof MCRFile) {
-                String msg = "Error: node is a file: " + root.getName();
-                LOGGER.error(msg);
-
-                return getErrorDocument(msg);
-            } else {
-                return getDirectoryXML((MCRDirectory) node);
-            }
+        try {
+            root = MCRFilesystemNode.getRootNode(ownerID);
+        } catch (org.mycore.common.MCRPersistenceException e) {
+            // Could not get value from JDBC result set
+            LOGGER.error("MCRFileNodeServlet: Error while getting root node!", e);
+            root = null;
         }
 
-        // remote node to be retrieved
-        String prop = "MCR.remoteaccess_" + hostAlias + "_query_class";
-        MCRRemoteAccessInterface comm = (MCRRemoteAccessInterface) (CONFIG.getInstanceOf(prop));
-
-        BufferedInputStream in = comm.requestIFS(hostAlias, requestPath);
-
-        if (in == null) {
-            String msg = "Error: cannot get Inputstream from remote interface of: " + hostAlias;
+        if (root == null) {
+            String msg = "Error: No root node found for owner ID " + ownerID;
             LOGGER.error(msg);
 
             return getErrorDocument(msg);
         }
 
-        org.jdom.input.SAXBuilder builder = new org.jdom.input.SAXBuilder();
+        if (root instanceof MCRFile) {
+            String msg = "Error: root node is a file: " + root.getName();
+            LOGGER.error(msg);
 
-        Document jdom;
-
-        try {
-            jdom = builder.build(in);
-        } catch (org.jdom.JDOMException ignores) {
-            jdom = getErrorDocument(ignores.getMessage());
-        } catch (IOException ignores) {
-        jdom = getErrorDocument(ignores.getMessage());
+            return getErrorDocument(msg);
         }
 
-        return jdom;
+        // root node is a directory
+        int pos = ownerID.length() + 1;
+        String path = requestPath.substring(pos);
 
+        if (path.length() == 0) {
+            // only owner ID submitted
+            return getDirectoryXML((MCRDirectory) root);
+        }
+
+        MCRDirectory dir = (MCRDirectory) root;
+        MCRFilesystemNode node = dir.getChildByPath(path);
+
+        if (node == null) {
+            String msg = "Error: No such file or directory " + path;
+            LOGGER.error(msg);
+
+            return getErrorDocument(msg);
+        } else if (node instanceof MCRFile) {
+            String msg = "Error: node is a file: " + root.getName();
+            LOGGER.error(msg);
+
+            return getErrorDocument(msg);
+        } else {
+            return getDirectoryXML((MCRDirectory) node);
+        }
     }
 
     /**

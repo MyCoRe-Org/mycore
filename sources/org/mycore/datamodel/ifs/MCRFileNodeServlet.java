@@ -23,12 +23,9 @@
 
 package org.mycore.datamodel.ifs;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.StringTokenizer;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -37,14 +34,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 import org.jdom.Document;
-import org.jdom.JDOMException;
-import org.jdom.input.SAXBuilder;
-
 import org.mycore.access.MCRAccessManager;
-import org.mycore.backend.remote.MCRRemoteAccessInterface;
-import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRException;
-import org.mycore.common.MCRUtils;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
 
@@ -74,32 +65,6 @@ public class MCRFileNodeServlet extends MCRServlet {
     // property!
     private static String accessErrorPage = CONFIG.getString("MCR.access_page_error", "");
 
-    // The list of hosts from the configuration
-    private static ArrayList remoteAliasList;
-
-    private static final SAXBuilder SAX_BUILDER = new SAXBuilder();
-
-    /**
-     * Initializes the servlet and reads the default language and the remote
-     * host list from the configuration.
-     */
-    public void init() throws MCRConfigurationException, ServletException {
-        super.init();
-
-        // read host list from configuration
-        String hostconf = CONFIG.getString("MCR.remoteaccess_hostaliases", "local");
-        remoteAliasList = new ArrayList();
-
-        if (hostconf.indexOf("local") < 0) {
-            remoteAliasList.add("local");
-        }
-
-        StringTokenizer st = new StringTokenizer(hostconf, ", ");
-
-        while (st.hasMoreTokens())
-            remoteAliasList.add(st.nextToken());
-    }
-
     /**
      * Handles the HTTP request
      */
@@ -109,27 +74,10 @@ public class MCRFileNodeServlet extends MCRServlet {
         if (!isParametersValid(request, response)) {
             return;
         }
-        String hostAlias = getHostAlias(request);
-
-        if (hostAlias.equals("local")) {
-            handleLocalRequest(request, response);
-        } else {
-            handleRemoteRequest(request, response, hostAlias);
-        }
+        handleLocalRequest(request, response);
     }
 
     private boolean isParametersValid(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        String hostAlias = getHostAlias(request);
-
-        if (!remoteAliasList.contains(hostAlias)) {
-            String msg = "Error: HTTP request host is not in the alias list";
-            LOGGER.error(msg);
-            errorPage(request, response, HttpServletResponse.SC_BAD_REQUEST, msg, new MCRException(hostAlias + " is not in the host alias list!"),
-                    false);
-
-            return false;
-        }
-
         String requestPath = request.getPathInfo();
         LOGGER.info("MCRFileNodeServlet: request path = " + requestPath);
 
@@ -141,21 +89,6 @@ public class MCRFileNodeServlet extends MCRServlet {
             return false;
         }
         return true;
-    }
-
-    /**
-     * @param req
-     * @return
-     */
-    private static String getHostAlias(HttpServletRequest req) {
-        // get the host alias
-        String hostAlias = getProperty(req, "hosts");
-
-        if ((hostAlias == null) || (hostAlias.trim().length() == 0)) {
-            hostAlias = "local";
-        }
-        LOGGER.debug("host = " + hostAlias);
-        return hostAlias;
     }
 
     /**
@@ -235,48 +168,6 @@ public class MCRFileNodeServlet extends MCRServlet {
             }
         }
         return ownerID.toString();
-    }
-
-    /**
-     * @param req
-     * @param res
-     * @param hostAlias
-     * @throws IOException
-     * @throws ServletException
-     */
-    private void handleRemoteRequest(HttpServletRequest req, HttpServletResponse res, String hostAlias) throws IOException, ServletException {
-        // remote node to be retrieved
-        String prop = "MCR.remoteaccess_" + hostAlias + "_query_class";
-        MCRRemoteAccessInterface comm = (MCRRemoteAccessInterface) (CONFIG.getInstanceOf(prop));
-
-        BufferedInputStream in = comm.requestIFS(hostAlias, req.getPathInfo());
-
-        if (in == null) {
-            return;
-        }
-
-        String headercontext = comm.getHeaderContent();
-
-        if (!headercontext.equals("text/xml")) {
-            res.setContentType(headercontext);
-            OutputStream out = new BufferedOutputStream(res.getOutputStream());
-            MCRUtils.copyStream(in, out);
-            out.close();
-            return;
-        }
-
-        org.jdom.Document jdom = null;
-        try {
-            jdom = SAX_BUILDER.build(in);
-        } catch (JDOMException e) {
-            LOGGER.warn("Error while parsing remote document", e);
-            errorPage(req, res, HttpServletResponse.SC_EXPECTATION_FAILED, "Error while parsing remote document.", e, false);
-        } catch (IOException e) {
-            LOGGER.warn("Error while parsing remote document", e);
-            errorPage(req, res, HttpServletResponse.SC_EXPECTATION_FAILED, "Error while parsing remote document.", e, false);
-        }
-
-        forwardRequest(req, res, jdom);
     }
 
     /**

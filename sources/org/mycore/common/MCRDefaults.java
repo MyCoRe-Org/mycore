@@ -33,6 +33,8 @@ import java.util.Locale;
  * 
  * @author Jens Kupferschmidt
  * @version $Revision$ $Date$
+ * 
+ * @deprecated
  */
 public interface MCRDefaults {
     /** The URL of the XLink */

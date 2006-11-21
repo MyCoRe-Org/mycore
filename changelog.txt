@@ -2,6 +2,16 @@ Version 1.3.1
 =============
 - Editor Framework: Added input validation using XSL condition for a complete panel
 - Added stylesheet to generate search masks from searchfields.xml
+- removed MCRCStoreLocalFileSystem and MCRCStoreRemoteFTP
+- removed MCRJDOMTransformXPathToJDOM
+- removed org.mycore.backend.remote package
+- removed org.mycore.backend.xmldb package
+- removed org.mycore.user package and dependencies
+- removed org.mycore.services.query package and dependencies
+- removed MCRXMLContainer and dependencies
+- marked MCRArgumentChecker as deprecated
+- marked MCRDefaults as deprecated
+- removed MCRUploadServlet2
 
 Version 1.3
 ===========

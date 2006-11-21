@@ -37,6 +37,8 @@ package org.mycore.common;
  *     System.out.println(&quot;Hello &quot; + name);
  * }
  * </pre>
+ * 
+ * @deprecated
  */
 public abstract class MCRArgumentChecker {
     /**

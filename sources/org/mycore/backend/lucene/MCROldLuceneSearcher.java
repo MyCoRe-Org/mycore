@@ -65,6 +65,7 @@ import org.mycore.services.plugins.TextFilterPluginManager;
  * Based on MCRLucenesearcher Version 1.43 for miless-software 
  * 
  * @author Harald Richter
+ * @deprecated use MCRLuceneSearcher
  */
 public class MCROldLuceneSearcher extends MCRSearcher {
     /** The logger */

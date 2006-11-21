@@ -30,10 +30,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLDecoder;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Hashtable;
@@ -55,9 +53,6 @@ import org.jdom.JDOMException;
 import org.jdom.input.DOMBuilder;
 import org.jdom.input.SAXBuilder;
 import org.jdom.transform.JDOMSource;
-import org.xml.sax.EntityResolver;
-import org.xml.sax.InputSource;
-
 import org.mycore.access.MCRAccessInterface;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRCache;
@@ -75,7 +70,8 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.MCRXMLTableManager;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.services.fieldquery.MCRQueryClient;
-import org.mycore.services.query.MCRQueryCache;
+import org.xml.sax.EntityResolver;
+import org.xml.sax.InputSource;
 
 /**
  * Reads XML documents from various URI types. This resolver is used to read
@@ -147,7 +143,6 @@ public class MCRURIResolver implements javax.xml.transform.URIResolver, EntityRe
         supportedSchemes.putAll(extResolverMapping);
         supportedSchemes.put("webapp", new MCRWebAppResolver());
         supportedSchemes.put("file", new MCRFileResolver());
-        supportedSchemes.put("query", new MCRQueryResolver());
         supportedSchemes.put("ifs", new MCRIFSResolver());
         supportedSchemes.put("mcrobject", new MCRObjectResolver());
         supportedSchemes.put("mcrws", new MCRWSResolver());
@@ -722,77 +717,6 @@ public class MCRURIResolver implements javax.xml.transform.URIResolver, EntityRe
                 path = path.substring(0, i);
             }
             return MCRDirectoryXML.getInstance().getDirectory(path, hosts).getRootElement();
-        }
-
-    }
-
-    private static class MCRQueryResolver implements MCRResolver {
-
-        private static final String HOST_PARAM = "host";
-
-        private static final String TYPE_PARAM = "type";
-
-        private static final String QUERY_PARAM = "query";
-
-        private static final String HOST_DEFAULT = "local";
-
-        private static final String URL_ENCODING = MCRConfiguration.instance().getString("MCR.request_charencoding", "UTF-8");
-
-        /**
-         * Returns query results as XML
-         */
-        public Element resolveElement(String uri) {
-            String key = uri.substring(uri.indexOf(":") + 1);
-            LOGGER.debug("Reading xml from query result using key :" + key);
-
-            String[] param;
-            String host;
-            String type;
-            String query;
-            StringTokenizer tok = new StringTokenizer(key, "&");
-            Hashtable params = new Hashtable();
-
-            while (tok.hasMoreTokens()) {
-                param = tok.nextToken().split("=");
-                params.put(param[0], param[1]);
-            }
-
-            if (params.get(HOST_PARAM) == null) {
-                host = HOST_DEFAULT;
-            } else {
-                host = (String) params.get(HOST_PARAM);
-            }
-
-            type = (String) params.get(TYPE_PARAM);
-            query = (String) params.get(QUERY_PARAM);
-
-            if (type == null) {
-                return null;
-            }
-
-            StringTokenizer hosts = new StringTokenizer(host, ",");
-            MCRXMLContainer results = new MCRXMLContainer();
-
-            while (hosts.hasMoreTokens()) {
-                try {
-                    results.importElements(query(hosts.nextToken(), type, query));
-                } catch (NumberFormatException e) {
-                    LOGGER.error("Error while processing query: " + key, e);
-                } catch (UnsupportedEncodingException e) {
-                    LOGGER.error("Error while processing query: " + key, e);
-                }
-            }
-
-            return results.exportAllToDocument().getRootElement();
-        }
-
-        private MCRXMLContainer query(String host, String type, String query) throws NumberFormatException, UnsupportedEncodingException {
-            if (query == null) {
-                query = "";
-            }
-
-            return MCRQueryCache.getResultList(URLDecoder.decode(host, URL_ENCODING), URLDecoder.decode(query, URL_ENCODING), URLDecoder.decode(type,
-                    URL_ENCODING), MCRConfiguration.instance().getInt("MCR.query_max_results", 10));
         }
 
     }
