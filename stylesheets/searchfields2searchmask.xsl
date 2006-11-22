@@ -131,7 +131,7 @@
     <target type="servlet" name="MCRSearchServlet" method="post" format="xml" />
 
     <components root="root" var="/query">
-      <headline anchor="LEFT">
+      <headline anchor="WEST">
         <text i18n="{$headline.i18n}"/>
       </headline>
 
