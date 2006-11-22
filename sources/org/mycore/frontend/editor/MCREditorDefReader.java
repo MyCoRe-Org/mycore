@@ -23,19 +23,67 @@
 
 package org.mycore.frontend.editor;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+import org.jdom.Document;
 import org.jdom.Element;
+import org.jdom.Namespace;
+import org.jdom.output.Format;
+import org.jdom.output.XMLOutputter;
 import org.mycore.common.MCRCache;
+import org.mycore.common.MCRException;
 import org.mycore.common.xml.MCRURIResolver;
+import org.mycore.common.xml.MCRXMLHelper;
 
 public class MCREditorDefReader {
+
+    private final static Logger logger = Logger.getLogger(MCREditorDefReader.class);
+
     /**
      * Reads the editor definition from the given URI
+     * 
+     * @param validate
+     *            if true, validate editor definition against schema
      */
-    static Element readDef(String uri, String ref) {
+    static Element readDef(String uri, String ref, boolean validate) {
         Element editor = new Element("editor");
+        editor.setAttribute("id", ref);
         editor.addContent(resolveInclude(uri, ref, true).getIncludedElements());
+
+        if (logger.isDebugEnabled()) {
+            XMLOutputter xout = new XMLOutputter();
+            xout.setFormat(Format.getPrettyFormat());
+            logger.debug("--------------------");
+            logger.debug("\n" + xout.outputString(editor) + "\n");
+            logger.debug("--------------------");
+        }
+
+        if (validate) {
+            Document doc = new Document(editor);
+            Namespace xsi = Namespace.getNamespace("xsi", "http://www.w3.org/2001/XMLSchema-instance");
+            editor.setAttribute("noNamespaceSchemaLocation", "editor.xsd", xsi);
+            editor.setAttribute("id", ref);
+
+            XMLOutputter xout = new XMLOutputter();
+            xout.setFormat(Format.getPrettyFormat());
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            try {
+                xout.output(doc, baos);
+                baos.close();
+            } catch (IOException ex) {
+                throw new MCRException("Exception while validating editor definition", ex);
+            }
+
+            logger.info("Validating editor definition against XML schema...");
+            MCRXMLHelper.parseXML(baos.toByteArray(), true);
+            logger.info("Editor definition successfully validated.");
+
+            editor.detach();
+            editor.removeAttribute("noNamespaceSchemaLocation", xsi);
+        }
 
         return editor;
     }

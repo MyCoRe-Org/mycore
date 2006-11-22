@@ -136,13 +136,15 @@ public class MCREditorServlet extends MCRServlet {
     private void processStartSession(HttpServletRequest req, HttpServletResponse res) throws java.io.IOException {
         String uri = req.getParameter("_uri");
         String ref = req.getParameter("_ref");
+        String val = req.getParameter("_validate");
         String key = req.getParameter("_requestParamKey");
 
         logger.info("Editor start editor session from " + ref + "@" + uri);
 
         Map requestParameters = getRequestParameters(key);
         Element param = getTargetParameters(requestParameters);
-        Element editor = MCREditorDefReader.readDef(uri, ref);
+        boolean validate = "true".equals(val);
+        Element editor = MCREditorDefReader.readDef(uri, ref, validate);
 
         if (param != null) {
             editor.addContent(param);
