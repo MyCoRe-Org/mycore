@@ -116,7 +116,6 @@ public class MCRZ3950Servlet extends MCRServlet {
 		   if (cut) {
 			   service.cutDownTo(index);
 			   service.setIndex(index - 1);
-			   service.fillClassificationsWithLabels();	
 		   }
 		   try {
 			   ServletOutputStream out = response.getOutputStream();

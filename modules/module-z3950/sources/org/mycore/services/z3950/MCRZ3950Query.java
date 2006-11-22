@@ -1,7 +1,5 @@
 package org.mycore.services.z3950;
 
-import org.w3c.dom.Document;
-
 /**
  * Dieses Java-Interface beschreibt die Syntax der grundlegenen Funktionen
  * für den Z39.50-Suchservice. 
@@ -18,8 +16,6 @@ public interface MCRZ3950Query {
 	
 	public void sort();
 	
-	public Document getDocument();
-	
 	/**
 	 * Gibt alle Ergebnisse als Bytestrom zurück.
 	 * @return Das Ergebnisdokument als Byte-Array, null falls es keine Ergebnisse gab.
@@ -31,14 +27,6 @@ public interface MCRZ3950Query {
 	 * @return True falls es Ergebnisse gab, sonst False.
 	 */
 	public boolean search();
-	
-	/**
-	 * Die Methode <code>fillClassificationsWithLabels</code> durchsucht alle
-	 * Metadaten und untersucht deren benutzte Klassifikationen. Da in den
-	 * Metadaten nur ein Verweis auf Klasse und Kategorie ist, wird dieser
-	 * ergänzt durch sein Label.
-	 */
-	public void fillClassificationsWithLabels();
 	
 	/**
 	 * Gibt die Anzahl der Ergebnisse zurück.
