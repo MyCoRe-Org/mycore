@@ -32,17 +32,9 @@
     <servlet-name>MCRLoginServlet</servlet-name>
     <servlet-class>org.mycore.user2.MCRLoginServlet</servlet-class>
   </servlet>
-  <servlet id="NBNResolver">
-    <servlet-name>MCRNBNResolver</servlet-name>
-    <servlet-class>org.mycore.services.nbn.MCRNBNResolver</servlet-class>
-  </servlet>
   <servlet id="OAIProvider">
     <servlet-name>MCROAIProvider</servlet-name>
     <servlet-class>org.mycore.services.oai.MCROAIProvider</servlet-class>
-  </servlet>
-  <servlet id="Query">
-    <servlet-name>MCRQueryServlet</servlet-name>
-    <servlet-class>org.mycore.services.query.MCRQueryServlet</servlet-class>
   </servlet>
   <servlet id="StaticXMLFile">
     <servlet-name>MCRStaticXMLFileServlet</servlet-name>
@@ -76,10 +68,6 @@
     <servlet-name>MCRObjectServlet</servlet-name>
     <servlet-class>org.mycore.frontend.servlets.MCRObjectServlet</servlet-class>
   </servlet>
-  <servlet id="MCRAccessCheckServlet">
-    <servlet-name>MCRAccessCheckServlet</servlet-name>
-    <servlet-class>org.mycore.access.MCRAccessCheckServlet</servlet-class>
-  </servlet>
   <servlet id="MCRSearch">
     <servlet-name>MCRSearchServlet</servlet-name>
     <servlet-class>org.mycore.services.fieldquery.MCRSearchServlet</servlet-class>
@@ -111,28 +99,12 @@
     <url-pattern>/servlets/MCRLoginServlet</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
-    <servlet-name>MCRNBNResolver</servlet-name>
-    <url-pattern>/servlets/MCRNBNResolver</url-pattern>
-  </servlet-mapping>
-  <servlet-mapping>
-    <servlet-name>MCRNBNResolver</servlet-name>
-    <url-pattern>/servlets/MCRNBNResolver/*</url-pattern>
-  </servlet-mapping>
-  <servlet-mapping>
     <servlet-name>MCROAIProvider</servlet-name>
     <url-pattern>/servlets/MCROAIProvider</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
-    <servlet-name>MCRQueryServlet</servlet-name>
-    <url-pattern>/servlets/MCRQueryServlet</url-pattern>
-  </servlet-mapping>
-  <servlet-mapping>
     <servlet-name>MCRUserServlet</servlet-name>
     <url-pattern>/servlets/MCRUserServlet</url-pattern>
-  </servlet-mapping>
-  <servlet-mapping>
-    <servlet-name>MCRAccessCheckServlet</servlet-name>
-    <url-pattern>/servlets/MCRAccessCheckServlet</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
     <servlet-name>XMLEditor</servlet-name>
