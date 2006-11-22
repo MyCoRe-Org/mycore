@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
 <!-- ============================================== -->
-<!-- $Revision: 1.51 $ $Date: 2006-11-20 07:17:30 $ -->
+<!-- $Revision: 1.52 $ $Date: 2006-11-22 20:36:32 $ -->
 <!-- ============================================== --> 
 
 <xsl:stylesheet 
@@ -57,6 +57,8 @@
         <xsl:value-of select="$RequestParamKey" />
         <xsl:text>&amp;_ref=</xsl:text>
         <xsl:value-of select="@id" />
+        <xsl:text>&amp;_validate=</xsl:text>
+        <xsl:value-of select="@validate" />
         <xsl:text>&amp;_action=start.session&amp;_uri=</xsl:text>
         <xsl:value-of select="$uri" />
       </xsl:otherwise>
