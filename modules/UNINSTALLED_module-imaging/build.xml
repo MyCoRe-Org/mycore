@@ -9,7 +9,7 @@
 <!-- Andreas Trappe 	- idea, concept				-->
 <!-- Chi Vu Huu		- concept, development			-->
 <!--												-->
-<!-- $Revision: 1.4 $ $Date: 2006-09-18 14:22:02 $ 								-->
+<!-- $Revision: 1.5 $ $Date: 2006-11-22 12:20:38 $ 								-->
 
 
 <project name="MyCoReModule - imaging" default="usage" basedir=".">
@@ -21,7 +21,7 @@
 <!-- =================================================================== -->
 
   <target name="info">
-    <echo>
+    <echo level="info">
            Ant version: ${ant.version}
       Java JDK version: ${java.version}
       Operating system: ${os.name}, version: ${os.version}, architecture: ${os.arch}
@@ -33,7 +33,7 @@
 <!-- =================================================================== -->
 
   <target name="usage">
-    <echo>
+    <echo level="info">
       Usage:
         ant [target]
 
@@ -81,7 +81,7 @@
 <!-- =================================================================== -->
 
 	<target name="synch">
-		<echo>Synchronisating Module-imaging to UNISTALLED-folder</echo>
+		<echo level="info">Synchronisating Module-imaging to UNISTALLED-folder</echo>
 		<copy todir="${env.MYCORE_HOME}/modules/module-imaging" flatten="false">
 			<fileset dir="${env.MYCORE_HOME}/modules/UNINSTALLED_module-imaging" excludes="CVS" />
 		</copy>	
@@ -93,7 +93,7 @@
 <!-- =================================================================== -->
 
   <target name="javac" depends="init">
-    <echo>Compiling ${packages} </echo>
+    <echo level="info">Compiling ${packages} </echo>
     <javac srcdir="${basedir}/modules/module-imaging/sources"
            destdir="${basedir}/classes"
            includes="${packages}"
@@ -109,7 +109,7 @@
   </target>
 
   <target name="compile" depends="synch">
-    <echo>Compiling module imaging soures</echo>
+    <echo level="info">Compiling module imaging soures</echo>
     <antcall target="javac">
       <param name="packages" value="org/mycore/services/imaging/**"/>
     </antcall>

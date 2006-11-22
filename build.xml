@@ -2,7 +2,7 @@
 
   <!-- =================================================================== -->
   <!-- MyCoRe build file for use with Apache Ant                           -->
-  <!-- $Revision: 1.125 $ $Date: 2006-11-22 11:52:13 $                      -->
+  <!-- $Revision: 1.126 $ $Date: 2006-11-22 12:20:38 $                      -->
   <!-- =================================================================== -->
 
 <project name="MyCoRe" default="usage" basedir=".">
@@ -53,18 +53,18 @@
   <target name="info" depends="init" description="display software and os versions">
     <property name="output.classpath" refid="mycore.classpath" />
 
-    <echo>Base directory   : ${basedir}</echo>
-    <echo>Operating system : ${os.name} Version ${os.version} on ${os.arch} </echo>
-    <echo>Java version     : JDK ${ant.java.version} Version ${java.version} from ${java.vendor}</echo>
-    <echo>Java home        : ${env.JAVA_HOME}</echo>
-    <echo>Ant build file   : $Revision: 1.125 $ $Date: 2006-11-22 11:52:13 $</echo>
-    <echo>Ant version      : ${ant.version}</echo>
-    <echo>Ant home         : ${ant.home}</echo>
-    <echo>Ant libdir       : ${ant.library.dir}</echo>
-    <echo>XML Store type   : ${MCR.XMLStore.Type}</echo>
-    <echo>JDBC Store type  : ${MCR.JDBCStore.Type}</echo>
-    <echo>System CLASSPATH : ${build.sysclasspath}</echo>
-    <echo>Active CLASSPATH : ${output.classpath}</echo>
+    <echo level="info">Base directory   : ${basedir}</echo>
+    <echo level="info">Operating system : ${os.name} Version ${os.version} on ${os.arch} </echo>
+    <echo level="info">Java version     : JDK ${ant.java.version} Version ${java.version} from ${java.vendor}</echo>
+    <echo level="info">Java home        : ${env.JAVA_HOME}</echo>
+    <echo level="info">Ant build file   : $Revision: 1.126 $ $Date: 2006-11-22 12:20:38 $</echo>
+    <echo level="info">Ant version      : ${ant.version}</echo>
+    <echo level="info">Ant home         : ${ant.home}</echo>
+    <echo level="info">Ant libdir       : ${ant.library.dir}</echo>
+    <echo level="info">XML Store type   : ${MCR.XMLStore.Type}</echo>
+    <echo level="info">JDBC Store type  : ${MCR.JDBCStore.Type}</echo>
+    <echo level="info">System CLASSPATH : ${build.sysclasspath}</echo>
+    <echo level="info">Active CLASSPATH : ${output.classpath}</echo>
   </target>
 
   <!-- =================================================================== -->
@@ -72,7 +72,7 @@
   <!-- =================================================================== -->
 
   <target name="init" depends="jdbcstore.path.1, jdbcstore.path.2, xmlstore.path.1, xmlstore.path.2, system.path.1, system.path.2" >
-    <echo>Initializing directories and classpath...</echo>
+    <echo level="info">Initializing directories and classpath...</echo>
 
     <mkdir dir="${basedir}/classes" />
     <mkdir dir="${basedir}/documentation/html" />
@@ -147,7 +147,7 @@
 		</junit>    
 	</target>
 	<target name="compile_testcases">
-		<echo>Compiling JUnit test cases...</echo>
+		<echo level="info">Compiling JUnit test cases...</echo>
 	    <antcall target="javac">
 	      <param name="altdir" value="${basedir}/tests"/>
 	      <param name="packages" value="**/*Test*"/>
@@ -166,7 +166,7 @@
       <equals arg1="${MCR.XMLStore.Type}" arg2="cm8" />
     </condition>
 
-    <echo>Creating ${jarfile} containing all compiled classes...</echo>
+    <echo level="info">Creating ${jarfile} containing all compiled classes...</echo>
     <jar 
       destfile="${basedir}/lib/${jarfile}"
     >
@@ -175,7 +175,7 @@
       <fileset dir="${basedir}/schema"  includes="*.xsd *.dtd"         />
       <fileset dir="${basedir}/config"  includes="build.properties"    />
     </jar>
-    <echo>---------------------------------------------------------</echo>
+    <echo level="info">---------------------------------------------------------</echo>
   </target>
   
   <!-- =================================================================== -->
@@ -183,7 +183,7 @@
   <!-- =================================================================== -->
 
   <target name="javac" depends="init">
-    <echo>Compiling ${packages}</echo>
+    <echo level="info">Compiling ${packages}</echo>
   	<condition property="altdir" value="">
   		<not><isset property="altdir"/></not>
   	</condition>
@@ -200,42 +200,33 @@
     	   fork="yes"
            deprecation="${deprecation}">
     </javac>
-    <echo>---------------------------------------------------------</echo>
+    <echo level="info">---------------------------------------------------------</echo>
   </target>
 
   <target name="compile" description="compiles all sources to classes directory"
-	  depends="compile_base, compile_backends, compile_modules">
+	  depends="compile_base, compile_modules">
   </target>
 
   <target name="compile_base">
-     <echo>Compiling MyCoRe base classes...</echo>
+     <echo level="info">Compiling MyCoRe non-module classes...</echo>
+     <condition property="mcr.exclude" value="org/mycore/backend/cm8/**">
+        <not><equals arg1="${MCR.XMLStore.Type}" arg2="cm8" /></not>
+     </condition>
+     <condition property="mcr.exclude" value="">
+       <equals arg1="${MCR.XMLStore.Type}" arg2="cm8" />
+     </condition>
      <antcall target="javac">
         <param name="packages" value="org/mycore/**"/>
-        <param name="excludes" value="org/mycore/backend/**"/>
+        <param name="excludes" value="${mcr.exclude}"/>
      </antcall>
   </target>	
 
-  <target name="compile_backends">
-    <echo>Compiling MyCoRe backend classes...</echo>
-
-    <!-- For internal use: setting MCR.XMLStore.Type=all will compile cm7 and cm8 and xmldb -->
-    <condition property="mcr.exclude" value="org/mycore/backend/cm8/**">
-        <not><equals arg1="${MCR.XMLStore.Type}" arg2="cm8" /></not>
-    </condition>
-    <condition property="mcr.exclude" value="">
-      <equals arg1="${MCR.XMLStore.Type}" arg2="cm8" />
-    </condition>
-    <antcall target="javac">
-        <param name="packages" value="org/mycore/backend/**"/>
-        <param name="excludes" value="${mcr.exclude}"/>
-    </antcall>
-  </target>
-	  <target name="compile_modules">
-	     <echo>Compiling MyCoRe modules...</echo>
-	    <subant target="compile" inheritall="true" inheritrefs="true">
-	      <fileset dir="." includes="modules/module-*/build.xml" />
-	    </subant>
-	  </target>	
+  <target name="compile_modules">
+    <echo level="info">Compiling MyCoRe modules...</echo>
+    <subant target="compile" inheritall="true" inheritrefs="true">
+      <fileset dir="." includes="modules/module-*/build.xml" />
+    </subant>
+  </target>	
 
 
   <!-- =================================================================== -->
@@ -281,7 +272,7 @@
   <!-- =================================================================== -->
 
   <target name="javadocs" depends="init,up2date" if="javadocs.outdated" description="creates JavaDoc API documentation in HTML format">
-    <echo>Building the MyCoRe JavaDoc API documentation...</echo>
+    <echo level="info">Building the MyCoRe JavaDoc API documentation...</echo>
 
     <javadoc
       packagenames        = "*"
@@ -304,7 +295,7 @@
       <group title="MyCoRe Services"                            packages="org.mycore.services*"  />
       <group title="MyCoRe User and Group Management"           packages="org.mycore.user*"      />
 
-      <link href="http://java.sun.com/j2se/1.4.2/docs/api/"/>
+      <link href="http://java.sun.com/j2se/1.5.0/docs/api/"/>
       <link href="http://www.mycore.de/library/cm-eip/eip-8.2-javadocs/" />
       <link href="http://jakarta.apache.org/tomcat/tomcat-5.0-doc/servletapi"/>
       <link href="http://java.sun.com/xml/jaxp/dist/1.1/docs/api/"/>
@@ -314,7 +305,7 @@
       <link href="http://jakarta.apache.org/lucene/docs/api/" />
       <link href="http://www.mycore.de/library/cm-eip/eip-8.2-javadocs/" />
     </javadoc>
-    <echo>---------------------------------------------------------</echo>
+    <echo level="info">---------------------------------------------------------</echo>
   </target>
 
   <!-- =================================================================== -->
@@ -322,7 +313,7 @@
   <!-- =================================================================== -->
 
   <target name="java2pdf" depends="init,up2date" if="pdf.outdated">
-    <echo> Building the MyCoRe JavaDoc API documentation as PDF...</echo>
+    <echo level="info"> Building the MyCoRe JavaDoc API documentation as PDF...</echo>
 
     <mkdir dir="${basedir}/documentation/pdf" />
     <javadoc
@@ -349,14 +340,14 @@
   <!-- =================================================================== -->
 
   <target name="clean" description="Removes all files generated by this build file">
-    <echo>Cleaning up...</echo>
+    <echo level="info">Cleaning up...</echo>
     <delete dir="${basedir}/classes"  />
     <delete dir="${basedir}/documentation/html" />
     <delete dir="${basedir}/documentation/pdf" />
     <delete includeEmptyDirs="true" >
       <fileset dir="${basedir}/lib" includes="mycore*.jar" />
     </delete>
-    <echo>---------------------------------------------------------</echo>
+    <echo level="info">---------------------------------------------------------</echo>
   </target>
 
   <!-- =================================================================== -->
@@ -376,7 +367,7 @@
   <!-- =================================================================== -->
 
   <target name="changelog">
-    <echo>
+    <echo level="info">
 
       Building CVS ChangeLog, please be patient...
     </echo>

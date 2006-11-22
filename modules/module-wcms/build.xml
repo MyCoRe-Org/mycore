@@ -2,7 +2,7 @@
 
 <!-- ============================================== -->
 <!--      MyCoRe-WCMS build file for use with ANT        -->
-<!-- $Revision: 1.9 $ $Date: 2005-12-14 09:27:31 $ -->
+<!-- $Revision: 1.10 $ $Date: 2006-11-22 12:20:38 $ -->
 <!-- ============================================== -->
 
 <project name="MyCoReModule - WCMS" default="usage" basedir=".">
@@ -14,7 +14,7 @@
 	<!-- ============================================== -->
 
 	<target name="version">
-		<echo>
+		<echo level="info">
            Ant version: ${ant.version}
       Java JDK version: ${java.version} 
       Operating system: ${os.name}, version: ${os.version}, architecture: ${os.arch}
@@ -24,15 +24,14 @@
 	<!-- ============================================== -->
 
 	<target name="usage">
-		<echo>
+		<echo level="info">
       Use the ant tool to plug in MyCoReWCMS-Module:
       Usage: ant [target] [target] [target] ...
 
       Available targets for MyCoReWCMS are:
-        compile                         compiles the Java Sources
-
-	        standalone		install MyCoReWCMS-Module as standalone application
-	        cleanStandalone		remove MyCoReWCMS-Module 
+        compile             compiles the Java Sources
+        standalone	        install MyCoReWCMS-Module as standalone application
+        cleanStandalone	    remove MyCoReWCMS-Module 
 		</echo>
 	</target>
 	
@@ -49,7 +48,7 @@
   </target>
 
   <target name="javac" depends="init" >
-    <echo>Compiling ${packages}</echo>
+    <echo level="info">Compiling ${packages}</echo>
     <javac srcdir="${basedir}/modules/module-wcms/aif/src"
            destdir="${basedir}/classes"
            includes="${packages}"
@@ -64,19 +63,12 @@
   </target>
 
   <target name="compile">
-   <echo>Compiling WCMS classes...</echo>
-   <antcall target="javac">
-     <param name="packages" value="wcms/util/**"/>
-   </antcall>
+   <echo level="info">Compiling WCMS classes...</echo>
    <antcall target="javac">
      <param name="packages" value="wcms/**"/>
    </antcall>
   </target>
 
-  <target name="webapps" />
-
   <!-- =================================================================== -->
 
 </project>
-
-

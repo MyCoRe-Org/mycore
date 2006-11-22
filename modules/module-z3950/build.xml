@@ -2,7 +2,7 @@
 
 <!-- ============================================== -->
 <!--      MyCoRe-WebService build file for use with ANT        -->
-<!-- $Revision: 1.1 $ $Date: 2006-04-20 09:23:22 $ -->
+<!-- $Revision: 1.2 $ $Date: 2006-11-22 12:20:38 $ -->
 <!-- ============================================== -->
 
 <project name="MyCoReModule - Z3950" default="usage" basedir=".">
@@ -14,7 +14,7 @@
 	<!-- ============================================== -->
 
 	<target name="version">
-		<echo>
+		<echo level="info">
            Ant version: ${ant.version}
       Java JDK version: ${java.version} 
       Operating system: ${os.name}, version: ${os.version}, architecture: ${os.arch}
@@ -24,7 +24,7 @@
 	<!-- ============================================== -->
 
 	<target name="usage">
-		<echo>
+		<echo level="info">
       Use the ant tool to plug in MyCoRe-Z3950-Module:
       Usage: ant [target] [target] [target] ...
 
@@ -47,7 +47,7 @@
   </target>
 
   <target name="javac" depends="init" >
-    <echo>Compiling ${packages}</echo>
+    <echo level="info">Compiling ${packages}</echo>
     <javac srcdir="${basedir}/modules/module-z3950/sources"
            destdir="${basedir}/classes"
            includes="${packages}"
@@ -62,7 +62,7 @@
   </target>
 
   <target name="compile">
-   <echo>Compiling Module MyCoRe-Z3950 classes...</echo>
+   <echo level="info">Compiling Module MyCoRe-Z3950 classes...</echo>
    <antcall target="javac">
      <param name="packages" value="org/**"/>
    </antcall>
@@ -70,7 +70,7 @@
 
   <!-- =================================================================== -->
   <target name="webapps">
-    <echo>
+    <echo level="info">
       Copying web application files of module "Z3950"
     </echo>
 <!--
@@ -89,5 +89,3 @@
   </target>
   
 </project>
-
-

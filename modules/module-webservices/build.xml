@@ -2,7 +2,7 @@
 
 <!-- ============================================== -->
 <!--      MyCoRe-WebService build file for use with ANT        -->
-<!-- $Revision: 1.13 $ $Date: 2006-05-24 08:16:56 $ -->
+<!-- $Revision: 1.14 $ $Date: 2006-11-22 12:20:38 $ -->
 <!-- ============================================== -->
 
 <project name="MyCoReModule - WebService" default="usage" basedir=".">
@@ -22,7 +22,7 @@
 	<!-- ============================================== -->
 
 	<target name="version">
-		<echo>
+		<echo level="info">
            Ant version: ${ant.version}
       Java JDK version: ${java.version} 
       Operating system: ${os.name}, version: ${os.version}, architecture: ${os.arch}
@@ -32,7 +32,7 @@
 	<!-- ============================================== -->
 
 	<target name="usage">
-		<echo>
+		<echo level="info">
       Use the ant tool to plug in MyCoRe-WeService-Module:
       Usage: ant [target] [target] [target] ...
 
@@ -64,7 +64,7 @@
   </target>
 
   <target name="javac" depends="init" >
-    <echo>Compiling ${packages}</echo>
+    <echo level="info">Compiling ${packages}</echo>
     <javac srcdir="${basedir}/modules/module-webservices/sources"
            destdir="${basedir}/classes"
            includes="${packages}"
@@ -80,7 +80,7 @@
   </target>
 
   <target name="compile">
-   <echo>Compiling Module MyCoRe-WebServices classes...</echo>
+   <echo level="info">Compiling Module MyCoRe-WebServices classes...</echo>
    <antcall target="javac">
      <param name="packages" value="org/**"/>
    </antcall>
@@ -88,7 +88,7 @@
 
   <!-- =================================================================== -->
   <target name="webapps">
-    <echo>
+    <echo level="info">
       Copying web application files of module "WebServices"
     </echo>
     <property name="webapps-libdir" value="webapps/WEB-INF/lib"/>  	
@@ -134,7 +134,7 @@
   <!-- ============================================== -->
 
   <target name="compile.ws">
-    <echo>
+    <echo level="info">
       Compiling WebServices interface
     </echo>
     <mkdir dir="build/classes" />
@@ -147,7 +147,7 @@
   <!-- ============================================== -->
 
   <target name="java2wsdl" depends="compile.ws">
-    <echo>
+    <echo level="info">
       Building wsdl from MCRWS.class
     </echo>
     <delete file="build/MCRWebService.wsdl" />
@@ -172,7 +172,7 @@
   <!-- ============================================== -->
 
   <target name="wsdl2java" depends="java2wsdl">
-    <echo>
+    <echo level="info">
       Building stubs from build/MCRWebService.wsdl
     </echo>
     <path id="wsdl2java.classpath">
@@ -197,7 +197,7 @@
   <!-- ============================================== -->
 
   <target name="compile.client" depends="wsdl2java">
-    <echo>
+    <echo level="info">
       Compiling WebServices client
     </echo>
     <mkdir dir="build/classes" />
@@ -214,7 +214,7 @@
   <!-- ============================================== -->
 
     <target name="wsclient.cmd" depends="compile.client">
-    <echo>
+    <echo level="info">
 
       Generating wsclient.cmd for starting wsclient from Command Line
     </echo>
@@ -243,7 +243,7 @@ java -Xms128m -Xmx512m -classpath "%AXISCLASSPATH%" org.mycore.services.wsclient
   </target>
   
     <target name="wsclient.sh" depends="compile.client" description="Generates wsclient.sh for starting wsclient from Command Line">
-    <echo>
+    <echo level="info">
 
       Generating wsclient.sh for starting wsclient from Command Line
     </echo>
@@ -275,7 +275,7 @@ java -Xms128m -Xmx512m -classpath "${AXISCLASSPATH}" org.mycore.services.wsclien
   <!-- ============================================== -->
 
     <target name="clean">
-    <echo>
+    <echo level="info">
       Delete directory "build"
     </echo>
     
@@ -283,5 +283,3 @@ java -Xms128m -Xmx512m -classpath "${AXISCLASSPATH}" org.mycore.services.wsclien
   </target>
   
 </project>
-
-

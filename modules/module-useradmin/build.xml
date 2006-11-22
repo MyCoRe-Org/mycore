@@ -2,7 +2,7 @@
 
 <!-- =================================================================== -->
 <!-- MyCoRe-UserAdministration build file for use with ANT               -->
-<!-- $Revision: 1.3 $ $Date: 2005-12-14 09:27:31 $                       -->
+<!-- $Revision: 1.4 $ $Date: 2006-11-22 12:20:38 $                       -->
 <!-- =================================================================== -->
 
 <project name="MyCoReModule - UserAdministration" default="usage" basedir=".">
@@ -14,7 +14,7 @@
 <!-- =================================================================== -->
 
   <target name="info">
-    <echo>
+    <echo level="info">
            Ant version: ${ant.version}
       Java JDK version: ${java.version}
       Operating system: ${os.name}, version: ${os.version}, architecture: ${os.arch}
@@ -26,7 +26,7 @@
 <!-- =================================================================== -->
 
   <target name="usage">
-    <echo>
+    <echo level="info">
       Usage:
         ant [target]
 
@@ -53,7 +53,7 @@
 <!-- =================================================================== -->
 
   <target name="javac" depends="init">
-    <echo>Compiling ${packages}</echo>
+    <echo level="info">Compiling ${packages}</echo>
     <javac srcdir="${basedir}/modules/module-useradmin/sources"
            destdir="${basedir}/classes"
            includes="${packages}"
@@ -65,19 +65,15 @@
 	       encoding="${sourceencoding}"
            deprecation="${deprecation}">
     </javac>
-    <echo>---------------------------------------------------------</echo>
+    <echo level="info">---------------------------------------------------------</echo>
   </target>
 
-  <target name="compile" depends="compile_frontend_servlets" />
-
-  <target name="compile_frontend_servlets">
-    <echo>Compiling the MyCoRe user administration frontent servlets</echo>
+  <target name="compile">
+	<echo level="info">Compiling the MyCoRe user administration frontent servlets</echo>
     <antcall target="javac">
       <param name="packages" value="org/mycore/frontend/servlets/**"/>
     </antcall>
   </target>
-
-  <target name="webapps" />
 
 <!-- =================================================================== -->
 <!-- Remove the user created directories and files                       -->
@@ -89,6 +85,4 @@
 <!-- =================================================================== -->
 
 </project>
-
-<!-- =========================== End of file =========================== -->
 
