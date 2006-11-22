@@ -50,7 +50,17 @@
 				<xs:element name="components">
 					<xs:complexType>
 						<xs:sequence>
-							<xs:element name="headline" type="labelOutputType" minOccurs="0"/>
+							<xs:element name="headline" minOccurs="0">
+							  <xs:complexType>
+								  <xs:sequence>
+  									<xs:choice maxOccurs="unbounded">
+	  								  <xs:element ref="text" />
+		  							  <xs:element ref="output" />
+			  						</xs:choice>
+			  				  </xs:sequence>
+			  				  <xs:attribute ref="anchor" use="optional" />
+			  			  </xs:complexType>
+							</xs:element>
 							<xs:choice maxOccurs="unbounded">
 								<xs:element ref="panel"/>
 								<xs:element ref="repeater"/>
@@ -87,7 +97,7 @@
 				<xs:choice maxOccurs="unbounded">
 					<xs:element name="cell" minOccurs="0" maxOccurs="unbounded">
 						<xs:complexType>
-							<xs:choice>
+							<xs:choice minOccurs="0">
 								<xs:element ref="panel"/>
 								<xs:element ref="repeater"/>
 								<xs:element ref="text"/>
@@ -349,7 +359,7 @@
 			</xs:choice>
 			<xs:attribute name="min" type="xs:int" use="required"/>
 			<xs:attribute name="max" type="xs:int" use="required"/>
-			<xs:attribute ref="lines" use="required"/>
+			<xs:attribute ref="lines" use="optional" default="off" />
 			<xs:attribute name="pos" use="optional" default="right">
 				<xs:simpleType>
 					<xs:restriction base="xs:string">
@@ -441,7 +451,7 @@
 	</xs:attribute>
 	<xs:simpleType name="varPath">
 		<xs:restriction base="xs:string">
-			<xs:pattern value="[a-zA-Z0-9/\[\]@-]+"/>
+			<xs:pattern value="/?@?[a-zA-Z0-9\-]+(\[@[a-zA-Z0-9\-]+=&apos;[a-zA-Z0-9\-]+&apos;\])?(\[[1-9]+[0-9]*\])?(/@?[a-zA-Z0-9\-]+(\[@[a-zA-Z0-9\-]+=&apos;[a-zA-Z0-9\-]+&apos;\])?(\[[1-9]+[0-9]*\])?)*" />
 		</xs:restriction>
 	</xs:simpleType>
 	<xs:complexType name="labelOutputType">
@@ -474,7 +484,7 @@
 		<xs:attribute name="autofill" type="xs:string" use="optional"/>
 		<xs:attribute name="id" type="xs:ID" use="optional"/>
 		<xs:attribute name="width" type="xs:int" use="required"/>
-		<xs:attribute name="maxlength" type="xs:int" use="required"/>
+		<xs:attribute name="maxlength" type="xs:int" use="optional"/>
 	</xs:complexType>
 	<xs:complexType name="anyComponent">
 		<xs:choice>
