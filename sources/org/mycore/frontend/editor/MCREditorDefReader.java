@@ -116,8 +116,10 @@ public class MCREditorDefReader {
         cell.setAttribute("row", "1");
         cell.setAttribute("col", "1");
         panel.addContent(cell);
-        Element tf = new Element("textfield");
-        tf.setAttribute("width", "105");
+        Element tf = new Element("textarea");
+        tf.setAttribute("width", "80");
+        tf.setAttribute("height", "1");
+        tf.setAttribute("wrap", "off");
         tf.setAttribute("default", ex.getLocalizedMessage());
         cell.addContent(tf);
         cell = new Element("cell");
