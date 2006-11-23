@@ -46,7 +46,6 @@ import org.apache.lucene.search.Hits;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
-import org.apache.lucene.search.TopDocs;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRNormalizer;
@@ -427,23 +426,23 @@ public class MCROldLuceneSearcher extends MCRSearcher {
             deleteLuceneLocks(LOCK_DIR, 100);
         }
 
-        TopDocs hits = searcher.search(luceneQuery, null, maxResults);
-        int found = hits.scoreDocs.length;
+        Hits hits = searcher.search( luceneQuery );
+        int found = hits.length();
+//        TopDocs hits = searcher.search(luceneQuery, null, maxResults);
+//        int found = hits.scoreDocs.length;
 
         LOGGER.info("Number of Objects found : " + found);
 
         MCRResults result = new MCRResults();
 
         for (int i = 0; i < found; i++) {
-            // org.apache.lucene.document.Document doc = hits.doc(i);
-            org.apache.lucene.document.Document doc = searcher.doc(hits.scoreDocs[i].doc);
+            org.apache.lucene.document.Document doc = hits.doc(i);
+            //org.apache.lucene.document.Document doc = searcher.doc(hits.scoreDocs[i].doc);
 
             String id = doc.get("returnid");
             if (null == id)    // für miless
               id = doc.get("mcrid");
-            LOGGER.debug("returnid: " + id);
             MCRHit hit = new MCRHit(id);
-            
             
             Enumeration fields = doc.fields();
             while (fields.hasMoreElements()) {
