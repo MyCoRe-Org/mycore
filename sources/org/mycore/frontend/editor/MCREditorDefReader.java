@@ -54,12 +54,6 @@ public class MCREditorDefReader {
         editor.setAttribute("id", ref);
         editor.addContent(resolveInclude(uri, ref, true).getIncludedElements());
 
-        if (logger.isDebugEnabled()) {
-            logger.debug("--------------------");
-            logger.debug("\n" + editor2String(editor) + "\n");
-            logger.debug("--------------------");
-        }
-
         if (validate) {
             Document doc = new Document(editor);
             Namespace xsi = Namespace.getNamespace("xsi", "http://www.w3.org/2001/XMLSchema-instance");
@@ -80,7 +74,7 @@ public class MCREditorDefReader {
                 MCRXMLHelper.parseXML(baos.toByteArray(), true);
             } catch (Exception ex) {
                 logger.error("Editor definition did not validate.");
-                return buildDummyEditorForErrorMessage(uri, ex, editor2String(editor));
+                return buildDummyEditorForErrorMessage(uri, ex, editor2String(doc));
             }
             logger.info("Editor definition successfully validated.");
             editor.detach();
@@ -90,11 +84,10 @@ public class MCREditorDefReader {
         return editor;
     }
 
-    private static String editor2String(Element editor) {
+    private static String editor2String(Document doc) {
         XMLOutputter xout = new XMLOutputter();
         xout.setFormat(Format.getPrettyFormat());
-        String xml = (editor.getDocument() == null ? xout.outputString(editor) : xout.outputString(editor.getDocument()));
-        return xml;
+        return xout.outputString(doc);
     }
 
     private static Element buildDummyEditorForErrorMessage(String uri, Exception ex, String editorDef) {
