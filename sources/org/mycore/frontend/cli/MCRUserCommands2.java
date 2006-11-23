@@ -633,7 +633,8 @@ public class MCRUserCommands2 extends MCRAbstractCommands {
      *            flag to determine whether we use password encryption or not
      */
     private static final void createUserFromFile(String filename, boolean useEncryption) throws MCRException {
-        if (!checkFilename(filename)) {
+        MCRUserMgr mcrUserMgr = MCRUserMgr.instance();
+    	if (!checkFilename(filename)) {
             return;
         }
 
@@ -651,7 +652,12 @@ public class MCRUserCommands2 extends MCRAbstractCommands {
 
             for (int i = 0; i < listelm.size(); i++) {
                 MCRUser u = new MCRUser((org.jdom.Element) listelm.get(i), useEncryption);
-                MCRUserMgr.instance().createUser(u);
+                if(!mcrUserMgr.existUser(u.getID())){
+                	mcrUserMgr.createUser(u);
+                }
+                else{
+                	 LOGGER.info("User "+u.getID()+" was not created, because it already exists.");
+                }
             }
         } catch (Exception e) {
             throw new MCRException("Error while loading user data.", e);
@@ -704,6 +710,7 @@ public class MCRUserCommands2 extends MCRAbstractCommands {
      *            the filename of the user data input
      */
     public static final void createGroupFromFile(String filename) throws MCRException {
+    	MCRUserMgr mcrUserMgr = MCRUserMgr.instance();
         if (!checkFilename(filename)) {
             return;
         }
@@ -722,7 +729,12 @@ public class MCRUserCommands2 extends MCRAbstractCommands {
 
             for (int i = 0; i < listelm.size(); i++) {
                 MCRGroup g = new MCRGroup((org.jdom.Element) listelm.get(i));
-                MCRUserMgr.instance().createGroup(g);
+                if(!mcrUserMgr.existGroup(g.getID())){
+                	MCRUserMgr.instance().createGroup(g);
+                }
+                else{
+                	LOGGER.info("Group "+g.getID()+" was not created, because it already exists.");
+                }
             }
         } catch (Exception e) {
             throw new MCRException("Error while loading group data.", e);
