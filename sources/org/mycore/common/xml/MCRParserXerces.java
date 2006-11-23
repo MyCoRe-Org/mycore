@@ -180,7 +180,6 @@ public class MCRParserXerces implements MCRParserInterface, ErrorHandler {
      */
     public Document parseXML(byte[] xml, boolean validate) {
         InputSource source = new InputSource(new ByteArrayInputStream(xml));
-
         return parse(source, validate);
     }
 
@@ -202,12 +201,14 @@ public class MCRParserXerces implements MCRParserInterface, ErrorHandler {
         try {
             return builder.build(source);
         } catch (Exception ex) {
-            LOGGER.error("Error while parsing XML document", ex);
-            throw new MCRException("Error while parsing XML document", ex);
+            if (ex instanceof MCRException)
+                throw (MCRException) ex;
+
+            throw new MCRException(msg, ex);
         }
     }
 
-    private final static String msg = " while parsing XML document: ";
+    private final static String msg = "Error while parsing XML document: ";
 
     /**
      * Handles parser warnings
@@ -221,7 +222,7 @@ public class MCRParserXerces implements MCRParserInterface, ErrorHandler {
      */
     public void error(SAXParseException ex) {
         LOGGER.error(getSAXErrorMessage(ex), ex);
-        throw new MCRException("Error " + msg + ex.getLocalizedMessage(), ex);
+        throw new MCRException(msg + getSAXErrorMessage(ex), ex);
     }
 
     /**
@@ -229,7 +230,7 @@ public class MCRParserXerces implements MCRParserInterface, ErrorHandler {
      */
     public void fatalError(SAXParseException ex) {
         LOGGER.fatal(getSAXErrorMessage(ex));
-        throw new MCRException("Error " + msg + ex.getLocalizedMessage(), ex);
+        throw new MCRException(msg + getSAXErrorMessage(ex), ex);
     }
 
     /**
@@ -250,14 +251,12 @@ public class MCRParserXerces implements MCRParserInterface, ErrorHandler {
                 systemId = systemId.substring(index + 1);
             }
 
-            str.append(systemId);
+            str.append(systemId).append(": ");
         }
 
-        str.append(" : line=");
-        str.append(ex.getLineNumber());
-        str.append(" : column=");
-        str.append(ex.getColumnNumber());
-        str.append(" : message=");
+        str.append("line ").append(ex.getLineNumber());
+        str.append(", column ").append(ex.getColumnNumber());
+        str.append(", ");
         str.append(ex.getLocalizedMessage());
 
         return str.toString();
