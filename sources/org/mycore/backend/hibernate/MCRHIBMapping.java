@@ -149,16 +149,6 @@ public class MCRHIBMapping {
             map.addIDColumn("mcrurn", "MCRURN", dbString, 194, "assigned", false);
             cfg.addXML(map.getTableXML());
 
-            // NBN Manager
-            map = new MCRTableGenerator(config.getString("MCR.nbn_store_sql_table", "MCRNBN"), "org.mycore.backend.hibernate.tables.MCRNBNS", "", 1);
-            map.addIDColumn("niss", "NISS", dbString, 32, "assigned", false);
-            map.addColumn("url", "URL", dbString, 250, false, false, false);
-            map.addColumn("author", "AUTHOR", dbString, 80, true, false, false);
-            map.addColumn("comment", "COMMENT", dbBlob, 1024, false, false, false);
-            map.addColumn("date", "DATE", dbTimestamp, 32, true, false, false);
-            map.addColumn("documentid", "DOCUMENTID", dbString, 64, false, false, false);
-            cfg.addXML(map.getTableXML());
-
             // User
             map = new MCRTableGenerator(config.getString("MCR.users_store_sql_table_users", "MCRUSERS"), "org.mycore.backend.hibernate.tables.MCRUSERS", "", 2);
             map.addIDColumn("numid", "NUMID", dbInt, 0, "assigned", false);
