@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.jdom.Comment;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.Namespace;
@@ -97,7 +98,7 @@ public class MCREditorDefReader {
     }
 
     private static Element buildDummyEditorForErrorMessage(String uri, Exception ex, String editorDef) {
-        Element editor = new Element( "editor" );
+        Element editor = new Element("editor");
         editor.setAttribute("id", "validationError");
         Element components = new Element("components");
         components.setAttribute("root", "root");
@@ -198,7 +199,7 @@ public class MCREditorDefReader {
         if (cached != null) {
             MCREditorServlet.logger.debug("Editor resolved include from cache: " + key);
 
-            return new MCRResolvedInclude(cached, cacheable);
+            return new MCRResolvedInclude(cached, cacheable, uri, idref);
         }
 
         // Get the elements to include from uri
@@ -217,7 +218,7 @@ public class MCREditorDefReader {
             includesCache.put(key, container);
         }
 
-        return new MCRResolvedInclude(container, cacheable);
+        return new MCRResolvedInclude(container, cacheable, uri, idref);
     }
 
     /**
@@ -231,9 +232,11 @@ public class MCREditorDefReader {
      */
     protected static boolean resolveIncludes(Element container) {
         boolean allCacheable = true;
-        List children = container.getChildren();
+        List children = container.getContent();
 
         for (int i = 0; i < children.size(); i++) {
+            if (!(children.get(i) instanceof Element))
+                continue;
             Element child = (Element) (children.get(i));
 
             if (child.getName().equals("include")) {
@@ -266,9 +269,14 @@ class MCRResolvedInclude {
 
     private boolean cacheable;
 
-    MCRResolvedInclude(Element container, boolean cacheable) {
+    MCRResolvedInclude(Element container, boolean cacheable, String uri, String idref) {
         this.cacheable = cacheable;
         this.included = new java.util.Vector();
+
+        String src = uri;
+        if ((idref != null) && (idref.trim().length() != 0))
+            src += "#" + idref;
+        included.add(new Comment(" ========== Begin of include from " + src + " ========== "));
 
         List children = container.getChildren();
 
@@ -276,6 +284,8 @@ class MCRResolvedInclude {
             Element child = (Element) (children.get(i));
             included.add(child.clone());
         }
+
+        included.add(new Comment(" ========== End of include from " + src + " ========== "));
     }
 
     boolean isCacheable() {
