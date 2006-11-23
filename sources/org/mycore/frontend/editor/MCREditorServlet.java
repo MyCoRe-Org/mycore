@@ -56,7 +56,7 @@ import org.mycore.frontend.servlets.MCRServletJob;
  * converts the submitted data into a JDOM XML document for further processing.
  * It can also handle file uploads.
  * 
- * @author Frank L?tzenkirchen
+ * @author Frank Lützenkirchen
  * @version $Revision$ $Date$
  */
 public class MCREditorServlet extends MCRServlet {
