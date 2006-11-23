@@ -24,18 +24,18 @@
 package org.mycore.frontend.servlets;
 
 import java.io.File;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
+import java.io.FileInputStream;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.mycore.common.MCRSessionMgr;
+import org.jdom.Document;
+import org.mycore.common.MCRUtils;
+import org.mycore.common.xml.MCRURIResolver;
+import org.mycore.common.xml.MCRXMLHelper;
+import org.mycore.frontend.editor.MCREditorServlet;
 
 /**
  * This servlet displays static *.xml files stored in the web application by
@@ -47,55 +47,39 @@ import org.mycore.common.MCRSessionMgr;
 public class MCRStaticXMLFileServlet extends MCRServlet {
     protected final static Logger LOGGER = Logger.getLogger(MCRStaticXMLFileServlet.class);
 
-    private Random random = new Random();
-
     public void doGetPost(MCRServletJob job) throws ServletException, java.io.IOException {
         String requestedPath = job.getRequest().getServletPath();
         LOGGER.info("MCRStaticXMLFileServlet " + requestedPath);
 
-        URL url = null;
-
-        try {
-            url = getServletContext().getResource(requestedPath);
-        } catch (MalformedURLException willNeverBeThrown) {
-        }
-
-        if (url == null) {
+        String path = getServletContext().getRealPath(requestedPath);
+        File file = new File(path);
+        if (!file.exists()) {
             String msg = "Could not find file " + requestedPath;
             job.getResponse().sendError(HttpServletResponse.SC_NOT_FOUND, msg);
 
             return;
         }
 
-        String path = getServletContext().getRealPath(requestedPath);
-        File file = new File(path);
-        String documentBaseURL = file.getParent() + File.separator;
-
-        // Store http request parameters into session, for later use
-        Map map = new HashMap();
-        map.putAll(job.getRequest().getParameterMap());
-
-        String key = buildRequestParamKey();
-        MCRServlet.requestParamCache.put(key, map);
-
-        job.getRequest().setAttribute("XSL.RequestParamKey", key);
         job.getRequest().setAttribute("XSL.StaticFilePath", requestedPath.substring(1));
-        job.getRequest().setAttribute("XSL.DocumentBaseURL", documentBaseURL);
+        job.getRequest().setAttribute("XSL.DocumentBaseURL", file.getParent() + File.separator);
         job.getRequest().setAttribute("XSL.FileName", file.getName());
         job.getRequest().setAttribute("XSL.FilePath", file.getPath());
-        job.getRequest().setAttribute("MCRLayoutServlet.Input.FILE", file);
+
+        // Find out XML document type: Is this a static webpage or some other XML?
+        FileInputStream fis = new FileInputStream(file);
+        String type = MCRUtils.parseDocumentType(fis);
+        fis.close();
+
+        // For static webpages, replace editor elements with complete editor definition
+        if ("MyCoReWebPage".equals(type) || "webpage".equals(type)) {
+            MCRURIResolver.init(getServletContext(), getBaseURL());
+            Document xml = MCRXMLHelper.parseURI(path, false);
+            MCREditorServlet.replaceEditorElements(job, "file://" + path, xml);
+            job.getRequest().setAttribute("MCRLayoutServlet.Input.JDOM", xml);
+        } else
+            job.getRequest().setAttribute("MCRLayoutServlet.Input.FILE", file);
 
         RequestDispatcher rd = getServletContext().getNamedDispatcher("MCRLayoutServlet");
         rd.forward(job.getRequest(), job.getResponse());
-    }
-
-    /** Helper method to build a unique key for caching http request params * */
-    private synchronized String buildRequestParamKey() {
-        StringBuffer sb = new StringBuffer();
-        sb.append(Long.toString(System.currentTimeMillis(), 36));
-        sb.append(Long.toString(random.nextLong(), 36));
-        sb.reverse();
-
-        return sb.toString();
     }
 }

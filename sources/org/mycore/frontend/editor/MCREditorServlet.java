@@ -24,7 +24,6 @@
 package org.mycore.frontend.editor;
 
 import java.io.IOException;
-import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
@@ -44,6 +43,7 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
+import org.jdom.filter.ElementFilter;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.mycore.common.MCRCache;
@@ -79,11 +79,7 @@ public class MCREditorServlet extends MCRServlet {
 
         String action = parms.getParameter("_action");
 
-        if ("start.session".equals(action)) {
-            processStartSession(req, res);
-        } else if ("load.session".equals(action)) {
-            processLoadSession(req, res);
-        } else if ("show.popup".equals(action)) {
+        if ("show.popup".equals(action)) {
             processShowPopup(req, res);
         } else if ("submit".equals(action)) {
             processSubmit(req, res, parms);
@@ -111,48 +107,59 @@ public class MCREditorServlet extends MCRServlet {
     }
 
     /**
-     * Loads existing editor session data into webpage
+     * Replaces editor elements in static webpage with complete editor
+     * definition.
+     * 
+     * @param job
+     *            the current MCRServletJob
+     * @param uri
+     *            the uri of the static XML file containing the editor
+     * @param xml
+     *            the complete XML document of the static webpage
      */
-    private void processLoadSession(HttpServletRequest req, HttpServletResponse res) throws java.io.IOException {
-        String sessionID = req.getParameter("_session");
-        logger.info("Editor session " + sessionID + " reload form data");
+    public static void replaceEditorElements(MCRServletJob job, String uri, Document xml) {
+        String sessionID = job.getRequest().getParameter("XSL.editor.session.id");
 
-        Element editor = (Element) (sessions.get(sessionID));
-        sendXML(res, editor.getDocument());
-    }
+        List editors = new ArrayList();
+        Iterator it = xml.getDescendants(new ElementFilter("editor"));
+        while (it.hasNext())
+            editors.add(it.next());
 
-    private void sendXML(HttpServletResponse res, Document doc) throws IOException {
-        res.setContentType("text/xml");
+        for (int i = 0; i < editors.size(); i++) {
 
-        OutputStream out = res.getOutputStream();
-        new org.jdom.output.XMLOutputter().output(doc, out);
-        out.flush();
-        out.close();
+            Element editor = (Element) (editors.get(i));
+            Element editorResolved = null;
+            if ((sessionID == null) || (sessions.get(sessionID) == null))
+                editorResolved = startSession(job.getRequest(), editor, uri);
+            else
+                editorResolved = (Element) (sessions.get(sessionID));
+
+            editor.removeContent();
+            editor.addContent(editorResolved.cloneContent());
+            editor.setAttribute("session", editorResolved.getAttributeValue("session"));
+        }
     }
 
     /**
      * Starts a new editor session in webpage
      */
-    private void processStartSession(HttpServletRequest req, HttpServletResponse res) throws java.io.IOException {
-        String uri = req.getParameter("_uri");
-        String ref = req.getParameter("_ref");
-        String val = req.getParameter("_validate");
-        String key = req.getParameter("_requestParamKey");
+    private static Element startSession(HttpServletRequest req, Element editor, String uri) {
 
+        String ref = editor.getAttributeValue("id");
         logger.info("Editor start editor session from " + ref + "@" + uri);
 
-        Map requestParameters = getRequestParameters(key);
-        Element param = getTargetParameters(requestParameters);
-        boolean validate = "true".equals(val);
-        Element editor = MCREditorDefReader.readDef(uri, ref, validate);
+        Map parameters = req.getParameterMap();
+        Element param = getTargetParameters(parameters);
+        boolean validate = "true".equals(editor.getAttributeValue("validate", "false"));
+        editor = MCREditorDefReader.readDef(uri, ref, validate);
 
         if (param != null) {
             editor.addContent(param);
         }
 
-        buildCancelURL(editor, requestParameters);
+        buildCancelURL(editor, parameters);
 
-        MCREditorSubmission sub = MCREditorSourceReader.readSource(editor, requestParameters);
+        MCREditorSubmission sub = MCREditorSourceReader.readSource(editor, parameters);
 
         if (sub != null) {
             editor.addContent(sub.buildInputElements());
@@ -172,21 +179,10 @@ public class MCREditorServlet extends MCRServlet {
 
         logger.info("Editor session " + sessionID + " created");
 
-        sendXML(res, new Document(editor));
+        return editor;
     }
 
-    private Map getRequestParameters(String key) {
-        MCRCache cache = MCRServlet.requestParamCache;
-        Map parameters = (Map) (cache.get(key));
-
-        return parameters;
-    }
-
-    private Element getTargetParameters(Map parameters) {
-        if (parameters == null) {
-            return null;
-        }
-
+    private static Element getTargetParameters(Map parameters) {
         Element tps = new Element("target-parameters");
         Iterator keys = parameters.keySet().iterator();
 
@@ -228,7 +224,7 @@ public class MCREditorServlet extends MCRServlet {
         return tps;
     }
 
-    private void buildCancelURL(Element editor, Map parameters) {
+    private static void buildCancelURL(Element editor, Map parameters) {
         if (parameters == null) {
             logger.debug("CancelURL: no request parameters, cancel element unchanged");
 
@@ -386,10 +382,10 @@ public class MCREditorServlet extends MCRServlet {
                 sb.append("?XSL.editor.session.id=").append(sessionID);
             } else if ("webpage".equals(subselect.getAttributeValue("type"))) {
                 sb.append(subselect.getAttributeValue("href"));
-                if ( subselect.getAttributeValue("href").indexOf("?") > 0)
+                if (subselect.getAttributeValue("href").indexOf("?") > 0)
                     sb.append("&XSL.subselect.session=").append(sessionID);
                 else
-                    sb.append("?XSL.subselect.session=").append(sessionID);                                
+                    sb.append("?XSL.subselect.session=").append(sessionID);
                 sb.append("&XSL.subselect.varpath=").append(var);
                 sb.append("&XSL.subselect.webpage=").append(parms.getParameter("_webpage"));
             } else if ("servlet".equals(subselect.getAttributeValue("type"))) {
