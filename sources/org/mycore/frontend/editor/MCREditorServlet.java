@@ -444,8 +444,7 @@ public class MCREditorServlet extends MCRServlet {
 
         MCREditorSubmission sub = new MCREditorSubmission(parms, editor, true);
 
-        if (sub.errors()) // validation failed, go back to editor form in
-        // webpage
+        if (sub.errors()) // validation failed, go back to editor form in webpage
         {
             editor.removeChild("input");
             editor.removeChild("repeats");
@@ -463,20 +462,6 @@ public class MCREditorServlet extends MCRServlet {
 
             logger.debug("Editor redirect to " + sb.toString());
             res.sendRedirect(res.encodeRedirectURL(sb.toString()));
-
-            return;
-        }
-
-        // If there is no input, handle as if "cancel" button was pressed
-        if (sub.getVariables().size() == 0) {
-            logger.debug("Editor: cancel");
-
-            Element cancel = editor.getChild("cancel");
-            String cancelURL = ((cancel != null) ? cancel.getAttributeValue("url", (String) null) : null);
-
-            if (cancelURL != null) {
-                res.sendRedirect(res.encodeRedirectURL(cancelURL));
-            }
 
             return;
         }
