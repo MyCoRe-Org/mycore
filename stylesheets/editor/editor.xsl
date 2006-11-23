@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
 <!-- ============================================== -->
-<!-- $Revision: 1.53 $ $Date: 2006-11-23 10:48:57 $ -->
+<!-- $Revision: 1.54 $ $Date: 2006-11-23 15:46:40 $ -->
 <!-- ============================================== --> 
 
 <xsl:stylesheet 
@@ -16,10 +16,7 @@
 
 <!-- ======== http request parameters ======== -->
 
-<xsl:param name="editor.session.id" /> <!-- reload session after plus minus up down button -->
-
 <xsl:param name="StaticFilePath"  /> <!-- path of static webpage including this editor -->
-<xsl:param name="RequestParamKey" /> <!-- key for accessing http request params in session -->
 
 <!-- ======== constants, do not change ======== -->
 <xsl:variable name="editor.delimiter.internal"  select="'_'" />
@@ -43,36 +40,9 @@
 <!-- ======== handles editor ======== -->
 
 <xsl:template match="editor">
-
-  <!-- ======== import editor definition ======== -->
-  <xsl:variable name="uri" select="concat('webapp:', $StaticFilePath)" />
-  <xsl:variable name="query">
-    <xsl:choose>
-      <xsl:when test="string-length($editor.session.id) &gt; 0">
-        <xsl:text>?_action=load.session&amp;_session=</xsl:text>
-        <xsl:value-of select="$editor.session.id" />
-      </xsl:when>
-      <xsl:otherwise>
-        <xsl:text>?_requestParamKey=</xsl:text>
-        <xsl:value-of select="$RequestParamKey" />
-        <xsl:text>&amp;_ref=</xsl:text>
-        <xsl:value-of select="@id" />
-        <xsl:text>&amp;_validate=</xsl:text>
-        <xsl:value-of select="@validate" />
-        <xsl:text>&amp;_action=start.session&amp;_uri=</xsl:text>
-        <xsl:value-of select="$uri" />
-      </xsl:otherwise>
-    </xsl:choose>
-  </xsl:variable>
-  <xsl:variable name="url">
-    <xsl:value-of select="concat('request:servlets/XMLEditor',$JSessionID,$query)" />
-  </xsl:variable>
-
   <!-- ======== build nested panel structure ======== -->
-  <xsl:apply-templates select="document($url)/editor/components" />
+  <xsl:apply-templates select="components" />
 </xsl:template>
-
-<!-- ========================================================================= -->
 
 <!-- ======== handle components ======== -->
 <xsl:template match="components">
