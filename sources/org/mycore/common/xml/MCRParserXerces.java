@@ -77,7 +77,7 @@ public class MCRParserXerces implements MCRParserInterface, ErrorHandler {
         builderValid.setFeature(FEATURE_NAMESPACES, true);
         builderValid.setFeature(FEATURE_SCHEMA_SUPPORT, true);
         builderValid.setFeature(FEATURE_FULL_SCHEMA_SUPPORT, false);
-        builderValid.setReuseParser(true);
+        builderValid.setReuseParser(false);
         builderValid.setErrorHandler(this);
         builderValid.setEntityResolver(MCRURIResolver.instance());
 
@@ -85,7 +85,7 @@ public class MCRParserXerces implements MCRParserInterface, ErrorHandler {
         builder.setFeature(FEATURE_NAMESPACES, true);
         builder.setFeature(FEATURE_SCHEMA_SUPPORT, true);
         builder.setFeature(FEATURE_FULL_SCHEMA_SUPPORT, true);
-        builder.setReuseParser(true);
+        builder.setReuseParser(false);
         builder.setErrorHandler(this);
         builder.setEntityResolver(MCRURIResolver.instance());
     }
