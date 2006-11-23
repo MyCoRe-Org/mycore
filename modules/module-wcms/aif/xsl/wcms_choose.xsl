@@ -151,11 +151,31 @@ docportal build.xml
 				<div class="titel"><xsl:value-of select="i18n:translate('wcms.action')"/></div>
 				<div class="inhalt">					
 					<table class="aktion">
-						<tr class="aktion">
-							<td class="aktionIcon"><img src="{$BilderPfad}/wahl_dummy.gif" /></td>
-							<td class="aktionBeschreibung"><a href="javascript:starteAktion('edit');"><xsl:value-of select="i18n:translate('wcms.action.editContent')"/></a></td>
-							<td class="aktionOptionLeer"> </td>
-						</tr>
+						<xsl:choose>
+							<xsl:when test="$CurrentLang=$DefaultLang">
+								<tr class="aktion">
+									<td class="aktionIcon"><img src="{$BilderPfad}/wahl_dummy.gif" /></td>
+									<td class="aktionBeschreibung"><a href="javascript:starteAktion('edit');"><xsl:value-of select="i18n:translate('wcms.action.editContent')"/></a></td>
+									<td class="aktionOptionLeer"> </td>
+								</tr>								
+							</xsl:when>
+							<xsl:otherwise>
+								<tr class="aktion">
+									<td class="aktionIcon"><img src="{$BilderPfad}/wahl_dummy.gif" /></td>
+									<td class="aktionBeschreibung"><a href="javascript:starteAktion('translate');"><xsl:value-of select="i18n:translate('wcms.action.translate')"/></a></td>
+									<td class="aktionOptionLeer"> </td>
+									<input type="hidden" name="template">
+										<xsl:for-each
+											select="/cms/templates/content/template" >
+												<xsl:attribute name="value">
+													<xsl:value-of
+														select="node()"/>
+												</xsl:attribute>
+										</xsl:for-each>
+									</input>
+								</tr>
+							</xsl:otherwise>
+						</xsl:choose>
 						<tr>
 							<td colspan="3" class="leerzeile"> </td>
 						</tr>

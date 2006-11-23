@@ -354,19 +354,9 @@ template:
 										<br/>
 									</td>
 								</tr>
-								<tr>
-									<td>
-										<label for="label">
-											<xsl:value-of
-												select="i18n:translate('wcms.labels.name')"/>
-										</label>
-									</td>
-									<td>
-										<xsl:call-template
+						
+									<xsl:call-template
 											name="menuePunktName"/>
-									</td>
-								</tr>
-								
 								<xsl:if
 									test="/cms/action[@mode = 'intern'] and /cms/action = 'add'">
 									<tr>
@@ -431,159 +421,162 @@ template:
 								
 							</table>
 						</p>
-						
 					</div>
-					<div>
-						
-						<!-- give autoimport some info about this panel -->
-						<dl title="tabinfo" style="display:none;">
-							<dd title="name">
-								<xsl:value-of
-									select="i18n:translate('wcms.labels.navi')"/>
-							</dd>
-							<dd title="title">
+					<xsl:choose>
+						<xsl:when test="$CurrentLang=$DefaultLang">
+					        <div>
+							
+							<!-- give autoimport some info about this panel -->
+							<dl title="tabinfo" style="display:none;">
+								<dd title="name">
+									<xsl:value-of
+										select="i18n:translate('wcms.labels.navi')"/>
+								</dd>
+								<dd title="title">
+									<xsl:value-of
+										select="i18n:translate('wcms.labels.navilabel')"/>
+								</dd>
+								<dd title="accesskey">n</dd>
+							</dl>
+							
+							<h3>
 								<xsl:value-of
 									select="i18n:translate('wcms.labels.navilabel')"/>
-							</dd>
-							<dd title="accesskey">n</dd>
-						</dl>
-						
-						<h3>
-							<xsl:value-of
-								select="i18n:translate('wcms.labels.navilabel')"/>
-						</h3>
-						<br/>
-						<p><!-- Navigationsverhalten -->
-							<table width="500">
-								<xsl:call-template
-									name="buildInterface.general.metaData.replaceMenu"/>
-								<tr></tr>
-								<tr>
-									<td>
-										<xsl:value-of
-											select="i18n:translate('wcms.labels.targetofLink')"/>
-									</td>
-									<td>
-										<xsl:call-template
-											name="buildInterface.general.metaData.target"/>
-									</td>
-								</tr>
-								<tr></tr>
-								<tr>
-									<td>
-										<xsl:value-of
-											select="i18n:translate('wcms.labels.constrainPopUp')"/>
-									</td>
-									<td>
-										<xsl:call-template
-											name="buildInterface.general.metaData.constrainPopUp"/>
-									</td>
-								</tr>
-							</table>
-						</p>
-						
-					</div>
-					<div>
-						
-						<!-- give autoimport some info about this panel -->
-						<dl title="tabinfo" style="display:none;">
-							<dd title="name">
-								<xsl:value-of
-									select="i18n:translate('wcms.labels.layout')"/>
-							</dd>
-							<dd title="title">
+							</h3>
+							<br/>
+							<p><!-- Navigationsverhalten -->
+								<table width="500">
+									<xsl:call-template
+										name="buildInterface.general.metaData.replaceMenu"/>
+									<tr></tr>
+									<tr>
+										<td>
+											<xsl:value-of
+												select="i18n:translate('wcms.labels.targetofLink')"/>
+										</td>
+										<td>
+											<xsl:call-template
+												name="buildInterface.general.metaData.target"/>
+										</td>
+									</tr>
+									<tr></tr>
+									<tr>
+										<td>
+											<xsl:value-of
+												select="i18n:translate('wcms.labels.constrainPopUp')"/>
+										</td>
+										<td>
+											<xsl:call-template
+												name="buildInterface.general.metaData.constrainPopUp"/>
+										</td>
+									</tr>
+								</table>
+							</p>
+							
+						</div>
+						<div>
+							
+							<!-- give autoimport some info about this panel -->
+							<dl title="tabinfo" style="display:none;">
+								<dd title="name">
+									<xsl:value-of
+										select="i18n:translate('wcms.labels.layout')"/>
+								</dd>
+								<dd title="title">
+									<xsl:value-of
+										select="i18n:translate('wcms.labels.layoutlabel')"/>
+								</dd>
+								<dd title="accesskey">l</dd>
+							</dl>
+							
+							<h3>
 								<xsl:value-of
 									select="i18n:translate('wcms.labels.layoutlabel')"/>
-							</dd>
-							<dd title="accesskey">l</dd>
-						</dl>
-						
-						<h3>
-							<xsl:value-of
-								select="i18n:translate('wcms.labels.layoutlabel')"/>
-						</h3>
-						<br/>
-						<p><!-- Layout anpassen -->
-							<table>
-								<tr>
-									<td>
-										<xsl:value-of
-											select="i18n:translate('wcms.labels.selecttemplate')"/>
-									</td>
-									<td>
-										<xsl:call-template
-											name="buildInterface.general.metaData.selectTemplate">
-											<xsl:with-param name="href"
-												select="$href"/>
-											<xsl:with-param name="kindoftemplate"
-												select="'selfTemplate'"/>
-										</xsl:call-template>
-									</td>
-								</tr>
-								<tr>
-									<td>
-										<xsl:value-of
-											select="i18n:translate('wcms.labels.menuPointLayout')"/>
-									</td>
-									<td>
-										<xsl:call-template
-											name="buildInterface.general.metaData.menuPointLayout"/>
-									</td>
-								</tr>
-							</table>
-						</p>
-						
-					</div>
-					<div>
-						
-						<!-- give autoimport some info about this panel -->
-						<dl title="tabinfo" style="display:none;">
-							<dd title="name">
-								<xsl:value-of
-									select="i18n:translate('wcms.labels.history')"/>
-							</dd>
-							<dd title="title">
-								<xsl:value-of
-									select="i18n:translate('wcms.labels.historylabel')"/>
-							</dd>
-							<dd title="accesskey">a</dd>
-						</dl>
-						
-						
-						<!--						<h3><xsl:value-of select="i18n:translate('wcms.labels.historylabel')"/></h3>-->
-						<br/>
-						<!-- Historie der Seite -->
-						<xsl:variable name="servletPath">
-							<xsl:value-of
-								select="concat('request:servlets/WCMSAdminServlet',$JSessionID,'?action=logs&amp;sort=date&amp;sortOrder=descending&amp;XSL.Style=xml')"/>
-						</xsl:variable>
-						<xsl:variable name="logData">
-							<xsl:copy-of
-								select="xalan:nodeset(document($servletPath))"/>
-						</xsl:variable>
-	
-								<!-- div class="titel">WCMS Nutzungsprotokoll</div -->
-
-								<table id="statistic2">
-									<xsl:call-template name="logs.headLine">
-										<xsl:with-param name="sortBy"
-											select="'date'"/>
-										<xsl:with-param name="currentSortOrder"
-											select="'descending'"/>
-									</xsl:call-template>
-									<xsl:call-template name="logs.generateList">
-										<xsl:with-param name="rootNode"
-											select="$logData"/>
-										<xsl:with-param name="currentSortOrder"
-											select="'descending'"/>
-										<xsl:with-param name="sortBy"
-											select="'date'"/>
-										<xsl:with-param name="onlyCurrentPage"
-											select="/cms/href/text()"/>
-									</xsl:call-template>
+							</h3>
+							<br/>
+							<p><!-- Layout anpassen -->
+								<table>
+									<tr>
+										<td>
+											<xsl:value-of
+												select="i18n:translate('wcms.labels.selecttemplate')"/>
+										</td>
+										<td>
+											<xsl:call-template
+												name="buildInterface.general.metaData.selectTemplate">
+												<xsl:with-param name="href"
+													select="$href"/>
+												<xsl:with-param name="kindoftemplate"
+													select="'selfTemplate'"/>
+											</xsl:call-template>
+										</td>
+									</tr>
+									<tr>
+										<td>
+											<xsl:value-of
+												select="i18n:translate('wcms.labels.menuPointLayout')"/>
+										</td>
+										<td>
+											<xsl:call-template
+												name="buildInterface.general.metaData.menuPointLayout"/>
+										</td>
+									</tr>
 								</table>
-
-					</div>
+							</p>
+							
+						</div>
+						<div>
+							
+							<!-- give autoimport some info about this panel -->
+							<dl title="tabinfo" style="display:none;">
+								<dd title="name">
+									<xsl:value-of
+										select="i18n:translate('wcms.labels.history')"/>
+								</dd>
+								<dd title="title">
+									<xsl:value-of
+										select="i18n:translate('wcms.labels.historylabel')"/>
+								</dd>
+								<dd title="accesskey">a</dd>
+							</dl>
+							
+							
+							<!--						<h3><xsl:value-of select="i18n:translate('wcms.labels.historylabel')"/></h3>-->
+							<br/>
+							<!-- Historie der Seite -->
+							<xsl:variable name="servletPath">
+								<xsl:value-of
+									select="concat('request:servlets/WCMSAdminServlet',$JSessionID,'?action=logs&amp;sort=date&amp;sortOrder=descending&amp;XSL.Style=xml')"/>
+							</xsl:variable>
+							<xsl:variable name="logData">
+								<xsl:copy-of
+									select="xalan:nodeset(document($servletPath))"/>
+							</xsl:variable>
+		
+									<!-- div class="titel">WCMS Nutzungsprotokoll</div -->
+	
+									<table id="statistic2">
+										<xsl:call-template name="logs.headLine">
+											<xsl:with-param name="sortBy"
+												select="'date'"/>
+											<xsl:with-param name="currentSortOrder"
+												select="'descending'"/>
+										</xsl:call-template>
+										<xsl:call-template name="logs.generateList">
+											<xsl:with-param name="rootNode"
+												select="$logData"/>
+											<xsl:with-param name="currentSortOrder"
+												select="'descending'"/>
+											<xsl:with-param name="sortBy"
+												select="'date'"/>
+											<xsl:with-param name="onlyCurrentPage"
+												select="/cms/href/text()"/>
+										</xsl:call-template>
+									</table>
+	
+						</div>
+						</xsl:when>
+					</xsl:choose>			
 				</div>
 				
 				
@@ -592,7 +585,7 @@ template:
 				<!-- Speichern Inhalt -->
 				<div id="speichern">
 					<!-- div class="comment"-->
-					<xsl:if test="/cms/action = 'edit'">
+					<xsl:if test="/cms/action = 'edit' or 'translate' ">
 								<table align="right">	
 									<tr>
 										<xsl:variable name="comment-value">
@@ -817,30 +810,56 @@ template:
 	<xsl:template name="menuePunktName">
 		<xsl:choose>
 			<xsl:when test="/cms/action='translate'">
-				<xsl:text>[</xsl:text>
-				<xsl:value-of select="$DefaultLang"/>
-				<xsl:text>] </xsl:text>
-				<xsl:value-of select="/cms/label"/>
-				<br/>
-				<xsl:text>[</xsl:text>
-				<xsl:value-of select="$CurrentLang"/>
-				<xsl:text>] </xsl:text>
-				<input type="text" size="60" maxlength="60" name="label"
-					class="text">
-					<xsl:attribute name="value">
-						<xsl:value-of select="/cms/label_currentLang"/>
-					</xsl:attribute>
-				</input>
+				<tr>
+					<td>
+						<xsl:value-of
+								select="i18n:translate('wcms.labels.name.originaltitle')"/>
+						<xsl:text>[</xsl:text>
+						<xsl:value-of select="$DefaultLang"/>
+						<xsl:text>]: </xsl:text>
+					</td>
+					<td>
+						<xsl:value-of select="/cms/label"/>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<xsl:value-of
+								select="i18n:translate('wcms.labels.name.translatedtitle')"/>
+						<xsl:text>[</xsl:text>
+						<xsl:value-of select="$CurrentLang"/>
+						<xsl:text>]: </xsl:text>
+					</td>
+					<td>
+						<input type="text" size="60" maxlength="60"
+							name="label_currentLang" class="text">
+							<xsl:attribute name="value">
+								<xsl:value-of select="/cms/label_currentLang"/>
+							</xsl:attribute>
+						</input>
+					</td>
+				</tr>
 			</xsl:when>
 			<xsl:otherwise>
-				<input type="text" size="60" maxlength="60" name="label"
-					class="text">
-					<xsl:if test=" /cms/action = 'edit' ">
-						<xsl:attribute name="value">
-							<xsl:value-of select="/cms/label"/>
-						</xsl:attribute>
-					</xsl:if>
-				</input>
+				<tr>
+					<td>
+						<label for="label">
+							<xsl:value-of
+								select="i18n:translate('wcms.labels.name')"/>
+						</label>
+					</td>
+					<td>
+						
+						<input type="text" size="60" maxlength="60" name="label"
+							class="text">
+							<xsl:if test=" /cms/action = 'edit' ">
+								<xsl:attribute name="value">
+									<xsl:value-of select="/cms/label"/>
+								</xsl:attribute>
+							</xsl:if>
+						</input>
+					</td>
+				</tr>
 			</xsl:otherwise>
 		</xsl:choose>
 	</xsl:template>
