@@ -89,6 +89,7 @@
 				<xs:element ref="include" minOccurs="0"/>
 			</xs:sequence>
 			<xs:attribute name="id" type="xs:ID" use="required"/>
+			<xs:attribute name="validate" type="xs:boolean" use="optional" />
 		</xs:complexType>
 	</xs:element>
 	<xs:element name="panel">
@@ -233,6 +234,13 @@
 			<xs:complexContent>
 				<xs:extension base="textInputType">
 					<xs:attribute name="height" type="xs:int" use="required"/>
+					<xs:attribute name="wrap" use="optional">
+						<xs:simpleType>
+							<xs:restriction base="xs:string">
+								<xs:enumeration value="on"/>
+							</xs:restriction>
+						</xs:simpleType>
+					</xs:attribute>
 					<xs:attribute name="wysiwygEditor" type="xs:boolean" use="optional" default="false"/>
 				</xs:extension>
 			</xs:complexContent>
