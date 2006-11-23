@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
 <!-- ============================================== -->
-<!-- $Revision: 1.52 $ $Date: 2006-11-22 20:36:32 $ -->
+<!-- $Revision: 1.53 $ $Date: 2006-11-23 10:48:57 $ -->
 <!-- ============================================== --> 
 
 <xsl:stylesheet 
@@ -936,12 +936,10 @@
         </xsl:text></script>
     </xsl:if>
     
-    <xsl:variable name="wrap" select="''" />
- 
     <xsl:text disable-output-escaping="yes">&lt;textarea </xsl:text>
       <xsl:text>cols="</xsl:text><xsl:value-of select="@width"/><xsl:text>" </xsl:text>
       <xsl:text>rows="</xsl:text><xsl:value-of select="@height"/><xsl:text>" </xsl:text>
-      <xsl:text>wrap="</xsl:text><xsl:value-of select="$wrap"/><xsl:text>" </xsl:text>
+      <xsl:text>wrap="</xsl:text><xsl:value-of select="@wrap"/><xsl:text>" </xsl:text>
       <xsl:text>name="</xsl:text><xsl:value-of select="$var"/><xsl:text>" </xsl:text>
       <xsl:text disable-output-escaping="yes">&gt;</xsl:text>
 
