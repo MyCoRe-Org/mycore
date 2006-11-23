@@ -63,7 +63,6 @@ public class MCREditorDefReader {
             Document doc = new Document(editor);
             Namespace xsi = Namespace.getNamespace("xsi", "http://www.w3.org/2001/XMLSchema-instance");
             editor.setAttribute("noNamespaceSchemaLocation", "editor.xsd", xsi);
-            editor.setAttribute("id", ref);
 
             XMLOutputter xout = new XMLOutputter();
             xout.setFormat(Format.getPrettyFormat());
@@ -80,15 +79,11 @@ public class MCREditorDefReader {
                 MCRXMLHelper.parseXML(baos.toByteArray(), true);
             } catch (Exception ex) {
                 logger.error("Editor definition did not validate.");
-                Element components = buildDummyEditorForErrorMessage(uri, ex, editor2String(editor));
-                editor.removeContent();
-                editor.addContent(components);
-                return editor;
-            } finally {
-                editor.detach();
-                editor.removeAttribute("noNamespaceSchemaLocation", xsi);
+                return buildDummyEditorForErrorMessage(uri, ex, editor2String(editor));
             }
             logger.info("Editor definition successfully validated.");
+            editor.detach();
+            editor.removeAttribute("noNamespaceSchemaLocation", xsi);
         }
 
         return editor;
@@ -102,8 +97,11 @@ public class MCREditorDefReader {
     }
 
     private static Element buildDummyEditorForErrorMessage(String uri, Exception ex, String editorDef) {
+        Element editor = new Element( "editor" );
+        editor.setAttribute("id", "validationError");
         Element components = new Element("components");
         components.setAttribute("root", "root");
+        editor.addContent(components);
         Element headline = new Element("headline");
         components.addContent(headline);
         Element text = new Element("text");
@@ -118,7 +116,7 @@ public class MCREditorDefReader {
         cell.setAttribute("col", "1");
         panel.addContent(cell);
         Element tf = new Element("textfield");
-        tf.setAttribute("width", "110");
+        tf.setAttribute("width", "105");
         tf.setAttribute("default", ex.getLocalizedMessage());
         cell.addContent(tf);
         cell = new Element("cell");
@@ -132,7 +130,7 @@ public class MCREditorDefReader {
         def.addContent(editorDef);
         ta.addContent(def);
         cell.addContent(ta);
-        return components;
+        return editor;
     }
 
     /**
