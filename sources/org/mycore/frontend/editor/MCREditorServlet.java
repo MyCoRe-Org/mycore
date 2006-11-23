@@ -167,17 +167,9 @@ public class MCREditorServlet extends MCRServlet {
         }
 
         String sessionID = buildSessionID();
-
-        if (editor != null) {
-            sessions.put(sessionID, editor);
-            logger.debug("Storing editor sessions under id " + sessionID);
-        } else {
-            logger.debug("Not storing null editor session (id " + sessionID + ")");
-        }
-
         editor.setAttribute("session", sessionID);
-
-        logger.info("Editor session " + sessionID + " created");
+        sessions.put(sessionID, editor);
+        logger.debug("Storing editor sessions under id " + sessionID);
 
         return editor;
     }
