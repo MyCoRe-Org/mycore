@@ -26,7 +26,6 @@ package org.mycore.datamodel.ifs;
 import java.util.GregorianCalendar;
 import java.util.Vector;
 
-import org.apache.log4j.Logger;
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRPersistenceException;
@@ -56,8 +55,6 @@ import org.mycore.common.MCRPersistenceException;
  * @version $Revision$ $Date$
  */
 public class MCRFileMetadataManager {
-    /** The Log4J logger * */
-    private static Logger logger = Logger.getLogger(MCRFileMetadataManager.class.getName());
 
     /** The single instance of this class * */
     private static MCRFileMetadataManager manager;
@@ -152,7 +149,6 @@ public class MCRFileMetadataManager {
      *            the MCRFilesystemNode to store
      */
     void storeNode(MCRFilesystemNode node) throws MCRPersistenceException {
-        logger.debug("IFS StoreNode " + node.getName());
         store.storeNode(node);
         cache.put(node.getID(), node);
     }
@@ -167,10 +163,7 @@ public class MCRFileMetadataManager {
      *         exists.
      */
     MCRFilesystemNode retrieveNode(String ID) throws MCRPersistenceException {
-        logger.debug("IFS RetrieveNode " + ID);
-
         MCRFilesystemNode n = (MCRFilesystemNode) (cache.get(ID));
-
         return ((n != null) ? n : store.retrieveNode(ID));
     }
 
@@ -247,7 +240,6 @@ public class MCRFileMetadataManager {
      *            the ID of the node to delete from the store
      */
     void deleteNode(String ID) throws MCRPersistenceException {
-        logger.debug("IFS DeleteNode " + ID);
         cache.remove(ID);
         store.deleteNode(ID);
     }
