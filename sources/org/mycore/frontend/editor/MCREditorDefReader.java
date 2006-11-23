@@ -54,10 +54,8 @@ public class MCREditorDefReader {
         editor.addContent(resolveInclude(uri, ref, true).getIncludedElements());
 
         if (logger.isDebugEnabled()) {
-            XMLOutputter xout = new XMLOutputter();
-            xout.setFormat(Format.getPrettyFormat());
             logger.debug("--------------------");
-            logger.debug("\n" + xout.outputString(editor) + "\n");
+            logger.debug("\n" + editor2String(editor) + "\n");
             logger.debug("--------------------");
         }
 
@@ -78,14 +76,63 @@ public class MCREditorDefReader {
             }
 
             logger.info("Validating editor definition against XML schema...");
-            MCRXMLHelper.parseXML(baos.toByteArray(), true);
+            try {
+                MCRXMLHelper.parseXML(baos.toByteArray(), true);
+            } catch (Exception ex) {
+                logger.error("Editor definition did not validate.");
+                Element components = buildDummyEditorForErrorMessage(uri, ex, editor2String(editor));
+                editor.removeContent();
+                editor.addContent(components);
+                return editor;
+            } finally {
+                editor.detach();
+                editor.removeAttribute("noNamespaceSchemaLocation", xsi);
+            }
             logger.info("Editor definition successfully validated.");
-
-            editor.detach();
-            editor.removeAttribute("noNamespaceSchemaLocation", xsi);
         }
 
         return editor;
+    }
+
+    private static String editor2String(Element editor) {
+        XMLOutputter xout = new XMLOutputter();
+        xout.setFormat(Format.getPrettyFormat());
+        String xml = xout.outputString(editor);
+        return xml;
+    }
+
+    private static Element buildDummyEditorForErrorMessage(String uri, Exception ex, String editorDef) {
+        Element components = new Element("components");
+        components.setAttribute("root", "root");
+        Element headline = new Element("headline");
+        components.addContent(headline);
+        Element text = new Element("text");
+        text.setAttribute("label", "Error in editor definition: " + uri);
+        headline.addContent(text);
+        Element panel = new Element("panel");
+        panel.setAttribute("lines", "off");
+        panel.setAttribute("id", "root");
+        components.addContent(panel);
+        Element cell = new Element("cell");
+        cell.setAttribute("row", "1");
+        cell.setAttribute("col", "1");
+        panel.addContent(cell);
+        Element tf = new Element("textfield");
+        tf.setAttribute("width", "110");
+        tf.setAttribute("default", ex.getLocalizedMessage());
+        cell.addContent(tf);
+        cell = new Element("cell");
+        cell.setAttribute("row", "2");
+        cell.setAttribute("col", "1");
+        panel.addContent(cell);
+        Element ta = new Element("textarea");
+        ta.setAttribute("width", "80");
+        ta.setAttribute("height", "30");
+        Element def = new Element("default");
+        def.addContent(editorDef);
+        ta.addContent(def);
+        cell.addContent(ta);
+        return components;
     }
 
     /**
