@@ -93,7 +93,7 @@ public class MCREditorDefReader {
     private static String editor2String(Element editor) {
         XMLOutputter xout = new XMLOutputter();
         xout.setFormat(Format.getPrettyFormat());
-        String xml = xout.outputString(editor);
+        String xml = (editor.getDocument() == null ? xout.outputString(editor) : xout.outputString(editor.getDocument()));
         return xml;
     }
 
@@ -127,6 +127,7 @@ public class MCREditorDefReader {
         Element ta = new Element("textarea");
         ta.setAttribute("width", "80");
         ta.setAttribute("height", "30");
+        ta.setAttribute("wrap", "off");
         Element def = new Element("default");
         def.addContent(editorDef);
         ta.addContent(def);
