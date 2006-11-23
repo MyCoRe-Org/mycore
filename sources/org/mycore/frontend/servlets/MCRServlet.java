@@ -42,7 +42,6 @@ import org.jdom.Document;
 import org.jdom.Element;
 import org.mycore.access.MCRAccessInterface;
 import org.mycore.access.MCRAccessManager;
-import org.mycore.common.MCRCache;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
@@ -56,7 +55,7 @@ import org.mycore.datamodel.metadata.MCRActiveLinkException;
  * taken from MilessServlet.java written by Frank Lï¿½tzenkirchen.
  * 
  * @author Detlev Degenhardt
- * @author Frank Lï¿½tzenkirchen
+ * @author Frank Lützenkirchen
  * @author Thomas Scheffler (yagee)
  * 
  * @version $Revision$ $Date$
@@ -81,8 +80,6 @@ public class MCRServlet extends HttpServlet {
 	private final static boolean GET = true;
 
 	private final static boolean POST = false;
-
-	protected static MCRCache requestParamCache = new MCRCache(40);
 
 	/** returns the base URL of the mycore system */
 	public static String getBaseURL() {
