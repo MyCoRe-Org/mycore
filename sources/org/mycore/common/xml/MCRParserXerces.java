@@ -83,8 +83,8 @@ public class MCRParserXerces implements MCRParserInterface, ErrorHandler {
 
         builder = new SAXBuilder("org.apache.xerces.parsers.SAXParser", false);
         builder.setFeature(FEATURE_NAMESPACES, true);
-        builder.setFeature(FEATURE_SCHEMA_SUPPORT, true);
-        builder.setFeature(FEATURE_FULL_SCHEMA_SUPPORT, true);
+        builder.setFeature(FEATURE_SCHEMA_SUPPORT, false);
+        builder.setFeature(FEATURE_FULL_SCHEMA_SUPPORT, false);
         builder.setReuseParser(false);
         builder.setErrorHandler(this);
         builder.setEntityResolver(MCRURIResolver.instance());
