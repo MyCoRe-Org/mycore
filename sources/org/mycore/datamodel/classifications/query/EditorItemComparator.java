@@ -33,7 +33,7 @@ import org.jdom.Namespace;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 
-public class EditorItemComparator implements Comparator {
+public class EditorItemComparator implements Comparator<Element> {
     
     public static final EditorItemComparator CURRENT_LANG_TEXT_ORDER=new EditorItemComparator();
 
@@ -41,34 +41,29 @@ public class EditorItemComparator implements Comparator {
         super();
     }
 
-    public int compare(Object o1, Object o2) {
-        if (!((o1 instanceof Element) && (o2 instanceof Element))){
-            //NO JDOM Elements
-            return 0;
-        }
-        Element e1=(Element)o1;
-        Element e2=(Element)o2;
-        if (!((e1.getName().equals("item"))&&(e2.getName().equals("item")))){
+    public int compare(Element o1, Element o2) {
+        if (!((o1.getName().equals("item"))&&(o2.getName().equals("item")))){
             //NO Editor Items
             return 0;
         }
-        return String.CASE_INSENSITIVE_ORDER.compare(getCurrentLangLabel(e1),getCurrentLangLabel(e2));
+        return String.CASE_INSENSITIVE_ORDER.compare(getCurrentLangLabel(o1),getCurrentLangLabel(o2));
     }
     
+    @SuppressWarnings("unchecked")
     private static String getCurrentLangLabel(Element item){
         MCRSession session=MCRSessionMgr.getCurrentSession();
         String currentLang=session.getCurrentLanguage();
-        List labels=item.getChildren("label");
-        Iterator it=labels.iterator();
+        List<Element> labels=item.getChildren("label");
+        Iterator<Element> it=labels.iterator();
         while (it.hasNext()){
-            Element label=(Element)it.next();
+            Element label=it.next();
             if (label.getAttributeValue("lang",Namespace.XML_NAMESPACE).equals(currentLang)){
                 return label.getText();
             }
         }
         if (labels.size()>0){
             //fallback to first label if currentLang label is not found
-            return ((Element)labels.get(0)).getText();
+            return labels.get(0).getText();
         }
         return "";
     }

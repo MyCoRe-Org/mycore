@@ -72,8 +72,7 @@ public class ClassificationTransformer {
      * 
      * @param cl
      *            MCR Classification as a JDOM Document
-     * @return
-     *            null if <code>cl</code> is not valid
+     * @return null if <code>cl</code> is not valid
      */
     public static Classification getClassification(Document cl) {
         Element categories = cl.getRootElement().getChild("categories");
@@ -113,17 +112,16 @@ public class ClassificationTransformer {
             Document cd = new Document(new Element("mycoreclass"));
             cd.getRootElement().setAttribute("noNamespaceSchemaLocation", "MCRClassification.xsd", Namespace.getNamespace("xsi", MCRDefaults.XSI_URL));
             cd.getRootElement().setAttribute("ID", cl.getId());
-            Iterator it = cl.getLabels().iterator();
-            while (it.hasNext()) {
-                // add Labels
-                cd.getRootElement().addContent(getElement((Label) it.next()));
+            for (Label label : cl.getLabels()) {
+                cd.getRootElement().addContent(getElement(label));
             }
             Element categories = new Element("categories");
             cd.getRootElement().addContent(categories);
-            it = cl.getCatgegories().iterator();
-            while (it.hasNext()) {
-                // add child categories
-                categories.addContent(getElement((Category) it.next(),cl.isCounterEnabled()));
+            for (Label label : cl.getLabels()) {
+                cd.getRootElement().addContent(getElement(label));
+            }
+            for (Category category : cl.getCategories()) {
+                categories.addContent(getElement(category, cl.isCounterEnabled()));
             }
             return cd;
         }
@@ -148,15 +146,11 @@ public class ClassificationTransformer {
             if (withCounter) {
                 ce.setAttribute("counter", Integer.toString(category.getNumberOfObjects()));
             }
-            Iterator it = category.getLabels().iterator();
-            while (it.hasNext()) {
-                // add labels
-                ce.addContent(getElement((Label) it.next()));
+            for (Label label : category.getLabels()) {
+                ce.addContent(getElement(label));
             }
-            it = category.getCatgegories().iterator();
-            while (it.hasNext()) {
-                // add child categories
-                ce.addContent(getElement((Category) it.next(),withCounter));
+            for (Category cat : category.getCategories()) {
+                ce.addContent(getElement(cat, withCounter));
             }
             return ce;
         }
@@ -178,31 +172,31 @@ public class ClassificationTransformer {
 
         private static final Pattern COUNT_PATTERN = Pattern.compile("\\{count\\}");
 
+        @SuppressWarnings("unchecked")
         static Document getDocument(Classification cl, String labelFormat) {
             Document cd = new Document(new Element("items"));
-            Iterator it = cl.getCatgegories().iterator();
-            while (it.hasNext()) {
-                // add child categories
-                cd.getRootElement().addContent(getElement((Category) it.next(), labelFormat, cl.isCounterEnabled()));
+            for (Category category : cl.getCategories()) {
+                cd.getRootElement().addContent(getElement(category, labelFormat, cl.isCounterEnabled()));
             }
             sortItems(cd.getRootElement().getChildren("item"));
             return cd;
         }
 
-        private static void sortItems(List items) {
+        @SuppressWarnings("unchecked")
+        private static void sortItems(List<Element> items) {
             sort(items, EditorItemComparator.CURRENT_LANG_TEXT_ORDER);
-            Iterator it = items.iterator();
+            Iterator<Element> it = items.iterator();
             while (it.hasNext()) {
-                Element item = (Element) it.next();
-                List children = item.getChildren("item");
+                Element item = it.next();
+                List<Element> children = item.getChildren("item");
                 if (children.size() > 0) {
                     sortItems(children);
                 }
             }
         }
 
-        private static void sort(List list, Comparator c) {
-            Element[] a = (Element[]) list.toArray(new Element[list.size()]);
+        private static void sort(List<Element> list, Comparator<Element> c) {
+            Element[] a = list.toArray(new Element[list.size()]);
             Arrays.sort(a, c);
             for (int i = 0; i < a.length; i++) {
                 a[i].detach();
@@ -225,7 +219,7 @@ public class ClassificationTransformer {
             String text = TEXT_PATTERN.matcher(labelFormat).replaceAll(label.getText());
             text = ID_PATTERN.matcher(text).replaceAll(cat.getId());
             text = DESCR_PATTERN.matcher(text).replaceAll(label.description);
-            if (withCounter){
+            if (withCounter) {
                 text = COUNT_PATTERN.matcher(text).replaceAll(Integer.toString(cat.getNumberOfObjects()));
             }
             return text;
@@ -234,15 +228,11 @@ public class ClassificationTransformer {
         static Element getElement(Category category, String labelFormat, boolean withCounter) {
             Element ce = new Element("item");
             ce.setAttribute("value", category.getId());
-            Iterator it = category.getLabels().iterator();
-            while (it.hasNext()) {
-                // add labels
-                ce.addContent(getElement((Label) it.next(), category, labelFormat, withCounter));
+            for (Label label : category.getLabels()) {
+                ce.addContent(getElement(label, category, labelFormat, withCounter));
             }
-            it = category.getCatgegories().iterator();
-            while (it.hasNext()) {
-                // add child categories
-                ce.addContent(getElement((Category) it.next(), labelFormat, withCounter));
+            for (Category cat : category.getCategories()) {
+                ce.addContent(getElement(cat, labelFormat, withCounter));
             }
             return ce;
         }

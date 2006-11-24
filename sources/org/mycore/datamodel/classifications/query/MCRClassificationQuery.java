@@ -88,7 +88,7 @@ public class MCRClassificationQuery {
             LOGGER.debug("countReferenceCategory");
             Map map = withCounter ? MCRLinkTableManager.instance().countReferenceCategory(classID) : null;
             LOGGER.debug("select category");
-            Category cat = (Category) returns.getCatgegories().get(0);
+            Category cat = (Category) returns.getCategories().get(0);
             LOGGER.debug("fillCategory");
             fillCategory(cat, catItem, map, levels, withCounter);
             LOGGER.debug("finished ClassCategSearch");
@@ -111,7 +111,7 @@ public class MCRClassificationQuery {
     public static Classification getClassificationHierarchie(String classID, String categID, int levels, boolean withCounter) {
         MCRCategoryItem catItem = MCRCategoryItem.getCategoryItem(classID, categID);
         MCRCategoryItem parent = catItem.getParent();
-        LinkedList list = new LinkedList();
+        LinkedList<MCRCategoryItem> list = new LinkedList<MCRCategoryItem>();
         list.add(0, catItem);
         while (parent != null) {
             // build the ancestor axis
@@ -169,7 +169,7 @@ public class MCRClassificationQuery {
         return returns;
     }
 
-    private static Classification getClassification(MCRCategoryItem catItem, List ancestors, int levels, boolean withCounter) {
+    private static Classification getClassification(MCRCategoryItem catItem, List<MCRCategoryItem> ancestors, int levels, boolean withCounter) {
         Classification cl = ClassificationFactory.getClassification(catItem.getClassificationItem());
         // map of every categID with numberofObjects
         Map map = withCounter ? MCRLinkTableManager.instance().countReferenceCategory(cl.getId()) : null;
@@ -178,17 +178,17 @@ public class MCRClassificationQuery {
         return cl;
     }
 
-    private static Category fillCategoryWithParents(ClassificationObject c, List ancestor, Map numDocs, boolean withCounter) {
+    private static Category fillCategoryWithParents(ClassificationObject c, List<MCRCategoryItem> ancestor, Map numDocs, boolean withCounter) {
         ClassificationObject co = c;
         Category cat = null;
-        Iterator it = ancestor.iterator();
+        Iterator<MCRCategoryItem> it = ancestor.iterator();
         while (it.hasNext()) {
-            MCRCategoryItem item = (MCRCategoryItem) it.next();
+            MCRCategoryItem item = it.next();
             cat = CategoryFactory.getCategory(item);
             if (withCounter) {
                 cat.setNumberOfObjects(getNumberOfObjects(cat.getClassID(), cat.getId(), numDocs));
             }
-            co.getCatgegories().add(cat);
+            co.getCategories().add(cat);
             co = cat;
         }
         return cat;
@@ -205,24 +205,25 @@ public class MCRClassificationQuery {
                     childC.setNumberOfObjects(count);
                 }
                 childC.setClassID(item.getClassificationID());
-                c.getCatgegories().add(childC);
+                c.getCategories().add(childC);
                 fillCategory(childC, child, map, levels - 1, withCounter);
             }
         }
     }
 
+    @SuppressWarnings("unchecked")
     private static void fillCategory(String classID, ClassificationObject c, Element e, int levels, boolean withCounter) {
         if (levels != 0) {
-            List children = e.getChildren("category");
-            Iterator it = children.iterator();
+            List<Element> children = e.getChildren("category");
+            Iterator<Element> it = children.iterator();
             while (it.hasNext()) {
-                Element child = (Element) it.next();
+                Element child = it.next();
                 Category childC = CategoryFactory.getCategory(child);
                 if (withCounter) {
                     childC.setNumberOfObjects(getNumberOfObjects(child));
                 }
                 childC.setClassID(classID);
-                c.getCatgegories().add(childC);
+                c.getCategories().add(childC);
                 fillCategory(classID, childC, child, levels - 1, withCounter);
             }
         }
@@ -244,6 +245,7 @@ public class MCRClassificationQuery {
     }
 
     private static class ClassificationFactory {
+        @SuppressWarnings("unchecked")
         static Classification getClassification(Element e) {
             Classification c = new Classification();
             c.setId(e.getAttributeValue("ID"));
@@ -260,6 +262,7 @@ public class MCRClassificationQuery {
     }
 
     private static class CategoryFactory {
+        @SuppressWarnings("unchecked")
         static Category getCategory(Element e) {
             Category c = new Category();
             c.setId(e.getAttributeValue("ID"));
@@ -288,17 +291,17 @@ public class MCRClassificationQuery {
             return label;
         }
 
-        static List getLabels(List labels) {
-            List returns = new ArrayList(labels.size());
-            Iterator it = labels.iterator();
+        static List<Label> getLabels(List<Element> labels) {
+            List<Label> returns = new ArrayList<Label>(labels.size());
+            Iterator<Element> it = labels.iterator();
             while (it.hasNext()) {
-                returns.add(getLabel((Element) it.next()));
+                returns.add(getLabel(it.next()));
             }
             return returns;
         }
 
-        static List getLabels(List lang, List text, List description) {
-            List returns = new ArrayList(lang.size());
+        static List<Label> getLabels(List lang, List text, List description) {
+            List<Label> returns = new ArrayList<Label>(lang.size());
             for (int i = 0; i < lang.size(); i++) {
                 returns.add(getLabel(lang.get(i).toString(), text.get(i).toString(), description.get(i).toString()));
             }
@@ -320,9 +323,8 @@ public class MCRClassificationQuery {
         private static void print(ClassificationObject c, int depth) {
             intend(depth);
             System.out.println("ID: " + c.getId());
-            Iterator it = c.getCatgegories().iterator();
-            while (it.hasNext()) {
-                print((ClassificationObject) it.next(), depth + 1);
+            for (Category category : c.getCategories()) {
+                print(category, depth + 1);
             }
         }
 
