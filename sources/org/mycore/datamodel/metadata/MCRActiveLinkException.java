@@ -23,10 +23,10 @@
  **/
 package org.mycore.datamodel.metadata;
 
-import java.util.Hashtable;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.Collection;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.mycore.common.MCRCatchException;
 
@@ -46,13 +46,13 @@ public class MCRActiveLinkException extends MCRCatchException {
      */
     private static final long serialVersionUID = 1L;
 
-    Hashtable linkTable = new Hashtable();
+    Map<String, Collection<String>> linkTable = new ConcurrentHashMap<String, Collection<String>>();
 
     /**
      * 
      * @return a Hashtable with destinations (key) and List of sources (value)
      */
-    public Map getActiveLinks() {
+    public Map<String, Collection<String>> getActiveLinks() {
         return linkTable;
     }
 
@@ -67,9 +67,9 @@ public class MCRActiveLinkException extends MCRCatchException {
      */
     public void addLink(String source, String dest) {
         if (!linkTable.containsKey(dest)) {
-            linkTable.put(dest, new LinkedList());
+            linkTable.put(dest, new ConcurrentLinkedQueue<String>());
         }
-        ((List) linkTable.get(dest)).add(source);
+        linkTable.get(dest).add(source);
     }
 
     /**
