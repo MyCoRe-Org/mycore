@@ -141,8 +141,8 @@ public class MCRDataExtractorMP3 extends MCRDataExtractor {
             String key = (String) (keys.nextElement());
             String method = p.getProperty(key);
             try {
-                Method m = tag.getClass().getMethod(method, null);
-                String value = (String) (m.invoke(tag, null));
+                Method m = tag.getClass().getMethod(method, new Class[]{});
+                String value = (String) (m.invoke(tag, new Object[]{}));
                 addDataValue(parent, key, value);
             } catch (Exception ex) {
                 continue;

@@ -40,7 +40,7 @@ public class MCRAbstractCommands implements MCRExternalCommandInterface {
     protected static MCRConfiguration CONFIG = null;
 
     /** The array holding all known commands */
-    protected ArrayList command = null;
+    protected ArrayList<MCRCommand> command = null;
 
     /**
      * Initialize common data.
@@ -53,7 +53,7 @@ public class MCRAbstractCommands implements MCRExternalCommandInterface {
      * The constrctor.
      */
     protected MCRAbstractCommands() {
-        command = new ArrayList();
+        command = new ArrayList<MCRCommand>();
     }
 
     /**
