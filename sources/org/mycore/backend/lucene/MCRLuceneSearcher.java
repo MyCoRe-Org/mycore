@@ -165,24 +165,30 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
         int before, after;
         int dez;
         long l;
-        if ("decimal".equals(type)) {
-            before = DEC_BEFORE;
-            after = DEC_AFTER;
-            dez = before + after;
-            double d = Double.parseDouble(content);
-            d = d * Math.pow(10, after) + Math.pow(10, dez);
-            l = (long) d;
-        } else {
-            before = INT_BEFORE;
-            dez = before;
-            l = Long.parseLong(content);
-            l = l + (long) (Math.pow(10, dez) + 0.1);
+        try {
+	        if ("decimal".equals(type)) {
+	            before = DEC_BEFORE;
+	            after = DEC_AFTER;
+	            dez = before + after;
+	            double d = Double.parseDouble(content);
+	            d = d * Math.pow(10, after) + Math.pow(10, dez);
+	            l = (long) d;
+	        } else {
+	            before = INT_BEFORE;
+	            dez = before;
+	            if ( content.indexOf('.')>0)
+	            	content = content.substring(content.lastIndexOf('.')+1);
+	            l = Long.parseLong(content);
+	            l = l + (long) (Math.pow(10, dez) + 0.1);
+	        }
+	        long m = l + add;
+	        String n = "0000000000000000000";
+	        String h = Long.toString(m);
+	        return n.substring(0, dez + 1 - h.length()) + h;
+        } catch ( Exception all) {
+        	LOGGER.info("MCRLuceneSearcher can't format this Number, ignore this content: " + content);
+        	return "0";
         }
-
-        long m = l + add;
-        String n = "0000000000000000000";
-        String h = Long.toString(m);
-        return n.substring(0, dez + 1 - h.length()) + h;
     }
 
     protected void removeFromIndex(String entryID) {
