@@ -86,10 +86,10 @@ import org.xml.sax.InputSource;
  * @author Frank Lützenkirchen
  * @author Thomas Scheffler (yagee)
  */
-public class MCRURIResolver implements javax.xml.transform.URIResolver, EntityResolver {
+public final class MCRURIResolver implements javax.xml.transform.URIResolver, EntityResolver {
     private static final Logger LOGGER = Logger.getLogger(MCRURIResolver.class);
     
-    private static Map SUPPORTED_SCHEMES;
+    private static Map<String, MCRResolver> SUPPORTED_SCHEMES;
 
     private static final String CONFIG_PREFIX = "MCR.UriResolver.";
 
@@ -135,10 +135,10 @@ public class MCRURIResolver implements javax.xml.transform.URIResolver, EntityRe
         }
     }
 
-    private HashMap getResolverMapping() {
-        final Map extResolverMapping = EXT_RESOLVER.getResolverMapping();
+    private HashMap<String, MCRResolver> getResolverMapping() {
+        final Map<String, MCRResolver> extResolverMapping = EXT_RESOLVER.getResolverMapping();
         // set Map to final size with loadfactor: full
-        HashMap supportedSchemes = new HashMap(10 + extResolverMapping.size(), 1);
+        HashMap<String, MCRResolver> supportedSchemes = new HashMap<String, MCRResolver>(10 + extResolverMapping.size(), 1);
         // don't let interal mapping be overwritten
         supportedSchemes.putAll(extResolverMapping);
         supportedSchemes.put("webapp", new MCRWebAppResolver());
@@ -209,6 +209,7 @@ public class MCRURIResolver implements javax.xml.transform.URIResolver, EntityRe
         return null;
     }
     
+    @SuppressWarnings("unchecked")
     private void addDebugInfo(String href, String base){
         final MCRSession session=MCRSessionMgr.getCurrentSession();
         Object obj=session.get(SESSION_OBJECT_NAME);
@@ -324,7 +325,7 @@ public class MCRURIResolver implements javax.xml.transform.URIResolver, EntityRe
 
     MCRResolver getResolver(String scheme) {
         if (SUPPORTED_SCHEMES.containsKey(scheme)) {
-            return (MCRResolver) SUPPORTED_SCHEMES.get(scheme);
+            return SUPPORTED_SCHEMES.get(scheme);
         }
         String msg = "Unsupported scheme type: " + scheme;
         throw new MCRUsageException(msg);
@@ -384,12 +385,13 @@ public class MCRURIResolver implements javax.xml.transform.URIResolver, EntityRe
          * @see MCRResolver
          * @return a Map of Resolver mappings
          */
-        public Map getResolverMapping();
+        public Map<String, MCRResolver> getResolverMapping();
     }
     
     private static class MCREmptyResolverProvider implements MCRResolverProvider{
         
-        public Map getResolverMapping() {
+        @SuppressWarnings("unchecked")
+        public Map<String, MCRResolver> getResolverMapping() {
             return Collections.EMPTY_MAP;
         }
         
@@ -444,7 +446,7 @@ public class MCRURIResolver implements javax.xml.transform.URIResolver, EntityRe
 
             String[] param;
             StringTokenizer tok = new StringTokenizer(key, "&");
-            HashMap params = new HashMap();
+            HashMap<String, String> params = new HashMap<String, String>();
             while (tok.hasMoreTokens()) {
                 param = tok.nextToken().split("=");
                 params.put(param[0], param[1]);
@@ -454,16 +456,16 @@ public class MCRURIResolver implements javax.xml.transform.URIResolver, EntityRe
                 return null;
             }
             if (params.get(OPERATION_KEY).equals("MCRDoRetrieveObject")) {
-                org.w3c.dom.Document document = MCRQueryClient.doRetrieveObject(params.get(HOST_KEY).toString(), params.get(OBJECT_KEY).toString());
+                org.w3c.dom.Document document = MCRQueryClient.doRetrieveObject(params.get(HOST_KEY), params.get(OBJECT_KEY));
                 return DOM_BUILDER.build(document).detachRootElement();
             }
             if (params.get(OPERATION_KEY).equals("MCRDoRetrieveClassification")) {
-                String hostAlias=params.get(HOST_KEY).toString();
-                String level=params.get(LEVEL_KEY).toString();
-                String type=params.get(TYPE_KEY).toString();
-                String classId=params.get(CLASS_KEY).toString();
-                String categId=params.get(CATEG_KEY).toString();
-                String format=params.get(FORMAT_KEY).toString();
+                String hostAlias=params.get(HOST_KEY);
+                String level=params.get(LEVEL_KEY);
+                String type=params.get(TYPE_KEY);
+                String classId=params.get(CLASS_KEY);
+                String categId=params.get(CATEG_KEY);
+                String format=params.get(FORMAT_KEY);
                 org.w3c.dom.Document document = MCRQueryClient.doRetrieveClassification(hostAlias, level, type, classId, categId, format);
                 return DOM_BUILDER.build(document).detachRootElement();
             }
@@ -736,15 +738,15 @@ public class MCRURIResolver implements javax.xml.transform.URIResolver, EntityRe
 
             String[] param;
             StringTokenizer tok = new StringTokenizer(key, "&");
-            Hashtable params = new Hashtable();
+            Hashtable<String, String> params = new Hashtable<String, String>();
 
             while (tok.hasMoreTokens()) {
                 param = tok.nextToken().split("=");
                 params.put(param[0], param[1]);
             }
 
-            String action = (String) params.get(ACTION_PARAM);
-            String objId = (String) params.get(OBJECT_ID_PARAM);
+            String action = params.get(ACTION_PARAM);
+            String objId = params.get(OBJECT_ID_PARAM);
 
             if (action == null || objId == null) {
                 return null;
