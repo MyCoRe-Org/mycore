@@ -32,7 +32,7 @@ import org.mycore.common.MCRException;
  * two MCRObject's. Optional you can append the reference with the label
  * attribute. See to W3C XLink Standard for more informations.
  * <p>
- * &lt;tag class="MCRMetaLinkMCRObject" heritable="..." parasearch="..."&gt;
+ * &lt;tag class="MCRMetaLinkID"&gt;
  * <br>
  * &lt;subtag xlink:type="locator" xlink:href=" <em>MCRObjectID</em>"
  * xlink:label="..." xlink:title="..."/&gt; <br>

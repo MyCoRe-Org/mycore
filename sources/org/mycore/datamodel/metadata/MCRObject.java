@@ -272,18 +272,6 @@ final public class MCRObject extends MCRBase {
     }
 
     /**
-     * This methode create a String for all text searchable data in this
-     * instance.
-     * 
-     * @exception MCRException
-     *                if the content of this class is not valid
-     * @return a String with the text values from the metadata object
-     */
-    public final String createTextSearch() throws MCRException {
-        return mcr_metadata.createTextSearch();
-    }
-
-    /**
      * The methode create the object in the data store.
      * 
      * @exception MCRPersistenceException

@@ -62,11 +62,11 @@ public class MCRObjectService {
     // service data
     private String lang = null;
 
-    private ArrayList dates = null;
+    private ArrayList<MCRMetaISO8601Date> dates = null;
 
-    private ArrayList rules = null;
+    private ArrayList<MCRMetaAccessRule> rules = null;
 
-    private ArrayList flags = null;
+    private ArrayList<MCRMetaLangText> flags = null;
 
     /**
      * This is the constructor of the MCRObjectService class. All data are set
@@ -74,7 +74,7 @@ public class MCRObjectService {
      */
     public MCRObjectService() {
         lang = MCRConfiguration.instance().getString("MCR.metadata_default_lang", "en");
-        dates = new ArrayList();
+        dates = new ArrayList<MCRMetaISO8601Date>();
         
         Date curTime=new Date();
         
@@ -85,8 +85,8 @@ public class MCRObjectService {
         d.setDate(curTime);
         dates.add(d);
 
-        rules = new ArrayList();
-        flags = new ArrayList();
+        rules = new ArrayList<MCRMetaAccessRule>();
+        flags = new ArrayList<MCRMetaLangText>();
     }
 
     /**
@@ -194,7 +194,7 @@ public class MCRObjectService {
         int i = -1;
 
         for (int j = 0; j < dates.size(); j++) {
-            if (((MCRMetaISO8601Date) dates.get(j)).getType().equals(type)) {
+            if (dates.get(j).getType().equals(type)) {
                 i = j;
                 break;
             }
@@ -204,7 +204,7 @@ public class MCRObjectService {
             return null;
         }
 
-        return (MCRMetaISO8601Date) dates.get(i);
+        return dates.get(i);
     }
 
     /**
@@ -279,7 +279,7 @@ public class MCRObjectService {
         StringBuffer sb = new StringBuffer("");
 
         for (int i = 0; i < flags.size(); i++) {
-            sb.append(((MCRMetaLangText) flags.get(i)).getText()).append(" ");
+            sb.append(flags.get(i).getText()).append(" ");
         }
 
         return sb.toString();
@@ -306,7 +306,7 @@ public class MCRObjectService {
             throw new IndexOutOfBoundsException("Index error in getFlag.");
         }
 
-        return ((MCRMetaLangText) flags.get(index)).getText();
+        return flags.get(index).getText();
     }
 
     /**
@@ -322,7 +322,7 @@ public class MCRObjectService {
         }
 
         for (int i = 0; i < flags.size(); i++) {
-            if (((MCRMetaLangText) flags.get(i)).getText().equals(value)) {
+            if (flags.get(i).getText().equals(value)) {
                 return true;
             }
         }
@@ -407,7 +407,7 @@ public class MCRObjectService {
         if ((permission == null) || (permission.trim().length() == 0))
             return ret;
         for (int i = 0; i < rules.size(); i++) {
-            if (((MCRMetaAccessRule) rules.get(i)).getPermission().equals(permission)) {
+            if (rules.get(i).getPermission().equals(permission)) {
                 ret = i;
                 break;
             }
@@ -426,7 +426,7 @@ public class MCRObjectService {
         if ((index < 0) || (index > rules.size())) {
             throw new IndexOutOfBoundsException("Index error in getRule.");
         }
-        return (MCRMetaAccessRule) rules.get(index);
+        return rules.get(index);
     }
 
     /**
@@ -441,7 +441,7 @@ public class MCRObjectService {
         if ((index < 0) || (index > rules.size())) {
             throw new IndexOutOfBoundsException("Index error in getRulePermission.");
         }
-        return ((MCRMetaAccessRule) rules.get(index)).getPermission();
+        return rules.get(index).getPermission();
     }
 
     /**
@@ -478,11 +478,9 @@ public class MCRObjectService {
             elmm.setAttribute("class", "MCRMetaISO8601Date");
             elmm.setAttribute("heritable", "false");
             elmm.setAttribute("notinherit", "false");
-            elmm.setAttribute("parasearch", "true");
-            elmm.setAttribute("textsearch", "false");
 
             for (int i = 0; i < dates.size(); i++) {
-                elmm.addContent(((MCRMetaISO8601Date) dates.get(i)).createXML());
+                elmm.addContent(dates.get(i).createXML());
             }
 
             elm.addContent(elmm);
@@ -493,11 +491,9 @@ public class MCRObjectService {
             elmm.setAttribute("class", "MCRMetaAccessRule");
             elmm.setAttribute("heritable", "false");
             elmm.setAttribute("notinherit", "false");
-            elmm.setAttribute("parasearch", "true");
-            elmm.setAttribute("textsearch", "false");
 
             for (int i = 0; i < rules.size(); i++) {
-                elmm.addContent(((MCRMetaAccessRule) rules.get(i)).createXML());
+                elmm.addContent(rules.get(i).createXML());
             }
 
             elm.addContent(elmm);
@@ -508,11 +504,9 @@ public class MCRObjectService {
             elmm.setAttribute("class", "MCRMetaLangText");
             elmm.setAttribute("heritable", "false");
             elmm.setAttribute("notinherit", "false");
-            elmm.setAttribute("parasearch", "true");
-            elmm.setAttribute("textsearch", "false");
 
             for (int i = 0; i < flags.size(); i++) {
-                elmm.addContent(((MCRMetaLangText) flags.get(i)).createXML());
+                elmm.addContent(flags.get(i).createXML());
             }
 
             elm.addContent(elmm);
@@ -556,7 +550,7 @@ public class MCRObjectService {
             return -1;
         }
         for (int i = 0; i < flags.size(); i++) {
-            if (((MCRMetaLangText) flags.get(i)).getText().equals(value)) {
+            if (flags.get(i).getText().equals(value)) {
                 return i;
             }
         }

@@ -33,7 +33,7 @@ import org.mycore.common.MCRException;
  * Optional you can append the reference with the label attribute. See to W3C
  * XLink Standard for more informations.
  * <p>
- * &lt;tag class="MCRMetaLink" heritable="..." parasearch="..."&gt; <br>
+ * &lt;tag class="MCRMetaLink"&gt; <br>
  * &lt;subtag xlink:type="locator" xlink:href=" <em>URL</em>"
  * xlink:label="..." xlink:title="..."/&gt; <br>
  * &lt;subtag xlink:type="arc" xlink:from=" <em>URL</em>" xlink:to="URL"/&gt;

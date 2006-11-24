@@ -47,12 +47,10 @@ public class MCRObjectMetadata {
 
     private boolean herited_xml = false;
 
-    private boolean herited_search = false;
-
     // metadata list
-    private ArrayList meta_list = null;
+    private ArrayList<MCRMetaElement> meta_list = null;
 
-    private ArrayList tag_names = null;
+    private ArrayList<String> tag_names = null;
 
     /**
      * This is the constructor of the MCRObjectMetadata class. It set the
@@ -65,9 +63,8 @@ public class MCRObjectMetadata {
     public MCRObjectMetadata() throws MCRConfigurationException {
         default_lang = MCRConfiguration.instance().getString("MCR.metadata_default_lang");
         herited_xml = MCRConfiguration.instance().getBoolean("MCR.metadata_herited_for_xml", false);
-        herited_search = MCRConfiguration.instance().getBoolean("MCR.metadata_herited_for_search", false);
-        meta_list = new ArrayList();
-        tag_names = new ArrayList();
+        meta_list = new ArrayList<MCRMetaElement>();
+        tag_names = new ArrayList<String>();
     }
 
     /**
@@ -87,7 +84,7 @@ public class MCRObjectMetadata {
      * @return String the associated tag name
      */
     public final String getMetadataTagName(int i) {
-        return (String) tag_names.get(i);
+        return tag_names.get(i);
     }
 
     /**
@@ -101,7 +98,7 @@ public class MCRObjectMetadata {
         MCRObjectMetadata heritMeta = new MCRObjectMetadata();
 
         for (int i = 0; i < size(); ++i) {
-            MCRMetaElement me = (MCRMetaElement) meta_list.get(i);
+            MCRMetaElement me = meta_list.get(i);
 
             if (me.getHeritable()) {
                 MCRMetaElement nme = (MCRMetaElement) me.clone();
@@ -135,18 +132,18 @@ public class MCRObjectMetadata {
             int pos = -1;
 
             for (int j = 0; j < size(); j++) {
-                if (((String) tag_names.get(j)).equals(newtag)) {
+                if (tag_names.get(j).equals(newtag)) {
                     pos = j;
                 }
             }
 
             if (pos != -1) {
-                if (!((MCRMetaElement) meta_list.get(pos)).getNotInherit()) {
-                    ((MCRMetaElement) meta_list.get(pos)).setHeritable(true);
+                if (!meta_list.get(pos).getNotInherit()) {
+                    meta_list.get(pos).setHeritable(true);
 
                     for (int j = 0; j < newelm.size(); j++) {
                         MCRMetaInterface obj = newelm.getElement(j);
-                        ((MCRMetaElement) meta_list.get(pos)).addMetaObject(obj);
+                        meta_list.get(pos).addMetaObject(obj);
                     }
                 }
             } else {
@@ -173,8 +170,8 @@ public class MCRObjectMetadata {
         int len = tag_names.size();
 
         for (int i = 0; i < len; i++) {
-            if (((String) tag_names.get(i)).equals(tag)) {
-                return (MCRMetaElement) meta_list.get(i);
+            if (tag_names.get(i).equals(tag)) {
+                return meta_list.get(i);
             }
         }
 
@@ -194,7 +191,7 @@ public class MCRObjectMetadata {
             return null;
         }
 
-        return (MCRMetaElement) meta_list.get(index);
+        return meta_list.get(index);
     }
 
     /**
@@ -220,7 +217,7 @@ public class MCRObjectMetadata {
         int fl = -1;
 
         for (int i = 0; i < len; i++) {
-            if (((String) tag_names.get(i)).equals(tag)) {
+            if (tag_names.get(i).equals(tag)) {
                 fl = i;
             }
         }
@@ -251,7 +248,7 @@ public class MCRObjectMetadata {
         int len = tag_names.size();
 
         for (int i = 0; i < len; i++) {
-            if (((String) tag_names.get(i)).equals(tag)) {
+            if (tag_names.get(i).equals(tag)) {
                 meta_list.remove(i);
                 tag_names.remove(i);
 
@@ -332,29 +329,10 @@ public class MCRObjectMetadata {
         int len = meta_list.size();
 
         for (int i = 0; i < len; i++) {
-            elm.addContent(((MCRMetaElement) meta_list.get(i)).createXML(herited_xml));
+            elm.addContent(meta_list.get(i).createXML(herited_xml));
         }
 
         return elm;
-    }
-
-    /**
-     * This methode create a String for all text searchable data in this
-     * instance.
-     * 
-     * @exception MCRException
-     *                if the content of this class is not valid
-     * @return a String with the text values from the metadata object
-     */
-    public final String createTextSearch() throws MCRException {
-        StringBuffer sb = new StringBuffer(4096);
-        int len = meta_list.size();
-
-        for (int i = 0; i < len; i++) {
-            sb.append(((MCRMetaElement) meta_list.get(i)).createTextSearch(herited_search));
-        }
-
-        return sb.toString();
     }
 
     /**
