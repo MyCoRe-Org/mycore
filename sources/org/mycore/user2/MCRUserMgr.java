@@ -23,6 +23,9 @@
 
 package org.mycore.user2;
 
+import static org.mycore.common.MCRConstants.XLINK_NAMESPACE;
+import static org.mycore.common.MCRConstants.XSI_NAMESPACE;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -33,7 +36,6 @@ import org.mycore.access.MCRAccessInterface;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRConfiguration;
-import org.mycore.common.MCRDefaults;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
@@ -562,9 +564,9 @@ public class MCRUserMgr {
         // Build the DOM
         MCRGroup currentGroup = null;
         org.jdom.Element root = new org.jdom.Element("mycoregroup");
-        root.addNamespaceDeclaration(org.jdom.Namespace.getNamespace("xsi", MCRDefaults.XSI_URL));
-        root.addNamespaceDeclaration(org.jdom.Namespace.getNamespace("xlink", MCRDefaults.XLINK_URL));
-        root.setAttribute("noNamespaceSchemaLocation", "MCRGroup.xsd", org.jdom.Namespace.getNamespace("xsi", MCRDefaults.XSI_URL));
+        root.addNamespaceDeclaration(XSI_NAMESPACE);
+        root.addNamespaceDeclaration(XLINK_NAMESPACE);
+        root.setAttribute("noNamespaceSchemaLocation", "MCRGroup.xsd", XSI_NAMESPACE);
 
         ArrayList allGroupIDs = mcrUserStore.getAllGroupIDs();
 
@@ -597,9 +599,9 @@ public class MCRUserMgr {
         // Build the DOM
         MCRUser currentUser;
         org.jdom.Element root = new org.jdom.Element("mycoreuser");
-        root.addNamespaceDeclaration(org.jdom.Namespace.getNamespace("xsi", MCRDefaults.XSI_URL));
-        root.addNamespaceDeclaration(org.jdom.Namespace.getNamespace("xlink", MCRDefaults.XLINK_URL));
-        root.setAttribute("noNamespaceSchemaLocation", "MCRUser.xsd", org.jdom.Namespace.getNamespace("xsi", MCRDefaults.XSI_URL));
+        root.addNamespaceDeclaration(XSI_NAMESPACE);
+        root.addNamespaceDeclaration(XLINK_NAMESPACE);
+        root.setAttribute("noNamespaceSchemaLocation", "MCRUser.xsd", XSI_NAMESPACE);
 
         ArrayList allUserIDs = mcrUserStore.getAllUserIDs();
 

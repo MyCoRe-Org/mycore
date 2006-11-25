@@ -23,6 +23,9 @@
 
 package org.mycore.common;
 
+import static org.mycore.common.MCRConstants.DEFAULT_ENCODING;
+import static org.mycore.common.MCRConstants.SUPPORTED_LANG;
+
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -59,14 +62,10 @@ import org.xml.sax.helpers.DefaultHandler;
  * programming API.
  * 
  * @author Jens Kupferschmidt
- * @author Frank Lï¿½tzenkirchen
+ * @author Frank Lützenkirchen
  * @author Thomas Scheffler (yagee)
  * 
  * @version $Revision$ $Date$
- */
-/**
- * @author dptadmin
- * 
  */
 public class MCRUtils {
     // The file slash
@@ -94,8 +93,8 @@ public class MCRUtils {
             return false;
         }
 
-        for (int i = 0; i < MCRDefaults.SUPPORTED_LANG.length; i++) {
-            if (lang.equals(MCRDefaults.SUPPORTED_LANG[i])) {
+        for (int i = 0; i < SUPPORTED_LANG.length; i++) {
+            if (lang.equals(SUPPORTED_LANG[i])) {
                 return true;
             }
         }
@@ -116,8 +115,8 @@ public class MCRUtils {
             return -1;
         }
 
-        for (int i = 0; i < MCRDefaults.SUPPORTED_LANG.length; i++) {
-            if (lang.equals(MCRDefaults.SUPPORTED_LANG[i])) {
+        for (int i = 0; i < SUPPORTED_LANG.length; i++) {
+            if (lang.equals(SUPPORTED_LANG[i])) {
                 return i;
             }
         }
@@ -139,7 +138,7 @@ public class MCRUtils {
             return DateFormat.getDateInstance(DateFormat.MEDIUM, Locale.getDefault());
         }
 
-        return MCRDefaults.DATE_FORMAT[i];
+        return MCRConstants.DATE_FORMAT[i];
     }
 
     /**
@@ -254,8 +253,8 @@ public class MCRUtils {
         }
 
         if (!test) {
-            for (int i = 0; i < MCRDefaults.SUPPORTED_LANG.length; i++) {
-                DateFormat df = getDateFormat(MCRDefaults.SUPPORTED_LANG[i]);
+            for (int i = 0; i < SUPPORTED_LANG.length; i++) {
+                DateFormat df = getDateFormat(SUPPORTED_LANG[i]);
                 df.setLenient(false);
 
                 try {
@@ -321,8 +320,8 @@ public class MCRUtils {
         }
 
         if (!test) {
-            for (int i = 0; i < MCRDefaults.SUPPORTED_LANG.length; i++) {
-                DateFormat df = getDateFormat(MCRDefaults.SUPPORTED_LANG[i]);
+            for (int i = 0; i < SUPPORTED_LANG.length; i++) {
+                DateFormat df = getDateFormat(SUPPORTED_LANG[i]);
 
                 try {
                     calendar.setTime(df.parse(indate.substring(start, indate.length())));
@@ -416,7 +415,7 @@ public class MCRUtils {
      */
     public static final byte[] getByteArray(org.jdom.Document jdom) throws MCRPersistenceException {
         MCRConfiguration conf = MCRConfiguration.instance();
-        String mcr_encoding = conf.getString("MCR.metadata_default_encoding", MCRDefaults.ENCODING);
+        String mcr_encoding = conf.getString("MCR.metadata_default_encoding", DEFAULT_ENCODING);
         ByteArrayOutputStream outb = new ByteArrayOutputStream();
 
         try {

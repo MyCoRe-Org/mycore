@@ -39,7 +39,7 @@ import org.jdom.Document;
 import org.jdom.Element;
 
 import org.mycore.common.MCRConfiguration;
-import org.mycore.common.MCRDefaults;
+import static org.mycore.common.MCRConstants.*;
 import org.mycore.common.MCRUtils;
 import org.mycore.common.xml.MCRParserXerces;
 import org.mycore.common.xml.MCRXMLHelper;
@@ -307,7 +307,7 @@ public class MCRSimpleWorkflowManager {
             return false;
         }
 
-        String DID = linkmeta.getAttributeValue("href", org.jdom.Namespace.getNamespace("xlink", MCRDefaults.XLINK_URL));
+        String DID = linkmeta.getAttributeValue("href", XLINK_NAMESPACE);
         logger.debug("The linked object ID of derivate is " + DID);
 
         if (!ID.equals(DID)) {

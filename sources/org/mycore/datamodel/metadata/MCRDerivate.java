@@ -23,12 +23,13 @@
 
 package org.mycore.datamodel.metadata;
 
+import static org.mycore.common.MCRConstants.XLINK_NAMESPACE;
+import static org.mycore.common.MCRConstants.XSI_NAMESPACE;
+
 import java.io.File;
 
 import org.apache.log4j.Logger;
-
 import org.mycore.common.MCRConfigurationException;
-import org.mycore.common.MCRDefaults;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.events.MCREvent;
@@ -109,7 +110,7 @@ final public class MCRDerivate extends MCRBase {
             setVersion();
         }
 
-        mcr_schema = jdom_element_root.getAttribute("noNamespaceSchemaLocation", org.jdom.Namespace.getNamespace("xsi", MCRDefaults.XSI_URL)).getValue().trim();
+        mcr_schema = jdom_element_root.getAttribute("noNamespaceSchemaLocation", XSI_NAMESPACE).getValue().trim();
 
         org.jdom.Element jdom_element;
 
@@ -186,9 +187,9 @@ final public class MCRDerivate extends MCRBase {
 
         org.jdom.Element elm = new org.jdom.Element("mycorederivate");
         org.jdom.Document doc = new org.jdom.Document(elm);
-        elm.addNamespaceDeclaration(org.jdom.Namespace.getNamespace("xsi", MCRDefaults.XSI_URL));
-        elm.addNamespaceDeclaration(org.jdom.Namespace.getNamespace("xlink", MCRDefaults.XLINK_URL));
-        elm.setAttribute("noNamespaceSchemaLocation", mcr_schema, org.jdom.Namespace.getNamespace("xsi", MCRDefaults.XSI_URL));
+        elm.addNamespaceDeclaration(XSI_NAMESPACE);
+        elm.addNamespaceDeclaration(XLINK_NAMESPACE);
+        elm.setAttribute("noNamespaceSchemaLocation", mcr_schema, XSI_NAMESPACE);
         elm.setAttribute("ID", mcr_id.getId());
         elm.setAttribute("label", mcr_label);
         elm.setAttribute("version", mcr_version);

@@ -23,24 +23,24 @@
 
 package org.mycore.datamodel.classifications;
 
+import static org.jdom.Namespace.XML_NAMESPACE;
+import static org.mycore.common.MCRConstants.XLINK_NAMESPACE;
+
 import java.util.ArrayList;
 import java.util.List;
 
-import org.jdom.Namespace;
-import org.jdom.Element;
 import org.jdom.Document;
-import org.mycore.common.MCRArgumentChecker;
+import org.jdom.Element;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRUsageException;
 import org.mycore.common.MCRUtils;
-import org.mycore.common.MCRDefaults;
 import org.mycore.datamodel.metadata.MCRLinkTableManager;
 
 /**
  * This class is an abstract class for the implementation of the classes
  * classification an category.
  * 
- * @author Frank Lï¿½tzenkirchen
+ * @author Frank Lützenkirchen
  * @author Jens Kupferschmidt
  * @version $Revision$ $Date$
  */
@@ -95,7 +95,7 @@ public abstract class MCRClassificationObject {
      *            an identifier String
      */
     public MCRClassificationObject(String ID) {
-        MCRArgumentChecker.ensureNotEmpty(ID, "ID");
+        assert(ID != null);
         this.ID = ID;
         this.text = new ArrayList();
         this.lang = new ArrayList();
@@ -409,7 +409,7 @@ public abstract class MCRClassificationObject {
         }
 
         org.jdom.Element elm = new org.jdom.Element("label");
-        elm.setAttribute("lang", getLang(index), Namespace.XML_NAMESPACE);
+        elm.setAttribute("lang", getLang(index), XML_NAMESPACE);
         elm.setAttribute("text", getText(index));
         elm.setAttribute("description", getDescription(index));
 
@@ -597,14 +597,14 @@ public abstract class MCRClassificationObject {
     	   Element element;
    	   for (int i = 0; i < tagList.size(); i++) {
    		   element = (Element) tagList.get(i);
-   		   cat.addData(element.getAttributeValue("lang",Namespace.XML_NAMESPACE),
+   		   cat.addData(element.getAttributeValue("lang",XML_NAMESPACE),
    		   			   element.getAttributeValue("text"),
    		   			   element.getAttributeValue("description"));		   
    	   }
    	   //process url, if given
    	   element = newCateg.getChild("url");
    	   if (element != null) {    	   
-   		   cat.URL= element.getAttributeValue("href",Namespace.getNamespace("xlink", MCRDefaults.XLINK_URL));
+   		   cat.URL= element.getAttributeValue("href", XLINK_NAMESPACE);
    	   }
    	   return cat;
       }

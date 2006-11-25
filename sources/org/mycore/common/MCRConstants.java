@@ -26,28 +26,31 @@ package org.mycore.common;
 import java.text.DateFormat;
 import java.util.Locale;
 
+import org.jdom.Namespace;
+
 /**
- * This class holds only static variables, they ar used in all classes as
- * default values. So we can change this in one source code. The values can be
- * changed be the propery configurations.
+ * This class replaces the deprecated MCRDefaults interface and provides some
+ * final static fields of common use.
  * 
  * @author Jens Kupferschmidt
+ * @author Thomas Scheffler (yagee)
  * @version $Revision$ $Date$
- * 
- * @deprecated
  */
-public interface MCRDefaults {
+public final class MCRConstants {
     /** The URL of the XLink */
-    public final static String XLINK_URL = "http://www.w3.org/1999/xlink";
+    private final static String XLINK_URL = "http://www.w3.org/1999/xlink";
+    public final static Namespace XLINK_NAMESPACE = Namespace.getNamespace("xlink", XLINK_URL);
 
     /** The URL of the XSI */
-    public final static String XSI_URL = "http://www.w3.org/2001/XMLSchema-instance";
+    private final static String XSI_URL = "http://www.w3.org/2001/XMLSchema-instance";
+    public final static Namespace XSI_NAMESPACE = Namespace.getNamespace("xsi", XSI_URL);
 
     /** The URL of the XSL */
-    public final static String XSL_URL = "http://www.w3.org/1999/XSL/Transform";
+    private final static String XSL_URL = "http://www.w3.org/1999/XSL/Transform";
+    public final static Namespace XSL_NAMESPACE = Namespace.getNamespace("xsl", XSL_URL);
 
     /** The default encoding */
-    public final static String ENCODING = "UTF-8";
+    public final static String DEFAULT_ENCODING = "UTF-8";
 
     /** The supported language codes (like xml:lang definition) * */
     public static String[] SUPPORTED_LANG = {
@@ -60,10 +63,9 @@ public interface MCRDefaults {
             "x-grc", // old greek
             "x-lat", // latin
             "x-cop", // coptic
-           
-            //extension for DINI Specification Labels (OAI-Interface)
-            "x-dini"
-    };
+
+            // extension for DINI Specification Labels (OAI-Interface)
+            "x-dini" };
 
     /** The date format for the supported languages * */
     public static DateFormat[] DATE_FORMAT = {

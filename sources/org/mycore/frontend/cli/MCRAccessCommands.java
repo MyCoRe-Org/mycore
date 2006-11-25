@@ -23,6 +23,8 @@
 
 package org.mycore.frontend.cli;
 
+import static org.mycore.common.MCRConstants.DEFAULT_ENCODING;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
@@ -36,7 +38,6 @@ import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.mycore.access.MCRAccessInterface;
 import org.mycore.access.MCRAccessManager;
-import org.mycore.common.MCRDefaults;
 import org.mycore.common.MCRException;
 import org.mycore.common.xml.MCRXMLHelper;
 import org.mycore.datamodel.metadata.MCRXMLTableManager;
@@ -247,7 +248,7 @@ public class MCRAccessCommands extends MCRAbstractCommands {
             }
             FileOutputStream fos = new FileOutputStream(file);
             LOGGER.info("Writing to file " + filename + " ...");
-            String mcr_encoding = CONFIG.getString("MCR.metadata_default_encoding", MCRDefaults.ENCODING);
+            String mcr_encoding = CONFIG.getString("MCR.metadata_default_encoding", DEFAULT_ENCODING);
             XMLOutputter out = new XMLOutputter(Format.getPrettyFormat().setEncoding(mcr_encoding));
             out.output(doc, fos);
         } catch (Exception e) {

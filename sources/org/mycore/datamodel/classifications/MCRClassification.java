@@ -23,6 +23,10 @@
 
 package org.mycore.datamodel.classifications;
 
+import static org.jdom.Namespace.XML_NAMESPACE;
+import static org.mycore.common.MCRConstants.XLINK_NAMESPACE;
+import static org.mycore.common.MCRConstants.XSI_NAMESPACE;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -39,12 +43,9 @@ import java.util.Vector;
 import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
-import org.jdom.Namespace;
 import org.jdom.filter.ElementFilter;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
-
-import org.mycore.common.MCRDefaults;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRUtils;
 import org.mycore.common.xml.MCRXMLHelper;
@@ -94,7 +95,7 @@ public class MCRClassification {
 
 		for (int i = 0; i < tagList.size(); i++) {
 			tag = (Element) tagList.get(i);
-			cl.addData(tag.getAttributeValue("lang", Namespace.XML_NAMESPACE), tag.getAttributeValue("text"), tag.getAttributeValue("description"));
+			cl.addData(tag.getAttributeValue("lang", XML_NAMESPACE), tag.getAttributeValue("text"), tag.getAttributeValue("description"));
 		}
 
 		LOGGER.debug("processing Classification:" + cl.toString());
@@ -114,14 +115,14 @@ public class MCRClassification {
 
 		for (int i = 0; i < tagList.size(); i++) {
 			element = (Element) tagList.get(i);
-			ci.addData(element.getAttributeValue("lang", Namespace.XML_NAMESPACE), element.getAttributeValue("text"), element.getAttributeValue("description"));
+			ci.addData(element.getAttributeValue("lang", XML_NAMESPACE), element.getAttributeValue("text"), element.getAttributeValue("description"));
 		}
 
 		// process url, if given
 		element = category.getChild("url");
 
 		if (element != null) {
-			ci.setURL(element.getAttributeValue("href", Namespace.getNamespace("xlink", MCRDefaults.XLINK_URL)));
+			ci.setURL(element.getAttributeValue("href", XLINK_NAMESPACE));
 		}
 
 		cat.add(ci); // add to list of categories
@@ -881,8 +882,8 @@ public class MCRClassification {
         MCRLinkTableManager mcr_linktable = MCRLinkTableManager.instance();
         org.jdom.Element elm = new org.jdom.Element("mycoreclass");
         org.jdom.Document doc = new org.jdom.Document(elm);
-        elm.addNamespaceDeclaration(org.jdom.Namespace.getNamespace("xsi", MCRDefaults.XSI_URL));
-        elm.addNamespaceDeclaration(org.jdom.Namespace.getNamespace("xlink", MCRDefaults.XLINK_URL));
+        elm.addNamespaceDeclaration(XSI_NAMESPACE);
+        elm.addNamespaceDeclaration(XLINK_NAMESPACE);
         elm.setAttribute(ID_ATTR, classID);
 
         org.jdom.Element cats = new org.jdom.Element("categories");
@@ -917,7 +918,7 @@ public class MCRClassification {
 
                 if (ci.getURL().length() != 0) {
                     org.jdom.Element u = new org.jdom.Element("url");
-                    u.setAttribute("href", ci.getURL(), org.jdom.Namespace.getNamespace("xlink", MCRDefaults.XLINK_URL));
+                    u.setAttribute("href", ci.getURL(), XLINK_NAMESPACE);
                     cat.addContent(u);
                 }
 

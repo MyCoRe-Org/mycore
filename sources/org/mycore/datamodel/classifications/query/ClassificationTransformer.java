@@ -23,6 +23,9 @@
 
 package org.mycore.datamodel.classifications.query;
 
+import static org.jdom.Namespace.XML_NAMESPACE;
+import static org.mycore.common.MCRConstants.XSI_NAMESPACE;
+
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -31,10 +34,6 @@ import java.util.regex.Pattern;
 
 import org.jdom.Document;
 import org.jdom.Element;
-import org.jdom.Namespace;
-
-import org.mycore.common.MCRDefaults;
-
 /**
  * 
  * @author Thomas Scheffler (yagee)
@@ -110,7 +109,7 @@ public class ClassificationTransformer {
     private static class MetaDataElementFactory {
         static Document getDocument(Classification cl) {
             Document cd = new Document(new Element("mycoreclass"));
-            cd.getRootElement().setAttribute("noNamespaceSchemaLocation", "MCRClassification.xsd", Namespace.getNamespace("xsi", MCRDefaults.XSI_URL));
+            cd.getRootElement().setAttribute("noNamespaceSchemaLocation", "MCRClassification.xsd", XSI_NAMESPACE);
             cd.getRootElement().setAttribute("ID", cl.getId());
             for (Label label : cl.getLabels()) {
                 cd.getRootElement().addContent(getElement(label));
@@ -129,7 +128,7 @@ public class ClassificationTransformer {
         static Element getElement(Label label) {
             Element le = new Element("label");
             if (stringNotEmpty(label.getLang())) {
-                le.setAttribute("lang", label.getLang(), Namespace.XML_NAMESPACE);
+                le.setAttribute("lang", label.getLang(), XML_NAMESPACE);
             }
             if (stringNotEmpty(label.getText())) {
                 le.setAttribute("text", label.getText());
@@ -209,7 +208,7 @@ public class ClassificationTransformer {
         static Element getElement(Label label, Category cat, String labelFormat, boolean withCounter) {
             Element le = new Element("label");
             if (stringNotEmpty(label.getLang())) {
-                le.setAttribute("lang", label.getLang(), Namespace.XML_NAMESPACE);
+                le.setAttribute("lang", label.getLang(), XML_NAMESPACE);
             }
             le.setText(getLabelText(label, cat, labelFormat, withCounter));
             return le;

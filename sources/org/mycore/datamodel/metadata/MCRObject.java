@@ -23,12 +23,14 @@
 
 package org.mycore.datamodel.metadata;
 
+import static org.mycore.common.MCRConstants.XLINK_NAMESPACE;
+import static org.mycore.common.MCRConstants.XSI_NAMESPACE;
+
 import java.util.Iterator;
 import java.util.List;
 
 import org.jdom.Document;
 import org.mycore.common.MCRConfigurationException;
-import org.mycore.common.MCRDefaults;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.events.MCREvent;
@@ -143,7 +145,7 @@ final public class MCRObject extends MCRBase {
             setVersion();
         }
 
-        mcr_schema = jdom_element_root.getAttribute("noNamespaceSchemaLocation", org.jdom.Namespace.getNamespace("xsi", MCRDefaults.XSI_URL)).getValue().trim();
+        mcr_schema = jdom_element_root.getAttribute("noNamespaceSchemaLocation", XSI_NAMESPACE).getValue().trim();
         logger.debug("MCRObject set schemafile: " + mcr_schema);
     }
 
@@ -258,9 +260,9 @@ final public class MCRObject extends MCRBase {
 
         org.jdom.Element elm = new org.jdom.Element("mycoreobject");
         org.jdom.Document doc = new org.jdom.Document(elm);
-        elm.addNamespaceDeclaration(org.jdom.Namespace.getNamespace("xsi", MCRDefaults.XSI_URL));
-        elm.addNamespaceDeclaration(org.jdom.Namespace.getNamespace("xlink", MCRDefaults.XLINK_URL));
-        elm.setAttribute("noNamespaceSchemaLocation", mcr_schema, org.jdom.Namespace.getNamespace("xsi", MCRDefaults.XSI_URL));
+        elm.addNamespaceDeclaration(XSI_NAMESPACE);
+        elm.addNamespaceDeclaration(XLINK_NAMESPACE);
+        elm.setAttribute("noNamespaceSchemaLocation", mcr_schema, XSI_NAMESPACE);
         elm.setAttribute("ID", mcr_id.getId());
         elm.setAttribute("label", mcr_label);
         elm.setAttribute("version", mcr_version);

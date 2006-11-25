@@ -23,12 +23,14 @@
 
 package org.mycore.user2;
 
+import static org.mycore.common.MCRConstants.XLINK_NAMESPACE;
+import static org.mycore.common.MCRConstants.XSI_NAMESPACE;
+
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.List;
 
-import org.mycore.common.MCRDefaults;
 import org.mycore.common.MCRException;
 
 /**
@@ -404,9 +406,9 @@ public class MCRGroup extends MCRUserObject implements MCRPrincipal {
      */
     public org.jdom.Document toJDOMDocument() throws MCRException {
         org.jdom.Element root = new org.jdom.Element("mycoregroup");
-        root.addNamespaceDeclaration(org.jdom.Namespace.getNamespace("xsi", MCRDefaults.XSI_URL));
-        root.addNamespaceDeclaration(org.jdom.Namespace.getNamespace("xlink", MCRDefaults.XLINK_URL));
-        root.setAttribute("noNamespaceSchemaLocation", "MCRGroup.xsd", org.jdom.Namespace.getNamespace("xsi", MCRDefaults.XSI_URL));
+        root.addNamespaceDeclaration(XSI_NAMESPACE);
+        root.addNamespaceDeclaration(XLINK_NAMESPACE);
+        root.setAttribute("noNamespaceSchemaLocation", "MCRGroup.xsd", XSI_NAMESPACE);
         root.addContent(this.toJDOMElement());
 
         org.jdom.Document jdomDoc = new org.jdom.Document(root);

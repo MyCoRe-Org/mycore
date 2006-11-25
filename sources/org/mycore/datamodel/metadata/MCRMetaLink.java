@@ -23,7 +23,8 @@
 
 package org.mycore.datamodel.metadata;
 
-import org.mycore.common.MCRDefaults;
+import static org.mycore.common.MCRConstants.XLINK_NAMESPACE;
+
 import org.mycore.common.MCRException;
 
 /**
@@ -281,7 +282,7 @@ public class MCRMetaLink extends MCRMetaDefault implements MCRMetaInterface {
         super.setFromDOM(element);
         super.type = "";
 
-        String temp = element.getAttributeValue("type", org.jdom.Namespace.getNamespace("xlink", MCRDefaults.XLINK_URL));
+        String temp = element.getAttributeValue("type", XLINK_NAMESPACE);
 
         if ((temp != null) && ((temp = temp.trim()).length() != 0)) {
             if ((temp.equals("locator")) || (temp.equals("arc"))) {
@@ -296,14 +297,14 @@ public class MCRMetaLink extends MCRMetaDefault implements MCRMetaInterface {
         }
 
         if (linktype.equals("locator")) {
-            String temp1 = element.getAttributeValue("href", org.jdom.Namespace.getNamespace("xlink", MCRDefaults.XLINK_URL));
-            String temp2 = element.getAttributeValue("label", org.jdom.Namespace.getNamespace("xlink", MCRDefaults.XLINK_URL));
-            String temp3 = element.getAttributeValue("title", org.jdom.Namespace.getNamespace("xlink", MCRDefaults.XLINK_URL));
+            String temp1 = element.getAttributeValue("href", XLINK_NAMESPACE);
+            String temp2 = element.getAttributeValue("label", XLINK_NAMESPACE);
+            String temp3 = element.getAttributeValue("title", XLINK_NAMESPACE);
             setReference(temp1, temp2, temp3);
         } else {
-            String temp1 = element.getAttributeValue("from", org.jdom.Namespace.getNamespace("xlink", MCRDefaults.XLINK_URL));
-            String temp2 = element.getAttributeValue("to", org.jdom.Namespace.getNamespace("xlink", MCRDefaults.XLINK_URL));
-            String temp3 = element.getAttributeValue("title", org.jdom.Namespace.getNamespace("xlink", MCRDefaults.XLINK_URL));
+            String temp1 = element.getAttributeValue("from", XLINK_NAMESPACE);
+            String temp2 = element.getAttributeValue("to", XLINK_NAMESPACE);
+            String temp3 = element.getAttributeValue("title", XLINK_NAMESPACE);
             setBiLink(temp1, temp2, temp3);
         }
     }
@@ -324,24 +325,24 @@ public class MCRMetaLink extends MCRMetaDefault implements MCRMetaInterface {
 
         org.jdom.Element elm = new org.jdom.Element(subtag);
         elm.setAttribute("inherited", (new Integer(inherited)).toString());
-        elm.setAttribute("type", linktype, org.jdom.Namespace.getNamespace("xlink", MCRDefaults.XLINK_URL));
+        elm.setAttribute("type", linktype, XLINK_NAMESPACE);
 
         if (linktype.equals("locator")) {
-            elm.setAttribute("href", href, org.jdom.Namespace.getNamespace("xlink", MCRDefaults.XLINK_URL));
+            elm.setAttribute("href", href, XLINK_NAMESPACE);
 
             if ((label != null) && ((label = label.trim()).length() != 0)) {
-                elm.setAttribute("label", label, org.jdom.Namespace.getNamespace("xlink", MCRDefaults.XLINK_URL));
+                elm.setAttribute("label", label, XLINK_NAMESPACE);
             }
 
             if ((title != null) && ((title = title.trim()).length() != 0)) {
-                elm.setAttribute("title", title, org.jdom.Namespace.getNamespace("xlink", MCRDefaults.XLINK_URL));
+                elm.setAttribute("title", title, XLINK_NAMESPACE);
             }
         } else {
-            elm.setAttribute("from", from, org.jdom.Namespace.getNamespace("xlink", MCRDefaults.XLINK_URL));
-            elm.setAttribute("to", to, org.jdom.Namespace.getNamespace("xlink", MCRDefaults.XLINK_URL));
+            elm.setAttribute("from", from, XLINK_NAMESPACE);
+            elm.setAttribute("to", to, XLINK_NAMESPACE);
 
             if ((title != null) && ((title = title.trim()).length() != 0)) {
-                elm.setAttribute("title", title, org.jdom.Namespace.getNamespace("xlink", MCRDefaults.XLINK_URL));
+                elm.setAttribute("title", title, XLINK_NAMESPACE);
             }
         }
 

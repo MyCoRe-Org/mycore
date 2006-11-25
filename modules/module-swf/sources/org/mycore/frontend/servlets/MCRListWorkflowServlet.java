@@ -24,6 +24,9 @@
 // package
 package org.mycore.frontend.servlets;
 
+import static org.mycore.common.MCRConstants.XLINK_NAMESPACE;
+import static org.mycore.common.MCRConstants.XSI_NAMESPACE;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -34,12 +37,10 @@ import javax.xml.transform.sax.TransformerHandler;
 import javax.xml.transform.stream.StreamSource;
 
 import org.apache.log4j.Logger;
-
 import org.mycore.access.MCRAccessInterface;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
-import org.mycore.common.MCRDefaults;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUtils;
 import org.mycore.common.xml.MCRXMLHelper;
@@ -165,7 +166,7 @@ public class MCRListWorkflowServlet extends MCRServlet {
                         org.jdom.Element s3 = s2.getChild("linkmeta");
 
                         if (s3 != null) {
-                            objid = s3.getAttributeValue("href", org.jdom.Namespace.getNamespace("xlink", MCRDefaults.XLINK_URL));
+                            objid = s3.getAttributeValue("href", XLINK_NAMESPACE);
                         }
                     }
 
@@ -196,7 +197,7 @@ public class MCRListWorkflowServlet extends MCRServlet {
 
         // build the frame of mcr_workflow
         org.jdom.Element root = new org.jdom.Element("mcr_workflow");
-        root.addNamespaceDeclaration(org.jdom.Namespace.getNamespace("xsi", MCRDefaults.XSI_URL));
+        root.addNamespaceDeclaration(XSI_NAMESPACE);
         root.setAttribute("type", type);
         root.setAttribute("step", step);
 

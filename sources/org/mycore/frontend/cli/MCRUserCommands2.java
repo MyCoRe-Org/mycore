@@ -23,6 +23,8 @@
 
 package org.mycore.frontend.cli;
 
+import static org.mycore.common.MCRConstants.DEFAULT_ENCODING;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
@@ -33,7 +35,6 @@ import org.apache.log4j.Logger;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.mycore.common.MCRConfiguration;
-import org.mycore.common.MCRDefaults;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.xml.MCRXMLHelper;
@@ -890,7 +891,7 @@ public class MCRUserCommands2 extends MCRAbstractCommands {
         // get encoding
         CONFIG = MCRConfiguration.instance();
 
-        String mcr_encoding = CONFIG.getString("MCR.metadata_default_encoding", MCRDefaults.ENCODING);
+        String mcr_encoding = CONFIG.getString("MCR.metadata_default_encoding", DEFAULT_ENCODING);
 
         // Create the output
         XMLOutputter outputter = new XMLOutputter(Format.getPrettyFormat().setEncoding(mcr_encoding));

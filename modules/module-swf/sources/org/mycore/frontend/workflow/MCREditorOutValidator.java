@@ -23,6 +23,10 @@
 
 package org.mycore.frontend.workflow;
 
+import static org.jdom.Namespace.XML_NAMESPACE;
+import static org.mycore.common.MCRConstants.XLINK_NAMESPACE;
+import static org.mycore.common.MCRConstants.XSI_NAMESPACE;
+
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -38,11 +42,9 @@ import java.util.StringTokenizer;
 import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
-import org.jdom.Namespace;
 import org.mycore.access.MCRAccessInterface;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRConfiguration;
-import org.mycore.common.MCRDefaults;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUtils;
@@ -241,7 +243,7 @@ public class MCREditorOutValidator {
 
     private boolean checkMetaObjectWithLang(Element datasubtag, Class metaClass) {
         if (datasubtag.getAttribute("lang") != null) {
-            datasubtag.getAttribute("lang").setNamespace(Namespace.XML_NAMESPACE);
+            datasubtag.getAttribute("lang").setNamespace(XML_NAMESPACE);
         }
         return checkMetaObject(datasubtag, metaClass);
     }
@@ -260,19 +262,19 @@ public class MCREditorOutValidator {
             return false;
         }
         if (datasubtag.getAttribute("type") != null) {
-            datasubtag.getAttribute("type").setNamespace(org.jdom.Namespace.getNamespace("xlink", MCRDefaults.XLINK_URL));
+            datasubtag.getAttribute("type").setNamespace(XLINK_NAMESPACE);
         }
 
         if (datasubtag.getAttribute("href") != null) {
-            datasubtag.getAttribute("href").setNamespace(org.jdom.Namespace.getNamespace("xlink", MCRDefaults.XLINK_URL));
+            datasubtag.getAttribute("href").setNamespace(XLINK_NAMESPACE);
         }
 
         if (datasubtag.getAttribute("title") != null) {
-            datasubtag.getAttribute("title").setNamespace(org.jdom.Namespace.getNamespace("xlink", MCRDefaults.XLINK_URL));
+            datasubtag.getAttribute("title").setNamespace(XLINK_NAMESPACE);
         }
 
         if (datasubtag.getAttribute("label") != null) {
-            datasubtag.getAttribute("label").setNamespace(org.jdom.Namespace.getNamespace("xlink", MCRDefaults.XLINK_URL));
+            datasubtag.getAttribute("label").setNamespace(XLINK_NAMESPACE);
         }
         return checkMetaObject(datasubtag, metaClass);
     }
@@ -378,11 +380,11 @@ public class MCREditorOutValidator {
     private void checkObject() {
         // add the namespaces (this is a workaround)
         org.jdom.Element root = input.getRootElement();
-        root.addNamespaceDeclaration(org.jdom.Namespace.getNamespace("xlink", MCRDefaults.XLINK_URL));
-        root.addNamespaceDeclaration(org.jdom.Namespace.getNamespace("xsi", MCRDefaults.XSI_URL));
+        root.addNamespaceDeclaration(XLINK_NAMESPACE);
+        root.addNamespaceDeclaration(XSI_NAMESPACE);
         // set the schema
         String mcr_schema = "datamodel-" + id.getTypeId() + ".xsd";
-        root.setAttribute("noNamespaceSchemaLocation", mcr_schema, org.jdom.Namespace.getNamespace("xsi", MCRDefaults.XSI_URL));
+        root.setAttribute("noNamespaceSchemaLocation", mcr_schema, XSI_NAMESPACE);
         // check the label
         String label = root.getAttributeValue("label");
         if ((label == null) || ((label = label.trim()).length() == 0)) {
@@ -541,7 +543,7 @@ public class MCREditorOutValidator {
      * @param metadata
      */
     private void checkObjectMetadata(Element metadata) {
-        metadata.getAttribute("lang").setNamespace(Namespace.XML_NAMESPACE);
+        metadata.getAttribute("lang").setNamespace(XML_NAMESPACE);
 
         List metadatalist = metadata.getChildren();
         Iterator metaIt = metadatalist.iterator();

@@ -23,10 +23,11 @@
 
 package org.mycore.datamodel.metadata;
 
+import static org.mycore.common.MCRConstants.DEFAULT_ENCODING;
+
 import org.apache.log4j.Logger;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
-import org.mycore.common.MCRDefaults;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
 
@@ -88,7 +89,7 @@ public abstract class MCRBase {
             mcr_conf = MCRConfiguration.instance();
 
             // Default Encoding
-            mcr_encoding = mcr_conf.getString("MCR.metadata_default_encoding", MCRDefaults.ENCODING);
+            mcr_encoding = mcr_conf.getString("MCR.metadata_default_encoding", DEFAULT_ENCODING);
             logger.debug("Encoding = " + mcr_encoding);
         } catch (Exception e) {
             logger.error("error occured: ", e);

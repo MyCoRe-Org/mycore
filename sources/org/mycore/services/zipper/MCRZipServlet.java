@@ -23,6 +23,8 @@
 
 package org.mycore.services.zipper;
 
+import static org.mycore.common.MCRConstants.XLINK_NAMESPACE;
+
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.util.Date;
@@ -47,7 +49,6 @@ import org.jdom.Element;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
-import org.mycore.common.MCRDefaults;
 import org.mycore.common.MCRException;
 import org.mycore.common.xml.MCRLayoutServlet;
 import org.mycore.common.xml.MCRXSLTransformation;
@@ -305,7 +306,7 @@ public class MCRZipServlet extends MCRServlet {
             LOGGER.debug(el.getName());
 
             if (el.getAttributeValue("inherited").equals("0")) {
-                String ownerID = el.getAttributeValue("href", org.jdom.Namespace.getNamespace("xlink", MCRDefaults.XLINK_URL));
+                String ownerID = el.getAttributeValue("href", XLINK_NAMESPACE);
                 // here the access check is tested only against the derivate
                 if(AI.checkPermission(ownerID,"read")) {
                 	String dir = null;
