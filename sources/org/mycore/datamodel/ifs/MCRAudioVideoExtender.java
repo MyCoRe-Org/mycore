@@ -32,7 +32,6 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.text.DecimalFormat;
 
-import org.mycore.common.MCRArgumentChecker;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
@@ -226,10 +225,6 @@ public abstract class MCRAudioVideoExtender {
      * @return the duration of this asset, formatted as a String
      */
     public String getDurationFormatted(String hourLabel, String minutesLabel, String secondsLabel) {
-        MCRArgumentChecker.ensureNotEmpty(hourLabel, "hourLabel");
-        MCRArgumentChecker.ensureNotEmpty(minutesLabel, "minutesLabel");
-        MCRArgumentChecker.ensureNotEmpty(secondsLabel, "secondsLabel");
-
         StringBuffer sb = new StringBuffer();
 
         if (durationHours > 0) {
