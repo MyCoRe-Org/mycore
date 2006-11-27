@@ -93,7 +93,7 @@ public class MCREditorServlet extends MCRServlet {
     /**
      * Shows a help popup window
      */
-    private void processShowPopup(HttpServletRequest req, HttpServletResponse res) throws ServletException, java.io.IOException {
+    private void processShowPopup(HttpServletRequest req, HttpServletResponse res) throws java.io.IOException {
         String sessionID = req.getParameter("_session");
         String ref = req.getParameter("_ref");
 
@@ -103,7 +103,7 @@ public class MCREditorServlet extends MCRServlet {
         Element popup = MCREditorDefReader.findElementByID(ref, editor);
         Element clone = (Element) (popup.clone());
 
-        sendToDisplay(req, res, new Document(clone));
+        LAYOUT.doLayout(req, res, new Document(clone));
     }
 
     /**
@@ -182,7 +182,8 @@ public class MCREditorServlet extends MCRServlet {
         Iterator it = editor.getDescendants(new ElementFilter(filter));
         while (it.hasNext()) {
             Element e = (Element) (it.next());
-            e.setAttribute(attrib, value);
+            if (e.getAttribute(attrib) == null)
+                e.setAttribute(attrib, value);
         }
     }
 
@@ -457,7 +458,7 @@ public class MCREditorServlet extends MCRServlet {
         MCREditorSubmission sub = new MCREditorSubmission(parms, editor, true);
 
         if (sub.errors()) // validation failed, go back to editor form in
-                            // webpage
+        // webpage
         {
             editor.removeChild("input");
             editor.removeChild("repeats");
@@ -489,7 +490,7 @@ public class MCREditorServlet extends MCRServlet {
         } else if (targetType.equals("debug")) {
             sendToDebug(res, sub);
         } else if (targetType.equals("display")) {
-            sendToDisplay(req, res, sub.getXML());
+            LAYOUT.doLayout(req, res, sub.getXML());
         } else if (targetType.equals("subselect")) {
             List variables = sub.getVariables();
             String root = sub.getXML().getRootElement().getName();
@@ -527,13 +528,6 @@ public class MCREditorServlet extends MCRServlet {
         StringBuffer url = new StringBuffer(req.getParameter("_target-url"));
         url.append('?').append(req.getQueryString());
         res.sendRedirect(res.encodeRedirectURL(url.toString()));
-    }
-
-    private void sendToDisplay(HttpServletRequest req, HttpServletResponse res, Document xml) throws IOException, ServletException {
-        req.setAttribute("MCRLayoutServlet.Input.JDOM", xml);
-
-        RequestDispatcher rd = getServletContext().getNamedDispatcher("MCRLayoutServlet");
-        rd.forward(req, res);
     }
 
     private void sendToSubSelect(HttpServletResponse res, MCRRequestParameters parms, List variables, String root) throws IOException {
