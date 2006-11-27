@@ -152,6 +152,6 @@ public final class MCRGoogleSitemapServlet extends MCRServlet {
         calcurrent = new GregorianCalendar();
         timecurrent = df.format(calcurrent.getTime());
         LOGGER.info("Stop Google access on " + timecurrent);
-        LAYOUT.sendXML(job.getRequest(), job.getResponse(), jdom);
+        getLayoutService().sendXML(job.getRequest(), job.getResponse(), jdom);
     }
 }

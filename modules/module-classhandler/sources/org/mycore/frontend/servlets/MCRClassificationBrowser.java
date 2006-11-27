@@ -133,12 +133,12 @@ public class MCRClassificationBrowser extends MCRServlet {
      *             for errors from the servlet engine.
      * @throws Exception
      */
-    protected void doLayout(MCRServletJob job, String styleBase, Document jdomDoc) throws ServletException, Exception {
+    protected void doLayout(MCRServletJob job, String styleBase, Document jdomDoc) throws Exception {
         if (getProperty(job.getRequest(), "XSL.Style") == null) {
             LOGGER.info("Set XSL.Style to: " + styleBase);
             job.getRequest().setAttribute("XSL.Style", styleBase);
         }
-        LAYOUT.doLayout(job.getRequest(),job.getResponse(),jdomDoc);
+        getLayoutService().doLayout(job.getRequest(),job.getResponse(),jdomDoc);
     }
 
 }
