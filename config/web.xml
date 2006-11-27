@@ -24,10 +24,6 @@
     <servlet-name>MCRFileNodeServlet</servlet-name>
     <servlet-class>org.mycore.datamodel.ifs.MCRFileNodeServlet</servlet-class>
   </servlet>
-  <servlet id="Layout">
-    <servlet-name>MCRLayoutServlet</servlet-name>
-    <servlet-class>org.mycore.common.xml.MCRLayoutServlet</servlet-class>
-  </servlet>
   <servlet id="Login">
     <servlet-name>MCRLoginServlet</servlet-name>
     <servlet-class>org.mycore.user2.MCRLoginServlet</servlet-class>
