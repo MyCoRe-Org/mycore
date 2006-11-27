@@ -153,6 +153,10 @@ public class MCREditorServlet extends MCRServlet {
         boolean validate = "true".equals(editor.getAttributeValue("validate", "false"));
         editor = MCREditorDefReader.readDef(uri, ref, validate);
 
+        setDefault(editor, "panel", "lines", "off");
+        setDefault(editor, "cell", "row", "1");
+        setDefault(editor, "cell", "col", "1");
+
         if (param != null) {
             editor.addContent(param);
         }
@@ -172,6 +176,14 @@ public class MCREditorServlet extends MCRServlet {
         logger.debug("Storing editor sessions under id " + sessionID);
 
         return editor;
+    }
+
+    private static void setDefault(Element editor, String filter, String attrib, String value) {
+        Iterator it = editor.getDescendants(new ElementFilter(filter));
+        while (it.hasNext()) {
+            Element e = (Element) (it.next());
+            e.setAttribute(attrib, value);
+        }
     }
 
     private static Element getTargetParameters(Map parameters) {
@@ -444,7 +456,8 @@ public class MCREditorServlet extends MCRServlet {
 
         MCREditorSubmission sub = new MCREditorSubmission(parms, editor, true);
 
-        if (sub.errors()) // validation failed, go back to editor form in webpage
+        if (sub.errors()) // validation failed, go back to editor form in
+                            // webpage
         {
             editor.removeChild("input");
             editor.removeChild("repeats");

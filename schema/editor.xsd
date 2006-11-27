@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- edited with XMLSpy v2005 sp1 U (http://www.xmlspy.com) by Lützenkirchen, Frank (Universität Duisburg-Essen) -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
-	<xs:import namespace="http://www.w3.org/XML/1998/namespace" schemaLocation="xml-2001.xsd" />
+	<xs:import namespace="http://www.w3.org/XML/1998/namespace" schemaLocation="xml-2001.xsd"/>
 	<xs:element name="editor">
 		<xs:complexType>
 			<xs:sequence>
@@ -51,15 +51,15 @@
 					<xs:complexType>
 						<xs:sequence>
 							<xs:element name="headline" minOccurs="0">
-							  <xs:complexType>
-								  <xs:sequence>
-  									<xs:choice maxOccurs="unbounded">
-	  								  <xs:element ref="text" />
-		  							  <xs:element ref="output" />
-			  						</xs:choice>
-			  				  </xs:sequence>
-			  				  <xs:attribute ref="anchor" use="optional" />
-			  			  </xs:complexType>
+								<xs:complexType>
+									<xs:sequence>
+										<xs:choice maxOccurs="unbounded">
+											<xs:element ref="text"/>
+											<xs:element ref="output"/>
+										</xs:choice>
+									</xs:sequence>
+									<xs:attribute ref="anchor" use="optional"/>
+								</xs:complexType>
 							</xs:element>
 							<xs:choice maxOccurs="unbounded">
 								<xs:element ref="panel"/>
@@ -89,78 +89,76 @@
 				<xs:element ref="include" minOccurs="0"/>
 			</xs:sequence>
 			<xs:attribute name="id" type="xs:ID" use="required"/>
-			<xs:attribute name="validate" type="xs:boolean" use="optional" />
+			<xs:attribute name="validate" type="xs:boolean" use="optional"/>
 		</xs:complexType>
 	</xs:element>
 	<xs:element name="panel">
 		<xs:complexType>
-			<xs:sequence>
-				<xs:choice maxOccurs="unbounded">
-					<xs:element name="cell" minOccurs="0" maxOccurs="unbounded">
-						<xs:complexType>
-							<xs:choice minOccurs="0">
-								<xs:element ref="panel"/>
-								<xs:element ref="repeater"/>
-								<xs:element ref="text"/>
-								<xs:element ref="output"/>
-								<xs:element ref="display"/>
-								<xs:element ref="textfield"/>
-								<xs:element ref="textarea"/>
-								<xs:element ref="password"/>
-								<xs:element ref="file"/>
-								<xs:element ref="list"/>
-								<xs:element ref="checkbox"/>
-								<xs:element ref="space"/>
-								<xs:element ref="button"/>
-								<xs:element ref="submitButton"/>
-								<xs:element ref="cancelButton"/>
-								<xs:element ref="helpPopup"/>
-								<xs:element ref="subselect"/>
-								<xs:element ref="include"/>
-							</xs:choice>
-							<xs:attribute name="row" use="required">
-								<xs:simpleType>
-									<xs:restriction base="xs:int">
-										<xs:minInclusive value="1"/>
-									</xs:restriction>
-								</xs:simpleType>
-							</xs:attribute>
-							<xs:attribute name="col" use="required">
-								<xs:simpleType>
-									<xs:restriction base="xs:int">
-										<xs:minInclusive value="1"/>
-									</xs:restriction>
-								</xs:simpleType>
-							</xs:attribute>
-							<xs:attribute name="colspan" use="optional">
-								<xs:simpleType>
-									<xs:restriction base="xs:int">
-										<xs:minInclusive value="1"/>
-									</xs:restriction>
-								</xs:simpleType>
-							</xs:attribute>
-							<xs:attribute ref="sortnr" use="optional"/>
-							<xs:attribute ref="var" use="optional"/>
-							<xs:attribute ref="anchor" use="optional"/>
-							<xs:attribute name="height" type="xs:string" use="optional"/>
-							<xs:attribute name="width" type="xs:string" use="optional"/>
-							<xs:attribute name="ref" type="xs:IDREF" use="optional"/>
-						</xs:complexType>
-					</xs:element>
-					<xs:element name="hidden" minOccurs="0" maxOccurs="unbounded">
-						<xs:complexType>
-							<xs:attribute ref="var" use="required"/>
-							<xs:attribute name="default" type="xs:string" use="optional"/>
-							<xs:attribute name="descendants" type="xs:boolean" use="optional"/>
-							<xs:attribute ref="sortnr" use="optional"/>
-						</xs:complexType>
-					</xs:element>
-					<xs:element ref="condition" minOccurs="0" maxOccurs="unbounded"/>
-					<xs:element ref="include" minOccurs="0" maxOccurs="unbounded"/>
-				</xs:choice>
-			</xs:sequence>
+			<xs:choice maxOccurs="unbounded">
+				<xs:element name="cell" minOccurs="0" maxOccurs="unbounded">
+					<xs:complexType>
+						<xs:choice minOccurs="0">
+							<xs:element ref="panel"/>
+							<xs:element ref="repeater"/>
+							<xs:element ref="text"/>
+							<xs:element ref="output"/>
+							<xs:element ref="display"/>
+							<xs:element ref="textfield"/>
+							<xs:element ref="textarea"/>
+							<xs:element ref="password"/>
+							<xs:element ref="file"/>
+							<xs:element ref="list"/>
+							<xs:element ref="checkbox"/>
+							<xs:element ref="space"/>
+							<xs:element ref="button"/>
+							<xs:element ref="submitButton"/>
+							<xs:element ref="cancelButton"/>
+							<xs:element ref="helpPopup"/>
+							<xs:element ref="subselect"/>
+							<xs:element ref="include"/>
+						</xs:choice>
+						<xs:attribute name="row" use="optional" default="1">
+							<xs:simpleType>
+								<xs:restriction base="xs:int">
+									<xs:minInclusive value="1"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:attribute>
+						<xs:attribute name="col" use="optional" default="1">
+							<xs:simpleType>
+								<xs:restriction base="xs:int">
+									<xs:minInclusive value="1"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:attribute>
+						<xs:attribute name="colspan" use="optional">
+							<xs:simpleType>
+								<xs:restriction base="xs:int">
+									<xs:minInclusive value="1"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:attribute>
+						<xs:attribute ref="sortnr" use="optional"/>
+						<xs:attribute ref="var" use="optional"/>
+						<xs:attribute ref="anchor" use="optional"/>
+						<xs:attribute name="height" type="xs:string" use="optional"/>
+						<xs:attribute name="width" type="xs:string" use="optional"/>
+						<xs:attribute name="ref" type="xs:IDREF" use="optional"/>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="hidden" minOccurs="0" maxOccurs="unbounded">
+					<xs:complexType>
+						<xs:attribute ref="var" use="required"/>
+						<xs:attribute name="default" type="xs:string" use="optional"/>
+						<xs:attribute name="descendants" type="xs:boolean" use="optional"/>
+						<xs:attribute ref="sortnr" use="optional"/>
+					</xs:complexType>
+				</xs:element>
+				<xs:element ref="condition" minOccurs="0" maxOccurs="unbounded"/>
+				<xs:element ref="include" minOccurs="0" maxOccurs="unbounded"/>
+			</xs:choice>
 			<xs:attribute name="id" type="xs:ID" use="optional"/>
-			<xs:attribute ref="lines" use="required"/>
+			<xs:attribute ref="lines" use="optional" default="off"/>
 		</xs:complexType>
 	</xs:element>
 	<xs:element name="condition">
@@ -367,7 +365,7 @@
 			</xs:choice>
 			<xs:attribute name="min" type="xs:int" use="required"/>
 			<xs:attribute name="max" type="xs:int" use="required"/>
-			<xs:attribute ref="lines" use="optional" default="off" />
+			<xs:attribute ref="lines" use="optional" default="off"/>
 			<xs:attribute name="pos" use="optional" default="right">
 				<xs:simpleType>
 					<xs:restriction base="xs:string">
@@ -459,7 +457,7 @@
 	</xs:attribute>
 	<xs:simpleType name="varPath">
 		<xs:restriction base="xs:string">
-			<xs:pattern value="/?@?[a-zA-Z0-9\-]+(\[@[a-zA-Z0-9\-]+=&apos;[a-zA-Z0-9\-]+&apos;\])?(\[[1-9]+[0-9]*\])?(/@?[a-zA-Z0-9\-]+(\[@[a-zA-Z0-9\-]+=&apos;[a-zA-Z0-9\-]+&apos;\])?(\[[1-9]+[0-9]*\])?)*" />
+			<xs:pattern value="/?@?[a-zA-Z0-9\-_\.]+(\[@[a-zA-Z0-9\-_\.]+=&apos;[a-zA-Z0-9\-_\.]+&apos;\])?(\[[1-9]+[0-9]*\])?(/@?[a-zA-Z0-9\-_\.]+(\[@[a-zA-Z0-9\-_\.]+=&apos;[a-zA-Z0-9\-_\.]+&apos;\])?(\[[1-9]+[0-9]*\])?)*"/>
 		</xs:restriction>
 	</xs:simpleType>
 	<xs:complexType name="labelOutputType">
@@ -467,13 +465,11 @@
 			<xs:element name="label" maxOccurs="unbounded">
 				<xs:complexType mixed="true">
 					<xs:sequence>
-						<xs:any namespace="http://www.w3.org/1999/xhtml" 
-	  processContents="skip" minOccurs="0"
-	  maxOccurs="unbounded"/>
+						<xs:any namespace="http://www.w3.org/1999/xhtml" processContents="skip" minOccurs="0" maxOccurs="unbounded"/>
 					</xs:sequence>
 					<xs:attribute name="i18n" type="xs:string" use="optional"/>
 					<xs:attribute name="css-style" type="xs:string" use="optional"/>
-					<xs:attribute ref="xml:lang" use="optional" />
+					<xs:attribute ref="xml:lang" use="optional"/>
 				</xs:complexType>
 			</xs:element>
 		</xs:sequence>
