@@ -1,6 +1,5 @@
 package org.mycore.frontend.servlets;
 
-import java.io.IOException;
 import java.util.Date;
 
 import javax.servlet.ServletContext;
@@ -25,7 +24,7 @@ public class MCRAdminServlet extends MCRServlet{
 //		isDefaultAccessRuleCreated = createAdminDefaultRule();
 	}
     
-    public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
+    public void doGet(HttpServletRequest request, HttpServletResponse response) 
     {
         try{
             ServletContext context = this.getServletContext();

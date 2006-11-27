@@ -87,7 +87,7 @@ public class MCRClassificationEditor {
             Element clroot = indoc.getRootElement();
             if (clroot == null)
                 return false;
-            Element categories = (Element) clroot.getChild("categories");
+            Element categories = clroot.getChild("categories");
             if (categories == null)
                 return false;
             Element newCateg = (Element) categories.getChild("category").clone();
