@@ -24,7 +24,6 @@
 package org.mycore.backend.hibernate;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -129,7 +128,7 @@ public class MCRHIBXMLStore implements MCRXMLTableInterface {
             tx.rollback();
             logger.error(e);
         } finally {
-            session.close();
+             if ( session != null ) session.close();
         }
    }
 
@@ -149,15 +148,15 @@ public class MCRHIBXMLStore implements MCRXMLTableInterface {
 
         try {
             MCRXMLTABLE tab = new MCRXMLTABLE(mcrid.getId(), version, this.type, null);
-            session.delete(tab); // "from MCRXMLTABLE where id='"+mcrid+"'
+            session.delete(tab); 	// "from MCRXMLTABLE where id='"+mcrid+"'
                                     // and version='"+version+"' and
                                     // type='"+type+"'");
             tx.commit();
         } catch (Exception e) {
             tx.rollback();
-            logger.error(e);
+            logger.error("delete: catched Error", e);
         } finally {
-            session.close();
+             if ( session != null ) session.close();
         }
     }
 
@@ -191,8 +190,7 @@ public class MCRHIBXMLStore implements MCRXMLTableInterface {
      */
     public final byte[] retrieve(MCRObjectID mcrid, int version) throws MCRPersistenceException {
         Session session = getSession();
-        Transaction tx = session.beginTransaction();
-        List l = new LinkedList();
+        List<?> l = new ArrayList<Object>();
 
         byte[] blob = null;
 
@@ -202,14 +200,11 @@ public class MCRHIBXMLStore implements MCRXMLTableInterface {
             if (l.size() > 0) {
             	blob = ((MCRXMLTABLE) l.get(0)).getXmlByteArray();
             }            
-            tx.commit();
         } catch (Exception e) {
-            tx.rollback();
             logger.error("error in retrieving the blob ",e);
-
             return null;
         } finally {
-            session.close();
+             if ( session != null ) session.close();
         }
 
         return blob;
@@ -234,16 +229,13 @@ public class MCRHIBXMLStore implements MCRXMLTableInterface {
     public final synchronized int getNextFreeIdInt(String project, String type) throws MCRPersistenceException {
     	
           Session session = getSession(); 
-          Transaction tx = session.beginTransaction();
-          List l = session.createQuery("select max(key.id) from "+classname+" where MCRID like '"+project+"_"+type+"%'").list();
-          tx.commit(); 
+          List<?> l = session.createQuery("select max(key.id) from "+classname+" where MCRID like '"+project+"_"+type+"%'").list();
           session.close();
           
           if (l.size() > 0 && l.get(0) != null) {
           	String max = (String) l.get(0);
           	if (max == null) return 1;
-          	return new
-	          MCRObjectID(max).getNumberAsInteger() + 1;
+          	return new  MCRObjectID(max).getNumberAsInteger() + 1;
           }
           return 1;
     }
@@ -261,16 +253,13 @@ public class MCRHIBXMLStore implements MCRXMLTableInterface {
     	boolean exists = false;
     	
         Session session = getSession(); 
-        Transaction tx = session.beginTransaction();
         StringBuffer query = new StringBuffer("select key.id from MCRXMLTABLE where MCRID = '")
         	.append(mcrid.getId()).append("' and MCRVERSION = ").append(version);
-        List l = session.createQuery(query.toString()).list();
+        List<?> l = session.createQuery(query.toString()).list();
         if (l.size() > 0) {
         	exists = true;
         }
-        tx.commit(); 
-        session.close();
-        
+        session.close();        
         return exists;
     }
 
@@ -282,24 +271,20 @@ public class MCRHIBXMLStore implements MCRXMLTableInterface {
      *            a MCRObjectID type string
      * @return a ArrayList of MCRObjectID's
      */
-    public ArrayList retrieveAllIDs(String type) {
+    public ArrayList<String> retrieveAllIDs(String type) {
         Session session = getSession();
-        Transaction tx = session.beginTransaction();
-        List l = new LinkedList();
-        ArrayList a = new ArrayList();
+        List<?> l;
+        ArrayList<String> a = new ArrayList<String>();
 
         try {
             l = session.createQuery("select distinct(key.id) from MCRXMLTABLE where MCRTYPE = '" + type + "'").list();
             for (int t = 0; t < l.size(); t++) {
-                a.add(l.get(t));
+                a.add((String) l.get(t));
             }
-            tx.commit();
         } catch (Exception e) {
-            tx.rollback();
-            logger.error("error stacktrace" ,e);
             throw new MCRException("Error during retrieveAllIDs(" + type + ")", e);
         } finally {
-            session.close();
+             if ( session != null ) session.close();
         }
 
         return a;
@@ -311,24 +296,20 @@ public class MCRHIBXMLStore implements MCRXMLTableInterface {
      * 
      * @return a ArrayList of MCRObjectID's
      */
-    public ArrayList retrieveAllIDs() {
+    public ArrayList<String> retrieveAllIDs() {
         Session session = getSession();
-        Transaction tx = session.beginTransaction();
-        List l = new LinkedList();
-        ArrayList a = new ArrayList();
+        List<?> l;
+        ArrayList<String> a = new ArrayList<String>();
 
         try {
             l = session.createQuery("select distinct(key.id) from MCRXMLTABLE").list();
             for (int t = 0; t < l.size(); t++) {
-                a.add(l.get(t));
+                a.add((String) l.get(t));
             }
-            tx.commit();
         } catch (Exception e) {
-            tx.rollback();
-            logger.error("error stacktrace" ,e);
             throw new MCRException("Error during retrieveAllIDs(" + type + ")", e);
         } finally {
-            session.close();
+             if ( session != null ) session.close();
         }
 
         return a;
@@ -336,7 +317,7 @@ public class MCRHIBXMLStore implements MCRXMLTableInterface {
 
     public static void test() {
         MCRHIBXMLStore store = new MCRHIBXMLStore();
-        List l = store.retrieveAllIDs(null);
+        List<String> l = store.retrieveAllIDs(null);
         int t;
 
         for (t = 0; t < l.size(); t++) {

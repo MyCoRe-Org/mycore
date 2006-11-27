@@ -86,13 +86,12 @@ public class MCRHIBClassificationStore implements MCRClassificationInterface {
             tx.rollback();
             logger.error(e);
         } finally {
-            session.close();
+             if ( session != null ) session.close();
         }
     }
 
     private void delete(Session session, String query) {
         List l = session.createQuery(query).list();
-
         for (int t = 0; t < l.size(); t++) {
             session.delete(l.get(t));
         }
@@ -119,7 +118,7 @@ public class MCRHIBClassificationStore implements MCRClassificationInterface {
             tx.rollback();
             logger.error(e);
         } finally {
-            session.close();
+             if ( session != null ) session.close();
         }
     }
 
@@ -148,7 +147,7 @@ public class MCRHIBClassificationStore implements MCRClassificationInterface {
         } catch (Exception e) {
             logger.error(e);
         } finally {
-            session.close();
+             if ( session != null ) session.close();
         }
         
         if ( null == c )
@@ -175,7 +174,7 @@ public class MCRHIBClassificationStore implements MCRClassificationInterface {
 
             return false; // FIXME: should we throw an exception here?
         } finally {
-            session.close();
+             if ( session != null ) session.close();
         }
 
         if (l.size() < 1) {
@@ -209,7 +208,7 @@ public class MCRHIBClassificationStore implements MCRClassificationInterface {
             tx.rollback();
             logger.error(e);
         } finally {
-            session.close();
+             if ( session != null ) session.close();
         }
     }
 
@@ -233,7 +232,7 @@ public class MCRHIBClassificationStore implements MCRClassificationInterface {
             tx.rollback();
             logger.error(e);
         } finally {
-            session.close();
+             if ( session != null ) session.close();
         }
     }
 
@@ -272,7 +271,7 @@ public class MCRHIBClassificationStore implements MCRClassificationInterface {
             logger.error(e);
             throw new MCRException("error while reading category item", e);
         } finally {
-            session.close();
+             if ( session != null ) session.close();
         }
 
         if ( null == ci )
@@ -317,7 +316,7 @@ public class MCRHIBClassificationStore implements MCRClassificationInterface {
             logger.error(e);
             throw new MCRException("error while reading categories", e);
         } finally {
-            session.close();
+             if ( session != null ) session.close();
         }
         
         if ( null == ci )
@@ -348,7 +347,7 @@ public class MCRHIBClassificationStore implements MCRClassificationInterface {
 
             return false;
         } finally {
-            session.close();
+             if ( session != null ) session.close();
         }
 
         return ret;
@@ -364,7 +363,7 @@ public class MCRHIBClassificationStore implements MCRClassificationInterface {
      * @return a list of MCRCategoryItem children
      */
     public final ArrayList retrieveChildren(String CLID, String PID) {
-        ArrayList children = new ArrayList();
+        ArrayList<MCRCategoryItem> children = new ArrayList<MCRCategoryItem>();
         Session session = getSession();
 
         try {
@@ -390,7 +389,7 @@ public class MCRHIBClassificationStore implements MCRClassificationInterface {
             logger.error(e);
             throw new MCRException("error while retrieving children of CATEG " + PID, e);
         } finally {
-            session.close();
+             if ( session != null ) session.close();
         }
 
         return children;
@@ -430,7 +429,7 @@ public class MCRHIBClassificationStore implements MCRClassificationInterface {
             logger.error(e);
             throw new MCRException("error while retrieving classification IDs", e);
         } finally {
-            session.close();
+             if ( session != null ) session.close();
         }
 
         return ID;
@@ -473,7 +472,7 @@ public class MCRHIBClassificationStore implements MCRClassificationInterface {
             logger.error(e.getMessage());
             throw new MCRException("error while retrieving classifications ", e);
         } finally {
-            session.close();
+             if ( session != null ) session.close();
         }
         return classList;
     }

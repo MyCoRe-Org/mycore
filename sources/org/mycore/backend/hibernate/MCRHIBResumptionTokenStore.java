@@ -86,15 +86,18 @@ public class MCRHIBResumptionTokenStore implements MCROAIResumptionTokenStore
         Transaction tx = session.beginTransaction();
 
         List delList = session.createCriteria(MCRRESUMPTIONTOKEN.class)
-        	.add (Restrictions.le("created",new Date(outdateTime))).list();
-
-        for (Iterator it = delList.iterator(); it.hasNext();) {
-            MCRRESUMPTIONTOKEN token = (MCRRESUMPTIONTOKEN) it.next();
-            session.delete(token);
-        }
-
-    	tx.commit();
-    	session.close();
+        	.add (Restrictions.le("created",new Date(outdateTime))).list();        
+        try {
+	        for (Iterator it = delList.iterator(); it.hasNext();) {
+	            MCRRESUMPTIONTOKEN token = (MCRRESUMPTIONTOKEN) it.next();
+	            session.delete(token);
+	        }
+	    	tx.commit();
+        } catch ( Exception e ) {
+        	tx.rollback();
+    	} finally {
+    		if ( session != null ) session.close();
+    	}
     }
 
     public final List getResumptionTokenHits(String resumptionTokenID, int requestedSize, int maxResults) {
@@ -103,10 +106,12 @@ public class MCRHIBResumptionTokenStore implements MCROAIResumptionTokenStore
 	String sepSpec = config.getString(STR_OAI_SEPARATOR_SPEC,"###");
 
         Session session = MCRHIBConnection.instance().getSession();;
-        Transaction tx = session.beginTransaction();
 
         MCRRESUMPTIONTOKEN resumptionToken = (MCRRESUMPTIONTOKEN) session.createCriteria(MCRRESUMPTIONTOKEN.class)
            .add(Restrictions.eq("resumptionTokenID", resumptionTokenID)).uniqueResult();
+
+        session.close();
+
         String prefix = resumptionToken.getPrefix();
         String instance = resumptionToken.getInstance();
         String repositoryID = config.getString(STR_OAI_REPOSITORY_IDENTIFIER + "." + instance);
@@ -117,13 +122,11 @@ public class MCRHIBResumptionTokenStore implements MCROAIResumptionTokenStore
 
         byte[] byteHitBlob = resumptionToken.getHitByteArray();
 
-        tx.commit();
-        session.close();
 
         String[] arHitBlob = (new String(byteHitBlob)).split(sepOAIHIT);
 
         MCRObject object = new MCRObject();
-    	List resultList = new ArrayList();
+    	List<String[]> resultList = new ArrayList<String[]>();
 
         for (int i = hitNrFrom; i <= maxLoop; i++) {
            String oaiID = "";
@@ -169,12 +172,9 @@ public class MCRHIBResumptionTokenStore implements MCROAIResumptionTokenStore
      */
     public String getPrefix(String token) {
         Session session = MCRHIBConnection.instance().getSession();
-        Transaction tx = session.beginTransaction();
-
         String prefix =  (String) session.createQuery("select prefix from " +
                         "MCRRESUMPTIONTOKEN " +
                         "where resumptionTokenID like '" + token + "'" ).uniqueResult() ;
-        tx.commit();
         session.close();
         return prefix;
     }
@@ -216,10 +216,10 @@ public class MCRHIBResumptionTokenStore implements MCROAIResumptionTokenStore
         byte[] hitBlob = sbHitBlob.toString().getBytes();
 
         MCRRESUMPTIONTOKEN tok = new MCRRESUMPTIONTOKEN();
-        try{
-		    Session session = MCRHIBConnection.instance().getSession();
-			Transaction tx = session.beginTransaction();
+	    Session session = MCRHIBConnection.instance().getSession();
+		Transaction tx = session.beginTransaction();
 
+		try{
 			tok.setResumptionTokenID(id);
 			tok.setPrefix(prefix);
 			tok.setCreated(new Date());
@@ -228,10 +228,11 @@ public class MCRHIBResumptionTokenStore implements MCROAIResumptionTokenStore
 			tok.setHitByteArray(hitBlob);
 			session.saveOrUpdate(tok);
 			tx.commit();
-			session.close();
-
         } catch(Exception ex) {
+        	tx.rollback();
             Logger.getLogger(MCRHIBResumptionTokenStore.class).error("catched error: ", ex);
+        } finally {
+			 if ( session != null ) session.close();        	
         }
         return;
     }

@@ -29,6 +29,7 @@ import java.util.Iterator;
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
+import org.hibernate.FlushMode;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
@@ -193,7 +194,9 @@ public class MCRHIBConnection implements Closeable {
      * @return Session current session object
      */
     public Session getSession() {
-        return sessions.openSession();
+        Session session =  sessions.openSession();
+        session.setFlushMode(FlushMode.COMMIT);
+        return session;
     }
 
     public Configuration getConfiguration() {

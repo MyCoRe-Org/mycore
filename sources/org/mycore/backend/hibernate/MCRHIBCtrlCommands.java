@@ -55,6 +55,7 @@ public class MCRHIBCtrlCommands extends MCRAbstractCommands {
     }
 
     /**
+     * 
      * method creates tables using hibernate
      */
     public static void createTables() {

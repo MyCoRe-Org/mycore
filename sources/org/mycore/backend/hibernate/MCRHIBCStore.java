@@ -56,9 +56,7 @@ public class MCRHIBCStore extends MCRContentStore {
 
     private synchronized int getNextFreeID() throws Exception {
         Session session = MCRHIBConnection.instance().getSession(); 
-        Transaction tx = session.beginTransaction();
         List l = session.createQuery("select max(storageid) from MCRCSTORE").list();
-        tx.commit(); 
         session.close();
         
         if (l.size() > 0) {
@@ -86,7 +84,7 @@ public class MCRHIBCStore extends MCRContentStore {
             tx.rollback();
             logger.error(e);
         } finally {
-            session.close();
+             if ( session != null ) session.close();
         }
 
         return storageID;
@@ -109,7 +107,7 @@ public class MCRHIBCStore extends MCRContentStore {
             tx.rollback();
             logger.error(e);
         } finally {
-            session.close();
+             if ( session != null ) session.close();
         }
     }
 
@@ -130,7 +128,7 @@ public class MCRHIBCStore extends MCRContentStore {
         } catch (Exception e) {
             logger.error(e);
         } finally {
-            session.close();
+             if ( session != null ) session.close();
         }
     }
 
@@ -144,7 +142,7 @@ public class MCRHIBCStore extends MCRContentStore {
         } catch (Exception e) {
             logger.error(e);
         } finally {
-            session.close();
+             if ( session != null ) session.close();
         }
         return null; //in case of error
     }
@@ -160,7 +158,7 @@ public class MCRHIBCStore extends MCRContentStore {
 
         public void close() throws IOException {
             super.close();
-            session.close();
+             if ( session != null ) session.close();
         }
     }
 }

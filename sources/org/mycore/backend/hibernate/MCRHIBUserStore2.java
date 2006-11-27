@@ -43,7 +43,8 @@ import org.mycore.user2.MCRUserStore;
 
 /**
  * This class implements the interface MCRUserStore
- * 
+ *  - flushmode is configured to COMMIT ! 
+ *
  * @author Matthias Kramm
  * @author Heiko Helmbrecht
  * @version $Revision$ $Date$
@@ -109,7 +110,7 @@ public class MCRHIBUserStore2 implements MCRUserStore {
             tx.rollback();
             throw new MCRException("Hibernate error while creating new user.", e);
         } finally {
-            session.close();
+            if ( session != null ) session.close();
         }
     }
 
@@ -130,25 +131,20 @@ public class MCRHIBUserStore2 implements MCRUserStore {
             for (int i = 0; i < l.size(); i++) {
                 MCRGROUPMEMBERS members = (MCRGROUPMEMBERS) l.get(i);
                 session.delete(members);
-                session.flush();
             }
-
             l = session.createQuery("from MCRUSERS where UID='" + delUserID + "'").list();
-
             if (l.size() == 1) {
                 MCRUSERS user = (MCRUSERS) l.get(0);
                 session.delete(user);
-                session.flush();
             } else {
                 logger.warn("There is no user '" + delUserID + "'");
             }
-
             tx.commit();
         } catch (HibernateException e) {
             tx.rollback();
             throw new MCRException("Hibernate error while deleting user '" + delUserID + "'.", e);
         } finally {
-            session.close();
+            if ( session != null ) session.close();
         }
     }
 
@@ -162,9 +158,7 @@ public class MCRHIBUserStore2 implements MCRUserStore {
      */
     public synchronized boolean existsUser(String userID) throws MCRException {
         Session session = MCRHIBConnection.instance().getSession();
-        Transaction tx = session.beginTransaction();
         List l = session.createQuery("from MCRUSERS where UID = '" + userID + "'").list();
-        tx.commit();
         session.close();
 
         if (l.size() > 0) {
@@ -191,10 +185,9 @@ public class MCRHIBUserStore2 implements MCRUserStore {
         try {
             l = session.createQuery("from MCRUSERS where NUMID = " + numID + " or UID = '" + userID + "'").list();
         } catch (Exception e) {
-            logger.error(e);
-            throw new MCRException("error during existsUser()", e);
+            throw new MCRException("existsUser: catched error ", e);
         } finally {
-            session.close();
+            if ( session != null ) session.close();
         }
 
         if (l.size() > 0) {
@@ -214,7 +207,6 @@ public class MCRHIBUserStore2 implements MCRUserStore {
      */
     public synchronized MCRUser retrieveUser(String userID) throws MCRException {
         Session session = MCRHIBConnection.instance().getSession();
-        Transaction tx = session.beginTransaction();
         MCRUser retuser = new MCRUser();
 
         try {
@@ -222,8 +214,7 @@ public class MCRHIBUserStore2 implements MCRUserStore {
             MCRUSERS user;
             retuser = null;
 
-            if (l.size() == 0) {
-                tx.rollback();
+            if (l.size() != 1) {
                 throw new MCRException("There is no user with ID = " + userID);
             } else {
                 user = (MCRUSERS) l.get(0);
@@ -255,7 +246,7 @@ public class MCRHIBUserStore2 implements MCRUserStore {
                 String primaryGroupID = user.getPrimgroup();
 
                 // Now lookup the groups this user is a member of
-                ArrayList groups = new ArrayList();
+                ArrayList<String> groups = new ArrayList<String>();
                 l = session.createQuery("from MCRGROUPMEMBERS where USERID = '" + userID + "'").list();
 
                 if (l.size() >= 1) {
@@ -282,13 +273,10 @@ public class MCRHIBUserStore2 implements MCRUserStore {
                     e.printStackTrace();
                 }
             }
-
-            tx.commit();
         } catch (HibernateException e) {
-            tx.rollback();
             throw new MCRException("Error while reading user information.", e);
         } finally {
-            session.close();
+            if ( session != null ) session.close();
         }
 
         return retuser;
@@ -302,10 +290,10 @@ public class MCRHIBUserStore2 implements MCRUserStore {
      */
     public synchronized void updateUser(MCRUser updUser) throws MCRException {
         Session session = MCRHIBConnection.instance().getSession();
-        Transaction tx = session.beginTransaction();
         List l = session.createQuery("from MCRUSERS where UID = '" + updUser.getID() + "'").list();
-        MCRUSERS user = new MCRUSERS();
 
+        MCRUSERS user = new MCRUSERS();
+        try {
         if (l.size() == 1) {
             user = (MCRUSERS) l.get(0);
 
@@ -337,15 +325,20 @@ public class MCRHIBUserStore2 implements MCRUserStore {
             user.setEmail(updUser.getUserContact().getEmail());
             user.setCellphone(updUser.getUserContact().getCellphone());
             user.setPrimgroup(updUser.getPrimaryGroupID());
-            session.save(user);
+            Transaction tx = session.beginTransaction();
+            try {
+            	session.save(user);
+            	tx.commit();
+            } catch (Exception e) {
+                logger.error(e);
+                tx.rollback();
+            }
         } else {
-            tx.commit();
-            session.close();
-            throw new MCRException("User " + updUser.getID() + " not found.");
+            throw new MCRException("User " + updUser.getID() + " not found or more than one.");
         }
-
-        tx.commit();
-        session.close();
+        } finally {
+            if ( session != null ) session.close();        	
+        }
     }
 
     /**
@@ -355,9 +348,8 @@ public class MCRHIBUserStore2 implements MCRUserStore {
      */
     public synchronized ArrayList getAllUserIDs() throws MCRException {
         Session session = MCRHIBConnection.instance().getSession();
-        Transaction tx = session.beginTransaction();
         List l = null;
-        ArrayList list = new ArrayList();
+        ArrayList<String> list = new ArrayList<String>();
 
         try {
             l = session.createQuery("from MCRUSERS").list();
@@ -366,13 +358,10 @@ public class MCRHIBUserStore2 implements MCRUserStore {
                 MCRUSERS user = (MCRUSERS) l.get(i);
                 list.add(user.getUid());
             }
-
-            tx.commit();
         } catch (Exception e) {
-            logger.error(e);
-            tx.rollback();
+            logger.error("getAllUserIDs: catched Error", e);
         } finally {
-            session.close();
+            if ( session != null ) session.close();
         }
 
         return list;
@@ -396,10 +385,9 @@ public class MCRHIBUserStore2 implements MCRUserStore {
             		 ret = max.intValue();
             }
         } catch (Exception e) {
-            logger.error(e);
             throw new MCRException("error during getMaxUserNumID()", e);
         } finally {
-            session.close();
+            if ( session != null ) session.close();
         }
         return ret;                       
     }
@@ -447,13 +435,12 @@ public class MCRHIBUserStore2 implements MCRUserStore {
                 admin.setGroupid((String) newGroup.getAdminGroupIDs().get(i));
                 session.saveOrUpdate(admin);
             }            
-
             tx.commit();
         } catch (HibernateException e) {
             tx.rollback();
-            throw new MCRException("Error in UserStore.", e);
+            throw new MCRException("createGroup: Error", e);
         } finally {
-            session.close();
+            if ( session != null ) session.close();
         }
     }
 
@@ -467,11 +454,8 @@ public class MCRHIBUserStore2 implements MCRUserStore {
      */
     public synchronized boolean existsGroup(String groupID) throws MCRException {
         Session session = MCRHIBConnection.instance().getSession();
-        Transaction tx = session.beginTransaction();
         List l = session.createQuery("from MCRGROUPS where GID = '" + groupID + "'").list();
-        tx.commit();
         session.close();
-
         if (l.size() > 0) {
             return true;
         } else {
@@ -492,18 +476,16 @@ public class MCRHIBUserStore2 implements MCRUserStore {
 
         try {
             List l = session.createQuery("from MCRGROUPS where GID = '" + delGroupID + "'").list();
-
             if (l.size() == 1) {
                 MCRGROUPS group = (MCRGROUPS) l.get(0);
                 session.delete(group);
+                tx.commit();
             }
-
-            tx.commit();
         } catch (HibernateException e) {
             tx.rollback();
-            throw new MCRException("Error while deleting group '" + delGroupID + "'.", e);
+            throw new MCRException("deleteGroup:Error while deleting group '" + delGroupID + "'.", e);
         } finally {
-            session.close();
+            if ( session != null ) session.close();
         }
     }
 
@@ -515,19 +497,15 @@ public class MCRHIBUserStore2 implements MCRUserStore {
      */
     public synchronized ArrayList getAllGroupIDs() throws MCRException {
         Session session = MCRHIBConnection.instance().getSession();
-        Transaction tx = session.beginTransaction();
         List l = session.createQuery("from MCRGROUPS").list();
-        tx.commit();
         session.close();
 
         if (l.size() > 0) {
-            ArrayList retList = new ArrayList();
-
+            ArrayList<String> retList = new ArrayList<String>();
             for (int i = 0; i < l.size(); i++) {
                 MCRGROUPS group = (MCRGROUPS) l.get(i);
                 retList.add(group.getGid());
             }
-
             return retList;
         } else {
             return null;
@@ -544,9 +522,10 @@ public class MCRHIBUserStore2 implements MCRUserStore {
      *         have userID in their administrators list
      */
     public synchronized ArrayList getGroupIDsWithAdminUser(String userID) throws MCRException {
-        ArrayList retList = new ArrayList();
+        ArrayList<String> retList = new ArrayList<String>();
         Session session = MCRHIBConnection.instance().getSession();
         List l = session.createQuery("from MCRGROUPADMINS where USERID = '" + userID + "'").list();
+        session.close();
 
         if (l.size() > 0) {
             for (int i = 0; i < l.size(); i++) {
@@ -554,9 +533,6 @@ public class MCRHIBUserStore2 implements MCRUserStore {
                 retList.add(groupadmins.getGid());
             }
         }
-
-        session.close();
-
         return retList;
     }
 
@@ -570,9 +546,10 @@ public class MCRHIBUserStore2 implements MCRUserStore {
      *         have groupID as primary group
      */
     public synchronized ArrayList getUserIDsWithPrimaryGroup(String groupID) throws MCRException {
-        ArrayList retList = new ArrayList();
+        ArrayList<String> retList = new ArrayList<String>();
         Session session = MCRHIBConnection.instance().getSession();
         List l = session.createQuery("from MCRUSERS where PRIMGROUP = '" + groupID + "'").list();
+        session.close();
 
         if (l.size() > 0) {
             for (int i = 0; i < l.size(); i++) {
@@ -580,9 +557,6 @@ public class MCRHIBUserStore2 implements MCRUserStore {
                 retList.add(users.getUid());
             }
         }
-
-        session.close();
-
         return retList;
     }
 
@@ -606,13 +580,12 @@ public class MCRHIBUserStore2 implements MCRUserStore {
                     dbgroup.setDescription(group.getDescription());
                     dbgroup.setModifieddate(group.getModifiedDate());
                     session.saveOrUpdate(dbgroup);
-                    session.flush();
                 }
             }
 
             // prepare groupadmin arraylist
-            ArrayList oldAdminUserIDs = new ArrayList();
-            ArrayList oldAdminGroupIDs = new ArrayList();
+            ArrayList<String> oldAdminUserIDs = new ArrayList<String>();
+            ArrayList<String> oldAdminGroupIDs = new ArrayList<String>();
             ArrayList newAdminGroupIDs = group.getAdminGroupIDs();
             ArrayList newAdminUserIDs = group.getAdminUserIDs();
             l = session.createQuery("from MCRGROUPADMINS where GID='" + group.getID() + "'").list();
@@ -630,7 +603,7 @@ public class MCRHIBUserStore2 implements MCRUserStore {
             }
 
             // prepare groupmember arraylist
-            ArrayList oldUserIDs = new ArrayList();
+            ArrayList<String> oldUserIDs = new ArrayList<String>();
             ArrayList newUserIDs = group.getMemberUserIDs();
             l = session.createQuery("from MCRGROUPMEMBERS where GID='" + group.getID() + "'").list();
 
@@ -643,10 +616,10 @@ public class MCRHIBUserStore2 implements MCRUserStore {
             }
 
             // after selection close commit transaction
-            tx.commit();
-            session.close();
-            session = MCRHIBConnection.instance().getSession();
-            tx = session.beginTransaction();
+            // tx.commit();
+            // session.close();
+            // session = MCRHIBConnection.instance().getSession();
+            // tx = session.beginTransaction();
 
             // insert
             for (int i = 0; i < newAdminUserIDs.size(); i++) {
@@ -656,7 +629,6 @@ public class MCRHIBUserStore2 implements MCRUserStore {
                     grpadmins.setUserid((String) newAdminUserIDs.get(i));
                     grpadmins.setGroupid("");
                     session.save(grpadmins);
-                    session.flush();
                 }
             }
 
@@ -667,7 +639,6 @@ public class MCRHIBUserStore2 implements MCRUserStore {
                     grpadmins.setUserid("");
                     grpadmins.setGroupid((String) newAdminGroupIDs.get(i));
                     session.save(grpadmins);
-                    session.flush();
                 }
             }
 
@@ -695,7 +666,6 @@ public class MCRHIBUserStore2 implements MCRUserStore {
                     grpmembers.setGid(group.getID());
                     grpmembers.setUserid((String) newUserIDs.get(i));
                     session.save(grpmembers);
-                    session.flush();
                 }
             }
 
@@ -707,22 +677,18 @@ public class MCRHIBUserStore2 implements MCRUserStore {
                     logger.info(deletedEntities + " groupmember-entries deleted");
                 }
             }
-
             tx.commit();
         } catch (MCRPersistenceException e) {
             tx.rollback();
-            logger.error("stackTrace", e);
-            throw new MCRException("Error in UserStore.", e);
+            throw new MCRException("updateGroup: Error in UserStore.", e);
         } catch (HibernateException e) {
             tx.rollback();
-            logger.error("stackTrace", e);
-            throw new MCRException("Hibernate error in UserStore.", e);
+            throw new MCRException("updateGroup: Hibernate error in UserStore.", e);
         } catch (Exception e) {
             tx.rollback();
-            logger.error("stackTrace", e);
-            throw new MCRException("Exception: ", e);
+            throw new MCRException("updateGroup: Exception: ", e);
         } finally {
-            session.close();
+            if ( session != null ) session.close();
         }
     }
 
@@ -737,15 +703,12 @@ public class MCRHIBUserStore2 implements MCRUserStore {
      */
     public synchronized MCRGroup retrieveGroup(String groupID) throws MCRException {
         Session session = MCRHIBConnection.instance().getSession();
-        Transaction tx = session.beginTransaction();
         MCRGroup group = new MCRGroup();
 
         try {
             List l = session.createQuery("from MCRGROUPS where GID = '" + groupID + "'").list();
-
             if (l.size() == 0) {
-                tx.rollback();
-                throw new MCRException("There is no group with ID = " + groupID);
+                throw new MCRException("retrieveGroup: There is no group with ID = " + groupID);
             } else {
                 MCRGROUPS groups = (MCRGROUPS) l.get(0);
 
@@ -758,46 +721,36 @@ public class MCRHIBUserStore2 implements MCRUserStore {
                 // (members) and privileges
                 l = session.createQuery("from MCRGROUPADMINS where GID = '" + groupID + "'").list();
 
-                ArrayList admUserIDs = new ArrayList();
-                ArrayList admGroupIDs = new ArrayList();
+                ArrayList<String> admUserIDs = new ArrayList<String>();
+                ArrayList<String> admGroupIDs = new ArrayList<String>();
 
                 if (l.size() > 0) {
                     for (int i = 0; i < l.size(); i++) {
                         MCRGROUPADMINS grpadmins = (MCRGROUPADMINS) l.get(i);
 
-                        if (grpadmins.getUserid() == null) {
-                        } else {
-                            if (!grpadmins.getUserid().equals("")) {
-                                admUserIDs.add(grpadmins.getUserid());
-                            }
+                        if (grpadmins.getUserid() != null && !grpadmins.getUserid().equals("")) {
+                           admUserIDs.add(grpadmins.getUserid());
                         }
 
-                        if (grpadmins.getGroupid() == null) {
-                        } else {
-                            if (!grpadmins.getGroupid().equals("")) {
-                                admGroupIDs.add(grpadmins.getGroupid());
-                            }
+                        if (grpadmins.getGroupid() != null  && !grpadmins.getGroupid().equals("")) {
+                           admGroupIDs.add(grpadmins.getGroupid());
                         }
                     }
                 }
 
                 l = session.createQuery("from MCRGROUPMEMBERS where GID = '" + groupID + "'").list();
 
-                ArrayList mbrUserIDs = new ArrayList();
+                ArrayList<String> mbrUserIDs = new ArrayList<String>();
 
                 if (l.size() > 0) {
                     for (int i = 0; i < l.size(); i++) {
                         MCRGROUPMEMBERS grpmembers = (MCRGROUPMEMBERS) l.get(i);
 
-                        if (grpmembers.getUserid() == null) {
-                        } else {
-                            if (!grpmembers.getUserid().equals("")) {
-                                mbrUserIDs.add(grpmembers.getUserid());
-                            }
+                        if (grpmembers.getUserid() != null && !grpmembers.getUserid().equals("")) {
+                            mbrUserIDs.add(grpmembers.getUserid());
                         }
                     }
                 }
-
                 // We create the group object
                 try {
                     group = new MCRGroup(groupID, creator, created, modified, description, admUserIDs, admGroupIDs, mbrUserIDs);
@@ -807,13 +760,10 @@ public class MCRHIBUserStore2 implements MCRUserStore {
                     e.printStackTrace();
                 }
             }
-
-            tx.commit();
         } catch (HibernateException ex) {
-            tx.rollback();
             throw new MCRException("Error in UserStore.", ex);
         } finally {
-            session.close();
+            if ( session != null ) session.close();
         }
 
         return group;

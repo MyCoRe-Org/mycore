@@ -53,7 +53,7 @@ public class MCRHIBSearcher extends MCRSearcher {
     /** The logger */
     private static Logger LOGGER = Logger.getLogger(MCRHIBSearcher.class.getName());
 
-    public static HashMap indexClassMapping = new HashMap();
+    public static HashMap<String, String> indexClassMapping = new HashMap<String, String>();
 
     private String tableName;
 
@@ -69,7 +69,7 @@ public class MCRHIBSearcher extends MCRSearcher {
 
     protected void addToIndex(String entryID, String returnID, List fields) {
         MCRHIBQuery query = new MCRHIBQuery((String) indexClassMapping.get(index));
-        Hashtable used = new Hashtable();
+        Hashtable<MCRFieldDef, MCRFieldDef> used = new Hashtable<MCRFieldDef, MCRFieldDef>();
 
         query.setValue("setmcrid", entryID);
         query.setValue("setreturnid", returnID);
@@ -93,10 +93,10 @@ public class MCRHIBSearcher extends MCRSearcher {
             session.saveOrUpdate(query.getQueryObject());
             tx.commit();
         } catch (Exception ex) {
-            LOGGER.error(ex);
             tx.rollback();
+            LOGGER.error("addToIndex: " , ex);
         } finally {
-            session.close();
+             if ( session != null ) session.close();
         }
     }
 
@@ -110,20 +110,18 @@ public class MCRHIBSearcher extends MCRSearcher {
             tx.commit();
         } catch (Exception e) {
             tx.rollback();
-            LOGGER.error(e);
+            LOGGER.error("removeFromIndex:", e);
         } finally {
-            session.close();
+             if ( session != null ) session.close();
         }
     }
 
     public MCRResults search(MCRCondition condition, int maxResults, List sortBy, boolean addSortData) {
         Session session = MCRHIBConnection.instance().getSession();
-        Transaction tx = session.beginTransaction();
         MCRResults results = new MCRResults();
 
         try {
             MCRHIBQuery hibquery = new MCRHIBQuery(condition, sortBy, (String) indexClassMapping.get(index));
-
             for (Iterator it = session.createQuery(hibquery.getHIBQuery()).iterate(); it.hasNext();) {
                 MCRHIBQuery tmpquery = new MCRHIBQuery(it.next());
                 MCRHit hit = new MCRHit((String) (tmpquery.getValue("getreturnid")));
@@ -148,14 +146,11 @@ public class MCRHIBSearcher extends MCRSearcher {
                 if ((maxResults > 0) && (results.getNumHits() >= maxResults))
                     break;
             }
-            tx.commit();
-
             results.setSorted((!addSortData) && (sortBy.size() > 0));
         } catch (Exception ex) {
-            tx.rollback();
-            LOGGER.error("Exception in MCRHibSearcher", ex);
+            LOGGER.error("search: Exception ", ex);
         } finally {
-            session.close();
+             if ( session != null ) session.close();
         }
 
         return results;
@@ -189,7 +184,7 @@ public class MCRHIBSearcher extends MCRSearcher {
                 new SchemaUpdate(MCRHIBConnection.instance().getConfiguration()).execute(true, true);
             }
         } catch (Exception e) {
-            LOGGER.error("error stacktrace", e);
+            LOGGER.error("updateConfiguration: catched error ", e);
         }
     }
 }

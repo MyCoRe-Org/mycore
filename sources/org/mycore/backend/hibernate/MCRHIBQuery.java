@@ -24,7 +24,7 @@
 package org.mycore.backend.hibernate;
 
 import java.lang.reflect.Method;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -58,7 +58,7 @@ public class MCRHIBQuery implements MCRConditionVisitor {
 
     private int count = 0; // number of children to proceed
 
-    private List elList = new LinkedList(); // stack for type-elements
+    private List<Element> elList = new ArrayList<Element>(); // stack for type-elements
 
     private int bracket = 0; // counts correct number of ')'
 
@@ -171,7 +171,7 @@ public class MCRHIBQuery implements MCRConditionVisitor {
         for (int i = 0; i < querymethods.length; i++) {
             if (querymethods[i].getName().toLowerCase().equals(methodname.toLowerCase())) {
                 try {
-                    ret = querymethods[i].invoke(queryobject, null);
+                    ret = querymethods[i].invoke(queryobject, (Object) null);
 
                     break;
                 } catch (Exception e) {
