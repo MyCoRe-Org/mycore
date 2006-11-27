@@ -78,8 +78,33 @@
 
   <filter-mapping>
     <filter-name>UriResolverDebugFilter</filter-name>
-    <servlet-name>MCRLayoutServlet</servlet-name>
-    <dispatcher>FORWARD</dispatcher>
+    <servlet-name>MCRStaticXMLFileServlet</servlet-name>
+    <dispatcher>REQUEST</dispatcher>
+  </filter-mapping>
+  <filter-mapping>
+    <filter-name>UriResolverDebugFilter</filter-name>
+    <servlet-name>MCRFileNodeServlet</servlet-name>
+    <dispatcher>REQUEST</dispatcher>
+  </filter-mapping>
+  <filter-mapping>
+    <filter-name>UriResolverDebugFilter</filter-name>
+    <servlet-name>MCRLoginServlet</servlet-name>
+    <dispatcher>REQUEST</dispatcher>
+  </filter-mapping>
+  <filter-mapping>
+    <filter-name>UriResolverDebugFilter</filter-name>
+    <servlet-name>MCRIndexBrowserServlet</servlet-name>
+    <dispatcher>REQUEST</dispatcher>
+  </filter-mapping>
+  <filter-mapping>
+    <filter-name>UriResolverDebugFilter</filter-name>
+    <servlet-name>MCRObjectServlet</servlet-name>
+    <dispatcher>REQUEST</dispatcher>
+  </filter-mapping>
+  <filter-mapping>
+    <filter-name>UriResolverDebugFilter</filter-name>
+    <servlet-name>MCRSearchServlet</servlet-name>
+    <dispatcher>REQUEST</dispatcher>
   </filter-mapping>
 
   <servlet-mapping>
