@@ -93,7 +93,7 @@ public class MCRListWorkflowServlet extends MCRServlet {
 
     /**
      * This method overrides doGetPost of MCRServlet and put the generated DOM
-     * in the LayoutServlet. <br />
+     * in the LayoutService. <br />
      * Input parameter are <br />
      * <ul>
      * <li>type - the MyCoRe type</li>

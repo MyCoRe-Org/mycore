@@ -121,14 +121,14 @@ public class MCRClassificationBrowser extends MCRServlet {
     /**
      * Gather information about the XML document to be shown and the
      * corresponding XSLT stylesheet and redirect the request to the
-     * LayoutServlet
+     * LayoutService
      * 
      * @param job
      *            The MCRServletJob instance
      * @param styleBase
      *            String value to select the correct XSL stylesheet
      * @param jdomDoc
-     *            The XML representation to be presented by the LayoutServlet
+     *            The XML representation to be presented by the LayoutService
      * @throws ServletException
      *             for errors from the servlet engine.
      * @throws Exception

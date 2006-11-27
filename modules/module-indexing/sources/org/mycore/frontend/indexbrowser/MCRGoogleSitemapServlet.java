@@ -28,8 +28,6 @@ import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.List;
 
-import javax.servlet.RequestDispatcher;
-
 import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -154,10 +152,6 @@ public final class MCRGoogleSitemapServlet extends MCRServlet {
         calcurrent = new GregorianCalendar();
         timecurrent = df.format(calcurrent.getTime());
         LOGGER.info("Stop Google access on " + timecurrent);
-        job.getRequest().setAttribute("MCRLayoutServlet.Input.JDOM", jdom);
-        job.getRequest().setAttribute("XSL.Style", "xml");
-
-        RequestDispatcher rd = getServletContext().getNamedDispatcher("MCRLayoutServlet");
-        rd.forward(job.getRequest(), job.getResponse());
+        LAYOUT.sendXML(job.getRequest(), job.getResponse(), jdom);
     }
 }

@@ -125,14 +125,14 @@ public class MCRUserAdminGUICommons extends MCRServlet {
     /**
      * Gather information about the XML document to be shown and the
      * corresponding XSLT stylesheet and redirect the request to the
-     * LayoutServlet
+     * LayoutService
      * 
      * @param job
      *            The MCRServletJob instance
      * @param styleSheet
      *            String value to select the correct XSL stylesheet
      * @param jdomDoc
-     *            The XML representation to be presented by the LayoutServlet
+     *            The XML representation to be presented by the LayoutService
      * @param useStrict
      *            If true, the parameter styleSheet must be used directly as
      *            name of a stylesheet when forwarding to the MCRLayoutService.
