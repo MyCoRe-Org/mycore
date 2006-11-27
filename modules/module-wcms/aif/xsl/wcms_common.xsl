@@ -11,7 +11,7 @@
 	
 	<!--BEGIN: Adminmenu-->
 	<xsl:variable name="servletAnswer_XML_tmp" 
-		select="concat('request:','servlets/WCMSLoginServlet',$JSessionID,'?XSL.Style=xml&amp;flag=true')"
+		select="concat('request:servlets/WCMSLoginServlet',$JSessionID,'?XSL.Style=xml&amp;flag=true')"
     />
 
 	<xsl:variable name="servletAnswer_XML" 
