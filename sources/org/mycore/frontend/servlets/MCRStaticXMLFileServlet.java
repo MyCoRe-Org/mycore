@@ -26,8 +26,6 @@ package org.mycore.frontend.servlets;
 import java.io.File;
 import java.io.FileInputStream;
 
-import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
@@ -39,7 +37,7 @@ import org.mycore.frontend.editor.MCREditorServlet;
 
 /**
  * This servlet displays static *.xml files stored in the web application by
- * sending them to MCRLayoutServlet.
+ * sending them to MCRLayoutService.
  * 
  * @author Frank Lützenkirchen
  * @version $Revision$ $Date$
@@ -47,7 +45,7 @@ import org.mycore.frontend.editor.MCREditorServlet;
 public class MCRStaticXMLFileServlet extends MCRServlet {
     protected final static Logger LOGGER = Logger.getLogger(MCRStaticXMLFileServlet.class);
 
-    public void doGetPost(MCRServletJob job) throws ServletException, java.io.IOException {
+    public void doGetPost(MCRServletJob job) throws java.io.IOException {
         String requestedPath = job.getRequest().getServletPath();
         LOGGER.info("MCRStaticXMLFileServlet " + requestedPath);
 
@@ -75,11 +73,8 @@ public class MCRStaticXMLFileServlet extends MCRServlet {
             MCRURIResolver.init(getServletContext(), getBaseURL());
             Document xml = MCRXMLHelper.parseURI(path, false);
             MCREditorServlet.replaceEditorElements(job, "file://" + path, xml);
-            job.getRequest().setAttribute("MCRLayoutServlet.Input.JDOM", xml);
+            getLayoutService().doLayout(job.getRequest(),job.getResponse(),xml);
         } else
-            job.getRequest().setAttribute("MCRLayoutServlet.Input.FILE", file);
-
-        RequestDispatcher rd = getServletContext().getNamedDispatcher("MCRLayoutServlet");
-        rd.forward(job.getRequest(), job.getResponse());
+            getLayoutService().doLayout(job.getRequest(),job.getResponse(),file);
     }
 }

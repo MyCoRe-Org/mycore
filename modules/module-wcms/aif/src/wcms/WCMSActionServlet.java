@@ -50,7 +50,6 @@ import java.util.GregorianCalendar;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -389,7 +388,6 @@ public class WCMSActionServlet extends WCMSServlet {
                 }
             }
 
-            request.setAttribute("MCRLayoutServlet.Input.JDOM", jdom);
             String jump = null;
             int filepos = 0;
             String help = null;
@@ -399,8 +397,7 @@ public class WCMSActionServlet extends WCMSServlet {
               {
             	if ((checkInput()) == false) {
             		// request.setAttribute("XSL.Style", "xml");
-                    RequestDispatcher rd = getServletContext().getNamedDispatcher("MCRLayoutServlet");
-                    rd.forward(request, response); 
+                    getLayoutService().doLayout(request,response,jdom);
                   }
             	else
             	  {
@@ -433,9 +430,7 @@ public class WCMSActionServlet extends WCMSServlet {
               }	
             else
               {	
-             // request.setAttribute("XSL.Style", "xml");
-             RequestDispatcher rd = getServletContext().getNamedDispatcher("MCRLayoutServlet");
-             rd.forward(request, response);
+             getLayoutService().doLayout(request,response,jdom);
               }
           } catch (Exception e) {
             e.printStackTrace();
@@ -1185,7 +1180,7 @@ public class WCMSActionServlet extends WCMSServlet {
         // update log file
         writeToLogFile(action, contentFileBackup);
 
-        // prepare xml container for MCRLayoutServlet
+        // prepare xml container for MCRLayoutService
         generateOutput(error, label, fileName);
     }
 

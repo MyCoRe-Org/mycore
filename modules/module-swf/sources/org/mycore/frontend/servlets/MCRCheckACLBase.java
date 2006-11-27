@@ -28,8 +28,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.servlet.RequestDispatcher;
-
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
@@ -313,11 +311,7 @@ abstract public class MCRCheckACLBase extends MCRCheckBase {
         }
 
         // restart editor
-        job.getRequest().setAttribute("MCRLayoutServlet.Input.JDOM", jdom);
         job.getRequest().setAttribute("XSL.Style", lang);
-
-        RequestDispatcher rd = getServletContext().getNamedDispatcher("MCRLayoutServlet");
-        rd.forward(job.getRequest(), job.getResponse());
+        getLayoutService().doLayout(job.getRequest(),job.getResponse(),jdom);
     }
-
 }

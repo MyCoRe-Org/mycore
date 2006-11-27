@@ -28,8 +28,6 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -57,7 +55,7 @@ public class WCMSFileUploadServlet extends WCMSServlet {
     /**
      * Main program called by doGet and doPost.
      */
-    protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws IOException {
         boolean isMultiPart = ServletFileUpload.isMultipartContent(request);
 
         if (isMultiPart) {
@@ -88,18 +86,17 @@ public class WCMSFileUploadServlet extends WCMSServlet {
         }
     }
 
-    private void generateStatusPage(HttpServletRequest request, HttpServletResponse response, boolean success, String message) throws ServletException,
-            IOException {
+    private void generateStatusPage(HttpServletRequest request, HttpServletResponse response, boolean success, String message) throws IOException {
         String msg = (message != null) ? message : "";
         String status = (success) ? "done" : "failed";
         forwardPage(request, response, status, msg);
     }
 
-    private void generateUploadPage(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    private void generateUploadPage(HttpServletRequest request, HttpServletResponse response) throws IOException {
         forwardPage(request, response, "upload", "2");
     }
 
-    private void forwardPage(HttpServletRequest request, HttpServletResponse response, String status, String error) throws ServletException, IOException {
+    private void forwardPage(HttpServletRequest request, HttpServletResponse response, String status, String error) throws IOException {
         MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
         Element rootOut = new Element("cms");
         Document jdom = new Document(rootOut);
@@ -108,9 +105,7 @@ public class WCMSFileUploadServlet extends WCMSServlet {
         rootOut.addContent(new Element("userClass").setText(mcrSession.get("userClass").toString()));
         rootOut.addContent(new Element("status").setText(status));
         rootOut.addContent(new Element("error").setText(error));
-        request.setAttribute("MCRLayoutServlet.Input.JDOM", jdom);
-        RequestDispatcher rd = getServletContext().getNamedDispatcher("MCRLayoutServlet");
-        rd.forward(request, response);
+        getLayoutService().doLayout(request,response,jdom);
     }
 
     private void processFormField(FileItem item) {

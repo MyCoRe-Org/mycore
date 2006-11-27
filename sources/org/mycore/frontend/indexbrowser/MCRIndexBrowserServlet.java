@@ -25,8 +25,6 @@ package org.mycore.frontend.indexbrowser;
 
 import java.util.Enumeration;
 
-import javax.servlet.RequestDispatcher;
-
 import org.jdom.Document;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
@@ -56,13 +54,7 @@ public class MCRIndexBrowserServlet extends MCRServlet {
         indexbrowser.getResultList();        
         Document pageContent = indexbrowser.getXMLContent();   
         
-        job.getRequest().setAttribute("MCRLayoutServlet.Input.JDOM", pageContent);
         job.getRequest().setAttribute("XSL.Style", searchclass);
-
-        RequestDispatcher rd = getServletContext().getNamedDispatcher("MCRLayoutServlet");
-        rd.forward(job.getRequest(), job.getResponse());
+        getLayoutService().doLayout(job.getRequest(),job.getResponse(),pageContent);
     }
-
-    // **************************************************************************
-
 }

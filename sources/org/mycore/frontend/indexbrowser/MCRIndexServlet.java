@@ -26,8 +26,6 @@ package org.mycore.frontend.indexbrowser;
 import java.util.List;
 import java.util.Vector;
 
-import javax.servlet.RequestDispatcher;
-
 import org.jdom.Document;
 import org.jdom.Element;
 import org.mycore.backend.sql.MCRSQLConnection;
@@ -199,11 +197,8 @@ public class MCRIndexServlet extends MCRServlet {
     // **************************************************************************
     private void sendXML(MCRServletJob job, Element root, String style) throws Exception {
         Document jdom = new Document(root);
-        job.getRequest().setAttribute("MCRLayoutServlet.Input.JDOM", jdom);
         job.getRequest().setAttribute("XSL.Style", style);
-
-        RequestDispatcher rd = getServletContext().getNamedDispatcher("MCRLayoutServlet");
-        rd.forward(job.getRequest(), job.getResponse());
+        getLayoutService().doLayout(job.getRequest(),job.getResponse(),jdom);
     }
 
     // **************************************************************************

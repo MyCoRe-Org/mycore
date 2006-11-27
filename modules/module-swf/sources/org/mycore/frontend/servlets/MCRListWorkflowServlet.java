@@ -32,7 +32,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.servlet.RequestDispatcher;
 import javax.xml.transform.sax.TransformerHandler;
 import javax.xml.transform.stream.StreamSource;
 
@@ -323,12 +322,7 @@ public class MCRListWorkflowServlet extends MCRServlet {
         }
 
         org.jdom.Document workflow_doc = new org.jdom.Document(root);
-
-        // return the JDOM
-        job.getRequest().setAttribute("MCRLayoutServlet.Input.JDOM", workflow_doc);
-
-        RequestDispatcher rd = getServletContext().getNamedDispatcher("MCRLayoutServlet");
-        rd.forward(job.getRequest(), job.getResponse());
+        getLayoutService().doLayout(job.getRequest(),job.getResponse(),workflow_doc);
     }
 
     /**

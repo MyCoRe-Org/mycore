@@ -189,12 +189,9 @@ public class MCRLoginServlet extends MCRServlet {
      * @throws IOException
      *             for java I/O errors.
      */
-    protected void doLayout(MCRServletJob job, String style, Document jdomDoc) throws ServletException, IOException {
-        job.getRequest().setAttribute("MCRLayoutServlet.Input.JDOM", jdomDoc);
+    protected void doLayout(MCRServletJob job, String style, Document jdomDoc) throws IOException {
         job.getRequest().setAttribute("XSL.Style", style);
-
-        RequestDispatcher rd = getServletContext().getNamedDispatcher("MCRLayoutServlet");
-        rd.forward(job.getRequest(), job.getResponse());
+        getLayoutService().doLayout(job.getRequest(),job.getResponse(),jdomDoc);
     }
     
     private static final String addParameter(String url, String name, String value){

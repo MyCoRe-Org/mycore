@@ -24,6 +24,7 @@
 package org.mycore.frontend.servlets;
 
 import org.mycore.datamodel.classifications.MCRClassificationBrowserData;
+import org.mycore.frontend.servlets.MCRServlet;
 import org.apache.log4j.Logger;
 import org.mycore.common.*;
 import org.jdom.*;
@@ -133,14 +134,11 @@ public class MCRClassificationBrowser extends MCRServlet {
      * @throws Exception
      */
     protected void doLayout(MCRServletJob job, String styleBase, Document jdomDoc) throws ServletException, Exception {
-        job.getRequest().setAttribute("MCRLayoutServlet.Input.JDOM", jdomDoc);
         if (getProperty(job.getRequest(), "XSL.Style") == null) {
             LOGGER.info("Set XSL.Style to: " + styleBase);
             job.getRequest().setAttribute("XSL.Style", styleBase);
         }
-
-        RequestDispatcher rd = getServletContext().getNamedDispatcher("MCRLayoutServlet");
-        rd.forward(job.getRequest(), job.getResponse());
+        LAYOUT.doLayout(job.getRequest(),job.getResponse(),jdomDoc);
     }
 
 }

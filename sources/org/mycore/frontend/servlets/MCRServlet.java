@@ -29,7 +29,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -46,7 +45,7 @@ import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.xml.MCRLayoutServlet;
+import org.mycore.common.xml.MCRLayoutService;
 import org.mycore.datamodel.metadata.MCRActiveLinkException;
 
 /**
@@ -80,8 +79,20 @@ public class MCRServlet extends HttpServlet {
 	private final static boolean GET = true;
 
 	private final static boolean POST = false;
+    
+    private static MCRLayoutService LAYOUT_SERVICE;
+    
+    public static MCRLayoutService getLayoutService() {
+        return LAYOUT_SERVICE;
+    }
 
-	/** returns the base URL of the mycore system */
+    public void init() throws ServletException {
+        super.init();
+        String dir = getServletContext().getRealPath("WEB-INF/stylesheets");
+        LAYOUT_SERVICE = new MCRLayoutService(dir);
+    }
+
+    /** returns the base URL of the mycore system */
 	public static String getBaseURL() {
 		return BASE_URL;
 	}
@@ -305,7 +316,7 @@ public class MCRServlet extends HttpServlet {
 	}
 
 	protected void generateErrorPage(HttpServletRequest request, HttpServletResponse response, int error, String msg, Exception ex, boolean xmlstyle)
-			throws IOException, ServletException {
+			throws IOException {
 		LOGGER.error(getClass().getName() + ": Error " + error + " occured. The following message was given: " + msg, ex);
 
 		String rootname = "mcr_error";
@@ -334,15 +345,14 @@ public class MCRServlet extends HttpServlet {
 			}
 		}
 
-		request.setAttribute(MCRLayoutServlet.JDOM_ATTR, errorDoc);
         request.setAttribute("XSL.Style", style);
         
         final String requestAttr="MCRServlet.generateErrorPage";
         if ((!response.isCommitted()) && (request.getAttribute(requestAttr)==null)){
             response.setStatus(error);
-            RequestDispatcher rd = getServletContext().getNamedDispatcher("MCRLayoutServlet");
             request.setAttribute(requestAttr,msg);
-            rd.forward(request, response);
+            LAYOUT_SERVICE.doLayout(request,response,errorDoc);
+            return;
         } else {
             if (request.getAttribute(requestAttr)!=null){
                 LOGGER.warn("Could not send error page. Generating error page failed. The original message:\n"+request.getAttribute(requestAttr));
@@ -353,7 +363,7 @@ public class MCRServlet extends HttpServlet {
 	}
 
 	protected void generateActiveLinkErrorpage(HttpServletRequest request, HttpServletResponse response, String msg, MCRActiveLinkException activeLinks)
-			throws IOException, ServletException {
+			throws IOException {
 		StringBuffer msgBuf = new StringBuffer(msg);
 		msgBuf.append("\nThere are links active preventing the commit of work, see error message for details. The following links where affected:");
 		Map links = activeLinks.getActiveLinks();
@@ -389,7 +399,7 @@ public class MCRServlet extends HttpServlet {
         return -1; //time is not known
     }
 
-    protected static String getProperty(HttpServletRequest request, String name) {
+    public static String getProperty(HttpServletRequest request, String name) {
 		String value = (String) request.getAttribute(name);
 
 		// if Attribute not given try Parameter

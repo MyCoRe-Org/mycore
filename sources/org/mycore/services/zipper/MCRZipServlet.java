@@ -50,7 +50,6 @@ import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRException;
-import org.mycore.common.xml.MCRLayoutServlet;
 import org.mycore.common.xml.MCRXSLTransformation;
 import org.mycore.datamodel.ifs.MCRDirectory;
 import org.mycore.datamodel.ifs.MCRFile;
@@ -99,7 +98,7 @@ public class MCRZipServlet extends MCRServlet {
     /**
      * Handles the HTTP request
      */
-    public void doGetPost(MCRServletJob job) throws IOException, ServletException {
+    public void doGetPost(MCRServletJob job) throws IOException {
         HttpServletRequest req = job.getRequest();
         HttpServletResponse res = job.getResponse();
 
@@ -295,7 +294,7 @@ public class MCRZipServlet extends MCRServlet {
      */
     protected void sendObject(Document jdom, HttpServletRequest req, ZipOutputStream out) throws IOException {
         // zip the object's Metadata
-        Properties parameters = MCRLayoutServlet.buildXSLParameters(req);
+        Properties parameters = getLayoutService().buildXSLParameters(req);
         sendZipped(jdom, parameters, out);
 
         // zip all derivates

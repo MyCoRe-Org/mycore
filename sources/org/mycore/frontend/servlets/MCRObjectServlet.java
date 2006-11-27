@@ -28,7 +28,6 @@ import java.util.Hashtable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -40,7 +39,6 @@ import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.xml.MCRLayoutServlet;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.MCRXMLTableManager;
 import org.mycore.services.fieldquery.MCRHit;
@@ -82,22 +80,25 @@ public class MCRObjectServlet extends MCRServlet {
 
     /**
      * The method replace the default form MCRServlet and redirect the
-     * MCRLayoutServlet.
+     * MCRLayoutService.
      * 
      * @param job
      *            the MCRServletJob instance
      */
-    public void doGetPost(MCRServletJob job) throws ServletException, Exception {
+    public void doGetPost(MCRServletJob job) throws Exception {
         try {
             String host = getObjectHost(job);
-            String id = (host == MCRHit.LOCAL) ? requestLocalObject(job) : requestRemoteObject(job);
+            String id = getObjectID(job.getRequest());
             if ((id == null) || (id.length() == 0)) {
                 return; // request failed;
             }
             String editorID=getEditorID(job.getRequest());
             setBrowseParameters(job, id, host, editorID);
-            RequestDispatcher rd = getServletContext().getNamedDispatcher("MCRLayoutServlet");
-            rd.forward(job.getRequest(), job.getResponse());
+
+            if(host == MCRHit.LOCAL)
+              getLayoutService().doLayout(job.getRequest(),job.getResponse(),requestLocalObject(job));
+            else
+              getLayoutService().doLayout(job.getRequest(),job.getResponse(),requestRemoteObject(job));
         } catch (MCRException e) {
             generateErrorPage(job.getRequest(), job.getResponse(), HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error while retrieving MCRObject with ID: "
                     + getObjectID(job.getRequest()), e, false);
@@ -113,14 +114,13 @@ public class MCRObjectServlet extends MCRServlet {
         return remoteHost;
     }
 
-    private String requestRemoteObject(MCRServletJob job) {
+    private org.w3c.dom.Document requestRemoteObject(MCRServletJob job) {
         String id = getObjectID(job.getRequest());
         String host = getProperty(job.getRequest(), "host");
-        job.getRequest().setAttribute(MCRLayoutServlet.DOM_ATTR, MCRQueryClient.doRetrieveObject(host, id));
-        return id;
+        return MCRQueryClient.doRetrieveObject(host, id);
     }
 
-    private String requestLocalObject(MCRServletJob job) throws IOException, ServletException {
+    private Document requestLocalObject(MCRServletJob job) throws IOException {
         String id = getObjectID(job.getRequest());
         MCRObjectID mcrid = new MCRObjectID(id);
 
@@ -133,10 +133,7 @@ public class MCRObjectServlet extends MCRServlet {
             return null;
         }
 
-        Document doc = TM.readDocument(mcrid);
-        // call the LayoutServlet
-        job.getRequest().setAttribute(MCRLayoutServlet.JDOM_ATTR, doc);
-        return id;
+        return TM.readDocument(mcrid);
     }
 
     private void setBrowseParameters(MCRServletJob job, String mcrid, String host, String editorID) {

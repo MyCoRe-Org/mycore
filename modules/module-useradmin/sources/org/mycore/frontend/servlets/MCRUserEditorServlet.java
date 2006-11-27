@@ -30,8 +30,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.jdom.output.Format;
-import org.jdom.output.XMLOutputter;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
@@ -74,7 +72,7 @@ public class MCRUserEditorServlet extends MCRUserAdminGUICommons {
      * @throws ServletException
      *             for errors from the servlet engine.
      */
-    public void doGetPost(MCRServletJob job) throws IOException, ServletException {
+    public void doGetPost(MCRServletJob job) throws IOException {
 
         String mode = getProperty(job.getRequest(), "mode");
 
@@ -116,7 +114,7 @@ public class MCRUserEditorServlet extends MCRUserAdminGUICommons {
      * @throws ServletException
      *             for errors from the servlet engine.
      */
-    private void getAssignableGroupsForUser(MCRServletJob job) throws IOException, ServletException {
+    private void getAssignableGroupsForUser(MCRServletJob job) throws IOException {
         // Get the MCRSession object for the current thread from the session
         // manager.
         MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
@@ -167,7 +165,7 @@ public class MCRUserEditorServlet extends MCRUserAdminGUICommons {
         }
 
         org.jdom.Document jdomDoc = new org.jdom.Document(root);
-        forwardXML(job, jdomDoc);
+        getLayoutService().sendXML(job.getRequest(),job.getResponse(),jdomDoc);
     }
     
     /**
@@ -182,7 +180,7 @@ public class MCRUserEditorServlet extends MCRUserAdminGUICommons {
      * @throws ServletException
      *             for errors from the servlet engine.
      */
-    private void getAllGroups(MCRServletJob job) throws IOException, ServletException {
+    private void getAllGroups(MCRServletJob job) throws IOException {
     	ArrayList groupIDs;
         try {
             if (AI.checkPermission("administrate-user")) {
@@ -222,7 +220,7 @@ public class MCRUserEditorServlet extends MCRUserAdminGUICommons {
         }
 
         org.jdom.Document jdomDoc = new org.jdom.Document(root);
-        forwardXML(job, jdomDoc);
+        getLayoutService().sendXML(job.getRequest(),job.getResponse(),jdomDoc);
     }
     
     /**
@@ -237,7 +235,7 @@ public class MCRUserEditorServlet extends MCRUserAdminGUICommons {
      * @throws ServletException
      *             for errors from the servlet engine.
      */
-    private void getAllUsers(MCRServletJob job) throws IOException, ServletException {
+    private void getAllUsers(MCRServletJob job) throws IOException {
     	ArrayList userIDs;
         try {
             if (AI.checkPermission("administrate-user")) {
@@ -277,7 +275,7 @@ public class MCRUserEditorServlet extends MCRUserAdminGUICommons {
         }
 
         org.jdom.Document jdomDoc = new org.jdom.Document(root);
-        forwardXML(job, jdomDoc);
+        getLayoutService().sendXML(job.getRequest(),job.getResponse(),jdomDoc);
     }    
 
     /**
@@ -293,7 +291,7 @@ public class MCRUserEditorServlet extends MCRUserAdminGUICommons {
      * @throws ServletException
      *             for errors from the servlet engine.
      */
-    private void retrieveAllUserXML(MCRServletJob job) throws IOException, ServletException {
+    private void retrieveAllUserXML(MCRServletJob job) throws IOException {
         // We first check the privileges for this use case
         if (!AI.checkPermission("administrate-user")) {
             showNoPrivsPage(job);
@@ -317,7 +315,7 @@ public class MCRUserEditorServlet extends MCRUserAdminGUICommons {
      * This method is still experimental! It is needed in the use case "modify
      * user".
      */
-    private void retrieveUserXML(MCRServletJob job) throws IOException, ServletException {
+    private void retrieveUserXML(MCRServletJob job) throws IOException {
         // We first check the privileges for this use case
         if (!AI.checkPermission("modify-user")) {
             showNoPrivsPage(job);
@@ -329,7 +327,7 @@ public class MCRUserEditorServlet extends MCRUserAdminGUICommons {
             String userID = getProperty(job.getRequest(), "uid");
             MCRUser user = MCRUserMgr.instance().retrieveUser(userID);
             org.jdom.Document jdomDoc = user.toJDOMDocument();
-            forwardXML(job, jdomDoc);
+            getLayoutService().sendXML(job.getRequest(),job.getResponse(),jdomDoc);
         } catch (MCRException ex) {
             // TODO: Es gibt Probleme mit den Fehlermeldungen, siehe oben.
             String msg = "An error occured while retrieving a user object from the store!";
@@ -343,7 +341,7 @@ public class MCRUserEditorServlet extends MCRUserAdminGUICommons {
      * This method is still experimental! It is needed in the use case "modify
      * group".
      */
-    private void retrieveGroupXML(MCRServletJob job) throws IOException, ServletException {
+    private void retrieveGroupXML(MCRServletJob job) throws IOException {
         // We first check the privileges for this use case
         if (!AI.checkPermission("modify-group")) {
             showNoPrivsPage(job);
@@ -355,7 +353,7 @@ public class MCRUserEditorServlet extends MCRUserAdminGUICommons {
             String groupID = getProperty(job.getRequest(), "gid");
             MCRGroup group = MCRUserMgr.instance().retrieveGroup(groupID);
             org.jdom.Document jdomDoc = group.toJDOMDocument();
-            forwardXML(job, jdomDoc);
+            getLayoutService().sendXML(job.getRequest(),job.getResponse(),jdomDoc);
         } catch (MCRException ex) {
             // TODO: Es gibt Probleme mit den Fehlermeldungen, siehe oben.
             String msg = "An error occured while retrieving a group object from the store!";
@@ -375,7 +373,7 @@ public class MCRUserEditorServlet extends MCRUserAdminGUICommons {
      * @throws ServletException
      *             for errors from the servlet engine.
      */
-    private void getEditorSubmission(MCRServletJob job) throws IOException, ServletException {
+    private void getEditorSubmission(MCRServletJob job) throws IOException {
         MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
         String currentUserID = mcrSession.getCurrentUserID();
 

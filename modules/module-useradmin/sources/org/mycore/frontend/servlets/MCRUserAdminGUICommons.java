@@ -29,7 +29,6 @@ import java.net.URLEncoder;
 import java.util.Enumeration;
 import java.util.Properties;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 
 import org.jdom.Document;
@@ -124,25 +123,6 @@ public class MCRUserAdminGUICommons extends MCRServlet {
     }
 
     /**
-     * This methods forwards a jdom document with XSL.Style=xml using the
-     * MCRLayoutServlet
-     * 
-     * @param jdomDoc
-     *            The XML document to be forwarded by the LayoutServlet
-     * @throws ServletException
-     *             for errors from the servlet engine.
-     * @throws IOException
-     *             for java I/O errors.
-     */
-    protected void forwardXML(MCRServletJob job, Document jdomDoc) throws ServletException, IOException {
-        job.getRequest().setAttribute("MCRLayoutServlet.Input.JDOM", jdomDoc);
-        job.getRequest().setAttribute("XSL.Style", "xml");
-
-        RequestDispatcher rd = getServletContext().getNamedDispatcher("MCRLayoutServlet");
-        rd.forward(job.getRequest(), job.getResponse());
-    }
-
-    /**
      * Gather information about the XML document to be shown and the
      * corresponding XSLT stylesheet and redirect the request to the
      * LayoutServlet
@@ -155,7 +135,7 @@ public class MCRUserAdminGUICommons extends MCRServlet {
      *            The XML representation to be presented by the LayoutServlet
      * @param useStrict
      *            If true, the parameter styleSheet must be used directly as
-     *            name of a stylesheet when forwarding to the MCRLayoutServlet.
+     *            name of a stylesheet when forwarding to the MCRLayoutService.
      *            If false, styleSheet will be appended by the signature of the
      *            current language. useStrict=true is used when not using a
      *            stylesheet at all because one simply needs the raw XML output.
@@ -165,7 +145,7 @@ public class MCRUserAdminGUICommons extends MCRServlet {
      * @throws IOException
      *             for java I/O errors.
      */
-    protected void doLayout(MCRServletJob job, String styleSheet, Document jdomDoc, boolean useStrict) throws ServletException, IOException {
+    protected void doLayout(MCRServletJob job, String styleSheet, Document jdomDoc, boolean useStrict) throws IOException {
         String language = MCRSessionMgr.getCurrentSession().getCurrentLanguage();
 
         if (!useStrict) {
@@ -173,10 +153,7 @@ public class MCRUserAdminGUICommons extends MCRServlet {
         }
 
         job.getRequest().getSession().setAttribute("mycore.language", language);
-        job.getRequest().setAttribute("MCRLayoutServlet.Input.JDOM", jdomDoc);
         job.getRequest().setAttribute("XSL.Style", styleSheet);
-
-        RequestDispatcher rd = getServletContext().getNamedDispatcher("MCRLayoutServlet");
-        rd.forward(job.getRequest(), job.getResponse());
+        getLayoutService().doLayout(job.getRequest(), job.getResponse(), jdomDoc);
     }
 }

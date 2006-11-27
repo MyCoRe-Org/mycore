@@ -103,7 +103,7 @@ public class MCREditorServlet extends MCRServlet {
         Element popup = MCREditorDefReader.findElementByID(ref, editor);
         Element clone = (Element) (popup.clone());
 
-        LAYOUT.doLayout(req, res, new Document(clone));
+        getLayoutService().doLayout(req, res, new Document(clone));
     }
 
     /**
@@ -490,7 +490,7 @@ public class MCREditorServlet extends MCRServlet {
         } else if (targetType.equals("debug")) {
             sendToDebug(res, sub);
         } else if (targetType.equals("display")) {
-            LAYOUT.doLayout(req, res, sub.getXML());
+            getLayoutService().doLayout(req, res, sub.getXML());
         } else if (targetType.equals("subselect")) {
             List variables = sub.getVariables();
             String root = sub.getXML().getRootElement().getName();

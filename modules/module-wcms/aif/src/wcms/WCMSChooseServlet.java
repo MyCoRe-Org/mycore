@@ -35,8 +35,6 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Vector;
 
-import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -130,13 +128,13 @@ public class WCMSChooseServlet extends WCMSServlet {
     /**
      * Main program called by doGet and doPost.
      */
-    protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws IOException {
     	
     	if (request.getParameter("mode")!=null && request.getParameter("mode").equals("getMultimedia")) {
     		Element rootOut_2 = new Element("cms");
     		Document doc_2 = new Document(rootOut_2);
     		addMultimedia(rootOut_2);
-    		forwardXML(request, response, doc_2);
+    		getLayoutService().doLayout(request, response, doc_2);
 		}
     	
         MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
@@ -585,23 +583,8 @@ public class WCMSChooseServlet extends WCMSServlet {
             mcrSession.put("addAtPosition", addAtPosition);
         }
 
-        forwardXML(request, response, jdom);
+        getLayoutService().doLayout(request, response, jdom);
     }
-
-	private void forwardXML(HttpServletRequest request, HttpServletResponse response, Document jdom) throws ServletException, IOException {
-		/**
-         * Transfer content of jdom object to MCRLayoutServlet.
-         */
-        request.setAttribute("MCRLayoutServlet.Input.JDOM", jdom);
-
-        /**
-         * Activate the following Line to see the XML output of the jdom object.
-         */
-
-        // request.setAttribute("XSL.Style", "xml");
-        RequestDispatcher rd = getServletContext().getNamedDispatcher("MCRLayoutServlet");
-        rd.forward(request, response);
-	}
 
 	private Element addMultimedia(Element rootOut) {
 		Element templates;

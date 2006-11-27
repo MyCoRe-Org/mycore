@@ -4,9 +4,6 @@ package org.mycore.frontend.servlets;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletException;
-
 import org.jdom.Attribute;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -28,7 +25,7 @@ public class MCRAccRuleServlet extends MCRServlet{
      * ruleid:
      *  ruleid as string       
      */
-    public void doGetPost(MCRServletJob job) throws IOException, ServletException {
+    public void doGetPost(MCRServletJob job) throws IOException {
         //get parameter
         String operation = getProperty(job.getRequest(), "operation");
         String ruleid = getProperty(job.getRequest(), "ruleid");
@@ -52,9 +49,7 @@ public class MCRAccRuleServlet extends MCRServlet{
             el.setAttribute(new Attribute("operation","deleted"));
         }
 
-        job.getRequest().setAttribute("MCRLayoutServlet.Input.JDOM", jdom);
-        RequestDispatcher rd = getServletContext().getNamedDispatcher("MCRLayoutServlet");
-        rd.forward(job.getRequest(), job.getResponse());
+        getLayoutService().doLayout(job.getRequest(),job.getResponse(),jdom);
     }
 
     /**

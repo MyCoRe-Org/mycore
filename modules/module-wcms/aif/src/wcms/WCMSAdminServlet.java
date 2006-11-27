@@ -29,8 +29,6 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -63,7 +61,7 @@ public class WCMSAdminServlet extends WCMSServlet {
      * @param response
      *            servlet response
      */
-    protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws IOException {
         MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
         String action = request.getParameter("action");
         List rootNodes = (List) mcrSession.get("rootNodes");
@@ -81,16 +79,16 @@ public class WCMSAdminServlet extends WCMSServlet {
 
         if (action!=null) {
         	if (action.equals("choose")) {
-        		request.setAttribute("MCRLayoutServlet.Input.JDOM", jdom);
+        		request.setAttribute("MCRLayoutService.Input.JDOM", jdom);
                 generateXML_managPage(mcrSession, rootOut, rootNodes, contentTemplates);
     	        } else if (action.equals("logs")) {
-    	        	request.setAttribute("MCRLayoutServlet.Input.JDOM", jdom);
+    	        	request.setAttribute("MCRLayoutService.Input.JDOM", jdom);
     	            generateXML_logs(request, rootOut);
     		        } else if (action.equals("managGlobal") && mcrSession.get("userClass").equals("admin")) {
-    		        	request.setAttribute("MCRLayoutServlet.Input.JDOM", jdom);
+    		        	request.setAttribute("MCRLayoutService.Input.JDOM", jdom);
     		            generateXML_managGlobal(rootOut);
     			        } else if (action.equals("saveGlobal") && mcrSession.get("userClass").equals("admin")) {
-    			        	request.setAttribute("MCRLayoutServlet.Input.JDOM", jdom);
+    			        	request.setAttribute("MCRLayoutService.Input.JDOM", jdom);
     			            generateXML_saveGlobal(request, response);
     			        }
     				        else if (action.equals("view") 
@@ -112,7 +110,7 @@ public class WCMSAdminServlet extends WCMSServlet {
     				            } 
     				            // archived content version requested
 								else {
-									request.setAttribute("MCRLayoutServlet.Input.FILE", new File(request.getParameter("file")));
+									getLayoutService().doLayout(request,response,new File(request.getParameter("file")));
 								}
     						}	
 		}
@@ -123,9 +121,7 @@ public class WCMSAdminServlet extends WCMSServlet {
         }	
       else
         {	
-        //request.setAttribute("XSL.Style", "xml");
-          RequestDispatcher rd = getServletContext().getNamedDispatcher("MCRLayoutServlet");
-          rd.forward(request, response);
+        getLayoutService().doLayout(request,response,jdom);
         }
         
     }

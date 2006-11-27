@@ -1,0 +1,490 @@
+/*
+ * $RCSfile$
+ * $Revision$ $Date$
+ *
+ * This file is part of ***  M y C o R e  ***
+ * See http://www.mycore.de/ for details.
+ *
+ * This program is free software; you can use it, redistribute it
+ * and / or modify it under the terms of the GNU General Public License
+ * (GPL) as published by the Free Software Foundation; either version 2
+ * of the License or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program, in a file called gpl.txt or license.txt.
+ * If not, write to the Free Software Foundation Inc.,
+ * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
+ */
+
+package org.mycore.common.xml;
+
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.PushbackInputStream;
+import java.util.Enumeration;
+import java.util.Iterator;
+import java.util.Properties;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import javax.xml.transform.Source;
+import javax.xml.transform.Templates;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.sax.SAXTransformerFactory;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
+
+import org.apache.log4j.Logger;
+import org.mycore.common.MCRCache;
+import org.mycore.common.MCRConfiguration;
+import org.mycore.common.MCRConfigurationException;
+import org.mycore.common.MCRException;
+import org.mycore.common.MCRSession;
+import org.mycore.common.MCRSessionMgr;
+import org.mycore.common.MCRUtils;
+import org.mycore.frontend.servlets.MCRServlet;
+
+/**
+ * Does the layout for other MyCoRe servlets by transforming XML input to
+ * various output formats, using XSL stylesheets.
+ * 
+ * @author Frank Lützenkirchen
+ * @author Thomas Scheffler (yagee)
+ * 
+ * @version $Revision$ $Date$
+ */
+public class MCRLayoutService {
+
+    /** A cache of already compiled stylesheets */
+    private MCRCache STYLESHEETS_CACHE = new MCRCache(100);
+
+    /** The directory containing the xsl files */
+    private String stylesheetsDir;
+
+    /** The XSL transformer factory to use */
+    private SAXTransformerFactory factory;
+
+    /** The logger */
+    private final static Logger LOGGER = Logger.getLogger(MCRLayoutService.class);
+
+    public MCRLayoutService(String stylesheetsDir) {
+        this.stylesheetsDir = stylesheetsDir;
+
+        TransformerFactory tf = TransformerFactory.newInstance();
+
+        if (!tf.getFeature(SAXTransformerFactory.FEATURE)) {
+            throw new MCRConfigurationException("Could not load a SAXTransformerFactory for use with XSLT");
+        }
+
+        factory = (SAXTransformerFactory) (tf);
+        factory.setURIResolver(MCRURIResolver.instance());
+    }
+
+    public void sendXML(HttpServletRequest req, HttpServletResponse res, org.jdom.Document jdom) throws IOException {
+        res.setContentType("text/xml");
+        OutputStream out = res.getOutputStream();
+        new org.jdom.output.XMLOutputter().output(jdom, out);
+        out.close();
+    }
+
+    public void sendXML(HttpServletRequest req, HttpServletResponse res, org.w3c.dom.Document dom) throws IOException {
+        sendXML(req, res, new org.jdom.input.DOMBuilder().build(dom));
+    }
+
+    public void sendXML(HttpServletRequest req, HttpServletResponse res, InputStream in) throws IOException {
+        res.setContentType("text/xml");
+        OutputStream out = res.getOutputStream();
+        MCRUtils.copyStream(in, out);
+        out.close();
+    }
+
+    public void sendXML(HttpServletRequest req, HttpServletResponse res, byte[] bytes) throws IOException {
+        sendXML(req, res, new ByteArrayInputStream(bytes));
+    }
+
+    public void sendXML(HttpServletRequest req, HttpServletResponse res, File file) throws IOException {
+        FileInputStream fis = new FileInputStream(file);
+        sendXML(req, res, fis);
+        fis.close();
+    }
+
+    public void doLayout(HttpServletRequest req, HttpServletResponse res, org.jdom.Document jdom) throws IOException {
+        String docType = (jdom.getDocType() == null ? jdom.getRootElement().getName() : jdom.getDocType().getElementName());
+        Properties parameters = buildXSLParameters(req);
+        File styleFile = chooseStyleFile(req, parameters, docType);
+        if (styleFile == null)
+          sendXML(req, res, jdom);
+        else 
+          transform(res, new org.jdom.transform.JDOMSource(jdom), docType, parameters, styleFile);
+    }
+
+    public void doLayout(HttpServletRequest req, HttpServletResponse res, org.w3c.dom.Document dom) throws IOException {
+        String docType = (dom.getDoctype() == null ? dom.getDocumentElement().getTagName() : dom.getDoctype().getName());
+        Properties parameters = buildXSLParameters(req);
+        File styleFile = chooseStyleFile(req, parameters, docType);
+        if (styleFile == null)
+          sendXML(req, res, dom);
+        else 
+          transform(res, new DOMSource(dom), docType, parameters, styleFile);
+    }
+
+    public void doLayout(HttpServletRequest req, HttpServletResponse res, InputStream is) throws IOException {
+        int bufferSize = 1000;
+        PushbackInputStream pis = new PushbackInputStream(is, bufferSize);
+        pis.mark(bufferSize);
+        String docType = MCRUtils.parseDocumentType(pis);
+        pis.reset();
+
+        Properties parameters = buildXSLParameters(req);
+        File styleFile = chooseStyleFile(req, parameters, docType);
+        if (styleFile == null)
+          sendXML(req, res, pis);
+        else 
+          transform(res, new StreamSource(pis), docType, parameters, styleFile);
+    }
+
+    public void doLayout(HttpServletRequest req, HttpServletResponse res, byte[] bytes) throws IOException {
+        doLayout(req, res, new ByteArrayInputStream(bytes));
+    }
+
+    public void doLayout(HttpServletRequest req, HttpServletResponse res, File file) throws IOException {
+        FileInputStream fis = new FileInputStream(file);
+        doLayout(req, res, fis);
+        fis.close();
+    }
+
+    private void transform(HttpServletResponse res, Source sourceXML, String docType, Properties parameters, File styleFile) throws IOException {
+        Templates stylesheet = buildCompiledStylesheet(styleFile);
+        Transformer transformer = buildTransformer(stylesheet);
+        setXSLParameters(transformer, parameters);
+
+        try {
+            transform(sourceXML, stylesheet, transformer, res);
+        } catch (IOException ex) {
+            LOGGER.error("IOException while XSL-transforming XML document", ex);
+        } catch (MCRException ex) {
+            // Check if it is an error page to suppress later recursively
+            // generating an error page when there is an error in the stylesheet
+            if (!"mcr_error".equals(docType))
+                throw ex;
+
+            String msg = "Error while generating error page!";
+            LOGGER.warn(msg, ex);
+            res.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, msg);
+        }
+    }
+
+    private File chooseStyleFile(HttpServletRequest req, Properties parameters, String docType) {
+        String style = parameters.getProperty("Style", "default");
+        LOGGER.debug("MCRLayoutService using style " + style);
+
+        String type = MCRServlet.getProperty(req, "type");
+        String styleName = buildStylesheetName(style, docType, type);
+        File styleFile = getStylesheetFile(styleName);
+
+        if ((styleFile == null) && (style.equals(MCRSessionMgr.getCurrentSession().getCurrentLanguage()))) {
+            // We are here because we tried to get a stylesheet for a specific
+            // language
+            style = "default";
+            styleName = buildStylesheetName(style, docType, type);
+            styleFile = getStylesheetFile(styleName);
+        }
+
+        // If no stylesheet exists, forward raw xml instead
+        // You can transform raw xml code by providing a stylesheed named
+        // [doctype]-xml.xsl now
+        if ((styleFile == null) && (style.equals("xml") || (style.equals("default"))))
+            return null;
+
+        if (styleFile == null) {
+            /*
+             * What's that? Maybe a kid wants to hack our MyCoRe to get that
+             * complicated raw xml source code. We should stop that now and
+             * forever and go to lunch!
+             */
+            String mode = MCRServlet.getProperty(req, "mode");
+            String layout = MCRServlet.getProperty(req, "layout");
+            String lang = MCRSessionMgr.getCurrentSession().getCurrentLanguage();
+
+            if ((layout == null) || (layout.equals(""))) {
+                layout = type;
+            }
+
+            style = mode + "-" + layout + "-" + lang;
+            styleName = buildStylesheetName(style, docType, type);
+            styleFile = getStylesheetFile(styleName);
+        }
+
+        return styleFile;
+    }
+
+    public Properties buildXSLParameters(HttpServletRequest request) {
+
+        // PROPERTIES: Read all properties from system configuration
+        Properties parameters = (Properties) (MCRConfiguration.instance().getProperties().clone());
+        
+        // SESSION: Read all *.xsl attributes that are stored in the browser session
+        if (request.getSession(false) != null) {
+        	HttpSession session = request.getSession(false);
+            for (Enumeration e = session.getAttributeNames(); e.hasMoreElements();) {
+                String name = (String) (e.nextElement());
+                if (name.startsWith("XSL."))
+                    parameters.put(name.substring(4), session.getAttribute(name));
+            }
+        }        
+        MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
+        Iterator sessObjKeys = mcrSession.getObjectsKeyList();
+        if (mcrSession != null) {
+        	while (sessObjKeys.hasNext()) {
+        		String name = (String) sessObjKeys.next();
+        		if (name.startsWith("XSL."))
+                    parameters.put(name.substring(4), mcrSession.get(name)); 
+        	}
+        }
+
+        // HTTP-REQUEST-PARAMETER: Read all *.xsl attributes from the client
+        // HTTP request parameters
+        for (Enumeration e = request.getParameterNames(); e.hasMoreElements();) {
+            String name = (String) (e.nextElement());
+            if (name.startsWith("XSL.")) {
+                if (!name.endsWith(".SESSION")) 
+                    parameters.put(name.substring(4), request.getParameter(name));
+                // store parameter in session if ends with *.SESSION
+                else 
+                    parameters.put(name.substring(4, name.length() - 8), request.getParameter(name));
+            }
+        }
+        MCRServlet.putParamsToSession(request);
+        
+        // SERVLETS-REQUEST-ATTRIBUTES: Read all *.xsl attributes provided by
+        // the invoking servlet
+        for (Enumeration e = request.getAttributeNames(); e.hasMoreElements();) {
+            String name = (String) (e.nextElement());
+            if (name.startsWith("XSL.")) {
+                if (!name.endsWith(".SESSION")) {
+                    if (request.getAttribute(name) != null) {
+                        parameters.put(name.substring(4), request.getAttribute(name));
+                    }
+                } // store parameter in session if ends with *.SESSION
+                else {
+                    parameters.put(name.substring(4, name.length() - 8), request.getAttribute(name));
+                    if (mcrSession!=null) {
+                    	mcrSession.put(name.substring(0, name.length() - 8), request.getAttribute(name));
+                        LOGGER.debug("MCRLayoutService: found Req.-Attribut " + name + "=" + request.getAttribute(name) + " that should be saved in session, safed " + name.substring(0, name.length() - 8) + "=" + request.getAttribute(name));	
+                    }
+                }
+            }
+
+        }
+
+        // Set some predefined XSL parameters:
+        String defaultLang = MCRConfiguration.instance().getString("MCR.metadata_default_lang", "en");
+
+        String user = MCRConfiguration.instance().getString("MCR.users_guestuser_username");
+        String lang = defaultLang;
+        String referer = request.getHeader("Referer");
+
+        if (referer == null) {
+            referer = "";
+        }
+
+        // handle HttpSession
+        HttpSession session = request.getSession(false);
+        String jSessionID = MCRConfiguration.instance().getString("MCR.session.param", ";jsessionid=");
+
+        if ((session != null) && !request.isRequestedSessionIdFromCookie()) {
+            parameters.put("HttpSession", jSessionID + session.getId());
+        }
+
+        if (session != null) {
+            parameters.put("JSessionID", jSessionID + session.getId());
+            //MCRSession mcrSession2 = (MCRSession) (session.getAttribute("mycore.session"));
+            if (mcrSession != null) {
+                user = mcrSession.getCurrentUserID();
+                lang = mcrSession.getCurrentLanguage();
+            }
+        }
+
+        LOGGER.debug("LayoutServlet XSL.MCRSessionID=" + parameters.getProperty("MCRSessionID"));
+        LOGGER.debug("LayoutServlet XSL.CurrentUser =" + user);
+        LOGGER.debug("LayoutServlet HttpSession =" + parameters.getProperty("HttpSession"));
+        LOGGER.debug("LayoutServlet JSessionID =" + parameters.getProperty("JSessionID"));
+        LOGGER.debug("LayoutServlet RefererURL =" + referer);
+
+        parameters.put("CurrentUser", user);
+        parameters.put("RequestURL", getCompleteURL(request));
+        parameters.put("WebApplicationBaseURL", MCRServlet.getBaseURL());
+        parameters.put("ServletsBaseURL", MCRServlet.getServletBaseURL());
+        parameters.put("DefaultLang", defaultLang);
+        parameters.put("CurrentLang", lang);
+        parameters.put("Referer", referer);
+
+        return parameters;
+    }
+
+    private final String getCompleteURL(HttpServletRequest request) {
+        StringBuffer buffer = request.getRequestURL();
+        String queryString = request.getQueryString();
+
+        if (queryString != null && queryString.length() > 0) {
+            buffer.append("?").append(queryString);
+        }
+
+        return buffer.toString();
+    }
+
+    /**
+     * Builds the filename of the stylesheet to use, e. g. "playlist-simple.xsl"
+     */
+    private String buildStylesheetName(String style, String docType, String type) {
+        StringBuffer filename = new StringBuffer(docType);
+
+        if (!"default".equals(style)) {
+            if (("xml".equals(style)) && (type != null) && (type.length() > 0)) {
+                filename.append("-").append(type);
+            }
+
+            filename.append("-");
+            filename.append(style);
+        }
+
+        filename.append(".xsl");
+
+        return filename.toString();
+    }
+
+    /**
+     * Gets a File object for the given filename and directory, or returns null
+     * if no such file exists.
+     */
+    private File getStylesheetFile(String name) {
+        File file = new File(stylesheetsDir, name);
+
+        if (!file.exists()) {
+            LOGGER.debug("MCRLayoutService did not find stylesheet " + name);
+            return null;
+        }
+
+        if (!file.canRead()) {
+            String msg = "XSL stylesheet " + name + " not readable";
+            throw new MCRConfigurationException(msg);
+        }
+
+        return file;
+    }
+
+    /**
+     * Reads an XSL stylesheet from the given file and returns it as compiled
+     * XSL Templates object.
+     * 
+     * @param file
+     *            the File that contains the XSL stylesheet
+     * @return the compiled stylesheet
+     */
+    private Templates buildCompiledStylesheet(File file) {
+        String path = file.getPath();
+        long time = file.lastModified();
+
+        Templates stylesheet = (Templates) (STYLESHEETS_CACHE.getIfUpToDate(path, time));
+
+        if (stylesheet == null) {
+            try {
+                stylesheet = factory.newTemplates(new StreamSource(file));
+                LOGGER.debug("MCRLayoutService compiled stylesheet " + file.getName());
+            } catch (TransformerConfigurationException exc) {
+                String msg = "Error while compiling XSL stylesheet " + file.getName() + ": " + exc.getMessageAndLocation();
+                throw new MCRConfigurationException(msg, exc);
+            }
+
+            STYLESHEETS_CACHE.put(path, stylesheet);
+        } else {
+            LOGGER.debug("MCRLayoutService using cached stylesheet " + file.getName());
+        }
+
+        return stylesheet;
+    }
+
+    /**
+     * Builds a XSL transformer that uses the given XSL stylesheet
+     * 
+     * @param stylesheet
+     *            the compiled XSL stylesheet to use
+     * @return the XSL transformer that can be used to do the XSL transformation
+     */
+    private Transformer buildTransformer(Templates stylesheet) {
+        try {
+            return factory.newTransformerHandler(stylesheet).getTransformer();
+        } catch (TransformerConfigurationException exc) {
+            String msg = "Error while building XSL transformer: " + exc.getMessageAndLocation();
+            throw new MCRConfigurationException(msg, exc);
+        }
+    }
+
+    /**
+     * Sets XSL parameters for the given transformer by taking them from the
+     * properties object provided.
+     * 
+     * @param transformer
+     *            the Transformer object thats parameters should be set
+     * @param parameters
+     *            the XSL parameters as name-value pairs
+     */
+    private void setXSLParameters(Transformer transformer, Properties parameters) {
+        Enumeration names = parameters.propertyNames();
+
+        while (names.hasMoreElements()) {
+            String name = (String) (names.nextElement());
+            String value = parameters.getProperty(name);
+
+            transformer.setParameter(name, value);
+        }
+    }
+
+    /**
+     * Transforms XML input with the given XSL stylesheet and sends the output
+     * as HTTP Servlet Response to the client browser.
+     * 
+     * @param xml
+     *            the XML input document
+     * @param xsl
+     *            the compiled XSL stylesheet
+     * @param transformer
+     *            the XSL transformer to use
+     * @param response
+     *            the response object to send the result to
+     */
+    private void transform(Source xml, Templates xsl, Transformer transformer, HttpServletResponse response) throws IOException, MCRException {
+        // Set content type from "<xsl:output media-type = "...">
+        // Set char encoding from "<xsl:output encoding = "...">
+        String ct = xsl.getOutputProperties().getProperty("media-type");
+        String enc = xsl.getOutputProperties().getProperty("encoding");
+        response.setCharacterEncoding(enc);
+        response.setContentType(ct + "; charset=" + enc);
+        LOGGER.debug("MCRLayoutService starts to output " + ct + "; charset=" + enc);
+
+        OutputStream out = response.getOutputStream();
+
+        try {
+            transformer.transform(xml, new StreamResult(out));
+        } catch (TransformerException ex) {
+            String msg = "Error while transforming XML using XSL stylesheet: " + ex.getMessageAndLocation();
+            throw new MCRException(msg, ex);
+        } finally {
+            out.close();
+        }
+    }
+}

@@ -957,7 +957,7 @@ public class MCRUtils {
 
         DefaultHandler handler = new DefaultHandler() {
             public void startElement(String uri, String localName, String qName, Attributes attributes) {
-                LOGGER.debug("MCRLayoutServlet detected root element = " + qName);
+                LOGGER.debug("MCRLayoutService detected root element = " + qName);
                 detected.setProperty("docType", qName);
                 throw new MCRException(forcedInterrupt);
             }

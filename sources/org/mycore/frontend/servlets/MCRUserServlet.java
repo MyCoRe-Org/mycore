@@ -25,7 +25,6 @@ package org.mycore.frontend.servlets;
 
 import java.io.IOException;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 
 import org.jdom.Document;
@@ -73,7 +72,7 @@ public class MCRUserServlet extends MCRServlet {
      * @throws ServletException
      *             for errors from the servlet engine.
      */
-    public void doGetPost(MCRServletJob job) throws IOException, ServletException {
+    public void doGetPost(MCRServletJob job) throws IOException {
         String mode = getProperty(job.getRequest(), "mode");
 
         if (mode.length() == 0) {
@@ -116,7 +115,7 @@ public class MCRUserServlet extends MCRServlet {
      * @throws ServletException
      *             for errors from the servlet engine.
      */
-    protected void changePwd(MCRServletJob job) throws IOException, ServletException {
+    protected void changePwd(MCRServletJob job) throws IOException {
         // Get the MCRSession object for the current thread from the session
         // manager.
         MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
@@ -162,7 +161,7 @@ public class MCRUserServlet extends MCRServlet {
      * @throws ServletException
      *             for errors from the servlet engine.
      */
-    protected void createPwdDialog(MCRServletJob job) throws IOException, ServletException {
+    protected void createPwdDialog(MCRServletJob job) throws IOException {
         org.jdom.Document jdomDoc = createJdomDocBase(job);
         doLayout(job, "ChangePwd", jdomDoc); // use the stylesheet
 
@@ -181,7 +180,7 @@ public class MCRUserServlet extends MCRServlet {
      * @throws ServletException
      *             for errors from the servlet engine.
      */
-    protected void selectTask(MCRServletJob job) throws IOException, ServletException {
+    protected void selectTask(MCRServletJob job) throws IOException {
         // For the moment only tasks possible for all users are presented. But
         // this is work
         // in progress. In the future the list of privileges for the current
@@ -207,7 +206,7 @@ public class MCRUserServlet extends MCRServlet {
      * @throws ServletException
      *             for errors from the servlet engine.
      */
-    protected void showUser(MCRServletJob job) throws IOException, ServletException {
+    protected void showUser(MCRServletJob job) throws IOException {
         // Get the MCRSession object for the current thread from the session
         // manager.
         MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
@@ -267,11 +266,8 @@ public class MCRUserServlet extends MCRServlet {
      * @throws IOException
      *             for java I/O errors.
      */
-    protected void doLayout(MCRServletJob job, String style, Document jdomDoc) throws ServletException, IOException {
-        job.getRequest().setAttribute("MCRLayoutServlet.Input.JDOM", jdomDoc);
+    protected void doLayout(MCRServletJob job, String style, Document jdomDoc) throws IOException {
         job.getRequest().setAttribute("XSL.Style", style);
-
-        RequestDispatcher rd = getServletContext().getNamedDispatcher("MCRLayoutServlet");
-        rd.forward(job.getRequest(), job.getResponse());
+        getLayoutService().doLayout(job.getRequest(),job.getResponse(),jdomDoc);
     }
 }

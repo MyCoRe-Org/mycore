@@ -27,7 +27,6 @@ import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -45,7 +44,7 @@ import org.mycore.frontend.servlets.MCRServletJob;
  * sent to the browser. If the node is an MCRFile with a MCRAudioVideoExtender,
  * the message that starts the associated streaming player will be delivered. If
  * the node is a MCRDirectory, the contents of that directory will be forwareded
- * to MCRLayoutServlet as XML data to display a detailed directory listing.
+ * to MCRLayoutService as XML data to display a detailed directory listing.
  * 
  * @author Frank Lützenkirchen
  * @author Jens Kupferschmidt
@@ -68,7 +67,7 @@ public class MCRFileNodeServlet extends MCRServlet {
     /**
      * Handles the HTTP request
      */
-    public void doGetPost(MCRServletJob job) throws IOException, ServletException {
+    public void doGetPost(MCRServletJob job) throws IOException {
         HttpServletRequest request = job.getRequest();
         HttpServletResponse response = job.getResponse();
         if (!isParametersValid(request, response)) {
@@ -77,7 +76,7 @@ public class MCRFileNodeServlet extends MCRServlet {
         handleLocalRequest(request, response);
     }
 
-    private boolean isParametersValid(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+    private boolean isParametersValid(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String requestPath = request.getPathInfo();
         LOGGER.info("MCRFileNodeServlet: request path = " + requestPath);
 
@@ -97,7 +96,7 @@ public class MCRFileNodeServlet extends MCRServlet {
      * @throws IOException
      * @throws ServletException
      */
-    private void handleLocalRequest(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+    private void handleLocalRequest(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String ownerID = getOwnerID(request);
         // local node to be retrieved
         MCRFilesystemNode root;
@@ -210,31 +209,19 @@ public class MCRFileNodeServlet extends MCRServlet {
     /**
      * Sends the contents of an MCRDirectory as XML data to the client
      */
-    private void sendDirectory(HttpServletRequest req, HttpServletResponse res, MCRDirectory dir) throws IOException, ServletException {
+    private void sendDirectory(HttpServletRequest req, HttpServletResponse res, MCRDirectory dir) throws IOException {
         LOGGER.info("MCRFileNodeServlet: Sending listing of directory " + dir.getName());
         Document jdom = MCRDirectoryXML.getInstance().getDirectoryXML(dir);
-        forwardRequest(req, res, jdom);
-
+        getLayoutService().doLayout(req, res, jdom);
     }
 
-    /** 
-     *  Forwards the document to the output
-     *  @author A.Schaar
-     *  @see its overwritten in jspdocportal 
-     */
-    protected void forwardRequest(HttpServletRequest req, HttpServletResponse res, Document jdom) throws IOException, ServletException {
-    	req.setAttribute("MCRLayoutServlet.Input.JDOM", jdom);
-        RequestDispatcher rd = getServletContext().getNamedDispatcher("MCRLayoutServlet");
-        rd.forward(req, res);    	
-    }
-    
     
     /** 
      *  Forwards the error to generate the output
      *  @author A.Schaar
      *  @see its overwritten in jspdocportal 
      */
-    protected void errorPage ( HttpServletRequest req, HttpServletResponse res, int error, String msg, Exception ex, boolean xmlstyle)  throws IOException, ServletException {
+    protected void errorPage ( HttpServletRequest req, HttpServletResponse res, int error, String msg, Exception ex, boolean xmlstyle)  throws IOException {
         generateErrorPage(req, res, error,msg, ex, xmlstyle);    	    
     }
 }

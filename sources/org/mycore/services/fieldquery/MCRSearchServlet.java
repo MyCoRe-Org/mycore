@@ -29,7 +29,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -87,7 +86,7 @@ public class MCRSearchServlet extends MCRServlet {
         defaultSearchOperator = config.getString(prefix + "DefaultSearchOperator", "contains");
     }
 
-    public void doGetPost(MCRServletJob job) throws IOException, ServletException {
+    public void doGetPost(MCRServletJob job) throws IOException {
         HttpServletRequest request = job.getRequest();
         HttpServletResponse response = job.getResponse();
 
@@ -104,20 +103,19 @@ public class MCRSearchServlet extends MCRServlet {
      * Returns a query that was previously submitted, to reload it into the
      * editor search mask. Usage: MCRSearchServlet?mode=load&id=XXXXX
      */
-    protected void loadQuery(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void loadQuery(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String id = request.getParameter("id");
         Document query = (Document) (getCache(QUERIES_KEY).get(id));
 
         // Send query XML to editor
-        request.setAttribute("XSL.Style", "xml");
-        forwardRequest(request, response, query);
+        getLayoutService().sendXML(request, response, query);
     }
 
     /**
      * Shows a results page. Usage:
      * MCRSearchServlet?mode=results&numPerPage=10&page=1
      */
-    protected void showResults(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void showResults(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
         // Get cached results
         String id = request.getParameter("id");
@@ -176,7 +174,7 @@ public class MCRSearchServlet extends MCRServlet {
         xml.addContent(new Element("condition").setAttribute("format", "xml").addContent(cond.toXML()));
 
         // Send output to LayoutServlet
-        forwardRequest(request, response, new Document(xml));
+        getLayoutService().doLayout(request, response, new Document(xml));
     }
 
     private String getReqParameter(HttpServletRequest req, String name, String defaultValue) {
@@ -382,18 +380,6 @@ public class MCRSearchServlet extends MCRServlet {
         public int numPerPage;
 
         public int page;
-    }
-
-    /**
-     * Forwards the document to the output
-     * 
-     * @author A.Schaar
-     * @see its overwritten in jspdocportal
-     */
-    protected void forwardRequest(HttpServletRequest req, HttpServletResponse res, Document jdom) throws IOException, ServletException {
-        req.setAttribute("MCRLayoutServlet.Input.JDOM", jdom);
-        RequestDispatcher rd = getServletContext().getNamedDispatcher("MCRLayoutServlet");
-        rd.forward(req, res);
     }
 
     /**

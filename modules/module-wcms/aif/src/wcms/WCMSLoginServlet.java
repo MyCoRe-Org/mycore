@@ -28,8 +28,6 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -71,7 +69,7 @@ public class WCMSLoginServlet extends WCMSServlet {
     /**
      * Main program called by doGet and doPost.
      */
-    protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws IOException {
         MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
         String userID = null;
         String userPassword = null;
@@ -216,9 +214,8 @@ public class WCMSLoginServlet extends WCMSServlet {
         }
         rootOut.addContent(new Element("modus").setText(modus));
         /**
-         * Transfer content of jdom object to MCRLayoutServlet.
+         * Transfer content of jdom object to MCRLayoutService.
          */
-        request.setAttribute("MCRLayoutServlet.Input.JDOM", jdom);
 
         /**
          * Activate the following Line to see the XML output of the jdom object.
@@ -226,8 +223,7 @@ public class WCMSLoginServlet extends WCMSServlet {
         if (mcrSession.get("status")!=null && mcrSession.get("status").equals("loggedIn") )
           {	
            // req.setAttribute("XSL.Style", "xml");
-           RequestDispatcher rd = getServletContext().getNamedDispatcher("MCRLayoutServlet");
-           rd.forward(request, response);
+           getLayoutService().doLayout(request,response,jdom);
           }
         flag = "false";
     }
