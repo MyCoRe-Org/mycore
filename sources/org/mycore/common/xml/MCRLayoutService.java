@@ -112,10 +112,6 @@ public class MCRLayoutService {
         out.close();
     }
 
-    public void sendXML(HttpServletRequest req, HttpServletResponse res, byte[] bytes) throws IOException {
-        sendXML(req, res, new ByteArrayInputStream(bytes));
-    }
-
     public void sendXML(HttpServletRequest req, HttpServletResponse res, File file) throws IOException {
         FileInputStream fis = new FileInputStream(file);
         sendXML(req, res, fis);
@@ -152,10 +148,6 @@ public class MCRLayoutService {
             sendXML(req, res, cis);
         else
             transform(res, new StreamSource(cis), docType, parameters, styleFile);
-    }
-
-    public void doLayout(HttpServletRequest req, HttpServletResponse res, byte[] bytes) throws IOException {
-        doLayout(req, res, new ByteArrayInputStream(bytes));
     }
 
     public void doLayout(HttpServletRequest req, HttpServletResponse res, File file) throws IOException {
