@@ -181,46 +181,17 @@ public class MCRLayoutService {
         String style = parameters.getProperty("Style", "default");
         LOGGER.debug("MCRLayoutService using style " + style);
 
-        String type = MCRServlet.getProperty(req, "type");
-        String styleName = buildStylesheetName(style, docType, type);
+        String styleName = buildStylesheetName(docType, style);
         File styleFile = getStylesheetFile(styleName);
-
-        if ((styleFile == null) && (style.equals(MCRSessionMgr.getCurrentSession().getCurrentLanguage()))) {
-            // We are here because we tried to get a stylesheet for a specific language
-            style = "default";
-            styleName = buildStylesheetName(style, docType, type);
-            styleFile = getStylesheetFile(styleName);
-        }
+        if (styleFile != null)
+            return styleFile;
 
         // If no stylesheet exists, forward raw xml instead
         // You can transform raw xml code by providing a stylesheed named
         // [doctype]-xml.xsl now
         if ((styleFile == null) && (style.equals("xml") || (style.equals("default"))))
             return null;
-
-        if (styleFile == null) {
-            /*
-             * What's that? Maybe a kid wants to hack our MyCoRe to get that
-             * complicated raw xml source code. We should stop that now and
-             * forever and go to lunch!
-             */
-            String mode = MCRServlet.getProperty(req, "mode");
-            String layout = MCRServlet.getProperty(req, "layout");
-            String lang = MCRSessionMgr.getCurrentSession().getCurrentLanguage();
-
-            if ((layout == null) || (layout.equals(""))) {
-                layout = type;
-            }
-
-            style = mode + "-" + layout + "-" + lang;
-            styleName = buildStylesheetName(style, docType, type);
-            styleFile = getStylesheetFile(styleName);
-        }
-
-        if( styleFile != null )
-          return styleFile;
-        else
-          throw new MCRException( "XSL stylesheet not found: " + styleName );
+        throw new MCRException("XSL stylesheet not found: " + styleName);
     }
 
     public Properties buildXSLParameters(HttpServletRequest request) {
@@ -240,12 +211,10 @@ public class MCRLayoutService {
         }
         MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
         Iterator sessObjKeys = mcrSession.getObjectsKeyList();
-        if (mcrSession != null) {
-            while (sessObjKeys.hasNext()) {
-                String name = (String) sessObjKeys.next();
-                if (name.startsWith("XSL."))
-                    parameters.put(name.substring(4), mcrSession.get(name));
-            }
+        while (sessObjKeys.hasNext()) {
+            String name = (String) sessObjKeys.next();
+            if (name.startsWith("XSL."))
+                parameters.put(name.substring(4), mcrSession.get(name));
         }
 
         // HTTP-REQUEST-PARAMETER: Read all *.xsl attributes from the client
@@ -343,14 +312,10 @@ public class MCRLayoutService {
     /**
      * Builds the filename of the stylesheet to use, e. g. "playlist-simple.xsl"
      */
-    private String buildStylesheetName(String style, String docType, String type) {
+    private String buildStylesheetName(String docType, String style) {
         StringBuffer filename = new StringBuffer(docType);
 
         if (!"default".equals(style)) {
-            if (("xml".equals(style)) && (type != null) && (type.length() > 0)) {
-                filename.append("-").append(type);
-            }
-
             filename.append("-");
             filename.append(style);
         }
