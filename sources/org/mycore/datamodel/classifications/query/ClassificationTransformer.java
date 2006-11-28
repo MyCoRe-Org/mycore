@@ -62,8 +62,8 @@ public class ClassificationTransformer {
      *            Classification
      * @return
      */
-    public static Document getEditorDocument(Classification cl) {
-        return ItemElementFactory.getDocument(cl, STANDARD_LABEL);
+    public static Document getEditorDocument(Classification cl, boolean sort) {
+        return ItemElementFactory.getDocument(cl, STANDARD_LABEL, sort);
     }
 
     /**
@@ -102,8 +102,8 @@ public class ClassificationTransformer {
      *            format String as specified above
      * @return
      */
-    public static Document getEditorDocument(Classification cl, String labelFormat) {
-        return ItemElementFactory.getDocument(cl, labelFormat);
+    public static Document getEditorDocument(Classification cl, String labelFormat, boolean sort) {
+        return ItemElementFactory.getDocument(cl, labelFormat, sort);
     }
 
     private static class MetaDataElementFactory {
@@ -172,12 +172,14 @@ public class ClassificationTransformer {
         private static final Pattern COUNT_PATTERN = Pattern.compile("\\{count\\}");
 
         @SuppressWarnings("unchecked")
-        static Document getDocument(Classification cl, String labelFormat) {
+        static Document getDocument(Classification cl, String labelFormat, boolean sort) {
             Document cd = new Document(new Element("items"));
             for (Category category : cl.getCategories()) {
                 cd.getRootElement().addContent(getElement(category, labelFormat, cl.isCounterEnabled()));
             }
-            sortItems(cd.getRootElement().getChildren("item"));
+            if (sort) {
+                sortItems(cd.getRootElement().getChildren("item"));
+            }
             return cd;
         }
 

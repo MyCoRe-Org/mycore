@@ -789,6 +789,7 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
         private static final MCRConfiguration CONFIG = MCRConfiguration.instance();
 
         private static final String FORMAT_CONFIG_PREFIX = CONFIG_PREFIX+"classification.format.";
+        private static final String SORT_CONFIG_PREFIX = CONFIG_PREFIX+"classification.sort.";
         
         private static MCRCache CLASS_CACHE;
         
@@ -886,10 +887,11 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
             Element returns;
             LOGGER.debug("start transformation of ClassificationQuery");
             if (format.startsWith("editor")) {
+                boolean sort=shouldSortCategories(classID);
                 if (labelFormat == null) {
-                    returns = ClassificationTransformer.getEditorDocument(cl).getRootElement();
+                    returns = ClassificationTransformer.getEditorDocument(cl, sort).getRootElement();
                 } else {
-                    returns = ClassificationTransformer.getEditorDocument(cl, labelFormat).getRootElement();
+                    returns = ClassificationTransformer.getEditorDocument(cl, labelFormat, sort).getRootElement();
                 }
             } else if (format.equals("metadata")) {
                 returns = ClassificationTransformer.getMetaDataDocument(cl).getRootElement();
@@ -908,6 +910,10 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
                 return CONFIG.getString(FORMAT_CONFIG_PREFIX + formatDef);
             }
             return null;
+        }
+        
+        private static boolean shouldSortCategories(String classId){
+            return CONFIG.getBoolean(SORT_CONFIG_PREFIX+classId,true);
         }
 
     }
