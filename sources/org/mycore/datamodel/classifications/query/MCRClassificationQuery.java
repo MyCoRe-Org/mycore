@@ -88,7 +88,7 @@ public class MCRClassificationQuery {
             LOGGER.debug("countReferenceCategory");
             Map map = withCounter ? MCRLinkTableManager.instance().countReferenceCategory(classID) : null;
             LOGGER.debug("select category");
-            Category cat = (Category) returns.getCategories().get(0);
+            Category cat = returns.getCategories().get(0);
             LOGGER.debug("fillCategory");
             fillCategory(cat, catItem, map, levels, withCounter);
             LOGGER.debug("finished ClassCategSearch");
@@ -140,7 +140,7 @@ public class MCRClassificationQuery {
         return returns;
     }
 
-    public static void main(String[] arg) throws IOException {
+    public static void main(String[] arg) {
         boolean withCounter = true;
         Classification c = MCRClassificationQuery.getClassification(arg[0], 1, withCounter);
         MainHelper.print(c, 0);

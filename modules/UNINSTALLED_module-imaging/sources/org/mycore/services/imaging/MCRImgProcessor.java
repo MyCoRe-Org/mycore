@@ -1,12 +1,9 @@
 package org.mycore.services.imaging;
 
 import java.awt.Dimension;
-import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.RenderingHints;
-import java.awt.image.BufferedImage;
 import java.awt.image.renderable.ParameterBlock;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
@@ -16,14 +13,11 @@ import javax.media.jai.JAI;
 import javax.media.jai.PlanarImage;
 
 import org.apache.log4j.Logger;
-import org.mycore.frontend.cli.MCRClassificationCommands;
 
 import com.sun.media.jai.codec.ImageCodec;
-import com.sun.media.jai.codec.ImageDecoder;
 import com.sun.media.jai.codec.ImageEncoder;
 import com.sun.media.jai.codec.JPEGEncodeParam;
 import com.sun.media.jai.codec.MemoryCacheSeekableStream;
-import com.sun.media.jai.codec.PNGDecodeParam;
 import com.sun.media.jai.codec.PNGEncodeParam;
 import com.sun.media.jai.codec.SeekableStream;
 import com.sun.media.jai.codec.TIFFEncodeParam;

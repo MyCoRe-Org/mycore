@@ -27,18 +27,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
-import javax.xml.namespace.QName;
-
-import org.apache.axis.client.Service;
-import org.apache.axis.constants.Style;
-import org.apache.axis.constants.Use;
-import org.apache.axis.description.OperationDesc;
-import org.apache.axis.description.ParameterDesc;
 import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
-import org.jdom.input.DOMBuilder;
 import org.jdom.output.DOMOutputter;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRException;
@@ -47,7 +39,8 @@ import org.mycore.common.xml.MCRURIResolver;
 /**
  * Executes a query on remote hosts using a webservice
  * 
- * @author Frank Lützenkirchen @author Jens Kupferschmidt
+ * @author Frank Lützenkirchen 
+ * @author Jens Kupferschmidt
  */
 public class MCRQueryClient {
     /** The logger */
@@ -82,8 +75,8 @@ public class MCRQueryClient {
             } catch (InstantiationException e) {
                 throw new MCRException(classname + " InstantiationException",e);
             }
-            ((MCRQueryClientInterface)qi).init(host);
-            String alias = ((MCRQueryClientInterface)qi).getAlias();
+            qi.init(host);
+            String alias = qi.getAlias();
             LOGGER.debug("Host " + alias + " uses class "+classname);
             accessclass.put(alias, qi);
             ALL_HOSTS.add(alias);
