@@ -29,7 +29,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.PushbackInputStream;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.Properties;
@@ -56,6 +55,7 @@ import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUtils;
+import org.mycore.datamodel.ifs.MCRContentInputStream;
 import org.mycore.frontend.servlets.MCRServlet;
 
 /**
@@ -127,9 +127,9 @@ public class MCRLayoutService {
         Properties parameters = buildXSLParameters(req);
         File styleFile = chooseStyleFile(req, parameters, docType);
         if (styleFile == null)
-          sendXML(req, res, jdom);
-        else 
-          transform(res, new org.jdom.transform.JDOMSource(jdom), docType, parameters, styleFile);
+            sendXML(req, res, jdom);
+        else
+            transform(res, new org.jdom.transform.JDOMSource(jdom), docType, parameters, styleFile);
     }
 
     public void doLayout(HttpServletRequest req, HttpServletResponse res, org.w3c.dom.Document dom) throws IOException {
@@ -137,24 +137,21 @@ public class MCRLayoutService {
         Properties parameters = buildXSLParameters(req);
         File styleFile = chooseStyleFile(req, parameters, docType);
         if (styleFile == null)
-          sendXML(req, res, dom);
-        else 
-          transform(res, new DOMSource(dom), docType, parameters, styleFile);
+            sendXML(req, res, dom);
+        else
+            transform(res, new DOMSource(dom), docType, parameters, styleFile);
     }
 
     public void doLayout(HttpServletRequest req, HttpServletResponse res, InputStream is) throws IOException {
-        int bufferSize = 1000;
-        PushbackInputStream pis = new PushbackInputStream(is, bufferSize);
-        pis.mark(bufferSize);
-        String docType = MCRUtils.parseDocumentType(pis);
-        pis.reset();
+        MCRContentInputStream cis = new MCRContentInputStream(is);
+        String docType = MCRUtils.parseDocumentType(new ByteArrayInputStream(cis.getHeader()));
 
         Properties parameters = buildXSLParameters(req);
         File styleFile = chooseStyleFile(req, parameters, docType);
         if (styleFile == null)
-          sendXML(req, res, pis);
-        else 
-          transform(res, new StreamSource(pis), docType, parameters, styleFile);
+            sendXML(req, res, cis);
+        else
+            transform(res, new StreamSource(cis), docType, parameters, styleFile);
     }
 
     public void doLayout(HttpServletRequest req, HttpServletResponse res, byte[] bytes) throws IOException {
@@ -197,8 +194,7 @@ public class MCRLayoutService {
         File styleFile = getStylesheetFile(styleName);
 
         if ((styleFile == null) && (style.equals(MCRSessionMgr.getCurrentSession().getCurrentLanguage()))) {
-            // We are here because we tried to get a stylesheet for a specific
-            // language
+            // We are here because we tried to get a stylesheet for a specific language
             style = "default";
             styleName = buildStylesheetName(style, docType, type);
             styleFile = getStylesheetFile(styleName);
@@ -229,31 +225,35 @@ public class MCRLayoutService {
             styleFile = getStylesheetFile(styleName);
         }
 
-        return styleFile;
+        if( styleFile != null )
+          return styleFile;
+        else
+          throw new MCRException( "XSL stylesheet not found: " + styleName );
     }
 
     public Properties buildXSLParameters(HttpServletRequest request) {
 
         // PROPERTIES: Read all properties from system configuration
         Properties parameters = (Properties) (MCRConfiguration.instance().getProperties().clone());
-        
-        // SESSION: Read all *.xsl attributes that are stored in the browser session
+
+        // SESSION: Read all *.xsl attributes that are stored in the browser
+        // session
         if (request.getSession(false) != null) {
-        	HttpSession session = request.getSession(false);
+            HttpSession session = request.getSession(false);
             for (Enumeration e = session.getAttributeNames(); e.hasMoreElements();) {
                 String name = (String) (e.nextElement());
                 if (name.startsWith("XSL."))
                     parameters.put(name.substring(4), session.getAttribute(name));
             }
-        }        
+        }
         MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
         Iterator sessObjKeys = mcrSession.getObjectsKeyList();
         if (mcrSession != null) {
-        	while (sessObjKeys.hasNext()) {
-        		String name = (String) sessObjKeys.next();
-        		if (name.startsWith("XSL."))
-                    parameters.put(name.substring(4), mcrSession.get(name)); 
-        	}
+            while (sessObjKeys.hasNext()) {
+                String name = (String) sessObjKeys.next();
+                if (name.startsWith("XSL."))
+                    parameters.put(name.substring(4), mcrSession.get(name));
+            }
         }
 
         // HTTP-REQUEST-PARAMETER: Read all *.xsl attributes from the client
@@ -261,15 +261,15 @@ public class MCRLayoutService {
         for (Enumeration e = request.getParameterNames(); e.hasMoreElements();) {
             String name = (String) (e.nextElement());
             if (name.startsWith("XSL.")) {
-                if (!name.endsWith(".SESSION")) 
+                if (!name.endsWith(".SESSION"))
                     parameters.put(name.substring(4), request.getParameter(name));
                 // store parameter in session if ends with *.SESSION
-                else 
+                else
                     parameters.put(name.substring(4, name.length() - 8), request.getParameter(name));
             }
         }
         MCRServlet.putParamsToSession(request);
-        
+
         // SERVLETS-REQUEST-ATTRIBUTES: Read all *.xsl attributes provided by
         // the invoking servlet
         for (Enumeration e = request.getAttributeNames(); e.hasMoreElements();) {
@@ -282,9 +282,9 @@ public class MCRLayoutService {
                 } // store parameter in session if ends with *.SESSION
                 else {
                     parameters.put(name.substring(4, name.length() - 8), request.getAttribute(name));
-                    if (mcrSession!=null) {
-                    	mcrSession.put(name.substring(0, name.length() - 8), request.getAttribute(name));
-                        LOGGER.debug("MCRLayoutService: found Req.-Attribut " + name + "=" + request.getAttribute(name) + " that should be saved in session, safed " + name.substring(0, name.length() - 8) + "=" + request.getAttribute(name));	
+                    if (mcrSession != null) {
+                        mcrSession.put(name.substring(0, name.length() - 8), request.getAttribute(name));
+                        LOGGER.debug("MCRLayoutService: found Req.-Attribut " + name + "=" + request.getAttribute(name) + " that should be saved in session, safed " + name.substring(0, name.length() - 8) + "=" + request.getAttribute(name));
                     }
                 }
             }
@@ -312,7 +312,8 @@ public class MCRLayoutService {
 
         if (session != null) {
             parameters.put("JSessionID", jSessionID + session.getId());
-            //MCRSession mcrSession2 = (MCRSession) (session.getAttribute("mycore.session"));
+            // MCRSession mcrSession2 = (MCRSession)
+            // (session.getAttribute("mycore.session"));
             if (mcrSession != null) {
                 user = mcrSession.getCurrentUserID();
                 lang = mcrSession.getCurrentLanguage();
