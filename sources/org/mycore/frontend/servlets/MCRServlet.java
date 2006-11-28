@@ -431,17 +431,24 @@ public class MCRServlet extends HttpServlet {
 	}
 
 	public static void putParamsToSession(HttpServletRequest request) {
-		Enumeration e = request.getParameterNames();
-		MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
-		
-		while (e.hasMoreElements()) {
-			String name = (String) (e.nextElement());
-			if (name.startsWith("XSL.") && name.endsWith(".SESSION") && (mcrSession!=null)) {
-            	mcrSession.put(name.substring(0, name.length() - 8), request.getParameter(name));
-                LOGGER.debug("Found HTTP-Req.-Parameter " + name + "=" + request.getParameter(name) 
-                		+ " that should be saved in session, safed " + name.substring(0, name.length() - 8) + "=" 
-                		+ request.getParameter(name));
-			}
-		}
-	}
+        MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
+
+        for (Enumeration e = request.getParameterNames(); e.hasMoreElements();) {
+            String name = e.nextElement().toString();
+            if (name.startsWith("XSL.") && name.endsWith(".SESSION")) {
+                mcrSession.put(name.substring(0, name.length() - 8), request.getParameter(name));
+                LOGGER.debug("Found HTTP-Req.-Parameter " + name + "=" + request.getParameter(name) + " that should be saved in session, safed "
+                        + name.substring(0, name.length() - 8) + "=" + request.getParameter(name));
+            }
+        }
+        for (Enumeration e = request.getAttributeNames(); e.hasMoreElements();) {
+            String name = e.nextElement().toString();
+            if (name.startsWith("XSL.") && name.endsWith(".SESSION")) {
+                mcrSession.put(name.substring(0, name.length() - 8), request.getAttribute(name));
+                LOGGER.debug("Found HTTP-Req.-Attribute " + name + "=" + request.getParameter(name) + " that should be saved in session, safed "
+                        + name.substring(0, name.length() - 8) + "=" + request.getParameter(name));
+            }
+
+        }
+    }
 }

@@ -48,6 +48,7 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
 import org.apache.log4j.Logger;
+
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
@@ -195,107 +196,71 @@ public class MCRLayoutService {
     }
 
     public Properties buildXSLParameters(HttpServletRequest request) {
-
         // PROPERTIES: Read all properties from system configuration
         Properties parameters = (Properties) (MCRConfiguration.instance().getProperties().clone());
-
-        // SESSION: Read all *.xsl attributes that are stored in the browser
-        // session
-        if (request.getSession(false) != null) {
-            HttpSession session = request.getSession(false);
-            for (Enumeration e = session.getAttributeNames(); e.hasMoreElements();) {
-                String name = (String) (e.nextElement());
-                if (name.startsWith("XSL."))
-                    parameters.put(name.substring(4), session.getAttribute(name));
-            }
-        }
-        MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
-        Iterator sessObjKeys = mcrSession.getObjectsKeyList();
-        while (sessObjKeys.hasNext()) {
-            String name = (String) sessObjKeys.next();
-            if (name.startsWith("XSL."))
-                parameters.put(name.substring(4), mcrSession.get(name));
-        }
-
-        // HTTP-REQUEST-PARAMETER: Read all *.xsl attributes from the client
-        // HTTP request parameters
-        for (Enumeration e = request.getParameterNames(); e.hasMoreElements();) {
-            String name = (String) (e.nextElement());
-            if (name.startsWith("XSL.")) {
-                if (!name.endsWith(".SESSION"))
-                    parameters.put(name.substring(4), request.getParameter(name));
-                // store parameter in session if ends with *.SESSION
-                else
-                    parameters.put(name.substring(4, name.length() - 8), request.getParameter(name));
-            }
-        }
-        MCRServlet.putParamsToSession(request);
-
-        // SERVLETS-REQUEST-ATTRIBUTES: Read all *.xsl attributes provided by
-        // the invoking servlet
-        for (Enumeration e = request.getAttributeNames(); e.hasMoreElements();) {
-            String name = (String) (e.nextElement());
-            if (name.startsWith("XSL.")) {
-                if (!name.endsWith(".SESSION")) {
-                    if (request.getAttribute(name) != null) {
-                        parameters.put(name.substring(4), request.getAttribute(name));
-                    }
-                } // store parameter in session if ends with *.SESSION
-                else {
-                    parameters.put(name.substring(4, name.length() - 8), request.getAttribute(name));
-                    if (mcrSession != null) {
-                        mcrSession.put(name.substring(0, name.length() - 8), request.getAttribute(name));
-                        LOGGER.debug("MCRLayoutService: found Req.-Attribut " + name + "=" + request.getAttribute(name) + " that should be saved in session, safed " + name.substring(0, name.length() - 8) + "=" + request.getAttribute(name));
-                    }
-                }
-            }
-
-        }
-
-        // Set some predefined XSL parameters:
-        String defaultLang = MCRConfiguration.instance().getString("MCR.metadata_default_lang", "en");
-
-        String user = MCRConfiguration.instance().getString("MCR.users_guestuser_username");
-        String lang = defaultLang;
-        String referer = request.getHeader("Referer");
-
-        if (referer == null) {
-            referer = "";
-        }
+        // added properties of MCRSession and request
+        parameters.putAll(mergeProperties(request));
 
         // handle HttpSession
         HttpSession session = request.getSession(false);
-        String jSessionID = MCRConfiguration.instance().getString("MCR.session.param", ";jsessionid=");
-
-        if ((session != null) && !request.isRequestedSessionIdFromCookie()) {
-            parameters.put("HttpSession", jSessionID + session.getId());
-        }
-
         if (session != null) {
-            parameters.put("JSessionID", jSessionID + session.getId());
-            // MCRSession mcrSession2 = (MCRSession)
-            // (session.getAttribute("mycore.session"));
-            if (mcrSession != null) {
-                user = mcrSession.getCurrentUserID();
-                lang = mcrSession.getCurrentLanguage();
+            String jSessionID = MCRConfiguration.instance().getString("MCR.session.param", ";jsessionid=");
+            if (!request.isRequestedSessionIdFromCookie()) {
+                parameters.put("HttpSession", jSessionID + session.getId());
             }
+            parameters.put("JSessionID", jSessionID + session.getId());
         }
 
-        LOGGER.debug("LayoutServlet XSL.MCRSessionID=" + parameters.getProperty("MCRSessionID"));
-        LOGGER.debug("LayoutServlet XSL.CurrentUser =" + user);
-        LOGGER.debug("LayoutServlet HttpSession =" + parameters.getProperty("HttpSession"));
-        LOGGER.debug("LayoutServlet JSessionID =" + parameters.getProperty("JSessionID"));
-        LOGGER.debug("LayoutServlet RefererURL =" + referer);
-
-        parameters.put("CurrentUser", user);
+        MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
+        parameters.put("CurrentUser", mcrSession.getCurrentUserID());
         parameters.put("RequestURL", getCompleteURL(request));
         parameters.put("WebApplicationBaseURL", MCRServlet.getBaseURL());
         parameters.put("ServletsBaseURL", MCRServlet.getServletBaseURL());
-        parameters.put("DefaultLang", defaultLang);
-        parameters.put("CurrentLang", lang);
-        parameters.put("Referer", referer);
+        parameters.put("DefaultLang", MCRConfiguration.instance().getString("MCR.metadata_default_lang", "en"));
+        parameters.put("CurrentLang", mcrSession.getCurrentLanguage());
+        parameters.put("Referer", (request.getHeader("Referer") != null) ? request.getHeader("Referer") : "");
+
+        LOGGER.debug("LayoutServlet XSL.MCRSessionID=" + parameters.getProperty("MCRSessionID"));
+        LOGGER.debug("LayoutServlet XSL.CurrentUser =" + mcrSession.getCurrentUserID());
+        LOGGER.debug("LayoutServlet HttpSession =" + parameters.getProperty("HttpSession"));
+        LOGGER.debug("LayoutServlet JSessionID =" + parameters.getProperty("JSessionID"));
+        LOGGER.debug("LayoutServlet RefererURL =" + parameters.getProperty("Referer"));
 
         return parameters;
+    }
+    
+    /**
+     * returns a merge list of XSL parameters.
+     * 
+     * First parameters stored in current MCRSession are used.
+     * These are overwritten by Parameters of HttpServletRequest.
+     * Finally attributes of HttpServletRequest overwrite the previous defined.
+     * @param request
+     * @return merged XSL.* properties of MCRSession and HttpServletRequest
+     */
+    private final Properties mergeProperties(HttpServletRequest request) {
+        Properties props = new Properties();
+        // Store XSL.*.SESSION parameters to MCRSession
+        MCRServlet.putParamsToSession(request);
+        MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
+        for (Iterator it = mcrSession.getObjectsKeyList(); it.hasNext();) {
+            String name = it.next().toString();
+            if (name.startsWith("XSL."))
+                props.put(name.substring(4), mcrSession.get(name));
+        }
+        for (Enumeration e = request.getParameterNames(); e.hasMoreElements();) {
+            String name = e.nextElement().toString();
+            if (name.startsWith("XSL.") && !name.endsWith(".SESSION")) {
+                props.put(name.substring(4), request.getParameter(name));
+            }
+        }
+        for (Enumeration e = request.getAttributeNames(); e.hasMoreElements();) {
+            String name = e.nextElement().toString();
+            if (name.startsWith("XSL.") && !name.endsWith(".SESSION")) {
+                props.put(name.substring(4), request.getAttribute(name).toString());
+            }
+        }
+        return props;
     }
 
     private final String getCompleteURL(HttpServletRequest request) {
