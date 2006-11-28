@@ -48,7 +48,6 @@ import org.apache.lucene.search.Hits;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
-import org.apache.lucene.search.TopDocs;
 import org.jdom.Element;
 
 import org.mycore.common.MCRConfiguration;
@@ -255,20 +254,23 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
             deleteLuceneLocks(LOCK_DIR, 100);
         }
 
-        TopDocs hits = searcher.search(luceneQuery, null, maxResults);
-        int found = hits.scoreDocs.length;
+        Hits hits = searcher.search( luceneQuery );
+        int found = hits.length();
+        //TopDocs hits = searcher.search(luceneQuery, null, maxResults);
+        //int found = hits.scoreDocs.length;
 
         LOGGER.info("Number of Objects found : " + found);
 
         MCRResults result = new MCRResults();
 
         for (int i = 0; i < found; i++) {
-            // org.apache.lucene.document.Document doc = hits.doc(i);
-            org.apache.lucene.document.Document doc = searcher.doc(hits.scoreDocs[i].doc);
+            org.apache.lucene.document.Document doc = hits.doc(i);
+            //org.apache.lucene.document.Document doc = searcher.doc(hits.scoreDocs[i].doc);
 
             String id = doc.get("returnid");
             MCRHit hit = new MCRHit(id);
-            String score = Float.toString(hits.scoreDocs[i].score);
+            String score = Float.toString(hits.score(i));
+            //String score = Float.toString(hits.scoreDocs[i].score);
             addSortDataToHit(sortBy, doc, hit, score);
             result.addHit(hit);
         }
