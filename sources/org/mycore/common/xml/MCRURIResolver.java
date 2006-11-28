@@ -228,7 +228,7 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
      * 
      * @see org.xml.sax.EntityResolver
      */
-    public InputSource resolveEntity(String publicId, String systemId) throws org.xml.sax.SAXException, java.io.IOException {
+    public InputSource resolveEntity(String publicId, String systemId) throws java.io.IOException {
         LOGGER.debug("Resolving " + publicId + " :: " + systemId);
 
         if (systemId == null) {
