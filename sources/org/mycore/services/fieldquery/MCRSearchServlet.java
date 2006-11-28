@@ -108,7 +108,7 @@ public class MCRSearchServlet extends MCRServlet {
         Document query = (Document) (getCache(QUERIES_KEY).get(id));
 
         // Send query XML to editor
-        getLayoutService().sendXML(request, response, query);
+        getLayoutService().sendXML(request, response, query);   
     }
 
     /**
@@ -174,7 +174,8 @@ public class MCRSearchServlet extends MCRServlet {
         xml.addContent(new Element("condition").setAttribute("format", "xml").addContent(cond.toXML()));
 
         // Send output to LayoutServlet
-        getLayoutService().doLayout(request, response, new Document(xml));
+        sendToLayout(request, response, new Document(xml));        
+
     }
 
     private String getReqParameter(HttpServletRequest req, String name, String defaultValue) {
@@ -380,6 +381,16 @@ public class MCRSearchServlet extends MCRServlet {
         public int numPerPage;
 
         public int page;
+    }
+
+   /**
+     * Forwards the document to the output
+     * 
+     * @author A.Schaar
+     * @see its overwritten in jspdocportal
+     */
+    protected void sendToLayout(HttpServletRequest req, HttpServletResponse res, Document jdom) throws IOException {
+        getLayoutService().doLayout(req, res, jdom);
     }
 
     /**
