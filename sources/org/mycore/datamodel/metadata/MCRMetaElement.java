@@ -27,6 +27,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+
+import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRUtils;
 
@@ -45,11 +47,13 @@ import org.mycore.common.MCRUtils;
  */
 public class MCRMetaElement {
     // common data
-    public static String DEFAULT_LANGUAGE = "de";
+    public final static String DEFAULT_LANGUAGE = "de";
 
-    public static boolean DEFAULT_HERITABLE = false;
+    public final static boolean DEFAULT_HERITABLE = false;
 
-    public static boolean DEFAULT_NOT_INHERIT = false;
+    public final static boolean DEFAULT_NOT_INHERIT = false;
+    
+    protected final static MCRConfiguration CONFIG = MCRConfiguration.instance();
 
     private String META_PACKAGE_NAME = "org.mycore.datamodel.metadata.";
 
@@ -74,12 +78,12 @@ public class MCRMetaElement {
      * for the element was set to <b>en </b>.
      */
     public MCRMetaElement() {
-        lang = DEFAULT_LANGUAGE;
-        classname = "";
-        tag = "";
-        heritable = DEFAULT_HERITABLE;
-        notinherit = DEFAULT_NOT_INHERIT;
-        list = new ArrayList();
+        this(DEFAULT_LANGUAGE,
+                CONFIG.getString("MCR.MetaElement.defaults.class",""),
+                "",
+                CONFIG.getBoolean("MCR.MetaElement.defaults.heritable",DEFAULT_HERITABLE),
+                CONFIG.getBoolean("MCR.MetaElement.defaults.notinherit",DEFAULT_NOT_INHERIT),
+                new ArrayList());
     }
 
     /**
@@ -91,17 +95,12 @@ public class MCRMetaElement {
      *            the default language
      */
     public MCRMetaElement(String default_lang) {
-        if ((default_lang == null) || ((default_lang = default_lang.trim()).length() == 0)) {
-            lang = DEFAULT_LANGUAGE;
-        } else {
-            lang = default_lang;
-        }
-
-        classname = "";
-        tag = "";
-        heritable = DEFAULT_HERITABLE;
-        notinherit = DEFAULT_NOT_INHERIT;
-        list = new ArrayList();
+        this(default_lang,
+                CONFIG.getString("MCR.MetaElement.defaults.class",""),
+                "",
+                CONFIG.getBoolean("MCR.MetaElement.defaults.heritable",DEFAULT_HERITABLE),
+                CONFIG.getBoolean("MCR.MetaElement.defaults.notinherit",DEFAULT_NOT_INHERIT),
+                new ArrayList());
     }
 
     /**
