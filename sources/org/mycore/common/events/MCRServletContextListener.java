@@ -28,6 +28,8 @@ import javax.servlet.ServletContextListener;
 
 import org.apache.log4j.Logger;
 
+import org.mycore.common.MCRConfiguration;
+
 /**
  * is a shutdown hook for the current <code>ServletContext</code>.
  * 
@@ -47,6 +49,8 @@ public class MCRServletContextListener implements ServletContextListener {
     private static final Logger LOGGER = Logger.getLogger(MCRServletContextListener.class);
 
     public void contextInitialized(ServletContextEvent sce) {
+        //Make sure logging is configured
+        MCRConfiguration.instance();
         // register to MCRShutdownHandler
         LOGGER.info("Register ServletContextListener to MCRShutdownHandler");
         MCRShutdownHandler.getInstance().isWebAppRunning = true;
