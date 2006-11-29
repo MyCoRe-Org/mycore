@@ -56,7 +56,7 @@ public final class MCRConstants {
     public static String[] SUPPORTED_LANG = {
 
     // ISO-639 with ISO-3166 extendions
-            "de", "de-DE", "en", "en-UK", "en-US",
+            "ar", "de", "de-DE", "en", "en-UK", "en-US",
             // extendion for historical languages
             "x-egy", // egypt
             "x-ara", // arabic
@@ -71,6 +71,7 @@ public final class MCRConstants {
     public static DateFormat[] DATE_FORMAT = {
 
     // ISO-639 with ISO-3166 extendions
+            DateFormat.getDateInstance(DateFormat.SHORT, Locale.UK), // ar
             DateFormat.getDateInstance(DateFormat.MEDIUM, Locale.GERMAN), // de
             DateFormat.getDateInstance(DateFormat.MEDIUM, Locale.GERMANY), // de-DE
             DateFormat.getDateInstance(DateFormat.SHORT, Locale.UK), // en
