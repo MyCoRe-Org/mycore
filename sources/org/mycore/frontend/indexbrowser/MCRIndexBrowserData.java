@@ -67,7 +67,7 @@ public class MCRIndexBrowserData {
 
         int from = 0;
 
-        int to = Integer.MAX_VALUE;
+        int to = Integer.MAX_VALUE-10;
 
         StringBuffer path;
 
@@ -183,7 +183,7 @@ public class MCRIndexBrowserData {
         // resort it for german ...
         // sortLinkedListForGerman();
         int from = Math.max(0, br.from);
-        int to = Math.min(numRows, br.to);
+        int to = Math.min(numRows, br.to+1);
         int numSelectedRows = to - from;
 
         results.setAttribute("numHits", String.valueOf(numRows));
