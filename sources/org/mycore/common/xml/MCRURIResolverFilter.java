@@ -26,6 +26,7 @@ package org.mycore.common.xml;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -38,12 +39,14 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponseWrapper;
 
 import org.apache.log4j.Logger;
+
 import org.mycore.common.MCRSession;
-import org.mycore.common.MCRSessionMgr;
+import org.mycore.frontend.servlets.MCRServlet;
 
 /**
  * Servlet Filter for adding debug information to servlet output.
@@ -64,11 +67,17 @@ public class MCRURIResolverFilter implements Filter {
      *      javax.servlet.ServletResponse, javax.servlet.FilterChain)
      */
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain filterChain) throws IOException, ServletException {
-        final MCRSession currentSession = MCRSessionMgr.getCurrentSession();
+        MCRSession currentSession=null;
         List list = null;
         if (LOGGER.isDebugEnabled()) {
+            /*
+             * we cannot call MCRSessionMgr.getCurrentSession() the current
+             * Session is gathered by MCRServlet that at this point was not
+             * called
+             */
+            currentSession = MCRServlet.getSession((HttpServletRequest) request);
+            LOGGER.debug("start filter in session " + currentSession.getID());
             // prepare UriResolver debug list
-            LOGGER.debug("start filter");
             list = new MyLinkedList();
             currentSession.put(MCRURIResolver.SESSION_OBJECT_NAME, list);
         }
@@ -139,7 +148,7 @@ public class MCRURIResolverFilter implements Filter {
      * 
      * @author Thomas Scheffler (yagee)
      */
-    private class MyLinkedList extends LinkedList {
+    private static class MyLinkedList extends LinkedList {
 
         private static final long serialVersionUID = -2602420461572432380L;
 
@@ -161,7 +170,7 @@ public class MCRURIResolverFilter implements Filter {
      * 
      * @author Thomas Scheffler (yagee)
      */
-    private class MyResponseWrapper extends HttpServletResponseWrapper {
+    private static class MyResponseWrapper extends HttpServletResponseWrapper {
         private ByteArrayOutputStream output;
 
         public String toString() {
