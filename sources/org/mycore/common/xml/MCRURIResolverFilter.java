@@ -26,7 +26,6 @@ package org.mycore.common.xml;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -69,7 +68,14 @@ public class MCRURIResolverFilter implements Filter {
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain filterChain) throws IOException, ServletException {
         MCRSession currentSession=null;
         List list = null;
-        if (LOGGER.isDebugEnabled()) {
+        /*
+         * isDebugEnabled() may return a different value
+         * when called a second time. Since we initialize things in the
+         * first block, we need to make sure to visit the second block only if we
+         * visited the first block, too.
+         */
+        final boolean debugEnabled = LOGGER.isDebugEnabled();
+        if (debugEnabled) {
             /*
              * we cannot call MCRSessionMgr.getCurrentSession() the current
              * Session is gathered by MCRServlet that at this point was not
@@ -92,7 +98,7 @@ public class MCRURIResolverFilter implements Filter {
          * ServletOutputStream.print(String). So we must encode it ourself to
          * byte arrays.
          */
-        if (LOGGER.isDebugEnabled() && !list.isEmpty() && (origOutput.length() > 0)
+        if (debugEnabled && !list.isEmpty() && (origOutput.length() > 0)
                 && (-1 != response.getContentType().indexOf("text/html") || -1 != response.getContentType().indexOf("text/xml"))) {
             int pos = getInsertPosition(origOutput);
             out.write(origOutput.substring(0, pos).getBytes(characterEncoding));
