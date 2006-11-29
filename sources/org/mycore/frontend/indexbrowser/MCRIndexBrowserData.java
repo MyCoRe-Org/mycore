@@ -162,14 +162,14 @@ public class MCRIndexBrowserData {
         ic.set(br.index);
         Element results = buildPageElement();
         int numRows = 0;
-        ll1 = (LinkedList<String[]>) (getCache(INDEX_KEY).get(br.index));
+        String cacheKey =br.index + "##" + br.search;
+        ll1 = (LinkedList<String[]>) (getCache(INDEX_KEY).get(cacheKey));
 		
-
         // first create all listitems
         if ( ll1 == null || ll1.isEmpty() ) {
              numRows = createLinkedListfromSearch();
-             getCache(INDEX_KEY).put(br.index, ll1);
-             getCache(QUERY_KEY).put(br.index, myQuery);
+             getCache(INDEX_KEY).put(cacheKey, ll1);
+             getCache(QUERY_KEY).put(cacheKey, myQuery);
              // for further search and research (by refine and other posibilities the query must be in the Cache
              MCRSearchServlet.getCache(MCRSearchServlet.getResultsKey()).put(mcrResult.getID(), mcrResult);
              MCRSearchServlet.getCache(MCRSearchServlet.getQueriesKey()).put(mcrResult.getID(), myQuery);
@@ -178,7 +178,7 @@ public class MCRIndexBrowserData {
              
         } else {
         	numRows = ll1.size();
-        	myQuery = (MCRQuery) getCache(QUERY_KEY).get(br.index);       	
+        	myQuery = (MCRQuery) getCache(QUERY_KEY).get(cacheKey);       	
         }
         // resort it for german ...
         // sortLinkedListForGerman();
