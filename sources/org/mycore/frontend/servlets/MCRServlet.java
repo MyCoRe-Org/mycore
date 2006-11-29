@@ -29,6 +29,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -46,6 +47,7 @@ import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.xml.MCRLayoutService;
+import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.datamodel.metadata.MCRActiveLinkException;
 
 /**
@@ -106,7 +108,7 @@ public class MCRServlet extends HttpServlet {
 	 * Initialisation of the static values for the base URL and servlet URL of
 	 * the mycore system.
 	 */
-	private static synchronized void prepareURLs(HttpServletRequest req) {
+	private static synchronized void prepareURLs(ServletContext context, HttpServletRequest req) {
 		String contextPath = req.getContextPath();
 
 		if (contextPath == null) {
@@ -120,6 +122,7 @@ public class MCRServlet extends HttpServlet {
         
 		BASE_URL = CONFIG.getString("MCR.baseurl",requestURL.substring(0, pos) + contextPath);
 		SERVLET_URL = BASE_URL + "servlets/";
+        MCRURIResolver.init(context, getBaseURL());
 	}
 
 	// The methods doGet() and doPost() simply call the private method
@@ -221,7 +224,7 @@ public class MCRServlet extends HttpServlet {
 		}
 
 		if (BASE_URL == null) {
-			prepareURLs(req);
+			prepareURLs(getServletContext(), req);
 		}
 
 		try {

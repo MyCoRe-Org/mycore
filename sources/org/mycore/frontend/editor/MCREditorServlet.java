@@ -64,11 +64,6 @@ public class MCREditorServlet extends MCRServlet {
 
     protected final static MCRCache sessions = new MCRCache(200);
 
-    public void init() throws ServletException {
-        super.init();
-        MCRURIResolver.init(getServletContext(), getBaseURL());
-    }
-
     public void doGetPost(MCRServletJob job) throws ServletException, java.io.IOException {
         HttpServletRequest req = job.getRequest();
         HttpServletResponse res = job.getResponse();
