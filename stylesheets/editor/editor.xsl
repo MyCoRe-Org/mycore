@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
 <!-- ============================================== -->
-<!-- $Revision: 1.54 $ $Date: 2006-11-23 15:46:40 $ -->
+<!-- $Revision: 1.55 $ $Date: 2006-11-29 15:48:03 $ -->
 <!-- ============================================== --> 
 
 <xsl:stylesheet 
@@ -55,7 +55,7 @@
       <xsl:apply-templates select="headline" />
 
       <!-- ======== if validation errors exist, display message ======== -->
-      <xsl:apply-templates select="/editor/failed">
+      <xsl:apply-templates select="ancestor::editor/failed">
         <xsl:with-param name="lines" select="panel[@id=current()/@root]/@lines" />
       </xsl:apply-templates>
 
@@ -176,7 +176,7 @@
   <tr>
     <td class="editorValidationMessage">
 
-      <xsl:for-each select="/editor/validationMessage">
+      <xsl:for-each select="ancestor::editor/validationMessage">
         <xsl:call-template name="output.label">
           <xsl:with-param name="usefont" select="'yes'" />
         </xsl:call-template>
@@ -397,13 +397,13 @@
   <table border="0" cellpadding="0" cellspacing="0">
     <xsl:attribute name="class">
       <xsl:choose>
-        <xsl:when test="/editor/failed/field[@sortnr=$pos]">editorPanelValidationFailed</xsl:when>
+        <xsl:when test="ancestor::editor/failed/field[@sortnr=$pos]">editorPanelValidationFailed</xsl:when>
         <xsl:otherwise>editorPanel</xsl:otherwise>
       </xsl:choose>
     </xsl:attribute>
-    <xsl:if test="/editor/failed/field[@sortnr=$pos]">
+    <xsl:if test="ancestor::editor/failed/field[@sortnr=$pos]">
       <xsl:variable name="message">
-        <xsl:for-each select="//condition[@id=/editor/failed/field[@sortnr=$pos]/@condition]">
+        <xsl:for-each select="//condition[@id=ancestor::editor/failed/field[@sortnr=$pos]/@condition]">
           <xsl:call-template name="output.label" />
         </xsl:for-each>
       </xsl:variable>
@@ -587,7 +587,7 @@
     <xsl:if test="position() = 1">
       <xsl:attribute name="class">
         <xsl:choose>
-          <xsl:when test="/editor/failed/field[@sortnr=$pos] and contains('textfield textarea password file list checkbox display ', concat(name(),' '))">editorCellValidationFailed</xsl:when>
+          <xsl:when test="ancestor::editor/failed/field[@sortnr=$pos] and contains('textfield textarea password file list checkbox display ', concat(name(),' '))">editorCellValidationFailed</xsl:when>
           <xsl:when test="$first='true'">
             <xsl:choose>
 			  <xsl:when test="$lines='off' and @lines='on'">editorCellWithPanelLinesOn</xsl:when>
@@ -616,9 +616,9 @@
 
     <!-- ======== show failed input validation message ======== -->
     <xsl:if test="contains('textfield textarea password file list checkbox display ', concat(name(),' '))">
-      <xsl:if test="/editor/failed/field[@sortnr=$pos]">
+      <xsl:if test="ancestor::editor/failed/field[@sortnr=$pos]">
         <xsl:variable name="message">
-          <xsl:for-each select="//condition[@id=/editor/failed/field[@sortnr=$pos]/@condition]">
+          <xsl:for-each select="//condition[@id=ancestor::editor/failed/field[@sortnr=$pos]/@condition]">
             <xsl:call-template name="output.label" />
           </xsl:for-each>
         </xsl:variable>
