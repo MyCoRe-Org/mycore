@@ -644,7 +644,7 @@ public class MCRSimpleWorkflowManager {
         }
         MCRObjectService service = new MCRObjectService();
         org.jdom.Element elm = service.createXML();
-        MCREditorOutValidator.setDefaultDerivateACLs(elm, DD);
+        MCREditorOutValidator.setDefaultDerivateACLs(elm);
         service.setFromDOM(elm);
         der.setService(service);
 

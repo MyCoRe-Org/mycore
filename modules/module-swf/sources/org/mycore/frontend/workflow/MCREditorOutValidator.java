@@ -42,6 +42,8 @@ import java.util.StringTokenizer;
 import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
+import org.jdom.input.SAXBuilder;
+
 import org.mycore.access.MCRAccessInterface;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRConfiguration;
@@ -88,7 +90,9 @@ import org.mycore.datamodel.metadata.MCRObjectID;
  * @version $Revision$ $Date$
  */
 public class MCREditorOutValidator {
-    private List errorlog;
+    private static final SAXBuilder SAX_BUILDER = new org.jdom.input.SAXBuilder();
+
+    private List<String> errorlog;
 
     private Document input;
 
@@ -98,14 +102,14 @@ public class MCREditorOutValidator {
 
     private static final Map checkMethods;
 
-    private static final ArrayList adduserlist;
+    private static final ArrayList<String> adduserlist;
 
     // The Access Manager
     protected static MCRAccessInterface AI = MCRAccessManager.getAccessImpl();
 
     static {
         // save all check methods in a Map for later usage
-        HashMap methods = new HashMap();
+        HashMap<String, Method> methods = new HashMap<String, Method>();
         Method[] m = MCREditorOutValidator.class.getDeclaredMethods();
         for (int i = 0; i < m.length; i++) {
             if (!m[i].getName().startsWith("checkMCR") || !((m[i].getParameterTypes().length == 1) && m[i].getParameterTypes()[0] == Element.class && m[i].getReturnType() == Boolean.TYPE)) {
@@ -116,7 +120,7 @@ public class MCREditorOutValidator {
         }
         checkMethods = Collections.unmodifiableMap(methods);
         // read the list of user add to ACL's
-        adduserlist = new ArrayList();
+        adduserlist = new ArrayList<String>();
         String inline = MCRConfiguration.instance().getString("MCR.AddUserPermissions", "read,write,delete");
         StringTokenizer st = new StringTokenizer(inline, ",");
         while (st.hasMoreTokens()) {
@@ -134,7 +138,7 @@ public class MCREditorOutValidator {
      *            editor input
      */
     public MCREditorOutValidator(Document jdom_in, MCRObjectID id) {
-        this.errorlog = new ArrayList();
+        this.errorlog = new ArrayList<String>();
         this.input = jdom_in;
         this.id = id;
         byte[] xml = MCRUtils.getByteArray(input);
@@ -282,70 +286,70 @@ public class MCREditorOutValidator {
     /**
      * @param datasubtag
      */
-    private boolean checkMCRMetaBoolean(Element datasubtag) {
+    boolean checkMCRMetaBoolean(Element datasubtag) {
         return checkMetaObject(datasubtag, MCRMetaBoolean.class);
     }
 
     /**
      * @param datasubtag
      */
-    private boolean checkMCRMetaPersonName(Element datasubtag) {
+    boolean checkMCRMetaPersonName(Element datasubtag) {
         return checkMetaObjectWithLang(datasubtag, MCRMetaPersonName.class);
     }
 
     /**
      * @param datasubtag
      */
-    private boolean checkMCRMetaInstitutionName(Element datasubtag) {
+    boolean checkMCRMetaInstitutionName(Element datasubtag) {
         return checkMetaObjectWithLang(datasubtag, MCRMetaInstitutionName.class);
     }
 
     /**
      * @param datasubtag
      */
-    private boolean checkMCRMetaAddress(Element datasubtag) {
+    boolean checkMCRMetaAddress(Element datasubtag) {
         return checkMetaObjectWithLang(datasubtag, MCRMetaAddress.class);
     }
 
     /**
      * @param datasubtag
      */
-    private boolean checkMCRMetaNumber(Element datasubtag) {
+    boolean checkMCRMetaNumber(Element datasubtag) {
         return checkMetaObjectWithLangNotEmpty(datasubtag, MCRMetaNumber.class);
     }
 
     /**
      * @param datasubtag
      */
-    private boolean checkMCRMetaHistoryDate(Element datasubtag) {
+    boolean checkMCRMetaHistoryDate(Element datasubtag) {
         return checkMetaObjectWithLang(datasubtag, MCRMetaHistoryDate.class);
     }
 
     /**
      * @param datasubtag
      */
-    private boolean checkMCRMetaDate(Element datasubtag) {
+    boolean checkMCRMetaDate(Element datasubtag) {
         return checkMetaObjectWithLangNotEmpty(datasubtag, MCRMetaDate.class);
     }
 
     /**
      * @param datasubtag
      */
-    private boolean checkMCRMetaLinkID(Element datasubtag) {
+    boolean checkMCRMetaLinkID(Element datasubtag) {
         return checkMetaObjectWithLinks(datasubtag, MCRMetaLinkID.class);
     }
 
     /**
      * @param datasubtag
      */
-    private boolean checkMCRMetaLink(Element datasubtag) {
+    boolean checkMCRMetaLink(Element datasubtag) {
         return checkMetaObjectWithLinks(datasubtag, MCRMetaLink.class);
     }
 
     /**
      * @param datasubtag
      */
-    private boolean checkMCRMetaClassification(Element datasubtag) {
+    boolean checkMCRMetaClassification(Element datasubtag) {
         String categid = datasubtag.getAttributeValue("categid");
         if (categid == null) {
             return false;
@@ -356,21 +360,21 @@ public class MCREditorOutValidator {
     /**
      * @param datasubtag
      */
-    private boolean checkMCRMetaISO8601Date(Element datasubtag) {
+    boolean checkMCRMetaISO8601Date(Element datasubtag) {
         return checkMetaObjectWithLangNotEmpty(datasubtag, MCRMetaISO8601Date.class);
     }
 
     /**
      * @param datasubtag
      */
-    private boolean checkMCRMetaLangText(Element datasubtag) {
+    boolean checkMCRMetaLangText(Element datasubtag) {
         return checkMetaObjectWithLangNotEmpty(datasubtag, MCRMetaLangText.class);
     }
 
     /**
      * @param datasubtag
      */
-    private boolean checkMCRMetaAccessRule(Element datasubtag) {
+    boolean checkMCRMetaAccessRule(Element datasubtag) {
         return checkMetaObjectWithLang(datasubtag, MCRMetaAccessRule.class);
     }
 
@@ -472,56 +476,56 @@ public class MCREditorOutValidator {
      * 
      * @param service
      */
+    @SuppressWarnings("unchecked")
     private void setDefaultObjectACLs(org.jdom.Element service) {
+        String resource = "/editor_default_acls_" + id.getTypeId() + ".xml";
         // Read stylesheet and add user
-        InputStream aclxml = MCREditorOutValidator.class.getResourceAsStream("/editor_default_acls_" + id.getTypeId() + ".xml");
+        InputStream aclxml = MCREditorOutValidator.class.getResourceAsStream(resource);
         if (aclxml == null) {
-            LOGGER.warn("Can't find default object ACL file editor_default_acls_....xml.");
-        } else {
-            try {
-                org.jdom.Document xml = (new org.jdom.input.SAXBuilder()).build(aclxml);
-                org.jdom.Element nacls = xml.getRootElement().getChild("servacls");
-                if (nacls != null) {
-                    org.jdom.Element acls = (org.jdom.Element) nacls.clone();
-                    List acllist = acls.getChildren();
-                    if (acllist != null) {
-                        for (int i = 0; i < acllist.size(); i++) {
-                            org.jdom.Element acl = (org.jdom.Element) acllist.get(i);
-                            if (acl != null) {
-                                String perm = acl.getAttributeValue("permission");
-                                if (adduserlist.contains(perm)) {
-                                    org.jdom.Element condition = acl.getChild("condition");
-                                    if (condition != null) {
-                                        org.jdom.Element rootbool = condition.getChild("boolean");
-                                        if (rootbool != null) {
-                                            org.jdom.Element andbool = (org.jdom.Element) rootbool.clone();
-                                            condition.removeContent();
-                                            List orbool = andbool.getChildren("boolean");
-                                            for (int j = 0; j < orbool.size(); j++) {
-                                                org.jdom.Element oneorbool = (org.jdom.Element) orbool.get(j);
-                                                org.jdom.Element firstcond = oneorbool.getChild("condition");
-                                                if (firstcond != null) {
-                                                    String field = firstcond.getAttributeValue("field");
-                                                    if (field == null)
-                                                        continue;
-                                                    if (!field.equals("user") && !field.equals("group"))
-                                                        continue;
-                                                    oneorbool.addContent(getCurrentUser());
-                                                }
-                                            }
-                                            condition.addContent(andbool);
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    service.addContent(acls);
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-                LOGGER.warn("Error while parsing file editor_default_acls_....xml.");
+            LOGGER.warn("Can't find default object ACL file " + resource.substring(1));
+            resource = "/editor_default_acls.xml"; //fallback
+            aclxml = MCREditorOutValidator.class.getResourceAsStream(resource);
+        }
+        if (aclxml == null) {
+            return;
+        }
+        try {
+            Document xml = SAX_BUILDER.build(aclxml);
+            Element acls = xml.getRootElement().getChild("servacls");
+            if (acls == null) {
+                return;
             }
+            for (Iterator<Element> it = acls.getChildren().iterator(); it.hasNext();) {
+                Element acl = it.next();
+                String perm = acl.getAttributeValue("permission");
+                if (!adduserlist.contains(perm)) {
+                    continue;
+                }
+                Element condition = acl.getChild("condition");
+                if (condition == null) {
+                    continue;
+                }
+                Element rootbool = condition.getChild("boolean");
+                if (rootbool == null) {
+                    continue;
+                }
+                for (Iterator<Element> boolIt = rootbool.getChildren("boolean").iterator(); boolIt.hasNext();) {
+                    Element orbool = boolIt.next();
+                    Element firstcond = orbool.getChild("condition");
+                    if (firstcond == null) {
+                        continue;
+                    }
+                    String field = firstcond.getAttributeValue("field");
+                    if (field == null)
+                        continue;
+                    if (!field.equals("user") && !field.equals("group"))
+                        continue;
+                    orbool.addContent(getCurrentUser());
+                }
+            }
+            service.addContent(acls.detach());
+        } catch (Exception e) {
+            LOGGER.warn("Error while parsing file " + resource, e);
         }
     }
 
@@ -543,7 +547,9 @@ public class MCREditorOutValidator {
      * @param metadata
      */
     private void checkObjectMetadata(Element metadata) {
-        metadata.getAttribute("lang").setNamespace(XML_NAMESPACE);
+        if (metadata.getAttribute("lang") != null) {
+            metadata.getAttribute("lang").setNamespace(XML_NAMESPACE);
+        }
 
         List metadatalist = metadata.getChildren();
         Iterator metaIt = metadatalist.iterator();
@@ -578,22 +584,21 @@ public class MCREditorOutValidator {
      * 
      * @param service
      */
-    protected static void setDefaultDerivateACLs(org.jdom.Element service, MCRObjectID id) {
+    protected static void setDefaultDerivateACLs(org.jdom.Element service) {
         // Read stylesheet and add user
-        InputStream aclxml = MCREditorOutValidator.class.getResourceAsStream("/editor_default_acls_" + id.getTypeId() + ".xml");
+        InputStream aclxml = MCREditorOutValidator.class.getResourceAsStream("/editor_default_acls_derivate.xml");
         if (aclxml == null) {
-            LOGGER.warn("Can't find default derivate ACL file editor_default_acls_....xml.");
-        } else {
-            try {
-                org.jdom.Document xml = (new org.jdom.input.SAXBuilder()).build(aclxml);
-                org.jdom.Element acls = xml.getRootElement().getChild("servacls");
-                if (acls != null) {
-                    acls.detach();
-                    service.addContent((org.jdom.Element) acls.clone());
-                }
-            } catch (Exception e) {
-                LOGGER.warn("Error while parsing file editor_default_acls_....xml.");
+            LOGGER.warn("Can't find default derivate ACL file editor_default_acls_derivate.xml.");
+            return;
+        }
+        try {
+            org.jdom.Document xml = (SAX_BUILDER).build(aclxml);
+            org.jdom.Element acls = xml.getRootElement().getChild("servacls");
+            if (acls != null) {
+                service.addContent(acls.detach());
             }
+        } catch (Exception e) {
+            LOGGER.warn("Error while parsing file editor_default_acls_derivate.xml.");
         }
     }
 
