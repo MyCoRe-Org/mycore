@@ -115,24 +115,8 @@
     <xsl:apply-templates select="*"/>
     <xsd:attribute name="heritable" type="xsd:boolean" use="optional" />
     <xsd:attribute name="notinherit" type="xsd:boolean" use="optional" />
-    <xsl:choose>
-     <xsl:when test="contains(@parasearch,'false')">
-      <xsd:attribute name="parasearch" type="xsd:boolean" use="required"
-        fixed="false" />
-     </xsl:when>
-     <xsl:otherwise>
-      <xsd:attribute name="parasearch" type="xsd:boolean" use="optional" />
-     </xsl:otherwise>
-    </xsl:choose>
-    <xsl:choose>
-     <xsl:when test="contains(@textsearch,'true')">
-      <xsd:attribute name="textsearch" type="xsd:boolean" use="required" 
-        fixed="true"/>
-     </xsl:when>
-     <xsl:otherwise>
-      <xsd:attribute name="textsearch" type="xsd:boolean" use="optional" />
-     </xsl:otherwise>
-    </xsl:choose>
+    <xsd:attribute name="parasearch" type="xsd:boolean" use="optional" />
+    <xsd:attribute name="textsearch" type="xsd:boolean" use="optional" />
    </xsd:complexType>
   </xsd:element>
  </xsl:for-each>
