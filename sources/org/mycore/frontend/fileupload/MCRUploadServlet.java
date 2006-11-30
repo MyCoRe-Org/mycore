@@ -254,15 +254,14 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
 
             Element uploads = sub.getXML().getRootElement();
             List paths = uploads.getChildren("path");
-            List files = sub.getFiles();
 
-            if ((files != null) && (files.size() >= 0)) {
-                int numFiles = files.size();
+            if ((paths != null) && (paths.size() >= 0)) {
+                int numFiles = paths.size();
                 LOGGER.info("UploadHandler uploading " + numFiles + " file(s)");
                 handler.startUpload(numFiles);
 
                 for (int i = 0; i < numFiles; i++) {
-                    FileItem item = (FileItem) (files.get(i));
+                    FileItem item = sub.getFile(paths.get(i));
                     InputStream in = item.getInputStream();
                     String path = ((Element) (paths.get(i))).getTextTrim();
                     path = getFileName(path);
