@@ -563,10 +563,17 @@ public class MCRObjectCommands extends MCRAbstractCommands {
 
   /**
    * The method read a MCRObject and use the transformer to write the data to a file.
+   * They are any steps to handel errors and save the damaged data.
+   * <ul>
+   * <li> Read data for object ID in the MCRObject, add ACL's and store it as checked and transformed XML. Return true.</li>
+   * <li> If it can't find a transformer instance (no script file found) it store the checked data with ACL's native in the file. Warning and return true.</li>
+   * <li> If it get an exception while build the MCRObject, it try to read the XML blob and stor it without check and ACL's to the file. Warning and return true.</li>
+   * <li> If it get an exception while store the native data without check, ACÖ's and transformation it return a warning and false.</li>
+   * </ul>
    * @param dir the file instance to store
    * @param trans the XML transformer
    * @param nid the MCRObjectID
-   * @return true if the store was okay, else return false
+   * @return true if the store was okay (see description), else return false
    * @throws FileNotFoundException
    * @throws TransformerException
    * @throws IOException
@@ -574,6 +581,8 @@ public class MCRObjectCommands extends MCRAbstractCommands {
   private static final boolean exportMCRObject(File dir, Transformer trans, MCRObjectID nid) throws FileNotFoundException, TransformerException, IOException {
     MCRObject obj = new MCRObject();
     Document xml = null;
+    File xmlOutput = new File(dir, nid.toString() + ".xml");
+    FileOutputStream out = new FileOutputStream(xmlOutput);
 
     try {
       // if object doesn't exist - no exception is catched!
@@ -584,22 +593,32 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         obj.getService().addRule((String) l.get(i), rule);
       }
       xml = obj.createXML();
+      if (trans != null) {
+          StreamResult sr = new StreamResult(out);
+          trans.transform(new org.jdom.transform.JDOMSource(xml), sr);
+          LOGGER.info("Object " + nid.toString() + " is complete exported to " + xmlOutput.getCanonicalPath() + ".");
+          return true;
+        } else {
+          new org.jdom.output.XMLOutputter().output(xml, out);
+          out.flush();
+          out.close();
+          LOGGER.warn("Object " + nid.toString() + " is exported without transformation to " + xmlOutput.getCanonicalPath() + ".");
+          return true;
+        }
     } catch (MCRException ex) {
-      return false;
+        byte[] bxml = null;
+        try {
+            bxml = obj.receiveXMLFromDatastore(nid);
+            xml = MCRXMLHelper.parseXML(bxml,false);
+            out.write(bxml);
+            out.flush();
+            LOGGER.warn("Object " + nid.toString() + " is native exported with damaged data to " + xmlOutput.getCanonicalPath() + ".");
+            return true;
+        } catch (Exception e) {
+            LOGGER.warn("Object " + nid.toString() + " can't find or store to " + xmlOutput.getCanonicalPath() + ".");
+        }
     }
-
-    File xmlOutput = new File(dir, nid.toString() + ".xml");
-    FileOutputStream out = new FileOutputStream(xmlOutput);
-    if (trans != null) {
-      StreamResult sr = new StreamResult(out);
-      trans.transform(new org.jdom.transform.JDOMSource(xml), sr);
-    } else {
-      new org.jdom.output.XMLOutputter().output(xml, out);
-      out.flush();
-      out.close();
-    }
-    LOGGER.info("Object " + nid.toString() + " saved to " + xmlOutput.getCanonicalPath() + ".");
-    return true;
+  return false;
   }
 
   /**
