@@ -259,11 +259,13 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
                 int numFiles = paths.size();
                 LOGGER.info("UploadHandler uploading " + numFiles + " file(s)");
                 handler.startUpload(numFiles);
-
                 for (int i = 0; i < numFiles; i++) {
                     FileItem item = sub.getFile(paths.get(i));
                     InputStream in = item.getInputStream();
                     String path = ((Element) (paths.get(i))).getTextTrim();
+                    path = getFileName(path);
+
+                    LOGGER.info("UploadServlet uploading " + path);
                     if (path.toLowerCase().endsWith(".zip")) {
                         uploadZipFile(handler, in);
                     } else
