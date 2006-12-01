@@ -29,12 +29,12 @@ import org.mycore.services.fieldquery.MCRSortBy;
 public class MCRIndexBrowserData {
     protected static Logger logger = Logger.getLogger(MCRIndexBrowserData.class);
     
-    private static final String INDEX_KEY = "MCRIndexBrowserData.list";
-    private static final String QUERY_KEY = "MCRIndexBrowserData.query";
+    protected static final String PREFIX = "MCRIndexBrowserData.";
+    protected static final String INDEX_KEY = PREFIX + "list";
+    protected static final String QUERY_KEY = PREFIX + "query";
     
     private static final long serialVersionUID = 1L;
 
-    // private static MCRCache ll1Cache = new MCRCache(500);
     private LinkedList<String[]> ll1 = new LinkedList<String[]>();
 
     private MyBrowseData br = new MyBrowseData();
@@ -162,14 +162,14 @@ public class MCRIndexBrowserData {
         ic.set(br.index);
         Element results = buildPageElement();
         int numRows = 0;
-        String cacheKey =br.index + "##" + br.search;
-        ll1 = (LinkedList<String[]>) (getCache(INDEX_KEY).get(cacheKey));
+        String cacheKey = br.index + "##" + br.search;
+        ll1 = (LinkedList<String[]>) (getCache(cacheKey).get(INDEX_KEY));
 		
         // first create all listitems
         if ( ll1 == null || ll1.isEmpty() ) {
              numRows = createLinkedListfromSearch();
-             getCache(INDEX_KEY).put(cacheKey, ll1);
-             getCache(QUERY_KEY).put(cacheKey, myQuery);
+             getCache(cacheKey).put(INDEX_KEY, ll1);
+             getCache(cacheKey).put(QUERY_KEY, myQuery);
              // for further search and research (by refine and other posibilities the query must be in the Cache
              MCRSearchServlet.getCache(MCRSearchServlet.getResultsKey()).put(mcrResult.getID(), mcrResult);
              MCRSearchServlet.getCache(MCRSearchServlet.getQueriesKey()).put(mcrResult.getID(), myQuery);
@@ -178,7 +178,7 @@ public class MCRIndexBrowserData {
              
         } else {
         	numRows = ll1.size();
-        	myQuery = (MCRQuery) getCache(QUERY_KEY).get(cacheKey);       	
+        	myQuery = (MCRQuery) getCache(cacheKey).get(QUERY_KEY);       	
         }
         // resort it for german ...
         // sortLinkedListForGerman();
@@ -492,13 +492,29 @@ public class MCRIndexBrowserData {
     }
 
     public static MCRCache getCache(String key) {
+    	key= PREFIX +  key;
         MCRCache c = (MCRCache) MCRSessionMgr.getCurrentSession().get(key);
         if (c == null) {
+            logger.debug("Create new IndexBrowserCache with KEY: " + key );
             c = new MCRCache(5);
             MCRSessionMgr.getCurrentSession().put(key, c);
         }
         return c;
     }
+    
+    public static void removeAllCachesStartsWithKey(String key) {
+    	key= PREFIX +  key;
+        Iterator iC = MCRSessionMgr.getCurrentSession().getObjectsKeyList();
+        while ( iC.hasNext()){
+        	String nextKey = (String) iC.next();
+        	if ( nextKey.startsWith(key)) {
+	             logger.debug("Remove IndexBrowserCache with KEY" + nextKey );
+	        	((MCRCache)MCRSessionMgr.getCurrentSession().get(nextKey)).remove(INDEX_KEY);
+	        	((MCRCache)MCRSessionMgr.getCurrentSession().get(nextKey)).remove(QUERY_KEY);
+        	}
+        }
+    }
+    
 
     /**
     private void sortLinkedListForGerman() {
