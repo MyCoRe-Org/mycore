@@ -277,7 +277,6 @@ abstract public class MCRCheckDataBase extends MCRCheckBase {
         }
 
         // restart editor
-        job.getRequest().setAttribute("XSL.Style", lang);
         getLayoutService().doLayout(job.getRequest(), job.getResponse(), jdom);
     }
 
