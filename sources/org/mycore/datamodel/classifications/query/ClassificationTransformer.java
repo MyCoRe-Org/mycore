@@ -45,6 +45,8 @@ public class ClassificationTransformer {
 
     private static final String STANDARD_LABEL = "{text}";
 
+    private static final Namespace XLINK_NAMESPACE = Namespace.getNamespace("xlink", MCRDefaults.XLINK_URL);
+
     /**
      * transforms a <code>Classification</code> into a MCR Classification.
      * 
@@ -96,6 +98,7 @@ public class ClassificationTransformer {
             Document cd = new Document(new Element("mycoreclass"));
             cd.getRootElement().setAttribute("noNamespaceSchemaLocation", "MCRClassification.xsd", Namespace.getNamespace("xsi", MCRDefaults.XSI_URL));
             cd.getRootElement().setAttribute("ID", cl.getId());
+            cd.getRootElement().addNamespaceDeclaration(XLINK_NAMESPACE);
             Iterator it = cl.getLabels().iterator();
             while (it.hasNext()) {
                 // add Labels
@@ -136,12 +139,32 @@ public class ClassificationTransformer {
                 // add labels
                 ce.addContent(getElement((Label) it.next()));
             }
+            if (category.getLink()!=null){
+                ce.addContent(getElement(category.getLink()));
+            }
             it = category.getCatgegories().iterator();
             while (it.hasNext()) {
                 // add child categories
                 ce.addContent(getElement((Category) it.next(),withCounter));
             }
             return ce;
+        }
+        
+        static Element getElement(Link link){
+            Element le = new Element ("url");
+            if (link.getHref()!=null){
+                le.setAttribute("href", link.getHref(), XLINK_NAMESPACE);
+            }
+            if (link.getLabel()!=null){
+                le.setAttribute("label", link.getLabel(), XLINK_NAMESPACE);
+            }
+            if (link.getTitle()!=null){
+                le.setAttribute("title", link.getTitle(), XLINK_NAMESPACE);
+            }
+            if (link.getType()!=null){
+                le.setAttribute("type", link.getType(), XLINK_NAMESPACE);
+            }
+            return le;
         }
 
         static boolean stringNotEmpty(String test) {

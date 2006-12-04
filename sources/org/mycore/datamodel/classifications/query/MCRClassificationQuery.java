@@ -37,6 +37,7 @@ import org.jdom.Namespace;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 
+import org.mycore.common.MCRDefaults;
 import org.mycore.datamodel.classifications.MCRCategoryItem;
 import org.mycore.datamodel.classifications.MCRClassification;
 import org.mycore.datamodel.classifications.MCRClassificationItem;
@@ -51,6 +52,8 @@ import org.mycore.datamodel.metadata.MCRLinkTableManager;
 public class MCRClassificationQuery {
 
     private static final Logger LOGGER = Logger.getLogger(MCRClassificationQuery.class);
+    
+    private static final Namespace XLINK_NAMESPACE = Namespace.getNamespace("xlink", MCRDefaults.XLINK_URL);
 
     /**
      * returns a classification as POJO.
@@ -142,8 +145,9 @@ public class MCRClassificationQuery {
 
     public static void main(String[] arg) throws IOException {
         boolean withCounter = true;
-        Classification c = MCRClassificationQuery.getClassification(arg[0], 1, withCounter);
+        Classification c = MCRClassificationQuery.getClassification(arg[0], -1, withCounter);
         MainHelper.print(c, 0);
+        MainHelper.print(ClassificationTransformer.getMetaDataDocument(c));
         c = MCRClassificationQuery.getClassification(arg[0], arg[1], 0, withCounter);
         MainHelper.print(c, 0);
         Document doc = ClassificationTransformer.getMetaDataDocument(c);
@@ -264,6 +268,10 @@ public class MCRClassificationQuery {
             Category c = new Category();
             c.setId(e.getAttributeValue("ID"));
             c.getLabels().addAll(LabelFactory.getLabels(e.getChildren("label")));
+            final Element url = e.getChild("url");
+            if (url!=null){
+                c.setLink(LinkFactory.getLink(url));
+            }
             return c;
         }
 
@@ -271,6 +279,10 @@ public class MCRClassificationQuery {
             Category c = new Category();
             c.setId(i.getID());
             c.getLabels().addAll(LabelFactory.getLabels(i.getLangArray(), i.getTextArray(), i.getDescriptionArray()));
+            if (i.getURL().length()>0){
+                c.setLink(LinkFactory.getLink(null, i.getURL(), null, null));
+               
+            }
             return c;
         }
     }
@@ -304,6 +316,24 @@ public class MCRClassificationQuery {
             }
             return returns;
         }
+    }
+    
+    private static class LinkFactory {
+
+        static Link getLink(Element e) {
+            return getLink(e.getAttributeValue("type", XLINK_NAMESPACE), e.getAttributeValue("href", XLINK_NAMESPACE), e.getAttributeValue("title",
+                    XLINK_NAMESPACE), e.getAttributeValue("label", XLINK_NAMESPACE));
+        }
+
+        static Link getLink(String type, String href, String title, String label) {
+            Link link = new Link();
+            link.setType(type);
+            link.setHref(href);
+            link.setTitle(title);
+            link.setLabel(label);
+            return link;
+        }
+
     }
 
     /**

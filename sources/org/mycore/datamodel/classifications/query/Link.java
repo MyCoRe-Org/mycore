@@ -1,9 +1,9 @@
-/*
+/**
  * $RCSfile$
  * $Revision$ $Date$
  *
- * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
+ * This file is part of ** M y C o R e **
+ * Visit our homepage at http://www.mycore.de/ for details.
  *
  * This program is free software; you can use it, redistribute it
  * and / or modify it under the terms of the GNU General Public License
@@ -16,11 +16,11 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program, in a file called gpl.txt or license.txt.
+ * along with this program, normally in the file license.txt.
  * If not, write to the Free Software Foundation Inc.,
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
- */
-
+ *
+ **/
 package org.mycore.datamodel.classifications.query;
 
 /**
@@ -29,36 +29,40 @@ package org.mycore.datamodel.classifications.query;
  * 
  * @version $Revision$ $Date$
  */
-public class Category extends ClassificationObject {
-
-    private int numberOfObjects;
-
-    private String classID;
+public class Link {
     
-    private Link link;
+    String type,href,title, label;
 
-    public Link getLink() {
-        return link;
+    public String getHref() {
+        return href;
     }
 
-    public void setLink(Link link) {
-        this.link = link;
+    public void setHref(String href) {
+        this.href = href;
     }
 
-    public String getClassID() {
-        return classID;
+    public String getLabel() {
+        return label;
     }
 
-    public void setClassID(String classID) {
-        this.classID = classID;
+    public void setLabel(String label) {
+        this.label = label;
     }
 
-    public int getNumberOfObjects() {
-        return numberOfObjects;
+    public String getTitle() {
+        return title;
     }
 
-    public void setNumberOfObjects(int numberOfObjects) {
-        this.numberOfObjects = numberOfObjects;
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 
 }
