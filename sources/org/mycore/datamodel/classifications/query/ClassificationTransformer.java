@@ -25,6 +25,7 @@ package org.mycore.datamodel.classifications.query;
 
 import static org.jdom.Namespace.XML_NAMESPACE;
 import static org.mycore.common.MCRConstants.XSI_NAMESPACE;
+import static org.mycore.common.MCRConstants.XLINK_NAMESPACE;
 
 import java.util.Arrays;
 import java.util.Comparator;
@@ -111,6 +112,7 @@ public class ClassificationTransformer {
             Document cd = new Document(new Element("mycoreclass"));
             cd.getRootElement().setAttribute("noNamespaceSchemaLocation", "MCRClassification.xsd", XSI_NAMESPACE);
             cd.getRootElement().setAttribute("ID", cl.getId());
+            cd.getRootElement().addNamespaceDeclaration(XLINK_NAMESPACE);
             for (Label label : cl.getLabels()) {
                 cd.getRootElement().addContent(getElement(label));
             }
@@ -145,10 +147,30 @@ public class ClassificationTransformer {
             for (Label label : category.getLabels()) {
                 ce.addContent(getElement(label));
             }
+            if (category.getLink()!=null){
+                ce.addContent(getElement(category.getLink()));
+            }
             for (Category cat : category.getCategories()) {
                 ce.addContent(getElement(cat, withCounter));
             }
             return ce;
+        }
+        
+        static Element getElement(Link link){
+            Element le = new Element ("url");
+            if (link.getHref()!=null){
+                le.setAttribute("href", link.getHref(), XLINK_NAMESPACE);
+            }
+            if (link.getLabel()!=null){
+                le.setAttribute("label", link.getLabel(), XLINK_NAMESPACE);
+            }
+            if (link.getTitle()!=null){
+                le.setAttribute("title", link.getTitle(), XLINK_NAMESPACE);
+            }
+            if (link.getType()!=null){
+                le.setAttribute("type", link.getType(), XLINK_NAMESPACE);
+            }
+            return le;
         }
 
         static boolean stringNotEmpty(String test) {

@@ -23,6 +23,8 @@
 
 package org.mycore.datamodel.classifications.query;
 
+import static org.mycore.common.MCRConstants.XLINK_NAMESPACE;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -37,6 +39,7 @@ import org.jdom.Namespace;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 
+import org.mycore.common.MCRUtils;
 import org.mycore.datamodel.classifications.MCRCategoryItem;
 import org.mycore.datamodel.classifications.MCRClassification;
 import org.mycore.datamodel.classifications.MCRClassificationItem;
@@ -142,19 +145,25 @@ public class MCRClassificationQuery {
 
     public static void main(String[] arg) {
         boolean withCounter = true;
-        Classification c = MCRClassificationQuery.getClassification(arg[0], 1, withCounter);
+        Classification c = MCRClassificationQuery.getClassification(arg[0], -1, withCounter);
         MainHelper.print(c, 0);
-        c = MCRClassificationQuery.getClassification(arg[0], arg[1], 0, withCounter);
-        MainHelper.print(c, 0);
-        Document doc = ClassificationTransformer.getMetaDataDocument(c);
-        MainHelper.print(doc);
-        doc = ClassificationTransformer.getEditorDocument(c, true);
-        MainHelper.print(doc);
-        doc = MCRClassification.receiveClassificationAsJDOM(arg[0]);
-        MainHelper.print(doc);
-        c = MCRClassificationQuery.getClassificationHierarchie(arg[0], arg[1], -1, withCounter);
-        doc = ClassificationTransformer.getMetaDataDocument(c);
-        MainHelper.print(doc);
+        try {
+            MCRUtils.writeJDOMToSysout(ClassificationTransformer.getMetaDataDocument(c));
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+//        c = MCRClassificationQuery.getClassification(arg[0], arg[1], 0, withCounter);
+//        MainHelper.print(c, 0);
+//        Document doc = ClassificationTransformer.getMetaDataDocument(c);
+//        MainHelper.print(doc);
+//        doc = ClassificationTransformer.getEditorDocument(c, true);
+//        MainHelper.print(doc);
+//        doc = MCRClassification.receiveClassificationAsJDOM(arg[0]);
+//        MainHelper.print(doc);
+//        c = MCRClassificationQuery.getClassificationHierarchie(arg[0], arg[1], -1, withCounter);
+//        doc = ClassificationTransformer.getMetaDataDocument(c);
+//        MainHelper.print(doc);
     }
 
     /**
@@ -267,6 +276,10 @@ public class MCRClassificationQuery {
             Category c = new Category();
             c.setId(e.getAttributeValue("ID"));
             c.getLabels().addAll(LabelFactory.getLabels(e.getChildren("label")));
+            final Element url = e.getChild("url");
+            if (url!=null){
+                c.setLink(LinkFactory.getLink(url));
+            }
             return c;
         }
 
@@ -274,6 +287,10 @@ public class MCRClassificationQuery {
             Category c = new Category();
             c.setId(i.getID());
             c.getLabels().addAll(LabelFactory.getLabels(i.getLangArray(), i.getTextArray(), i.getDescriptionArray()));
+            if (i.getURL().length()>0){
+                c.setLink(LinkFactory.getLink(null, i.getURL(), null, null));
+               
+            }
             return c;
         }
     }
@@ -307,6 +324,24 @@ public class MCRClassificationQuery {
             }
             return returns;
         }
+    }
+    
+    private static class LinkFactory {
+
+        static Link getLink(Element e) {
+            return getLink(e.getAttributeValue("type", XLINK_NAMESPACE), e.getAttributeValue("href", XLINK_NAMESPACE), e.getAttributeValue("title",
+                    XLINK_NAMESPACE), e.getAttributeValue("label", XLINK_NAMESPACE));
+        }
+
+        static Link getLink(String type, String href, String title, String label) {
+            Link link = new Link();
+            link.setType(type);
+            link.setHref(href);
+            link.setTitle(title);
+            link.setLabel(label);
+            return link;
+        }
+
     }
 
     /**
