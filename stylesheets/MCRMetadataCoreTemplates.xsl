@@ -205,7 +205,7 @@
  <xsd:element name="{@name}" minOccurs="{@minOccurs}" maxOccurs="{@maxOccurs}">
   <xsd:complexType>
    <xsd:sequence>
-    <xsd:element name="text" type="xsd:string" minOccurs='1' maxOccurs='1'/>
+    <xsd:element name="text" type="xsd:string" minOccurs='0' maxOccurs='1'/>
     <xsd:element name="von"  type="xsd:string" minOccurs='0' maxOccurs='1'/>
     <xsd:element name="ivon"  type="xsd:integer" minOccurs='0' maxOccurs='1'/>
     <xsd:element name="bis"  type="xsd:string" minOccurs='0' maxOccurs='1'/>
