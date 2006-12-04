@@ -116,9 +116,6 @@ public class ClassificationTransformer {
             }
             Element categories = new Element("categories");
             cd.getRootElement().addContent(categories);
-            for (Label label : cl.getLabels()) {
-                cd.getRootElement().addContent(getElement(label));
-            }
             for (Category category : cl.getCategories()) {
                 categories.addContent(getElement(category, cl.isCounterEnabled()));
             }
