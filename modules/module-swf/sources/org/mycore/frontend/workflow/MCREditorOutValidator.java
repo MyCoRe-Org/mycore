@@ -265,10 +265,11 @@ public class MCREditorOutValidator {
         if (href == null) {
             return false;
         }
-        if (datasubtag.getAttribute("type") != null) {
+        if (datasubtag.getAttribute("xtype") != null) {
+            datasubtag.getAttribute("xtype").setNamespace(XLINK_NAMESPACE).setName("type");
+        } else if (datasubtag.getAttribute("type") != null) {
             datasubtag.getAttribute("type").setNamespace(XLINK_NAMESPACE);
         }
-
         if (datasubtag.getAttribute("href") != null) {
             datasubtag.getAttribute("href").setNamespace(XLINK_NAMESPACE);
         }
