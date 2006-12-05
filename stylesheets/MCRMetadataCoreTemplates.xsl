@@ -88,10 +88,12 @@
 <xsl:template match="mcrmetaxml">
 <xsd:sequence>
  <xsd:element name="{@name}" minOccurs="{@minOccurs}" maxOccurs="{@maxOccurs}">
-   <xsd:complexType>
-    <xsd:sequence>
-     <xsd:any processContents="skip"/>
+   <xsd:complexType mixed="true">
+    <xsd:sequence maxOccurs="unbounded">
+     <xsd:any namespace="##any" minOccurs="0" processContents="skip"/>
     </xsd:sequence>
+    <xsd:attribute name="type" use="optional" type="mcrdefaulttype" />
+    <xsd:attribute name="inherited" use="optional" type="xsd:integer" />
    </xsd:complexType>
  </xsd:element>
 </xsd:sequence>
