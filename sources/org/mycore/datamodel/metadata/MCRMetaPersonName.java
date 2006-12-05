@@ -34,7 +34,7 @@ import org.mycore.common.MCRException;
  * @author J. Vogler
  * @version $Revision$ $Date$
  */
-final public class MCRMetaPersonName extends MCRMetaDefault implements MCRMetaInterface {
+final public class MCRMetaPersonName extends MCRMetaDefault {
     // MetaPerson data
     private String firstname;
 
@@ -267,7 +267,7 @@ final public class MCRMetaPersonName extends MCRMetaDefault implements MCRMetaIn
 
         org.jdom.Element elm = new org.jdom.Element(subtag);
         elm.setAttribute("lang", lang, Namespace.XML_NAMESPACE);
-        elm.setAttribute("inherited", (new Integer(inherited)).toString());
+        elm.setAttribute("inherited", Integer.toString(inherited));
 
         if ((type != null) && ((type = type.trim()).length() != 0)) {
             elm.setAttribute("type", type);
@@ -302,27 +302,6 @@ final public class MCRMetaPersonName extends MCRMetaDefault implements MCRMetaIn
         }
 
         return elm;
-    }
-
-    /**
-     * This methode create a String for all text searchable data in this
-     * instance.
-     * 
-     * @param textsearch
-     *            true if the data should text searchable
-     * @exception MCRException
-     *                if the content of this class is not valid
-     * @return an empty String, because the content is not text searchable.
-     */
-    public final String createTextSearch(boolean textsearch) throws MCRException {
-        if (textsearch) {
-            StringBuffer sb = new StringBuffer(128);
-            sb.append(academic).append(' ').append(peerage).append(' ').append(firstname).append(' ').append(prefix).append(' ').append(surname).append(NL);
-
-            return sb.toString();
-        }
-
-        return "";
     }
 
     /**

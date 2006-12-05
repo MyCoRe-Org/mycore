@@ -34,7 +34,7 @@ import org.mycore.common.MCRException;
  * @author Jens Kupferschmidt
  * @version $Revision$ $Date$
  */
-public class MCRMetaAccessRule extends MCRMetaDefault implements MCRMetaInterface {
+public class MCRMetaAccessRule extends MCRMetaDefault {
     // MCRMetaAccessRule data
     protected org.jdom.Element condition;
 
@@ -196,7 +196,7 @@ public class MCRMetaAccessRule extends MCRMetaDefault implements MCRMetaInterfac
         }
         org.jdom.Element elm = new org.jdom.Element(subtag);
         elm.setAttribute("lang", lang, Namespace.XML_NAMESPACE);
-        elm.setAttribute("inherited", (new Integer(inherited)).toString());
+        elm.setAttribute("inherited", Integer.toString(inherited));
         if ((permission != null) && ((permission = permission.trim()).length() != 0)) {
             elm.setAttribute("permission", permission);
         }
@@ -205,20 +205,6 @@ public class MCRMetaAccessRule extends MCRMetaDefault implements MCRMetaInterfac
         }
         elm.addContent(condition);
         return elm;
-    }
-
-    /**
-     * This methode create a String for all text searchable data in this
-     * instance.
-     * 
-     * @param textsearch
-     *            true if the data should text searchable
-     * @exception MCRException
-     *                if the content of this class is not valid
-     * @return a String with the text value
-     */
-    public String createTextSearch(boolean textsearch) throws MCRException {
-        return "";
     }
 
     /**

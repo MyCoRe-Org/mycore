@@ -40,8 +40,9 @@ import org.mycore.common.MCRUtils;
  * 
  * @author Jens Kupferschmidt
  * @version $Revision$ $Date$
+ * @deprecated use MCRMetaISO8601Date
  */
-final public class MCRMetaDate extends MCRMetaDefault implements MCRMetaInterface {
+final public class MCRMetaDate extends MCRMetaDefault {
     // common data
     // MetaDate data
     private GregorianCalendar date;
@@ -264,20 +265,6 @@ final public class MCRMetaDate extends MCRMetaDefault implements MCRMetaInterfac
         elm.addContent(getDateToString());
 
         return elm;
-    }
-
-    /**
-     * This methode create a String for all text searchable data in this
-     * instance.
-     * 
-     * @param textsearch
-     *            true if the data should text searchable
-     * @exception MCRException
-     *                if the content of this class is not valid
-     * @return an empty String, because the content is not text searchable.
-     */
-    public final String createTextSearch(boolean textsearch) throws MCRException {
-        return "";
     }
 
     /**

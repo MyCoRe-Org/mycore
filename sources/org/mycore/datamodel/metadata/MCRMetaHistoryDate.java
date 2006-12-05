@@ -37,7 +37,7 @@ import org.mycore.common.MCRException;
  * @author Juergen Vogler
  * @version $Revision$ $Date$
  */
-final public class MCRMetaHistoryDate extends MCRMetaDefault implements MCRMetaInterface {
+final public class MCRMetaHistoryDate extends MCRMetaDefault {
     // MetaHistoryDate data
     private GregorianCalendar default_von;
 
@@ -522,7 +522,7 @@ final public class MCRMetaHistoryDate extends MCRMetaDefault implements MCRMetaI
 
         org.jdom.Element elm = new org.jdom.Element(subtag);
         elm.setAttribute("lang", lang, org.jdom.Namespace.XML_NAMESPACE);
-        elm.setAttribute("inherited", (new Integer(inherited)).toString());
+        elm.setAttribute("inherited", Integer.toString(inherited));
 
         if ((type != null) && ((type = type.trim()).length() != 0)) {
             elm.setAttribute("type", type);
@@ -534,29 +534,15 @@ final public class MCRMetaHistoryDate extends MCRMetaDefault implements MCRMetaI
 
         if (von != null) {
             elm.addContent(new org.jdom.Element("von").addContent(getVonToString()));
-            elm.addContent(new org.jdom.Element("ivon").addContent((new Integer(ivon)).toString()));
+            elm.addContent(new org.jdom.Element("ivon").addContent(Integer.toString(ivon)));
         }
 
         if (bis != null) {
             elm.addContent(new org.jdom.Element("bis").addContent(getBisToString()));
-            elm.addContent(new org.jdom.Element("ibis").addContent((new Integer(ibis)).toString()));
+            elm.addContent(new org.jdom.Element("ibis").addContent(Integer.toString(ibis)));
         }
 
         return elm;
-    }
-
-    /**
-     * This methode create a String for all text searchable data in this
-     * instance.
-     * 
-     * @param textsearch
-     *            true if the data should text searchable
-     * @exception MCRException
-     *                if the content of this class is not valid
-     * @return an empty String, because the content is not text searchable.
-     */
-    public final String createTextSearch(boolean textsearch) throws MCRException {
-        return "";
     }
 
     /**

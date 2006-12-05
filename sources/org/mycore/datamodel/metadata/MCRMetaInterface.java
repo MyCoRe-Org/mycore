@@ -32,7 +32,7 @@ import org.mycore.common.MCRException;
  * @author Jens Kupferschmidt
  * @version $Revision$ $Date$
  */
-public interface MCRMetaInterface {
+public interface MCRMetaInterface extends Cloneable {
     /**
      * This method get the inherited element.
      * 
@@ -132,15 +132,6 @@ public interface MCRMetaInterface {
      * @return a JDOM Element with the XML data of the metadata part
      */
     public org.jdom.Element createXML() throws MCRException;
-
-    /**
-     * This abstract method create a String for the text searchable data.
-     * 
-     * @exception MCRException
-     *                if the content of this class is not valid
-     * @return a String with the text search data
-     */
-    public String createTextSearch(boolean textsearch) throws MCRException;
 
     /**
      * This methode check the validation of the content of this class.

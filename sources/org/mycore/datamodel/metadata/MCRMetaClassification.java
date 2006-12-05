@@ -39,7 +39,7 @@ import org.mycore.datamodel.classifications.MCRClassificationItem;
  * @author Jens Kupferschmidt
  * @version $Revision$ $Date$
  */
-public class MCRMetaClassification extends MCRMetaDefault implements MCRMetaInterface {
+public class MCRMetaClassification extends MCRMetaDefault {
     /** The length of the classification ID * */
     public static final int MAX_CLASSID_LENGTH = MCRObjectID.MAX_LENGTH;
 
@@ -178,25 +178,11 @@ public class MCRMetaClassification extends MCRMetaDefault implements MCRMetaInte
             elm.setAttribute("type", type);
         }
 
-        elm.setAttribute("inherited", (new Integer(inherited)).toString());
+        elm.setAttribute("inherited", Integer.toString(inherited));
         elm.setAttribute("classid", classid);
         elm.setAttribute("categid", categid);
 
         return elm;
-    }
-
-    /**
-     * This methode create a String for all text searchable data in this
-     * instance.
-     * 
-     * @param textsearch
-     *            true if the data should text searchable
-     * @exception MCRException
-     *                if the content of this class is not valid
-     * @return an empty String, because the content is not text searchable.
-     */
-    public String createTextSearch(boolean textsearch) throws MCRException {
-        return "";
     }
 
     /**

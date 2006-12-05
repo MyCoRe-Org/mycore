@@ -60,7 +60,7 @@ import org.mycore.common.MCRException;
  * @version $Revision$ $Date$
  * @since 1.3
  */
-public final class MCRMetaISO8601Date extends MCRMetaDefault implements MCRMetaInterface {
+public final class MCRMetaISO8601Date extends MCRMetaDefault {
 
     private Element export;
 
@@ -354,14 +354,6 @@ public final class MCRMetaISO8601Date extends MCRMetaDefault implements MCRMetaI
      */
     public IsoFormat getFormat() {
         return this.isoFormat;
-    }
-
-    /*
-     * 
-     * @see org.mycore.datamodel.metadata.MCRMetaDefault#createTextSearch(boolean)
-     */
-    public String createTextSearch(boolean textsearch) throws MCRException {
-        return "";
     }
 
     /**

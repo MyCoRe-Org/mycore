@@ -37,7 +37,7 @@ import org.mycore.common.MCRException;
  * @author Jens Kupferschmidt
  * @version $Revision$ $Date$
  */
-final public class MCRMetaIFS extends MCRMetaDefault implements MCRMetaInterface {
+final public class MCRMetaIFS extends MCRMetaDefault {
     // MCRMetaIFS data
     private String sourcepath;
 
@@ -182,20 +182,6 @@ final public class MCRMetaIFS extends MCRMetaDefault implements MCRMetaInterface
         elm.setAttribute("ifsid", ifsid);
 
         return elm;
-    }
-
-    /**
-     * This methode create a String for all text searchable data in this
-     * instance.
-     * 
-     * @param textsearch
-     *            true if the data should text searchable
-     * @exception MCRException
-     *                if the content of this class is not valid
-     * @return an empty String, because the content is not text searchable.
-     */
-    public final String createTextSearch(boolean textsearch) throws MCRException {
-        return "";
     }
 
     /**

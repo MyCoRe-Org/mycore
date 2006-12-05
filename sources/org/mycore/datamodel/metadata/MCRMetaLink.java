@@ -44,7 +44,7 @@ import org.mycore.common.MCRException;
  * @author Jens Kupferschmidt
  * @version $Revision$ $Date$
  */
-public class MCRMetaLink extends MCRMetaDefault implements MCRMetaInterface {
+public class MCRMetaLink extends MCRMetaDefault {
     /** The length of XLink:type * */
     public static final int MAX_XLINK_TYPE_LENGTH = 8;
 
@@ -324,7 +324,7 @@ public class MCRMetaLink extends MCRMetaDefault implements MCRMetaInterface {
         }
 
         org.jdom.Element elm = new org.jdom.Element(subtag);
-        elm.setAttribute("inherited", (new Integer(inherited)).toString());
+        elm.setAttribute("inherited", Integer.toString(inherited));
         elm.setAttribute("type", linktype, XLINK_NAMESPACE);
 
         if (linktype.equals("locator")) {
@@ -347,20 +347,6 @@ public class MCRMetaLink extends MCRMetaDefault implements MCRMetaInterface {
         }
 
         return elm;
-    }
-
-    /**
-     * This methode create a String for all text searchable data in this
-     * instance. Only the title string was returned.
-     * 
-     * @param textsearch
-     *            true if the data should text searchable
-     * @exception MCRException
-     *                if the content of this class is not valid
-     * @return an empty String, because the content is not text searchable.
-     */
-    public final String createTextSearch(boolean textsearch) throws MCRException {
-        return title;
     }
 
     /**

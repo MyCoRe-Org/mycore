@@ -26,7 +26,9 @@ package org.mycore.datamodel.metadata;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.jdom.Content;
 import org.jdom.Namespace;
+
 import org.mycore.common.MCRException;
 
 /**
@@ -34,13 +36,13 @@ import org.mycore.common.MCRException;
  * of a metadata object. The MCRMetaLangText class present a single item, which
  * has triples of a text and his corresponding language and optional a type.
  * 
+ * @author Thomas Scheffler (yagee)
  * @author Jens Kupferschmidt
  * @author Johannes Bühler
  * @version $Revision$ $Date$
  */
-public class MCRMetaXML extends MCRMetaDefault implements MCRMetaInterface {
-    // XML data list
-    protected ArrayList xmllist = null;
+public class MCRMetaXML extends MCRMetaDefault {
+    List<Content> content;
 
     /**
      * This is the constructor. <br>
@@ -48,81 +50,13 @@ public class MCRMetaXML extends MCRMetaDefault implements MCRMetaInterface {
      */
     public MCRMetaXML() {
         super();
-        xmllist = new ArrayList();
+    }
+    
+    public MCRMetaXML(String set_datapart, String set_subtag, String set_type, int set_inherited) throws MCRException {
+        super(set_datapart, set_subtag, null, set_type, set_inherited);
     }
 
-    /**
-     * This is the constructor. <br>
-     * The language element was set. If the value of <em>default_lang</em> is
-     * null, empty or false <b>en </b> was set. The subtag element was set to
-     * the value of <em>set_subtag<em>. If the value of <em>set_subtag</em>
-     * is null or empty an exception was throwed. The type element was set to
-     * the value of <em>set_type<em>, if it is null, an empty string was set
-     * to the type element. The xml element was set to the value of
-     * <em>set_xml<em>.
-     *
-     * @param set_datapart     the global part of the elements like 'metadata'
-     *                         or 'service'
-     * @param set_subtag       the name of the subtag
-     * @param default_lang     the default language
-     * @param set_type         the optional type string
-     * @param set_inherted     a value >= 0
-     * @param set_xml          a java.util.ArrayList of org.jdom.Element
-     * @exception MCRException if the set_subtag value is null or empty
-     */
-    public MCRMetaXML(String set_datapart, String set_subtag, String default_lang, String set_type, int set_inherted, ArrayList set_xml) throws MCRException {
-        super(set_datapart, set_subtag, default_lang, set_type, set_inherted);
 
-        if (set_xml != null) {
-            xmllist = set_xml;
-        }
-    }
-
-    /**
-     * This method set the java.util.List of org.jdom.Element
-     * 
-     * @param set_xml
-     *            the java.util.ArrayList of org.jdom.Element
-     */
-    public final void set(ArrayList set_xml) {
-        if (set_xml != null) {
-            xmllist = set_xml;
-        }
-    }
-
-    /**
-     * This method get the ArrayList of org.jdom.Element.
-     * 
-     * @return the ArrayList of org.jdom.Element
-     */
-    public final ArrayList get() {
-        return xmllist;
-    }
-
-    /**
-     * This method add a org.jdom.Element to the java.util.ArrayList.
-     * 
-     * @param set_xml
-     *            the XML stream as org.jdom.Element
-     */
-    public final void addElement(org.jdom.Element set_xml) {
-        if (set_xml != null) {
-            xmllist.add(set_xml.detach());
-        }
-    }
-
-    /**
-     * This method get org.jdom.Element with index i from the ArrayList.
-     * 
-     * @return the XML as org.jdom.Element
-     */
-    public final org.jdom.Element getElement(int i) {
-        if ((i < 0) || (i > xmllist.size())) {
-            return null;
-        }
-
-        return ((org.jdom.Element) xmllist.get(i));
-    }
 
     /**
      * This method read the XML input stream part from a DOM part for the
@@ -131,18 +65,11 @@ public class MCRMetaXML extends MCRMetaDefault implements MCRMetaInterface {
      * @param element
      *            a relevant JDOM element for the metadata
      */
+    @SuppressWarnings("unchecked")
     public void setFromDOM(org.jdom.Element element) {
         super.setFromDOM(element);
-
-        List temp = element.getChildren();
-
-        if (temp == null) {
-            return;
-        }
-
-        for (int i = 0; i < temp.size(); i++) {
-            xmllist.add(((org.jdom.Element) temp.get(i)).detach());
-        }
+        
+        this.content=element.cloneContent();
     }
 
     /**
@@ -161,30 +88,23 @@ public class MCRMetaXML extends MCRMetaDefault implements MCRMetaInterface {
 
         org.jdom.Element elm = new org.jdom.Element(subtag);
         elm.setAttribute("lang", lang, Namespace.XML_NAMESPACE);
-        elm.setAttribute("inherited", (new Integer(inherited)).toString());
+        elm.setAttribute("inherited", Integer.toString(inherited));
 
         if ((type != null) && ((type = type.trim()).length() != 0)) {
             elm.setAttribute("type", type);
         }
-
-        for (int i = 0; i < xmllist.size(); i++) {
-            elm.addContent(((org.jdom.Element) xmllist.get(i)).detach());
-        }
+        List<Content> addedContent=new ArrayList<Content>(this.content.size());
+        cloneListContent(addedContent, this.content);
+        elm.addContent(addedContent);
 
         return elm;
     }
-
-    /**
-     * This methode create an empty String for all cases
-     * 
-     * @param textsearch
-     *            true if the data should text searchable
-     * @exception MCRException
-     *                if the content of this class is not valid
-     * @return a String with the text value
-     */
-    public String createTextSearch(boolean textsearch) throws MCRException {
-        return "";
+    
+    private static void cloneListContent(List<Content> dest, List<Content> source){
+        dest.clear();
+        for (Content c:source){
+            dest.add((Content)c.clone());
+        }
     }
 
     /**
@@ -203,7 +123,7 @@ public class MCRMetaXML extends MCRMetaDefault implements MCRMetaInterface {
             return false;
         }
 
-        if (xmllist == null) {
+        if (content == null) {
             return false;
         }
 
@@ -214,18 +134,8 @@ public class MCRMetaXML extends MCRMetaDefault implements MCRMetaInterface {
      * This method make a clone of this class.
      */
     public Object clone() {
-        MCRMetaXML out = null;
-
-        try {
-            out = (MCRMetaXML) super.clone();
-        } catch (CloneNotSupportedException e) {
-            LOGGER.warn(new StringBuffer(MCRMetaXML.class.getName()).append(" could not be cloned."), e);
-
-            return null;
-        }
-
-        out.xmllist = (ArrayList) xmllist.clone();
-
+        MCRMetaXML out = new MCRMetaXML();
+        out.setFromDOM(createXML());
         return out;
     }
 
@@ -235,6 +145,6 @@ public class MCRMetaXML extends MCRMetaDefault implements MCRMetaInterface {
     public void debug() {
         LOGGER.debug("Start Class : MCRMetaXML");
         super.debugDefault();
-        LOGGER.debug("ArrayList size()   = \n" + xmllist.size());
+        LOGGER.debug("Number of contents  = \n" + content.size());
     }
 }

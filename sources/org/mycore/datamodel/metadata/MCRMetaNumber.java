@@ -42,7 +42,7 @@ import org.mycore.common.MCRException;
  * @author Jens Kupferschmidt
  * @version $Revision$ $Date$
  */
-final public class MCRMetaNumber extends MCRMetaDefault implements MCRMetaInterface {
+final public class MCRMetaNumber extends MCRMetaDefault {
     /** The length of the attributes * */
     public static final int MAX_DIMENSION_LENGTH = 128;
 
@@ -350,7 +350,7 @@ final public class MCRMetaNumber extends MCRMetaDefault implements MCRMetaInterf
 
         org.jdom.Element elm = new org.jdom.Element(subtag);
         elm.setAttribute("lang", lang, Namespace.XML_NAMESPACE);
-        elm.setAttribute("inherited", (new Integer(inherited)).toString());
+        elm.setAttribute("inherited", Integer.toString(inherited));
 
         if ((type != null) && ((type = type.trim()).length() != 0)) {
             elm.setAttribute("type", type);
@@ -367,20 +367,6 @@ final public class MCRMetaNumber extends MCRMetaDefault implements MCRMetaInterf
         elm.addContent(getNumberToString());
 
         return elm;
-    }
-
-    /**
-     * This methode create a String for all text searchable data in this
-     * instance.
-     * 
-     * @param textsearch
-     *            true if the data should text searchable
-     * @exception MCRException
-     *                if the content of this class is not valid
-     * @return an empty String, because the content is not text searchable.
-     */
-    public final String createTextSearch(boolean textsearch) throws MCRException {
-        return "";
     }
 
     /**

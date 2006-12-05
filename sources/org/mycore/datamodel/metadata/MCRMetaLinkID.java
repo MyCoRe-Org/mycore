@@ -43,7 +43,7 @@ import org.mycore.common.MCRException;
  * @author Jens Kupferschmidt
  * @version $Revision$ $Date$
  */
-final public class MCRMetaLinkID extends MCRMetaLink implements MCRMetaInterface {
+final public class MCRMetaLinkID extends MCRMetaLink {
     /**
      * This is the constructor. <br>
      * The language element was set to <b>en </b>. All other elemnts was set to

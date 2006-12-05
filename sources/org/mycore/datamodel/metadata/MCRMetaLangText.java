@@ -34,7 +34,7 @@ import org.mycore.common.MCRException;
  * @author Jens Kupferschmidt
  * @version $Revision$ $Date$
  */
-public class MCRMetaLangText extends MCRMetaDefault implements MCRMetaInterface {
+public class MCRMetaLangText extends MCRMetaDefault {
     // MetaLangText data
     protected String text;
 
@@ -198,7 +198,7 @@ public class MCRMetaLangText extends MCRMetaDefault implements MCRMetaInterface 
 
         org.jdom.Element elm = new org.jdom.Element(subtag);
         elm.setAttribute("lang", lang, Namespace.XML_NAMESPACE);
-        elm.setAttribute("inherited", (new Integer(inherited)).toString());
+        elm.setAttribute("inherited", Integer.toString(inherited));
 
         if ((form != null) && ((form = form.trim()).length() != 0)) {
             elm.setAttribute("form", form);
@@ -211,24 +211,6 @@ public class MCRMetaLangText extends MCRMetaDefault implements MCRMetaInterface 
         elm.addContent(text);
 
         return elm;
-    }
-
-    /**
-     * This methode create a String for all text searchable data in this
-     * instance.
-     * 
-     * @param textsearch
-     *            true if the data should text searchable
-     * @exception MCRException
-     *                if the content of this class is not valid
-     * @return a String with the text value
-     */
-    public String createTextSearch(boolean textsearch) throws MCRException {
-        if (textsearch) {
-            return text;
-        }
-
-        return "";
     }
 
     /**
