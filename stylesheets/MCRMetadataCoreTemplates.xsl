@@ -94,6 +94,7 @@
     </xsd:sequence>
     <xsd:attribute name="type" use="optional" type="mcrdefaulttype" />
     <xsd:attribute name="inherited" use="optional" type="xsd:integer" />
+    <xsd:attribute ref="xml:lang" use="optional" />
    </xsd:complexType>
  </xsd:element>
 </xsd:sequence>
