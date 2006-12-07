@@ -334,6 +334,7 @@ public class MCRServlet extends HttpServlet {
 
 		while (ex != null) {
 			Element exception = new Element("exception");
+            exception.setAttribute( "type", ex.getClass().getName() );
 			Element trace = new Element("trace");
 			Element message = new Element("message");
 			trace.setText(MCRException.getStackTraceAsString(ex));
