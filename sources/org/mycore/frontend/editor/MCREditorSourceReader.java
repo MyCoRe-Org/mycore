@@ -70,7 +70,13 @@ public class MCREditorSourceReader {
                 }
             }
         } else if ((source != null) && (source.getAttributeValue("url", "").trim().length() > 0)) {
-            url = source.getAttributeValue("url");
+            //start new session if token attribute is present
+            if (source.getAttributeValue("token")==null){
+                url = source.getAttributeValue("url");
+            } else {
+                //as there is no sessionId yet we can not replace token in url
+                url = null;
+            }
         }
 
         if ((url == null) || (url.trim().length() == 0)) {
