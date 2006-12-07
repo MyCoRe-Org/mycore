@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!-- ============================================== -->
-<!-- $Revision: 1.31 $ $Date: 2006-12-07 12:28:15 $ -->
+<!-- $Revision: 1.32 $ $Date: 2006-12-07 12:53:34 $ -->
 <!-- ============================================== -->
 
 <xsl:stylesheet
@@ -103,6 +103,7 @@
  <xsd:element name="{@name}" minOccurs="{@minOccurs}" maxOccurs="{@maxOccurs}">
    <xsd:complexType>
      <xsd:attribute name="inherited" use="optional" type="xsd:integer" />
+     <xsd:attribute name="type" use="optional" type="mcrdefaulttype" />
      <xsd:attribute ref="xlink:type" />
      <xsd:attribute ref="xlink:href" use="optional"/>
      <xsd:attribute ref="xlink:title" use="optional"/>
@@ -123,6 +124,7 @@
  <xsd:element name="{@name}" minOccurs="{@minOccurs}" maxOccurs="{@maxOccurs}">
    <xsd:complexType>
      <xsd:attribute name="inherited" use="optional" type="xsd:integer" />
+     <xsd:attribute name="type" use="optional" type="mcrdefaulttype" />
      <xsd:attribute ref="xlink:type" />
      <xsd:attribute ref="xlink:href" use="optional"/>
      <xsd:attribute ref="xlink:title" use="optional"/>

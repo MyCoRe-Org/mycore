@@ -280,7 +280,6 @@ public class MCRMetaLink extends MCRMetaDefault {
      */
     public void setFromDOM(org.jdom.Element element) throws MCRException {
         super.setFromDOM(element);
-        super.type = "";
 
         String temp = element.getAttributeValue("type", XLINK_NAMESPACE);
 
@@ -325,6 +324,9 @@ public class MCRMetaLink extends MCRMetaDefault {
 
         org.jdom.Element elm = new org.jdom.Element(subtag);
         elm.setAttribute("inherited", Integer.toString(inherited));
+        if ((type != null) && ((type = type.trim()).length() != 0)) {
+            elm.setAttribute("type", type);
+        }
         elm.setAttribute("type", linktype, XLINK_NAMESPACE);
 
         if (linktype.equals("locator")) {
