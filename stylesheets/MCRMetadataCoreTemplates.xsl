@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!-- ============================================== -->
-<!-- $Revision: 1.30 $ $Date: 2006-12-07 10:54:00 $ -->
+<!-- $Revision: 1.31 $ $Date: 2006-12-07 12:28:15 $ -->
 <!-- ============================================== -->
 
 <xsl:stylesheet
@@ -259,32 +259,36 @@
   fixed="MCRMetaNumber" />
 </xsl:template>
 
-<!-- Template for the metadata MCRMetaPerson -->
+<!-- Template for the metadata MCRMetaPersonName -->
 
-<xsl:template match="mcrmetaperson">
+<xsl:template match="mcrmetapersonname">
 <xsd:sequence>
  <xsd:element name="{@name}" minOccurs="{@minOccurs}" maxOccurs="{@maxOccurs}">
   <xsd:complexType>
-   <xsd:sequence>
-    <xsd:element name="firstname" type="xsd:string" minOccurs='0' 
+   <xsd:all>
+    <xsd:element name="firstname" type="xsd:string" minOccurs='0'
      maxOccurs='1'/>
-    <xsd:element name="callname" type="xsd:string" minOccurs='0' 
+    <xsd:element name="callname" type="xsd:string" minOccurs='0'
      maxOccurs='1'/>
-    <xsd:element name="surname" type="xsd:string" minOccurs='0' 
+    <xsd:element name="surname" type="xsd:string" minOccurs='1'
      maxOccurs='1'/>
-    <xsd:element name="academic" type="xsd:string" minOccurs='0' 
+    <xsd:element name="fullname" type="xsd:string" minOccurs='0'
      maxOccurs='1'/>
-    <xsd:element name="peerage" type="xsd:string" minOccurs='0' 
+    <xsd:element name="academic" type="xsd:string" minOccurs='0'
      maxOccurs='1'/>
-   </xsd:sequence>
+    <xsd:element name="peerage" type="xsd:string" minOccurs='0'
+     maxOccurs='1'/>
+    <xsd:element name="prefix" type="xsd:string" minOccurs='0'
+     maxOccurs='1'/>
+   </xsd:all>
    <xsd:attribute name="type" use="optional" type="mcrdefaulttype" />
    <xsd:attribute ref="xml:lang" />
    <xsd:attribute name="inherited" use="optional" type="xsd:integer" />
   </xsd:complexType>
  </xsd:element>
 </xsd:sequence>
-<xsd:attribute name="class" type="xsd:string" use="required" 
-  fixed="MCRMetaPerson"/>
+<xsd:attribute name="class" type="xsd:string" use="required"
+  fixed="MCRMetaPersonName"/>
 </xsl:template>
 
 <!-- Template for the metadata MCRMetaAddress -->
@@ -317,31 +321,31 @@
   fixed="MCRMetaAddress"/>
 </xsl:template>
 
-<!-- Template for the metadata MCRMetaCorporation -->
+<!-- Template for the metadata MCRMetaInstitutionName -->
 
-<xsl:template match="mcrmetacorporation">
+<xsl:template match="mcrmetainstitutionname">
 <xsd:sequence>
  <xsd:element name="{@name}" minOccurs="{@minOccurs}" maxOccurs="{@maxOccurs}">
   <xsd:complexType>
-   <xsd:sequence>
-    <xsd:element name="name" type="xsd:string" minOccurs='0' 
+   <xsd:all>
+    <xsd:element name="fullname" type="xsd:string" minOccurs='1'
      maxOccurs='1'/>
-    <xsd:element name="nickname" type="xsd:string" minOccurs='0' 
+    <xsd:element name="nickname" type="xsd:string" minOccurs='0'
      maxOccurs='1'/>
-    <xsd:element name="parent" type="xsd:string" minOccurs='0' 
+    <xsd:element name="property" type="xsd:string" minOccurs='0'
      maxOccurs='1'/>
-    <xsd:element name="property" type="xsd:string" minOccurs='0' 
-     maxOccurs='1'/>
-   </xsd:sequence>
+   </xsd:all>
    <xsd:attribute name="type" use="optional" type="mcrdefaulttype" />
    <xsd:attribute name="inherited" use="optional" type="xsd:integer" />
    <xsd:attribute ref="xml:lang" />
   </xsd:complexType>
  </xsd:element>
 </xsd:sequence>
-<xsd:attribute name="class" type="xsd:string" use="required" 
-  fixed="MCRMetaCorporation"/>
+<xsd:attribute name="class" type="xsd:string" use="required"
+  fixed="MCRMetaInstitutionName"/>
 </xsl:template>
+
+<!-- Template for the metadata MCRMetaBoolean -->
 
 <xsl:template match="mcrmetaboolean">
 <xsd:sequence>
