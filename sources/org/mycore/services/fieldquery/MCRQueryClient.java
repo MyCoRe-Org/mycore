@@ -47,7 +47,7 @@ public class MCRQueryClient {
     private final static Logger LOGGER = Logger.getLogger(MCRQueryClient.class);
 
     /** A list containing the aliases of all hosts */
-    public final static List ALL_HOSTS;
+    public final static List<String> ALL_HOSTS;
 
     /** A map from host alias to classes for access types */
     private static Properties accessclass = new Properties();
@@ -56,7 +56,7 @@ public class MCRQueryClient {
         // Read hosts.xml configuration file
         Element hosts = MCRURIResolver.instance().resolve("resource:hosts.xml");
 
-        ALL_HOSTS = new ArrayList();
+        ALL_HOSTS = new ArrayList<String>();
         List children = hosts.getChildren();
         for (int i = 0; i < children.size(); i++) {
             Element host = (Element) (children.get(i));

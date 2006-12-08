@@ -66,13 +66,13 @@ public class MCRHit {
     private String host = LOCAL;
 
     /** List of MCRFieldValue objects that are hit metadata */
-    private List metaData = new ArrayList();
+    private List<MCRFieldValue> metaData = new ArrayList<MCRFieldValue>();
 
     /** List of MCRFieldValue objects that are sort data */
-    private List sortData = new ArrayList();
+    private List<MCRFieldValue> sortData = new ArrayList<MCRFieldValue>();
 
     /** Map from field to field value, used for sorting */
-    private Map sortValues = new HashMap();
+    private Map<MCRFieldDef,String> sortValues = new HashMap<MCRFieldDef,String>();
 
     /**
      * Creates a new result hit with the given object ID
@@ -154,7 +154,7 @@ public class MCRHit {
             sortData.add(fieldValue);
             sortValues.put(field, value);
         } else if ("text name identifier".indexOf(field.getDataType()) >= 0) {
-            String oldValue = (String) (sortValues.get(field));
+            String oldValue = sortValues.get(field);
             String newValue = oldValue.concat(" ").concat(value);
             sortData.add(fieldValue);
             sortValues.put(field, newValue);
@@ -181,8 +181,8 @@ public class MCRHit {
      * @see MCRResults#sortBy(List)
      */
     int compareTo(MCRFieldDef field, MCRHit other) {
-        String va = (String) (this.sortValues.get(field));
-        String vb = (String) (other.sortValues.get(field));
+        String va = this.sortValues.get(field);
+        String vb = other.sortValues.get(field);
 
         if ((va == null) || (va.trim().length() == 0)) {
             return (((vb == null) || (vb.trim().length() == 0)) ? 0 : (-1));
@@ -235,7 +235,7 @@ public class MCRHit {
             eHit.addContent(eSort);
 
             for (int i = 0; i < sortData.size(); i++) {
-                MCRFieldValue fv = (MCRFieldValue) (sortData.get(i));
+                MCRFieldValue fv = sortData.get(i);
                 eSort.addContent(fv.buildXML());
             }
         }
@@ -244,7 +244,7 @@ public class MCRHit {
         int count = 0;
 
         for (int i = 0; i < metaData.size(); i++) {
-            MCRFieldValue fv = (MCRFieldValue) (metaData.get(i));
+            MCRFieldValue fv = metaData.get(i);
             if ((i == 0) || (fv == null)) {
                 if ((eMeta != null) && (count == 0))
                     continue;

@@ -52,13 +52,13 @@ import org.jdom.Element;
  */
 public class MCRResults {
     /** The list of MCRHit objects */
-    private ArrayList hits = new ArrayList();
+    private ArrayList<MCRHit> hits = new ArrayList<MCRHit>();
 
     /**
      * A map containing MCRHit IDs used for and/or operations on two different
      * MCRResult objects
      */
-    private HashMap map = new HashMap();
+    private HashMap<String,MCRHit> map = new HashMap<String,MCRHit>();
 
     /** If true, this results are already sorted */
     private boolean isSorted = false;
@@ -116,7 +116,7 @@ public class MCRResults {
      */
     public MCRHit getHit(int i) {
         if ((i >= 0) && (i < hits.size())) {
-            return (MCRHit) hits.get(i);
+            return hits.get(i);
         }
         return null;
     }
@@ -130,7 +130,7 @@ public class MCRResults {
      */
     private MCRHit getHit(String key) {
         if (map.containsKey(key)) {
-            return (MCRHit) (map.get(key));
+            return map.get(key);
         }
         return null;
     }
@@ -152,7 +152,7 @@ public class MCRResults {
      */
     public void cutResults(int maxResults) {
         while ((hits.size() > maxResults) && (maxResults > 0)) {
-            MCRHit hit = (MCRHit) (hits.remove(hits.size() - 1));
+            MCRHit hit = hits.remove(hits.size() - 1);
             map.remove(hit.getKey());
         }
     }
@@ -183,16 +183,13 @@ public class MCRResults {
      * @param sortByList
      *            a List of MCRSortBy objects
      */
-    public void sortBy(final List sortByList) {
-        Collections.sort(this.hits, new Comparator() {
-            public int compare(Object oa, Object ob) {
-                MCRHit a = (MCRHit) oa;
-                MCRHit b = (MCRHit) ob;
-
+    public void sortBy(final List<MCRSortBy> sortByList) {
+        Collections.sort(this.hits, new Comparator<MCRHit>() {
+            public int compare(MCRHit a, MCRHit b) {
                 int result = 0;
 
                 for (int i = 0; (result == 0) && (i < sortByList.size()); i++) {
-                    MCRSortBy sortBy = (MCRSortBy) (sortByList.get(i));
+                    MCRSortBy sortBy = sortByList.get(i);
                     result = a.compareTo(sortBy.getField(), b);
                     if (sortBy.getSortOrder() == MCRSortBy.DESCENDING) {
                         result *= -1;
@@ -223,7 +220,7 @@ public class MCRResults {
         results.setAttribute("numHits", String.valueOf(getNumHits()));
 
         for (int i = min; i <= max; i++)
-            results.addContent(((MCRHit) hits.get(i)).buildXML());
+            results.addContent(hits.get(i).buildXML());
 
         return results;
     }

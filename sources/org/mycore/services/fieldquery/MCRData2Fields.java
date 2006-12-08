@@ -96,9 +96,9 @@ public class MCRData2Fields {
             Element root = (Element) (xslTemplate.clone());
             Element fv = root.getChild("template", MCRFieldDef.xslns).getChild("fieldValues", MCRFieldDef.mcrns);
 
-            List fieldDefs = MCRFieldDef.getFieldDefs(index);
+            List<MCRFieldDef> fieldDefs = MCRFieldDef.getFieldDefs(index);
             for (int i = 0; i < fieldDefs.size(); i++) {
-                MCRFieldDef fieldDef = (MCRFieldDef) (fieldDefs.get(i));
+                MCRFieldDef fieldDef = fieldDefs.get(i);
                 if (source.indexOf(fieldDef.getSource()) == -1)
                     continue;
                 Element fragment = fieldDef.getXSL();
@@ -128,7 +128,7 @@ public class MCRData2Fields {
      *            the ID of the index as defined in searchfields.xml
      * @return a List of MCRFieldValue objects that contain field and value
      */
-    public static List buildFields(MCRObject obj, String index) {
+    public static List<MCRFieldValue> buildFields(MCRObject obj, String index) {
         String source = MCRFieldDef.OBJECT_METADATA + " " + MCRFieldDef.OBJECT_CATEGORY;
         Document xsl = buildStylesheet(index, source);
         Document xml = obj.createXML();
@@ -145,17 +145,17 @@ public class MCRData2Fields {
      *            the ID of the index as defined in searchfields.xml
      * @return a List of MCRFieldValue objects that contain field and value
      */
-    public static List buildFields(MCRFile file, String index) {
-        List values = new ArrayList();
+    public static List<MCRFieldValue> buildFields(MCRFile file, String index) {
+        List<MCRFieldValue> values = new ArrayList<MCRFieldValue>();
 
         boolean foundSourceXMLContent = false;
         boolean foundSourceFileMetadata = false;
         boolean foundSourceFileAdditional = false;
 
         // Handle source FILE_TEXT_CONTENT
-        List fieldDefList = MCRFieldDef.getFieldDefs(index);
+        List<MCRFieldDef> fieldDefList = MCRFieldDef.getFieldDefs(index);
         for (int i = 0; i < fieldDefList.size(); i++) {
-            MCRFieldDef fieldDef = (MCRFieldDef) (fieldDefList.get(i));
+            MCRFieldDef fieldDef = fieldDefList.get(i);
             if (!fieldDef.isUsedForObjectType(file.getContentTypeID()))
                 continue;
 
@@ -217,14 +217,14 @@ public class MCRData2Fields {
      *            the ID of the index as defined in searchfields.xml
      * @return a List of MCRFieldValue objects that contain name, type and value
      */
-    public static List buildFields(Document doc, String index) {
+    public static List<MCRFieldValue> buildFields(Document doc, String index) {
         Document xsl = buildStylesheet(index, MCRFieldDef.XML);
         return buildValues(xsl, doc, doc.getRootElement().getName());
     }
 
     /** Transforms xml input to search field values using XSL * */
-    private static List buildValues(Document xsl, Document xml, String objectType) {
-        List values = new ArrayList();
+    private static List<MCRFieldValue> buildValues(Document xsl, Document xml, String objectType) {
+        List<MCRFieldValue> values = new ArrayList<MCRFieldValue>();
 
         List fieldValues = null;
         try {

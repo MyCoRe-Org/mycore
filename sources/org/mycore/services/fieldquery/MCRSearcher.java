@@ -190,7 +190,7 @@ public abstract class MCRSearcher extends MCREventHandlerBase implements MCREven
      *            later
      * @return the query results
      */
-    public abstract MCRResults search(MCRCondition condition, int maxResults, List sortBy, boolean addSortData);
+    public abstract MCRResults search(MCRCondition condition, int maxResults, List<MCRSortBy> sortBy, boolean addSortData);
 
     /**
      * Adds field values needed for sorting for those hits that do not have sort

@@ -293,7 +293,7 @@ public class MCRSearchServlet extends MCRServlet {
 
             // Find condition fields without values
             it = root.getDescendants(new ElementFilter("condition"));
-            Vector help = new Vector();
+            Vector<Element> help = new Vector<Element>();
             while (it.hasNext()) {
                 Element condition = (Element) it.next();
                 if (condition.getAttribute("value") == null) {
@@ -303,7 +303,7 @@ public class MCRSearchServlet extends MCRServlet {
 
             // Remove found conditions without values
             for (int i = help.size() - 1; i >= 0; i--)
-                ((Element) (help.get(i))).detach();
+                help.get(i).detach();
 
             Element condElem = (Element) (root.getChild("conditions").getChildren().get(0));
             cond = new MCRQueryParser().parse(condElem);

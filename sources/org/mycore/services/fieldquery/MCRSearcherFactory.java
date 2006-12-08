@@ -28,7 +28,6 @@ import java.util.Hashtable;
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
-import org.mycore.common.MCRArgumentChecker;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
 
@@ -43,7 +42,7 @@ import org.mycore.common.MCRConfigurationException;
  */
 public class MCRSearcherFactory {
     /** Hashtable SearcherID to MCRSearcher instance */
-    protected static Hashtable table = new Hashtable();
+    protected static Hashtable<String,MCRSearcher> table = new Hashtable<String,MCRSearcher>();
 
     /** The logger */
     private static final Logger LOGGER = Logger.getLogger(MCRSearcherFactory.class);
@@ -60,8 +59,6 @@ public class MCRSearcherFactory {
      *             if no MCRSearcher implementation is configured for this ID
      */
     public static MCRSearcher getSearcher(String searcherID) {
-        MCRArgumentChecker.ensureNotEmpty(searcherID, "Searcher ID");
-
         if (!table.containsKey(searcherID)) {
             try {
                 String searcherClass = "MCR.Searcher." + searcherID + ".Class";
@@ -78,7 +75,7 @@ public class MCRSearcherFactory {
             }
         }
 
-        return (MCRSearcher) (table.get(searcherID));
+        return table.get(searcherID);
     }
 
     /**

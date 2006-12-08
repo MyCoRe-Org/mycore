@@ -246,7 +246,7 @@ public class MCRQueryParser extends MCRBooleanClauseParser {
                 return qc;
 
             // Normalize value when contains operator is used
-            List values = new ArrayList();
+            List<String> values = new ArrayList<String>();
 
             String phrase = null;
             StringTokenizer st = new StringTokenizer(qc.getValue(), " ");
@@ -285,7 +285,7 @@ public class MCRQueryParser extends MCRBooleanClauseParser {
 
             MCRAndCondition ac = new MCRAndCondition();
             for (int i = 0; i < values.size(); i++) {
-                String value = (String) (values.get(i));
+                String value = values.get(i);
                 if (value.startsWith("'")) // phrase
                     ac.addChild(new MCRQueryCondition(qc.getField(), "phrase", value.substring(1, value.length() - 1)));
                 else if (value.startsWith("-'")) // NOT phrase
