@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
 <!-- ============================================== -->
-<!-- $Revision: 1.48.2.2 $ $Date: 2006-10-16 16:56:06 $ -->
+<!-- $Revision: 1.48.2.3 $ $Date: 2006-12-08 12:37:06 $ -->
 <!-- ============================================== --> 
 
 <xsl:stylesheet 
@@ -1023,11 +1023,21 @@
 <xsl:template match="list">
   <xsl:param name="var" />
 
+  <!-- When any value exists, do not use the given default value -->
+  <xsl:variable name="default">
+    <xsl:choose>
+      <xsl:when test="(string-length(@default)=0) or (@default and ancestor::editor/input/var[(@name=$var) or starts-with(@name,concat($var,'['))])">
+        <xsl:text>--DuMmY--</xsl:text>
+      </xsl:when>
+      <xsl:otherwise><xsl:value-of select="@default" /></xsl:otherwise>
+    </xsl:choose>
+  </xsl:variable>
+
   <!-- ====== type multirow ======== -->
   <xsl:if test="@type='multirow'">
     <xsl:call-template name="editor.list">
       <xsl:with-param name="var"     select="$var"      />
-      <xsl:with-param name="default" select="@default"  />
+      <xsl:with-param name="default" select="$default"  />
       <xsl:with-param name="rows"    select="@rows"     />
       <xsl:with-param name="multi"   select="@multiple" />
     </xsl:call-template>
@@ -1036,14 +1046,14 @@
   <xsl:if test="@type='dropdown'">
     <xsl:call-template name="editor.list">
       <xsl:with-param name="var"     select="$var"      />
-      <xsl:with-param name="default" select="@default"  />
+      <xsl:with-param name="default" select="$default"  />
     </xsl:call-template>
   </xsl:if>
   <!-- ====== type radio ======== -->
   <xsl:if test="(@type='radio') or (@type='checkbox')">
     <xsl:call-template name="editor.list.radio.cb">
       <xsl:with-param name="var"     select="$var"      />
-      <xsl:with-param name="default" select="@default"  />
+      <xsl:with-param name="default" select="$default"  />
     </xsl:call-template>
   </xsl:if>
 </xsl:template>
