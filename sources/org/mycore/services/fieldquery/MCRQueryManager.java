@@ -102,10 +102,6 @@ public class MCRQueryManager {
         if ((results.getNumHits() == 0) || results.isSorted() || sortBy.isEmpty())
             return;
 
-        List<MCRFieldDef> fields = new ArrayList<MCRFieldDef>(sortBy.size());
-        for (int i = 0; i < sortBy.size(); i++)
-            fields.add(sortBy.get(i).getField());
-
         // Iterator over all MCRHits that have no sort data set
         Iterator hitIterator = new Iterator() {
             private int i = 0;
@@ -134,7 +130,7 @@ public class MCRQueryManager {
 
         String index = sortBy.get(0).getField().getIndex(); 
         MCRSearcher searcher = MCRSearcherFactory.getSearcherForIndex(index);
-        searcher.addSortData(hitIterator, fields);
+        searcher.addSortData(hitIterator, sortBy);
         results.sortBy(query.getSortBy());
     }
 

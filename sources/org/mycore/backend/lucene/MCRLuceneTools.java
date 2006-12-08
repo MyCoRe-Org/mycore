@@ -25,7 +25,6 @@ package org.mycore.backend.lucene;
 
 import java.io.StringReader;
 
-import org.apache.log4j.Logger;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.Token;
 import org.apache.lucene.analysis.TokenStream;
@@ -43,7 +42,7 @@ import java.util.HashMap;
  */
 public class MCRLuceneTools {
     MCRConfiguration config = MCRConfiguration.instance();
-    private static Map analyzerMap = new HashMap();
+    private static Map<String,Analyzer> analyzerMap = new HashMap<String,Analyzer>();
 
     /**
      * Use Lucene Analyzer to normalize strings
@@ -58,7 +57,7 @@ public class MCRLuceneTools {
      * @return the normalized string
      */
     public static String luceneNormalize(String value, String ID) throws Exception {
-      Analyzer analyzer = (Analyzer)analyzerMap.get( ID );
+      Analyzer analyzer = analyzerMap.get( ID );
       if (null == analyzer)
       {
         analyzer = (Analyzer)MCRConfiguration.instance().getInstanceOf("MCR.Lucene.Analyzer." + ID + ".Class");

@@ -46,6 +46,7 @@ import org.apache.lucene.search.Hits;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
+import org.jdom.Element;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRNormalizer;
@@ -389,11 +390,11 @@ public class MCROldLuceneSearcher extends MCRSearcher {
         searcher.close();
     }
 
-    public MCRResults search(MCRCondition condition, int maxResults, List sortBy, boolean addSortData) {
+    public MCRResults search(MCRCondition condition, int maxResults, List<MCRSortBy> sortBy, boolean addSortData) {
         MCRResults results = new MCRResults();
 
         try {
-            List f = new ArrayList();
+            List<Element> f = new ArrayList<Element>();
             f.add(condition.toXML());
 
             boolean reqf = true;

@@ -203,6 +203,6 @@ public abstract class MCRSearcher extends MCREventHandlerBase implements MCREven
      * @param sortBy
      *            the MCRFieldDef fields that are sort criteria
      */
-    public void addSortData(Iterator hits, List sortBy) {
+    public void addSortData(Iterator hits, List<MCRSortBy> sortBy) {
     }
 }

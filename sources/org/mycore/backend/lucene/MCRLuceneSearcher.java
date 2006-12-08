@@ -217,7 +217,7 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
         modifyIndex(modifyAction);
     }
 
-    public MCRResults search(MCRCondition condition, int maxResults, List sortBy, boolean addSortData) {
+    public MCRResults search(MCRCondition condition, int maxResults, List<MCRSortBy> sortBy, boolean addSortData) {
         MCRResults results = new MCRResults();
 
         try {
@@ -241,7 +241,7 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
      * 
      * @return result set
      */
-    private MCRResults getLuceneHits(Query luceneQuery, int maxResults, List sortBy, boolean addSortData) throws Exception {
+    private MCRResults getLuceneHits(Query luceneQuery, int maxResults, List<MCRSortBy> sortBy, boolean addSortData) throws Exception {
         if (maxResults <= 0)
             maxResults = 1000000;
 
@@ -289,10 +289,10 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
      * @param score
      *          of hit 
      */
-    private void addSortDataToHit(List sortBy, org.apache.lucene.document.Document doc, MCRHit hit, String score)
+    private void addSortDataToHit(List<MCRSortBy> sortBy, org.apache.lucene.document.Document doc, MCRHit hit, String score)
     {
       for (int j = 0; j < sortBy.size(); j++) {
-          MCRSortBy sb = (MCRSortBy) sortBy.get(j);
+          MCRSortBy sb = sortBy.get(j);
           MCRFieldDef fds = sb.getField();
           if (null != fds) {
               String field = fds.getName();
@@ -417,7 +417,7 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
         return doc;
     }
 
-    public void addSortData(Iterator hits, List sortBy) {
+    public void addSortData(Iterator hits, List<MCRSortBy> sortBy) {
         try {
             IndexSearcher searcher = new IndexSearcher(IndexDir.getAbsolutePath());
     

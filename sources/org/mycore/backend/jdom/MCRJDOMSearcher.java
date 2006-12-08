@@ -83,7 +83,7 @@ public class MCRJDOMSearcher extends MCRSearcher {
      * Map where key is entryID and value is XML document containing indexed
      * data
      */
-    private HashMap map = new HashMap();
+    private HashMap<String,Document> map = new HashMap<String,Document>();
 
     /** XSL transformer factory */
     private TransformerFactory factory = TransformerFactory.newInstance();
@@ -164,7 +164,7 @@ public class MCRJDOMSearcher extends MCRSearcher {
 
         for (Iterator keys = map.keySet().iterator(); keys.hasNext();) {
             String entryID = (String) (keys.next());
-            Document xml = (Document) (map.get(entryID));
+            Document xml = map.get(entryID);
 
             if (matches(xml, transformer, out)) {
                 String returnID = xml.getRootElement().getAttributeValue("returnID");
@@ -387,13 +387,13 @@ public class MCRJDOMSearcher extends MCRSearcher {
         return MCRInputValidator.instance().compare(valueA, valueB, operator, "string", null);
     }
 
-    public void addSortData(Iterator hits, List sortBy) {
+    public void addSortData(Iterator hits, List<MCRSortBy> sortBy) {
         while (hits.hasNext()) {
             MCRHit hit = (MCRHit) hits.next();
-            Document data = (Document) (map.get(hit.getID()));
+            Document data = map.get(hit.getID());
 
             for (int j = 0; j < sortBy.size(); j++) {
-                MCRFieldDef fd = (MCRFieldDef) sortBy.get(j);
+                MCRFieldDef fd = sortBy.get(j).getField();
                 List values = data.getRootElement().getChildren(fd.getName());
                 for (Iterator itv = values.iterator(); itv.hasNext();) {
                     Element value = (Element) (itv.next());
