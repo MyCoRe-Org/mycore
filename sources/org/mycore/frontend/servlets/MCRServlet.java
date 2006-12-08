@@ -324,8 +324,8 @@ public class MCRServlet extends HttpServlet {
 
 		String rootname = "mcr_error";
         String style=getProperty(request,"XSL.Style");
-        if ((style!=null) && !(style.equals("xml"))){
-            style=null;
+        if ((style == null) || !(style.equals("xml"))) {
+            style = "default";
         }
 		Element root = new Element(rootname);
 		root.setAttribute("HttpError", Integer.toString(error)).setText(msg);
