@@ -213,7 +213,7 @@ public class MCRIndexBrowserData {
                 // the thirt field from the lll-element is the objectid
                 v.addContent(new Element("id").addContent(myValues[2]));
 
-                for (int j = 0; j < ic.outputFields.length; j++) {
+                for (int j = 0; ic.outputFields != null && j < ic.outputFields.length; j++) {
                     String sField = ic.outputFields[j];
                     Element col = new Element("col");
                     col.setAttribute("name", sField);
@@ -406,7 +406,10 @@ public class MCRIndexBrowserData {
                 // for faster results we take the first 2 fields from the mcrhit
                 // they should be set with an searchfield with
                 // type="identifier", to get the exact String
-                String[] listelm = new String[ic.outputFields.length + 3];
+            	int len = 0;
+            	if ( ic.outputFields != null)
+            		len = ic.outputFields.length;
+                String[] listelm = new String[ len + 3];
                 Element child = (Element) (mcrHit.get(i));
                 logger.debug("\n" + out.outputString(child));
 
@@ -431,10 +434,9 @@ public class MCRIndexBrowserData {
         // we will shown in detail
         // this occurres if we have only a small count of results, or we show
         // only a part
-        if (to - from <= ic.maxPerPage) {
+        if (to - from <= ic.maxPerPage && ic.outputFields != null) {
             for (int i = from - 1; i < to; i++) {
-                String[] listelm = ll1.get(i);
-
+                String[] listelm = ll1.get(i);                
                 Document od = new Document();
                 MCRObject oo = new MCRObject();
                 try {
@@ -444,9 +446,7 @@ public class MCRIndexBrowserData {
                     continue;
                 }
                 // outputfields came only from metadataobject
-                if (ic.outputFields != null) {
-                    setListeElm(od, ic.outputFields, 3, listelm, false);
-                }
+                setListeElm(od, ic.outputFields, 3, listelm, false);
                 ll1.set(i, listelm);
             }
         }
