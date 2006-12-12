@@ -43,6 +43,7 @@ import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.index.IndexModifier;
+import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.Hits;
 import org.apache.lucene.search.IndexSearcher;
@@ -123,6 +124,19 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
 
         System.setProperty("org.apache.lucene.lockDir", LOCK_DIR.getAbsolutePath());
         deleteLuceneLocks(LOCK_DIR, 0);
+        
+        // is index directory initialized, .....?
+        try {
+          IndexWriter writer = MCRLuceneTools.getLuceneWriter(config.getString(prefix + "IndexDir"), true);
+          writer.close();
+      } catch (IOException e) {
+          LOGGER.error(e.getClass().getName() + ": " + e.getMessage());
+          LOGGER.error(MCRException.getStackTraceAsString(e));
+      } catch (Exception e) {
+          LOGGER.error(e.getClass().getName() + ": " + e.getMessage());
+          LOGGER.error(MCRException.getStackTraceAsString(e));
+      }
+
 
         try {
             modifyExecutor = new IndexModifyExecutor(new LinkedBlockingQueue<Runnable>(),IndexDir);
