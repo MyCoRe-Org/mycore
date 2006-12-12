@@ -23,11 +23,20 @@
 
 package org.mycore.backend.lucene;
 
+import java.io.File;
 import java.io.StringReader;
 
+import org.apache.log4j.Logger;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.Token;
 import org.apache.lucene.analysis.TokenStream;
+import org.apache.lucene.analysis.de.GermanAnalyzer;
+import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.IndexWriter;
+import org.apache.lucene.index.Term;
+import org.apache.lucene.search.Hits;
+import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.TermQuery;
 import org.mycore.common.MCRConfiguration;
 import java.util.Map;
 import java.util.HashMap;
@@ -43,6 +52,8 @@ import java.util.HashMap;
 public class MCRLuceneTools {
     MCRConfiguration config = MCRConfiguration.instance();
     private static Map<String,Analyzer> analyzerMap = new HashMap<String,Analyzer>();
+    /** The logger */
+    private final static Logger LOGGER = Logger.getLogger(MCRLuceneTools.class);
 
     /**
      * Use Lucene Analyzer to normalize strings
@@ -79,4 +90,86 @@ public class MCRLuceneTools {
       return sb.toString();
     }
 
+    /**
+     * Get Lucene Writer
+     * 
+     * @param indexDir
+     *            directory where lucene index is store first check existance of
+     *            index directory, if it does nor exist create it
+     * 
+     * @return the lucene writer, calling programm must close writer
+     */
+    public static IndexWriter getLuceneWriter(String indexDir, boolean first) throws Exception {
+        IndexWriter writer;
+        Analyzer analyzer = new GermanAnalyzer();
+
+        // does directory for text index exist, if not build it
+        if (first) {
+            File file = new File(indexDir);
+
+            if (!file.exists()) {
+                LOGGER.info("The Directory doesn't exist: " + indexDir + " try to build it");
+
+                IndexWriter writer2 = new IndexWriter(indexDir, analyzer, true);
+                writer2.close();
+            } else if (file.isDirectory()) {
+                if (0 == file.list().length) {
+                    LOGGER.info("No Entries in Directory, initialize: " + indexDir);
+
+                    IndexWriter writer2 = new IndexWriter(indexDir, analyzer, true);
+                    writer2.close();
+                }
+            }
+        } // if ( first
+
+        writer = new IndexWriter(indexDir, analyzer, false);
+        // writer.mergeFactor = 200;
+        writer.setMergeFactor(200);
+        // writer.maxMergeDocs = 2000;
+        writer.setMaxMergeDocs(2000);
+
+        return writer;
+    }
+    
+    /**
+     * Delete all documents in Lucene with id
+     * 
+     * @param fieldname
+     *            string name of lucene field with stored id
+     * @param id
+     *            string document id
+     * @param indexDir *
+     *            the directory where index is stored
+     * 
+     */
+    public static synchronized void deleteLuceneDocument(String fieldname, String id, String indexDir) throws Exception {
+        IndexSearcher searcher = new IndexSearcher(indexDir);
+
+        if (null == searcher) {
+            return;
+        }
+
+        Term te1 = new Term(fieldname, id);
+
+        TermQuery qu = new TermQuery(te1);
+
+        LOGGER.info("Searching for: " + qu.toString(""));
+
+        Hits hits = searcher.search(qu);
+
+        LOGGER.info("Number of documents found : " + hits.length());
+
+        if (hits.length() > 0) {
+            IndexReader reader = IndexReader.open(indexDir);
+            for (int i = 0; i < hits.length(); i++) {
+                // reader.delete(hits.id(i));
+                reader.deleteDocument(hits.id(i));
+            }
+            LOGGER.info("DELETE: " + id);
+            reader.close();
+        }
+
+        searcher.close();
+    }
+  
 }
