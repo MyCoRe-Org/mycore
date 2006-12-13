@@ -2,7 +2,7 @@
 
   <!-- =================================================================== -->
   <!-- MyCoRe build file for use with Apache Ant                           -->
-  <!-- $Revision: 1.126 $ $Date: 2006-11-22 12:20:38 $                      -->
+  <!-- $Revision: 1.127 $ $Date: 2006-12-13 10:34:54 $                      -->
   <!-- =================================================================== -->
 
 <project name="MyCoRe" default="usage" basedir=".">
@@ -57,7 +57,7 @@
     <echo level="info">Operating system : ${os.name} Version ${os.version} on ${os.arch} </echo>
     <echo level="info">Java version     : JDK ${ant.java.version} Version ${java.version} from ${java.vendor}</echo>
     <echo level="info">Java home        : ${env.JAVA_HOME}</echo>
-    <echo level="info">Ant build file   : $Revision: 1.126 $ $Date: 2006-11-22 12:20:38 $</echo>
+    <echo level="info">Ant build file   : $Revision: 1.127 $ $Date: 2006-12-13 10:34:54 $</echo>
     <echo level="info">Ant version      : ${ant.version}</echo>
     <echo level="info">Ant home         : ${ant.home}</echo>
     <echo level="info">Ant libdir       : ${ant.library.dir}</echo>
@@ -75,8 +75,6 @@
     <echo level="info">Initializing directories and classpath...</echo>
 
     <mkdir dir="${basedir}/classes" />
-    <mkdir dir="${basedir}/documentation/html" />
-    <mkdir dir="${basedir}/documentation/pdf"  /> 
 
     <!-- Fail if environment variables are not set -->
     <fail message="Environment variable JAVA_HOME is not set!" unless="env.JAVA_HOME" />
@@ -274,6 +272,7 @@
   <target name="javadocs" depends="init,up2date" if="javadocs.outdated" description="creates JavaDoc API documentation in HTML format">
     <echo level="info">Building the MyCoRe JavaDoc API documentation...</echo>
 
+    <mkdir dir="${basedir}/documentation/html" />
     <javadoc
       packagenames        = "*"
       sourcepathref       = "sourcepath"
