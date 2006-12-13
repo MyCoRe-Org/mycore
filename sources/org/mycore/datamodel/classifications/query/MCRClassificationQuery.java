@@ -24,12 +24,12 @@
 package org.mycore.datamodel.classifications.query;
 
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.jdom.Document;
-
 import org.mycore.common.MCRUtils;
 import org.mycore.datamodel.classifications.MCRCategoryItem;
 import org.mycore.datamodel.classifications.MCRClassification;
@@ -131,6 +131,47 @@ public class MCRClassificationQuery {
         Classification returns = ClassificationTransformer.getClassification(doc, -1, withCounter);
         LOGGER.debug("-getClassification finished");
         return returns;
+    }
+
+    /**
+     * returns <code>Category</code> with id <code>categID</code> in ClassificationObject <code>co</code>.
+     * @param co
+     * @param categID
+     * @return <code>null</code> if no <code>Category</code> with id <code>categID</code> is present as a child of <code>co</code>.
+     */
+    public static Category findCategory(ClassificationObject co, String categID) {
+        if (co instanceof Category && co.getId().equals(categID)) {
+            return (Category) co;
+        }
+        for (Iterator it = co.getCategories().iterator(); it.hasNext();) {
+            Category cat = (Category) it.next();
+            if (findCategory(cat, categID) != null)
+                return cat;
+        }
+        return null;
+    }
+
+    /**
+     * returns parent <code>Category</code> of <code>category</code>.
+     * @param classification Classification to search for parent in
+     * @param category child category
+     * @return <code>classification</code> if category has no parent category and is in <code>classification</code>,
+     * parent <code>Category</code> or <code>null</code> if <code>category</code> is not in <code>classification</code>.
+     */
+    public static ClassificationObject findParent(Classification classification, Category category) {
+        return findParentInClassificationObject(classification, category);
+    }
+
+    private static ClassificationObject findParentInClassificationObject(ClassificationObject co, Category cat){
+        if (co.getCategories().contains(cat)){
+            return co;
+        }
+        for (Category category:co.getCategories()){
+            if (findParentInClassificationObject(category, cat) != null){
+                return category;
+            }
+        }
+        return null;
     }
 
     public static void main(String[] arg) {
