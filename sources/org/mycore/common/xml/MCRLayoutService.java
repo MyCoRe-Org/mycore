@@ -228,21 +228,31 @@ public class MCRLayoutService {
 
         return parameters;
     }
-    
+
     /**
-     * returns a merge list of XSL parameters.
+     * returns a merged list of XSL parameters.
      * 
-     * First parameters stored in current MCRSession are used.
-     * These are overwritten by Parameters of HttpServletRequest.
-     * Finally attributes of HttpServletRequest overwrite the previous defined.
+     * First parameters stored in current HttpSession are used. These are
+     * overwritten by Parameters of MCRSession. Finally parameters, then attributes 
+     * of HttpServletRequest overwrite the previously defined.
+     * 
      * @param request
-     * @return merged XSL.* properties of MCRSession and HttpServletRequest
+     * @return merged XSL.* properties of MCR|HttpSession and HttpServletRequest
      */
     private final Properties mergeProperties(HttpServletRequest request) {
         Properties props = new Properties();
+
         // Store XSL.*.SESSION parameters to MCRSession
         MCRServlet.putParamsToSession(request);
+        HttpSession session = request.getSession(false);
         MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
+        if (session != null) {
+            for (Enumeration e = session.getAttributeNames(); e.hasMoreElements();) {
+                String name = (String) (e.nextElement());
+                if (name.startsWith("XSL."))
+                    props.put(name.substring(4), session.getAttribute(name));
+            }
+        }
         for (Iterator it = mcrSession.getObjectsKeyList(); it.hasNext();) {
             String name = it.next().toString();
             if (name.startsWith("XSL."))
