@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
 <!-- ============================================== -->
-<!-- $Revision: 1.4 $ $Date: 2005-09-20 08:38:28 $ -->
+<!-- $Revision: 1.5 $ $Date: 2006-12-14 10:57:49 $ -->
 <!-- ============================================== --> 
 
 <xsl:stylesheet 
@@ -11,7 +11,7 @@
 
 <xsl:output 
   method="html" 
-  encoding="ISO-8859-1" 
+  encoding="UTF-8" 
   media-type="text/html" 
   doctype-public="-//W3C//DTD HTML 3.2 Final//EN"
 />
