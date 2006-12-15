@@ -132,17 +132,17 @@ public class MCRLinkTableManager {
      */
     public void addReferenceLink(String from, String to, String type, String attr) {
         if ((from == null) || ((from = from.trim()).length() == 0)) {
-            logger.warn("The from value of a reference link is false, the link was " + "not added to the link table");
+            logger.warn("The from value of a reference link is false, the link was not added to the link table");
             return;
         }
 
         if ((to == null) || ((to = to.trim()).length() == 0)) {
-            logger.warn("The to value of a reference link is false, the link was " + "not added to the link table");
+            logger.warn("The to value of a reference link is false, the link was not added to the link table");
             return;
         }
 
         if ((type == null) || ((type = type.trim()).length() == 0)) {
-            logger.warn("The type value of a reference link is false, the link was " + "not added to the link table");
+            logger.warn("The type value of a reference link is false, the link was not added to the link table");
             return;
         }
 
@@ -157,7 +157,7 @@ public class MCRLinkTableManager {
             persistenceclass.create(from, to, type, attr);
         } catch (Exception e) {
             e.printStackTrace();
-            logger.warn("An error was occured while add a dataset from the reference link table, add not succesful.");
+            logger.warn("An error occured while adding a dataset from the reference link table, adding not succesful.");
         }
     }
 
@@ -186,7 +186,7 @@ public class MCRLinkTableManager {
         try {
             persistenceclass.delete(from,null,null);
         } catch (Exception e) {
-            logger.warn("An error was occured while delete a dataset from the" + " reference link table, deleting is not succesful.");
+            logger.warn("An error occured while deleting a dataset from the" + " reference link table, deleting is not succesful.");
         }
     }
 
@@ -242,7 +242,7 @@ public class MCRLinkTableManager {
         }
      try { persistenceclass.delete(from, to, type); }
      catch (Exception e) { 
-         logger.warn("An error was occured while delete a dataset from the" + " reference link table, deleting is not succesful."); 
+         logger.warn("An error occured while deleting a dataset from the" + " reference link table, deleting is not succesful."); 
          } 
      }
 
@@ -349,7 +349,7 @@ public class MCRLinkTableManager {
         try {
             return persistenceclass.countTo(null,to,null,null);
         } catch (Exception e) {
-            logger.warn("An error was occured while search for references of " + to + ".");
+            logger.warn("An error occured while searching for references of " + to + ".");
         }
 
         return 0;
@@ -384,7 +384,7 @@ public class MCRLinkTableManager {
             }
             return persistenceclass.countTo(null,to, null, restriction);
         } catch (Exception e) {
-            logger.warn("An error was occured while search for references of " + to + ".");
+            logger.warn("An error occured while searching for references of " + to + ".");
         }
 
         return 0;
@@ -452,7 +452,7 @@ public class MCRLinkTableManager {
         }
         return persistenceclass.countTo(null,sb.toString(), "classid", restriction);
     } catch (Exception e) {
-        logger.warn("An error was occured while search for references of " + sb.toString() + ".");
+        logger.warn("An error occured while searching for references of " + sb.toString() + ".");
     }
     return 0;
     }
@@ -482,7 +482,7 @@ public class MCRLinkTableManager {
         try {
             return persistenceclass.getSourcesOf(to,null);
         } catch (Exception e) {
-            logger.warn("An error was occured while search for references to " + to + ".");
+            logger.warn("An error occured while searching for references to " + to + ".");
             return new LinkedList();
         }
     }
@@ -524,7 +524,7 @@ public class MCRLinkTableManager {
         try {
             return persistenceclass.getSourcesOf(to,type);
         } catch (Exception e) {
-            logger.warn("An error was occured while search for references to " + to + " with " + type + ".");
+            logger.warn("An error occured while searching for references to " + to + " with " + type + ".");
             return new LinkedList();
         }
     }
@@ -547,7 +547,7 @@ public class MCRLinkTableManager {
             }
             return ll;
         } catch (Exception e) {
-            logger.warn("An error was occured while search for references to " + to + ".");
+            logger.warn("An error occured while searching for references to " + to + ".");
             return ll;
         }
     }
@@ -571,7 +571,7 @@ public class MCRLinkTableManager {
         try {
             return ((MCRLinkTableInterface) tablelist.get(i)).getDestinationsOf(source);
         } catch (Exception e) {
-            logger.warn("An error was occured while search for references from " + source + ".");
+            logger.warn("An error occured while searching for references from " + source + ".");
             return new LinkedList();
         }
     }
@@ -596,7 +596,7 @@ public class MCRLinkTableManager {
         try {
             return ((MCRLinkTableInterface) tablelist.get(i)).getDestinationsOf(source, referenceType);
         } catch (Exception e) {
-            logger.warn("An error was occured while search for references from " + source + ".");
+            logger.warn("An error occured while searching for references from " + source + ".");
             return new LinkedList();
         }
     }
@@ -621,7 +621,7 @@ public class MCRLinkTableManager {
         try {
             return ((MCRLinkTableInterface) tablelist.get(i)).getDestinationsOf(sources);
         } catch (Exception e) {
-            logger.warn("An error was occured while search for references from " + sources + ".");
+            logger.warn("An error occured while searching for references from " + sources + ".");
             return new LinkedList();
         }
     }
