@@ -2,7 +2,7 @@
 
   <!-- =================================================================== -->
   <!-- MyCoRe build file for use with Apache Ant                           -->
-  <!-- $Revision: 1.127 $ $Date: 2006-12-13 10:34:54 $                      -->
+  <!-- $Revision: 1.128 $ $Date: 2006-12-19 14:39:29 $                      -->
   <!-- =================================================================== -->
 
 <project name="MyCoRe" default="usage" basedir=".">
@@ -57,7 +57,7 @@
     <echo level="info">Operating system : ${os.name} Version ${os.version} on ${os.arch} </echo>
     <echo level="info">Java version     : JDK ${ant.java.version} Version ${java.version} from ${java.vendor}</echo>
     <echo level="info">Java home        : ${env.JAVA_HOME}</echo>
-    <echo level="info">Ant build file   : $Revision: 1.127 $ $Date: 2006-12-13 10:34:54 $</echo>
+    <echo level="info">Ant build file   : $Revision: 1.128 $ $Date: 2006-12-19 14:39:29 $</echo>
     <echo level="info">Ant version      : ${ant.version}</echo>
     <echo level="info">Ant home         : ${ant.home}</echo>
     <echo level="info">Ant libdir       : ${ant.library.dir}</echo>
@@ -382,7 +382,7 @@
     <exec executable="/mcr/applications/cvschangelogbuilder-2.0/cvschangelogbuilder.pl">
       <arg value="-module=mycore" />
       <arg value="-output=buildhtmlreport" />
-      <arg value="-viewcvsurl=http://www.mycore.de/cvs/viewcvs.cgi" />
+      <arg value="-viewcvsurl=http://www.mycore.de/cvs/viewvc.cgi" />
       <arg value="-dir=${basedir}/documentation/changelogs/${year}" /> 
     </exec>
 
