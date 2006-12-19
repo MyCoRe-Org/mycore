@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- Mit XMLSpy v2007 sp1 bearbeitet (http://www.altova.com) von Frank Lützenkirchen (Universitätsbibliothek Duisburg-Essen) -->
 <!-- edited with XMLSpy v2005 sp1 U (http://www.xmlspy.com) by Lützenkirchen, Frank (Universität Duisburg-Essen) -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
 	<xs:import namespace="http://www.w3.org/XML/1998/namespace" schemaLocation="xml-2001.xsd"/>
@@ -278,10 +279,10 @@
 	<xs:element name="list">
 		<xs:complexType>
 			<xs:sequence>
-				<xs:choice>
+				<xs:choice maxOccurs="unbounded">
 					<xs:element ref="item" maxOccurs="unbounded"/>
-					<xs:element ref="condition" minOccurs="0" maxOccurs="unbounded"/>
-					<xs:element ref="include" minOccurs="0" maxOccurs="unbounded"/>
+					<xs:element ref="condition"/>
+					<xs:element ref="include"/>
 				</xs:choice>
 			</xs:sequence>
 			<xs:attribute name="id" type="xs:ID" use="optional"/>
