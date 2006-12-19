@@ -194,6 +194,41 @@ public class MCROldLuceneSearcher extends MCRSearcher {
     }
 
     /**
+     * @param sortBy
+     * @param doc
+     *          lucene document to get sortdata from 
+     * @param hit
+     *          sortdata are added 
+     * @param score
+     *          of hit 
+     */
+    private void addSortDataToHit(List<MCRSortBy> sortBy, org.apache.lucene.document.Document doc, MCRHit hit, String score)
+    {
+      for (int j = 0; j < sortBy.size(); j++) {
+          MCRSortBy sb = sortBy.get(j);
+          MCRFieldDef fds = sb.getField();
+          if (null != fds) {
+              String field = fds.getName();
+              String values[] = doc.getValues(field);
+              if (null != values) {
+                  for (int i=0; i < values.length; i++)
+                  {
+                    MCRFieldDef fd = MCRFieldDef.getDef(field);
+                    MCRFieldValue fv = new MCRFieldValue(fd, values[i]);
+                    hit.addSortData(fv);
+                  }
+              }
+              else if ("score".equals(field) && null != score)
+              {
+                MCRFieldDef fd = MCRFieldDef.getDef(field);
+                MCRFieldValue fv = new MCRFieldValue(fd, score);
+                hit.addSortData(fv);
+              }
+          }
+      }
+    }
+
+    /**
      * Build lucene document from transformed xml list
      * 
      * @param fields
@@ -414,7 +449,7 @@ public class MCROldLuceneSearcher extends MCRSearcher {
      * 
      * @return result set
      */
-    private MCRResults getLuceneHits(Query luceneQuery, int maxResults, List sortBy, boolean addSortData) throws Exception {
+    private MCRResults getLuceneHits(Query luceneQuery, int maxResults, List<MCRSortBy> sortBy, boolean addSortData) throws Exception {
         if (maxResults <= 0)
             maxResults = 1000000;
 
@@ -459,22 +494,8 @@ public class MCROldLuceneSearcher extends MCRSearcher {
             }
             
             
-            for (int j=0; j<sortBy.size(); j++)
-            {
-              MCRSortBy sb = (MCRSortBy)sortBy.get(j);
-              MCRFieldDef fds = sb.getField();
-              if ( null != fds)
-              {
-                String field =  fds.getName();
-                String value = doc.get(field);
-                if ( null != value)
-                {
-                  MCRFieldDef fd   = MCRFieldDef.getDef(field);
-                  MCRFieldValue fv = new MCRFieldValue(fd, value);
-                  hit.addSortData(fv);
-                }
-              }
-            }
+            String score = Float.toString(hits.score(i));
+            addSortDataToHit(sortBy, doc, hit, score);
             result.addHit(hit);
         }
 
@@ -483,7 +504,7 @@ public class MCROldLuceneSearcher extends MCRSearcher {
         return result;
     }
     
-    public void addSortData(Iterator hits, List sortBy)
+    public void addSortData(Iterator hits, List<MCRSortBy> sortBy)
     {
       try
       {
@@ -493,30 +514,19 @@ public class MCROldLuceneSearcher extends MCRSearcher {
             return;
         }
 
-        while(hits.hasNext())
-        {
-          MCRHit hit = (MCRHit)hits.next();
+        while (hits.hasNext()) {
+          MCRHit hit = (MCRHit) hits.next();
           String id = hit.getID();
           Term te1 = new Term("mcrid", id);
-          
+
           TermQuery qu = new TermQuery(te1);
-          
+
           Hits hitl = searcher.search(qu);
-          if (hitl.length() > 0)
-          {
-            org.apache.lucene.document.Document doc = hitl.doc(0);
-            for (int j=0; j<sortBy.size(); j++)
-            {
-              MCRFieldDef fd = (MCRFieldDef)sortBy.get(j);
-              String value = doc.get(fd.getName());
-              if ( null != value)
-              {
-                MCRFieldValue fv = new MCRFieldValue(fd, value);
-                hit.addSortData(fv);
-              }
-            }
+          if (hitl.length() > 0) {
+              org.apache.lucene.document.Document doc = hitl.doc(0);
+              addSortDataToHit(sortBy, doc, hit, null);
           }
-        }
+      }
         
         searcher.close();
       } catch (IOException e)
