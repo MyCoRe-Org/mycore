@@ -30,6 +30,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.jdom.Document;
+import org.jdom.Element;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
@@ -775,9 +776,28 @@ final public class MCRObject extends MCRBase {
         }
 
         // update all children
-        for (int i = 0; i < mcr_struct.getChildSize(); i++) {
-            MCRObject child = new MCRObject();
-            child.updateMetadataInDatastore(mcr_struct.getChild(i).getXLinkHrefID());
+        boolean updatechildren = false;
+        MCRObjectMetadata md = getMetadata();
+        MCRObjectMetadata mdold = old.getMetadata();
+        for (int i = 0; i < md.size(); i++) {
+            MCRMetaElement melm = md.getMetadataElement(i);
+            if (melm.getHeritable()) {
+                try {
+                    MCRMetaElement melmold = mdold.getMetadataElement(melm.getTag());
+                    Element jelm = melm.createXML(false);
+                    Element jelmold = melmold.createXML(false);
+                    if (!jelm.equals(jelmold))
+                        updatechildren = true;
+                } catch (RuntimeException e) {
+                    updatechildren = true;
+                }
+            }
+        }
+        if (updatechildren) {
+            for (int i = 0; i < mcr_struct.getChildSize(); i++) {
+                MCRObject child = new MCRObject();
+                child.updateMetadataInDatastore(mcr_struct.getChild(i).getXLinkHrefID());
+            }
         }
     }
 
@@ -846,8 +866,8 @@ final public class MCRObject extends MCRBase {
     }
 
     /**
-     * The method updates the search index with the data from the XLM
-     * store. Also it check the derivate links of itself.
+     * The method updates the search index with the data from the XLM store.
+     * Also it check the derivate links of itself.
      * 
      * @param id
      *            the MCRObjectID as string
@@ -857,8 +877,8 @@ final public class MCRObject extends MCRBase {
     }
 
     /**
-     * The method updates the search index with the data from the XLM
-     * store. Also it check the derivate links of itself.
+     * The method updates the search index with the data from the XLM store.
+     * Also it check the derivate links of itself.
      * 
      * @param id
      *            the MCRObjectID
@@ -871,7 +891,7 @@ final public class MCRObject extends MCRBase {
         for (int i = 0; i < mcr_struct.getDerivateSize(); i++) {
             link = mcr_struct.getDerivate(i);
             if (!MCRDerivate.existInDatastore(link.getXLinkHref())) {
-                logger.error("Can't find MCRDerivate "+link.getXLinkHref());
+                logger.error("Can't find MCRDerivate " + link.getXLinkHref());
             }
         }
         // handle events

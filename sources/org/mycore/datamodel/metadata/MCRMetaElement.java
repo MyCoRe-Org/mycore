@@ -52,7 +52,7 @@ public class MCRMetaElement {
     public final static boolean DEFAULT_HERITABLE = false;
 
     public final static boolean DEFAULT_NOT_INHERIT = false;
-    
+
     protected final static MCRConfiguration CONFIG = MCRConfiguration.instance();
 
     private String META_PACKAGE_NAME = "org.mycore.datamodel.metadata.";
@@ -71,19 +71,14 @@ public class MCRMetaElement {
 
     private boolean notinherit;
 
-    private ArrayList list = null;
+    private ArrayList<MCRMetaInterface> list = null;
 
     /**
      * This is the constructor of the MCRMetaElement class. The default language
      * for the element was set to <b>en </b>.
      */
     public MCRMetaElement() {
-        this(DEFAULT_LANGUAGE,
-                CONFIG.getString("MCR.MetaElement.defaults.class",""),
-                "",
-                CONFIG.getBoolean("MCR.MetaElement.defaults.heritable",DEFAULT_HERITABLE),
-                CONFIG.getBoolean("MCR.MetaElement.defaults.notinherit",DEFAULT_NOT_INHERIT),
-                new ArrayList());
+        this(DEFAULT_LANGUAGE, CONFIG.getString("MCR.MetaElement.defaults.class", ""), "", CONFIG.getBoolean("MCR.MetaElement.defaults.heritable", DEFAULT_HERITABLE), CONFIG.getBoolean("MCR.MetaElement.defaults.notinherit", DEFAULT_NOT_INHERIT), new ArrayList<MCRMetaInterface>());
     }
 
     /**
@@ -95,12 +90,7 @@ public class MCRMetaElement {
      *            the default language
      */
     public MCRMetaElement(String default_lang) {
-        this(default_lang,
-                CONFIG.getString("MCR.MetaElement.defaults.class",""),
-                "",
-                CONFIG.getBoolean("MCR.MetaElement.defaults.heritable",DEFAULT_HERITABLE),
-                CONFIG.getBoolean("MCR.MetaElement.defaults.notinherit",DEFAULT_NOT_INHERIT),
-                new ArrayList());
+        this(default_lang, CONFIG.getString("MCR.MetaElement.defaults.class", ""), "", CONFIG.getBoolean("MCR.MetaElement.defaults.heritable", DEFAULT_HERITABLE), CONFIG.getBoolean("MCR.MetaElement.defaults.notinherit", DEFAULT_NOT_INHERIT), new ArrayList<MCRMetaInterface>());
     }
 
     /**
@@ -121,7 +111,7 @@ public class MCRMetaElement {
      * @param set_list
      *            a list of MCRMeta... data lines to add in this element
      */
-    public MCRMetaElement(String set_lang, String set_classname, String set_tag, boolean set_heritable, boolean set_notinherit, ArrayList set_list) {
+    public MCRMetaElement(String set_lang, String set_classname, String set_tag, boolean set_heritable, boolean set_notinherit, ArrayList<MCRMetaInterface> set_list) {
         if ((set_lang != null) && ((set_lang = set_lang.trim()).length() != 0)) {
             lang = set_lang;
         }
@@ -132,7 +122,7 @@ public class MCRMetaElement {
         setTag(set_tag);
         heritable = set_heritable;
         notinherit = set_notinherit;
-        list = new ArrayList();
+        list = new ArrayList<MCRMetaInterface>();
 
         if (set_list != null) {
             for (int i = 0; i < set_list.size(); i++) {
@@ -372,7 +362,7 @@ public class MCRMetaElement {
                 throw new MCRException(fullname + " InstantiationException");
             }
 
-            list.add(obj);
+            list.add((MCRMetaInterface) obj);
         }
     }
 
