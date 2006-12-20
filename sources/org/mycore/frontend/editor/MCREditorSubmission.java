@@ -391,7 +391,7 @@ public class MCREditorSubmission {
                             LOGGER.debug(pathA + " " + oper + " " + pathB);
                             LOGGER.debug(cond);
                         }
-                    } else {
+                    } else if (condition.getAttribute("field1") == null) {
                         Element current = null;
 
                         try {
