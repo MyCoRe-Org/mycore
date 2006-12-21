@@ -190,7 +190,11 @@ public class MCRClassificationBrowserData {
     if (doctype != null) {
       try {
         String typelist = config.getString("MCR.type_" + doctype);
-        doctypeArray = typelist.split(",");
+        if (typelist.equals("true")) {
+            doctypeArray = new String[1];
+            doctypeArray[0] = doctype;           
+        } else {
+        doctypeArray = typelist.split(","); }
       } catch (Exception allignore) {
         doctypeArray = new String[1];
         doctypeArray[0] = "document";
@@ -492,7 +496,7 @@ public class MCRClassificationBrowserData {
       
       int level =  Integer.parseInt(line.getAttributeValue("level"));
       
-      // für Sortierung schon mal die leveltiefe bestimmen
+      // fï¿½r Sortierung schon mal die leveltiefe bestimmen
       LOGGER.debug(" NumDocs - " + numDocs);
 
       if (emptyLeafs.endsWith("no") && numDocs == 0) {
