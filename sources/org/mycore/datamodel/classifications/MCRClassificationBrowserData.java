@@ -83,9 +83,9 @@ public class MCRClassificationBrowserData {
 
   private String sort = null;
 
-  private String doctype = null;
+  private String objectType = null;
 
-  private String[] doctypeArray = null;
+  private String[] objectTypeArray = null;
 
   private String restriction = null;
 
@@ -102,68 +102,51 @@ public class MCRClassificationBrowserData {
 
     String[] uriParts = uri.split("/"); // mySplit();
     LOGGER.info(" Start");
-    String classifID = "";
-
-    if (uriParts.length <= 1) {
-      LOGGER.debug(this.getClass() + " PathParts - classification is default");
-      pageName = config.getString("MCR.ClassificationBrowser.default.EmbeddingPage");
-      xslStyle = config.getString("MCR.ClassificationBrowser.default.Style");
-      emptyLeafs = config.getString("MCR.ClassificationBrowser.default.EmptyLeafs");
-      view = config.getString("MCR.ClassificationBrowser.default.View");
-      doctype = config.getString("MCR.ClassificationBrowser.default.Doctype");
-      comments = config.getString("MCR.ClassificationBrowser.default.Comments");
-      searchField = config.getString("MCR.ClassificationBrowser.default.searchField");
-      classifID = actclid;
-      startPath = "default";
-    } else {
-      LOGGER.debug(" PathParts - classification " + uriParts[1]);
-      LOGGER.debug(" Number of PathParts =" + uriParts.length);
+    String classifID = null;
+    final String browserClass = (uriParts.length <= 1) ? "default" : uriParts[1];
+    LOGGER.debug(" PathParts - classification " + browserClass);
+    LOGGER.debug(" Number of PathParts =" + uriParts.length);
       try {
-        classifID = config.getString("MCR.ClassificationBrowser." + uriParts[1] + ".Classification");
+        classifID = config.getString("MCR.ClassificationBrowser." + browserClass + ".Classification");
       } catch (org.mycore.common.MCRConfigurationException noClass) {
         classifID = actclid;
       }
       try {
-        pageName = config.getString("MCR.ClassificationBrowser." + uriParts[1] + ".EmbeddingPage");
+        pageName = config.getString("MCR.ClassificationBrowser." + browserClass + ".EmbeddingPage");
       } catch (org.mycore.common.MCRConfigurationException noPagename) {
         pageName = config.getString("MCR.ClassificationBrowser.default.EmbeddingPage");
       }
       try {
-        xslStyle = config.getString("MCR.ClassificationBrowser." + uriParts[1] + ".Style");
+        xslStyle = config.getString("MCR.ClassificationBrowser." + browserClass + ".Style");
       } catch (org.mycore.common.MCRConfigurationException noStyle) {
         xslStyle = config.getString("MCR.ClassificationBrowser.default.Style");
       }
       try {
-        searchField = config.getString("MCR.ClassificationBrowser." + uriParts[1] + ".searchField");
+        searchField = config.getString("MCR.ClassificationBrowser." + browserClass + ".searchField");
       } catch (org.mycore.common.MCRConfigurationException noSearchfield) {
         searchField = config.getString("MCR.ClassificationBrowser.default.searchField");
       }
 
       try {
-        emptyLeafs = config.getString("MCR.ClassificationBrowser." + uriParts[1] + ".EmptyLeafs");
+        emptyLeafs = config.getString("MCR.ClassificationBrowser." + browserClass + ".EmptyLeafs");
       } catch (org.mycore.common.MCRConfigurationException noEmptyLeafs) {
         emptyLeafs = config.getString("MCR.ClassificationBrowser.default.EmptyLeafs");
       }
       try {
-        view = config.getString("MCR.ClassificationBrowser." + uriParts[1] + ".View");
+        view = config.getString("MCR.ClassificationBrowser." + browserClass + ".View");
       } catch (org.mycore.common.MCRConfigurationException noView) {
         view = config.getString("MCR.ClassificationBrowser.default.View");
       }
+      setObjectTypes(browserClass);
       try {
-        doctype = config.getString("MCR.ClassificationBrowser." + uriParts[1] + ".Doctype");
-      } catch (org.mycore.common.MCRConfigurationException noDoctype) {
-        doctype = config.getString("MCR.ClassificationBrowser.default.Doctype");
-      }
-      try {
-        sort = config.getString("MCR.ClassificationBrowser." + uriParts[1] + ".Sort");
-        comments = config.getString("MCR.ClassificationBrowser." + uriParts[1] + ".Comments");
-        restriction = config.getString("MCR.ClassificationBrowser." + uriParts[1] + ".Restriction");
+        sort = config.getString("MCR.ClassificationBrowser." + browserClass + ".Sort");
+        comments = config.getString("MCR.ClassificationBrowser." + browserClass + ".Comments");
+        restriction = config.getString("MCR.ClassificationBrowser." + browserClass + ".Restriction");
       } catch (org.mycore.common.MCRConfigurationException ig) {
         // ignore for this parameters, the are optionally
         ;
       }
-      startPath = uriParts[1];
-    }
+      startPath = browserClass;
 
     if ("edit".equals(mode)) {
       pageName = config.getString("MCR.classeditor.EmbeddingPage");
@@ -187,32 +170,39 @@ public class MCRClassificationBrowserData {
     setClassification(classifID);
     setActualPath(actEditorCategid);    
     
-    if (doctype != null) {
-      try {
-        String typelist = config.getString("MCR.type_" + doctype);
-        if (typelist.equals("true")) {
-            doctypeArray = new String[1];
-            doctypeArray[0] = doctype;           
-        } else {
-        doctypeArray = typelist.split(","); }
-      } catch (Exception allignore) {
-        doctypeArray = new String[1];
-        doctypeArray[0] = "document";
-        LOGGER.warn("No search type was found - document was set");
-      }
-    }
+
     showComments = comments.endsWith("true") ? true : false;
 
-    LOGGER.debug(" SetClassification " + classifID);
-    LOGGER.debug(" Empty nodes: " + emptyLeafs);
-    LOGGER.debug(" View: " + view);
-    LOGGER.debug(" Comment: " + comments);
-    LOGGER.debug(" Doctypes: " + doctype);
-    for (int i = 0; i < doctypeArray.length; i++)
-      LOGGER.debug(" Type: " + doctypeArray[i]);
-    LOGGER.debug(" Restriction: " + restriction);
-    LOGGER.debug(" Sort: " + sort);
+    if (LOGGER.isDebugEnabled()){
+        LOGGER.debug(" SetClassification " + classifID);
+        LOGGER.debug(" Empty nodes: " + emptyLeafs);
+        LOGGER.debug(" View: " + view);
+        LOGGER.debug(" Comment: " + comments);
+        LOGGER.debug(" Doctypes: " + objectType);
+        for (int i = 0; i < objectTypeArray.length; i++)
+            LOGGER.debug(" Type: " + objectTypeArray[i]);
+        LOGGER.debug(" Restriction: " + restriction);
+        LOGGER.debug(" Sort: " + sort);
+    }    
   }
+
+
+private void setObjectTypes(final String browserClass) {
+        try {
+            // NOTE: read *.Doctype for compatiblity reasons
+            objectType = config.getString("MCR.ClassificationBrowser." + browserClass + ".Objecttype", config.getString("MCR.ClassificationBrowser."
+                    + browserClass + ".Doctype"));
+        } catch (org.mycore.common.MCRConfigurationException noDoctype) {
+            objectType = config.getString("MCR.ClassificationBrowser.default.ObjectType", config.getString("MCR.ClassificationBrowser.default.Doctype"));
+        }
+        if (objectType != null) {
+            objectTypeArray = objectType.split(",");
+        } else {
+            objectTypeArray = new String[1];
+            objectTypeArray[0] = "document";
+            LOGGER.warn("No object type was found - document was set");
+        }
+    }
 
 
   public String getUri() {
@@ -381,23 +371,9 @@ public class MCRClassificationBrowserData {
         browserClass = "default";
       }
       cli.setAttribute("browserClass", browserClass);
+      setObjectTypes(browserClass);
       try {
-        doctype = config.getString("MCR.ClassificationBrowser." + browserClass + ".Doctype");
-      } catch (org.mycore.common.MCRConfigurationException noDoctype) {
-        doctype = config.getString("MCR.ClassificationBrowser.default.Doctype");
-      }
-      if (doctype != null) {
-        try {
-          String typelist = config.getString("MCR.type_" + doctype);
-          doctypeArray = typelist.split(",");
-        } catch (Exception allignore) {
-          doctypeArray = new String[1];
-          doctypeArray[0] = "document";
-          LOGGER.warn("No search type was found - document was set");
-        }
-      }
-      try {
-        Counter = Integer.toString(clI[i].countDocLinks(doctypeArray, ""));
+        Counter = Integer.toString(clI[i].countDocLinks(objectTypeArray, ""));
       } catch (Exception ignore) {
         Counter = "NaN";
       }
@@ -469,14 +445,14 @@ public class MCRClassificationBrowserData {
     xNavtree.setAttribute("emptyLeafs", emptyLeafs);
     xNavtree.setAttribute("view", view);
     StringBuffer sb = new StringBuffer();
-    if (doctypeArray.length > 1) sb.append("(");
-    for (int i=0; i<doctypeArray.length;i++) {
-      sb.append("(objectType+=+").append(doctypeArray[i]).append(")");
-      if ((doctypeArray.length > 1) && (i<doctypeArray.length-1)) {
+    if (objectTypeArray.length > 1) sb.append("(");
+    for (int i=0; i<objectTypeArray.length;i++) {
+      sb.append("(objectType+=+").append(objectTypeArray[i]).append(")");
+      if ((objectTypeArray.length > 1) && (i<objectTypeArray.length-1)) {
         sb.append("+or+");
       }
     }
-    if (doctypeArray.length > 1) sb.append(")");
+    if (objectTypeArray.length > 1) sb.append(")");
     xNavtree.setAttribute("doctype", sb.toString());
     xNavtree.setAttribute("restriction", restriction != null ? restriction : "");
     xNavtree.setAttribute("searchField", searchField);
