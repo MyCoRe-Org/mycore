@@ -156,7 +156,7 @@ public abstract class MCRSearcher extends MCREventHandlerBase implements MCREven
      * @param fields
      *            a List of MCRFieldValue objects
      */
-    protected void addToIndex(String entryID, String returnID, List fields) {
+    public void addToIndex(String entryID, String returnID, List fields) {
     }
 
     /**
@@ -168,7 +168,7 @@ public abstract class MCRSearcher extends MCREventHandlerBase implements MCREven
      * @param entryID
      *            the unique ID of this entry in the index
      */
-    protected void removeFromIndex(String entryID) {
+    public void removeFromIndex(String entryID) {
     }
 
     /**

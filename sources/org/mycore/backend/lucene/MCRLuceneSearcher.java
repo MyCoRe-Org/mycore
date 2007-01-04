@@ -204,7 +204,7 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
         }
     }
 
-    protected void removeFromIndex(String entryID) {
+    public void removeFromIndex(String entryID) {
         LOGGER.info("MCRLuceneSearcher removing indexed data of " + entryID);
 
         try {
@@ -329,7 +329,7 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
       }
     }
 
-    protected void addToIndex(String entryID, String returnID, List fields) {
+    public void addToIndex(String entryID, String returnID, List fields) {
         LOGGER.info("MCRLuceneSearcher indexing data of " + entryID);
 
         if ((fields == null) || (fields.size() == 0)) {

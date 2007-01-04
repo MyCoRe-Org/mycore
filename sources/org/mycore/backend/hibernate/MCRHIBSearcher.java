@@ -67,7 +67,7 @@ public class MCRHIBSearcher extends MCRSearcher {
         updateConfiguration();
     }
 
-    protected void addToIndex(String entryID, String returnID, List fields) {
+    public void addToIndex(String entryID, String returnID, List fields) {
         MCRHIBQuery query = new MCRHIBQuery((String) indexClassMapping.get(index));
         Hashtable<MCRFieldDef, MCRFieldDef> used = new Hashtable<MCRFieldDef, MCRFieldDef>();
 
@@ -100,7 +100,7 @@ public class MCRHIBSearcher extends MCRSearcher {
         }
     }
 
-    protected void removeFromIndex(String entryID) {
+    public void removeFromIndex(String entryID) {
         Session session = MCRHIBConnection.instance().getSession();
         Transaction tx = session.beginTransaction();
 

@@ -173,7 +173,7 @@ public class MCROldLuceneSearcher extends MCRSearcher {
         }
     }
 
-    protected void addToIndex(String entryID, String returnID, List fields) {
+    public void addToIndex(String entryID, String returnID, List fields) {
         LOGGER.info("MCRoldLuceneSearcher indexing data of " + entryID);
 
         if ((fields == null) || (fields.size() == 0)) {
@@ -374,7 +374,7 @@ public class MCROldLuceneSearcher extends MCRSearcher {
         return writer;
     }
 
-    protected void removeFromIndex(String entryID) {
+    public void removeFromIndex(String entryID) {
         LOGGER.info("MCRoldLuceneSearcher removing indexed data of " + entryID);
 
         try {

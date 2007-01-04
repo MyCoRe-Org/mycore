@@ -107,7 +107,7 @@ public class MCRSQLSearcher extends MCRSearcher {
     }
 
     // TODO: store all values, not just the first for each repeated field
-    protected void addToIndex(String entryID, String returnID, List fields) {
+    public void addToIndex(String entryID, String returnID, List fields) {
         MCRSQLStatement query = new MCRSQLStatement(table);
         query.setValue(new MCRSQLColumn("MCRID", entryID, "string"));
         query.setValue(new MCRSQLColumn("RETURNID", returnID, "string"));
@@ -149,7 +149,7 @@ public class MCRSQLSearcher extends MCRSearcher {
         MCRSQLConnection.justDoUpdate(sql);
     }
 
-    protected void removeFromIndex(String entryID) {
+    public void removeFromIndex(String entryID) {
         MCRSQLStatement query = new MCRSQLStatement(table).setCondition("MCRID", entryID);
         String sql = query.toDeleteStatement();
         LOGGER.debug(sql);

@@ -122,7 +122,7 @@ public class MCRJDOMSearcher extends MCRSearcher {
         }
     }
 
-    protected void addToIndex(String entryID, String returnID, List fields) {
+    public void addToIndex(String entryID, String returnID, List fields) {
         if ((fields == null) || (fields.size() == 0)) {
             return;
         }
@@ -148,7 +148,7 @@ public class MCRJDOMSearcher extends MCRSearcher {
         map.put(entryID, new Document(data));
     }
 
-    protected void removeFromIndex(String entryID) {
+    public void removeFromIndex(String entryID) {
         LOGGER.info("MCRJDOMSearcher removing indexed data of " + entryID);
         map.remove(entryID);
     }
