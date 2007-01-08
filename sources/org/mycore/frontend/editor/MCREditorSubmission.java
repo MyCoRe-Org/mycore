@@ -67,6 +67,10 @@ public class MCREditorSubmission {
 
     private Document xml;
 
+    private final static String ATTR_SEP = "__";
+    private final static String BLANK = " ";
+    private final static String BLANK_ESCAPED = "_-_";
+    
     /**
      * Set variables from source xml file that should be edited
      * 
@@ -123,10 +127,10 @@ public class MCREditorSubmission {
         for (int i = 0; i < attributes.size(); i++) {
             Attribute attribute = (Attribute) (attributes.get(i));
             String name = attribute.getName();
-            String value = attribute.getValue();
+            String value = attribute.getValue().replace(BLANK,BLANK_ESCAPED);
             if ((value == null) || (value.length() == 0))
                 continue;
-            key = element.getName() + "__" + name + "__" + value;
+            key = element.getName() + ATTR_SEP + name + ATTR_SEP + value;
             if (constraints.containsKey(key))
                 setVariablesFromXML(prefix, key, element, predecessors);
         }
@@ -179,10 +183,10 @@ public class MCREditorSubmission {
                 int pos3 = var.indexOf("]", pos2);
                 String name = var.substring(0, pos1).trim();
                 String attr = var.substring(pos1 + 2, pos2).trim();
-                String value = var.substring(pos2 + 2, pos3 - 1).trim();
+                String value = var.substring(pos2 + 2, pos3 - 1).trim().replace(BLANK,BLANK_ESCAPED);
                 if (name.indexOf("/") >= 0)
                     name = name.substring(name.lastIndexOf("/") + 1).trim();
-                String key = name + "__" + attr + "__" + value;
+                String key = name + ATTR_SEP + attr + ATTR_SEP + value;
                 constraints.put(key, value);
             }
         }
@@ -632,12 +636,12 @@ public class MCREditorSubmission {
             element.setName(name);
         }
 
-        pos = name.indexOf("__");
+        pos = name.indexOf(ATTR_SEP);
         if (pos > 0) {
             element.setName(name.substring(0, pos));
-            int pos2 = name.indexOf("__", pos + 2);
+            int pos2 = name.indexOf(ATTR_SEP, pos + 2);
             String attr = name.substring(pos + 2, pos2);
-            String val = name.substring(pos2 + 2);
+            String val = name.substring(pos2 + 2).replace(BLANK_ESCAPED,BLANK);
             element.setAttribute(attr, val);
         }
 
