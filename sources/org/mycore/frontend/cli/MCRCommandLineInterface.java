@@ -487,7 +487,6 @@ public class MCRCommandLineInterface {
 	 * "quit" commands.
 	 */
 	public static void exit() {
-		System.out.println(system + " Goodbye, and remember: \"Alles wird gut.\"\n");
 		System.exit(0);
 	}
 }

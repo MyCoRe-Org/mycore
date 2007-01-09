@@ -30,6 +30,8 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 
+import org.mycore.common.MCRConfiguration;
+
 /**
  * is a wrapper for shutdown hooks.
  * 
@@ -70,6 +72,8 @@ public class MCRShutdownHandler {
     private static Logger LOGGER = Logger.getLogger(MCRShutdownHandler.class);
 
     private static final Set requests = Collections.synchronizedSet(new HashSet());
+    
+    private static final String system = MCRConfiguration.instance().getString("MCR.CommandLineInterface.SystemName", "MyCoRe") + ":";
 
     private static boolean shuttingDown = false;
 
@@ -100,6 +104,7 @@ public class MCRShutdownHandler {
     }
 
     void shutDown() {
+        System.out.println(system+" Shutting down system, please wait...\n");
         LOGGER.info("requests: " + requests.toString());
         synchronized (requests) {
             shuttingDown = true;
@@ -110,6 +115,7 @@ public class MCRShutdownHandler {
                 it.remove();
             }
         }
+        System.out.println(system + " Goodbye, and remember: \"Alles wird gut.\"\n");
     }
 
 }
