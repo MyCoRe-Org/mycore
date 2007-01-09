@@ -205,4 +205,10 @@ public abstract class MCRSearcher extends MCREventHandlerBase implements MCREven
      */
     public void addSortData(Iterator hits, List<MCRSortBy> sortBy) {
     }
+
+    /**
+     * Removes all entries from index.
+     */
+    public void clearIndex() {
+    }
 }

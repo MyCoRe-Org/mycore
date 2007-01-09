@@ -459,6 +459,18 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
         }
     }
 
+    public void clearIndex() {
+      try
+      {
+        IndexWriter writer = new IndexWriter(IndexDir, analyzer, true);
+        writer.close();
+      } catch (IOException e)
+      {
+        LOGGER.error(e.getClass().getName() + ": " + e.getMessage());
+        LOGGER.error(MCRException.getStackTraceAsString(e));
+      }
+    }
+    
     public void close() {
         LOGGER.info("Closing "+toString()+"...");
         modifyExecutor.shutdown();
