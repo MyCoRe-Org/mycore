@@ -487,7 +487,7 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
     }
 
     private static class IndexModifyExecutor extends ThreadPoolExecutor {
-        boolean modifierClosed, firstJob;
+        boolean modifierClosed, firstJob, closeModifierEarly;
 
         private IndexModifier indexModifier;
 
@@ -499,6 +499,7 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
             this.indexDir = indexDir;
             modifierClosed=true;
             firstJob=true;
+            closeModifierEarly=MCRConfiguration.instance().getBoolean("MCR.Lucene.closeModifierEarly", false);
         }
 
         @Override
@@ -506,7 +507,7 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
             super.afterExecute(r, t);
             if (firstJob)
                 firstJob=false;
-            if (getQueue().isEmpty())
+            if (getQueue().isEmpty() || closeModifierEarly)
                 closeIndexModifier();
         }
 
