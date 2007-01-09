@@ -238,86 +238,7 @@ public class MCROldLuceneSearcher extends MCRSearcher {
      * 
      */
     public static Document buildLuceneDocument(List fields) throws Exception {
-        Document doc = new Document();
-
-        for (int i = 0; i < fields.size(); i++) {
-            MCRFieldValue field = (MCRFieldValue) (fields.get(i));
-            String name = field.getField().getName();
-            String type = field.getField().getDataType();
-            String content = field.getValue();
-            MCRFile mcrfile = field.getFile();
-
-            if (null != mcrfile) {
-                if (PLUGIN_MANAGER == null) {
-//                    throw new MCRException("###mal sehn");
-                    PLUGIN_MANAGER = TextFilterPluginManager.getInstance();
-                }
-                if (PLUGIN_MANAGER.isSupported(mcrfile.getContentType())) {
-                    LOGGER.debug("####### Index MCRFile: " + mcrfile.getPath());
-
-                    BufferedReader in = new BufferedReader(PLUGIN_MANAGER.transform(mcrfile.getContentType(), mcrfile.getContentAsInputStream()));
-                    String s;
-                    StringBuffer text = new StringBuffer();
-                    while ((s = in.readLine()) != null) {
-                        text.append(s).append(" ");
-                    }
-
-                    s = text.toString();
-                    s = MCRNormalizer.normalizeString(s);
-
-                    doc.add(new Field(name, s, Field.Store.NO, Field.Index.TOKENIZED));
-                }
-            } else {
-                if ("date".equals(type) || "time".equals(type) || "timestamp".equals(type)) {
-                    type = "identifier";
-                } else if ("boolean".equals(type)) {
-                    content = "true".equals(content) ? "1" : "0";
-                    type = "identifier";
-                } else if ("decimal".equals(type)) {
-                    content = handleNumber(content, "decimal", 0);
-                    type = "identifier";
-                } else if ("integer".equals(type)) {
-                    content = handleNumber(content, "integer", 0);
-                    type = "identifier";
-                }
-
-                if (type.equals("identifier")) {
-                    doc.add(new Field(name, content, Field.Store.YES, Field.Index.UN_TOKENIZED));
-                }
-
-                if (type.equals("Text") || type.equals("name") || (type.equals("text") && field.getField().isSortable())) {
-                    doc.add(new Field(name, content, Field.Store.YES, Field.Index.TOKENIZED));
-                } else if (type.equals("text")) {
-                    doc.add(new Field(name, content, Field.Store.NO, Field.Index.TOKENIZED));
-                }
-            }
-        }
-
-        return doc;
-    }
-
-    public static String handleNumber(String content, String type, long add) {
-        int before, after;
-        int dez;
-        long l;
-        if ("decimal".equals(type)) {
-            before = DEC_BEFORE;
-            after = DEC_AFTER;
-            dez = before + after;
-            double d = Double.parseDouble(content);
-            d = d * Math.pow(10, after) + Math.pow(10, dez);
-            l = (long) d;
-        } else {
-            before = INT_BEFORE;
-            dez = before;
-            l = Long.parseLong(content);
-            l = l + (long) (Math.pow(10, dez) + 0.1);
-        }
-
-        long m = l + add;
-        String n = "0000000000000000000";
-        String h = Long.toString(m);
-        return n.substring(0, dez + 1 - h.length()) + h;
+        return MCRLuceneSearcher.buildLuceneDocument(fields);
     }
 
     /**
@@ -531,8 +452,20 @@ public class MCROldLuceneSearcher extends MCRSearcher {
         searcher.close();
       } catch (IOException e)
       {
-        LOGGER.error("Exception in MCRoldLuceneSearcher (addSortData)", e);
+        LOGGER.error("Exception in MCROldLuceneSearcher (addSortData)", e);
       }
     }
+    public void clearIndex() {
+      try
+      {
+        IndexWriter writer = new IndexWriter(IndexDir, analyzer, true);
+        writer.close();
+      } catch (IOException e)
+      {
+        LOGGER.error(e.getClass().getName() + ": " + e.getMessage());
+        LOGGER.error(MCRException.getStackTraceAsString(e));
+      }
+    }
+    
 }
 
