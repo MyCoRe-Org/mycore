@@ -69,13 +69,13 @@ final public class MCRMetaHistoryDate extends MCRMetaDefault {
         String max = config.getString("MCR.history_date_max", "AD31.12.3000");
 
         try {
-            default_von = getAntikDate(min, false);
+            default_von = getHistoryDate(min, false);
         } catch (MCRException e) {
             throw new MCRException("The default_von date is false.", e);
         }
 
         try {
-            default_bis = getAntikDate(max, true);
+            default_bis = getHistoryDate(max, true);
         } catch (MCRException e) {
             throw new MCRException("The default_bis date is false.", e);
         }
@@ -112,13 +112,13 @@ final public class MCRMetaHistoryDate extends MCRMetaDefault {
         String max = config.getString("MCR.ancient_date_max");
 
         try {
-            default_von = getAntikDate(min, false);
+            default_von = getHistoryDate(min, false);
         } catch (MCRException e) {
             throw new MCRException("The default_von date is false.", e);
         }
 
         try {
-            default_bis = getAntikDate(max, true);
+            default_bis = getHistoryDate(max, true);
         } catch (MCRException e) {
             throw new MCRException("The default_bis date is false.", e);
         }
@@ -142,7 +142,7 @@ final public class MCRMetaHistoryDate extends MCRMetaDefault {
      *            12 or 31 else it is 1
      * @return the GregorianCalendar date value or null if an error was occured.
      */
-    public static final GregorianCalendar getAntikDate(String datestr, boolean last) {
+    public static final GregorianCalendar getHistoryDate(String datestr, boolean last) {
         datestr = datestr.trim();
 
         if (datestr == null) {
@@ -407,7 +407,7 @@ final public class MCRMetaHistoryDate extends MCRMetaDefault {
      */
     public final void setVonDate(String set_date) {
         try {
-            von = getAntikDate(set_date, false);
+            von = getHistoryDate(set_date, false);
         } catch (Exception e) {
             von = default_von;
         }
@@ -439,7 +439,7 @@ final public class MCRMetaHistoryDate extends MCRMetaDefault {
      */
     public final void setBisDate(String set_date) throws MCRException {
         try {
-            bis = getAntikDate(set_date, true);
+            bis = getHistoryDate(set_date, true);
         } catch (Exception e) {
             bis = default_bis;
         }
