@@ -786,8 +786,8 @@ final public class MCRObject extends MCRBase {
                     MCRMetaElement melmold = mdold.getMetadataElement(melm.getTag());
                     Element jelm = melm.createXML(false);
                     Element jelmold = melmold.createXML(false);
-                    if (!jelm.equals(jelmold))
-                        updatechildren = true;
+                    if (!MCRXMLHelper.deepEqual(new Document(jelmold), new Document(jelm)))
+                    	updatechildren = true;
                 } catch (RuntimeException e) {
                     updatechildren = true;
                 }
