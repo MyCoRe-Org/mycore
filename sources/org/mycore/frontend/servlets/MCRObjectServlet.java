@@ -207,7 +207,11 @@ public class MCRObjectServlet extends MCRServlet {
     }
     
     private final String getEditorID(HttpServletRequest request) {
-        String referer=request.getHeader("Referer");
+        String referer=getProperty(request, "referer");
+        if (referer!=null){
+            return resolveEditorID(referer);
+        }
+        referer=request.getHeader("Referer");
         if (referer==null){
             return null;
         }
