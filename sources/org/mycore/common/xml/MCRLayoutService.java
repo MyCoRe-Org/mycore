@@ -63,7 +63,7 @@ import org.mycore.frontend.servlets.MCRServlet;
  * Does the layout for other MyCoRe servlets by transforming XML input to
  * various output formats, using XSL stylesheets.
  * 
- * @author Frank Lützenkirchen
+ * @author Frank Lï¿½tzenkirchen
  * @author Thomas Scheffler (yagee)
  * 
  * @version $Revision$ $Date$
@@ -274,13 +274,21 @@ public class MCRLayoutService {
     }
 
     private final String getCompleteURL(HttpServletRequest request) {
-        StringBuffer buffer = request.getRequestURL();
+        String requesturl = request.getRequestURL().toString();
+        StringBuffer buffer = new StringBuffer(requesturl);
+        if (requesturl.length() > 7) {
+           int i =  requesturl.indexOf("/",7); // http://
+           if (i != -1) {
+               buffer = new StringBuffer(MCRServlet.getBaseURL());
+               buffer.append(requesturl.substring(i+1,requesturl.length()));
+           }
+        } 
         String queryString = request.getQueryString();
 
         if (queryString != null && queryString.length() > 0) {
             buffer.append("?").append(queryString);
         }
-
+        LOGGER.debug("Complete request URL : "+buffer.toString());
         return buffer.toString();
     }
 
