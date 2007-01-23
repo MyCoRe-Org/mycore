@@ -80,6 +80,7 @@ public class MCRUploadApplet extends JApplet {
         Color bg = getColorParameter("background-color");
         System.out.println(bg.toString());
         setBackground(bg);
+        setLocale();
 
         // TODO: Refactor parameters from web page
         // TODO: Refactor thread handling
@@ -221,9 +222,8 @@ public class MCRUploadApplet extends JApplet {
     private final String translateI18N(String label) {
         String result;
         Locale currentLocale = getLocale();
-        ResourceBundle message = ResourceBundle.getBundle("messages", new Locale(currentLocale.getLanguage()));
-
         try {
+            ResourceBundle message = ResourceBundle.getBundle("messages", currentLocale);
             result = message.getString(label);
         } catch (java.util.MissingResourceException mre) {
             result = "???" + label + "???";
@@ -236,12 +236,14 @@ public class MCRUploadApplet extends JApplet {
     private final Color getColorParameter(String name) {
         String value = getParameter(name);
         if (value == null) {
-            return null;
+            System.err.println("Did not find color parameter: "+name);
+            return Color.WHITE; //as a default if parameter is missing
         }
         int rgbValue;
         try {
             rgbValue = Integer.parseInt(value.substring(1), 16);
         } catch (NumberFormatException e) {
+            System.err.println("Color parameter "+name+" has no valid value: "+value);
             // in this case return red
             return new Color((float) 1.0, (float) 0.0, (float) 0.0);
         }
@@ -265,6 +267,13 @@ public class MCRUploadApplet extends JApplet {
         sb.append(sessionId);
         sb.append(query);
         return sb.toString();
+    }
+    
+    private void setLocale(){
+        String value=getParameter("locale");
+        if (value!=null){
+            setLocale(new Locale(value));
+        }
     }
 
 }
