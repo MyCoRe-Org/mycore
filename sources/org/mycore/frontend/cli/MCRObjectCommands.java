@@ -476,7 +476,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         if (!MCRObject.existInDatastore(nid))
           continue;
 
-        if (exportMCRObject(dir, trans, nid))
+        if (!exportMCRObject(dir, trans, nid))
           continue;
 
         k++;
