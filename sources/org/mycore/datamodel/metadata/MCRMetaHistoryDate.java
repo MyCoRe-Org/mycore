@@ -26,22 +26,36 @@ package org.mycore.datamodel.metadata;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.Locale;
 
-import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 
 /**
  * This class implements all methods for handling with the MCRMetaHistoryDate
- * part of a metadata object. 
+ * part of a metadata object.
  * 
  * @author Juergen Vogler
  * @version $Revision$ $Date$
  */
 final public class MCRMetaHistoryDate extends MCRMetaDefault {
-    // MetaHistoryDate data
-    private GregorianCalendar default_von;
+    /** The maximal length of 'text' */
+    public static final int MCRHISTORYDATE_MAX_TEXT = 128;
 
-    private GregorianCalendar default_bis;
+    /** The first day of Julian Date */
+    public static final String min = "BC01.01.4712";
+
+    /** The last day of our era :=)) */
+    public static final String max = "AD31.12.3999";
+
+    /** The first day of Gregorian Calendar */
+    public static final String shift = "AD15.10.1582";
+
+    // MetaHistoryDate data
+    private static GregorianCalendar default_von = getHistoryDate(min, false);
+
+    private static GregorianCalendar default_bis = getHistoryDate(max, true);
+
+    private static GregorianCalendar default_shift = getHistoryDate(shift, true);
 
     private String text;
 
@@ -53,8 +67,11 @@ final public class MCRMetaHistoryDate extends MCRMetaDefault {
 
     private int ibis;
 
-    /** The maximal length of 'text' */
-    public static final int MCRHISTORYDATE_MAX_TEXT = 128;
+    private static int GREGORIAN = 0;
+
+    private static int JULIAN = 1;
+
+    private static int ISLAM = 2;
 
     /**
      * This is the constructor. <br>
@@ -63,28 +80,11 @@ final public class MCRMetaHistoryDate extends MCRMetaDefault {
      */
     public MCRMetaHistoryDate() {
         super();
-
-        MCRConfiguration config = MCRConfiguration.instance();
-        String min = config.getString("MCR.history_date_min", "BC01.01.3000");
-        String max = config.getString("MCR.history_date_max", "AD31.12.3000");
-
-        try {
-            default_von = getHistoryDate(min, false);
-        } catch (MCRException e) {
-            throw new MCRException("The default_von date is false.", e);
-        }
-
-        try {
-            default_bis = getHistoryDate(max, true);
-        } catch (MCRException e) {
-            throw new MCRException("The default_bis date is false.", e);
-        }
-
         text = "";
         von = default_von;
-        ivon = getIntDate(von);
+        ivon = getJulianDayNumber(von);
         bis = default_bis;
-        ibis = getIntDate(bis);
+        ibis = getJulianDayNumber(bis);
     }
 
     /**
@@ -106,92 +106,136 @@ final public class MCRMetaHistoryDate extends MCRMetaDefault {
      */
     public MCRMetaHistoryDate(String set_datapart, String set_subtag, String default_lang, String set_type, int set_inherted) throws MCRException {
         super(set_datapart, set_subtag, default_lang, set_type, set_inherted);
-
-        MCRConfiguration config = MCRConfiguration.instance();
-        String min = config.getString("MCR.ancient_date_min");
-        String max = config.getString("MCR.ancient_date_max");
-
-        try {
-            default_von = getHistoryDate(min, false);
-        } catch (MCRException e) {
-            throw new MCRException("The default_von date is false.", e);
-        }
-
-        try {
-            default_bis = getHistoryDate(max, true);
-        } catch (MCRException e) {
-            throw new MCRException("The default_bis date is false.", e);
-        }
-
         text = "";
         von = default_von;
-        ivon = getIntDate(von);
+        ivon = getJulianDayNumber(von);
         bis = default_bis;
-        ibis = getIntDate(bis);
+        ibis = getJulianDayNumber(bis);
     }
 
     /**
      * This method convert a ancient date to a GregorianCalendar value. The
-     * syntax for the input is [-|AD|BC][[[t]t.][m]m.][yyy]y in a Gregorian
-     * calendar date.
+     * syntax for the input is [-|AD|BC][[[t]t.][m]m.][yyy]y [AD|BC] in a a
+     * given calendar.
      * 
      * @param datestr
      *            the date as string.
      * @param last
-     *            the value is true if the defaults should be high values like
-     *            12 or 31 else it is 1
+     *            the value is true if the date should be filled with the
+     *            highest value of month or day like 12 or 31 else it fill the
+     *            date with the lowest value 1 for month and day.
+     * @param cal
+     *            the calendar as String 'gregorian' or 'julian'. 'gregorian' is
+     *            the default.
      * @return the GregorianCalendar date value or null if an error was occured.
      */
     public static final GregorianCalendar getHistoryDate(String datestr, boolean last) {
-        datestr = datestr.trim();
+        return getHistoryDate(datestr, last, "gregorian");
+    }
 
+    /**
+     * This method convert a ancient date to a GregorianCalendar value. The
+     * syntax for the input is [-|AD|BC][[[t]t.][m]m.][yyy]y [AD|BC] in a a
+     * given calendar.
+     * 
+     * @param datestr
+     *            the date as string.
+     * @param last
+     *            the value is true if the date should be filled with the
+     *            highest value of month or day like 12 or 31 else it fill the
+     *            date with the lowest value 1 for month and day.
+     * @param cal
+     *            the calendar as String 'gregorian' or 'julian'. 'gregorian' is
+     *            the default.
+     * @return the GregorianCalendar date value or null if an error was occured.
+     */
+    public static final GregorianCalendar getHistoryDate(String datestr, boolean last, String cal) {
+        // check
+        datestr = datestr.trim();
         if (datestr == null) {
             return null;
         }
-
         if (datestr.length() > 18) {
             return null;
         }
-
         if (datestr.length() == 0) {
             return null;
         }
-
+        int calint;
+        if (cal == null)
+            calint = GREGORIAN;
+        else {
+            cal = cal.trim().toLowerCase();
+            if (!cal.equals("gregorian") && !cal.equals("julian"))
+                calint = GREGORIAN;
+            if (cal.equals("gregorian"))
+                calint = GREGORIAN;
+            if (cal.equals("julian"))
+                calint = JULIAN;
+        }
+        // check data
         try {
             // suche nach v. Chr.
             boolean bc = false;
             int start = 0;
-
+            int ende = datestr.length();
             if (datestr.substring(0, 1).equals("-")) {
                 bc = true;
                 start = 1;
+            } else {
+                if (datestr.length() > 2) {
+                    int i = datestr.indexOf("AD");
+                    if (i != -1) {
+                        if (i == 0) {
+                            bc = false;
+                            start = 2;
+                        } else {
+                            bc = false;
+                            start = 0;
+                            ende = i - 1;
+                        }
+                    }
+                    i = datestr.indexOf("BC");
+                    if (i != -1) {
+                        if (i == 0) {
+                            bc = true;
+                            start = 2;
+                        } else {
+                            bc = true;
+                            start = 0;
+                            ende = i - 1;
+                        }
+                    }
+                }
+                if (datestr.length() > 7) {
+                    int i = datestr.indexOf("n. Chr.");
+                    if (i != -1) {
+                        if (i == 0) {
+                            bc = false;
+                            start = 7;
+                        } else {
+                            bc = false;
+                            start = 0;
+                            ende = i - 1;
+                        }
+                    }
+                    i = datestr.indexOf("v. Chr.");
+                    if (i != -1) {
+                        if (i == 0) {
+                            bc = true;
+                            start = 7;
+                        } else {
+                            bc = true;
+                            start = 0;
+                            ende = i - 1;
+                        }
+                    }
+                }
             }
-
-            if (datestr.length() > 2) {
-                if (datestr.substring(0, 2).equals("AD")) {
-                    bc = false;
-                    start = 2;
-                }
-
-                if (datestr.substring(0, 2).equals("BC")) {
-                    bc = true;
-                    start = 2;
-                }
-            }
-
-            if (datestr.length() > 7) {
-                if (datestr.substring(0, 7).equals("n. Chr.")) {
-                    bc = false;
-                    start = 7;
-                }
-
-                if (datestr.substring(0, 7).equals("v. Chr.")) {
-                    bc = true;
-                    start = 7;
-                }
-            }
+            datestr = datestr.substring(start, ende).trim();
 
             // deutsch oder ISO?
+            start = 0;
             boolean iso = false;
             String token = ".";
 
@@ -325,12 +369,12 @@ final public class MCRMetaHistoryDate extends MCRMetaDefault {
      * 
      * @return the date string
      */
-    private final String getDateToString(GregorianCalendar date) {
+    public static final String getDateToString(GregorianCalendar date) {
         if (date == null) {
             return "";
         }
 
-        SimpleDateFormat formatter = new SimpleDateFormat("Gdd.MM.yyyy");
+        SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy G", (new Locale("en")));
         formatter.setCalendar(date);
 
         return formatter.format(date.getTime());
@@ -358,9 +402,9 @@ final public class MCRMetaHistoryDate extends MCRMetaDefault {
      */
     public final void setDefaultVonBis() {
         von = default_von;
-        ivon = getIntDate(von);
+        ivon = getJulianDayNumber(von);
         bis = default_bis;
-        ibis = getIntDate(bis);
+        ibis = getJulianDayNumber(bis);
     }
 
     /**
@@ -379,8 +423,8 @@ final public class MCRMetaHistoryDate extends MCRMetaDefault {
             setBisDate(numdat.substring(i + 3));
         }
 
-        ivon = getIntDate(von);
-        ibis = getIntDate(bis);
+        ivon = getJulianDayNumber(von);
+        ibis = getJulianDayNumber(bis);
     }
 
     /**
@@ -396,7 +440,7 @@ final public class MCRMetaHistoryDate extends MCRMetaDefault {
             von = set_date;
         }
 
-        ivon = getIntDate(von);
+        ivon = getJulianDayNumber(von);
     }
 
     /**
@@ -412,7 +456,7 @@ final public class MCRMetaHistoryDate extends MCRMetaDefault {
             von = default_von;
         }
 
-        ivon = getIntDate(von);
+        ivon = getJulianDayNumber(von);
     }
 
     /**
@@ -428,7 +472,7 @@ final public class MCRMetaHistoryDate extends MCRMetaDefault {
             bis = set_date;
         }
 
-        ibis = getIntDate(bis);
+        ibis = getJulianDayNumber(bis);
     }
 
     /**
@@ -444,7 +488,7 @@ final public class MCRMetaHistoryDate extends MCRMetaDefault {
             bis = default_bis;
         }
 
-        ibis = getIntDate(bis);
+        ibis = getJulianDayNumber(bis);
     }
 
     /**
@@ -549,16 +593,16 @@ final public class MCRMetaHistoryDate extends MCRMetaDefault {
      * This method checks the validation of the content of this class. The
      * method returns <em>false</em> if
      * <ul>
-     * <li>the text is empty and
-     * <li>the von is empty and
-     * <li>the bis is empty and
+     * <li>the text is null or
+     * <li>the von is null or
+     * <li>the bis is null
      * </ul>
      * otherwise the method returns <em>true</em>.
      * 
      * @return a boolean value
      */
     public final boolean isValid() {
-        if (((text = text.trim()).length() == 0) && (von == null) && (bis == null)) {
+        if ((text == null) || (von == null) || (bis == null)) {
             return false;
         }
 
@@ -566,22 +610,80 @@ final public class MCRMetaHistoryDate extends MCRMetaDefault {
     }
 
     /**
-     * Convert the GregorianCalendar to an integer.
+     * Convert the GregorianCalendar to an Julian Day number.
      * 
      * @param date
      *            the GregorianCalendar date
-     * @return the represented interger
+     * @return the represented interger of Julian Day number
      */
-    public static final int getIntDate(GregorianCalendar date) {
+    public static final int getJulianDayNumber(GregorianCalendar date) {
         int number = 0;
-
-        if (date.get(Calendar.ERA) == GregorianCalendar.AD) {
-            number = ((4000 + date.get(Calendar.YEAR)) * 10000) + (date.get(Calendar.MONTH) * 100) + date.get(Calendar.DAY_OF_MONTH);
-        } else {
-            number = ((4000 - date.get(Calendar.YEAR)) * 10000) + (date.get(Calendar.MONTH) * 100) + date.get(Calendar.DAY_OF_MONTH);
+        boolean gregorian = false;
+        int y = date.get(Calendar.YEAR);
+        int m = date.get(Calendar.MONTH) + 1; // month starts with 0
+        int d = date.get(Calendar.DAY_OF_MONTH);
+        if (date.get(Calendar.ERA) == GregorianCalendar.BC) {
+            y *= -1;
         }
-
+        // Check Julian / Gregorian Calendar
+        if ((y > 1582) || (y == 1582 && m > 10) || (y == 1582 && m == 10 && d >= 15)) {
+            gregorian = true;
+        }
+        // Shift 2 month
+        if (m <= 2) {
+            y -= 1;
+            m += 12;
+        }
+        // comute Julian Day
+        int B = 0;
+        if (gregorian) {
+            int A = (new Double(y / 100)).intValue();
+            B = 2 - A + (new Double(A / 4)).intValue();
+        }
+        number = (new Double(365.25 * (y + 4716))).intValue() + (new Double(30.6001 * (m + 1))).intValue() + d + B - 1524;
         return number;
+    }
+
+    /**
+     * This method convert the Julian Day number to a Gregorian Calendar date.
+     * 
+     * @param jday
+     *            the Jualian Day number
+     * @return the Grgorian Calendar date. If jday < 0 it return the first day
+     *         BC4712-01-01. If jday > 3182029 it return 3999-12-31.
+     */
+    public static final GregorianCalendar getGregorianCalendar(int jday) {
+        GregorianCalendar greg;
+        if (jday < 0)
+            return default_von;
+        if (jday > 3182029)
+            return default_bis;
+        // check date >= 1582-10-15
+        double A = jday;
+        if (jday >= 2299161) {
+            int g = (new Double((jday - 1867216.25) / 36524.25)).intValue();
+            A = jday + 1 + g - (new Double(g / 4)).intValue();
+        }
+        // compute date
+        double B = A + 1524;
+        int C = (new Double((new Double(B - 122.1)).intValue() / 365.25)).intValue();
+        int D = (new Double(365.25 * C)).intValue();
+        int E = (new Double((B - D) / 30.6001)).intValue();
+        int d = (new Double(B)).intValue() - D - (new Double(E * 30.6001)).intValue();
+        int m;
+        if (E < 14)
+            m = E - 1;
+        else
+            m = E - 13;
+        int y;
+        if (m > 2)
+            y = C - 4716;
+        else
+            y = C - 4715;
+        if (jday < 1721424)
+            y += 1;
+        greg = new GregorianCalendar(y, m - 1, d);
+        return greg;
     }
 
     /**
@@ -603,8 +705,10 @@ final public class MCRMetaHistoryDate extends MCRMetaDefault {
         LOGGER.debug("Start Class : MCRMetaHistoryDate");
         super.debugDefault();
         LOGGER.debug("Text               = " + text);
-        LOGGER.debug("Von                = " + getVonToString());
-        LOGGER.debug("Bis                = " + getBisToString());
+        LOGGER.debug("Von (String)       = " + getVonToString());
+        LOGGER.debug("Von (JulianDay)    = " + ivon);
+        LOGGER.debug("Bis (String)       = " + getBisToString());
+        LOGGER.debug("Bis (JulianDay)    = " + ibis);
         LOGGER.debug("Stop");
         LOGGER.debug("");
     }
