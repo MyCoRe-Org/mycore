@@ -98,7 +98,7 @@ final public class MCRMetaHistoryDate extends MCRMetaDefault {
         text = "";
         setDefaultVon();
         setDefaultBis();
-        calendar = CALENDARS[4];
+        calendar = CALENDARS[0];
     }
 
     /**
@@ -126,7 +126,7 @@ final public class MCRMetaHistoryDate extends MCRMetaDefault {
         text = "";
         setDefaultVon();
         setDefaultBis();
-        calendar = CALENDARS[4];
+        calendar = CALENDARS[0];
     }
 
     /**
@@ -489,7 +489,7 @@ final public class MCRMetaHistoryDate extends MCRMetaDefault {
     public final void setVonDate(Calendar set_date) {
         if (set_date == null) {
             setDefaultVon();
-            calendar = CALENDARS[4];
+            calendar = CALENDARS[0];
             LOGGER.warn("The calendar to set 'von' is null, default is set.");
             return;
         }
@@ -524,7 +524,7 @@ final public class MCRMetaHistoryDate extends MCRMetaDefault {
     public final void setBisDate(Calendar set_date) {
         if (set_date == null) {
             setDefaultBis();
-            calendar = CALENDARS[4];
+            calendar = CALENDARS[0];
             LOGGER.warn("The calendar to set 'bis' is null, default is set.");
             return;
         }
