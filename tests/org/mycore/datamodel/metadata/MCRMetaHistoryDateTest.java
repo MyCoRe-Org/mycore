@@ -24,7 +24,8 @@
 
 package org.mycore.datamodel.metadata;
 
-import java.util.GregorianCalendar;
+import com.ibm.icu.util.Calendar;
+import com.ibm.icu.util.GregorianCalendar;
 
 import org.apache.log4j.Logger;
 import org.mycore.common.MCRConfiguration;
@@ -38,17 +39,9 @@ import org.mycore.common.MCRTestCase;
  *
  */
 public class MCRMetaHistoryDateTest extends MCRTestCase {
-    private static Logger LOGGER;
 
     protected void setUp() throws Exception {
         super.setUp();
-        if (setProperty("MCR.log4j.logger.org.mycore.datamodel.metadata.MCRMetaHistoryDate","INFO", false)){
-            //DEBUG will print a Stacktrace if we test for errors, but that's O.K.
-            MCRConfiguration.instance().configureLogging();
-        }
-        if (LOGGER == null) {
-            LOGGER = Logger.getLogger(MCRMetaHistoryDateTest.class);
-        }
     }
 
     protected void tearDown() throws Exception {
@@ -71,100 +64,64 @@ public class MCRMetaHistoryDateTest extends MCRTestCase {
 
     /*
      * Test method for 'org.mycore.datamodel.metadata.MCRMetaHistoryDate.getHistoryDate(String, boolean, String)'
+     * Test method for 'org.mycore.datamodel.metadata.MCRMetaHistoryDate.getHistoryDate(String, boolean)'
      */
     public void testGetHistoryDate() {
     String dstring;
-    // 01.01.0001 BC (julianisch)
-    GregorianCalendar greg = MCRMetaHistoryDate.getHistoryDate("-01.01.0001",false,"gregorian");
-    dstring = MCRMetaHistoryDate.getDateToString(greg);
+    Calendar cal;
+    // 01.01.0001 BC (julianisch/gregorianisch)
+    cal = (GregorianCalendar)MCRMetaHistoryDate.getHistoryDate("-01.01.0001",false,MCRMetaHistoryDate.TAG_GREGORIAN);
+    dstring = MCRMetaHistoryDate.getDateToGregorianString(cal);
     assertEquals("Date is not 01.01.0001 BC.","01.01.0001 BC",dstring);            
-    // 01.01.0001 BC (julianisch)
-    greg = MCRMetaHistoryDate.getHistoryDate("BC01.01.0001",false,"julian");
-    dstring = MCRMetaHistoryDate.getDateToString(greg);
-    assertEquals("Date is not 01.01.0001 BC.","01.01.0001 BC",dstring); 
-    // 01.01.0001 AD (julianisch)
-    greg = MCRMetaHistoryDate.getHistoryDate("01.01.0001 AD",false,null);
-    dstring = MCRMetaHistoryDate.getDateToString(greg);
+    // 01.01.0001 BC (julianisch/gregorianisch)
+    cal = (GregorianCalendar)MCRMetaHistoryDate.getGregorianHistoryDate("-01.01.0001",false);
+    dstring = MCRMetaHistoryDate.getDateToGregorianString(cal);
+    assertEquals("Date is not 01.01.0001 BC.","01.01.0001 BC",dstring);            
+    // 01.01.0001 AD (julianisch/gregorianisch)
+    cal = MCRMetaHistoryDate.getHistoryDate("01.01.0001 AD",false,null);
+    dstring = MCRMetaHistoryDate.getDateToGregorianString(cal);
     assertEquals("Date is not 01.01.0001 AD.","01.01.0001 AD",dstring);            
+    // 01.01.0001 AD (julianisch/gregorianisch)
+    cal = MCRMetaHistoryDate.getGregorianHistoryDate("01.01.0001",false);
+    dstring = MCRMetaHistoryDate.getDateToGregorianString(cal);
+    assertEquals("Date is not 01.01.0001 AD.","01.01.0001 AD",dstring);            
+    // 01.01.0045 BC (julianisch/gregorianisch)
+    cal = MCRMetaHistoryDate.getGregorianHistoryDate("-45",false);
+    dstring = MCRMetaHistoryDate.getDateToGregorianString(cal);
+    assertEquals("Date is not 01.01.0045 BC.","01.01.0045 BC",dstring);            
+    // 31.12.0045 BC (julianisch/gregorianisch)
+    cal = MCRMetaHistoryDate.getGregorianHistoryDate("BC45",true);
+    dstring = MCRMetaHistoryDate.getDateToGregorianString(cal);
+    assertEquals("Date is not 31.12.0045 BC.","31.12.0045 BC",dstring);            
+    // 31.12.0045 BC (julianisch/gregorianisch)
+    cal = MCRMetaHistoryDate.getGregorianHistoryDate("10.45 v. Chr.",true);
+    dstring = MCRMetaHistoryDate.getDateToGregorianString(cal);
+    assertEquals("Date is not 31.10.0045 BC.","31.10.0045 BC",dstring);            
     }
 
     /*
-     * Test method for 'org.mycore.datamodel.metadata.MCRMetaHistoryDate.setText(String)'
-     */
-    public void testSetText() {
-
-    }
-
-    /*
-     * Test method for 'org.mycore.datamodel.metadata.MCRMetaHistoryDate.setDefaultVonBis()'
-     */
-    public void testSetDefaultVonBis() {
-
-    }
-
-    /*
-     * Test method for 'org.mycore.datamodel.metadata.MCRMetaHistoryDate.setDateVonBis(String)'
-     */
-    public void testSetDateVonBis() {
-
-    }
-
-    /*
-     * Test method for 'org.mycore.datamodel.metadata.MCRMetaHistoryDate.setVonDate(GregorianCalendar)'
-     */
-    public void testSetVonDateGregorianCalendar() {
-        MCRMetaHistoryDate hd = new MCRMetaHistoryDate();
-        hd.setVonDate(new GregorianCalendar(1964,1,24));
-        assertEquals("Von value is not 24.02.1964 AD","24.02.1964 AD",hd.getVonToString());
-    }
-
-    /*
-     * Test method for 'org.mycore.datamodel.metadata.MCRMetaHistoryDate.setVonDate(String)'
-     */
-    public void testSetVonDateString() {
-        MCRMetaHistoryDate hd = new MCRMetaHistoryDate();
-        hd.setVonDate("24.02.1964");
-        assertEquals("Von value is not 24.02.1964 AD","24.02.1964 AD",hd.getVonToString());
-    }
-
-    /*
-     * Test method for 'org.mycore.datamodel.metadata.MCRMetaHistoryDate.setBisDate(GregorianCalendar)'
-     */
-    public void testSetBisDateGregorianCalendar() {
-        MCRMetaHistoryDate hd = new MCRMetaHistoryDate();
-        hd.setBisDate(new GregorianCalendar(1964,1,24));
-        assertEquals("Bis value is not 24.02.1964 AD","24.02.1964 AD",hd.getBisToString());
-    }
-
-    /*
-     * Test method for 'org.mycore.datamodel.metadata.MCRMetaHistoryDate.setBisDate(String)'
-     */
-    public void testSetBisDateString() {
-        MCRMetaHistoryDate hd = new MCRMetaHistoryDate();
-        hd.setBisDate("24.02.1964");
-        assertEquals("Bis value is not 24.02.1964 AD","24.02.1964 AD",hd.getBisToString());
-    }
-
-    /*
-     * Test method for 'org.mycore.datamodel.metadata.MCRMetaHistoryDate.getJulianDay(GregorianCalendar)'
+     * Test method for 'org.mycore.datamodel.metadata.MCRMetaHistoryDate.getJulianDayNumber(Calendar)'
      */
     public void testGetJulianDayNumber() {
-        int result = 0;
-        MCRMetaHistoryDate hd = new MCRMetaHistoryDate();
         GregorianCalendar greg;
-        // First day of julianian day number 1.1.4712 BC 
+        MCRMetaHistoryDate hd = new MCRMetaHistoryDate();
+        int result;
+        // First day of Julianian Day number 1.1.4712 BC         
         result = MCRMetaHistoryDate.getJulianDayNumber(hd.getVon());
         assertEquals("Date 01.01.4712 BC is not 0.",0,result);
-        // 01.01.4711 BC (julianisch)
-        greg = new GregorianCalendar(4711,0,1);
+        // First day of (OUR) Julianian Day number 31.12.3999 AD         
+        result = MCRMetaHistoryDate.getJulianDayNumber(hd.getBis());
+        assertEquals("Date 31.12.3999 AD is not 3182057.",3182057,result);
+        // 24.03.0005 BC (julianisch)
+        greg = new GregorianCalendar(5,2,24);
         greg.set(GregorianCalendar.ERA, GregorianCalendar.BC);
         result = MCRMetaHistoryDate.getJulianDayNumber(greg);
-        assertEquals("Date 01.01.4711 BC is not 366.",366,result);
+        assertEquals("Julian date 24.03.0005 BC is not 1719680.",1719680,result);
         // 31.12.1 BC (julianisch)
         greg = new GregorianCalendar(1,11,31);
         greg.set(GregorianCalendar.ERA, GregorianCalendar.BC);
         result = MCRMetaHistoryDate.getJulianDayNumber(greg);
-        assertEquals("Date 31.12.0001 BC is not 1721057.",1721057,result);
+        assertEquals("Date 31.12.0001 BC is not 1721423.",1721423,result);
         // 1.1.1 AD (julianisch)
         greg = new GregorianCalendar(1,0,1);
         greg.set(GregorianCalendar.ERA, GregorianCalendar.AD);
@@ -197,47 +154,48 @@ public class MCRMetaHistoryDateTest extends MCRTestCase {
     }
 
     /*
-     * Test method for 'org.mycore.datamodel.metadata.MCRMetaHistoryDate.getGregorianCalendar(int)'
+     * Test method for 'org.mycore.datamodel.metadata.MCRMetaHistoryDate.setVonDate(GregorianCalendar)'
      */
-    public void testGetGregorianCalendar() {
-        GregorianCalendar greg;
-        String dstring;
-        // negative input
-        greg = MCRMetaHistoryDate.getGregorianCalendar(-1);
-        dstring = MCRMetaHistoryDate.getDateToString(greg);
-        assertEquals("Date 0 is not 01.01.4712 BC.","01.01.4712 BC",dstring);        
-        // First day of julianian day number 1.1.4712 BC 
-        greg = MCRMetaHistoryDate.getGregorianCalendar(0);
-        dstring = MCRMetaHistoryDate.getDateToString(greg);
-        assertEquals("Date 0 is not 01.01.4712 BC.","01.01.4712 BC",dstring);        
-        // 01.01.4711 BC (julianisch)
-        greg = MCRMetaHistoryDate.getGregorianCalendar(366);
-        dstring = MCRMetaHistoryDate.getDateToString(greg);
-        assertEquals("Date 366 is not 01.01.4711 BC.","01.01.4711 BC",dstring);        
-        // 31.12.0001 BC (julianisch)
-        greg = MCRMetaHistoryDate.getGregorianCalendar(1721057);
-        dstring = MCRMetaHistoryDate.getDateToString(greg);
-        assertEquals("Date 1721057 is not 31.12.0001 BC.","31.12.0001 BC",dstring);        
-        // 01.01.0001  AD (julianisch)
-        greg = MCRMetaHistoryDate.getGregorianCalendar(1721424);
-        dstring = MCRMetaHistoryDate.getDateToString(greg);
-        assertEquals("Date 1721424 is not 01.01.0001 AD.","01.01.0001 AD",dstring);        
-        // 27.01.333 AD (julianisch)
-        greg = MCRMetaHistoryDate.getGregorianCalendar(1842713);
-        dstring = MCRMetaHistoryDate.getDateToString(greg);
-        assertEquals("Date 1842713 is not 27.01.333 AD.","27.01.0333 AD",dstring);        
-        // 4.10.1582 AD (julianisch)
-        greg = MCRMetaHistoryDate.getGregorianCalendar(2299160);
-        dstring = MCRMetaHistoryDate.getDateToString(greg);
-        assertEquals("Date 2299160 is not 04.10.1582 AD.","04.10.1582 AD",dstring);        
-        // 15.10.1582 AD (gregorianisch)
-        greg = MCRMetaHistoryDate.getGregorianCalendar(2299161);
-        dstring = MCRMetaHistoryDate.getDateToString(greg);
-        assertEquals("Date 2299161 is not 15.10.1582 AD.","15.10.1582 AD",dstring);        
-        // 01.01.2000 AD (gregorianisch)
-        greg = MCRMetaHistoryDate.getGregorianCalendar(2451545);
-        dstring = MCRMetaHistoryDate.getDateToString(greg);
-        assertEquals("Date 2451545 is not 01.01.2000 AD.","01.01.2000 AD",dstring);        
+    public void testSetVonDateGregorianCalendar() {
+        MCRMetaHistoryDate hd = new MCRMetaHistoryDate();
+        hd.setVonDate(new GregorianCalendar(1964,1,24));
+        assertEquals("Von value is not 24.02.1964 AD","24.02.1964 AD",hd.getVonToGregorianString());
     }
 
+    /*
+     * Test method for 'org.mycore.datamodel.metadata.MCRMetaHistoryDate.setVonDate(String)'
+     */
+    public void testSetVonDateString() {
+        MCRMetaHistoryDate hd = new MCRMetaHistoryDate();
+        hd.setVonDate("24.02.1964",MCRMetaHistoryDate.TAG_GREGORIAN);
+        assertEquals("Von value is not 24.02.1964 AD","24.02.1964 AD",hd.getVonToGregorianString());
+    }
+
+    /*
+     * Test method for 'org.mycore.datamodel.metadata.MCRMetaHistoryDate.setBisDate(GregorianCalendar)'
+     */
+    public void testSetBisDateGregorianCalendar() {
+        MCRMetaHistoryDate hd = new MCRMetaHistoryDate();
+        hd.setBisDate(new GregorianCalendar(1964,1,24));
+        assertEquals("Bis value is not 24.02.1964 AD","24.02.1964 AD",hd.getBisToGregorianString());
+    }
+
+    /*
+     * Test method for 'org.mycore.datamodel.metadata.MCRMetaHistoryDate.setBisDate(String)'
+     */
+    public void testSetBisDateString() {
+        MCRMetaHistoryDate hd = new MCRMetaHistoryDate();
+        hd.setBisDate("24.02.1964",MCRMetaHistoryDate.TAG_GREGORIAN);
+        assertEquals("Bis value is not 24.02.1964 AD","24.02.1964 AD",hd.getBisToGregorianString());
+    }
+
+    /*
+     * Test method for 'org.mycore.datamodel.metadata.MCRMetaHistoryDate.debug()'
+     */
+    public void testDebug() {
+        MCRMetaHistoryDate hd = new MCRMetaHistoryDate();
+        hd.setVonDate("05.10.1582",MCRMetaHistoryDate.TAG_GREGORIAN);
+        hd.setBisDate("15.10.1582",MCRMetaHistoryDate.TAG_GREGORIAN);
+        hd.debug();
+    }
 }

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!-- ============================================== -->
-<!-- $Revision: 1.32 $ $Date: 2006-12-07 12:53:34 $ -->
+<!-- $Revision: 1.33 $ $Date: 2007-01-30 06:43:19 $ -->
 <!-- ============================================== -->
 
 <xsl:stylesheet
@@ -209,6 +209,7 @@
     <xsd:element name="ivon"  type="xsd:integer" minOccurs='0' maxOccurs='1'/>
     <xsd:element name="bis"  type="xsd:string" minOccurs='0' maxOccurs='1'/>
     <xsd:element name="ibis"  type="xsd:integer" minOccurs='0' maxOccurs='1'/>
+    <xsd:element name="calendar"  type="xsd:string" minOccurs='0' maxOccurs='1'/>
    </xsd:sequence>
    <xsd:attribute name="type" use="optional" type="xsd:string" />
    <xsd:attribute name="inherited" use="optional" type="xsd:integer" />
