@@ -46,9 +46,8 @@ import org.jdom.Element;
 import org.jdom.filter.ElementFilter;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
+
 import org.mycore.common.MCRCache;
-import org.mycore.common.MCRUtils;
-import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
 
@@ -469,7 +468,6 @@ public class MCREditorServlet extends MCRServlet {
             sb.append(parms.getParameter("_webpage"));
             sb.append("?XSL.editor.session.id=");
             sb.append(sessionID);
-            MCRUtils.writeJDOMToSysout(new Document((Element)editor.clone()));
             logger.debug("Editor redirect to " + sb.toString());
             res.sendRedirect(res.encodeRedirectURL(sb.toString()));
 
