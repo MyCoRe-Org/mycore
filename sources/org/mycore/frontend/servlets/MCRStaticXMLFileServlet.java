@@ -25,13 +25,17 @@ package org.mycore.frontend.servlets;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.net.MalformedURLException;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 import org.jdom.Document;
+
 import org.mycore.common.MCRUtils;
-import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.common.xml.MCRXMLHelper;
 import org.mycore.frontend.editor.MCREditorServlet;
 
@@ -46,22 +50,28 @@ public class MCRStaticXMLFileServlet extends MCRServlet {
     protected final static Logger LOGGER = Logger.getLogger(MCRStaticXMLFileServlet.class);
 
     public void doGetPost(MCRServletJob job) throws java.io.IOException {
-        String requestedPath = job.getRequest().getServletPath();
+        final HttpServletRequest request = job.getRequest();
+        final HttpServletResponse response = job.getResponse();
+        String requestedPath = request.getServletPath();
         LOGGER.info("MCRStaticXMLFileServlet " + requestedPath);
 
         String path = getServletContext().getRealPath(requestedPath);
         File file = new File(path);
         if (!file.exists()) {
             String msg = "Could not find file " + requestedPath;
-            job.getResponse().sendError(HttpServletResponse.SC_NOT_FOUND, msg);
+            response.sendError(HttpServletResponse.SC_NOT_FOUND, msg);
 
             return;
         }
 
-        job.getRequest().setAttribute("XSL.StaticFilePath", requestedPath.substring(1));
-        job.getRequest().setAttribute("XSL.DocumentBaseURL", file.getParent() + File.separator);
-        job.getRequest().setAttribute("XSL.FileName", file.getName());
-        job.getRequest().setAttribute("XSL.FilePath", file.getPath());
+        processFile(request, response, file);
+    }
+
+    static void processFile(final HttpServletRequest request, final HttpServletResponse response, File file) throws FileNotFoundException, IOException, MalformedURLException {
+        request.setAttribute("XSL.StaticFilePath", request.getServletPath().substring(1));
+        request.setAttribute("XSL.DocumentBaseURL", file.getParent() + File.separator);
+        request.setAttribute("XSL.FileName", file.getName());
+        request.setAttribute("XSL.FilePath", file.getPath());
 
         // Find out XML document type: Is this a static webpage or some other XML?
         FileInputStream fis = new FileInputStream(file);
@@ -70,11 +80,10 @@ public class MCRStaticXMLFileServlet extends MCRServlet {
 
         // For static webpages, replace editor elements with complete editor definition
         if ("MyCoReWebPage".equals(type) || "webpage".equals(type)) {
-            MCRURIResolver.init(getServletContext(), getBaseURL());
-            Document xml = MCRXMLHelper.parseURI(path, false);
-            MCREditorServlet.replaceEditorElements(job, "file://" + path, xml);
-            getLayoutService().doLayout(job.getRequest(),job.getResponse(),xml);
+            Document xml = MCRXMLHelper.parseURI(file.toURI().toString(), false);
+            MCREditorServlet.replaceEditorElements(request, file.toURL().toString(), xml);
+            getLayoutService().doLayout(request,response,xml);
         } else
-            getLayoutService().doLayout(job.getRequest(),job.getResponse(),file);
+            getLayoutService().doLayout(request,response,file);
     }
 }

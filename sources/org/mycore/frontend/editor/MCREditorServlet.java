@@ -47,6 +47,7 @@ import org.jdom.filter.ElementFilter;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.mycore.common.MCRCache;
+import org.mycore.common.MCRUtils;
 import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
@@ -105,15 +106,15 @@ public class MCREditorServlet extends MCRServlet {
      * Replaces editor elements in static webpage with complete editor
      * definition.
      * 
-     * @param job
+     * @param request
      *            the current MCRServletJob
      * @param uri
      *            the uri of the static XML file containing the editor
      * @param xml
      *            the complete XML document of the static webpage
      */
-    public static void replaceEditorElements(MCRServletJob job, String uri, Document xml) {
-        String sessionID = job.getRequest().getParameter("XSL.editor.session.id");
+    public static void replaceEditorElements(HttpServletRequest request, String uri, Document xml) {
+        String sessionID = request.getParameter("XSL.editor.session.id");
 
         List editors = new ArrayList();
         Iterator it = xml.getDescendants(new ElementFilter("editor"));
@@ -125,7 +126,7 @@ public class MCREditorServlet extends MCRServlet {
             Element editor = (Element) (editors.get(i));
             Element editorResolved = null;
             if ((sessionID == null) || (sessions.get(sessionID) == null))
-                editorResolved = startSession(job.getRequest(), editor, uri);
+                editorResolved = startSession(request, editor, uri);
             else
                 editorResolved = (Element) (sessions.get(sessionID));
 
@@ -468,7 +469,7 @@ public class MCREditorServlet extends MCRServlet {
             sb.append(parms.getParameter("_webpage"));
             sb.append("?XSL.editor.session.id=");
             sb.append(sessionID);
-
+            MCRUtils.writeJDOMToSysout(new Document((Element)editor.clone()));
             logger.debug("Editor redirect to " + sb.toString());
             res.sendRedirect(res.encodeRedirectURL(sb.toString()));
 
