@@ -33,6 +33,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.TransformerFactoryConfigurationError;
@@ -148,10 +149,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
     public static final void deleteAllObjects(String type) throws MCRActiveLinkException {
         MCRObject mycore_obj = new MCRObject();
         MCRXMLTableManager tm = MCRXMLTableManager.instance();
-        ArrayList ids = tm.retrieveAllIDs(type);
-        Iterator it = ids.iterator();
-        while (it.hasNext()) {
-            String id = it.next().toString();
+        for (String id : tm.retrieveAllIDs(type)) {
             try {
                 mycore_obj.deleteFromDatastore(id);
                 LOGGER.info(mycore_obj.getId() + " deleted.");
@@ -269,16 +267,16 @@ public class MCRObjectCommands extends MCRAbstractCommands {
 
         int numProcessed = 0;
 
-        for (int i = 0; i < list.length; i++) {
-            if (!list[i].endsWith(".xml")) {
+        for (String element : list) {
+            if (!element.endsWith(".xml")) {
                 continue;
             }
 
-            if (list[i].indexOf("derivate") != -1) {
+            if (element.indexOf("derivate") != -1) {
                 continue;
             }
 
-            if (processFromFile(new File(dir, list[i]), update, true)) {
+            if (processFromFile(new File(dir, element), update, true)) {
                 numProcessed++;
             }
         }
@@ -451,63 +449,42 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      *            the type of the stylesheet
      */
     public static final void export(String fromID, String toID, String dirname, String style) {
-        // check fromID and toID
-        MCRObjectID fid = null;
-        MCRObjectID tid = null;
+        MCRObjectID fid,tid;
 
+        // check fromID and toID
         try {
             fid = new MCRObjectID(fromID);
-        } catch (Exception ex) {
-            LOGGER.error("FromID : " + ex.getMessage());
-            LOGGER.error("");
-
-            return;
-        }
-
-        try {
             tid = new MCRObjectID(toID);
         } catch (Exception ex) {
-            LOGGER.error("ToID : " + ex.getMessage());
-            LOGGER.error("");
-
+            LOGGER.error("FromID : " + ex.getMessage());
             return;
         }
-
         // check dirname
         File dir = new File(dirname);
-
-        if (dir.isFile()) {
+        if (!dir.isDirectory()) {
             LOGGER.error(dirname + " is not a dirctory.");
-            LOGGER.error("");
-
             return;
         }
-
-        Transformer trans = getTransformer(style);
 
         MCRObjectID nid = fid;
         int k = 0;
-
         try {
+            Transformer trans = getTransformer(style);
             for (int i = fid.getNumberAsInteger(); i < (tid.getNumberAsInteger() + 1); i++) {
                 nid.setNumber(i);
-
-                if (!MCRObject.existInDatastore(nid))
+                if (!MCRObject.existInDatastore(nid)) {
                     continue;
-
-                if (!exportMCRObject(dir, trans, nid))
+                }
+                if (!exportMCRObject(dir, trans, nid)) {
                     continue;
-
+                }
                 k++;
             }
         } catch (Exception ex) {
             LOGGER.error(ex.getMessage());
             LOGGER.error("Exception while store file to " + dir.getAbsolutePath());
-            LOGGER.error("");
-
             return;
         }
-
         LOGGER.info(k + " Object's stored under " + dir.getAbsolutePath() + ".");
     }
 
@@ -533,12 +510,15 @@ public class MCRObjectCommands extends MCRAbstractCommands {
             LOGGER.error(dirname + " is not a dirctory.");
             return;
         }
-        Transformer trans = getTransformer(style);
+        Transformer trans;
+        try {
+            trans = getTransformer(style);
+        } catch (Exception e) {
+            LOGGER.error("Error while getting transformer:", e);
+            return;
+        }
         MCRXMLTableManager tm = MCRXMLTableManager.instance();
-        ArrayList ids = tm.retrieveAllIDs(type);
-        Iterator it = ids.iterator();
-        while (it.hasNext()) {
-            String id = it.next().toString();
+        for (String id : tm.retrieveAllIDs(type)) {
             MCRObjectID oid = new MCRObjectID(id);
             try {
                 exportMCRObject(dir, trans, oid);
@@ -558,25 +538,24 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      *            the style attribute for the transformer stylesheet
      * @return the transformer
      * @throws TransformerFactoryConfigurationError
+     * @throws TransformerConfigurationException 
      */
-    private static final Transformer getTransformer(String style) throws TransformerFactoryConfigurationError {
+    private static final Transformer getTransformer(String style) throws TransformerFactoryConfigurationError, TransformerConfigurationException {
         String xslfile = "mcr_save-object.xsl";
-        if ((style != null) && (style.trim().length() != 0))
+        if ((style != null) && (style.trim().length() != 0)) {
             xslfile = "mcr_" + style + "-object.xsl";
+        }
         Transformer trans = null;
 
-        try {
-            InputStream in = MCRObjectCommands.class.getResourceAsStream("/" + xslfile);
-            if (in == null) {
-                in = MCRObjectCommands.class.getResourceAsStream("/mcr_save-object.xsl");
-            }
-            if (in != null) {
-                StreamSource source = new StreamSource(in);
-                TransformerFactory transfakt = TransformerFactory.newInstance();
-                transfakt.setURIResolver(MCRURIResolver.instance());
-                trans = transfakt.newTransformer(source);
-            }
-        } catch (Exception e) {
+        InputStream in = MCRObjectCommands.class.getResourceAsStream("/" + xslfile);
+        if (in == null) {
+            in = MCRObjectCommands.class.getResourceAsStream("/mcr_save-object.xsl");
+        }
+        if (in != null) {
+            StreamSource source = new StreamSource(in);
+            TransformerFactory transfakt = TransformerFactory.newInstance();
+            transfakt.setURIResolver(MCRURIResolver.instance());
+            trans = transfakt.newTransformer(source);
         }
         return trans;
     }
@@ -723,15 +702,13 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      * @param type
      *            the MCRObjectID type
      */
+    @SuppressWarnings("unchecked")
     public static final void repairMetadataSearch(String type) {
         LOGGER.info("Start the repair for type " + type);
-
         String typetest = CONFIG.getString("MCR.type_" + type, "");
 
         if (typetest.length() == 0) {
             LOGGER.error("The type " + type + " was not found.");
-            LOGGER.info(" ");
-
             return;
         }
 
@@ -739,22 +716,16 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         MCREvent evt = new MCREvent(MCREvent.OBJECT_TYPE, MCREvent.LISTIDS_EVENT);
         evt.put("objectType", type);
         MCREventManager.instance().handleEvent(evt);
-        ArrayList ar = (ArrayList) evt.get("objectIDs");
+        List<String> ar = (List<String>) evt.get("objectIDs");
         if ((ar == null) || (ar.size() == 0)) {
             LOGGER.warn("No ID's was found for type " + type + ".");
             return;
         }
-        String stid = null;
-
-        for (int i = 0; i < ar.size(); i++) {
-            stid = (String) ar.get(i);
-
+        for (String stid : ar) {
             MCRObject obj = new MCRObject();
             obj.repairPersitenceDatastore(stid);
-            LOGGER.info("Repaired " + (String) ar.get(i));
+            LOGGER.info("Repaired " + stid);
         }
-
-        LOGGER.info(" ");
     }
 
     /**

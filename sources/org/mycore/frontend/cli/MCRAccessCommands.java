@@ -27,7 +27,6 @@ import static org.mycore.common.MCRConstants.DEFAULT_ENCODING;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -36,6 +35,7 @@ import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
+
 import org.mycore.access.MCRAccessInterface;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRException;
@@ -344,9 +344,8 @@ public class MCRAccessCommands extends MCRAbstractCommands {
         Element rule = getRuleFromFile(strFileRule);
         if (rule == null)
             return;
-        ArrayList list = MCRXMLTableManager.instance().retrieveAllIDs(documentType);
-        for (Iterator it = list.iterator(); it.hasNext();) {
-            String id = (String) it.next();
+        List<String> list = MCRXMLTableManager.instance().retrieveAllIDs(documentType);
+        for (String id : list) {
             AI.addRule(id, permission, rule, description);
         }
         return;

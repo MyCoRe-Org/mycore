@@ -84,8 +84,10 @@ public class MCRLayoutService {
 
     public MCRLayoutService(String stylesheetsDir) {
         this.stylesheetsDir = stylesheetsDir;
-
+//        System.setProperty("javax.xml.transform.TransformerFactory", "org.apache.xalan.xsltc.trax.TransformerFactoryImpl");
+        System.setProperty("javax.xml.transform.TransformerFactory", "org.apache.xalan.processor.TransformerFactoryImpl");
         TransformerFactory tf = TransformerFactory.newInstance();
+        LOGGER.info("Transformerfactory: "+tf.getClass().getName());
 
         if (!tf.getFeature(SAXTransformerFactory.FEATURE)) {
             throw new MCRConfigurationException("Could not load a SAXTransformerFactory for use with XSLT");

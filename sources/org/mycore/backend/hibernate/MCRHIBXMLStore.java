@@ -190,7 +190,7 @@ public class MCRHIBXMLStore implements MCRXMLTableInterface {
      */
     public final byte[] retrieve(MCRObjectID mcrid, int version) throws MCRPersistenceException {
         Session session = getSession();
-        List<?> l = new ArrayList<Object>();
+        List<?> l;
 
         byte[] blob = null;
 
@@ -271,7 +271,7 @@ public class MCRHIBXMLStore implements MCRXMLTableInterface {
      *            a MCRObjectID type string
      * @return a ArrayList of MCRObjectID's
      */
-    public ArrayList<String> retrieveAllIDs(String type) {
+    public List<String> retrieveAllIDs(String type) {
         Session session = getSession();
         List<?> l;
         ArrayList<String> a = new ArrayList<String>();
@@ -296,7 +296,7 @@ public class MCRHIBXMLStore implements MCRXMLTableInterface {
      * 
      * @return a ArrayList of MCRObjectID's
      */
-    public ArrayList<String> retrieveAllIDs() {
+    public List<String> retrieveAllIDs() {
         Session session = getSession();
         List<?> l;
         ArrayList<String> a = new ArrayList<String>();

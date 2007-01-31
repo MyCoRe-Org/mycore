@@ -23,7 +23,7 @@
 
 package org.mycore.datamodel.metadata;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandlerBase;
@@ -111,7 +111,7 @@ public class MCRXMLTableEventHandler extends MCREventHandlerBase {
 
     /**
      * This method put all ID's of the XML data from SQL table data via
-     * MCRXMLTableManager in an ArryList and put it in the MCREvent instance as
+     * MCRXMLTableManager in an List&lt;String&gt; and put it in the MCREvent instance as
      * entry 'objectIDs'.
      * 
      * @param evt
@@ -120,7 +120,7 @@ public class MCRXMLTableEventHandler extends MCREventHandlerBase {
      *            the MCR type that caused the event
      */
     protected final void handleObjectListIDs(MCREvent evt, String objtype) {
-        ArrayList ar = mcr_xmltable.retrieveAllIDs(objtype);
+        List<String> ar = mcr_xmltable.retrieveAllIDs(objtype);
         evt.put("objectIDs", ar);
     }
 
@@ -196,7 +196,7 @@ public class MCRXMLTableEventHandler extends MCREventHandlerBase {
 
     /**
      * This method put all ID's of the XML data from SQL table data via
-     * MCRXMLTableManager in an ArryList and put it in the MCREvent instance as
+     * MCRXMLTableManager in an List&lt;String&gt; and put it in the MCREvent instance as
      * entry 'derivateIDs'.
      * 
      * @param evt
@@ -205,7 +205,7 @@ public class MCRXMLTableEventHandler extends MCREventHandlerBase {
      *            the MCR type that caused the event
      */
     protected final void handleDerivateListIDs(MCREvent evt, String dertype) {
-        ArrayList ar = mcr_xmltable.retrieveAllIDs(dertype);
+        List<String> ar = mcr_xmltable.retrieveAllIDs(dertype);
         evt.put("derivateIDs", ar);
     }
 

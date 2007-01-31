@@ -23,7 +23,7 @@
 
 package org.mycore.datamodel.metadata;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import org.mycore.common.MCRPersistenceException;
 
@@ -135,5 +135,5 @@ public interface MCRXMLTableInterface {
      *            a MCRObjectID type string
      * @return a ArrayList of MCRObjectID's
      */
-    public ArrayList retrieveAllIDs(String type);
+    public List<String> retrieveAllIDs(String type);
 }

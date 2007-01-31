@@ -26,12 +26,13 @@ package org.mycore.backend.jdom;
 import static org.mycore.common.MCRConstants.XSL_NAMESPACE;
 
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.jdom.Document;
+
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRException;
@@ -156,7 +157,7 @@ public class MCRJDOMMemoryStore {
     private Hashtable readObjectsFromPersistentStore(String type) {
         long startdate = System.currentTimeMillis();
         MCRXMLTableManager mcr_xml = MCRXMLTableManager.instance();
-        ArrayList ar = mcr_xml.retrieveAllIDs(type);
+        List<String> ar = mcr_xml.retrieveAllIDs(type);
         Hashtable objects = new Hashtable();
         int size = ar.size();
         

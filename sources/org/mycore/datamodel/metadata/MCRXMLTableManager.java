@@ -27,11 +27,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Hashtable;
-import java.util.Iterator;
+import java.util.List;
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
 import org.jdom.Document;
+
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
@@ -49,7 +50,7 @@ import org.mycore.common.xml.MCRXMLHelper;
  */
 public class MCRXMLTableManager {
     /** The link table manager singleton */
-    protected static MCRXMLTableManager SINGLETON;
+    private static MCRXMLTableManager SINGLETON;
 
     // logger
     static Logger LOGGER = Logger.getLogger(MCRLinkTableManager.class);
@@ -58,7 +59,7 @@ public class MCRXMLTableManager {
 
     static MCRCache jdomCache;
 
-    private Hashtable tablelist;
+    private Hashtable<String, MCRXMLTableInterface> tablelist;
 
     private static int number_distance = 1;
 
@@ -77,7 +78,7 @@ public class MCRXMLTableManager {
      * The constructor of this class.
      */
     protected MCRXMLTableManager() {
-        tablelist = new Hashtable();
+        tablelist = new Hashtable<String, MCRXMLTableInterface>();
         jdomCache = new MCRCache(CONFIG.getInt("MCR.xml.tablemanager.cache.size", 100));
         number_distance = CONFIG.getInt("MCR.metadata_objectid_number_distance", 1);
     }
@@ -93,7 +94,7 @@ public class MCRXMLTableManager {
         if ((type == null) || (type.length() == 0)) {
             throw new MCRException("The type is null or empty.");
         } else if (tablelist.containsKey(type)) {
-            return (MCRXMLTableInterface) tablelist.get(type);
+            return tablelist.get(type);
         }
 
         MCRXMLTableInterface inst = (MCRXMLTableInterface) CONFIG.getInstanceOf("MCR.xml_store_class");
@@ -246,7 +247,7 @@ public class MCRXMLTableManager {
      *            a MCRObjectID type string
      * @return a ArrayList of MCRObjectID's
      */
-    public ArrayList retrieveAllIDs(String type) {
+    public List<String> retrieveAllIDs(String type) {
         return getXMLTable(type).retrieveAllIDs(type);
     }
     
@@ -256,14 +257,13 @@ public class MCRXMLTableManager {
      * 
      * @return a ArrayList of MCRObjectID's
      */
-    public ArrayList retrieveAllIDs() {
-    		ArrayList a = new ArrayList();
-    		for (Iterator it = getAllAllowedMCRObjectIDTypes().iterator(); it.hasNext();) {
-				String type = (String) it.next();
-				a.addAll(retrieveAllIDs(type));
-			}
-    		Collections.sort(a);
-    		return a;
+    public List<String> retrieveAllIDs() {
+        ArrayList<String> a = new ArrayList<String>();
+        for (String type : getAllAllowedMCRObjectIDTypes()) {
+            a.addAll(retrieveAllIDs(type));
+        }
+        Collections.sort(a);
+        return a;
     }   
     
     /**
@@ -272,8 +272,8 @@ public class MCRXMLTableManager {
      * reads the mycore.properties-configuration for datamodel-types
      * @return a ArrayList of MCRObjectID-Types for which MCR.type_{datamodel}=true
      */
-    public ArrayList getAllAllowedMCRObjectIDTypes(){
-    	ArrayList listTypes = new ArrayList();
+    public List<String> getAllAllowedMCRObjectIDTypes(){
+    	ArrayList<String> listTypes = new ArrayList<String>();
     	final String prefix = "MCR.type_";
         Properties prop = MCRConfiguration.instance().getProperties(prefix);
         Enumeration names = prop.propertyNames();

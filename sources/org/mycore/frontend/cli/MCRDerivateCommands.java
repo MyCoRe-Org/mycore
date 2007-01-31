@@ -28,8 +28,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.xml.transform.Transformer;
@@ -40,9 +38,9 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
 import org.apache.log4j.Logger;
-
 import org.jdom.Document;
 import org.jdom.Element;
+
 import org.mycore.access.MCRAccessBaseImpl;
 import org.mycore.access.MCRAccessInterface;
 import org.mycore.common.MCRConfiguration;
@@ -128,10 +126,8 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
     public static void deleteAllDerivates() {
         MCRDerivate der = new MCRDerivate();
         MCRXMLTableManager tm = MCRXMLTableManager.instance();
-        ArrayList ids = tm.retrieveAllIDs("derivate");
-        Iterator it = ids.iterator();
-        while (it.hasNext()) {
-            String id = it.next().toString();
+        List<String> ids = tm.retrieveAllIDs("derivate");
+        for (String id : ids) {
             try {
                 der.deleteFromDatastore(id);
                 LOGGER.info(der.getId().getId() + " deleted.");
@@ -535,10 +531,8 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
         Transformer trans = getTransformer(style);
 
         MCRXMLTableManager tm = MCRXMLTableManager.instance();
-        ArrayList ids = tm.retrieveAllIDs("derivate");
-        Iterator it = ids.iterator();
-        while (it.hasNext()) {
-            String id = it.next().toString();
+        List<String> ids = tm.retrieveAllIDs("derivate");
+        for (String id : ids) {
             MCRObjectID oid = new MCRObjectID(id);
             try {
                 exportDerivate(dir, trans, oid);
@@ -647,6 +641,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
     /**
      * The method start the repair the content search index for all derivates.
      */
+    @SuppressWarnings("unchecked")
     public static void repairDerivateSearch() {
         LOGGER.info("Start the repair for type derivate.");
 
@@ -654,22 +649,16 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
         MCREvent evt = new MCREvent(MCREvent.DERIVATE_TYPE, MCREvent.LISTIDS_EVENT);
         evt.put("derivateType", "derivate");
         MCREventManager.instance().handleEvent(evt);
-        ArrayList ar = (ArrayList) evt.get("derivateIDs");
+        List<String> ar = (List<String>) evt.get("derivateIDs");
         if ((ar == null) || (ar.size() == 0)) {
             LOGGER.warn("No ID's was found for type derivate.");
             return;
         }
-        String stid = null;
-
-        for (int i = 0; i < ar.size(); i++) {
-            stid = (String) ar.get(i);
-
+        for (String stid:ar){
             MCRDerivate der = new MCRDerivate();
             der.repairPersitenceDatastore(stid);
-            LOGGER.info("Repaired " + (String) ar.get(i));
+            LOGGER.info("Repaired " + stid);
         }
-
-        LOGGER.info(" ");
     }
 
     /**
