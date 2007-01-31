@@ -82,16 +82,32 @@ public class MCRQueryParser extends MCRBooleanClauseParser {
      * @return
      */
     private MCRCondition buildConditions(String field, String oper, String value) {
-        if (field.indexOf(",") == -1)
-            return buildCondition(field, oper, value);
-        else // Multiple fields in one condition, combine with OR
+        if (field.contains(",")) // Multiple fields in one condition, combine
+                                    // with OR
         {
-            StringTokenizer st = new StringTokenizer(field, ", ");
+            StringTokenizer st = new StringTokenizer(field, ",");
             MCROrCondition oc = new MCROrCondition();
             while (st.hasMoreTokens())
                 oc.addChild(buildCondition(st.nextToken(), oper, value));
             return oc;
-        }
+        } else if (field.contains("-")) // MCRMetaHistoryDate condition von-bis
+        {
+            StringTokenizer st = new StringTokenizer(field, "-");
+            String fieldFrom = st.nextToken();
+            String fieldTo = st.nextToken();
+            if (oper.equals("=")) {
+                // von-bis = x --> (von <= x) AND (bis >= x)
+                MCRAndCondition ac = new MCRAndCondition();
+                ac.addChild(buildCondition(fieldFrom, "<=", value));
+                ac.addChild(buildCondition(fieldTo, ">=", value));
+                return ac;
+            } else if (oper.contains("<"))
+                return buildCondition(fieldFrom, oper, value);
+            else
+                // oper.contains( ">" )
+                return buildCondition(fieldTo, oper, value);
+        } else
+            return buildCondition(field, oper, value);
     }
 
     /**
