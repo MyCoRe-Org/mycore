@@ -24,7 +24,6 @@
 package org.mycore.frontend.indexbrowser;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.List;
 
@@ -32,6 +31,7 @@ import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.Namespace;
+
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.xml.MCRXMLHelper;
 import org.mycore.datamodel.metadata.MCRObjectID;
@@ -84,7 +84,6 @@ public final class MCRGoogleSitemapServlet extends MCRServlet {
         LOGGER.info("Start Google access on " + timecurrent);
 
         // build over all types
-        String id = null;
         MCRObjectID mid = new MCRObjectID();
         byte[] xml = null;
         Document doc = null;
@@ -93,10 +92,8 @@ public final class MCRGoogleSitemapServlet extends MCRServlet {
         Element servdates = null;
         List servdatelist = null;
         Element servdate = null;
-        for (int i = 0; i < types.length; i++) {
-            ArrayList al = tm.retrieveAllIDs(types[i]);
-            for (int j = 0; j < al.size(); j++) {
-                id = (String) al.get(j);
+        for (String type : types) {
+            for (String id : tm.retrieveAllIDs(type)) {
                 LOGGER.debug("Read object with ID " + id);
                 mid.setID(id);
                 xml = tm.retrieve(mid);
