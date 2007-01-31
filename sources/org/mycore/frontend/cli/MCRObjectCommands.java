@@ -28,8 +28,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.xml.transform.Transformer;
@@ -41,11 +39,7 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
 import org.apache.log4j.Logger;
-import org.jdom.Document;
-import org.jdom.Element;
-import org.mycore.access.MCRAccessBaseImpl;
-import org.mycore.access.MCRAccessInterface;
-import org.mycore.common.MCRConfiguration;
+
 import org.mycore.common.MCRException;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventManager;
@@ -66,9 +60,6 @@ import org.mycore.datamodel.metadata.MCRXMLTableManager;
  */
 public class MCRObjectCommands extends MCRAbstractCommands {
     private static Logger LOGGER = Logger.getLogger(MCRObjectCommands.class.getName());
-
-    private static final MCRAccessInterface ACCESS_IMPL = (MCRAccessInterface) MCRConfiguration.instance().getInstanceOf("MCR.Access_class_name",
-            MCRAccessBaseImpl.class.getName());
 
     /**
      * The empty constructor.
@@ -449,7 +440,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      *            the type of the stylesheet
      */
     public static final void export(String fromID, String toID, String dirname, String style) {
-        MCRObjectID fid,tid;
+        MCRObjectID fid, tid;
 
         // check fromID and toID
         try {
@@ -538,7 +529,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      *            the style attribute for the transformer stylesheet
      * @return the transformer
      * @throws TransformerFactoryConfigurationError
-     * @throws TransformerConfigurationException 
+     * @throws TransformerConfigurationException
      */
     private static final Transformer getTransformer(String style) throws TransformerFactoryConfigurationError, TransformerConfigurationException {
         String xslfile = "mcr_save-object.xsl";
@@ -588,46 +579,26 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      * @throws IOException
      */
     private static final boolean exportMCRObject(File dir, Transformer trans, MCRObjectID nid) throws FileNotFoundException, TransformerException, IOException {
-        MCRObject obj = new MCRObject();
-        Document xml = null;
+        byte[] xml = null;
+        try {
+            // if object do'snt exist - no exception is catched!
+            xml = MCRObject.receiveXMLFromDatastore(nid.toString());
+        } catch (MCRException ex) {
+            return false;
+        }
+
         File xmlOutput = new File(dir, nid.toString() + ".xml");
         FileOutputStream out = new FileOutputStream(xmlOutput);
 
-        try {
-            // if object doesn't exist - no exception is catched!
-            obj.receiveFromDatastore(nid);
-            List l = ACCESS_IMPL.getPermissionsForID(nid.toString());
-            for (int i = 0; i < l.size(); i++) {
-                Element rule = ACCESS_IMPL.getRule(nid.toString(), (String) l.get(i));
-                obj.getService().addRule((String) l.get(i), rule);
-            }
-            xml = obj.createXML();
-            if (trans != null) {
-                StreamResult sr = new StreamResult(out);
-                trans.transform(new org.jdom.transform.JDOMSource(xml), sr);
-                LOGGER.info("Object " + nid.toString() + " is complete exported to " + xmlOutput.getCanonicalPath() + ".");
-                return true;
-            } else {
-                new org.jdom.output.XMLOutputter().output(xml, out);
-                out.flush();
-                out.close();
-                LOGGER.warn("Object " + nid.toString() + " is exported without transformation to " + xmlOutput.getCanonicalPath() + ".");
-                return true;
-            }
-        } catch (MCRException ex) {
-            byte[] bxml = null;
-            try {
-                bxml = obj.receiveXMLFromDatastore(nid);
-                xml = MCRXMLHelper.parseXML(bxml, false);
-                out.write(bxml);
-                out.flush();
-                LOGGER.warn("Object " + nid.toString() + " is native exported with damaged data to " + xmlOutput.getCanonicalPath() + ".");
-                return true;
-            } catch (Exception e) {
-                LOGGER.warn("Object " + nid.toString() + " can't find or store to " + xmlOutput.getCanonicalPath() + ".");
-            }
+        if (trans != null) {
+            StreamResult sr = new StreamResult(out);
+            trans.transform(new org.jdom.transform.JDOMSource(MCRXMLHelper.parseXML(xml, false)), sr);
+        } else {
+            out.write(xml);
+            out.flush();
         }
-        return false;
+        LOGGER.info("Object " + nid.toString() + " saved to " + xmlOutput.getCanonicalPath() + ".");
+        return true;
     }
 
     /**
