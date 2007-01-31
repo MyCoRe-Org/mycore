@@ -588,7 +588,7 @@ final public class MCRObject extends MCRBase {
      * @exception MCRPersistenceException
      *                if a persistence problem is occured
      */
-    public final byte[] receiveXMLFromDatastore(String id) throws MCRPersistenceException {
+    public static final byte[] receiveXMLFromDatastore(String id) throws MCRPersistenceException {
         return receiveXMLFromDatastore(new MCRObjectID(id));
     }
 
@@ -602,7 +602,7 @@ final public class MCRObject extends MCRBase {
      * @exception MCRPersistenceException
      *                if a persistence problem is occured
      */
-    public final byte[] receiveXMLFromDatastore(MCRObjectID id) throws MCRPersistenceException {
+    public static final byte[] receiveXMLFromDatastore(MCRObjectID id) throws MCRPersistenceException {
         // handle events
         MCREvent evt = new MCREvent(MCREvent.OBJECT_TYPE, MCREvent.RECEIVE_EVENT);
         evt.put("objectID", id);
@@ -611,7 +611,7 @@ final public class MCRObject extends MCRBase {
         try {
             xml = (byte[]) evt.get("xml");
         } catch (RuntimeException e) {
-            throw new MCRPersistenceException("The XML file for ID " + mcr_id.getId() + " was not retrieved.");
+            throw new MCRPersistenceException("The XML file for ID " + id.getId() + " was not retrieved.");
         }
         return xml;
     }
