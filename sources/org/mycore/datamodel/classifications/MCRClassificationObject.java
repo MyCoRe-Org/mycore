@@ -40,7 +40,7 @@ import org.mycore.datamodel.metadata.MCRLinkTableManager;
  * This class is an abstract class for the implementation of the classes
  * classification an category.
  * 
- * @author Frank Lützenkirchen
+ * @author Frank Luetzenkirchen
  * @author Jens Kupferschmidt
  * @version $Revision$ $Date$
  */
@@ -59,11 +59,11 @@ public abstract class MCRClassificationObject {
 
     protected String ID;
 
-    protected ArrayList lang;
+    protected ArrayList<String> lang;
 
-    protected ArrayList text;
+    protected ArrayList<String> text;
 
-    protected ArrayList description;
+    protected ArrayList<String> description;
 
     protected String[] childrenIDs;
 
@@ -97,9 +97,9 @@ public abstract class MCRClassificationObject {
     public MCRClassificationObject(String ID) {
         assert(ID != null);
         this.ID = ID;
-        this.text = new ArrayList();
-        this.lang = new ArrayList();
-        this.description = new ArrayList();
+        this.text = new ArrayList<String>();
+        this.lang = new ArrayList<String>();
+        this.description = new ArrayList<String>();
         this.childrenIDs = null;
         this.deleted = false;
     }
