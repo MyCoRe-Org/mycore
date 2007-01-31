@@ -32,6 +32,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.util.Collections;
@@ -586,20 +588,20 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
          * @throws IOException 
          * @throws JDOMException 
          * @throws FileNotFoundException 
+         * @throws URISyntaxException 
          */
-        public Element resolveElement(String uri) throws FileNotFoundException, JDOMException, IOException {
-            String path = uri.substring("file://".length());
-            LOGGER.debug("Reading xml from file " + path);
-
-            File file = new File(path);
-            Element fromCache = (Element) fileCache.getIfUpToDate(path, file.lastModified());
+        public Element resolveElement(String uri) throws FileNotFoundException, JDOMException, IOException, URISyntaxException {
+            URI fileURI=new URI(uri);
+            File file = new File(fileURI);
+            LOGGER.debug("Reading xml from file " + file.getAbsolutePath());
+            Element fromCache = (Element) fileCache.getIfUpToDate(fileURI.toString(), file.lastModified());
 
             if (fromCache != null) {
                 return (Element) (fromCache.clone());
             }
 
             Element parsed = MCRURIResolver.instance().parseStream(new FileInputStream(file));
-            fileCache.put(path, parsed);
+            fileCache.put(fileURI.toString(), parsed);
 
             return (Element) (parsed.clone());
         }
