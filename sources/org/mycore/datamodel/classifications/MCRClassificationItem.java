@@ -23,7 +23,7 @@
 
 package org.mycore.datamodel.classifications;
 
-import org.mycore.common.MCRArgumentChecker;
+import org.mycore.common.MCRUsageException;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.jdom.Element;
 
@@ -31,7 +31,7 @@ import org.jdom.Element;
  * This class represents a classification item of the MyCoRe classification
  * model and implements the abstract MCRClassificationObject class.
  * 
- * @author Frank Lützenkirchen
+ * @author Frank Luetzenkirchen
  * @author Jens Kupferschmidt
  * @version $Revision$ $Date$
  */
@@ -95,8 +95,9 @@ public class MCRClassificationItem extends MCRClassificationObject {
      */
     public MCRCategoryItem getCategoryItem(String categID) {
         ensureNotDeleted();
-        MCRArgumentChecker.ensureNotEmpty(categID, "categID");
-
+        if ((categID == null) || ((categID = categID.trim()).length() == 0)) {
+            throw new MCRUsageException("categID is an empty String");
+        }
         return MCRCategoryItem.getCategoryItem(this.ID, categID);
     }
 
@@ -109,8 +110,9 @@ public class MCRClassificationItem extends MCRClassificationObject {
      */
     public MCRCategoryItem getCategoryItemForLabelText(String labeltext) {
         ensureNotDeleted();
-        MCRArgumentChecker.ensureNotEmpty(labeltext, "labeltext");
-
+        if ((labeltext == null) || ((labeltext = labeltext.trim()).length() == 0)) {
+            throw new MCRUsageException("labeltext is an empty String");
+        }
         return MCRCategoryItem.getCategoryItemForLabelText(this.ID, labeltext);
     }
 
@@ -123,22 +125,23 @@ public class MCRClassificationItem extends MCRClassificationObject {
      * @return the MCRClassificationItem
      */
     public static MCRClassificationItem getClassificationItem(String ID) {
-        MCRArgumentChecker.ensureNotEmpty(ID, "ID");
-
+        if ((ID == null) || ((ID = ID.trim()).length() == 0)) {
+            throw new MCRUsageException("ID is an empty String");
+        }
         return manager().retrieveClassificationItem(ID);
     }
-    
+
     /**
      * return a MCRClassificationItem as JDOM Element
      * 
      * @return the MCRClassificationItem
      */
-     public Element getClassificationItemAsJDom() {
-    	Element xClassI = new Element( "classification" );
-	    xClassI.setAttribute ( "ID", getClassificationID());
-	    for (int i=0; i< getSize(); i++ ){
-		    xClassI.addContent(getJDOMElement(i));	    	
-	    }
-	    return xClassI;
+    public Element getClassificationItemAsJDom() {
+        Element xClassI = new Element("classification");
+        xClassI.setAttribute("ID", getClassificationID());
+        for (int i = 0; i < getSize(); i++) {
+            xClassI.addContent(getJDOMElement(i));
+        }
+        return xClassI;
     }
 }
