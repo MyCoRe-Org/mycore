@@ -24,6 +24,7 @@
 package org.mycore.services.fieldquery;
 
 import java.util.ArrayList;
+import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
@@ -31,6 +32,7 @@ import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 import org.jdom.Element;
+import org.mycore.datamodel.metadata.MCRMetaHistoryDate;
 import org.mycore.datamodel.metadata.MCRMetaISO8601Date;
 import org.mycore.parsers.bool.MCRAndCondition;
 import org.mycore.parsers.bool.MCRBooleanClauseParser;
@@ -82,30 +84,29 @@ public class MCRQueryParser extends MCRBooleanClauseParser {
      * @return
      */
     private MCRCondition buildConditions(String field, String oper, String value) {
-        if (field.contains(",")) // Multiple fields in one condition, combine
-                                    // with OR
-        {
+        if (field.contains(",")) 
+        { // Multiple fields in one condition, combine with OR
             StringTokenizer st = new StringTokenizer(field, ",");
             MCROrCondition oc = new MCROrCondition();
             while (st.hasMoreTokens())
                 oc.addChild(buildCondition(st.nextToken(), oper, value));
             return oc;
-        } else if (field.contains("-")) // MCRMetaHistoryDate condition von-bis
-        {
+        } else if (field.contains("-")) 
+        { // MCRMetaHistoryDate condition von-bis
             StringTokenizer st = new StringTokenizer(field, "-");
             String fieldFrom = st.nextToken();
             String fieldTo = st.nextToken();
             if (oper.equals("=")) {
                 // von-bis = x --> (von <= x) AND (bis >= x)
                 MCRAndCondition ac = new MCRAndCondition();
-                ac.addChild(buildCondition(fieldFrom, "<=", value));
-                ac.addChild(buildCondition(fieldTo, ">=", value));
+                ac.addChild(buildCondition(fieldFrom, "<=", normalizeHistoryDate("<=",value)));
+                ac.addChild(buildCondition(fieldTo, ">=", normalizeHistoryDate(">=",value)));
                 return ac;
             } else if (oper.contains("<"))
-                return buildCondition(fieldFrom, oper, value);
+                return buildCondition(fieldFrom, oper, normalizeHistoryDate(oper,value));
             else
                 // oper.contains( ">" )
-                return buildCondition(fieldTo, oper, value);
+                return buildCondition(fieldTo, oper, normalizeHistoryDate(oper,value));
         } else
             return buildCondition(field, oper, value);
     }
@@ -332,5 +333,28 @@ public class MCRQueryParser extends MCRBooleanClauseParser {
         } catch (Throwable t) {
             return false;
         }
+    }
+    
+    /**
+     * Normalizes MCRMetaHistoryDate values used in a query. If the
+     * date is incomplete (for example, only the year given), it depends
+     * on the search operator used, whether the upper (31th Dec of year)
+     * or lower (1st Jan of year) bound is used.
+     * 
+     * @param operator the search operator, one of >, >=, <, <=
+     * @param date the date to search for
+     * @return the julian day number, as a String
+     */
+    private static String normalizeHistoryDate(String operator, String date) {
+        GregorianCalendar cal = null;
+        if (operator.equals(">"))
+            cal = MCRMetaHistoryDate.getHistoryDate(date, true);
+        if (operator.equals("<"))
+            cal = MCRMetaHistoryDate.getHistoryDate(date, false);
+        if (operator.equals(">="))
+            cal = MCRMetaHistoryDate.getHistoryDate(date, false);
+        if (operator.equals("<="))
+            cal = MCRMetaHistoryDate.getHistoryDate(date, true);
+        return String.valueOf(MCRMetaHistoryDate.getIntDate(cal));
     }
 }
