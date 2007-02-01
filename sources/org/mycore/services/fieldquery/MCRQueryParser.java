@@ -24,11 +24,12 @@
 package org.mycore.services.fieldquery;
 
 import java.util.ArrayList;
-import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import com.ibm.icu.util.GregorianCalendar;
 
 import org.apache.log4j.Logger;
 import org.jdom.Element;
@@ -348,13 +349,13 @@ public class MCRQueryParser extends MCRBooleanClauseParser {
     private static String normalizeHistoryDate(String operator, String date) {
         GregorianCalendar cal = null;
         if (operator.equals(">"))
-            cal = MCRMetaHistoryDate.getHistoryDate(date, true);
+            cal = MCRMetaHistoryDate.getGregorianHistoryDate(date, true);
         if (operator.equals("<"))
-            cal = MCRMetaHistoryDate.getHistoryDate(date, false);
+            cal = MCRMetaHistoryDate.getGregorianHistoryDate(date, false);
         if (operator.equals(">="))
-            cal = MCRMetaHistoryDate.getHistoryDate(date, false);
+            cal = MCRMetaHistoryDate.getGregorianHistoryDate(date, false);
         if (operator.equals("<="))
-            cal = MCRMetaHistoryDate.getHistoryDate(date, true);
-        return String.valueOf(MCRMetaHistoryDate.getIntDate(cal));
+            cal = MCRMetaHistoryDate.getGregorianHistoryDate(date, true);
+        return String.valueOf(MCRMetaHistoryDate.getJulianDayNumber(cal));
     }
 }
