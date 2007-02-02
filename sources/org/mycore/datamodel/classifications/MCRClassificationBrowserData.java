@@ -528,7 +528,11 @@ public class MCRClassificationBrowserData {
                 if (catid.equalsIgnoreCase(actItemID)) {
                     search += "/..";
                 } else {
+                    if (!uri.endsWith(catid)) {
                     search += "/" + catid;
+                    } else {
+                        search += "/..";
+                    }
                 }
 
                 if (search.indexOf("//") > 0) {
