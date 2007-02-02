@@ -287,19 +287,6 @@ final public class MCRObject extends MCRBase {
             throw new MCRPersistenceException("The object " + mcr_id.getId() + " allready exists, nothing done.");
         }
 
-        // check if document allready refer to this id
-        List sources = MCRLinkTableManager.instance().getSourceOf(mcr_id);
-        if (sources.size() > 0) {
-            MCRActiveLinkException activeLinks = new MCRActiveLinkException(new StringBuffer("Error while adding object ").append(mcr_id.toString()).append(". The ID of this object is already referenced by other objects so this object can not be added until all links are corrected.").toString());
-            String curSource;
-            Iterator it = sources.iterator();
-            while (it.hasNext()) {
-                curSource = (String) it.next();
-                activeLinks.addLink(curSource, mcr_id.toString());
-            }
-            throw activeLinks;
-        }
-
         // create this object in datastore
         if (mcr_service.getDate("createdate") == null) {
             mcr_service.setDate("createdate");
