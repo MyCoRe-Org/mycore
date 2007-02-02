@@ -449,7 +449,6 @@ final public class MCRMetaHistoryDate extends MCRMetaDefault {
      * The method set the calendar String value.
      */
     public final void setCalendar(String calstr) {
-        System.out.println("####################### calendar  " + calstr);
         if (calstr == null) {
             calendar = TAG_GREGORIAN;
             LOGGER.warn("The calendar field of MCRMeataHistoryDate is set to .");
@@ -523,6 +522,7 @@ final public class MCRMetaHistoryDate extends MCRMetaDefault {
         try {
             c = getHistoryDate(set_date, false, calstr);
         } catch (Exception e) {
+            e.printStackTrace();
         }
         setVonDate(c);
     }
@@ -552,14 +552,12 @@ final public class MCRMetaHistoryDate extends MCRMetaDefault {
      *            the calendar as String, one of CALENDARS.
      */
     public final void setBisDate(String set_date, String calstr) {
-        System.out.println("#######################" + set_date + "  " + calstr);
         Calendar c = bis;
         try {
-            c = getHistoryDate(set_date, false, calstr);
+            c = getHistoryDate(set_date, true, calstr);
         } catch (Exception e) {
             e.printStackTrace();
         }
-        System.out.println("#######################" + getDateToGregorianString(c));
         setBisDate(c);
     }
 
@@ -628,11 +626,8 @@ final public class MCRMetaHistoryDate extends MCRMetaDefault {
         super.setFromDOM(element);
         setText(element.getChildTextTrim("text"));
         setCalendar(element.getChildTextTrim("calendar"));
-        System.out.println("22222222222222222222222222 calendar  " + calendar);
         setVonDate(element.getChildTextTrim("von"), calendar);
-        System.out.println("22222222222222222222222222 calendar  " + calendar);
         setBisDate(element.getChildTextTrim("bis"), calendar);
-        System.out.println("22222222222222222222222222 calendar  " + calendar);
     }
 
     /**
