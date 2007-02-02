@@ -23,6 +23,7 @@
 
 package org.mycore.backend.hibernate.tables;
 
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.sql.Blob;
@@ -121,5 +122,13 @@ public class MCRBlob implements java.sql.Blob {
 
             return null;
         }
+    }
+
+    public void free() throws SQLException {
+        data=null;
+    }
+
+    public InputStream getBinaryStream(long pos, long length) throws SQLException {
+        return new ByteArrayInputStream(data, (int)pos, (int)length);
     }
 }
