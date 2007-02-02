@@ -83,7 +83,9 @@ final public class MCRMetaHistoryDate extends MCRMetaDefault {
     private String calendar;
 
     // all available calendars of ICU
-    //private static String CALENDARS[] = { TAG_BUDDHIST, TAG_CHINESE, TAG_COPTIC, TAG_ETHIOPIC, TAG_GREGORIAN, TAG_HEBREW, TAG_ISLAMIC, TAG_ISLAMIC_CIVIL, TAG_JAPANESE };
+    // private static String CALENDARS[] = { TAG_BUDDHIST, TAG_CHINESE,
+    // TAG_COPTIC, TAG_ETHIOPIC, TAG_GREGORIAN, TAG_HEBREW, TAG_ISLAMIC,
+    // TAG_ISLAMIC_CIVIL, TAG_JAPANESE };
     private static String CALENDARS[] = { TAG_GREGORIAN };
 
     /**
@@ -96,9 +98,9 @@ final public class MCRMetaHistoryDate extends MCRMetaDefault {
     public MCRMetaHistoryDate() {
         super();
         text = "";
+        calendar = CALENDARS[0];
         setDefaultVon();
         setDefaultBis();
-        calendar = CALENDARS[0];
     }
 
     /**
@@ -124,9 +126,9 @@ final public class MCRMetaHistoryDate extends MCRMetaDefault {
     public MCRMetaHistoryDate(String set_datapart, String set_subtag, String default_lang, String set_type, int set_inherted) throws MCRException {
         super(set_datapart, set_subtag, default_lang, set_type, set_inherted);
         text = "";
+        calendar = CALENDARS[0];
         setDefaultVon();
         setDefaultBis();
-        calendar = CALENDARS[0];
     }
 
     /**
@@ -188,7 +190,7 @@ final public class MCRMetaHistoryDate extends MCRMetaDefault {
                     break;
                 }
             }
-            if (calstr == null) {
+            if (caltmp == null) {
                 caltmp = TAG_GREGORIAN;
             }
         }
@@ -444,9 +446,10 @@ final public class MCRMetaHistoryDate extends MCRMetaDefault {
     }
 
     /**
-     * The method set the text value.
+     * The method set the calendar String value.
      */
     public final void setCalendar(String calstr) {
+        System.out.println("####################### calendar  " + calstr);
         if (calstr == null) {
             calendar = TAG_GREGORIAN;
             LOGGER.warn("The calendar field of MCRMeataHistoryDate is set to .");
@@ -459,7 +462,18 @@ final public class MCRMetaHistoryDate extends MCRMetaDefault {
             }
         }
         calendar = TAG_GREGORIAN;
-        LOGGER.warn("The calendar field of MCRMeataHistoryDate is set to .");
+        LOGGER.warn("The calendar field of MCRMeataHistoryDate is set to " + TAG_GREGORIAN + ".");
+    }
+
+    /**
+     * The method set the calendar String value.
+     */
+    public final void setCalendar(Calendar cal) {
+        if (cal instanceof GregorianCalendar) {
+            calendar = TAG_GREGORIAN;
+            return;
+        }
+        calendar = TAG_GREGORIAN;
     }
 
     /**
@@ -489,13 +503,11 @@ final public class MCRMetaHistoryDate extends MCRMetaDefault {
     public final void setVonDate(Calendar set_date) {
         if (set_date == null) {
             setDefaultVon();
-            calendar = CALENDARS[0];
             LOGGER.warn("The calendar to set 'von' is null, default is set.");
             return;
         }
         ivon = set_date.get(GregorianCalendar.JULIAN_DAY);
         von = set_date;
-        calendar = set_date.getDisplayName(new Locale("en"));
     }
 
     /**
@@ -507,7 +519,7 @@ final public class MCRMetaHistoryDate extends MCRMetaDefault {
      *            the calendar as String, one of CALENDARS.
      */
     public final void setVonDate(String set_date, String calstr) {
-        Calendar c = null;
+        Calendar c = von;
         try {
             c = getHistoryDate(set_date, false, calstr);
         } catch (Exception e) {
@@ -524,13 +536,11 @@ final public class MCRMetaHistoryDate extends MCRMetaDefault {
     public final void setBisDate(Calendar set_date) {
         if (set_date == null) {
             setDefaultBis();
-            calendar = CALENDARS[0];
             LOGGER.warn("The calendar to set 'bis' is null, default is set.");
             return;
         }
         ibis = set_date.get(GregorianCalendar.JULIAN_DAY);
         bis = set_date;
-        calendar = set_date.getDisplayName(new Locale("en"));
     }
 
     /**
@@ -542,11 +552,14 @@ final public class MCRMetaHistoryDate extends MCRMetaDefault {
      *            the calendar as String, one of CALENDARS.
      */
     public final void setBisDate(String set_date, String calstr) {
-        Calendar c = null;
+        System.out.println("#######################" + set_date + "  " + calstr);
+        Calendar c = bis;
         try {
             c = getHistoryDate(set_date, false, calstr);
         } catch (Exception e) {
+            e.printStackTrace();
         }
+        System.out.println("#######################" + getDateToGregorianString(c));
         setBisDate(c);
     }
 
@@ -615,8 +628,11 @@ final public class MCRMetaHistoryDate extends MCRMetaDefault {
         super.setFromDOM(element);
         setText(element.getChildTextTrim("text"));
         setCalendar(element.getChildTextTrim("calendar"));
+        System.out.println("22222222222222222222222222 calendar  " + calendar);
         setVonDate(element.getChildTextTrim("von"), calendar);
+        System.out.println("22222222222222222222222222 calendar  " + calendar);
         setBisDate(element.getChildTextTrim("bis"), calendar);
+        System.out.println("22222222222222222222222222 calendar  " + calendar);
     }
 
     /**
