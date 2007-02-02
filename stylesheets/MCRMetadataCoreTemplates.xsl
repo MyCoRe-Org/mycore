@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!-- ============================================== -->
-<!-- $Revision: 1.33 $ $Date: 2007-01-30 06:43:19 $ -->
+<!-- $Revision: 1.34 $ $Date: 2007-02-02 12:10:44 $ -->
 <!-- ============================================== -->
 
 <xsl:stylesheet
@@ -203,14 +203,14 @@
 <xsd:sequence>
  <xsd:element name="{@name}" minOccurs="{@minOccurs}" maxOccurs="{@maxOccurs}">
   <xsd:complexType>
-   <xsd:sequence>
+   <xsd:all>
     <xsd:element name="text" type="xsd:string" minOccurs='0' maxOccurs='1'/>
     <xsd:element name="von"  type="xsd:string" minOccurs='0' maxOccurs='1'/>
     <xsd:element name="ivon"  type="xsd:integer" minOccurs='0' maxOccurs='1'/>
     <xsd:element name="bis"  type="xsd:string" minOccurs='0' maxOccurs='1'/>
     <xsd:element name="ibis"  type="xsd:integer" minOccurs='0' maxOccurs='1'/>
     <xsd:element name="calendar"  type="xsd:string" minOccurs='0' maxOccurs='1'/>
-   </xsd:sequence>
+   </xsd:all>
    <xsd:attribute name="type" use="optional" type="xsd:string" />
    <xsd:attribute name="inherited" use="optional" type="xsd:integer" />
    <xsd:attribute ref="xml:lang" />
@@ -269,20 +269,13 @@
  <xsd:element name="{@name}" minOccurs="{@minOccurs}" maxOccurs="{@maxOccurs}">
   <xsd:complexType>
    <xsd:all>
-    <xsd:element name="firstname" type="xsd:string" minOccurs='0'
-     maxOccurs='1'/>
-    <xsd:element name="callname" type="xsd:string" minOccurs='0'
-     maxOccurs='1'/>
-    <xsd:element name="surname" type="xsd:string" minOccurs='1'
-     maxOccurs='1'/>
-    <xsd:element name="fullname" type="xsd:string" minOccurs='0'
-     maxOccurs='1'/>
-    <xsd:element name="academic" type="xsd:string" minOccurs='0'
-     maxOccurs='1'/>
-    <xsd:element name="peerage" type="xsd:string" minOccurs='0'
-     maxOccurs='1'/>
-    <xsd:element name="prefix" type="xsd:string" minOccurs='0'
-     maxOccurs='1'/>
+    <xsd:element name="firstname" type="xsd:string" minOccurs='0' maxOccurs='1'/>
+    <xsd:element name="callname" type="xsd:string" minOccurs='0' maxOccurs='1'/>
+    <xsd:element name="surname" type="xsd:string" minOccurs='1' maxOccurs='1'/>
+    <xsd:element name="fullname" type="xsd:string" minOccurs='0' maxOccurs='1'/>
+    <xsd:element name="academic" type="xsd:string" minOccurs='0' maxOccurs='1'/>
+    <xsd:element name="peerage" type="xsd:string" minOccurs='0' maxOccurs='1'/>
+    <xsd:element name="prefix" type="xsd:string" minOccurs='0' maxOccurs='1'/>
    </xsd:all>
    <xsd:attribute name="type" use="optional" type="mcrdefaulttype" />
    <xsd:attribute ref="xml:lang" />
@@ -301,18 +294,12 @@
  <xsd:element name="{@name}" minOccurs="{@minOccurs}" maxOccurs="{@maxOccurs}">
   <xsd:complexType>
    <xsd:all>
-    <xsd:element name="country" type="xsd:string" minOccurs='0' 
-     maxOccurs='1'/>
-    <xsd:element name="state" type="xsd:string" minOccurs='0' 
-     maxOccurs='1'/>
-    <xsd:element name="zipcode" type="xsd:string" minOccurs='0' 
-     maxOccurs='1'/>
-    <xsd:element name="city" type="xsd:string" minOccurs='0' 
-     maxOccurs='1'/>
-    <xsd:element name="street" type="xsd:string" minOccurs='0' 
-     maxOccurs='1'/>
-    <xsd:element name="number" type="xsd:string" minOccurs='0' 
-     maxOccurs='1'/>
+    <xsd:element name="country" type="xsd:string" minOccurs='0' maxOccurs='1'/>
+    <xsd:element name="state" type="xsd:string" minOccurs='0' maxOccurs='1'/>
+    <xsd:element name="zipcode" type="xsd:string" minOccurs='0' maxOccurs='1'/>
+    <xsd:element name="city" type="xsd:string" minOccurs='0' maxOccurs='1'/>
+    <xsd:element name="street" type="xsd:string" minOccurs='0' maxOccurs='1'/>
+    <xsd:element name="number" type="xsd:string" minOccurs='0' maxOccurs='1'/>
    </xsd:all>
    <xsd:attribute name="type" use="optional" type="mcrdefaulttype" />
    <xsd:attribute name="inherited" use="optional" type="xsd:integer" />
@@ -331,12 +318,9 @@
  <xsd:element name="{@name}" minOccurs="{@minOccurs}" maxOccurs="{@maxOccurs}">
   <xsd:complexType>
    <xsd:all>
-    <xsd:element name="fullname" type="xsd:string" minOccurs='1'
-     maxOccurs='1'/>
-    <xsd:element name="nickname" type="xsd:string" minOccurs='0'
-     maxOccurs='1'/>
-    <xsd:element name="property" type="xsd:string" minOccurs='0'
-     maxOccurs='1'/>
+    <xsd:element name="fullname" type="xsd:string" minOccurs='1' maxOccurs='1'/>
+    <xsd:element name="nickname" type="xsd:string" minOccurs='0' maxOccurs='1'/>
+    <xsd:element name="property" type="xsd:string" minOccurs='0' maxOccurs='1'/>
    </xsd:all>
    <xsd:attribute name="type" use="optional" type="mcrdefaulttype" />
    <xsd:attribute name="inherited" use="optional" type="xsd:integer" />
