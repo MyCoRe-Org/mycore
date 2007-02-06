@@ -40,7 +40,7 @@ import org.mycore.common.MCRException;
  * @version $Revision$ $Date$
  * @see http://icu.sourceforge.net/
  */
-final public class MCRMetaHistoryDate extends MCRMetaDefault {
+public class MCRMetaHistoryDate extends MCRMetaDefault {
     /** The maximal length of 'text' */
     public static final int MCRHISTORYDATE_MAX_TEXT = 128;
 
@@ -598,6 +598,15 @@ final public class MCRMetaHistoryDate extends MCRMetaDefault {
     }
 
     /**
+     * This method get the ivon element as Julian Day integer.
+     * 
+     * @return the date
+     */
+    public final int getIvon() {
+        return ivon;
+    }
+
+    /**
      * This method get the bis element as ICU-Calendar.
      * 
      * @return the date
@@ -616,13 +625,22 @@ final public class MCRMetaHistoryDate extends MCRMetaDefault {
     }
 
     /**
+     * This method get the ibis element as Julian Day integer.
+     * 
+     * @return the date
+     */
+    public final int getIbis() {
+        return ibis;
+    }
+
+    /**
      * This method reads the XML input stream part from a DOM part for the
      * metadata of the document.
      * 
      * @param element
      *            a relevant JDOM element for the metadata
      */
-    public final void setFromDOM(org.jdom.Element element) {
+    public void setFromDOM(org.jdom.Element element) {
         super.setFromDOM(element);
         setText(element.getChildTextTrim("text"));
         setCalendar(element.getChildTextTrim("calendar"));
@@ -638,7 +656,7 @@ final public class MCRMetaHistoryDate extends MCRMetaDefault {
      *                if the content of this class is not valid
      * @return a JDOM Element with the XML MCRMetaHistoryDate part
      */
-    public final org.jdom.Element createXML() throws MCRException {
+    public org.jdom.Element createXML() throws MCRException {
         if (!isValid()) {
             debug();
             throw new MCRException("The content of MCRMetaHistoryDate is not valid.");
@@ -694,7 +712,7 @@ final public class MCRMetaHistoryDate extends MCRMetaDefault {
      * 
      * @return a boolean value
      */
-    public final boolean isValid() {
+    public boolean isValid() {
         if ((text == null) || (von == null) || (bis == null) || (calendar == null)) {
             return false;
         }
@@ -705,11 +723,12 @@ final public class MCRMetaHistoryDate extends MCRMetaDefault {
     /**
      * This method make a clone of this class.
      */
-    public final Object clone() {
+    public Object clone() {
         MCRMetaHistoryDate out = new MCRMetaHistoryDate(datapart, subtag, lang, type, inherited);
         out.setText(text);
         out.setVonDate(von);
         out.setBisDate(bis);
+        out.setCalendar(calendar);
 
         return out;
     }
@@ -717,11 +736,11 @@ final public class MCRMetaHistoryDate extends MCRMetaDefault {
     /**
      * This method put debug data to the logger (for the debug mode).
      */
-    public final void debug() {
+    public void debug() {
         LOGGER.debug("Start Class : MCRMetaHistoryDate");
         super.debugDefault();
         LOGGER.debug("Text               = " + text);
-        LOGGER.debug("Calendar           = " + text);
+        LOGGER.debug("Calendar           = " + calendar);
         if (calendar.equals(TAG_GREGORIAN)) {
             LOGGER.debug("Von (String)       = " + getVonToGregorianString());
         }
