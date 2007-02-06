@@ -626,8 +626,9 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
         public Element resolveElement(String uri) throws Exception {
             String path = uri.substring(uri.indexOf(":") + 1);
             LOGGER.debug("Reading xml from webapp " + path);
-            uri = "file://" + context.getRealPath(path);
-
+            File f = new File(context.getRealPath(path));
+            uri = f.toURI().toString();
+            
             return fallback.resolveElement(uri);
         }
     }
