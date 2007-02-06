@@ -451,7 +451,7 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
     public final void setCalendar(String calstr) {
         if (calstr == null) {
             calendar = TAG_GREGORIAN;
-            LOGGER.warn("The calendar field of MCRMeataHistoryDate is set to .");
+            LOGGER.warn("The calendar field of MCRMeataHistoryDate is set to " + TAG_GREGORIAN + ".");
             return;
         }
         for (int i = 0; i < CALENDARS.length; i++) {
