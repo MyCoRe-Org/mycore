@@ -239,7 +239,7 @@ public class MCRAccessCommands extends MCRAbstractCommands {
                 }
                 Element rule = AI.getRule(permission);
                 mcrpermission.addContent(rule);
-                doc.addContent(mcrpermission);
+                doc.getRootElement().addContent(mcrpermission);
             }
             File file = new File(filename);
             if (file.exists()) {
