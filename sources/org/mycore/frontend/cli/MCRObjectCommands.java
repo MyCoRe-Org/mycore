@@ -432,64 +432,43 @@ public class MCRObjectCommands extends MCRAbstractCommands {
    *          the type of the stylesheet
    */
   public static final void export(String fromID, String toID, String dirname, String style) {
-    // check fromID and toID
-    MCRObjectID fid = null;
-    MCRObjectID tid = null;
+      MCRObjectID fid, tid;
 
-    try {
-      fid = new MCRObjectID(fromID);
-    } catch (Exception ex) {
-      LOGGER.error("FromID : " + ex.getMessage());
-      LOGGER.error("");
-
-      return;
-    }
-
-    try {
-      tid = new MCRObjectID(toID);
-    } catch (Exception ex) {
-      LOGGER.error("ToID : " + ex.getMessage());
-      LOGGER.error("");
-
-      return;
-    }
-
-    // check dirname
-    File dir = new File(dirname);
-
-    if (dir.isFile()) {
-      LOGGER.error(dirname + " is not a dirctory.");
-      LOGGER.error("");
-
-      return;
-    }
-
-    Transformer trans = getTransformer(style);
-
-    MCRObjectID nid = fid;
-    int k = 0;
-
-    try {
-      for (int i = fid.getNumberAsInteger(); i < (tid.getNumberAsInteger() + 1); i++) {
-        nid.setNumber(i);
-
-        if (!MCRObject.existInDatastore(nid))
-          continue;
-
-        if (!exportMCRObject(dir, trans, nid))
-          continue;
-
-        k++;
+      // check fromID and toID
+      try {
+          fid = new MCRObjectID(fromID);
+          tid = new MCRObjectID(toID);
+      } catch (Exception ex) {
+          LOGGER.error("FromID : " + ex.getMessage());
+          return;
       }
-    } catch (Exception ex) {
-      LOGGER.error(ex.getMessage());
-      LOGGER.error("Exception while store file to " + dir.getAbsolutePath());
-      LOGGER.error("");
+      // check dirname
+      File dir = new File(dirname);
+      if (!dir.isDirectory()) {
+          LOGGER.error(dirname + " is not a dirctory.");
+          return;
+      }
 
-      return;
-    }
-
-    LOGGER.info(k + " Object's stored under " + dir.getAbsolutePath() + ".");
+      MCRObjectID nid = fid;
+      int k = 0;
+      try {
+          Transformer trans = getTransformer(style);
+          for (int i = fid.getNumberAsInteger(); i < (tid.getNumberAsInteger() + 1); i++) {
+              nid.setNumber(i);
+              if (!MCRObject.existInDatastore(nid)) {
+                  continue;
+              }
+              if (!exportMCRObject(dir, trans, nid)) {
+                  continue;
+              }
+              k++;
+          }
+      } catch (Exception ex) {
+          LOGGER.error(ex.getMessage());
+          LOGGER.error("Exception while store file to " + dir.getAbsolutePath());
+          return;
+      }
+      LOGGER.info(k + " Object's stored under " + dir.getAbsolutePath() + ".");
   }
 
   /**
