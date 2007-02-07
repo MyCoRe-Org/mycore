@@ -540,7 +540,13 @@ public class MCRClassificationBrowserData {
         if (line.cat.getID().equalsIgnoreCase(actItemID))
           search += "/..";
         else
-          search += "/" + line.cat.getID();
+        {
+            if (!uri.endsWith(line.cat.getID())) {
+            search += "/" + line.cat.getID();
+            } else {
+            	search += "/" + line.cat.getID();
+            }
+        }
 
         if (search.indexOf("//") > 0)
           search = search.substring(0, search.indexOf("//")) + search.substring(search.indexOf("//") + 1);
