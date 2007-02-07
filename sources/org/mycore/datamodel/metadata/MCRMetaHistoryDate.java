@@ -713,7 +713,7 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
      * @return a boolean value
      */
     public boolean isValid() {
-        if ((text == null) || (von == null) || (bis == null) || (calendar == null)) {
+        if ((text == null) || (text.length() == 0) || (von == null) || (bis == null) || (calendar == null)) {
             return false;
         }
 
