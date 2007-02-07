@@ -192,10 +192,11 @@ public class MCRClassificationBrowserData {
         try {
             // NOTE: read *.Doctype for compatiblity reasons
             objectType = config.getString("MCR.ClassificationBrowser." + browserClass + ".Objecttype", config.getString("MCR.ClassificationBrowser."
-                    + browserClass + ".Doctype"));
+                    + browserClass + ".Doctype",null));
         } catch (final org.mycore.common.MCRConfigurationException noDoctype) {
-            objectType = config.getString("MCR.ClassificationBrowser.default.ObjectType", config.getString("MCR.ClassificationBrowser.default.Doctype"));
+            objectType = config.getString("MCR.ClassificationBrowser.default.ObjectType", config.getString("MCR.ClassificationBrowser.default.Doctype",null));
         }
+        
         if (objectType != null) {
             objectTypeArray = objectType.split(",");
         } else {
