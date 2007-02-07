@@ -537,15 +537,10 @@ public class MCRClassificationBrowserData {
 
       if (numLength > 0) {
         String search = uri;
-        if (line.cat.getID().equalsIgnoreCase(actItemID))
+        if (line.cat.getID().equalsIgnoreCase(actItemID) || uri.endsWith(line.cat.getID()))
           search += "/..";
-        else
-        {
-            if (!uri.endsWith(line.cat.getID())) {
+        else {
             search += "/" + line.cat.getID();
-            } else {
-            	search += "/" + line.cat.getID();
-            }
         }
 
         if (search.indexOf("//") > 0)
