@@ -168,6 +168,8 @@ public class MCROAIProvider extends MCRServlet {
     private static final String STR_SCHEMA_INSTANCE = "http://www.w3.org/2001/XMLSchema-instance";
 
     private static final String STR_GRANULARITY = "yyyy-MM-dd'T'HH:mm:dd'Z'";
+    
+    private static final String STR_GRANULARITY_SHORT = "yyyy-MM-dd";
 
     private static final String STR_FIRST_DATE = "2000-01-01";
 
@@ -513,6 +515,12 @@ public class MCROAIProvider extends MCRServlet {
         }
         ParsePosition pos = new ParsePosition(0);
         Date currentDate = dateFormat.parse(date, pos);
+        if(currentDate==null){
+        	//try to match the simpler dateformat
+        	dateFormat = new SimpleDateFormat(STR_GRANULARITY_SHORT);
+        	pos = new ParsePosition(0);
+        	currentDate = dateFormat.parse(date, pos);
+       }
 
         return currentDate;
     }
