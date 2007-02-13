@@ -24,6 +24,8 @@
 package org.mycore.frontend.cli;
 
 import static org.mycore.common.MCRConstants.DEFAULT_ENCODING;
+import static org.mycore.common.MCRConstants.XLINK_NAMESPACE;
+import static org.mycore.common.MCRConstants.XSI_NAMESPACE;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -227,7 +229,11 @@ public class MCRAccessCommands extends MCRAbstractCommands {
         MCRAccessInterface AI = MCRAccessManager.getAccessImpl();
 
         try {
-            Document doc = new Document(new Element("mcrpermissions"));
+            Element mcrpermissions = new Element("mcrpermissions");
+            mcrpermissions.addNamespaceDeclaration(XSI_NAMESPACE);
+            mcrpermissions.addNamespaceDeclaration(XLINK_NAMESPACE);
+            mcrpermissions.setAttribute("noNamespaceSchemaLocation", "MCRPermissions.xsd", XSI_NAMESPACE);
+            Document doc = new Document(mcrpermissions);
             List permissions = AI.getPermissions();
             for (Iterator it = permissions.iterator(); it.hasNext();) {
                 String permission = (String) it.next();
@@ -239,12 +245,11 @@ public class MCRAccessCommands extends MCRAbstractCommands {
                 }
                 Element rule = AI.getRule(permission);
                 mcrpermission.addContent(rule);
-                doc.getRootElement().addContent(mcrpermission);
+                mcrpermissions.addContent(mcrpermission);
             }
             File file = new File(filename);
             if (file.exists()) {
-                System.out.println("File yet exists");
-                return;
+                LOGGER.warn("File "+filename+" yet exists, overwrite.");
             }
             FileOutputStream fos = new FileOutputStream(file);
             LOGGER.info("Writing to file " + filename + " ...");
