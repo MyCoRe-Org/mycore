@@ -29,6 +29,8 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.List;
 
+import javax.servlet.http.HttpSession;
+
 import org.jdom.Document;
 
 import org.mycore.common.MCRConfigurationException;
@@ -196,6 +198,14 @@ abstract public class MCRCheckDataBase extends MCRCheckBase {
             return;
         }
 
+        // handle HttpSession
+        String sessionID = "";
+        HttpSession session = job.getRequest().getSession(false);
+        if (session != null) {
+            String jSessionID = CONFIG.getString("MCR.session.param", ";jsessionid=");
+            sessionID = jSessionID + session.getId();
+        }
+        
         // write to the log file
         for (int i = 0; i < logtext.size(); i++) {
             LOGGER.error(logtext.get(i));
@@ -252,7 +262,7 @@ abstract public class MCRCheckDataBase extends MCRCheckBase {
 
                 // the edit button
                 org.jdom.Element form = section.getChild("form");
-                form.setAttribute("action", job.getResponse().encodeRedirectURL(getBaseURL() + "servlets/MCRStartEditorServlet"));
+                form.setAttribute("action", job.getResponse().encodeRedirectURL(getBaseURL() + "servlets/MCRStartEditorServlet"+sessionID));
 
                 org.jdom.Element input1 = new org.jdom.Element("input");
                 input1.setAttribute("name", "lang");
