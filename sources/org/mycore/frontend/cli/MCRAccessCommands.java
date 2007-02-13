@@ -224,7 +224,11 @@ public class MCRAccessCommands extends MCRAbstractCommands {
     	MCRAccessInterface AI = MCRAccessManager.getAccessImpl();
 
         try {
-        	Document doc = new Document(new Element("mcrpermissions"));
+            Element mcrpermissions = new Element("mcrpermissions");
+            mcrpermissions.addNamespaceDeclaration(org.jdom.Namespace.getNamespace("xsi", MCRDefaults.XSI_URL));
+            mcrpermissions.addNamespaceDeclaration(org.jdom.Namespace.getNamespace("xlink",MCRDefaults.XLINK_URL));
+            mcrpermissions.setAttribute("noNamespaceSchemaLocation", "MCRPermissions.xsd", org.jdom.Namespace.getNamespace("xsi", MCRDefaults.XSI_URL));
+            Document doc = new Document(mcrpermissions);
         	List permissions = AI.getPermissions();
         	for (Iterator it = permissions.iterator(); it.hasNext();) {
         		String permission = (String) it.next();
@@ -236,12 +240,11 @@ public class MCRAccessCommands extends MCRAbstractCommands {
         		}
         		Element rule = AI.getRule(permission);
         		mcrpermission.addContent(rule);
-        		doc.getRootElement().addContent(mcrpermission);
+                mcrpermissions.addContent(mcrpermission);
 			}
         	File file = new File(filename);
         	if(file.exists()){
-        		System.out.println("File yet exists");
-        		return;
+                LOGGER.warn("File "+filename+" yet exists, overwrite.");
         	}
         	FileOutputStream fos = new FileOutputStream(file);
         	LOGGER.info("Writing to file " + filename + " ...");
