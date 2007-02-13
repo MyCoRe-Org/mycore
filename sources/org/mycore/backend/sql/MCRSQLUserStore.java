@@ -33,10 +33,10 @@ import java.util.ArrayList;
 import org.apache.log4j.Logger;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
-import org.mycore.user2.MCRGroup;
-import org.mycore.user2.MCRUser;
-import org.mycore.user2.MCRUserContact;
-import org.mycore.user2.MCRUserStore;
+import org.mycore.user.MCRGroup;
+import org.mycore.user.MCRUser;
+import org.mycore.user.MCRUserContact;
+import org.mycore.user.MCRUserStore;
 
 /**
  * This class implements the interface MCRUserStore and uses SQL tables for
@@ -46,9 +46,9 @@ import org.mycore.user2.MCRUserStore;
  * @author Detlev Degenhardt
  * @version $Revision$ $Date$
  */
-public class MCRSQLUserStore2 implements MCRUserStore {
+public class MCRSQLUserStore implements MCRUserStore {
     /** the logger */
-    static Logger logger = Logger.getLogger(MCRSQLUserStore2.class.getName());
+    static Logger logger = Logger.getLogger(MCRSQLUserStore.class.getName());
 
     /** name of the sql table containing user information */
     private String SQLUsersTable;
@@ -67,7 +67,7 @@ public class MCRSQLUserStore2 implements MCRUserStore {
      * information data from mycore.properties. The existence of the tables is
      * checked. If the tables do not yet exist they will be created.
      */
-    public MCRSQLUserStore2() {
+    public MCRSQLUserStore() {
         // set configuration
         MCRConfiguration config = MCRConfiguration.instance();
         SQLUsersTable = config.getString("MCR.users_store_sql_table_users", "MCRUSERS");

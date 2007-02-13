@@ -27,7 +27,7 @@ import java.util.List;
 import org.jdom.Element;
 
 import org.mycore.common.MCRException;
-import org.mycore.user2.MCRUser;
+import org.mycore.user.MCRUser;
 
 /**
  * This serves as an interface to an underlying access controll system.

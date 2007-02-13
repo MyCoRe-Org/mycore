@@ -56,7 +56,7 @@ import org.mycore.datamodel.metadata.MCRActiveLinkException;
  * 
  * @see MCRCommand
  * 
- * @author Frank Lützenkirchen
+ * @author Frank Lï¿½tzenkirchen
  * @author Detlev Degenhardt
  * @author Jens Kupferschmidt
  * @author Thomas Scheffler (yagee)
@@ -430,7 +430,7 @@ public class MCRCommandLineInterface {
 	public static void changeToUser(String user, String password) {
 		System.out.println(system + " The old user ID is " + session.getCurrentUserID());
 
-		if (org.mycore.user2.MCRUserMgr.instance().login(user.trim(), password.trim())) {
+		if (org.mycore.user.MCRUserMgr.instance().login(user.trim(), password.trim())) {
 			session.setCurrentUserID(user);
             session.setLoginTime();
 			System.out.println(system + " The new user ID is " + session.getCurrentUserID());

@@ -21,7 +21,7 @@
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
  */
 
-package org.mycore.user2;
+package org.mycore.user;
 
 /**
  * Java-based implementation of the unix crypt(3) command

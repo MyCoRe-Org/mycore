@@ -42,8 +42,8 @@ import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.user2.MCRUser;
-import org.mycore.user2.MCRUserMgr;
+import org.mycore.user.MCRUser;
+import org.mycore.user.MCRUserMgr;
 
 /**
  * MyCoRe-Standard Implementation of the

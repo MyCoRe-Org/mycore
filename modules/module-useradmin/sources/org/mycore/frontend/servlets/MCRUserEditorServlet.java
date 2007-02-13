@@ -35,9 +35,9 @@ import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.frontend.editor.MCREditorSubmission;
 import org.mycore.frontend.editor.MCRRequestParameters;
-import org.mycore.user2.MCRGroup;
-import org.mycore.user2.MCRUser;
-import org.mycore.user2.MCRUserMgr;
+import org.mycore.user.MCRGroup;
+import org.mycore.user.MCRUser;
+import org.mycore.user.MCRUserMgr;
 
 /**
  * This servlet provides a web interface for the editors of the user management
@@ -137,10 +137,10 @@ public class MCRUserEditorServlet extends MCRUserAdminGUICommons {
                 // checking the privileges using the MCRUserAdminServlet first.
                 LOGGER.warn("MCRUserEditorServlet: not enough permissions! " + "Someone might have tried to call the new user form directly.");
 
-                // TODO: Hier muss irgendwie eine vernünftige Fehlermeldung her!
+                // TODO: Hier muss irgendwie eine vernï¿½nftige Fehlermeldung her!
                 // Aktuell spielt das MCREditorServlet noch nicht mit. Die
                 // folgenden
-                // Zeilen z.B. führen zu einem "impossible to open input stream"
+                // Zeilen z.B. fï¿½hren zu einem "impossible to open input stream"
                 // Fehler im MCREditorServlet (weil halt error 403 gesendet
                 // wird)
                 String msg = "You do not have enough permissions for this use case!";
@@ -192,10 +192,10 @@ public class MCRUserEditorServlet extends MCRUserAdminGUICommons {
                 // checking the privileges using the MCRUserAdminServlet first.
                 LOGGER.warn("MCRUserEditorServlet: not enough permissions! " + "Someone might have tried to call the new user form directly.");
 
-                // TODO: Hier muss irgendwie eine vernünftige Fehlermeldung her!
+                // TODO: Hier muss irgendwie eine vernï¿½nftige Fehlermeldung her!
                 // Aktuell spielt das MCREditorServlet noch nicht mit. Die
                 // folgenden
-                // Zeilen z.B. führen zu einem "impossible to open input stream"
+                // Zeilen z.B. fï¿½hren zu einem "impossible to open input stream"
                 // Fehler im MCREditorServlet (weil halt error 403 gesendet
                 // wird)
                 String msg = "You do not have enough permissions for this use case!";
@@ -247,10 +247,10 @@ public class MCRUserEditorServlet extends MCRUserAdminGUICommons {
                 // checking the privileges using the MCRUserAdminServlet first.
                 LOGGER.warn("MCRUserEditorServlet: not enough permissions! " + "Someone might have tried to call the new user form directly.");
 
-                // TODO: Hier muss irgendwie eine vernünftige Fehlermeldung her!
+                // TODO: Hier muss irgendwie eine vernï¿½nftige Fehlermeldung her!
                 // Aktuell spielt das MCREditorServlet noch nicht mit. Die
                 // folgenden
-                // Zeilen z.B. führen zu einem "impossible to open input stream"
+                // Zeilen z.B. fï¿½hren zu einem "impossible to open input stream"
                 // Fehler im MCREditorServlet (weil halt error 403 gesendet
                 // wird)
                 String msg = "You do not have enough permissions for this use case!";

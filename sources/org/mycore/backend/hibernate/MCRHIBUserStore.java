@@ -37,9 +37,9 @@ import org.mycore.backend.hibernate.tables.MCRGROUPS;
 import org.mycore.backend.hibernate.tables.MCRUSERS;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
-import org.mycore.user2.MCRGroup;
-import org.mycore.user2.MCRUser;
-import org.mycore.user2.MCRUserStore;
+import org.mycore.user.MCRGroup;
+import org.mycore.user.MCRUser;
+import org.mycore.user.MCRUserStore;
 
 /**
  * This class implements the interface MCRUserStore
@@ -49,14 +49,14 @@ import org.mycore.user2.MCRUserStore;
  * @author Heiko Helmbrecht
  * @version $Revision$ $Date$
  */
-public class MCRHIBUserStore2 implements MCRUserStore {
-    static Logger logger = Logger.getLogger(MCRHIBUserStore2.class.getName());
+public class MCRHIBUserStore implements MCRUserStore {
+    static Logger logger = Logger.getLogger(MCRHIBUserStore.class.getName());
 
     /**
      * The constructor reads the names of the SQL tables which hold the user
      * information data from mycore.properties.
      */
-    public MCRHIBUserStore2() {
+    public MCRHIBUserStore() {
     }
 
     /**

@@ -38,10 +38,10 @@ import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.xml.MCRXMLHelper;
-import org.mycore.user2.MCRCrypt;
-import org.mycore.user2.MCRGroup;
-import org.mycore.user2.MCRUser;
-import org.mycore.user2.MCRUserMgr;
+import org.mycore.user.MCRCrypt;
+import org.mycore.user.MCRGroup;
+import org.mycore.user.MCRUser;
+import org.mycore.user.MCRUserMgr;
 
 /**
  * This class provides a set of commands for the org.mycore.user management
@@ -52,14 +52,14 @@ import org.mycore.user2.MCRUserMgr;
  * @author Jens Kupferschmidt
  * @version $Revision$ $Date$
  */
-public class MCRUserCommands2 extends MCRAbstractCommands {
+public class MCRUserCommands extends MCRAbstractCommands {
     /** The logger */
-    private static Logger LOGGER = Logger.getLogger(MCRUserCommands2.class.getName());
+    private static Logger LOGGER = Logger.getLogger(MCRUserCommands.class.getName());
 
     /**
      * The constructor.
      */
-    public MCRUserCommands2() {
+    public MCRUserCommands() {
         super();
 
         MCRCommand com = null;

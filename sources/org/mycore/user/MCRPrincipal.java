@@ -21,7 +21,7 @@
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
  */
 
-package org.mycore.user2;
+package org.mycore.user;
 
 /**
  * A principal is an abstract conception of elements defined in the user
@@ -30,7 +30,7 @@ package org.mycore.user2;
  * role, e.g. being the owner of an object in the repository.
  * 
  * @author Detlev Degenhardt
- * @author Benno Süselbeck
+ * @author Benno Sï¿½selbeck
  * @version $Revision$ $Date$
  */
 public interface MCRPrincipal {

@@ -32,7 +32,7 @@ import org.jdom.Element;
 
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
-import org.mycore.user2.MCRUser;
+import org.mycore.user.MCRUser;
 
 /**
  * This class is a base implementation of the <code>MCRAccessInterface</code>.
