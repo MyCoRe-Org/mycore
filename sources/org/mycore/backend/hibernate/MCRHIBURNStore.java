@@ -205,7 +205,7 @@ public class MCRHIBURNStore implements MCRURNStore {
         if (urn == null || (urn.length() == 0)) { return exists; }
 
         Session session = getSession();
-        StringBuffer query = new StringBuffer("select key.id from ").append(classname).append(" where URN = '").append(urn).append("'");
+        StringBuffer query = new StringBuffer("select key.mcrid from ").append(classname).append(" where key.mcrurn = '").append(urn).append("'");
         List l = session.createQuery(query.toString()).list();
         if (l.size() > 0) {
             exists = true;
