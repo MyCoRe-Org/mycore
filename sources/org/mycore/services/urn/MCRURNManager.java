@@ -236,4 +236,22 @@ public class MCRURNManager {
     public static void removeURN(String urn) {
         store.removeURN(urn);
     }
+    
+    /**
+     * Create and Assign a new URN to the given Document
+     * Ensure that new created URNs do not allready exist in URN store
+     * @param documentID a MCRID
+     * @param configID - the configurationID of the URN Builder 
+     * @return the URN
+     */
+    public static synchronized String buildAndAssignURN(String documentID, String configID){
+        String urn=null;
+        do{
+        	urn = buildURN(configID);
+        }
+        while(isAssigned(urn));	
+        
+    	assignURN(urn, documentID);
+        return urn;
+    }
 }
