@@ -143,10 +143,10 @@ public class MCRClassificationQuery {
         if (co instanceof Category && co.getId().equals(categID)) {
             return (Category) co;
         }
-        for (Iterator it = co.getCategories().iterator(); it.hasNext();) {
-            Category cat = (Category) it.next();
-            if (findCategory(cat, categID) != null)
-                return cat;
+        for (Category category:co.getCategories()) {
+            Category returns = findCategory(category, categID);
+            if (returns != null)
+                return returns;
         }
         return null;
     }
