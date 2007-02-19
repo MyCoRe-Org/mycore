@@ -42,6 +42,7 @@ import org.jdom.Namespace;
 import org.mycore.datamodel.classifications.MCRCategoryItem;
 import org.mycore.datamodel.classifications.MCRClassificationItem;
 import org.mycore.datamodel.metadata.MCRLinkTableManager;
+import org.mycore.datamodel.metadata.MCRObjectID;
 
 /**
  * 
@@ -300,7 +301,7 @@ public class ClassificationTransformer {
         @SuppressWarnings("unchecked")
         static Classification getClassification(Element e) {
             Classification c = new Classification();
-            c.setId(e.getAttributeValue("ID"));
+            c.setId(new MCRObjectID(e.getAttributeValue("ID")).toString());
             c.getLabels().addAll(LabelFactory.getLabels(e.getChildren("label")));
             return c;
         }
