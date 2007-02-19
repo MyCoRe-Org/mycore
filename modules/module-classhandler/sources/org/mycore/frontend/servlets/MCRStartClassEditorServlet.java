@@ -27,14 +27,10 @@ package org.mycore.frontend.servlets;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.Enumeration;
-
 import java.util.Properties;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.log4j.Logger;
-import org.jdom.output.XMLOutputter;
-import org.mycore.common.MCRSession;
-import org.mycore.common.MCRSessionMgr;
 import org.mycore.datamodel.classifications.MCRClassificationEditor;
 import org.mycore.frontend.editor.MCREditorSubmission;
 import org.mycore.frontend.editor.MCRRequestParameters;
@@ -78,8 +74,8 @@ public class MCRStartClassEditorServlet extends MCRServlet {
      */
     public void doGetPost(MCRServletJob job) throws Exception {
 
-        MCRSession session = MCRSessionMgr.getCurrentSession();
-        
+        // MCRSession session = MCRSessionMgr.getCurrentSession();
+
         // read the XML data if given from Editorsession
         MCREditorSubmission sub = (MCREditorSubmission) (job.getRequest().getAttribute("MCREditorSubmission"));
 
@@ -136,16 +132,22 @@ public class MCRStartClassEditorServlet extends MCRServlet {
             boolean bret = false;
 
             // for debug
-            XMLOutputter outputter = new XMLOutputter();
-            LOGGER.debug(outputter.outputString(indoc));
+            /*
+             * XMLOutputter outputter = new XMLOutputter();
+             * LOGGER.debug(outputter.outputString(indoc));
+             */
 
             if ("create-category".equals(todo2) || "modify-category".equals(todo2)) {
                 if ("create-category".equals(todo2)) {
                     // create
-                    bret = clE.createCategoryInClassification(indoc, clid, categid);
+                    if (!clE.isLocked(clid)) {
+                        bret = clE.createCategoryInClassification(indoc, clid, categid);
+                    }
                 } else {
                     // modify
-                    bret = clE.modifyCategoryInClassification(indoc, clid, categid);
+                    if (!clE.isLocked(clid)) {
+                        bret = clE.modifyCategoryInClassification(indoc, clid, categid);
+                    }
                 }
                 if (bret)
                     job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(path + "&categid=" + categid + "&clid=" + clid));
@@ -155,11 +157,13 @@ public class MCRStartClassEditorServlet extends MCRServlet {
                     // Classifikationsstartseite zu landen
                     path = path.substring(0, path.indexOf("&clid"));
                 }
-                if ("create-classification".equals(todo2))
+                if ("create-classification".equals(todo2)) {
                     bret = clE.createNewClassification(indoc);
-                else if ("modify-classification".equals(todo2))
-                    bret = clE.modifyClassificationDescription(indoc, clid);
-                else if ("import-classification".equals(todo2)) {
+                } else if ("modify-classification".equals(todo2)) {
+                    if (!clE.isLocked(clid)) {
+                        bret = clE.modifyClassificationDescription(indoc, clid);
+                    }
+                } else if ("import-classification".equals(todo2)) {
                     String fname = parms.getParameter("/mycoreclass/pathes/path").trim();
                     fname = clE.setTempFile(fname, (FileItem) sub.getFiles().get(0));
                     String sUpdate = parms.getParameter("/mycoreclass/update");
@@ -174,13 +178,17 @@ public class MCRStartClassEditorServlet extends MCRServlet {
                     job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(path));
 
             }
-            if (!bret)
+            if (!bret) {
                 job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + icerrorpage));
+            }
             return;
         }
 
         if ("up-category".equals(todo) || "down-category".equals(todo) || "left-category".equals(todo) || "right-category".equals(todo)) {
-            boolean bret = clE.moveCategoryInClassification(categid, clid, todo.substring(0, todo.indexOf("-")));
+            boolean bret = false;
+            if (!clE.isLocked(clid)) {
+                bret = clE.moveCategoryInClassification(categid, clid, todo.substring(0, todo.indexOf("-")));
+            }
             if (bret) {
                 job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(path + "&categid=" + categid + "&clid=" + clid));
             } else {
@@ -191,27 +199,32 @@ public class MCRStartClassEditorServlet extends MCRServlet {
 
         // first call, direct without editor
         else if ("delete-category".equals(todo)) {
-            // l�schen
-            int cnt = clE.deleteCategoryInClassification(clid, categid);
-            if (cnt == 0) { // deleted, no more references
-                job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(path + "&clid=" + clid));
-            } else { // not delete cause references exist
-                job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + iderrorpage));
+            // l?schen
+            if (!clE.isLocked(clid)) {
+                int cnt = clE.deleteCategoryInClassification(clid, categid);
+
+                if (cnt == 0) { // deleted, no more references
+                    job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(path + "&clid=" + clid));
+                } else { // not delete cause references exist
+                    job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + iderrorpage));
+                }
             }
             return;
         }
 
         // first call, direct without editor
         else if ("delete-classification".equals(todo)) {
-            boolean cnt = clE.deleteClassification(clid);
-            if (cnt) { // deleted, no more references
-                if (path.indexOf("&clid") > 0) {
-                    // Classification cut
-                    path = path.substring(0, path.indexOf("&clid"));
+            if (!clE.isLocked(clid)) {
+                boolean cnt = clE.deleteClassification(clid);
+                if (cnt) { // deleted, no more references
+                    if (path.indexOf("&clid") > 0) {
+                        // Classification cut
+                        path = path.substring(0, path.indexOf("&clid"));
+                    }
+                    job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(path));
+                } else { // not delete cause references exist
+                    job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + iderrorpage));
                 }
-                job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(path));
-            } else { // not delete cause references exist
-                job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + iderrorpage));
             }
             return;
         }
@@ -231,6 +244,22 @@ public class MCRStartClassEditorServlet extends MCRServlet {
 
         }
 
+        else if ("save-all".equals(todo)) {
+
+            if (clE.saveAll()) {
+                job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(path + "&clid=" + clid));
+            } else {
+                job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + imerrorpage));
+            }
+            return;
+        } else if ("purge-all".equals(todo)) {
+            if (clE.purgeAll()) {
+                job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(path + "&clid=" + clid));
+            } else {
+                job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + imerrorpage));
+            }
+            return;
+        }
         // first call of editor, build the editor dialogue
         if ("create-category".equals(todo) || "modify-category".equals(todo) || "create-classification".equals(todo) || "modify-classification".equals(todo)) {
 

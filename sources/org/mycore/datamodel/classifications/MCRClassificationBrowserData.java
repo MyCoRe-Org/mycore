@@ -24,18 +24,30 @@
 package org.mycore.datamodel.classifications;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.TreeSet;
+import java.util.Set;
+import java.util.Hashtable;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
+import org.jdom.Namespace;
 import org.jdom.xpath.XPath;
 
 import org.mycore.access.MCRAccessInterface;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRConfiguration;
+import org.mycore.common.MCRSession;
+import org.mycore.common.MCRSessionMgr;
+import org.mycore.datamodel.classifications.query.Category;
+import org.mycore.datamodel.classifications.query.Classification;
+import org.mycore.datamodel.classifications.query.ClassificationObject;
+import org.mycore.datamodel.classifications.query.Label;
+import org.mycore.datamodel.classifications.query.MCRClassificationQuery;
 
 /**
  * Instances of MCRClassificationBrowser contain the data of the currently
@@ -64,7 +76,7 @@ public class MCRClassificationBrowserData {
     // private Vector lines;
     private ArrayList lines;
 
-    private MCRClassificationItem classif;
+    private Classification classif;
 
     private String startPath = "";
 
@@ -93,6 +105,8 @@ public class MCRClassificationBrowserData {
     int maxlevel = 0;
 
     int totalNumOfDocs = 0;
+
+    public static Map<String, String> ClassUserTable = new Hashtable<String, String>();
 
     public MCRClassificationBrowserData(final String u, final String mode, final String actclid, final String actEditorCategid) throws Exception {
         uri = u;
@@ -194,7 +208,7 @@ public class MCRClassificationBrowserData {
             objectType = config.getString("MCR.ClassificationBrowser." + browserClass + ".Objecttype", config.getString("MCR.ClassificationBrowser."
                     + browserClass + ".Doctype",null));
         } catch (final org.mycore.common.MCRConfigurationException noDoctype) {
-            objectType = config.getString("MCR.ClassificationBrowser.default.ObjectType", config.getString("MCR.ClassificationBrowser.default.Doctype",null));
+            objectType = config.getString("MCR.ClassificationBrowser.default.ObjectType", config.getString("MCR.ClassificationBrowser.default.Doctype"));
         }
         
         if (objectType != null) {
@@ -232,7 +246,7 @@ public class MCRClassificationBrowserData {
         return xslStyle;
     }
 
-    public MCRClassificationItem getClassification() {
+    public Classification getClassification() {
         return classif;
     }
 
@@ -251,10 +265,10 @@ public class MCRClassificationBrowserData {
     }
 
     private final void setClassification(final String classifID) throws Exception {
-        classif = MCRClassificationItem.getClassificationItem(classifID);
+        classif = getClassificationPool().getClassificationAsPojo(classifID);
         lines = new ArrayList();
         totalNumOfDocs = 0;
-        putCategoriesintoLines(-1, classif.getChildrenFromJDomAsList(), 1);
+        putCategoriesintoLines(-1, classif.getCategories(), 1);
         LOGGER.debug("Arraylist of CategItems initialized - Size " + lines.size());
     }
 
@@ -331,24 +345,21 @@ public class MCRClassificationBrowserData {
     }
 
     @SuppressWarnings("unchecked")
-    private void putCategoriesintoLines(final int startpos, final List children, final int level) {
+    private void putCategoriesintoLines(final int startpos, final List<Category> children, final int level) {
         LOGGER.debug("Start Explore Arraylist of CategItems  ");
         int i = startpos;
         for (int j = 0, k = children.size(); j < k; j++) {
-            final Element child = (Element) children.get(j);
+            Category categ = (Category) children.get(j);
+            Element child = MCRCategoryElementFactory.getCategoryElement(categ, classif.isCounterEnabled());
             lines.add(++i, setTreeline(child, level + 1));
             if (startpos == -1) {
-                if (child.getAttributeValue("counter") != null) {
-                    totalNumOfDocs += Integer.parseInt(child.getAttributeValue("counter"));
-                }
+                totalNumOfDocs += categ.getNumberOfObjects();
             }
         }
         LOGGER.debug("End Explore - Arraylist of CategItems ");
     }
 
     public org.jdom.Document createXmlTreeforAllClassifications() throws Exception {
-        final MCRClassificationManager clm = new MCRClassificationManager();
-        final MCRClassificationItem[] clI = clm.getAllClassification();
 
         final Element xDocument = new Element("classificationbrowse");
         final Element EditClassbutton = new Element("userCanEdit");
@@ -365,25 +376,70 @@ public class MCRClassificationBrowserData {
         String browserClass = "";
         String Counter = "";
 
-        for (int i = 0; i < clI.length && clI[i] != null; i++) {
-            final Element cli = clI[i].getClassificationItemAsJDom();
+        final Set<String> allIDs = getClassificationPool().getAllIDs();
+        List<String> ids = new ArrayList<String>(allIDs.size());
+        ids.addAll(allIDs);
+        Collections.sort(ids);
+
+        for (String id : ids) {
+            Classification classif = getClassificationPool().getClassificationAsPojo(id);
+            Element cli = getBrowseElement(classif);
+            String sessionID=MCRSessionMgr.getCurrentSession().getID();
             try {
-                browserClass = config.getString("MCR.classeditor." + clI[i].getClassificationID());
+                browserClass = config.getString("MCR.classeditor." + classif.getId());
             } catch (final Exception ignore) {
                 browserClass = "default";
             }
+            if (ClassUserTable.containsKey(id)) {
+                if (ClassUserTable.get(id) != sessionID) {
+                    cli.setAttribute("userEdited", MCRSession.getSession(ClassUserTable.get(id)).getCurrentUserID());
+                } else {
+                    cli.setAttribute("userEdited", "false");
+                }
+            } else {
+                cli.setAttribute("userEdited", "false");
+            }
+
+            if (getClassificationPool().isEdited(id)) {
+                cli.setAttribute("edited", "true");
+            } else {
+                cli.setAttribute("edited", "false");
+            }
             cli.setAttribute("browserClass", browserClass);
             setObjectTypes(browserClass);
+
             try {
-                Counter = Integer.toString(clI[i].countDocLinks(objectTypeArray, ""));
-            } catch (final Exception ignore) {
+                int cnt = 0;
+                for (Category cat : classif.getCategories()) {
+                    cnt += cat.getNumberOfObjects();
+                }
+                Counter = Integer.toString(cnt);
+            } catch (Exception ignore) {
                 Counter = "NaN";
             }
             cli.setAttribute("counter", Counter);
             xNavtree.addContent(cli);
         }
-
         return new Document(xDocument);
+    }
+
+    private static Element getBrowseElement(Classification classif) {
+        Element ce = new Element("classification");
+        ce.setAttribute("ID", classif.getId());
+        for (Label label : classif.getLabels()) {
+            Element labelElement = new Element("label");
+            if (label.getLang() != null) {
+                labelElement.setAttribute("lang", label.getLang(), Namespace.XML_NAMESPACE);
+            }
+            if (label.getText() != null) {
+                labelElement.setAttribute("text", label.getText());
+            }
+            if (label.getDescription() != null) {
+                labelElement.setAttribute("description", label.getDescription());
+            }
+            ce.addContent(labelElement);
+        }
+        return ce;
     }
 
     /**
@@ -395,20 +451,41 @@ public class MCRClassificationBrowserData {
 
     public org.jdom.Document createXmlTree(final String lang) throws Exception {
 
-        final MCRClassificationItem cl = getClassification();
+        final Classification cl = getClassificationPool().getClassificationAsPojo(getClassification().getId());
+        Label labels = getLabel(cl, lang);
         Element xDocument = new Element("classificationBrowse");
-        LOGGER.info(cl.getClassificationID());
 
         final Element xID = new Element("classifID");
-        xID.addContent(cl.getClassificationID());
+        xID.addContent(cl.getId());
         xDocument.addContent(xID);
 
+        final Element xUserEdited=new Element("userEdited");
+        if(ClassUserTable.containsKey(cl.getId())) {
+            xUserEdited.addContent(MCRSession.getSession(ClassUserTable.get(cl.getId())).getCurrentUserID());
+        } else {
+            xUserEdited.addContent("false");
+        }
+        xDocument.addContent(xUserEdited);
+        
+        final Element xSessionID=new Element("session");
+        if(ClassUserTable.containsKey(cl.getId())) {
+            xSessionID.addContent(ClassUserTable.get(cl.getId()));
+        } else {
+            xSessionID.addContent("");
+        }
+        
+        xDocument.addContent(xSessionID);
+       
+        final Element xCurrentSessionID=new Element("currentSession");
+        xCurrentSessionID.addContent(MCRSessionMgr.getCurrentSession().getID());
+        xDocument.addContent(xCurrentSessionID); 
+        
         final Element xLabel = new Element("label");
-        xLabel.addContent(cl.getText(lang));
+        xLabel.addContent(labels.getText());
         xDocument.addContent(xLabel);
 
         final Element xDesc = new Element("description");
-        xDesc.addContent(cl.getDescription(lang));
+        xDesc.addContent(labels.getDescription());
         xDocument.addContent(xDesc);
 
         final Element xDocuments = new Element("cntDocuments");
@@ -441,7 +518,7 @@ public class MCRClassificationBrowserData {
 
         // data as XML from outputNavigationTree
         final Element xNavtree = new Element("navigationtree");
-        xNavtree.setAttribute("classifID", cl.getClassificationID());
+        xNavtree.setAttribute("classifID", cl.getId());
         xNavtree.setAttribute("categID", actItemID);
         xNavtree.setAttribute("predecessor", lastItemID);
         xNavtree.setAttribute("emptyLeafs", emptyLeafs);
@@ -452,7 +529,7 @@ public class MCRClassificationBrowserData {
         }
         for (int i = 0; i < objectTypeArray.length; i++) {
             sb.append("(objectType+=+").append(objectTypeArray[i]).append(")");
-            if (objectTypeArray.length > 1 && i < objectTypeArray.length - 1) {
+            if ((objectTypeArray.length > 1) && (i < objectTypeArray.length - 1)) {
                 sb.append("+or+");
             }
         }
@@ -464,7 +541,6 @@ public class MCRClassificationBrowserData {
         xNavtree.setAttribute("searchField", searchField);
 
         int i = 0;
-        // MCRNavigTreeLine line;
         Element line;
         while ((line = getTreeline(i++)) != null) {
 
@@ -472,13 +548,16 @@ public class MCRClassificationBrowserData {
             final int numDocs = Integer.parseInt(line.getAttributeValue("counter"));
             final String status = line.getAttributeValue("hasChildren");
 
-            final Element label = (Element) XPath.selectSingleNode(line, "label[@xml:lang='" + lang + "']");
+            Element label = (Element) XPath.selectSingleNode(line, "label[lang('" + lang + "')]");
+            if (label == null) {
+                label = (Element) XPath.selectSingleNode(line, "label");
+            }
             final String text = label.getAttributeValue("text");
             final String description = label.getAttributeValue("description");
 
             final int level = Integer.parseInt(line.getAttributeValue("level"));
 
-            // fï¿½r Sortierung schon mal die leveltiefe bestimmen
+            // für Sortierung schon mal die leveltiefe bestimmen
             LOGGER.debug(" NumDocs - " + numDocs);
 
             if (emptyLeafs.endsWith("no") && numDocs == 0) {
@@ -526,15 +605,14 @@ public class MCRClassificationBrowserData {
 
             if (numLength > 0) {
                 String search = uri;
-                if (catid.equalsIgnoreCase(actItemID) || uri.endsWith(catid)) {
+                if (catid.equalsIgnoreCase(actItemID)) {
                     search += "/..";
                 } else {
                     search += "/" + catid;
                 }
 
-                if (search.indexOf("//") > 0) {
+                if (search.indexOf("//") > 0)
                     search = search.substring(0, search.indexOf("//")) + search.substring(search.indexOf("//") + 1);
-                }
 
                 xCol2.setAttribute("searchbase", search);
                 xCol2.setAttribute("lineID", catid);
@@ -542,7 +620,7 @@ public class MCRClassificationBrowserData {
 
             xCol2.addContent(text);
 
-            if (showComments() && description != null) {
+            if (showComments() && (description != null)) {
                 final Element comment = new Element("comment");
                 xCol2.addContent(comment);
                 comment.setText(description);
@@ -555,13 +633,15 @@ public class MCRClassificationBrowserData {
         if ("true".equals(sort)) {
             xDocument = sortMyTree(xDocument);
         }
-        return new org.jdom.Document(xDocument);
+        Document doc = new org.jdom.Document(xDocument);
+        return doc;
     }
 
     public void update(final String categID) throws Exception {
         int lastLevel = 0;
         boolean hideLevel = false;
 
+        Category cat = MCRClassificationQuery.findCategory(classif, categID);
         LOGGER.debug(this.getClass() + " update CategoryTree for: " + categID);
         Element line;
         for (int i = 0; i < lines.size(); i++) {
@@ -570,7 +650,7 @@ public class MCRClassificationBrowserData {
             final String status = line.getAttributeValue("hasChildren");
             final int level = Integer.parseInt(line.getAttributeValue("level"));
 
-            hideLevel = hideLevel && level > lastLevel;
+            hideLevel = hideLevel && (level > lastLevel);
             LOGGER.debug(" compare CategoryTree on " + i + "_" + catid + " to " + categID);
 
             if (view.endsWith("tree")) {
@@ -578,16 +658,17 @@ public class MCRClassificationBrowserData {
                     lines.remove(i--);
                 } else if (categID.equals(catid)) {
                     if (status.equals("F")) // hide expanded category - //
-                                            // children
+                    // children
                     {
                         line.setAttribute("hasChildren", "T");
                         hideLevel = true;
                         lastLevel = level;
                     } else if (status.equals("T")) // expand category - //
-                                                    // children
+                    // children
                     {
                         line.setAttribute("hasChildren", "F");
-                        putCategoriesintoLines(i, new MCRCategoryItem(catid, classif.ID, "").getChildrenFromJDomAsList(), level + 1);
+
+                        putCategoriesintoLines(i, cat.getCategories(), level + 1);
                     }
                 }
             } else {
@@ -595,7 +676,7 @@ public class MCRClassificationBrowserData {
                     line.setAttribute("level", "0");
                     LOGGER.info(" expand " + catid);
                     line.setAttribute("hasChildren", "F");
-                    putCategoriesintoLines(i, new MCRCategoryItem(catid, classif.ID, "").getChildrenFromJDomAsList(), level + 1);
+                    putCategoriesintoLines(i, new Category().getCategories(), level + 1);
                 } else {
                     LOGGER.debug(" remove lines " + i + "_" + catid);
                     lines.remove(i--);
@@ -617,16 +698,16 @@ public class MCRClassificationBrowserData {
 
     private Element sortMyTreeperLevel(final Element xDocument, final int activelevel, final int position) {
         Element xDoc = xDocument;
-        final Element aktRow = (Element) xDoc.getChild("navigationtree").getChildren().get(position);
+        final Element aktRow = ((Element) xDoc.getChild("navigationtree").getChildren().get(position));
         final String aktText = ((Element) aktRow.getChildren().get(1)).getText();
 
         final List children = xDoc.getChild("navigationtree").getChildren();
         int level = activelevel;
         int Cnt = 0;
         for (int j = position + 1; j < children.size(); j++) {
-            final Element child = (Element) children.get(j);
-            final Element col1 = (Element) child.getChildren().get(0);
-            final Element col2 = (Element) child.getChildren().get(1);
+            final Element child = (Element) (children.get(j));
+            final Element col1 = (Element) (child.getChildren().get(0));
+            final Element col2 = (Element) (child.getChildren().get(1));
 
             try {
                 level = col1.getAttribute("lineLevel").getIntValue();
@@ -641,9 +722,9 @@ public class MCRClassificationBrowserData {
                     changeRows(aktRow, child);
                     boolean bjumpOverChilds = true;
                     while (bjumpOverChilds && j < children.size() - 1) {
-                        final Element next = (Element) children.get(j + 1);
+                        final Element next = (Element) (children.get(j + 1));
                         if (next != null) {
-                            final Element colx = (Element) child.getChildren().get(0);
+                            final Element colx = (Element) (child.getChildren().get(0));
                             int nextlevel = level;
                             try {
                                 nextlevel = colx.getAttribute("lineLevel").getIntValue();
@@ -651,21 +732,18 @@ public class MCRClassificationBrowserData {
                                 ;
                             }
 
-                            if (nextlevel > level) {
+                            if (nextlevel > level)
                                 j++;
-                            } else {
+                            else
                                 bjumpOverChilds = false;
-                            }
-                        } else {
+                        } else
                             bjumpOverChilds = false;
-                        }
                     }
                     Cnt++;
                     xDoc = sortMyTreeperLevel(xDoc, activelevel, position);
                 }
-                if (position < children.size() - 1 && j == children.size() - 1 && Cnt == 0) {
+                if (position < children.size() - 1 && j == children.size() - 1 && Cnt == 0)
                     xDoc = sortMyTreeperLevel(xDoc, activelevel, position + 1);
-                }
             }
         }
         return xDoc;
@@ -673,11 +751,11 @@ public class MCRClassificationBrowserData {
 
     private void changeRows(final Element aktRow, final Element child) {
 
-        final Element col1 = (Element) child.getChildren().get(0);
-        final Element col2 = (Element) child.getChildren().get(1);
-        final Element placer = (Element) aktRow.clone();
-        final Element place1 = (Element) placer.getChildren().get(0);
-        final Element place2 = (Element) placer.getChildren().get(1);
+        final Element col1 = (Element) (child.getChildren().get(0));
+        final Element col2 = (Element) (child.getChildren().get(1));
+        final Element placer = (Element) (aktRow.clone());
+        final Element place1 = (Element) (placer.getChildren().get(0));
+        final Element place2 = (Element) (placer.getChildren().get(1));
 
         final Element xc1 = new Element("col");
         final Element xc2 = new Element("col");
@@ -725,9 +803,8 @@ public class MCRClassificationBrowserData {
 
     private static String fillToConstantLength(final String value, final String fillsign, final int length) {
         final int valueLength = value.length();
-        if (valueLength >= length) {
+        if (valueLength >= length)
             return value;
-        }
         final StringBuffer ret = new StringBuffer("");
         for (int i = 0; i < length - valueLength; i++) {
             ret.append(fillsign);
@@ -735,5 +812,67 @@ public class MCRClassificationBrowserData {
         ret.append(value);
         return ret.toString();
     }
+
+    /**
+     * @return Returns the pool.
+     */
+    public static MCRClassificationPool getClassificationPool() {
+        MCRSession session = MCRSessionMgr.getCurrentSession();
+        Object cp = session.get("MCRClassificationPool.instance");
+        if (cp != null && cp instanceof MCRClassificationPool) {
+            return (MCRClassificationPool) cp;
+        }
+        MCRClassificationPool classPool = new MCRClassificationPool();
+        session.put("MCRClassificationPool.instance", classPool);
+        return classPool;
+    }
+
+        private static Label getLabel(ClassificationObject co, String lang) {
+            for(Label label:co.getLabels()) {
+                if(label.getLang().equals(lang)) {
+                    return label;
+                }
+            }
+            return new Label();
+    }
+
+    private static class MCRCategoryElementFactory {
+        static Element getCategoryElement(Category category, boolean withCounter) {
+            Element ce = new Element("category");
+            ce.setAttribute("ID", category.getId());
+            if (withCounter) {
+                ce.setAttribute("counter", Integer.toString(category.getNumberOfObjects()));
+            }
+            for (Label label : category.getLabels()) {
+                ce.addContent(getElement(label));
+            }
+            for (Category child : category.getCategories()) {
+                ce.addContent(getCategoryElement(child, withCounter));
+            }
+            return ce;
+        }
+
+        private static Element getElement(Label label) {
+            Element le = new Element("label");
+            if (stringNotEmpty(label.getLang())) {
+                le.setAttribute("lang", label.getLang(), Namespace.XML_NAMESPACE);
+            }
+            if (stringNotEmpty(label.getText())) {
+                le.setAttribute("text", label.getText());
+            }
+            if (stringNotEmpty(label.getDescription())) {
+                le.setAttribute("description", label.getDescription());
+            }
+            return le;
+        }
+
+        private static boolean stringNotEmpty(String test) {
+            if (test != null && test.length() > 0) {
+                return true;
+            }
+            return false;
+        }
+    }
+    
 
 }
