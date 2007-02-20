@@ -118,7 +118,7 @@ public class MCRURIResolverFilter implements Filter {
 
     private int getInsertPosition(final String origOutput) {
         // if html document, before head-tag
-        int pos = origOutput.indexOf("<head>") - 1;
+        int pos = origOutput.indexOf("<head>");
         if (pos < 0) {
             // for xml output, after <?xml *?>
             pos = origOutput.indexOf("?>") + 2;
