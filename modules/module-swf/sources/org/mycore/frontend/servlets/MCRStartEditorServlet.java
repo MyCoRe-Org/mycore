@@ -1089,12 +1089,10 @@ public class MCRStartEditorServlet extends MCRServlet {
             return;
         }
 
-        StringBuffer sb = new StringBuffer();
-        sb.append("file://").append(CONFIG.getString("MCR.editor_" + mytype + "_directory")).append('/').append(mysemcrid).append(".xml");
-
+        File wfFile=new File(CONFIG.getString("MCR.editor_" + mytype + "_directory"),mysemcrid+".xml");
         String base = getBaseURL() + myfile;
         Properties params = new Properties();
-        params.put("XSL.editor.source.url", sb.toString());
+        params.put("XSL.editor.source.url", wfFile.toURI().toString());
         params.put("XSL.editor.cancel.url", getBaseURL() + cancelpage);
         params.put("mcrid", mysemcrid);
         params.put("type", mytype);
