@@ -33,6 +33,9 @@ import org.jdom.Attribute;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.xpath.XPath;
+import org.mycore.access.MCRAccessInterface;
+import org.mycore.access.MCRAccessManager;
+import org.mycore.access.mcrimpl.MCRAccessControlSystem;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRException;
 import org.mycore.datamodel.classifications.MCRCategoryItem;
@@ -74,7 +77,7 @@ public class MCROAIQueryImpl implements MCROAIQuery {
 
     private String lastQuery = "";
 
-    private Object[] resultArray;
+    private List resultArray;
 
     /**
      * Method MCROAIQueryService.
@@ -261,7 +264,7 @@ public class MCROAIQueryImpl implements MCROAIQuery {
 
         if (hasMore() && ((listRecords == lastQuery.equals("listRecords")) || (!listRecords == lastQuery.equals("listIdentifiers")))) {
             for (int i = deliveredResults; i < Math.min(maxReturns + deliveredResults, numResults); i++) {
-                list.add(resultArray[i]);
+                list.add(resultArray.get(i));
             }
             deliveredResults = Math.min(maxReturns + deliveredResults, numResults);
             return list;
@@ -315,16 +318,24 @@ public class MCROAIQueryImpl implements MCROAIQuery {
         logger.debug("OAI-QUERY:" + cAnd);
         MCRResults results = MCRQueryManager.search(query);
 
-        numResults = results.getNumHits();
-        resultArray = new Object[numResults];
-        logger.debug("OAIQuery found:" + numResults + " hits");
+        int resultCount = results.getNumHits();
+        resultArray = new ArrayList();
+        MCRAccessInterface access = MCRAccessManager.getAccessImpl();
+        for (int i = 0; i < resultCount; i++) {
+        	String objectID = results.getHit(i).getID();
+            if(access.checkPermission(objectID, "read")){
+            	resultArray.add(objectID);
+            }
+        }        
+        numResults = resultArray.size();
+       
+        logger.debug("OAIQuery found:" + resultCount + " hits");
+        logger.debug(numResults+" hits are publically accessable");
         deliveredResults = Math.min(maxReturns, numResults);
         logger.debug("deliveredResults:" + deliveredResults);
-        for (int i = 0; i < numResults; i++) {
-            resultArray[i] = results.getHit(i).getID();
-        }
+
         for (int i = 0; i < deliveredResults; i++) {
-            list.add(resultArray[i]);
+            list.add(resultArray.get(i));
         }
 
         return list;
