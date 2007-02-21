@@ -33,6 +33,9 @@ import org.jdom.Attribute;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.xpath.XPath;
+import org.mycore.access.MCRAccessInterface;
+import org.mycore.access.MCRAccessManager;
+import org.mycore.access.mcrimpl.MCRAccessControlSystem;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRException;
 import org.mycore.datamodel.classifications.MCRCategoryItem;
@@ -74,7 +77,7 @@ public class MCROAIQueryImpl implements MCROAIQuery {
 
     private String lastQuery = "";
 
-    private Object[] resultArray;
+    private List resultArray;
 
     /**
      * Method MCROAIQueryService.
@@ -142,39 +145,34 @@ public class MCROAIQueryImpl implements MCROAIQuery {
      *         id, the label and a description
      */
     private List getSets(MCRCategoryItem[] categories, String parentSpec, String instance) {
-        
-    	List newList = new ArrayList();
+
+        List newList = new ArrayList();
+        String setID = null;
 
         for (int i = 0; i < categories.length; i++) {
-            String[] set = new String[3];
 //          added DINI (OAI) Support
             if(categories[i].getLangArray().contains("x-dini")){
                	//ignore parentSpec, since it is specified in the label
-            	set[0] = new String(categories[i].getText("x-dini"));
-            	
+            	setID = new String(categories[i].getText("x-dini"));
             }
             else{
-            	set[0] = new String(parentSpec + categories[i].getID());	
+            	setID = new String(parentSpec + categories[i].getID());	
             }            
-            set[1] = new String(categories[i].getText("en"));
-            set[2] = new String(categories[i].getDescription("en"));
-
-            if (categories[i].hasChildren()) {
+              if (categories[i].hasChildren()) {
             	logger.debug("Kategorie " + categories[i].getID() + " hat " + categories[i].getNumChildren() + " Kinder.");
-                newList.addAll(getSets(categories[i].getChildren(), set[0] + ":", instance));
+                newList.addAll(getSets(categories[i].getChildren(), setID + ":", instance));
             }
 
             // We should better have a look if the set is empty...
             MCRLinkTableManager ltm = MCRLinkTableManager.instance();
             int numberOfLinks = ltm.countReferenceCategory(categories[i].getClassificationID(), categories[i].getID());
-
-            if (numberOfLinks > 0) {
-            	if(!set[0].equals("")){ //emtpy - dini - attributes shall be ignored
-            		newList.add(set);
-            		logger.debug("Der Gruppenliste wurde der Datensatz " + set[0] + " hinzugefügt.");
+            							//emtpy - dini - attributes shall be ignored);
+            if (numberOfLinks > 0 && !setID.equals("")) {
+            		newList.add(new String[]{setID, categories[i].getText("en"), categories[i].getDescription("en")});
+            		logger.debug("Der Gruppenliste wurde der Datensatz " + setID + " hinzugefügt.");
             	}
             }
-        }
+        
 
         return newList;
     }
@@ -266,7 +264,7 @@ public class MCROAIQueryImpl implements MCROAIQuery {
 
         if (hasMore() && ((listRecords == lastQuery.equals("listRecords")) || (!listRecords == lastQuery.equals("listIdentifiers")))) {
             for (int i = deliveredResults; i < Math.min(maxReturns + deliveredResults, numResults); i++) {
-                list.add(resultArray[i]);
+                list.add(resultArray.get(i));
             }
             deliveredResults = Math.min(maxReturns + deliveredResults, numResults);
             return list;
@@ -320,16 +318,24 @@ public class MCROAIQueryImpl implements MCROAIQuery {
         logger.debug("OAI-QUERY:" + cAnd);
         MCRResults results = MCRQueryManager.search(query);
 
-        numResults = results.getNumHits();
-        resultArray = new Object[numResults];
-        logger.debug("OAIQuery found:" + numResults + " hits");
+        int resultCount = results.getNumHits();
+        resultArray = new ArrayList();
+        MCRAccessInterface access = MCRAccessManager.getAccessImpl();
+        for (int i = 0; i < resultCount; i++) {
+        	String objectID = results.getHit(i).getID();
+            if(access.checkPermission(objectID, "read")){
+            	resultArray.add(objectID);
+            }
+        }        
+        numResults = resultArray.size();
+       
+        logger.debug("OAIQuery found:" + resultCount + " hits");
+        logger.debug(numResults+" hits are publically accessable");
         deliveredResults = Math.min(maxReturns, numResults);
         logger.debug("deliveredResults:" + deliveredResults);
-        for (int i = 0; i < numResults; i++) {
-            resultArray[i] = results.getHit(i).getID();
-        }
+
         for (int i = 0; i < deliveredResults; i++) {
-            list.add(resultArray[i]);
+            list.add(resultArray.get(i));
         }
 
         return list;
