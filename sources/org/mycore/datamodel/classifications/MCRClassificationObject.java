@@ -40,7 +40,7 @@ import org.mycore.datamodel.metadata.MCRLinkTableManager;
  * This class is an abstract class for the implementation of the classes
  * classification an category.
  * 
- * @author Frank L�tzenkirchen
+ * @author Frank L?tzenkirchen
  * @author Jens Kupferschmidt
  * @version $Revision$ $Date$
  */
@@ -481,6 +481,23 @@ public abstract class MCRClassificationObject {
         }
 
         return children;
+    }
+
+    public List getChildrenFromJDomAsList(){
+  	   ensureNotDeleted();
+       String categID = ( this instanceof MCRCategoryItem ? ID : null );
+ 	   Element EFound;	   
+ 	   if (categID != null){
+ 	      String cachingID = getClassificationID() + "@@" + categID;	      
+ 		  EFound =  (Element) (	manager().jDomCache.get(cachingID));
+          if (EFound == null) {
+ 			 EFound = findCategInJDom(categID, receiveClassificationAsJDOM().getRootElement().getChild("categories"));
+            	 manager().jDomCache.put(cachingID, EFound);
+          }		
+ 	   } else {
+ 		  EFound = receiveClassificationAsJDOM().getRootElement().getChild("categories");
+ 	   }
+ 	   return EFound.getChildren("category");    	
     }
 
     public MCRCategoryItem[] getChildrenFromJDom(){
