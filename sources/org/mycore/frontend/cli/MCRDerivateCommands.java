@@ -93,14 +93,14 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
                 "The command store all derivates with MCRObjectID's between {0} and {1} to the directory {2}");
         command.add(com);
 
-        com = new MCRCommand("export derivate {0} to directory {1} with {2}", "org.mycore.frontend.cli.MCRDerivateCommands.export String String String",
-                "The command store the derivate with the MCRObjectID {0} to the directory {1} with the stylesheet mcr_{2}-object.xsl. For {2} save is the default.");
-        command.add(com);
-
         com = new MCRCommand(
                 "export derivate from {0} to {1} to directory {2} with {3}",
                 "org.mycore.frontend.cli.MCRDerivateCommands.export String String String String",
                 "The command store all derivates with MCRObjectID's between {0} and {1} to the directory {2} with the stylesheet mcr_{3}-object.xsl. For {3} save is the default.");
+        command.add(com);
+
+        com = new MCRCommand("export derivate {0} to directory {1} with {2}", "org.mycore.frontend.cli.MCRDerivateCommands.export String String String",
+                "The command store the derivate with the MCRObjectID {0} to the directory {1} with the stylesheet mcr_{2}-object.xsl. For {2} save is the default.");
         command.add(com);
 
         com = new MCRCommand("show loadable derivate of {0} to directory {1}", "org.mycore.frontend.cli.MCRDerivateCommands.show String String",
