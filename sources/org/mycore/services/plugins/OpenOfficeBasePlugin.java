@@ -56,7 +56,7 @@ abstract class OpenOfficeBasePlugin implements TextFilterPlugin {
 
     private static final String SAXparser = "org.apache.xerces.parsers.SAXParser";
 
-    private HashSet contentTypes;
+    private HashSet<MCRFileContentType> contentTypes;
 
     private static int DEF_BYTE_SZ = 1024 * 63;
 
@@ -66,19 +66,22 @@ abstract class OpenOfficeBasePlugin implements TextFilterPlugin {
     OpenOfficeBasePlugin(String contentType) {
         super();
 
-        if (contentTypes == null) {
-            contentTypes = new HashSet();
+        contentTypes = new HashSet<MCRFileContentType>();
 
-            if (MCRFileContentTypeFactory.isTypeAvailable(contentType)) {
-                contentTypes.add(MCRFileContentTypeFactory.getType(contentType));
-            }
+        if (MCRFileContentTypeFactory.isTypeAvailable(contentType)) {
+            contentTypes.add(MCRFileContentTypeFactory.getType(contentType));
         }
 
         try {
             Class.forName(SAXparser);
         } catch (ClassNotFoundException e) {
-            throw new FilterPluginInstantiationException(new StringBuffer("This Plugin is only tested with Xerces").append("(http://xml.apache.org/xerces2-j/index.html) and").append(" though requires it to be installed somewhere in").append(" CLASSPATH. Please ensure that a jar file ").append(" containing the class ").append(SAXparser).append(" is listed in a CLASSPATH before running your")
-                    .append(" brandnew MyCoRe(tm)-Application.\n").append(" I as a developer of cause know that Xerces is").append(" bundled with every MyCoRe(tm) release and thus").append(" you will never read this message.\n").append(" But just in case, I thought it is a good idea to").append(" implement this message here.").toString());
+            throw new FilterPluginInstantiationException(new StringBuilder("This Plugin is only tested with Xerces").append(
+                    "(http://xml.apache.org/xerces2-j/index.html) and").append(" though requires it to be installed somewhere in").append(
+                    " CLASSPATH. Please ensure that a jar file ").append(" containing the class ").append(SAXparser).append(
+                    " is listed in a CLASSPATH before running your").append(" brandnew MyCoRe(tm)-Application.\n").append(
+                    " I as a developer of cause know that Xerces is").append(" bundled with every MyCoRe(tm) release and thus").append(
+                    " you will never read this message.\n").append(" But just in case, I thought it is a good idea to").append(" implement this message here.")
+                    .toString());
         }
     }
 
@@ -176,25 +179,25 @@ abstract class OpenOfficeBasePlugin implements TextFilterPlugin {
 
     private Reader getTextReader(InputStream xml) throws IOException, SAXException {
         XMLReader reader = XMLReaderFactory.createXMLReader(SAXparser);
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         reader.setContentHandler(new TextHandler(buf,getTextNameSpace()));
 
         InputSource inp = new InputSource(xml);
         reader.setEntityResolver(OooResolver);
         reader.parse(inp);
 
-        return new StringBufferReader(buf);
+        return new StringBuilderReader(buf);
     }
     
     abstract String getTextNameSpace();
     abstract String getDocumentName();
 
-    private static class StringBufferReader extends Reader {
-        private final StringBuffer buf;
+    private static class StringBuilderReader extends Reader {
+        private final StringBuilder buf;
 
         private int pos;
 
-        public StringBufferReader(StringBuffer buf) {
+        public StringBuilderReader(StringBuilder buf) {
             this.buf = buf;
             pos = 0;
         }
@@ -229,11 +232,11 @@ abstract class OpenOfficeBasePlugin implements TextFilterPlugin {
     private static class TextHandler extends DefaultHandler {
         private String textNS;
 
-        private final StringBuffer buf;
+        private final StringBuilder buf;
 
         private boolean textElement = false;
         
-        TextHandler(StringBuffer buf,String textNameSpace) {
+        TextHandler(StringBuilder buf,String textNameSpace) {
             this.buf = buf;
             this.textNS= textNameSpace;
         }
