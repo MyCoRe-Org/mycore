@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
 <!-- ============================================== -->
-<!-- $Revision: 1.48.2.3 $ $Date: 2006-12-08 12:37:06 $ -->
+<!-- $Revision: 1.48.2.4 $ $Date: 2007-02-26 07:03:50 $ -->
 <!-- ============================================== --> 
 
 <xsl:stylesheet 
@@ -1197,21 +1197,21 @@
 
 <!-- ======== space ======== -->
 <xsl:template match="space">
-  <span>
+  <div>
     <xsl:attribute name="style">
       <xsl:text>margin: 0px; </xsl:text>
       <xsl:if test="@width">
-        <xsl:text>width: </xsl:text>
+        <xsl:text>padding-left: </xsl:text>
         <xsl:value-of select="@width" />
         <xsl:text>; </xsl:text>
       </xsl:if>
       <xsl:if test="@height">
-        <xsl:text>height: </xsl:text>
+        <xsl:text>padding-bottom: </xsl:text>
         <xsl:value-of select="@height" />
         <xsl:text>; </xsl:text>
       </xsl:if>
     </xsl:attribute> 
-  </span>
+  </div>
 </xsl:template>
 
 <!-- ======== handle multirow or dropdown ======== -->
