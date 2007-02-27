@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
 <!-- ============================================== -->
-<!-- $Revision: 1.48.2.4 $ $Date: 2007-02-26 07:03:50 $ -->
+<!-- $Revision: 1.48.2.5 $ $Date: 2007-02-27 07:27:26 $ -->
 <!-- ============================================== --> 
 
 <xsl:stylesheet 
@@ -174,6 +174,7 @@
   <input type="hidden" name="{$editor.delimiter.internal}session" value="{../@session}" />
   <input type="hidden" name="{$editor.delimiter.internal}webpage" value="{$StaticFilePath}" />
   <input type="hidden" name="{$editor.delimiter.internal}action"  value="submit" />
+  <input type="hidden" name="{$editor.delimiter.internal}root"    value="{@var}" />
 
   <!-- ======== durchreichen der target parameter ======== -->
   <xsl:for-each select="../target-parameters/target-parameter">

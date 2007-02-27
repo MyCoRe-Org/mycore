@@ -62,6 +62,8 @@ public class MCREditorSubmission {
     private MCRRequestParameters parms;
 
     private Document xml;
+    
+    private String rootName;
 
     /**
      * Set variables from source xml file that should be edited
@@ -499,8 +501,11 @@ public class MCREditorSubmission {
     }
 
     private void buildTargetXML() {
-        MCREditorVariable first = (MCREditorVariable) (variables.get(0));
-        Element root = new Element(first.getPathElements()[0]);
+        Element root;
+        if( variables.size() > 0 )
+          root = new Element(((MCREditorVariable)(variables.get(0))).getPathElements()[0]);
+        else
+          root = new Element(rootName.replace("/",""));
 
         for (int i = 0; i < variables.size(); i++) {
             MCREditorVariable var = (MCREditorVariable) (variables.get(i));
