@@ -72,12 +72,14 @@ public class MCREditorSubmission {
      *            the root element of the XML input
      */
     MCREditorSubmission(Element input) {
+        rootName = input.getName();
         setVariablesFromElement(input, "/", "");
         setRepeatsFromVariables();
     }
 
     MCREditorSubmission(MCRRequestParameters parms, Element editor, boolean validate) {
         this.parms = parms;
+        rootName = parms.getParameter( "_root" );
         setVariablesFromSubmission(parms, editor, validate);
         Collections.sort(variables);
         setRepeatsFromSubmission();
