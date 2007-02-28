@@ -24,7 +24,10 @@
 
 package org.mycore.services.oai;
 
+import java.io.File;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -53,6 +56,7 @@ import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.Namespace;
+import org.jdom.ProcessingInstruction;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.mycore.common.MCRConfigurationException;
@@ -277,6 +281,16 @@ public class MCROAIProvider extends MCRServlet {
                     document = addError(header, "badVerb", ERR_ILLEGAL_VERB);
                 }
             }
+            //<?xml-stylesheet type='text/xsl' href='/content/oai/oai2.xsl' ?>
+            File f = new File(getServletContext().getRealPath("content/oai/oai2.xsl"));
+            if(f.exists()){
+            	Map<String,String> pairs = new HashMap<String, String>();
+            	pairs.put("type", "text/xsl");
+            	pairs.put("href", baseurl+"content/oai/oai2.xsl");
+            	ProcessingInstruction pi = new ProcessingInstruction("xml-stylesheet", pairs); 
+            	document.addContent(0,pi);
+            }
+            
             outputter.output(document, out);
             return;
         } catch (MCRException mcrx) {
@@ -1488,7 +1502,7 @@ public class MCROAIProvider extends MCRServlet {
         // if(format.contains("epicur")&& !email.equals("")){
         // parameters.put("ResponseEmail", email);
         // }
-        return MCRXSLTransformation.transform(document, getServletContext().getRealPath("/WEB-INF/stylesheets/" + format), parameters);
+       return MCRXSLTransformation.transform(document, getServletContext().getRealPath("/WEB-INF/stylesheets/" + format), parameters);
     }
 
     static MCROAIConfigBean getConfigBean(String instance) {
