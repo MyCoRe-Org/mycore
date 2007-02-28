@@ -284,9 +284,21 @@ public class MCROAIProvider extends MCRServlet {
             //<?xml-stylesheet type='text/xsl' href='/content/oai/oai2.xsl' ?>
             File f = new File(getServletContext().getRealPath("content/oai/oai2.xsl"));
             if(f.exists()){
+            	String myURL = new String(baseurl);
+            	if(myURL.length()==0){
+            		String contextPath = request.getContextPath();
+            		if (contextPath == null) {
+            			contextPath = "";
+            		}
+            		contextPath += "/";
+            		int pos = url.indexOf(contextPath, 9);
+               		myURL=url.substring(0, pos) + contextPath;
+            	}
+            	
             	Map<String,String> pairs = new HashMap<String, String>();
             	pairs.put("type", "text/xsl");
-            	pairs.put("href", baseurl+"content/oai/oai2.xsl");
+            	
+            	pairs.put("href", myURL+"content/oai/oai2.xsl");
             	ProcessingInstruction pi = new ProcessingInstruction("xml-stylesheet", pairs); 
             	document.addContent(0,pi);
             }
