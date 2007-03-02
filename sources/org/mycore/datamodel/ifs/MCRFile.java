@@ -206,16 +206,6 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
     }
 
     /**
-     * The methodset the storage ID that identifies the place where the
-     * MCRContentStore has stored the content of this file
-     */
-    public void setStorageID(String storageID) {
-        if (storageID == null)
-            return;
-        this.storageID = storageID;
-    }
-
-    /**
      * Returns the MCRContentStore instance that holds the content of this file
      * 
      * @return the MCRContentStore instance that holds the content of this file,
@@ -325,7 +315,6 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
      */
     public void setContentFrom(InputStream source) throws MCRPersistenceException {
         ensureNotDeleted();
-        MCRArgumentChecker.ensureNotNull(source, "source input stream");
 
         String old_md5 = this.md5;
         long old_size = this.size;
@@ -343,9 +332,8 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
         {
             MCRContentStore store = MCRContentStoreFactory.selectStore(this);
 
-            storeID = store.getID();
             storageID = store.storeContent(this, cis);
-            // storeID = store.getID();
+            storeID = store.getID();
         }
 
         size = cis.getLength();

@@ -69,12 +69,6 @@ public interface MCRFileReader {
     public String getStorageID();
 
     /**
-     * The methodset the storage ID that identifies the place where the
-     * MCRContentStore has stored the content of this file
-     */
-    public void setStorageID(String storageID);
-    
-    /**
      * Returns the content type of the content of this file
      */
     public String getContentTypeID();
