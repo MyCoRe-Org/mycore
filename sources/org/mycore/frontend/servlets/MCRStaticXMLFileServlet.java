@@ -28,6 +28,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.util.HashMap;
+import java.util.StringTokenizer;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -35,6 +37,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.log4j.Logger;
 import org.jdom.Document;
 
+import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRUtils;
 import org.mycore.common.xml.MCRXMLHelper;
 import org.mycore.frontend.editor.MCREditorServlet;
@@ -49,6 +52,10 @@ import org.mycore.frontend.editor.MCREditorServlet;
 public class MCRStaticXMLFileServlet extends MCRServlet {
     protected final static Logger LOGGER = Logger.getLogger(MCRStaticXMLFileServlet.class);
 
+    protected final static String docTypesIncludingEditors = MCRConfiguration.instance().getString( "MCR.EditorFramework.DocTypes", "MyCoReWebPage" );
+    
+    protected final static HashMap<String,String> docTypesMap = new HashMap<String,String>(); 
+    
     public void doGetPost(MCRServletJob job) throws java.io.IOException {
         final HttpServletRequest request = job.getRequest();
         final HttpServletResponse response = job.getResponse();
@@ -78,8 +85,15 @@ public class MCRStaticXMLFileServlet extends MCRServlet {
         String type = MCRUtils.parseDocumentType(fis);
         fis.close();
 
-        // For static webpages, replace editor elements with complete editor definition
-        if ("MyCoReWebPage".equals(type) || "webpage".equals(type)) {
+        // Parse list of document types that may contain editor elements
+        if( docTypesMap.isEmpty() )
+        {
+          StringTokenizer st = new StringTokenizer( docTypesIncludingEditors, ", " );
+          while( st.hasMoreTokens() ) docTypesMap.put( st.nextToken(), null );
+        }
+        
+        // For defined document types like static webpages, replace editor elements with complete editor definition
+        if (docTypesMap.containsKey(type)) {
             Document xml = MCRXMLHelper.parseURI(file.toURI().toString(), false);
             MCREditorServlet.replaceEditorElements(request, file.toURL().toString(), xml);
             getLayoutService().doLayout(request,response,xml);
