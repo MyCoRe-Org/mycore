@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
 <!-- ============================================== -->
-<!-- $Revision: 1.58 $ $Date: 2007-02-27 07:26:36 $ -->
+<!-- $Revision: 1.59 $ $Date: 2007-03-02 15:07:23 $ -->
 <!-- ============================================== --> 
 
 <xsl:stylesheet 
@@ -362,7 +362,12 @@
         </xsl:choose>
       </td>
       <td align="left" valign="bottom" class="editorRepeaterButton">
-        <input type="image" name="{$editor.delimiter.internal}m-{$var}-{$row.nr}" src="{$WebApplicationBaseURL}images/pmud-minus.png"/>
+        <xsl:choose>
+          <xsl:when test="$num &gt; 1">
+            <input type="image" name="{$editor.delimiter.internal}m-{$var}-{$row.nr}" src="{$WebApplicationBaseURL}images/pmud-minus.png"/>
+          </xsl:when>
+          <xsl:otherwise><img src="{$WebApplicationBaseURL}images/pmud-blank.png" border="0" /></xsl:otherwise>
+        </xsl:choose>
       </td>
       <td align="left" valign="bottom" class="editorRepeaterButton">
         <xsl:choose>
