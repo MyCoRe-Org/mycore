@@ -60,6 +60,9 @@ public class MCRMailer {
     protected static Session mailSession;
 
     protected static String encoding;
+    
+    /** How often should MCRMailer try to send mail? */
+    protected static int numTries;
 
     /** Initializes the class */
     static {
@@ -69,6 +72,7 @@ public class MCRMailer {
         Properties mailProperties = new Properties();
 
         try {
+            numTries = config.getInt( "MCR.mail.numTries", 1 );
             mailProperties.setProperty("mail.smtp.host", config.getString("MCR.mail.server"));
             mailProperties.setProperty("mail.transport.protocol", config.getString("MCR.mail.protocol", "smtp"));
             mailSession = Session.getDefaultInstance(mailProperties, null);
@@ -250,14 +254,15 @@ public class MCRMailer {
      */
     public static void send(final String from, final List replyTo, final List to, final List bcc, final String subject, final String body, final List parts) {
         try {
-            trySending(from, replyTo, to, bcc, subject, body, parts);
-        } catch (Exception ex) {
+            if( numTries > 0 ) trySending(from, replyTo, to, bcc, subject, body, parts);
+        } catch (Exception ex){
             logger.info("Sending email failed: " + ex.getClass().getName() + " " + ex.getMessage());
-            logger.info("Retrying in 5 minutes...");
-
+            if( numTries < 2 ) return;
+            
             Thread t = new Thread(new Runnable() {
                 public void run() {
-                    for (int i = 0; i < 10; i++) {
+                    for (int i = numTries - 1; i > 0; i--) {
+                        logger.info("Retrying in 5 minutes...");
                         Object obj = new Object();
                         try {
                             synchronized (obj) {
@@ -268,15 +273,11 @@ public class MCRMailer {
                         }
 
                         try {
-                            logger.info("Retrying to send email to " + to.get(0));
                             trySending(from, replyTo, to, bcc, subject, body, parts);
                             logger.info("Successfully resended email.");
                             break;
                         } catch (Exception ex) {
                             logger.info("Sending email failed: " + ex.getClass().getName() + " " + ex.getMessage());
-                            logger.info("Retrying in 5 minutes...");
-                            if (i == 9)
-                                logger.info("Sending email finally failed: " + subject + " " + to.get(0));
                         }
                     }
                 }
@@ -333,6 +334,7 @@ public class MCRMailer {
             msg.setContent(multipart);
         }
 
+        logger.info("Sending email to " + to.get(0));
         Transport.send(msg);
     }
 
