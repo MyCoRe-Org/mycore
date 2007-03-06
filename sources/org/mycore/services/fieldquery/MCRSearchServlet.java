@@ -49,7 +49,7 @@ import org.mycore.parsers.bool.MCRCondition;
 /**
  * This servlet executes queries and presents result pages.
  * 
- * @author Frank Lützenkirchen
+ * @author Frank Lï¿½tzenkirchen
  * @author Harald Richter
  */
 public class MCRSearchServlet extends MCRServlet {
@@ -401,8 +401,13 @@ public class MCRSearchServlet extends MCRServlet {
      */
     protected void sendRedirect(HttpServletRequest req, HttpServletResponse res, String id, String numPerPage) throws IOException {
         // Redirect browser to first results page
-        String url = "MCRSearchServlet?mode=results&id=" + id + "&numPerPage=" + numPerPage;
-        res.sendRedirect(res.encodeRedirectURL(url));
+        StringBuffer sb = new StringBuffer();
+        sb.append("MCRSearchServlet?mode=results&id=").append(id).append("&numPerPage=").append(numPerPage);
+        String style = req.getParameter("XSL.Style");
+        if ((style != null) && (style.trim().length() != 0)){
+            sb.append("&XSL.Style=").append(style);
+        }
+        res.sendRedirect(res.encodeRedirectURL(sb.toString()));
     }
 
 }
