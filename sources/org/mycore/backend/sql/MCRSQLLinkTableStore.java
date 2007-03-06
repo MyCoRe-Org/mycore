@@ -34,8 +34,6 @@ import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.datamodel.metadata.MCRLinkTableInterface;
-import org.mycore.datamodel.metadata.MCRLinkTableManager;
-import org.mycore.datamodel.metadata.MCRMetaClassification;
 import org.mycore.datamodel.metadata.MCRObjectID;
 
 /**
@@ -53,12 +51,6 @@ public class MCRSQLLinkTableStore implements MCRLinkTableInterface {
 
     // internal data
     private String tableName;
-
-    private String mytype;
-
-    private int lengthClassID = MCRMetaClassification.MAX_CLASSID_LENGTH;
-
-    private int lengthCategID = MCRMetaClassification.MAX_CATEGID_LENGTH;
 
     private int lengthObjectID = MCRObjectID.MAX_LENGTH;
 
@@ -267,7 +259,8 @@ public class MCRSQLLinkTableStore implements MCRLinkTableInterface {
      * @param to
      *            Destination-ID
      * @param type
-     *            link reference type
+     *            Link reference type, this can be null. Current types are
+     *            child, classid, parent, reference and derivate.
      * @return List of Strings (Source-IDs)
      */
     public List getSourcesOf(String to, String type) {
@@ -278,7 +271,7 @@ public class MCRSQLLinkTableStore implements MCRLinkTableInterface {
         }
         logger.debug("STATEMENT: " + select);
         MCRSQLConnection conn = MCRSQLConnectionPool.instance().getConnection();
-        List returns = new LinkedList();
+        List returns = new LinkedList<String>();
 
         try {
             MCRSQLRowReader reader = conn.doQuery(select.toString());
@@ -301,7 +294,8 @@ public class MCRSQLLinkTableStore implements MCRLinkTableInterface {
      * @param source
      *            Source-ID
      * @param type
-     *            link referenceType
+     *            Link reference type, this can be null. Current types are
+     *            child, classid, parent, reference and derivate.
      * @return List of Strings (Destination-IDs)
      */
     public List getDestinationsOf(String source, String type) {
@@ -312,7 +306,7 @@ public class MCRSQLLinkTableStore implements MCRLinkTableInterface {
         }
         logger.debug("STATEMENT: " + select);
         MCRSQLConnection conn = MCRSQLConnectionPool.instance().getConnection();
-        List returns = new LinkedList();
+        List returns = new LinkedList<String>();
 
         try {
             MCRSQLRowReader reader = conn.doQuery(select.toString());

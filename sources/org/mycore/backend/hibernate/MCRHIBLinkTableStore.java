@@ -100,7 +100,8 @@ public class MCRHIBLinkTableStore implements MCRLinkTableInterface {
             tx.rollback();
             logger.error(e);
         } finally {
-             if ( session != null ) session.close();
+            if (session != null)
+                session.close();
         }
     }
 
@@ -133,14 +134,15 @@ public class MCRHIBLinkTableStore implements MCRLinkTableInterface {
         Transaction tx = session.beginTransaction();
 
         try {
-            int deleted=session.createQuery(sb.toString()).executeUpdate();
-            logger.debug(deleted+" references deleted.");
+            int deleted = session.createQuery(sb.toString()).executeUpdate();
+            logger.debug(deleted + " references deleted.");
             tx.commit();
         } catch (Exception e) {
             tx.rollback();
             logger.error(e);
         } finally {
-             if ( session != null ) session.close();
+            if (session != null)
+                session.close();
         }
     }
 
@@ -162,27 +164,27 @@ public class MCRHIBLinkTableStore implements MCRLinkTableInterface {
         Session session = getSession();
         Integer returns;
         StringBuffer qBf = new StringBuffer(1024);
-        qBf.append("select count(key.mcrfrom) from ").append(classname).append(" where MCRTO like ")
-        .append('\'').append(to).append('\'');
+        qBf.append("select count(key.mcrfrom) from ").append(classname).append(" where MCRTO like ").append('\'').append(to).append('\'');
 
         if ((type != null) && (type.length() != 0)) {
-          qBf.append(" and MCRTYPE = \'").append(type).append('\'');
+            qBf.append(" and MCRTYPE = \'").append(type).append('\'');
         }
         if ((restriction != null) && (restriction.length() != 0)) {
-          qBf.append(" and MCRTO like \'").append(restriction).append('\'');
+            qBf.append(" and MCRTO like \'").append(restriction).append('\'');
         }
         if ((fromtype != null) && (fromtype.length() != 0)) {
-          qBf.append(" and MCRFROM like \'%_").append(fromtype).append("_%\'");
+            qBf.append(" and MCRFROM like \'%_").append(fromtype).append("_%\'");
         }
 
         try {
             Query q = session.createQuery(qBf.toString());
-            returns=(Integer)q.uniqueResult();
+            returns = (Integer) q.uniqueResult();
         } catch (Exception e) {
             logger.error(e);
             throw new MCRException("Error during countTo(" + fromtype + "," + to + "," + type + "," + restriction + ")", e);
         } finally {
-             if ( session != null ) session.close();
+            if (session != null)
+                session.close();
         }
 
         return returns.intValue();
@@ -214,7 +216,8 @@ public class MCRHIBLinkTableStore implements MCRLinkTableInterface {
         } catch (Exception e) {
             throw new MCRException("Error during getCountedMapOfMCRTO", e);
         } finally {
-             if ( session != null ) session.close();
+            if (session != null)
+                session.close();
         }
         return map;
     }
@@ -226,7 +229,8 @@ public class MCRHIBLinkTableStore implements MCRLinkTableInterface {
      * @param to
      *            Destination-ID
      * @param type
-     *            link reference type, this can be null
+     *            Link reference type, this can be null. Current types are
+     *            child, classid, parent, reference and derivate.
      * @return List of Strings (Source-IDs)
      */
     public List getSourcesOf(String to, String type) {
@@ -243,7 +247,8 @@ public class MCRHIBLinkTableStore implements MCRLinkTableInterface {
         } catch (Exception e) {
             throw new MCRException("Error during getSourceOf", e);
         } finally {
-             if ( session != null ) session.close();
+            if (session != null)
+                session.close();
         }
         return returns;
     }
@@ -254,7 +259,8 @@ public class MCRHIBLinkTableStore implements MCRLinkTableInterface {
      * @param source
      *            source-ID
      * @param type
-     *            reference type of the link
+     *            Link reference type, this can be null. Current types are
+     *            child, classid, parent, reference and derivate.
      * @return List of Strings (Destination-IDs)
      */
     public List getDestinationsOf(String source, String type) {
@@ -271,7 +277,8 @@ public class MCRHIBLinkTableStore implements MCRLinkTableInterface {
         } catch (Exception e) {
             throw new MCRException("Error during getDestinationOf", e);
         } finally {
-             if ( session != null ) session.close();
+            if (session != null)
+                session.close();
         }
         return returns;
     }
