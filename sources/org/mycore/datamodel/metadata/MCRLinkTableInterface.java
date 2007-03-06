@@ -33,7 +33,7 @@ import java.util.Map;
  * @version $Revision$ $Date$
  */
 public interface MCRLinkTableInterface {
-
+    
     /**
      * The method create a new item in the datastore.
      * 
@@ -97,21 +97,23 @@ public interface MCRLinkTableInterface {
      * @param to
      *            Destination-ID
      * @param type
-     *            link reference type
+     *            Link reference type, this can be null. Current types are
+     *            classid, child, parent, reference and derivate.
      * @return List of Strings (Source-IDs)
      */
     public List getSourcesOf(String to, String type);
 
     /**
-     * Returns a List of all link destination of <code>source</code> and a
+     * Returns a List of all link destination of <code>from</code> and a
      * special <code>type</code>
      * 
-     * @param source
+     * @param from
      *            Source-ID
      * @param type
-     *            link referenceType
+     *            Link reference type, this can be null. Current types are
+     *            classid, child, parent, reference and derivate.
      * @return List of Strings (Destination-IDs)
      */
-    public List getDestinationsOf(String source, String type);
+    public List getDestinationsOf(String from, String type);
 
 }

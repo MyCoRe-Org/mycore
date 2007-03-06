@@ -23,8 +23,6 @@
 
 package org.mycore.datamodel.metadata;
 
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -102,6 +100,18 @@ public class MCRLinkTableManager {
         persistenceclass = (MCRLinkTableInterface) obj;
     }
 
+    /**
+     * This method check the type of link.
+     * 
+     * @param type
+     * @return true if it is a defined type, else return false and send a warning to the logger.
+     */
+    private final boolean checkType(String type) {
+        if (type.equals(ENTRY_TYPE_CHILD) || type.equals(ENTRY_TYPE_CLASSID) || type.equals(ENTRY_TYPE_DERIVATE) || type.equals(ENTRY_TYPE_PARENT) || type.equals(ENTRY_TYPE_REFERENCE)) { return true;}
+        logger.warn("The value "+type+" is not a defined type for the link table.");
+        return false;
+    }
+    
     /**
      * The method add a reference link pair.
      * 
@@ -446,11 +456,11 @@ public class MCRLinkTableManager {
             int idt = 0;
             for (idt = 0; idt < types.length; idt++) {
                 mydoctype = types[idt];
-                cnt += persistenceclass.countTo(mydoctype,sb.toString(), "classid", restriction);
+                cnt += persistenceclass.countTo(mydoctype,sb.toString(), ENTRY_TYPE_CLASSID, restriction);
             }
             return cnt;
         }
-        return persistenceclass.countTo(null,sb.toString(), "classid", restriction);
+        return persistenceclass.countTo(null, sb.toString(), ENTRY_TYPE_CLASSID, restriction);
     } catch (Exception e) {
         logger.warn("An error occured while searching for references of " + sb.toString() + ".");
     }
@@ -520,6 +530,7 @@ public class MCRLinkTableManager {
             logger.warn("The type value of a reference link is false, the link was not found in the link table");
             return new LinkedList();
         }
+        checkType(type);
 
         try {
             return persistenceclass.getSourcesOf(to,type);
@@ -552,83 +563,53 @@ public class MCRLinkTableManager {
         }
     }
 
-    /*
-    public List getDestinationOf(String type, String source) {
-        int i = checkType(type);
-
-        if (i == -1) {
-            logger.warn("The type value of a reference link is false, the link was found in the link table");
-
-            return new LinkedList();
-        }
-
-        if ((source == null) || (source.length() == 0)) {
+    /**
+     * Returns a List of all link destinations of <code>from</code>
+     *     and a special <code>type</code>
+     * 
+     * @param from
+     *            Destination-ID
+     * @param type
+     *            link reference type
+     * @return List of Strings (Source-IDs)
+     */
+    public List getDestinationOf(MCRObjectID from, String type) {
+        return getDestinationOf(from.getId(),type);
+    }
+    
+    /**
+     * Returns a List of all link destination of <code>from</code> and a
+     * special <code>type</code>
+     * 
+     * @param from
+     *            Source-ID
+     * @param type
+     *            Link reference type, this can be null. Current types are
+     *            classid, child, parent, reference and derivate.
+     * @return List of Strings (Destination-IDs)
+     */
+    public List getDestinationOf(String from, String type) {
+        if ((from == null) || (from.length() == 0)) {
             logger.warn("The to value of a reference link is false, the link was not found in the link table");
-
             return new LinkedList();
         }
-
+        if ((type == null) || (type.length() == 0)) {
+            logger.warn("The type value of a reference link is false, the link was not found in the link table");
+            return new LinkedList();
+        }
+        checkType(type);
+        
         try {
-            return ((MCRLinkTableInterface) tablelist.get(i)).getDestinationsOf(source);
+            return persistenceclass.getDestinationsOf(from, type);
         } catch (Exception e) {
-            logger.warn("An error occured while searching for references from " + source + ".");
+            logger.warn("An error occured while searching for references from " + from + ".");
             return new LinkedList();
         }
     }
-    */
 
-    /*
-    public List getDestinationOf(String type, String source, String referenceType) {
-        int i = checkType(type);
-
-        if (i == -1) {
-            logger.warn("The type value of a reference link is false, the link was found in the link table");
-
-            return new LinkedList();
-        }
-
-        if ((source == null) || (source.length() == 0)) {
-            logger.warn("The to value of a reference link is false, the link was not found in the link table");
-
-            return new LinkedList();
-        }
-
-        try {
-            return ((MCRLinkTableInterface) tablelist.get(i)).getDestinationsOf(source, referenceType);
-        } catch (Exception e) {
-            logger.warn("An error occured while searching for references from " + source + ".");
-            return new LinkedList();
-        }
-    }
-    */
-
-    /*
-    public List getDestinationOf(String type, String[] sources) {
-        int i = checkType(type);
-
-        if (i == -1) {
-            logger.warn("The type value of a reference link is false, the link was found in the link table");
-
-            return new LinkedList();
-        }
-
-        if ((sources == null) || (sources.length == 0)) {
-            logger.warn("The to value of a reference link is false, the link was not found in the link table");
-
-            return new LinkedList();
-        }
-
-        try {
-            return ((MCRLinkTableInterface) tablelist.get(i)).getDestinationsOf(sources);
-        } catch (Exception e) {
-            logger.warn("An error occured while searching for references from " + sources + ".");
-            return new LinkedList();
-        }
-    }
-    */
-
-    /*
+    /**
      * The method retun a list of links for the given classification and category.
+     * 
      * @param classid the classification ID
      * @param categid the category of this classification
      * @return a list of ID's
@@ -637,8 +618,9 @@ public class MCRLinkTableManager {
         return getSourceOf(classid + "##" + categid, ENTRY_TYPE_CLASSID);
     }
 
-    /*
+    /**
      * The method return the first link of a given category of a classification.
+     * 
      * @param classid the classification ID
      * @param categid the category of this classification
      * @return a list of ID's
