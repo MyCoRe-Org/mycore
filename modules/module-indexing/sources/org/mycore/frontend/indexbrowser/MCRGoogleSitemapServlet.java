@@ -23,17 +23,13 @@
 
 package org.mycore.frontend.indexbrowser;
 
-import java.text.SimpleDateFormat;
-import java.util.GregorianCalendar;
-import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.Namespace;
+import org.jdom.xpath.XPath;
 
 import org.mycore.common.MCRConfiguration;
-import org.mycore.common.xml.MCRXMLHelper;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.MCRXMLTableManager;
 import org.mycore.frontend.servlets.MCRServlet;
@@ -46,6 +42,7 @@ import org.mycore.frontend.servlets.MCRServletJob;
  * 
  * @author Frank Luetzenkirchen
  * @author Jens Kupferschmidt
+ * @author Thomas Scheffler (yagee)
  * @version $Revision$ $Date$
  */
 public final class MCRGoogleSitemapServlet extends MCRServlet {
@@ -69,86 +66,33 @@ public final class MCRGoogleSitemapServlet extends MCRServlet {
      */
     public void doGetPost(MCRServletJob job) throws Exception {
         // set baseurl
+        final long start = System.currentTimeMillis();
         String addr = getBaseURL() + "receive/";
         // build ducment frame
         Namespace ns = Namespace.getNamespace("http://www.google.com/schemas/sitemap/0.84");
         Element urlset = new Element("urlset", ns);
         Document jdom = new Document(urlset);
 
-        // set current date
-        GregorianCalendar calcurrent = new GregorianCalendar();
-        String pattern = "yyyy-MM-dd'T'hh:mm'+01:00'";
-        SimpleDateFormat df = new SimpleDateFormat(pattern);
-        String timecurrent = df.format(calcurrent.getTime());
-        String time = null;
-        LOGGER.info("Start Google access on " + timecurrent);
-
         // build over all types
         MCRObjectID mid = new MCRObjectID();
-        byte[] xml = null;
         Document doc = null;
-        Element mycore = null;
-        Element service = null;
-        Element servdates = null;
-        List servdatelist = null;
-        Element servdate = null;
+        XPath xpath = XPath.newInstance("/mycoreobject/service/servdates/servdate[@type='modifydate']");
         for (String type : types) {
-            for (String id : tm.retrieveAllIDs(type)) {
-                LOGGER.debug("Read object with ID " + id);
-                mid.setID(id);
-                xml = tm.retrieve(mid);
-                doc = MCRXMLHelper.parseXML(xml, false);
-                mycore = doc.getRootElement();
-                if (mycore == null) {
-                    LOGGER.warn("No root element for object ID " + id);
-                    continue;
-                }
-                service = mycore.getChild("service");
-                if (service == null) {
-                    LOGGER.warn("No service element for object ID " + id);
-                    continue;
-                }
-                servdates = service.getChild("servdates");
-                if (servdates == null) {
-                    LOGGER.warn("No servdates element for object ID " + id);
-                    continue;
-                }
-                servdatelist = servdates.getChildren("servdate");
-                if ((servdatelist == null) || (servdatelist.size() == 0)) {
-                    LOGGER.warn("No servdate element for object ID " + id);
-                    continue;
-                }
-                for (int k = 0; k < servdatelist.size(); k++) {
-                    servdate = (Element) servdatelist.get(k);
-                    if (servdate.getAttributeValue("type").equals("modifydate")) {
-                        time = servdate.getText();
-                        break;
-                    }
-                }
+            for (Object objID : tm.retrieveAllIDs(type)) {
+                String mcrID = objID.toString();
+                mid.setID(mcrID);
+                doc = tm.readDocument(mid);
+                Element servDate = (Element) xpath.selectSingleNode(doc);
                 // build entry
                 Element url = new Element("url", ns);
-                Element loc = new Element("loc", ns);
-                Element lastmod = new Element("lastmod", ns);
-                Element changefreq = new Element("changefreq", ns);
-                changefreq.addContent(freq);
-                loc.addContent(addr + id);
-                try {
-                    time = time.substring(0, 16) + "+01:00";
-                    lastmod.addContent(time);
-                } catch (Exception e) {
-                    lastmod.addContent(timecurrent);
-                }
-                url.addContent(loc);
-                url.addContent(changefreq);
-                url.addContent(lastmod);
+                url.addContent(new Element("loc", ns).addContent(addr + mcrID));
+                url.addContent(new Element("changefreq", ns).addContent(freq));
+                url.addContent(new Element("lastmod", ns).addContent(servDate.getText()));
                 urlset.addContent(url);
             }
         }
-
         // redirect Layout Servlet
-        calcurrent = new GregorianCalendar();
-        timecurrent = df.format(calcurrent.getTime());
-        LOGGER.info("Stop Google access on " + timecurrent);
+        LOGGER.debug("Google sitemap request took " + (System.currentTimeMillis() - start) + "ms.");
         getLayoutService().sendXML(job.getRequest(), job.getResponse(), jdom);
     }
 }
