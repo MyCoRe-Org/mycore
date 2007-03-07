@@ -23,43 +23,63 @@
 
 package org.mycore.services.webservices;
 
-public interface MCRWS
-{
+public interface MCRWS {
 
-  /**
-   * Retrieves MyCoRe object   
-   *
-   * @param ID The ID of the document to retrieve   
-   * 
-   * @return data of mycore object
-   * 
-   **/
-  public abstract org.w3c.dom.Document MCRDoRetrieveObject(String ID) throws Exception;
+    /**
+     * Retrieves MyCoRe object
+     * 
+     * @param ID
+     *            The ID of the document to retrieve
+     * 
+     * @return data of mycore object
+     * 
+     */
+    public abstract org.w3c.dom.Document MCRDoRetrieveObject(String ID) throws Exception;
 
-  /**
-   * Retrieves MyCoRe Classification   
-   *
-   * @param level   number of levels to retrievwe   
-   * @param type    parents|children   
-   * @param classID The ID of the classification   
-   * @param categID   categroryID where retrieval with level starts
-   * @param format of retrieved classification, valid values are: editor['['formatAlias']']|metadata    
-   * 
-   * @return data of mycore classification
-   * 
-   **/
-  public abstract org.w3c.dom.Document MCRDoRetrieveClassification( String level, String type,
-      String classID, String categID, String format) throws Exception;
+    /**
+     * Retrieves MyCoRe Classification
+     * 
+     * @param level
+     *            number of levels to retrievwe
+     * @param type
+     *            parents|children
+     * @param classID
+     *            The ID of the classification
+     * @param categID
+     *            categroryID where retrieval with level starts
+     * @param format
+     *            of retrieved classification, valid values are:
+     *            editor['['formatAlias']']|metadata
+     * 
+     * @return data of mycore classification
+     * 
+     */
+    public abstract org.w3c.dom.Document MCRDoRetrieveClassification(String level, String type, String classID, String categID, String format) throws Exception;
 
-  /**
-   * Search for MyCoRe objects
-   * 
-   * @param query
-   *          as mycore xml query
-   * 
-   * @return resultset of search
-   * 
-   */
-  public abstract org.w3c.dom.Document MCRDoQuery(org.w3c.dom.Document query) throws Exception;
+    /**
+     * Search for MyCoRe objects
+     * 
+     * @param query
+     *            as mycore xml query
+     * 
+     * @return resultset of search
+     * 
+     */
+    public abstract org.w3c.dom.Document MCRDoQuery(org.w3c.dom.Document query) throws Exception;
+
+    /**
+     * Retrieves MyCoRe Links
+     * 
+     * @param from
+     *            the source ID of the link
+     * @param to
+     *            the target ID of the link
+     * @param type
+     *            the link type (if it is null, refernce is default)
+     * 
+     * @return mcr:result JDOM object
+     * 
+     */
+    public abstract org.w3c.dom.Document MCRDoRetrieveLinks(String from, String to, String type) throws Exception;
 
 }

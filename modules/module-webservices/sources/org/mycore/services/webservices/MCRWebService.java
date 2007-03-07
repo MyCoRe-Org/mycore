@@ -23,12 +23,17 @@
 
 package org.mycore.services.webservices;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.log4j.Logger;
 
 import org.jdom.Document;
+import org.mycore.datamodel.metadata.MCRLinkTableManager;
 import org.mycore.datamodel.metadata.MCRXMLTableManager;
 import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.services.fieldquery.MCRHit;
 import org.mycore.services.fieldquery.MCRQuery;
 import org.mycore.services.fieldquery.MCRQueryManager;
 import org.mycore.services.fieldquery.MCRResults;
@@ -112,4 +117,46 @@ public class MCRWebService implements MCRWS {
         return doo.output(result);
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see MCRWS#MCRDoQuery(org.w3c.dom.Document)
+     */
+    public org.w3c.dom.Document MCRDoRetrieveLinks(String from, String to, String type) throws Exception {
+        // set default empty answer
+        MCRResults results = new MCRResults();
+        // check parameter
+        if ((type == null) || (type.length() == 0)) {
+            type = MCRLinkTableManager.ENTRY_TYPE_REFERENCE;
+        }
+        if (from == null)
+            from = "";
+        if (to == null)
+            to = "";
+        if ((from.length() != 0) || (to.length() != 0)) {
+          logger.debug("Input parameter : type=" + type + "   from=" + from + "   to=" + to);
+          List links = new ArrayList();
+          MCRLinkTableManager LM = MCRLinkTableManager.instance();
+          // Look for links
+          if ((from = from.trim()).length() != 0) {
+            // logger.debug("Use MCRLinkTableManager.getDestinationOf("+from+","+type+")");
+            links = LM.getDestinationOf(from, type);
+        } else {
+            // logger.debug("Use MCRLinkTableManager.getSourceOf("+to+","+type+")");
+            links = LM.getSourceOf(to, type);
+        }
+        // logger.debug("Get "+(new Integer(links.size())).toString()+" results");
+        for (int i = 0; i < links.size(); i++) {
+            MCRHit hit = new MCRHit((String) links.get(i));
+            results.addHit(hit);
+        }
+        } else {
+            logger.warn("Input parameter from and to are empty!");
+        }
+        // write output
+        Document result = new Document(results.buildXML());
+        org.jdom.output.DOMOutputter doo = new org.jdom.output.DOMOutputter();
+        return doo.output(result);
+    }
+    
 }

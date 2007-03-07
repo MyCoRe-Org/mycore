@@ -149,6 +149,20 @@
       </parameter>
     </operation>
 
+    <operation name="MCRDoRetrieveLinks">
+      <documentation>This operation retrieves one or more linked MyCoRe object id's
+                     Result is a mcr:result list as org.w3c.dom.Document</documentation>
+      <parameter name="from" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema">
+        <documentation>the link source, it is optional with to </documentation>
+      </parameter>
+      <parameter name="to" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema">
+        <documentation>the link target, it is optional with from </documentation>
+      </parameter>
+      <parameter name="type" type="tns:string" xmlns:tns="http://www.w3.org/2001/XMLSchema">
+        <documentation>the link type, it is optional, default is reference</documentation>
+      </parameter>
+    </operation>
+
   </service>
 
 </deployment>
