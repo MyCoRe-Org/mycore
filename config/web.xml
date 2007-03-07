@@ -72,6 +72,10 @@
     <servlet-name>MCRSearchServlet</servlet-name>
     <servlet-class>org.mycore.services.fieldquery.MCRSearchServlet</servlet-class>
   </servlet>
+  <servlet id="MCRLink">
+    <servlet-name>MCRLinkServlet</servlet-name>
+    <servlet-class>org.mycore.frontend.servlets.MCRLinkServlet</servlet-class>
+  </servlet>
 
   <!-- uncomment for administration interface -->
   <!-- <servlet id="MCRAdminServlet"> -->
@@ -167,6 +171,10 @@
   <servlet-mapping>
     <servlet-name>MCRSearchServlet</servlet-name>
     <url-pattern>/servlets/MCRSearchServlet</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>MCRLinkServlet</servlet-name>
+    <url-pattern>/servlets/MCRLinkServlet</url-pattern>
   </servlet-mapping>
 
   <!-- uncomment for administration interface -->
