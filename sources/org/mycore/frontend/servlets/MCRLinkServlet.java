@@ -90,41 +90,42 @@ public class MCRLinkServlet extends MCRServlet {
                 type = MCRLinkTableManager.ENTRY_TYPE_REFERENCE;
             }
             from = job.getRequest().getParameter("from");
-            if (from == null) from = "";
+            if (from == null)
+                from = "";
             to = job.getRequest().getParameter("to");
-            if (to == null) to = "";
+            if (to == null)
+                to = "";
             if ((from.length() == 0) && (to.length() == 0)) {
                 return; // request failed;
             }
-            LOGGER.debug("Input parameter : type="+type+"   from="+from+"   to="+to+"   host="+host);
+            LOGGER.debug("Input parameter : type=" + type + "   from=" + from + "   to=" + to + "   host=" + host);
 
-            if(host.equals(MCRHit.LOCAL)) {
+            if (host.equals(MCRHit.LOCAL)) {
                 MCRResults results = new MCRResults();
                 List links = new ArrayList();
                 // Look for links
                 if ((from != null) && (from.length() != 0)) {
                     links = LM.getDestinationOf(from, type);
-                } else  {
+                } else {
                     links = LM.getSourceOf(to, type);
                 }
-                for (int i=0;i<links.size();i++) {
-                    MCRHit hit = new MCRHit((String)links.get(i));
+                for (int i = 0; i < links.size(); i++) {
+                    MCRHit hit = new MCRHit((String) links.get(i));
                     results.addHit(hit);
                 }
                 // build XML
                 Element xml = results.buildXML();
                 // Send output to LayoutServlet
-                sendToLayout(job.getRequest(), job.getResponse(), new Document(xml));                    
+                sendToLayout(job.getRequest(), job.getResponse(), new Document(xml));
             } else {
                 LOGGER.warn("Remote host access is not supported, use the WebService access!");
             }
         } catch (MCRException e) {
-            generateErrorPage(job.getRequest(), job.getResponse(), HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error while retrieving link for ID: "
-                    + from + " - "+ to + " - "+ type, e, false);
+            generateErrorPage(job.getRequest(), job.getResponse(), HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error while retrieving link for ID: " + from + " - " + to + " - " + type, e, false);
             return;
         }
     }
-    
+
     /**
      * Forwards the document to the output
      * 
