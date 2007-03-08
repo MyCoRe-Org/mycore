@@ -26,7 +26,7 @@ package org.mycore.services.fieldquery;
 /*
  * The interface for the remote access.
  * 
- * @author Jens Kupferschmidt @author Frank Lützenkirchen
+ * @author Jens Kupferschmidt @author Frank Lï¿½tzenkirchen
  */
 
 public interface MCRQueryClientInterface {
@@ -35,7 +35,7 @@ public interface MCRQueryClientInterface {
      * Initalize the class for using.
      */
     abstract void init(org.jdom.Element xmlhost);
-    
+
     /*
      * The method return the alias of the host definition. @return the host
      * alias as String
@@ -62,7 +62,7 @@ public interface MCRQueryClientInterface {
      * @return the object document
      */
     abstract org.w3c.dom.Document doRetrieveObject(String ID);
-    
+
     /**
      * Retrieves an classification part from remote host using the WebService.
      * 
@@ -75,8 +75,24 @@ public interface MCRQueryClientInterface {
      * @param categID
      *            the category ID of the classification to retrieve
      * @param format
-     *             of retrieved classification, valid values are: editor['['formatAlias']']|metadata
-@return the classification document
+     *            of retrieved classification, valid values are:
+     *            editor['['formatAlias']']|metadata
+     * @return the classification document
      */
     abstract org.w3c.dom.Document doRetrieveClassification(String level, String type, String classID, String categID, String format);
+
+    /**
+     * Retrieves an link from remote host using the WebService.
+     * 
+     * @param hostAlias
+     *            the alias of the remote host as defined in hosts.xml
+     * @param from
+     *            the source of the link
+     * @param to
+     *            the target of the link
+     * @param type
+     *            the type of the link
+     * @return the mcr:result document
+     */
+    abstract org.w3c.dom.Document doRetrieveLinks(String from, String to, String type);
 }

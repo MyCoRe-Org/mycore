@@ -30,7 +30,7 @@ import org.apache.log4j.Logger;
  * all data for one host defined in the file hosts.xml. Default values are the
  * WebService data.
  * 
- * @author Jens Kupferschmidt @author Frank Lützenkirchen
+ * @author Jens Kupferschmidt @author Frank Lï¿½tzenkirchen
  */
 
 public class MCRQueryClientBase implements MCRQueryClientInterface {
@@ -117,5 +117,22 @@ public class MCRQueryClientBase implements MCRQueryClientInterface {
      */
     public org.w3c.dom.Document doRetrieveClassification(String level, String type, String classID, String categID, String format) {
         return null;
+    }
+    
+    /**
+     * Retrieves an link from remote host using the WebService.
+     * 
+     * @param hostAlias
+     *            the alias of the remote host as defined in hosts.xml
+     * @param from
+     *            the source of the link
+     * @param to
+     *            the target of the link
+     * @param type
+     *            the type of the link
+     * @return the mcr:result document
+     */
+    public org.w3c.dom.Document doRetrieveLinks(String from, String to, String type) {
+        return null;        
     }
 }
