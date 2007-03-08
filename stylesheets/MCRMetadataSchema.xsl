@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!-- ============================================== -->
-<!-- $Revision: 1.10 $ $Date: 2006-12-07 10:54:00 $ -->
+<!-- $Revision: 1.11 $ $Date: 2007-03-08 13:44:46 $ -->
 <!-- ============================================== -->
 
 <xsl:stylesheet
@@ -97,8 +97,6 @@
      <xsl:apply-templates select="*"/>
      <xsd:attribute name="heritable" type="xsd:boolean" use="optional" />
      <xsd:attribute name="notinherit" type="xsd:boolean" use="optional" />
-     <xsd:attribute name="parasearch" type="xsd:boolean" use="optional" />
-     <xsd:attribute name="textsearch" type="xsd:boolean" use="optional" />
     </xsd:complexType>
    </xsd:element>
   </xsl:for-each>
@@ -119,8 +117,6 @@
     <xsl:apply-templates select="*"/>
     <xsd:attribute name="heritable" type="xsd:boolean" use="optional" />
     <xsd:attribute name="notinherit" type="xsd:boolean" use="optional" />
-    <xsd:attribute name="parasearch" type="xsd:boolean" use="optional" />
-    <xsd:attribute name="textsearch" type="xsd:boolean" use="optional" />
    </xsd:complexType>
   </xsd:element>
  </xsl:for-each>
@@ -145,8 +141,6 @@
     <xsl:apply-templates select="*"/>
     <xsd:attribute name="heritable" type="xsd:boolean" use="optional" />
     <xsd:attribute name="notinherit" type="xsd:boolean" use="optional" />
-    <xsd:attribute name="parasearch" type="xsd:boolean" use="optional" />
-    <xsd:attribute name="textsearch" type="xsd:boolean" use="optional" />
    </xsd:complexType>
   </xsd:element>
  </xsl:for-each>
@@ -171,8 +165,6 @@
     <xsl:apply-templates select="*"/>
     <xsd:attribute name="heritable" type="xsd:boolean" use="optional" />
     <xsd:attribute name="notinherit" type="xsd:boolean" use="optional" />
-    <xsd:attribute name="parasearch" type="xsd:boolean" use="optional" />
-    <xsd:attribute name="textsearch" type="xsd:boolean" use="optional" />
    </xsd:complexType>
   </xsd:element>
  </xsl:for-each>
