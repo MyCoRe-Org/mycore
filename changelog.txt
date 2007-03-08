@@ -15,6 +15,8 @@ Version 2.0 (Head)
 - LayoutServlet removed, replaced by MCRLayoutService
 - Use the IBM ICU library to handle calendars in MCRMetaHistoryDate. Now the searchable integer
   of this metadata element is the Julian Day number. 
+- move the classes of org.mycore.user2 to org.mycore.user
+- add a WebService and URIResolver access to the MCRLinkTable
 
 Version 1.3
 ===========
