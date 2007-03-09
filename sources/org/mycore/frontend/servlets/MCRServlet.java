@@ -24,9 +24,9 @@
 package org.mycore.frontend.servlets;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Enumeration;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
 import javax.servlet.ServletContext;
@@ -40,6 +40,7 @@ import org.apache.log4j.Logger;
 import org.jdom.DocType;
 import org.jdom.Document;
 import org.jdom.Element;
+
 import org.mycore.access.MCRAccessInterface;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRConfiguration;
@@ -65,9 +66,9 @@ public class MCRServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
     // Some configuration details
-	protected static MCRConfiguration CONFIG = MCRConfiguration.instance();
+	protected static final MCRConfiguration CONFIG = MCRConfiguration.instance();
 	
-	protected static MCRAccessInterface AI = MCRAccessManager.getAccessImpl();
+	protected static final MCRAccessInterface AI = MCRAccessManager.getAccessImpl();
 
 	private static Logger LOGGER = Logger.getLogger(MCRServlet.class);;
 
@@ -91,7 +92,9 @@ public class MCRServlet extends HttpServlet {
     public void init() throws ServletException {
         super.init();
         String dir = getServletContext().getRealPath("WEB-INF/stylesheets");
-        LAYOUT_SERVICE = new MCRLayoutService(dir);
+        if (LAYOUT_SERVICE==null){
+            LAYOUT_SERVICE = new MCRLayoutService(dir);
+        }
     }
 
     /** returns the base URL of the mycore system */
@@ -148,34 +151,21 @@ public class MCRServlet extends HttpServlet {
 		HttpSession theSession = req.getSession(true);
 		MCRSession session = null;
 
-		String sessionID = req.getParameter("MCRSessionID");
-		MCRSession fromRequest = null;
-
-		if (sessionID != null) {
-			fromRequest = MCRSession.getSession(sessionID);
-		}
-
 		MCRSession fromHttpSession = (MCRSession) theSession.getAttribute("mycore.session");
 
-		// Choose:
-		if (fromRequest != null) {
-			session = fromRequest;
-		}
-		// Take session from http request parameter MCRSessionID
-		else if (fromHttpSession != null) {
+		if (fromHttpSession != null) {
+            // Take session from HttpSession with servlets
 			session = fromHttpSession;
 		}
-		// Take session from HttpSession with servlets
 		else {
+            // Create a new session
 			session = MCRSessionMgr.getCurrentSession();
 		}
 
-		// Create a new session
 		// Store current session in HttpSession
 		theSession.setAttribute("mycore.session", session);
         //store the HttpSession ID in MCRSession
         session.put("http.session", theSession.getId());
-       
 
 		// Bind current session to this thread:
 		MCRSessionMgr.setCurrentSession(session);
@@ -361,7 +351,7 @@ public class MCRServlet extends HttpServlet {
             if (request.getAttribute(requestAttr)!=null){
                 LOGGER.warn("Could not send error page. Generating error page failed. The original message:\n"+request.getAttribute(requestAttr));
             } else {
-                LOGGER.warn("Could not send error page. Response allready commited. The following message was given:\n"+msg,ex);
+                LOGGER.warn("Could not send error page. Response allready commited. The following message was given:\n"+msg);
             }
         }
 	}
@@ -370,17 +360,14 @@ public class MCRServlet extends HttpServlet {
 			throws IOException {
 		StringBuffer msgBuf = new StringBuffer(msg);
 		msgBuf.append("\nThere are links active preventing the commit of work, see error message for details. The following links where affected:");
-		Map links = activeLinks.getActiveLinks();
-		Iterator destIt = links.keySet().iterator();
-		String curDest;
-		while (destIt.hasNext()) {
-			curDest = destIt.next().toString();
-			List sources = (List) links.get(curDest);
-			Iterator sourceIt = sources.iterator();
-			while (sourceIt.hasNext()) {
-				msgBuf.append('\n').append(sourceIt.next().toString()).append("==>").append(curDest);
-			}
-		}
+		Map<String, Collection<String>> links = activeLinks.getActiveLinks();
+		Iterator<Map.Entry<String, Collection<String>>> entryIt = links.entrySet().iterator();
+        while (entryIt.hasNext()){
+            Map.Entry<String, Collection<String>> entry=entryIt.next();
+            for (String source:entry.getValue()){
+                msgBuf.append('\n').append(source).append("==>").append(entry.getKey());
+            }
+        }
 		generateErrorPage(request, response, HttpServletResponse.SC_INTERNAL_SERVER_ERROR, msgBuf.toString(), activeLinks, false);
 	}
 
