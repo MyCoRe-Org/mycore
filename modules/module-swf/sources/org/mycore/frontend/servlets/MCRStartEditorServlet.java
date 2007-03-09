@@ -639,7 +639,8 @@ public class MCRStartEditorServlet extends MCRServlet {
         }
 
         StringBuffer sb = new StringBuffer();
-        sb.append(getBaseURL()).append("receive/").append(mytfmcrid).append("?XSL.Style=editor");
+        //TODO: should transform mcrobject and use "session:" to save roundtrip
+        sb.append("request:receive/").append(mytfmcrid).append("?XSL.Style=editor");
 
         String base = getBaseURL() + myfile;
         Properties params = new Properties();
