@@ -86,21 +86,11 @@ public class MCREditorSourceReader {
         }
         //:NOTE: adjust MAX_URI_PROTOCOL_LENGTH according to the longest protocol name MCRURIResolver understands
         if (url.substring(0, (url.length() < MAX_URI_PROTOCOL_LENGTH) ? url.length() : MAX_URI_PROTOCOL_LENGTH).indexOf(":") == -1) {
-            url = MCRServlet.getBaseURL() + url;
-        }
-
-        if (url.startsWith("http:") || url.startsWith("https:")) {
-            StringBuffer sb = new StringBuffer(url);
-            sb.append((url.indexOf("?") == -1) ? "?" : "&");
-            sb.append("MCRSessionID=");
-            sb.append(MCRSessionMgr.getCurrentSession().getID());
-            url = sb.toString();
+            url = "request:" + url;
         }
 
         MCREditorServlet.logger.info("Editor reading XML input from " + url);
-
         Element input = MCRURIResolver.instance().resolve(url);
-
         return new MCREditorSubmission(input,editor);
     }
 }

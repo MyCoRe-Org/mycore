@@ -556,13 +556,6 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
             final Object httpSessionID = currentSession.get("http.session");
             final String finalURL;
             if (httpSessionID == null) {
-                if (path.indexOf("?") != -1) {
-                    url.append("&");
-                } else {
-                    url.append("?");
-                }
-                url.append("MCRSessionID=");
-                url.append(currentSession.getID());
                 finalURL = url.toString();
             } else {
                 finalURL = toEncoded(url.toString(), httpSessionID.toString());
