@@ -17,6 +17,12 @@ Version 2.0 (Head)
   of this metadata element is the Julian Day number. 
 - move the classes of org.mycore.user2 to org.mycore.user
 - add a WebService and URIResolver access to the MCRLinkTable
+- removed support for MCRSessionID request parameter:
+   use HttpSession to access MCRSession
+- MCRMailer: retry sending mails if first attempt fails
+- new Classification editor with less database commits
+- Upgrade to FCK-Editor 2.4
+- compiles on Java 6
 
 Version 1.3
 ===========
