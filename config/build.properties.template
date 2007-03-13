@@ -31,8 +31,8 @@
 # Use package: org.mycore.backend.sql
 # Hint: the JDBC driver is in the DB2 package
 # MCR.JDBCStore.Type=db2
-# MCR.JDBCStore.BaseDir=/home/db2inst1/sqllib
-# MCR.JDBCStore.Jars=java/sqlj.zip java/db2java.zip java/db2jcc.jar
+# MCR.JDBCStore.BaseDir=/home/db2inst1/sqllib/java
+# MCR.JDBCStore.Jars=db2jcc.jar db2jcc_license_cu.jar db2jcc_javax.jar
 # MCR.JDBCStore.ClassesDirs=function
 # MCR.JDBCStore.LibPath=java lib
 
