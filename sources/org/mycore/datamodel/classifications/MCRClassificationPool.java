@@ -104,9 +104,11 @@ public class MCRClassificationPool {
         Classification classif=(Classification)classifications.get(clid);
         
         if(classif!=null) {  
+            LOGGER.info("Classification with ID: "+classif.getId()+" comes from the session.");
             return classif;
         } else {
             Classification cl=MCRClassificationQuery.getClassification(clid,-1,true);
+            LOGGER.info("Classification with ID: "+cl.getId()+" comes from the database.");
             return cl;
         }
     }

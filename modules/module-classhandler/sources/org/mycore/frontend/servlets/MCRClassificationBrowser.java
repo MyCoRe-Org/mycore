@@ -92,7 +92,7 @@ public class MCRClassificationBrowser extends MCRServlet {
 
         Document jdomFile = getEmbeddingPage(mcrSession.BData.getPageName());
         Document jdom = null;
-        if (mode.equalsIgnoreCase("edit") && (actclid.length() == 0 || uri.length() == 0)) {
+        if (mode.equalsIgnoreCase("edit") && (actclid.length() == 0 && uri.length() == 0)) {
             // alle Klasifikationen auflisten (auch die nicht eingebundenen)
             jdom = mcrSession.BData.createXmlTreeforAllClassifications();
 

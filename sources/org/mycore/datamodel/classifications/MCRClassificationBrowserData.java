@@ -116,7 +116,7 @@ public class MCRClassificationBrowserData {
         final String[] uriParts = uri.split("/"); // mySplit();
         LOGGER.info(" Start");
         String classifID = null;
-        final String browserClass = uriParts.length <= 1 ? "default" : uriParts[1];
+        final String browserClass = (uriParts.length <= 1 ? "default" : uriParts[1]);
         LOGGER.debug(" PathParts - classification " + browserClass);
         LOGGER.debug(" Number of PathParts =" + uriParts.length);
         try {
@@ -181,7 +181,7 @@ public class MCRClassificationBrowserData {
         if (comments == null) {
             comments = "false";
         }
-
+        LOGGER.info("uriParts length: "+uriParts.length);
         clearPath(uriParts);
         setClassification(classifID);
         setActualPath(actEditorCategid);
@@ -274,7 +274,12 @@ public class MCRClassificationBrowserData {
 
     private void clearPath(final String[] uriParts) throws Exception {
         final String[] cati = new String[uriParts.length];
-        String path = "/" + uriParts[1];
+        String path = "";
+        if (uriParts.length == 1) {
+            path = "/" + uriParts[0];
+        } else {
+            path = "/" + uriParts[1];
+        }
         int len = 0;
         // pfad bereinigen
         for (int k = 2; k < uriParts.length; k++) {
@@ -834,6 +839,17 @@ public class MCRClassificationBrowserData {
                 }
             }
             return new Label();
+    }
+        
+    public static void clearCurrentUserClassTable() {
+        final String curSessionID = MCRSessionMgr.getCurrentSession().getID();
+        final Iterator<Map.Entry<String, String>> it = ClassUserTable.entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry<String, String> entry = it.next();
+            if (entry.getKey().equals(curSessionID)) {
+                it.remove();
+            }
+        }
     }
 
     private static class MCRCategoryElementFactory {

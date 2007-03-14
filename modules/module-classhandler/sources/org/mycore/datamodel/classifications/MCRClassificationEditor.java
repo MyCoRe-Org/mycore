@@ -30,7 +30,9 @@ import static org.mycore.common.MCRConstants.XSI_NAMESPACE;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.log4j.Logger;
@@ -422,13 +424,13 @@ public class MCRClassificationEditor {
     }
 
     public boolean saveAll() {
-        MCRClassificationBrowserData.ClassUserTable.clear();
-        return MCRClassificationBrowserData.getClassificationPool().saveAll();
-
+        final boolean saveAll = MCRClassificationBrowserData.getClassificationPool().saveAll();
+        MCRClassificationBrowserData.clearCurrentUserClassTable();
+        return saveAll;
     }
 
     public boolean purgeAll() {
-        MCRClassificationBrowserData.ClassUserTable.clear();
+        MCRClassificationBrowserData.clearCurrentUserClassTable();
         return MCRClassificationBrowserData.getClassificationPool().purgeAll();
     }
 
