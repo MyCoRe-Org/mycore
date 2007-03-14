@@ -23,14 +23,18 @@
 
 package org.mycore.datamodel.classifications.query;
 
+import java.io.Serializable;
+
 /**
  * 
  * @author Thomas Scheffler (yagee)
  * 
  * @version $Revision$ $Date$
  */
-public class Classification extends ClassificationObject {
-    
+public class Classification extends ClassificationObject implements Serializable {
+
+    private static final long serialVersionUID = 147519495882309725L;
+
     private boolean counterEnabled;
 
     public boolean isCounterEnabled() {
@@ -39,6 +43,10 @@ public class Classification extends ClassificationObject {
 
     public void setCounterEnabled(boolean counterEnabled) {
         this.counterEnabled = counterEnabled;
+    }
+
+    public Classification clone() {
+        return (Classification) super.clone();
     }
 
 }

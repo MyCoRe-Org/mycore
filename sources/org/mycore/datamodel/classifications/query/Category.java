@@ -23,18 +23,22 @@
 
 package org.mycore.datamodel.classifications.query;
 
+import java.io.Serializable;
+
 /**
  * 
  * @author Thomas Scheffler (yagee)
  * 
  * @version $Revision$ $Date$
  */
-public class Category extends ClassificationObject {
+public class Category extends ClassificationObject implements Serializable {
+
+    private static final long serialVersionUID = -6270311269042057342L;
 
     private int numberOfObjects;
 
     private String classID;
-    
+
     private Link link;
 
     public Link getLink() {
@@ -59,6 +63,14 @@ public class Category extends ClassificationObject {
 
     public void setNumberOfObjects(int numberOfObjects) {
         this.numberOfObjects = numberOfObjects;
+    }
+
+    public Category clone() {
+        Category clone = (Category) super.clone();
+        if (link != null) {
+            clone.link = link.clone();
+        }
+        return clone;
     }
 
 }

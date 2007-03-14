@@ -23,15 +23,19 @@
  **/
 package org.mycore.datamodel.classifications.query;
 
+import java.io.Serializable;
+
 /**
  * 
  * @author Thomas Scheffler (yagee)
  * 
  * @version $Revision$ $Date$
  */
-public class Link {
-    
-    String type,href,title, label;
+public class Link implements Cloneable, Serializable {
+
+    private static final long serialVersionUID = 4724359667520764818L;
+
+    String type, href, title, label;
 
     public String getHref() {
         return href;
@@ -63,6 +67,17 @@ public class Link {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    @Override
+    public Link clone() {
+        Link clone = null;
+        try {
+            clone = (Link) super.clone();
+        } catch (CloneNotSupportedException ce) {
+            // Can not happen
+        }
+        return clone;
     }
 
 }

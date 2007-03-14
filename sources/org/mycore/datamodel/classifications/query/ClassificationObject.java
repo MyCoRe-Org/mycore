@@ -32,11 +32,12 @@ import java.util.List;
  * 
  * @version $Revision$ $Date$
  */
-public class ClassificationObject {
+public abstract class ClassificationObject implements Cloneable {
 
     String id;
 
     List<Label> labels;
+
     List<Category> catgegories;
 
     public List<Category> getCategories() {
@@ -79,6 +80,31 @@ public class ClassificationObject {
 
     public int hashCode() {
         return getId().hashCode();
+    }
+
+    @Override
+    public ClassificationObject clone() {
+        ClassificationObject clone = null;
+        try {
+            clone = (ClassificationObject) super.clone();
+        } catch (CloneNotSupportedException ce) {
+            // Can not happen
+        }
+
+        // The clone has a reference to this object's category and label list,
+        // so
+        // owerwrite with null so it get initialized on next access;
+        clone.catgegories = null;
+        List<Category> clonedCatList = clone.getCategories();
+        clone.labels = null;
+        List<Label> clonedLabelList = clone.getLabels();
+        for (Category category : catgegories) {
+            clonedCatList.add(category.clone());
+        }
+        for (Label label : labels) {
+            clonedLabelList.add(label.clone());
+        }
+        return clone;
     }
 
 }

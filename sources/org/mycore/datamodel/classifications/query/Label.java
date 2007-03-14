@@ -23,13 +23,17 @@
 
 package org.mycore.datamodel.classifications.query;
 
+import java.io.Serializable;
+
 /**
  * 
  * @author Thomas Scheffler (yagee)
  * 
  * @version $Revision$ $Date$
  */
-public class Label {
+public class Label implements Cloneable, Serializable {
+
+    private static final long serialVersionUID = 946493314913567890L;
 
     String lang, text, description;
 
@@ -55,6 +59,17 @@ public class Label {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    @Override
+    public Label clone() {
+        Label clone = null;
+        try {
+            clone = (Label) super.clone();
+        } catch (CloneNotSupportedException ce) {
+            // Can not happen
+        }
+        return clone;
     }
 
 }
