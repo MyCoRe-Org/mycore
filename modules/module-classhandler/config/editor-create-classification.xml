@@ -20,14 +20,11 @@
   </panel>
 
   <panel id="NewClass">
-    <hidden var="@ID" />
     <cell col="1" row="1" colspan="2" anchor="NORTHWEST" ref="AClid" />	  	  	  
     <cell col="1" row="2" anchor="NORTHWEST">	  
 	  <text i18n="classedit.label.id.p" class="editorlabel" />
 	</cell>	
-    <cell col="2" row="2" anchor="NORTHWEST">
-	  <text i18n="classedit.label.sysid" class="editorlabel" />
-    </cell> 	  	  
+    <cell col="2" row="2" anchor="NORTHWEST" ref="TFzeile1024" var="@ID" />
     <cell col="1" row="3" anchor="NORTHWEST">	  
 	  <text i18n="classedit.label.label.p" class="editorlabel"/>
 	</cell>		  

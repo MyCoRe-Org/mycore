@@ -240,16 +240,23 @@ public class MCRClassificationEditor {
             label.setAttribute("description", "empty");
             category.addContent(label);
             categories.addContent(category);
-
+            
+            String submittedID = indoc.getRootElement().getAttributeValue("ID");
             MCRObjectID cli = new MCRObjectID();
-            String base = CONFIG.getString("MCR.default_project_id", "DocPortal") + "_class";
+            if (submittedID != null) {
+                cli.setID(submittedID);
+            }
+            if (submittedID == null || !cli.isValid()) {
 
-            LOGGER.debug("Create a CLID with base " + base);
-            cli.setNextFreeId(base);
+                String base = CONFIG.getString("MCR.default_project_id", "DocPortal") + "_class";
 
-            if (!cli.isValid()) {
-                LOGGER.error("Create an unique CLID failed. " + cli.toString());
-                return false;
+                LOGGER.debug("Create a CLID with base " + base);
+                cli.setNextFreeId(base);
+
+                if (!cli.isValid()) {
+                    LOGGER.error("Create an unique CLID failed. " + cli.toString());
+                    return false;
+                }
             }
 
             mycoreclass.addNamespaceDeclaration(XSI_NAMESPACE);

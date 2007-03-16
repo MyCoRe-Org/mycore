@@ -31,6 +31,7 @@ import java.util.Properties;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.log4j.Logger;
+import org.jdom.Element;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.datamodel.classifications.MCRClassificationBrowserData;
 import org.mycore.datamodel.classifications.MCRClassificationEditor;
@@ -38,6 +39,7 @@ import org.mycore.datamodel.classifications.query.Category;
 import org.mycore.datamodel.classifications.query.Classification;
 import org.mycore.datamodel.classifications.query.ClassificationTransformer;
 import org.mycore.datamodel.classifications.query.MCRClassificationQuery;
+import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.editor.MCREditorSubmission;
 import org.mycore.frontend.editor.MCRRequestParameters;
 
@@ -290,7 +292,16 @@ public class MCRStartClassEditorServlet extends MCRServlet {
 
             }
             if ("create-classification".equals(todo)) {
-                params.put("XSL.editor.source.new", "true");
+                MCRObjectID cli = new MCRObjectID();
+                String idBase = CONFIG.getString("MCR.default_project_id", "DocPortal") + "_class";
+                cli.setNextFreeId(idBase);
+
+                if (!cli.isValid()) {
+                    LOGGER.error("Create an unique CLID failed. " + cli.toString());
+                }
+                Element classRoot=new Element("mycoreclass").setAttribute("ID", cli.getId());
+                params.put("XSL.editor.source.url", "session:"+sessionObjectID);
+                MCRSessionMgr.getCurrentSession().put(sessionObjectID, classRoot);
             }
             if ("modify-category".equals(todo)) {
                 if (isEdited){
