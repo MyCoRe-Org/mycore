@@ -64,34 +64,34 @@ public class MCRUserCommands extends MCRAbstractCommands {
 
         MCRCommand com = null;
 
-        com = new MCRCommand("init superuser", "org.mycore.frontend.cli.MCRUserCommands.initSuperuser", "Initialized the user system. This command run only if the user database does not exist.");
+        com = new MCRCommand("init superuser", "org.mycore.frontend.cli.MCRUserCommands.initSuperuser", "Initialized the user system. This command runs only if the user database does not exist.");
         command.add(com);
 
-        com = new MCRCommand("check user data consistency", "org.mycore.frontend.cli.MCRUserCommands.checkConsistency", "This command check the user system of his consistency.");
+        com = new MCRCommand("check user data consistency", "org.mycore.frontend.cli.MCRUserCommands.checkConsistency", "This command checks the user system for its consistency.");
         command.add(com);
 
-        com = new MCRCommand("encrypt passwords in user xml file {0} to file {1}", "org.mycore.frontend.cli.MCRUserCommands.encryptPasswordsInXMLFile String String", "This is a miration tool to change old plain text password enties to encrpted entries.");
+        com = new MCRCommand("encrypt passwords in user xml file {0} to file {1}", "org.mycore.frontend.cli.MCRUserCommands.encryptPasswordsInXMLFile String String", "This is a migration tool to change old plain text password entries to encrpted entries.");
         command.add(com);
 
-        com = new MCRCommand("set password for user {0} to {1}", "org.mycore.frontend.cli.MCRUserCommands.setPassword String String", "This command set a new password for the user. You must be this user or you must have administrator access.");
+        com = new MCRCommand("set password for user {0} to {1}", "org.mycore.frontend.cli.MCRUserCommands.setPassword String String", "This command sets a new password for the user. You must be this user or you must have administrator access.");
         command.add(com);
 
-        com = new MCRCommand("set user management to ro mode", "org.mycore.frontend.cli.MCRUserCommands.setLock", "The command change the management mode of the user system to read-only.");
+        com = new MCRCommand("set user management to ro mode", "org.mycore.frontend.cli.MCRUserCommands.setLock", "The command changes the management mode of the user system to read-only.");
         command.add(com);
 
-        com = new MCRCommand("set user management to rw mode", "org.mycore.frontend.cli.MCRUserCommands.setunLock", "The command change the management mode of the user system to read-write.");
+        com = new MCRCommand("set user management to rw mode", "org.mycore.frontend.cli.MCRUserCommands.setunLock", "The command changes the management mode of the user system to read-write.");
         command.add(com);
 
-        com = new MCRCommand("enable user {0}", "org.mycore.frontend.cli.MCRUserCommands.enableUser String", "The command enabled the user for the access.");
+        com = new MCRCommand("enable user {0}", "org.mycore.frontend.cli.MCRUserCommands.enableUser String", "The command enables the user for the access.");
         command.add(com);
 
-        com = new MCRCommand("disable user {0}", "org.mycore.frontend.cli.MCRUserCommands.disableUser String", "The command disabled the user from the access.");
+        com = new MCRCommand("disable user {0}", "org.mycore.frontend.cli.MCRUserCommands.disableUser String", "The command disables the user from the access.");
         command.add(com);
 
-        com = new MCRCommand("create group data from file {0}", "org.mycore.frontend.cli.MCRUserCommands.createGroupFromFile String", "The command create one or more new groups in the user system with data from the file {0}. This create make a constency check.");
+        com = new MCRCommand("create group data from file {0}", "org.mycore.frontend.cli.MCRUserCommands.createGroupFromFile String", "The command creates one or more new groups in the user system with data from the file {0}. This create makes a constency check.");
         command.add(com);
 
-        com = new MCRCommand("import group data from file {0}", "org.mycore.frontend.cli.MCRUserCommands.importGroupFromFile String", "The command import one or more groups to the user system with data from the file {0}. This create make a NOT constency check. The command is designd only for repair processes.");
+        com = new MCRCommand("import group data from file {0}", "org.mycore.frontend.cli.MCRUserCommands.importGroupFromFile String", "The command imports one or more groups to the user system with data from the file {0}. This create does NOT make a constency check. The command is designd only for repair processes.");
         command.add(com);
 
         com = new MCRCommand("delete group {0}", "org.mycore.frontend.cli.MCRUserCommands.deleteGroup String", "");
