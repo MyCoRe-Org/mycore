@@ -23,8 +23,6 @@
 
 package org.mycore.backend.jdom;
 
-import static org.mycore.common.MCRConstants.XSL_NAMESPACE;
-
 import java.io.InputStream;
 import java.util.Enumeration;
 import java.util.Hashtable;
@@ -59,8 +57,6 @@ public class MCRJDOMMemoryStore {
     /** A hashtable of the JDOM trees */
     private Hashtable trees = new Hashtable();
 
-    private org.jdom.Document xslorig = null;
-
     /** Timestamp of the last SQL read and the default reload time in seconds */
     private long tslast = 0;
 
@@ -85,41 +81,10 @@ public class MCRJDOMMemoryStore {
      * Creates a new JDOM memory store
      */
     private MCRJDOMMemoryStore() {
-        // Read stylesheet
-        InputStream searchxsl = MCRJDOMMemoryStore.class.getResourceAsStream("/MCRJDOMSearch.xsl");
-
-        if (searchxsl == null) {
-            throw new MCRConfigurationException("Can't find stylesheet file MCRJDOMSearch.xsl");
-        }
-
-        try {
-            xslorig = (new org.jdom.input.SAXBuilder()).build(searchxsl);
-        } catch (Exception e) {
-            throw new MCRException("Error while parsing file MCRJDOMSearch.xsl.");
-        }
-
         // set the start time and the diff from the config
         MCRConfiguration config = MCRConfiguration.instance();
         tslast = System.currentTimeMillis();
         tsdiff = (config.getLong("MCR.persistence_jdom_reload", tsdiffdefault)) * 1000;
-    }
-
-    /**
-     * Returns a stylesheet that will execute a query on the JDOM store.
-     * 
-     * @param query
-     *            the XSLT String that represents the search condition
-     * @return a org.jdom.Document of the stylesheet
-     */
-    org.jdom.Document getStylesheet(String query) {
-        org.jdom.Document xslfile = (org.jdom.Document) (xslorig.clone());
-        xslfile.getRootElement().getChild("template", XSL_NAMESPACE).getChild("result").getChild("choose", XSL_NAMESPACE).getChild("when", XSL_NAMESPACE).setAttribute("test", query);
-
-        // debug
-        // org.jdom.output.XMLOutputter outputter = new
-        // org.jdom.output.XMLOutputter(org.jdom.output.Format.getPrettyFormat());
-        // outputter.output(xslfile, System.out);
-        return xslfile;
     }
 
     /**
