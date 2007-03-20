@@ -23,13 +23,13 @@
 
 package org.mycore.datamodel.classifications;
 
-import org.mycore.common.MCRArgumentChecker;
+import org.mycore.common.MCRUsageException;
 
 /**
  * This class represents a category item of the MyCoRe classification model and
  * implements the abstract MCRClassificationObject class.
  * 
- * @author Frank Lützenkirchen
+ * @author Frank Luetzenkirchen
  * @author Jens Kupferschmidt
  * @version $Revision$ $Date$
  */
@@ -49,9 +49,13 @@ public class MCRCategoryItem extends MCRClassificationObject {
      */
     public MCRCategoryItem(String ID, MCRClassificationObject parent) {
         super(ID);
-        MCRArgumentChecker.ensureNotNull(parent, "parent");
+        if (parent == null) {
+            throw new MCRUsageException("Parameter parent is null");
+        }
         this.classifID = parent.getClassificationID();
-        MCRArgumentChecker.ensureIsFalse(ID.equals(classifID), "A category ID can not be the same as its classification ID");
+        if (ID.equals(classifID)) {
+            throw new MCRUsageException("A category ID can not be the same as its classification ID");
+        }
 
         if (parent instanceof MCRCategoryItem) {
             this.parentID = parent.ID;
@@ -145,9 +149,12 @@ public class MCRCategoryItem extends MCRClassificationObject {
      * @return a MCRCategoryItem
      */
     public static MCRCategoryItem getCategoryItem(String classifID, String categID) {
-        MCRArgumentChecker.ensureNotEmpty(classifID, "classifID");
-        MCRArgumentChecker.ensureNotEmpty(categID, "categID");
-
+        if ((classifID == null) || (classifID.trim().length() == 0)) {
+            throw new MCRUsageException("Parameter classifID is null or empty");
+        }
+        if ((categID == null) || (categID.trim().length() == 0)) {
+            throw new MCRUsageException("Parameter categID is null or empty");
+        }
         return manager().retrieveCategoryItem(classifID, categID);
     }
 
@@ -162,9 +169,12 @@ public class MCRCategoryItem extends MCRClassificationObject {
      * @return a MCRCategoryItem
      */
     public static MCRCategoryItem getCategoryItemForLabelText(String classifID, String labeltext) {
-        MCRArgumentChecker.ensureNotEmpty(classifID, "classifID");
-        MCRArgumentChecker.ensureNotEmpty(labeltext, "labeltext");
-
+        if ((classifID == null) || (classifID.trim().length() == 0)) {
+            throw new MCRUsageException("Parameter classifID is null or empty");
+        }
+        if ((labeltext == null) || (labeltext.trim().length() == 0)) {
+            throw new MCRUsageException("Parameter labeltext is null or empty");
+        }
         return manager().retrieveCategoryItemForLabelText(classifID, labeltext);
     }
 

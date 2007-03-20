@@ -27,6 +27,7 @@ import java.util.List;
 
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandlerBase;
+import org.mycore.datamodel.classifications.MCRClassification;
 
 /**
  * This class manages all operations of the XMLTables for operations of an
@@ -37,6 +38,77 @@ import org.mycore.common.events.MCREventHandlerBase;
 public class MCRXMLTableEventHandler extends MCREventHandlerBase {
 
     static MCRXMLTableManager mcr_xmltable = MCRXMLTableManager.instance();
+
+    /**
+     * This method add the data to SQL table of XML data via MCRXMLTableManager.
+     * 
+     * @param evt
+     *            the event that occured
+     * @param obj
+     *            the MCRClassification that caused the event
+     */
+    protected final void handleClassificationCreated(MCREvent evt, MCRClassification obj) {
+        org.jdom.Document doc = obj.createXML();
+        mcr_xmltable.create(obj.getId(), doc);
+    }
+
+    /**
+     * This method update the data to SQL table of XML data via
+     * MCRXMLTableManager.
+     * 
+     * @param evt
+     *            the event that occured
+     * @param obj
+     *            the MCRClassification that caused the event
+     */
+    protected final void handleClassificationUpdated(MCREvent evt, MCRClassification obj) {
+        mcr_xmltable.delete(obj.getId());
+        handleClassificationCreated(evt, obj);
+    }
+
+    /**
+     * This method delete the XML data from SQL table data via
+     * MCRXMLTableManager.
+     * 
+     * @param evt
+     *            the event that occured
+     * @param obj
+     *            the MCRClassification that caused the event
+     */
+    protected final void handleClassificationDeleted(MCREvent evt, MCRClassification obj) {
+        mcr_xmltable.delete(obj.getId());
+    }
+
+    /**
+     * This method receive the XML data from SQL table data via
+     * MCRXMLTableManager and put it in the MCREvent instance.
+     * 
+     * @param evt
+     *            the event that occured
+     * @param objid
+     *            the MCRObjectID that caused the event
+     */
+    protected final void handleClassificationReceived(MCREvent evt, MCRObjectID objid) {
+        byte[] xml = mcr_xmltable.retrieve(objid);
+        if (xml == null)
+            return;
+        evt.put("xml", xml);
+    }
+
+    /**
+     * This method check exist of the XML data from SQL table data via
+     * MCRXMLTableManager and put the boolean result in the MCREvent instance as
+     * entry 'exist'.
+     * 
+     * @param evt
+     *            the event that occured
+     * @param objid
+     *            the MCRObjectID that caused the event
+     */
+    protected final void handleClassificationExist(MCREvent evt, MCRObjectID objid) {
+        boolean res = mcr_xmltable.exist(objid);
+        evt.put("exist", Boolean.toString(res));
+    }
 
     /**
      * This method add the data to SQL table of XML data via MCRXMLTableManager.

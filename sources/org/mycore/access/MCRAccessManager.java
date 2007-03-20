@@ -75,6 +75,25 @@ public class MCRAccessManager {
     }
 
     /**
+     * adds an access rule for an ID to an access system.
+     * 
+     * @param id
+     *            the ID of the object as String
+     * @param permission
+     *            the access permission for the rule
+     * @param rule
+     *            the access rule
+     * @param description
+     *            description for the given access rule, e.g. "allows public access"
+     * @throws MCRException
+     *             if an errow was occured
+     * @see MCRAccessInterface#addRule(String, String, org.jdom.Element, String)
+     */
+    public static void addRule(String id, String permission, org.jdom.Element rule, String description) throws MCRException {
+        getAccessImpl().addRule(id, permission, rule, description);
+    }
+
+    /**
      * removes the <code>permission</code> rule for the MCRObjectID.
      * 
      * @param id
@@ -87,6 +106,21 @@ public class MCRAccessManager {
      */
     public static void removeRule(MCRObjectID id, String permission) throws MCRException {
         getAccessImpl().removeRule(id.getId(), permission);
+    }
+
+    /**
+     * removes the <code>permission</code> rule for the ID.
+     * 
+     * @param id
+     *            the ID of an object as String
+     * @param permission
+     *            the access permission for the rule
+     * @throws MCRException
+     *             if an errow was occured
+     * @see MCRAccessInterface#removeRule(String, String)
+     */
+    public static void removeRule(String id, String permission) throws MCRException {
+        getAccessImpl().removeRule(id, permission);
     }
 
     /**
@@ -169,6 +203,18 @@ public class MCRAccessManager {
 		}
 		return accessAllowed;
     }
+    
+    /**
+     * lists all permissions defined for the <code>id</code>.
+     * 
+     * @param id
+     *           the ID of the object as String
+     * @return a <code>List</code> of all for <code>id</code> defined
+     *         permissions
+     */ 
+    public static List getPermissionsForID(String id) {
+        return getAccessImpl().getPermissionsForID(id);
+    } 
     
     /**
      * lists all permissions defined for the <code>id</code>.

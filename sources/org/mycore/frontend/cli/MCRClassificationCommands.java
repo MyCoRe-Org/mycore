@@ -26,19 +26,21 @@ package org.mycore.frontend.cli;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.mycore.common.MCRException;
 import org.mycore.datamodel.classifications.MCRClassification;
 import org.mycore.datamodel.metadata.MCRActiveLinkException;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.datamodel.metadata.MCRXMLTableManager;
 
 /**
  * Provides static methods that implement commands for the MyCoRe command line
  * interface for classifications.
  * 
  * @author Jens Kupferschmidt
- * @author Frank Lützenkirchen
+ * @author Frank Luetzenkirchen
  * @version $Revision$ $Date$
  */
 public class MCRClassificationCommands extends MCRAbstractCommands {
@@ -70,6 +72,9 @@ public class MCRClassificationCommands extends MCRAbstractCommands {
 
         com = new MCRCommand("save classification {0} to {1}", "org.mycore.frontend.cli.MCRClassificationCommands.save String String", "The command store the classification with MCRObjectID {0} to the file with name {1}.");
         command.add(com);
+
+        com = new MCRCommand("repair all classifications", "org.mycore.frontend.cli.MCRClassificationCommands.repairAll", "The command repair all classifications in SQL tables with BLOB data from XML table.");
+        command.add(com);
     }
 
     /**
@@ -82,7 +87,7 @@ public class MCRClassificationCommands extends MCRAbstractCommands {
         MCRObjectID mcr_id = new MCRObjectID(ID);
 
         try {
-            MCRClassification.delete(mcr_id.getId());
+            MCRClassification.deleteFromDatastore(mcr_id.getId());
             LOGGER.info(mcr_id.getId() + " deleted.");
         } catch (MCRException ex) {
             LOGGER.debug(ex.getStackTraceAsString());
@@ -205,13 +210,14 @@ public class MCRClassificationCommands extends MCRAbstractCommands {
 
         try {
             MCRClassification cl = new MCRClassification();
+            cl.setFromURI(file.getAbsolutePath());
 
             if (update) {
-                String id = cl.updateFromURI(file.getAbsolutePath());
-                LOGGER.info(id + " updated.\n");
+                cl.updateInDatastore();
+                LOGGER.info(cl.getId().getId() + " updated.\n");
             } else {
-                String id = cl.createFromURI(file.getAbsolutePath());
-                LOGGER.info(id + " loaded.\n");
+                cl.createInDatastore();
+                LOGGER.info(cl.getId().getId() + " loaded.\n");
             }
 
             return true;
@@ -249,5 +255,22 @@ public class MCRClassificationCommands extends MCRAbstractCommands {
 
         LOGGER.info("Classification " + mcr_id.getId() + " stored under " + filename + ".");
         LOGGER.info("");
+    }
+    
+    /**
+     * The method read all classifications from the MCRXMLTableManager and repair the other SQL tables. If no ACL entry exist it set a default entry.
+     */
+    public static void repairAll() {
+        MCRXMLTableManager TM = MCRXMLTableManager.instance();
+        List <String> list = TM.retrieveAllIDs("class");
+        for (int i=0;i<list.size();i++) {
+            String mcrid =  (String)list.get(i);
+            byte [] xml = TM.retrieve(new MCRObjectID(mcrid));
+            MCRClassification cl = new MCRClassification();
+            cl.setFromXML(xml);
+            cl.repairInDatastore();
+            LOGGER.info("Classification " + mcrid + " repaired.");
+            LOGGER.info("");
+        }
     }
 }

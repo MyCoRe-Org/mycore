@@ -200,12 +200,13 @@ public class MCRClassificationEditor {
             try {
                 LOGGER.info("Reading file " + sFile + " ...\n");
                 MCRClassification cl = new MCRClassification();
+                cl.setFromURI(sFile);
                 if (bUpdate) {
-                    clid = cl.updateFromURI(sFile);
-                    LOGGER.info("Classification: " + clid + " successfully imported with update!");
+                    cl.updateInDatastore();
+                    LOGGER.info("Classification: " + cl.getId().getId() + " successfully imported with update!");
                 } else {
-                    clid = cl.createFromURI(sFile);
-                    LOGGER.info("Classification: " + clid + " successfully imported with create!");
+                    cl.createInDatastore();
+                    LOGGER.info("Classification: " + cl.getId().getId() + " successfully imported with create!");
                 }
                 return true;
             } catch (MCRException ex) {
@@ -492,7 +493,7 @@ public class MCRClassificationEditor {
     public final boolean deleteClassification(String clid) {
         LOGGER.debug("Start delete classification " + clid);
         try {
-            MCRClassification.delete(clid);
+            MCRClassification.deleteFromDatastore(clid);
             return true;
         } catch (MCRActiveLinkException ae) {
             LOGGER.warn("Classification: " + clid + " can't be deleted, there are some refernces of documents to this");

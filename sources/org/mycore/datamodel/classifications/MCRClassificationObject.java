@@ -558,19 +558,6 @@ public abstract class MCRClassificationObject {
         return sb.toString();
     }
     
-    public void updateFromJDOM(Document cljdom) {
- 	   MCRClassification cl = new MCRClassification();
- 	   try {
- 		  cl.updateFromJDOM(cljdom);
- 		  manager().jDomCache.remove(getClassificationID());
- 	   } catch ( org.mycore.datamodel.metadata.MCRActiveLinkException ignored) {
- 		   //new kind of error - seems that no category can be updated if in use
- 		   //we do nothing instead of it
- 		   ;
- 	   }
- 	   
-    }
-    
     private Element findCategInJDom( String categID, Element categories){
         List jchildren = categories.getChildren("category");
    	 Element EFound = new Element("category");

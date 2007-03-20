@@ -51,7 +51,8 @@ public class MCRClassificationPool {
             Classification clas=(Classification)classifications.get(iter.next().toString());
             Document doc=ClassificationTransformer.getMetaDataDocument(clas);
             try {
-                cl.updateFromJDOM(doc);
+                cl.setFromJDOM(doc);
+                cl.updateInDatastore();
                 iter.remove();
             } catch (Exception e) {
                 e.printStackTrace();
@@ -89,7 +90,7 @@ public class MCRClassificationPool {
      */
     public void updateClassification(Classification cl) { 
         classifications.put(cl.getId(),cl);
-        LOGGER.debug("Classification: "+cl.getId()+" wurde in den Session hinzugefügt!");
+        LOGGER.debug("Classification: "+cl.getId()+" wurde in den Session hinzugefï¿½gt!");
         
     }
     

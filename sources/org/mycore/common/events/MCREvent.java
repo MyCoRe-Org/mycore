@@ -30,9 +30,14 @@ package org.mycore.common.events;
  * Events are automatically created by some MyCoRe components and are forwarded
  * to the handlers by MCREventManager.
  * 
- * @author Frank L�tzenkirchen
+ * @author Frank Luetzenkirchen
  */
 public class MCREvent extends java.util.Hashtable {
+    /**
+     * Default version ID
+     */
+    private static final long serialVersionUID = 1L;
+
     /** Pre-defined event types * */
     final static public String CREATE_EVENT = "create";
 
@@ -53,6 +58,8 @@ public class MCREvent extends java.util.Hashtable {
     final static public String DERIVATE_TYPE = "MCRDerivate";
 
     final static public String FILE_TYPE = "MCRFile";
+
+    final static public String CLASS_TYPE = "MCRClassification";
 
     /** The object type like object or file * */
     private String objType;
