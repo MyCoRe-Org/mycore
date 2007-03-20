@@ -1,7 +1,7 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml version="1.0" encoding="UTF-8"?>
 
 <!-- ============================================== -->
-<!-- $Revision: 1.4 $ $Date: 2007-02-19 14:05:12 $ -->
+<!-- $Revision: 1.5 $ $Date: 2007-03-20 13:49:49 $ -->
 <!-- ============================================== -->
 
 <!-- +
@@ -54,7 +54,7 @@
     <xsl:variable name="currentSession" select="../currentSession" />
     
     <xsl:variable name="hrefstart" select="concat($WebApplicationBaseURL, 'browse?mode=edit')" />
-    <xsl:variable name="search" select="searchField" />
+    <xsl:variable name="search" select="@searchField" />
     <xsl:variable name="type" select="startPath" />
     <xsl:variable name="canEdit" select="../userCanEdit" />
     <xsl:variable name="uri" select="uri" />
@@ -164,8 +164,8 @@
                 <td class="{$trStyle}">
                   <xsl:choose>
                     <xsl:when test="col[1]/@folder1 = 'folder_minus' ">
-                      <!-- leer  weil hier nur die Rückreferenz aufs parent kommt
-                        geht anders bestimmt schöner -->
+                      <!-- leer  weil hier nur die RÃ¼ckreferenz aufs parent kommt
+                        geht anders bestimmt schÃ¶ner -->
                       &#160;
                     </xsl:when>
                     <xsl:otherwise>
@@ -434,7 +434,7 @@
                     <input type="hidden" name="path" value='{$path}' />
                     <input type="hidden" name="clid" value='' />
                     <input type="hidden" name="todo" value='save-all' />
-                    <input type="submit" class="button" name="saveAll" value="Alle Änderungen speichern" />
+                    <input type="submit" class="button" name="saveAll" value="Alle Ã„nderungen speichern" />
                   </form>
                 </td>
                 <td>
@@ -442,7 +442,7 @@
                     <input type="hidden" name="path" value='{$path}' />
                     <input type="hidden" name="clid" value='' />
                     <input type="hidden" name="todo" value='purge-all' />
-                    <input type="submit" class="button" name="purgeAll" value="Änderungen verwerfen" />
+                    <input type="submit" class="button" name="purgeAll" value="Ã„nderungen verwerfen" />
                   </form>
                 </td>
               </tr>
