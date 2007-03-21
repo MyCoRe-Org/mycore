@@ -2,7 +2,7 @@
 
   <!-- =================================================================== -->
   <!-- MyCoRe build file for use with Apache Ant                           -->
-  <!-- $Revision: 1.130 $ $Date: 2007-02-20 08:35:06 $                      -->
+  <!-- $Revision: 1.131 $ $Date: 2007-03-21 14:46:28 $                      -->
   <!-- =================================================================== -->
 
 <project name="MyCoRe" default="usage" basedir=".">
@@ -56,8 +56,8 @@
     <echo level="info">Base directory   : ${basedir}</echo>
     <echo level="info">Operating system : ${os.name} Version ${os.version} on ${os.arch} </echo>
     <echo level="info">Java version     : JDK ${ant.java.version} Version ${java.version} from ${java.vendor}</echo>
-    <echo level="info">Java home        : ${env.JAVA_HOME}</echo>
-    <echo level="info">Ant build file   : $Revision: 1.130 $ $Date: 2007-02-20 08:35:06 $</echo>
+    <echo level="info">Java home        : ${java.home}</echo>
+    <echo level="info">Ant build file   : $Revision: 1.131 $ $Date: 2007-03-21 14:46:28 $</echo>
     <echo level="info">Ant version      : ${ant.version}</echo>
     <echo level="info">Ant home         : ${ant.home}</echo>
     <echo level="info">Ant libdir       : ${ant.library.dir}</echo>
@@ -75,9 +75,6 @@
     <echo level="info">Initializing directories and classpath...</echo>
 
     <mkdir dir="${basedir}/classes" />
-
-    <!-- Fail if environment variables are not set -->
-    <fail message="Environment variable JAVA_HOME is not set!" unless="env.JAVA_HOME" />
 
     <path id="mycore.classpath">
       <pathelement location="${basedir}/classes" />
