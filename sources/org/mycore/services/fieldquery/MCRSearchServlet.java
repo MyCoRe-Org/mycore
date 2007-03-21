@@ -49,7 +49,7 @@ import org.mycore.parsers.bool.MCRCondition;
 /**
  * This servlet executes queries and presents result pages.
  * 
- * @author Frank Lï¿½tzenkirchen
+ * @author Frank Lützenkirchen
  * @author Harald Richter
  */
 public class MCRSearchServlet extends MCRServlet {
