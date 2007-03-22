@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!-- ============================================== -->
-<!-- $Revision: 1.5 $ $Date: 2007-03-20 13:49:49 $ -->
+<!-- $Revision: 1.6 $ $Date: 2007-03-22 20:55:29 $ -->
 <!-- ============================================== -->
 
 <!-- +
@@ -434,7 +434,7 @@
                     <input type="hidden" name="path" value='{$path}' />
                     <input type="hidden" name="clid" value='' />
                     <input type="hidden" name="todo" value='save-all' />
-                    <input type="submit" class="button" name="saveAll" value="Alle Änderungen speichern" />
+                    <input type="submit" class="button" name="saveAll" value="{i18n:translate('Browse.saveClass')}" />
                   </form>
                 </td>
                 <td>
@@ -442,7 +442,7 @@
                     <input type="hidden" name="path" value='{$path}' />
                     <input type="hidden" name="clid" value='' />
                     <input type="hidden" name="todo" value='purge-all' />
-                    <input type="submit" class="button" name="purgeAll" value="Änderungen verwerfen" />
+                    <input type="submit" class="button" name="purgeAll" value="{i18n:translate('Browse.discardClass')}" />
                   </form>
                 </td>
               </tr>
