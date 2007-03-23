@@ -367,14 +367,14 @@ public class MCRClassificationBrowserData {
     public org.jdom.Document createXmlTreeforAllClassifications() throws Exception {
 
         final Element xDocument = new Element("classificationbrowse");
-        final Element EditClassbutton = new Element("userCanEdit");
+        final Element CreateClassButton = new Element("userCanCreate");
         if (AI.checkPermission("create-classification")) {
-            EditClassbutton.addContent("true");
+            CreateClassButton.addContent("true");
         } else {
-            EditClassbutton.addContent("false");
+            CreateClassButton.addContent("false");
         }
 
-        xDocument.addContent(EditClassbutton);
+        xDocument.addContent(CreateClassButton);
 
         final Element xNavtree = new Element("classificationlist");
         xDocument.addContent(xNavtree);
@@ -390,11 +390,24 @@ public class MCRClassificationBrowserData {
             Classification classif = getClassificationPool().getClassificationAsPojo(id);
             Element cli = getBrowseElement(classif);
             String sessionID=MCRSessionMgr.getCurrentSession().getID();
+            // set browser type
             try {
                 browserClass = config.getString("MCR.classeditor." + classif.getId());
             } catch (final Exception ignore) {
                 browserClass = "default";
             }
+            // set permissions
+            if (AI.checkPermission(id,"writedb")) {
+                cli.setAttribute("userCanEdit","true");
+            } else {
+                cli.setAttribute("userCanEdit","false");
+            }
+            if (AI.checkPermission(id,"deletedb")) {
+                cli.setAttribute("userCanDelete","true");
+            } else {
+                cli.setAttribute("userCanDelete","false");
+            }
+            // set done flag
             if (ClassUserTable.containsKey(id)) {
                 if (ClassUserTable.get(id) != sessionID) {
                     cli.setAttribute("userEdited", MCRSession.getSession(ClassUserTable.get(id)).getCurrentUserID());
@@ -513,13 +526,21 @@ public class MCRClassificationBrowserData {
         xSearchField.addContent(searchField);
         xDocument.addContent(xSearchField);
 
-        // Editierbutton Einfï¿½gen - wenn die permission es erlaubt
-        final Element Editbutton = new Element("userCanEdit");
+        // add edit button if user has permission
+        final Element CreateButton = new Element("userCanCreate");
+        final Element EditButton = new Element("userCanEdit");
+        final Element DeleteButton = new Element("userCanDelete");
 
         // now we check this right for the current user
-        final String permString = String.valueOf(AI.checkPermission("create-classification"));
-        Editbutton.addContent(permString);
-        xDocument.addContent(Editbutton);
+        String permString = String.valueOf(AI.checkPermission("create-classification"));
+        CreateButton.addContent(permString);
+        xDocument.addContent(CreateButton);
+        permString = String.valueOf(AI.checkPermission(cl.getId(),"writedb"));
+        EditButton.addContent(permString);
+        xDocument.addContent(EditButton);
+        permString = String.valueOf(AI.checkPermission(cl.getId(),"deletedb"));
+        DeleteButton.addContent(permString);
+        xDocument.addContent(DeleteButton);
 
         // data as XML from outputNavigationTree
         final Element xNavtree = new Element("navigationtree");
@@ -562,7 +583,7 @@ public class MCRClassificationBrowserData {
 
             final int level = Integer.parseInt(line.getAttributeValue("level"));
 
-            // für Sortierung schon mal die leveltiefe bestimmen
+            // fï¿½r Sortierung schon mal die leveltiefe bestimmen
             LOGGER.debug(" NumDocs - " + numDocs);
 
             if (emptyLeafs.endsWith("no") && numDocs == 0) {

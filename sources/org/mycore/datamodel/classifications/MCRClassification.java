@@ -62,7 +62,7 @@ import org.mycore.datamodel.metadata.MCRXMLTableManager;
  * This class implements all methods for a classification and extended the
  * MCRClassificationObject class.
  * 
- * @author Frank Luetzenkirchen
+ * @author Frank Luetzenkirchen 
  * @author Jens Kupferschmidt
  * @author Thomas Scheffler (yagee)
  * @version $Revision$ $Date$
@@ -80,7 +80,9 @@ public class MCRClassification {
     private static final String OBJ_COUNT_ATTR = "counter";
 
     private static final String ID_ATTR = "ID";
-
+    
+    private static MCRXMLTableManager TM = MCRXMLTableManager.instance();
+    
     /**
      * The constructor
      */
@@ -148,9 +150,11 @@ public class MCRClassification {
      *            the classification as jdom tree
      */
     public final void setFromJDOM(org.jdom.Document jdom) {
-        cl = new MCRClassificationItem(new MCRObjectID(jdom.getRootElement().getAttributeValue(ID_ATTR)).getId());
+        Element xmlblob = jdom.getRootElement();
+        xmlblob.detach();
+        cl = new MCRClassificationItem(new MCRObjectID(xmlblob.getAttributeValue(ID_ATTR)).getId());
 
-        List tagList = jdom.getRootElement().getChildren("label");
+        List tagList = xmlblob.getChildren("label");
         Element tag;
 
         for (int i = 0; i < tagList.size(); i++) {
@@ -160,14 +164,14 @@ public class MCRClassification {
 
         LOGGER.debug("processing Classification:" + cl.toString());
         cat = new ArrayList<MCRCategoryItem>();
-        tagList = jdom.getRootElement().getChild("categories").getChildren("category");
+        tagList = xmlblob.getChild("categories").getChildren("category");
 
         for (int i = 0; i < tagList.size(); i++) {
             breakDownCategories((Element) tagList.get(i), cl);
         }
 
         // read service part
-        Element service = jdom.getRootElement().getChild("service");
+        Element service = xmlblob.getChild("service");
         mcr_service = new MCRObjectService();
         if (service != null) {
             mcr_service.setFromDOM(service);
@@ -215,53 +219,60 @@ public class MCRClassification {
         elm.addNamespaceDeclaration(XSI_NAMESPACE);
         elm.addNamespaceDeclaration(XLINK_NAMESPACE);
         elm.setAttribute("noNamespaceSchemaLocation", "MCRClassification.xsd", XSI_NAMESPACE);
+        // add class element
         elm.setAttribute("ID", getId().getId());
         for (int i = 0; i < cl.getSize(); i++) {
             elm.addContent(cl.getJDOMElement(i));
         }
-        // categories
-        org.jdom.Element elmcats = new org.jdom.Element("categories");
-        for (int i = 0; i < cat.size(); i++) {
-            if ((cat.get(i)).parentID == null) {
-                MCRCategoryItem ci = cat.get(i);
-                elmcats.addContent(getCategXML(i, ci));
-            }
-        }
-
+        Element elmcats = new Element("categories");
         elm.addContent(elmcats);
-        // service
-        elm.addContent(mcr_service.createXML());
-
-        return doc;
-    }
-
-    private final Element getCategXML(int i, MCRCategoryItem ci) {
-        org.jdom.Element elmcat = new org.jdom.Element("category");
-        elmcat.setAttribute("ID", ci.ID);
-        for (int j = 0; j < ci.getSize(); j++) {
-            elmcat.addContent(ci.getJDOMElement(j));
+        Element last[] = new Element[cat.size()];
+        for (int i = 0; i < cat.size(); i++) {
+            MCRCategoryItem item = (MCRCategoryItem) cat.get(i);
+            Element elmcat = new Element("categorie");
+            elmcat.setAttribute("ID", item.ID);
+            for (int j = 0; j < item.getSize(); j++)
+                elmcat.addContent(item.getJDOMElement(j));
+            Element elmurl = new Element("URL");
+            elmurl.setAttribute("href", item.getURL(), XLINK_NAMESPACE);
+            elmcat.addContent(elmurl);
+            last[i] = elmcat;
         }
-        if (ci.URL.length() != 0) {
-            org.jdom.Element elmurl = new org.jdom.Element("url");
-            elmurl.setAttribute("href", ci.URL, XLINK_NAMESPACE);
-        }
-        // end of array list
-        if (i + 1 >= cat.size()) {
-            return elmcat;
-        }
-
-        MCRCategoryItem cn = null;
-        int j = i + 1;
-        cn = cat.get(j);
-        while (ci.ID.equals(cn.parentID)) {
-            j++;
-            elmcat.addContent(getCategXML(j, cn));
-            cn = null;
-            if (j < cat.size()) {
-                cn = cat.get(j);
+        int deep = 0;
+        String parent[] = new String[100];
+        int parentindex[] = new int[100];
+        for (int i = 0; i < cat.size(); i++) {
+            MCRCategoryItem item = (MCRCategoryItem) cat.get(i);
+            if (item.parentID == null) {
+                elmcats.addContent(last[i]);
+                parent[deep] = item.ID;
+                parentindex[deep] = i;
+                continue;
             }
+            if (parent[deep].equals(item.parentID)) {
+                last[parentindex[deep]].addContent(last[i]);
+                deep++;
+                parent[deep] = item.ID;
+                parentindex[deep] = i;
+                continue;
+            }
+            for (int j=0;j<=deep;j++) {
+                if (parent[j].equals(item.parentID)) {
+                    deep = j;
+                    last[parentindex[deep]].addContent(last[i]);
+                    break;
+                }
+            }
+
         }
-        return elmcat;
+        // add service
+        elm.addContent(mcr_service.createXML());
+        try {
+            MCRUtils.writeJDOMToSysout(doc);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return doc;
     }
 
     /**

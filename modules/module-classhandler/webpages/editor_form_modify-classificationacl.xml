@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE MyCoReWebPage>
+
+<MyCoReWebPage>
+
+<section title="Bearbeiten der Zugriffsrechte" xml:lang="de">
+<p></p>
+<br />
+<p></p>
+<editor id="modify-classacl"><include uri="webapp:editor/editor-modify-classacl.xml" /></editor>
+<p></p>
+<br />
+<p></p>
+</section>
+
+<section title="Edit the access rights" xml:lang="en">
+<p></p>
+<br />
+<p></p>
+<editor id="modify-classacl"><include uri="webapp:editor/editor-modify-classacl.xml" /></editor>
+<p></p>
+<br />
+<p></p>
+</section>
+
+</MyCoReWebPage>
+
+

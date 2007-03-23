@@ -156,6 +156,25 @@ public class MCRAccessManager {
     }
 
     /**
+     * updates an access rule for an ID.
+     * 
+     * @param id
+     *            the ID of the object
+     * @param permission
+     *            the access permission for the rule
+     * @param rule
+     *            the access rule
+     * @param description
+     *            description for the given access rule, e.g. "allows public access"
+     * @throws MCRException
+     *             if an errow was occured
+     * @see MCRAccessInterface#updateRule(String, String, Element, String)
+     */
+    public static void updateRule(String id, String permission, org.jdom.Element rule, String description) throws MCRException {
+        getAccessImpl().updateRule(id, permission, rule, description);
+    }
+
+    /**
      * determines whether the current user has the permission to perform a
      * certain action.
      * 

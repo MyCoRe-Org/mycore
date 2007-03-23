@@ -306,7 +306,6 @@ public class MCRAccessEventHandler extends MCREventHandlerBase {
     private void handleClassificationCreated(MCRClassification base) {
         // save the start time
         long t1 = System.currentTimeMillis();
-        System.out.println("****************************************************");
 
         // create
         List li = AI.getPermissionsForID(base.getId().getId());
@@ -342,7 +341,6 @@ public class MCRAccessEventHandler extends MCREventHandlerBase {
     private void handleClassificationUpdated(MCRClassification base) {
         // save the start time
         long t1 = System.currentTimeMillis();
-        System.out.println("****************************************************");
 
         // update
         List li = AI.getPermissionsForID(base.getId().getId());
@@ -371,7 +369,6 @@ public class MCRAccessEventHandler extends MCREventHandlerBase {
             }
         }
 
-        System.out.println("****************************************************");
         // save the stop time
         long t2 = System.currentTimeMillis();
         double diff = (t2 - t1) / 1000.0;

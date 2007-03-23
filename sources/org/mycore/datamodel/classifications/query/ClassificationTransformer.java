@@ -39,6 +39,7 @@ import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.Namespace;
 
+import org.mycore.common.MCRUtils;
 import org.mycore.datamodel.classifications.MCRCategoryItem;
 import org.mycore.datamodel.classifications.MCRClassificationItem;
 import org.mycore.datamodel.metadata.MCRLinkTableManager;
@@ -319,6 +320,9 @@ public class ClassificationTransformer {
          * @return
          */
         static Classification getClassification(Document cl, int levels, boolean withCounter) {
+ try {
+            MCRUtils.writeJDOMToSysout(cl);
+ } catch (Exception e) {}
             Classification returns = getClassification(cl.getRootElement());
             returns.setCounterEnabled(withCounter);
             CategoryFactory.fillCategory(returns.getId(), returns, cl.getRootElement().getChild("categories"), levels, withCounter);

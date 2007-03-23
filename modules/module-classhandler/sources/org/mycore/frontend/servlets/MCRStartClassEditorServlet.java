@@ -27,12 +27,15 @@ package org.mycore.frontend.servlets;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.Enumeration;
+import java.util.List;
 import java.util.Properties;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.log4j.Logger;
 import org.jdom.Element;
+import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
+import org.mycore.common.MCRUtils;
 import org.mycore.datamodel.classifications.MCRClassificationBrowserData;
 import org.mycore.datamodel.classifications.MCRClassificationEditor;
 import org.mycore.datamodel.classifications.query.Category;
@@ -40,6 +43,7 @@ import org.mycore.datamodel.classifications.query.Classification;
 import org.mycore.datamodel.classifications.query.ClassificationTransformer;
 import org.mycore.datamodel.classifications.query.MCRClassificationQuery;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.datamodel.metadata.MCRObjectService;
 import org.mycore.frontend.editor.MCREditorSubmission;
 import org.mycore.frontend.editor.MCRRequestParameters;
 
@@ -129,6 +133,39 @@ public class MCRStartClassEditorServlet extends MCRServlet {
         String imerrorpage = pagedir + CONFIG.getString("MCR.classeditor_page_error_move", "classeditor_error_move.xml");
         String imperrorpage = pagedir + CONFIG.getString("MCR.classeditor_page_error_import", "classeditor_error_import.xml");
 
+        // change the ACLs of classification
+        if ("acl-classification".equals(todo)) {
+            if (!(AI.checkPermission(clid,"writedb"))) {
+                job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + usererrorpage));
+                return;
+            }
+            org.jdom.Element serviceelm = null;
+            MCRObjectService serv = new MCRObjectService();
+            
+            List permlist = AI.getPermissionsForID(clid);
+            for (int i = 0; i < permlist.size(); i++) {
+                org.jdom.Element ruleelm = AI.getRule(clid, (String) permlist.get(i));
+                org.jdom.Document dof = new org.jdom.Document();
+                org.jdom.Element eof = new org.jdom.Element("test");
+                dof.addContent(eof);
+                eof.addContent((org.jdom.Element) ruleelm.detach().clone());
+                byte[] xml = MCRUtils.getByteArray(dof);
+                System.out.println(new String(xml));
+                serv.addRule((String) permlist.get(i), ruleelm);
+           }
+            serviceelm = serv.createXML();
+
+            MCRSession session = MCRSessionMgr.getCurrentSession();
+            session.put("service", serviceelm);
+            String base = getBaseURL() + "editor_form_modify-classificationacl.xml";
+            Properties params = new Properties();
+            params.put("XSL.editor.source.url", "session:service");
+            params.put("XSL.editor.cancel.url", getBaseURL() + cancelpage);
+            params.put("mcrid", clid);
+            job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(buildRedirectURL(base, params)));
+            return;
+        }
+        
         if (!(AI.checkPermission("create-classification"))) {
             job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + usererrorpage));
             return;
