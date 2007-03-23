@@ -45,8 +45,6 @@ import org.mycore.access.MCRAccessBaseImpl;
 import org.mycore.access.MCRAccessInterface;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
-import org.mycore.common.events.MCREvent;
-import org.mycore.common.events.MCREventManager;
 import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.datamodel.ifs.MCRFileImportExport;
 import org.mycore.datamodel.metadata.MCRDerivate;
@@ -641,20 +639,14 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
     /**
      * The method start the repair the content search index for all derivates.
      */
-    @SuppressWarnings("unchecked")
     public static void repairDerivateSearch() {
         LOGGER.info("Start the repair for type derivate.");
-
-        // handle events
-        MCREvent evt = new MCREvent(MCREvent.DERIVATE_TYPE, MCREvent.LISTIDS_EVENT);
-        evt.put("derivateType", "derivate");
-        MCREventManager.instance().handleEvent(evt);
-        List<String> ar = (List<String>) evt.get("derivateIDs");
-        if ((ar == null) || (ar.size() == 0)) {
+        List<String> ar = MCRXMLTableManager.instance().retrieveAllIDs("derivate");
+        if (ar.size() == 0) {
             LOGGER.warn("No ID's was found for type derivate.");
             return;
         }
-        for (String stid:ar){
+        for (String stid : ar) {
             MCRDerivate der = new MCRDerivate();
             der.repairPersitenceDatastore(stid);
             LOGGER.info("Repaired " + stid);

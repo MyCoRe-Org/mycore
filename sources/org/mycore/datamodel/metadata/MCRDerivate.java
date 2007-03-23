@@ -379,16 +379,7 @@ final public class MCRDerivate extends MCRBase {
      *                if a persistence problem is occured
      */
     public final static boolean existInDatastore(MCRObjectID id) throws MCRPersistenceException {
-        // handle events
-        MCREvent evt = new MCREvent(MCREvent.DERIVATE_TYPE, MCREvent.EXIST_EVENT);
-        evt.put("objectID", id);
-        MCREventManager.instance().handleEvent(evt);
-        boolean ret = false;
-        try {
-            ret = Boolean.valueOf((String) evt.get("exist")).booleanValue();
-        } catch (RuntimeException e) {
-        }
-        return ret;
+        return MCRXMLTableManager.instance().exist(id);
     }
 
     /**
@@ -443,17 +434,7 @@ final public class MCRDerivate extends MCRBase {
      *                if a persistence problem is occured
      */
     public static final byte[] receiveXMLFromDatastore(MCRObjectID id) throws MCRPersistenceException {
-        // handle events
-        MCREvent evt = new MCREvent(MCREvent.DERIVATE_TYPE, MCREvent.RECEIVE_EVENT);
-        evt.put("objectID", id);
-        MCREventManager.instance().handleEvent(evt);
-        byte[] xml = null;
-        try {
-            xml = (byte[]) evt.get("xml");
-        } catch (RuntimeException e) {
-            throw new MCRPersistenceException("The XML file for ID " + id.getId() + " was not retrieved.", e);
-        }
-        return xml;
+        return MCRXMLTableManager.instance().retrieve(id);
     }
 
     /**

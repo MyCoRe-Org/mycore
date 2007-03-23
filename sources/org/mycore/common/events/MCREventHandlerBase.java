@@ -24,12 +24,12 @@
 package org.mycore.common.events;
 
 import org.apache.log4j.Logger;
+
 import org.mycore.common.MCRConfiguration;
 import org.mycore.datamodel.classifications.MCRClassification;
 import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRObject;
-import org.mycore.datamodel.metadata.MCRObjectID;
 
 /**
  * Abstract helper class that can be subclassed to implement event handlers more
@@ -42,7 +42,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
     private static Logger logger = Logger.getLogger(MCREventHandlerBase.class);
 
     /** configuration */
-    protected static MCRConfiguration CONFIG = MCRConfiguration.instance();
+    protected static final MCRConfiguration CONFIG = MCRConfiguration.instance();
 
     /**
      * This method handle all calls for EventHandler for the event types
@@ -70,28 +70,6 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
                 }
                 return;
             }
-            MCRObjectID objid = (MCRObjectID) (evt.get("objectID"));
-            if (objid != null) {
-                logger.debug(getClass().getName() + " handling " + objid.getId() + " " + evt.getEventType());
-                if (evt.getEventType().equals(MCREvent.RECEIVE_EVENT)) {
-                    handleObjectReceived(evt, objid);
-                } else if (evt.getEventType().equals(MCREvent.EXIST_EVENT)) {
-                    handleObjectExist(evt, objid);
-                } else {
-                    logger.warn("Can't find method for an object ID data handler for event type " + evt.getEventType());
-                }
-                return;
-            }
-            String objtype = (String) (evt.get("objectType"));
-            if ((objtype != null) && (CONFIG.getString("MCR.type_" + objtype, "").length() != 0)) {
-                logger.debug(getClass().getName() + " handling " + objtype + " " + evt.getEventType());
-                if (evt.getEventType().equals(MCREvent.LISTIDS_EVENT)) {
-                    handleObjectListIDs(evt, objtype);
-                } else {
-                    logger.warn("Can't find method for an object type data handler for event type " + evt.getEventType());
-                }
-                return;
-            }
             logger.warn("Can't find method for " + MCREvent.OBJECT_TYPE + " for event type " + evt.getEventType());
             return;
         }
@@ -110,28 +88,6 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
                     handleDerivateRepaired(evt, der);
                 } else {
                     logger.warn("Can't find method for a derivate data handler for event type " + evt.getEventType());
-                }
-                return;
-            }
-            MCRObjectID objid = (MCRObjectID) (evt.get("objectID"));
-            if (objid != null) {
-                logger.debug(getClass().getName() + " handling " + objid.getId() + " " + evt.getEventType());
-                if (evt.getEventType().equals(MCREvent.RECEIVE_EVENT)) {
-                    handleDerivateReceived(evt, objid);
-                } else if (evt.getEventType().equals(MCREvent.EXIST_EVENT)) {
-                    handleDerivateExist(evt, objid);
-                } else {
-                    logger.warn("Can't find method for a derivate ID data handler for event type " + evt.getEventType());
-                }
-                return;
-            }
-            String objtype = (String) (evt.get("derivateType"));
-            if ((objtype != null) && (CONFIG.getString("MCR.type_" + objtype, "").length() != 0)) {
-                logger.debug(getClass().getName() + " handling " + objtype + " " + evt.getEventType());
-                if (evt.getEventType().equals(MCREvent.LISTIDS_EVENT)) {
-                    handleDerivateListIDs(evt, objtype);
-                } else {
-                    logger.warn("Can't find method for a derivate type data handler for event type " + evt.getEventType());
                 }
                 return;
             }
@@ -177,18 +133,6 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
                 }
                 return;
             }
-            MCRObjectID objid = (MCRObjectID) (evt.get("objectID"));
-            if (objid != null) {
-                logger.debug(getClass().getName() + " handling " + objid.getId() + " " + evt.getEventType());
-                if (evt.getEventType().equals(MCREvent.RECEIVE_EVENT)) {
-                    handleClassificationReceived(evt, objid);
-                } else if (evt.getEventType().equals(MCREvent.EXIST_EVENT)) {
-                    handleClassificationExist(evt, objid);
-                } else {
-                    logger.warn("Can't find method for a classification ID data handler for event type " + evt.getEventType());
-                }
-                return;
-            }
             logger.warn("Can't find method for " + MCREvent.CLASS_TYPE + " for event type " + evt.getEventType());
             return;
         }
@@ -221,28 +165,6 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
                 }
                 return;
             }
-            MCRObjectID objid = (MCRObjectID) (evt.get("objectID"));
-            if (objid != null) {
-                logger.debug(getClass().getName() + " handling " + objid.getId() + " " + evt.getEventType());
-                if (evt.getEventType().equals(MCREvent.RECEIVE_EVENT)) {
-                    undoObjectReceived(evt, objid);
-                } else if (evt.getEventType().equals(MCREvent.EXIST_EVENT)) {
-                    undoObjectExist(evt, objid);
-                } else {
-                    logger.warn("Can't find method for an object ID data handler for event type " + evt.getEventType());
-                }
-                return;
-            }
-            String objtype = (String) (evt.get("objectType"));
-            if ((objtype != null) && (CONFIG.getString("MCR.type_" + objtype, "").length() != 0)) {
-                logger.debug(getClass().getName() + " handling " + objtype + " " + evt.getEventType());
-                if (evt.getEventType().equals(MCREvent.LISTIDS_EVENT)) {
-                    undoObjectListIDs(evt, objtype);
-                } else {
-                    logger.warn("Can't find method for an object type data handler for event type " + evt.getEventType());
-                }
-                return;
-            }
             logger.warn("Can't find method for " + MCREvent.OBJECT_TYPE + " for event type " + evt.getEventType());
             return;
         }
@@ -264,36 +186,12 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
                 }
                 return;
             }
-            MCRObjectID objid = (MCRObjectID) (evt.get("objectID"));
-            if (objid != null) {
-                logger.debug(getClass().getName() + " handling " + objid.getId() + evt.getEventType());
-                if (evt.getEventType().equals(MCREvent.RECEIVE_EVENT)) {
-                    undoDerivateReceived(evt, objid);
-                } else if (evt.getEventType().equals(MCREvent.EXIST_EVENT)) {
-                    undoDerivateExist(evt, objid);
-                } else {
-                    logger.warn("Can't find method for a derivate ID data handler for event type " + evt.getEventType());
-                }
-                return;
-            }
-            String objtype = (String) (evt.get("derivateType"));
-            if ((objtype != null) && (CONFIG.getString("MCR.type_" + objtype, "").length() != 0)) {
-                logger.debug(getClass().getName() + " handling " + objtype + " " + evt.getEventType());
-                if (evt.getEventType().equals(MCREvent.LISTIDS_EVENT)) {
-                    undoDerivateListIDs(evt, objtype);
-                } else {
-                    logger.warn("Can't find method for a derivate type data handler for event type " + evt.getEventType());
-                }
-                return;
-            }
             logger.warn("Can't find method for " + MCREvent.DERIVATE_TYPE + " for event type " + evt.getEventType());
             return;
         }
 
         if (evt.getObjectType().equals(MCREvent.FILE_TYPE)) {
             MCRFile file = (MCRFile) (evt.get("file"));
-            logger.debug(getClass().getName() + " handling " + file.getOwnerID() + "/" + file.getAbsolutePath() + " " + evt.getEventType());
-
             if (file != null) {
                 logger.debug(getClass().getName() + " handling " + file.getOwnerID() + "/" + file.getAbsolutePath() + " " + evt.getEventType());
                 if (evt.getEventType().equals(MCREvent.CREATE_EVENT)) {
@@ -327,18 +225,6 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
                     undoClassificationRepaired(evt, obj);
                 } else {
                     logger.warn("Can't find method for an classification data handler for event type " + evt.getEventType());
-                }
-                return;
-            }
-            MCRObjectID objid = (MCRObjectID) (evt.get("objectID"));
-            if (objid != null) {
-                logger.debug(getClass().getName() + " handling " + objid.getId() + " " + evt.getEventType());
-                if (evt.getEventType().equals(MCREvent.RECEIVE_EVENT)) {
-                    undoClassificationReceived(evt, objid);
-                } else if (evt.getEventType().equals(MCREvent.EXIST_EVENT)) {
-                    undoClassificationExist(evt, objid);
-                } else {
-                    logger.warn("Can't find method for an classification ID data handler for event type " + evt.getEventType());
                 }
                 return;
             }
@@ -406,32 +292,6 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
     }
 
     /**
-     * Handles classification receive events. This implementation does nothing and
-     * should be overwritted by subclasses.
-     * 
-     * @param evt
-     *            the event that occured
-     * @param objid
-     *            the MCRObjectID that caused the event
-     */
-    protected void handleClassificationReceived(MCREvent evt, MCRObjectID objid) {
-        doNothing(evt, objid);
-    }
-
-    /**
-     * Handles classification exist events. This implementation does nothing and should
-     * be overwritted by subclasses.
-     * 
-     * @param evt
-     *            the event that occured
-     * @param objid
-     *            the MCRObjectID that caused the event
-     */
-    protected void handleClassificationExist(MCREvent evt, MCRObjectID objid) {
-        doNothing(evt, objid);
-    }
-
-    /**
      * Handles object created events. This implementation does nothing and
      * should be overwritted by subclasses.
      * 
@@ -484,45 +344,6 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
     }
 
     /**
-     * Handles object receive events. This implementation does nothing and
-     * should be overwritted by subclasses.
-     * 
-     * @param evt
-     *            the event that occured
-     * @param objid
-     *            the MCRObjectID that caused the event
-     */
-    protected void handleObjectReceived(MCREvent evt, MCRObjectID objid) {
-        doNothing(evt, objid);
-    }
-
-    /**
-     * Handles object exist events. This implementation does nothing and should
-     * be overwritted by subclasses.
-     * 
-     * @param evt
-     *            the event that occured
-     * @param objid
-     *            the MCRObjectID that caused the event
-     */
-    protected void handleObjectExist(MCREvent evt, MCRObjectID objid) {
-        doNothing(evt, objid);
-    }
-
-    /**
-     * Handles of object listids events. This implementation does nothing and
-     * should be overwritted by subclasses.
-     * 
-     * @param evt
-     *            the event that occured
-     * @param objtype
-     *            the MCR type that caused the event
-     */
-    protected void handleObjectListIDs(MCREvent evt, String objtype) {
-        doNothing(evt, objtype);
-    }
-
-    /**
      * Handles derivate created events. This implementation does nothing and
      * should be overwritted by subclasses.
      * 
@@ -572,45 +393,6 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
      */
     protected void handleDerivateRepaired(MCREvent evt, MCRDerivate der) {
         doNothing(evt, der);
-    }
-
-    /**
-     * Handles derivate receive events. This implementation does nothing and
-     * should be overwritted by subclasses.
-     * 
-     * @param evt
-     *            the event that occured
-     * @param objid
-     *            the MCRObjectID that caused the event
-     */
-    protected void handleDerivateReceived(MCREvent evt, MCRObjectID objid) {
-        doNothing(evt, objid);
-    }
-
-    /**
-     * Handles derivate exist events. This implementation does nothing and
-     * should be overwritted by subclasses.
-     * 
-     * @param evt
-     *            the event that occured
-     * @param objid
-     *            the MCRObjectID that caused the event
-     */
-    protected void handleDerivateExist(MCREvent evt, MCRObjectID objid) {
-        doNothing(evt, objid);
-    }
-
-    /**
-     * Handles undo of object listids events. This implementation does nothing
-     * and should be overwritted by subclasses.
-     * 
-     * @param evt
-     *            the event that occured
-     * @param objtype
-     *            the MCR type that caused the event
-     */
-    protected void handleDerivateListIDs(MCREvent evt, String objtype) {
-        doNothing(evt, objtype);
     }
 
     /**
@@ -718,32 +500,6 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
     }
 
     /**
-     * Handles undo of classification receive events. This implementation does nothing
-     * and should be overwritted by subclasses.
-     * 
-     * @param evt
-     *            the event that occured
-     * @param objid
-     *            the MCRObjectID that caused the event
-     */
-    protected void undoClassificationReceived(MCREvent evt, MCRObjectID objid) {
-        doNothing(evt, objid);
-    }
-
-    /**
-     * Handles undo of classification exist events. This implementation does nothing and
-     * should be overwritted by subclasses.
-     * 
-     * @param evt
-     *            the event that occured
-     * @param objid
-     *            the MCRObjectID that caused the event
-     */
-    protected void undoClassificationExist(MCREvent evt, MCRObjectID objid) {
-        doNothing(evt, objid);
-    }
-
-    /**
      * Handles undo of object created events. This implementation does nothing
      * and should be overwritted by subclasses.
      * 
@@ -796,45 +552,6 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
     }
 
     /**
-     * Handles undo of object receive events. This implementation does nothing
-     * and should be overwritted by subclasses.
-     * 
-     * @param evt
-     *            the event that occured
-     * @param objid
-     *            the MCRObjectID that caused the event
-     */
-    protected void undoObjectReceived(MCREvent evt, MCRObjectID objid) {
-        doNothing(evt, objid);
-    }
-
-    /**
-     * Handles undo of object exist events. This implementation does nothing and
-     * should be overwritted by subclasses.
-     * 
-     * @param evt
-     *            the event that occured
-     * @param objid
-     *            the MCRObjectID that caused the event
-     */
-    protected void undoObjectExist(MCREvent evt, MCRObjectID objid) {
-        doNothing(evt, objid);
-    }
-
-    /**
-     * Handles undo of object listids events. This implementation does nothing
-     * and should be overwritted by subclasses.
-     * 
-     * @param evt
-     *            the event that occured
-     * @param objtype
-     *            the MCR type that caused the event
-     */
-    protected void undoObjectListIDs(MCREvent evt, String objtype) {
-        doNothing(evt, objtype);
-    }
-
-    /**
      * Handles undo of derivate created events. This implementation does nothing
      * and should be overwritted by subclasses.
      * 
@@ -884,45 +601,6 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
      */
     protected void undoDerivateRepaired(MCREvent evt, MCRDerivate der) {
         doNothing(evt, der);
-    }
-
-    /**
-     * Handles undo of derivate receive events. This implementation does nothing
-     * and should be overwritted by subclasses.
-     * 
-     * @param evt
-     *            the event that occured
-     * @param objid
-     *            the MCRObjectID that caused the event
-     */
-    protected void undoDerivateReceived(MCREvent evt, MCRObjectID objid) {
-        doNothing(evt, objid);
-    }
-
-    /**
-     * Handles undo of derivate exist events. This implementation does nothing
-     * and should be overwritted by subclasses.
-     * 
-     * @param evt
-     *            the event that occured
-     * @param objid
-     *            the MCRObjectID that caused the event
-     */
-    protected void undoDerivateExist(MCREvent evt, MCRObjectID objid) {
-        doNothing(evt, objid);
-    }
-
-    /**
-     * Handles undo of derivate listids events. This implementation does nothing
-     * and should be overwritted by subclasses.
-     * 
-     * @param evt
-     *            the event that occured
-     * @param objtype
-     *            the MCR type that caused the event
-     */
-    protected void undoDerivateListIDs(MCREvent evt, String objtype) {
-        doNothing(evt, objtype);
     }
 
     /**

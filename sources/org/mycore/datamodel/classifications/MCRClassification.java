@@ -385,16 +385,7 @@ public class MCRClassification {
      *                if a persistence problem is occured
      */
     public final static boolean existInDatastore(MCRObjectID id) throws MCRPersistenceException {
-        // handle events
-        MCREvent evt = new MCREvent(MCREvent.CLASS_TYPE, MCREvent.EXIST_EVENT);
-        evt.put("objectID", id);
-        MCREventManager.instance().handleEvent(evt);
-        boolean ret = false;
-        try {
-            ret = Boolean.valueOf((String) evt.get("exist")).booleanValue();
-        } catch (RuntimeException e) {
-        }
-        return ret;
+        return MCRXMLTableManager.instance().exist(id);
     }
 
     /**

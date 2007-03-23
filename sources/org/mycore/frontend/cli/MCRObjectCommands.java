@@ -41,8 +41,6 @@ import javax.xml.transform.stream.StreamSource;
 import org.apache.log4j.Logger;
 
 import org.mycore.common.MCRException;
-import org.mycore.common.events.MCREvent;
-import org.mycore.common.events.MCREventManager;
 import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.common.xml.MCRXMLHelper;
 import org.mycore.datamodel.metadata.MCRActiveLinkException;
@@ -673,7 +671,6 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      * @param type
      *            the MCRObjectID type
      */
-    @SuppressWarnings("unchecked")
     public static final void repairMetadataSearch(String type) {
         LOGGER.info("Start the repair for type " + type);
         String typetest = CONFIG.getString("MCR.type_" + type, "");
@@ -682,13 +679,8 @@ public class MCRObjectCommands extends MCRAbstractCommands {
             LOGGER.error("The type " + type + " was not found.");
             return;
         }
-
-        // handle events
-        MCREvent evt = new MCREvent(MCREvent.OBJECT_TYPE, MCREvent.LISTIDS_EVENT);
-        evt.put("objectType", type);
-        MCREventManager.instance().handleEvent(evt);
-        List<String> ar = (List<String>) evt.get("objectIDs");
-        if ((ar == null) || (ar.size() == 0)) {
+        List<String> ar = (List<String>) MCRXMLTableManager.instance().retrieveAllIDs(type);
+        if (ar.size() == 0) {
             LOGGER.warn("No ID's was found for type " + type + ".");
             return;
         }
