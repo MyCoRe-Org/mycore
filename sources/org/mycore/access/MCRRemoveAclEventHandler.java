@@ -28,6 +28,7 @@ import org.apache.log4j.Logger;
 
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandlerBase;
+import org.mycore.datamodel.classifications.MCRClassification;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRObject;
@@ -37,11 +38,27 @@ import org.mycore.datamodel.metadata.MCRObject;
  * MCRObjects.
  * 
  * @author Thomas Scheffler (yagee)
+ * @author Jens Kupferschmidt
  * @version $Revision$ $Date$
  */
 public class MCRRemoveAclEventHandler extends MCREventHandlerBase {
 
     private static final Logger LOGGER = Logger.getLogger(MCRRemoveAclEventHandler.class);
+
+    protected void handleClassificationCreated(MCREvent evt, MCRClassification obj) {
+        handleAddOrModify(obj);
+    }
+
+    protected void handleClassificationUpdated(MCREvent evt, MCRClassification obj) {
+        handleAddOrModify(obj);
+    }
+
+    protected void handleClassificationDeleted(MCREvent evt, MCRClassification obj) {
+        handleDelete(obj);
+    }
+
+    protected void handleClassificationRepaired(MCREvent evt, MCRClassification obj) {
+    }
 
     protected void handleObjectCreated(MCREvent evt, MCRObject obj) {
         handleAddOrModify(obj);
@@ -71,6 +88,24 @@ public class MCRRemoveAclEventHandler extends MCREventHandlerBase {
     }
 
     protected void handleDerivateRepaired(MCREvent evt, MCRDerivate der) {
+    }
+
+    private void handleAddOrModify(MCRClassification base) {
+        long start = System.currentTimeMillis();
+        int rulesize = base.getService().getRulesSize();
+        while (0 < rulesize) {
+            base.getService().removeRule(0);
+            rulesize--;
+        }
+        long diff = System.currentTimeMillis() - start;
+        LOGGER.debug("event handled in " + diff);
+    }
+
+    private void handleDelete(MCRClassification base) {
+        long start = System.currentTimeMillis();
+        MCRAccessManager.removeAllRules(base.getId());
+        long diff = System.currentTimeMillis() - start;
+        LOGGER.debug("event handled in " + diff);
     }
 
     private void handleAddOrModify(MCRBase base) {

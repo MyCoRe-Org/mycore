@@ -73,6 +73,9 @@ public class MCRClassificationCommands extends MCRAbstractCommands {
         com = new MCRCommand("save classification {0} to {1}", "org.mycore.frontend.cli.MCRClassificationCommands.save String String", "The command store the classification with MCRObjectID {0} to the file with name {1}.");
         command.add(com);
 
+        com = new MCRCommand("save all classifications to {0}", "org.mycore.frontend.cli.MCRClassificationCommands.saveAll String", "The command store all classifications to the directory with name {0}.");
+        command.add(com);
+
         com = new MCRCommand("repair all classifications", "org.mycore.frontend.cli.MCRClassificationCommands.repairAll", "The command repair all classifications in SQL tables with BLOB data from XML table.");
         command.add(com);
     }
@@ -102,7 +105,7 @@ public class MCRClassificationCommands extends MCRAbstractCommands {
      * 
      * @param directory
      *            the directory containing the XML files
-     * @throws MCRActiveLinkException 
+     * @throws MCRActiveLinkException
      */
     public static void loadFromDirectory(String directory) throws MCRActiveLinkException {
         processFromDirectory(directory, false);
@@ -113,7 +116,7 @@ public class MCRClassificationCommands extends MCRAbstractCommands {
      * 
      * @param directory
      *            the directory containing the XML files
-     * @throws MCRActiveLinkException 
+     * @throws MCRActiveLinkException
      */
     public static void updateFromDirectory(String directory) throws MCRActiveLinkException {
         processFromDirectory(directory, true);
@@ -127,7 +130,7 @@ public class MCRClassificationCommands extends MCRAbstractCommands {
      * @param update
      *            if true, classification will be updated, else Classification
      *            is created
-     * @throws MCRActiveLinkException 
+     * @throws MCRActiveLinkException
      */
     private static void processFromDirectory(String directory, boolean update) throws MCRActiveLinkException {
         File dir = new File(directory);
@@ -166,7 +169,7 @@ public class MCRClassificationCommands extends MCRAbstractCommands {
      * 
      * @param file
      *            the location of the xml file
-     * @throws MCRActiveLinkException 
+     * @throws MCRActiveLinkException
      */
     public static boolean loadFromFile(String file) throws MCRActiveLinkException {
         return processFromFile(new File(file), false);
@@ -177,7 +180,7 @@ public class MCRClassificationCommands extends MCRAbstractCommands {
      * 
      * @param file
      *            the location of the xml file
-     * @throws MCRActiveLinkException 
+     * @throws MCRActiveLinkException
      */
     public static boolean updateFromFile(String file) throws MCRActiveLinkException {
         return processFromFile(new File(file), true);
@@ -191,7 +194,7 @@ public class MCRClassificationCommands extends MCRAbstractCommands {
      * @param update
      *            if true, classification will be updated, else classification
      *            is created
-     * @throws MCRActiveLinkException 
+     * @throws MCRActiveLinkException
      */
     private static boolean processFromFile(File file, boolean update) throws MCRActiveLinkException {
         if (!file.getName().endsWith(".xml")) {
@@ -229,7 +232,7 @@ public class MCRClassificationCommands extends MCRAbstractCommands {
     }
 
     /**
-     * Save an MCRClassification.
+     * Save a MCRClassification.
      * 
      * @param ID
      *            the ID of the MCRClassification to be save.
@@ -258,7 +261,41 @@ public class MCRClassificationCommands extends MCRAbstractCommands {
     }
     
     /**
-     * The method read all classifications from the MCRXMLTableManager and repair the other SQL tables. If no ACL entry exist it set a default entry.
+     * Save all MCRClassifications.
+     * 
+     * @param dirname
+     *            the directory name to store all classifications
+     */
+    public static void saveAll(String dirname) {
+        String dname = "";
+        if (dirname.length() != 0) {
+        try {
+            File dir = new File(dirname);
+            if (!dir.exists()) {
+                dir.mkdir();
+            }
+            if (!dir.exists()) {
+                LOGGER.error("Can't find or create directory "+dirname);
+                return;
+            } else {
+                dname = dirname+File.separator;
+            }
+        } catch (Exception e) {
+            LOGGER.error("Can't find or create directory "+dirname);
+            return;
+        }}
+
+        List li = MCRXMLTableManager.instance().retrieveAllIDs("class");
+        for (int i = 0; i < li.size();i++) {
+            String id = (String)li.get(i);
+            save(id,dname+id+".xml");
+        }
+    }
+    
+    /**
+     * The method read all classifications from the MCRXMLTableManager and
+     * repair the other SQL tables. If no ACL entry exist it set a default
+     * entry.
      */
     public static void repairAll() {
         MCRXMLTableManager TM = MCRXMLTableManager.instance();

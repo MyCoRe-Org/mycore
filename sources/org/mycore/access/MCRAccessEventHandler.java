@@ -395,7 +395,6 @@ public class MCRAccessEventHandler extends MCREventHandlerBase {
         // add default ACLs if it does not exist
         // this is only for the migartion process
         List li = AI.getPermissionsForID(base.getId().getId());
-        System.out.println("***" + li.size());
         if (li.size() == 0) {
             // Read default XML definition
             try {

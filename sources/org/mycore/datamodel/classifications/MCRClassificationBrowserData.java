@@ -387,7 +387,9 @@ public class MCRClassificationBrowserData {
         Collections.sort(ids);
 
         for (String id : ids) {
+System.out.println("WWWWWWWWWWWWWWWWWWW"+id);
             Classification classif = getClassificationPool().getClassificationAsPojo(id);
+System.out.println("WWWWWWWWWWWWWWWWWWW"+classif);
             Element cli = getBrowseElement(classif);
             String sessionID=MCRSessionMgr.getCurrentSession().getID();
             // set browser type

@@ -62,7 +62,7 @@ import org.mycore.datamodel.metadata.MCRXMLTableManager;
  * This class implements all methods for a classification and extended the
  * MCRClassificationObject class.
  * 
- * @author Frank Luetzenkirchen 
+ * @author Frank Luetzenkirchen
  * @author Jens Kupferschmidt
  * @author Thomas Scheffler (yagee)
  * @version $Revision$ $Date$
@@ -80,9 +80,9 @@ public class MCRClassification {
     private static final String OBJ_COUNT_ATTR = "counter";
 
     private static final String ID_ATTR = "ID";
-    
+
     private static MCRXMLTableManager TM = MCRXMLTableManager.instance();
-    
+
     /**
      * The constructor
      */
@@ -233,9 +233,11 @@ public class MCRClassification {
             elmcat.setAttribute("ID", item.ID);
             for (int j = 0; j < item.getSize(); j++)
                 elmcat.addContent(item.getJDOMElement(j));
-            Element elmurl = new Element("URL");
-            elmurl.setAttribute("href", item.getURL(), XLINK_NAMESPACE);
-            elmcat.addContent(elmurl);
+            if (item.getURL().length() != 0) {
+                Element elmurl = new Element("URL");
+                elmurl.setAttribute("href", item.getURL(), XLINK_NAMESPACE);
+                elmcat.addContent(elmurl);
+            }
             last[i] = elmcat;
         }
         int deep = 0;
@@ -256,7 +258,7 @@ public class MCRClassification {
                 parentindex[deep] = i;
                 continue;
             }
-            for (int j=0;j<=deep;j++) {
+            for (int j = 0; j <= deep; j++) {
                 if (parent[j].equals(item.parentID)) {
                     deep = j;
                     last[parentindex[deep]].addContent(last[i]);
@@ -292,19 +294,6 @@ public class MCRClassification {
         }
         if (mcr_service.getDate("modifydate") == null) {
             mcr_service.setDate("modifydate");
-        }
-
-        // build the XML byte array
-        /*
-         * XMLOutputter xout = new XMLOutputter(Format.getRawFormat());
-         * ByteArrayOutputStream bout = new ByteArrayOutputStream(); try {
-         * xout.output(createXML(), bout); } catch (IOException e) { throw new
-         * MCRException("Ooops", e); }
-         */
-        try {
-            MCRUtils.writeJDOMToSysout(createXML());
-        } catch (Exception e) {
-            e.printStackTrace();
         }
 
         // Call event handler
@@ -772,10 +761,15 @@ public class MCRClassification {
     public final void updateInDatastore() throws MCRActiveLinkException {
         boolean realUpdate = false;
         Hashtable oldLinks = new Hashtable();
+        if (mcr_service.getDate("createdate") == null) {
+            mcr_service.setDate("createdate");
+        }
+        mcr_service.setDate("modifydate");
         Document jdom = createXML();
+        boolean exist = existInDatastore(getId());
 
         // exist the object?
-        if (existInDatastore(getId())) {
+        if (exist) {
             // save old classification for later reference
             Document oldClass = MCRClassification.receiveClassificationAsJDOM(getId().getId());
 
@@ -835,34 +829,21 @@ public class MCRClassification {
             realUpdate = true;
         }
 
-        // old part 2
-        cl = new MCRClassificationItem(getId().getId());
-        cl.delete(cl.getClassificationID());
-        setFromJDOM(jdom);
-        if (mcr_service.getDate("createdate") == null) {
-            mcr_service.setDate("createdate");
-        }
-        mcr_service.setDate("modifydate");
-
-        XMLOutputter xout = new XMLOutputter(Format.getRawFormat());
-        ByteArrayOutputStream bout = new ByteArrayOutputStream();
-
-        try {
-            xout.output(jdom, bout);
-        } catch (IOException e) {
-            throw new MCRException("Ooops", e);
-        }
-
-        MCRXMLTableManager mgr = MCRXMLTableManager.instance();
-
-        if (mgr.exist(getId())) {
-            mgr.update(getId(), bout.toByteArray());
+        // Call event handler
+        MCREvent evt = null;
+        if (exist) {
+            evt = new MCREvent(MCREvent.CLASS_TYPE, MCREvent.UPDATE_EVENT);
         } else {
-            mgr.create(getId(), bout.toByteArray());
+            evt = new MCREvent(MCREvent.CLASS_TYPE, MCREvent.CREATE_EVENT);
         }
+        evt.put("class", this);
+        MCREventManager.instance().handleEvent(evt);
 
+        // store in SQL tables
+        if (exist) {
+            cl.delete();
+        }
         cl.create();
-
         for (int i = 0; i < cat.size(); i++) {
             ((MCRCategoryItem) cat.get(i)).create();
         }

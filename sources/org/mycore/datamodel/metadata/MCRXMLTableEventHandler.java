@@ -63,7 +63,8 @@ public class MCRXMLTableEventHandler extends MCREventHandlerBase {
      */
     protected final void handleClassificationUpdated(MCREvent evt, MCRClassification obj) {
         mcr_xmltable.delete(obj.getId());
-        handleClassificationCreated(evt, obj);
+        org.jdom.Document doc = obj.createXML();
+        mcr_xmltable.create(obj.getId(), doc);
     }
 
     /**
@@ -77,37 +78,6 @@ public class MCRXMLTableEventHandler extends MCREventHandlerBase {
      */
     protected final void handleClassificationDeleted(MCREvent evt, MCRClassification obj) {
         mcr_xmltable.delete(obj.getId());
-    }
-
-    /**
-     * This method receive the XML data from SQL table data via
-     * MCRXMLTableManager and put it in the MCREvent instance.
-     * 
-     * @param evt
-     *            the event that occured
-     * @param objid
-     *            the MCRObjectID that caused the event
-     */
-    protected final void handleClassificationReceived(MCREvent evt, MCRObjectID objid) {
-        byte[] xml = mcr_xmltable.retrieve(objid);
-        if (xml == null)
-            return;
-        evt.put("xml", xml);
-    }
-
-    /**
-     * This method check exist of the XML data from SQL table data via
-     * MCRXMLTableManager and put the boolean result in the MCREvent instance as
-     * entry 'exist'.
-     * 
-     * @param evt
-     *            the event that occured
-     * @param objid
-     *            the MCRObjectID that caused the event
-     */
-    protected final void handleClassificationExist(MCREvent evt, MCRObjectID objid) {
-        boolean res = mcr_xmltable.exist(objid);
-        evt.put("exist", Boolean.toString(res));
     }
 
     /**
@@ -134,7 +104,8 @@ public class MCRXMLTableEventHandler extends MCREventHandlerBase {
      */
     protected final void handleObjectUpdated(MCREvent evt, MCRObject obj) {
         mcr_xmltable.delete(obj.getId());
-        handleObjectCreated(evt, obj);
+        org.jdom.Document doc = obj.createXML();
+        mcr_xmltable.create(obj.getId(), doc);
     }
 
     /**
@@ -148,52 +119,6 @@ public class MCRXMLTableEventHandler extends MCREventHandlerBase {
      */
     protected final void handleObjectDeleted(MCREvent evt, MCRObject obj) {
         mcr_xmltable.delete(obj.getId());
-    }
-
-    /**
-     * This method receive the XML data from SQL table data via
-     * MCRXMLTableManager and put it in the MCREvent instance.
-     * 
-     * @param evt
-     *            the event that occured
-     * @param objid
-     *            the MCRObjectID that caused the event
-     */
-    protected final void handleObjectReceived(MCREvent evt, MCRObjectID objid) {
-        byte[] xml = mcr_xmltable.retrieve(objid);
-        if (xml == null)
-            return;
-        evt.put("xml", xml);
-    }
-
-    /**
-     * This method check exist of the XML data from SQL table data via
-     * MCRXMLTableManager and put the boolean result in the MCREvent instance as
-     * entry 'exist'.
-     * 
-     * @param evt
-     *            the event that occured
-     * @param objid
-     *            the MCRObjectID that caused the event
-     */
-    protected final void handleObjectExist(MCREvent evt, MCRObjectID objid) {
-        boolean res = mcr_xmltable.exist(objid);
-        evt.put("exist", Boolean.toString(res));
-    }
-
-    /**
-     * This method put all ID's of the XML data from SQL table data via
-     * MCRXMLTableManager in an List&lt;String&gt; and put it in the MCREvent instance as
-     * entry 'objectIDs'.
-     * 
-     * @param evt
-     *            the event that occured
-     * @param objtype
-     *            the MCR type that caused the event
-     */
-    protected final void handleObjectListIDs(MCREvent evt, String objtype) {
-        List<String> ar = mcr_xmltable.retrieveAllIDs(objtype);
-        evt.put("objectIDs", ar);
     }
 
     /**
@@ -220,7 +145,8 @@ public class MCRXMLTableEventHandler extends MCREventHandlerBase {
      */
     protected final void handleDerivateUpdated(MCREvent evt, MCRDerivate der) {
         mcr_xmltable.delete(der.getId());
-        handleDerivateCreated(evt, der);
+        org.jdom.Document doc = der.createXML();
+        mcr_xmltable.create(der.getId(), doc);
     }
 
     /**
@@ -234,51 +160,6 @@ public class MCRXMLTableEventHandler extends MCREventHandlerBase {
      */
     protected final void handleDerivateDeleted(MCREvent evt, MCRDerivate der) {
         mcr_xmltable.delete(der.getId());
-    }
-
-    /**
-     * This method receive the XML data from SQL table data via
-     * MCRXMLTableManager and put it in the MCREvent instance.
-     * 
-     * @param evt
-     *            the event that occured
-     * @param objid
-     *            the MCRObjectID that caused the event
-     */
-    protected final void handleDerivateReceived(MCREvent evt, MCRObjectID objid) {
-        byte[] xml = mcr_xmltable.retrieve(objid);
-        if (xml == null)
-            return;
-        evt.put("xml", xml);
-    }
-
-    /**
-     * This method check exist of the XML data from SQL table data via
-     * MCRXMLTableManager and put the boolean result in the MCREvent instance.
-     * 
-     * @param evt
-     *            the event that occured
-     * @param objid
-     *            the MCRObjectID that caused the event
-     */
-    protected final void handleDerivateExist(MCREvent evt, MCRObjectID objid) {
-        boolean res = mcr_xmltable.exist(objid);
-        evt.put("exist", Boolean.toString(res));
-    }
-
-    /**
-     * This method put all ID's of the XML data from SQL table data via
-     * MCRXMLTableManager in an List&lt;String&gt; and put it in the MCREvent instance as
-     * entry 'derivateIDs'.
-     * 
-     * @param evt
-     *            the event that occured
-     * @param dertype
-     *            the MCR type that caused the event
-     */
-    protected final void handleDerivateListIDs(MCREvent evt, String dertype) {
-        List<String> ar = mcr_xmltable.retrieveAllIDs(dertype);
-        evt.put("derivateIDs", ar);
     }
 
 }
