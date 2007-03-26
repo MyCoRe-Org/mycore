@@ -67,6 +67,9 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
     /** The ACL interface */
     private static final MCRAccessInterface ACCESS_IMPL = (MCRAccessInterface) MCRConfiguration.instance().getInstanceOf("MCR.Access_class_name", MCRAccessBaseImpl.class.getName());
 
+    /** Default transformer script */
+    public static final String DEFAULT_TRANSFORMER = "save-derivate.xsl";
+
     /**
      * The constructor.
      */
@@ -96,10 +99,10 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
         com = new MCRCommand("update all derivates from directory {0}", "org.mycore.frontend.cli.MCRDerivateCommands.updateFromDirectory String", "The command update all derivates form the directory {0} in the system.");
         command.add(com);
 
-        com = new MCRCommand("export derivate {0} to directory {1} with {2}", "org.mycore.frontend.cli.MCRDerivateCommands.export String String String", "The command store the derivate with the MCRObjectID {0} to the directory {1} with the stylesheet mcr_{2}-object.xsl. For {2} save is the default.");
+        com = new MCRCommand("export derivate {0} to directory {1} with {2}", "org.mycore.frontend.cli.MCRDerivateCommands.export String String String", "The command store the derivate with the MCRObjectID {0} to the directory {1} with the stylesheet {2}-object.xsl. For {2} save is the default.");
         command.add(com);
 
-        com = new MCRCommand("export derivate from {0} to {1} to directory {2} with {3}", "org.mycore.frontend.cli.MCRDerivateCommands.export String String String String", "The command store all derivates with MCRObjectID's between {0} and {1} to the directory {2} with the stylesheet mcr_{3}-object.xsl. For {3} save is the default.");
+        com = new MCRCommand("export derivate from {0} to {1} to directory {2} with {3}", "org.mycore.frontend.cli.MCRDerivateCommands.export String String String String", "The command store all derivates with MCRObjectID's between {0} and {1} to the directory {2} with the stylesheet {3}-object.xsl. For {3} save is the default.");
         command.add(com);
 
         com = new MCRCommand("export all derivates to directory {0} with {1}", "org.mycore.frontend.cli.MCRDerivateCommands.exportAllDerivates String String", "Stores all derivates to the directory {0} with the stylesheet mcr_{1}-derivate.xsl. For {1} save is the default.");
@@ -615,9 +618,9 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
      * @throws TransformerFactoryConfigurationError
      */
     private static Transformer getTransformer(String style) throws TransformerFactoryConfigurationError {
-        String xslfile = "mcr_save-derivate.xsl";
+        String xslfile = DEFAULT_TRANSFORMER;
         if ((style != null) && (style.trim().length() != 0)) {
-            xslfile = "mcr_" + style + "-derivate.xsl";
+            xslfile = style + "-derivate.xsl";
         }
         Transformer trans = null;
 

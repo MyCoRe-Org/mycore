@@ -25,11 +25,20 @@ package org.mycore.frontend.cli;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
+
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.TransformerFactoryConfigurationError;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
 
 import org.apache.log4j.Logger;
 import org.mycore.common.MCRException;
+import org.mycore.common.xml.MCRURIResolver;
+import org.mycore.common.xml.MCRXMLHelper;
 import org.mycore.datamodel.classifications.MCRClassification;
 import org.mycore.datamodel.metadata.MCRActiveLinkException;
 import org.mycore.datamodel.metadata.MCRObjectID;
@@ -46,6 +55,9 @@ import org.mycore.datamodel.metadata.MCRXMLTableManager;
 public class MCRClassificationCommands extends MCRAbstractCommands {
     /** The logger */
     private static Logger LOGGER = Logger.getLogger(MCRClassificationCommands.class.getName());
+
+    /** Default transformer script */
+    public static final String DEFAULT_TRANSFORMER = "save-classification.xsl";
 
     /**
      * The empty constructor.
@@ -70,10 +82,10 @@ public class MCRClassificationCommands extends MCRAbstractCommands {
         com = new MCRCommand("update all classifications from directory {0}", "org.mycore.frontend.cli.MCRClassificationCommands.updateFromDirectory String", "The command update all classifications in the directory {0} to the system.");
         command.add(com);
 
-        com = new MCRCommand("save classification {0} to {1}", "org.mycore.frontend.cli.MCRClassificationCommands.save String String", "The command store the classification with MCRObjectID {0} to the file with name {1}.");
+        com = new MCRCommand("export classification {0} to {1} with {2}", "org.mycore.frontend.cli.MCRClassificationCommands.export String String String", "The command store the classification with MCRObjectID {0} to the file named {1} with the stylesheet {2}-object.xsl. For {2} save is the default..");
         command.add(com);
 
-        com = new MCRCommand("save all classifications to {0}", "org.mycore.frontend.cli.MCRClassificationCommands.saveAll String", "The command store all classifications to the directory with name {0}.");
+        com = new MCRCommand("export all classifications to {0} with {1}", "org.mycore.frontend.cli.MCRClassificationCommands.exportAll String String", "The command store all classifications to the directory with name {0} with the stylesheet {1}-object.xsl. For {1} save is the default.");
         command.add(com);
 
         com = new MCRCommand("repair all classifications", "org.mycore.frontend.cli.MCRClassificationCommands.repairAll", "The command repair all classifications in SQL tables with BLOB data from XML table.");
@@ -238,60 +250,106 @@ public class MCRClassificationCommands extends MCRAbstractCommands {
      *            the ID of the MCRClassification to be save.
      * @param filename
      *            the filename to store the classification
+     * @param style
+     *            the name part of the stylesheet like <em>style</em>-classification.xsl
+     * @return false if an error was occured, else true
      */
-    public static void save(String ID, String filename) {
+    public static boolean export(String ID, String dirname, String style) {
+        String dname = "";
+        if (dirname.length() != 0) {
+            try {
+                File dir = new File(dirname);
+                if (!dir.isDirectory()) {
+                    dir.mkdir();
+                }
+                if (!dir.isDirectory()) {
+                    LOGGER.error("Can't find or create directory " + dirname);
+                    LOGGER.info("");
+                   return false;
+                } else {
+                    dname = dirname;
+                }
+            } catch (Exception e) {
+                LOGGER.error("Can't find or create directory " + dirname);
+                LOGGER.info("");
+                return false;
+            }
+        }
         MCRObjectID mcr_id = new MCRObjectID(ID);
         MCRClassification cl = new MCRClassification();
         byte[] xml = cl.receiveClassificationAsXML(mcr_id.getId());
-
+        
         try {
-            FileOutputStream out = new FileOutputStream(filename);
-            out.write(xml);
-            out.flush();
-        } catch (IOException ex) {
+            Transformer trans = getTransformer(style);
+            File xmlOutput = new File(dname, ID + ".xml");
+            FileOutputStream out = new FileOutputStream(xmlOutput);
+            if (trans != null) {
+                StreamResult sr = new StreamResult(out);
+                trans.transform(new org.jdom.transform.JDOMSource(MCRXMLHelper.parseXML(xml, false)), sr);
+            } else {
+                out.write(xml);
+                out.flush();
+            }
+            LOGGER.info("Classifcation " + ID + " saved to " + xmlOutput.getCanonicalPath() + ".");
+            LOGGER.info("");
+        } catch (Exception ex) {
             LOGGER.error(ex.getMessage());
-            LOGGER.error("Exception while store to file " + filename);
-            LOGGER.error("");
-
-            return;
+            LOGGER.error("Can't save " + ID);
+            LOGGER.info("");
+            return false;
         }
-
-        LOGGER.info("Classification " + mcr_id.getId() + " stored under " + filename + ".");
-        LOGGER.info("");
+        return true;
     }
-    
+
     /**
      * Save all MCRClassifications.
      * 
      * @param dirname
      *            the directory name to store all classifications
+     * @param style
+     *            the name part of the stylesheet like <em>style</em>-classification.xsl
+     * @return false if an error was occured, else true
      */
-    public static void saveAll(String dirname) {
-        String dname = "";
-        if (dirname.length() != 0) {
-        try {
-            File dir = new File(dirname);
-            if (!dir.exists()) {
-                dir.mkdir();
-            }
-            if (!dir.exists()) {
-                LOGGER.error("Can't find or create directory "+dirname);
-                return;
-            } else {
-                dname = dirname+File.separator;
-            }
-        } catch (Exception e) {
-            LOGGER.error("Can't find or create directory "+dirname);
-            return;
-        }}
-
+    public static boolean exportAll(String dirname, String style) {
         List li = MCRXMLTableManager.instance().retrieveAllIDs("class");
-        for (int i = 0; i < li.size();i++) {
-            String id = (String)li.get(i);
-            save(id,dname+id+".xml");
+        boolean ret = false;
+        for (int i = 0; i < li.size(); i++) {
+            String id = (String) li.get(i);
+            ret = ret & export(id, dirname, style);
         }
+        return ret;
+    } 
+
+    /**
+     * The method search for a stylesheet mcr_<em>style</em>_object.xsl and
+     * build the transformer. Default is <em>mcr_save-object.xsl</em>.
+     * 
+     * @param style
+     *            the style attribute for the transformer stylesheet
+     * @return the transformer
+     * @throws TransformerFactoryConfigurationError
+     * @throws TransformerConfigurationException
+     */
+    private static final Transformer getTransformer(String style) throws TransformerFactoryConfigurationError, TransformerConfigurationException {
+        String xslfile = DEFAULT_TRANSFORMER;
+        if ((style != null) && (style.trim().length() != 0)) {
+            xslfile = style + "-classification.xsl";
+        }
+        Transformer trans = null;
+
+        InputStream in = MCRClassificationCommands.class.getResourceAsStream("/" + xslfile);
+        if (in == null) {
+            in = MCRClassificationCommands.class.getResourceAsStream(DEFAULT_TRANSFORMER);
+        }
+        if (in != null) {
+            StreamSource source = new StreamSource(in);
+            TransformerFactory transfakt = TransformerFactory.newInstance();
+            transfakt.setURIResolver(MCRURIResolver.instance());
+            trans = transfakt.newTransformer(source);
+        }
+        return trans;
     }
-    
+
     /**
      * The method read all classifications from the MCRXMLTableManager and
      * repair the other SQL tables. If no ACL entry exist it set a default
@@ -299,10 +357,10 @@ public class MCRClassificationCommands extends MCRAbstractCommands {
      */
     public static void repairAll() {
         MCRXMLTableManager TM = MCRXMLTableManager.instance();
-        List <String> list = TM.retrieveAllIDs("class");
-        for (int i=0;i<list.size();i++) {
-            String mcrid =  (String)list.get(i);
-            byte [] xml = TM.retrieve(new MCRObjectID(mcrid));
+        List<String> list = TM.retrieveAllIDs("class");
+        for (int i = 0; i < list.size(); i++) {
+            String mcrid = (String) list.get(i);
+            byte[] xml = TM.retrieve(new MCRObjectID(mcrid));
             MCRClassification cl = new MCRClassification();
             cl.setFromXML(xml);
             cl.repairInDatastore();

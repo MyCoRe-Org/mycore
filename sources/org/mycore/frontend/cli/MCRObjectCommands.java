@@ -57,7 +57,11 @@ import org.mycore.datamodel.metadata.MCRXMLTableManager;
  * @version $Revision$ $Date$
  */
 public class MCRObjectCommands extends MCRAbstractCommands {
+    /** The logger */
     private static Logger LOGGER = Logger.getLogger(MCRObjectCommands.class.getName());
+
+    /** Default transformer script */
+    public static final String DEFAULT_TRANSFORMER = "save-object.xsl";
 
     /**
      * The empty constructor.
@@ -96,11 +100,11 @@ public class MCRObjectCommands extends MCRAbstractCommands {
 
         com = new MCRCommand("export object from {0} to {1} to directory {2} with {3}",
                 "org.mycore.frontend.cli.MCRObjectCommands.export String String String String",
-                "Stores all MCRObjects with MCRObjectID's between {0} and {1} to the directory {2} with the stylesheet mcr_{3}-object.xsl. For {3} save is the default.");
+                "Stores all MCRObjects with MCRObjectID's between {0} and {1} to the directory {2} with the stylesheet {3}-object.xsl. For {3} save is the default.");
         command.add(com);
 
         com = new MCRCommand("export object {0} to directory {1} with {2}", "org.mycore.frontend.cli.MCRObjectCommands.export String String String",
-                "Stores the MCRObject with the MCRObjectID {0} to the directory {1} with the stylesheet mcr_{2}-object.xsl. For {2} save is the default.");
+                "Stores the MCRObject with the MCRObjectID {0} to the directory {1} with the stylesheet {2}-object.xsl. For {2} save is the default.");
         command.add(com);
 
         com = new MCRCommand("export all objects of type {0} to directory {1} with {2}",
@@ -530,15 +534,15 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      * @throws TransformerConfigurationException
      */
     private static final Transformer getTransformer(String style) throws TransformerFactoryConfigurationError, TransformerConfigurationException {
-        String xslfile = "mcr_save-object.xsl";
+        String xslfile = DEFAULT_TRANSFORMER;
         if ((style != null) && (style.trim().length() != 0)) {
-            xslfile = "mcr_" + style + "-object.xsl";
+            xslfile = style + "-object.xsl";
         }
         Transformer trans = null;
 
         InputStream in = MCRObjectCommands.class.getResourceAsStream("/" + xslfile);
         if (in == null) {
-            in = MCRObjectCommands.class.getResourceAsStream("/mcr_save-object.xsl");
+            in = MCRObjectCommands.class.getResourceAsStream(DEFAULT_TRANSFORMER);
         }
         if (in != null) {
             StreamSource source = new StreamSource(in);
@@ -596,6 +600,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
             out.flush();
         }
         LOGGER.info("Object " + nid.toString() + " saved to " + xmlOutput.getCanonicalPath() + ".");
+        LOGGER.info("");
         return true;
     }
 
