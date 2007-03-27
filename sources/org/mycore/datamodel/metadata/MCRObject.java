@@ -57,11 +57,11 @@ final public class MCRObject extends MCRBase {
     private MCRObjectMetadata mcr_metadata = null;
 
     /**
-     * This is the constructor of the MCRObject class. It make an instance of
+     * This is the constructor of the MCRObject class. It creates an instance of
      * the parser class and the metadata class. <br>
-     * The constructor reads the following informations from the property file:
+     * The constructor reads the following information from the property file:
      * <ul>
-     * <li>MCR.parser_class_name</li>
+     * <li>MCR.XMLParser.Class</li>
      * </ul>
      * 
      * @exception MCRException

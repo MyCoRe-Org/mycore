@@ -67,11 +67,11 @@ public class MCRParserXerces implements MCRParserInterface, ErrorHandler {
 
     /**
      * Constructor for the Xerces parser. Sets default validation flag as
-     * specified by the property MCR.parser_schema_validation in
+     * specified by the property MCR.XMLParser.ValidateSchema in
      * mycore.properties
      */
     public MCRParserXerces() {
-        FLAG_VALIDATION = MCRConfiguration.instance().getBoolean("MCR.parser_schema_validation", FLAG_VALIDATION);
+        FLAG_VALIDATION = MCRConfiguration.instance().getBoolean("MCR.XMLParser.ValidateSchema", FLAG_VALIDATION);
 
         builderValid = new SAXBuilder("org.apache.xerces.parsers.SAXParser", true);
         builderValid.setFeature(FEATURE_NAMESPACES, true);
