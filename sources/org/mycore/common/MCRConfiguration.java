@@ -180,29 +180,19 @@ public class MCRConfiguration {
      * every configuration file
      */
     protected Properties properties;
+    
+    /**
+     * List of deprecated properties with their new name
+     */
+    protected Properties depr;
 
     /**
      * Protected constructor to create the singleton instance
      */
     protected MCRConfiguration() {
         properties = new Properties();
-        reload(false);
-
-        Enumeration names = System.getProperties().propertyNames();
-
-        while (names.hasMoreElements()) {
-            String name = (String) (names.nextElement());
-
-            if (name.startsWith("MCR.")) {
-                String value = System.getProperty(name);
-
-                if (value != null) {
-                    set(name, value);
-                }
-            }
-        }
-
-        configureLogging();
+        depr = new Properties();
+        reload(true);
     }
 
     /**
@@ -223,15 +213,29 @@ public class MCRConfiguration {
     public void reload(boolean clear) {
         if (clear) {
             properties.clear();
+            depr.clear();
         }
 
         String fn = System.getProperty("MCR.configuration.file", "mycore.properties");
         loadFromFile(fn);
-        substituteReferences();
+
+        Enumeration names = System.getProperties().propertyNames();
+        while (names.hasMoreElements()) {
+            String name = (String) (names.nextElement());
+            if (name.startsWith("MCR.")) {
+                String value = System.getProperty(name);
+                if (value != null) {
+                    set(name, value);
+                }
+            }
+        }
 
         if (clear) {
             configureLogging();
         }
+
+        substituteReferences();
+        substituteDeprecatedProperties();
     }
 
     /**
@@ -263,6 +267,38 @@ public class MCRConfiguration {
                 }
             }
         } while (found);
+    }
+    
+    /**
+     * Loads file deprecated.properties that can be used to rename old properties.
+     * The file contains a list of renamed properties: OldPropertyName=NewPropertyName.
+     * The old property is automatically replaced with the new name, so that
+     * existing mycore.properties files must not be migrated immediately. Users get a
+     * warning when their configuration still contains deprecated properties. 
+     */
+    private void substituteDeprecatedProperties()
+    {
+        InputStream in = this.getClass().getResourceAsStream("/deprecated.properties");
+        if (in == null)
+            return;
+        try {
+            depr.load(in);
+            in.close();
+        } catch (Exception exc) {
+            throw new MCRConfigurationException("Could not load configuration file deprecated.properties", exc);
+        }
+
+        Enumeration names = depr.keys();
+        while (names.hasMoreElements()) {
+            String deprecatedName = (String) (names.nextElement());
+            if (properties.containsKey(deprecatedName)) {
+                String newName = depr.getProperty(deprecatedName);
+                String msg = "DEPRECATED: User should rename property " + deprecatedName + " to " + newName;
+                Logger.getLogger(this.getClass()).warn(msg);
+                if (!properties.containsKey(newName))
+                    properties.put(newName, properties.get(deprecatedName));
+            }
+        }
     }
 
     /**
@@ -302,7 +338,7 @@ public class MCRConfiguration {
             properties.load(in);
             in.close();
         } catch (Exception exc) {
-            throw new MCRConfigurationException("Exception while loading configuration file " + filename, exc);
+            throw new MCRConfigurationException("Could not load configuration file " + filename, exc);
         }
 
         String include = getString("MCR.configuration.include", null);
@@ -379,7 +415,7 @@ public class MCRConfiguration {
             PropertyConfigurator.configure(prop);
             for (String name : warn) {
                 Logger logger = Logger.getLogger(this.getClass());
-                logger.warn("User, you should rename property " + name + " to " + name.substring(4));
+                logger.warn("DEPRECATED: User should rename property " + name + " to " + name.substring(4));
             }
         }
     }
@@ -396,18 +432,7 @@ public class MCRConfiguration {
      *             instantiated
      */
     public Object getInstanceOf(String name, String defaultname) throws MCRConfigurationException {
-        String classname = properties.getProperty(name);
-
-        if (classname == null) {
-            if (defaultname != null) {
-                classname = defaultname;
-            }
-
-            if (classname == null) {
-                throw new MCRConfigurationException("Configuration property " + name + " is not set!");
-            }
-        }
-
+        String classname = getString(name,defaultname);
         Class cl;
 
         Logger.getLogger(this.getClass()).debug("Loading Class: " + classname);
@@ -531,7 +556,7 @@ public class MCRConfiguration {
      *             if the property with this name is not set
      */
     public String getString(String name) {
-        String value = properties.getProperty(name);
+        String value = getString(name, null);
 
         if (value == null) {
             throw new MCRConfigurationException("Configuration property " + name + " is not set");
@@ -551,8 +576,16 @@ public class MCRConfiguration {
      * @return the value of the configuration property as a String
      */
     public String getString(String name, String defaultValue) {
+        if (depr.containsKey(name)) {
+            String msg = "DEPRECATED: Developer should rename property " + name + " to " + depr.getProperty(name);
+            Logger.getLogger(this.getClass()).warn(msg);
+        }
+
         String value = properties.getProperty(name);
-        return ((value == null) ? defaultValue : value);
+        if ((value == null) && depr.containsKey(name))
+            value = properties.getProperty(depr.getProperty(name));
+
+        return (value == null ? defaultValue : value);
     }
 
     /**
@@ -762,8 +795,6 @@ public class MCRConfiguration {
      *            null</CODE>
      */
     public void set(String name, String value) {
-        MCRArgumentChecker.ensureNotEmpty(name, "name");
-
         if (value == null) {
             properties.remove(name);
         } else {
@@ -850,7 +881,6 @@ public class MCRConfiguration {
      *            the PrintStream to list the configuration properties on
      */
     public void list(PrintStream out) {
-        MCRArgumentChecker.ensureNotNull(out, "out");
         properties.list(out);
     }
 
@@ -864,7 +894,6 @@ public class MCRConfiguration {
      *            the PrintWriter to list the configuration properties on
      */
     public void list(PrintWriter out) {
-        MCRArgumentChecker.ensureNotNull(out, "out");
         properties.list(out);
     }
 
@@ -882,7 +911,6 @@ public class MCRConfiguration {
      *             </CODE>
      */
     public void store(OutputStream out, String header) throws IOException {
-        MCRArgumentChecker.ensureNotNull(out, "out");
         properties.store(out, header);
     }
 
