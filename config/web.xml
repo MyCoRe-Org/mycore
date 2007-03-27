@@ -1,8 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <web-app xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd" version="2.4">
+  xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd" version="2.4">
 
   <display-name>MyCoRe Application</display-name>
+
+  <!-- **************************************************************** -->
+  <!-- Servlets and mapping from MyCoRe kernel                          -->
+  <!-- **************************************************************** -->
 
   <listener>
     <listener-class>org.mycore.common.events.MCRServletContextListener</listener-class>
@@ -15,10 +19,6 @@
     <filter-name>UriResolverDebugFilter</filter-name>
     <filter-class>org.mycore.common.xml.MCRURIResolverFilter</filter-class>
   </filter>
-
-  <!-- **************************************************************** -->
-  <!-- Servlets and mapping from MyCoRe kernel                          -->
-  <!-- **************************************************************** -->
 
   <servlet id="FileNode">
     <servlet-name>MCRFileNodeServlet</servlet-name>
@@ -76,13 +76,6 @@
     <servlet-name>MCRLinkServlet</servlet-name>
     <servlet-class>org.mycore.frontend.servlets.MCRLinkServlet</servlet-class>
   </servlet>
-
-  <!-- uncomment for administration interface -->
-  <!-- <servlet id="MCRAdminServlet"> -->
-  <!--  <servlet-name>MCRAdminServlet</servlet-name> -->
-  <!--  <servlet-class>org.mycore.frontend.servlets.MCRAdminServlet</servlet-class> -->
-  <!--</servlet> -->
-  <!-- administration interface end -->
 
   <filter-mapping>
     <filter-name>UriResolverDebugFilter</filter-name>
@@ -163,7 +156,6 @@
     <servlet-name>MCRIndexServlet</servlet-name>
     <url-pattern>/index/*</url-pattern>
   </servlet-mapping>
-
   <servlet-mapping>
     <servlet-name>MCRObjectServlet</servlet-name>
     <url-pattern>/receive/*</url-pattern>
@@ -178,6 +170,10 @@
   </servlet-mapping>
 
   <!-- uncomment for administration interface -->
+  <!-- <servlet id="MCRAdminServlet"> -->
+  <!--  <servlet-name>MCRAdminServlet</servlet-name> -->
+  <!--  <servlet-class>org.mycore.frontend.servlets.MCRAdminServlet</servlet-class> -->
+  <!--</servlet> -->
   <!-- <servlet-mapping> -->
   <!--         <servlet-name>MCRAdminServlet</servlet-name> -->
   <!--         <url-pattern>/admin</url-pattern> -->
