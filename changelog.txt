@@ -23,6 +23,7 @@ Version 2.0 (Head)
 - new Classification editor with less database commits
 - Upgrade to FCK-Editor 2.4
 - compiles on Java 6
+- The file deprecated.properties contains a list of properties that should (but must not) be renamed
 
 Version 1.3
 ===========
