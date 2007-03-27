@@ -280,7 +280,6 @@ public class MCRConfiguration {
      *             if the file can not be loaded
      */
     private void loadFromFile(String filename) {
-        MCRArgumentChecker.ensureNotEmpty(filename, "filename");
         File mycoreProperties = new File(filename);
         InputStream in;
         if (mycoreProperties.canRead()) {
@@ -351,19 +350,25 @@ public class MCRConfiguration {
     }
 
     /**
-     * Configures Log4J based on the MCR.log4j properties
+     * Configures Log4J based on the log4j properties
      */
     public synchronized void configureLogging() {
         Properties prop = new Properties();
         Enumeration names = this.properties.propertyNames();
         boolean reconfigure = false;
+        java.util.List<String> warn = new java.util.ArrayList<String>();
 
         while (names.hasMoreElements()) {
             String name = (String) (names.nextElement());
-
+            if (!name.contains("log4j"))
+                continue;
+            String value = this.properties.getProperty(name);
             if (name.startsWith("MCR.log4j")) {
-                String value = this.properties.getProperty(name);
-                prop.setProperty(name.substring(4), value);
+                warn.add(name);
+                name = name.substring(4);
+            }
+            if (name.startsWith("log4j")) {
+                prop.setProperty(name, value);
                 reconfigure = true;
             }
         }
@@ -372,6 +377,10 @@ public class MCRConfiguration {
             System.out.println("MCRConfiguration reconfiguring Log4J logging...");
             org.apache.log4j.LogManager.resetConfiguration();
             PropertyConfigurator.configure(prop);
+            for (String name : warn) {
+                Logger logger = Logger.getLogger(this.getClass());
+                logger.warn("User, you should rename property " + name + " to " + name.substring(4));
+            }
         }
     }
 
@@ -387,8 +396,6 @@ public class MCRConfiguration {
      *             instantiated
      */
     public Object getInstanceOf(String name, String defaultname) throws MCRConfigurationException {
-        MCRArgumentChecker.ensureNotEmpty(name, "name");
-
         String classname = properties.getProperty(name);
 
         if (classname == null) {
@@ -524,8 +531,6 @@ public class MCRConfiguration {
      *             if the property with this name is not set
      */
     public String getString(String name) {
-        MCRArgumentChecker.ensureNotEmpty(name, "name");
-
         String value = properties.getProperty(name);
 
         if (value == null) {
@@ -546,10 +551,7 @@ public class MCRConfiguration {
      * @return the value of the configuration property as a String
      */
     public String getString(String name, String defaultValue) {
-        MCRArgumentChecker.ensureNotEmpty(name, "name");
-
         String value = properties.getProperty(name);
-
         return ((value == null) ? defaultValue : value);
     }
 
