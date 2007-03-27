@@ -133,7 +133,7 @@ public class MCRLoginServlet extends MCRServlet {
                     groups.append((String) groupList.get(i)).append(" ");
                 }
 
-                job.getRequest().getSession().setAttribute("XSL.CurrentGroups", groups.toString());
+                mcrSession.put("XSL.CurrentGroups", groups.toString());
 
                 if (uid.equals(GUEST_ID)) {
                     job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(backto_url));
