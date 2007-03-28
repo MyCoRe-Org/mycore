@@ -23,125 +23,30 @@
 
 package org.mycore.datamodel.classifications;
 
-import org.mycore.common.MCRUsageException;
-import org.mycore.datamodel.metadata.MCRObjectID;
-import org.jdom.Element;
+import java.io.Serializable;
 
 /**
- * This class represents a classification item of the MyCoRe classification
- * model and implements the abstract MCRClassificationObject class.
  * 
- * @author Frank Luetzenkirchen
- * @author Jens Kupferschmidt
+ * @author Thomas Scheffler (yagee)
+ * 
  * @version $Revision$ $Date$
  */
-public class MCRClassificationItem extends MCRClassificationObject {
-    /**
-     * The constructor create a new MCRClassificationItem for the given classID.
-     * This must be a valid MCRObjectID.
-     * 
-     * @param classID
-     *            the ID of this classification
-     */
-    public MCRClassificationItem(String classID) {
-        super(classID);
-        MCRObjectID.isValidOrDie(classID);
+public class MCRClassificationItem extends MCRClassificationObject implements Serializable {
+
+    private static final long serialVersionUID = 147519495882309725L;
+
+    private boolean counterEnabled;
+
+    public boolean isCounterEnabled() {
+        return counterEnabled;
     }
 
-    /**
-     * The constructor create a new MCRClassificationItem for the given classID.
-     * This must be a valid MCRObjectID.
-     * 
-     * @param classID
-     *            the ID of this classification as MCRObjectID
-     */
-    public MCRClassificationItem(MCRObjectID classID) {
-        super(classID.getId());
+    public void setCounterEnabled(boolean counterEnabled) {
+        this.counterEnabled = counterEnabled;
     }
 
-    /**
-     * The method call the MCRClassificationManager to create this instance.
-     */
-    public final void create() {
-        manager().createClassificationItem(this);
+    public MCRClassificationItem clone() {
+        return (MCRClassificationItem) super.clone();
     }
 
-    /**
-     * The method call the MCRClassificationManager to delete this instance.
-     * 
-     * @param ID
-     *            the MCRClassificationItem ID
-     */
-    public void delete(String ID) {
-        super.delete();
-        manager().deleteClassificationItem(ID);
-    }
-
-    /**
-     * The methode return the classification ID.
-     * 
-     * @return the classification ID
-     */
-    public final String getClassificationID() {
-        return ID;
-    }
-
-    /**
-     * The method return a MCRCategoryItem for the given category ID.
-     * 
-     * @param categID
-     *            the category ID
-     * @return the MCRCategoryItem
-     */
-    public MCRCategoryItem getCategoryItem(String categID) {
-        ensureNotDeleted();
-        if ((categID == null) || ((categID = categID.trim()).length() == 0)) {
-            throw new MCRUsageException("categID is an empty String");
-        }
-        return MCRCategoryItem.getCategoryItem(this.ID, categID);
-    }
-
-    /**
-     * The method return a MCRCategoryItem for the given category labeltext.
-     * 
-     * @param labeltext
-     *            the category label text
-     * @return the MCRCategoryItem
-     */
-    public MCRCategoryItem getCategoryItemForLabelText(String labeltext) {
-        ensureNotDeleted();
-        if ((labeltext == null) || ((labeltext = labeltext.trim()).length() == 0)) {
-            throw new MCRUsageException("labeltext is an empty String");
-        }
-        return MCRCategoryItem.getCategoryItemForLabelText(this.ID, labeltext);
-    }
-
-    /**
-     * The method return a MCRClassificationItem for the given classification
-     * ID.
-     * 
-     * @param ID
-     *            the classification ID
-     * @return the MCRClassificationItem
-     */
-    public static MCRClassificationItem getClassificationItem(String ID) {
-        if ((ID == null) || ((ID = ID.trim()).length() == 0)) {
-            throw new MCRUsageException("ID is an empty String");
-        }
-        return manager().retrieveClassificationItem(ID);
-    }
-
-    /**
-     * return a MCRClassificationItem as JDOM Element
-     * 
-     * @return the MCRClassificationItem
-     */
-    public Element getClassificationItemAsJDom() {
-        Element xClassI = new Element("classification");
-        xClassI.setAttribute("ID", getClassificationID());
-        for (int i = 0; i < getSize(); i++) {
-            xClassI.addContent(getJDOMElement(i));
-        }
-        return xClassI;
-    }
 }

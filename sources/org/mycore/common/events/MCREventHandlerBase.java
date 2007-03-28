@@ -119,7 +119,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
         if (evt.getObjectType().equals(MCREvent.CLASS_TYPE)) {
             MCRClassification cl = (MCRClassification) (evt.get("class"));
             if (cl != null) {
-                logger.debug(getClass().getName() + " handling " + cl.getId().getId() + " " + evt.getEventType());
+                logger.debug(getClass().getName() + " handling " + cl.getId() + " " + evt.getEventType());
                 if (evt.getEventType().equals(MCREvent.CREATE_EVENT)) {
                     handleClassificationCreated(evt, cl);
                 } else if (evt.getEventType().equals(MCREvent.UPDATE_EVENT)) {
@@ -214,7 +214,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
         if (evt.getObjectType().equals(MCREvent.CLASS_TYPE)) {
             MCRClassification obj = (MCRClassification) (evt.get("class"));
             if (obj != null) {
-                logger.debug(getClass().getName() + " handling " + obj.getId().getId() + " " + evt.getEventType());
+                logger.debug(getClass().getName() + " handling " + obj.getId() + " " + evt.getEventType());
                 if (evt.getEventType().equals(MCREvent.CREATE_EVENT)) {
                     undoClassificationCreated(evt, obj);
                 } else if (evt.getEventType().equals(MCREvent.UPDATE_EVENT)) {

@@ -25,6 +25,7 @@ package org.mycore.datamodel.metadata;
 
 import org.mycore.common.MCRException;
 import org.mycore.datamodel.classifications.MCRCategoryItem;
+import org.mycore.datamodel.classifications.MCRClassification;
 import org.mycore.datamodel.classifications.MCRClassificationItem;
 
 /**
@@ -201,15 +202,10 @@ public class MCRMetaClassification extends MCRMetaDefault {
         }
 
         try {
-            MCRClassificationItem cl = MCRClassificationItem.getClassificationItem(classid);
-
-            if (cl == null) {
+            if (!MCRClassification.existInDatastore(classid)) {
                 return false;
             }
-
-            MCRCategoryItem ci = cl.getCategoryItem(categid);
-
-            if (ci == null) {
+            if (!MCRClassification.existInDatastore(classid,categid)) {
                 return false;
             }
         } catch (Exception e) {

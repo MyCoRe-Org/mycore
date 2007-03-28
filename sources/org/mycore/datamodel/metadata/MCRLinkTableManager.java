@@ -32,6 +32,7 @@ import org.apache.log4j.Logger;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 import org.mycore.datamodel.classifications.MCRCategoryItem;
+import org.mycore.datamodel.classifications.MCRClassification;
 import org.mycore.datamodel.classifications.MCRClassificationItem;
 
 /**
@@ -282,9 +283,8 @@ public class MCRLinkTableManager {
      */
     public void addClassificationLink(String from, String classid, String categid) {
         addReferenceLink(from, classid + "##" + categid, ENTRY_TYPE_CLASSID, "");
-        MCRClassificationItem classitem = MCRClassificationItem.getClassificationItem(classid);
-        MCRCategoryItem categitem = classitem.getCategoryItem(categid);
-        if (categitem.getParent() != null) {
+        MCRCategoryItem categitem = MCRClassification.receiveCategoryItem(classid, categid);
+        if (categitem.getParentID() != null) {
             addClassificationLink(from, classid, categitem.getParentID());
         }
     }
@@ -324,9 +324,8 @@ public class MCRLinkTableManager {
      */
      public void deleteClassificationLink(String from, String classid, String categid) { 
          deleteReferenceLink(from, classid + "##" + categid, ENTRY_TYPE_CLASSID); 
-         MCRClassificationItem classitem = MCRClassificationItem.getClassificationItem(classid); 
-         MCRCategoryItem categitem = classitem.getCategoryItem(categid); 
-         if (categitem.getParent() != null) { 
+         MCRCategoryItem categitem = MCRClassification.receiveCategoryItem(classid, categid);
+         if (categitem.getParentID() != null) { 
              deleteClassificationLink(from, classid, categitem.getParentID()); }
          }
 
@@ -626,13 +625,12 @@ public class MCRLinkTableManager {
      * @return a list of ID's
      */
     public List getFirstLinksToCategory(String classid, String categid) {
-        MCRClassificationItem classification = MCRClassificationItem.getClassificationItem(classid);
-        MCRCategoryItem categ = classification.getCategoryItem(categid);
+        MCRCategoryItem categ = MCRClassification.receiveCategoryItem(classid, categid);
         List categList = getLinksToCategory(classid, categid);
-        MCRCategoryItem[] childs = categ.getChildren();
-        String[] childIDs = new String[childs.length];
+        List<MCRCategoryItem> childs = categ.getCategories();
+        String[] childIDs = new String[childs.size()];
         for (int i = 0; i < childIDs.length; i++) {
-            childIDs[i] = new StringBuffer(classid).append("##").append(childs[i].getClassificationID()).toString();
+            childIDs[i] = new StringBuffer(classid).append("##").append(((MCRCategoryItem)childs.get(i)).getClassID()).toString();
         }
         List childrenList = getSourceOf(childIDs, ENTRY_TYPE_CLASSID);
         categList.removeAll(childrenList);

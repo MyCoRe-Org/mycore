@@ -26,7 +26,7 @@ package org.mycore.datamodel.metadata;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandlerBase;
 import org.mycore.datamodel.classifications.MCRCategoryItem;
-import org.mycore.datamodel.classifications.MCRClassificationItem;
+import org.mycore.datamodel.classifications.MCRClassification;
 
 /**
  * This class manages all operations of the LinkTables for operations of an
@@ -55,8 +55,8 @@ public class MCRLinkTableEventHandler extends MCREventHandlerBase {
         MCRObjectMetadata meta = obj.getMetadata();
         MCRMetaElement elm = null;
         MCRMetaInterface inf = null;
-        if (false){
-            //TODO: add undo events
+        if (false) {
+            // TODO: add undo events
             checkLinkTargets(obj);
         }
         for (int i = 0; i < meta.size(); i++) {
@@ -81,7 +81,7 @@ public class MCRLinkTableEventHandler extends MCREventHandlerBase {
         int dersize = struct.getDerivateSize();
         for (int i = 0; i < dersize; i++) {
             MCRMetaLinkID lid = struct.getDerivate(i);
-            mcr_linktable.addReferenceLink(obj.getId(), lid.getXLinkHrefID(), MCRLinkTableManager.ENTRY_TYPE_DERIVATE,"");
+            mcr_linktable.addReferenceLink(obj.getId(), lid.getXLinkHrefID(), MCRLinkTableManager.ENTRY_TYPE_DERIVATE, "");
         }
 
     }
@@ -98,12 +98,9 @@ public class MCRLinkTableEventHandler extends MCREventHandlerBase {
                 if (inf instanceof MCRMetaClassification) {
                     String classID = ((MCRMetaClassification) inf).getClassId();
                     String categID = ((MCRMetaClassification) inf).getCategId();
-                    MCRClassificationItem classification = MCRClassificationItem.getClassificationItem(classID);
-                    if (classification != null) {
-                        MCRCategoryItem categ = classification.getCategoryItem(categID);
-                        if (categ != null) {
-                            continue;
-                        }
+                    MCRCategoryItem categ = MCRClassification.receiveCategoryItem(classID, categID);
+                    if (categ != null) {
+                        continue;
                     }
                     MCRActiveLinkException activeLink = new MCRActiveLinkException("Failure while adding link!. Destination does not exist.");
                     String destination = classID + "##" + categID;

@@ -49,7 +49,7 @@ public class MCRXMLTableEventHandler extends MCREventHandlerBase {
      */
     protected final void handleClassificationCreated(MCREvent evt, MCRClassification obj) {
         org.jdom.Document doc = obj.createXML();
-        mcr_xmltable.create(obj.getId(), doc);
+        mcr_xmltable.create(new MCRObjectID(obj.getId()), doc);
     }
 
     /**
@@ -62,9 +62,9 @@ public class MCRXMLTableEventHandler extends MCREventHandlerBase {
      *            the MCRClassification that caused the event
      */
     protected final void handleClassificationUpdated(MCREvent evt, MCRClassification obj) {
-        mcr_xmltable.delete(obj.getId());
+        mcr_xmltable.delete(new MCRObjectID(obj.getId()));
         org.jdom.Document doc = obj.createXML();
-        mcr_xmltable.create(obj.getId(), doc);
+        mcr_xmltable.create(new MCRObjectID(obj.getId()), doc);
     }
 
     /**
@@ -77,7 +77,7 @@ public class MCRXMLTableEventHandler extends MCREventHandlerBase {
      *            the MCRClassification that caused the event
      */
     protected final void handleClassificationDeleted(MCREvent evt, MCRClassification obj) {
-        mcr_xmltable.delete(obj.getId());
+        mcr_xmltable.delete(new MCRObjectID(obj.getId()));
     }
 
     /**

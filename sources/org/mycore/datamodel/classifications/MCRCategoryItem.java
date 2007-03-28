@@ -23,196 +23,115 @@
 
 package org.mycore.datamodel.classifications;
 
-import org.mycore.common.MCRUsageException;
+import java.io.Serializable;
 
 /**
- * This class represents a category item of the MyCoRe classification model and
- * implements the abstract MCRClassificationObject class.
+ * This method implemets a special category item of a MyCore classification.
  * 
- * @author Frank Luetzenkirchen
- * @author Jens Kupferschmidt
+ * @author Thomas Scheffler (yagee)
+ * @author jens Kupferschmidt
+ * 
  * @version $Revision$ $Date$
  */
-public class MCRCategoryItem extends MCRClassificationObject {
-    protected String parentID;
-    protected String classifID;
-    protected String URL;
-    protected int counter;
+public class MCRCategoryItem extends MCRClassificationObject implements Serializable {
+
+    private static final long serialVersionUID = -6270311269042057342L;
+
+    private int numberOfObjects;
+
+    private String classID;
+
+    private String parentID;
+
+    private MCRLink link;
 
     /**
-     * The constructor to fill this item.
+     * This method return the link entry.
      * 
-     * @param parent
-     *            the parent MCRClassificationObject
-     * @param ID
-     *            an identifier String
+     * @return the link entry as MCRLink
      */
-    public MCRCategoryItem(String ID, MCRClassificationObject parent) {
-        super(ID);
-        if (parent == null) {
-            throw new MCRUsageException("Parameter parent is null");
-        }
-        this.classifID = parent.getClassificationID();
-        if (ID.equals(classifID)) {
-            throw new MCRUsageException("A category ID can not be the same as its classification ID");
-        }
-
-        if (parent instanceof MCRCategoryItem) {
-            this.parentID = parent.ID;
-        }
-
-        if (parent.childrenIDs != null) {
-            parent.childrenIDs = null;
-        }
-
-        URL = "";
+    public MCRLink getLink() {
+        return link;
     }
 
     /**
-     * The constructor to fill this item.
+     * This method set the link entry.
      * 
-     * @param ID
-     *            an identifier String
-     * @param classifID
-     *            the ID of the classification
-     * @param parentID
-     *            the ID of the parent
+     * @param link
+     *            the link entry
      */
-    public MCRCategoryItem(String ID, String classifID, String parentID) {
-        super(ID);
-        this.classifID = classifID;
-        this.parentID = parentID;
-        URL = "";
-        counter =0;
+    public void setLink(MCRLink link) {
+        this.link = link;
     }
 
     /**
-     * The method call the MCRClassificationManager to create this instance.
-     */
-    public final void create() {
-        manager().createCategoryItem(this);
-    }
-
-    /**
-     * The method call the MCRClassificationManager to delete this instance.
-     */
-    public void delete() {
-        MCRClassificationObject parent = getParent();
-
-        if (parent == null) {
-            parent = getClassificationItem();
-        }
-
-        parent.childrenIDs = null;
-        super.delete();
-        manager().deleteCategoryItem(classifID, ID);
-    }
-
-    /**
-     * The methode return the classification ID.
+     * This method return the classification ID.
      * 
      * @return the classification ID
      */
-    public String getClassificationID() {
-        return classifID;
+    public String getClassID() {
+        return classID;
     }
 
-    public MCRClassificationItem getClassificationItem() {
-        ensureNotDeleted();
-
-        return MCRClassificationItem.getClassificationItem(classifID);
+    /**
+     * This method set the classification ID.
+     * 
+     * @param classID
+     *            the classification ID
+     */
+    public void setClassID(String classID) {
+        this.classID = classID;
     }
 
-    public MCRCategoryItem getParent() {
-        ensureNotDeleted();
-
-        if (parentID == null) {
-            return null;
-        }
-        return getCategoryItem(classifID, parentID);
-    }
-
+    /**
+     * This method return the parent category ID.
+     * 
+     * @return the parent category ID
+     */
     public String getParentID() {
-        ensureNotDeleted();
-
         return parentID;
     }
 
     /**
-     * The method return a MCRCategoryItem for the given Classification and
-     * Category ID.
+     * This method set the parent category ID.
      * 
-     * @param classifID
-     *            the classification ID
-     * @param categID
-     *            the category ID
-     * @return a MCRCategoryItem
+     * @param parentID
+     *            the parent category ID
      */
-    public static MCRCategoryItem getCategoryItem(String classifID, String categID) {
-        if ((classifID == null) || (classifID.trim().length() == 0)) {
-            throw new MCRUsageException("Parameter classifID is null or empty");
-        }
-        if ((categID == null) || (categID.trim().length() == 0)) {
-            throw new MCRUsageException("Parameter categID is null or empty");
-        }
-        return manager().retrieveCategoryItem(classifID, categID);
+    public void setParentID(String parentID) {
+        this.parentID = parentID;
     }
 
     /**
-     * The method return a MCRCategoryItem for the given Classification and
-     * Category label text.
+     * This method return the number of object.
      * 
-     * @param classifID
-     *            the classification ID
-     * @param labeltext
-     *            the category label text
-     * @return a MCRCategoryItem
+     * @return the number of objects
      */
-    public static MCRCategoryItem getCategoryItemForLabelText(String classifID, String labeltext) {
-        if ((classifID == null) || (classifID.trim().length() == 0)) {
-            throw new MCRUsageException("Parameter classifID is null or empty");
-        }
-        if ((labeltext == null) || (labeltext.trim().length() == 0)) {
-            throw new MCRUsageException("Parameter labeltext is null or empty");
-        }
-        return manager().retrieveCategoryItemForLabelText(classifID, labeltext);
+    public int getNumberOfObjects() {
+        return numberOfObjects;
     }
 
     /**
-     * The method returns the URL string.
+     * This method set the number of objects.
      * 
-     * @return the URL string
+     * @param numberOfObjects
+     *            the number of objects
      */
-    public final String getURL() {
-        return URL;
+    public void setNumberOfObjects(int numberOfObjects) {
+        this.numberOfObjects = numberOfObjects;
     }
 
     /**
-     * The method set the URL string.
+     * This method clone this class.
      * 
-     * @param url
-     *            the URL string
+     * @return a clone of this class
      */
-    public final void setURL(String url) {
-        if (url == null) {
-            URL = "";
-
-            return;
+    public MCRCategoryItem clone() {
+        MCRCategoryItem clone = (MCRCategoryItem) super.clone();
+        if (link != null) {
+            clone.link = link.clone();
         }
-
-        URL = url;
+        return clone;
     }
 
-    /**
-     * Put all data to a string
-     */
-    public final String toString() {
-        StringBuffer sb = new StringBuffer();
-        sb.append("Classification: ").append(classifID).append("\n");
-        sb.append("Parent ID:      ").append(parentID).append("\n");
-        sb.append(super.toString());
-        sb.append("URL             ").append(URL).append("\n");
-
-        return sb.toString();
-    }
 }

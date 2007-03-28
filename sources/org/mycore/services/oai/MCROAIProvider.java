@@ -63,6 +63,8 @@ import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRException;
 import org.mycore.common.xml.MCRXSLTransformation;
 import org.mycore.datamodel.classifications.MCRCategoryItem;
+import org.mycore.datamodel.classifications.MCRClassification;
+import org.mycore.datamodel.classifications.MCRLabel;
 import org.mycore.datamodel.metadata.MCRMetaClassification;
 import org.mycore.datamodel.metadata.MCRMetaElement;
 import org.mycore.datamodel.metadata.MCRObject;
@@ -72,7 +74,7 @@ import org.mycore.frontend.servlets.MCRServletJob;
 /**
  * This class implements an OAI Data Provider for MyCoRe and Miless
  * 
- * @author Werner Greßhoff
+ * @author Werner Greï¿½hoff
  * @author Heiko Helmbrecht
  * 
  * @version $Revision$ $Date$
@@ -172,7 +174,7 @@ public class MCROAIProvider extends MCRServlet {
     private static final String STR_SCHEMA_INSTANCE = "http://www.w3.org/2001/XMLSchema-instance";
 
     private static final String STR_GRANULARITY = "yyyy-MM-dd'T'HH:mm:dd'Z'";
-    
+
     private static final String STR_GRANULARITY_SHORT = "yyyy-MM-dd";
 
     private static final String STR_FIRST_DATE = "2000-01-01";
@@ -281,28 +283,28 @@ public class MCROAIProvider extends MCRServlet {
                     document = addError(header, "badVerb", ERR_ILLEGAL_VERB);
                 }
             }
-            //<?xml-stylesheet type='text/xsl' href='/content/oai/oai2.xsl' ?>
+            // <?xml-stylesheet type='text/xsl' href='/content/oai/oai2.xsl' ?>
             File f = new File(getServletContext().getRealPath("content/oai/oai2.xsl"));
-            if(f.exists()){
-            	String myURL = new String(baseurl);
-            	if(myURL.length()==0){
-            		String contextPath = request.getContextPath();
-            		if (contextPath == null) {
-            			contextPath = "";
-            		}
-            		contextPath += "/";
-            		int pos = url.indexOf(contextPath, 9);
-               		myURL=url.substring(0, pos) + contextPath;
-            	}
-            	
-            	Map<String,String> pairs = new HashMap<String, String>();
-            	pairs.put("type", "text/xsl");
-            	
-            	pairs.put("href", myURL+"content/oai/oai2.xsl");
-            	ProcessingInstruction pi = new ProcessingInstruction("xml-stylesheet", pairs); 
-            	document.addContent(0,pi);
+            if (f.exists()) {
+                String myURL = new String(baseurl);
+                if (myURL.length() == 0) {
+                    String contextPath = request.getContextPath();
+                    if (contextPath == null) {
+                        contextPath = "";
+                    }
+                    contextPath += "/";
+                    int pos = url.indexOf(contextPath, 9);
+                    myURL = url.substring(0, pos) + contextPath;
+                }
+
+                Map<String, String> pairs = new HashMap<String, String>();
+                pairs.put("type", "text/xsl");
+
+                pairs.put("href", myURL + "content/oai/oai2.xsl");
+                ProcessingInstruction pi = new ProcessingInstruction("xml-stylesheet", pairs);
+                document.addContent(0, pi);
             }
-            
+
             outputter.output(document, out);
             return;
         } catch (MCRException mcrx) {
@@ -541,12 +543,12 @@ public class MCROAIProvider extends MCRServlet {
         }
         ParsePosition pos = new ParsePosition(0);
         Date currentDate = dateFormat.parse(date, pos);
-        if(currentDate==null){
-        	//try to match the simpler dateformat
-        	dateFormat = new SimpleDateFormat(STR_GRANULARITY_SHORT);
-        	pos = new ParsePosition(0);
-        	currentDate = dateFormat.parse(date, pos);
-       }
+        if (currentDate == null) {
+            // try to match the simpler dateformat
+            dateFormat = new SimpleDateFormat(STR_GRANULARITY_SHORT);
+            pos = new ParsePosition(0);
+            currentDate = dateFormat.parse(date, pos);
+        }
 
         return currentDate;
     }
@@ -614,7 +616,7 @@ public class MCROAIProvider extends MCRServlet {
         Element eIdentify = new Element("Identify", ns);
         eIdentify.addContent(newElementWithContent("repositoryName", ns, repositoryName));
         if (baseurl.length() != 0) {
-            eIdentify.addContent(newElementWithContent("baseURL", ns, baseurl+"servlets/MCROAIProvider"));
+            eIdentify.addContent(newElementWithContent("baseURL", ns, baseurl + "servlets/MCROAIProvider"));
         } else {
             eIdentify.addContent(newElementWithContent("baseURL", ns, request.getRequestURL().toString().split(";")[0]));
         }
@@ -1508,13 +1510,13 @@ public class MCROAIProvider extends MCRServlet {
             parameters.put("ServletsBaseURL", servletsBaseURL);
             parameters.put("WebApplicationBaseURL", webApplicationBaseURL);
         }
-        // DNB erlaubt in Epicur-Beschreibung keinen Inhalt für das Element
+        // DNB erlaubt in Epicur-Beschreibung keinen Inhalt fï¿½r das Element
         // <resupply>
         // String email = CONFIG.getString("MCR.oai.epicur.responseemail", "");
         // if(format.contains("epicur")&& !email.equals("")){
         // parameters.put("ResponseEmail", email);
         // }
-       return MCRXSLTransformation.transform(document, getServletContext().getRealPath("/WEB-INF/stylesheets/" + format), parameters);
+        return MCRXSLTransformation.transform(document, getServletContext().getRealPath("/WEB-INF/stylesheets/" + format), parameters);
     }
 
     static MCROAIConfigBean getConfigBean(String instance) {
@@ -1565,16 +1567,18 @@ public class MCROAIProvider extends MCRServlet {
                     String classificationId = classification.getClassId();
                     if (classifications.contains(classificationId)) {
                         String categoryId = classification.getCategId();
-                        MCRCategoryItem category = MCRCategoryItem.getCategoryItem(classificationId, categoryId);
-                        if (category.getLangArray().contains("x-dini")) {
-                            setSpec.append(" ").append(category.getText("x-dini"));
-                        } else {
-                            MCRCategoryItem parent;
-                            while ((parent = category.getParent()) != null) {
-                                categoryId = parent.getID() + ":" + categoryId;
-                                category = parent;
+                        MCRCategoryItem category = MCRClassification.receiveCategoryItem(classificationId, categoryId);
+                        List labels = category.getLabels();
+                        boolean found = false;
+                        for (int l = 0; l < labels.size(); l++) {
+                            if (((MCRLabel) labels.get(l)).getLang().equals("x-dini")) {
+                                setSpec.append(" ").append(((MCRLabel) labels.get(l)).getText());
+                                found = true;
+                                break;
                             }
-
+                        }
+                        if (!found) {
+                            categoryId = category.getParentID() + ":" + categoryId;
                             setSpec.append(" ").append(categoryId);
                         }
                     }

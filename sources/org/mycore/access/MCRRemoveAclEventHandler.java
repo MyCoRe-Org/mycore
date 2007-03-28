@@ -32,6 +32,7 @@ import org.mycore.datamodel.classifications.MCRClassification;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRObject;
+import org.mycore.datamodel.metadata.MCRObjectID;
 
 /**
  * This class contains EventHandler methods to remove the access part of
@@ -103,7 +104,7 @@ public class MCRRemoveAclEventHandler extends MCREventHandlerBase {
 
     private void handleDelete(MCRClassification base) {
         long start = System.currentTimeMillis();
-        MCRAccessManager.removeAllRules(base.getId());
+        MCRAccessManager.removeAllRules(new MCRObjectID(base.getId()));
         long diff = System.currentTimeMillis() - start;
         LOGGER.debug("event handled in " + diff);
     }

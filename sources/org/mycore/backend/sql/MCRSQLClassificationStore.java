@@ -31,13 +31,15 @@ import org.mycore.datamodel.classifications.MCRCategoryItem;
 import org.mycore.datamodel.classifications.MCRClassificationInterface;
 import org.mycore.datamodel.classifications.MCRClassificationItem;
 import org.mycore.datamodel.classifications.MCRClassificationObject;
+import org.mycore.datamodel.classifications.MCRLabel;
+import org.mycore.datamodel.classifications.MCRLink;
 import org.mycore.datamodel.metadata.MCRMetaClassification;
 
 /**
  * This class implements the MCRClassificationInterface as persistence layer for
  * a SQL database.
  * 
- * @author Frank Lützenkirchen
+ * @author Frank Lï¿½tzenkirchen
  * @author Jens Kupferschmidt
  * @version $Revision$ $Date$
  * @deprecated
@@ -189,10 +191,10 @@ public class MCRSQLClassificationStore implements MCRClassificationInterface {
      *            an instance of a MCRClassificationItem
      */
     public final void createClassificationItem(MCRClassificationItem classification) {
-        MCRSQLConnection.justDoUpdate(new MCRSQLStatement(tableClass).setValue("ID", classification.getID()).toInsertStatement());
-
-        for (int i = 0; i < classification.getSize(); i++) {
-            MCRSQLConnection.justDoUpdate(new MCRSQLStatement(tableClassLabel).setValue("ID", classification.getID()).setValue("LANG", classification.getLang(i)).setValue("TEXT", classification.getText(i)).setValue("MCRDESC", classification.getDescription(i)).toInsertStatement());
+        MCRSQLConnection.justDoUpdate(new MCRSQLStatement(tableClass).setValue("ID", classification.getId()).toInsertStatement());
+        ArrayList<MCRLabel> label = (ArrayList<MCRLabel>) classification.getLabels();
+        for (int i = 0; i < label.size(); i++) {
+            MCRSQLConnection.justDoUpdate(new MCRSQLStatement(tableClassLabel).setValue("ID", classification.getId()).setValue("LANG", ((MCRLabel) label.get(i)).getLang()).setValue("TEXT",((MCRLabel) label.get(i)).getText() ).setValue("MCRDESC", ((MCRLabel) label.get(i)).getDescription()).toInsertStatement());
         }
     }
 
@@ -223,12 +225,12 @@ public class MCRSQLClassificationStore implements MCRClassificationInterface {
         try {
             MCRSQLRowReader reader = conn.doQuery(query);
             while (reader.next()) {
-                if (c == null)
-                    c = new MCRClassificationItem(ID);
-                String lang = reader.getString("LANG");
-                String text = reader.getString("TEXT");
-                String desc = reader.getString("MCRDESC");
-                c.addData(lang, text, desc);
+                if (c == null) {
+                    c = new MCRClassificationItem();
+                    c.setId(ID);
+                }
+                MCRLabel label = new MCRLabel(reader.getString("LANG"), reader.getString("TEXT"), reader.getString("MCRDESC"));
+                c.addLabel(label);
             }
             reader.close();
         } finally {
@@ -257,13 +259,14 @@ public class MCRSQLClassificationStore implements MCRClassificationInterface {
      */
     public final void createCategoryItem(MCRCategoryItem category) {
         try {
-            MCRSQLConnection.justDoUpdate(new MCRSQLStatement(tableCateg).setValue("ID", category.getID()).setValue("CLID", category.getClassificationID()).setValue("PID", category.getParentID()).setValue("URL", category.getURL()).toInsertStatement());
+            MCRSQLConnection.justDoUpdate(new MCRSQLStatement(tableCateg).setValue("ID", category.getId()).setValue("CLID", category.getClassID()).setValue("PID", category.getParentID()).setValue("URL", category.getLink().getHref()).toInsertStatement());
         } catch (Exception e) {
-            MCRSQLConnection.justDoUpdate(new MCRSQLStatement(tableCateg).setValue("ID", category.getID()).setValue("CLID", category.getClassificationID()).setValue("PID", category.getParentID()).toInsertStatement());
+            MCRSQLConnection.justDoUpdate(new MCRSQLStatement(tableCateg).setValue("ID", category.getId()).setValue("CLID", category.getClassID()).setValue("PID", category.getParentID()).toInsertStatement());
         }
 
-        for (int i = 0; i < category.getSize(); i++) {
-            MCRSQLConnection.justDoUpdate(new MCRSQLStatement(tableCategLabel).setValue("ID", category.getID()).setValue("CLID", category.getClassificationID()).setValue("LANG", category.getLang(i)).setValue("TEXT", category.getText(i)).setValue("MCRDESC", category.getDescription(i)).toInsertStatement());
+        ArrayList<MCRLabel> label = (ArrayList<MCRLabel>) category.getLabels();
+        for (int i = 0; i < label.size(); i++) {
+            MCRSQLConnection.justDoUpdate(new MCRSQLStatement(tableCategLabel).setValue("ID", category.getId()).setValue("CLID", category.getClassID()).setValue("LANG", ((MCRLabel) label.get(i)).getLang()).setValue("TEXT", ((MCRLabel) label.get(i)).getText()).setValue("MCRDESC", ((MCRLabel) label.get(i)).getDescription()).toInsertStatement());
         }
     }
 
@@ -311,15 +314,17 @@ public class MCRSQLClassificationStore implements MCRClassificationInterface {
             }
             reader.close();
 
-            MCRCategoryItem c = new MCRCategoryItem(ID, CLID, PID);
-            c.setURL(URL);
+            MCRCategoryItem c = new MCRCategoryItem();
+            c.setId(ID);
+            c.setClassID(CLID);
+            c.setParentID(PID);
+            MCRLink link = new MCRLink("locator", URL, URL, "");
+            c.setLink(link);
             reader = conn.doQuery(new MCRSQLStatement(tableCategLabel).setCondition("ID", ID).setCondition("CLID", CLID).toSelectStatement());
 
             while (reader.next()) {
-                String lang = reader.getString("LANG");
-                String text = reader.getString("TEXT");
-                String desc = reader.getString("MCRDESC");
-                c.addData(lang, text, desc);
+                MCRLabel label = new MCRLabel(reader.getString("LANG"), reader.getString("TEXT"), reader.getString("MCRDESC"));
+                c.addLabel(label);
             }
             reader.close();
 
@@ -350,11 +355,12 @@ public class MCRSQLClassificationStore implements MCRClassificationInterface {
             }
 
             String ID = reader.getString("ID");
-            String lang = reader.getString("LANG");
-            String text = reader.getString("TEXT");
-            String desc = reader.getString("MCRDESC");
-            MCRCategoryItem c = new MCRCategoryItem(ID, CLID, "");
-            c.addData(lang, text, desc);
+            MCRCategoryItem c = new MCRCategoryItem();
+            c.setId(ID);
+            c.setClassID(CLID);
+            c.setParentID("");
+            MCRLabel label = new MCRLabel(reader.getString("LANG"), reader.getString("TEXT"), reader.getString("MCRDESC"));
+            c.addLabel(label);
             reader = conn.doQuery(new MCRSQLStatement(tableCateg).setCondition("ID", ID).setCondition("CLID", CLID).toSelectStatement());
             found = reader.next();
 
@@ -364,20 +370,17 @@ public class MCRSQLClassificationStore implements MCRClassificationInterface {
             }
 
             String URL = "";
-
             try {
                 URL = reader.getString("URL");
             } catch (Exception e) {
                 URL = "";
             }
-
             if (URL == null) {
                 URL = "";
             }
-
             reader.close();
-
-            c.setURL(URL);
+            MCRLink link = new MCRLink("locator", URL, URL, "");
+            c.setLink(link);
 
             return c;
         } finally {
@@ -408,7 +411,7 @@ public class MCRSQLClassificationStore implements MCRClassificationInterface {
      * @return a list of MCRCategoryItem children
      */
     public final ArrayList retrieveChildren(String CLID, String PID) {
-        ArrayList children = new ArrayList();
+        ArrayList<MCRCategoryItem> children = new ArrayList<MCRCategoryItem>();
         MCRSQLConnection conn = MCRSQLConnectionPool.instance().getConnection();
         try {
             MCRSQLRowReader reader = conn.doQuery(new MCRSQLStatement(tableCateg).setCondition("PID", PID).setCondition("CLID", CLID).toSelectStatement());
@@ -427,20 +430,22 @@ public class MCRSQLClassificationStore implements MCRClassificationInterface {
                     URL = "";
                 }
 
-                MCRCategoryItem child = new MCRCategoryItem(ID, CLID, PID);
-                child.setURL(URL);
+                MCRCategoryItem child = new MCRCategoryItem();
+                child.setId(ID);
+                child.setClassID(CLID);
+                child.setParentID(PID);
+                MCRLink link = new MCRLink("locator", URL, URL, "");
+                child.setLink(link);
                 children.add(child);
             }
             reader.close();
 
             for (int i = 0; i < children.size(); i++) {
-                reader = conn.doQuery(new MCRSQLStatement(tableCategLabel).setCondition("ID", ((MCRCategoryItem) children.get(i)).getID()).setCondition("CLID", CLID).toSelectStatement());
+                reader = conn.doQuery(new MCRSQLStatement(tableCategLabel).setCondition("ID", ((MCRCategoryItem) children.get(i)).getId()).setCondition("CLID", CLID).toSelectStatement());
 
                 while (reader.next()) {
-                    String lang = reader.getString("LANG");
-                    String text = reader.getString("TEXT");
-                    String desc = reader.getString("MCRDESC");
-                    ((MCRCategoryItem) children.get(i)).addData(lang, text, desc);
+                    MCRLabel label = new MCRLabel(reader.getString("LANG"), reader.getString("TEXT"), reader.getString("MCRDESC"));
+                    ((MCRCategoryItem) children.get(i)).addLabel(label);
                 }
                 reader.close();
             }
@@ -515,21 +520,18 @@ public class MCRSQLClassificationStore implements MCRClassificationInterface {
         int k = -1;
         while (reader.next()) {
         	String ID = reader.getString("ID");
-        	if ( k==-1 || !classList[k].getClassificationID().equalsIgnoreCase(ID) ){
+        	if ( k==-1 || !classList[k].getId().equalsIgnoreCase(ID) ){
         		k++;
                 //logger.debug("next ID of classList[" + Integer.toString(k) + "] = " + ID);
-        		classList[k] = new MCRClassificationItem(ID);
+        		classList[k] = new MCRClassificationItem();
+                classList[k].setId(ID);
            		//logger.debug("add first data of classList[" + Integer.toString(k) + "] = " + ID);
-           	 	classList[k].addData(reader.getString("LANG"),
-        				reader.getString("TEXT"),
-        				reader.getString("MCRDESC")
-        				);
+                MCRLabel label = new MCRLabel(reader.getString("LANG"), reader.getString("TEXT"), reader.getString("MCRDESC"));
+           	 	classList[k].addLabel(label);
         	} else {
         		//logger.debug("add more data of classList[" + Integer.toString(k) + "] = " + ID);
-        		classList[k].addData(reader.getString("LANG"),
-        				reader.getString("TEXT"),
-        				reader.getString("MCRDESC")
-        				);
+                MCRLabel label = new MCRLabel(reader.getString("LANG"), reader.getString("TEXT"), reader.getString("MCRDESC"));
+        		classList[k].addLabel(label);
         	}
         }
         return classList;

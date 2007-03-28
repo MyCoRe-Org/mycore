@@ -39,9 +39,16 @@ import org.mycore.common.MCRUsageException;
 import org.mycore.datamodel.classifications.MCRCategoryItem;
 import org.mycore.datamodel.classifications.MCRClassificationInterface;
 import org.mycore.datamodel.classifications.MCRClassificationItem;
+import org.mycore.datamodel.classifications.MCRLabel;
+import org.mycore.datamodel.classifications.MCRLink;
 
 /**
  * This class implements the MCRClassificationInterface
+ * 
+ * @author Heiko Helmbrecht
+ * @author Jens Kupferschmidt
+ * 
+ * @version $Revision$ $Date$
  */
 public class MCRHIBClassificationStore implements MCRClassificationInterface {
     // logger
@@ -71,13 +78,13 @@ public class MCRHIBClassificationStore implements MCRClassificationInterface {
     public final void createClassificationItem(MCRClassificationItem classification) {
         Session session = getSession();
         Transaction tx = session.beginTransaction();
-        MCRCLASS c = new MCRCLASS(classification.getID());
+        MCRCLASS c = new MCRCLASS(classification.getId());
 
         try {
             session.saveOrUpdate(c);
-
-            for (int i = 0; i < classification.getSize(); i++) {
-                MCRCLASSLABEL cl = new MCRCLASSLABEL(classification.getID(), classification.getLang(i), classification.getText(i), classification.getDescription(i));
+            ArrayList<MCRLabel> label = (ArrayList<MCRLabel>) classification.getLabels();
+            for (int i = 0; i < label.size(); i++) {
+                MCRCLASSLABEL cl = new MCRCLASSLABEL(classification.getId(), ((MCRLabel) label.get(i)).getLang(), ((MCRLabel) label.get(i)).getText(), ((MCRLabel) label.get(i)).getDescription());
                 session.saveOrUpdate(cl);
             }
 
@@ -86,7 +93,8 @@ public class MCRHIBClassificationStore implements MCRClassificationInterface {
             tx.rollback();
             logger.error(e);
         } finally {
-             if ( session != null ) session.close();
+            if (session != null)
+                session.close();
         }
     }
 
@@ -118,7 +126,8 @@ public class MCRHIBClassificationStore implements MCRClassificationInterface {
             tx.rollback();
             logger.error(e);
         } finally {
-             if ( session != null ) session.close();
+            if (session != null)
+                session.close();
         }
     }
 
@@ -130,28 +139,31 @@ public class MCRHIBClassificationStore implements MCRClassificationInterface {
      */
     public final MCRClassificationItem retrieveClassificationItem(String ID) {
         Session session = getSession();
-        MCRClassificationItem c = new MCRClassificationItem(ID);
+        MCRClassificationItem c = new MCRClassificationItem();
+        c.setId(ID);
 
         try {
             List l = session.createQuery("FROM MCRCLASS WHERE id = '" + ID + "'").list();
 
             if (l.size() > 0) {
-              l = session.createQuery("from MCRCLASSLABEL where ID = '" + ID + "'").list();
-              
-              for (int t = 0; t < l.size(); t++) {
-                MCRCLASSLABEL cl = (MCRCLASSLABEL) l.get(t);
-                c.addData(cl.getLang(), cl.getText(), cl.getMcrdesc());
-              }
-            } else c = null;
+                l = session.createQuery("from MCRCLASSLABEL where ID = '" + ID + "'").list();
+                for (int t = 0; t < l.size(); t++) {
+                    MCRCLASSLABEL cl = (MCRCLASSLABEL) l.get(t);
+                    MCRLabel label = new MCRLabel(cl.getLang(), cl.getText(), cl.getMcrdesc());
+                    c.addLabel(label);
+                }
+            } else
+                c = null;
 
         } catch (Exception e) {
             logger.error(e);
         } finally {
-             if ( session != null ) session.close();
+            if (session != null)
+                session.close();
         }
-        
-        if ( null == c )
-          throw new MCRUsageException("no classfication with ID '" + ID + "' found");
+
+        if (null == c)
+            throw new MCRUsageException("no classfication with ID '" + ID + "' found");
 
         return c;
     }
@@ -174,7 +186,8 @@ public class MCRHIBClassificationStore implements MCRClassificationInterface {
 
             return false; // FIXME: should we throw an exception here?
         } finally {
-             if ( session != null ) session.close();
+            if (session != null)
+                session.close();
         }
 
         if (l.size() < 1) {
@@ -195,11 +208,11 @@ public class MCRHIBClassificationStore implements MCRClassificationInterface {
         Transaction tx = session.beginTransaction();
 
         try {
-            MCRCATEG c = new MCRCATEG(category.getID(), category.getClassificationID(), category.getParentID(), category.getURL());
+            MCRCATEG c = new MCRCATEG(category.getId(), category.getClassID(), category.getParentID(), category.getLink().getHref());
             session.saveOrUpdate(c);
-
-            for (int i = 0; i < category.getSize(); i++) {
-                MCRCATEGLABEL cl = new MCRCATEGLABEL(category.getID(), category.getClassificationID(), category.getLang(i), category.getText(i), category.getDescription(i));
+            ArrayList<MCRLabel> label = (ArrayList<MCRLabel>) category.getLabels();
+            for (int i = 0; i < label.size(); i++) {
+                MCRCATEGLABEL cl = new MCRCATEGLABEL(category.getId(), category.getClassID(), ((MCRLabel) label.get(i)).getLang(), ((MCRLabel) label.get(i)).getText(), ((MCRLabel) label.get(i)).getDescription());
                 session.saveOrUpdate(cl);
             }
 
@@ -208,7 +221,8 @@ public class MCRHIBClassificationStore implements MCRClassificationInterface {
             tx.rollback();
             logger.error(e);
         } finally {
-             if ( session != null ) session.close();
+            if (session != null)
+                session.close();
         }
     }
 
@@ -232,7 +246,8 @@ public class MCRHIBClassificationStore implements MCRClassificationInterface {
             tx.rollback();
             logger.error(e);
         } finally {
-             if ( session != null ) session.close();
+            if (session != null)
+                session.close();
         }
     }
 
@@ -252,31 +267,38 @@ public class MCRHIBClassificationStore implements MCRClassificationInterface {
             List l = session.createQuery("from MCRCATEG where ID = '" + ID + "' AND CLID = '" + CLID + "'").list();
 
             if (l.size() > 0) {
-              MCRCATEG c = (MCRCATEG) l.get(0);
-              
-              ci = new MCRCategoryItem(ID, CLID, c.getPid());
-              ci.setURL(c.getUrl());
-              
-              List la = session.createQuery("from MCRCATEGLABEL where ID = '" + ID + "' and CLID = '" + CLID + "'").list();
-              
-              if (la.size() > 0) {
-                for (int t = 0; t < la.size(); t++) {
-                  MCRCATEGLABEL cl = (MCRCATEGLABEL) la.get(t);
-                  ci.addData(cl.getLang(), cl.getText(), cl.getMcrdesc());
-                }
-              } else ci = null;
+                MCRCATEG c = (MCRCATEG) l.get(0);
+
+                ci = new MCRCategoryItem();
+                ci.setId(ID);
+                ci.setClassID(CLID);
+                ci.setParentID(c.getPid());
+                MCRLink link = new MCRLink("locator", c.getUrl(), c.getUrl(), "");
+                ci.setLink(link);
+
+                List la = session.createQuery("from MCRCATEGLABEL where ID = '" + ID + "' and CLID = '" + CLID + "'").list();
+
+                if (la.size() > 0) {
+                    for (int t = 0; t < la.size(); t++) {
+                        MCRCATEGLABEL cl = (MCRCATEGLABEL) la.get(t);
+                        MCRLabel label = new MCRLabel(cl.getLang(), cl.getText(), cl.getMcrdesc());
+                        ci.addLabel(label);
+                    }
+                } else
+                    ci = null;
             }
 
         } catch (Exception e) {
             logger.error(e);
             throw new MCRException("error while reading category item", e);
         } finally {
-             if ( session != null ) session.close();
+            if (session != null)
+                session.close();
         }
 
-        if ( null == ci )
-          throw new MCRUsageException("no such category '" + ID + "' in classification '" + CLID + "' found");
-        
+        if (null == ci)
+            throw new MCRUsageException("no such category '" + ID + "' in classification '" + CLID + "' found");
+
         return ci;
     }
 
@@ -296,31 +318,38 @@ public class MCRHIBClassificationStore implements MCRClassificationInterface {
             List l = session.createQuery("FROM MCRCATEG WHERE TEXT = '" + labeltext + "' AND CLID = '" + CLID + "'").list();
 
             if (l.size() > 0) {
-              MCRCATEG c = (MCRCATEG) l.get(0);
-              String ID = c.getId();
-              ci = new MCRCategoryItem(ID, CLID, c.getPid());
-              ci.setURL(c.getUrl());
-              
-              List la = session.createQuery("FROM MCRCATEGLABEL WHERE ID = '" + ID + "' AND CLID = '" + CLID + "'").list();
-              
-              if (la.size() > 0) {
-                for (int t = 0; t < la.size(); t++) {
-                  MCRCATEGLABEL cl = (MCRCATEGLABEL) la.get(t);
-                  ci.addData(cl.getLang(), cl.getText(), cl.getMcrdesc());
-                }
-              } else ci = null;
-              
+                MCRCATEG c = (MCRCATEG) l.get(0);
+                String ID = c.getId();
+                ci = new MCRCategoryItem();
+                ci.setId(ID);
+                ci.setClassID(CLID);
+                ci.setParentID(c.getPid());
+                MCRLink link = new MCRLink("locator", c.getUrl(), c.getUrl(), "");
+                ci.setLink(link);
+
+                List la = session.createQuery("FROM MCRCATEGLABEL WHERE ID = '" + ID + "' AND CLID = '" + CLID + "'").list();
+
+                if (la.size() > 0) {
+                    for (int t = 0; t < la.size(); t++) {
+                        MCRCATEGLABEL cl = (MCRCATEGLABEL) la.get(t);
+                        MCRLabel label = new MCRLabel(cl.getLang(), cl.getText(), cl.getMcrdesc());
+                        ci.addLabel(label);
+                    }
+                } else
+                    ci = null;
+
             }
 
         } catch (Exception e) {
             logger.error(e);
             throw new MCRException("error while reading categories", e);
         } finally {
-             if ( session != null ) session.close();
+            if (session != null)
+                session.close();
         }
-        
-        if ( null == ci )
-          throw new MCRUsageException("no such category with label'" + labeltext + "' in classification '" + CLID + "' found");
+
+        if (null == ci)
+            throw new MCRUsageException("no such category with label'" + labeltext + "' in classification '" + CLID + "' found");
 
         return ci;
     }
@@ -347,7 +376,8 @@ public class MCRHIBClassificationStore implements MCRClassificationInterface {
 
             return false;
         } finally {
-             if ( session != null ) session.close();
+            if (session != null)
+                session.close();
         }
 
         return ret;
@@ -371,25 +401,31 @@ public class MCRHIBClassificationStore implements MCRClassificationInterface {
 
             for (int t = 0; t < l.size(); t++) {
                 MCRCATEG c = (MCRCATEG) l.get(t);
-                MCRCategoryItem child = new MCRCategoryItem(c.getId(), c.getClid(), c.getPid());
-                child.setURL(c.getUrl());
+                MCRCategoryItem child = new MCRCategoryItem();
+                child.setId(c.getId());
+                child.setClassID(c.getClid());
+                child.setParentID(c.getPid());
+                MCRLink link = new MCRLink("locator", c.getUrl(), c.getUrl(), "");
+                child.setLink(link);
                 children.add(child);
             }
 
             for (int i = 0; i < children.size(); i++) {
                 MCRCategoryItem child = (MCRCategoryItem) (children.get(i));
-                List li = session.createQuery("from MCRCATEGLABEL where ID = '" + child.getID() + "' and CLID = '" + CLID + "'").list();
+                List li = session.createQuery("from MCRCATEGLABEL where ID = '" + child.getId() + "' and CLID = '" + CLID + "'").list();
 
                 for (int t = 0; t < li.size(); t++) {
                     MCRCATEGLABEL cl = (MCRCATEGLABEL) li.get(t);
-                    child.addData(cl.getLang(), cl.getText(), cl.getMcrdesc());
+                    MCRLabel label = new MCRLabel(cl.getLang(), cl.getText(), cl.getMcrdesc());
+                    child.addLabel(label);
                 }
             }
         } catch (Exception e) {
             logger.error(e);
             throw new MCRException("error while retrieving children of CATEG " + PID, e);
         } finally {
-             if ( session != null ) session.close();
+            if (session != null)
+                session.close();
         }
 
         return children;
@@ -429,12 +465,13 @@ public class MCRHIBClassificationStore implements MCRClassificationInterface {
             logger.error(e);
             throw new MCRException("error while retrieving classification IDs", e);
         } finally {
-             if ( session != null ) session.close();
+            if (session != null)
+                session.close();
         }
 
         return ID;
     }
-    
+
     /**
      * The method returns all availiable classification's they are loaded.
      * 
@@ -442,37 +479,42 @@ public class MCRHIBClassificationStore implements MCRClassificationInterface {
      */
     public final MCRClassificationItem[] getAllClassification() {
         Session session = getSession();
-    	logger.debug("List of classifications");
-    	MCRClassificationItem[] classList =null;
-    	
+        logger.debug("List of classifications");
+        MCRClassificationItem[] classList = null;
+
         try {
-        	//SELECT count * from MCRCLASS !!! ist redundanzfrei!
+            // SELECT count * from MCRCLASS !!! ist redundanzfrei!
             List lcount = session.createQuery("from MCRCLASS").list();
             classList = new MCRClassificationItem[lcount.size()];
 
-        	//SELECT id, lang, text, mcrdesc FROM MCRCLASSLABEL M order by id, lang, !! ist mehr als count * from MCRCLASS
+            // SELECT id, lang, text, mcrdesc FROM MCRCLASSLABEL M order by id,
+            // lang, !! ist mehr als count * from MCRCLASS
             List l = session.createQuery("from MCRCLASSLABEL ORDER BY 1,2").list();
-            
+
             int k = -1;
 
-            for(int i=0; i < l.size(); i++) {
-            	MCRCLASSLABEL actual = (MCRCLASSLABEL)l.get(i);
-            	if ( k==-1 || !classList[k].getClassificationID().equalsIgnoreCase(actual.getId()) ){
-            		k++;
+            for (int i = 0; i < l.size(); i++) {
+                MCRCLASSLABEL actual = (MCRCLASSLABEL) l.get(i);
+                if (k == -1 || !classList[k].getId().equalsIgnoreCase(actual.getId())) {
+                    k++;
                     logger.debug("next ID of classList[" + Integer.toString(k) + "] = " + actual.getId());
-            		classList[k] = new MCRClassificationItem(actual.getId());
-               		logger.debug("add first data of classList[" + Integer.toString(k) + "] = " + actual.getId());
-               	 	classList[k].addData(actual.getLang(),actual.getText(),actual.getMcrdesc());
-            	} else {
-            		logger.debug("add more data of classList[" + Integer.toString(k) + "] = " + actual.getId());
-               	 	classList[k].addData(actual.getLang(),actual.getText(),actual.getMcrdesc());
-            	}
+                    classList[k] = new MCRClassificationItem();
+                    classList[k].setId(actual.getId());
+                    logger.debug("add first data of classList[" + Integer.toString(k) + "] = " + actual.getId());
+                    MCRLabel label = new MCRLabel(actual.getLang(), actual.getText(), actual.getMcrdesc());
+                    classList[k].addLabel(label);
+                } else {
+                    logger.debug("add more data of classList[" + Integer.toString(k) + "] = " + actual.getId());
+                    MCRLabel label = new MCRLabel(actual.getLang(), actual.getText(), actual.getMcrdesc());
+                    classList[k].addLabel(label);
+                }
             }
         } catch (Exception e) {
             logger.error(e.getMessage());
             throw new MCRException("error while retrieving classifications ", e);
         } finally {
-             if ( session != null ) session.close();
+            if (session != null)
+                session.close();
         }
         return classList;
     }

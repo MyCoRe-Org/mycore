@@ -30,16 +30,21 @@ import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRPersistenceException;
 
 /**
- * This class is the manangement class for the whole classification system of
- * MyCoRe. They would only used by the ClassificationItem and CategoryItem.
+ * This class is the manangement class for the SQL store of the classification
+ * system of MyCoRe. They would only used by the MCRClassification.
+ * 
+ * @author Frank Luetzenkirchen
+ * @author Jens Kupferschmidt
+ * @author Thomas Scheffler (yagee)
+ * @version $Revision$ $Date$
  */
-class MCRClassificationManager {
+public class MCRClassificationManager {
     protected static MCRClassificationManager manager;
 
     /**
      * Make an instance of MCRClassificationManager.
      */
-    protected static MCRClassificationManager instance() {
+    public static MCRClassificationManager instance() {
         if (manager == null) {
             manager = new MCRClassificationManager();
         }
@@ -48,10 +53,13 @@ class MCRClassificationManager {
     }
 
     protected MCRCache categoryCache;
+
     protected MCRCache classificationCache;
+
     protected MCRCache jDomCache;
-    
+
     protected MCRClassificationInterface store;
+
     private static final MCRConfiguration CONFIG = MCRConfiguration.instance();
 
     /**
@@ -70,18 +78,18 @@ class MCRClassificationManager {
     }
 
     void createClassificationItem(MCRClassificationItem classification) {
-        if (store.classificationItemExists(classification.getID())) {
+        if (store.classificationItemExists(classification.getId())) {
             throw new MCRPersistenceException("Classification already exists");
         }
 
         store.createClassificationItem(classification);
-        classificationCache.put(classification.getID(), classification);
+        classificationCache.put(classification.getId(), classification);
         CONFIG.systemModified();
     }
 
     void createCategoryItem(MCRCategoryItem category) {
-        if (store.categoryItemExists(category.getClassificationID(), category.getID())) {
-            throw new MCRPersistenceException("Category " + category.getID() + " already exists");
+        if (store.categoryItemExists(category.getClassID(), category.getId())) {
+            throw new MCRPersistenceException("Category " + category.getId() + " already exists");
         }
 
         store.createCategoryItem(category);
@@ -89,7 +97,7 @@ class MCRClassificationManager {
         CONFIG.systemModified();
     }
 
-    MCRClassificationItem retrieveClassificationItem(String ID) {
+    public final MCRClassificationItem retrieveClassificationItem(String ID) {
         MCRClassificationItem c = (MCRClassificationItem) (classificationCache.get(ID));
 
         if (c == null) {
@@ -148,19 +156,18 @@ class MCRClassificationManager {
         return store.retrieveNumberOfChildren(classifID, parentID);
     }
 
-    
     protected String getCachingID(MCRCategoryItem category) {
-        return category.getClassificationID() + "@@" + category.getID();
+        return category.getClassID() + "@@" + category.getId();
     }
 
     protected String[] getAllClassificationID() {
         return store.getAllClassificationID();
     }
-    
+
     protected MCRClassificationItem[] getAllClassification() {
         return store.getAllClassification();
     }
-    
+
     void deleteClassificationItem(String classifID) {
         classificationCache.remove(classifID);
         jDomCache.remove(classifID);
@@ -174,5 +181,5 @@ class MCRClassificationManager {
         store.deleteCategoryItem(classifID, categID);
         CONFIG.systemModified();
     }
-    
+
 }

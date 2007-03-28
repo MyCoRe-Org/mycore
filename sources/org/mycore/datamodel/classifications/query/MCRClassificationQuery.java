@@ -24,7 +24,6 @@
 package org.mycore.datamodel.classifications.query;
 
 import java.io.IOException;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
 
@@ -76,7 +75,7 @@ public class MCRClassificationQuery {
         Classification returns = getClassification(classID, categID, withCounter);
         if (levels != 0) {
             LOGGER.debug("getCategoryItem");
-            MCRCategoryItem catItem = MCRCategoryItem.getCategoryItem(classID, categID);
+            MCRCategoryItem catItem = MCRClassification.receiveCategoryItem(classID, categID);
             // map of every categID with numberofObjects
             LOGGER.debug("countReferenceCategory");
             Map map = withCounter ? MCRLinkTableManager.instance().countReferenceCategory(classID) : null;
@@ -102,14 +101,14 @@ public class MCRClassificationQuery {
      * @return
      */
     public static Classification getClassificationHierarchie(String classID, String categID, int levels, boolean withCounter) {
-        MCRCategoryItem catItem = MCRCategoryItem.getCategoryItem(classID, categID);
-        MCRCategoryItem parent = catItem.getParent();
+        MCRCategoryItem catItem = MCRClassification.receiveCategoryItem(classID, categID);
+        MCRCategoryItem parent = MCRClassification.receiveCategoryItem(catItem.getClassID(),catItem.getParentID());
         LinkedList<MCRCategoryItem> list = new LinkedList<MCRCategoryItem>();
         list.add(0, catItem);
         while (parent != null) {
             // build the ancestor axis
             list.add(0, parent);
-            parent = parent.getParent();
+            parent = MCRClassification.receiveCategoryItem(catItem.getClassID(),parent.getParentID());;
         }
         return ClassificationTransformer.getClassification(catItem, list, levels, withCounter);
 

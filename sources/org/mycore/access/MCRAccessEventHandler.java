@@ -39,6 +39,7 @@ import org.mycore.datamodel.classifications.MCRClassification;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRObject;
+import org.mycore.datamodel.metadata.MCRObjectID;
 
 /**
  * This class holds all EventHandler methods to manage the access part of the
@@ -308,7 +309,7 @@ public class MCRAccessEventHandler extends MCREventHandlerBase {
         long t1 = System.currentTimeMillis();
 
         // create
-        List li = AI.getPermissionsForID(base.getId().getId());
+        List li = AI.getPermissionsForID(base.getId());
         int aclsize = 0;
         if (li != null) {
             aclsize = li.size();
@@ -343,7 +344,7 @@ public class MCRAccessEventHandler extends MCREventHandlerBase {
         long t1 = System.currentTimeMillis();
 
         // update
-        List li = AI.getPermissionsForID(base.getId().getId());
+        List li = AI.getPermissionsForID(base.getId());
         int aclsize = 0;
         if (li != null) {
             aclsize = li.size();
@@ -380,7 +381,7 @@ public class MCRAccessEventHandler extends MCREventHandlerBase {
         long t1 = System.currentTimeMillis();
 
         // delete
-        MCRAccessManager.removeAllRules(base.getId());
+        MCRAccessManager.removeAllRules(new MCRObjectID(base.getId()));
 
         // save the stop time
         long t2 = System.currentTimeMillis();
@@ -394,7 +395,7 @@ public class MCRAccessEventHandler extends MCREventHandlerBase {
 
         // add default ACLs if it does not exist
         // this is only for the migartion process
-        List li = AI.getPermissionsForID(base.getId().getId());
+        List li = AI.getPermissionsForID(base.getId());
         if (li.size() == 0) {
             // Read default XML definition
             try {
@@ -408,15 +409,15 @@ public class MCRAccessEventHandler extends MCREventHandlerBase {
                     String permission = acl.getAttributeValue("permission");
                     if (storedrules.indexOf(permission) != -1) {
                         MCRAccessManager.addRule(base.getId(), permission, conditions, "");
-                        LOGGER.info("Add Permission " + permission + " for " + base.getId().getId() + ".");
+                        LOGGER.info("Add Permission " + permission + " for " + base.getId() + ".");
                     }
                 }
             } catch (Exception e) {
                 LOGGER.warn("Error while parsing file editor_default_acls_classification.xml.");
-                setDefaultPermissions(base.getId().getId(), false);
+                setDefaultPermissions(base.getId(), false);
             }
         } else {
-            LOGGER.warn("Permissions for ID " + base.getId().getId() + " allready exist.");
+            LOGGER.warn("Permissions for ID " + base.getId() + " allready exist.");
         }
 
         // save the stop time

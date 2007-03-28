@@ -229,10 +229,10 @@ public class MCRClassificationCommands extends MCRAbstractCommands {
 
             if (update) {
                 cl.updateInDatastore();
-                LOGGER.info(cl.getId().getId() + " updated.\n");
+                LOGGER.info(cl.getId() + " updated.\n");
             } else {
                 cl.createInDatastore();
-                LOGGER.info(cl.getId().getId() + " loaded.\n");
+                LOGGER.info(cl.getId() + " loaded.\n");
             }
 
             return true;

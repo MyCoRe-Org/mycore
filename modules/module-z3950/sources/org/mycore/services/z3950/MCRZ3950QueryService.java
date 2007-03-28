@@ -9,6 +9,7 @@ import org.jdom.Element;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRUtils;
 import org.mycore.datamodel.classifications.MCRCategoryItem;
+import org.mycore.datamodel.classifications.MCRClassification;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.MCRXMLTableManager;
 import org.mycore.parsers.bool.MCRCondition;
@@ -18,7 +19,7 @@ import org.mycore.services.fieldquery.MCRResults;
 import org.mycore.services.fieldquery.*;
 
 /**
- * Diese Klasse ist eine Implementierung eines Suchservice für die Z39.50-
+ * Diese Klasse ist eine Implementierung eines Suchservice fï¿½r die Z39.50-
  * Schnittstelle. Dabei werden nur Z39.50-Anfragen im Prefixformat
  * entgegengenommen.
  * @author Andreas de Azevedo
@@ -39,7 +40,7 @@ public class MCRZ3950QueryService implements MCRZ3950Query {
     // Das Ergebnis der Suche
     private MCRResults mycoreResults;
     
-    // Wir geben immer nur ein Ergebnis zurück, normalerweise das erste
+    // Wir geben immer nur ein Ergebnis zurï¿½ck, normalerweise das erste
     private int index;
     
 
@@ -60,7 +61,7 @@ public class MCRZ3950QueryService implements MCRZ3950Query {
     public void sort() {}
     
     /**
-     * Gibt alle Ergebnisse als Bytestrom zurück.
+     * Gibt alle Ergebnisse als Bytestrom zurï¿½ck.
      * @return Das Ergebnisdokument als Byte-Array, null falls es keine Ergebnisse gab.
      */
     public byte[] getDocumentAsByteArray() {
@@ -89,7 +90,7 @@ public class MCRZ3950QueryService implements MCRZ3950Query {
     }
     
     /**
-     * Führt eine Suchanfrage in MyCoRe aus.
+     * Fï¿½hrt eine Suchanfrage in MyCoRe aus.
      * @return True falls es Ergebnisse gab, sonst False.
      */
     public boolean search() {
@@ -110,20 +111,20 @@ public class MCRZ3950QueryService implements MCRZ3950Query {
      * Die Methode <code>fillClassificationsWithLabels</code> durchsucht alle
      * Metadaten und untersucht deren benutzte Klassifikationen. Da in den
      * Metadaten nur ein Verweis auf Klasse und Kategorie ist, wird dieser
-     * ergänzt durch sein Label.
+     * ergï¿½nzt durch sein Label.
      */
     private void fillClassificationsWithLabels(org.jdom.Element result) {
         Element metadata = result.getChild("metadata");
         // Alle Kinder des Knotens, also alle Metadaten
         List metadataChildren = metadata.getChildren();
         Iterator itm = metadataChildren.iterator();
-        // Iteriere über alle Knoten
+        // Iteriere ï¿½ber alle Knoten
         while (itm.hasNext()) {
-            // Prüfe, ob der Knoten eine Klassifikation benutzt
+            // Prï¿½fe, ob der Knoten eine Klassifikation benutzt
             Element parent = (Element) itm.next();
             String cl = parent.getAttributeValue("class");
             if (cl.equals("MCRMetaClassification")) {
-                // Iteriere über alle Kinder des Knotens (z.B. Subject)             
+                // Iteriere ï¿½ber alle Kinder des Knotens (z.B. Subject)             
                 List children = parent.getChildren();
                 Iterator it = children.iterator();
                 while (it.hasNext()) {
@@ -131,10 +132,10 @@ public class MCRZ3950QueryService implements MCRZ3950Query {
                     String classificationId = e.getAttributeValue("classid");
                     String categoryId = e.getAttributeValue("categid");
                     MCRCategoryItem category = 
-                        MCRCategoryItem.getCategoryItem(classificationId,
+                        MCRClassification.receiveCategoryItem(classificationId,
                                                         categoryId);
-                    // Fülle den Knoten mit dem Klassifiaktions-Label
-                    e.setText(category.getText(0));
+                    // Fï¿½lle den Knoten mit dem Klassifiaktions-Label
+                    e.setText((String)(category.getLabels()).get(0).getText());
                 }
             }
         }
