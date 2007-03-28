@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
 <!-- ============================================== -->
-<!-- $Revision: 1.62 $ $Date: 2007-03-28 15:53:30 $ -->
+<!-- $Revision: 1.63 $ $Date: 2007-03-28 15:58:34 $ -->
 <!-- ============================================== --> 
 
 <xsl:stylesheet 
@@ -552,7 +552,7 @@
   <xsl:for-each select="ancestor::components/*[@id = current()/@ref]|*">
 
     <xsl:if test="(position() = 1) and ancestor::editor/failed/field[@sortnr=$pos] and contains('textfield textarea password file list checkbox display ', concat(name(),' '))">
-      <xsl:attribute name="class">editorCellValidationFailed</xsl:attribute>
+      <xsl:attribute name="class">editorValidationFailed</xsl:attribute>
     </xsl:if>
 
     <!-- ======== handle nested component (textfield, textarea, ...) ======== -->
