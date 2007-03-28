@@ -135,7 +135,7 @@
         <text i18n="{$headline.i18n}"/>
       </headline>
 
-      <panel id="root" lines="off">
+      <panel id="root">
       
         <hidden var="@mask" default="{$filename.webpage}" />
         <hidden var="conditions/@format" default="xml" />
@@ -252,7 +252,7 @@
     
     <cell row="{$pos}" col="1" colspan="2" anchor="NORTHWEST" var="conditions/boolean/boolean/condition{$pos}">
       <repeater min="1" max="10">
-        <panel lines="off">
+        <panel>
         
           <cell row="1" col="1" anchor="EAST" width="200px" var="@field">
             <xsl:choose>
@@ -450,7 +450,7 @@
   </cell>
   <cell row="97" col="2" anchor="NORTHWEST" var="sortBy/field">
     <repeater min="1" max="3">
-      <panel lines="off">
+      <panel>
         <cell row="1" col="1" anchor="WEST" var="@name">
           <list type="dropdown">
             <item value="" i18n="editor.search.choose" />
@@ -478,7 +478,7 @@
   <xsl:comment> Select maximum number of results and num per page </xsl:comment>
 
   <cell row="98" col="1" colspan="2" anchor="SOUTHEAST" height="50px">
-    <panel lines="off">
+    <panel>
       <cell row="1" col="1" anchor="WEST">
         <text  i18n="editor.search.max" />
       </cell>

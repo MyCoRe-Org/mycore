@@ -159,7 +159,6 @@
 				<xs:element ref="include" minOccurs="0" maxOccurs="unbounded"/>
 			</xs:choice>
 			<xs:attribute name="id" type="xs:ID" use="optional"/>
-			<xs:attribute ref="lines" use="optional" default="off"/>
 		</xs:complexType>
 	</xs:element>
 	<xs:element name="condition">
@@ -383,7 +382,6 @@
 			</xs:choice>
 			<xs:attribute name="min" type="xs:int" use="required"/>
 			<xs:attribute name="max" type="xs:int" use="required"/>
-			<xs:attribute ref="lines" use="optional" default="off"/>
 			<xs:attribute name="pos" use="optional" default="right">
 				<xs:simpleType>
 					<xs:restriction base="xs:string">
@@ -462,14 +460,6 @@
 				<xs:enumeration value="WEST"/>
 				<xs:enumeration value="NORTHWEST"/>
 				<xs:enumeration value="CENTER"/>
-			</xs:restriction>
-		</xs:simpleType>
-	</xs:attribute>
-	<xs:attribute name="lines" id="lines">
-		<xs:simpleType>
-			<xs:restriction base="xs:string">
-				<xs:enumeration value="on"/>
-				<xs:enumeration value="off"/>
 			</xs:restriction>
 		</xs:simpleType>
 	</xs:attribute>
