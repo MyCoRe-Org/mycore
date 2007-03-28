@@ -41,6 +41,13 @@ public class MCRLink implements Cloneable, Serializable {
     String type, href, title, label;
 
     /**
+     * Constructor
+     */
+    public MCRLink() {
+        super();
+    }
+
+    /**
      * Construcor
      * 
      * @param type
@@ -53,6 +60,7 @@ public class MCRLink implements Cloneable, Serializable {
      *            label if link
      */
     public MCRLink(String type, String href, String title, String label) {
+        super();
         if ((type == null) || ((type = type.trim()).length() == 0)) {
             this.type = "locator";
         } else {

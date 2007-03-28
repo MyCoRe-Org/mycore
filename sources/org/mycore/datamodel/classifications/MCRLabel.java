@@ -40,6 +40,13 @@ public class MCRLabel implements Cloneable, Serializable {
     String lang, text, description;
 
     /**
+     * Constructor
+     */
+    public MCRLabel() {
+        super();
+    }
+
+    /**
      * The constructor set all label data.
      * 
      * @param lang the language entry
@@ -47,6 +54,7 @@ public class MCRLabel implements Cloneable, Serializable {
      * @param description the description entry
      */
     public MCRLabel(String lang, String text, String description) {
+        super();
         this.lang = lang;
         this.text = text;
         this.description = description;
