@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
 <!-- ============================================== -->
-<!-- $Revision: 1.63 $ $Date: 2007-03-28 15:58:34 $ -->
+<!-- $Revision: 1.64 $ $Date: 2007-03-28 16:02:23 $ -->
 <!-- ============================================== --> 
 
 <xsl:stylesheet 
@@ -385,6 +385,8 @@
 
   <table cellspacing="0">
     <xsl:if test="ancestor::editor/failed/field[@sortnr=$pos]">
+      <xsl:attribute name="class">editorValidationFailed</xsl:attribute>
+
       <xsl:variable name="message">
         <xsl:for-each select="//condition[@id=ancestor::editor/failed/field[@sortnr=$pos]/@condition]">
           <xsl:call-template name="output.label" />
