@@ -30,7 +30,7 @@ import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.mycore.access.MCRAccessInterface;
 import org.mycore.access.MCRAccessManager;
-import org.mycore.datamodel.metadata.MCRActiveLinkException;
+import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.workflow.MCREditorOutValidator;
 import org.mycore.frontend.workflow.MCRSimpleWorkflowManager;

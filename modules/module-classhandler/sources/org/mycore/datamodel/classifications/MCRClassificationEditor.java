@@ -30,9 +30,7 @@ import static org.mycore.common.MCRConstants.XSI_NAMESPACE;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.log4j.Logger;
@@ -48,8 +46,8 @@ import org.mycore.datamodel.classifications.query.ClassificationObject;
 import org.mycore.datamodel.classifications.query.ClassificationTransformer;
 import org.mycore.datamodel.classifications.query.Label;
 import org.mycore.datamodel.classifications.query.MCRClassificationQuery;
-import org.mycore.datamodel.metadata.MCRActiveLinkException;
-import org.mycore.datamodel.metadata.MCRLinkTableManager;
+import org.mycore.datamodel.common.MCRActiveLinkException;
+import org.mycore.datamodel.common.MCRLinkTableManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 
 /**

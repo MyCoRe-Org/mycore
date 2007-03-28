@@ -29,8 +29,8 @@ import java.util.List;
 import org.apache.log4j.Logger;
 
 import org.jdom.Document;
-import org.mycore.datamodel.metadata.MCRLinkTableManager;
-import org.mycore.datamodel.metadata.MCRXMLTableManager;
+import org.mycore.datamodel.common.MCRLinkTableManager;
+import org.mycore.datamodel.common.MCRXMLTableManager;
 import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.services.fieldquery.MCRHit;

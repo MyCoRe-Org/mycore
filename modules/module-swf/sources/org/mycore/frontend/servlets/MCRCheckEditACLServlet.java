@@ -30,7 +30,7 @@ import java.util.List;
 
 import org.mycore.common.MCRMailer;
 import org.mycore.common.MCRUtils;
-import org.mycore.datamodel.metadata.MCRActiveLinkException;
+import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.MCRObjectService;
