@@ -37,6 +37,9 @@ import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventManager;
 import org.mycore.common.xml.MCRXMLHelper;
+import org.mycore.datamodel.common.MCRActiveLinkException;
+import org.mycore.datamodel.common.MCRLinkTableManager;
+import org.mycore.datamodel.common.MCRXMLTableManager;
 
 /**
  * This class implements all methode for handling one metadata object. Methodes

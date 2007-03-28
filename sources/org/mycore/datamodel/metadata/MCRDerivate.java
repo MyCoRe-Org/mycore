@@ -35,6 +35,8 @@ import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventManager;
 import org.mycore.common.xml.MCRXMLHelper;
+import org.mycore.datamodel.common.MCRActiveLinkException;
+import org.mycore.datamodel.common.MCRXMLTableManager;
 import org.mycore.datamodel.ifs.MCRDirectory;
 import org.mycore.datamodel.ifs.MCRFileImportExport;
 

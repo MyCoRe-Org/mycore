@@ -72,7 +72,7 @@ import org.mycore.datamodel.classifications.query.ClassificationTransformer;
 import org.mycore.datamodel.classifications.query.MCRClassificationQuery;
 import org.mycore.datamodel.ifs.MCRDirectoryXML;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.datamodel.metadata.MCRXMLTableManager;
+import org.mycore.datamodel.common.MCRXMLTableManager;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.services.fieldquery.MCRQuery;
 import org.mycore.services.fieldquery.MCRQueryClient;

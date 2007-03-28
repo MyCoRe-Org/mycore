@@ -23,7 +23,6 @@
 
 package org.mycore.backend.jdom;
 
-import java.io.InputStream;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
@@ -32,18 +31,16 @@ import org.apache.log4j.Logger;
 import org.jdom.Document;
 
 import org.mycore.common.MCRConfiguration;
-import org.mycore.common.MCRConfigurationException;
-import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.datamodel.metadata.MCRNormalizeText;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.datamodel.metadata.MCRXMLTableManager;
+import org.mycore.datamodel.common.MCRXMLTableManager;
 
 /**
  * This class implements the memory store based on JDOM documents.
  * 
  * @author Jens Kupferschmidt
- * @author Frank Lützenkirchen
+ * @author Frank Lï¿½tzenkirchen
  * 
  * @version $Revision$ $Date$
  */

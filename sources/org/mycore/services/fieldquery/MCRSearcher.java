@@ -32,7 +32,7 @@ import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandler;
 import org.mycore.common.events.MCREventHandlerBase;
 import org.mycore.datamodel.ifs.MCRFile;
-import org.mycore.datamodel.metadata.MCRLinkTableManager;
+import org.mycore.datamodel.common.MCRLinkTableManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.parsers.bool.MCRCondition;
 
@@ -44,7 +44,7 @@ import org.mycore.parsers.bool.MCRCondition;
  * overwriting the method search. Searchers that do not need indexing or do this
  * on their own can simply ignore the add/remove methods.
  * 
- * @author Frank Lützenkirchen
+ * @author Frank Lï¿½tzenkirchen
  */
 public abstract class MCRSearcher extends MCREventHandlerBase implements MCREventHandler {
     /** The logger */

@@ -21,12 +21,21 @@
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
  */
 
-package org.mycore.datamodel.metadata;
+package org.mycore.datamodel.common;
 
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandlerBase;
 import org.mycore.datamodel.classifications.MCRCategoryItem;
 import org.mycore.datamodel.classifications.MCRClassification;
+import org.mycore.datamodel.metadata.MCRMetaClassification;
+import org.mycore.datamodel.metadata.MCRMetaElement;
+import org.mycore.datamodel.metadata.MCRMetaInterface;
+import org.mycore.datamodel.metadata.MCRMetaLink;
+import org.mycore.datamodel.metadata.MCRMetaLinkID;
+import org.mycore.datamodel.metadata.MCRObject;
+import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.datamodel.metadata.MCRObjectMetadata;
+import org.mycore.datamodel.metadata.MCRObjectStructure;
 
 /**
  * This class manages all operations of the LinkTables for operations of an

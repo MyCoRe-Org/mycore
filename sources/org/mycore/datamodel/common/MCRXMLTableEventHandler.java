@@ -21,13 +21,16 @@
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
  */
 
-package org.mycore.datamodel.metadata;
+package org.mycore.datamodel.common;
 
 import java.util.List;
 
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandlerBase;
 import org.mycore.datamodel.classifications.MCRClassification;
+import org.mycore.datamodel.metadata.MCRDerivate;
+import org.mycore.datamodel.metadata.MCRObject;
+import org.mycore.datamodel.metadata.MCRObjectID;
 
 /**
  * This class manages all operations of the XMLTables for operations of an

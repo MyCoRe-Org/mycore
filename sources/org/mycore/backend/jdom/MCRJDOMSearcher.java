@@ -49,7 +49,7 @@ import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.datamodel.metadata.MCRXMLTableManager;
+import org.mycore.datamodel.common.MCRXMLTableManager;
 import org.mycore.frontend.editor.MCRInputValidator;
 import org.mycore.parsers.bool.MCRAndCondition;
 import org.mycore.parsers.bool.MCRCondition;
@@ -73,7 +73,7 @@ import org.mycore.services.fieldquery.MCRSortBy;
  * persistent store and indexed in memory. This class may also be useful for
  * learning how to implement MCRSearchers and indexers.
  * 
- * @author Frank Lützenkirchen
+ * @author Frank Lï¿½tzenkirchen
  */
 public class MCRJDOMSearcher extends MCRSearcher {
     /** The logger */

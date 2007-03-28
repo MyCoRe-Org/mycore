@@ -30,7 +30,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.mycore.common.MCRConfiguration;
-import org.mycore.datamodel.metadata.MCRXMLTableManager;
+import org.mycore.datamodel.common.MCRXMLTableManager;
 
 /**
  * The purpose of this interface is to make the choice of the persistence layer

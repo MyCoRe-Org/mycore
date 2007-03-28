@@ -35,7 +35,7 @@ import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.mycore.common.MCRException;
-import org.mycore.datamodel.metadata.MCRLinkTableManager;
+import org.mycore.datamodel.common.MCRLinkTableManager;
 import org.mycore.services.fieldquery.MCRHit;
 import org.mycore.services.fieldquery.MCRResults;
 

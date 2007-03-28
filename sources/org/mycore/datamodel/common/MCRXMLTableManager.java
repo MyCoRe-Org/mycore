@@ -21,7 +21,7 @@
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
  */
 
-package org.mycore.datamodel.metadata;
+package org.mycore.datamodel.common;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -39,6 +39,7 @@ import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.MCRUtils;
 import org.mycore.common.xml.MCRXMLHelper;
+import org.mycore.datamodel.metadata.MCRObjectID;
 
 /**
  * This class manage all accesses to the XML table database. This database holds

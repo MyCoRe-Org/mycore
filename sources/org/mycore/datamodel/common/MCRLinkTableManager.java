@@ -21,7 +21,7 @@
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
  */
 
-package org.mycore.datamodel.metadata;
+package org.mycore.datamodel.common;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -34,6 +34,7 @@ import org.mycore.common.MCRException;
 import org.mycore.datamodel.classifications.MCRCategoryItem;
 import org.mycore.datamodel.classifications.MCRClassification;
 import org.mycore.datamodel.classifications.MCRClassificationItem;
+import org.mycore.datamodel.metadata.MCRObjectID;
 
 /**
  * This class manage all accesses to the link table database. This database

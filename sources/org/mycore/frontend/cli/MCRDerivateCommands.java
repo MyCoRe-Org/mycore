@@ -50,7 +50,7 @@ import org.mycore.datamodel.ifs.MCRFileImportExport;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.datamodel.metadata.MCRXMLTableManager;
+import org.mycore.datamodel.common.MCRXMLTableManager;
 
 /**
  * Provides static methods that implement commands for the MyCoRe command line

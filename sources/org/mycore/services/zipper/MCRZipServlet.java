@@ -55,7 +55,7 @@ import org.mycore.datamodel.ifs.MCRDirectory;
 import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.ifs.MCRFilesystemNode;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.datamodel.metadata.MCRXMLTableManager;
+import org.mycore.datamodel.common.MCRXMLTableManager;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
 
@@ -159,7 +159,7 @@ public class MCRZipServlet extends MCRServlet {
                 out.close();
             }
         } catch (Exception e) {
-            String msg = "Das Zip-File konnte nicht ordnungsgemäss erstellt werden, " + "Bitte überprüfen Sie die eingegebenen Parameter";
+            String msg = "Das Zip-File konnte nicht ordnungsgemï¿½ss erstellt werden, " + "Bitte ï¿½berprï¿½fen Sie die eingegebenen Parameter";
             res.reset();
             generateErrorPage(req, res, HttpServletResponse.SC_BAD_REQUEST, msg, new MCRException("zip-Error!",e), false);
         }

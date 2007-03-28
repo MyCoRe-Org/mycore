@@ -43,7 +43,7 @@ import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.datamodel.metadata.MCRActiveLinkException;
+import org.mycore.datamodel.common.MCRActiveLinkException;
 
 /**
  * The main class implementing the MyCoRe command line interface. With the

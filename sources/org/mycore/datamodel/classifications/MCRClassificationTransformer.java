@@ -42,7 +42,6 @@ import org.jdom.Namespace;
 import org.mycore.common.MCRUtils;
 import org.mycore.datamodel.classifications.MCRCategoryItem;
 import org.mycore.datamodel.classifications.MCRClassificationItem;
-import org.mycore.datamodel.metadata.MCRLinkTableManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 
 /**

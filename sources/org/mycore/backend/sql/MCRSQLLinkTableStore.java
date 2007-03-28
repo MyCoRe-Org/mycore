@@ -33,7 +33,7 @@ import org.apache.log4j.Logger;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
-import org.mycore.datamodel.metadata.MCRLinkTableInterface;
+import org.mycore.datamodel.common.MCRLinkTableInterface;
 import org.mycore.datamodel.metadata.MCRObjectID;
 
 /**

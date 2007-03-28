@@ -32,7 +32,7 @@ import org.jdom.Document;
 import org.mycore.common.MCRUtils;
 import org.mycore.datamodel.classifications.MCRCategoryItem;
 import org.mycore.datamodel.classifications.MCRClassification;
-import org.mycore.datamodel.metadata.MCRLinkTableManager;
+import org.mycore.datamodel.common.MCRLinkTableManager;
 
 /**
  * 

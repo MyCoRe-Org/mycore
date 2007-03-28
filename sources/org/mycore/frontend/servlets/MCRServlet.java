@@ -49,7 +49,7 @@ import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.xml.MCRLayoutService;
 import org.mycore.common.xml.MCRURIResolver;
-import org.mycore.datamodel.metadata.MCRActiveLinkException;
+import org.mycore.datamodel.common.MCRActiveLinkException;
 
 /**
  * This is the superclass of all MyCoRe servlets. It provides helper methods for
@@ -57,7 +57,7 @@ import org.mycore.datamodel.metadata.MCRActiveLinkException;
  * taken from MilessServlet.java written by Frank Lï¿½tzenkirchen.
  * 
  * @author Detlev Degenhardt
- * @author Frank Lützenkirchen
+ * @author Frank Lï¿½tzenkirchen
  * @author Thomas Scheffler (yagee)
  * 
  * @version $Revision$ $Date$

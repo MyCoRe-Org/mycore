@@ -24,38 +24,28 @@
 package org.mycore.datamodel.classifications;
 
 import static org.jdom.Namespace.XML_NAMESPACE;
-import static org.mycore.common.MCRConstants.XLINK_NAMESPACE;
 import static org.mycore.common.MCRConstants.XSI_NAMESPACE;
+import static org.mycore.common.MCRConstants.XLINK_NAMESPACE;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.filter.ElementFilter;
-import org.jdom.output.Format;
-import org.jdom.output.XMLOutputter;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
-import org.mycore.common.MCRUtils;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventManager;
 import org.mycore.common.xml.MCRXMLHelper;
-import org.mycore.datamodel.metadata.MCRActiveLinkException;
-import org.mycore.datamodel.metadata.MCRLinkTableManager;
+import org.mycore.datamodel.common.MCRActiveLinkException;
+import org.mycore.datamodel.common.MCRLinkTableManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.MCRObjectService;
-import org.mycore.datamodel.metadata.MCRXMLTableManager;
+import org.mycore.datamodel.common.MCRXMLTableManager;
 
 /**
  * This class implements all methods for a classification and extended the

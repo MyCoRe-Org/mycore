@@ -21,7 +21,8 @@
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
  *
  **/
-package org.mycore.datamodel.metadata;
+
+package org.mycore.datamodel.common;
 
 import java.util.Collection;
 import java.util.Map;

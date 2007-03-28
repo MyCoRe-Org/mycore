@@ -30,6 +30,7 @@ import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
+import org.mycore.datamodel.common.MCRActiveLinkException;
 
 /**
  * This class is a abstract basic class for objects in the MyCoRe Project. It is

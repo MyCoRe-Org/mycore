@@ -31,6 +31,7 @@ import java.util.HashMap;
 import org.apache.log4j.Logger;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
+import org.mycore.datamodel.common.MCRXMLTableManager;
 
 /**
  * This class holds all informations and methods to handle the MyCoRe Object ID.

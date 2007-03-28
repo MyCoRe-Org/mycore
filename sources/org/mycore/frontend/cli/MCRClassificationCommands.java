@@ -40,9 +40,9 @@ import org.mycore.common.MCRException;
 import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.common.xml.MCRXMLHelper;
 import org.mycore.datamodel.classifications.MCRClassification;
-import org.mycore.datamodel.metadata.MCRActiveLinkException;
+import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.datamodel.metadata.MCRXMLTableManager;
+import org.mycore.datamodel.common.MCRXMLTableManager;
 
 /**
  * Provides static methods that implement commands for the MyCoRe command line
@@ -265,7 +265,7 @@ public class MCRClassificationCommands extends MCRAbstractCommands {
                 if (!dir.isDirectory()) {
                     LOGGER.error("Can't find or create directory " + dirname);
                     LOGGER.info("");
-                   return false;
+                    return false;
                 } else {
                     dname = dirname;
                 }
@@ -278,7 +278,7 @@ public class MCRClassificationCommands extends MCRAbstractCommands {
         MCRObjectID mcr_id = new MCRObjectID(ID);
         MCRClassification cl = new MCRClassification();
         byte[] xml = cl.receiveClassificationAsXML(mcr_id.getId());
-        
+
         try {
             Transformer trans = getTransformer(style);
             File xmlOutput = new File(dname, ID + ".xml");
@@ -318,7 +318,7 @@ public class MCRClassificationCommands extends MCRAbstractCommands {
             ret = ret & export(id, dirname, style);
         }
         return ret;
-    } 
+    }
 
     /**
      * The method search for a stylesheet mcr_<em>style</em>_object.xsl and

@@ -21,11 +21,12 @@
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
  */
 
-package org.mycore.datamodel.metadata;
+package org.mycore.datamodel.common;
 
 import java.util.List;
 
 import org.mycore.common.MCRPersistenceException;
+import org.mycore.datamodel.metadata.MCRObjectID;
 
 /**
  * This interface is designed to choose the Persistence for the XML tables.

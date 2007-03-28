@@ -34,7 +34,7 @@ import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.datamodel.metadata.MCRXMLTableInterface;
+import org.mycore.datamodel.common.MCRXMLTableInterface;
 
 /**
  * This class implements the MCRXMLInterface as a presistence layer for the

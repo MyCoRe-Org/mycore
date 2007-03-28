@@ -30,7 +30,7 @@ import org.jdom.Document;
 import org.jdom.Element;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.datamodel.metadata.MCRXMLTableManager;
+import org.mycore.datamodel.common.MCRXMLTableManager;
 
 /**
  * Use this class if you want to have a fallback to ancestor access rules.

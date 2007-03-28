@@ -40,7 +40,7 @@ import org.mycore.common.MCRCache;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.datamodel.metadata.MCRXMLTableManager;
+import org.mycore.datamodel.common.MCRXMLTableManager;
 import org.mycore.services.fieldquery.MCRHit;
 import org.mycore.services.fieldquery.MCRQueryClient;
 import org.mycore.services.fieldquery.MCRResults;

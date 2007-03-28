@@ -36,7 +36,7 @@ import org.hibernate.Transaction;
 import org.mycore.backend.hibernate.tables.MCRLINKHREF;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
-import org.mycore.datamodel.metadata.MCRLinkTableInterface;
+import org.mycore.datamodel.common.MCRLinkTableInterface;
 
 /**
  * This class implements the MCRLinkTableInterface.
