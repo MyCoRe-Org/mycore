@@ -236,7 +236,7 @@ final public class MCRDerivate extends MCRBase {
         MCRMetaLinkID der = new MCRMetaLinkID();
         der.setReference(mcr_id.getId(), mcr_label, "");
         der.setSubTag("derobject");
-        byte[] backup = MCRXMLTableManager.instance().retrieve(meta.getXLinkHrefID());
+        byte[] backup = MCRXMLTableManager.instance().retrieveAsXML(meta.getXLinkHrefID());
 
         try {
             MCRObject obj = new MCRObject();
@@ -436,7 +436,7 @@ final public class MCRDerivate extends MCRBase {
      *                if a persistence problem is occured
      */
     public static final byte[] receiveXMLFromDatastore(MCRObjectID id) throws MCRPersistenceException {
-        return MCRXMLTableManager.instance().retrieve(id);
+        return MCRXMLTableManager.instance().retrieveAsXML(id);
     }
 
     /**

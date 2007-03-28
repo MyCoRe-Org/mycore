@@ -112,7 +112,7 @@ public class MCRJDOMSearcher extends MCRSearcher {
                     MCRObject obj = new MCRObject();
                     MCRObjectID oid = new MCRObjectID(sid);
                     obj.setId(oid);
-                    obj.setFromXML(mcr_xml.retrieve(oid), false);
+                    obj.setFromXML(mcr_xml.retrieveAsXML(oid), false);
                     List fields = MCRData2Fields.buildFields(obj, index);
                     addToIndex(sid, sid, fields);
                 }

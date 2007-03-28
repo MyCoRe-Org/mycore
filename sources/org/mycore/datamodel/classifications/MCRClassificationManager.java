@@ -24,10 +24,12 @@
 package org.mycore.datamodel.classifications;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRPersistenceException;
+import org.mycore.datamodel.metadata.MCRObjectID;
 
 /**
  * This class is the manangement class for the SQL store of the classification
@@ -87,7 +89,7 @@ public class MCRClassificationManager {
         CONFIG.systemModified();
     }
 
-    void createCategoryItem(MCRCategoryItem category) {
+    protected void createCategoryItem(MCRCategoryItem category) {
         if (store.categoryItemExists(category.getClassID(), category.getId())) {
             throw new MCRPersistenceException("Category " + category.getId() + " already exists");
         }
@@ -95,6 +97,15 @@ public class MCRClassificationManager {
         store.createCategoryItem(category);
         categoryCache.put(getCachingID(category), category);
         CONFIG.systemModified();
+    }
+    
+    protected void createCategoryItems(List catlist) {
+        if ((catlist == null) || (catlist.size() == 0)) return;
+        for (int i=0; i<catlist.size();i++) {
+        MCRCategoryItem cat = (MCRCategoryItem) catlist.get(i);
+        createCategoryItem(cat);
+        createCategoryItems(cat.getCategories());
+        }
     }
 
     public final MCRClassificationItem retrieveClassificationItem(String ID) {
@@ -168,14 +179,22 @@ public class MCRClassificationManager {
         return store.getAllClassification();
     }
 
-    void deleteClassificationItem(String classifID) {
+    protected void deleteClassificationItem(MCRObjectID classifID) {
+        deleteClassificationItem(classifID.getId());
+    }
+    
+    protected void deleteClassificationItem(String classifID) {
         classificationCache.remove(classifID);
         jDomCache.remove(classifID);
         store.deleteClassificationItem(classifID);
         CONFIG.systemModified();
     }
 
-    void deleteCategoryItem(String classifID, String categID) {
+    protected void deleteCategoryItem(MCRObjectID classifID, String categID) {
+        deleteCategoryItem(classifID.getId(),categID);
+    }
+    
+    protected void deleteCategoryItem(String classifID, String categID) {
         categoryCache.remove(classifID + "@@" + categID);
         jDomCache.remove(classifID + "@@" + categID);
         store.deleteCategoryItem(classifID, categID);

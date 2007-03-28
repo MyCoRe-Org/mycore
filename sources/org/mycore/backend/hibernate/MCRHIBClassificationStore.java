@@ -208,16 +208,21 @@ public class MCRHIBClassificationStore implements MCRClassificationInterface {
         Transaction tx = session.beginTransaction();
 
         try {
-            MCRCATEG c = new MCRCATEG(category.getId(), category.getClassID(), category.getParentID(), category.getLink().getHref());
+            String url = (category.getLink() != null) ? category.getLink().getHref() : "";
+            MCRCATEG c = new MCRCATEG(category.getId(), category.getClassID(), category.getParentID(), url);
             session.saveOrUpdate(c);
-            ArrayList<MCRLabel> label = (ArrayList<MCRLabel>) category.getLabels();
-            for (int i = 0; i < label.size(); i++) {
-                MCRCATEGLABEL cl = new MCRCATEGLABEL(category.getId(), category.getClassID(), ((MCRLabel) label.get(i)).getLang(), ((MCRLabel) label.get(i)).getText(), ((MCRLabel) label.get(i)).getDescription());
+            ArrayList<MCRLabel> labellist = (ArrayList<MCRLabel>) category.getLabels();
+            for (int i = 0; i < labellist.size(); i++) {
+                MCRLabel label = (MCRLabel) labellist.get(i); 
+                String text = (label.getText() != null) ? label.getText() : "";
+                String desc = (label.getDescription() != null) ? label.getDescription() : "";
+                MCRCATEGLABEL cl = new MCRCATEGLABEL(category.getId(), category.getClassID(), label.getLang(), text, desc);
                 session.saveOrUpdate(cl);
             }
 
             tx.commit();
         } catch (Exception e) {
+            e.printStackTrace();
             tx.rollback();
             logger.error(e);
         } finally {

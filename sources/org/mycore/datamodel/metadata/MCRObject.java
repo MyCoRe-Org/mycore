@@ -574,7 +574,7 @@ final public class MCRObject extends MCRBase {
      *                if a persistence problem is occured
      */
     public static final byte[] receiveXMLFromDatastore(MCRObjectID id) throws MCRPersistenceException {
-        return MCRXMLTableManager.instance().retrieve(id);
+        return MCRXMLTableManager.instance().retrieveAsXML(id);
     }
 
     /**

@@ -500,7 +500,9 @@ public class MCRClassificationEditor {
     public final boolean deleteClassification(String clid) {
         LOGGER.debug("Start delete classification " + clid);
         try {
-            MCRClassification.deleteFromDatastore(clid);
+            MCRObjectID mcrclid = new MCRObjectID(clid);
+            MCRClassification cl = new MCRClassification();
+            cl.deleteFromDatastore(mcrclid);
             return true;
         } catch (MCRActiveLinkException ae) {
             LOGGER.warn("Classification: " + clid + " can't be deleted, there are some refernces of documents to this");

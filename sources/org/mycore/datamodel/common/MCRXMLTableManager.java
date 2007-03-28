@@ -198,8 +198,24 @@ public class MCRXMLTableManager {
      * @exception MCRException if
      *                the method arguments are not correct
      */
-    public byte[] retrieve(MCRObjectID mcrid) throws MCRException {
+    public byte[] retrieveAsXML(MCRObjectID mcrid) throws MCRException {
         return getXMLTable(mcrid.getTypeId()).retrieve(mcrid, 1);
+    }
+
+    /**
+     * The method retrieve a dataset for the given MCRObjectID and returns the
+     * corresponding JDOM Document.
+     * 
+     * @param mcrid
+     *            a MCRObjectID
+     * 
+     * @return the JDOM Document of data or NULL
+     * @exception MCRException if
+     *                the method arguments are not correct
+     */
+    public Document retrieveAsJDOM(MCRObjectID mcrid) throws MCRException {
+        byte[] xml = getXMLTable(mcrid.getTypeId()).retrieve(mcrid, 1);
+        return MCRXMLHelper.parseXML(xml,false);
     }
 
     /**
@@ -304,7 +320,7 @@ public class MCRXMLTableManager {
         Document jDoc = (Document) jdomCache.get(id);
 
         if (jDoc == null) {
-            byte[] xml = retrieve(id);
+            byte[] xml = retrieveAsXML(id);
 
             if ((xml == null) || (xml.length == 0)) {
                 StringBuffer sb = new StringBuffer("Error while retrieving XML with id ").append(id).append(" from MCRXMLTableInterface.");
