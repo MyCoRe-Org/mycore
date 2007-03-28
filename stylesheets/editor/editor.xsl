@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
 <!-- ============================================== -->
-<!-- $Revision: 1.61 $ $Date: 2007-03-28 15:36:03 $ -->
+<!-- $Revision: 1.62 $ $Date: 2007-03-28 15:53:30 $ -->
 <!-- ============================================== --> 
 
 <xsl:stylesheet 
@@ -213,7 +213,7 @@
 
   <input type="hidden" name="{$editor.delimiter.internal}n-{$var}" value="{$num.visible}" />
 
-  <table cellspacing="0" class="editorPanel">
+  <table cellspacing="0">
   
     <!-- ======== iterate rows in repeater ======== -->
     <xsl:call-template name="repeater.row">
@@ -331,7 +331,7 @@
   <xsl:param name="max" />
   <xsl:param name="row.nr" />
 
-  <td align="left" valign="bottom" class="editorCellWithComp">
+  <td align="left" valign="bottom">
   
     <table cellspacing="0">
       <tr>
@@ -384,12 +384,6 @@
   <xsl:variable name="cells" select="ancestor::components/panel[@id = current()/include/@ref]/cell|cell" />
 
   <table cellspacing="0">
-    <xsl:attribute name="class">
-      <xsl:choose>
-        <xsl:when test="ancestor::editor/failed/field[@sortnr=$pos]">editorPanelValidationFailed</xsl:when>
-        <xsl:otherwise>editorPanel</xsl:otherwise>
-      </xsl:choose>
-    </xsl:attribute>
     <xsl:if test="ancestor::editor/failed/field[@sortnr=$pos]">
       <xsl:variable name="message">
         <xsl:for-each select="//condition[@id=ancestor::editor/failed/field[@sortnr=$pos]/@condition]">
@@ -557,24 +551,8 @@
   <!-- ======== handle referenced or embedded component ======== -->
   <xsl:for-each select="ancestor::components/*[@id = current()/@ref]|*">
 
-    <xsl:if test="position() = 1">
-      <xsl:attribute name="class">
-        <xsl:choose>
-          <xsl:when test="ancestor::editor/failed/field[@sortnr=$pos] and contains('textfield textarea password file list checkbox display ', concat(name(),' '))">editorCellValidationFailed</xsl:when>
-          <xsl:when test="$first='true'">
-            <xsl:choose>
-			  <xsl:when test="contains('panel repeater ', concat(name(),' '))">editorCellWithPanel</xsl:when>
-              <xsl:otherwise>editorCellWithComp</xsl:otherwise>
-            </xsl:choose>
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:choose>
-			  <xsl:when test="contains('panel repeater ', concat(name(),' '))">editorCellWithPanel</xsl:when>
-              <xsl:otherwise>editorCellWithComp</xsl:otherwise>
-            </xsl:choose>
-          </xsl:otherwise>
-  	    </xsl:choose>
-  	  </xsl:attribute>
+    <xsl:if test="(position() = 1) and ancestor::editor/failed/field[@sortnr=$pos] and contains('textfield textarea password file list checkbox display ', concat(name(),' '))">
+      <xsl:attribute name="class">editorCellValidationFailed</xsl:attribute>
     </xsl:if>
 
     <!-- ======== handle nested component (textfield, textarea, ...) ======== -->
