@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
 <!-- ============================================== -->
-<!-- $Revision: 1.59 $ $Date: 2007-03-02 15:07:23 $ -->
+<!-- $Revision: 1.60 $ $Date: 2007-03-28 15:09:13 $ -->
 <!-- ============================================== --> 
 
 <xsl:stylesheet 
@@ -55,9 +55,7 @@
       <xsl:apply-templates select="headline" />
 
       <!-- ======== if validation errors exist, display message ======== -->
-      <xsl:apply-templates select="ancestor::editor/failed">
-        <xsl:with-param name="lines" select="panel[@id=current()/@root]/@lines" />
-      </xsl:apply-templates>
+      <xsl:apply-templates select="ancestor::editor/failed" />
 
       <tr>
         <td>
@@ -280,13 +278,6 @@
 
   <!-- ======== output another repeated row ======== -->
   <xsl:if test="($row.nr &lt; $min) or ($row.nr &lt; $num)">
-    <xsl:if test="@lines='on'">
-      <tr>
-        <td width="100%" colspan="2" class="editorHLine">
-          <img src="{$WebApplicationBaseURL}images/pmud-blank.png" border="0" height="1" width="1" alt=" "/>
-        </td>
-      </tr>
-    </xsl:if>
     <xsl:call-template name="repeater.row">
       <xsl:with-param name="row.nr" select="1 + $row.nr" />
       <xsl:with-param name="num" select="$num" />
@@ -326,7 +317,6 @@
     <xsl:call-template name="cell">
       <xsl:with-param name="var"   select="$var.new" />
       <xsl:with-param name="pos"   select="$pos.new" />
-      <xsl:with-param name="lines" select="@lines" />
       <xsl:with-param name="first" select="not(@pos='left')" />
     </xsl:call-template>
     
@@ -341,15 +331,8 @@
   <xsl:param name="max" />
   <xsl:param name="row.nr" />
 
-  <td align="left" valign="bottom">
+  <td align="left" valign="bottom" class="editorCellWithComp">
   
-    <xsl:attribute name="class">
-      <xsl:choose>
-        <xsl:when test="@lines='on' and not(@pos='left')">editorCellWithCompLinesOn</xsl:when>
-        <xsl:otherwise>editorCellWithCompLinesOff</xsl:otherwise>
-      </xsl:choose>
-    </xsl:attribute>
-
     <table cellpadding="0" cellspacing="0" border="0">
       <tr>
   
@@ -462,14 +445,6 @@
       </xsl:call-template>
     </tr>
   </xsl:if>
-
-  <xsl:if test="(count($cells[@row=$row.nr]) &gt; 0) and ($cells[@row &gt; $row.nr]) and (@lines='on')">
-    <tr>
-      <td width="100%" colspan="10" class="editorHLine">
-        <img src="{$WebApplicationBaseURL}images/pmud-blank.png" border="0" height="1" width="1" alt=" "/>
-      </td>
-    </tr>
-  </xsl:if>
   
   <!-- ======== iterate through all rows ======== -->
   <xsl:if test="$cells[@row &gt; $row.nr]">
@@ -537,15 +512,12 @@
         <xsl:value-of select="$pos.new" />
       </xsl:attribute>
 
-      <xsl:variable name="lines" select="@lines" />
-      
       <!-- ======== if there is a cell here, handle it ======== -->
       <xsl:for-each select="$the.cell">
         <xsl:call-template name="cell">
           <xsl:with-param name="var"      select="$var"      />
           <xsl:with-param name="pos"      select="$pos.new"  />
           <xsl:with-param name="num.next" select="$num.next" />
-          <xsl:with-param name="lines"    select="$lines"    />
           <xsl:with-param name="first"    select="$num.prev = 0" />
         </xsl:call-template>
       </xsl:for-each>
@@ -570,7 +542,6 @@
   <xsl:param name="var" />
   <xsl:param name="pos" />
   <xsl:param name="num.next" select="'0'" />
-  <xsl:param name="lines" />
   <xsl:param name="first" />
 
   <!-- ======== build new variable path ======== -->
@@ -596,17 +567,14 @@
           <xsl:when test="ancestor::editor/failed/field[@sortnr=$pos] and contains('textfield textarea password file list checkbox display ', concat(name(),' '))">editorCellValidationFailed</xsl:when>
           <xsl:when test="$first='true'">
             <xsl:choose>
-			  <xsl:when test="$lines='off' and @lines='on'">editorCellWithPanelLinesOn</xsl:when>
-			  <xsl:when test="contains('panel repeater ', concat(name(),' '))">editorCellWithPanelLinesOff</xsl:when>
-              <xsl:otherwise>editorCellWithCompLinesOff</xsl:otherwise>
+			  <xsl:when test="contains('panel repeater ', concat(name(),' '))">editorCellWithPanel</xsl:when>
+              <xsl:otherwise>editorCellWithComp</xsl:otherwise>
             </xsl:choose>
           </xsl:when>
           <xsl:otherwise>
             <xsl:choose>
-			  <xsl:when test="$lines='on' and contains('panel repeater ', concat(name(),' '))">editorCellWithPanelLinesOn</xsl:when>
-			  <xsl:when test="$lines='on'">editorCellWithCompLinesOn</xsl:when>
-			  <xsl:when test="contains('panel repeater ', concat(name(),' '))">editorCellWithPanelLinesOff</xsl:when>
-              <xsl:otherwise>editorCellWithCompLinesOff</xsl:otherwise>
+			  <xsl:when test="contains('panel repeater ', concat(name(),' '))">editorCellWithPanel</xsl:when>
+              <xsl:otherwise>editorCellWithComp</xsl:otherwise>
             </xsl:choose>
           </xsl:otherwise>
   	    </xsl:choose>
