@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
 <!-- ============================================== -->
-<!-- $Revision: 1.60 $ $Date: 2007-03-28 15:09:13 $ -->
+<!-- $Revision: 1.61 $ $Date: 2007-03-28 15:36:03 $ -->
 <!-- ============================================== --> 
 
 <xsl:stylesheet 
@@ -49,7 +49,7 @@
   <form>
     <xsl:call-template name="editor.set.form.attrib" />    
 
-    <table border="0" cellpadding="0" cellspacing="0" class="editor">
+    <table cellspacing="0" class="editor">
 
       <!-- ======== if exists, output editor headline ======== -->
       <xsl:apply-templates select="headline" />
@@ -213,7 +213,7 @@
 
   <input type="hidden" name="{$editor.delimiter.internal}n-{$var}" value="{$num.visible}" />
 
-  <table border="0" cellpadding="0" cellspacing="0" class="editorPanel">
+  <table cellspacing="0" class="editorPanel">
   
     <!-- ======== iterate rows in repeater ======== -->
     <xsl:call-template name="repeater.row">
@@ -333,7 +333,7 @@
 
   <td align="left" valign="bottom" class="editorCellWithComp">
   
-    <table cellpadding="0" cellspacing="0" border="0">
+    <table cellspacing="0">
       <tr>
   
       <td align="left" valign="bottom" class="editorRepeaterButton">
@@ -383,7 +383,7 @@
   <!-- ======== include cells of other panels by include/@ref ======== -->
   <xsl:variable name="cells" select="ancestor::components/panel[@id = current()/include/@ref]/cell|cell" />
 
-  <table border="0" cellpadding="0" cellspacing="0">
+  <table cellspacing="0">
     <xsl:attribute name="class">
       <xsl:choose>
         <xsl:when test="ancestor::editor/failed/field[@sortnr=$pos]">editorPanelValidationFailed</xsl:when>
@@ -553,10 +553,6 @@
 
   <!-- ======== set align / valign ======== -->
   <xsl:call-template name="editor.set.anchor" />
-
-  <!-- ======== set width / height ======== -->
-  <xsl:copy-of select="@height" />
-  <xsl:copy-of select="@width" />
 
   <!-- ======== handle referenced or embedded component ======== -->
   <xsl:for-each select="ancestor::components/*[@id = current()/@ref]|*">
@@ -1071,7 +1067,7 @@
 
   <xsl:variable name="type" select="@type" />
 
-  <table cellpadding="0" cellspacing="0" border="0">
+  <table cellspacing="0">
     <xsl:for-each select="item">
 
       <xsl:variable name="pxy" select="position() - 1" />

@@ -142,8 +142,6 @@
 						<xs:attribute ref="sortnr" use="optional"/>
 						<xs:attribute ref="var" use="optional"/>
 						<xs:attribute ref="anchor" use="optional"/>
-						<xs:attribute name="height" type="xs:string" use="optional"/>
-						<xs:attribute name="width" type="xs:string" use="optional"/>
 						<xs:attribute name="ref" type="xs:IDREF" use="optional"/>
 					</xs:complexType>
 				</xs:element>
