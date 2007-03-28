@@ -2,7 +2,7 @@
 
   <!-- =================================================================== -->
   <!-- MyCoRe build file for use with Apache Ant                           -->
-  <!-- $Revision: 1.132 $ $Date: 2007-03-27 15:48:34 $                      -->
+  <!-- $Revision: 1.133 $ $Date: 2007-03-28 11:58:16 $                      -->
   <!-- =================================================================== -->
 
 <project name="MyCoRe" default="usage" basedir=".">
@@ -36,6 +36,27 @@
   <!-- Path where PDF doclet is installed -->
   <property name="doclets" value="/mcr/cvs/doclets" />
 
+  <macrodef name="modulePreHook">
+    <attribute name="target"/>
+    <sequential>
+      <subant target="@{target}" inheritall="true" inheritrefs="true">
+        <fileset dir="." includes="modules/module-*/build.xml">
+        	<containsregexp expression="\u003ctarget.*name=\u0022pre.@{target}\u0022"/> 
+        </fileset>
+      </subant>
+    </sequential>
+  </macrodef>
+  <macrodef name="moduleHook">
+    <attribute name="target"/>
+    <sequential>
+      <subant target="@{target}" inheritall="true" inheritrefs="true">
+        <fileset dir="." includes="modules/module-*/build.xml">
+        	<containsregexp expression="\u003ctarget.*name=\u0022@{target}\u0022"/> 
+        </fileset>
+      </subant>
+    </sequential>
+  </macrodef>
+
   <!-- =================================================================== -->
   <!-- Some help on using ant with this build file                         -->
   <!-- =================================================================== -->
@@ -51,13 +72,14 @@
   <!-- =================================================================== -->
 
   <target name="info" depends="init" description="display software and os versions">
+    <modulePreHook target="info"/>
     <property name="output.classpath" refid="mycore.classpath" />
 
     <echo level="info">Base directory   : ${basedir}</echo>
     <echo level="info">Operating system : ${os.name} Version ${os.version} on ${os.arch} </echo>
     <echo level="info">Java version     : JDK ${ant.java.version} Version ${java.version} from ${java.vendor}</echo>
     <echo level="info">Java home        : ${java.home}</echo>
-    <echo level="info">Ant build file   : $Revision: 1.132 $ $Date: 2007-03-27 15:48:34 $</echo>
+    <echo level="info">Ant build file   : $Revision: 1.133 $ $Date: 2007-03-28 11:58:16 $</echo>
     <echo level="info">Ant version      : ${ant.version}</echo>
     <echo level="info">Ant home         : ${ant.home}</echo>
     <echo level="info">Ant libdir       : ${ant.library.dir}</echo>
@@ -65,6 +87,7 @@
     <echo level="info">JDBC Store type  : ${MCR.JDBCStore.Type}</echo>
     <echo level="info">System CLASSPATH : ${build.sysclasspath}</echo>
     <echo level="info">Active CLASSPATH : ${output.classpath}</echo>
+    <moduleHook target="info"/>
   </target>
 
   <!-- =================================================================== -->
@@ -154,6 +177,7 @@
   <!-- =================================================================== -->
 
   <target name="jar" depends="compile" description="creates lib/mycore*.jar">
+    <modulePreHook target="jar"/>
     <condition property="jarfile" value="mycore.jar">
       <not><equals arg1="${MCR.XMLStore.Type}" arg2="cm8" /></not>
     </condition>
@@ -171,7 +195,7 @@
       <fileset dir="${basedir}/config"  includes="build.properties"      />
       <fileset dir="${basedir}/config"  includes="deprecated.properties" />
     </jar>
-    <echo level="info">---------------------------------------------------------</echo>
+    <moduleHook target="jar"/>
   </target>
   
   <!-- =================================================================== -->
@@ -199,31 +223,21 @@
     <echo level="info">---------------------------------------------------------</echo>
   </target>
 
-  <target name="compile" description="compiles all sources to classes directory"
-	  depends="compile_base, compile_modules">
+  <target name="compile" description="compiles all sources to classes directory">
+    <modulePreHook target="compile"/>
+    <echo level="info">Compiling MyCoRe non-module classes...</echo>
+    <condition property="mcr.exclude" value="org/mycore/backend/cm8/**">
+       <not><equals arg1="${MCR.XMLStore.Type}" arg2="cm8" /></not>
+    </condition>
+    <condition property="mcr.exclude" value="">
+      <equals arg1="${MCR.XMLStore.Type}" arg2="cm8" />
+    </condition>
+    <antcall target="javac">
+       <param name="packages" value="org/mycore/**"/>
+       <param name="excludes" value="${mcr.exclude}"/>
+    </antcall>
+    <moduleHook target="compile"/>
   </target>
-
-  <target name="compile_base">
-     <echo level="info">Compiling MyCoRe non-module classes...</echo>
-     <condition property="mcr.exclude" value="org/mycore/backend/cm8/**">
-        <not><equals arg1="${MCR.XMLStore.Type}" arg2="cm8" /></not>
-     </condition>
-     <condition property="mcr.exclude" value="">
-       <equals arg1="${MCR.XMLStore.Type}" arg2="cm8" />
-     </condition>
-     <antcall target="javac">
-        <param name="packages" value="org/mycore/**"/>
-        <param name="excludes" value="${mcr.exclude}"/>
-     </antcall>
-  </target>	
-
-  <target name="compile_modules">
-    <echo level="info">Compiling MyCoRe modules...</echo>
-    <subant target="compile" inheritall="true" inheritrefs="true">
-      <fileset dir="." includes="modules/module-*/build.xml" />
-    </subant>
-  </target>	
-
 
   <!-- =================================================================== -->
   <!-- Check if javadocs and pdf are up to date or outdated                -->
@@ -268,6 +282,7 @@
   <!-- =================================================================== -->
 
   <target name="javadocs" depends="init,up2date" if="javadocs.outdated" description="creates JavaDoc API documentation in HTML format">
+    <modulePreHook target="javadocs"/>
     <echo level="info">Building the MyCoRe JavaDoc API documentation...</echo>
 
     <mkdir dir="${basedir}/documentation/html" />
@@ -302,7 +317,7 @@
       <link href="http://jakarta.apache.org/lucene/docs/api/" />
       <link href="http://www.mycore.de/library/cm-eip/eip-8.2-javadocs/" />
     </javadoc>
-    <echo level="info">---------------------------------------------------------</echo>
+    <moduleHook target="javadocs"/>
   </target>
 
   <!-- =================================================================== -->
@@ -337,6 +352,7 @@
   <!-- =================================================================== -->
 
   <target name="clean" description="Removes all files generated by this build file">
+    <modulePreHook target="clean"/>
     <echo level="info">Cleaning up...</echo>
     <delete dir="${basedir}/classes"  />
     <delete dir="${basedir}/documentation/html" />
@@ -344,7 +360,7 @@
     <delete includeEmptyDirs="true" >
       <fileset dir="${basedir}/lib" includes="mycore*.jar" />
     </delete>
-    <echo level="info">---------------------------------------------------------</echo>
+    <moduleHook target="clean"/>
   </target>
 
   <!-- =================================================================== -->
@@ -460,4 +476,3 @@
   </target>
 
 </project>
-
