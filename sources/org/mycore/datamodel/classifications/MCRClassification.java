@@ -414,6 +414,17 @@ public class MCRClassification extends MCRClassificationItem {
         evt.put("class", this);
         MCREventManager.instance().handleEvent(evt);
 
+        // delete SQL tables
+        it = oldIDsSet.iterator();
+        while (it.hasNext()) {
+            String cid = (String) it.next();
+            CM.deleteCategoryItem(getId(), cid);
+        }
+        CM.deleteClassificationItem(getId());
+        // store in SQL tables
+        CM.createClassificationItem(this);
+        CM.createCategoryItems(getCategories());
+        
         CM.jDomCache.remove(getId());
     }
 
