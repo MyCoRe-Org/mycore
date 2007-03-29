@@ -42,6 +42,7 @@ import org.jdom.Namespace;
 import org.mycore.common.MCRUtils;
 import org.mycore.datamodel.classifications.MCRCategoryItem;
 import org.mycore.datamodel.classifications.MCRClassificationItem;
+import org.mycore.datamodel.common.MCRLinkTableManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 
 /**
@@ -69,8 +70,9 @@ public class MCRClassificationTransformer {
      * transforms a <code>MCRCategoryItem</code> into a JDOM Element.
      * 
      * @param item
-     *           the category item
-     * @param withCounter a flag that the result holds the counter too
+     *            the category item
+     * @param withCounter
+     *            a flag that the result holds the counter too
      * @return
      */
     public static Element getMetaDataElement(MCRCategoryItem item, boolean withCounter) {
@@ -139,12 +141,44 @@ public class MCRClassificationTransformer {
         return ItemElementFactory.getDocument(cl, labelFormat, sort);
     }
 
+    /**
+     * transforms a <code>Classification</code> into a MCR Editor definition (<code>&lt;items&gt;</code>).
+     * 
+     * This method allows you to specify how the labels will look like.
+     * <code>labelFormat</code> is simply a String that is parsed for a few
+     * key words, that will be replaced by a dynamic value. The following
+     * keywords can be used at the moment:
+     * <ul>
+     * <li>{id}</li>
+     * <li>{text}</li>
+     * <li>{description}</li>
+     * <li>{count}</li>
+     * </ul>
+     * 
+     * @param cl
+     *            Classification
+     * @param labelFormat
+     *            format String as specified above
+     * @return
+     */
+    public static Document getEditorDocument(MCRClassificationItem cl, String labelFormat, boolean sort) {
+        return ItemElementFactory.getDocument(cl, labelFormat, sort);
+    }
+
     public static void addChildren(String ID, MCRClassificationObject item, Element elm, int levels, boolean withCounter) {
         CategoryFactory.fillCategory(ID, item, elm, levels, withCounter);
     }
-    
+
+    public static void addChildren(MCRClassificationObject c, MCRCategoryItem item, Map map, int levels, boolean withCounter) {
+        CategoryFactory.fillCategory(c, item, map, levels, withCounter);
+    }
+
     static MCRClassificationItem getClassification(Document cl, int levels, boolean withCounter) {
         return ClassificationFactory.getClassification(cl, levels, withCounter);
+    }
+
+    static MCRClassificationItem getClassification(MCRCategoryItem catItem, List<MCRCategoryItem> ancestors, int levels, boolean withCounter) {
+        return ClassificationFactory.getClassification(catItem, ancestors, levels, withCounter);
     }
 
     private static class MetaDataElementFactory {
@@ -276,9 +310,11 @@ public class MCRClassificationTransformer {
         }
 
         static String getLabelText(MCRLabel label, MCRCategoryItem cat, String labelFormat, boolean withCounter) {
-            String text = TEXT_PATTERN.matcher(labelFormat).replaceAll(label.getText());
+            String labtext = (label.getText() != null) ? label.getText() : "";
+            String text = TEXT_PATTERN.matcher(labelFormat).replaceAll(labtext);
             text = ID_PATTERN.matcher(text).replaceAll(cat.getId());
-            text = DESCR_PATTERN.matcher(text).replaceAll(label.description);
+            String labdesc = (label.getDescription() != null) ? label.getDescription() : "";
+            text = DESCR_PATTERN.matcher(text).replaceAll(labdesc);
             if (withCounter) {
                 text = COUNT_PATTERN.matcher(text).replaceAll(Integer.toString(cat.getNumberOfObjects()));
             }
@@ -320,15 +356,24 @@ public class MCRClassificationTransformer {
          * @return
          */
         static MCRClassificationItem getClassification(Document cl, int levels, boolean withCounter) {
- try {
-            MCRUtils.writeJDOMToSysout(cl);
- } catch (Exception e) {}
+            try {
+                MCRUtils.writeJDOMToSysout(cl);
+            } catch (Exception e) {
+            }
             MCRClassificationItem returns = getClassification(cl.getRootElement());
             returns.setCounterEnabled(withCounter);
             CategoryFactory.fillCategory(returns.getId(), returns, cl.getRootElement().getChild("categories"), levels, withCounter);
             return returns;
         }
 
+        static MCRClassificationItem getClassification(MCRCategoryItem catItem, List<MCRCategoryItem> ancestors, int levels, boolean withCounter) {
+            MCRClassificationItem cl = MCRClassificationManager.instance().retrieveClassificationItem(catItem.getClassID());
+            // map of every categID with numberofObjects
+            Map map = withCounter ? MCRLinkTableManager.instance().countReferenceCategory(cl.getId()) : null;
+            MCRCategoryItem cat = CategoryFactory.fillCategoryWithParents(cl, ancestors, map, withCounter);
+            CategoryFactory.fillCategory(cat, catItem, map, levels, withCounter);
+            return cl;
+        }
     }
 
     private static class CategoryFactory {
@@ -336,11 +381,11 @@ public class MCRClassificationTransformer {
         static MCRCategoryItem getCategory(Element e) {
             MCRCategoryItem c = new MCRCategoryItem();
             c.setId(e.getAttributeValue("ID"));
-            Element parent = (Element)e.getParent();
+            Element parent = (Element) e.getParent();
             if (parent.getName().equals("category")) {
                 c.setParentID(parent.getAttributeValue("ID"));
             } else {
-                c.setParentID(null); 
+                c.setParentID(null);
             }
             c.getLabels().addAll(LabelFactory.getLabels(e.getChildren("label")));
             final Element url = e.getChild("url");
@@ -348,6 +393,38 @@ public class MCRClassificationTransformer {
                 c.setLink(LinkFactory.getLink(url));
             }
             return c;
+        }
+
+        private static MCRCategoryItem fillCategoryWithParents(MCRClassificationObject c, List<MCRCategoryItem> ancestor, Map numDocs, boolean withCounter) {
+            MCRClassificationObject co = c;
+            MCRCategoryItem cat = null;
+            Iterator<MCRCategoryItem> it = ancestor.iterator();
+            while (it.hasNext()) {
+                MCRCategoryItem item = it.next();
+                cat = item;
+                if (withCounter) {
+                    cat.setNumberOfObjects(getNumberOfObjects(cat.getClassID(), cat.getId(), numDocs));
+                }
+                co.getCategories().add(cat);
+                co = cat;
+            }
+            return cat;
+        }
+
+        private static void fillCategory(MCRClassificationObject c, MCRCategoryItem item, Map map, int levels, boolean withCounter) {
+            if (levels != 0) {
+                List<MCRCategoryItem> children = item.getCategories();
+                for (int i = 0; i < children.size(); i++) {
+                    MCRCategoryItem child = (MCRCategoryItem) children.get(i);
+                    if (withCounter) {
+                        int count = getNumberOfObjects(item.getClassID(), item.getId(), map);
+                        child.setNumberOfObjects(count);
+                    }
+                    child.setClassID(item.getClassID());
+                    c.getCategories().add(child);
+                    fillCategory(child, child, map, levels - 1, withCounter);
+                }
+            }
         }
 
         @SuppressWarnings("unchecked")
@@ -390,7 +467,7 @@ public class MCRClassificationTransformer {
         }
 
         static MCRLabel getLabel(String lang, String text, String description) {
-            MCRLabel label = new MCRLabel(lang,text,description);
+            MCRLabel label = new MCRLabel(lang, text, description);
             return label;
         }
 
@@ -415,12 +492,11 @@ public class MCRClassificationTransformer {
     private static class LinkFactory {
 
         static MCRLink getLink(Element e) {
-            return getLink(e.getAttributeValue("type", XLINK_NAMESPACE), e.getAttributeValue("href", XLINK_NAMESPACE), e.getAttributeValue("title",
-                    XLINK_NAMESPACE), e.getAttributeValue("label", XLINK_NAMESPACE));
+            return getLink(e.getAttributeValue("type", XLINK_NAMESPACE), e.getAttributeValue("href", XLINK_NAMESPACE), e.getAttributeValue("title", XLINK_NAMESPACE), e.getAttributeValue("label", XLINK_NAMESPACE));
         }
 
         static MCRLink getLink(String type, String href, String title, String label) {
-            MCRLink link = new MCRLink(type,href,title,label);
+            MCRLink link = new MCRLink(type, href, title, label);
             return link;
         }
 
