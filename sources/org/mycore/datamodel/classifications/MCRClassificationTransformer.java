@@ -139,12 +139,6 @@ public class MCRClassificationTransformer {
         return ItemElementFactory.getDocument(cl, labelFormat, sort);
     }
 
-    /*
-    public static void addChildren(MCRClassificationObject c, MCRCategoryItem item, Map map, int levels, boolean withCounter) {
-        CategoryFactory.fillCategory(c, item, map, levels, withCounter);
-    }
-    */
-
     public static void addChildren(String ID, MCRClassificationObject item, Element elm, int levels, boolean withCounter) {
         CategoryFactory.fillCategory(ID, item, elm, levels, withCounter);
     }
@@ -152,12 +146,6 @@ public class MCRClassificationTransformer {
     static MCRClassificationItem getClassification(Document cl, int levels, boolean withCounter) {
         return ClassificationFactory.getClassification(cl, levels, withCounter);
     }
-
-    /*
-    static MCRClassificationItem getClassification(MCRCategoryItem catItem, List<MCRCategoryItem> ancestors, int levels, boolean withCounter) {
-        return ClassificationFactory.getClassification(catItem, ancestors, levels, withCounter);
-    }
-    */
 
     private static class MetaDataElementFactory {
         static Document getDocument(MCRClassificationItem cl) {
@@ -326,15 +314,6 @@ public class MCRClassificationTransformer {
             return c;
         }
 
-        /*
-        static MCRClassificationItem getClassification(MCRClassificationItem i) {
-            MCRClassificationItem c = new MCRClassificationItem();
-            c.setId(i.getID());
-            c.getLabels().addAll(LabelFactory.getLabels(i.getLangArray(), i.getTextArray(), i.getDescriptionArray()));
-            return c;
-        }
-        */
-
         /**
          * @param cl
          * @param levels
@@ -350,16 +329,6 @@ public class MCRClassificationTransformer {
             return returns;
         }
 
-        /*
-        static MCRClassificationItem getClassification(MCRCategoryItem catItem, List<MCRCategoryItem> ancestors, int levels, boolean withCounter) {
-            MCRClassificationItem cl = getClassification(catItem.getClassificationItem());
-            // map of every categID with numberofObjects
-            Map map = withCounter ? MCRLinkTableManager.instance().countReferenceCategory(cl.getId()) : null;
-            MCRCategoryItem cat = CategoryFactory.fillCategoryWithParents(cl, ancestors, map, withCounter);
-            CategoryFactory.fillCategory(cat, catItem, map, levels, withCounter);
-            return cl;
-        }
-        */
     }
 
     private static class CategoryFactory {
@@ -380,56 +349,6 @@ public class MCRClassificationTransformer {
             }
             return c;
         }
-
-        /*
-        static MCRCategoryItem getCategory(MCRCategoryItem i) {
-            MCRCategoryItem c = new MCRCategoryItem();
-            c.setId(i.getID());
-            c.getLabels().addAll(LabelFactory.getLabels(i.getLangArray(), i.getTextArray(), i.getDescriptionArray()));
-            if (i.getURL().length() > 0) {
-                c.setLink(LinkFactory.getLink(null, i.getURL(), null, null));
-
-            }
-            return c;
-        }
-        */
-
-        /*
-        private static MCRCategoryItem fillCategoryWithParents(MCRClassificationObject c, List<MCRCategoryItem> ancestor, Map numDocs, boolean withCounter) {
-            MCRClassificationObject co = c;
-            MCRCategoryItem cat = null;
-            Iterator<MCRCategoryItem> it = ancestor.iterator();
-            while (it.hasNext()) {
-                MCRCategoryItem item = it.next();
-                cat = getCategory(item);
-                if (withCounter) {
-                    cat.setNumberOfObjects(getNumberOfObjects(cat.getClassID(), cat.getId(), numDocs));
-                }
-                co.getCategories().add(cat);
-                co = cat;
-            }
-            return cat;
-        }
-        */
-
-        /*
-        private static void fillCategory(MCRClassificationObject c, MCRCategoryItem item, Map map, int levels, boolean withCounter) {
-            if (levels != 0) {
-                MCRCategoryItem[] children = item.getChildren();
-                for (int i = 0; i < children.length; i++) {
-                    MCRCategoryItem child = children[i];
-                    MCRCategoryItem childC = getCategory(child);
-                    if (withCounter) {
-                        int count = getNumberOfObjects(item.getClassificationID(), item.getID(), map);
-                        childC.setNumberOfObjects(count);
-                    }
-                    childC.setClassID(item.getClassificationID());
-                    c.getCategories().add(childC);
-                    fillCategory(childC, child, map, levels - 1, withCounter);
-                }
-            }
-        }
-        */
 
         @SuppressWarnings("unchecked")
         private static void fillCategory(String classID, MCRClassificationObject c, Element e, int levels, boolean withCounter) {

@@ -148,7 +148,7 @@ public class MCRClassification extends MCRClassificationItem {
         // get ID
         Element xmlblob = jdom.getRootElement();
         xmlblob.detach();
-        setId(xmlblob.getAttributeValue("ID"));
+        setId((new MCRObjectID(xmlblob.getAttributeValue("ID"))).getId());
         LOGGER.debug("processing read Classification:" + getId());
         setCounterEnabled(false);
         // get labels
