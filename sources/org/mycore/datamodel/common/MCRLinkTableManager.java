@@ -33,7 +33,6 @@ import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 import org.mycore.datamodel.classifications.MCRCategoryItem;
 import org.mycore.datamodel.classifications.MCRClassification;
-import org.mycore.datamodel.classifications.MCRClassificationItem;
 import org.mycore.datamodel.metadata.MCRObjectID;
 
 /**
@@ -284,7 +283,7 @@ public class MCRLinkTableManager {
      */
     public void addClassificationLink(String from, String classid, String categid) {
         addReferenceLink(from, classid + "##" + categid, ENTRY_TYPE_CLASSID, "");
-        MCRCategoryItem categitem = MCRClassification.receiveCategoryItem(classid, categid);
+        MCRCategoryItem categitem = MCRClassification.retrieveCategoryItem(classid, categid);
         if (categitem.getParentID() != null) {
             addClassificationLink(from, classid, categitem.getParentID());
         }
@@ -325,7 +324,7 @@ public class MCRLinkTableManager {
      */
      public void deleteClassificationLink(String from, String classid, String categid) { 
          deleteReferenceLink(from, classid + "##" + categid, ENTRY_TYPE_CLASSID); 
-         MCRCategoryItem categitem = MCRClassification.receiveCategoryItem(classid, categid);
+         MCRCategoryItem categitem = MCRClassification.retrieveCategoryItem(classid, categid);
          if (categitem.getParentID() != null) { 
              deleteClassificationLink(from, classid, categitem.getParentID()); }
          }
@@ -626,8 +625,8 @@ public class MCRLinkTableManager {
      * @return a list of ID's
      */
     public List getFirstLinksToCategory(String classid, String categid) {
-        MCRCategoryItem categ = MCRClassification.receiveCategoryItem(classid, categid);
-        List categList = getLinksToCategory(classid, categid);
+        MCRCategoryItem categ = MCRClassification.retrieveCategoryItem(classid, categid);
+        List<List> categList = getLinksToCategory(classid, categid);
         List<MCRCategoryItem> childs = categ.getCategories();
         String[] childIDs = new String[childs.size()];
         for (int i = 0; i < childIDs.length; i++) {

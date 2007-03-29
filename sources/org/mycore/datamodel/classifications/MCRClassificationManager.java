@@ -122,7 +122,7 @@ public class MCRClassificationManager {
         return c;
     }
 
-    MCRCategoryItem retrieveCategoryItem(String classifID, String categID) {
+    public final MCRCategoryItem retrieveCategoryItem(String classifID, String categID) {
         String cachingID = classifID + "@@" + categID;
         MCRCategoryItem c = (MCRCategoryItem) (categoryCache.get(cachingID));
 

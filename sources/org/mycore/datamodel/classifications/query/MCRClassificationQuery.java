@@ -54,7 +54,7 @@ public class MCRClassificationQuery {
      * @return
      */
     public static Classification getClassification(String ID, int levels, boolean withCounter) {
-        Document cl = MCRClassification.receiveClassificationAsJDOM(ID, withCounter);
+        Document cl = MCRClassification.retrieveClassificationAsJDOM(ID, withCounter);
         return ClassificationTransformer.getClassification(cl, levels, withCounter);
     }
 
@@ -75,7 +75,7 @@ public class MCRClassificationQuery {
         Classification returns = getClassification(classID, categID, withCounter);
         if (levels != 0) {
             LOGGER.debug("getCategoryItem");
-            MCRCategoryItem catItem = MCRClassification.receiveCategoryItem(classID, categID);
+            MCRCategoryItem catItem = MCRClassification.retrieveCategoryItem(classID, categID);
             // map of every categID with numberofObjects
             LOGGER.debug("countReferenceCategory");
             Map map = withCounter ? MCRLinkTableManager.instance().countReferenceCategory(classID) : null;
@@ -101,14 +101,14 @@ public class MCRClassificationQuery {
      * @return
      */
     public static Classification getClassificationHierarchie(String classID, String categID, int levels, boolean withCounter) {
-        MCRCategoryItem catItem = MCRClassification.receiveCategoryItem(classID, categID);
-        MCRCategoryItem parent = MCRClassification.receiveCategoryItem(catItem.getClassID(),catItem.getParentID());
+        MCRCategoryItem catItem = MCRClassification.retrieveCategoryItem(classID, categID);
+        MCRCategoryItem parent = MCRClassification.retrieveCategoryItem(catItem.getClassID(),catItem.getParentID());
         LinkedList<MCRCategoryItem> list = new LinkedList<MCRCategoryItem>();
         list.add(0, catItem);
         while (parent != null) {
             // build the ancestor axis
             list.add(0, parent);
-            parent = MCRClassification.receiveCategoryItem(catItem.getClassID(),parent.getParentID());;
+            parent = MCRClassification.retrieveCategoryItem(catItem.getClassID(),parent.getParentID());;
         }
         return ClassificationTransformer.getClassification(catItem, list, levels, withCounter);
 
@@ -125,7 +125,7 @@ public class MCRClassificationQuery {
      */
     public static Classification getClassification(String classID, String categID, boolean withCounter) {
         LOGGER.debug("-receiveCategoryAsJDOM");
-        Document doc = MCRClassification.receiveCategoryAsJDOM(classID, categID, withCounter);
+        Document doc = MCRClassification.retrieveCategoryAsJDOM(classID, categID, withCounter);
         LOGGER.debug("-getClassification");
         Classification returns = ClassificationTransformer.getClassification(doc, -1, withCounter);
         LOGGER.debug("-getClassification finished");

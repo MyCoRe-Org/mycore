@@ -107,7 +107,7 @@ public class MCRLinkTableEventHandler extends MCREventHandlerBase {
                 if (inf instanceof MCRMetaClassification) {
                     String classID = ((MCRMetaClassification) inf).getClassId();
                     String categID = ((MCRMetaClassification) inf).getCategId();
-                    MCRCategoryItem categ = MCRClassification.receiveCategoryItem(classID, categID);
+                    MCRCategoryItem categ = MCRClassification.retrieveCategoryItem(classID, categID);
                     if (categ != null) {
                         continue;
                     }

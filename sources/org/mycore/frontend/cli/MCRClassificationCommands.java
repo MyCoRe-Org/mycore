@@ -278,7 +278,7 @@ public class MCRClassificationCommands extends MCRAbstractCommands {
         }
         MCRObjectID mcr_id = new MCRObjectID(ID);
         MCRClassification cl = new MCRClassification();
-        byte[] xml = cl.receiveClassificationAsXML(mcr_id.getId());
+        byte[] xml = cl.retrievClassificationAsXML(mcr_id.getId());
 
         try {
             Transformer trans = getTransformer(style);

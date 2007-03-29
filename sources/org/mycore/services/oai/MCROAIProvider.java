@@ -1567,7 +1567,7 @@ public class MCROAIProvider extends MCRServlet {
                     String classificationId = classification.getClassId();
                     if (classifications.contains(classificationId)) {
                         String categoryId = classification.getCategId();
-                        MCRCategoryItem category = MCRClassification.receiveCategoryItem(classificationId, categoryId);
+                        MCRCategoryItem category = MCRClassification.retrieveCategoryItem(classificationId, categoryId);
                         List labels = category.getLabels();
                         boolean found = false;
                         for (int l = 0; l < labels.size(); l++) {

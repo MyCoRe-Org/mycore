@@ -132,7 +132,7 @@ public class MCRZ3950QueryService implements MCRZ3950Query {
                     String classificationId = e.getAttributeValue("classid");
                     String categoryId = e.getAttributeValue("categid");
                     MCRCategoryItem category = 
-                        MCRClassification.receiveCategoryItem(classificationId,
+                        MCRClassification.retrieveCategoryItem(classificationId,
                                                         categoryId);
                     // F�lle den Knoten mit dem Klassifiaktions-Label
                     e.setText((String)(category.getLabels()).get(0).getText());

@@ -27,6 +27,8 @@ import org.mycore.common.MCRException;
 import org.mycore.datamodel.classifications.MCRCategoryItem;
 import org.mycore.datamodel.classifications.MCRClassification;
 import org.mycore.datamodel.classifications.MCRClassificationItem;
+import org.mycore.datamodel.classifications.MCRClassificationManager;
+import org.mycore.datamodel.common.MCRXMLTableManager;
 
 /**
  * This class implements all method for handling with the MCRMetaClassification
@@ -202,10 +204,10 @@ public class MCRMetaClassification extends MCRMetaDefault {
         }
 
         try {
-            if (!MCRClassification.existInDatastore(classid)) {
+            if (!MCRXMLTableManager.instance().exist(new MCRObjectID(classid))) {
                 return false;
             }
-            if (!MCRClassification.existInDatastore(classid,categid)) {
+            if (MCRClassificationManager.instance().retrieveCategoryItem(classid, categid) == null) {
                 return false;
             }
         } catch (Exception e) {

@@ -32,7 +32,7 @@ public class MCRClassificationPool {
      * @return
      */
     public Set<String> getAllIDs() {
-        String[] dbIDs=MCRClassification.receiveAllClassificationID();
+        String[] dbIDs=MCRClassificationManager.instance().getAllClassificationID();
         Set<String> ids=new HashSet<String>();
         for (String id:dbIDs){
             ids.add(id);

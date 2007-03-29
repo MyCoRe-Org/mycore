@@ -109,7 +109,7 @@ public class MCROAIQueryImpl implements MCROAIQuery {
         String[] classifications = MCROAIProvider.getConfigBean(instance).getClassificationIDs();
         List list = new ArrayList();
         for (int i = 0; i < classifications.length; i++) {
-            byte[] classification = MCRClassification.receiveClassificationAsXML(classifications[i]);
+            byte[] classification = MCRClassification.retrievClassificationAsXML(classifications[i]);
             MCRClassification cl = new MCRClassification();
             cl.setFromXML(classification);
             list.addAll(addXDINI(cl.getCategories()));
@@ -340,7 +340,7 @@ public class MCROAIQueryImpl implements MCROAIQuery {
 				.getClassificationIDsForSearchField(searchField);
 
 		for (int i = 0; i < classification.length; i++) {
-			org.jdom.Document jDomDoc = MCRClassification.receiveClassificationAsJDOM(classification[i]);
+			org.jdom.Document jDomDoc = MCRClassification.retrieveClassificationAsJDOM(classification[i]);
 			try {
 				//could be improved: return only <label> under a <categegory> but //category/label[..] does not work here
 				XPath xpathExpr = XPath.newInstance("//label[@xml:lang='x-dini' and @text='"+ set + "']/..//@ID");
