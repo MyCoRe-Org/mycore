@@ -769,6 +769,11 @@ final public class MCRObject extends MCRBase {
         if (!importMode || mcr_service.getDate("modifydate") == null) {
             mcr_service.setDate("modifydate");
         }
+        // remove ACL if it is set from data source
+        for (int i=0;i < mcr_service.getRulesSize();i++) {
+            mcr_service.removeRule(i);
+            i--;
+        }
         // handle events
         MCREvent evt = new MCREvent(MCREvent.OBJECT_TYPE, MCREvent.UPDATE_EVENT);
         evt.put("object", this);
