@@ -222,7 +222,10 @@ public class MCRClassificationTransformer {
                 ce.addContent(getElement(label));
             }
             if (category.getLink() != null) {
-                ce.addContent(getElement(category.getLink()));
+                MCRLink link = category.getLink();
+                if ((link.getHref() != null) && (link.getHref().length() != 0)) {
+                    ce.addContent(getElement(link));
+                }
             }
             for (MCRCategoryItem cat : category.getCategories()) {
                 ce.addContent(getElement(cat, withCounter));
@@ -367,19 +370,11 @@ public class MCRClassificationTransformer {
         }
 
         static MCRClassificationItem getClassification(MCRCategoryItem catItem, List<MCRCategoryItem> ancestors, int levels, boolean withCounter) {
-System.out.println("44444444444444"+catItem.getId());
             MCRClassificationItem cl = MCRClassificationManager.instance().retrieveClassificationItem(catItem.getClassID());
-System.out.println("55555555555555"+cl.getId());
             // map of every categID with numberofObjects
             Map map = withCounter ? MCRLinkTableManager.instance().countReferenceCategory(cl.getId()) : null;
-System.out.println("66666666666666"+map);
-try {
             MCRCategoryItem cat = CategoryFactory.fillCategoryWithParents(cl, ancestors, map, withCounter);
-            System.out.println("777777777777777777"+cl.getId()+"  "+cat.getId());
             CategoryFactory.fillCategory(cat, catItem, map, levels, withCounter);
-            System.out.println("88888888888888888"+cl.getId());
-                    } catch (Exception e) {e.printStackTrace(); }
-                    System.out.println("88888888888888888"+cl.getId());
             return cl;
         }
     }
