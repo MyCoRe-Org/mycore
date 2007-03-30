@@ -102,16 +102,16 @@ public class MCRClassificationQuery {
      */
     public static MCRClassificationItem getClassificationHierarchie(String classID, String categID, int levels, boolean withCounter) {
         MCRCategoryItem catItem = MCRClassification.retrieveCategoryItem(classID, categID);
-        MCRCategoryItem parent = MCRClassification.retrieveCategoryItem(catItem.getClassID(),catItem.getParentID());
+        MCRCategoryItem parent = (catItem.getParentID() != null) ? MCRClassification.retrieveCategoryItem(classID,catItem.getParentID()):null;
         LinkedList<MCRCategoryItem> list = new LinkedList<MCRCategoryItem>();
         list.add(0, catItem);
         while (parent != null) {
             // build the ancestor axis
             list.add(0, parent);
-            parent = MCRClassification.retrieveCategoryItem(catItem.getClassID(),parent.getParentID());;
+            if (parent.getParentID() == null) break;
+            parent = MCRClassification.retrieveCategoryItem(classID,parent.getParentID());
         }
         return MCRClassificationTransformer.getClassification(catItem, list, levels, withCounter);
-
     }
 
     /**
