@@ -32,6 +32,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
@@ -39,121 +40,121 @@ import org.jdom.input.SAXBuilder;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.jdom.xpath.XPath;
-
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
+import org.mycore.common.xml.MCRURIResolver;
 
 public class WCMSAdminServlet extends WCMSServlet {
-	// private boolean back;
 
-	// private String backaddr = null;
-
-	// private HttpServletRequest request;
-
-	// private HttpServletResponse response;
-
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 
-	/**
-	 * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
-	 * methods.
+	private static final Logger LOGGER = Logger
+			.getLogger(WCMSAdminServlet.class);
+
+	/*
+	 * (non-Javadoc)
 	 * 
-	 * @param request
-	 *            servlet request
-	 * @param response
-	 *            servlet response
+	 * @see wcms.WCMSServlet#processRequest(javax.servlet.http.HttpServletRequest,
+	 *      javax.servlet.http.HttpServletResponse)
 	 */
 	protected void processRequest(HttpServletRequest request,
 			HttpServletResponse response) throws IOException {
+
 		MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
-		String action = request.getParameter("action");
+		String todo = getTodo(request);
+
+		// generate output XML
+		Element root = new Element("cms");
+		Document jdom = new Document(root);
+		root.addContent(new Element("session").setText(todo));
+		root.addContent(new Element("userID").setText(mcrSession.get("userID")
+				.toString()));
+		root.addContent(new Element("userClass").setText(mcrSession.get(
+				"userClass").toString()));
+
+		// process request
+		if (todo.equals("exit")) {
+			String exitWCMSAddress = request.getParameter("address");
+			response.sendRedirect(response.encodeRedirectURL(exitWCMSAddress));
+		}
+		else if (todo.equals("getMultimediaConfig")) {
+    		Document docOut = new Document(new Element("cms"));
+    		getMultimediaConfig(docOut.getRootElement());
+    		getLayoutService().sendXML(request, response, docOut);
+		}
+		else if (todo.equals("choose"))
+			generateXML_managPage(mcrSession, root);
+		else if (todo.equals("logs"))
+			generateXML_logs(request, root);
+		else if (todo.equals("managGlobal")
+				&& mcrSession.get("userClass").equals("admin"))
+			generateXML_managGlobal(root);
+		else if (todo.equals("saveGlobal")
+				&& mcrSession.get("userClass").equals("admin"))
+			generateXML_saveGlobal(request, response);
+		else if (todo.equals("view")
+				&& (request.getParameter("file") != null && !request
+						.getParameter("file").equals(""))) {
+			// live content version requested
+			if (request.getParameter("file").toString().subSequence(0, 4)
+					.equals("http")) {
+				String url = request.getParameter("file");
+				url = url + "?XSL.href=" + request.getParameter("XSL.href");
+				// archived navi version requested
+				if (request.getParameter("XSL.navi") != null
+						&& !request.getParameter("XSL.navi").equals("")
+						&& !request.getParameter("XSL.navi").toString()
+								.subSequence(0, 4).equals("http")) {
+					url = url + "&XSL.navi=" + request.getParameter("XSL.navi");
+					response.sendRedirect(response.encodeRedirectURL(url));
+				} else
+					response.sendRedirect(response.encodeRedirectURL(url));
+			}
+			// archived content version requested
+			else
+				getLayoutService().doLayout(request, response,
+						new File(request.getParameter("file")));
+		}
+		else
+			getLayoutService().doLayout(request, response, jdom);
+	}
+
+	/**
+	 * Returns the task for the servlet call
+	 * 
+	 * @param request
+	 * @return
+	 */
+	final String getTodo(HttpServletRequest request) {
+		if (request.getParameter("action") != null
+				&& !request.getParameter("action").equals("")) {
+			return request.getParameter("action");
+		}
+		if (request.getParameter("todo") != null
+				&& !request.getParameter("todo").equals("")) {
+			return request.getParameter("todo");
+		}
+		LOGGER
+				.error("action AND todo == null. Call without a given request parameter.");
+		return null;
+	}
+
+	public void generateXML_managPage(MCRSession mcrSession, Element root) {
 		List rootNodes = (List) mcrSession.get("rootNodes");
 		File[] contentTemplates = new File((CONFIG
 				.getString("MCR.WCMS.templatePath") + "content/").replace('/',
 				File.separatorChar)).listFiles();
-		Element rootOut = new Element("cms");
-		Document jdom = new Document(rootOut);
-		rootOut.addContent(new Element("session").setText(action));
-		rootOut.addContent(new Element("userID").setText(mcrSession.get(
-				"userID").toString()));
-		rootOut.addContent(new Element("userClass").setText(mcrSession.get(
-				"userClass").toString()));
-
-		// setReq(request);
-		// setResp(response);
-		// setback(request);
-		//setbackaddr(request);
-
-		if (action != null) {
-			if (action.equals("choose")) {
-				// request.setAttribute("MCRLayoutService.Input.JDOM", jdom);
-				generateXML_managPage(mcrSession, rootOut, rootNodes,
-						contentTemplates);
-			} else if (action.equals("logs")) {
-				// request.setAttribute("MCRLayoutService.Input.JDOM", jdom);
-				generateXML_logs(request, rootOut);
-			} else if (action.equals("managGlobal")
-					&& mcrSession.get("userClass").equals("admin")) {
-				// request.setAttribute("MCRLayoutService.Input.JDOM", jdom);
-				generateXML_managGlobal(rootOut);
-			} else if (action.equals("saveGlobal")
-					&& mcrSession.get("userClass").equals("admin")) {
-				// request.setAttribute("MCRLayoutService.Input.JDOM", jdom);
-				generateXML_saveGlobal(request, response);
-			} else if (action.equals("view")
-					&& (request.getParameter("file") != null && !request
-							.getParameter("file").equals(""))) {
-
-				// live content version requested
-				if (request.getParameter("file").toString().subSequence(0, 4)
-						.equals("http")) {
-					String url = request.getParameter("file");
-					url = url + "?XSL.href=" + request.getParameter("XSL.href");
-					// archived navi version requested
-					if (request.getParameter("XSL.navi") != null
-							&& !request.getParameter("XSL.navi").equals("")
-							&& !request.getParameter("XSL.navi").toString()
-									.subSequence(0, 4).equals("http")) {
-						url = url + "&XSL.navi="
-								+ request.getParameter("XSL.navi");
-						response.sendRedirect(response.encodeRedirectURL(url));
-					} else {
-						response.sendRedirect(response.encodeRedirectURL(url));
-					}
-				}
-				// archived content version requested
-				else {
-					getLayoutService().doLayout(request, response,
-							new File(request.getParameter("file")));
-				}
-			}
-		}
-
-		if (exitWCMS(request)) {
-			String exitWCMSAddress = request.getParameter("address");
-			response.sendRedirect(response.encodeRedirectURL(exitWCMSAddress));
-		} else {
-			getLayoutService().doLayout(request, response, jdom);
-		}
-
-	}
-
-	public void generateXML_managPage(MCRSession mcrSession, Element rootOut,
-			List rootNodes, File[] contentTemplates) {
-		rootOut.addContent(new Element("userRealName").setText(mcrSession.get(
+		root.addContent(new Element("userRealName").setText(mcrSession.get(
 				"userRealName").toString()));
-		rootOut.addContent(new Element("userClass").setText(mcrSession.get(
+		root.addContent(new Element("userClass").setText(mcrSession.get(
 				"userClass").toString()));
-		rootOut.addContent(new Element("error").setText(""));
+		root.addContent(new Element("error").setText(""));
 
 		Iterator rootNodesIterator = rootNodes.iterator();
 
 		while (rootNodesIterator.hasNext()) {
 			Element rootNode = (Element) rootNodesIterator.next();
-			rootOut.addContent(new Element("rootNode").setAttribute("href",
+			root.addContent(new Element("rootNode").setAttribute("href",
 					rootNode.getAttributeValue("href")).setText(
 					rootNode.getTextTrim()));
 		}
@@ -169,7 +170,7 @@ public class WCMSAdminServlet extends WCMSServlet {
 		}
 
 		templates.addContent(contentTemp);
-		rootOut.addContent(templates);
+		root.addContent(templates);
 	}
 
 	public void generateXML_logs(HttpServletRequest request, Element rootOut) {
@@ -265,28 +266,11 @@ public class WCMSAdminServlet extends WCMSServlet {
 		}
 	}
 
-	/*
-	 * public void setReq(HttpServletRequest req) { this.request = req; }
-	 * 
-	 * public HttpServletRequest getReq() { return request; }
-	 * 
-	 * public void setResp(HttpServletResponse resp) { this.response = resp; }
-	 * 
-	 * public HttpServletResponse getResp() { return response; }
-	 */
-	public boolean exitWCMS(HttpServletRequest request) {
+/*	public boolean exitWCMS(HttpServletRequest request) {
 		if (request.getParameter("back") != null
 				&& request.getParameter("back").equals("true"))
 			return true;
 		return false;
-	}
-
-	/*
-	 * public void setback(HttpServletRequest request) {
-	 *  } public String getbackaddr() { return this.backaddr; }
-	 */
-
-/*	public void setbackaddr(HttpServletRequest request) {
-		this.backaddr = request.getParameter("address");
 	}*/
+
 }

@@ -55,7 +55,10 @@ import org.mycore.common.MCRSessionMgr;
  * Select action process for Web-Content-Management-System (WCMS).
  */
 public class WCMSChooseServlet extends WCMSServlet {
-    private Namespace ns = Namespace.XML_NAMESPACE; // xml Namespace for the
+
+	private static final long serialVersionUID = 1L;
+
+	private Namespace ns = Namespace.XML_NAMESPACE; // xml Namespace for the
 
     // language attribute lang
     private String currentLang = null; //
@@ -121,21 +124,10 @@ public class WCMSChooseServlet extends WCMSServlet {
 
     List currentLangContentOutput;
 
-    File[] imageList; // listing of the images directory (without cvs)
-
-    File[] documentList; // listing of the documents directory (without cvs)
-
     /**
      * Main program called by doGet and doPost.
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws IOException {
-    	
-    	if (request.getParameter("mode")!=null && request.getParameter("mode").equals("getMultimedia")) {
-    		Element rootOut_2 = new Element("cms");
-    		Document doc_2 = new Document(rootOut_2);
-    		addMultimedia(rootOut_2);
-    		getLayoutService().doLayout(request, response, doc_2);
-		}
     	
         MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
         String userID = (String) mcrSession.get("userID");
@@ -240,11 +232,6 @@ public class WCMSChooseServlet extends WCMSServlet {
             errorOut.println(jdome.getMessage());
             errorOut.close();
         }
-
-        /*
-         * //System.out.println("label:"+label+".............................................");
-         * //System.out.println("label_currentLang:"+label_currentLang+".............................................");
-         */
 
         /**
          * Try to build a jdom Object from the content (this has to be valid
@@ -519,7 +506,7 @@ public class WCMSChooseServlet extends WCMSServlet {
             }
         }
 
-        templates = addMultimedia(rootOut);
+        templates = getMultimediaConfig(rootOut);
 
         Element master = new Element("master");
 
@@ -586,51 +573,7 @@ public class WCMSChooseServlet extends WCMSServlet {
         getLayoutService().doLayout(request, response, jdom);
     }
 
-	private Element addMultimedia(Element rootOut) {
-		Element templates;
-		imageList = null;
-        documentList = null;
-        templates = new Element("templates");
 
-        Element images = new Element("images");
-        rootOut.addContent(images);
-
-        File imagePath = new File((CONFIG.getString("MCR.WCMS.imagePath").replace('/', File.separatorChar)));
-
-        if (!imagePath.exists()) {
-            imagePath.mkdirs();
-        }
-
-        imageList = new File(imagePath.toString()).listFiles();
-
-        for (int i = 0; i < imageList.length; i++) {
-            if (!imageList[i].isDirectory()) {
-                images.addContent(new Element("image").setText(imageList[i].getName()));
-            }
-        }
-
-        rootOut.addContent(new Element("imagePath").setText(CONFIG.getString("MCR.WCMS.imagePath").substring(CONFIG.getString("MCR.WCMS.imagePath").lastIndexOf("webapps"))));
-
-        Element documents = new Element("documents");
-        rootOut.addContent(documents);
-
-        File documentPath = new File((CONFIG.getString("MCR.WCMS.documentPath").replace('/', File.separatorChar)));
-
-        if (!documentPath.exists()) {
-            documentPath.mkdirs();
-        }
-
-        documentList = new File(documentPath.toString()).listFiles();
-
-        for (int i = 0; i < documentList.length; i++) {
-            if (!documentList[i].isDirectory()) {
-                documents.addContent(new Element("document").setText(documentList[i].getName()));
-            }
-        }
-
-        rootOut.addContent(new Element("documentPath").setText(CONFIG.getString("MCR.WCMS.documentPath").substring(CONFIG.getString("MCR.WCMS.documentPath").lastIndexOf("webapps"))));
-		return templates;
-	}
 
     /**
      * Finds the selected element in the navigation.xml and assigns attribute

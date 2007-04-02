@@ -628,14 +628,14 @@ template:
 							<xsl:choose>
 								<xsl:when test="$check = '1' ">
 									<a class="button"
-										href="{$ServletsBaseURL}WCMSAdminServlet?action=choose&amp;wcmsID=0024&amp;back=true&amp;address={$address}">
+										href="{$ServletsBaseURL}WCMSAdminServlet?todo=exit&amp;address={$address}">
 										<xsl:value-of
 											select="i18n:translate('wcms.buttons.cancel')"/>
 									</a>
 								</xsl:when>
 								<xsl:otherwise>
 									<a class="button"
-										href="{$ServletsBaseURL}WCMSAdminServlet?action=choose&amp;wcmsID=0024">
+										href="{$ServletsBaseURL}WCMSAdminServlet?todo=exit&amp;wcmsID=0024">
 										<xsl:value-of
 											select="i18n:translate('wcms.buttons.cancel')"/>
 									</a>

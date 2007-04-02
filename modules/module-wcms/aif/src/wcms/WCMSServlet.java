@@ -109,4 +109,56 @@ public abstract class WCMSServlet extends MCRServlet {
      * final void WriteJDOM2XMLFile(Document doc, String pathOfFile) { }
      */
     protected abstract void processRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException;
+
+	/** Attaches on the given JDOM-Element an JDOM-Element with the configuration of available multimedia objects (images, misc. documents).
+	 * @param root
+	 * @return
+	 */
+	public Element getMultimediaConfig(Element root) {
+
+	    File[] imageList=null;
+	    File[] documentList=null; 		
+		
+		Element templates;
+        templates = new Element("templates");
+
+        Element images = new Element("images");
+        root.addContent(images);
+
+        File imagePath = new File((CONFIG.getString("MCR.WCMS.imagePath").replace('/', File.separatorChar)));
+
+        if (!imagePath.exists()) {
+            imagePath.mkdirs();
+        }
+
+        imageList = new File(imagePath.toString()).listFiles();
+
+        for (int i = 0; i < imageList.length; i++) {
+            if (!imageList[i].isDirectory()) {
+                images.addContent(new Element("image").setText(imageList[i].getName()));
+            }
+        }
+
+        root.addContent(new Element("imagePath").setText(CONFIG.getString("MCR.WCMS.imagePath").substring(CONFIG.getString("MCR.WCMS.imagePath").lastIndexOf("webapps"))));
+
+        Element documents = new Element("documents");
+        root.addContent(documents);
+
+        File documentPath = new File((CONFIG.getString("MCR.WCMS.documentPath").replace('/', File.separatorChar)));
+
+        if (!documentPath.exists()) {
+            documentPath.mkdirs();
+        }
+
+        documentList = new File(documentPath.toString()).listFiles();
+
+        for (int i = 0; i < documentList.length; i++) {
+            if (!documentList[i].isDirectory()) {
+                documents.addContent(new Element("document").setText(documentList[i].getName()));
+            }
+        }
+
+        root.addContent(new Element("documentPath").setText(CONFIG.getString("MCR.WCMS.documentPath").substring(CONFIG.getString("MCR.WCMS.documentPath").lastIndexOf("webapps"))));
+		return templates;
+	}    
 }
