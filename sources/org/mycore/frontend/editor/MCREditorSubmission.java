@@ -618,6 +618,7 @@ public class MCREditorSubmission {
                 parent.addContent(var.getValue());
                 node = parent;
             } else {
+                LOGGER.debug( "Setting attribute " + var.getPath() + " = " + var.getValue() );
                 parent.setAttribute(var.getAttributeName(), var.getValue());
                 node = parent.getAttribute(var.getAttributeName());
             }
