@@ -26,15 +26,13 @@ package org.mycore.frontend.editor;
 import java.util.Map;
 
 import org.jdom.Element;
-import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.xml.MCRURIResolver;
-import org.mycore.frontend.servlets.MCRServlet;
 
 /**
  * This class contains the functionality to read XML input that should be editor
  * in the editor.
  * 
- * @author Frank LÃ¼tzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCREditorSourceReader {
     
