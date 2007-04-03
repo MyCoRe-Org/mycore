@@ -383,11 +383,11 @@ public class MCREditorServlet extends MCRServlet {
             } else if ("webpage".equals(subselect.getAttributeValue("type"))) {
                 sb.append(subselect.getAttributeValue("href"));
                 if (subselect.getAttributeValue("href").indexOf("?") > 0)
-                    sb.append("&XSL.subselect.session=").append(sessionID);
+                    sb.append("&XSL.subselect.session.SESSION=").append(sessionID);
                 else
-                    sb.append("?XSL.subselect.session=").append(sessionID);
-                sb.append("&XSL.subselect.varpath=").append(var);
-                sb.append("&XSL.subselect.webpage=").append(parms.getParameter("_webpage"));
+                    sb.append("?XSL.subselect.session.SESSION=").append(sessionID);
+                sb.append("&XSL.subselect.varpath.SESSION=").append(var);
+                sb.append("&XSL.subselect.webpage.SESSION=").append(parms.getParameter("_webpage"));
             } else if ("servlet".equals(subselect.getAttributeValue("type"))) {
                 sb.append(subselect.getAttributeValue("href"));
                 sb.append("?subselect.session=").append(sessionID);
