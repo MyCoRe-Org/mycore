@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
 <!-- ============================================== -->
-<!-- $Revision: 1.64 $ $Date: 2007-03-28 16:02:23 $ -->
+<!-- $Revision: 1.65 $ $Date: 2007-04-03 14:42:37 $ -->
 <!-- ============================================== --> 
 
 <xsl:stylesheet 
@@ -336,7 +336,7 @@
     <table cellspacing="0">
       <tr>
   
-      <td align="left" valign="bottom" class="editorRepeaterButton">
+      <td>
         <xsl:choose>
           <xsl:when test="$num &lt; $max">
             <input type="image" name="{$editor.delimiter.internal}p-{$var}-{$row.nr}" src="{$WebApplicationBaseURL}images/pmud-plus.png"/>
@@ -344,7 +344,7 @@
           <xsl:otherwise><img src="{$WebApplicationBaseURL}images/pmud-blank.png" border="0" /></xsl:otherwise>
         </xsl:choose>
       </td>
-      <td align="left" valign="bottom" class="editorRepeaterButton">
+      <td>
         <xsl:choose>
           <xsl:when test="$num &gt; 1">
             <input type="image" name="{$editor.delimiter.internal}m-{$var}-{$row.nr}" src="{$WebApplicationBaseURL}images/pmud-minus.png"/>
@@ -352,7 +352,7 @@
           <xsl:otherwise><img src="{$WebApplicationBaseURL}images/pmud-blank.png" border="0" /></xsl:otherwise>
         </xsl:choose>
       </td>
-      <td align="left" valign="bottom" class="editorRepeaterButton">
+      <td>
         <xsl:choose>
           <xsl:when test="($row.nr &lt; $num) or ($row.nr &lt; $min)">
         <input type="image" name="{$editor.delimiter.internal}d-{$var}-{$row.nr}" src="{$WebApplicationBaseURL}images/pmud-down.png"/>
@@ -360,7 +360,7 @@
           <xsl:otherwise><img src="{$WebApplicationBaseURL}images/pmud-blank.png" border="0" /></xsl:otherwise>
         </xsl:choose>
       </td>
-      <td align="left" valign="bottom" class="editorRepeaterButton">
+      <td>
         <xsl:choose>
           <xsl:when test="$row.nr &gt; 1">
         <input type="image" name="{$editor.delimiter.internal}u-{$var}-{$row.nr}" src="{$WebApplicationBaseURL}images/pmud-up.png"/>
@@ -677,7 +677,7 @@
 
   <xsl:choose>
     <xsl:when test="button">
-      <input type="button" onClick="window.open('{$url}','help','{$properties}');" class="editorButton">
+      <input type="button" onClick="window.open('{$url}','help','{$properties}');">
         <xsl:attribute name="value">
           <xsl:choose>
             <xsl:when test="button[lang($CurrentLang)]">
@@ -694,7 +694,7 @@
       </input>
     </xsl:when>
     <xsl:otherwise>
-      <input type="button" value=" ? " onClick="window.open('{$url}','help','{$properties}');" class="editorButton" />
+      <input type="button" value=" ? " onClick="window.open('{$url}','help','{$properties}');" />
     </xsl:otherwise>
   </xsl:choose>
 </xsl:template>
@@ -760,20 +760,18 @@
 <xsl:template match="display">
   <xsl:param name="var" />
   
-  <span class="editorText">
-    <xsl:choose>
-      <xsl:when test="ancestor::editor/input/var[@name = $var]">
-        <input type="hidden" name="{$var}" value="{ancestor::editor/input/var[@name = $var]/@value}" />
-        <xsl:value-of select="ancestor::editor/input/var[@name = $var]/@value" />
-      </xsl:when>
-      <xsl:when test="@default">
-        <xsl:value-of select="@default" />
-      </xsl:when>
-      <xsl:otherwise>
-        <xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>
-      </xsl:otherwise>
-    </xsl:choose>  
-  </span>
+  <xsl:choose>
+    <xsl:when test="ancestor::editor/input/var[@name = $var]">
+      <input type="hidden" name="{$var}" value="{ancestor::editor/input/var[@name = $var]/@value}" />
+      <xsl:value-of select="ancestor::editor/input/var[@name = $var]/@value" />
+    </xsl:when>
+    <xsl:when test="@default">
+      <xsl:value-of select="@default" />
+    </xsl:when>
+    <xsl:otherwise>
+      <xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>
+    </xsl:otherwise>
+  </xsl:choose>  
 </xsl:template>
 
 <!-- ======== output ======== -->
@@ -790,19 +788,17 @@
   <xsl:variable name="selected.cell" 
     select="ancestor::editor/input/var[@name=$var.new]" 
   />
-  <span class="editorText">
-    <xsl:choose>
-      <xsl:when test="$selected.cell">
-        <xsl:value-of select="$selected.cell/@value" disable-output-escaping="yes" />
-      </xsl:when>
-      <xsl:when test="@default">
-        <xsl:value-of select="@default" />
-      </xsl:when>
-      <xsl:otherwise>
-        <xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>
-      </xsl:otherwise>
-    </xsl:choose>  
-  </span>
+  <xsl:choose>
+    <xsl:when test="$selected.cell">
+      <xsl:value-of select="$selected.cell/@value" disable-output-escaping="yes" />
+    </xsl:when>
+    <xsl:when test="@default">
+      <xsl:value-of select="@default" />
+    </xsl:when>
+    <xsl:otherwise>
+      <xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>
+    </xsl:otherwise>
+  </xsl:choose>  
 </xsl:template>
 
 <!-- ======== textfield and textarea ======== -->
@@ -879,13 +875,13 @@
   
   <!-- ======== if older value exists, display controls to delete old file ======== -->
   <xsl:if test="string-length($source) != 0">
-    <span class="editorText">Existierende Datei auf dem Server: </span>
-    <b><span class="editorText"><xsl:value-of select="$source" /></span></b>
+    <xsl:text>Existierende Datei auf dem Server: </xsl:text>
+    <strong><xsl:value-of select="$source" /></strong>
     <br/>
     <input type="checkbox" name="{$editor.delimiter.internal}delete-{$var}" value="true" />
-    <span class="editorText"> löschen </span>
+    <xsl:text> löschen </xsl:text>
     <input type="hidden" name="{$var}" value="{$source}" />
-    <span class="editorText">und/oder ersetzen durch diese Datei: </span>
+    <xsl:text>und/oder ersetzen durch diese Datei: </xsl:text>
     <br/>
   </xsl:if>
 
@@ -919,7 +915,7 @@
     <xsl:call-template name="output.label" />
   </xsl:variable>
 
-  <input type="submit" value="{$label}" name="{$editor.delimiter.internal}s-{@id}-{$var}" class="editorButton">
+  <input type="submit" value="{$label}" name="{$editor.delimiter.internal}s-{@id}-{$var}">
     <xsl:if test="@width">
       <xsl:attribute name="style">width:<xsl:value-of select="@width" /></xsl:attribute>
     </xsl:if>
@@ -965,7 +961,7 @@
     <xsl:call-template name="output.label" />
   </xsl:variable>
 
-  <input type="button" value="{$label}" onClick="self.location.href='{$url}'" class="editorButton">
+  <input type="button" value="{$label}" onClick="self.location.href='{$url}'">
     <xsl:if test="$width">
       <xsl:attribute name="style">width:<xsl:value-of select="$width" /></xsl:attribute>
     </xsl:if>
@@ -978,7 +974,7 @@
     <xsl:call-template name="output.label" />
   </xsl:variable>
 
-  <input type="submit" value="{$label}" class="editorButton">
+  <input type="submit" value="{$label}">
     <xsl:if test="@width">
       <xsl:attribute name="style">width:<xsl:value-of select="@width" /></xsl:attribute>
     </xsl:if>
@@ -1062,7 +1058,7 @@
         <xsl:text disable-output-escaping="yes">&lt;tr&gt;</xsl:text>
       </xsl:if>
 
-      <td class="editorRepeaterButton">
+      <td>
         <xsl:if test="$type='radio'">
           <xsl:call-template name="editor.radio">
             <xsl:with-param name="var"     select="$var"     />
