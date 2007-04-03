@@ -249,6 +249,9 @@ public class MCRServlet extends HttpServlet {
 				session.setCurrentIP(getRemoteAddr(req));
 			}
 
+            // Store XSL.*.SESSION parameters to MCRSession
+            putParamsToSession(req);
+
 			if (GETorPOST == GET) {
 				doGet(job);
 			} else {
@@ -421,7 +424,7 @@ public class MCRServlet extends HttpServlet {
 		return addr;
 	}
 
-	public static void putParamsToSession(HttpServletRequest request) {
+	private static void putParamsToSession(HttpServletRequest request) {
         MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
 
         for (Enumeration e = request.getParameterNames(); e.hasMoreElements();) {

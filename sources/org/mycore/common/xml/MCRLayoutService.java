@@ -244,8 +244,6 @@ public class MCRLayoutService {
     private final Properties mergeProperties(HttpServletRequest request) {
         Properties props = new Properties();
 
-        // Store XSL.*.SESSION parameters to MCRSession
-        MCRServlet.putParamsToSession(request);
         HttpSession session = request.getSession(false);
         MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
         if (session != null) {
