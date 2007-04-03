@@ -928,7 +928,7 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
                 throw new IllegalArgumentException("Invalid target format (" + format + ") in uri for retrieval of classification: " + uri);
             }
             LOGGER.debug("end resolving " + uri);
-            return returns;
+            return (Element)returns.detach();
         }
 
         private static String getLabelFormat(String editorString) {
