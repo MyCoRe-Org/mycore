@@ -162,6 +162,7 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
         supportedSchemes.put("localclass", new MCRLocalClassResolver());
         supportedSchemes.put("classification", new MCRClassificationResolver());
         supportedSchemes.put("query", new MCRQueryResolver());
+        supportedSchemes.put("buildxml", new MCRBuildXMLResolver());
         return supportedSchemes;
     }
 
@@ -1022,6 +1023,86 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
             return input;
         }
 
+    }
+
+    private static class MCRBuildXMLResolver implements MCRResolver {
+
+        /**
+         * Builds a simple xml node tree on basis of name value pair
+         */
+        public Element resolveElement(String uri) {
+            String key = uri.substring(uri.indexOf(":") + 1);
+            LOGGER.debug("Reading xml from query result using key :" + key);
+
+            Hashtable<String, String> params = getParameterMap(key);
+            String baseElement=params.get("_rootName_");
+            if (baseElement==null){
+                baseElement="uriTemp";
+            } else {
+                params.remove("_rootName_");
+            }
+            Element returns=new Element("uriTemp");
+            for (Map.Entry<String, String> entry:params.entrySet()){
+                constructElement(returns, entry.getKey(), entry.getValue());
+            }
+            if (returns.getName().equals("uriTemp")){
+                if (returns.getChildren().size()>1){
+                    LOGGER.warn("More than 1 root node defined, returning one");
+                    return (Element)((Element)returns.getChildren().get(0)).detach();
+                }
+            }
+            return returns;
+        }
+
+        private static Hashtable<String, String> getParameterMap(String key) {
+            String[] param;
+            StringTokenizer tok = new StringTokenizer(key, "&");
+            Hashtable<String, String> params = new Hashtable<String, String>();
+
+            while (tok.hasMoreTokens()) {
+                param = tok.nextToken().split("=");
+                try {
+                    params.put(URLDecoder.decode(param[0],"UTF-8"), URLDecoder.decode(param[0],"UTF-8"));
+                } catch (UnsupportedEncodingException e) {
+                    //should never happen
+                    LOGGER.error("UTF-8 is a unknown encoding.",e);
+                }
+            }
+            return params;
+        }
+        private static void constructElement(Element current, String xpath, String value) {
+            int i = xpath.indexOf('/');
+            LOGGER.debug("Processing xpath: "+xpath);
+            String subname = xpath;
+            if (i > 0) {
+                //construct new element name and xpath value
+                subname = xpath.substring(0, i);
+                xpath = xpath.substring(i + 1);
+            }
+            i = xpath.indexOf('/');
+            if (subname.startsWith("@")) {
+                if (i > 0) {
+                    subname = subname.substring(0, i);//attribute should be the last
+                }
+                subname=subname.substring(1);//remove @
+                LOGGER.debug("Setting attribute "+subname+"="+value);
+                current.setAttribute(subname, value);
+                return;
+            }
+            Element newcurrent = current.getChild(subname);
+            if (newcurrent == null) {
+                newcurrent = new Element(subname);
+                LOGGER.debug("Adding element "+newcurrent.getName()+" to "+current.getName());
+                current.addContent(newcurrent);
+            }
+            if (subname==xpath) {
+                //last element of xpath
+                LOGGER.debug("Setting text of element "+newcurrent.getName()+" to "+value);
+                newcurrent.setText(value);
+                return;
+            }
+            constructElement(newcurrent, xpath, value); //recursive call
+        }
     }
 
 }

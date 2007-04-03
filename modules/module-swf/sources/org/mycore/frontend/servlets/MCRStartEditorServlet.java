@@ -30,7 +30,9 @@ import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Method;
 import java.net.URLEncoder;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import javax.servlet.ServletException;
@@ -1137,11 +1139,23 @@ public class MCRStartEditorServlet extends MCRServlet {
         String base = getBaseURL() + myfile;
         Properties params = new Properties();
         // start changes for submitting xml templates
-        Element root = new Element("mycoreobject");
         LOGGER.debug("calling buildXMLTemplate...");
-        if (MCREditorServletHelper.buildXMLTemplate(job.getRequest(), root)) {
-            MCRSessionMgr.getCurrentSession().put("wnewobj", root);
-            params.put("XSL.editor.source.url", "session:wnewobj");
+        Enumeration e = job.getRequest().getParameterNames();
+        HashMap<String, String> templatePairs = new HashMap<String, String>();
+        while (e.hasMoreElements()) {
+            String name = (String) (e.nextElement());
+            String value = job.getRequest().getParameter(name);
+            if (!name.startsWith("_xml_")) {
+                continue;
+            }
+            templatePairs.put(URLEncoder.encode(name, "UTF-8"), URLEncoder.encode(value, "UTF-8"));
+        }
+        if (templatePairs.size() > 0) {
+            StringBuilder sb = new StringBuilder("buildxml:_rootName_=mycoreobject");
+            for (Map.Entry<String, String> entry : templatePairs.entrySet()) {
+                sb.append('&').append(entry.getKey()).append('=').append(entry.getValue());
+            }
+            params.put("XSL.editor.source.url", sb.toString());
         } else {
             LOGGER.debug("XMLTemplate is empty");
             params.put("XSL.editor.source.new", "true");// old code
