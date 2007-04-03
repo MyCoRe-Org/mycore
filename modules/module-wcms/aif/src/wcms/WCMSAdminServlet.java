@@ -74,21 +74,26 @@ public class WCMSAdminServlet extends WCMSServlet {
 
 		// process request
 		if (todo.equals("exit")) {
-			String exitWCMSAddress = request.getParameter("address");
-			response.sendRedirect(response.encodeRedirectURL(exitWCMSAddress));
+			exitWCMS(request, response);
 		}
 		else if (todo.equals("getMultimediaConfig")) {
     		Document docOut = new Document(new Element("cms"));
     		getMultimediaConfig(docOut.getRootElement());
     		getLayoutService().sendXML(request, response, docOut);
 		}
-		else if (todo.equals("choose"))
+		else if (todo.equals("choose")) {
 			generateXML_managPage(mcrSession, root);
-		else if (todo.equals("logs"))
+			getLayoutService().doLayout(request, response, jdom);
+		}
+		else if (todo.equals("logs")) {
 			generateXML_logs(request, root);
+			getLayoutService().doLayout(request, response, jdom);
+		}
 		else if (todo.equals("managGlobal")
-				&& mcrSession.get("userClass").equals("admin"))
+				&& mcrSession.get("userClass").equals("admin")) {
 			generateXML_managGlobal(root);
+			getLayoutService().doLayout(request, response, jdom);
+		}
 		else if (todo.equals("saveGlobal")
 				&& mcrSession.get("userClass").equals("admin"))
 			generateXML_saveGlobal(request, response);
@@ -117,6 +122,16 @@ public class WCMSAdminServlet extends WCMSServlet {
 		}
 		else
 			getLayoutService().doLayout(request, response, jdom);
+	}
+
+	private void exitWCMS(HttpServletRequest request, HttpServletResponse response) throws IOException {
+		if (request.getParameter("address")!=null && !request.getParameter("address").equals("")) {
+			String exitURL = request.getParameter("address");
+			response.sendRedirect(response.encodeRedirectURL(exitURL));	
+		} else {
+			String exitURL = request.getContextPath() + "/servlets/WCMSAdminServlet?action=choose";
+			response.sendRedirect(response.encodeRedirectURL(exitURL));
+		}
 	}
 
 	/**
