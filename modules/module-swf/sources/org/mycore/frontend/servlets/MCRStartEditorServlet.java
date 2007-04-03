@@ -38,7 +38,6 @@ import java.util.Properties;
 import javax.servlet.ServletException;
 
 import org.apache.log4j.Logger;
-import org.jdom.Element;
 
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRException;
@@ -46,12 +45,11 @@ import org.mycore.common.MCRMailer;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUtils;
-import org.mycore.datamodel.ifs.MCRDirectory;
 import org.mycore.datamodel.common.MCRActiveLinkException;
+import org.mycore.datamodel.ifs.MCRDirectory;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.frontend.editor.MCREditorServletHelper;
 import org.mycore.frontend.fileupload.MCRUploadHandlerIFS;
 import org.mycore.frontend.fileupload.MCRUploadHandlerMyCoRe;
 import org.mycore.frontend.workflow.MCRSimpleWorkflowManager;
