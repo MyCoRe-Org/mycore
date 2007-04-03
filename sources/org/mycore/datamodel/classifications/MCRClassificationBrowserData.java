@@ -43,11 +43,11 @@ import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.datamodel.classifications.query.Category;
-import org.mycore.datamodel.classifications.query.Classification;
-import org.mycore.datamodel.classifications.query.ClassificationObject;
-import org.mycore.datamodel.classifications.query.Label;
-import org.mycore.datamodel.classifications.query.MCRClassificationQuery;
+import org.mycore.datamodel.classifications.MCRCategoryItem;
+import org.mycore.datamodel.classifications.MCRClassificationItem;
+import org.mycore.datamodel.classifications.MCRClassificationObject;
+import org.mycore.datamodel.classifications.MCRLabel;
+import org.mycore.datamodel.classifications.MCRClassificationQuery;
 
 /**
  * Instances of MCRClassificationBrowser contain the data of the currently
@@ -76,7 +76,7 @@ public class MCRClassificationBrowserData {
     // private Vector lines;
     private ArrayList lines;
 
-    private Classification classif;
+    private MCRClassificationItem classif;
 
     private String startPath = "";
 
@@ -246,7 +246,7 @@ public class MCRClassificationBrowserData {
         return xslStyle;
     }
 
-    public Classification getClassification() {
+    public MCRClassificationItem getClassification() {
         return classif;
     }
 
@@ -350,11 +350,11 @@ public class MCRClassificationBrowserData {
     }
 
     @SuppressWarnings("unchecked")
-    private void putCategoriesintoLines(final int startpos, final List<Category> children, final int level) {
+    private void putCategoriesintoLines(final int startpos, final List<MCRCategoryItem> children, final int level) {
         LOGGER.debug("Start Explore Arraylist of CategItems  ");
         int i = startpos;
         for (int j = 0, k = children.size(); j < k; j++) {
-            Category categ = (Category) children.get(j);
+            MCRCategoryItem categ = (MCRCategoryItem) children.get(j);
             Element child = MCRCategoryElementFactory.getCategoryElement(categ, classif.isCounterEnabled());
             lines.add(++i, setTreeline(child, level + 1));
             if (startpos == -1) {
@@ -387,9 +387,7 @@ public class MCRClassificationBrowserData {
         Collections.sort(ids);
 
         for (String id : ids) {
-System.out.println("WWWWWWWWWWWWWWWWWWW"+id);
-            Classification classif = getClassificationPool().getClassificationAsPojo(id);
-System.out.println("WWWWWWWWWWWWWWWWWWW"+classif);
+            MCRClassificationItem classif = getClassificationPool().getClassificationAsPojo(id);
             Element cli = getBrowseElement(classif);
             String sessionID=MCRSessionMgr.getCurrentSession().getID();
             // set browser type
@@ -430,7 +428,7 @@ System.out.println("WWWWWWWWWWWWWWWWWWW"+classif);
 
             try {
                 int cnt = 0;
-                for (Category cat : classif.getCategories()) {
+                for (MCRCategoryItem cat : classif.getCategories()) {
                     cnt += cat.getNumberOfObjects();
                 }
                 Counter = Integer.toString(cnt);
@@ -443,10 +441,10 @@ System.out.println("WWWWWWWWWWWWWWWWWWW"+classif);
         return new Document(xDocument);
     }
 
-    private static Element getBrowseElement(Classification classif) {
+    private static Element getBrowseElement(MCRClassificationItem classif) {
         Element ce = new Element("classification");
         ce.setAttribute("ID", classif.getId());
-        for (Label label : classif.getLabels()) {
+        for (MCRLabel label : classif.getLabels()) {
             Element labelElement = new Element("label");
             if (label.getLang() != null) {
                 labelElement.setAttribute("lang", label.getLang(), Namespace.XML_NAMESPACE);
@@ -471,8 +469,12 @@ System.out.println("WWWWWWWWWWWWWWWWWWW"+classif);
 
     public org.jdom.Document createXmlTree(final String lang) throws Exception {
 
-        final Classification cl = getClassificationPool().getClassificationAsPojo(getClassification().getId());
-        Label labels = getLabel(cl, lang);
+        //final MCRClassificationItem cl = getClassificationPool().getClassificationAsPojo(getClassification().getId());
+        System.out.println("*****************************"+getClassification());
+        MCRClassificationPool cp = getClassificationPool();
+        MCRClassificationItem cl = cp.getClassificationAsPojo(getClassification().getId());
+        System.out.println("*****************************"+getClassification().getId());
+        MCRLabel labels = getLabel(cl, lang);
         Element xDocument = new Element("classificationBrowse");
 
         final Element xID = new Element("classifID");
@@ -669,7 +671,7 @@ System.out.println("WWWWWWWWWWWWWWWWWWW"+classif);
         int lastLevel = 0;
         boolean hideLevel = false;
 
-        Category cat = MCRClassificationQuery.findCategory(classif, categID);
+        MCRCategoryItem cat = MCRClassificationQuery.findCategory(classif, categID);
         LOGGER.debug(this.getClass() + " update CategoryTree for: " + categID);
         Element line;
         for (int i = 0; i < lines.size(); i++) {
@@ -704,7 +706,7 @@ System.out.println("WWWWWWWWWWWWWWWWWWW"+classif);
                     line.setAttribute("level", "0");
                     LOGGER.info(" expand " + catid);
                     line.setAttribute("hasChildren", "F");
-                    putCategoriesintoLines(i, new Category().getCategories(), level + 1);
+                    putCategoriesintoLines(i, new MCRCategoryItem().getCategories(), level + 1);
                 } else {
                     LOGGER.debug(" remove lines " + i + "_" + catid);
                     lines.remove(i--);
@@ -855,13 +857,13 @@ System.out.println("WWWWWWWWWWWWWWWWWWW"+classif);
         return classPool;
     }
 
-        private static Label getLabel(ClassificationObject co, String lang) {
-            for(Label label:co.getLabels()) {
+        private static MCRLabel getLabel(MCRClassificationObject co, String lang) {
+            for(MCRLabel label:co.getLabels()) {
                 if(label.getLang().equals(lang)) {
                     return label;
                 }
             }
-            return new Label();
+            return new MCRLabel();
     }
         
     public static void clearCurrentUserClassTable() {
@@ -876,22 +878,22 @@ System.out.println("WWWWWWWWWWWWWWWWWWW"+classif);
     }
 
     private static class MCRCategoryElementFactory {
-        static Element getCategoryElement(Category category, boolean withCounter) {
+        static Element getCategoryElement(MCRCategoryItem category, boolean withCounter) {
             Element ce = new Element("category");
             ce.setAttribute("ID", category.getId());
             if (withCounter) {
                 ce.setAttribute("counter", Integer.toString(category.getNumberOfObjects()));
             }
-            for (Label label : category.getLabels()) {
+            for (MCRLabel label : category.getLabels()) {
                 ce.addContent(getElement(label));
             }
-            for (Category child : category.getCategories()) {
+            for (MCRCategoryItem child : category.getCategories()) {
                 ce.addContent(getCategoryElement(child, withCounter));
             }
             return ce;
         }
 
-        private static Element getElement(Label label) {
+        private static Element getElement(MCRLabel label) {
             Element le = new Element("label");
             if (stringNotEmpty(label.getLang())) {
                 le.setAttribute("lang", label.getLang(), Namespace.XML_NAMESPACE);

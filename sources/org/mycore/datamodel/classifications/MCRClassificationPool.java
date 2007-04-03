@@ -8,9 +8,9 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.datamodel.classifications.query.Classification;
-import org.mycore.datamodel.classifications.query.ClassificationTransformer;
-import org.mycore.datamodel.classifications.query.MCRClassificationQuery;
+import org.mycore.datamodel.classifications.MCRClassificationItem;
+import org.mycore.datamodel.classifications.MCRClassificationTransformer;
+import org.mycore.datamodel.classifications.MCRClassificationQuery;
 
 /**
  * @author Radi Radichev
@@ -19,7 +19,7 @@ import org.mycore.datamodel.classifications.query.MCRClassificationQuery;
 
 public class MCRClassificationPool {
     
-    private HashMap<String, Classification> classifications=new HashMap<String, Classification>(); // A Hash map to store all edited classifications
+    private HashMap<String, MCRClassificationItem> classifications=new HashMap<String, MCRClassificationItem>(); // A Hash map to store all edited classifications
     static Logger LOGGER=Logger.getLogger(MCRClassificationPool.class);
     MCRClassification cl=new MCRClassification();
     
@@ -48,8 +48,8 @@ public class MCRClassificationPool {
         Iterator iter=classifications.keySet().iterator();
               
         while(iter.hasNext()) {
-            Classification clas=(Classification)classifications.get(iter.next().toString());
-            Document doc=ClassificationTransformer.getMetaDataDocument(clas);
+            MCRClassificationItem clas=(MCRClassificationItem)classifications.get(iter.next().toString());
+            Document doc=MCRClassificationTransformer.getMetaDataDocument(clas);
             try {
                 cl.setFromJDOM(doc);
                 cl.updateInDatastore();
@@ -88,7 +88,7 @@ public class MCRClassificationPool {
      * or a Category is edited
      * @param cl Classification to be stored in the session.
      */
-    public void updateClassification(Classification cl) { 
+    public void updateClassification(MCRClassificationItem cl) { 
         classifications.put(cl.getId(),cl);
         LOGGER.debug("Classification: "+cl.getId()+" wurde in den Session hinzugef�gt!");
         
@@ -101,14 +101,14 @@ public class MCRClassificationPool {
      * @return Document classif
      */
     
-    public Classification getClassificationAsPojo(String clid) {
-        Classification classif=(Classification)classifications.get(clid);
+    public MCRClassificationItem getClassificationAsPojo(String clid) {
+        MCRClassificationItem classif=(MCRClassificationItem)classifications.get(clid);
         
         if(classif!=null) {  
             LOGGER.info("Classification with ID: "+classif.getId()+" comes from the session.");
             return classif;
         } else {
-            Classification cl=MCRClassificationQuery.getClassification(clid,-1,true);
+            MCRClassificationItem cl=MCRClassificationQuery.getClassification(clid,-1,true);
             LOGGER.info("Classification with ID: "+cl.getId()+" comes from the database.");
             return cl;
         }

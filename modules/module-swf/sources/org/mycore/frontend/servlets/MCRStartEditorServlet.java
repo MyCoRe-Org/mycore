@@ -556,15 +556,15 @@ public class MCRStartEditorServlet extends MCRServlet {
         List permlist = AI.getPermissionsForID(mysemcrid);
         for (int i = 0; i < permlist.size(); i++) {
             org.jdom.Element ruleelm = AI.getRule(mysemcrid, (String) permlist.get(i));
-            org.jdom.Document dof = new org.jdom.Document();
-            org.jdom.Element eof = new org.jdom.Element("test");
-            dof.addContent(eof);
-            eof.addContent((org.jdom.Element) ruleelm.detach().clone());
-            byte[] xml = MCRUtils.getByteArray(dof);
-            System.out.println(new String(xml));
             obj.getService().addRule((String) permlist.get(i), ruleelm);
         }
         serviceelm = obj.getService().createXML();
+        if (LOGGER.isDebugEnabled()) {
+            org.jdom.Document dof = new org.jdom.Document();
+            dof.addContent(serviceelm);
+            byte[] xml = MCRUtils.getByteArray(dof);
+            System.out.println(new String(xml));
+        }
 
         MCRSession session = MCRSessionMgr.getCurrentSession();
         session.put("service", serviceelm);

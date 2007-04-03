@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!-- ============================================== -->
-<!-- $Revision: 1.1 $ $Date: 2007-03-23 11:11:54 $ -->
+<!-- $Revision: 1.2 $ $Date: 2007-04-03 12:55:23 $ -->
 <!-- ============================================== -->
 
 <editor>
@@ -54,18 +54,23 @@
    <cell col="2" row="1" anchor="NORTHWEST" ref="ListPermission" var="@permission" sortnr="1"/>
    <hidden var="condition/@format" default="xml"/>
    <hidden var="condition/boolean/@operator" default="and" />
+	  
+	  
    <cell col="1" row="2" anchor="NORTHWEST" >
     <text id="TUserGroup" i18n="editor.common.acl.uog" />
    </cell>
    <cell col="2" row="2" anchor="NORTHWEST" ref="AllUser" />
+	  
    <cell col="1" row="3" anchor="NORTHWEST" >
     <text id="TUserGroup" i18n="editor.common.acl.date" />
    </cell>
    <cell col="2" row="3" anchor="NORTHWEST" ref="AllDate" />
+	  
    <cell col="1" row="4" anchor="NORTHWEST" >
     <text id="TUserGroup" i18n="editor.common.acl.ip"/>
    </cell>
    <cell col="2" row="4" anchor="NORTHWEST" ref="AllIP" />
+	  
    <cell col="1" row="5" anchor="NORTHWEST">
     <space width="0px" height="20px"/>
    </cell>

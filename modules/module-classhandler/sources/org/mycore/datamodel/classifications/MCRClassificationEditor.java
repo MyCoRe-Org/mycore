@@ -40,12 +40,12 @@ import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUtils;
-import org.mycore.datamodel.classifications.query.Category;
-import org.mycore.datamodel.classifications.query.Classification;
-import org.mycore.datamodel.classifications.query.ClassificationObject;
-import org.mycore.datamodel.classifications.query.ClassificationTransformer;
-import org.mycore.datamodel.classifications.query.Label;
-import org.mycore.datamodel.classifications.query.MCRClassificationQuery;
+import org.mycore.datamodel.classifications.MCRCategoryItem;
+import org.mycore.datamodel.classifications.MCRClassificationItem;
+import org.mycore.datamodel.classifications.MCRClassificationObject;
+import org.mycore.datamodel.classifications.MCRClassificationTransformer;
+import org.mycore.datamodel.classifications.MCRLabel;
+import org.mycore.datamodel.classifications.MCRClassificationQuery;
 import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.common.MCRLinkTableManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
@@ -64,7 +64,7 @@ public class MCRClassificationEditor {
     // logger
     private static Logger LOGGER = Logger.getLogger(MCRClassificationEditor.class);
 
-    private Classification classif;
+    private MCRClassificationItem classif;
 
     private MCRConfiguration CONFIG;
 
@@ -110,8 +110,8 @@ public class MCRClassificationEditor {
             newCateg = setNewJDOMCategElement(newCateg);
             newCateg.setAttribute("counter", "0");
             if (MCRClassificationQuery.findCategory(classif, newID) == null) {
-                Category newCategory = ClassificationTransformer.getCategory(newCateg);
-                List<Category> categs = classif.getCategories();
+                MCRCategoryItem newCategory = MCRClassificationTransformer.getCategory(newCateg);
+                List<MCRCategoryItem> categs = classif.getCategories();
                 categs.add(newCategory);
                 classif.setCatgegories(categs);
                 MCRClassificationBrowserData.getClassificationPool().updateClassification(classif);
@@ -152,12 +152,12 @@ public class MCRClassificationEditor {
                 LOGGER.error("The category ID's are different.");
                 return false;
             }
-            Category oldCategory = MCRClassificationQuery.findCategory(classif, newID);
+            MCRCategoryItem oldCategory = MCRClassificationQuery.findCategory(classif, newID);
             if (oldCategory == null) {
                 LOGGER.error("The category ID does not exist in classification " + clid);
                 return false;
             }
-            Category newCategory = ClassificationTransformer.getCategory(newCateg);
+            MCRCategoryItem newCategory = MCRClassificationTransformer.getCategory(newCateg);
             oldCategory.getLabels().clear();
             oldCategory.setLabels(newCategory.getLabels());
 
@@ -279,7 +279,7 @@ public class MCRClassificationEditor {
             mycoreclass.addContent(categories);
             Document cljdom = new Document();
             cljdom.addContent(mycoreclass);
-            Classification classif = ClassificationTransformer.getClassification(cljdom);
+            MCRClassificationItem classif = MCRClassificationTransformer.getClassification(cljdom);
             MCRClassificationBrowserData.getClassificationPool().updateClassification(classif);
             LOGGER.debug("Classification " + cli.toString() + " successfully created!");
             return true;
@@ -311,7 +311,7 @@ public class MCRClassificationEditor {
 
             for (int i = 0; i < tagList.size(); i++) {
                 element = (Element) tagList.get(i);
-                Label label = new Label();
+                MCRLabel label = new MCRLabel();
                 label.setLang(element.getAttributeValue("lang"));
                 label.setText(element.getAttributeValue("text"));
                 label.setDescription(element.getAttributeValue("description"));
@@ -346,19 +346,19 @@ public class MCRClassificationEditor {
 
             classif = MCRClassificationBrowserData.getClassificationPool().getClassificationAsPojo(clid);
             if (way.equalsIgnoreCase("up")) {
-                Category categ = MCRClassificationQuery.findCategory(classif, categid);
+                MCRCategoryItem categ = MCRClassificationQuery.findCategory(classif, categid);
                 moveUp(categ);
                 bret = true;
             } else if (way.equalsIgnoreCase("down")) {
-                Category categ = MCRClassificationQuery.findCategory(classif, categid);
+                MCRCategoryItem categ = MCRClassificationQuery.findCategory(classif, categid);
                 moveDown(categ);
                 bret = true;
             } else if (way.equalsIgnoreCase("right")) {
-                Category categ = MCRClassificationQuery.findCategory(classif, categid);
+                MCRCategoryItem categ = MCRClassificationQuery.findCategory(classif, categid);
                 moveRight(categ);
                 bret = true;
             } else if (way.equalsIgnoreCase("left")) {
-                Category categ = MCRClassificationQuery.findCategory(classif, categid);
+                MCRCategoryItem categ = MCRClassificationQuery.findCategory(classif, categid);
                 moveLeft(categ);
                 bret = true;
             }
@@ -376,8 +376,8 @@ public class MCRClassificationEditor {
         }
     }
 
-    private boolean moveUp(Category cat) {
-        ClassificationObject parent = MCRClassificationQuery.findParent(classif, cat);
+    private boolean moveUp(MCRCategoryItem cat) {
+        MCRClassificationObject parent = MCRClassificationQuery.findParent(classif, cat);
         int index = parent.getCategories().indexOf(cat);
         if (index > 0) {
             parent.getCategories().remove(index);
@@ -388,8 +388,8 @@ public class MCRClassificationEditor {
         }
     }
 
-    private boolean moveDown(Category cat) {
-        ClassificationObject parent = MCRClassificationQuery.findParent(classif, cat);
+    private boolean moveDown(MCRCategoryItem cat) {
+        MCRClassificationObject parent = MCRClassificationQuery.findParent(classif, cat);
         int index = parent.getCategories().indexOf(cat);
         if (index < parent.getCategories().size()) {
             parent.getCategories().remove(index);
@@ -400,8 +400,8 @@ public class MCRClassificationEditor {
         }
     }
 
-    private boolean moveRight(Category cat) {
-        ClassificationObject parent = MCRClassificationQuery.findParent(classif, cat);
+    private boolean moveRight(MCRCategoryItem cat) {
+        MCRClassificationObject parent = MCRClassificationQuery.findParent(classif, cat);
         if (parent.getCategories().size() == 1) {
             return false;
         }
@@ -414,12 +414,12 @@ public class MCRClassificationEditor {
         return true;
     }
 
-    private boolean moveLeft(Category cat) {
-        ClassificationObject parent = MCRClassificationQuery.findParent(classif, cat);
-        if (!(parent instanceof Category) || parent == null) {
+    private boolean moveLeft(MCRCategoryItem cat) {
+        MCRClassificationObject parent = MCRClassificationQuery.findParent(classif, cat);
+        if (!(parent instanceof MCRCategoryItem) || parent == null) {
             return false;
         }
-        ClassificationObject grandParent = MCRClassificationQuery.findParent(classif, (Category) parent);
+        MCRClassificationObject grandParent = MCRClassificationQuery.findParent(classif, (MCRCategoryItem) parent);
         if (grandParent == null) {
             grandParent = classif;
         }
