@@ -34,7 +34,7 @@ import org.mycore.frontend.servlets.MCRServlet;
  * This class contains the functionality to read XML input that should be editor
  * in the editor.
  * 
- * @author Frank Lützenkirchen
+ * @author Frank Lï¿½tzenkirchen
  */
 public class MCREditorSourceReader {
     
@@ -91,6 +91,7 @@ public class MCREditorSourceReader {
 
         MCREditorServlet.logger.info("Editor reading XML input from " + url);
         Element input = MCRURIResolver.instance().resolve(url);
+        input.detach();
         return new MCREditorSubmission(input,editor);
     }
 }
