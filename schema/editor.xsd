@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Mit XMLSpy v2007 sp1 bearbeitet (http://www.altova.com) von Frank Lützenkirchen (Universitätsbibliothek Duisburg-Essen) -->
+<!-- Mit XMLSpy v2007 sp2 (http://www.altova.com) von Frank Lützenkirchen (Universitätsbibliothek Duisburg-Essen) bearbeitet -->
 <!-- edited with XMLSpy v2005 sp1 U (http://www.xmlspy.com) by Lützenkirchen, Frank (Universität Duisburg-Essen) -->
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
 	<xs:import namespace="http://www.w3.org/XML/1998/namespace" schemaLocation="xml-2001.xsd"/>
@@ -389,6 +389,7 @@
 					</xs:restriction>
 				</xs:simpleType>
 			</xs:attribute>
+			<xs:attribute ref="anchor" use="optional"/>
 		</xs:complexType>
 	</xs:element>
 	<xs:element name="include">

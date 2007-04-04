@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
 <!-- ============================================== -->
-<!-- $Revision: 1.65 $ $Date: 2007-04-03 14:42:37 $ -->
+<!-- $Revision: 1.66 $ $Date: 2007-04-04 09:50:40 $ -->
 <!-- ============================================== --> 
 
 <xsl:stylesheet 
@@ -331,7 +331,9 @@
   <xsl:param name="max" />
   <xsl:param name="row.nr" />
 
-  <td align="left" valign="bottom">
+  <td>
+    <!-- ======== set align / valign ======== -->
+    <xsl:call-template name="editor.set.anchor" />
   
     <table cellspacing="0">
       <tr>
