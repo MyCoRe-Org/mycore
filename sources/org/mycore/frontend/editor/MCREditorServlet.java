@@ -116,14 +116,12 @@ public class MCREditorServlet extends MCRServlet {
     public static void replaceEditorElements(HttpServletRequest request, String uri, Document xml) {
         String sessionID = request.getParameter("XSL.editor.session.id");
 
-        List editors = new ArrayList();
+        List<Element> editors = new ArrayList<Element>();
         Iterator it = xml.getDescendants(new ElementFilter("editor"));
         while (it.hasNext())
-            editors.add(it.next());
+            editors.add((Element)(it.next()));
 
-        for (int i = 0; i < editors.size(); i++) {
-
-            Element editor = (Element) (editors.get(i));
+        for (Element editor: editors ) {
             Element editorResolved = null;
             if ((sessionID == null) || (sessions.get(sessionID) == null))
                 editorResolved = startSession(request, editor, uri);
@@ -159,8 +157,8 @@ public class MCREditorServlet extends MCRServlet {
         String sourceURI = replaceParameters(editor, "source", "uri", parameters);
 
         if (sourceURI != null) {
-            logger.info("Editor reading XML input from " + uri);
-            Element input = MCRURIResolver.instance().resolve(uri);
+            logger.info("Editor reading XML input from " + sourceURI);
+            Element input = MCRURIResolver.instance().resolve(sourceURI);
             MCREditorSubmission sub = new MCREditorSubmission(input, editor);
             editor.addContent(sub.buildInputElements());
             editor.addContent(sub.buildRepeatElements());
@@ -177,7 +175,7 @@ public class MCREditorServlet extends MCRServlet {
         String sessionID = buildSessionID();
         editor.setAttribute("session", sessionID);
         sessions.put(sessionID, editor);
-        logger.debug("Storing editor sessions under id " + sessionID);
+        logger.debug("Storing editor under session id " + sessionID);
 
         return editor;
     }
@@ -199,7 +197,7 @@ public class MCREditorServlet extends MCRServlet {
      * @return the value of the first attribute in the element list where all
      *         parameters could be replaced successfully
      */
-    private static String replaceParameters(Element parent, String elementName, String attributeName, Map parameters) {
+    private static String replaceParameters(Element parent, String elementName, String attributeName, Map<String,String[]> parameters) {
         // Get all elements of a given name, e.g. "source"
         List<Element> l = parent.getChildren(elementName);
         for (Element e : l) {
@@ -224,7 +222,7 @@ public class MCREditorServlet extends MCRServlet {
                         break;
                     else
                         // Replace parameter with value from request
-                        replaced.append(parameters.get(token));
+                        replaced.append(parameters.get(token)[0]);
                 } else
                     replaced.append(token);
             }
