@@ -3,7 +3,10 @@
 
 <editor id="modifyuser">
 
+    <source uri="request:servlets/MCRUserEditorServlet?mode=retrieveuserxml&uid={uid}" />
     <target type="servlet" name="MCRUserEditorServlet" method="post" format="xml" /> -->
+    <cancel url="{cancelUrl}" />
+    
     <components root="modify-user" var="/mycoreuser">
         <include uri="webapp:editor/imports-common-user.xml" />
         <headline anchor="CENTER">

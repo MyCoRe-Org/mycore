@@ -8,24 +8,15 @@
   <maintitle xml:lang="en">User management</maintitle>
   <pagetitle xml:lang="de">Erzeugen einer neuen Benutzerkennung</pagetitle>
   <pagetitle xml:lang="en">Create a new user account</pagetitle>
-  <buttons xml:lang="de">
-  </buttons>
+  <buttons xml:lang="de" />
 </head>
 
 <section title="Neuanlegen eines Benutzers" xml:lang="de">
-  <p></p>
-  <br />
   <editor id="createuser"><include uri="webapp:editor/editor-createuser.xml" /></editor>
-  <p></p>
-  <br />
 </section>
 
 <section title="Create a new user account" xml:lang="en">
-  <p></p>
-  <br />
   <editor id="createuser"><include uri="webapp:editor/editor-createuser.xml" /></editor>
-  <p></p>
-  <br />
 </section>
 
 </MyCoReWebPage>
