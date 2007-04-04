@@ -73,7 +73,10 @@ import org.xml.sax.InputSource;
  * @version
  */
 public class WCMSActionServlet extends WCMSServlet {
-    private static final Namespace ns = Namespace.XML_NAMESPACE;
+	
+	private static final long serialVersionUID = 1L;
+
+	private static final Namespace ns = Namespace.XML_NAMESPACE;
 
     /* Session, userDB */
     private String userID = null; // UserID of the current user
@@ -216,6 +219,11 @@ public class WCMSActionServlet extends WCMSServlet {
      *            servlet response
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response) {
+    	
+    	logger.debug("########################################");
+    	logger.debug("procReq");
+    	logger.debug("########################################");    	
+    	
         mcrSession = MCRSessionMgr.getCurrentSession();
         
         setReq(request);
@@ -943,31 +951,20 @@ public class WCMSActionServlet extends WCMSServlet {
 
     public void makeAction(String action) {
         try {
-            // /////////////////////////////////////////////////////////////////////////////////////////////
-            // prepare content as sdom document
-            // /////////////////////////////////////////////////////////////////////////////////////////////
-            Document doc = new Document();
-
+        	Document html2BeStored = new Document();
+        	
             if (action.equals("add")) {
                 if (mode.equals("intern")) {
-                    if (!hrefFile.exists()) {
+                   if (!hrefFile.exists()) {
                         hrefFile.getParentFile().mkdir();
-
-                        // BufferedOutputStream bo = new
-                        // BufferedOutputStream(new FileOutputStream(hrefFile));
-                        StringBuffer head = new StringBuffer("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n").append("<!DOCTYPE MyCoReWebPage>\n").append("<MyCoReWebPage>\n").append("\t<section xml:lang=\"" + defaultLang + "\" title=\"" + label + "\">\n");
-                        StringBuffer body = new StringBuffer(content);
-                        StringBuffer tail = new StringBuffer("\t</section>\n").append("</MyCoReWebPage>\n");
-                        BufferedInputStream bis = new BufferedInputStream(new ByteArrayInputStream(((head).append(body).append(tail)).toString().getBytes("UTF-8")));
-                        doc = getXMLAsJDOM(bis);
+                        StringBuffer contentHead = new StringBuffer("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n").append("<!DOCTYPE MyCoReWebPage>\n").append("<MyCoReWebPage>\n").append("\t<section xml:lang=\"" + defaultLang + "\" title=\"" + label + "\">\n");
+                        StringBuffer contentBody = new StringBuffer(content);
+                        StringBuffer contentTail = new StringBuffer("\t</section>\n").append("</MyCoReWebPage>\n");
+                        BufferedInputStream bis = new BufferedInputStream(new ByteArrayInputStream(((contentHead).append(contentBody).append(contentTail)).toString().getBytes("UTF-8")));
+                        html2BeStored = getXMLAsJDOM(bis);
                         bis.close();
-
-                        // writeJDOMDocumentToFile(doc, hrefFile);
-                        // MCRUtils.copyStream(bi,bo);
-                        // bo.close();
                     } else {
                         error = "Unter diesem Pfad existiert bereits ein File mit diesem Filename!";
-
                         return;
                     }
                 } else {
@@ -978,49 +975,26 @@ public class WCMSActionServlet extends WCMSServlet {
             if (action.equals("edit")) {
                 if (mode.equals("intern")) {
                     try {
-                        // SAXBuilder builder = new SAXBuilder();
-                        // builder.setEntityResolver(new ResolveDTD());
-                        doc = new Document();
+                        //Document storedHTML = new Document();
 
                         try {
-                            doc = getXMLAsJDOM(content);
+                            Element formHTML = getXMLAsJDOM(content).getRootElement();
+                            
+                        	html2BeStored = getXMLAsJDOM(hrefFile);
 
-                            Element html = doc.getRootElement();
-                            doc = getXMLAsJDOM(hrefFile);
+                            Element storedHTMLRoot = html2BeStored.getRootElement();
+                            validate(storedHTMLRoot);
 
-                            Element root = doc.getRootElement();
-                            validate(root);
-
-                            Element actElem = findActElem(root, "lang", defaultLang, ns);
-                            actElem.setAttribute("title", label);
-							if (html.getName().equals("dummyRoot")){
-								actElem.setContent(html.cloneContent());
+                            Element contentSection = findActElem(storedHTMLRoot, "lang", defaultLang, ns);
+                            contentSection.setAttribute("title", label);
+							if (formHTML.getName().equals("dummyRoot")){
+								contentSection.setContent(formHTML.cloneContent());
 							}
-							else actElem.setContent((Element)html.clone());
+							else 
+								contentSection.setContent((Element)formHTML.clone());
                         } catch (Exception ex) {
                             logger.error("Error while updating document, update rejected.", ex);
                         }
-
-                        /*
-                         * try { content = " <section
-                         * xml:lang=\""+defaultLang+"\" title=\""+label+"\"
-                         * >"+content+" </section>"; //content.replaceAll("&",
-                         * "&amp;"); doc = getXMLAsJDOM(new
-                         * StringReader(content)); Element html =
-                         * doc.getRootElement(); html.detach(); //builder = new
-                         * SAXBuilder(); doc = getXMLAsJDOM(hrefFile); Element
-                         * root = doc.getRootElement(); validate(root); Element
-                         * actElem = findActElem(root, "lang", defaultLang, ns);
-                         * Element parent = (Element)actElem.getParent();
-                         * parent.removeContent(actElem);
-                         * parent.addContent(html); } catch (Exception e) {
-                         * error = "non_valid_xhtml_content"; sessionParam =
-                         * "action"; generateOutput(error, label, fileName);
-                         * return; } } //writeJDOMDocumentToFile(doc, hrefFile);
-                         * /*XMLOutputter xmlout = new
-                         * XMLOutputter(Format.getRawFormat().setTextMode(Format.TextMode.PRESERVE).setEncoding("UTF-8"));
-                         * xmlout.output(doc, new FileOutputStream(hrefFile));
-                         */
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -1031,93 +1005,47 @@ public class WCMSActionServlet extends WCMSServlet {
 
             if (action.equals("translate") && mode.equals("intern")) {
                 try {
-                    /*
-                     * SAXBuilder builder = new SAXBuilder();
-                     * builder.setEntityResolver(new ResolveDTD()); doc = new
-                     * Document();
-                     */
-                    try {
-                        doc = getXMLAsJDOM(contentCurrentLang);
 
-                        Element html = doc.getRootElement();
+                        Element formHTML = getXMLAsJDOM(contentCurrentLang).getRootElement();
 
-                        // html.detach();
-                        // builder = new SAXBuilder();
-                        doc = getXMLAsJDOM(hrefFile);
+                        html2BeStored = getXMLAsJDOM(hrefFile);
 
-                        Element root = doc.getRootElement();
-                        validate(root);
+                        Element storedHTMLRoot = html2BeStored.getRootElement();
+                        validate(storedHTMLRoot);
 
-                        Element actElem = findActElem(root, "lang", currentLang, ns);
+                        Element contentSection = findActElem(storedHTMLRoot, "lang", currentLang, ns);
 
-                        if (actElem == null) {
-                            root.addContent(new Element("section").setAttribute("lang", currentLang, ns).setAttribute("title", label));
+                        if (contentSection == null) {
+                            storedHTMLRoot.addContent(new Element("section").setAttribute("lang", currentLang, ns).setAttribute("title", label));
                         }
 
-                        actElem = findActElem(root, "lang", currentLang, ns);
-                        actElem.setAttribute("title", label);
-                        actElem.setContent(html.cloneContent());
-                    } catch (Exception ex) {
-                        ex.printStackTrace();
-                    }
-
-                    /*
-                     * try { contentCurrentLang = " <section
-                     * xml:lang=\""+currentLang+"\"
-                     * title=\""+currentLangLabel+"\" >"+contentCurrentLang+"
-                     * </section>"; //contentCurrentLang.replaceAll("&",
-                     * "&amp;"); doc = builder.build(new
-                     * StringReader(contentCurrentLang)); Element html =
-                     * doc.getRootElement(); html.detach(); builder = new
-                     * SAXBuilder(); doc = builder.build(hrefFile); Element root =
-                     * doc.getRootElement(); validate(root); Element actElem =
-                     * findActElem(root, "lang", currentLang, ns); if (actElem ==
-                     * null) { root.addContent(html); } actElem =
-                     * findActElem(root, "lang", currentLang, ns); Element
-                     * parent = (Element)actElem.getParent();
-                     * parent.removeContent(actElem); parent.addContent(html); }
-                     * catch (Exception e) { error = "non_valid_xhtml_content";
-                     * sessionParam = "action"; generateOutput(error, label,
-                     * fileName); return; } }
-                     */
+                        contentSection = findActElem(storedHTMLRoot, "lang", currentLang, ns);
+                        contentSection.setAttribute("title", label);
+                        contentSection.setContent(formHTML.cloneContent());
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
 
-            // /////////////////////////////////////////////////////////////////////////////////////////////
-            // end of: prepare content as sdom document
-            // /////////////////////////////////////////////////////////////////////////////////////////////
-            // /////////////////////////////////////////////////////////////////////////////////////////////
             // management of prepared content jdom
-            // /////////////////////////////////////////////////////////////////////////////////////////////
             if (action.equals("delete")) {
                 if (realyDel.equals("true")) {
                     if (mode.equals("intern")) {
                         // if (storeTypMycore) {
                         hrefFile.delete();
-
                         File testFile = hrefFile;
-
                         while (testFile.getParentFile().listFiles().length < 1) {
                             testFile.getParentFile().delete();
                             testFile = testFile.getParentFile();
                         }
-
-                        // }
                     }
-                } else {
+                } else 
                     sessionParam = "choose";
-                }
-
                 return;
             }
 
-            writeJDOMDocumentToFile(doc, hrefFile);
+            writeJDOMDocumentToFile(html2BeStored, hrefFile);
 
-            // /////////////////////////////////////////////////////////////////////////////////////////////
-            // end: management of prepared content jdom
-            // /////////////////////////////////////////////////////////////////////////////////////////////
         } catch (FileNotFoundException e) {
             error = "File not found. For further information look at the System Output.";
             e.printStackTrace();
@@ -1151,7 +1079,6 @@ public class WCMSActionServlet extends WCMSServlet {
         if ((checkInput()) == false) {
             sessionParam = "action";
             generateOutput(error, label, fileName);
-
             return;
         }
 
@@ -1162,8 +1089,6 @@ public class WCMSActionServlet extends WCMSServlet {
 
         naviFileBackup = makeBackup(naviFile);
 
-        // for testing
-        // test();
         // update navigation base
         modifyNavi(naviFile);
 
@@ -1370,42 +1295,65 @@ public class WCMSActionServlet extends WCMSServlet {
      * @return JDOM Document
      */
     public Document getXMLAsJDOM(Object xmlSource) {
+    	logger.debug("########################################");
+    	logger.debug("inside getXMLAsJDOM(Object xmlSource)");
+    	logger.debug("########################################");
         SAXBuilder builder = new SAXBuilder();
         Document jdomDoc = new Document();
 
         try {
             if (xmlSource instanceof String) {
+            	logger.debug("########################################");
+            	logger.debug("instanceof String="+xmlSource);
+            	logger.debug("########################################");
                 jdomDoc = builder.build(new ByteArrayInputStream(((String) xmlSource).getBytes("UTF-8")));
             }
-
             if (xmlSource instanceof File) {
+            	logger.debug("########################################");
+            	logger.debug("instanceof File="+xmlSource);
+            	logger.debug("########################################");            	
                 jdomDoc = builder.build((File) xmlSource);
             }
-
-            /*
-             * if (xmlSource instanceof InputSource) { jdomDoc =
-             * builder.build((InputSource)xmlSource); }
-             */
             if (xmlSource instanceof InputStream) {
+            	logger.debug("########################################");
+            	logger.debug("instanceof InputStream="+xmlSource);
+            	logger.debug("########################################");            	
                 jdomDoc = builder.build((InputStream) xmlSource);
             }
-
-            /*
-             * if (xmlSource instanceof Reader) { jdomDoc =
-             * builder.build((Reader)xmlSource); }
-             */
             if (xmlSource instanceof URL) {
+            	logger.debug("########################################");
+            	logger.debug("instanceof URL="+xmlSource);
+            	logger.debug("########################################");            	
                 jdomDoc = builder.build((URL) xmlSource);
             }
         } catch (JDOMException e) {
-            logger.debug("JDOM warning: Source is not a valid XML Document.");
-            jdomDoc = validateSource(xmlSource);
+        	// no root element ? 
+        	String extendedXML= addRootElement((String)xmlSource);
+        	try {
+				logger.debug("########################################");
+	        	logger.debug("JDOMException occurred -> adding root tag ="+extendedXML);
+	        	logger.debug("########################################");
+				jdomDoc = builder.build(new ByteArrayInputStream((extendedXML).getBytes("UTF-8")));
+			} catch (UnsupportedEncodingException e1) {
+				e1.printStackTrace();
+			} catch (JDOMException e1) {
+				logger.debug("##########################################################");
+	        	logger.debug("JDOMException after root tag added occurred -> using JTidy");
+	        	logger.debug("##########################################################");
+				jdomDoc = validateSource(xmlSource);	
+				e1.printStackTrace();
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
         } catch (IOException e) {
             logger.debug("IO error: File \"" + xmlSource + "\" can't be parsed as JDOM.");
             e.printStackTrace();
         }
-
         return jdomDoc;
+    }
+    
+    public String addRootElement(String xml) {
+    	return "<dummyRoot>"+xml+"</dummyRoot>";
     }
 
     public Document validateSource(Object xmlSource) {
@@ -1435,41 +1383,19 @@ public class WCMSActionServlet extends WCMSServlet {
             if (xmlSource != null) {
                 if (xmlSource instanceof String) {
                     System.out.println("String");
-
-                    // bis = new BufferedInputStream(new
-                    // ByteArrayInputStream(((String)xmlSource).getBytes("UTF-8")));
                     bais = new ByteArrayInputStream(((String) xmlSource).getBytes("UTF-8"));
                 }
 
                 if (xmlSource instanceof File) {
                     System.out.println("File");
-
-                    // bis = new BufferedInputStream(new
-                    // FileInputStream((File)xmlSource));
                     bis = new BufferedInputStream(new FileInputStream((File) xmlSource));
                 }
 
-                /*
-                 * if (xmlSource instanceof InputSource) {//check this later
-                 * System.out.println("InputSource"); bis = new
-                 * BufferedInputStream(((InputSource)xmlSource).getByteStream()); }
-                 */
                 if (xmlSource instanceof InputStream) { //
                     System.out.println("InputStream");
                     bis = new BufferedInputStream((InputStream) xmlSource);
                 }
 
-                /*
-                 * if (xmlSource instanceof Reader) {//check this later
-                 * System.out.println("Reader"); bis = new
-                 * BufferedInputStream(new
-                 * ByteArrayInputStream(((Reader)xmlSource).toString().getBytes("UTF-8"))); }
-                 * if (xmlSource instanceof URL) { System.out.println("URL");
-                 * //bis = new
-                 * BufferedInputStream(((URL)xmlSource).openStream()); bis = new
-                 * BufferedInputStream( new ByteArrayInputStream(new
-                 * String(((URL)xmlSource).getContent().toString()).getBytes("UTF-8"))); }
-                 */
             }
 
             SequenceInputStream sis = new SequenceInputStream(new SequenceInputStream(beginTag, bais), endTag);
@@ -1587,8 +1513,8 @@ public class WCMSActionServlet extends WCMSServlet {
 
         /* code validation by JTidy */
         if (request.getParameter("codeValidationDisable") == null) {
-            logger.debug("Code validation using" + VALIDATOR);
-            codeValidation(VALIDATOR);
+            //logger.debug("Code validation using" + VALIDATOR);
+            //codeValidation(VALIDATOR);
         }
 
         /* END: code validation by JTidy */
@@ -1727,40 +1653,7 @@ public class WCMSActionServlet extends WCMSServlet {
             attribute = "href";
             avalue = href;
         }
-        
-                       
            hrefFile = new File(getServletContext().getRealPath("") + fileName.replace('/', fs));
-
-        /*---------------------- Variable Test Output -------------------------*/
-
-        // System.out.println("----- Variable Test Output ------");
-        // System.out.println("hrefFile: "+hrefFile);
-        // System.out.println("---------Session--------");
-        // System.out.println("userID: "+userID);
-        // System.out.println("userClass: "+userClass);
-        // System.out.println("rootNodes: "+rootNodes);
-        // System.out.println("action: "+action);
-        // System.out.println("mode: "+mode);
-        // System.out.println("href: "+href);
-        // System.out.println("defaultLang: "+defaultLang);
-        // System.out.println("currentLang: "+currentLang);
-        // System.out.println("currentLangLabel: "+currentLangLabel);
-        // System.out.println("---------Request--------");
-        // System.out.println("label: "+label);
-        // System.out.println("target: "+target);
-        // System.out.println("style: "+style);
-        // System.out.println("content: "+content);
-        // System.out.println("contentCurrentLang: "+contentCurrentLang);
-        // System.out.println("link: "+link);
-        // System.out.println("realy_delete: "+realyDel);
-        // System.out.println("fileName: "+fileName);
-        // System.out.println("labelPath: "+labelPath);
-        // System.out.println("---------Error--------");
-        // System.out.println("error: "+error);
-        // System.out.println("avalue: "+avalue);
-        // System.out.println("replaceMenu: "+replaceMenu);
-        // System.out.println("masterTemplate: "+masterTemplate);
-        /*---------------------------------------------------------------------*/
     }
 
     /**
