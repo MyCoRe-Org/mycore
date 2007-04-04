@@ -172,6 +172,54 @@ public class MCREditorServlet extends MCRServlet {
         return editor;
     }
 
+    /**
+     * Replaces parameter names with their values for a list of element attributes.
+     * For example, in &lt;source uri="request:servlets/SomeServlet?id={id}" /&gt;,
+     * replaces the {id} with the actual value, if present.  
+     * 
+     * @param parent parent Element, e.g. the editor element
+     * @param elementName name of the child element(s), e.g. the "source" element
+     * @param attributeName name of the attribute, e.g. the "uri" attribute
+     * @param parameters the request parameter map
+     * @return the value of the first attribute in the element list where all parameters could be replaced successfully
+     */
+    private static String replaceParameters( Element parent, String elementName, String attributeName, Map parameters )
+    {
+      // Get all elements of a given name, e.g. "source"
+      List<Element> l = parent.getChildren( elementName );
+      for( Element e : l )
+      {
+        // Get attribute of that element, e.g. "uri"
+        String value = e.getAttributeValue( attributeName );
+        
+        StringTokenizer st = new java.util.StringTokenizer( value, "{}", true );
+        // The attribute value with all {...} replaced with actual request param values
+        StringBuffer replaced = new StringBuffer();
+        boolean withinParameter = false;
+        
+        while( st.hasMoreTokens() )
+        {
+          String token = st.nextToken();
+          if( token.equals( "{" ) ) 
+            withinParameter = true; // Begin of request parameter name
+          else if( token.equals( "}" ) )
+            withinParameter = false; // End of request parameter name
+          else if( withinParameter )
+          {
+            // If request parameter not given, skip complete value 
+            if( ! parameters.containsKey( token ) ) break;
+            else // Replace parameter with value from request
+            replaced.append( parameters.get( token ) );
+          }
+          else
+            replaced.append( token );
+        }
+        // If all parameters have been replaced, return this value 
+        if( ! withinParameter ) return replaced.toString();
+      }
+      return null; // Fall back, no matches at all 
+    }
+    
     private static void setDefault(Element editor, String filter, String attrib, String value) {
         Iterator it = editor.getDescendants(new ElementFilter(filter));
         while (it.hasNext()) {
