@@ -148,7 +148,6 @@ public class MCREditorServlet extends MCRServlet {
         boolean validate = "true".equals(editor.getAttributeValue("validate", "false"));
         editor = MCREditorDefReader.readDef(uri, ref, validate);
 
-        setDefault(editor, "panel", "lines", "off");
         setDefault(editor, "cell", "row", "1");
         setDefault(editor, "cell", "col", "1");
 
