@@ -141,6 +141,7 @@ public class MCRHIBClassificationStore implements MCRClassificationInterface {
         Session session = getSession();
         MCRClassificationItem c = new MCRClassificationItem();
         c.setId(ID);
+        c.setCatgegories(new ArrayList<MCRCategoryItem>());
 
         try {
             List l = session.createQuery("FROM MCRCLASS WHERE id = '" + ID + "'").list();
@@ -278,6 +279,7 @@ public class MCRHIBClassificationStore implements MCRClassificationInterface {
                 ci.setId(ID);
                 ci.setClassID(CLID);
                 ci.setParentID(c.getPid());
+                ci.setCatgegories(new ArrayList<MCRCategoryItem>());
                 MCRLink link = new MCRLink("locator", c.getUrl(), c.getUrl(), "");
                 ci.setLink(link);
 
@@ -329,6 +331,7 @@ public class MCRHIBClassificationStore implements MCRClassificationInterface {
                 ci.setId(ID);
                 ci.setClassID(CLID);
                 ci.setParentID(c.getPid());
+                ci.setCatgegories(new ArrayList<MCRCategoryItem>());
                 MCRLink link = new MCRLink("locator", c.getUrl(), c.getUrl(), "");
                 ci.setLink(link);
 

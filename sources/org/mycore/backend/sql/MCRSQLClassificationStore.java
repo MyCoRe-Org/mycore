@@ -228,6 +228,7 @@ public class MCRSQLClassificationStore implements MCRClassificationInterface {
                 if (c == null) {
                     c = new MCRClassificationItem();
                     c.setId(ID);
+                    c.setCatgegories(new ArrayList<MCRCategoryItem>());
                 }
                 MCRLabel label = new MCRLabel(reader.getString("LANG"), reader.getString("TEXT"), reader.getString("MCRDESC"));
                 c.addLabel(label);
@@ -318,6 +319,7 @@ public class MCRSQLClassificationStore implements MCRClassificationInterface {
             c.setId(ID);
             c.setClassID(CLID);
             c.setParentID(PID);
+            c.setCatgegories(new ArrayList<MCRCategoryItem>());
             MCRLink link = new MCRLink("locator", URL, URL, "");
             c.setLink(link);
             reader = conn.doQuery(new MCRSQLStatement(tableCategLabel).setCondition("ID", ID).setCondition("CLID", CLID).toSelectStatement());
@@ -359,6 +361,7 @@ public class MCRSQLClassificationStore implements MCRClassificationInterface {
             c.setId(ID);
             c.setClassID(CLID);
             c.setParentID("");
+            c.setCatgegories(new ArrayList<MCRCategoryItem>());
             MCRLabel label = new MCRLabel(reader.getString("LANG"), reader.getString("TEXT"), reader.getString("MCRDESC"));
             c.addLabel(label);
             reader = conn.doQuery(new MCRSQLStatement(tableCateg).setCondition("ID", ID).setCondition("CLID", CLID).toSelectStatement());
