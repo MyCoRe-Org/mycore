@@ -105,8 +105,7 @@ public class MCRUserAdminServlet extends MCRUserAdminGUICommons {
         String editorFormular = pageDir + "editor_form_create-user.xml";
         String base = getBaseURL() + editorFormular;
         Properties params = new Properties();
-        params.put("XSL.editor.source.new", "true");
-        params.put("XSL.editor.cancel.url", getBaseURL() + cancelPage);
+        params.put("cancelUrl", getBaseURL() + cancelPage);
         params.put("usecase", "create-user");
         job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(buildRedirectURL(base, params)));
 
@@ -133,8 +132,7 @@ public class MCRUserAdminServlet extends MCRUserAdminGUICommons {
         String editorFormular = pageDir + "editor_form_create-group.xml";
         String base = getBaseURL() + editorFormular;
         Properties params = new Properties();
-        params.put("XSL.editor.source.new", "true");
-        params.put("XSL.editor.cancel.url", getBaseURL() + cancelPage);
+        params.put("cancelUrl", getBaseURL() + cancelPage);
         params.put("usecase", "create-group");
         job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(buildRedirectURL(base, params)));
 
@@ -180,8 +178,8 @@ public class MCRUserAdminServlet extends MCRUserAdminGUICommons {
         String uid = getProperty(job.getRequest(), "uid");
         String base = getBaseURL() + editorFormular;
         Properties params = new Properties();
-        params.put("XSL.editor.source.url", "servlets/MCRUserEditorServlet?mode=retrieveuserxml&uid=" + uid);
-        params.put("XSL.editor.cancel.url", getBaseURL() + cancelPage);
+        params.put("uid", uid);
+        params.put("cancelUrl", getBaseURL() + cancelPage);
         params.put("usecase", "modify-user");
         job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(buildRedirectURL(base, params)));
 
@@ -203,8 +201,8 @@ public class MCRUserAdminServlet extends MCRUserAdminGUICommons {
         String gid = getProperty(job.getRequest(), "gid");
         String base = getBaseURL() + editorFormular;
         Properties params = new Properties();
-        params.put("XSL.editor.source.url", "servlets/MCRUserEditorServlet?mode=retrievegroupxml&gid=" + gid);
-        params.put("XSL.editor.cancel.url", getBaseURL() + cancelPage);
+        params.put("gid", gid);
+        params.put("cancelUrl", getBaseURL() + cancelPage);
         params.put("usecase", "modify-user");
         job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(buildRedirectURL(base, params)));
 
