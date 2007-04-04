@@ -607,10 +607,9 @@ public class MCRInputValidator {
      * @return true, if the XML element validates
      */
     public boolean validateExternally(String clazz, String method, Element elem) {
-        Class[] argTypes = new Class[2];
-        argTypes[0] = String.class;
-        argTypes[1] = String.class;
-        Object[] args = new Object[2];
+        Class[] argTypes = new Class[1];
+        argTypes[0] = Element.class;
+        Object[] args = new Object[1];
         args[0] = elem;
         Object result = new Boolean(false);
         try {
