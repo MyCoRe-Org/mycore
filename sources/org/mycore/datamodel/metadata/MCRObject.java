@@ -621,9 +621,8 @@ final public class MCRObject extends MCRBase {
 
         try {
             old.receiveFromDatastore(mcr_id);
-        } catch (MCRPersistenceException pe) {
+        } catch (Exception pe) {
             createInDatastore();
-
             return;
         }
 
