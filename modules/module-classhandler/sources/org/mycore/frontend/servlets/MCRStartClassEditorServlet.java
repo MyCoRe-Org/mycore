@@ -159,8 +159,8 @@ public class MCRStartClassEditorServlet extends MCRServlet {
             session.put("service", serviceelm);
             String base = getBaseURL() + "editor_form_modify-classificationacl.xml";
             Properties params = new Properties();
-            params.put("XSL.editor.source.url", "session:service");
-            params.put("XSL.editor.cancel.url", getBaseURL() + cancelpage);
+            params.put("sourceUri", "session:service");
+            params.put("cancelUrl", getBaseURL() + cancelpage);
             params.put("mcrid", clid);
             job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(buildRedirectURL(base, params)));
             return;
@@ -278,8 +278,7 @@ public class MCRStartClassEditorServlet extends MCRServlet {
         else if ("import-classification".equals(todo)) {
             String base = getBaseURL() + myfile;
             Properties params = new Properties();
-            params.put("XSL.editor.source.new", "true");
-            params.put("XSL.editor.cancel.url", getBaseURL() + cancelpage);
+            params.put("cancelUrl", getBaseURL() + cancelpage);
             params.put("clid", clid);
             params.put("path", path);
             params.put("todo2", todo);
@@ -325,7 +324,7 @@ public class MCRStartClassEditorServlet extends MCRServlet {
                 } else {
                     sb.append("classification:metadata:0:children:").append(clid);
                 }
-                params.put("XSL.editor.source.url", sb.toString());
+                params.put("sourceUri", sb.toString());
 
             }
             if ("create-classification".equals(todo)) {
@@ -337,7 +336,7 @@ public class MCRStartClassEditorServlet extends MCRServlet {
                     LOGGER.error("Create an unique CLID failed. " + cli.toString());
                 }
                 Element classRoot = new Element("mycoreclass").setAttribute("ID", cli.getId());
-                params.put("XSL.editor.source.url", "session:" + sessionObjectID);
+                params.put("sourceUri", "session:" + sessionObjectID);
                 MCRSessionMgr.getCurrentSession().put(sessionObjectID, classRoot);
             }
             if ("modify-category".equals(todo)) {
@@ -352,7 +351,7 @@ public class MCRStartClassEditorServlet extends MCRServlet {
                 } else {
                     sb.append("classification:metadata:0:children:").append(clid).append(':').append(categid);
                 }
-                params.put("XSL.editor.source.url", sb.toString());
+                params.put("sourceUri", sb.toString());
                 params.put("categid", categid);
             }
             if ("create-category".equals(todo)) {
@@ -362,10 +361,10 @@ public class MCRStartClassEditorServlet extends MCRServlet {
                 } else {
                     sb.append("classification:metadata:0:children:").append(clid);
                 }
-                params.put("XSL.editor.source.url", sb.toString());
+                params.put("sourceUri", sb.toString());
                 params.put("categid", categid);
             }
-            params.put("XSL.editor.cancel.url", getBaseURL() + cancelpage);
+            params.put("cancelUrl", getBaseURL() + cancelpage);
             params.put("clid", clid);
             params.put("path", path);
             params.put("todo2", todo);

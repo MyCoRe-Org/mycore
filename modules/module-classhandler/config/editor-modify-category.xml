@@ -2,7 +2,10 @@
 <!DOCTYPE editor>
 
 <editor>
+ <source uri="{sourceUri}" />
  <target type="servlet" name="MCRStartClassEditorServlet" method="get" format="xml" />
+ <cancel url="{cancelUrl}" />
+
  <components root="modify-category" var="/mycoreclass">
 
   <include uri="webapp:editor/imports-common.xml" />

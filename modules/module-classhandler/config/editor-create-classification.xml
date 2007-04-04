@@ -3,6 +3,8 @@
 
 <editor>
  <target type="servlet" name="MCRStartClassEditorServlet" method="get" format="xml" />
+ <cancel url="{cancelUrl}" />
+ 
  <components root="create-classification" var="/mycoreclass">
 
   <include uri="webapp:editor/imports-common.xml" />
