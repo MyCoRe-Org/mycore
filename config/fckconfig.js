@@ -62,11 +62,11 @@ FCKConfig.AutoDetectLanguage	= true ;
 FCKConfig.DefaultLanguage		= 'de' ;
 FCKConfig.ContentLangDirection	= 'ltr' ;
 
-FCKConfig.ProcessHTMLEntities	= true ;
-FCKConfig.IncludeLatinEntities	= true ;
-FCKConfig.IncludeGreekEntities	= true ;
+FCKConfig.ProcessHTMLEntities	= false ;
+FCKConfig.IncludeLatinEntities	= false ;
+FCKConfig.IncludeGreekEntities	= false ;
 
-FCKConfig.ProcessNumericEntities = false ;
+FCKConfig.ProcessNumericEntities = true ;
 
 FCKConfig.AdditionalNumericEntities = ''  ;		// Single Quote: "'"
 
