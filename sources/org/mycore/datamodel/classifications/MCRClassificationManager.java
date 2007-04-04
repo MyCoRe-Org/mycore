@@ -35,7 +35,7 @@ import org.mycore.datamodel.metadata.MCRObjectID;
  * This class is the manangement class for the SQL store of the classification
  * system of MyCoRe. They would only used by the MCRClassification.
  * 
- * @author Frank Luetzenkirchen
+ * @author Frank Lützenkirchen
  * @author Jens Kupferschmidt
  * @author Thomas Scheffler (yagee)
  * @version $Revision$ $Date$
@@ -79,7 +79,13 @@ public class MCRClassificationManager {
 
     }
 
-    void createClassificationItem(MCRClassificationItem classification) {
+    /**
+     * This method create the classificaton in the store.
+     * 
+     * @param classification
+     *            a classification as MCRClassificationItem
+     */
+    protected final void createClassificationItem(MCRClassificationItem classification) {
         if (store.classificationItemExists(classification.getId())) {
             throw new MCRPersistenceException("Classification already exists");
         }
@@ -89,7 +95,13 @@ public class MCRClassificationManager {
         CONFIG.systemModified();
     }
 
-    protected void createCategoryItem(MCRCategoryItem category) {
+    /**
+     * This method create the category in the store.
+     * 
+     * @param category
+     *            a category as MCRCategoryItem
+     */
+    protected final void createCategoryItem(MCRCategoryItem category) {
         if (store.categoryItemExists(category.getClassID(), category.getId())) {
             throw new MCRPersistenceException("Category " + category.getId() + " already exists");
         }
@@ -98,52 +110,98 @@ public class MCRClassificationManager {
         categoryCache.put(getCachingID(category), category);
         CONFIG.systemModified();
     }
-    
-    protected void createCategoryItems(List catlist) {
-        if ((catlist == null) || (catlist.size() == 0)) return;
-        for (int i=0; i<catlist.size();i++) {
-        MCRCategoryItem cat = (MCRCategoryItem) catlist.get(i);
-        createCategoryItem(cat);
-        createCategoryItems(cat.getCategories());
+
+    /**
+     * This method create all categories they are stored in the list as
+     * MCRCategoryItem in the store.
+     * 
+     * @param catlist
+     *            a list of MCRCategoryItem
+     */
+    protected final void createCategoryItems(List catlist) {
+        if ((catlist == null) || (catlist.size() == 0))
+            return;
+        for (int i = 0; i < catlist.size(); i++) {
+            MCRCategoryItem cat = (MCRCategoryItem) catlist.get(i);
+            createCategoryItem(cat);
+            createCategoryItems(cat.getCategories());
         }
     }
 
+    /**
+     * This method return a MCRClassificationItem of a classification
+     * 
+     * @param ID
+     *            the classification ID
+     * @return the corresponding MCRClassificationItem
+     */
     public final MCRClassificationItem retrieveClassificationItem(String ID) {
         MCRClassificationItem c = (MCRClassificationItem) (classificationCache.get(ID));
-
         if (c == null) {
             c = store.retrieveClassificationItem(ID);
-
             if (c != null) {
                 classificationCache.put(ID, c);
+                return c.clone();
+            } else {
+                return c;
             }
         }
-
-        return c;
+        return c.clone();
     }
 
+    /**
+     * This method return a MCRCategoryItem of a category of a classification.
+     * 
+     * @param classifID
+     *            the classification ID
+     * @param categID
+     *            the category ID
+     * @return the corresponding MCRCategoryItem
+     */
     public final MCRCategoryItem retrieveCategoryItem(String classifID, String categID) {
         String cachingID = classifID + "@@" + categID;
         MCRCategoryItem c = (MCRCategoryItem) (categoryCache.get(cachingID));
-
         if (c == null) {
             c = store.retrieveCategoryItem(classifID, categID);
-
             if (c != null) {
                 categoryCache.put(cachingID, c);
+                return c.clone();
+            } else {
+                return c;
             }
         }
-
-        return c;
+        return c.clone();
     }
 
-    MCRCategoryItem retrieveCategoryItemForLabelText(String classifID, String labeltext) {
+    /**
+     * This method return a MCRCategoryItem of a classification with a given
+     * label text.
+     * 
+     * @param classifID
+     *            the classification ID
+     * @param labeltext
+     *            the text of the label
+     * @return the corresponding MCRCategoryItem
+     */
+    public final MCRCategoryItem retrieveCategoryItemForLabelText(String classifID, String labeltext) {
         MCRCategoryItem c = store.retrieveCategoryItemForLabelText(classifID, labeltext);
-
-        return c;
+        if (c == null) {
+            return c;
+        }
+        return c.clone();
     }
 
-    MCRCategoryItem[] retrieveChildren(String classifID, String parentID) {
+    /**
+     * This method return an array of MCRCategoryItem for a category of a
+     * classification.
+     * 
+     * @param classifID
+     *            the classification ID
+     * @param parentID
+     *            the category ID
+     * @return
+     */
+    public final MCRCategoryItem[] retrieveChildren(String classifID, String parentID) {
         ArrayList retrieved = store.retrieveChildren(classifID, parentID);
         MCRCategoryItem[] children = new MCRCategoryItem[retrieved.size()];
 
@@ -163,38 +221,95 @@ public class MCRClassificationManager {
         return children;
     }
 
-    int retrieveNumberOfChildren(String classifID, String parentID) {
+    /**
+     * This method return the number of childs of a parent category for a
+     * classification.
+     * 
+     * @param classifID
+     *            the classification ID
+     * @param parentID
+     *            the category ID
+     * @return the number of childs
+     */
+    public final int retrieveNumberOfChildren(String classifID, String parentID) {
         return store.retrieveNumberOfChildren(classifID, parentID);
     }
 
-    protected String getCachingID(MCRCategoryItem category) {
+    /**
+     * This method return a ID String of classification ID + '@@' + category ID.
+     * 
+     * @param category
+     *            the MCRCategoryItem
+     * @return an ID String
+     */
+    protected final String getCachingID(MCRCategoryItem category) {
         return category.getClassID() + "@@" + category.getId();
     }
 
-    protected String[] getAllClassificationID() {
+    /**
+     * This method return an array of IDs of all classifications they stored in
+     * the system.
+     * 
+     * @return an array of IDs
+     */
+    protected final String[] getAllClassificationID() {
         return store.getAllClassificationID();
     }
 
-    protected MCRClassificationItem[] getAllClassification() {
+    /**
+     * This method return an array of all MCRClassificationItems they stored in
+     * the system.
+     * 
+     * @return an array of all MCRClassificationItems
+     */
+    protected final MCRClassificationItem[] getAllClassification() {
         return store.getAllClassification();
     }
 
-    protected void deleteClassificationItem(MCRObjectID classifID) {
+    /**
+     * This method delete a classification from the store.
+     * 
+     * @param classifID
+     *            the classification ID as MCRObjectID
+     */
+    protected final void deleteClassificationItem(MCRObjectID classifID) {
         deleteClassificationItem(classifID.getId());
     }
-    
-    protected void deleteClassificationItem(String classifID) {
+
+    /**
+     * This method delete a classification from the store.
+     * 
+     * @param classifID
+     *            the classification ID as String
+     */
+    protected final void deleteClassificationItem(String classifID) {
         classificationCache.remove(classifID);
         jDomCache.remove(classifID);
         store.deleteClassificationItem(classifID);
         CONFIG.systemModified();
     }
 
-    protected void deleteCategoryItem(MCRObjectID classifID, String categID) {
-        deleteCategoryItem(classifID.getId(),categID);
+    /**
+     * This method delete a category item from the store.
+     * 
+     * @param classifID
+     *            the classification ID as MCRObjectID
+     * @param categID
+     *            the category ID as String
+     */
+    protected final void deleteCategoryItem(MCRObjectID classifID, String categID) {
+        deleteCategoryItem(classifID.getId(), categID);
     }
-    
-    protected void deleteCategoryItem(String classifID, String categID) {
+
+    /**
+     * This method delete a category item from the store.
+     * 
+     * @param classifID
+     *            the classification ID as String
+     * @param categID
+     *            the category ID as String
+     */
+    protected final void deleteCategoryItem(String classifID, String categID) {
         categoryCache.remove(classifID + "@@" + categID);
         jDomCache.remove(classifID + "@@" + categID);
         store.deleteCategoryItem(classifID, categID);
