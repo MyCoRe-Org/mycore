@@ -56,7 +56,7 @@ public abstract class MCRClassificationObject implements Cloneable {
     /**
      * This method return a list of all category items.
      * 
-     * @return a list of all category items 
+     * @return a list of all category items
      */
     public List<MCRCategoryItem> getCategories() {
         if (catgegories == null) {
@@ -86,17 +86,19 @@ public abstract class MCRClassificationObject implements Cloneable {
     /**
      * This method set the ID from a String
      * 
-     * @param id the ID as String
+     * @param id
+     *            the ID as String
      */
     public void setId(String id) {
         this.id = id;
     }
-    
+
     public void addLabel(MCRLabel label) {
-        if (labels == null) labels = new ArrayList<MCRLabel>();
+        if (labels == null)
+            labels = new ArrayList<MCRLabel>();
         labels.add(label);
     }
-    
+
     public List<MCRLabel> getLabels() {
         if (labels == null) {
             labels = new ArrayList<MCRLabel>();
@@ -106,6 +108,25 @@ public abstract class MCRClassificationObject implements Cloneable {
 
     public void setLabels(List<MCRLabel> labels) {
         this.labels = labels;
+    }
+
+    /**
+     * This method return the MCRLabel object for a given language
+     * 
+     * @param lang
+     *            the language as ISO String
+     * @return the MCRLabel instance
+     */
+    public MCRLabel retrieveLabel(String lang) {
+        if (labels.size() == 0) {
+            return null;
+        }
+        for (MCRLabel lbl : labels) {
+            if (lbl.getLang().equals(lang)) {
+                return lbl;
+            }
+        }
+        return (MCRLabel) labels.get(0);
     }
 
     public boolean equals(Object arg0) {
