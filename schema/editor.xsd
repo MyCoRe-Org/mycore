@@ -12,6 +12,11 @@
 						<xs:attribute name="uri" type="xs:anyURI" use="required"/>
 					</xs:complexType>
 				</xs:element>
+				<xs:element name="cancel" minOccurs="0" maxOccurs="unbounded">
+					<xs:complexType>
+						<xs:attribute name="url" type="xs:anyURI" use="required"/>
+					</xs:complexType>
+				</xs:element>
 				<xs:element name="target">
 					<xs:complexType>
 						<xs:attribute name="type" use="required">
