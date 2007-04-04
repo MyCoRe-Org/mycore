@@ -159,13 +159,17 @@ public class MCREditorServlet extends MCRServlet {
         buildCancelURL(editor, parameters);
 
         String sourceURI = replaceParameters(editor, "source", "uri", parameters);
-        MCREditorServlet.logger.info("Editor reading XML input from " + uri);
-        Element input = MCRURIResolver.instance().resolve(uri);
-        MCREditorSubmission sub = new MCREditorSubmission(input, editor);
 
-        if (sub != null) {
+        if (sourceURI != null) {
+            MCREditorServlet.logger.info("Editor reading XML input from " + uri);
+            Element input = MCRURIResolver.instance().resolve(uri);
+            MCREditorSubmission sub = new MCREditorSubmission(input, editor);
             editor.addContent(sub.buildInputElements());
             editor.addContent(sub.buildRepeatElements());
+        }
+        else
+        {
+            MCREditorServlet.logger.info("Editor is started empty without XML input");
         }
 
         String sessionID = buildSessionID();
