@@ -30,6 +30,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -243,6 +244,11 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
 
         if (systemId == null) {
             return null; // Use default resolver
+        }
+
+        if (systemId.length()==0){
+            //if you overwrite SYSTEM by empty String in XSL
+            return new InputSource(new StringReader(""));
         }
 
         InputStream is = getCachedResource("/" + getFileName(systemId));
