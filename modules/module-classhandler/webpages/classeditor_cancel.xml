@@ -4,18 +4,15 @@
 <MyCoReWebPage>
 
 <head>
- <maintitle xml:lang="de">@libri</maintitle>
- <maintitle xml:lang="en">@libri</maintitle>
+ <maintitle xml:lang="de">MyCoRe</maintitle>
+ <maintitle xml:lang="en">MyCoRe</maintitle>
  <pagetitle xml:lang="de">Klassifikationseditor Abbruch</pagetitle>
- <pagetitle xml:lang="en">Cancel Class Editor</pagetitle>
+ <pagetitle xml:lang="en">Cancel Classification Editor</pagetitle>
  <HttpForward>browse?mode=edit</HttpForward>
 	
 </head>
 
 <section title="Klassifikationseditor Abbruch" xml:lang="de">
-<p></p>
-<br />
-<p></p>
 <center>
 <table width="80%">
  <tr align="center">
@@ -29,15 +26,9 @@
  </tr>
 </table>
 </center>
-<p></p>
-<br />
-<p></p>
 </section>
 
 <section title="Classification Editor canceled" xml:lang="en">
-<p></p>
-<br />
-<p></p>
 <center>
 <table width="80%">
  <tr align="center">
@@ -51,9 +42,6 @@
  </tr>
 </table>
 </center>
-<p></p>
-<br />
-<p></p>
 </section>
 
 </MyCoReWebPage>

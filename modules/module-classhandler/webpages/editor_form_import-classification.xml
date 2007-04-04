@@ -4,23 +4,11 @@
 <MyCoReWebPage>
 
 <section title="Importieren einer Klassifikation" xml:lang="de">
-<p></p>
-<br />
-<p></p>
 <editor id="import-classification-de"><include uri="webapp:editor/editor-import-classification.xml"/></editor>
-<p></p>
-<br />
-<p></p>
 </section>
 
 <section title="Import a new classification" xml:lang="en">
-<p></p>
-<br />
-<p></p>
 <editor id="import-classification-en"><include uri="webapp:editor/editor-import-classification.xml"/></editor>
-<p></p>
-<br />
-<p></p>
 </section>
 
 </MyCoReWebPage>
