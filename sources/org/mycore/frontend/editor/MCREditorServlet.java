@@ -156,21 +156,23 @@ public class MCREditorServlet extends MCRServlet {
             editor.addContent(param);
         }
 
-        buildCancelURL(editor, parameters);
-
         String sourceURI = replaceParameters(editor, "source", "uri", parameters);
 
         if (sourceURI != null) {
-            MCREditorServlet.logger.info("Editor reading XML input from " + uri);
+            logger.info("Editor reading XML input from " + uri);
             Element input = MCRURIResolver.instance().resolve(uri);
             MCREditorSubmission sub = new MCREditorSubmission(input, editor);
             editor.addContent(sub.buildInputElements());
             editor.addContent(sub.buildRepeatElements());
         }
         else
-        {
-            MCREditorServlet.logger.info("Editor is started empty without XML input");
-        }
+            logger.info("Editor is started empty without XML input");
+        
+        String cancelURL = replaceParameters(editor, "cancel", "url", parameters);
+        logger.info("Editor cancel url is " + cancelURL );
+        editor.removeChildren("cancel");
+        if( cancelURL != null)
+            editor.addContent(new Element("cancel").setAttribute("url", cancelURL));
 
         String sessionID = buildSessionID();
         editor.setAttribute("session", sessionID);
@@ -282,76 +284,6 @@ public class MCREditorServlet extends MCRServlet {
         }
 
         return tps;
-    }
-
-    private static void buildCancelURL(Element editor, Map parameters) {
-        if (parameters == null) {
-            logger.debug("CancelURL: no request parameters, cancel element unchanged");
-
-            return;
-        }
-
-        // Option 1: Cancel URL comes from http request parameter
-        String[] values = (String[]) (parameters.get("XSL.editor.cancel.url"));
-
-        if ((values != null) && (values.length > 0) && (values[0] != null) && (values[0].trim().length() > 0)) {
-            editor.removeChild("cancel");
-
-            Element cancel = new Element("cancel");
-            editor.addContent(cancel);
-            cancel.setAttribute("url", values[0].trim());
-            logger.debug("CancelURL set from request: " + values[0]);
-
-            return;
-        }
-
-        // Otherwise, use cancel element from editor definition
-        Element cancel = editor.getChild("cancel");
-
-        if (cancel == null) {
-            logger.debug("CancelURL element in editor definition is null");
-
-            return;
-        }
-
-        String urlFromElement = cancel.getAttributeValue("url", (String) null);
-
-        if (urlFromElement == null) {
-            logger.debug("CancelURL attribute in editor definition is null");
-
-            return;
-        }
-
-        // Option 2: Cancel URL comes from element in editor definition
-        values = (String[]) (parameters.get("XSL.editor.cancel.id"));
-
-        if ((values == null) || (values.length == 0) || (values[0] == null) || (values[0].trim().length() == 0)) {
-            if (cancel.getAttribute("token") != null) {
-                cancel.removeAttribute("token");
-            }
-
-            logger.debug("CancelURL set from editor definition: " + urlFromElement);
-
-            return;
-        }
-
-        // Option 3: Cancel URL is combined of request param token with url from
-        // editor def
-        String tokenFromElement = cancel.getAttributeValue("token", (String) null);
-
-        if ((tokenFromElement == null) || (tokenFromElement.trim().length() == 0) || (urlFromElement.indexOf(tokenFromElement) < 0)) {
-            logger.debug("CancelURL token in editor definition is null or illegal");
-
-            return;
-        }
-
-        int pos = urlFromElement.indexOf(tokenFromElement);
-        String prefix = urlFromElement.substring(0, pos);
-        String suffix = urlFromElement.substring(pos + tokenFromElement.length());
-        String url = prefix + values[0].trim() + suffix;
-        cancel.setAttribute("url", url);
-        cancel.removeAttribute("token");
-        logger.debug("CancelURL built from request token: " + url);
     }
 
     private static Random random = new Random();
