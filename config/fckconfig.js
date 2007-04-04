@@ -49,9 +49,9 @@ FCKConfig.ContentLangDirection	= 'ltr' ;
 FCKConfig.EnableXHTML		= true ;	// Unsupported: Do not change.
 FCKConfig.EnableSourceXHTML	= true ;	// Unsupported: Do not change.
 
-FCKConfig.ProcessHTMLEntities	= true ;
-FCKConfig.IncludeLatinEntities	= true ;
-FCKConfig.IncludeGreekEntities	= true ;
+FCKConfig.ProcessHTMLEntities	= false;
+FCKConfig.IncludeLatinEntities	= false;
+FCKConfig.IncludeGreekEntities	= false;
 
 FCKConfig.FillEmptyBlocks	= true ;
 
