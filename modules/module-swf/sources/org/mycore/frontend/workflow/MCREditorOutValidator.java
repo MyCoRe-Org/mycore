@@ -42,7 +42,9 @@ import java.util.StringTokenizer;
 import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
+import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
+import org.jdom.xpath.XPath;
 
 import org.mycore.access.MCRAccessInterface;
 import org.mycore.access.MCRAccessManager;
@@ -157,6 +159,12 @@ public class MCREditorOutValidator {
         MCRObject obj = new MCRObject();
         try {
             // load the JDOM object
+            XPath editorOutput = XPath.newInstance("/mycoreobject/*/*/*[@editor.output]");
+            for (Object node : editorOutput.selectNodes(input)) {
+                Element e = (Element) node;
+                LOGGER.debug("removing \"editor.output\" Attribute from " + e.getName());
+                e.removeAttribute("editor.output");
+            }
             byte[] xml = MCRUtils.getByteArray(input);
             obj.setFromXML(xml, true);
             Date curTime = new Date();
@@ -173,6 +181,8 @@ public class MCREditorOutValidator {
             if (ex != null) {
                 errorlog.add(ex.getMessage());
             }
+        } catch (JDOMException e) {
+            errorlog.add(e.getMessage());
         }
         return input;
     }
