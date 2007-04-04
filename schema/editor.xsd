@@ -7,10 +7,9 @@
 		<xs:complexType>
 			<xs:sequence>
 				<xs:element ref="include" minOccurs="0"/>
-				<xs:element name="source" minOccurs="0">
+				<xs:element name="source" minOccurs="0" maxOccurs="unbounded">
 					<xs:complexType>
-						<xs:attribute name="url" type="xs:anyURI" use="required"/>
-						<xs:attribute name="token" type="xs:string" use="optional"/>
+						<xs:attribute name="uri" type="xs:anyURI" use="required"/>
 					</xs:complexType>
 				</xs:element>
 				<xs:element name="target">
