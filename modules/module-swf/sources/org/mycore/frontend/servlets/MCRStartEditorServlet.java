@@ -366,8 +366,7 @@ public class MCRStartEditorServlet extends MCRServlet {
         String base = getBaseURL() + myfile;
         Properties params = new Properties();
         params.put("XSL.UploadID", fuhid);
-        params.put("XSL.editor.source.new", "true");
-        params.put("XSL.editor.cancel.url", getBaseURL() + cancelpage);
+        params.put("cancelUrl", getBaseURL() + cancelpage);
         params.put("XSL.target.param.1", "method=formBasedUpload");
         params.put("XSL.target.param.2", "uploadId=" + fuhid);
         params.put("mcrid", mysemcrid);
@@ -570,8 +569,8 @@ public class MCRStartEditorServlet extends MCRServlet {
         session.put("service", serviceelm);
         String base = getBaseURL() + myfile;
         Properties params = new Properties();
-        params.put("XSL.editor.source.url", "session:service");
-        params.put("XSL.editor.cancel.url", getBaseURL() + cancelpage);
+        params.put("sourceUri", "session:service");
+        params.put("cancelUrl", getBaseURL() + cancelpage);
         params.put("mcrid", mysemcrid);
         params.put("type", mytype);
         params.put("step", mystep);
@@ -608,8 +607,7 @@ public class MCRStartEditorServlet extends MCRServlet {
         sb.append(getBaseURL()).append(pagedir).append("editor_form_commit-derivate.xml");
 
         Properties params = new Properties();
-        params.put("XSL.editor.source.new", "true");
-        params.put("XSL.editor.cancel.url", getBaseURL() + cancelpage);
+        params.put("cancelUrl", getBaseURL() + cancelpage);
         params.put("se_mcrid", mysemcrid);
         params.put("re_mcrid", myremcrid);
         params.put("type", mytype);
@@ -641,8 +639,8 @@ public class MCRStartEditorServlet extends MCRServlet {
 
         String base = getBaseURL() + myfile;
         Properties params = new Properties();
-        params.put("XSL.editor.source.url", sb.toString());
-        params.put("XSL.editor.cancel.url", getBaseURL() + cancelpage);
+        params.put("sourceUri", sb.toString());
+        params.put("cancelUrl", getBaseURL() + cancelpage);
         params.put("mcrid", mytfmcrid);
         params.put("type", mytype);
         params.put("step", mystep);
@@ -762,8 +760,7 @@ public class MCRStartEditorServlet extends MCRServlet {
         String base = getBaseURL() + myfile;
         Properties params = new Properties();
         params.put("XSL.UploadID", fuhid);
-        params.put("XSL.editor.source.new", "true");
-        params.put("XSL.editor.cancel.url", getBaseURL() + cancelpage);
+        params.put("cancelUrl", getBaseURL() + cancelpage);
         params.put("XSL.target.param.1", "method=formBasedUpload");
         params.put("XSL.target.param.2", "uploadId=" + fuhid);
         params.put("mcrid", mysemcrid);
@@ -1017,8 +1014,8 @@ public class MCRStartEditorServlet extends MCRServlet {
         session.put("service", service);
         String base = getBaseURL() + myfile;
         Properties params = new Properties();
-        params.put("XSL.editor.source.url", "session:service");
-        params.put("XSL.editor.cancel.url", getBaseURL() + cancelpage);
+        params.put("sourceUri", "session:service");
+        params.put("cancelUrl", getBaseURL() + cancelpage);
         params.put("mcrid", mysemcrid);
         params.put("type", mytype);
         params.put("step", mystep);
@@ -1059,8 +1056,7 @@ public class MCRStartEditorServlet extends MCRServlet {
         sb.append(getBaseURL()).append(pagedir).append("editor_form_editor-derivate.xml");
 
         Properties params = new Properties();
-        params.put("XSL.editor.source.new", "true");
-        params.put("XSL.editor.cancel.url", getBaseURL() + cancelpage);
+        params.put("cancelUrl", getBaseURL() + cancelpage);
         params.put("se_mcrid", mysemcrid);
         params.put("re_mcrid", myremcrid);
         params.put("type", mytype);
@@ -1090,8 +1086,8 @@ public class MCRStartEditorServlet extends MCRServlet {
         File wfFile=new File(CONFIG.getString("MCR.editor_" + mytype + "_directory"),mysemcrid+".xml");
         String base = getBaseURL() + myfile;
         Properties params = new Properties();
-        params.put("XSL.editor.source.url", wfFile.toURI().toString());
-        params.put("XSL.editor.cancel.url", getBaseURL() + cancelpage);
+        params.put("sourceUri", wfFile.toURI().toString());
+        params.put("cancelUrl", getBaseURL() + cancelpage);
         params.put("mcrid", mysemcrid);
         params.put("type", mytype);
         params.put("step", mystep);
@@ -1153,13 +1149,12 @@ public class MCRStartEditorServlet extends MCRServlet {
             for (Map.Entry<String, String> entry : templatePairs.entrySet()) {
                 sb.append('&').append(entry.getKey()).append('=').append(entry.getValue());
             }
-            params.put("XSL.editor.source.url", sb.toString());
+            params.put("sourceUri", sb.toString());
         } else {
             LOGGER.debug("XMLTemplate is empty");
-            params.put("XSL.editor.source.new", "true");// old code
         }
         // end changes
-        params.put("XSL.editor.cancel.url", getBaseURL() + cancelpage);
+        params.put("cancelUrl", getBaseURL() + cancelpage);
         params.put("mcrid", mytfmcrid);
         params.put("type", mytype);
         params.put("step", mystep);
