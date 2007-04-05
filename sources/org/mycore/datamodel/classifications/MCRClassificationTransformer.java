@@ -385,7 +385,7 @@ public class MCRClassificationTransformer {
             MCRCategoryItem c = new MCRCategoryItem();
             c.setId(e.getAttributeValue("ID"));
             Element parent = (Element) e.getParent();
-            if (parent.getName().equals("category")) {
+            if ((parent != null) && (parent.getName().equals("category"))) {
                 c.setParentID(parent.getAttributeValue("ID"));
             } else {
                 c.setParentID(null);
