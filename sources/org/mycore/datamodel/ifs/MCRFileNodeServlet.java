@@ -62,7 +62,7 @@ public class MCRFileNodeServlet extends MCRServlet {
     // because in a case of MCRConfigurationException,
     // no Servlet will be instantiated, and thats more bad then a missing
     // property!
-    private static String accessErrorPage = CONFIG.getString("MCR.access_page_error", "");
+    private static String accessErrorPage = CONFIG.getString("MCR.Access.Page.Error", "");
 
     /**
      * Handles the HTTP request

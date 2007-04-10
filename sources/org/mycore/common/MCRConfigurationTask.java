@@ -46,7 +46,7 @@ import org.apache.tools.ant.Task;
  */
 public class MCRConfigurationTask extends Task {
     // some constants
-    private static final String MCR_CONFIGURATION_INCLUDE = "MCR.configuration.include";
+    private static final String MCR_CONFIGURATION_INCLUDE = "MCR.Configuration.Include";
 
     private static final Pattern INCLUDE_PATTERN = Pattern.compile(MCR_CONFIGURATION_INCLUDE);
 
@@ -183,7 +183,7 @@ public class MCRConfigurationTask extends Task {
 
     /*
      * loads the property file and marks the occurence of
-     * MCR.configuration.include
+     * MCR.Configuration.Include
      */
     private void loadLines() {
         BufferedReader reader = null;
@@ -196,7 +196,7 @@ public class MCRConfigurationTask extends Task {
                 // add each line of the property file to the array list
                 propLines.add(line);
                 if ((lineNumber < 0) && INCLUDE_PATTERN.matcher(line).find()) {
-                    // found the MCR.configuration.include line
+                    // found the MCR.Configuration.Include line
                     lineNumber = i;
                     if (line.indexOf(value) > 0) {
                         // value is included
@@ -255,7 +255,7 @@ public class MCRConfigurationTask extends Task {
      * sets the value for the action to be performed. For 'addInclude' a value
      * of "mycore.properties.moduleXY" would result in adding
      * ",mycore.properties.moduleXY" to the property
-     * "MCR.configuration.include".
+     * "MCR.Configuration.Include".
      * 
      * @param action
      *            a 'mycore.properties' file

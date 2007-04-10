@@ -49,9 +49,9 @@ import org.mycore.services.plugins.FilterPluginInstantiationException;
  * 
  * <PRE>
  * // Get a configuration property as a String: 
- * String driver = MCRConfiguration.instance().getString( "MCR.jdbc.driver" ); 
+ * String driver = MCRConfiguration.instance().getString( "MCR.JDBC.Driver" ); 
  * // Get a configuration property as an int, use 500 as default if not set: 
- * int max = MCRConfiguration.instance().getInt( "MCR.cache.size", 500 );
+ * int max = MCRConfiguration.instance().getInt( "MCR.Cache.Size", 500 );
  * </PRE>
  * 
  * As you see, the class provides methods to get configuration properties as
@@ -60,17 +60,17 @@ import org.mycore.services.plugins.FilterPluginInstantiationException;
  * <CODE>instance()</CODE> is called the first time, the file <B><CODE>
  * mycore.properties</CODE> </B> is read. It can be located somewhere in the
  * <CODE>CLASSPATH</CODE>, even in a jar or zip file. The properties file may
- * have a property called <B><CODE>MCR.configuration.include</CODE> </B> that
+ * have a property called <B><CODE>MCR.Configuration.Include</CODE> </B> that
  * contains a comma-separated list of other configuration files to read
  * subsequently. The class also reads any Java <B>system properties</B> that
  * start with "<CODE>MCR.</CODE>" and that are set when the application
  * starts. System properties will override properties read from the
  * configuration files. Furthermore, the name of the main configuration file can
  * be altered by specifying the system property <B><CODE>
- * MCR.configuration.file</CODE> </B>. Here is an example:
+ * MCR.Configuration.File</CODE> </B>. Here is an example:
  * 
  * <PRE>
- * java -DMCR.configuration.file=some_other.properties -DMCR.foo=bar MyCoReSample
+ * java -DMCR.Configuration.File=some_other.properties -DMCR.foo=bar MyCoReSample
  * </PRE>
  * 
  * Property values may include the values of other properties, recursively, by
@@ -92,10 +92,10 @@ import org.mycore.services.plugins.FilterPluginInstantiationException;
  * class. This is transparent for client code, they would still use <CODE>
  * MCRConfiguration.instance()</CODE> to get the subclass instance. To use a
  * subclass instead of <CODE>MCRConfiguration</CODE> itself, specify the
- * system property <CODE>MCR.configuration.class</CODE>, e. g.
+ * system property <CODE>MCR.Configuration.Class</CODE>, e. g.
  * 
  * <PRE>
- * java -DMCR.configuration.class=MCRConfigurationSubclass MyCoReSample
+ * java -DMCR.Configuration.Class=MCRConfigurationSubclass MyCoReSample
  * </PRE>
  * 
  * @see #loadFromFile
@@ -132,20 +132,20 @@ public class MCRConfiguration {
 
     /**
      * Instantiates the singleton by calling the protected constructor. If the
-     * system property <CODE>MCR.configuration.class</CODE> is set when the
+     * system property <CODE>MCR.Configuration.Class</CODE> is set when the
      * system starts, the class specified in that property will be instantiated
      * instead. This allows for subclassing <CODE>MCRConfiguration</CODE> to
      * change behaviour and use the subclass instead of <CODE>MCRConfiguration
      * </CODE>.
      */
     protected static void createSingleton() {
-        String name = System.getProperty("MCR.configuration.class");
+        String name = System.getProperty("MCR.Configuration.Class");
 
         if (name != null) {
             try {
                 singleton = (MCRConfiguration) (Class.forName(name).newInstance());
             } catch (Exception exc) {
-                throw new MCRConfigurationException("Could not create MCR.configuration.class singleton \"" + name + "\"", exc);
+                throw new MCRConfigurationException("Could not create MCR.Configuration.Class singleton \"" + name + "\"", exc);
             }
         } else {
             singleton = new MCRConfiguration();
@@ -197,7 +197,7 @@ public class MCRConfiguration {
 
     /**
      * Reloads all properties from the configuration files. If the system
-     * property <CODE>MCR.configuration.file</CODE> is set, the file specified
+     * property <CODE>MCR.Configuration.File</CODE> is set, the file specified
      * in this property will be used as main configuration file, otherwise the
      * default file <CODE>mycore.properties</CODE> will be read. If the
      * parameter <CODE>clear</CODE> is <CODE>true</CODE>, all properties
@@ -216,7 +216,7 @@ public class MCRConfiguration {
             depr.clear();
         }
 
-        String fn = System.getProperty("MCR.configuration.file", "mycore.properties");
+        String fn = System.getProperty("MCR.Configuration.File", "mycore.properties");
         loadFromFile(fn);
 
         Enumeration names = System.getProperties().propertyNames();
@@ -306,7 +306,7 @@ public class MCRConfiguration {
      * them to the properties currently set. This method scans the <CODE>
      * CLASSPATH</CODE> for the properties file, it may be a plain file, but
      * may also be located in a zip or jar file. If the properties file contains
-     * a property called <CODE>MCR.configuration.include</CODE>, the files
+     * a property called <CODE>MCR.Configuration.Include</CODE>, the files
      * specified in that property will also be read. Multiple include files have
      * to be separated by spaces or colons.
      * 
@@ -341,11 +341,11 @@ public class MCRConfiguration {
             throw new MCRConfigurationException("Could not load configuration file " + filename, exc);
         }
 
-        String include = getString("MCR.configuration.include", null);
+        String include = getString("MCR.Configuration.Include", null);
 
         if (include != null) {
             StringTokenizer st = new StringTokenizer(include, ", ");
-            set("MCR.configuration.include", null);
+            set("MCR.Configuration.Include", null);
 
             while (st.hasMoreTokens())
                 loadFromFile(st.nextToken());

@@ -43,11 +43,11 @@ import org.mycore.datamodel.metadata.MCRObjectID;
  */
 public class MCRAccessManager {
 
-    private static final MCRAccessInterface ACCESS_IMPL = (MCRAccessInterface) MCRConfiguration.instance().getInstanceOf("MCR.Access_class_name",
+    private static final MCRAccessInterface ACCESS_IMPL = (MCRAccessInterface) MCRConfiguration.instance().getInstanceOf("MCR.Access.Class",
             MCRAccessBaseImpl.class.getName());
 
     private static final MCRAccessCheckStrategy ACCESS_STRATEGY = (MCRAccessCheckStrategy) MCRConfiguration.instance().getInstanceOf(
-            "MCR.Access_strategy_class_name", MCRObjectIDStrategy.class.getName());
+            "MCR.Access.Strategy.Class", MCRObjectIDStrategy.class.getName());
 
     public static final Logger LOGGER = Logger.getLogger(MCRAccessManager.class);
 

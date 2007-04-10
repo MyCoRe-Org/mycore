@@ -123,7 +123,7 @@ public class MCREditorOutValidator {
         checkMethods = Collections.unmodifiableMap(methods);
         // read the list of user add to ACL's
         adduserlist = new ArrayList<String>();
-        String inline = MCRConfiguration.instance().getString("MCR.AddUserPermissions", "read,write,delete");
+        String inline = MCRConfiguration.instance().getString("MCR.Access.AddUserPermissions", "read,write,delete");
         StringTokenizer st = new StringTokenizer(inline, ",");
         while (st.hasMoreTokens()) {
             adduserlist.add(st.nextToken());

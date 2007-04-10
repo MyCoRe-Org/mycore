@@ -79,7 +79,7 @@ public class MCRZipServlet extends MCRServlet {
     private static final long serialVersionUID = 1L;
     // The Log4J logger
     private static Logger LOGGER = Logger.getLogger(MCRZipServlet.class.getName());
-    private static String accessErrorPage = CONFIG.getString("MCR.access_page_error");
+    private static String accessErrorPage = CONFIG.getString("MCR.Access.Page.Error");
 
     protected MCRXMLTableManager xmltable = null;
 

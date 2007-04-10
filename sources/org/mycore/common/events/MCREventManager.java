@@ -95,7 +95,7 @@ public class MCREventManager {
 
             String type = st.nextToken();
             int nr = Integer.parseInt(st.nextToken());
-            String mode = st.nextToken(); // "class" or "indexer"
+            String mode = st.nextToken(); // "Class" or "Indexer"
 
             if (nr == 1) {
                 instances = new ArrayList();
@@ -106,9 +106,9 @@ public class MCREventManager {
 
             Object handler = null;
 
-            if ("class".equals(mode)) {
+            if ("Class".equals(mode)) {
                 handler = config.getSingleInstanceOf(name);
-            } else { // "indexer"
+            } else { // "Indexer"
                 handler = MCRSearcherFactory.getSearcher(config.getString(name));
             }
 

@@ -48,7 +48,7 @@ public class MCRAccessBaseImpl implements MCRAccessInterface {
 
     private static MCRAccessInterface SINGLETON;
 
-    final protected static String AccessPermissions = MCRConfiguration.instance().getString("MCR.AccessPermissions", "read,write,delete");
+    final protected static String AccessPermissions = MCRConfiguration.instance().getString("MCR.Access.AccessPermissions", "read,write,delete");
 
     /** the logger */
     protected static Logger LOGGER = Logger.getLogger(MCRAccessBaseImpl.class.getName());

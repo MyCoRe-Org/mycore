@@ -62,7 +62,7 @@ public class MCRCheckClassACLServlet extends MCRServlet {
     protected static MCRAccessInterface AI = MCRAccessManager.getAccessImpl();
 
     // the configured permissions
-    private static String storedrules = CONFIG.getString("MCR.StorePermissions", "read,write,delete");
+    private static String storedrules = CONFIG.getString("MCR.Access.StorePermissions", "read,write,delete");
 
     /**
      * This method overrides doGetPost of MCRServlet and handels all actions

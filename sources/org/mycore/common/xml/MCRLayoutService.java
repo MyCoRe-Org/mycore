@@ -206,7 +206,7 @@ public class MCRLayoutService {
         // handle HttpSession
         HttpSession session = request.getSession(false);
         if (session != null) {
-            String jSessionID = MCRConfiguration.instance().getString("MCR.session.param", ";jsessionid=");
+            String jSessionID = MCRConfiguration.instance().getString("MCR.Session.Param", ";jsessionid=");
             if (!request.isRequestedSessionIdFromCookie()) {
                 parameters.put("HttpSession", jSessionID + session.getId());
             }
@@ -218,7 +218,7 @@ public class MCRLayoutService {
         parameters.put("RequestURL", getCompleteURL(request));
         parameters.put("WebApplicationBaseURL", MCRServlet.getBaseURL());
         parameters.put("ServletsBaseURL", MCRServlet.getServletBaseURL());
-        parameters.put("DefaultLang", MCRConfiguration.instance().getString("MCR.metadata_default_lang", "en"));
+        parameters.put("DefaultLang", MCRConfiguration.instance().getString("MCR.Metadata.DefaultLang", "en"));
         parameters.put("CurrentLang", mcrSession.getCurrentLanguage());
         parameters.put("Referer", (request.getHeader("Referer") != null) ? request.getHeader("Referer") : "");
 

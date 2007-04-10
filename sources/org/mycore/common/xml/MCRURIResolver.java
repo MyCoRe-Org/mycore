@@ -100,7 +100,7 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
 
     private static Map<String, MCRResolver> SUPPORTED_SCHEMES;
 
-    private static final String CONFIG_PREFIX = "MCR.UriResolver.";
+    private static final String CONFIG_PREFIX = "MCR.URIResolver.";
 
     private static final MCRResolverProvider EXT_RESOLVER = getExternalResolverProvider();
 
@@ -123,7 +123,7 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
     }
 
     private static final MCRResolverProvider getExternalResolverProvider() {
-        String externalClassName = MCRConfiguration.instance().getString(CONFIG_PREFIX + "externalResolver.class", null);
+        String externalClassName = MCRConfiguration.instance().getString(CONFIG_PREFIX + "ExternalResolver.Class", null);
         final MCREmptyResolverProvider emptyResolverProvider = new MCREmptyResolverProvider();
         if (externalClassName == null) {
             return emptyResolverProvider;
@@ -388,7 +388,7 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
      * 
      * One can implement this interface to provide additional URI schemes this
      * MCRURIResolver should handle, too. To add your mapping you have to set
-     * the <code>MCR.UriResolver.externalResolver.class</code> property to the
+     * the <code>MCR.URIResolver.ExternalResolver.Class</code> property to the
      * implementing class.
      * 
      * @author Thomas Scheffler
@@ -823,9 +823,9 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
 
         private static final MCRConfiguration CONFIG = MCRConfiguration.instance();
 
-        private static final String FORMAT_CONFIG_PREFIX = CONFIG_PREFIX + "classification.format.";
+        private static final String FORMAT_CONFIG_PREFIX = CONFIG_PREFIX + "Classification.Format.";
 
-        private static final String SORT_CONFIG_PREFIX = CONFIG_PREFIX + "classification.sort.";
+        private static final String SORT_CONFIG_PREFIX = CONFIG_PREFIX + "Classification.Sort.";
 
         private static MCRCache CLASS_CACHE;
 
@@ -836,7 +836,7 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
         }
 
         private void initCache() {
-            int cacheSize = MCRConfiguration.instance().getInt(CONFIG_PREFIX + "classification.CacheSize", 1000);
+            int cacheSize = MCRConfiguration.instance().getInt(CONFIG_PREFIX + "Classification.CacheSize", 1000);
             CLASS_CACHE = new MCRCache(cacheSize);
             CACHE_INIT_TIME = System.currentTimeMillis();
         }
@@ -847,7 +847,7 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
          * Syntax:
          * <code>classification:{editor['['formatAlias']']|metadata}:{Levels}:{parents|children}:{ClassID}[:CategID]
          * 
-         * formatAlias: MCRConfiguration property MCR.UriResolver.classification.format.formatAlias
+         * formatAlias: MCRConfiguration property MCR.UURResolver.Classification.Format.FormatAlias
          * 
          * @param uri
          *            URI in the syntax above

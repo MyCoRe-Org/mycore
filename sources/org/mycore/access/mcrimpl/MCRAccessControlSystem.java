@@ -75,7 +75,7 @@ public class MCRAccessControlSystem extends MCRAccessBaseImpl{
     public MCRAccessControlSystem() {
         MCRConfiguration config = MCRConfiguration.instance();
         int size = config.getInt("MCR.AccessPool.CacheSize", 2048);
-        String pools = config.getString("MCR.AccessPermissions", "read,write,delete");
+        String pools = config.getString("MCR.Access.AccessPermissions", "read,write,delete");
 
         if (pools.trim().length() == 0) {
             disabled = true;
