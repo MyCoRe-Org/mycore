@@ -55,13 +55,13 @@ public class MCRObjectMetadata {
     /**
      * This is the constructor of the MCRObjectMetadata class. It set the
      * default language for all metadata to the value from the configuration
-     * propertie <em>MCR.metadata_default_lang</em>.
+     * propertie <em>MCR.Metadata.DefaultLang</em>.
      * 
      * @exception MCRConfigurationException
      *                a special exception for configuartion data
      */
     public MCRObjectMetadata() throws MCRConfigurationException {
-        default_lang = MCRConfiguration.instance().getString("MCR.metadata_default_lang");
+        default_lang = MCRConfiguration.instance().getString("MCR.Metadata.DefaultLang");
         herited_xml = MCRConfiguration.instance().getBoolean("MCR.metadata_herited_for_xml", false);
         meta_list = new ArrayList<MCRMetaElement>();
         tag_names = new ArrayList<String>();

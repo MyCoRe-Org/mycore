@@ -73,7 +73,7 @@ public class MCRObjectService {
      * to null.
      */
     public MCRObjectService() {
-        lang = MCRConfiguration.instance().getString("MCR.metadata_default_lang", "en");
+        lang = MCRConfiguration.instance().getString("MCR.Metadata.DefaultLang", "en");
         dates = new ArrayList<MCRMetaISO8601Date>();
         
         Date curTime=new Date();

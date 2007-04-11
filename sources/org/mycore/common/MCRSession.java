@@ -78,7 +78,7 @@ public class MCRSession implements Cloneable {
     public MCRSession() {
         MCRConfiguration config = MCRConfiguration.instance();
         userID = config.getString("MCR.users_guestuser_username", "gast");
-        language = config.getString("MCR.metadata_default_lang", "de");
+        language = config.getString("MCR.Metadata.DefaultLang", "de");
 
         ip = "";
         sessionID = buildSessionID();

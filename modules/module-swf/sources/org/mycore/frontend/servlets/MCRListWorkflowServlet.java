@@ -88,7 +88,7 @@ public class MCRListWorkflowServlet extends MCRServlet {
     public void init() throws MCRConfigurationException, javax.servlet.ServletException {
         super.init();
         WFM = MCRSimpleWorkflowManager.instance();
-        DefaultLang = MCRConfiguration.instance().getString("MCR.metadata_default_lang", "en");
+        DefaultLang = MCRConfiguration.instance().getString("MCR.Metadata.DefaultLang", "en");
     }
 
     /**

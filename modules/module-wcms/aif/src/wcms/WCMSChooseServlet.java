@@ -153,7 +153,7 @@ public class WCMSChooseServlet extends WCMSServlet {
 
         /* get languages */
         if (mcrSession != null) {
-            defaultLang = MCRConfiguration.instance().getString("MCR.metadata_default_lang", "en").toLowerCase();
+            defaultLang = MCRConfiguration.instance().getString("MCR.Metadata.DefaultLang", "en").toLowerCase();
             currentLang = mcrSession.getCurrentLanguage().toLowerCase();
         }
 
