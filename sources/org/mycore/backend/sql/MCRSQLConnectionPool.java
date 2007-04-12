@@ -51,10 +51,10 @@ public class MCRSQLConnectionPool {
     protected static MCRSQLConnectionPool singleton;
 
     /** The internal list of free connections */
-    protected Vector freeConnections = new Vector();
+    protected Vector<MCRSQLConnection> freeConnections = new Vector<MCRSQLConnection>();
 
     /** The internal list of connections that are currently in use */
-    protected Vector usedConnections = new Vector();
+    protected Vector<MCRSQLConnection> usedConnections = new Vector<MCRSQLConnection>();
 
     /** The maximum number of connections that will be built */
     protected int maxNumConnections;
@@ -90,13 +90,13 @@ public class MCRSQLConnectionPool {
         MCRConfiguration config = MCRConfiguration.instance();
 
         logger.info("Building JDBC connection pool...");
-        maxNumConnections = config.getInt("MCR.persistence_sql_max_connections", 1);
+        maxNumConnections = config.getInt("MCR.Persistence.SQL.Connections.Max", 1);
 
-        int initNumConnections = config.getInt("MCR.persistence_sql_init_connections", maxNumConnections);
-        String driver = config.getString("MCR.persistence_sql_driver");
-        logger.debug("MCR.persistence_sql_driver: " + driver);
+        int initNumConnections = config.getInt("MCR.Persistence.SQL.Connections.Init", maxNumConnections);
+        String driver = config.getString("MCR.Persistence.SQL.Driver");
+        logger.debug("MCR.Persistence.SQL.Driver: " + driver);
 
-        testStatement = config.getString("MCR.persistence_sql_connection_test_query", null);
+        testStatement = config.getString("MCR.Persistence.SQL.Connections.TestQuery", "select * from mcraccessrules");
 
         try {
             Class.forName(driver);

@@ -76,10 +76,10 @@ public class MCRHIBConnection implements Closeable {
 
     static {
         MCRConfiguration config = MCRConfiguration.instance();
-        url = config.getString("MCR.persistence_sql_database_url", "hsqldb");
-        userID = config.getString("MCR.persistence_sql_database_userid", "");
-        password = config.getString("MCR.persistence_sql_database_passwd", "");
-        driver = config.getString("MCR.persistence_sql_driver", "");
+        url = config.getString("MCR.Persistence.SQL.Database.URL", "hsqldb");
+        userID = config.getString("MCR.Persistence.SQL.Database.Userid", "");
+        password = config.getString("MCR.Persistence.SQL.Database.Passwd", "");
+        driver = config.getString("MCR.Persistence.SQL.Driver", "");
     }
 
     public static synchronized MCRHIBConnection instance() throws MCRPersistenceException {
@@ -134,6 +134,7 @@ public class MCRHIBConnection implements Closeable {
         	.setProperty("hibernate.connection.url", url)
         	.setProperty("hibernate.connection.username", userID)
         	.setProperty("hibernate.connection.password", password)
+            // [TODO] replace MCR.hibernate
         	.setProperty("hibernate.show_sql","" + config.getBoolean("MCR.hibernate.show_sql", false));
         // set connection pooling
         // you can overload every hibernate property by defining 
@@ -147,6 +148,7 @@ public class MCRHIBConnection implements Closeable {
         	.setProperty("hibernate.c3p0.acquire_increment","2")
         	.setProperty("hibernate.c3p0.validate","false");
         
+        // [TODO] replace MCR.hibernate
         Properties hibProperties = config.getProperties("MCR.hibernate.");
         for (Enumeration e = hibProperties.keys(); e.hasMoreElements();) {
         	String key = (String) e.nextElement();

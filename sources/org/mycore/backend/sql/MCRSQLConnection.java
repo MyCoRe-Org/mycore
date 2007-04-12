@@ -82,10 +82,10 @@ public class MCRSQLConnection {
 
     static {
         MCRConfiguration config = MCRConfiguration.instance();
-        url = config.getString("MCR.persistence_sql_database_url");
-        userID = config.getString("MCR.persistence_sql_database_userid", "");
-        password = config.getString("MCR.persistence_sql_database_passwd", "");
-        maxUsages = config.getInt("MCR.persistence_sql_database_connection_max_usages", Integer.MAX_VALUE);
+        url = config.getString("MCR.Persistence.SQL.Database.URL");
+        userID = config.getString("MCR.persistence.SQL.Database.Userid", "");
+        password = config.getString("MCR.persistence.SQL.Database.Passwd", "");
+        maxUsages = config.getInt("MCR.persistence.SQL.Database.Connections.Max", Integer.MAX_VALUE);
     }
 
     /**
