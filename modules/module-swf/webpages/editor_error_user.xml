@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="ISO_8859-1"?>
+<!DOCTYPE MyCoReWebPage>
+
+<MyCoReWebPage>
+
+<section title="Privileg Fehler" xml:lang="de">
+<table class="frame">
+<tr>
+<td>
+<center>
+<table width="80%">
+ <tr>
+  <td class="workflowerror">
+   Dieser Nutzer ist für diese Arbeit mit dem Editor nicht berechtigt!
+  </td>
+ </tr>
+</table>
+</center>
+</td>
+</tr>
+</table>
+</section>
+
+<section title="Privileg error" xml:lang="en">
+<table class="frame">
+<tr>
+<td>
+<center>
+<table width="80%">
+ <tr>
+  <td class="workflowerror">
+  This login is for this work with the editor not authorized! 
+  </td>
+ </tr>
+</table>
+</center>
+</td>
+</tr>
+</table>
+</section>
+
+</MyCoReWebPage>
+
+

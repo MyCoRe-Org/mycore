@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="ISO_8859-1"?>
+<!DOCTYPE MyCoReWebPage>
+
+<MyCoReWebPage>
+
+<section title="Datenfehler im Eingabeformular" xml:lang="de">
+<center>
+<table width="80%">
+ <tr align="center">
+  <td align="center">
+<font color="red">
+Bei der Prüfung des Eingabeformulars traten die oben genannten Fehler auf.
+</font>
+  </td>
+ </tr>
+</table>
+</center>
+<form  method="get">
+ <center>
+<!--
+ <input name="lang" type="hidden" value="{$CurrentLang}" />
+ <input name="se_mcrid" type="hidden" value="{@ID}" />
+ <input name="type" type="hidden" value="{$type}" />
+-->
+ <input name="step" type="hidden" value="editor" />
+ <input name="todo" type="hidden" value="weditobj" />
+ <input type="submit" class="submitbutton" value="Bearbeiten des fehlerhaften Datensatzes" />
+</center>
+</form>
+</section>
+
+<section title="Check error in the input formular" xml:lang="en">
+<center>
+<table width="80%">
+ <tr align="center">
+  <td align="center">
+<font color="red">
+At the check of the input formular you get the messages on the top.
+</font>
+  </td>
+ </tr>
+</table>
+</center>
+<form  method="get">
+ <center>
+<!--
+ <input name="lang" type="hidden" value="{$CurrentLang}" />
+ <input name="se_mcrid" type="hidden" value="{@ID}" />
+ <input name="type" type="hidden" value="{$type}" />
+-->
+ <input name="step" type="hidden" value="editor" />
+ <input name="todo" type="hidden" value="weditobj" />
+ <input type="submit" class="submitbutton" value="Edit the wrong dataset" />
+ </center>
+</form>
+</section>
+
+</MyCoReWebPage>
+

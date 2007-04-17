@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE MyCoReWebPage>
+
+<MyCoReWebPage>
+
+<section title="Löschen der Daten" xml:lang="de">
+<strong>Das Löschen der Daten war erfolgreich.</strong>
+</section>
+
+<section title="Remove the data" xml:lang="en">
+<strong>The dataset was removed sccessfuly.</strong>
+</section>
+
+</MyCoReWebPage>
+
+

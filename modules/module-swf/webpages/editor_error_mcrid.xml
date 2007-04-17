@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="ISO_8859-1"?>
+<!DOCTYPE MyCoReWebPage>
+
+<MyCoReWebPage>
+
+<section title="MCRObjectID Fehler" xml:lang="de">
+<center>
+<table width="80%">
+ <tr align="center">
+  <td align="center">
+<font color="red">
+   Die angebene MCRObjectID ist falsch!
+</font>
+  </td>
+ </tr>
+</table>
+</center>
+</section>
+
+<section title="MCRObjectID Error" xml:lang="en">
+<center>
+<table width="80%">
+ <tr align="center">
+  <td align="center">
+<font color="red">
+   The MCRObjectID is wrong!
+</font>
+  </td>
+ </tr>
+</table>
+</center>
+</section>
+
+</MyCoReWebPage>
+
+

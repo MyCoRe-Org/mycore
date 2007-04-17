@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="ISO_8859-1"?>
+<!DOCTYPE MyCoReWebPage>
+
+<MyCoReWebPage>
+
+<section title="Speicher Fehler" xml:lang="de">
+<center>
+<table width="80%">
+ <tr align="center">
+  <td align="center">
+<font color="red">
+   Beim Abspeichern der bearbeiteten Daten gab es ein Problem.
+   Die Daten wurden nicht im Dateisystem abgelegt.
+   Bitte sprechen Sie mit dem Systemadministrator darüber.
+</font>
+  </td>
+ </tr>
+</table>
+</center>
+</section>
+
+<section title="Save error" xml:lang="en">
+<center>
+<table width="80%">
+ <tr align="center">
+  <td align="center">
+<font color="red">
+   At the save an error was occured.
+   The data are not in the file system saved.
+   Please contact your system administrator.
+</font>
+  </td>
+ </tr>
+</table>
+</center>
+</section>
+</MyCoReWebPage>
+
+

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="ISO_8859-1"?>
+<!DOCTYPE MyCoReWebPage>
+
+<MyCoReWebPage>
+
+<section title="Löschfehler" xml:lang="de">
+<center>
+<table width="80%">
+ <tr align="center">
+  <td align="center">
+<font color="red">
+   Beim Löschen der Daten aus dem Server gab es ein Problem.
+   Die Daten wurden nicht gelöscht.
+   Bitte sprechen Sie mit dem Systemadministrator darüber.
+</font>
+  </td>
+ </tr>
+</table>
+</center>
+</section>
+
+<section title="Delete error" xml:lang="en">
+<center>
+<table width="80%">
+ <tr align="center">
+  <td align="center">
+<font color="red">
+   A delete error on the server was occured.
+   Data were not deleted.
+   Please consult the system administartor.
+</font>
+  </td>
+ </tr>
+</table>
+</center>
+</section>
+
+</MyCoReWebPage>
+
+
