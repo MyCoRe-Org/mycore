@@ -416,6 +416,12 @@ public class MCRServlet extends HttpServlet {
         if ((addr == null) || (addr.trim().length() == 0)) {
             addr = req.getHeader("x-forwarded-for");
         }
+        
+        // X_FORWARDED_FOR can be comma separated list of hosts,
+        // if so, take last one:
+        if (( addr != null ) && addr.contains(",")) {
+            addr = addr.substring(addr.lastIndexOf(",")+1).trim();
+        }        
 
         if ((addr == null) || (addr.trim().length() == 0)) {
             addr = req.getRemoteAddr();
