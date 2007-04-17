@@ -285,8 +285,17 @@ public class MCRMailer {
                 for (int i = 0; i < parts.size(); i++) {
                     messagePart = new MimeBodyPart();
 
-                    DataSource source = new URLDataSource(new URL((String) parts.get(i)));
+                    URL url = new URL((String) parts.get(i));
+                    DataSource source = new URLDataSource(url);
                     messagePart.setDataHandler(new DataHandler(source));
+                    
+                    String fileName = url.getPath();
+                    if (fileName.contains("\\")) 
+                        fileName = fileName.substring(fileName.lastIndexOf("\\") + 1);
+                    else if (fileName.contains("/")) 
+                        fileName = fileName.substring(fileName.lastIndexOf("/") + 1);
+                    messagePart.setFileName(fileName);
+                    
                     multipart.addBodyPart(messagePart);
                 }
 
