@@ -79,8 +79,8 @@ public final class MCRObjectID {
      */
     static {
         CONFIG = MCRConfiguration.instance();
-        number_distance = CONFIG.getInt("MCR.metadata_objectid_number_distance", 1);
-        number_pattern = CONFIG.getString("MCR.metadata_objectid_number_pattern", "0000000000");
+        number_distance = CONFIG.getInt("MCR.Metadata.ObjectID.NumberDistance", 1);
+        number_pattern = CONFIG.getString("MCR.Metadata.ObjectID.NumberPattern", "0000000000");
         number_format = new DecimalFormat(number_pattern);
     }
 
@@ -222,7 +222,7 @@ public final class MCRObjectID {
 
         String test = type.toLowerCase().intern();
 
-        if (!CONFIG.getBoolean("MCR.type_" + test, false)) {
+        if (!CONFIG.getBoolean("MCR.Metadata.Type." + test, false)) {
             return false;
         }
 
@@ -389,9 +389,9 @@ public final class MCRObjectID {
         String mcr_id;
 
         try {
-            mcr_id = URLEncoder.encode(id, CONFIG.getString("MCR.request_charencoding", "UTF-8"));
+            mcr_id = URLEncoder.encode(id, CONFIG.getString("MCR.Request.CharEncoding", "UTF-8"));
         } catch (UnsupportedEncodingException e1) {
-            LOGGER.error("MCR.request_charencoding property does not contain a valid encoding:", e1);
+            LOGGER.error("MCR.Request.CharEncoding property does not contain a valid encoding:", e1);
 
             return false;
         }
@@ -417,7 +417,7 @@ public final class MCRObjectID {
 
         mcr_type_id = mcr_id.substring(i + 1, j).toLowerCase().intern();
 
-        if (!CONFIG.getBoolean("MCR.type_" + mcr_type_id.toLowerCase(), false)) {
+        if (!CONFIG.getBoolean("MCR.Metadata.Type." + mcr_type_id.toLowerCase(), false)) {
             return false;
         }
 

@@ -32,7 +32,7 @@ import org.mycore.common.MCRConfiguration;
  * The purpose of this interface is to make the choice of the persistence layer
  * configurable. Any concrete database-class which stores MyCoRe Access control
  * must implement this interface. Which database actually will be used can then
- * be configured by reading the value <code>MCR.rulestore_class_name</code>
+ * be configured by reading the value <code>MCR.Persistence.Rule.Store_Class</code>
  * from mycore.properties.access
  * 
  * @author Arne Seifert
@@ -60,14 +60,14 @@ public abstract class MCRRuleStore {
 
     final protected static String sqlDateformat = "yyyy-MM-dd HH:mm:ss";
 
-    final protected static String ruletablename = MCRConfiguration.instance().getString("MCR.access_store_sql_table_rule", "MCRACCESSRULE");
+    final protected static String ruletablename = MCRConfiguration.instance().getString("MCR.Persistence.Access.Store.Table.Rule", "MCRACCESSRULE");
 
     static private MCRRuleStore implementation;
 
     public static MCRRuleStore getInstance() {
         try {
             if (implementation == null) {
-                implementation = (MCRRuleStore) MCRConfiguration.instance().getSingleInstanceOf("MCR.rulestore_class_name", "org.mycore.backend.hibernate.MCRHIBRuleStore");
+                implementation = (MCRRuleStore) MCRConfiguration.instance().getSingleInstanceOf("MCR.Persistence.Rule.Store_Class", "org.mycore.backend.hibernate.MCRHIBRuleStore");
             }
         } catch (Exception e) {
             logger.error(e);

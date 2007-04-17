@@ -77,10 +77,10 @@ public class MCRSQLClassificationStore implements MCRClassificationInterface {
         MCRConfiguration config = MCRConfiguration.instance();
 
         // set configuration
-        tableClass = config.getString("MCR.classifications_store_sql_table_class", "MCRCLASS");
-        tableClassLabel = config.getString("MCR.classifications_store_sql_table_classlabel", "MCRCLASSLABEL");
-        tableCateg = config.getString("MCR.classifications_store_sql_table_categ", "MCRCATEG");
-        tableCategLabel = config.getString("MCR.classifications_store_sql_table_categlabel", "MCRCATEGLABEL");
+        tableClass = config.getString("MCR.Persistence.Classification.Store.Table.Class", "MCRCLASS");
+        tableClassLabel = config.getString("MCR.Persistence.Classification.Store.Table.ClassLabel", "MCRCLASSLABEL");
+        tableCateg = config.getString("MCR.Persistence.Classification.Store.Table.Categ", "MCRCATEG");
+        tableCategLabel = config.getString("MCR.Persistence.Classification.Store.Table.CategLabel", "MCRCATEGLABEL");
 
         if (!MCRSQLConnection.doesTableExist(tableClass)) {
             logger.info("Create table " + tableClass);

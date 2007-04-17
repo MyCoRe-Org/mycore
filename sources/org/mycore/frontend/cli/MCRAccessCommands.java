@@ -253,7 +253,7 @@ public class MCRAccessCommands extends MCRAbstractCommands {
             }
             FileOutputStream fos = new FileOutputStream(file);
             LOGGER.info("Writing to file " + filename + " ...");
-            String mcr_encoding = CONFIG.getString("MCR.metadata_default_encoding", DEFAULT_ENCODING);
+            String mcr_encoding = CONFIG.getString("MCR.Metadata.DefaultEncoding", DEFAULT_ENCODING);
             XMLOutputter out = new XMLOutputter(Format.getPrettyFormat().setEncoding(mcr_encoding));
             out.output(doc, fos);
         } catch (Exception e) {

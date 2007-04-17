@@ -104,7 +104,7 @@ public class MCRTableGenerator {
     private DocType createDoctype() {
         if (doctype_url == null) {
             try {
-                String strDir = MCRConfiguration.instance().getString("MCR.dtd.directory", System.getProperties().getProperty("java.io.tmpdir"));
+                String strDir = MCRConfiguration.instance().getString("MCR.Hibernate.DTD.Directory", System.getProperties().getProperty("java.io.tmpdir"));
                 File dir = new File(strDir);
                 if (!dir.exists()) {
                     dir.mkdirs();

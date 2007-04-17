@@ -62,7 +62,7 @@ public class MCRObjectMetadata {
      */
     public MCRObjectMetadata() throws MCRConfigurationException {
         default_lang = MCRConfiguration.instance().getString("MCR.Metadata.DefaultLang");
-        herited_xml = MCRConfiguration.instance().getBoolean("MCR.metadata_herited_for_xml", false);
+        herited_xml = MCRConfiguration.instance().getBoolean("MCR.Metadata.HeritedForXML", false);
         meta_list = new ArrayList<MCRMetaElement>();
         tag_names = new ArrayList<String>();
     }

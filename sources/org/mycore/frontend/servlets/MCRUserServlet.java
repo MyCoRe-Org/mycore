@@ -56,8 +56,8 @@ public class MCRUserServlet extends MCRServlet {
      */
     public void init() throws ServletException {
         super.init();
-        GUEST_ID = CONFIG.getString("MCR.users_guestuser_username");
-        GUEST_PWD = CONFIG.getString("MCR.users_guestuser_userpasswd");
+        GUEST_ID = CONFIG.getString("MCR.Users.Guestuser.UserName","gast");
+        GUEST_PWD = CONFIG.getString("MCR.Users.Guestuser.UserPasswd","gast");
     }
 
     /**

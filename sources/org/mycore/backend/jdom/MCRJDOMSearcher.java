@@ -73,7 +73,7 @@ import org.mycore.services.fieldquery.MCRSortBy;
  * persistent store and indexed in memory. This class may also be useful for
  * learning how to implement MCRSearchers and indexers.
  * 
- * @author Frank Lï¿½tzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCRJDOMSearcher extends MCRSearcher {
     /** The logger */
@@ -94,7 +94,7 @@ public class MCRJDOMSearcher extends MCRSearcher {
         MCRXMLTableManager mcr_xml = MCRXMLTableManager.instance();
 
         // Find all types of MCRObject data:
-        String cfgPrefix = "MCR.persistence_config_";
+        String cfgPrefix = "MCR.Metadata.Config.";
         Properties props = MCRConfiguration.instance().getProperties(cfgPrefix);
         for (Enumeration keys = props.keys(); keys.hasMoreElements();) {
             String key = (String) (keys.nextElement());

@@ -68,11 +68,11 @@ public class MCRClassificationManager {
      * Constructor for a new MCRClassificationManager.
      */
     protected MCRClassificationManager() {
-        Object object = CONFIG.getInstanceOf("MCR.classifications_store_class");
+        Object object = CONFIG.getInstanceOf("MCR.Persistence.Classification.Store.Class");
         store = (MCRClassificationInterface) object;
 
-        int classifSize = CONFIG.getInt("MCR.classifications_classification_cache_size", 30);
-        int categSize = CONFIG.getInt("MCR.classifications_category_cache_size", 500);
+        int classifSize = CONFIG.getInt("MCR.Persistence.Classification.Store.CacheSize.Class", 30);
+        int categSize = CONFIG.getInt("MCR.Persistence.Classification.Store.CacheSize.Categ", 500);
         classificationCache = new MCRCache(classifSize);
         categoryCache = new MCRCache(categSize);
         jDomCache = new MCRCache(categSize);

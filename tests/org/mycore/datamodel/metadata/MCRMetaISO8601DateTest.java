@@ -143,8 +143,8 @@ public class MCRMetaISO8601DateTest extends MCRTestCase {
         ts.setFormat((String)null);
         ts.setDate(timeString);
         assertNull("Date is not null", ts.getDate());
-        setProperty("MCR.SimpleDateFormat.strictParsing","false",true);
-        setProperty("MCR.SimpleDateFormat.locales","de_DE,en_US",true);
+        setProperty("MCR.Metadata.SimpleDateFormat.StrictParsing","false",true);
+        setProperty("MCR.Metadata.SimpleDateFormat.Locales","de_DE,en_US",true);
         ts.setFormat((String)null);
         ts.setDate(timeString);
         LOGGER.debug(ts.getISOString());
@@ -152,7 +152,7 @@ public class MCRMetaISO8601DateTest extends MCRTestCase {
         ts.setDate(timeString);
         LOGGER.debug(ts.getISOString());
         //assertNotNull("Date is null", ts.getDate());
-        setProperty("MCR.SimpleDateFormat.strictParsing","true",true);
+        setProperty("MCR.Metadata.SimpleDateFormat.StrictParsing","true",true);
     }
 
     /*

@@ -80,8 +80,8 @@ public class MCRXMLTableManager {
      */
     protected MCRXMLTableManager() {
         tablelist = new Hashtable<String, MCRXMLTableInterface>();
-        jdomCache = new MCRCache(CONFIG.getInt("MCR.xml.tablemanager.cache.size", 100));
-        number_distance = CONFIG.getInt("MCR.metadata_objectid_number_distance", 1);
+        jdomCache = new MCRCache(CONFIG.getInt("MCR.Persistence.XML.Store.CacheSize", 100));
+        number_distance = CONFIG.getInt("MCR.Metadata.ObjectID.NumberDistance", 1);
     }
 
     /**
@@ -98,7 +98,7 @@ public class MCRXMLTableManager {
             return tablelist.get(type);
         }
 
-        MCRXMLTableInterface inst = (MCRXMLTableInterface) CONFIG.getInstanceOf("MCR.xml_store_class");
+        MCRXMLTableInterface inst = (MCRXMLTableInterface) CONFIG.getInstanceOf("MCR.Persistence.XML.Store.Class");
         inst.init(type);
         tablelist.put(type, inst);
 
@@ -287,11 +287,11 @@ public class MCRXMLTableManager {
      * The method return a Array list with all MCRObjectID-Types, stored in the XML
      * table.
      * reads the mycore.properties-configuration for datamodel-types
-     * @return a ArrayList of MCRObjectID-Types for which MCR.type_{datamodel}=true
+     * @return a ArrayList of MCRObjectID-Types for which MCR.Metadata.Type.{datamodel}=true
      */
     public List<String> getAllAllowedMCRObjectIDTypes(){
     	ArrayList<String> listTypes = new ArrayList<String>();
-    	final String prefix = "MCR.type_";
+    	final String prefix = "MCR.Metadata.Type.";
         Properties prop = MCRConfiguration.instance().getProperties(prefix);
         Enumeration names = prop.propertyNames();
         while (names.hasMoreElements()) {

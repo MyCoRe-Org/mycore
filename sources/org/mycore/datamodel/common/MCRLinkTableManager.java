@@ -85,7 +85,7 @@ public class MCRLinkTableManager {
         MCRConfiguration config = MCRConfiguration.instance();
 
         // Load the persistence class
-        persistclassname = config.getString("MCR.linktable_store_class");
+        persistclassname = config.getString("MCR.Persistence.LinkTable.Store.Class");
 
         Object obj = new Object();
         try {

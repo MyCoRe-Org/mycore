@@ -146,16 +146,16 @@ public class MCRUserCommands extends MCRAbstractCommands {
      * properties were set, mcradmin with password mycore will be used.
      */
     public static void initSuperuser() throws MCRException {
-        String suser = CONFIG.getString("MCR.users_superuser_username", "mcradmin");
-        String spasswd = CONFIG.getString("MCR.users_superuser_userpasswd", "mycore");
-        String sgroup = CONFIG.getString("MCR.users_superuser_groupname", "mcrgroup");
-        String guser = CONFIG.getString("MCR.users_guestuser_username", "gast");
-        String gpasswd = CONFIG.getString("MCR.users_guestuser_userpasswd", "gast");
-        String ggroup = CONFIG.getString("MCR.users_guestuser_groupname", "mcrgast");
+        String suser = CONFIG.getString("MCR.Users.Superuser.Username", "root");
+        String spasswd = CONFIG.getString("MCR.Users.Superuser.UserPasswd", "alleswirdgut");
+        String sgroup = CONFIG.getString("MCR.Users.Superuser.GroupName", "admingroup");
+        String guser = CONFIG.getString("MCR.Users.Guestuser.UserName", "gast");
+        String gpasswd = CONFIG.getString("MCR.Users.Guestuser.UserPasswd", "gast");
+        String ggroup = CONFIG.getString("MCR.Users.Guestuser.GroupName", "guestgroup");
 
         // If CONFIGuration parameter defines that we use password encryption:
         // encrypt!
-        String useCrypt = CONFIG.getString("MCR.users_use_password_encryption", "false");
+        String useCrypt = CONFIG.getString("MCR.Users.UsePasswordEncryption", "false");
         boolean useEncryption = (useCrypt.trim().equals("true")) ? true : false;
 
         if (useEncryption) {
@@ -229,21 +229,21 @@ public class MCRUserCommands extends MCRAbstractCommands {
             throw new MCRException("Can't create the superuser.", e);
         }
 
-        LOGGER.info("The user " + suser + " with password " + CONFIG.getString("MCR.users_superuser_userpasswd", "mycore") + " is installed.");
+        LOGGER.info("The user " + suser + " with password " + CONFIG.getString("MCR.Users.Superuser.UserPasswd", "alleswirdgut") + " is installed.");
 
         // the guest
         try {
             ArrayList<String> groupIDs = new ArrayList<String>();
             groupIDs.add(ggroup);
 
-            MCRUser u = new MCRUser(2, guser, suser, null, null, true, true, "guest", gpasswd, ggroup, groupIDs, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
+            MCRUser u = new MCRUser(2, guser, suser, null, null, true, true, "gast", gpasswd, ggroup, groupIDs, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
 
             MCRUserMgr.instance().initializeUser(u, suser);
         } catch (Exception e) {
             throw new MCRException("Can't create the guest user.", e);
         }
 
-        LOGGER.info("The user " + guser + " with password " + CONFIG.getString("MCR.users_guestuser_userpasswd", "gast") + " is installed.");
+        LOGGER.info("The user " + guser + " with password " + CONFIG.getString("CR.Users.Guestuser.UserPasswd", "gast") + " is installed.");
 
         // check all
         MCRSessionMgr.getCurrentSession().setCurrentUserID(suser);
@@ -620,7 +620,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
      *            the filename of the user data input
      */
     public static final void createUserFromFile(String filename) {
-        String useCrypt = CONFIG.getString("MCR.users_use_password_encryption", "false");
+        String useCrypt = CONFIG.getString("MCR.Users.UsePasswordEncryption", "false");
         boolean useEncryption = (useCrypt.trim().equals("true")) ? true : false;
         createUserFromFile(filename, useEncryption);
     }
@@ -782,7 +782,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
      *            the filename of the user data input
      */
     public static final void updateUserFromFile(String filename) {
-        String useCrypt = CONFIG.getString("MCR.users_use_password_encryption", "false");
+        String useCrypt = CONFIG.getString("MCR.Users.UsePasswordEncryption", "false");
         boolean useEncryption = (useCrypt.trim().equals("true")) ? true : false;
         updateUserFromFile(filename, useEncryption);
     }
@@ -891,7 +891,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
         // get encoding
         CONFIG = MCRConfiguration.instance();
 
-        String mcr_encoding = CONFIG.getString("MCR.metadata_default_encoding", DEFAULT_ENCODING);
+        String mcr_encoding = CONFIG.getString("MCR.Metadata.DefaultEncoding", DEFAULT_ENCODING);
 
         // Create the output
         XMLOutputter outputter = new XMLOutputter(Format.getPrettyFormat().setEncoding(mcr_encoding));

@@ -64,7 +64,7 @@ public class MCRAVExtVideoCharger extends MCRAudioVideoExtender {
         String prefix = "MCR.IFS.AVExtender." + storeID + ".";
 
         MCRConfiguration CONFIG = MCRConfiguration.instance();
-        encoding = CONFIG.getString("MCR.request_charencoding", "UTF-8"); 
+        encoding = CONFIG.getString("MCR.Request.CharEncoding", "UTF-8"); 
         baseMetadata = CONFIG.getString(prefix + "VSListURL");
         playerDownloadURL = CONFIG.getString(prefix + "PlayerURL");
         basePlayerStarter = CONFIG.getString(prefix + "ISCPFSelURL");
@@ -84,7 +84,7 @@ public class MCRAVExtVideoCharger extends MCRAudioVideoExtender {
         try {
             assetID = URLEncoder.encode(file.getStorageID(), encoding);
         } catch (UnsupportedEncodingException e) {
-            throw new MCRPersistenceException("MCR.request_charencoding property does not contain a valid encoding:", e);
+            throw new MCRPersistenceException("MCR.Request.CharEncoding property does not contain a valid encoding:", e);
         }
 
         try {

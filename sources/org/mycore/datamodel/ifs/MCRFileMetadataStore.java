@@ -33,7 +33,7 @@ import org.mycore.common.MCRPersistenceException;
  * file's content, this store holds its descriptive data like the directory
  * structure, file type, checksum and size. There can only be one instance to be
  * used in a system, that instance is configured by the property
- * <b>MCR.IFS.FileMetadataStore.Class </b>
+ * <b>MCR.Persistence.IFS.FileMetadataStore.Class </b>
  * 
  * @see MCRFileMetadataManager
  * @see MCRFilesystemNode

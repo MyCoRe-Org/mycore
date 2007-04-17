@@ -84,7 +84,7 @@ public abstract class MCRBase {
         mcr_conf = MCRConfiguration.instance();
 
         // Default Encoding
-        mcr_encoding = mcr_conf.getString("MCR.metadata_default_encoding", DEFAULT_ENCODING);
+        mcr_encoding = mcr_conf.getString("MCR.Metadata.DefaultEncoding", DEFAULT_ENCODING);
         logger.debug("Encoding = " + mcr_encoding);
     }
 

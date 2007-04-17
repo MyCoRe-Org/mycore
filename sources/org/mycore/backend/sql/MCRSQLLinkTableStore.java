@@ -60,7 +60,7 @@ public class MCRSQLLinkTableStore implements MCRLinkTableInterface {
     public MCRSQLLinkTableStore() {
         MCRConfiguration config = MCRConfiguration.instance();
         // set configuration
-        tableName = config.getString("MCR.linktable_store_sql_table_href","MCRLINKTABLE");
+        tableName = config.getString("MCR.Persistence.LinkTable.Store.Table","MCRLINKTABLE");
 
         if (!MCRSQLConnection.doesTableExist(tableName)) {
             logger.info("Create table " + tableName);

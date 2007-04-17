@@ -58,7 +58,7 @@ public class MCRHIBMapping {
             MCRTableGenerator map;
 
             // Category
-            map = new MCRTableGenerator(config.getString("MCR.classifications_store_sql_table_categ", "MCRCATEG"), "org.mycore.backend.hibernate.tables.MCRCATEG", "", 2);
+            map = new MCRTableGenerator(config.getString("MCR.Persistence.Classification.Store.Table.Categ", "MCRCATEG"), "org.mycore.backend.hibernate.tables.MCRCATEG", "", 2);
             map.addIDColumn("id", "ID", dbString, 128, "assigned", true);
             map.addIDColumn("clid", "CLID", dbString, 64, "assigned", true);
             map.addColumn("pid", "PID", dbString, 128, false, false, false);
@@ -66,7 +66,7 @@ public class MCRHIBMapping {
             cfg.addXML(map.getTableXML());
 
             // Categorylabel
-            map = new MCRTableGenerator(config.getString("MCR.classifications_store_sql_table_categlabel", "MCRCATEGLAB"), "org.mycore.backend.hibernate.tables.MCRCATEGLABEL", "", 3);
+            map = new MCRTableGenerator(config.getString("MCR.Persistence.Classification.Store.Table.CategLabel", "MCRCATEGLAB"), "org.mycore.backend.hibernate.tables.MCRCATEGLABEL", "", 3);
             map.addIDColumn("id", "ID", dbString, 128, "assigned", false);
             map.addIDColumn("clid", "CLID", dbString, 64, "assigned", false);
             map.addIDColumn("lang", "LANG", dbString, 8, "assigned", false);
@@ -75,12 +75,12 @@ public class MCRHIBMapping {
             cfg.addXML(map.getTableXML());
 
             // Classification
-            map = new MCRTableGenerator(config.getString("MCR.classifications_store_sql_table_class", "MCRCLASS"), "org.mycore.backend.hibernate.tables.MCRCLASS", "", 1);
+            map = new MCRTableGenerator(config.getString("MCR.Persistence.Classification.Store.Table.Class", "MCRCLASS"), "org.mycore.backend.hibernate.tables.MCRCLASS", "", 1);
             map.addIDColumn("id", "ID", dbString, 64, "assigned", true);
             cfg.addXML(map.getTableXML());
 
             // Classification Label
-            map = new MCRTableGenerator(config.getString("MCR.classifications_store_sql_table_classlabel", "MCRCLASSLAB"), "org.mycore.backend.hibernate.tables.MCRCLASSLABEL", "", 2);
+            map = new MCRTableGenerator(config.getString("MCR.Persistence.Classification.Store.Table.ClassLabel", "MCRCLASSLAB"), "org.mycore.backend.hibernate.tables.MCRCLASSLABEL", "", 2);
             map.addIDColumn("id", "ID", dbString, 64, "assigned", false);
             map.addIDColumn("lang", "LANG", dbString, 8, "assigned", false);
             map.addColumn("text", "TEXT", dbString, 254, false, false, false);
@@ -88,13 +88,13 @@ public class MCRHIBMapping {
             cfg.addXML(map.getTableXML());
 
             // CStore
-            map = new MCRTableGenerator(config.getString("MCR.content_store_sql_table", "MCRCSTORE"), "org.mycore.backend.hibernate.tables.MCRCSTORE", "", 1);
+            map = new MCRTableGenerator(config.getString("MCR.Persistence.Content.Store.Table", "MCRCSTORE"), "org.mycore.backend.hibernate.tables.MCRCSTORE", "", 1);
             map.addIDColumn("storageid", "STORAGEID", dbInt, 0, "assigned", true);
             map.addColumn("content", "CONTENT", dbBlob, 0, false, false, false);
             cfg.addXML(map.getTableXML());
 
             // FS Nodes
-            map = new MCRTableGenerator(config.getString("MCR.IFS.FileMetadataStore.SQL.TableName", "MCRFSNODES"), "org.mycore.backend.hibernate.tables.MCRFSNODES", "", 1);
+            map = new MCRTableGenerator(config.getString("MCR.Persistence.IFS.FileMetadataStore.Table", "MCRFSNODES"), "org.mycore.backend.hibernate.tables.MCRFSNODES", "", 1);
             map.addIDColumn("id", "ID", dbString, 16, "assigned", false);
             map.addColumn("pid", "PID", dbString, 16, false, false, false);
             map.addColumn("type", "TYPE", dbString, 1, true, false, false);
@@ -114,20 +114,20 @@ public class MCRHIBMapping {
             cfg.addXML(map.getTableXML());
 
             // Group Admins
-            map = new MCRTableGenerator(config.getString("MCR.users_store_sql_table_group_admins", "MCRGROUPADMINS"), "org.mycore.backend.hibernate.tables.MCRGROUPADMINS", "", 3);
+            map = new MCRTableGenerator(config.getString("MCR.Persistence.User.Store.Table.GroupAdmins", "MCRGROUPADMINS"), "org.mycore.backend.hibernate.tables.MCRGROUPADMINS", "", 3);
             map.addIDColumn("gid", "GID", dbString, 20, "native", false);
             map.addIDColumn("userid", "USERID", dbString, 20, "native", false);
             map.addIDColumn("groupid", "GROUPID", dbString, 20, "native", false);
             cfg.addXML(map.getTableXML());
 
             // Group Members
-            map = new MCRTableGenerator(config.getString("MCR.users_store_sql_table_group_members", "MCRGROUPMEMBERS"), "org.mycore.backend.hibernate.tables.MCRGROUPMEMBERS", "", 3);
+            map = new MCRTableGenerator(config.getString("MCR.Persistence.User.Store.Table.GroupMembers", "MCRGROUPMEMBERS"), "org.mycore.backend.hibernate.tables.MCRGROUPMEMBERS", "", 3);
             map.addIDColumn("gid", "GID", dbString, 20, "native", false);
             map.addIDColumn("userid", "USERID", dbString, 20, "native", false);
             cfg.addXML(map.getTableXML());
 
             // Group
-            map = new MCRTableGenerator(config.getString("MCR.users_store_sql_table_groups", "MCRGROUPS"), "org.mycore.backend.hibernate.tables.MCRGROUPS", "", 1);
+            map = new MCRTableGenerator(config.getString("MCR.Persistence.User.Store.Table.Groups", "MCRGROUPS"), "org.mycore.backend.hibernate.tables.MCRGROUPS", "", 1);
             map.addIDColumn("gid", "GID", dbString, 20, "assigned", false);
             map.addColumn("creator", "CREATOR", dbString, 20, true, false, false);
             map.addColumn("creationdate", "CREATIONDATE", dbTimestamp, 0, true, false, false);
@@ -136,7 +136,7 @@ public class MCRHIBMapping {
             cfg.addXML(map.getTableXML());
 
             // Link Href
-            map = new MCRTableGenerator(config.getString("MCR.linktable_store_sql_table_href", "MCRLINKHREF"), "org.mycore.backend.hibernate.tables.MCRLINKHREF", "", 3);
+            map = new MCRTableGenerator(config.getString("MCR.Persistence.LinkTable.Store.Table", "MCRLINKHREF"), "org.mycore.backend.hibernate.tables.MCRLINKHREF", "", 3);
             map.addIDColumn("mcrfrom", "MCRFROM", dbString, 64, "assigned", false);
             map.addIDColumn("mcrto", "MCRTO", dbString, 194, "assigned", false);
             map.addIDColumn("mcrtype", "MCRTYPE", dbString, 75, "assigned", false);
@@ -144,13 +144,13 @@ public class MCRHIBMapping {
             cfg.addXML(map.getTableXML());
 
             // URN store
-            map = new MCRTableGenerator(config.getString("MCR.urn_store_sql_table", "MCRURN"), "org.mycore.backend.hibernate.tables.MCRURN", "", 2);
+            map = new MCRTableGenerator(config.getString("MCR.Persistence.URN.Store.Table", "MCRURN"), "org.mycore.backend.hibernate.tables.MCRURN", "", 2);
             map.addIDColumn("mcrid", "MCRID", dbString, 64, "assigned", false);
             map.addIDColumn("mcrurn", "MCRURN", dbString, 194, "assigned", false);
             cfg.addXML(map.getTableXML());
 
             // User
-            map = new MCRTableGenerator(config.getString("MCR.users_store_sql_table_users", "MCRUSERS"), "org.mycore.backend.hibernate.tables.MCRUSERS", "", 2);
+            map = new MCRTableGenerator(config.getString("MCR.Persistence.User.Store.Table.Users", "MCRUSERS"), "org.mycore.backend.hibernate.tables.MCRUSERS", "", 2);
             map.addIDColumn("numid", "NUMID", dbInt, 0, "assigned", false);
             map.addIDColumn("uid", "UID", dbString, 20, "assigned", false);
             map.addColumn("creator", "CREATOR", dbString, 20, true, false, false);
@@ -180,7 +180,7 @@ public class MCRHIBMapping {
             cfg.addXML(map.getTableXML());
 
             // XML Table
-            map = new MCRTableGenerator(config.getString("MCR.xml_store_sql_table", "MCRXMLTABLE"), "org.mycore.backend.hibernate.tables.MCRXMLTABLE", "", 3);
+            map = new MCRTableGenerator(config.getString("MCR.Persistence.XML.Store.Table", "MCRXMLTABLE"), "org.mycore.backend.hibernate.tables.MCRXMLTABLE", "", 3);
             map.addIDColumn("id", "MCRID", dbString, 64, "assigned", false);
             map.addIDColumn("version", "MCRVERSION", dbInt, 64, "assigned", false);
             map.addIDColumn("type", "MCRTYPE", dbString, 64, "assigned", false);
@@ -193,7 +193,7 @@ public class MCRHIBMapping {
             // MCR.hibernate.hbm.xml.TABLENAME=TABLENAME.hbm.xml
             // the -.hbm.xml files must be copied in the classpath before
             // starting ant create.hibernate or ant create.metastore
-            Properties hbmxmlProps = config.getProperties("MCR.hibernate.hbm.xml");
+            Properties hbmxmlProps = config.getProperties("MCR.Persistence.Hibernate.HBM.XML");
             for (Enumeration en = hbmxmlProps.propertyNames(); en.hasMoreElements();) {
                 cfg.addResource(config.getString((String) en.nextElement()));
             }

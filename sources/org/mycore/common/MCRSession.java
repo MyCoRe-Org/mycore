@@ -73,11 +73,11 @@ public class MCRSession implements Cloneable {
 
     /**
      * The constructor of a MCRSession. As default the user ID is set to the
-     * value of the property variable named 'MCR.users_guestuser_username'.
+     * value of the property variable named 'MCR.Users.Guestuser.UserName'.
      */
     public MCRSession() {
         MCRConfiguration config = MCRConfiguration.instance();
-        userID = config.getString("MCR.users_guestuser_username", "gast");
+        userID = config.getString("MCR.Users.Guestuser.UserName", "gast");
         language = config.getString("MCR.Metadata.DefaultLang", "de");
 
         ip = "";

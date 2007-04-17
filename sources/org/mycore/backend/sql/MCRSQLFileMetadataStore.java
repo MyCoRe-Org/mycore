@@ -42,7 +42,7 @@ public class MCRSQLFileMetadataStore implements MCRFileMetadataStore {
 
     public MCRSQLFileMetadataStore() throws MCRPersistenceException {
         MCRConfiguration config = MCRConfiguration.instance();
-        table = config.getString("MCR.IFS.FileMetadataStore.SQL.TableName");
+        table = config.getString("MCR.Persistence.IFS.FileMetadataStore.Table");
 
         if (!MCRSQLConnection.doesTableExist(table)) {
             createTable();

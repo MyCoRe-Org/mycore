@@ -415,7 +415,7 @@ public class MCRUtils {
      */
     public static final byte[] getByteArray(org.jdom.Document jdom) throws MCRPersistenceException {
         MCRConfiguration conf = MCRConfiguration.instance();
-        String mcr_encoding = conf.getString("MCR.metadata_default_encoding", DEFAULT_ENCODING);
+        String mcr_encoding = conf.getString("MCR.Metadata.DefaultEncoding", DEFAULT_ENCODING);
         ByteArrayOutputStream outb = new ByteArrayOutputStream();
 
         try {

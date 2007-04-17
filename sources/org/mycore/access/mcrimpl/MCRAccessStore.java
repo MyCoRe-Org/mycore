@@ -36,7 +36,7 @@ import org.mycore.datamodel.common.MCRXMLTableManager;
  * The purpose of this interface is to make the choice of the persistence layer
  * configurable. Any concrete database-class which stores MyCoRe Access control
  * must implement this interface. Which database actually will be used can then
- * be configured by reading the value <code>MCR.accessstore_class_name</code>
+ * be configured by reading the value <code>MCR.Persistence.Access.Store.Class</code>
  * from mycore.properties.access
  * 
  * @author Arne Seifert
@@ -73,9 +73,9 @@ public abstract class MCRAccessStore {
     
     final protected static String sqlDateformat = "yyyy-MM-dd HH:mm:ss";
 
-    final protected static String SQLAccessCtrlRule = MCRConfiguration.instance().getString("MCR.access_store_sql_table_rule", "MCRACCESSRULE");
+    final protected static String SQLAccessCtrlRule = MCRConfiguration.instance().getString("MCR.Persistence.Access.Store.Table.Rule", "MCRACCESSRULE");
 
-    final protected static String SQLAccessCtrlMapping = MCRConfiguration.instance().getString("MCR.access_store_sql_table_map", "MCRACCESS");
+    final protected static String SQLAccessCtrlMapping = MCRConfiguration.instance().getString("MCR.Persistence.Access.Store.Table.Map", "MCRACCESS");
 
     final protected static String AccessPools = MCRConfiguration.instance().getString("MCR.AccessPools", "read,write,delete");
 
@@ -84,7 +84,7 @@ public abstract class MCRAccessStore {
     public static MCRAccessStore getInstance() {
         try {
             if (implementation == null) {
-                implementation = (MCRAccessStore) MCRConfiguration.instance().getSingleInstanceOf("MCR.accessstore_class_name", "org.mycore.backend.hibernate.MCRHIBAccessStore");
+                implementation = (MCRAccessStore) MCRConfiguration.instance().getSingleInstanceOf("MCR.Persistence.Access.Store.Class", "org.mycore.backend.hibernate.MCRHIBAccessStore");
             }
         } catch (Exception e) {
             logger.error(e);
@@ -131,7 +131,7 @@ public abstract class MCRAccessStore {
             List elements = new LinkedList();
             MCRAccessDefinition def = null;
             
-            if (MCRConfiguration.instance().getBoolean("MCR.type_" + type)){
+            if (MCRConfiguration.instance().getBoolean("MCR.Metadata.Type." + type)){
                 elements = MCRXMLTableManager.instance().retrieveAllIDs(type);
             }
             

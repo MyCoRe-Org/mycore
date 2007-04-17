@@ -77,8 +77,8 @@ public class MCRAdminServlet extends MCRServlet{
 	 */
 	public static boolean createAdminDefaultRule() {
 		try {
-			MCRAccessStore accessStore = (MCRAccessStore) Class.forName(CONFIG.getString("MCR.accessstore_class_name")).newInstance();
-			MCRRuleStore ruleStore = (MCRRuleStore) Class.forName(CONFIG.getString("MCR.rulestore_class_name")).newInstance();			
+			MCRAccessStore accessStore = (MCRAccessStore) Class.forName(CONFIG.getString("MCR.Persistence.Access.Store.Class")).newInstance();
+			MCRRuleStore ruleStore = (MCRRuleStore) Class.forName(CONFIG.getString("MCR.Persistence.Rule.Store_Class")).newInstance();			
 			String ruleID = "STANDARD-ACCESS-ADMIN-RULE";
 			MCRAccessRule rule = ruleStore.getRule(ruleID);
 			if (rule == null || rule.equals("")) {

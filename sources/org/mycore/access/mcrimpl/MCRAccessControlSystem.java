@@ -60,7 +60,7 @@ public class MCRAccessControlSystem extends MCRAccessBaseImpl{
 	public static final String poolPrivilegeID = "POOLPRIVILEGE" ;
 	public static final String lexicographicalPattern = "0000000000" ;
 	
-	static String superuserID = MCRConfiguration.instance().getString("MCR.users_superuser_username", "mcradmin");
+	static String superuserID = MCRConfiguration.instance().getString("MCR.Users.Superuser.UserName", "mcradmin");
 	
     static MCRCache cache;
 

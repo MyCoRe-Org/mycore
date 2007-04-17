@@ -70,10 +70,10 @@ public class MCRSQLUserStore implements MCRUserStore {
     public MCRSQLUserStore() {
         // set configuration
         MCRConfiguration config = MCRConfiguration.instance();
-        SQLUsersTable = config.getString("MCR.users_store_sql_table_users", "MCRUSERS");
-        SQLGroupsTable = config.getString("MCR.users_store_sql_table_groups", "MCRGROUPS");
-        SQLGroupMembersTable = config.getString("MCR.users_store_sql_table_group_members", "MCRGROUPMEMBERS");
-        SQLGroupAdminsTable = config.getString("MCR.users_store_sql_table_group_admins", "MCRGROUPADMINS");
+        SQLUsersTable = config.getString("MCR.Persistence.User.Store.Table.Users", "MCRUSERS");
+        SQLGroupsTable = config.getString("MCR.Persistence.User.Store.Table.Groups", "MCRGROUPS");
+        SQLGroupMembersTable = config.getString("MCR.Persistence.User.Store.Table.GroupMembers", "MCRGROUPMEMBERS");
+        SQLGroupAdminsTable = config.getString("MCR.Persistence.User.Store.Table.GroupAdmins", "MCRGROUPADMINS");
 
         // create tables
         if (!MCRSQLConnection.doesTableExist(SQLUsersTable)) {

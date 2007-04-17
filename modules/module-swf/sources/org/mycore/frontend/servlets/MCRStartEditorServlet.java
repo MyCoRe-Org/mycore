@@ -400,10 +400,7 @@ public class MCRStartEditorServlet extends MCRServlet {
             der.deleteFromDatastore(mysemcrid);
 
             MCRObjectID ID = new MCRObjectID(myremcrid);
-            StringBuffer sb = (new StringBuffer("MCR.type_")).append(ID.getTypeId()).append("_in");
-
-            String searchtype = CONFIG.getString(sb.toString(), ID.getTypeId());
-            sb = new StringBuffer();
+            StringBuffer sb = new StringBuffer();
             sb.append("receive/").append(myremcrid);
             myfile = sb.toString();
         } catch (Exception e) {

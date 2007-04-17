@@ -39,8 +39,8 @@ import org.mycore.common.MCRException;
  * The purpose of this interface is to make the choice of the persistence layer
  * configurable. Any concrete database-class which stores MyCoRe Access control
  * must implement this interface. Which database actually will be used can then
- * be configured by reading the value <code>MCR.userstore_class_name</code>
- * from mycore.properties.
+ * be configured by reading the value <code>MCR.Persistence.Access.Store.Table.Rule</code>
+ * and <code>MCR.Persistence.Access.Store.Table.Map</code> from mycore.properties.
  * 
  * @author Arne Seifert
  * @version $Revision$ $Date$

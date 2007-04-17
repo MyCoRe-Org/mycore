@@ -68,7 +68,7 @@ public class MCRSQLTableCreate extends MCRAbstractCommands {
     public static void createTableForType(String type) {
         LOGGER.info("Create the SQL table for type " + type);
 
-        boolean test = CONFIG.getBoolean("MCR.type_" + type, false);
+        boolean test = CONFIG.getBoolean("MCR.Metadata.Type." + type, false);
 
         if (!test) {
             throw new MCRPersistenceException("Wront type " + type + " to create SQL tables!");

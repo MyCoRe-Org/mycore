@@ -163,7 +163,7 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
         newDerivate = true;
         derivate = new MCRDerivate();
         derivate.setId(newDerID);
-        String schema = CONFIG.getString("MCR.persistence_config_derivate", "datamodel-derivate.xml").replaceAll(".xml", ".xsd");
+        String schema = CONFIG.getString("MCR.Metadata.Config.derivate", "datamodel-derivate.xml").replaceAll(".xml", ".xsd");
         derivate.setSchema(schema);
         derivate.setLabel("data object from " + docId);
         // set link to Object

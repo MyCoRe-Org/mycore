@@ -43,7 +43,7 @@ import org.mycore.common.MCRPersistenceException;
  * <li><b>MCR.IFS.FileMetadataStore.Class: </b> The class that implements the
  * MCRFileMetadataStore interface and that should be used to store the
  * persistent metadata.</li>
- * <li><b>MCR.IFS.FileMetadataStore.CacheSize: </b> The size of the cache
+ * <li><b>MCR.Persistence.IFS.FileMetadataStore.CacheSize: </b> The size of the cache
  * holding the most recently used MCRFilesystemNodes expressed as maximum number
  * of node objects in the cache.</li>
  * </ul>
@@ -79,7 +79,7 @@ public class MCRFileMetadataManager {
         MCRConfiguration config = MCRConfiguration.instance();
 
         // The FileMetadataStore to use
-        Object object = config.getInstanceOf("MCR.IFS.FileMetadataStore.Class");
+        Object object = config.getInstanceOf("MCR.Persistence.IFS.FileMetadataStore.Class");
         store = (MCRFileMetadataStore) object;
 
         // The cache size for the MCRFilesystemNode cache

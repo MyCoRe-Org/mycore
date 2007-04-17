@@ -80,7 +80,7 @@ public class MCRSQLXMLStore implements MCRXMLTableInterface {
             throw new MCRPersistenceException("The type of the constructor" + " is null or empty.");
         }
 
-        boolean test = config.getBoolean("MCR.type_" + type, false);
+        boolean test = config.getBoolean("MCR.Metadata.Type." + type, false);
 
         if (!test) {
             throw new MCRPersistenceException("The type " + type + " of the constructor" + " is false.");
@@ -89,8 +89,8 @@ public class MCRSQLXMLStore implements MCRXMLTableInterface {
         mytype = type;
 
         // set configuration
-        tableName = config.getString("MCR.xml_store_sql_table_" + mytype, "MCRXMLTABLE");
-        blobsize = config.getString("MCR.xml_store_sql_size_" + mytype, "BLOB");
+        tableName = config.getString("MCR.Persistence.XML.Store.Table" + mytype, "MCRXMLTABLE");
+        blobsize = config.getString("MCR.Persistence.XML.Store.Blob", "BLOB");
 
         if (!MCRSQLConnection.doesTableExist(tableName)) {
             logger.info("Create table " + tableName + " with size " + blobsize);

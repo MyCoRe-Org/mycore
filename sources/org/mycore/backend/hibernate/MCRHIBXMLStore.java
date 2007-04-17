@@ -76,7 +76,7 @@ public class MCRHIBXMLStore implements MCRXMLTableInterface {
             throw new MCRPersistenceException("The type of the constructor" + " is null or empty.");
         }
 
-        boolean test = config.getBoolean("MCR.type_" + type, false);
+        boolean test = config.getBoolean("MCR.Metadata.Type." + type, false);
 
         if (!test) {
             throw new MCRPersistenceException("The type " + type + " of the constructor" + " is false.");

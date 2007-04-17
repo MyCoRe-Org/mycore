@@ -88,8 +88,8 @@ public class MCRUserMgr {
     private MCRUserMgr() throws MCRException {
         config = MCRConfiguration.instance();
 
-        String userStoreName = config.getString("MCR.userstore_class_name");
-        useEncryption = config.getBoolean("MCR.users_use_password_encryption", false);
+        String userStoreName = config.getString("MCR.Persistence.User.Store.Class");
+        useEncryption = config.getBoolean("MCR.Users.UsePasswordEncryption", false);
 
         try {
             mcrUserStore = (MCRUserStore) Class.forName(userStoreName).newInstance();

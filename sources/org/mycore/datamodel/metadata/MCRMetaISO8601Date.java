@@ -213,7 +213,7 @@ public final class MCRMetaISO8601Date extends MCRMetaDefault {
         try {
             dt = getDateTime(FormatChooser.cropSecondFractions(isoString));
         } catch (RuntimeException e) {
-            boolean strictParsingEnabled=CONFIG.getBoolean("MCR.SimpleDateFormat.strictParsing",true);
+            boolean strictParsingEnabled=CONFIG.getBoolean("MCR.Metadata.SimpleDateFormat.StrictParsing",true);
             if (!strictParsingEnabled){
                 /*
                  * Last line of defence against the worst dates of the universe ;o)
@@ -229,7 +229,7 @@ public final class MCRMetaISO8601Date extends MCRMetaDefault {
     }
     
     private DateTime guessDateTime(String date){
-        String locales=CONFIG.getString("MCR.SimpleDateFormat.locales","de_DE");
+        String locales=CONFIG.getString("MCR.Metadata.SimpleDateFormat.Locales","de_DE");
         StringTokenizer tok=new StringTokenizer(locales,",");
         while (tok.hasMoreTokens()){
             Locale locale= getLocale(tok.nextToken());

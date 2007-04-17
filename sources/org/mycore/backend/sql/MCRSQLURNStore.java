@@ -37,7 +37,7 @@ public class MCRSQLURNStore implements MCRURNStore {
     private String table;
 
     public MCRSQLURNStore() {
-        table = MCRConfiguration.instance().getString("MCR.URN.SQLStore.TableName");
+        table = MCRConfiguration.instance().getString("MCR.Persistence.URN.Store.Table");
         if (!MCRSQLConnection.doesTableExist(table)) {
             MCRSQLStatement stmt = new MCRSQLStatement(table);
             stmt.addColumn("URN VARCHAR(250) NOT NULL PRIMARY KEY");

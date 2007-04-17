@@ -32,7 +32,7 @@ import org.mycore.common.MCRException;
  * configurable. Any concrete database-class which stores MyCoRe user, group and
  * privilege information must implement this interface. Which database actually
  * will be used can then be configured by reading the value
- * <code>MCR.userstore_class_name</code> from mycore.properties.
+ * <code>MCR.Persistence.User.Store.Class</code> from mycore.properties.
  * 
  * @author Detlev Degenhardt
  * @version $Revision$ $Date$
