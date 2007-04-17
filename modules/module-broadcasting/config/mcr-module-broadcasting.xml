@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!-- ============================================== -->
+<!--  MyCoRe - Module-Broadcasting 					-->
+<!--  												-->
+<!-- Module-Broadcasting 1.0, 05-2006  				-->
+<!-- +++++++++++++++++++++++++++++++++++++			-->
+<!--  												-->
+<!-- Andreas Trappe 	- idea, concept, dev.		-->
+<!--												-->
+<!-- ============================================== -->
+
+<mcr-module-broadcasting>
+	
+	<!-- on | off -->
+	<power>on</power>
+	
+	<!-- <group/> &| <user> -->
+	<!-- allowGuestGroup ("true|false") 
+	=> if set to true all "gast" users are listen on the channel, if "false" only user != "gast" are listen -->
+	<receivers allowGuestGroup="true">
+		<groups>
+			<message>Caution, root!</message>
+			<group>rootgroup</group>
+		</groups>
+		<users>
+			<message>Hello Author1A!</message>			
+			<user>author1a</user>
+		</users>
+	</receivers>
+	
+	<!-- ... -->
+	<onAirTime>
+		<!-- ISO 8601-->
+		<from>2006-10-20T10:17:42.920Z</from>
+		<!-- ISO 8601-->		
+		<to>2006-10-20T10:17:42.920Z</to>
+	</onAirTime>
+	
+</mcr-module-broadcasting>
