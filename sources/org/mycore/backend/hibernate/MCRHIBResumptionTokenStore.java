@@ -50,10 +50,10 @@ public class MCRHIBResumptionTokenStore implements MCROAIResumptionTokenStore
     // logger
     static Logger logger=Logger.getLogger(MCRHIBResumptionTokenStore.class);
 
-    private static final String STR_OAI_RESUMPTIONTOKEN_TIMEOUT = "MCR.oai.resumptiontoken.timeout";
-    private static final String STR_OAI_REPOSITORY_IDENTIFIER = "MCR.oai.repositoryidentifier"; // Identifier
-    private static final String STR_OAI_SEPARATOR_OAIHIT = "MCR.oai.separator.oaihit"; // A String not allowed in MCROBJIDs
-    private static final String STR_OAI_SEPARATOR_SPEC = "MCR.oai.separator.spec"; // A String not allowed in SPECS and SPECDESCRIPTIONS
+    private static final String STR_OAI_RESUMPTIONTOKEN_TIMEOUT = "MCR.OAI.Resumptiontoken.Timeout";
+    private static final String STR_OAI_REPOSITORY_IDENTIFIER = "MCR.OAI.Repository.Identifier"; // Identifier
+    private static final String STR_OAI_SEPARATOR_OAIHIT = "MCR.OAI.Separator.Hit"; // A String not allowed in MCROBJIDs
+    private static final String STR_OAI_SEPARATOR_SPEC = "MCR.OAI.Separator.Spec"; // A String not allowed in SPECS and SPECDESCRIPTIONS
 
     static MCRConfiguration config;
 

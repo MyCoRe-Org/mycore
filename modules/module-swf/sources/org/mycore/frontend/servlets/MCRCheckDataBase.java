@@ -111,7 +111,7 @@ abstract public class MCRCheckDataBase extends MCRCheckBase {
 
         // Save the incoming to a file
         byte[] outxml = MCRUtils.getByteArray(indoc);
-        String savedir = CONFIG.getString("MCR.editor_" + ID.getTypeId() + "_directory");
+        String savedir = CONFIG.getString("MCR.SWF.Directory." + ID.getTypeId());
         String NL = System.getProperty("file.separator");
         String fullname = savedir + NL + ID.getId() + ".xml";
         storeMetadata(outxml, job, ID, fullname);
@@ -202,7 +202,7 @@ abstract public class MCRCheckDataBase extends MCRCheckBase {
         String sessionID = "";
         HttpSession session = job.getRequest().getSession(false);
         if (session != null) {
-            String jSessionID = CONFIG.getString("MCR.session.param", ";jsessionid=");
+            String jSessionID = CONFIG.getString("MCR.Session.Param", ";jsessionid=");
             sessionID = jSessionID + session.getId();
         }
         
@@ -212,8 +212,8 @@ abstract public class MCRCheckDataBase extends MCRCheckBase {
         }
 
         // prepare editor with error messages
-        String pagedir = CONFIG.getString("MCR.editor_page_dir", "");
-        String myfile = pagedir + CONFIG.getString("MCR.editor_page_error_formular", "editor_error_formular.xml");
+        String pagedir = CONFIG.getString("MCR.SWF.PageDir", "");
+        String myfile = pagedir + CONFIG.getString("MCR.SWF.PageErrorFormular", "editor_error_formular.xml");
         org.jdom.Document jdom = null;
 
         try {

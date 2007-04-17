@@ -93,19 +93,19 @@ public class MCRStartEditorServlet extends MCRServlet {
     protected static String SLASH = System.getProperty("file.separator");;
 
     // static pages
-    protected static String pagedir = CONFIG.getString("MCR.editor_page_dir", "");
+    protected static String pagedir = CONFIG.getString("MCR.SWF.PageDir", "");
 
-    protected static String cancelpage = pagedir + CONFIG.getString("MCR.editor_page_cancel", "editor_cancel.xml");
+    protected static String cancelpage = pagedir + CONFIG.getString("MCR.SWF.PageCancel", "editor_cancel.xml");
 
-    protected static String deletepage = pagedir + CONFIG.getString("MCR.editor_page_delete", "editor_delete.xml");
+    protected static String deletepage = pagedir + CONFIG.getString("MCR.SWF.PageDelete", "editor_delete.xml");
 
-    protected static String usererrorpage = pagedir + CONFIG.getString("MCR.editor_page_error_user", "editor_error_user.xml");
+    protected static String usererrorpage = pagedir + CONFIG.getString("MCR.SWF.PageErrorUser", "editor_error_user.xml");
 
-    protected static String mcriderrorpage = pagedir + CONFIG.getString("MCR.editor_page_error_mcrid", "editor_error_mcrid.xml");
+    protected static String mcriderrorpage = pagedir + CONFIG.getString("MCR.SWF.PageErrorMcrid", "editor_error_mcrid.xml");
 
-    protected static String storeerrorpage = pagedir + CONFIG.getString("MCR.editor_page_error_store", "editor_error_store.xml");
+    protected static String storeerrorpage = pagedir + CONFIG.getString("MCR.SWF.PageErrorStore", "editor_error_store.xml");
 
-    protected static String deleteerrorpage = pagedir + CONFIG.getString("MCR.editor_page_error_delete", "editor_error_delete.xml");
+    protected static String deleteerrorpage = pagedir + CONFIG.getString("MCR.SWF.PageErrorDelete", "editor_error_delete.xml");
 
     // common data
     protected String mystep = null; // the special step for todo
@@ -176,11 +176,11 @@ public class MCRStartEditorServlet extends MCRServlet {
 
         // get the type
         mytype = getProperty(job.getRequest(), "type");
-        if (mytype == null) {
-            mytype = CONFIG.getString("MCR.default_project_type", "document");
+        if (mytype == null)  {
+            mytype = CONFIG.getString("MCR.SWF.Project.Type", "document");
         }
         if (mytype.length() == 0) {
-            mytype = CONFIG.getString("MCR.default_project_type", "document");
+            mytype = CONFIG.getString("MCR.SWF.Project.Type", "document");
         }
         LOGGER.info("TYPE = " + mytype);
 
@@ -207,8 +207,8 @@ public class MCRStartEditorServlet extends MCRServlet {
         }
 
         if ((mytfmcrid == null) || ((mytfmcrid = mytfmcrid.trim()).length() == 0)) {
-            String defaproject = CONFIG.getString("MCR.default_project_id", "MCR");
-            String myproject = CONFIG.getString("MCR." + mytype + "_project_id", "MCR");
+            String defaproject = CONFIG.getString("MCR.SWF.Project.ID", "MCR");
+            String myproject = CONFIG.getString("MCR.SWF.Project.ID." + mytype , "MCR");
 
             if (myproject.equals("MCR")) {
                 myproject = defaproject;
@@ -219,7 +219,7 @@ public class MCRStartEditorServlet extends MCRServlet {
             MCRObjectID mcridnext = new MCRObjectID();
             mcridnext.setNextFreeId(myproject);
 
-            String workdir = CONFIG.getString("MCR.editor_" + mytype + "_directory", "/");
+            String workdir = CONFIG.getString("MCR.SWF.Directory." + mytype, "/");
             File workf = new File(workdir);
 
             if (workf.isDirectory()) {
@@ -411,7 +411,7 @@ public class MCRStartEditorServlet extends MCRServlet {
 
         if (addr.size() != 0) {
             String sender = WFM.getMailSender();
-            String appl = CONFIG.getString("MCR.editor_mail_application_id", "DocPortal");
+            String appl = CONFIG.getString("MCR.SWF.Mail.ApplicationID", "DocPortal");
             String subject = "Automaticaly message from " + appl;
             StringBuffer text = new StringBuffer();
             text.append("Es wurde ein Derivate mit der ID ").append(mysemcrid).append(" des Objektes mit der ID ").append(mysemcrid).append(" aus dem Server gel�scht.");
@@ -512,7 +512,7 @@ public class MCRStartEditorServlet extends MCRServlet {
 
         if (addr.size() != 0) {
             String sender = WFM.getMailSender();
-            String appl = CONFIG.getString("MCR.editor_mail_application_id", "DocPortal");
+            String appl = CONFIG.getString("MCR.SWF.Mail.ApplicationID", "DocPortal");
             String subject = "Automaticaly message from " + appl;
             StringBuffer text = new StringBuffer();
             text.append("Es wurde ein Objekt vom Typ ").append(mytype).append(" mit der ID ").append(mytfmcrid).append(" aus dem Server gel�scht.");
@@ -725,10 +725,7 @@ public class MCRStartEditorServlet extends MCRServlet {
         }
 
         MCRObjectID ID = new MCRObjectID(myremcrid);
-        StringBuffer sb = new StringBuffer();
-        sb = (new StringBuffer("MCR.type_")).append(ID.getTypeId()).append("_in");
-
-        sb = new StringBuffer(getBaseURL());
+        StringBuffer sb = new StringBuffer(getBaseURL());
         sb.append("receive/").append(myremcrid);
         job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(sb.toString()));
     }
@@ -794,7 +791,7 @@ public class MCRStartEditorServlet extends MCRServlet {
 
                 if (addr.size() != 0) {
                     String sender = WFM.getMailSender();
-                    String appl = CONFIG.getString("MCR.editor_mail_application_id", "DocPortal");
+                    String appl = CONFIG.getString("MCR.SWF.Mail.ApplicationID", "DocPortal");
                     String subject = "Automaticaly message from " + appl;
                     StringBuffer text = new StringBuffer();
                     text.append("Es wurde ein Objekt vom Typ ").append(mytype).append(" mit der ID ").append(mysemcrid).append(" aus dem Workflow in das System geladen.");
@@ -854,7 +851,7 @@ public class MCRStartEditorServlet extends MCRServlet {
 
         if (addr.size() != 0) {
             String sender = WFM.getMailSender();
-            String appl = CONFIG.getString("MCR.editor_mail_application_id", "DocPortal");
+            String appl = CONFIG.getString("MCR.SWF.Mail.ApplicationID", "DocPortal");
             String subject = "Automaticaly message from " + appl;
             StringBuffer text = new StringBuffer();
             text.append("Es wurde ein Derivate mit der ID ").append(mysemcrid).append(" aus dem Workflow gel�scht.");
@@ -955,7 +952,7 @@ public class MCRStartEditorServlet extends MCRServlet {
 
         if (addr.size() != 0) {
             String sender = WFM.getMailSender();
-            String appl = CONFIG.getString("MCR.editor_mail_application_id", "DocPortal");
+            String appl = CONFIG.getString("MCR.SWF.Mail.ApplicationID", "DocPortal");
             String subject = "Automaticaly message from " + appl;
             StringBuffer text = new StringBuffer();
             text.append("Es wurde ein Objekt vom Typ ").append(mytype).append(" mit der ID ").append(mysemcrid).append(" aus dem Workflow gel�scht.");
@@ -991,7 +988,7 @@ public class MCRStartEditorServlet extends MCRServlet {
 
         // read file
         StringBuffer sb = new StringBuffer();
-        sb.append(CONFIG.getString("MCR.editor_" + mcrmysemcrid.getTypeId() + "_directory")).append(SLASH).append(mysemcrid).append(".xml");
+        sb.append(CONFIG.getString("MCR.SWF.Directory." + mcrmysemcrid.getTypeId())).append(SLASH).append(mysemcrid).append(".xml");
         org.jdom.Element service = null;
         try {
             File fi = new File(sb.toString());
@@ -1080,7 +1077,7 @@ public class MCRStartEditorServlet extends MCRServlet {
             return;
         }
 
-        File wfFile=new File(CONFIG.getString("MCR.editor_" + mytype + "_directory"),mysemcrid+".xml");
+        File wfFile=new File(CONFIG.getString("MCR.SWF.Directory." + mytype),mysemcrid+".xml");
         String base = getBaseURL() + myfile;
         Properties params = new Properties();
         params.put("sourceUri", wfFile.toURI().toString());

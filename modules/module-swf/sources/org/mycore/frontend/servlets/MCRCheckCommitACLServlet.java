@@ -59,7 +59,7 @@ public class MCRCheckCommitACLServlet extends MCRCheckACLBase {
         if (okay) {
             sb.append("receive/").append(ID.getId());
         } else {
-            sb.append(CONFIG.getString("MCR.editor_page_dir", "")).append(CONFIG.getString("MCR.editor_page_error_store", "editor_error_store.xml"));
+            sb.append(CONFIG.getString("MCR.SWF.PageDir", "")).append(CONFIG.getString("MCR.SWF.PageErrorStore", "editor_error_store.xml"));
         }
         return sb.toString();
     }
@@ -78,7 +78,7 @@ public class MCRCheckCommitACLServlet extends MCRCheckACLBase {
         }
 
         String sender = WFM.getMailSender();
-        String appl = CONFIG.getString("MCR.editor_mail_application_id", "DocPortal");
+        String appl = CONFIG.getString("MCR.SWF.Mail.ApplicationID", "DocPortal");
         String subject = "Automaticaly message from " + appl;
         StringBuffer text = new StringBuffer();
         text.append("The ACL data of the MyCoRe object of type ").append(ID.getTypeId()).append(" with the ID ").append(ID.getId()).append(" in the server was changes.");
@@ -113,8 +113,8 @@ public class MCRCheckCommitACLServlet extends MCRCheckACLBase {
         try {
             obj.updateInDatastore();
         } catch (Exception ex) {
-            LOGGER.error(ex.getMessage());
-            LOGGER.error("Exception while store " + ID.getId() + "to server.");
+            ex.printStackTrace();
+            LOGGER.error("Exception while store " + ID.getId() + " to server.");
             try {
                 errorHandlerIO(job);
             } catch (Exception ioe) {

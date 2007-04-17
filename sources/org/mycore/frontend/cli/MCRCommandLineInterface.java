@@ -116,8 +116,8 @@ public class MCRCommandLineInterface {
 		// **************************************
 		// Read internal and/or external commands
 		// **************************************
-		readCommands("MCR.internal_command_classes", "internal");
-		readCommands("MCR.external_command_classes", "external");
+		readCommands("MCR.CLI.Classes.Internal", "internal");
+		readCommands("MCR.CLI.Classes.External", "external");
 	}
 
 	private static void readCommands(String property, String type) {

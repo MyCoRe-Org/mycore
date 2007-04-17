@@ -24,15 +24,15 @@ public class MCROAIConfigBean {
 
 	public MCROAIConfigBean(String instance) {
     	this.oaiInstanceName = instance;
-    	String restriction = config.getString("MCR.oai.queryRestriction." + instance,"");
+    	String restriction = config.getString("MCR.OAI.QueryRestriction." + instance,"");
     	if(!restriction.equals("")) {
     		this.queryRestriction = restriction;
     	}
-    	String[] searchFieldsAr = config.getString("MCR.oai.setscheme.searchfields." + instance,"format,type").replaceAll(" ","").split(",");
+    	String[] searchFieldsAr = config.getString("MCR.OAI.Setscheme.Searchfields." + instance,"format,type").replaceAll(" ","").split(",");
     	this.searchFields = Arrays.asList(searchFieldsAr);
-    	List lstClassificationIDs = new ArrayList();
+    	List<String> lstClassificationIDs = new ArrayList<String>();
     	for(int i=0;i<searchFieldsAr.length;i++){
-    		String[] classIDs = config.getString("MCR.oai.setscheme.classids." + instance+"."+searchFieldsAr[i]).replaceAll(" ","").split(",");
+    		String[] classIDs = config.getString("MCR.OAI.Setscheme.Classids." + instance+"."+searchFieldsAr[i]).replaceAll(" ","").split(",");
     		for(int j=0;j<classIDs.length;j++){
     			lstClassificationIDs.add(classIDs[j]);
     		}
@@ -40,13 +40,13 @@ public class MCROAIConfigBean {
     	this.classificationIDs =(String[]) lstClassificationIDs.toArray(new String[]{});
     	
     	if(this.classificationIDs.length == 0){
-    		logger.error("no classification entry found in MCR.oai.setscheme.classids." + instance);
+    		logger.error("no classification entry found in MCR.OAI.Setscheme.Classids." + instance);
     		this.classificationIDs = new String[2];
     		this.classificationIDs[0] = "DocPortal_class_00000006" ;
     		this.classificationIDs[0] = "DocPortal_class_00000005" ;
     	}
-    	this.repositoryIdentifier = config.getString("MCR.oai.repositoryidentifier." + instance,"oai.mycore.de");
-    	this.repositoryName = config.getString("MCR.oai.repositoryname." + instance,"MyCoRe Repository fuer Online Hochschulschriften");
+    	this.repositoryIdentifier = config.getString("MCR.OAI.Repository.Identifier." + instance,"oai.mycore.de");
+    	this.repositoryName = config.getString("MCR.OAI.Repository.Name." + instance,"MyCoRe Repository fuer Online Hochschulschriften");
 	}
 
 
@@ -55,7 +55,7 @@ public class MCROAIConfigBean {
 	}
 	
 	public String[] getClassificationIDsForSearchField(String searchField){
-		return config.getString("MCR.oai.setscheme.classids." + oaiInstanceName+"."+searchField).replaceAll(" ","").split(",");
+		return config.getString("MCR.OAI.Setscheme.Classids." + oaiInstanceName+"."+searchField).replaceAll(" ","").split(",");
 	}
 
 

@@ -26,8 +26,6 @@ package org.mycore.services.oai;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -74,7 +72,7 @@ import org.mycore.frontend.servlets.MCRServletJob;
 /**
  * This class implements an OAI Data Provider for MyCoRe and Miless
  * 
- * @author Werner Greï¿½hoff
+ * @author Werner Greßhoff
  * @author Heiko Helmbrecht
  * 
  * @version $Revision$ $Date$
@@ -110,37 +108,37 @@ public class MCROAIProvider extends MCRServlet {
     private static String baseurl;
 
     static {
-        Properties props = CONFIG.getProperties("MCR.oai.repositoryidentifier.");
+        Properties props = CONFIG.getProperties("MCR.OAI.Repository.Identifier.");
         oaiConfig = new HashMap();
         for (Enumeration en = props.propertyNames(); en.hasMoreElements();) {
             String propName = (String) en.nextElement();
-            String instance = propName.substring("MCR.oai.repositoryidentifier.".length());
+            String instance = propName.substring("MCR.OAI.Repository.Identifier.".length());
             oaiConfig.put(instance, new MCROAIConfigBean(instance));
         }
-        oaiAdminEmail = CONFIG.getString("MCR.oai.adminemail");
-        oaiProviderFriends = CONFIG.getString("MCR.oai.friends", "");
-        oaiResumptionTokenTimeOut = CONFIG.getInt("MCR.oai.resumptiontoken.timeout", 72);
-        maxReturns = CONFIG.getInt("MCR.oai.maxreturns", 10);
-        resStore = (MCROAIResumptionTokenStore) CONFIG.getInstanceOf("MCR.oai.resumptiontoken.store", "org.mycore.backend.hibernate.MCRHIBResumptionTokenStore");
+        oaiAdminEmail = CONFIG.getString("MCR.OAI.AdmineMail");
+        oaiProviderFriends = CONFIG.getString("MCR.OAI.Friends", "");
+        oaiResumptionTokenTimeOut = CONFIG.getInt("MCR.OAI.Resumptiontoken.Timeout", 72);
+        maxReturns = CONFIG.getInt("MCR.OAI.MaxReturns", 10);
+        resStore = (MCROAIResumptionTokenStore) CONFIG.getInstanceOf("MCR.OAI.Resumptiontoken.Store", "org.mycore.backend.hibernate.MCRHIBResumptionTokenStore");
         baseurl = CONFIG.getString("MCR.baseurl", "");
     }
 
     // property name for the implementing class of MCROAIQuery
-    private static final String STR_OAI_QUERYSERVICE = "MCR.oai.queryservice";
+    private static final String STR_OAI_QUERYSERVICE = "MCR.OAI.QueryService";
 
-    private static final String STR_OAI_METADATA_TRANSFORMER = "MCR.oai.metadata.transformer";
+    private static final String STR_OAI_METADATA_TRANSFORMER = "MCR.OAI.Metadata.Transformer";
 
     // If there are other metadata formats than the standard format oai_dc
     // available,
     // all need a namespace and schema entry
     // of it's own, e.g.
-    // MCR.oai.metadata.namespace.olac=http://www.language-archives.org/OLAC/0.2/
-    // MCR.oai.metadata.schema.olac=http://www.language-archives.org/OLAC/olac-0.2.xsd
-    private static final String STR_OAI_METADATA_NAMESPACE = "MCR.oai.metadata.namespace";
+    // MCR.OAI.Metadata.Namespace.olac=http://www.language-archives.org/OLAC/0.2/
+    // MCR.OAI.Metadata.Schema.olac=http://www.language-archives.org/OLAC/olac-0.2.xsd
+    private static final String STR_OAI_METADATA_NAMESPACE = "MCR.OAI.Metadata.Namespace";
 
-    private static final String STR_OAI_METADATA_ELEMENT = "MCR.oai.metadata.element";
+    private static final String STR_OAI_METADATA_ELEMENT = "MCR.OAI.Metadata.Element";
 
-    private static final String STR_OAI_METADATA_SCHEMA = "MCR.oai.metadata.schema";
+    private static final String STR_OAI_METADATA_SCHEMA = "MCR.OAI.Metadata.Schema";
 
     // Following the DINI recommendation for OAI repositories
     // (http://www.dini.de/documents/OAI-Empfehlungen-Okt2003-de.pdf) there
@@ -1510,7 +1508,7 @@ public class MCROAIProvider extends MCRServlet {
             parameters.put("ServletsBaseURL", servletsBaseURL);
             parameters.put("WebApplicationBaseURL", webApplicationBaseURL);
         }
-        // DNB erlaubt in Epicur-Beschreibung keinen Inhalt fï¿½r das Element
+        // DNB erlaubt in Epicur-Beschreibung keinen Inhalt für das Element
         // <resupply>
         // String email = CONFIG.getString("MCR.oai.epicur.responseemail", "");
         // if(format.contains("epicur")&& !email.equals("")){

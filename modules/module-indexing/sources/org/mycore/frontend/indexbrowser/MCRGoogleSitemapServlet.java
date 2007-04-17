@@ -51,9 +51,9 @@ public final class MCRGoogleSitemapServlet extends MCRServlet {
 
     private static final Logger LOGGER = Logger.getLogger(MCRGoogleSitemapServlet.class);
 
-    private static final String[] types = MCRConfiguration.instance().getString("MCR.googlesitemap.types", "document").split(",");
+    private static final String[] types = MCRConfiguration.instance().getString("MCR.GoogleSitemap.Types", "document").split(",");
 
-    private static final String freq = MCRConfiguration.instance().getString("MCR.googlesitemap.freq", "monthly");
+    private static final String freq = MCRConfiguration.instance().getString("MCR.GoogleSitemap.Freq", "monthly");
 
     private static final MCRXMLTableManager tm = MCRXMLTableManager.instance();
 

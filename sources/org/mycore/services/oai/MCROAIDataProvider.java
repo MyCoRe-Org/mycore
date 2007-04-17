@@ -87,42 +87,42 @@ public class MCROAIDataProvider extends HttpServlet {
 
     // repository independent settings which are used for all repositories
     
-    private static final String STR_OAI_ADMIN_EMAIL = "MCR.oai.adminemail"; 
+    private static final String STR_OAI_ADMIN_EMAIL = "MCR.OAI.AdmineMail"; 
     // EMail address of oai admin repository specific settings. Should be followed by 
     // Servletname so the OAI client may decide which settings belong to itself.
     
-    private static final String STR_OAI_REPOSITORY_NAME = "MCR.oai.repositoryname"; 
+    private static final String STR_OAI_REPOSITORY_NAME = "MCR.OAI.Repository.Name"; 
     // Name of the repository
     
-    private static final String STR_OAI_REPOSITORY_IDENTIFIER = "MCR.oai.repositoryidentifier"; 
+    private static final String STR_OAI_REPOSITORY_IDENTIFIER = "MCR.OAI.Repository.Identifier"; 
     // Identifier of the repository
     
-    private static final String STR_OAI_FRIENDS = "MCR.oai.friends"; 
+    private static final String STR_OAI_FRIENDS = "MCR.OAI.Friends"; 
     // a colon (:) separated list of other OAI repsoitories (friends)
     
-    private static final String STR_OAI_QUERYSERVICE = "MCR.oai.queryservice"; 
+    private static final String STR_OAI_QUERYSERVICE = "MCR.OAI.QueryService"; 
     // implementing class of MCROAIQuery
 
-    private static final String STR_OAI_RESUMPTIONTOKEN_DIR = "MCR.oai.resumptiontoken.dir"; 
+    private static final String STR_OAI_RESUMPTIONTOKEN_DIR = "MCR.OAI.Resumptiontoken.Dir"; 
     // temporary Directory
     
-    private static final String STR_OAI_RESUMPTIONTOKEN_TIMEOUT = "MCR.oai.resumptiontoken.timeout"; 
+    private static final String STR_OAI_RESUMPTIONTOKEN_TIMEOUT = "MCR.OAI.Resumptiontoken.Timeout"; 
     // timeout, after which a resumption token will be deleted
     
-    private static final String STR_OAI_MAXRETURNS = "MCR.oai.maxreturns"; 
+    private static final String STR_OAI_MAXRETURNS = "MCR.OAI.MaxReturns"; 
     // maximum number of returned list sets
 
-    private static final String STR_OAI_METADATA_TRANSFORMER = "MCR.oai.metadata.transformer";
+    private static final String STR_OAI_METADATA_TRANSFORMER = "MCR.OAI.Metadata.Transformer";
 
     // If there are other metadata formats available, all need a namespace and
     // schema entry of it's own, e.g.
-    // MCR.oai.metadata.namespace.olac=http://www.language-archives.org/OLAC/0.2/
-    // MCR.oai.metadata.schema.olac=http://www.language-archives.org/OLAC/olac-0.2.xsd
-    private static final String STR_OAI_METADATA_NAMESPACE = "MCR.oai.metadata.namespace";
+    // MCR.OAI.Metadata.Namespace.olac=http://www.language-archives.org/OLAC/0.2/
+    // MCR.OAI.Metadata.Schema.olac=http://www.language-archives.org/OLAC/olac-0.2.xsd
+    private static final String STR_OAI_METADATA_NAMESPACE = "MCR.OAI.Metadata.Namespace";
 
-    private static final String STR_OAI_METADATA_ELEMENT = "MCR.oai.metadata.element";
+    private static final String STR_OAI_METADATA_ELEMENT = "MCR.OAI.Metadata.Element";
 
-    private static final String STR_OAI_METADATA_SCHEMA = "MCR.oai.metadata.schema";
+    private static final String STR_OAI_METADATA_SCHEMA = "MCR.OAI.Metadata.Schema";
 
     // Following the DINI recommendation for OAI repositories
     // (http://www.dini.de/documents/OAI-Empfehlungen-Okt2003-de.pdf) there
@@ -130,7 +130,7 @@ public class MCROAIDataProvider extends HttpServlet {
     // restrictive in usage. So this client provides a possibility to map
     // from a far more detailed classification system to the simplistic
     // DINI specification.
-    private static final String STR_OAI_CATEGORY_MAPPING = "MCR.oai.dini-mapping";
+    private static final String STR_OAI_CATEGORY_MAPPING = "MCR.OAI.Dini-mapping";
 
     // Some constants referring to metadata formats (must be known for dc)
     private static final String STR_DC_NAMESPACE = "http://www.openarchives.org/OAI/2.0/oai_dc/";

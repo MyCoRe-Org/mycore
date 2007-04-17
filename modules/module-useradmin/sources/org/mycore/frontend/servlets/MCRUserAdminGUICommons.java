@@ -53,10 +53,10 @@ public class MCRUserAdminGUICommons extends MCRServlet {
     /** Initialisation of the servlet */
     public void init() throws ServletException {
         super.init();
-        pageDir = CONFIG.getString("MCR.useradmin_page_dir", "");
-        noPrivsPage = pageDir + CONFIG.getString("MCR.useradmin_page_error_privileges", "useradmin_error_privileges.xml");
-        cancelPage = pageDir + CONFIG.getString("MCR.useradmin_page_cancel", "useradmin_cancel.xml");
-        okPage = pageDir + CONFIG.getString("MCR.useradmin_page_ok", "useradmin_ok.xml");
+        pageDir = CONFIG.getString("MCR.Useradmin.PageDir", "");
+        noPrivsPage = pageDir + CONFIG.getString("MCR.Useradmin.Page.ErrorPrivileges", "useradmin_error_privileges.xml");
+        cancelPage = pageDir + CONFIG.getString("MCR.Useradmin.Page.Cancel", "useradmin_cancel.xml");
+        okPage = pageDir + CONFIG.getString("MCR.Useradmin.Page.OK", "useradmin_ok.xml");
     }
 
     /**

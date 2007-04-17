@@ -103,7 +103,7 @@ public class MCRSimpleWorkflowManager {
         config = MCRConfiguration.instance();
 
         // read mail sender address
-        sender = config.getString("MCR.editor_mail_sender", "mcradmin@localhost");
+        sender = config.getString("MCR.Mail.Address", "mcradmin@localhost");
 
         // int tables
         ht = new Hashtable();
@@ -123,7 +123,7 @@ public class MCRSimpleWorkflowManager {
             return (String) ht.get(type);
         }
 
-        String dirname = config.getString("MCR.editor_" + type + "_directory", null);
+        String dirname = config.getString("MCR.SWF.Directory" + type, null);
 
         if (dirname == null) {
             ht.put(type, ".");
@@ -160,12 +160,12 @@ public class MCRSimpleWorkflowManager {
             return (List) mt.get(type + "_" + todo);
         }
 
-        String mailaddr = config.getString("MCR.editor_" + type + "_" + todo + "_mail", "");
+        String mailaddr = config.getString("MCR.SWF.Mail." + type + "." + todo, "");
         ArrayList li = new ArrayList();
 
         if ((mailaddr == null) || ((mailaddr = mailaddr.trim()).length() == 0)) {
             mt.put(type, li);
-            logger.warn("No mail address for " + type + "_" + todo + " is in the configuration.");
+            logger.warn("No mail address for MCR.SWF.Mail." + type + "." + todo + " is in the configuration.");
 
             return li;
         }
