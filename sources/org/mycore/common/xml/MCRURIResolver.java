@@ -1031,6 +1031,24 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
 
     }
 
+    /**
+     * Builds XML trees from a string representation. Multiple XPath expressions can be
+     * separated by &amp;
+     * 
+     * Example:
+     * 
+     * buildxml:_rootName_=mycoreobject&metadata/parents/parent/@href='FooBar_Document_4711'
+     *  
+     * This will return:
+     * 
+     * <mycoreobject>
+     *   <metadata>
+     *      <parents>
+     *        <parent href="'FooBar_Document_4711'" />
+     *      </parents>
+     *   </metadata>
+     * </mycoreobject>
+     */
     private static class MCRBuildXMLResolver implements MCRResolver {
 
         /**
@@ -1047,7 +1065,7 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
             } else {
                 params.remove("_rootName_");
             }
-            Element returns=new Element("uriTemp");
+            Element returns=new Element(baseElement);
             for (Map.Entry<String, String> entry:params.entrySet()){
                 constructElement(returns, entry.getKey(), entry.getValue());
             }
@@ -1068,7 +1086,7 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
             while (tok.hasMoreTokens()) {
                 param = tok.nextToken().split("=");
                 try {
-                    params.put(URLDecoder.decode(param[0],"UTF-8"), URLDecoder.decode(param[0],"UTF-8"));
+                    params.put(URLDecoder.decode(param[0],"UTF-8"), URLDecoder.decode(param[1],"UTF-8"));
                 } catch (UnsupportedEncodingException e) {
                     //should never happen
                     LOGGER.error("UTF-8 is a unknown encoding.",e);
@@ -1110,5 +1128,4 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
             constructElement(newcurrent, xpath, value); //recursive call
         }
     }
-
 }
