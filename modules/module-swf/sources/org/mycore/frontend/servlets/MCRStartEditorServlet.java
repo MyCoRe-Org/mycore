@@ -1133,6 +1133,7 @@ public class MCRStartEditorServlet extends MCRServlet {
         while (e.hasMoreElements()) {
             String name = (String) (e.nextElement());
             String value = job.getRequest().getParameter(name);
+            params.put(name, value);
             if (!name.startsWith("_xml_")) {
                 continue;
             }
