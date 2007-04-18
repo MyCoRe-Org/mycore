@@ -22,15 +22,16 @@ function receiveBroadcast(sender, registerServlet) {
 	req.onreadystatechange=function() {
 	  if (req.readyState==4) {
 	   if (req.status==200) {
-	   
-		   // alert message
+
 		   var answerXML = req.responseXML;		   
-		   var message = answerXML.getElementsByTagName("onAir")[0].firstChild.nodeValue;		   
-		   alert(message);
+		   var signal = answerXML.getElementsByTagName("signal")[0].firstChild.nodeValue;		   	   
 		   
-		   // register user as already received a message
-		   addReceiver(registerServlet);
-		   
+	       // alert message, if there is one
+		   if (signal=="on") {
+			   var message = answerXML.getElementsByTagName("message")[0].firstChild.nodeValue;		   	   		   
+			   alert(message);
+		   }
+			   
 		   // ask in peridical time spaces for new messages 
 			var reCall = "receiveBroadcast('"+sender+"','"+registerServlet+"')";
 	        setTimeout(reCall, 3000);
@@ -40,6 +41,7 @@ function receiveBroadcast(sender, registerServlet) {
 	req.send(null);		
 }
 // ================================================================================================== //
+/*
 function addReceiver(registerServlet) {
 	
 	var note = registerServlet+"?mode=addReceiver";
@@ -64,6 +66,6 @@ function addReceiver(registerServlet) {
 	}
 	req.send(null);		
 }
-
+*/
 // ================================================================================================== //
 

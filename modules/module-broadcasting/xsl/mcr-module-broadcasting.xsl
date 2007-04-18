@@ -3,7 +3,7 @@
 <!-- ============================================== -->
 <!--  MyCoRe - Module-Broadcasting 					-->
 <!--  												-->
-<!-- Module-Broadcasting 1.0, 05-2006  				-->
+<!-- Module-Broadcasting 1.0, 04-2007  				-->
 <!-- +++++++++++++++++++++++++++++++++++++			-->
 <!--  												-->
 <!-- Andreas Trappe 	- idea, concept, dev.		-->
@@ -51,34 +51,105 @@
 							<xsl:call-template name="send.noSignal"/>
 						</xsl:when>
 						<xsl:otherwise>
-							
+							<!-- is user a receiver ? -->
+							<xsl:variable name="isReceiver">
+								<xsl:call-template name="get.isReceiver"/>
+							</xsl:variable>
+							<xsl:choose>
+								<xsl:when test="$isReceiver='false'">
+									<xsl:call-template name="send.noSignal"/>
+								</xsl:when>
+								<xsl:otherwise>
+									<!-- register receiver as already received a message -->
+									<xsl:call-template name="registerUser" />
+									<!-- send message -->
+									<xsl:call-template name="send.message" />
+								</xsl:otherwise>
+							</xsl:choose>
 						</xsl:otherwise>
 					</xsl:choose>
 				</xsl:otherwise>
 			</xsl:choose>
-			
-			<!--			<xsl:choose>
-			<xsl:when test="$initJS='true'">
-			<onAir>
-			<xsl:value-of select="program/message/text()"/>
-			</onAir>
-			</xsl:when>
-			<xsl:otherwise>
-			<noSignal/>
-			</xsl:otherwise>
-			</xsl:choose>-->
 			
 		</mcr-module-broadcasting>
 		
 	</xsl:template>
 	<!-- ======================================================================================== -->
 	<xsl:template name="send.noSignal">
-		<noSignal/>
+		<signal>off</signal>
 	</xsl:template>
+	<!-- ======================================================================================== -->
+	<xsl:template name="send.message">
+		
+		<xsl:variable name="message">
+			
+			<!-- check if user got message -->
+			<xsl:for-each select="receivers//users">
+				<xsl:if test="user[text()=$CurrentUser]">
+					<xsl:value-of select="message/text()"/>
+				</xsl:if>
+			</xsl:for-each>
+			
+			<!-- if no user with message found, check if group got message -->
+			
+		</xsl:variable>
+		
+		
+		<signal>on</signal>		
+		<message><xsl:value-of select="$message" /></message>
+		
+	</xsl:template>	
 	<!-- ======================================================================================== -->	
 	<xsl:template name="get.onAir">
-		onAirTime
+		<!-- TODO -->
+		<xsl:value-of select="'true'" />
 	</xsl:template>	
+	<!-- ======================================================================================== -->	
+	<xsl:template name="get.isReceiver">
+		<xsl:variable name="tmp">
+			<xsl:call-template name="get.isReceiver.tmp"/>
+		</xsl:variable>
+		<xsl:choose>
+			<xsl:when test="contains($tmp,'true')">
+				<xsl:value-of select="'true'"/>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:value-of select="'false'"/>
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>	
+	<!-- ======================================================================================== -->		
+	<xsl:template name="get.isReceiver.tmp">
+		
+		<xsl:choose>
+			<xsl:when test="$CurrentUser='gast' and receivers[@allowGuestGroup='false']"/>
+			<xsl:otherwise>
+				<!-- validate groups -->
+				<xsl:if test="receivers//group">
+					<xsl:for-each select="receivers//group">
+						<xsl:if test="contains($CurrentGroups,text())">
+							<xsl:value-of select="'true'"/>
+						</xsl:if>
+					</xsl:for-each>
+				</xsl:if>
+				<!-- validate users -->
+				<xsl:if test="receivers//user">
+					<xsl:for-each select="receivers//user">
+						<xsl:if test="contains($CurrentUser,text())">
+							<xsl:value-of select="'true'"/>
+						</xsl:if>
+					</xsl:for-each>
+				</xsl:if>
+			</xsl:otherwise>
+		</xsl:choose>
+
+	</xsl:template>	
+	<!-- ======================================================================================== -->
+	<xsl:template name="registerUser">
+		<xsl:variable name="tmp">
+			<xsl:copy-of select="document(concat($servletURIRes,'?mode=addReceiver'))"/>
+		</xsl:variable>
+	</xsl:template>
 	<!-- ======================================================================================== -->	
 	<xsl:template name="module-broadcasting.getHeader">
 		<xsl:if test="$initJS='true'">
@@ -95,7 +166,7 @@
 			<xsl:copy-of select="document(concat($servletURIRes,'?mode=hasReceived'))"/>
 		</xsl:variable>
 		<xsl:choose>
-			<xsl:when test="xalan:nodeset($alreadyReceived)/mcr-module-broadcasting/true">
+			<xsl:when test="xalan:nodeset($alreadyReceived)/mcr-module-broadcasting/hasReceived/text()='true'">
 				<xsl:value-of select="'true'"/>
 			</xsl:when>
 			<xsl:otherwise>
@@ -105,12 +176,15 @@
 	</xsl:template>
 	<!-- ======================================================================================== -->	
 	<xsl:template name="get.initJS">
+		<xsl:variable name="config">
+			<xsl:copy-of select="document('webapp:modules/module-broadcasting/config/mcr-module-broadcasting.xml')"/>
+		</xsl:variable>
 		<!-- power on ? -->
 		<xsl:choose>
-			<xsl:when test="/mcr-module-broadcasting/power/text()='on'">
+			<xsl:when test="xalan:nodeset($config)//power/text()='on'">
 				<!-- gast ?= receiver -->
 				<xsl:choose>
-					<xsl:when test="/mcr-module-broadcasting/receivers/@allowGuestGroup='true'">
+					<xsl:when test="xalan:nodeset($config)//receivers[@allowGuestGroup='true']">
 						<xsl:value-of select="'true'"/>
 					</xsl:when>
 					<xsl:otherwise>
@@ -133,25 +207,3 @@
 	</xsl:template>
 	<!-- ======================================================================================== -->
 </xsl:stylesheet>
-
-			<xsl:when test="$CurrentUser!='gast' and contains($CurrentGroups,//group/text())">
-				<xsl:variable name="alreadyReceived">
-					<xsl:copy-of select="document(concat($servletURIRes,'?mode=hasReceived'))"/>
-				</xsl:variable>
-				<xsl:choose>
-					<xsl:when test="xalan:nodeset($alreadyReceived)/mcr-module-broadcasting/true">
-						<xsl:value-of select="'false'"/>
-					</xsl:when>
-					<xsl:otherwise>
-						<xsl:value-of select="'true'"/>
-					</xsl:otherwise>
-				</xsl:choose>
-			</xsl:when>
-
-
-
-
-
-
-
-

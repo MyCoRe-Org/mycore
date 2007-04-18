@@ -47,8 +47,6 @@ public class MCRBroadcastingServlet extends MCRServlet {
 
 		HttpServletRequest request = job.getRequest();
 		HttpServletResponse response = job.getResponse();
-		printRequest(request);
-
 		MCRSession session = MCRSessionMgr.getCurrentSession();
 
 		// get mode and process
@@ -79,14 +77,24 @@ public class MCRBroadcastingServlet extends MCRServlet {
 			recList = new HashMap();
 		else
 			recList = (HashMap) cache.get("bcRecList");
-		recList.put(session.getCurrentUserID(), "dummy");
+		
+		// if user==gast put sessionID, otherwise put username+sessionID
+		if (session.getCurrentUserID().equals("gast")) 
+			recList.put(session.getID(), "dummy");	
+		else {
+			String key = session.getCurrentUserID().trim()+session.getID().trim();
+			recList.put(key, "dummy");
+		}
+		
 		cache.put("bcRecList", recList);
 	}
 
 	private boolean hasReceived(MCRSession session) {
 		if (!cache.isEmpty() && cache.get("bcRecList") != null) {
 			HashMap recList = (HashMap) cache.get("bcRecList");
-			if (recList.get(session.getCurrentUserID()) != null)
+			
+			if ( (session.getCurrentUserID().equals("gast") && recList.get(session.getID())!=null)
+					|| (!session.getCurrentUserID().equals("gast") && recList.get(session.getCurrentUserID().trim()+session.getID().trim())!=null))
 				return true;
 		}
 		return false;
@@ -100,38 +108,4 @@ public class MCRBroadcastingServlet extends MCRServlet {
 		Document jdom = new Document(root);
 		getLayoutService().sendXML(request, response, jdom);
 	}
-
-	public void printRequest(HttpServletRequest request) {
-		LOGGER.debug("############################################# ");
-		for (Enumeration e = request.getHeaderNames(); e.hasMoreElements();) {
-			String name = (String) (e.nextElement());
-			LOGGER.debug("HEADER: " + name + "=" + request.getHeader(name));
-		}
-		LOGGER.debug("start print Request-Parameters ############## ");
-		for (Enumeration e = request.getParameterNames(); e.hasMoreElements();) {
-			String name = (String) (e.nextElement());
-			LOGGER.debug("" + name + "=" + request.getParameter(name));
-		}
-		LOGGER.debug("finished printing Request-Parameters ######### ");
-		LOGGER.debug("                                               ");
-
-		LOGGER.debug("start print Request-Attributes ################ ");
-		for (Enumeration e = request.getAttributeNames(); e.hasMoreElements();) {
-			String name = (String) (e.nextElement());
-			LOGGER.debug("" + name + "=" + request.getAttribute(name));
-		}
-		LOGGER.debug("finished printing Request-Attributes ########## ");
-		LOGGER.debug("############################################### ");
-	}
-
-	public void prepareErrorPage(HttpServletRequest request,
-			HttpServletResponse response, String errorMessage)
-			throws IOException, ServletException {
-		LOGGER.error(errorMessage);
-		generateErrorPage(request, response,
-				HttpServletResponse.SC_BAD_REQUEST, errorMessage,
-				new MCRException(errorMessage), false);
-		return;
-	}
-
 }
