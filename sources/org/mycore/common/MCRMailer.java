@@ -72,7 +72,7 @@ public class MCRMailer {
         Properties mailProperties = new Properties();
 
         try {
-            numTries = config.getInt( "MCR.Mail.MumTries", 1 );
+            numTries = config.getInt( "MCR.Mail.NumTries", 1 );
             mailProperties.setProperty("mail.smtp.host", config.getString("MCR.Mail.Server"));
             mailProperties.setProperty("mail.transport.protocol", config.getString("MCR.Mail.Protocol", "smtp"));
             mailSession = Session.getDefaultInstance(mailProperties, null);
