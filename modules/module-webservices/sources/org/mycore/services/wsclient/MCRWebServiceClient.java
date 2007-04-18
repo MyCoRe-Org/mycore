@@ -167,7 +167,7 @@ public class MCRWebServiceClient {
                 String level = params.getProperty("level");
                 String categID = params.getProperty("catID", "");
                 String type = "children";
-                String format = "editor[textcounter]";
+                String format = "editor[TextCounter]";
                 if (null != classID && null != level) {
                     // org.w3c.dom.Document result =
                     // stub.MCRDoRetrieveClassification(level, "children",
