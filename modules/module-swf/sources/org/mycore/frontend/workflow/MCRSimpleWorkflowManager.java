@@ -123,7 +123,7 @@ public class MCRSimpleWorkflowManager {
             return (String) ht.get(type);
         }
 
-        String dirname = config.getString("MCR.SWF.Directory" + type, null);
+        String dirname = config.getString("MCR.SWF.Directory." + type, null);
 
         if (dirname == null) {
             ht.put(type, ".");
