@@ -230,12 +230,13 @@ public class MCRConfiguration {
             }
         }
 
-        if (clear) {
-            configureLogging();
-        }
 
         substituteReferences();
         substituteDeprecatedProperties();
+        
+        if (clear) {
+            configureLogging();
+        }
     }
 
     /**
