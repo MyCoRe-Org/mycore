@@ -15,29 +15,39 @@
 	<!-- on | off -->
 	<power>off</power>
 	
+	<!-- Seconds, in which intervall the client will ask for new messages -->
+	<refreshRate>10</refreshRate>
+	
+	<message.header>Header content</message.header>
+	<message.tail>Tail content</message.tail>
+	
 	<!-- <group/> &| <user> -->
 	<!-- allowGuestGroup ("true|false") 
 	=> if set to true all "gast" users are listen on the channel, if "false" only user != "gast" are listen -->
 	<receivers allowGuestGroup="true">
 		<groups>
-			<message>Caution, root!</message>
-			<group>rootgroup</group>
+			<message.body>Caution, rootgroup!</message.body>
+			<group>admingroup</group>
 		</groups>
 		<groups>
-			<message>huhu gast!</message>
+			<message.body>hello gast!</message.body>
 			<group>guestgroup</group>
-		</groups>		
+		</groups>
 		<users>
-			<message>Hello Author1A!</message>			
-			<user>author1a</user>
+			<message.body>Hello root </message.body>
+			<user>root</user>
+		</users>
+		<users>
+			<message.body>Hello gast!</message.body>
+			<user>gast</user>
 		</users>
 	</receivers>
 	
-	<!-- NOT SUPPORTED YET -->
+	<!-- DO NOT USE - NOT SUPPORTED YET -->
 	<onAirTime>
 		<!-- ISO 8601-->
 		<from>2006-10-20T10:17:42.920Z</from>
-		<!-- ISO 8601-->		
+		<!-- ISO 8601-->
 		<to>2006-10-20T10:17:42.920Z</to>
 	</onAirTime>
 	

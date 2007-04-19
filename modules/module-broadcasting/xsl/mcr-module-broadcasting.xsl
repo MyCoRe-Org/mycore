@@ -27,17 +27,9 @@
 	<xsl:variable name="initJS">
 		<xsl:call-template name="get.initJS"/>
 	</xsl:variable>
-	
-	<xsl:variable name="message.header">
-		<xsl:copy-of select="'Nachricht von Zeitschriften-Server Journals@UrMEL:'"/>
-	</xsl:variable>
-	<xsl:variable name="message.footer">
-		<xsl:copy-of select="'Vielen Dank, ihr Journals@UrMEL-Team'"/>
-	</xsl:variable>
-		
 	<!-- ======================================================================================== -->
 	<xsl:template match="/mcr-module-broadcasting">
-
+		
 		<mcr-module-broadcasting>
 			
 			<!-- already received ? -->
@@ -68,9 +60,9 @@
 								</xsl:when>
 								<xsl:otherwise>
 									<!-- register receiver as already received a message -->
-									<xsl:call-template name="registerUser" />
+									<xsl:call-template name="registerUser"/>
 									<!-- send message -->
-									<xsl:call-template name="send.message" />
+									<xsl:call-template name="send.message"/>
 								</xsl:otherwise>
 							</xsl:choose>
 						</xsl:otherwise>
@@ -88,23 +80,29 @@
 	<!-- ======================================================================================== -->
 	<xsl:template name="send.message">
 		
-		<xsl:variable name="message">
+		<xsl:variable name="message.body">
 			<xsl:call-template name="get.message"/>
 		</xsl:variable>
 		
 		<signal>on</signal>
-		<message>
-			<xsl:value-of select="concat($message.header,' --- ',$message,' --- ',$message.footer)"/>
-		</message>
+		<message.header>
+			<xsl:copy-of select="message.header/text()"/>
+		</message.header>
+		<message.body>
+			<xsl:copy-of select="$message.body"/>
+		</message.body>
+		<message.tail>
+			<xsl:copy-of select="message.tail/text()"/>
+		</message.tail>
 		
 	</xsl:template>
-	<!-- ======================================================================================== -->	
+	<!-- ======================================================================================== -->
 	<xsl:template name="get.message">
 		<xsl:variable name="userMessage">
 			<!-- check if user got message -->
 			<xsl:for-each select="receivers//users">
 				<xsl:if test="user[text()=$CurrentUser]">
-					<xsl:value-of select="message/text()"/>
+					<xsl:value-of select="message.body/text()"/>
 				</xsl:if>
 			</xsl:for-each>
 		</xsl:variable>
@@ -123,7 +121,7 @@
 							</xsl:for-each>
 						</xsl:variable>
 						<xsl:if test="$messageFound='true'">
-							<xsl:value-of select="concat(message/text(),'#$#$#$#')"/>
+							<xsl:value-of select="concat(message.body/text(),'#$#$#$#')"/>
 						</xsl:if>
 					</xsl:for-each>
 				</xsl:variable>
@@ -149,12 +147,12 @@
 			</xsl:otherwise>
 		</xsl:choose>
 	</xsl:template>
-	<!-- ======================================================================================== -->		
+	<!-- ======================================================================================== -->
 	<xsl:template name="get.onAir">
 		<!-- TODO -->
-		<xsl:value-of select="'true'" />
-	</xsl:template>	
-	<!-- ======================================================================================== -->	
+		<xsl:value-of select="'true'"/>
+	</xsl:template>
+	<!-- ======================================================================================== -->
 	<xsl:template name="get.isReceiver">
 		<xsl:variable name="tmp">
 			<xsl:call-template name="get.isReceiver.tmp"/>
@@ -167,8 +165,8 @@
 				<xsl:value-of select="'false'"/>
 			</xsl:otherwise>
 		</xsl:choose>
-	</xsl:template>	
-	<!-- ======================================================================================== -->		
+	</xsl:template>
+	<!-- ======================================================================================== -->
 	<xsl:template name="get.isReceiver.tmp">
 		<xsl:choose>
 			<xsl:when test="$CurrentUser='gast' and receivers[@allowGuestGroup='false']"/>
@@ -191,20 +189,26 @@
 				</xsl:if>
 			</xsl:otherwise>
 		</xsl:choose>
-	</xsl:template>	
+	</xsl:template>
 	<!-- ======================================================================================== -->
 	<xsl:template name="registerUser">
 		<xsl:variable name="tmp">
 			<xsl:copy-of select="document(concat($servletURIRes,'?mode=addReceiver'))"/>
 		</xsl:variable>
 	</xsl:template>
-	<!-- ======================================================================================== -->	
+	<!-- ======================================================================================== -->
 	<xsl:template name="module-broadcasting.getHeader">
+		<xsl:variable name="config">
+			<xsl:call-template name="get.config"/>
+		</xsl:variable>
+		<xsl:variable name="refreshRate">
+			<xsl:value-of select="xalan:nodeset($config)//refreshRate/text()"/>
+		</xsl:variable>
 		<xsl:if test="$initJS='true'">
 			<script language="JavaScript" src="{$WebApplicationBaseURL}modules/module-broadcasting/web/JS/broadcasting.js"
 				type="text/javascript"/>
 			<script type="text/javascript">
-				<xsl:value-of select="concat('receiveBroadcast(&#34;',$sender,'&#34;,&#34;',$servlet,'&#34;);')"/>
+				<xsl:value-of select="concat('receiveBroadcast(&#34;',$sender,'&#34;,&#34;',$servlet,'&#34;,&#34;',$refreshRate,'&#34;);')"/>
 			</script>
 		</xsl:if>
 	</xsl:template>
@@ -222,10 +226,14 @@
 			</xsl:otherwise>
 		</xsl:choose>
 	</xsl:template>
-	<!-- ======================================================================================== -->	
+	<!-- ======================================================================================== -->
+	<xsl:template name="get.config">
+		<xsl:copy-of select="document('webapp:modules/module-broadcasting/config/mcr-module-broadcasting.xml')"/>
+	</xsl:template>
+	<!-- ======================================================================================== -->
 	<xsl:template name="get.initJS">
 		<xsl:variable name="config">
-			<xsl:copy-of select="document('webapp:modules/module-broadcasting/config/mcr-module-broadcasting.xml')"/>
+			<xsl:call-template name="get.config"/>
 		</xsl:variable>
 		<!-- power on ? -->
 		<xsl:choose>
