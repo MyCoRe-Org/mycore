@@ -8,10 +8,13 @@ import java.util.StringTokenizer;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
+import org.jdom.Content;
 import org.jdom.Document;
 import org.jdom.Element;
+import org.jdom.JDOMException;
 import org.jdom.filter.ElementFilter;
 import org.jdom.output.XMLOutputter;
+import org.jdom.xpath.XPath;
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRSessionMgr;
@@ -463,22 +466,42 @@ public class MCRIndexBrowserData {
             String sField = Fields[j];
 
             // Eintrag der ID
-            if (sField.equals("id")) {
+            if (sField.equalsIgnoreCase("id")) {
                 value = od.getRootElement().getAttributeValue("ID");
 
             } else {
-                Iterator<?> it = od.getDescendants(new ElementFilter(sField));
-                // only the atribute different texts are taken!!
-                while (it.hasNext()) {
-                    Element el = (Element) it.next();
-                    if (attribute != el.getAttributeValue("type")) {
-                        if (value.length() > 0) {
-                            value += " - ";
-                        }
-                        value += el.getText();
-                        attribute = el.getAttributeValue("type");
-                    }
-                }
+            	if(sField.contains("/")){
+            		//evaluate an XPath-Expression
+            		try{
+            			XPath xpath = XPath.newInstance(sField);
+            			List<?> xpathResults = xpath.selectNodes(od);
+            			value ="";
+            			for(int i=0;i<xpathResults.size();i++){
+            				if(i>0){
+            					value +=" - ";
+            				}
+            				value +=((Content)xpathResults.get(i)).getValue();
+            			}
+            			
+            		}
+            		catch(JDOMException jde){
+            			value="";
+            		}
+            	}
+            	else{
+            		Iterator<?> it = od.getDescendants(new ElementFilter(sField));
+                	// 	only the atribute different texts are taken!!
+                	while (it.hasNext()) {
+                    	Element el = (Element) it.next();
+                    	if (attribute != el.getAttributeValue("type")) {
+                        	if (value.length() > 0) {
+                        		value += " - ";
+                        	}
+                        	value += el.getText();
+                        	attribute = el.getAttributeValue("type");
+                    	}
+                	}
+            	}
             }
             if (append) {
                 if (j == 0)
