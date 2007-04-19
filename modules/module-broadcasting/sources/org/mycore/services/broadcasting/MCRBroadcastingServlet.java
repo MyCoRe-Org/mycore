@@ -52,10 +52,10 @@ public class MCRBroadcastingServlet extends MCRServlet {
 		// get mode and process
 		Element answer = null;
 		if (request.getParameter("mode").equals("hasReceived")) {
-			String hasReceived = Boolean.toString(hasReceived(session));
+			String hasReceived = Boolean.toString(hasReceived(session, request));
 			answer = new Element("hasReceived").setText(hasReceived);
 		} else if (request.getParameter("mode").equals("addReceiver")) {
-			addReceiver(session);
+			addReceiver(session, request);
 			answer = new Element("addReceiver").setText("done");
 		} else if (request.getParameter("mode").equals("clearReceiverList")) {
 			clearReceiverList();
@@ -71,7 +71,7 @@ public class MCRBroadcastingServlet extends MCRServlet {
 		cache.clear();
 	}
 
-	private void addReceiver(MCRSession session) {
+	private void addReceiver(MCRSession session, HttpServletRequest request) {
 		HashMap recList;
 		if (cache.isEmpty())
 			recList = new HashMap();
@@ -82,24 +82,32 @@ public class MCRBroadcastingServlet extends MCRServlet {
 		if (session.getCurrentUserID().equals("gast")) 
 			recList.put(session.getID(), "dummy");	
 		else {
-			String key = session.getCurrentUserID().trim()+session.getID().trim();
+			String key = getKey(request, session);
 			recList.put(key, "dummy");
 		}
 		
 		cache.put("bcRecList", recList);
 	}
 
-	private boolean hasReceived(MCRSession session) {
+	private boolean hasReceived(MCRSession session, HttpServletRequest request) {
 		if (!cache.isEmpty() && cache.get("bcRecList") != null) {
 			HashMap recList = (HashMap) cache.get("bcRecList");
 			
-			if ( (session.getCurrentUserID().equals("gast") && recList.get(session.getID())!=null)
-					|| (!session.getCurrentUserID().equals("gast") && recList.get(session.getCurrentUserID().trim()+session.getID().trim())!=null))
+			String key = getKey(request, session);
+			if ( (session.getCurrentUserID().equals("gast") && recList.get(session.getID())!=null)					
+					|| (!session.getCurrentUserID().equals("gast") && recList.get(key)!=null))
 				return true;
 		}
 		return false;
 	}
 
+	private final static String getKey(HttpServletRequest request, MCRSession session) {
+		if (request.getParameter("sessionSensitive").equals("true")) 
+			return session.getCurrentUserID().trim()+session.getID().trim();
+		else 
+			return session.getCurrentUserID().trim();
+	}
+	
 	public void forwardJDOM(HttpServletRequest request,
 			HttpServletResponse response, Element elem) throws IOException {
 

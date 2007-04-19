@@ -79,11 +79,9 @@
 	</xsl:template>
 	<!-- ======================================================================================== -->
 	<xsl:template name="send.message">
-		
 		<xsl:variable name="message.body">
 			<xsl:call-template name="get.message"/>
 		</xsl:variable>
-		
 		<signal>on</signal>
 		<message.header>
 			<xsl:copy-of select="message.header/text()"/>
@@ -94,7 +92,6 @@
 		<message.tail>
 			<xsl:copy-of select="message.tail/text()"/>
 		</message.tail>
-		
 	</xsl:template>
 	<!-- ======================================================================================== -->
 	<xsl:template name="get.message">
@@ -149,8 +146,15 @@
 	</xsl:template>
 	<!-- ======================================================================================== -->
 	<xsl:template name="get.onAir">
-		<!-- TODO -->
-		<xsl:value-of select="'true'"/>
+		<!-- TODO, implement <from> <to> -->
+		<xsl:choose>
+			<xsl:when test="//onAirTime[@send='ever']">
+				<xsl:value-of select="'true'"/>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:value-of select="'false'"/>
+			</xsl:otherwise>
+		</xsl:choose>
 	</xsl:template>
 	<!-- ======================================================================================== -->
 	<xsl:template name="get.isReceiver">
@@ -192,8 +196,11 @@
 	</xsl:template>
 	<!-- ======================================================================================== -->
 	<xsl:template name="registerUser">
+		<xsl:variable name="sessionSensitive">
+			<xsl:call-template name="get.sessionSensitive"/>
+		</xsl:variable>		
 		<xsl:variable name="tmp">
-			<xsl:copy-of select="document(concat($servletURIRes,'?mode=addReceiver'))"/>
+			<xsl:copy-of select="document(concat($servletURIRes,'?mode=addReceiver&amp;sessionSensitive=',$sessionSensitive))"/>
 		</xsl:variable>
 	</xsl:template>
 	<!-- ======================================================================================== -->
@@ -214,8 +221,11 @@
 	</xsl:template>
 	<!-- ======================================================================================== -->
 	<xsl:template name="get.alreadyReceived">
+		<xsl:variable name="sessionSensitive">
+			<xsl:call-template name="get.sessionSensitive"/>
+		</xsl:variable>
 		<xsl:variable name="alreadyReceived">
-			<xsl:copy-of select="document(concat($servletURIRes,'?mode=hasReceived'))"/>
+			<xsl:copy-of select="document(concat($servletURIRes,'?mode=hasReceived&amp;sessionSensitive=',$sessionSensitive))"/>
 		</xsl:variable>
 		<xsl:choose>
 			<xsl:when test="xalan:nodeset($alreadyReceived)/mcr-module-broadcasting/hasReceived/text()='true'">
@@ -225,6 +235,10 @@
 				<xsl:value-of select="'false'"/>
 			</xsl:otherwise>
 		</xsl:choose>
+	</xsl:template>
+	<!-- ======================================================================================== -->	
+	<xsl:template name="get.sessionSensitive">
+		<xsl:copy-of select="//sessionSensitive/text()"/>
 	</xsl:template>
 	<!-- ======================================================================================== -->
 	<xsl:template name="get.config">

@@ -13,10 +13,18 @@
 <mcr-module-broadcasting>
 	
 	<!-- on | off -->
+	<!-- on = client will autmatically listen for new messages by AJAX -->
+	<!-- off client won't listen for new messages -->
 	<power>off</power>
 	
 	<!-- Seconds, in which intervall the client will ask for new messages -->
-	<refreshRate>10</refreshRate>
+	<refreshRate>60</refreshRate>
+	
+	<!-- true | false -->
+	<!-- true = user will get the same message again, if a new session is opened, even though the user already received the message
+		-> should be used, if a user login will be used by more than one person -->
+	<!-- false = each user will get a message only on times, indepently on the session -->
+	<sessionSensitive>false</sessionSensitive>
 	
 	<message.header>Header content</message.header>
 	<message.tail>Tail content</message.tail>
@@ -43,8 +51,11 @@
 		</users>
 	</receivers>
 	
-	<!-- DO NOT USE - NOT SUPPORTED YET -->
-	<onAirTime>
+	<!-- <from> & <to> are NOT supported yet, -> use @send -->
+	<!-- @send = ever | never -->
+	<!-- ever  = send continuasly -->
+	<!-- never = do NOT send -->
+	<onAirTime send="ever">
 		<!-- ISO 8601-->
 		<from>2006-10-20T10:17:42.920Z</from>
 		<!-- ISO 8601-->
