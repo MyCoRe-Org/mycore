@@ -28,6 +28,13 @@
 		<xsl:call-template name="get.initJS"/>
 	</xsl:variable>
 	
+	<xsl:variable name="message.header">
+		<xsl:copy-of select="'Nachricht von Zeitschriften-Server Journals@UrMEL:'"/>
+	</xsl:variable>
+	<xsl:variable name="message.footer">
+		<xsl:copy-of select="'Vielen Dank, ihr Journals@UrMEL-Team'"/>
+	</xsl:variable>
+		
 	<!-- ======================================================================================== -->
 	<xsl:template match="/mcr-module-broadcasting">
 
@@ -82,24 +89,67 @@
 	<xsl:template name="send.message">
 		
 		<xsl:variable name="message">
-			
+			<xsl:call-template name="get.message"/>
+		</xsl:variable>
+		
+		<signal>on</signal>
+		<message>
+			<xsl:value-of select="concat($message.header,' --- ',$message,' --- ',$message.footer)"/>
+		</message>
+		
+	</xsl:template>
+	<!-- ======================================================================================== -->	
+	<xsl:template name="get.message">
+		<xsl:variable name="userMessage">
 			<!-- check if user got message -->
 			<xsl:for-each select="receivers//users">
 				<xsl:if test="user[text()=$CurrentUser]">
 					<xsl:value-of select="message/text()"/>
 				</xsl:if>
 			</xsl:for-each>
-			
-			<!-- if no user with message found, check if group got message -->
-			
 		</xsl:variable>
-		
-		
-		<signal>on</signal>		
-		<message><xsl:value-of select="$message" /></message>
-		
-	</xsl:template>	
-	<!-- ======================================================================================== -->	
+		<!-- no user message -> check if group got message -->
+		<xsl:variable name="groupMessage">
+			<xsl:if test="$userMessage=''">
+				<xsl:variable name="groupMessTmp">
+					<!-- check each <groups> group :-) -->
+					<xsl:for-each select="receivers//groups">
+						<xsl:variable name="messageFound">
+							<!-- check each group within -->
+							<xsl:for-each select="group">
+								<xsl:if test="contains($CurrentGroups,text())">
+									<xsl:value-of select="'true'"/>
+								</xsl:if>
+							</xsl:for-each>
+						</xsl:variable>
+						<xsl:if test="$messageFound='true'">
+							<xsl:value-of select="concat(message/text(),'#$#$#$#')"/>
+						</xsl:if>
+					</xsl:for-each>
+				</xsl:variable>
+				<!-- assign message, if one has been found -->
+				<xsl:if test="$groupMessTmp!=''">
+					<xsl:choose>
+						<xsl:when test="contains($groupMessTmp,'#$#$#$#')">
+							<xsl:value-of select="substring-before($groupMessTmp,'#$#$#$#')"/>
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:value-of select="$groupMessTmp"/>
+						</xsl:otherwise>
+					</xsl:choose>
+				</xsl:if>
+			</xsl:if>
+		</xsl:variable>
+		<xsl:choose>
+			<xsl:when test="$userMessage!=''">
+				<xsl:value-of select="$userMessage"/>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:value-of select="$groupMessage"/>
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
+	<!-- ======================================================================================== -->		
 	<xsl:template name="get.onAir">
 		<!-- TODO -->
 		<xsl:value-of select="'true'" />
@@ -120,7 +170,6 @@
 	</xsl:template>	
 	<!-- ======================================================================================== -->		
 	<xsl:template name="get.isReceiver.tmp">
-		
 		<xsl:choose>
 			<xsl:when test="$CurrentUser='gast' and receivers[@allowGuestGroup='false']"/>
 			<xsl:otherwise>
@@ -142,7 +191,6 @@
 				</xsl:if>
 			</xsl:otherwise>
 		</xsl:choose>
-
 	</xsl:template>	
 	<!-- ======================================================================================== -->
 	<xsl:template name="registerUser">

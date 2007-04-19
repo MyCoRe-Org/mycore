@@ -13,7 +13,7 @@
 <mcr-module-broadcasting>
 	
 	<!-- on | off -->
-	<power>on</power>
+	<power>off</power>
 	
 	<!-- <group/> &| <user> -->
 	<!-- allowGuestGroup ("true|false") 
@@ -23,13 +23,17 @@
 			<message>Caution, root!</message>
 			<group>rootgroup</group>
 		</groups>
+		<groups>
+			<message>huhu gast!</message>
+			<group>guestgroup</group>
+		</groups>		
 		<users>
 			<message>Hello Author1A!</message>			
 			<user>author1a</user>
 		</users>
 	</receivers>
 	
-	<!-- ... -->
+	<!-- NOT SUPPORTED YET -->
 	<onAirTime>
 		<!-- ISO 8601-->
 		<from>2006-10-20T10:17:42.920Z</from>

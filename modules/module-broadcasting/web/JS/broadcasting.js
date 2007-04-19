@@ -40,32 +40,3 @@ function receiveBroadcast(sender, registerServlet) {
 	}
 	req.send(null);		
 }
-// ================================================================================================== //
-/*
-function addReceiver(registerServlet) {
-	
-	var note = registerServlet+"?mode=addReceiver";
-	var req;
-	// transmit
-	if (window.XMLHttpRequest) {
-		req = new XMLHttpRequest();
-	}
-		else if (window.ActiveXObject) {
-			req = new ActiveXObject("Microsoft.XMLHTTP");
-		}
-	req.open("GET", note, true);
-	
-	req.onreadystatechange=function() {
-	  if (req.readyState==4) {
-	   if (req.status==200) {
-		   var answerXML = req.responseXML;
-		   var message = answerXML.getElementsByTagName("addReceiver")[0].firstChild.nodeValue;
-		   //alert("addReceiver="+message);
-	   }
-	  }		
-	}
-	req.send(null);		
-}
-*/
-// ================================================================================================== //
-
