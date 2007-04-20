@@ -117,7 +117,7 @@
 								</xsl:if>
 							</xsl:for-each>
 						</xsl:variable>
-						<xsl:if test="$messageFound='true'">
+						<xsl:if test="contains($messageFound,'true')">
 							<xsl:value-of select="concat(message.body/text(),'#$#$#$#')"/>
 						</xsl:if>
 					</xsl:for-each>
