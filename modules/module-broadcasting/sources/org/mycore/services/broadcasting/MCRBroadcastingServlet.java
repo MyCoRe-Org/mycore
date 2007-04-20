@@ -86,10 +86,9 @@ public class MCRBroadcastingServlet extends MCRServlet {
 			
 			while (receiver.hasNext()) {
 				String recKey = (String)receiver.next();
-				String recValue = (String)recList.get(recKey);
 				Element key = new Element("key").setText(recKey);
-				Element value = new Element("value").setText(recValue);
-				recListRoot.addContent(new Element("receiver").addContent(key).addContent(value));
+				Element recValue = (Element)recList.get(recKey);
+				recListRoot.addContent(new Element("receiver").addContent(key).addContent(recValue.detach()));
 			}
 			return recListRoot;
 		} else 
@@ -107,7 +106,7 @@ public class MCRBroadcastingServlet extends MCRServlet {
 		else
 			recList = (HashMap) cache.get("bcRecList");
 		
-		String value = getReceiverValue(session);
+		Element value = getReceiverDetails(session);
 		
 		// if user==gast put sessionID, otherwise put username+sessionID
 		if (session.getCurrentUserID().equals("gast"))
@@ -120,8 +119,12 @@ public class MCRBroadcastingServlet extends MCRServlet {
 		cache.put("bcRecList", recList);
 	}
 
-	private final static String getReceiverValue(MCRSession session) {
-		return "UserID="+session.getCurrentUserID()+" UsersIP="+session.getCurrentIP()+" UsersSession="+session.getID();
+	private final Element getReceiverDetails(MCRSession session) {
+		Element details = new Element("details")
+		.addContent(new Element("login").setText(session.getCurrentUserID()))
+		.addContent(new Element("ip").setText(session.getCurrentIP()))
+		.addContent(new Element("session-id").setText(session.getID()));
+		return details;
 	}
 	
 	private boolean hasReceived(MCRSession session, HttpServletRequest request) {
