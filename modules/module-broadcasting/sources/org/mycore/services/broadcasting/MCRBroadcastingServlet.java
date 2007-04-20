@@ -12,6 +12,7 @@ package org.mycore.services.broadcasting;
 import java.io.IOException;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.Iterator;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -60,13 +61,41 @@ public class MCRBroadcastingServlet extends MCRServlet {
 		} else if (request.getParameter("mode").equals("clearReceiverList")) {
 			clearReceiverList();
 			answer = new Element("clearReceiverList").setText("done");
-		} else
+		} else if (request.getParameter("mode").equals("getReceiverList")) {
+			answer = getReceiverListAsXML(session);
+		}
+		else
 			answer = new Element("nothingDone");
 
 		// render xml
 		forwardJDOM(request, response, answer);
 	}
 
+	private HashMap getReceiverList(MCRSession session) {
+		if (!cache.isEmpty() && cache.get("bcRecList") != null) 
+			return (HashMap) cache.get("bcRecList");
+		return null;
+	}
+	
+	private Element getReceiverListAsXML(MCRSession session) {
+		
+		if (getReceiverList(session)!=null) {
+			Element recListRoot = new Element("receiverList");
+			HashMap recList = getReceiverList(session);
+			Iterator receiver = recList.keySet().iterator();
+			
+			while (receiver.hasNext()) {
+				String recKey = (String)receiver.next();
+				String recValue = (String)recList.get(recKey);
+				Element key = new Element("key").setText(recKey);
+				Element value = new Element("value").setText(recValue);
+				recListRoot.addContent(new Element("receiver").addContent(key).addContent(value));
+			}
+			return recListRoot;
+		} else 
+			return new Element("empty");
+	}	
+	
 	private void clearReceiverList() {
 		cache.clear();
 	}
@@ -78,21 +107,27 @@ public class MCRBroadcastingServlet extends MCRServlet {
 		else
 			recList = (HashMap) cache.get("bcRecList");
 		
+		String value = getReceiverValue(session);
+		
 		// if user==gast put sessionID, otherwise put username+sessionID
-		if (session.getCurrentUserID().equals("gast")) 
-			recList.put(session.getID(), "dummy");	
+		if (session.getCurrentUserID().equals("gast"))
+			recList.put(session.getID(), value);	
 		else {
 			String key = getKey(request, session);
-			recList.put(key, "dummy");
+			recList.put(key, value);
 		}
 		
 		cache.put("bcRecList", recList);
 	}
 
+	private final static String getReceiverValue(MCRSession session) {
+		return "UserID="+session.getCurrentUserID()+" UsersIP="+session.getCurrentIP()+" UsersSession="+session.getID();
+	}
+	
 	private boolean hasReceived(MCRSession session, HttpServletRequest request) {
-		if (!cache.isEmpty() && cache.get("bcRecList") != null) {
-			HashMap recList = (HashMap) cache.get("bcRecList");
-			
+//		if (!cache.isEmpty() && cache.get("bcRecList") != null) {
+		HashMap recList = getReceiverList(session);
+		if (recList!=null) {
 			String key = getKey(request, session);
 			if ( (session.getCurrentUserID().equals("gast") && recList.get(session.getID())!=null)					
 					|| (!session.getCurrentUserID().equals("gast") && recList.get(key)!=null))

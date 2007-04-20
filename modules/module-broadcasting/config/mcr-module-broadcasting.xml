@@ -32,15 +32,15 @@
 	<!-- <group/> &| <user> -->
 	<!-- allowGuestGroup ("true|false") 
 	=> if set to true all "gast" users are listen on the channel, if "false" only user != "gast" are listen -->
-	<receivers allowGuestGroup="true">
+	<receivers allowGuestGroup="false">
 		<groups>
-			<message.body>Caution, rootgroup!</message.body>
+			<message.body>Caution, admingroup!</message.body>
 			<group>admingroup</group>
 		</groups>
 		<groups>
-			<message.body>hello gast!</message.body>
-			<group>guestgroup</group>
-		</groups>
+			<message.body>Caution, authorgroup1 group!</message.body>
+			<group>authorgroup1</group>
+		</groups>		
 		<users>
 			<message.body>Hello root </message.body>
 			<user>root</user>
