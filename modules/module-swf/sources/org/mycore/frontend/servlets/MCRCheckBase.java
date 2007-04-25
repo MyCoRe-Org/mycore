@@ -87,8 +87,9 @@ abstract public class MCRCheckBase extends MCRServlet {
      *            the MCRServletJob
      */
     protected void errorHandlerIO(MCRServletJob job) throws Exception {
-        String pagedir = CONFIG.getString("MCR.editor_page_dir", "");
-        job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + pagedir + "editor_error_store.xml"));
+        String pagedir = CONFIG.getString("MCR.SWF.PageDir", "");
+        String page = CONFIG.getString("MCR.SWF.PageErrorStore", "");
+        job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + pagedir + page));
     }
 
     /**
