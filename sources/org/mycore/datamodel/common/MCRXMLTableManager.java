@@ -32,6 +32,7 @@ import java.util.Properties;
 
 import org.apache.log4j.Logger;
 import org.jdom.Document;
+import org.jdom.Element;
 
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRConfiguration;
@@ -325,7 +326,10 @@ public class MCRXMLTableManager {
             if ((xml == null) || (xml.length == 0)) {
                 StringBuffer sb = new StringBuffer("Error while retrieving XML with id ").append(id).append(" from MCRXMLTableInterface.");
                 LOGGER.error(sb);
-                throw new MCRException(sb.toString());
+                Element error = new Element("mcr_error");
+                error.addContent(sb.toString());
+                error.setAttribute("id", id.getId());
+                return new Document(error); 
             }
 
             // read from MCRXMLTable
