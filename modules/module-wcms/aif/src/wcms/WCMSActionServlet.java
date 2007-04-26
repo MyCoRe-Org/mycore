@@ -957,19 +957,12 @@ public class WCMSActionServlet extends WCMSServlet {
                 if (mode.equals("intern")) {
                     if (!hrefFile.exists()) {
                         hrefFile.getParentFile().mkdir();
-
-                        // BufferedOutputStream bo = new
-                        // BufferedOutputStream(new FileOutputStream(hrefFile));
                         StringBuffer head = new StringBuffer("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n").append("<!DOCTYPE MyCoReWebPage>\n").append("<MyCoReWebPage>\n").append("\t<section xml:lang=\"" + defaultLang + "\" title=\"" + label + "\">\n");
                         StringBuffer body = new StringBuffer(content);
                         StringBuffer tail = new StringBuffer("\t</section>\n").append("</MyCoReWebPage>\n");
                         BufferedInputStream bis = new BufferedInputStream(new ByteArrayInputStream(((head).append(body).append(tail)).toString().getBytes("UTF-8")));
                         doc = getXMLAsJDOM(bis);
                         bis.close();
-
-                        // writeJDOMDocumentToFile(doc, hrefFile);
-                        // MCRUtils.copyStream(bi,bo);
-                        // bo.close();
                     } else {
                         error = "Unter diesem Pfad existiert bereits ein File mit diesem Filename!";
 
@@ -983,8 +976,6 @@ public class WCMSActionServlet extends WCMSServlet {
             if (action.equals("edit")) {
                 if (mode.equals("intern")) {
                     try {
-                        // SAXBuilder builder = new SAXBuilder();
-                        // builder.setEntityResolver(new ResolveDTD());
                         doc = new Document();
 
                         try {
@@ -1005,27 +996,6 @@ public class WCMSActionServlet extends WCMSServlet {
                         } catch (Exception ex) {
                             logger.error("Error while updating document, update rejected.", ex);
                         }
-
-                        /*
-                         * try { content = " <section
-                         * xml:lang=\""+defaultLang+"\" title=\""+label+"\"
-                         * >"+content+" </section>"; //content.replaceAll("&",
-                         * "&amp;"); doc = getXMLAsJDOM(new
-                         * StringReader(content)); Element html =
-                         * doc.getRootElement(); html.detach(); //builder = new
-                         * SAXBuilder(); doc = getXMLAsJDOM(hrefFile); Element
-                         * root = doc.getRootElement(); validate(root); Element
-                         * actElem = findActElem(root, "lang", defaultLang, ns);
-                         * Element parent = (Element)actElem.getParent();
-                         * parent.removeContent(actElem);
-                         * parent.addContent(html); } catch (Exception e) {
-                         * error = "non_valid_xhtml_content"; sessionParam =
-                         * "action"; generateOutput(error, label, fileName);
-                         * return; } } //writeJDOMDocumentToFile(doc, hrefFile);
-                         * /*XMLOutputter xmlout = new
-                         * XMLOutputter(Format.getRawFormat().setTextMode(Format.TextMode.PRESERVE).setEncoding("UTF-8"));
-                         * xmlout.output(doc, new FileOutputStream(hrefFile));
-                         */
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -1036,18 +1006,11 @@ public class WCMSActionServlet extends WCMSServlet {
 
             if (action.equals("translate") && mode.equals("intern")) {
                 try {
-                    /*
-                     * SAXBuilder builder = new SAXBuilder();
-                     * builder.setEntityResolver(new ResolveDTD()); doc = new
-                     * Document();
-                     */
                     try {
                         doc = getXMLAsJDOM(contentCurrentLang);
 
                         Element html = doc.getRootElement();
 
-                        // html.detach();
-                        // builder = new SAXBuilder();
                         doc = getXMLAsJDOM(hrefFile);
 
                         Element root = doc.getRootElement();
@@ -1065,51 +1028,22 @@ public class WCMSActionServlet extends WCMSServlet {
                     } catch (Exception ex) {
                         ex.printStackTrace();
                     }
-
-                    /*
-                     * try { contentCurrentLang = " <section
-                     * xml:lang=\""+currentLang+"\"
-                     * title=\""+currentLangLabel+"\" >"+contentCurrentLang+"
-                     * </section>"; //contentCurrentLang.replaceAll("&",
-                     * "&amp;"); doc = builder.build(new
-                     * StringReader(contentCurrentLang)); Element html =
-                     * doc.getRootElement(); html.detach(); builder = new
-                     * SAXBuilder(); doc = builder.build(hrefFile); Element root =
-                     * doc.getRootElement(); validate(root); Element actElem =
-                     * findActElem(root, "lang", currentLang, ns); if (actElem ==
-                     * null) { root.addContent(html); } actElem =
-                     * findActElem(root, "lang", currentLang, ns); Element
-                     * parent = (Element)actElem.getParent();
-                     * parent.removeContent(actElem); parent.addContent(html); }
-                     * catch (Exception e) { error = "non_valid_xhtml_content";
-                     * sessionParam = "action"; generateOutput(error, label,
-                     * fileName); return; } }
-                     */
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
-
-            // /////////////////////////////////////////////////////////////////////////////////////////////
-            // end of: prepare content as sdom document
-            // /////////////////////////////////////////////////////////////////////////////////////////////
             // /////////////////////////////////////////////////////////////////////////////////////////////
             // management of prepared content jdom
             // /////////////////////////////////////////////////////////////////////////////////////////////
             if (action.equals("delete")) {
                 if (realyDel.equals("true")) {
                     if (mode.equals("intern")) {
-                        // if (storeTypMycore) {
                         hrefFile.delete();
-
                         File testFile = hrefFile;
-
                         while (testFile.getParentFile().listFiles().length < 1) {
                             testFile.getParentFile().delete();
                             testFile = testFile.getParentFile();
                         }
-
-                        // }
                     }
                 } else {
                     sessionParam = "choose";
@@ -1120,9 +1054,6 @@ public class WCMSActionServlet extends WCMSServlet {
 
             writeJDOMDocumentToFile(doc, hrefFile);
 
-            // /////////////////////////////////////////////////////////////////////////////////////////////
-            // end: management of prepared content jdom
-            // /////////////////////////////////////////////////////////////////////////////////////////////
         } catch (FileNotFoundException e) {
             error = "File not found. For further information look at the System Output.";
             e.printStackTrace();
@@ -1387,24 +1318,32 @@ public class WCMSActionServlet extends WCMSServlet {
                 jdomDoc = builder.build((File) xmlSource);
             }
 
-            /*
-             * if (xmlSource instanceof InputSource) { jdomDoc =
-             * builder.build((InputSource)xmlSource); }
-             */
             if (xmlSource instanceof InputStream) {
                 jdomDoc = builder.build((InputStream) xmlSource);
             }
 
-            /*
-             * if (xmlSource instanceof Reader) { jdomDoc =
-             * builder.build((Reader)xmlSource); }
-             */
             if (xmlSource instanceof URL) {
                 jdomDoc = builder.build((URL) xmlSource);
             }
         } catch (JDOMException e) {
-            logger.debug("JDOM warning: Source is not a valid XML Document.");
-            jdomDoc = validateSource(xmlSource);
+        	// no root element ? 
+        	String extendedXML= addRootElement((String)xmlSource);
+        	try {
+				logger.debug("########################################");
+	        	logger.debug("JDOMException occurred -> adding root tag ="+extendedXML);
+	        	logger.debug("########################################");
+				jdomDoc = builder.build(new ByteArrayInputStream((extendedXML).getBytes("UTF-8")));
+			} catch (UnsupportedEncodingException e1) {
+				e1.printStackTrace();
+			} catch (JDOMException e1) {
+				logger.debug("##########################################################");
+	        	logger.debug("JDOMException after root tag added occurred -> using JTidy");
+	        	logger.debug("##########################################################");
+				jdomDoc = validateSource(xmlSource);	
+				e1.printStackTrace();
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}        	
         } catch (IOException e) {
             logger.debug("IO error: File \"" + xmlSource + "\" can't be parsed as JDOM.");
             e.printStackTrace();
@@ -1413,6 +1352,10 @@ public class WCMSActionServlet extends WCMSServlet {
         return jdomDoc;
     }
 
+    public String addRootElement(String xml) {
+    	return "<dummyRoot>"+xml+"</dummyRoot>";
+    }    
+    
     public Document validateSource(Object xmlSource) {
         logger.debug("Trying to build a valid XHTML/XML Document from Source using JTidy.");
 
@@ -1591,10 +1534,10 @@ public class WCMSActionServlet extends WCMSServlet {
         contentCurrentLang = request.getParameter("content_currentLang");
 
         /* code validation by JTidy */
-        if (request.getParameter("codeValidationDisable") == null) {
+        /*if (request.getParameter("codeValidationDisable") == null) {
             logger.debug("Code validation using" + VALIDATOR);
             codeValidation(VALIDATOR);
-        }
+        }*/
 
         /* END: code validation by JTidy */
         currentLangLabel = request.getParameter("label_currentLang");
