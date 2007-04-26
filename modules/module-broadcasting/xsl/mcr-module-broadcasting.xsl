@@ -217,6 +217,7 @@
 			<script type="text/javascript">
 				<xsl:value-of select="concat('receiveBroadcast(&#34;',$sender,'&#34;,&#34;',$servlet,'&#34;,&#34;',$refreshRate,'&#34;);')"/>
 			</script>
+			<meta name="expires" content="-1" />
 		</xsl:if>
 	</xsl:template>
 	<!-- ======================================================================================== -->

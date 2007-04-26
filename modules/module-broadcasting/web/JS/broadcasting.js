@@ -7,25 +7,36 @@
 /*  											*/
 /************************************************/
 // ================================================================================================== //
+
 function receiveBroadcast(sender, registerServlet, refreshRate) {
-	
+
+	// open up request	
 	var req;
-	// transmit
 	if (window.XMLHttpRequest) {
 		req = new XMLHttpRequest();
 	}
 		else if (window.ActiveXObject) {
 			req = new ActiveXObject("Microsoft.XMLHTTP");
 		}
-	req.open("GET", sender, true);
+		
+	//fake address to kidd stupid internet explorer :-)
+	var randomNumber = Math.random();
+	var senderWithNumber = sender+"?XSL.dummyNumber="+randomNumber;
+	req.open("GET", senderWithNumber, true);
 	
+	//disable cache
+	req.setRequestHeader("Pragma", "no-cache");
+	req.setRequestHeader("Cache-Control", "must-revalidate");
+	req.setRequestHeader("If-Modified-Since", "Sat, 1 Jan 2000 00:00:00 GMT");
+	
+	//call server's xml document
 	req.onreadystatechange=function() {
 	  if (req.readyState==4) {
 	   if (req.status==200) {
 
 		   var answerXML = req.responseXML;		   
 		   var signal = answerXML.getElementsByTagName("signal")[0].firstChild.nodeValue;		   	   
-		   
+
 	       // alert message, if there is one
 		   if (signal=="on") {
    			   var messageHeader 	= answerXML.getElementsByTagName("message.header")[0].firstChild.nodeValue;		   	   		   
@@ -35,7 +46,7 @@ function receiveBroadcast(sender, registerServlet, refreshRate) {
 			   alert(message);
 		   }
 			   
-		   // ask in peridical time spaces for new messages 
+		   // ask in peridical time slots for new messages 
 			var reCall = "receiveBroadcast('"+sender+"','"+registerServlet+"','"+refreshRate+"')";
 			var refreshRateMilliSec = refreshRate*1000;
 	        setTimeout(reCall, refreshRateMilliSec);

@@ -33,22 +33,22 @@
 	<!-- allowGuestGroup ("true|false") 
 	=> if set to true all "gast" users are listen on the channel, if "false" only user != "gast" are listen -->
 	<receivers allowGuestGroup="false">
-		<groups>
+<!--		<groups>
 			<message.body>Caution, admingroup!</message.body>
 			<group>admingroup</group>
 		</groups>
 		<groups>
 			<message.body>Caution, authorgroup1 group!</message.body>
 			<group>authorgroup1</group>
-		</groups>		
+		</groups>		-->
 		<users>
 			<message.body>Hello root </message.body>
 			<user>root</user>
 		</users>
-		<users>
+<!--		<users>
 			<message.body>Hello gast!</message.body>
 			<user>gast</user>
-		</users>
+		</users>-->
 	</receivers>
 	
 	<!-- <from> & <to> are NOT supported yet, -> use @send -->
