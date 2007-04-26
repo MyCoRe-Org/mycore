@@ -2,7 +2,7 @@
 
 <!-- ============================================== -->
 <!--      MyCoRe-WCMS build file for use with ANT        -->
-<!-- $Revision: 1.10 $ $Date: 2006-11-22 12:20:38 $ -->
+<!-- $Revision: 1.11 $ $Date: 2007-04-26 10:14:56 $ -->
 <!-- ============================================== -->
 
 <project name="MyCoReModule - WCMS" default="usage" basedir=".">
@@ -65,7 +65,7 @@
   <target name="compile">
    <echo level="info">Compiling WCMS classes...</echo>
    <antcall target="javac">
-     <param name="packages" value="wcms/**"/>
+    <param name="packages" value="org/mycore/frontend/wcms/**"/>
    </antcall>
   </target>
 

@@ -26,7 +26,7 @@
  *
  * Created on 22. September 2003, 16:09
  */
-package wcms;
+package org.mycore.frontend.wcms;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;

@@ -4,27 +4,27 @@
 
 <servlet id="WCMSLoginServlet">
 	<servlet-name> WCMSLoginServlet </servlet-name>
-	<servlet-class> wcms.WCMSLoginServlet </servlet-class>
+	<servlet-class> org.mycore.frontend.wcms.WCMSLoginServlet </servlet-class>
 </servlet>
 <servlet id="WCMSChooseServlet">
 	<servlet-name> WCMSChooseServlet </servlet-name>
-	<servlet-class> wcms.WCMSChooseServlet </servlet-class>
+	<servlet-class> org.mycore.frontend.wcms.WCMSChooseServlet </servlet-class>
 </servlet>
 <servlet id="WCMSActionServlet">
 	<servlet-name> WCMSActionServlet </servlet-name>
-	<servlet-class> wcms.WCMSActionServlet </servlet-class>
+	<servlet-class> org.mycore.frontend.wcms.WCMSActionServlet </servlet-class>
 </servlet>
 <servlet id="WCMSAdminServlet">
 	<servlet-name> WCMSAdminServlet </servlet-name>
-	<servlet-class> wcms.WCMSAdminServlet </servlet-class>
+	<servlet-class> org.mycore.frontend.wcms.WCMSAdminServlet </servlet-class>
 </servlet>
 <servlet id="WCMSFileUploadServlet">
 	<servlet-name> WCMSFileUploadServlet </servlet-name>
-	<servlet-class> wcms.WCMSFileUploadServlet </servlet-class>
+	<servlet-class> org.mycore.frontend.wcms.WCMSFileUploadServlet </servlet-class>
 </servlet>
 <servlet id="WCMSGetStaticHTMLServlet">
 	<servlet-name> WCMSGetStaticHTMLServlet </servlet-name>
-	<servlet-class> wcms.WCMSGetStaticHTMLServlet </servlet-class>
+	<servlet-class> org.mycore.frontend.wcms.WCMSGetStaticHTMLServlet </servlet-class>
 </servlet>
 
 <servlet-mapping>
