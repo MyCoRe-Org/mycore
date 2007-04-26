@@ -563,7 +563,7 @@ public class MCRConfiguration {
             throw new MCRConfigurationException("Configuration property " + name + " is not set");
         }
 
-        return value;
+        return value.trim();
     }
 
     /**
@@ -586,7 +586,7 @@ public class MCRConfiguration {
         if ((value == null) && depr.containsKey(name))
             value = properties.getProperty(depr.getProperty(name));
 
-        return (value == null ? defaultValue : value);
+        return (value == null ? defaultValue : value.trim());
     }
 
     /**
