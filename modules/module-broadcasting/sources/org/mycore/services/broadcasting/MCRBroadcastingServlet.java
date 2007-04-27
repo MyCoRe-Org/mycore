@@ -52,6 +52,7 @@ public class MCRBroadcastingServlet extends MCRServlet {
 
 		// get mode and process
 		Element answer = null;
+		boolean transformByXSL=false;
 		if (request.getParameter("mode").equals("hasReceived")) {
 			String hasReceived = Boolean.toString(hasReceived(session, request));
 			answer = new Element("hasReceived").setText(hasReceived);
@@ -63,12 +64,13 @@ public class MCRBroadcastingServlet extends MCRServlet {
 			answer = new Element("clearReceiverList").setText("done");
 		} else if (request.getParameter("mode").equals("getReceiverList")) {
 			answer = getReceiverListAsXML(session);
+			transformByXSL=true;
 		}
 		else
 			answer = new Element("nothingDone");
 
 		// render xml
-		forwardJDOM(request, response, answer);
+		forwardJDOM(request, response, answer, transformByXSL);
 	}
 
 	private HashMap getReceiverList(MCRSession session) {
@@ -79,11 +81,10 @@ public class MCRBroadcastingServlet extends MCRServlet {
 	
 	private Element getReceiverListAsXML(MCRSession session) {
 		
+		Element recListRoot = new Element("receiverList");
 		if (getReceiverList(session)!=null) {
-			Element recListRoot = new Element("receiverList");
 			HashMap recList = getReceiverList(session);
 			Iterator receiver = recList.keySet().iterator();
-			
 			while (receiver.hasNext()) {
 				String recKey = (String)receiver.next();
 				Element key = new Element("key").setText(recKey);
@@ -92,7 +93,7 @@ public class MCRBroadcastingServlet extends MCRServlet {
 			}
 			return recListRoot;
 		} else 
-			return new Element("empty");
+			return recListRoot.addContent(new Element("empty"));
 	}	
 	
 	private void clearReceiverList() {
@@ -147,11 +148,20 @@ public class MCRBroadcastingServlet extends MCRServlet {
 	}
 	
 	public void forwardJDOM(HttpServletRequest request,
-			HttpServletResponse response, Element elem) throws IOException {
+			HttpServletResponse response, Element elem, boolean xslTransformation) throws IOException {
 
-		Element root = new Element("mcr-module-broadcasting");
+		Element root=null;
+		if (xslTransformation)
+			root = new Element("mcr-module-broadcasting-admin");
+		else 
+			root = new Element("mcr-module-broadcasting");
+		
 		root.addContent(elem);
 		Document jdom = new Document(root);
-		getLayoutService().sendXML(request, response, jdom);
+		
+		if (xslTransformation)
+			getLayoutService().doLayout(request, response, jdom);
+		else 
+			getLayoutService().sendXML(request, response, jdom);
 	}
 }
