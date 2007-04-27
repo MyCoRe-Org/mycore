@@ -29,6 +29,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.Properties;
@@ -58,6 +59,7 @@ import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUtils;
 import org.mycore.datamodel.ifs.MCRContentInputStream;
 import org.mycore.frontend.servlets.MCRServlet;
+import org.mycore.user.MCRUserMgr;
 
 /**
  * Does the layout for other MyCoRe servlets by transforming XML input to
@@ -213,8 +215,19 @@ public class MCRLayoutService {
             parameters.put("JSessionID", jSessionID + session.getId());
         }
 
+        // get current groups
         MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
-        parameters.put("CurrentUser", mcrSession.getCurrentUserID());
+        String uid = mcrSession.getCurrentUserID();
+        StringBuffer groups = new StringBuffer();
+        ArrayList groupList = MCRUserMgr.instance().retrieveUser(uid).getGroupIDs();
+        for (int i = 0; i < groupList.size(); i++) {
+            if (i != 0) groups.append(" ");
+            groups.append((String) groupList.get(i));
+        }
+
+        // set parameters
+        parameters.put("CurrentUser", uid);
+        parameters.put("CurrentGroups", groups.toString());
         parameters.put("RequestURL", getCompleteURL(request));
         parameters.put("WebApplicationBaseURL", MCRServlet.getBaseURL());
         parameters.put("ServletsBaseURL", MCRServlet.getServletBaseURL());

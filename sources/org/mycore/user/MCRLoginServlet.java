@@ -54,12 +54,15 @@ public class MCRLoginServlet extends MCRServlet {
 
     private static String GUEST_PWD;
 
+    private static String GUEST_GID;
+
     public void init() throws ServletException {
         super.init();
 
         if ((GUEST_ID == null) || (GUEST_PWD == null)) {
-            GUEST_ID = CONFIG.getString("MCR.Users.Guestuser.UserName","gast");
-            GUEST_PWD = CONFIG.getString("MCR.Users.Guestuser.UserPasswd","gast");
+            GUEST_ID = CONFIG.getString("MCR.Users.Guestuser.UserName", "gast");
+            GUEST_PWD = CONFIG.getString("MCR.Users.Guestuser.UserPasswd", "gast");
+            GUEST_GID = CONFIG.getString("MCR.Users.Guestuser.GroupName", "guestgroup");
         }
     }
 
@@ -86,19 +89,30 @@ public class MCRLoginServlet extends MCRServlet {
         if (backto_url != null) {
             backto_url = (backto_url.trim().length() == 0) ? null : backto_url.trim();
         }
+        if (backto_url == null) {
+            backto_url = MCRServlet.getBaseURL();
+        }
 
         // Do not change login, just redirect to given url:
-        if (mcrSession.getCurrentUserID().equals(uid) && (pwd == null) && (backto_url != null)) {
+        if (mcrSession.getCurrentUserID().equals(uid)) {
             job.getResponse().setHeader("Cache-Control", "no-cache");
             job.getResponse().setHeader("Pragma", "no-cache");
-            job.getResponse().setHeader("Expires","0");
-            job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(addParameter(backto_url,"reload","true")));
-
+            job.getResponse().setHeader("Expires", "0");
+            job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(addParameter(backto_url, "reload", "true")));
             return;
         }
 
-        if (backto_url == null) {
-            backto_url = MCRServlet.getBaseURL();
+        // Change login for default guest user, just redirect to given url:
+        if (GUEST_ID.equals(uid)) {
+            mcrSession.setCurrentUserID(GUEST_ID);
+            mcrSession.setLoginTime();
+            mcrSession.put("XSL.CurrentGroups", GUEST_GID);
+            LOGGER.info("Guest user " + GUEST_GID + " logged in successfully.");
+            job.getResponse().setHeader("Cache-Control", "no-cache");
+            job.getResponse().setHeader("Pragma", "no-cache");
+            job.getResponse().setHeader("Expires", "0");
+            job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(addParameter(backto_url, "reload", "true")));
+            return;
         }
 
         org.jdom.Element root = new org.jdom.Element("mcr_user");
@@ -128,18 +142,11 @@ public class MCRLoginServlet extends MCRServlet {
                 // Stylesheets.
                 StringBuffer groups = new StringBuffer();
                 ArrayList groupList = MCRUserMgr.instance().retrieveUser(uid).getGroupIDs();
-
                 for (int i = 0; i < groupList.size(); i++) {
-                    groups.append((String) groupList.get(i)).append(" ");
+                    if (i != 0) groups.append(" ");
+                    groups.append((String) groupList.get(i));
                 }
-
                 mcrSession.put("XSL.CurrentGroups", groups.toString());
-
-                if (uid.equals(GUEST_ID)) {
-                    job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(backto_url));
-
-                    return;
-                }
 
                 RequestDispatcher rd = getServletContext().getNamedDispatcher("MCRUserServlet");
                 job.getRequest().removeAttribute("lang");
@@ -147,7 +154,6 @@ public class MCRLoginServlet extends MCRServlet {
                 job.getRequest().removeAttribute("mode");
                 job.getRequest().setAttribute("mode", "Select");
                 rd.forward(job.getRequest(), job.getResponse());
-
                 return;
             }
 
@@ -191,13 +197,13 @@ public class MCRLoginServlet extends MCRServlet {
      */
     protected void doLayout(MCRServletJob job, String style, Document jdomDoc) throws IOException {
         job.getRequest().setAttribute("XSL.Style", style);
-        getLayoutService().doLayout(job.getRequest(),job.getResponse(),jdomDoc);
+        getLayoutService().doLayout(job.getRequest(), job.getResponse(), jdomDoc);
     }
-    
-    private static final String addParameter(String url, String name, String value){
-        if (url.indexOf("?")==-1){
-            return url+"?"+name+"="+value;
+
+    private static final String addParameter(String url, String name, String value) {
+        if (url.indexOf("?") == -1) {
+            return url + "?" + name + "=" + value;
         }
-        return url+"&"+name+"="+value;
+        return url + "&" + name + "=" + value;
     }
 }
