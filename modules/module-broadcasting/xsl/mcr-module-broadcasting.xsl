@@ -59,8 +59,6 @@
 									<xsl:call-template name="send.noSignal"/>
 								</xsl:when>
 								<xsl:otherwise>
-									<!-- register receiver as already received a message -->
-									<xsl:call-template name="registerUser"/>
 									<!-- send message -->
 									<xsl:call-template name="send.message"/>
 								</xsl:otherwise>
@@ -195,13 +193,12 @@
 		</xsl:choose>
 	</xsl:template>
 	<!-- ======================================================================================== -->
-	<xsl:template name="registerUser">
+	<xsl:template name="get.registerCall">
+		<xsl:param name="xmlConfig" />
 		<xsl:variable name="sessionSensitive">
-			<xsl:call-template name="get.sessionSensitive"/>
-		</xsl:variable>		
-		<xsl:variable name="tmp">
-			<xsl:copy-of select="document(concat($servletURIRes,'?mode=addReceiver&amp;sessionSensitive=',$sessionSensitive))"/>
+			<xsl:copy-of select="xalan:nodeset($xmlConfig)//sessionSensitive/text()"/>
 		</xsl:variable>
+		<xsl:copy-of select="concat($servlet,'?mode=addReceiver&amp;sessionSensitive=',$sessionSensitive)"/>
 	</xsl:template>
 	<!-- ======================================================================================== -->
 	<xsl:template name="module-broadcasting.getHeader">
@@ -211,11 +208,16 @@
 		<xsl:variable name="refreshRate">
 			<xsl:value-of select="xalan:nodeset($config)//refreshRate/text()"/>
 		</xsl:variable>
+		<xsl:variable name="registerCall">
+			<xsl:call-template name="get.registerCall">
+				<xsl:with-param name="xmlConfig" select="xalan:nodeset($config)"/>
+			</xsl:call-template>
+		</xsl:variable>
 		<xsl:if test="$initJS='true'">
 			<script language="JavaScript" src="{$WebApplicationBaseURL}modules/module-broadcasting/web/JS/broadcasting.js"
 				type="text/javascript"/>
 			<script type="text/javascript">
-				<xsl:value-of select="concat('receiveBroadcast(&#34;',$sender,'&#34;,&#34;',$servlet,'&#34;,&#34;',$refreshRate,'&#34;);')"/>
+				<xsl:value-of select="concat('receiveBroadcast(&#34;',$sender,'&#34;,&#34;',$registerCall,'&#34;,&#34;',$refreshRate,'&#34;);')"/>
 			</script>
 			<meta name="expires" content="-1" />
 		</xsl:if>

@@ -6,7 +6,6 @@
 /* Andreas Trappe 	- concept, devel. 			*/
 /*  											*/
 /************************************************/
-// ================================================================================================== //
 
 function receiveBroadcast(sender, registerServlet, refreshRate) {
 
@@ -44,12 +43,40 @@ function receiveBroadcast(sender, registerServlet, refreshRate) {
 			   var messageTail 		= answerXML.getElementsByTagName("message.tail")[0].firstChild.nodeValue;		   	   		   
 			   message=messageHeader+"\n\n"+message+"\n\n"+messageTail;
 			   alert(message);
+			   addReceiver(registerServlet);
 		   }
 			   
 		   // ask in peridical time slots for new messages 
 			var reCall = "receiveBroadcast('"+sender+"','"+registerServlet+"','"+refreshRate+"')";
 			var refreshRateMilliSec = refreshRate*1000;
 	        setTimeout(reCall, refreshRateMilliSec);
+	   }
+	  }		
+	}
+	req.send(null);		
+}
+
+function addReceiver(registerServlet) {
+	
+	var req;
+	// transmit
+	if (window.XMLHttpRequest) {
+		req = new XMLHttpRequest();
+	}
+		else if (window.ActiveXObject) {
+			req = new ActiveXObject("Microsoft.XMLHTTP");
+		}
+		
+	//fake address to kidd stupid internet explorer :-)
+	var randomNumber = Math.random();
+	var senderWithNumber = registerServlet; //+"&dummyNumber="+randomNumber;
+	req.open("GET", registerServlet, true);
+	
+	req.onreadystatechange=function() {
+	  if (req.readyState==4) {
+	   if (req.status==200) {
+		   var answerXML = req.responseXML;
+		   var message = answerXML.getElementsByTagName("addReceiver")[0].firstChild.nodeValue;
 	   }
 	  }		
 	}
