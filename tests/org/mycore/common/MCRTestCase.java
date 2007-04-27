@@ -5,7 +5,7 @@ import java.io.File;
 import junit.framework.TestCase;
 
 public class MCRTestCase extends TestCase {
-    File properties=null;;
+    File properties=null;
     static MCRConfiguration CONFIG; 
 
     /**
@@ -18,9 +18,9 @@ public class MCRTestCase extends TestCase {
      */
     protected void setUp() throws Exception {
         super.setUp();
-        if (System.getProperties().getProperty("MCR.configuration.file")==null){
+        if (System.getProperties().getProperty("MCR.Configuration.File")==null){
             properties=File.createTempFile("test",".properties");
-            System.getProperties().setProperty("MCR.configuration.file",properties.getAbsolutePath());
+            System.getProperties().setProperty("MCR.Configuration.File",properties.getAbsolutePath());
         }
         CONFIG=MCRConfiguration.instance();
         boolean setPropertie=false;
