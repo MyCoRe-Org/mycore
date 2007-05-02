@@ -204,6 +204,24 @@ public class MCRSearchServlet extends MCRServlet {
             query.setAttribute("numPerPage", getReqParameter(request, "numPerPage", "0"));
             input = new Document(query);
 
+            
+            Element sortBy = new Element("sortBy");
+            query.addContent(sortBy);
+            
+            Enumeration sortNames = request.getParameterNames();
+            while (sortNames.hasMoreElements()) {
+                String name = (String) (sortNames.nextElement());
+                if (name.endsWith(".sortField"))
+                {
+                  String sortField = name.substring(0, name.length()-10);
+                  Element field = new Element("field");
+                  field.setAttribute("name", sortField);
+                  field.setAttribute("order", getReqParameter(request, name, "ascending"));
+                  sortBy.addContent(field);
+                }
+            }
+            
+            
             Element conditions = new Element("conditions");
             query.addContent(conditions);
 
