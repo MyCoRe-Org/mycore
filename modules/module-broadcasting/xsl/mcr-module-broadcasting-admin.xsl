@@ -64,7 +64,7 @@
 	<xsl:template match="receiverList">
 		<xsl:choose>
 			<xsl:when test="empty" >
-				<xsl:copy-of select="'Empty. No messages has been received, yet.'"/>
+				<xsl:copy-of select="'Empty. No messages have been received, yet.'"/>
 			</xsl:when>
 			<xsl:otherwise>
 				<table style="border:solid 1px;" width="100%">
