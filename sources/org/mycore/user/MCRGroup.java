@@ -39,8 +39,8 @@ import org.mycore.common.MCRException;
  * The main duty of a group object is to define
  * exactly which members it will have.
  * 
- * @see org.mycore.user2.MCRUserMgr
- * @see org.mycore.user2.MCRUserObject
+ * @see org.mycore.user.MCRUserMgr
+ * @see org.mycore.user.MCRUserObject
  * 
  * @author Detlev Degenhardt
  * @author Jens Kupferschmidt

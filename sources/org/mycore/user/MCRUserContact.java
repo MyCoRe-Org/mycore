@@ -32,8 +32,8 @@ import org.apache.log4j.Logger;
  * user objects are managed by the user manager (the instance of the singleton
  * MCRUserMgr).
  * 
- * @see org.mycore.user2.MCRUserMgr
- * @see org.mycore.user2.MCRUser
+ * @see org.mycore.user.MCRUserMgr
+ * @see org.mycore.user.MCRUser
  * 
  * @author Detlev Degenhardt
  * @author Jens Kupferschmidt

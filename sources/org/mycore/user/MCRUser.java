@@ -39,10 +39,10 @@ import org.mycore.common.MCRSessionMgr;
 /**
  * Instances of this class represent MyCoRe users.
  * 
- * @see org.mycore.user2.MCRUserMgr
- * @see org.mycore.user2.MCRUserObject
- * @see org.mycore.user2.MCRUserContact
- * @see org.mycore.user2.MCRUserMgr
+ * @see org.mycore.user.MCRUserMgr
+ * @see org.mycore.user.MCRUserObject
+ * @see org.mycore.user.MCRUserContact
+ * @see org.mycore.user.MCRUserMgr
  * 
  * @author Detlev Degenhardt
  * @author Jens Kupferschmidt

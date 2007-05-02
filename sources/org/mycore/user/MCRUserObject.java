@@ -35,8 +35,8 @@ import org.mycore.common.MCRException;
 /**
  * This is the abstract super class of MCRUser and MCRGroup
  * 
- * @see org.mycore.user2.MCRUser
- * @see org.mycore.user2.MCRGroup
+ * @see org.mycore.user.MCRUser
+ * @see org.mycore.user.MCRGroup
  * 
  * @author Detlev Degenhardt
  * @author Jens Kupferschmidt
