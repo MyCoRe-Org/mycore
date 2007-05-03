@@ -80,10 +80,10 @@ public class MCRWebService implements MCRWS {
         if ( null == format )
           format = "metadata";
         String uri = "classification:" + format + ":" + level + ":" + type + ":" + classID + ":" + categID;
-        org.jdom.Document d = null;
+        org.jdom.Document d = new org.jdom.Document();
 
         org.jdom.Element cl = MCRURIResolver.instance().resolve(uri);
-        d = cl.getDocument();
+        d.addContent(cl);
 
         org.jdom.output.DOMOutputter doo = new org.jdom.output.DOMOutputter();
 
