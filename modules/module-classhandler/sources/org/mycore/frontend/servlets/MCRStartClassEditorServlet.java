@@ -262,10 +262,7 @@ public class MCRStartClassEditorServlet extends MCRServlet {
             if (!clE.isLocked(clid)) {
                 boolean cnt = clE.deleteClassification(clid);
                 if (cnt) { // deleted, no more references
-                    if (path.indexOf("&clid") > 0) {
-                        // Classification cut
-                        path = path.substring(0, path.indexOf("&clid"));
-                    }
+                    path = getBaseURL()+"browse?mode=edit";
                     job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(path));
                 } else { // not delete cause references exist
                     job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + iderrorpage));
