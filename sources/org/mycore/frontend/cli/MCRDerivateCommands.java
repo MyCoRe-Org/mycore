@@ -65,7 +65,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
     private static Logger LOGGER = Logger.getLogger(MCRDerivateCommands.class.getName());
 
     /** The ACL interface */
-    private static final MCRAccessInterface ACCESS_IMPL = (MCRAccessInterface) MCRConfiguration.instance().getInstanceOf("MCR.Access_class_name", MCRAccessBaseImpl.class.getName());
+    private static final MCRAccessInterface ACCESS_IMPL = (MCRAccessInterface) MCRConfiguration.instance().getInstanceOf("MCR.Access.Class", MCRAccessBaseImpl.class.getName());
 
     /** Default transformer script */
     public static final String DEFAULT_TRANSFORMER = "save-derivate.xsl";
