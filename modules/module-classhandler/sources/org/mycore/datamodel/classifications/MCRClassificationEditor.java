@@ -503,12 +503,13 @@ public class MCRClassificationEditor {
             MCRObjectID mcrclid = new MCRObjectID(clid);
             MCRClassification cl = new MCRClassification();
             cl.deleteFromDatastore(mcrclid);
+            LOGGER.info("Classification: " + clid + " deleted.");
             return true;
         } catch (MCRActiveLinkException ae) {
-            LOGGER.warn("Classification: " + clid + " can't be deleted, there are some refernces of documents to this");
+            LOGGER.warn("Classification: " + clid + " can't be deleted, there are some refernces of documents to this.");
             return false;
         } catch (Exception e) {
-            LOGGER.error("Classification delete failed - the Reason is:" + e.getMessage());
+            LOGGER.error("Classification delete failed - the Reason is:" + e.getMessage() + " .");
             return false;
         }
     }

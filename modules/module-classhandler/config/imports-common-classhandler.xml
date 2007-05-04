@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- ============================================== -->
+<!-- $Revision: 1.1 $ $Date: 2007-05-04 11:35:51 $ -->
+<!-- ============================================== -->
+
+<imports>
+<!-- *** Language List *** -->
+
+  <list id="Slang" width="60" type="dropdown">
+    <item value="de">
+      <label xml:lang="de">de</label>
+      <label xml:lang="en">ger</label>
+    </item>
+    <item value="en">
+      <label xml:lang="de">en</label>
+      <label xml:lang="en">eng</label>
+    </item>
+  </list>
+
+<!-- *** Data for the buttons ** -->
+
+  <submitButton id="BSubmit" width="100px" i18n="buttons.save" />
+  <cancelButton id="BCancel" width="100px" i18n="buttons.cancel" />
+
+  <panel id="TwoButtons">
+    <cell col="1" row="1" anchor="WEST" ref="BCancel"/>
+    <cell col="2" row="1" anchor="WEST" ref="BSubmit" var="save"/>
+  </panel>
+
+<!-- *** Text fields *** -->
+
+  <textfield id="TFzeile128" width="32" maxlength="32"/>
+  <textfield id="TFzeile1024" width="48" maxlength="1024"/>
+
+<!-- *** End *** -->
+
+</imports>

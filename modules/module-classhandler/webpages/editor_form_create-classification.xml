@@ -1,16 +1,77 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE MyCoReWebPage>
 
+<!-- ============================================== -->
+<!-- $Revision: 1.4 $ $Date: 2007-05-04 11:35:52 $ -->
+<!-- ============================================== -->
+
 <MyCoReWebPage>
 
 <section title="Neuanlegen einer Klassifikation" xml:lang="de">
-<editor id="create-classification-de"><include uri="webapp:editor/editor-create-classification.xml"/></editor>
 </section>
 
 <section title="Create a new category for the given classification" xml:lang="en">
-<editor id="create-classification-en"><include uri="webapp:editor/editor-create-classification.xml"/></editor>
 </section>
 
+<section xml:lang="all">
+<editor id="create-classification">
+ <target type="servlet" name="MCRStartClassEditorServlet" method="get" format="xml" />
+ <cancel url="{cancelUrl}" />
+ 
+ <components root="create-classification" var="/mycoreclass">
+
+  <include uri="webapp:editor/imports-common-classhandler.xml" />
+
+  <headline anchor="CENTER">
+   <text i18n="classedit.headline.addclass" />
+  </headline>
+
+  <panel id="create-classification">	  	  
+	<hidden var="categories/category/@ID" default="empty"/>
+	<hidden var="categories/category/label/@text" default="Empty"/>
+	<cell col="1" row="1" colspan="2" anchor="NORTHWEST" ref="NewClass" />	  	  	  
+	<cell col="1" row="2" colspan="2" anchor="NORTHWEST"><space width="1px" height="10px" /></cell>	
+    <cell col="1" row="3" colspan="2" anchor="EAST"      ref="TwoButtons"  />
+	<cell col="1" row="4" colspan="2" anchor="NORTHWEST"><space width="1px" height="10px" /></cell>	
+  </panel>
+
+  <panel id="NewClass">
+    <cell col="1" row="1" colspan="2" anchor="NORTHWEST" ref="AClid" />	  	  	  
+    <cell col="1" row="2" anchor="NORTHWEST">	  
+	  <text i18n="classedit.label.id.p" class="editorlabel" />
+	</cell>	
+    <cell col="2" row="2" anchor="NORTHWEST" ref="TFzeile1024" var="@ID" />
+    <cell col="1" row="3" anchor="NORTHWEST">	  
+	  <text i18n="classedit.label.label.p" class="editorlabel"/>
+	</cell>		  
+    <cell col="2" row="3" var="label" anchor="NORTHWEST" >
+		   <repeater min="1" max="10" ref="RNewClassLabel" />      
+	</cell>	      	  	   	 	  	    	  	  
+    <cell col="1" row="5" colspan="2" anchor="NORTHWEST"><space width="1px" height="10px" /></cell>		  
+  </panel>
+	 
+  <panel id="RNewClassLabel">
+	<cell col="1" row="1" anchor="NORTHWEST" ref="Slang" var="@lang" default="de"/>    	  
+    <cell col="2" row="1" anchor="NORTHWEST">	  
+	  <text i18n="classedit.label.lang" class="editorlabel"/>
+	</cell>
+    <cell col="1" row="2" anchor="NORTHWEST" ref="TFzeile1024" var="@text"  />	  
+    <cell col="2" row="2" anchor="NORTHWEST">	  
+	  <text i18n="classedit.label.text.p" class="editorlabel"/>
+	</cell>	  
+    <cell col="1" row="3" anchor="NORTHWEST" ref="TFzeile1024"  var="@description"  />	  
+    <cell col="2" row="3" anchor="NORTHWEST">	  
+	  <text i18n="classedit.label.description" class="editorlabel"/>
+	</cell>	  	  
+  </panel>
+
+  <text id="AClid" i18n="classedit.label.addclass.aclid" class="editorlabel"/>
+
+<!-- *** End *** -->
+
+ </components>
+</editor>
+</section>
 </MyCoReWebPage>
 
 

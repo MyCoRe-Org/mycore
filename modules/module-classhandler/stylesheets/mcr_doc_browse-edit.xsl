@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!-- ============================================== -->
-<!-- $Revision: 1.7 $ $Date: 2007-03-23 11:11:55 $ -->
+<!-- $Revision: 1.8 $ $Date: 2007-05-04 11:35:53 $ -->
 <!-- ============================================== -->
 
 <!-- +
@@ -44,6 +44,7 @@
   <xsl:template match="navigationtree">
     <xsl:variable name="predecessor" select="@predecessor" />
     <xsl:variable name="classifID" select="@classifID" />
+    <xsl:variable name="label" select="../label" />
     <xsl:variable name="actcateg" select="@categID" />
     <xsl:variable name="view" select="@view" />
     <xsl:variable name="doctype" select="@doctype" />
@@ -75,6 +76,11 @@
     
     <table cellspacing="0" cellpadding="0" style="width:100%; margin: 3% 0px 3% 2%;" class="bg_background">
       <tr>
+        <td style="text-align:left;padding-right:20px;">
+          <b>
+            <xsl:value-of select="$label" />
+          </b>
+        </td>
         <td style="text-align:right;padding-right:5px;">
           <a href='{$hrefstart}'>
             <xsl:value-of select="i18n:translate('Browse.showAllClass')" />
@@ -82,10 +88,8 @@
         </td>
       </tr>
       <tr>
-        <td>
-          <b>
-            <xsl:value-of select="concat('[',$classifID,']')" />
-          </b>
+        <td colspan="2">
+          <xsl:value-of select="concat('[',$classifID,']')" />
           <xsl:if test="$userEdited != 'false'">
             <br/><b><xsl:value-of select="i18n:translate('Browse.editError')"/></b>
             <xsl:value-of select="$userEdited" />

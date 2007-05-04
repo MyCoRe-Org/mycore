@@ -121,7 +121,7 @@ public class MCRCheckClassACLServlet extends MCRServlet {
     protected String getNextURL(MCRObjectID ID, boolean okay) throws MCRActiveLinkException {
         StringBuffer sb = new StringBuffer();
         if (okay) {
-            sb.append("browse/").append(ID.getId());
+            sb.append(getBaseURL()).append("browse?mode=edit");
         } else {
             sb.append(CONFIG.getString("MCR.editor_page_dir", "")).append(CONFIG.getString("MCR.editor_page_error_store", "editor_error_store.xml"));
         }
