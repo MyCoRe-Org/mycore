@@ -436,19 +436,36 @@ public class MCRServlet extends HttpServlet {
         for (Enumeration e = request.getParameterNames(); e.hasMoreElements();) {
             String name = e.nextElement().toString();
             if (name.startsWith("XSL.") && name.endsWith(".SESSION")) {
-                mcrSession.put(name.substring(0, name.length() - 8), request.getParameter(name));
-                LOGGER.debug("Found HTTP-Req.-Parameter " + name + "=" + request.getParameter(name) + " that should be saved in session, safed "
-                        + name.substring(0, name.length() - 8) + "=" + request.getParameter(name));
+            	String key = name.substring(0, name.length() - 8); 
+            	// parameter is not empty -> store
+            	if (!request.getParameter(name).trim().equals("")) {
+            		mcrSession.put(key, request.getParameter(name));
+                    LOGGER.debug("Found HTTP-Req.-Parameter " + name + "=" + request.getParameter(name) + " that should be saved in session, safed "
+                            + key + "=" + request.getParameter(name));	
+				} 
+            	// paramter is empty -> do not store and if contained in session, remove from it
+            	else {
+            		if (mcrSession.get(key)!=null)
+            			mcrSession.deleteObject(key);
+				}
             }
         }
         for (Enumeration e = request.getAttributeNames(); e.hasMoreElements();) {
             String name = e.nextElement().toString();
             if (name.startsWith("XSL.") && name.endsWith(".SESSION")) {
-                mcrSession.put(name.substring(0, name.length() - 8), request.getAttribute(name));
-                LOGGER.debug("Found HTTP-Req.-Attribute " + name + "=" + request.getParameter(name) + " that should be saved in session, safed "
-                        + name.substring(0, name.length() - 8) + "=" + request.getParameter(name));
+            	String key = name.substring(0, name.length() - 8);
+            	// attribute is not empty -> store            	
+            	if (!request.getAttribute(name).toString().trim().equals("")) {
+            		mcrSession.put(key, request.getAttribute(name));
+                    LOGGER.debug("Found HTTP-Req.-Attribute " + name + "=" + request.getParameter(name) + " that should be saved in session, safed "
+                            + key + "=" + request.getParameter(name));	
+            	}
+            	// attribute is empty -> do not store and if contained in session, remove from it            	
+            	else {
+            		if (mcrSession.get(key)!=null)
+            			mcrSession.deleteObject(key);
+            	}
             }
-
         }
     }
 }
