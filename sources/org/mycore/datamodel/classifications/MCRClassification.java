@@ -28,6 +28,7 @@ import static org.mycore.common.MCRConstants.XSI_NAMESPACE;
 import static org.mycore.common.MCRConstants.XLINK_NAMESPACE;
 
 import java.io.ByteArrayInputStream;
+import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
@@ -207,10 +208,6 @@ public class MCRClassification extends MCRClassificationItem {
         evt.put("class", this);
         MCREventManager.instance().handleEvent(evt);
 
-        // store in SQL tables
-        CM.createClassificationItem(this);
-        CM.createCategoryItems(getCategories());
-
         return;
     }
 
@@ -230,7 +227,7 @@ public class MCRClassification extends MCRClassificationItem {
 
         // save old classification for later reference and roll back
         Document oldClass = TM.retrieveAsJDOM(ID);
-        Hashtable<String,Element> oldIDs = new Hashtable<String,Element>();
+        Hashtable<String, Element> oldIDs = new Hashtable<String, Element>();
         // all categ-IDs can easily be searched now
         getHashedIDs(oldClass.getRootElement(), oldIDs);
         Set removedIDs = oldIDs.keySet();
@@ -240,8 +237,8 @@ public class MCRClassification extends MCRClassificationItem {
         while (it.hasNext()) {
             String cid = (String) it.next();
             int i = LM.countReferenceCategory(ID.getId(), cid);
-            count +=i;
-            LOGGER.debug("Check link for category with ID " + cid );
+            count += i;
+            LOGGER.debug("Check link for category with ID " + cid);
             if (i != 0) {
                 LOGGER.error("Category " + cid + " in classification " + ID.getId() + " has " + (new Integer(i).toString() + " links. Can't remove!"));
                 candelete = false;
@@ -252,13 +249,6 @@ public class MCRClassification extends MCRClassificationItem {
             throw e;
         }
 
-        // SQL delete
-        it = removedIDs.iterator();
-        while (it.hasNext()) {
-            String cid = (String) it.next();
-            CM.deleteCategoryItem(ID, cid);
-        }
-        CM.deleteClassificationItem(ID);
         // handle events
         MCREvent evt = new MCREvent(MCREvent.CLASS_TYPE, MCREvent.DELETE_EVENT);
         MCRClassification oldcl = new MCRClassification();
@@ -382,49 +372,47 @@ public class MCRClassification extends MCRClassificationItem {
         mcr_service.setDate("modifydate");
 
         Document thisClass = createXML();
-        Hashtable<String,Element> thisIDs = new Hashtable<String,Element>();
+        Hashtable<String, Element> thisIDs = new Hashtable<String, Element>();
         // save old classification for later reference and roll back
-        Document oldClass = TM.retrieveAsJDOM(new MCRObjectID(getId()));
-        Hashtable<String,Element> oldIDs = new Hashtable<String,Element>();
+        Document oldClassDoc = TM.retrieveAsJDOM(new MCRObjectID(getId()));
+        Hashtable<String, Element> oldIDs = new Hashtable<String, Element>();
         // all categ-IDs can easily be searched now
-        getHashedIDs(oldClass.getRootElement(), oldIDs);
+        getHashedIDs(oldClassDoc.getRootElement(), oldIDs);
         getHashedIDs(thisClass.getRootElement(), thisIDs);
         Set oldIDsSet = oldIDs.keySet();
         Set thisIDsSet = thisIDs.keySet();
         // compare entries
-        int count = 0;
-        boolean canupdate = true;
+        ArrayList<String> oldCateg = new ArrayList<String>();
         Iterator it = oldIDsSet.iterator();
         while (it.hasNext()) {
             String cid = (String) it.next();
+            System.out.println("??????????????????"+cid);
             int i = LM.countReferenceCategory(getId(), cid);
-            if (i == 0) { it.remove(); continue; }
-            if (thisIDsSet.contains(cid)) {it.remove(); continue; }
-            canupdate = false;
-            LOGGER.error("The category "+cid+" of classification "+getId()+" has "+(new Integer(i)).toString()+" references and was not found in new classification.");
+            if (i == 0) {
+                it.remove();
+                continue;
+            }
+            if (thisIDsSet.contains(cid)) {
+                it.remove();
+                continue;
+            }
+            oldCateg.add(cid);
+            LOGGER.warn("The category " + cid + " of classification " + getId() + " has " + (new Integer(i)).toString() + " references and was not found in new classification.");
         }
-        if (!canupdate) {
-            MCRActiveLinkException e = new MCRActiveLinkException(new StringBuffer("Error while deleting classification ").append(getId()).append(". ").append((new Integer(count).toString())).append(" unresolved reverences!").toString());
-            throw e;
+        if (oldCateg.size() != 0) {
+            MCRClassification oldClass = new MCRClassification();
+            oldClass.setFromJDOM(oldClassDoc);
+            for (int i = 0; i < oldCateg.size(); i++) {
+                copyCategory(oldClass, (String) oldCateg.get(i));
+            }
         }
-        
+
         // Call event handler for ACL and XML table
         MCREvent evt = null;
         evt = new MCREvent(MCREvent.CLASS_TYPE, MCREvent.UPDATE_EVENT);
         evt.put("class", this);
         MCREventManager.instance().handleEvent(evt);
 
-        // delete SQL tables
-        it = oldIDsSet.iterator();
-        while (it.hasNext()) {
-            String cid = (String) it.next();
-            CM.deleteCategoryItem(getId(), cid);
-        }
-        CM.deleteClassificationItem(getId());
-        // store in SQL tables
-        CM.createClassificationItem(this);
-        CM.createCategoryItems(getCategories());
-        
         CM.jDomCache.remove(getId());
     }
 

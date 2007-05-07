@@ -23,13 +23,18 @@
 
 package org.mycore.backend.hibernate.tables;
 
+import org.mycore.common.MCRPersistenceException;
+
 public class MCRCLASS {
     private String id;
 
     public MCRCLASS() {
     }
 
-    public MCRCLASS(String id) {
+    public MCRCLASS(String id) throws MCRPersistenceException {
+        if ((id == null) || (id.trim().length() == 0)) {
+            throw new MCRPersistenceException("The classification has an empty ID element.");
+            }
         this.id = id;
     }
 

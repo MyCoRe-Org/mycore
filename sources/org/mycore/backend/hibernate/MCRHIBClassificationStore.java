@@ -78,9 +78,9 @@ public class MCRHIBClassificationStore implements MCRClassificationInterface {
     public final void createClassificationItem(MCRClassificationItem classification) {
         Session session = getSession();
         Transaction tx = session.beginTransaction();
-        MCRCLASS c = new MCRCLASS(classification.getId());
 
         try {
+            MCRCLASS c = new MCRCLASS(classification.getId());
             session.saveOrUpdate(c);
             ArrayList<MCRLabel> label = (ArrayList<MCRLabel>) classification.getLabels();
             for (int i = 0; i < label.size(); i++) {
@@ -220,7 +220,6 @@ public class MCRHIBClassificationStore implements MCRClassificationInterface {
                 MCRCATEGLABEL cl = new MCRCATEGLABEL(category.getId(), category.getClassID(), label.getLang(), text, desc);
                 session.saveOrUpdate(cl);
             }
-
             tx.commit();
         } catch (Exception e) {
             e.printStackTrace();

@@ -23,6 +23,8 @@
 
 package org.mycore.backend.hibernate.tables;
 
+import org.mycore.common.MCRPersistenceException;
+
 public class MCRCLASSLABEL {
     private MCRCLASSLABELPK key;
 
@@ -35,6 +37,9 @@ public class MCRCLASSLABEL {
     }
 
     public MCRCLASSLABEL(String id, String lang, String text, String mcrdesc) {
+        if ((id == null) || (id.trim().length() == 0) || (lang == null) || (lang.trim().length() == 0)) {
+            throw new MCRPersistenceException("The label of a classification has an empty ID or lang element.");
+            }
         this.text = text;
         this.mcrdesc = mcrdesc;
         this.key = new MCRCLASSLABELPK(id, lang);

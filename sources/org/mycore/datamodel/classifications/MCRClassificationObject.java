@@ -26,6 +26,8 @@ package org.mycore.datamodel.classifications;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+
 /**
  * This calss implmets all common parts of a classifcation or category item.
  * 
@@ -34,6 +36,9 @@ import java.util.List;
  * @version $Revision$ $Date$
  */
 public abstract class MCRClassificationObject implements Cloneable {
+
+    // logger
+    static Logger LOGGER = Logger.getLogger(MCRClassificationObject.class);
 
     /** The langth of the languages * */
     public static final int MAX_CLASSIFICATION_LANG = 8;

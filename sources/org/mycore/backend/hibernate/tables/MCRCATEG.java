@@ -23,6 +23,8 @@
 
 package org.mycore.backend.hibernate.tables;
 
+import org.mycore.common.MCRPersistenceException;
+
 public class MCRCATEG {
     private MCRCATEGPK key;
 
@@ -34,7 +36,10 @@ public class MCRCATEG {
         this.key = new MCRCATEGPK();
     }
 
-    public MCRCATEG(String id, String clid, String pid, String url) {
+    public MCRCATEG(String id, String clid, String pid, String url) throws MCRPersistenceException {
+        if ((id == null) || (id.trim().length() == 0) || (clid == null) || (clid.trim().length() == 0)) {
+            throw new MCRPersistenceException("The label of a category has an empty ID, CLID or lang element.");
+            }
         this.key = new MCRCATEGPK(id, clid);
         this.pid = pid;
         this.url = url;
