@@ -15,52 +15,66 @@
 	
 	<xsl:include href="MyCoReLayout.xsl"/>
 	<xsl:variable name="PageTitle" select="'Module-Broadcasting Monitoring'"/>
+	<xsl:variable name="access">
+		<xsl:call-template name="get.access" />
+	</xsl:variable>
 	
 	<!-- ======================================================================================== -->
+	
 	<xsl:template match="/mcr-module-broadcasting-admin">
-		<table width="100%">
-			<!-- general infos -->
-			<tr>
-				<th align="left">General setup:</th>
-			</tr>
-			<tr>
-				<td>
-					<xsl:call-template name="main"/>
-				</td>
-			</tr>
-			
-			<xsl:call-template name="lineBreak"/>
-			
-			<!-- receiver list -->
-			<tr>
-				<th align="left">Receiver list:</th>
-			</tr>
-			<tr>
-				<td>
-					<xsl:apply-templates select="receiverList"/>
-				</td>
-			</tr>
-			
-			<xsl:call-template name="lineBreak"/>
-			
-			<xsl:choose>
-				<xsl:when test="receiverList/empty"/>
-				<xsl:otherwise>
-					<!-- clear receiver list -->
+		<xsl:choose>
+			<xsl:when test="$access='true'">
+				<table width="100%">
+					<!-- general infos -->
 					<tr>
-						<th align="left">Clear receiver list:</th>
+						<th align="left">General setup:</th>
 					</tr>
 					<tr>
 						<td>
-							<xsl:call-template name="clearReceiverList"/>
+							<xsl:call-template name="main"/>
 						</td>
 					</tr>
-				</xsl:otherwise>
-			</xsl:choose>
-			
-		</table>
+					<xsl:call-template name="lineBreak"/>
+					<!-- receiver list -->
+					<tr>
+						<th align="left">Receiver list:</th>
+					</tr>
+					<tr>
+						<td>
+							<xsl:apply-templates select="receiverList"/>
+						</td>
+					</tr>
+					<xsl:call-template name="lineBreak"/>
+					<xsl:choose>
+						<xsl:when test="receiverList/empty"/>
+						<xsl:otherwise>
+							<!-- clear receiver list -->
+							<tr>
+								<th align="left">Clear receiver list:</th>
+							</tr>
+							<tr>
+								<td>
+									<xsl:call-template name="clearReceiverList"/>
+								</td>
+							</tr>
+						</xsl:otherwise>
+					</xsl:choose>
+				</table>
+			</xsl:when>
+			<xsl:otherwise>
+				<table width="100%">
+					<tr>
+						<td align="left">No access.</td>
+					</tr>
+				</table>
+			</xsl:otherwise>
+		</xsl:choose>
 	</xsl:template>
 	<!-- ======================================================================================== -->
+	<xsl:template name="get.access">
+		<xsl:value-of select="/mcr-module-broadcasting-admin/receiverList/@access"/>
+	</xsl:template>
+	<!-- ======================================================================================== -->	
 	<xsl:template match="receiverList">
 		<xsl:choose>
 			<xsl:when test="empty" >

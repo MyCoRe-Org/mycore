@@ -22,6 +22,8 @@ import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
+import org.mycore.access.MCRAccessInterface;
+import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRException;
@@ -59,20 +61,26 @@ public class MCRBroadcastingServlet extends MCRServlet {
 		} else if (request.getParameter("mode").equals("addReceiver")) {
 			addReceiver(session, request);
 			answer = new Element("addReceiver").setText("done");
-		} else if (request.getParameter("mode").equals("clearReceiverList")) {
+		} else if (request.getParameter("mode").equals("clearReceiverList") && access()) {
 			clearReceiverList();
 			answer = new Element("clearReceiverList").setText("done");
-		} else if (request.getParameter("mode").equals("getReceiverList")) {
+		} else if (request.getParameter("mode").equals("getReceiverList") && access()) {
 			answer = getReceiverListAsXML(session);
 			transformByXSL=true;
 		}
-		else
+		else {
+			transformByXSL=true;
 			answer = new Element("nothingDone");
+		}
 
 		// render xml
 		forwardJDOM(request, response, answer, transformByXSL);
 	}
 
+	private static boolean access() {
+		return MCRAccessManager.getAccessImpl().checkPermission("module-broadcasting", "manage");
+	}
+	
 	private HashMap getReceiverList(MCRSession session) {
 		if (!cache.isEmpty() && cache.get("bcRecList") != null) 
 			return (HashMap) cache.get("bcRecList");
@@ -81,7 +89,7 @@ public class MCRBroadcastingServlet extends MCRServlet {
 	
 	private Element getReceiverListAsXML(MCRSession session) {
 		
-		Element recListRoot = new Element("receiverList");
+		Element recListRoot = new Element("receiverList").setAttribute("access","true");
 		if (getReceiverList(session)!=null) {
 			HashMap recList = getReceiverList(session);
 			Iterator receiver = recList.keySet().iterator();
