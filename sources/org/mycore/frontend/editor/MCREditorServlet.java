@@ -23,6 +23,8 @@
 
 package org.mycore.frontend.editor;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
@@ -471,6 +473,8 @@ public class MCREditorServlet extends MCRServlet {
             sendToServlet(req, res, sub);
         } else if (targetType.equals("url")) {
             sendToURL(req, res);
+        } else if (targetType.equals("webapp")) {
+          sendToWebAppFile(req, res, sub);
         } else if (targetType.equals("debug")) {
             sendToDebug(res, sub);
         } else if (targetType.equals("display")) {
@@ -514,6 +518,28 @@ public class MCREditorServlet extends MCRServlet {
         res.sendRedirect(res.encodeRedirectURL(url.toString()));
     }
 
+    /**
+     * Writes the output of editor to a local file in the web application directory.
+     * Usage: &lt;target type="webapp" name="{relative_path_to_file}" url="{redirect url after file is written}" /&gt;
+     * 
+     * @throws IOException
+     */
+    private void sendToWebAppFile(HttpServletRequest req, HttpServletResponse res, MCREditorSubmission sub) throws IOException {
+      String path = sub.getParameters().getParameter("_target-name");
+      String url = sub.getParameters().getParameter("_target-url");
+
+      logger.debug("Writing editor output to webapp file " + path);
+      
+      File f = new File(getServletContext().getRealPath(path));
+      FileOutputStream fout = new FileOutputStream(f);
+      XMLOutputter outputter = new XMLOutputter(Format.getPrettyFormat().setEncoding( "UTF-8"  ));
+      outputter.output(sub.getXML(), fout);
+      fout.close();
+      
+      logger.debug("EditorServlet redirecting to " + url);
+      res.sendRedirect(res.encodeRedirectURL(url.toString()));
+    }
+ 
     private void sendToSubSelect(HttpServletResponse res, MCRRequestParameters parms, List variables, String root) throws IOException {
         String webpage = parms.getParameter("subselect.webpage");
         String varpath = parms.getParameter("subselect.varpath");
