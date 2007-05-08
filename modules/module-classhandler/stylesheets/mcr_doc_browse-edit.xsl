@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!-- ============================================== -->
-<!-- $Revision: 1.8 $ $Date: 2007-05-04 11:35:53 $ -->
+<!-- $Revision: 1.9 $ $Date: 2007-05-08 12:15:28 $ -->
 <!-- ============================================== -->
 
 <!-- +
@@ -92,7 +92,7 @@
           <xsl:value-of select="concat('[',$classifID,']')" />
           <xsl:if test="$userEdited != 'false'">
             <br/><b><xsl:value-of select="i18n:translate('Browse.editError')"/></b>
-            <xsl:value-of select="$userEdited" />
+            &#160;<xsl:value-of select="$userEdited" />
           </xsl:if>
           <table cellspacing="1" cellpadding="2" style="margin: 3% 10px 3% 2%;">
 
@@ -294,20 +294,44 @@
               </tr>
             </xsl:for-each>
 
-            <xsl:if test="@rowcount = 1 ">
+            <tr>
+             <td>
               <xsl:if test="($canEdit = 'true')">
                 <hr />
+				<table>
+                <tr>
+				<td>
                 <form action="{$WebApplicationBaseURL}servlets/MCRStartClassEditorServlet{$HttpSession}" method="get">
                   <input type="hidden" name="todo" value='create-category' />
                   <input type="hidden" name="todo2" value='modify-classification' />
                   <input type="hidden" name="path" value='{$path}' />
                   <input type="hidden" name="clid" value='{$classifID}' />
                   <input type="hidden" name="categid" value='empty' />
-                  <input type="image" src='{$classnew}' title="{i18n:translate('Browse.newCat')}" />
+                  <input type="submit" class="button" name="newcateg" value="{i18n:translate('Browse.newCat')}" />
                 </form>
+				</td>
+                <td>
+                  <form action="{$WebApplicationBaseURL}servlets/MCRStartClassEditorServlet{$HttpSession}" method="get">
+                    <input type="hidden" name="path" value='{$path}' />
+                    <input type="hidden" name="clid" value='' />
+                    <input type="hidden" name="todo" value='save-all' />
+                    <input type="submit" class="button" name="saveAll" value="{i18n:translate('Browse.saveClass')}" />
+                  </form>
+                </td>
+                <td>
+                  <form action="{$WebApplicationBaseURL}servlets/MCRStartClassEditorServlet{$HttpSession}" method="get">
+                    <input type="hidden" name="path" value='{$path}' />
+                    <input type="hidden" name="clid" value='' />
+                    <input type="hidden" name="todo" value='purge-all' />
+                    <input type="submit" class="button" name="purgeAll" value="{i18n:translate('Browse.discardClass')}" />
+                  </form>
+                </td>
+				</tr>
+				</table>
                 <hr />
               </xsl:if>
-            </xsl:if>
+			</td>
+			</tr>
           </table>
         </td>
       </tr>
