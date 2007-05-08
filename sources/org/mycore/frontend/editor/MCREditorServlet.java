@@ -474,7 +474,7 @@ public class MCREditorServlet extends MCRServlet {
         } else if (targetType.equals("url")) {
             sendToURL(req, res);
         } else if (targetType.equals("webapp")) {
-          sendToWebAppFile(req, res, sub);
+          sendToWebAppFile(req, res, sub, editor);
         } else if (targetType.equals("debug")) {
             sendToDebug(res, sub);
         } else if (targetType.equals("display")) {
@@ -521,12 +521,12 @@ public class MCREditorServlet extends MCRServlet {
     /**
      * Writes the output of editor to a local file in the web application directory.
      * Usage: &lt;target type="webapp" name="{relative_path_to_file}" url="{redirect url after file is written}" /&gt;
+     * If cancel url is given, user is redirected to that page, otherwise target url is used.
      * 
      * @throws IOException
      */
-    private void sendToWebAppFile(HttpServletRequest req, HttpServletResponse res, MCREditorSubmission sub) throws IOException {
+    private void sendToWebAppFile(HttpServletRequest req, HttpServletResponse res, MCREditorSubmission sub, Element editor) throws IOException {
       String path = sub.getParameters().getParameter("_target-name");
-      String url = sub.getParameters().getParameter("_target-url");
 
       logger.debug("Writing editor output to webapp file " + path);
       
@@ -536,6 +536,11 @@ public class MCREditorServlet extends MCRServlet {
       outputter.output(sub.getXML(), fout);
       fout.close();
       
+      String url = sub.getParameters().getParameter("_target-url");
+      Element cancel = editor.getChild("cancel");
+      if( ( cancel != null ) && ( cancel.getAttributeValue( "url" ) != null ) )
+        url = cancel.getAttributeValue( "url" );
+        
       logger.debug("EditorServlet redirecting to " + url);
       res.sendRedirect(res.encodeRedirectURL(url.toString()));
     }
