@@ -470,10 +470,8 @@ public class MCRClassificationBrowserData {
     public org.jdom.Document createXmlTree(final String lang) throws Exception {
 
         //final MCRClassificationItem cl = getClassificationPool().getClassificationAsPojo(getClassification().getId());
-        System.out.println("*****************************"+getClassification());
         MCRClassificationPool cp = getClassificationPool();
         MCRClassificationItem cl = cp.getClassificationAsPojo(getClassification().getId());
-        System.out.println("*****************************"+getClassification().getId());
         MCRLabel labels = getLabel(cl, lang);
         Element xDocument = new Element("classificationBrowse");
 
