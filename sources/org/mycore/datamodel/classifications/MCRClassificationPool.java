@@ -21,7 +21,6 @@ public class MCRClassificationPool {
     
     private HashMap<String, MCRClassificationItem> classifications=new HashMap<String, MCRClassificationItem>(); // A Hash map to store all edited classifications
     static Logger LOGGER=Logger.getLogger(MCRClassificationPool.class);
-    MCRClassification cl=new MCRClassification();
     
     public MCRClassificationPool() {
         MCRSessionMgr.getCurrentSession().put("classifications",classifications); //Put the hash map in the current session
@@ -51,9 +50,12 @@ public class MCRClassificationPool {
             MCRClassificationItem clas=(MCRClassificationItem)classifications.get(iter.next().toString());
             Document doc=MCRClassificationTransformer.getMetaDataDocument(clas);
             try {
+                MCRClassification cl=new MCRClassification();
+System.out.println("********************************************************"+cl.getId());
                 cl.setFromJDOM(doc);
                 cl.updateInDatastore();
                 iter.remove();
+System.out.println("********************************************************"+cl.getId());
             } catch (Exception e) {
                 e.printStackTrace();
                 return false; 
@@ -90,7 +92,7 @@ public class MCRClassificationPool {
      */
     public void updateClassification(MCRClassificationItem cl) { 
         classifications.put(cl.getId(),cl);
-        LOGGER.debug("Classification: "+cl.getId()+" wurde in den Session hinzugef�gt!");
+        LOGGER.debug("Classification: "+cl.getId()+" add to session!");
         
     }
     

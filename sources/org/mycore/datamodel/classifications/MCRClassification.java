@@ -196,12 +196,13 @@ public class MCRClassification extends MCRClassificationItem {
         }
 
         // set date values in service part
+        if (mcr_service == null) {
+            mcr_service = new MCRObjectService();
+        }
         if (mcr_service.getDate("createdate") == null) {
             mcr_service.setDate("createdate");
         }
-        if (mcr_service.getDate("modifydate") == null) {
-            mcr_service.setDate("modifydate");
-        }
+        mcr_service.setDate("modifydate");
 
         // Call event handler
         MCREvent evt = new MCREvent(MCREvent.CLASS_TYPE, MCREvent.CREATE_EVENT);
@@ -366,10 +367,12 @@ public class MCRClassification extends MCRClassificationItem {
         }
 
         // set date
+        if (mcr_service == null) {
+            mcr_service = new MCRObjectService();
+        }
         if (mcr_service.getDate("createdate") == null) {
             mcr_service.setDate("createdate");
         }
-        mcr_service.setDate("modifydate");
 
         Document thisClass = createXML();
         Hashtable<String, Element> thisIDs = new Hashtable<String, Element>();
@@ -381,12 +384,17 @@ public class MCRClassification extends MCRClassificationItem {
         getHashedIDs(thisClass.getRootElement(), thisIDs);
         Set oldIDsSet = oldIDs.keySet();
         Set thisIDsSet = thisIDs.keySet();
+        // set create date from old
+        Element service = oldClassDoc.getRootElement().getChild("service");
+        if (service != null) {
+            mcr_service.setFromDOM(service);
+        }        
+        mcr_service.setDate("modifydate");
         // compare entries
         ArrayList<String> oldCateg = new ArrayList<String>();
         Iterator it = oldIDsSet.iterator();
         while (it.hasNext()) {
             String cid = (String) it.next();
-            System.out.println("??????????????????"+cid);
             int i = LM.countReferenceCategory(getId(), cid);
             if (i == 0) {
                 it.remove();
