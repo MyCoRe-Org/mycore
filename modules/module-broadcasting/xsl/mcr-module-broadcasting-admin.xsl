@@ -27,7 +27,7 @@
 				<table width="100%">
 					<!-- general infos -->
 					<tr>
-						<th align="left">General setup:</th>
+						<th align="left">General setup: <a href="{concat($WebApplicationBaseURL,'modules/module-broadcasting/web/editor/editor_start_broadcasting.xml')}" >edit</a></th>
 					</tr>
 					<tr>
 						<td>
