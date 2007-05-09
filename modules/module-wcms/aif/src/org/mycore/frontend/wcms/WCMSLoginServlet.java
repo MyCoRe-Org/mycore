@@ -42,7 +42,7 @@ import org.mycore.frontend.servlets.MCRServletJob;
 
 import org.mycore.frontend.wcms.*;
 
-import wcms.util.HashCipher;
+import org.mycore.frontend.wcms.util.HashCipher;
 
 /**
  * Loginprocess for Web-Content-Management-System (WCMS).

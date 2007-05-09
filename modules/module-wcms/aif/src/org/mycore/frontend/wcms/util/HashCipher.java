@@ -21,7 +21,7 @@
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
  */
 
-package wcms.util;
+package org.mycore.frontend.wcms.util;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
