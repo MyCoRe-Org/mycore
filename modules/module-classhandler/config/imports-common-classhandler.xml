@@ -1,21 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!-- ============================================== -->
-<!-- $Revision: 1.1 $ $Date: 2007-05-04 11:35:51 $ -->
+<!-- $Revision: 1.2 $ $Date: 2007-05-09 06:16:37 $ -->
 <!-- ============================================== -->
 
 <imports>
 <!-- *** Language List *** -->
 
-  <list id="Slang" width="60" type="dropdown">
-    <item value="de">
-      <label xml:lang="de">de</label>
-      <label xml:lang="en">ger</label>
-    </item>
-    <item value="en">
-      <label xml:lang="de">en</label>
-      <label xml:lang="en">eng</label>
-    </item>
+  <list id="Slang" width="60" type="dropdown" default="de">
+    <item value="ar" i18n="common.list.slang.ar"/>
+    <item value="de" i18n="common.list.slang.de"/>
+    <item value="en" i18n="common.list.slang.en"/>
   </list>
 
 <!-- *** Data for the buttons ** -->
