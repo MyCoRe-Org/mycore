@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
 <!-- ============================================== -->
-<!-- $Revision: 1.66 $ $Date: 2007-04-04 09:50:40 $ -->
+<!-- $Revision: 1.67 $ $Date: 2007-05-09 07:41:46 $ -->
 <!-- ============================================== --> 
 
 <xsl:stylesheet 
@@ -40,6 +40,21 @@
 <!-- ======== handles editor ======== -->
 
 <xsl:template match="editor">
+  <!-- ======== include fckEditor if needed ======== -->
+  <xsl:if test="components//textarea[@wysiwygEditor='true']">
+    <script type="text/javascript"><xsl:text>
+      window.onload = function()
+      {
+</xsl:text>
+      <xsl:for-each select="components//textarea[@wysiwygEditor='true']">
+<xsl:text>        </xsl:text><xsl:value-of select="concat('startFCK',generate-id(.),'();')" /><xsl:text>
+</xsl:text>
+      </xsl:for-each>
+<xsl:text>      }
+</xsl:text>
+    </script>
+  </xsl:if>
+  
   <!-- ======== build nested panel structure ======== -->
   <xsl:apply-templates select="components" />
 </xsl:template>
@@ -834,7 +849,7 @@
     <!-- ======== Use the WYSIWYG HTML Editor? ======== -->
     <xsl:if test="@wysiwygEditor='true'">
       <script type="text/javascript"><xsl:text>
-        window.onload = function()
+        function </xsl:text><xsl:value-of select="concat('startFCK',generate-id(.),'()')" /><xsl:text>
         {
       	  var oFCKeditor = new FCKeditor( '</xsl:text>
       	  <xsl:value-of select="$var" />
