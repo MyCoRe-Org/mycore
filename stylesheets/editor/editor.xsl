@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
 <!-- ============================================== -->
-<!-- $Revision: 1.48.2.5 $ $Date: 2007-02-27 07:27:26 $ -->
+<!-- $Revision: 1.48.2.6 $ $Date: 2007-05-09 07:46:52 $ -->
 <!-- ============================================== --> 
 
 <xsl:stylesheet 
@@ -74,6 +74,22 @@
 
 <!-- ======== handle components ======== -->
 <xsl:template match="components">
+
+  <!-- ======== include fckEditor if needed ======== -->
+  <xsl:if test=".//textarea[@wysiwygEditor='true']">
+    <script type="text/javascript"><xsl:text>
+      window.onload = function()
+      {
+</xsl:text>
+      <xsl:for-each select=".//textarea[@wysiwygEditor='true']">
+<xsl:text>        </xsl:text><xsl:value-of select="concat('startFCK',generate-id(.),'();')" /><xsl:text>
+</xsl:text>
+      </xsl:for-each>
+<xsl:text>      }
+</xsl:text>
+    </script>
+  </xsl:if>
+
   <form>
     <xsl:call-template name="editor.set.form.attrib" />    
 
@@ -869,7 +885,7 @@
     <!-- ======== Use the WYSIWYG HTML Editor? ======== -->
     <xsl:if test="@wysiwygEditor='true'">
       <script type="text/javascript"><xsl:text>
-        window.onload = function()
+        function </xsl:text><xsl:value-of select="concat('startFCK',generate-id(.),'()')" /><xsl:text>
         {
       	  var oFCKeditor = new FCKeditor( '</xsl:text>
       	  <xsl:value-of select="$var" />
