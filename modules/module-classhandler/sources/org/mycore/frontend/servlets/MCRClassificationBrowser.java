@@ -138,7 +138,7 @@ public class MCRClassificationBrowser extends MCRServlet {
             LOGGER.info("Set XSL.Style to: " + styleBase);
             job.getRequest().setAttribute("XSL.Style", styleBase);
         }
-        getLayoutService().doLayout(job.getRequest(),job.getResponse(),jdomDoc);
+        getLayoutService().doLayout(job.getRequest(), job.getResponse(), jdomDoc);
     }
 
 }

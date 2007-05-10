@@ -30,6 +30,7 @@ import static org.mycore.common.MCRConstants.XSI_NAMESPACE;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.fileupload.FileItem;
@@ -454,30 +455,29 @@ public class MCRClassificationEditor {
     public final int deleteCategoryInClassification(String clid, String categid) {
         try {
             LOGGER.debug("Start delete in classification " + clid + " the category: " + categid);
-            boolean bret = false;
             int cnt = 0;
 
             classif = MCRClassificationBrowserData.getClassificationPool().getClassificationAsPojo(clid);
 
-            if (bret) {
+            MCRCategoryItem categToDelete = MCRClassificationQuery.findCategory(classif, categid);
+            MCRClassificationObject parent = MCRClassificationQuery.findParent(classif, categToDelete);
 
-                MCRCategoryItem clc = new MCRCategoryItem();
-                clc.setId(categid);
-                clc.setClassID(clid);
-                clc.setParentID(null);
+            if (parent != null) {
 
                 MCRLinkTableManager mcl = MCRLinkTableManager.instance();
-                if (clc.getClassID().equals(clc.getId())) {
-                    cnt = mcl.countReferenceCategory(clc.getClassID(), "", null, null);
+                if (categToDelete.getClassID().equals(categToDelete.getId())) {
+                    cnt = mcl.countReferenceCategory(categToDelete.getClassID(), "", null, null);
                 } else {
-                    cnt = mcl.countReferenceCategory(clc.getClassID(), clc.getId(), null, null);
+                    cnt = mcl.countReferenceCategory(categToDelete.getClassID(), categToDelete.getId(), null, null);
                 }
                 if (cnt == 0) {
+                    parent.getCategories().remove(categToDelete);
                     MCRClassificationBrowserData.getClassificationPool().updateClassification(classif);
                     String sessionID = MCRSessionMgr.getCurrentSession().getID();
                     MCRClassificationBrowserData.ClassUserTable.put(classif.getId(), sessionID);
                 } else {
-                    LOGGER.error("Category " + categid + " in classification " + clid + " can't be deleted, there are " + cnt + "refernces of documents to this");
+                    LOGGER.error("Category " + categid + " in classification " + clid + " can't be deleted, there are " + cnt
+                            + "refernces of documents to this");
                 }
             } else {
                 LOGGER.warn("Category " + categid + " in classification: " + clid + " not found! - nothing todo");

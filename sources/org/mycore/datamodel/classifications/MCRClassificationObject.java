@@ -56,7 +56,7 @@ public abstract class MCRClassificationObject implements Cloneable {
 
     List<MCRLabel> labels;
 
-    List<MCRCategoryItem> catgegories;
+    List<MCRCategoryItem> categories;
 
     /**
      * This method return a list of all category items.
@@ -64,10 +64,10 @@ public abstract class MCRClassificationObject implements Cloneable {
      * @return a list of all category items
      */
     public List<MCRCategoryItem> getCategories() {
-        if (catgegories == null) {
-            catgegories = new ArrayList<MCRCategoryItem>();
+        if (categories == null) {
+            categories = new ArrayList<MCRCategoryItem>();
         }
-        return catgegories;
+        return categories;
     }
 
     /**
@@ -76,7 +76,7 @@ public abstract class MCRClassificationObject implements Cloneable {
      * @param catgegories
      */
     public void setCatgegories(List<MCRCategoryItem> catgegories) {
-        this.catgegories = catgegories;
+        this.categories = catgegories;
     }
 
     /**
@@ -158,11 +158,11 @@ public abstract class MCRClassificationObject implements Cloneable {
         // The clone has a reference to this object's category and label list,
         // so
         // owerwrite with null so it get initialized on next access;
-        clone.catgegories = null;
+        clone.categories = null;
         List<MCRCategoryItem> clonedCatList = clone.getCategories();
         clone.labels = null;
         List<MCRLabel> clonedLabelList = clone.getLabels();
-        for (MCRCategoryItem category : catgegories) {
+        for (MCRCategoryItem category : categories) {
             clonedCatList.add(category.clone());
         }
         for (MCRLabel label : labels) {

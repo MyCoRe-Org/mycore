@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!-- ============================================== -->
-<!-- $Revision: 1.10 $ $Date: 2007-05-08 12:54:33 $ -->
+<!-- $Revision: 1.11 $ $Date: 2007-05-10 11:16:50 $ -->
 <!-- ============================================== -->
 
 <!-- +
@@ -50,10 +50,10 @@
     <xsl:variable name="doctype" select="@doctype" />
     <xsl:variable name="restriction" select="@restriction" />
     <xsl:variable name="search_attribute" select="@searchField" />
-    <xsl:variable name="userEdited" select="../userEdited"/>
-    <xsl:variable name="session" select="../session"/>
+    <xsl:variable name="userEdited" select="../userEdited" />
+    <xsl:variable name="session" select="../session" />
     <xsl:variable name="currentSession" select="../currentSession" />
-    
+
     <xsl:variable name="hrefstart" select="concat($WebApplicationBaseURL, 'browse?mode=edit')" />
     <xsl:variable name="search" select="@searchField" />
     <xsl:variable name="type" select="startPath" />
@@ -62,8 +62,8 @@
     <xsl:variable name="canDelete" select="../userCanDelete" />
     <xsl:variable name="uri" select="uri" />
     <xsl:variable name="path" select="concat($WebApplicationBaseURL, 'browse/', $uri,'?mode=edit')" />
-    <xsl:variable name="edited" select="edited"/>
-    
+    <xsl:variable name="edited" select="edited" />
+
     <xsl:variable name="classnew" select="concat($WebApplicationBaseURL, 'images/classnew.gif')" />
     <xsl:variable name="classedit" select="concat($WebApplicationBaseURL, 'images/classedit.gif')" />
     <xsl:variable name="classdelete" select="concat($WebApplicationBaseURL, 'images/classdelete.gif')" />
@@ -73,7 +73,7 @@
     <xsl:variable name="classright" select="concat($WebApplicationBaseURL, 'images/classright.gif')" />
     <xsl:variable name="classexport" select="concat($WebApplicationBaseURL, 'images/classexport.gif')" />
     <xsl:variable name="imgEmpty" select="concat($WebApplicationBaseURL, 'images/emtyDot1Pix.gif')" />
-    
+
     <table cellspacing="0" cellpadding="0" style="width:100%; margin: 3% 0px 3% 2%;" class="bg_background">
       <tr>
         <td style="text-align:left;padding-right:20px;">
@@ -91,8 +91,12 @@
         <td colspan="2">
           <xsl:value-of select="concat('[',$classifID,']')" />
           <xsl:if test="$userEdited != 'false'">
-            <br/><b><xsl:value-of select="i18n:translate('Browse.editError')"/></b>
-            &#160;<xsl:value-of select="$userEdited" />
+            <br />
+            <b>
+              <xsl:value-of select="i18n:translate('Browse.editError')" />
+            </b>
+            &#160;
+            <xsl:value-of select="$userEdited" />
           </xsl:if>
           <table cellspacing="1" cellpadding="2" style="margin: 3% 10px 3% 2%;">
 
@@ -295,45 +299,45 @@
             </xsl:for-each>
 
             <tr>
-             <td colspan="6">
-              <xsl:if test="($canEdit = 'true')">
-                <hr />
-				<center>
-				<table>
-                <tr>
-				<td>
-                <form action="{$WebApplicationBaseURL}servlets/MCRStartClassEditorServlet{$HttpSession}" method="get">
-                  <input type="hidden" name="todo" value='create-category' />
-                  <input type="hidden" name="todo2" value='modify-classification' />
-                  <input type="hidden" name="path" value='{$path}' />
-                  <input type="hidden" name="clid" value='{$classifID}' />
-                  <input type="hidden" name="categid" value='empty' />
-                  <input type="submit" class="button" name="newcateg" value="{i18n:translate('Browse.newCat')}" />
-                </form>
-				</td>
-                <td>
-                  <form action="{$WebApplicationBaseURL}servlets/MCRStartClassEditorServlet{$HttpSession}" method="get">
-                    <input type="hidden" name="path" value='{$path}' />
-                    <input type="hidden" name="clid" value='' />
-                    <input type="hidden" name="todo" value='save-all' />
-                    <input type="submit" class="button" name="saveAll" value="{i18n:translate('Browse.saveClass')}" />
-                  </form>
-                </td>
-                <td>
-                  <form action="{$WebApplicationBaseURL}servlets/MCRStartClassEditorServlet{$HttpSession}" method="get">
-                    <input type="hidden" name="path" value='{$path}' />
-                    <input type="hidden" name="clid" value='' />
-                    <input type="hidden" name="todo" value='purge-all' />
-                    <input type="submit" class="button" name="purgeAll" value="{i18n:translate('Browse.discardClass')}" />
-                  </form>
-                </td>
-				</tr>
-				</table>
-			    </center>
-                <hr />
-              </xsl:if>
-			</td>
-			</tr>
+              <td colspan="6">
+                <xsl:if test="($canEdit = 'true')">
+                  <hr />
+                  <center>
+                    <table>
+                      <tr>
+                        <td>
+                          <form action="{$WebApplicationBaseURL}servlets/MCRStartClassEditorServlet{$HttpSession}" method="get">
+                            <input type="hidden" name="todo" value='create-category' />
+                            <input type="hidden" name="todo2" value='modify-classification' />
+                            <input type="hidden" name="path" value='{$path}' />
+                            <input type="hidden" name="clid" value='{$classifID}' />
+                            <input type="hidden" name="categid" value='empty' />
+                            <input type="submit" class="button" name="newcateg" value="{i18n:translate('Browse.newCat')}" />
+                          </form>
+                        </td>
+                        <td>
+                          <form action="{$WebApplicationBaseURL}servlets/MCRStartClassEditorServlet{$HttpSession}" method="get">
+                            <input type="hidden" name="path" value='{$path}' />
+                            <input type="hidden" name="clid" value='' />
+                            <input type="hidden" name="todo" value='save-all' />
+                            <input type="submit" class="button" name="saveAll" value="{i18n:translate('Browse.saveClass')}" />
+                          </form>
+                        </td>
+                        <td>
+                          <form action="{$WebApplicationBaseURL}servlets/MCRStartClassEditorServlet{$HttpSession}" method="get">
+                            <input type="hidden" name="path" value='{$path}' />
+                            <input type="hidden" name="clid" value='' />
+                            <input type="hidden" name="todo" value='purge-all' />
+                            <input type="submit" class="button" name="purgeAll" value="{i18n:translate('Browse.discardClass')}" />
+                          </form>
+                        </td>
+                      </tr>
+                    </table>
+                  </center>
+                  <hr />
+                </xsl:if>
+              </td>
+            </tr>
           </table>
         </td>
       </tr>
@@ -343,7 +347,7 @@
   <xsl:template match="classificationlist">
     <xsl:variable name="path" select="concat($WebApplicationBaseURL, 'browse/',$HttpSession, '?mode=edit' )" />
     <xsl:variable name="canCreate" select="../userCanCreate" />
-    
+
     <xsl:variable name="classnew" select="concat($WebApplicationBaseURL, 'images/classnew.gif')" />
     <xsl:variable name="classedit" select="concat($WebApplicationBaseURL, 'images/classedit.gif')" />
     <xsl:variable name="classdelete" select="concat($WebApplicationBaseURL, 'images/classdelete.gif')" />
@@ -355,14 +359,14 @@
     <xsl:variable name="classexport" select="concat($WebApplicationBaseURL, 'images/classexport.gif')" />
     <xsl:variable name="imgEmpty" select="concat($WebApplicationBaseURL, 'images/emtyDot1Pix.gif')" />
     <table cellspacing="0" cellpadding="0" border="0">
-      <xsl:for-each select="classification">   
-        
+      <xsl:for-each select="classification">
+
         <xsl:variable name="browserClass" select="@browserClass" />
         <xsl:variable name="classifID" select="@ID" />
         <xsl:variable name="counter" select="@counter" />
         <xsl:variable name="categpath" select="concat($WebApplicationBaseURL, 'browse/', $browserClass,$HttpSession, '?mode=edit&amp;clid=',$classifID )" />
         <xsl:variable name="edited" select="@edited" />
-        <xsl:variable name="userEdited" select="@userEdited"/>
+        <xsl:variable name="userEdited" select="@userEdited" />
         <xsl:variable name="canEdit" select="@userCanEdit" />
         <xsl:variable name="canDelete" select="@userCanDelete" />
         <xsl:variable name="h2" select="string-length(@counter)" />
@@ -413,15 +417,15 @@
                       <input type="image" src='{$classedit}' title="{i18n:translate('Browse.classDescEdit')}" />
                     </form>
                   </td>
-                  <td width="25" valign="top">
-                    <a target="new" alt="$classifID"
-                      onclick="fensterCodice('{$WebApplicationBaseURL}services/MCRWebService{$HttpSession}?method=MCRDoRetrieveClassification&amp;level=3&amp;type=children&amp;classID={$classifID}&amp;categID=');return false;"
-                      href="{$WebApplicationBaseURL}services/MCRWebService{$HttpSession}?method=MCRDoRetrieveClassification&amp;level=3&amp;type=children&amp;classID={$classifID}&amp;categID=">
-                      <input
-                        onclick="fensterCodice('{$WebApplicationBaseURL}services/MCRWebService{$HttpSession}?method=MCRDoRetrieveClassification&amp;level=3&amp;type=children&amp;classID={$classifID}&amp;categID=');return false;"
-                        type="image" src='{$classexport}' title="{i18n:translate('Browse.classExport')}" />
-                    </a>
-                  </td>
+                  <xsl:if test="$edited='false'">
+                    <td width="25" valign="top">
+                      <a target="new" alt="$classifID" onclick="fensterCodice('{$WebApplicationBaseURL}receive/{$classifID}{$HttpSession}');return false;"
+                        href="{$WebApplicationBaseURL}receive/{$classifID}{$HttpSession}">
+                        <input onclick="fensterCodice('{$WebApplicationBaseURL}receive/{$classifID}{$HttpSession});return false;" type="image"
+                          src='{$classexport}' title="{i18n:translate('Browse.classExport')}" />
+                      </a>
+                    </td>
+                  </xsl:if>
                   <td width="25" valign="top">
                     <form action="{$WebApplicationBaseURL}servlets/MCRStartClassEditorServlet{$HttpSession}" method="get">
                       <input type="hidden" name="todo" value='acl-classification' />

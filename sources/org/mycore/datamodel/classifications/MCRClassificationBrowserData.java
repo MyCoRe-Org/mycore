@@ -181,7 +181,7 @@ public class MCRClassificationBrowserData {
         if (comments == null) {
             comments = "false";
         }
-        LOGGER.info("uriParts length: "+uriParts.length);
+        LOGGER.info("uriParts length: " + uriParts.length);
         clearPath(uriParts);
         setClassification(classifID);
         setActualPath(actEditorCategid);
@@ -206,11 +206,11 @@ public class MCRClassificationBrowserData {
         try {
             // NOTE: read *.Doctype for compatiblity reasons
             objectType = config.getString("MCR.ClassificationBrowser." + browserClass + ".Objecttype", config.getString("MCR.ClassificationBrowser."
-                    + browserClass + ".Doctype",null));
+                    + browserClass + ".Doctype", null));
         } catch (final org.mycore.common.MCRConfigurationException noDoctype) {
             objectType = config.getString("MCR.ClassificationBrowser.default.ObjectType", config.getString("MCR.ClassificationBrowser.default.Doctype"));
         }
-        
+
         if (objectType != null) {
             objectTypeArray = objectType.split(",");
         } else {
@@ -389,7 +389,7 @@ public class MCRClassificationBrowserData {
         for (String id : ids) {
             MCRClassificationItem classif = getClassificationPool().getClassificationAsPojo(id);
             Element cli = getBrowseElement(classif);
-            String sessionID=MCRSessionMgr.getCurrentSession().getID();
+            String sessionID = MCRSessionMgr.getCurrentSession().getID();
             // set browser type
             try {
                 browserClass = config.getString("MCR.classeditor." + classif.getId());
@@ -397,15 +397,20 @@ public class MCRClassificationBrowserData {
                 browserClass = "default";
             }
             // set permissions
-            if (AI.checkPermission(id,"writedb")) {
-                cli.setAttribute("userCanEdit","true");
+            if (getClassificationPool().isEdited(id) == false) {
+                if (AI.checkPermission(id, "writedb")) {
+                    cli.setAttribute("userCanEdit", "true");
+                } else {
+                    cli.setAttribute("userCanEdit", "false");
+                }
+                if (AI.checkPermission(id, "deletedb")) {
+                    cli.setAttribute("userCanDelete", "true");
+                } else {
+                    cli.setAttribute("userCanDelete", "false");
+                }
             } else {
-                cli.setAttribute("userCanEdit","false");
-            }
-            if (AI.checkPermission(id,"deletedb")) {
-                cli.setAttribute("userCanDelete","true");
-            } else {
-                cli.setAttribute("userCanDelete","false");
+                cli.setAttribute("userCanEdit", "true");
+                cli.setAttribute("userCanDelete", "true");
             }
             // set done flag
             if (ClassUserTable.containsKey(id)) {
@@ -469,7 +474,8 @@ public class MCRClassificationBrowserData {
 
     public org.jdom.Document createXmlTree(final String lang) throws Exception {
 
-        //final MCRClassificationItem cl = getClassificationPool().getClassificationAsPojo(getClassification().getId());
+        // final MCRClassificationItem cl =
+        // getClassificationPool().getClassificationAsPojo(getClassification().getId());
         MCRClassificationPool cp = getClassificationPool();
         MCRClassificationItem cl = cp.getClassificationAsPojo(getClassification().getId());
         MCRLabel labels = getLabel(cl, lang);
@@ -479,27 +485,27 @@ public class MCRClassificationBrowserData {
         xID.addContent(cl.getId());
         xDocument.addContent(xID);
 
-        final Element xUserEdited=new Element("userEdited");
-        if(ClassUserTable.containsKey(cl.getId())) {
+        final Element xUserEdited = new Element("userEdited");
+        if (ClassUserTable.containsKey(cl.getId())) {
             xUserEdited.addContent(MCRSession.getSession(ClassUserTable.get(cl.getId())).getCurrentUserID());
         } else {
             xUserEdited.addContent("false");
         }
         xDocument.addContent(xUserEdited);
-        
-        final Element xSessionID=new Element("session");
-        if(ClassUserTable.containsKey(cl.getId())) {
+
+        final Element xSessionID = new Element("session");
+        if (ClassUserTable.containsKey(cl.getId())) {
             xSessionID.addContent(ClassUserTable.get(cl.getId()));
         } else {
             xSessionID.addContent("");
         }
-        
+
         xDocument.addContent(xSessionID);
-       
-        final Element xCurrentSessionID=new Element("currentSession");
+
+        final Element xCurrentSessionID = new Element("currentSession");
         xCurrentSessionID.addContent(MCRSessionMgr.getCurrentSession().getID());
-        xDocument.addContent(xCurrentSessionID); 
-        
+        xDocument.addContent(xCurrentSessionID);
+
         final Element xLabel = new Element("label");
         xLabel.addContent(labels.getText());
         xDocument.addContent(xLabel);
@@ -534,15 +540,25 @@ public class MCRClassificationBrowserData {
         final Element DeleteButton = new Element("userCanDelete");
 
         // now we check this right for the current user
-        String permString = String.valueOf(AI.checkPermission("create-classification"));
-        CreateButton.addContent(permString);
-        xDocument.addContent(CreateButton);
-        permString = String.valueOf(AI.checkPermission(cl.getId(),"writedb"));
-        EditButton.addContent(permString);
-        xDocument.addContent(EditButton);
-        permString = String.valueOf(AI.checkPermission(cl.getId(),"deletedb"));
-        DeleteButton.addContent(permString);
-        xDocument.addContent(DeleteButton);
+        if (cp.isEdited(getClassification().getId()) == false) {
+            String permString = String.valueOf(AI.checkPermission("create-classification"));
+            CreateButton.addContent(permString);
+            xDocument.addContent(CreateButton);
+            permString = String.valueOf(AI.checkPermission(cl.getId(), "writedb"));
+            EditButton.addContent(permString);
+            xDocument.addContent(EditButton);
+            permString = String.valueOf(AI.checkPermission(cl.getId(), "deletedb"));
+            DeleteButton.addContent(permString);
+            xDocument.addContent(DeleteButton);
+        } else {
+            String permString = "true";
+            CreateButton.addContent(permString);
+            xDocument.addContent(CreateButton);
+            EditButton.addContent(permString);
+            xDocument.addContent(EditButton);
+            DeleteButton.addContent(permString);
+            xDocument.addContent(DeleteButton);
+        }
 
         // data as XML from outputNavigationTree
         final Element xNavtree = new Element("navigationtree");
@@ -573,7 +589,11 @@ public class MCRClassificationBrowserData {
         while ((line = getTreeline(i++)) != null) {
 
             final String catid = line.getAttributeValue("ID");
-            final int numDocs = Integer.parseInt(line.getAttributeValue("counter"));
+            int numDocs = 0;
+            if (line.getAttributeValue("counter") != null) {
+                LOGGER.info("COUNTER ATTRIBUTE: " + line.getAttributeValue("counter"));
+                numDocs = Integer.parseInt(line.getAttributeValue("counter"));
+            }
             final String status = line.getAttributeValue("hasChildren");
 
             Element label = (Element) XPath.selectSingleNode(line, "label[lang('" + lang + "')]");
@@ -855,15 +875,15 @@ public class MCRClassificationBrowserData {
         return classPool;
     }
 
-        private static MCRLabel getLabel(MCRClassificationObject co, String lang) {
-            for(MCRLabel label:co.getLabels()) {
-                if(label.getLang().equals(lang)) {
-                    return label;
-                }
+    private static MCRLabel getLabel(MCRClassificationObject co, String lang) {
+        for (MCRLabel label : co.getLabels()) {
+            if (label.getLang().equals(lang)) {
+                return label;
             }
-            return new MCRLabel();
+        }
+        return new MCRLabel();
     }
-        
+
     public static void clearCurrentUserClassTable() {
         final String curSessionID = MCRSessionMgr.getCurrentSession().getID();
         final Iterator<Map.Entry<String, String>> it = ClassUserTable.entrySet().iterator();
@@ -912,6 +932,5 @@ public class MCRClassificationBrowserData {
             return false;
         }
     }
-    
 
 }
