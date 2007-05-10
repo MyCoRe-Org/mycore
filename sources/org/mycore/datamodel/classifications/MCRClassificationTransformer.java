@@ -24,8 +24,8 @@
 package org.mycore.datamodel.classifications;
 
 import static org.jdom.Namespace.XML_NAMESPACE;
-import static org.mycore.common.MCRConstants.XSI_NAMESPACE;
 import static org.mycore.common.MCRConstants.XLINK_NAMESPACE;
+import static org.mycore.common.MCRConstants.XSI_NAMESPACE;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -39,9 +39,6 @@ import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.Namespace;
 
-import org.mycore.common.MCRUtils;
-import org.mycore.datamodel.classifications.MCRCategoryItem;
-import org.mycore.datamodel.classifications.MCRClassificationItem;
 import org.mycore.datamodel.common.MCRLinkTableManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
 
@@ -359,10 +356,6 @@ public class MCRClassificationTransformer {
          * @return
          */
         static MCRClassificationItem getClassification(Document cl, int levels, boolean withCounter) {
-            try {
-                MCRUtils.writeJDOMToSysout(cl);
-            } catch (Exception e) {
-            }
             MCRClassificationItem returns = getClassification(cl.getRootElement());
             returns.setCounterEnabled(withCounter);
             CategoryFactory.fillCategory(returns.getId(), returns, cl.getRootElement().getChild("categories"), levels, withCounter);
@@ -449,7 +442,7 @@ public class MCRClassificationTransformer {
 
         private static int getNumberOfObjects(String classID, String categID, Map map) {
             String mapKey = classID + "##" + categID;
-            int count = (map.get(mapKey) != null) ? ((Integer) map.get(mapKey)).intValue() : 0;
+            int count = (map.get(mapKey) != null) ? ((Number) map.get(mapKey)).intValue() : 0;
             return count;
         }
 
