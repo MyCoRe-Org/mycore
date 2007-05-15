@@ -133,5 +133,9 @@ public class MCRCategoryItem extends MCRClassificationObject implements Serializ
         }
         return clone;
     }
+    
+    public static MCRCategoryItem retrieveCategoryItem(String classID, String categID){
+        return CM.retrieveCategoryItem(classID, categID);
+    }
 
 }

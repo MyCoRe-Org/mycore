@@ -134,30 +134,6 @@ public class MCRClassificationTransformer {
      *            format String as specified above
      * @return
      */
-    public static Document getEditorDocument(MCRClassification cl, String labelFormat, boolean sort) {
-        return ItemElementFactory.getDocument(cl, labelFormat, sort);
-    }
-
-    /**
-     * transforms a <code>Classification</code> into a MCR Editor definition (<code>&lt;items&gt;</code>).
-     * 
-     * This method allows you to specify how the labels will look like.
-     * <code>labelFormat</code> is simply a String that is parsed for a few
-     * key words, that will be replaced by a dynamic value. The following
-     * keywords can be used at the moment:
-     * <ul>
-     * <li>{id}</li>
-     * <li>{text}</li>
-     * <li>{description}</li>
-     * <li>{count}</li>
-     * </ul>
-     * 
-     * @param cl
-     *            Classification
-     * @param labelFormat
-     *            format String as specified above
-     * @return
-     */
     public static Document getEditorDocument(MCRClassificationItem cl, String labelFormat, boolean sort) {
         return ItemElementFactory.getDocument(cl, labelFormat, sort);
     }

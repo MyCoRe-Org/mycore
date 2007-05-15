@@ -24,8 +24,6 @@
 package org.mycore.datamodel.classifications;
 
 import static org.jdom.Namespace.XML_NAMESPACE;
-import static org.mycore.common.MCRConstants.XSI_NAMESPACE;
-import static org.mycore.common.MCRConstants.XLINK_NAMESPACE;
 
 import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
@@ -39,6 +37,7 @@ import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.filter.ElementFilter;
+
 import org.mycore.common.MCRException;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventManager;
@@ -63,16 +62,13 @@ public class MCRClassification extends MCRClassificationItem {
     private static final long serialVersionUID = 4754441996528345601L;
 
     // logger
-    static Logger LOGGER = Logger.getLogger(MCRClassification.class);
+    static final Logger LOGGER = Logger.getLogger(MCRClassification.class);
 
     // the XML table manager
-    static MCRXMLTableManager TM = MCRXMLTableManager.instance();
+    static final MCRXMLTableManager TM = MCRXMLTableManager.instance();
 
     // the link table manager
-    static MCRLinkTableManager LM = MCRLinkTableManager.instance();
-
-    // the classification SQL manager
-    static MCRClassificationManager CM = MCRClassificationManager.instance();
+    static final MCRLinkTableManager LM = MCRLinkTableManager.instance();
 
     // the service part of MCRObjects
     private MCRObjectService mcr_service = null;
@@ -100,8 +96,7 @@ public class MCRClassification extends MCRClassificationItem {
      *            the classification ID
      */
     public final void setFromStore(MCRObjectID classid) {
-        byte[] xml = MCRXMLTableManager.instance().retrieveAsXML(classid);
-        setFromXML(xml);
+        setFromJDOM(retrieveClassificationAsJDOM(classid.toString()));
     }
 
     /**
@@ -219,7 +214,7 @@ public class MCRClassification extends MCRClassificationItem {
      *            the classification ID to delete
      * @throws MCRActiveLinkException
      */
-    public final void deleteFromDatastore(MCRObjectID ID) throws MCRActiveLinkException {
+    public static final void deleteFromDatastore(MCRObjectID ID) throws MCRActiveLinkException {
         // exist the object?
         if (!MCRXMLTableManager.instance().exist(ID)) {
             LOGGER.warn("The classification with ID " + ID + " does not exist.");
@@ -278,33 +273,7 @@ public class MCRClassification extends MCRClassificationItem {
      * @return the classification as JDOM
      */
     public static final Document retrieveClassificationAsJDOM(String classID) {
-        return retrieveClassificationAsJDOM(classID, false);
-    }
-
-    /**
-     * The method return the classification as JDOM tree.
-     * 
-     * @param classID
-     *            the classification ID to delete
-     * @param validator
-     *            the boolean flag for the validator
-     * @return the classification as JDOM
-     */
-    public static final Document retrieveClassificationAsJDOM(String classID, boolean flag) {
-        byte[] xml = retrievClassificationAsXML(classID);
-        Document classification = MCRXMLHelper.parseXML(xml, flag);
-
-        Map map = MCRLinkTableManager.instance().countReferenceCategory(classID);
-        // in map we've got the sharp number for every categoryID (without
-        // children)
-        // now we add to every categoryID the numbers of the children
-        for (Iterator it = classification.getDescendants(new ElementFilter("category")); it.hasNext();) {
-            Element category = (Element) it.next();
-            String mapKey = classID + "##" + category.getAttributeValue("ID");
-            int count = (map.get(mapKey) != null) ? ((Number) map.get(mapKey)).intValue() : 0;
-            category.setAttribute("counter", Integer.toString(count));
-        }
-        return classification;
+        return TM.readDocument(new MCRObjectID(classID));
     }
 
     /**
@@ -319,29 +288,6 @@ public class MCRClassification extends MCRClassificationItem {
      */
     public static final MCRCategoryItem retrieveCategoryItem(String classifID, String categID) {
         return CM.retrieveCategoryItem(classifID, categID);
-    }
-
-    /**
-     * The method return the category as XML byte array.
-     * 
-     * @param classID
-     *            the classification ID
-     * @param categID
-     *            the category ID
-     * @return the classification as XML
-     */
-    public static final org.jdom.Document retrieveCategoryAsJDOM(String classID, String categID, boolean withCounter) {
-        MCRCategoryItem item = CM.retrieveCategoryItem(classID, categID);
-        org.jdom.Element elm = new org.jdom.Element("mycoreclass");
-        org.jdom.Document doc = new org.jdom.Document(elm);
-        elm.addNamespaceDeclaration(XSI_NAMESPACE);
-        elm.addNamespaceDeclaration(XLINK_NAMESPACE);
-        elm.setAttribute("ID", classID);
-        org.jdom.Element cats = new org.jdom.Element("categories");
-        elm.addContent(cats);
-        org.jdom.Element cat = MCRClassificationTransformer.getMetaDataElement(item, true);
-        cats.addContent(cat);
-        return doc;
     }
 
     /**
@@ -407,6 +353,7 @@ public class MCRClassification extends MCRClassificationItem {
             oldCateg.add(cid);
             LOGGER.warn("The category " + cid + " of classification " + getId() + " has " + (new Integer(i)).toString() + " references and was not found in new classification.");
         }
+        //oldCateg contains all Categories that are removed and are target of object links
         if (oldCateg.size() != 0) {
             MCRClassification oldClass = new MCRClassification();
             oldClass.setFromJDOM(oldClassDoc);
@@ -450,6 +397,23 @@ public class MCRClassification extends MCRClassificationItem {
             }
             getHashedIDs(cur, sink); // recursive call for all children
         }
+    }
+
+    public static Document retrieveClassificationAsJDOM(String classID, boolean withCounter) {
+        Document classification=retrieveClassificationAsJDOM(classID);
+        if (withCounter) {
+            Map map = MCRLinkTableManager.instance().countReferenceCategory(classID);
+            // in map we've got the sharp number for every categoryID (without
+            // children)
+            // now we add to every categoryID the numbers of the children
+            for (Iterator it = classification.getDescendants(new ElementFilter("category")); it.hasNext();) {
+                Element category = (Element) it.next();
+                String mapKey = classID + "##" + category.getAttributeValue("ID");
+                int count = (map.get(mapKey) != null) ? ((Number) map.get(mapKey)).intValue() : 0;
+                category.setAttribute("counter", Integer.toString(count));
+            }
+        }
+        return classification;
     }
 
 }

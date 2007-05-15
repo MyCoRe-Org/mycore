@@ -23,14 +23,8 @@
 
 package org.mycore.datamodel.classifications;
 
-import java.util.List;
-
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandlerBase;
-import org.mycore.datamodel.classifications.MCRClassification;
-import org.mycore.datamodel.metadata.MCRDerivate;
-import org.mycore.datamodel.metadata.MCRObject;
-import org.mycore.datamodel.metadata.MCRObjectID;
 
 /**
  * This class manages all operations of the classifications for operations of an

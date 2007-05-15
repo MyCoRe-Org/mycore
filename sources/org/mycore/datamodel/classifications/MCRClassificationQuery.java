@@ -23,15 +23,17 @@
 
 package org.mycore.datamodel.classifications;
 
+import static org.mycore.common.MCRConstants.XLINK_NAMESPACE;
+import static org.mycore.common.MCRConstants.XSI_NAMESPACE;
+
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.jdom.Document;
+
 import org.mycore.common.MCRUtils;
-import org.mycore.datamodel.classifications.MCRCategoryItem;
-import org.mycore.datamodel.classifications.MCRClassification;
 import org.mycore.datamodel.common.MCRLinkTableManager;
 
 /**
@@ -125,7 +127,7 @@ public class MCRClassificationQuery {
      */
     public static MCRClassificationItem getClassification(String classID, String categID, boolean withCounter) {
         LOGGER.debug("-receiveCategoryAsJDOM");
-        Document doc = MCRClassification.retrieveCategoryAsJDOM(classID, categID, withCounter);
+        Document doc = MCRClassificationQuery.retrieveCategoryAsJDOM(classID, categID, withCounter);
         LOGGER.debug("-getClassification");
         MCRClassificationItem returns = MCRClassificationTransformer.getClassification(doc, -1, withCounter);
         LOGGER.debug("-getClassification finished");
@@ -223,5 +225,28 @@ public class MCRClassificationQuery {
             }
         }
 
+    }
+
+    /**
+     * The method return the category as XML byte array.
+     * 
+     * @param classID
+     *            the classification ID
+     * @param categID
+     *            the category ID
+     * @return the classification as XML
+     */
+    private static final org.jdom.Document retrieveCategoryAsJDOM(String classID, String categID, boolean withCounter) {
+        MCRCategoryItem item = MCRCategoryItem.retrieveCategoryItem(classID, categID);
+        org.jdom.Element elm = new org.jdom.Element("mycoreclass");
+        org.jdom.Document doc = new org.jdom.Document(elm);
+        elm.addNamespaceDeclaration(XSI_NAMESPACE);
+        elm.addNamespaceDeclaration(XLINK_NAMESPACE);
+        elm.setAttribute("ID", classID);
+        org.jdom.Element cats = new org.jdom.Element("categories");
+        elm.addContent(cats);
+        org.jdom.Element cat = MCRClassificationTransformer.getMetaDataElement(item, withCounter);
+        cats.addContent(cat);
+        return doc;
     }
 }

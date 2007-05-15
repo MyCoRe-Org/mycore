@@ -75,7 +75,7 @@ public class MCRClassificationItem extends MCRClassificationObject implements Se
      * @param categname
      *            the name of the category
      */
-    public final void copyCategory(MCRClassification oldClass, String categname) {
+    public final void copyCategory(MCRClassificationItem oldClass, String categname) {
         // get a list of categories as path to the category named categname
         ArrayList<MCRCategoryItem> path = getPath(oldClass, categname);
         if (LOGGER.isDebugEnabled()) {

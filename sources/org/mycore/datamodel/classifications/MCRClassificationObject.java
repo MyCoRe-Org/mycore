@@ -52,6 +52,8 @@ public abstract class MCRClassificationObject implements Cloneable {
     /** The length of the URL * */
     public static final int MAX_CATEGORY_URL = 254;
 
+    protected static final MCRClassificationManager CM = MCRClassificationManager.instance();
+
     String id;
 
     List<MCRLabel> labels;
