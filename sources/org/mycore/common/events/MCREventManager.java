@@ -107,6 +107,11 @@ public class MCREventManager {
             Object handler = null;
 
             if ("Class".equals(mode)) {
+                if (config.getString(name).length()==0){
+                    //if property from mycore.properties is overwritten with empty value
+                    //by mycore.properties.private
+                    continue;
+                }
                 handler = config.getSingleInstanceOf(name);
             } else { // "Indexer"
                 handler = MCRSearcherFactory.getSearcher(config.getString(name));
