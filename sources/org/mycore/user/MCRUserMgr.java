@@ -457,12 +457,12 @@ public class MCRUserMgr {
                 mcrUserStore.updateGroup(agroup);
             }
         } catch (Exception ex) {
-            throw new MCRException("Can't delete user " + groupID, ex);
+            throw new MCRException("Can't delete group " + groupID, ex);
         } finally {
             groupCache.remove(groupID);
             mcrUserStore.deleteGroup(groupID);
         }
-        LOGGER.info("User with ID " + groupID + " deleted.");
+        LOGGER.info("Group with ID " + groupID + " deleted.");
     }
 
     /**
