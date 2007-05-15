@@ -301,7 +301,7 @@ public class MCRClassification extends MCRClassificationItem {
         for (Iterator it = classification.getDescendants(new ElementFilter("category")); it.hasNext();) {
             Element category = (Element) it.next();
             String mapKey = classID + "##" + category.getAttributeValue("ID");
-            int count = (map.get(mapKey) != null) ? ((Integer) map.get(mapKey)).intValue() : 0;
+            int count = (map.get(mapKey) != null) ? ((Number) map.get(mapKey)).intValue() : 0;
             category.setAttribute("counter", Integer.toString(count));
         }
         return classification;
