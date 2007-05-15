@@ -51,11 +51,9 @@ public class MCRClassificationPool {
             Document doc=MCRClassificationTransformer.getMetaDataDocument(clas);
             try {
                 MCRClassification cl=new MCRClassification();
-System.out.println("********************************************************"+cl.getId());
                 cl.setFromJDOM(doc);
                 cl.updateInDatastore();
                 iter.remove();
-System.out.println("********************************************************"+cl.getId());
             } catch (Exception e) {
                 e.printStackTrace();
                 return false; 
