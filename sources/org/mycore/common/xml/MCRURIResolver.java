@@ -43,7 +43,9 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.StringTokenizer;
+import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -103,6 +105,8 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
     private static final String CONFIG_PREFIX = "MCR.URIResolver.";
 
     private static final MCRResolverProvider EXT_RESOLVER = getExternalResolverProvider();
+    
+    private static final MCRResolverProvider MODULE_RESOLVER = new MCRModuleResolverProvider();
 
     private static final MCRURIResolver singleton = new MCRURIResolver();
 
@@ -146,10 +150,12 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
 
     private HashMap<String, MCRResolver> getResolverMapping() {
         final Map<String, MCRResolver> extResolverMapping = EXT_RESOLVER.getResolverMapping();
+        final Map<String, MCRResolver> modResolverMapping = MODULE_RESOLVER.getResolverMapping();
         // set Map to final size with loadfactor: full
-        HashMap<String, MCRResolver> supportedSchemes = new HashMap<String, MCRResolver>(10 + extResolverMapping.size(), 1);
+        HashMap<String, MCRResolver> supportedSchemes = new HashMap<String, MCRResolver>(10 + modResolverMapping.size() + extResolverMapping.size(), 1);
         // don't let interal mapping be overwritten
         supportedSchemes.putAll(extResolverMapping);
+        supportedSchemes.putAll(modResolverMapping);
         supportedSchemes.put("webapp", new MCRWebAppResolver());
         supportedSchemes.put("file", new MCRFileResolver());
         supportedSchemes.put("ifs", new MCRIFSResolver());
@@ -413,6 +419,28 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
         @SuppressWarnings("unchecked")
         public Map<String, MCRResolver> getResolverMapping() {
             return Collections.EMPTY_MAP;
+        }
+
+    }
+
+    private static class MCRModuleResolverProvider implements MCRResolverProvider {
+
+        @SuppressWarnings("unchecked")
+        public Map<String, MCRResolver> getResolverMapping() {
+            Properties props=MCRConfiguration.instance().getProperties(CONFIG_PREFIX+"ModuleResolver.");
+            if (props.isEmpty()){
+                return Collections.EMPTY_MAP;
+            }
+            Map<String, MCRResolver> map=new HashMap<String, MCRResolver>();
+            for (Entry entry:props.entrySet()){
+                try {
+                    Class cl=Class.forName(entry.getValue().toString());
+                    map.put(entry.getKey().toString(), (MCRResolver)cl.newInstance());
+                } catch (Exception e) {
+                    throw new MCRException("Cannot instantiate "+entry.getValue()+" for URI scheme "+entry.getKey(),e);
+                }
+            }
+            return map;
         }
 
     }
