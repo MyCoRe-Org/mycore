@@ -105,8 +105,6 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
     private static final String CONFIG_PREFIX = "MCR.URIResolver.";
 
     private static final MCRResolverProvider EXT_RESOLVER = getExternalResolverProvider();
-    
-    private static final MCRResolverProvider MODULE_RESOLVER = new MCRModuleResolverProvider();
 
     private static final MCRURIResolver singleton = new MCRURIResolver();
 
@@ -128,9 +126,9 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
 
     private static final MCRResolverProvider getExternalResolverProvider() {
         String externalClassName = MCRConfiguration.instance().getString(CONFIG_PREFIX + "ExternalResolver.Class", null);
-        final MCREmptyResolverProvider emptyResolverProvider = new MCREmptyResolverProvider();
+        final MCRResolverProvider moduleResolverProvider = new MCRModuleResolverProvider();
         if (externalClassName == null) {
-            return emptyResolverProvider;
+            return moduleResolverProvider;
         }
         try {
             Class cl = Class.forName(externalClassName);
@@ -138,24 +136,22 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
             return resolverProvider;
         } catch (ClassNotFoundException e) {
             LOGGER.warn("Could not find external Resolver class", e);
-            return emptyResolverProvider;
+            return moduleResolverProvider;
         } catch (InstantiationException e) {
             LOGGER.warn("Could not instantiate external Resolver class", e);
-            return emptyResolverProvider;
+            return moduleResolverProvider;
         } catch (IllegalAccessException e) {
             LOGGER.warn("Could not instantiate external Resolver class", e);
-            return emptyResolverProvider;
+            return moduleResolverProvider;
         }
     }
 
     private HashMap<String, MCRResolver> getResolverMapping() {
         final Map<String, MCRResolver> extResolverMapping = EXT_RESOLVER.getResolverMapping();
-        final Map<String, MCRResolver> modResolverMapping = MODULE_RESOLVER.getResolverMapping();
         // set Map to final size with loadfactor: full
-        HashMap<String, MCRResolver> supportedSchemes = new HashMap<String, MCRResolver>(10 + modResolverMapping.size() + extResolverMapping.size(), 1);
+        HashMap<String, MCRResolver> supportedSchemes = new HashMap<String, MCRResolver>(10 + extResolverMapping.size(), 1);
         // don't let interal mapping be overwritten
         supportedSchemes.putAll(extResolverMapping);
-        supportedSchemes.putAll(modResolverMapping);
         supportedSchemes.put("webapp", new MCRWebAppResolver());
         supportedSchemes.put("file", new MCRFileResolver());
         supportedSchemes.put("ifs", new MCRIFSResolver());
@@ -412,15 +408,6 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
          * @return a Map of Resolver mappings
          */
         public Map<String, MCRResolver> getResolverMapping();
-    }
-
-    private static class MCREmptyResolverProvider implements MCRResolverProvider {
-
-        @SuppressWarnings("unchecked")
-        public Map<String, MCRResolver> getResolverMapping() {
-            return Collections.EMPTY_MAP;
-        }
-
     }
 
     private static class MCRModuleResolverProvider implements MCRResolverProvider {
