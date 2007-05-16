@@ -144,7 +144,9 @@ public class MCRSearchServlet extends MCRServlet {
         if (npp == 0)
             page = 1;
         else if (page > numPages)
-            page = numPages;
+          page = numPages;
+        else if (page < 1)
+          page = 1;
 
         // Number of first and last hit to be shown
         int first = (page - 1) * npp;
@@ -256,7 +258,7 @@ public class MCRSearchServlet extends MCRServlet {
                 Enumeration names = request.getParameterNames();
                 while (names.hasMoreElements()) {
                     String name = (String) (names.nextElement());
-                    if (name.endsWith(".operator"))
+                    if (name.endsWith(".operator") || name.endsWith(".sortField"))
                         continue;
                     if (" maxResults numPerPage mask ".indexOf(" " + name + " ") >= 0)
                         continue;
