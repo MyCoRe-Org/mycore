@@ -40,6 +40,7 @@ import org.jdom.filter.ElementFilter;
 import org.jdom.output.XMLOutputter;
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRConfiguration;
+import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.frontend.editor.MCREditorSubmission;
 import org.mycore.frontend.servlets.MCRServlet;
@@ -120,6 +121,8 @@ public class MCRSearchServlet extends MCRServlet {
         // Get cached results
         String id = request.getParameter("id");
         MCRResults result = (MCRResults) (getCache(RESULTS_KEY).get(id));
+        if (null == result)
+          throw new MCRException("Ergebnisliste nicht mehr gültig. Führen Sie die Suche bitte erneut aus.");
         Document query = (Document) (getCache(QUERIES_KEY).get(id));
 
         // Effective number of hits per page
@@ -140,7 +143,13 @@ public class MCRSearchServlet extends MCRServlet {
         String spage = request.getParameter("page");
         if (spage == null)
             spage = "1";
-        int page = Integer.parseInt(spage);
+        int page = 0;
+        try
+        {
+          page = Integer.parseInt(spage);
+        } catch (NumberFormatException e)
+        {
+        }
         if (npp == 0)
             page = 1;
         else if (page > numPages)
