@@ -31,12 +31,9 @@ import java.util.List;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.hibernate.cfg.Configuration;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.tool.hbm2ddl.SchemaUpdate;
-import org.hibernate.type.StringType;
-import org.hibernate.type.TextType;
-import org.hibernate.type.TimestampType;
+
 import org.mycore.access.mcrimpl.MCRAccessControlSystem;
 import org.mycore.access.mcrimpl.MCRAccessStore;
 import org.mycore.access.mcrimpl.MCRRuleMapping;
@@ -77,34 +74,6 @@ public class MCRHIBAccessStore extends MCRAccessStore {
     public void createTables() {
         try {
             // update schema -> first time create table
-            Configuration cfg = hibconnection.getConfiguration();
-            MCRTableGenerator map = null;
-            boolean mappingMustBeCreated = false;
-            if (!hibconnection.containsMapping(SQLAccessCtrlMapping)) {
-                map = new MCRTableGenerator(SQLAccessCtrlMapping, "org.mycore.backend.hibernate.tables.MCRACCESS", "", 3);
-                map.addIDColumn("rid", "RID", new StringType(), 64, "assigned", false);
-                map.addIDColumn("acpool", "ACPOOL", new StringType(), 64, "assigned", false);
-                map.addIDColumn("objid", "OBJID", new StringType(), 64, "assigned", false);
-                map.addColumn("creator", "CREATOR", new StringType(), 64, true, false, false);
-                map.addColumn("creationdate", "CREATIONDATE", new TimestampType(), 64, true, false, false);
-                cfg.addXML(map.getTableXML());
-                mappingMustBeCreated = true;
-            }
-
-            if (!hibconnection.containsMapping(SQLAccessCtrlRule)) {
-                map = new MCRTableGenerator(SQLAccessCtrlRule, "org.mycore.backend.hibernate.tables.MCRACCESSRULE", "", 1);
-                map.addIDColumn("rid", "RID", new StringType(), 64, "assigned", false);
-                map.addColumn("creator", "CREATOR", new StringType(), 64, true, false, false);
-                map.addColumn("creationdate", "CREATIONDATE", new TimestampType(), 64, true, false, false);
-                map.addColumn("rule", "RULE", new TextType(), 2048000, false, false, false);
-                map.addColumn("description", "DESCRIPTION", new StringType(), 255, false, false, false);
-                cfg.addXML(map.getTableXML());
-                mappingMustBeCreated = true;
-            }
-            if (mappingMustBeCreated)
-            	cfg.createMappings();
-
-            hibconnection.buildSessionFactory(cfg);
             new SchemaUpdate(MCRHIBConnection.instance().getConfiguration()).execute(true, true);
         } catch (Exception e) {
             logger.error("error at createTables()" ,e);

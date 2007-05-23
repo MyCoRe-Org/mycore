@@ -29,14 +29,12 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.hibernate.cfg.Configuration;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.tool.hbm2ddl.SchemaUpdate;
-import org.hibernate.type.StringType;
-import org.hibernate.type.TextType;
-import org.hibernate.type.TimestampType;
+
 import org.mycore.access.mcrimpl.MCRAccessRule;
 import org.mycore.access.mcrimpl.MCRRuleStore;
 import org.mycore.backend.hibernate.tables.MCRACCESSRULE;
@@ -172,22 +170,7 @@ public class MCRHIBRuleStore extends MCRRuleStore {
      */
     private void init() {
         try {
-            // update schema -> first time create table
-            Configuration cfg = MCRHIBConnection.instance().getConfiguration();
-
-            if (!MCRHIBConnection.instance().containsMapping(ruletablename)) {
-                MCRTableGenerator map = new MCRTableGenerator(ruletablename, "org.mycore.backend.hibernate.tables.MCRACCESSRULE", "", 1);
-                map.addIDColumn("rid", "RID", new StringType(), 64, "assigned", false);
-                map.addColumn("creator", "CREATOR", new StringType(), 64, true, false, false);
-                map.addColumn("creationdate", "CREATIONDATE", new TimestampType(), 64, true, false, false);
-                map.addColumn("rule", "RULE", new TextType(), 2048000, false, false, false);
-                map.addColumn("description", "DESCRIPTION", new StringType(), 255, false, false, false);
-                cfg.addXML(map.getTableXML());
-                cfg.createMappings();
-
-                MCRHIBConnection.instance().buildSessionFactory(cfg);
-                new SchemaUpdate(MCRHIBConnection.instance().getConfiguration()).execute(true, true);
-            }
+            new SchemaUpdate(MCRHIBConnection.instance().getConfiguration()).execute(true, true);
         } catch (Exception e) {
             logger.error("catched error", e);
         }
@@ -206,15 +189,15 @@ public class MCRHIBRuleStore extends MCRRuleStore {
         Session session = MCRHIBConnection.instance().getSession();
         MCRAccessRule rule = null;
         try {
-        	MCRACCESSRULE hibrule = null;
-        	List li = session.createCriteria(MCRACCESSRULE.class).add(Restrictions.eq("rid", ruleid)).list();
-        	if ( li != null && li.size() > 0){
-        		hibrule = ((MCRACCESSRULE) li.get(0));
-        	}
+            logger.debug("Getting MCRACCESSRULE");
+        	MCRACCESSRULE hibrule = (MCRACCESSRULE)session.createCriteria(MCRACCESSRULE.class).add(Restrictions.eq("rid", ruleid)).uniqueResult();
+            logger.debug("Getting MCRACCESSRULE done");
 
             if (hibrule != null) {
                 try {
+                    logger.debug("new MCRAccessRule");
                     rule = new MCRAccessRule(ruleid, hibrule.getCreator(), hibrule.getCreationdate(), hibrule.getRule(), hibrule.getDescription());
+                    logger.debug("new MCRAccessRule done");
                 } catch (Exception e) {
                     throw new MCRException("Rule " + ruleid + " can't be parsed", e);
                 }
