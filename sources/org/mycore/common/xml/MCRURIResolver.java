@@ -84,6 +84,8 @@ import org.mycore.services.fieldquery.MCRResults;
 import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
 
+import sun.management.MXBeanSupport;
+
 /**
  * Reads XML documents from various URI types. This resolver is used to read
  * DTDs, XML Schema files, XSL document() usages, xsl:include usages and MyCoRe
@@ -975,6 +977,8 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
         private static final String SORT_PARAM = "sortby";
 
         private static final String ORDER_PARAM = "order";
+        
+        private static final String MAXRESULTS_PARAM 	= "maxResults";
 
         /**
          * Returns query results for query in "term" parameter
@@ -994,17 +998,26 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
             }
             String sortby = params.get(SORT_PARAM);
             String order = params.get(ORDER_PARAM);
+            String maxResults = getMaxResults(params);
 
             if (query == null) {
                 return null;
             }
-            Document input = getQueryDocument(query, sortby, order);
+            Document input = getQueryDocument(query, sortby, order, maxResults);
             // Execute query
             long start = System.currentTimeMillis();
             MCRResults result = MCRQueryManager.search(MCRQuery.parseXML(input));
             long qtime = System.currentTimeMillis() - start;
             LOGGER.debug("MCRSearchServlet total query time: " + qtime);
             return result.buildXML();
+        }
+        
+        private static String getMaxResults(Hashtable<String, String> params) {
+            String maxResults = params.get(MAXRESULTS_PARAM); 
+            if (maxResults!=null 
+            		&& !maxResults.equals("")) 
+            	return maxResults;
+        	return "0";
         }
 
         private static Hashtable<String, String> getParameterMap(String key) {
@@ -1019,9 +1032,10 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
             return params;
         }
 
-        private static Document getQueryDocument(String query, String sortby, String order) {
+        private static Document getQueryDocument(String query, String sortby, String order, String maxResults) {
             Element queryElement = new Element("query");
-            queryElement.setAttribute("maxResults", "0");
+            //queryElement.setAttribute("maxResults", "0");
+            queryElement.setAttribute("maxResults", maxResults);
             queryElement.setAttribute("numPerPage", "0");
             Document input = new Document(queryElement);
 
