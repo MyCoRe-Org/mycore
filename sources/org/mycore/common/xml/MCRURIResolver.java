@@ -71,11 +71,11 @@ import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUsageException;
 import org.mycore.common.MCRUtils;
 import org.mycore.datamodel.classifications.MCRClassificationItem;
-import org.mycore.datamodel.classifications.MCRClassificationTransformer;
 import org.mycore.datamodel.classifications.MCRClassificationQuery;
+import org.mycore.datamodel.classifications.MCRClassificationTransformer;
+import org.mycore.datamodel.common.MCRXMLTableManager;
 import org.mycore.datamodel.ifs.MCRDirectoryXML;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.datamodel.common.MCRXMLTableManager;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.services.fieldquery.MCRQuery;
 import org.mycore.services.fieldquery.MCRQueryClient;
@@ -83,8 +83,6 @@ import org.mycore.services.fieldquery.MCRQueryManager;
 import org.mycore.services.fieldquery.MCRResults;
 import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
-
-import sun.management.MXBeanSupport;
 
 /**
  * Reads XML documents from various URI types. This resolver is used to read
@@ -1034,7 +1032,6 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
 
         private static Document getQueryDocument(String query, String sortby, String order, String maxResults) {
             Element queryElement = new Element("query");
-            //queryElement.setAttribute("maxResults", "0");
             queryElement.setAttribute("maxResults", maxResults);
             queryElement.setAttribute("numPerPage", "0");
             Document input = new Document(queryElement);
