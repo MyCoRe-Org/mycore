@@ -27,6 +27,8 @@ import java.sql.Blob;
 
 public class MCRXMLTABLE {
     private MCRXMLTABLEPK key;
+    
+    private String type;
 
     private Blob xml;
 
@@ -35,7 +37,8 @@ public class MCRXMLTABLE {
     }
 
     public MCRXMLTABLE(String id, int version, String type, Blob xml) {
-        this.key = new MCRXMLTABLEPK(id, version, type);
+        this.key = new MCRXMLTABLEPK(id, version);
+        this.type = type;
         this.xml = xml;
     }
 
@@ -64,11 +67,11 @@ public class MCRXMLTABLE {
     }
 
     public String getType() {
-        return this.key.getType();
+        return type;
     }
 
     public void setType(String type) {
-        this.key.setType(type);
+        this.type = type;
     }
 
     public byte[] getXmlByteArray() {

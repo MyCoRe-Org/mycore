@@ -32,12 +32,9 @@ public class MCRXMLTABLEPK implements Serializable {
 
     private int version;
 
-    private String type;
-
-    public MCRXMLTABLEPK(String id, int version, String type) {
+    public MCRXMLTABLEPK(String id, int version) {
         this.id = id;
         this.version = version;
-        this.type = type;
     }
 
     public MCRXMLTABLEPK() {
@@ -51,9 +48,6 @@ public class MCRXMLTABLEPK implements Serializable {
         return version;
     }
 
-    public String getType() {
-        return type;
-    }
 
     public void setId(String id) {
         this.id = id;
@@ -63,21 +57,38 @@ public class MCRXMLTABLEPK implements Serializable {
         this.version = version;
     }
 
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    public boolean equals(Object _other) {
-        if (!(_other instanceof MCRXMLTABLEPK)) {
-            return false;
-        }
-
-        MCRXMLTABLEPK other = (MCRXMLTABLEPK) _other;
-
-        return this.id.equals(other.id) && (this.version == other.version) && this.type.equals(other.type);
-    }
-
+    /* (non-Javadoc)
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(getId()).append(getVersion()).append(getType()).toHashCode();
+        final int PRIME = 31;
+        int result = 1;
+        result = PRIME * result + ((id == null) ? 0 : id.hashCode());
+        result = PRIME * result + version;
+        return result;
     }
+
+    /* (non-Javadoc)
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        final MCRXMLTABLEPK other = (MCRXMLTABLEPK) obj;
+        if (id == null) {
+            if (other.id != null)
+                return false;
+        } else if (!id.equals(other.id))
+            return false;
+        if (version != other.version)
+            return false;
+        return true;
+    }
+
 }

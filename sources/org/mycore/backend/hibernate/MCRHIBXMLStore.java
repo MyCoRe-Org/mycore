@@ -195,7 +195,7 @@ public class MCRHIBXMLStore implements MCRXMLTableInterface {
         byte[] blob = null;
 
         try {
-            MCRXMLTABLEPK pk = new MCRXMLTABLEPK(mcrid.getId(), version, this.type);
+            MCRXMLTABLEPK pk = new MCRXMLTABLEPK(mcrid.getId(), version);
             l = session.createCriteria(MCRXMLTABLE.class).add(Restrictions.eq("key", pk)).list();
             if (l.size() > 0) {
             	blob = ((MCRXMLTABLE) l.get(0)).getXmlByteArray();
