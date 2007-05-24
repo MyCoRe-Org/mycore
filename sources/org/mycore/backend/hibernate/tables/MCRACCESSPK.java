@@ -64,4 +64,47 @@ public class MCRACCESSPK implements Serializable {
     public void setRid(String rid) {
         this.rid = rid;
     }
+
+    /* (non-Javadoc)
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public int hashCode() {
+        final int PRIME = 31;
+        int result = 1;
+        result = PRIME * result + ((acpool == null) ? 0 : acpool.hashCode());
+        result = PRIME * result + ((objid == null) ? 0 : objid.hashCode());
+        result = PRIME * result + ((rid == null) ? 0 : rid.hashCode());
+        return result;
+    }
+
+    /* (non-Javadoc)
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        final MCRACCESSPK other = (MCRACCESSPK) obj;
+        if (acpool == null) {
+            if (other.acpool != null)
+                return false;
+        } else if (!acpool.equals(other.acpool))
+            return false;
+        if (objid == null) {
+            if (other.objid != null)
+                return false;
+        } else if (!objid.equals(other.objid))
+            return false;
+        if (rid == null) {
+            if (other.rid != null)
+                return false;
+        } else if (!rid.equals(other.rid))
+            return false;
+        return true;
+    }
 }
