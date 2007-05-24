@@ -97,8 +97,8 @@ public class MCRUserMgr {
             throw new MCRException("MCRUserStore error", e);
         }
 
-        userCache = new MCRCache(20); // resonable values? This might also be
-        groupCache = new MCRCache(10); // read from mycore.properties....
+        userCache = new MCRCache(20, "UserMgr users"); // resonable values? This might also be
+        groupCache = new MCRCache(10, "UserMgr groups"); // read from mycore.properties....
 
         AI = MCRAccessManager.getAccessImpl();
     }

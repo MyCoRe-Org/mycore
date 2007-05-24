@@ -202,7 +202,7 @@ public class MCRIndexServlet extends MCRServlet {
     }
 
     // **************************************************************************
-    private MCRCache configurations = new MCRCache(20);
+    private MCRCache configurations = new MCRCache(20, "IndexServlet IndexConfigurations");
 
     private synchronized MCRIndexConfiguration getConfiguration(String ID) {
         MCRIndexConfiguration ic = (MCRIndexConfiguration) (configurations.get(ID));

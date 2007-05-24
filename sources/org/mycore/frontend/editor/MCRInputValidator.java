@@ -79,7 +79,7 @@ public class MCRInputValidator {
     }
 
     /** Cache of reusable stylesheets for checking XSL conditions * */
-    private MCRCache xslcondCache = new MCRCache(20);
+    private MCRCache xslcondCache = new MCRCache(20, "InputValidator XSL conditions");
 
     /**
      * Checks the input string against an XSL condition. The syntax of the
@@ -174,7 +174,7 @@ public class MCRInputValidator {
     }
 
     /** Cache of reusable compiled regular expressions * */
-    private MCRCache regexpCache = new MCRCache(20);
+    private MCRCache regexpCache = new MCRCache(20, "InputValidator compiled reqular expressions");
 
     /**
      * Checks the input string against a regular expression.
@@ -232,7 +232,7 @@ public class MCRInputValidator {
     }
 
     /** Cache of reusable DateFormat objects * */
-    private MCRCache formatCache = new MCRCache(20);
+    private MCRCache formatCache = new MCRCache(20, "InputValidator DateFormat objects");
 
     /**
      * Returns a reusable DateFormat object for the given format string. That

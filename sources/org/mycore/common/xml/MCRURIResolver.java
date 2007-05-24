@@ -120,7 +120,7 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
     private MCRURIResolver() {
         MCRConfiguration config = MCRConfiguration.instance();
         int cacheSize = config.getInt(CONFIG_PREFIX + "StaticFiles.CacheSize", 100);
-        bytesCache = new MCRCache(cacheSize);
+        bytesCache = new MCRCache(cacheSize, "URIResolver Resources");
         SUPPORTED_SCHEMES = Collections.unmodifiableMap(getResolverMapping());
     }
 
@@ -612,12 +612,8 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
         /**
          * A cache of parsed XML files *
          */
-        private MCRCache fileCache;
-
-        public MCRFileResolver() {
-            int cacheSize = MCRConfiguration.instance().getInt(CONFIG_PREFIX + "StaticFiles.CacheSize", 100);
-            fileCache = new MCRCache(cacheSize);
-        }
+        final static int cacheSize = MCRConfiguration.instance().getInt(CONFIG_PREFIX + "StaticFiles.CacheSize", 100);
+        private static MCRCache fileCache = new MCRCache(cacheSize, "URIResolver Files");
 
         /**
          * Reads XML from a file URL.
@@ -852,7 +848,7 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
 
         private void initCache() {
             int cacheSize = MCRConfiguration.instance().getInt(CONFIG_PREFIX + "Classification.CacheSize", 1000);
-            CLASS_CACHE = new MCRCache(cacheSize);
+            CLASS_CACHE = new MCRCache(cacheSize, "URIResolver Classifications");
             CACHE_INIT_TIME = System.currentTimeMillis();
         }
 

@@ -73,7 +73,7 @@ import org.mycore.user.MCRUserMgr;
 public class MCRLayoutService {
 
     /** A cache of already compiled stylesheets */
-    private MCRCache STYLESHEETS_CACHE = new MCRCache(100);
+    private MCRCache STYLESHEETS_CACHE = new MCRCache(100, "XSLT Stylesheets");
 
     /** The directory containing the xsl files */
     private String stylesheetsDir;

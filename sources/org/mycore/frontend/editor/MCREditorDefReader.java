@@ -164,7 +164,7 @@ public class MCREditorDefReader {
      * A cache of reusable resolved includes. Key is URI and IDREF, cached value
      * is a container element that holds the resolved includes.
      */
-    protected static MCRCache includesCache = new MCRCache(100);
+    protected static MCRCache includesCache = new MCRCache(100, "EditorDefReader Includes");
 
     /**
      * Resolves the uri and idref to a list of elements to include. If idref is

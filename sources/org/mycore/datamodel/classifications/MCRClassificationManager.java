@@ -73,9 +73,9 @@ public class MCRClassificationManager {
 
         int classifSize = CONFIG.getInt("MCR.Persistence.Classification.Store.CacheSize.Class", 30);
         int categSize = CONFIG.getInt("MCR.Persistence.Classification.Store.CacheSize.Categ", 500);
-        classificationCache = new MCRCache(classifSize);
-        categoryCache = new MCRCache(categSize);
-        jDomCache = new MCRCache(categSize);
+        classificationCache = new MCRCache(classifSize, "ClassificationManager Classifications");
+        categoryCache = new MCRCache(categSize, "ClassificationManager Categories");
+        jDomCache = new MCRCache(categSize, "ClassificationManager Classification Documents");
 
     }
 

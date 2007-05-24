@@ -519,7 +519,7 @@ public class MCRIndexBrowserData {
         MCRCache c = (MCRCache) MCRSessionMgr.getCurrentSession().get(key);
         if (c == null) {
             logger.debug("Create new IndexBrowserCache with KEY: " + key );
-            c = new MCRCache(5);
+            c = new MCRCache(5, "IndexBrowser Cache key("+key+")");
             MCRSessionMgr.getCurrentSession().put(key, c);
         }
         return c;

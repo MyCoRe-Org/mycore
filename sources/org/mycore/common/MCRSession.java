@@ -58,7 +58,7 @@ public class MCRSession implements Cloneable {
     private String sessionID = null;
 
     /** A cache of MCRSession objects, used for method getSession( String ) */
-    private static MCRCache sessions = new MCRCache(1000);
+    private static MCRCache sessions = new MCRCache(1000, "MCRSession sessions");
 
     /** -ASC- f�r MCRClassificationBrowser Class session daten */
     public MCRClassificationBrowserData BData = null;

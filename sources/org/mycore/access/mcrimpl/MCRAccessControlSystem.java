@@ -82,7 +82,7 @@ public class MCRAccessControlSystem extends MCRAccessBaseImpl {
             disabled = true;
         }
 
-        cache = new MCRCache(size);
+        cache = new MCRCache(size, "Access Rules");
         accessStore = MCRAccessStore.getInstance();
         ruleStore = MCRRuleStore.getInstance();
         accessComp = new MCRAccessConditionsComparator();

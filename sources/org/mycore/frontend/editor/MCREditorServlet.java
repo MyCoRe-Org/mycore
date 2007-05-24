@@ -65,7 +65,7 @@ import org.mycore.frontend.servlets.MCRServletJob;
 public class MCREditorServlet extends MCRServlet {
     protected final static Logger logger = Logger.getLogger(MCREditorServlet.class);
 
-    protected final static MCRCache sessions = new MCRCache(200);
+    protected final static MCRCache sessions = new MCRCache(200, "EditorServlet Sessions");
 
     public void doGetPost(MCRServletJob job) throws ServletException, java.io.IOException {
         HttpServletRequest req = job.getRequest();

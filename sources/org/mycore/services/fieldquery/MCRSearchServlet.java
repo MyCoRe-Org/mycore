@@ -400,7 +400,7 @@ public class MCRSearchServlet extends MCRServlet {
     public static MCRCache getCache(String key) {
         MCRCache c = (MCRCache) MCRSessionMgr.getCurrentSession().get(key);
         if (c == null) {
-            c = new MCRCache(5);
+            c = new MCRCache(5, "SearchServlet Cache key("+key+")");
             MCRSessionMgr.getCurrentSession().put(key, c);
         }
         return c;

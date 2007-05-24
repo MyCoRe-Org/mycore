@@ -34,7 +34,7 @@ import org.mycore.common.MCRCache;
  * @version $Revision$ $Date$
  */
 public class MCRUploadHandlerManager {
-    protected static MCRCache handlers = new MCRCache(100);
+    protected static MCRCache handlers = new MCRCache(100,"UploadHandlerManager UploadHandlers");
 
     private static Logger logger = Logger.getLogger(MCRUploadHandlerManager.class);
 

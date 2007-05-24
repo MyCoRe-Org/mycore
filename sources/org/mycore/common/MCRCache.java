@@ -84,6 +84,10 @@ public class MCRCache {
 
     /** The maximum number of objects that the cache can hold */
     protected int capacity;
+    
+    protected String type;
+    
+    private MCRCache(){};
 
     /**
      * Creates a new cache with a given capacity.
@@ -91,8 +95,10 @@ public class MCRCache {
      * @param capacity
      *            the maximum number of objects this cache will hold
      */
-    public MCRCache(int capacity) {
+    public MCRCache(int capacity, String type) {
         setCapacity(capacity);
+        this.type=type;
+        MCRCacheJMXBridge.registerMe(this);
     }
 
     /**
@@ -348,7 +354,7 @@ public class MCRCache {
      * A small sample program for testing this class.
      */
     public static void main(String[] args) {
-        MCRCache cache = new MCRCache(4);
+        MCRCache cache = new MCRCache(4, "Small Sample Program");
         System.out.println(cache);
         cache.put("a", "Anton");
         cache.put("b", "Bohnen");

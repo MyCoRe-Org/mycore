@@ -81,7 +81,7 @@ public class MCRXMLTableManager {
      */
     protected MCRXMLTableManager() {
         tablelist = new Hashtable<String, MCRXMLTableInterface>();
-        jdomCache = new MCRCache(CONFIG.getInt("MCR.Persistence.XML.Store.CacheSize", 100));
+        jdomCache = new MCRCache(CONFIG.getInt("MCR.Persistence.XML.Store.CacheSize", 100), "XMLTable JDOMs");
         number_distance = CONFIG.getInt("MCR.Metadata.ObjectID.NumberDistance", 1);
     }
 

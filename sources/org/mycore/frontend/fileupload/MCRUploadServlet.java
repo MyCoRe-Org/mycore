@@ -77,7 +77,7 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
 
     static Logger LOGGER = Logger.getLogger(MCRUploadServlet.class);
 
-    static MCRCache sessionIDs = new MCRCache(100);
+    static MCRCache sessionIDs = new MCRCache(100, "UploadServlet Upload sessions");
 
     public synchronized void init() throws ServletException {
         super.init();

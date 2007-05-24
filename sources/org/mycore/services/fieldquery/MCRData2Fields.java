@@ -84,7 +84,7 @@ public class MCRData2Fields {
         template.addContent(fieldValues);
     }
 
-    private static MCRCache stylesheets = new MCRCache(10);
+    private static MCRCache stylesheets = new MCRCache(10, "Date2Fields Stylesheets");
 
     private static Document buildStylesheet(String index, String source) {
         String key = index + "//" + source;
