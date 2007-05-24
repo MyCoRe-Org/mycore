@@ -39,7 +39,7 @@ public class MCRCacheJMXBridge {
         Object mbean=new MCRCacheManager(cache);
         ObjectName name;
         try {
-            name=new ObjectName(MCRConfiguration.instance().getString("MCR.NameOfProject","MyCoRe-Application").replace(':',' ' )+":component=MCRCache,type="+cache.type);
+            name=new ObjectName(MCRConfiguration.instance().getString("MCR.NameOfProject","MyCoRe-Application").replace(':',' ' )+":type=MCRCache,component="+cache.type);
         } catch (MalformedObjectNameException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
