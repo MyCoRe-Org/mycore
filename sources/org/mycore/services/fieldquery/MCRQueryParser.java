@@ -127,6 +127,8 @@ public class MCRQueryParser extends MCRBooleanClauseParser {
         MCRFieldDef def = MCRFieldDef.getDef(field);
         if (def == null)
             throw new MCRParseException("Field not defined: <" + field + ">");
+        if (!MCRFieldType.isValidOperatorForType(def.getDataType(), oper))
+            throw new MCRParseException("Search operator <" + oper + "> not allowed for field <" + field + ">");
         return new MCRQueryCondition(def, oper, value);
     }
 
