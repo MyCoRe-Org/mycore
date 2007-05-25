@@ -26,6 +26,7 @@ package org.mycore.services.fieldquery;
 import org.jdom.Element;
 import org.mycore.parsers.bool.MCRCondition;
 import org.mycore.parsers.bool.MCRConditionVisitor;
+import org.mycore.parsers.bool.MCRParseException;
 
 /**
  * Represents a simple query condition, which consists of a search field,
@@ -41,6 +42,10 @@ public class MCRQueryCondition extends MCRFieldValue implements MCRCondition {
     /** Creates a new simple query condition */
     public MCRQueryCondition(MCRFieldDef field, String operator, String value) {
         super( field, value );
+        
+        if (!MCRFieldType.isValidOperatorForType(field.getDataType(), operator))
+            throw new MCRParseException("Search operator <" + operator + "> not allowed for field <" + field.getName() + ">");
+        
         this.operator = operator;
     }
 
