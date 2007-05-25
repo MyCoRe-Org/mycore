@@ -71,7 +71,7 @@ public class MCRCache {
     protected MCRCacheEntry lru;
 
     /** A hashtable for looking up a cached object by a given key */
-    protected Hashtable index = new Hashtable();
+    protected Hashtable<Object,MCRCacheEntry> index = new Hashtable<Object,MCRCacheEntry>();
 
     /** The number of requests to get an object from this cache */
     protected long gets = 0;
@@ -85,8 +85,10 @@ public class MCRCache {
     /** The maximum number of objects that the cache can hold */
     protected int capacity;
     
+    /** Tch type string for the MCRCacheJMXBridge */
     protected String type;
     
+    /** The constructor */
     private MCRCache(){};
 
     /**
@@ -94,6 +96,7 @@ public class MCRCache {
      * 
      * @param capacity
      *            the maximum number of objects this cache will hold
+     * @param type the type string for MCRCacheJMXBridge
      */
     public MCRCache(int capacity, String type) {
         setCapacity(capacity);
@@ -113,8 +116,12 @@ public class MCRCache {
      *            the non-null object to be put into the cache
      */
     public synchronized void put(Object key, Object obj) {
-        MCRArgumentChecker.ensureNotNull(key, "key");
-        MCRArgumentChecker.ensureNotNull(obj, "obj");
+        if (key == null) {
+            throw new MCRUsageException("The value of the argument key is null.");
+        }
+        if (obj == null) {
+            throw new MCRUsageException("The value of the argument obj is null.");
+        }
 
         if (capacity == 0) {
             return;
@@ -152,7 +159,9 @@ public class MCRCache {
      *            the key for the object you want to remove from this cache
      */
     public synchronized void remove(Object key) {
-        MCRArgumentChecker.ensureNotNull(key, "key");
+        if (key == null) {
+            throw new MCRUsageException("The value of the argument key is null.");
+        }
 
         if (!index.containsKey(key)) {
             return;
@@ -190,7 +199,9 @@ public class MCRCache {
      * @return the cached object, or null
      */
     public synchronized Object get(Object key) {
-        MCRArgumentChecker.ensureNotNull(key, "key");
+        if (key == null) {
+            throw new MCRUsageException("The value of the argument key is null.");
+        }
 
         gets++;
 
@@ -280,7 +291,9 @@ public class MCRCache {
      *            the maximum number of objects this cache will hold
      */
     public synchronized void setCapacity(int capacity) {
-        MCRArgumentChecker.ensureIsTrue(capacity >= 0, "cache capacity must be >= 0");
+        if (capacity < 0) {
+            throw new MCRUsageException("The cache capacity must be >= 0.");
+        }
 
         while (size > capacity)
             remove(lru.key);
@@ -331,7 +344,7 @@ public class MCRCache {
      * Clears the cache by removing all entries from the cache
      */
     public synchronized void clear() {
-        index = new Hashtable();
+        index = new Hashtable<Object,MCRCacheEntry>();
         size = 0;
         mru = lru = null;
     }
