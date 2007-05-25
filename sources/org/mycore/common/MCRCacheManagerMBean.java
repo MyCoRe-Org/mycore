@@ -39,6 +39,10 @@ public interface MCRCacheManagerMBean {
     
     public double getFillRate();
     
+    public String getLeastRecentlyUsedElement();
+    
+    public String getMostRecentlyUsedElement();
+    
     public void clear();
 
 }

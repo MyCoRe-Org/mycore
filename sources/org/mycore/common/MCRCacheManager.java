@@ -76,4 +76,14 @@ public class MCRCacheManager implements MCRCacheManagerMBean {
         setCapacity(capacity);
     }
 
+
+    public String getLeastRecentlyUsedElement() {
+        return cache.lru.key.toString();
+    }
+
+
+    public String getMostRecentlyUsedElement() {
+        return cache.mru.key.toString();
+    }
+
 }
