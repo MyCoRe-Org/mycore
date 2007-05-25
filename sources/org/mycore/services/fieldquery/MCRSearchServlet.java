@@ -76,15 +76,11 @@ public class MCRSearchServlet extends MCRServlet {
     /** Default search field */
     private String defaultSearchField;
 
-    /** Default search operator */
-    private String defaultSearchOperator;
-
     public void init() throws ServletException {
         super.init();
         MCRConfiguration config = MCRConfiguration.instance();
         String prefix = "MCR.SearchServlet.";
         defaultSearchField = config.getString(prefix + "DefaultSearchField", "allMeta");
-        defaultSearchOperator = config.getString(prefix + "DefaultSearchOperator", "contains");
     }
 
     public void doGetPost(MCRServletJob job) throws IOException {
@@ -239,9 +235,10 @@ public class MCRSearchServlet extends MCRServlet {
             if (request.getParameter("search") != null) {
                 // Search in default field with default operator
 
+                String defaultOperator = MCRFieldType.getDefaultOperator(MCRFieldDef.getDef(defaultSearchField).getDataType()); 
                 Element cond = new Element("condition");
                 cond.setAttribute("field", defaultSearchField);
-                cond.setAttribute("operator", defaultSearchOperator);
+                cond.setAttribute("operator", defaultOperator );
                 cond.setAttribute("value", getReqParameter(request, "search", null));
 
                 Element b = new Element("boolean");
@@ -274,7 +271,7 @@ public class MCRSearchServlet extends MCRServlet {
 
                     String operator = request.getParameter(name + ".operator");
                     if (operator == null)
-                        operator = defaultSearchOperator;
+                        operator = MCRFieldType.getDefaultOperator(MCRFieldDef.getDef(name).getDataType()); 
 
                     Element parent = b;
 
