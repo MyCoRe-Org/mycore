@@ -229,7 +229,8 @@ public class MCRData2Fields {
         List fieldValues = null;
         try {
             JDOMResult xmlres = new JDOMResult();
-            TransformerFactory factory = TransformerFactory.newInstance();
+            System.setProperty("javax.xml.transform.TransformerFactory", "org.apache.xalan.processor.TransformerFactoryImpl");
+            TransformerFactory factory = TransformerFactory.newInstance(System.getProperty("javax.xml.transform.TransformerFactory"),MCRData2Fields.class.getClassLoader());
             factory.setURIResolver(MCRURIResolver.instance());
             Transformer transformer = factory.newTransformer(new JDOMSource(xsl));
             transformer.setParameter("objectType", objectType);
