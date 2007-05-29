@@ -29,6 +29,7 @@ import javax.servlet.ServletContextListener;
 import org.apache.log4j.Logger;
 
 import org.mycore.common.MCRConfiguration;
+import org.mycore.services.mbeans.MCRObject;
 
 /**
  * is a shutdown hook for the current <code>ServletContext</code>.
@@ -54,6 +55,9 @@ public class MCRServletContextListener implements ServletContextListener {
         // register to MCRShutdownHandler
         LOGGER.info("Register ServletContextListener to MCRShutdownHandler");
         MCRShutdownHandler.getInstance().isWebAppRunning = true;
+        // register MBeans
+        LOGGER.info("Register MBean: MCRObject");
+        MCRObject.register();
     }
 
     public void contextDestroyed(ServletContextEvent sce) {
