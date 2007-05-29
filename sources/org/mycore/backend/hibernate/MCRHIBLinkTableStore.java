@@ -162,7 +162,7 @@ public class MCRHIBLinkTableStore implements MCRLinkTableInterface {
      */
     public final int countTo(String fromtype, String to, String type, String restriction) {
         Session session = getSession();
-        Integer returns;
+        Number returns;
         StringBuffer qBf = new StringBuffer(1024);
         qBf.append("select count(key.mcrfrom) from ").append(classname).append(" where MCRTO like ").append('\'').append(to).append('\'');
 
@@ -178,7 +178,7 @@ public class MCRHIBLinkTableStore implements MCRLinkTableInterface {
 
         try {
             Query q = session.createQuery(qBf.toString());
-            returns = (Integer) q.uniqueResult();
+            returns = (Number) q.uniqueResult();
         } catch (Exception e) {
             logger.error(e);
             throw new MCRException("Error during countTo(" + fromtype + "," + to + "," + type + "," + restriction + ")", e);
