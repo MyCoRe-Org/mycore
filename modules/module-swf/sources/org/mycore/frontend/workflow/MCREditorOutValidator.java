@@ -68,6 +68,7 @@ import org.mycore.datamodel.metadata.MCRMetaNumber;
 import org.mycore.datamodel.metadata.MCRMetaPersonName;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.user.MCRUserMgr;
 
 /**
  * provides a wrappe for editor validation and MCRObject creation.
@@ -75,7 +76,7 @@ import org.mycore.datamodel.metadata.MCRObjectID;
  * For a new MetaDataType, e.g. MCRMetaFooBaar, create a method
  * 
  * <pre>
- *           boolean checkMCRMetaFooBar(Element)
+ *            boolean checkMCRMetaFooBar(Element)
  * </pre>
  * 
  * use the following methods in that method to do common tasks on element
@@ -221,7 +222,7 @@ public class MCREditorOutValidator {
                     LOGGER.warn("Error while invoking " + m.getName(), e);
                 }
             } else {
-                LOGGER.warn("Tag <"+datatag.getName()+"> of type " + mcrclass + " has no validator defined, fallback to default behaviour");
+                LOGGER.warn("Tag <" + datatag.getName() + "> of type " + mcrclass + " has no validator defined, fallback to default behaviour");
                 // try to create MCRMetaInterface instance
                 try {
                     Class metaClass = Class.forName(mcrclass);
@@ -494,7 +495,7 @@ public class MCREditorOutValidator {
         InputStream aclxml = MCREditorOutValidator.class.getResourceAsStream(resource);
         if (aclxml == null) {
             LOGGER.warn("Can't find default object ACL file " + resource.substring(1));
-            resource = "/editor_default_acls.xml"; //fallback
+            resource = "/editor_default_acls.xml"; // fallback
             aclxml = MCREditorOutValidator.class.getResourceAsStream(resource);
         }
         if (aclxml == null) {
@@ -522,36 +523,40 @@ public class MCREditorOutValidator {
                 }
                 for (Iterator<Element> boolIt = rootbool.getChildren("boolean").iterator(); boolIt.hasNext();) {
                     Element orbool = boolIt.next();
-                    Element firstcond = orbool.getChild("condition");
-                    if (firstcond == null) {
-                        continue;
+                    for (Iterator<Element> condIt = orbool.getChildren("condition").iterator(); condIt.hasNext();) {
+                        Element firstcond = condIt.next();
+                        if (firstcond == null) {
+                            continue;
+                        }
+                        String value = firstcond.getAttributeValue("value");
+                        if (value == null)
+                            continue;
+                        if (value.equals("$CurrentUser")) {
+                            String thisuser = MCRSessionMgr.getCurrentSession().getCurrentUserID();
+                            firstcond.setAttribute("value", thisuser);
+                            continue;
+                        }
+                        if (value.equals("$CurrentGroup")) {
+                            String thisuser = MCRSessionMgr.getCurrentSession().getCurrentUserID();
+                            ArrayList<String> ar = MCRUserMgr.instance().getGroupsContainingUser(thisuser);
+                            firstcond.setAttribute("value", ar.get(0));
+                            continue;
+                        }
+                        int i = value.indexOf("$CurrentIP");
+                        if (i != -1) {
+                            String thisip = MCRSessionMgr.getCurrentSession().getCurrentIP();
+                            StringBuffer sb = new StringBuffer(64);
+                            sb.append(value.substring(0, i)).append(thisip).append(value.substring(i + 10, value.length()));
+                            firstcond.setAttribute("value", sb.toString());
+                            continue;
+                        }
                     }
-                    String field = firstcond.getAttributeValue("field");
-                    if (field == null)
-                        continue;
-                    if (!field.equals("user") && !field.equals("group"))
-                        continue;
-                    orbool.addContent(getCurrentUser());
                 }
             }
             service.addContent(acls.detach());
         } catch (Exception e) {
             LOGGER.warn("Error while parsing file " + resource, e);
         }
-    }
-
-    /**
-     * The method build the condition element of the current user
-     * 
-     * @return a JDOM Element
-     */
-    private final org.jdom.Element getCurrentUser() {
-        org.jdom.Element user = new org.jdom.Element("condition");
-        user.setAttribute("field", "user");
-        user.setAttribute("operator", "=");
-        String thisuser = MCRSessionMgr.getCurrentSession().getCurrentUserID();
-        user.setAttribute("value", thisuser);
-        return user;
     }
 
     /**
