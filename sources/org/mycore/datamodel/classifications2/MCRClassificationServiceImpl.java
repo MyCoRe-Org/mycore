@@ -23,7 +23,10 @@
  **/
 package org.mycore.datamodel.classifications2;
 
-public class MCRClassificationServiceImpl {
+import java.util.ArrayList;
+import java.util.List;
+
+public class MCRClassificationServiceImpl implements MCRClassificationService {
     
     protected static int calculateLeftRight(MCRClassificationObject co, int startValue){
         int curValue=startValue;
@@ -33,6 +36,22 @@ public class MCRClassificationServiceImpl {
         }
         co.setRight(++curValue);
         return curValue;
+    }
+    
+    /* (non-Javadoc)
+     * @see org.mycore.datamodel.classifications2.MCRClassificationService#hasChildren(org.mycore.datamodel.classifications2.MCRClassificationID)
+     */
+    public boolean hasChildren(MCRClassificationID cid){
+        //TODO: implement hasChildren
+        return true;
+    }
+    
+    /* (non-Javadoc)
+     * @see org.mycore.datamodel.classifications2.MCRClassificationService#getChildren(org.mycore.datamodel.classifications2.MCRClassificationID)
+     */
+    public List<MCRClassificationObject> getChildren(MCRClassificationID cid){
+        //TODO: implement getChildren
+        return new ArrayList<MCRClassificationObject>();
     }
 
 }
