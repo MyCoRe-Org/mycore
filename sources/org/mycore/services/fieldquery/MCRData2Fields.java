@@ -30,6 +30,7 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 
 import org.apache.log4j.Logger;
+import org.apache.xalan.processor.TransformerFactoryImpl;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.output.XMLOutputter;
@@ -229,8 +230,7 @@ public class MCRData2Fields {
         List fieldValues = null;
         try {
             JDOMResult xmlres = new JDOMResult();
-            System.setProperty("javax.xml.transform.TransformerFactory", "org.apache.xalan.processor.TransformerFactoryImpl");
-            TransformerFactory factory = TransformerFactory.newInstance(System.getProperty("javax.xml.transform.TransformerFactory"),MCRData2Fields.class.getClassLoader());
+            TransformerFactory factory = new TransformerFactoryImpl();
             factory.setURIResolver(MCRURIResolver.instance());
             Transformer transformer = factory.newTransformer(new JDOMSource(xsl));
             transformer.setParameter("objectType", objectType);
