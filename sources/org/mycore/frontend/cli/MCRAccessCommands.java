@@ -66,9 +66,6 @@ public class MCRAccessCommands extends MCRAbstractCommands {
         com = new MCRCommand("load permissions data from file {0}", "org.mycore.frontend.cli.MCRAccessCommands.loadPermissionsFromFile String", "The command loads the permissions data of the access control system with data from the file {0}.");
         command.add(com);
 
-        com = new MCRCommand("update permissions data from file {0}", "org.mycore.frontend.cli.MCRAccessCommands.updatePermissionsFromFile String", "The command update the permissions data of the access control system with data from the file {0}.");
-        command.add(com);
-
         com = new MCRCommand("list all permissions", "org.mycore.frontend.cli.MCRAccessCommands.listAllPermissions", "");
         command.add(com);
 
@@ -162,18 +159,6 @@ public class MCRAccessCommands extends MCRAbstractCommands {
      * @see #updatePermissionsFromFile(String)
      */
     public static void loadPermissionsFromFile(String filename) throws Exception {
-        updatePermissionsFromFile(filename);
-    }
-
-    /**
-     * This method deletes the old permissions (if given any) and sets the new
-     * permissions given in a certain file
-     * 
-     * @param filename
-     *            the filename of the file that contains the mcrpermissions
-     */
-    public static void updatePermissionsFromFile(String filename) throws Exception {
-        deleteAllPermissions();
         createPermissionsFromFile(filename);
     }
 
