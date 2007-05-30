@@ -43,6 +43,7 @@ import org.jdom.Element;
 
 import org.mycore.access.MCRAccessBaseImpl;
 import org.mycore.access.MCRAccessInterface;
+import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 import org.mycore.common.xml.MCRURIResolver;
@@ -65,7 +66,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
     private static Logger LOGGER = Logger.getLogger(MCRDerivateCommands.class.getName());
 
     /** The ACL interface */
-    private static final MCRAccessInterface ACCESS_IMPL = (MCRAccessInterface) MCRConfiguration.instance().getInstanceOf("MCR.Access.Class", MCRAccessBaseImpl.class.getName());
+    private static final MCRAccessInterface ACCESS_IMPL = MCRAccessManager.getAccessImpl();
 
     /** Default transformer script */
     public static final String DEFAULT_TRANSFORMER = "save-derivate.xsl";
