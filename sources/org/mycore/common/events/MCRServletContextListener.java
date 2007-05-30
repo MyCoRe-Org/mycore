@@ -29,6 +29,7 @@ import javax.servlet.ServletContextListener;
 import org.apache.log4j.Logger;
 
 import org.mycore.common.MCRConfiguration;
+import org.mycore.services.mbeans.MCRDerivate;
 import org.mycore.services.mbeans.MCRObject;
 
 /**
@@ -58,6 +59,8 @@ public class MCRServletContextListener implements ServletContextListener {
         // register MBeans
         LOGGER.info("Register MBean: MCRObject");
         MCRObject.register();
+        LOGGER.info("Register MBean: MCRDerivate");
+        MCRDerivate.register();
     }
 
     public void contextDestroyed(ServletContextEvent sce) {
