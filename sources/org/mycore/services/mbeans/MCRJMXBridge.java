@@ -24,10 +24,8 @@
 package org.mycore.services.mbeans;
 
 import java.lang.management.ManagementFactory;
-import java.util.ArrayList;
 
 import javax.management.MBeanServer;
-import javax.management.MBeanServerFactory;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 
@@ -45,33 +43,11 @@ public class MCRJMXBridge {
             return;
         }
         MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
-        //MBeanServer mbs = getServer();
         try {
-            System.out.println("1:"+MCRJMXBridge.class.getClassLoader().toString());
-            //System.out.println("2:"+mbs.getClassLoader(name));
             mbs.registerMBean(mbean, name);
-            System.out.println("3:"+mbs.getClassLoaderFor(name));
         } catch (Exception e) {
             e.printStackTrace();
         }
 
     }
-
-    private static MBeanServer getServer() {
-        MBeanServer mbServer = null;
-        ArrayList<MBeanServer> mbservers = MBeanServerFactory.findMBeanServer(null);
-        if (mbservers.size() > 0) {
-            mbServer = (MBeanServer) mbservers.get(0);
-        }
-
-        if (mbServer != null) {
-            System.out.println("Found our MBean server");
-        } else {
-            mbServer = MBeanServerFactory.createMBeanServer();
-        }
-
-        return mbServer;
-
-    }
-
 }
