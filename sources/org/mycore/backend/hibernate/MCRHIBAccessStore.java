@@ -61,7 +61,7 @@ public class MCRHIBAccessStore extends MCRAccessStore {
             List l = session.createQuery("from MCRACCESS where OBJID = '" + objID + "' and ACPOOL = '" + ACPool + "'").list();
            
             if (l.size() == 1) {
-                strRuleID = ((MCRACCESS) l.get(0)).getKey().getRid();
+                strRuleID = ((MCRACCESS) l.get(0)).getRid();
             }
         } catch (Exception e) {
             logger.error(e);
@@ -88,14 +88,15 @@ public class MCRHIBAccessStore extends MCRAccessStore {
      */
     public void createAccessDefinition(MCRRuleMapping rulemapping) {
 
-        if (!existAccessDefinition(rulemapping.getRuleId(), rulemapping.getPool(), rulemapping.getObjId())) {
+        if (!existAccessDefinition(rulemapping.getPool(), rulemapping.getObjId())) {
             Session session = MCRHIBConnection.instance().getSession();
             Transaction tx = session.beginTransaction();
             MCRACCESS accdef = new MCRACCESS();
 
             try {
                 DateFormat df = new SimpleDateFormat(sqlDateformat);
-                accdef.setKey(new MCRACCESSPK(rulemapping.getRuleId(), rulemapping.getPool(), rulemapping.getObjId()));
+                accdef.setKey(new MCRACCESSPK(rulemapping.getPool(), rulemapping.getObjId()));
+                accdef.setRid(rulemapping.getRuleId());
                 accdef.setCreator(rulemapping.getCreator());
                 accdef.setCreationdate(Timestamp.valueOf(df.format(rulemapping.getCreationdate())));
                 session.save(accdef);
@@ -119,10 +120,10 @@ public class MCRHIBAccessStore extends MCRAccessStore {
      * @param objid
      * @return boolean value
      */
-    private boolean existAccessDefinition(String ruleid, String pool, String objid) {
+    private boolean existAccessDefinition(String pool, String objid) {
         Session session = MCRHIBConnection.instance().getSession();
         try {
-            MCRACCESSPK key = new MCRACCESSPK(ruleid, pool, objid);
+            MCRACCESSPK key = new MCRACCESSPK(pool, objid);
             List l = session.createCriteria(MCRACCESS.class).add(Restrictions.eq("key", key)).list();
             if (l.size() == 1) {
                 return true;
@@ -202,7 +203,8 @@ public class MCRHIBAccessStore extends MCRAccessStore {
             // insert
             MCRACCESS accdef = new MCRACCESS();
             DateFormat df = new SimpleDateFormat(sqlDateformat);
-            accdef.setKey(new MCRACCESSPK(rulemapping.getRuleId(), rulemapping.getPool(), rulemapping.getObjId()));
+            accdef.setKey(new MCRACCESSPK(rulemapping.getPool(), rulemapping.getObjId()));
+            accdef.setRid(rulemapping.getRuleId());
             accdef.setCreator(rulemapping.getCreator());
             accdef.setCreationdate(Timestamp.valueOf(df.format(rulemapping.getCreationdate())));
             session.save(accdef);
@@ -233,18 +235,18 @@ public class MCRHIBAccessStore extends MCRAccessStore {
      *            objectid of MCRObject
      * @return MCRAccessData
      */
-    public MCRRuleMapping getAccessDefinition(String ruleid, String pool, String objid) {
+    public MCRRuleMapping getAccessDefinition(String pool, String objid) {
 
         Session session = MCRHIBConnection.instance().getSession();
         MCRRuleMapping rulemapping = new MCRRuleMapping();
         try {
-            MCRACCESS data = ((MCRACCESS) session.createCriteria(MCRACCESS.class).add(Restrictions.eq("key", new MCRACCESSPK(ruleid, pool, objid))).list().get(0));
+            MCRACCESS data = ((MCRACCESS) session.createCriteria(MCRACCESS.class).add(Restrictions.eq("key", new MCRACCESSPK(pool, objid))).list().get(0));
             if (data != null) {
                 rulemapping.setCreationdate(data.getCreationdate());
                 rulemapping.setCreator(data.getCreator());
                 rulemapping.setObjId(data.getKey().getObjid());
                 rulemapping.setPool(data.getKey().getAcpool());
-                rulemapping.setRuleId(data.getKey().getRid());
+                rulemapping.setRuleId(data.getRid());
             }
         } catch (Exception e) {
             logger.error(e);

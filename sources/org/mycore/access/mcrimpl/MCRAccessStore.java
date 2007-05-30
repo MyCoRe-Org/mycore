@@ -53,7 +53,7 @@ public abstract class MCRAccessStore {
 
     public abstract void updateAccessDefinition(MCRRuleMapping accessdata);
 
-    public abstract MCRRuleMapping getAccessDefinition(String ruleid, String pool, String objid);
+    public abstract MCRRuleMapping getAccessDefinition(String pool, String objid);
     
     public abstract ArrayList getMappedObjectId(String pool); // ArrayList with ObjID's as String
     

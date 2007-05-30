@@ -26,7 +26,8 @@ package org.mycore.backend.hibernate.tables;
 import java.io.Serializable;
 
 public class MCRACCESSPK implements Serializable {
-    private String rid;
+
+    private static final long serialVersionUID = 1177905976922683366L;
 
     private String acpool;
 
@@ -35,8 +36,7 @@ public class MCRACCESSPK implements Serializable {
     public MCRACCESSPK() {
     }
 
-    public MCRACCESSPK(String rid, String acpool, String objid) {
-        this.rid = rid;
+    public MCRACCESSPK(String acpool, String objid) {
         this.acpool = acpool;
         this.objid = objid;
     }
@@ -57,14 +57,6 @@ public class MCRACCESSPK implements Serializable {
         this.objid = objid;
     }
 
-    public String getRid() {
-        return rid;
-    }
-
-    public void setRid(String rid) {
-        this.rid = rid;
-    }
-
     /* (non-Javadoc)
      * @see java.lang.Object#hashCode()
      */
@@ -74,7 +66,6 @@ public class MCRACCESSPK implements Serializable {
         int result = 1;
         result = PRIME * result + ((acpool == null) ? 0 : acpool.hashCode());
         result = PRIME * result + ((objid == null) ? 0 : objid.hashCode());
-        result = PRIME * result + ((rid == null) ? 0 : rid.hashCode());
         return result;
     }
 
@@ -100,11 +91,7 @@ public class MCRACCESSPK implements Serializable {
                 return false;
         } else if (!objid.equals(other.objid))
             return false;
-        if (rid == null) {
-            if (other.rid != null)
-                return false;
-        } else if (!rid.equals(other.rid))
-            return false;
         return true;
     }
+
 }

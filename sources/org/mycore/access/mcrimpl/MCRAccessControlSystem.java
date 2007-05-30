@@ -122,11 +122,8 @@ public class MCRAccessControlSystem extends MCRAccessBaseImpl {
     }
 
     public void removeRule(String id, String pool) throws MCRException {
-        String ruleID = accessStore.getRuleID(id, pool);
-        if (ruleID != null && !ruleID.equals("")) {
-            MCRRuleMapping ruleMapping = accessStore.getAccessDefinition(ruleID, pool, id);
-            accessStore.deleteAccessDefinition(ruleMapping);
-        }
+        MCRRuleMapping ruleMapping = accessStore.getAccessDefinition(pool, id);
+        accessStore.deleteAccessDefinition(ruleMapping);
     }
 
     public void removeRule(String permission) throws MCRException {
