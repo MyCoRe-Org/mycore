@@ -40,7 +40,7 @@ public class MCRClassificationObject {
 
     private List<MCRClassificationObject> children;
 
-    private int left, right;
+    private int left, right, level;
 
     private final ReentrantReadWriteLock childrenLock = new ReentrantReadWriteLock();
 
@@ -119,6 +119,14 @@ public class MCRClassificationObject {
      */
     public void setLabels(Set<MCRLabel> labels) {
         this.labels = labels;
+    }
+
+    public int getLevel() {
+        return level;
+    }
+
+    public void setLevel(int level) {
+        this.level = level;
     }
 
     /**

@@ -40,5 +40,19 @@ public class MCRClassificationServiceImplTest extends MCRTestCase {
         co3.getChildren().add(co4);
         assertEquals(8, MCRClassificationServiceImpl.calculateLeftRight(co1, 1));
     }
+    
+    public void testCalculateLevel() {
+        MCRClassificationObject co1 = new MCRClassificationObject();
+        assertEquals(0, MCRClassificationServiceImpl.calculateLevel(co1, 0));
+        MCRClassificationObject co2 = new MCRClassificationObject();
+        co1.getChildren().add(co2);
+        assertEquals(1, MCRClassificationServiceImpl.calculateLevel(co1, 0));
+        MCRClassificationObject co3 = new MCRClassificationObject();
+        co1.getChildren().add(co3);
+        assertEquals(1, MCRClassificationServiceImpl.calculateLevel(co1, 0));
+        MCRClassificationObject co4 = new MCRClassificationObject();
+        co3.getChildren().add(co4);
+        assertEquals(2, MCRClassificationServiceImpl.calculateLevel(co1, 0));
+    }
 
 }
