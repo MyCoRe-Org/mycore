@@ -24,10 +24,10 @@ public class MCRTestCase extends TestCase {
         }
         CONFIG=MCRConfiguration.instance();
         boolean setPropertie=false;
-        setPropertie=setProperty("MCR.log4j.rootLogger","DEBUG, stdout",false)?true:setPropertie;
-        setPropertie=setProperty("MCR.log4j.appender.stdout","org.apache.log4j.ConsoleAppender",false)?true:setPropertie;
-        setPropertie=setProperty("MCR.log4j.appender.stdout.layout","org.apache.log4j.PatternLayout",false)?true:setPropertie;
-        setPropertie=setProperty("MCR.log4j.appender.stdout.layout.ConversionPattern","%-5p %m%n",false)?true:setPropertie;
+        setPropertie=setProperty("log4j.rootLogger","DEBUG, stdout",false)?true:setPropertie;
+        setPropertie=setProperty("log4j.appender.stdout","org.apache.log4j.ConsoleAppender",false)?true:setPropertie;
+        setPropertie=setProperty("log4j.appender.stdout.layout","org.apache.log4j.PatternLayout",false)?true:setPropertie;
+        setPropertie=setProperty("log4j.appender.stdout.layout.ConversionPattern","%-5p %m%n",false)?true:setPropertie;
         if (setPropertie){
             CONFIG.configureLogging();
         }
