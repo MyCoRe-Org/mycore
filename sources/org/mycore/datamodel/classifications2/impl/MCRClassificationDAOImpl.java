@@ -29,7 +29,7 @@ import java.util.List;
 
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRClassificationDAO;
-import org.mycore.datamodel.classifications2.MCRClassificationID;
+import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.MCRLabel;
 
 /**
@@ -86,9 +86,9 @@ public class MCRClassificationDAOImpl implements MCRClassificationDAO {
     /*
      * (non-Javadoc)
      * 
-     * @see org.mycore.datamodel.classifications2.MCRClassificationService#hasChildren(org.mycore.datamodel.classifications2.MCRClassificationID)
+     * @see org.mycore.datamodel.classifications2.MCRClassificationService#hasChildren(org.mycore.datamodel.classifications2.MCRCategoryID)
      */
-    public boolean hasChildren(MCRClassificationID cid) {
+    public boolean hasChildren(MCRCategoryID cid) {
         // TODO: implement hasChildren
         return true;
     }
@@ -96,14 +96,14 @@ public class MCRClassificationDAOImpl implements MCRClassificationDAO {
     /*
      * (non-Javadoc)
      * 
-     * @see org.mycore.datamodel.classifications2.MCRClassificationService#getChildren(org.mycore.datamodel.classifications2.MCRClassificationID)
+     * @see org.mycore.datamodel.classifications2.MCRClassificationService#getChildren(org.mycore.datamodel.classifications2.MCRCategoryID)
      */
-    public List<MCRCategory> getChildren(MCRClassificationID cid) {
+    public List<MCRCategory> getChildren(MCRCategoryID cid) {
         // TODO: implement getChildren
         return new ArrayList<MCRCategory>();
     }
 
-    public void addCategory(MCRClassificationID parentID, MCRCategory category) {
+    public void addCategory(MCRCategoryID parentID, MCRCategory category) {
         // TODO Auto-generated method stub
 
     }
@@ -118,42 +118,42 @@ public class MCRClassificationDAOImpl implements MCRClassificationDAO {
 
     }
 
-    public void deleteCategory(MCRClassificationID id) {
+    public void deleteCategory(MCRCategoryID id) {
         // TODO Auto-generated method stub
 
     }
 
-    public Collection<MCRCategory> getCategoriesByLabel(MCRClassificationID baseID, String lang, String text) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    public MCRCategory getCategory(MCRClassificationID id, int childLevel) {
+    public Collection<MCRCategory> getCategoriesByLabel(MCRCategoryID baseID, String lang, String text) {
         // TODO Auto-generated method stub
         return null;
     }
 
-    public List<MCRCategory> getParents(MCRClassificationID id) {
+    public MCRCategory getCategory(MCRCategoryID id, int childLevel) {
         // TODO Auto-generated method stub
         return null;
     }
 
-    public MCRCategory getRootCategory(MCRClassificationID baseID, int childLevel) {
+    public List<MCRCategory> getParents(MCRCategoryID id) {
         // TODO Auto-generated method stub
         return null;
     }
 
-    public void moveCategory(MCRClassificationID id, MCRClassificationID newParentID) {
+    public MCRCategory getRootCategory(MCRCategoryID baseID, int childLevel) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public void moveCategory(MCRCategoryID id, MCRCategoryID newParentID) {
         // TODO Auto-generated method stub
 
     }
 
-    public void moveCategory(MCRClassificationID id, MCRClassificationID newParentID, int index) {
+    public void moveCategory(MCRCategoryID id, MCRCategoryID newParentID, int index) {
         // TODO Auto-generated method stub
 
     }
 
-    public void removeLabel(MCRClassificationID id, String lang) {
+    public void removeLabel(MCRCategoryID id, String lang) {
         // TODO Auto-generated method stub
 
     }
@@ -163,7 +163,7 @@ public class MCRClassificationDAOImpl implements MCRClassificationDAO {
 
     }
 
-    public void setLabel(MCRClassificationID id, MCRLabel label) {
+    public void setLabel(MCRCategoryID id, MCRLabel label) {
         // TODO Auto-generated method stub
 
     }

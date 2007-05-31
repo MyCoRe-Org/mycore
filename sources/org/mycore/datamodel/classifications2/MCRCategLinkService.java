@@ -38,25 +38,25 @@ public interface MCRCategLinkService extends MCRTransactionalDAO {
      * Counts links to a collection of categories.
      * 
      * @param categIDs
-     *            Collection of MCRClassificationID which links should be
+     *            Collection of MCRCategoryID which links should be
      *            counted
-     * @return a Map with MCRClassificationID as key and the number of links as
+     * @return a Map with MCRCategoryID as key and the number of links as
      *         value
      */
-    public abstract Map<MCRClassificationID, Number> countLinks(Collection<MCRClassificationID> categIDs);
+    public abstract Map<MCRCategoryID, Number> countLinks(Collection<MCRCategoryID> categIDs);
 
     /**
      * Counts links to a collection of categories.
      * 
      * @param categIDs
-     *            Collection of MCRClassificationID which links should be
+     *            Collection of MCRCategoryID which links should be
      *            counted
      * @param type
      *            restrict links that refer to object of this type
-     * @return a Map with MCRClassificationID as key and the number of links as
+     * @return a Map with MCRCategoryID as key and the number of links as
      *         value
      */
-    public abstract Map<MCRClassificationID, Number> countLinksForType(Collection<MCRClassificationID> categIDs, String type);
+    public abstract Map<MCRCategoryID, Number> countLinksForType(Collection<MCRCategoryID> categIDs, String type);
 
     /**
      * Delete all links that refer to the given Object ID.
@@ -83,7 +83,7 @@ public interface MCRCategLinkService extends MCRTransactionalDAO {
      *            ID of the category
      * @return Collection of Object IDs
      */
-    public abstract Collection<String> getLinksFromCategory(MCRClassificationID id);
+    public abstract Collection<String> getLinksFromCategory(MCRCategoryID id);
 
     /**
      * Returns a list of linked Object IDs restricted by the specified type.
@@ -94,16 +94,16 @@ public interface MCRCategLinkService extends MCRTransactionalDAO {
      *            restrict links that refer to object of this type
      * @return Collection of Object IDs
      */
-    public abstract Collection<String> getLinksFromCategoryForType(MCRClassificationID id, String type);
+    public abstract Collection<String> getLinksFromCategoryForType(MCRCategoryID id, String type);
 
     /**
      * Returns a list of linked categories.
      * 
      * @param id
      *            Object ID of a linked Object
-     * @return list of MCRClassificationID of linked categories
+     * @return list of MCRCategoryID of linked categories
      */
-    public abstract Collection<MCRClassificationID> getLinksFromObject(String id);
+    public abstract Collection<MCRCategoryID> getLinksFromObject(String id);
 
     /**
      * Add links between categories and Objects.
@@ -116,6 +116,6 @@ public interface MCRCategLinkService extends MCRTransactionalDAO {
      * @see #countLinks(Collection)
      * @see #countLinksForType(Collection, String)
      */
-    public abstract void setLinks(Map<MCRObjectReference, MCRClassificationID> map);
+    public abstract void setLinks(Map<MCRObjectReference, MCRCategoryID> map);
 
 }

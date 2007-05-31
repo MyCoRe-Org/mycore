@@ -30,7 +30,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRClassificationDAOFactory;
-import org.mycore.datamodel.classifications2.MCRClassificationID;
+import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.MCRLabel;
 
 /**
@@ -43,7 +43,7 @@ public abstract class MCRAbstractCategoryImpl implements MCRCategory {
 
     protected MCRCategory root;
 
-    private MCRClassificationID id;
+    private MCRCategoryID id;
 
     private URI URI;
 
@@ -68,7 +68,7 @@ public abstract class MCRAbstractCategoryImpl implements MCRCategory {
         return children;
     }
 
-    public MCRClassificationID getId() {
+    public MCRCategoryID getId() {
         return id;
     }
 
@@ -104,7 +104,7 @@ public abstract class MCRAbstractCategoryImpl implements MCRCategory {
         return (root != null && this.id.equals(root.getId()));
     }
 
-    public void setId(MCRClassificationID id) {
+    public void setId(MCRCategoryID id) {
         this.id = id;
     }
 

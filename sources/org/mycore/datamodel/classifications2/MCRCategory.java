@@ -71,13 +71,13 @@ public interface MCRCategory {
     /**
      * @return the id
      */
-    public abstract MCRClassificationID getId();
+    public abstract MCRCategoryID getId();
 
     /**
      * @param id
      *            the id to set
      */
-    public abstract void setId(MCRClassificationID id);
+    public abstract void setId(MCRCategoryID id);
 
     /**
      * @return the labels

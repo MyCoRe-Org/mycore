@@ -26,7 +26,7 @@ package org.mycore.datamodel.classifications2.impl;
 import java.util.Collection;
 import java.util.Map;
 
-import org.mycore.datamodel.classifications2.MCRClassificationID;
+import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.MCRCategLinkService;
 import org.mycore.datamodel.classifications2.MCRObjectReference;
 
@@ -39,12 +39,12 @@ import org.mycore.datamodel.classifications2.MCRObjectReference;
  */
 public class MCRCategLinkServiceImpl implements MCRCategLinkService {
 
-    public Map<MCRClassificationID, Number> countLinks(Collection<MCRClassificationID> categIDs) {
+    public Map<MCRCategoryID, Number> countLinks(Collection<MCRCategoryID> categIDs) {
         // TODO Auto-generated method stub
         return null;
     }
 
-    public Map<MCRClassificationID, Number> countLinksForType(Collection<MCRClassificationID> categIDs, String type) {
+    public Map<MCRCategoryID, Number> countLinksForType(Collection<MCRCategoryID> categIDs, String type) {
         // TODO Auto-generated method stub
         return null;
     }
@@ -59,22 +59,22 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
 
     }
 
-    public Collection<String> getLinksFromCategory(MCRClassificationID id) {
+    public Collection<String> getLinksFromCategory(MCRCategoryID id) {
         // TODO Auto-generated method stub
         return null;
     }
 
-    public Collection<String> getLinksFromCategoryForType(MCRClassificationID id, String type) {
+    public Collection<String> getLinksFromCategoryForType(MCRCategoryID id, String type) {
         // TODO Auto-generated method stub
         return null;
     }
 
-    public Collection<MCRClassificationID> getLinksFromObject(String id) {
+    public Collection<MCRCategoryID> getLinksFromObject(String id) {
         // TODO Auto-generated method stub
         return null;
     }
 
-    public void setLinks(Map<MCRObjectReference, MCRClassificationID> map) {
+    public void setLinks(Map<MCRObjectReference, MCRCategoryID> map) {
         // TODO Auto-generated method stub
 
     }

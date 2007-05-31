@@ -43,7 +43,7 @@ public interface MCRClassificationDAO extends MCRTransactionalDAO {
      * @param category
      *            Category (with children) to be added
      */
-    public abstract void addCategory(MCRClassificationID parentID, MCRCategory category);
+    public abstract void addCategory(MCRCategoryID parentID, MCRCategory category);
 
     /**
      * Deletes a category with all child categories.
@@ -51,7 +51,7 @@ public interface MCRClassificationDAO extends MCRTransactionalDAO {
      * @param id
      *            ID of Category to be removed
      */
-    public abstract void deleteCategory(MCRClassificationID id);
+    public abstract void deleteCategory(MCRCategoryID id);
 
     /**
      * Retrieve all Categories tagged by a specific label in a specific lang.
@@ -64,7 +64,7 @@ public interface MCRClassificationDAO extends MCRTransactionalDAO {
      *            text of the label
      * @return a collection of MCRCategories with matching labels
      */
-    public abstract Collection<MCRCategory> getCategoriesByLabel(MCRClassificationID baseID, String lang, String text);
+    public abstract Collection<MCRCategory> getCategoriesByLabel(MCRCategoryID baseID, String lang, String text);
 
     /**
      * Returns MCRCategory with this id and childLevel levels of subcategories.
@@ -76,7 +76,7 @@ public interface MCRClassificationDAO extends MCRTransactionalDAO {
      *            invinitive)
      * @return MCRCategory with <code>id</code>
      */
-    public abstract MCRCategory getCategory(MCRClassificationID id, int childLevel);
+    public abstract MCRCategory getCategory(MCRCategoryID id, int childLevel);
 
     /**
      * Returns the list of child categories for the specified category.
@@ -85,7 +85,7 @@ public interface MCRClassificationDAO extends MCRTransactionalDAO {
      *            ID of category
      * @return list of child category
      */
-    public abstract List<MCRCategory> getChildren(MCRClassificationID id);
+    public abstract List<MCRCategory> getChildren(MCRCategoryID id);
 
     /**
      * Returns the parent of the given category and its parent and so on. The
@@ -95,24 +95,24 @@ public interface MCRClassificationDAO extends MCRTransactionalDAO {
      *            ID of Category
      * @return list of parents
      */
-    public abstract List<MCRCategory> getParents(MCRClassificationID id);
+    public abstract List<MCRCategory> getParents(MCRCategoryID id);
 
     /**
      * Returns the root Category with ancestor axis of the specified category
      * and childLevel levels of subcategories.
      * 
-     * You can say it is the combination of getParents(MCRClassificationID) and
-     * getCategory(MCRClassificationID, int).
+     * You can say it is the combination of getParents(MCRCategoryID) and
+     * getCategory(MCRCategoryID, int).
      * 
      * @param baseID
      *            Category with relative level set to "0".
      * @param childLevel
      *            amount of subcategory levels rooted at baseID category
      * @return the root Category (Classification)
-     * @see #getParents(MCRClassificationID)
-     * @see #getCategory(MCRClassificationID, int)
+     * @see #getParents(MCRCategoryID)
+     * @see #getCategory(MCRCategoryID, int)
      */
-    public abstract MCRCategory getRootCategory(MCRClassificationID baseID, int childLevel);
+    public abstract MCRCategory getRootCategory(MCRCategoryID baseID, int childLevel);
 
     /**
      * Tells if a given category contains subcategories.
@@ -121,7 +121,7 @@ public interface MCRClassificationDAO extends MCRTransactionalDAO {
      *            ID of Category
      * @return true if subcategories are present
      */
-    public abstract boolean hasChildren(MCRClassificationID id);
+    public abstract boolean hasChildren(MCRCategoryID id);
 
     /**
      * Moves a Category from one subtree in a classification to a new parent.
@@ -133,7 +133,7 @@ public interface MCRClassificationDAO extends MCRTransactionalDAO {
      * @param newParentID
      *            ID of the new parent
      */
-    public abstract void moveCategory(MCRClassificationID id, MCRClassificationID newParentID);
+    public abstract void moveCategory(MCRCategoryID id, MCRCategoryID newParentID);
 
     /**
      * Moves a Category from one subtree in a classification to a new parent as
@@ -146,7 +146,7 @@ public interface MCRClassificationDAO extends MCRTransactionalDAO {
      * @param index
      *            insert category at index in the list of children
      */
-    public abstract void moveCategory(MCRClassificationID id, MCRClassificationID newParentID, int index);
+    public abstract void moveCategory(MCRCategoryID id, MCRCategoryID newParentID, int index);
 
     /**
      * Removes a label from a Category.
@@ -156,7 +156,7 @@ public interface MCRClassificationDAO extends MCRTransactionalDAO {
      * @param lang
      *            which language should be removed?
      */
-    public abstract void removeLabel(MCRClassificationID id, String lang);
+    public abstract void removeLabel(MCRCategoryID id, String lang);
 
     /**
      * Sets or updates a label from a Category.
@@ -166,6 +166,6 @@ public interface MCRClassificationDAO extends MCRTransactionalDAO {
      * @param label
      *            to be set or updated
      */
-    public abstract void setLabel(MCRClassificationID id, MCRLabel label);
+    public abstract void setLabel(MCRCategoryID id, MCRLabel label);
 
 }

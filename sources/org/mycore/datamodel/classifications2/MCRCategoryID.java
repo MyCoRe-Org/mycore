@@ -34,7 +34,7 @@ import java.io.Serializable;
  * @version $Revision$ $Date$
  * @since 2.0
  */
-public class MCRClassificationID implements Serializable {
+public class MCRCategoryID implements Serializable {
 
     private static final long serialVersionUID = -5672923571406252855L;
 
@@ -69,7 +69,7 @@ public class MCRClassificationID implements Serializable {
             return false;
         if (getClass() != obj.getClass())
             return false;
-        final MCRClassificationID other = (MCRClassificationID) obj;
+        final MCRCategoryID other = (MCRCategoryID) obj;
         if (ID == null) {
             if (other.ID != null)
                 return false;
