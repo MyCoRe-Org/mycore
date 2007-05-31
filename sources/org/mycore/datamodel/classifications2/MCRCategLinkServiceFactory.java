@@ -23,6 +23,8 @@
  **/
 package org.mycore.datamodel.classifications2;
 
+import org.mycore.datamodel.classifications2.impl.MCRCategLinkServiceImpl;
+
 /**
  * @author Thomas Scheffler (yagee)
  * 
@@ -30,7 +32,7 @@ package org.mycore.datamodel.classifications2;
  * @since 2.0
  */
 public class MCRCategLinkServiceFactory {
-    private static MCRCategLinkService instance;
+    private static MCRCategLinkService instance=new MCRCategLinkServiceImpl();
 
     /**
      * Returns an instance of a MCRCategoryDAO implementator.

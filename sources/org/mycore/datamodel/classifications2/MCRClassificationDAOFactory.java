@@ -23,6 +23,8 @@
  **/
 package org.mycore.datamodel.classifications2;
 
+import org.mycore.datamodel.classifications2.impl.MCRCategoryDAOImpl;
+
 /**
  * @author Thomas Scheffler (yagee)
  * 
@@ -31,7 +33,7 @@ package org.mycore.datamodel.classifications2;
  */
 public class MCRClassificationDAOFactory {
 
-    private static MCRCategoryDAO instance;
+    private static MCRCategoryDAO instance=new MCRCategoryDAOImpl();
 
     /**
      * Returns an instance of a MCRCategoryDAO implementator.
