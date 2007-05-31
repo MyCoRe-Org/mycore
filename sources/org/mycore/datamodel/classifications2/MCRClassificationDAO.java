@@ -33,7 +33,7 @@ import java.util.List;
  * @version $Revision$ $Date$
  * @since 2.0
  */
-public interface MCRClassificationDAO {
+public interface MCRClassificationDAO extends MCRTransactionalDAO {
 
     /**
      * Adds a category as child of another category.
@@ -44,20 +44,6 @@ public interface MCRClassificationDAO {
      *            Category (with children) to be added
      */
     public abstract void addCategory(MCRClassificationID parentID, MCRCategory category);
-
-    /**
-     * Starts a new transaction.
-     * 
-     * Transactions are bound to the currentThread and must be closed either by
-     * commitTransaction() or rollBackTransaction(). Not more than one
-     * uncommitted transaction is allowed per thread.
-     */
-    public abstract void beginTransaction();
-
-    /**
-     * Commits the changes to the underlaying persistence layer.
-     */
-    public abstract void commitTransaction();
 
     /**
      * Deletes a category with all child categories.
@@ -171,14 +157,6 @@ public interface MCRClassificationDAO {
      *            which language should be removed?
      */
     public abstract void removeLabel(MCRClassificationID id, String lang);
-
-    /**
-     * Forces the underlaying transaction to roll back.
-     * 
-     * Every changes made since begin of the transaction
-     * 
-     */
-    public abstract void rollBackTransaction();
 
     /**
      * Sets or updates a label from a Category.
