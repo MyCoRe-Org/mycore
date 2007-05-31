@@ -55,7 +55,7 @@ public final class MCRObjectID {
     private static final Logger LOGGER = Logger.getLogger(MCRObjectID.class);
 
     // counter for the next IDs per project base ID
-    private static HashMap lastnumber = new HashMap();
+    private static HashMap<String,Integer> lastnumber = new HashMap<String,Integer>();
 
     // data of the ID
     private String mcr_project_id = null;
