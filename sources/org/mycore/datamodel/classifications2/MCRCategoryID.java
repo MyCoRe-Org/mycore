@@ -26,11 +26,10 @@ package org.mycore.datamodel.classifications2;
 import java.io.Serializable;
 
 /**
- * 
- * @author Thomas Scheffler (yagee)
- * 
  * The composite identifier of a MCRCategory. If <code>rootID == ID</code> the
  * associated MCRCategory instance is a root category (a classification).
+ * 
+ * @author Thomas Scheffler (yagee)
  * @version $Revision$ $Date$
  * @since 2.0
  */
