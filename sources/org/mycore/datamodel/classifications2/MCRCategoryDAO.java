@@ -33,7 +33,7 @@ import java.util.List;
  * @version $Revision$ $Date$
  * @since 2.0
  */
-public interface MCRClassificationDAO extends MCRTransactionalDAO {
+public interface MCRCategoryDAO extends MCRTransactionalDAO {
 
     /**
      * Adds a category as child of another category.

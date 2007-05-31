@@ -31,12 +31,12 @@ package org.mycore.datamodel.classifications2;
  */
 public class MCRClassificationDAOFactory {
 
-    private static MCRClassificationDAO instance;
+    private static MCRCategoryDAO instance;
 
     /**
-     * Returns an instance of a MCRClassificationDAO implementator.
+     * Returns an instance of a MCRCategoryDAO implementator.
      */
-    public static final MCRClassificationDAO getInstance() {
+    public static final MCRCategoryDAO getInstance() {
         return instance;
     }
 

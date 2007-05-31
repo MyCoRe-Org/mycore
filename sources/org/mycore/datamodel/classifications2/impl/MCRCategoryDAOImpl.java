@@ -28,7 +28,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.mycore.datamodel.classifications2.MCRCategory;
-import org.mycore.datamodel.classifications2.MCRClassificationDAO;
+import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.MCRLabel;
 
@@ -39,7 +39,7 @@ import org.mycore.datamodel.classifications2.MCRLabel;
  * @version $Revision$ $Date$
  * @since 2.0
  */
-public class MCRClassificationDAOImpl implements MCRClassificationDAO {
+public class MCRCategoryDAOImpl implements MCRCategoryDAO {
 
     /**
      * calculates left and right value throug the subtree rooted at
