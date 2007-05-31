@@ -1,47 +1,42 @@
 ##############################################################################
 # Workflow                                                                   #
+#                                                                            #
+# This lines are sample definitions for a document data type. This file will #
+# not copied by th ant process. Put all properties for SWF in the            #
+# mycore.properties and mycore.properties.private files!!!                   #
 ##############################################################################
 
+# Editor workflow message pages
+# --------> defined in mycore.properties <---------
+  MCR.SWF.PageDir=
+  MCR.SWF.PageCancel=editor_cancel.xml
+  MCR.SWF.PageDelete=editor_deleted.xml
+  MCR.SWF.PageErrorStore=editor_error_store.xml
+  MCR.SWF.PageErrorUser=editor_error_user.xml
+  MCR.SWF.PageErrorMcrid=editor_error_mcrid.xml
+  MCR.SWF.PageErrorDelete=editor_error_delete.xml
+  MCR.SWF.PageErrorFormular=editor_error_formular.xml
+
 # The project ID
-MCR.default_project_id=DocPortal
-MCR.default_project_type=document
-MCR.document_project_id=DocPortal
+# --------> defined in mycore.properties <---------
+  MCR.SWF.Project.ID=TestDocument
+  MCR.SWF.Project.Type=document
+  MCR.SWF.Project.ID.document=TestDocument
 
-# Editor path
-MCR.editor_document_directory=/home/mcradmin/mycoresample/workflow/document
+# Workflow store directory path
+# --------> defined in mycore.properties.private <---------
+  MCR.SWF.Directory.base=%MCR.basedir%/data/workflow
+  MCR.SWF.Directory.document=%MCR.basedir%/data/workflow/document
 
-MCR.editor_document_wnewobj_mail=user@domain.xyz
-MCR.editor_document_wnewder_mail=
-MCR.editor_document_waddfile_mail=
-MCR.editor_document_weditobj_mail=
-MCR.editor_document_weditder_mail=
-MCR.editor_document_weditacl_mail=
-MCR.editor_document_wsetlabel_mail_
-MCR.editor_document_wsetfile_mail_
-MCR.editor_document_wcommit_mail=user@domain.xyz
-MCR.editor_document_wdelobj_mail=
-MCR.editor_document_wdelder_mail=
-MCR.editor_document_wdelfile_mail=
-MCR.editor_document_snewder_mail=
-MCR.editor_document_saddfile_mail=
-MCR.editor_document_seditobj_mail=
-MCR.editor_document_seditder_mail=
-MCR.editor_document_seditacl_mail=
-MCR.editor_document_ssetlabel_mail_
-MCR.editor_document_ssetfile_mail_
-MCR.editor_document_sdelobj_mail=
-MCR.editor_document_sdelder_mail=
-MCR.editor_document_sdelfile_mail=
+# Editor flags for todo and type
+# --------> defined in mycore.properties <---------
+  MCR.SWF.Mail.document.wcommit=%MCR.Mail.Address%
+  MCR.SWF.Mail.document.seditobj=%MCR.Mail.Address%
+  MCR.SWF.Mail.document.seditacl=%MCR.Mail.Address%
+  MCR.SWF.Mail.document.sdelobj=%MCR.Mail.Address%
 
-MCR.editor_mail_sender=user@domain.xyz
-MCR.editor_mail_application_id=MyCoReSample
-
-# Generic mail configuration for MCRMailer
-MCR.mail.server=myhost.de
-MCR.mail.protocol=smtp
-MCR.mail.debug=false
-
-# Editor HostAlias for Classification
-MCR.editor_baseurl=local
+# The identificatior of the application
+# --------> defined in mycore.properties <---------
+  MCR.SWF.Mail.ApplicationID=Test
 
 ##############################################################################
