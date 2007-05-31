@@ -47,40 +47,21 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
      * 
      * @param co
      *            root node of subtree
-     * @param startValue
+     * @param leftStart
      *            co.left will be set to this value
+     * @param levelStart co.getLevel() will return this value
      * @return co.right
      */
-    protected static int calculateLeftRight(MCRCategoryImpl co, int startValue) {
-        int curValue = startValue;
-        co.setLeft(startValue);
+    protected static int calculateLeftRightAndLevel(MCRCategoryImpl co, int leftStart, int levelStart) {
+        int curValue = leftStart;
+        final int nextLevel = levelStart + 1;
+        co.setLeft(leftStart);
+        co.setLevel(levelStart);
         for (MCRCategory child : co.getChildren()) {
-            curValue = calculateLeftRight((MCRCategoryImpl) child, ++curValue);
+            curValue = calculateLeftRightAndLevel((MCRCategoryImpl) child, ++curValue, nextLevel);
         }
         co.setRight(++curValue);
         return curValue;
-    }
-
-    /**
-     * calculates level attribute of <code>co</code> and all of its children.
-     * 
-     * @param co
-     *            root node of subtree
-     * @param startValue
-     *            co.level will set to this value
-     * @return max level value in subtree
-     */
-    protected static int calculateLevel(MCRCategoryImpl co, int startValue) {
-        co.setLevel(startValue);
-        int maxLevel = startValue;
-        final int nextLevel = startValue + 1;
-        for (MCRCategory child : co.getChildren()) {
-            int curValue = calculateLevel((MCRCategoryImpl) child, nextLevel);
-            if (curValue > maxLevel) {
-                maxLevel = curValue;
-            }
-        }
-        return maxLevel;
     }
 
     /*
