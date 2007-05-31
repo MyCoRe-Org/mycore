@@ -23,10 +23,20 @@
  **/
 package org.mycore.datamodel.classifications2;
 
-public class MCRClassificationServiceFactory {
-    private static MCRClassificationService instance=new MCRClassificationServiceImpl();
-    
-    public static MCRClassificationService getInstance(){
+/**
+ * @author Thomas Scheffler (yagee)
+ * 
+ * @version $Revision$ $Date$
+ * @since 2.0
+ */
+public class MCRClassificationDAOFactory {
+
+    private static MCRClassificationDAO instance;
+
+    /**
+     * Returns an instance of a MCRClassificationDAO implementator.
+     */
+    public static final MCRClassificationDAO getInstance() {
         return instance;
     }
 

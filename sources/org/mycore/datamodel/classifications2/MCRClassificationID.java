@@ -23,11 +23,28 @@
  **/
 package org.mycore.datamodel.classifications2;
 
-public class MCRClassificationID {
-    
+import java.io.Serializable;
+
+/**
+ * 
+ * @author Thomas Scheffler (yagee)
+ * 
+ * The composite identifier of a MCRCategory. If <code>rootID == ID</code> the
+ * associated MCRCategory instance is a root category (a classification).
+ * @version $Revision$ $Date$
+ * @since 2.0
+ */
+public class MCRClassificationID implements Serializable {
+
+    private static final long serialVersionUID = -5672923571406252855L;
+
     private String rootID;
+
     private String ID;
-    /* (non-Javadoc)
+
+    /*
+     * (non-Javadoc)
+     * 
      * @see java.lang.Object#hashCode()
      */
     @Override
@@ -38,7 +55,10 @@ public class MCRClassificationID {
         result = PRIME * result + ((rootID == null) ? 0 : rootID.hashCode());
         return result;
     }
-    /* (non-Javadoc)
+
+    /*
+     * (non-Javadoc)
+     * 
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
@@ -62,26 +82,32 @@ public class MCRClassificationID {
             return false;
         return true;
     }
+
     /**
-     * @return the iD
+     * @return the ID
      */
     public String getID() {
         return ID;
     }
+
     /**
-     * @param id the iD to set
+     * @param id
+     *            the ID to set
      */
     public void setID(String id) {
         ID = id;
     }
+
     /**
      * @return the rootID
      */
     public String getRootID() {
         return rootID;
     }
+
     /**
-     * @param rootID the rootID to set
+     * @param rootID
+     *            the rootID to set
      */
     public void setRootID(String rootID) {
         this.rootID = rootID;

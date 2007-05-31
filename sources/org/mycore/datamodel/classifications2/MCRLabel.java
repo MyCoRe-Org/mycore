@@ -26,13 +26,16 @@ package org.mycore.datamodel.classifications2;
 import java.io.Serializable;
 
 /**
- * This class implements a label of a classification or a category.
+ * This class represents a label of a MCRCategory.
  * 
  * @author Thomas Scheffler (yagee)
  * 
  * @version $Revision$ $Date$
+ * @since 2.0
  */
 public class MCRLabel implements Cloneable, Serializable {
+
+    private static final long serialVersionUID = -843799854929361194L;
 
     String lang, text, description;
 
@@ -42,7 +45,7 @@ public class MCRLabel implements Cloneable, Serializable {
         this.text = text;
         this.description = description;
     }
-    
+
     public String getLang() {
         return lang;
     }
