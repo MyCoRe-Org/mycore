@@ -37,29 +37,23 @@ package org.mycore.common;
  * written by Morgan Delagrange. Please see <http://www.apache.org/>.
  * 
  * @author Detlev Degenhardt
+ * @author Thomas Scheffler (yagee)
  * @version $Revision$ $Date$
  */
 public class MCRSessionMgr {
-    /**
-     * Custom ThreadLocal class that automatically initializes the default
-     * MyCoRe session object for the thread.
-     */
-    private static class ThreadLocalSession extends ThreadLocal {
-        // The first time a ThreadLocal object is accessed on a particular
-        // thread, the state for
-        // that thread's copy of the local variable is set by executing the
-        // method initialValue().
-        public Object initialValue() {
-            return new MCRSession();
-        }
-    }
 
     /**
      * This ThreadLocal is automatically instantiated per thread with a MyCoRe
      * session object containing the default session parameters which are set in
      * the constructor of MCRSession.
+     * 
+     * @see ThreadLocal
      */
-    private static ThreadLocalSession theThreadLocalSession = new ThreadLocalSession();
+    private static ThreadLocal<MCRSession> theThreadLocalSession = new ThreadLocal<MCRSession>() {
+        public MCRSession initialValue() {
+            return new MCRSession();
+        }
+    };
 
     /**
      * This method returns the unique MyCoRe session object for the current
@@ -69,14 +63,7 @@ public class MCRSessionMgr {
      * @return MyCoRe MCRSession object
      */
     public static synchronized MCRSession getCurrentSession() {
-        MCRSession session = (MCRSession) theThreadLocalSession.get();
-
-        if (session == null) {
-            theThreadLocalSession.set(theThreadLocalSession.initialValue());
-            session = (MCRSession) theThreadLocalSession.get();
-        }
-
-        return session;
+        return theThreadLocalSession.get();
     }
 
     /**
@@ -93,11 +80,8 @@ public class MCRSessionMgr {
      * inside a Thread-pooling environment like Servlet engines.
      */
     public static synchronized void releaseCurrentSession() {
-        MCRSession session = (MCRSession) theThreadLocalSession.get();
-
-        if (session != null) {
-            MCRSession.logger.debug("MCRSession released " + session.getID());
-            theThreadLocalSession.set(null);
-        }
+        MCRSession session = theThreadLocalSession.get();
+        MCRSession.logger.debug("MCRSession released " + session.getID());
+        theThreadLocalSession.remove();
     }
 }
