@@ -28,6 +28,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Hashtable;
 import java.util.List;
 
 import javax.xml.transform.Transformer;
@@ -62,6 +63,9 @@ public class MCRObjectCommands extends MCRAbstractCommands {
 
     /** Default transformer script */
     public static final String DEFAULT_TRANSFORMER = "save-object.xsl";
+    
+    /** static compiled transformer stylesheets */
+    private static Hashtable <String,javax.xml.transform.Transformer> translist = new Hashtable<String,javax.xml.transform.Transformer>();
 
     /**
      * The empty constructor.
@@ -538,7 +542,10 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         if ((style != null) && (style.trim().length() != 0)) {
             xslfile = style + "-object.xsl";
         }
-        Transformer trans = null;
+        Transformer trans = translist.get(xslfile);
+        if (trans != null) {
+            return trans;
+        }
 
         InputStream in = MCRObjectCommands.class.getResourceAsStream("/" + xslfile);
         if (in == null) {
@@ -550,6 +557,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
             transfakt.setURIResolver(MCRURIResolver.instance());
             trans = transfakt.newTransformer(source);
         }
+        translist.put(xslfile,trans);
         return trans;
     }
 
