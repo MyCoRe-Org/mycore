@@ -133,7 +133,7 @@ public class MCRSessionMgr {
      */
     static void addSession(MCRSession session) {
         sessions.put(session.getID(), session);
-        session.fireSessionEvent(created, session.accessCount.get());
+        session.fireSessionEvent(created, session.concurrentAccess.get());
     }
 
     /**
@@ -145,7 +145,7 @@ public class MCRSessionMgr {
      */
     static void removeSession(MCRSession session) {
         sessions.remove(session.getID());
-        session.fireSessionEvent(destroyed, session.accessCount.get());
+        session.fireSessionEvent(destroyed, session.concurrentAccess.get());
     }
 
     /**
