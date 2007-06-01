@@ -23,12 +23,19 @@
 
 package org.mycore.common;
 
+import static org.mycore.common.events.MCRSessionEvent.Type.*;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.log4j.Logger;
+
+import org.mycore.common.events.MCRSessionEvent;
+import org.mycore.common.events.MCRSessionListener;
 import org.mycore.datamodel.classifications.MCRClassificationBrowserData;
 
 /**
@@ -44,9 +51,11 @@ import org.mycore.datamodel.classifications.MCRClassificationBrowserData;
 public class MCRSession implements Cloneable {
     /** A map storing arbitrary session data * */
     private Map map = new HashMap();
+    
+    AtomicInteger accessCount;
 
     /** the logger */
-    static Logger logger = Logger.getLogger(MCRSession.class.getName());
+    static Logger LOGGER = Logger.getLogger(MCRSession.class.getName());
 
     /** The user ID of the session */
     private String userID = null;
@@ -66,7 +75,7 @@ public class MCRSession implements Cloneable {
 
     private String ip = null;
     
-    private long loginTime;
+    private long loginTime,lastAccessTime,thisAccesstime;
 
     /**
      * The constructor of a MCRSession. As default the user ID is set to the
@@ -76,19 +85,22 @@ public class MCRSession implements Cloneable {
         MCRConfiguration config = MCRConfiguration.instance();
         userID = config.getString("MCR.Users.Guestuser.UserName", "gast");
         language = config.getString("MCR.Metadata.DefaultLang", "de");
+        accessCount = new AtomicInteger();
 
         ip = "";
         sessionID = buildSessionID();
         MCRSessionMgr.addSession(this);
 
-        logger.debug("MCRSession created " + sessionID);
+        LOGGER.debug("MCRSession created " + sessionID);
         setLoginTime();
     }
     
     public final void setLoginTime(){
         loginTime=System.currentTimeMillis();
+        lastAccessTime=loginTime;
+        thisAccesstime=loginTime;
     }
-
+    
     /**
      * Constructs a unique session ID for this session, based on current time
      * and IP address of host where the code runs.
@@ -170,10 +182,10 @@ public class MCRSession implements Cloneable {
 
     /** Write data to the logger for debugging purposes */
     public final void debug() {
-        logger.debug("SessionID = " + sessionID);
-        logger.debug("UserID    = " + userID);
-        logger.debug("IP        = " + ip);
-        logger.debug("language  = " + language);
+        LOGGER.debug("SessionID = " + sessionID);
+        LOGGER.debug("UserID    = " + userID);
+        LOGGER.debug("IP        = " + ip);
+        LOGGER.debug("language  = " + language);
     }
 
     /** Stores an object under the given key within the session * */
@@ -216,7 +228,7 @@ public class MCRSession implements Cloneable {
                 }
         }
         } catch ( Exception e) {
-            logger.debug("Exception while parsing new ip "+newip+" using old value.",e);
+            LOGGER.debug("Exception while parsing new ip "+newip+" using old value.",e);
             return;
         }
         this.ip = newip;
@@ -228,10 +240,10 @@ public class MCRSession implements Cloneable {
 
     public void close() {
         // clear bound objects
-        logger.debug("Clearing local map.");
+        LOGGER.debug("Clearing local map.");
         map.clear();
         // remove from session list
-        logger.debug("Remove myself from MCRSession list");
+        LOGGER.debug("Remove myself from MCRSession list");
         MCRSessionMgr.removeSession(this);
         this.sessionID=null;
     }
@@ -246,6 +258,36 @@ public class MCRSession implements Cloneable {
         sb.append(getCurrentIP());
         sb.append("]");
         return sb.toString();
+    }
+    
+    public long getLastAccessedTime(){
+        return lastAccessTime;
+    }
+    
+    public void activate(){
+        lastAccessTime=thisAccesstime;
+        thisAccesstime=System.currentTimeMillis();
+        accessCount.incrementAndGet();
+        fireSessionEvent(activated);
+    }
+    
+    public void passivate(){
+        fireSessionEvent(passivated);
+    }
+    
+    void fireSessionEvent(MCRSessionEvent.Type type){
+        List<MCRSessionListener> listeners= MCRSessionMgr.getListeners();
+        if (listeners.size() == 0) {
+            return;
+        }
+        MCRSessionEvent event=new MCRSessionEvent(this,type);
+        LOGGER.debug(event);
+        MCRSessionMgr.getListenersLock().readLock().lock();
+        MCRSessionListener[] list = listeners.toArray(new MCRSessionListener[listeners.size()]);
+        MCRSessionMgr.getListenersLock().readLock().unlock();
+        for (MCRSessionListener listener:list){
+            listener.sessionEvent(event);
+        }
     }
 
 }

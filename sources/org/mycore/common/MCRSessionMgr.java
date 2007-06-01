@@ -23,8 +23,15 @@
 
 package org.mycore.common;
 
+import static org.mycore.common.events.MCRSessionEvent.Type.*;
+
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+
+import org.mycore.common.events.MCRSessionListener;
 
 /**
  * Manages sessions for a MyCoRe system. This class is backed by a ThreadLocal
@@ -46,6 +53,10 @@ import java.util.Map;
 public class MCRSessionMgr {
     
     private static Map<String, MCRSession> sessions=new HashMap<String, MCRSession>();
+    
+    private static List<MCRSessionListener> listeners = new ArrayList<MCRSessionListener>();
+    
+    private static ReentrantReadWriteLock listenersLock = new ReentrantReadWriteLock();
 
     /**
      * This ThreadLocal is automatically instantiated per thread with a MyCoRe
@@ -75,6 +86,7 @@ public class MCRSessionMgr {
      * This method sets a MyCoRe session object for the current Thread.
      */
     public static synchronized void setCurrentSession(MCRSession theSession) {
+        theSession.activate();
         theThreadLocalSession.set(theSession);
     }
 
@@ -86,7 +98,8 @@ public class MCRSessionMgr {
      */
     public static synchronized void releaseCurrentSession() {
         MCRSession session = theThreadLocalSession.get();
-        MCRSession.logger.debug("MCRSession released " + session.getID());
+        session.passivate();
+        MCRSession.LOGGER.debug("MCRSession released " + session.getID());
         theThreadLocalSession.remove();
     }
 
@@ -96,17 +109,39 @@ public class MCRSessionMgr {
     public static MCRSession getSession(String sessionID) {
         MCRSession s = sessions.get(sessionID);
         if (s == null) {
-            MCRSession.logger.warn("MCRSession with ID " + sessionID + " not cached any more");
+            MCRSession.LOGGER.warn("MCRSession with ID " + sessionID + " not cached any more");
         }
         return s;
     }
     
     static void addSession(MCRSession session) {
         sessions.put(session.getID(), session);
+        session.fireSessionEvent(created);
     }
     
     static void removeSession(MCRSession session) {
         sessions.remove(session.getID());
+        session.fireSessionEvent(destroyed);
+    }
+    
+    public static void addSessionListener(MCRSessionListener listener){
+        listenersLock.writeLock().lock();
+        listeners.add(listener);
+        listenersLock.writeLock().unlock();
+    }
+    
+    public static void removeSessionListener(MCRSessionListener listener){
+        listenersLock.writeLock().lock();
+        listeners.remove(listener);
+        listenersLock.writeLock().unlock();
+    }
+    
+    static List<MCRSessionListener> getListeners(){
+        return listeners;
+    }
+    
+    static ReentrantReadWriteLock getListenersLock(){
+        return listenersLock;
     }
     
 }
