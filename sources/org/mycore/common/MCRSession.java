@@ -130,7 +130,7 @@ public class MCRSession implements Cloneable {
     
     /** returns the current user ID */
     public final String getCurrentUserID() {
-        return userID.trim();
+        return userID;
     }
 
     /** sets the current user ID */
@@ -140,7 +140,7 @@ public class MCRSession implements Cloneable {
 
     /** returns the current language */
     public final String getCurrentLanguage() {
-        return language.trim();
+        return language;
     }
 
     /** sets the current language */
@@ -234,6 +234,18 @@ public class MCRSession implements Cloneable {
         logger.debug("Remove myself from MCRSession list");
         MCRSessionMgr.removeSession(this);
         this.sessionID=null;
+    }
+    
+    public String toString(){
+        StringBuilder sb=new StringBuilder();
+        sb.append("MCRSession[");
+        sb.append(getID());
+        sb.append(",user:'");
+        sb.append(getCurrentUserID());
+        sb.append("',ip:");
+        sb.append(getCurrentIP());
+        sb.append("]");
+        return sb.toString();
     }
 
 }
