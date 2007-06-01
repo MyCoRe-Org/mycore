@@ -41,7 +41,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.StringTokenizer;
@@ -61,6 +60,9 @@ import org.jdom.input.DOMBuilder;
 import org.jdom.input.SAXBuilder;
 import org.jdom.output.XMLOutputter;
 import org.jdom.transform.JDOMSource;
+import org.xml.sax.EntityResolver;
+import org.xml.sax.InputSource;
+
 import org.mycore.access.MCRAccessInterface;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRCache;
@@ -81,8 +83,6 @@ import org.mycore.services.fieldquery.MCRQuery;
 import org.mycore.services.fieldquery.MCRQueryClient;
 import org.mycore.services.fieldquery.MCRQueryManager;
 import org.mycore.services.fieldquery.MCRResults;
-import org.xml.sax.EntityResolver;
-import org.xml.sax.InputSource;
 
 /**
  * Reads XML documents from various URI types. This resolver is used to read
@@ -224,14 +224,7 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
 
     @SuppressWarnings("unchecked")
     private void addDebugInfo(String href, String base) {
-        final MCRSession session = MCRSessionMgr.getCurrentSession();
-        Object obj = session.get(SESSION_OBJECT_NAME);
-        if (obj == null) {
-            LOGGER.debug("Please use MCRURIResolverFilter to add debug informations to HTML pages.");
-            return;
-        }
-        List list = (List) obj;
-        list.add(href + " from " + base);
+        MCRURIResolverFilter.uriList.get().add(href + " from " + base);
     }
 
     /**

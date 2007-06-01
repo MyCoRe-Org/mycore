@@ -38,14 +38,10 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponseWrapper;
 
 import org.apache.log4j.Logger;
-
-import org.mycore.common.MCRSession;
-import org.mycore.frontend.servlets.MCRServlet;
 
 /**
  * Servlet Filter for adding debug information to servlet output.
@@ -54,6 +50,12 @@ import org.mycore.frontend.servlets.MCRServlet;
  */
 public class MCRURIResolverFilter implements Filter {
     private static final Logger LOGGER = Logger.getLogger(MCRURIResolver.class);
+
+    static ThreadLocal<List> uriList = new ThreadLocal<List>() {
+        protected List initialValue() {
+            return new MyLinkedList();
+        }
+    };
 
     /**
      * adds debug information from MCRURIResolver to Servlet output.
@@ -66,54 +68,45 @@ public class MCRURIResolverFilter implements Filter {
      *      javax.servlet.ServletResponse, javax.servlet.FilterChain)
      */
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain filterChain) throws IOException, ServletException {
-        MCRSession currentSession=null;
-        List list = null;
         /*
-         * isDebugEnabled() may return a different value
-         * when called a second time. Since we initialize things in the
-         * first block, we need to make sure to visit the second block only if we
-         * visited the first block, too.
+         * isDebugEnabled() may return a different value when called a second
+         * time. Since we initialize things in the first block, we need to make
+         * sure to visit the second block only if we visited the first block,
+         * too.
          */
         final boolean debugEnabled = LOGGER.isDebugEnabled();
-        if (debugEnabled) {
-            /*
-             * we cannot call MCRSessionMgr.getCurrentSession() the current
-             * Session is gathered by MCRServlet that at this point was not
-             * called
-             */
-            currentSession = MCRServlet.getSession((HttpServletRequest) request);
-            LOGGER.debug("start filter in session " + currentSession.getID());
-            // prepare UriResolver debug list
-            list = new MyLinkedList();
-            currentSession.put(MCRURIResolver.SESSION_OBJECT_NAME, list);
-        }
-        ServletOutputStream out = response.getOutputStream();
-        MyResponseWrapper wrapper = new MyResponseWrapper((HttpServletResponse) response);
-        // process request
-        filterChain.doFilter(request, wrapper);
-        final String origOutput = wrapper.toString();
-        final String characterEncoding = wrapper.getCharacterEncoding();
-        /**
-         * NOTE: jetty doesn't correctly implement
-         * ServletOutputStream.print(String). So we must encode it ourself to
-         * byte arrays.
-         */
-        if (debugEnabled && !list.isEmpty() && (origOutput.length() > 0)
-                && (-1 != response.getContentType().indexOf("text/html") || -1 != response.getContentType().indexOf("text/xml"))) {
-            int pos = getInsertPosition(origOutput);
-            out.write(origOutput.substring(0, pos).getBytes(characterEncoding));
-            final String insertString = "\n<!-- \n" + list.toString() + "\n-->";
-            final byte[] insertBytes = insertString.getBytes(characterEncoding);
-            out.write(insertBytes);
-            out.write(origOutput.substring(pos, origOutput.length()).getBytes(characterEncoding));
-            response.setContentLength(origOutput.getBytes(characterEncoding).length+insertBytes.length);
-            // delete debuglist
-            currentSession.deleteObject(MCRURIResolver.SESSION_OBJECT_NAME);
-            LOGGER.debug("end filter");
+        if (!debugEnabled) {
+            //do not filter...
+            filterChain.doFilter(request, response);
         } else {
-            out.write(origOutput.getBytes(characterEncoding));
+            ServletOutputStream out = response.getOutputStream();
+            MyResponseWrapper wrapper = new MyResponseWrapper((HttpServletResponse) response);
+            // process request
+            filterChain.doFilter(request, wrapper);
+            final String origOutput = wrapper.toString();
+            final String characterEncoding = wrapper.getCharacterEncoding();
+            /**
+             * NOTE: jetty doesn't correctly implement
+             * ServletOutputStream.print(String). So we must encode it ourself
+             * to byte arrays.
+             */
+            if (!uriList.get().isEmpty() && (origOutput.length() > 0)
+                    && (-1 != response.getContentType().indexOf("text/html") || -1 != response.getContentType().indexOf("text/xml"))) {
+                int pos = getInsertPosition(origOutput);
+                out.write(origOutput.substring(0, pos).getBytes(characterEncoding));
+                final String insertString = "\n<!-- \n" + uriList.get().toString() + "\n-->";
+                final byte[] insertBytes = insertString.getBytes(characterEncoding);
+                out.write(insertBytes);
+                out.write(origOutput.substring(pos, origOutput.length()).getBytes(characterEncoding));
+                response.setContentLength(origOutput.getBytes(characterEncoding).length + insertBytes.length);
+                // delete debuglist
+                uriList.remove();
+                LOGGER.debug("end filter");
+            } else {
+                out.write(origOutput.getBytes(characterEncoding));
+            }
+            out.close();
         }
-        out.close();
     }
 
     private int getInsertPosition(final String origOutput) {
@@ -197,7 +190,7 @@ public class MCRURIResolverFilter implements Filter {
 
         public MyResponseWrapper(HttpServletResponse response) {
             super(response);
-            output = new ByteArrayOutputStream(16*1024);
+            output = new ByteArrayOutputStream(16 * 1024);
         }
 
         public PrintWriter getWriter() {
@@ -207,14 +200,14 @@ public class MCRURIResolverFilter implements Filter {
         public ServletOutputStream getOutputStream() throws IOException {
             return new MyServletOutputStream();
         }
-        
+
         public String getCharacterEncoding() {
-            final String encoding=super.getCharacterEncoding();
-            LOGGER.debug("Character Encoding: "+encoding);
+            final String encoding = super.getCharacterEncoding();
+            LOGGER.debug("Character Encoding: " + encoding);
             return encoding;
         }
 
-        private class MyServletOutputStream extends ServletOutputStream{
+        private class MyServletOutputStream extends ServletOutputStream {
 
             public void print(String arg0) throws IOException {
                 output.write(arg0.getBytes(getResponse().getCharacterEncoding()));
@@ -223,7 +216,7 @@ public class MCRURIResolverFilter implements Filter {
             public void write(int b) throws IOException {
                 output.write(b);
             }
-            
+
         }
     }
 }
