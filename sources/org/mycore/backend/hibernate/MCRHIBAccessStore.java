@@ -152,7 +152,7 @@ public class MCRHIBAccessStore extends MCRAccessStore {
         }
         
         try {
-        	int count = ( (Integer) session.createQuery(query.toString()).iterate().next() ).intValue();
+        	int count = ( (Long) session.createQuery(query.toString()).iterate().next() ).intValue();
         	if (count > 0){
         		return true;
         	}
