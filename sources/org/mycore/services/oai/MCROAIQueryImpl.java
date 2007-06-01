@@ -124,8 +124,8 @@ public class MCROAIQueryImpl implements MCROAIQuery {
             MCRCategoryItem category = (MCRCategoryItem)categories.get(i);
             List labels = category.getLabels();
             for (int j=0;j<labels.size();j++) {
-              MCRLabel label = (MCRLabel)labels.get(i);
-              if (label.getLang().equals("x-dini")) {
+              MCRLabel label = (MCRLabel)labels.get(j);
+              if ("x-dini".equals(label.getLang())) {
                 String[] set = new String[3];
                 set[0]= label.getText();
                 set[1]=label.getText();
@@ -190,12 +190,12 @@ public class MCROAIQueryImpl implements MCROAIQuery {
 
         String[] identifier = MCROAIProvider.getHeader(object, id, repositoryId, instance);
         list.add(identifier);
-        logger.debug("Identifier hinzugef�gt");
+        logger.debug("Identifier hinzugefuegt");
 
         Element eMetadata = (Element) object.createXML().getRootElement().clone();
 
         list.add(eMetadata);
-        logger.debug("Metadaten hinzugef�gt");
+        logger.debug("Metadaten hinzugefuegt");
 
         return list;
     }
