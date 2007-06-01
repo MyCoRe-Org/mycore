@@ -423,6 +423,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
         try {
             org.jdom.Document jdomDoc = MCRUserMgr.instance().getAllGroups();
             FileOutputStream outFile = new FileOutputStream(filename);
+            LOGGER.info("Writing to file " + filename + " ...");
             saveToXMLFile(jdomDoc, outFile);
         } catch (Exception e) {
             throw new MCRException("Error while command saveAllGroupsToFile()", e);
@@ -440,6 +441,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
         try {
             org.jdom.Document jdomDoc = MCRUserMgr.instance().getAllUsers();
             FileOutputStream outFile = new FileOutputStream(filename);
+            LOGGER.info("Writing to file " + filename + " ...");
             saveToXMLFile(jdomDoc, outFile);
         } catch (Exception e) {
             throw new MCRException("Error while command saveAllUsersToFile()", e);
@@ -460,6 +462,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
             MCRGroup group = MCRUserMgr.instance().retrieveGroup(groupID);
             org.jdom.Document jdomDoc = group.toJDOMDocument();
             FileOutputStream outFile = new FileOutputStream(filename);
+            LOGGER.info("Writing to file " + filename + " ...");
             saveToXMLFile(jdomDoc, outFile);
         } catch (Exception e) {
             throw new MCRException("Error while command saveGroupToFile()", e);
@@ -480,6 +483,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
             MCRUser user = MCRUserMgr.instance().retrieveUser(userID);
             org.jdom.Document jdomDoc = user.toJDOMDocument();
             FileOutputStream outFile = new FileOutputStream(filename);
+            LOGGER.info("Writing to file " + filename + " ...");
             saveToXMLFile(jdomDoc, outFile);
         } catch (Exception e) {
             throw new MCRException("Error while command saveUserToFile()", e);
