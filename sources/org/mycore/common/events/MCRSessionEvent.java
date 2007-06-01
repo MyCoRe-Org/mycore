@@ -41,10 +41,20 @@ public class MCRSessionEvent {
     private Type type;
 
     private MCRSession session;
+    
+    private int concurrentAccessors;
 
-    public MCRSessionEvent(MCRSession session, Type type) {
+    public MCRSessionEvent(MCRSession session, Type type, int concurrentAccessors) {
         this.session = session;
         this.type = type;
+        this.concurrentAccessors = concurrentAccessors;
+    }
+
+    /**
+     * Return how many threads accessed the session at time the event occured.
+     */
+    public int getConcurrentAccessors() {
+        return concurrentAccessors;
     }
 
     /**
@@ -65,9 +75,11 @@ public class MCRSessionEvent {
         StringBuilder sb=new StringBuilder();
         sb.append("MCRSessionEvent['");
         sb.append(getSession());
-        sb.append("','");
+        sb.append("',");
         sb.append(getType());
-        sb.append("']'");
+        sb.append(",");
+        sb.append(getConcurrentAccessors());
+        sb.append("]'");
         return sb.toString();
     }
 

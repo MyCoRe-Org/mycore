@@ -23,7 +23,8 @@
 
 package org.mycore.common;
 
-import static org.mycore.common.events.MCRSessionEvent.Type.*;
+import static org.mycore.common.events.MCRSessionEvent.Type.created;
+import static org.mycore.common.events.MCRSessionEvent.Type.destroyed;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -31,6 +32,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import org.mycore.common.events.MCRSessionEvent;
 import org.mycore.common.events.MCRSessionListener;
 
 /**
@@ -51,11 +53,11 @@ import org.mycore.common.events.MCRSessionListener;
  * @version $Revision$ $Date$
  */
 public class MCRSessionMgr {
-    
-    private static Map<String, MCRSession> sessions=new HashMap<String, MCRSession>();
-    
+
+    private static Map<String, MCRSession> sessions = new HashMap<String, MCRSession>();
+
     private static List<MCRSessionListener> listeners = new ArrayList<MCRSessionListener>();
-    
+
     private static ReentrantReadWriteLock listenersLock = new ReentrantReadWriteLock();
 
     /**
@@ -83,7 +85,11 @@ public class MCRSessionMgr {
     }
 
     /**
-     * This method sets a MyCoRe session object for the current Thread.
+     * This method sets a MyCoRe session object for the current Thread. This
+     * method fires a "activated" event, when called the first time for this
+     * session and thread.
+     * 
+     * @see org.mycore.common.events.MCRSessionEvent.Type#activated
      */
     public static void setCurrentSession(MCRSession theSession) {
         theSession.activate();
@@ -94,7 +100,11 @@ public class MCRSessionMgr {
      * Releases the MyCoRe session from its current thread. Subsequent calls of
      * getCurrentSession() will return a different MCRSession object than before
      * for the current Thread. One use for this method is to reset the session
-     * inside a Thread-pooling environment like Servlet engines.
+     * inside a Thread-pooling environment like Servlet engines. This method
+     * fires a "passivated" event, when called the last time for this session
+     * and thread.
+     * 
+     * @see org.mycore.common.events.MCRSessionEvent.Type#passivated
      */
     public static void releaseCurrentSession() {
         MCRSession session = theThreadLocalSession.get();
@@ -113,35 +123,76 @@ public class MCRSessionMgr {
         }
         return s;
     }
-    
+
+    /**
+     * Add MCRSession to a static Map that manages all sessions. This method
+     * fires a "created" event and is invoked by MCRSession constructor.
+     * 
+     * @see MCRSession#MCRSession()
+     * @see org.mycore.common.events.MCRSessionEvent.Type#created
+     */
     static void addSession(MCRSession session) {
         sessions.put(session.getID(), session);
-        session.fireSessionEvent(created);
+        session.fireSessionEvent(created, session.accessCount.get());
     }
-    
+
+    /**
+     * Remove MCRSession from a static Map that manages all sessions. This
+     * method fires a "destroyed" event and is invoked by MCRSession.close().
+     * 
+     * @see MCRSession#close()
+     * @see org.mycore.common.events.MCRSessionEvent.Type#destroyed
+     */
     static void removeSession(MCRSession session) {
         sessions.remove(session.getID());
-        session.fireSessionEvent(destroyed);
+        session.fireSessionEvent(destroyed, session.accessCount.get());
     }
-    
-    public static void addSessionListener(MCRSessionListener listener){
+
+    /**
+     * Add a MCRSessionListener, that gets infomed about MCRSessionEvents.
+     * 
+     * @see #removeSessionListener(MCRSessionListener)
+     */
+    public static void addSessionListener(MCRSessionListener listener) {
         listenersLock.writeLock().lock();
         listeners.add(listener);
         listenersLock.writeLock().unlock();
     }
-    
-    public static void removeSessionListener(MCRSessionListener listener){
+
+    /**
+     * Removes a MCRSessionListener from the list.
+     * 
+     * @see #addSessionListener(MCRSessionListener)
+     */
+    public static void removeSessionListener(MCRSessionListener listener) {
         listenersLock.writeLock().lock();
         listeners.remove(listener);
         listenersLock.writeLock().unlock();
     }
-    
-    static List<MCRSessionListener> getListeners(){
+
+    /**
+     * Allows access to all MCRSessionListener instances.
+     * 
+     * Mainly for internal use of MCRSession.
+     */
+    static List<MCRSessionListener> getListeners() {
         return listeners;
     }
-    
-    static ReentrantReadWriteLock getListenersLock(){
+
+    /**
+     * Allows to lock out access to list of MCESessionListener instances.
+     * 
+     * When you want to read on the list, use the readLock() and use the
+     * writeLock() if you want to modify the list. Using locks will allow a high
+     * degree of concurrent access.
+     * 
+     * Mainly for internal use of MCRSession.
+     * 
+     * @see ReentrantReadWriteLock#readLock();
+     * @see ReentrantReadWriteLock#writeLock();
+     */
+    static ReentrantReadWriteLock getListenersLock() {
         return listenersLock;
     }
-    
+
 }

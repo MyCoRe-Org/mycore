@@ -54,6 +54,8 @@ public class MCRSession implements Cloneable {
 
     AtomicInteger accessCount;
 
+    AtomicInteger concurrentAccess;
+
     ThreadLocal<AtomicInteger> currentThreadCount = new ThreadLocal<AtomicInteger>() {
         public AtomicInteger initialValue() {
             return new AtomicInteger();
@@ -92,6 +94,7 @@ public class MCRSession implements Cloneable {
         userID = config.getString("MCR.Users.Guestuser.UserName", "gast");
         language = config.getString("MCR.Metadata.DefaultLang", "de");
         accessCount = new AtomicInteger();
+        concurrentAccess = new AtomicInteger();
 
         ip = "";
         sessionID = buildSessionID();
@@ -272,12 +275,17 @@ public class MCRSession implements Cloneable {
         return lastAccessTime;
     }
 
-    public void activate() {
+    /**
+     * Activate this session. For internal use mainly by MCRSessionMgr.
+     * 
+     * @see MCRSessionMgr#setCurrentSession(MCRSession)
+     */
+    void activate() {
         lastAccessTime = thisAccesstime;
         thisAccesstime = System.currentTimeMillis();
         accessCount.incrementAndGet();
         if (currentThreadCount.get().getAndIncrement() == 0) {
-            fireSessionEvent(activated);
+            fireSessionEvent(activated, concurrentAccess.incrementAndGet());
         } else {
             try {
                 throw new MCRException("Cannot activate a Session more than once per thread: " + currentThreadCount.get().get());
@@ -287,20 +295,38 @@ public class MCRSession implements Cloneable {
         }
     }
 
-    public void passivate() {
+    /**
+     * Passivate this session. For internal use mainly by MCRSessionMgr.
+     * 
+     * @see MCRSessionMgr#releaseCurrentSession()
+     */
+    void passivate() {
         if (currentThreadCount.get().getAndDecrement() == 1) {
-            fireSessionEvent(passivated);
+            fireSessionEvent(passivated, concurrentAccess.decrementAndGet());
         } else {
             LOGGER.debug("deactivate currentThreadCount: " + currentThreadCount.get().get());
         }
     }
 
-    void fireSessionEvent(MCRSessionEvent.Type type) {
+    /**
+     * Fire MCRSessionEvents.
+     * 
+     * This is a common method that fires all types of MCRSessionEvent.
+     * 
+     * Mainly for internal use of MCRSession and MCRSessionMgr.
+     * 
+     * @param type
+     *            type of event
+     * @param concurrentAccessors
+     *            number of concurrentThreads (passivateEvent gets 0 for
+     *            singleThread)
+     */
+    void fireSessionEvent(MCRSessionEvent.Type type, int concurrentAccessors) {
         List<MCRSessionListener> listeners = MCRSessionMgr.getListeners();
         if (listeners.size() == 0) {
             return;
         }
-        MCRSessionEvent event = new MCRSessionEvent(this, type);
+        MCRSessionEvent event = new MCRSessionEvent(this, type, concurrentAccessors);
         LOGGER.debug(event);
         MCRSessionMgr.getListenersLock().readLock().lock();
         MCRSessionListener[] list = listeners.toArray(new MCRSessionListener[listeners.size()]);
