@@ -415,7 +415,7 @@ public class MCRClassificationBrowserData {
             // set done flag
             if (ClassUserTable.containsKey(id)) {
                 if (ClassUserTable.get(id) != sessionID) {
-                    cli.setAttribute("userEdited", MCRSession.getSession(ClassUserTable.get(id)).getCurrentUserID());
+                    cli.setAttribute("userEdited", MCRSessionMgr.getSession(ClassUserTable.get(id)).getCurrentUserID());
                 } else {
                     cli.setAttribute("userEdited", "false");
                 }
@@ -487,7 +487,7 @@ public class MCRClassificationBrowserData {
 
         final Element xUserEdited = new Element("userEdited");
         if (ClassUserTable.containsKey(cl.getId())) {
-            xUserEdited.addContent(MCRSession.getSession(ClassUserTable.get(cl.getId())).getCurrentUserID());
+            xUserEdited.addContent(MCRSessionMgr.getSession(ClassUserTable.get(cl.getId())).getCurrentUserID());
         } else {
             xUserEdited.addContent("false");
         }

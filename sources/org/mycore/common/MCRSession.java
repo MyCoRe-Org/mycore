@@ -37,7 +37,7 @@ import org.mycore.datamodel.classifications.MCRClassificationBrowserData;
  * 
  * @author Detlev Degenhardt
  * @author Jens Kupferschmidt
- * @author Frank Lï¿½tzenkirchen
+ * @author Frank Lützenkirchen
  * 
  * @version $Revision$ $Date$
  */
@@ -57,10 +57,7 @@ public class MCRSession implements Cloneable {
     /** The unique ID of this session */
     private String sessionID = null;
 
-    /** A cache of MCRSession objects, used for method getSession( String ) */
-    private static MCRCache sessions = new MCRCache(1000, "MCRSession sessions");
-
-    /** -ASC- fï¿½r MCRClassificationBrowser Class session daten */
+    /** -ASC- für MCRClassificationBrowser Class session daten */
     public MCRClassificationBrowserData BData = null;
 
     private String FullName = null;
@@ -82,7 +79,7 @@ public class MCRSession implements Cloneable {
 
         ip = "";
         sessionID = buildSessionID();
-        sessions.put(sessionID, this);
+        MCRSessionMgr.addSession(this);
 
         logger.debug("MCRSession created " + sessionID);
         setLoginTime();
@@ -90,19 +87,6 @@ public class MCRSession implements Cloneable {
     
     public final void setLoginTime(){
         loginTime=System.currentTimeMillis();
-    }
-
-    /**
-     * Returns the MCRSession for the given sessionID.
-     */
-    public static MCRSession getSession(String sessionID) {
-        MCRSession s = (MCRSession) (sessions.get(sessionID));
-
-        if (s == null) {
-            logger.warn("MCRSession with ID " + sessionID + " not cached any more");
-        }
-
-        return s;
     }
 
     /**
@@ -248,7 +232,7 @@ public class MCRSession implements Cloneable {
         map.clear();
         // remove from session list
         logger.debug("Remove myself from MCRSession list");
-        sessions.remove(getID());
+        MCRSessionMgr.removeSession(this);
         this.sessionID=null;
     }
 

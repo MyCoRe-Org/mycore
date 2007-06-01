@@ -138,7 +138,7 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
             // Remember current MCRSession for upload
             String sessionID = (String) (sessionIDs.get(uploadId));
             if (sessionID != null) {
-                MCRSession session = MCRSession.getSession(sessionID);
+                MCRSession session = MCRSessionMgr.getSession(sessionID);
                 if (session != null)
                     MCRSessionMgr.setCurrentSession(session);
             }

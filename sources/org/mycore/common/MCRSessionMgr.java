@@ -23,6 +23,9 @@
 
 package org.mycore.common;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Manages sessions for a MyCoRe system. This class is backed by a ThreadLocal
  * variable, so every Thread is guaranteed to get a unique instance of
@@ -41,6 +44,8 @@ package org.mycore.common;
  * @version $Revision$ $Date$
  */
 public class MCRSessionMgr {
+    
+    private static Map<String, MCRSession> sessions=new HashMap<String, MCRSession>();
 
     /**
      * This ThreadLocal is automatically instantiated per thread with a MyCoRe
@@ -84,4 +89,24 @@ public class MCRSessionMgr {
         MCRSession.logger.debug("MCRSession released " + session.getID());
         theThreadLocalSession.remove();
     }
+
+    /**
+     * Returns the MCRSession for the given sessionID.
+     */
+    public static MCRSession getSession(String sessionID) {
+        MCRSession s = sessions.get(sessionID);
+        if (s == null) {
+            MCRSession.logger.warn("MCRSession with ID " + sessionID + " not cached any more");
+        }
+        return s;
+    }
+    
+    static void addSession(MCRSession session) {
+        sessions.put(session.getID(), session);
+    }
+    
+    static void removeSession(MCRSession session) {
+        sessions.remove(session.getID());
+    }
+    
 }
