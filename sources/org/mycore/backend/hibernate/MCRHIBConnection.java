@@ -229,4 +229,8 @@ public class MCRHIBConnection implements Closeable {
         return base;
     }
 
+    public SessionFactory getSessionFactory() {
+        return SESSION_FACTORY;
+    }
+
 }
