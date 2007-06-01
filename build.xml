@@ -2,7 +2,7 @@
 
   <!-- =================================================================== -->
   <!-- MyCoRe build file for use with Apache Ant                           -->
-  <!-- $Revision: 1.133 $ $Date: 2007-03-28 11:58:16 $                      -->
+  <!-- $Revision: 1.134 $ $Date: 2007-06-01 15:21:51 $                      -->
   <!-- =================================================================== -->
 
 <project name="MyCoRe" default="usage" basedir=".">
@@ -79,7 +79,7 @@
     <echo level="info">Operating system : ${os.name} Version ${os.version} on ${os.arch} </echo>
     <echo level="info">Java version     : JDK ${ant.java.version} Version ${java.version} from ${java.vendor}</echo>
     <echo level="info">Java home        : ${java.home}</echo>
-    <echo level="info">Ant build file   : $Revision: 1.133 $ $Date: 2007-03-28 11:58:16 $</echo>
+    <echo level="info">Ant build file   : $Revision: 1.134 $ $Date: 2007-06-01 15:21:51 $</echo>
     <echo level="info">Ant version      : ${ant.version}</echo>
     <echo level="info">Ant home         : ${ant.home}</echo>
     <echo level="info">Ant libdir       : ${ant.library.dir}</echo>
@@ -245,9 +245,7 @@
 
   <target name="up2date">
 
-    <path id="javadocs.classpath">
-      <fileset dir="${basedir}/lib" includes="*.jar"/>
-    </path>
+    <path id="javadocs.classpath" refid="mycore.classpath"/>
 
     <path id="sourcepath">
       <dirset dir="${basedir}" includes="sources" />
@@ -288,6 +286,7 @@
     <mkdir dir="${basedir}/documentation/html" />
     <javadoc
       packagenames        = "*"
+      encoding            = "${sourceencoding}"
       sourcepathref       = "sourcepath"
       destdir             = "${basedir}/documentation/html"
       classpathref        = "javadocs.classpath"
@@ -308,14 +307,12 @@
       <group title="MyCoRe User and Group Management"           packages="org.mycore.user*"      />
 
       <link href="http://java.sun.com/j2se/1.5.0/docs/api/"/>
-      <link href="http://www.mycore.de/library/cm-eip/eip-8.2-javadocs/" />
       <link href="http://jakarta.apache.org/tomcat/tomcat-5.0-doc/servletapi"/>
       <link href="http://java.sun.com/xml/jaxp/dist/1.1/docs/api/"/>
       <link href="http://www.jdom.org/docs/apidocs"/>
-      <link href="http://xmldb-org.sourceforge.net/xapi/api/"/>
       <link href="http://logging.apache.org/log4j/docs/api/"/>
       <link href="http://jakarta.apache.org/lucene/docs/api/" />
-      <link href="http://www.mycore.de/library/cm-eip/eip-8.2-javadocs/" />
+      <link href="http://www.hibernate.org/hib_docs/v3/api/" />
     </javadoc>
     <moduleHook target="javadocs"/>
   </target>
