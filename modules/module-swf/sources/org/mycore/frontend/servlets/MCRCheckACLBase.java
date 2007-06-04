@@ -129,7 +129,7 @@ abstract public class MCRCheckACLBase extends MCRCheckBase {
      */
     protected org.jdom.Element prepareService(org.jdom.Document jdom_in, MCRObjectID ID, MCRServletJob job, String lang) throws Exception {
         org.jdom.Element elm_out = null;
-        ArrayList logtext = new ArrayList();
+        ArrayList <String>logtext = new ArrayList<String>();
         org.jdom.Element root = jdom_in.getRootElement();
         if (root != null) {
             org.jdom.Element servacls = root.getChild("servacls");

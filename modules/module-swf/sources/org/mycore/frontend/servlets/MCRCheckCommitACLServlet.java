@@ -25,9 +25,9 @@ package org.mycore.frontend.servlets;
 
 import java.util.List;
 
+import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRMailer;
 import org.mycore.datamodel.common.MCRActiveLinkException;
-import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.MCRObjectService;
 
@@ -43,6 +43,8 @@ import org.mycore.datamodel.metadata.MCRObjectService;
 public class MCRCheckCommitACLServlet extends MCRCheckACLBase {
 
     private static final long serialVersionUID = 1L;
+
+    private static String storedrules = CONFIG.getString("MCR.Access.StorePermissions", "read,write,delete");
 
     /**
      * The method return an URL with the next working step. If okay flag is
@@ -81,11 +83,11 @@ public class MCRCheckCommitACLServlet extends MCRCheckACLBase {
         String appl = CONFIG.getString("MCR.SWF.Mail.ApplicationID", "DocPortal");
         String subject = "Automaticaly message from " + appl;
         StringBuffer text = new StringBuffer();
-        text.append("The ACL data of the MyCoRe object of type ").append(ID.getTypeId()).append(" with the ID ").append(ID.getId()).append(" in the server was changes.");
-        LOGGER.info(text.toString());
+        text.append("The ACL data of the MyCoRe object of type ").append(ID.getTypeId()).append(" with the ID ").append(ID.getId()).append(" was changed in the server.");
 
         try {
             MCRMailer.send(sender, addr, subject, text.toString(), false);
+            LOGGER.info("Send a mail about change ACLs to " + addr);
         } catch (Exception ex) {
             LOGGER.error("Can't send a mail to " + addr);
         }
@@ -103,28 +105,25 @@ public class MCRCheckCommitACLServlet extends MCRCheckACLBase {
      *            the MCRObjectID
      */
     public final boolean storeService(org.jdom.Element outelm, MCRServletJob job, MCRObjectID ID) {
-        MCRObject obj = new MCRObject();
-        obj.receiveFromDatastore(ID);
+
         MCRObjectService service = new MCRObjectService();
         service.setFromDOM(outelm);
-        obj.setService(service);
-
-        // Save the prepared MCRObject/MCRDerivate to a file
-        try {
-            obj.updateInDatastore();
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            LOGGER.error("Exception while store " + ID.getId() + " to server.");
-            try {
-                errorHandlerIO(job);
-            } catch (Exception ioe) {
-                ioe.printStackTrace();
-            }
-
+        int rulesize = service.getRulesSize();
+        if (rulesize == 0) {
+            LOGGER.warn("The ACL conditions for this object was empty, no update!");
             return false;
         }
+        while (0 < rulesize) {
+            org.jdom.Element conditions = service.getRule(0).getCondition();
+            String permission = service.getRule(0).getPermission();
+            if (storedrules.indexOf(permission) != -1) {
+                MCRAccessManager.updateRule(ID, permission, conditions, "");
+            }
+            service.removeRule(0);
+            rulesize--;
+        }
 
-        LOGGER.info("Object " + ID.getId() + " stored in the server.");
+        LOGGER.info("Update ACLs for ID " + ID.getId() + "in server.");
         return true;
     }
 }
