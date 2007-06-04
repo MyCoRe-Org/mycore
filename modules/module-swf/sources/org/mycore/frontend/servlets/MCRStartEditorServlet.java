@@ -207,42 +207,8 @@ public class MCRStartEditorServlet extends MCRServlet {
         }
 
         if ((mytfmcrid == null) || ((mytfmcrid = mytfmcrid.trim()).length() == 0)) {
-            String defaproject = CONFIG.getString("MCR.SWF.Project.ID", "MCR");
             String myproject = CONFIG.getString("MCR.SWF.Project.ID." + mytype, "MCR");
-
-            if (myproject.equals("MCR")) {
-                myproject = defaproject;
-            }
-
-            myproject = myproject + "_" + mytype;
-
-            MCRObjectID mcridnext = new MCRObjectID();
-            mcridnext.setNextFreeId(myproject);
-
-            String workdir = CONFIG.getString("MCR.SWF.Directory." + mytype, "/");
-            File workf = new File(workdir);
-
-            if (workf.isDirectory()) {
-                String[] list = workf.list();
-
-                for (int i = 0; i < list.length; i++) {
-                    if (!list[i].startsWith(myproject)) {
-                        continue;
-                    }
-
-                    try {
-                        MCRObjectID mcriddir = new MCRObjectID(list[i].substring(0, list[i].length() - 4));
-
-                        if (mcridnext.getNumberAsInteger() <= mcriddir.getNumberAsInteger()) {
-                            mcriddir.setNumber(mcriddir.getNumberAsInteger() + 1);
-                            mcridnext = mcriddir;
-                        }
-                    } catch (Exception e) {
-                    }
-                }
-            }
-
-            mytfmcrid = mcridnext.getId();
+            mytfmcrid = getNextMCRTFID(myproject,mytype);
         }
         LOGGER.info("MCRID (TF) = " + mytfmcrid);
 
@@ -344,6 +310,52 @@ public class MCRStartEditorServlet extends MCRServlet {
         return redirectURL.toString();
     }
 
+    /**
+     * This method return a next new MCRObjectID for the given type and project ID.
+     * 
+     * @param projectid The MCRObjectID project ID
+     * @type type  The MCRObjectID type
+     * @return the next free MCRObject for the given parameter
+     */
+    protected final String getNextMCRTFID(String myproject,String mytype)
+    {
+        if ((myproject == null) || (myproject.trim().length() == 0) || (myproject.equals("MCR"))) {
+            myproject = CONFIG.getString("MCR.SWF.Project.ID", "MCR");
+        }
+        if ((mytype == null) || (mytype.trim().length() == 0) || (mytype.equals("MCR"))) {
+            mytype = "document";
+        }
+
+        myproject = myproject + "_" + mytype;
+
+        MCRObjectID mcridnext = new MCRObjectID();
+        mcridnext.setNextFreeId(myproject);
+
+        String workdir = CONFIG.getString("MCR.SWF.Directory." + mytype, "/");
+        File workf = new File(workdir);
+
+        if (workf.isDirectory()) {
+            String[] list = workf.list();
+
+            for (int i = 0; i < list.length; i++) {
+                if (!list[i].startsWith(myproject)) {
+                    continue;
+                }
+
+                try {
+                    MCRObjectID mcriddir = new MCRObjectID(list[i].substring(0, list[i].length() - 4));
+
+                    if (mcridnext.getNumberAsInteger() <= mcriddir.getNumberAsInteger()) {
+                        mcriddir.setNumber(mcriddir.getNumberAsInteger() + 1);
+                        mcridnext = mcriddir;
+                    }
+                } catch (Exception e) {
+                }
+            }
+        }
+
+        return mcridnext.getId();
+}
     /**
      * The method start the editor add a file to a derivate object that is
      * stored in the server. The method use the input parameter: <b>type</b>,<b>step</b>
