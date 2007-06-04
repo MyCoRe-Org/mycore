@@ -54,7 +54,7 @@ import org.mycore.common.MCRSessionMgr;
 /**
  * Select action process for Web-Content-Management-System (WCMS).
  */
-public class WCMSChooseServlet extends WCMSServlet {
+public class MCRWCMSChooseServlet extends MCRWCMSServlet {
 
 	private static final long serialVersionUID = 1L;
 

@@ -5,7 +5,7 @@
 	<xsl:template name="wcmsMultimedia">
 		
 		<xsl:variable name="servletAnswer_XML"
-			select="document(concat('request:','servlets/WCMSAdminServlet?todo=getMultimediaConfig'))"/>
+			select="document(concat('request:','servlets/MCRWCMSAdminServlet?todo=getMultimediaConfig'))"/>
 		
 		<form name="wcmsMultimedia" target="">
 			<table align="center" class="table_noGrid">
@@ -42,7 +42,7 @@
 						<br/>
 						<br/>
 						<!-- upload -->
-						<a href="{$ServletsBaseURL}WCMSFileUploadServlet{$HttpSession}">
+						<a href="{$ServletsBaseURL}MCRWCMSFileUploadServlet{$HttpSession}">
 							<xsl:value-of select="concat(i18n:translate('wcms.uploadImg'),':')"/>
 						</a>
 					</td>
@@ -89,7 +89,7 @@
 					<td>
 						<!-- upload -->
 						<br/>
-						<a href="{$ServletsBaseURL}WCMSFileUploadServlet{$HttpSession}">
+						<a href="{$ServletsBaseURL}MCRWCMSFileUploadServlet{$HttpSession}">
 							<xsl:value-of select="concat(i18n:translate('wcms.uploadDoc'),':')"/>
 						</a>
 					</td>

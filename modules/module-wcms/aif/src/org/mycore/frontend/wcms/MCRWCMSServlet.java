@@ -44,7 +44,7 @@ import org.mycore.frontend.servlets.MCRServletJob;
  * Need to insert some things here
  * 
  */
-public abstract class WCMSServlet extends MCRServlet {
+public abstract class MCRWCMSServlet extends MCRServlet {
     protected static final String OUTPUT_ENCODING = "UTF-8";
 
     protected static final String VALIDATOR = "JTidy";

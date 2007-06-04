@@ -89,7 +89,7 @@
 								<img 
 									src="{$WebApplicationBaseURL}templates/master/template_wcms/IMAGES/naviMenu/greenArrow.gif" 
 									width="16" height="8" border="0" alt="" title="" />
-								<a href="javascript: document.useAgain.submit()">DBT-WCMS nochmals nutzen</a>
+								<a href="javascript: document.useAgain.submit()">WCMS nochmals nutzen</a>
 								<br/>
 								<br/>
 								<img 
@@ -103,7 +103,7 @@
 				</td>
 			</tr>
 		</table>
-		<form name="useAgain" action="{$ServletsBaseURL}WCMSLoginServlet" method="post">
+		<form name="useAgain" action="{$ServletsBaseURL}MCRWCMSLoginServlet" method="post">
 			<input type="hidden" name="sessionID" >
 				<xsl:attribute name="value">
 					<xsl:value-of select="/cms/sessionID" />

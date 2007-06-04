@@ -44,12 +44,12 @@ import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.xml.MCRURIResolver;
 
-public class WCMSAdminServlet extends WCMSServlet {
+public class MCRWCMSAdminServlet extends MCRWCMSServlet {
 
 	private static final long serialVersionUID = 1L;
 
 	private static final Logger LOGGER = Logger
-			.getLogger(WCMSAdminServlet.class);
+			.getLogger(MCRWCMSAdminServlet.class);
 
 	/*
 	 * (non-Javadoc)

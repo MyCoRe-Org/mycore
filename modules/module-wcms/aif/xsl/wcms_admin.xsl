@@ -97,7 +97,7 @@ section: Template: name="wcmsAdministration.welcome"
 					<img 
 						src="{$WebApplicationBaseURL}templates/master/template_wcms/IMAGES/naviMenu/greenArrow.gif" 
 						width="16" height="8" border="0" alt="" title=""/> 
-					<a href="{$ServletsBaseURL}WCMSAdminServlet?action=choose">
+					<a href="{$ServletsBaseURL}MCRWCMSAdminServlet?action=choose">
 						<xsl:value-of select="i18n:translate('wcms.admin.options.manage')"/>
 					</a>
 
@@ -107,7 +107,7 @@ section: Template: name="wcmsAdministration.welcome"
 						<img 
 							src="{$WebApplicationBaseURL}templates/master/template_wcms/IMAGES/naviMenu/greenArrow.gif" 
 							width="16" height="8" border="0" alt="" title=""/> 
-						<a href="{$ServletsBaseURL}WCMSAdminServlet?action=managGlobal">
+						<a href="{$ServletsBaseURL}MCRWCMSAdminServlet?action=managGlobal">
 							<xsl:value-of select="i18n:translate('wcms.admin.options.globalSetup')"/>
 						</a>
 					</xsl:if>
@@ -116,7 +116,7 @@ section: Template: name="wcmsAdministration.welcome"
 					<img 
 						src="{$WebApplicationBaseURL}templates/master/template_wcms/IMAGES/naviMenu/greenArrow.gif" 
 						width="16" height="8" border="0" alt="" title="" />
-					<a href="{$ServletsBaseURL}WCMSAdminServlet?action=logs&amp;sort=date&amp;sortOrder=descending">
+					<a href="{$ServletsBaseURL}MCRWCMSAdminServlet?action=logs&amp;sort=date&amp;sortOrder=descending">
 						<xsl:value-of select="i18n:translate('wcms.admin.options.showStats')"/>
 					</a> 
 					<br/><br/>
@@ -398,7 +398,7 @@ section: Template: name="wcmsAdministration.welcome"
 		<xsl:value-of select="encodeURL:encode(concat('/',$cleanHref), 'UTF-8')"/>
 	</xsl:variable>
 	
-	<xsl:value-of select="concat($ServletsBaseURL,'WCMSAdminServlet?action=view&amp;file=',$file,'&amp;XSL.navi=',$navi,'&amp;XSL.href=',$href)" />
+	<xsl:value-of select="concat($ServletsBaseURL,'MCRWCMSAdminServlet?action=view&amp;file=',$file,'&amp;XSL.navi=',$navi,'&amp;XSL.href=',$href)" />
 </xsl:template>	
 
 <!-- ===================================================================================== -->		
@@ -469,7 +469,7 @@ section: Template: name="wcmsAdministration.managGlobal"
 	<div id="settings-width">
 
 		<div id="settings">
-			<form name="settings" action="{$ServletsBaseURL}WCMSAdminServlet{$JSessionID}?action=saveGlobal" method="post">
+			<form name="settings" action="{$ServletsBaseURL}MCRWCMSAdminServlet{$JSessionID}?action=saveGlobal" method="post">
 				<div class="titel"><xsl:value-of select="i18n:translate('wcms.design')"/></div>
 				<div class="inhalt">
 					<fieldset>
@@ -669,7 +669,7 @@ section: Template: name="wcmsAdministration.managGlobal.defaultTempl"
 		<xsl:choose>
 			<xsl:when test=" $sortBy = 'date' " >
 				<th id="aktive-row">
-					<a href="WCMSAdminServlet?action=logs&amp;sort=date&amp;sortOrder={$flipedSortOrder}">
+					<a href="MCRWCMSAdminServlet?action=logs&amp;sort=date&amp;sortOrder={$flipedSortOrder}">
 						<xsl:choose>
 							<xsl:when test="$currentSortOrder='descending'">
 								<xsl:text>&#8659; </xsl:text>
@@ -684,7 +684,7 @@ section: Template: name="wcmsAdministration.managGlobal.defaultTempl"
 			</xsl:when>
 			<xsl:otherwise>
 				<th>
-					<a href="WCMSAdminServlet?action=logs&amp;sort=date&amp;sortOrder={$currentSortOrder}">
+					<a href="MCRWCMSAdminServlet?action=logs&amp;sort=date&amp;sortOrder={$currentSortOrder}">
 						<xsl:value-of select="i18n:translate('wcms.date')"/>
 					</a>
 				</th>
@@ -695,7 +695,7 @@ section: Template: name="wcmsAdministration.managGlobal.defaultTempl"
 		<xsl:choose>
 			<xsl:when test="/cms/userClass != 'autor' and $sortBy = 'userRealName' " >
 				<th id="aktive-row">
-					<a href="WCMSAdminServlet?action=logs&amp;sort=userRealName&amp;sortOrder={$flipedSortOrder}">
+					<a href="MCRWCMSAdminServlet?action=logs&amp;sort=userRealName&amp;sortOrder={$flipedSortOrder}">
 						<xsl:choose>
 							<xsl:when test="$currentSortOrder='descending'">
 								<xsl:text>&#8659; </xsl:text>
@@ -710,7 +710,7 @@ section: Template: name="wcmsAdministration.managGlobal.defaultTempl"
 			</xsl:when>
 			<xsl:when test="/cms/userClass != 'autor' and $sortBy != 'userRealName' " >
 				<th>										
-					<a href="WCMSAdminServlet?action=logs&amp;sort=userRealName&amp;sortOrder={$currentSortOrder}">
+					<a href="MCRWCMSAdminServlet?action=logs&amp;sort=userRealName&amp;sortOrder={$currentSortOrder}">
 						<xsl:value-of select="i18n:translate('wcms.user')"/>
 					</a>
 				</th>
@@ -721,7 +721,7 @@ section: Template: name="wcmsAdministration.managGlobal.defaultTempl"
 		<xsl:choose>
 			<xsl:when test=" $sortBy = 'labelPath' " >
 				<th id="aktive-row">
-					<a href="WCMSAdminServlet?action=logs&amp;sort=labelPath&amp;sortOrder={$flipedSortOrder}">
+					<a href="MCRWCMSAdminServlet?action=logs&amp;sort=labelPath&amp;sortOrder={$flipedSortOrder}">
 						<xsl:choose>
 						<xsl:when test="$currentSortOrder='descending'">
 								<xsl:text>&#8659; </xsl:text>
@@ -736,7 +736,7 @@ section: Template: name="wcmsAdministration.managGlobal.defaultTempl"
 			</xsl:when>
 			<xsl:otherwise>
 				<th>
-					<a href="WCMSAdminServlet?action=logs&amp;sort=labelPath&amp;sortOrder={$currentSortOrder}">
+					<a href="MCRWCMSAdminServlet?action=logs&amp;sort=labelPath&amp;sortOrder={$currentSortOrder}">
 						<xsl:value-of select="i18n:translate('wcms.site')"/>
 					</a>
 				</th>
@@ -747,7 +747,7 @@ section: Template: name="wcmsAdministration.managGlobal.defaultTempl"
 		<xsl:choose>
 			<xsl:when test=" $sortBy = 'doneAction' " >
 				<th id="aktive-row">
-					<a href="WCMSAdminServlet?action=logs&amp;sort=doneAction&amp;sortOrder={$flipedSortOrder}">
+					<a href="MCRWCMSAdminServlet?action=logs&amp;sort=doneAction&amp;sortOrder={$flipedSortOrder}">
 						<xsl:choose>
 							<xsl:when test="$currentSortOrder='descending'">
 								<xsl:text>&#8659; </xsl:text>
@@ -762,7 +762,7 @@ section: Template: name="wcmsAdministration.managGlobal.defaultTempl"
 			</xsl:when>
 			<xsl:otherwise>
 				<th>
-					<a href="WCMSAdminServlet?action=logs&amp;sort=doneAction&amp;sortOrder={$currentSortOrder}">
+					<a href="MCRWCMSAdminServlet?action=logs&amp;sort=doneAction&amp;sortOrder={$currentSortOrder}">
 						<xsl:value-of select="i18n:translate('wcms.action')"/>
 					</a>
 				</th>
@@ -778,16 +778,16 @@ section: Template: name="wcmsAdministration.managGlobal.defaultTempl"
 			<xsl:when test="/cms/userClass = 'systemAdmin' and ($sortBy = 'backupContentFile' or $sortBy = 'backupNavigationFile') " >
 				<th id="aktive-row">
 					<b>Backup
-					<a href="WCMSAdminServlet?action=logs&amp;sort=backupContentFile&amp;sortOrder={$flipedSortOrder}">(Inhalt</a>
-					<a href="WCMSAdminServlet?action=logs&amp;sort=backupNavigationFile&amp;sortOrder={$flipedSortOrder}">, Navigation)</a>
+					<a href="MCRWCMSAdminServlet?action=logs&amp;sort=backupContentFile&amp;sortOrder={$flipedSortOrder}">(Inhalt</a>
+					<a href="MCRWCMSAdminServlet?action=logs&amp;sort=backupNavigationFile&amp;sortOrder={$flipedSortOrder}">, Navigation)</a>
 					</b>
 				</th>
 			</xsl:when>
 			<xsl:when test="/cms/userClass = 'systemAdmin' and ($sortBy != 'backupContentFile' and $sortBy != 'backupNavigationFile') " >
 				<th>
 					Backup
-					<a href="WCMSAdminServlet?action=logs&amp;sort=backupContentFile&amp;sortOrder={$currentSortOrder}"> (Inhalt</a>
-					<a href="WCMSAdminServlet?action=logs&amp;sort=backupNavigationFile&amp;sortOrder={$currentSortOrder}">, Navigation)</a>
+					<a href="MCRWCMSAdminServlet?action=logs&amp;sort=backupContentFile&amp;sortOrder={$currentSortOrder}"> (Inhalt</a>
+					<a href="MCRWCMSAdminServlet?action=logs&amp;sort=backupNavigationFile&amp;sortOrder={$currentSortOrder}">, Navigation)</a>
 				</th>
 			</xsl:when>
 		</xsl:choose-->

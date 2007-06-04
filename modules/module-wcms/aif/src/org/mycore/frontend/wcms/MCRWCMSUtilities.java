@@ -16,16 +16,22 @@ import org.mycore.common.MCRConfiguration;
 public class MCRWCMSUtilities {
 	final static String OBJIDPREFIX= "webpage:";
 	
-	public static boolean access(String webpageID, String permission) throws JDOMException, IOException {
-		return getAccessGeneral() && getAccess(webpageID, permission);
+	public static boolean readAccess(String webpageID, String permission) throws JDOMException, IOException {
+		return getAccess(webpageID, permission);
+	}
+	
+	public static boolean writeAccess(String webpageID, String permission) throws JDOMException, IOException {
+		return getWriteAccessGeneral() && readAccess(webpageID, permission);
 	}
 
 	private static boolean getAccess(String webpageID, String permission) throws JDOMException, IOException {
+		
 		// get item as JDOM-Element
 		final Document navi = getNavi();
 		String xpathExp = "//item[@href='"+webpageID+"']";
 		XPath xpath = XPath.newInstance(xpathExp); 
 		Element item = (Element)xpath.selectSingleNode(navi);
+		
 		// check permission != false of each parent item and of current one
 		boolean access = true;
 		MCRAccessInterface am = MCRAccessManager.getAccessImpl();
@@ -36,10 +42,11 @@ public class MCRWCMSUtilities {
 				access = am.checkPermission(objID,permission);
 			item = item.getParentElement();
 		} while (item!=null && access);
+		
 		return access;
 	}
 
-	public static boolean getAccessGeneral(){
+	private static boolean getWriteAccessGeneral(){
 		return MCRAccessManager.getAccessImpl().checkPermission("wcms-access");
 	}
 	

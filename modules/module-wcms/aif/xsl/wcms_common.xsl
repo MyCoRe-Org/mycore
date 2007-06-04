@@ -11,7 +11,7 @@
 	
 	<!--BEGIN: Adminmenu-->
 	<xsl:variable name="servletAnswer_XML" 
-		select="document('request:servlets/WCMSLoginServlet?XSL.Style=xml&amp;flag=true')"
+		select="document('request:servlets/MCRWCMSLoginServlet?XSL.Style=xml&amp;flag=true')"
     />
 	
      <xsl:if test="$servletAnswer_XML/cms/modus/text() = 'true'">

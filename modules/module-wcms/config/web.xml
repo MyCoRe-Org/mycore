@@ -2,52 +2,52 @@
 <!-- Servlets and mappings of module-wcms                             -->
 <!-- **************************************************************** -->
 
-<servlet id="WCMSLoginServlet">
-	<servlet-name> WCMSLoginServlet </servlet-name>
-	<servlet-class> org.mycore.frontend.wcms.WCMSLoginServlet </servlet-class>
+<servlet id="MCRWCMSLoginServlet">
+	<servlet-name> MCRWCMSLoginServlet </servlet-name>
+	<servlet-class> org.mycore.frontend.wcms.MCRWCMSLoginServlet </servlet-class>
 </servlet>
-<servlet id="WCMSChooseServlet">
-	<servlet-name> WCMSChooseServlet </servlet-name>
-	<servlet-class> org.mycore.frontend.wcms.WCMSChooseServlet </servlet-class>
+<servlet id="MCRWCMSChooseServlet">
+	<servlet-name> MCRWCMSChooseServlet </servlet-name>
+	<servlet-class> org.mycore.frontend.wcms.MCRWCMSChooseServlet </servlet-class>
 </servlet>
-<servlet id="WCMSActionServlet">
-	<servlet-name> WCMSActionServlet </servlet-name>
-	<servlet-class> org.mycore.frontend.wcms.WCMSActionServlet </servlet-class>
+<servlet id="MCRWCMSActionServlet">
+	<servlet-name> MCRWCMSActionServlet </servlet-name>
+	<servlet-class> org.mycore.frontend.wcms.MCRWCMSActionServlet </servlet-class>
 </servlet>
-<servlet id="WCMSAdminServlet">
-	<servlet-name> WCMSAdminServlet </servlet-name>
-	<servlet-class> org.mycore.frontend.wcms.WCMSAdminServlet </servlet-class>
+<servlet id="MCRWCMSAdminServlet">
+	<servlet-name> MCRWCMSAdminServlet </servlet-name>
+	<servlet-class> org.mycore.frontend.wcms.MCRWCMSAdminServlet </servlet-class>
 </servlet>
-<servlet id="WCMSFileUploadServlet">
-	<servlet-name> WCMSFileUploadServlet </servlet-name>
-	<servlet-class> org.mycore.frontend.wcms.WCMSFileUploadServlet </servlet-class>
+<servlet id="MCRWCMSFileUploadServlet">
+	<servlet-name> MCRWCMSFileUploadServlet </servlet-name>
+	<servlet-class> org.mycore.frontend.wcms.MCRWCMSFileUploadServlet </servlet-class>
 </servlet>
-<servlet id="WCMSGetStaticHTMLServlet">
-	<servlet-name> WCMSGetStaticHTMLServlet </servlet-name>
-	<servlet-class> org.mycore.frontend.wcms.WCMSGetStaticHTMLServlet </servlet-class>
+<servlet id="MCRWCMSGetStaticHTMLServlet">
+	<servlet-name> MCRWCMSGetStaticHTMLServlet </servlet-name>
+	<servlet-class> org.mycore.frontend.wcms.MCRWCMSGetStaticHTMLServlet </servlet-class>
 </servlet>
 
 <servlet-mapping>
-	<servlet-name> WCMSLoginServlet </servlet-name>
-	<url-pattern> /servlets/WCMSLoginServlet </url-pattern>
+	<servlet-name> MCRWCMSLoginServlet </servlet-name>
+	<url-pattern> /servlets/MCRWCMSLoginServlet </url-pattern>
 </servlet-mapping>
 <servlet-mapping>
-	<servlet-name> WCMSChooseServlet </servlet-name>
-	<url-pattern> /servlets/WCMSChooseServlet </url-pattern>
+	<servlet-name> MCRWCMSChooseServlet </servlet-name>
+	<url-pattern> /servlets/MCRWCMSChooseServlet </url-pattern>
 </servlet-mapping>
 <servlet-mapping>
-	<servlet-name> WCMSActionServlet </servlet-name>
-	<url-pattern> /servlets/WCMSActionServlet </url-pattern>
+	<servlet-name> MCRWCMSActionServlet </servlet-name>
+	<url-pattern> /servlets/MCRWCMSActionServlet </url-pattern>
 </servlet-mapping>
 <servlet-mapping>
-	<servlet-name> WCMSAdminServlet </servlet-name>
-	<url-pattern> /servlets/WCMSAdminServlet </url-pattern>
+	<servlet-name> MCRWCMSAdminServlet </servlet-name>
+	<url-pattern> /servlets/MCRWCMSAdminServlet </url-pattern>
 </servlet-mapping>
 <servlet-mapping>
-	<servlet-name> WCMSFileUploadServlet </servlet-name>
-	<url-pattern> /servlets/WCMSFileUploadServlet </url-pattern>
+	<servlet-name> MCRWCMSFileUploadServlet </servlet-name>
+	<url-pattern> /servlets/MCRWCMSFileUploadServlet </url-pattern>
 </servlet-mapping>
 <servlet-mapping>
-	<servlet-name> WCMSGetStaticHTMLServlet </servlet-name>
-	<url-pattern> /servlets/WCMSGetStaticHTMLServlet </url-pattern>
+	<servlet-name> MCRWCMSGetStaticHTMLServlet </servlet-name>
+	<url-pattern> /servlets/MCRWCMSGetStaticHTMLServlet </url-pattern>
 </servlet-mapping>

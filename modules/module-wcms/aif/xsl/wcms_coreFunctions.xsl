@@ -162,7 +162,7 @@ parameters:
 				<div class="leftmenu">
 					<ul class="menu">
 						<li>
-							<a href="{$ServletsBaseURL}WCMSAdminServlet{$JSessionID}?action=choose">
+							<a href="{$ServletsBaseURL}MCRWCMSAdminServlet{$JSessionID}?action=choose">
 								<xsl:if test="$menupunkt='Bearbeiten'">
 									<xsl:attribute name="class">
 										<xsl:value-of select="'current'"/>
@@ -184,7 +184,7 @@ parameters:
 							</a>
 						</li>
 						<li>
-							<a href="{$ServletsBaseURL}WCMSAdminServlet{$JSessionID}?action=managGlobal">
+							<a href="{$ServletsBaseURL}MCRWCMSAdminServlet{$JSessionID}?action=managGlobal">
 								<xsl:if test="$menupunkt='Einstellungen'">
 									<xsl:attribute name="class">
 										<xsl:value-of select="'current'"/>
@@ -194,7 +194,7 @@ parameters:
 							</a>
 						</li>
 						<li>
-							<a href="{$ServletsBaseURL}WCMSAdminServlet{$JSessionID}?action=logs&amp;sort=date&amp;sortOrder=descending">
+							<a href="{$ServletsBaseURL}MCRWCMSAdminServlet{$JSessionID}?action=logs&amp;sort=date&amp;sortOrder=descending">
 								<xsl:if test="$menupunkt='Statistik'">
 									<xsl:attribute name="class">
 										<xsl:value-of select="'current'"/>

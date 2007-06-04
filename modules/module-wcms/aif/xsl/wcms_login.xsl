@@ -82,7 +82,7 @@ section: Template: wcmsLogin
 				</div>
 				-->
 				<div id="login-maske">
-					<form name="login" action="{$ServletsBaseURL}WCMSLoginServlet" method="post">
+					<form name="login" action="{$ServletsBaseURL}MCRWCMSLoginServlet" method="post">
 						<fieldset>
 							<!-- legend style="display:inline;">Anmelden zu statischen Seiten</legend>
 							<p>Um statische Seiten anzulegen und zu pflegen, melden Sie sich bitte hier an.</p-->

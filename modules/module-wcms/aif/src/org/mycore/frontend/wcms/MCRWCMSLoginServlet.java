@@ -47,8 +47,8 @@ import org.mycore.frontend.wcms.util.HashCipher;
 /**
  * Loginprocess for Web-Content-Management-System (WCMS).
  */
-public class WCMSLoginServlet extends WCMSServlet {
-    private static Logger LOGGER = Logger.getLogger(WCMSLoginServlet.class);
+public class MCRWCMSLoginServlet extends MCRWCMSServlet {
+    private static Logger LOGGER = Logger.getLogger(MCRWCMSLoginServlet.class);
 
     /**
      * Identify and assign the system dependent file seperator character.

@@ -43,7 +43,7 @@ import org.jdom.input.SAXBuilder;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 
-public class WCMSGetStaticHTMLServlet extends WCMSServlet {
+public class MCRWCMSGetStaticHTMLServlet extends MCRWCMSServlet {
     private Namespace ns = Namespace.XML_NAMESPACE; // xml Namespace for the
 
     // language attribute lang

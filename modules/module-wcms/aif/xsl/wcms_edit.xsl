@@ -68,7 +68,7 @@ template:
 					<xsl:for-each
 						select="document($navigationBase)/navigation/*">
 						<xsl:variable name="dirPath"
-							select="concat( parent::node()/@dir , @dir )"/>
+							select="concat( parent::node()/@href , @href )"/>
 						<xsl:if test=" $dirPath = $href ">
 							<xsl:value-of select="@label"/>
 						</xsl:if>
@@ -180,13 +180,13 @@ template:
 					<xsl:choose>
 						<xsl:when test="$check = '1' ">
 							<a
-								href="{$ServletsBaseURL}WCMSActionServlet{$JSessionID}?delete=false&amp;wcmsID=0024&amp;back=true&amp;address={$address}"
+								href="{$ServletsBaseURL}MCRWCMSActionServlet{$JSessionID}?delete=false&amp;wcmsID=0024&amp;back=true&amp;address={$address}"
 								class="button">
 								<xsl:value-of
 									select="i18n:translate('wcms.menus.deleteCancel')"/>
 							</a>
 							<a
-								href="{$ServletsBaseURL}WCMSActionServlet{$JSessionID}?delete=true&amp;labelPath={$labelPath}&amp;wcmsID=0024&amp;back=true&amp;address={$address}"
+								href="{$ServletsBaseURL}MCRWCMSActionServlet{$JSessionID}?delete=true&amp;labelPath={$labelPath}&amp;wcmsID=0024&amp;back=true&amp;address={$address}"
 								class="button">
 								<xsl:value-of
 									select="i18n:translate('wcms.menus.deleteAccept')"/>
@@ -194,13 +194,13 @@ template:
 						</xsl:when>
 						<xsl:otherwise>
 							<a
-								href="{$ServletsBaseURL}WCMSActionServlet{$JSessionID}?delete=false&amp;wcmsID=0024"
+								href="{$ServletsBaseURL}MCRWCMSActionServlet{$JSessionID}?delete=false&amp;wcmsID=0024"
 								class="button">
 								<xsl:value-of
 									select="i18n:translate('wcms.menus.deleteCancel')"/>
 							</a>
 							<a
-								href="{$ServletsBaseURL}WCMSActionServlet{$JSessionID}?delete=true&amp;labelPath={$labelPath}&amp;wcmsID=0024"
+								href="{$ServletsBaseURL}MCRWCMSActionServlet{$JSessionID}?delete=true&amp;labelPath={$labelPath}&amp;wcmsID=0024"
 								class="button">
 								<xsl:value-of
 									select="i18n:translate('wcms.menus.deleteAccept')"/>
@@ -253,11 +253,11 @@ template:
 				<xsl:choose>
 					<xsl:when test="$check = '1' ">
 						<xsl:value-of
-							select="concat($ServletsBaseURL,'WCMSActionServlet',$JSessionID,'?wcmsID=0024&amp;back=true&amp;address=',$address)"/>
+							select="concat($ServletsBaseURL,'MCRWCMSActionServlet',$JSessionID,'?wcmsID=0024&amp;back=true&amp;address=',$address)"/>
 					</xsl:when>
 					<xsl:otherwise>
 						<xsl:value-of
-							select="concat($ServletsBaseURL,'WCMSActionServlet',$JSessionID,'?wcmsID=0024')"/>
+							select="concat($ServletsBaseURL,'MCRWCMSActionServlet',$JSessionID,'?wcmsID=0024')"/>
 					</xsl:otherwise>
 				</xsl:choose>
 			</xsl:variable>
@@ -546,14 +546,14 @@ template:
 							<!-- Historie der Seite -->
 							<xsl:variable name="servletPath">
 								<xsl:value-of
-									select="concat('request:servlets/WCMSAdminServlet',$JSessionID,'?action=logs&amp;sort=date&amp;sortOrder=descending&amp;XSL.Style=xml')"/>
+									select="concat('request:servlets/MCRWCMSAdminServlet',$JSessionID,'?action=logs&amp;sort=date&amp;sortOrder=descending&amp;XSL.Style=xml')"/>
 							</xsl:variable>
 							<xsl:variable name="logData">
 								<xsl:copy-of
 									select="xalan:nodeset(document($servletPath))"/>
 							</xsl:variable>
 		
-									<!-- div class="titel">WCMS Nutzungsprotokoll</div -->
+									<!-- div class="titel">MCRWCMS Nutzungsprotokoll</div -->
 	
 									<table id="statistic2">
 										<xsl:call-template name="logs.headLine">
@@ -628,14 +628,14 @@ template:
 							<xsl:choose>
 								<xsl:when test="$check = '1' ">
 									<a class="button"
-										href="{$ServletsBaseURL}WCMSAdminServlet?todo=exit&amp;address={$address}">
+										href="{$ServletsBaseURL}MCRWCMSAdminServlet?todo=exit&amp;address={$address}">
 										<xsl:value-of
 											select="i18n:translate('wcms.buttons.cancel')"/>
 									</a>
 								</xsl:when>
 								<xsl:otherwise>
 									<a class="button"
-										href="{$ServletsBaseURL}WCMSAdminServlet?todo=exit&amp;wcmsID=0024">
+										href="{$ServletsBaseURL}MCRWCMSAdminServlet?todo=exit&amp;wcmsID=0024">
 										<xsl:value-of
 											select="i18n:translate('wcms.buttons.cancel')"/>
 									</a>

@@ -45,7 +45,7 @@ docportal build.xml
 		</xsl:call-template>
 
 
-		<form name="choose" action="{$ServletsBaseURL}WCMSChooseServlet{$JSessionID}" method="post">
+		<form name="choose" action="{$ServletsBaseURL}MCRWCMSChooseServlet{$JSessionID}" method="post">
 
 		<!-- Inhaltsbereich -->
 		<div id="auswahl">
@@ -306,7 +306,7 @@ section: Template: name="chooseContent"
 									<xsl:choose>
 										<!-- allowed -->
 										<xsl:when test=" position() = last() " >
-											<option value="2{@dir}">
+											<option value="2{@href}">
 												<xsl:value-of select="label[lang($DefaultLang)]" />
 											</option>
 										</xsl:when>

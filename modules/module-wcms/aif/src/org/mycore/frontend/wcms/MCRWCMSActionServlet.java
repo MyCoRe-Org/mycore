@@ -72,7 +72,7 @@ import org.xml.sax.InputSource;
  * @author m5brmi-sh, Thomas Scheffler (yagee)
  * @version
  */
-public class WCMSActionServlet extends WCMSServlet {
+public class MCRWCMSActionServlet extends MCRWCMSServlet {
 	
 	private static final long serialVersionUID = 1L;
 
@@ -205,7 +205,7 @@ public class WCMSActionServlet extends WCMSServlet {
 
     File[] masterTemplates;
 
-    static Logger logger = Logger.getLogger(WCMSActionServlet.class);
+    static Logger logger = Logger.getLogger(MCRWCMSActionServlet.class);
 
     MCRSession mcrSession = null;
 

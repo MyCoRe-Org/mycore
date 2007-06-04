@@ -43,14 +43,14 @@ import org.jdom.Element;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 
-public class WCMSFileUploadServlet extends WCMSServlet {
+public class MCRWCMSFileUploadServlet extends MCRWCMSServlet {
     private static final long serialVersionUID = 1L;
 
     private static final File DOCUMENT_DIR = new File(CONFIG.getString("MCR.WCMS.documentPath").replace('/', File.separatorChar));
 
     private static final File IMAGE_DIR = new File(CONFIG.getString("MCR.WCMS.imagePath").replace('/', File.separatorChar));
 
-    private static final Logger LOGGER = Logger.getLogger(WCMSFileUploadServlet.class);
+    private static final Logger LOGGER = Logger.getLogger(MCRWCMSFileUploadServlet.class);
 
     /**
      * Main program called by doGet and doPost.
