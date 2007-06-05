@@ -31,6 +31,7 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 
 import org.mycore.common.MCRConfiguration;
+import org.mycore.common.MCRSessionMgr;
 
 /**
  * is a wrapper for shutdown hooks.
@@ -115,6 +116,8 @@ public class MCRShutdownHandler {
                 it.remove();
             }
         }
+        System.out.println(system+" closing any remaining MCRSession instances, please wait...\n");
+        MCRSessionMgr.close();
         System.out.println(system + " Goodbye, and remember: \"Alles wird gut.\"\n");
     }
 

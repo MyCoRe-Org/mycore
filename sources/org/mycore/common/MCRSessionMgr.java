@@ -32,7 +32,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import org.mycore.common.events.MCRSessionEvent;
 import org.mycore.common.events.MCRSessionListener;
 
 /**
@@ -193,6 +192,14 @@ public class MCRSessionMgr {
      */
     static ReentrantReadWriteLock getListenersLock() {
         return listenersLock;
+    }
+    
+    public static void close(){
+        listenersLock.writeLock().lock();
+        for (MCRSession session:sessions.values()){
+            session.close();
+        }
+        listenersLock.writeLock().unlock();
     }
 
 }
