@@ -106,7 +106,7 @@ public class MCRSessionContext extends ThreadLocalSessionContext implements MCRS
      * Closes Session if Session is still open.
      */
     private void autoCloseSession(Session currentSession) {
-        if (currentSession.isOpen()) {
+        if (currentSession != null && currentSession.isOpen()) {
             LOGGER.debug("Autoclosing current hibernate Session");
             currentSession.close();
         }
@@ -119,7 +119,7 @@ public class MCRSessionContext extends ThreadLocalSessionContext implements MCRS
             LOGGER.debug("First Thread to access " + mcrSession);
             LOGGER.debug("Try to reuse hibernate Session from current " + mcrSession);
             Object obj = mcrSession.get(SESSION_KEY);
-            if (obj != null && ((Session)obj).isOpen()) {
+            if (obj != null && ((Session) obj).isOpen()) {
                 LOGGER.debug("Reusing old hibernate Session.");
                 return (org.hibernate.classic.Session) obj;
             }
@@ -148,10 +148,12 @@ public class MCRSessionContext extends ThreadLocalSessionContext implements MCRS
 
     @Override
     protected CleanupSynch buildCleanupSynch() {
-        return new CleanupSynch(factory){
+        return new CleanupSynch(factory) {
             private static final long serialVersionUID = -7894370437708819993L;
+
             public void afterCompletion(int arg0) {
             }
+
             public void beforeCompletion() {
             }
         };
