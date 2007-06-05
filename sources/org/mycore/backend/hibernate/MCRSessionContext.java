@@ -91,7 +91,6 @@ public class MCRSessionContext extends ThreadLocalSessionContext implements MCRS
         case destroyed:
             currentSession = unbind(factory);
             autoCloseSession(currentSession);
-            currentSession.close();
             Object obj = mcrSession.get(SESSION_KEY);
             if (obj != null && currentSession != obj) {
                 autoCloseSession((Session) obj);
