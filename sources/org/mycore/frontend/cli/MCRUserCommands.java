@@ -34,7 +34,7 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
-import org.mycore.common.MCRConfiguration;
+
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.xml.MCRXMLHelper;
@@ -892,9 +892,6 @@ public class MCRUserCommands extends MCRAbstractCommands {
      *            a FileOutputStream object for the output
      */
     private static final void saveToXMLFile(org.jdom.Document jdomDoc, FileOutputStream outFile) throws MCRException {
-        // get encoding
-        CONFIG = MCRConfiguration.instance();
-
         String mcr_encoding = CONFIG.getString("MCR.Metadata.DefaultEncoding", DEFAULT_ENCODING);
 
         // Create the output

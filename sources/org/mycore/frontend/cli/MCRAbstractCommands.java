@@ -37,17 +37,10 @@ import org.mycore.common.MCRConfiguration;
  */
 public class MCRAbstractCommands implements MCRExternalCommandInterface {
     /** The configuration instance */
-    protected static MCRConfiguration CONFIG = null;
+    protected static final MCRConfiguration CONFIG = MCRConfiguration.instance();
 
     /** The array holding all known commands */
     protected ArrayList<MCRCommand> command = null;
-
-    /**
-     * Initialize common data.
-     */
-    static {
-        CONFIG = MCRConfiguration.instance();
-    }
 
     /**
      * The constrctor.
@@ -63,7 +56,7 @@ public class MCRAbstractCommands implements MCRExternalCommandInterface {
      * 
      * @return a command pair RArrayList
      */
-    public final ArrayList getPossibleCommands() {
+    public final ArrayList<MCRCommand> getPossibleCommands() {
         return command;
     }
 }

@@ -102,8 +102,7 @@ public class MCRClassificationCommands extends MCRAbstractCommands {
         MCRObjectID mcr_id = new MCRObjectID(ID);
 
         try {
-            MCRClassification cl = new MCRClassification();
-            cl.deleteFromDatastore(mcr_id);
+            MCRClassification.deleteFromDatastore(mcr_id);
             LOGGER.info(mcr_id.getId() + " deleted.");
         } catch (MCRException ex) {
             LOGGER.debug(ex.getStackTraceAsString());
@@ -277,8 +276,7 @@ public class MCRClassificationCommands extends MCRAbstractCommands {
             }
         }
         MCRObjectID mcr_id = new MCRObjectID(ID);
-        MCRClassification cl = new MCRClassification();
-        byte[] xml = cl.retrievClassificationAsXML(mcr_id.getId());
+        byte[] xml = MCRClassification.retrievClassificationAsXML(mcr_id.getId());
 
         try {
             Transformer trans = getTransformer(style);

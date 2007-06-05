@@ -178,9 +178,8 @@ public class MCRCommand {
 
         for (int i = 0; i < numParameters; i++) {
             if (parameterTypes[i] == Integer.TYPE) {
-                parameters[i] = new Integer(((Number) commandParameters[j]).intValue());
+                parameters[i] = ((Integer)commandParameters[j]).intValue(); 
                 j++;
-
                 continue;
             }
 

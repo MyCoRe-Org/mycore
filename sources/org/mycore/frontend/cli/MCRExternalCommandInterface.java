@@ -39,5 +39,5 @@ public interface MCRExternalCommandInterface {
      * 
      * @return a command pair RArrayList
      */
-    public ArrayList getPossibleCommands();
+    public ArrayList<MCRCommand> getPossibleCommands();
 }

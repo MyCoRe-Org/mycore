@@ -41,17 +41,15 @@ import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
 
-import org.mycore.access.MCRAccessBaseImpl;
 import org.mycore.access.MCRAccessInterface;
 import org.mycore.access.MCRAccessManager;
-import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 import org.mycore.common.xml.MCRURIResolver;
+import org.mycore.datamodel.common.MCRXMLTableManager;
 import org.mycore.datamodel.ifs.MCRFileImportExport;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.datamodel.common.MCRXMLTableManager;
 
 /**
  * Provides static methods that implement commands for the MyCoRe command line

@@ -75,10 +75,10 @@ public class MCRCommandLineInterface {
     private static MCRConfiguration config = null;
 
     /** The array holding all known commands */
-    protected static ArrayList knownCommands = new ArrayList();
+    protected static ArrayList<MCRCommand> knownCommands = new ArrayList<MCRCommand>();
 
     /** A queue of commands waiting to be executed */
-    protected static Vector commandQueue = new Vector();
+    protected static Vector<String> commandQueue = new Vector<String>();
 
     /** The standard input console where the user enters commands */
     protected static BufferedReader console = new BufferedReader(new InputStreamReader(System.in));
@@ -136,7 +136,7 @@ public class MCRCommandLineInterface {
                 String msg = "Could not instantiate class " + classname;
                 throw new org.mycore.common.MCRConfigurationException(msg, e);
             }
-            ArrayList commands = ((MCRExternalCommandInterface) obj).getPossibleCommands();
+            ArrayList<MCRCommand> commands = ((MCRExternalCommandInterface) obj).getPossibleCommands();
             knownCommands.addAll(commands);
         }
     }
@@ -231,18 +231,20 @@ public class MCRCommandLineInterface {
      *            The command string to be processed
      */
     protected static void processCommand(String command) {
+        long start = System.currentTimeMillis();
         Transaction tx = MCRHIBConnection.instance().getSession().beginTransaction();
+        boolean commandProcessed = false;
         try {
-            for (int i = 0; i < knownCommands.size(); i++) {
-                long time = System.currentTimeMillis();
-                if (((MCRCommand) knownCommands.get(i)).invoke(command.trim())) {
-                    time = System.currentTimeMillis() - time;
-                    System.out.println(system + " Command processed (" + time + " ms)");
-                    return;
-                }
+            for (MCRCommand currentCommand : knownCommands) {
+                commandProcessed = currentCommand.invoke(command);
+                if (commandProcessed)
+                    break;
             }
             tx.commit();
-            System.out.println(system + " Command not understood. Enter 'help' to get a list of commands.");
+            if (commandProcessed)
+                System.out.printf("%s Command processed (%d ms)\n", system, (System.currentTimeMillis() - start));
+            else
+                System.out.printf("%s Command not understood. Enter 'help' to get a list of commands.\n", system);
         } catch (Exception ex) {
             tx.rollback();
             showException(ex, false);
