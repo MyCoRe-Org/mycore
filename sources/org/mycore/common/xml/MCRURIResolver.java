@@ -318,7 +318,7 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
     }
 
     private Element resolveURI(String uri) throws Exception {
-        LOGGER.info("Reading xml from uri " + uri);
+        LOGGER.debug("Reading xml from uri " + uri);
         String scheme = getScheme(uri);
         return getResolver(scheme).resolveElement(uri);
     }
