@@ -30,11 +30,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.Session;
-import org.hibernate.Transaction;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.tool.hbm2ddl.SchemaUpdate;
 
-import org.mycore.access.mcrimpl.MCRAccessControlSystem;
 import org.mycore.access.mcrimpl.MCRAccessStore;
 import org.mycore.access.mcrimpl.MCRRuleMapping;
 import org.mycore.backend.hibernate.tables.MCRACCESS;
@@ -48,6 +46,7 @@ import org.mycore.backend.hibernate.tables.MCRACCESSPK;
  */
 public class MCRHIBAccessStore extends MCRAccessStore {
     final protected static MCRHIBConnection hibconnection = MCRHIBConnection.instance();
+    private static final DateFormat DATE_FORMAT = new SimpleDateFormat(sqlDateformat);
 
     public MCRHIBAccessStore() {
         createTables();
@@ -86,14 +85,11 @@ public class MCRHIBAccessStore extends MCRAccessStore {
             Session session = MCRHIBConnection.instance().getSession();
             MCRACCESS accdef = new MCRACCESS();
 
-            DateFormat df = new SimpleDateFormat(sqlDateformat);
             accdef.setKey(new MCRACCESSPK(rulemapping.getPool(), rulemapping.getObjId()));
             accdef.setRid(rulemapping.getRuleId());
             accdef.setCreator(rulemapping.getCreator());
-            accdef.setCreationdate(Timestamp.valueOf(df.format(rulemapping.getCreationdate())));
+            accdef.setCreationdate(Timestamp.valueOf(DATE_FORMAT.format(rulemapping.getCreationdate())));
             session.save(accdef);
-
-            ((MCRAccessControlSystem) MCRAccessControlSystem.instance()).removeFromCache(rulemapping.getObjId(), rulemapping.getPool());
         }
     }
 
@@ -152,22 +148,13 @@ public class MCRHIBAccessStore extends MCRAccessStore {
      * update AccessDefinition in db for given MCRAccessData
      */
     public void updateAccessDefinition(MCRRuleMapping rulemapping) {
-        // do that in one transaction
         Session session = MCRHIBConnection.instance().getSession();
-        // delete
-        session.createQuery("delete MCRACCESS " + "where ACPOOL = '" + rulemapping.getPool() + "'" + " AND OBJID = '" + rulemapping.getObjId() + "'")
-                .executeUpdate();
-
-        // insert
-        MCRACCESS accdef = new MCRACCESS();
-        DateFormat df = new SimpleDateFormat(sqlDateformat);
-        accdef.setKey(new MCRACCESSPK(rulemapping.getPool(), rulemapping.getObjId()));
+        // update
+        MCRACCESS accdef = (MCRACCESS)session.get(MCRACCESS.class, new MCRACCESSPK(rulemapping.getPool(), rulemapping.getObjId()));
         accdef.setRid(rulemapping.getRuleId());
         accdef.setCreator(rulemapping.getCreator());
-        accdef.setCreationdate(Timestamp.valueOf(df.format(rulemapping.getCreationdate())));
-        session.save(accdef);
-
-        ((MCRAccessControlSystem) MCRAccessControlSystem.instance()).removeFromCache(rulemapping.getObjId(), rulemapping.getPool());
+        accdef.setCreationdate(Timestamp.valueOf(DATE_FORMAT.format(rulemapping.getCreationdate())));
+        session.update(accdef);
     }
 
     /**
