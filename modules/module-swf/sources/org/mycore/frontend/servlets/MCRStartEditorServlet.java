@@ -50,6 +50,7 @@ import org.mycore.datamodel.ifs.MCRDirectory;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.datamodel.metadata.MCRObjectService;
 import org.mycore.frontend.fileupload.MCRUploadHandlerIFS;
 import org.mycore.frontend.fileupload.MCRUploadHandlerMyCoRe;
 import org.mycore.frontend.workflow.MCRSimpleWorkflowManager;
@@ -558,16 +559,15 @@ public class MCRStartEditorServlet extends MCRServlet {
         }
 
         // read object
-        org.jdom.Element serviceelm = null;
-        MCRObject obj = new MCRObject();
-        obj.receiveFromDatastore(mysemcrid);
+        MCRObjectService service = new MCRObjectService();
+        //obj.receiveFromDatastore(mysemcrid);
         List permlist = AI.getPermissionsForID(mysemcrid);
         for (int i = 0; i < permlist.size(); i++) {
             org.jdom.Element ruleelm = AI.getRule(mysemcrid, (String) permlist.get(i));
             ruleelm = normalizeACLforSWF(ruleelm);
-            obj.getService().addRule((String) permlist.get(i), ruleelm);
+            service.addRule((String) permlist.get(i), ruleelm);
         }
-        serviceelm = obj.getService().createXML();
+        org.jdom.Element serviceelm = service.createXML();
         if (LOGGER.isDebugEnabled()) {
             org.jdom.Document dof = new org.jdom.Document();
             dof.addContent(serviceelm);

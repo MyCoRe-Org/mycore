@@ -28,6 +28,7 @@ import java.util.List;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRMailer;
 import org.mycore.datamodel.common.MCRActiveLinkException;
+import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.MCRObjectService;
 
@@ -59,6 +60,17 @@ public class MCRCheckCommitACLServlet extends MCRCheckACLBase {
     protected String getNextURL(MCRObjectID ID, boolean okay) throws MCRActiveLinkException {
         StringBuffer sb = new StringBuffer();
         if (okay) {
+            if (ID.getTypeId().equals("class")) {
+                sb.append("browse?mode=edit");
+                return sb.toString();
+            }
+            if (ID.getTypeId().equals("derivate")) {
+                MCRDerivate der = new MCRDerivate();
+                der.receiveFromDatastore(ID);
+                String parent = der.getDerivate().getMetaLink().getXLinkHref();
+                sb.append("receive/").append(parent);
+                return sb.toString();
+            }
             sb.append("receive/").append(ID.getId());
         } else {
             sb.append(CONFIG.getString("MCR.SWF.PageDir", "")).append(CONFIG.getString("MCR.SWF.PageErrorStore", "editor_error_store.xml"));
