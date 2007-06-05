@@ -492,7 +492,6 @@ public class MCRCommandLineInterface {
      * "quit" commands.
      */
     public static void exit() {
-        MCRSessionMgr.getCurrentSession().close();
         System.exit(0);
     }
 }
