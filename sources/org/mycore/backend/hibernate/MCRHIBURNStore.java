@@ -71,18 +71,9 @@ public class MCRHIBURNStore implements MCRURNStore {
         }
 
         Session session = getSession();
-        Transaction tx = session.beginTransaction();
-        try {
-            MCRURN tab = new MCRURN(id,urn);
-            logger.debug("Inserting " + id + "/" + urn + " into database");
-            session.saveOrUpdate(tab);
-            tx.commit();
-        } catch (Exception e) {
-            tx.rollback();
-            logger.error("create: error: ", e);
-        } finally {
-             if ( session != null ) session.close();
-        }
+        MCRURN tab = new MCRURN(id, urn);
+        logger.debug("Inserting " + id + "/" + urn + " into database");
+        session.saveOrUpdate(tab);
     }
 
     /**
@@ -116,17 +107,8 @@ public class MCRHIBURNStore implements MCRURNStore {
         sb.append("delete from ").append(classname).append(" where MCRURN = '").append(urn).append("'");
 
         Session session = getSession();
-        Transaction tx = session.beginTransaction();
-        try {
-            int deleted=session.createQuery(sb.toString()).executeUpdate();
-            logger.debug(deleted+" references deleted.");
-            tx.commit();
-        } catch (Exception e) {
-            tx.rollback();
-            logger.error("delete: error", e);
-        } finally {
-             if ( session != null ) session.close();
-        }
+        int deleted = session.createQuery(sb.toString()).executeUpdate();
+        logger.debug(deleted + " references deleted.");
     }
 
     /**
@@ -144,54 +126,48 @@ public class MCRHIBURNStore implements MCRURNStore {
     /**
      * Retrieves the URN that is assigned to the given document ID
      * 
-      * @param id
+     * @param id
      *            the MCRObjectID as String
-    * @return the urn, or null if no urn is assigned to this ID
+     * @return the urn, or null if no urn is assigned to this ID
      */
     public final String getURNforDocument(String id) throws MCRPersistenceException {
-        if (id == null || (id.length() == 0)) { return null; }
-        
+        if (id == null || (id.length() == 0)) {
+            return null;
+        }
+
         Session session = getSession();
         String ret = null;
         StringBuffer querySB = new StringBuffer("select key.mcrid from ").append(classname).append(" where MCRID='").append(id).append("'");
         logger.debug("HQL-Statement: " + querySB.toString());
         List returns;
-        try {
-            returns = session.createQuery(querySB.toString()).list();
-            if (returns.size() != 1) return ret;
-            ret = (String) returns.get(0);
-        } catch (Exception e) {
-            throw new MCRException("Error during getURNforDocument", e);
-        } finally {
-             if ( session != null ) session.close();
-        }        
+        returns = session.createQuery(querySB.toString()).list();
+        if (returns.size() != 1)
+            return ret;
+        ret = (String) returns.get(0);
         return ret;
     }
 
     /**
      * Retrieves the URN that is assigned to the given document ID
      * 
-      * @param urn
+     * @param urn
      *            the URN as String
-    * @return the document ID, or null if no urn is assigned to this ID
+     * @return the document ID, or null if no urn is assigned to this ID
      */
     public final String getDocumentIDforURN(String urn) throws MCRPersistenceException {
-        if (urn == null || (urn.length() == 0)) { return null; }
-        
+        if (urn == null || (urn.length() == 0)) {
+            return null;
+        }
+
         Session session = getSession();
         String ret = null;
         StringBuffer querySB = new StringBuffer("select key.mcrurn from ").append(classname).append(" where MCRURN='").append(urn).append("'");
         logger.debug("HQL-Statement: " + querySB.toString());
         List returns;
-        try {
-            returns = session.createQuery(querySB.toString()).list();
-            if (returns.size() != 1) return ret;
-            ret = (String) returns.get(0);
-        } catch (Exception e) {
-            throw new MCRException("Error during getDocumentIDforURN", e);
-        } finally {
-             if ( session != null ) session.close();
-        }
+        returns = session.createQuery(querySB.toString()).list();
+        if (returns.size() != 1)
+            return ret;
+        ret = (String) returns.get(0);
         return ret;
     }
 
@@ -202,7 +178,9 @@ public class MCRHIBURNStore implements MCRURNStore {
      */
     public final boolean exist(String urn) {
         boolean exists = false;
-        if (urn == null || (urn.length() == 0)) { return exists; }
+        if (urn == null || (urn.length() == 0)) {
+            return exists;
+        }
 
         Session session = getSession();
         StringBuffer query = new StringBuffer("select key.mcrid from ").append(classname).append(" where key.mcrurn = '").append(urn).append("'");
@@ -210,7 +188,6 @@ public class MCRHIBURNStore implements MCRURNStore {
         if (l.size() > 0) {
             exists = true;
         }
-        session.close();
         return exists;
     }
 

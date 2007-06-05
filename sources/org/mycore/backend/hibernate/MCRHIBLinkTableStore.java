@@ -90,19 +90,8 @@ public class MCRHIBLinkTableStore implements MCRLinkTableInterface {
         }
 
         Session session = getSession();
-        Transaction tx = session.beginTransaction();
-
-        try {
-            MCRLINKHREF l = new MCRLINKHREF(from, to, type, attr);
-            session.saveOrUpdate(l);
-            tx.commit();
-        } catch (Exception e) {
-            tx.rollback();
-            logger.error(e);
-        } finally {
-            if (session != null)
-                session.close();
-        }
+        MCRLINKHREF l = new MCRLINKHREF(from, to, type, attr);
+        session.saveOrUpdate(l);
     }
 
     /**
@@ -131,19 +120,8 @@ public class MCRHIBLinkTableStore implements MCRLinkTableInterface {
         }
 
         Session session = getSession();
-        Transaction tx = session.beginTransaction();
-
-        try {
-            int deleted = session.createQuery(sb.toString()).executeUpdate();
-            logger.debug(deleted + " references deleted.");
-            tx.commit();
-        } catch (Exception e) {
-            tx.rollback();
-            logger.error(e);
-        } finally {
-            if (session != null)
-                session.close();
-        }
+        int deleted = session.createQuery(sb.toString()).executeUpdate();
+        logger.debug(deleted + " references deleted.");
     }
 
     /**
@@ -176,16 +154,8 @@ public class MCRHIBLinkTableStore implements MCRLinkTableInterface {
             qBf.append(" and MCRFROM like \'%_").append(fromtype).append("_%\'");
         }
 
-        try {
-            Query q = session.createQuery(qBf.toString());
-            returns = (Number) q.uniqueResult();
-        } catch (Exception e) {
-            logger.error(e);
-            throw new MCRException("Error during countTo(" + fromtype + "," + to + "," + type + "," + restriction + ")", e);
-        } finally {
-            if (session != null)
-                session.close();
-        }
+        Query q = session.createQuery(qBf.toString());
+        returns = (Number) q.uniqueResult();
 
         return returns.intValue();
     }
@@ -207,17 +177,10 @@ public class MCRHIBLinkTableStore implements MCRLinkTableInterface {
         Session session = getSession();
         String query = "select count(key.mcrfrom), key.mcrto from " + classname + " where MCRTO like '" + mcrtoPrefix + "%' group by key.mcrto";
         logger.debug("HQL-Statement: " + query);
-        try {
-            Iterator results = session.createQuery(query).list().iterator();
-            while (results.hasNext()) {
-                Object[] row = (Object[]) results.next();
-                map.put(row[1], row[0]);
-            }
-        } catch (Exception e) {
-            throw new MCRException("Error during getCountedMapOfMCRTO", e);
-        } finally {
-            if (session != null)
-                session.close();
+        Iterator results = session.createQuery(query).list().iterator();
+        while (results.hasNext()) {
+            Object[] row = (Object[]) results.next();
+            map.put(row[1], row[0]);
         }
         return map;
     }
@@ -242,14 +205,7 @@ public class MCRHIBLinkTableStore implements MCRLinkTableInterface {
         String query = querySB.toString();
         logger.debug("HQL-Statement: " + query);
         List returns;
-        try {
-            returns = session.createQuery(query).list();
-        } catch (Exception e) {
-            throw new MCRException("Error during getSourceOf", e);
-        } finally {
-            if (session != null)
-                session.close();
-        }
+        returns = session.createQuery(query).list();
         return returns;
     }
 
@@ -272,14 +228,7 @@ public class MCRHIBLinkTableStore implements MCRLinkTableInterface {
         String query = querySB.toString();
         logger.debug("HQL-Statement: " + query);
         List returns;
-        try {
-            returns = session.createQuery(query).list();
-        } catch (Exception e) {
-            throw new MCRException("Error during getDestinationOf", e);
-        } finally {
-            if (session != null)
-                session.close();
-        }
+        returns = session.createQuery(query).list();
         return returns;
     }
 

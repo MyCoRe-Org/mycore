@@ -23,8 +23,6 @@
 
 package org.mycore.backend.hibernate;
 
-import java.io.FilterInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.List;
@@ -38,7 +36,6 @@ import org.mycore.common.MCRException;
 import org.mycore.datamodel.ifs.MCRContentInputStream;
 import org.mycore.datamodel.ifs.MCRContentStore;
 import org.mycore.datamodel.ifs.MCRFileReader;
-
 
 /**
  * This class implements the MCRContentStore interface.
@@ -55,15 +52,14 @@ public class MCRHIBCStore extends MCRContentStore {
     }
 
     private synchronized int getNextFreeID() throws Exception {
-        Session session = MCRHIBConnection.instance().getSession(); 
+        Session session = MCRHIBConnection.instance().getSession();
         List l = session.createQuery("select max(storageid) from MCRCSTORE").list();
-        session.close();
-        
+
         if (l.size() > 0) {
-        	int max = ((Integer) l.get(0)).intValue();
-        	return max + 1;
+            int max = ((Integer) l.get(0)).intValue();
+            return max + 1;
         }
-       	return 1;
+        return 1;
     }
 
     protected synchronized String doStoreContent(MCRFileReader file, MCRContentInputStream source) throws Exception {
@@ -75,90 +71,40 @@ public class MCRHIBCStore extends MCRContentStore {
         source.read(b);
 
         MCRCSTORE c = new MCRCSTORE(ID, b);
-        Transaction tx = session.beginTransaction();
-
-        try {
-            session.saveOrUpdate(c);
-            tx.commit();
-        } catch (Exception e) {
-            tx.rollback();
-            logger.error(e);
-        } finally {
-             if ( session != null ) session.close();
-        }
+        session.saveOrUpdate(c);
 
         return storageID;
     }
 
     protected synchronized void doDeleteContent(String ID) throws Exception {
-    	int storageID = Integer.valueOf(ID).intValue();
+        int storageID = Integer.valueOf(ID).intValue();
         Session session = MCRHIBConnection.instance().getSession();
-        Transaction tx = session.beginTransaction();
+        List l = session.createQuery("from MCRCSTORE where storageid=" + storageID).list();
 
-        try {
-            List l = session.createQuery("from MCRCSTORE where storageid=" + storageID ).list();
-
-            for (int t = 0; t < l.size(); t++) {
-                session.delete(l.get(t));
-            }
-
-            tx.commit();
-        } catch (Exception e) {
-            tx.rollback();
-            logger.error(e);
-        } finally {
-             if ( session != null ) session.close();
+        for (int t = 0; t < l.size(); t++) {
+            session.delete(l.get(t));
         }
     }
 
     protected void doRetrieveContent(MCRFileReader file, OutputStream target) throws Exception {
         int storageID = Integer.valueOf(file.getStorageID()).intValue();
         Session session = MCRHIBConnection.instance().getSession();
+        List l = session.createQuery("from MCRCSTORE where storageid=" + storageID).list();
 
-        try {
-            List l = session.createQuery("from MCRCSTORE where storageid=" + storageID ).list();
-
-            if (l.size() < 1) {
-                throw new MCRException("No such content: " + storageID);
-            }
-
-            MCRCSTORE st = (MCRCSTORE) l.get(0);
-            byte[] c = st.getContentBytes();
-            target.write(c);
-        } catch (Exception e) {
-            logger.error(e);
-        } finally {
-             if ( session != null ) session.close();
+        if (l.size() < 1) {
+            throw new MCRException("No such content: " + storageID);
         }
+
+        MCRCSTORE st = (MCRCSTORE) l.get(0);
+        byte[] c = st.getContentBytes();
+        target.write(c);
     }
 
     protected InputStream doRetrieveContent(MCRFileReader file) throws Exception {
         int storageID = Integer.valueOf(file.getStorageID()).intValue();
         Session session = MCRHIBConnection.instance().getSession();
-
-        try {
-            MCRCSTORE st = (MCRCSTORE)session.createQuery("from MCRCSTORE where storageid=" + storageID ).uniqueResult();
-            return new HibInputStream(st.getInputStream(),session);
-        } catch (Exception e) {
-            logger.error(e);
-        } finally {
-             if ( session != null ) session.close();
-        }
-        return null; //in case of error
+        MCRCSTORE st = (MCRCSTORE) session.createQuery("from MCRCSTORE where storageid=" + storageID).uniqueResult();
+        return st.getInputStream();
     }
 
-    private static class HibInputStream extends FilterInputStream {
-
-        private Session session;
-
-        public HibInputStream(InputStream source, Session session) {
-            super(source);
-            this.session = session;
-        }
-
-        public void close() throws IOException {
-            super.close();
-             if ( session != null ) session.close();
-        }
-    }
 }

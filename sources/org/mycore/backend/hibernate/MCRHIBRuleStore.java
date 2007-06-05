@@ -47,11 +47,11 @@ import org.mycore.common.MCRException;
  * 
  */
 public class MCRHIBRuleStore extends MCRRuleStore {
-	
-	public MCRHIBRuleStore() {
-		init();
-	}
-	
+
+    public MCRHIBRuleStore() {
+        init();
+    }
+
     /**
      * Method creates new rule in database by given rule-object
      * 
@@ -62,61 +62,6 @@ public class MCRHIBRuleStore extends MCRRuleStore {
 
         if (!existsRule(rule.getId())) {
             Session session = MCRHIBConnection.instance().getSession();
-            Transaction tx = session.beginTransaction();
-            MCRACCESSRULE hibrule = new MCRACCESSRULE();
-
-            try {
-                DateFormat df = new SimpleDateFormat(sqlDateformat);
-                hibrule.setCreationdate(Timestamp.valueOf(df.format(rule.getCreationTime())));
-                hibrule.setCreator(rule.getCreator());
-                hibrule.setRid(rule.getId());
-                hibrule.setRule(rule.getRuleString());
-                hibrule.setDescription(rule.getDescription());
-                session.saveOrUpdate(hibrule);
-                tx.commit();
-            } catch (Exception e) {
-                tx.rollback();
-                logger.error("createRule: catched error", e);
-            } finally {
-                 if ( session != null ) session.close();
-            }
-        } else {
-            logger.error("rule with id '" + rule.getId() + "' can't be created, rule still exists.");
-        }
-    }
-
-    /**
-     * Method retrieves the ruleIDs of rules, whose string-representation starts with given data
-     * 
-     */
-    public ArrayList retrieveRuleIDs(String ruleExpression, String description) {
-    	ArrayList<String> ret = new ArrayList<String>();
-    	Session session = MCRHIBConnection.instance().getSession();
-        try{
-        	List l = session.createCriteria(MCRACCESSRULE.class)
-        		.add(Restrictions.like("rule", ruleExpression))
-        		.add(Restrictions.like("description", description)).list();
-            for (int i = 0; i < l.size(); i++) {
-                ret.add(((MCRACCESSRULE) l.get(i)).getRid());
-            }        	
-        }catch (Exception e) {
-            logger.error("retrieveRuleIDs: catched error", e);
-        } finally {
-             if ( session != null ) session.close();
-        }
-    	return ret;
-    }
-    
-    /**
-     * Method updates accessrule by given rule. internal: rule will be deleted
-     * first and recreated
-     */
-    public void updateRule(MCRAccessRule rule) {
-        Session session = MCRHIBConnection.instance().getSession();
-        Transaction tx = session.beginTransaction();
-
-        try {
-            session.createQuery("delete MCRACCESSRULE where RID = '" + rule.getId() + "'").executeUpdate();
             MCRACCESSRULE hibrule = new MCRACCESSRULE();
 
             DateFormat df = new SimpleDateFormat(sqlDateformat);
@@ -126,14 +71,43 @@ public class MCRHIBRuleStore extends MCRRuleStore {
             hibrule.setRule(rule.getRuleString());
             hibrule.setDescription(rule.getDescription());
             session.saveOrUpdate(hibrule);
-          
-            tx.commit();
-        } catch (Exception e) {
-            tx.rollback();
-            logger.error("updateRule: catched error",e);
-        } finally {
-             if ( session != null ) session.close();
+        } else {
+            logger.error("rule with id '" + rule.getId() + "' can't be created, rule still exists.");
         }
+    }
+
+    /**
+     * Method retrieves the ruleIDs of rules, whose string-representation starts
+     * with given data
+     * 
+     */
+    public ArrayList retrieveRuleIDs(String ruleExpression, String description) {
+        ArrayList<String> ret = new ArrayList<String>();
+        Session session = MCRHIBConnection.instance().getSession();
+        List l = session.createCriteria(MCRACCESSRULE.class).add(Restrictions.like("rule", ruleExpression)).add(Restrictions.like("description", description))
+                .list();
+        for (int i = 0; i < l.size(); i++) {
+            ret.add(((MCRACCESSRULE) l.get(i)).getRid());
+        }
+        return ret;
+    }
+
+    /**
+     * Method updates accessrule by given rule. internal: rule will be deleted
+     * first and recreated
+     */
+    public void updateRule(MCRAccessRule rule) {
+        Session session = MCRHIBConnection.instance().getSession();
+        session.createQuery("delete MCRACCESSRULE where RID = '" + rule.getId() + "'").executeUpdate();
+        MCRACCESSRULE hibrule = new MCRACCESSRULE();
+
+        DateFormat df = new SimpleDateFormat(sqlDateformat);
+        hibrule.setCreationdate(Timestamp.valueOf(df.format(rule.getCreationTime())));
+        hibrule.setCreator(rule.getCreator());
+        hibrule.setRid(rule.getId());
+        hibrule.setRule(rule.getRuleString());
+        hibrule.setDescription(rule.getDescription());
+        session.saveOrUpdate(hibrule);
     }
 
     /**
@@ -141,17 +115,7 @@ public class MCRHIBRuleStore extends MCRRuleStore {
      */
     public void deleteRule(String ruleid) {
         Session session = MCRHIBConnection.instance().getSession();
-        Transaction tx = session.beginTransaction();
-
-        try {
-            session.createQuery("delete MCRACCESSRULE where RID = '" + ruleid + "'").executeUpdate();          
-            tx.commit();
-        } catch (Exception e) {
-            tx.rollback();
-            logger.error("catched error",e);
-        } finally {
-             if ( session != null ) session.close();
-        }
+        session.createQuery("delete MCRACCESSRULE where RID = '" + ruleid + "'").executeUpdate();
     }
 
     /**
@@ -162,7 +126,7 @@ public class MCRHIBRuleStore extends MCRRuleStore {
      * @return MCRAccessRule object with database values or null
      */
     public MCRAccessRule retrieveRule(String ruleid) {
-    	return getRule(ruleid);
+        return getRule(ruleid);
     }
 
     /**
@@ -188,25 +152,13 @@ public class MCRHIBRuleStore extends MCRRuleStore {
 
         Session session = MCRHIBConnection.instance().getSession();
         MCRAccessRule rule = null;
-        try {
-            logger.debug("Getting MCRACCESSRULE");
-        	MCRACCESSRULE hibrule = (MCRACCESSRULE)session.createCriteria(MCRACCESSRULE.class).add(Restrictions.eq("rid", ruleid)).uniqueResult();
-            logger.debug("Getting MCRACCESSRULE done");
+        MCRACCESSRULE hibrule = (MCRACCESSRULE) session.createCriteria(MCRACCESSRULE.class).add(Restrictions.eq("rid", ruleid)).uniqueResult();
+        logger.debug("Getting MCRACCESSRULE done");
 
-            if (hibrule != null) {
-                try {
-                    logger.debug("new MCRAccessRule");
-                    rule = new MCRAccessRule(ruleid, hibrule.getCreator(), hibrule.getCreationdate(), hibrule.getRule(), hibrule.getDescription());
-                    logger.debug("new MCRAccessRule done");
-                } catch (Exception e) {
-                    throw new MCRException("Rule " + ruleid + " can't be parsed", e);
-                }
-            }
-
-        } catch (Exception e) {
-            logger.error("getRule: catched error: ",e);
-        } finally {
-             if ( session != null ) session.close();
+        if (hibrule != null) {
+            logger.debug("new MCRAccessRule");
+            rule = new MCRAccessRule(ruleid, hibrule.getCreator(), hibrule.getCreationdate(), hibrule.getRule(), hibrule.getDescription());
+            logger.debug("new MCRAccessRule done");
         }
 
         return rule;
@@ -217,18 +169,10 @@ public class MCRHIBRuleStore extends MCRRuleStore {
 
         Session session = MCRHIBConnection.instance().getSession();
         ArrayList<String> ret = new ArrayList<String>();
-
-        try {
-            List l = session.createCriteria(MCRACCESSRULE.class).list();
-            for (int i = 0; i < l.size(); i++) {
-                ret.add(((MCRACCESSRULE) l.get(i)).getRid());
-            }
-        } catch (Exception e) {
-            logger.error("retrieveAllIDs:catched error: ",e);
-        } finally {
-             if ( session != null ) session.close();
+        List l = session.createCriteria(MCRACCESSRULE.class).list();
+        for (int i = 0; i < l.size(); i++) {
+            ret.add(((MCRACCESSRULE) l.get(i)).getRid());
         }
-
         return ret;
     }
 
@@ -242,39 +186,29 @@ public class MCRHIBRuleStore extends MCRRuleStore {
      */
     public boolean existsRule(String ruleid) throws MCRException {
 
-        try {
-            Session session = MCRHIBConnection.instance().getSession();
-            List l = session.createCriteria(MCRACCESSRULE.class).add(Restrictions.eq("rid", ruleid)).list();
-            session.close();
-            if (l.size() == 1) {
-                return true;
-            }
-            return false;
-        } catch (Exception ex) {
-            throw new MCRException("existsRule: catched error", ex);
+        Session session = MCRHIBConnection.instance().getSession();
+        List l = session.createCriteria(MCRACCESSRULE.class).add(Restrictions.eq("rid", ruleid)).list();
+        session.close();
+        if (l.size() == 1) {
+            return true;
         }
+        return false;
     }
 
-	public int getNextFreeRuleID(String prefix) {
-    	int ret = 1;
-    	Session session = MCRHIBConnection.instance().getSession();
-        try{
-        	List l = session.createQuery("select max(rid) from MCRACCESSRULE where rid like '"+prefix+"%'").list();
-            if (l.size() > 0) {
-              	String max = (String) l.get(0);
-              	if (max == null){
-              		ret = 1;
-              	}else {
-                  	int lastNumber = Integer.parseInt(max.substring(prefix.length()));
-                  	ret = lastNumber + 1;              		
-              	}
-            } else
-            	return 1;
-        }catch (Exception e) {
-            logger.error("getNextFreeRuleID: catched error", e);
-        } finally {
-             if ( session != null ) session.close();
-        }
+    public int getNextFreeRuleID(String prefix) {
+        int ret = 1;
+        Session session = MCRHIBConnection.instance().getSession();
+        List l = session.createQuery("select max(rid) from MCRACCESSRULE where rid like '" + prefix + "%'").list();
+        if (l.size() > 0) {
+            String max = (String) l.get(0);
+            if (max == null) {
+                ret = 1;
+            } else {
+                int lastNumber = Integer.parseInt(max.substring(prefix.length()));
+                ret = lastNumber + 1;
+            }
+        } else
+            return 1;
         return ret;
-	}    
+    }
 }

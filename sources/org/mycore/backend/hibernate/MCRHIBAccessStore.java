@@ -48,25 +48,19 @@ import org.mycore.backend.hibernate.tables.MCRACCESSPK;
  */
 public class MCRHIBAccessStore extends MCRAccessStore {
     final protected static MCRHIBConnection hibconnection = MCRHIBConnection.instance();
-    
+
     public MCRHIBAccessStore() {
-    	createTables();
+        createTables();
     }
 
     public String getRuleID(String objID, String ACPool) {
 
         Session session = MCRHIBConnection.instance().getSession();
         String strRuleID = "";
-        try {
-            List l = session.createQuery("from MCRACCESS where OBJID = '" + objID + "' and ACPOOL = '" + ACPool + "'").list();
-           
-            if (l.size() == 1) {
-                strRuleID = ((MCRACCESS) l.get(0)).getRid();
-            }
-        } catch (Exception e) {
-            logger.error(e);
-        } finally {
-             if ( session != null ) session.close();
+        List l = session.createQuery("from MCRACCESS where OBJID = '" + objID + "' and ACPOOL = '" + ACPool + "'").list();
+
+        if (l.size() == 1) {
+            strRuleID = ((MCRACCESS) l.get(0)).getRid();
         }
         return strRuleID;
     }
@@ -76,7 +70,7 @@ public class MCRHIBAccessStore extends MCRAccessStore {
             // update schema -> first time create table
             new SchemaUpdate(MCRHIBConnection.instance().getConfiguration()).execute(true, true);
         } catch (Exception e) {
-            logger.error("error at createTables()" ,e);
+            logger.error("error at createTables()", e);
         }
     }
 
@@ -90,25 +84,16 @@ public class MCRHIBAccessStore extends MCRAccessStore {
 
         if (!existAccessDefinition(rulemapping.getPool(), rulemapping.getObjId())) {
             Session session = MCRHIBConnection.instance().getSession();
-            Transaction tx = session.beginTransaction();
             MCRACCESS accdef = new MCRACCESS();
 
-            try {
-                DateFormat df = new SimpleDateFormat(sqlDateformat);
-                accdef.setKey(new MCRACCESSPK(rulemapping.getPool(), rulemapping.getObjId()));
-                accdef.setRid(rulemapping.getRuleId());
-                accdef.setCreator(rulemapping.getCreator());
-                accdef.setCreationdate(Timestamp.valueOf(df.format(rulemapping.getCreationdate())));
-                session.save(accdef);
-                tx.commit();
-                
-                ((MCRAccessControlSystem)MCRAccessControlSystem.instance()).removeFromCache(rulemapping.getObjId(), rulemapping.getPool());
-            } catch (Exception e) {
-                tx.rollback();
-                logger.error("catched error", e);
-            } finally {
-                 if ( session != null ) session.close();
-            }
+            DateFormat df = new SimpleDateFormat(sqlDateformat);
+            accdef.setKey(new MCRACCESSPK(rulemapping.getPool(), rulemapping.getObjId()));
+            accdef.setRid(rulemapping.getRuleId());
+            accdef.setCreator(rulemapping.getCreator());
+            accdef.setCreationdate(Timestamp.valueOf(df.format(rulemapping.getCreationdate())));
+            session.save(accdef);
+
+            ((MCRAccessControlSystem) MCRAccessControlSystem.instance()).removeFromCache(rulemapping.getObjId(), rulemapping.getPool());
         }
     }
 
@@ -122,47 +107,32 @@ public class MCRHIBAccessStore extends MCRAccessStore {
      */
     private boolean existAccessDefinition(String pool, String objid) {
         Session session = MCRHIBConnection.instance().getSession();
-        try {
-            MCRACCESSPK key = new MCRACCESSPK(pool, objid);
-            List l = session.createCriteria(MCRACCESS.class).add(Restrictions.eq("key", key)).list();
-            if (l.size() == 1) {
-                return true;
-            } 
-            return false;
-        } catch (Exception e) {
-            logger.error(e);
+        MCRACCESSPK key = new MCRACCESSPK(pool, objid);
+        List l = session.createCriteria(MCRACCESS.class).add(Restrictions.eq("key", key)).list();
+        if (l.size() == 1) {
             return true;
-        } finally {
-             if ( session != null ) session.close();
         }
+        return false;
     }
-    
+
     public boolean existsRule(String objid, String pool) {
-    	Session session = MCRHIBConnection.instance().getSession();
-        
-        if(objid == null || objid.equals("")) {
-        	logger.warn("empty parameter objid in existsRule");
-        	return false;
+        Session session = MCRHIBConnection.instance().getSession();
+
+        if (objid == null || objid.equals("")) {
+            logger.warn("empty parameter objid in existsRule");
+            return false;
         }
-        
-        StringBuffer query = new StringBuffer("select count(*) from MCRACCESS ")
-        	.append("where key.objid like '").append(objid).append("'");
+
+        StringBuffer query = new StringBuffer("select count(*) from MCRACCESS ").append("where key.objid like '").append(objid).append("'");
         if (pool != null && !pool.equals("")) {
-        	query.append(" and key.acpool like '").append(pool).append("'");
+            query.append(" and key.acpool like '").append(pool).append("'");
         }
-        
-        try {
-        	int count = ( (Long) session.createQuery(query.toString()).iterate().next() ).intValue();
-        	if (count > 0){
-        		return true;
-        	}
-        	return false;
-        } catch (Exception e) {
-            logger.error("catched error", e);
+
+        int count = ((Number) session.createQuery(query.toString()).iterate().next()).intValue();
+        if (count > 0) {
             return true;
-        } finally {
-             if ( session != null ) session.close();
         }
+        return false;
     }
 
     /**
@@ -174,54 +144,30 @@ public class MCRHIBAccessStore extends MCRAccessStore {
     public void deleteAccessDefinition(MCRRuleMapping rulemapping) {
 
         Session session = MCRHIBConnection.instance().getSession();
-        Transaction tx = session.beginTransaction();
-
-        try {
-            session.createQuery("delete MCRACCESS " + "where ACPOOL = '" + rulemapping.getPool() + "'" + " AND OBJID = '" + rulemapping.getObjId() + "'").executeUpdate();
-            tx.commit();
-        } catch (Exception e) {
-            tx.rollback();
-            logger.error(e);
-            e.printStackTrace();
-        } finally {
-             if ( session != null ) session.close();
-        }
+        session.createQuery("delete MCRACCESS " + "where ACPOOL = '" + rulemapping.getPool() + "'" + " AND OBJID = '" + rulemapping.getObjId() + "'")
+                .executeUpdate();
     }
 
     /**
      * update AccessDefinition in db for given MCRAccessData
      */
     public void updateAccessDefinition(MCRRuleMapping rulemapping) {
-    	// do that in one transaction
+        // do that in one transaction
         Session session = MCRHIBConnection.instance().getSession();
-        Transaction tx = session.beginTransaction();
+        // delete
+        session.createQuery("delete MCRACCESS " + "where ACPOOL = '" + rulemapping.getPool() + "'" + " AND OBJID = '" + rulemapping.getObjId() + "'")
+                .executeUpdate();
 
-        try {
-        	// delete 
-            session.createQuery("delete MCRACCESS " + "where ACPOOL = '" + rulemapping.getPool() + "'" + " AND OBJID = '" + rulemapping.getObjId() + "'").executeUpdate();
-            
-            // insert
-            MCRACCESS accdef = new MCRACCESS();
-            DateFormat df = new SimpleDateFormat(sqlDateformat);
-            accdef.setKey(new MCRACCESSPK(rulemapping.getPool(), rulemapping.getObjId()));
-            accdef.setRid(rulemapping.getRuleId());
-            accdef.setCreator(rulemapping.getCreator());
-            accdef.setCreationdate(Timestamp.valueOf(df.format(rulemapping.getCreationdate())));
-            session.save(accdef);
-            tx.commit();                
+        // insert
+        MCRACCESS accdef = new MCRACCESS();
+        DateFormat df = new SimpleDateFormat(sqlDateformat);
+        accdef.setKey(new MCRACCESSPK(rulemapping.getPool(), rulemapping.getObjId()));
+        accdef.setRid(rulemapping.getRuleId());
+        accdef.setCreator(rulemapping.getCreator());
+        accdef.setCreationdate(Timestamp.valueOf(df.format(rulemapping.getCreationdate())));
+        session.save(accdef);
 
-            ((MCRAccessControlSystem)MCRAccessControlSystem.instance()).removeFromCache(rulemapping.getObjId(), rulemapping.getPool());
-            
-        } catch (Exception e) {
-            tx.rollback();
-            logger.error(e);
-            e.printStackTrace();
-        } finally {
-             if ( session != null ) session.close();
-        }
-
-//    	deleteAccessDefinition(rulemapping);
-//      createAccessDefinition(rulemapping);
+        ((MCRAccessControlSystem) MCRAccessControlSystem.instance()).removeFromCache(rulemapping.getObjId(), rulemapping.getPool());
     }
 
     /**
@@ -239,19 +185,13 @@ public class MCRHIBAccessStore extends MCRAccessStore {
 
         Session session = MCRHIBConnection.instance().getSession();
         MCRRuleMapping rulemapping = new MCRRuleMapping();
-        try {
-            MCRACCESS data = ((MCRACCESS) session.createCriteria(MCRACCESS.class).add(Restrictions.eq("key", new MCRACCESSPK(pool, objid))).list().get(0));
-            if (data != null) {
-                rulemapping.setCreationdate(data.getCreationdate());
-                rulemapping.setCreator(data.getCreator());
-                rulemapping.setObjId(data.getKey().getObjid());
-                rulemapping.setPool(data.getKey().getAcpool());
-                rulemapping.setRuleId(data.getRid());
-            }
-        } catch (Exception e) {
-            logger.error(e);
-        } finally {
-             if ( session != null ) session.close();
+        MCRACCESS data = ((MCRACCESS) session.createCriteria(MCRACCESS.class).add(Restrictions.eq("key", new MCRACCESSPK(pool, objid))).list().get(0));
+        if (data != null) {
+            rulemapping.setCreationdate(data.getCreationdate());
+            rulemapping.setCreator(data.getCreator());
+            rulemapping.setObjId(data.getKey().getObjid());
+            rulemapping.setPool(data.getKey().getAcpool());
+            rulemapping.setRuleId(data.getRid());
         }
 
         return rulemapping;
@@ -262,15 +202,9 @@ public class MCRHIBAccessStore extends MCRAccessStore {
         Session session = MCRHIBConnection.instance().getSession();
         ArrayList<String> ret = new ArrayList<String>();
 
-        try {
-            List l = session.createQuery("from MCRACCESS where ACPOOL = '" + pool + "'").list();
-            for (int i=0; i<l.size(); i++){
-                ret.add(((MCRACCESS) l.get(i)).getKey().getObjid());                
-            }
-        } catch (Exception e) {
-            logger.error(e);
-        } finally {
-             if ( session != null ) session.close();
+        List l = session.createQuery("from MCRACCESS where ACPOOL = '" + pool + "'").list();
+        for (int i = 0; i < l.size(); i++) {
+            ret.add(((MCRACCESS) l.get(i)).getKey().getObjid());
         }
 
         return ret;
@@ -280,53 +214,33 @@ public class MCRHIBAccessStore extends MCRAccessStore {
 
         Session session = MCRHIBConnection.instance().getSession();
         ArrayList<String> ret = new ArrayList<String>();
-        try {
-            List l = session.createQuery("from MCRACCESS where OBJID = '" + objid + "'").list();
-            for (int i=0; i<l.size(); i++){
-                MCRACCESS access = (MCRACCESS) l.get(i);                
-                ret.add(access.getKey().getAcpool());                
-            }
-        } catch (Exception e) {
-            logger.error(e);
-        } finally {
-             if ( session != null ) session.close();
+        List l = session.createQuery("from MCRACCESS where OBJID = '" + objid + "'").list();
+        for (int i = 0; i < l.size(); i++) {
+            MCRACCESS access = (MCRACCESS) l.get(i);
+            ret.add(access.getKey().getAcpool());
         }
-        
+
         return ret;
     }
 
     public ArrayList getDatabasePools() {
-        
-    	ArrayList<String> ret = new ArrayList<String>();
+
+        ArrayList<String> ret = new ArrayList<String>();
         Session session = MCRHIBConnection.instance().getSession();
-        
-        try {
-            List l = session.createCriteria(MCRACCESS.class).list();
-            for (int i=0; i<l.size(); i++){
-                if (! ret.contains(((MCRACCESS)l.get(i)).getKey().getAcpool())){
-                    ret.add(((MCRACCESS)l.get(i)).getKey().getAcpool());
-                }
-            }            
-        } catch (Exception e) {
-            logger.error(e);
-        } finally {
-             if ( session != null ) session.close();
+        List l = session.createCriteria(MCRACCESS.class).list();
+        for (int i = 0; i < l.size(); i++) {
+            if (!ret.contains(((MCRACCESS) l.get(i)).getKey().getAcpool())) {
+                ret.add(((MCRACCESS) l.get(i)).getKey().getAcpool());
+            }
         }
-        
         return ret;
     }
 
-	public List getDistinctStringIDs() {
+    public List getDistinctStringIDs() {
         List ret = new ArrayList();
         Session session = MCRHIBConnection.instance().getSession();
         String query = "select distinct(key.objid) from MCRACCESS order by OBJID";
-        try{
-        	ret = session.createQuery(query).list();        	
-        }catch (Exception e) {
-            logger.error("error stacktrace", e);
-        } finally {
-             if ( session != null ) session.close();
-        }
+        ret = session.createQuery(query).list();
         return ret;
-	}
+    }
 }
