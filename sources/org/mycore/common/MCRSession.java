@@ -250,12 +250,12 @@ public class MCRSession implements Cloneable {
     }
 
     public void close() {
-        // clear bound objects
-        LOGGER.debug("Clearing local map.");
-        map.clear();
         // remove from session list
         LOGGER.debug("Remove myself from MCRSession list");
         MCRSessionMgr.removeSession(this);
+        // clear bound objects
+        LOGGER.debug("Clearing local map.");
+        map.clear();
         this.sessionID = null;
     }
 
