@@ -171,7 +171,8 @@ public class MCRServlet extends HttpServlet {
         session.put("http.session", theSession.getId());
 
         String currentThread = getProperty(req, "currentThreadName");
-        //check if this is request passed the same thread before (RequestDispatcher)
+        // check if this is request passed the same thread before
+        // (RequestDispatcher)
         if (currentThread == null || !currentThread.equals(Thread.currentThread().getName())) {
             // Bind current session to this thread:
             MCRSessionMgr.setCurrentSession(session);
@@ -262,13 +263,19 @@ public class MCRServlet extends HttpServlet {
 
             // Store XSL.*.SESSION parameters to MCRSession
             putParamsToSession(req);
-            tx = MCRHIBConnection.instance().getSession().beginTransaction();
+            if (getProperty(req, INITIAL_SERVLET_NAME_KEY).equals(getServletName())) {
+                // current Servlet not called via RequestDispatcher
+                tx = MCRHIBConnection.instance().getSession().beginTransaction();
+            }
             if (GETorPOST == GET) {
                 doGet(job);
             } else {
                 doPost(job);
             }
-            tx.commit();
+            if (getProperty(req, INITIAL_SERVLET_NAME_KEY).equals(getServletName())) {
+                // current Servlet not called via RequestDispatcher
+                tx.commit();
+            }
         } catch (Exception ex) {
             tx.rollback();
             if (ex instanceof ServletException) {
@@ -283,7 +290,7 @@ public class MCRServlet extends HttpServlet {
             // Release current MCRSession from current Thread,
             // in case that Thread pooling will be used by servlet engine
             if (getProperty(req, INITIAL_SERVLET_NAME_KEY).equals(getServletName())) {
-                //current Servlet not called via RequestDispatcher
+                // current Servlet not called via RequestDispatcher
                 MCRSessionMgr.releaseCurrentSession();
             }
         }
