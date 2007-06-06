@@ -41,6 +41,16 @@ public class MCRCategoryID implements Serializable {
 
     private String ID;
 
+    /**
+     * @param rootID aka Classification ID
+     * @param id aka Category ID
+     */
+    public MCRCategoryID(String rootID, String id) {
+        super();
+        this.rootID = rootID;
+        ID = id;
+    }
+
     /*
      * (non-Javadoc)
      * 

@@ -23,6 +23,8 @@
  **/
 package org.mycore.datamodel.classifications2.impl;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -38,6 +40,81 @@ import org.mycore.datamodel.classifications2.MCRLabel;
  */
 public class MCRCategoryImpl extends MCRAbstractCategoryImpl {
 
+    protected static class ChildList extends ArrayList<MCRCategory> {
+        private static final long serialVersionUID = 180424337316332676L;
+        private MCRCategory root;
+        private MCRCategory thisCategory;
+
+        /**
+         * @param root
+         * @param thisCategory
+         */
+        public ChildList(MCRCategory root, MCRCategory thisCategory) {
+            super();
+            this.root = root;
+            this.thisCategory = thisCategory;
+        }
+
+        @Override
+        public boolean add(MCRCategory e) {
+            final MCRCategoryImpl wrappedCategory = wrapCategory(e);
+            wrappedCategory.setParent(thisCategory);
+            wrappedCategory.setRoot(root);
+            return super.add(wrappedCategory);
+        }
+
+        @Override
+        public MCRCategory remove(int index) {
+            MCRCategory category = super.remove(index);
+            removeAncestorReferences(category);
+            return category;
+        }
+
+        @Override
+        public boolean remove(Object o) {
+            boolean removed = super.remove(o);
+            if (removed) {
+                removeAncestorReferences((MCRCategory) o);
+            }
+            return removed;
+        }
+
+        /**
+         * @param category
+         */
+        private void removeAncestorReferences(MCRCategory category) {
+            if (category instanceof MCRAbstractCategoryImpl) {
+                ((MCRAbstractCategoryImpl) category).parent = null;
+                ((MCRAbstractCategoryImpl) category).root = null;
+            }
+        }
+
+        @Override
+        public MCRCategory set(int index, MCRCategory element) {
+            MCRCategory category = super.set(index, element);
+            if (category != element) {
+                removeAncestorReferences(category);
+            }
+            return category;
+        }
+
+        private MCRCategoryImpl wrapCategory(MCRCategory category) {
+            if (category instanceof MCRCategoryImpl) {
+                return (MCRCategoryImpl) category;
+            }
+            MCRCategoryImpl catImpl = new MCRCategoryImpl();
+            catImpl.setId(category.getId());
+            catImpl.labels = category.getLabels();
+            catImpl.parent = category.getParent();
+            catImpl.root = category.getRoot();
+            for (MCRCategory child : category.getChildren()) {
+                catImpl.getChildren().add(child);
+            }
+            return catImpl;
+        }
+
+    }
+
     private int left, right;
 
     int level;
@@ -46,12 +123,31 @@ public class MCRCategoryImpl extends MCRAbstractCategoryImpl {
     }
 
     /**
+     * @return the left
+     */
+    public int getLeft() {
+        return left;
+    }
+
+    public int getLevel() {
+        return level;
+    }
+
+    /**
+     * @return the right
+     */
+    public int getRight() {
+        return right;
+    }
+
+    /**
      * @param children
      *            the children to set
      */
     public void setChildren(List<MCRCategory> children) {
         childrenLock.writeLock().lock();
-        this.children = children;
+        this.children = new ChildList(this.root, this);
+        this.children.addAll(children);
         childrenLock.writeLock().unlock();
     }
 
@@ -59,23 +155,8 @@ public class MCRCategoryImpl extends MCRAbstractCategoryImpl {
      * @param labels
      *            the labels to set
      */
-    public void setLabels(Set<MCRLabel> labels) {
+    public void setLabels(Collection<MCRLabel> labels) {
         this.labels = labels;
-    }
-
-    public int getLevel() {
-        return level;
-    }
-
-    public void setLevel(int level) {
-        this.level = level;
-    }
-
-    /**
-     * @return the left
-     */
-    public int getLeft() {
-        return left;
     }
 
     /**
@@ -86,11 +167,8 @@ public class MCRCategoryImpl extends MCRAbstractCategoryImpl {
         this.left = left;
     }
 
-    /**
-     * @return the right
-     */
-    public int getRight() {
-        return right;
+    public void setLevel(int level) {
+        this.level = level;
     }
 
     /**
@@ -106,7 +184,7 @@ public class MCRCategoryImpl extends MCRAbstractCategoryImpl {
      * 
      * @see org.mycore.datamodel.classifications2.MCRCategory#setRoot(org.mycore.datamodel.classifications2.MCRClassificationObject)
      */
-    public void setRoot(MCRCategoryImpl root) {
+    public void setRoot(MCRCategory root) {
         this.root = root;
     }
 

@@ -24,13 +24,14 @@
 package org.mycore.datamodel.classifications2.impl;
 
 import java.net.URI;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.mycore.datamodel.classifications2.MCRCategory;
-import org.mycore.datamodel.classifications2.MCRClassificationDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
+import org.mycore.datamodel.classifications2.MCRClassificationDAOFactory;
 import org.mycore.datamodel.classifications2.MCRLabel;
 
 /**
@@ -42,12 +43,14 @@ import org.mycore.datamodel.classifications2.MCRLabel;
 public abstract class MCRAbstractCategoryImpl implements MCRCategory {
 
     protected MCRCategory root;
+    
+    protected MCRCategory parent;
 
     private MCRCategoryID id;
 
     private URI URI;
 
-    protected Set<MCRLabel> labels;
+    protected Collection<MCRLabel> labels;
 
     protected List<MCRCategory> children;
 
@@ -72,7 +75,7 @@ public abstract class MCRAbstractCategoryImpl implements MCRCategory {
         return id;
     }
 
-    public Set<MCRLabel> getLabels() {
+    public Collection<MCRLabel> getLabels() {
         return labels;
     }
 
@@ -110,6 +113,19 @@ public abstract class MCRAbstractCategoryImpl implements MCRCategory {
 
     public void setURI(URI uri) {
         URI = uri;
+    }
+
+    public MCRCategory getParent() {
+        return parent;
+    }
+
+    public void setParent(MCRCategory parent) {
+        if (this.parent != null){
+            //remove this from current parent
+            this.parent.getChildren().remove(this);
+        }
+        this.parent=parent;
+        parent.getChildren().add(this);
     }
 
 }

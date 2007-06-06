@@ -23,10 +23,12 @@
  **/
 package org.mycore.datamodel.classifications2.impl;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+
+import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
@@ -40,6 +42,8 @@ import org.mycore.datamodel.classifications2.MCRLabel;
  * @since 2.0
  */
 public class MCRCategoryDAOImpl implements MCRCategoryDAO {
+    
+    private static final Logger LOGGER = Logger.getLogger(MCRCategoryImpl.class);
 
     /**
      * calculates left and right value throug the subtree rooted at
@@ -49,7 +53,8 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
      *            root node of subtree
      * @param leftStart
      *            co.left will be set to this value
-     * @param levelStart co.getLevel() will return this value
+     * @param levelStart
+     *            co.getLevel() will return this value
      * @return co.right
      */
     protected static int calculateLeftRightAndLevel(MCRCategoryImpl co, int leftStart, int levelStart) {
@@ -81,26 +86,24 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
      */
     public List<MCRCategory> getChildren(MCRCategoryID cid) {
         // TODO: implement getChildren
-        return new ArrayList<MCRCategory>();
+        return new MCRCategoryImpl.ChildList(null, null);
     }
 
     public void addCategory(MCRCategoryID parentID, MCRCategory category) {
-        // TODO Auto-generated method stub
-
-    }
-
-    public void beginTransaction() {
-        // TODO Auto-generated method stub
-
-    }
-
-    public void commitTransaction() {
-        // TODO Auto-generated method stub
-
+        int leftStart=0;
+        int levelStart=0;
+        if (parentID!=null){
+            //calculate left and level
+        }
+        LOGGER.info("Calculating LEFT,RIGHT and LEVEL attributes...");
+        int nodes=calculateLeftRightAndLevel((MCRCategoryImpl)category, leftStart, levelStart) / 2;
+        LOGGER.info("Calculating LEFT,RIGHT and LEVEL attributes. Done! Nodes: "+nodes);
+        MCRHIBConnection.instance().getSession().save(category);
+        LOGGER.info("Categorie saved.");
     }
 
     public void deleteCategory(MCRCategoryID id) {
-        // TODO Auto-generated method stub
+        MCRHIBConnection.instance().getSession().delete(MCRHIBConnection.instance().getSession().get(MCRCategoryImpl.class, id));
 
     }
 
@@ -135,11 +138,6 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
     }
 
     public void removeLabel(MCRCategoryID id, String lang) {
-        // TODO Auto-generated method stub
-
-    }
-
-    public void rollBackTransaction() {
         // TODO Auto-generated method stub
 
     }
