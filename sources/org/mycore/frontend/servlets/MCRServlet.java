@@ -65,6 +65,8 @@ import org.mycore.datamodel.common.MCRActiveLinkException;
  * @version $Revision$ $Date$
  */
 public class MCRServlet extends HttpServlet {
+    private static final String INITIAL_SERVLET_NAME_KEY = "currentServletName";
+
     private static final long serialVersionUID = 1L;
 
     // Some configuration details
@@ -149,7 +151,7 @@ public class MCRServlet extends HttpServlet {
         doGetPost(job);
     }
 
-    public static MCRSession getSession(HttpServletRequest req) {
+    public static MCRSession getSession(HttpServletRequest req, String servletName) {
         HttpSession theSession = req.getSession(true);
         MCRSession session = null;
 
@@ -168,8 +170,14 @@ public class MCRServlet extends HttpServlet {
         // store the HttpSession ID in MCRSession
         session.put("http.session", theSession.getId());
 
-        // Bind current session to this thread:
-        MCRSessionMgr.setCurrentSession(session);
+        String currentThread = getProperty(req, "currentThreadName");
+        //check if this is request passed the same thread before (RequestDispatcher)
+        if (currentThread == null || !currentThread.equals(Thread.currentThread().getName())) {
+            // Bind current session to this thread:
+            MCRSessionMgr.setCurrentSession(session);
+            req.setAttribute("currentThreadName", Thread.currentThread().getName());
+            req.setAttribute(INITIAL_SERVLET_NAME_KEY, servletName);
+        }
 
         // Forward MCRSessionID to XSL Stylesheets
         req.setAttribute("XSL.MCRSessionID", session.getID());
@@ -221,7 +229,7 @@ public class MCRServlet extends HttpServlet {
         Transaction tx = null;
 
         try {
-            MCRSession session = getSession(req);
+            MCRSession session = getSession(req, getServletName());
 
             String c = getClass().getName();
             c = c.substring(c.lastIndexOf(".") + 1);
@@ -274,7 +282,10 @@ public class MCRServlet extends HttpServlet {
         } finally {
             // Release current MCRSession from current Thread,
             // in case that Thread pooling will be used by servlet engine
-            MCRSessionMgr.releaseCurrentSession();
+            if (getProperty(req, INITIAL_SERVLET_NAME_KEY).equals(getServletName())) {
+                //current Servlet not called via RequestDispatcher
+                MCRSessionMgr.releaseCurrentSession();
+            }
         }
     }
 
