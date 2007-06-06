@@ -241,8 +241,8 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
             return null; // Use default resolver
         }
 
-        if (systemId.length()==0){
-            //if you overwrite SYSTEM by empty String in XSL
+        if (systemId.length() == 0) {
+            // if you overwrite SYSTEM by empty String in XSL
             return new InputSource(new StringReader(""));
         }
 
@@ -363,8 +363,6 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
      * Resolver interface. use this to implement custom URI schemes.
      * 
      * @author Thomas Scheffler (yagee)
-     * 
-     * @version $Revision$ $Date$
      */
     public static interface MCRResolver {
         /**
@@ -387,8 +385,6 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
      * implementing class.
      * 
      * @author Thomas Scheffler
-     * 
-     * @version $Revision$ $Date$
      */
     public static interface MCRResolverProvider {
         /**
@@ -407,17 +403,17 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
 
         @SuppressWarnings("unchecked")
         public Map<String, MCRResolver> getResolverMapping() {
-            Properties props=MCRConfiguration.instance().getProperties(CONFIG_PREFIX+"ModuleResolver.");
-            if (props.isEmpty()){
+            Properties props = MCRConfiguration.instance().getProperties(CONFIG_PREFIX + "ModuleResolver.");
+            if (props.isEmpty()) {
                 return Collections.EMPTY_MAP;
             }
-            Map<String, MCRResolver> map=new HashMap<String, MCRResolver>();
-            for (Entry entry:props.entrySet()){
+            Map<String, MCRResolver> map = new HashMap<String, MCRResolver>();
+            for (Entry entry : props.entrySet()) {
                 try {
-                    Class cl=Class.forName(entry.getValue().toString());
-                    map.put(entry.getKey().toString(), (MCRResolver)cl.newInstance());
+                    Class cl = Class.forName(entry.getValue().toString());
+                    map.put(entry.getKey().toString(), (MCRResolver) cl.newInstance());
                 } catch (Exception e) {
-                    throw new MCRException("Cannot instantiate "+entry.getValue()+" for URI scheme "+entry.getKey(),e);
+                    throw new MCRException("Cannot instantiate " + entry.getValue() + " for URI scheme " + entry.getKey(), e);
                 }
             }
             return map;
@@ -606,6 +602,7 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
          * A cache of parsed XML files *
          */
         final static int cacheSize = MCRConfiguration.instance().getInt(CONFIG_PREFIX + "StaticFiles.CacheSize", 100);
+
         private static MCRCache fileCache = new MCRCache(cacheSize, "URIResolver Files");
 
         /**
@@ -831,17 +828,16 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
 
         private static final String SORT_CONFIG_PREFIX = CONFIG_PREFIX + "Classification.Sort.";
 
-        private static MCRCache CLASS_CACHE;
+        private static final MCRCache CLASS_CACHE = new MCRCache(MCRConfiguration.instance().getInt(CONFIG_PREFIX + "Classification.CacheSize", 1000),
+                "URIResolver Classifications");
 
         private static long CACHE_INIT_TIME;
 
         public MCRClassificationResolver() {
-            initCache();
         }
 
         private void initCache() {
-            int cacheSize = MCRConfiguration.instance().getInt(CONFIG_PREFIX + "Classification.CacheSize", 1000);
-            CLASS_CACHE = new MCRCache(cacheSize, "URIResolver Classifications");
+            CLASS_CACHE.clear();
             CACHE_INIT_TIME = System.currentTimeMillis();
         }
 
@@ -922,7 +918,7 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
                 }
                 cl = MCRClassificationQuery.getClassificationHierarchie(classID, categ, levels, withCounter);
             }
-            
+
             Element returns;
             LOGGER.debug("start transformation of ClassificationQuery");
             if (format.startsWith("editor")) {
@@ -939,7 +935,7 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
                 throw new IllegalArgumentException("Invalid target format (" + format + ") in uri for retrieval of classification: " + uri);
             }
             LOGGER.debug("end resolving " + uri);
-            return (Element)returns.detach();
+            return (Element) returns.detach();
         }
 
         private static String getLabelFormat(String editorString) {
@@ -964,8 +960,8 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
         private static final String SORT_PARAM = "sortby";
 
         private static final String ORDER_PARAM = "order";
-        
-        private static final String MAXRESULTS_PARAM 	= "maxResults";
+
+        private static final String MAXRESULTS_PARAM = "maxResults";
 
         /**
          * Returns query results for query in "term" parameter
@@ -998,13 +994,12 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
             LOGGER.debug("MCRSearchServlet total query time: " + qtime);
             return result.buildXML();
         }
-        
+
         private static String getMaxResults(Hashtable<String, String> params) {
-            String maxResults = params.get(MAXRESULTS_PARAM); 
-            if (maxResults!=null 
-            		&& !maxResults.equals("")) 
-            	return maxResults;
-        	return "0";
+            String maxResults = params.get(MAXRESULTS_PARAM);
+            if (maxResults != null && !maxResults.equals(""))
+                return maxResults;
+            return "0";
         }
 
         private static Hashtable<String, String> getParameterMap(String key) {
@@ -1047,22 +1042,17 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
     }
 
     /**
-     * Builds XML trees from a string representation. Multiple XPath expressions can be
-     * separated by &amp;
+     * Builds XML trees from a string representation. Multiple XPath expressions
+     * can be separated by &amp;
      * 
      * Example:
      * 
      * buildxml:_rootName_=mycoreobject&metadata/parents/parent/@href='FooBar_Document_4711'
-     *  
+     * 
      * This will return:
      * 
-     * <mycoreobject>
-     *   <metadata>
-     *      <parents>
-     *        <parent href="'FooBar_Document_4711'" />
-     *      </parents>
-     *   </metadata>
-     * </mycoreobject>
+     * <mycoreobject> <metadata> <parents> <parent href="'FooBar_Document_4711'" />
+     * </parents> </metadata> </mycoreobject>
      */
     private static class MCRBuildXMLResolver implements MCRResolver {
 
@@ -1074,20 +1064,20 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
             LOGGER.debug("Reading xml from query result using key :" + key);
 
             Hashtable<String, String> params = getParameterMap(key);
-            String baseElement=params.get("_rootName_");
-            if (baseElement==null){
-                baseElement="uriTemp";
+            String baseElement = params.get("_rootName_");
+            if (baseElement == null) {
+                baseElement = "uriTemp";
             } else {
                 params.remove("_rootName_");
             }
-            Element returns=new Element(baseElement);
-            for (Map.Entry<String, String> entry:params.entrySet()){
+            Element returns = new Element(baseElement);
+            for (Map.Entry<String, String> entry : params.entrySet()) {
                 constructElement(returns, entry.getKey(), entry.getValue());
             }
-            if (returns.getName().equals("uriTemp")){
-                if (returns.getChildren().size()>1){
+            if (returns.getName().equals("uriTemp")) {
+                if (returns.getChildren().size() > 1) {
                     LOGGER.warn("More than 1 root node defined, returning one");
-                    return (Element)((Element)returns.getChildren().get(0)).detach();
+                    return (Element) ((Element) returns.getChildren().get(0)).detach();
                 }
             }
             return returns;
@@ -1101,46 +1091,48 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
             while (tok.hasMoreTokens()) {
                 param = tok.nextToken().split("=");
                 try {
-                    params.put(URLDecoder.decode(param[0],"UTF-8"), URLDecoder.decode(param[1],"UTF-8"));
+                    params.put(URLDecoder.decode(param[0], "UTF-8"), URLDecoder.decode(param[1], "UTF-8"));
                 } catch (UnsupportedEncodingException e) {
-                    //should never happen
-                    LOGGER.error("UTF-8 is a unknown encoding.",e);
+                    // should never happen
+                    LOGGER.error("UTF-8 is a unknown encoding.", e);
                 }
             }
             return params;
         }
+
         private static void constructElement(Element current, String xpath, String value) {
             int i = xpath.indexOf('/');
-            LOGGER.debug("Processing xpath: "+xpath);
+            LOGGER.debug("Processing xpath: " + xpath);
             String subname = xpath;
             if (i > 0) {
-                //construct new element name and xpath value
+                // construct new element name and xpath value
                 subname = xpath.substring(0, i);
                 xpath = xpath.substring(i + 1);
             }
             i = xpath.indexOf('/');
             if (subname.startsWith("@")) {
                 if (i > 0) {
-                    subname = subname.substring(0, i);//attribute should be the last
+                    subname = subname.substring(0, i);// attribute should be
+                    // the last
                 }
-                subname=subname.substring(1);//remove @
-                LOGGER.debug("Setting attribute "+subname+"="+value);
+                subname = subname.substring(1);// remove @
+                LOGGER.debug("Setting attribute " + subname + "=" + value);
                 current.setAttribute(subname, value);
                 return;
             }
             Element newcurrent = current.getChild(subname);
             if (newcurrent == null) {
                 newcurrent = new Element(subname);
-                LOGGER.debug("Adding element "+newcurrent.getName()+" to "+current.getName());
+                LOGGER.debug("Adding element " + newcurrent.getName() + " to " + current.getName());
                 current.addContent(newcurrent);
             }
-            if (subname==xpath) {
-                //last element of xpath
-                LOGGER.debug("Setting text of element "+newcurrent.getName()+" to "+value);
+            if (subname == xpath) {
+                // last element of xpath
+                LOGGER.debug("Setting text of element " + newcurrent.getName() + " to " + value);
                 newcurrent.setText(value);
                 return;
             }
-            constructElement(newcurrent, xpath, value); //recursive call
+            constructElement(newcurrent, xpath, value); // recursive call
         }
     }
 }
