@@ -216,6 +216,10 @@ final public class MCRDerivate extends MCRBase {
         if (!isValid()) {
             throw new MCRPersistenceException("The derivate " + mcr_id.getId() + " is not valid.");
         }
+        String objid = mcr_derivate.getMetaLink().getXLinkHref();
+        if (!MCRXMLTableManager.instance().exist(new MCRObjectID(objid))) {
+            throw new MCRPersistenceException("The derivate " + mcr_id.getId() + " can't find metadata object " + objid + ", nothing done.");
+        }
 
         // prepare the derivate metadata and store under the XML table
         if (mcr_service.getDate("createdate") == null || !importMode) {
