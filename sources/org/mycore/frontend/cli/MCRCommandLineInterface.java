@@ -246,8 +246,9 @@ public class MCRCommandLineInterface {
             else
                 System.out.printf("%s Command not understood. Enter 'help' to get a list of commands.\n", system);
         } catch (Exception ex) {
-            tx.rollback();
             showException(ex, false);
+            System.out.printf("%s Command '%s' failed. Performing transaction rollback!\n", system, command);
+            tx.rollback();
         }
     }
 
