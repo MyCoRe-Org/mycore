@@ -339,7 +339,7 @@ final public class MCRDerivate extends MCRBase {
                 obj.removeDerivateInDatastore(meta, mcr_id.getId());
                 LOGGER.info("Link in MCRObject " + meta + " to MCRDerivate " + mcr_id.getId() + " is deleted.");
             } catch (Exception e) {
-                LOGGER.warn("Error while delete link for MCRDerivate " + mcr_id.getId() + "from MCRObject " + meta + ".");
+                LOGGER.warn("Can't delete link for MCRDerivate " + mcr_id.getId() + " from MCRObject " + meta + ". Error ignored.");
             }
         }
 
