@@ -32,7 +32,7 @@ import java.util.Map;
  * @version $Revision$ $Date$
  * @since 2.0
  */
-public interface MCRCategLinkService extends MCRTransactionalDAO {
+public interface MCRCategLinkService {
 
     /**
      * Counts links to a collection of categories.
