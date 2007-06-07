@@ -34,52 +34,33 @@ import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
-import org.mycore.common.MCRSessionMgr;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
 
 /**
- * @author Thomas Scheffler (yagee)
+ * @author Andreas Trappe, Thomas Scheffler 
  * 
  * Need to insert some things here
  * 
  */
 public abstract class MCRWCMSServlet extends MCRServlet {
     protected static final String OUTPUT_ENCODING = "UTF-8";
-
     protected static final String VALIDATOR = "JTidy";
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.mycore.frontend.servlets.MCRServlet#doGetPost(org.mycore.frontend.servlets.MCRServletJob)
-     */
+    protected static final String LOGINSERVLET_URL = getServletBaseURL()+"MCRLoginServlet";
+    
     protected void doGetPost(MCRServletJob job) throws Exception {
-        if (isValidUser()) {
+        if (access()) 
         	processRequest(job.getRequest(), job.getResponse());
-        } else {
-       	    job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(CONFIG.getString("MCR.WCMS.sessionError")));     	 
-        }
+        else  
+       	    job.getResponse().sendRedirect(LOGINSERVLET_URL);
     }
 
-    protected final boolean isValidUser() {
-        String status = (String) MCRSessionMgr.getCurrentSession().get("status");
-
-        return ((status != null) && status.equals("loggedIn"));
+    protected final boolean access() {
+        return MCRWCMSUtilities.getWriteAccessGeneral();
     }
 
     public Element getTemplates() {
         Element templates = new Element("templates");
-
-        // content
-
-        /*
-         * File [] contentTemplates = new
-         * File(super.CONFIG.getString("MCR.WCMS.templatePath")+"content/".replace('/',
-         * File.separatorChar)).listFiles(); Element content = new
-         * Element("content"); content.addContent(new
-         * Element("template").setText(conTemp.toString()));
-         */
 
         // master
         File[] masterTemplates = new File(CONFIG.getString("MCR.WCMS.templatePath") + "master/".replace('/', File.separatorChar)).listFiles();

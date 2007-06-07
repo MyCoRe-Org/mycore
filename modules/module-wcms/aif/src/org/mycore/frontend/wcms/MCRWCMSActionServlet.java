@@ -1133,6 +1133,7 @@ public class MCRWCMSActionServlet extends MCRWCMSServlet {
             tidy.setQuoteMarks(true);
             tidy.setQuoteNbsp(true);
             tidy.setErrout(pw);
+            tidy.setNumEntities(true);
 
             if (content != null) {
                 ByteArrayInputStream bais = new ByteArrayInputStream(contentTmp.getBytes(OUTPUT_ENCODING));
@@ -1371,8 +1372,21 @@ public class MCRWCMSActionServlet extends MCRWCMSServlet {
          */
         Tidy tidy = new Tidy();
         tidy = getTidyConfig(tidy, "xhtml");
+        //tidy.setErrout(pw);
+        tidy.setInputEncoding(OUTPUT_ENCODING);
+        tidy.setOutputEncoding(OUTPUT_ENCODING);
+        tidy.setWord2000(true);
+        tidy.setPrintBodyOnly(true);
+        tidy.setIndentContent(true);
+        tidy.setForceOutput(true);
+        tidy.setMakeClean(true);
+        tidy.setMakeBare(true);
+        tidy.setQuoteAmpersand(true);
+        tidy.setQuoteMarks(true);
+        tidy.setQuoteNbsp(true);
+        tidy.setNumEntities(true);
         tidy.setErrout(pw);
-
+        
         BufferedInputStream bis = null;
         ByteArrayInputStream beginTag = new ByteArrayInputStream("<dummyRoot>".getBytes());
         ByteArrayInputStream endTag = new ByteArrayInputStream("</dummyRoot>".getBytes());

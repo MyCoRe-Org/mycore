@@ -32,7 +32,8 @@ template:
 	version="1.0" 
 	xmlns:xsl="http://www.w3.org/1999/XSL/Transform" 
 	xmlns:xalan="http://xml.apache.org/xalan"
-    xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation" >
+  xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation" 
+ >
 
 	<!-- Erzeugen des Seitentitels-->
 	<xsl:variable name="PageTitle">
@@ -169,6 +170,5 @@ parameters:
 		</tr>
 	</xsl:template>
 
-<!-- =================================================================================== -->
-
+<!-- =================================================================================== -->  
 </xsl:stylesheet>
