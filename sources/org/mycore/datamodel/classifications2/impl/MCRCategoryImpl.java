@@ -26,7 +26,8 @@ package org.mycore.datamodel.classifications2.impl;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
+
+import org.apache.log4j.Logger;
 
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRLabel;
@@ -42,7 +43,9 @@ public class MCRCategoryImpl extends MCRAbstractCategoryImpl {
 
     protected static class ChildList extends ArrayList<MCRCategory> {
         private static final long serialVersionUID = 180424337316332676L;
+
         private MCRCategory root;
+
         private MCRCategory thisCategory;
 
         /**
@@ -56,11 +59,31 @@ public class MCRCategoryImpl extends MCRAbstractCategoryImpl {
         }
 
         @Override
+        public void add(int index, MCRCategory element) {
+            super.add(index, wrapCategory(element));
+        }
+
+        @Override
         public boolean add(MCRCategory e) {
-            final MCRCategoryImpl wrappedCategory = wrapCategory(e);
-            wrappedCategory.setParent(thisCategory);
-            wrappedCategory.setRoot(root);
-            return super.add(wrappedCategory);
+            return super.add(wrapCategory(e));
+        }
+
+        @Override
+        public boolean addAll(Collection<? extends MCRCategory> c) {
+            return super.addAll(wrapCategories(c));
+        }
+
+        @Override
+        public boolean addAll(int index, Collection<? extends MCRCategory> c) {
+            return super.addAll(index, wrapCategories(c));
+        }
+
+        @Override
+        public void clear() {
+            for (int i = 0; i < size(); i++) {
+                removeAncestorReferences(get(i));
+            }
+            super.clear();
         }
 
         @Override
@@ -90,6 +113,14 @@ public class MCRCategoryImpl extends MCRAbstractCategoryImpl {
         }
 
         @Override
+        protected void removeRange(int fromIndex, int toIndex) {
+            for (int i = fromIndex; i < toIndex; i++) {
+                removeAncestorReferences(get(i));
+            }
+            super.removeRange(fromIndex, toIndex);
+        }
+
+        @Override
         public MCRCategory set(int index, MCRCategory element) {
             MCRCategory category = super.set(index, element);
             if (category != element) {
@@ -98,24 +129,36 @@ public class MCRCategoryImpl extends MCRAbstractCategoryImpl {
             return category;
         }
 
-        private MCRCategoryImpl wrapCategory(MCRCategory category) {
-            if (category instanceof MCRCategoryImpl) {
-                return (MCRCategoryImpl) category;
+        private Collection<MCRCategoryImpl> wrapCategories(Collection<? extends MCRCategory> categories) {
+            List<MCRCategoryImpl> list = new ArrayList<MCRCategoryImpl>(categories.size());
+            for (MCRCategory category : categories) {
+                list.add(wrapCategory(category));
             }
-            MCRCategoryImpl catImpl = new MCRCategoryImpl();
+            return list;
+        }
+
+        private MCRCategoryImpl wrapCategory(MCRCategory category) {
+            MCRCategoryImpl catImpl;
+            if (category instanceof MCRCategoryImpl) {
+                catImpl = (MCRCategoryImpl) category;
+                catImpl.setParent(thisCategory);
+                catImpl.setRoot(root);
+                return catImpl;
+            }
+            catImpl = new MCRCategoryImpl();
             catImpl.setId(category.getId());
             catImpl.labels = category.getLabels();
-            catImpl.parent = category.getParent();
-            catImpl.root = category.getRoot();
-            for (MCRCategory child : category.getChildren()) {
-                catImpl.getChildren().add(child);
-            }
+            catImpl.setParent(thisCategory);
+            catImpl.setRoot(root);
+            catImpl.getChildren().addAll(category.getChildren());
             return catImpl;
         }
 
     }
 
-    private int left, right;
+    private static Logger LOGGER = Logger.getLogger(MCRCategoryImpl.class);
+
+    private int left, right, positionInParent;
 
     int level;
 
@@ -134,6 +177,16 @@ public class MCRCategoryImpl extends MCRAbstractCategoryImpl {
     }
 
     /**
+     * @return the positionInParent
+     */
+    public int getPositionInParent() {
+        if (parent == null) {
+            return 0;
+        }
+        return parent.getChildren().indexOf(this);
+    }
+
+    /**
      * @return the right
      */
     public int getRight() {
@@ -146,8 +199,9 @@ public class MCRCategoryImpl extends MCRAbstractCategoryImpl {
      */
     public void setChildren(List<MCRCategory> children) {
         childrenLock.writeLock().lock();
-        this.children = new ChildList(this.root, this);
-        this.children.addAll(children);
+        ChildList newChildren = new ChildList(this.root, this);
+        newChildren.addAll(children);
+        this.children = newChildren;
         childrenLock.writeLock().unlock();
     }
 
@@ -169,6 +223,15 @@ public class MCRCategoryImpl extends MCRAbstractCategoryImpl {
 
     public void setLevel(int level) {
         this.level = level;
+    }
+
+    /**
+     * @param positionInParent
+     *            the positionInParent to set
+     */
+    public void setPositionInParent(int positionInParent) {
+        LOGGER.warn("Attempt to modify positionInParent to: " + positionInParent + " oldValue: " + getPositionInParent());
+        this.positionInParent = positionInParent;
     }
 
     /**

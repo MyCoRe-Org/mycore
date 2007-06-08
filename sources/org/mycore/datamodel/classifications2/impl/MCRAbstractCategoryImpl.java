@@ -26,7 +26,6 @@ package org.mycore.datamodel.classifications2.impl;
 import java.net.URI;
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.mycore.datamodel.classifications2.MCRCategory;
@@ -43,7 +42,7 @@ import org.mycore.datamodel.classifications2.MCRLabel;
 public abstract class MCRAbstractCategoryImpl implements MCRCategory {
 
     protected MCRCategory root;
-    
+
     protected MCRCategory parent;
 
     private MCRCategoryID id;
@@ -62,14 +61,19 @@ public abstract class MCRAbstractCategoryImpl implements MCRCategory {
 
     public List<MCRCategory> getChildren() {
         childrenLock.readLock().lock();
+        boolean childrenPresent = true;
         if (children == null) {
+            childrenPresent = false;
             childrenLock.readLock().unlock();
-            childrenLock.writeLock().lock();
-            children = MCRClassificationDAOFactory.getInstance().getChildren(this.id);
-            childrenLock.writeLock().unlock();
+            setChildren(MCRClassificationDAOFactory.getInstance().getChildren(this.id));
+        }
+        if (childrenPresent) {
+            childrenLock.readLock().unlock();
         }
         return children;
     }
+
+    abstract void setChildren(List<MCRCategory> children);
 
     public MCRCategoryID getId() {
         return id;
@@ -120,12 +124,17 @@ public abstract class MCRAbstractCategoryImpl implements MCRCategory {
     }
 
     public void setParent(MCRCategory parent) {
-        if (this.parent != null){
-            //remove this from current parent
+        if (this.parent == parent) {
+            return;
+        }
+        if (this.parent != null) {
+            // remove this from current parent
             this.parent.getChildren().remove(this);
         }
-        this.parent=parent;
-        parent.getChildren().add(this);
+        this.parent = parent;
+        if (parent != null) {
+            parent.getChildren().add(this);
+        }
     }
 
 }

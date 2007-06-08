@@ -39,6 +39,9 @@ public class MCRLabel implements Cloneable, Serializable {
 
     String lang, text, description;
 
+    public MCRLabel() {
+        
+    }
     public MCRLabel(String lang, String text, String description) {
         super();
         this.lang = lang;

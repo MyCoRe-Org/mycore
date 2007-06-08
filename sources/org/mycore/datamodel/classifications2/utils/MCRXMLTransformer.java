@@ -24,6 +24,8 @@
 package org.mycore.datamodel.classifications2.utils;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 
 import org.jdom.Document;
@@ -63,8 +65,8 @@ public class MCRXMLTransformer {
         return children;
     }
 
-    private static List<MCRLabel> getLabel(List elements) {
-        List<MCRLabel> labels = new ArrayList<MCRLabel>(elements.size());
+    private static Collection<MCRLabel> getLabel(List elements) {
+        Collection<MCRLabel> labels = new HashSet<MCRLabel>(elements.size(),1l);
         for (Object o : elements) {
             Element e = (Element) o;
             labels.add(new MCRLabel(e.getAttributeValue("lang", Namespace.XML_NAMESPACE), e.getAttributeValue("text"), e.getAttributeValue("description")));
