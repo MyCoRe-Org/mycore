@@ -64,7 +64,7 @@ public class MCRCheckCommitDataServlet extends MCRCheckDataBase {
             // return all is ready
             sb.append("receive/").append(ID.getId());
         } else {
-            sb.append(CONFIG.getString("MCR.editor_page_dir", "")).append(CONFIG.getString("MCR.editor_page_error_store", "editor_error_store.xml"));
+            sb.append(CONFIG.getString("MCR.SWF.PageDir", "")).append(CONFIG.getString("MCR.SWF.PageErrorStore", "editor_error_store.xml"));
         }
         return sb.toString();
     }
@@ -84,7 +84,7 @@ public class MCRCheckCommitDataServlet extends MCRCheckDataBase {
         }
 
         String sender = wfm.getMailSender();
-        String appl = CONFIG.getString("MCR.editor_mail_application_id", "DocPortal");
+        String appl = CONFIG.getString("MCR.SWF.Mail.ApplicationID", "DocPortal");
         String subject = "Automaticaly message from " + appl;
         StringBuffer text = new StringBuffer();
         text.append("Es wurde ein Objekt vom Typ ").append(ID.getTypeId()).append(" mit der ID ").append(ID.getId()).append(" aus dem Workflow in das System geladen.");
