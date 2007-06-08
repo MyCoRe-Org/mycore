@@ -149,7 +149,7 @@ public class MCRHIBClassificationStore implements MCRClassificationInterface {
      */
     public final boolean classificationItemExists(String ID) {
         Session session = getSession();
-        if (1 > ((Number) session.createCriteria(MCRCLASS.class).add(Restrictions.eq("ID", ID)).setProjection(Projections.rowCount()).uniqueResult())
+        if (1 > ((Number) session.createCriteria(MCRCLASS.class).add(Restrictions.eq("id", ID)).setProjection(Projections.rowCount()).uniqueResult())
                 .intValue()) {
             return false;
         }
