@@ -7,12 +7,12 @@ title: wcms_choose.xsl
 Erzeugt die Auswahlseite einer Aktion.
 
 template:
-	- wcmsChoose (name)
-	- chooseContent (name)
-	- chooseContentInfo (name)
-	- errorOnChoose (name)
-	- hiddenForm (name)
-	- wcmsChoose.action.option
+- wcmsChoose (name)
+- chooseContent (name)
+- chooseContentInfo (name)
+- errorOnChoose (name)
+- hiddenForm (name)
+- wcmsChoose.action.option
 }=========================================================================================
 ====================================================================================== -->
 
@@ -296,52 +296,37 @@ template:
   <!-- ===================================================================================== -->
   
   <xsl:template name="chooseContent">
-      <xsl:variable name="writableNavi">
-        <xsl:call-template name="get.writableNavi"/>
-      </xsl:variable>
-    <!--
-    writeNavi=<xsl:copy-of select="$writableNavi"/>...
-    -->
+    <xsl:variable name="writableNavi">
+      <xsl:call-template name="get.writableNavi"/>
+    </xsl:variable>
     <select name="href" size="20" class="auswahl-ziel">
-      
-      <!-- display menu items -->
-      <!-- TODO: replace this "for-each" throug every node by prepared filtered navigation structure -->
-      <!-- BECAUSE its very slow, this kind of implementation -->
-<!--      <xsl:for-each select="xalan:nodeset($loaded_navigation_xml)//item">-->
-      
-      <xsl:for-each select="xalan:nodeset($writableNavi)//item">      
-<!--        <xsl:variable name="access">
-          <xsl:call-template name="get.wcmsWriteAccess">
-            <xsl:with-param name="webpage" select="@href"/>
-          </xsl:call-template>
-        </xsl:variable>-->
-<!--        <xsl:if test="$access='true'">-->
-          <option value="1{@href}">
-            <xsl:for-each select="ancestor::item">
-              <xsl:text> &#9472;
-              </xsl:text>
-            </xsl:for-each>
-            <!-- handle different languages -->
-            <xsl:variable name="label_defLang" select="./label[lang($DefaultLang)]!=''"/>
-            <xsl:variable name="label_curLang" select="./label[lang($CurrentLang)]!=''"/>
-            <xsl:choose>
-              <!-- not default lang and label translated -->
-              <xsl:when test="($CurrentLang != $DefaultLang) and $label_curLang != ''">
-                <xsl:value-of select="./label[lang($CurrentLang)]"/> (
-                <xsl:value-of select="./label[lang($DefaultLang)]"/>) </xsl:when>
-              <!-- not default lang and label NOT translated -->
-              <xsl:when test="($CurrentLang != $DefaultLang) and $label_curLang = ''">
-                &lt;!&gt; (
-                <xsl:value-of select="./label[lang($DefaultLang)]"/>) </xsl:when>
-              <xsl:otherwise>
-                <xsl:value-of select="./label[lang($DefaultLang)]"/>
-              </xsl:otherwise>
-            </xsl:choose>
-            <xsl:if test=" @replaceMenu = 'true' or @template != '' or @constrainPopUp = 'true' ">
-              <xsl:call-template name="chooseContentInfo"/>
-            </xsl:if>
-          </option>
-<!--        </xsl:if>-->
+      <xsl:for-each select="xalan:nodeset($writableNavi)//item">
+        <option value="1{@href}">
+          <xsl:for-each select="ancestor::item">
+            <xsl:text> &#9472;
+            </xsl:text>
+          </xsl:for-each>
+          <!-- handle different languages -->
+          <xsl:variable name="label_defLang" select="./label[lang($DefaultLang)]!=''"/>
+          <xsl:variable name="label_curLang" select="./label[lang($CurrentLang)]!=''"/>
+          <xsl:choose>
+            <!-- not default lang and label translated -->
+            <xsl:when test="($CurrentLang != $DefaultLang) and $label_curLang != ''">
+              <xsl:value-of select="./label[lang($CurrentLang)]"/> (
+              <xsl:value-of select="./label[lang($DefaultLang)]"/>) </xsl:when>
+            <!-- not default lang and label NOT translated -->
+            <xsl:when test="($CurrentLang != $DefaultLang) and $label_curLang = ''">
+              &lt;!&gt; (
+              <xsl:value-of select="./label[lang($DefaultLang)]"/>) </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="./label[lang($DefaultLang)]"/>
+            </xsl:otherwise>
+          </xsl:choose>
+          <xsl:if test=" @replaceMenu = 'true' or @template != '' or @constrainPopUp = 'true' ">
+            <xsl:call-template name="chooseContentInfo"/>
+          </xsl:if>
+        </option>
+        <!--        </xsl:if>-->
       </xsl:for-each>
       <!-- END OF: display menu items -->
       
@@ -583,21 +568,5 @@ template:
     <xsl:copy-of select="wcmsUtils:getWritableNavi()"/>
   </xsl:template>
   
-  <!-- =================================================================================== -->  
+  <!-- =================================================================================== -->
 </xsl:stylesheet>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

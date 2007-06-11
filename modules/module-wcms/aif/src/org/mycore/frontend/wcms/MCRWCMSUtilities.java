@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
@@ -14,41 +15,44 @@ import org.jdom.xpath.XPath;
 import org.mycore.access.MCRAccessInterface;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRConfiguration;
+import org.mycore.common.MCRException;
 
 public class MCRWCMSUtilities {
     final static String OBJIDPREFIX_WEBPAGE = "webpage:";
+
+    final static XPath xpath;
+    static {
+        try {
+            xpath = XPath.newInstance("*[@href and not(@type='extern')]");
+        } catch (JDOMException e) {
+            throw new MCRException("", e);
+        }
+    }
+
+    // strategies for access verification
     final static int ALLTRUE = 1;
+
     final static int ONETRUE_ALLTRUE = 2;
-    //private final static Logger LOGGER = Logger.getLogger("MCRWCMSUtilities"); 
+
+    //private final static Logger LOGGER = Logger.getLogger("MCRWCMSUtilities");
 
     /*
      * public static boolean readAccess(String webpageID, String permission)
      * throws JDOMException, IOException { return getAccess(webpageID,
      * permission, ALLTRUE); }
      */
-    
-    
+
     public static boolean writeAccess(String webpageID) throws JDOMException, IOException {
         return getWriteAccessGeneral() && getAccess(webpageID, "write", ONETRUE_ALLTRUE);
     }
-    
+
     public static org.w3c.dom.Document getWritableNavi() throws JDOMException, IOException {
         Element origNavi = new Element("root");
         origNavi.addContent(getNavi().getRootElement().detach());
         Document writableNavi = new Document(new Element("root"));
-        
-        System.out.println("######################################################");
-        System.out.println("start to get writeable navi...");        
-        System.out.println("######################################################");
-    
         buildWritableNavi(origNavi, writableNavi);
-    
-        System.out.println("######################################################");
-        System.out.println("finfished getting writeable navi...");        
-        System.out.println("######################################################");
-        
         return new DOMOutputter().output(writableNavi);
-    }     
+    }
 
     protected static boolean getWriteAccessGeneral() {
         return MCRAccessManager.getAccessImpl().checkPermission("wcms-access");
@@ -72,9 +76,9 @@ public class MCRWCMSUtilities {
             access = false;
             do {
                 access = itemAccess(permission, item, access);
-                if (item.isRootElement()) 
-                    item=null;
-                else 
+                if (item.isRootElement())
+                    item = null;
+                else
                     item = item.getParentElement();
             } while (item != null && !access);
         }
@@ -105,68 +109,16 @@ public class MCRWCMSUtilities {
     }
 
     private static void buildWritableNavi(Element origNavi, Document writableNavi) throws JDOMException, IOException {
-        List childs = origNavi.getChildren();
+        List childs = xpath.selectNodes(origNavi);
         Iterator childIter = childs.iterator();
-/*        System.out.println("######################################################");
-        System.out.println("within recursive call, number of found items="+childs.size()+"..");        
-        System.out.println("######################################################");*/
-        int i =0;
         while (childIter.hasNext()) {
-            i++;
-/*            System.out.println("######################################################");
-            System.out.println("within while children list, pos of childs="+i+"..");        
-            System.out.println("######################################################");
-  */          
             Element child = (Element) childIter.next();
-            if (child.getAttributeValue("href")!=null) {
-    /*            System.out.println("######################################################");
-                System.out.println("child received from IteratorList, webpageID="+getWebpageID(child)+"..");
-                System.out.println("######################################################");
-*/                
-                boolean access = writeAccess(getWebpageID(child));
-        /*        System.out.println("######################################################");
-                System.out.println("getWebpageID(child)="+getWebpageID(child)+"..");        
-                System.out.println("######################################################");
-                
-                //boolean access = true;
-                System.out.println("######################################################");
-                System.out.println("access verified -> access="+access+"..");        
-                System.out.println("######################################################");
-  */              
-                
-                if (access) {
-/*                    System.out.println("######################################################");
-                    System.out.println("access allowed -> no recursive call...");        
-                    System.out.println("######################################################");
-                    */    
-                    childIter.remove();
-                    writableNavi.getRootElement().addContent(child);
-                }
-                else {
-/*                    System.out.println("######################################################");
-                    System.out.println("recall, because webpageID="+getWebpageID(child)+" was forbidden..");        
-                    System.out.println("######################################################");
-                    */
-                    buildWritableNavi(child, writableNavi);
-                }
-            }
-
-                
+            boolean access = itemAccess("write", child, false);
+            if (access)
+                writableNavi.getRootElement().addContent(child.detach());
+            else
+                buildWritableNavi(child, writableNavi);
         }
-
-        //return writableNavi;
     }
-    
+
 }
-
-
-
-
-
-
-
-
-
-
-
-
