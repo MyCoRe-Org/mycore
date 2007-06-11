@@ -17,7 +17,8 @@ template:
 ====================================================================================== -->
 
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xalan="http://xml.apache.org/xalan"
-  xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation">
+  xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation"
+  xmlns:wcmsUtils="xalan:///org.mycore.frontend.wcms.MCRWCMSUtilities">
   
   <!-- ====================================================================================={
   section: Template: name="wcmsChoose"
@@ -295,18 +296,26 @@ template:
   <!-- ===================================================================================== -->
   
   <xsl:template name="chooseContent">
+      <xsl:variable name="writableNavi">
+        <xsl:call-template name="get.writableNavi"/>
+      </xsl:variable>
+    <!--
+    writeNavi=<xsl:copy-of select="$writableNavi"/>...
+    -->
     <select name="href" size="20" class="auswahl-ziel">
       
       <!-- display menu items -->
       <!-- TODO: replace this "for-each" throug every node by prepared filtered navigation structure -->
       <!-- BECAUSE its very slow, this kind of implementation -->
-      <xsl:for-each select="xalan:nodeset($loaded_navigation_xml)//item">
-        <xsl:variable name="access">
+<!--      <xsl:for-each select="xalan:nodeset($loaded_navigation_xml)//item">-->
+      
+      <xsl:for-each select="xalan:nodeset($writableNavi)//item">      
+<!--        <xsl:variable name="access">
           <xsl:call-template name="get.wcmsWriteAccess">
             <xsl:with-param name="webpage" select="@href"/>
           </xsl:call-template>
-        </xsl:variable>
-        <xsl:if test="$access='true'">
+        </xsl:variable>-->
+<!--        <xsl:if test="$access='true'">-->
           <option value="1{@href}">
             <xsl:for-each select="ancestor::item">
               <xsl:text> &#9472;
@@ -332,7 +341,7 @@ template:
               <xsl:call-template name="chooseContentInfo"/>
             </xsl:if>
           </option>
-        </xsl:if>
+<!--        </xsl:if>-->
       </xsl:for-each>
       <!-- END OF: display menu items -->
       
@@ -570,4 +579,25 @@ template:
   </xsl:template>
   <!-- =================================================================================== -->
   
+  <xsl:template name="get.writableNavi">
+    <xsl:copy-of select="wcmsUtils:getWritableNavi()"/>
+  </xsl:template>
+  
+  <!-- =================================================================================== -->  
 </xsl:stylesheet>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

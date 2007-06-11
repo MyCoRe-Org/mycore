@@ -2,7 +2,7 @@
 
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xalan="http://xml.apache.org/xalan"
   xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation"
-  xmlns:wcmsAccess="xalan:///org.mycore.frontend.wcms.MCRWCMSUtilities">
+  xmlns:wcmsUtils="xalan:///org.mycore.frontend.wcms.MCRWCMSUtilities">
   
   <!-- ======================================================================================================== -->
   <xsl:template name="getFastWCMS">
@@ -85,7 +85,7 @@
     <xsl:param name="webpage"/>
     <xsl:choose>
       <xsl:when test="$webpage!=''">
-        <xsl:copy-of select="wcmsAccess:writeAccess($webpage,'write')"/>
+        <xsl:copy-of select="wcmsUtils:writeAccess($webpage)"/>
       </xsl:when>
       <xsl:otherwise>
         <xsl:value-of select="'false'"/>
