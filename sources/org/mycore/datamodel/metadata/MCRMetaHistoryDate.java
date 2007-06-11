@@ -716,6 +716,11 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
         if ((text == null) || (text.length() == 0) || (von == null) || (bis == null) || (calendar == null)) {
             return false;
         }
+        if (ibis < ivon) {
+            Calendar swp = (Calendar)von.clone();
+            setVonDate((Calendar)bis.clone());
+            setBisDate(swp);
+        }
 
         return true;
     }
