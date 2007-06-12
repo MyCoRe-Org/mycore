@@ -118,6 +118,19 @@ public abstract class MCRUploadHandler {
     public abstract void finishUpload() throws Exception;
 
     /**
+     * After the remote user canceled the upload process in the applet, 
+     * this method is called so that the UploadHandler subclass can finish 
+     * or cancel work. The implementation is optional, by default finishUpload()
+     * is called 
+     * 
+     * @throws Exception
+     */
+    public void cancelUpload() throws Exception
+    {
+      finishUpload();
+    }
+
+    /**
      * When the applet is closed after uploading all files, the servlet calls
      * this method automatically to unregister this upload handler from the
      * UploadHandlerManager.

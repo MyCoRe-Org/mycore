@@ -212,7 +212,7 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
             handler.unregister();
 
             return;
-        } else if (method.equals("startDerivateSession String int")) {
+        } else if (method.equals("startUploadSession")) {
             String uploadId = req.getParameter("uploadId");
             int numFiles = Integer.parseInt(req.getParameter("numFiles"));
             MCRUploadHandlerManager.getHandler(uploadId).startUpload(numFiles);
@@ -223,7 +223,7 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
 
             LOGGER.info("UploadServlet start session " + uploadId);
             sendResponse(res, "OK");
-        } else if (method.equals("createFile String")) {
+        } else if (method.equals("uploadFile")) {
             final String path = req.getParameter("path");
 
             LOGGER.info("UploadServlet uploading " + path);
@@ -241,11 +241,16 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
 
             LOGGER.debug("Applet wants to send content of file " + path);
             sendResponse(res, serverIP + ":" + serverPort);
-        } else if (method.equals("endDerivateSession String")) {
+        } else if (method.equals("endUploadSession")) {
             String uploadId = req.getParameter("uploadId");
             MCRUploadHandler uploadHandler = MCRUploadHandlerManager.getHandler(uploadId);
             uploadHandler.finishUpload();
             sendResponse(res, "OK");
+        } else if (method.equals("cancelUploadSession")) {
+          String uploadId = req.getParameter("uploadId");
+          MCRUploadHandler uploadHandler = MCRUploadHandlerManager.getHandler(uploadId);
+          uploadHandler.cancelUpload();
+          sendResponse(res, "OK");
         } else if (method.equals("formBasedUpload")) {
             String uploadId = parms.getParameter("uploadId");
             MCRUploadHandler handler = MCRUploadHandlerManager.getHandler(uploadId);
