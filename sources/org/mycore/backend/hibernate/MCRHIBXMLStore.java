@@ -30,7 +30,6 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.hibernate.Query;
 import org.hibernate.Session;
-import org.hibernate.Transaction;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
@@ -155,7 +154,13 @@ public class MCRHIBXMLStore implements MCRXMLTableInterface {
      *                the method arguments are not correct
      */
     public synchronized final void update(MCRObjectID mcrid, byte[] xml, int version) throws MCRPersistenceException {
-        create(mcrid, xml, version);
+        Session session = getSession();
+        MCRXMLTABLE xmlEntry = (MCRXMLTABLE) session.load(MCRXMLTABLE.class, new MCRXMLTABLEPK(mcrid.getId(), version));
+        xmlEntry.setVersion(version);
+        xmlEntry.setType(this.type);
+        xmlEntry.setXmlByteArray(xml);
+        logger.debug("Updateing " + mcrid.getId() + "/" + version + "/" + this.type + " in database");
+        session.update(xmlEntry);
     }
 
     /**
@@ -276,7 +281,7 @@ public class MCRHIBXMLStore implements MCRXMLTableInterface {
         int t;
 
         for (t = 0; t < l.size(); t++) {
-            logger.debug(l.get(0).toString());
+            logger.debug(l.get(0));
         }
     }
 }
