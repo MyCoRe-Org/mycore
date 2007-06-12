@@ -23,6 +23,7 @@
 
 package org.mycore.frontend.fileupload;
 
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -141,7 +142,7 @@ public class MCRUploadHandlerMyCoRe extends MCRUploadHandler {
         File fout = new File(newdir, newfile);
 
         try {
-            FileOutputStream fouts = new FileOutputStream(fout);
+            BufferedOutputStream fouts = new BufferedOutputStream(new FileOutputStream(fout));
             MCRUtils.copyStream(in, fouts);
             fouts.close();
             logger.info("Data object stored under " + fout.getName());
