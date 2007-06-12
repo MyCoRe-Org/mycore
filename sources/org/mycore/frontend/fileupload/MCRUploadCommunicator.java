@@ -84,8 +84,13 @@ public class MCRUploadCommunicator {
             upm = new MCRUploadProgressMonitor(list[0].size(), countTotalBytes(list[0]), applet);
             startUploadSession(list[0].size());
             loadFiles(list);
-            endUploadSession();
-            upm.finish();
+            if (upm.isCanceled()) {
+                System.out.println("Upload is canceled by user.");
+                cancelUploadSession();
+            } else {
+                endUploadSession();
+                upm.finish();
+            }
         } catch (Exception ex) {
             String msg = ex.getClass().getName() + ": " + ex.getLocalizedMessage();
 
@@ -120,12 +125,17 @@ public class MCRUploadCommunicator {
         }
 
         for (int i = 0; i < list[0].size(); i++) {
+            if (upm.isCanceled())
+                return;
+
             File file = (File) (list[0].get(i));
             String path = (String) (list[1].get(i));
-
             upm.startFile(file.getName(), file.length());
+
             uploadFile(path, file);
-            upm.endFile();
+
+            if (!upm.isCanceled())
+                upm.endFile();
         }
     }
 
@@ -135,10 +145,13 @@ public class MCRUploadCommunicator {
         String md5 = buildMD5String(file);
         System.out.println("MD5 checksum is " + md5);
 
+        if (upm.isCanceled())
+            return;
+
         // TODO: Refactor method names in communication
         Hashtable request = new Hashtable();
         request.put("md5", md5);
-        request.put("method", "createFile String");
+        request.put("method", "uploadFile");
         request.put("path", path);
 
         System.out.println("Sending filename to server: " + path);
@@ -148,7 +161,6 @@ public class MCRUploadCommunicator {
 
         if ("skip file".equals(reply)) {
             System.out.println("File skipped.");
-
             return;
         }
 
@@ -158,6 +170,9 @@ public class MCRUploadCommunicator {
         System.out.println("Server says we should connect to " + host + ":" + port);
 
         System.out.println("Trying to create client socket...");
+
+        if (upm.isCanceled())
+            return;
 
         Socket socket = new Socket(host, port);
         System.out.println("Socket created, connected to server.");
@@ -172,26 +187,33 @@ public class MCRUploadCommunicator {
         zos.putNextEntry(ze);
 
         int num = 0;
+        long len = file.length();
         byte[] buffer = new byte[65536];
 
         System.out.println("Starting to send file content...");
 
-        InputStream source = new BufferedInputStream(new FileInputStream(file));
+        InputStream source = new BufferedInputStream(new FileInputStream(file),buffer.length);
 
         while ((num = source.read(buffer)) != -1) {
+            if (upm.isCanceled())
+                break;
             zos.write(buffer, 0, num);
-            System.out.println("Sended " + num + " of " + file.length() + " bytes.");
+            System.out.println("Sended " + num + " of " + len + " bytes.");
             upm.progressFile(num);
         }
 
         zos.closeEntry();
         zos.flush();
         System.out.println("Finished sending file content.");
-        
+
         String ok = din.readUTF();
-        System.out.println("Server finished storing file content: " + ok );
-        
+        System.out.println("Server finished storing file content: " + ok);
+
         socket.close();
+
+        if (upm.isCanceled())
+            return;
+
         System.out.println("Socket closed, file transfer successfully completed.");
     }
 
@@ -257,22 +279,26 @@ public class MCRUploadCommunicator {
 
     protected void startUploadSession(int numFiles) throws IOException, MCRUploadException {
         Hashtable request = new Hashtable();
-        request.put("method", "startDerivateSession String int");
+        request.put("method", "startUploadSession");
         request.put("numFiles", String.valueOf(numFiles));
         send(request);
     }
 
     protected void endUploadSession() throws IOException, MCRUploadException {
         Hashtable request = new Hashtable();
-        request.put("method", "endDerivateSession String");
+        request.put("method", "endUploadSession");
+        send(request);
+    }
+
+    protected void cancelUploadSession() throws IOException, MCRUploadException {
+        Hashtable request = new Hashtable();
+        request.put("method", "cancelUploadSession");
         send(request);
     }
 
     protected Object send(Hashtable parameters) throws IOException, MCRUploadException {
         parameters.put("uploadId", uid);
-
         Hashtable response = getResponse(doPost(parameters));
-
         return response.get("return");
     }
 
