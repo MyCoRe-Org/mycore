@@ -25,7 +25,7 @@ package org.mycore.services.mbeans;
 
 import org.mycore.frontend.cli.MCRObjectCommands;
 
-public class MCRObject implements MCRObjectMBean {
+public class MCRObject extends MCRPersistenceBase implements MCRObjectMBean {
     
     public MCRObject(){
     }
@@ -34,62 +34,80 @@ public class MCRObject implements MCRObjectMBean {
         MCRObject instance=new MCRObject();
         MCRJMXBridge.registerMe(instance, "Persistence Operations", instance.getClass().getSimpleName());
     }
-
-    public boolean loadFromDirectory(String directory) {
+    
+    public synchronized boolean loadFromDirectory(String directory) {
         try {
+            startTransaction();
             MCRObjectCommands.loadFromDirectory(directory);
+            commitTransaction();
         } catch (Throwable e) {
             e.printStackTrace();
+            rollbackTransaction();
             return false;
         }
         return true;
     }
 
-    public boolean loadFromFile(String file) {
+    public synchronized boolean loadFromFile(String file) {
         try {
+            startTransaction();
             MCRObjectCommands.loadFromFile(file);
+            commitTransaction();
         } catch (Throwable e) {
             e.printStackTrace();
+            rollbackTransaction();
             return false;
         }
         return true;
     }
 
-    public boolean repairIndexOfObjectID(String id) {
+    public synchronized boolean repairIndexOfObjectID(String id) {
         try {
+            startTransaction();
             MCRObjectCommands.repairMetadataSearchForID(id);
+            commitTransaction();
         } catch (Throwable e) {
             e.printStackTrace();
+            rollbackTransaction();
             return false;
         }
         return true;
     }
 
-    public boolean repairIndexOfObjectType(String type) {
+    public synchronized boolean repairIndexOfObjectType(String type) {
         try {
+            startTransaction();
             MCRObjectCommands.repairMetadataSearch(type);
+            commitTransaction();
         } catch (Throwable e) {
             e.printStackTrace();
+            rollbackTransaction();
             return false;
         }
         return true;
     }
 
-    public boolean updateFromDirectory(String directory) {
+    public synchronized boolean updateFromDirectory(String directory) {
         try {
+            startTransaction();
             MCRObjectCommands.updateFromDirectory(directory);
+            commitTransaction();
         } catch (Throwable e) {
             e.printStackTrace();
+            rollbackTransaction();
             return false;
         }
         return true;
     }
 
-    public boolean updateFromFile(String file) {
+    public synchronized boolean updateFromFile(String file) {
         try {
+            startTransaction();
             MCRObjectCommands.updateFromFile(file);
+            commitTransaction();
         } catch (Throwable e) {
             e.printStackTrace();
+            rollbackTransaction();
             return false;
         }
         return true;

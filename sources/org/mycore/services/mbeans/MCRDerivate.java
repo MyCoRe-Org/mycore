@@ -31,7 +31,7 @@ import org.mycore.frontend.cli.MCRDerivateCommands;
  * Need to insert some things here
  *
  */
-public class MCRDerivate implements MCRDerivateMBean {
+public class MCRDerivate extends MCRPersistenceBase implements MCRDerivateMBean {
 
     public static void register(){
         MCRDerivate instance=new MCRDerivate();
@@ -41,11 +41,14 @@ public class MCRDerivate implements MCRDerivateMBean {
     /* (non-Javadoc)
      * @see org.mycore.services.mbeans.MCRDerivateMBean#deleteDerivate(java.lang.String)
      */
-    public boolean deleteDerivate(String id) {
+    public synchronized boolean deleteDerivate(String id) {
         try {
+            startTransaction();
             MCRDerivateCommands.delete(id);
+            commitTransaction();
         } catch (Throwable e) {
             e.printStackTrace();
+            rollbackTransaction();
             return false;
         }
         return true;
@@ -54,11 +57,14 @@ public class MCRDerivate implements MCRDerivateMBean {
     /* (non-Javadoc)
      * @see org.mycore.services.mbeans.MCRDerivateMBean#loadDerivateFromFile(java.lang.String)
      */
-    public boolean loadDerivateFromFile(String file) {
+    public synchronized boolean loadDerivateFromFile(String file) {
         try {
+            startTransaction();
             MCRDerivateCommands.loadFromFile(file);
+            commitTransaction();
         } catch (Throwable e) {
             e.printStackTrace();
+            rollbackTransaction();
             return false;
         }
         return true;
@@ -67,11 +73,14 @@ public class MCRDerivate implements MCRDerivateMBean {
     /* (non-Javadoc)
      * @see org.mycore.services.mbeans.MCRDerivateMBean#loadDerivatesFromDirectory(java.lang.String)
      */
-    public boolean loadDerivatesFromDirectory(String directory) {
+    public synchronized boolean loadDerivatesFromDirectory(String directory) {
         try {
+            startTransaction();
             MCRDerivateCommands.loadFromDirectory(directory);
+            commitTransaction();
         } catch (Throwable e) {
             e.printStackTrace();
+            rollbackTransaction();
             return false;
         }
         return true;
@@ -80,11 +89,14 @@ public class MCRDerivate implements MCRDerivateMBean {
     /* (non-Javadoc)
      * @see org.mycore.services.mbeans.MCRDerivateMBean#repairIndexOfDerivateID(java.lang.String)
      */
-    public boolean repairIndexOfDerivateID(String id) {
+    public synchronized boolean repairIndexOfDerivateID(String id) {
         try {
+            startTransaction();
             MCRDerivateCommands.repairDerivateSearchForID(id);
+            commitTransaction();
         } catch (Throwable e) {
             e.printStackTrace();
+            rollbackTransaction();
             return false;
         }
         return true;
@@ -93,11 +105,14 @@ public class MCRDerivate implements MCRDerivateMBean {
     /* (non-Javadoc)
      * @see org.mycore.services.mbeans.MCRDerivateMBean#repairIndexOfDerivates()
      */
-    public boolean repairIndexOfDerivates() {
+    public synchronized boolean repairIndexOfDerivates() {
         try {
+            startTransaction();
             MCRDerivateCommands.repairDerivateSearch();
+            commitTransaction();
         } catch (Throwable e) {
             e.printStackTrace();
+            rollbackTransaction();
             return false;
         }
         return true;
@@ -106,11 +121,14 @@ public class MCRDerivate implements MCRDerivateMBean {
     /* (non-Javadoc)
      * @see org.mycore.services.mbeans.MCRDerivateMBean#updateDerivateFromFile(java.lang.String)
      */
-    public boolean updateDerivateFromFile(String file) {
+    public synchronized boolean updateDerivateFromFile(String file) {
         try {
+            startTransaction();
             MCRDerivateCommands.updateFromFile(file);
+            commitTransaction();
         } catch (Throwable e) {
             e.printStackTrace();
+            rollbackTransaction();
             return false;
         }
         return true;
@@ -119,11 +137,14 @@ public class MCRDerivate implements MCRDerivateMBean {
     /* (non-Javadoc)
      * @see org.mycore.services.mbeans.MCRDerivateMBean#updateDerivatesFromDirectory(java.lang.String)
      */
-    public boolean updateDerivatesFromDirectory(String directory) {
+    public synchronized boolean updateDerivatesFromDirectory(String directory) {
         try {
+            startTransaction();
             MCRDerivateCommands.updateFromDirectory(directory);
+            commitTransaction();
         } catch (Throwable e) {
             e.printStackTrace();
+            rollbackTransaction();
             return false;
         }
         return true;
