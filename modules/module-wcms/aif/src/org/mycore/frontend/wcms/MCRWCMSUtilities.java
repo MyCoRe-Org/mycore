@@ -20,6 +20,11 @@ import org.mycore.common.MCRException;
 public class MCRWCMSUtilities {
     final static String OBJIDPREFIX_WEBPAGE = "webpage:";
 
+    // strategies for access verification
+    final static int ALLTRUE = 1;
+
+    final static int ONETRUE_ALLTRUE = 2;
+
     final static XPath xpath;
     static {
         try {
@@ -29,12 +34,19 @@ public class MCRWCMSUtilities {
         }
     }
 
-    // strategies for access verification
-    final static int ALLTRUE = 1;
+    final static Document navi;
+    static {
+        try {
+            navi = getNavi();
+        } catch (JDOMException e) {
+            throw new MCRException("", e);
+        } catch (IOException e) {
+            throw new MCRException("", e);
+        }
+    }
 
-    final static int ONETRUE_ALLTRUE = 2;
-
-    //private final static Logger LOGGER = Logger.getLogger("MCRWCMSUtilities");
+    // private final static Logger LOGGER =
+    // Logger.getLogger("MCRWCMSUtilities");
 
     /*
      * public static boolean readAccess(String webpageID, String permission)
@@ -42,13 +54,32 @@ public class MCRWCMSUtilities {
      * permission, ALLTRUE); }
      */
 
+    /**
+     * Verifies a given webpage-ID (//item/@href) from navigation.xml on write
+     * permission, based on ACL-System. To be used by XSL with
+     * Xalan-Java-Extension-Call
+     * 
+     * @param webpageID
+     * @return True if access granted, false if access is forbidden
+     * @throws JDOMException
+     * @throws IOException
+     */
     public static boolean writeAccess(String webpageID) throws JDOMException, IOException {
         return getWriteAccessGeneral() && getAccess(webpageID, "write", ONETRUE_ALLTRUE);
     }
 
+    /**
+     * Returns a filtered navigation.xml, according to current logged in users
+     * WCMS-Write permissions. Only menu items that are permitted to write on
+     * are given back.
+     * 
+     * @return org.w3c.dom.Document with writable menu items.
+     * @throws JDOMException
+     * @throws IOException
+     */
     public static org.w3c.dom.Document getWritableNavi() throws JDOMException, IOException {
         Element origNavi = new Element("root");
-        origNavi.addContent(getNavi().getRootElement().detach());
+        origNavi.addContent(navi.getRootElement().cloneContent());
         Document writableNavi = new Document(new Element("root"));
         buildWritableNavi(origNavi, writableNavi);
         return new DOMOutputter().output(writableNavi);
@@ -60,7 +91,6 @@ public class MCRWCMSUtilities {
 
     private static boolean getAccess(String webpageID, String permission, int strategy) throws JDOMException, IOException {
         // get item as JDOM-Element
-        final Document navi = getNavi();
         final String xpathExp = "//.[@href='" + webpageID + "']";
         XPath xpath = XPath.newInstance(xpathExp);
         Element item = (Element) xpath.selectSingleNode(navi);
