@@ -99,6 +99,10 @@ public class MCRUploadProgressMonitor extends JDialog {
 
     protected long startTime; // Time the upload startet
 
+    protected long endTime; // Time the upload finished
+
+    protected long lastUpdate; // Time the last data update was drawn
+
     protected JLabel lbThroughput; // Average number of bytes per second
 
     protected JLabel lbTime; // Time elapsed / estimated time remaining
@@ -234,18 +238,47 @@ public class MCRUploadProgressMonitor extends JDialog {
 
         setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 
-        Runnable updater = new Runnable() {
+        Runnable starter = new Runnable() {
             public void run() {
                 MCRUploadProgressMonitor.this.setVisible(true);
                 MCRUploadProgressMonitor.this.requestFocus();
             }
         };
 
-        SwingUtilities.invokeLater(updater);
+        // This thread will update display even if upload gets very slow
+        Thread updater = new Thread(new Runnable() {
+            public void run() {
+
+                while (MCRUploadProgressMonitor.this.lastUpdate == 0) {
+                    try {
+                        Thread.sleep(1500);
+                    } catch (InterruptedException ex) {
+                    }
+                }
+
+                while (!(MCRUploadProgressMonitor.this.finished || MCRUploadProgressMonitor.this.canceled)) {
+                    try {
+                        Thread.sleep(500);
+                    } catch (InterruptedException ex) {
+                    }
+
+                    if (MCRUploadProgressMonitor.this.finished || MCRUploadProgressMonitor.this.canceled)
+                        return;
+
+                    long now = System.currentTimeMillis();
+                    if (now - MCRUploadProgressMonitor.this.lastUpdate > 900)
+                        MCRUploadProgressMonitor.this.update();
+                }
+            }
+        });
+
+        SwingUtilities.invokeLater(starter);
+        updater.start();
     }
 
     protected void cancel() {
         canceled = true;
+        endTime = System.currentTimeMillis();
         end();
     }
 
@@ -318,10 +351,15 @@ public class MCRUploadProgressMonitor extends JDialog {
 
         final String sFile = formatSize(bytesFile) + " von " + formatSize(sizeFile) + " übertragen";
 
-        long now = System.currentTimeMillis();
+        lastUpdate = System.currentTimeMillis();
+        long now = (endTime > 0 ? endTime : lastUpdate);
         final int sec = Math.max((int) (now - startTime) / 1000, 1);
-        double secPerPM = ((double) sec / (double) permilleTotal);
-        final int rest = (int) (secPerPM * (1000 - permilleTotal));
+
+        long bytesPerMilli = 1;
+        if (now > startTime)
+            bytesPerMilli = Math.max(1, bytesTotal / (now - startTime));
+        int rest = (int) ((sizeTotal - bytesTotal) / bytesPerMilli / 1000);
+
         int throughput = Math.round(bytesTotal / sec);
 
         final String sTotal = formatSize(bytesTotal) + " von " + formatSize(sizeTotal) + " insgesamt übertragen";
@@ -412,6 +450,7 @@ public class MCRUploadProgressMonitor extends JDialog {
         bytesTotal = sizeTotal;
         fileCount = numFiles;
         finished = true;
+        endTime = System.currentTimeMillis();
         end();
     }
 
@@ -422,6 +461,7 @@ public class MCRUploadProgressMonitor extends JDialog {
     public void cancel(Exception ex) {
         canceled = true;
         finished = true;
+        endTime = System.currentTimeMillis();
         MCRUploadProgressMonitor.reportException(ex);
         end();
     }
@@ -500,8 +540,7 @@ public class MCRUploadProgressMonitor extends JDialog {
                 break;
             while ((num = fin.read(buffer, 0, buffer.length)) != -1) {
                 // Simulate a read error and the following cancel() invocation
-                // if( i == 2 ) { upm.cancel( new java.io.IOException(
-                // "Simulierter Lesefehler" ) ); return; }
+                // if( i == 2 ) { upm.cancel( new java.io.IOException( "Simulierter Lesefehler" ) ); return; }
 
                 if (upm.isCanceled())
                     break;
