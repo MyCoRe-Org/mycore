@@ -83,9 +83,9 @@ public class MCRUploadApplet extends JApplet {
 
         // If true, applet allows to select multiple files and directories.
         // If false, only a single file can be selected. Default is true.
-        boolean selectMultiple = ! "false".equals(getParameter("selectMultiple"));
+        boolean selectMultiple = !"false".equals(getParameter("selectMultiple"));
 
-        // List of file extensions to accept separated by comma or spaces, 
+        // List of file extensions to accept separated by comma or spaces,
         // default is to accept all files
         final String acceptFileTypes = getParameter("acceptFileTypes");
 
@@ -141,7 +141,7 @@ public class MCRUploadApplet extends JApplet {
         locationChooser.setMultiSelectionEnabled(selectMultiple);
 
         // Add a file filter to accept only files with certain extensions
-        if ((acceptFileTypes != null) && (acceptFileTypes.trim().length() > 0)) {
+        if ((acceptFileTypes != null) && (acceptFileTypes.trim().length() > 0) && (!"*".equals(acceptFileTypes.trim()))) {
             locationChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
             locationChooser.setFileFilter(new FileFilter() {
                 Set<String> accepted = new HashSet<String>();
