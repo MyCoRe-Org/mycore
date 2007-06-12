@@ -29,7 +29,6 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
-import org.mycore.common.MCRException;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRLabel;
 
@@ -61,25 +60,21 @@ public class MCRCategoryImpl extends MCRAbstractCategoryImpl {
 
         @Override
         public void add(int index, MCRCategory element) {
-            LOGGER.info("Add Element with index");
             super.add(index, wrapCategory(element));
         }
 
         @Override
         public boolean add(MCRCategory e) {
-            LOGGER.info("Add Element: "+e.getId()+" "+this.size(),new MCRException(""));
             return super.add(wrapCategory(e));
         }
 
         @Override
         public boolean addAll(Collection<? extends MCRCategory> c) {
-            LOGGER.info("Add Collection with size:"+c.size());
             return super.addAll(wrapCategories(c));
         }
 
         @Override
         public boolean addAll(int index, Collection<? extends MCRCategory> c) {
-            LOGGER.info("Add Collection with index");
             return super.addAll(index, wrapCategories(c));
         }
 
