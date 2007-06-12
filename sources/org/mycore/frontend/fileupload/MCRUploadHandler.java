@@ -88,11 +88,13 @@ public abstract class MCRUploadHandler {
      *            the path and filename of the file
      * @param checksum
      *            the MD5 checksum computed at the client applet side
+     * @param length 
+     *            the length of the file in bytes (file size)
      * @return true, if the file should be uploaded, false if the file should be
      *         skipped
      * @throws Exception
      */
-    public boolean acceptFile(String path, String checksum) throws Exception {
+    public boolean acceptFile(String path, String checksum, long length) throws Exception {
         return true;
     }
 

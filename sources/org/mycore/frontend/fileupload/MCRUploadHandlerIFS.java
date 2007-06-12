@@ -104,11 +104,13 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
      *            file name
      * @param checksum
      *            md5 checksum of of file
+     * @param length
+     *            the length of the file in bytes (file size)
      * 
      * @return true transfer file false don't send file
      * 
      */
-    public boolean acceptFile(String path, String checksum) throws Exception {
+    public boolean acceptFile(String path, String checksum, long length) throws Exception {
         MCRFilesystemNode child = rootDir.getChildByPath(path);
         if (!(child instanceof MCRFile)) {
             return true;

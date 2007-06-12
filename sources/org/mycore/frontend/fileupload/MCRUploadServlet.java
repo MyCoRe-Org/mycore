@@ -228,12 +228,14 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
 
             LOGGER.info("UploadServlet uploading " + path);
 
-            final String uploadId = req.getParameter("uploadId");
-            final String md5 = req.getParameter("md5");
-            LOGGER.debug("UploadServlet receives file " + path + " with md5 " + md5);
+            String uploadId = req.getParameter("uploadId");
+            String md5 = req.getParameter("md5");
+            long length = Long.parseLong(req.getParameter("length"));
+            
+            LOGGER.debug("UploadServlet receives file " + path + " (" + length + " bytes)" +" with md5 " + md5);
 
-            if (!MCRUploadHandlerManager.getHandler(uploadId).acceptFile(path, md5)) {
-                LOGGER.debug("Skip file " + path);
+            if (!MCRUploadHandlerManager.getHandler(uploadId).acceptFile(path, md5, length)) {
+                LOGGER.debug("Skipping file " + path);
                 sendResponse(res, "skip file");
 
                 return;
