@@ -247,10 +247,10 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
             uploadHandler.finishUpload();
             sendResponse(res, "OK");
         } else if (method.equals("cancelUploadSession")) {
-          String uploadId = req.getParameter("uploadId");
-          MCRUploadHandler uploadHandler = MCRUploadHandlerManager.getHandler(uploadId);
-          uploadHandler.cancelUpload();
-          sendResponse(res, "OK");
+            String uploadId = req.getParameter("uploadId");
+            MCRUploadHandler uploadHandler = MCRUploadHandlerManager.getHandler(uploadId);
+            uploadHandler.cancelUpload();
+            sendResponse(res, "OK");
         } else if (method.equals("formBasedUpload")) {
             String uploadId = parms.getParameter("uploadId");
             MCRUploadHandler handler = MCRUploadHandlerManager.getHandler(uploadId);
