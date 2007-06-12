@@ -100,16 +100,7 @@ public class MCRUploadHandlerMyCoRe extends MCRUploadHandler {
         dirname = workdir + File.separator + derId;
     }
 
-    /**
-     * Store file in data store
-     * 
-     * @param path
-     *            file name
-     * @param in
-     *            InputStream belongs to socket, do not close!
-     * 
-     */
-    public void receiveFile(String path, InputStream in) throws Exception {
+    public long receiveFile(String path, InputStream in, long length, String md5) throws Exception {
         // prepare to save
         logger.debug("Upload file path: " + path);
 
@@ -153,6 +144,15 @@ public class MCRUploadHandlerMyCoRe extends MCRUploadHandler {
         // set mainfile
         if (mainfile.length() == 0) {
             mainfile = fname;
+        }
+        
+        long myLength = fout.length();
+        if( myLength >= length )
+          return myLength;
+        else
+        {
+          fout.delete(); // Incomplete file transfer, user canceled upload
+          return 0;
         }
     }
 

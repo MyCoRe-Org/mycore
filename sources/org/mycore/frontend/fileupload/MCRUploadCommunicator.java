@@ -184,7 +184,9 @@ public class MCRUploadCommunicator {
         zos.setLevel(Deflater.NO_COMPRESSION);
 
         ZipEntry ze = new ZipEntry(java.net.URLEncoder.encode(path, "UTF-8"));
-        ze.setExtra(uid.getBytes("UTF-8"));
+        StringBuffer extra = new StringBuffer();
+        extra.append(md5).append(" ").append(file.length()).append(" ").append(uid);
+        ze.setExtra(extra.toString().getBytes("UTF-8"));
         zos.putNextEntry(ze);
 
         int num = 0;
@@ -207,8 +209,8 @@ public class MCRUploadCommunicator {
         zos.flush();
         System.out.println("Finished sending file content.");
 
-        String ok = din.readUTF();
-        System.out.println("Server finished storing file content: " + ok);
+        long numBytesStored = din.readLong();
+        System.out.println("Server reports that " + numBytesStored + " bytes have been stored." );
 
         socket.close();
 

@@ -119,19 +119,19 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
         return !checksum.equals(file.getMD5());
     }
 
-    /**
-     * Store file in data store
-     * 
-     * @param path
-     *            file name
-     * @param in
-     *            InputStream belongs to socket, do not close!
-     * 
-     */
-    public synchronized void receiveFile(String path, InputStream in) throws Exception {
+    public synchronized long receiveFile(String path, InputStream in, long length, String md5) throws Exception {
         LOGGER.debug("adding file: " + path);
         MCRFile file = getNewFile(path);
         file.setContentFrom(in);
+        
+        long myLength = file.getSize();
+        if( myLength >= length )
+          return myLength;
+        else
+        {
+          file.delete(); // Incomplete file transfer, user canceled upload
+          return 0;
+        }
     }
 
     /**

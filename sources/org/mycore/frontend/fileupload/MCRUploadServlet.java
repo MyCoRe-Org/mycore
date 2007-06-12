@@ -130,10 +130,16 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
 
             ZipEntry ze = zis.getNextEntry();
             String path = URLDecoder.decode(ze.getName(), "UTF-8");
-            String uploadId = new String(ze.getExtra(), "UTF-8");
-
-            LOGGER.debug("Received path = " + path);
+            String extra = new String(ze.getExtra(), "UTF-8");
+            String[] parts = extra.split("\\s");
+            String md5 = parts[0];
+            long length = Long.parseLong(parts[1]);
+            String uploadId = parts[2];
+            
             LOGGER.debug("Received uploadID = " + uploadId);
+            LOGGER.debug("Received path     = " + path);
+            LOGGER.debug("Received length   = " + length);
+            LOGGER.debug("Received md5      = " + md5);
 
             // Remember current MCRSession for upload
             String sessionID = (String) (sessionIDs.get(uploadId));
@@ -142,11 +148,11 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
                 if (session != null)
                     MCRSessionMgr.setCurrentSession(session);
             }
-            MCRUploadHandlerManager.getHandler(uploadId).receiveFile(path, zis);
+            long numBytesStored = MCRUploadHandlerManager.getHandler(uploadId).receiveFile(path, zis, length, md5);
 
             LOGGER.debug("Stored incoming file content");
 
-            dos.writeUTF("OK");
+            dos.writeLong(numBytesStored);
             dos.flush();
 
             LOGGER.info("File transfer completed successfully.");
@@ -269,6 +275,7 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
 
                 for (int i = 0; i < numFiles; i++) {
                     FileItem item = sub.getFile(paths.get(i));
+                    
                     InputStream in = item.getInputStream();
                     String path = ((Element) (paths.get(i))).getTextTrim();
                     path = getFileName(path);
@@ -277,7 +284,7 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
                     if (path.toLowerCase().endsWith(".zip")) {
                         uploadZipFile(handler, in);
                     } else
-                        handler.receiveFile(path, in);
+                        handler.receiveFile(path, in, 0, null);
                 }
 
                 handler.finishUpload();
@@ -311,7 +318,7 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
             }
 
             LOGGER.info("UploadServlet unpacking ZIP entry " + path);
-            handler.receiveFile(path, zis);
+            handler.receiveFile(path, zis, 0, null);
         }
     }
 
