@@ -284,7 +284,9 @@ public class MCRServlet extends HttpServlet {
                 throw (IOException) ex;
             } else {
                 handleException(ex);
+                tx = MCRHIBConnection.instance().getSession().beginTransaction();
                 generateErrorPage(req, res, 500, ex.getMessage(), ex, false);
+                tx.commit();
             }
         } finally {
             // Release current MCRSession from current Thread,
