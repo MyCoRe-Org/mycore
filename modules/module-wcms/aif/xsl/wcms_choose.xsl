@@ -301,6 +301,27 @@ template:
     </xsl:variable>
     <select name="href" size="20" class="auswahl-ziel">
       <xsl:for-each select="xalan:nodeset($writableNavi)//item">
+        <!-- provide headline, if new node section begins -->
+        <xsl:if test="@ancestorLabels">
+          <xsl:choose>
+            <xsl:when test="@ancestorLabels!=''">
+              <option value="9">
+                <xsl:value-of select="'              '"/>
+              </option>
+              <option value="9">
+                <xsl:value-of select="@ancestorLabels"/>
+              </option>
+            </xsl:when>
+            <xsl:otherwise>
+              <option value="9">
+                <xsl:value-of select="'              '"/>
+              </option>
+            </xsl:otherwise>
+          </xsl:choose>
+          <option value="9">
+            <xsl:value-of select="'======================'"/>
+          </option>
+        </xsl:if>
         <option value="1{@href}">
           <xsl:for-each select="ancestor::item">
             <xsl:text> &#9472;
@@ -326,10 +347,7 @@ template:
             <xsl:call-template name="chooseContentInfo"/>
           </xsl:if>
         </option>
-        <!--        </xsl:if>-->
       </xsl:for-each>
-      <!-- END OF: display menu items -->
-      
     </select>
   </xsl:template>
   

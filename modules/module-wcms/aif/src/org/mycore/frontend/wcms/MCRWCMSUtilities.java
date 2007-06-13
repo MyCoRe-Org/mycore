@@ -16,6 +16,8 @@ import org.mycore.access.MCRAccessInterface;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
+import org.mycore.common.MCRSession;
+import org.mycore.common.MCRSessionMgr;
 
 public class MCRWCMSUtilities {
     final static String OBJIDPREFIX_WEBPAGE = "webpage:";
@@ -34,19 +36,7 @@ public class MCRWCMSUtilities {
         }
     }
 
-    final static Document navi;
-    static {
-        try {
-            navi = getNavi();
-        } catch (JDOMException e) {
-            throw new MCRException("", e);
-        } catch (IOException e) {
-            throw new MCRException("", e);
-        }
-    }
-
-    // private final static Logger LOGGER =
-    // Logger.getLogger("MCRWCMSUtilities");
+    private final static Logger LOGGER = Logger.getLogger("MCRWCMSUtilities");
 
     /*
      * public static boolean readAccess(String webpageID, String permission)
@@ -79,7 +69,7 @@ public class MCRWCMSUtilities {
      */
     public static org.w3c.dom.Document getWritableNavi() throws JDOMException, IOException {
         Element origNavi = new Element("root");
-        origNavi.addContent(navi.getRootElement().cloneContent());
+        origNavi.addContent(getNavi().getRootElement().detach());
         Document writableNavi = new Document(new Element("root"));
         buildWritableNavi(origNavi, writableNavi);
         return new DOMOutputter().output(writableNavi);
@@ -93,7 +83,7 @@ public class MCRWCMSUtilities {
         // get item as JDOM-Element
         final String xpathExp = "//.[@href='" + webpageID + "']";
         XPath xpath = XPath.newInstance(xpathExp);
-        Element item = (Element) xpath.selectSingleNode(navi);
+        Element item = (Element) xpath.selectSingleNode(getNavi());
         // check permission according to $strategy
         boolean access = false;
         if (strategy == ALLTRUE) {
@@ -144,11 +134,44 @@ public class MCRWCMSUtilities {
         while (childIter.hasNext()) {
             Element child = (Element) childIter.next();
             boolean access = itemAccess("write", child, false);
-            if (access)
+            if (access) {
+                // mark root item, to be able proccessing by XSL
+                child.setAttribute("ancestorLabels", getAncestorLabels(child));
+                // cut node and add to target XML
                 writableNavi.getRootElement().addContent(child.detach());
-            else
+            } else
                 buildWritableNavi(child, writableNavi);
         }
+    }
+
+    /**
+     * Returns all labels of the ancestor axis for the given item within
+     * navigation.xml
+     * 
+     * @param itemClone
+     * @return Label as String, like "labelRoot > labelChild >
+     *         labelChildOfChild"
+     * @throws JDOMException
+     * @throws IOException
+     */
+    private static final String getAncestorLabels(Element item) throws JDOMException, IOException {
+        String label = "";
+        String lang = MCRSessionMgr.getCurrentSession().getCurrentLanguage().trim();
+        XPath xpath = XPath.newInstance("//.[@href='" + getWebpageID(item) + "']");
+        Element ic = (Element) xpath.selectSingleNode(getNavi());
+        while (ic.getName().equals("item")) {
+            ic = ic.getParentElement();
+            String webpageID = getWebpageID(ic);
+            xpath = XPath.newInstance("//.[@href='" + webpageID + "']/label[@xml:lang='" + lang + "']");
+            Element labelEl = (Element) xpath.selectSingleNode(getNavi());
+            if (labelEl != null) {
+                if (label.equals(""))
+                    label = labelEl.getTextTrim();
+                else
+                    label = labelEl.getTextTrim() + " > " + label;
+            }
+        }
+        return label;
     }
 
 }
