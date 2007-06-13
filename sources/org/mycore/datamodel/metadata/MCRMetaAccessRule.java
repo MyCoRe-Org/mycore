@@ -84,6 +84,7 @@ public class MCRMetaAccessRule extends MCRMetaDefault {
             throw new MCRException("The condition Element of MCRMetaAccessRule is null.");
         }
         condition = set_condition;
+        condition.detach();
     }
 
     /**
@@ -108,6 +109,7 @@ public class MCRMetaAccessRule extends MCRMetaDefault {
             throw new MCRException("The condition Element of MCRMetaAccessRule is null.");
         }
         condition = set_condition;
+        condition.detach();
     }
 
     /**
@@ -123,6 +125,7 @@ public class MCRMetaAccessRule extends MCRMetaDefault {
             throw new MCRException("The condition Element of MCRMetaAccessRule is null.");
         }
         condition = (org.jdom.Element)set_condition.clone();
+        condition.detach();
     }
 
     /**
@@ -173,6 +176,7 @@ public class MCRMetaAccessRule extends MCRMetaDefault {
             throw new MCRException("The condition Element of MCRMetaAccessRule is null.");
         }
         condition = (org.jdom.Element)temp_condition.clone();
+        condition.detach();
 
         String temp_permission = element.getAttributeValue("permission");
         if (temp_permission == null) {
