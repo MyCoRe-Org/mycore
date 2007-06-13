@@ -181,7 +181,7 @@ public class MCRUploadCommunicator {
         ZipOutputStream zos = new ZipOutputStream(socket.getOutputStream());
         DataInputStream din = new DataInputStream(socket.getInputStream());
 
-        zos.setLevel(Deflater.NO_COMPRESSION);
+        zos.setLevel(Deflater.BEST_COMPRESSION);
 
         ZipEntry ze = new ZipEntry(java.net.URLEncoder.encode(path, "UTF-8"));
         StringBuffer extra = new StringBuffer();
