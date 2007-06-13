@@ -144,7 +144,7 @@ public class MCRUploadApplet extends JApplet {
         if ((acceptFileTypes != null) && (acceptFileTypes.trim().length() > 0) && (!"*".equals(acceptFileTypes.trim()))) {
             locationChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
             locationChooser.setFileFilter(new FileFilter() {
-                Set<String> accepted = new HashSet<String>();
+                Set accepted = new HashSet();
 
                 public boolean accept(File f) {
                     if (accepted.isEmpty()) {

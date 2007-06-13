@@ -153,7 +153,7 @@ public class MCRUploadCommunicator {
         request.put("md5", md5);
         request.put("method", "uploadFile");
         request.put("path", path);
-        request.put("length", file.length() );
+        request.put("length", String.valueOf(file.length()) );
 
         System.out.println("Sending filename to server: " + path);
 
