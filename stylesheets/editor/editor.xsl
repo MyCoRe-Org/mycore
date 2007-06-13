@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
 <!-- ============================================== -->
-<!-- $Revision: 1.68 $ $Date: 2007-05-09 08:57:07 $ -->
+<!-- $Revision: 1.69 $ $Date: 2007-06-13 12:43:17 $ -->
 <!-- ============================================== --> 
 
 <xsl:stylesheet 
@@ -32,7 +32,9 @@
 
 <!-- ======== FCK Editor JavaScript laden ======== -->
 <xsl:variable name="head.additional">
-  <script type="text/javascript" src="{$WebApplicationBaseURL}fck/fckeditor.js" />
+  <xsl:if test="//textarea[@wysiwygEditor='true']">
+    <script type="text/javascript" src="{$WebApplicationBaseURL}fck/fckeditor.js" />
+  </xsl:if>
 </xsl:variable>
 
 <!-- ========================================================================= -->
