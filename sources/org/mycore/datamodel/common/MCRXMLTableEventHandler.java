@@ -23,8 +23,6 @@
 
 package org.mycore.datamodel.common;
 
-import java.util.List;
-
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandlerBase;
 import org.mycore.datamodel.classifications.MCRClassification;
@@ -106,9 +104,7 @@ public class MCRXMLTableEventHandler extends MCREventHandlerBase {
      *            the MCRObject that caused the event
      */
     protected final void handleObjectUpdated(MCREvent evt, MCRObject obj) {
-        mcr_xmltable.delete(obj.getId());
-        org.jdom.Document doc = obj.createXML();
-        mcr_xmltable.create(obj.getId(), doc);
+        mcr_xmltable.update(obj.getId(), obj.createXML());
     }
 
     /**
@@ -147,9 +143,7 @@ public class MCRXMLTableEventHandler extends MCREventHandlerBase {
      *            the MCRObject that caused the event
      */
     protected final void handleDerivateUpdated(MCREvent evt, MCRDerivate der) {
-        mcr_xmltable.delete(der.getId());
-        org.jdom.Document doc = der.createXML();
-        mcr_xmltable.create(der.getId(), doc);
+        mcr_xmltable.update(der.getId(), der.createXML());
     }
 
     /**
