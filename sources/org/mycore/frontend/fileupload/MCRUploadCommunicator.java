@@ -191,6 +191,7 @@ public class MCRUploadCommunicator {
 
         int num = 0;
         long len = file.length();
+        long sended = 0;
         byte[] buffer = new byte[65536];
 
         System.out.println("Starting to send file content...");
@@ -201,7 +202,8 @@ public class MCRUploadCommunicator {
             if (upm.isCanceled())
                 break;
             zos.write(buffer, 0, num);
-            System.out.println("Sended " + num + " of " + len + " bytes.");
+            sended += num;
+            System.out.println("Sended " + sended + " of " + len + " bytes.");
             upm.progressFile(num);
         }
 
