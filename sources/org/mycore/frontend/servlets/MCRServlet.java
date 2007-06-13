@@ -277,7 +277,10 @@ public class MCRServlet extends HttpServlet {
                 tx.commit();
             }
         } catch (Exception ex) {
-            tx.rollback();
+            if (getProperty(req, INITIAL_SERVLET_NAME_KEY).equals(getServletName())) {
+                // current Servlet not called via RequestDispatcher
+                tx.rollback();
+            }
             if (ex instanceof ServletException) {
                 throw (ServletException) ex;
             } else if (ex instanceof IOException) {
