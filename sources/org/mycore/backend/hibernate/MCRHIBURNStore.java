@@ -136,7 +136,7 @@ public class MCRHIBURNStore implements MCRURNStore {
 
         Session session = getSession();
         String ret = null;
-        StringBuffer querySB = new StringBuffer("select key.mcrid from ").append(classname).append(" where MCRID='").append(id).append("'");
+        StringBuffer querySB = new StringBuffer("select key.mcrurn from ").append(classname).append(" where key.mcrid='").append(id).append("'");
         logger.debug("HQL-Statement: " + querySB.toString());
         List returns;
         returns = session.createQuery(querySB.toString()).list();
@@ -160,7 +160,7 @@ public class MCRHIBURNStore implements MCRURNStore {
 
         Session session = getSession();
         String ret = null;
-        StringBuffer querySB = new StringBuffer("select key.mcrurn from ").append(classname).append(" where MCRURN='").append(urn).append("'");
+        StringBuffer querySB = new StringBuffer("select key.mcrid from ").append(classname).append(" where key.mcrurn='").append(urn).append("'");
         logger.debug("HQL-Statement: " + querySB.toString());
         List returns;
         returns = session.createQuery(querySB.toString()).list();
