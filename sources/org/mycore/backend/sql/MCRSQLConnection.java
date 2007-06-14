@@ -83,9 +83,9 @@ public class MCRSQLConnection {
     static {
         MCRConfiguration config = MCRConfiguration.instance();
         url = config.getString("MCR.Persistence.SQL.Database.URL");
-        userID = config.getString("MCR.persistence.SQL.Database.Userid", "");
-        password = config.getString("MCR.persistence.SQL.Database.Passwd", "");
-        maxUsages = config.getInt("MCR.persistence.SQL.Database.Connections.Max", Integer.MAX_VALUE);
+        userID = config.getString("MCR.Persistence.SQL.Database.Userid", "");
+        password = config.getString("MCR.Persistence.SQL.Database.Passwd", "");
+        maxUsages = config.getInt("MCR.Persistence.SQL.Database.Connections.MaxUsages", Integer.MAX_VALUE);
     }
 
     /**
@@ -116,7 +116,7 @@ public class MCRSQLConnection {
         logger.debug("MCRSQLConnection: Building connection to JDBC datastore using URL " + url);
 
         try {
-            if (!userID.equals("")) {
+            if ( ( userID != null ) && ( userID.trim().length() > 0 ) ) {
                 connection = DriverManager.getConnection(url, userID, password);
             } else {
                 connection = DriverManager.getConnection(url);
