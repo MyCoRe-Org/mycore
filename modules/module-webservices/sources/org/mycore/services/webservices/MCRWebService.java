@@ -28,11 +28,9 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
-import org.hibernate.Transaction;
 import org.jdom.Document;
 import org.mycore.datamodel.common.MCRLinkTableManager;
 import org.mycore.datamodel.common.MCRXMLTableManager;
-import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.services.fieldquery.MCRHit;
@@ -59,17 +57,8 @@ public class MCRWebService implements MCRWS {
      * @see MCRWS#MCRDoRetrieveObject(java.lang.String)
      */
     public org.w3c.dom.Document MCRDoRetrieveObject(String ID) throws Exception {
-        Transaction tx = MCRHIBConnection.instance().getSession().beginTransaction();
-
-        org.jdom.Document d;
-        try {
-            // check the ID and retrieve the data
-            d = TM.readDocument(new MCRObjectID(ID));
-            tx.commit();
-        } catch (Exception ex) {
-            tx.rollback();
-            throw ex;
-        }
+        // check the ID and retrieve the data
+        org.jdom.Document d = TM.readDocument(new MCRObjectID(ID));
 
         org.jdom.output.DOMOutputter doo = new org.jdom.output.DOMOutputter();
 
@@ -79,7 +68,6 @@ public class MCRWebService implements MCRWS {
         }
 
         return doo.output(d);
-
     }
 
     /*
@@ -88,21 +76,14 @@ public class MCRWebService implements MCRWS {
      * @see MCRWS#MCRDoRetrieveClassification(java.lang.String,
      *      java.lang.String, java.lang.String)
      */
-    public org.w3c.dom.Document MCRDoRetrieveClassification(String level, String type, String classID, String categID, String format) throws Exception {
-        if (null == format)
-            format = "metadata";
+    public org.w3c.dom.Document MCRDoRetrieveClassification(String level, String type, String classID, String categID, String format ) throws Exception {
+        if ( null == format )
+          format = "metadata";
         String uri = "classification:" + format + ":" + level + ":" + type + ":" + classID + ":" + categID;
         org.jdom.Document d = new org.jdom.Document();
 
-        Transaction tx = MCRHIBConnection.instance().getSession().beginTransaction();
-        try {
-            org.jdom.Element cl = MCRURIResolver.instance().resolve(uri);
-            d.addContent(cl);
-            tx.commit();
-        } catch (Exception ex) {
-            tx.rollback();
-            throw ex;
-        }
+        org.jdom.Element cl = MCRURIResolver.instance().resolve(uri);
+        d.addContent(cl);
 
         org.jdom.output.DOMOutputter doo = new org.jdom.output.DOMOutputter();
 
@@ -129,16 +110,7 @@ public class MCRWebService implements MCRWS {
         }
 
         // Execute query
-        MCRResults res = null;
-        Transaction tx = MCRHIBConnection.instance().getSession().beginTransaction();
-        try {
-            res = MCRQueryManager.search(MCRQuery.parseXML(doc), true);
-            tx.commit();
-        } catch (Exception ex) {
-            tx.rollback();
-            throw ex;
-        }
-
+        MCRResults res = MCRQueryManager.search(MCRQuery.parseXML(doc), true);
         Document result = new Document(res.buildXML());
 
         org.jdom.output.DOMOutputter doo = new org.jdom.output.DOMOutputter();
@@ -161,40 +133,30 @@ public class MCRWebService implements MCRWS {
             from = "";
         if (to == null)
             to = "";
-
-        Transaction tx = MCRHIBConnection.instance().getSession().beginTransaction();
-        try {
-            if ((from.length() != 0) || (to.length() != 0)) {
-                logger.debug("Input parameter : type=" + type + "   from=" + from + "   to=" + to);
-                List links = new ArrayList();
-                MCRLinkTableManager LM = MCRLinkTableManager.instance();
-                // Look for links
-                if ((from = from.trim()).length() != 0) {
-                    // logger.debug("Use
-                    // MCRLinkTableManager.getDestinationOf("+from+","+type+")");
-                    links = LM.getDestinationOf(from, type);
-                } else {
-                    // logger.debug("Use
-                    // MCRLinkTableManager.getSourceOf("+to+","+type+")");
-                    links = LM.getSourceOf(to, type);
-                }
-                // logger.debug("Get "+(new Integer(links.size())).toString()+"
-                // results");
-                for (int i = 0; i < links.size(); i++) {
-                    MCRHit hit = new MCRHit((String) links.get(i));
-                    results.addHit(hit);
-                }
-            } else {
-                logger.warn("Input parameter from and to are empty!");
-            }
-            tx.commit();
-        } catch (Exception ex) {
-            tx.rollback();
-            throw ex;
+        if ((from.length() != 0) || (to.length() != 0)) {
+          logger.debug("Input parameter : type=" + type + "   from=" + from + "   to=" + to);
+          List links = new ArrayList();
+          MCRLinkTableManager LM = MCRLinkTableManager.instance();
+          // Look for links
+          if ((from = from.trim()).length() != 0) {
+            // logger.debug("Use MCRLinkTableManager.getDestinationOf("+from+","+type+")");
+            links = LM.getDestinationOf(from, type);
+        } else {
+            // logger.debug("Use MCRLinkTableManager.getSourceOf("+to+","+type+")");
+            links = LM.getSourceOf(to, type);
+        }
+        // logger.debug("Get "+(new Integer(links.size())).toString()+" results");
+        for (int i = 0; i < links.size(); i++) {
+            MCRHit hit = new MCRHit((String) links.get(i));
+            results.addHit(hit);
+        }
+        } else {
+            logger.warn("Input parameter from and to are empty!");
         }
         // write output
         Document result = new Document(results.buildXML());
         org.jdom.output.DOMOutputter doo = new org.jdom.output.DOMOutputter();
         return doo.output(result);
     }
+    
 }
