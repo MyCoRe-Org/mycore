@@ -63,9 +63,9 @@ public class MCRObjectCommands extends MCRAbstractCommands {
 
     /** Default transformer script */
     public static final String DEFAULT_TRANSFORMER = "save-object.xsl";
-    
+
     /** static compiled transformer stylesheets */
-    private static Hashtable <String,javax.xml.transform.Transformer> translist = new Hashtable<String,javax.xml.transform.Transformer>();
+    private static Hashtable<String, javax.xml.transform.Transformer> translist = new Hashtable<String, javax.xml.transform.Transformer>();
 
     /**
      * The empty constructor.
@@ -75,65 +75,49 @@ public class MCRObjectCommands extends MCRAbstractCommands {
 
         MCRCommand com = null;
 
-        com = new MCRCommand("delete all objects of type {0}", "org.mycore.frontend.cli.MCRObjectCommands.deleteAllObjects String",
-                "Removes MCRObjects in the number range between the MCRObjectID {0} and {1}.");
+        com = new MCRCommand("delete all objects of type {0}", "org.mycore.frontend.cli.MCRObjectCommands.deleteAllObjects String", "Removes MCRObjects in the number range between the MCRObjectID {0} and {1}.");
         command.add(com);
 
-        com = new MCRCommand("delete object from {0} to {1}", "org.mycore.frontend.cli.MCRObjectCommands.deleteFromTo String String",
-                "Removes MCRObjects in the number range between the MCRObjectID {0} and {1}.");
+        com = new MCRCommand("delete object from {0} to {1}", "org.mycore.frontend.cli.MCRObjectCommands.deleteFromTo String String", "Removes MCRObjects in the number range between the MCRObjectID {0} and {1}.");
         command.add(com);
 
         com = new MCRCommand("delete object {0}", "org.mycore.frontend.cli.MCRObjectCommands.delete String", "Removes a MCRObject with the MCRObjectID {0}");
         command.add(com);
 
-        com = new MCRCommand("load object from file {0}", "org.mycore.frontend.cli.MCRObjectCommands.loadFromFile String",
-                "Adds a MCRObject form the file {0} to the system.");
+        com = new MCRCommand("load object from file {0}", "org.mycore.frontend.cli.MCRObjectCommands.loadFromFile String", "Adds a MCRObject form the file {0} to the system.");
         command.add(com);
 
-        com = new MCRCommand("load all objects from directory {0}", "org.mycore.frontend.cli.MCRObjectCommands.loadFromDirectory String",
-                "Loads all MCRObjects form the directory {0} to the system.");
+        com = new MCRCommand("load all objects from directory {0}", "org.mycore.frontend.cli.MCRObjectCommands.loadFromDirectory String", "Loads all MCRObjects form the directory {0} to the system.");
         command.add(com);
 
-        com = new MCRCommand("update object from file {0}", "org.mycore.frontend.cli.MCRObjectCommands.updateFromFile String",
-                "Updates a MCRObject form the file {0} in the system.");
+        com = new MCRCommand("update object from file {0}", "org.mycore.frontend.cli.MCRObjectCommands.updateFromFile String", "Updates a MCRObject form the file {0} in the system.");
         command.add(com);
 
-        com = new MCRCommand("update all objects from directory {0}", "org.mycore.frontend.cli.MCRObjectCommands.updateFromDirectory String",
-                "Updates all MCRObjects form the directory {0} in the system.");
+        com = new MCRCommand("update all objects from directory {0}", "org.mycore.frontend.cli.MCRObjectCommands.updateFromDirectory String", "Updates all MCRObjects form the directory {0} in the system.");
         command.add(com);
 
-        com = new MCRCommand("export object from {0} to {1} to directory {2} with {3}",
-                "org.mycore.frontend.cli.MCRObjectCommands.export String String String String",
-                "Stores all MCRObjects with MCRObjectID's between {0} and {1} to the directory {2} with the stylesheet {3}-object.xsl. For {3} save is the default.");
+        com = new MCRCommand("export object from {0} to {1} to directory {2} with {3}", "org.mycore.frontend.cli.MCRObjectCommands.export String String String String", "Stores all MCRObjects with MCRObjectID's between {0} and {1} to the directory {2} with the stylesheet {3}-object.xsl. For {3} save is the default.");
         command.add(com);
 
-        com = new MCRCommand("export object {0} to directory {1} with {2}", "org.mycore.frontend.cli.MCRObjectCommands.export String String String",
-                "Stores the MCRObject with the MCRObjectID {0} to the directory {1} with the stylesheet {2}-object.xsl. For {2} save is the default.");
+        com = new MCRCommand("export object {0} to directory {1} with {2}", "org.mycore.frontend.cli.MCRObjectCommands.export String String String", "Stores the MCRObject with the MCRObjectID {0} to the directory {1} with the stylesheet {2}-object.xsl. For {2} save is the default.");
         command.add(com);
 
-        com = new MCRCommand("export all objects of type {0} to directory {1} with {2}",
-                "org.mycore.frontend.cli.MCRObjectCommands.exportAllObjects String String String",
-                "Stores all MCRObjects of type {0} to directory {1} with the stylesheet mcr_{2}-object.xsl. For {2} save is the default.");
+        com = new MCRCommand("export all objects of type {0} to directory {1} with {2}", "org.mycore.frontend.cli.MCRObjectCommands.exportAllObjects String String String", "Stores all MCRObjects of type {0} to directory {1} with the stylesheet mcr_{2}-object.xsl. For {2} save is the default.");
         command.add(com);
 
-        com = new MCRCommand("get last object ID for base {0}", "org.mycore.frontend.cli.MCRObjectCommands.getLastID String",
-                "Returns the last used MCRObjectID for the ID base.");
+        com = new MCRCommand("get last object ID for base {0}", "org.mycore.frontend.cli.MCRObjectCommands.getLastID String", "Returns the last used MCRObjectID for the ID base.");
         command.add(com);
 
-        com = new MCRCommand("get next object ID for base {0}", "org.mycore.frontend.cli.MCRObjectCommands.getNextID String",
-                "Returns the next free MCRObjectID for the ID base.");
+        com = new MCRCommand("get next object ID for base {0}", "org.mycore.frontend.cli.MCRObjectCommands.getNextID String", "Returns the next free MCRObjectID for the ID base.");
         command.add(com);
 
-        com = new MCRCommand("check file {0}", "org.mycore.frontend.cli.MCRObjectCommands.checkXMLFile String",
-                "Checks the data file {0} against the XML Schema.");
+        com = new MCRCommand("check file {0}", "org.mycore.frontend.cli.MCRObjectCommands.checkXMLFile String", "Checks the data file {0} against the XML Schema.");
         command.add(com);
 
-        com = new MCRCommand("repair metadata search of type {0}", "org.mycore.frontend.cli.MCRObjectCommands.repairMetadataSearch String",
-                "Reads the SQL store table of MCRObject XML files for the type {0} and restore them to the search store.");
+        com = new MCRCommand("repair metadata search of type {0}", "org.mycore.frontend.cli.MCRObjectCommands.repairMetadataSearch String", "Reads the SQL store table of MCRObject XML files for the type {0} and restore them to the search store.");
         command.add(com);
 
-        com = new MCRCommand("repair metadata search of ID {0}", "org.mycore.frontend.cli.MCRObjectCommands.repairMetadataSearchForID String",
-                "Read the SQL store table of MCRObject XML files with MCRObjectID {0} and restore them to the search store.");
+        com = new MCRCommand("repair metadata search of ID {0}", "org.mycore.frontend.cli.MCRObjectCommands.repairMetadataSearchForID String", "Read the SQL store table of MCRObject XML files with MCRObjectID {0} and restore them to the search store.");
         command.add(com);
     }
 
@@ -546,19 +530,29 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         if (trans != null) {
             return trans;
         }
+        LOGGER.debug("Will load transformer stylesheet " + xslfile + "for export.");
 
         InputStream in = MCRObjectCommands.class.getResourceAsStream("/" + xslfile);
         if (in == null) {
             in = MCRObjectCommands.class.getResourceAsStream(DEFAULT_TRANSFORMER);
         }
-        if (in != null) {
-            StreamSource source = new StreamSource(in);
-            TransformerFactory transfakt = TransformerFactory.newInstance();
-            transfakt.setURIResolver(MCRURIResolver.instance());
-            trans = transfakt.newTransformer(source);
+        try {
+            if (in != null) {
+                StreamSource source = new StreamSource(in);
+                TransformerFactory transfakt = TransformerFactory.newInstance();
+                transfakt.setURIResolver(MCRURIResolver.instance());
+                trans = transfakt.newTransformer(source);
+                translist.put(xslfile, trans);
+                return trans;
+            } else {
+                LOGGER.warn("Can't load transformer ressource " + xslfile + " or " + DEFAULT_TRANSFORMER + ".");
+            }
+        } catch (Exception e) {
+            LOGGER.warn("Error while load transformer ressource " + xslfile + " or " + DEFAULT_TRANSFORMER + ".");
+            if (LOGGER.isDebugEnabled()) {
+            e.printStackTrace();}
         }
-        translist.put(xslfile,trans);
-        return trans;
+        return null;
     }
 
     /**
