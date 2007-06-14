@@ -36,12 +36,14 @@ import java.io.StringReader;
 import java.util.Vector;
 import java.util.Properties;
 
+import org.hibernate.Transaction;
 import org.mycore.parsers.bool.MCRAndCondition;
 import org.mycore.parsers.bool.MCROrCondition;
 import org.mycore.parsers.bool.MCRNotCondition;
 import org.mycore.parsers.bool.MCRCondition;
 import org.mycore.services.fieldquery.MCRFieldDef;
 import org.mycore.services.fieldquery.MCRQueryCondition;
+import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRConfiguration;
 
@@ -325,6 +327,7 @@ public class MCRZ3950PrefixQueryParser
     if (1 == args.length)
       pqfQuery = args[0];
 
+    Transaction tx = MCRHIBConnection.instance().getSession().beginTransaction();
     MCRZ3950PrefixQueryParser pqs = new MCRZ3950PrefixQueryParser(new StringReader(
         pqfQuery));
     try
@@ -333,9 +336,10 @@ public class MCRZ3950PrefixQueryParser
       System.out.println("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
       System.out.println("pqf query    : " + pqfQuery);
       System.out.println("mycore query : " + result.toString());
-    } catch (MCRException e)
+      tx.commit();
+    } catch (Exception e)
     {
-      // TODO Auto-generated catch block
+      tx.rollback();
       e.printStackTrace();
     }
   }
