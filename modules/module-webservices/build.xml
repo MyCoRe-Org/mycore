@@ -2,7 +2,7 @@
 
 <!-- ============================================== -->
 <!--      MyCoRe-WebService build file for use with ANT        -->
-<!-- $Revision: 1.15 $ $Date: 2007-06-14 13:40:59 $ -->
+<!-- $Revision: 1.16 $ $Date: 2007-06-14 13:50:16 $ -->
 <!-- ============================================== -->
 
 <project name="MyCoReModule - WebService" default="usage" basedir=".">
@@ -86,7 +86,7 @@
    </antcall>
   </target>
 
-  <target name="jar">
+  <target name="pre.jar">
     <!-- Registers the MyCoRe WSDD provider for Axis -->
     <mkdir dir="${basedir}/classes/META-INF/services" />
     <echo file="${basedir}/classes/META-INF/services/org.apache.axis.deployment.wsdd.Provider" append="false">org.mycore.services.webservices.MCRWSDDProvider</echo>
