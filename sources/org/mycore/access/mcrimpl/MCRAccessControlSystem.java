@@ -313,19 +313,6 @@ public class MCRAccessControlSystem extends MCRAccessBaseImpl {
     }
 
     /**
-     * method removes an access entry from the cache
-     * 
-     * @param objID
-     * @param pool
-     * @return dummy-true
-     */
-    public boolean removeFromCache(String objID, String pool) {
-        String cacheKey = pool + "#" + objID;
-        cache.remove(cacheKey);
-        return true;
-    }
-
-    /**
      * method that delivers the next free ruleID for a given Prefix and sets the
      * counter to counter + 1
      * 
