@@ -49,10 +49,8 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.TimeZone;
 
-import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -67,6 +65,8 @@ import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRException;
 import org.mycore.common.xml.MCRXSLTransformation;
+import org.mycore.frontend.servlets.MCRServlet;
+import org.mycore.frontend.servlets.MCRServletJob;
 
 /**
  * This class implements an OAI Data Provider for MyCoRe and Miless
@@ -76,7 +76,7 @@ import org.mycore.common.xml.MCRXSLTransformation;
  * @version $Revision: 1.23 $ $Date: 2003/01/31 12:48:25 $
  * @deprecated
  */
-public class MCROAIDataProvider extends HttpServlet {
+public class MCROAIDataProvider extends MCRServlet {
     /**
      * <code>serialVersionUID</code> introduced for compatibility with JDK 1.4
      * (a should have)
@@ -86,30 +86,39 @@ public class MCROAIDataProvider extends HttpServlet {
     static Logger logger = Logger.getLogger(MCROAIDataProvider.class);
 
     // repository independent settings which are used for all repositories
-    
-    private static final String STR_OAI_ADMIN_EMAIL = "MCR.OAI.AdmineMail"; 
-    // EMail address of oai admin repository specific settings. Should be followed by 
+
+    private static final String STR_OAI_ADMIN_EMAIL = "MCR.OAI.AdmineMail";
+
+    // EMail address of oai admin repository specific settings. Should be
+    // followed by
     // Servletname so the OAI client may decide which settings belong to itself.
-    
-    private static final String STR_OAI_REPOSITORY_NAME = "MCR.OAI.Repository.Name"; 
+
+    private static final String STR_OAI_REPOSITORY_NAME = "MCR.OAI.Repository.Name";
+
     // Name of the repository
-    
-    private static final String STR_OAI_REPOSITORY_IDENTIFIER = "MCR.OAI.Repository.Identifier"; 
+
+    private static final String STR_OAI_REPOSITORY_IDENTIFIER = "MCR.OAI.Repository.Identifier";
+
     // Identifier of the repository
-    
-    private static final String STR_OAI_FRIENDS = "MCR.OAI.Friends"; 
+
+    private static final String STR_OAI_FRIENDS = "MCR.OAI.Friends";
+
     // a colon (:) separated list of other OAI repsoitories (friends)
-    
-    private static final String STR_OAI_QUERYSERVICE = "MCR.OAI.QueryService"; 
+
+    private static final String STR_OAI_QUERYSERVICE = "MCR.OAI.QueryService";
+
     // implementing class of MCROAIQuery
 
-    private static final String STR_OAI_RESUMPTIONTOKEN_DIR = "MCR.OAI.Resumptiontoken.Dir"; 
+    private static final String STR_OAI_RESUMPTIONTOKEN_DIR = "MCR.OAI.Resumptiontoken.Dir";
+
     // temporary Directory
-    
-    private static final String STR_OAI_RESUMPTIONTOKEN_TIMEOUT = "MCR.OAI.Resumptiontoken.Timeout"; 
+
+    private static final String STR_OAI_RESUMPTIONTOKEN_TIMEOUT = "MCR.OAI.Resumptiontoken.Timeout";
+
     // timeout, after which a resumption token will be deleted
-    
-    private static final String STR_OAI_MAXRETURNS = "MCR.OAI.MaxReturns"; 
+
+    private static final String STR_OAI_MAXRETURNS = "MCR.OAI.MaxReturns";
+
     // maximum number of returned list sets
 
     private static final String STR_OAI_METADATA_TRANSFORMER = "MCR.OAI.Metadata.Transformer";
@@ -171,62 +180,16 @@ public class MCROAIDataProvider extends HttpServlet {
 
     private static String resumptionTokenDir;
 
-    static {
+    public void init() throws ServletException {
+        super.init();
         config = MCRConfiguration.instance();
         resumptionTokenDir = config.getString(STR_OAI_RESUMPTIONTOKEN_DIR) + File.separator;
     }
 
-    /**
-     * Method init. Initializes the Servlet when first loaded
-     * 
-     * @param config
-     *            Configuration data
-     * @throws ServletException
-     */
-    public void init(ServletConfig config) throws ServletException {
-        super.init(config);
-    }
+    protected void doGetPost(MCRServletJob job) throws Exception {
+        HttpServletResponse response = job.getResponse();
+        HttpServletRequest request = job.getRequest();
 
-    /**
-     * Method destroy. Automatically destroys the Servlet.
-     */
-    public void destroy() {
-    }
-
-    /**
-     * Method doGet. Handles the HTTP <code>GET</code> method.
-     * 
-     * @param request
-     *            servlet request
-     * @param response
-     *            servlet response
-     */
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) {
-        processRequest(request, response);
-    }
-
-    /**
-     * Method doPost. Handles the HTTP <code>POST</code> method.
-     * 
-     * @param request
-     *            servlet request
-     * @param response
-     *            servlet response
-     */
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) {
-        processRequest(request, response);
-    }
-
-    /**
-     * Method processRequest. Processes requests for both HTTP <code>GET</code>
-     * and <code>POST</code> methods.
-     * 
-     * @param request
-     *            servlet request
-     * @param response
-     *            servlet response
-     */
-    protected void processRequest(HttpServletRequest request, HttpServletResponse response) {
         response.setContentType("text/xml; charset=UTF-8");
 
         // Exceptions must be caught...
