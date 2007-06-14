@@ -2,7 +2,7 @@
 
   <!-- =================================================================== -->
   <!-- MyCoRe build file for use with Apache Ant                           -->
-  <!-- $Revision: 1.134 $ $Date: 2007-06-01 15:21:51 $                      -->
+  <!-- $Revision: 1.135 $ $Date: 2007-06-14 13:57:33 $                      -->
   <!-- =================================================================== -->
 
 <project name="MyCoRe" default="usage" basedir=".">
@@ -39,7 +39,7 @@
   <macrodef name="modulePreHook">
     <attribute name="target"/>
     <sequential>
-      <subant target="@{target}" inheritall="true" inheritrefs="true">
+      <subant target="pre.@{target}" inheritall="true" inheritrefs="true">
         <fileset dir="." includes="modules/module-*/build.xml">
         	<containsregexp expression="\u003ctarget.*name=\u0022pre.@{target}\u0022"/> 
         </fileset>
@@ -79,7 +79,7 @@
     <echo level="info">Operating system : ${os.name} Version ${os.version} on ${os.arch} </echo>
     <echo level="info">Java version     : JDK ${ant.java.version} Version ${java.version} from ${java.vendor}</echo>
     <echo level="info">Java home        : ${java.home}</echo>
-    <echo level="info">Ant build file   : $Revision: 1.134 $ $Date: 2007-06-01 15:21:51 $</echo>
+    <echo level="info">Ant build file   : $Revision: 1.135 $ $Date: 2007-06-14 13:57:33 $</echo>
     <echo level="info">Ant version      : ${ant.version}</echo>
     <echo level="info">Ant home         : ${ant.home}</echo>
     <echo level="info">Ant libdir       : ${ant.library.dir}</echo>
