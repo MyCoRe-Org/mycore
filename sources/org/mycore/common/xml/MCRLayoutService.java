@@ -219,10 +219,16 @@ public class MCRLayoutService {
         MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
         String uid = mcrSession.getCurrentUserID();
         StringBuffer groups = new StringBuffer();
-        ArrayList groupList = MCRUserMgr.instance().retrieveUser(uid).getGroupIDs();
-        for (int i = 0; i < groupList.size(); i++) {
-            if (i != 0) groups.append(" ");
-            groups.append((String) groupList.get(i));
+        
+        if (MCRConfiguration.instance().getString("MCR.Users.Guestuser.UserName").equals(uid)) {
+            groups.append(MCRConfiguration.instance().getString("MCR.Users.Guestuser.GroupName"));
+        }
+        else {
+          ArrayList groupList = MCRUserMgr.instance().retrieveUser(uid).getGroupIDs();
+          for (int i = 0; i < groupList.size(); i++) {
+              if (i != 0) groups.append(" ");
+              groups.append((String) groupList.get(i));
+          }
         }
 
         // set parameters
