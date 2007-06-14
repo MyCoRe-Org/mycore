@@ -29,14 +29,14 @@ import org.apache.axis.deployment.wsdd.WSDDProvider;
 import org.apache.axis.deployment.wsdd.WSDDService;
 
 /**
- * WSDDProvider that returns a MCRRPCProvider with name MCR
+ * WSDDProvider that returns a MCRRPCProvider with name MCRRPC
  * 
  * @author Frank Lützenkirchen
  */
 public class MCRWSDDProvider extends WSDDProvider {
 
     public String getName() {
-        return "MCR";
+        return "MCRRPC";
     }
 
     public Handler newProviderInstance(WSDDService arg0, EngineConfiguration arg1) throws Exception {
