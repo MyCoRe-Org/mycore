@@ -350,108 +350,6 @@ template:
       </xsl:for-each>
     </select>
   </xsl:template>
-  
-  <!-- ===================================================================================== -->
-  <xsl:template name="chooseContent_old">
-    <select name="href" size="20" class="auswahl-ziel">
-      <!-- each root node -->
-      <xsl:for-each select="/cms/rootNode">
-        <xsl:variable name="myRootNode" select="node()"/>
-        <xsl:variable name="myRootNodeTypeHREF" select="@href"/>
-        <!-- go through the complete navigation.xml -->
-        <xsl:for-each select="document($navigationBase)//*">
-          <xsl:variable name="firstRootNode" select="position()"/>
-          
-          <!-- if the current entry is the rootNode -->
-          <xsl:if
-            test="	($myRootNodeTypeHREF = 'yes' and $myRootNode = @href )
-									or
-									($myRootNodeTypeHREF = 'no' and $myRootNode	= name(current()))">
-            
-            <!-- display menu name -->
-            <xsl:for-each select="ancestor-or-self::*">
-              <xsl:if test="position() = 2 ">
-                <option value="9">
-                  <xsl:value-of select="'======================'"/>
-                </option>
-                <!-- test if user is allowed to select this menu point -->
-                <xsl:choose>
-                  <!-- allowed -->
-                  <xsl:when test=" position() = last() ">
-                    <option value="2{@href}">
-                      <xsl:value-of select="label[lang($DefaultLang)]"/>
-                    </option>
-                  </xsl:when>
-                  <!-- forbidden -->
-                  <xsl:otherwise>
-                    <option value="8">
-                      <xsl:variable name="labelPath">
-                        <xsl:for-each select="document($navigationBase)//item">
-                          <xsl:if test="$myRootNode = @href">
-                            <xsl:for-each select="ancestor-or-self::item">
-                              <xsl:value-of select="concat(' > ',./label)"/>
-                            </xsl:for-each>
-                          </xsl:if>
-                        </xsl:for-each>
-                      </xsl:variable>
-                      <xsl:value-of select="concat(@label,$labelPath)"/>
-                    </option>
-                  </xsl:otherwise>
-                </xsl:choose>
-                <!-- test if user is allowed to select this menu point -->
-                <option value="9">
-                  <xsl:value-of select="'======================'"/>
-                </option>
-              </xsl:if>
-            </xsl:for-each>
-            <!-- END OF: display menu name -->
-            
-            <!-- display menu items -->
-            <xsl:for-each select="descendant-or-self::item">
-              <xsl:if test="@href">
-                <option value="1{@href}">
-                  <xsl:if test="concat($firstRootNode, position())='21'">
-                    <xsl:attribute name="selected">
-                      <xsl:value-of select="'selected'"/>
-                    </xsl:attribute>
-                  </xsl:if>
-                  <xsl:for-each select="ancestor::item">
-                    <xsl:text> &#9472;
-                    </xsl:text>
-                  </xsl:for-each>
-                  <!-- handle different languages -->
-                  <xsl:variable name="label_defLang" select="./label[lang($DefaultLang)]!=''"/>
-                  <xsl:variable name="label_curLang" select="./label[lang($CurrentLang)]!=''"/>
-                  <xsl:choose>
-                    <!-- not default lang and label translated -->
-                    <xsl:when test="($CurrentLang != $DefaultLang) and $label_curLang != ''">
-                      <xsl:value-of select="./label[lang($CurrentLang)]"/> (
-                      <xsl:value-of select="./label[lang($DefaultLang)]"/>) </xsl:when>
-                    <!-- not default lang and label NOT translated -->
-                    <xsl:when test="($CurrentLang != $DefaultLang) and $label_curLang = ''">
-                      &lt;!&gt; (
-                      <xsl:value-of select="./label[lang($DefaultLang)]"/>) </xsl:when>
-                    <xsl:otherwise>
-                      <xsl:value-of select="./label[lang($DefaultLang)]"/>
-                    </xsl:otherwise>
-                  </xsl:choose>
-                  <xsl:if test=" @replaceMenu = 'true' or @template != '' or @constrainPopUp = 'true' ">
-                    <xsl:call-template name="chooseContentInfo"/>
-                  </xsl:if>
-                </option>
-              </xsl:if>
-            </xsl:for-each>
-            <!-- END OF: display menu items -->
-            
-          </xsl:if>
-          <!-- END OF: if the current entry is the rootNode -->
-        </xsl:for-each>
-        <!-- END OF: go through the complete navigation.xml -->
-      </xsl:for-each>
-      <!-- END OF: each root node -->
-    </select>
-  </xsl:template>
-  
   <!-- ====================================================================================={
   section: Template: name="chooseContentInfo"
   
@@ -546,20 +444,6 @@ template:
       <xsl:when test="$whichAction = 'add'">
         <xsl:choose>
           <xsl:when test="$CurrentLang=$DefaultLang">
-            <!--
-            <select name="template" size="1" > 
-            <xsl:for-each select="/cms/templates/content/template">
-            <option>
-            <xsl:attribute name="value">
-            <xsl:value-of select="node()"/>
-            </xsl:attribute>
-            <xsl:value-of select="node()"/>
-            </option>
-            </xsl:for-each>
-            </select>
-            <xsl:text>Als Vorlage benutzen</xsl:text>
-            <br />
-            -->
             <input type="hidden" name="template" value="dumy.xml"/>
             <input type="checkbox" name="useContent" value="true" checked="checked" disabled="disabled"/>
             <span class="deaktiviert">

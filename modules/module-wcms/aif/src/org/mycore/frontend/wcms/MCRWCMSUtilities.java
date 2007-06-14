@@ -38,11 +38,23 @@ public class MCRWCMSUtilities {
 
     private final static Logger LOGGER = Logger.getLogger("MCRWCMSUtilities");
 
-    /*
-     * public static boolean readAccess(String webpageID, String permission)
-     * throws JDOMException, IOException { return getAccess(webpageID,
-     * permission, ALLTRUE); }
-     */
+    public static boolean readAccess(String webpageID, String blogWebpageID) throws JDOMException, IOException {
+        LOGGER.debug("###############################################");
+        LOGGER.debug("start check read access with blogWebpageID for webpageID="+webpageID+"...");
+        boolean access =getAccess(webpageID, "read", ALLTRUE);
+        LOGGER.debug("finished checking read access with blogWebpageID: "+webpageID+"="+access+"...");
+        LOGGER.debug("###############################################");
+        return access;
+    }
+    
+    public static boolean readAccess(String webpageID) throws JDOMException, IOException {
+        LOGGER.debug("###############################################");
+        LOGGER.debug("start check read access for webpageID="+webpageID+"...");
+        boolean access =getAccess(webpageID, "read", ALLTRUE);
+        LOGGER.debug("finished checking read access: "+webpageID+"="+access+"...");
+        LOGGER.debug("###############################################");
+        return access;
+    }
 
     /**
      * Verifies a given webpage-ID (//item/@href) from navigation.xml on write
@@ -81,8 +93,7 @@ public class MCRWCMSUtilities {
 
     private static boolean getAccess(String webpageID, String permission, int strategy) throws JDOMException, IOException {
         // get item as JDOM-Element
-        final String xpathExp = "//.[@href='" + webpageID + "']";
-        XPath xpath = XPath.newInstance(xpathExp);
+        XPath xpath = XPath.newInstance("//.[@href='" + webpageID + "']");
         Element item = (Element) xpath.selectSingleNode(getNavi());
         // check permission according to $strategy
         boolean access = false;
@@ -90,15 +101,21 @@ public class MCRWCMSUtilities {
             access = true;
             do {
                 access = itemAccess(permission, item, access);
-                item = item.getParentElement();
+                /*if (item.isRootElement())
+                    item = null;
+                else
+                */
+                    item = item.getParentElement();
             } while (item != null && access);
         } else if (strategy == ONETRUE_ALLTRUE) {
             access = false;
             do {
                 access = itemAccess(permission, item, access);
+                /*
                 if (item.isRootElement())
                     item = null;
                 else
+                */
                     item = item.getParentElement();
             } while (item != null && !access);
         }
