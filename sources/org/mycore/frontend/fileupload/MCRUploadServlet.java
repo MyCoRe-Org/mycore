@@ -46,7 +46,9 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.log4j.Logger;
+import org.hibernate.Transaction;
 import org.jdom.Element;
+import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRException;
@@ -122,6 +124,7 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
     public void handleUpload(Socket socket) {
         LOGGER.info("Client applet connected to socket now.");
 
+        Transaction tx = MCRHIBConnection.instance().getSession().beginTransaction();
         try {
             DataOutputStream dos = new DataOutputStream(socket.getOutputStream());
             ZipInputStream zis = new ZipInputStream(socket.getInputStream());
@@ -156,8 +159,10 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
             dos.flush();
 
             LOGGER.info("File transfer completed successfully.");
+            tx.commit();
         } catch (Exception ex) {
             LOGGER.error("Exception while receiving and storing file content from applet:", ex);
+            tx.rollback();
         } finally {
             try {
                 if (socket != null) {
