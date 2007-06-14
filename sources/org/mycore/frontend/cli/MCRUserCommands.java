@@ -255,10 +255,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
 
         LOGGER.info("The user " + guser + " with password " + CONFIG.getString("CR.Users.Guestuser.UserPasswd", "gast") + " is installed.");
 
-        // check all
         MCRSessionMgr.getCurrentSession().setCurrentUserID(suser);
-        MCRUserMgr.instance().checkConsistency();
-        LOGGER.info("");
     }
 
     /**
