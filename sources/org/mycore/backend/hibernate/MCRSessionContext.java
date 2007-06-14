@@ -70,7 +70,7 @@ public class MCRSessionContext extends ThreadLocalSessionContext implements MCRS
         Session currentSession;
         switch (event.getType()) {
         case activated:
-            if (event.getConcurrentAccessors() < 1) {
+            if (event.getConcurrentAccessors() <= 1) {
                 // mark this Thread as first Thread of MCRSession
                 LOGGER.debug("First Thread to access " + mcrSession);
                 firstThread.set(true);
@@ -78,7 +78,7 @@ public class MCRSessionContext extends ThreadLocalSessionContext implements MCRS
             break;
         case passivated:
             currentSession = unbind(factory);
-            if (event.getConcurrentAccessors() < 2) {
+            if (event.getConcurrentAccessors() <= 1) {
                 // save Session for later use;
                 LOGGER.debug("Saving hibernate Session for later use in " + mcrSession);
                 mcrSession.put(SESSION_KEY, currentSession);
@@ -96,6 +96,8 @@ public class MCRSessionContext extends ThreadLocalSessionContext implements MCRS
                 autoCloseSession((Session) obj);
             }
             firstThread.remove();
+            break;
+        case created:
             break;
         default:
             break;
@@ -122,7 +124,12 @@ public class MCRSessionContext extends ThreadLocalSessionContext implements MCRS
             if (obj != null && ((Session) obj).isOpen()) {
                 LOGGER.debug("Reusing old hibernate Session.");
                 return (org.hibernate.classic.Session) obj;
+            } else if (obj == null) {
+                LOGGER.debug("No Hibernate Session found.");
+            } else if (!((Session) obj).isOpen()) {
+                LOGGER.debug("Found only a closed Hibernate Session.");
             }
+
         }
         // creates a new one
         LOGGER.debug("Obtaining new hibernate Session.");
@@ -130,6 +137,7 @@ public class MCRSessionContext extends ThreadLocalSessionContext implements MCRS
         if (mcrSession.get(SESSION_KEY) == null || firstThread.get()) {
             // must be a Sessions that started before this instance added as
             // MCRSessionListener or old Session was closed
+            LOGGER.debug("Storing hibernate session in current MCRSession");
             firstThread.set(true);
             mcrSession.put(SESSION_KEY, session);
         }
