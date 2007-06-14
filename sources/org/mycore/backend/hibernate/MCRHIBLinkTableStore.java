@@ -31,10 +31,8 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.hibernate.Query;
 import org.hibernate.Session;
-import org.hibernate.Transaction;
 
 import org.mycore.backend.hibernate.tables.MCRLINKHREF;
-import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.datamodel.common.MCRLinkTableInterface;
 

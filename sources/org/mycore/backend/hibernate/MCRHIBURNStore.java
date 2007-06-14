@@ -27,9 +27,8 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.hibernate.Session;
-import org.hibernate.Transaction;
+
 import org.mycore.backend.hibernate.tables.MCRURN;
-import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.services.urn.MCRURNStore;
 

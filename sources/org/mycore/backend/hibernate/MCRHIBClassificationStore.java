@@ -24,12 +24,10 @@
 package org.mycore.backend.hibernate;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.hibernate.Session;
-import org.hibernate.Transaction;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
@@ -37,7 +35,6 @@ import org.mycore.backend.hibernate.tables.MCRCATEG;
 import org.mycore.backend.hibernate.tables.MCRCATEGLABEL;
 import org.mycore.backend.hibernate.tables.MCRCLASS;
 import org.mycore.backend.hibernate.tables.MCRCLASSLABEL;
-import org.mycore.common.MCRException;
 import org.mycore.common.MCRUsageException;
 import org.mycore.datamodel.classifications.MCRCategoryItem;
 import org.mycore.datamodel.classifications.MCRClassificationInterface;
