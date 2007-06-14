@@ -175,31 +175,6 @@ public class MCRClassificationQuery {
         return null;
     }
 
-    public static void main(String[] arg) {
-        boolean withCounter = true;
-        MCRClassificationItem c = MCRClassificationQuery.getClassification(arg[0], -1, withCounter);
-        MainHelper.print(c, 0);
-        try {
-            MCRUtils.writeJDOMToSysout(MCRClassificationTransformer.getMetaDataDocument(c));
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        // c = MCRClassificationQuery.getClassification(arg[0], arg[1], 0,
-        // withCounter);
-        // MainHelper.print(c, 0);
-        // Document doc = ClassificationTransformer.getMetaDataDocument(c);
-        // MainHelper.print(doc);
-        // doc = ClassificationTransformer.getEditorDocument(c, true);
-        // MainHelper.print(doc);
-        // doc = MCRClassification.receiveClassificationAsJDOM(arg[0]);
-        // MainHelper.print(doc);
-        // c = MCRClassificationQuery.getClassificationHierarchie(arg[0],
-        // arg[1], -1, withCounter);
-        // doc = ClassificationTransformer.getMetaDataDocument(c);
-        // MainHelper.print(doc);
-    }
-
     /**
      * 
      * @author Thomas Scheffler (yagee)
