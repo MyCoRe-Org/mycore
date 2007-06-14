@@ -29,6 +29,8 @@ import java.rmi.Remote;
 
 import javax.xml.namespace.QName;
 
+import org.hibernate.Transaction;
+import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.common.xml.MCRURIResolver;
 
 import org.apache.log4j.Logger;
@@ -93,6 +95,8 @@ public class MCRWebServiceClient {
     }
 
     public static void main(String args[]) {
+        Transaction tx = MCRHIBConnection.instance().getSession().beginTransaction();
+
         Properties params = new Properties();
         params.setProperty("endpoint", "http://localhost:8080/docportal/services/MCRWebService");
         /*
@@ -217,7 +221,7 @@ public class MCRWebServiceClient {
                 String to = params.getProperty("to", "");
                 String type = params.getProperty("type", "");
                 if ((from.length() != 0) || (to.length() != 0)) {
-                    org.w3c.dom.Document result = stub.MCRDoRetrieveLinks(from,to,type);
+                    org.w3c.dom.Document result = stub.MCRDoRetrieveLinks(from, to, type);
                     org.jdom.input.DOMBuilder d = new org.jdom.input.DOMBuilder();
                     org.jdom.Document doc = d.build(result);
                     org.jdom.output.XMLOutputter outputter = new org.jdom.output.XMLOutputter();
@@ -228,11 +232,14 @@ public class MCRWebServiceClient {
             } else {
                 usage();
             }
+            tx.commit();
         } catch (AxisFault ax) {
+            tx.rollback();
             System.out.println(ax.toString());
             ax.dump();
         } catch (Exception ex) {
             ex.printStackTrace();
+            tx.rollback();
         }
     }
 }
