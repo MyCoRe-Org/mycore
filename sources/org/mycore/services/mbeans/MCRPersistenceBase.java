@@ -44,7 +44,7 @@ public class MCRPersistenceBase {
     }
 
     protected void rollbackTransaction() {
-        tx.commit();
+        tx.rollback();
     }
 
 }
