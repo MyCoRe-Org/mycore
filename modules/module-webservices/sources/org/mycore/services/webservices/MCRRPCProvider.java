@@ -44,11 +44,12 @@ public class MCRRPCProvider extends RPCProvider {
      * Wraps WebService method invocation with hibernate transaction
      */
     protected Object invokeMethod(MessageContext mc, Method method, Object obj, Object[] argValues) throws Exception {
-        LOGGER.info( "WebService call to " + method.getClass().getName() + ":" + method.getName() );
+        LOGGER.info( "WebService call to " + method.getDeclaringClass().getName() + ":" + method.getName() );
         Transaction tx = MCRHIBConnection.instance().getSession().beginTransaction();
         try {
             Object result = super.invokeMethod(mc, method, obj, argValues);
             tx.commit();
+            LOGGER.debug( "WebService returned from " + method.getDeclaringClass().getName() + ":" + method.getName() );
             return result;
         } catch (Exception ex) {
             tx.rollback();
