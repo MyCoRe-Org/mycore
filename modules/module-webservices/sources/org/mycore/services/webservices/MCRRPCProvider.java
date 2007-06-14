@@ -33,6 +33,8 @@ import org.mycore.backend.hibernate.MCRHIBConnection;
 
 /**
  * Wraps WebService method invocation with hibernate transaction
+ * 
+ * @author Frank Lützenkirchen
  */
 public class MCRRPCProvider extends RPCProvider {
 

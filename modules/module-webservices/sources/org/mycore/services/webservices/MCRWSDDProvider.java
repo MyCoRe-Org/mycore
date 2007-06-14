@@ -30,6 +30,8 @@ import org.apache.axis.deployment.wsdd.WSDDService;
 
 /**
  * WSDDProvider that returns a MCRRPCProvider with name MCR
+ * 
+ * @author Frank Lützenkirchen
  */
 public class MCRWSDDProvider extends WSDDProvider {
 
