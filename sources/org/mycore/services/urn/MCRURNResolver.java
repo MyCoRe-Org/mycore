@@ -23,14 +23,14 @@
 
 package org.mycore.services.urn;
 
-import java.io.IOException;
-
-import javax.servlet.http.HttpServlet;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 import org.mycore.common.MCRConfiguration;
+import org.mycore.frontend.servlets.MCRServlet;
+import org.mycore.frontend.servlets.MCRServletJob;
 
 /**
  * This servlet resolves a given URN (urn:nbn:de) from a HTTP request and
@@ -46,7 +46,7 @@ import org.mycore.common.MCRConfiguration;
  * @author Frank Lützenkirchen
  * @version $Revision$ $Date$
  */
-public class MCRURNResolver extends HttpServlet {
+public class MCRURNResolver extends MCRServlet {
 
     private final static Logger LOGGER = Logger.getLogger(MCRURNResolver.class);
 
@@ -54,13 +54,17 @@ public class MCRURNResolver extends HttpServlet {
 
     protected String documentURL;
 
-    public void init() {
+    public void init() throws ServletException {
+        super.init();
         String base = "MCR.URN.Resolver.";
         masterURL = MCRConfiguration.instance().getString(base + "MasterURL");
         documentURL = MCRConfiguration.instance().getString(base + "DocumentURL");
     }
 
-    public void doGet(HttpServletRequest req, HttpServletResponse res) throws IOException {
+    public void doGetPost(MCRServletJob job) throws Exception {
+        HttpServletRequest req = job.getRequest();
+        HttpServletResponse res = job.getResponse();
+
         String path = req.getPathInfo();
         String param = req.getQueryString();
 
