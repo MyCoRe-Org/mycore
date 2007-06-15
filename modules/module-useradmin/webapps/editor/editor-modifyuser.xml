@@ -3,7 +3,7 @@
 
 <editor id="modifyuser">
 
-    <source uri="request:servlets/MCRUserEditorServlet?mode=retrieveuserxml&uid={uid}" />
+    <source uri="request:servlets/MCRUserEditorServlet?mode=retrieveuserxml&amp;uid={uid}" />
     <target type="servlet" name="MCRUserEditorServlet" method="post" format="xml" /> -->
     <cancel url="{cancelUrl}" />
     

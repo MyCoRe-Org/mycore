@@ -3,7 +3,7 @@
 
 <editor id="creategroup">
 
-    <source uri="request:servlets/MCRUserEditorServlet?mode=retrievegroupxml&gid={gid}" />
+    <source uri="request:servlets/MCRUserEditorServlet?mode=retrievegroupxml&amp;gid={gid}" />
     <target type="servlet" name="MCRUserEditorServlet" method="post" format="xml" />
     <cancel url="{cancelUrl}" />
     
