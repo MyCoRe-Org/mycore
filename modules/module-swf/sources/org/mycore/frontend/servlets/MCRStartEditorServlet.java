@@ -125,12 +125,15 @@ public class MCRStartEditorServlet extends MCRServlet {
 
     protected String extparm = null; // the extra parameter
 
+    protected static int number_distance = 1;
+    
     /** Initialisation of the servlet */
     public void init() throws ServletException {
         super.init();
 
         // Workflow Manager
         WFM = MCRSimpleWorkflowManager.instance();
+        number_distance = CONFIG.getInt("MCR.Metadata.ObjectID.NumberDistance", 1);
 
     }
 
@@ -347,7 +350,11 @@ public class MCRStartEditorServlet extends MCRServlet {
                     MCRObjectID mcriddir = new MCRObjectID(list[i].substring(0, list[i].length() - 4));
 
                     if (mcridnext.getNumberAsInteger() <= mcriddir.getNumberAsInteger()) {
-                        mcriddir.setNumber(mcriddir.getNumberAsInteger() + 1);
+                        int mylastnumber = mcriddir.getNumberAsInteger()+1;
+                        while ((mylastnumber % number_distance) != 0) {
+                            mylastnumber += 1;
+                        }
+                        mcriddir.setNumber(mylastnumber);
                         mcridnext = mcriddir;
                     }
                 } catch (Exception e) {
