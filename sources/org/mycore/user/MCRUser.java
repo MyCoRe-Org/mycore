@@ -70,7 +70,7 @@ public class MCRUser extends MCRUserObject implements MCRPrincipal, Principal {
     protected MCRUserContact userContact;
     
     /** A list of groups (IDs) where this user is a member of */
-    protected ArrayList groupIDs = null;    
+    protected List<String> groupIDs = null;    
 
     /**
      * Default constructor. It is used to create a user object with empty
@@ -87,7 +87,7 @@ public class MCRUser extends MCRUserObject implements MCRPrincipal, Principal {
         updateAllowed = false;
         passwd = "";
         primaryGroupID = "";
-        groupIDs = new ArrayList();
+        groupIDs = new ArrayList<String>();
         userContact = new MCRUserContact();
     }
 
@@ -162,7 +162,7 @@ public class MCRUser extends MCRUserObject implements MCRPrincipal, Principal {
      * @param cellphone
      *            number of cellular phone, if available
      */
-    public MCRUser(int numID, String ID, String creator, Timestamp creationDate, Timestamp modifiedDate, boolean idEnabled, boolean updateAllowed, String description, String passwd, String primaryGroupID, ArrayList groupIDs, String salutation, String firstname, String lastname, String street, String city, String postalcode, String country, String state, String institution, String faculty,
+    public MCRUser(int numID, String ID, String creator, Timestamp creationDate, Timestamp modifiedDate, boolean idEnabled, boolean updateAllowed, String description, String passwd, String primaryGroupID, List<String> groupIDs, String salutation, String firstname, String lastname, String street, String city, String postalcode, String country, String state, String institution, String faculty,
             String department, String institute, String telephone, String fax, String email, String cellphone) throws MCRException, Exception {
         // The following data will never be changed by update
         super.ID = trim(ID, id_len);
@@ -343,7 +343,7 @@ public class MCRUser extends MCRUserObject implements MCRPrincipal, Principal {
      * 
      * @return list of all groups the user is a member of
      */
-    public final ArrayList getAllGroupIDs() {
+    public final List<String> getAllGroupIDs() {
     	return groupIDs;
     }
 
@@ -604,7 +604,7 @@ public class MCRUser extends MCRUserObject implements MCRPrincipal, Principal {
      * @return This method returns the list of groups as a ArrayList of strings.
      *         These are the groups where the object itself is a member of.
      */
-    public final ArrayList getGroupIDs() {
+    public final List<String> getGroupIDs() {
         return groupIDs;
     }    
     

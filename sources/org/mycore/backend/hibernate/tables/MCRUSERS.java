@@ -26,7 +26,9 @@ package org.mycore.backend.hibernate.tables;
 import java.sql.Timestamp;
 
 public class MCRUSERS {
-    private MCRUSERSPK key;
+    private int numid;
+    
+    private String uid;
 
     private String creator;
 
@@ -74,47 +76,36 @@ public class MCRUSERS {
 
     private String cellphone;
 
-    private String primgroup;
+    private MCRGROUPS primgroup;
 
     public MCRUSERS() {
-        this.key = new MCRUSERSPK();
     }
 
     public MCRUSERS(int numid, String uid) {
-        this.key = new MCRUSERSPK(numid, uid);
-    }
-
-    /**
-     * @hibernate.property column="Primary Key" not-null="true" update="true"
-     */
-    public MCRUSERSPK getKey() {
-        return key;
-    }
-
-    public void setKey(MCRUSERSPK key) {
-        this.key = key;
+        this.numid=numid;
+        this.uid=uid;
     }
 
     /**
      * @hibernate.property column="NUMID" not-null="true" update="true"
      */
     public int getNumid() {
-        return key.getNumid();
+        return numid;
     }
 
     public void setNumid(int numid) {
-        key.setNumid(numid);
+        this.numid=numid;
     }
 
     /**
      * @hibernate.property column="UID" not-null="true" update="true"
      */
     public String getUid() {
-        return key.getUid();
+        return uid;
     }
 
     public void setUid(String uid) {
-        key.setUid(uid);
+        this.uid=uid;
     }
 
     /**
@@ -373,11 +364,11 @@ public class MCRUSERS {
     /**
      * @hibernate.property column="PRIMGROUP" not-null="true" update="true"
      */
-    public String getPrimgroup() {
+    public MCRGROUPS getPrimgroup() {
         return primgroup;
     }
 
-    public void setPrimgroup(String primgroup) {
+    public void setPrimgroup(MCRGROUPS primgroup) {
         this.primgroup = primgroup;
     }
 }

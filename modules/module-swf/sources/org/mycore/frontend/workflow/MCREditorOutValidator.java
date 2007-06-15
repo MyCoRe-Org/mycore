@@ -538,7 +538,7 @@ public class MCREditorOutValidator {
                         }
                         if (value.equals("$CurrentGroup")) {
                             String thisuser = MCRSessionMgr.getCurrentSession().getCurrentUserID();
-                            ArrayList<String> ar = MCRUserMgr.instance().getGroupsContainingUser(thisuser);
+                            List<String> ar = MCRUserMgr.instance().getGroupsContainingUser(thisuser);
                             firstcond.setAttribute("value", ar.get(0));
                             continue;
                         }

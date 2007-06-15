@@ -29,6 +29,7 @@ import static org.mycore.common.MCRConstants.XSI_NAMESPACE;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -97,8 +98,10 @@ public class MCRUserMgr {
             throw new MCRException("MCRUserStore error", e);
         }
 
-        userCache = new MCRCache(20, "UserMgr users"); // resonable values? This might also be
-        groupCache = new MCRCache(10, "UserMgr groups"); // read from mycore.properties....
+        userCache = new MCRCache(20, "UserMgr users"); // resonable values?
+        // This might also be
+        groupCache = new MCRCache(10, "UserMgr groups"); // read from
+        // mycore.properties....
 
         AI = MCRAccessManager.getAccessImpl();
     }
@@ -149,15 +152,15 @@ public class MCRUserMgr {
         // one of its members.
         LOGGER.info("Consistency check is started.");
 
-        ArrayList allUserIDs = mcrUserStore.getAllUserIDs();
+        List<String> allUserIDs = mcrUserStore.getAllUserIDs();
 
-        for (int i = 0; i < allUserIDs.size(); i++) {
-            MCRUser currentUser = retrieveUser((String) allUserIDs.get(i), true);
-            ArrayList currentGroupIDs = currentUser.getGroupIDs();
+        for (String userID : allUserIDs) {
+            MCRUser currentUser = retrieveUser(userID, true);
+            List<String> currentGroupIDs = currentUser.getGroupIDs();
 
-            for (int j = 0; j < currentGroupIDs.size(); j++) {
-                if (!mcrUserStore.existsGroup((String) currentGroupIDs.get(j))) {
-                    LOGGER.error("user : '" + currentUser.getID() + "' error: unknown group '" + (String) currentGroupIDs.get(j) + "'!");
+            for (String gid : currentGroupIDs) {
+                if (!mcrUserStore.existsGroup(gid)) {
+                    LOGGER.error("user : '" + currentUser.getID() + "' error: unknown group '" + gid + "'!");
                 }
             }
 
@@ -173,10 +176,10 @@ public class MCRUserMgr {
         // respectively) and check
         // if they have unknown users as admins or members, unknown groups as
         // admins or members etc.
-        ArrayList allGroupIDs = mcrUserStore.getAllGroupIDs();
+        List<String> allGroupIDs = mcrUserStore.getAllGroupIDs();
 
-        for (int i = 0; i < allGroupIDs.size(); i++) {
-            MCRGroup currentGroup = retrieveGroup((String) allGroupIDs.get(i), true);
+        for (String gid : allGroupIDs) {
+            MCRGroup currentGroup = retrieveGroup(gid, true);
 
             // check the admin users
             ArrayList admUserIDs = currentGroup.getAdminUserIDs();
@@ -344,11 +347,11 @@ public class MCRUserMgr {
         primGroup.modificationIsAllowed();
 
         // Check if the groups the user will be a member of really exist
-        ArrayList groupIDs = user.getGroupIDs();
+        List<String> groupIDs = user.getGroupIDs();
 
-        for (int j = 0; j < groupIDs.size(); j++) {
-            if (!mcrUserStore.existsGroup((String) groupIDs.get(j))) {
-                throw new MCRException("The user '" + user.getID() + "' is linked to the unknown group '" + groupIDs.get(j) + "'.");
+        for (String gid : groupIDs) {
+            if (!mcrUserStore.existsGroup(gid)) {
+                throw new MCRException("The user '" + user.getID() + "' is linked to the unknown group '" + gid + "'.");
             }
 
             // With the following we test if the current user may modify the
@@ -356,7 +359,7 @@ public class MCRUserMgr {
             // will be a member of. It is important to check this prior to
             // creating the user
             // such that we do not have to make a rollback.
-            MCRGroup linkedGroup = this.retrieveGroup((String) groupIDs.get(j), true);
+            MCRGroup linkedGroup = this.retrieveGroup(gid, true);
             linkedGroup.modificationIsAllowed();
         }
 
@@ -425,10 +428,11 @@ public class MCRUserMgr {
         // as their primary
         // group. If so, this group cannot be deleted. First the users must be
         // updated.
-        ArrayList primUserIDs = mcrUserStore.getUserIDsWithPrimaryGroup(groupID);
+        List<String> primUserIDs = mcrUserStore.getUserIDsWithPrimaryGroup(groupID);
 
-        if (primUserIDs.size() > 0) {
-            throw new MCRException("Group '" + groupID + "' can't be deleted since there" + " are users with '" + groupID + "' as their primary group. First update or" + " delete the users!");
+        if (primUserIDs.iterator().hasNext()) {
+            throw new MCRException("Group '" + groupID + "' can't be deleted since there" + " are users with '" + groupID
+                    + "' as their primary group. First update or" + " delete the users!");
         }
 
         try {
@@ -447,12 +451,12 @@ public class MCRUserMgr {
             }
 
             // Remove all admin items from other groups
-            ArrayList ogroups = mcrUserStore.getGroupIDsWithAdminUser(groupID);
+            List<String> ogroups = mcrUserStore.getGroupIDsWithAdminUser(groupID);
 
-            for (int i = 0; i < ogroups.size(); i++) {
-                groupCache.remove(ogroups.get(i));
+            for (String gid : ogroups) {
+                groupCache.remove(gid);
 
-                MCRGroup agroup = retrieveGroup((String) ogroups.get(i));
+                MCRGroup agroup = retrieveGroup(gid);
                 agroup.removeAdminGroupID(groupID);
                 mcrUserStore.updateGroup(agroup);
             }
@@ -495,15 +499,15 @@ public class MCRUserMgr {
 
         // We have to notify the groups where this user is an administrative
         // user
-        ArrayList adminGroups = mcrUserStore.getGroupIDsWithAdminUser(userID);
-        for (int i = 0; i < adminGroups.size(); i++) {
+        List<String> adminGroups = mcrUserStore.getGroupIDsWithAdminUser(userID);
+        for (String gid : adminGroups) {
             try {
-                MCRGroup adminGroup = retrieveGroup((String) adminGroups.get(i));
+                MCRGroup adminGroup = retrieveGroup(gid);
                 adminGroup.removeAdminUserID(userID);
                 groupCache.remove(adminGroup.getID());
                 mcrUserStore.updateGroup(adminGroup);
             } catch (Exception ex) {
-                LOGGER.warn("Can't remove " + userID + "from group " + adminGroups.get(i));
+                LOGGER.warn("Can't remove " + userID + "from group " + gid);
             }
         }
 
@@ -551,7 +555,7 @@ public class MCRUserMgr {
      * 
      * @return ArrayList of strings containing the group IDs of the system.
      */
-    public final synchronized ArrayList getAllGroupIDs() throws MCRException {
+    public final synchronized List<String> getAllGroupIDs() throws MCRException {
         return mcrUserStore.getAllGroupIDs();
     }
 
@@ -568,10 +572,10 @@ public class MCRUserMgr {
         root.addNamespaceDeclaration(XLINK_NAMESPACE);
         root.setAttribute("noNamespaceSchemaLocation", "MCRGroup.xsd", XSI_NAMESPACE);
 
-        ArrayList allGroupIDs = mcrUserStore.getAllGroupIDs();
+        List<String> allGroupIDs = mcrUserStore.getAllGroupIDs();
 
-        for (int i = 0; i < allGroupIDs.size(); i++) {
-            currentGroup = mcrUserStore.retrieveGroup((String) allGroupIDs.get(i));
+        for (String gid : allGroupIDs) {
+            currentGroup = mcrUserStore.retrieveGroup(gid);
             root.addContent(currentGroup.toJDOMElement());
         }
 
@@ -586,7 +590,7 @@ public class MCRUserMgr {
      * 
      * @return ArrayList of strings containing the user IDs of the system.
      */
-    public final synchronized ArrayList getAllUserIDs() throws MCRException {
+    public final synchronized List<String> getAllUserIDs() throws MCRException {
         return mcrUserStore.getAllUserIDs();
     }
 
@@ -603,10 +607,10 @@ public class MCRUserMgr {
         root.addNamespaceDeclaration(XLINK_NAMESPACE);
         root.setAttribute("noNamespaceSchemaLocation", "MCRUser.xsd", XSI_NAMESPACE);
 
-        ArrayList allUserIDs = mcrUserStore.getAllUserIDs();
+        List<String> allUserIDs = mcrUserStore.getAllUserIDs();
 
-        for (int i = 0; i < allUserIDs.size(); i++) {
-            currentUser = mcrUserStore.retrieveUser((String) allUserIDs.get(i));
+        for (String uid : allUserIDs) {
+            currentUser = mcrUserStore.retrieveUser(uid);
             root.addContent(currentUser.toJDOMElement());
         }
 
@@ -635,8 +639,8 @@ public class MCRUserMgr {
      * 
      * @return set of groups the given user is a member of
      */
-    public final Set getGroupsContainingUser(MCRUser user, Set groups) {
-        Set set = new HashSet();
+    public final Set<MCRGroup> getGroupsContainingUser(MCRUser user, Set groups) {
+        Set<MCRGroup> set = new HashSet<MCRGroup>();
         Iterator iterator = groups.iterator();
 
         while (iterator.hasNext()) {
@@ -659,12 +663,11 @@ public class MCRUserMgr {
      * 
      * @return an ArrayList of groups where the given user is a member of
      */
-    public final ArrayList getGroupsContainingUser(String user) {
+    public final List<String> getGroupsContainingUser(String user) {
         MCRUser u = retrieveUser(user);
-        ArrayList a = getAllGroupIDs();
-        ArrayList o = new ArrayList();
-        for (int i = 0; i < a.size(); i++) {
-            String aa = (String) a.get(i);
+        List<String> a = getAllGroupIDs();
+        List<String> o = new ArrayList<String>(a.size());
+        for (String aa : a) {
             if (retrieveGroup(aa).hasUserMember(u)) {
                 if (!o.contains(aa)) {
                     o.add(aa);
@@ -740,17 +743,18 @@ public class MCRUserMgr {
 
             // now create the user or group
             if (obj instanceof MCRUser) {
+                final MCRUser user = (MCRUser) obj;
                 // Check exist user
-                if (mcrUserStore.existsUser(((MCRUser) obj).getID())) {
+                if (mcrUserStore.existsUser(user.getID())) {
                     throw new MCRException("The user '" + obj.getID() + "' already exists!");
                 }
                 // Check if the primary group exists
-                String primarygroup = ((MCRUser) obj).getPrimaryGroupID();
+                String primarygroup = user.getPrimaryGroupID();
                 if (!mcrUserStore.existsGroup(primarygroup)) {
                     throw new MCRException("The primary group of the user '" + obj.getID() + "' does not exist.");
                 }
                 // Check if the groups the user will be a member of really exist
-                ArrayList groupIDs = ((MCRUser) obj).getGroupIDs();
+                List<String> groupIDs = user.getGroupIDs();
                 for (int i = 0; i < groupIDs.size(); i++) {
                     if (!mcrUserStore.existsGroup((String) groupIDs.get(i))) {
                         throw new MCRException("The user '" + obj.getID() + "' is linked to the unknown group '" + groupIDs.get(i) + "'.");
@@ -759,16 +763,16 @@ public class MCRUserMgr {
                 // At first create the user. The user must be created before
                 // updating the groups because the existence of the user will
                 // be checked while updating the groups.
-                mcrUserStore.createUser((MCRUser) obj);
+                mcrUserStore.createUser(user);
                 // now we update the primary group
                 MCRGroup primGroup = mcrUserStore.retrieveGroup(primarygroup);
-                primGroup.addMemberUserID(((MCRUser) obj).getID());
+                primGroup.addMemberUserID(user.getID());
                 groupCache.remove(primGroup.getID());
                 mcrUserStore.updateGroup(primGroup);
                 // now update the other groups
                 for (int i = 0; i < groupIDs.size(); i++) {
                     MCRGroup otherGroup = retrieveGroup((String) groupIDs.get(i), true);
-                    otherGroup.addMemberUserID(((MCRUser) obj).getID());
+                    otherGroup.addMemberUserID(user.getID());
                     groupCache.remove(otherGroup.getID());
                     mcrUserStore.updateGroup(otherGroup);
                 }
@@ -995,8 +999,8 @@ public class MCRUserMgr {
      * @return set of groups according to the given set of group IDs
      * @throws MCRException
      */
-    public final Set retrieveGroups(Set groupIDs) throws MCRException {
-        Set groups = new HashSet();
+    public final Set<MCRGroup> retrieveGroups(Set groupIDs) throws MCRException {
+        Set<MCRGroup> groups = new HashSet<MCRGroup>();
         Iterator iterator = groupIDs.iterator();
 
         while (iterator.hasNext()) {
@@ -1081,8 +1085,8 @@ public class MCRUserMgr {
      * @return set of users according to the given set of user IDs
      * @throws MCRException
      */
-    public final Set retrieveUsers(Set userIDs) {
-        Set users = new HashSet();
+    public final Set<MCRUser> retrieveUsers(Set userIDs) {
+        Set<MCRUser> users = new HashSet<MCRUser>();
         Iterator iterator = userIDs.iterator();
 
         while (iterator.hasNext()) {

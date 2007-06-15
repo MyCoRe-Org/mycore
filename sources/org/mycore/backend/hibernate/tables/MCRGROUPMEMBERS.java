@@ -30,7 +30,7 @@ public class MCRGROUPMEMBERS {
         this.key = new MCRGROUPMEMBERSPK();
     }
 
-    public MCRGROUPMEMBERS(String gid, String userid, String groupid) {
+    public MCRGROUPMEMBERS(MCRGROUPS gid, MCRUSERS userid, String groupid) {
         this.key = new MCRGROUPMEMBERSPK(gid, userid);
     }
 
@@ -52,22 +52,22 @@ public class MCRGROUPMEMBERS {
     /**
      * @hibernate.property column="GID" not-null="true" update="true"
      */
-    public String getGid() {
+    public MCRGROUPS getGid() {
         return key.getGid();
     }
 
-    public void setGid(String gid) {
+    public void setGid(MCRGROUPS gid) {
         key.setGid(gid);
     }
 
     /**
      * @hibernate.property column="USERID" not-null="true" update="true"
      */
-    public String getUserid() {
+    public MCRUSERS getUserid() {
         return key.getUserid();
     }
 
-    public void setUserid(String userid) {
+    public void setUserid(MCRUSERS userid) {
         key.setUserid(userid);
     }
 

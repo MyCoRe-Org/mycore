@@ -24,13 +24,14 @@
 package org.mycore.user;
 
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.List;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 
 import org.apache.log4j.Logger;
 import org.jdom.Document;
+
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
@@ -141,7 +142,7 @@ public class MCRLoginServlet extends MCRServlet {
                 // session. The LayoutServlet then forwards them to the XSL
                 // Stylesheets.
                 StringBuffer groups = new StringBuffer();
-                ArrayList groupList = MCRUserMgr.instance().retrieveUser(uid).getGroupIDs();
+                List<String> groupList = MCRUserMgr.instance().retrieveUser(uid).getGroupIDs();
                 for (int i = 0; i < groupList.size(); i++) {
                     if (i != 0) groups.append(" ");
                     groups.append((String) groupList.get(i));

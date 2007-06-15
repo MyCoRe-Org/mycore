@@ -24,12 +24,13 @@
 package org.mycore.frontend.servlets;
 
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
+
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
@@ -47,6 +48,8 @@ import org.mycore.user.MCRUserMgr;
  * @version $Revision$ $Date$
  */
 public class MCRUserEditorServlet extends MCRUserAdminGUICommons {
+    private static final long serialVersionUID = 1L;
+
     private static final Logger LOGGER = Logger.getLogger(MCRUserEditorServlet.class);
 
     /** Initialisation of the servlet */
@@ -83,13 +86,13 @@ public class MCRUserEditorServlet extends MCRUserAdminGUICommons {
         if (mode.equals("getAssignableGroupsForUser")) {
             getAssignableGroupsForUser(job);
         } else if (mode.equals("getAllUsers")) {
-                getAllUsers(job);
+            getAllUsers(job);
         } else if (mode.equals("getAllGroups")) {
-            getAllGroups(job);                
+            getAllGroups(job);
         } else if (mode.equals("retrieveuserxml")) {
             retrieveUserXML(job);
         } else if (mode.equals("retrievegroupxml")) {
-            retrieveGroupXML(job);            
+            retrieveGroupXML(job);
         } else if (mode.equals("retrievealluserxml")) {
             retrieveAllUserXML(job);
         } else if (mode.equals("xml")) {
@@ -119,7 +122,7 @@ public class MCRUserEditorServlet extends MCRUserAdminGUICommons {
         // manager.
         MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
         String currentUserID = mcrSession.getCurrentUserID();
-        ArrayList groupIDs = null;
+        List<String> groupIDs = null;
 
         try {
             // The list of assignable groups depends on the privileges of the
@@ -137,10 +140,12 @@ public class MCRUserEditorServlet extends MCRUserAdminGUICommons {
                 // checking the privileges using the MCRUserAdminServlet first.
                 LOGGER.warn("MCRUserEditorServlet: not enough permissions! " + "Someone might have tried to call the new user form directly.");
 
-                // TODO: Hier muss irgendwie eine vern�nftige Fehlermeldung her!
+                // TODO: Hier muss irgendwie eine vern�nftige Fehlermeldung
+                // her!
                 // Aktuell spielt das MCREditorServlet noch nicht mit. Die
                 // folgenden
-                // Zeilen z.B. f�hren zu einem "impossible to open input stream"
+                // Zeilen z.B. f�hren zu einem "impossible to open input
+                // stream"
                 // Fehler im MCREditorServlet (weil halt error 403 gesendet
                 // wird)
                 String msg = "You do not have enough permissions for this use case!";
@@ -160,18 +165,19 @@ public class MCRUserEditorServlet extends MCRUserAdminGUICommons {
         org.jdom.Element root = new org.jdom.Element("items");
 
         for (int i = 0; i < groupIDs.size(); i++) {
-            org.jdom.Element item = new org.jdom.Element("item").setAttribute("value", (String) groupIDs.get(i)).setAttribute("label", (String) groupIDs.get(i));
+            org.jdom.Element item = new org.jdom.Element("item").setAttribute("value", (String) groupIDs.get(i))
+                    .setAttribute("label", (String) groupIDs.get(i));
             root.addContent(item);
         }
 
         org.jdom.Document jdomDoc = new org.jdom.Document(root);
-        getLayoutService().sendXML(job.getRequest(),job.getResponse(),jdomDoc);
+        getLayoutService().sendXML(job.getRequest(), job.getResponse(), jdomDoc);
     }
-    
+
     /**
-     * This method retrieves a list of all groups. Typically this servlet mode is implicitly
-     * called by an MyCoRe editor definition file, e.g. to fill drop down boxes
-     * or lists in the user administration GUI.
+     * This method retrieves a list of all groups. Typically this servlet mode
+     * is implicitly called by an MyCoRe editor definition file, e.g. to fill
+     * drop down boxes or lists in the user administration GUI.
      * 
      * @param job
      *            The MCRServletJob instance
@@ -181,7 +187,7 @@ public class MCRUserEditorServlet extends MCRUserAdminGUICommons {
      *             for errors from the servlet engine.
      */
     private void getAllGroups(MCRServletJob job) throws IOException {
-    	ArrayList groupIDs;
+        List<String> groupIDs;
         try {
             if (AI.checkPermission("administrate-user")) {
                 groupIDs = MCRUserMgr.instance().getAllGroupIDs();
@@ -192,10 +198,12 @@ public class MCRUserEditorServlet extends MCRUserAdminGUICommons {
                 // checking the privileges using the MCRUserAdminServlet first.
                 LOGGER.warn("MCRUserEditorServlet: not enough permissions! " + "Someone might have tried to call the new user form directly.");
 
-                // TODO: Hier muss irgendwie eine vern�nftige Fehlermeldung her!
+                // TODO: Hier muss irgendwie eine vern�nftige Fehlermeldung
+                // her!
                 // Aktuell spielt das MCREditorServlet noch nicht mit. Die
                 // folgenden
-                // Zeilen z.B. f�hren zu einem "impossible to open input stream"
+                // Zeilen z.B. f�hren zu einem "impossible to open input
+                // stream"
                 // Fehler im MCREditorServlet (weil halt error 403 gesendet
                 // wird)
                 String msg = "You do not have enough permissions for this use case!";
@@ -215,18 +223,19 @@ public class MCRUserEditorServlet extends MCRUserAdminGUICommons {
         org.jdom.Element root = new org.jdom.Element("items");
 
         for (int i = 0; i < groupIDs.size(); i++) {
-            org.jdom.Element item = new org.jdom.Element("item").setAttribute("value", (String) groupIDs.get(i)).setAttribute("label", (String) groupIDs.get(i));
+            org.jdom.Element item = new org.jdom.Element("item").setAttribute("value", (String) groupIDs.get(i))
+                    .setAttribute("label", (String) groupIDs.get(i));
             root.addContent(item);
         }
 
         org.jdom.Document jdomDoc = new org.jdom.Document(root);
-        getLayoutService().sendXML(job.getRequest(),job.getResponse(),jdomDoc);
+        getLayoutService().sendXML(job.getRequest(), job.getResponse(), jdomDoc);
     }
-    
+
     /**
-     * This method retrieves a list of all users. Typically this servlet mode is implicitly
-     * called by an MyCoRe editor definition file, e.g. to fill drop down boxes
-     * or lists in the user administration GUI.
+     * This method retrieves a list of all users. Typically this servlet mode is
+     * implicitly called by an MyCoRe editor definition file, e.g. to fill drop
+     * down boxes or lists in the user administration GUI.
      * 
      * @param job
      *            The MCRServletJob instance
@@ -236,7 +245,7 @@ public class MCRUserEditorServlet extends MCRUserAdminGUICommons {
      *             for errors from the servlet engine.
      */
     private void getAllUsers(MCRServletJob job) throws IOException {
-    	ArrayList userIDs;
+        List<String> userIDs;
         try {
             if (AI.checkPermission("administrate-user")) {
                 userIDs = MCRUserMgr.instance().getAllUserIDs();
@@ -247,10 +256,12 @@ public class MCRUserEditorServlet extends MCRUserAdminGUICommons {
                 // checking the privileges using the MCRUserAdminServlet first.
                 LOGGER.warn("MCRUserEditorServlet: not enough permissions! " + "Someone might have tried to call the new user form directly.");
 
-                // TODO: Hier muss irgendwie eine vern�nftige Fehlermeldung her!
+                // TODO: Hier muss irgendwie eine vern�nftige Fehlermeldung
+                // her!
                 // Aktuell spielt das MCREditorServlet noch nicht mit. Die
                 // folgenden
-                // Zeilen z.B. f�hren zu einem "impossible to open input stream"
+                // Zeilen z.B. f�hren zu einem "impossible to open input
+                // stream"
                 // Fehler im MCREditorServlet (weil halt error 403 gesendet
                 // wird)
                 String msg = "You do not have enough permissions for this use case!";
@@ -275,8 +286,8 @@ public class MCRUserEditorServlet extends MCRUserAdminGUICommons {
         }
 
         org.jdom.Document jdomDoc = new org.jdom.Document(root);
-        getLayoutService().sendXML(job.getRequest(),job.getResponse(),jdomDoc);
-    }    
+        getLayoutService().sendXML(job.getRequest(), job.getResponse(), jdomDoc);
+    }
 
     /**
      * This method retrieves the all users list
@@ -310,7 +321,7 @@ public class MCRUserEditorServlet extends MCRUserAdminGUICommons {
 
         return;
     }
-    
+
     /**
      * This method is still experimental! It is needed in the use case "modify
      * user".
@@ -327,7 +338,7 @@ public class MCRUserEditorServlet extends MCRUserAdminGUICommons {
             String userID = getProperty(job.getRequest(), "uid");
             MCRUser user = MCRUserMgr.instance().retrieveUser(userID);
             org.jdom.Document jdomDoc = user.toJDOMDocument();
-            getLayoutService().sendXML(job.getRequest(),job.getResponse(),jdomDoc);
+            getLayoutService().sendXML(job.getRequest(), job.getResponse(), jdomDoc);
         } catch (MCRException ex) {
             // TODO: Es gibt Probleme mit den Fehlermeldungen, siehe oben.
             String msg = "An error occured while retrieving a user object from the store!";
@@ -336,7 +347,7 @@ public class MCRUserEditorServlet extends MCRUserAdminGUICommons {
 
         return;
     }
-    
+
     /**
      * This method is still experimental! It is needed in the use case "modify
      * group".
@@ -353,7 +364,7 @@ public class MCRUserEditorServlet extends MCRUserAdminGUICommons {
             String groupID = getProperty(job.getRequest(), "gid");
             MCRGroup group = MCRUserMgr.instance().retrieveGroup(groupID);
             org.jdom.Document jdomDoc = group.toJDOMDocument();
-            getLayoutService().sendXML(job.getRequest(),job.getResponse(),jdomDoc);
+            getLayoutService().sendXML(job.getRequest(), job.getResponse(), jdomDoc);
         } catch (MCRException ex) {
             // TODO: Es gibt Probleme mit den Fehlermeldungen, siehe oben.
             String msg = "An error occured while retrieving a group object from the store!";
@@ -361,7 +372,7 @@ public class MCRUserEditorServlet extends MCRUserAdminGUICommons {
         }
 
         return;
-    }    
+    }
 
     /**
      * This method reads the XML data sent by the MyCoRe editor framework.
@@ -425,22 +436,23 @@ public class MCRUserEditorServlet extends MCRUserAdminGUICommons {
 
                 return;
             }
-        }else if ((useCase.equals("create-group") || useCase.equals("modify-group")) && jdomDoc.getRootElement().getName().equals("mycoregroup")) {
-        	try{
-        		String groupID = jdomDoc.getRootElement().getChild("group").getAttributeValue("ID");
-        		if(groupID == null) throw new MCRException("groupid is not valid");
-        		MCRGroup group = new MCRGroup(jdomDoc.getRootElement().getChild("group"));
-        		if (useCase.equals("create-group")) {
-        			MCRUserMgr.instance().createGroup(group);
-        		}else{
-        			MCRUserMgr.instance().updateGroup(group);
-        		}
+        } else if ((useCase.equals("create-group") || useCase.equals("modify-group")) && jdomDoc.getRootElement().getName().equals("mycoregroup")) {
+            try {
+                String groupID = jdomDoc.getRootElement().getChild("group").getAttributeValue("ID");
+                if (groupID == null)
+                    throw new MCRException("groupid is not valid");
+                MCRGroup group = new MCRGroup(jdomDoc.getRootElement().getChild("group"));
+                if (useCase.equals("create-group")) {
+                    MCRUserMgr.instance().createGroup(group);
+                } else {
+                    MCRUserMgr.instance().updateGroup(group);
+                }
                 // doLayout(job, "xml", jdomDoc, true);
                 showOkPage(job);
             } catch (MCRException ex) {
                 generateErrorPage(job.getRequest(), job.getResponse(), HttpServletResponse.SC_INTERNAL_SERVER_ERROR, ex.getMessage(), ex, false);
                 return;
-            }        	
+            }
         } else {
             // TODO: error message
         }

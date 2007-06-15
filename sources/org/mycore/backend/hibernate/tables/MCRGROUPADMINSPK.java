@@ -29,16 +29,18 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 
 public class MCRGROUPADMINSPK implements Serializable {
-    private String gid;
+    private static final long serialVersionUID = -3499227415039938870L;
 
-    private String userid;
+    private MCRGROUPS gid;
 
-    private String groupid;
+    private MCRUSERS userid;
+
+    private MCRGROUPS groupid;
 
     public MCRGROUPADMINSPK() {
     }
 
-    public MCRGROUPADMINSPK(String gid, String userid, String groupid) {
+    public MCRGROUPADMINSPK(MCRGROUPS gid, MCRUSERS userid, MCRGROUPS groupid) {
         this.gid = gid;
         this.userid = userid;
         this.groupid = groupid;
@@ -47,7 +49,7 @@ public class MCRGROUPADMINSPK implements Serializable {
     /**
      * @return Returns the gid.
      */
-    public String getGid() {
+    public MCRGROUPS getGid() {
         return gid;
     }
 
@@ -55,14 +57,14 @@ public class MCRGROUPADMINSPK implements Serializable {
      * @param gid
      *            The gid to set.
      */
-    public void setGid(String gid) {
+    public void setGid(MCRGROUPS gid) {
         this.gid = gid;
     }
 
     /**
      * @return Returns the groupid.
      */
-    public String getGroupid() {
+    public MCRGROUPS getGroupid() {
         return groupid;
     }
 
@@ -70,14 +72,14 @@ public class MCRGROUPADMINSPK implements Serializable {
      * @param groupid
      *            The groupid to set.
      */
-    public void setGroupid(String groupid) {
+    public void setGroupid(MCRGROUPS groupid) {
         this.groupid = groupid;
     }
 
     /**
      * @return Returns the userid.
      */
-    public String getUserid() {
+    public MCRUSERS getUserid() {
         return userid;
     }
 
@@ -85,7 +87,7 @@ public class MCRGROUPADMINSPK implements Serializable {
      * @param userid
      *            The userid to set.
      */
-    public void setUserid(String userid) {
+    public void setUserid(MCRUSERS userid) {
         this.userid = userid;
     }
 

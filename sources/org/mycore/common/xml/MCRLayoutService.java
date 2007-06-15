@@ -29,9 +29,9 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Properties;
 
 import javax.servlet.http.HttpServletRequest;
@@ -224,7 +224,7 @@ public class MCRLayoutService {
             groups.append(MCRConfiguration.instance().getString("MCR.Users.Guestuser.GroupName"));
         }
         else {
-          ArrayList groupList = MCRUserMgr.instance().retrieveUser(uid).getGroupIDs();
+          List<String> groupList = MCRUserMgr.instance().retrieveUser(uid).getGroupIDs();
           for (int i = 0; i < groupList.size(); i++) {
               if (i != 0) groups.append(" ");
               groups.append((String) groupList.get(i));

@@ -23,7 +23,7 @@
 
 package org.mycore.user;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import org.mycore.common.MCRException;
 
@@ -109,7 +109,7 @@ public interface MCRUserStore {
      * 
      * @return ArrayList of strings including the user IDs of the system
      */
-    public ArrayList getAllUserIDs() throws MCRException;
+    public List<String> getAllUserIDs() throws MCRException;
 
     /**
      * This method gets all group IDs and returns them as a ArrayList of
@@ -117,7 +117,7 @@ public interface MCRUserStore {
      * 
      * @return ArrayList of strings including the group IDs of the system
      */
-    public ArrayList getAllGroupIDs() throws MCRException;
+    public List<String> getAllGroupIDs() throws MCRException;
 
     /**
      * This method returns the maximum value of the numerical user IDs
@@ -135,7 +135,7 @@ public interface MCRUserStore {
      * @return ArrayList of strings including the group IDs of the system which
      *         have userID in their administrators list
      */
-    public ArrayList getGroupIDsWithAdminUser(String userID) throws MCRException;
+    public List<String> getGroupIDsWithAdminUser(String userID) throws MCRException;
 
     /**
      * This method gets all user IDs with a given primary group and returns them
@@ -146,7 +146,7 @@ public interface MCRUserStore {
      * @return ArrayList of strings including the user IDs of the system which
      *         have groupID as primary group
      */
-    public ArrayList getUserIDsWithPrimaryGroup(String groupID) throws MCRException;
+    public List<String> getUserIDsWithPrimaryGroup(String groupID) throws MCRException;
 
     /**
      * This method retrieves a MyCoRe user object from the persistent datastore.
