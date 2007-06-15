@@ -326,7 +326,7 @@ public class MCRStartClassEditorServlet extends MCRServlet {
             }
             if ("create-classification".equals(todo)) {
                 MCRObjectID cli = new MCRObjectID();
-                String idBase = CONFIG.getString("MCR.default_project_id", "DocPortal") + "_class";
+                String idBase = CONFIG.getString("MCR.SWF.Project.ID", "DocPortal") + "_class";
                 cli.setNextFreeId(idBase);
 
                 if (!cli.isValid()) {
