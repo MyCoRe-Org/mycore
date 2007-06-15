@@ -71,8 +71,6 @@ public class MCREditorServlet extends MCRServlet {
         HttpServletRequest req = job.getRequest();
         HttpServletResponse res = job.getResponse();
 
-        logger.debug("doGetPost in EditorServlet");
-
         MCRRequestParameters parms = new MCRRequestParameters(req);
 
         String action = parms.getParameter("_action");
@@ -95,7 +93,7 @@ public class MCREditorServlet extends MCRServlet {
         String sessionID = req.getParameter("_session");
         String ref = req.getParameter("_ref");
 
-        logger.info("Editor session " + sessionID + " show popup " + ref);
+        logger.debug("Editor session " + sessionID + " show popup " + ref);
 
         Element editor = (Element) (sessions.get(sessionID));
         Element popup = MCREditorDefReader.findElementByID(ref, editor);
@@ -142,7 +140,7 @@ public class MCREditorServlet extends MCRServlet {
     private static Element startSession(HttpServletRequest req, Element editor, String uri) {
 
         String ref = editor.getAttributeValue("id");
-        logger.info("Editor start editor session from " + ref + "@" + uri);
+        logger.debug("Editor start editor session from " + ref + "@" + uri);
 
         Map parameters = req.getParameterMap();
         Element param = getTargetParameters(parameters);
@@ -166,10 +164,10 @@ public class MCREditorServlet extends MCRServlet {
             editor.addContent(sub.buildRepeatElements());
         }
         else
-            logger.info("Editor is started empty without XML input");
+            logger.debug("Editor is started empty without XML input");
         
         String cancelURL = replaceParameters(editor, "cancel", "url", parameters);
-        logger.info("Editor cancel url is " + cancelURL );
+        logger.debug("Editor cancel url is " + cancelURL );
         editor.removeChildren("cancel");
         if( cancelURL != null)
             editor.addContent(new Element("cancel").setAttribute("url", cancelURL));
@@ -359,7 +357,7 @@ public class MCREditorServlet extends MCRServlet {
             StringTokenizer sst = new StringTokenizer(button.substring(3), "-");
             String id = sst.nextToken();
             String var = sst.nextToken();
-            logger.info("Editor start subselect " + id + " at position " + var);
+            logger.debug("Editor start subselect " + id + " at position " + var);
 
             Element subselect = MCREditorDefReader.findElementByID(id, editor);
             StringBuffer sb = new StringBuffer(getBaseURL());
@@ -396,7 +394,7 @@ public class MCREditorServlet extends MCRServlet {
             editor.addContent(sub.buildInputElements());
             editor.addContent(sub.buildRepeatElements());
 
-            logger.info("Editor goto subselect at " + url);
+            logger.debug("Editor goto subselect at " + url);
             res.sendRedirect(res.encodeRedirectURL(url));
         } else {
             int pos = button.lastIndexOf("-");
