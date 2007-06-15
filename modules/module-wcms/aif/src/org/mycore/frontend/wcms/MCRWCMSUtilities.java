@@ -27,6 +27,8 @@ public class MCRWCMSUtilities {
 
     final static int ONETRUE_ALLTRUE = 2;
 
+    final static int ALL2BLOCKER_TRUE = 3;
+
     final static XPath xpath;
     static {
         try {
@@ -38,20 +40,20 @@ public class MCRWCMSUtilities {
 
     private final static Logger LOGGER = Logger.getLogger("MCRWCMSUtilities");
 
-    public static boolean readAccess(String webpageID, String blogWebpageID) throws JDOMException, IOException {
+    public static boolean readAccess(String webpageID, String blockerWebpageID) throws JDOMException, IOException {
         LOGGER.debug("###############################################");
-        LOGGER.debug("start check read access with blogWebpageID for webpageID="+webpageID+"...");
-        boolean access =getAccess(webpageID, "read", ALLTRUE);
-        LOGGER.debug("finished checking read access with blogWebpageID: "+webpageID+"="+access+"...");
+        LOGGER.debug("start check read access with blockerWebpageID=" + blockerWebpageID + " for webpageID=" + webpageID + "...");
+        boolean access = getAccess(webpageID, "read", ALL2BLOCKER_TRUE, blockerWebpageID);
+        LOGGER.debug("finished checking read access with blockerWebpageID: " + webpageID + "=" + access + "...");
         LOGGER.debug("###############################################");
         return access;
     }
-    
+
     public static boolean readAccess(String webpageID) throws JDOMException, IOException {
         LOGGER.debug("###############################################");
-        LOGGER.debug("start check read access for webpageID="+webpageID+"...");
-        boolean access =getAccess(webpageID, "read", ALLTRUE);
-        LOGGER.debug("finished checking read access: "+webpageID+"="+access+"...");
+        LOGGER.debug("start check read access for webpageID=" + webpageID + "...");
+        boolean access = getAccess(webpageID, "read", ALLTRUE);
+        LOGGER.debug("finished checking read access: " + webpageID + "=" + access + "...");
         LOGGER.debug("###############################################");
         return access;
     }
@@ -92,34 +94,44 @@ public class MCRWCMSUtilities {
     }
 
     private static boolean getAccess(String webpageID, String permission, int strategy) throws JDOMException, IOException {
-        // get item as JDOM-Element
-        XPath xpath = XPath.newInstance("//.[@href='" + webpageID + "']");
-        Element item = (Element) xpath.selectSingleNode(getNavi());
+        Element item = getItem(webpageID);
         // check permission according to $strategy
         boolean access = false;
         if (strategy == ALLTRUE) {
             access = true;
             do {
                 access = itemAccess(permission, item, access);
-                /*if (item.isRootElement())
-                    item = null;
-                else
-                */
-                    item = item.getParentElement();
+                item = item.getParentElement();
             } while (item != null && access);
         } else if (strategy == ONETRUE_ALLTRUE) {
             access = false;
             do {
                 access = itemAccess(permission, item, access);
-                /*
-                if (item.isRootElement())
-                    item = null;
-                else
-                */
-                    item = item.getParentElement();
+                item = item.getParentElement();
             } while (item != null && !access);
         }
         return access;
+    }
+
+    private static boolean getAccess(String webpageID, String permission, int strategy, String blockerWebpageID) throws JDOMException,
+            IOException {
+        Element item = getItem(webpageID);
+        // check permission according to $strategy
+        boolean access = false;
+        if (strategy == ALL2BLOCKER_TRUE) {
+            access = true;
+            do {
+                access = itemAccess(permission, item, access);
+                item = item.getParentElement();
+            } while (item != null && access && !getWebpageID(item).equals(blockerWebpageID));
+        }
+        return access;
+    }
+
+    private static Element getItem(String webpageID) throws JDOMException, IOException {
+        XPath xpath = XPath.newInstance("//.[@href='" + webpageID + "']");
+        Element item = (Element) xpath.selectSingleNode(getNavi());
+        return item;
     }
 
     private static boolean itemAccess(String permission, Element item, boolean access) {
