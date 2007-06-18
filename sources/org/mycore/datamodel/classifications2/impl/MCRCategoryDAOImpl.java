@@ -106,7 +106,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         Criteria c = session.createCriteria(CATEGRORY_CLASS).setProjection(Projections.rowCount());
         c.add(Subqueries.propertyEq("parent", DetachedCriteria.forClass(CATEGRORY_CLASS).setProjection(Projections.property("internalID")).add(
                 CategoryExpression.eq(cid))));
-        return ((Number)c.uniqueResult()).intValue() > 0;
+        return ((Number) c.uniqueResult()).intValue() > 0;
     }
 
     /*
@@ -119,13 +119,11 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         if (!exist(cid)) {
             return new MCRCategoryImpl.ChildList(null, null);
         }
-        // Criteria criteria =
-        // MCRHIBConnection.instance().getSession().createCriteria(CATEGRORY_CLASS);
-        // criteria.add(Restrictions.eq("parent", cid));
-        Query q = MCRHIBConnection.instance().getSession().getNamedQuery(CATEGRORY_CLASS.getName() + ".getChildren");
-        q.setString("parentID", cid.getID());
-        q.setString("rootID", cid.getRootID());
-        return (List<MCRCategory>) q.list();
+        Session session = MCRHIBConnection.instance().getSession();
+        Criteria c = session.createCriteria(CATEGRORY_CLASS).add(
+                Subqueries.propertyEq("parent", DetachedCriteria.forClass(CATEGRORY_CLASS).setProjection(Projections.property("internalID")).add(
+                        CategoryExpression.eq(cid))));
+        return (List<MCRCategory>) c.list();
     }
 
     public void addCategory(MCRCategoryID parentID, MCRCategory category) {
@@ -134,9 +132,10 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         Session session = MCRHIBConnection.instance().getSession();
         MCRCategoryImpl parent = null;
         if (parentID != null) {
-            parent = (MCRCategoryImpl) session.get(CATEGRORY_CLASS, parentID);
+            parent = (MCRCategoryImpl) session.createCriteria(CATEGRORY_CLASS).add(CategoryExpression.eq(parentID)).uniqueResult();
             levelStart = parent.getLevel() + 1;
             leftStart = parent.getLeft() + 1;
+            parent.getChildren().add(category);
         }
         LOGGER.info("Calculating LEFT,RIGHT and LEVEL attributes...");
         int nodes = calculateLeftRightAndLevel(MCRCategoryImpl.wrapCategory(category, parent, (parent == null) ? category.getRoot() : parent.getRoot()),
@@ -145,17 +144,21 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         if (parentID != null) {
             LOGGER.info("LEFT AND RIGHT values need updates");
             Query leftQuery = session.getNamedQuery(CATEGRORY_CLASS.getName() + ".updateLeft");
-            leftQuery.setInteger(":left", leftStart);
-            leftQuery.setInteger(":increment", nodes * 2);
+            leftQuery.setInteger("left", leftStart);
+            leftQuery.setInteger("increment", nodes * 2);
             int leftChanges = leftQuery.executeUpdate();
-            Query rightQuery = session.getNamedQuery(CATEGRORY_CLASS.getName() + ".updateLeft");
-            rightQuery.setInteger(":left", leftStart);
-            rightQuery.setInteger(":increment", nodes * 2);
+            Query rightQuery = session.getNamedQuery(CATEGRORY_CLASS.getName() + ".updateRight");
+            rightQuery.setInteger("left", leftStart);
+            rightQuery.setInteger("increment", nodes * 2);
             int rightChanges = rightQuery.executeUpdate();
             LOGGER.info("Updated " + leftChanges + " left and " + rightChanges + " right values.");
         }
         session.save(category);
-        session.evict(category);
+        if (parent == null) {
+            session.evict(category);
+        } else {
+            session.evict(parent);
+        }
         LOGGER.info("Categorie saved.");
     }
 
