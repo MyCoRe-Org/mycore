@@ -25,7 +25,9 @@ package org.mycore.backend.hibernate;
 
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.hibernate.Session;
@@ -605,16 +607,26 @@ public class MCRHIBUserStore implements MCRUserStore {
             l = session.createQuery("from MCRGROUPMEMBERS where GID = '" + groupID + "'").list();
 
             ArrayList<String> mbrUserIDs = new ArrayList<String>();
+            
+            Set<String> users=new HashSet<String>();
 
             if (l.size() > 0) {
                 for (int i = 0; i < l.size(); i++) {
                     MCRGROUPMEMBERS grpmembers = (MCRGROUPMEMBERS) l.get(i);
 
                     if (grpmembers.getUserid() != null && !grpmembers.getUserid().equals("")) {
-                        mbrUserIDs.add(grpmembers.getUserid().getUid());
+                        users.add(grpmembers.getUserid().getUid());
                     }
                 }
             }
+            
+            //Add all users with groupID as primary group
+            l = session.createCriteria(MCRUSERS.class).setProjection(Projections.property("uid")).add(Restrictions.eq("primgroup", groups)).list();
+            for (Object uid : l) {
+                users.add(uid.toString());
+            }
+            mbrUserIDs.addAll(users);
+            
             // We create the group object
             try {
                 return new MCRGroup(groupID, creator, created, modified, description, admUserIDs, admGroupIDs, mbrUserIDs);
