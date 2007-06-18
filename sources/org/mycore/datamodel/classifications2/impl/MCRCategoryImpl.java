@@ -23,6 +23,7 @@
  **/
 package org.mycore.datamodel.classifications2.impl;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -39,10 +40,12 @@ import org.mycore.datamodel.classifications2.MCRLabel;
  * @version $Revision$ $Date$
  * @since 2.0
  */
-public class MCRCategoryImpl extends MCRAbstractCategoryImpl {
+public class MCRCategoryImpl extends MCRAbstractCategoryImpl implements Serializable {
+
+    private static final long serialVersionUID = -7431317191711000317L;
 
     protected static class ChildList extends ArrayList<MCRCategory> {
-        private static final long serialVersionUID = 180424337316332676L;
+        private static final long serialVersionUID = 5844882597476033744L;
 
         private MCRCategory root;
 
@@ -60,22 +63,22 @@ public class MCRCategoryImpl extends MCRAbstractCategoryImpl {
 
         @Override
         public void add(int index, MCRCategory element) {
-            super.add(index, wrapCategory(element));
+            super.add(index, wrapCategory(element, thisCategory, root));
         }
 
         @Override
         public boolean add(MCRCategory e) {
-            return super.add(wrapCategory(e));
+            return super.add(wrapCategory(e, thisCategory, root));
         }
 
         @Override
         public boolean addAll(Collection<? extends MCRCategory> c) {
-            return super.addAll(wrapCategories(c));
+            return super.addAll(wrapCategories(c, thisCategory, root));
         }
 
         @Override
         public boolean addAll(int index, Collection<? extends MCRCategory> c) {
-            return super.addAll(index, wrapCategories(c));
+            return super.addAll(index, wrapCategories(c, thisCategory, root));
         }
 
         @Override
@@ -129,37 +132,11 @@ public class MCRCategoryImpl extends MCRAbstractCategoryImpl {
             return category;
         }
 
-        private Collection<MCRCategoryImpl> wrapCategories(Collection<? extends MCRCategory> categories) {
-            List<MCRCategoryImpl> list = new ArrayList<MCRCategoryImpl>(categories.size());
-            for (MCRCategory category : categories) {
-                list.add(wrapCategory(category));
-            }
-            return list;
-        }
-
-        private MCRCategoryImpl wrapCategory(MCRCategory category) {
-            MCRCategoryImpl catImpl;
-            if (category instanceof MCRCategoryImpl) {
-                catImpl = (MCRCategoryImpl) category;
-                //don't use setParent() as it call add() from ChildList
-                catImpl.parent = thisCategory;
-                catImpl.setRoot(root);
-                return catImpl;
-            }
-            catImpl = new MCRCategoryImpl();
-            catImpl.setId(category.getId());
-            catImpl.labels = category.getLabels();
-            catImpl.parent = thisCategory;
-            catImpl.setRoot(root);
-            catImpl.getChildren().addAll(category.getChildren());
-            return catImpl;
-        }
-
     }
 
     private static Logger LOGGER = Logger.getLogger(MCRCategoryImpl.class);
 
-    private int left, right, positionInParent;
+    private int left, right, positionInParent, internalID;
 
     int level;
 
@@ -250,6 +227,47 @@ public class MCRCategoryImpl extends MCRAbstractCategoryImpl {
      */
     public void setRoot(MCRCategory root) {
         this.root = root;
+    }
+
+    static Collection<MCRCategoryImpl> wrapCategories(Collection<? extends MCRCategory> categories, MCRCategory parent, MCRCategory root) {
+        List<MCRCategoryImpl> list = new ArrayList<MCRCategoryImpl>(categories.size());
+        for (MCRCategory category : categories) {
+            list.add(wrapCategory(category, parent, root));
+        }
+        return list;
+    }
+
+    static MCRCategoryImpl wrapCategory(MCRCategory category, MCRCategory parent, MCRCategory root) {
+        MCRCategoryImpl catImpl;
+        if (category instanceof MCRCategoryImpl) {
+            catImpl = (MCRCategoryImpl) category;
+            // don't use setParent() as it call add() from ChildList
+            catImpl.parent = parent;
+            catImpl.setRoot(root);
+            return catImpl;
+        }
+        catImpl = new MCRCategoryImpl();
+        catImpl.setId(category.getId());
+        catImpl.labels = category.getLabels();
+        catImpl.parent = parent;
+        catImpl.setRoot(root);
+        catImpl.getChildren().addAll(category.getChildren());
+        return catImpl;
+    }
+
+    /**
+     * @return the internalID
+     */
+    public int getInternalID() {
+        return internalID;
+    }
+
+    /**
+     * @param internalID
+     *            the internalID to set
+     */
+    public void setInternalID(int internalID) {
+        this.internalID = internalID;
     }
 
 }

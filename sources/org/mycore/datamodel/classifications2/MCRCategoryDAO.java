@@ -115,6 +115,15 @@ public interface MCRCategoryDAO {
     public abstract MCRCategory getRootCategory(MCRCategoryID baseID, int childLevel);
 
     /**
+     * Tells if a given category exists.
+     * 
+     * @param id
+     *            ID of Category
+     * @return true if category is present
+     */
+    public abstract boolean exist(MCRCategoryID id);
+
+    /**
      * Tells if a given category contains subcategories.
      * 
      * @param id

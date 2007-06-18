@@ -46,13 +46,20 @@ public class MCRCategoryID implements Serializable {
     }
 
     /**
-     * @param rootID aka Classification ID
-     * @param id aka Category ID
+     * @param rootID
+     *            aka Classification ID
+     * @param id
+     *            aka Category ID
      */
     public MCRCategoryID(String rootID, String id) {
         super();
-        this.rootID = rootID;
-        ID = id;
+        setID(id);
+        setRootID(rootID);
+    }
+
+    public static MCRCategoryID rootID(String rootID) {
+        String root = rootID.intern();
+        return new MCRCategoryID(root, null);
     }
 
     /*
@@ -123,7 +130,15 @@ public class MCRCategoryID implements Serializable {
      *            the rootID to set
      */
     public void setRootID(String rootID) {
-        this.rootID = rootID;
+        this.rootID = rootID.intern();
+    }
+
+    /* (non-Javadoc)
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        return getRootID()+":"+getID();
     }
 
 }

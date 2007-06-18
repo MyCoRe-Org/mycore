@@ -43,24 +43,26 @@ public class MCRXMLTransformer {
         MCRCategoryImpl category = new MCRCategoryImpl();
         category.setRoot(category);
         final String classID = xml.getRootElement().getAttributeValue("ID");
-        category.setId(new MCRCategoryID(classID, classID));
-        category.setChildren(getChildCategories(classID, xml.getRootElement().getChild("categories").getChildren("category")));
+        category.setLevel(0);
+        category.setId(MCRCategoryID.rootID(classID));
+        category.setChildren(getChildCategories(classID, xml.getRootElement().getChild("categories").getChildren("category"), 1));
         category.setLabels(getLabel(xml.getRootElement().getChildren("label")));
         return category;
     }
 
-    private static MCRCategory getCategory(String classID, Element e) {
+    private static MCRCategory getCategory(String classID, Element e, int level) {
         MCRCategoryImpl category = new MCRCategoryImpl();
         category.setId(new MCRCategoryID(classID, e.getAttributeValue("ID")));
         category.setLabels(getLabel(e.getChildren("label")));
-        category.setChildren(getChildCategories(classID, e.getChildren("category")));
+        category.setLevel(level);
+        category.setChildren(getChildCategories(classID, e.getChildren("category"), level+1));
         return category;
     }
 
-    private static List<MCRCategory> getChildCategories(String classID, List elements) {
+    private static List<MCRCategory> getChildCategories(String classID, List elements, int level) {
         List<MCRCategory> children = new ArrayList<MCRCategory>(elements.size());
         for (Object o : elements) {
-            children.add(getCategory(classID, (Element) o));
+            children.add(getCategory(classID, (Element) o, level));
         }
         return children;
     }

@@ -27,6 +27,17 @@ import java.util.Collection;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.hibernate.Criteria;
+import org.hibernate.HibernateException;
+import org.hibernate.Query;
+import org.hibernate.Session;
+import org.hibernate.criterion.CriteriaQuery;
+import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.DetachedCriteria;
+import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Restrictions;
+import org.hibernate.criterion.Subqueries;
+import org.hibernate.engine.TypedValue;
 
 import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.datamodel.classifications2.MCRCategory;
@@ -42,8 +53,10 @@ import org.mycore.datamodel.classifications2.MCRLabel;
  * @since 2.0
  */
 public class MCRCategoryDAOImpl implements MCRCategoryDAO {
-    
-    private static final Logger LOGGER = Logger.getLogger(MCRCategoryImpl.class);
+
+    private static final Logger LOGGER = Logger.getLogger(MCRCategoryDAOImpl.class);
+
+    private static final Class CATEGRORY_CLASS = MCRCategoryImpl.class;
 
     /**
      * calculates left and right value throug the subtree rooted at
@@ -63,6 +76,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         co.setLeft(leftStart);
         co.setLevel(levelStart);
         for (MCRCategory child : co.getChildren()) {
+            LOGGER.info(child.getId());
             curValue = calculateLeftRightAndLevel((MCRCategoryImpl) child, ++curValue, nextLevel);
         }
         co.setRight(++curValue);
@@ -72,11 +86,27 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
     /*
      * (non-Javadoc)
      * 
+     * @see org.mycore.datamodel.classifications2.MCRCategoryDAO#exist(org.mycore.datamodel.classifications2.MCRCategoryID)
+     */
+    public boolean exist(MCRCategoryID id) {
+        Criteria criteria = MCRHIBConnection.instance().getSession().createCriteria(CATEGRORY_CLASS);
+        criteria.setProjection(Projections.rowCount()).add(CategoryExpression.eq(id));
+        return ((Number) criteria.uniqueResult()).intValue() > 0;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mycore.datamodel.classifications2.MCRClassificationService#hasChildren(org.mycore.datamodel.classifications2.MCRCategoryID)
      */
     public boolean hasChildren(MCRCategoryID cid) {
-        // TODO: implement hasChildren
-        return true;
+        // SELECT * FROM MCRCATEGORY WHERE PARENTID=(SELECT INTERNALID FROM
+        // MCRCATEGORY WHERE rootID=cid.getRootID() and ID...);
+        Session session = MCRHIBConnection.instance().getSession();
+        Criteria c = session.createCriteria(CATEGRORY_CLASS).setProjection(Projections.rowCount());
+        c.add(Subqueries.propertyEq("parent", DetachedCriteria.forClass(CATEGRORY_CLASS).setProjection(Projections.property("internalID")).add(
+                CategoryExpression.eq(cid))));
+        return ((Number)c.uniqueResult()).intValue() > 0;
     }
 
     /*
@@ -84,27 +114,57 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
      * 
      * @see org.mycore.datamodel.classifications2.MCRClassificationService#getChildren(org.mycore.datamodel.classifications2.MCRCategoryID)
      */
+    @SuppressWarnings("unchecked")
     public List<MCRCategory> getChildren(MCRCategoryID cid) {
-        // TODO: implement getChildren
-        return new MCRCategoryImpl.ChildList(null, null);
+        if (!exist(cid)) {
+            return new MCRCategoryImpl.ChildList(null, null);
+        }
+        // Criteria criteria =
+        // MCRHIBConnection.instance().getSession().createCriteria(CATEGRORY_CLASS);
+        // criteria.add(Restrictions.eq("parent", cid));
+        Query q = MCRHIBConnection.instance().getSession().getNamedQuery(CATEGRORY_CLASS.getName() + ".getChildren");
+        q.setString("parentID", cid.getID());
+        q.setString("rootID", cid.getRootID());
+        return (List<MCRCategory>) q.list();
     }
 
     public void addCategory(MCRCategoryID parentID, MCRCategory category) {
-        int leftStart=0;
-        int levelStart=0;
-        if (parentID!=null){
-            //calculate left and level
+        int leftStart = 0;
+        int levelStart = 0;
+        Session session = MCRHIBConnection.instance().getSession();
+        MCRCategoryImpl parent = null;
+        if (parentID != null) {
+            parent = (MCRCategoryImpl) session.get(CATEGRORY_CLASS, parentID);
+            levelStart = parent.getLevel() + 1;
+            leftStart = parent.getLeft() + 1;
         }
         LOGGER.info("Calculating LEFT,RIGHT and LEVEL attributes...");
-        int nodes=calculateLeftRightAndLevel((MCRCategoryImpl)category, leftStart, levelStart) / 2;
-        LOGGER.info("Calculating LEFT,RIGHT and LEVEL attributes. Done! Nodes: "+nodes);
-        MCRHIBConnection.instance().getSession().save(category);
+        int nodes = calculateLeftRightAndLevel(MCRCategoryImpl.wrapCategory(category, parent, (parent == null) ? category.getRoot() : parent.getRoot()),
+                leftStart, levelStart) / 2;
+        LOGGER.info("Calculating LEFT,RIGHT and LEVEL attributes. Done! Nodes: " + nodes);
+        if (parentID != null) {
+            LOGGER.info("LEFT AND RIGHT values need updates");
+            Query leftQuery = session.getNamedQuery(CATEGRORY_CLASS.getName() + ".updateLeft");
+            leftQuery.setInteger(":left", leftStart);
+            leftQuery.setInteger(":increment", nodes * 2);
+            int leftChanges = leftQuery.executeUpdate();
+            Query rightQuery = session.getNamedQuery(CATEGRORY_CLASS.getName() + ".updateLeft");
+            rightQuery.setInteger(":left", leftStart);
+            rightQuery.setInteger(":increment", nodes * 2);
+            int rightChanges = rightQuery.executeUpdate();
+            LOGGER.info("Updated " + leftChanges + " left and " + rightChanges + " right values.");
+        }
+        session.save(category);
+        session.evict(category);
         LOGGER.info("Categorie saved.");
     }
 
     public void deleteCategory(MCRCategoryID id) {
-        MCRHIBConnection.instance().getSession().delete(MCRHIBConnection.instance().getSession().get(MCRCategoryImpl.class, id));
-
+        Session session = MCRHIBConnection.instance().getSession();
+        LOGGER.info("Will get: " + id);
+        MCRCategory category = (MCRCategory) session.createCriteria(CATEGRORY_CLASS).add(CategoryExpression.eq(id)).uniqueResult();
+        LOGGER.info("Will delete: " + category.getId());
+        session.delete(category);
     }
 
     public Collection<MCRCategory> getCategoriesByLabel(MCRCategoryID baseID, String lang, String text) {
@@ -123,8 +183,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
     }
 
     public MCRCategory getRootCategory(MCRCategoryID baseID, int childLevel) {
-        // TODO Auto-generated method stub
-        return null;
+        return (MCRCategory) MCRHIBConnection.instance().getSession().get(CATEGRORY_CLASS, MCRCategoryID.rootID(baseID.getRootID()));
     }
 
     public void moveCategory(MCRCategoryID id, MCRCategoryID newParentID) {
@@ -144,6 +203,39 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
 
     public void setLabel(MCRCategoryID id, MCRLabel label) {
         // TODO Auto-generated method stub
+
+    }
+
+    private static class CategoryExpression implements Criterion {
+        private static final long serialVersionUID = 2518173920912008890L;
+
+        MCRCategoryID id;
+
+        Criterion derived;
+
+        private CategoryExpression(MCRCategoryID id) {
+            this.id = id;
+            if (id.getID() == null) {
+                // handle Classification
+                derived = Restrictions.and(Restrictions.eq("id.rootID", id.getRootID()), Restrictions.isNull("id.ID"));
+            } else {
+                // handle Category
+                derived = Restrictions.eq("id", id);
+            }
+
+        }
+
+        public static CategoryExpression eq(MCRCategoryID id) {
+            return new CategoryExpression(id);
+        }
+
+        public TypedValue[] getTypedValues(Criteria criteria, CriteriaQuery criteriaQuery) throws HibernateException {
+            return derived.getTypedValues(criteria, criteriaQuery);
+        }
+
+        public String toSqlString(Criteria criteria, CriteriaQuery criteriaQuery) throws HibernateException {
+            return derived.toSqlString(criteria, criteriaQuery);
+        }
 
     }
 
