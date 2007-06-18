@@ -243,9 +243,10 @@ public class MCRHIBConnection implements Closeable, MCRSessionListener {
     }
     
     public void flushSession(){
-        getSession().setFlushMode(FlushMode.MANUAL);
-        getSession().flush();
-        getSession().setFlushMode(FlushMode.COMMIT);
+        Session currentSession=getSession();
+        currentSession.setFlushMode(FlushMode.MANUAL);
+        currentSession.flush();
+        currentSession.setFlushMode(FlushMode.COMMIT);
     }
 
 }
