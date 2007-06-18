@@ -187,7 +187,7 @@ public class MCRWCMSActionServlet extends MCRWCMSServlet {
     
     private String backaddr = null;
 
-    private File naviFile = new File(CONFIG.getString("MCR.WCMS.navigationFile").replace('/', File.separatorChar));
+    private File naviFile = new File(CONFIG.getString("MCR.navigationFile").replace('/', File.separatorChar));
 
     private HttpServletRequest request;
 
@@ -274,7 +274,7 @@ public class MCRWCMSActionServlet extends MCRWCMSServlet {
             }
 
             if (action.equals("delete")) {
-                File[] contentTemplates = new File((CONFIG.getString("MCR.WCMS.templatePath") + "content/").replace('/', File.separatorChar)).listFiles();
+                File[] contentTemplates = new File((CONFIG.getString("MCR.templatePath") + "content/").replace('/', File.separatorChar)).listFiles();
                 Element templates = new Element("templates");
                 Element contentTemp = new Element("content");
 
@@ -1502,7 +1502,7 @@ public class MCRWCMSActionServlet extends MCRWCMSServlet {
         hrefFile = null;
         error = href = labelPath = content = label = link = dir = null;
         changeInfo = null;
-        masterTemplates = new File(CONFIG.getString("MCR.WCMS.templatePath") + "master/".replace('/', File.separatorChar)).listFiles();
+        masterTemplates = new File(CONFIG.getString("MCR.templatePath") + "master/".replace('/', File.separatorChar)).listFiles();
         userID = (String) mcrSession.get("userID");
         userClass = (String) mcrSession.get("userClass");
         userRealName = (String) mcrSession.get("userRealName");

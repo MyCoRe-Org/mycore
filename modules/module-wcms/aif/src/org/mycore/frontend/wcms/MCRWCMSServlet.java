@@ -63,7 +63,7 @@ public abstract class MCRWCMSServlet extends MCRServlet {
         Element templates = new Element("templates");
 
         // master
-        File[] masterTemplates = new File(CONFIG.getString("MCR.WCMS.templatePath") + "master/".replace('/', File.separatorChar)).listFiles();
+        File[] masterTemplates = new File(CONFIG.getString("MCR.templatePath") + "master/".replace('/', File.separatorChar)).listFiles();
         Element master = new Element("master");
 
         for (int i = 0; i < masterTemplates.length; i++) {

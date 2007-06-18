@@ -157,7 +157,7 @@ public class MCRWCMSAdminServlet extends MCRWCMSServlet {
 	public void generateXML_managPage(MCRSession mcrSession, Element root) {
 		List rootNodes = (List) mcrSession.get("rootNodes");
 		File[] contentTemplates = new File((CONFIG
-				.getString("MCR.WCMS.templatePath") + "content/").replace('/',
+				.getString("MCR.templatePath") + "content/").replace('/',
 				File.separatorChar)).listFiles();
 		root.addContent(new Element("userRealName").setText(mcrSession.get(
 				"userRealName").toString()));
@@ -223,7 +223,7 @@ public class MCRWCMSAdminServlet extends MCRWCMSServlet {
 			HttpServletResponse response) {
 		try {
 			String pathToNavi = new String(CONFIG.getString(
-					"MCR.WCMS.navigationFile").replace('/', File.separatorChar));
+					"MCR.navigationFile").replace('/', File.separatorChar));
 			Document naviBase = new Document();
 			naviBase = XMLFile2JDOM(pathToNavi);
 
@@ -247,7 +247,7 @@ public class MCRWCMSAdminServlet extends MCRWCMSServlet {
 				NaviBaseRoot.setAttribute("template", defaultTemplateAIF);
 
 				File navigationBase = new File(CONFIG.getString(
-						"MCR.WCMS.navigationFile").replace('/',
+						"MCR.navigationFile").replace('/',
 						File.separatorChar));
 				XMLOutputter xmlOut = new XMLOutputter(Format.getRawFormat()
 						.setTextMode(Format.TextMode.PRESERVE).setEncoding(
