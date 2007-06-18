@@ -23,17 +23,13 @@
 
 package org.mycore.backend.hibernate;
 
-import java.sql.Blob;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.hibernate.Query;
 import org.hibernate.Session;
-import org.hibernate.criterion.Projections;
-import org.hibernate.criterion.Restrictions;
 
-import org.mycore.backend.hibernate.tables.MCRBlob;
 import org.mycore.backend.hibernate.tables.MCRXMLTABLE;
 import org.mycore.backend.hibernate.tables.MCRXMLTABLEPK;
 import org.mycore.common.MCRConfiguration;
@@ -177,12 +173,8 @@ public class MCRHIBXMLStore implements MCRXMLTableInterface {
      */
     public final byte[] retrieve(MCRObjectID mcrid, int version) throws MCRPersistenceException {
         Session session = getSession();
-        byte[] blob = null;
-
         MCRXMLTABLEPK pk = new MCRXMLTABLEPK(mcrid.getId(), version);
-        blob = MCRBlob.getBytes((Blob) session.createCriteria(MCRXMLTABLE.class).add(Restrictions.eq("key", pk)).setProjection(Projections.property("xml"))
-                .uniqueResult());
-        return blob;
+        return ((MCRXMLTABLE)session.get(MCRXMLTABLE.class, pk)).getXmlByteArray();
     }
 
     /**
