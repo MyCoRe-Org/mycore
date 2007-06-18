@@ -24,6 +24,7 @@
 package org.mycore.datamodel.classifications2.impl;
 
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -40,6 +41,7 @@ import org.hibernate.criterion.Subqueries;
 import org.hibernate.engine.TypedValue;
 
 import org.mycore.backend.hibernate.MCRHIBConnection;
+import org.mycore.common.MCRException;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
@@ -102,11 +104,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
     public boolean hasChildren(MCRCategoryID cid) {
         // SELECT * FROM MCRCATEGORY WHERE PARENTID=(SELECT INTERNALID FROM
         // MCRCATEGORY WHERE rootID=cid.getRootID() and ID...);
-        Session session = MCRHIBConnection.instance().getSession();
-        Criteria c = session.createCriteria(CATEGRORY_CLASS).setProjection(Projections.rowCount());
-        c.add(Subqueries.propertyEq("parent", DetachedCriteria.forClass(CATEGRORY_CLASS).setProjection(Projections.property("internalID")).add(
-                CategoryExpression.eq(cid))));
-        return ((Number) c.uniqueResult()).intValue() > 0;
+        return getNumberOfChildren(cid) > 0;
     }
 
     /*
@@ -126,7 +124,18 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         return (List<MCRCategory>) c.list();
     }
 
+    private static int getNumberOfChildren(MCRCategoryID id) {
+        Session session = MCRHIBConnection.instance().getSession();
+        Criteria c = session.createCriteria(CATEGRORY_CLASS).setProjection(Projections.rowCount());
+        c.add(Subqueries.propertyEq("parent", DetachedCriteria.forClass(CATEGRORY_CLASS).setProjection(Projections.property("internalID")).add(
+                CategoryExpression.eq(id))));
+        return ((Number) c.uniqueResult()).intValue();
+    }
+
     public void addCategory(MCRCategoryID parentID, MCRCategory category) {
+        if (exist(category.getId())) {
+            throw new MCRException("Cannot add category. A category with ID " + category.getId() + " allready exists");
+        }
         int leftStart = 0;
         int levelStart = 0;
         Session session = MCRHIBConnection.instance().getSession();
@@ -190,8 +199,8 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
     }
 
     public void moveCategory(MCRCategoryID id, MCRCategoryID newParentID) {
-        // TODO Auto-generated method stub
-
+        int index = getNumberOfChildren(newParentID);
+        moveCategory(id, newParentID, index);
     }
 
     public void moveCategory(MCRCategoryID id, MCRCategoryID newParentID, int index) {
@@ -200,13 +209,28 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
     }
 
     public void removeLabel(MCRCategoryID id, String lang) {
-        // TODO Auto-generated method stub
-
+        Session session = MCRHIBConnection.instance().getSession();
+        MCRCategoryImpl category = (MCRCategoryImpl) session.createCriteria(CATEGRORY_CLASS).add(CategoryExpression.eq(id)).uniqueResult();
+        Iterator<MCRLabel> it = category.labels.iterator();
+        while (it.hasNext()) {
+            if (lang.equals(it.next().getLang())) {
+                it.remove();
+            }
+        }
+        session.update(category);
     }
 
     public void setLabel(MCRCategoryID id, MCRLabel label) {
-        // TODO Auto-generated method stub
-
+        Session session = MCRHIBConnection.instance().getSession();
+        MCRCategoryImpl category = (MCRCategoryImpl) session.createCriteria(CATEGRORY_CLASS).add(CategoryExpression.eq(id)).uniqueResult();
+        Iterator<MCRLabel> it = category.labels.iterator();
+        while (it.hasNext()) {
+            if (label.getLang().equals(it.next().getLang())) {
+                it.remove();
+            }
+        }
+        category.labels.add(label);
+        session.update(category);
     }
 
     private static class CategoryExpression implements Criterion {
