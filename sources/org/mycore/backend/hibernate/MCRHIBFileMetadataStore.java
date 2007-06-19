@@ -101,8 +101,12 @@ public class MCRHIBFileMetadataStore implements MCRFileMetadataStore {
             throw new MCRPersistenceException("MCRFilesystemNode must be either MCRFile or MCRDirectory");
         }
 
-        MCRFSNODES fs = new MCRFSNODES();
-        fs.setId(ID);
+        Session session = getSession();
+        MCRFSNODES fs = (MCRFSNODES) session.get(MCRFSNODES.class, ID);
+        if (fs == null) {
+            fs = new MCRFSNODES();
+            fs.setId(ID);
+        }
         fs.setPid(PID);
         fs.setType(TYPE);
         fs.setOwner(OWNER);
@@ -118,38 +122,32 @@ public class MCRHIBFileMetadataStore implements MCRFileMetadataStore {
         fs.setNumchdf(NUMCHDF);
         fs.setNumchtd(NUMCHTD);
         fs.setNumchtf(NUMCHTF);
-
-        Session session = getSession();
-        deleteNode(node.getID());
         session.saveOrUpdate(fs);
     }
 
     public String retrieveRootNodeID(String ownerID) throws MCRPersistenceException {
         Session session = getSession();
-        List l = new ArrayList();
+        String nodeID = (String) session.createQuery("select id from MCRFSNODES where OWNER = '" + ownerID + "' and PID=NULL").uniqueResult();
 
-        l = session.createQuery("from MCRFSNODES where OWNER = '" + ownerID + "' and PID=NULL").list();
-
-        if (l.size() < 1) {
+        if (nodeID == null) {
             logger.warn("There is no fsnode with OWNER = " + ownerID);
             return null;
         }
 
-        return ((MCRFSNODES) (l.get(0))).getId();
+        return nodeID;
     }
 
     public MCRFilesystemNode retrieveChild(String parentID, String name) {
         Session session = getSession();
-        List l = new ArrayList();
         Query q = session.createQuery("from MCRFSNODES where PID = :pid and NAME = :name");
         q.setString("pid", parentID).setString("name", name);
-        l = q.list();
+        MCRFSNODES node = (MCRFSNODES) q.uniqueResult();
 
-        if (l.size() < 1) {
+        if (node == null) {
             return null;
         }
 
-        return buildNode((MCRFSNODES) l.get(0));
+        return buildNode(node);
     }
 
     public Vector retrieveChildrenIDs(String parentID) throws MCRPersistenceException {
@@ -173,25 +171,18 @@ public class MCRHIBFileMetadataStore implements MCRFileMetadataStore {
 
     public void deleteNode(String ID) throws MCRPersistenceException {
         Session session = getSession();
-        List l = session.createQuery("from MCRFSNODES where ID = '" + ID + "'").list();
-
-        for (int t = 0; t < l.size(); t++) {
-            MCRFSNODES node = (MCRFSNODES) l.get(t);
-            session.delete(node);
-        }
+        session.delete(session.get(MCRFSNODES.class, ID));
     }
 
     public MCRFilesystemNode retrieveNode(String ID) throws MCRPersistenceException {
         Session session = getSession();
-        List l = new ArrayList();
-        l = session.createQuery("from MCRFSNODES where ID = '" + ID + "'").list();
-
-        if (l.size() < 1) {
+        MCRFSNODES node = (MCRFSNODES) session.get(MCRFSNODES.class, ID);
+        if (node == null) {
             logger.warn("There is no FSNODE with ID = " + ID);
             return null;
         }
 
-        return buildNode((MCRFSNODES) l.get(0));
+        return buildNode(node);
     }
 
     public MCRFilesystemNode buildNode(MCRFSNODES node) {
