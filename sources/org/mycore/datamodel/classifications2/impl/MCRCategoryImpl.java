@@ -29,6 +29,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.hibernate.collection.PersistentList;
 
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRLabel;
@@ -177,9 +178,13 @@ public class MCRCategoryImpl extends MCRAbstractCategoryImpl implements Serializ
      */
     public void setChildren(List<MCRCategory> children) {
         childrenLock.writeLock().lock();
-        ChildList newChildren = new ChildList(this.root, this);
-        newChildren.addAll(children);
-        this.children = newChildren;
+        if (children instanceof PersistentList) {
+            this.children = children;
+        } else {
+            ChildList newChildren = new ChildList(this.root, this);
+            newChildren.addAll(children);
+            this.children = newChildren;
+        }
         childrenLock.writeLock().unlock();
     }
 
@@ -208,7 +213,6 @@ public class MCRCategoryImpl extends MCRAbstractCategoryImpl implements Serializ
      *            the positionInParent to set
      */
     public void setPositionInParent(int positionInParent) {
-        LOGGER.warn("Attempt to modify positionInParent to: " + positionInParent + " oldValue: " + getPositionInParent());
         this.positionInParent = positionInParent;
     }
 
