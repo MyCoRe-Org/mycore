@@ -35,6 +35,7 @@ import org.hibernate.Session;
 import org.hibernate.criterion.CriteriaQuery;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.DetachedCriteria;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.criterion.Subqueries;
@@ -93,7 +94,11 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
     public boolean exist(MCRCategoryID id) {
         Criteria criteria = MCRHIBConnection.instance().getSession().createCriteria(CATEGRORY_CLASS);
         criteria.setProjection(Projections.rowCount()).add(CategoryExpression.eq(id));
-        return ((Number) criteria.uniqueResult()).intValue() > 0;
+        Number result = (Number) criteria.uniqueResult();
+        if (result == null) {
+            return false;
+        }
+        return result.intValue() > 0;
     }
 
     /*
@@ -130,6 +135,16 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         c.add(Subqueries.propertyEq("parent", DetachedCriteria.forClass(CATEGRORY_CLASS).setProjection(Projections.property("internalID")).add(
                 CategoryExpression.eq(id))));
         return ((Number) c.uniqueResult()).intValue();
+    }
+
+    private static Integer[] getLeftRightValues(MCRCategoryID id) {
+        Session session = MCRHIBConnection.instance().getSession();
+        Criteria c = session.createCriteria(CATEGRORY_CLASS).setProjection(
+                Projections.projectionList().add(Projections.property("left")).add(Projections.property("right")));
+        c.add(CategoryExpression.eq(id));
+        Object[] result = (Object[]) c.uniqueResult();
+        Integer[] iResult = new Integer[] { (Integer) result[0], (Integer) result[1] };
+        return iResult;
     }
 
     public void addCategory(MCRCategoryID parentID, MCRCategory category) {
@@ -180,12 +195,41 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
     }
 
     public Collection<MCRCategory> getCategoriesByLabel(MCRCategoryID baseID, String lang, String text) {
-        // TODO Auto-generated method stub
+        Session session = MCRHIBConnection.instance().getSession();
+        Criteria c = session.createCriteria(CATEGRORY_CLASS);
+        Integer[] leftRight = getLeftRightValues(baseID);
+        c.add(Restrictions.eq("id.rootID", baseID.getRootID()));
+        c.add(Restrictions.between("left", leftRight[0], leftRight[1]));
+        // TODO: add lang and text to query
         return null;
     }
 
+    @SuppressWarnings("unchecked")
     public MCRCategory getCategory(MCRCategoryID id, int childLevel) {
         // TODO Auto-generated method stub
+        Session session = MCRHIBConnection.instance().getSession();
+        Criteria c = session.createCriteria(CATEGRORY_CLASS);
+        Integer[] leftRight = getLeftRightValues(id);
+        c.add(Restrictions.eq("id.rootID", id.getRootID()));
+        c.add(Restrictions.between("left", leftRight[0], leftRight[1]));
+        if (childLevel >= 0) {
+            MCRCategoryImpl category = (MCRCategoryImpl) session.createCriteria(CATEGRORY_CLASS).add(CategoryExpression.eq(id)).uniqueResult();
+            if (childLevel == 0) {
+                session.evict(category);
+                return category;
+            }
+            int curLevel = category.getLevel();
+            c.add(Restrictions.between("level", curLevel, (curLevel + childLevel)));
+        }
+        c.addOrder(Order.asc("level"));
+        c.addOrder(Order.asc("parent"));
+        //
+        for (MCRCategoryImpl cat : (List<MCRCategoryImpl>) c.list()) {
+            final int level = cat.level;
+            final MCRCategoryID parentID = (cat.getParent() == null) ? null : cat.getParent().getId();
+            final MCRCategoryID thisID = cat.getId();
+            System.out.printf("Level: %d, Parent: %s, ID: %s\n", level, parentID, thisID);
+        }
         return null;
     }
 
