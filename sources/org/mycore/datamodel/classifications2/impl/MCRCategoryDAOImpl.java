@@ -23,6 +23,7 @@
  **/
 package org.mycore.datamodel.classifications2.impl;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -35,7 +36,6 @@ import org.hibernate.Session;
 import org.hibernate.criterion.CriteriaQuery;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.DetachedCriteria;
-import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.criterion.Subqueries;
@@ -43,6 +43,7 @@ import org.hibernate.engine.TypedValue;
 
 import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.common.MCRException;
+import org.mycore.common.MCRPersistenceException;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
@@ -190,6 +191,9 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         Session session = MCRHIBConnection.instance().getSession();
         LOGGER.info("Will get: " + id);
         MCRCategory category = (MCRCategory) session.createCriteria(CATEGRORY_CLASS).add(CategoryExpression.eq(id)).uniqueResult();
+        if (category == null) {
+            throw new MCRPersistenceException("Category " + id + " was not found. Delete aborted.");
+        }
         LOGGER.info("Will delete: " + category.getId());
         session.delete(category);
     }
@@ -209,28 +213,26 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         // TODO Auto-generated method stub
         Session session = MCRHIBConnection.instance().getSession();
         Criteria c = session.createCriteria(CATEGRORY_CLASS);
-        Integer[] leftRight = getLeftRightValues(id);
-        c.add(Restrictions.eq("id.rootID", id.getRootID()));
-        c.add(Restrictions.between("left", leftRight[0], leftRight[1]));
-        if (childLevel >= 0) {
-            MCRCategoryImpl category = (MCRCategoryImpl) session.createCriteria(CATEGRORY_CLASS).add(CategoryExpression.eq(id)).uniqueResult();
-            if (childLevel == 0) {
-                session.evict(category);
-                return category;
+        c.setCacheable(true);
+        c.add(CategoryExpression.eq(id));
+        MCRCategoryImpl category = (MCRCategoryImpl) c.uniqueResult();
+        return copyDeep(category, childLevel);
+    }
+
+    public static MCRCategoryImpl copyDeep(MCRCategoryImpl category, int level) {
+        MCRCategoryImpl newCateg = new MCRCategoryImpl();
+        int childAmount = (level > 0) ? category.getChildren().size() : 0;
+        newCateg.setChildren(new ArrayList<MCRCategory>(childAmount));
+        newCateg.setId(category.getId());
+        newCateg.setLabels(category.getLabels());
+        newCateg.setRoot(category.root);
+        newCateg.setURI(category.getURI());
+        if (childAmount > 0) {
+            for (MCRCategory child : category.getChildren()) {
+                newCateg.getChildren().add(copyDeep((MCRCategoryImpl) child, level - 1));
             }
-            int curLevel = category.getLevel();
-            c.add(Restrictions.between("level", curLevel, (curLevel + childLevel)));
         }
-        c.addOrder(Order.asc("level"));
-        c.addOrder(Order.asc("parent"));
-        //
-        for (MCRCategoryImpl cat : (List<MCRCategoryImpl>) c.list()) {
-            final int level = cat.level;
-            final MCRCategoryID parentID = (cat.getParent() == null) ? null : cat.getParent().getId();
-            final MCRCategoryID thisID = cat.getId();
-            System.out.printf("Level: %d, Parent: %s, ID: %s\n", level, parentID, thisID);
-        }
-        return null;
+        return newCateg;
     }
 
     public List<MCRCategory> getParents(MCRCategoryID id) {
