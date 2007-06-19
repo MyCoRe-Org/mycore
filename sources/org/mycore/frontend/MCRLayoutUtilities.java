@@ -2,6 +2,7 @@ package org.mycore.frontend;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
 
 import org.apache.log4j.Logger;
 import org.jdom.Document;
@@ -24,19 +25,29 @@ public class MCRLayoutUtilities {
 
     public final static int ALL2BLOCKER_TRUE = 3;
 
-    private final static Logger LOGGER = Logger.getLogger("MCRWCMSUtilities");
-
+    private final static Logger LOGGER = Logger.getLogger(MCRLayoutUtilities.class);
+    
+    private static HashMap itemStore = new HashMap();
+    
+    private static long CACHE_INITTIME = 0;
+    
+    private static Document NAVI = null;
+    
     public static boolean readAccess(String webpageID, String blockerWebpageID) throws JDOMException, IOException {
-        LOGGER.debug("start check read access with blockerWebpageID=" + blockerWebpageID + " for webpageID=" + webpageID + "...");
+        LOGGER.debug("start to check read access for webpageID= " + webpageID + " (with blockerWebpageID =" + blockerWebpageID + ")");
+        long startTime = System.currentTimeMillis();
         boolean access = getAccess(webpageID, "read", ALL2BLOCKER_TRUE, blockerWebpageID);
-        LOGGER.debug("finished checking read access with blockerWebpageID: " + webpageID + "=" + access + "...");
+        long finishTime = (System.currentTimeMillis() - startTime) ;
+        LOGGER.debug("verified read access for webpageID= " + webpageID + " (with blockerWebpageID =" + blockerWebpageID + ") => " + access + ": took "
+                        + finishTime + " msec.");
         return access;
     }
 
     public static boolean readAccess(String webpageID) throws JDOMException, IOException {
-        LOGGER.debug("start check read access for webpageID=" + webpageID + "...");
+        long startTime = System.currentTimeMillis();
         boolean access = getAccess(webpageID, "read", ALLTRUE);
-        LOGGER.debug("finished checking read access: " + webpageID + "=" + access + "...");
+        long finishTime = (System.currentTimeMillis() - startTime) ;
+        LOGGER.debug("verified read access for webpageID= " + webpageID + " => " + access + ": took " + finishTime + " msec.");
         return access;
     }
 
@@ -105,8 +116,12 @@ public class MCRLayoutUtilities {
     }
 
     private static Element getItem(String webpageID) throws JDOMException, IOException {
-        XPath xpath = XPath.newInstance("//.[@href='" + webpageID + "']");
-        Element item = (Element) xpath.selectSingleNode(getNavi());
+        Element item = (Element)itemStore.get(webpageID);
+        if (item==null) {
+            XPath xpath = XPath.newInstance("//.[@href='" + webpageID + "']");
+            item = (Element) xpath.selectSingleNode(getNavi());
+            itemStore.put(webpageID,item);
+        }
         return item;
     }
 
@@ -129,14 +144,12 @@ public class MCRLayoutUtilities {
     public static Document getNavi() throws JDOMException, IOException {
         final MCRConfiguration CONFIG = MCRConfiguration.instance();
         final File navFile = new File(CONFIG.getString("MCR.navigationFile").replace('/', File.separatorChar));
-        final Document navigation = new SAXBuilder().build(navFile);
-        return navigation;
+        // cache does not exist or to old
+        if (CACHE_INITTIME <= navFile.lastModified()) {
+            NAVI = new SAXBuilder().build(navFile);
+            CACHE_INITTIME = System.currentTimeMillis();
+        } 
+        return NAVI;
     }
 
 }
-
-
-
-
-
-
