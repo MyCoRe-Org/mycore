@@ -2,7 +2,7 @@
 
   <!-- =================================================================== -->
   <!-- MyCoRe build file for use with Apache Ant                           -->
-  <!-- $Revision: 1.136 $ $Date: 2007-06-19 12:15:17 $                      -->
+  <!-- $Revision: 1.137 $ $Date: 2007-06-19 12:40:04 $                      -->
   <!-- =================================================================== -->
 
 <project name="MyCoRe" default="usage" basedir=".">
@@ -79,7 +79,7 @@
     <echo level="info">Operating system : ${os.name} Version ${os.version} on ${os.arch} </echo>
     <echo level="info">Java version     : JDK ${ant.java.version} Version ${java.version} from ${java.vendor}</echo>
     <echo level="info">Java home        : ${java.home}</echo>
-    <echo level="info">Ant build file   : $Revision: 1.136 $ $Date: 2007-06-19 12:15:17 $</echo>
+    <echo level="info">Ant build file   : $Revision: 1.137 $ $Date: 2007-06-19 12:40:04 $</echo>
     <echo level="info">Ant version      : ${ant.version}</echo>
     <echo level="info">Ant home         : ${ant.home}</echo>
     <echo level="info">Ant libdir       : ${ant.library.dir}</echo>
@@ -151,8 +151,8 @@
   <!-- Runs JUnit test cases                                               -->
   <!-- =================================================================== -->
 
-	<target name="test" depends="compile_testcases">
-	    <junit>
+	<target name="test" depends="init,compile_testcases">
+	    <junit printsummary="on">
 	    	<classpath refid="mycore.classpath"/>
 	    	<formatter type="brief" usefile="false"/>
 	    	<batchtest>
