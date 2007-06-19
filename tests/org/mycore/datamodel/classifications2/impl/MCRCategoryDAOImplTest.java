@@ -23,25 +23,31 @@
  **/
 package org.mycore.datamodel.classifications2.impl;
 
+import org.mycore.common.MCRHibTestCase;
 import org.mycore.common.MCRTestCase;
+import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.impl.MCRCategoryImpl;
 import org.mycore.datamodel.classifications2.impl.MCRCategoryDAOImpl;
 
-public class MCRCategoryDAOImplTest extends MCRTestCase {
+public class MCRCategoryDAOImplTest extends MCRHibTestCase {
 
     public void testCalculateLeftRightAndLevel() {
         MCRCategoryImpl co1 = new MCRCategoryImpl();
+        co1.setId(MCRCategoryID.rootID("co1"));
         assertEquals(2, MCRCategoryDAOImpl.calculateLeftRightAndLevel(co1, 1, 0));
         assertEquals(0, co1.getLevel());
         MCRCategoryImpl co2 = new MCRCategoryImpl();
+        co2.setId(new MCRCategoryID(co1.getId().getRootID(),"co2"));
         co1.getChildren().add(co2);
         assertEquals(4, MCRCategoryDAOImpl.calculateLeftRightAndLevel(co1, 1, 0));
         assertEquals(1, co2.getLevel());
         MCRCategoryImpl co3 = new MCRCategoryImpl();
+        co3.setId(new MCRCategoryID(co1.getId().getRootID(),"co3"));
         co1.getChildren().add(co3);
         assertEquals(6, MCRCategoryDAOImpl.calculateLeftRightAndLevel(co1, 1, 0));
         assertEquals(1, co3.getLevel());
         MCRCategoryImpl co4 = new MCRCategoryImpl();
+        co4.setId(new MCRCategoryID(co1.getId().getRootID(),"co4"));
         co3.getChildren().add(co4);
         assertEquals(8, MCRCategoryDAOImpl.calculateLeftRightAndLevel(co1, 1, 0));
         assertEquals(2, co4.getLevel());
