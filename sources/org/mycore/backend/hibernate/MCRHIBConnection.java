@@ -100,7 +100,8 @@ public class MCRHIBConnection implements Closeable, MCRSessionListener {
      * This method creates the configuration needed by hibernate
      */
     private void buildConfiguration() {
-        HIBCFG = new Configuration().configure();
+        String resource=System.getProperty("MCR.Hibernate.Configuration", "hibernate.cfg.xml");
+        HIBCFG = new Configuration().configure(resource);
         System.out.println("Hibernate configured");
     }
 
