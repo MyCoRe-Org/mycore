@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
@@ -24,6 +25,8 @@ public class MCRWCMSUtilities {
         }
     }
 
+    private final static Logger LOGGER = Logger.getLogger(MCRWCMSUtilities.class);
+
     /**
      * Verifies a given webpage-ID (//item/@href) from navigation.xml on write
      * permission, based on ACL-System. To be used by XSL with
@@ -35,7 +38,10 @@ public class MCRWCMSUtilities {
      * @throws IOException
      */
     public static boolean writeAccess(String webpageID) throws JDOMException, IOException {
-        return getWriteAccessGeneral() && MCRLayoutUtilities.getAccess(webpageID, "write", MCRLayoutUtilities.ONETRUE_ALLTRUE);
+        LOGGER.debug("start check write access for webpageID=" + webpageID + "...");
+        boolean access = getWriteAccessGeneral() && MCRLayoutUtilities.getAccess(webpageID, "write", MCRLayoutUtilities.ONETRUE_ALLTRUE);
+        LOGGER.debug("finished checking write access for webpage=" + webpageID + "=" + access + "...");
+        return access;
     }
 
     /**
