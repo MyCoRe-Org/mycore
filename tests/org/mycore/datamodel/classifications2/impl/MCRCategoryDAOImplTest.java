@@ -24,10 +24,7 @@
 package org.mycore.datamodel.classifications2.impl;
 
 import org.mycore.common.MCRHibTestCase;
-import org.mycore.common.MCRTestCase;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
-import org.mycore.datamodel.classifications2.impl.MCRCategoryImpl;
-import org.mycore.datamodel.classifications2.impl.MCRCategoryDAOImpl;
 
 public class MCRCategoryDAOImplTest extends MCRHibTestCase {
 
