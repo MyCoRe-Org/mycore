@@ -479,7 +479,7 @@ final public class MCRDerivate extends MCRBase {
 
         try {
             old.receiveFromDatastore(mcr_id.getId());
-        } catch (MCRException e) {
+        } catch (Exception e) {
             createInDatastore();
             return;
         }
