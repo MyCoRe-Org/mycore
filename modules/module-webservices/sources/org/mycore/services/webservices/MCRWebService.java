@@ -79,20 +79,17 @@ public class MCRWebService implements MCRWS {
     public org.w3c.dom.Document MCRDoRetrieveClassification(String level, String type, String classID, String categID, String format ) throws Exception {
         if ( null == format )
           format = "metadata";
+
         String uri = "classification:" + format + ":" + level + ":" + type + ":" + classID + ":" + categID;
-        org.jdom.Document d = new org.jdom.Document();
-
         org.jdom.Element cl = MCRURIResolver.instance().resolve(uri);
-        d.addContent(cl);
-
-        org.jdom.output.DOMOutputter doo = new org.jdom.output.DOMOutputter();
 
         if (logger.isDebugEnabled()) {
             org.jdom.output.XMLOutputter outputter = new org.jdom.output.XMLOutputter();
-            logger.debug(outputter.outputString(d));
+            logger.debug(outputter.outputString(cl));
         }
 
-        return doo.output(d);
+        org.jdom.Document d = new org.jdom.Document( (org.jdom.Element)( cl.clone() ) );
+        return new org.jdom.output.DOMOutputter().output(d);
     }
 
     /*
