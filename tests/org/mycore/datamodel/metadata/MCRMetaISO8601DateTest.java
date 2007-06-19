@@ -49,7 +49,7 @@ public class MCRMetaISO8601DateTest extends MCRTestCase {
 
     protected void setUp() throws Exception {
         super.setUp();//org.mycore.datamodel.metadata.MCRMetaISO8601Date
-        if (setProperty("MCR.log4j.logger.org.mycore.datamodel.metadata.MCRMetaISO8601Date","INFO", false)){
+        if (setProperty("log4j.logger.org.mycore.datamodel.metadata.MCRMetaISO8601Date","INFO", false)){
             //DEBUG will print a Stacktrace if we test for errors, but that's O.K.
             MCRConfiguration.instance().configureLogging();
         }

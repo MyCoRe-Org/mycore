@@ -51,7 +51,7 @@ public class MCRMetaXMLTest extends MCRTestCase {
 
     protected void setUp() throws Exception {
         super.setUp();//org.mycore.datamodel.metadata.MCRMetaXML
-        if (setProperty("MCR.log4j.logger.org.mycore.datamodel.metadata","INFO", false)){
+        if (setProperty("log4j.logger.org.mycore.datamodel.metadata","INFO", false)){
             //DEBUG will print a Stacktrace if we test for errors, but that's O.K.
             MCRConfiguration.instance().configureLogging();
         }
