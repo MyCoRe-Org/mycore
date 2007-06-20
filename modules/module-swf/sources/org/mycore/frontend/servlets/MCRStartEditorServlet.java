@@ -126,7 +126,7 @@ public class MCRStartEditorServlet extends MCRServlet {
     protected String extparm = null; // the extra parameter
 
     protected static int number_distance = 1;
-    
+
     /** Initialisation of the servlet */
     public void init() throws ServletException {
         super.init();
@@ -212,7 +212,7 @@ public class MCRStartEditorServlet extends MCRServlet {
 
         if ((mytfmcrid == null) || ((mytfmcrid = mytfmcrid.trim()).length() == 0)) {
             String myproject = CONFIG.getString("MCR.SWF.Project.ID." + mytype, "MCR");
-            mytfmcrid = getNextMCRTFID(myproject,mytype);
+            mytfmcrid = getNextMCRTFID(myproject, mytype);
         }
         LOGGER.info("MCRID (TF) = " + mytfmcrid);
 
@@ -315,14 +315,15 @@ public class MCRStartEditorServlet extends MCRServlet {
     }
 
     /**
-     * This method return a next new MCRObjectID for the given type and project ID.
+     * This method return a next new MCRObjectID for the given type and project
+     * ID.
      * 
-     * @param projectid The MCRObjectID project ID
-     * @type type  The MCRObjectID type
+     * @param projectid
+     *            The MCRObjectID project ID
+     * @type type The MCRObjectID type
      * @return the next free MCRObject for the given parameter
      */
-    protected final String getNextMCRTFID(String myproject,String mytype)
-    {
+    protected final String getNextMCRTFID(String myproject, String mytype) {
         if ((myproject == null) || (myproject.trim().length() == 0) || (myproject.equals("MCR"))) {
             myproject = CONFIG.getString("MCR.SWF.Project.ID", "MCR");
         }
@@ -350,7 +351,7 @@ public class MCRStartEditorServlet extends MCRServlet {
                     MCRObjectID mcriddir = new MCRObjectID(list[i].substring(0, list[i].length() - 4));
 
                     if (mcridnext.getNumberAsInteger() <= mcriddir.getNumberAsInteger()) {
-                        int mylastnumber = mcriddir.getNumberAsInteger()+1;
+                        int mylastnumber = mcriddir.getNumberAsInteger() + 1;
                         while ((mylastnumber % number_distance) != 0) {
                             mylastnumber += 1;
                         }
@@ -363,7 +364,8 @@ public class MCRStartEditorServlet extends MCRServlet {
         }
 
         return mcridnext.getId();
-}
+    }
+
     /**
      * The method start the editor add a file to a derivate object that is
      * stored in the server. The method use the input parameter: <b>type</b>,<b>step</b>
@@ -567,7 +569,7 @@ public class MCRStartEditorServlet extends MCRServlet {
 
         // read object
         MCRObjectService service = new MCRObjectService();
-        //obj.receiveFromDatastore(mysemcrid);
+        // obj.receiveFromDatastore(mysemcrid);
         List permlist = AI.getPermissionsForID(mysemcrid);
         for (int i = 0; i < permlist.size(); i++) {
             org.jdom.Element ruleelm = AI.getRule(mysemcrid, (String) permlist.get(i));
@@ -603,11 +605,12 @@ public class MCRStartEditorServlet extends MCRServlet {
      *            The XML access condition from the ACL system
      */
     private final org.jdom.Element normalizeACLforSWF(org.jdom.Element ruleelm) {
-        try {
-            System.out.println("XXXXXXXXXXXXXXXXX");
-            MCRUtils.writeJDOMToSysout(new org.jdom.Document().addContent(ruleelm));
-        } catch (Exception e) {
+        if (LOGGER.isDebugEnabled()) {
+            try {
+                MCRUtils.writeJDOMToSysout(new org.jdom.Document().addContent(ruleelm));
+            } catch (Exception e) {
 
+            }
         }
         org.jdom.Element newcondition = new org.jdom.Element("condition");
         newcondition.setAttribute("format", "xml");
