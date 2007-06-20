@@ -40,6 +40,7 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.MCRObjectService;
 import org.mycore.frontend.editor.MCREditorSubmission;
 import org.mycore.frontend.editor.MCRRequestParameters;
+import org.mycore.user.MCRUserMgr;
 
 /**
  * The servlet store the MCREditorServlet output XML in a file of a MCR type
@@ -63,6 +64,9 @@ public class MCRCheckClassACLServlet extends MCRServlet {
 
     // the configured permissions
     private static String storedrules = CONFIG.getString("MCR.Access.StorePermissions", "read,write,delete");
+
+    // The User Manager
+    protected static MCRUserMgr UM = MCRUserMgr.instance();
 
     /**
      * This method overrides doGetPost of MCRServlet and handels all actions
@@ -121,9 +125,9 @@ public class MCRCheckClassACLServlet extends MCRServlet {
     protected String getNextURL(MCRObjectID ID, boolean okay) throws MCRActiveLinkException {
         StringBuffer sb = new StringBuffer();
         if (okay) {
-            sb.append(getBaseURL()).append("browse?mode=edit");
+            sb.append("browse?mode=edit");
         } else {
-            sb.append(CONFIG.getString("MCR.editor_page_dir", "")).append(CONFIG.getString("MCR.editor_page_error_store", "editor_error_store.xml"));
+            sb.append(CONFIG.getString("MCR.SWF.PageDir", "")).append(CONFIG.getString("MCR.SWF.PageErrorStore", "editor_error_store.xml"));
         }
         return sb.toString();
     }
@@ -154,10 +158,84 @@ public class MCRCheckClassACLServlet extends MCRServlet {
      */
     protected org.jdom.Element prepareService(org.jdom.Document jdom_in, MCRObjectID ID, MCRServletJob job, String lang) throws Exception {
         org.jdom.Element elm_out = null;
-        ArrayList<String> logtext = new ArrayList<String>();
+        ArrayList <String>logtext = new ArrayList<String>();
         org.jdom.Element root = jdom_in.getRootElement();
-        if (root == null) {
-            logtext.add("The ACL service output from editor is null.");
+        if (root != null) {
+            org.jdom.Element servacls = root.getChild("servacls");
+            if (servacls != null) {
+                List servacllist = servacls.getChildren("servacl");
+                if (servacllist.size() != 0) {
+                    for (int i = 0; i < servacllist.size(); i++) {
+                        org.jdom.Element servacl = (org.jdom.Element) servacllist.get(i);
+                        org.jdom.Element outcond = servacl.getChild("condition");
+                        if (outcond != null) {
+                            org.jdom.Element outbool = outcond.getChild("boolean");
+                            if (outbool != null) {
+                                List inbool = outbool.getChildren("boolean");
+                                String outoper = outbool.getAttributeValue("operator");
+                                if (inbool.size() != 0 && outoper != null && !outoper.equals("true")) {
+                                    for (int j = 0; j < inbool.size(); j++) {
+                                        List incondlist = ((org.jdom.Element) inbool.get(j)).getChildren("condition");
+                                        int k = incondlist.size();
+                                        if (k != 0) {
+                                            for (int l = 0; l < k; l++) {
+                                                org.jdom.Element incond = (org.jdom.Element) incondlist.get(l);
+                                                String condvalue = incond.getAttributeValue("value");
+                                                if (condvalue == null || (condvalue = condvalue.trim()).length() == 0) {
+                                                    ((org.jdom.Element) inbool.get(j)).removeContent(incond);
+                                                    k--;
+                                                    l--;
+                                                    continue;
+                                                }
+                                                String condfield = incond.getAttributeValue("field");
+                                                if (condfield.equals("user")) {
+                                                    if (!UM.existUser(condvalue)) {
+                                                        ((org.jdom.Element) inbool.get(j)).removeContent(incond);
+                                                        k--;
+                                                        l--;
+                                                        continue;
+                                                    }
+                                                }
+                                                if (condfield.equals("group")) {
+                                                    if (!UM.existGroup(condvalue)) {
+                                                        ((org.jdom.Element) inbool.get(j)).removeContent(incond);
+                                                        k--;
+                                                        l--;
+                                                        continue;
+                                                    }
+                                                }
+                                            }
+                                            if (k == 1) {
+                                                org.jdom.Element newtrue = new org.jdom.Element("boolean");
+                                                newtrue.setAttribute("operator", "true");
+                                                ((org.jdom.Element) inbool.get(j)).addContent(newtrue);
+                                            }
+                                        } else {
+                                            logtext.add("Can't find an inner condition element.");
+                                        }
+                                    }
+                                } else {
+                                    if (outoper == null || !outoper.equals("true")) {
+                                        logtext.add("Wrong structure of MyCoRe ACL JDOM in boolean.");
+                                    }
+                                }
+                            } else {
+                                outbool = new org.jdom.Element("boolean");
+                                outbool.setAttribute("operator", "true");
+                                outcond.addContent(outbool);
+                            }
+                        } else {
+                            logtext.add("Can't find a condition element.");
+                        }
+                    }
+                } else {
+                    logtext.add("Can't find a servacl element.");
+                }
+            } else {
+                logtext.add("Can't find the servacls element.");
+            }
+        } else {
+            logtext.add("The service part is null.");
         }
         elm_out = (org.jdom.Element) root.clone();
         errorHandlerValid(job, logtext, ID, lang);

@@ -145,6 +145,7 @@ public class MCRStartClassEditorServlet extends MCRServlet {
             List permlist = AI.getPermissionsForID(clid);
             for (int i = 0; i < permlist.size(); i++) {
                 org.jdom.Element ruleelm = AI.getRule(clid, (String) permlist.get(i));
+                ruleelm = normalizeACLforSWF(ruleelm);
                 serv.addRule((String) permlist.get(i), ruleelm);
             }
             serviceelm = serv.createXML();
@@ -398,4 +399,84 @@ public class MCRStartClassEditorServlet extends MCRServlet {
         LOGGER.debug("Sending redirect to " + redirectURL.toString());
         return redirectURL.toString();
     }
+    
+    /**
+     * Normalize the ACL to use in the SWF ACL editor. Some single conditions
+     * are one step to high in the hierarchie of the conditin tree. This method
+     * move it down and normalized the output.
+     * 
+     * @param ruleelm
+     *            The XML access condition from the ACL system
+     */
+    private final org.jdom.Element normalizeACLforSWF(org.jdom.Element ruleelm) {
+        if (LOGGER.isDebugEnabled()) {
+            try {
+                MCRUtils.writeJDOMToSysout(new org.jdom.Document().addContent(ruleelm));
+            } catch (Exception e) {
+
+            }
+        }
+        org.jdom.Element newcondition = new org.jdom.Element("condition");
+        newcondition.setAttribute("format", "xml");
+        org.jdom.Element newwrapperand = new org.jdom.Element("boolean");
+        newwrapperand.setAttribute("operator", "and");
+        newcondition.addContent(newwrapperand);
+        if (ruleelm == null) {
+            return newcondition;
+        }
+        try {
+            org.jdom.Element newtrue = new org.jdom.Element("boolean");
+            newtrue.setAttribute("operator", "true");
+            org.jdom.Element oldwrapperand = ruleelm.getChild("boolean");
+            if (oldwrapperand == null) {
+                return newcondition;
+            }
+
+            org.jdom.Element newuser = (org.jdom.Element) newtrue.detach();
+            org.jdom.Element newdate = (org.jdom.Element) newtrue.detach();
+            org.jdom.Element newip = (org.jdom.Element) newtrue.detach();
+            org.jdom.Element newelm = null;
+
+            List<org.jdom.Element> parts = oldwrapperand.getChildren();
+            for (int i = 0; i < parts.size(); i++) {
+                if (i > 2)
+                    break;
+                org.jdom.Element oldelm = (org.jdom.Element) parts.get(i).detach();
+                if (oldelm.getChildren().size() == 0)
+                    continue;
+                if (oldelm.getName().equals("condition")) {
+                    org.jdom.Element newwrapper = new org.jdom.Element("boolean");
+                    newwrapper.setAttribute("operator", "or");
+                    newwrapper.addContent(oldelm);
+                    newelm = newwrapper;
+                } else {
+                    newelm = oldelm;
+                }
+                String testfield = "";
+                List<org.jdom.Element> innercond = newelm.getChildren();
+                for (int j = 0; j < innercond.size(); j++) {
+                    org.jdom.Element cond = (org.jdom.Element) innercond.get(j);
+                    if (cond.getName().equals("condition")) {
+                        testfield = cond.getAttributeValue("field");
+                    }
+                }
+                if (testfield.equals("user") || testfield.equals("group")) {
+                    newuser = newelm;
+                }
+                if (testfield.equals("date")) {
+                    newdate = newelm;
+                }
+                if (testfield.equals("ip")) {
+                    newip = newelm;
+                }
+            }
+            newwrapperand.addContent(newuser.detach());
+            newwrapperand.addContent(newdate.detach());
+            newwrapperand.addContent(newip.detach());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return newcondition;
+    }
+
 }
