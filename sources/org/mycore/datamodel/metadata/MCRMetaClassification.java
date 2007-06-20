@@ -24,9 +24,6 @@
 package org.mycore.datamodel.metadata;
 
 import org.mycore.common.MCRException;
-import org.mycore.datamodel.classifications.MCRCategoryItem;
-import org.mycore.datamodel.classifications.MCRClassification;
-import org.mycore.datamodel.classifications.MCRClassificationItem;
 import org.mycore.datamodel.classifications.MCRClassificationManager;
 import org.mycore.datamodel.common.MCRXMLTableManager;
 
@@ -211,6 +208,7 @@ public class MCRMetaClassification extends MCRMetaDefault {
                 return false;
             }
         } catch (Exception e) {
+        	LOGGER.debug("Error validating classification "+classid, e);
             return false;
         }
 
