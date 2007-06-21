@@ -267,7 +267,6 @@ public class MCRCommandLineInterface {
     }
 
     protected static void saveQueue(String lastCommand) {
-        // TODO: Write incomplete commands to a file
         System.out.println(system);
         System.out.println(system + " The following command failed: ");
         System.out.println(system + " " + lastCommand);
