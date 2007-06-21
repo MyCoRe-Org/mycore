@@ -29,6 +29,8 @@ import java.text.Format;
 import java.text.MessageFormat;
 import java.text.NumberFormat;
 import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.StringTokenizer;
 
 import org.mycore.common.MCRConfigurationException;
@@ -178,7 +180,7 @@ public class MCRCommand {
 
         for (int i = 0; i < numParameters; i++) {
             if (parameterTypes[i] == Integer.TYPE) {
-                parameters[i] = ((Integer)commandParameters[j]).intValue(); 
+                parameters[i] = ((Integer) commandParameters[j]).intValue();
                 j++;
                 continue;
             }
@@ -199,8 +201,10 @@ public class MCRCommand {
      * given the user input from the command line. This is only done when the
      * command line syntax matches the syntax used by this command.
      * 
-     * @return true, if the command syntax matched and the command was invoked,
-     *         false otherwise
+     * @return null, if the command syntax did not match and the command was not
+     *         invoked, otherwise a List of commands is returned which may be
+     *         empty or otherwise contains commands that should be processed
+     *         next
      * @param input
      *            The command entered by the user at the command prompt
      * @throws IllegalAccessException
@@ -212,20 +216,22 @@ public class MCRCommand {
      * @throws NoSuchMethodException
      *             when the method specified does not exist
      */
-    public boolean invoke(String input) throws IllegalAccessException, InvocationTargetException, ClassNotFoundException, NoSuchMethodException {
+    public List<String> invoke(String input) throws IllegalAccessException, InvocationTargetException, ClassNotFoundException, NoSuchMethodException {
         if (!input.startsWith(suffix)) {
-            return false;
+            return null;
         }
 
         Object[] commandParameters = parseCommandLine(input);
 
         if (commandParameters == null) {
-            return false;
+            return null;
         }
 
-        getMethod().invoke(null, buildInvocationParameters(commandParameters));
-
-        return true;
+        Object result = getMethod().invoke(null, buildInvocationParameters(commandParameters));
+        if ((result instanceof List) && (!((List) result).isEmpty()) && (((List) result).get(0) instanceof String))
+            return (List<String>) result;
+        else
+            return new ArrayList<String>();
     }
 
     /**

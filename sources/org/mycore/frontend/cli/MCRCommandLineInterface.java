@@ -25,10 +25,13 @@ package org.mycore.frontend.cli;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -45,6 +48,7 @@ import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
+import org.mycore.common.MCRUsageException;
 import org.mycore.datamodel.common.MCRActiveLinkException;
 
 /**
@@ -86,8 +90,7 @@ public class MCRCommandLineInterface {
     /** The current session */
     private static MCRSession session = null;
 
-    /** If true, main() method will terminate after catched exception */
-    private static boolean terminateAfterException = false;
+    private static boolean interactiveMode = true;
 
     /**
      * Reads command definitions from a configuration file and builds the
@@ -97,21 +100,17 @@ public class MCRCommandLineInterface {
         // **************************************
         // Built-in commands
         // **************************************
-        knownCommands.add(new MCRCommand("process {0}", "org.mycore.frontend.cli.MCRCommandLineInterface.readCommandsFile String",
-                "Execute the commands listed in the text file {0}."));
-        knownCommands.add(new MCRCommand("help {0}", "org.mycore.frontend.cli.MCRCommandLineInterface.showCommandsHelp String",
-                "Show the help text for the commands beginning with {0}."));
+        knownCommands.add(new MCRCommand("process {0}", "org.mycore.frontend.cli.MCRCommandLineInterface.readCommandsFile String", "Execute the commands listed in the text file {0}."));
+        knownCommands.add(new MCRCommand("help {0}", "org.mycore.frontend.cli.MCRCommandLineInterface.showCommandsHelp String", "Show the help text for the commands beginning with {0}."));
         knownCommands.add(new MCRCommand("help", "org.mycore.frontend.cli.MCRCommandLineInterface.listKnownCommands", "List all possible commands."));
         knownCommands.add(new MCRCommand("exit", "org.mycore.frontend.cli.MCRCommandLineInterface.exit", "Stop and exit the commandline tool."));
         knownCommands.add(new MCRCommand("quit", "org.mycore.frontend.cli.MCRCommandLineInterface.exit", "Stop and exit the commandline tool."));
-        knownCommands.add(new MCRCommand("! {0}", "org.mycore.frontend.cli.MCRCommandLineInterface.executeShellCommand String",
-                "Execute the shell command {0}, for example '! ls' or '! cmd /c dir'"));
+        knownCommands.add(new MCRCommand("! {0}", "org.mycore.frontend.cli.MCRCommandLineInterface.executeShellCommand String", "Execute the shell command {0}, for example '! ls' or '! cmd /c dir'"));
+        knownCommands.add(new MCRCommand("show file {0}", "org.mycore.frontend.cli.MCRCommandLineInterface.show String", "Show contents of local file {0}"));
 
         if (system.indexOf("miless") == -1) {
-            knownCommands.add(new MCRCommand("change to user {0} with {1}", "org.mycore.frontend.cli.MCRCommandLineInterface.changeToUser String String",
-                    "Change the user {0} with the given password in {1}."));
-            knownCommands.add(new MCRCommand("login {0}", "org.mycore.frontend.cli.MCRCommandLineInterface.login String",
-                    "Start the login dialog for the user {0}."));
+            knownCommands.add(new MCRCommand("change to user {0} with {1}", "org.mycore.frontend.cli.MCRCommandLineInterface.changeToUser String String", "Change the user {0} with the given password in {1}."));
+            knownCommands.add(new MCRCommand("login {0}", "org.mycore.frontend.cli.MCRCommandLineInterface.login String", "Start the login dialog for the user {0}."));
             knownCommands.add(new MCRCommand("whoami", "org.mycore.frontend.cli.MCRCommandLineInterface.whoami", "Print the current user."));
         }
 
@@ -161,7 +160,7 @@ public class MCRCommandLineInterface {
         try {
             initCommands();
         } catch (Exception ex) {
-            showException(ex, false);
+            showException(ex);
             System.exit(1);
         }
 
@@ -170,29 +169,28 @@ public class MCRCommandLineInterface {
         System.out.println(system);
 
         if (args.length > 0) {
+            interactiveMode = false;
+
             StringBuffer sb = new StringBuffer();
             for (int i = 0; i < args.length; i++)
                 sb.append(args[i]).append(" ");
             String line = sb.toString().trim();
-
-            int pos = line.indexOf(";;");
-            if (pos == -1)
-                commandQueue.add(line);
-            else
-                do {
-                    String cmd = line.substring(0, pos).trim();
+            String[] cmds = line.split(";;");
+            for (String cmd : cmds) {
+                cmd = cmd.trim();
+                if (cmd.length() > 0)
                     commandQueue.add(cmd);
-                    line = line.substring(pos + 2).trim();
-                    pos = line.indexOf(";;");
-                } while (pos != -1);
-            commandQueue.add("exit");
+            }
         }
 
-        String command;
+        String command = null;
 
         while (true) {
             if (commandQueue.isEmpty()) {
-                command = readCommandFromPrompt();
+                if (interactiveMode)
+                    command = readCommandFromPrompt();
+                else
+                    System.exit(0);
             } else {
                 command = (String) commandQueue.firstElement();
                 commandQueue.removeElementAt(0);
@@ -219,7 +217,6 @@ public class MCRCommandLineInterface {
             }
         } while ((line = line.trim()).length() == 0);
 
-        terminateAfterException = false;
         return line;
     }
 
@@ -233,23 +230,81 @@ public class MCRCommandLineInterface {
     protected static void processCommand(String command) {
         long start = System.currentTimeMillis();
         Transaction tx = MCRHIBConnection.instance().getSession().beginTransaction();
-        boolean commandProcessed = false;
+        List<String> commandsReturned = null;
         try {
             for (MCRCommand currentCommand : knownCommands) {
-                commandProcessed = currentCommand.invoke(command);
-                if (commandProcessed)
+                commandsReturned = currentCommand.invoke(command);
+                if (commandsReturned != null) // Command was executed
+                {
+                    // Add commands to queue
+                    for (int i = 0; i < commandsReturned.size(); i++)
+                        commandQueue.insertElementAt(commandsReturned.get(i), i);
+
                     break;
+                }
             }
             tx.commit();
-            if (commandProcessed)
+            if (commandsReturned != null)
                 System.out.printf("%s Command processed (%d ms)\n", system, (System.currentTimeMillis() - start));
-            else
-                System.out.printf("%s Command not understood. Enter 'help' to get a list of commands.\n", system);
+            else {
+                if (interactiveMode)
+                    System.out.printf("%s Command not understood. Enter 'help' to get a list of commands.\n", system);
+                else
+                    throw new MCRUsageException("Command not understood: " + command);
+            }
         } catch (Exception ex) {
-            showException(ex, false);
-            System.out.printf("%s Command '%s' failed. Performing transaction rollback!\n", system, command);
-            tx.rollback();
+            showException(ex);
+            System.out.printf("%s Command failed. Performing transaction rollback...\n", system);
+            try {
+                tx.rollback();
+            } catch (Exception ex2) {
+                showException(ex2);
+            }
+            saveQueue(command);
+            if (!interactiveMode)
+                System.exit(1);
         }
+    }
+
+    protected static void saveQueue(String lastCommand) {
+        // TODO: Write incomplete commands to a file
+        System.out.println(system);
+        System.out.println(system + " The following command failed: ");
+        System.out.println(system + " " + lastCommand);
+        if (!commandQueue.isEmpty())
+            System.out.printf("%s There are %s other commands still unprocessed.", system, commandQueue.size());
+        else if (interactiveMode)
+            return;
+
+        String fname = "unprocessed-commands.txt";
+        System.out.println(system + " Writing unprocessed commands to file " + fname);
+
+        try {
+            PrintWriter pw = new PrintWriter(new OutputStreamWriter(new FileOutputStream(fname)));
+            pw.println(lastCommand);
+            for (String command : commandQueue)
+                pw.println(command);
+            pw.close();
+        } catch (IOException ex) {
+            showException(ex);
+        }
+    }
+
+    /**
+     * Show contents of a local text file, including line numbers.
+     * 
+     * @param fname the filename
+     * @throws Exception
+     */
+    public static void show(String fname) throws Exception {
+        BufferedReader br = new BufferedReader( new FileReader( fname ) );
+        System.out.println();
+        String line;
+        int i = 1;
+        while( (line = br.readLine()) != null )
+          System.out.printf( "%04d: %s\n",i++,line );
+        br.close();
+        System.out.println();
     }
 
     /**
@@ -258,14 +313,14 @@ public class MCRCommandLineInterface {
      * @param ex
      *            The exception that was catched while processing a command
      */
-    protected static void showException(Throwable ex, boolean child) {
+    protected static void showException(Throwable ex) {
         if (ex instanceof InvocationTargetException) {
             ex = ((InvocationTargetException) ex).getTargetException();
-            showException(ex, false);
+            showException(ex);
             return;
         } else if (ex instanceof ExceptionInInitializerError) {
             ex = ((ExceptionInInitializerError) ex).getCause();
-            showException(ex, false);
+            showException(ex);
             return;
         }
 
@@ -323,12 +378,9 @@ public class MCRCommandLineInterface {
             if (ex != null) {
                 System.out.println(system);
                 System.out.println(system + " This exception was caused by:");
-                showException(ex, true);
+                showException(ex);
             }
         }
-
-        if ((!child) && terminateAfterException)
-            System.exit(1);
     }
 
     /**
@@ -343,25 +395,23 @@ public class MCRCommandLineInterface {
      * @throws FileNotFoundException
      *             when the file was not found
      */
-    public static void readCommandsFile(String file) throws IOException, FileNotFoundException {
+    public static List<String> readCommandsFile(String file) throws IOException, FileNotFoundException {
         BufferedReader reader = new BufferedReader(new FileReader(file));
         System.out.println(system + " Reading commands from file " + file);
 
         String line;
-        int pos = 0;
-
+        List<String> list = new ArrayList<String>();
         while ((line = reader.readLine()) != null) {
             line = line.trim();
 
             if (line.startsWith("#") || (line.length() == 0)) {
                 continue;
             }
-            commandQueue.insertElementAt(line, pos++);
+            list.add(line);
         }
 
         reader.close();
-
-        terminateAfterException = true; // we are in batch mode now
+        return list;
     }
 
     /**
