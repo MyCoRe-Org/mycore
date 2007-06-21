@@ -74,14 +74,12 @@ public final class MCRGoogleSitemapServlet extends MCRServlet {
         Document jdom = new Document(urlset);
 
         // build over all types
-        MCRObjectID mid = new MCRObjectID();
         Document doc = null;
         XPath xpath = XPath.newInstance("/mycoreobject/service/servdates/servdate[@type='modifydate']");
         for (String type : types) {
             for (Object objID : tm.retrieveAllIDs(type)) {
                 String mcrID = objID.toString();
-                mid.setID(mcrID);
-                doc = tm.readDocument(mid);
+                doc = tm.readDocument(new MCRObjectID(mcrID));
                 Element servDate = (Element) xpath.selectSingleNode(doc);
                 // build entry
                 Element url = new Element("url", ns);
