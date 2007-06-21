@@ -90,6 +90,7 @@ public class MCRHIBLinkTableStore implements MCRLinkTableInterface {
         Session session = getSession();
         MCRLINKHREF l = new MCRLINKHREF(from, to, type, attr);
         session.saveOrUpdate(l);
+        session.evict(l);
     }
 
     /**
