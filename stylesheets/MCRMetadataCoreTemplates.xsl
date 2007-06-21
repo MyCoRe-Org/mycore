@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!-- ============================================== -->
-<!-- $Revision: 1.34 $ $Date: 2007-02-02 12:10:44 $ -->
+<!-- $Revision: 1.35 $ $Date: 2007-06-21 12:06:55 $ -->
 <!-- ============================================== -->
 
 <xsl:stylesheet
@@ -204,7 +204,7 @@
  <xsd:element name="{@name}" minOccurs="{@minOccurs}" maxOccurs="{@maxOccurs}">
   <xsd:complexType>
    <xsd:all>
-    <xsd:element name="text" type="xsd:string" minOccurs='0' maxOccurs='1'/>
+    <xsd:element name="text" type="xsd:string" minOccurs='1' maxOccurs='1'/>
     <xsd:element name="von"  type="xsd:string" minOccurs='0' maxOccurs='1'/>
     <xsd:element name="ivon"  type="xsd:integer" minOccurs='0' maxOccurs='1'/>
     <xsd:element name="bis"  type="xsd:string" minOccurs='0' maxOccurs='1'/>
