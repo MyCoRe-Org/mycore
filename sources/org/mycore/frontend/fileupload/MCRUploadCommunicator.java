@@ -175,7 +175,11 @@ public class MCRUploadCommunicator {
         if (upm.isCanceled())
             return;
 
+        int bufferSize = 65536;
         Socket socket = new Socket(host, port);
+        socket.setReceiveBufferSize(Math.max(socket.getReceiveBufferSize(),bufferSize));
+        socket.setSendBufferSize(Math.max(socket.getReceiveBufferSize(),bufferSize));
+        
         System.out.println("Socket created, connected to server.");
 
         ZipOutputStream zos = new ZipOutputStream(socket.getOutputStream());
@@ -203,7 +207,6 @@ public class MCRUploadCommunicator {
                 break;
             zos.write(buffer, 0, num);
             sended += num;
-            System.out.println("Sended " + sended + " of " + len + " bytes.");
             upm.progressFile(num);
         }
 
