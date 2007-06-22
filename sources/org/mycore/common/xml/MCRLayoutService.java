@@ -65,7 +65,7 @@ import org.mycore.user.MCRUserMgr;
  * Does the layout for other MyCoRe servlets by transforming XML input to
  * various output formats, using XSL stylesheets.
  * 
- * @author Frank Lï¿½tzenkirchen
+ * @author Frank Lützenkirchen
  * @author Thomas Scheffler (yagee)
  * 
  * @version $Revision$ $Date$
@@ -81,6 +81,8 @@ public class MCRLayoutService {
     /** The XSL transformer factory to use */
     private SAXTransformerFactory factory;
 
+    private boolean setCurrentGroups;
+    
     /** The logger */
     private final static Logger LOGGER = Logger.getLogger(MCRLayoutService.class);
 
@@ -97,6 +99,8 @@ public class MCRLayoutService {
 
         factory = (SAXTransformerFactory) (tf);
         factory.setURIResolver(MCRURIResolver.instance());
+        
+        setCurrentGroups = MCRConfiguration.instance().getBoolean("MCR.Users.SetCurrentGroups", true);
     }
 
     public void sendXML(HttpServletRequest req, HttpServletResponse res, org.jdom.Document jdom) throws IOException {
@@ -215,25 +219,23 @@ public class MCRLayoutService {
             parameters.put("JSessionID", jSessionID + session.getId());
         }
 
-        // get current groups
         MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
-        String uid = mcrSession.getCurrentUserID();
-        StringBuffer groups = new StringBuffer();
+        String uid = MCRSessionMgr.getCurrentSession().getCurrentUserID();
         
-        if (MCRConfiguration.instance().getString("MCR.Users.Guestuser.UserName").equals(uid)) {
-            groups.append(MCRConfiguration.instance().getString("MCR.Users.Guestuser.GroupName"));
-        }
-        else {
-          List<String> groupList = MCRUserMgr.instance().retrieveUser(uid).getGroupIDs();
-          for (int i = 0; i < groupList.size(); i++) {
-              if (i != 0) groups.append(" ");
-              groups.append((String) groupList.get(i));
-          }
+        if (setCurrentGroups) { // for MyCoRe applications, always true
+            StringBuffer groups = new StringBuffer();
+
+            List<String> groupList = MCRUserMgr.instance().retrieveUser(uid).getGroupIDs();
+            for (int i = 0; i < groupList.size(); i++) {
+                if (i != 0)
+                    groups.append(" ");
+                groups.append((String) groupList.get(i));
+            }
+            parameters.put("CurrentGroups", groups.toString());
         }
 
         // set parameters
         parameters.put("CurrentUser", uid);
-        parameters.put("CurrentGroups", groups.toString());
         parameters.put("RequestURL", getCompleteURL(request));
         parameters.put("WebApplicationBaseURL", MCRServlet.getBaseURL());
         parameters.put("ServletsBaseURL", MCRServlet.getServletBaseURL());
