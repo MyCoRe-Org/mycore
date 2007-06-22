@@ -148,16 +148,8 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
      */
     public static void delete(String ID) {
         MCRDerivate mycore_obj = new MCRDerivate();
-
-        try {
-            mycore_obj.deleteFromDatastore(ID);
-            LOGGER.info(mycore_obj.getId().getId() + " deleted.");
-        } catch (MCRException ex) {
-            LOGGER.debug(ex.getStackTraceAsString());
-            LOGGER.error(ex.getMessage());
-            LOGGER.error("Can't delete " + mycore_obj.getId().getId() + ".");
-            LOGGER.error("");
-        }
+        mycore_obj.deleteFromDatastore(ID);
+        LOGGER.info(mycore_obj.getId().getId() + " deleted.");
     }
 
     /**
@@ -172,28 +164,22 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
         int from_i = 0;
         int to_i = 0;
 
-        try {
-            MCRObjectID from = new MCRObjectID(IDfrom);
-            MCRObjectID to = new MCRObjectID(IDto);
-            MCRObjectID now = new MCRObjectID(IDfrom);
-            from_i = from.getNumberAsInteger();
-            to_i = to.getNumberAsInteger();
+        MCRObjectID from = new MCRObjectID(IDfrom);
+        MCRObjectID to = new MCRObjectID(IDto);
+        MCRObjectID now = new MCRObjectID(IDfrom);
+        from_i = from.getNumberAsInteger();
+        to_i = to.getNumberAsInteger();
 
-            if (from_i > to_i) {
-                throw new MCRException("The from-to-interval is false.");
+        if (from_i > to_i) {
+            throw new MCRException("The from-to-interval is false.");
+        }
+
+        for (int i = from_i; i < (to_i + 1); i++) {
+
+            now.setNumber(i);
+            if (MCRObject.existInDatastore(now)) {
+                delete(now.getId());
             }
-
-            for (int i = from_i; i < (to_i + 1); i++) {
-
-                now.setNumber(i);
-                if (MCRObject.existInDatastore(now)) {
-                    delete(now.getId());
-                }
-            }
-        } catch (MCRException ex) {
-            LOGGER.debug(ex.getStackTraceAsString());
-            LOGGER.error(ex.getMessage());
-            LOGGER.error("");
         }
     }
 
@@ -361,14 +347,8 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
      */
     public static void getNextID(String base) {
         MCRObjectID mcr_id = new MCRObjectID();
-
-        try {
-            mcr_id.setNextFreeId(base);
-            LOGGER.info(mcr_id.getId());
-        } catch (MCRException ex) {
-            LOGGER.error(ex.getMessage());
-            LOGGER.error("");
-        }
+        mcr_id.setNextFreeId(base);
+        LOGGER.info(mcr_id.getId());
     }
 
     /**

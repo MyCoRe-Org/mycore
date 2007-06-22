@@ -126,27 +126,23 @@ public class MCRAccessCommands extends MCRAbstractCommands {
 
         LOGGER.info("Reading file " + filename + " ...");
 
-        try {
-            org.jdom.Document doc = MCRXMLHelper.parseURI(filename, true);
-            org.jdom.Element rootelm = doc.getRootElement();
+        org.jdom.Document doc = MCRXMLHelper.parseURI(filename, true);
+        org.jdom.Element rootelm = doc.getRootElement();
 
-            if (!rootelm.getName().equals("mcrpermissions")) {
-                throw new MCRException("The data are not for mcrpermissions.");
-            }
+        if (!rootelm.getName().equals("mcrpermissions")) {
+            throw new MCRException("The data are not for mcrpermissions.");
+        }
 
-            List listelm = rootelm.getChildren("mcrpermission");
+        List listelm = rootelm.getChildren("mcrpermission");
 
-            for (Iterator it = listelm.iterator(); it.hasNext();) {
-                Element mcrpermission = (Element) it.next();
-                String permissionName = mcrpermission.getAttributeValue("name").trim().toLowerCase();
-                String ruleDescription = mcrpermission.getAttributeValue("ruledescription");
-                if (ruleDescription == null)
-                    ruleDescription = "";
-                Element rule = (Element) mcrpermission.getChild("condition").clone();
-                AI.addRule(permissionName, rule, ruleDescription);
-            }
-        } catch (Exception e) {
-            throw new MCRException("Error while loading permissions data.", e);
+        for (Iterator it = listelm.iterator(); it.hasNext();) {
+            Element mcrpermission = (Element) it.next();
+            String permissionName = mcrpermission.getAttributeValue("name").trim().toLowerCase();
+            String ruleDescription = mcrpermission.getAttributeValue("ruledescription");
+            if (ruleDescription == null)
+                ruleDescription = "";
+            Element rule = (Element) mcrpermission.getChild("condition").clone();
+            AI.addRule(permissionName, rule, ruleDescription);
         }
     }
 
@@ -178,30 +174,26 @@ public class MCRAccessCommands extends MCRAbstractCommands {
      * ArrayList of all privileges stored in the persistent datastore.
      */
     public static void listAllPermissions() throws MCRException {
-        try {
-            MCRAccessInterface AI = MCRAccessManager.getAccessImpl();
-            List permissions = AI.getPermissions();
-            boolean noPermissionsDefined = true;
-            for (Iterator it = permissions.iterator(); it.hasNext();) {
-                noPermissionsDefined = false;
-                String permission = (String) it.next();
-                String description = AI.getRuleDescription(permission);
-                if (description.equals(""))
-                    description = "No description";
-                org.jdom.Element rule = AI.getRule(permission);
-                System.out.println("       " + permission);
-                System.out.println("           " + description);
-                if (rule != null) {
-                    org.jdom.output.XMLOutputter o = new org.jdom.output.XMLOutputter();
-                    System.out.println("           " + o.outputString(rule));
-                }
+        MCRAccessInterface AI = MCRAccessManager.getAccessImpl();
+        List permissions = AI.getPermissions();
+        boolean noPermissionsDefined = true;
+        for (Iterator it = permissions.iterator(); it.hasNext();) {
+            noPermissionsDefined = false;
+            String permission = (String) it.next();
+            String description = AI.getRuleDescription(permission);
+            if (description.equals(""))
+                description = "No description";
+            org.jdom.Element rule = AI.getRule(permission);
+            System.out.println("       " + permission);
+            System.out.println("           " + description);
+            if (rule != null) {
+                org.jdom.output.XMLOutputter o = new org.jdom.output.XMLOutputter();
+                System.out.println("           " + o.outputString(rule));
             }
-            if (noPermissionsDefined)
-                System.out.println("No permissions defined");
-            System.out.println();
-        } catch (Exception e) {
-            throw new MCRException("Error while command saveAllGroupsToFile()", e);
         }
+        if (noPermissionsDefined)
+            System.out.println("No permissions defined");
+        System.out.println();
     }
 
     /**
@@ -210,40 +202,36 @@ public class MCRAccessCommands extends MCRAbstractCommands {
      * @param filename
      *            the file written to
      */
-    public static final void saveAllPermissionsToFile(String filename) throws MCRException {
+    public static final void saveAllPermissionsToFile(String filename) throws Exception {
         MCRAccessInterface AI = MCRAccessManager.getAccessImpl();
 
-        try {
-            Element mcrpermissions = new Element("mcrpermissions");
-            mcrpermissions.addNamespaceDeclaration(XSI_NAMESPACE);
-            mcrpermissions.addNamespaceDeclaration(XLINK_NAMESPACE);
-            mcrpermissions.setAttribute("noNamespaceSchemaLocation", "MCRPermissions.xsd", XSI_NAMESPACE);
-            Document doc = new Document(mcrpermissions);
-            List permissions = AI.getPermissions();
-            for (Iterator it = permissions.iterator(); it.hasNext();) {
-                String permission = (String) it.next();
-                Element mcrpermission = new Element("mcrpermission");
-                mcrpermission.setAttribute("name", permission);
-                String ruleDescription = AI.getRuleDescription(permission);
-                if (!ruleDescription.equals("")) {
-                    mcrpermission.setAttribute("ruledescription", ruleDescription);
-                }
-                Element rule = AI.getRule(permission);
-                mcrpermission.addContent(rule);
-                mcrpermissions.addContent(mcrpermission);
+        Element mcrpermissions = new Element("mcrpermissions");
+        mcrpermissions.addNamespaceDeclaration(XSI_NAMESPACE);
+        mcrpermissions.addNamespaceDeclaration(XLINK_NAMESPACE);
+        mcrpermissions.setAttribute("noNamespaceSchemaLocation", "MCRPermissions.xsd", XSI_NAMESPACE);
+        Document doc = new Document(mcrpermissions);
+        List permissions = AI.getPermissions();
+        for (Iterator it = permissions.iterator(); it.hasNext();) {
+            String permission = (String) it.next();
+            Element mcrpermission = new Element("mcrpermission");
+            mcrpermission.setAttribute("name", permission);
+            String ruleDescription = AI.getRuleDescription(permission);
+            if (!ruleDescription.equals("")) {
+                mcrpermission.setAttribute("ruledescription", ruleDescription);
             }
-            File file = new File(filename);
-            if (file.exists()) {
-                LOGGER.warn("File "+filename+" yet exists, overwrite.");
-            }
-            FileOutputStream fos = new FileOutputStream(file);
-            LOGGER.info("Writing to file " + filename + " ...");
-            String mcr_encoding = CONFIG.getString("MCR.Metadata.DefaultEncoding", DEFAULT_ENCODING);
-            XMLOutputter out = new XMLOutputter(Format.getPrettyFormat().setEncoding(mcr_encoding));
-            out.output(doc, fos);
-        } catch (Exception e) {
-            throw new MCRException("Error while loading permissions data.", e);
+            Element rule = AI.getRule(permission);
+            mcrpermission.addContent(rule);
+            mcrpermissions.addContent(mcrpermission);
         }
+        File file = new File(filename);
+        if (file.exists()) {
+            LOGGER.warn("File " + filename + " yet exists, overwrite.");
+        }
+        FileOutputStream fos = new FileOutputStream(file);
+        LOGGER.info("Writing to file " + filename + " ...");
+        String mcr_encoding = CONFIG.getString("MCR.Metadata.DefaultEncoding", DEFAULT_ENCODING);
+        XMLOutputter out = new XMLOutputter(Format.getPrettyFormat().setEncoding(mcr_encoding));
+        out.output(doc, fos);
     }
 
     private static Element getRuleFromFile(String strFileRule) {

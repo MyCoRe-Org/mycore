@@ -37,7 +37,6 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
 import org.apache.log4j.Logger;
-import org.mycore.common.MCRException;
 import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.common.xml.MCRXMLHelper;
 import org.mycore.datamodel.classifications.MCRClassification;
@@ -101,16 +100,8 @@ public class MCRClassificationCommands extends MCRAbstractCommands {
      */
     public static void delete(String ID) throws MCRActiveLinkException {
         MCRObjectID mcr_id = new MCRObjectID(ID);
-
-        try {
-            MCRClassification.deleteFromDatastore(mcr_id);
-            LOGGER.info(mcr_id.getId() + " deleted.");
-        } catch (MCRException ex) {
-            LOGGER.debug(ex.getStackTraceAsString());
-            LOGGER.error(ex.getMessage());
-            LOGGER.error("Can't delete " + mcr_id.getId() + ".");
-            LOGGER.error("");
-        }
+        MCRClassification.deleteFromDatastore(mcr_id);
+        LOGGER.info(ID + " deleted.");
     }
 
     /**
@@ -238,7 +229,7 @@ public class MCRClassificationCommands extends MCRAbstractCommands {
      *            the name part of the stylesheet like <em>style</em>-classification.xsl
      * @return false if an error was occured, else true
      */
-    public static boolean export(String ID, String dirname, String style) {
+    public static boolean export(String ID, String dirname, String style) throws Exception {
         String dname = "";
         if (dirname.length() != 0) {
             try {
@@ -262,25 +253,18 @@ public class MCRClassificationCommands extends MCRAbstractCommands {
         MCRObjectID mcr_id = new MCRObjectID(ID);
         byte[] xml = MCRClassification.retrievClassificationAsXML(mcr_id.getId());
 
-        try {
-            Transformer trans = getTransformer(style);
-            File xmlOutput = new File(dname, ID + ".xml");
-            FileOutputStream out = new FileOutputStream(xmlOutput);
-            if (trans != null) {
-                StreamResult sr = new StreamResult(out);
-                trans.transform(new org.jdom.transform.JDOMSource(MCRXMLHelper.parseXML(xml, false)), sr);
-            } else {
-                out.write(xml);
-                out.flush();
-            }
-            LOGGER.info("Classifcation " + ID + " saved to " + xmlOutput.getCanonicalPath() + ".");
-            LOGGER.info("");
-        } catch (Exception ex) {
-            LOGGER.error(ex.getMessage());
-            LOGGER.error("Can't save " + ID);
-            LOGGER.info("");
-            return false;
+        Transformer trans = getTransformer(style);
+        File xmlOutput = new File(dname, ID + ".xml");
+        FileOutputStream out = new FileOutputStream(xmlOutput);
+        if (trans != null) {
+            StreamResult sr = new StreamResult(out);
+            trans.transform(new org.jdom.transform.JDOMSource(MCRXMLHelper.parseXML(xml, false)), sr);
+        } else {
+            out.write(xml);
+            out.flush();
         }
+        LOGGER.info("Classifcation " + ID + " saved to " + xmlOutput.getCanonicalPath() + ".");
+        LOGGER.info("");
         return true;
     }
 
@@ -293,7 +277,7 @@ public class MCRClassificationCommands extends MCRAbstractCommands {
      *            the name part of the stylesheet like <em>style</em>-classification.xsl
      * @return false if an error was occured, else true
      */
-    public static boolean exportAll(String dirname, String style) {
+    public static boolean exportAll(String dirname, String style) throws Exception {
         List li = MCRXMLTableManager.instance().retrieveAllIDs("class");
         boolean ret = false;
         for (int i = 0; i < li.size(); i++) {
