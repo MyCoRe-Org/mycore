@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.URLDecoder;
@@ -80,6 +81,8 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
     static Logger LOGGER = Logger.getLogger(MCRUploadServlet.class);
 
     static MCRCache sessionIDs = new MCRCache(100, "UploadServlet Upload sessions");
+    
+    final static int bufferSize = 65536;
 
     public synchronized void init() throws ServletException {
         super.init();
@@ -95,7 +98,9 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
             serverPort = CONFIG.getInt("MCR.FileUpload.Port", defPort);
 
             LOGGER.info("Opening server socket: ip=" + serverIP + " port=" + serverPort);
-            server = new ServerSocket(serverPort, 1, InetAddress.getByName(serverIP));
+            server = new ServerSocket();
+            server.setReceiveBufferSize(Math.max(server.getReceiveBufferSize(), bufferSize));
+            server.bind(new InetSocketAddress(serverIP,serverPort));
             LOGGER.debug("Server socket successfully created.");
 
             // Starts separate thread that will receive and store file content
@@ -183,6 +188,9 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
 
             try {
                 final Socket socket = server.accept();
+                socket.setReceiveBufferSize(bufferSize);
+                socket.setSendBufferSize(bufferSize);
+                
                 Thread handlerThread = new Thread(new Runnable() {
                     public void run() {
                         handleUpload(socket);
