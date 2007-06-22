@@ -30,7 +30,6 @@ import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
@@ -260,15 +259,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
      * respectively.
      */
     public static void checkConsistency() throws Exception {
-        try {
-            MCRUserMgr.instance().checkConsistency();
-        } catch (Exception e) {
-            LOGGER.error(e.getMessage());
-            Level level = LOGGER.getLevel();
-            if (level.equals(Level.DEBUG)) {
-                e.printStackTrace();
-            }
-        }
+      MCRUserMgr.instance().checkConsistency();
     }
 
     /**
@@ -279,15 +270,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
      *            the ID of the group which will be deleted
      */
     public static void deleteGroup(String groupID) throws Exception {
-        try {
-            MCRUserMgr.instance().deleteGroup(groupID);
-        } catch (Exception e) {
-            LOGGER.error(e.getMessage());
-            Level level = LOGGER.getLevel();
-            if (level.equals(Level.DEBUG)) {
-                e.printStackTrace();
-            }
-        }
+       MCRUserMgr.instance().deleteGroup(groupID);
     }
 
     /**
@@ -298,15 +281,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
      *            the ID of the user which will be deleted
      */
     public static void deleteUser(String userID) throws Exception {
-        try {
-            MCRUserMgr.instance().deleteUser(userID);
-        } catch (Exception e) {
-            LOGGER.error(e.getMessage());
-            Level level = LOGGER.getLevel();
-            if (level.equals(Level.DEBUG)) {
-                e.printStackTrace();
-            }
-        }
+      MCRUserMgr.instance().deleteUser(userID);
     }
 
     /**
@@ -316,15 +291,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
      *            the ID of the user which will be enabled
      */
     public static void enableUser(String userID) throws Exception {
-        try {
-            MCRUserMgr.instance().enableUser(userID);
-        } catch (Exception e) {
-            LOGGER.error(e.getMessage());
-            Level level = LOGGER.getLevel();
-            if (level.equals(Level.DEBUG)) {
-                e.printStackTrace();
-            }
-        }
+      MCRUserMgr.instance().enableUser(userID);
     }
 
     /**
@@ -378,15 +345,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
      *            the ID of the user which will be enabled
      */
     public static void disableUser(String userID) throws Exception {
-        try {
-            MCRUserMgr.instance().disableUser(userID);
-        } catch (Exception e) {
-            LOGGER.error(e.getMessage());
-            Level level = LOGGER.getLevel();
-            if (level.equals(Level.DEBUG)) {
-                e.printStackTrace();
-            }
-        }
+       MCRUserMgr.instance().disableUser(userID);
     }
 
     /**
@@ -499,45 +458,21 @@ public class MCRUserCommands extends MCRAbstractCommands {
      *            the ID of the user for which the password will be set
      */
     public static void setPassword(String userID, String password) throws MCRException {
-        try {
-            MCRUserMgr.instance().setPassword(userID, password);
-        } catch (Exception e) {
-            LOGGER.error(e.getMessage());
-            Level level = LOGGER.getLevel();
-            if (level.equals(Level.DEBUG)) {
-                e.printStackTrace();
-            }
-        }
+      MCRUserMgr.instance().setPassword(userID, password);
     }
 
     /**
      * This method sets the user management component to read only mode
      */
     public static void setLock() throws MCRException {
-        try {
-            MCRUserMgr.instance().setLock(true);
-        } catch (Exception e) {
-            LOGGER.error(e.getMessage());
-            Level level = LOGGER.getLevel();
-            if (level.equals(Level.DEBUG)) {
-                e.printStackTrace();
-            }
-        }
+      MCRUserMgr.instance().setLock(true);
     }
 
     /**
      * This method sets the user management component to read/write access mode
      */
     public static void unLock() throws MCRException {
-        try {
-            MCRUserMgr.instance().setLock(false);
-        } catch (Exception e) {
-            LOGGER.error(e.getMessage());
-            Level level = LOGGER.getLevel();
-            if (level.equals(Level.DEBUG)) {
-                e.printStackTrace();
-            }
-        }
+      MCRUserMgr.instance().setLock(false);
     }
 
     /**
