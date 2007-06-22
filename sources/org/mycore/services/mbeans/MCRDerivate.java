@@ -23,131 +23,111 @@
  **/
 package org.mycore.services.mbeans;
 
+import java.util.List;
+
+import org.apache.log4j.Logger;
+
+import org.mycore.frontend.cli.MCRCommand;
 import org.mycore.frontend.cli.MCRDerivateCommands;
 
 /**
  * @author Thomas Scheffler (yagee)
  * 
  * Need to insert some things here
- *
+ * 
  */
-public class MCRDerivate extends MCRPersistenceBase implements MCRDerivateMBean {
+public class MCRDerivate extends MCRCommandWrapperMBean implements MCRDerivateMBean {
 
-    public static void register(){
-        MCRDerivate instance=new MCRDerivate();
-        MCRJMXBridge.registerMe(instance, "Persistence Operations", instance.getClass().getSimpleName());
+    private static final Logger LOGGER = Logger.getLogger(MCRDerivate.class);
+
+    public static void register() {
+        MCRDerivate instance = new MCRDerivate();
+        MCRJMXBridge.registerMe(instance, "Persistence Operations", instance.getName());
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mycore.services.mbeans.MCRDerivateMBean#deleteDerivate(java.lang.String)
      */
     public synchronized boolean deleteDerivate(String id) {
-        try {
-            startTransaction();
-            MCRDerivateCommands.delete(id);
-            commitTransaction();
-        } catch (Throwable e) {
-            e.printStackTrace();
-            rollbackTransaction();
-            return false;
-        }
-        return true;
+        addCommand("delete derivate " + id);
+        return processCommands();
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mycore.services.mbeans.MCRDerivateMBean#loadDerivateFromFile(java.lang.String)
      */
     public synchronized boolean loadDerivateFromFile(String file) {
-        try {
-            startTransaction();
-            MCRDerivateCommands.loadFromFile(file);
-            commitTransaction();
-        } catch (Throwable e) {
-            e.printStackTrace();
-            rollbackTransaction();
-            return false;
-        }
-        return true;
+        addCommand("load derivate from file " + file);
+        return processCommands();
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mycore.services.mbeans.MCRDerivateMBean#loadDerivatesFromDirectory(java.lang.String)
      */
     public synchronized boolean loadDerivatesFromDirectory(String directory) {
-        try {
-            startTransaction();
-            MCRDerivateCommands.loadFromDirectory(directory);
-            commitTransaction();
-        } catch (Throwable e) {
-            e.printStackTrace();
-            rollbackTransaction();
-            return false;
-        }
-        return true;
+        addCommand("load all derivates from directory " + directory);
+        return processCommands();
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mycore.services.mbeans.MCRDerivateMBean#repairIndexOfDerivateID(java.lang.String)
      */
     public synchronized boolean repairIndexOfDerivateID(String id) {
-        try {
-            startTransaction();
-            MCRDerivateCommands.repairDerivateSearchForID(id);
-            commitTransaction();
-        } catch (Throwable e) {
-            e.printStackTrace();
-            rollbackTransaction();
-            return false;
-        }
-        return true;
+        addCommand("repair derivate search of ID " + id);
+        return processCommands();
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mycore.services.mbeans.MCRDerivateMBean#repairIndexOfDerivates()
      */
     public synchronized boolean repairIndexOfDerivates() {
-        try {
-            startTransaction();
-            MCRDerivateCommands.repairDerivateSearch();
-            commitTransaction();
-        } catch (Throwable e) {
-            e.printStackTrace();
-            rollbackTransaction();
-            return false;
-        }
-        return true;
+        addCommand("repair derivate search of type derivate");
+        return processCommands();
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mycore.services.mbeans.MCRDerivateMBean#updateDerivateFromFile(java.lang.String)
      */
     public synchronized boolean updateDerivateFromFile(String file) {
-        try {
-            startTransaction();
-            MCRDerivateCommands.updateFromFile(file);
-            commitTransaction();
-        } catch (Throwable e) {
-            e.printStackTrace();
-            rollbackTransaction();
-            return false;
-        }
-        return true;
+        addCommand("update derivate from file " + file);
+        return processCommands();
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.mycore.services.mbeans.MCRDerivateMBean#updateDerivatesFromDirectory(java.lang.String)
      */
     public synchronized boolean updateDerivatesFromDirectory(String directory) {
-        try {
-            startTransaction();
-            MCRDerivateCommands.updateFromDirectory(directory);
-            commitTransaction();
-        } catch (Throwable e) {
-            e.printStackTrace();
-            rollbackTransaction();
-            return false;
-        }
-        return true;
+        addCommand("update all derivates from directory " + directory);
+        return processCommands();
+    }
+
+    @Override
+    protected List<MCRCommand> getCommands() {
+        return new MCRDerivateCommands().getPossibleCommands();
+    }
+
+    @Override
+    protected Logger getLogger() {
+        return LOGGER;
+    }
+
+    @Override
+    protected String getName() {
+        return MCRDerivate.class.getSimpleName();
     }
 
 }

@@ -106,7 +106,8 @@ public class MCRCommand {
                 parameterTypes[i] = String.class;
                 f = null;
             } else {
-                throw new MCRConfigurationException("Error while parsing command definitions for command line interface:\n" + "Unsupported argument type '" + token + "' in command " + methodSignature);
+                throw new MCRConfigurationException("Error while parsing command definitions for command line interface:\n" + "Unsupported argument type '"
+                        + token + "' in command " + methodSignature);
             }
 
             messageFormat.setFormat(i, f);
@@ -131,9 +132,9 @@ public class MCRCommand {
      * @throws NoSuchMethodException
      *             When the method specified in the constructor was not found
      */
-    protected Method getMethod() throws ClassNotFoundException, NoSuchMethodException {
+    protected Method getMethod(ClassLoader classLoader) throws ClassNotFoundException, NoSuchMethodException {
         if (method == null) {
-            method = Class.forName(className).getMethod(methodName, parameterTypes);
+            method = Class.forName(className, true, classLoader).getMethod(methodName, parameterTypes);
         }
 
         return method;
@@ -217,6 +218,12 @@ public class MCRCommand {
      *             when the method specified does not exist
      */
     public List<String> invoke(String input) throws IllegalAccessException, InvocationTargetException, ClassNotFoundException, NoSuchMethodException {
+        return invoke(input, null);
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<String> invoke(String input, ClassLoader classLoader) throws IllegalAccessException, InvocationTargetException, ClassNotFoundException,
+            NoSuchMethodException {
         if (!input.startsWith(suffix)) {
             return null;
         }
@@ -227,7 +234,7 @@ public class MCRCommand {
             return null;
         }
 
-        Object result = getMethod().invoke(null, buildInvocationParameters(commandParameters));
+        Object result = getMethod(classLoader).invoke(null, buildInvocationParameters(commandParameters));
         if ((result instanceof List) && (!((List) result).isEmpty()) && (((List) result).get(0) instanceof String))
             return (List<String>) result;
         else

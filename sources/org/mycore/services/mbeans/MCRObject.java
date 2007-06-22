@@ -23,94 +23,68 @@
  **/
 package org.mycore.services.mbeans;
 
+import java.util.List;
+
+import org.apache.log4j.Logger;
+
+import org.mycore.frontend.cli.MCRCommand;
 import org.mycore.frontend.cli.MCRObjectCommands;
 
-public class MCRObject extends MCRPersistenceBase implements MCRObjectMBean {
-    
-    public MCRObject(){
+public class MCRObject extends MCRCommandWrapperMBean implements MCRObjectMBean {
+
+    private static final Logger LOGGER = Logger.getLogger(MCRDerivate.class);
+
+    public MCRObject() {
     }
-    
-    public static void register(){
-        MCRObject instance=new MCRObject();
-        MCRJMXBridge.registerMe(instance, "Persistence Operations", instance.getClass().getSimpleName());
+
+    public static void register() {
+        MCRObject instance = new MCRObject();
+        MCRJMXBridge.registerMe(instance, "Persistence Operations", instance.getName());
     }
-    
+
     public synchronized boolean loadFromDirectory(String directory) {
-        try {
-            startTransaction();
-            MCRObjectCommands.loadFromDirectory(directory);
-            commitTransaction();
-        } catch (Throwable e) {
-            e.printStackTrace();
-            rollbackTransaction();
-            return false;
-        }
-        return true;
+        addCommand("load all objects from directory " + directory);
+        return processCommands();
     }
 
     public synchronized boolean loadFromFile(String file) {
-        try {
-            startTransaction();
-            MCRObjectCommands.loadFromFile(file);
-            commitTransaction();
-        } catch (Throwable e) {
-            e.printStackTrace();
-            rollbackTransaction();
-            return false;
-        }
-        return true;
+        addCommand("load object from file " + file);
+        return processCommands();
     }
 
     public synchronized boolean repairIndexOfObjectID(String id) {
-        try {
-            startTransaction();
-            MCRObjectCommands.repairMetadataSearchForID(id);
-            commitTransaction();
-        } catch (Throwable e) {
-            e.printStackTrace();
-            rollbackTransaction();
-            return false;
-        }
-        return true;
+        addCommand("repair metadata search of ID " + id);
+        return processCommands();
     }
 
     public synchronized boolean repairIndexOfObjectType(String type) {
-        try {
-            startTransaction();
-            MCRObjectCommands.repairMetadataSearch(type);
-            commitTransaction();
-        } catch (Throwable e) {
-            e.printStackTrace();
-            rollbackTransaction();
-            return false;
-        }
-        return true;
+        addCommand("repair metadata search of type " + type);
+        return processCommands();
     }
 
     public synchronized boolean updateFromDirectory(String directory) {
-        try {
-            startTransaction();
-            MCRObjectCommands.updateFromDirectory(directory);
-            commitTransaction();
-        } catch (Throwable e) {
-            e.printStackTrace();
-            rollbackTransaction();
-            return false;
-        }
-        return true;
+        addCommand("update all objects from directory " + directory);
+        return processCommands();
     }
 
     public synchronized boolean updateFromFile(String file) {
-        try {
-            startTransaction();
-            MCRObjectCommands.updateFromFile(file);
-            commitTransaction();
-        } catch (Throwable e) {
-            e.printStackTrace();
-            rollbackTransaction();
-            return false;
-        }
-        return true;
+        addCommand("update object from file " + file);
+        return processCommands();
+    }
+
+    @Override
+    protected List<MCRCommand> getCommands() {
+        return new MCRObjectCommands().getPossibleCommands();
+    }
+
+    @Override
+    protected Logger getLogger() {
+        return LOGGER;
+    }
+
+    @Override
+    protected String getName() {
+        return MCRObject.class.getSimpleName();
     }
 
 }
