@@ -101,7 +101,7 @@ public class MCRCommand {
 
             if (token.equals("int")) {
                 parameterTypes[i] = Integer.TYPE;
-                f = NumberFormat.getNumberInstance();
+                f = NumberFormat.getIntegerInstance();
             } else if (token.equals("String")) {
                 parameterTypes[i] = String.class;
                 f = null;
@@ -180,7 +180,7 @@ public class MCRCommand {
 
         for (int i = 0; i < numParameters; i++) {
             if (parameterTypes[i] == Integer.TYPE) {
-                parameters[i] = ((Integer) commandParameters[j]).intValue();
+                parameters[i] = ((Number) commandParameters[j]).intValue();
                 j++;
                 continue;
             }
