@@ -28,6 +28,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 
@@ -205,8 +206,8 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      *            the directory containing the XML files
      * @throws MCRActiveLinkException
      */
-    public static final void loadFromDirectory(String directory) throws MCRActiveLinkException {
-        processFromDirectory(directory, false);
+    public static final List<String> loadFromDirectory(String directory) throws MCRActiveLinkException {
+        return processFromDirectory(directory, false);
     }
 
     /**
@@ -216,8 +217,8 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      *            the directory containing the XML files
      * @throws MCRActiveLinkException
      */
-    public static final void updateFromDirectory(String directory) throws MCRActiveLinkException {
-        processFromDirectory(directory, true);
+    public static final List<String> updateFromDirectory(String directory) throws MCRActiveLinkException {
+        return processFromDirectory(directory, true);
     }
 
     /**
@@ -229,40 +230,27 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      *            if true, object will be updated, else object is created
      * @throws MCRActiveLinkException
      */
-    private static final void processFromDirectory(String directory, boolean update) throws MCRActiveLinkException {
+    private static final List<String> processFromDirectory(String directory, boolean update) throws MCRActiveLinkException {
         File dir = new File(directory);
 
         if (!dir.isDirectory()) {
             LOGGER.warn(directory + " ignored, is not a directory.");
-
-            return;
+            return null;
         }
 
         String[] list = dir.list();
 
         if (list.length == 0) {
             LOGGER.warn("No files found in directory " + directory);
-
-            return;
+            return null;
         }
 
-        int numProcessed = 0;
+        List<String> cmds = new ArrayList<String>();
+        for (String file : list)
+            if ( file.endsWith(".xml") && ( ! file.contains( "derivate" ) ) )
+                cmds.add( ( update ? "update" : "load" ) + " object from file " + new File( dir, file ).getAbsolutePath() );
 
-        for (String element : list) {
-            if (!element.endsWith(".xml")) {
-                continue;
-            }
-
-            if (element.indexOf("derivate") != -1) {
-                continue;
-            }
-
-            if (processFromFile(new File(dir, element), update, true)) {
-                numProcessed++;
-            }
-        }
-
-        LOGGER.info("Processed " + numProcessed + " files.");
+        return cmds;
     }
 
     /**
@@ -327,40 +315,32 @@ public class MCRObjectCommands extends MCRAbstractCommands {
     private static final boolean processFromFile(File file, boolean update, boolean importMode) throws MCRActiveLinkException {
         if (!file.getName().endsWith(".xml")) {
             LOGGER.warn(file + " ignored, does not end with *.xml");
-
             return false;
         }
 
         if (!file.isFile()) {
             LOGGER.warn(file + " ignored, is not a file.");
-
             return false;
         }
 
         LOGGER.info("Reading file " + file + " ...");
 
-        try {
-            MCRObject mycore_obj = new MCRObject();
-            mycore_obj.setImportMode(importMode);
-            mycore_obj.setFromURI(file.getAbsolutePath());
-            LOGGER.info("Label --> " + mycore_obj.getLabel());
+        MCRObject mycore_obj = new MCRObject();
+        mycore_obj.setImportMode(importMode);
+        mycore_obj.setFromURI(file.getAbsolutePath());
+        LOGGER.info("Label --> " + mycore_obj.getLabel());
 
-            if (update) {
-                mycore_obj.updateInDatastore();
-                LOGGER.info(mycore_obj.getId().getId() + " updated.");
-                LOGGER.info("");
-            } else {
-                mycore_obj.createInDatastore();
-                LOGGER.info(mycore_obj.getId().getId() + " loaded.");
-                LOGGER.info("");
-            }
-
-            return true;
-        } catch (MCRException ex) {
-            LOGGER.error("Exception while loading from file " + file, ex);
-
-            return false;
+        if (update) {
+            mycore_obj.updateInDatastore();
+            LOGGER.info(mycore_obj.getId().getId() + " updated.");
+            LOGGER.info("");
+        } else {
+            mycore_obj.createInDatastore();
+            LOGGER.info(mycore_obj.getId().getId() + " loaded.");
+            LOGGER.info("");
         }
+
+        return true;
     }
 
     /**

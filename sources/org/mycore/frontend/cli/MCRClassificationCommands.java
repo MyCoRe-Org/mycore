@@ -26,6 +26,7 @@ package org.mycore.frontend.cli;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.transform.Transformer;
@@ -119,8 +120,8 @@ public class MCRClassificationCommands extends MCRAbstractCommands {
      *            the directory containing the XML files
      * @throws MCRActiveLinkException
      */
-    public static void loadFromDirectory(String directory) throws MCRActiveLinkException {
-        processFromDirectory(directory, false);
+    public static List<String> loadFromDirectory(String directory) throws MCRActiveLinkException {
+        return processFromDirectory(directory, false);
     }
 
     /**
@@ -130,8 +131,8 @@ public class MCRClassificationCommands extends MCRAbstractCommands {
      *            the directory containing the XML files
      * @throws MCRActiveLinkException
      */
-    public static void updateFromDirectory(String directory) throws MCRActiveLinkException {
-        processFromDirectory(directory, true);
+    public static List<String> updateFromDirectory(String directory) throws MCRActiveLinkException {
+        return processFromDirectory(directory, true);
     }
 
     /**
@@ -144,36 +145,27 @@ public class MCRClassificationCommands extends MCRAbstractCommands {
      *            is created
      * @throws MCRActiveLinkException
      */
-    private static void processFromDirectory(String directory, boolean update) throws MCRActiveLinkException {
+    private static List<String> processFromDirectory(String directory, boolean update) throws MCRActiveLinkException {
         File dir = new File(directory);
 
         if (!dir.isDirectory()) {
             LOGGER.warn(directory + " ignored, is not a directory.");
-
-            return;
+            return null;
         }
 
         String[] list = dir.list();
 
         if (list.length == 0) {
             LOGGER.warn("No files found in directory " + directory);
-
-            return;
+            return null;
         }
 
-        int numProcessed = 0;
+        List<String> cmds = new ArrayList<String>();
+        for (String file : list)
+            if ( file.endsWith(".xml") )
+                cmds.add( ( update ? "update" : "load" ) + " classification from file " + new File( dir, file ).getAbsolutePath() );
 
-        for (int i = 0; i < list.length; i++) {
-            if (!list[i].endsWith(".xml")) {
-                continue;
-            }
-
-            if (processFromFile(new File(dir, list[i]), update)) {
-                numProcessed++;
-            }
-        }
-
-        LOGGER.info("Processed " + numProcessed + " files.");
+        return cmds;
     }
 
     /**
@@ -211,36 +203,28 @@ public class MCRClassificationCommands extends MCRAbstractCommands {
     private static boolean processFromFile(File file, boolean update) throws MCRActiveLinkException {
         if (!file.getName().endsWith(".xml")) {
             LOGGER.warn(file + " ignored, does not end with *.xml");
-
             return false;
         }
 
         if (!file.isFile()) {
             LOGGER.warn(file + " ignored, is not a file.");
-
             return false;
         }
 
         LOGGER.info("Reading file " + file + " ...\n");
 
-        try {
-            MCRClassification cl = new MCRClassification();
-            cl.setFromURI(file.getAbsolutePath());
+        MCRClassification cl = new MCRClassification();
+        cl.setFromURI(file.getAbsolutePath());
 
-            if (update) {
-                cl.updateInDatastore();
-                LOGGER.info(cl.getId() + " updated.\n");
-            } else {
-                cl.createInDatastore();
-                LOGGER.info(cl.getId() + " loaded.\n");
-            }
-
-            return true;
-        } catch (MCRException ex) {
-            LOGGER.error("Exception while loading from file " + file, ex);
-
-            return false;
+        if (update) {
+            cl.updateInDatastore();
+            LOGGER.info(cl.getId() + " updated.\n");
+        } else {
+            cl.createInDatastore();
+            LOGGER.info(cl.getId() + " loaded.\n");
         }
+
+        return true;
     }
 
     /**

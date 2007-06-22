@@ -237,8 +237,12 @@ public class MCRCommandLineInterface {
                 if (commandsReturned != null) // Command was executed
                 {
                     // Add commands to queue
-                    for (int i = 0; i < commandsReturned.size(); i++)
-                        commandQueue.insertElementAt(commandsReturned.get(i), i);
+                    if (commandsReturned.size() > 0) {
+                        System.out.println(system + " Queueing " + commandsReturned.size() + " commands to process");
+
+                        for (int i = 0; i < commandsReturned.size(); i++)
+                            commandQueue.insertElementAt(commandsReturned.get(i), i);
+                    }
 
                     break;
                 }
@@ -271,7 +275,7 @@ public class MCRCommandLineInterface {
         System.out.println(system + " The following command failed: ");
         System.out.println(system + " " + lastCommand);
         if (!commandQueue.isEmpty())
-            System.out.printf("%s There are %s other commands still unprocessed.", system, commandQueue.size());
+            System.out.printf("%s There are %s other commands still unprocessed.\n", system, commandQueue.size());
         else if (interactiveMode)
             return;
 

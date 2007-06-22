@@ -28,6 +28,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.transform.Transformer;
@@ -202,8 +203,8 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
      * @param directory
      *            the directory containing the XML files
      */
-    public static void loadFromDirectory(String directory) {
-        processFromDirectory(directory, false);
+    public static List<String> loadFromDirectory(String directory) {
+        return processFromDirectory(directory, false);
     }
 
     /**
@@ -212,8 +213,8 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
      * @param directory
      *            the directory containing the XML files
      */
-    public static void updateFromDirectory(String directory) {
-        processFromDirectory(directory, true);
+    public static List<String> updateFromDirectory(String directory) {
+        return processFromDirectory(directory, true);
     }
 
     /**
@@ -224,40 +225,27 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
      * @param update
      *            if true, object will be updated, else object is created
      */
-    private static void processFromDirectory(String directory, boolean update) {
+    private static List<String> processFromDirectory(String directory, boolean update) {
         File dir = new File(directory);
 
         if (!dir.isDirectory()) {
             LOGGER.warn(directory + " ignored, is not a directory.");
-
-            return;
+            return null;
         }
 
         String[] list = dir.list();
 
         if (list.length == 0) {
             LOGGER.warn("No files found in directory " + directory);
-
-            return;
+            return null;
         }
 
-        int numProcessed = 0;
+        List<String> cmds = new ArrayList<String>();
+        for (String file : list)
+            if ( file.endsWith(".xml") && file.contains( "derivate" ) )
+                cmds.add( ( update ? "update" : "load" ) + " derivate from file " + new File( dir, file ).getAbsolutePath() );
 
-        for (int i = 0; i < list.length; i++) {
-            if (!list[i].endsWith(".xml")) {
-                continue;
-            }
-
-            if (list[i].indexOf("derivate") == -1) {
-                continue;
-            }
-
-            if (processFromFile(new File(dir, list[i]), update, true)) {
-                numProcessed++;
-            }
-        }
-
-        LOGGER.info("Processed " + numProcessed + " files.");
+        return cmds;
     }
 
     /**
@@ -317,64 +305,55 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
     private static boolean processFromFile(File file, boolean update, boolean importMode) {
         if (!file.getName().endsWith(".xml")) {
             LOGGER.warn(file + " ignored, does not end with *.xml");
-
             return false;
         }
 
         if (!file.isFile()) {
             LOGGER.warn(file + " ignored, is not a file.");
-
             return false;
         }
 
         LOGGER.info("Reading file " + file + " ...");
 
-        try {
-            MCRDerivate mycore_obj = new MCRDerivate();
-            mycore_obj.setImportMode(importMode);
-            mycore_obj.setFromURI(file.getAbsolutePath());
+        MCRDerivate mycore_obj = new MCRDerivate();
+        mycore_obj.setImportMode(importMode);
+        mycore_obj.setFromURI(file.getAbsolutePath());
 
-            // Replace relative path with absolute path of files
-            if (mycore_obj.getDerivate().getInternals() != null) {
-                String path = mycore_obj.getDerivate().getInternals().getSourcePath();
-                path = path.replace('/', File.separatorChar).replace('\\', File.separatorChar);
-                if (path.trim().length() <= 1)
-                    // the path is the path name plus the name of the derivate -
-                    path = mycore_obj.getId().getId().toLowerCase();
+        // Replace relative path with absolute path of files
+        if (mycore_obj.getDerivate().getInternals() != null) {
+            String path = mycore_obj.getDerivate().getInternals().getSourcePath();
+            path = path.replace('/', File.separatorChar).replace('\\', File.separatorChar);
+            if (path.trim().length() <= 1)
+                // the path is the path name plus the name of the derivate -
+                path = mycore_obj.getId().getId().toLowerCase();
+            File sPath = new File(path);
 
-                File sPath = new File(path);
+            if (!sPath.isAbsolute()) {
+                // only change path to absolute path when relative
+                String prefix = file.getParent();
 
-                if (!sPath.isAbsolute()) {
-                    // only change path to absolute path when relative
-                    String prefix = file.getParent();
-
-                    if (prefix != null) {
-                        path = prefix + File.separator + path;
-                    }
+                if (prefix != null) {
+                    path = prefix + File.separator + path;
                 }
-
-                mycore_obj.getDerivate().getInternals().setSourcePath(path);
-                LOGGER.info("Source path --> " + path);
             }
 
-            LOGGER.info("Label --> " + mycore_obj.getLabel());
-
-            if (update) {
-                mycore_obj.updateInDatastore();
-                LOGGER.info(mycore_obj.getId().getId() + " updated.");
-                LOGGER.info("");
-            } else {
-                mycore_obj.createInDatastore();
-                LOGGER.info(mycore_obj.getId().getId() + " loaded.");
-                LOGGER.info("");
-            }
-
-            return true;
-        } catch (MCRException ex) {
-            LOGGER.error("Exception while loading from file " + file, ex);
-
-            return false;
+            mycore_obj.getDerivate().getInternals().setSourcePath(path);
+            LOGGER.info("Source path --> " + path);
         }
+
+        LOGGER.info("Label --> " + mycore_obj.getLabel());
+
+        if (update) {
+            mycore_obj.updateInDatastore();
+            LOGGER.info(mycore_obj.getId().getId() + " updated.");
+            LOGGER.info("");
+        } else {
+            mycore_obj.createInDatastore();
+            LOGGER.info(mycore_obj.getId().getId() + " loaded.");
+            LOGGER.info("");
+        }
+
+        return true;
     }
 
     /**
