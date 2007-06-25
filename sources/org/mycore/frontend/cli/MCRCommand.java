@@ -218,7 +218,7 @@ public class MCRCommand {
      *             when the method specified does not exist
      */
     public List<String> invoke(String input) throws IllegalAccessException, InvocationTargetException, ClassNotFoundException, NoSuchMethodException {
-        return invoke(input, null);
+        return invoke(input, MCRCommand.class.getClassLoader());
     }
 
     @SuppressWarnings("unchecked")
