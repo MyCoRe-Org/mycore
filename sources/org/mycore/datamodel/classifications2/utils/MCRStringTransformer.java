@@ -52,12 +52,11 @@ public class MCRStringTransformer {
 
     private static void printLabels(Collection<MCRLabel> labels, StringBuilder sb) {
         for (MCRLabel label : labels) {
-            sb.append(label.getLang());
-            sb.append('(');
-            sb.append(label.getText());
-            sb.append("),");
+            sb.append(label);
+            sb.append(',');
         }
-        sb.deleteCharAt(sb.length() - 1);
+        if (labels.size() > 0)
+            sb.deleteCharAt(sb.length() - 1);
     }
 
 }
