@@ -83,5 +83,55 @@ public class MCRLabel implements Cloneable, Serializable {
         }
         return clone;
     }
+    @Override
+    public String toString() {
+        StringBuilder sb=new StringBuilder();
+        sb.append(getLang());
+        sb.append('(');
+        sb.append(getText());
+        sb.append(')');
+        return sb.toString();
+    }
+    /* (non-Javadoc)
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public int hashCode() {
+        final int PRIME = 31;
+        int result = 1;
+        result = PRIME * result + ((description == null) ? 0 : description.hashCode());
+        result = PRIME * result + ((lang == null) ? 0 : lang.hashCode());
+        result = PRIME * result + ((text == null) ? 0 : text.hashCode());
+        return result;
+    }
+    /* (non-Javadoc)
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        final MCRLabel other = (MCRLabel) obj;
+        if (description == null) {
+            if (other.description != null)
+                return false;
+        } else if (!description.equals(other.description))
+            return false;
+        if (lang == null) {
+            if (other.lang != null)
+                return false;
+        } else if (!lang.equals(other.lang))
+            return false;
+        if (text == null) {
+            if (other.text != null)
+                return false;
+        } else if (!text.equals(other.text))
+            return false;
+        return true;
+    }
 
 }
