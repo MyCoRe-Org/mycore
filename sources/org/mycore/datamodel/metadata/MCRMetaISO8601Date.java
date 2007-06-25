@@ -268,7 +268,7 @@ public final class MCRMetaISO8601Date extends MCRMetaDefault {
      * @return a new Date instance of the time set in this element
      */
     public final Date getDate() {
-        return (dt == null) ? null : new Date(dt.getMillis());
+        return (dt == null) ? null : (Date)dt.toDate().clone();
     }
 
     /**
