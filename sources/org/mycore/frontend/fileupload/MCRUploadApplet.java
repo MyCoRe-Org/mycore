@@ -47,7 +47,6 @@ import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import javax.swing.UIManager;
 import javax.swing.filechooser.FileFilter;
 
 /**
@@ -74,7 +73,7 @@ public class MCRUploadApplet extends JApplet {
     protected JButton locationButton;
 
     protected JFileChooser locationChooser;
-
+    
     public void init() {
         uploadId = getParameter("uploadId");
         targetURL = getParameter("url");
@@ -94,25 +93,6 @@ public class MCRUploadApplet extends JApplet {
         System.out.println("Background color: " + bg.toString());
         setBackground(bg);
         setLocale();
-
-        // TODO: Refactor parameters from web page
-        // TODO: Refactor thread handling
-        try {
-            UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
-            /*
-             * Comment cause it is a known bug with color under GTKLookAndFeel.
-             * This bug was found under Firefox 7.0.8 with JDK 1.4. The global
-             * color was not set in content too.
-             */
-            /*
-             * if
-             * (System.getProperty("os.name","unknown").indexOf("Windows")>=0){
-             * UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel"); }
-             * else {
-             * UIManager.setLookAndFeel("com.sun.java.swing.plaf.gtk.GTKLookAndFeel"); }
-             */
-        } catch (Exception ignored) {
-        }
 
         chooserButton = new JButton(translateI18N("MCRUploadApplet.select"));
         chooserButton.addActionListener(new ActionListener() {
