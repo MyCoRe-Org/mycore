@@ -127,13 +127,20 @@ public abstract class MCRAbstractCategoryImpl implements MCRCategory {
         if (this.parent == parent) {
             return;
         }
-        if (this.parent != null) {
-            // remove this from current parent
-            this.parent.getChildren().remove(this);
-        }
+        detachFromParent();
         this.parent = parent;
         if (parent != null) {
             parent.getChildren().add(this);
+        }
+    }
+
+    /**
+     * 
+     */
+    void detachFromParent() {
+        if (this.parent != null) {
+            // remove this from current parent
+            this.parent.getChildren().remove(this);
         }
     }
 
