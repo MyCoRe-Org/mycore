@@ -24,7 +24,6 @@
 package org.mycore.datamodel.classifications2.impl;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
@@ -157,7 +156,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         Session session = MCRHIBConnection.instance().getSession();
         MCRCategoryImpl parent = null;
         if (parentID != null) {
-            parent = (MCRCategoryImpl) session.createCriteria(CATEGRORY_CLASS).add(CategoryExpression.eq(parentID)).uniqueResult();
+            parent = getByNaturalID(session, parentID);
             levelStart = parent.getLevel() + 1;
             leftStart = parent.getLeft() + 1;
             parent.getChildren().add(category);
@@ -179,43 +178,43 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
             LOGGER.info("Updated " + leftChanges + " left and " + rightChanges + " right values.");
         }
         session.save(category);
-        if (parent == null) {
-            session.evict(category);
-        } else {
-            session.evict(parent);
-        }
-        LOGGER.info("Categorie saved.");
+         LOGGER.info("Categorie saved.");
     }
 
     public void deleteCategory(MCRCategoryID id) {
         Session session = MCRHIBConnection.instance().getSession();
         LOGGER.info("Will get: " + id);
-        MCRCategory category = (MCRCategory) session.createCriteria(CATEGRORY_CLASS).add(CategoryExpression.eq(id)).uniqueResult();
+        MCRCategory category = getByNaturalID(session, id);
+        ;
         if (category == null) {
             throw new MCRPersistenceException("Category " + id + " was not found. Delete aborted.");
         }
         LOGGER.info("Will delete: " + category.getId());
         session.delete(category);
+        if (category.getParent() != null) {
+            // is not a classification
+            // TODO: Update Left and Right values
+        }
     }
 
-    public Collection<MCRCategory> getCategoriesByLabel(MCRCategoryID baseID, String lang, String text) {
+    @SuppressWarnings("unchecked")
+    public List<MCRCategory> getCategoriesByLabel(MCRCategoryID baseID, String lang, String text) {
         Session session = MCRHIBConnection.instance().getSession();
-        Criteria c = session.createCriteria(CATEGRORY_CLASS);
         Integer[] leftRight = getLeftRightValues(baseID);
-        c.add(Restrictions.eq("id.rootID", baseID.getRootID()));
-        c.add(Restrictions.between("left", leftRight[0], leftRight[1]));
-        // TODO: add lang and text to query
-        return null;
+        Query q = session.getNamedQuery(CATEGRORY_CLASS.getName() + ".byLabel");
+        q.setString("rootID", baseID.getRootID());
+        q.setInteger("left", leftRight[0]);
+        q.setInteger("right", leftRight[1]);
+        q.setString("lang", lang);
+        q.setString("text", text);
+        return (List<MCRCategory>) q.list();
     }
 
     @SuppressWarnings("unchecked")
     public MCRCategory getCategory(MCRCategoryID id, int childLevel) {
         // TODO Auto-generated method stub
         Session session = MCRHIBConnection.instance().getSession();
-        Criteria c = session.createCriteria(CATEGRORY_CLASS);
-        c.setCacheable(true);
-        c.add(CategoryExpression.eq(id));
-        MCRCategoryImpl category = (MCRCategoryImpl) c.uniqueResult();
+        MCRCategoryImpl category = getByNaturalID(session, id);
         return copyDeep(category, childLevel);
     }
 
@@ -236,8 +235,15 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
     }
 
     public List<MCRCategory> getParents(MCRCategoryID id) {
-        // TODO Auto-generated method stub
-        return null;
+        // TODO: Make use of left and right value here
+        Session session = MCRHIBConnection.instance().getSession();
+        List<MCRCategory> parents = new ArrayList<MCRCategory>();
+        MCRCategory category = getByNaturalID(session, id);
+        while (category.getParent() != null) {
+            category = category.getParent();
+            parents.add(category);
+        }
+        return parents;
     }
 
     public MCRCategory getRootCategory(MCRCategoryID baseID, int childLevel) {
@@ -250,13 +256,29 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
     }
 
     public void moveCategory(MCRCategoryID id, MCRCategoryID newParentID, int index) {
-        // TODO Auto-generated method stub
-
+        Session session = MCRHIBConnection.instance().getSession();
+        MCRCategoryImpl subTree = getByNaturalID(session, id);
+        MCRCategoryImpl oldParent = (MCRCategoryImpl) subTree.getParent();
+        MCRCategoryImpl newParent = getByNaturalID(session, newParentID);
+        subTree.detachFromParent();
+        newParent.getChildren().add(index, subTree);
+        // update needed for old and newParent;
+        // TODO: Update Left, Right and Level values
+        boolean updateOldParent = (oldParent.getLeft() < newParent.getLeft() || oldParent.getRight() > newParent.getRight()) ? true : false;
+        boolean updateNewParent = (!oldParent.getId().equals(newParent.getId())) ? true : false;
+        if (updateOldParent) {
+            LOGGER.info("Updating old parent " + oldParent.getId());
+            session.update(oldParent);
+        }
+        if (updateNewParent) {
+            LOGGER.info("Updating new parent " + newParent.getId());
+            //session.update(newParent);
+        }
     }
 
     public void removeLabel(MCRCategoryID id, String lang) {
         Session session = MCRHIBConnection.instance().getSession();
-        MCRCategoryImpl category = (MCRCategoryImpl) session.createCriteria(CATEGRORY_CLASS).add(CategoryExpression.eq(id)).uniqueResult();
+        MCRCategoryImpl category = getByNaturalID(session, id);
         Iterator<MCRLabel> it = category.labels.iterator();
         while (it.hasNext()) {
             if (lang.equals(it.next().getLang())) {
@@ -268,7 +290,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
 
     public void setLabel(MCRCategoryID id, MCRLabel label) {
         Session session = MCRHIBConnection.instance().getSession();
-        MCRCategoryImpl category = (MCRCategoryImpl) session.createCriteria(CATEGRORY_CLASS).add(CategoryExpression.eq(id)).uniqueResult();
+        MCRCategoryImpl category = getByNaturalID(session, id);
         Iterator<MCRLabel> it = category.labels.iterator();
         while (it.hasNext()) {
             if (label.getLang().equals(it.next().getLang())) {
@@ -277,6 +299,12 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         }
         category.labels.add(label);
         session.update(category);
+    }
+
+    private static MCRCategoryImpl getByNaturalID(Session session, MCRCategoryID id) {
+        Integer internalID = (Integer) session.createCriteria(CATEGRORY_CLASS).setProjection(Projections.id()).setCacheable(true)
+                .add(CategoryExpression.eq(id)).uniqueResult();
+        return (MCRCategoryImpl) session.get(CATEGRORY_CLASS, internalID);
     }
 
     private static class CategoryExpression implements Criterion {
