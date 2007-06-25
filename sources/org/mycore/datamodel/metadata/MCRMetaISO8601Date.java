@@ -468,7 +468,8 @@ public final class MCRMetaISO8601Date extends MCRMetaDefault {
             if (isoFormat != null) {
                 df = getFormatterForFormat(isoFormat);
             } else if ((isoString != null) && (isoString.length() != 0)) {
-                df = getFormatterForDuration(isoString);
+                String normalized = (isoString.charAt(0) == '-') ? isoString.substring(1) : isoString;
+                df = getFormatterForDuration(normalized);
             } else {
                 df = COMPLETE_HH_MM_SS_SSS_FORMAT;
             }
@@ -500,8 +501,15 @@ public final class MCRMetaISO8601Date extends MCRMetaDefault {
         private static DateTimeFormatter getFormatterForDuration(String isoString) {
             boolean test = false;
             switch (isoString.length()) {
-            case 4:
+            case 1:
+            case 2:
+            case 3:
                 return USE_UTC ? UTC_YEAR_FORMAT : YEAR_FORMAT;
+            case 4:
+                if (isoString.indexOf('-') == -1)
+                    return USE_UTC ? UTC_YEAR_FORMAT : YEAR_FORMAT;
+            case 5:
+            case 6:
             case 7:
                 return USE_UTC ? UTC_YEAR_MONTH_FORMAT : YEAR_MONTH_FORMAT;
             case 10:
