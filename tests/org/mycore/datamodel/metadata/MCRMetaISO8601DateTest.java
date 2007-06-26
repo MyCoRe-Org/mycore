@@ -75,9 +75,6 @@ public class MCRMetaISO8601DateTest extends MCRTestCase {
         assertEquals(duration + " test failed", getFormat(MCRMetaISO8601Date.FormatChooser.YEAR_MONTH_FORMAT), getFormat(MCRMetaISO8601Date.FormatChooser
                 .getFormatter(duration, null)));
         // test complete
-        duration = "-1-01-18";
-        assertEquals(duration + " test failed", getFormat(MCRMetaISO8601Date.FormatChooser.COMPLETE_FORMAT), getFormat(MCRMetaISO8601Date.FormatChooser
-                .getFormatter(duration, null)));
         duration = "2006-01-18";
         assertEquals(duration + " test failed", getFormat(MCRMetaISO8601Date.FormatChooser.COMPLETE_FORMAT), getFormat(MCRMetaISO8601Date.FormatChooser
                 .getFormatter(duration, null)));
