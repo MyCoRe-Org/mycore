@@ -34,6 +34,7 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -107,12 +108,10 @@ public class MCRCommandLineInterface {
         knownCommands.add(new MCRCommand("quit", "org.mycore.frontend.cli.MCRCommandLineInterface.exit", "Stop and exit the commandline tool."));
         knownCommands.add(new MCRCommand("! {0}", "org.mycore.frontend.cli.MCRCommandLineInterface.executeShellCommand String", "Execute the shell command {0}, for example '! ls' or '! cmd /c dir'"));
         knownCommands.add(new MCRCommand("show file {0}", "org.mycore.frontend.cli.MCRCommandLineInterface.show String", "Show contents of local file {0}"));
-
-        if (system.indexOf("miless") == -1) {
-            knownCommands.add(new MCRCommand("change to user {0} with {1}", "org.mycore.frontend.cli.MCRCommandLineInterface.changeToUser String String", "Change the user {0} with the given password in {1}."));
-            knownCommands.add(new MCRCommand("login {0}", "org.mycore.frontend.cli.MCRCommandLineInterface.login String", "Start the login dialog for the user {0}."));
-            knownCommands.add(new MCRCommand("whoami", "org.mycore.frontend.cli.MCRCommandLineInterface.whoami", "Print the current user."));
-        }
+        knownCommands.add(new MCRCommand("change to user {0} with {1}", "org.mycore.frontend.cli.MCRCommandLineInterface.changeToUser String String", "Change the user {0} with the given password in {1}."));
+        knownCommands.add(new MCRCommand("login {0}", "org.mycore.frontend.cli.MCRCommandLineInterface.login String", "Start the login dialog for the user {0}."));
+        knownCommands.add(new MCRCommand("whoami", "org.mycore.frontend.cli.MCRCommandLineInterface.whoami", "Print the current user."));
+        knownCommands.add(new MCRCommand("show command statistics", "org.mycore.frontend.cli.MCRCommandLineInterface.showCommandStatistics", "Show statistics on number of commands processed and execution time needed per command"));
 
         // **************************************
         // Read internal and/or external commands
@@ -220,6 +219,12 @@ public class MCRCommandLineInterface {
         return line;
     }
 
+    /** Stores total time needed for all executions of the given command */
+    protected static HashMap<String,Long> timeNeeded = new HashMap<String,Long>();
+    
+    /** Stores total number of executions for each command */
+    protected static HashMap<String,Integer> numInvocations = new HashMap<String,Integer>();
+    
     /**
      * Processes a command entered by searching a matching command in the list
      * of known commands and executing its method.
@@ -228,14 +233,28 @@ public class MCRCommandLineInterface {
      *            The command string to be processed
      */
     protected static void processCommand(String command) {
-        long start = System.currentTimeMillis();
+        long start = 0, end = 0;
         Transaction tx = MCRHIBConnection.instance().getSession().beginTransaction();
         List<String> commandsReturned = null;
+        String invokedCommand = null;
+        
         try {
             for (MCRCommand currentCommand : knownCommands) {
+                start = System.currentTimeMillis();
                 commandsReturned = currentCommand.invoke(command);
+                
                 if (commandsReturned != null) // Command was executed
                 {
+                    end = System.currentTimeMillis();
+                    invokedCommand = currentCommand.showSyntax();
+                    
+                    long sum = ( timeNeeded.containsKey( invokedCommand ) ? timeNeeded.get( invokedCommand ) : 0L );
+                    sum += end - start;
+                    timeNeeded.put( invokedCommand, sum );
+                    
+                    int num = 1 + ( numInvocations.containsKey( invokedCommand ) ? numInvocations.get( invokedCommand ) : 0 );
+                    numInvocations.put( invokedCommand, num );
+                    
                     // Add commands to queue
                     if (commandsReturned.size() > 0) {
                         System.out.println(system + " Queueing " + commandsReturned.size() + " commands to process");
@@ -249,7 +268,7 @@ public class MCRCommandLineInterface {
             }
             tx.commit();
             if (commandsReturned != null)
-                System.out.printf("%s Command processed (%d ms)\n", system, (System.currentTimeMillis() - start));
+                System.out.printf("%s Command processed (%d ms)\n", system, (end - start));
             else {
                 if (interactiveMode)
                     System.out.printf("%s Command not understood. Enter 'help' to get a list of commands.\n", system);
@@ -268,6 +287,25 @@ public class MCRCommandLineInterface {
             if (!interactiveMode)
                 System.exit(1);
         }
+    }
+    
+    /**
+     * Shows statistics on number of invocations 
+     * and time needed for each command
+     * successfully executed.
+     */
+    public static void showCommandStatistics()
+    {
+      System.out.println();
+      for( Object key : timeNeeded.keySet().toArray() )
+      {
+        long tn = timeNeeded.get( key );
+        int num = numInvocations.get( key );
+        
+        System.out.println( key );
+        System.out.println( "  total: " + tn + " ms, average: " + ( tn / num ) + " ms, "  + num + " invocations." );
+      }
+      System.out.println();
     }
 
     protected static void saveQueue(String lastCommand) {
