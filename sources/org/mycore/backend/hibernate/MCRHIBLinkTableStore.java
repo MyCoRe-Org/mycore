@@ -33,6 +33,7 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 
 import org.mycore.backend.hibernate.tables.MCRLINKHREF;
+import org.mycore.backend.hibernate.tables.MCRLINKHREFPK;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.datamodel.common.MCRLinkTableInterface;
 
@@ -88,7 +89,16 @@ public class MCRHIBLinkTableStore implements MCRLinkTableInterface {
         }
 
         Session session = getSession();
-        MCRLINKHREF l = new MCRLINKHREF(from, to, type, attr);
+        MCRLINKHREFPK pk = new MCRLINKHREFPK();
+        pk.setMcrfrom(from);
+        pk.setMcrto(to);
+        pk.setMcrtype(type);
+        MCRLINKHREF l = (MCRLINKHREF) session.get(MCRLINKHREF.class, pk);
+        if (l == null) {
+            l = new MCRLINKHREF();
+            l.setKey(pk);
+        }
+        l.setMcrattr(attr);
         session.saveOrUpdate(l);
     }
 
