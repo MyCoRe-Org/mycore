@@ -166,6 +166,7 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
         supportedSchemes.put("classification", new MCRClassificationResolver());
         supportedSchemes.put("query", new MCRQueryResolver());
         supportedSchemes.put("buildxml", new MCRBuildXMLResolver());
+        supportedSchemes.put("notnull", new MCRNotNullResolver());
         return supportedSchemes;
     }
 
@@ -1039,6 +1040,35 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
             return input;
         }
 
+    }
+    
+    /**
+     * Ensures that the return of the given uri is never null.
+     * When the return is null, or the uri throws an exception,
+     * this resolver will return an empty XML element instead.
+     * 
+     * Usage: notnull:<anyMyCoReURI>
+     */
+    private static class MCRNotNullResolver implements MCRResolver {
+
+        public Element resolveElement(String uri) {
+            String target = uri.substring(uri.indexOf(":") + 1);
+            LOGGER.debug("Ensuring xml is not null: " + target);
+            try {
+                Element result = MCRURIResolver.instance().resolve(target);
+                if (result != null)
+                    return result;
+                else {
+                    LOGGER.debug("MCRNotNullResolver returning empty xml");
+                    return new Element("null");
+                }
+            } catch (Exception ex) {
+                LOGGER.info("MCRNotNullResolver caught exception: " + ex.getLocalizedMessage());
+                LOGGER.debug(ex.getStackTrace());
+                LOGGER.debug("MCRNotNullResolver returning empty xml");
+                return new Element("null");
+            }
+        }
     }
 
     /**
