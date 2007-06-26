@@ -51,6 +51,7 @@ import javax.xml.parsers.SAXParserFactory;
 
 import org.apache.log4j.Logger;
 import org.jdom.Document;
+import org.jdom.Element;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.xml.sax.Attributes;
@@ -801,33 +802,71 @@ public class MCRUtils {
     }
 
     /**
+     * The method wrap the org.jdom.Element in a org.jdom.Document and write it
+     * to a file.
+     * 
+     * @param elm
+     *            the JDOM Document
+     * @param xml
+     *            the File instance
+     */
+    public static final void writeElementToFile(Element elm, File xml) {
+        writeJDOMToFile((new Document()).addContent(elm), xml);
+    }
+
+    /**
      * The method write a given JDOM Document to a file.
      * 
      * @param jdom
      *            the JDOM Document
      * @param xml
      *            the File instance
-     * @throws IOException
      */
-    public static final void writeJDOMToFile(Document jdom, File xml) throws IOException {
-        XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat());
-        BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(xml));
-        xout.output(jdom, out);
-        out.close();
+    public static final void writeJDOMToFile(Document jdom, File xml) {
+        try {
+            XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat());
+            BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(xml));
+            xout.output(jdom, out);
+            out.close();
+        } catch (IOException ioe) {
+            if (LOGGER.isDebugEnabled()) {
+                ioe.printStackTrace();
+            } else {
+                LOGGER.error("Can't write org.jdom.Document to file "+xml.getName()+".");
+            }
+        }
     }
-    
+
+    /**
+     * The method wrap the org.jdom.Element in a org.jdom.Document and write it
+     * to Sysout.
+     * 
+     * @param elm
+     *            the JDOM Document
+     */
+    public static final void writeElementToSysout(Element elm) {
+        writeJDOMToSysout((new Document()).addContent(elm));
+    }
+
     /**
      * The method write a given JDOM Document to the system output.
      * 
      * @param jdom
      *            the JDOM Document
-     * @throws IOException
      */
-    public static final void writeJDOMToSysout(Document jdom) throws IOException {
-        XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat());
-        BufferedOutputStream out = new BufferedOutputStream(System.out);
-        xout.output(jdom, out);
-        out.flush();
+    public static final void writeJDOMToSysout(Document jdom) {
+        try {
+            XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat());
+            BufferedOutputStream out = new BufferedOutputStream(System.out);
+            xout.output(jdom, out);
+            out.flush();
+        } catch (IOException ioe) {
+            if (LOGGER.isDebugEnabled()) {
+                ioe.printStackTrace();
+            } else {
+                LOGGER.error("Can't write org.jdom.Document to Sysout.");
+            }
+        }
     }
 
     /**
