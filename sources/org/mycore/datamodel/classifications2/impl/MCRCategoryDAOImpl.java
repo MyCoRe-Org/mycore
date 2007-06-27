@@ -235,6 +235,13 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         session.update(category);
     }
 
+    public void replaceCategory(MCRCategory newCategory) throws IllegalArgumentException {
+        if (!exist(newCategory.getId())){
+            throw new IllegalArgumentException("MCRCategory can not be replaced. MCRCategoryID '"+newCategory.getId()+"' is unknown.");
+        }
+        // TODO Auto-generated method stub
+    }
+
     public void setLabel(MCRCategoryID id, MCRLabel label) {
         Session session = MCRHIBConnection.instance().getSession();
         MCRCategoryImpl category = getByNaturalID(session, id);

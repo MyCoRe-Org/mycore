@@ -167,6 +167,24 @@ public interface MCRCategoryDAO {
     public abstract void removeLabel(MCRCategoryID id, String lang);
 
     /**
+     * Replaces a <code>MCRCategory</code> by a new version of the same
+     * category.
+     * 
+     * This replacment includes all subcategories and labels. So former
+     * subcategories and labels not present in <code>newCategory</code> will
+     * be removed while new ones will be inserted.
+     * 
+     * If you can use the other methods defined by this interface as they ought
+     * to be more optimized.
+     * 
+     * @param newCategory
+     *            new version of MCRCategory
+     * @throws IllegalArgumentException
+     *             if old version of MCRCategory does not exist
+     */
+    public abstract void replaceCategory(MCRCategory newCategory) throws IllegalArgumentException;
+
+    /**
      * Sets or updates a label from a Category.
      * 
      * @param id
