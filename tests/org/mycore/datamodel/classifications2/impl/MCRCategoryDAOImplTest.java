@@ -27,7 +27,6 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.HashSet;
 
-import org.hibernate.Session;
 import org.jdom.Document;
 
 import org.mycore.backend.hibernate.MCRHIBConnection;
