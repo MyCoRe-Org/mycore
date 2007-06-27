@@ -25,20 +25,25 @@ package org.mycore.datamodel.classifications2.impl;
 
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.HashSet;
 
+import org.hibernate.Session;
 import org.jdom.Document;
 
+import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRHibTestCase;
 import org.mycore.common.xml.MCRXMLHelper;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
+import org.mycore.datamodel.classifications2.MCRLabel;
 import org.mycore.datamodel.classifications2.utils.MCRStringTransformer;
 import org.mycore.datamodel.classifications2.utils.MCRXMLTransformer;
 
 public class MCRCategoryDAOImplTest extends MCRHibTestCase {
 
     private static final String WORLD_CLASS_RESOURCE_NAME = "/org/mycore/datamodel/classifications2/impl/resources/worldclass.xml";
+
     static final String CATEGORY_MAPPING_RESOURCE_NAME = "/org/mycore/datamodel/classifications2/impl/MCRCategoryImpl.hbm.xml";
 
     private static final MCRCategoryDAOImpl DAO = new MCRCategoryDAOImpl();
@@ -79,6 +84,22 @@ public class MCRCategoryDAOImplTest extends MCRHibTestCase {
         System.out.println(MCRStringTransformer.getString(category));
         DAO.addCategory(null, category);
         endTransaction();
+        beginTransaction();
+        // clear from cache
+        sessionFactory.getCurrentSession().clear();
+        assertTrue("Exist check failed for Category " + category.getId(), DAO.exist(category.getId()));
+        MCRCategoryImpl india = new MCRCategoryImpl();
+        india.setId(new MCRCategoryID(category.getId().getRootID(), "India"));
+        india.setLabels(new HashSet<MCRLabel>());
+        india.getLabels().add(new MCRLabel("de", "Indien", null));
+        india.getLabels().add(new MCRLabel("en", "India", null));
+        MCRHIBConnection.instance().flushSession();
+        DAO.addCategory(new MCRCategoryID(category.getId().getRootID(), "Asia"), india);
+        endTransaction();
+        beginTransaction();
+        // clear from cache
+        sessionFactory.getCurrentSession().clear();
+        assertTrue("Exist check failed for Category " + india.getId(), DAO.exist(india.getId()));
     }
 
 }
