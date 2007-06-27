@@ -71,7 +71,6 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
             parent = getByNaturalID(session, parentID);
             levelStart = parent.getLevel() + 1;
             leftStart = parent.getLeft() + 1;
-            parent.getChildren().add(category);
         }
         LOGGER.info("Calculating LEFT,RIGHT and LEVEL attributes...");
         final MCRCategoryImpl wrapCategory = MCRCategoryImpl.wrapCategory(category, parent, (parent == null) ? category.getRoot() : parent.getRoot());
@@ -82,6 +81,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         if (parentID != null) {
             final int increment = nodes * 2;
             updateLeftRightValue(connection, leftStart, increment);
+            parent.getChildren().add(category);
         }
         session.save(category);
         LOGGER.info("Categorie saved.");
@@ -421,8 +421,10 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
     }
 
     private static MCRCategoryImpl getByNaturalID(Session session, MCRCategoryID id) {
-        Integer internalID = (Integer) session.createCriteria(CATEGRORY_CLASS).setProjection(Projections.id()).setCacheable(true).add(
-                MCRCategoryExpression.eq(id)).uniqueResult();
+        final Criteria criteria = session.createCriteria(CATEGRORY_CLASS).setProjection(Projections.id());
+        LOGGER.info("Cache is GET enabled: " + session.getCacheMode().isGetEnabled());
+        LOGGER.info("Cache is PUT enabled: " + session.getCacheMode().isPutEnabled());
+        Integer internalID = (Integer) criteria.setCacheable(true).add(MCRCategoryExpression.eq(id)).uniqueResult();
         return (MCRCategoryImpl) session.get(CATEGRORY_CLASS, internalID);
     }
 
