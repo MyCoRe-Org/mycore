@@ -23,7 +23,6 @@
  **/
 package org.mycore.datamodel.classifications2;
 
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -52,6 +51,15 @@ public interface MCRCategoryDAO {
      *            ID of Category to be removed
      */
     public abstract void deleteCategory(MCRCategoryID id);
+
+    /**
+     * Tells if a given category exists.
+     * 
+     * @param id
+     *            ID of Category
+     * @return true if category is present
+     */
+    public abstract boolean exist(MCRCategoryID id);
 
     /**
      * Retrieve all Categories tagged by a specific label in a specific lang.
@@ -113,15 +121,6 @@ public interface MCRCategoryDAO {
      * @see #getCategory(MCRCategoryID, int)
      */
     public abstract MCRCategory getRootCategory(MCRCategoryID baseID, int childLevel);
-
-    /**
-     * Tells if a given category exists.
-     * 
-     * @param id
-     *            ID of Category
-     * @return true if category is present
-     */
-    public abstract boolean exist(MCRCategoryID id);
 
     /**
      * Tells if a given category contains subcategories.
