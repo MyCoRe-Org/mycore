@@ -24,8 +24,10 @@
 package org.mycore.datamodel.classifications2.impl;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.hibernate.Criteria;
@@ -236,10 +238,51 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
     }
 
     public void replaceCategory(MCRCategory newCategory) throws IllegalArgumentException {
-        if (!exist(newCategory.getId())){
-            throw new IllegalArgumentException("MCRCategory can not be replaced. MCRCategoryID '"+newCategory.getId()+"' is unknown.");
+        if (!exist(newCategory.getId())) {
+            throw new IllegalArgumentException("MCRCategory can not be replaced. MCRCategoryID '" + newCategory.getId() + "' is unknown.");
         }
-        // TODO Auto-generated method stub
+        final MCRHIBConnection connection = MCRHIBConnection.instance();
+        Session session = connection.getSession();
+        MCRCategoryImpl oldCategory = getByNaturalID(session, newCategory.getId());
+        // old Map with all Categories referenced by ID
+        Map<MCRCategoryID, MCRCategoryImpl> oldMap = new HashMap<MCRCategoryID, MCRCategoryImpl>();
+        fillIDMap(oldMap, oldCategory);
+        // detatch from session (all sub categories are fetched)
+        session.evict(oldCategory);
+        MCRCategoryImpl newCategoryImpl = MCRCategoryImpl.wrapCategory(newCategory, oldCategory.getParent(), oldCategory.getRoot());
+        Map<MCRCategoryID, MCRCategoryImpl> newMap = new HashMap<MCRCategoryID, MCRCategoryImpl>();
+        fillIDMap(newMap, newCategoryImpl);
+        // set internalID of known categories
+        for (MCRCategoryImpl category : newMap.values()) {
+            MCRCategoryImpl oldValue = oldMap.get(category.getId());
+            if (oldValue != null) {
+                category.setInternalID(oldValue.getInternalID());
+            }
+        }
+        // calculate left, right and level values
+        int diffNodes = newMap.size() - oldMap.size();
+        LOGGER.info("Update changes classification node size by: " + diffNodes);
+        int increment = diffNodes * 2;
+        if (increment != 0 && oldCategory.isCategory()) {
+            final int left = getRightSiblingOrOfAncestor((MCRCategoryImpl) oldCategory.getParent(), oldCategory.getPositionInParent() + 1).getLeft();
+            final int maxLeft = ((MCRCategoryImpl) oldCategory.getRoot()).getRight();
+            final int right = getRightSiblingOrParent((MCRCategoryImpl) oldCategory.getParent(), oldCategory.getPositionInParent() + 1).getRight();
+            final int maxRight = maxLeft;
+            updateLeftRightValueMax(connection, left, maxLeft, right, maxRight, increment);
+        }
+        calculateLeftRightAndLevel(newCategoryImpl, oldCategory.getLevel(), oldCategory.getLeft());
+        if (oldCategory.isCategory()) {
+            MCRCategoryImpl parent = (MCRCategoryImpl) oldCategory.getParent();
+            parent.getChildren().set(oldCategory.getPositionInParent(), newCategoryImpl);
+        }
+        // delete removed categories
+        for (MCRCategoryImpl category : oldMap.values()) {
+            if (!newMap.containsKey(category.getId())) {
+                LOGGER.info("Deleting category :" + category.getId());
+                session.delete(category);
+            }
+        }
+        session.saveOrUpdate(newCategoryImpl);
     }
 
     public void setLabel(MCRCategoryID id, MCRLabel label) {
@@ -378,9 +421,16 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
     }
 
     private static MCRCategoryImpl getByNaturalID(Session session, MCRCategoryID id) {
-        Integer internalID = (Integer) session.createCriteria(CATEGRORY_CLASS).setProjection(Projections.id()).setCacheable(true)
-                .add(MCRCategoryExpression.eq(id)).uniqueResult();
+        Integer internalID = (Integer) session.createCriteria(CATEGRORY_CLASS).setProjection(Projections.id()).setCacheable(true).add(
+                MCRCategoryExpression.eq(id)).uniqueResult();
         return (MCRCategoryImpl) session.get(CATEGRORY_CLASS, internalID);
+    }
+
+    private static void fillIDMap(Map<MCRCategoryID, MCRCategoryImpl> map, MCRCategoryImpl category) {
+        map.put(category.getId(), category);
+        for (MCRCategory subCategory : category.getChildren()) {
+            fillIDMap(map, (MCRCategoryImpl) subCategory);
+        }
     }
 
     private static Integer[] getLeftRightValues(MCRCategoryID id) {
