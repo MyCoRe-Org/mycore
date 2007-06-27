@@ -23,8 +23,10 @@
  **/
 package org.mycore.common;
 
+import org.hibernate.HibernateException;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
+import org.hibernate.tool.hbm2ddl.SchemaExport;
 
 import org.mycore.backend.hibernate.MCRHIBConnection;
 
@@ -34,7 +36,7 @@ import org.mycore.backend.hibernate.MCRHIBConnection;
  * Need to insert some things here
  * 
  */
-public class MCRHibTestCase extends MCRTestCase {
+public abstract class MCRHibTestCase extends MCRTestCase {
 
     protected SessionFactory sessionFactory;
 
@@ -44,25 +46,41 @@ public class MCRHibTestCase extends MCRTestCase {
     protected void setUp() throws Exception {
         // Configure logging etc.
         super.setUp();
-        boolean setPropertie=false;
-        setPropertie=setProperty("log4j.logger.org.hibernate","WARN",false)?true:setPropertie;
-        setPropertie=setProperty("log4j.logger.org.hsqldb","WARN",false)?true:setPropertie;
-        if (setPropertie){
+        boolean setPropertie = false;
+        setPropertie = setProperty("log4j.logger.org.hibernate", "WARN", false) ? true : setPropertie;
+        setPropertie = setProperty("log4j.logger.org.hsqldb", "WARN", false) ? true : setPropertie;
+        if (setPropertie) {
             CONFIG.configureLogging();
         }
         System.setProperty("MCR.Hibernate.Configuration", "org/mycore/hibernate.cfg.xml");
-        sessionFactory = MCRHIBConnection.instance().getSessionFactory();
-        tx = sessionFactory.getCurrentSession().beginTransaction();
+        final MCRHIBConnection connection = MCRHIBConnection.instance();
+        sessionFactory = connection.getSessionFactory();
+        SchemaExport export=new SchemaExport(connection.getConfiguration());
+        export.create(false, true);
+        beginTransaction();
     }
 
     @Override
     protected void tearDown() throws Exception {
         super.tearDown();
+        endTransaction();
+    }
+
+    protected void beginTransaction() {
+        tx = sessionFactory.getCurrentSession().beginTransaction();
+    }
+
+    /**
+     * @throws HibernateExceptionException
+     * 
+     */
+    protected void endTransaction() throws HibernateException {
         if (tx != null && tx.isActive()) {
             try {
                 tx.commit();
-            } catch (Exception e) {
+            } catch (HibernateException e) {
                 tx.rollback();
+                throw e;
             }
         }
     }

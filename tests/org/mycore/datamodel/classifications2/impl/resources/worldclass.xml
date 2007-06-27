@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mycoreclass ID="World">
+  <label xml:lang="de" text="Staaten" description="Klassifikation von Staaten" />
+  <label xml:lang="en" text="Nations" description="classification of states" />
+  <categories>
+    <category ID="Europe">
+      <label xml:lang="de" text="Europa" />
+      <label xml:lang="en" text="Europe" />
+      <label xml:lang="fr" text="Europe" />
+      <label xml:lang="es" text="Europa" />
+      <category ID="Germany">
+        <label xml:lang="de" text="Deutschland" />
+        <label xml:lang="en" text="Germany" />
+        <label xml:lang="fr" text="Allemagne" />
+        <label xml:lang="es" text="Alemania" />
+      </category>
+      <category ID="UK">
+        <label xml:lang="de" text="Vereinigtes Königreich" />
+        <label xml:lang="en" text="United Kingdom" />
+        <label xml:lang="fr" text="Royaume-Uni" />
+        <label xml:lang="es" text="Reino Unido" />
+      </category>
+      <category ID="France">
+        <label xml:lang="de" text="Frankreich" />
+        <label xml:lang="en" text="France" />
+        <label xml:lang="fr" text="France" />
+        <label xml:lang="es" text="Francia" />
+      </category>
+      <category ID="Spain">
+        <label xml:lang="de" text="Spanien" />
+        <label xml:lang="en" text="Spain" />
+        <label xml:lang="fr" text="Espagne" />
+        <label xml:lang="es" text="España" />
+      </category>
+    </category>
+    <category ID="Asia">
+      <label xml:lang="de" text="Asien" />
+      <label xml:lang="en" text="Asia" />
+      <label xml:lang="fr" text="Asie" />
+      <label xml:lang="es" text="Asia" />
+    </category>
+  </categories>
+</mycoreclass>

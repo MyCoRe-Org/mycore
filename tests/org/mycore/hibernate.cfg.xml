@@ -12,6 +12,10 @@
     <property name="connection.password"></property>
     <property name="dialect">org.hibernate.dialect.HSQLDialect</property>
     <property name="current_session_context_class">thread</property>
+    <property name="cache.use_second_level_cache">false</property>
+    <property name="cache.use_query_cache">false</property>
+    
+    <mapping resource="org/mycore/datamodel/classifications2/impl/MCRCategoryImpl.hbm.xml"/>
   </session-factory>
 
 </hibernate-configuration>
