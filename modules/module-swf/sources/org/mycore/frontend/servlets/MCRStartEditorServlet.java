@@ -404,7 +404,8 @@ public class MCRStartEditorServlet extends MCRServlet {
     }
 
     /**
-     * The method add a new NBN to the dataset with type <b>document</b> or <b>disshab</b>. The access right is writedb.
+     * The method add a new NBN to the dataset with type <b>document</b> or
+     * <b>disshab</b>. The access right is writedb.
      * 
      * @param job
      *            the MCRServletJob instance
@@ -426,23 +427,23 @@ public class MCRStartEditorServlet extends MCRServlet {
             MCRMetaElement elm = obj.getMetadataElement("nbns");
             if (elm == null) {
                 String urn = MCRURNManager.buildURN("UBL");
-                MCRMetaNBN nbn = new MCRMetaNBN("metadata","nbn",0,urn);
+                MCRMetaNBN nbn = new MCRMetaNBN("metadata", "nbn", 0, urn);
                 ArrayList<MCRMetaInterface> list = new ArrayList<MCRMetaInterface>();
-                elm = new MCRMetaElement("de","MCRMetaNBN","nbns",true,false,list);
+                elm = new MCRMetaElement("de", "MCRMetaNBN", "nbns", true, false, list);
                 elm.addMetaObject(nbn);
-                obj.getMetadata().setMetadataElement(elm,"nbns");
+                obj.getMetadata().setMetadataElement(elm, "nbns");
                 try {
-                obj.updateInDatastore();
-                MCRURNManager.assignURN(urn,obj.getId().toString());
+                    obj.updateInDatastore();
+                    MCRURNManager.assignURN(urn, obj.getId().toString());
                 } catch (MCRActiveLinkException e) {
-                    LOGGER.warn("Can't store NBN for "+mysemcrid);
+                    LOGGER.warn("Can't store NBN for " + mysemcrid);
                     e.printStackTrace();
                 }
-                LOGGER.info("Add the NBN "+urn);
+                LOGGER.info("Add the NBN " + urn);
             } else {
-                LOGGER.warn("The NBN already exists for "+mysemcrid);
+                LOGGER.warn("The NBN already exists for " + mysemcrid);
             }
-            
+
         }
         // back to the metadata view
         StringBuffer sb = new StringBuffer();
@@ -488,7 +489,8 @@ public class MCRStartEditorServlet extends MCRServlet {
             String appl = CONFIG.getString("MCR.SWF.Mail.ApplicationID", "DocPortal");
             String subject = "Automaticaly message from " + appl;
             StringBuffer text = new StringBuffer();
-            text.append("Es wurde ein Derivate mit der ID ").append(mysemcrid).append(" des Objektes mit der ID ").append(mysemcrid).append(" aus dem Server gel�scht.");
+            text.append("Es wurde ein Derivate mit der ID ").append(mysemcrid).append(" des Objektes mit der ID ").append(mysemcrid).append(
+                    " aus dem Server gel�scht.");
             LOGGER.info(text.toString());
 
             try {
@@ -579,6 +581,11 @@ public class MCRStartEditorServlet extends MCRServlet {
             obj.deleteFromDatastore(mytfmcrid);
             myfile = deletepage;
         } catch (Exception e) {
+            if (LOGGER.isDebugEnabled()) {
+                e.printStackTrace();
+            } else {
+                LOGGER.error(e.getMessage());
+            }
             myfile = deleteerrorpage;
         }
 
@@ -947,7 +954,8 @@ public class MCRStartEditorServlet extends MCRServlet {
                     String appl = CONFIG.getString("MCR.SWF.Mail.ApplicationID", "DocPortal");
                     String subject = "Automaticaly message from " + appl;
                     StringBuffer text = new StringBuffer();
-                    text.append("Es wurde ein Objekt vom Typ ").append(mytype).append(" mit der ID ").append(mysemcrid).append(" aus dem Workflow in das System geladen.");
+                    text.append("Es wurde ein Objekt vom Typ ").append(mytype).append(" mit der ID ").append(mysemcrid).append(
+                            " aus dem Workflow in das System geladen.");
                     LOGGER.info(text.toString());
 
                     try {
