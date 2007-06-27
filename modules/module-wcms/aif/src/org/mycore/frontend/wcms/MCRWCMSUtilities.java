@@ -55,7 +55,7 @@ public class MCRWCMSUtilities {
      */
     public static org.w3c.dom.Document getWritableNavi() throws JDOMException, IOException {
         Element origNavi = new Element("root");
-        origNavi.addContent(MCRLayoutUtilities.getNavi().getRootElement().detach());
+        origNavi.addContent((Element) MCRLayoutUtilities.getNavi().getRootElement().clone());
         Document writableNavi = new Document(new Element("root"));
         buildWritableNavi(origNavi, writableNavi);
         return new DOMOutputter().output(writableNavi);

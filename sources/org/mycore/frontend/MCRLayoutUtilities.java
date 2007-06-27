@@ -26,18 +26,20 @@ public class MCRLayoutUtilities {
     public final static int ALL2BLOCKER_TRUE = 3;
 
     private final static Logger LOGGER = Logger.getLogger(MCRLayoutUtilities.class);
-    
+
     private static HashMap itemStore = new HashMap();
-    
+
     private static long CACHE_INITTIME = 0;
-    
-    private static Document NAVI = null;
-    
+
+    private static Document NAVI;
+
+    private static final File NAVFILE = new File(MCRConfiguration.instance().getString("MCR.navigationFile").replace('/', File.separatorChar));
+
     public static boolean readAccess(String webpageID, String blockerWebpageID) throws JDOMException, IOException {
         LOGGER.debug("start to check read access for webpageID= " + webpageID + " (with blockerWebpageID =" + blockerWebpageID + ")");
         long startTime = System.currentTimeMillis();
         boolean access = getAccess(webpageID, "read", ALL2BLOCKER_TRUE, blockerWebpageID);
-        long finishTime = (System.currentTimeMillis() - startTime) ;
+        long finishTime = (System.currentTimeMillis() - startTime);
         LOGGER.debug("verified read access for webpageID= " + webpageID + " (with blockerWebpageID =" + blockerWebpageID + ") => " + access + ": took "
                         + finishTime + " msec.");
         return access;
@@ -46,7 +48,7 @@ public class MCRLayoutUtilities {
     public static boolean readAccess(String webpageID) throws JDOMException, IOException {
         long startTime = System.currentTimeMillis();
         boolean access = getAccess(webpageID, "read", ALLTRUE);
-        long finishTime = (System.currentTimeMillis() - startTime) ;
+        long finishTime = (System.currentTimeMillis() - startTime);
         LOGGER.debug("verified read access for webpageID= " + webpageID + " => " + access + ": took " + finishTime + " msec.");
         return access;
     }
@@ -116,11 +118,11 @@ public class MCRLayoutUtilities {
     }
 
     private static Element getItem(String webpageID) throws JDOMException, IOException {
-        Element item = (Element)itemStore.get(webpageID);
-        if (item==null) {
+        Element item = (Element) itemStore.get(webpageID);
+        if (item == null) {
             XPath xpath = XPath.newInstance("//.[@href='" + webpageID + "']");
             item = (Element) xpath.selectSingleNode(getNavi());
-            itemStore.put(webpageID,item);
+            itemStore.put(webpageID, item);
         }
         return item;
     }
@@ -142,13 +144,11 @@ public class MCRLayoutUtilities {
     }
 
     public static Document getNavi() throws JDOMException, IOException {
-        final MCRConfiguration CONFIG = MCRConfiguration.instance();
-        final File navFile = new File(CONFIG.getString("MCR.navigationFile").replace('/', File.separatorChar));
         // cache does not exist or to old
-        if (CACHE_INITTIME <= navFile.lastModified()) {
-            NAVI = new SAXBuilder().build(navFile);
+        if (CACHE_INITTIME < NAVFILE.lastModified()) {
+            NAVI = new SAXBuilder().build(NAVFILE);
             CACHE_INITTIME = System.currentTimeMillis();
-        } 
+        }
         return NAVI;
     }
 
