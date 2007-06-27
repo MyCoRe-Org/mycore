@@ -38,6 +38,7 @@ import org.jaxen.jdom.JDOMXPath;
 import org.jdom.Document;
 import org.jdom.Element;
 
+import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.common.MCRConfiguration;
 import static org.mycore.common.MCRConstants.*;
 import org.mycore.common.MCRUtils;
@@ -450,7 +451,8 @@ public class MCRSimpleWorkflowManager {
         }
 
         logger.info("The metadata objekt was " + fn + " loaded.");
-
+        // Database connection needs to be flushed
+        MCRHIBConnection.instance().flushSession();
         // commit derivates
         if (!MCRObject.existInDatastore(ID)) {
             return false;
@@ -496,6 +498,8 @@ public class MCRSimpleWorkflowManager {
             MCRDerivateCommands.loadFromFile(filename, false);
         }
 
+        // Database connection needs to be flushed
+        MCRHIBConnection.instance().flushSession();
         if (!MCRDerivate.existInDatastore(ID)) {
             return false;
         }
