@@ -41,7 +41,7 @@ public class MCRCategoryID implements Serializable {
 
     private String ID;
 
-    public MCRCategoryID() {
+    MCRCategoryID() {
         super();
     }
 
@@ -114,7 +114,7 @@ public class MCRCategoryID implements Serializable {
      * @param id
      *            the ID to set
      */
-    public void setID(String id) {
+    void setID(String id) {
         ID = id;
     }
 
@@ -129,7 +129,7 @@ public class MCRCategoryID implements Serializable {
      * @param rootID
      *            the rootID to set
      */
-    public void setRootID(String rootID) {
+    void setRootID(String rootID) {
         this.rootID = rootID.intern();
     }
 
