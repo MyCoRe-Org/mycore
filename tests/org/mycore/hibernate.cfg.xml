@@ -14,6 +14,8 @@
     <property name="current_session_context_class">thread</property>
     <property name="cache.use_second_level_cache">false</property>
     <property name="cache.use_query_cache">false</property>
+    <property name="current_session_context_class">org.mycore.backend.hibernate.MCRSessionContext</property>
+    <property name="jdbc.batch_size">0</property>
     
     <mapping resource="org/mycore/datamodel/classifications2/impl/MCRCategoryImpl.hbm.xml"/>
   </session-factory>
