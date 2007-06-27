@@ -54,7 +54,7 @@ public class MCRXMLHelper {
     /** Returns the XML Parser as configured in mycore.properties */
     private static MCRParserInterface getParser() throws MCRException {
         if (PARSER == null) {
-            Object o = MCRConfiguration.instance().getInstanceOf("MCR.XMLParser.Class");
+            Object o = MCRConfiguration.instance().getInstanceOf("MCR.XMLParser.Class", "org.mycore.common.xml.MCRParserXerces");
             PARSER = (MCRParserInterface) o;
         }
 
@@ -152,9 +152,11 @@ public class MCRXMLHelper {
     }
 
     /**
-     * Removes characters that are illegal in XML text nodes or attribute values.
+     * Removes characters that are illegal in XML text nodes or attribute
+     * values.
      * 
-     * @param text the String that should be used in XML elements or attributes
+     * @param text
+     *            the String that should be used in XML elements or attributes
      * @return the String with all illegal characters removed
      */
     public static String removeIllegalChars(String text) {
@@ -171,145 +173,141 @@ public class MCRXMLHelper {
         }
         return sb.toString();
     }
-    
+
     /**
      * checks whether two documents are equal.
      * 
-     * This test performs a deep check across all child components of a Document.
-     * @param d1 first Document to compare
-     * @param d2 second Document to compare
+     * This test performs a deep check across all child components of a
+     * Document.
+     * 
+     * @param d1
+     *            first Document to compare
+     * @param d2
+     *            second Document to compare
      * @return true, if d1 and d2 are deep equal
      * @see Document#equals(java.lang.Object)
      */
-    public static boolean deepEqual(Document d1,Document d2){
-        return JDOMEquivalent.equivalent(d1,d2);
+    public static boolean deepEqual(Document d1, Document d2) {
+        return JDOMEquivalent.equivalent(d1, d2);
     }
 
     private static class JDOMEquivalent {
-    
-        private JDOMEquivalent() { }
-    
+
+        private JDOMEquivalent() {
+        }
+
         public static boolean equivalent(Document d1, Document d2) {
             return equivalentContent(d1, d2);
         }
-    
+
         public static boolean equivalent(Element e1, Element e2) {
-            return equivalentName(e1, e2) &&
-                   equivalentAttributes(e1, e2) &&
-                   equivalentContent(e1.getDescendants(), e2.getDescendants());
+            return equivalentName(e1, e2) && equivalentAttributes(e1, e2) && equivalentContent(e1.getDescendants(), e2.getDescendants());
         }
-    
+
         public static boolean equivalent(Text t1, Text t2) {
             String v1 = t1.getValue();
             String v2 = t2.getValue();
             return v1.equals(v2);
         }
-    
+
         public static boolean equivalent(DocType d1, DocType d2) {
-            return (((d1.getPublicID()==d2.getPublicID()) || d1.getPublicID().equals(d2.getPublicID())) && ((d1.getSystemID()==d2.getSystemID()) || d1.getSystemID().equals(d2.getSystemID())));
+            return (((d1.getPublicID() == d2.getPublicID()) || d1.getPublicID().equals(d2.getPublicID())) && ((d1.getSystemID() == d2.getSystemID()) || d1
+                    .getSystemID().equals(d2.getSystemID())));
         }
-    
+
         public static boolean equivalent(Comment c1, Comment c2) {
             String v1 = c1.getValue();
             String v2 = c2.getValue();
             return v1.equals(v2);
         }
-    
-        public static boolean equivalent(ProcessingInstruction p1,
-                                  ProcessingInstruction p2) {
+
+        public static boolean equivalent(ProcessingInstruction p1, ProcessingInstruction p2) {
             String t1 = p1.getTarget();
             String t2 = p2.getTarget();
             String d1 = p1.getData();
             String d2 = p2.getData();
             return t1.equals(t2) && d1.equals(d2);
         }
-    
+
         public static boolean equivalent(Attribute a1, Attribute a2) {
             String v1 = a1.getValue();
             String v2 = a2.getValue();
             return equivalentName(a1, a2) && v1.equals(v2);
         }
-    
+
         public static boolean equivalentAttributes(Element e1, Element e2) {
-            List aList1=e1.getAttributes();
-            List aList2=e2.getAttributes();
-            if (aList1.size()!=aList2.size()){
+            List aList1 = e1.getAttributes();
+            List aList2 = e2.getAttributes();
+            if (aList1.size() != aList2.size()) {
                 return false;
             }
-            Iterator i1=aList1.iterator();
-            Iterator i2=aList2.iterator();
-            while (i1.hasNext()){
-                Attribute a1=(Attribute)i1.next();
-                Attribute a2=(Attribute)i2.next();
-                if (!equivalent(a1,a2)){
+            Iterator i1 = aList1.iterator();
+            Iterator i2 = aList2.iterator();
+            while (i1.hasNext()) {
+                Attribute a1 = (Attribute) i1.next();
+                Attribute a2 = (Attribute) i2.next();
+                if (!equivalent(a1, a2)) {
                     return false;
                 }
             }
             return true;
         }
-    
+
         public static boolean equivalentContent(Document d1, Document d2) {
-            //XXX short circuit if content size1 != content size2
+            // XXX short circuit if content size1 != content size2
             return equivalentContent(d1.getDescendants(), d2.getDescendants());
         }
-    
+
         public static boolean equivalentContent(Element e1, Element e2) {
-            //XXX short circuit if content size1 != content size2
+            // XXX short circuit if content size1 != content size2
             return equivalentContent(e1.getDescendants(), e2.getDescendants());
         }
-    
+
         public static boolean equivalentContent(Iterator i1, Iterator i2) {
             boolean result = true;
-            while(result && i1.hasNext() && i2.hasNext()) {
-                Object o1 = i1.next();        
-                Object o2 = i2.next();        
+            while (result && i1.hasNext() && i2.hasNext()) {
+                Object o1 = i1.next();
+                Object o2 = i2.next();
                 if ((o1 instanceof Element) && (o2 instanceof Element)) {
                     result = equivalent((Element) o1, (Element) o2);
-                    //XXX Hmm, this should work and avoid much recursion
-                    //    if we can guarentee i1, i2 are instances of
-                    //    DescendantIterator
+                    // XXX Hmm, this should work and avoid much recursion
+                    // if we can guarentee i1, i2 are instances of
+                    // DescendantIterator
                     //
-                    //    result = equivalentName((Element) o1, (Element) o2) &&
-                    //             equivalentAttributes((Element) o1, (Element) o2);
-                }
-                else if ((o1 instanceof Text) && (o2 instanceof Text)) {
+                    // result = equivalentName((Element) o1, (Element) o2) &&
+                    // equivalentAttributes((Element) o1, (Element) o2);
+                } else if ((o1 instanceof Text) && (o2 instanceof Text)) {
                     result = equivalent((Text) o1, (Text) o2);
-                }
-                else if ((o1 instanceof Comment) && (o2 instanceof Comment)) {
+                } else if ((o1 instanceof Comment) && (o2 instanceof Comment)) {
                     result = equivalent((Comment) o1, (Comment) o2);
-                }
-                else if ((o1 instanceof ProcessingInstruction) &&
-                         (o2 instanceof ProcessingInstruction)) {
-                    result = equivalent((ProcessingInstruction) o1,
-                                        (ProcessingInstruction) o2);
-                }
-                else if ((o1 instanceof DocType) && (o2 instanceof DocType)) {
+                } else if ((o1 instanceof ProcessingInstruction) && (o2 instanceof ProcessingInstruction)) {
+                    result = equivalent((ProcessingInstruction) o1, (ProcessingInstruction) o2);
+                } else if ((o1 instanceof DocType) && (o2 instanceof DocType)) {
                     result = equivalent((DocType) o1, (DocType) o2);
-                }
-                else {
+                } else {
                     result = false;
                 }
             }
             return result;
         }
-    
+
         public static boolean equivalentName(Element e1, Element e2) {
             Namespace ns1 = e1.getNamespace();
             String localName1 = e1.getName();
-    
+
             Namespace ns2 = e2.getNamespace();
             String localName2 = e2.getName();
-    
+
             return (ns1.equals(ns2)) && (localName1.equals(localName2));
         }
-    
+
         public static boolean equivalentName(Attribute a1, Attribute a2) {
             Namespace ns1 = a1.getNamespace();
             String localName1 = a1.getName();
-    
+
             Namespace ns2 = a2.getNamespace();
             String localName2 = a2.getName();
-    
+
             return (ns1.equals(ns2)) && (localName1.equals(localName2));
         }
     }
