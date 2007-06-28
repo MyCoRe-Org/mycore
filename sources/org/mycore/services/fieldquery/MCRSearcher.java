@@ -141,6 +141,14 @@ public abstract class MCRSearcher extends MCREventHandlerBase implements MCREven
     protected void handleObjectRepaired(MCREvent evt, MCRObject obj) {
         handleObjectUpdated(evt, obj);
     }
+    
+    protected void undoObjectCreated(MCREvent evt, MCRObject obj) {
+      handleObjectDeleted(evt, obj);
+    }
+
+    protected void undoObjectDeleted(MCREvent evt, MCRObject obj) {
+      handleObjectCreated(evt, obj);
+    }
 
     /**
      * Adds field values to the search index. Searchers that need an indexer
