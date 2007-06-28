@@ -36,50 +36,72 @@ import org.mycore.datamodel.classifications2.utils.MCRXMLTransformer;
 
 /**
  * Commands for the classification system.
+ * 
  * @author Thomas Scheffler (yagee)
  */
 public class MCRClassification2Commands extends MCRAbstractCommands {
-    
-    private static final MCRCategoryDAO DAO= new MCRCategoryDAOImpl();
-    
-    public MCRClassification2Commands(){
-        command.add(new MCRCommand("load classification2 from file {0}", "org.mycore.frontend.cli.MCRClassification2Commands.loadFromFile String", "The command add a new classification form file {0} to the system."));
-        command.add(new MCRCommand("update classification2 from file {0}", "org.mycore.frontend.cli.MCRClassification2Commands.updateFromFile String", "The command add a new classification form file {0} to the system."));
-        command.add(new MCRCommand("delete classification2 {0}", "org.mycore.frontend.cli.MCRClassification2Commands.delete String", "The command remove the classification with MCRObjectID {0} from the system."));
+
+    private static final MCRCategoryDAO DAO = new MCRCategoryDAOImpl();
+
+    public MCRClassification2Commands() {
+        command.add(new MCRCommand("load classification2 from file {0}", "org.mycore.frontend.cli.MCRClassification2Commands.loadFromFile String",
+                "The command add a new classification form file {0} to the system."));
+        command.add(new MCRCommand("update classification2 from file {0}", "org.mycore.frontend.cli.MCRClassification2Commands.updateFromFile String",
+                "The command add a new classification form file {0} to the system."));
+        command.add(new MCRCommand("delete classification2 {0}", "org.mycore.frontend.cli.MCRClassification2Commands.delete String",
+                "The command remove the classification with MCRObjectID {0} from the system."));
+        command.add(new MCRCommand("count classification2 children of {0}", "org.mycore.frontend.cli.MCRClassification2Commands.countChildren String",
+                "The command remove the classification with MCRObjectID {0} from the system."));
     }
-    
+
     /**
      * Deletes a classification
+     * 
      * @param classID
      * @see MCRCategoryDAO#deleteCategory(MCRCategoryID)
      */
-    public static void delete(String classID){
+    public static void delete(String classID) {
         DAO.deleteCategory(MCRCategoryID.rootID(classID));
     }
-    
+
+    /**
+     * Deletes a classification
+     * 
+     * @param classID
+     * @see MCRCategoryDAO#deleteCategory(MCRCategoryID)
+     */
+    public static void countChildren(String classID) {
+        MCRCategory category = DAO.getCategory(MCRCategoryID.rootID(classID), -1);
+        System.out.printf("%s has %d children", category.getId(), category.getChildren().size());
+    }
+
     /**
      * Adds a classification.
      * 
      * Classification is built from a file.
-     * @param filname file in mcrclass xml format
+     * 
+     * @param filname
+     *            file in mcrclass xml format
      * @see MCRCategoryDAO#addCategory(MCRCategoryID, MCRCategory)
      */
-    public static void loadFromFile(String filename){
-        File file=new File(filename);
-        Document xml=MCRXMLHelper.parseURI(file.getPath());
-        MCRCategory category=MCRXMLTransformer.getCategory(xml);
+    public static void loadFromFile(String filename) {
+        File file = new File(filename);
+        Document xml = MCRXMLHelper.parseURI(file.getPath());
+        MCRCategory category = MCRXMLTransformer.getCategory(xml);
         DAO.addCategory(null, category);
     }
-    
+
     /**
      * Replaces a classification with a new version
-     * @param filename file in mcrclass xml format
+     * 
+     * @param filename
+     *            file in mcrclass xml format
      * @see MCRCategoryDAO#replaceCategory(MCRCategory)
      */
-    public static void updateFromFile(String filename){
-        File file=new File(filename);
-        Document xml=MCRXMLHelper.parseURI(file.getPath());
-        MCRCategory category=MCRXMLTransformer.getCategory(xml);
+    public static void updateFromFile(String filename) {
+        File file = new File(filename);
+        Document xml = MCRXMLHelper.parseURI(file.getPath());
+        MCRCategory category = MCRXMLTransformer.getCategory(xml);
         DAO.replaceCategory(category);
     }
 
