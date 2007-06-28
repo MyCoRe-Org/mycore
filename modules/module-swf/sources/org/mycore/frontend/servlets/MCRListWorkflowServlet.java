@@ -55,7 +55,7 @@ import org.mycore.frontend.workflow.MCRSimpleWorkflowManager;
  * <p />
  * &gt;mcr_workflow type="..." step="..."&lt; <br />
  * &gt;item ID="..."&lt; <br />
- * &gt;label&lt;Die 99 582 am Lokschuppen in Schönheide&gt;/label&lt; <br />
+ * &gt;label&lt;Die 99 582 am Lokschuppen in Schï¿½nheide&gt;/label&lt; <br />
  * &gt;data&lt;Jens Kupferschmidt&gt;/data&lt; <br />
  * &gt;data&lt;2004-06-08&gt;/data&lt; <br />
  * &gt;derivate ID="..." label="..."&lt; <br />
@@ -70,6 +70,9 @@ import org.mycore.frontend.workflow.MCRSimpleWorkflowManager;
  * @version $Revision$ $Date$
  */
 public class MCRListWorkflowServlet extends MCRServlet {
+
+    private static final long serialVersionUID = 1L;
+
     // The LOGGER
     private static Logger LOGGER = Logger.getLogger(MCRListWorkflowServlet.class.getName());
 
@@ -128,10 +131,10 @@ public class MCRListWorkflowServlet extends MCRServlet {
         String dirname = WFM.getDirectoryPath(type);
 
         // read the derivate XML files
-        ArrayList derobjid = new ArrayList();
-        ArrayList derderid = new ArrayList();
-        ArrayList dermain = new ArrayList();
-        ArrayList derlabel = new ArrayList();
+        ArrayList<String> derobjid = new ArrayList<String>();
+        ArrayList<String> derderid = new ArrayList<String>();
+        ArrayList<String> dermain = new ArrayList<String>();
+        ArrayList<String> derlabel = new ArrayList<String>();
         org.jdom.Document der_in;
         org.jdom.Element der;
         String mainfile;
@@ -185,6 +188,9 @@ public class MCRListWorkflowServlet extends MCRServlet {
                 derlabel.add(label);
                 dermain.add(mainfile);
             } catch (Exception ex) {
+                if (LOGGER.isDebugEnabled()) {
+                    ex.printStackTrace();
+                }
                 LOGGER.warn("Can't parse workflow file " + dername);
             }
         }
@@ -210,7 +216,7 @@ public class MCRListWorkflowServlet extends MCRServlet {
         // initialize transformer
         MCRXSLTransformation transform = MCRXSLTransformation.getInstance();
         TransformerHandler handler = transform.getTransformerHandler(transform.getStylesheet(new StreamSource(styleFile)));
-        Map parameters = new HashMap();
+        Map<String,String> parameters = new HashMap<String,String>();
         parameters.put("DefaultLang", DefaultLang);
         parameters.put("CurrentLang", lang);
         MCRXSLTransformation.setParameters(handler, parameters);
@@ -244,10 +250,10 @@ public class MCRListWorkflowServlet extends MCRServlet {
                     writedb = service.getRule(j).getCondition();
                     bwritedb = AI.checkPermission(writedb);
                 }
-
-                // LOGGER.debug("Workflow file "+wfile+" was readed.");
             } catch (Exception ex) {
-                // ex.printStackTrace();
+                if (LOGGER.isDebugEnabled()) {
+                    ex.printStackTrace();
+                }
                 LOGGER.warn("Can't parse workflow file " + wfile);
 
                 continue;
