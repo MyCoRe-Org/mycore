@@ -111,16 +111,18 @@ public class MCRHIBXMLStore implements MCRXMLTableInterface {
         Session session = getSession();
         MCRXMLTABLEPK pk = new MCRXMLTABLEPK(mcrid.getId(), version);
         MCRXMLTABLE tab = (MCRXMLTABLE) session.get(MCRXMLTABLE.class, pk);
-        if (tab == null) {
+        if (tab != null) {
+            //Object is in session: maybe delete before?
+            session.evict(tab);
+            MCRHIBConnection.instance().flushSession();
+        } else {
             tab = new MCRXMLTABLE();
             tab.setKey(pk);
+            tab.setType(this.type);
         }
-        tab.setType(this.type);
         tab.setXmlByteArray(xml);
-
         logger.debug("Inserting " + mcrid.getId() + "/" + version + "/" + this.type + " into database");
-
-        session.saveOrUpdate(tab);
+        session.save(tab);
     }
 
     /**
