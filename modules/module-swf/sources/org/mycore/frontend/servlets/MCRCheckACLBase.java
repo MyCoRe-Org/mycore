@@ -25,7 +25,6 @@ package org.mycore.frontend.servlets;
 
 import java.io.InputStream;
 import java.net.URL;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
