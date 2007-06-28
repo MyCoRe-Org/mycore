@@ -193,7 +193,7 @@ public class MCRCommandLineInterface {
             } else {
                 command = (String) commandQueue.firstElement();
                 commandQueue.removeElementAt(0);
-                System.out.print(system + "> " + command );
+                System.out.println(system + "> " + command );
             }
 
             processCommand(command);
