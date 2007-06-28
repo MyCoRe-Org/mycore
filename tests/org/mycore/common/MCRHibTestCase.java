@@ -55,15 +55,19 @@ public abstract class MCRHibTestCase extends MCRTestCase {
         System.setProperty("MCR.Hibernate.Configuration", "org/mycore/hibernate.cfg.xml");
         final MCRHIBConnection connection = MCRHIBConnection.instance();
         sessionFactory = connection.getSessionFactory();
-        SchemaExport export=new SchemaExport(connection.getConfiguration());
+        SchemaExport export = new SchemaExport(connection.getConfiguration());
         export.create(false, true);
         beginTransaction();
+        sessionFactory.getCurrentSession().clear();
     }
 
     @Override
     protected void tearDown() throws Exception {
         super.tearDown();
         endTransaction();
+        sessionFactory.getCurrentSession().close();
+        sessionFactory.close();
+        sessionFactory = null;
     }
 
     protected void beginTransaction() {

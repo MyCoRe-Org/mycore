@@ -26,7 +26,9 @@ package org.mycore.datamodel.classifications2.impl;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.HashSet;
+import java.util.List;
 
+import org.hibernate.criterion.Projections;
 import org.jdom.Document;
 
 import org.mycore.backend.hibernate.MCRHIBConnection;
@@ -47,10 +49,13 @@ public class MCRCategoryDAOImplTest extends MCRHibTestCase {
 
     private static final MCRCategoryDAOImpl DAO = new MCRCategoryDAOImpl();
 
+    private MCRCategory category;
+
     @Override
     protected void setUp() throws Exception {
         // TODO Auto-generated method stub
         super.setUp();
+        loadWorldClassification();
     }
 
     public void testCalculateLeftRightAndLevel() {
@@ -75,12 +80,7 @@ public class MCRCategoryDAOImplTest extends MCRHibTestCase {
         assertEquals(2, co4.getLevel());
     }
 
-    public void testAddCategory() throws MCRException, URISyntaxException {
-        URL worlClassUrl = this.getClass().getResource(WORLD_CLASS_RESOURCE_NAME);
-        System.out.println("Using URL: " + worlClassUrl);
-        Document xml = MCRXMLHelper.parseURI(worlClassUrl.toURI().toString());
-        MCRCategory category = MCRXMLTransformer.getCategory(xml);
-        System.out.println(MCRStringTransformer.getString(category));
+    public void testAddCategory() throws MCRException {
         DAO.addCategory(null, category);
         endTransaction();
         beginTransaction();
@@ -99,6 +99,80 @@ public class MCRCategoryDAOImplTest extends MCRHibTestCase {
         // clear from cache
         sessionFactory.getCurrentSession().clear();
         assertTrue("Exist check failed for Category " + india.getId(), DAO.exist(india.getId()));
+        MCRCategoryImpl rootCategory = (MCRCategoryImpl) sessionFactory.getCurrentSession().get(MCRCategoryImpl.class,
+                ((MCRCategoryImpl) category).getInternalID());
+        List<MCRCategoryImpl> allNodes = (List<MCRCategoryImpl>) sessionFactory.getCurrentSession().createCriteria(MCRCategoryImpl.class).list();
+        System.out.printf("Rowcount: %d\n", allNodes.size());
+        for (MCRCategoryImpl node : allNodes) {
+            System.out.printf("%d, %s, %d, %d, %s\n", node.getInternalID(), node.getId().getRootID(), node.getLevel(), node.getPositionInParent(), node.getId()
+                    .getID());
+        }
+        assertEquals("Category count does not match.", category.getChildren().size(), rootCategory.getChildren().size());
+    }
+
+    public void testDeleteCategory() {
+        DAO.addCategory(null, category);
+        endTransaction();
+        beginTransaction();
+        // clear from cache
+        sessionFactory.getCurrentSession().clear();
+        DAO.deleteCategory(category.getId());
+        endTransaction();
+        beginTransaction();
+        // clear from cache
+        sessionFactory.getCurrentSession().clear();
+        // check if classification is present
+        assertFalse("Category is not deleted: " + category.getId(), DAO.exist(category.getId()));
+        // check if any subcategory is present
+        assertFalse("Category is not deleted: " + category.getChildren().get(0).getId(), DAO.exist(category.getChildren().get(0).getId()));
+    }
+
+    public void testGetCategoriesByLabel() {
+        DAO.addCategory(null, category);
+        endTransaction();
+        beginTransaction();
+        // clear from cache
+        sessionFactory.getCurrentSession().clear();
+        MCRCategory find = category.getChildren().get(0).getChildren().get(0);
+        MCRCategory dontFind = category.getChildren().get(1);
+        MCRLabel label = find.getLabels().iterator().next();
+        List<MCRCategory> results = DAO.getCategoriesByLabel(category.getId(), label.getLang(), label.getText());
+        assertFalse("No search results found", results.isEmpty());
+        assertTrue("Could not find Category: " + find.getId(), results.get(0).getLabels().contains(label));
+        assertTrue("No search result expected.", DAO.getCategoriesByLabel(dontFind.getId(), label.getLang(), label.getText()).isEmpty());
+    }
+
+    public void testGetCategory() {
+        DAO.addCategory(null, category);
+        endTransaction();
+        beginTransaction();
+        // clear from cache
+        sessionFactory.getCurrentSession().clear();
+        MCRCategory rootCategory = DAO.getCategory(category.getId(), 0);
+        assertTrue("Children present with child Level 0.", rootCategory.getChildren().isEmpty());
+        rootCategory = DAO.getCategory(category.getId(), 1);
+        assertTrue("Children present with child Level 1.", rootCategory.getChildren().get(0).getChildren().isEmpty());
+        System.out.println(MCRStringTransformer.getString(rootCategory));
+        assertEquals("Category count does not match with child Level 1.", category.getChildren().size(), rootCategory.getChildren().size());
+        rootCategory = DAO.getCategory(category.getId(), -1);
+        assertEquals("Did not get all categories.", countNodes(category), countNodes(rootCategory));
+    }
+
+    /**
+     * @throws URISyntaxException
+     */
+    private void loadWorldClassification() throws URISyntaxException {
+        URL worlClassUrl = this.getClass().getResource(WORLD_CLASS_RESOURCE_NAME);
+        Document xml = MCRXMLHelper.parseURI(worlClassUrl.toURI().toString());
+        category = MCRXMLTransformer.getCategory(xml);
+    }
+
+    private static int countNodes(MCRCategory category) {
+        int i = 1;
+        for (MCRCategory child : category.getChildren()) {
+            i += countNodes(child);
+        }
+        return i;
     }
 
 }
