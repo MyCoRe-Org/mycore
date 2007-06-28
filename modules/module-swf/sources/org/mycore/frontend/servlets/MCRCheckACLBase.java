@@ -25,6 +25,7 @@ package org.mycore.frontend.servlets;
 
 import java.io.InputStream;
 import java.net.URL;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,6 +33,7 @@ import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
+import org.mycore.common.MCRUtils;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.editor.MCREditorSubmission;
 import org.mycore.frontend.editor.MCRRequestParameters;
@@ -169,6 +171,14 @@ abstract public class MCRCheckACLBase extends MCRCheckBase {
                                                 }
                                                 if (condfield.equals("group")) {
                                                     if (!UM.existGroup(condvalue)) {
+                                                        ((org.jdom.Element) inbool.get(j)).removeContent(incond);
+                                                        k--;
+                                                        l--;
+                                                        continue;
+                                                    }
+                                                }
+                                                if (condfield.equals("date")) {
+                                                    if (MCRUtils.covertDateToISO(condvalue) == null) {
                                                         ((org.jdom.Element) inbool.get(j)).removeContent(incond);
                                                         k--;
                                                         l--;
