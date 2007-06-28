@@ -60,7 +60,7 @@ public class MCRHttpSessionListener implements HttpSessionListener, HttpSessionB
      */
     public void sessionDestroyed(HttpSessionEvent hse) {
         // clear MCRSessions
-        LOGGER.info("HttpSession will be destroyed, clearing up.");
+        LOGGER.debug("HttpSession will be destroyed, clearing up.");
         HttpSession httpSession = hse.getSession();
         LOGGER.debug("Removing any MCRSessions from HttpSession");
         for (Enumeration e = httpSession.getAttributeNames(); e.hasMoreElements();) {
@@ -72,7 +72,7 @@ public class MCRHttpSessionListener implements HttpSessionListener, HttpSessionB
                 httpSession.removeAttribute(key);
             }
         }
-        LOGGER.info("Clearing up done");
+        LOGGER.debug("Clearing up done");
     }
 
     public void valueBound(HttpSessionBindingEvent hsbe) {
