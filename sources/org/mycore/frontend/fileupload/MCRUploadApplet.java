@@ -23,6 +23,7 @@
 
 package org.mycore.frontend.fileupload;
 
+import java.applet.AppletContext;
 import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -32,7 +33,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.File;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashSet;
 import java.util.Locale;
@@ -220,9 +220,13 @@ public class MCRUploadApplet extends JApplet {
 
     void returnToURL() {
         try {
-            getAppletContext().showDocument(new URL(targetURL));
-        } catch (MalformedURLException exc) {
-            System.out.println("MALFORMED URL: " + targetURL);
+            URL url = new URL(targetURL);
+            AppletContext context = this.getAppletContext();
+            context.showDocument(url);
+        } catch (Exception exc) {
+            System.out.println("Unable to return to URL " + targetURL);
+            System.out.println(exc.getMessage());
+            exc.printStackTrace();
         }
     }
 
