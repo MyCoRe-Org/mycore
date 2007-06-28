@@ -109,9 +109,12 @@ public class MCRHIBXMLStore implements MCRXMLTableInterface {
         }
 
         Session session = getSession();
-        MCRXMLTABLE tab = new MCRXMLTABLE();
-        tab.setId(mcrid.getId());
-        tab.setVersion(version);
+        MCRXMLTABLEPK pk = new MCRXMLTABLEPK(mcrid.getId(), version);
+        MCRXMLTABLE tab = (MCRXMLTABLE) session.get(MCRXMLTABLE.class, pk);
+        if (tab == null) {
+            tab = new MCRXMLTABLE();
+            tab.setKey(pk);
+        }
         tab.setType(this.type);
         tab.setXmlByteArray(xml);
 
@@ -174,7 +177,7 @@ public class MCRHIBXMLStore implements MCRXMLTableInterface {
     public final byte[] retrieve(MCRObjectID mcrid, int version) throws MCRPersistenceException {
         Session session = getSession();
         MCRXMLTABLEPK pk = new MCRXMLTABLEPK(mcrid.getId(), version);
-        return ((MCRXMLTABLE)session.get(MCRXMLTABLE.class, pk)).getXmlByteArray();
+        return ((MCRXMLTABLE) session.get(MCRXMLTABLE.class, pk)).getXmlByteArray();
     }
 
     /**
