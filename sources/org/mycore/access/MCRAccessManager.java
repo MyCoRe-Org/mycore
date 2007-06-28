@@ -198,8 +198,19 @@ public class MCRAccessManager {
      * @return
      */
     public static boolean checkPermission(String id, String permission) {
-        return ACCESS_STRATEGY.checkPermission(id, permission);   
-    }
+      return ACCESS_STRATEGY.checkPermission(id, permission);   
+  }
+
+    /**
+     * determines whether the current user has the permission to perform a
+     * certain action.
+     * 
+     * @param permission
+     * @return
+     */
+    public static boolean checkPermission(String permission) {
+      return getAccessImpl().checkPermission(permission);   
+  }
 
     /**
      * checks whether the current user has the permission to read/see a derivate
