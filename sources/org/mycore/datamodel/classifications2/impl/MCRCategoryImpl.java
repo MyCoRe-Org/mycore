@@ -250,12 +250,14 @@ public class MCRCategoryImpl extends MCRAbstractCategoryImpl implements Serializ
             catImpl.setRoot(root);
             return catImpl;
         }
+        LOGGER.debug("wrap Category: " + category.getId());
         catImpl = new MCRCategoryImpl();
         catImpl.setId(category.getId());
         catImpl.labels = category.getLabels();
         catImpl.parent = parent;
         catImpl.setRoot(root);
-        catImpl.getChildren().addAll(category.getChildren());
+        catImpl.children = new ArrayList<MCRCategory>(category.getChildren().size());
+        catImpl.getChildren().addAll(wrapCategories(category.getChildren(), catImpl, root));
         return catImpl;
     }
 
