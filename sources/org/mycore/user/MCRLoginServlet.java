@@ -123,7 +123,14 @@ public class MCRLoginServlet extends MCRServlet {
         root.addContent(new org.jdom.Element("guest_pwd").addContent(GUEST_PWD));
 
         try {
-            loginOk = ((uid != null) && (pwd != null) && MCRUserMgr.instance().login(uid, pwd));
+            loginOk = ((uid != null) && (pwd != null));
+            if (loginOk) {
+                loginOk = MCRUserMgr.instance().existUser(uid);
+                if (!loginOk)
+                    root.setAttribute("unknown_user", "true");
+            }
+            if (loginOk)
+                loginOk = MCRUserMgr.instance().login(uid, pwd);
 
             // If the login attempt was successfull, change the user ID and
             // forward to the
