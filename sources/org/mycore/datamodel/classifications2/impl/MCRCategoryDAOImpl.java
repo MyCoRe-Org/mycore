@@ -151,6 +151,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
      */
     @SuppressWarnings("unchecked")
     public List<MCRCategory> getChildren(MCRCategoryID cid) {
+        LOGGER.info("Get children of category: "+cid);
         if (!exist(cid)) {
             return new MCRCategoryImpl.ChildList(null, null);
         }
@@ -405,14 +406,17 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
 
     private static MCRCategoryImpl copyDeep(MCRCategoryImpl category, int level) {
         MCRCategoryImpl newCateg = new MCRCategoryImpl();
-        int childAmount = (level > 0) ? category.getChildren().size() : 0;
+        int childAmount = (level != 0) ? category.getChildren().size() : 0;
         newCateg.setChildren(new ArrayList<MCRCategory>(childAmount));
         newCateg.setId(category.getId());
         newCateg.setLabels(category.getLabels());
         newCateg.setRoot(category.root);
         newCateg.setURI(category.getURI());
+        System.out.printf("Children size: %d\n", childAmount);
         if (childAmount > 0) {
+            int i = 0;
             for (MCRCategory child : category.getChildren()) {
+                System.out.printf("Child %d\n", ++i);
                 newCateg.getChildren().add(copyDeep((MCRCategoryImpl) child, level - 1));
             }
         }
