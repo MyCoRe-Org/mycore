@@ -112,7 +112,7 @@ public class MCRHIBXMLStore implements MCRXMLTableInterface {
         MCRXMLTABLEPK pk = new MCRXMLTABLEPK(mcrid.getId(), version);
         MCRXMLTABLE tab = (MCRXMLTABLE) session.get(MCRXMLTABLE.class, pk);
         if (tab != null) {
-            //Object is in session: maybe delete before?
+            // Object is in session: maybe delete before?
             session.evict(tab);
             MCRHIBConnection.instance().flushSession();
         } else {
@@ -201,6 +201,7 @@ public class MCRHIBXMLStore implements MCRXMLTableInterface {
     public final synchronized int getNextFreeIdInt(String project, String type) throws MCRPersistenceException {
 
         Session session = getSession();
+        MCRHIBConnection.instance().flushSession();
         List<?> l = session.createQuery("select max(key.id) from " + classname + " where MCRID like '" + project + "_" + type + "%'").list();
         if (l.size() > 0 && l.get(0) != null) {
             String max = (String) l.get(0);
@@ -224,6 +225,10 @@ public class MCRHIBXMLStore implements MCRXMLTableInterface {
         boolean exists = false;
 
         Session session = getSession();
+        MCRXMLTABLEPK pk = new MCRXMLTABLEPK(mcrid.getId(), version);
+        if (session.get(MCRXMLTABLE.class, pk)!=null){
+            return true;
+        }
         StringBuffer query = new StringBuffer("select key.id from MCRXMLTABLE where MCRID = '").append(mcrid.getId()).append("' and MCRVERSION = ").append(
                 version);
         List<?> l = session.createQuery(query.toString()).list();
