@@ -72,12 +72,12 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
             levelStart = parent.getLevel() + 1;
             leftStart = parent.getLeft() + 1;
         }
-        LOGGER.info("Calculating LEFT,RIGHT and LEVEL attributes...");
+        LOGGER.debug("Calculating LEFT,RIGHT and LEVEL attributes...");
         final MCRCategoryImpl wrapCategory = MCRCategoryImpl.wrapCategory(category, parent, (parent == null) ? category.getRoot() : parent.getRoot());
         calculateLeftRightAndLevel(wrapCategory, leftStart, levelStart);
         // alway add +1 for the current node
         int nodes = 1 + (wrapCategory.getRight() - wrapCategory.getLeft()) / 2;
-        LOGGER.info("Calculating LEFT,RIGHT and LEVEL attributes. Done! Nodes: " + nodes);
+        LOGGER.debug("Calculating LEFT,RIGHT and LEVEL attributes. Done! Nodes: " + nodes);
         if (parentID != null) {
             final int increment = nodes * 2;
             updateLeftRightValue(connection, leftStart, increment);
@@ -90,17 +90,17 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
     public void deleteCategory(MCRCategoryID id) {
         final MCRHIBConnection connection = MCRHIBConnection.instance();
         Session session = connection.getSession();
-        LOGGER.info("Will get: " + id);
+        LOGGER.debug("Will get: " + id);
         MCRCategoryImpl category = getByNaturalID(session, id);
         if (category == null) {
             throw new MCRPersistenceException("Category " + id + " was not found. Delete aborted.");
         }
-        LOGGER.info("Will delete: " + category.getId());
+        LOGGER.debug("Will delete: " + category.getId());
         MCRCategory parent = category.parent;
         category.detachFromParent();
         session.delete(category);
         if (parent != null) {
-            LOGGER.info("Left: " + category.getLeft() + " Right: " + category.getRight());
+            LOGGER.debug("Left: " + category.getLeft() + " Right: " + category.getRight());
             // always add +1 for the currentNode
             int nodes = 1 + (category.getRight() - category.getLeft()) / 2;
             final int increment = nodes * -2;
@@ -139,7 +139,6 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
 
     @SuppressWarnings("unchecked")
     public MCRCategory getCategory(MCRCategoryID id, int childLevel) {
-        // TODO Auto-generated method stub
         Session session = MCRHIBConnection.instance().getSession();
         MCRCategoryImpl category = getByNaturalID(session, id);
         return copyDeep(category, childLevel);
@@ -212,11 +211,11 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         boolean updateOldParent = (oldParent.getLeft() < newParent.getLeft() || oldParent.getRight() > newParent.getRight()) ? true : false;
         boolean updateNewParent = (!oldParent.getId().equals(newParent.getId())) ? true : false;
         if (updateOldParent) {
-            LOGGER.info("Updating old parent " + oldParent.getId());
+            LOGGER.debug("Updating old parent " + oldParent.getId());
             session.update(oldParent);
         }
         if (updateNewParent) {
-            LOGGER.info("Updating new parent " + newParent.getId());
+            LOGGER.debug("Updating new parent " + newParent.getId());
             session.update(newParent);
         }
         if (movedToRight)
@@ -261,7 +260,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         }
         // calculate left, right and level values
         int diffNodes = newMap.size() - oldMap.size();
-        LOGGER.info("Update changes classification node size by: " + diffNodes);
+        LOGGER.debug("Update changes classification node size by: " + diffNodes);
         int increment = diffNodes * 2;
         if (increment != 0 && oldCategory.isCategory()) {
             final int left = getRightSiblingOrOfAncestor((MCRCategoryImpl) oldCategory.getParent(), oldCategory.getPositionInParent() + 1).getLeft();
@@ -316,7 +315,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         co.setLeft(leftStart);
         co.setLevel(levelStart);
         for (MCRCategory child : co.getChildren()) {
-            LOGGER.info(child.getId());
+            LOGGER.debug(child.getId());
             curValue = calculateLeftRightAndLevel((MCRCategoryImpl) child, ++curValue, nextLevel);
         }
         co.setRight(++curValue);
@@ -422,8 +421,6 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
 
     private static MCRCategoryImpl getByNaturalID(Session session, MCRCategoryID id) {
         final Criteria criteria = session.createCriteria(CATEGRORY_CLASS).setProjection(Projections.id());
-        LOGGER.info("Cache is GET enabled: " + session.getCacheMode().isGetEnabled());
-        LOGGER.info("Cache is PUT enabled: " + session.getCacheMode().isPutEnabled());
         Integer internalID = (Integer) criteria.setCacheable(true).add(MCRCategoryExpression.eq(id)).uniqueResult();
         return (MCRCategoryImpl) session.get(CATEGRORY_CLASS, internalID);
     }
@@ -461,7 +458,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
     private static void updateLeftRightValue(MCRHIBConnection connection, int left, final int increment) {
         Session session = connection.getSession();
         connection.flushSession();
-        LOGGER.info("LEFT AND RIGHT values need updates. Left=" + left + ", increment by: " + increment);
+        LOGGER.debug("LEFT AND RIGHT values need updates. Left=" + left + ", increment by: " + increment);
         Query leftQuery = session.getNamedQuery(CATEGRORY_CLASS.getName() + ".updateLeft");
         leftQuery.setInteger("left", left);
         leftQuery.setInteger("increment", increment);
@@ -471,13 +468,13 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         rightQuery.setInteger("increment", increment);
         int rightChanges = rightQuery.executeUpdate();
         connection.flushSession();
-        LOGGER.info("Updated " + leftChanges + " left and " + rightChanges + " right values.");
+        LOGGER.debug("Updated " + leftChanges + " left and " + rightChanges + " right values.");
     }
 
     private static void updateLeftRightValueMax(MCRHIBConnection connection, int left, int maxLeft, int right, int maxRight, final int increment) {
         Session session = connection.getSession();
         connection.flushSession();
-        LOGGER.info("LEFT AND RIGHT values need updates. Left=" + left + ", increment by: " + increment);
+        LOGGER.debug("LEFT AND RIGHT values need updates. Left=" + left + ", increment by: " + increment);
         Query leftQuery = session.getNamedQuery(CATEGRORY_CLASS.getName() + ".updateLeftMax");
         leftQuery.setInteger("left", left);
         leftQuery.setInteger("max", maxLeft);
@@ -489,7 +486,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         rightQuery.setInteger("increment", increment);
         int rightChanges = rightQuery.executeUpdate();
         connection.flushSession();
-        LOGGER.info("Updated " + leftChanges + " left and " + rightChanges + " right values.");
+        LOGGER.debug("Updated " + leftChanges + " left and " + rightChanges + " right values.");
     }
 
     private static void updateMoveLeft(MCRHIBConnection connection, MCRCategoryImpl oldParent, MCRCategoryImpl newParent, int left, int right, int index) {
