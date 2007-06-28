@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!-- =================================================================== -->
+<!-- 
+         A small installer tool for MyCoRe and DocPortal
+
+         Downloads mycore, docportal and content/defaultsample
+         Builds docportal and loads sample content 
+         Starts webserver and downloads the DocPortal homepage
+         $Revision: 1.1 $ $Date: 2007-06-28 14:28:27 $  
+--> 
+<!-- =================================================================== -->
+
+<project name="DocPortalInstaller" default="install" basedir=".">
+  <property name="destdir"     value="c:/java/install" />
+  <property name="mailserver"  value="mailout.uni-due.de" />
+  <property name="mailaddress" value="luetzenkirchen@ub.uni-duisburg-essen.de" />
+
+  <property name="cvsroot" value=":pserver:anoncvs@server.mycore.de:/cvs" />	
+
+  <target name="install" >
+  	<echo>
+
+  	========================================	
+  		Prepare ...
+  	========================================	
+
+  	</echo>
+  	<delete dir="${destdir}" />
+  	<mkdir dir="${destdir}" />
+  	<echo>
+
+  	========================================	
+  		CVS CheckOut ...
+  	========================================	
+
+  	</echo>
+    <cvs cvsroot="${cvsroot}" command="co -P mycore docportal content/defaultsample" dest="${destdir}" />
+  	<echo>
+
+  	========================================	
+  		Build mycore.jar ...
+  	========================================	
+
+  	</echo>
+    <copy file="${destdir}/mycore/config/build.properties.template" tofile="${destdir}/mycore/config/build.properties" />
+  	<ant dir="${destdir}/mycore" antfile="build.xml" target="jar" inheritAll="false" inheritRefs="false" />  	
+  	<echo>
+
+  	========================================	
+  		Edit mycore.properties.private ...
+  	========================================	
+
+  	</echo>
+  	<copy file="${destdir}/docportal/config/mycore.properties.private.template" tofile="${destdir}/docportal/config/mycore.properties.private" />
+  	<replace file="${destdir}/docportal/config/mycore.properties.private" token="MCR.basedir=/home/mcradmin/docportal" value="MCR.basedir=${destdir}/docportal" />
+  	<replace file="${destdir}/docportal/config/mycore.properties.private" token="MCR.Mail.Server=my-mail-host.de" value="MCR.Mail.Server=${mailserver}" />
+  	<replace file="${destdir}/docportal/config/mycore.properties.private" token="MCR.Mail.Address=" value="MCR.Mail.Address=${mailaddress}" />
+  	<replace file="${destdir}/docportal/config/mycore.properties.private" token="MCR.WebService.Admin=" value="MCR.WebService.Admin=wsadmin" />
+  	<replace file="${destdir}/docportal/config/mycore.properties.private" token="MCR.WebService.AdminPasswd=" value="MCR.WebService.AdminPasswd=wspasswd" />
+  	<copy file="${destdir}/docportal/config/hibernate/hibernate.cfg.xml.template" tofile="${destdir}/docportal/config/hibernate/hibernate.cfg.xml" />
+  	<ant dir="${destdir}/docportal" antfile="build.xml" target="info"               inheritAll="false" inheritRefs="false" />  	
+  	<echo>
+
+  	========================================	
+  		Create directories ...
+  	========================================	
+
+  	</echo>
+  	<ant dir="${destdir}/docportal" antfile="build.xml" target="create.directories" inheritAll="false" inheritRefs="false" />  	
+  	<echo>
+
+  	========================================	
+  		Create XML Schema files ...
+  	========================================	
+
+  	</echo>
+  	<ant dir="${destdir}/docportal" antfile="build.xml" target="create.schema"      inheritAll="false" inheritRefs="false" />  	
+  	<echo>
+
+  	========================================	
+  		Build third party jar ...
+  	========================================	
+
+  	</echo>
+  	<ant dir="${destdir}/docportal" antfile="build.xml" target="jar"                inheritAll="false" inheritRefs="false" />  	
+  	<echo>
+
+  	========================================	
+  		Create shell scripts ...
+  	========================================	
+
+  	</echo>
+  	<ant dir="${destdir}/docportal" antfile="build.xml" target="create.scripts"     inheritAll="false" inheritRefs="false" />  	
+  	<echo>
+
+  	========================================	
+  		Start HSQLDB ...
+  	========================================	
+
+  	</echo>
+  	<exec executable="cmd" spawn="true">
+  	    <arg value="/c"/>
+  	    <arg value="${destdir}/docportal/build/bin/hsqldbstart.cmd"/>
+  	    <arg value="-p"/>
+    </exec>
+  	<sleep seconds="5" />
+  	<echo>
+
+  	========================================	
+  		Create SQL tables ...
+  	========================================	
+
+  	</echo>
+  	<ant dir="${destdir}/docportal" antfile="build.xml" target="create.metastore"     inheritAll="false" inheritRefs="false" />  	
+  	<echo>
+
+  	========================================	
+  		Create users ...
+  	========================================	
+
+  	</echo>
+  	<ant dir="${destdir}/docportal" antfile="build.xml" target="create.users"         inheritAll="false" inheritRefs="false" />  	
+  	<echo>
+
+  	========================================	
+  		Create default rules ...
+  	========================================	
+
+  	</echo>
+  	<ant dir="${destdir}/docportal" antfile="build.xml" target="create.default-rules" inheritAll="false" inheritRefs="false" />  	
+  	<echo>
+
+  	========================================	
+  		Load classifications ...
+  	========================================	
+
+  	</echo>
+  	<ant dir="${destdir}/docportal" antfile="build.xml" target="create.class"         inheritAll="false" inheritRefs="false" />  	
+  	<echo>
+
+  	========================================	
+  		Generate key for applet signing ...
+  	========================================	
+
+  	</echo>
+  	<ant dir="${destdir}/docportal" antfile="build.xml" target="create.genkeys"       inheritAll="false" inheritRefs="false" />  	
+  	<echo>
+
+  	========================================	
+  		Build web application ...
+  	========================================	
+
+  	</echo>
+  	<ant dir="${destdir}/docportal" antfile="build.xml" target="webapps"              inheritAll="false" inheritRefs="false" />  	
+  	<echo>
+
+  	========================================	
+  		Load default sample content ...
+  	========================================	
+
+  	</echo>
+  	<ant dir="${destdir}/content/defaultsample" antfile="build.xml" target="load" inheritAll="false" inheritRefs="false" />  	
+  	<echo>
+
+  	========================================	
+  		Start web application server ...
+  	========================================	
+
+  	</echo>
+  	<exec executable="cmd" spawn="true">
+  	    <arg value="/c"/>
+  	    <arg value="${destdir}/docportal/build/bin/jettystart.cmd"/>
+  	    <arg value="-p"/>
+    </exec>
+  	<sleep seconds="5" />
+  	<echo>
+
+  	========================================	
+  		Download DocPortal homepage ...
+  	========================================	
+
+  	</echo>
+  	<get src="http://localhost:8291/content/below/index.xml" dest="${destdir}/homepage.html" verbose="on" />
+  	<echo>
+
+  	========================================	
+  		Stop web application server ...
+  	========================================	
+
+  	</echo>
+  	<exec executable="cmd">
+  	    <arg value="/c"/>
+  	    <arg value="${destdir}/docportal/build/bin/jettystop.cmd"/>
+  	    <arg value="-p"/>
+    </exec>
+  	<echo>
+
+  	========================================	
+  		Stop HSQLDB ...
+  	========================================	
+
+  	</echo>
+  	<exec executable="cmd">
+  	    <arg value="/c"/>
+  	    <arg value="${destdir}/docportal/build/bin/hsqldbstop.cmd"/>
+  	    <arg value="-p"/>
+    </exec>
+  	<echo>
+
+  	========================================	
+  		Show HTML downloaded ...
+  	========================================	
+
+  	</echo>
+  	<loadfile property="homepage" srcFile="${destdir}/homepage.html" />
+  	<echo>${homepage}</echo>
+  	<echo>
+
+  	========================================	
+  		THE END ...
+  	========================================	
+
+  	</echo>
+  </target>
+</project>
