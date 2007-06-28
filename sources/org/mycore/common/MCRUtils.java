@@ -25,6 +25,7 @@ package org.mycore.common;
 
 import static org.mycore.common.MCRConstants.DEFAULT_ENCODING;
 import static org.mycore.common.MCRConstants.SUPPORTED_LANG;
+import static org.mycore.common.MCRConstants.DATE_FORMAT;
 
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
@@ -43,7 +44,6 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Locale;
 import java.util.Properties;
 
 import javax.xml.parsers.SAXParser;
@@ -63,7 +63,7 @@ import org.xml.sax.helpers.DefaultHandler;
  * programming API.
  * 
  * @author Jens Kupferschmidt
- * @author Frank Lützenkirchen
+ * @author Frank Lï¿½tzenkirchen
  * @author Thomas Scheffler (yagee)
  * 
  * @version $Revision$ $Date$
@@ -104,132 +104,6 @@ public class MCRUtils {
     }
 
     /**
-     * The method return the index of a language string in the statich field
-     * MCRDefault.SUPPORTED_LANG. If the lang is not supported -1 was returned.
-     * 
-     * @param lang
-     *            the language string
-     * @return the index if the language was supported, otherwise -1
-     */
-    public static final int getPositionLang(String lang) {
-        if ((lang == null) || ((lang = lang.trim()).length() == 0)) {
-            return -1;
-        }
-
-        for (int i = 0; i < SUPPORTED_LANG.length; i++) {
-            if (lang.equals(SUPPORTED_LANG[i])) {
-                return i;
-            }
-        }
-
-        return -1;
-    }
-
-    /**
-     * The method return the instance of DateFormat for the given language.
-     * 
-     * @param lang
-     *            the language string
-     * @return the instance of DateFormat or null
-     */
-    public static final DateFormat getDateFormat(String lang) {
-        int i = getPositionLang(lang);
-
-        if (i == -1) {
-            return DateFormat.getDateInstance(DateFormat.MEDIUM, Locale.getDefault());
-        }
-
-        return MCRConstants.DATE_FORMAT[i];
-    }
-
-    /**
-     * The method check a date string for the pattern <em>tt.mm.jjjj</em>.
-     * 
-     * @param date
-     *            the date string
-     * @return true if the pattern is correct, otherwise false
-     */
-    public static final boolean isDateInDe(String date) {
-        if ((date == null) || ((date = date.trim()).length() == 0)) {
-            return false;
-        }
-
-        date = date.trim().toUpperCase();
-
-        if (date.length() != 10) {
-            return false;
-        }
-
-        try {
-            DateFormat df = getDateFormat("de");
-            GregorianCalendar newdate = new GregorianCalendar();
-            newdate.setTime(df.parse(date));
-        } catch (ParseException e) {
-            return false;
-        }
-
-        return true;
-    }
-
-    /**
-     * The method check a date string for the pattern <em>yyyy-dd-mm</em>.
-     * 
-     * @param date
-     *            the date string
-     * @return true if the pattern is correct, otherwise false
-     */
-    public static final boolean isDateInEn_UK(String date) {
-        if ((date == null) || ((date = date.trim()).length() == 0)) {
-            return false;
-        }
-
-        date = date.trim().toUpperCase();
-
-        if (date.length() != 10) {
-            return false;
-        }
-
-        try {
-            DateFormat df = getDateFormat("en-UK");
-            GregorianCalendar newdate = new GregorianCalendar();
-            newdate.setTime(df.parse(date));
-        } catch (ParseException e) {
-            return false;
-        }
-
-        return true;
-    }
-
-    /**
-     * The method check a date string for the pattern <em>yyyy/dd/mm</em>.
-     * 
-     * @param date
-     *            the date string
-     * @return true if the pattern is correct, otherwise false
-     */
-    public static final boolean isDateInEn_US(String date) {
-        if ((date == null) || ((date = date.trim()).length() == 0)) {
-            return false;
-        }
-
-        date = date.trim().toUpperCase();
-
-        if (date.length() != 10) {
-            return false;
-        }
-
-        try {
-            DateFormat df = getDateFormat("en-US");
-            GregorianCalendar newdate = new GregorianCalendar();
-            newdate.setTime(df.parse(date));
-        } catch (ParseException e) {
-            return false;
-        }
-
-        return true;
-    }
-
-    /**
      * The methode convert the input date string to the ISO output string. If
      * the input can't convert, the output is null.
      * 
@@ -254,8 +128,8 @@ public class MCRUtils {
         }
 
         if (!test) {
-            for (int i = 0; i < SUPPORTED_LANG.length; i++) {
-                DateFormat df = getDateFormat(SUPPORTED_LANG[i]);
+            for (int i = 0; i < DATE_FORMAT.length; i++) {
+                DateFormat df = DATE_FORMAT[i];
                 df.setLenient(false);
 
                 try {
@@ -321,8 +195,8 @@ public class MCRUtils {
         }
 
         if (!test) {
-            for (int i = 0; i < SUPPORTED_LANG.length; i++) {
-                DateFormat df = getDateFormat(SUPPORTED_LANG[i]);
+            for (int i = 0; i < DATE_FORMAT.length; i++) {
+                DateFormat df = DATE_FORMAT[i];
 
                 try {
                     calendar.setTime(df.parse(indate.substring(start, indate.length())));
@@ -477,8 +351,10 @@ public class MCRUtils {
      * @return true if Inputstream copied successfully to OutputStream
      */
     public static boolean copyStream(InputStream source, OutputStream target) {
-        MCRArgumentChecker.ensureNotNull(source, "InputStream source");
-
+        if (source == null) {
+            throw new MCRException("InputStream source is null.");
+        }
+        
         try {
             // R E A D / W R I T E by chunks
             int chunkSize = 63 * 1024;
@@ -533,8 +409,10 @@ public class MCRUtils {
      * @return true if Inputstream copied successfully to OutputStream
      */
     public static boolean copyReader(Reader source, Writer target) {
-        MCRArgumentChecker.ensureNotNull(source, "Reader source");
-
+        if (source == null) {
+            throw new MCRException("Reader source is null.");
+        }
+        
         try {
             // R E A D / W R I T E by chunks
             int chunkSize = 63 * 1024;
@@ -646,7 +524,9 @@ public class MCRUtils {
      * @return the cutted HashSet
      */
     public static final HashSet cutHashSet(HashSet hashin, int maxitems) {
-        MCRArgumentChecker.ensureNotNull(hashin, "Input HashSet");
+        if (hashin == null) {
+            throw new MCRException("Input HashSet is null.");
+        }
 
         if (maxitems < 1) {
             LOGGER.warn("The maximum items are lower then 1.");
@@ -670,7 +550,9 @@ public class MCRUtils {
      * @return the cutted ArrayList
      */
     public static final ArrayList cutArrayList(ArrayList arrayin, int maxitems) {
-        MCRArgumentChecker.ensureNotNull(arrayin, "Input ArrayList");
+        if (arrayin == null) {
+            throw new MCRException("Input ArrayList is null.");
+        }
 
         if (maxitems < 1) {
             LOGGER.warn("The maximum items are lower then 1.");

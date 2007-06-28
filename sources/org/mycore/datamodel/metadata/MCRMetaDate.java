@@ -23,8 +23,6 @@
 
 package org.mycore.datamodel.metadata;
 
-import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.GregorianCalendar;
 
@@ -76,7 +74,8 @@ final public class MCRMetaDate extends MCRMetaDefault {
      * @param set_date         the date as GregorianCalendar
      * @exception MCRException if the set_subtag value is null or empty
      */
-    public MCRMetaDate(String set_datapart, String set_subtag, String default_lang, String set_type, int set_inherted, GregorianCalendar set_date) throws MCRException {
+    public MCRMetaDate(String set_datapart, String set_subtag, String default_lang, String set_type, int set_inherted, GregorianCalendar set_date)
+            throws MCRException {
         super(set_datapart, set_subtag, default_lang, set_type, set_inherted);
         date = null;
 
@@ -182,18 +181,10 @@ final public class MCRMetaDate extends MCRMetaDefault {
             return;
         }
 
-        date = new GregorianCalendar();
-
-        try {
-            DateFormat df = MCRUtils.getDateFormat(lang);
-            date.setTime(df.parse(set_date));
-        } catch (ParseException e) {
-            try {
-                SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-                date.setTime(formatter.parse(set_date));
-            } catch (ParseException ex) {
-                throw new MCRException("Can't parse date.");
-            }
+        date = MCRUtils.covertDateToGregorianCalendar(set_date);
+        if (date == null) {
+            LOGGER.warn("Can't parse date, set current date.");
+            date = new GregorianCalendar();
         }
     }
 
