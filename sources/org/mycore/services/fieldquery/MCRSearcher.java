@@ -88,12 +88,18 @@ public abstract class MCRSearcher extends MCREventHandlerBase implements MCREven
     }
 
     private String getReturnID(MCRFile file) {
+        // Maybe fieldquery is used in application without link table manager
+        if( MCRConfiguration.instance().getString( "MCR.Persistence.LinkTable.Store.Class", null ) == null ) 
+          return file.getID();
+            
         String ownerID = file.getOwnerID();
+        
         List list = MCRLinkTableManager.instance().getSourceOf(ownerID, MCRLinkTableManager.ENTRY_TYPE_DERIVATE);
         if ((list == null) || (list.size() == 0))
             return file.getID();
-        String objectID = (String) (list.get(0));
-        return objectID;
+        
+        // Return ID of MCRObject this MCRFile belongs to
+        return (String) (list.get(0)); 
     }
 
     protected void handleFileCreated(MCREvent evt, MCRFile file) {
