@@ -101,13 +101,9 @@ public class MCRCategoryDAOImplTest extends MCRHibTestCase {
         assertTrue("Exist check failed for Category " + india.getId(), DAO.exist(india.getId()));
         MCRCategoryImpl rootCategory = (MCRCategoryImpl) sessionFactory.getCurrentSession().get(MCRCategoryImpl.class,
                 ((MCRCategoryImpl) category).getInternalID());
-        List<MCRCategoryImpl> allNodes = (List<MCRCategoryImpl>) sessionFactory.getCurrentSession().createCriteria(MCRCategoryImpl.class).list();
-        System.out.printf("Rowcount: %d\n", allNodes.size());
-        for (MCRCategoryImpl node : allNodes) {
-            System.out.printf("%d, %s, %d, %d, %s\n", node.getInternalID(), node.getId().getRootID(), node.getLevel(), node.getPositionInParent(), node.getId()
-                    .getID());
-        }
-        assertEquals("Category count does not match.", category.getChildren().size(), rootCategory.getChildren().size());
+        assertEquals("Child category count does not match.", category.getChildren().size(), rootCategory.getChildren().size());
+        int allNodes = (Integer)sessionFactory.getCurrentSession().createCriteria(MCRCategoryImpl.class).setProjection(Projections.rowCount()).uniqueResult();
+        assertEquals("Complete category count does not match.", countNodes(category), allNodes);
     }
 
     public void testDeleteCategory() {
