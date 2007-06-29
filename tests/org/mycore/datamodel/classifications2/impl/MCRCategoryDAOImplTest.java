@@ -148,10 +148,9 @@ public class MCRCategoryDAOImplTest extends MCRHibTestCase {
         assertTrue("Children present with child Level 0.", rootCategory.getChildren().isEmpty());
         rootCategory = DAO.getCategory(category.getId(), 1);
         assertTrue("Children present with child Level 1.", rootCategory.getChildren().get(0).getChildren().isEmpty());
-        System.out.println(MCRStringTransformer.getString(rootCategory));
-        assertEquals("Category count does not match with child Level 1.", category.getChildren().size(), rootCategory.getChildren().size());
+        assertEquals("Category count does not match with child Level 1.\n"+MCRStringTransformer.getString(rootCategory), category.getChildren().size(), rootCategory.getChildren().size());
         rootCategory = DAO.getCategory(category.getId(), -1);
-        assertEquals("Did not get all categories.", countNodes(category), countNodes(rootCategory));
+        assertEquals("Did not get all categories."+MCRStringTransformer.getString(rootCategory), countNodes(category), countNodes(rootCategory));
     }
 
     /**

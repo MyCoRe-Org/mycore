@@ -151,7 +151,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
      */
     @SuppressWarnings("unchecked")
     public List<MCRCategory> getChildren(MCRCategoryID cid) {
-        LOGGER.info("Get children of category: "+cid);
+        LOGGER.debug("Get children of category: "+cid);
         if (!exist(cid)) {
             return new MCRCategoryImpl.ChildList(null, null);
         }
@@ -412,11 +412,9 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         newCateg.setLabels(category.getLabels());
         newCateg.setRoot(category.root);
         newCateg.setURI(category.getURI());
-        System.out.printf("Children size: %d\n", childAmount);
         if (childAmount > 0) {
             int i = 0;
             for (MCRCategory child : category.getChildren()) {
-                System.out.printf("Child %d\n", ++i);
                 newCateg.getChildren().add(copyDeep((MCRCategoryImpl) child, level - 1));
             }
         }
