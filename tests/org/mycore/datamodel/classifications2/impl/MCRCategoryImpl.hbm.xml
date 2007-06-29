@@ -4,7 +4,7 @@
 <hibernate-mapping package="org.mycore.datamodel.classifications2.impl">
   <class name="MCRCategoryImpl" table="MCRCategory">
     <cache usage="nonstrict-read-write" />
-    <id name="internalID">
+    <id name="internalID" access="field">
       <generator class="native" />
     </id>
     <component class="org.mycore.datamodel.classifications2.MCRCategoryID" name="id" unique="true">
@@ -22,14 +22,14 @@
         <property name="description" />
       </composite-element>
     </set>
-    <list name="children" cascade="all" inverse="true">
+    <list name="children" cascade="all" inverse="true" access="field">
       <key column="parentID" />
       <list-index column="positionInParent" />
       <one-to-many class="MCRCategoryImpl" />
     </list>
     <property name="positionInParent" />
     <!-- Values to go up hierarchy fast -->
-    <many-to-one name="parent" class="MCRCategoryImpl" not-null="false" cascade="none" column="parentID" />
+    <many-to-one name="parent" class="MCRCategoryImpl" not-null="false" cascade="none" column="parentID" access="field" />
 
     <many-to-one name="root" insert="false" update="false" class="MCRCategoryImpl" cascade="none"
       formula="(SELECT cat.internalID FROM MCRCategory cat WHERE (cat.ClassID=ClassID and cat.CategID is null))">

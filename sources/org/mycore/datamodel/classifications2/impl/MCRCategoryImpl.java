@@ -159,8 +159,10 @@ public class MCRCategoryImpl extends MCRAbstractCategoryImpl implements Serializ
      * @return the positionInParent
      */
     public int getPositionInParent() {
+        LOGGER.debug("getposition called for " + getId() + " with: " + this.positionInParent);
         if (parent == null) {
-            return 0;
+            LOGGER.debug("getposition called with no parent set.");
+            return positionInParent;
         }
         return parent.getChildren().indexOf(this);
     }
@@ -177,6 +179,7 @@ public class MCRCategoryImpl extends MCRAbstractCategoryImpl implements Serializ
      *            the children to set
      */
     public void setChildren(List<MCRCategory> children) {
+        LOGGER.debug("Set children called for " + getId() + "list'" + children.getClass().getName() + "': " + children);
         childrenLock.writeLock().lock();
         if (children instanceof PersistentList) {
             this.children = children;
@@ -213,6 +216,7 @@ public class MCRCategoryImpl extends MCRAbstractCategoryImpl implements Serializ
      *            the positionInParent to set
      */
     public void setPositionInParent(int positionInParent) {
+        LOGGER.debug("Set position called for " + getId() + " with: " + positionInParent + " was: " + this.positionInParent);
         this.positionInParent = positionInParent;
     }
 
