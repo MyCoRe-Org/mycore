@@ -25,6 +25,7 @@ package org.mycore.frontend.wcms;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -34,25 +35,37 @@ import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
+import org.mycore.common.MCRSession;
+import org.mycore.common.MCRSessionMgr;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
 
 /**
- * @author Andreas Trappe, Thomas Scheffler 
+ * @author Andreas Trappe, Thomas Scheffler
  * 
  * Need to insert some things here
  * 
  */
 public abstract class MCRWCMSServlet extends MCRServlet {
     protected static final String OUTPUT_ENCODING = "UTF-8";
+
     protected static final String VALIDATOR = "JTidy";
-    protected static final String LOGINSERVLET_URL = getServletBaseURL()+"MCRLoginServlet";
-    
+
+    protected static final String LOGINSERVLET_URL = getServletBaseURL() + "MCRLoginServlet";
+
     protected void doGetPost(MCRServletJob job) throws Exception {
-        if (access()) 
-        	processRequest(job.getRequest(), job.getResponse());
-        else  
-       	    job.getResponse().sendRedirect(LOGINSERVLET_URL);
+        if (access()) {
+            // set some global required params
+            MCRSession session = MCRSessionMgr.getCurrentSession();
+            session.put("status", "loggedIn");
+            session.put("userID", session.getCurrentUserID());
+            session.put("userRealName", session.getCurrentUserID());
+            session.put("userClass", "admin");
+            session.put("rootNodes", new ArrayList());
+            // forward
+            processRequest(job.getRequest(), job.getResponse());
+        } else
+            job.getResponse().sendRedirect(LOGINSERVLET_URL);
     }
 
     protected final boolean access() {
@@ -91,16 +104,19 @@ public abstract class MCRWCMSServlet extends MCRServlet {
      */
     protected abstract void processRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException;
 
-	/** Attaches on the given JDOM-Element an JDOM-Element with the configuration of available multimedia objects (images, misc. documents).
-	 * @param root
-	 * @return
-	 */
-	public Element getMultimediaConfig(Element root) {
+    /**
+     * Attaches on the given JDOM-Element an JDOM-Element with the configuration
+     * of available multimedia objects (images, misc. documents).
+     * 
+     * @param root
+     * @return
+     */
+    public Element getMultimediaConfig(Element root) {
 
-	    File[] imageList=null;
-	    File[] documentList=null; 		
-		
-		Element templates;
+        File[] imageList = null;
+        File[] documentList = null;
+
+        Element templates;
         templates = new Element("templates");
 
         Element images = new Element("images");
@@ -120,7 +136,8 @@ public abstract class MCRWCMSServlet extends MCRServlet {
             }
         }
 
-        root.addContent(new Element("imagePath").setText(CONFIG.getString("MCR.WCMS.imagePath").substring(CONFIG.getString("MCR.WCMS.imagePath").lastIndexOf("webapps"))));
+        root.addContent(new Element("imagePath").setText(CONFIG.getString("MCR.WCMS.imagePath").substring(
+                        CONFIG.getString("MCR.WCMS.imagePath").lastIndexOf("webapps"))));
 
         Element documents = new Element("documents");
         root.addContent(documents);
@@ -139,7 +156,8 @@ public abstract class MCRWCMSServlet extends MCRServlet {
             }
         }
 
-        root.addContent(new Element("documentPath").setText(CONFIG.getString("MCR.WCMS.documentPath").substring(CONFIG.getString("MCR.WCMS.documentPath").lastIndexOf("webapps"))));
-		return templates;
-	}    
+        root.addContent(new Element("documentPath").setText(CONFIG.getString("MCR.WCMS.documentPath").substring(
+                        CONFIG.getString("MCR.WCMS.documentPath").lastIndexOf("webapps"))));
+        return templates;
+    }
 }

@@ -73,10 +73,10 @@ import org.xml.sax.InputSource;
  * @version
  */
 public class MCRWCMSActionServlet extends MCRWCMSServlet {
-	
-	private static final long serialVersionUID = 1L;
 
-	private static final Namespace ns = Namespace.XML_NAMESPACE;
+    private static final long serialVersionUID = 1L;
+
+    private static final Namespace ns = Namespace.XML_NAMESPACE;
 
     /* Session, userDB */
     private String userID = null; // UserID of the current user
@@ -114,7 +114,8 @@ public class MCRWCMSActionServlet extends MCRWCMSServlet {
 
     // navigation {bold, normal}
     private String label = null; // Label showing the element in the
-                                    // navigation
+
+    // navigation
 
     private String content = null; // Content saved as xml file
 
@@ -126,14 +127,16 @@ public class MCRWCMSActionServlet extends MCRWCMSServlet {
 
     // element
     private String changeInfo = null; // Contains changes made during edit
-                                        // (like
+
+    // (like
 
     // commit in cvs)
     private String realyDel = null; // Marks a flag for confirmation security
 
     // request on the delete action
     private String labelPath = null; // Complete path of labels on the
-                                        // acestor
+
+    // acestor
 
     // axis to the current element
     private String replaceMenu = null; // Representing a Parameter, allowing an
@@ -145,10 +148,12 @@ public class MCRWCMSActionServlet extends MCRWCMSServlet {
     private String constrainPopUp = null; // 
 
     private String masterTemplate = null; // Represents the action of
-                                            // templates
-    
+
+    // templates
+
     private String selfTemplate = null; // Represents the action of
-                                           // templates
+
+    // templates
 
     // (set, change, remove)
     private String fileName = null; // href attribut for the new element and
@@ -156,7 +161,8 @@ public class MCRWCMSActionServlet extends MCRWCMSServlet {
     // posiition where the element is saved on
     // the server in case of mode = intern
     private String contentFileBackup = null; // Path for content backup
-                                                // (should
+
+    // (should
 
     // be data type File)
     private String naviFileBackup = null; // Path for navigation.xml backup
@@ -182,9 +188,9 @@ public class MCRWCMSActionServlet extends MCRWCMSServlet {
     private String sessionParam = null;
 
     private String addAtPosition = null;
-    
+
     private boolean back;
-    
+
     private String backaddr = null;
 
     private File naviFile = new File(CONFIG.getString("MCR.navigationFile").replace('/', File.separatorChar));
@@ -219,19 +225,18 @@ public class MCRWCMSActionServlet extends MCRWCMSServlet {
      *            servlet response
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response) {
-    	
-    	logger.debug("########################################");
-    	logger.debug("procReq");
-    	logger.debug("########################################");    	
-    	
+
+        logger.debug("########################################");
+        logger.debug("procReq");
+        logger.debug("########################################");
+
         mcrSession = MCRSessionMgr.getCurrentSession();
-        
+
         setReq(request);
         setResp(response);
         setback();
         setbackaddr();
         initParam(getReq());
-        
 
         if (!realyDel.equals("false")) {
             doItAll(hrefFile, action, mode, addAtPosition);
@@ -248,7 +253,8 @@ public class MCRWCMSActionServlet extends MCRWCMSServlet {
 
             // Document doc = builder.build(naviFile);
             Element root = doc.getRootElement();
-            validate(root);
+            if (!MCRSessionMgr.getCurrentSession().get("mode").toString().equals("extern"))
+                validate(root);
 
             Element rootOut = new Element("cms");
             Document jdom = new Document(rootOut);
@@ -399,48 +405,39 @@ public class MCRWCMSActionServlet extends MCRWCMSServlet {
             String jump = null;
             int filepos = 0;
             String help = null;
-            
+
             // if you used the edittool
-            if(getback())
-              {
-            	if ((checkInput()) == false) {
-            		// request.setAttribute("XSL.Style", "xml");
-                    getLayoutService().doLayout(request,response,jdom);
-                  }
-            	else
-            	  {
-	               //if new intern child, predecossor or successor created, go to it	
-	               if(action.equals("add") && mode.equals("intern"))
-	                 {
-	            	  if(addAtPosition.equals("child"))
-	            	    {  
-	            		 int length = getbackaddr().length();
-	                	 help = getbackaddr().substring(0,(length-4));
-	                	 filepos = fileName.lastIndexOf("/");
-	                	 jump = help.concat(fileName.substring(filepos));  
-	            		}
-	            	  else
-	            	    {
-	            		 filepos = fileName.lastIndexOf("/"); 
-	            		 int neighbarpos = getbackaddr().lastIndexOf("/");
-	            		 help = getbackaddr().substring(0,neighbarpos);
-	            		 jump = help.concat(fileName.substring(filepos));
-	            		 
-	            	    }
-	                 }
-	               // on edit or external link go back to initiator address
-	               else
-	                 {
-	            	  jump = getbackaddr(); 
-	                 }
-	            	response.sendRedirect(jump);
-            	  }
-              }	
-            else
-              {	
-             getLayoutService().doLayout(request,response,jdom);
-              }
-          } catch (Exception e) {
+            if (getback()) {
+                if ((checkInput()) == false) {
+                    // request.setAttribute("XSL.Style", "xml");
+                    getLayoutService().doLayout(request, response, jdom);
+                } else {
+                    // if new intern child, predecossor or successor created, go
+                    // to it
+                    if (action.equals("add") && mode.equals("intern")) {
+                        if (addAtPosition.equals("child")) {
+                            int length = getbackaddr().length();
+                            help = getbackaddr().substring(0, (length - 4));
+                            filepos = fileName.lastIndexOf("/");
+                            jump = help.concat(fileName.substring(filepos));
+                        } else {
+                            filepos = fileName.lastIndexOf("/");
+                            int neighbarpos = getbackaddr().lastIndexOf("/");
+                            help = getbackaddr().substring(0, neighbarpos);
+                            jump = help.concat(fileName.substring(filepos));
+
+                        }
+                    }
+                    // on edit or external link go back to initiator address
+                    else {
+                        jump = getbackaddr();
+                    }
+                    response.sendRedirect(jump);
+                }
+            } else {
+                getLayoutService().doLayout(request, response, jdom);
+            }
+        } catch (Exception e) {
             e.printStackTrace();
             error = e.getMessage();
         }
@@ -451,7 +448,8 @@ public class MCRWCMSActionServlet extends MCRWCMSServlet {
             File footer = new File(CONFIG.getString("MCR.WCMS.footer").replace('/', File.separatorChar));
             Document doc = new Document();
 
-            if (!footer.exists()) footer.getParentFile().mkdirs();
+            if (!footer.exists())
+                footer.getParentFile().mkdirs();
             doc = getXMLAsJDOM(footer);
             Element root = doc.getRootElement();
             root.setAttribute("date", getDate()).setAttribute("time", getTime()).setAttribute("labelPath", labelPath).setAttribute("lastEditor", userRealName);
@@ -476,13 +474,17 @@ public class MCRWCMSActionServlet extends MCRWCMSServlet {
 
             if (root.getChild("meta") != null) {
                 if (root.getChild("meta").getChild("log") != null) {
-                    root.getChild("meta").getChild("log").setAttribute("date", getDate()).setAttribute("time", getTime()).setAttribute("labelPath", labelPath).setAttribute("lastEditor", userRealName);
+                    root.getChild("meta").getChild("log").setAttribute("date", getDate()).setAttribute("time", getTime()).setAttribute("labelPath", labelPath)
+                                    .setAttribute("lastEditor", userRealName);
                 } else {
-                    root.getChild("meta").addContent(new Element("log").setAttribute("date", getDate()).setAttribute("time", getTime()).setAttribute("labelPath", labelPath).setAttribute("lastEditor", userRealName));
+                    root.getChild("meta").addContent(
+                                    new Element("log").setAttribute("date", getDate()).setAttribute("time", getTime()).setAttribute("labelPath", labelPath)
+                                                    .setAttribute("lastEditor", userRealName));
                 }
             } else {
                 Element meta = new Element("meta");
-                meta.addContent(new Element("log").setAttribute("date", getDate()).setAttribute("time", getTime()).setAttribute("labelPath", labelPath).setAttribute("lastEditor", userRealName));
+                meta.addContent(new Element("log").setAttribute("date", getDate()).setAttribute("time", getTime()).setAttribute("labelPath", labelPath)
+                                .setAttribute("lastEditor", userRealName));
                 root.addContent(meta);
             }
 
@@ -519,30 +521,20 @@ public class MCRWCMSActionServlet extends MCRWCMSServlet {
             Element root = doc.getRootElement();
 
             if (contentFileBackup == null) {
-            	
-                contentFileBackup = CONFIG.getString("MCR.WCMS.backupPath").replace('/', File.separatorChar)+fileName.substring(1);
+
+                contentFileBackup = CONFIG.getString("MCR.WCMS.backupPath").replace('/', File.separatorChar) + fileName.substring(1);
             }
 
             if (changeInfo == null) {
-                root.addContent(new Element("log")
-                		.setAttribute("date", getDate())
-                		.setAttribute("time", getTime())
-                		.setAttribute("userRealName", userRealName)
-                		.setAttribute("labelPath", labelPath)
-                		.setAttribute("doneAction", action)
-                		.setAttribute("backupContentFile", contentFileBackup)
-                		.setAttribute("backupNavigationFile", naviFileBackup));
+                root.addContent(new Element("log").setAttribute("date", getDate()).setAttribute("time", getTime()).setAttribute("userRealName", userRealName)
+                                .setAttribute("labelPath", labelPath).setAttribute("doneAction", action).setAttribute("backupContentFile", contentFileBackup)
+                                .setAttribute("backupNavigationFile", naviFileBackup));
             } else {
                 Element log = new Element("log");
-                log	.setAttribute("date", getDate())
-                	.setAttribute("time", getTime())
-	                .setAttribute("userRealName", userRealName)
-	                .setAttribute("labelPath", labelPath)
-	                .setAttribute("doneAction", action)
-	                .setAttribute("backupContentFile", contentFileBackup)
-	                .setAttribute("backupNavigationFile", naviFileBackup)
-                .addContent(new Element("note").setText(changeInfo));
-                
+                log.setAttribute("date", getDate()).setAttribute("time", getTime()).setAttribute("userRealName", userRealName).setAttribute("labelPath",
+                                labelPath).setAttribute("doneAction", action).setAttribute("backupContentFile", contentFileBackup).setAttribute(
+                                "backupNavigationFile", naviFileBackup).addContent(new Element("note").setText(changeInfo));
+
                 root.addContent(log);
             }
 
@@ -704,7 +696,8 @@ public class MCRWCMSActionServlet extends MCRWCMSServlet {
             try {
                 Document doc = getXMLAsJDOM(inputFile);
                 Element root = doc.getRootElement();
-                validate(root);
+                if (!mcrSession.get("mode").toString().equals("extern"))
+                    validate(root);
 
                 Element actElem = findActElem(root, attribute, avalue);
                 List neighbors = ((Element) actElem.getParent()).getChildren();
@@ -718,21 +711,29 @@ public class MCRWCMSActionServlet extends MCRWCMSServlet {
 
                     if ((0 <= position) && (position <= neighbors.size())) {
                         if (!masterTemplate.equals("delete") && !masterTemplate.equals("noAction")) {
-                            neighbors.add(position, new Element("item").setAttribute("href", fileName).setAttribute("type", mode).setAttribute("target", target).setAttribute("style", style).setAttribute("replaceMenu", replaceMenu).setAttribute("constrainPopUp", constrainPopUp).setAttribute("template", masterTemplate).addContent(
-                                    new Element("label").setAttribute("lang", defaultLang, ns).setText(label)));
+                            neighbors.add(position, new Element("item").setAttribute("href", fileName).setAttribute("type", mode)
+                                            .setAttribute("target", target).setAttribute("style", style).setAttribute("replaceMenu", replaceMenu).setAttribute(
+                                                            "constrainPopUp", constrainPopUp).setAttribute("template", masterTemplate).addContent(
+                                                            new Element("label").setAttribute("lang", defaultLang, ns).setText(label)));
                         } else {
-                            neighbors.add(position, new Element("item").setAttribute("href", fileName).setAttribute("type", mode).setAttribute("target", target).setAttribute("style", style).setAttribute("replaceMenu", replaceMenu).setAttribute("constrainPopUp", constrainPopUp).addContent(new Element("label").setAttribute("lang", defaultLang, ns).setText(label)));
+                            neighbors.add(position, new Element("item").setAttribute("href", fileName).setAttribute("type", mode)
+                                            .setAttribute("target", target).setAttribute("style", style).setAttribute("replaceMenu", replaceMenu).setAttribute(
+                                                            "constrainPopUp", constrainPopUp).addContent(
+                                                            new Element("label").setAttribute("lang", defaultLang, ns).setText(label)));
                         }
                     }
                 }
 
                 if (addAtPosition.equals("child")) {
                     if (!masterTemplate.equals("delete") && !masterTemplate.equals("noAction")) {
-                        Element itemElement = new Element("item").setAttribute("href", fileName).setAttribute("type", mode).setAttribute("target", target).setAttribute("style", style).setAttribute("replaceMenu", replaceMenu).setAttribute("constrainPopUp", constrainPopUp).setAttribute("template", masterTemplate);
+                        Element itemElement = new Element("item").setAttribute("href", fileName).setAttribute("type", mode).setAttribute("target", target)
+                                        .setAttribute("style", style).setAttribute("replaceMenu", replaceMenu).setAttribute("constrainPopUp", constrainPopUp)
+                                        .setAttribute("template", masterTemplate);
                         itemElement.addContent(new Element("label").setAttribute("lang", defaultLang, ns).setText(label));
                         actElem.addContent(itemElement);
                     } else {
-                        Element itemElement = new Element("item").setAttribute("href", fileName).setAttribute("type", mode).setAttribute("target", target).setAttribute("style", style).setAttribute("replaceMenu", replaceMenu).setAttribute("constrainPopUp", constrainPopUp);
+                        Element itemElement = new Element("item").setAttribute("href", fileName).setAttribute("type", mode).setAttribute("target", target)
+                                        .setAttribute("style", style).setAttribute("replaceMenu", replaceMenu).setAttribute("constrainPopUp", constrainPopUp);
                         itemElement.addContent(new Element("label").setAttribute("lang", defaultLang, ns).setText(label));
                         actElem.addContent(itemElement);
                     }
@@ -951,16 +952,18 @@ public class MCRWCMSActionServlet extends MCRWCMSServlet {
 
     public void makeAction(String action) {
         try {
-        	Document html2BeStored = new Document();
-        	
+            Document html2BeStored = new Document();
+
             if (action.equals("add")) {
                 if (mode.equals("intern")) {
-                   if (!hrefFile.exists()) {
+                    if (!hrefFile.exists()) {
                         hrefFile.getParentFile().mkdir();
-                        StringBuffer contentHead = new StringBuffer("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n").append("<!DOCTYPE MyCoReWebPage>\n").append("<MyCoReWebPage>\n").append("\t<section xml:lang=\"" + defaultLang + "\" title=\"" + label + "\">\n");
+                        StringBuffer contentHead = new StringBuffer("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n").append("<!DOCTYPE MyCoReWebPage>\n")
+                                        .append("<MyCoReWebPage>\n").append("\t<section xml:lang=\"" + defaultLang + "\" title=\"" + label + "\">\n");
                         StringBuffer contentBody = new StringBuffer(content);
                         StringBuffer contentTail = new StringBuffer("\t</section>\n").append("</MyCoReWebPage>\n");
-                        BufferedInputStream bis = new BufferedInputStream(new ByteArrayInputStream(((contentHead).append(contentBody).append(contentTail)).toString().getBytes("UTF-8")));
+                        BufferedInputStream bis = new BufferedInputStream(new ByteArrayInputStream(((contentHead).append(contentBody).append(contentTail))
+                                        .toString().getBytes("UTF-8")));
                         html2BeStored = getXMLAsJDOM(bis);
                         bis.close();
                     } else {
@@ -975,23 +978,22 @@ public class MCRWCMSActionServlet extends MCRWCMSServlet {
             if (action.equals("edit")) {
                 if (mode.equals("intern")) {
                     try {
-                        //Document storedHTML = new Document();
+                        // Document storedHTML = new Document();
 
                         try {
                             Element formHTML = getXMLAsJDOM(content).getRootElement();
-                            
-                        	html2BeStored = getXMLAsJDOM(hrefFile);
+
+                            html2BeStored = getXMLAsJDOM(hrefFile);
 
                             Element storedHTMLRoot = html2BeStored.getRootElement();
                             validate(storedHTMLRoot);
 
                             Element contentSection = findActElem(storedHTMLRoot, "lang", defaultLang, ns);
                             contentSection.setAttribute("title", label);
-							if (formHTML.getName().equals("dummyRoot")){
-								contentSection.setContent(formHTML.cloneContent());
-							}
-							else 
-								contentSection.setContent((Element)formHTML.clone());
+                            if (formHTML.getName().equals("dummyRoot")) {
+                                contentSection.setContent(formHTML.cloneContent());
+                            } else
+                                contentSection.setContent((Element) formHTML.clone());
                         } catch (Exception ex) {
                             logger.error("Error while updating document, update rejected.", ex);
                         }
@@ -1006,22 +1008,22 @@ public class MCRWCMSActionServlet extends MCRWCMSServlet {
             if (action.equals("translate") && mode.equals("intern")) {
                 try {
 
-                        Element formHTML = getXMLAsJDOM(contentCurrentLang).getRootElement();
+                    Element formHTML = getXMLAsJDOM(contentCurrentLang).getRootElement();
 
-                        html2BeStored = getXMLAsJDOM(hrefFile);
+                    html2BeStored = getXMLAsJDOM(hrefFile);
 
-                        Element storedHTMLRoot = html2BeStored.getRootElement();
-                        validate(storedHTMLRoot);
+                    Element storedHTMLRoot = html2BeStored.getRootElement();
+                    validate(storedHTMLRoot);
 
-                        Element contentSection = findActElem(storedHTMLRoot, "lang", currentLang, ns);
+                    Element contentSection = findActElem(storedHTMLRoot, "lang", currentLang, ns);
 
-                        if (contentSection == null) {
-                            storedHTMLRoot.addContent(new Element("section").setAttribute("lang", currentLang, ns).setAttribute("title", label));
-                        }
+                    if (contentSection == null) {
+                        storedHTMLRoot.addContent(new Element("section").setAttribute("lang", currentLang, ns).setAttribute("title", label));
+                    }
 
-                        contentSection = findActElem(storedHTMLRoot, "lang", currentLang, ns);
-                        contentSection.setAttribute("title", label);
-                        contentSection.setContent(formHTML.cloneContent());
+                    contentSection = findActElem(storedHTMLRoot, "lang", currentLang, ns);
+                    contentSection.setAttribute("title", label);
+                    contentSection.setContent(formHTML.cloneContent());
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -1039,7 +1041,7 @@ public class MCRWCMSActionServlet extends MCRWCMSServlet {
                             testFile = testFile.getParentFile();
                         }
                     }
-                } else 
+                } else
                     sessionParam = "choose";
                 return;
             }
@@ -1074,7 +1076,11 @@ public class MCRWCMSActionServlet extends MCRWCMSServlet {
     }
 
     public void doItAll(File hrefFile, String action, String mode, String addAtPosition) {
-        logger.debug("addAtPosition ("+addAtPosition+") will never be used."); //FIXME: use or remove addAtPosition
+        logger.debug("addAtPosition (" + addAtPosition + ") will never be used."); // FIXME:
+        // use
+        // or
+        // remove
+        // addAtPosition
         // verify if html form was filled in correctly
         if ((checkInput()) == false) {
             sessionParam = "action";
@@ -1110,7 +1116,11 @@ public class MCRWCMSActionServlet extends MCRWCMSServlet {
     }
 
     public void codeValidation(String validator) {
-        logger.debug("validator ("+validator+") will never be used."); //FIXME: use or remove validator
+        logger.debug("validator (" + validator + ") will never be used."); // FIXME:
+        // use
+        // or
+        // remove
+        // validator
         try {
             String contentTmp = content;
             String contentCurrentLangTmp = contentCurrentLang;
@@ -1296,65 +1306,65 @@ public class MCRWCMSActionServlet extends MCRWCMSServlet {
      * @return JDOM Document
      */
     public Document getXMLAsJDOM(Object xmlSource) {
-    	logger.debug("########################################");
-    	logger.debug("inside getXMLAsJDOM(Object xmlSource)");
-    	logger.debug("########################################");
+        logger.debug("########################################");
+        logger.debug("inside getXMLAsJDOM(Object xmlSource)");
+        logger.debug("########################################");
         SAXBuilder builder = new SAXBuilder();
         Document jdomDoc = new Document();
 
         try {
             if (xmlSource instanceof String) {
-            	logger.debug("########################################");
-            	logger.debug("instanceof String="+xmlSource);
-            	logger.debug("########################################");
+                logger.debug("########################################");
+                logger.debug("instanceof String=" + xmlSource);
+                logger.debug("########################################");
                 jdomDoc = builder.build(new ByteArrayInputStream(((String) xmlSource).getBytes("UTF-8")));
             }
             if (xmlSource instanceof File) {
-            	logger.debug("########################################");
-            	logger.debug("instanceof File="+xmlSource);
-            	logger.debug("########################################");            	
+                logger.debug("########################################");
+                logger.debug("instanceof File=" + xmlSource);
+                logger.debug("########################################");
                 jdomDoc = builder.build((File) xmlSource);
             }
             if (xmlSource instanceof InputStream) {
-            	logger.debug("########################################");
-            	logger.debug("instanceof InputStream="+xmlSource);
-            	logger.debug("########################################");            	
+                logger.debug("########################################");
+                logger.debug("instanceof InputStream=" + xmlSource);
+                logger.debug("########################################");
                 jdomDoc = builder.build((InputStream) xmlSource);
             }
             if (xmlSource instanceof URL) {
-            	logger.debug("########################################");
-            	logger.debug("instanceof URL="+xmlSource);
-            	logger.debug("########################################");            	
+                logger.debug("########################################");
+                logger.debug("instanceof URL=" + xmlSource);
+                logger.debug("########################################");
                 jdomDoc = builder.build((URL) xmlSource);
             }
         } catch (JDOMException e) {
-        	// no root element ? 
-        	String extendedXML= addRootElement((String)xmlSource);
-        	try {
-				logger.debug("########################################");
-	        	logger.debug("JDOMException occurred -> adding root tag ="+extendedXML);
-	        	logger.debug("########################################");
-				jdomDoc = builder.build(new ByteArrayInputStream((extendedXML).getBytes("UTF-8")));
-			} catch (UnsupportedEncodingException e1) {
-				e1.printStackTrace();
-			} catch (JDOMException e1) {
-				logger.debug("##########################################################");
-	        	logger.debug("JDOMException after root tag added occurred -> using JTidy");
-	        	logger.debug("##########################################################");
-				jdomDoc = validateSource(xmlSource);	
-				e1.printStackTrace();
-			} catch (IOException e1) {
-				e1.printStackTrace();
-			}
+            // no root element ?
+            String extendedXML = addRootElement((String) xmlSource);
+            try {
+                logger.debug("########################################");
+                logger.debug("JDOMException occurred -> adding root tag =" + extendedXML);
+                logger.debug("########################################");
+                jdomDoc = builder.build(new ByteArrayInputStream((extendedXML).getBytes("UTF-8")));
+            } catch (UnsupportedEncodingException e1) {
+                e1.printStackTrace();
+            } catch (JDOMException e1) {
+                logger.debug("##########################################################");
+                logger.debug("JDOMException after root tag added occurred -> using JTidy");
+                logger.debug("##########################################################");
+                jdomDoc = validateSource(xmlSource);
+                e1.printStackTrace();
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
         } catch (IOException e) {
             logger.debug("IO error: File \"" + xmlSource + "\" can't be parsed as JDOM.");
             e.printStackTrace();
         }
         return jdomDoc;
     }
-    
+
     public String addRootElement(String xml) {
-    	return "<dummyRoot>"+xml+"</dummyRoot>";
+        return "<dummyRoot>" + xml + "</dummyRoot>";
     }
 
     public Document validateSource(Object xmlSource) {
@@ -1372,7 +1382,7 @@ public class MCRWCMSActionServlet extends MCRWCMSServlet {
          */
         Tidy tidy = new Tidy();
         tidy = getTidyConfig(tidy, "xhtml");
-        //tidy.setErrout(pw);
+        // tidy.setErrout(pw);
         tidy.setInputEncoding(OUTPUT_ENCODING);
         tidy.setOutputEncoding(OUTPUT_ENCODING);
         tidy.setWord2000(true);
@@ -1386,7 +1396,7 @@ public class MCRWCMSActionServlet extends MCRWCMSServlet {
         tidy.setQuoteNbsp(true);
         tidy.setNumEntities(true);
         tidy.setErrout(pw);
-        
+
         BufferedInputStream bis = null;
         ByteArrayInputStream beginTag = new ByteArrayInputStream("<dummyRoot>".getBytes());
         ByteArrayInputStream endTag = new ByteArrayInputStream("</dummyRoot>".getBytes());
@@ -1513,8 +1523,7 @@ public class MCRWCMSActionServlet extends MCRWCMSServlet {
         dir = (String) mcrSession.get("dir");
         currentLang = (String) mcrSession.get("currentLang");
         defaultLang = (String) mcrSession.get("defaultLang");
-        
-                
+
         if (mcrSession.get("addAtPosition") != null) {
             addAtPosition = (String) mcrSession.get("addAtPosition");
         }
@@ -1527,8 +1536,8 @@ public class MCRWCMSActionServlet extends MCRWCMSServlet {
 
         /* code validation by JTidy */
         if (request.getParameter("codeValidationDisable") == null) {
-            //logger.debug("Code validation using" + VALIDATOR);
-            //codeValidation(VALIDATOR);
+            // logger.debug("Code validation using" + VALIDATOR);
+            // codeValidation(VALIDATOR);
         }
 
         /* END: code validation by JTidy */
@@ -1540,7 +1549,8 @@ public class MCRWCMSActionServlet extends MCRWCMSServlet {
          */
         /* check for dynamic content bindings */
         /* add */
-        if ((request.getParameter("dcbActionAdd") != null) && !request.getParameter("dcbActionAdd").equals("") && (request.getParameter("dcbValueAdd") != null) && !request.getParameter("dcbValueAdd").equals("")) {
+        if ((request.getParameter("dcbActionAdd") != null) && !request.getParameter("dcbActionAdd").equals("") && (request.getParameter("dcbValueAdd") != null)
+                        && !request.getParameter("dcbValueAdd").equals("")) {
             dcbActionAdd = true;
             dcbValueAdd = request.getParameter("dcbValueAdd");
         } else {
@@ -1548,7 +1558,8 @@ public class MCRWCMSActionServlet extends MCRWCMSServlet {
         }
 
         /* remove */
-        if ((request.getParameter("dcbActionDelete") != null) && !request.getParameter("dcbActionDelete").equals("") && (request.getParameter("dcbValueDelete") != null) && !request.getParameter("dcbValueDelete").equals("")) {
+        if ((request.getParameter("dcbActionDelete") != null) && !request.getParameter("dcbActionDelete").equals("")
+                        && (request.getParameter("dcbValueDelete") != null) && !request.getParameter("dcbValueDelete").equals("")) {
             dcbActionDelete = true;
             dcbValueDelete = request.getParameter("dcbValueDelete");
         } else {
@@ -1583,11 +1594,10 @@ public class MCRWCMSActionServlet extends MCRWCMSServlet {
         masterTemplate = request.getParameter("masterTemplate");
         selfTemplate = request.getParameter("selfTemplate");
 
-        if(selfTemplate != "")
-          {
-           masterTemplate = selfTemplate;
-          }	
-        
+        if (selfTemplate != "") {
+            masterTemplate = selfTemplate;
+        }
+
         fileName = href;
 
         /* -------------------------------------------------------------------- */
@@ -1667,7 +1677,7 @@ public class MCRWCMSActionServlet extends MCRWCMSServlet {
             attribute = "href";
             avalue = href;
         }
-           hrefFile = new File(getServletContext().getRealPath("") + fileName.replace('/', fs));
+        hrefFile = new File(getServletContext().getRealPath("") + fileName.replace('/', fs));
     }
 
     /**
@@ -1713,25 +1723,23 @@ public class MCRWCMSActionServlet extends MCRWCMSServlet {
         }
     }
 
-	public boolean getback() {
-		return this.back;
-	}
+    public boolean getback() {
+        return this.back;
+    }
 
-	public void setback() {
-		if(request.getParameter("back")!=null &&
-				request.getParameter("back").equals("true")	) {
-			this.back=true;
-		}
-		else
-		{	
-			this.back = false;
-		}	
-	}
-	public String getbackaddr() {
-		return this.backaddr;
-	}
+    public void setback() {
+        if (request.getParameter("back") != null && request.getParameter("back").equals("true")) {
+            this.back = true;
+        } else {
+            this.back = false;
+        }
+    }
 
-	public void setbackaddr() {
-		this.backaddr=request.getParameter("address");
-	}
+    public String getbackaddr() {
+        return this.backaddr;
+    }
+
+    public void setbackaddr() {
+        this.backaddr = request.getParameter("address");
+    }
 }
