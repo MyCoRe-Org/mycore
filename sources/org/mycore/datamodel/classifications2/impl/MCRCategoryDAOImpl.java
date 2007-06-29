@@ -151,7 +151,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
      */
     @SuppressWarnings("unchecked")
     public List<MCRCategory> getChildren(MCRCategoryID cid) {
-        LOGGER.debug("Get children of category: "+cid);
+        LOGGER.debug("Get children of category: " + cid);
         if (!exist(cid)) {
             return new MCRCategoryImpl.ChildList(null, null);
         }
@@ -175,7 +175,33 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
     }
 
     public MCRCategory getRootCategory(MCRCategoryID baseID, int childLevel) {
-        return (MCRCategory) MCRHIBConnection.instance().getSession().get(CATEGRORY_CLASS, MCRCategoryID.rootID(baseID.getRootID()));
+        if (baseID.getID() == null) {
+            return getCategory(baseID, childLevel);
+        }
+        Session session = MCRHIBConnection.instance().getSession();
+        List<MCRCategory> parents = getParents(baseID);
+        List<MCRCategoryImpl> parentsCopy = new ArrayList<MCRCategoryImpl>(parents.size());
+        for (int i = parents.size() - 1; i >= 0; i--) {
+            parentsCopy.add(copyDeep((MCRCategoryImpl) parents.get(i), 0));
+        }
+        MCRCategoryImpl root = parentsCopy.get(0);
+        for (int i = 1; i < parentsCopy.size(); i++) {
+            parentsCopy.get(i).setRoot(root);
+            parentsCopy.get(i).setParent(parentsCopy.get(i - 1));
+        }
+        MCRCategoryImpl node = getByNaturalID(session, baseID);
+        // prepare a temporary copy for the deepCopy process
+        MCRCategoryImpl tempCopy = new MCRCategoryImpl();
+        tempCopy.setInternalID(node.getInternalID());
+        tempCopy.setId(node.getId());
+        tempCopy.setLabels(node.getLabels());
+        tempCopy.setLevel(node.getLevel());
+        tempCopy.children = node.children;
+        tempCopy.root = root;
+        // attach deep node copy to its parent
+        copyDeep(tempCopy, childLevel).setParent(parentsCopy.get(parentsCopy.size() - 1));
+        // return root node
+        return root;
     }
 
     /*
