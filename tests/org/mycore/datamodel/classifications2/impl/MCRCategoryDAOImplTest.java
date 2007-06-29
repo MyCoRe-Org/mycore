@@ -100,12 +100,15 @@ public class MCRCategoryDAOImplTest extends MCRHibTestCase {
         // clear from cache
         sessionFactory.getCurrentSession().clear();
         assertTrue("Exist check failed for Category " + india.getId(), DAO.exist(india.getId()));
-        MCRCategoryImpl rootCategory = (MCRCategoryImpl) sessionFactory.getCurrentSession().get(MCRCategoryImpl.class,
-                ((MCRCategoryImpl) category).getInternalID());
+        MCRCategoryImpl rootCategory = getRootCategoryFromSession();
         assertEquals("Child category count does not match.", category.getChildren().size(), rootCategory.getChildren().size());
         int allNodes = (Integer) sessionFactory.getCurrentSession().createCriteria(MCRCategoryImpl.class).setProjection(Projections.rowCount()).uniqueResult();
         // category + india
         assertEquals("Complete category count does not match.", countNodes(category) + 1, allNodes);
+    }
+
+    private MCRCategoryImpl getRootCategoryFromSession() {
+        return (MCRCategoryImpl) sessionFactory.getCurrentSession().get(MCRCategoryImpl.class, ((MCRCategoryImpl) category).getInternalID());
     }
 
     public void testDeleteCategory() {
@@ -200,6 +203,38 @@ public class MCRCategoryDAOImplTest extends MCRHibTestCase {
         assertEquals("Category count does not match.", 1 + countNodes(find), countNodes(rootCategory));
     }
 
+    public void testChildren() {
+        DAO.addCategory(null, category);
+        endTransaction();
+        beginTransaction();
+        // clear from cache
+        sessionFactory.getCurrentSession().clear();
+        assertTrue("Category '" + category.getId() + "' should have children.", DAO.hasChildren(category.getId()));
+        assertFalse("Category '" + category.getChildren().get(1).getId() + "' shouldn't have children.", DAO.hasChildren(category.getChildren().get(1).getId()));
+    }
+
+    public void testMoveCategoryWithoutIndex() {
+        DAO.addCategory(null, category);
+        endTransaction();
+        beginTransaction();
+        // clear from cache
+        sessionFactory.getCurrentSession().clear();
+        checkLeftRightLevelValue(getRootCategoryFromSession(), 0, 0);
+        endTransaction();
+        beginTransaction();
+        // clear from cache
+        sessionFactory.getCurrentSession().clear();
+        MCRCategory moveNode = category.getChildren().get(1);
+        // Europe conquer Asia
+        DAO.moveCategory(moveNode.getId(), category.getChildren().get(0).getId());
+        endTransaction();
+        beginTransaction();
+        // clear from cache
+        sessionFactory.getCurrentSession().clear();
+        MCRCategoryImpl rootNode = getRootCategoryFromSession();
+        checkLeftRightLevelValue(rootNode, 0, 0);
+    }
+
     /**
      * @throws URISyntaxException
      */
@@ -215,6 +250,23 @@ public class MCRCategoryDAOImplTest extends MCRHibTestCase {
             i += countNodes(child);
         }
         return i;
+    }
+
+    private int checkLeftRightLevelValue(MCRCategoryImpl node, int leftStart, int levelStart) {
+        int curValue = leftStart;
+        final int nextLevel = levelStart + 1;
+        System.out.printf("Checking %s\n", node.getId());
+        assertEquals("Left value did not match on ID: " + node.getId(), leftStart, node.getLeft());
+        assertEquals("Level value did not match on ID: " + node.getId(), levelStart, node.getLevel());
+        for (MCRCategory child : node.children) {
+            curValue = checkLeftRightLevelValue((MCRCategoryImpl) child, ++curValue, nextLevel);
+        }
+        assertEquals("Right value did not match on ID: " + node.getId(), ++curValue, node.getRight());
+        return curValue;
+    }
+
+    protected boolean isDebugEnabled() {
+        return true;
     }
 
 }
