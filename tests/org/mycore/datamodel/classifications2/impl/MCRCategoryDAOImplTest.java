@@ -25,6 +25,7 @@ package org.mycore.datamodel.classifications2.impl;
 
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
@@ -102,9 +103,9 @@ public class MCRCategoryDAOImplTest extends MCRHibTestCase {
         MCRCategoryImpl rootCategory = (MCRCategoryImpl) sessionFactory.getCurrentSession().get(MCRCategoryImpl.class,
                 ((MCRCategoryImpl) category).getInternalID());
         assertEquals("Child category count does not match.", category.getChildren().size(), rootCategory.getChildren().size());
-        int allNodes = (Integer)sessionFactory.getCurrentSession().createCriteria(MCRCategoryImpl.class).setProjection(Projections.rowCount()).uniqueResult();
-        //category + india
-        assertEquals("Complete category count does not match.", countNodes(category)+1, allNodes);
+        int allNodes = (Integer) sessionFactory.getCurrentSession().createCriteria(MCRCategoryImpl.class).setProjection(Projections.rowCount()).uniqueResult();
+        // category + india
+        assertEquals("Complete category count does not match.", countNodes(category) + 1, allNodes);
     }
 
     public void testDeleteCategory() {
@@ -149,9 +150,54 @@ public class MCRCategoryDAOImplTest extends MCRHibTestCase {
         assertTrue("Children present with child Level 0.", rootCategory.getChildren().isEmpty());
         rootCategory = DAO.getCategory(category.getId(), 1);
         assertTrue("Children present with child Level 1.", rootCategory.getChildren().get(0).getChildren().isEmpty());
-        assertEquals("Category count does not match with child Level 1.\n"+MCRStringTransformer.getString(rootCategory), category.getChildren().size(), rootCategory.getChildren().size());
+        assertEquals("Category count does not match with child Level 1.\n" + MCRStringTransformer.getString(rootCategory), category.getChildren().size(),
+                rootCategory.getChildren().size());
         rootCategory = DAO.getCategory(category.getId(), -1);
-        assertEquals("Did not get all categories."+MCRStringTransformer.getString(rootCategory), countNodes(category), countNodes(rootCategory));
+        assertEquals("Did not get all categories." + MCRStringTransformer.getString(rootCategory), countNodes(category), countNodes(rootCategory));
+    }
+
+    public void testGetChildren() {
+        DAO.addCategory(null, category);
+        endTransaction();
+        beginTransaction();
+        // clear from cache
+        sessionFactory.getCurrentSession().clear();
+        List<MCRCategory> children = DAO.getChildren(category.getId());
+        assertEquals("Did not get all children of :" + category.getId(), category.getChildren().size(), children.size());
+        for (int i = 0; i < children.size(); i++) {
+            assertEquals("Category IDs of children do not match.", category.getChildren().get(i).getId(), children.get(i).getId());
+        }
+    }
+
+    public void testGetParents() {
+        DAO.addCategory(null, category);
+        endTransaction();
+        beginTransaction();
+        // clear from cache
+        sessionFactory.getCurrentSession().clear();
+        MCRCategory find = category.getChildren().get(0).getChildren().get(0);
+        List<MCRCategory> parents = DAO.getParents(find.getId());
+        MCRCategory findParent = find;
+        for (MCRCategory parent : parents) {
+            findParent = findParent.getParent();
+            assertNotNull("Returned too much parents.", findParent);
+            assertEquals("Parents did not match.", findParent.getId(), parent.getId());
+        }
+    }
+
+    public void testGetRootCategory() {
+        DAO.addCategory(null, category);
+        endTransaction();
+        beginTransaction();
+        // clear from cache
+        sessionFactory.getCurrentSession().clear();
+        // Europe
+        MCRCategory find = category.getChildren().get(0);
+        MCRCategory rootCategory = DAO.getRootCategory(find.getId(), 0);
+        assertEquals("Category count does not match.", 2, countNodes(rootCategory));
+        assertEquals("Did not get root Category.", find.getRoot().getId(), rootCategory.getId());
+        rootCategory = DAO.getRootCategory(find.getId(), -1);
+        assertEquals("Category count does not match.", 1 + countNodes(find), countNodes(rootCategory));
     }
 
     /**
