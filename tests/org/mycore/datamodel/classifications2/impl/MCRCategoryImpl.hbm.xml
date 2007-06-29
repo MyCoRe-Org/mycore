@@ -36,9 +36,9 @@
     </many-to-one>
 
     <!-- Values to aquire child categories fast -->
-    <property name="level" />
-    <property name="left" />
-    <property name="right" />
+    <property name="level"/>
+    <property name="left" column="leftValue"/>
+    <property name="right" column="rightValue"/>
 
     <!-- some queries used by MCRCategoryDAOImpl -->
     <query name="deleteCategory">
