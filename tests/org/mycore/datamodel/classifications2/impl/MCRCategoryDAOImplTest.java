@@ -103,7 +103,8 @@ public class MCRCategoryDAOImplTest extends MCRHibTestCase {
                 ((MCRCategoryImpl) category).getInternalID());
         assertEquals("Child category count does not match.", category.getChildren().size(), rootCategory.getChildren().size());
         int allNodes = (Integer)sessionFactory.getCurrentSession().createCriteria(MCRCategoryImpl.class).setProjection(Projections.rowCount()).uniqueResult();
-        assertEquals("Complete category count does not match.", countNodes(category), allNodes);
+        //category + india
+        assertEquals("Complete category count does not match.", countNodes(category)+1, allNodes);
     }
 
     public void testDeleteCategory() {
