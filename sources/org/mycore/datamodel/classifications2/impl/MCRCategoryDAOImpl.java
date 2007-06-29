@@ -233,10 +233,24 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         // update needed for old and newParent;
         // Update Left, Right values of other categories
         boolean movedToRight = isCategoryMovedRight(oldParent, newParent, index);
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("OldParent left: " + oldParent.getLeft() + " Right: " + oldParent.getRight() + " Level: " + oldParent.getLevel());
+            LOGGER.debug("NewParent left: " + newParent.getLeft() + " Right: " + newParent.getRight() + " Level: " + newParent.getLevel());
+            LOGGER.debug("SubTree   left: " + subTree.getLeft() + " Right: " + subTree.getRight() + " Level: " + subTree.getLevel());
+            if (movedToRight) {
+                LOGGER.debug("Category '" + id + "' is moved right.");
+            } else {
+                LOGGER.debug("Category '" + id + "' is moved left.");
+            }
+        }
         // update Left, Right and Level values
         calculateLeftRightAndLevel(subTree, newParent.getLeft() + 1, newParent.getLevel() + 1);
+        // only update oldParent if newParent is not its ancestor
         boolean updateOldParent = (oldParent.getLeft() < newParent.getLeft() || oldParent.getRight() > newParent.getRight()) ? true : false;
-        boolean updateNewParent = (!oldParent.getId().equals(newParent.getId())) ? true : false;
+        // only update newParent if newParent!=oldParent and
+        // oldParent is not its ancestor
+        boolean updateNewParent = (!oldParent.getId().equals(newParent.getId()) && (newParent.getLeft() < oldParent.getLeft() || newParent.getRight() > oldParent
+                .getRight())) ? true : false;
         if (updateOldParent) {
             LOGGER.debug("Updating old parent " + oldParent.getId());
             session.update(oldParent);
@@ -503,14 +517,14 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         Session session = connection.getSession();
         connection.flushSession();
         LOGGER.debug("LEFT AND RIGHT values need updates. Left=" + left + ", increment by: " + increment);
-        Query leftQuery = session.getNamedQuery(CATEGRORY_CLASS.getName() + ".updateLeftMax");
+        Query leftQuery = session.getNamedQuery(CATEGRORY_CLASS.getName() + ".updateLeftWithMax");
         leftQuery.setInteger("left", left);
         leftQuery.setInteger("max", maxLeft);
         leftQuery.setInteger("increment", increment);
         int leftChanges = leftQuery.executeUpdate();
-        Query rightQuery = session.getNamedQuery(CATEGRORY_CLASS.getName() + ".updateRightMax");
+        Query rightQuery = session.getNamedQuery(CATEGRORY_CLASS.getName() + ".updateRightWithMax");
         rightQuery.setInteger("right", right);
-        leftQuery.setInteger("max", maxRight);
+        rightQuery.setInteger("max", maxRight);
         rightQuery.setInteger("increment", increment);
         int rightChanges = rightQuery.executeUpdate();
         connection.flushSession();
