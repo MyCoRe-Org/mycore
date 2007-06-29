@@ -24,7 +24,6 @@
 package org.mycore.common;
 
 import static org.mycore.common.MCRConstants.DEFAULT_ENCODING;
-import static org.mycore.common.MCRConstants.SUPPORTED_LANG;
 import static org.mycore.common.MCRConstants.DATE_FORMAT;
 
 import java.io.BufferedOutputStream;
@@ -44,6 +43,7 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Locale;
 import java.util.Properties;
 
 import javax.xml.parsers.SAXParser;
@@ -81,6 +81,23 @@ public class MCRUtils {
     // public constant data
     private static final Logger LOGGER = Logger.getLogger(MCRUtils.class);
 
+    // Language lists
+    private static ArrayList<String> langlist = new ArrayList<String>();
+    private static ArrayList<String> countrylist = new ArrayList<String>();
+    
+    /**
+     * Load two static arrays for fast search of ISO-639/ISO-3166 strings.
+     */
+    static {
+        StringBuffer sb;
+        for ( Locale l : Locale.getAvailableLocales()) {
+            sb = new StringBuffer(l.getLanguage());
+            langlist.add(sb.toString());
+            sb.append('-').append(l.getCountry());
+            countrylist.add(sb.toString());
+        }
+    }
+    
     /**
      * This method check the language string base on RFC 1766 to the supported
      * languages in mycore.
@@ -93,13 +110,9 @@ public class MCRUtils {
         if ((lang == null) || ((lang = lang.trim()).length() == 0)) {
             return false;
         }
-
-        for (int i = 0; i < SUPPORTED_LANG.length; i++) {
-            if (lang.equals(SUPPORTED_LANG[i])) {
-                return true;
-            }
-        }
-
+        if (lang.startsWith("x-")) { return true; }
+        if (langlist.contains(lang)) { return true; }
+        if (countrylist.contains(lang)) { return true; }
         return false;
     }
 

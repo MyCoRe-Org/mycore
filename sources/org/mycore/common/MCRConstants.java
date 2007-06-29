@@ -52,21 +52,6 @@ public final class MCRConstants {
     /** The default encoding */
     public final static String DEFAULT_ENCODING = "UTF-8";
 
-    /** The supported language codes (like xml:lang definition) * */
-    public static String[] SUPPORTED_LANG = {
-
-    // ISO-639 with ISO-3166 extendions
-            "ar", "de", "de-DE", "en", "en-UK", "en-US",
-            // extendion for historical languages
-            "x-egy", // egypt
-            "x-ara", // arabic
-            "x-grc", // old greek
-            "x-lat", // latin
-            "x-cop", // coptic
-
-            // extension for DINI Specification Labels (OAI-Interface)
-            "x-dini" };
-
     /** The date format for the supported languages * */
     public static DateFormat[] DATE_FORMAT = {
         DateFormat.getDateInstance(DateFormat.MEDIUM, Locale.getDefault()), // x-...
