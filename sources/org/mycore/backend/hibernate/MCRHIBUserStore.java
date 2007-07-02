@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
@@ -340,7 +341,7 @@ public class MCRHIBUserStore implements MCRUserStore {
         for (int i = 0; i < memberUserIDs.size(); i++) {
             MCRGROUPMEMBERS member = new MCRGROUPMEMBERS();
             member.setGid(group);
-            member.setUserid((MCRUSERS)session.get(MCRUSERS.class, memberUserIDs.get(i).toString()));
+            member.setUserid((MCRUSERS) session.get(MCRUSERS.class, memberUserIDs.get(i).toString()));
             session.save(member);
             session.flush();
         }
@@ -349,7 +350,7 @@ public class MCRHIBUserStore implements MCRUserStore {
         for (int i = 0; i < newGroup.getAdminUserIDs().size(); i++) {
             MCRGROUPADMINS admin = new MCRGROUPADMINS();
             admin.setGid(group);
-            admin.setUserid((MCRUSERS)session.get(MCRUSERS.class, newGroup.getAdminUserIDs().get(i).toString()));
+            admin.setUserid((MCRUSERS) session.get(MCRUSERS.class, newGroup.getAdminUserIDs().get(i).toString()));
             admin.setGroupid(ADMIN_GROUP);
             session.saveOrUpdate(admin);
             session.flush();
@@ -360,7 +361,7 @@ public class MCRHIBUserStore implements MCRUserStore {
             admin.setGid(group);
             admin.setUserid(ADMIN_USER);
             final String adminGroupID = newGroup.getAdminGroupIDs().get(i).toString();
-            admin.setGroupid((MCRGROUPS)session.get(MCRGROUPS.class, adminGroupID));
+            admin.setGroupid((MCRGROUPS) session.get(MCRGROUPS.class, adminGroupID));
             if (session.get(MCRGROUPADMINS.class, admin.getKey()) == null) {
                 session.saveOrUpdate(admin);
                 session.flush();
@@ -420,8 +421,9 @@ public class MCRHIBUserStore implements MCRUserStore {
     @SuppressWarnings("unchecked")
     public List<String> getGroupIDsWithAdminUser(String userID) throws MCRException {
         Session session = MCRHIBConnection.instance().getSession();
-        List<String> l = session.createQuery("SELECT gid from MCRGROUPADMINS where USERID = '" + userID + "'").list();
-        return l;
+        Criteria c = session.createCriteria(MCRGROUPADMINS.class).setProjection(Projections.property("gid")).add(
+                Restrictions.eq("userid", session.get(MCRUSERS.class, userID)));
+        return c.list();
     }
 
     /**
@@ -607,8 +609,8 @@ public class MCRHIBUserStore implements MCRUserStore {
             l = session.createQuery("from MCRGROUPMEMBERS where GID = '" + groupID + "'").list();
 
             ArrayList<String> mbrUserIDs = new ArrayList<String>();
-            
-            Set<String> users=new HashSet<String>();
+
+            Set<String> users = new HashSet<String>();
 
             if (l.size() > 0) {
                 for (int i = 0; i < l.size(); i++) {
@@ -619,14 +621,14 @@ public class MCRHIBUserStore implements MCRUserStore {
                     }
                 }
             }
-            
-            //Add all users with groupID as primary group
+
+            // Add all users with groupID as primary group
             l = session.createCriteria(MCRUSERS.class).setProjection(Projections.property("uid")).add(Restrictions.eq("primgroup", groups)).list();
             for (Object uid : l) {
                 users.add(uid.toString());
             }
             mbrUserIDs.addAll(users);
-            
+
             // We create the group object
             try {
                 return new MCRGroup(groupID, creator, created, modified, description, admUserIDs, admGroupIDs, mbrUserIDs);
