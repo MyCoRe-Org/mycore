@@ -60,12 +60,12 @@ UPDATE MCRCategoryImpl cat SET cat.right=cat.right+:increment WHERE cat.right >=
     </query>
     <query name="updateLeftWithMax">
       <![CDATA[
-UPDATE MCRCategoryImpl cat SET cat.left=cat.left+:increment WHERE cat.left > :left and cat.left < :max
+UPDATE MCRCategoryImpl cat SET cat.left=cat.left+:increment WHERE cat.left > :left and cat.left <= :max
       ]]>
     </query>
     <query name="updateRightWithMax">
       <![CDATA[
-UPDATE MCRCategoryImpl cat SET cat.right=cat.right+:increment WHERE cat.right > :right and cat.right < :max
+UPDATE MCRCategoryImpl cat SET cat.right=cat.right+:increment WHERE cat.right > :right and cat.right <= :max
       ]]>
     </query>
     <query name="byLabel">
