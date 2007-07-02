@@ -129,7 +129,7 @@ public class MCRWCMSAdminServlet extends MCRWCMSServlet {
 			String exitURL = request.getParameter("address");
 			response.sendRedirect(response.encodeRedirectURL(exitURL));	
 		} else {
-			String exitURL = request.getContextPath() + "/servlets/WCMSAdminServlet?action=choose";
+			String exitURL = request.getContextPath() + "/servlets/MCRWCMSAdminServlet?action=choose";
 			response.sendRedirect(response.encodeRedirectURL(exitURL));
 		}
 	}
