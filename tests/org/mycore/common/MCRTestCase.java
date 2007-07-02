@@ -9,8 +9,6 @@ public class MCRTestCase extends TestCase {
 
     static MCRConfiguration CONFIG;
 
-    protected boolean debug = false;
-
     /**
      * initializes MCRConfiguration with an empty property file.
      * 
@@ -28,7 +26,7 @@ public class MCRTestCase extends TestCase {
         }
         CONFIG = MCRConfiguration.instance();
         boolean setPropertie = false;
-        if (debug)
+        if (isDebugEnabled())
             setPropertie = setProperty("log4j.rootLogger", "DEBUG, stdout", false) ? true : setPropertie;
         else
             setPropertie = setProperty("log4j.rootLogger", "INFO, stdout", false) ? true : setPropertie;
@@ -55,4 +53,9 @@ public class MCRTestCase extends TestCase {
         }
         return false;
     }
+
+    protected boolean isDebugEnabled() {
+        return false;
+    }
+
 }
