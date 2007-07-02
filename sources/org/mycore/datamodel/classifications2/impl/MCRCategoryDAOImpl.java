@@ -247,9 +247,9 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
             }
         }
         if (movedToRight)
-            updateMoveRight(connection, oldParent, newParent, left, right, index);
+            updateMoveRight(connection, oldParent, newParent, left, right, index, oldIndex);
         else
-            updateMoveLeft(connection, oldParent, newParent, left, right, index);
+            updateMoveLeft(connection, oldParent, newParent, left, right, index, oldIndex);
         // use newParent.left+1 if no left sibling else leftSibling.right+1
         int leftStart = (index == 0) ? (getLeftRightValues(newParent.getId())[0] + 1)
                 : (getLeftRightValues(newParent.getChildren().get(index - 1).getId())[1] + 1);
@@ -561,35 +561,52 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         LOGGER.debug("Updated " + leftChanges + " left and " + rightChanges + " right values.");
     }
 
-    private static void updateMoveLeft(MCRHIBConnection connection, MCRCategoryImpl oldParent, MCRCategoryImpl newParent, int left, int right, int index) {
+    private static void updateMoveLeft(MCRHIBConnection connection, MCRCategoryImpl oldParent, MCRCategoryImpl newParent, int left, int right, int index,
+            int oldIndex) {
         int nodes = 1 + (right - left) / 2;
-        MCRCategoryImpl rightSiblingOrOfAncestor = getRightSiblingOrOfAncestor(newParent, index);
-        int maxLeft = rightSiblingOrOfAncestor.getLeft();
-        MCRCategoryImpl rightSiblingOrParent = getRightSiblingOrParent(newParent, index);
-        int maxRight = rightSiblingOrParent.getRight();
-        int minRight = right;
-        if (maxRight <= right) {
-            // Update at least newParent
-            minRight = maxRight - 1;
-        }
         int increment = 2 * nodes;
-        updateLeftRightValueMax(connection, left, maxLeft, minRight, maxRight, increment);
-        connection.getSession().refresh(rightSiblingOrOfAncestor);
-    }
-
-    private static void updateMoveRight(MCRHIBConnection connection, MCRCategoryImpl oldParent, MCRCategoryImpl newParent, int left, int right, int index) {
-        int nodes = 1 + (right - left) / 2;
-        int maxLeft = getLeftSiblingOrParent(newParent, index).getLeft();
-        int minLeft = left;
-        if (maxLeft <= left) {
-            // update at least newParent
-            minLeft = maxLeft - 1;
+        if (newParent == oldParent) {
+            MCRCategoryImpl leftSiblingOrParent = getLeftSiblingOrParent(newParent, index);
+            int newLeft = leftSiblingOrParent.getLeft();
+            int newRight = (leftSiblingOrParent == newParent) ? newLeft + 1 : leftSiblingOrParent.getRight();
+            updateLeftRightValueMax(connection, newLeft, left, newRight, right, increment);
+            connection.getSession().refresh(newParent);
+        } else {
+            MCRCategoryImpl rightSiblingOrOfAncestor = getRightSiblingOrOfAncestor(newParent, index);
+            int maxLeft = rightSiblingOrOfAncestor.getLeft();
+            MCRCategoryImpl rightSiblingOrParent = getRightSiblingOrParent(newParent, index);
+            int maxRight = rightSiblingOrParent.getRight();
+            int minRight = right;
+            if (maxRight <= right) {
+                // Update at least newParent
+                minRight = maxRight - 1;
+            }
+            updateLeftRightValueMax(connection, left, maxLeft, minRight, maxRight, increment);
+            connection.getSession().refresh(rightSiblingOrOfAncestor);
         }
-        MCRCategoryImpl leftSiblingOrOfAncestor = getLeftSiblingOrOfAncestor(newParent, index);
-        int maxRight = leftSiblingOrOfAncestor.getRight();
-        int increment = -2 * nodes;
-        updateLeftRightValueMax(connection, minLeft, maxLeft, right, maxRight, increment);
-        connection.getSession().refresh(leftSiblingOrOfAncestor);
     }
 
+    private static void updateMoveRight(MCRHIBConnection connection, MCRCategoryImpl oldParent, MCRCategoryImpl newParent, int left, int right, int index,
+            int oldIndex) {
+        int nodes = 1 + (right - left) / 2;
+        int increment = -2 * nodes;
+        if (newParent == oldParent) {
+            MCRCategoryImpl leftSibling = getLeftSiblingOrParent(newParent, index);
+            int maxLeft=leftSibling.getLeft();
+            int maxRight=leftSibling.getRight();
+            updateLeftRightValueMax(connection, right, maxLeft, left, maxRight, increment);
+            connection.getSession().refresh(newParent);
+        } else {
+            int maxLeft = getLeftSiblingOrParent(newParent, index).getLeft();
+            int minLeft = left;
+            if (maxLeft <= left) {
+                // update at least newParent
+                minLeft = maxLeft - 1;
+            }
+            MCRCategoryImpl leftSiblingOrOfAncestor = getLeftSiblingOrOfAncestor(newParent, index);
+            int maxRight = leftSiblingOrOfAncestor.getRight();
+            updateLeftRightValueMax(connection, minLeft, maxLeft, right, maxRight, increment);
+            connection.getSession().refresh(leftSiblingOrOfAncestor);
+        }
+    }
 }

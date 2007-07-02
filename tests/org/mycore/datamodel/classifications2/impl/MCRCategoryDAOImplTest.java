@@ -235,14 +235,33 @@ public class MCRCategoryDAOImplTest extends MCRHibTestCase {
         beginTransaction();
         // clear from cache
         sessionFactory.getCurrentSession().clear();
+        MCRCategoryImpl rootNode = getRootCategoryFromSession();
+        checkLeftRightLevelValue(rootNode, 0, 0);
+    }
+
+    public void testMoveCategoryInParent() throws SQLException {
+        DAO.addCategory(null, category);
+        endTransaction();
+        beginTransaction();
+        // clear from cache
+        sessionFactory.getCurrentSession().clear();
+        MCRCategory moveNode = category.getChildren().get(1);
+        DAO.moveCategory(moveNode.getId(), moveNode.getParent().getId(), 0);
+        endTransaction();
+        beginTransaction();
+        sessionFactory.getCurrentSession().clear();
+
         Connection connection = sessionFactory.getCurrentSession().connection();
         CallableStatement st=connection.prepareCall("SELECT internalId, ClassID, CategID, parentID, positionInParent, level, leftValue, rightValue FROM MCRCategory");
         ResultSet rs=st.executeQuery();
         while (rs.next()){
-            System.out.printf("%d %s %s %d %d %d %d %d\n", rs.getInt(1), rs.getString(2), rs.getString(3), rs.getInt(4), rs.getInt(5), rs.getInt(6), rs.getInt(7), rs.getInt(8));
+            System.out.printf("%d %s %s\t%d   %d   %d  %2d  %2d\n", rs.getInt(1), rs.getString(2), rs.getString(3), rs.getInt(4), rs.getInt(5), rs.getInt(6), rs.getInt(7), rs.getInt(8));
         }
+
         MCRCategoryImpl rootNode = getRootCategoryFromSession();
         checkLeftRightLevelValue(rootNode, 0, 0);
+        MCRCategory movedNode=rootNode.getChildren().get(0);
+        assertEquals("Did not expect this category on position 0.", moveNode.getId(), movedNode.getId());
     }
 
     /**
