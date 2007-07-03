@@ -278,7 +278,6 @@ public class MCRCategoryDAOImplTest extends MCRHibTestCase {
     private int checkLeftRightLevelValue(MCRCategoryImpl node, int leftStart, int levelStart) {
         int curValue = leftStart;
         final int nextLevel = levelStart + 1;
-        System.out.printf("Checking %s\n", node.getId());
         assertEquals("Left value did not match on ID: " + node.getId(), leftStart, node.getLeft());
         assertEquals("Level value did not match on ID: " + node.getId(), levelStart, node.getLevel());
         for (MCRCategory child : node.children) {
@@ -286,10 +285,6 @@ public class MCRCategoryDAOImplTest extends MCRHibTestCase {
         }
         assertEquals("Right value did not match on ID: " + node.getId(), ++curValue, node.getRight());
         return curValue;
-    }
-
-    protected boolean isDebugEnabled() {
-        return true;
     }
 
 }
