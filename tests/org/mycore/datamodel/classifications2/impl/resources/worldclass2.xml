@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mycoreclass ID="World">
+  <label xml:lang="de" text="Staaten" description="Klassifikation von Staaten" />
+  <label xml:lang="en" text="Nations" description="classification of states" />
+  <categories>
+    <category ID="Europe">
+      <label xml:lang="de" text="Europa" />
+      <label xml:lang="en" text="Europe" />
+      <label xml:lang="fr" text="Europe" />
+      <category ID="Germany">
+        <label xml:lang="de" text="Deutschland" />
+        <label xml:lang="en" text="Germany" />
+        <label xml:lang="fr" text="Allemagne" />
+      </category>
+      <category ID="UK">
+        <label xml:lang="de" text="Vereinigtes Königreich" />
+        <label xml:lang="en" text="United Kingdom" />
+        <label xml:lang="fr" text="Royaume-Uni" />
+      </category>
+      <category ID="France">
+        <label xml:lang="de" text="Frankreich" />
+        <label xml:lang="en" text="France" />
+        <label xml:lang="fr" text="France" />
+      </category>
+    </category>
+    <category ID="Asia">
+      <label xml:lang="de" text="Asien" />
+      <label xml:lang="en" text="Asia" />
+      <label xml:lang="fr" text="Asie" />
+      <category ID="China">
+        <label xml:lang="de" text="China" />
+        <label xml:lang="en" text="China" />
+        <label xml:lang="fr" text="Chine" />
+      </category>
+      <category ID="India">
+        <label xml:lang="de" text="Indien" />
+        <label xml:lang="en" text="India" />
+        <label xml:lang="fr" text="Inde" />
+      </category>
+    </category>
+  </categories>
+</mycoreclass>
