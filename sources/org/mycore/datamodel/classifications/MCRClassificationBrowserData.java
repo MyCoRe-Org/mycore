@@ -205,8 +205,7 @@ public class MCRClassificationBrowserData {
     private void setObjectTypes(final String browserClass) {
         try {
             // NOTE: read *.Doctype for compatiblity reasons
-            objectType = config.getString("MCR.ClassificationBrowser." + browserClass + ".Objecttype", config.getString("MCR.ClassificationBrowser."
-                    + browserClass + ".Doctype", null));
+            objectType = config.getString("MCR.ClassificationBrowser." + browserClass + ".Objecttype", config.getString("MCR.ClassificationBrowser." + browserClass + ".Doctype", null));
         } catch (final org.mycore.common.MCRConfigurationException noDoctype) {
             objectType = config.getString("MCR.ClassificationBrowser.default.ObjectType", config.getString("MCR.ClassificationBrowser.default.Doctype"));
         }
@@ -736,117 +735,96 @@ public class MCRClassificationBrowserData {
 
     // don't use it works not really good
 
-    private Element sortMyTree(final Element xDocument) {
+    private final Element sortMyTree(final Element xDocument) {
         Element xDoc = (Element) xDocument.clone();
-        for (int i = 0; i < maxlevel; i++) {
-            xDoc = sortMyTreeperLevel(xDoc, i, 0);
-        }
-        return xDoc;
-    }
-
-    private Element sortMyTreeperLevel(final Element xDocument, final int activelevel, final int position) {
-        Element xDoc = xDocument;
-        final Element aktRow = ((Element) xDoc.getChild("navigationtree").getChildren().get(position));
-        final String aktText = ((Element) aktRow.getChildren().get(1)).getText();
-
-        final List children = xDoc.getChild("navigationtree").getChildren();
-        int level = activelevel;
-        int Cnt = 0;
-        for (int j = position + 1; j < children.size(); j++) {
-            final Element child = (Element) (children.get(j));
+        final Element navitree = ((Element) xDoc.getChild("navigationtree"));
+        // separate
+        ArrayList<String> itemname = new ArrayList<String>();
+        ArrayList<Integer> itemlevel = new ArrayList<Integer>();
+        ArrayList<Element> itemelm = new ArrayList<Element>();
+        List navitreelist = navitree.getChildren();
+        for (int i = 0; i < navitreelist.size(); i++) {
+            final Element child = (Element) (navitreelist.get(i));
             final Element col1 = (Element) (child.getChildren().get(0));
             final Element col2 = (Element) (child.getChildren().get(1));
-
+            final String sText = col2.getText();
+            int level = 0;
             try {
                 level = col1.getAttribute("lineLevel").getIntValue();
             } catch (final Exception ignored) {
-                ;
             }
-
-            final String sText = col2.getText();
-
-            if (activelevel == level) {
-                if (aktText.compareTo(sText) > 0) {
-                    changeRows(aktRow, child);
-                    boolean bjumpOverChilds = true;
-                    while (bjumpOverChilds && j < children.size() - 1) {
-                        final Element next = (Element) (children.get(j + 1));
-                        if (next != null) {
-                            final Element colx = (Element) (child.getChildren().get(0));
-                            int nextlevel = level;
-                            try {
-                                nextlevel = colx.getAttribute("lineLevel").getIntValue();
-                            } catch (final Exception ignored) {
-                                ;
-                            }
-
-                            if (nextlevel > level)
-                                j++;
-                            else
-                                bjumpOverChilds = false;
-                        } else
-                            bjumpOverChilds = false;
-                    }
-                    Cnt++;
-                    xDoc = sortMyTreeperLevel(xDoc, activelevel, position);
-                }
-                if (position < children.size() - 1 && j == children.size() - 1 && Cnt == 0)
-                    xDoc = sortMyTreeperLevel(xDoc, activelevel, position + 1);
-            }
+            itemname.add(sText);
+            itemlevel.add(new Integer(level));
+            itemelm.add((Element) child.clone());
+            navitree.removeContent(child);
+            i--;
+        }
+        int[] itemnum = new int[itemname.size()];
+        for (int i = 0; i < itemname.size(); i++) {
+            itemnum[i] = i;
+        }
+        // debug
+        //for (int i = 0; i < itemnum.length; i++) {
+        //    System.out.println("===> " + i + "  " + itemnum[i] + "  " + itemname.get(itemnum[i]));
+        //}
+        // sort
+        sortMyTreePerLevel(0, itemname.size(), 1, itemname, itemlevel, itemnum);
+        // debug
+        //for (int i = 0; i < itemnum.length; i++) {
+        //    System.out.println("---> " + i + "  " + itemnum[i] + "  " + itemname.get(itemnum[i]));
+        //}
+        // write back
+        for (int i = 0; i < itemnum.length; i++) {
+            navitree.addContent(itemelm.get(itemnum[i]));
         }
         return xDoc;
     }
 
-    private void changeRows(final Element aktRow, final Element child) {
-
-        final Element col1 = (Element) (child.getChildren().get(0));
-        final Element col2 = (Element) (child.getChildren().get(1));
-        final Element placer = (Element) (aktRow.clone());
-        final Element place1 = (Element) (placer.getChildren().get(0));
-        final Element place2 = (Element) (placer.getChildren().get(1));
-
-        final Element xc1 = new Element("col");
-        final Element xc2 = new Element("col");
-
-        aktRow.setContent(0, xc1);
-        xc1.setAttribute("lineLevel", col1.getAttributeValue("lineLevel"));
-
-        xc1.setAttribute("childpos", col1.getAttributeValue("childpos"));
-        xc1.setAttribute("folder1", col1.getAttributeValue("folder1"));
-        xc1.setAttribute("folder2", col1.getAttributeValue("folder2"));
-        if (col1.getAttributeValue("plusminusbase") != null) {
-            xc1.setAttribute("plusminusbase", col1.getAttributeValue("plusminusbase"));
+    private final void sortMyTreePerLevel(int von, int bis, int level, ArrayList<String> itemname, ArrayList<Integer> itemlevel, int[] itemnum) {
+        if (von == bis)
+            return;
+        //System.out.println("$$$>" + von + "  " + bis);
+        for (int i = von; i < bis - 1; i++) {
+            //System.out.println("III>" + i + "  " + itemname.get(itemnum[i]));
+            if (itemlevel.get(itemnum[i]) != level) {
+                //System.out.println("%%%> inner sort");
+                int start = i;
+                int stop = start;
+                while (stop + 1 < bis && itemlevel.get(itemnum[stop + 1]).intValue() > level) {
+                    stop++;
+                }
+                //System.out.println("--------------------");
+                sortMyTreePerLevel(start, stop+1, level + 2, itemname, itemlevel, itemnum);
+                //System.out.println("--------------------");
+                i = stop+1;
+                if (i >= bis) continue;
+            }
+            String aktitem = itemname.get(itemnum[i]);
+            for (int j = i + 1; j < bis; j++) {
+                if (level != itemlevel.get(itemnum[j]).intValue())
+                    continue;
+                //System.out.println("%%%>" + i + "  " + aktitem + "  " + j + "  " + itemname.get(itemnum[j]) + "  " + level + "  " + itemlevel.get(itemnum[j]).intValue());
+                if (aktitem.compareTo(itemname.get(itemnum[j])) > 0) {
+                    // must switch
+                    //System.out.println("%%%> swap " + i + " with " + j);
+                    int[] swap = itemnum.clone();
+                    itemnum[i] = itemnum[j];
+                    int ii = i;
+                    for (int jj = j; jj < bis; jj++) {
+                        //System.out.println("* " + ii + "  " + jj);
+                        itemnum[ii] = swap[jj];
+                        ii++;
+                    }
+                    for (int jj = i; jj < j; jj++) {
+                        //System.out.println("# " + ii + "  " + jj);
+                        itemnum[ii] = swap[jj];
+                        ii++;
+                    }
+                    j = i;
+                    aktitem = itemname.get(itemnum[i]);
+                }
+            }
         }
-
-        aktRow.setContent(1, xc2);
-        xc2.setAttribute("numDocs", col2.getAttributeValue("numDocs"));
-        xc2.setAttribute("fmtnumDocs", col2.getAttributeValue("fmtnumDocs"));
-        xc2.setAttribute("searchbase", col2.getAttributeValue("searchbase"));
-        if (col2.getAttributeValue("lineID") != null) {
-            xc2.setAttribute("lineID", col2.getAttributeValue("lineID"));
-        }
-        xc2.addContent(col2.getText());
-
-        final Element xc3 = new Element("col");
-        final Element xc4 = new Element("col");
-
-        child.setContent(0, xc3);
-        xc3.setAttribute("lineLevel", place1.getAttributeValue("lineLevel"));
-        xc3.setAttribute("childpos", place1.getAttributeValue("childpos"));
-        xc3.setAttribute("folder1", place1.getAttributeValue("folder1"));
-        xc3.setAttribute("folder2", place1.getAttributeValue("folder2"));
-        if (place1.getAttributeValue("plusminusbase") != null) {
-            xc3.setAttribute("plusminusbase", place1.getAttributeValue("plusminusbase"));
-        }
-
-        child.setContent(1, xc4);
-        xc4.setAttribute("numDocs", place2.getAttributeValue("numDocs"));
-        xc4.setAttribute("fmtnumDocs", place2.getAttributeValue("fmtnumDocs"));
-        xc4.setAttribute("searchbase", place2.getAttributeValue("searchbase"));
-        if (place2.getAttributeValue("lineID") != null) {
-            xc4.setAttribute("lineID", place2.getAttributeValue("lineID"));
-        }
-        xc4.addContent(place2.getText());
     }
 
     private static String fillToConstantLength(final String value, final String fillsign, final int length) {
