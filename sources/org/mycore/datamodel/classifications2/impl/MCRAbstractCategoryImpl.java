@@ -24,8 +24,8 @@
 package org.mycore.datamodel.classifications2.impl;
 
 import java.net.URI;
-import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.mycore.datamodel.classifications2.MCRCategory;
@@ -49,7 +49,7 @@ public abstract class MCRAbstractCategoryImpl implements MCRCategory {
 
     private URI URI;
 
-    protected Collection<MCRLabel> labels;
+    protected Map<String, MCRLabel> labels;
 
     protected List<MCRCategory> children;
 
@@ -79,7 +79,7 @@ public abstract class MCRAbstractCategoryImpl implements MCRCategory {
         return id;
     }
 
-    public Collection<MCRLabel> getLabels() {
+    public Map<String, MCRLabel> getLabels() {
         return labels;
     }
 

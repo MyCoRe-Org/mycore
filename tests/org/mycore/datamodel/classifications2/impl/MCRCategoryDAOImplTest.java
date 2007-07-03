@@ -26,7 +26,7 @@ package org.mycore.datamodel.classifications2.impl;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.sql.SQLException;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.List;
 
 import org.hibernate.criterion.Projections;
@@ -88,9 +88,9 @@ public class MCRCategoryDAOImplTest extends MCRHibTestCase {
         assertTrue("Exist check failed for Category " + category.getId(), DAO.exist(category.getId()));
         MCRCategoryImpl india = new MCRCategoryImpl();
         india.setId(new MCRCategoryID(category.getId().getRootID(), "India"));
-        india.setLabels(new HashSet<MCRLabel>());
-        india.getLabels().add(new MCRLabel("de", "Indien", null));
-        india.getLabels().add(new MCRLabel("en", "India", null));
+        india.setLabels(new HashMap<String, MCRLabel>());
+        india.getLabels().put("de", new MCRLabel("de", "Indien", null));
+        india.getLabels().put("en", new MCRLabel("en", "India", null));
         MCRHIBConnection.instance().flushSession();
         DAO.addCategory(new MCRCategoryID(category.getId().getRootID(), "Asia"), india);
         startNewTransaction();
@@ -116,10 +116,10 @@ public class MCRCategoryDAOImplTest extends MCRHibTestCase {
         addWorldClassification();
         MCRCategory find = category.getChildren().get(0).getChildren().get(0);
         MCRCategory dontFind = category.getChildren().get(1);
-        MCRLabel label = find.getLabels().iterator().next();
+        MCRLabel label = find.getLabels().values().iterator().next();
         List<MCRCategory> results = DAO.getCategoriesByLabel(category.getId(), label.getLang(), label.getText());
         assertFalse("No search results found", results.isEmpty());
-        assertTrue("Could not find Category: " + find.getId(), results.get(0).getLabels().contains(label));
+        assertTrue("Could not find Category: " + find.getId(), results.get(0).getLabels().containsValue(label));
         assertTrue("No search result expected.", DAO.getCategoriesByLabel(dontFind.getId(), label.getLang(), label.getText()).isEmpty());
     }
 
@@ -233,7 +233,7 @@ public class MCRCategoryDAOImplTest extends MCRHibTestCase {
         startNewTransaction();
         rootNode = getRootCategoryFromSession();
         assertEquals("Label count does not match.", count + 1, rootNode.getLabels().size());
-        assertEquals("Label does not match.", description, getLabel(rootNode, lang).getDescription());
+        assertEquals("Label does not match.", description, rootNode.getLabels().get(lang).getDescription());
     }
 
     private void startNewTransaction() {
@@ -286,15 +286,6 @@ public class MCRCategoryDAOImplTest extends MCRHibTestCase {
         }
         assertEquals("Right value did not match on ID: " + node.getId(), ++curValue, node.getRight());
         return curValue;
-    }
-
-    private static MCRLabel getLabel(MCRCategory category, String lang) {
-        for (MCRLabel label : category.getLabels()) {
-            if (lang.equals(label.getLang())) {
-                return label;
-            }
-        }
-        return null;
     }
 
     protected boolean isDebugEnabled() {

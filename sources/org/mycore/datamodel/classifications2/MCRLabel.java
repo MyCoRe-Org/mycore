@@ -40,8 +40,9 @@ public class MCRLabel implements Cloneable, Serializable {
     String lang, text, description;
 
     public MCRLabel() {
-        
+
     }
+
     public MCRLabel(String lang, String text, String description) {
         super();
         this.lang = lang;
@@ -66,6 +67,8 @@ public class MCRLabel implements Cloneable, Serializable {
     }
 
     public String getDescription() {
+        if (description == null)
+            return "";
         return description;
     }
 
@@ -83,28 +86,35 @@ public class MCRLabel implements Cloneable, Serializable {
         }
         return clone;
     }
+
     @Override
     public String toString() {
-        StringBuilder sb=new StringBuilder();
+        StringBuilder sb = new StringBuilder();
         sb.append(getLang());
         sb.append('(');
         sb.append(getText());
         sb.append(')');
         return sb.toString();
     }
-    /* (non-Javadoc)
+
+    /*
+     * (non-Javadoc)
+     * 
      * @see java.lang.Object#hashCode()
      */
     @Override
     public int hashCode() {
         final int PRIME = 31;
         int result = 1;
-        result = PRIME * result + ((description == null) ? 0 : description.hashCode());
+        result = PRIME * result + getDescription().hashCode();
         result = PRIME * result + ((lang == null) ? 0 : lang.hashCode());
         result = PRIME * result + ((text == null) ? 0 : text.hashCode());
         return result;
     }
-    /* (non-Javadoc)
+
+    /*
+     * (non-Javadoc)
+     * 
      * @see java.lang.Object#equals(java.lang.Object)
      */
     @Override
@@ -116,11 +126,6 @@ public class MCRLabel implements Cloneable, Serializable {
         if (getClass() != obj.getClass())
             return false;
         final MCRLabel other = (MCRLabel) obj;
-        if (description == null) {
-            if (other.description != null)
-                return false;
-        } else if (!description.equals(other.description))
-            return false;
         if (lang == null) {
             if (other.lang != null)
                 return false;
@@ -130,6 +135,8 @@ public class MCRLabel implements Cloneable, Serializable {
             if (other.text != null)
                 return false;
         } else if (!text.equals(other.text))
+            return false;
+        if (!getDescription().equals(other.getDescription()))
             return false;
         return true;
     }

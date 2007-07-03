@@ -26,6 +26,7 @@ package org.mycore.datamodel.classifications2;
 import java.net.URI;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Thomas Scheffler (yagee)
@@ -82,7 +83,7 @@ public interface MCRCategory {
     /**
      * @return the labels
      */
-    public abstract Collection<MCRLabel> getLabels();
+    public abstract Map<String, MCRLabel> getLabels();
 
     /**
      * Returns the hierarchie level of this category.
@@ -97,10 +98,12 @@ public interface MCRCategory {
      * @return the root category
      */
     public abstract MCRCategory getRoot();
-    
+
     /**
      * Returns the parent element
-     * @return the categories parent or null if isClassification()==true or category currently not attached
+     * 
+     * @return the categories parent or null if isClassification()==true or
+     *         category currently not attached
      */
     public abstract MCRCategory getParent();
 

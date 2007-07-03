@@ -24,9 +24,9 @@
 package org.mycore.datamodel.classifications2.utils;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.jdom.Document;
 import org.jdom.Element;
@@ -55,10 +55,11 @@ public class MCRXMLTransformer {
         category.setId(new MCRCategoryID(classID, e.getAttributeValue("ID")));
         category.setLabels(getLabel(e.getChildren("label")));
         category.setLevel(level);
-        category.setChildren(getChildCategories(classID, e.getChildren("category"), level+1));
+        category.setChildren(getChildCategories(classID, e.getChildren("category"), level + 1));
         return category;
     }
 
+    @SuppressWarnings("unchecked")
     private static List<MCRCategory> getChildCategories(String classID, List elements, int level) {
         List<MCRCategory> children = new ArrayList<MCRCategory>(elements.size());
         for (Object o : elements) {
@@ -67,11 +68,13 @@ public class MCRXMLTransformer {
         return children;
     }
 
-    private static Collection<MCRLabel> getLabel(List elements) {
-        Collection<MCRLabel> labels = new HashSet<MCRLabel>(elements.size(),1l);
+    @SuppressWarnings("unchecked")
+    private static Map<String, MCRLabel> getLabel(List elements) {
+        Map<String, MCRLabel> labels = new HashMap<String, MCRLabel>(elements.size(), 1l);
         for (Object o : elements) {
             Element e = (Element) o;
-            labels.add(new MCRLabel(e.getAttributeValue("lang", Namespace.XML_NAMESPACE), e.getAttributeValue("text"), e.getAttributeValue("description")));
+            String lang = e.getAttributeValue("lang", Namespace.XML_NAMESPACE);
+            labels.put(lang,new MCRLabel(lang, e.getAttributeValue("text"), e.getAttributeValue("description")));
         }
         return labels;
     }

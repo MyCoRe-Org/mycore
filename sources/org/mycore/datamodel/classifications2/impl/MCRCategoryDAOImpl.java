@@ -25,7 +25,6 @@ package org.mycore.datamodel.classifications2.impl;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -274,12 +273,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
     public void removeLabel(MCRCategoryID id, String lang) {
         Session session = MCRHIBConnection.instance().getSession();
         MCRCategoryImpl category = getByNaturalID(session, id);
-        for (MCRLabel label : category.labels) {
-            if (lang.equals(label.getLang())) {
-                LOGGER.debug("Removing label with lang " + lang);
-                category.labels.remove(label);
-            }
-        }
+        category.getLabels().remove(lang);
         session.flush();
     }
 
@@ -334,13 +328,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
     public void setLabel(MCRCategoryID id, MCRLabel label) {
         Session session = MCRHIBConnection.instance().getSession();
         MCRCategoryImpl category = getByNaturalID(session, id);
-        Iterator<MCRLabel> it = category.labels.iterator();
-        while (it.hasNext()) {
-            if (label.getLang().equals(it.next().getLang())) {
-                it.remove();
-            }
-        }
-        category.labels.add(label);
+        category.getLabels().put(label.getLang(), label);
         session.update(category);
     }
 
