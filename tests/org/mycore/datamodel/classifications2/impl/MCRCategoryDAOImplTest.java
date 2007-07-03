@@ -25,11 +25,7 @@ package org.mycore.datamodel.classifications2.impl;
 
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.sql.CallableStatement;
-import java.sql.Connection;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
@@ -194,16 +190,6 @@ public class MCRCategoryDAOImplTest extends MCRHibTestCase {
         MCRCategory moveNode = category.getChildren().get(1);
         DAO.moveCategory(moveNode.getId(), moveNode.getParent().getId(), 0);
         startNewTransaction();
-
-        Connection connection = sessionFactory.getCurrentSession().connection();
-        CallableStatement st = connection
-                .prepareCall("SELECT internalId, ClassID, CategID, parentID, positionInParent, level, leftValue, rightValue FROM MCRCategory");
-        ResultSet rs = st.executeQuery();
-        while (rs.next()) {
-            System.out.printf("%d %s %s\t%d   %d   %d  %2d  %2d\n", rs.getInt(1), rs.getString(2), rs.getString(3), rs.getInt(4), rs.getInt(5), rs.getInt(6),
-                    rs.getInt(7), rs.getInt(8));
-        }
-
         MCRCategoryImpl rootNode = getRootCategoryFromSession();
         checkLeftRightLevelValue(rootNode, 0, 0);
         MCRCategory movedNode = rootNode.getChildren().get(0);
