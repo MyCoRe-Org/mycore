@@ -34,6 +34,7 @@ import org.hibernate.FlushMode;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
+import org.hibernate.jmx.StatisticsService;
 import org.hibernate.mapping.Table;
 import org.hibernate.stat.Statistics;
 import org.hibernate.type.BooleanType;
@@ -55,6 +56,7 @@ import org.mycore.common.events.MCRSessionEvent;
 import org.mycore.common.events.MCRSessionListener;
 import org.mycore.common.events.MCRShutdownHandler;
 import org.mycore.common.events.MCRShutdownHandler.Closeable;
+import org.mycore.services.mbeans.MCRJMXBridge;
 
 /**
  * Class for hibernate connection to selected database
@@ -87,6 +89,7 @@ public class MCRHIBConnection implements Closeable, MCRSessionListener {
         try {
             buildConfiguration();
             buildSessionFactory();
+            registerStatisticsService();
         } catch (Exception exc) {
             String msg = "Could not connect to database";
             throw new MCRPersistenceException(msg, exc);
@@ -118,6 +121,11 @@ public class MCRHIBConnection implements Closeable, MCRSessionListener {
         SESSION_FACTORY.close();
         SESSION_FACTORY = config.buildSessionFactory();
         HIBCFG = config;
+    }
+    
+    private static void registerStatisticsService(){
+        StatisticsService stats=new StatisticsService();
+        MCRJMXBridge.registerMe(stats, "Hibernate", "Statistics");
     }
 
     /**
