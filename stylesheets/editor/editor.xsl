@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
 <!-- ============================================== -->
-<!-- $Revision: 1.69 $ $Date: 2007-06-13 12:43:17 $ -->
+<!-- $Revision: 1.70 $ $Date: 2007-07-03 09:57:21 $ -->
 <!-- ============================================== --> 
 
 <xsl:stylesheet 
@@ -608,7 +608,23 @@
 <xsl:template name="editor.set.anchor">
   <!-- ======== set td/@align ======== -->
   <xsl:attribute name="align">
+	<xsl:choose>
+	<xsl:when test="$CurrentLang = 'ar'">
     <xsl:choose>
+      <xsl:when test="@anchor='NORTH'"    >center</xsl:when>
+      <xsl:when test="@anchor='NORTHEAST'">left</xsl:when>
+      <xsl:when test="@anchor='EAST'"     >left</xsl:when>
+      <xsl:when test="@anchor='SOUTHEAST'">left</xsl:when>
+      <xsl:when test="@anchor='SOUTH'"    >center</xsl:when>
+      <xsl:when test="@anchor='SOUTHWEST'">right</xsl:when>  
+      <xsl:when test="@anchor='WEST'"     >right</xsl:when>
+      <xsl:when test="@anchor='NORTHWEST'">right</xsl:when>
+      <xsl:when test="@anchor='CENTER'"   >center</xsl:when>   
+      <xsl:otherwise>right</xsl:otherwise>
+    </xsl:choose>
+	</xsl:when>
+	<xsl:otherwise>
+	<xsl:choose>
       <xsl:when test="@anchor='NORTH'"    >center</xsl:when>
       <xsl:when test="@anchor='NORTHEAST'">right</xsl:when>
       <xsl:when test="@anchor='EAST'"     >right</xsl:when>
@@ -620,11 +636,13 @@
       <xsl:when test="@anchor='CENTER'"   >center</xsl:when>   
       <xsl:otherwise>left</xsl:otherwise>
     </xsl:choose>
+	</xsl:otherwise>
+	</xsl:choose>
   </xsl:attribute>
 
   <!-- ======== set td/@valign ======== -->
   <xsl:attribute name="valign">
-    <xsl:choose>
+	<xsl:choose>
       <xsl:when test="@anchor='NORTH'"    >top</xsl:when>
       <xsl:when test="@anchor='NORTHEAST'">top</xsl:when>
       <xsl:when test="@anchor='EAST'     ">middle</xsl:when>
@@ -635,7 +653,7 @@
       <xsl:when test="@anchor='NORTHWEST'">top</xsl:when>
       <xsl:when test="@anchor='CENTER'"   >middle</xsl:when>
       <xsl:otherwise>top</xsl:otherwise>
-    </xsl:choose>
+    </xsl:choose>	
   </xsl:attribute>
 </xsl:template>
 

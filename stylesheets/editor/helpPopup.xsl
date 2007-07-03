@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
 <!-- ============================================== -->
-<!-- $Revision: 1.5 $ $Date: 2006-12-14 10:57:49 $ -->
+<!-- $Revision: 1.6 $ $Date: 2007-07-03 09:57:21 $ -->
 <!-- ============================================== --> 
 
 <xsl:stylesheet 
   version="1.0" 
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+  xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation"
+  exclude-result-prefixes="i18n">
 >
 
 <xsl:output 
@@ -33,7 +35,7 @@
             </xsl:for-each>
           </xsl:when>
           <xsl:otherwise>
-Hilfe zum Formular
+            <xsl:value-of select="i18n:translate('buttons.helpPopup.help')" />
           </xsl:otherwise>
         </xsl:choose>
       </title>
@@ -57,21 +59,44 @@ Hilfe zum Formular
     </xsl:choose>
     <body>
       <table border="0" cellpadding="5" cellspacing="0" width="100%" height="100%">
-        
-        <tr>
-          <td align="left" >
-            <xsl:for-each select="helpPopup">
-              <xsl:call-template name="output.label" />
-            </xsl:for-each>
-          </td>
-        </tr>
-
-        <tr>
-          <td align="right">
-            <input type="button" class="editorButton" value="Fenster schliessen" onClick="window.close();" />
-          </td>
-        </tr>
-
+        <xsl:choose>
+          <xsl:when test="$CurrentLang = 'ar'">
+            <tr>
+              <td align="right" >
+                <xsl:for-each select="helpPopup">
+                  <xsl:call-template name="output.label" />
+                </xsl:for-each>
+              </td>
+            </tr>
+            <tr>
+              <td align="left">
+                <input type="button" class="editorButton" onClick="window.close();" >
+	    		  <xsl:attribute name="value">
+                    <xsl:value-of select="i18n:translate('buttons.helpPopup.close')" />
+	    		  </xsl:attribute>
+	    		</input>
+              </td>
+            </tr>
+          </xsl:when>
+          <xsl:otherwise>
+            <tr>
+              <td align="left" >
+                <xsl:for-each select="helpPopup">
+                  <xsl:call-template name="output.label" />
+                </xsl:for-each>
+              </td>
+            </tr>
+            <tr>
+              <td align="right">
+                <input type="button" class="editorButton" onClick="window.close();" >
+	    		  <xsl:attribute name="value">
+                    <xsl:value-of select="i18n:translate('buttons.helpPopup.close')" />
+	    		  </xsl:attribute>
+	    		</input>
+              </td>
+            </tr>			  
+		  </xsl:otherwise>
+        </xsl:choose>
       </table>
     </body>
   </html>
