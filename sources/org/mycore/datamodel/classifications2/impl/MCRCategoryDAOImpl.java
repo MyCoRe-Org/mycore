@@ -274,13 +274,13 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
     public void removeLabel(MCRCategoryID id, String lang) {
         Session session = MCRHIBConnection.instance().getSession();
         MCRCategoryImpl category = getByNaturalID(session, id);
-        Iterator<MCRLabel> it = category.labels.iterator();
-        while (it.hasNext()) {
-            if (lang.equals(it.next().getLang())) {
-                it.remove();
+        for (MCRLabel label : category.labels) {
+            if (lang.equals(label.getLang())) {
+                LOGGER.debug("Removing label with lang " + lang);
+                category.labels.remove(label);
             }
         }
-        session.update(category);
+        session.flush();
     }
 
     public void replaceCategory(MCRCategory newCategory) throws IllegalArgumentException {
@@ -592,8 +592,8 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         int increment = -2 * nodes;
         if (newParent == oldParent) {
             MCRCategoryImpl leftSibling = getLeftSiblingOrParent(newParent, index);
-            int maxLeft=leftSibling.getLeft();
-            int maxRight=leftSibling.getRight();
+            int maxLeft = leftSibling.getLeft();
+            int maxRight = leftSibling.getRight();
             updateLeftRightValueMax(connection, right, maxLeft, left, maxRight, increment);
             connection.getSession().refresh(newParent);
         } else {
