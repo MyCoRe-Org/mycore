@@ -1,6 +1,7 @@
 package org.mycore.frontend.wcms;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
@@ -10,7 +11,6 @@ import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.output.DOMOutputter;
 import org.jdom.xpath.XPath;
-import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRException;
 import org.mycore.frontend.MCRLayoutUtilities;
 
@@ -37,10 +37,10 @@ public class MCRWCMSUtilities {
      * @throws JDOMException
      * @throws IOException
      */
-    public static boolean writeAccess(String webpageID) throws JDOMException, IOException {
-        LOGGER.debug("start check write access for webpageID=" + webpageID + "...");
-        boolean access = getWriteAccessGeneral() && MCRLayoutUtilities.getAccess(webpageID, "write", MCRLayoutUtilities.ONETRUE_ALLTRUE);
-        LOGGER.debug("finished checking write access for webpage=" + webpageID + "=" + access + "...");
+    public static boolean writeAccess(String webpageID) {
+        long startTime = System.currentTimeMillis();
+        boolean access = MCRLayoutUtilities.getAccess(webpageID, "write", MCRLayoutUtilities.ONETRUE_ALLTRUE);
+        LOGGER.debug("checked write access for webpage=" + webpageID + "=" + access + ": took " + MCRLayoutUtilities.getDuration(startTime) + " msec.");
         return access;
     }
 
@@ -61,10 +61,61 @@ public class MCRWCMSUtilities {
         return new DOMOutputter().output(writableNavi);
     }
 
-    protected static boolean getWriteAccessGeneral() {
-        return MCRAccessManager.getAccessImpl().checkPermission("wcms-access");
+    /**
+     * Returns a boolean, signalling if the user has at least write acces for 1
+     * item.
+     * 
+     * @return true, if access is granted for at least 1 item OR false, if the
+     *         user has no access for any item
+     * @throws JDOMException
+     */
+    protected static boolean writeAccessGeneral() {
+        Element navi = (new Element("root")).addContent((Element) MCRLayoutUtilities.getNavi().getRootElement().clone());
+        long startTime = System.currentTimeMillis();
+        HashMap accessMap = new HashMap();
+        getWriteAccessGeneral(navi, accessMap);
+        boolean access = !accessMap.isEmpty();
+        LOGGER.debug("checked write access in general=" + access + ": took " + MCRLayoutUtilities.getDuration(startTime) + " msec.");
+        return access;
     }
 
+    /**
+     * The implementation for writeAccessGeneral()
+     * 
+     * @param navigation
+     * @return
+     * @throws JDOMException
+     */
+    private static void getWriteAccessGeneral(Element navigation, HashMap accessMap) {
+        List childs = null;
+        try {
+            childs = xpath.selectNodes(navigation);
+        } catch (JDOMException e) {
+            e.printStackTrace();
+        }
+        Iterator childIter = childs.iterator();
+        while (accessMap.isEmpty() && childIter.hasNext()) {
+            Element child = (Element) childIter.next();
+            boolean access = MCRLayoutUtilities.itemAccess("write", child, false);
+            if (access)
+                accessMap.put("access", "true");
+            else
+                getWriteAccessGeneral(child, accessMap);
+        }
+    }
+
+    /**
+     * Returns a DOM-Object containing only items the user have write access
+     * for. The writable items structure will be put into writableNavi.
+     * 
+     * @param origNavi
+     *            The navigation.xml with an additional dummy root Element
+     * @param writableNavi
+     *            A Document with only o root tag to be filled with writeable
+     *            items
+     * @throws JDOMException
+     * @throws IOException
+     */
     private static void buildWritableNavi(Element origNavi, Document writableNavi) throws JDOMException, IOException {
         List childs = xpath.selectNodes(origNavi);
         Iterator childIter = childs.iterator();

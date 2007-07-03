@@ -35,22 +35,60 @@ public class MCRLayoutUtilities {
 
     private static final File NAVFILE = new File(MCRConfiguration.instance().getString("MCR.navigationFile").replace('/', File.separatorChar));
 
-    public static boolean readAccess(String webpageID, String blockerWebpageID) throws JDOMException, IOException {
-        LOGGER.debug("start to check read access for webpageID= " + webpageID + " (with blockerWebpageID =" + blockerWebpageID + ")");
-        long startTime = System.currentTimeMillis();
-        boolean access = getAccess(webpageID, "read", ALL2BLOCKER_TRUE, blockerWebpageID);
-        long finishTime = (System.currentTimeMillis() - startTime);
-        LOGGER.debug("verified read access for webpageID= " + webpageID + " (with blockerWebpageID =" + blockerWebpageID + ") => " + access + ": took "
-                        + finishTime + " msec.");
-        return access;
+    private static final String AC_ON = MCRConfiguration.instance().getString("MCR.Website.ReadAccessVerification");
+
+    /**
+     * Verifies a given $webpage-ID (//item/@href) from navigation.xml on read
+     * permission, based on ACL-System. To be used by XSL with
+     * Xalan-Java-Extension-Call. $blockerWebpageID can be used as already
+     * verified item with read access. So, only items of the ancestor axis till
+     * and exclusive $blockerWebpageID are verified. Use this, if you want to
+     * speed up the check
+     * 
+     * @param webpageID,
+     *            any item/@href from navigation.xml
+     * @param blockerWebpageID,
+     *            any ancestor item of webpageID from navigation.xml
+     * @return true if access granted, false if not
+     */
+    public static boolean readAccess(String webpageID, String blockerWebpageID) {
+        if (accessControlOn()) {
+            long startTime = System.currentTimeMillis();
+            boolean access = getAccess(webpageID, "read", ALL2BLOCKER_TRUE, blockerWebpageID);
+            LOGGER.debug("checked read access for webpageID= " + webpageID + " (with blockerWebpageID =" + blockerWebpageID + ") => " + access + ": took "
+                            + getDuration(startTime) + " msec.");
+            return access;
+        } else
+            return true;
     }
 
-    public static boolean readAccess(String webpageID) throws JDOMException, IOException {
-        long startTime = System.currentTimeMillis();
-        boolean access = getAccess(webpageID, "read", ALLTRUE);
-        long finishTime = (System.currentTimeMillis() - startTime);
-        LOGGER.debug("verified read access for webpageID= " + webpageID + " => " + access + ": took " + finishTime + " msec.");
-        return access;
+    /**
+     * Verifies a given $webpage-ID (//item/@href) from navigation.xml on read
+     * permission, based on ACL-System. To be used by XSL with
+     * Xalan-Java-Extension-Call.
+     * 
+     * @param webpageID,
+     *            any item/@href from navigation.xml
+     * @return true if access granted, false if not
+     */
+    public static boolean readAccess(String webpageID) {
+        if (accessControlOn()) {
+            long startTime = System.currentTimeMillis();
+            boolean access = getAccess(webpageID, "read", ALLTRUE);
+            LOGGER.debug("checked read access for webpageID= " + webpageID + " => " + access + ": took " + getDuration(startTime) + " msec.");
+            return access;
+        } else
+            return true;
+    }
+
+    /**
+     * Verifies, if the read access control is switched on (signalled by a
+     * property)
+     * 
+     * @return true if switched on, false if not
+     */
+    private static boolean accessControlOn() {
+        return Boolean.parseBoolean(AC_ON.trim());
     }
 
     /**
@@ -63,16 +101,27 @@ public class MCRLayoutUtilities {
      * @throws JDOMException
      * @throws IOException
      */
-    public static final String getAncestorLabels(Element item) throws JDOMException, IOException {
+    public static final String getAncestorLabels(Element item) {
         String label = "";
         String lang = MCRSessionMgr.getCurrentSession().getCurrentLanguage().trim();
-        XPath xpath = XPath.newInstance("//.[@href='" + getWebpageID(item) + "']");
-        Element ic = (Element) xpath.selectSingleNode(getNavi());
+        XPath xpath;
+        Element ic = null;
+        try {
+            xpath = XPath.newInstance("//.[@href='" + getWebpageID(item) + "']");
+            ic = (Element) xpath.selectSingleNode(getNavi());
+        } catch (JDOMException e) {
+            e.printStackTrace();
+        }
         while (ic.getName().equals("item")) {
             ic = ic.getParentElement();
             String webpageID = getWebpageID(ic);
-            xpath = XPath.newInstance("//.[@href='" + webpageID + "']/label[@xml:lang='" + lang + "']");
-            Element labelEl = (Element) xpath.selectSingleNode(getNavi());
+            Element labelEl = null;
+            try {
+                xpath = XPath.newInstance("//.[@href='" + webpageID + "']/label[@xml:lang='" + lang + "']");
+                labelEl = (Element) xpath.selectSingleNode(getNavi());
+            } catch (JDOMException e) {
+                e.printStackTrace();
+            }
             if (labelEl != null) {
                 if (label.equals(""))
                     label = labelEl.getTextTrim();
@@ -83,7 +132,20 @@ public class MCRLayoutUtilities {
         return label;
     }
 
-    public static boolean getAccess(String webpageID, String permission, int strategy) throws JDOMException, IOException {
+    /**
+     * Verifies, if an item of navigation.xml has a given $permission.
+     * 
+     * @param webpageID,
+     *            item/@href
+     * @param permission,
+     *            permission to look for
+     * @param strategy:
+     *            ALLTRUE => all ancestor items of webpageID must have the
+     *            permission, ONETRUE_ALLTRUE => only 1 ancestor item must have
+     *            the permission
+     * @return true, if access, false if no access
+     */
+    public static boolean getAccess(String webpageID, String permission, int strategy) {
         Element item = getItem(webpageID);
         // check permission according to $strategy
         boolean access = false;
@@ -103,7 +165,22 @@ public class MCRLayoutUtilities {
         return access;
     }
 
-    public static boolean getAccess(String webpageID, String permission, int strategy, String blockerWebpageID) throws JDOMException, IOException {
+    /**
+     * Verifies, if an item of navigation.xml has a given $permission with a
+     * stop item ($blockerWebpageID)
+     * 
+     * @param webpageID,
+     *            item/@href
+     * @param permission,
+     *            permission to look for
+     * @param strategy:
+     *            ALL2BLOCKER_TRUE => all ancestor items of webpageID till and
+     *            exlusiv $blockerWebpageID must have the permission
+     * @param blockerWebpageID:
+     *            any ancestor item of webpageID from navigation.xml
+     * @return true, if access, false if no access
+     */
+    public static boolean getAccess(String webpageID, String permission, int strategy, String blockerWebpageID) {
         Element item = getItem(webpageID);
         // check permission according to $strategy
         boolean access = false;
@@ -117,22 +194,56 @@ public class MCRLayoutUtilities {
         return access;
     }
 
-    private static Element getItem(String webpageID) throws JDOMException, IOException {
+    /**
+     * Returns a Element presention of an item[@href=$webpageID]
+     * 
+     * @param webpageID
+     * @return Element
+     */
+    private static Element getItem(String webpageID) {
+        if (!naviCacheValid())
+            itemStore.clear();
         Element item = (Element) itemStore.get(webpageID);
         if (item == null) {
-            XPath xpath = XPath.newInstance("//.[@href='" + webpageID + "']");
-            item = (Element) xpath.selectSingleNode(getNavi());
+            XPath xpath;
+            try {
+                xpath = XPath.newInstance("//.[@href='" + webpageID + "']");
+                item = (Element) xpath.selectSingleNode(getNavi());
+            } catch (JDOMException e) {
+                e.printStackTrace();
+            }
             itemStore.put(webpageID, item);
         }
         return item;
     }
 
+    /**
+     * Verifies a single item on access according to $permission
+     * 
+     * @param permission
+     * @param item
+     * @param access,
+     *            initial value
+     * @return
+     */
     public static boolean itemAccess(String permission, Element item, boolean access) {
         MCRAccessInterface am = MCRAccessManager.getAccessImpl();
         String objID = getWebpageACLID(item);
         if (am.hasRule(objID, permission))
             access = am.checkPermission(objID, permission);
         return access;
+    }
+
+    /**
+     * Verifies if the cache of navigation.xml is valid.
+     * 
+     * @return true if valid, false if note
+     */
+    private static boolean naviCacheValid() {
+        if (CACHE_INITTIME < NAVFILE.lastModified())
+            return false;
+        else
+            return true;
     }
 
     private static String getWebpageACLID(Element item) {
@@ -143,13 +254,28 @@ public class MCRLayoutUtilities {
         return item.getAttributeValue("href");
     }
 
-    public static Document getNavi() throws JDOMException, IOException {
-        // cache does not exist or to old
-        if (CACHE_INITTIME < NAVFILE.lastModified()) {
-            NAVI = new SAXBuilder().build(NAVFILE);
+    /**
+     * Returns the navigation.xml as org.jdom.document, using a cache the
+     * enhance loading time.
+     * 
+     * @return navigation.xml as org.jdom.document
+     */
+    public static Document getNavi() {
+        if (!naviCacheValid()) {
+            try {
+                NAVI = new SAXBuilder().build(NAVFILE);
+            } catch (JDOMException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
             CACHE_INITTIME = System.currentTimeMillis();
         }
         return NAVI;
+    }
+
+    public static long getDuration(long startTime) {
+        return (System.currentTimeMillis() - startTime);
     }
 
 }

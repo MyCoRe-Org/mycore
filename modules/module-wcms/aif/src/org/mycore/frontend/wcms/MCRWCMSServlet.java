@@ -54,7 +54,7 @@ public abstract class MCRWCMSServlet extends MCRServlet {
     protected static final String LOGINSERVLET_URL = getServletBaseURL() + "MCRLoginServlet";
 
     protected void doGetPost(MCRServletJob job) throws Exception {
-        if (access()) {
+        if (accessGeneral()) {
             // set some global required params
             MCRSession session = MCRSessionMgr.getCurrentSession();
             session.put("status", "loggedIn");
@@ -68,8 +68,8 @@ public abstract class MCRWCMSServlet extends MCRServlet {
             job.getResponse().sendRedirect(LOGINSERVLET_URL);
     }
 
-    protected final boolean access() {
-        return MCRWCMSUtilities.getWriteAccessGeneral();
+    protected final boolean accessGeneral() {
+        return MCRWCMSUtilities.writeAccessGeneral();
     }
 
     public Element getTemplates() {
