@@ -41,289 +41,285 @@ import org.mycore.datamodel.ifs.MCRFilesystemNode;
  * 
  * 
  * @version 0.01pre 03/01/2006<br>
- * 			1.00 08/08/2006
+ *          1.00 08/08/2006
  * @author Vu Huu Chi
  * 
  */
 
 public class MCRImgCacheManager implements CacheManager {
-	public static final String THUMB = "Thumb";
+    public static final String THUMB = "Thumb";
 
-	public static final String CACHE = "Cache";
+    public static final String CACHE = "Cache";
 
-	public static final String ORIG = "Orig";
-	
-	public static final String CACHE_FOLDER = "imgCache";
+    public static final String ORIG = "Orig";
 
-	private Logger LOGGER = Logger.getLogger(MCRImgCacheManager.class.getName());
-	
-	protected MCRDirectory cacheInIFS = null;
+    public static final String CACHE_FOLDER = "imgCache";
 
-	public MCRImgCacheManager() {
-		if ((cacheInIFS = MCRDirectory.getRootDirectory(CACHE_FOLDER)) == null)
-			try {
-				cacheInIFS = new MCRDirectory(CACHE_FOLDER, CACHE_FOLDER);
-			} catch (Exception e) {
-				throw new MCRException(e.getMessage());
-			}
+    private Logger LOGGER = Logger.getLogger(MCRImgCacheManager.class.getName());
+
+    protected static MCRDirectory cacheInIFS;
+
+    public MCRImgCacheManager() {
+		init();
 	}
 
-	public void getImage(MCRFile image, String filename, OutputStream imageData) {
-		MCRFilesystemNode cachedImg = cacheInIFS.getChildByPath(buildPath(image) + "/" + filename);
+    private static synchronized void init() {
+        if ((cacheInIFS = MCRDirectory.getRootDirectory(CACHE_FOLDER)) == null)
+            try {
+                cacheInIFS = new MCRDirectory(CACHE_FOLDER, CACHE_FOLDER);
+            } catch (Exception e) {
+                throw new MCRException(e.getMessage());
+            }
+    }
 
-		if (cachedImg != null && cachedImg instanceof MCRFile) {
-			Stopwatch timer = new Stopwatch();
+    public void getImage(MCRFile image, String filename, OutputStream imageData) {
+        MCRFilesystemNode cachedImg = cacheInIFS.getChildByPath(buildPath(image) + "/" + filename);
 
-			timer.start();
-			((MCRFile) cachedImg).getContentTo(imageData);
-			timer.stop();
-			LOGGER.info("getContentTo: " + timer.getElapsedTime());
-		} else
-			throw new MCRException("Could not load " + image.getName() + "from cache!");
-	}
+        if (cachedImg != null && cachedImg instanceof MCRFile) {
+            Stopwatch timer = new Stopwatch();
 
-	public InputStream getImageAsInputStream(MCRFile image, String filename) throws IOException {
-		MCRFilesystemNode cachedImg = cacheInIFS.getChildByPath(buildPath(image) + "/" + filename);
+            timer.start();
+            ((MCRFile) cachedImg).getContentTo(imageData);
+            timer.stop();
+            LOGGER.info("getContentTo: " + timer.getElapsedTime());
+        } else
+            throw new MCRException("Could not load " + image.getName() + "from cache!");
+    }
 
-		if (cachedImg != null && cachedImg instanceof MCRFile) {
-			return ((MCRFile) cachedImg).getContentAsInputStream();
-		} 
-		else {
-			return null;
-		}
-	}
+    public InputStream getImageAsInputStream(MCRFile image, String filename) throws IOException {
+        MCRFilesystemNode cachedImg = cacheInIFS.getChildByPath(buildPath(image) + "/" + filename);
 
-	public void saveImage(MCRFile image, Dimension size, InputStream imageData) {
-		saveImage(image, dimToString(size), imageData);
-	}
+        if (cachedImg != null && cachedImg instanceof MCRFile) {
+            return ((MCRFile) cachedImg).getContentAsInputStream();
+        } else {
+            return null;
+        }
+    }
 
-	public void saveImage(MCRFile image, String filename, InputStream imageData) {
-		
-		MCRDirectory cachedImg = getCacheDir(image);
+    public void saveImage(MCRFile image, Dimension size, InputStream imageData) {
+        saveImage(image, dimToString(size), imageData);
+    }
 
-		try {
-			MCRFile cachedImgIFS = new MCRFile(filename + "lock", cachedImg);
+    public void saveImage(MCRFile image, String filename, InputStream imageData) {
 
-			cachedImgIFS.setContentFrom(imageData);
-			cachedImgIFS.setName(filename);
-		} catch (Exception e) {
-			throw new MCRException("Could not save Image " + image.getName() + " as " + filename + " in cache!");
-		}
-	}
+        MCRDirectory cachedImg = getCacheDir(image);
 
-	public void deleteImage(MCRFile image, Dimension size) {
-		deleteImage(image, dimToString(size));
-	}
+        try {
+            MCRFile cachedImgIFS = new MCRFile(filename + "lock", cachedImg);
 
-	public void deleteImage(MCRFile image, String filename) {
-		MCRFilesystemNode cachedImg = cacheInIFS.getChildByPath(buildPath(image) + "/" + filename);
+            cachedImgIFS.setContentFrom(imageData);
+            cachedImgIFS.setName(filename);
+        } catch (Exception e) {
+            throw new MCRException("Could not save Image " + image.getName() + " as " + filename + " in cache!");
+        }
+    }
 
-		if (cachedImg != null && cachedImg instanceof MCRFile)
-			((MCRFile) cachedImg).delete();
-		else
-			LOGGER.debug("Could not delete " + image.getName() + "from cache!");
-//			throw new MCRException("Could not delete " + image.getName() + "from cache!");
+    public void deleteImage(MCRFile image, Dimension size) {
+        deleteImage(image, dimToString(size));
+    }
 
-	}
+    public void deleteImage(MCRFile image, String filename) {
+        MCRFilesystemNode cachedImg = cacheInIFS.getChildByPath(buildPath(image) + "/" + filename);
 
-	public void deleteImage(MCRFile image) {
-		MCRFilesystemNode cachedImg = cacheInIFS.getChildByPath(buildPath(image));
+        if (cachedImg != null && cachedImg instanceof MCRFile)
+            ((MCRFile) cachedImg).delete();
+        else
+            LOGGER.debug("Could not delete " + image.getName() + "from cache!");
+        // throw new MCRException("Could not delete " + image.getName() + "from
+        // cache!");
 
-		if (cachedImg != null && cachedImg instanceof MCRDirectory) {
-			LOGGER.debug("****************************************");
-			LOGGER.debug("* MCRImgCacheManager - deleteImage ");
-			LOGGER.debug("* Delte : " + cachedImg.getName());
-			LOGGER.debug("****************************************");
-			((MCRDirectory) cachedImg).delete();
-		}
-		else
-			LOGGER.debug("Could not delete " + image.getName() + "from cache!");
-//			throw new MCRException("Could not delete " + image.getName() + "from cache!");
+    }
 
-	}
+    public void deleteImage(MCRFile image) {
+        MCRFilesystemNode cachedImg = cacheInIFS.getChildByPath(buildPath(image));
 
-	
+        if (cachedImg != null && cachedImg instanceof MCRDirectory) {
+            LOGGER.debug("****************************************");
+            LOGGER.debug("* MCRImgCacheManager - deleteImage ");
+            LOGGER.debug("* Delte : " + cachedImg.getName());
+            LOGGER.debug("****************************************");
+            ((MCRDirectory) cachedImg).delete();
+        } else
+            LOGGER.debug("Could not delete " + image.getName() + "from cache!");
+        // throw new MCRException("Could not delete " + image.getName() + "from
+        // cache!");
 
-	public boolean existInCache(MCRFile image, String filename) {
-		MCRFilesystemNode cachedImg = cacheInIFS.getChildByPath(buildPath(image) + "/" + filename);
+    }
 
-		if (cachedImg != null && cachedImg instanceof MCRFile)
-			return true;
-		else
-			return false;
-	}
+    public boolean existInCache(MCRFile image, String filename) {
+        MCRFilesystemNode cachedImg = cacheInIFS.getChildByPath(buildPath(image) + "/" + filename);
 
-	public boolean existInCache(MCRFile image) {
-		return (existInCache(image, THUMB) || existInCache(image, ORIG) || existInCache(image, CACHE));
-	}
+        if (cachedImg != null && cachedImg instanceof MCRFile)
+            return true;
+        else
+            return false;
+    }
 
-	public int getImgWidth(MCRFile image) {
-		int width = 0;
+    public boolean existInCache(MCRFile image) {
+        return (existInCache(image, THUMB) || existInCache(image, ORIG) || existInCache(image, CACHE));
+    }
 
-		try {
-			Element addData = image.getAdditionalData("ImageMetaData");
+    public int getImgWidth(MCRFile image) {
+        int width = 0;
 
-			if (addData != null) {
-				width = (new Integer(addData.getChild("imageSize").getChild("width").getText())).intValue();
-			}
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (JDOMException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+        try {
+            Element addData = image.getAdditionalData("ImageMetaData");
 
-		return width;
-	}
+            if (addData != null) {
+                width = (new Integer(addData.getChild("imageSize").getChild("width").getText())).intValue();
+            }
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (JDOMException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
 
-	public int getImgHeight(MCRFile image) {
-		int height = 0;
+        return width;
+    }
 
-		try {
-			Element addData = image.getAdditionalData("ImageMetaData");
+    public int getImgHeight(MCRFile image) {
+        int height = 0;
 
-			if (addData != null) {
-				height = (new Integer(addData.getChild("imageSize").getChild("height").getText())).intValue();
-			}
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (JDOMException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+        try {
+            Element addData = image.getAdditionalData("ImageMetaData");
 
-		return height;
-	}
+            if (addData != null) {
+                height = (new Integer(addData.getChild("imageSize").getChild("height").getText())).intValue();
+            }
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (JDOMException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
 
-	public void setImgSize(MCRFile image, int width, int height) {
-		try {
-			Element addData = image.getAdditionalData("ImageMetaData");
-			if (addData == null) {
-				addData = new Element("ImageMetaData").addContent(new Element("imageSize"));
-				Element elem = addData.getChild("imageSize");
-				elem.addContent((new Element("width")).setText(String.valueOf(width)));
-				elem.addContent((new Element("height")).setText(String.valueOf(height)));
-				image.setAdditionalData(addData);
+        return height;
+    }
 
-				LOGGER.info("Writing additional data for " + image.getName() + " complete!");
-			}
-			else
-				LOGGER.info("Additional data for " + image.getName() + " allready exists!");
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (JDOMException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
+    public void setImgSize(MCRFile image, int width, int height) {
+        try {
+            Element addData = image.getAdditionalData("ImageMetaData");
+            if (addData == null) {
+                addData = new Element("ImageMetaData").addContent(new Element("imageSize"));
+                Element elem = addData.getChild("imageSize");
+                elem.addContent((new Element("width")).setText(String.valueOf(width)));
+                elem.addContent((new Element("height")).setText(String.valueOf(height)));
+                image.setAdditionalData(addData);
 
-	public void setLock(MCRFile image) {
-		MCRFilesystemNode node;
-		MCRDirectory cachedImg = getCacheDir(image);
-		
-		node = cachedImg.getChild("lock");
-		LOGGER.debug("****************************************");
-		LOGGER.debug("* setLock: " + cachedImg.getName());
-		LOGGER.debug("* setLock: " + cachedImg.getOwnerID());
-		LOGGER.debug("****************************************");
-		
-		if (node == null) {
-			LOGGER.debug("****************************************");
-			LOGGER.debug("* Lock Image!");
-			LOGGER.debug("****************************************");
-			MCRFile lock = new MCRFile("lock", cachedImg);
-		}
-		else {
-			LOGGER.info("****************************************");
-			LOGGER.info("* Image allready locked!");
-			LOGGER.info("****************************************");
-		}
-	}
+                LOGGER.info("Writing additional data for " + image.getName() + " complete!");
+            } else
+                LOGGER.info("Additional data for " + image.getName() + " allready exists!");
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (JDOMException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
 
-	public void removeLock(MCRFile image) {
-		MCRFilesystemNode node;
-		MCRDirectory cachedImg = getCacheDir(image);
-		
-		node = cachedImg.getChild("lock");
-		
-		if (node != null) {
-			LOGGER.debug("****************************************");
-			LOGGER.debug("* Remove Lock!");
-			LOGGER.debug("****************************************");
-			((MCRFile)node).delete();
-		}
-		else {
-			LOGGER.info("****************************************");
-			LOGGER.info("* Image is not locked!");
-			LOGGER.info("****************************************");
-		}
-		
-	}
-	
-	public boolean isLocked(MCRFile image) {
-		MCRFilesystemNode node;
-		MCRDirectory cachedImg = getCacheDir(image);
-		
-		node = cachedImg.getChild("lock");
-		LOGGER.debug("****************************************");
-		LOGGER.debug("* setLock: " + cachedImg.getName());
-		LOGGER.debug("* setLock: " + cachedImg.getOwnerID());
-		LOGGER.debug("****************************************");
-		
-		if (node == null) {
-			LOGGER.debug("****************************************");
-			LOGGER.debug("* Not Locked!");
-			LOGGER.debug("****************************************");
-			return false;
-		}
-		else {
-			LOGGER.debug("****************************************");
-			LOGGER.debug("* Is Locked!");
-			LOGGER.debug("****************************************");
-			return true;
-		}
-		
-	}
-	
-	/* *********************************************************************************************** */
-	/* End implement interface																		   */
-	/* *********************************************************************************************** */
-	
-	private MCRDirectory getCacheDir(MCRFile image) {
-		String path = buildPath(image);
-		MCRFilesystemNode node = cacheInIFS.getChildByPath(path);
-		MCRDirectory cachedImg = null;
+    public void setLock(MCRFile image) {
+        MCRFilesystemNode node;
+        MCRDirectory cachedImg = getCacheDir(image);
 
-		LOGGER.info("****************************************");
-		LOGGER.info("* PATH for img in Cache: " + path);
-		LOGGER.info("****************************************");
-		
-		if (node != null && node instanceof MCRDirectory)
-			cachedImg = (MCRDirectory) node;
-		else
-			cachedImg = new MCRDirectory(path, cacheInIFS);
-		return cachedImg;
-	}
-	
-	private String buildPath(MCRFile image) {
-		String ownerID = image.getOwnerID();
-		String absPath = image.getAbsolutePath().replaceAll("/", "%20");
-		
-		return ownerID + absPath;
-	}
+        node = cachedImg.getChild("lock");
+        LOGGER.debug("****************************************");
+        LOGGER.debug("* setLock: " + cachedImg.getName());
+        LOGGER.debug("* setLock: " + cachedImg.getOwnerID());
+        LOGGER.debug("****************************************");
 
-	// return 'width'x'height' as String
-	private String dimToString(Dimension size) {
-		return size.width + "x" + size.height;
-	}
+        if (node == null) {
+            LOGGER.debug("****************************************");
+            LOGGER.debug("* Lock Image!");
+            LOGGER.debug("****************************************");
+            MCRFile lock = new MCRFile("lock", cachedImg);
+        } else {
+            LOGGER.info("****************************************");
+            LOGGER.info("* Image allready locked!");
+            LOGGER.info("****************************************");
+        }
+    }
 
-	public boolean existInCache(MCRFile image, Dimension size) {
-		return existInCache(image, dimToString(size));
-	}
+    public void removeLock(MCRFile image) {
+        MCRFilesystemNode node;
+        MCRDirectory cachedImg = getCacheDir(image);
 
-	
+        node = cachedImg.getChild("lock");
+
+        if (node != null) {
+            LOGGER.debug("****************************************");
+            LOGGER.debug("* Remove Lock!");
+            LOGGER.debug("****************************************");
+            ((MCRFile) node).delete();
+        } else {
+            LOGGER.info("****************************************");
+            LOGGER.info("* Image is not locked!");
+            LOGGER.info("****************************************");
+        }
+
+    }
+
+    public boolean isLocked(MCRFile image) {
+        MCRFilesystemNode node;
+        MCRDirectory cachedImg = getCacheDir(image);
+
+        node = cachedImg.getChild("lock");
+        LOGGER.debug("****************************************");
+        LOGGER.debug("* setLock: " + cachedImg.getName());
+        LOGGER.debug("* setLock: " + cachedImg.getOwnerID());
+        LOGGER.debug("****************************************");
+
+        if (node == null) {
+            LOGGER.debug("****************************************");
+            LOGGER.debug("* Not Locked!");
+            LOGGER.debug("****************************************");
+            return false;
+        } else {
+            LOGGER.debug("****************************************");
+            LOGGER.debug("* Is Locked!");
+            LOGGER.debug("****************************************");
+            return true;
+        }
+
+    }
+
+    /* *********************************************************************************************** */
+    /* End implement interface */
+    /* *********************************************************************************************** */
+
+    private MCRDirectory getCacheDir(MCRFile image) {
+        String path = buildPath(image);
+        MCRFilesystemNode node = cacheInIFS.getChildByPath(path);
+        MCRDirectory cachedImg = null;
+
+        LOGGER.info("****************************************");
+        LOGGER.info("* PATH for img in Cache: " + path);
+        LOGGER.info("****************************************");
+
+        if (node != null && node instanceof MCRDirectory)
+            cachedImg = (MCRDirectory) node;
+        else
+            cachedImg = new MCRDirectory(path, cacheInIFS);
+        return cachedImg;
+    }
+
+    private String buildPath(MCRFile image) {
+        String ownerID = image.getOwnerID();
+        String absPath = image.getAbsolutePath().replaceAll("/", "%20");
+
+        return ownerID + absPath;
+    }
+
+    // return 'width'x'height' as String
+    private String dimToString(Dimension size) {
+        return size.width + "x" + size.height;
+    }
+
+    public boolean existInCache(MCRFile image, Dimension size) {
+        return existInCache(image, dimToString(size));
+    }
 
 }
