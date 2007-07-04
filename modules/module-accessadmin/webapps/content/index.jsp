@@ -9,7 +9,7 @@
 <%@ page import="org.mycore.user.MCRGroup" %>
 
 <%
-	MCRSession mcrSession = MCRServlet.getSession(request);
+	MCRSession mcrSession = MCRServlet.getSession(request,"HttpJspBase");
 	MCRUser user = MCRUserMgr.instance().retrieveUser(mcrSession.getCurrentUserID());
     String WebApplicationBaseURL = MCRServlet.getBaseURL();
 	String pageurl = (String) request.getAttribute("page");
