@@ -56,6 +56,7 @@ import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
+import org.mycore.common.MCRUsageException;
 import org.mycore.common.MCRUtils;
 import org.mycore.datamodel.ifs.MCRContentInputStream;
 import org.mycore.frontend.servlets.MCRServlet;
@@ -65,7 +66,7 @@ import org.mycore.user.MCRUserMgr;
  * Does the layout for other MyCoRe servlets by transforming XML input to
  * various output formats, using XSL stylesheets.
  * 
- * @author Frank Lützenkirchen
+ * @author Frank Lï¿½tzenkirchen
  * @author Thomas Scheffler (yagee)
  * 
  * @version $Revision$ $Date$
@@ -82,16 +83,17 @@ public class MCRLayoutService {
     private SAXTransformerFactory factory;
 
     private boolean setCurrentGroups;
-    
+
     /** The logger */
     private final static Logger LOGGER = Logger.getLogger(MCRLayoutService.class);
 
     public MCRLayoutService(String stylesheetsDir) {
         this.stylesheetsDir = stylesheetsDir;
-//        System.setProperty("javax.xml.transform.TransformerFactory", "org.apache.xalan.xsltc.trax.TransformerFactoryImpl");
+        // System.setProperty("javax.xml.transform.TransformerFactory",
+        // "org.apache.xalan.xsltc.trax.TransformerFactoryImpl");
         System.setProperty("javax.xml.transform.TransformerFactory", "org.apache.xalan.processor.TransformerFactoryImpl");
         TransformerFactory tf = TransformerFactory.newInstance();
-        LOGGER.info("Transformerfactory: "+tf.getClass().getName());
+        LOGGER.info("Transformerfactory: " + tf.getClass().getName());
 
         if (!tf.getFeature(SAXTransformerFactory.FEATURE)) {
             throw new MCRConfigurationException("Could not load a SAXTransformerFactory for use with XSLT");
@@ -99,7 +101,7 @@ public class MCRLayoutService {
 
         factory = (SAXTransformerFactory) (tf);
         factory.setURIResolver(MCRURIResolver.instance());
-        
+
         setCurrentGroups = MCRConfiguration.instance().getBoolean("MCR.Users.SetCurrentGroups", true);
     }
 
@@ -221,7 +223,7 @@ public class MCRLayoutService {
 
         MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
         String uid = MCRSessionMgr.getCurrentSession().getCurrentUserID();
-        
+
         if (setCurrentGroups) { // for MyCoRe applications, always true
             StringBuffer groups = new StringBuffer();
 
@@ -256,8 +258,8 @@ public class MCRLayoutService {
      * returns a merged list of XSL parameters.
      * 
      * First parameters stored in current HttpSession are used. These are
-     * overwritten by Parameters of MCRSession. Finally parameters, then attributes 
-     * of HttpServletRequest overwrite the previously defined.
+     * overwritten by Parameters of MCRSession. Finally parameters, then
+     * attributes of HttpServletRequest overwrite the previously defined.
      * 
      * @param request
      * @return merged XSL.* properties of MCR|HttpSession and HttpServletRequest
@@ -354,7 +356,7 @@ public class MCRLayoutService {
      *            the File that contains the XSL stylesheet
      * @return the compiled stylesheet
      */
-    private Templates buildCompiledStylesheet(File file) {
+    private Templates buildCompiledStylesheet(File file) throws MCRConfigurationException {
         String path = file.getPath();
         long time = file.lastModified();
 
@@ -368,8 +370,12 @@ public class MCRLayoutService {
                 String msg = "Error while compiling XSL stylesheet " + file.getName() + ": " + exc.getMessageAndLocation();
                 throw new MCRConfigurationException(msg, exc);
             }
-
-            STYLESHEETS_CACHE.put(path, stylesheet);
+            try {
+                STYLESHEETS_CACHE.put(path, stylesheet);
+            } catch (MCRUsageException exc) {
+                String msg = "Error while putting XSL stylesheet in cache " + file.getName();
+                throw new MCRConfigurationException(msg, exc);
+            }
         } else {
             LOGGER.debug("MCRLayoutService using cached stylesheet " + file.getName());
         }
