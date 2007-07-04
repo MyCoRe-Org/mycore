@@ -35,7 +35,7 @@ public class MCRLayoutUtilities {
 
     private static final File NAVFILE = new File(MCRConfiguration.instance().getString("MCR.navigationFile").replace('/', File.separatorChar));
 
-    private static final String AC_ON = MCRConfiguration.instance().getString("MCR.Website.ReadAccessVerification");
+    private static final boolean AC_ON = MCRConfiguration.instance().getBoolean("MCR.Website.ReadAccessVerification", true);
 
     /**
      * Verifies a given $webpage-ID (//item/@href) from navigation.xml on read
@@ -88,7 +88,7 @@ public class MCRLayoutUtilities {
      * @return true if switched on, false if not
      */
     private static boolean accessControlOn() {
-        return Boolean.parseBoolean(AC_ON.trim());
+        return AC_ON;
     }
 
     /**
