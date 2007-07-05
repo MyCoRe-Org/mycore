@@ -480,8 +480,7 @@ public class MCRCommandLineInterface {
 
         for (int i = 0; i < knownCommands.size(); i++) {
             if (((MCRCommand) knownCommands.get(i)).showSyntax().indexOf(com) != -1) {
-                System.out.println(system + " Help for command \'" + ((MCRCommand) knownCommands.get(i)).showSyntax() + "\'");
-                System.out.println(system);
+                System.out.println(system + " " + ((MCRCommand) knownCommands.get(i)).showSyntax() );
                 System.out.println(system + "      " + ((MCRCommand) knownCommands.get(i)).getHelpText());
                 System.out.println(system);
                 test = true;
