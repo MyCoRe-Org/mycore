@@ -83,7 +83,7 @@ public class MCRMetaAccessRule extends MCRMetaDefault {
         if ((set_condition == null) || (!set_condition.getName().equals("condition"))) {
             throw new MCRException("The condition Element of MCRMetaAccessRule is null.");
         }
-        condition = set_condition;
+        condition = (org.jdom.Element)set_condition.clone();
         condition.detach();
     }
 
@@ -207,6 +207,7 @@ public class MCRMetaAccessRule extends MCRMetaDefault {
         if ((type != null) && ((type = type.trim()).length() != 0)) {
             elm.setAttribute("type", type);
         }
+        condition.detach();
         elm.addContent(condition);
         return elm;
     }
