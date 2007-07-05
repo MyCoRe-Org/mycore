@@ -36,6 +36,7 @@ import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
 import org.mycore.backend.hibernate.tables.MCRGROUPADMINS;
+import org.mycore.backend.hibernate.tables.MCRGROUPADMINSPK;
 import org.mycore.backend.hibernate.tables.MCRGROUPMEMBERS;
 import org.mycore.backend.hibernate.tables.MCRGROUPS;
 import org.mycore.backend.hibernate.tables.MCRUSERS;
@@ -493,29 +494,37 @@ public class MCRHIBUserStore implements MCRUserStore {
         // insert
         for (int i = 0; i < newAdminUserIDs.size(); i++) {
             if (!oldAdminUserIDs.contains(newAdminUserIDs.get(i))) {
-                MCRGROUPADMINS grpadmins = new MCRGROUPADMINS();
-                grpadmins.setGid(dbgroup);
+                MCRGROUPADMINSPK pk = new MCRGROUPADMINSPK();
+                pk.setGid(dbgroup);
+                pk.setGroupid(ADMIN_GROUP);
                 MCRUSERS user = new MCRUSERS();
                 user.setUid((String) newAdminUserIDs.get(i));
-                grpadmins.setUserid(user);
-                grpadmins.setGroupid(ADMIN_GROUP);
-                session.save(grpadmins);
-                session.evict(ADMIN_GROUP);
-                session.evict(user);
+                pk.setUserid(user);
+                if (session.get(MCRGROUPADMINS.class, pk) == null) {
+                    MCRGROUPADMINS grpadmins = new MCRGROUPADMINS();
+                    grpadmins.setKey(pk);
+                    session.save(grpadmins);
+                    session.evict(ADMIN_GROUP);
+                    session.evict(user);
+                }
             }
         }
 
         for (int i = 0; i < newAdminGroupIDs.size(); i++) {
             if (!oldAdminGroupIDs.contains(newAdminGroupIDs.get(i))) {
-                MCRGROUPADMINS grpadmins = new MCRGROUPADMINS();
-                grpadmins.setGid(dbgroup);
-                grpadmins.setUserid(ADMIN_USER);
+                MCRGROUPADMINSPK pk = new MCRGROUPADMINSPK();
+                pk.setGid(dbgroup);
                 MCRGROUPS adminGroup = new MCRGROUPS();
                 adminGroup.setGid((String) newAdminGroupIDs.get(i));
-                grpadmins.setGroupid(adminGroup);
-                session.save(grpadmins);
-                session.evict(ADMIN_USER);
-                session.evict(adminGroup);
+                pk.setGroupid(adminGroup);
+                pk.setUserid(ADMIN_USER);
+                if (session.get(MCRGROUPADMINS.class, pk) == null) {
+                    MCRGROUPADMINS grpadmins = new MCRGROUPADMINS();
+                    grpadmins.setKey(pk);
+                    session.save(grpadmins);
+                    session.evict(ADMIN_USER);
+                    session.evict(adminGroup);
+                }
             }
         }
 
