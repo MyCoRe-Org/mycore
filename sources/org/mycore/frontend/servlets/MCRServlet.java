@@ -24,10 +24,14 @@
 package org.mycore.frontend.servlets;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.util.Collection;
 import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
+import java.util.StringTokenizer;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -434,30 +438,71 @@ public class MCRServlet extends HttpServlet {
         return value;
     }
 
+    /** The IP addresses of trusted web proxies */
+    protected static Set<String> trustedProxies = new HashSet<String>(); 
+    
     /**
-     * Returns the IP address of the client that made the request. When a proxy
-     * server was used, e. g. Apache mod_proxy in front of Tomcat, the value of
-     * the HTTP header X_FORWARDED_FOR is returned, otherwise the REMOTE_ADDR is
-     * returned
+     * Builds a list of trusted proxy IPs from MCR.Request.TrustedProxies.
+     * The IP address of the local host is automatically added to this list.
+     */
+    protected static synchronized void initTrustedProxies() {
+        String sTrustedProxies = MCRConfiguration.instance().getString("MCR.Request.TrustedProxies", "");
+        StringTokenizer st = new StringTokenizer(sTrustedProxies, " ,;");
+        while (st.hasMoreTokens())
+            trustedProxies.add(st.nextToken());
+
+        // Always trust the local host
+        trustedProxies.add("127.0.0.1");
+
+        try {
+            String host = new java.net.URL(getBaseURL()).getHost();
+            trustedProxies.add(InetAddress.getByName(host).getHostAddress());
+        } catch (Exception ex) {
+            LOGGER.warn("Could not determine IP of local host", ex);
+        }
+
+        for (String proxy : trustedProxies)
+            LOGGER.debug("Trusted proxy: " + proxy);
+    }
+
+    /**
+     * Returns the IP address of the client that made the request. When a
+     * trusted proxy server was used, e. g. a local Apache mod_proxy in front of
+     * Tomcat, the value of the last entry in the HTTP header X_FORWARDED_FOR is
+     * returned, otherwise the REMOTE_ADDR is returned. The list of trusted
+     * proxy IPs can be configured using the property
+     * MCR.Request.TrustedProxies, which is a List of IP addresses separated by
+     * blanks and/or comma.
      */
     public static String getRemoteAddr(HttpServletRequest req) {
-        String addr = req.getHeader("X_FORWARDED_FOR");
+        if (trustedProxies.isEmpty())
+            initTrustedProxies();
 
-        if ((addr == null) || (addr.trim().length() == 0)) {
-            addr = req.getHeader("x-forwarded-for");
+        // Check if request comes in via a proxy
+        // There are two possible header names
+        String xForwardedFor = req.getHeader("X_FORWARDED_FOR");
+        if ((xForwardedFor == null) || (xForwardedFor.trim().length() == 0)) {
+            xForwardedFor = req.getHeader("x-forwarded-for");
         }
+
+        // If no proxy is used, use client IP from HTTP request
+        if ((xForwardedFor == null) || (xForwardedFor.trim().length() == 0))
+            return req.getRemoteAddr();
 
         // X_FORWARDED_FOR can be comma separated list of hosts,
-        // if so, take last one:
-        if ((addr != null) && addr.contains(",")) {
-            addr = addr.substring(addr.lastIndexOf(",") + 1).trim();
-        }
+        // if so, take last entry, all others are not reliable because
+        // any client may have set the header to any value.
+        StringTokenizer st = new StringTokenizer(xForwardedFor, " ,;");
+        while (st.hasMoreTokens())
+            xForwardedFor = st.nextToken();
 
-        if ((addr == null) || (addr.trim().length() == 0)) {
-            addr = req.getRemoteAddr();
-        }
+        // If request comes from a trusted proxy,
+        // the best IP is the last entry in xForwardedFor
+        if (trustedProxies.contains(req.getRemoteAddr()))
+            return xForwardedFor;
 
-        return addr;
+        // Otherwise, use client IP from HTTP request
+        return req.getRemoteAddr();
     }
 
     private static void putParamsToSession(HttpServletRequest request) {
