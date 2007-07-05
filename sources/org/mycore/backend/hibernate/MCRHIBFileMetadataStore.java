@@ -127,14 +127,24 @@ public class MCRHIBFileMetadataStore implements MCRFileMetadataStore {
 
     public String retrieveRootNodeID(String ownerID) throws MCRPersistenceException {
         Session session = getSession();
-        String nodeID = (String) session.createQuery("select id from MCRFSNODES where OWNER = '" + ownerID + "' and PID=NULL").uniqueResult();
-
-        if (nodeID == null) {
-            logger.warn("There is no fsnode with OWNER = " + ownerID);
-            return null;
+        if (ownerID.equals("imgCache")) {
+            StringBuffer sb = (new StringBuffer("from MCRFSNODES where OWNER = '")).append(ownerID).append("' and PID is NULL");
+            List l = new ArrayList();
+            l = session.createQuery(sb.toString()).list();
+            if (l.size() < 1) {
+                logger.warn("There is no fsnode with OWNER = " + ownerID);
+                return null;
+            }
+            return ((MCRFSNODES) (l.get(0))).getId();
+        } else {
+            StringBuffer sb = (new StringBuffer("select id from MCRFSNODES where OWNER = '")).append(ownerID).append("' and PID is NULL");
+            String nodeID = (String) session.createQuery(sb.toString()).uniqueResult();
+            if (nodeID == null) {
+                logger.warn("There is no fsnode with OWNER = " + ownerID);
+                return null;
+            }
+            return nodeID;
         }
-
-        return nodeID;
     }
 
     public MCRFilesystemNode retrieveChild(String parentID, String name) {
