@@ -1,22 +1,28 @@
+  <!-- **************************************************************** -->
+  <!-- Servlets and mapping for the user administration module          -->
+  <!-- **************************************************************** -->
 
-<!-- **************************************************************** -->
-<!-- Servlets and mappings of module-useradmin                        -->
-<!-- **************************************************************** -->
- 
-<servlet id="MCRUserAdmin">
-  <servlet-name>MCRUserAdminServlet</servlet-name>
-  <servlet-class>org.mycore.frontend.servlets.MCRUserAdminServlet</servlet-class>
-</servlet>
-<servlet id="MCRUserEditor">
-  <servlet-name>MCRUserEditorServlet</servlet-name>
-  <servlet-class>org.mycore.frontend.servlets.MCRUserEditorServlet</servlet-class>
-</servlet>
-           
-<servlet-mapping>
-  <servlet-name>MCRUserAdminServlet</servlet-name>
-  <url-pattern>/servlets/MCRUserAdminServlet</url-pattern>
-</servlet-mapping>
-<servlet-mapping>
-  <servlet-name>MCRUserEditorServlet</servlet-name>
-  <url-pattern>/servlets/MCRUserEditorServlet</url-pattern>
-</servlet-mapping>
+  <servlet id="MCRUserAdmin">
+    <servlet-name>MCRUserAdminServlet</servlet-name>
+    <servlet-class>org.mycore.frontend.servlets.MCRUserAdminServlet</servlet-class>
+  </servlet>
+  <servlet id="MCRUserEditor">
+    <servlet-name>MCRUserEditorServlet</servlet-name>
+    <servlet-class>org.mycore.frontend.servlets.MCRUserEditorServlet</servlet-class>
+  </servlet>
+  <servlet id="MCRUserAjax">
+    <servlet-name>MCRUserAjaxServlet</servlet-name>
+    <servlet-class>org.mycore.frontend.servlets.MCRUserAjaxServlet</servlet-class>
+    </servlet>
+  <servlet-mapping>
+    <servlet-name>MCRUserAdminServlet</servlet-name>
+    <url-pattern>/servlets/MCRUserAdminServlet</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>MCRUserEditorServlet</servlet-name>
+    <url-pattern>/servlets/MCRUserEditorServlet</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>MCRUserAjaxServlet</servlet-name>
+    <url-pattern>/servlets/MCRUserAjaxServlet</url-pattern>
+  </servlet-mapping>
