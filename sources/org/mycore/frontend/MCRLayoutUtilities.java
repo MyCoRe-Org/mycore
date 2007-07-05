@@ -35,7 +35,7 @@ public class MCRLayoutUtilities {
 
     private static final File NAVFILE = new File(MCRConfiguration.instance().getString("MCR.navigationFile").replace('/', File.separatorChar));
 
-    private static final boolean AC_ON = MCRConfiguration.instance().getBoolean("MCR.Website.ReadAccessVerification", true);
+    private static final boolean ACCESS_CONTROLL_ON = MCRConfiguration.instance().getBoolean("MCR.Website.ReadAccessVerification", true);
 
     /**
      * Verifies a given $webpage-ID (//item/@href) from navigation.xml on read
@@ -52,7 +52,7 @@ public class MCRLayoutUtilities {
      * @return true if access granted, false if not
      */
     public static boolean readAccess(String webpageID, String blockerWebpageID) {
-        if (accessControlOn()) {
+        if (ACCESS_CONTROLL_ON) {
             long startTime = System.currentTimeMillis();
             boolean access = getAccess(webpageID, "read", ALL2BLOCKER_TRUE, blockerWebpageID);
             LOGGER.debug("checked read access for webpageID= " + webpageID + " (with blockerWebpageID =" + blockerWebpageID + ") => " + access + ": took "
@@ -72,23 +72,13 @@ public class MCRLayoutUtilities {
      * @return true if access granted, false if not
      */
     public static boolean readAccess(String webpageID) {
-        if (accessControlOn()) {
+        if (ACCESS_CONTROLL_ON) {
             long startTime = System.currentTimeMillis();
             boolean access = getAccess(webpageID, "read", ALLTRUE);
             LOGGER.debug("checked read access for webpageID= " + webpageID + " => " + access + ": took " + getDuration(startTime) + " msec.");
             return access;
         } else
             return true;
-    }
-
-    /**
-     * Verifies, if the read access control is switched on (signalled by a
-     * property)
-     * 
-     * @return true if switched on, false if not
-     */
-    private static boolean accessControlOn() {
-        return AC_ON;
     }
 
     /**
