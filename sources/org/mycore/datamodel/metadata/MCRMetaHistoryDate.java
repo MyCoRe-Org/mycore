@@ -434,7 +434,7 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
      */
     public final void setText(String set) {
         if (set == null) {
-            text = "";
+            text = "?";
             LOGGER.warn("The text field of MCRMeataHistoryDate is empty.");
             return;
         }
@@ -522,7 +522,8 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
         try {
             c = getHistoryDate(set_date, false, calstr);
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.warn("The von date " + set_date + " for calendar " + calstr + " is false.");
+            c = null;
         }
         setVonDate(c);
     }
@@ -556,7 +557,8 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
         try {
             c = getHistoryDate(set_date, true, calstr);
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.warn("The bis date " + set_date + " for calendar " + calstr + " is false.");
+            c = null;
         }
         setBisDate(c);
     }
@@ -717,8 +719,8 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
             return false;
         }
         if (ibis < ivon) {
-            Calendar swp = (Calendar)von.clone();
-            setVonDate((Calendar)bis.clone());
+            Calendar swp = (Calendar) von.clone();
+            setVonDate((Calendar) bis.clone());
             setBisDate(swp);
         }
 
