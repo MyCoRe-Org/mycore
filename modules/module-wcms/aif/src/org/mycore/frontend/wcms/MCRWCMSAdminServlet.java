@@ -269,7 +269,7 @@ public class MCRWCMSAdminServlet extends MCRWCMSServlet {
 			String contextPath = request.getContextPath() + "/";
 			int pos = address.indexOf(contextPath, 9);
 			address = address.substring(0, pos) + contextPath
-					+ "servlets/WCMSLoginServlet";
+					+ "servlets/MCRWCMSLoginServlet";
 			response.sendRedirect(response.encodeRedirectURL(response
 					.encodeURL(address)));
 		} catch (JDOMException e) {
