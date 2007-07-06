@@ -422,8 +422,8 @@ public class MCRHIBUserStore implements MCRUserStore {
     @SuppressWarnings("unchecked")
     public List<String> getGroupIDsWithAdminUser(String userID) throws MCRException {
         Session session = MCRHIBConnection.instance().getSession();
-        Criteria c = session.createCriteria(MCRGROUPADMINS.class).setProjection(Projections.property("gid")).add(
-                Restrictions.eq("userid", session.get(MCRUSERS.class, userID)));
+        Criteria c = session.createCriteria(MCRGROUPADMINS.class).setProjection(Projections.property("key.gid.gid")).add(
+                Restrictions.eq("key.userid", session.get(MCRUSERS.class, userID)));
         return c.list();
     }
 
