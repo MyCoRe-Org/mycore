@@ -72,7 +72,7 @@ public class MCRUploadCommunicator {
 
     protected MCRUploadApplet applet;
 
-    protected final static int bufferSize = 262144; // 256 KByte
+    protected final static int bufferSize = 65536; // 64 KByte
 
     public MCRUploadCommunicator(String url, String uploadId, MCRUploadApplet applet) {
         this.url = url;
@@ -196,9 +196,6 @@ public class MCRUploadCommunicator {
         ze.setExtra(extra.toString().getBytes("UTF-8"));
         zos.putNextEntry(ze);
 
-        Hashtable ping = new Hashtable();
-        ping.put("method", "ping");
-        
         int num = 0;
         long sended = 0;
         byte[] buffer = new byte[bufferSize];
@@ -219,7 +216,11 @@ public class MCRUploadCommunicator {
             if( ( System.currentTimeMillis() - lastPing ) > 60000 )
             {
               lastPing = System.currentTimeMillis();
-              send(ping);
+              Hashtable ping = new Hashtable();
+              ping.put("method", "ping");
+              System.out.println( "Sending ping to servlet..." );
+              String pong = (String)( send(ping) );
+              System.out.println( "Server responded with " + pong );
             }
         }
 

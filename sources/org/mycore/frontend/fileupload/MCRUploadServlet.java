@@ -82,7 +82,7 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
 
     static MCRCache sessionIDs = new MCRCache(100, "UploadServlet Upload sessions");
     
-    final static int bufferSize = 262144;
+    final static int bufferSize = 65536; // 64 KByte
 
     public synchronized void init() throws ServletException {
         super.init();
