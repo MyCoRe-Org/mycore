@@ -382,10 +382,12 @@ public class MCRUserMgr {
 
             // now update the other groups
             for (int i = 0; i < groupIDs.size(); i++) {
-                MCRGroup otherGroup = retrieveGroup((String) groupIDs.get(i), true);
-                otherGroup.addMemberUserID(user.getID());
-                groupCache.remove(otherGroup.getID());
-                mcrUserStore.updateGroup(otherGroup);
+            	if(!primGroup.getID().equals(groupIDs.get(i))){
+            		MCRGroup otherGroup = retrieveGroup((String) groupIDs.get(i), true);
+            		otherGroup.addMemberUserID(user.getID());
+            		groupCache.remove(otherGroup.getID());
+            		mcrUserStore.updateGroup(otherGroup);
+            	}
             }
         } catch (MCRException ex) {
             // Since something went wrong we delete the previously created user.
