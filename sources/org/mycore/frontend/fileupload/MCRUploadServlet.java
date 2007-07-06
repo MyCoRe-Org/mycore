@@ -82,7 +82,7 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
 
     static MCRCache sessionIDs = new MCRCache(100, "UploadServlet Upload sessions");
     
-    final static int bufferSize = 65536;
+    final static int bufferSize = 262144;
 
     public synchronized void init() throws ServletException {
         super.init();
@@ -102,6 +102,7 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
             server.setReceiveBufferSize(Math.max(server.getReceiveBufferSize(), bufferSize));
             server.bind(new InetSocketAddress(serverIP,serverPort));
             LOGGER.debug("Server socket successfully created.");
+            LOGGER.debug("Server receive buffer size is " + server.getReceiveBufferSize() );
 
             // Starts separate thread that will receive and store file content
             new Thread(this).start();
@@ -190,6 +191,7 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
                 final Socket socket = server.accept();
                 socket.setReceiveBufferSize(bufferSize);
                 socket.setSendBufferSize(bufferSize);
+                LOGGER.debug("Socket receive buffer size is " + socket.getReceiveBufferSize());
                 
                 Thread handlerThread = new Thread(new Runnable() {
                     public void run() {
@@ -262,6 +264,8 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
 
             LOGGER.debug("Applet wants to send content of file " + path);
             sendResponse(res, serverIP + ":" + serverPort);
+        } else if (method.equals("ping")) {
+            sendResponse(res, "pong");
         } else if (method.equals("endUploadSession")) {
             String uploadId = req.getParameter("uploadId");
             MCRUploadHandler uploadHandler = MCRUploadHandlerManager.getHandler(uploadId);

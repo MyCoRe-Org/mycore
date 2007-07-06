@@ -72,6 +72,8 @@ public class MCRUploadCommunicator {
 
     protected MCRUploadApplet applet;
 
+    protected final static int bufferSize = 262144; // 256 KByte
+
     public MCRUploadCommunicator(String url, String uploadId, MCRUploadApplet applet) {
         this.url = url;
         this.uid = uploadId;
@@ -154,7 +156,7 @@ public class MCRUploadCommunicator {
         request.put("method", "uploadFile");
         request.put("path", path);
         request.put("length", String.valueOf(file.length()) );
-
+        
         System.out.println("Sending filename to server: " + path);
 
         String reply = (String) (send(request));
@@ -175,17 +177,18 @@ public class MCRUploadCommunicator {
         if (upm.isCanceled())
             return;
 
-        int bufferSize = 65536;
         Socket socket = new Socket(host, port);
         socket.setReceiveBufferSize(Math.max(socket.getReceiveBufferSize(),bufferSize));
-        socket.setSendBufferSize(Math.max(socket.getReceiveBufferSize(),bufferSize));
+        socket.setSendBufferSize(Math.max(socket.getSendBufferSize(),bufferSize));
         
         System.out.println("Socket created, connected to server.");
+        System.out.println("Socket send buffer size is " + socket.getSendBufferSize() );
 
         ZipOutputStream zos = new ZipOutputStream(socket.getOutputStream());
         DataInputStream din = new DataInputStream(socket.getInputStream());
 
-        zos.setLevel(Deflater.BEST_COMPRESSION);
+        // Large files like video already are compressed somehow
+        zos.setLevel(Deflater.NO_COMPRESSION); 
 
         ZipEntry ze = new ZipEntry(java.net.URLEncoder.encode(path, "UTF-8"));
         StringBuffer extra = new StringBuffer();
@@ -193,21 +196,31 @@ public class MCRUploadCommunicator {
         ze.setExtra(extra.toString().getBytes("UTF-8"));
         zos.putNextEntry(ze);
 
+        Hashtable ping = new Hashtable();
+        ping.put("method", "ping");
+        
         int num = 0;
-        long len = file.length();
         long sended = 0;
-        byte[] buffer = new byte[65536];
+        byte[] buffer = new byte[bufferSize];
 
         System.out.println("Starting to send file content...");
 
         InputStream source = new BufferedInputStream(new FileInputStream(file),buffer.length);
 
+        long lastPing = System.currentTimeMillis();
         while ((num = source.read(buffer)) != -1) {
             if (upm.isCanceled())
                 break;
             zos.write(buffer, 0, num);
             sended += num;
             upm.progressFile(num);
+            
+            // Send a "ping" to MCRUploadServlet so that server keeps HTTP Session alive
+            if( ( System.currentTimeMillis() - lastPing ) > 60000 )
+            {
+              lastPing = System.currentTimeMillis();
+              send(ping);
+            }
         }
 
         zos.closeEntry();
@@ -396,10 +409,10 @@ public class MCRUploadCommunicator {
         MessageDigest digest = MessageDigest.getInstance("MD5");
 
         InputStream fis = new FileInputStream(file);
-        BufferedInputStream bis = new BufferedInputStream(fis, 65536);
+        BufferedInputStream bis = new BufferedInputStream(fis, bufferSize);
         DigestInputStream in = new DigestInputStream(bis, digest);
 
-        byte[] buffer = new byte[65536];
+        byte[] buffer = new byte[bufferSize];
 
         while (in.read(buffer, 0, buffer.length) != -1)
             ;
