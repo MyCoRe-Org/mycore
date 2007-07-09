@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
 <!-- ============================================== -->
-<!--  MyCoRe - Module-Broadcasting build file for use with ANT        -->
+<!--  MyCoRe - Module-ACL-Editor 			        -->
 <!--  												-->
-<!-- Module-Broadcasting 1.0, 05-2006  					-->
+<!-- Module-ACL-Editor 1.0, 08-2007  				-->
 <!-- +++++++++++++++++++++++++++++++++++++			-->
 <!--  												-->
-<!-- Andreas Trappe 	- idea, concept, dev.		-->
-<!-- Huu Chi, Vu		- programming				-->
+<!-- Thomas Scheffler 	- idea, concept				-->
+<!-- Andreas Trappe 								-->
 <!--												-->
+<!-- Chi Vu Huu			- development				-->
 <!-- ============================================== -->
 
 
