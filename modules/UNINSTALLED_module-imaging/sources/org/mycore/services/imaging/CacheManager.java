@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import org.mycore.datamodel.ifs.MCRDirectory;
 import org.mycore.datamodel.ifs.MCRFile;
 
 /**
@@ -81,4 +82,5 @@ public interface CacheManager {
 	void setLock(MCRFile image);
 	void removeLock(MCRFile image);
 	boolean isLocked(MCRFile image);
+    String listCacheDir();
 }

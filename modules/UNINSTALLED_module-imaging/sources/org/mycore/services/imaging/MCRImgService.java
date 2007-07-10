@@ -78,7 +78,7 @@ public class MCRImgService {
 			LOGGER.debug("* Get " + filename + " Width x Height - use Cache");
 			LOGGER.debug("*********************************************");
 
-			CacheManager cache = new MCRImgCacheManager();
+			CacheManager cache = MCRImgCacheManager.instance();
 			
 			InputStream input = null;
 
@@ -147,7 +147,8 @@ public class MCRImgService {
 
 	// fitToWidth
 	public void getImage(MCRFile image, int xTopPos, int yTopPos, int boundWidth, int boundHeight, OutputStream output) throws IOException {
-		CacheManager cache = new MCRImgCacheManager();
+//		CacheManager cache = new MCRImgCacheManager();
+        CacheManager cache = MCRImgCacheManager.instance();
 		int origWidth = cache.getImgWidth(image);
 
 		getImage(image, xTopPos, yTopPos, boundWidth, boundHeight, (float) boundWidth / (float) origWidth, output);
@@ -187,7 +188,7 @@ public class MCRImgService {
 			LOGGER.debug("*********************************************");
 			LOGGER.debug("* Get image ROI else - use Cache");
 			LOGGER.debug("*********************************************");
-			CacheManager cache = new MCRImgCacheManager();
+			CacheManager cache = MCRImgCacheManager.instance();
 			InputStream input = null;
 			boolean outputFilled = false;
 

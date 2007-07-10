@@ -61,12 +61,15 @@ public class MCRImgCacheCommands extends MCRAbstractCommands {
     }
 
     public static void clearCache() {
-        MCRDirectory dir = MCRDirectory.getRootDirectory("imgCache");
+//        MCRDirectory dir = MCRDirectory.getRootDirectory("imgCache");
+        MCRDirectory dir = (MCRDirectory) MCRFilesystemNode.getRootNode(MCRImgCacheManager.CACHE_FOLDER);
         if (dir != null) {
             dir.delete();
+            LOGGER.info("Cache deleted!");
         }
-        LOGGER.info("Cache deleted!");
-
+        else {
+            LOGGER.info("No Cache in Filesystem! Nothing to do!");
+        }
     }
 
     private static void getSuppFiles(List list, String contentType, MCRDirectory rootNode) {
@@ -101,7 +104,7 @@ public class MCRImgCacheCommands extends MCRAbstractCommands {
 
         getSuppFiles(list, suppContTypes, derivate);
 
-        MCRImgCacheManager cache = new MCRImgCacheManager();
+        MCRImgCacheManager cache = MCRImgCacheManager.instance();
         MCRFile image = null;
 
         for (Iterator iter = list.iterator(); iter.hasNext();) {
@@ -130,7 +133,7 @@ public class MCRImgCacheCommands extends MCRAbstractCommands {
             throw new MCRException("File " + ID + " does not exist!");
 
         if (suppContTypes.indexOf(imgFile.getContentTypeID()) > -1) {
-            MCRImgCacheManager cache = new MCRImgCacheManager();
+            MCRImgCacheManager cache = MCRImgCacheManager.instance();
             MCRFile image = null;
 
             image = imgFile;
@@ -178,7 +181,7 @@ public class MCRImgCacheCommands extends MCRAbstractCommands {
             LOGGER.debug("* File type " + fileType + " supported in file list - " + suppContTypes);
             LOGGER.debug("* Index in file list: " + suppContTypes.indexOf(fileType));
             LOGGER.debug("****************************************");
-            MCRImgCacheManager cache = new MCRImgCacheManager();
+            CacheManager cache = MCRImgCacheManager.instance();
             MCRImgProcessor processor = new MCRImgProcessor();
             // ByteArrayOutputStream imgData = new ByteArrayOutputStream();
 
@@ -194,7 +197,7 @@ public class MCRImgCacheCommands extends MCRAbstractCommands {
                 // cache.setLock(image);
                 boolean cacheOrig = (new Boolean(config.getString("MCR.Module-iview.cacheOrig"))).booleanValue();
                 // cache Original
-                if (cacheOrig && !processor.hasCorrectTileSize() && !cache.existInCache(image, cache.ORIG)) {
+                if (cacheOrig && !processor.hasCorrectTileSize() && !cache.existInCache(image, MCRImgCacheManager.ORIG)) {
                     ByteArrayOutputStream imgData = new ByteArrayOutputStream();
                     processor.tiffEncode(imgData);
                     if ((fileType.equals("tiff") || fileType.equals("tif"))) {
@@ -209,20 +212,22 @@ public class MCRImgCacheCommands extends MCRAbstractCommands {
                         LOGGER.debug("* not TIFF						         *");
                         LOGGER.debug("****************************************");
                         ByteArrayInputStream input = new ByteArrayInputStream(imgData.toByteArray());
-                        cache.saveImage(image, cache.ORIG, input);
+                        cache.saveImage(image, MCRImgCacheManager.ORIG, input);
                         imgData.reset();
                     }
 
                 } else {
                     LOGGER.info("****************************************");
-                    LOGGER.info("Image " + image.getName() + " as version " + cache.ORIG + " allready exists in Cache!");
+                    LOGGER.info("Image " + image.getName() + " as version " + MCRImgCacheManager.ORIG + " allready exists in Cache!");
                     LOGGER.info("****************************************");
                 }
 
+                LOGGER.debug("Cache files ORIG: \n" + cache.listCacheDir());
+                
                 int cacheWidth = Integer.parseInt(config.getString("MCR.Module-iview.cache.size.width"));
                 int cacheHeight = Integer.parseInt(config.getString("MCR.Module-iview.cache.size.height"));
                 // cache small version
-                if ((imgSize.width > 2 * cacheWidth || imgSize.height > 2 * cacheHeight) && !cache.existInCache(image, cache.CACHE)) {
+                if ((imgSize.width > 2 * cacheWidth || imgSize.height > 2 * cacheHeight) && !cache.existInCache(image, MCRImgCacheManager.CACHE)) {
                     LOGGER.debug("****************************************");
                     LOGGER.debug("* MCRImgCacheCommands - cacheFile      *");
                     LOGGER.debug("* (imgSize.width > 2 * 1024 || imgSize.height > 2 * 768)  *");
@@ -231,44 +236,48 @@ public class MCRImgCacheCommands extends MCRAbstractCommands {
                     processor.resize(cacheWidth, cacheHeight);
                     processor.tiffEncode(imgData);
                     ByteArrayInputStream input = new ByteArrayInputStream(imgData.toByteArray());
-                    cache.saveImage(image, cache.CACHE, input);
+                    cache.saveImage(image, MCRImgCacheManager.CACHE, input);
                     imgData.reset();
 
                     LOGGER.info("****************************************");
-                    LOGGER.info("Image " + image.getName() + " cached successfull under the name " + cache.CACHE + " !");
+                    LOGGER.info("Image " + image.getName() + " cached successfull under the name " + MCRImgCacheManager.CACHE + " !");
                     LOGGER.info("****************************************");
 
                 } else {
                     LOGGER.info("****************************************");
-                    LOGGER.info("Image " + image.getName() + " as version " + cache.CACHE + " allready exists in Cache!");
+                    LOGGER.info("Image " + image.getName() + " as version " + MCRImgCacheManager.CACHE + " allready exists in Cache!");
                     LOGGER.info("****************************************");
                 }
+                
+                LOGGER.debug("Cache files CACHE: \n" + cache.listCacheDir());
 
                 // cache Thumbnail
-                if (!cache.existInCache(image, cache.THUMB)) {
+                if (!cache.existInCache(image, MCRImgCacheManager.THUMB)) {
                     int thumbWidth = Integer.parseInt(config.getString("MCR.Module-iview.thumbnail.size.width"));
                     int thumbHeight = Integer.parseInt(config.getString("MCR.Module-iview.thumbnail.size.height"));
                     LOGGER.debug("****************************************");
                     LOGGER.debug("* MCRImgCacheCommands - cacheFile      *");
-                    LOGGER.debug("* !cache.existInCache(image, cache.THUMB)  *");
+                    LOGGER.debug("* !cache.existInCache(image, MCRImgCacheManager.THUMB)  *");
                     LOGGER.debug("****************************************");
                     ByteArrayOutputStream imgData = new ByteArrayOutputStream();
                     processor.resize(thumbWidth, thumbHeight);
                     processor.jpegEncode(imgData);
                     ByteArrayInputStream input = new ByteArrayInputStream(imgData.toByteArray());
-                    cache.saveImage(image, cache.THUMB, input);
+                    cache.saveImage(image, MCRImgCacheManager.THUMB, input);
                     imgData.reset();
 
                     LOGGER.info("****************************************");
-                    LOGGER.info("Image " + image.getName() + " cached successfull under the name " + cache.THUMB + " !");
+                    LOGGER.info("Image " + image.getName() + " cached successfull under the name " + MCRImgCacheManager.THUMB + " !");
                     LOGGER.info("****************************************");
                     // cache.removeLock(image);
                 } else {
                     LOGGER.info("****************************************");
-                    LOGGER.info("Image " + image.getName() + " as version " + cache.THUMB + " allready exists in Cache!");
+                    LOGGER.info("Image " + image.getName() + " as version " + MCRImgCacheManager.THUMB + " allready exists in Cache!");
                     LOGGER.info("****************************************");
                 }
 
+                LOGGER.debug("Cache files THUMB: \n" + cache.listCacheDir());
+                
                 LOGGER.info("****************************************");
                 LOGGER.info("* Caching image " + image.getName() + " finished successfull!");
                 LOGGER.info("****************************************");

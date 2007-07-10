@@ -24,7 +24,7 @@ public class MCRImgCacheEventHandler extends MCREventHandlerBase {
 		LOGGER.debug("* OwnerID: "+ file.getOwnerID());
 		LOGGER.debug("*************************************************");
 		MCRConfiguration config = MCRConfiguration.instance();
-		MCRImgCacheManager imgCache = new MCRImgCacheManager();
+		MCRImgCacheManager imgCache = MCRImgCacheManager.instance();
 		
 		if (!file.getOwnerID().equals(MCRImgCacheManager.CACHE_FOLDER) && !imgCache.existInCache(file)) {
 			LOGGER.debug("**************************************************");
@@ -56,7 +56,7 @@ public class MCRImgCacheEventHandler extends MCREventHandlerBase {
 	 *            the MCRFile that caused the event
 	 */
 	protected void handleFileDeleted(MCREvent evt, MCRFile file) {
-		MCRImgCacheManager imgCache = new MCRImgCacheManager();
+		MCRImgCacheManager imgCache = MCRImgCacheManager.instance();
 		if (imgCache.existInCache(file)) {
 			try {
 				MCRImgCacheCommands.removeCachedFile(file.getID());
