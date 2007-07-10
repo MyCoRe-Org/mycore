@@ -165,9 +165,8 @@ public class MCRHIBFileMetadataStore implements MCRFileMetadataStore {
         List l = new ArrayList();
         l = session.createQuery("from MCRFSNODES where PID = '" + parentID + "'").list();
 
-        if (l.size() < 1) {
-            String msg = "MCRHIBFileMetadataStore.retrieveChildrenIDs(): There are no nodes with PID = " + parentID;
-            throw new MCRException(msg);
+        if (l.size() == 0) {
+            return new Vector();
         }
 
         Vector<String> v = new Vector<String>(l.size());
