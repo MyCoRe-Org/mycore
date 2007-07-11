@@ -21,12 +21,12 @@ import org.mycore.common.MCRSessionMgr;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.parsers.bool.MCRAndCondition;
 import org.mycore.parsers.bool.MCROrCondition;
+import org.mycore.services.fieldquery.MCRCachedQueryData;
 import org.mycore.services.fieldquery.MCRFieldDef;
 import org.mycore.services.fieldquery.MCRQuery;
 import org.mycore.services.fieldquery.MCRQueryCondition;
 import org.mycore.services.fieldquery.MCRQueryManager;
 import org.mycore.services.fieldquery.MCRResults;
-import org.mycore.services.fieldquery.MCRSearchServlet;
 import org.mycore.services.fieldquery.MCRSortBy;
 
 public class MCRIndexBrowserData {
@@ -174,9 +174,7 @@ public class MCRIndexBrowserData {
              getCache(cacheKey).put(INDEX_KEY, ll1);
              getCache(cacheKey).put(QUERY_KEY, myQuery);
              // for further search and research (by refine and other posibilities the query must be in the Cache
-             MCRSearchServlet.getCache(MCRSearchServlet.getResultsKey()).put(mcrResult.getID(), mcrResult);
-             MCRSearchServlet.getCache(MCRSearchServlet.getQueriesKey()).put(mcrResult.getID(), myQuery);
-             MCRSearchServlet.getCache(MCRSearchServlet.getConditionsKey()).put(mcrResult.getID(), myQuery.getCondition());
+             new MCRCachedQueryData( mcrResult, myQuery.buildXML(), myQuery.getCondition() );
              results.setAttribute("resultid", mcrResult.getID());
              
         } else {

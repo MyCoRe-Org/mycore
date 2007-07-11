@@ -36,15 +36,14 @@ import org.apache.log4j.Logger;
 
 import org.jdom.Document;
 import org.mycore.access.MCRAccessManager;
-import org.mycore.common.MCRCache;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.common.MCRXMLTableManager;
+import org.mycore.services.fieldquery.MCRCachedQueryData;
 import org.mycore.services.fieldquery.MCRHit;
 import org.mycore.services.fieldquery.MCRQueryClient;
 import org.mycore.services.fieldquery.MCRResults;
-import org.mycore.services.fieldquery.MCRSearchServlet;
 
 /**
  * This servlet response the MCRObject certain by the call path
@@ -143,16 +142,16 @@ public class MCRObjectServlet extends MCRServlet {
         if (editorID == null) {
             return;
         }
-        MCRCache parameterCache = (MCRCache) MCRSessionMgr.getCurrentSession().get(MCRSearchServlet.getParametersKey());
-        MCRSearchServlet.SearchParameters sp = (parameterCache == null) ? null : (MCRSearchServlet.SearchParameters) (parameterCache).get(editorID);
+        
+        MCRCachedQueryData qd = MCRCachedQueryData.getData(editorID);
 
-        if (sp != null) {
+        if (qd != null) {
             // editorID found and editorSession still valid
             storeEditorID(mcrid, editorID);
             job.getRequest().setAttribute("XSL.resultListEditorID", editorID);
-            job.getRequest().setAttribute("XSL.numPerPage", String.valueOf(sp.numPerPage));
-            job.getRequest().setAttribute("XSL.page", String.valueOf(sp.page));
-            MCRResults results = (MCRResults) ((MCRCache) MCRSessionMgr.getCurrentSession().get(MCRSearchServlet.getResultsKey())).get(editorID);
+            job.getRequest().setAttribute("XSL.numPerPage", String.valueOf(qd.getNumPerPage()));
+            job.getRequest().setAttribute("XSL.page", String.valueOf(qd.getPage()));
+            MCRResults results = qd.getResults();
             MCRHit previousObject = null, nextObject = null;
             int numHits = results.getNumHits();
             for (int i = 0; i < numHits; i++) {

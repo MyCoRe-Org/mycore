@@ -38,11 +38,8 @@ import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.filter.ElementFilter;
 import org.jdom.output.XMLOutputter;
-import org.mycore.common.MCRCache;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
-import org.mycore.common.MCRSession;
-import org.mycore.common.MCRSessionMgr;
 import org.mycore.frontend.editor.MCREditorSubmission;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
@@ -58,21 +55,6 @@ public class MCRSearchServlet extends MCRServlet {
     private static final long serialVersionUID = 1L;
 
     protected static final Logger LOGGER = Logger.getLogger(MCRSearchServlet.class);
-
-    /** Cached query results */
-    private static final String RESULTS_KEY = "MCRSearchServlet.results";
-
-    /** Cached queries as XML, for re-use in editor form */
-    private static final String QUERIES_KEY = "MCRSearchServlet.queries";
-
-    /** Cached queries as XML, for re-use in editor form */
-    private static final String RESORT_KEY = "MCRSearchServlet.resort";
-
-    /** Cached queries as parsed MCRCondition, for output with results */
-    private static final String CONDIDTIONS_KEY = "MCRSearchServlet.conditions";
-
-    /** search parameters * */
-    private static final String PARAMS_KEY = "MCRSearchServlet.parameters";
 
     /** Default search field */
     private String defaultSearchField;
@@ -96,17 +78,24 @@ public class MCRSearchServlet extends MCRServlet {
         else
             doQuery(request, response);
     }
+    
+    protected MCRCachedQueryData getQueryData( HttpServletRequest request )
+    {
+      String id = request.getParameter( "id" );
+      MCRCachedQueryData qd = MCRCachedQueryData.getData( id );
+      if( qd == null )
+      {
+        throw new MCRException( "Result list is not in cache any more, please re-run query" );
+      }
+      return qd;
+    }
 
     /**
      * Returns a query that was previously submitted, to reload it into the
      * editor search mask. Usage: MCRSearchServlet?mode=load&id=XXXXX
      */
     protected void loadQuery(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        String id = request.getParameter("id");
-        Document query = (Document) (getCache(QUERIES_KEY).get(id));
-
-        // Send query XML to editor
-        getLayoutService().sendXML(request, response, query);   
+        getLayoutService().sendXML(request, response, getQueryData(request).getQuery() );   
     }
 
     /**
@@ -114,24 +103,20 @@ public class MCRSearchServlet extends MCRServlet {
      * MCRSearchServlet?mode=results&numPerPage=10&page=1
      */
     protected void showResults(HttpServletRequest request, HttpServletResponse response) throws IOException {
-
         // Get cached results
-        String id = request.getParameter("id");
-        MCRResults result = (MCRResults) (getCache(RESULTS_KEY).get(id));
-        if (null == result)
-          throw new MCRException("Ergebnisliste nicht mehr gültig. Führen Sie die Suche bitte erneut aus.");
-        Document query = (Document) (getCache(QUERIES_KEY).get(id));
+        MCRCachedQueryData qd = getQueryData(request);
+        MCRResults results = qd.getResults();
 
         // Effective number of hits per page
         String snpp = request.getParameter("numPerPage");
         if (snpp == null)
             snpp = "0";
         int npp = Integer.parseInt(snpp);
-        if (npp > result.getNumHits())
+        if (npp > results.getNumHits())
             npp = 0;
 
         // Total number of pages
-        int numHits = Math.max(1, result.getNumHits());
+        int numHits = Math.max(1, results.getNumHits());
         int numPages = 1;
         if (npp > 0)
             numPages = (int) (Math.ceil((double) numHits / (double) npp));
@@ -156,30 +141,28 @@ public class MCRSearchServlet extends MCRServlet {
 
         // Number of first and last hit to be shown
         int first = (page - 1) * npp;
-        int last = result.getNumHits() - 1;
+        int last = results.getNumHits() - 1;
         if (npp > 0)
-            last = Math.min(result.getNumHits(), first + npp) - 1;
+            last = Math.min(results.getNumHits(), first + npp) - 1;
 
         // Build result hits as XML document
-        Element xml = result.buildXML(first, last);
+        Element xml = results.buildXML(first, last);
 
         // Add additional data for output
         xml.setAttribute("numPerPage", String.valueOf(npp));
         xml.setAttribute("numPages", String.valueOf(numPages));
         xml.setAttribute("page", String.valueOf(page));
         // save some parameters
-        SearchParameters sp = new SearchParameters();
-        sp.page = page;
-        sp.numPerPage = npp;
-        getCache(PARAMS_KEY).put(id, sp);
+        qd.setPage( page );
+        qd.setNumPerPage( npp );
 
         // The URL of the search mask that was used
-        xml.setAttribute("mask", query.getRootElement().getAttributeValue("mask"));
+        xml.setAttribute("mask", qd.getQuery().getRootElement().getAttributeValue("mask"));
 
         // The query condition, to show together with the results
-        MCRCondition cond = (MCRCondition) (getCache(CONDIDTIONS_KEY).get(id));
-        xml.addContent(new Element("condition").setAttribute("format", "text").setText(cond.toString()));
-        xml.addContent(new Element("condition").setAttribute("format", "xml").addContent(cond.toXML()));
+        MCRCondition condition = qd.getCondition();
+        xml.addContent(new Element("condition").setAttribute("format", "text").setText(condition.toString()));
+        xml.addContent(new Element("condition").setAttribute("format", "xml").addContent(condition.toXML()));
 
         // Send output to LayoutServlet
         sendToLayout(request, response, new Document(xml));        
@@ -295,7 +278,7 @@ public class MCRSearchServlet extends MCRServlet {
             }
         }
 
-        Object clonedQuery = input.clone(); // Keep for later re-use
+        Document clonedQuery = (Document)(input.clone()); // Keep for later re-use
 
         // Show incoming query document
         if (LOGGER.isDebugEnabled()) {
@@ -358,58 +341,15 @@ public class MCRSearchServlet extends MCRServlet {
         }
 
         // Execute query
-        long start = System.currentTimeMillis();
         MCRResults result = MCRQueryManager.search(MCRQuery.parseXML(input));
-        long qtime = System.currentTimeMillis() - start;
-        LOGGER.debug("MCRSearchServlet total query time: " + qtime);
 
         String npp = root.getAttributeValue("numPerPage", "0");
 
         // Store query and results in cache
-        getCache(RESULTS_KEY).put(result.getID(), result);
-        getCache(QUERIES_KEY).put(result.getID(), clonedQuery);
-        getCache(RESORT_KEY).put(result.getID(), input);
-        getCache(CONDIDTIONS_KEY).put(result.getID(), cond);
+        new MCRCachedQueryData( result, clonedQuery, cond );
 
         // Redirect browser to first results page
         sendRedirect(request, response, result.getID(), npp);
-    }
-
-    public static String getConditionsKey() {
-        return CONDIDTIONS_KEY;
-    }
-
-    public static String getQueriesKey() {
-        return QUERIES_KEY;
-    }
-
-    public static String getResultsKey() {
-        return RESULTS_KEY;
-    }
-
-    public static String getParametersKey() {
-        return PARAMS_KEY;
-    }
-
-    public static String getResortKey() {
-        return RESORT_KEY;
-    }
-
-    public static MCRCache getCache(String key) {
-      MCRSession session = MCRSessionMgr.getCurrentSession();
-        MCRCache c = (MCRCache) session.get(key);
-        if (c == null) {
-            String cacheID = key+"/"+session.getID();
-            c = new MCRCache(5, "SearchServlet Cache key("+cacheID+")");
-            session.put(key, c);
-        }
-        return c;
-    }
-
-    public static class SearchParameters {
-        public int numPerPage;
-
-        public int page;
     }
 
    /**
@@ -438,5 +378,4 @@ public class MCRSearchServlet extends MCRServlet {
         }
         res.sendRedirect(res.encodeRedirectURL(sb.toString()));
     }
-
 }
