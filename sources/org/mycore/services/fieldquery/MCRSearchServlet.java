@@ -41,6 +41,7 @@ import org.jdom.output.XMLOutputter;
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
+import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.frontend.editor.MCREditorSubmission;
 import org.mycore.frontend.servlets.MCRServlet;
@@ -395,10 +396,12 @@ public class MCRSearchServlet extends MCRServlet {
     }
 
     public static MCRCache getCache(String key) {
-        MCRCache c = (MCRCache) MCRSessionMgr.getCurrentSession().get(key);
+      MCRSession session = MCRSessionMgr.getCurrentSession();
+        MCRCache c = (MCRCache) session.get(key);
         if (c == null) {
-            c = new MCRCache(5, "SearchServlet Cache key("+key+")");
-            MCRSessionMgr.getCurrentSession().put(key, c);
+            String cacheID = key+"/"+session.getID();
+            c = new MCRCache(5, "SearchServlet Cache key("+cacheID+")");
+            session.put(key, c);
         }
         return c;
     }
