@@ -23,6 +23,7 @@
 
 package org.mycore.datamodel.common;
 
+import java.io.InputStream;
 import java.util.List;
 
 import org.mycore.common.MCRPersistenceException;
@@ -88,7 +89,7 @@ public interface MCRXMLTableInterface {
 
     /**
      * The method retrieve a dataset for the given MCRObjectID and returns the
-     * corresponding XML file as byte array.
+     * corresponding XML file as InputStream.
      * 
      * @param mcrid
      *            a MCRObjectID
@@ -97,7 +98,7 @@ public interface MCRXMLTableInterface {
      * @exception MCRPersistenceException if
      *                the method arguments are not correct
      */
-    public byte[] retrieve(MCRObjectID mcrid, int version) throws MCRPersistenceException;
+    public InputStream retrieve(MCRObjectID mcrid, int version) throws MCRPersistenceException;
 
     /**
      * This method returns the next free ID number for a given MCRObjectID base.

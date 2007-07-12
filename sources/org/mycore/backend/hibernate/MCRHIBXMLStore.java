@@ -23,12 +23,17 @@
 
 package org.mycore.backend.hibernate;
 
+import java.io.InputStream;
+import java.sql.Blob;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.hibernate.Query;
 import org.hibernate.Session;
+import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Restrictions;
 
 import org.mycore.backend.hibernate.tables.MCRXMLTABLE;
 import org.mycore.backend.hibernate.tables.MCRXMLTABLEPK;
@@ -176,10 +181,15 @@ public class MCRHIBXMLStore implements MCRXMLTableInterface {
      * @exception MCRPersistenceException
      *                the method arguments are not correct
      */
-    public final byte[] retrieve(MCRObjectID mcrid, int version) throws MCRPersistenceException {
+    public final InputStream retrieve(MCRObjectID mcrid, int version) throws MCRPersistenceException {
         Session session = getSession();
         MCRXMLTABLEPK pk = new MCRXMLTABLEPK(mcrid.getId(), version);
-        return ((MCRXMLTABLE) session.get(MCRXMLTABLE.class, pk)).getXmlByteArray();
+        Blob blob = (Blob) session.createCriteria(MCRXMLTABLE.class).setProjection(Projections.property("xml")).add(Restrictions.eq("key", pk)).uniqueResult();
+        try {
+            return blob.getBinaryStream();
+        } catch (SQLException e) {
+            throw new MCRPersistenceException("Cannot get Blob for " + mcrid, e);
+        }
     }
 
     /**
@@ -226,7 +236,7 @@ public class MCRHIBXMLStore implements MCRXMLTableInterface {
 
         Session session = getSession();
         MCRXMLTABLEPK pk = new MCRXMLTABLEPK(mcrid.getId(), version);
-        if (session.get(MCRXMLTABLE.class, pk)!=null){
+        if (session.get(MCRXMLTABLE.class, pk) != null) {
             return true;
         }
         StringBuffer query = new StringBuffer("select key.id from MCRXMLTABLE where MCRID = '").append(mcrid.getId()).append("' and MCRVERSION = ").append(

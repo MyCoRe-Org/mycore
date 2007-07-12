@@ -52,7 +52,7 @@ public class MCRXMLHelper {
     private static MCRParserInterface PARSER;
 
     /** Returns the XML Parser as configured in mycore.properties */
-    private static MCRParserInterface getParser() throws MCRException {
+    public static MCRParserInterface getParser() throws MCRException {
         if (PARSER == null) {
             Object o = MCRConfiguration.instance().getInstanceOf("MCR.XMLParser.Class", "org.mycore.common.xml.MCRParserXerces");
             PARSER = (MCRParserInterface) o;

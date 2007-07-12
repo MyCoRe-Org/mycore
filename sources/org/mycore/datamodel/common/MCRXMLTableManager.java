@@ -23,6 +23,9 @@
 
 package org.mycore.datamodel.common;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -105,7 +108,7 @@ public class MCRXMLTableManager {
 
         return inst;
     }
-    
+
     /**
      * The method create a new item in the datastore.
      * 
@@ -114,8 +117,8 @@ public class MCRXMLTableManager {
      * @param xml
      *            a JDOM Document
      * 
-     * @exception MCRException if
-     *                the method arguments are not correct
+     * @exception MCRException
+     *                if the method arguments are not correct
      */
     public void create(MCRObjectID mcrid, org.jdom.Document xml) throws MCRException {
         getXMLTable(mcrid.getTypeId()).create(mcrid, MCRUtils.getByteArray(xml), 1);
@@ -131,8 +134,8 @@ public class MCRXMLTableManager {
      * @param xml
      *            a byte array with the XML file
      * 
-     * @exception MCRException if
-     *                the method arguments are not correct
+     * @exception MCRException
+     *                if the method arguments are not correct
      */
     public void create(MCRObjectID mcrid, byte[] xml) throws MCRException {
         getXMLTable(mcrid.getTypeId()).create(mcrid, xml, 1);
@@ -145,8 +148,8 @@ public class MCRXMLTableManager {
      * @param mcrid
      *            a MCRObjectID
      * 
-     * @exception MCRException if
-     *                the method argument is not correct
+     * @exception MCRException
+     *                if the method argument is not correct
      */
     public void delete(MCRObjectID mcrid) throws MCRException {
         getXMLTable(mcrid.getTypeId()).delete(mcrid, 1);
@@ -162,8 +165,8 @@ public class MCRXMLTableManager {
      * @param xml
      *            a byte array with the XML file
      * 
-     * @exception MCRException if
-     *                the method arguments are not correct
+     * @exception MCRException
+     *                if the method arguments are not correct
      */
     public void update(MCRObjectID mcrid, org.jdom.Document xml) throws MCRException {
         getXMLTable(mcrid.getTypeId()).update(mcrid, MCRUtils.getByteArray(xml), 1);
@@ -179,8 +182,8 @@ public class MCRXMLTableManager {
      * @param xml
      *            a byte array with the XML file
      * 
-     * @exception MCRException if
-     *                the method arguments are not correct
+     * @exception MCRException
+     *                if the method arguments are not correct
      */
     public void update(MCRObjectID mcrid, byte[] xml) throws MCRException {
         getXMLTable(mcrid.getTypeId()).update(mcrid, xml, 1);
@@ -196,11 +199,13 @@ public class MCRXMLTableManager {
      *            a MCRObjectID
      * 
      * @return the byte array of data or NULL
-     * @exception MCRException if
-     *                the method arguments are not correct
+     * @exception MCRException
+     *                if the method arguments are not correct
      */
     public byte[] retrieveAsXML(MCRObjectID mcrid) throws MCRException {
-        return getXMLTable(mcrid.getTypeId()).retrieve(mcrid, 1);
+        ByteArrayOutputStream bos=new ByteArrayOutputStream();
+        MCRUtils.copyStream(getXMLTable(mcrid.getTypeId()).retrieve(mcrid, 1), bos);
+        return bos.toByteArray();
     }
 
     /**
@@ -211,12 +216,12 @@ public class MCRXMLTableManager {
      *            a MCRObjectID
      * 
      * @return the JDOM Document of data or NULL
-     * @exception MCRException if
-     *                the method arguments are not correct
+     * @exception MCRException
+     *                if the method arguments are not correct
      */
     public Document retrieveAsJDOM(MCRObjectID mcrid) throws MCRException {
-        byte[] xml = getXMLTable(mcrid.getTypeId()).retrieve(mcrid, 1);
-        return MCRXMLHelper.parseXML(xml,false);
+        InputStream xml = getXMLTable(mcrid.getTypeId()).retrieve(mcrid, 1);
+        return MCRXMLHelper.getParser().parseXML(xml, false);
     }
 
     /**
@@ -268,7 +273,7 @@ public class MCRXMLTableManager {
     public List<String> retrieveAllIDs(String type) {
         return getXMLTable(type).retrieveAllIDs(type);
     }
-    
+
     /**
      * The method return a Array list with all stored MCRObjectID's of the XML
      * table
@@ -282,26 +287,27 @@ public class MCRXMLTableManager {
         }
         Collections.sort(a);
         return a;
-    }   
-    
+    }
+
     /**
-     * The method return a Array list with all MCRObjectID-Types, stored in the XML
-     * table.
-     * reads the mycore.properties-configuration for datamodel-types
-     * @return a ArrayList of MCRObjectID-Types for which MCR.Metadata.Type.{datamodel}=true
+     * The method return a Array list with all MCRObjectID-Types, stored in the
+     * XML table. reads the mycore.properties-configuration for datamodel-types
+     * 
+     * @return a ArrayList of MCRObjectID-Types for which
+     *         MCR.Metadata.Type.{datamodel}=true
      */
-    public List<String> getAllAllowedMCRObjectIDTypes(){
-    	ArrayList<String> listTypes = new ArrayList<String>();
-    	final String prefix = "MCR.Metadata.Type.";
+    public List<String> getAllAllowedMCRObjectIDTypes() {
+        ArrayList<String> listTypes = new ArrayList<String>();
+        final String prefix = "MCR.Metadata.Type.";
         Properties prop = MCRConfiguration.instance().getProperties(prefix);
         Enumeration names = prop.propertyNames();
         while (names.hasMoreElements()) {
-        	String name = (String) (names.nextElement());
-        	if (MCRConfiguration.instance().getBoolean(name)) {
-        		listTypes.add(name.substring(prefix.length()));
-        	}
+            String name = (String) (names.nextElement());
+            if (MCRConfiguration.instance().getBoolean(name)) {
+                listTypes.add(name.substring(prefix.length()));
+            }
         }
-    	return listTypes;    	
+        return listTypes;
     }
 
     /**
@@ -321,19 +327,7 @@ public class MCRXMLTableManager {
         Document jDoc = (Document) jdomCache.get(id);
 
         if (jDoc == null) {
-            byte[] xml = retrieveAsXML(id);
-
-            if ((xml == null) || (xml.length == 0)) {
-                StringBuffer sb = new StringBuffer("Error while retrieving XML with id ").append(id).append(" from MCRXMLTableInterface.");
-                LOGGER.error(sb);
-                Element error = new Element("mcr_error");
-                error.addContent(sb.toString());
-                error.setAttribute("id", id.getId());
-                return new Document(error); 
-            }
-
-            // read from MCRXMLTable
-            jDoc = MCRXMLHelper.parseXML(xml, false);
+            jDoc = retrieveAsJDOM(id);
             jdomCache.put(id, jDoc);
             LOGGER.debug(new StringBuffer(id.toString()).append(" is now in MCRCache..."));
         } else {

@@ -23,6 +23,8 @@
 
 package org.mycore.common.xml;
 
+import java.io.InputStream;
+
 import org.jdom.Document;
 import org.mycore.common.MCRException;
 
@@ -112,4 +114,30 @@ public interface MCRParserInterface {
      * @return the XML file as a DOM object
      */
     public Document parseXML(byte[] xml, boolean valid) throws MCRException;
+
+    /**
+     * Parses an Byte Array and returns it as DOM. Use the validation value from
+     * mycore.properties.
+     * 
+     * @param input
+     *            the InputStream to be parsed
+     * @throws MCRException
+     *             if XML could not be parsed
+     * @return the XML file as a DOM object
+     */
+    public Document parseXML(InputStream input) throws MCRException;
+
+    /**
+     * Parses an Byte Array and returns it as DOM. Use the given validation
+     * flag.
+     * 
+     * @param input
+     *            the InputStream to be parsed
+     * @param validate
+     *            the validation flag
+     * @throws MCRException
+     *             if XML could not be parsed
+     * @return the XML file as a DOM object
+     */
+    public Document parseXML(InputStream input, boolean validate) throws MCRException;
 }

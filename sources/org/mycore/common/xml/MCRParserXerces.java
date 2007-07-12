@@ -24,6 +24,7 @@
 package org.mycore.common.xml;
 
 import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.io.StringReader;
 
 import org.apache.log4j.Logger;
@@ -190,6 +191,15 @@ public class MCRParserXerces implements MCRParserInterface, ErrorHandler {
      */
     public Document parseXML(byte[] xml, boolean validate) {
         InputSource source = new InputSource(new ByteArrayInputStream(xml));
+        return parse(source, validate);
+    }
+
+    public Document parseXML(InputStream input) throws MCRException {
+        return parseXML(input, FLAG_VALIDATION);
+    }
+
+    public Document parseXML(InputStream input, boolean validate) throws MCRException {
+        InputSource source = new InputSource(input);
         return parse(source, validate);
     }
 
