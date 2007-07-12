@@ -15,70 +15,69 @@ import org.mycore.access.mcrimpl.MCRAccessStore;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 
-import com.sun.org.apache.bcel.internal.generic.LOOKUPSWITCH;
-
 public class MCRACLEditorValidation {
-	private static Logger LOGGER = Logger.getLogger(MCRACLEditorValidation.class);
-	public static boolean nonExistingRule(String objid, String acpool) {
-		MCRAccessStore accessStore = MCRAccessStore.getInstance();
-		return !accessStore.existsRule(objid, acpool);
-	}
+    private static Logger LOGGER = Logger.getLogger(MCRACLEditorValidation.class);
 
-	public static boolean validateInput(Element input) throws IOException, JDOMException {
-		Filter posFilter = new Filter() {
-			public boolean matches(Object arg0) {
-				if (((Element) arg0).getAttributeValue("pos") == null) {
-					return true;
-				} else
-					return false;
-			}
-		};
-		for (Iterator it = input.getContent(posFilter).iterator(); it.hasNext();) {
-			Element currentElem = (Element) it.next();
+    public static boolean nonExistingRule(String objid, String acpool) {
+        MCRAccessStore accessStore = MCRAccessStore.getInstance();
+        return !accessStore.existsRule(objid, acpool);
+    }
 
-			System.out.println("#############################################");
-			new XMLOutputter(Format.getPrettyFormat()).output(currentElem, System.out);
-			System.out.println("#############################################");
+    public static boolean validateInput(Element input) throws IOException, JDOMException {
+        Filter posFilter = new Filter() {
+            public boolean matches(Object arg0) {
+                if (((Element) arg0).getAttributeValue("pos") == null) {
+                    return true;
+                } else
+                    return false;
+            }
+        };
+        for (Iterator it = input.getContent(posFilter).iterator(); it.hasNext();) {
+            Element currentElem = (Element) it.next();
 
-			String objID = currentElem.getChildText("OBJID");
-			String acPool = currentElem.getChildText("ACPOOL");
+            System.out.println("#############################################");
+            new XMLOutputter(Format.getPrettyFormat()).output(currentElem, System.out);
+            System.out.println("#############################################");
 
-			if (MCRAccessStore.getInstance().existsRule(objID, acPool))
-				return false;
-		}
-		return true;
-	}
+            String objID = currentElem.getChildText("OBJID");
+            String acPool = currentElem.getChildText("ACPOOL");
 
-	public static boolean validateFilter(Element input) throws IOException {
-		if (input != null) {
-			MCRSession session = MCRSessionMgr.getCurrentSession();
+            if (MCRAccessStore.getInstance().existsRule(objID, acPool))
+                return false;
+        }
+        return true;
+    }
 
-			String objIDFilter = input.getChildText("objid");
-			String acpoolFilter = input.getChildText("acpool");
-			Map filterMap = new HashMap();
+    public static boolean validateFilter(Element input) throws IOException {
+        if (input != null) {
+            MCRSession session = MCRSessionMgr.getCurrentSession();
 
-			if (objIDFilter != null) {
-				filterMap.put("objid", objIDFilter);
-				LOGGER.info("******* ObjID FIlter: " + objIDFilter);
-			}
+            String objIDFilter = input.getChildText("objid");
+            String acpoolFilter = input.getChildText("acpool");
+            Map filterMap = new HashMap();
 
-			if (acpoolFilter != null) {
-				filterMap.put("acpool", acpoolFilter);
-				LOGGER.info("******* AcPool FIlter: " + acpoolFilter);
-			}
+            if (objIDFilter != null) {
+                filterMap.put("objid", objIDFilter);
+                LOGGER.info("******* ObjID FIlter: " + objIDFilter);
+            }
 
-			if (filterMap.size() > 0)
-				session.put("filter", filterMap);
+            if (acpoolFilter != null) {
+                filterMap.put("acpool", acpoolFilter);
+                LOGGER.info("******* AcPool FIlter: " + acpoolFilter);
+            }
 
-			if (objIDFilter == null && acpoolFilter == null && session.get("filter") != null)
-				session.deleteObject("filter");
+            if (filterMap.size() > 0)
+                session.put("filter", filterMap);
 
-			System.out.println("#############################################");
-			new XMLOutputter(Format.getPrettyFormat()).output(input, System.out);
-			System.out.println("#############################################");
+            if (objIDFilter == null && acpoolFilter == null && session.get("filter") != null)
+                session.deleteObject("filter");
 
-			// session.put("filter", "true");
-		}
-		return true;
-	}
+            System.out.println("#############################################");
+            new XMLOutputter(Format.getPrettyFormat()).output(input, System.out);
+            System.out.println("#############################################");
+
+            // session.put("filter", "true");
+        }
+        return true;
+    }
 }
