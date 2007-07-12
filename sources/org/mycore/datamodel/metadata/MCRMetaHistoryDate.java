@@ -434,7 +434,7 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
      */
     public final void setText(String set) {
         if (set == null) {
-            text = "?";
+            text = "";
             LOGGER.warn("The text field of MCRMeataHistoryDate is empty.");
             return;
         }
