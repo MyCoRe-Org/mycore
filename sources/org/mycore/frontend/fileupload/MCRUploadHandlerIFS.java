@@ -72,14 +72,17 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
 
         if (derId == null) {
             // create new derivate
+            LOGGER.debug("derId=null create derivate with next free ID");
             createNewDerivate(docId, getFreeDerivateID());
         } else {
             if (MCRDerivate.existInDatastore(derId)) {
+                LOGGER.debug("Derivate allready exists: "+derId);
                 newDerivate = false;
                 derivate = new MCRDerivate();
                 derivate.receiveFromDatastore(derId);
             } else {
                 // create new derivate with given ID
+                LOGGER.debug("derId='"+derId+"' create derivate with that ID");
                 createNewDerivate(docId, new MCRObjectID(derId));
             }
         }
@@ -141,8 +144,6 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
     public void finishUpload() throws Exception {
         String mainfile = getMainFilePath(rootDir);
         if (newDerivate) {
-            MCRDerivate derivate = new MCRDerivate();
-            derivate.receiveFromDatastore(this.derivate.getId());
             derivate.getDerivate().getInternals().setMainDoc(mainfile);
             derivate.updateInDatastore();
             setDefaultPermissions(derivate.getId());

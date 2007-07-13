@@ -598,6 +598,7 @@ public class MCRSimpleWorkflowManager {
         // get derivate xml object
         MCRDerivate der = createDerivate(ID, DD);
         der.updateInDatastore();
+        MCRHIBConnection.instance().flushSession();
         logger.info("Derivate " + DD.getId() + " stored in server.");
         return DD.getId();
     }
