@@ -142,9 +142,7 @@ public class MCRHIBXMLStore implements MCRXMLTableInterface {
      */
     public synchronized final void delete(MCRObjectID mcrid, int version) throws MCRPersistenceException {
         Session session = getSession();
-        Query q = session.createQuery("DELETE from MCRXMLTABLE where id= :id");
-        q.setParameter("id", new MCRXMLTABLEPK(mcrid.getId(), version));
-        q.executeUpdate();
+        session.delete(session.get(MCRXMLTABLE.class, new MCRXMLTABLEPK(mcrid.getId(), version)));
     }
 
     /**
