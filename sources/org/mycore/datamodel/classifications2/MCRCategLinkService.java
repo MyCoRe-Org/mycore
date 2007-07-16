@@ -38,10 +38,8 @@ public interface MCRCategLinkService {
      * Counts links to a collection of categories.
      * 
      * @param categIDs
-     *            Collection of MCRCategoryID which links should be
-     *            counted
-     * @return a Map with MCRCategoryID as key and the number of links as
-     *         value
+     *            Collection of MCRCategoryID which links should be counted
+     * @return a Map with MCRCategoryID as key and the number of links as value
      */
     public abstract Map<MCRCategoryID, Number> countLinks(Collection<MCRCategoryID> categIDs);
 
@@ -49,12 +47,10 @@ public interface MCRCategLinkService {
      * Counts links to a collection of categories.
      * 
      * @param categIDs
-     *            Collection of MCRCategoryID which links should be
-     *            counted
+     *            Collection of MCRCategoryID which links should be counted
      * @param type
      *            restrict links that refer to object of this type
-     * @return a Map with MCRCategoryID as key and the number of links as
-     *         value
+     * @return a Map with MCRCategoryID as key and the number of links as value
      */
     public abstract Map<MCRCategoryID, Number> countLinksForType(Collection<MCRCategoryID> categIDs, String type);
 
@@ -111,11 +107,13 @@ public interface MCRCategLinkService {
      * Implementors must assure that ancestor (parent) axis categories are
      * implicit linked by this method.
      * 
-     * @param map
-     *            containing the single links
+     * @param objectReference
+     *            reference to a Object
+     * @param categories
+     *            a collection of categoryIDs to be linked to
      * @see #countLinks(Collection)
      * @see #countLinksForType(Collection, String)
      */
-    public abstract void setLinks(Map<MCRObjectReference, MCRCategoryID> map);
+    public abstract void setLinks(MCRObjectReference objectReference, Collection<MCRCategoryID> categories);
 
 }

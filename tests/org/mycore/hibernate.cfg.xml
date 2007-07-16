@@ -18,6 +18,7 @@
     <property name="jdbc.batch_size">0</property>
     
     <mapping resource="org/mycore/datamodel/classifications2/impl/MCRCategoryImpl.hbm.xml"/>
+    <mapping resource="org/mycore/datamodel/classifications2/impl/MCRCategoryLink.hbm.xml"/>
   </session-factory>
 
 </hibernate-configuration>

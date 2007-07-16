@@ -44,13 +44,13 @@ import org.mycore.datamodel.classifications2.utils.MCRXMLTransformer;
 
 public class MCRCategoryDAOImplTest extends MCRHibTestCase {
 
-    private static final String WORLD_CLASS_RESOURCE_NAME = "/org/mycore/datamodel/classifications2/impl/resources/worldclass.xml";
+    static final String WORLD_CLASS_RESOURCE_NAME = "/org/mycore/datamodel/classifications2/impl/resources/worldclass.xml";
 
     private static final String WORLD_CLASS2_RESOURCE_NAME = "/org/mycore/datamodel/classifications2/impl/resources/worldclass2.xml";
 
     static final String CATEGORY_MAPPING_RESOURCE_NAME = "/org/mycore/datamodel/classifications2/impl/MCRCategoryImpl.hbm.xml";
 
-    private static final MCRCategoryDAOImpl DAO = new MCRCategoryDAOImpl();
+    static final MCRCategoryDAOImpl DAO = new MCRCategoryDAOImpl();
 
     private MCRCategory category, category2;
 
@@ -234,13 +234,6 @@ public class MCRCategoryDAOImplTest extends MCRHibTestCase {
         rootNode = getRootCategoryFromSession();
         assertEquals("Label count does not match.", count + 1, rootNode.getLabels().size());
         assertEquals("Label does not match.", description, rootNode.getLabels().get(lang).getDescription());
-    }
-
-    private void startNewTransaction() {
-        endTransaction();
-        beginTransaction();
-        // clear from cache
-        sessionFactory.getCurrentSession().clear();
     }
 
     private MCRCategoryImpl getRootCategoryFromSession() {

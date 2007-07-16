@@ -21,9 +21,9 @@
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
  *
  **/
-package org.mycore.datamodel.classifications2;
+package org.mycore.datamodel.classifications2.impl;
 
-import java.io.Serializable;
+import org.mycore.datamodel.classifications2.MCRObjectReference;
 
 /**
  * @author Thomas Scheffler (yagee)
@@ -31,44 +31,46 @@ import java.io.Serializable;
  * @version $Revision$ $Date$
  * @since 2.0
  */
-public class MCRObjectReference implements Serializable {
+class MCRCategoryLink {
 
-    private static final long serialVersionUID = -6457722746147666860L;
+    int id;
 
-    private String objectID;
+    private MCRCategoryImpl category;
 
-    private String type;
+    private MCRObjectReference objectReference;
 
-    public MCRObjectReference() {
+    MCRCategoryLink() {
+        super();
     }
 
-    public MCRObjectReference(String objectID, String type) {
-        setObjectID(objectID);
-        setType(type);
+    MCRCategoryLink(MCRCategoryImpl category, MCRObjectReference objectReference) {
+        super();
+        this.category = category;
+        this.objectReference = objectReference;
     }
 
-    public String getObjectID() {
-        return objectID;
+    public MCRCategoryImpl getCategory() {
+        return category;
     }
 
-    public void setObjectID(String objectID) {
-        this.objectID = objectID;
+    public void setCategory(MCRCategoryImpl category) {
+        this.category = category;
     }
 
-    public String getType() {
-        return type;
+    public MCRObjectReference getObjectReference() {
+        return objectReference;
     }
 
-    public void setType(String type) {
-        this.type = type;
+    public void setObjectReference(MCRObjectReference objectReference) {
+        this.objectReference = objectReference;
     }
 
     @Override
     public int hashCode() {
-        final int PRIME = 31;
+        final int prime = 31;
         int result = 1;
-        result = PRIME * result + ((objectID == null) ? 0 : objectID.hashCode());
-        result = PRIME * result + ((type == null) ? 0 : type.hashCode());
+        result = prime * result + ((category == null) ? 0 : category.hashCode());
+        result = prime * result + ((objectReference == null) ? 0 : objectReference.hashCode());
         return result;
     }
 
@@ -78,18 +80,18 @@ public class MCRObjectReference implements Serializable {
             return true;
         if (obj == null)
             return false;
-        if (getClass() != obj.getClass())
+        if (!(obj instanceof MCRCategoryLink))
             return false;
-        final MCRObjectReference other = (MCRObjectReference) obj;
-        if (objectID == null) {
-            if (other.objectID != null)
+        final MCRCategoryLink other = (MCRCategoryLink) obj;
+        if (category == null) {
+            if (other.category != null)
                 return false;
-        } else if (!objectID.equals(other.objectID))
+        } else if (!category.equals(other.category))
             return false;
-        if (type == null) {
-            if (other.type != null)
+        if (objectReference == null) {
+            if (other.objectReference != null)
                 return false;
-        } else if (!type.equals(other.type))
+        } else if (!objectReference.equals(other.objectReference))
             return false;
         return true;
     }

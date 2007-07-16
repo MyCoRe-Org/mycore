@@ -24,10 +24,18 @@
 package org.mycore.datamodel.classifications2.impl;
 
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-import org.mycore.datamodel.classifications2.MCRCategoryID;
+import org.apache.log4j.Logger;
+import org.hibernate.Query;
+import org.hibernate.Session;
+
+import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.datamodel.classifications2.MCRCategLinkService;
+import org.mycore.datamodel.classifications2.MCRCategoryDAO;
+import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.MCRObjectReference;
 
 /**
@@ -39,59 +47,91 @@ import org.mycore.datamodel.classifications2.MCRObjectReference;
  */
 public class MCRCategLinkServiceImpl implements MCRCategLinkService {
 
+    static MCRCategoryDAO DAO = new MCRCategoryDAOImpl();
+
+    private static Logger LOGGER = Logger.getLogger(MCRCategLinkServiceImpl.class);
+
+    private static Class<MCRCategoryLink> LINK_CLASS = MCRCategoryLink.class;
+
+    @SuppressWarnings("unchecked")
     public Map<MCRCategoryID, Number> countLinks(Collection<MCRCategoryID> categIDs) {
-        // TODO Auto-generated method stub
-        return null;
+        Session session = MCRHIBConnection.instance().getSession();
+        Map<MCRCategoryID, Number> countLinks = new HashMap<MCRCategoryID, Number>();
+        Query q = session.getNamedQuery(LINK_CLASS.getName() + ".NumberPerCategID");
+        q.setParameterList("categIDs", categIDs);
+        List<Object[]> result = q.list();
+        for (Object[] sr : result) {
+            MCRCategoryID key = (MCRCategoryID) sr[0];
+            Number value = (Number) sr[1];
+            countLinks.put(key, value);
+        }
+        return countLinks;
     }
 
+    @SuppressWarnings("unchecked")
     public Map<MCRCategoryID, Number> countLinksForType(Collection<MCRCategoryID> categIDs, String type) {
-        // TODO Auto-generated method stub
-        return null;
+        Session session = MCRHIBConnection.instance().getSession();
+        Map<MCRCategoryID, Number> countLinks = new HashMap<MCRCategoryID, Number>();
+        Query q = session.getNamedQuery(LINK_CLASS.getName() + ".NumberByTypePerCategID");
+        q.setParameterList("categIDs", categIDs);
+        q.setParameter("type", type);
+        List<Object[]> result = q.list();
+        for (Object[] sr : result) {
+            MCRCategoryID key = (MCRCategoryID) sr[0];
+            Number value = (Number) sr[1];
+            countLinks.put(key, value);
+        }
+        return countLinks;
     }
 
     public void deleteLink(String id) {
-        // TODO Auto-generated method stub
-
+        Session session = MCRHIBConnection.instance().getSession();
+        Query q = session.getNamedQuery(LINK_CLASS.getName() + ".deleteByObjectID");
+        q.setParameter("id", id);
+        int deleted = q.executeUpdate();
+        LOGGER.debug("Number of Links deleted: " + deleted);
     }
 
     public void deleteLinks(Collection<String> ids) {
-        // TODO Auto-generated method stub
-
+        Session session = MCRHIBConnection.instance().getSession();
+        Query q = session.getNamedQuery(LINK_CLASS.getName() + ".deleteByObjectCollection");
+        q.setParameterList("ids", ids);
+        int deleted = q.executeUpdate();
+        LOGGER.debug("Number of Links deleted: " + deleted);
     }
 
+    @SuppressWarnings("unchecked")
     public Collection<String> getLinksFromCategory(MCRCategoryID id) {
-        // TODO Auto-generated method stub
-        return null;
+        Session session = MCRHIBConnection.instance().getSession();
+        Query q = session.getNamedQuery(LINK_CLASS.getName() + ".ObjectIDByCategory");
+        q.setParameter("category", id);
+        return q.list();
     }
 
+    @SuppressWarnings("unchecked")
     public Collection<String> getLinksFromCategoryForType(MCRCategoryID id, String type) {
-        // TODO Auto-generated method stub
-        return null;
+        Session session = MCRHIBConnection.instance().getSession();
+        Query q = session.getNamedQuery(LINK_CLASS.getName() + ".ObjectIDByCategoryAndType");
+        q.setParameter("category", id);
+        q.setParameter("type", id);
+        return q.list();
     }
 
+    @SuppressWarnings("unchecked")
     public Collection<MCRCategoryID> getLinksFromObject(String id) {
-        // TODO Auto-generated method stub
-        return null;
+        Session session = MCRHIBConnection.instance().getSession();
+        Query q = session.getNamedQuery(LINK_CLASS.getName() + ".categoriesByObjectID");
+        q.setParameter("id", id);
+        return q.list();
     }
 
-    public void setLinks(Map<MCRObjectReference, MCRCategoryID> map) {
-        // TODO Auto-generated method stub
-
+    public void setLinks(MCRObjectReference objectReference, Collection<MCRCategoryID> categories) {
+        Session session = MCRHIBConnection.instance().getSession();
+        for (MCRCategoryID categID : categories) {
+            MCRCategoryLink link = new MCRCategoryLink(MCRCategoryDAOImpl.getByNaturalID(session, categID), objectReference);
+            LOGGER.debug("Adding Link from " + link.getCategory().getId() + "(" + link.getCategory().getInternalID() + ") to " + objectReference.getObjectID());
+            session.save(link);
+            LOGGER.debug("===DONE: " + link.id);
+        }
     }
-
-    public void beginTransaction() {
-        // TODO Auto-generated method stub
-
-    }
-
-    public void commitTransaction() {
-        // TODO Auto-generated method stub
-
-    }
-
-    public void rollBackTransaction() {
-        // TODO Auto-generated method stub
-
-    }
-
 }

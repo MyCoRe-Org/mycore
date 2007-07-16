@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping package="org.mycore.datamodel.classifications2.impl">
+  <class name="MCRCategoryLink">
+    <cache usage="nonstrict-read-write" />
+    <id name="id" access="field">
+      <generator class="native" />
+    </id>
+    <many-to-one name="category" class="MCRCategoryImpl" cascade="none" />
+    <component name="objectReference">
+      <property name="objectID" access="field"/>
+      <property name="type" column="objectType" access="field"/>
+    </component>
+<!--     -->
+    <query name="NumberPerCategID">
+      <![CDATA[
+SELECT c1.id, count(*) FROM MCRCategoryImpl c1, MCRCategoryLink li
+WHERE
+  c1.internalID IN (:internalIDs) AND
+  li.category in (
+    select internalID from MCRCategoryImpl c2
+    where c2.id.rootID=c1.id.rootID
+    and c2.left BETWEEN c1.left AND c1.right
+  )
+GROUP BY c1.id
+      ]]>
+    </query>
+    <query name="NumberByTypePerCategID">
+      <![CDATA[
+SELECT category.id, count(*) FROM MCRCategoryLink WHERE category.id IN (:categIDs) and objectReference.type=:type
+      ]]>
+    </query>
+    <query name="deleteByObjectID">
+      <![CDATA[
+DELETE FROM MCRCategoryLink WHERE objectReference.objectID=:id
+      ]]>
+    </query>
+    <query name="deleteByObjectCollection">
+      <![CDATA[
+DELETE FROM MCRCategoryLink WHERE objectReference.objectID IN (:ids)
+      ]]>
+    </query>
+    <query name="ObjectIDByCategory">
+      <![CDATA[
+SELECT objectReference.objectID FROM MCRCategoryLink WHERE category.id=:category
+      ]]>
+    </query>
+    <query name="ObjectIDByCategoryAndType">
+      <![CDATA[
+SELECT objectReference.objectID FROM MCRCategoryLink WHERE category.id=:category and objectReference.type=:type
+      ]]>
+    </query>
+    <query name="categoriesByObjectID">
+      <![CDATA[
+SELECT category.id FROM MCRCategoryLink WHERE objectReference.objectID=:id
+      ]]>
+    </query>
+ <!--  -->
+  </class>
+</hibernate-mapping>

@@ -478,7 +478,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         return newCateg;
     }
 
-    private static MCRCategoryImpl getByNaturalID(Session session, MCRCategoryID id) {
+    static MCRCategoryImpl getByNaturalID(Session session, MCRCategoryID id) {
         final Criteria criteria = session.createCriteria(CATEGRORY_CLASS).setProjection(Projections.id());
         Integer internalID = (Integer) criteria.setCacheable(true).add(MCRCategoryExpression.eq(id)).uniqueResult();
         return (MCRCategoryImpl) session.get(CATEGRORY_CLASS, internalID);

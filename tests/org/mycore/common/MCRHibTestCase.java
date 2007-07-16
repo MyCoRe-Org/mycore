@@ -89,4 +89,11 @@ public abstract class MCRHibTestCase extends MCRTestCase {
         }
     }
 
+    protected void startNewTransaction() {
+        endTransaction();
+        beginTransaction();
+        // clear from cache
+        sessionFactory.getCurrentSession().clear();
+    }
+
 }
