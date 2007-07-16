@@ -30,7 +30,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
@@ -99,13 +98,9 @@ public class MCRHIBXMLStore implements MCRXMLTableInterface {
      * @param version
      *            the version of the XML Blob as integer
      * @exception MCRPersistenceException
-     * 
-     * 
-     * 
-     * 
-     * the method arguments are not correct
+     *                the method arguments are not correct
      */
-    public synchronized final void create(MCRObjectID mcrid, byte[] xml, int version) throws MCRPersistenceException {
+    public synchronized final void create(String mcrid, byte[] xml, int version) throws MCRPersistenceException {
         if (mcrid == null) {
             throw new MCRPersistenceException("The MCRObjectID is null.");
         }
@@ -114,7 +109,7 @@ public class MCRHIBXMLStore implements MCRXMLTableInterface {
         }
 
         Session session = getSession();
-        MCRXMLTABLEPK pk = new MCRXMLTABLEPK(mcrid.getId(), version);
+        MCRXMLTABLEPK pk = new MCRXMLTABLEPK(mcrid, version);
         MCRXMLTABLE tab = (MCRXMLTABLE) session.get(MCRXMLTABLE.class, pk);
         if (tab != null) {
             // Object is in session: maybe delete before?
@@ -126,7 +121,7 @@ public class MCRHIBXMLStore implements MCRXMLTableInterface {
             tab.setType(this.type);
         }
         tab.setXmlByteArray(xml);
-        logger.debug("Inserting " + mcrid.getId() + "/" + version + "/" + this.type + " into database");
+        logger.debug("Inserting " + mcrid + "/" + version + "/" + this.type + " into database MCRXMLTABLE");
         session.save(tab);
     }
 
@@ -140,9 +135,10 @@ public class MCRHIBXMLStore implements MCRXMLTableInterface {
      * @exception MCRPersistenceException
      *                the method argument is not correct
      */
-    public synchronized final void delete(MCRObjectID mcrid, int version) throws MCRPersistenceException {
+    public synchronized final void delete(String mcrid, int version) throws MCRPersistenceException {
         Session session = getSession();
-        session.delete(session.get(MCRXMLTABLE.class, new MCRXMLTABLEPK(mcrid.getId(), version)));
+        logger.debug("Deleting " + mcrid + "/" + version + " from database MCRXMLTABLE");
+        session.delete(session.get(MCRXMLTABLE.class, new MCRXMLTABLEPK(mcrid, version)));
     }
 
     /**
@@ -157,13 +153,13 @@ public class MCRHIBXMLStore implements MCRXMLTableInterface {
      * @exception MCRPersistenceException
      *                the method arguments are not correct
      */
-    public synchronized final void update(MCRObjectID mcrid, byte[] xml, int version) throws MCRPersistenceException {
+    public synchronized final void update(String mcrid, byte[] xml, int version) throws MCRPersistenceException {
         Session session = getSession();
-        MCRXMLTABLE xmlEntry = (MCRXMLTABLE) session.load(MCRXMLTABLE.class, new MCRXMLTABLEPK(mcrid.getId(), version));
+        MCRXMLTABLE xmlEntry = (MCRXMLTABLE) session.load(MCRXMLTABLE.class, new MCRXMLTABLEPK(mcrid, version));
         xmlEntry.setVersion(version);
         xmlEntry.setType(this.type);
         xmlEntry.setXmlByteArray(xml);
-        logger.debug("Updateing " + mcrid.getId() + "/" + version + "/" + this.type + " in database");
+        logger.debug("Updateing " + mcrid + "/" + version + "/" + this.type + " in database");
         session.update(xmlEntry);
     }
 
@@ -179,9 +175,9 @@ public class MCRHIBXMLStore implements MCRXMLTableInterface {
      * @exception MCRPersistenceException
      *                the method arguments are not correct
      */
-    public final InputStream retrieve(MCRObjectID mcrid, int version) throws MCRPersistenceException {
+    public final InputStream retrieve(String mcrid, int version) throws MCRPersistenceException {
         Session session = getSession();
-        MCRXMLTABLEPK pk = new MCRXMLTABLEPK(mcrid.getId(), version);
+        MCRXMLTABLEPK pk = new MCRXMLTABLEPK(mcrid, version);
         Blob blob = (Blob) session.createCriteria(MCRXMLTABLE.class).setProjection(Projections.property("xml")).add(Restrictions.eq("key", pk)).uniqueResult();
         try {
             return blob.getBinaryStream();
@@ -229,15 +225,15 @@ public class MCRHIBXMLStore implements MCRXMLTableInterface {
      *            the version of the XML Blob as integer
      * @return true if the MCRObjectID exist, else return false
      */
-    public final boolean exist(MCRObjectID mcrid, int version) {
+    public final boolean exist(String mcrid, int version) {
         boolean exists = false;
 
         Session session = getSession();
-        MCRXMLTABLEPK pk = new MCRXMLTABLEPK(mcrid.getId(), version);
+        MCRXMLTABLEPK pk = new MCRXMLTABLEPK(mcrid, version);
         if (session.get(MCRXMLTABLE.class, pk) != null) {
             return true;
         }
-        StringBuffer query = new StringBuffer("select key.id from MCRXMLTABLE where MCRID = '").append(mcrid.getId()).append("' and MCRVERSION = ").append(
+        StringBuffer query = new StringBuffer("select key.id from MCRXMLTABLE where MCRID = '").append(mcrid).append("' and MCRVERSION = ").append(
                 version);
         List<?> l = session.createQuery(query.toString()).list();
         if (l.size() > 0) {

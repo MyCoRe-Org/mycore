@@ -89,17 +89,19 @@ public class MCRHIBLinkTableStore implements MCRLinkTableInterface {
         }
 
         Session session = getSession();
-        MCRLINKHREFPK pk = new MCRLINKHREFPK();
-        pk.setMcrfrom(from);
-        pk.setMcrto(to);
-        pk.setMcrtype(type);
-        MCRLINKHREF l = (MCRLINKHREF) session.get(MCRLINKHREF.class, pk);
-        if (l == null) {
-            l = new MCRLINKHREF();
-            l.setKey(pk);
+        MCRLINKHREFPK pk = new MCRLINKHREFPK(from, to, type);
+        MCRLINKHREF tab = (MCRLINKHREF) session.get(MCRLINKHREF.class, pk);
+        if (tab != null) {
+            // Object is in session: maybe delete before?
+            session.evict(tab);
+            MCRHIBConnection.instance().flushSession();
+        } else {
+            tab = new MCRLINKHREF();
+            tab.setKey(pk);
         }
-        l.setMcrattr(attr);
-        session.saveOrUpdate(l);
+        tab.setMcrattr(attr);
+        logger.debug("Inserting " + from + "/" + to + "/" + type + " into database MCRLINKHREF");
+        session.save(tab);
     }
 
     /**
@@ -118,18 +120,16 @@ public class MCRHIBLinkTableStore implements MCRLinkTableInterface {
         }
         StringBuffer sb = new StringBuffer();
         sb.append("delete from ").append(classname).append(" where MCRFROM = '").append(from).append("'");
-
         if ((to != null) && ((to = to.trim()).length() > 0)) {
             sb.append(" and MCRTO = '").append(to).append("'");
         }
-
         if ((type != null) && ((type = type.trim()).length() > 0)) {
             sb.append(" and MCRTYPE = '").append(type).append("'");
         }
-
+        logger.debug("Deleting " + from + " from database MCRLINKHREF");
         Session session = getSession();
         int deleted = session.createQuery(sb.toString()).executeUpdate();
-        logger.debug(deleted + " references deleted.");
+        logger.debug((new Integer(deleted)).toString()+" items deleted.");
     }
 
     /**

@@ -23,7 +23,6 @@
 
 package org.mycore.datamodel.common;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -35,7 +34,6 @@ import java.util.Properties;
 
 import org.apache.log4j.Logger;
 import org.jdom.Document;
-import org.jdom.Element;
 
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRConfiguration;
@@ -121,7 +119,7 @@ public class MCRXMLTableManager {
      *                if the method arguments are not correct
      */
     public void create(MCRObjectID mcrid, org.jdom.Document xml) throws MCRException {
-        getXMLTable(mcrid.getTypeId()).create(mcrid, MCRUtils.getByteArray(xml), 1);
+        getXMLTable(mcrid.getTypeId()).create(mcrid.getId(), MCRUtils.getByteArray(xml), 1);
         jdomCache.put(mcrid, xml);
         CONFIG.systemModified();
     }
@@ -138,7 +136,7 @@ public class MCRXMLTableManager {
      *                if the method arguments are not correct
      */
     public void create(MCRObjectID mcrid, byte[] xml) throws MCRException {
-        getXMLTable(mcrid.getTypeId()).create(mcrid, xml, 1);
+        getXMLTable(mcrid.getTypeId()).create(mcrid.getId(), xml, 1);
         CONFIG.systemModified();
     }
 
@@ -152,7 +150,7 @@ public class MCRXMLTableManager {
      *                if the method argument is not correct
      */
     public void delete(MCRObjectID mcrid) throws MCRException {
-        getXMLTable(mcrid.getTypeId()).delete(mcrid, 1);
+        getXMLTable(mcrid.getTypeId()).delete(mcrid.getId(), 1);
         jdomCache.remove(mcrid);
         CONFIG.systemModified();
     }
@@ -169,7 +167,7 @@ public class MCRXMLTableManager {
      *                if the method arguments are not correct
      */
     public void update(MCRObjectID mcrid, org.jdom.Document xml) throws MCRException {
-        getXMLTable(mcrid.getTypeId()).update(mcrid, MCRUtils.getByteArray(xml), 1);
+        getXMLTable(mcrid.getTypeId()).update(mcrid.getId(), MCRUtils.getByteArray(xml), 1);
         jdomCache.put(mcrid, xml);
         CONFIG.systemModified();
     }
@@ -186,7 +184,7 @@ public class MCRXMLTableManager {
      *                if the method arguments are not correct
      */
     public void update(MCRObjectID mcrid, byte[] xml) throws MCRException {
-        getXMLTable(mcrid.getTypeId()).update(mcrid, xml, 1);
+        getXMLTable(mcrid.getTypeId()).update(mcrid.getId(), xml, 1);
         jdomCache.remove(mcrid);
         CONFIG.systemModified();
     }
@@ -203,8 +201,8 @@ public class MCRXMLTableManager {
      *                if the method arguments are not correct
      */
     public byte[] retrieveAsXML(MCRObjectID mcrid) throws MCRException {
-        ByteArrayOutputStream bos=new ByteArrayOutputStream();
-        MCRUtils.copyStream(getXMLTable(mcrid.getTypeId()).retrieve(mcrid, 1), bos);
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        MCRUtils.copyStream(getXMLTable(mcrid.getTypeId()).retrieve(mcrid.getId(), 1), bos);
         return bos.toByteArray();
     }
 
@@ -220,7 +218,7 @@ public class MCRXMLTableManager {
      *                if the method arguments are not correct
      */
     public Document retrieveAsJDOM(MCRObjectID mcrid) throws MCRException {
-        InputStream xml = getXMLTable(mcrid.getTypeId()).retrieve(mcrid, 1);
+        InputStream xml = getXMLTable(mcrid.getTypeId()).retrieve(mcrid.getId(), 1);
         return MCRXMLHelper.getParser().parseXML(xml, false);
     }
 
@@ -259,7 +257,7 @@ public class MCRXMLTableManager {
      * @return true if the MCRObjectID exist, else return false
      */
     public boolean exist(MCRObjectID mcrid) {
-        return getXMLTable(mcrid.getTypeId()).exist(mcrid, 1);
+        return getXMLTable(mcrid.getTypeId()).exist(mcrid.getId(), 1);
     }
 
     /**

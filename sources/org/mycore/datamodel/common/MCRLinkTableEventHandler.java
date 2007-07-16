@@ -73,7 +73,8 @@ public class MCRLinkTableEventHandler extends MCREventHandlerBase {
             for (int j = 0; j < elm.size(); j++) {
                 inf = elm.getElement(j);
                 if (inf instanceof MCRMetaClassification) {
-                    mcr_linktable.addClassificationLink(mcr_id, new MCRObjectID(((MCRMetaClassification) inf).getClassId()), ((MCRMetaClassification) inf).getCategId());
+                    mcr_linktable.addClassificationLink(mcr_id, new MCRObjectID(((MCRMetaClassification) inf).getClassId()), ((MCRMetaClassification) inf)
+                            .getCategId());
                     continue;
                 }
                 if (inf instanceof MCRMetaLinkID) {

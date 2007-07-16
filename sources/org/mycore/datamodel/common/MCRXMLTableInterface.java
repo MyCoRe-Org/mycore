@@ -27,7 +27,6 @@ import java.io.InputStream;
 import java.util.List;
 
 import org.mycore.common.MCRPersistenceException;
-import org.mycore.datamodel.metadata.MCRObjectID;
 
 /**
  * This interface is designed to choose the Persistence for the XML tables.
@@ -42,8 +41,8 @@ public interface MCRXMLTableInterface {
      * 
      * @param type
      *            the type String of the MCRObjectID
-     * @exception MCRPersistenceException throws
-     *                if the type is not correct
+     * @exception MCRPersistenceException
+     *                throws if the type is not correct
      */
     public void init(String type) throws MCRPersistenceException;
 
@@ -56,10 +55,10 @@ public interface MCRXMLTableInterface {
      *            a byte array with the XML file
      * @param version
      *            the version number as integer
-     * @exception MCRPersistenceException if
-     *                the method arguments are not correct
+     * @exception MCRPersistenceException
+     *                if the method arguments are not correct
      */
-    public void create(MCRObjectID mcrid, byte[] xml, int version) throws MCRPersistenceException;
+    public void create(String mcrid, byte[] xml, int version) throws MCRPersistenceException;
 
     /**
      * The method remove a item for the MCRObjectID from the datastore.
@@ -68,10 +67,10 @@ public interface MCRXMLTableInterface {
      *            a MCRObjectID
      * @param version
      *            the version number as integer
-     * @exception MCRPersistenceException if
-     *                the method argument is not correct
+     * @exception MCRPersistenceException
+     *                if the method argument is not correct
      */
-    public void delete(MCRObjectID mcrid, int version) throws MCRPersistenceException;
+    public void delete(String mcrid, int version) throws MCRPersistenceException;
 
     /**
      * The method update an item in the datastore.
@@ -82,10 +81,10 @@ public interface MCRXMLTableInterface {
      *            a byte array with the XML file
      * @param version
      *            the version number as integer
-     * @exception MCRPersistenceException if
-     *                the method arguments are not correct
+     * @exception MCRPersistenceException
+     *                if the method arguments are not correct
      */
-    public void update(MCRObjectID mcrid, byte[] xml, int version) throws MCRPersistenceException;
+    public void update(String mcrid, byte[] xml, int version) throws MCRPersistenceException;
 
     /**
      * The method retrieve a dataset for the given MCRObjectID and returns the
@@ -95,10 +94,10 @@ public interface MCRXMLTableInterface {
      *            a MCRObjectID
      * @param version
      *            the version number as integer
-     * @exception MCRPersistenceException if
-     *                the method arguments are not correct
+     * @exception MCRPersistenceException
+     *                if the method arguments are not correct
      */
-    public InputStream retrieve(MCRObjectID mcrid, int version) throws MCRPersistenceException;
+    public InputStream retrieve(String mcrid, int version) throws MCRPersistenceException;
 
     /**
      * This method returns the next free ID number for a given MCRObjectID base.
@@ -127,7 +126,7 @@ public interface MCRXMLTableInterface {
      *            the version number as integer
      * @return true if the MCRObjectID exist, else return false
      */
-    public boolean exist(MCRObjectID mcrid, int version);
+    public boolean exist(String mcrid, int version);
 
     /**
      * The method return a Array list with all stored MCRObjectID's of the XML
