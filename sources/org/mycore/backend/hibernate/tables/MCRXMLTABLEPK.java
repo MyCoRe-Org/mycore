@@ -25,9 +25,10 @@ package org.mycore.backend.hibernate.tables;
 
 import java.io.Serializable;
 
-import org.apache.commons.lang.builder.HashCodeBuilder;
-
 public class MCRXMLTABLEPK implements Serializable {
+
+    private static final long serialVersionUID = 8330273148129972169L;
+
     private String id;
 
     private int version;

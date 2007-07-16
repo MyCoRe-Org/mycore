@@ -29,6 +29,9 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 
 public class MCRCATEGPK implements Serializable {
+
+    private static final long serialVersionUID = -2883097610006670647L;
+
     public String id;
 
     public String clid;

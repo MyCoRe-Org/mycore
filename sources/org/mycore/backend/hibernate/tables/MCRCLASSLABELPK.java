@@ -29,6 +29,9 @@ import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.commons.lang.builder.HashCodeBuilder;
 
 public class MCRCLASSLABELPK implements Serializable {
+
+    private static final long serialVersionUID = -6549251131842480150L;
+
     private String id;
 
     private String lang;

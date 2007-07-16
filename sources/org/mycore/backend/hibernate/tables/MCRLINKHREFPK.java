@@ -36,11 +36,34 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
  * @version $Revision$ $Date$
  */
 public class MCRLINKHREFPK implements Serializable {
+
+    private static final long serialVersionUID = -5838803852559721772L;
+
     private String mcrfrom;
 
     private String mcrto;
 
     private String mcrtype;
+
+    /**
+     * @param from
+     *            the source ID of the link
+     * @param to
+     *            the target ID of the link
+     * @param type
+     *            the type of the link
+     */
+    public MCRLINKHREFPK(String from, String to, String type) {
+        this.mcrfrom = from;
+        this.mcrto = to;
+        this.mcrtype = type;
+    }
+
+    /**
+     * The constructor
+     */
+    public MCRLINKHREFPK() {
+    }
 
     /**
      * Get the data field from.
@@ -112,7 +135,8 @@ public class MCRLINKHREFPK implements Serializable {
 
         MCRLINKHREFPK castother = (MCRLINKHREFPK) other;
 
-        return new EqualsBuilder().append(this.getMcrfrom(), castother.getMcrfrom()).append(this.getMcrto(), castother.getMcrto()).append(this.getMcrtype(), castother.getMcrtype()).isEquals();
+        return new EqualsBuilder().append(this.getMcrfrom(), castother.getMcrfrom()).append(this.getMcrto(), castother.getMcrto()).append(this.getMcrtype(),
+                castother.getMcrtype()).isEquals();
     }
 
     /**

@@ -10,6 +10,8 @@ import org.apache.commons.lang.builder.ToStringBuilder;
 /** @author Hibernate CodeGenerator */
 public class MCRRESUMPTIONTOKEN implements Serializable {
 
+    private static final long serialVersionUID = 5750307015900672047L;
+
     /** identifier field */
     private String resumptionTokenID;
 
