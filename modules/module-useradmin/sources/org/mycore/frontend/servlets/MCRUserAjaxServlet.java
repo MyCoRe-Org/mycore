@@ -56,20 +56,23 @@ public class MCRUserAjaxServlet extends MCRServlet {
         CONFIG = MCRConfiguration.instance();
     }
 
+    /**
+     * Modes: users - get all data( groups with users ) update- if username is
+     * "undefined" get the current group with all users in it. else put the user
+     * in the group and show updated version of the group. delete- if the group
+     * is "null" then delete the user from the system. else delete the user from
+     * the group
+     */
     public void doGetPost(MCRServletJob job) throws IOException {
 
         String mode = getProperty(job.getRequest(), "mode");
         String username = getProperty(job.getRequest(), "user");
-        LOGGER.debug("USERNAME: " + username);
         String group = getProperty(job.getRequest(), "group");
-        LOGGER.debug("GRUPPE: " + group);
         if (mode == null) {
             buidPage(job);
         } else if (mode.equals("users")) {
-            LOGGER.debug("MODE: " + mode);
             getData(job, "");
         } else if (mode.equals("update")) {
-            LOGGER.debug("MODE: " + mode);
             if (username.equals("undefined")) {
                 getGroup(job, group, "0");
             } else {
@@ -79,16 +82,14 @@ public class MCRUserAjaxServlet extends MCRServlet {
 
         } else if (mode.equals("delete")) {
             if (group.equals("null")) {
-                LOGGER.debug("MODE: " + mode);
                 if (removeUser(username) == 1) {
                     getData(job, MCRTranslation.translate("users.error.root"));
                 } else {
                     getData(job, "0");
                 }
             } else {
-                LOGGER.debug("MODE: " + mode);
                 if (deleteUser(group, username) == 1) {
-                    getGroup(job, group, MCRTranslation.translate("users.error.primGroup",username+";"+group));
+                    getGroup(job, group, MCRTranslation.translate("users.error.primGroup", username + ";" + group));
                 } else {
                     getGroup(job, group, "0");
                 }
@@ -97,9 +98,13 @@ public class MCRUserAjaxServlet extends MCRServlet {
     }
 
     /**
-     * Delete a user from the system
+     * Delete a user from the system. Checks to see if the user to be deleted is
+     * the Superuser. If so it can't be done and an error message is being
+     * returned.
+     * 
      * @param nutzer
-     * @return
+     * @return 0 if the user is deleted. 1 if the user is the Super user and
+     *         can't be deleted.
      */
     private int removeUser(String nutzer) {
         String rootUser = CONFIG.getString("MCR.Users.Superuser.UserName");
@@ -113,6 +118,7 @@ public class MCRUserAjaxServlet extends MCRServlet {
 
     /**
      * Delete the user from the group only.
+     * 
      * @param gruppe
      * @param nutzer
      * @return
@@ -150,7 +156,10 @@ public class MCRUserAjaxServlet extends MCRServlet {
 
     /**
      * Build a JSON Representation of a group with all users who are in it, and
-     * return it to the java script.
+     * return it to the java script. The JSON Object json has 2 arrays.1. for
+     * the group to be returned and 2. for errors groupToUpdate is a jsonobject
+     * with an array with all the users in the group, and another property
+     * "name" with the name of the group.
      * 
      * @param job
      *            The group to be returned as JSON Doc.
@@ -188,7 +197,13 @@ public class MCRUserAjaxServlet extends MCRServlet {
 
     /**
      * Builds a JSON Representation of all groups with all the users in the
-     * database and returns the JSON string to the java script
+     * database and returns the JSON string to the java script. The root of the
+     * document is a JSON Object (json). There are 3 JSON Arrays in it: groups,
+     * users and error The group array is an array of json objects with name:
+     * groupID and another array with all the users in the current group The
+     * users array is just an array with all the users in the system. If an
+     * error occurs it can be send as a string parameter and it would be in the
+     * error array.
      * 
      * @param job
      * @throws IOException
