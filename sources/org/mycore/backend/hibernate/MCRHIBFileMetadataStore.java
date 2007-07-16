@@ -34,7 +34,6 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 
 import org.mycore.backend.hibernate.tables.MCRFSNODES;
-import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.datamodel.ifs.MCRDirectory;
 import org.mycore.datamodel.ifs.MCRFile;
