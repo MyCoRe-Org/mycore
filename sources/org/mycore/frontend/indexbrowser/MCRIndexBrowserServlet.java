@@ -30,31 +30,31 @@ import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
 
 /**
- * @author Anja Schaar
+ * @author Anja Schaar, Andreas Trappe
  * 
  * 
  */
 public class MCRIndexBrowserServlet extends MCRServlet {
-	
+
     protected void doGetPost(MCRServletJob job) throws Exception {
-    	Enumeration ee = job.getRequest().getParameterNames();
-        while ( ee.hasMoreElements() ) {
-             String param = (String) ee.nextElement();
-        	 System.out.println("PARAM: " + param + " VALUE: "  + 	job.getRequest().getParameter(param) );
+        Enumeration ee = job.getRequest().getParameterNames();
+        while (ee.hasMoreElements()) {
+            String param = (String) ee.nextElement();
+            System.out.println("PARAM: " + param + " VALUE: " + job.getRequest().getParameter(param));
         }
-         
+
         String search = job.getRequest().getParameter("search");
-        String mode = job.getRequest().getParameter("mode");		
-        String searchclass = job.getRequest().getParameter("searchclass");		  	
-        String fromTo = job.getRequest().getParameter("fromTo");		  	     
-        String path = job.getRequest().getParameter("path");		  	     
-        
+        String mode = job.getRequest().getParameter("mode");
+        String searchclass = job.getRequest().getParameter("searchclass");
+        String fromTo = job.getRequest().getParameter("fromTo");
+        String path = job.getRequest().getParameter("path");
+
         MCRIndexBrowserData indexbrowser = new MCRIndexBrowserData(search, mode, searchclass, fromTo, path);
         indexbrowser.getQuery();
-        indexbrowser.getResultList();        
-        Document pageContent = indexbrowser.getXMLContent();   
-        
+        indexbrowser.getResultList();
+        Document pageContent = indexbrowser.getXMLContent();
+
         job.getRequest().setAttribute("XSL.Style", searchclass);
-        getLayoutService().doLayout(job.getRequest(),job.getResponse(),pageContent);
+        getLayoutService().doLayout(job.getRequest(), job.getResponse(), pageContent);
     }
 }
