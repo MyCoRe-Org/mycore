@@ -25,6 +25,7 @@ package org.mycore.frontend.indexbrowser;
 
 import java.util.Enumeration;
 
+import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
@@ -44,7 +45,7 @@ public class MCRIndexBrowserServlet extends MCRServlet {
         }
 
         String search = job.getRequest().getParameter("search");
-        String mode = job.getRequest().getParameter("mode");
+        String mode = getMode(job);
         String searchclass = job.getRequest().getParameter("searchclass");
         String fromTo = job.getRequest().getParameter("fromTo");
         String path = job.getRequest().getParameter("path");
@@ -56,5 +57,12 @@ public class MCRIndexBrowserServlet extends MCRServlet {
 
         job.getRequest().setAttribute("XSL.Style", searchclass);
         getLayoutService().doLayout(job.getRequest(), job.getResponse(), pageContent);
+    }
+
+    private String getMode(MCRServletJob job) {
+        if (job.getRequest().getParameter("mode")!=null && !job.getRequest().getParameter("mode").trim().equals("")) {
+            return job.getRequest().getParameter("mode").toLowerCase().trim();
+        } else 
+            return "prefix";
     }
 }

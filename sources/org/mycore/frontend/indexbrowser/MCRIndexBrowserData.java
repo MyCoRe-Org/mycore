@@ -280,8 +280,7 @@ public class MCRIndexBrowserData {
         eIndex.setAttribute("id", br.index);
         Element results = new Element("results");
         page.addContent(results);
-        if (br != null && br.mode != null)
-            results.setAttribute("mode", br.mode);
+        results.setAttribute("mode", br.mode);
         return results;
     }
 
