@@ -32,12 +32,16 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.jdom.Document;
 
 import org.mycore.common.MCRHibTestCase;
 import org.mycore.common.xml.MCRXMLHelper;
 import org.mycore.datamodel.classifications2.MCRCategory;
+import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.MCRObjectReference;
 import org.mycore.datamodel.classifications2.utils.MCRXMLTransformer;
 
@@ -55,6 +59,8 @@ public class MCRCategLinkServiceImplTest extends MCRHibTestCase {
     private Collection<MCRCategoryLink> testLinks;
 
     private static MCRCategLinkServiceImpl SERVICE = new MCRCategLinkServiceImpl();
+
+    private static final Logger LOGGER = Logger.getLogger(MCRCategLinkServiceImplTest.class);
 
     /*
      * (non-Javadoc)
@@ -134,7 +140,15 @@ public class MCRCategLinkServiceImplTest extends MCRHibTestCase {
      * {@link org.mycore.datamodel.classifications2.impl.MCRCategLinkServiceImpl#countLinks(java.util.Collection)}.
      */
     public void testCountLinks() {
-        fail("Not yet implemented");
+        addTestLinks();
+        startNewTransaction();
+        List<MCRCategoryID> categIDs = Arrays.asList(category.getId(), category.getChildren().get(0).getId(), category.getChildren().get(0).getChildren()
+                .get(0).getId(), category.getChildren().get(0).getChildren().get(1).getId(), category.getChildren().get(0).getChildren().get(2).getId());
+        Map<MCRCategoryID, Number> map = SERVICE.countLinks(categIDs);
+        LOGGER.debug("****List of returned map");
+        LOGGER.debug(map);
+        assertEquals("Returned amount of MCRCategoryIDs does not match.", categIDs.size(), map.size());
+        assertEquals("Count of Europe links does not match.", 6, map.get(category.getChildren().get(0).getId()).intValue());
     }
 
     /**

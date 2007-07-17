@@ -23,6 +23,7 @@
  **/
 package org.mycore.datamodel.classifications2.impl;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -55,17 +56,37 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
 
     @SuppressWarnings("unchecked")
     public Map<MCRCategoryID, Number> countLinks(Collection<MCRCategoryID> categIDs) {
+        Map<String, Collection<String>> perClassID=new HashMap<String, Collection<String>>();
+        Map<MCRCategoryID, Number> returns=new HashMap<MCRCategoryID, Number>();
+        //ensure that all categIDs are grouped per classID
+        for (MCRCategoryID id:categIDs){
+            Collection<String> categs=perClassID.get(id.getRootID());
+            if (categs==null){
+                categs=new ArrayList<String>(categIDs.size());
+                perClassID.put(id.getRootID(), categs);
+            }
+            categs.add(id.getID());
+            //initialize all categIDs with link count of zero
+            returns.put(id, 0);
+        }
         Session session = MCRHIBConnection.instance().getSession();
         Map<MCRCategoryID, Number> countLinks = new HashMap<MCRCategoryID, Number>();
-        Query q = session.getNamedQuery(LINK_CLASS.getName() + ".NumberPerCategID");
-        q.setParameterList("categIDs", categIDs);
-        List<Object[]> result = q.list();
-        for (Object[] sr : result) {
-            MCRCategoryID key = (MCRCategoryID) sr[0];
-            Number value = (Number) sr[1];
-            countLinks.put(key, value);
+        //for every classID do:
+        for (Map.Entry<String, Collection<String>> entry: perClassID.entrySet()){
+            String classID=entry.getKey();
+            Query q = session.getNamedQuery(LINK_CLASS.getName() + ".NumberPerCategID");
+            q.setParameter("classID", classID);
+            q.setParameterList("categIDs", entry.getValue());
+            List<Object[]> result = q.list();
+            for (Object[] sr : result) {
+                MCRCategoryID key = (MCRCategoryID) sr[0];
+                Number value = (Number) sr[1];
+                countLinks.put(key, value);
+            }
         }
-        return countLinks;
+        //overwrites zero count where database returned a value
+        returns.putAll(countLinks);
+        return returns;
     }
 
     @SuppressWarnings("unchecked")

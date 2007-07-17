@@ -15,17 +15,42 @@
 <!--     -->
     <query name="NumberPerCategID">
       <![CDATA[
-SELECT c1.id, count(*) FROM MCRCategoryImpl c1, MCRCategoryLink li
-WHERE
-  c1.internalID IN (:internalIDs) AND
-  li.category in (
-    select internalID from MCRCategoryImpl c2
-    where c2.id.rootID=c1.id.rootID
-    and c2.left BETWEEN c1.left AND c1.right
-  )
-GROUP BY c1.id
+SELECT cat.id, count(*), cat.internalID
+  FROM MCRCategoryImpl cat, MCRCategoryLink link WHERE
+    cat.internalID IN (
+      SELECT c1.internalID FROM MCRCategoryImpl c1 WHERE
+        c1.id.rootID=:classID AND
+        c1.id.ID IN (:categIDs)
+    ) AND
+    link.category IN (
+      SELECT internalID FROM MCRCategoryImpl c2 WHERE
+        c2.id.rootID = cat.id.rootID AND
+        c2.left BETWEEN cat.left AND cat.right
+    )
+  GROUP BY cat.internalID, cat.id.rootID, cat.id.ID
       ]]>
     </query>
+<!-- 
+    <query name="NumberPerCategID.old">
+      <![CDATA[
+SELECT cat.id, count(*), cat.internalID
+  FROM MCRCategoryImpl cat, MCRCategoryLink link 
+  WHERE
+    cat.internalID IN (
+      SELECT c1.internalID FROM MCRCategoryImpl c1 WHERE
+          c1.id.rootID=:classID AND
+          c1.id.categID IN (:categIDs)
+          AND link.category IN (
+            SELECT internalID FROM MCRCategoryImpl c2
+              WHERE
+                c2.id.rootID = cat.id.rootID AND
+                c2.left BETWEEN cat.left AND cat.right
+          )
+    )
+  GROUP BY cat.internalID, cat.id.rootID, cat.id.categID
+      ]]>
+    </query>
+ -->      
     <query name="NumberByTypePerCategID">
       <![CDATA[
 SELECT category.id, count(*) FROM MCRCategoryLink WHERE category.id IN (:categIDs) and objectReference.type=:type
