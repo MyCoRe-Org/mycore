@@ -109,8 +109,7 @@ public class MCRLinkTableManager {
      *         warning to the logger.
      */
     private final boolean checkType(String type) {
-        if (type.equals(ENTRY_TYPE_CHILD) || type.equals(ENTRY_TYPE_CLASSID) || type.equals(ENTRY_TYPE_DERIVATE) || type.equals(ENTRY_TYPE_PARENT)
-                || type.equals(ENTRY_TYPE_REFERENCE)) {
+        if (type.equals(ENTRY_TYPE_CHILD) || type.equals(ENTRY_TYPE_CLASSID) || type.equals(ENTRY_TYPE_DERIVATE) || type.equals(ENTRY_TYPE_PARENT) || type.equals(ENTRY_TYPE_REFERENCE)) {
             return true;
         }
         logger.warn("The value " + type + " is not a defined type for the link table.");
@@ -165,14 +164,15 @@ public class MCRLinkTableManager {
             attr = "";
         }
 
-        StringBuffer sb = new StringBuffer().append("Link in table ").append(type).append(" add for ").append(from).append("<-->").append(to).append(" with ")
-                .append(type).append(" and ").append(attr);
+        StringBuffer sb = new StringBuffer().append("Link in table ").append(type).append(" add for ").append(from).append("<-->").append(to).append(" with ").append(type).append(" and ").append(attr);
         logger.debug(sb.toString());
 
         try {
             persistenceclass.create(from, to, type, attr);
         } catch (Exception e) {
-            e.printStackTrace();
+            if (logger.isDebugEnabled()) {
+                e.printStackTrace();
+            }
             logger.warn("An error occured while adding a dataset from the reference link table, adding not succesful.");
         }
     }
@@ -202,6 +202,9 @@ public class MCRLinkTableManager {
         try {
             persistenceclass.delete(from, null, null);
         } catch (Exception e) {
+            if (logger.isDebugEnabled()) {
+                e.printStackTrace();
+            }
             logger.warn("An error occured while deleting a dataset from the" + from + " reference link table, deleting could be not succesful.");
         }
     }
@@ -224,6 +227,7 @@ public class MCRLinkTableManager {
         try {
             persistenceclass.delete(from, to, type);
         } catch (Exception e) {
+            e.printStackTrace();
             logger.warn("An error occured while deleting a dataset from the" + " reference link table, deleting is not succesful.");
         }
     }

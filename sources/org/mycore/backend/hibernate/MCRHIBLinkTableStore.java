@@ -75,30 +75,20 @@ public class MCRHIBLinkTableStore implements MCRLinkTableInterface {
         if ((from == null) || ((from = from.trim()).length() == 0)) {
             throw new MCRPersistenceException("The from value is null or empty.");
         }
-
         if ((to == null) || ((to = to.trim()).length() == 0)) {
             throw new MCRPersistenceException("The to value is null or empty.");
         }
-
         if ((type == null) || ((type = type.trim()).length() == 0)) {
             throw new MCRPersistenceException("The type value is null or empty.");
         }
-
         if ((attr == null) || ((attr = attr.trim()).length() == 0)) {
             attr = "";
         }
 
         Session session = getSession();
         MCRLINKHREFPK pk = new MCRLINKHREFPK(from, to, type);
-        MCRLINKHREF tab = (MCRLINKHREF) session.get(MCRLINKHREF.class, pk);
-        if (tab != null) {
-            // Object is in session: maybe delete before?
-            session.evict(tab);
-            MCRHIBConnection.instance().flushSession();
-        } else {
-            tab = new MCRLINKHREF();
-            tab.setKey(pk);
-        }
+        MCRLINKHREF tab = new MCRLINKHREF();
+        tab.setKey(pk);
         tab.setMcrattr(attr);
         logger.debug("Inserting " + from + "/" + to + "/" + type + " into database MCRLINKHREF");
         session.save(tab);
@@ -129,7 +119,7 @@ public class MCRHIBLinkTableStore implements MCRLinkTableInterface {
         logger.debug("Deleting " + from + " from database MCRLINKHREF");
         Session session = getSession();
         int deleted = session.createQuery(sb.toString()).executeUpdate();
-        logger.debug((new Integer(deleted)).toString()+" items deleted.");
+        logger.debug((new Integer(deleted)).toString() + " items deleted.");
     }
 
     /**

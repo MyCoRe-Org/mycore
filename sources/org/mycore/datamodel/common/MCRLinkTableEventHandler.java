@@ -58,9 +58,9 @@ public class MCRLinkTableEventHandler extends MCREventHandlerBase {
      */
     protected final void handleObjectCreated(MCREvent evt, MCRObject obj) {
         // delete old entries
-        handleObjectDeleted(evt, obj);
-        // set new entries
         MCRObjectID mcr_id = obj.getId();
+        mcr_linktable.deleteReferenceLink(mcr_id);
+        // set new entries
         MCRObjectMetadata meta = obj.getMetadata();
         MCRMetaElement elm = null;
         MCRMetaInterface inf = null;
