@@ -100,6 +100,7 @@ public class MCRCategoryDAOImplTest extends MCRHibTestCase {
         int allNodes = (Integer) sessionFactory.getCurrentSession().createCriteria(MCRCategoryImpl.class).setProjection(Projections.rowCount()).uniqueResult();
         // category + india
         assertEquals("Complete category count does not match.", countNodes(category) + 1, allNodes);
+        assertTrue("No root category present", rootCategory.getRoot() != null);
     }
 
     public void testDeleteCategory() {
