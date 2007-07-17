@@ -59,7 +59,7 @@ public class MCRCategoryID implements Serializable {
 
     public static MCRCategoryID rootID(String rootID) {
         String root = rootID.intern();
-        return new MCRCategoryID(root, null);
+        return new MCRCategoryID(root, "");
     }
 
     /*
@@ -133,12 +133,14 @@ public class MCRCategoryID implements Serializable {
         this.rootID = rootID.intern();
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see java.lang.Object#toString()
      */
     @Override
     public String toString() {
-        return getRootID()+":"+getID();
+        return getRootID() + ((getID().length() > 0) ? ":" + getID() : "");
     }
 
 }
