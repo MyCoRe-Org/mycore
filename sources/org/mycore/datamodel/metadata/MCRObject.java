@@ -31,6 +31,7 @@ import java.util.List;
 
 import org.jdom.Document;
 import org.jdom.Element;
+import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
@@ -777,6 +778,7 @@ final public class MCRObject extends MCRBase {
         MCREvent evt = new MCREvent(MCREvent.OBJECT_TYPE, MCREvent.UPDATE_EVENT);
         evt.put("object", this);
         MCREventManager.instance().handleEvent(evt);
+        MCRHIBConnection.instance().flushSession();
     }
 
     /**
