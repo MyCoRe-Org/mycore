@@ -91,7 +91,12 @@ public class MCRHIBLinkTableStore implements MCRLinkTableInterface {
         tab.setKey(pk);
         tab.setMcrattr(attr);
         logger.debug("Inserting " + from + "/" + to + "/" + type + " into database MCRLINKHREF");
-        session.save(tab);
+        try {
+            session.save(tab);
+        } catch (org.hibernate.NonUniqueObjectException e) {
+            session.evict(tab);
+            session.save(tab);
+        }
     }
 
     /**
