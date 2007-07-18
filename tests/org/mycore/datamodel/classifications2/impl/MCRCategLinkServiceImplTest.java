@@ -156,7 +156,15 @@ public class MCRCategLinkServiceImplTest extends MCRHibTestCase {
      * {@link org.mycore.datamodel.classifications2.impl.MCRCategLinkServiceImpl#countLinksForType(Collection, String)}.
      */
     public void testCountLinksForType() {
-        fail("Not yet implemented");
+        addTestLinks();
+        startNewTransaction();
+        List<MCRCategoryID> categIDs = Arrays.asList(category.getId(), category.getChildren().get(0).getId(), category.getChildren().get(0).getChildren()
+                .get(0).getId(), category.getChildren().get(0).getChildren().get(1).getId(), category.getChildren().get(0).getChildren().get(2).getId());
+        Map<MCRCategoryID, Number> map = SERVICE.countLinksForType(categIDs, "city");
+        LOGGER.debug("****List of returned map");
+        LOGGER.debug(map);
+        assertEquals("Returned amount of MCRCategoryIDs does not match.", categIDs.size(), map.size());
+        assertEquals("Count of Europe links does not match.", 2, map.get(category.getChildren().get(0).getId()).intValue());
     }
 
     private void loadWorldClassification() throws URISyntaxException {
