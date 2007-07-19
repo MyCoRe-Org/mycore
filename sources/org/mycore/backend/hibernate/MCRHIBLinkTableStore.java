@@ -86,17 +86,18 @@ public class MCRHIBLinkTableStore implements MCRLinkTableInterface {
         }
 
         Session session = getSession();
-        MCRLINKHREFPK pk = new MCRLINKHREFPK(from, to, type);
-        MCRLINKHREF tab = new MCRLINKHREF();
-        tab.setKey(pk);
-        tab.setMcrattr(attr);
-        logger.debug("Inserting " + from + "/" + to + "/" + type + " into database MCRLINKHREF");
-        try {
-            session.save(tab);
-        } catch (org.hibernate.NonUniqueObjectException e) {
-            session.evict(tab);
-            session.save(tab);
+        MCRLINKHREFPK pk = new MCRLINKHREFPK();
+        pk.setMcrfrom(from);
+        pk.setMcrto(to);
+        pk.setMcrtype(type);
+        MCRLINKHREF l = (MCRLINKHREF) session.get(MCRLINKHREF.class, pk);
+        if (l == null) {
+            l = new MCRLINKHREF();
+            l.setKey(pk);
         }
+        l.setMcrattr(attr);
+        logger.debug("Inserting " + from + "/" + to + "/" + type + " into database MCRLINKHREF");
+        session.saveOrUpdate(l);
     }
 
     /**
