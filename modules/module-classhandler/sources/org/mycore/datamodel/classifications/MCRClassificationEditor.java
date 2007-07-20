@@ -30,7 +30,6 @@ import static org.mycore.common.MCRConstants.XSI_NAMESPACE;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.fileupload.FileItem;
@@ -196,7 +195,6 @@ public class MCRClassificationEditor {
      */
     public boolean importClassification(boolean bUpdate, String sFile) {
         LOGGER.debug("Start importNewClassification.");
-        String clid = "";
         try {
             try {
                 LOGGER.info("Reading file " + sFile + " ...\n");
@@ -250,7 +248,7 @@ public class MCRClassificationEditor {
             }
             if (submittedID == null || !cli.isValid()) {
 
-                String base = CONFIG.getString("MCR.default_project_id", "DocPortal") + "_class";
+                String base = CONFIG.getString("MCR.SWF.Project.ID", "DocPortal") + "_class";
 
                 LOGGER.debug("Create a CLID with base " + base);
                 cli.setNextFreeId(base);

@@ -60,7 +60,7 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
 
     private static final String ID_TYPE = "derivate";
 
-    private static final String PROJECT = MCRConfiguration.instance().getString("MCR.default_project_id", "MCR");
+    private static final String PROJECT = MCRConfiguration.instance().getString("MCR.SWF.Project.ID", "MCR");
 
     private static final Logger LOGGER = Logger.getLogger(MCRUploadHandlerIFS.class);
 
