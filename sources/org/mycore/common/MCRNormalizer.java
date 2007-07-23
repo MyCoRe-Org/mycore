@@ -23,19 +23,29 @@
 
 package org.mycore.common;
 
-import java.util.Locale;
 import java.util.StringTokenizer;
 import java.util.regex.Pattern;
 
+import org.apache.log4j.Logger;
+
 /**
- * This class implements only static methods to normalize text values.
+ * This class implements only static methods to normalize text values. Rules
+ * written as x&gt;u .You can configure this normalization with two property
+ * values<br>
+ * <ul>
+ * <li>MCR.Metadata.Normalize.AddRule - add more rules to the default rule</li>
+ * <li>MCR.Metadata.Normalize.SetRule - replace the default rule</li>
+ * </ul>
  * 
  * @author Frank Lützenkirchen
  * @author Thomas Scheffler (yagee)
+ * @author Jens Kupferschmidt
  * 
  * @version $Revision$ $Date$
  */
 public class MCRNormalizer {
+    static Logger logger = Logger.getLogger(MCRNormalizer.class);
+    
     /** List of characters that will be replaced */
     private static String rules = "ä>ae ö>oe ü>ue ß>ss à>a á>a â>a è>e é>e ê>e ì>i í>i î>i ò>o ó>o ô>o ù>u ú>u û>u";
 
@@ -44,8 +54,22 @@ public class MCRNormalizer {
     private static String[] replace;
 
     private static boolean normalize = true;
-    
+
+    private static MCRConfiguration config = MCRConfiguration.instance();
+
+    private static String addRule = config.getString("MCR.Metadata.Normalize.AddRule", "");
+
+    private static String setRule = config.getString("MCR.Metadata.Normalize.SetRule", "");
+
     static {
+        if ((setRule != null) && (setRule.trim().length() != 0)) {
+            rules = setRule;
+        } else {
+            if ((addRule != null) && (addRule.trim().length() != 0)) {
+                rules = rules + " " + addRule;
+            }
+
+        }
         StringTokenizer st = new StringTokenizer(rules, "> ");
         int numPatterns = st.countTokens() / 2;
 
@@ -55,6 +79,7 @@ public class MCRNormalizer {
         for (int i = 0; i < numPatterns; i++) {
             patterns[i] = Pattern.compile(st.nextToken());
             replace[i] = st.nextToken();
+            logger.debug("normalize -->"+patterns[i]+" to -->"+replace[i]);
         }
     }
 
@@ -67,35 +92,34 @@ public class MCRNormalizer {
      * @return the normalized String in lower case.
      */
     public static final String normalizeString(String in) {
-        return normalizeString(in,normalize);
+        return normalizeString(in, normalize);
     }
-    
+
     public static final String normalizeString(String in, boolean reallyNormalize) {
         if ((in == null) || (in.trim().length() == 0))
             return "";
 
-        if ( !reallyNormalize )
-          return in;
-        
-        in = in.toLowerCase(Locale.GERMANY).trim();
+        if (!reallyNormalize)
+            return in;
+
+        // in = in.toLowerCase(Locale.GERMANY).trim();
+        in = in.toLowerCase().trim();
 
         for (int i = 0; i < patterns.length; i++)
             in = patterns[i].matcher(in).replaceAll(replace[i]);
 
         return in;
     }
-    
+
     /**
-     * Activates or deactivates normalizing.
-     * Used in miless software to make indexing of scorm and searching possible
+     * Activates or deactivates normalizing. Used in miless software to make
+     * indexing of scorm and searching possible
      * 
      * @param value
-     *            true  normalize strings
-     *            false do not normalize strings
-     *            
+     *            true normalize strings false do not normalize strings
+     * 
      */
-    public static final void setDoNormalize(boolean value)
-    {
-      normalize = value;
+    public static final void setDoNormalize(boolean value) {
+        normalize = value;
     }
 }
