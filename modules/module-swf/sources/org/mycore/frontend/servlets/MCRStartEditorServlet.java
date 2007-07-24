@@ -666,30 +666,39 @@ public class MCRStartEditorServlet extends MCRServlet {
     private final org.jdom.Element normalizeACLforSWF(org.jdom.Element ruleelm) {
         if (LOGGER.isDebugEnabled()) {
             try {
-                MCRUtils.writeJDOMToSysout(new org.jdom.Document().addContent(ruleelm));
+                MCRUtils.writeElementToSysout(ruleelm);
             } catch (Exception e) {
-
+                LOGGER.warn("Can't write ACL Element input for SWF.");
             }
         }
+        // build new condition element
         org.jdom.Element newcondition = new org.jdom.Element("condition");
         newcondition.setAttribute("format", "xml");
+        // build new boolean AND element
         org.jdom.Element newwrapperand = new org.jdom.Element("boolean");
         newwrapperand.setAttribute("operator", "and");
         newcondition.addContent(newwrapperand);
+        // build new boolean TRUE element
+        org.jdom.Element newtrue = new org.jdom.Element("boolean");
+        newtrue.setAttribute("operator", "true");
+        // check rule
         if (ruleelm == null) {
+            LOGGER.warn("Rule element is null.");
             return newcondition;
         }
         try {
-            org.jdom.Element newtrue = new org.jdom.Element("boolean");
-            newtrue.setAttribute("operator", "true");
+            // check of boolean AND element
             org.jdom.Element oldwrapperand = ruleelm.getChild("boolean");
             if (oldwrapperand == null) {
                 return newcondition;
             }
 
-            org.jdom.Element newuser = (org.jdom.Element) newtrue.detach();
-            org.jdom.Element newdate = (org.jdom.Element) newtrue.detach();
-            org.jdom.Element newip = (org.jdom.Element) newtrue.detach();
+            org.jdom.Element newuser = (org.jdom.Element) newtrue.clone();
+            newuser.detach();
+            org.jdom.Element newdate = (org.jdom.Element) newtrue.clone();
+            newdate.detach();
+            org.jdom.Element newip = (org.jdom.Element) newtrue.clone();
+            newip.detach();
             org.jdom.Element newelm = null;
 
             List<org.jdom.Element> parts = oldwrapperand.getChildren();
@@ -697,8 +706,8 @@ public class MCRStartEditorServlet extends MCRServlet {
                 if (i > 2)
                     break;
                 org.jdom.Element oldelm = (org.jdom.Element) parts.get(i).detach();
-                if (oldelm.getChildren().size() == 0)
-                    continue;
+                //if (oldelm.getChildren().size() == 0)
+                //    continue;
                 if (oldelm.getName().equals("condition")) {
                     org.jdom.Element newwrapper = new org.jdom.Element("boolean");
                     newwrapper.setAttribute("operator", "or");
@@ -730,6 +739,13 @@ public class MCRStartEditorServlet extends MCRServlet {
             newwrapperand.addContent(newip.detach());
         } catch (Exception e) {
             e.printStackTrace();
+        }
+        if (LOGGER.isDebugEnabled()) {
+            try {
+                MCRUtils.writeElementToSysout(newcondition);
+            } catch (Exception e) {
+                LOGGER.warn("Can't write ACL Element output for SWF.");
+            }
         }
         return newcondition;
     }
