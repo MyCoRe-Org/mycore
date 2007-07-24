@@ -46,8 +46,8 @@ import org.apache.log4j.Logger;
 public class MCRNormalizer {
     static Logger logger = Logger.getLogger(MCRNormalizer.class);
     
-    /** List of characters that will be replaced */
-    private static String rules = "ä>ae ö>oe ü>ue ß>ss à>a á>a â>a è>e é>e ê>e ì>i í>i î>i ò>o ó>o ô>o ù>u ú>u û>u";
+    /** List of characters that will be replaced */                                                                   /* small u with ring small c with caron  small thorn */ 
+    private static String rules = "ä>ae ö>oe ü>ue ß>ss à>a á>a â>a å>a è>e é>e ê>e ì>i í>i î>i ò>o ó>o ô>o ù>u ú>u û>u \uc5af>u \uc48d>c š>s Ş>th";
 
     private static Pattern[] patterns;
 
