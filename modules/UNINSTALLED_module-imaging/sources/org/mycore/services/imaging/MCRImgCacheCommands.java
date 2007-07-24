@@ -19,6 +19,8 @@ import java.util.List;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
+import org.hibernate.Session;
+import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 import org.mycore.datamodel.ifs.MCRDirectory;
@@ -60,16 +62,33 @@ public class MCRImgCacheCommands extends MCRAbstractCommands {
          */
     }
 
-    public static void clearCache() {
-//        MCRDirectory dir = MCRDirectory.getRootDirectory("imgCache");
+    public static void clearCache() throws Exception {
         MCRDirectory dir = (MCRDirectory) MCRFilesystemNode.getRootNode(MCRImgCacheManager.CACHE_FOLDER);
-        if (dir != null) {
-            dir.delete();
-            LOGGER.info("Cache deleted!");
+        
+        while (dir != null){
+            try {
+                dir.delete();
+                dir = (MCRDirectory) MCRFilesystemNode.getRootNode(MCRImgCacheManager.CACHE_FOLDER);
+            } catch (Exception e) {
+                LOGGER.info("Maybe inconsistency of image cache! Try to clean up.");
+                Session dbSession = MCRHIBConnection.instance().getSession();
+                
+                int deletedEntities = dbSession.createQuery("delete from MCRFSNODES node where node.owner = :owner")
+                                        .setString("owner", MCRImgCacheManager.CACHE_FOLDER)
+                                        .executeUpdate();
+                dir = (MCRDirectory) MCRFilesystemNode.getRootNode(MCRImgCacheManager.CACHE_FOLDER);
+                
+                if (dir != null){
+                    /*dir = null;
+                    LOGGER.info("Big mess!!! Send Developer a mail!");*/
+                    throw new Exception("Big mess!!! Send Developer a mail!");
+                }
+                LOGGER.info("Deleted "+ deletedEntities + " Entities. Image cache cleaned!");
+            }
+            
         }
-        else {
-            LOGGER.info("No Cache in Filesystem! Nothing to do!");
-        }
+        
+        LOGGER.info("Cache deleted!");
     }
 
     private static void getSuppFiles(List list, String contentType, MCRDirectory rootNode) {
