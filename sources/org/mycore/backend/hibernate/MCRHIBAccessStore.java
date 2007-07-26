@@ -180,7 +180,7 @@ public class MCRHIBAccessStore extends MCRAccessStore {
             rulemapping.setPool(data.getKey().getAcpool());
             rulemapping.setRuleId(data.getRid());
         }
-
+        session.evict(data);
         return rulemapping;
     }
 
