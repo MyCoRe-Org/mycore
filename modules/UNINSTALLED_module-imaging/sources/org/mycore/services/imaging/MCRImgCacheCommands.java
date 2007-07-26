@@ -23,6 +23,7 @@ import org.hibernate.Session;
 import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
+import org.mycore.datamodel.common.MCRXMLTableManager;
 import org.mycore.datamodel.ifs.MCRDirectory;
 import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.ifs.MCRFilesystemNode;
@@ -42,52 +43,76 @@ public class MCRImgCacheCommands extends MCRAbstractCommands {
         com = new MCRCommand("clear image cache", "org.mycore.services.imaging.MCRImgCacheCommands.clearCache", "The command clear the image cache.");
         command.add(com);
 
-        com = new MCRCommand("create image cache for file {0}", "org.mycore.services.imaging.MCRImgCacheCommands.cacheFile String", "The command create the image cache version for the given File.");
+        com = new MCRCommand("create image cache for file {0}", "org.mycore.services.imaging.MCRImgCacheCommands.cacheFile String",
+                "The command create the image cache version for the given File.");
         command.add(com);
 
-        com = new MCRCommand("remove image cache for file {0}", "org.mycore.services.imaging.MCRImgCacheCommands.removeCachedFile String", "The command remove the image cache version for the given File.");
+        com = new MCRCommand("remove image cache for file {0}", "org.mycore.services.imaging.MCRImgCacheCommands.removeCachedFile String",
+                "The command remove the image cache version for the given File.");
         command.add(com);
 
-        com = new MCRCommand("create image cache for derivate {0}", "org.mycore.services.imaging.MCRImgCacheCommands.cacheDeriv String", "The command create the image cache version for the given Derivate.");
+        com = new MCRCommand("create image cache for derivate {0}", "org.mycore.services.imaging.MCRImgCacheCommands.cacheDeriv String",
+                "The command create the image cache version for the given Derivate.");
         command.add(com);
 
-        com = new MCRCommand("remove image cache for derivate {0}", "org.mycore.services.imaging.MCRImgCacheCommands.removeCachedDeriv String", "The command remove the image cache version for the given Derivate.");
+        com = new MCRCommand("remove image cache for derivate {0}", "org.mycore.services.imaging.MCRImgCacheCommands.removeCachedDeriv String",
+                "The command remove the image cache version for the given Derivate.");
         command.add(com);
 
-        /*
-         * com = new MCRCommand( "cacheMkdir {0}",
-         * "org.mycore.services.imaging.MCRImgCacheCommands.cacheMkdir String",
-         * "The command create the Directories in the Image cache.");
-         * command.add(com);
-         */
+        com = new MCRCommand("repair image cache", "org.mycore.services.imaging.MCRImgCacheCommands.repairCache",
+                "The command repair the image cache. This is clearing the complete image cache and rebuild it. Caution this will take a lot of time!");
+        command.add(com);
     }
 
+    public static final void repairCache() {
+        MCRXMLTableManager xmlTableManager = MCRXMLTableManager.instance();
+        List derivateList = xmlTableManager.retrieveAllIDs("derivate");
+
+        try {
+            clearCache();
+            
+            for (Iterator it = derivateList.iterator(); it.hasNext();){
+                String derivateID = (String)it.next();
+                LOGGER.info("Caching Derivate " + derivateID);
+                cacheDeriv(derivateID);
+            }
+            
+        } catch (MCRException ex) {
+            LOGGER.error(ex.getMessage());
+            LOGGER.error("");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        LOGGER.info("\n Repairing image cache completed successfull!\n");
+    }
+    
     public static void clearCache() throws Exception {
         MCRDirectory dir = (MCRDirectory) MCRFilesystemNode.getRootNode(MCRImgCacheManager.CACHE_FOLDER);
-        
-        while (dir != null){
+
+        while (dir != null) {
             try {
                 dir.delete();
                 dir = (MCRDirectory) MCRFilesystemNode.getRootNode(MCRImgCacheManager.CACHE_FOLDER);
             } catch (Exception e) {
                 LOGGER.info("Maybe inconsistency of image cache! Try to clean up.");
                 Session dbSession = MCRHIBConnection.instance().getSession();
-                
-                int deletedEntities = dbSession.createQuery("delete from MCRFSNODES node where node.owner = :owner")
-                                        .setString("owner", MCRImgCacheManager.CACHE_FOLDER)
-                                        .executeUpdate();
+
+                int deletedEntities = dbSession.createQuery("delete from MCRFSNODES node where node.owner = :owner").setString("owner",
+                        MCRImgCacheManager.CACHE_FOLDER).executeUpdate();
                 dir = (MCRDirectory) MCRFilesystemNode.getRootNode(MCRImgCacheManager.CACHE_FOLDER);
-                
-                if (dir != null){
-                    /*dir = null;
-                    LOGGER.info("Big mess!!! Send Developer a mail!");*/
+
+                if (dir != null) {
+                    /*
+                     * dir = null; LOGGER.info("Big mess!!! Send Developer a
+                     * mail!");
+                     */
                     throw new Exception("Big mess!!! Send Developer a mail!");
                 }
-                LOGGER.info("Deleted "+ deletedEntities + " Entities. Image cache cleaned!");
+                LOGGER.info("Deleted " + deletedEntities + " Entities. Image cache cleaned!");
             }
-            
+
         }
-        
+
         LOGGER.info("Cache deleted!");
     }
 
@@ -242,12 +267,12 @@ public class MCRImgCacheCommands extends MCRAbstractCommands {
                 }
 
                 LOGGER.debug("Cache files ORIG: \n" + cache.listCacheDir());
-                
+
                 int cacheWidth = Integer.parseInt(config.getString("MCR.Module-iview.cache.size.width"));
                 int cacheHeight = Integer.parseInt(config.getString("MCR.Module-iview.cache.size.height"));
-                
+
                 int factor = 2;
-                
+
                 if (imgSize.width < imgSize.height)
                     factor = 1;
                 // cache small version
@@ -272,7 +297,7 @@ public class MCRImgCacheCommands extends MCRAbstractCommands {
                     LOGGER.info("Image " + image.getName() + " as version " + MCRImgCacheManager.CACHE + " allready exists in Cache!");
                     LOGGER.info("****************************************");
                 }
-                
+
                 LOGGER.debug("Cache files CACHE: \n" + cache.listCacheDir());
 
                 // cache Thumbnail
@@ -301,7 +326,7 @@ public class MCRImgCacheCommands extends MCRAbstractCommands {
                 }
 
                 LOGGER.debug("Cache files THUMB: \n" + cache.listCacheDir());
-                
+
                 LOGGER.info("****************************************");
                 LOGGER.info("* Caching image " + image.getName() + " finished successfull!");
                 LOGGER.info("****************************************");
