@@ -142,7 +142,8 @@ public class MCRImgProcessor implements ImgProcessor {
 		LOGGER.debug("* Loading Image succesfull!");
 		LOGGER.debug("********************************");
 		
-		Point scaleTopCorner = new Point((int) (xTopPos / scaleFactor), (int) (yTopPos / scaleFactor));
+//		Point scaleTopCorner = new Point((int) (xTopPos / scaleFactor), (int) (yTopPos / scaleFactor));
+        Point scaleTopCorner = new Point(xTopPos, yTopPos);
 		Dimension scaleBoundary = new Dimension((int) (boundWidth / scaleFactor), (int) (boundHeight / scaleFactor));
 		
 		if (scaleBoundary.width > origSize.width)
@@ -154,6 +155,7 @@ public class MCRImgProcessor implements ImgProcessor {
 		LOGGER.debug("*********************************************");
 		LOGGER.debug("* MCRImgProcessor - scaleROI#");
 		LOGGER.debug("* ScaleFactor: " + scaleFactor);
+        LOGGER.debug("* scaleTopCorner: " + scaleTopCorner);
 		LOGGER.debug("* scaleBoundary.width: " + scaleBoundary.width);
 		LOGGER.debug("* scaleBoundary.height: " + scaleBoundary.height);
 		LOGGER.debug("* origSize.width: " + origSize.width);
@@ -343,7 +345,7 @@ public class MCRImgProcessor implements ImgProcessor {
 		origSize.width = image.getWidth();
 		origSize.height = image.getHeight();
 		LOGGER.info("******************************************");
-		LOGGER.info("* File loading successfull - MEM");
+		LOGGER.info("* Loading MEM Cache");
 		LOGGER.info("* origSize.width: " + origSize.width);
 		LOGGER.info("* origSize.height: " + origSize.height);
 		LOGGER.info("******************************************");

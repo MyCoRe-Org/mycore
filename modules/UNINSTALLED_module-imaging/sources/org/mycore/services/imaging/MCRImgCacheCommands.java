@@ -245,14 +245,19 @@ public class MCRImgCacheCommands extends MCRAbstractCommands {
                 
                 int cacheWidth = Integer.parseInt(config.getString("MCR.Module-iview.cache.size.width"));
                 int cacheHeight = Integer.parseInt(config.getString("MCR.Module-iview.cache.size.height"));
+                
+                int factor = 2;
+                
+                if (imgSize.width < imgSize.height)
+                    factor = 1;
                 // cache small version
-                if ((imgSize.width > 2 * cacheWidth || imgSize.height > 2 * cacheHeight) && !cache.existInCache(image, MCRImgCacheManager.CACHE)) {
+                if ((imgSize.width > factor * cacheWidth) && !cache.existInCache(image, MCRImgCacheManager.CACHE)) {
                     LOGGER.debug("****************************************");
                     LOGGER.debug("* MCRImgCacheCommands - cacheFile      *");
                     LOGGER.debug("* (imgSize.width > 2 * 1024 || imgSize.height > 2 * 768)  *");
                     LOGGER.debug("****************************************");
                     ByteArrayOutputStream imgData = new ByteArrayOutputStream();
-                    processor.resize(cacheWidth, cacheHeight);
+                    processor.resizeFitWidth(cacheWidth);
                     processor.tiffEncode(imgData);
                     ByteArrayInputStream input = new ByteArrayInputStream(imgData.toByteArray());
                     cache.saveImage(image, MCRImgCacheManager.CACHE, input);

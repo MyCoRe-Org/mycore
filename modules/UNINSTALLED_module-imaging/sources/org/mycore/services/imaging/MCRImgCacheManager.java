@@ -17,15 +17,12 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import org.apache.log4j.Logger;
-import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.mycore.backend.hibernate.MCRHIBConnection;
-import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 import org.mycore.datamodel.ifs.MCRDirectory;
 import org.mycore.datamodel.ifs.MCRFile;
-import org.mycore.datamodel.ifs.MCRFileNodeServlet;
 import org.mycore.datamodel.ifs.MCRFilesystemNode;
 
 /*******************************************************************************
@@ -134,8 +131,10 @@ public class MCRImgCacheManager implements CacheManager {
         LOGGER.debug("Path in cache: " +  cachedImg.getAbsolutePath());
 
         if (cachedImg != null && cachedImg instanceof MCRFile) {
+            LOGGER.debug("Return Image from Cache as InputStream.");
             return ((MCRFile) cachedImg).getContentAsInputStream();
         } else {
+            LOGGER.debug("Return Null.");
             return null;
         }
     }
@@ -268,71 +267,6 @@ public class MCRImgCacheManager implements CacheManager {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-    }
-
-    public void setLock(MCRFile image) {
-        MCRFilesystemNode node;
-        MCRDirectory cachedImg = getCacheDir(image);
-
-        node = cachedImg.getChild("lock");
-        LOGGER.debug("****************************************");
-        LOGGER.debug("* setLock: " + cachedImg.getName());
-        LOGGER.debug("* setLock: " + cachedImg.getOwnerID());
-        LOGGER.debug("****************************************");
-
-        if (node == null) {
-            LOGGER.debug("****************************************");
-            LOGGER.debug("* Lock Image!");
-            LOGGER.debug("****************************************");
-            MCRFile lock = new MCRFile("lock", cachedImg);
-        } else {
-            LOGGER.info("****************************************");
-            LOGGER.info("* Image allready locked!");
-            LOGGER.info("****************************************");
-        }
-    }
-
-    public void removeLock(MCRFile image) {
-        MCRFilesystemNode node;
-        MCRDirectory cachedImg = getCacheDir(image);
-
-        node = cachedImg.getChild("lock");
-
-        if (node != null) {
-            LOGGER.debug("****************************************");
-            LOGGER.debug("* Remove Lock!");
-            LOGGER.debug("****************************************");
-            ((MCRFile) node).delete();
-        } else {
-            LOGGER.info("****************************************");
-            LOGGER.info("* Image is not locked!");
-            LOGGER.info("****************************************");
-        }
-
-    }
-
-    public boolean isLocked(MCRFile image) {
-        MCRFilesystemNode node;
-        MCRDirectory cachedImg = getCacheDir(image);
-
-        node = cachedImg.getChild("lock");
-        LOGGER.debug("****************************************");
-        LOGGER.debug("* setLock: " + cachedImg.getName());
-        LOGGER.debug("* setLock: " + cachedImg.getOwnerID());
-        LOGGER.debug("****************************************");
-
-        if (node == null) {
-            LOGGER.debug("****************************************");
-            LOGGER.debug("* Not Locked!");
-            LOGGER.debug("****************************************");
-            return false;
-        } else {
-            LOGGER.debug("****************************************");
-            LOGGER.debug("* Is Locked!");
-            LOGGER.debug("****************************************");
-            return true;
-        }
-
     }
 
     /* *********************************************************************************************** */
