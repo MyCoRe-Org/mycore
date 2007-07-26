@@ -54,44 +54,76 @@ public class MCRImgCacheCommands extends MCRAbstractCommands {
         com = new MCRCommand("create image cache for derivate {0}", "org.mycore.services.imaging.MCRImgCacheCommands.cacheDeriv String",
                 "The command create the image cache version for the given Derivate.");
         command.add(com);
+        com = new MCRCommand("create image cache for all derivates", "org.mycore.services.imaging.MCRImgCacheCommands.createCache",
+                "The command create the the complete image cache for all derivates in the MyCore System. Caution this will take a lot of time!");
+        command.add(com);
 
         com = new MCRCommand("remove image cache for derivate {0}", "org.mycore.services.imaging.MCRImgCacheCommands.removeCachedDeriv String",
                 "The command remove the image cache version for the given Derivate.");
         command.add(com);
 
-        com = new MCRCommand("repair image cache", "org.mycore.services.imaging.MCRImgCacheCommands.repairCache",
+        /*com = new MCRCommand("repair image cache", "org.mycore.services.imaging.MCRImgCacheCommands.repairCache",
                 "The command repair the image cache. This is clearing the complete image cache and rebuild it. Caution this will take a lot of time!");
-        command.add(com);
+        command.add(com);*/
+
+        /*com = new MCRCommand("fake image cache", "org.mycore.services.imaging.MCRImgCacheCommands.fakeCache", "Fake don't use it!");
+        command.add(com);*/
     }
+    // for tests only
+    /*public static final void fakeCache() {
+        for (int i = 0; i <= 3; i++) {
+            new MCRDirectory(MCRImgCacheManager.CACHE_FOLDER, MCRImgCacheManager.CACHE_FOLDER);
+        }
+    }*/
 
-    public static final void repairCache() {
-        MCRXMLTableManager xmlTableManager = MCRXMLTableManager.instance();
-        List derivateList = xmlTableManager.retrieveAllIDs("derivate");
-
+    /*public static final void repairCache() {
         try {
             clearCache();
-            
-            for (Iterator it = derivateList.iterator(); it.hasNext();){
-                String derivateID = (String)it.next();
-                LOGGER.info("Caching Derivate " + derivateID);
-                cacheDeriv(derivateID);
-            }
-            
+            MCRHIBConnection.instance().flushSession();
+
+            createCache();
+
         } catch (MCRException ex) {
             LOGGER.error(ex.getMessage());
             LOGGER.error("");
         } catch (Exception e) {
             e.printStackTrace();
         }
-        LOGGER.info("\n Repairing image cache completed successfull!\n");
+        LOGGER.info("\n\n Repairing image cache completed successfull!\n");
+    }*/
+
+    public static final void createCache() {
+        MCRXMLTableManager xmlTableManager = MCRXMLTableManager.instance();
+        List derivateList = xmlTableManager.retrieveAllIDs("derivate");
+
+        try {
+            for (Iterator it = derivateList.iterator(); it.hasNext();) {
+                String derivateID = (String) it.next();
+                LOGGER.info("Caching Derivate " + derivateID);
+                cacheDeriv(derivateID);
+            }
+
+        } catch (MCRException ex) {
+            LOGGER.error(ex.getMessage());
+            LOGGER.error("");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        LOGGER.info("\n\n Creating image cache for all derivates completed successfull!\n");
     }
-    
+
     public static void clearCache() throws Exception {
         MCRDirectory dir = (MCRDirectory) MCRFilesystemNode.getRootNode(MCRImgCacheManager.CACHE_FOLDER);
+        
+        if (dir == null){
+            LOGGER.debug("Dir NULL.");
+        }
 
         while (dir != null) {
             try {
+                LOGGER.debug("Try deleting cache folder.");
                 dir.delete();
+                MCRHIBConnection.instance().flushSession();
                 dir = (MCRDirectory) MCRFilesystemNode.getRootNode(MCRImgCacheManager.CACHE_FOLDER);
             } catch (Exception e) {
                 LOGGER.info("Maybe inconsistency of image cache! Try to clean up.");
