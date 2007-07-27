@@ -22,191 +22,190 @@ import org.mycore.datamodel.ifs.MCRFile;
 
 public class MCRImgService {
 
-	public final int THUMBNAIL = 0;
+    public final int THUMBNAIL = 0;
 
-	public final int IMAGE = 1;
+    public final int IMAGE = 1;
 
-	protected float scaleFactor = 0.0F;
+    protected float scaleFactor = 0.0F;
 
-	protected boolean USE_CACHE = false;
+    protected boolean USE_CACHE = false;
 
-	protected int format = -1;
-	
-	private static Logger LOGGER = Logger.getLogger(MCRImgService.class.getName());
+    protected int format = -1;
 
-	public MCRImgService() {
-		MCRConfiguration config = MCRConfiguration.instance();
-		USE_CACHE = (new Boolean(config.getString("MCR.Module-iview.useCache"))).booleanValue();
-	}
+    private static Logger LOGGER = Logger.getLogger(MCRImgService.class.getName());
 
-	// Image getter methods
+    public MCRImgService() {
+        MCRConfiguration config = MCRConfiguration.instance();
+        USE_CACHE = (new Boolean(config.getString("MCR.Module-iview.useCache"))).booleanValue();
+    }
 
-	// fit to Width x Heigth, even Thumbnail
-	public void getImage(MCRFile image, int newWidth, int newHeight, OutputStream output) throws IOException {
-		MCRConfiguration config = MCRConfiguration.instance();
-		ImgProcessor processor = new MCRImgProcessor();
-		float jpegQuality = java.lang.Float.parseFloat(config.getString("MCR.Module-iview.jpegQuality"));
-		processor.setJpegQuality(jpegQuality);
-		
-		String filename = image.getName();
+    // Image getter methods
 
-		boolean outputFilled = false;
-		float scaleHelp = 1;
+    // fit to Width x Heigth, even Thumbnail
+    public void getImage(MCRFile image, int newWidth, int newHeight, OutputStream output) throws IOException {
+        MCRConfiguration config = MCRConfiguration.instance();
+        ImgProcessor processor = new MCRImgProcessor();
+        float jpegQuality = java.lang.Float.parseFloat(config.getString("MCR.Module-iview.jpegQuality"));
+        processor.setJpegQuality(jpegQuality);
 
-		try {
-			if (image.getAdditionalData("ImageMetaData") == null) {
-				LOGGER.debug("*********************************");
-				LOGGER.debug("* MCRImgService create Add-Data *");
-				LOGGER.debug("*********************************");
-				MCRImgCacheCommands.cacheFile(image, true);
-			}
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (JDOMException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+        String filename = image.getName();
 
-		if (USE_CACHE) {
-			LOGGER.debug("*********************************************");
-			LOGGER.debug("* Get " + filename + " Width x Height - use Cache");
-			LOGGER.debug("*********************************************");
+        boolean outputFilled = false;
+        float scaleHelp = 1;
 
-			CacheManager cache = MCRImgCacheManager.instance();
-			
-			InputStream input = null;
+        try {
+            if (image.getAdditionalData("ImageMetaData") == null) {
+                LOGGER.debug("*********************************");
+                LOGGER.debug("* MCRImgService create Add-Data *");
+                LOGGER.debug("*********************************");
+                MCRImgCacheCommands.cacheFile(image, true);
+            }
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (JDOMException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
 
-			int thumbWidth = Integer.parseInt(config.getString("MCR.Module-iview.thumbnail.size.width"));
-			int thumbHeight = Integer.parseInt(config.getString("MCR.Module-iview.thumbnail.size.height"));
+        if (USE_CACHE) {
+            LOGGER.debug("*********************************************");
+            LOGGER.debug("* Get " + filename + " Width x Height - use Cache");
+            LOGGER.debug("*********************************************");
 
-			int origWidth = cache.getImgWidth(image);
-			int origHeight = cache.getImgHeight(image);
+            CacheManager cache = MCRImgCacheManager.instance();
 
-			int cacheWidth = Integer.parseInt(config.getString("MCR.Module-iview.cache.size.width"));
-			int cacheHeight = Integer.parseInt(config.getString("MCR.Module-iview.cache.size.height"));
+            InputStream input = null;
 
-			float scaleHelpW = (float) cacheWidth / (float) origWidth;
-			float scaleHelpH = (float) cacheHeight / (float) origHeight;
+            int thumbWidth = Integer.parseInt(config.getString("MCR.Module-iview.thumbnail.size.width"));
+            int thumbHeight = Integer.parseInt(config.getString("MCR.Module-iview.thumbnail.size.height"));
 
-			if (scaleHelpW > scaleHelpH) {
-				scaleHelp = scaleHelpH;
-				cacheWidth = (int) (cacheWidth * scaleHelp);
-			} else {
-				scaleHelp = scaleHelpW;
-				cacheHeight = (int) (cacheHeight * scaleHelp);
-			}
-			
-			if ((newWidth == thumbWidth || newHeight == thumbHeight) && cache.existInCache(image, MCRImgCacheManager.THUMB)) {
-				LOGGER.debug("*********************************************");
-				LOGGER.debug("* Get Thumbnail from ImgCache for " + filename);
-				LOGGER.debug("*********************************************");
+            int origWidth = cache.getImgWidth(image);
+            int origHeight = cache.getImgHeight(image);
 
-				cache.getImage(image, MCRImgCacheManager.THUMB, output);
-				outputFilled = true;
-//                newWidth <= cacheWidth && newHeight <= cacheHeight
-			} else if ((newWidth <= cacheWidth) && cache.existInCache(image, MCRImgCacheManager.CACHE)) {
-				LOGGER.debug("*********************************************");
-				LOGGER.debug("* Get Cache from ImgCache for " + filename);
-				LOGGER.debug("*********************************************");
+            int cacheWidth = Integer.parseInt(config.getString("MCR.Module-iview.cache.size.width"));
+            int cacheHeight = Integer.parseInt(config.getString("MCR.Module-iview.cache.size.height"));
 
-				// scaleFactor = scaleFactor / scalefactor;
+            float scaleHelpW = (float) cacheWidth / (float) origWidth;
+            float scaleHelpH = (float) cacheHeight / (float) origHeight;
 
-				// get the small cached version
-				input = cache.getImageAsInputStream(image, MCRImgCacheManager.CACHE);
-			} else if (cache.existInCache(image, MCRImgCacheManager.ORIG)) {
-				LOGGER.debug("*********************************************");
-				LOGGER.debug("* Get Orig from ImgCache for " + filename);
-				LOGGER.debug("*********************************************");
-				scaleHelp = 1;
-				input = cache.getImageAsInputStream(image, MCRImgCacheManager.ORIG);
+            if (scaleHelpW > scaleHelpH) {
+                scaleHelp = scaleHelpH;
+                cacheWidth = (int) (cacheWidth * scaleHelp);
+            } else {
+                scaleHelp = scaleHelpW;
+                cacheHeight = (int) (cacheHeight * scaleHelp);
+            }
 
-			} else {
-				LOGGER.debug("*********************************************");
-				LOGGER.debug("* Get Orig from IFS for " + filename);
-				LOGGER.debug("*********************************************");
-				input = image.getContentAsInputStream();
-			}
+            if ((newWidth == thumbWidth || newHeight == thumbHeight) && cache.existInCache(image, MCRImgCacheManager.THUMB)) {
+                LOGGER.debug("*********************************************");
+                LOGGER.debug("* Get Thumbnail from ImgCache for " + filename);
+                LOGGER.debug("*********************************************");
 
-			if (!outputFilled) {
-				processor.resize(input, newWidth, newHeight, output);
-			}
-		} else {
-			LOGGER.debug("*********************************************");
-			LOGGER.debug("* Get " + filename + " Width x Height - use Processor");
-			LOGGER.debug("*********************************************");
-			processor.resize(image.getContentAsInputStream(), newWidth, newHeight, output);
-		}
+                cache.getImage(image, MCRImgCacheManager.THUMB, output);
+                outputFilled = true;
+                // newWidth <= cacheWidth && newHeight <= cacheHeight
+            } else if ((newWidth <= cacheWidth) && cache.existInCache(image, MCRImgCacheManager.CACHE)) {
+                LOGGER.debug("*********************************************");
+                LOGGER.debug("* Get Cache from ImgCache for " + filename);
+                LOGGER.debug("*********************************************");
 
-		scaleFactor = processor.getScaleFactor() * scaleHelp;
-	}
+                // scaleFactor = scaleFactor / scalefactor;
 
-	// fitToWidth
-	public void getImage(MCRFile image, int xTopPos, int yTopPos, int boundWidth, int boundHeight, OutputStream output) throws IOException {
-//		CacheManager cache = new MCRImgCacheManager();
+                // get the small cached version
+                input = cache.getImageAsInputStream(image, MCRImgCacheManager.CACHE);
+            } else if (cache.existInCache(image, MCRImgCacheManager.ORIG)) {
+                LOGGER.debug("*********************************************");
+                LOGGER.debug("* Get Orig from ImgCache for " + filename);
+                LOGGER.debug("*********************************************");
+                scaleHelp = 1;
+                input = cache.getImageAsInputStream(image, MCRImgCacheManager.ORIG);
+
+            } else {
+                LOGGER.debug("*********************************************");
+                LOGGER.debug("* Get Orig from IFS for " + filename);
+                LOGGER.debug("*********************************************");
+                input = image.getContentAsInputStream();
+            }
+
+            if (!outputFilled) {
+                processor.resize(input, newWidth, newHeight, output);
+            }
+        } else {
+            LOGGER.debug("*********************************************");
+            LOGGER.debug("* Get " + filename + " Width x Height - use Processor");
+            LOGGER.debug("*********************************************");
+            processor.resize(image.getContentAsInputStream(), newWidth, newHeight, output);
+        }
+
+        scaleFactor = processor.getScaleFactor() * scaleHelp;
+    }
+
+    // fitToWidth
+    public void getImage(MCRFile image, int xTopPos, int yTopPos, int boundWidth, int boundHeight, OutputStream output) throws IOException {
+        // CacheManager cache = new MCRImgCacheManager();
         CacheManager cache = MCRImgCacheManager.instance();
-		int origWidth = cache.getImgWidth(image);
+        int origWidth = cache.getImgWidth(image);
         LOGGER.debug("getImage - fitToWidth # xTopPos: " + xTopPos);
         LOGGER.debug("getImage - fitToWidth # yTopPos: " + yTopPos);
         LOGGER.debug("getImage - fitToWidth # boundWidth: " + boundWidth);
         LOGGER.debug("getImage - fitToWidth # boundHeight: " + boundHeight);
 
-		getImage(image, xTopPos, yTopPos, boundWidth, boundHeight, (float) boundWidth / (float) origWidth, output);
-	}
+        getImage(image, xTopPos, yTopPos, boundWidth, boundHeight, (float) boundWidth / (float) origWidth, output);
+    }
 
-	public void getImage(MCRFile image, int xTopPos, int yTopPos, int boundWidth, int boundHeight, float scaleFactor, OutputStream output) throws IOException {
-		MCRConfiguration config = MCRConfiguration.instance();
-		ImgProcessor processor = new MCRImgProcessor();
-		float jpegQuality = java.lang.Float.parseFloat(config.getString("MCR.Module-iview.jpegQuality"));
-		processor.setJpegQuality(jpegQuality);
+    public void getImage(MCRFile image, int xTopPos, int yTopPos, int boundWidth, int boundHeight, float scaleFactor, OutputStream output) throws IOException {
+        MCRConfiguration config = MCRConfiguration.instance();
+        ImgProcessor processor = new MCRImgProcessor();
+        float jpegQuality = java.lang.Float.parseFloat(config.getString("MCR.Module-iview.jpegQuality"));
+        processor.setJpegQuality(jpegQuality);
 
-		LOGGER.debug("getImage - ROI # scaleFactor: " + scaleFactor);
+        LOGGER.debug("getImage - ROI # scaleFactor: " + scaleFactor);
         LOGGER.debug("getImage - ROI # xTopPos: " + xTopPos);
         LOGGER.debug("getImage - ROI # yTopPos: " + yTopPos);
         LOGGER.debug("getImage - ROI # boundWidth: " + boundWidth);
         LOGGER.debug("getImage - ROI # boundHeight: " + boundHeight);
-        
-		this.scaleFactor = scaleFactor;
 
-		try {
-			if (image.getAdditionalData("ImageMetaData") == null) {
-				MCRImgCacheCommands.cacheFile(image, true);
-			}
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (JDOMException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+        this.scaleFactor = scaleFactor;
 
-		if (USE_CACHE) {
+        try {
+            if (image.getAdditionalData("ImageMetaData") == null) {
+                MCRImgCacheCommands.cacheFile(image, true);
+            }
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (JDOMException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+        if (USE_CACHE) {
             LOGGER.debug("getImage - ROI using 'if (USE_CACHE)'");
-			CacheManager cache = MCRImgCacheManager.instance();
-			InputStream input = null;
+            CacheManager cache = MCRImgCacheManager.instance();
+            InputStream input = null;
 
-			int origWidth = cache.getImgWidth(image);
-			int origHeight = cache.getImgHeight(image);
-            
+            int origWidth = cache.getImgWidth(image);
+            int origHeight = cache.getImgHeight(image);
+
             LOGGER.debug("getImage - ROI # OrigWidth: " + origWidth);
             LOGGER.debug("getImage - ROI # OrigHeight: " + origHeight);
 
-			int resWidth = (int) (scaleFactor * origWidth);
-			int resHeight = (int) (scaleFactor * origHeight);
+            int resWidth = (int) (scaleFactor * origWidth);
+            int resHeight = (int) (scaleFactor * origHeight);
 
-			int cacheWidth = Integer.parseInt(config.getString("MCR.Module-iview.cache.size.width"));
-			int cacheHeight = Integer.parseInt(config.getString("MCR.Module-iview.cache.size.height"));
-            
-             xTopPos = (int) (xTopPos * scaleFactor);
-             yTopPos = (int) (yTopPos * scaleFactor);
+            int cacheWidth = Integer.parseInt(config.getString("MCR.Module-iview.cache.size.width"));
+            int cacheHeight = Integer.parseInt(config.getString("MCR.Module-iview.cache.size.height"));
 
-            
+            xTopPos = (int) (xTopPos * scaleFactor);
+            yTopPos = (int) (yTopPos * scaleFactor);
+
             if ((resWidth <= cacheWidth) && cache.existInCache(image, MCRImgCacheManager.CACHE)) {
                 LOGGER.debug("getImage - ROI # get Cache version");
 
@@ -220,35 +219,35 @@ public class MCRImgService {
                 xTopPos = (int) (xTopPos / scaleHelp);
                 yTopPos = (int) (yTopPos / scaleHelp);
 
-				// get the small cached version
-				input = cache.getImageAsInputStream(image, MCRImgCacheManager.CACHE);
-			} else if (cache.existInCache(image, MCRImgCacheManager.ORIG)) {
+                // get the small cached version
+                input = cache.getImageAsInputStream(image, MCRImgCacheManager.CACHE);
+            } else if (cache.existInCache(image, MCRImgCacheManager.ORIG)) {
                 LOGGER.debug("getImage - ROI # get orig version from Cache");
-               
-				// get the orig cached version
-				input = cache.getImageAsInputStream(image, MCRImgCacheManager.ORIG);
-			} else {
+
+                // get the orig cached version
+                input = cache.getImageAsInputStream(image, MCRImgCacheManager.ORIG);
+            } else {
                 LOGGER.debug("getImage - ROI # get orig version from IFS");
-                
-				//  get the orig version from IFS
-				input = image.getContentAsInputStream();
-			}
+
+                // get the orig version from IFS
+                input = image.getContentAsInputStream();
+            }
             LOGGER.debug("getImage - ROI # edited scaleFactor: " + scaleFactor);
             LOGGER.debug("getImage - ROI # edited xTopPos: " + xTopPos);
             LOGGER.debug("getImage - ROI # edited yTopPos: " + yTopPos);
             LOGGER.debug("getImage - ROI # edited boundWidth: " + boundWidth);
             LOGGER.debug("getImage - ROI # edited boundHeight: " + boundHeight);
-            
-            if (input != null) {
-				processor.scaleROI(input, xTopPos, yTopPos, boundWidth, boundHeight, scaleFactor, output);
-			}
-		} else {
-			processor.scaleROI(image.getContentAsInputStream(), xTopPos, yTopPos, boundWidth, boundHeight, scaleFactor, output);
-		}
-	}
 
-	public float getScaleFactor() {
-		return scaleFactor;
-	}
+            if (input != null) {
+                processor.scaleROI(input, xTopPos, yTopPos, boundWidth, boundHeight, scaleFactor, output);
+            }
+        } else {
+            processor.scaleROI(image.getContentAsInputStream(), xTopPos, yTopPos, boundWidth, boundHeight, scaleFactor, output);
+        }
+    }
+
+    public float getScaleFactor() {
+        return scaleFactor;
+    }
 
 }

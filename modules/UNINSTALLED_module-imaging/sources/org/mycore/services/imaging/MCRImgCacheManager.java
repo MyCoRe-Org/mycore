@@ -56,13 +56,13 @@ public class MCRImgCacheManager implements CacheManager {
     private Logger LOGGER = Logger.getLogger(MCRImgCacheManager.class.getName());
 
     protected static MCRDirectory cacheInIFS;
-    
+
     private static MCRImgCacheManager cacheManager;
-    
-    public static synchronized MCRImgCacheManager  instance(){
+
+    public static synchronized MCRImgCacheManager instance() {
         if (cacheManager == null)
             cacheManager = new MCRImgCacheManager();
-        
+
         return cacheManager;
     }
 
@@ -74,46 +74,42 @@ public class MCRImgCacheManager implements CacheManager {
             } catch (Exception e) {
                 throw new MCRException(e.getMessage());
             }
-            
+
     }
-    
-    public String listCacheDir(){
+
+    public String listCacheDir() {
         return listDir(cacheInIFS, null);
     }
-    
-    private String listDir(MCRDirectory dir, String tab){
+
+    private String listDir(MCRDirectory dir, String tab) {
         String dirStructure = "";
-        
+
         if (tab == null)
             tab = "";
-        
+
         dirStructure = tab + dir.getName() + "\n";
-        
-        for (MCRFilesystemNode child : dir.getChildren()){
-            if (child instanceof MCRDirectory){
-                dirStructure = dirStructure + listDir((MCRDirectory)child, "\t+-");
-            } else{
+
+        for (MCRFilesystemNode child : dir.getChildren()) {
+            if (child instanceof MCRDirectory) {
+                dirStructure = dirStructure + listDir((MCRDirectory) child, "\t+-");
+            } else {
                 dirStructure = dirStructure + "\t+-" + child.getName() + "\n";
             }
         }
         return dirStructure;
     }
 
-    /*private static synchronized void init() {
-        
-        // if ((cacheInIFS = MCRDirectory.getRootDirectory(CACHE_FOLDER)) ==
-        // null)
-        if ((cacheInIFS = (MCRDirectory) MCRFilesystemNode.getRootNode(CACHE_FOLDER)) == null)
-            try {
-                cacheInIFS = new MCRDirectory(CACHE_FOLDER, CACHE_FOLDER);
-            } catch (Exception e) {
-                throw new MCRException(e.getMessage());
-            }
-    }*/
+    /*
+     * private static synchronized void init() { // if ((cacheInIFS =
+     * MCRDirectory.getRootDirectory(CACHE_FOLDER)) == // null) if ((cacheInIFS =
+     * (MCRDirectory) MCRFilesystemNode.getRootNode(CACHE_FOLDER)) == null) try {
+     * cacheInIFS = new MCRDirectory(CACHE_FOLDER, CACHE_FOLDER); } catch
+     * (Exception e) { throw new MCRException(e.getMessage()); } }
+     */
 
     public void getImage(MCRFile image, String filename, OutputStream imageData) {
         MCRFilesystemNode cachedImg = cacheInIFS.getChildByPath(buildPath(image) + "/" + filename);
-        LOGGER.debug("Path in cache: " +  cachedImg.getAbsolutePath());
+        LOGGER.debug("Path in cache: " + cachedImg.getAbsolutePath());
 
         if (cachedImg != null && cachedImg instanceof MCRFile) {
             Stopwatch timer = new Stopwatch();
@@ -128,7 +124,7 @@ public class MCRImgCacheManager implements CacheManager {
 
     public InputStream getImageAsInputStream(MCRFile image, String filename) throws IOException {
         MCRFilesystemNode cachedImg = cacheInIFS.getChildByPath(buildPath(image) + "/" + filename);
-        LOGGER.debug("Path in cache: " +  cachedImg.getAbsolutePath());
+        LOGGER.debug("Path in cache: " + cachedImg.getAbsolutePath());
 
         if (cachedImg != null && cachedImg instanceof MCRFile) {
             LOGGER.debug("Return Image from Cache as InputStream.");
@@ -139,14 +135,14 @@ public class MCRImgCacheManager implements CacheManager {
         }
     }
 
-    public void  saveImage(MCRFile image, Dimension size, InputStream imageData) {
+    public void saveImage(MCRFile image, Dimension size, InputStream imageData) {
         saveImage(image, dimToString(size), imageData);
     }
 
     public synchronized void saveImage(MCRFile image, String filename, InputStream imageData) {
 
         MCRDirectory cachedImg = getCacheDir(image);
-        
+
         if (cachedImg == null)
             cachedImg = setCacheDir(image);
 
@@ -195,11 +191,10 @@ public class MCRImgCacheManager implements CacheManager {
     public boolean existInCache(MCRFile image, String filename) {
         MCRFilesystemNode cachedImg = cacheInIFS.getChildByPath(buildPath(image) + "/" + filename);
 
-        if (cachedImg != null && cachedImg instanceof MCRFile){
-            
+        if (cachedImg != null && cachedImg instanceof MCRFile) {
+
             return true;
-        }
-        else
+        } else
             return false;
     }
 
@@ -284,22 +279,21 @@ public class MCRImgCacheManager implements CacheManager {
         LOGGER.info("* Directory: " + (node instanceof MCRDirectory));
         LOGGER.info("****************************************");
 
-        if (node != null && node instanceof MCRDirectory){
+        if (node != null && node instanceof MCRDirectory) {
             cachedImg = (MCRDirectory) node;
             LOGGER.debug("Path in cache found: " + cachedImg.getAbsolutePath());
-        }
-        else{
-//            cachedImg = new MCRDirectory(path, cacheInIFS);
+        } else {
+            // cachedImg = new MCRDirectory(path, cacheInIFS);
             LOGGER.debug("No path in cache!" + path);
         }
         return cachedImg;
     }
-    
-    private MCRDirectory setCacheDir(MCRFile image){
+
+    private MCRDirectory setCacheDir(MCRFile image) {
         String path = buildPath(image);
         MCRDirectory dir = new MCRDirectory(path, cacheInIFS);
         MCRHIBConnection.instance().flushSession();
-        
+
         return dir;
     }
 

@@ -44,53 +44,54 @@ public class MCRImgCacheCommands extends MCRAbstractCommands {
         command.add(com);
 
         com = new MCRCommand("create image cache for file {0}", "org.mycore.services.imaging.MCRImgCacheCommands.cacheFile String",
-                "The command create the image cache version for the given File.");
+                        "The command create the image cache version for the given File.");
         command.add(com);
 
         com = new MCRCommand("remove image cache for file {0}", "org.mycore.services.imaging.MCRImgCacheCommands.removeCachedFile String",
-                "The command remove the image cache version for the given File.");
+                        "The command remove the image cache version for the given File.");
         command.add(com);
 
         com = new MCRCommand("create image cache for derivate {0}", "org.mycore.services.imaging.MCRImgCacheCommands.cacheDeriv String",
-                "The command create the image cache version for the given Derivate.");
+                        "The command create the image cache version for the given Derivate.");
         command.add(com);
         com = new MCRCommand("create image cache for all derivates", "org.mycore.services.imaging.MCRImgCacheCommands.createCache",
-                "The command create the the complete image cache for all derivates in the MyCore System. Caution this will take a lot of time!");
+                        "The command create the the complete image cache for all derivates in the MyCore System. Caution this will take a lot of time!");
         command.add(com);
 
         com = new MCRCommand("remove image cache for derivate {0}", "org.mycore.services.imaging.MCRImgCacheCommands.removeCachedDeriv String",
-                "The command remove the image cache version for the given Derivate.");
+                        "The command remove the image cache version for the given Derivate.");
         command.add(com);
 
-        /*com = new MCRCommand("repair image cache", "org.mycore.services.imaging.MCRImgCacheCommands.repairCache",
-                "The command repair the image cache. This is clearing the complete image cache and rebuild it. Caution this will take a lot of time!");
-        command.add(com);*/
+        /*
+         * com = new MCRCommand("repair image cache",
+         * "org.mycore.services.imaging.MCRImgCacheCommands.repairCache", "The
+         * command repair the image cache. This is clearing the complete image
+         * cache and rebuild it. Caution this will take a lot of time!");
+         * command.add(com);
+         */
 
-        /*com = new MCRCommand("fake image cache", "org.mycore.services.imaging.MCRImgCacheCommands.fakeCache", "Fake don't use it!");
-        command.add(com);*/
+        /*
+         * com = new MCRCommand("fake image cache",
+         * "org.mycore.services.imaging.MCRImgCacheCommands.fakeCache", "Fake
+         * don't use it!"); command.add(com);
+         */
     }
+
     // for tests only
-    /*public static final void fakeCache() {
-        for (int i = 0; i <= 3; i++) {
-            new MCRDirectory(MCRImgCacheManager.CACHE_FOLDER, MCRImgCacheManager.CACHE_FOLDER);
-        }
-    }*/
+    /*
+     * public static final void fakeCache() { for (int i = 0; i <= 3; i++) { new
+     * MCRDirectory(MCRImgCacheManager.CACHE_FOLDER,
+     * MCRImgCacheManager.CACHE_FOLDER); } }
+     */
 
-    /*public static final void repairCache() {
-        try {
-            clearCache();
-            MCRHIBConnection.instance().flushSession();
-
-            createCache();
-
-        } catch (MCRException ex) {
-            LOGGER.error(ex.getMessage());
-            LOGGER.error("");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        LOGGER.info("\n\n Repairing image cache completed successfull!\n");
-    }*/
+    /*
+     * public static final void repairCache() { try { clearCache();
+     * MCRHIBConnection.instance().flushSession();
+     * 
+     * createCache(); } catch (MCRException ex) { LOGGER.error(ex.getMessage());
+     * LOGGER.error(""); } catch (Exception e) { e.printStackTrace(); }
+     * LOGGER.info("\n\n Repairing image cache completed successfull!\n"); }
+     */
 
     public static final void createCache() {
         MCRXMLTableManager xmlTableManager = MCRXMLTableManager.instance();
@@ -114,8 +115,8 @@ public class MCRImgCacheCommands extends MCRAbstractCommands {
 
     public static void clearCache() throws Exception {
         MCRDirectory dir = (MCRDirectory) MCRFilesystemNode.getRootNode(MCRImgCacheManager.CACHE_FOLDER);
-        
-        if (dir == null){
+
+        if (dir == null) {
             LOGGER.debug("Dir NULL.");
         }
 
@@ -130,7 +131,7 @@ public class MCRImgCacheCommands extends MCRAbstractCommands {
                 Session dbSession = MCRHIBConnection.instance().getSession();
 
                 int deletedEntities = dbSession.createQuery("delete from MCRFSNODES node where node.owner = :owner").setString("owner",
-                        MCRImgCacheManager.CACHE_FOLDER).executeUpdate();
+                                MCRImgCacheManager.CACHE_FOLDER).executeUpdate();
                 dir = (MCRDirectory) MCRFilesystemNode.getRootNode(MCRImgCacheManager.CACHE_FOLDER);
 
                 if (dir != null) {
