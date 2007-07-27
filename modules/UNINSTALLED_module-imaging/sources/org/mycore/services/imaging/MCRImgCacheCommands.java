@@ -40,15 +40,15 @@ public class MCRImgCacheCommands extends MCRAbstractCommands {
         super();
         MCRCommand com = null;
 
-        com = new MCRCommand("clear image cache", "org.mycore.services.imaging.MCRImgCacheCommands.clearCache", "The command clear the image cache.");
+        com = new MCRCommand("delete image cache for all derivates", "org.mycore.services.imaging.MCRImgCacheCommands.deleteCache", "The command deletes the whole image cache.");
         command.add(com);
 
         com = new MCRCommand("create image cache for file {0}", "org.mycore.services.imaging.MCRImgCacheCommands.cacheFile String",
                         "The command create the image cache version for the given File.");
         command.add(com);
 
-        com = new MCRCommand("remove image cache for file {0}", "org.mycore.services.imaging.MCRImgCacheCommands.removeCachedFile String",
-                        "The command remove the image cache version for the given File.");
+        com = new MCRCommand("delete image cache for file {0}", "org.mycore.services.imaging.MCRImgCacheCommands.deleteCachedFile String",
+                        "The command delete the image cache version for the given File.");
         command.add(com);
 
         com = new MCRCommand("create image cache for derivate {0}", "org.mycore.services.imaging.MCRImgCacheCommands.cacheDeriv String",
@@ -58,8 +58,8 @@ public class MCRImgCacheCommands extends MCRAbstractCommands {
                         "The command create the the complete image cache for all derivates in the MyCore System. Caution this will take a lot of time!");
         command.add(com);
 
-        com = new MCRCommand("remove image cache for derivate {0}", "org.mycore.services.imaging.MCRImgCacheCommands.removeCachedDeriv String",
-                        "The command remove the image cache version for the given Derivate.");
+        com = new MCRCommand("delete image cache for derivate {0}", "org.mycore.services.imaging.MCRImgCacheCommands.deleteCachedDeriv String",
+                        "The command delete the image cache version for the given Derivate.");
         command.add(com);
 
         /*
@@ -113,7 +113,7 @@ public class MCRImgCacheCommands extends MCRAbstractCommands {
         LOGGER.info("\n\n Creating image cache for all derivates completed successfull!\n");
     }
 
-    public static void clearCache() throws Exception {
+    public static void deleteCache() throws Exception {
         MCRDirectory dir = (MCRDirectory) MCRFilesystemNode.getRootNode(MCRImgCacheManager.CACHE_FOLDER);
 
         if (dir == null) {
@@ -166,7 +166,7 @@ public class MCRImgCacheCommands extends MCRAbstractCommands {
         }
     }
 
-    public static void removeCachedDeriv(String ID) throws Exception {
+    public static void deleteCachedDeriv(String ID) throws Exception {
         List list = new Vector();
         MCRDirectory derivate = null;
         MCRConfiguration config = MCRConfiguration.instance();
@@ -191,7 +191,7 @@ public class MCRImgCacheCommands extends MCRAbstractCommands {
         }
     }
 
-    public static void removeCachedFile(String ID) throws Exception {
+    public static void deleteCachedFile(String ID) throws Exception {
         List list = new Vector();
         MCRFile imgFile = null;
         MCRConfiguration config = MCRConfiguration.instance();

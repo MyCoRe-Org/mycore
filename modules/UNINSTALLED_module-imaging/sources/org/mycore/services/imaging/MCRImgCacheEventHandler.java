@@ -59,7 +59,7 @@ public class MCRImgCacheEventHandler extends MCREventHandlerBase {
         MCRImgCacheManager imgCache = MCRImgCacheManager.instance();
         if (imgCache.existInCache(file)) {
             try {
-                MCRImgCacheCommands.removeCachedFile(file.getID());
+                MCRImgCacheCommands.deleteCachedFile(file.getID());
             } catch (Exception e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
