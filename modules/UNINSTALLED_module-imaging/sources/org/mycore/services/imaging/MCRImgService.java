@@ -208,11 +208,8 @@ public class MCRImgService {
 
             if ((resWidth <= cacheWidth) && cache.existInCache(image, MCRImgCacheManager.CACHE)) {
                 LOGGER.debug("getImage - ROI # get Cache version");
-
-                float scaleHelpW = (float) cacheWidth / (float) origWidth;
-                float scaleHelpH = (float) cacheHeight / (float) origHeight;
-
-                float scaleHelp = (scaleHelpW > scaleHelpH) ? scaleHelpH : scaleHelpW;
+                
+                float scaleHelp = (float) cacheWidth / (float) origWidth;
 
                 scaleFactor = scaleFactor / scaleHelp;
 
