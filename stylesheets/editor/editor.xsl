@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
 <!-- ============================================== -->
-<!-- $Revision: 1.70 $ $Date: 2007-07-03 09:57:21 $ -->
+<!-- $Revision: 1.71 $ $Date: 2007-07-31 13:39:42 $ -->
 <!-- ============================================== --> 
 
 <xsl:stylesheet 
@@ -1236,8 +1236,10 @@
       <xsl:attribute name="disabled">disabled</xsl:attribute>
     </xsl:if>
     
+    <xsl:variable name="vars" select="ancestor::editor/input/var[(@name=$var) or starts-with(@name,concat($var,'['))]" />
+    
     <xsl:apply-templates select="item" mode="editor.list">
-      <xsl:with-param name="var"     select="$var"     />
+      <xsl:with-param name="vars"    select="$vars"   />
       <xsl:with-param name="default" select="$default" />
     </xsl:apply-templates>
   </select>
@@ -1266,14 +1268,14 @@
 
 <!-- ======== html select list option ======== -->
 <xsl:template match="item" mode="editor.list">
-  <xsl:param name="var"     />
+  <xsl:param name="vars"     />
   <xsl:param name="default" />
   <xsl:param name="indent" select="''"/>
 
   <option value="{@value}">
   
     <xsl:choose>
-      <xsl:when test="ancestor::editor/input/var[((@name=$var) or starts-with(@name,concat($var,'['))) and (@value=current()/@value)]">
+      <xsl:when test="$vars[@value=current()/@value]">
         <xsl:attribute name="selected">selected</xsl:attribute>
       </xsl:when>
       <xsl:when test="$default=current()/@value">
@@ -1287,9 +1289,9 @@
 
   <!-- ======== handle nested items ======== -->
   <xsl:apply-templates select="item" mode="editor.list">
-    <xsl:with-param name="var"     select="$var"     />
+    <xsl:with-param name="vars"    select="$vars"    />
     <xsl:with-param name="default" select="$default" />
-    <xsl:with-param name="indent" select="concat($editor.list.indent,$indent)" />
+    <xsl:with-param name="indent"  select="concat($editor.list.indent,$indent)" />
   </xsl:apply-templates>
 </xsl:template>
 
