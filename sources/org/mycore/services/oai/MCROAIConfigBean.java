@@ -18,9 +18,9 @@ public class MCROAIConfigBean {
 	//	 you can define for each instance of your application a special restriction
 	private String queryRestriction;
 	//	 searchfields from searchfields.xml relevant for oai list set
-	private List searchFields;
+	private List searchFields = new ArrayList();
 	//	 classificationID relevant for the oai list set
-	private String[] classificationIDs;
+	private String[] classificationIDs=new String[]{};
 
 	public MCROAIConfigBean(String instance) {
     	this.oaiInstanceName = instance;
@@ -28,22 +28,25 @@ public class MCROAIConfigBean {
     	if(!restriction.equals("")) {
     		this.queryRestriction = restriction;
     	}
-    	String[] searchFieldsAr = config.getString("MCR.OAI.Setscheme.Searchfields." + instance,"format,type").replaceAll(" ","").split(",");
-    	this.searchFields = Arrays.asList(searchFieldsAr);
-    	List<String> lstClassificationIDs = new ArrayList<String>();
-    	for(int i=0;i<searchFieldsAr.length;i++){
-    		String[] classIDs = config.getString("MCR.OAI.Setscheme.Classids." + instance+"."+searchFieldsAr[i]).replaceAll(" ","").split(",");
-    		for(int j=0;j<classIDs.length;j++){
-    			lstClassificationIDs.add(classIDs[j]);
-    		}
-    	}   	
-    	this.classificationIDs =(String[]) lstClassificationIDs.toArray(new String[]{});
+    	String s = config.getString("MCR.OAI.Setscheme.Searchfields." + instance,"").replaceAll(" ","");
+    	if(s.length()>0){
+    		String[] searchFieldsAr = s.split(",");
+    		this.searchFields = Arrays.asList(searchFieldsAr);
+    		List<String> lstClassificationIDs = new ArrayList<String>();
+    		for(int i=0;i<searchFieldsAr.length;i++){
+    			String[] classIDs = config.getString("MCR.OAI.Setscheme.Classids." + instance+"."+searchFieldsAr[i]).replaceAll(" ","").split(",");
+    			for(int j=0;j<classIDs.length;j++){
+    				lstClassificationIDs.add(classIDs[j]);
+    			}
+    		}   	
+    		this.classificationIDs =(String[]) lstClassificationIDs.toArray(new String[]{});
     	
-    	if(this.classificationIDs.length == 0){
-    		logger.error("no classification entry found in MCR.OAI.Setscheme.Classids." + instance);
-    		this.classificationIDs = new String[2];
-    		this.classificationIDs[0] = "DocPortal_class_00000006" ;
-    		this.classificationIDs[0] = "DocPortal_class_00000005" ;
+    		if(this.classificationIDs.length == 0){
+    			logger.error("no classification entry found in MCR.OAI.Setscheme.Classids." + instance);
+    			this.classificationIDs = new String[2];
+    			this.classificationIDs[0] = "DocPortal_class_00000006" ;
+    			this.classificationIDs[1] = "DocPortal_class_00000005" ;
+    		}
     	}
     	this.repositoryIdentifier = config.getString("MCR.OAI.Repository.Identifier." + instance,"oai.mycore.de");
     	this.repositoryName = config.getString("MCR.OAI.Repository.Name." + instance,"MyCoRe Repository fuer Online Hochschulschriften");

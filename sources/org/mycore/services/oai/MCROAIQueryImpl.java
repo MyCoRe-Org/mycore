@@ -251,12 +251,14 @@ public class MCROAIQueryImpl implements MCROAIQuery {
         for (Iterator it = searchFields.iterator(); it.hasNext();) {
             String searchField = (String) it.next();
             MCRFieldDef field = MCRFieldDef.getDef(searchField);
-            if (set == null) {
-                cOr.addChild(new MCRQueryCondition(field, "like", ""));
-            } else {
-                String categoryId = set[0].substring(set[0].lastIndexOf(':') + 1);
-                cOr.addChild(new MCRQueryCondition(field, "like", categoryId));
-                generateQueryForDiniLabels(cOr, searchField, set[0], instance);
+            if(field!=null){
+            	if (set == null) {
+            		cOr.addChild(new MCRQueryCondition(field, "like", ""));
+            	} else {
+            		String categoryId = set[0].substring(set[0].lastIndexOf(':') + 1);
+            		cOr.addChild(new MCRQueryCondition(field, "like", categoryId));
+            		generateQueryForDiniLabels(cOr, searchField, set[0], instance);
+            	}
             }
         }
         if ((cOr.getChildren() != null) && (cOr.getChildren().size() > 0)) {
