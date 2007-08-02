@@ -28,6 +28,8 @@ import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 
+import com.ibm.icu.text.Normalizer;
+
 /**
  * This class implements only static methods to normalize text values. Rules
  * written as x&gt;u .You can configure this normalization with two property
@@ -46,8 +48,8 @@ import org.apache.log4j.Logger;
 public class MCRNormalizer {
     static Logger logger = Logger.getLogger(MCRNormalizer.class);
     
-    /** List of characters that will be replaced */                                                                   /* small u with ring small c with caron  small thorn */ 
-    private static String rules = "ä>ae ö>oe ü>ue ß>ss à>a á>a â>a å>a è>e é>e ê>e ì>i í>i î>i ò>o ó>o ô>o ù>u ú>u û>u \uc5af>u \uc48d>c š>s Þ>th";
+    /** List of characters that will be replaced */                                                         
+    private static String rules = "ä>ae ö>oe ü>ue ß>ss à>a á>a â>a è>e é>e ê>e ì>i í>i î>i ò>o ó>o ô>o ù>u ú>u û>u";
 
     private static Pattern[] patterns;
 
@@ -60,6 +62,8 @@ public class MCRNormalizer {
     private static String addRule = config.getString("MCR.Metadata.Normalize.AddRule", "");
 
     private static String setRule = config.getString("MCR.Metadata.Normalize.SetRule", "");
+    
+    private static String diacriticRule = config.getString("MCR.Metadata.Normalize.DiacriticRule", "");
 
     static {
         if ((setRule != null) && (setRule.trim().length() != 0)) {
@@ -92,7 +96,40 @@ public class MCRNormalizer {
      * @return the normalized String in lower case.
      */
     public static final String normalizeString(String in) {
-        return normalizeString(in, normalize);
+
+      // replace letters with diacritics with therr corresponding letter 
+      // lower letter umlat a is replaces with a
+      if ( diacriticRule.equals("true"))
+      {
+        in = Normalizer.decompose(in, false);
+      
+        String[]  dia = {
+            "\u0301", // &amp;#769;  (0xcc 0x81 = 204 129) COMBINING ACUTE ACCENT
+            "\u0300", // &amp;#768;  (0xcc 0x80 = 204 128) COMBINING GRAVE ACCENT
+            "\u0302", // &amp;#770;  (0xcc 0x82 = 204 130) COMBINING CIRCUMFLEX ACCENT
+            "\u0307", // &amp;#775;  (0xcc 0x87 = 204 135) COMBINING DOT ABOVE
+            "\u0308", // &amp;#776;  (0xcc 0x88 = 204 136) COMBINING DIAERESIS
+            "\u0306", // &amp;#774;  (0xcc 0x86 = 204 134) COMBINING BREVE
+            "\u030B", // &amp;#779;  (0xcc 0x8b = 204 139) COMBINING DOUBLE ACUTE ACCENT
+            "\u030C", // &amp;#780;  (0xcc 0x8c = 204 140) COMBINING CARON  (Hacek)
+            "\u030A", // &amp;#778;  (0xcc 0x8a = 204 138) COMBINING RING ABOVE
+            "\u0304", // &amp;#772;  (0xcc 0x84 = 204 132) COMBINING MACRON
+            "\u032E", // &amp;#814;  (0xcc 0xae = 204 174) COMBINING BREVE BELOW
+            "\u0328", // &amp;#808;  (0xcc 0xa8 = 204 168) COMBINING OGONEK
+            "\u0327", // &amp;#807;  (0xcc 0xa7 = 204 167) COMBINING CEDILLA
+            "\u0323", // &amp;#803;  (0xcc 0xa3 = 204 163) COMBINING DOT BELOW
+            "\u0338", // &amp;#824;  (0xcc 0xb8 = 204 184) COMBINING LONG SOLIDUS OVERLAY
+            "\u0336", // &amp;#822;  (0xcc 0xb6 = 204 182) COMBINING LONG STROKE OVERLAY
+            "\u0332", // &amp;#818;  (0xcc 0xb2 = 204 178) COMBINING LOW LINE
+            "\u0303"};// &amp;#771;  (0xcc 0x83 = 204 131) COMBINING TILDE
+
+        for (int i=0; i<dia.length; i++)
+        {
+          in = MCRUtils.replaceString(in, dia[i] , "");
+        }
+      }
+      
+      return normalizeString(in, normalize);
     }
 
     public static final String normalizeString(String in, boolean reallyNormalize) {
