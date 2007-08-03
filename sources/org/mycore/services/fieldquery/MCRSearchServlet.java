@@ -287,7 +287,30 @@ public class MCRSearchServlet extends MCRServlet {
         }
 
         org.jdom.Element root = input.getRootElement();
-        MCRCondition cond = null;
+        MCRCondition cond =  cleanupQuery(input);
+
+        // Execute query
+        MCRResults result = MCRQueryManager.search(MCRQuery.parseXML(input));
+
+        String npp = root.getAttributeValue("numPerPage", "0");
+
+        // Store query and results in cache
+        new MCRCachedQueryData( result, clonedQuery, cond );
+
+        // Redirect browser to first results page
+        sendRedirect(request, response, result.getID(), npp);
+    }
+    
+    /**
+     * cleans the query
+     * e.g. renames condition elements and removes empty condition elements
+     * @param input - the jdom-Document containing the query, which has to be modified
+     * @returns the cleaned condition
+     * 
+     */
+    protected MCRCondition cleanupQuery(Document input){
+    	org.jdom.Element root = input.getRootElement();
+    	MCRCondition cond = null;
 
         if (root.getChild("conditions").getAttributeValue("format", "xml").equals("xml")) {
             // Query is in XML format
@@ -339,17 +362,11 @@ public class MCRSearchServlet extends MCRServlet {
             if (sortBy.getChildren().size() == 0)
                 sortBy.detach();
         }
-
-        // Execute query
-        MCRResults result = MCRQueryManager.search(MCRQuery.parseXML(input));
-
-        String npp = root.getAttributeValue("numPerPage", "0");
-
-        // Store query and results in cache
-        new MCRCachedQueryData( result, clonedQuery, cond );
-
-        // Redirect browser to first results page
-        sendRedirect(request, response, result.getID(), npp);
+        return cond;
+    	
+    	
+    	
+    	
     }
 
    /**
