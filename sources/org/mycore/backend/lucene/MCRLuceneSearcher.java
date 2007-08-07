@@ -39,7 +39,7 @@ import org.apache.log4j.Logger;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.PerFieldAnalyzerWrapper;
 import org.apache.lucene.analysis.de.GermanAnalyzer;
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
+import org.apache.lucene.analysis.SimpleAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.index.IndexModifier;
@@ -143,13 +143,13 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
         } catch (Exception e) {
             throw new MCRException("Cannot start IndexModifier thread.", e);
         }
-        // should work like GermanAnalyzer without stemming
-        StandardAnalyzer standardAnalyzer = new StandardAnalyzer();
+        // should work like GermanAnalyzer without stemming and removing of stopwords
+        SimpleAnalyzer simpleAnalyzer = new SimpleAnalyzer();
         List fds = MCRFieldDef.getFieldDefs(getIndex());
         for (int i = 0; i < fds.size(); i++) {
             MCRFieldDef fd = (MCRFieldDef) (fds.get(i));
             if ("name".equals(fd.getDataType())) {
-                ((PerFieldAnalyzerWrapper) analyzer).addAnalyzer(fd.getName(), standardAnalyzer);
+                ((PerFieldAnalyzerWrapper) analyzer).addAnalyzer(fd.getName(), simpleAnalyzer);
             }
         }
         MCRShutdownHandler.getInstance().addCloseable(this);
