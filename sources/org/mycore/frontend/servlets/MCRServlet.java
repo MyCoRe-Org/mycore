@@ -278,7 +278,14 @@ public class MCRServlet extends HttpServlet {
             }
             if (getProperty(req, INITIAL_SERVLET_NAME_KEY).equals(getServletName())) {
                 // current Servlet not called via RequestDispatcher
-                if( tx != null ) tx.commit();
+                try {
+                    if( tx != null ) tx.commit();
+                } catch (RuntimeException e) {
+                    MCRHIBConnection.instance().getSession().close();
+                    tx = MCRHIBConnection.instance().getSession().beginTransaction();
+                    generateErrorPage(req, res, 500, e.getMessage(), e, false);
+                    tx.commit();
+                }
             }
         } catch (Exception ex) {
             if (getProperty(req, INITIAL_SERVLET_NAME_KEY).equals(getServletName())) {
