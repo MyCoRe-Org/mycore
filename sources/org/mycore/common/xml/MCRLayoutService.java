@@ -29,10 +29,14 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
+import java.util.StringTokenizer;
+import java.util.TooManyListenersException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -49,6 +53,14 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
 import org.apache.log4j.Logger;
+import org.apache.xalan.templates.ElemTemplate;
+import org.apache.xalan.templates.ElemTemplateElement;
+import org.apache.xalan.trace.GenerateEvent;
+import org.apache.xalan.trace.PrintTraceListener;
+import org.apache.xalan.trace.SelectionEvent;
+import org.apache.xalan.trace.TraceListener;
+import org.apache.xalan.trace.TraceManager;
+import org.apache.xalan.trace.TracerEvent;
 
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRConfiguration;
@@ -61,6 +73,8 @@ import org.mycore.common.MCRUtils;
 import org.mycore.datamodel.ifs.MCRContentInputStream;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.user.MCRUserMgr;
+import org.w3c.dom.Node;
+import org.xml.sax.SAXException;
 
 /**
  * Does the layout for other MyCoRe servlets by transforming XML input to
@@ -71,7 +85,7 @@ import org.mycore.user.MCRUserMgr;
  * 
  * @version $Revision$ $Date$
  */
-public class MCRLayoutService {
+public class MCRLayoutService implements org.apache.xalan.trace.TraceListener {
 
     /** A cache of already compiled stylesheets */
     private MCRCache STYLESHEETS_CACHE = new MCRCache(100, "XSLT Stylesheets");
@@ -392,7 +406,20 @@ public class MCRLayoutService {
      */
     private Transformer buildTransformer(Templates stylesheet) {
         try {
-            return factory.newTransformerHandler(stylesheet).getTransformer();
+            Transformer tf = factory.newTransformerHandler(stylesheet).getTransformer();
+            
+            // In debug mode, add a TraceListener to log stylesheet execution
+            if (LOGGER.isDebugEnabled()) {
+                try {
+                    TraceManager tm = ((org.apache.xalan.transformer.TransformerImpl) tf).getTraceManager();
+                    tm.addTraceListener(this);
+
+                } catch (Exception ex) {
+                    LOGGER.warn(ex);
+                }
+            }
+            
+            return tf;
         } catch (TransformerConfigurationException exc) {
             String msg = "Error while building XSL transformer: " + exc.getMessageAndLocation();
             throw new MCRConfigurationException(msg, exc);
@@ -451,5 +478,92 @@ public class MCRLayoutService {
         } finally {
             out.close();
         }
+    }
+    
+    /**
+     * Traces the execution of xsl stylesheet elements in debug mode. The trace is
+     * written to the log, and in parallel as comment elements to the output html.
+     */
+    public void trace(TracerEvent ev) {
+        ElemTemplateElement ete = ev.m_styleNode; // Current position in stylesheet
+
+        StringBuffer log = new StringBuffer();
+
+        // Find the name of the stylesheet file currently processed
+        try {
+            StringTokenizer st = new StringTokenizer(ete.getBaseIdentifier(), "/\\");
+            String stylesheet = null;
+            while (st.hasMoreTokens())
+                stylesheet = st.nextToken();
+            if (stylesheet != null)
+                log.append(" ").append(stylesheet);
+        } catch (Exception ignored) {
+        }
+
+        // Output current line number and column number
+        log.append(" line " + ete.getLineNumber() + " col " + ete.getColumnNumber());
+
+        // Find the name of the xsl:template currently processed
+        try {
+            ElemTemplate et = ev.m_processor.getCurrentTemplate();
+            log.append(" in <xsl:template");
+            if (et.getMatch() != null)
+                log.append(" match=\"" + et.getMatch().getPatternString() + "\"");
+            if (et.getName() != null)
+                log.append(" name=\"" + et.getName().getLocalName() + "\"");
+            if (et.getMode() != null)
+                log.append(" mode=\"" + et.getMode().getLocalName() + "\"");
+            log.append(">");
+        } catch (Exception ignored) {
+        }
+
+        // Output name of the xsl or html element currently processed
+        log.append(" " + ete.getTagName());
+        LOGGER.debug("Trace" + log.toString() );
+
+        // Output xpath of current xml source node in context
+        StringBuffer path = new StringBuffer();
+        Node node = ev.m_sourceNode;
+        if (node != null) {
+            path.append(node.getLocalName());
+            while ((node = node.getParentNode()) != null) {
+                path.insert(0, node.getLocalName() + "/");
+            }
+        }
+        if (path.length() > 0) {
+            LOGGER.debug("Source " + path.toString());
+        }
+        if (LOGGER.isDebugEnabled()) {
+            try {
+                ev.m_processor.getResultTreeHandler().comment(log.toString() + " ");
+                if (path.length() > 0) {
+                    ev.m_processor.getResultTreeHandler().comment(" source " + path.toString() + " ");
+                }
+            } catch (Exception ignored) {
+            }
+        }
+    }
+
+    /**
+     * When a stylesheet generates characters, they will be logged in debug
+     * mode.
+     */
+    public void generated(GenerateEvent ev) {
+        if (ev.m_eventtype == 12)
+            LOGGER.debug("Output " + new String(ev.m_characters, ev.m_start, ev.m_length).trim());
+    }
+
+    /**
+     * When a stylesheet does a selection, like in &lt;xsl:value-of /&gt; or similar elements,
+     * the selection element and xpath is logged in debug mode.
+     */
+    public void selected(SelectionEvent ev) {
+        String log = "Selection <xsl:" + ev.m_styleNode.getTagName() + " " + ev.m_attributeName + "=\"" + ev.m_xpath.getPatternString() + "\">";
+        LOGGER.debug(log);
+        if (LOGGER.isDebugEnabled())
+            try {
+                ev.m_processor.getResultTreeHandler().comment( " " + log + " " );
+            } catch (SAXException ignored) {
+            }
     }
 }
