@@ -566,9 +566,12 @@ public class MCRHIBUserStore implements MCRUserStore {
         // and delete the entries from the member lookup table
         for (int i = 0; i < oldUserIDs.size(); i++) {
             if (!newUserIDs.contains(oldUserIDs.get(i))) {
-                int deletedEntities = session.createQuery(
-                        "delete MCRGROUPMEMBERS where GID = '" + group.getID() + "' " + "and USERID ='" + (String) oldUserIDs.get(i) + "'").executeUpdate();
-                logger.info(deletedEntities + " groupmember-entries deleted");
+                List deleteEntities = session.createQuery(
+                        "from MCRGROUPMEMBERS where GID = '" + group.getID() + "' " + "and USERID ='" + (String) oldUserIDs.get(i) + "'").list();
+                for (Object o : deleteEntities) {
+                    session.delete(o);
+                }
+                logger.info(deleteEntities.size() + " groupmember-entries deleted");
             }
         }
     }
