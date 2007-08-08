@@ -26,14 +26,15 @@ package org.mycore.frontend.indexbrowser;
 import java.io.File;
 
 import org.jdom.Document;
-
-import org.mycore.common.xml.MCRXMLHelper;
-import org.mycore.frontend.servlets.MCRServlet;
-import org.mycore.frontend.servlets.MCRServletJob;
+import org.mycore.common.MCRUtils;
+import org.mycore.frontend.cli.MCRAbstractCommands;
+import org.mycore.frontend.cli.MCRCommand;
 
 /**
- * This class builds a google sitemap containing links to all documents. The
- * web.xml file should contain a mapping to /sitemap.xml See
+ * This class builds a google sitemap containing links to all documents and
+ * store them to the webapps directory. This can be configured with property
+ * variable MCR.GoogleSitemap.Directory. The web.xml file should contain a
+ * mapping to /sitemap.xml See
  * http://www.google.com/webmasters/sitemaps/docs/en/protocol.html
  * 
  * @author Frank Luetzenkirchen
@@ -41,30 +42,28 @@ import org.mycore.frontend.servlets.MCRServletJob;
  * @author Thomas Scheffler (yagee)
  * @version $Revision$ $Date$
  */
-public final class MCRGoogleSitemapServlet extends MCRServlet {
-
-    private static final long serialVersionUID = 1L;
+public final class MCRGoogleSitemapCommands extends MCRAbstractCommands {
 
     /**
-     * This method implement the doGetPost method of MCRServlet. It build a XML
-     * file for the Google search engine.
-     * 
-     * @param job
-     *            a MCRServletJob instance
+     * The empty constructor.
      */
-    public void doGetPost(MCRServletJob job) throws Exception {
-        String fn = MCRGoogleSitemapCommon.getFileName();
-        File fi = new File(fn);
-        Document jdom = null;
-        if (fi.isFile()) {
-            jdom = MCRXMLHelper.parseXML(fn);
-            if (jdom == null) {
-                jdom = MCRGoogleSitemapCommon.buildSitemap();
-            }
-        } else {
-            jdom = MCRGoogleSitemapCommon.buildSitemap();
-        }
-        // redirect Layout Servlet
-        getLayoutService().sendXML(job.getRequest(), job.getResponse(), jdom);
+    public MCRGoogleSitemapCommands() {
+        super();
+
+        MCRCommand com = null;
+
+        com = new MCRCommand("build google sitemap", "org.mycore.frontend.indexbrowser.MCRGoogleSitemapCommands.buildSitemap", "Create the google sitemap in the webapps directory.");
+        command.add(com);
     }
+
+    /**
+     * The build and store method.
+     */
+    public static final void buildSitemap() throws Exception{
+        String fn = MCRGoogleSitemapCommon.getFileName();
+        File xml = new File(fn);
+        Document jdom = MCRGoogleSitemapCommon.buildSitemap();
+        MCRUtils.writeJDOMToFile(jdom, xml);
+    }
+
 }
