@@ -165,7 +165,33 @@ public class MCRCategoryImpl extends MCRAbstractCategoryImpl implements Serializ
             LOGGER.debug("getposition called with no parent set.");
             return positionInParent;
         }
-        return parent.getChildren().indexOf(this);
+        try {
+            int position = parent.getChildren().indexOf(this);
+            if (position == -1) {
+                // sometimes indexOf does not find this instance so we need to
+                // check for the ID here to
+                position = 0;
+                for (MCRCategory sibling : parent.getChildren()) {
+                    if (sibling.getId().equals(getId()))
+                        return position;
+                    position++;
+                }
+                if (LOGGER.isDebugEnabled()) {
+                    StringBuilder sb = new StringBuilder("List of children of parent: ");
+                    sb.append(parent.getId()).append('\n');
+                    for (MCRCategory sibling : parent.getChildren()) {
+                        sb.append(sibling.getId()).append('\n');
+                    }
+                    LOGGER.debug(sb.toString());
+
+                }
+                throw new IndexOutOfBoundsException("Position -1 is not valid.");
+            }
+            return position;
+        } catch (RuntimeException e) {
+            LOGGER.error("Cannot use parent.getChildren() here", e);
+            throw e;
+        }
     }
 
     /**
