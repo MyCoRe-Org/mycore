@@ -189,7 +189,7 @@ public class MCRCategoryTransformer {
         static Document getDocument(MCRCategory cl, String labelFormat, boolean sort) {
             Document cd = new Document(new Element("items"));
             Map<MCRCategoryID, Number> countMap = null;
-            if (ID_PATTERN.matcher(labelFormat).find()) {
+            if (COUNT_PATTERN.matcher(labelFormat).find()) {
                 countMap = MCRCategLinkServiceFactory.getInstance().countLinks(getAllCategIDs(cl));
             }
             for (MCRCategory category : cl.getChildren()) {
