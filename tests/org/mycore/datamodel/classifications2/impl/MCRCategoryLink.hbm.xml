@@ -7,11 +7,13 @@
     <id name="id" access="field">
       <generator class="native" />
     </id>
-    <many-to-one name="category" class="MCRCategoryImpl" cascade="none" />
-    <component name="objectReference">
-      <property name="objectID" access="field"/>
-      <property name="type" column="objectType" access="field"/>
-    </component>
+    <natural-id mutable="true">
+      <many-to-one name="category" class="MCRCategoryImpl" cascade="none" />
+      <component name="objectReference">
+        <property name="objectID" access="field" />
+        <property name="type" column="objectType" access="field" />
+      </component>
+    </natural-id>
     <query name="NumberPerCategID">
       <![CDATA[
 SELECT cat.id, count(*), cat.internalID
@@ -72,6 +74,6 @@ SELECT objectReference.objectID FROM MCRCategoryLink WHERE category.id=:category
 SELECT category.id FROM MCRCategoryLink WHERE objectReference.objectID=:id
       ]]>
     </query>
- <!--  -->
+    <!--  -->
   </class>
 </hibernate-mapping>
