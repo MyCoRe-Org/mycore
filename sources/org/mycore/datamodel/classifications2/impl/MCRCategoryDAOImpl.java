@@ -463,11 +463,20 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
     }
 
     private static MCRCategoryImpl copyDeep(MCRCategoryImpl category, int level) {
+        if (category == null) {
+            return null;
+        }
         MCRCategoryImpl newCateg = new MCRCategoryImpl();
-        int childAmount = (level != 0) ? category.getChildren().size() : 0;
+        int childAmount;
+        try {
+            childAmount = (level != 0) ? category.getChildren().size() : 0;
+        } catch (RuntimeException e) {
+            LOGGER.error("Cannot get children size for category: " + category.getId(), e);
+            throw e;
+        }
         newCateg.setChildren(new ArrayList<MCRCategory>(childAmount));
         newCateg.setId(category.getId());
-        newCateg.setLabels(category.getLabels());
+        newCateg.setLabels(new HashMap<String, MCRLabel>(category.getLabels()));
         newCateg.setRoot(category.root);
         newCateg.setURI(category.getURI());
         if (childAmount > 0) {
@@ -481,6 +490,11 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
     static MCRCategoryImpl getByNaturalID(Session session, MCRCategoryID id) {
         final Criteria criteria = session.createCriteria(CATEGRORY_CLASS).setProjection(Projections.id());
         Integer internalID = (Integer) criteria.setCacheable(true).add(MCRCategoryExpression.eq(id)).uniqueResult();
+        LOGGER.debug("getByNaturalID(" + id + "): " + internalID);
+        if (internalID == null) {
+            LOGGER.warn("Could not find requested MCRCategory id id: " + id);
+            return null;
+        }
         return (MCRCategoryImpl) session.get(CATEGRORY_CLASS, internalID);
     }
 
