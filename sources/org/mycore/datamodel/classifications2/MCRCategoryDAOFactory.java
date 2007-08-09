@@ -31,7 +31,7 @@ import org.mycore.datamodel.classifications2.impl.MCRCategoryDAOImpl;
  * @version $Revision$ $Date$
  * @since 2.0
  */
-public class MCRClassificationDAOFactory {
+public class MCRCategoryDAOFactory {
 
     private static MCRCategoryDAO instance=new MCRCategoryDAOImpl();
 

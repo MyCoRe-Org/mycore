@@ -30,7 +30,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
-import org.mycore.datamodel.classifications2.MCRClassificationDAOFactory;
+import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRLabel;
 
 /**
@@ -65,7 +65,7 @@ public abstract class MCRAbstractCategoryImpl implements MCRCategory {
         if (children == null) {
             childrenPresent = false;
             childrenLock.readLock().unlock();
-            setChildren(MCRClassificationDAOFactory.getInstance().getChildren(this.id));
+            setChildren(MCRCategoryDAOFactory.getInstance().getChildren(this.id));
         }
         if (childrenPresent) {
             childrenLock.readLock().unlock();
@@ -100,7 +100,7 @@ public abstract class MCRAbstractCategoryImpl implements MCRCategory {
         } finally {
             childrenLock.readLock().unlock();
         }
-        return MCRClassificationDAOFactory.getInstance().hasChildren(this.id);
+        return MCRCategoryDAOFactory.getInstance().hasChildren(this.id);
     }
 
     public final boolean isCategory() {
