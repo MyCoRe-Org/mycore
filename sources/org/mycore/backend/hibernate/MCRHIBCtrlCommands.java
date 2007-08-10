@@ -23,24 +23,54 @@
 
 package org.mycore.backend.hibernate;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.util.Date;
+import java.util.List;
+import java.util.regex.Pattern;
+
 import org.apache.log4j.Logger;
+import org.dom4j.DocumentException;
+import org.dom4j.DocumentFactory;
+import org.dom4j.Element;
+import org.dom4j.ElementHandler;
+import org.dom4j.ElementPath;
+import org.dom4j.QName;
+import org.dom4j.io.OutputFormat;
+import org.dom4j.io.SAXReader;
+import org.dom4j.io.XMLWriter;
+import org.hibernate.EntityMode;
 import org.hibernate.HibernateException;
+import org.hibernate.ReplicationMode;
+import org.hibernate.Session;
 import org.hibernate.tool.hbm2ddl.SchemaUpdate;
+import org.xml.sax.SAXException;
+import org.xml.sax.helpers.AttributesImpl;
+
+import org.mycore.backend.hibernate.tables.MCRACCESS;
+import org.mycore.backend.hibernate.tables.MCRACCESSRULE;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.frontend.cli.MCRAbstractCommands;
-import org.mycore.frontend.cli.MCRClassificationCommands;
 import org.mycore.frontend.cli.MCRCommand;
 
 /**
  * This class provides a set of commands for the org.mycore.access package which
  * can be used by the command line interface. (creates sql tables, run queries
  * 
+ * @author Thomas Scheffler (yagee)
  * @author Arne Seifert
  */
 public class MCRHIBCtrlCommands extends MCRAbstractCommands {
     /** The logger */
-    public static Logger LOGGER = Logger.getLogger(MCRClassificationCommands.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(MCRHIBCtrlCommands.class.getName());
+
+    private static final DocumentFactory DOC_FACTORY = new DocumentFactory();
+
+    private static final java.util.regex.Pattern OBJECT_PATTERN = Pattern.compile("^/[^/]+/[^/]+$");
 
     /**
      * constructor with commands.
@@ -50,7 +80,26 @@ public class MCRHIBCtrlCommands extends MCRAbstractCommands {
 
         MCRCommand com = null;
 
-        com = new MCRCommand("init hibernate", "org.mycore.backend.hibernate.MCRHIBCtrlCommands.createTables", "The command creates all tables for MyCoRe by hibernate.");
+        com = new MCRCommand("init hibernate", "org.mycore.backend.hibernate.MCRHIBCtrlCommands.createTables",
+                "The command creates all tables for MyCoRe by hibernate.");
+        command.add(com);
+        com = new MCRCommand("export acl rules to file {0}", "org.mycore.backend.hibernate.MCRHIBCtrlCommands.exportAccessRules String",
+                "Exports all ACL rules to a given file.");
+        command.add(com);
+        com = new MCRCommand("import acl rules from file {0}", "org.mycore.backend.hibernate.MCRHIBCtrlCommands.importAccessRules String",
+                "Imports all ACL rules from a given file.");
+        command.add(com);
+        com = new MCRCommand("export acl mappings to file {0}", "org.mycore.backend.hibernate.MCRHIBCtrlCommands.exportAccessMappings String",
+                "Exports all ACL mappings to a given file.");
+        command.add(com);
+        com = new MCRCommand("import acl mappings from file {0}", "org.mycore.backend.hibernate.MCRHIBCtrlCommands.importAccessMappings String",
+                "Imports all ACL mappings from a given file.");
+        command.add(com);
+        com = new MCRCommand("export entity {0} to file {1}", "org.mycore.backend.hibernate.MCRHIBCtrlCommands.exportEntity String String",
+                "Exports an entity (fully qualified class name) to a given file.");
+        command.add(com);
+        com = new MCRCommand("import entity {0} from file {1}", "org.mycore.backend.hibernate.MCRHIBCtrlCommands.importEntity String String",
+                "Imports an entity (fully qualified class name) from a given file.");
         command.add(com);
     }
 
@@ -69,4 +118,89 @@ public class MCRHIBCtrlCommands extends MCRAbstractCommands {
             throw new MCRException("Hibernate error while creating database tables.", e);
         }
     }
+
+    public static void exportAccessRules(String file) throws IOException, SAXException {
+        exportFile(file, "accessrules", MCRACCESSRULE.class);
+    }
+
+    public static void importAccessRules(String file) throws IOException, DocumentException {
+        importFile(file, MCRACCESSRULE.class.getName());
+    }
+
+    public static void exportAccessMappings(String file) throws IOException, SAXException {
+        exportFile(file, "accessmap", MCRACCESS.class);
+    }
+
+    public static void importAccessMappings(String file) throws IOException, DocumentException {
+        importFile(file, MCRACCESS.class.getName());
+    }
+
+    public static void exportEntity(String className, String file) throws IOException, SAXException, ClassNotFoundException {
+        Class<?> exportClass = Class.forName(className);
+        exportFile(file, exportClass.getSimpleName().toLowerCase(), exportClass);
+    }
+
+    public static void importEntity(String className, String file) throws IOException, DocumentException {
+        importFile(file, className);
+    }
+
+    @SuppressWarnings("unchecked")
+    private static void exportFile(String file, String rootTag, Class persistedClass) throws FileNotFoundException, UnsupportedEncodingException, IOException,
+            SAXException {
+        File exportFile = new File(file);
+        if (exportFile.exists() && exportFile.isDirectory()) {
+            throw new MCRException(exportFile.getAbsolutePath() + " is a directory.");
+        }
+        Session session = MCRHIBConnection.instance().getSession();
+        Session xmlSession = session.getSession(EntityMode.DOM4J);
+        QName rootName = DOC_FACTORY.createQName(rootTag, "mycore", "http://mycore.org");
+        OutputFormat format = OutputFormat.createPrettyPrint();
+        format.setEncoding("UTF-8");
+        FileOutputStream fileOutputStream = new FileOutputStream(exportFile);
+        XMLWriter xmlWriter = new XMLWriter(fileOutputStream, format);
+        xmlWriter.startDocument();
+        xmlWriter.write(DOC_FACTORY.createComment("Export from: " + new Date().toString()));
+        xmlWriter.startPrefixMapping(rootName.getNamespacePrefix(), rootName.getNamespaceURI());
+        xmlWriter.startElement(rootName.getNamespaceURI(), rootName.getName(), rootName.getQualifiedName(), new AttributesImpl());
+        List<Element> elements = xmlSession.createCriteria(persistedClass).list();
+        for (Element result : elements) {
+            xmlWriter.write(result);
+        }
+        xmlWriter.endElement(rootName.getNamespaceURI(), rootName.getName(), rootName.getQualifiedName());
+        xmlWriter.endPrefixMapping(rootName.getNamespacePrefix());
+        xmlWriter.endDocument();
+        xmlWriter.close();
+        fileOutputStream.close();
+    }
+
+    @SuppressWarnings("unchecked")
+    private static void importFile(String file, final String entityName) throws DocumentException {
+        File importFile = new File(file);
+        if (importFile.exists() && importFile.isDirectory()) {
+            throw new MCRException(importFile.getAbsolutePath() + " is a directory.");
+        }
+        SAXReader xmlReader = new SAXReader(false);
+        Session session = MCRHIBConnection.instance().getSession();
+        final Session xmlSession = session.getSession(EntityMode.DOM4J);
+        final ReplicationMode replicationMode = ReplicationMode.OVERWRITE;
+        // the rootElement is not of interest
+        xmlReader.setDefaultHandler(new ElementHandler() {
+
+            public void onStart(ElementPath path) {
+            }
+
+            public void onEnd(ElementPath path) {
+                // only process elements directly below the root element
+                if (OBJECT_PATTERN.matcher(path.getPath()).find()) {
+                    Element rule = path.getCurrent();
+                    // import into database
+                     xmlSession.replicate(entityName, rule, replicationMode);
+                    // save some memory
+                    rule.detach();
+                }
+            }
+        });
+        xmlReader.read(importFile);
+    }
+
 }
