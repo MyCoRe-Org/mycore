@@ -28,6 +28,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Iterator;
@@ -81,9 +82,27 @@ public class MCREditorServlet extends MCRServlet {
             processSubmit(req, res, parms);
         } else if ("end.subselect".equals(action)) {
             processEndSubSelect(req, res, parms);
+        } else if ("include".equals(action)) {
+            includeEditorFromXSL(req, res);
         } else {
             res.sendError(HttpServletResponse.SC_BAD_REQUEST);
         }
+    }
+
+    private void includeEditorFromXSL(HttpServletRequest req, HttpServletResponse res) throws IOException {
+        String sessionID = req.getParameter("XSL.editor.session.id");
+        Element editorResolved = null;
+
+        if ((sessionID == null) || (sessions.get(sessionID) == null)) {
+            Map parameters = req.getParameterMap();
+            String ref = req.getParameter("_ref");
+            String uri = req.getParameter("_uri");
+            boolean validate = "true".equals(req.getParameter("_validate"));
+            editorResolved = startSession(parameters, ref, uri, validate);
+        } else
+            editorResolved = (Element) (sessions.get(sessionID));
+
+        getLayoutService().sendXML(req, res, new Document((Element) (editorResolved.clone())));
     }
 
     /**
@@ -124,7 +143,12 @@ public class MCREditorServlet extends MCRServlet {
         for (Element editor: editors ) {
             Element editorResolved = null;
             if ((sessionID == null) || (sessions.get(sessionID) == null))
-                editorResolved = startSession(request, editor, uri);
+            {
+                Map parameters = request.getParameterMap();
+                boolean validate = "true".equals(editor.getAttributeValue("validate", "false"));
+                String ref = editor.getAttributeValue("id");
+                editorResolved = startSession(parameters, ref, uri, validate);
+            }
             else
                 editorResolved = (Element) (sessions.get(sessionID));
 
@@ -137,15 +161,11 @@ public class MCREditorServlet extends MCRServlet {
     /**
      * Starts a new editor session in webpage
      */
-    private static Element startSession(HttpServletRequest req, Element editor, String uri) {
-
-        String ref = editor.getAttributeValue("id");
+    private static Element startSession(Map parameters, String ref, String uri, boolean validate) {
         logger.debug("Editor start editor session from " + ref + "@" + uri);
 
-        Map parameters = req.getParameterMap();
         Element param = getTargetParameters(parameters);
-        boolean validate = "true".equals(editor.getAttributeValue("validate", "false"));
-        editor = MCREditorDefReader.readDef(uri, ref, validate);
+        Element editor = MCREditorDefReader.readDef(uri, ref, validate);
 
         setDefault(editor, "cell", "row", "1");
         setDefault(editor, "cell", "col", "1");
@@ -362,14 +382,15 @@ public class MCREditorServlet extends MCRServlet {
             Element subselect = MCREditorDefReader.findElementByID(id, editor);
             StringBuffer sb = new StringBuffer(getBaseURL());
 
+            String webpage = URLEncoder.encode(parms.getParameter("_webpage"),"UTF-8");
             if ("editor".equals(subselect.getAttributeValue("type"))) {
                 sb.append(subselect.getAttributeValue("href"));
                 sb.append("?subselect.session=").append(sessionID);
                 sb.append("&subselect.varpath=").append(var);
-                sb.append("&subselect.webpage=").append(parms.getParameter("_webpage"));
+                sb.append("&subselect.webpage=").append(webpage);
                 sb.append("&XSL.editor.cancel.url=").append(getBaseURL());
                 sb.append(parms.getParameter("_webpage"));
-                sb.append("?XSL.editor.session.id=").append(sessionID);
+                sb.append("XSL.editor.session.id=").append(sessionID);
             } else if ("webpage".equals(subselect.getAttributeValue("type"))) {
                 sb.append(subselect.getAttributeValue("href"));
                 if (subselect.getAttributeValue("href").indexOf("?") > 0)
@@ -377,12 +398,12 @@ public class MCREditorServlet extends MCRServlet {
                 else
                     sb.append("?XSL.subselect.session.SESSION=").append(sessionID);
                 sb.append("&XSL.subselect.varpath.SESSION=").append(var);
-                sb.append("&XSL.subselect.webpage.SESSION=").append(parms.getParameter("_webpage"));
+                sb.append("&XSL.subselect.webpage.SESSION=").append(webpage);
             } else if ("servlet".equals(subselect.getAttributeValue("type"))) {
                 sb.append(subselect.getAttributeValue("href"));
                 sb.append("?subselect.session=").append(sessionID);
                 sb.append("&subselect.varpath=").append(var);
-                sb.append("&subselect.webpage=").append(parms.getParameter("_webpage"));
+                sb.append("&subselect.webpage=").append(webpage);
             }
 
             String url = sb.toString();
@@ -427,7 +448,7 @@ public class MCREditorServlet extends MCRServlet {
             // Redirect to webpage to reload editor form
             StringBuffer sb = new StringBuffer(getBaseURL());
             sb.append(parms.getParameter("_webpage"));
-            sb.append("?XSL.editor.session.id=");
+            sb.append("XSL.editor.session.id=");
             sb.append(sessionID);
 
             logger.debug("Editor redirect to " + sb.toString());
@@ -456,7 +477,7 @@ public class MCREditorServlet extends MCRServlet {
             // Redirect to webpage to reload editor form
             StringBuffer sb = new StringBuffer(getBaseURL());
             sb.append(parms.getParameter("_webpage"));
-            sb.append("?XSL.editor.session.id=");
+            sb.append("XSL.editor.session.id=");
             sb.append(sessionID);
             logger.debug("Editor redirect to " + sb.toString());
             res.sendRedirect(res.encodeRedirectURL(sb.toString()));
@@ -559,7 +580,7 @@ public class MCREditorServlet extends MCRServlet {
         // Redirect to webpage to reload editor form
         StringBuffer sb = new StringBuffer(getBaseURL());
         sb.append(webpage);
-        sb.append("?XSL.editor.session.id=");
+        sb.append("XSL.editor.session.id=");
         sb.append(sessionID);
 
         logger.debug("Editor redirect to " + sb.toString());

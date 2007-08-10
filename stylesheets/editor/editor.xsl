@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
 <!-- ============================================== -->
-<!-- $Revision: 1.71 $ $Date: 2007-07-31 13:39:42 $ -->
+<!-- $Revision: 1.72 $ $Date: 2007-08-10 13:19:14 $ -->
 <!-- ============================================== --> 
 
 <xsl:stylesheet 
   version="1.0" 
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   xmlns:xalan="http://xml.apache.org/xalan"
+  xmlns:encoder="xalan://java.net.URLEncoder"
 >
 
 <!-- ========================================================================= -->
@@ -15,8 +16,6 @@
 <xsl:include href="editor-common.xsl" />
 
 <!-- ======== http request parameters ======== -->
-
-<xsl:param name="StaticFilePath"  /> <!-- path of static webpage including this editor -->
 
 <!-- ======== constants, do not change ======== -->
 <xsl:variable name="editor.delimiter.internal"  select="'_'" />
@@ -39,7 +38,33 @@
 
 <!-- ========================================================================= -->
 
-<!-- ======== handles editor ======== -->
+<!-- ======== include editor from within any xsl stylesheet ======== -->
+
+<xsl:template name="include.editor">
+  <xsl:param name="uri" /> <!-- URI of the editor definition xml -->
+  <xsl:param name="ref" /> <!-- ID of the editor in the XML file at given URI -->
+  <xsl:param name="validate" select="'false'" /> <!-- If true, validate against editor.xsd schema -->
+  
+  <xsl:variable name="url">
+    <xsl:value-of select="$ServletsBaseURL" />
+    <xsl:text>XMLEditor</xsl:text>
+    <xsl:value-of select="$HttpSession" />
+    <xsl:text>?_action=include&amp;_uri=</xsl:text>
+    <xsl:value-of select="encoder:encode($uri)" />
+    <xsl:text>&amp;_ref=</xsl:text>
+    <xsl:value-of select="$ref" />
+    <xsl:text>&amp;_validate=</xsl:text>
+    <xsl:value-of select="$validate" />
+    <xsl:if test="contains($RequestURL,'?')">
+      <xsl:text>&amp;</xsl:text>
+      <xsl:copy-of select="substring-after($RequestURL,'?')" />
+    </xsl:if>
+  </xsl:variable>
+
+  <xsl:apply-templates select="document($url)/editor" />
+</xsl:template>
+
+<!-- ======== handles editor included within a static webpage ======== -->
 
 <xsl:template match="editor">
   <!-- ======== include fckEditor if needed ======== -->
@@ -159,9 +184,21 @@
 
   <!-- ======== send editor session ID to servlet ======== -->
   <input type="hidden" name="{$editor.delimiter.internal}session" value="{../@session}" />
-  <input type="hidden" name="{$editor.delimiter.internal}webpage" value="{$StaticFilePath}" />
   <input type="hidden" name="{$editor.delimiter.internal}action"  value="submit" />
   <input type="hidden" name="{$editor.delimiter.internal}root"    value="{@var}" />
+  <input type="hidden" name="{$editor.delimiter.internal}webpage">
+    <xsl:attribute name="value">
+      <xsl:value-of select="substring-after($RequestURL,$WebApplicationBaseURL)" />
+      <xsl:choose>
+        <xsl:when test="contains($RequestURL,'?')">
+          <xsl:text>&amp;</xsl:text>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:text>?</xsl:text>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:attribute>
+  </input>
 
   <!-- ======== durchreichen der target parameter ======== -->
   <xsl:for-each select="../target-parameters/target-parameter">
@@ -964,7 +1001,7 @@
 
   <!-- ======== build url for cancel button ======== -->
   <xsl:variable name="url">
-    <xsl:call-template name="build.url">
+    <xsl:call-template name="build.editor.url">
       <xsl:with-param name="url" select="ancestor::editor/cancel/@url" />
     </xsl:call-template>
   </xsl:variable>
@@ -1246,7 +1283,7 @@
 </xsl:template>
 
 <!-- ======== If url is relative, add WebApplicationBaseURL and make it absolute ======== -->
-<xsl:template name="build.url">
+<xsl:template name="build.editor.url">
   <xsl:param name="url" />
   <xsl:variable name="return">
     <xsl:choose>

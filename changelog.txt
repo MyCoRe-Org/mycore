@@ -1,5 +1,6 @@
 Version 2.0 (Head)
 =============
+- Editor Framework: Added xsl template to dynamically include editor from any xsl stylesheet
 - Editor Framework: Added input validation using XSL condition for a complete panel
 - Added stylesheet to generate search masks from searchfields.xml
 - removed MCRCStoreLocalFileSystem and MCRCStoreRemoteFTP
