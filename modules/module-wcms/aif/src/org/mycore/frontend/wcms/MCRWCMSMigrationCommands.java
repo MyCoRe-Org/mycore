@@ -27,12 +27,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
@@ -46,8 +43,10 @@ import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
 import org.jdom.output.XMLOutputter;
 import org.jdom.xpath.XPath;
+import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
+import org.mycore.frontend.MCRLayoutUtilities;
 import org.mycore.frontend.cli.MCRAbstractCommands;
 import org.mycore.frontend.cli.MCRCommand;
 import org.mycore.user.MCRGroup;
@@ -61,11 +60,11 @@ public class MCRWCMSMigrationCommands extends MCRAbstractCommands {
         super();
         MCRCommand com = null;
 
-        com = new MCRCommand("m", "org.mycore.frontend.wcms.MCRWCMSMigrationCommands.migrate",
+        com = new MCRCommand("migrate wcms-users", "org.mycore.frontend.wcms.MCRWCMSMigrationCommands.migrate",
                         "The command migrates WCMSUserDB.xml into MyCoRe-User-Management.");
         command.add(com);
 
-        com = new MCRCommand("s", "org.mycore.frontend.wcms.MCRWCMSMigrationCommands.simulateMigrate",
+        com = new MCRCommand("simulate migrate wcms-users", "org.mycore.frontend.wcms.MCRWCMSMigrationCommands.simulateMigrate",
                         "NO database actions will be done. The command simulates a migration of WCMSUserDB.xml into MyCoRe-User-Management.");
         command.add(com);
 
@@ -80,6 +79,7 @@ public class MCRWCMSMigrationCommands extends MCRAbstractCommands {
     }
 
     private static final void doMigration(boolean simulate) {
+        LOGGER.info(getSimText(simulate) + "Migration started\n");
         // 1
         Properties props = (Properties) (MCRConfiguration.instance().getProperties().clone());
         migrateNavi(simulate, props);
@@ -93,7 +93,45 @@ public class MCRWCMSMigrationCommands extends MCRAbstractCommands {
         // 3.2
         assignUsers(simulate, ht3, dbOrig, groupDescr_groupID);
         // 3.3
-        //addACLs(simulate, );
+        addACLs(simulate, ht1, ht3, groupDescr_groupID);
+        LOGGER.info(getSimText(simulate) + "Migration finished\n");
+    }
+
+    private static void addACLs(boolean simulate, Hashtable rootNodes, Hashtable userAndGroups, Hashtable groupDes_groupID) {
+        // all root nodes
+        for (Enumeration e = rootNodes.keys(); e.hasMoreElements();) {
+            String rootNode = (String) e.nextElement();
+            // all groups
+            Hashtable groups4Rules = new Hashtable();
+            for (Enumeration e2 = userAndGroups.keys(); e2.hasMoreElements();) {
+                String userList = (String) e2.nextElement();
+                String groupDes = getGroupDescrPrefix() + userAndGroups.get(userList).toString();
+                boolean rootNodeContained = groupDes.contains(rootNode);
+                if (rootNodeContained) {
+                    String groupID = groupDes_groupID.get(groupDes).toString();
+                    groups4Rules.put(groupID, "");
+                }
+            }
+            // save rules as acl
+            String aclObjId = MCRLayoutUtilities.getOBJIDPREFIX_WEBPAGE() + rootNode;
+            String writePerm = MCRWCMSUtilities.getWRITE_PERMISSION_WEBPAGE();
+            // // build rule as XML
+            Element rule = new Element("condition");
+            rule.addContent(new Element("boolean").setAttribute("operator", "or"));
+            for (Enumeration e3 = groups4Rules.keys(); e3.hasMoreElements();) {
+                String groupID = (String) e3.nextElement();
+                Element cond = new Element("condition");
+                cond.setAttribute("field", "group");
+                cond.setAttribute("operator", "=");
+                cond.setAttribute("value", groupID);
+                rule.getChild("boolean").addContent(cond);
+            }
+            // // save
+            if (!simulate)
+                MCRAccessManager.addRule(aclObjId, writePerm, rule, "automatically created ACL for WCMS-Write-Access");
+            LOGGER.debug(getSimText(simulate) + "saved ACL for object-ID=" + aclObjId + " with rule=" + rule);
+        }
+        LOGGER.info(getSimText(simulate) + "ACL creation finished, created "+rootNodes.size()+" ACL's\n");
     }
 
     private static void assignUsers(boolean simulate, Hashtable userAndGroups, Document userDB, Hashtable groupDescr_groupID) {
@@ -108,9 +146,9 @@ public class MCRWCMSMigrationCommands extends MCRAbstractCommands {
                 String user = tok.nextToken().toString();
                 // assign to group
                 MCRGroup mcrGroup = null;
-                if (!simulate) 
+                if (!simulate)
                     mcrGroup = uMan.retrieveGroup(mcrGroupID);
-                if (mcrGroup!=null && mcrGroup.hasUserMember(user)) {
+                if (mcrGroup != null && mcrGroup.hasUserMember(user)) {
                     LOGGER.debug(getSimText(simulate) + "user=" + user + " not added as member to group=" + mcrGroupID + ", because it already exist");
                 } else {
                     // user exist ?
@@ -122,7 +160,7 @@ public class MCRWCMSMigrationCommands extends MCRAbstractCommands {
                 }
             }
         }
-        LOGGER.debug(getSimText(simulate) + "user assignment to group finished sucessfully");
+        LOGGER.info(getSimText(simulate) + "user assignment to groups finished sucessfully");
     }
 
     private static Hashtable createGroups(boolean simulate, Hashtable userAndGroups) {
@@ -148,8 +186,9 @@ public class MCRWCMSMigrationCommands extends MCRAbstractCommands {
                 uMan.createGroup(mcrGroup);
             // store mcrGroupID - groupWithRootNodes
             groupID_groupDes.put(groupName, mcrGroupID);
-            LOGGER.debug(getSimText(simulate) + "group=" + mcrGroupID + " ("+groupName+") added in DB");
+            LOGGER.debug(getSimText(simulate) + "group=" + mcrGroupID + " (" + groupName + ") added in DB");
         }
+        LOGGER.info(getSimText(simulate) + "groups creation finished, "+userAndGroups.size()+" groups created");
         return groupID_groupDes;
     }
 
@@ -211,15 +250,15 @@ public class MCRWCMSMigrationCommands extends MCRAbstractCommands {
             String groups = "";
             if (userAndGroups.containsKey(userList)) {
                 groups = userAndGroups.get(userList) + getGroupSeperator() + rootNode;
-                LOGGER.debug(getSimText(simulate) + "recalculated user(s)=" + userList + " to group=" + groups);
+                //LOGGER.debug(getSimText(simulate) + "recalculated user(s)=" + userList + " to group=" + groups);
             } else {
                 groups = rootNode;
-                LOGGER.debug(getSimText(simulate) + "calculated user(s)=" + userList + " to group=" + groups);
+                //LOGGER.debug(getSimText(simulate) + "calculated user(s)=" + userList + " to group=" + groups);
             }
             userAndGroups.put(userList, groups);
 
         }
-        LOGGER.debug(getSimText(simulate) + "2.3 successfully \n");
+        //LOGGER.debug(getSimText(simulate) + "2.3 successfully \n");
         return userAndGroups;
     }
 
@@ -246,9 +285,10 @@ public class MCRWCMSMigrationCommands extends MCRAbstractCommands {
         if (!uMan.existUser(userID)) {
             String userName = user.getAttributeValue("userRealName");
             if (!simulate) {
-                MCRUser userNew=null;
+                MCRUser userNew = null;
                 try {
-                    userNew = new MCRUser(uMan.getMaxUserNumID()+1, userID, "root", null, null, true, true, "", userID,group.getID(),new ArrayList(),"","",userName,"","","","","","","","","","","","","");
+                    userNew = new MCRUser(uMan.getMaxUserNumID() + 1, userID, "root", null, null, true, true, "", userID, group.getID(), new ArrayList(), "",
+                                    "", userName, "", "", "", "", "", "", "", "", "", "", "", "", "");
                 } catch (MCRException e) {
                     e.printStackTrace();
                 } catch (Exception e) {
@@ -276,7 +316,7 @@ public class MCRWCMSMigrationCommands extends MCRAbstractCommands {
             String rootNode = categ.getTextTrim();
             rootNodesTable.put(rootNode, "");
         }
-        LOGGER.debug(getSimText(simulate) + "2.1 successfully \n");
+        //LOGGER.debug(getSimText(simulate) + "2.1 successfully \n");
         return rootNodesTable;
     }
 
@@ -296,7 +336,7 @@ public class MCRWCMSMigrationCommands extends MCRAbstractCommands {
         }
         if (!simulate)
             saveXML(navLoc, nav);
-        LOGGER.debug(getSimText(simulate) + "navi migrated successfully, original navi backed up under " + backupLoc + " \n");
+        LOGGER.info(getSimText(simulate) + "navi migrated successfully, original navi backed up under " + backupLoc + " \n");
     }
 
     private static String getSimText(boolean simulate) {
