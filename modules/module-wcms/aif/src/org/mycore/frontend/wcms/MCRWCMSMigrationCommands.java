@@ -27,6 +27,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -46,6 +47,7 @@ import org.jdom.input.SAXBuilder;
 import org.jdom.output.XMLOutputter;
 import org.jdom.xpath.XPath;
 import org.mycore.common.MCRConfiguration;
+import org.mycore.common.MCRException;
 import org.mycore.frontend.cli.MCRAbstractCommands;
 import org.mycore.frontend.cli.MCRCommand;
 import org.mycore.user.MCRGroup;
@@ -84,60 +86,84 @@ public class MCRWCMSMigrationCommands extends MCRAbstractCommands {
         // 2.1
         Document dbOrig = loadXML(props.getProperty("MCR.WCMS.wcmsUserDBFile"));
         Hashtable ht1 = getRootNodes(simulate, props, dbOrig);
-        // 2.2
-        // setupUser(simulate, dbOrig);
         // 2.3
         Hashtable ht3 = getUserAndGroups(simulate, ht1, dbOrig);
         // 3.1
-        createGroups(simulate, ht3);
-
+        Hashtable groupDescr_groupID = createGroups(simulate, ht3);
         // 3.2
-        assignUsers(simulate, ht3, dbOrig);
+        assignUsers(simulate, ht3, dbOrig, groupDescr_groupID);
+        // 3.3
+        //addACLs(simulate, );
     }
 
-    private static void assignUsers(boolean simulate, Hashtable userAndGroups, Document userDB) {
+    private static void assignUsers(boolean simulate, Hashtable userAndGroups, Document userDB, Hashtable groupDescr_groupID) {
         MCRUserMgr uMan = MCRUserMgr.instance();
         for (Enumeration e = userAndGroups.keys(); e.hasMoreElements();) {
             String userList = (String) e.nextElement();
-            String group = getGroupDescrPrefix() + userAndGroups.get(userList).toString();
+            String group4Users = userAndGroups.get(userList).toString();
+            String mcrGroupID = (String) groupDescr_groupID.get(getGroupDescrPrefix() + group4Users);
             // seperate users
             StringTokenizer tok = new StringTokenizer(userList, getUserSeperator());
             while (tok.hasMoreTokens()) {
                 String user = tok.nextToken().toString();
                 // assign to group
-                MCRGroup mcrGroup = uMan.retrieveGroup(group);
-                if (mcrGroup.hasUserMember(user)) {
-                    LOGGER.debug(getSimText(simulate) + "user=" + user + " not added as member to group=" + group + ", because it already exist");
+                MCRGroup mcrGroup = null;
+                if (!simulate) 
+                    mcrGroup = uMan.retrieveGroup(mcrGroupID);
+                if (mcrGroup!=null && mcrGroup.hasUserMember(user)) {
+                    LOGGER.debug(getSimText(simulate) + "user=" + user + " not added as member to group=" + mcrGroupID + ", because it already exist");
                 } else {
                     // user exist ?
                     if (!uMan.existUser(user))
                         createUser(simulate, userDB, user, mcrGroup);
                     if (!simulate)
                         mcrGroup.addMemberUserID(user);
-                    LOGGER.debug(getSimText(simulate) + "added user=" + user + " as member to group=" + group);
+                    LOGGER.debug(getSimText(simulate) + "added user=" + user + " as member to group=" + mcrGroupID);
                 }
             }
         }
         LOGGER.debug(getSimText(simulate) + "user assignment to group finished sucessfully");
     }
 
-    private static void createGroups(boolean simulate, Hashtable userAndGroups) {
+    private static Hashtable createGroups(boolean simulate, Hashtable userAndGroups) {
         MCRUserMgr uMan = MCRUserMgr.instance();
+        int pos = 0;
+        Hashtable groupID_groupDes = new Hashtable();
+        // all groups
         for (Enumeration e = userAndGroups.keys(); e.hasMoreElements();) {
+            pos++;
             String userList = (String) e.nextElement();
-            String groupList = (String) userAndGroups.get(userList);
-            String groupName = getGroupDescrPrefix() + groupList;
-            MCRGroup group = new MCRGroup();
-            group.setID(groupName);
-            group.addAdminUserID("root");
-            if (uMan.existGroup(groupName))
-                LOGGER.debug(getSimText(simulate) + "group=" + group + " already exists, not added in DB");
-            else {
-                if (!simulate)
-                    uMan.createGroup(group);
-                LOGGER.debug(getSimText(simulate) + "group=" + group + " added in DB");
-            }
+            String group = (String) userAndGroups.get(userList);
+            String groupName = getGroupDescrPrefix() + group;
+
+            // build mcrGroup
+            int mcrGroupIDNum = getMCRGroupID(pos);
+            String mcrGroupID = getGroupIDPrefix() + Integer.toString(mcrGroupIDNum);
+            MCRGroup mcrGroup = new MCRGroup();
+            mcrGroup.setID(mcrGroupID);
+            mcrGroup.setDescription(groupName);
+            mcrGroup.addAdminUserID("root");
+            // store in db
+            if (!simulate)
+                uMan.createGroup(mcrGroup);
+            // store mcrGroupID - groupWithRootNodes
+            groupID_groupDes.put(groupName, mcrGroupID);
+            LOGGER.debug(getSimText(simulate) + "group=" + mcrGroupID + " ("+groupName+") added in DB");
         }
+        return groupID_groupDes;
+    }
+
+    private static int getMCRGroupID(int recommendedID) {
+        MCRUserMgr uMan = MCRUserMgr.instance();
+        int newID = recommendedID;
+        while (uMan.existGroup(getGroupIDPrefix() + Integer.toString(newID))) {
+            newID++;
+        }
+        return newID;
+    }
+
+    private static String getGroupIDPrefix() {
+        return "WCMS ";
     }
 
     private static String getGroupDescrPrefix() {
@@ -183,12 +209,15 @@ public class MCRWCMSMigrationCommands extends MCRAbstractCommands {
             }
             // add user list with belonging root nodes to hashmap
             String groups = "";
-            if (userAndGroups.containsKey(userList))
+            if (userAndGroups.containsKey(userList)) {
                 groups = userAndGroups.get(userList) + getGroupSeperator() + rootNode;
-            else
+                LOGGER.debug(getSimText(simulate) + "recalculated user(s)=" + userList + " to group=" + groups);
+            } else {
                 groups = rootNode;
+                LOGGER.debug(getSimText(simulate) + "calculated user(s)=" + userList + " to group=" + groups);
+            }
             userAndGroups.put(userList, groups);
-            LOGGER.debug(getSimText(simulate) + "calculated user=" + userList + " for group(s)=" + groups);
+
         }
         LOGGER.debug(getSimText(simulate) + "2.3 successfully \n");
         return userAndGroups;
@@ -216,11 +245,15 @@ public class MCRWCMSMigrationCommands extends MCRAbstractCommands {
         MCRUserMgr uMan = MCRUserMgr.instance();
         if (!uMan.existUser(userID)) {
             String userName = user.getAttributeValue("userRealName");
-            MCRUser userNew = new MCRUser();
-            userNew.addGroupID(group.getID());
-            userNew.getUserContact().setLastName(userName);
-            userNew.setPassword(userID);
             if (!simulate) {
+                MCRUser userNew=null;
+                try {
+                    userNew = new MCRUser(uMan.getMaxUserNumID()+1, userID, "root", null, null, true, true, "", userID,group.getID(),new ArrayList(),"","",userName,"","","","","","","","","","","","","");
+                } catch (MCRException e) {
+                    e.printStackTrace();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
                 uMan.createUser(userNew);
             }
             LOGGER.debug(getSimText(simulate) + "user=" + userID + " (" + userName + ") missed, so created it\n");
