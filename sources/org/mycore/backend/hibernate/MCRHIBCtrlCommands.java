@@ -158,7 +158,10 @@ public class MCRHIBCtrlCommands extends MCRAbstractCommands {
         Session session = MCRHIBConnection.instance().getSession();
         Session xmlSession = session.getSession(EntityMode.DOM4J);
         QName rootName = DOC_FACTORY.createQName(rootTag, "mycore", "http://www.mycore.org/");
-        OutputFormat format = OutputFormat.createPrettyPrint();
+        OutputFormat format = OutputFormat.createCompactFormat();
+        format.setTrimText(false);
+        format.setNewLineAfterDeclaration(true);
+        format.setSuppressDeclaration(false);
         format.setEncoding("UTF-8");
         FileOutputStream fileOutputStream = new FileOutputStream(exportFile);
         BufferedOutputStream bout = new BufferedOutputStream(fileOutputStream);
