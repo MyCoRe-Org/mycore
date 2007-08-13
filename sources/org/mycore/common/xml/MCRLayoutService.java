@@ -533,14 +533,14 @@ public class MCRLayoutService implements org.apache.xalan.trace.TraceListener {
         if (path.length() > 0) {
             LOGGER.debug("Source " + path.toString());
         }
-        if (LOGGER.isDebugEnabled()) {
-            try {
+        try {
+            if ("true".equals(ev.m_processor.getParameter("DEBUG"))) {
                 ev.m_processor.getResultTreeHandler().comment(log.toString() + " ");
                 if (path.length() > 0) {
                     ev.m_processor.getResultTreeHandler().comment(" source " + path.toString() + " ");
                 }
-            } catch (Exception ignored) {
             }
+        } catch (Exception ignored) {
         }
     }
 
@@ -560,10 +560,10 @@ public class MCRLayoutService implements org.apache.xalan.trace.TraceListener {
     public void selected(SelectionEvent ev) {
         String log = "Selection <xsl:" + ev.m_styleNode.getTagName() + " " + ev.m_attributeName + "=\"" + ev.m_xpath.getPatternString() + "\">";
         LOGGER.debug(log);
-        if (LOGGER.isDebugEnabled())
-            try {
-                ev.m_processor.getResultTreeHandler().comment( " " + log + " " );
-            } catch (SAXException ignored) {
-            }
+        try {
+            if ("true".equals(ev.m_processor.getParameter("DEBUG")))
+                ev.m_processor.getResultTreeHandler().comment(" " + log + " ");
+        } catch (SAXException ignored) {
+        }
     }
 }
