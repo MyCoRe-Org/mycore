@@ -16,6 +16,8 @@ import org.mycore.frontend.MCRLayoutUtilities;
 
 public class MCRWCMSUtilities {
 
+    final static String WRITE_PERMISSION_WEBPAGE = "write";
+
     final static XPath xpath;
     static {
         try {
@@ -39,7 +41,7 @@ public class MCRWCMSUtilities {
      */
     public static boolean writeAccess(String webpageID) {
         long startTime = System.currentTimeMillis();
-        boolean access = MCRLayoutUtilities.getAccess(webpageID, "write", MCRLayoutUtilities.ONETRUE_ALLTRUE);
+        boolean access = MCRLayoutUtilities.getAccess(webpageID, getWRITE_PERMISSION_WEBPAGE(), MCRLayoutUtilities.ONETRUE_ALLTRUE);
         LOGGER.debug("checked write access for webpage=" + webpageID + "=" + access + ": took " + MCRLayoutUtilities.getDuration(startTime) + " msec.");
         return access;
     }
@@ -96,7 +98,7 @@ public class MCRWCMSUtilities {
         Iterator childIter = childs.iterator();
         while (accessMap.isEmpty() && childIter.hasNext()) {
             Element child = (Element) childIter.next();
-            boolean access = MCRLayoutUtilities.itemAccess("write", child, false);
+            boolean access = MCRLayoutUtilities.itemAccess(getWRITE_PERMISSION_WEBPAGE(), child, false);
             if (access)
                 accessMap.put("access", "true");
             else
@@ -121,7 +123,7 @@ public class MCRWCMSUtilities {
         Iterator childIter = childs.iterator();
         while (childIter.hasNext()) {
             Element child = (Element) childIter.next();
-            boolean access = MCRLayoutUtilities.itemAccess("write", child, false);
+            boolean access = MCRLayoutUtilities.itemAccess(getWRITE_PERMISSION_WEBPAGE(), child, false);
             if (access) {
                 // mark root item, to be able proccessing by XSL
                 child.setAttribute("ancestorLabels", MCRLayoutUtilities.getAncestorLabels(child));
@@ -130,6 +132,10 @@ public class MCRWCMSUtilities {
             } else
                 buildWritableNavi(child, writableNavi);
         }
+    }
+
+    public static String getWRITE_PERMISSION_WEBPAGE() {
+        return WRITE_PERMISSION_WEBPAGE;
     }
 
 }

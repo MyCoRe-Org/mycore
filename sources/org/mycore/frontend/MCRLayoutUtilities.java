@@ -268,4 +268,8 @@ public class MCRLayoutUtilities {
         return (System.currentTimeMillis() - startTime);
     }
 
+    public static String getOBJIDPREFIX_WEBPAGE() {
+        return OBJIDPREFIX_WEBPAGE;
+    }
+
 }
