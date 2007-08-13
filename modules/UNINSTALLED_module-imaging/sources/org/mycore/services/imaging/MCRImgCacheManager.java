@@ -176,10 +176,8 @@ public class MCRImgCacheManager implements CacheManager {
         MCRFilesystemNode cachedImg = cacheInIFS.getChildByPath(buildPath(image));
 
         if (cachedImg != null && cachedImg instanceof MCRDirectory) {
-            LOGGER.debug("****************************************");
-            LOGGER.debug("* MCRImgCacheManager - deleteImage ");
-            LOGGER.debug("* Delte : " + cachedImg.getName());
-            LOGGER.debug("****************************************");
+            LOGGER.debug("MCRImgCacheManager - deleteImage");
+            LOGGER.debug("Delte : " + cachedImg.getName());
             ((MCRDirectory) cachedImg).delete();
         } else
             LOGGER.debug("Could not delete " + image.getName() + "from cache!");
@@ -273,11 +271,9 @@ public class MCRImgCacheManager implements CacheManager {
         MCRFilesystemNode node = cacheInIFS.getChildByPath(path);
         MCRDirectory cachedImg = null;
 
-        LOGGER.info("****************************************");
-        LOGGER.info("* PATH for img in Cache: " + path);
-        LOGGER.info("* Node: " + node);
-        LOGGER.info("* Directory: " + (node instanceof MCRDirectory));
-        LOGGER.info("****************************************");
+        LOGGER.info("PATH for img in Cache: " + path);
+        LOGGER.info("Node: " + node);
+        LOGGER.info("Directory: " + (node instanceof MCRDirectory));
 
         if (node != null && node instanceof MCRDirectory) {
             cachedImg = (MCRDirectory) node;

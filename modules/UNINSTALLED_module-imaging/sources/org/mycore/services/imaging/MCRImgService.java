@@ -55,9 +55,7 @@ public class MCRImgService {
 
         try {
             if (image.getAdditionalData("ImageMetaData") == null) {
-                LOGGER.debug("*********************************");
-                LOGGER.debug("* MCRImgService create Add-Data *");
-                LOGGER.debug("*********************************");
+                LOGGER.debug("MCRImgService create Add-Data");
                 MCRImgCacheCommands.cacheFile(image, true);
             }
         } catch (IOException e) {
@@ -72,9 +70,7 @@ public class MCRImgService {
         }
 
         if (USE_CACHE) {
-            LOGGER.debug("*********************************************");
-            LOGGER.debug("* Get " + filename + " Width x Height - use Cache");
-            LOGGER.debug("*********************************************");
+            LOGGER.debug("Get " + filename + " Width x Height - use Cache");
 
             CacheManager cache = MCRImgCacheManager.instance();
 
@@ -101,33 +97,25 @@ public class MCRImgService {
             }
 
             if ((newWidth == thumbWidth || newHeight == thumbHeight) && cache.existInCache(image, MCRImgCacheManager.THUMB)) {
-                LOGGER.debug("*********************************************");
-                LOGGER.debug("* Get Thumbnail from ImgCache for " + filename);
-                LOGGER.debug("*********************************************");
+                LOGGER.debug("Get Thumbnail from ImgCache for " + filename);
 
                 cache.getImage(image, MCRImgCacheManager.THUMB, output);
                 outputFilled = true;
                 // newWidth <= cacheWidth && newHeight <= cacheHeight
             } else if ((newWidth <= cacheWidth) && cache.existInCache(image, MCRImgCacheManager.CACHE)) {
-                LOGGER.debug("*********************************************");
-                LOGGER.debug("* Get Cache from ImgCache for " + filename);
-                LOGGER.debug("*********************************************");
+                LOGGER.debug("Get Cache from ImgCache for " + filename);
 
                 // scaleFactor = scaleFactor / scalefactor;
 
                 // get the small cached version
                 input = cache.getImageAsInputStream(image, MCRImgCacheManager.CACHE);
             } else if (cache.existInCache(image, MCRImgCacheManager.ORIG)) {
-                LOGGER.debug("*********************************************");
-                LOGGER.debug("* Get Orig from ImgCache for " + filename);
-                LOGGER.debug("*********************************************");
+                LOGGER.debug("Get Orig from ImgCache for " + filename);
                 scaleHelp = 1;
                 input = cache.getImageAsInputStream(image, MCRImgCacheManager.ORIG);
 
             } else {
-                LOGGER.debug("*********************************************");
-                LOGGER.debug("* Get Orig from IFS for " + filename);
-                LOGGER.debug("*********************************************");
+                LOGGER.debug("Get Orig from IFS for " + filename);
                 input = image.getContentAsInputStream();
             }
 
@@ -135,9 +123,7 @@ public class MCRImgService {
                 processor.resize(input, newWidth, newHeight, output);
             }
         } else {
-            LOGGER.debug("*********************************************");
-            LOGGER.debug("* Get " + filename + " Width x Height - use Processor");
-            LOGGER.debug("*********************************************");
+            LOGGER.debug("Get " + filename + " Width x Height - use Processor");
             processor.resize(image.getContentAsInputStream(), newWidth, newHeight, output);
         }
 

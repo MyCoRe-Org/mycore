@@ -143,9 +143,7 @@ public class MCRImgProcessor implements ImgProcessor {
         if (image == null)
             image = loadmageMEMCache(input);
 
-        LOGGER.debug("********************************");
-        LOGGER.debug("* Loading Image succesfull!");
-        LOGGER.debug("********************************");
+        LOGGER.debug("Loading Image succesfull!");
 
         // Point scaleTopCorner = new Point((int) (xTopPos / scaleFactor), (int)
         // (yTopPos / scaleFactor));
@@ -158,15 +156,13 @@ public class MCRImgProcessor implements ImgProcessor {
         if (scaleBoundary.height > origSize.height)
             scaleBoundary.height = origSize.height;
 
-        LOGGER.debug("*********************************************");
-        LOGGER.debug("* MCRImgProcessor - scaleROI#");
-        LOGGER.debug("* ScaleFactor: " + scaleFactor);
-        LOGGER.debug("* scaleTopCorner: " + scaleTopCorner);
-        LOGGER.debug("* scaleBoundary.width: " + scaleBoundary.width);
-        LOGGER.debug("* scaleBoundary.height: " + scaleBoundary.height);
-        LOGGER.debug("* origSize.width: " + origSize.width);
-        LOGGER.debug("* origSize.height: " + origSize.height);
-        LOGGER.debug("*********************************************");
+        LOGGER.debug("MCRImgProcessor - scaleROI#");
+        LOGGER.debug("ScaleFactor: " + scaleFactor);
+        LOGGER.debug("scaleTopCorner: " + scaleTopCorner);
+        LOGGER.debug("scaleBoundary.width: " + scaleBoundary.width);
+        LOGGER.debug("scaleBoundary.height: " + scaleBoundary.height);
+        LOGGER.debug("origSize.width: " + origSize.width);
+        LOGGER.debug("origSize.height: " + origSize.height);
 
         if (scaleBoundary.width < origSize.width || scaleBoundary.height < origSize.height)
             image = crop(image, scaleTopCorner, scaleBoundary);
@@ -309,11 +305,9 @@ public class MCRImgProcessor implements ImgProcessor {
 
         origSize.width = image.getWidth();
         origSize.height = image.getHeight();
-        LOGGER.info("******************************************");
-        LOGGER.info("* File loading successfull - FileCache");
-        LOGGER.info("* origSize.width: " + origSize.width);
-        LOGGER.info("* origSize.height: " + origSize.height);
-        LOGGER.info("******************************************");
+        LOGGER.info("File loading successfull - FileCache");
+        LOGGER.info("origSize.width: " + origSize.width);
+        LOGGER.info("origSize.height: " + origSize.height);
         return image;
     }
 
@@ -339,11 +333,9 @@ public class MCRImgProcessor implements ImgProcessor {
 
         origSize.width = image.getWidth();
         origSize.height = image.getHeight();
-        LOGGER.info("******************************************");
-        LOGGER.info("* Loading MEM Cache");
-        LOGGER.info("* origSize.width: " + origSize.width);
-        LOGGER.info("* origSize.height: " + origSize.height);
-        LOGGER.info("******************************************");
+        LOGGER.info("Loading MEM Cache");
+        LOGGER.info("origSize.width: " + origSize.width);
+        LOGGER.info("origSize.height: " + origSize.height);
         return image;
     }
 
@@ -401,19 +393,15 @@ public class MCRImgProcessor implements ImgProcessor {
 
         float scaleFactor = 1;
 
-        LOGGER.debug("*********************************************");
-        LOGGER.debug("* MCRImgProcessor - resizeImage             *");
-        LOGGER.debug("* newWidth: " + newWidth);
-        LOGGER.debug("* newHeight: " + newHeight);
-        LOGGER.debug("* origSize.width: " + origSize.width);
-        LOGGER.debug("* origSize.height: " + origSize.height);
-        LOGGER.debug("*********************************************");
+        LOGGER.debug("MCRImgProcessor - resizeImage             *");
+        LOGGER.debug("newWidth: " + newWidth);
+        LOGGER.debug("newHeight: " + newHeight);
+        LOGGER.debug("origSize.width: " + origSize.width);
+        LOGGER.debug("origSize.height: " + origSize.height);
 
         if (newWidth != origSize.width || newHeight != origSize.height) {
-            LOGGER.debug("*********************************************");
-            LOGGER.debug("* MCRImgProcessor - resizeImage             *");
-            LOGGER.debug("* in IF                                     *");
-            LOGGER.debug("*********************************************");
+            LOGGER.debug("MCRImgProcessor - resizeImage");
+            LOGGER.debug("in IF");
             int origWidth = img.getWidth();
             int origHeight = img.getHeight();
             float xScale = (float) newWidth / (float) origWidth;
@@ -427,22 +415,16 @@ public class MCRImgProcessor implements ImgProcessor {
     // Encoding Part
     private void encode(OutputStream output) {
         if (useEncoder == JPEG_ENC) {
-            LOGGER.debug("*********************************************");
-            LOGGER.debug("* MCRImgProcessor - encode	              *");
-            LOGGER.debug("* JPEG_ENC                                  *");
-            LOGGER.debug("*********************************************");
+            LOGGER.debug("MCRImgProcessor - encode");
+            LOGGER.debug("JPEG_ENC");
             jpegEncode(image, output, jpegQuality);
         } else if (useEncoder == TIFF_ENC) {
-            LOGGER.debug("*********************************************");
-            LOGGER.debug("* MCRImgProcessor - encode	              *");
-            LOGGER.debug("* TIFF_ENC                                  *");
-            LOGGER.debug("*********************************************");
+            LOGGER.debug("MCRImgProcessor - encode");
+            LOGGER.debug("TIFF_ENC");
             tiffEncode(image, output, true, tileWidth, tileHeight);
         } else if (useEncoder == PNG_ENC) {
-            LOGGER.debug("*********************************************");
-            LOGGER.debug("* MCRImgProcessor - encode	              *");
-            LOGGER.debug("* PNG_ENC                                   *");
-            LOGGER.debug("*********************************************");
+            LOGGER.debug("MCRImgProcessor - encode");
+            LOGGER.debug("PNG_ENC");
             pngEncode(image, output, true);
         }
     }

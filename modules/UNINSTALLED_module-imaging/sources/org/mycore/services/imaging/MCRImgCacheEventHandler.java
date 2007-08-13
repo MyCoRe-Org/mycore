@@ -18,21 +18,17 @@ public class MCRImgCacheEventHandler extends MCREventHandlerBase {
      *            the MCRFile that caused the event
      */
     protected void handleFileCreated(MCREvent evt, MCRFile file) {
-        LOGGER.debug("*************************************************");
-        LOGGER.debug("* MCRImgCacheEventHandler.handleFileCreated     *");
-        LOGGER.debug("* FileName: " + file.getName());
-        LOGGER.debug("* OwnerID: " + file.getOwnerID());
-        LOGGER.debug("*************************************************");
+        LOGGER.debug("MCRImgCacheEventHandler.handleFileCreated");
+        LOGGER.debug("FileName: " + file.getName());
+        LOGGER.debug("OwnerID: " + file.getOwnerID());
         MCRConfiguration config = MCRConfiguration.instance();
         MCRImgCacheManager imgCache = MCRImgCacheManager.instance();
 
         if (!file.getOwnerID().equals(MCRImgCacheManager.CACHE_FOLDER) && !imgCache.existInCache(file)) {
-            LOGGER.debug("**************************************************");
-            LOGGER.debug("* MCRImgCacheEventHandler.handleFileCreated - IF *");
-            LOGGER.debug("* FileName: " + file.getName());
-            LOGGER.debug("* OwnerID: " + file.getOwnerID());
-            LOGGER.debug("* ID: " + file.getID());
-            LOGGER.debug("**************************************************");
+            LOGGER.debug("MCRImgCacheEventHandler.handleFileCreated - IF");
+            LOGGER.debug("FileName: " + file.getName());
+            LOGGER.debug("OwnerID: " + file.getOwnerID());
+            LOGGER.debug("ID: " + file.getID());
             try {
                 MCRImgCacheCommands.cacheFile(file.getID());
             } catch (Exception e) {
@@ -40,10 +36,8 @@ public class MCRImgCacheEventHandler extends MCREventHandlerBase {
                 e.printStackTrace();
             }
         } else {
-            LOGGER.debug("*************************************************");
-            LOGGER.debug("* MCRImgCacheEventHandler.handleFileCreated     *");
-            LOGGER.debug("* We don't want to cache files from Image Cache *");
-            LOGGER.debug("*************************************************");
+            LOGGER.debug("MCRImgCacheEventHandler.handleFileCreated");
+            LOGGER.debug("We don't want to cache files from Image Cache");
         }
     }
 
@@ -64,15 +58,11 @@ public class MCRImgCacheEventHandler extends MCREventHandlerBase {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }
-            LOGGER.debug("*************************************************");
-            LOGGER.debug("* MCRImgCacheEventHandler.handleFileDeleted     *");
-            LOGGER.debug("* Remove File: " + file.getName());
-            LOGGER.debug("*************************************************");
+            LOGGER.debug("MCRImgCacheEventHandler.handleFileDeleted");
+            LOGGER.debug("Remove File: " + file.getName());
         } else {
-            LOGGER.debug("*************************************************");
-            LOGGER.debug("* MCRImgCacheEventHandler.handleFileCreated     *");
-            LOGGER.debug("* We only delete files from Image Cache *");
-            LOGGER.debug("*************************************************");
+            LOGGER.debug("MCRImgCacheEventHandler.handleFileCreated");
+            LOGGER.debug("We only delete files from Image Cache");
         }
     }
 
