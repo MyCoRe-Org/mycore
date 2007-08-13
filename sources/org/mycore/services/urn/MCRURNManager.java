@@ -118,7 +118,7 @@ public class MCRURNManager {
      * 
      * @return the checksum for the given urn:nbn:de
      */
-    private static String buildChecksum(String urn) {
+    public static String buildChecksum(String urn) {
         StringBuffer buffer = new StringBuffer();
 
         for (int i = 0; i < urn.length(); i++) {
