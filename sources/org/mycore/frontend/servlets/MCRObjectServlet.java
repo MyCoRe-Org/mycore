@@ -91,20 +91,20 @@ public class MCRObjectServlet extends MCRServlet {
             if ((id == null) || (id.length() == 0)) {
                 return; // request failed;
             }
-            String editorID=getEditorID(job.getRequest());
+            String editorID = getEditorID(job.getRequest());
             setBrowseParameters(job, id, host, editorID);
 
-            if(host == MCRHit.LOCAL)
-              getLayoutService().doLayout(job.getRequest(),job.getResponse(),requestLocalObject(job));
+            if (host == MCRHit.LOCAL)
+                getLayoutService().doLayout(job.getRequest(), job.getResponse(), requestLocalObject(job));
             else
-              getLayoutService().doLayout(job.getRequest(),job.getResponse(),requestRemoteObject(job));
+                getLayoutService().doLayout(job.getRequest(), job.getResponse(), requestRemoteObject(job));
         } catch (MCRException e) {
             generateErrorPage(job.getRequest(), job.getResponse(), HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error while retrieving MCRObject with ID: "
                     + getObjectID(job.getRequest()), e, false);
             return;
         }
     }
-    
+
     private String getObjectHost(MCRServletJob job) {
         String remoteHost = job.getRequest().getParameter("host");
         if ((remoteHost == null) || (remoteHost.length() == 0)) {
@@ -142,7 +142,7 @@ public class MCRObjectServlet extends MCRServlet {
         if (editorID == null) {
             return;
         }
-        
+
         MCRCachedQueryData qd = MCRCachedQueryData.getData(editorID);
 
         if (qd != null) {
@@ -204,57 +204,62 @@ public class MCRObjectServlet extends MCRServlet {
         LOGGER.debug("Path = " + pathInfo + "-->" + pathInfo.substring(1, j));
         return pathInfo.substring(1, j);
     }
-    
+
     private final String getEditorID(HttpServletRequest request) {
-        String referer=getProperty(request, "referer");
-        if (referer!=null){
+        String referer = getProperty(request, "referer");
+        if (referer != null) {
             return resolveEditorID(referer);
         }
-        referer=request.getHeader("Referer");
-        if (referer==null){
+        referer = request.getHeader("Referer");
+        if (referer == null) {
             return null;
         }
-        if (-1 != referer.indexOf("MCRSearchServlet")){
+        if (-1 != referer.indexOf("MCRSearchServlet")) {
             return getEditorIDFromSearch(referer);
         }
         return getEditorIDFromObjectID(request, referer);
     }
-    
-    protected static final String getEditorIDFromSearch(String referer){
-        Matcher m=SEARCH_ID_PATTERN.matcher(referer);
+
+    protected static final String getEditorIDFromSearch(String referer) {
+        Matcher m = SEARCH_ID_PATTERN.matcher(referer);
         m.find();
-        LOGGER.debug("Group count: "+m.groupCount());
-        String editorID=m.group(1);
+        LOGGER.debug("Group count: " + m.groupCount());
+        String editorID = m.group(1);
         return editorID;
     }
 
-    protected final String getEditorIDFromObjectID(HttpServletRequest request, String referer){
-        String servletPath=request.getServletPath();
-        Pattern p=Pattern.compile(servletPath+"([^;\\?]*)");
-        Matcher m=p.matcher(referer);
-        if (m.find()){
-            return resolveEditorID(getIDFromPathInfo(m.group(1)));
+    protected final String getEditorIDFromObjectID(HttpServletRequest request, String referer) {
+        String servletPath = request.getServletPath();
+        Pattern p = Pattern.compile(servletPath + "([^;\\?]*)");
+        Matcher m = p.matcher(referer);
+        if (m.find()) {
+            try {
+                return resolveEditorID(getIDFromPathInfo(m.group(1)));
+            } catch (RuntimeException e) {
+                LOGGER.warn("Exception occured while parsing referer: " + referer, e);
+                throw e;
+            }
         }
-        LOGGER.debug("Didn't found ID in referer: "+m.toString());
+        LOGGER.debug("Didn't found ID in referer: " + m.toString());
         return resolveEditorID(getObjectID(request));
     }
-    
-    protected final static String resolveEditorID(String objectID){
-        Hashtable h=(Hashtable)MCRSessionMgr.getCurrentSession().get(EDITOR_ID_TABLE_KEY);
-        if (h==null){
+
+    protected final static String resolveEditorID(String objectID) {
+        Hashtable h = (Hashtable) MCRSessionMgr.getCurrentSession().get(EDITOR_ID_TABLE_KEY);
+        if (h == null) {
             return null;
         }
         Object o = h.get(objectID);
         return (o == null) ? null : o.toString();
     }
 
-    protected final static void storeEditorID(String objectID, String editorID){
-        Hashtable h=(Hashtable)MCRSessionMgr.getCurrentSession().get(EDITOR_ID_TABLE_KEY);
-        if (h==null){
-            h=new Hashtable();
-            MCRSessionMgr.getCurrentSession().put(EDITOR_ID_TABLE_KEY,h);
+    protected final static void storeEditorID(String objectID, String editorID) {
+        Hashtable h = (Hashtable) MCRSessionMgr.getCurrentSession().get(EDITOR_ID_TABLE_KEY);
+        if (h == null) {
+            h = new Hashtable();
+            MCRSessionMgr.getCurrentSession().put(EDITOR_ID_TABLE_KEY, h);
         }
-        LOGGER.debug("Storing editorID: "+editorID+" to MCRObjectID: "+objectID);
-        h.put(objectID,editorID);
+        LOGGER.debug("Storing editorID: " + editorID + " to MCRObjectID: " + objectID);
+        h.put(objectID, editorID);
     }
 }
