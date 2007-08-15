@@ -91,9 +91,11 @@ public class MCREditorSubmission {
     MCREditorSubmission(MCRRequestParameters parms, Element editor, boolean validate) {
         this.parms = parms;
         rootName = parms.getParameter( "_root" );
-        setVariablesFromSubmission(parms, editor, validate);
+        setVariablesFromSubmission(parms, editor);
         Collections.sort(variables);
         setRepeatsFromSubmission();
+        if (validate) 
+            validate(parms, editor);
     }
 
     MCREditorSubmission(Element saved, List submitted, String root, String varpath) {
@@ -196,7 +198,7 @@ public class MCREditorSubmission {
         }
     }
 
-    private void setVariablesFromSubmission(MCRRequestParameters parms, Element editor, boolean validate) {
+    private void setVariablesFromSubmission(MCRRequestParameters parms, Element editor) {
         for (Enumeration e = parms.getParameterNames(); e.hasMoreElements();) {
             String name = (String) (e.nextElement());
 
@@ -267,10 +269,6 @@ public class MCREditorSubmission {
                     files.add(file);
                 }
             }
-        }
-
-        if (validate) {
-            validate(parms, editor);
         }
     }
 
