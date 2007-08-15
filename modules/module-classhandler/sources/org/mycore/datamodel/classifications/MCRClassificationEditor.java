@@ -107,12 +107,16 @@ public class MCRClassificationEditor {
                 return false;
             }
 
+            
+            MCRCategoryItem categ=MCRClassificationQuery.findCategory(classif, categid);
+            
             newCateg = setNewJDOMCategElement(newCateg);
             newCateg.setAttribute("counter", "0");
             if (MCRClassificationQuery.findCategory(classif, newID) == null) {
                 MCRCategoryItem newCategory = MCRClassificationTransformer.getCategory(newCateg);
                 List<MCRCategoryItem> categs = classif.getCategories();
-                categs.add(newCategory);
+                int prevIndex=categs.indexOf(categ);
+                categs.add(prevIndex+1,newCategory);
                 classif.setCatgegories(categs);
                 MCRClassificationBrowserData.getClassificationPool().updateClassification(classif);
                 String sessionID = MCRSessionMgr.getCurrentSession().getID();
