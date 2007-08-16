@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!-- ============================================== -->
-<!-- $Revision: 1.3 $ $Date: 2006-09-29 13:28:22 $ -->
+<!-- $Revision: 1.4 $ $Date: 2007-08-16 06:51:55 $ -->
 <!-- ============================================== -->
 
 <!-- +
@@ -65,10 +65,10 @@
  <xsl:variable name="search_attribute" select="@searchField" />
 
  <xsl:for-each select="row">
-   <xsl:variable name="href1" select="concat($WebApplicationBaseURL, 'browse', col[2]/@searchbase)" />
+   <xsl:variable name="href1" select="concat($WebApplicationBaseURL, 'browse', col[2]/@searchbase, $HttpSession)" />
    <xsl:variable name="actnode" select="position()" />  
 
-   <xsl:variable name="href2" select="concat($ServletsBaseURL, 'MCRSearchServlet?query=(',$search,'+=+', col[2]/@lineID, ')+and+',$doctype,'&amp;numPerPage=10','&amp;mask=browse/',$type)" />
+   <xsl:variable name="href2" select="concat($ServletsBaseURL, 'MCRSearchServlet', $HttpSession, '?query=(',$search,'+=+', col[2]/@lineID, ')+and+',$doctype,'&amp;numPerPage=10','&amp;mask=browse/',$type)" />
    <xsl:variable name="img1"  select="concat($WebApplicationBaseURL, 'images/', col[1]/@folder1, '.gif')" />
    <xsl:variable name="img2"  select="concat($WebApplicationBaseURL, 'images/', col[1]/@folder2, '.gif')" />
    <xsl:variable name="img3"  select="concat($WebApplicationBaseURL, 'images/folder_blank.gif')" />
