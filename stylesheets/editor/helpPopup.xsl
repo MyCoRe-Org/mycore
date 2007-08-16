@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
 <!-- ============================================== -->
-<!-- $Revision: 1.6 $ $Date: 2007-07-03 09:57:21 $ -->
+<!-- $Revision: 1.7 $ $Date: 2007-08-16 09:31:35 $ -->
 <!-- ============================================== --> 
 
 <xsl:stylesheet 
@@ -9,7 +9,6 @@
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation"
   exclude-result-prefixes="i18n">
->
 
 <xsl:output 
   method="html" 
