@@ -131,7 +131,7 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
             return moduleResolverProvider;
         }
         try {
-            Class cl = Class.forName(externalClassName);
+            Class<?> cl = Class.forName(externalClassName);
             final MCRResolverProvider resolverProvider = (MCRResolverProvider) cl.newInstance();
             return resolverProvider;
         } catch (ClassNotFoundException e) {
@@ -701,7 +701,7 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
          */
         public Element resolveElement(String uri) throws Exception {
             String classname = uri.substring(uri.indexOf(":") + 1, uri.indexOf("?"));
-            Class cl = null;
+            Class<?> cl = null;
             Logger.getLogger(this.getClass()).debug("Loading Class: " + classname);
             cl = Class.forName(classname);
             Object o = cl.newInstance();
@@ -829,17 +829,7 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
 
         private static final String SORT_CONFIG_PREFIX = CONFIG_PREFIX + "Classification.Sort.";
 
-        private static final MCRCache CLASS_CACHE = new MCRCache(MCRConfiguration.instance().getInt(CONFIG_PREFIX + "Classification.CacheSize", 1000),
-                "URIResolver Classifications");
-
-        private static long CACHE_INIT_TIME;
-
         public MCRClassificationResolver() {
-        }
-
-        private void initCache() {
-            CLASS_CACHE.clear();
-            CACHE_INIT_TIME = System.currentTimeMillis();
         }
 
         /**
@@ -858,19 +848,7 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
          */
         public Element resolveElement(String uri) {
             LOGGER.debug("start resolving " + uri);
-            Element returns;
-            if (CONFIG.getSystemLastModified() > CACHE_INIT_TIME) {
-                initCache();
-                returns = getClassElement(uri);
-                CLASS_CACHE.put(uri, returns);
-            } else {
-                returns = (Element) CLASS_CACHE.get(uri);
-                if (returns == null) {
-                    returns = getClassElement(uri);
-                    CLASS_CACHE.put(uri, returns);
-                }
-            }
-            return returns;
+            return getClassElement(uri);
         }
 
         private Element getClassElement(String uri) {
@@ -1041,11 +1019,11 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
         }
 
     }
-    
+
     /**
-     * Ensures that the return of the given uri is never null.
-     * When the return is null, or the uri throws an exception,
-     * this resolver will return an empty XML element instead.
+     * Ensures that the return of the given uri is never null. When the return
+     * is null, or the uri throws an exception, this resolver will return an
+     * empty XML element instead.
      * 
      * Usage: notnull:<anyMyCoReURI>
      */
