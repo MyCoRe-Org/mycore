@@ -122,11 +122,15 @@ public class MCRImgService {
             if (!outputFilled) {
                 processor.resize(input, newWidth, newHeight, output);
             }
+            input.close();
         } else {
             LOGGER.debug("Get " + filename + " Width x Height - use Processor");
-            processor.resize(image.getContentAsInputStream(), newWidth, newHeight, output);
+            InputStream input = image.getContentAsInputStream();
+            processor.resize(input, newWidth, newHeight, output);
+            input.close();
         }
 
+        output.close();
         scaleFactor = processor.getScaleFactor() * scaleHelp;
     }
 
@@ -194,7 +198,7 @@ public class MCRImgService {
 
             if ((resWidth <= cacheWidth) && cache.existInCache(image, MCRImgCacheManager.CACHE)) {
                 LOGGER.debug("getImage - ROI # get Cache version");
-                
+
                 float scaleHelp = (float) cacheWidth / (float) origWidth;
 
                 scaleFactor = scaleFactor / scaleHelp;
@@ -224,9 +228,13 @@ public class MCRImgService {
             if (input != null) {
                 processor.scaleROI(input, xTopPos, yTopPos, boundWidth, boundHeight, scaleFactor, output);
             }
+            input.close();
         } else {
-            processor.scaleROI(image.getContentAsInputStream(), xTopPos, yTopPos, boundWidth, boundHeight, scaleFactor, output);
+            InputStream input = image.getContentAsInputStream();
+            processor.scaleROI(input, xTopPos, yTopPos, boundWidth, boundHeight, scaleFactor, output);
+            input.close();
         }
+        output.close();
     }
 
     public float getScaleFactor() {
