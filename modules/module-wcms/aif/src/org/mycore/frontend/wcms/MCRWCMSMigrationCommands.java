@@ -129,7 +129,7 @@ public class MCRWCMSMigrationCommands extends MCRAbstractCommands {
             // // save
             if (!simulate)
                 MCRAccessManager.addRule(aclObjId, writePerm, rule, "automatically created ACL for WCMS-Write-Access");
-            LOGGER.debug(getSimText(simulate) + "saved ACL for object-ID=" + aclObjId + " with rule=" + rule);
+            LOGGER.info(getSimText(simulate) + "saved ACL for object-ID=" + aclObjId + " with rule=" + rule);
         }
         LOGGER.info(getSimText(simulate) + "ACL creation finished, created "+rootNodes.size()+" ACL's\n");
     }
@@ -149,14 +149,14 @@ public class MCRWCMSMigrationCommands extends MCRAbstractCommands {
                 if (!simulate)
                     mcrGroup = uMan.retrieveGroup(mcrGroupID);
                 if (mcrGroup != null && mcrGroup.hasUserMember(user)) {
-                    LOGGER.debug(getSimText(simulate) + "user=" + user + " not added as member to group=" + mcrGroupID + ", because it already exist");
+                    LOGGER.info(getSimText(simulate) + "user=" + user + " not added as member to group=" + mcrGroupID + ", because it already exist");
                 } else {
                     // user exist ?
                     if (!uMan.existUser(user))
                         createUser(simulate, userDB, user, mcrGroup);
                     if (!simulate)
                         mcrGroup.addMemberUserID(user);
-                    LOGGER.debug(getSimText(simulate) + "added user=" + user + " as member to group=" + mcrGroupID);
+                    LOGGER.info(getSimText(simulate) + "added user=" + user + " as member to group=" + mcrGroupID);
                 }
             }
         }
@@ -186,7 +186,7 @@ public class MCRWCMSMigrationCommands extends MCRAbstractCommands {
                 uMan.createGroup(mcrGroup);
             // store mcrGroupID - groupWithRootNodes
             groupID_groupDes.put(groupName, mcrGroupID);
-            LOGGER.debug(getSimText(simulate) + "group=" + mcrGroupID + " (" + groupName + ") added in DB");
+            LOGGER.info(getSimText(simulate) + "group=" + mcrGroupID + " (" + groupName + ") added in DB");
         }
         LOGGER.info(getSimText(simulate) + "groups creation finished, "+userAndGroups.size()+" groups created");
         return groupID_groupDes;
@@ -202,7 +202,7 @@ public class MCRWCMSMigrationCommands extends MCRAbstractCommands {
     }
 
     private static String getGroupIDPrefix() {
-        return "WCMS ";
+        return "WCMS_";
     }
 
     private static String getGroupDescrPrefix() {
@@ -250,15 +250,15 @@ public class MCRWCMSMigrationCommands extends MCRAbstractCommands {
             String groups = "";
             if (userAndGroups.containsKey(userList)) {
                 groups = userAndGroups.get(userList) + getGroupSeperator() + rootNode;
-                //LOGGER.debug(getSimText(simulate) + "recalculated user(s)=" + userList + " to group=" + groups);
+                //LOGGER.info(getSimText(simulate) + "recalculated user(s)=" + userList + " to group=" + groups);
             } else {
                 groups = rootNode;
-                //LOGGER.debug(getSimText(simulate) + "calculated user(s)=" + userList + " to group=" + groups);
+                //LOGGER.info(getSimText(simulate) + "calculated user(s)=" + userList + " to group=" + groups);
             }
             userAndGroups.put(userList, groups);
 
         }
-        //LOGGER.debug(getSimText(simulate) + "2.3 successfully \n");
+        //LOGGER.info(getSimText(simulate) + "2.3 successfully \n");
         return userAndGroups;
     }
 
@@ -296,7 +296,7 @@ public class MCRWCMSMigrationCommands extends MCRAbstractCommands {
                 }
                 uMan.createUser(userNew);
             }
-            LOGGER.debug(getSimText(simulate) + "user=" + userID + " (" + userName + ") missed, so created it\n");
+            LOGGER.info(getSimText(simulate) + "user=" + userID + " (" + userName + ") missed, so created it\n");
         }
     }
 
@@ -316,7 +316,7 @@ public class MCRWCMSMigrationCommands extends MCRAbstractCommands {
             String rootNode = categ.getTextTrim();
             rootNodesTable.put(rootNode, "");
         }
-        //LOGGER.debug(getSimText(simulate) + "2.1 successfully \n");
+        //LOGGER.info(getSimText(simulate) + "2.1 successfully \n");
         return rootNodesTable;
     }
 
