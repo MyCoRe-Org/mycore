@@ -394,7 +394,12 @@ public class MCRHIBUserStore implements MCRUserStore {
      */
     public void deleteGroup(String delGroupID) throws MCRException {
         Session session = MCRHIBConnection.instance().getSession();
-        session.delete(session.get(MCRGROUPS.class, delGroupID));
+        Object group = session.get(MCRGROUPS.class, delGroupID);
+        Criteria c = session.createCriteria(MCRGROUPADMINS.class).add(Restrictions.eq("key.gid", group));
+        for (Object groupAdmin : c.list()) {
+            session.delete(groupAdmin);
+        }
+        session.delete(group);
     }
 
     /**
