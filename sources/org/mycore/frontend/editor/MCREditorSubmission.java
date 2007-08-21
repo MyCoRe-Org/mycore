@@ -98,19 +98,26 @@ public class MCREditorSubmission {
             validate(parms, editor);
     }
 
-    MCREditorSubmission(Element saved, List submitted, String root, String varpath) {
+    MCREditorSubmission(Element saved, List submitted, String root, MCRRequestParameters parms) {
         Element input = saved.getChild("input");
         List children = input.getChildren();
+        
+        String varpath = parms.getParameter("subselect.varpath");
+        boolean merge = "true".equals( parms.getParameter("subselect.merge") );
 
+        Hashtable<String,String> table = new Hashtable<String,String>(); 
+        
         for (int i = 0; i < children.size(); i++) {
             Element var = (Element) (children.get(i));
             String path = var.getAttributeValue("name");
             String value = var.getAttributeValue("value");
-
-            if (path.equals(varpath) || path.startsWith(varpath + "/")) {
-                continue;
-            }
-            addVariable(path, value);
+            
+            if( merge )
+              table.put( path, value );
+            else if (path.equals(varpath) || path.startsWith(varpath + "/"))
+              continue;
+            else
+              table.put( path, value );
         }
 
         for (int i = 0; i < submitted.size(); i++) {
@@ -118,7 +125,14 @@ public class MCREditorSubmission {
             String path = var.getPath();
             String value = var.getValue();
             path = varpath + path.substring(root.length());
-            addVariable(path, value);
+            table.put( path, value );
+        }
+        
+        for( Iterator<String> it = table.keySet().iterator(); it.hasNext(); )
+        {
+          String path = it.next();
+          String value = table.get( path );
+          addVariable(path, value);
         }
 
         Collections.sort(variables);

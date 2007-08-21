@@ -566,11 +566,10 @@ public class MCREditorServlet extends MCRServlet {
  
     private void sendToSubSelect(HttpServletResponse res, MCRRequestParameters parms, List variables, String root) throws IOException {
         String webpage = parms.getParameter("subselect.webpage");
-        String varpath = parms.getParameter("subselect.varpath");
         String sessionID = parms.getParameter("subselect.session");
 
         Element editor = (Element) (sessions.get(sessionID));
-        MCREditorSubmission subnew = new MCREditorSubmission(editor, variables, root, varpath);
+        MCREditorSubmission subnew = new MCREditorSubmission(editor, variables, root, parms);
 
         editor.removeChild("input");
         editor.removeChild("repeats");
