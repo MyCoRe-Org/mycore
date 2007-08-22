@@ -100,54 +100,56 @@ public class MCRUserMigrationCommands extends MCRAbstractCommands {
         // 1
         Properties props = (Properties) (MCRConfiguration.instance().getProperties());
         String workingDir = props.getProperty("MCR.BaseDirectory", null);
-        if(workingDir!=null){
-        	File dir = new File(workingDir+"/user-migration");
-        	dir.mkdirs();
-        	File groupFile = new File(dir+"/group-data.xml");
-        	File userFile = new File(dir+"/user-data.xml");
+        if(workingDir==null){
+        	workingDir=System.getProperty("java.io.tmpdir");
+        }       
+
+       	File dir = new File(workingDir+"/user-migration");
+       	dir.mkdirs();
+       	File groupFile = new File(dir+"/group-data.xml");
+       	File userFile = new File(dir+"/user-data.xml");
+       	
+       	//MCRUserCommands.saveAllGroupsToFile(groupFile.getAbsolutePath());
+       	cmds.add("save all groups to file "+groupFile.getAbsolutePath());
+       	
+       	//MCRUserCommands.saveAllUsersToFile(userFile.getAbsolutePath());
+       	cmds.add("save all users to file "+userFile.getAbsolutePath());
         	
-        	//MCRUserCommands.saveAllGroupsToFile(groupFile.getAbsolutePath());
-        	cmds.add("save all groups to file "+groupFile.getAbsolutePath());
-        	
-        	//MCRUserCommands.saveAllUsersToFile(userFile.getAbsolutePath());
-        	cmds.add("save all users to file "+userFile.getAbsolutePath());
-         	
-        	//Drop tables
-        	cmds.add("private migrate users drop tables");
-        	
-        	//MCRHIBCtrlCommands.createTables();
-        	cmds.add("init hibernate");
-        	
-        	//MCRUserCommands.initSuperuser();
-        	cmds.add("init superuser");
-        	
-        	//cleanupGroupFile(groupFile);
-        	cmds.add("private migrate user cleanup group file "+groupFile.getAbsolutePath());
-        	
-        	//cleanupUserFile(userFile);
-        	cmds.add("private migrate user cleanup user file "+userFile.getAbsolutePath());
-        	
-        	//MCRUserCommands.importGroupFromFile(groupFile.getAbsolutePath());
-        	cmds.add("import group data from file "+groupFile.getAbsolutePath());
-        	
-        	//MCRUserCommands.importUserFromFile(userFile.getAbsolutePath());
-        	cmds.add("import user data from file "+userFile.getAbsolutePath());
-        	
-        	/*
-        	//for debugging
-        	//MCRUserCommands.saveAllGroupsToFile(groupFile.getAbsolutePath().replace(".xml", ".new"));
-        	cmds.add("save all groups to file "+groupFile.getAbsolutePath().replace(".xml", ".new"));
-        	
-        	//MCRUserCommands.saveAllUsersToFile(userFile.getAbsolutePath().replace(".xml", ".new"));
-        	cmds.add("save all users to file "+userFile.getAbsolutePath().replace(".xml", ".new"));
-        	*/
-        	
-        	//userFile.delete();
-        	//groupFile.delete();
-        	//dir.delete();
-        	cmds.add("private migrate user delete temp files "+userFile.getAbsolutePath()+" "+groupFile.getAbsolutePath()+" "+dir.getAbsolutePath()); 
-        	
-        }
+       	//Drop tables
+       	cmds.add("private migrate users drop tables");
+       	
+       	//MCRHIBCtrlCommands.createTables();
+       	cmds.add("init hibernate");
+       	
+       	//MCRUserCommands.initSuperuser();
+       	cmds.add("init superuser");
+       	
+       	//cleanupGroupFile(groupFile);
+       	cmds.add("private migrate user cleanup group file "+groupFile.getAbsolutePath());
+       	
+       	//cleanupUserFile(userFile);
+       	cmds.add("private migrate user cleanup user file "+userFile.getAbsolutePath());
+       	
+       	//MCRUserCommands.importGroupFromFile(groupFile.getAbsolutePath());
+       	cmds.add("import group data from file "+groupFile.getAbsolutePath());
+       	
+       	//MCRUserCommands.importUserFromFile(userFile.getAbsolutePath());
+       	cmds.add("import user data from file "+userFile.getAbsolutePath());
+       	
+       	/*
+       	//for debugging
+       	//MCRUserCommands.saveAllGroupsToFile(groupFile.getAbsolutePath().replace(".xml", ".new"));
+       	cmds.add("save all groups to file "+groupFile.getAbsolutePath().replace(".xml", ".new"));
+       	
+       	//MCRUserCommands.saveAllUsersToFile(userFile.getAbsolutePath().replace(".xml", ".new"));
+       	cmds.add("save all users to file "+userFile.getAbsolutePath().replace(".xml", ".new"));
+       	*/
+       	
+       	//userFile.delete();
+       	//groupFile.delete();
+       	//dir.delete();
+       	cmds.add("private migrate user delete temp files "+userFile.getAbsolutePath()+" "+groupFile.getAbsolutePath()+" "+dir.getAbsolutePath()); 
+      
         LOGGER.info("Migration der Nutzer beendet\n");
 
         
@@ -341,7 +343,5 @@ public class MCRUserMigrationCommands extends MCRAbstractCommands {
 		catch(Exception e){
     		LOGGER.debug("Error in user migration while modifying group members" , e);
     	}
-    }
-
-		
+    }    
 }
