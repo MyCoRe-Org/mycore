@@ -23,6 +23,7 @@
 
 package org.mycore.backend.hibernate;
 
+import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -557,13 +558,11 @@ public class MCRHIBUserStore implements MCRUserStore {
         // table
         for (int i = 0; i < newUserIDs.size(); i++) {
             if (!oldUserIDs.contains(newUserIDs.get(i))) {
+                MCRUSERS user = (MCRUSERS) session.get(MCRUSERS.class, newUserIDs.get(i).toString());
                 MCRGROUPMEMBERS grpmembers = new MCRGROUPMEMBERS();
                 grpmembers.setGid(dbgroup);
-                MCRUSERS user = new MCRUSERS();
-                user.setUid(newUserIDs.get(i).toString());
                 grpmembers.setUserid(user);
-                session.save(grpmembers);
-                session.evict(user);
+                session.merge(grpmembers);
             }
         }
 
