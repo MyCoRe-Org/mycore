@@ -224,8 +224,13 @@ public class MCRObjectServlet extends MCRServlet {
         Matcher m = SEARCH_ID_PATTERN.matcher(referer);
         m.find();
         LOGGER.debug("Group count: " + m.groupCount());
-        String editorID = m.group(1);
-        return editorID;
+        try {
+            String editorID = m.group(1);
+            return editorID;
+        } catch (RuntimeException e) {
+            LOGGER.warn("Exception occured while parsing referer: " + referer, e);
+            throw e;
+        }
     }
 
     protected final String getEditorIDFromObjectID(HttpServletRequest request, String referer) {
