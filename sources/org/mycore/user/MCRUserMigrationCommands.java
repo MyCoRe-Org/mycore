@@ -24,7 +24,10 @@
 package org.mycore.user;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -34,7 +37,6 @@ import java.util.List;
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
-import org.hibernate.Query;
 import org.hibernate.Session;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -59,6 +61,7 @@ import org.mycore.frontend.cli.MCRCommand;
  * @author Robert Stephan
  */
 public class MCRUserMigrationCommands extends MCRAbstractCommands {
+	private static boolean DEBUG=true;
     private static Logger LOGGER = Logger.getLogger(MCRUserMigrationCommands.class.getName());
 
     public MCRUserMigrationCommands() {
@@ -148,7 +151,9 @@ public class MCRUserMigrationCommands extends MCRAbstractCommands {
        	//userFile.delete();
        	//groupFile.delete();
        	//dir.delete();
-       	cmds.add("private migrate user delete temp files "+userFile.getAbsolutePath()+" "+groupFile.getAbsolutePath()+" "+dir.getAbsolutePath()); 
+      
+       	
+       	if(!DEBUG)cmds.add("private migrate user delete temp files "+userFile.getAbsolutePath()+" "+groupFile.getAbsolutePath()+" "+dir.getAbsolutePath()); 
       
         LOGGER.info("Migration der Nutzer beendet\n");
 
@@ -257,15 +262,39 @@ public class MCRUserMigrationCommands extends MCRAbstractCommands {
      */
     public static void cleanupGroupFile(String groupFile){
     	try{
+    		if(DEBUG)copyFile(new File(groupFile), new File(groupFile+".org"));
     		SAXBuilder sb = new SAXBuilder();
     		Document doc = sb.build(groupFile);
-
+    		//delete group.members	
     		XPath x      = XPath.newInstance("//group.members");
     		List list    = x.selectNodes(doc);
     		for(Object o:list){
     			Element e = (Element) o;
     			e.removeContent();
     		}
+    		
+    		//change group.admins/admins.userID to "root"
+    	    //change group.admins/admins.groupID to "admingroup"
+    		x      = XPath.newInstance("//admins.userID");
+    		list    = x.selectNodes(doc);
+    		for(Object o:list){
+    			Element e = (Element) o;
+    			if(e.getText()==null || e.getText().trim().equals("")){
+    				e.getParentElement().getParentElement().removeChild(e.getParentElement().getName());
+    			}
+    		}
+    		
+    		x      = XPath.newInstance("//admins.groupID");
+    		list    = x.selectNodes(doc);
+    		for(Object o:list){
+    			Element e = (Element) o;
+    			if(e.getText()==null || e.getText().trim().equals("")){
+    				e.getParentElement().getParentElement().removeChild(e.getParentElement().getName());
+    			}
+    		}
+    		
+    		
+    		
     		//deltete existing Groups
     		x=XPath.newInstance("//group");
     		list = x.selectNodes(doc);
@@ -289,6 +318,7 @@ public class MCRUserMigrationCommands extends MCRAbstractCommands {
      */
     public static void cleanupUserFile(String userFile){
     	try{
+    		if(DEBUG)copyFile(new File(userFile), new File(userFile+".org"));
     		SAXBuilder sb = new SAXBuilder();
     		Document doc = sb.build(userFile);
 
@@ -343,5 +373,41 @@ public class MCRUserMigrationCommands extends MCRAbstractCommands {
 		catch(Exception e){
     		LOGGER.debug("Error in user migration while modifying group members" , e);
     	}
-    }    
+    }
+    
+    //just for debugging 
+    private static void copyFile(File fromFile, File toFile){
+    	FileInputStream from = null;
+        FileOutputStream to = null;
+        try {
+          from = new FileInputStream(fromFile);
+          to = new FileOutputStream(toFile);
+          byte[] buffer = new byte[4096];
+          int bytesRead;
+
+          while ((bytesRead = from.read(buffer)) != -1)
+            to.write(buffer, 0, bytesRead); // write
+        }
+        catch(FileNotFoundException e){
+        	e.printStackTrace();
+        }
+        catch(IOException e){
+        	e.printStackTrace();
+        }
+        
+        finally {
+          if (from != null)
+            try {
+              from.close();
+            } catch (IOException e) {
+              ;
+            }
+          if (to != null)
+            try {
+              to.close();
+            } catch (IOException e) {
+              ;
+            }
+        }
+    }
 }
