@@ -375,9 +375,10 @@ public class MCRUserMigrationCommands extends MCRAbstractCommands {
                 if (o instanceof Comment) {
                     LOGGER.info("Found Comment");
                     String s = ((Comment) o).getText();
-                    String[] sa = s.split("|");
+                    String[] sa = s.split("\\|");
                     String users = sa[0];
-                    String groups = sa[1];
+                    String groups="";
+                    if(sa.length>1) groups = sa[1];
                     String[] userA = users.split(";");
                     String[] groupA = groups.split(";");
                     for (String x : userA) {
