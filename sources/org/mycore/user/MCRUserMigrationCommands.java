@@ -38,6 +38,7 @@ import java.util.Properties;
 
 import org.apache.log4j.Logger;
 import org.hibernate.Session;
+import org.jdom.Comment;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.input.SAXBuilder;
@@ -86,6 +87,10 @@ public class MCRUserMigrationCommands extends MCRAbstractCommands {
 
         com = new MCRCommand("private migrate user delete temp files {0} {1} {2}", "org.mycore.user.MCRUserMigrationCommands.deleteTempFiles String String String",
         "This private command removes existing (initial) users from the exported user data file.");
+        command.add(com);
+        
+        com = new MCRCommand("private migrate user update admins from file {0}", "org.mycore.user.MCRUserMigrationCommands.updateAdmins String",
+        "This private command restores previously saved admin information.");
         command.add(com);
         
     }
@@ -138,6 +143,10 @@ public class MCRUserMigrationCommands extends MCRAbstractCommands {
        	
        	//MCRUserCommands.importUserFromFile(userFile.getAbsolutePath());
        	cmds.add("import user data from file "+userFile.getAbsolutePath());
+
+       	//MCRUserCommands.importGroupFromFile(groupFile.getAbsolutePath());
+       	cmds.add("private migrate user update admins from file "+groupFile.getAbsolutePath());
+
        	
        	/*
        	//for debugging
@@ -193,12 +202,27 @@ public class MCRUserMigrationCommands extends MCRAbstractCommands {
     public static final void deleteTempFiles(String f1, String f2, String f3){
     	try{
     		File file1 = new File(f1);
-    		file1.delete();
+    		if(file1.getAbsolutePath().endsWith(".xml")){
+    			File f1org = new File(file1.getAbsolutePath()+".org.xml");
+    			f1org.delete();
+    		}
+    		file1.delete();		
+    		
     		File file2 = new File(f2);
+    		if(file2.getAbsolutePath().endsWith(".xml")){
+    			File f1org = new File(file2.getAbsolutePath()+".org.xml");
+    			f1org.delete();
+    		}
     		file2.delete();
     		
     		File file3 = new File(f3);
+    		if(file3.getAbsolutePath().endsWith(".xml")){
+    			File f1org = new File(file3.getAbsolutePath()+".org.xml");
+    			f1org.delete();
+    		}
     		file3.delete();
+    		
+    		
     		
     		
     	}catch(Exception e){
@@ -261,8 +285,10 @@ public class MCRUserMigrationCommands extends MCRAbstractCommands {
      * we also delete all groups - allready created by "init superuser"
      */
     public static void cleanupGroupFile(String groupFile){
+    	StringBuffer useradmins=new StringBuffer();
+    	StringBuffer groupadmins=new StringBuffer();
     	try{
-    		if(DEBUG)copyFile(new File(groupFile), new File(groupFile+".org"));
+    		copyFile(new File(groupFile), new File(groupFile+".org.xml"));
     		SAXBuilder sb = new SAXBuilder();
     		Document doc = sb.build(groupFile);
     		//delete group.members	
@@ -278,18 +304,22 @@ public class MCRUserMigrationCommands extends MCRAbstractCommands {
     		list    = x.selectNodes(doc);
     		for(Object o:list){
     			Element e = (Element) o;
-    			if(e.getText()==null || e.getText().trim().equals("")){
-    				e.detach();
-    			}
+    			if(useradmins.length()>0)useradmins.append(";");
+    			useradmins.append(e.getParentElement().getParentElement().getAttributeValue("ID"));
+    			useradmins.append("=");
+    			useradmins.append(e.getText());
+    			
+    			e.detach();
     		}
     		
     		x      = XPath.newInstance("//admins.groupID");
     		list    = x.selectNodes(doc);
     		for(Object o:list){
     			Element e = (Element) o;
-    			if(e.getText()==null || e.getText().trim().equals("")){
-    				e.detach();
-    			}
+    			if(groupadmins.length()>0)groupadmins.append(";");
+    			groupadmins.append(e.getParentElement().getParentElement().getAttributeValue("ID"));
+    			groupadmins.append("=");
+    			groupadmins.append(e.getText());    				
     		}
     		
     		
@@ -302,7 +332,8 @@ public class MCRUserMigrationCommands extends MCRAbstractCommands {
     			if (MCRUserMgr.instance().existGroup(e.getAttributeValue("ID"))){
     				e.getParent().removeContent(e);
     			}
-    		}    	
+    		} 
+    		doc.addContent(new Comment(useradmins.toString()+"|"+groupadmins.toString()));
     		XMLOutputter xmlOut = new XMLOutputter();
     		xmlOut.output(doc, new OutputStreamWriter(new FileOutputStream(groupFile), "utf-8"));
     	}
@@ -317,7 +348,7 @@ public class MCRUserMigrationCommands extends MCRAbstractCommands {
      */
     public static void cleanupUserFile(String userFile){
     	try{
-    		if(DEBUG)copyFile(new File(userFile), new File(userFile+".org"));
+    		copyFile(new File(userFile), new File(userFile+".org.xml"));
     		SAXBuilder sb = new SAXBuilder();
     		Document doc = sb.build(userFile);
 
@@ -338,6 +369,56 @@ public class MCRUserMigrationCommands extends MCRAbstractCommands {
     		LOGGER.debug("Error in user migration while modifying group members" , e);
     	}    	
     }
+    
+    
+    public static void updateAdmins(String groupFile){
+    	SAXBuilder sb = new SAXBuilder();
+    	MCRUserMgr mgr = MCRUserMgr.instance();
+		try{
+			Document doc = sb.build(groupFile);
+			for(Object o:doc.getContent()){
+				if(o instanceof Comment){
+					String s = ((Comment)o).getText();
+					String[]sa = s.split("|");
+					String users = sa[0];
+					String groups = sa[1];
+					String[]userA=users.split(";");
+					String[]groupA=groups.split(";");
+					for (String x:userA){
+						String id = x.split("=")[0];
+						String value = x.split("=")[1];
+						MCRGroup mcrGroup = mgr.retrieveGroup(id);
+						mcrGroup.addAdminUserID(value);
+						mgr.updateGroup(mcrGroup);
+					}
+					LOGGER.info(Integer.toString(userA.length)+" user as admins added");
+					for (String x:groupA){
+						String id = x.split("=")[0];
+						String value = x.split("=")[1];
+						MCRGroup mcrGroup = mgr.retrieveGroup(id);
+						mcrGroup.addAdminGroupID(value);
+						mgr.updateGroup(mcrGroup);
+					}
+					LOGGER.info(Integer.toString(groupA.length)+" group as admins added");
+					
+					
+					
+					
+				}
+				
+				
+				
+			}
+			
+			
+			
+		}
+		catch(Exception e){
+	    	LOGGER.debug("Error in user migration while updateing group admin information" , e);
+	    }
+    }
+    
+    
     private static void evictUserData(File userFile){
     	try{
     	SAXBuilder sb = new SAXBuilder();
@@ -409,4 +490,5 @@ public class MCRUserMigrationCommands extends MCRAbstractCommands {
             }
         }
     }
+    
 }
