@@ -273,14 +273,13 @@ public class MCRUserMigrationCommands extends MCRAbstractCommands {
     			e.removeContent();
     		}
     		
-    		//change group.admins/admins.userID to "root"
-    	    //change group.admins/admins.groupID to "admingroup"
+    		//remove empty admins.userID and admins.groupID
     		x      = XPath.newInstance("//admins.userID");
     		list    = x.selectNodes(doc);
     		for(Object o:list){
     			Element e = (Element) o;
     			if(e.getText()==null || e.getText().trim().equals("")){
-    				e.getParentElement().getParentElement().removeChild(e.getParentElement().getName());
+    				e.detach();
     			}
     		}
     		
@@ -289,7 +288,7 @@ public class MCRUserMigrationCommands extends MCRAbstractCommands {
     		for(Object o:list){
     			Element e = (Element) o;
     			if(e.getText()==null || e.getText().trim().equals("")){
-    				e.getParentElement().getParentElement().removeChild(e.getParentElement().getName());
+    				e.detach();
     			}
     		}
     		
