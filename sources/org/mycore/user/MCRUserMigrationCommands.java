@@ -319,7 +319,9 @@ public class MCRUserMigrationCommands extends MCRAbstractCommands {
     			if(groupadmins.length()>0)groupadmins.append(";");
     			groupadmins.append(e.getParentElement().getParentElement().getAttributeValue("ID"));
     			groupadmins.append("=");
-    			groupadmins.append(e.getText());    				
+    			groupadmins.append(e.getText());    		
+    			
+    			e.detach();
     		}
     		
     		
