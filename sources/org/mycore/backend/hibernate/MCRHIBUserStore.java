@@ -23,7 +23,6 @@
 
 package org.mycore.backend.hibernate;
 
-import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -609,17 +608,23 @@ public class MCRHIBUserStore implements MCRUserStore {
             ArrayList<String> admGroupIDs = new ArrayList<String>();
 
             if (l.size() > 0) {
+                // may have rootGroup and rootUser here several time
+                // make a temporarily set to filter dublicate entries
+                Set<String> admUserSet = new HashSet<String>();
+                Set<String> admGroupSet = new HashSet<String>();
                 for (int i = 0; i < l.size(); i++) {
                     MCRGROUPADMINS grpadmins = (MCRGROUPADMINS) l.get(i);
 
                     if (grpadmins.getUserid() != null && !grpadmins.getUserid().equals("")) {
-                        admUserIDs.add(grpadmins.getUserid().getUid());
+                        admUserSet.add(grpadmins.getUserid().getUid());
                     }
 
                     if (grpadmins.getGroupid() != null && !grpadmins.getGroupid().equals("")) {
-                        admGroupIDs.add(grpadmins.getGroupid().getGid());
+                        admGroupSet.add(grpadmins.getGroupid().getGid());
                     }
                 }
+                admUserIDs.addAll(admUserSet);
+                admGroupIDs.addAll(admGroupSet);
             }
 
             l = session.createQuery("from MCRGROUPMEMBERS where GID = '" + groupID + "'").list();
