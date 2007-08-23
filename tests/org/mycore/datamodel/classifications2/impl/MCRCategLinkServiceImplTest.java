@@ -179,9 +179,4 @@ public class MCRCategLinkServiceImplTest extends MCRHibTestCase {
         }
     }
 
-    @Override
-    protected boolean isDebugEnabled() {
-        return true;
-    }
-
 }
