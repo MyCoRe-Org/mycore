@@ -377,27 +377,33 @@ public class MCRUserMigrationCommands extends MCRAbstractCommands {
                     String s = ((Comment) o).getText();
                     String[] sa = s.split("\\|");
                     String users = sa[0];
-                    String groups="";
-                    if(sa.length>1) groups = sa[1];
+                    String groups = "";
+                    if (sa.length > 1)
+                        groups = sa[1];
                     String[] userA = users.split(";");
                     String[] groupA = groups.split(";");
                     for (String x : userA) {
-                        String id = x.split("=")[0];
-                        String value = x.split("=")[1];
-                        MCRGroup mcrGroup = mgr.retrieveGroup(id);
-                        mcrGroup.addAdminUserID(value);
-                        mgr.updateGroup(mcrGroup);
+                        final String[] groupAdmin = x.split("=");
+                        if (groupAdmin.length > 1) {
+                            String id = groupAdmin[0];
+                            String value = groupAdmin[1];
+                            MCRGroup mcrGroup = mgr.retrieveGroup(id);
+                            mcrGroup.addAdminUserID(value);
+                            mgr.updateGroup(mcrGroup);
+                            LOGGER.info("Adding user '" + value + "' to admins of group '" + id + "'.");
+                        }
                     }
-                    LOGGER.info(Integer.toString(userA.length) + " user as admins added");
                     for (String x : groupA) {
-                        String id = x.split("=")[0];
-                        String value = x.split("=")[1];
-                        MCRGroup mcrGroup = mgr.retrieveGroup(id);
-                        mcrGroup.addAdminGroupID(value);
-                        mgr.updateGroup(mcrGroup);
+                        final String[] groupAdmin = x.split("=");
+                        if (groupAdmin.length > 1) {
+                            String id = groupAdmin[0];
+                            String value = groupAdmin[1];
+                            MCRGroup mcrGroup = mgr.retrieveGroup(id);
+                            mcrGroup.addAdminGroupID(value);
+                            mgr.updateGroup(mcrGroup);
+                            LOGGER.info("Adding group '" + value + "' to admins of group '" + id + "'.");
+                        }
                     }
-                    LOGGER.info(Integer.toString(groupA.length) + " group as admins added");
-
                 }
 
             }
