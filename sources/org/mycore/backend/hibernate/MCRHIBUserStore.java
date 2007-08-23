@@ -135,6 +135,7 @@ public class MCRHIBUserStore implements MCRUserStore {
         if (l.size() == 1) {
             MCRUSERS user = (MCRUSERS) l.get(0);
             session.delete(user);
+            session.flush();
         } else {
             logger.warn("There is no user '" + delUserID + "'");
         }
