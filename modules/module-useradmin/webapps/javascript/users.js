@@ -3,6 +3,7 @@
 var url;  //URL für den Request
 var req;	//Request Variable
 var data;	//JSON Document 
+var background; //Background Color
 
 var userToUpdate;
 var groupToUpdate;
@@ -19,10 +20,9 @@ function initialize() {
 	data="";
 	
 	$("userManagement").style.display="block";
-	
 	//Den Mülleimer initialisieren
 	Droppables.add("trash",{
-		accept:"usersElement",
+		accept:["usersElement","groupsElement"],
 		onDrop:function(element,drop) {
 			userToUpdate=element.lastChild.innerHTML;
 			groupToUpdate=element.parentNode.parentNode.id;
@@ -32,12 +32,17 @@ function initialize() {
 			if(userToUpdate==undefined) {
 				userToUpdate=element.innerHTML;
 			}
-			new Effect.Puff(element.id);
-			var result=confirm(confirmDeleteUser);
-			if(result==true) {
-				deleteUser();
+			if(element.className=="groupsElement")
+			{
+				deleteGroup(element.id);
 			} else {
-				updateGroup();
+				new Effect.Puff(element.id);
+				var result=confirm(confirmDeleteUser);
+				if(result==true) {
+					deleteUser();
+				} else {
+					updateGroup();
+				}
 			}
 		}});
 	//Einen Request zum Server schicken, damit die Daten angezeigt werden.
@@ -86,15 +91,15 @@ function showData() {
 	data.users.each(
 		function(user) {
 			itemIndex++;
-			$("usersList").appendChild(createUserElement(user));
-			new Draggable(user,{revert:true});
+			$("usersList").appendChild(createUserElement(user.userID,user.name));
+			new Draggable(user.userID,{revert:true});
 		}
 	);
 	
 	data.groups.each(
 		function(group) {
 			groupIndex++;
-			$("groupsList").appendChild(createGroupElement(group.name));
+			$("groupsList").appendChild(createGroupElement(group.name,group.desc));
 			$("Content_"+group.name).style.display="none";
 			Droppables.add(group.name, {
 				accept:"usersElement",
@@ -112,8 +117,11 @@ function showData() {
 					new Draggable(user+"_"+group.name,{revert:true});
 				}
 			);
+			new Draggable(group.name,{revert:true,handle:group.name+"_link"});
 		}
 	);
+	
+	highlightGroups();
 	
 	if(data.error[0]!="none" && data.error[0]!="0")
 	{
@@ -124,13 +132,64 @@ function showData() {
 	
 }
 
+
+function highlightGroups() {
+
+	data.users.each(
+		function(user) {
+			$(user.userID).setAttribute("onmouseover","highlight('"+user.userID+"')");
+			$(user.userID).setAttribute("onmouseout","turnBack('"+user.userID+"')");
+		}
+	);
+}
+
+function highlight(username) {
+	groupsIndex=0;
+	groupsArray=new Array();
+	data.groups.each(
+		function(group){
+			groupsIndex++;
+			data.groups[groupsIndex-1].users.each(
+				function(user) {
+					if(user==username)
+						groupsArray.push(group.name);
+				}
+			);
+		}
+	);
+	for(var i=0;i<groupsArray.length;i++)
+	{
+		background=$(groupsArray[i]).style.backgroundColor;
+		$(groupsArray[i]).style.backgroundColor="#14516e";
+	}
+} 
+
+function turnBack(username) {
+	groupsIndex=0;
+	groupsArray=new Array();
+	data.groups.each(
+		function(group){
+			groupsIndex++;
+			data.groups[groupsIndex-1].users.each(
+				function(user) {
+					if(user==username)
+						groupsArray.push(group.name);
+				}
+			);
+		}
+	);
+	for(var i=0;i<groupsArray.length;i++)
+	{
+		$(groupsArray[i]).style.backgroundColor=background;
+	}
+} 
 //nur die veränderte Gruppe aktualisieren
 function showGroup() {
 	data=req.responseText.parseJSON();
 	
 	$(data.gruppe.name).innerHTML="";
 	
-	$(data.gruppe.name).appendChild(createGroupElement(data.gruppe.name));
+	$(data.gruppe.name).appendChild(createGroupElement(data.gruppe.name,data.gruppe.desc));
 	Droppables.add(data.gruppe.name, {
 		accept:"usersElement",
 		onDrop:function(element,drop) {
@@ -154,18 +213,46 @@ function showGroup() {
 		url=servletBaseURL+"MCRUserAjaxServlet?mode=users";
     	sendRequest(url,showData);
 	}
+	new Draggable(data.gruppe.name,{revert:true,handle:data.gruppe.name+"_link"});
 }
 //Löschen eines Nutzers
 function deleteUser() {
+	url=servletBaseURL+"MCRUserAjaxServlet?mode=delete&user="+userToUpdate+"&group="+groupToUpdate;
 	if(groupToUpdate!=null) {
-		url=servletBaseURL+"MCRUserAjaxServlet?mode=delete&user="+userToUpdate+"&group="+groupToUpdate;
 		sendRequest(url,showGroup);
     } else {
-    	url=servletBaseURL+"MCRUserAjaxServlet?mode=delete&user="+userToUpdate+"&group="+groupToUpdate;
     	sendRequest(url,showData);
     }
 }
 
+function deleteGroup(id) {
+	var result=confirm(groupDel);
+	if(result==true)	{
+		url=servletBaseURL+"MCRUserAjaxServlet?mode=deleteGroup&group="+id;
+		sendRequest(url,completeDeleteGroup);
+	} 
+}
+
+function completeDeleteGroup() {
+	var data=req.responseText.parseJSON();
+	if(data.response=="ok") {
+		url=servletBaseURL+"MCRUserAjaxServlet?mode=users";
+    	sendRequest(url,showData);
+    } else if(data.error=="hasMembers") {
+    	var result=confirm(groupNotEmpty);
+    	if ( result==true) {
+    		url=servletBaseURL+"MCRUserAjaxServlet?mode=deleteGroupComplete&group="+data.group;
+			sendRequest(url,completeDeleteGroup);
+    	} else {
+    		url=servletBaseURL+"MCRUserAjaxServlet?mode=users";
+    		sendRequest(url,showData);
+    	}
+    } else if(data.error="primaryGroup") {
+    	alert(primaryGroup+data.users);
+    	url=servletBaseURL+"MCRUserAjaxServlet?mode=users";
+   		sendRequest(url,showData);
+    }
+}
 //Hinzufügen eines Nutzers in eine Gruppe
 function updateGroup() {
 	url=servletBaseURL+"MCRUserAjaxServlet?mode=update&user="+userToUpdate+"&group="+groupToUpdate;
@@ -182,7 +269,7 @@ function createGroupUser(user,group) {
 }
 
 //Aufbauen des Nutzer-Elements in die Nutzerliste
-function createUserElement(user) {
+function createUserElement(user,name) {
 	var userContainer=document.createElement("div");
 	var usrImg=document.createElement("img");
 	var usrElement=document.createElement("div")
@@ -190,6 +277,7 @@ function createUserElement(user) {
 	usrImg.setAttribute("src",userImg);
 	userContainer.className="usersElement";
 	userContainer.setAttribute("id",user);
+	userContainer.setAttribute("TITLE","header=[Real Name] body=["+name+"]");
 	usrElement.innerHTML=user;
 	userContainer.appendChild(usrImg);
 	userContainer.appendChild(usrElement);
@@ -197,16 +285,21 @@ function createUserElement(user) {
 }
 
 //Aufbauen eines Gruppen-Element
-function createGroupElement(group) {
+function createGroupElement(group,description) {
 	var id=group;
 	var groupElement=document.createElement("div");
 	var link=document.createElement("a");
 	link.setAttribute("href","#");
 	link.setAttribute("onclick","Effect.toggle('Content_"+group+"','blind')");
 	link.innerHTML=id;
+	var handle=document.createElement("img");
+	handle.setAttribute("src",grpHandle);
+	handle.setAttribute("id",id+"_link");
 	groupElement.className="groupsElement";
 	groupElement.setAttribute("id",id);
 	groupElement.appendChild(link);
+	groupElement.appendChild(handle);
+	groupElement.setAttribute("TITLE","header=[Description] body=["+description+"]");
 	var content=document.createElement("div");
 	content.className="groupsContent";
 	id="Content_"+group;

@@ -13,6 +13,7 @@
     <script src="{$WebApplicationBaseURL}javascript/json.js" type="text/javascript"></script>
     <script src="{$WebApplicationBaseURL}javascript/prototype.js" type="text/javascript"></script>
     <script src="{$WebApplicationBaseURL}javascript/scriptaculous.js" type="text/javascript"></script>
+    <script src="{$WebApplicationBaseURL}javascript/boxover.js" type="text/javascript"></script>
     <script type="text/javascript">
       <xsl:value-of select="concat('var servletBaseURL=&#x22;',$ServletsBaseURL,'&#x22;')" />
     </script>
@@ -23,10 +24,22 @@
       <xsl:value-of select="concat('var userImg=&#x22;',$WebApplicationBaseURL,'templates/master/',$template,'/IMAGES/system-users.png','&#x22;')" />
     </script>
     <script type="text/javascript">
+      <xsl:value-of select="concat('var grpHandle=&#x22;',$WebApplicationBaseURL,'templates/master/',$template,'/IMAGES/handle.png','&#x22;')" />
+    </script>
+    <script type="text/javascript">
       <xsl:value-of select="concat('var userHdr=&#x22;',i18n:translate('users.manage.users'),'&#x22;')" />
     </script>    
     <script type="text/javascript">
       <xsl:value-of select="concat('var groupHdr=&#x22;',i18n:translate('users.manage.groups'),'&#x22;')" />
+    </script>  
+    <script type="text/javascript">
+      <xsl:value-of select="concat('var groupDel=&#x22;',i18n:translate('users.confirm.groupDelete'),'&#x22;')" />
+    </script>  
+    <script type="text/javascript">
+      <xsl:value-of select="concat('var primaryGroup=&#x22;',i18n:translate('users.error.primaryGroup'),'&#x22;')" />
+    </script>  
+    <script type="text/javascript">
+      <xsl:value-of select="concat('var groupNotEmpty=&#x22;',i18n:translate('users.confirm.groupNotEmpty'),'&#x22;')" />
     </script>  
     <script src="{$WebApplicationBaseURL}javascript/users.js" type="text/javascript"></script>
 
