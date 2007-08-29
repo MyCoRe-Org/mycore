@@ -104,49 +104,57 @@ public class MCRUserCommands extends MCRAbstractCommands {
                 "The command imports one or more groups to the user system with data from the file {0}. This create does NOT make a constency check. The command is designd only for repair processes.");
         command.add(com);
 
-        com = new MCRCommand("delete group {0}", "org.mycore.frontend.cli.MCRUserCommands.deleteGroup String", "");
+        com = new MCRCommand("delete group {0}", "org.mycore.frontend.cli.MCRUserCommands.deleteGroup String",
+                "The command delete the group {0} from the user system, but only if it has no user members.");
         command.add(com);
 
-        com = new MCRCommand("create user data from file {0}", "org.mycore.frontend.cli.MCRUserCommands.createUserFromFile String", "");
+        com = new MCRCommand("create user data from file {0}", "org.mycore.frontend.cli.MCRUserCommands.createUserFromFile String",
+                "The command create one or more new users in the user system with data from the file {0}.");
         command.add(com);
 
-        com = new MCRCommand("import user data from file {0}", "org.mycore.frontend.cli.MCRUserCommands.importUserFromFile String", "");
+        com = new MCRCommand(
+                "import user data from file {0}",
+                "org.mycore.frontend.cli.MCRUserCommands.importUserFromFile String",
+                "The command imports one or more groups to the user system with data from the file {0}. This create does NOT make a constency check. The command is designd only for repair processes.");
         command.add(com);
 
-        com = new MCRCommand("update user data from file {0}", "org.mycore.frontend.cli.MCRUserCommands.updateUserFromFile String", "");
+        com = new MCRCommand("update user data from file {0}", "org.mycore.frontend.cli.MCRUserCommands.updateUserFromFile String",
+                "The command update one or more users in the user system with data from the file {0}.");
         command.add(com);
 
-        com = new MCRCommand("delete user {0}", "org.mycore.frontend.cli.MCRUserCommands.deleteUser String", "");
+        com = new MCRCommand("delete user {0}", "org.mycore.frontend.cli.MCRUserCommands.deleteUser String", "The command delete the user {0}.");
         command.add(com);
 
-        com = new MCRCommand("add user {0} as member to group {1}", "org.mycore.frontend.cli.MCRUserCommands.addMemberUserToGroup String String", "");
+        com = new MCRCommand("add user {0} as member to group {1}", "org.mycore.frontend.cli.MCRUserCommands.addMemberUserToGroup String String",
+                "The command add a user {0} as secondary member in the group {1}.");
         command.add(com);
 
-        com = new MCRCommand("remove user {0} as member from group {1}", "org.mycore.frontend.cli.MCRUserCommands.removeMemberUserFromGroup String String", "");
+        com = new MCRCommand("remove user {0} as member from group {1}", "org.mycore.frontend.cli.MCRUserCommands.removeMemberUserFromGroup String String",
+                "The command remove the user {0} as secondary member from the group {1}.");
         command.add(com);
 
-        com = new MCRCommand("list all groups", "org.mycore.frontend.cli.MCRUserCommands.listAllGroups", "");
+        com = new MCRCommand("list all groups", "org.mycore.frontend.cli.MCRUserCommands.listAllGroups", "The command list all groups.");
         command.add(com);
 
-        com = new MCRCommand("list group {0}", "org.mycore.frontend.cli.MCRUserCommands.listGroup String", "");
+        com = new MCRCommand("list group {0}", "org.mycore.frontend.cli.MCRUserCommands.listGroup String", "The command list the group {0}.");
         command.add(com);
 
-        com = new MCRCommand("list all users", "org.mycore.frontend.cli.MCRUserCommands.listAllUsers", "");
+        com = new MCRCommand("list all users", "org.mycore.frontend.cli.MCRUserCommands.listAllUsers", "The command list all users.");
         command.add(com);
 
-        com = new MCRCommand("list user {0}", "org.mycore.frontend.cli.MCRUserCommands.listUser String", "");
+        com = new MCRCommand("list user {0}", "org.mycore.frontend.cli.MCRUserCommands.listUser String", "The command list the user {0}.");
         command.add(com);
 
-        com = new MCRCommand("save all groups to file {0}", "org.mycore.frontend.cli.MCRUserCommands.saveAllGroupsToFile String", "");
+        com = new MCRCommand("export all groups to file {0}", "org.mycore.frontend.cli.MCRUserCommands.exportAllGroupsToFile String", "The command exports all group data to the file {0}.");
         command.add(com);
 
-        com = new MCRCommand("save group {0} to file {1}", "org.mycore.frontend.cli.MCRUserCommands.saveGroupToFile String String", "");
+        com = new MCRCommand("export group {0} to file {1}", "org.mycore.frontend.cli.MCRUserCommands.exportGroupToFile String String", "The command exports the data of group {0} to the file {1}.");
         command.add(com);
 
-        com = new MCRCommand("save all users to file {0}", "org.mycore.frontend.cli.MCRUserCommands.saveAllUsersToFile String", "");
+        com = new MCRCommand("export all users to file {0}", "org.mycore.frontend.cli.MCRUserCommands.exportAllUsersToFile String", "The command exports all user data to the file {0}.");
         command.add(com);
 
-        com = new MCRCommand("save user {0} to file {1}", "org.mycore.frontend.cli.MCRUserCommands.saveUserToFile String String", "");
+        com = new MCRCommand("export user {0} to file {1}", "org.mycore.frontend.cli.MCRUserCommands.exportUserToFile String String", "The command exports the data of user {0} to the file {1}.");
         command.add(com);
     }
 
@@ -259,7 +267,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
      * respectively.
      */
     public static void checkConsistency() throws Exception {
-      MCRUserMgr.instance().checkConsistency();
+        MCRUserMgr.instance().checkConsistency();
     }
 
     /**
@@ -270,7 +278,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
      *            the ID of the group which will be deleted
      */
     public static void deleteGroup(String groupID) throws Exception {
-       MCRUserMgr.instance().deleteGroup(groupID);
+        MCRUserMgr.instance().deleteGroup(groupID);
     }
 
     /**
@@ -281,7 +289,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
      *            the ID of the user which will be deleted
      */
     public static void deleteUser(String userID) throws Exception {
-      MCRUserMgr.instance().deleteUser(userID);
+        MCRUserMgr.instance().deleteUser(userID);
     }
 
     /**
@@ -291,7 +299,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
      *            the ID of the user which will be enabled
      */
     public static void enableUser(String userID) throws Exception {
-      MCRUserMgr.instance().enableUser(userID);
+        MCRUserMgr.instance().enableUser(userID);
     }
 
     /**
@@ -345,7 +353,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
      *            the ID of the user which will be enabled
      */
     public static void disableUser(String userID) throws Exception {
-       MCRUserMgr.instance().disableUser(userID);
+        MCRUserMgr.instance().disableUser(userID);
     }
 
     /**
@@ -374,12 +382,12 @@ public class MCRUserCommands extends MCRAbstractCommands {
 
     /**
      * This command takes a file name as a parameter, retrieves all groups from
-     * MCRUserMgr as JDOM document and saves this to the given file.
+     * MCRUserMgr as JDOM document and export this to the given file.
      * 
      * @param filename
-     *            Name of the file the groups will be saved to
+     *            Name of the file in this the groups will be exported
      */
-    public static void saveAllGroupsToFile(String filename) throws MCRException {
+    public static void exportAllGroupsToFile(String filename) throws MCRException {
         try {
             org.jdom.Document jdomDoc = MCRUserMgr.instance().getAllGroups();
             FileOutputStream outFile = new FileOutputStream(filename);
@@ -392,12 +400,12 @@ public class MCRUserCommands extends MCRAbstractCommands {
 
     /**
      * This command takes a file name as a parameter, retrieves all users from
-     * MCRUserMgr as JDOM document and saves this to the given file.
+     * MCRUserMgr as JDOM document and export this to the given file.
      * 
      * @param filename
-     *            Name of the file the users will be saved to
+     *            Name of the file in this the users will be exported
      */
-    public static void saveAllUsersToFile(String filename) throws MCRException {
+    public static void exportAllUsersToFile(String filename) throws MCRException {
         try {
             org.jdom.Document jdomDoc = MCRUserMgr.instance().getAllUsers();
             FileOutputStream outFile = new FileOutputStream(filename);
@@ -410,14 +418,14 @@ public class MCRUserCommands extends MCRAbstractCommands {
 
     /**
      * This command takes a groupID and file name as a parameter, retrieves the
-     * group from MCRUserMgr as JDOM document and saves this to the given file.
+     * group from MCRUserMgr as JDOM document and export this to the given file.
      * 
      * @param groupID
      *            ID of the group to be saved
      * @param filename
-     *            Name of the file the groups will be saved to
+     *            Name of the file to store the exported group
      */
-    public static void saveGroupToFile(String groupID, String filename) throws Exception {
+    public static void exportGroupToFile(String groupID, String filename) throws Exception {
         try {
             MCRGroup group = MCRUserMgr.instance().retrieveGroup(groupID);
             org.jdom.Document jdomDoc = group.toJDOMDocument();
@@ -431,14 +439,14 @@ public class MCRUserCommands extends MCRAbstractCommands {
 
     /**
      * This command takes a userID and file name as a parameter, retrieves the
-     * user from MCRUserMgr as JDOM document and saves this to the given file.
+     * user from MCRUserMgr as JDOM document and export this to the given file.
      * 
      * @param userID
      *            ID of the user to be saved
      * @param filename
-     *            Name of the file the user will be saved to
+     *            Name of the file to store the exported user
      */
-    public static void saveUserToFile(String userID, String filename) throws MCRException {
+    public static void exportUserToFile(String userID, String filename) throws MCRException {
         try {
             MCRUser user = MCRUserMgr.instance().retrieveUser(userID);
             org.jdom.Document jdomDoc = user.toJDOMDocument();
@@ -458,21 +466,21 @@ public class MCRUserCommands extends MCRAbstractCommands {
      *            the ID of the user for which the password will be set
      */
     public static void setPassword(String userID, String password) throws MCRException {
-      MCRUserMgr.instance().setPassword(userID, password);
+        MCRUserMgr.instance().setPassword(userID, password);
     }
 
     /**
      * This method sets the user management component to read only mode
      */
     public static void setLock() throws MCRException {
-      MCRUserMgr.instance().setLock(true);
+        MCRUserMgr.instance().setLock(true);
     }
 
     /**
      * This method sets the user management component to read/write access mode
      */
     public static void unLock() throws MCRException {
-      MCRUserMgr.instance().setLock(false);
+        MCRUserMgr.instance().setLock(false);
     }
 
     /**
