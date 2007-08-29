@@ -67,6 +67,9 @@ public final class MCRGoogleSitemapCommon {
     /** The style for by Google link */
     private static final String style = MCRConfiguration.instance().getString("MCR.GoogleSitemap.Style", "");
 
+    /** The url path for retrieving object metadata */
+    private static final String objectPath = MCRConfiguration.instance().getString("MCR.GoogleSitemap.ObjectPath", "receive/");
+    
     /** The XML table API */
     private static final MCRXMLTableManager tm = MCRXMLTableManager.instance();
 
@@ -107,7 +110,7 @@ public final class MCRGoogleSitemapCommon {
                 doc = tm.readDocument(new MCRObjectID(mcrID));
                 Element servDate = (Element) xpath.selectSingleNode(doc);
                 StringBuffer sb = new StringBuffer(1024);
-                sb.append(baseurl).append("receive/").append(mcrID);
+                sb.append(baseurl).append(objectPath).append(mcrID);
                 if ((style != null) && (style.trim().length() > 0)) {
                     sb.append("?XSL.Style=").append(style);
                 }
