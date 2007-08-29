@@ -106,10 +106,10 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         com = new MCRCommand("export all objects of type {0} to directory {1} with {2}", "org.mycore.frontend.cli.MCRObjectCommands.exportAllObjects String String String", "Stores all MCRObjects of type {0} to directory {1} with the stylesheet mcr_{2}-object.xsl. For {2} save is the default.");
         command.add(com);
 
-        com = new MCRCommand("get last object ID for base {0}", "org.mycore.frontend.cli.MCRObjectCommands.getLastID String", "Returns the last used MCRObjectID for the ID base.");
+        com = new MCRCommand("get last ID for base {0}", "org.mycore.frontend.cli.MCRObjectCommands.getLastID String", "Returns the last used MCRObjectID for the ID base {0}.");
         command.add(com);
 
-        com = new MCRCommand("get next object ID for base {0}", "org.mycore.frontend.cli.MCRObjectCommands.getNextID String", "Returns the next free MCRObjectID for the ID base.");
+        com = new MCRCommand("get next ID for base {0}", "org.mycore.frontend.cli.MCRObjectCommands.getNextID String", "Returns the next free MCRObjectID for the ID base {0}.");
         command.add(com);
 
         com = new MCRCommand("check file {0}", "org.mycore.frontend.cli.MCRObjectCommands.checkXMLFile String", "Checks the data file {0} against the XML Schema.");

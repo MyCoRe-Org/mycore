@@ -111,9 +111,6 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
         com = new MCRCommand("show loadable derivate of {0} to directory {1}", "org.mycore.frontend.cli.MCRDerivateCommands.show String String", "The command store the derivate with the MCRObjectID {0} to the directory {1}, without ifs-metadata");
         command.add(com);
 
-        com = new MCRCommand("get next derivate ID for base {0}", "org.mycore.frontend.cli.MCRDerivateCommands.getNextID String", "The command return the next free MCRObjectID for the ID base.");
-        command.add(com);
-
         com = new MCRCommand("repair derivate search of type derivate", "org.mycore.frontend.cli.MCRDerivateCommands.repairDerivateSearch", "The command read the Content store and reindex the derivate search stores.");
         command.add(com);
 
@@ -340,15 +337,6 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
         }
 
         return true;
-    }
-
-    /**
-     * Shows a list of next MCRObjectIDs.
-     */
-    public static void getNextID(String base) {
-        MCRObjectID mcr_id = new MCRObjectID();
-        mcr_id.setNextFreeId(base);
-        LOGGER.info(mcr_id.getId());
     }
 
     /**
