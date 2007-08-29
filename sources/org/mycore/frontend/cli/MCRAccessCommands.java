@@ -63,28 +63,39 @@ public class MCRAccessCommands extends MCRAbstractCommands {
 
         MCRCommand com = null;
 
-        com = new MCRCommand("load permissions data from file {0}", "org.mycore.frontend.cli.MCRAccessCommands.loadPermissionsFromFile String", "The command loads the permissions data of the access control system with data from the file {0}.");
+        com = new MCRCommand("load permissions data from file {0}", "org.mycore.frontend.cli.MCRAccessCommands.loadPermissionsFromFile String",
+                "The command loads the permissions data of the access control system with data from the file {0}.");
         command.add(com);
 
-        com = new MCRCommand("list all permissions", "org.mycore.frontend.cli.MCRAccessCommands.listAllPermissions", "");
+        com = new MCRCommand("list all permissions", "org.mycore.frontend.cli.MCRAccessCommands.listAllPermissions", "List all permission entries.");
         command.add(com);
 
-        com = new MCRCommand("delete all permissions", "org.mycore.frontend.cli.MCRAccessCommands.deleteAllPermissions", "");
+        com = new MCRCommand("delete all permissions", "org.mycore.frontend.cli.MCRAccessCommands.deleteAllPermissions",
+                "Remove all permission entries from the Access Control System.");
         command.add(com);
 
-        com = new MCRCommand("save all permissions to file {0}", "org.mycore.frontend.cli.MCRAccessCommands.saveAllPermissionsToFile String", "");
+        com = new MCRCommand("export all permissions to file {0}", "org.mycore.frontend.cli.MCRAccessCommands.exportAllPermissionsToFile String",
+                "Export all permissions from the Access Control System to the file {0}.");
         command.add(com);
 
-        com = new MCRCommand("update permission {0} for id {1} with rulefile {2} described by {3}", "org.mycore.frontend.cli.MCRAccessCommands.permissionUpdateForID String String String String", "The command updates access rule for a given id of a given permission with a given special rule");
+        com = new MCRCommand("update permission {0} for id {1} with rulefile {2} described by {3}",
+                "org.mycore.frontend.cli.MCRAccessCommands.permissionUpdateForID String String String String",
+                "The command updates access rule for a given id of a given permission with a given special rule");
         command.add(com);
 
-        com = new MCRCommand("update permission {0} for id {1} with rulefile {2}", "org.mycore.frontend.cli.MCRAccessCommands.permissionUpdateForID String String String", "The command updates access rule for a given id of a given permission with a given special rule");
+        com = new MCRCommand("update permission {0} for id {1} with rulefile {2}",
+                "org.mycore.frontend.cli.MCRAccessCommands.permissionUpdateForID String String String",
+                "The command updates access rule for a given id of a given permission with a given special rule");
         command.add(com);
 
-        com = new MCRCommand("update permission {0} for documentType {1} with rulefile {2} described by {3}", "org.mycore.frontend.cli.MCRAccessCommands.permissionUpdateForDocumentType String String String String", "The command updates access rule for a given permission and all ids of a given MCRObject-Type with a given special rule");
+        com = new MCRCommand("update permission {0} for documentType {1} with rulefile {2} described by {3}",
+                "org.mycore.frontend.cli.MCRAccessCommands.permissionUpdateForDocumentType String String String String",
+                "The command updates access rule for a given permission and all ids of a given MCRObject-Type with a given special rule");
         command.add(com);
 
-        com = new MCRCommand("update permission {0} for documentType {1} with rulefile {2}", "org.mycore.frontend.cli.MCRAccessCommands.permissionUpdateForDocumentType String String String", "The command updates access rule for a given permission and all ids of a given MCRObject-Type with a given special rule");
+        com = new MCRCommand("update permission {0} for documentType {1} with rulefile {2}",
+                "org.mycore.frontend.cli.MCRAccessCommands.permissionUpdateForDocumentType String String String",
+                "The command updates access rule for a given permission and all ids of a given MCRObject-Type with a given special rule");
         command.add(com);
     }
 
@@ -197,12 +208,12 @@ public class MCRAccessCommands extends MCRAbstractCommands {
     }
 
     /**
-     * This method just saves the permissions to a file
+     * This method just export the permissions to a file
      * 
      * @param filename
      *            the file written to
      */
-    public static final void saveAllPermissionsToFile(String filename) throws Exception {
+    public static final void exportAllPermissionsToFile(String filename) throws Exception {
         MCRAccessInterface AI = MCRAccessManager.getAccessImpl();
 
         Element mcrpermissions = new Element("mcrpermissions");
