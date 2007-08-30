@@ -91,21 +91,18 @@ public class MCRHIBRuleStore extends MCRRuleStore {
     }
 
     /**
-     * Method updates accessrule by given rule. internal: rule will be deleted
-     * first and recreated
+     * Method updates accessrule by given rule. internal: get rule object from session
+     * set values, update via session
      */
     public void updateRule(MCRAccessRule rule) {
         Session session = MCRHIBConnection.instance().getSession();
-        session.createQuery("delete MCRACCESSRULE where RID = '" + rule.getId() + "'").executeUpdate();
-        MCRACCESSRULE hibrule = new MCRACCESSRULE();
+        MCRACCESSRULE hibrule = (MCRACCESSRULE)session.get(MCRACCESSRULE.class, rule.getId());
 
         DateFormat df = new SimpleDateFormat(sqlDateformat);
         hibrule.setCreationdate(Timestamp.valueOf(df.format(rule.getCreationTime())));
         hibrule.setCreator(rule.getCreator());
-        hibrule.setRid(rule.getId());
         hibrule.setRule(rule.getRuleString());
         hibrule.setDescription(rule.getDescription());
-        session.saveOrUpdate(hibrule);
     }
 
     /**
