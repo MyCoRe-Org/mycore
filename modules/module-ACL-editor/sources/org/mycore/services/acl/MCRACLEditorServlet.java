@@ -64,10 +64,7 @@ public class MCRACLEditorServlet extends MCRServlet {
             objidFilter = request.getParameter("objid");
             acpoolFilter = request.getParameter("acpool");
             answer = XMLProcessing.access2XML(HIBA.getAccessPermission(objidFilter, acpoolFilter));
-            
-            if (addNew != null && addNew.equals("true"))
-                answer.addContent(XMLProcessing.accessElem(-1, "", "", ""));
-            
+           
             doLayout = true;
         } else if (mode.equals("ACLPermissionsEditor")) {
             LOGGER.debug("ACLPermissionsEditor");
@@ -134,14 +131,14 @@ public class MCRACLEditorServlet extends MCRServlet {
             LOGGER.debug("Redirect to URL " + redirectURL);
             redirect(response, redirectURL);
         } else if (indocRootName.equals("mcr_access_set")) {
-            Document origDoc = new Document().setContent(XMLProcessing.access2XML(HIBA.getAccessPermission(objidFilter, acpoolFilter)));
+            Document origDoc = new Document(XMLProcessing.access2XML(HIBA.getAccessPermission(objidFilter, acpoolFilter)));
             Map diffMap = XMLProcessing.findAccessDiff(indoc, origDoc);
 
             HIBA.savePermChanges(diffMap);
             redirect(response, "modules/module-ACL-editor/web/editor/editor-ACL_start.xml");
 
         } else if (indocRootName.equals("mcr_access_rule_set")) {
-            Document origDoc = new Document().setContent(XMLProcessing.access2XML(HIBA.getAccessPermission(objidFilter, acpoolFilter)));
+            Document origDoc = new Document(XMLProcessing.ruleSet2XML(HIBA.getAccessRule()));
             Map diffMap = XMLProcessing.findRulesDiff(indoc, origDoc);
 
             HIBA.saveRuleChanges(diffMap);

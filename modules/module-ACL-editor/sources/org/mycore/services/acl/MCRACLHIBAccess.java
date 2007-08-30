@@ -7,11 +7,12 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Restrictions;
+import org.mycore.access.MCRAccessInterface;
+import org.mycore.access.mcrimpl.MCRAccessControlSystem;
 import org.mycore.access.mcrimpl.MCRAccessRule;
 import org.mycore.access.mcrimpl.MCRAccessStore;
 import org.mycore.access.mcrimpl.MCRRuleMapping;
 import org.mycore.access.mcrimpl.MCRRuleStore;
-import org.mycore.backend.hibernate.MCRHIBAccessStore;
 import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.backend.hibernate.tables.MCRACCESS;
 import org.mycore.backend.hibernate.tables.MCRACCESSRULE;
@@ -62,13 +63,18 @@ public class MCRACLHIBAccess {
 	
 	public void saveRuleChanges(Map diffMap){
         MCRRuleStore ruleStore = MCRRuleStore.getInstance();
+        MCRAccessInterface AI = MCRAccessControlSystem.instance();
         
         for (Iterator it = ((List)diffMap.get("update")).iterator(); it.hasNext();){
             ruleStore.updateRule((MCRAccessRule)it.next());
+            /*MCRAccessRule currentRule = (MCRAccessRule)it.next();
+            ruleStore.deleteRule(currentRule.getId());
+            AI.createRule(currentRule.getRuleString(), "ACL-Editor", currentRule.getDescription());*/
         }
         
         for (Iterator it = ((List)diffMap.get("save")).iterator(); it.hasNext();){
-            ruleStore.createRule((MCRAccessRule)it.next());
+            MCRACCESSRULE accessRule = (MCRACCESSRULE)it.next();
+            AI.createRule(accessRule.getRule(), "ACL-Editor", accessRule.getDescription());
         }
         
         for (Iterator it = ((List)diffMap.get("delete")).iterator(); it.hasNext();){
