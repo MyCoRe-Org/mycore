@@ -11,7 +11,11 @@ import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.filter.Filter;
+import org.mycore.access.MCRAccessInterface;
+import org.mycore.access.mcrimpl.MCRAccessControlSystem;
+import org.mycore.access.mcrimpl.MCRAccessRule;
 import org.mycore.access.mcrimpl.MCRRuleMapping;
+import org.mycore.access.mcrimpl.MCRRuleStore;
 import org.mycore.backend.hibernate.tables.MCRACCESS;
 import org.mycore.backend.hibernate.tables.MCRACCESSRULE;
 
@@ -45,10 +49,8 @@ public class MCRACLXMLProcessing {
         for (Iterator it = accessList.iterator(); it.hasNext();) {
             MCRACCESS accessView = (MCRACCESS) it.next();
 
-            Element mcr_access = new Element("mcr_access");
+            /*Element mcr_access = new Element("mcr_access");
             mcr_access.setAttribute("pos", Integer.toString(i));
-            // mcr_access.addContent(new
-            // Element("pos").addContent(Integer.toString(i)));
 
             Element ACPOOL = new Element("ACPOOL");
             ACPOOL.addContent(accessView.getKey().getAcpool());
@@ -63,10 +65,39 @@ public class MCRACLXMLProcessing {
             mcr_access.addContent(OBJID);
             mcr_access.addContent(RID);
 
-            mcr_access_set.addContent(mcr_access);
+            mcr_access_set.addContent(mcr_access);*/
+            
+            //------------------------------------------------
+            
+            String acpool = accessView.getKey().getAcpool();
+            String objid = accessView.getKey().getObjid();
+            String rid = accessView.getRid();
+            
+            mcr_access_set.addContent(accessElem(i, acpool, objid, rid));
+            
             i++;
         }
         return mcr_access_set;
+    }
+    
+    public Element accessElem(int pos, String acpool, String objid, String rid){
+        Element mcr_access = new Element("mcr_access");
+        if (pos > 0)
+            mcr_access.setAttribute("pos", Integer.toString(pos));
+
+        Element ACPOOL = new Element("ACPOOL");
+        ACPOOL.addContent(acpool);
+
+        Element OBJID = new Element("OBJID");
+        OBJID.addContent(objid);
+
+        Element RID = new Element("RID");
+        RID.addContent(rid);
+
+        mcr_access.addContent(ACPOOL);
+        mcr_access.addContent(OBJID);
+        mcr_access.addContent(RID);
+        return mcr_access;
     }
 
     public Element ruleSet2Items(List ruleList) {
@@ -94,6 +125,14 @@ public class MCRACLXMLProcessing {
 
     public Element ruleSet2XML(List ruleList) {
         Element mcrAccessRuleSet = new Element("mcr_access_rule_set");
+        
+        if (ruleList == null){
+            MCRACCESSRULE emptyRule = new MCRACCESSRULE();
+            emptyRule.setRid("");
+            emptyRule.setRule("");
+            ruleList = new LinkedList();
+            ruleList.add(emptyRule);
+        }
 
         for (Iterator it = ruleList.iterator(); it.hasNext();) {
             MCRACCESSRULE rule = (MCRACCESSRULE) it.next();
@@ -115,6 +154,52 @@ public class MCRACLXMLProcessing {
         return mcrAccessRuleSet;
     }
 
+    public Map findRulesDiff(Document editedRules, Document origRules) throws Exception {
+        Element editedRulesRoot = editedRules.getRootElement();
+        Map diffMap = new HashMap();
+        
+        List updateList = new LinkedList();
+        List saveList = new LinkedList();
+        List deleteList = new LinkedList();
+        
+        List matches = new LinkedList();
+        
+        String rule = "";
+        String description = "";
+        
+        Filter newRulesFilter = new Filter() {
+            public boolean matches(Object arg0) {
+                if (((Element) arg0).getAttributeValue("pos") == null) {
+                    return true;
+                } else
+                    return false;
+            }
+        };
+        
+        matches = editedRulesRoot.removeContent(newRulesFilter);
+        
+        // saving new rules
+        MCRRuleStore ruleStore = MCRRuleStore.getInstance();
+        int rid = ruleStore.getNextFreeRuleID(MCRAccessControlSystem.systemRulePrefix);
+        int i = 0;
+        Iterator iter = matches.iterator();
+        while (iter.hasNext()){
+            Element currentRule = (Element) iter.next();
+            
+            rule = currentRule.getChildText("RULE");
+            description = currentRule.getChildText("DESCRIPTION");
+            
+            saveList.add(new MCRAccessRule(Integer.toString(rid + i), "", new Date(), rule, description));
+            i++;
+        }
+        
+        diffMap.put("update", updateList);
+        diffMap.put("save", saveList);
+        diffMap.put("delete", deleteList);
+        
+        return diffMap;
+    }
+    
     public Map findAccessDiff(Document editedAcces, Document origAccess) throws Exception {
         Element editedAccessRoot = editedAcces.getRootElement();
         Map diffMap = new HashMap();
@@ -123,7 +208,7 @@ public class MCRACLXMLProcessing {
 
         List editedElemList = editedAccessRoot.getChildren();
         Element origAccessRoot = origAccess.getRootElement();
-
+        
         List updateList = new LinkedList();
         List saveList = new LinkedList();
         List deleteList = new LinkedList();
@@ -139,22 +224,8 @@ public class MCRACLXMLProcessing {
 
                 saveList.add(createRuleMapping(currentRID, currentACPool, currentObjID));
             } else {
-                // XPath xpath =
-                // XPath.newInstance("/mcr_access_set/mcr_access[@pos='" +
-                // position + "']");
-
-                // Element origElem = (Element)
-                // xpath.selectSingleNode(origAccess);
                 Filter posFilter = new Filter() {
                     public boolean matches(Object arg0) {
-                        /*
-                         * System.out.println("#############################################");
-                         * try { new
-                         * XMLOutputter(Format.getPrettyFormat()).output((Element)
-                         * arg0, System.out); } catch (IOException e) { // TODO
-                         * Auto-generated catch block e.printStackTrace(); }
-                         * System.out.println("#############################################");
-                         */
                         if (((Element) arg0).getAttributeValue("pos").equals(position)) {
                             return true;
                         } else

@@ -14,7 +14,7 @@
 	<xsl:include href="MyCoReLayout.xsl"/>
 	<xsl:variable name="PageTitle" select="'Module-ACL Editor'"/>
 	
-	<xsl:template match="/mcr_access_set">
+	<xsl:template match="/mcr_access_set-debug">
 		<a href="http://141.35.23.203:8291/modules/module-ACL-editor/web/editor/editor_start_ACL_editor.xml"><b>Permissions editieren</b></a><br/>
 		<table border="1">
 			<tr>

@@ -7,8 +7,11 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Restrictions;
+import org.mycore.access.mcrimpl.MCRAccessRule;
 import org.mycore.access.mcrimpl.MCRAccessStore;
 import org.mycore.access.mcrimpl.MCRRuleMapping;
+import org.mycore.access.mcrimpl.MCRRuleStore;
+import org.mycore.backend.hibernate.MCRHIBAccessStore;
 import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.backend.hibernate.tables.MCRACCESS;
 import org.mycore.backend.hibernate.tables.MCRACCESSRULE;
@@ -21,7 +24,7 @@ public class MCRACLHIBAccess {
 		return MCRHIBConnection.instance().getSession().createCriteria(MCRACCESS.class).list();
 	}
 	
-	public List getAccess(String objidFilter, String acpoolFilter){
+	public List getAccessPermission(String objidFilter, String acpoolFilter){
 		Criteria query = MCRHIBConnection.instance().getSession().createCriteria(MCRACCESS.class);
 		
 		if (objidFilter != null){
@@ -41,7 +44,7 @@ public class MCRACLHIBAccess {
 		return MCRHIBConnection.instance().getSession().createCriteria(MCRACCESSRULE.class).list();
 	}
 	
-	public void saveChanges(Map diffMap){
+	public void savePermChanges(Map diffMap){
 		MCRAccessStore accessStore = MCRAccessStore.getInstance();
 		
 		for (Iterator it = ((List)diffMap.get("update")).iterator(); it.hasNext();){
@@ -56,4 +59,20 @@ public class MCRACLHIBAccess {
 			accessStore.deleteAccessDefinition((MCRRuleMapping)it.next());
 		}
 	}
+	
+	public void saveRuleChanges(Map diffMap){
+        MCRRuleStore ruleStore = MCRRuleStore.getInstance();
+        
+        for (Iterator it = ((List)diffMap.get("update")).iterator(); it.hasNext();){
+            ruleStore.updateRule((MCRAccessRule)it.next());
+        }
+        
+        for (Iterator it = ((List)diffMap.get("save")).iterator(); it.hasNext();){
+            ruleStore.createRule((MCRAccessRule)it.next());
+        }
+        
+        for (Iterator it = ((List)diffMap.get("delete")).iterator(); it.hasNext();){
+            ruleStore.deleteRule((String)it.next());
+        }
+    }
 }

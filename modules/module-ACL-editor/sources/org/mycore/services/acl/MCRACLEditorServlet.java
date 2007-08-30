@@ -2,6 +2,7 @@ package org.mycore.services.acl;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.ServletException;
@@ -11,245 +12,304 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
-import org.jdom.output.XMLOutputter;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.frontend.editor.MCREditorSubmission;
-import org.mycore.frontend.editor.MCRRequestParameters;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
 
 public class MCRACLEditorServlet extends MCRServlet {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
 
-	private static Logger LOGGER = Logger.getLogger(MCRACLEditorServlet.class);
+    private static Logger LOGGER = Logger.getLogger(MCRACLEditorServlet.class);
 
-	public void init() throws MCRConfigurationException, ServletException {
-		super.init();
-	}
+    public void init() throws MCRConfigurationException, ServletException {
+        super.init();
+    }
 
-	public void doGetPost(MCRServletJob job) throws Exception {
-		MCRSession session = MCRSessionMgr.getCurrentSession();
-		HttpServletRequest request = job.getRequest();
-		HttpServletResponse response = job.getResponse();
-		String mode = request.getParameter("mode");
+    public void doGetPost(MCRServletJob job) throws Exception {
+        MCRSession session = MCRSessionMgr.getCurrentSession();
+        HttpServletRequest request = job.getRequest();
+        HttpServletResponse response = job.getResponse();
+        String mode = request.getParameter("mode");
 
-		MCRACLHIBAccess HIBA = new MCRACLHIBAccess();
-		MCRACLXMLProcessing XMLProcessing = new MCRACLXMLProcessing();
+        MCRACLHIBAccess HIBA = new MCRACLHIBAccess();
+        MCRACLXMLProcessing XMLProcessing = new MCRACLXMLProcessing();
 
-		String objidFilter = null;
-		String acpoolFilter = null;
-		Map filterMap = (Map) session.get("filter");
+        String objidFilter = null;
+        String acpoolFilter = null;
 
-		if (filterMap != null) {
-			objidFilter = (String) filterMap.get("objid");
-			acpoolFilter = (String) filterMap.get("acpool");
+        LOGGER.info("******* Current Filter: obj: " + objidFilter + "\t ac: " + acpoolFilter);
 
-			if (objidFilter != null && objidFilter.equals("*")) {
-				filterMap.remove("objid");
-				objidFilter = null;
-			}
+        System.out.println("#################################################");
+        System.out.println("# version 0.041                                 #");
+        System.out.println("#################################################");
 
-			if (acpoolFilter != null && acpoolFilter.equals("*")) {
-				filterMap.remove("acpool");
-				acpoolFilter = null;
-			}
+        boolean doLayout = false;
+        Element answer = null;
 
-			if (acpoolFilter == null && objidFilter == null) {
-				session.deleteObject("filter");
-			}
+        String errorMsg = "The request did not contain a valid mode for this servlet!";
 
-		} else
-			LOGGER.debug("******** Filter NULL *******");
+        if (mode == null) {
+            LOGGER.debug("processSubmission");
+            processSubmission(job, response, objidFilter, acpoolFilter);
+        } else if (mode.equals("getACLPermissions")) {
+            LOGGER.debug("getACLPermissions");
+            String addNew = request.getParameter("addNew");
+            objidFilter = request.getParameter("objid");
+            acpoolFilter = request.getParameter("acpool");
+            answer = XMLProcessing.access2XML(HIBA.getAccessPermission(objidFilter, acpoolFilter));
+            
+            if (addNew != null && addNew.equals("true"))
+                answer.addContent(XMLProcessing.accessElem(-1, "", "", ""));
+            
+            doLayout = true;
+        } else if (mode.equals("ACLPermissionsEditor")) {
+            LOGGER.debug("ACLPermissionsEditor");
+            answer = new Element("ACLPermissionsEditor");
+            doLayout = true;
+            // redirect(response,
+            // "modules/module-ACL-editor/web/editor/editor-ACL_Permissions.xml?source_mode=getACLPermissions");
+        } else if (mode.equals("access")) {
+            answer = XMLProcessing.access2XML(HIBA.getAccessPermission(objidFilter, acpoolFilter));
+            answer.addContent(XMLProcessing.ruleSet2Items(HIBA.getAccessRule()));
+            doLayout = true;
+        } else if (mode.equals("getRuleAsItems")) {
+            answer = XMLProcessing.ruleSet2Items(HIBA.getAccessRule());
+            doLayout = true;
+        } else if (mode.equals("getRuleTable")) {
+            List ruleList = null;
 
-		LOGGER.info("******* Current Filter: obj: " + objidFilter + "\t ac: " + acpoolFilter);
+            if (request.getParameter("newRule") == null) {
+                ruleList = HIBA.getAccessRule();
+            }
 
-		System.out.println("#################################################");
-		System.out.println("# version 0.041                                 #");
-		System.out.println("#################################################");
+            answer = XMLProcessing.ruleSet2XML(ruleList);
+            doLayout = true;
+        } else if (mode.equals("getFilter")) {
+            LOGGER.info("******* get Filter!");
+            objidFilter = request.getParameter("objid");
+            acpoolFilter = request.getParameter("acpool");
+            answer = XMLProcessing.accessFilter2XML(objidFilter, acpoolFilter);
+            doLayout = true;
+        } else if (mode.equals("removeFilter")) {
+            String redirectURL = "modules/module-ACL-editor/web/editor/editor-ACL_start.xml";
+            LOGGER.debug("Redirect to URL " + redirectURL);
+            redirect(response, redirectURL);
+        } else {
+            job.getResponse().sendError(HttpServletResponse.SC_BAD_REQUEST, errorMsg);
+        }
 
-		boolean doLayout = false;
-		Element answer = null;
+        if (doLayout)
+            doLayout(request, response, answer, "html");
 
-		String errorMsg = "The request did not contain a valid mode for this servlet!";
+    }
 
-		if (mode == null) {
-			processSubmission(job, response, objidFilter, acpoolFilter);
-		} else if (mode.equals("access")) {
-			answer = XMLProcessing.access2XML(HIBA.getAccess(objidFilter, acpoolFilter));
-			doLayout = true;
-		} else if (mode.equals("getRuleAsItems")) {
-			answer = XMLProcessing.ruleSet2Items(HIBA.getAccessRule());
-			doLayout = true;
-		} else if (mode.equals("getRuleTable")) {
-			answer = XMLProcessing.ruleSet2XML(HIBA.getAccessRule());
-			doLayout = true;
-		} else if (mode.equals("getFilter")) {
-			LOGGER.info("******* get Filter!");
-			answer = XMLProcessing.accessFilter2XML(objidFilter, acpoolFilter);
-			doLayout = true;
-		} else if (mode.equals("setFilter")) {
-			LOGGER.info("******* set Filter!");
-			setFilterFromGet(request, response);
-			redirect(response, "servlets/MCRACLEditorServlet?mode=getFilter");
-		} else if (mode.equals("removeFilter")) {
-			removeFilter(request, response);
-			// redirect(response,
-			// "servlets/MCRACLEditorServlet?mode=getFilter");
-			MCRRequestParameters parms = new MCRRequestParameters(request);
-			String sessionID = parms.getParameter("_session");
-//			StringBuffer sb = new StringBuffer(getBaseURL());
-			StringBuffer sb = new StringBuffer();
-            sb.append(parms.getParameter("_webpage"));
-            sb.append("?XSL.editor.session.id=");
-            sb.append(sessionID);
-			redirect(response, sb.toString());
-		} else {
-			job.getResponse().sendError(HttpServletResponse.SC_BAD_REQUEST, errorMsg);
-		}
+    private void processSubmission(MCRServletJob job, HttpServletResponse response, String objidFilter, String acpoolFilter) throws Exception {
+        LOGGER.debug("Process submission!");
+        MCRACLHIBAccess HIBA = new MCRACLHIBAccess();
+        MCRACLXMLProcessing XMLProcessing = new MCRACLXMLProcessing();
+        Document indoc = getSubmissionDoc(job); // sub.getXML();
 
-		if (doLayout)
-			doLayout(request, response, answer);
+        Element indocRoot = indoc.getRootElement();
+        String indocRootName = indocRoot.getName();
 
-	}
+        if (indocRootName.equals("mcr_access_filter")) {
+            /*
+             * Here we are a little bit inconsistent. Normally
+             * MCRACLXMLProcessing should take care of all the xml stuff, but
+             * here we have to move to much data around for nothing and blow up
+             * the code
+             */
+            objidFilter = indocRoot.getChildText(ACLConstants.objidFilter);
+            acpoolFilter = indocRoot.getChildText(ACLConstants.acpoolFilter);
+            setFilter(objidFilter, acpoolFilter);
+            String redirectURL = "modules/module-ACL-editor/web/editor/editor-ACL_start.xml";
+            redirectURL = appendFilter(redirectURL, objidFilter, acpoolFilter);
+            LOGGER.debug("Redirect to URL " + redirectURL);
+            redirect(response, redirectURL);
+        } else if (indocRootName.equals("mcr_access_set")) {
+            Document origDoc = new Document().setContent(XMLProcessing.access2XML(HIBA.getAccessPermission(objidFilter, acpoolFilter)));
+            Map diffMap = XMLProcessing.findAccessDiff(indoc, origDoc);
 
-	private void processSubmission(MCRServletJob job, HttpServletResponse response, String objidFilter, String acpoolFilter) throws Exception {
-		MCRACLHIBAccess HIBA = new MCRACLHIBAccess();
-		MCRACLXMLProcessing XMLProcessing = new MCRACLXMLProcessing();
-		MCREditorSubmission sub = (MCREditorSubmission) job.getRequest().getAttribute("MCREditorSubmission");
-		Document indoc = sub.getXML();
-		
-		Element indocRoot = indoc.getRootElement();
-		String indocRootName = indocRoot.getName();
+            HIBA.savePermChanges(diffMap);
+            redirect(response, "modules/module-ACL-editor/web/editor/editor-ACL_start.xml");
 
-		if (indocRootName.equals("mcr_access_filter")) {
-			/*
-			 * Here we are a little bit inconsistent. Normally MCRACLXMLProcessing should
-			 * take care of all the xml stuff, but here we have to move to much data
-			 * around for nothing and blow up the code
-			 */
-			objidFilter = indocRoot.getChildText("objid");
-			acpoolFilter = indocRoot.getChildText("acpool");
-			setFilter(objidFilter, acpoolFilter);
-			
-			redirect(response, "modules/module-ACL-editor/web/editor/editor_start_ACL_editor.xml");
-		} else if (indocRootName.equals("mcr_access_set")) {
-			Document origDoc = new Document().setContent(XMLProcessing.access2XML(HIBA.getAccess(objidFilter, acpoolFilter)));
-			Map diffMap = XMLProcessing.findAccessDiff(indoc, origDoc);
+        } else if (indocRootName.equals("mcr_access_rule_set")) {
+            Document origDoc = new Document().setContent(XMLProcessing.access2XML(HIBA.getAccessPermission(objidFilter, acpoolFilter)));
+            Map diffMap = XMLProcessing.findRulesDiff(indoc, origDoc);
 
-			HIBA.saveChanges(diffMap);
-			redirect(response, "servlets/MCRACLEditorServlet?mode=access");
+            HIBA.saveRuleChanges(diffMap);
+            redirect(response, "modules/module-ACL-editor/web/editor/editor-access_rule.xml");
 
-		}
-	}
+        }
+    }
 
-	private void setFilterFromGet(HttpServletRequest request, HttpServletResponse response) {
-		String newObjIDFilter = request.getParameter("objid");
-		String newAcPoolFilter = request.getParameter("acpool");
+    private String appendFilter(String URL, String objid, String acpool) {
+        String sign = "";
 
-		setFilter(newObjIDFilter, newAcPoolFilter);
-	}
+        if (URL.contains("?"))
+            sign = "&";
+        else
+            sign = "?";
 
-	private void setFilter(String newObjIDFilter, String newAcPoolFilter) {
-		MCRSession session = MCRSessionMgr.getCurrentSession();
-		Map filterMap = (Map) session.get("filter");
-		boolean oldFilterExist = false;
+        if (objid != null) {
+            URL = URL + sign + "objid=" + objid;
+            sign = "&";
+        }
 
-		if (filterMap == null)
-			filterMap = new HashMap();
-		else
-			oldFilterExist = true;
+        if (acpool != null)
+            URL = URL + sign + "acpool=" + acpool;
 
-		String oldObjIDFilter = (String) filterMap.get("objid");
-		String oldAcPoolFilter = (String) filterMap.get("acpool");
+        return URL;
+    }
 
-		/*
-		 * Here we check what happen to the objid filter depending on its old
-		 * and new value.
-		 * 
-		 * There are two cases where the filter have to be removed: 1)
-		 * newObjIDFilter != null && newObjIDFilter.equals("") 2) newObjIDFilter ==
-		 * null && oldObjIDFilter != null
-		 * 
-		 * so the order of the if test is important to keep the code small. When
-		 * oldObjIDFilter == null, the rest is skipped regardless of the value
-		 * of the or test. The newObjIDFilter.equals("") ist just evualate if
-		 * newObjIDFilter != null so no NullPointer exception is expected.
-		 * 
-		 * When the if test is true so we have to remove the filter value in the
-		 * session as well the value in filterMap.
-		 * 
-		 * When we reach the second if test we have to check the following
-		 * cases: 1) newObjIDFilter != null && oldObjIDFilter == null 2)
-		 * newObjIDFilter != null && oldObjIDFilter != null
-		 * 
-		 * In both cases we have to set the new filter regardless of the value
-		 * of oldObjIDFilter.
-		 * 
-		 * When newObjIDFilter == null && oldObjIDFilter == null, nothing to do
-		 */
-		if (oldObjIDFilter != null && (newObjIDFilter == null || newObjIDFilter.equals(""))) {
-			session.deleteObject("objid");
-			filterMap.remove("objid");
+    private Document getSubmissionDoc(MCRServletJob job) {
+        MCREditorSubmission sub = (MCREditorSubmission) job.getRequest().getAttribute("MCREditorSubmission");
+        return sub.getXML();
+    }
 
-			LOGGER.info("******* ObjID Filter removed!");
-		} else if (newObjIDFilter != null) {
-			filterMap.put("objid", newObjIDFilter);
-			LOGGER.info("******* new ObjID Filter: " + newObjIDFilter);
-		}
+    private String getFiler(MCRSession session, String filter) {
+        Map filterMap = (Map) session.get(ACLConstants.filterFromSession);
 
-		/*
-		 * see objid filter
-		 */
-		if (oldAcPoolFilter != null && (newAcPoolFilter == null || newAcPoolFilter.equals(""))) {
-			session.deleteObject("acpool");
-			filterMap.remove("acpool");
+        if (filterMap != null) {
+            filter = (String) filterMap.get(filter);
+        } else {
+            filter = null;
+            LOGGER.debug("******** Filter NULL *******");
+        }
 
-			LOGGER.info("******* AcPool Filter removed!");
-		} else if (newAcPoolFilter != null) {
-			filterMap.put("acpool", newAcPoolFilter);
-			LOGGER.info("******* new AcPool Filter: " + newAcPoolFilter);
-		}
+        return filter;
+    }
 
-		if (filterMap.size() == 0 && oldFilterExist) {
-			session.deleteObject("filter");
-			LOGGER.info("******* Filter completely removed!");
-		} else {
-			session.put("filter", filterMap);
-			LOGGER.info("******* Filter updated!");
-		}
-	}
+    private void setFilter(Document indoc) {
+        Element indocRoot = indoc.getRootElement();
+        String indocRootName = indocRoot.getName();
+        if (indocRootName.equals("mcr_access_filter")) {
+            String objidFilter = indocRoot.getChildText(ACLConstants.objidFilter);
+            String acpoolFilter = indocRoot.getChildText(ACLConstants.acpoolFilter);
+            setFilter(objidFilter, acpoolFilter);
+        } else
+            LOGGER.debug("Wrong filter document, filter not set!");
+    }
 
-	private void removeFilter(HttpServletRequest request, HttpServletResponse response) {
-		MCRSession session = MCRSessionMgr.getCurrentSession();
+    private void setFilter(HttpServletRequest request, HttpServletResponse response) {
+        String newObjIDFilter = request.getParameter(ACLConstants.objidFilter);
+        String newAcPoolFilter = request.getParameter(ACLConstants.acpoolFilter);
 
-		if (session.get("filter") != null)
-			session.deleteObject("filter");
-	}
+        setFilter(newObjIDFilter, newAcPoolFilter);
+    }
 
-	private void redirect(HttpServletResponse response, String url) {
-		if (url == null)
-			url = "";
+    private void setFilter(String newObjIDFilter, String newAcPoolFilter) {
+        MCRSession session = MCRSessionMgr.getCurrentSession();
+        Map filterMap = (Map) session.get(ACLConstants.filterFromSession);
+        boolean oldFilterExist = false;
 
-		try {
-			response.sendRedirect(response.encodeRedirectURL(getBaseURL() + url));
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
+        if (filterMap == null)
+            filterMap = new HashMap();
+        else
+            oldFilterExist = true;
 
-	private void doLayout(HttpServletRequest request, HttpServletResponse response, Element elem) throws IOException {
-		doLayout(request, response, new Document(elem));
-	}
+        String oldObjIDFilter = (String) filterMap.get(ACLConstants.objidFilter);
+        String oldAcPoolFilter = (String) filterMap.get(ACLConstants.acpoolFilter);
 
-	private void doLayout(HttpServletRequest request, HttpServletResponse response, Document doc) throws IOException {
-		getLayoutService().doLayout(request, response, doc);
-	}
+        /*
+         * Here we check what happen to the objid filter depending on its old
+         * and new value.
+         * 
+         * There are two cases where the filter have to be removed: 1)
+         * newObjIDFilter != null && newObjIDFilter.equals("") 2) newObjIDFilter ==
+         * null && oldObjIDFilter != null
+         * 
+         * so the order of the if test is important to keep the code small. When
+         * oldObjIDFilter == null, the rest is skipped regardless of the value
+         * of the or test. The newObjIDFilter.equals("") ist just evualate if
+         * newObjIDFilter != null so no NullPointer exception is expected.
+         * 
+         * When the if test is true so we have to remove the filter value in the
+         * session as well the value in filterMap.
+         * 
+         * When we reach the second if test we have to check the following
+         * cases: 1) newObjIDFilter != null && oldObjIDFilter == null 2)
+         * newObjIDFilter != null && oldObjIDFilter != null
+         * 
+         * In both cases we have to set the new filter regardless of the value
+         * of oldObjIDFilter.
+         * 
+         * When newObjIDFilter == null && oldObjIDFilter == null, nothing to do
+         */
+        if (oldObjIDFilter != null && (newObjIDFilter == null || newObjIDFilter.equals(""))) {
+            session.deleteObject(ACLConstants.objidFilter);
+            filterMap.remove(ACLConstants.objidFilter);
+
+            LOGGER.info("******* ObjID Filter removed!");
+        } else if (newObjIDFilter != null) {
+            filterMap.put(ACLConstants.objidFilter, newObjIDFilter);
+            LOGGER.info("******* new ObjID Filter: " + newObjIDFilter);
+        }
+
+        /*
+         * see objid filter
+         */
+        if (oldAcPoolFilter != null && (newAcPoolFilter == null || newAcPoolFilter.equals(""))) {
+            session.deleteObject(ACLConstants.acpoolFilter);
+            filterMap.remove(ACLConstants.acpoolFilter);
+
+            LOGGER.info("******* AcPool Filter removed!");
+        } else if (newAcPoolFilter != null) {
+            filterMap.put(ACLConstants.acpoolFilter, newAcPoolFilter);
+            LOGGER.info("******* new AcPool Filter: " + newAcPoolFilter);
+        }
+
+        if (filterMap.size() == 0 && oldFilterExist) {
+            session.deleteObject(ACLConstants.filterFromSession);
+            LOGGER.info("******* Filter completely removed!");
+        } else {
+            session.put(ACLConstants.filterFromSession, filterMap);
+            LOGGER.info("******* Filter updated!");
+        }
+    }
+
+    private void removeFilter(HttpServletRequest request, HttpServletResponse response) {
+        MCRSession session = MCRSessionMgr.getCurrentSession();
+
+        if (session.get(ACLConstants.filterFromSession) != null)
+            session.deleteObject(ACLConstants.filterFromSession);
+    }
+
+    private void redirect(HttpServletResponse response, String url) {
+        if (url == null)
+            url = "";
+
+        try {
+            response.sendRedirect(response.encodeRedirectURL(getBaseURL() + url));
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
+    private void doLayout(HttpServletRequest request, HttpServletResponse response, Element elem, String format) throws IOException {
+        doLayout(request, response, new Document(elem), format);
+    }
+
+    private void doLayout(HttpServletRequest request, HttpServletResponse response, Document doc, String format) throws IOException {
+
+        if (format.equals("xml"))
+            getLayoutService().sendXML(request, response, doc);
+        else
+            getLayoutService().doLayout(request, response, doc);
+    }
+
+    private class ACLConstants {
+        static final String filterFromSession = "filter";
+        static final String objidFilter = "objid";
+        static final String acpoolFilter = "acpool";
+    }
 
 }

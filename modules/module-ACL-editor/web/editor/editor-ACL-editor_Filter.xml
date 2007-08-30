@@ -41,11 +41,6 @@
 					<label xml:lang="de">Filter löschen</label>
 				</cancelButton>
 			</cell>
-			<cell id="mcr.access.remove_foo.buttons" row="10" col="5">
-				<button width="100px" url="">
-					<label xml:lang="de">Foo</label>
-				</button>
-			</cell>
 		</panel>
 	</components>
 </editor>
