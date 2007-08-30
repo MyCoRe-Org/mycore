@@ -281,45 +281,6 @@ public class MCRStartEditorServlet extends MCRServlet {
     }
 
     /**
-     * Builds an url that can be used to redirect the client browser to another
-     * page, including http request parameters. The request parameters will be
-     * encoded as http get request.
-     * 
-     * @param baseURL
-     *            the base url of the target webpage
-     * @param parameters
-     *            the http request parameters
-     */
-    protected String buildRedirectURL(String baseURL, Properties parameters) {
-        StringBuffer redirectURL = new StringBuffer(baseURL);
-        boolean first = true;
-
-        for (Enumeration e = parameters.keys(); e.hasMoreElements();) {
-            if (first) {
-                redirectURL.append("?");
-                first = false;
-            } else {
-                redirectURL.append("&");
-            }
-
-            String name = (String) (e.nextElement());
-            String value = null;
-
-            try {
-                value = URLEncoder.encode(parameters.getProperty(name), "UTF-8");
-            } catch (UnsupportedEncodingException ex) {
-                value = parameters.getProperty(name);
-            }
-
-            redirectURL.append(name).append("=").append(value);
-        }
-
-        LOGGER.debug("Sending redirect to " + redirectURL.toString());
-
-        return redirectURL.toString();
-    }
-
-    /**
      * This method return a next new MCRObjectID for the given type and project
      * ID.
      * 

@@ -24,12 +24,15 @@
 package org.mycore.frontend.servlets;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
+import java.net.URLEncoder;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
 
@@ -398,6 +401,39 @@ public class MCRServlet extends HttpServlet {
         }
     }
 
+    /**
+     * This method builds a URL that can be used to redirect the client browser
+     * to another page, thereby including http request parameters. The request
+     * parameters will be encoded as http get request.
+     * 
+     * @param baseURL
+     *            the base url of the target webpage
+     * @param parameters
+     *            the http request parameters
+     */
+    protected String buildRedirectURL(String baseURL, Properties parameters) {
+        StringBuilder redirectURL = new StringBuilder(baseURL);
+        boolean first = true;
+        for (Enumeration e = parameters.keys(); e.hasMoreElements();) {
+            if (first) {
+                redirectURL.append("?");
+                first = false;
+            } else
+                redirectURL.append("&");
+
+            String name = (String) (e.nextElement());
+            String value = null;
+            try {
+                value = URLEncoder.encode(parameters.getProperty(name), "UTF-8");
+            } catch (UnsupportedEncodingException ex) {
+                value = parameters.getProperty(name);
+            }
+            redirectURL.append(name).append("=").append(value);
+        }
+        LOGGER.debug("Sending redirect to " + redirectURL.toString());
+        return redirectURL.toString();
+    }
+    
     protected void generateActiveLinkErrorpage(HttpServletRequest request, HttpServletResponse response, String msg, MCRActiveLinkException activeLinks)
             throws IOException {
         StringBuffer msgBuf = new StringBuffer(msg);
