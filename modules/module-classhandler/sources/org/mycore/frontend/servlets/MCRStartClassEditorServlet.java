@@ -24,9 +24,6 @@
 
 package org.mycore.frontend.servlets;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.util.Enumeration;
 import java.util.List;
 import java.util.Properties;
 
@@ -36,12 +33,12 @@ import org.jdom.Element;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUtils;
+import org.mycore.datamodel.classifications.MCRCategoryItem;
 import org.mycore.datamodel.classifications.MCRClassificationBrowserData;
 import org.mycore.datamodel.classifications.MCRClassificationEditor;
-import org.mycore.datamodel.classifications.MCRCategoryItem;
 import org.mycore.datamodel.classifications.MCRClassificationItem;
-import org.mycore.datamodel.classifications.MCRClassificationTransformer;
 import org.mycore.datamodel.classifications.MCRClassificationQuery;
+import org.mycore.datamodel.classifications.MCRClassificationTransformer;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.MCRObjectService;
 import org.mycore.frontend.editor.MCREditorSubmission;
@@ -377,29 +374,6 @@ public class MCRStartClassEditorServlet extends MCRServlet {
 
     }
 
-    private final String buildRedirectURL(String baseURL, Properties parameters) {
-        StringBuffer redirectURL = new StringBuffer(baseURL);
-        boolean first = true;
-        for (Enumeration e = parameters.keys(); e.hasMoreElements();) {
-            if (first) {
-                redirectURL.append("?");
-                first = false;
-            } else
-                redirectURL.append("&");
-
-            String name = (String) (e.nextElement());
-            String value = null;
-            try {
-                value = URLEncoder.encode(parameters.getProperty(name), "UTF-8");
-            } catch (UnsupportedEncodingException ex) {
-                value = parameters.getProperty(name);
-            }
-            redirectURL.append(name).append("=").append(value);
-        }
-        LOGGER.debug("Sending redirect to " + redirectURL.toString());
-        return redirectURL.toString();
-    }
-    
     /**
      * Normalize the ACL to use in the SWF ACL editor. Some single conditions
      * are one step to high in the hierarchie of the conditin tree. This method
