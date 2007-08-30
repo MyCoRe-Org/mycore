@@ -38,7 +38,29 @@ import org.mycore.user.MCRUser;
  * @since 1.3
  */
 public interface MCRAccessInterface {
-
+    
+    /**
+     * create an access rule in the rulestore using an rule string in plain text
+     * 
+     * @param rule
+     *              the rule string in plain text
+     * @param creator
+     * @param description
+     *              a String description of the rule in prosa 
+     */
+    public void createRule(String rule, String creator, String description);
+    
+    /**
+     * create an access rule in the rulestore using an rule string in plain text
+     * 
+     * @param rule
+     *              the rule string as xml
+     * @param creator
+     * @param description
+     *              a String description of the rule in prosa 
+     */
+    public void createRule(Element rule, String creator, String description);
+    
     /**
      * adds an access rule for an ID to an access system. The parameter
      * <code>id</code> serves as an identifier for the concrete underlying

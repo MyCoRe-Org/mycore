@@ -292,4 +292,13 @@ public class MCRAccessBaseImpl implements MCRAccessInterface {
         return null;
     }
 
+    public void createRule(String rule, String creator, String description) {
+        LOGGER.debug("Execute MCRAccessBaseImpl createRule with rule " + rule + " \n and description " + description);
+        
+    }
+
+    public void createRule(Element rule, String creator, String description) {
+        // TODO Auto-generated method stub
+        
+    }
 }
