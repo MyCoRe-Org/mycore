@@ -1,11 +1,13 @@
 package org.mycore.services.acl;
 
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.hibernate.Criteria;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.mycore.access.MCRAccessInterface;
 import org.mycore.access.mcrimpl.MCRAccessControlSystem;
@@ -38,11 +40,15 @@ public class MCRACLHIBAccess {
 			query = query.add(Restrictions.like("key.acpool", acpoolFilter.replaceAll("\\*", "%")));
 		}
 		
+        query.addOrder(Order.asc("key.objid"));
+        query.addOrder(Order.asc("key.acpool"));
+        
 		return query.list();
 	}
 	
 	public List getAccessRule(){
-		return MCRHIBConnection.instance().getSession().createCriteria(MCRACCESSRULE.class).list();
+        Criteria query = MCRHIBConnection.instance().getSession().createCriteria(MCRACCESSRULE.class);
+		return query.list();
 	}
 	
 	public void savePermChanges(Map diffMap){
@@ -66,10 +72,8 @@ public class MCRACLHIBAccess {
         MCRAccessInterface AI = MCRAccessControlSystem.instance();
         
         for (Iterator it = ((List)diffMap.get("update")).iterator(); it.hasNext();){
-            ruleStore.updateRule((MCRAccessRule)it.next());
-            /*MCRAccessRule currentRule = (MCRAccessRule)it.next();
-            ruleStore.deleteRule(currentRule.getId());
-            AI.createRule(currentRule.getRuleString(), "ACL-Editor", currentRule.getDescription());*/
+            MCRACCESSRULE rule = (MCRACCESSRULE) it.next();
+            ruleStore.updateRule(new MCRAccessRule(rule.getRid(), "ACL-Editor", new Date(), rule.getRule(), rule.getDescription()));
         }
         
         for (Iterator it = ((List)diffMap.get("save")).iterator(); it.hasNext();){
