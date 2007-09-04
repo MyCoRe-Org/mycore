@@ -62,6 +62,14 @@ public interface MCRAccessInterface {
     public void createRule(Element rule, String creator, String description);
     
     /**
+     * generate rule string from xml
+     * 
+     * @param rule
+     * @return
+     */
+    public String getNormalizedRuleString(Element rule);
+    
+    /**
      * adds an access rule for an ID to an access system. The parameter
      * <code>id</code> serves as an identifier for the concrete underlying
      * rule, e.g. a MCRObjectID.

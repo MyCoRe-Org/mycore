@@ -301,4 +301,9 @@ public class MCRAccessBaseImpl implements MCRAccessInterface {
         // TODO Auto-generated method stub
         
     }
+
+    public String getNormalizedRuleString(Element rule) {
+        // TODO Auto-generated method stub
+        return null;
+    }
 }

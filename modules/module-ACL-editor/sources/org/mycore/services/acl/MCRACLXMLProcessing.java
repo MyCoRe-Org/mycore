@@ -22,7 +22,6 @@ import org.mycore.access.mcrimpl.MCRRuleMapping;
 import org.mycore.backend.hibernate.tables.MCRACCESS;
 import org.mycore.backend.hibernate.tables.MCRACCESSPK;
 import org.mycore.backend.hibernate.tables.MCRACCESSRULE;
-import org.mycore.frontend.cli.MCRAccessCommands;
 
 public class MCRACLXMLProcessing {
     private static Logger LOGGER = Logger.getLogger(MCRACLXMLProcessing.class);
