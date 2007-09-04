@@ -25,8 +25,10 @@ package org.mycore.frontend.indexbrowser;
 
 import java.io.File;
 
+import org.apache.log4j.Logger;
 import org.jdom.Document;
 
+import org.mycore.common.MCRUtils;
 import org.mycore.common.xml.MCRXMLHelper;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
@@ -45,6 +47,9 @@ public final class MCRGoogleSitemapServlet extends MCRServlet {
 
     private static final long serialVersionUID = 1L;
 
+    /** The logger */
+    private static Logger LOGGER = Logger.getLogger(MCRGoogleSitemapServlet.class.getName());
+
     /**
      * This method implement the doGetPost method of MCRServlet. It build a XML
      * file for the Google search engine.
@@ -53,16 +58,41 @@ public final class MCRGoogleSitemapServlet extends MCRServlet {
      *            a MCRServletJob instance
      */
     public void doGetPost(MCRServletJob job) throws Exception {
-        String fn = MCRGoogleSitemapCommon.getFileName();
-        File fi = new File(fn);
+        MCRGoogleSitemapCommon common = new MCRGoogleSitemapCommon();
+        int number = common.checkSitemapFile();
+        LOGGER.debug("Build Google number of URL files " + Integer.toString(number) + ".");
         Document jdom = null;
+        // check if sitemap_google.xml exist
+        String fnsm = common.getFileName(1, true);
+        LOGGER.debug("Build Google check file " + fnsm);
+        File fi = new File(fnsm);
         if (fi.isFile()) {
-            jdom = MCRXMLHelper.parseXML(fn);
+            jdom = MCRXMLHelper.parseURI(fnsm, false);
             if (jdom == null) {
-                jdom = MCRGoogleSitemapCommon.buildSitemap();
+                if (number == 1) {
+                    jdom = common.buildSitemap();
+                } else {
+                    jdom = common.buildSitemapIndex(number);
+                }
             }
+            // redirect Layout Servlet
+            getLayoutService().sendXML(job.getRequest(), job.getResponse(), jdom);
+            return;
+        }
+        // remove old files
+        common.removeSitemapFiles();
+        // build new return and URL files
+        if (number == 1) {
+            jdom = common.buildSitemap();
         } else {
-            jdom = MCRGoogleSitemapCommon.buildSitemap();
+            for (int i = 0; i < number; i++) {
+                String fn = common.getFileName(i + 2, true);
+                File xml = new File(fn);
+                jdom = common.buildSitemap(i);
+                LOGGER.info("Write Google sitemap file " + fn + ".");
+                MCRUtils.writeJDOMToFile(jdom, xml);
+            }
+            jdom = common.buildSitemapIndex(number);
         }
         // redirect Layout Servlet
         getLayoutService().sendXML(job.getRequest(), job.getResponse(), jdom);

@@ -25,6 +25,7 @@ package org.mycore.frontend.indexbrowser;
 
 import java.io.File;
 
+import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.mycore.common.MCRUtils;
 import org.mycore.frontend.cli.MCRAbstractCommands;
@@ -44,6 +45,9 @@ import org.mycore.frontend.cli.MCRCommand;
  */
 public final class MCRGoogleSitemapCommands extends MCRAbstractCommands {
 
+    /** The logger */
+    private static Logger LOGGER = Logger.getLogger(MCRGoogleSitemapCommands.class.getName());
+
     /**
      * The empty constructor.
      */
@@ -52,18 +56,46 @@ public final class MCRGoogleSitemapCommands extends MCRAbstractCommands {
 
         MCRCommand com = null;
 
-        com = new MCRCommand("build google sitemap", "org.mycore.frontend.indexbrowser.MCRGoogleSitemapCommands.buildSitemap", "Create the google sitemap in the webapps directory.");
+        com = new MCRCommand("build google sitemap", "org.mycore.frontend.indexbrowser.MCRGoogleSitemapCommands.buildSitemap", "Create the google sitemap(s) in the webapps directory.");
         command.add(com);
     }
 
     /**
      * The build and store method.
      */
-    public static final void buildSitemap() throws Exception{
-        String fn = MCRGoogleSitemapCommon.getFileName();
-        File xml = new File(fn);
-        Document jdom = MCRGoogleSitemapCommon.buildSitemap();
-        MCRUtils.writeJDOMToFile(jdom, xml);
+    public static final void buildSitemap() throws Exception {
+        // check time
+        LOGGER.debug("Build Google sitemap start.");
+        final long start = System.currentTimeMillis();
+        // init
+        MCRGoogleSitemapCommon common = new MCRGoogleSitemapCommon();
+        // remove old files
+        common.removeSitemapFiles();
+        // compute number of files
+        int number = common.checkSitemapFile();
+        LOGGER.debug("Build Google number of URL files "+Integer.toString(number)+".");
+        if (number == 1) {
+            String fn = common.getFileName(1,true);
+            File xml = new File(fn);
+            Document jdom = common.buildSitemap();
+            LOGGER.info("Write Google sitemap file " + fn + ".");
+            MCRUtils.writeJDOMToFile(jdom, xml);
+        } else {
+            String fn = common.getFileName(1,true);
+            File xml = new File(fn);
+            Document jdom = common.buildSitemapIndex(number);
+            LOGGER.info("Write Google sitemap file " + fn + ".");
+            MCRUtils.writeJDOMToFile(jdom, xml);
+            for (int i = 0; i < number; i++) {
+                fn = common.getFileName(i+2,true);
+                xml = new File(fn);
+                jdom = common.buildSitemap(i);
+                LOGGER.info("Write Google sitemap file " + fn + ".");
+                MCRUtils.writeJDOMToFile(jdom, xml);
+            }
+        }
+        // check time
+        LOGGER.debug("Google sitemap request took " + (System.currentTimeMillis() - start) + "ms.");
     }
 
 }
