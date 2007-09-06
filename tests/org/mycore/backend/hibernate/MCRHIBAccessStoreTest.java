@@ -141,7 +141,7 @@ public class MCRHIBAccessStoreTest extends MCRHibTestCase {
         ACCESS_STORE.updateAccessDefinition(ruleMapping);
         startNewTransaction();
         MCRACCESS access = (MCRACCESS) sessionFactory.getCurrentSession().get(MCRACCESS.class, new MCRACCESSPK(permission, objID));
-        assertEquals(FALSE_RULE.getRid(), access.getRid());
+        assertEquals(FALSE_RULE, access.getRule());
     }
 
     /**

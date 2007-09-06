@@ -51,7 +51,9 @@ public class MCRACLXMLProcessing {
 
         if (accessList == null){
             MCRACCESS emptyAccess = new MCRACCESS();
-            emptyAccess.setRid("");
+            MCRACCESSRULE emptyRule = new MCRACCESSRULE();
+            emptyRule.setRid("");
+            emptyAccess.setRule(emptyRule);
             emptyAccess.setKey(new MCRACCESSPK("",""));
             accessList = new LinkedList();
             accessList.add(emptyAccess);
@@ -71,7 +73,7 @@ public class MCRACLXMLProcessing {
             OBJID.addContent(accessView.getKey().getObjid());
 
             Element RID = new Element("RID");
-            RID.addContent(accessView.getRid());
+            RID.addContent(accessView.getRule().getRid());
 
             mcrAccess.addContent(ACPOOL);
             mcrAccess.addContent(OBJID);

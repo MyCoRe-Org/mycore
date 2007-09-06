@@ -29,7 +29,9 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.hibernate.Criteria;
 import org.hibernate.Session;
+import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.tool.hbm2ddl.SchemaUpdate;
 
@@ -37,6 +39,7 @@ import org.mycore.access.mcrimpl.MCRAccessStore;
 import org.mycore.access.mcrimpl.MCRRuleMapping;
 import org.mycore.backend.hibernate.tables.MCRACCESS;
 import org.mycore.backend.hibernate.tables.MCRACCESSPK;
+import org.mycore.backend.hibernate.tables.MCRACCESSRULE;
 
 /**
  * Hibernate implementation of acceess store to manage access rights
@@ -46,6 +49,7 @@ import org.mycore.backend.hibernate.tables.MCRACCESSPK;
  */
 public class MCRHIBAccessStore extends MCRAccessStore {
     final protected static MCRHIBConnection hibconnection = MCRHIBConnection.instance();
+
     private static final DateFormat DATE_FORMAT = new SimpleDateFormat(sqlDateformat);
 
     public MCRHIBAccessStore() {
@@ -55,13 +59,9 @@ public class MCRHIBAccessStore extends MCRAccessStore {
     public String getRuleID(String objID, String ACPool) {
 
         Session session = MCRHIBConnection.instance().getSession();
-        String strRuleID = "";
-        List l = session.createQuery("from MCRACCESS where OBJID = '" + objID + "' and ACPOOL = '" + ACPool + "'").list();
-
-        if (l.size() == 1) {
-            strRuleID = ((MCRACCESS) l.get(0)).getRid();
-        }
-        return strRuleID;
+        Criteria c = session.createCriteria(MCRACCESS.class).setProjection(Projections.property("rid.rid")).add(Restrictions.eq("objid", objID)).add(
+                Restrictions.eq("acpool", ACPool));
+        return c.uniqueResult().toString();
     }
 
     public void createTables() {
@@ -86,7 +86,7 @@ public class MCRHIBAccessStore extends MCRAccessStore {
             MCRACCESS accdef = new MCRACCESS();
 
             accdef.setKey(new MCRACCESSPK(rulemapping.getPool(), rulemapping.getObjId()));
-            accdef.setRid(rulemapping.getRuleId());
+            accdef.setRule(getAccessRule(rulemapping.getRuleId()));
             accdef.setCreator(rulemapping.getCreator());
             accdef.setCreationdate(Timestamp.valueOf(DATE_FORMAT.format(rulemapping.getCreationdate())));
             session.save(accdef);
@@ -150,8 +150,8 @@ public class MCRHIBAccessStore extends MCRAccessStore {
     public void updateAccessDefinition(MCRRuleMapping rulemapping) {
         Session session = MCRHIBConnection.instance().getSession();
         // update
-        MCRACCESS accdef = (MCRACCESS)session.get(MCRACCESS.class, new MCRACCESSPK(rulemapping.getPool(), rulemapping.getObjId()));
-        accdef.setRid(rulemapping.getRuleId());
+        MCRACCESS accdef = (MCRACCESS) session.get(MCRACCESS.class, new MCRACCESSPK(rulemapping.getPool(), rulemapping.getObjId()));
+        accdef.setRule(getAccessRule(rulemapping.getRuleId()));
         accdef.setCreator(rulemapping.getCreator());
         accdef.setCreationdate(Timestamp.valueOf(DATE_FORMAT.format(rulemapping.getCreationdate())));
         session.update(accdef);
@@ -178,7 +178,7 @@ public class MCRHIBAccessStore extends MCRAccessStore {
             rulemapping.setCreator(data.getCreator());
             rulemapping.setObjId(data.getKey().getObjid());
             rulemapping.setPool(data.getKey().getAcpool());
-            rulemapping.setRuleId(data.getRid());
+            rulemapping.setRuleId(data.getRule().getRid());
         }
         session.evict(data);
         return rulemapping;
@@ -229,5 +229,10 @@ public class MCRHIBAccessStore extends MCRAccessStore {
         String query = "select distinct(key.objid) from MCRACCESS order by OBJID";
         ret = session.createQuery(query).list();
         return ret;
+    }
+
+    private static MCRACCESSRULE getAccessRule(String rid) {
+        Session session = MCRHIBConnection.instance().getSession();
+        return (MCRACCESSRULE) session.get(MCRACCESSRULE.class, rid);
     }
 }

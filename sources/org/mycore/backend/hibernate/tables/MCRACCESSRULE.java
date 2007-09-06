@@ -94,4 +94,61 @@ public class MCRACCESSRULE {
     public void setRule(String rule) {
         this.rule = rule;
     }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((creationdate == null) ? 0 : creationdate.hashCode());
+        result = prime * result + ((creator == null) ? 0 : creator.hashCode());
+        result = prime * result + ((description == null) ? 0 : description.hashCode());
+        result = prime * result + ((rid == null) ? 0 : rid.hashCode());
+        result = prime * result + ((rule == null) ? 0 : rule.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        System.out.println("EQUALS");
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (!(obj instanceof MCRACCESSRULE))
+            return false;
+        final MCRACCESSRULE other = (MCRACCESSRULE) obj;
+        if (creationdate == null) {
+            if (other.getCreationdate() != null)
+                return false;
+        } else {
+            if (other.getCreationdate() == null)
+                return false;
+            // We will remove milliseconds as they don't need to be saved
+            long thisLong = (long) Math.floor(creationdate.getTime() / 1000);
+            long otherLong = (long) Math.floor(other.getCreationdate().getTime() / 1000);
+            if (thisLong != otherLong)
+                return false;
+        }
+        if (creator == null) {
+            if (other.getCreator() != null)
+                return false;
+        } else if (!creator.equals(other.getCreator()))
+            return false;
+        if (description == null) {
+            if (other.getDescription() != null)
+                return false;
+        } else if (!description.equals(other.getDescription()))
+            return false;
+        if (rid == null) {
+            if (other.getRid() != null)
+                return false;
+        } else if (!rid.equals(other.getRid()))
+            return false;
+        if (rule == null) {
+            if (other.getRule() != null)
+                return false;
+        } else if (!rule.equals(other.getRule()))
+            return false;
+        return true;
+    }
 }

@@ -28,7 +28,7 @@ import java.sql.Timestamp;
 public class MCRACCESS {
     private MCRACCESSPK key;
 
-    private String rid;
+    private MCRACCESSRULE rule;
     
     private String creator;
 
@@ -41,9 +41,9 @@ public class MCRACCESS {
         this.key = new MCRACCESSPK(key.getAcpool(), key.getObjid());
     }
 
-    public MCRACCESS(String rid, String acpool, String objid, String creator, Timestamp creationdate) {
+    public MCRACCESS(MCRACCESSRULE rule, String acpool, String objid, String creator, Timestamp creationdate) {
         this.key = new MCRACCESSPK(acpool, objid);
-        this.rid = rid;
+        this.rule = rule;
         this.creator = creator;
         this.creationdate = creationdate;
     }
@@ -72,11 +72,11 @@ public class MCRACCESS {
         this.creator = creator;
     }
 
-    public String getRid() {
-        return rid;
+    public MCRACCESSRULE getRule() {
+        return rule;
     }
 
-    public void setRid(String rid) {
-        this.rid = rid;
+    public void setRule(MCRACCESSRULE rule) {
+        this.rule = rule;
     }
 }
