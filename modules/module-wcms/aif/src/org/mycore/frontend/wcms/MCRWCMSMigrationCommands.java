@@ -49,6 +49,7 @@ import org.mycore.common.MCRException;
 import org.mycore.frontend.MCRLayoutUtilities;
 import org.mycore.frontend.cli.MCRAbstractCommands;
 import org.mycore.frontend.cli.MCRCommand;
+import org.mycore.user.MCRCrypt;
 import org.mycore.user.MCRGroup;
 import org.mycore.user.MCRUser;
 import org.mycore.user.MCRUserMgr;
@@ -131,7 +132,7 @@ public class MCRWCMSMigrationCommands extends MCRAbstractCommands {
                 MCRAccessManager.addRule(aclObjId, writePerm, rule, "automatically created ACL for WCMS-Write-Access");
             LOGGER.info(getSimText(simulate) + "saved ACL for object-ID=" + aclObjId + " with rule=" + rule);
         }
-        LOGGER.info(getSimText(simulate) + "ACL creation finished, created "+rootNodes.size()+" ACL's\n");
+        LOGGER.info(getSimText(simulate) + "ACL creation finished, created " + rootNodes.size() + " ACL's\n");
     }
 
     private static void assignUsers(boolean simulate, Hashtable userAndGroups, Document userDB, Hashtable groupDescr_groupID) {
@@ -188,7 +189,7 @@ public class MCRWCMSMigrationCommands extends MCRAbstractCommands {
             groupID_groupDes.put(groupName, mcrGroupID);
             LOGGER.info(getSimText(simulate) + "group=" + mcrGroupID + " (" + groupName + ") added in DB");
         }
-        LOGGER.info(getSimText(simulate) + "groups creation finished, "+userAndGroups.size()+" groups created");
+        LOGGER.info(getSimText(simulate) + "groups creation finished, " + userAndGroups.size() + " groups created");
         return groupID_groupDes;
     }
 
@@ -250,15 +251,17 @@ public class MCRWCMSMigrationCommands extends MCRAbstractCommands {
             String groups = "";
             if (userAndGroups.containsKey(userList)) {
                 groups = userAndGroups.get(userList) + getGroupSeperator() + rootNode;
-                //LOGGER.info(getSimText(simulate) + "recalculated user(s)=" + userList + " to group=" + groups);
+                // LOGGER.info(getSimText(simulate) + "recalculated user(s)=" +
+                // userList + " to group=" + groups);
             } else {
                 groups = rootNode;
-                //LOGGER.info(getSimText(simulate) + "calculated user(s)=" + userList + " to group=" + groups);
+                // LOGGER.info(getSimText(simulate) + "calculated user(s)=" +
+                // userList + " to group=" + groups);
             }
             userAndGroups.put(userList, groups);
 
         }
-        //LOGGER.info(getSimText(simulate) + "2.3 successfully \n");
+        // LOGGER.info(getSimText(simulate) + "2.3 successfully \n");
         return userAndGroups;
     }
 
@@ -285,9 +288,16 @@ public class MCRWCMSMigrationCommands extends MCRAbstractCommands {
         if (!uMan.existUser(userID)) {
             String userName = user.getAttributeValue("userRealName");
             if (!simulate) {
+                // encrypt password if property set
+                String useCrypt = CONFIG.getString("MCR.Users.UsePasswordEncryption", "false");
+                boolean useEncryption = (useCrypt.trim().equals("true")) ? true : false;
+                String password = userID;
+                if (useEncryption)
+                    password = MCRCrypt.crypt(password);
+                // create user
                 MCRUser userNew = null;
                 try {
-                    userNew = new MCRUser(uMan.getMaxUserNumID() + 1, userID, "root", null, null, true, true, "", userID, group.getID(), new ArrayList(), "",
+                    userNew = new MCRUser(uMan.getMaxUserNumID() + 1, userID, "root", null, null, true, true, "", password, group.getID(), new ArrayList(), "",
                                     "", userName, "", "", "", "", "", "", "", "", "", "", "", "", "");
                 } catch (MCRException e) {
                     e.printStackTrace();
@@ -316,7 +326,7 @@ public class MCRWCMSMigrationCommands extends MCRAbstractCommands {
             String rootNode = categ.getTextTrim();
             rootNodesTable.put(rootNode, "");
         }
-        //LOGGER.info(getSimText(simulate) + "2.1 successfully \n");
+        // LOGGER.info(getSimText(simulate) + "2.1 successfully \n");
         return rootNodesTable;
     }
 
