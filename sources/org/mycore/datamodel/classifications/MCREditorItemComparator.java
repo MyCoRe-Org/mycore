@@ -34,6 +34,8 @@ import org.jdom.Namespace;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 
+import com.ibm.icu.text.Normalizer;
+
 public class MCREditorItemComparator implements Comparator<Element> {
     
     public static final MCREditorItemComparator CURRENT_LANG_TEXT_ORDER=new MCREditorItemComparator();
@@ -47,7 +49,11 @@ public class MCREditorItemComparator implements Comparator<Element> {
             //NO Editor Items
             return 0;
         }
-        return String.CASE_INSENSITIVE_ORDER.compare(getCurrentLangLabel(o1),getCurrentLangLabel(o2));
+        // Handle Problems with sorting of german umlauts and other diacritics 
+        // Tänzerin is now before Träumer
+        String la = Normalizer.decompose(getCurrentLangLabel(o1), false);
+        String lb = Normalizer.decompose(getCurrentLangLabel(o2), false);
+        return String.CASE_INSENSITIVE_ORDER.compare(la,lb);
     }
     
     @SuppressWarnings("unchecked")
