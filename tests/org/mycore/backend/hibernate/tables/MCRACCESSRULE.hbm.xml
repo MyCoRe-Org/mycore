@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping>
+  <class name="org.mycore.backend.hibernate.tables.MCRACCESSRULE" table="MCRACCESSRULE" node="accessrule">
+    <id column="RID" name="rid" type="string" node="@id">
+      <generator class="assigned" />
+    </id>
+    <property name="creator" type="string" column="CREATOR" length="64" not-null="true" unique="false" node="@creator" />
+    <property name="creationdate" type="timestamp" column="CREATIONDATE" length="64" not-null="true" unique="false"
+      node="@date" />
+    <property name="rule" type="text" column="RULE" length="2048000" not-null="false" unique="false" node="." />
+    <property name="description" type="string" column="DESCRIPTION" length="255" not-null="false" unique="false"
+      node="@description" />
+  </class>
+</hibernate-mapping>
+

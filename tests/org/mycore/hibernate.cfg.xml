@@ -19,6 +19,9 @@
     
     <mapping resource="org/mycore/datamodel/classifications2/impl/MCRCategoryImpl.hbm.xml"/>
     <mapping resource="org/mycore/datamodel/classifications2/impl/MCRCategoryLink.hbm.xml"/>
+    <mapping resource="org/mycore/backend/hibernate/tables/MCRACCESSRULE.hbm.xml"/>
+    <mapping resource="org/mycore/backend/hibernate/tables/MCRACCESS.hbm.xml"/>
+    
   </session-factory>
 
 </hibernate-configuration>
