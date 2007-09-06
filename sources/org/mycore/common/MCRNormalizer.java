@@ -37,31 +37,37 @@ import com.ibm.icu.text.Normalizer;
  * <ul>
  * <li>MCR.Metadata.Normalize.AddRule - add more rules to the default rule</li>
  * <li>MCR.Metadata.Normalize.SetRule - replace the default rule</li>
- * <li>MCR.Metadata.Normalize.DiacriticRule true (standard) | false - first rule, remove diacritics from letters <br>
- * Here you can see how decomposition works: http://www.icu-project.org/apiref/icu4j/com/ibm/icu/text/Normalizer.html <br>
+ * <li>MCR.Metadata.Normalize.DiacriticRule true (standard) | false - first
+ * rule, remove diacritics from letters <br>
+ * Here you can see how decomposition works:
+ * http://www.icu-project.org/apiref/icu4j/com/ibm/icu/text/Normalizer.html <br>
  * These diacritics will be removed from letters when property is true: <br>
- *           "\u0301", // &amp;#769;  (0xcc 0x81 = 204 129) COMBINING ACUTE ACCENT <br>
- *           "\u0300", // &amp;#768;  (0xcc 0x80 = 204 128) COMBINING GRAVE ACCENT <br>
- *           "\u0302", // &amp;#770;  (0xcc 0x82 = 204 130) COMBINING CIRCUMFLEX ACCENT <br>
- *           "\u0307", // &amp;#775;  (0xcc 0x87 = 204 135) COMBINING DOT ABOVE <br>
- *           "\u0308", // &amp;#776;  (0xcc 0x88 = 204 136) COMBINING DIAERESIS <br>
- *           "\u0306", // &amp;#774;  (0xcc 0x86 = 204 134) COMBINING BREVE <br>
- *           "\u030B", // &amp;#779;  (0xcc 0x8b = 204 139) COMBINING DOUBLE ACUTE ACCENT <br>
- *           "\u030C", // &amp;#780;  (0xcc 0x8c = 204 140) COMBINING CARON  (Hacek) <br>
- *           "\u030A", // &amp;#778;  (0xcc 0x8a = 204 138) COMBINING RING ABOVE <br>
- *           "\u0304", // &amp;#772;  (0xcc 0x84 = 204 132) COMBINING MACRON <br>
- *           "\u032E", // &amp;#814;  (0xcc 0xae = 204 174) COMBINING BREVE BELOW <br>
- *           "\u0328", // &amp;#808;  (0xcc 0xa8 = 204 168) COMBINING OGONEK <br>
- *           "\u0327", // &amp;#807;  (0xcc 0xa7 = 204 167) COMBINING CEDILLA <br>
- *           "\u0323", // &amp;#803;  (0xcc 0xa3 = 204 163) COMBINING DOT BELOW <br>
- *           "\u0338", // &amp;#824;  (0xcc 0xb8 = 204 184) COMBINING LONG SOLIDUS OVERLAY <br>
- *           "\u0336", // &amp;#822;  (0xcc 0xb6 = 204 182) COMBINING LONG STROKE OVERLAY <br>
- *           "\u0332", // &amp;#818;  (0xcc 0xb2 = 204 178) COMBINING LOW LINE <br>
- *           "\u0303"};// &amp;#771;  (0xcc 0x83 = 204 131) COMBINING TILDE <br>
+ * "\u0301", // &amp;#769; (0xcc 0x81 = 204 129) COMBINING ACUTE ACCENT <br>
+ * "\u0300", // &amp;#768; (0xcc 0x80 = 204 128) COMBINING GRAVE ACCENT <br>
+ * "\u0302", // &amp;#770; (0xcc 0x82 = 204 130) COMBINING CIRCUMFLEX ACCENT
+ * <br>
+ * "\u0307", // &amp;#775; (0xcc 0x87 = 204 135) COMBINING DOT ABOVE <br>
+ * "\u0308", // &amp;#776; (0xcc 0x88 = 204 136) COMBINING DIAERESIS <br>
+ * "\u0306", // &amp;#774; (0xcc 0x86 = 204 134) COMBINING BREVE <br>
+ * "\u030B", // &amp;#779; (0xcc 0x8b = 204 139) COMBINING DOUBLE ACUTE ACCENT
+ * <br>
+ * "\u030C", // &amp;#780; (0xcc 0x8c = 204 140) COMBINING CARON (Hacek) <br>
+ * "\u030A", // &amp;#778; (0xcc 0x8a = 204 138) COMBINING RING ABOVE <br>
+ * "\u0304", // &amp;#772; (0xcc 0x84 = 204 132) COMBINING MACRON <br>
+ * "\u032E", // &amp;#814; (0xcc 0xae = 204 174) COMBINING BREVE BELOW <br>
+ * "\u0328", // &amp;#808; (0xcc 0xa8 = 204 168) COMBINING OGONEK <br>
+ * "\u0327", // &amp;#807; (0xcc 0xa7 = 204 167) COMBINING CEDILLA <br>
+ * "\u0323", // &amp;#803; (0xcc 0xa3 = 204 163) COMBINING DOT BELOW <br>
+ * "\u0338", // &amp;#824; (0xcc 0xb8 = 204 184) COMBINING LONG SOLIDUS OVERLAY
+ * <br>
+ * "\u0336", // &amp;#822; (0xcc 0xb6 = 204 182) COMBINING LONG STROKE OVERLAY
+ * <br>
+ * "\u0332", // &amp;#818; (0xcc 0xb2 = 204 178) COMBINING LOW LINE <br>
+ * "\u0303"};// &amp;#771; (0xcc 0x83 = 204 131) COMBINING TILDE <br>
  * </li>
  * </ul>
  * 
- * @author Frank Lützenkirchen
+ * @author Frank L\u00fctzenkirchen
  * @author Thomas Scheffler (yagee)
  * @author Jens Kupferschmidt
  * @author Harald Richter
@@ -70,9 +76,9 @@ import com.ibm.icu.text.Normalizer;
  */
 public class MCRNormalizer {
     static Logger logger = Logger.getLogger(MCRNormalizer.class);
-    
-    /** List of characters that will be replaced */                                                         
-    private static String rules = "ä>ae ö>oe ü>ue ß>ss à>a á>a â>a è>e é>e ê>e ì>i í>i î>i ò>o ó>o ô>o ù>u ú>u û>u";
+
+    /** List of characters that will be replaced */
+    private static String rules = "\u00DF>ss \u00E4>ae \u00C4>ae \u00F6>oe \u00D6>oe \u00FC>ue \u00DC>ue"; // sz ae Ae oe Oe ue Ue
 
     private static Pattern[] patterns;
 
@@ -85,8 +91,10 @@ public class MCRNormalizer {
     private static String addRule = config.getString("MCR.Metadata.Normalize.AddRule", "");
 
     private static String setRule = config.getString("MCR.Metadata.Normalize.SetRule", "");
-    
-    private static String diacriticRule = config.getString("MCR.Metadata.Normalize.DiacriticRule", "true");
+
+    private static boolean diacriticRule = config.getBoolean("MCR.Metadata.Normalize.DiacriticRule", true);
+
+    private static boolean useRuleFirst = config.getBoolean("MCR.Metadata.Normalize.UseRuleFirst", false);
 
     static {
         if ((setRule != null) && (setRule.trim().length() != 0)) {
@@ -106,7 +114,7 @@ public class MCRNormalizer {
         for (int i = 0; i < numPatterns; i++) {
             patterns[i] = Pattern.compile(st.nextToken());
             replace[i] = st.nextToken();
-            logger.debug("normalize -->"+patterns[i]+" to -->"+replace[i]);
+            logger.debug("normalize -->" + patterns[i] + " to -->" + replace[i]);
         }
     }
 
@@ -119,40 +127,64 @@ public class MCRNormalizer {
      * @return the normalized String in lower case.
      */
     public static final String normalizeString(String in) {
-
-      // replace letters with diacritics with therr corresponding letter 
-      // lower letter umlat a is replaces with a
-      if ( diacriticRule.equals("true"))
-      {
-        in = Normalizer.decompose(in, false);
-      
-        String[]  dia = {
-            "\u0301", // &amp;#769;  (0xcc 0x81 = 204 129) COMBINING ACUTE ACCENT
-            "\u0300", // &amp;#768;  (0xcc 0x80 = 204 128) COMBINING GRAVE ACCENT
-            "\u0302", // &amp;#770;  (0xcc 0x82 = 204 130) COMBINING CIRCUMFLEX ACCENT
-            "\u0307", // &amp;#775;  (0xcc 0x87 = 204 135) COMBINING DOT ABOVE
-            "\u0308", // &amp;#776;  (0xcc 0x88 = 204 136) COMBINING DIAERESIS
-            "\u0306", // &amp;#774;  (0xcc 0x86 = 204 134) COMBINING BREVE
-            "\u030B", // &amp;#779;  (0xcc 0x8b = 204 139) COMBINING DOUBLE ACUTE ACCENT
-            "\u030C", // &amp;#780;  (0xcc 0x8c = 204 140) COMBINING CARON  (Hacek)
-            "\u030A", // &amp;#778;  (0xcc 0x8a = 204 138) COMBINING RING ABOVE
-            "\u0304", // &amp;#772;  (0xcc 0x84 = 204 132) COMBINING MACRON
-            "\u032E", // &amp;#814;  (0xcc 0xae = 204 174) COMBINING BREVE BELOW
-            "\u0328", // &amp;#808;  (0xcc 0xa8 = 204 168) COMBINING OGONEK
-            "\u0327", // &amp;#807;  (0xcc 0xa7 = 204 167) COMBINING CEDILLA
-            "\u0323", // &amp;#803;  (0xcc 0xa3 = 204 163) COMBINING DOT BELOW
-            "\u0338", // &amp;#824;  (0xcc 0xb8 = 204 184) COMBINING LONG SOLIDUS OVERLAY
-            "\u0336", // &amp;#822;  (0xcc 0xb6 = 204 182) COMBINING LONG STROKE OVERLAY
-            "\u0332", // &amp;#818;  (0xcc 0xb2 = 204 178) COMBINING LOW LINE
-            "\u0303"};// &amp;#771;  (0xcc 0x83 = 204 131) COMBINING TILDE
-
-        for (int i=0; i<dia.length; i++)
-        {
-          in = MCRUtils.replaceString(in, dia[i] , "");
+        String temp = in;
+        // use private rules first
+        if (useRuleFirst) {
+            temp = normalizeString(temp, normalize);
         }
-      }
-      
-      return normalizeString(in, normalize);
+
+        // replace letters with diacritics with therr corresponding letter
+        // lower letter umlat a is replaces with a
+        if (diacriticRule) {
+            temp = Normalizer.decompose(temp, false);
+
+            String[] dia = { "\u0301", // &amp;#769; (0xcc 0x81 = 204 129)
+                            // COMBINING ACUTE ACCENT
+                            "\u0300", // &amp;#768; (0xcc 0x80 = 204 128)
+                            // COMBINING GRAVE ACCENT
+                            "\u0302", // &amp;#770; (0xcc 0x82 = 204 130)
+                            // COMBINING CIRCUMFLEX ACCENT
+                            "\u0307", // &amp;#775; (0xcc 0x87 = 204 135)
+                            // COMBINING DOT ABOVE
+                            "\u0308", // &amp;#776; (0xcc 0x88 = 204 136)
+                            // COMBINING DIAERESIS
+                            "\u0306", // &amp;#774; (0xcc 0x86 = 204 134)
+                            // COMBINING BREVE
+                            "\u030B", // &amp;#779; (0xcc 0x8b = 204 139)
+                            // COMBINING DOUBLE ACUTE ACCENT
+                            "\u030C", // &amp;#780; (0xcc 0x8c = 204 140)
+                            // COMBINING CARON (Hacek)
+                            "\u030A", // &amp;#778; (0xcc 0x8a = 204 138)
+                            // COMBINING RING ABOVE
+                            "\u0304", // &amp;#772; (0xcc 0x84 = 204 132)
+                            // COMBINING MACRON
+                            "\u032E", // &amp;#814; (0xcc 0xae = 204 174)
+                            // COMBINING BREVE BELOW
+                            "\u0328", // &amp;#808; (0xcc 0xa8 = 204 168)
+                            // COMBINING OGONEK
+                            "\u0327", // &amp;#807; (0xcc 0xa7 = 204 167)
+                            // COMBINING CEDILLA
+                            "\u0323", // &amp;#803; (0xcc 0xa3 = 204 163)
+                            // COMBINING DOT BELOW
+                            "\u0338", // &amp;#824; (0xcc 0xb8 = 204 184)
+                            // COMBINING LONG SOLIDUS OVERLAY
+                            "\u0336", // &amp;#822; (0xcc 0xb6 = 204 182)
+                            // COMBINING LONG STROKE OVERLAY
+                            "\u0332", // &amp;#818; (0xcc 0xb2 = 204 178)
+                            // COMBINING LOW LINE
+                            "\u0303" };// &amp;#771; (0xcc 0x83 = 204 131)
+            // COMBINING TILDE
+
+            for (int i = 0; i < dia.length; i++) {
+                temp = MCRUtils.replaceString(temp, dia[i], "");
+            }
+        }
+
+        if (!useRuleFirst) {
+            temp = normalizeString(temp, normalize);
+        }
+
+        return temp;
     }
 
     public static final String normalizeString(String in, boolean reallyNormalize) {
