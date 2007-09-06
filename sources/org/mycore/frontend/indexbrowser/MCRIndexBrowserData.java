@@ -17,6 +17,7 @@ import org.jdom.output.XMLOutputter;
 import org.jdom.xpath.XPath;
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRConfiguration;
+import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.parsers.bool.MCRAndCondition;
@@ -53,6 +54,8 @@ public class MCRIndexBrowserData {
     private MCRResults mcrResult;
 
     private MCRQuery myQuery;
+
+    private static final String defaultlang = MCRConfiguration.instance().getString("MCR.Metadata.DefaultLang", "de");
 
     class MyRangeDelim {
         int pos;
@@ -483,6 +486,8 @@ public class MCRIndexBrowserData {
     private void setListeElm(Document od, String[] Fields, int startindex, String[] listelm, boolean append) {
         if (Fields == null)
             return;
+        MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
+        String currentlang = mcrSession.getCurrentLanguage();
         for (int j = 0; j < Fields.length; j++) {
             String value = "";
             String attribute = "";
@@ -510,18 +515,62 @@ public class MCRIndexBrowserData {
                         value = "";
                     }
                 } else {
+                    // get for current lang
                     Iterator<?> it = od.getDescendants(new ElementFilter(sField));
                     // only the atribute different texts are taken!!
+                    int counter = 0;
+                    boolean hasdefault = false;
                     while (it.hasNext()) {
                         Element el = (Element) it.next();
-                        if (attribute != el.getAttributeValue("type")) {
-                            if (value.length() > 0) {
-                                value += " - ";
+                        String lang = el.getAttributeValue("lang", org.jdom.Namespace.XML_NAMESPACE);
+                        if ((lang != null) && (lang.equals(currentlang))) {
+                            if (attribute != el.getAttributeValue("type")) {
+                                if (value.length() > 0) {
+                                    value += " - ";
+                                }
+                                value += el.getText();
+                                attribute = el.getAttributeValue("type");
                             }
-                            value += el.getText();
-                            attribute = el.getAttributeValue("type");
+                            counter++;
+                        }
+                        if ((lang != null) && (lang.equals(currentlang))) {
+                            hasdefault = true;
                         }
                     }
+                    if (counter == 0) {
+                        // get for current lang
+                        it = od.getDescendants(new ElementFilter(sField));
+                        // only the atribute different texts are taken!!
+                        if (hasdefault) {
+                            while (it.hasNext()) {
+                                Element el = (Element) it.next();
+                                String lang = el.getAttributeValue("lang", org.jdom.Namespace.XML_NAMESPACE);
+                                if ((lang != null) && (lang.equals(defaultlang))) {
+                                    if (attribute != el.getAttributeValue("type")) {
+                                        if (value.length() > 0) {
+                                            value += " - ";
+                                        }
+                                        value += el.getText();
+                                        attribute = el.getAttributeValue("type");
+                                    }
+                                    break;
+                                }
+                            }
+                        } else {
+                            while (it.hasNext()) {
+                                Element el = (Element) it.next();
+                                if (attribute != el.getAttributeValue("type")) {
+                                    if (value.length() > 0) {
+                                        value += " - ";
+                                    }
+                                    value += el.getText();
+                                    attribute = el.getAttributeValue("type");
+                                }
+                                break;
+                            }
+                        }
+                    }
+
                 }
             }
             if (append) {
