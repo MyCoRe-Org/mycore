@@ -61,7 +61,7 @@ public class MCRHIBAccessStore extends MCRAccessStore {
         Session session = MCRHIBConnection.instance().getSession();
         Criteria c = session.createCriteria(MCRACCESS.class).setProjection(Projections.property("rule.rid")).add(Restrictions.eq("key.objid", objID)).add(
                 Restrictions.eq("key.acpool", ACPool));
-        return c.uniqueResult().toString();
+        return (String) c.uniqueResult();
     }
 
     public void createTables() {

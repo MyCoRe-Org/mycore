@@ -121,10 +121,12 @@ public class MCRHIBAccessStoreTest extends MCRHibTestCase {
     public void testGetRuleID() {
         final String objID = "test";
         final String permission = "maytest";
-        MCRRuleMapping ruleMapping = addRuleMapping(objID, permission, TRUE_RULE.getRid());
+        addRuleMapping(objID, permission, TRUE_RULE.getRid());
         startNewTransaction();
         String rid = ACCESS_STORE.getRuleID(objID, permission);
         assertEquals(TRUE_RULE.getRid(), rid);
+        rid = ACCESS_STORE.getRuleID(objID, "notdefined");
+        assertEquals(null, rid);
     }
 
     /**
