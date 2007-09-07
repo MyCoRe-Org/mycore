@@ -59,8 +59,8 @@ public class MCRHIBAccessStore extends MCRAccessStore {
     public String getRuleID(String objID, String ACPool) {
 
         Session session = MCRHIBConnection.instance().getSession();
-        Criteria c = session.createCriteria(MCRACCESS.class).setProjection(Projections.property("rid.rid")).add(Restrictions.eq("objid", objID)).add(
-                Restrictions.eq("acpool", ACPool));
+        Criteria c = session.createCriteria(MCRACCESS.class).setProjection(Projections.property("rule.rid")).add(Restrictions.eq("key.objid", objID)).add(
+                Restrictions.eq("key.acpool", ACPool));
         return c.uniqueResult().toString();
     }
 

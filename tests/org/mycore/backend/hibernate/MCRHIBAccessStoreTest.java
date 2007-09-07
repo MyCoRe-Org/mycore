@@ -116,6 +116,19 @@ public class MCRHIBAccessStoreTest extends MCRHibTestCase {
 
     /**
      * Test method for
+     * {@link org.mycore.backend.hibernate.MCRHIBAccessStore#getRuleID(String, String)}.
+     */
+    public void testGetRuleID() {
+        final String objID = "test";
+        final String permission = "maytest";
+        MCRRuleMapping ruleMapping = addRuleMapping(objID, permission, TRUE_RULE.getRid());
+        startNewTransaction();
+        String rid = ACCESS_STORE.getRuleID(objID, permission);
+        assertEquals(TRUE_RULE.getRid(), rid);
+    }
+
+    /**
+     * Test method for
      * {@link org.mycore.backend.hibernate.MCRHIBAccessStore#deleteAccessDefinition(org.mycore.access.mcrimpl.MCRRuleMapping)}.
      */
     public void testDeleteAccessDefinition() {
