@@ -8,6 +8,7 @@ import java.util.StringTokenizer;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
+import org.jdom.Attribute;
 import org.jdom.Content;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -508,7 +509,12 @@ public class MCRIndexBrowserData {
                             if (i > 0) {
                                 value += " - ";
                             }
-                            value += ((Content) xpathResults.get(i)).getValue();
+                            if(xpathResults.get(i) instanceof Attribute){
+                            	value+=((Attribute) xpathResults.get(i)).getValue();
+                            }
+                            else{
+                            	value += ((Content) xpathResults.get(i)).getValue();
+                            }
                         }
 
                     } catch (JDOMException jde) {
