@@ -42,16 +42,19 @@ import org.apache.tools.ant.Task;
 
 /**
  * Ant task that allows 'mycore.properties' manipulation via ant.
+ * 
  * @author Thomas Scheffler (yagee)
  */
 public class MCRConfigurationTask extends Task {
     // some constants
-    private static final String MCR_CONFIGURATION_INCLUDE = "MCR.Configuration.Include";
+    private static final String MCR_CONFIGURATION_INCLUDE_DEFAULT = "MCR.Configuration.Include";
 
-    private static final Pattern INCLUDE_PATTERN = Pattern.compile(MCR_CONFIGURATION_INCLUDE);
+    private Pattern includePattern;
 
-    // some fields settable and gettable via methods
+    // some fields setable and getable via methods
     private String action;
+
+    private String key;
 
     private String value;
 
@@ -95,6 +98,7 @@ public class MCRConfigurationTask extends Task {
      * checks whether all preconditions are met
      */
     private void checkPreConditions() throws BuildException {
+        setIncludePattern(key);
         if (action == null) {
             throw new BuildException("Must specify 'action' attribute");
         }
@@ -117,6 +121,7 @@ public class MCRConfigurationTask extends Task {
      */
     private void reset() {
         action = null;
+        key = null;
         propertyFile = null;
         lineNumber = -1;
         propertiesLoaded = false;
@@ -129,7 +134,7 @@ public class MCRConfigurationTask extends Task {
      */
     private void addInclude() {
         if (valuePresent) {
-            handleOutput(new StringBuffer("Not changing ").append(propertyFile.getName()).append(": '").append(value).append("' allready included.").toString());
+            handleOutput(new StringBuffer("Not changing ").append(propertyFile.getName()).append(": '").append(value).append("' already included.").toString());
             return;
         }
         fileChanged = true;
@@ -137,8 +142,8 @@ public class MCRConfigurationTask extends Task {
         String newProp = prop + "," + value;
         propLines.remove(lineNumber);
         propLines.add(lineNumber, newProp);
-        handleOutput(new StringBuffer(propertyFile.getName()).append(':').append(lineNumber).append(" added '").append(value).append("' to ").append(
-                MCR_CONFIGURATION_INCLUDE).toString());
+        handleOutput(new StringBuffer(propertyFile.getName()).append(':').append(lineNumber).append(" added '").append(value).append("' to ").append(getKey())
+                        .toString());
     }
 
     /**
@@ -154,7 +159,7 @@ public class MCRConfigurationTask extends Task {
         propLines.remove(lineNumber);
         propLines.add(lineNumber, newProp);
         handleOutput(new StringBuffer(propertyFile.getName()).append(':').append(lineNumber).append(" removed '").append(value).append("' from ").append(
-                MCR_CONFIGURATION_INCLUDE).toString());
+                        getKey()).toString());
     }
 
     /*
@@ -195,7 +200,7 @@ public class MCRConfigurationTask extends Task {
             for (String line = reader.readLine(); line != null; line = reader.readLine()) {
                 // add each line of the property file to the array list
                 propLines.add(line);
-                if ((lineNumber < 0) && INCLUDE_PATTERN.matcher(line).find()) {
+                if ((lineNumber < 0) && includePattern.matcher(line).find()) {
                     // found the MCR.Configuration.Include line
                     lineNumber = i;
                     if (line.indexOf(value) > 0) {
@@ -263,4 +268,23 @@ public class MCRConfigurationTask extends Task {
     public void setValue(String value) {
         this.value = value;
     }
+
+    public String getKey() {
+        if (key == null)
+            return MCR_CONFIGURATION_INCLUDE_DEFAULT;
+        else
+            return key;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
+    }
+
+    public void setIncludePattern(String key) {
+        if (key == null)
+            this.includePattern = Pattern.compile(MCR_CONFIGURATION_INCLUDE_DEFAULT);
+        else
+            this.includePattern = Pattern.compile(key);
+    }
+
 }
