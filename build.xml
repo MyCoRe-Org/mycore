@@ -2,7 +2,7 @@
 
   <!-- =================================================================== -->
   <!-- MyCoRe build file for use with Apache Ant                           -->
-  <!-- $Revision: 1.139 $ $Date: 2007-06-27 17:48:21 $                      -->
+  <!-- $Revision: 1.140 $ $Date: 2007-09-11 06:18:49 $                      -->
   <!-- =================================================================== -->
 
 <project name="MyCoRe" default="usage" basedir=".">
@@ -79,12 +79,11 @@
     <echo level="info">Operating system : ${os.name} Version ${os.version} on ${os.arch} </echo>
     <echo level="info">Java version     : JDK ${ant.java.version} Version ${java.version} from ${java.vendor}</echo>
     <echo level="info">Java home        : ${java.home}</echo>
-    <echo level="info">Ant build file   : $Revision: 1.139 $ $Date: 2007-06-27 17:48:21 $</echo>
+    <echo level="info">Ant build file   : $Revision: 1.140 $ $Date: 2007-09-11 06:18:49 $</echo>
     <echo level="info">Ant version      : ${ant.version}</echo>
     <echo level="info">Ant home         : ${ant.home}</echo>
     <echo level="info">Ant libdir       : ${ant.library.dir}</echo>
     <echo level="info">XML Store type   : ${MCR.XMLStore.Type}</echo>
-    <echo level="info">JDBC Store type  : ${MCR.JDBCStore.Type}</echo>
     <echo level="info">System CLASSPATH : ${build.sysclasspath}</echo>
     <echo level="info">Active CLASSPATH : ${output.classpath}</echo>
     <moduleHook target="info"/>

@@ -9,79 +9,6 @@
 
 #######################################################################
 #
-# Environment for Relational Database System to use via JDBC and SQL
-#
-# MCR.JDBCStore.Type
-#   dummy value just for your information
-# MCR.JDBCStore.BaseDir
-#   base directory where jar's, class files and libraries are installed
-# MCR.JDBCStore.Jars 
-#   list of jar files or filename patterns to include into CLASSPATH
-#   relative to BaseDir, separated by blanks
-# MCR.JDBCStore.ClassesDirs
-#   list of directories containing class files or resources to include
-#   relative to BaseDir, separated by blanks
-# MCR.JDBCStore.LibPath
-#   list of directories containing native libraries for LIBPATH
-#   relative to BaseDir, separated by blanks
-#
-#######################################################################
-
-# IBM DB2 Version 8.2 under IBM AIX without Hibernate
-# Use package: org.mycore.backend.sql
-# Hint: the JDBC driver is in the DB2 package
-# MCR.JDBCStore.Type=db2
-# MCR.JDBCStore.BaseDir=/home/db2inst1/sqllib/java
-# MCR.JDBCStore.Jars=db2jcc.jar db2jcc_license_cu.jar db2jcc_javax.jar
-# MCR.JDBCStore.ClassesDirs=function
-# MCR.JDBCStore.LibPath=java lib
-
-# HSQLDB native under Linux or Windows without Hibernate
-# Use package: org.mycore.backend.sql
-# Hint: JDBC driver is included in MyCoRe!
-# MCR.JDBCStore.Type=hsqldb
-
-# MySQL native under Linux or Windows without Hibernate
-# Use package: org.mycore.backend.sql
-# Hint: JDBC driver is included in MyCoRe!
-# MCR.JDBCStore.Type=mysql
-# MCR.JDBCStore.BaseDir=/usr/share
-# MCR.JDBCStore.Jars=java/mysql-connector-java.jar
-
-# Hibernate for Linux or Windows
-# Use package: org.mycore.backend.hibernate
-# Hint: the Hibernate access to SQL DB's is included!
-  MCR.JDBCStore.Type=hibernate
-
-####################################################################### 
-#
-# Persistent Store for XML data of MCRObject and MCRDerivate 
-#
-# MCR.XMLStore.Type
-#   set to cm8 if you want to use the cm8 backend
-# MCR.XMLStore.BaseDir
-#   base directory where jar's, class files and libraries are installed
-# MCR.XMLStore.Jars
-#   list of jar files or filename patterns to include into CLASSPATH
-#   relative to BaseDir, separated by blanks
-# MCR.XMLStore.ClassesDirs  
-#   list of directories containing class files or resources to include
-#   relative to BaseDir, separated by blanks
-# MCR.XMLStore.LibPath   
-#   list of directories containing native libraries for LIBPATH
-#   relative to BaseDir, separated by blanks
-#
-#######################################################################
-
-# IBM Content Manager Version 8.3 under IBM AIX for metadata and content
-# MCR.XMLStore.Type=cm8
-# MCR.XMLStore.BaseDir=/usr/lpp/cmb
-# MCR.XMLStore.Jars=lib/cmb*8*.jar lib/dtappsrv.jar
-# MCR.XMLStore.ClassesDirs=lib cmgmt
-# MCR.XMLStore.LibPath=lib
-
-#######################################################################
-#
 # If you use some OS like SuSE Linux 10.x some *.jar files of system
 # componets are in special directories. For this case uncomment the
 # next line .
@@ -92,22 +19,6 @@
 # MCR.System.Jars=ant.jar
 # MCR.System.Jars=ant.jar jai/jai_codec.jar jai/jai_core.jar
 # MCR.System.Jars=ant.jar jai/jai_codec.jar jai/jai_core.jar mysql-connector-java.jar
-
-#######################################################################
-# 
-# MyCoRe will copy the jar files listed under 
-# MCR.JDBCStore.Jars and MCR.XMLStore.Jars 
-# to the web application WEB-INF/lib directory.
-# If these files load native libraries to connect to the database,
-# this may cause trouble at runtime when you run multiple web applications
-# in the same JVM or use dynamic servlet reloading. In this case, put these
-# jars in a separate directory where they are just loaded once, for tomcat
-# for example move these files to the directory 'common'. MyCoRe will
-# do this for you if you specify a directory here to put the shared jars in:
-#
-#######################################################################
-
-# MCR.WebAppServer.SharedJarsDir=
 
 #######################################################################
 
