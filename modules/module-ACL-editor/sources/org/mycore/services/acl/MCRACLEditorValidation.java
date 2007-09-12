@@ -48,6 +48,17 @@ public class MCRACLEditorValidation {
         return true;
     }
 
+    public static boolean ruleInUse(Element input) throws IOException {
+        String rid = input.getChildText("RID");
+        MCRACLHIBAccess HIBA = new MCRACLHIBAccess();
+        
+        if (HIBA.getAccessPermission(null, null, rid).size() > 0)
+            LOGGER.debug("Rule " + rid + " is in use!");
+        
+        LOGGER.debug("Validate Rule in Use: " + input);
+        return false;
+    }
+    
     public static boolean validateFilter(Element input) throws IOException {
         if (input != null) {
             MCRSession session = MCRSessionMgr.getCurrentSession();

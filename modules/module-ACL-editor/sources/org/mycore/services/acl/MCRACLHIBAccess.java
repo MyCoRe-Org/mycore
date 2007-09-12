@@ -28,6 +28,10 @@ public class MCRACLHIBAccess {
 	}
 	
 	public List getAccessPermission(String objidFilter, String acpoolFilter){
+        return getAccessPermission(objidFilter, acpoolFilter, null);
+    }
+    
+	public List getAccessPermission(String objidFilter, String acpoolFilter, String ridFilter){
 		Criteria query = MCRHIBConnection.instance().getSession().createCriteria(MCRACCESS.class);
 		
 		if (objidFilter != null){
@@ -39,6 +43,11 @@ public class MCRACLHIBAccess {
 			LOGGER.info("#### OBJID Filter: " + acpoolFilter + "\t" + acpoolFilter.replaceAll("\\*", "%"));
 			query = query.add(Restrictions.like("key.acpool", acpoolFilter.replaceAll("\\*", "%")));
 		}
+        
+        if (ridFilter != null){
+            LOGGER.info("#### RID Filter: " + ridFilter);
+            query = query.add(Restrictions.like("rule.rid", ridFilter.replaceAll("\\*", "%")));
+        }
 		
         query.addOrder(Order.asc("key.objid"));
         query.addOrder(Order.asc("key.acpool"));

@@ -3,6 +3,7 @@ package org.mycore.services.acl;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -12,17 +13,12 @@ import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.mycore.common.MCRConfigurationException;
-import org.mycore.common.MCRSession;
-import org.mycore.common.MCRSessionMgr;
 import org.mycore.frontend.editor.MCREditorSubmission;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
 
 public class MCRACLEditorServlet extends MCRServlet {
 
-    /**
-     * 
-     */
     private static final long serialVersionUID = 1L;
 
     private static Logger LOGGER = Logger.getLogger(MCRACLEditorServlet.class);
@@ -32,7 +28,6 @@ public class MCRACLEditorServlet extends MCRServlet {
     }
 
     public void doGetPost(MCRServletJob job) throws Exception {
-        MCRSession session = MCRSessionMgr.getCurrentSession();
         HttpServletRequest request = job.getRequest();
         HttpServletResponse response = job.getResponse();
         String mode = request.getParameter("mode");
@@ -42,6 +37,7 @@ public class MCRACLEditorServlet extends MCRServlet {
 
         String objidFilter = null;
         String acpoolFilter = null;
+        String layout = "html";
 
         LOGGER.info("******* Current Filter: obj: " + objidFilter + "\t ac: " + acpoolFilter);
 
@@ -58,27 +54,27 @@ public class MCRACLEditorServlet extends MCRServlet {
             LOGGER.debug("processSubmission");
             processSubmission(job, response, objidFilter, acpoolFilter);
         } else if (mode.equals("getACLPermissions")) {
+            // retrieve the permission from DB, maybe with some filter
+            // create the xml
             LOGGER.debug("getACLPermissions");
-            String addNew = request.getParameter("addNew");
             objidFilter = request.getParameter("objid");
             acpoolFilter = request.getParameter("acpool");
             answer = XMLProcessing.access2XML(HIBA.getAccessPermission(objidFilter, acpoolFilter));
-           
+
             doLayout = true;
         } else if (mode.equals("ACLPermissionsEditor")) {
-            LOGGER.debug("ACLPermissionsEditor");
-            answer = new Element("ACLPermissionsEditor");
-            doLayout = true;
-            // redirect(response,
-            // "modules/module-ACL-editor/web/editor/editor-ACL_Permissions.xml?source_mode=getACLPermissions");
+            callPermissionEditor(request, response);
         } else if (mode.equals("access")) {
+            // still in use should be removed in future
             answer = XMLProcessing.access2XML(HIBA.getAccessPermission(objidFilter, acpoolFilter));
             answer.addContent(XMLProcessing.ruleSet2Items(HIBA.getAccessRule()));
             doLayout = true;
         } else if (mode.equals("getRuleAsItems")) {
+            // rules in item form for dropdown list in permission editor
             answer = XMLProcessing.ruleSet2Items(HIBA.getAccessRule());
             doLayout = true;
         } else if (mode.equals("getRuleTable")) {
+            // rule as xml for the rule editor
             List ruleList = null;
 
             if (request.getParameter("newRule") == null) {
@@ -88,12 +84,14 @@ public class MCRACLEditorServlet extends MCRServlet {
             answer = XMLProcessing.ruleSet2XML(ruleList);
             doLayout = true;
         } else if (mode.equals("getFilter")) {
+            // the filter as xml for filter editor
             LOGGER.info("******* get Filter!");
             objidFilter = request.getParameter("objid");
             acpoolFilter = request.getParameter("acpool");
             answer = XMLProcessing.accessFilter2XML(objidFilter, acpoolFilter);
             doLayout = true;
         } else if (mode.equals("removeFilter")) {
+            // "remove" the filter
             String redirectURL = "modules/module-ACL-editor/web/editor/editor-ACL_start.xml";
             LOGGER.debug("Redirect to URL " + redirectURL);
             redirect(response, redirectURL);
@@ -102,20 +100,66 @@ public class MCRACLEditorServlet extends MCRServlet {
         }
 
         if (doLayout)
-            doLayout(request, response, answer, "html");
+            doLayout(request, response, answer, layout);
 
     }
 
+    private void callPermissionEditor(HttpServletRequest request, HttpServletResponse response) {
+        LOGGER.debug("ACLPermissionsEditor");
+        String redirectURL = "modules/module-ACL-editor/web/editor/editor-ACL_start.xml";
+
+        String objidFilter = request.getParameter("objid");
+        String acpoolFilter = request.getParameter("acpool");
+
+        redirect(response, redirectURL, objidFilter, acpoolFilter);
+    }
+
+    private void redirect(HttpServletResponse response, String redirectURL, String objidFilter, String acpoolFilter) {
+        Properties parameters = new Properties();
+        boolean addParam = false;
+
+        if (objidFilter != null) {
+            parameters.put("objid", objidFilter);
+            addParam = true;
+        }
+
+        if (acpoolFilter != null) {
+            parameters.put("acpool", acpoolFilter);
+            addParam = true;
+        }
+
+        if (addParam) {
+            redirectURL = buildRedirectURL(redirectURL, parameters);
+            LOGGER.debug("Redirect to: " + redirectURL);
+        }
+        redirect(response, redirectURL);
+    }
+
+    /**
+     * processing incomming data from editor
+     * 
+     * @param job
+     * @param response
+     * @param objidFilter
+     * @param acpoolFilter
+     * @throws Exception
+     */
     private void processSubmission(MCRServletJob job, HttpServletResponse response, String objidFilter, String acpoolFilter) throws Exception {
         LOGGER.debug("Process submission!");
         MCRACLHIBAccess HIBA = new MCRACLHIBAccess();
         MCRACLXMLProcessing XMLProcessing = new MCRACLXMLProcessing();
-        Document indoc = getSubmissionDoc(job); // sub.getXML();
+        Document indoc = getSubmissionDoc(job);
 
         Element indocRoot = indoc.getRootElement();
         String indocRootName = indocRoot.getName();
 
-        if (indocRootName.equals("mcr_access_set")) {
+        if (indocRootName.equals("mcr_access_filter")) {
+            objidFilter = indocRoot.getChildText("objid");
+            acpoolFilter = indocRoot.getChildText("acpool");
+            String redirectURL = "modules/module-ACL-editor/web/editor/editor-ACL_start.xml";
+            
+            redirect(response, redirectURL, objidFilter, acpoolFilter);
+        } else if (indocRootName.equals("mcr_access_set")) {
             Document origDoc = new Document(XMLProcessing.access2XML(HIBA.getAccessPermission(objidFilter, acpoolFilter)));
             Map diffMap = XMLProcessing.findAccessDiff(indoc, origDoc);
 

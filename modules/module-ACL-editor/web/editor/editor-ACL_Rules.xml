@@ -14,6 +14,11 @@
 
             <components root="ACL-Rule-editor" var="/mcr_access_rule_set">
                 <panel id="ACL-Rule-editor" lines="on">
+                    <cell row="15" col="1">
+                        <button width="130px" url="editor-ACL_start.xml">
+                            <label xml:lang="de">Permission Editor</label>
+                        </button>
+                    </cell>
                     <cell row="20" col="1" var="mcr_access_rule">
                         <repeater min="0" max="1024">
                             <panel id="mcr.rule">
