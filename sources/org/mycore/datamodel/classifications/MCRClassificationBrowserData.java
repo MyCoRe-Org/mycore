@@ -414,7 +414,14 @@ public class MCRClassificationBrowserData {
             // set done flag
             if (ClassUserTable.containsKey(id)) {
                 if (ClassUserTable.get(id) != sessionID) {
-                    cli.setAttribute("userEdited", MCRSessionMgr.getSession(ClassUserTable.get(id)).getCurrentUserID());
+                    MCRSession oldsession = MCRSessionMgr.getSession(ClassUserTable.get(id));
+                    if (null != oldsession)
+                      cli.setAttribute("userEdited", oldsession.getCurrentUserID());
+                    else
+                    {
+                      ClassUserTable.remove(id);
+                      cli.setAttribute("userEdited", "false");
+                    }
                 } else {
                     cli.setAttribute("userEdited", "false");
                 }
