@@ -130,7 +130,7 @@ abstract public class MCRCheckACLBase extends MCRCheckBase {
      */
     protected org.jdom.Element prepareService(org.jdom.Document jdom_in, MCRObjectID ID, MCRServletJob job, String lang) throws Exception {
         org.jdom.Element elm_out = null;
-        ArrayList <String>logtext = new ArrayList<String>();
+        ArrayList<String> logtext = new ArrayList<String>();
         org.jdom.Element root = jdom_in.getRootElement();
         if (root != null) {
             org.jdom.Element servacls = root.getChild("servacls");
@@ -186,9 +186,16 @@ abstract public class MCRCheckACLBase extends MCRCheckBase {
                                                 }
                                             }
                                             if (k == 1) {
-                                                org.jdom.Element newtrue = new org.jdom.Element("boolean");
-                                                newtrue.setAttribute("operator", "true");
-                                                ((org.jdom.Element) inbool.get(j)).addContent(newtrue);
+                                                String inbooloper = ((org.jdom.Element) inbool.get(j)).getAttributeValue("operator");
+                                                if ((inbooloper != null) && inbooloper.toLowerCase().equals("and")) {
+                                                    org.jdom.Element newtrue = new org.jdom.Element("boolean");
+                                                    newtrue.setAttribute("operator", "true");
+                                                    ((org.jdom.Element) inbool.get(j)).addContent(newtrue);
+                                                } else {
+                                                    org.jdom.Element newfalse = new org.jdom.Element("boolean");
+                                                    newfalse.setAttribute("operator", "false");
+                                                    ((org.jdom.Element) inbool.get(j)).addContent(newfalse);
+                                                }
                                             }
                                         } else {
                                             logtext.add("Can't find an inner condition element.");
@@ -321,6 +328,6 @@ abstract public class MCRCheckACLBase extends MCRCheckBase {
 
         // restart editor
         job.getRequest().setAttribute("XSL.Style", lang);
-        getLayoutService().doLayout(job.getRequest(),job.getResponse(),jdom);
+        getLayoutService().doLayout(job.getRequest(), job.getResponse(), jdom);
     }
 }
