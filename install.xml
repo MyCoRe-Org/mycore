@@ -7,7 +7,7 @@
          Downloads mycore, docportal and content/defaultsample
          Builds docportal and loads sample content 
          Starts webserver and downloads the DocPortal homepage
-         $Revision: 1.1 $ $Date: 2007-06-28 14:28:27 $  
+         $Revision: 1.2 $ $Date: 2007-09-13 12:02:22 $  
 --> 
 <!-- =================================================================== -->
 
@@ -26,6 +26,12 @@
   	========================================	
 
   	</echo>
+    <condition property="os.is.unix">
+      <os family="unix" />
+    </condition>
+    <condition property="os.is.windows">
+      <os family="dos" />
+    </condition>
   	<delete dir="${destdir}" />
   	<mkdir dir="${destdir}" />
   	<echo>
@@ -99,12 +105,10 @@
   	========================================	
 
   	</echo>
-  	<exec executable="cmd" spawn="true">
-  	    <arg value="/c"/>
-  	    <arg value="${destdir}/docportal/build/bin/hsqldbstart.cmd"/>
-  	    <arg value="-p"/>
-    </exec>
-  	<sleep seconds="5" />
+    <antcall target="run">
+      <param name="command" value="hsqldbstart" />
+    </antcall>
+  	<sleep seconds="20" />
   	<echo>
 
   	========================================	
@@ -168,12 +172,10 @@
   	========================================	
 
   	</echo>
-  	<exec executable="cmd" spawn="true">
-  	    <arg value="/c"/>
-  	    <arg value="${destdir}/docportal/build/bin/jettystart.cmd"/>
-  	    <arg value="-p"/>
-    </exec>
-  	<sleep seconds="5" />
+    <antcall target="run">
+      <param name="command" value="jettystart" />
+    </antcall>
+  	<sleep seconds="20" />
   	<echo>
 
   	========================================	
@@ -189,11 +191,9 @@
   	========================================	
 
   	</echo>
-  	<exec executable="cmd">
-  	    <arg value="/c"/>
-  	    <arg value="${destdir}/docportal/build/bin/jettystop.cmd"/>
-  	    <arg value="-p"/>
-    </exec>
+    <antcall target="run">
+      <param name="command" value="jettystop" />
+    </antcall>
   	<echo>
 
   	========================================	
@@ -201,11 +201,9 @@
   	========================================	
 
   	</echo>
-  	<exec executable="cmd">
-  	    <arg value="/c"/>
-  	    <arg value="${destdir}/docportal/build/bin/hsqldbstop.cmd"/>
-  	    <arg value="-p"/>
-    </exec>
+    <antcall target="run">
+      <param name="command" value="hsqldbstop" />
+    </antcall>
   	<echo>
 
   	========================================	
@@ -223,4 +221,29 @@
 
   	</echo>
   </target>
+	
+  <target name="run">
+    <antcall target="run.windows">
+      <param name="command" value="${command}" />
+    </antcall>
+    <antcall target="run.unix">
+      <param name="command" value="${command}" />
+    </antcall>
+  </target>
+	
+  <target name="run.windows" if="os.is.windows">
+    <exec executable="cmd" spawn="true">
+      <arg value="/c"/>
+      <arg value="${destdir}/docportal/build/bin/${command}.cmd"/>
+      <arg value="-p"/>
+    </exec>
+  </target>
+	
+  <target name="run.unix" if="os.is.unix">
+    <exec executable="nohup" spawn="true">
+      <arg value="/bin/sh"/>
+      <arg value="${destdir}/docportal/build/bin/${command}.sh"/>
+    </exec>
+  </target>
+	
 </project>
