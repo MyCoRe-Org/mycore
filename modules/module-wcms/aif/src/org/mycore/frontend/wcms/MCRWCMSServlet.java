@@ -35,6 +35,8 @@ import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
+import org.mycore.access.MCRAccessInterface;
+import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.frontend.servlets.MCRServlet;
@@ -69,7 +71,11 @@ public abstract class MCRWCMSServlet extends MCRServlet {
     }
 
     protected final boolean accessGeneral() {
-        return MCRWCMSUtilities.writeAccessGeneral();
+        return (MCRWCMSUtilities.writeAccessGeneral() || hasRight2Manage());
+    }
+
+    private boolean hasRight2Manage() {
+        return (MCRWCMSUtilities.manageReadAccess() || MCRWCMSUtilities.manageWCMSAccess());
     }
 
     public Element getTemplates() {

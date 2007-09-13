@@ -115,7 +115,7 @@ public class MCRWCMSMigrationCommands extends MCRAbstractCommands {
             }
             // save rules as acl
             String aclObjId = MCRLayoutUtilities.getOBJIDPREFIX_WEBPAGE() + rootNode;
-            String writePerm = MCRWCMSUtilities.getWRITE_PERMISSION_WEBPAGE();
+            String writePerm = MCRWCMSUtilities.getWritePermissionWebpage();
             // // build rule as XML
             Element rule = new Element("condition");
             rule.addContent(new Element("boolean").setAttribute("operator", "or"));

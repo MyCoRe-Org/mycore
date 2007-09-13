@@ -11,12 +11,16 @@ import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.output.DOMOutputter;
 import org.jdom.xpath.XPath;
+import org.mycore.access.MCRAccessInterface;
+import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRException;
 import org.mycore.frontend.MCRLayoutUtilities;
 
 public class MCRWCMSUtilities {
 
     final static String WRITE_PERMISSION_WEBPAGE = "write";
+    final static String PERM_RIGHTS_MANAGEMENT_READ_ACCESS = "manage-readaccess-website";
+    final static String PERM_RIGHTS_MANAGEMENT_WCMS_ACCESS = "manage-wcmsaccess";
 
     final static XPath xpath;
     static {
@@ -41,7 +45,7 @@ public class MCRWCMSUtilities {
      */
     public static boolean writeAccess(String webpageID) {
         long startTime = System.currentTimeMillis();
-        boolean access = MCRLayoutUtilities.getAccess(webpageID, getWRITE_PERMISSION_WEBPAGE(), MCRLayoutUtilities.ONETRUE_ALLTRUE);
+        boolean access = MCRLayoutUtilities.getAccess(webpageID, getWritePermissionWebpage(), MCRLayoutUtilities.ONETRUE_ALLTRUE);
         LOGGER.debug("checked write access for webpage=" + webpageID + "=" + access + ": took " + MCRLayoutUtilities.getDuration(startTime) + " msec.");
         return access;
     }
@@ -64,7 +68,7 @@ public class MCRWCMSUtilities {
     }
 
     /**
-     * Returns a boolean, signalling if the user has at least write acces for 1
+     * Returns a boolean, signalling if the user has at least write access for 1
      * item.
      * 
      * @return true, if access is granted for at least 1 item OR false, if the
@@ -98,7 +102,7 @@ public class MCRWCMSUtilities {
         Iterator childIter = childs.iterator();
         while (accessMap.isEmpty() && childIter.hasNext()) {
             Element child = (Element) childIter.next();
-            boolean access = MCRLayoutUtilities.itemAccess(getWRITE_PERMISSION_WEBPAGE(), child, false);
+            boolean access = MCRLayoutUtilities.itemAccess(getWritePermissionWebpage(), child, false);
             if (access)
                 accessMap.put("access", "true");
             else
@@ -123,7 +127,7 @@ public class MCRWCMSUtilities {
         Iterator childIter = childs.iterator();
         while (childIter.hasNext()) {
             Element child = (Element) childIter.next();
-            boolean access = MCRLayoutUtilities.itemAccess(getWRITE_PERMISSION_WEBPAGE(), child, false);
+            boolean access = MCRLayoutUtilities.itemAccess(getWritePermissionWebpage(), child, false);
             if (access) {
                 // mark root item, to be able proccessing by XSL
                 child.setAttribute("ancestorLabels", MCRLayoutUtilities.getAncestorLabels(child));
@@ -134,8 +138,24 @@ public class MCRWCMSUtilities {
         }
     }
 
-    public static String getWRITE_PERMISSION_WEBPAGE() {
+    public static String getWritePermissionWebpage() {
         return WRITE_PERMISSION_WEBPAGE;
     }
 
+    public static String getPermRightsManagementReadAccess() {
+        return PERM_RIGHTS_MANAGEMENT_READ_ACCESS;
+    }
+
+    public static String getPermRightsManagementWCMSAccess() {
+        return PERM_RIGHTS_MANAGEMENT_WCMS_ACCESS;
+    }
+    
+    public static boolean manageReadAccess () {
+        return MCRAccessManager.getAccessImpl().checkPermission(MCRWCMSUtilities.getPermRightsManagementReadAccess());
+    }
+
+    public static boolean manageWCMSAccess () {
+        return MCRAccessManager.getAccessImpl().checkPermission(MCRWCMSUtilities.getPermRightsManagementWCMSAccess());
+    }        
+    
 }

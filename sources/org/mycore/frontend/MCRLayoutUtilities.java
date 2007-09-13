@@ -12,11 +12,14 @@ import org.jdom.input.SAXBuilder;
 import org.jdom.xpath.XPath;
 import org.mycore.access.MCRAccessInterface;
 import org.mycore.access.MCRAccessManager;
+import org.mycore.access.mcrimpl.MCRAccessStore;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRSessionMgr;
 
 public class MCRLayoutUtilities {
     final static String OBJIDPREFIX_WEBPAGE = "webpage:";
+
+    final static String READ_PERMISSION_WEBPAGE = "read";
 
     // strategies for access verification
     public final static int ALLTRUE = 1;
@@ -240,6 +243,10 @@ public class MCRLayoutUtilities {
         return OBJIDPREFIX_WEBPAGE + getWebpageID(item);
     }
 
+    public static String getWebpageACLID(String webpageID) {
+        return OBJIDPREFIX_WEBPAGE + webpageID;
+    }
+
     private static String getWebpageID(Element item) {
         return item.getAttributeValue("href");
     }
@@ -270,6 +277,33 @@ public class MCRLayoutUtilities {
 
     public static String getOBJIDPREFIX_WEBPAGE() {
         return OBJIDPREFIX_WEBPAGE;
+    }
+
+    public static boolean hasRule(String permission, String webpageID) {
+        MCRAccessInterface am = MCRAccessManager.getAccessImpl();
+        return am.hasRule(getWebpageACLID(webpageID), permission);
+    }
+
+    public static String getRuleID(String permission, String webpageID) {
+        MCRAccessStore as = MCRAccessStore.getInstance();
+        String ruleID = as.getRuleID(getWebpageACLID(webpageID), permission);
+        if (ruleID != null)
+            return ruleID;
+        else
+            return "";
+    }
+
+    public static String getRuleDescr(String permission, String webpageID) {
+        MCRAccessInterface am = MCRAccessManager.getAccessImpl();
+        String ruleDes = am.getRuleDescription(getWebpageACLID(webpageID), permission);
+        if (ruleDes != null)
+            return ruleDes;
+        else
+            return "";
+    }
+
+    public static String getPermission2ReadWebpage() {
+        return READ_PERMISSION_WEBPAGE;
     }
 
 }
