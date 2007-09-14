@@ -40,10 +40,14 @@ import org.jdom.input.SAXBuilder;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.jdom.xpath.XPath;
+import org.mycore.access.MCRAccessInterface;
+import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.frontend.MCRLayoutUtilities;
+import org.mycore.user.MCRUser;
+import org.mycore.user.MCRUserMgr;
 
 public class MCRWCMSAdminServlet extends MCRWCMSServlet {
 
@@ -108,17 +112,68 @@ public class MCRWCMSAdminServlet extends MCRWCMSServlet {
         }
         // manage read access
         else if (todo.equals(MCRWCMSUtilities.getPermRightsManagementReadAccess()) && MCRWCMSUtilities.manageReadAccess()) {
-            Element answer = new Element("cms");
-            answer.addContent(new Element("rightsManagement").setAttribute("mode", MCRWCMSUtilities.getPermRightsManagementReadAccess()));
-            getLayoutService().doLayout(request, response, new Document(answer));
+            manageReadAccess(request, response);
         }
         // manage wcms access
         else if (todo.equals(MCRWCMSUtilities.getPermRightsManagementWCMSAccess()) && MCRWCMSUtilities.manageWCMSAccess()) {
-            Element answer = new Element("cms");
-            answer.addContent(new Element("rightsManagement").setAttribute("mode", MCRWCMSUtilities.getPermRightsManagementWCMSAccess()));
-            getLayoutService().doLayout(request, response, new Document(answer));
+            manageWCMSAdminAccess(request, response);
         } else
             getLayoutService().doLayout(request, response, jdom);
+    }
+
+    private void manageWCMSAdminAccess(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        Element answer = new Element("cms");
+        answer.addContent(new Element("rightsManagement").setAttribute("mode", MCRWCMSUtilities.getPermRightsManagementWCMSAccess()));
+        // add all users to xml
+        answer.getChild("rightsManagement").addContent(MCRUserMgr.instance().getAllUsers().getRootElement().detach());
+        // add admin users to xml
+        Element adminUsers = getWCMSAdminUsers(MCRWCMSUtilities.getPermRightsManagementWCMSAccess());
+        if (adminUsers != null)
+            answer.getChild("rightsManagement").addContent(adminUsers);
+        if (request.getParameter("filter") != null && !request.getParameter("filter").equals("#$#$#")) {
+            answer.getChild("rightsManagement").setAttribute("filteredUser", request.getParameter("filter"));
+        }
+        // render
+        getLayoutService().doLayout(request, response, new Document(answer));
+    }
+
+    private void manageReadAccess(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        Element answer = new Element("cms");
+        answer.addContent(new Element("rightsManagement").setAttribute("mode", MCRWCMSUtilities.getPermRightsManagementReadAccess()));
+        // add all users to xml
+        answer.getChild("rightsManagement").addContent(MCRUserMgr.instance().getAllUsers().getRootElement().detach());
+        // add admin users to xml
+        Element adminUsers = getWCMSAdminUsers(MCRWCMSUtilities.getPermRightsManagementReadAccess());
+        if (adminUsers != null)
+            answer.getChild("rightsManagement").addContent(adminUsers);
+        getLayoutService().doLayout(request, response, new Document(answer));
+    }
+
+    /**
+     * Returns an org.jdom.element containing all MCRUsers that have access to
+     * wcms write management
+     * 
+     * @return all wcms write admin users OR null if no user has access
+     */
+    private Element getWCMSAdminUsers(String permission) {
+        MCRUserMgr um = MCRUserMgr.instance();
+        MCRAccessInterface am = MCRAccessManager.getAccessImpl();
+        List userIDs = um.getAllUserIDs();
+        Iterator userIt = userIDs.iterator();
+        Element adminUsers = (new Element("users")).setAttribute("filter", "administrators");
+        boolean adminsFound = false;
+        while (userIt.hasNext()) {
+            String userID = (String) userIt.next();
+            MCRUser mcrUser = um.retrieveUser(userID);
+            if (am.checkPermission(permission, mcrUser)) {
+                adminUsers.addContent(mcrUser.toJDOMElement());
+                adminsFound = true;
+            }
+        }
+        if (adminsFound)
+            return adminUsers;
+        else
+            return null;
     }
 
     private void exitWCMS(HttpServletRequest request, HttpServletResponse response) throws IOException {

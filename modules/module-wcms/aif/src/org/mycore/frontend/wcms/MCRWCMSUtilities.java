@@ -15,11 +15,15 @@ import org.mycore.access.MCRAccessInterface;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRException;
 import org.mycore.frontend.MCRLayoutUtilities;
+import org.mycore.user.MCRUser;
+import org.mycore.user.MCRUserMgr;
 
 public class MCRWCMSUtilities {
 
     final static String WRITE_PERMISSION_WEBPAGE = "write";
+
     final static String PERM_RIGHTS_MANAGEMENT_READ_ACCESS = "manage-readaccess-website";
+
     final static String PERM_RIGHTS_MANAGEMENT_WCMS_ACCESS = "manage-wcmsaccess";
 
     final static XPath xpath;
@@ -60,10 +64,29 @@ public class MCRWCMSUtilities {
      * @throws IOException
      */
     public static org.w3c.dom.Document getWritableNavi() throws JDOMException, IOException {
+        return getWritableNaviImpl("");
+    }
+
+    /**
+     * Returns a filtered navigation.xml, according to the given user WCMS-Write
+     * permissions. Only menu items that are permitted to write on are given
+     * back.
+     * 
+     * @param userID,
+     *            a MCRUserID
+     * @return org.w3c.dom.Document with writable menu items.
+     * @throws JDOMException
+     * @throws IOException
+     */
+    public static org.w3c.dom.Document getWritableNavi(String userID) throws JDOMException, IOException {
+        return getWritableNaviImpl(userID);
+    }
+
+    private static org.w3c.dom.Document getWritableNaviImpl(String userID) throws JDOMException, IOException {
         Element origNavi = new Element("root");
         origNavi.addContent((Element) MCRLayoutUtilities.getNavi().getRootElement().clone());
         Document writableNavi = new Document(new Element("root"));
-        buildWritableNavi(origNavi, writableNavi);
+        buildWritableNavi(origNavi, writableNavi, userID);
         return new DOMOutputter().output(writableNavi);
     }
 
@@ -122,19 +145,24 @@ public class MCRWCMSUtilities {
      * @throws JDOMException
      * @throws IOException
      */
-    private static void buildWritableNavi(Element origNavi, Document writableNavi) throws JDOMException, IOException {
+    private static void buildWritableNavi(Element origNavi, Document writableNavi, String userID) throws JDOMException, IOException {
         List childs = xpath.selectNodes(origNavi);
         Iterator childIter = childs.iterator();
         while (childIter.hasNext()) {
             Element child = (Element) childIter.next();
-            boolean access = MCRLayoutUtilities.itemAccess(getWritePermissionWebpage(), child, false);
+            boolean access = false;
+            if (!userID.equals("")) {
+                MCRUser user = MCRUserMgr.instance().retrieveUser(userID);
+                access = MCRLayoutUtilities.itemAccess(getWritePermissionWebpage(), child, false, user);
+            } else
+                access = MCRLayoutUtilities.itemAccess(getWritePermissionWebpage(), child, false);
             if (access) {
                 // mark root item, to be able proccessing by XSL
                 child.setAttribute("ancestorLabels", MCRLayoutUtilities.getAncestorLabels(child));
                 // cut node and add to target XML
                 writableNavi.getRootElement().addContent(child.detach());
             } else
-                buildWritableNavi(child, writableNavi);
+                buildWritableNavi(child, writableNavi, userID);
         }
     }
 
@@ -149,13 +177,13 @@ public class MCRWCMSUtilities {
     public static String getPermRightsManagementWCMSAccess() {
         return PERM_RIGHTS_MANAGEMENT_WCMS_ACCESS;
     }
-    
-    public static boolean manageReadAccess () {
+
+    public static boolean manageReadAccess() {
         return MCRAccessManager.getAccessImpl().checkPermission(MCRWCMSUtilities.getPermRightsManagementReadAccess());
     }
 
-    public static boolean manageWCMSAccess () {
+    public static boolean manageWCMSAccess() {
         return MCRAccessManager.getAccessImpl().checkPermission(MCRWCMSUtilities.getPermRightsManagementWCMSAccess());
-    }        
-    
+    }
+
 }

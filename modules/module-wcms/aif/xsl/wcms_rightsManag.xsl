@@ -6,10 +6,16 @@
     <xsl:variable name="perm">
         <xsl:call-template name="wcms.rightsManagement.getPermission" />
     </xsl:variable>
+    <xsl:variable name="filteredUser">
+        <xsl:call-template name="wcms.rightsManagement.getfilteredUser" />
+    </xsl:variable>
 
     <!--  ============================================================================================ -->
     <xsl:template match="cms/rightsManagement">
         <xsl:call-template name="wcms.rightsManagement.head" />
+        <br />
+        <xsl:call-template name="wcms.rightsManagement.userList" />
+        <br />
         <div id="statistic-width">
             <div id="statistic">
                 <div class="inhalt">
@@ -23,18 +29,107 @@
                         <th>
                             <xsl:value-of select="i18n:translate('wcms.rightsManag.edit')" />
                         </th>
-                        <!-- root -->
-                        <xsl:for-each select="$loaded_navigation_xml">
-                            <xsl:call-template name="wcms.rightsManagement.row" />
-                        </xsl:for-each>
-                        <!-- all sub entries -->
-                        <xsl:for-each select="$loaded_navigation_xml//node()[@href]">
-                            <xsl:call-template name="wcms.rightsManagement.row" />
-                        </xsl:for-each>
+                        <!-- generate table -->
+                        <xsl:choose>
+                            <!-- filter is set, get filtered navi.xml -->
+                            <xsl:when test="$perm=$write and $filteredUser!=''">
+                                <xsl:variable name="filteredNavi" select="wcmsUtils:getWritableNavi($filteredUser)" />
+                                <!-- all valid entries -->
+                                <xsl:for-each select="$filteredNavi//node()[@href]">
+                                    <xsl:call-template name="wcms.rightsManagement.row" />
+                                </xsl:for-each>
+                            </xsl:when>
+                            <!-- filter NOT set, user normal navi.xml -->
+                            <xsl:otherwise>
+                                <!-- root -->
+                                <xsl:for-each select="$loaded_navigation_xml">
+                                    <xsl:call-template name="wcms.rightsManagement.row" />
+                                </xsl:for-each>
+                                <!-- all sub entries -->
+                                <xsl:for-each select="$loaded_navigation_xml//node()[@href]">
+                                    <xsl:call-template name="wcms.rightsManagement.row" />
+                                </xsl:for-each>
+                            </xsl:otherwise>
+                        </xsl:choose>
                     </table>
                 </div>
             </div>
         </div>
+    </xsl:template>
+    <!--  ============================================================================================ -->
+    <xsl:template name="wcms.rightsManagement.userList">
+        <table>
+            <tr>
+                <td>
+                    <xsl:call-template name="wcms.rightsManagement.userList.admins" />
+                </td>
+                <xsl:if test="$perm=$write">
+                    <td>
+                        <xsl:call-template name="wcms.rightsManagement.userList.complete" />
+                    </td>
+                </xsl:if>
+            </tr>
+        </table>
+    </xsl:template>
+    <!--  ============================================================================================ -->
+    <xsl:template name="wcms.rightsManagement.userList.admins">
+        <xsl:choose>
+            <xsl:when test="$perm=$write">
+                <xsl:value-of select="i18n:translate('wcms.rightsManag.write.cb.descr')" />
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:value-of select="i18n:translate('wcms.rightsManag.read.cb.descr')" />
+            </xsl:otherwise>
+        </xsl:choose>
+        <br />
+        <select size="1">
+            <xsl:for-each select="./users[@filter='administrators']/user">
+                <option>
+                    <xsl:value-of select="concat(user.contact/contact.firstname/text(),user.contact/contact.lastname/text(),' (',@ID,')')" />
+                </option>
+            </xsl:for-each>
+        </select>
+    </xsl:template>
+    <!--  ============================================================================================ -->
+    <xsl:template name="wcms.rightsManagement.userList.complete">
+        <xsl:variable name="filteredUser" select="@filteredUser" />
+        <xsl:choose>
+            <xsl:when test="$perm=$write">
+                <xsl:value-of select="i18n:translate('wcms.rightsManag.write.filter.descr')" />
+            </xsl:when>
+        </xsl:choose>        
+        <br />
+        <form action="{$ServletsBaseURL}MCRWCMSAdminServlet{$JSessionID}" id="userFilter">
+            <input type="hidden" name="action" value="{$manage-wcms}" />
+            <select size="1" name="filter" onChange="document.getElementById('userFilter').submit()">
+                <xsl:choose>
+                    <xsl:when test="not(@filteredUser)">
+                        <option value="#$#$#" selected="selected">
+                            <xsl:value-of select="i18n:translate('wcms.rightsManag.write.filter.noRestr')" />
+                        </option>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <option value="#$#$#">
+                            <xsl:value-of select="i18n:translate('wcms.rightsManag.write.filter.noRestr')" />
+                        </option>
+                    </xsl:otherwise>
+                </xsl:choose>
+                <xsl:for-each select="./mycoreuser/user">
+                    <xsl:choose>
+                        <xsl:when test="$filteredUser=@ID">
+                            <option value="{@ID}" selected="selected">
+                                <xsl:value-of select="concat(user.contact/contact.firstname/text(),user.contact/contact.lastname/text(),' (',@ID,')')" />
+                            </option>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <option value="{@ID}">
+                                <xsl:value-of select="concat(user.contact/contact.firstname/text(),user.contact/contact.lastname/text(),' (',@ID,')')" />
+                            </option>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </xsl:for-each>
+            </select>
+        </form>
     </xsl:template>
     <!--  ============================================================================================ -->
     <xsl:template name="wcms.rightsManagement.head">
@@ -136,4 +231,29 @@
         </xsl:choose>
     </xsl:template>
     <!--  ============================================================================================ -->
+    <xsl:template name="wcms.rightsManagement.getfilteredUser">
+        <xsl:choose>
+            <xsl:when test="/cms/rightsManagement[@filteredUser]">
+                <xsl:value-of select="/cms/rightsManagement/@filteredUser" />
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:value-of select="''" />
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:template>
+    <!--  ============================================================================================ -->
+
+
 </xsl:stylesheet>
+
+
+
+
+
+
+
+
+
+
+
+

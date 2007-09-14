@@ -15,6 +15,7 @@ import org.mycore.access.MCRAccessManager;
 import org.mycore.access.mcrimpl.MCRAccessStore;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRSessionMgr;
+import org.mycore.user.MCRUser;
 
 public class MCRLayoutUtilities {
     final static String OBJIDPREFIX_WEBPAGE = "webpage:";
@@ -188,7 +189,7 @@ public class MCRLayoutUtilities {
     }
 
     /**
-     * Returns a Element presention of an item[@href=$webpageID]
+     * Returns a Element presentation of an item[@href=$webpageID]
      * 
      * @param webpageID
      * @return Element
@@ -226,6 +227,24 @@ public class MCRLayoutUtilities {
             access = am.checkPermission(objID, permission);
         return access;
     }
+    
+    /**
+     * Verifies a single item on access according to $permission and for a given user 
+     * 
+     * @param permission
+     * @param item
+     * @param access,
+     *            initial value
+     * @param user
+     * @return
+     */
+    public static boolean itemAccess(String permission, Element item, boolean access, MCRUser user) {
+        MCRAccessInterface am = MCRAccessManager.getAccessImpl();
+        String objID = getWebpageACLID(item);
+        if (am.hasRule(objID, permission))
+            access = am.checkPermission(objID, permission, user);
+        return access;
+    }    
 
     /**
      * Verifies if the cache of navigation.xml is valid.
