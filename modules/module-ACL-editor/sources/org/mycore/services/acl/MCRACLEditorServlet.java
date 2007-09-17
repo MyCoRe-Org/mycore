@@ -49,7 +49,9 @@ public class MCRACLEditorServlet extends MCRServlet {
         Element answer = null;
 
         String errorMsg = "The request did not contain a valid mode for this servlet!";
-
+        objidFilter = request.getParameter("objid");
+        acpoolFilter = request.getParameter("acpool");
+        
         if (mode == null) {
             LOGGER.debug("processSubmission");
             processSubmission(job, response, objidFilter, acpoolFilter);
@@ -57,8 +59,6 @@ public class MCRACLEditorServlet extends MCRServlet {
             // retrieve the permission from DB, maybe with some filter
             // create the xml
             LOGGER.debug("getACLPermissions");
-            objidFilter = request.getParameter("objid");
-            acpoolFilter = request.getParameter("acpool");
             answer = XMLProcessing.access2XML(HIBA.getAccessPermission(objidFilter, acpoolFilter));
 
             doLayout = true;
@@ -160,6 +160,9 @@ public class MCRACLEditorServlet extends MCRServlet {
             
             redirect(response, redirectURL, objidFilter, acpoolFilter);
         } else if (indocRootName.equals("mcr_access_set")) {
+            LOGGER.debug("Process Submission - Filter:");
+            LOGGER.debug("objid Filter: " + objidFilter);
+            LOGGER.debug("acpool Filter: " + acpoolFilter);
             Document origDoc = new Document(XMLProcessing.access2XML(HIBA.getAccessPermission(objidFilter, acpoolFilter)));
             Map diffMap = XMLProcessing.findAccessDiff(indoc, origDoc);
 
