@@ -39,12 +39,6 @@ public class MCRACLEditorServlet extends MCRServlet {
         String acpoolFilter = null;
         String layout = "html";
 
-        LOGGER.info("******* Current Filter: obj: " + objidFilter + "\t ac: " + acpoolFilter);
-
-        System.out.println("#################################################");
-        System.out.println("# version 0.041                                 #");
-        System.out.println("#################################################");
-
         boolean doLayout = false;
         Element answer = null;
 
@@ -85,7 +79,7 @@ public class MCRACLEditorServlet extends MCRServlet {
             doLayout = true;
         } else if (mode.equals("getFilter")) {
             // the filter as xml for filter editor
-            LOGGER.info("******* get Filter!");
+            LOGGER.info("get Filter!");
             objidFilter = request.getParameter("objid");
             acpoolFilter = request.getParameter("acpool");
             answer = XMLProcessing.accessFilter2XML(objidFilter, acpoolFilter);

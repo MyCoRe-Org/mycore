@@ -35,17 +35,17 @@ public class MCRACLHIBAccess {
 		Criteria query = MCRHIBConnection.instance().getSession().createCriteria(MCRACCESS.class);
 		
 		if (objidFilter != null){
-			LOGGER.info("#### OBJID Filter: " + objidFilter + "\t" + objidFilter.replaceAll("\\*", "%"));
+			LOGGER.info("OBJID Filter: " + objidFilter + "\t" + objidFilter.replaceAll("\\*", "%"));
 			query = query.add(Restrictions.like("key.objid", objidFilter.replaceAll("\\*", "%")));
 		}
 		
 		if (acpoolFilter != null){
-			LOGGER.info("#### OBJID Filter: " + acpoolFilter + "\t" + acpoolFilter.replaceAll("\\*", "%"));
+			LOGGER.info("OBJID Filter: " + acpoolFilter + "\t" + acpoolFilter.replaceAll("\\*", "%"));
 			query = query.add(Restrictions.like("key.acpool", acpoolFilter.replaceAll("\\*", "%")));
 		}
         
         if (ridFilter != null){
-            LOGGER.info("#### RID Filter: " + ridFilter);
+            LOGGER.info("RID Filter: " + ridFilter);
             query = query.add(Restrictions.like("rule.rid", ridFilter.replaceAll("\\*", "%")));
         }
 		
