@@ -11,7 +11,7 @@
     <!--  
         <target type="debug" method="post" format="html"/>
     -->
-    <cancel url="servlets/MCRACLEditorServlet?mode=removeFilter" />
+    <cancel url="servlets/MCRACLEditorServlet?mode=cancel" />
 
     <components root="ACL-PermissionFilter" var="/mcr_access_filter">
         <panel id="ACL-PermissionFilter" lines="on">

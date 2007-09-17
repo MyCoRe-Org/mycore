@@ -46,25 +46,26 @@ public class MCRACLXMLProcessing {
         return filter;
     }
 
-    public Element access2XML(List accessList) {
+    public Element access2XML(List accessList, boolean withPos) {
         Element mcrAccessSet = new Element("mcr_access_set");
 
-        if (accessList == null){
+        if (accessList == null) {
             MCRACCESS emptyAccess = new MCRACCESS();
             MCRACCESSRULE emptyRule = new MCRACCESSRULE();
             emptyRule.setRid("");
             emptyAccess.setRule(emptyRule);
-            emptyAccess.setKey(new MCRACCESSPK("",""));
+            emptyAccess.setKey(new MCRACCESSPK("", ""));
             accessList = new LinkedList();
             accessList.add(emptyAccess);
         }
-        
+
         int i = 0;
         for (Iterator it = accessList.iterator(); it.hasNext();) {
             MCRACCESS accessView = (MCRACCESS) it.next();
 
             Element mcrAccess = new Element("mcr_access");
-            mcrAccess.setAttribute("pos", Integer.toString(i));
+            if (withPos)
+                mcrAccess.setAttribute("pos", Integer.toString(i));
 
             Element ACPOOL = new Element("ACPOOL");
             ACPOOL.addContent(accessView.getKey().getAcpool());
@@ -80,12 +81,12 @@ public class MCRACLXMLProcessing {
             mcrAccess.addContent(RID);
 
             mcrAccessSet.addContent(mcrAccess);
-            
+
             i++;
         }
         return mcrAccessSet;
     }
-    
+
     public Element ruleSet2Items(List ruleList) {
         Element items = new Element("items");
 
@@ -111,24 +112,24 @@ public class MCRACLXMLProcessing {
 
     public Element ruleSet2XML(List ruleList) {
         Element mcrAccessRuleSet = new Element("mcr_access_rule_set");
-        
-        if (ruleList == null){
+
+        if (ruleList == null) {
             MCRACCESSRULE emptyRule = new MCRACCESSRULE();
             emptyRule.setRid("");
             emptyRule.setRule("");
             ruleList = new LinkedList();
             ruleList.add(emptyRule);
         }
-        
+
         int i = 0;
         for (Iterator it = ruleList.iterator(); it.hasNext();) {
             MCRACCESSRULE rule = (MCRACCESSRULE) it.next();
 
             Element mcrAccessRule = new Element("mcr_access_rule");
             mcrAccessRule.setAttribute("pos", Integer.toString(i));
-            
+
             mcrAccessRule.addContent(new Element("RuleStyle").addContent("plain"));
-            
+
             mcrAccessRule.addContent(new Element("RID").addContent(rule.getRid()));
             mcrAccessRule.addContent(new Element("RULE").addContent(rule.getRule()));
 
@@ -140,7 +141,7 @@ public class MCRACLXMLProcessing {
                 mcrAccessRule.addContent(new Element("DESCRIPTION").addContent(""));
 
             mcrAccessRuleSet.addContent(mcrAccessRule);
-            
+
             i++;
         }
 
@@ -150,44 +151,50 @@ public class MCRACLXMLProcessing {
     public Map findRulesDiff(Document editedRules, Document origRules) throws Exception {
         Element editedRulesRoot = editedRules.getRootElement();
         Element origRulesRoot = origRules.getRootElement();
-        
+
         Map diffMap = new HashMap();
-        
+
         List updateList = new LinkedList();
         List saveList = new LinkedList();
         List deleteList = new LinkedList();
-        
+
         String rid = "";
         String editedRuleString = "";
         String editedDescription = "";
         String ruleStyle = "";
-        
+
         List rulesList = editedRulesRoot.getChildren();
+
         
-        MCRACCESSRULE accessRule = new MCRACCESSRULE();
-        
+
         Iterator iterator = rulesList.iterator();
         while (iterator.hasNext()) {
+            MCRACCESSRULE accessRule = new MCRACCESSRULE();
             Element editedRule = (Element) iterator.next();
-            
+
             final String pos = editedRule.getAttributeValue("pos");
             ruleStyle = editedRule.getChildText("RuleStyle");
             rid = editedRule.getChildText("RID");
             editedRuleString = editedRule.getChildText("RULE");
             editedDescription = editedRule.getChildText("DESCRIPTION");
-            
-            LOGGER.debug("Rule " + rid + " from edited list!");
-            
+
+            LOGGER.debug("Edited Pos: " + pos);
+            LOGGER.debug("Edited RID: " + rid);
+            LOGGER.debug("Edited Rule: " + editedRuleString);
+            LOGGER.debug("Edited Desc: " + editedDescription);
+
+            if (editedDescription == null)
+                editedDescription = "";
+
             if (ruleStyle.equals("xml"))
                 editedRuleString = ruleFromXML(editedRuleString);
-            
+
             accessRule.setRid(rid);
             accessRule.setRule(editedRuleString);
             accessRule.setDescription(editedDescription);
-            
-            
+
             // pos null or empty means new rule
-            if (pos == null || pos.equals("")){
+            if (pos == null || pos.equals("")) {
                 LOGGER.debug("Adding new rule to save list!");
                 saveList.add(accessRule);
             } else {
@@ -199,45 +206,45 @@ public class MCRACLXMLProcessing {
                             return false;
                     }
                 };
-                
+
                 Element origRule = (Element) origRulesRoot.removeContent(posFilter).get(0);
                 String origRuleString = origRule.getChildText("RULE");
                 String origDescription = origRule.getChildText("DESCRIPTION");
-                
+
                 // find some changes in rule String or description
                 if (!editedRuleString.equals(origRuleString) || !editedDescription.equals(origDescription)) {
                     LOGGER.debug("Adding rule " + rid + " to update list!");
-                    
+
                     updateList.add(accessRule);
                 }
             }
         }
-        
+
         // remainder in origRules are deleted rules
         iterator = origRulesRoot.getChildren().iterator();
-        while(iterator.hasNext()){
-            rid = ((Element)iterator.next()).getChildText("RID");
+        while (iterator.hasNext()) {
+            rid = ((Element) iterator.next()).getChildText("RID");
             LOGGER.debug("Adding rule " + rid + " to delete list!");
             deleteList.add(rid);
         }
-        
+
         diffMap.put("update", updateList);
         diffMap.put("save", saveList);
         diffMap.put("delete", deleteList);
-        
+
         return diffMap;
     }
 
     private String ruleFromXML(String rule) throws JDOMException, IOException {
-        SAXBuilder saxBuilder=new SAXBuilder("org.apache.xerces.parsers.SAXParser");
-        Reader stringReader=new StringReader(rule);
-        Document jdomDocument=saxBuilder.build(stringReader);
+        SAXBuilder saxBuilder = new SAXBuilder("org.apache.xerces.parsers.SAXParser");
+        Reader stringReader = new StringReader(rule);
+        Document jdomDocument = saxBuilder.build(stringReader);
         MCRAccessInterface AI = MCRAccessControlSystem.instance();
-//        new MCRAccessCommands().
-        
+        // new MCRAccessCommands().
+
         return AI.getNormalizedRuleString(jdomDocument.getRootElement());
     }
-    
+
     public Map findAccessDiff(Document editedAcces, Document origAccess) throws Exception {
         Element editedAccessRoot = editedAcces.getRootElement();
         Map diffMap = new HashMap();
@@ -246,7 +253,7 @@ public class MCRACLXMLProcessing {
 
         List editedElemList = editedAccessRoot.getChildren();
         Element origAccessRoot = origAccess.getRootElement();
-        
+
         List updateList = new LinkedList();
         List saveList = new LinkedList();
         List deleteList = new LinkedList();

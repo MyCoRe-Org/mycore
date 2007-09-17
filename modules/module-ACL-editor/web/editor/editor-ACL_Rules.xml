@@ -49,7 +49,7 @@
                                     </list>
                                 </cell>
                                 <cell row="25" col="2" var="RULE">
-                                    <textarea width="70" height="10" />
+                                    <textarea width="70" height="3" />
                                 </cell>
 
 

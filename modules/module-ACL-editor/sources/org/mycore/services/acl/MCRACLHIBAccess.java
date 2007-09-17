@@ -82,7 +82,17 @@ public class MCRACLHIBAccess {
         
         for (Iterator it = ((List)diffMap.get("update")).iterator(); it.hasNext();){
             MCRACCESSRULE rule = (MCRACCESSRULE) it.next();
-            ruleStore.updateRule(new MCRAccessRule(rule.getRid(), "ACL-Editor", new Date(), rule.getRule(), rule.getDescription()));
+            String rid = rule.getRid();
+            String ruleString = rule.getRule();
+            String desc = rule.getDescription();
+            StringBuffer debugMSG = new StringBuffer("Update: ");
+            debugMSG.append(rid).append(" - ");
+            debugMSG.append(ruleString).append(" - ");
+            debugMSG.append(desc);
+            
+            LOGGER.debug(debugMSG.toString());
+            
+            ruleStore.updateRule(new MCRAccessRule(rid, "ACL-Editor", new Date(), ruleString, desc));
         }
         
         for (Iterator it = ((List)diffMap.get("save")).iterator(); it.hasNext();){
