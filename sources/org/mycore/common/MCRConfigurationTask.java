@@ -125,7 +125,7 @@ public class MCRConfigurationTask extends Task {
     private Properties getProperties(File pFile) throws FileNotFoundException, IOException {
         Properties returns = new Properties();
         if (pFile.exists())
-            returns.load(new InputStreamReader(new FileInputStream(pFile), PROPERTY_CHARSET));
+            returns.load(new FileInputStream(pFile));
         return returns;
     }
 
