@@ -353,7 +353,9 @@ public class MCRConfigurationTask extends Task {
             bw.newLine();
             synchronized (properties) {
                 List<String> list = new ArrayList<String>(properties.size());
-                list.addAll(properties.stringPropertyNames());
+                for (Object key : properties.keySet()) {
+                    list.add(key.toString());
+                }
                 Collections.sort(list);
                 for (String key : list) {
                     String val = (String) properties.get(key);
