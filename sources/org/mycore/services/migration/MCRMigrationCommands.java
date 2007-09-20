@@ -43,9 +43,9 @@ public class MCRMigrationCommands extends MCRAbstractCommands {
     public static List<String> migrateUser(int step) throws Exception {
         switch (step) {
         case 1:
-            return Collections.nCopies(1, "save all groups to file " + MCRUserMigrationHelper.getGroupFile().getAbsolutePath());
+            return Collections.nCopies(1, "export all groups to file " + MCRUserMigrationHelper.getGroupFile().getAbsolutePath());
         case 2:
-            return Collections.nCopies(1, "save all users to file " + MCRUserMigrationHelper.getUserFile().getAbsolutePath());
+            return Collections.nCopies(1, "export all users to file " + MCRUserMigrationHelper.getUserFile().getAbsolutePath());
         case 3:
             MCRUserMigrationHelper.dropTables();
             return Collections.emptyList();
