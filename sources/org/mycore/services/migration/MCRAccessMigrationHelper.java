@@ -59,7 +59,6 @@ class MCRAccessMigrationHelper {
         stmt.executeUpdate("DROP TABLE MCRACCESS");
         stmt.close();
         con.commit();
-        MCRHIBConnection.instance().flushSession();
         Session session = MCRHIBConnection.instance().getSession();
         session.clear();
     }

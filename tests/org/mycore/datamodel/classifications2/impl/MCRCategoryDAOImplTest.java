@@ -91,7 +91,6 @@ public class MCRCategoryDAOImplTest extends MCRHibTestCase {
         india.setLabels(new HashMap<String, MCRLabel>());
         india.getLabels().put("de", new MCRLabel("de", "Indien", null));
         india.getLabels().put("en", new MCRLabel("en", "India", null));
-        MCRHIBConnection.instance().flushSession();
         DAO.addCategory(new MCRCategoryID(category.getId().getRootID(), "Asia"), india);
         startNewTransaction();
         assertTrue("Exist check failed for Category " + india.getId(), DAO.exist(india.getId()));

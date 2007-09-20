@@ -113,7 +113,6 @@ public class MCRHIBUserStore implements MCRUserStore {
 
         // insert values
         session.save(user);
-        session.flush();
     }
 
     /**
@@ -135,7 +134,6 @@ public class MCRHIBUserStore implements MCRUserStore {
         if (l.size() == 1) {
             MCRUSERS user = (MCRUSERS) l.get(0);
             session.delete(user);
-            session.flush();
         } else {
             logger.warn("There is no user '" + delUserID + "'");
         }
@@ -336,7 +334,6 @@ public class MCRHIBUserStore implements MCRUserStore {
         group.setModifieddate(newGroup.getModifiedDate());
         group.setDescription(newGroup.getDescription());
         session.save(group);
-        session.flush();
 
         final ArrayList memberUserIDs = newGroup.getMemberUserIDs();
         // now update the member lookup table Groupmembers
@@ -345,7 +342,6 @@ public class MCRHIBUserStore implements MCRUserStore {
             member.setGid(group);
             member.setUserid((MCRUSERS) session.get(MCRUSERS.class, memberUserIDs.get(i).toString()));
             session.save(member);
-            session.flush();
         }
 
         // Groupadmins
@@ -355,7 +351,6 @@ public class MCRHIBUserStore implements MCRUserStore {
             admin.setUserid((MCRUSERS) session.get(MCRUSERS.class, newGroup.getAdminUserIDs().get(i).toString()));
             admin.setGroupid(ADMIN_GROUP);
             session.saveOrUpdate(admin);
-            session.flush();
             session.evict(ADMIN_GROUP);
         }
         for (int i = 0; i < newGroup.getAdminGroupIDs().size(); i++) {
@@ -366,7 +361,6 @@ public class MCRHIBUserStore implements MCRUserStore {
             admin.setGroupid((MCRGROUPS) session.get(MCRGROUPS.class, adminGroupID));
             if (session.get(MCRGROUPADMINS.class, admin.getKey()) == null) {
                 session.saveOrUpdate(admin);
-                session.flush();
                 session.evict(ADMIN_USER);
             }
         }

@@ -30,7 +30,6 @@ import java.io.IOException;
 import java.util.Iterator;
 
 import org.apache.log4j.Logger;
-import org.hibernate.FlushMode;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
@@ -48,7 +47,6 @@ import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
-
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.MCRSessionMgr;
@@ -103,9 +101,9 @@ public class MCRHIBConnection implements Closeable, MCRSessionListener {
      * This method creates the configuration needed by hibernate
      */
     private void buildConfiguration() {
-        String resource=System.getProperty("MCR.Hibernate.Configuration", "hibernate.cfg.xml");
+        String resource = System.getProperty("MCR.Hibernate.Configuration", "hibernate.cfg.xml");
         HIBCFG = new Configuration().configure(resource);
-        System.out.println("Hibernate configured");
+        LOGGER.info("Hibernate configured");
     }
 
     /**
@@ -122,9 +120,9 @@ public class MCRHIBConnection implements Closeable, MCRSessionListener {
         SESSION_FACTORY = config.buildSessionFactory();
         HIBCFG = config;
     }
-    
-    private static void registerStatisticsService(){
-        StatisticsService stats=new StatisticsService();
+
+    private static void registerStatisticsService() {
+        StatisticsService stats = new StatisticsService();
         stats.setSessionFactory(SESSION_FACTORY);
         MCRJMXBridge.registerMe(stats, "Hibernate", "Statistics");
     }
@@ -137,7 +135,6 @@ public class MCRHIBConnection implements Closeable, MCRSessionListener {
      */
     public Session getSession() {
         Session session = SESSION_FACTORY.getCurrentSession();
-        session.setFlushMode(FlushMode.COMMIT);
         return session;
     }
 
@@ -249,14 +246,7 @@ public class MCRHIBConnection implements Closeable, MCRSessionListener {
 
     public void sessionEvent(MCRSessionEvent event) {
         // TODO Auto-generated method stub
-        
-    }
-    
-    public void flushSession(){
-        Session currentSession=getSession();
-        currentSession.setFlushMode(FlushMode.MANUAL);
-        currentSession.flush();
-        currentSession.setFlushMode(FlushMode.COMMIT);
+
     }
 
 }

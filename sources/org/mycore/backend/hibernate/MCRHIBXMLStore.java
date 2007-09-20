@@ -111,11 +111,7 @@ public class MCRHIBXMLStore implements MCRXMLTableInterface {
         Session session = getSession();
         MCRXMLTABLEPK pk = new MCRXMLTABLEPK(mcrid, version);
         MCRXMLTABLE tab = (MCRXMLTABLE) session.get(MCRXMLTABLE.class, pk);
-        if (tab != null) {
-            // Object is in session: maybe delete before?
-            session.evict(tab);
-            MCRHIBConnection.instance().flushSession();
-        } else {
+        if (tab == null) {
             tab = new MCRXMLTABLE();
             tab.setKey(pk);
             tab.setType(this.type);
@@ -205,7 +201,7 @@ public class MCRHIBXMLStore implements MCRXMLTableInterface {
     public final synchronized int getNextFreeIdInt(String project, String type) throws MCRPersistenceException {
 
         Session session = getSession();
-        MCRHIBConnection.instance().flushSession();
+        //TODO: SQL -> Criteria
         List<?> l = session.createQuery("select max(key.id) from " + classname + " where MCRID like '" + project + "_" + type + "%'").list();
         if (l.size() > 0 && l.get(0) != null) {
             String max = (String) l.get(0);

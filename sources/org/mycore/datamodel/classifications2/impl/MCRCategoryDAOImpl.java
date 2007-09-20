@@ -274,7 +274,6 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         Session session = MCRHIBConnection.instance().getSession();
         MCRCategoryImpl category = getByNaturalID(session, id);
         category.getLabels().remove(lang);
-        session.flush();
     }
 
     public void replaceCategory(MCRCategory newCategory) throws IllegalArgumentException {
@@ -530,7 +529,6 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
      */
     private static void updateLeftRightValue(MCRHIBConnection connection, int left, final int increment) {
         Session session = connection.getSession();
-        connection.flushSession();
         LOGGER.debug("LEFT AND RIGHT values need updates. Left=" + left + ", increment by: " + increment);
         Query leftQuery = session.getNamedQuery(CATEGRORY_CLASS.getName() + ".updateLeft");
         leftQuery.setInteger("left", left);
@@ -540,13 +538,11 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         rightQuery.setInteger("left", left);
         rightQuery.setInteger("increment", increment);
         int rightChanges = rightQuery.executeUpdate();
-        connection.flushSession();
         LOGGER.debug("Updated " + leftChanges + " left and " + rightChanges + " right values.");
     }
 
     private static void updateLeftRightValueMax(MCRHIBConnection connection, int left, int maxLeft, int right, int maxRight, final int increment) {
         Session session = connection.getSession();
-        connection.flushSession();
         LOGGER.debug("LEFT AND RIGHT values need updates. Left=" + left + ", MaxLeft=" + maxLeft + ", Right=" + right + ", MaxRight=" + maxRight
                 + " increment by: " + increment);
         Query leftQuery = session.getNamedQuery(CATEGRORY_CLASS.getName() + ".updateLeftWithMax");
@@ -559,7 +555,6 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         rightQuery.setInteger("max", maxRight);
         rightQuery.setInteger("increment", increment);
         int rightChanges = rightQuery.executeUpdate();
-        connection.flushSession();
         LOGGER.debug("Updated " + leftChanges + " left and " + rightChanges + " right values.");
     }
 

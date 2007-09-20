@@ -63,7 +63,6 @@ public class MCRClassificationEventHandler extends MCREventHandlerBase {
     protected final void handleClassificationUpdated(MCREvent evt, MCRClassification obj) {
         // SQL index delete
         CM.deleteClassificationItem(obj.getId());
-        MCRHIBConnection.instance().flushSession();
         // store in SQL tables
         CM.createClassificationItem(obj);
         CM.createCategoryItems(obj.getCategories());        
@@ -95,7 +94,6 @@ public class MCRClassificationEventHandler extends MCREventHandlerBase {
     protected final void handleClassificationRepaired(MCREvent evt, MCRClassification obj) {
         // SQL index delete
         CM.deleteClassificationItem(obj.getId());
-        MCRHIBConnection.instance().flushSession();
         // store in SQL tables
         CM.createClassificationItem(obj);
         CM.createCategoryItems(obj.getCategories());        

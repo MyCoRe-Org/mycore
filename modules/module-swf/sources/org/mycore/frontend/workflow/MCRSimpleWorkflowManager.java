@@ -451,8 +451,6 @@ public class MCRSimpleWorkflowManager {
         }
 
         logger.info("The metadata objekt was " + fn + " loaded.");
-        // Database connection needs to be flushed
-        MCRHIBConnection.instance().flushSession();
         // commit derivates
         if (!MCRObject.existInDatastore(ID)) {
             return false;
@@ -498,8 +496,6 @@ public class MCRSimpleWorkflowManager {
             MCRDerivateCommands.loadFromFile(filename, false);
         }
 
-        // Database connection needs to be flushed
-        MCRHIBConnection.instance().flushSession();
         if (!MCRDerivate.existInDatastore(ID)) {
             return false;
         }
@@ -598,7 +594,6 @@ public class MCRSimpleWorkflowManager {
         // get derivate xml object
         MCRDerivate der = createDerivate(ID, DD);
         der.updateInDatastore();
-        MCRHIBConnection.instance().flushSession();
         logger.info("Derivate " + DD.getId() + " stored in server.");
         return DD.getId();
     }

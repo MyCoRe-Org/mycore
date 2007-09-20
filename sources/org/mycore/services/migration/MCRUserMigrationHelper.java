@@ -100,7 +100,6 @@ class MCRUserMigrationHelper {
             LOGGER.debug("Failed to drop table", e);
             throw e;
         }
-        MCRHIBConnection.instance().flushSession();
         Session session = MCRHIBConnection.instance().getSession();
         session.clear();
     }
