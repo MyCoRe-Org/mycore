@@ -129,7 +129,6 @@ public class MCRImgCacheCommands extends MCRAbstractCommands {
             try {
                 LOGGER.debug("Try deleting cache folder.");
                 dir.delete();
-                MCRHIBConnection.instance().flushSession();
                 dir = (MCRDirectory) MCRFilesystemNode.getRootNode(MCRImgCacheManager.CACHE_FOLDER);
             } catch (Exception e) {
                 LOGGER.info("Maybe inconsistency of image cache! Try to clean up.");

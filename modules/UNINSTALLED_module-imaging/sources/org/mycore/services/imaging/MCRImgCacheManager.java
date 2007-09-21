@@ -288,7 +288,6 @@ public class MCRImgCacheManager implements CacheManager {
     private MCRDirectory setCacheDir(MCRFile image) {
         String path = buildPath(image);
         MCRDirectory dir = new MCRDirectory(path, cacheInIFS);
-        MCRHIBConnection.instance().flushSession();
 
         return dir;
     }
