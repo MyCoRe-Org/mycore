@@ -876,7 +876,12 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
                 // remove leading ":" from the for block above
                 categID.deleteCharAt(0);
             }
-            String categ = categID.toString();
+            String categ;
+            try {
+                categ = URLDecoder.decode(categID.toString(), "UTF-8");
+            } catch (UnsupportedEncodingException e) {
+                categ = categID.toString();
+            }
             MCRClassificationItem cl = null;
             String labelFormat = getLabelFormat(format);
             boolean withCounter = false;
