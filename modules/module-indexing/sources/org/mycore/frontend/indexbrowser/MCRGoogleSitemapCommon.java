@@ -80,7 +80,7 @@ public final class MCRGoogleSitemapCommon {
     private static final String objectPath = MCRConfiguration.instance().getString("MCR.GoogleSitemap.ObjectPath", "receive/");
 
     /** Number of URLs in one sitemap */
-    private static int numberOfURLs = MCRConfiguration.instance().getInt("MCR.GoogleSitemap.NumberOfURLs", 30000);
+    private static int numberOfURLs = MCRConfiguration.instance().getInt("MCR.GoogleSitemap.NumberOfURLs", 50000);
 
     /** The XML table API */
     private static final MCRXMLTableManager tm = MCRXMLTableManager.instance();
