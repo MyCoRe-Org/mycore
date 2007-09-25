@@ -121,8 +121,8 @@ public class MCRImgService {
 
             if (!outputFilled) {
                 processor.resize(input, newWidth, newHeight, output);
+                input.close();
             }
-            input.close();
         } else {
             LOGGER.debug("Get " + filename + " Width x Height - use Processor");
             InputStream input = image.getContentAsInputStream();
