@@ -275,7 +275,7 @@
               <cell row="1" col="2" anchor="WEST" var="@value"> 
                 <list type="dropdown">
                   <item value="" i18n="editor.search.choose" />
-                  <include uri="classification:editor[TextCounter]:2:children:{substring-after($type,'@')}" />
+                  <include uri="classification:editor[TextCounter]:2:children:{substring-after($type,'@')}" cacheable="false" />
                 </list>
               </cell>
             </xsl:when>
@@ -571,7 +571,7 @@
       <xsl:when test="@classification and @source='objectCategory'">
         <list type="dropdown">
           <item value="" i18n="editor.search.choose" />
-          <include uri="classification:editor[TextCounter]:2:children:{@classification}" />
+          <include uri="classification:editor[TextCounter]:2:children:{@classification}" cacheable="false" />
         </list>
       </xsl:when>
       <xsl:otherwise>
