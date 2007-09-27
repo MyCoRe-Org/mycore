@@ -252,7 +252,7 @@
       <hidden var="conditions/boolean/boolean/condition{$pos}/@field" default="{normalize-space($fields.for.type)}" /> 
     </xsl:if>
     
-    <cell row="{$pos}" col="1" colspan="2" anchor="NORTHWEST" var="conditions/boolean/boolean/condition{$pos}">
+    <cell row="{number($pos)*2}" col="1" colspan="2" anchor="NORTHWEST" var="conditions/boolean/boolean/condition{$pos}">
       <repeater min="1" max="10">
         <panel>
         
@@ -269,6 +269,7 @@
                 <text i18n="{mcr:index/mcr:field[@name=normalize-space($fields.for.type)]/@i18n}" />
               </xsl:otherwise>
             </xsl:choose>
+            <space width="200px" height="0px" />
           </cell>    
           <xsl:choose>
             <xsl:when test="starts-with($type,'@')">
@@ -515,8 +516,8 @@
 <!-- ==================================================== -->
 
 <xsl:template name="spacer">
-  <cell row="92" col="1" colspan="2" anchor="WEST" height="20px">
-    <text><label> </label></text>
+  <cell row="92" col="1" colspan="2" anchor="WEST">
+    <space height="20px" />
   </cell>
 </xsl:template>
 
@@ -563,10 +564,10 @@
 
   <hidden var="conditions/boolean/condition{$pos}/@field" default="{@name}" />
   <hidden var="conditions/boolean/condition{$pos}/@operator" default="{$fieldtypes/mcr:type[@name=current()/@type]/@default}" />
-  <cell row="{$pos}" col="1" anchor="EAST">
+  <cell row="{number($pos)*2}" col="1" anchor="EAST">
     <text i18n="{@i18n}" />
   </cell>
-  <cell row="{$pos}" col="2" anchor="WEST" var="conditions/boolean/condition{$pos}/@value">
+  <cell row="{number($pos)*2}" col="2" anchor="WEST" var="conditions/boolean/condition{$pos}/@value">
     <xsl:choose>
       <xsl:when test="@classification and @source='objectCategory'">
         <list type="dropdown">
