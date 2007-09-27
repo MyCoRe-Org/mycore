@@ -31,6 +31,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.jdom.Element;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 
@@ -145,16 +146,20 @@ public class MCRUserCommands extends MCRAbstractCommands {
         com = new MCRCommand("list user {0}", "org.mycore.frontend.cli.MCRUserCommands.listUser String", "The command list the user {0}.");
         command.add(com);
 
-        com = new MCRCommand("export all groups to file {0}", "org.mycore.frontend.cli.MCRUserCommands.exportAllGroupsToFile String", "The command exports all group data to the file {0}.");
+        com = new MCRCommand("export all groups to file {0}", "org.mycore.frontend.cli.MCRUserCommands.exportAllGroupsToFile String",
+                "The command exports all group data to the file {0}.");
         command.add(com);
 
-        com = new MCRCommand("export group {0} to file {1}", "org.mycore.frontend.cli.MCRUserCommands.exportGroupToFile String String", "The command exports the data of group {0} to the file {1}.");
+        com = new MCRCommand("export group {0} to file {1}", "org.mycore.frontend.cli.MCRUserCommands.exportGroupToFile String String",
+                "The command exports the data of group {0} to the file {1}.");
         command.add(com);
 
-        com = new MCRCommand("export all users to file {0}", "org.mycore.frontend.cli.MCRUserCommands.exportAllUsersToFile String", "The command exports all user data to the file {0}.");
+        com = new MCRCommand("export all users to file {0}", "org.mycore.frontend.cli.MCRUserCommands.exportAllUsersToFile String",
+                "The command exports all user data to the file {0}.");
         command.add(com);
 
-        com = new MCRCommand("export user {0} to file {1}", "org.mycore.frontend.cli.MCRUserCommands.exportUserToFile String String", "The command exports the data of user {0} to the file {1}.");
+        com = new MCRCommand("export user {0} to file {1}", "org.mycore.frontend.cli.MCRUserCommands.exportUserToFile String String",
+                "The command exports the data of user {0} to the file {1}.");
         command.add(com);
     }
 
@@ -429,6 +434,12 @@ public class MCRUserCommands extends MCRAbstractCommands {
         try {
             MCRGroup group = MCRUserMgr.instance().retrieveGroup(groupID);
             org.jdom.Document jdomDoc = group.toJDOMDocument();
+            Element elmroot = jdomDoc.getRootElement();
+            Element elmgroup = elmroot.getChild("group");
+            Element elmmember = elmgroup.getChild("group.members");
+            if (elmmember != null) {
+                elmgroup.removeChild("group.members");
+            }
             FileOutputStream outFile = new FileOutputStream(filename);
             LOGGER.info("Writing to file " + filename + " ...");
             saveToXMLFile(jdomDoc, outFile);
