@@ -85,7 +85,7 @@ public class MCRCheckCommitDataServlet extends MCRCheckDataBase {
 
         String sender = wfm.getMailSender();
         String appl = CONFIG.getString("MCR.SWF.Mail.ApplicationID", "DocPortal");
-        String subject = "Automaticaly message from " + appl;
+        String subject = "Automatically generated message from " + appl;
         StringBuffer text = new StringBuffer();
         text.append("Es wurde ein Objekt vom Typ ").append(ID.getTypeId()).append(" mit der ID ").append(ID.getId()).append(" aus dem Workflow in das System geladen.");
         LOGGER.info(text.toString());

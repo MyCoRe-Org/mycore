@@ -80,7 +80,7 @@ public class MCRCheckNewDataServlet extends MCRCheckDataBase {
 
         String sender = wfm.getMailSender();
         String appl = CONFIG.getString("MCR.SWF.Mail.ApplicationID", "DocPortal");
-        String subject = "Automaticaly message from " + appl;
+        String subject = "Automatically generated message from " + appl;
         StringBuffer text = new StringBuffer();
         text.append("Es wurde ein neues Objekt vom Typ ").append(ID.getTypeId()).append(" mit der ID ").append(ID.getId()).append(" in den Workflow eingestellt.");
         LOGGER.info(text.toString());

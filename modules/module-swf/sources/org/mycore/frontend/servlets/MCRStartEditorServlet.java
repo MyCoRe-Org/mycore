@@ -448,7 +448,7 @@ public class MCRStartEditorServlet extends MCRServlet {
         if (addr.size() != 0) {
             String sender = WFM.getMailSender();
             String appl = CONFIG.getString("MCR.SWF.Mail.ApplicationID", "DocPortal");
-            String subject = "Automaticaly message from " + appl;
+            String subject = "Automatically generated message from " + appl;
             StringBuffer text = new StringBuffer();
             text.append("Es wurde ein Derivate mit der ID ").append(mysemcrid).append(" des Objektes mit der ID ").append(mysemcrid).append(
                     " aus dem Server gel�scht.");
