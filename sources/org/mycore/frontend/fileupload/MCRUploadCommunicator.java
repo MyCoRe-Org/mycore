@@ -226,6 +226,8 @@ public class MCRUploadCommunicator {
 
         zos.closeEntry();
         zos.flush();
+        System.out.println("Releasing file: "+file);
+        source.close();
         System.out.println("Finished sending file content.");
 
         long numBytesStored = din.readLong();
