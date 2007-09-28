@@ -32,7 +32,7 @@ import org.mycore.parsers.bool.MCRCondition;
 /**
  * Manages a cache that contains the data of the most recently used queries.
  * There are {MCR.SearchServlet.CacheSize} most recently used queries 
- * in a global cache. Additionally, the last query of earch session is always 
+ * in a global cache. Additionally, the last query of search session is always 
  * stored within the MCRSession.
  * 
  * @author Frank Lützenkirchen
@@ -50,16 +50,18 @@ public class MCRCachedQueryData
   
   private final static String LAST_QUERY_IN_SESSION = "LastQuery";
   
-  public static MCRCachedQueryData getData( String id )
-  {
-    // The n most recently used queries are in a global cache
-    MCRCachedQueryData data = (MCRCachedQueryData)( cache.get( id ) );
-    if( data != null ) return data;
-    
-    // Additionally, the last query of a single session is always there
-    data = (MCRCachedQueryData)( MCRSessionMgr.getCurrentSession().get( LAST_QUERY_IN_SESSION ) );
-    return( data.getResults().getID().equals( id ) ? data : null );
-  }
+  public static MCRCachedQueryData getData(String id) {
+        // The n most recently used queries are in a global cache
+        MCRCachedQueryData data = (MCRCachedQueryData) (cache.get(id));
+        if (data == null) {
+            // Additionally, the last query of a single session is always there
+            data = (MCRCachedQueryData) (MCRSessionMgr.getCurrentSession().get(LAST_QUERY_IN_SESSION));
+            // May be the last query in session is the one we are looking for
+            if ((data != null) && (data.getResults().getID().equals(id)))
+                return data;
+        }
+        return data; // May be null, if no cached query data found
+    }        
   
   /** The query as XML, for later reloading into search mask editor form */
   private Document query; 
