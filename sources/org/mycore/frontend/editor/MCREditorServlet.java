@@ -51,6 +51,8 @@ import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 
 import org.mycore.common.MCRCache;
+import org.mycore.common.MCRSession;
+import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
@@ -336,6 +338,12 @@ public class MCREditorServlet extends MCRServlet {
 
             variables.add(new MCREditorVariable(name, value));
         }
+        
+        // Remove subselect parameters from current session
+        MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
+        mcrSession.deleteObject("XSL.subselect.session");
+        mcrSession.deleteObject("XSL.subselect.varpath");
+        mcrSession.deleteObject("XSL.subselect.webpage");
 
         sendToSubSelect(res, parms, variables, root);
     }
