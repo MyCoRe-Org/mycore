@@ -55,7 +55,7 @@ public final class MCRObjectID {
     private static final Logger LOGGER = Logger.getLogger(MCRObjectID.class);
 
     // counter for the next IDs per project base ID
-    private static HashMap<String,Integer> lastnumber = new HashMap<String,Integer>();
+    private static HashMap<String, Integer> lastnumber = new HashMap<String, Integer>();
 
     // data of the ID
     private String mcr_project_id = null;
@@ -104,6 +104,20 @@ public final class MCRObjectID {
         }
 
         mcr_valid_id = true;
+    }
+
+    /**
+     * The method set the MCRObjectID from a given base ID string. The number
+     * was computed from this methode. It is the next free number of an item in
+     * the database for the given project ID and type ID.
+     * 
+     * @exception MCRException
+     *                if the given string is not valid or can't connect to the
+     *                MCRXMLTableManager.
+     */
+    public void setNextFreeId() throws MCRException {
+        String base_id = getBase();
+        manageFreeId(base_id, 1);
     }
 
     /**
