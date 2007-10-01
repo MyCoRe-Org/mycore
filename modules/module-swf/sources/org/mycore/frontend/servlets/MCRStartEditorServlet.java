@@ -1264,6 +1264,7 @@ public class MCRStartEditorServlet extends MCRServlet {
 
         String base = getBaseURL() + myfile;
         Properties params = new Properties();
+        
         // start changes for submitting xml templates
         LOGGER.debug("calling buildXMLTemplate...");
         Enumeration e = job.getRequest().getParameterNames();
@@ -1271,11 +1272,13 @@ public class MCRStartEditorServlet extends MCRServlet {
         while (e.hasMoreElements()) {
             String name = (String) (e.nextElement());
             String value = job.getRequest().getParameter(name);
-            params.put(name, value);
-            if (!name.startsWith("_xml_")) {
-                continue;
+            if (name.startsWith("_xml_")) {
+                templatePairs.put(URLEncoder.encode(name.substring(5), "UTF-8"), URLEncoder.encode(value, "UTF-8"));
             }
-            templatePairs.put(URLEncoder.encode(name, "UTF-8"), URLEncoder.encode(value, "UTF-8"));
+            else {
+                params.put(name, value);
+             
+            }
         }
         if (templatePairs.size() > 0) {
             StringBuilder sb = new StringBuilder("buildxml:_rootName_=mycoreobject");
@@ -1287,6 +1290,7 @@ public class MCRStartEditorServlet extends MCRServlet {
             LOGGER.debug("XMLTemplate is empty");
         }
         // end changes
+        
         params.put("cancelUrl", getBaseURL() + cancelpage);
         params.put("mcrid", mytfmcrid);
         params.put("type", mytype);
