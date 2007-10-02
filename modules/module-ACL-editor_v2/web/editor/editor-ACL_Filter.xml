@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="ISO_8859-1"?>
+<!DOCTYPE editor>
+
+<editor id="ACL-PermissionFilter">
+    <source uri="request:servlets/MCRACLEditorServlet?mode=getFilter&amp;objid={objid}&amp;acpool={acpool}" />
+    <source uri="request:servlets/MCRACLEditorServlet?mode=getFilter&amp;objid={objid}" />
+    <source uri="request:servlets/MCRACLEditorServlet?mode=getFilter&amp;acpool={acpool}" />
+    <source uri="request:servlets/MCRACLEditorServlet?mode=getFilter" />
+
+    <target type="servlet" name="MCRACLEditorServlet" method="post" format="xml" />
+    <!--  
+        <target type="debug" method="post" format="html"/>
+    -->
+    <cancel url="servlets/MCRACLEditorServlet?mode=cancel" />
+
+    <components root="ACL-PermissionFilter" var="/mcr_access_filter">
+        <panel id="ACL-PermissionFilter" lines="on">
+            <!-- ********************* Filter input ************************ -->
+            <cell row="5" col="1">
+                <text>
+                    <label xml:land="de">AcPool Filter:</label>
+                </text>
+            </cell>
+            <cell row="5" col="2">
+                <text>
+                    <label xml:land="de">ObjID Filter:</label>
+                </text>
+            </cell>
+            <cell id="mcr.access.acpool.filter" row="10" col="1" var="acpool">
+                <textfield width="20" />
+            </cell>
+            <cell id="mcr.access.objid.filter" row="10" col="2" var="objid">
+                <textfield width="20" />
+            </cell>
+
+            <!-- ************************** BUTTONS ************************ -->
+            <cell id="mcr.access.filter.button" row="10" col="3">
+                <submitButton width="100px">
+                    <label xml:lang="de">Filtern</label>
+                </submitButton>
+            </cell>
+            <cell id="mcr.access.remove_filter.button" row="10" col="4">
+                <cancelButton width="100px">
+                    <label xml:lang="de">Filter löschen</label>
+                </cancelButton>
+            </cell>
+        </panel>
+    </components>
+</editor>
+

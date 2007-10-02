@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="ISO_8859-1"?>
+<!DOCTYPE MyCoReWebPage>
+
+<MyCoReWebPage>
+    <section title="ACL Rule Editor" xml:lang="de">
+        <editor id="ACL-Rule-editor">
+            <source uri="request:servlets/MCRACLEditorServlet?mode=getRuleTable" />
+
+            <target type="servlet" name="MCRACLEditorServlet" method="post" format="xml" />
+            <!--
+                <target type="debug" method="post" format="html"/>
+            -->
+            <cancel url="servlets/MCRACLEditorServlet?mode=access" />
+
+            <components root="ACL-Rule-editor" var="/mcr_access_rule_set">
+                <panel id="ACL-Rule-editor" lines="on">
+                    <cell row="15" col="1">
+                        <button width="130px" url="editor-ACL_start.xml">
+                            <label xml:lang="de">Permission Editor</label>
+                        </button>
+                    </cell>
+                    <cell row="20" col="1" var="mcr_access_rule">
+                        <repeater min="0" max="1024">
+                            <panel id="mcr.rule">
+                                <hidden var="@pos" />
+                                <hidden var="RID" />
+                                <cell row="10" col="1">
+                                    <label xml:lang="de">
+                                        <b>Rule ID:</b>
+                                    </label>
+                                </cell>
+                                <cell row="10" col="2">
+                                    <output var="RID" />
+                                </cell>
+
+                                <cell row="20" col="1">
+                                    <label xml:lang="de">
+                                        <b>Rule String:</b>
+                                    </label>
+                                </cell>
+                                <cell row="20" col="2" default="plain" var="RuleStyle">
+                                    <list type="radio" row="2">
+                                        <item value="plain">
+                                            <label xml:lang="de">Text</label>
+                                        </item>
+                                        <item value="xml">
+                                            <label xml:lang="de">XML</label>
+                                        </item>
+                                    </list>
+                                </cell>
+                                <cell row="25" col="2" var="RULE">
+                                    <textarea width="70" height="3" />
+                                </cell>
+
+
+                                <cell row="30" col="1">
+                                    <label xml:lang="de">
+                                        <b>Description:</b>
+                                    </label>
+                                </cell>
+                                <cell row="30" col="2" var="DESCRIPTION">
+                                    <textfield width="70" />
+                                    <text>
+                                        <label>
+                                            <hr />
+                                        </label>
+                                    </text>
+                                </cell>
+                            </panel>
+                            <space height="10px" />
+                        </repeater>
+                    </cell>
+
+
+                    <!-- ************************** BUTTONS ************************ -->
+
+                    <cell row="30" col="1" anchor="CENTER">
+                        <space width="20px" height="30px" />
+                        <panel id="buttons" lines="on">
+                            <cell row="10" col="2">
+                                <submitButton width="100px">
+                                    <label xml:lang="de">OK</label>
+                                </submitButton>
+                            </cell>
+                            <cell row="10" col="1">
+                                <cancelButton width="100px">
+                                    <label xml:lang="de">Abbrechen</label>
+                                </cancelButton>
+                            </cell>
+                        </panel>
+                    </cell>
+                </panel>
+            </components>
+        </editor>
+    </section>
+</MyCoReWebPage>
+

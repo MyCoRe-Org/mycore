@@ -1,0 +1,13 @@
+      <!-- **************************************************************** -->
+      <!-- Servlets and mapping for the ACL editor Module          -->
+      <!-- **************************************************************** -->
+ 
+      <servlet id="MCRACLEditorServlet_v2">
+            <servlet-name>MCRACLEditorServlet_v2</servlet-name>
+            <servlet-class>org.mycore.services.acl.MCRACLEditorServlet_v2</servlet-class>
+      </servlet>
+           
+      <servlet-mapping>
+            <servlet-name>MCRACLEditorServlet_v2</servlet-name>
+            <url-pattern>/servlets/MCRACLEditorServlet_v2/*</url-pattern>
+      </servlet-mapping>
