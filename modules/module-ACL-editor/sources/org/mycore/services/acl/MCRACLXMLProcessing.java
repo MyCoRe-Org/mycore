@@ -366,7 +366,7 @@ public class MCRACLXMLProcessing {
 
     }
 
-    private MCRRuleMapping createRuleMapping(String rid, String acpool, String objid) {
+    public MCRRuleMapping createRuleMapping(String rid, String acpool, String objid) {
         MCRRuleMapping ruleMapping = new MCRRuleMapping();
 
         ruleMapping.setCreator("ACL-Editor");
