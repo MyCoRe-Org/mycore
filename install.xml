@@ -7,7 +7,7 @@
          Downloads mycore, docportal and content/defaultsample
          Builds docportal and loads sample content 
          Starts webserver and downloads the DocPortal homepage
-         $Revision: 1.3 $ $Date: 2007-09-13 12:05:37 $  
+         $Revision: 1.4 $ $Date: 2007-10-05 07:35:18 $  
 --> 
 <!-- =================================================================== -->
 
@@ -41,7 +41,8 @@
     ========================================  
 
     </echo>
-    <cvs cvsroot="${cvsroot}" command="co -P mycore docportal content/defaultsample" dest="${destdir}" />
+    <cvs cvsroot="${cvsroot}" command="co -P mycore content/defaultsample" dest="${destdir}" />
+    <cvs cvsroot="${cvsroot}" command="co -P -r myliwi docportal " dest="${destdir}" />
     <echo>
 
     ========================================  
@@ -149,6 +150,14 @@
 
     </echo>
     <ant dir="${destdir}/docportal" antfile="build.xml" target="create.genkeys"       inheritAll="false" inheritRefs="false" />    
+    <echo>
+
+    ========================================  
+      Generate search masks ...
+    ========================================  
+
+    </echo>
+    <ant dir="${destdir}/docportal" antfile="build.xml" target="create.searchmask"    inheritAll="false" inheritRefs="false" />    
     <echo>
 
     ========================================  
