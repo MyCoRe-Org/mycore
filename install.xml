@@ -7,7 +7,7 @@
          Downloads mycore, docportal and content/defaultsample
          Builds docportal and loads sample content 
          Starts webserver and downloads the DocPortal homepage
-         $Revision: 1.4 $ $Date: 2007-10-05 07:35:18 $  
+         $Revision: 1.5 $ $Date: 2007-10-05 07:39:06 $  
 --> 
 <!-- =================================================================== -->
 
@@ -41,8 +41,11 @@
     ========================================  
 
     </echo>
+    <cvs cvsroot="${cvsroot}" command="co -P mycore docportal content/defaultsample" dest="${destdir}" />
+  	<!--
     <cvs cvsroot="${cvsroot}" command="co -P mycore content/defaultsample" dest="${destdir}" />
-    <cvs cvsroot="${cvsroot}" command="co -P -r myliwi docportal " dest="${destdir}" />
+    <cvs cvsroot="${cvsroot}" command="co -P -r myliwi docportal" dest="${destdir}" />
+    -->
     <echo>
 
     ========================================  
