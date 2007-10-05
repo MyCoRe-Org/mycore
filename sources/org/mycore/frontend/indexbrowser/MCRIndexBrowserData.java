@@ -42,11 +42,11 @@ public class MCRIndexBrowserData {
 
     private static final long serialVersionUID = 1L;
 
-    private LinkedList<String[]> ll1 = new LinkedList<String[]>();
+    private LinkedList<String[]> linkedList1 = new LinkedList<String[]>();
 
-    private MyBrowseData br = new MyBrowseData();
+    private MyBrowseData browseData = new MyBrowseData();
 
-    private MyIndexConfiguration ic = new MyIndexConfiguration();
+    private MyIndexConfiguration indexConfig = new MyIndexConfiguration();
 
     private XMLOutputter out = new XMLOutputter(org.jdom.output.Format.getPrettyFormat());
 
@@ -167,17 +167,17 @@ public class MCRIndexBrowserData {
 
     public MCRIndexBrowserData(String search, String mode, String path, String fromTo, String mask) {
 
-        br.set(search, mode, path, fromTo, mask);
-        ic.set(br.index);
+        browseData.set(search, mode, path, fromTo, mask);
+        indexConfig.set(browseData.index);
         Element results = buildPageElement();
         int numRows = 0;
-        String cacheKey = br.index + "##" + br.search + "##" + mode;
-        ll1 = (LinkedList<String[]>) (getCache(cacheKey).get(INDEX_KEY));
+        String cacheKey = browseData.index + "##" + browseData.search + "##" + mode;
+        linkedList1 = (LinkedList<String[]>) (getCache(cacheKey).get(INDEX_KEY));
 
         // first create all listitems
-        if (ll1 == null || ll1.isEmpty()) {
+        if (linkedList1 == null || linkedList1.isEmpty()) {
             numRows = createLinkedListfromSearch();
-            getCache(cacheKey).put(INDEX_KEY, ll1);
+            getCache(cacheKey).put(INDEX_KEY, linkedList1);
             getCache(cacheKey).put(QUERY_KEY, myQuery);
             // for further search and research (by refine and other posibilities
             // the query must be in the Cache
@@ -185,27 +185,27 @@ public class MCRIndexBrowserData {
             results.setAttribute("resultid", mcrResult.getID());
 
         } else {
-            numRows = ll1.size();
+            numRows = linkedList1.size();
             myQuery = (MCRQuery) getCache(cacheKey).get(QUERY_KEY);
         }
         // resort it for german ...
         // sortLinkedListForGerman();
-        int from = Math.max(0, br.from);
-        int to = Math.min(numRows, br.to + 1);
+        int from = Math.max(0, browseData.from);
+        int to = Math.min(numRows, browseData.to + 1);
         int numSelectedRows = to - from;
 
         results.setAttribute("numHits", String.valueOf(numRows));
-        if (br.search != null) {
-            results.setAttribute("search", br.search);
+        if (browseData.search != null) {
+            results.setAttribute("search", browseData.search);
         }
 
-        if (numSelectedRows <= ic.maxPerPage) {
+        if (numSelectedRows <= indexConfig.maxPerPage) {
             // set the metadata for the details only for the shown objects
             fillLinkedListWithMetadata(from, to);
 
             // build the xml-result tree with detailed Informations
             for (int i = from; i < to; i++) {
-                String myValues[] = ll1.get(i);
+                String myValues[] = linkedList1.get(i);
 
                 Element v = new Element("value");
                 v.setAttribute("pos", String.valueOf(i));
@@ -221,8 +221,8 @@ public class MCRIndexBrowserData {
                 // the thirt field from the lll-element is the objectid
                 v.addContent(new Element("id").addContent(myValues[2]));
 
-                for (int j = 0; ic.outputFields != null && j < ic.outputFields.length; j++) {
-                    String sField = ic.outputFields[j];
+                for (int j = 0; indexConfig.outputFields != null && j < indexConfig.outputFields.length; j++) {
+                    String sField = indexConfig.outputFields[j];
                     Element col = new Element("col");
                     col.setAttribute("name", sField);
                     col.addContent(myValues[3 + j]);
@@ -233,21 +233,21 @@ public class MCRIndexBrowserData {
         } else {
             // to much results to show all details
             // build the xml-result tree with the range of the searchresults
-            int stepSize = calculateStepSize(numSelectedRows, ic.maxPerPage);
+            int stepSize = calculateStepSize(numSelectedRows, indexConfig.maxPerPage);
             List<MyRangeDelim> delims = new Vector<MyRangeDelim>();
 
             for (int i = from; i < to; i++) {
-                String myValues[] = ll1.get(i);
+                String myValues[] = linkedList1.get(i);
                 delims.add(new MyRangeDelim(i, myValues[1]));
 
                 i = Math.min(i + stepSize, to - 1);
 
-                String myVal[] = ll1.get(i);
+                String myVal[] = linkedList1.get(i);
                 String value = myVal[1];
 
                 if ((i < to) && ((to - i) < 3)) {
                     i = to - 1;
-                    value = ll1.get(i)[1];
+                    value = linkedList1.get(i)[1];
                 }
                 delims.add(new MyRangeDelim(i, value));
             }
@@ -262,8 +262,8 @@ public class MCRIndexBrowserData {
 
     public Document getQuery() {
         Document jQuery = myQuery.buildXML();
-        if (br.mask != null) {
-            jQuery.getRootElement().setAttribute("mask", br.mask);
+        if (browseData.mask != null) {
+            jQuery.getRootElement().setAttribute("mask", browseData.mask);
         }
         return jQuery;
     }
@@ -276,15 +276,15 @@ public class MCRIndexBrowserData {
     private Element buildPageElement() {
         // Build output index page
         page = new Element("indexpage");
-        page.setAttribute("path", br.path.toString());
+        page.setAttribute("path", browseData.path.toString());
 
         Element eIndex = new Element("index");
         page.addContent(eIndex);
 
-        eIndex.setAttribute("id", br.index);
+        eIndex.setAttribute("id", browseData.index);
         Element results = new Element("results");
         page.addContent(results);
-        results.setAttribute("mode", br.mode);
+        results.setAttribute("mode", browseData.mode);
         return results;
     }
 
@@ -357,33 +357,33 @@ public class MCRIndexBrowserData {
 
         MCRFieldDef field = MCRFieldDef.getDef("objectType");
 
-        if (ic.table.indexOf(",") != -1) {
+        if (indexConfig.table.indexOf(",") != -1) {
             MCROrCondition cOr = new MCROrCondition();
-            StringTokenizer st = new StringTokenizer(ic.table, ",");
+            StringTokenizer st = new StringTokenizer(indexConfig.table, ",");
             while (st.hasMoreTokens()) {
                 cOr.addChild(new MCRQueryCondition(field, "=", st.nextToken()));
             }
             cAnd.addChild(cOr);
         } else {
-            cAnd.addChild(new MCRQueryCondition(field, "=", ic.table));
+            cAnd.addChild(new MCRQueryCondition(field, "=", indexConfig.table));
         }
 
-        field = MCRFieldDef.getDef(ic.browseField);
+        field = MCRFieldDef.getDef(indexConfig.browseField);
         // String value = br.search == null ? "*" : br.search + "*";
-        String value = br.search == null ? "*" : br.search;
+        String value = browseData.search == null ? "*" : browseData.search;
         String operator = getOperator();
 
         cAnd.addChild(new MCRQueryCondition(field, operator, value));
 
-        boolean order = "ascending".equalsIgnoreCase(ic.order);
+        boolean order = "ascending".equalsIgnoreCase(indexConfig.order);
         List<MCRSortBy> sortCriteria = new ArrayList<MCRSortBy>();
 
-        for (int i = 0; ic.sortFields != null && i < ic.sortFields.length; i++) {
-            field = MCRFieldDef.getDef(ic.sortFields[i]);
+        for (int i = 0; indexConfig.sortFields != null && i < indexConfig.sortFields.length; i++) {
+            field = MCRFieldDef.getDef(indexConfig.sortFields[i]);
             if (null != field)
                 sortCriteria.add(new MCRSortBy(field, order));
             else
-                logger.error("MCRFieldDef not available: " + ic.sortFields[i]);
+                logger.error("MCRFieldDef not available: " + indexConfig.sortFields[i]);
         }
 
         myQuery = new MCRQuery(cAnd, sortCriteria, 0);
@@ -401,9 +401,9 @@ public class MCRIndexBrowserData {
      * 
      */
     private String getOperator() {
-        if (br != null && br.mode != null && br.mode.equalsIgnoreCase("equals"))
+        if (browseData != null && browseData.mode != null && browseData.mode.equalsIgnoreCase("equals"))
             return "=";
-        else if (br != null && br.mode != null && br.mode.equalsIgnoreCase("prefix"))
+        else if (browseData != null && browseData.mode != null && browseData.mode.equalsIgnoreCase("prefix"))
             return "like";
         else
             return "like";
@@ -424,7 +424,7 @@ public class MCRIndexBrowserData {
     private int createLinkedListfromSearch() {
         buildQuery();
         // at first we must create the full list with all results
-        ll1 = new LinkedList<String[]>();
+        linkedList1 = new LinkedList<String[]>();
         mcrResult = MCRQueryManager.search(myQuery);
         logger.debug("Results found hits:" + mcrResult.getNumHits());
         Document jResult = new Document(mcrResult.buildXML());
@@ -437,8 +437,8 @@ public class MCRIndexBrowserData {
                 // they should be set with an searchfield with
                 // type="identifier", to get the exact String
                 int len = 0;
-                if (ic.outputFields != null)
-                    len = ic.outputFields.length;
+                if (indexConfig.outputFields != null)
+                    len = indexConfig.outputFields.length;
                 String[] listelm = new String[len + 3];
                 Element child = (Element) (mcrHit.get(i));
                 logger.debug("\n" + out.outputString(child));
@@ -451,10 +451,10 @@ public class MCRIndexBrowserData {
                     listelm[1] = listelm[0];
 
                 listelm[2] = child.getAttributeValue("id");
-                ll1.add(listelm);
+                linkedList1.add(listelm);
             }
         }
-        return ll1.size();
+        return linkedList1.size();
     }
 
     private int fillLinkedListWithMetadata(int from, int to) {
@@ -464,9 +464,9 @@ public class MCRIndexBrowserData {
         // we will shown in detail
         // this occurres if we have only a small count of results, or we show
         // only a part
-        if (to - from <= ic.maxPerPage && ic.outputFields != null) {
+        if (to - from <= indexConfig.maxPerPage && indexConfig.outputFields != null) {
             for (int i = from - 1; i < to; i++) {
-                String[] listelm = ll1.get(i);
+                String[] listelm = linkedList1.get(i);
                 Document od = new Document();
                 MCRObject oo = new MCRObject();
                 try {
@@ -476,11 +476,11 @@ public class MCRIndexBrowserData {
                     continue;
                 }
                 // outputfields came only from metadataobject
-                setListeElm(od, ic.outputFields, 3, listelm, false);
-                ll1.set(i, listelm);
+                setListeElm(od, indexConfig.outputFields, 3, listelm, false);
+                linkedList1.set(i, listelm);
             }
         }
-        return ll1.size();
+        return linkedList1.size();
     }
 
     // reads the values from the metadata of the document
@@ -509,11 +509,10 @@ public class MCRIndexBrowserData {
                             if (i > 0) {
                                 value += " - ";
                             }
-                            if(xpathResults.get(i) instanceof Attribute){
-                            	value+=((Attribute) xpathResults.get(i)).getValue();
-                            }
-                            else{
-                            	value += ((Content) xpathResults.get(i)).getValue();
+                            if (xpathResults.get(i) instanceof Attribute) {
+                                value += ((Attribute) xpathResults.get(i)).getValue();
+                            } else {
+                                value += ((Content) xpathResults.get(i)).getValue();
                             }
                         }
 
