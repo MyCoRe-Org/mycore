@@ -58,6 +58,17 @@ public class MCRIndexBrowserData {
 
     private static final String defaultlang = MCRConfiguration.instance().getString("MCR.Metadata.DefaultLang", "de");
 
+    private static MCRCache INDEX_CACHE = new MCRCache(100, "Cache for already created indexes");
+
+    private static MCRConfiguration MCR_CONFIG = MCRConfiguration.instance();
+
+    /*
+     * indexCache is build like this:
+     * 
+     * --+ indexCache +---+ MCRObjectType +---+ Cache entries for configured
+     * aliases
+     */
+
     class MyRangeDelim {
         int pos;
 
@@ -165,6 +176,28 @@ public class MCRIndexBrowserData {
         }
     }
 
+    private void initIndexCacheForObjectType(String alias) {
+        String objectType = getObjectType(alias);
+        if (INDEX_CACHE.get(objectType) == null)
+            INDEX_CACHE.put(objectType, new MCRCache(1000, "Index cache for object type " + objectType));
+    }
+
+    private static String getObjectType(String alias) {
+        // get object type belonging to alias
+        String propKey = "MCR.IndexBrowser." + alias + ".Table";
+        String objectType = MCR_CONFIG.getProperties("MCR.IndexBrowser.").getProperty(propKey);
+        return objectType;
+    }
+
+    private MCRCache getIndexCache(String alias) {
+        String objectType = getObjectType(alias);
+        return ((MCRCache) INDEX_CACHE.get(objectType));
+    }
+
+    protected static void deleteIndexCacheOfObjectType(String objectType) {
+        INDEX_CACHE.remove(objectType);
+    }
+
     public MCRIndexBrowserData(String search, String mode, String path, String fromTo, String mask) {
 
         browseData.set(search, mode, path, fromTo, mask);
@@ -172,21 +205,24 @@ public class MCRIndexBrowserData {
         Element results = buildPageElement();
         int numRows = 0;
         String cacheKey = browseData.index + "##" + browseData.search + "##" + mode;
-        linkedList1 = (LinkedList<String[]>) (getCache(cacheKey).get(INDEX_KEY));
 
-        // first create all listitems
-        if (linkedList1 == null || linkedList1.isEmpty()) {
+        if (cached(path, cacheKey)) {
+            MCRCache cache = ((MCRCache) getIndexCache(path).get(getCacheKey(cacheKey)));
+            linkedList1 = (LinkedList<String[]>) (cache.get(INDEX_KEY));
+            numRows = linkedList1.size();
+            myQuery = (MCRQuery) cache.get(QUERY_KEY);
+        } else {
+            initIndexCacheForObjectType(path);
+            MCRCache cacheNew = new MCRCache(5, "IndexBrowser Cache key(" + getCacheKey(cacheKey) + ")");
+            getIndexCache(path).put(getCacheKey(cacheKey), cacheNew);
+            // cache = getCache(cacheKey);
             numRows = createLinkedListfromSearch();
-            getCache(cacheKey).put(INDEX_KEY, linkedList1);
-            getCache(cacheKey).put(QUERY_KEY, myQuery);
+            ((MCRCache) getIndexCache(path).get(getCacheKey(cacheKey))).put(INDEX_KEY, linkedList1);
+            ((MCRCache) getIndexCache(path).get(getCacheKey(cacheKey))).put(QUERY_KEY, myQuery);
             // for further search and research (by refine and other posibilities
             // the query must be in the Cache
             new MCRCachedQueryData(mcrResult, myQuery.buildXML(), myQuery.getCondition());
             results.setAttribute("resultid", mcrResult.getID());
-
-        } else {
-            numRows = linkedList1.size();
-            myQuery = (MCRQuery) getCache(cacheKey).get(QUERY_KEY);
         }
         // resort it for german ...
         // sortLinkedListForGerman();
@@ -589,23 +625,22 @@ public class MCRIndexBrowserData {
 
     }
 
-    public static MCRCache getCache(String key) {
-        key = PREFIX + key;
-        MCRCache c = (MCRCache) MCRSessionMgr.getCurrentSession().get(key);
-        if (c == null) {
-            logger.debug("Create new IndexBrowserCache with KEY: " + key);
-            c = new MCRCache(5, "IndexBrowser Cache key(" + key + ")");
-            MCRSessionMgr.getCurrentSession().put(key, c);
-        }
-        return c;
+    private boolean cached(String alias, String key) {
+        String objType = getObjectType(alias);
+        String cacheKey = getCacheKey(key);
+        if ((((MCRCache) INDEX_CACHE.get(objType)) != null) && ((MCRCache) INDEX_CACHE.get(objType)).get(cacheKey) != null)
+            return true;
+        else
+            return false;
     }
 
     public static void removeAllCachesStartsWithKey(String key) {
-        key = PREFIX + key;
+        String key2 = getCacheKey(key);
         Iterator iC = MCRSessionMgr.getCurrentSession().getObjectsKeyList();
+        // indexCache.
         while (iC.hasNext()) {
             String nextKey = (String) iC.next();
-            if (nextKey.startsWith(key)) {
+            if (nextKey.startsWith(key2)) {
                 logger.debug("Remove IndexBrowserCache with KEY" + nextKey);
                 ((MCRCache) MCRSessionMgr.getCurrentSession().get(nextKey)).remove(INDEX_KEY);
                 ((MCRCache) MCRSessionMgr.getCurrentSession().get(nextKey)).remove(QUERY_KEY);
@@ -613,23 +648,7 @@ public class MCRIndexBrowserData {
         }
     }
 
-    /**
-     * private void sortLinkedListForGerman() { /** Collections.sort(ll1, new
-     * Comparator() { public int compare(final Object o1, final Object o2) {
-     * final Collator germanCc = Collator.getInstance(Locale.GERMAN);
-     * 
-     * final String[] name1 = (String[]) o1; final String[] name2 = (String[])
-     * o2; // int cc = name1[0].compareTo(name2[0]); //
-     * System.out.println("NAME1:" + name2[0] + "NAME2:" + name1[0]+ // "ERG: " +
-     * cc);
-     * 
-     * final CollationKey key1 = germanCc.getCollationKey(name1[0]); final
-     * CollationKey key2 = germanCc.getCollationKey(name2[0]);
-     * 
-     * final int comp = key1.compareTo(key2); // System.out.println("NAME1:" +
-     * name2[0] + "NAME2:" + name1[0]+ // "ERG: " + comp); //
-     * System.out.println("___________________________"); return comp; } });
-     * 
-     * return; }
-     */
+    private static String getCacheKey(String key) {
+        return PREFIX + key;
+    }
 }
