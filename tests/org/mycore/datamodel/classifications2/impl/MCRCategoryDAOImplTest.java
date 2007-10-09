@@ -156,6 +156,14 @@ public class MCRCategoryDAOImplTest extends MCRHibTestCase {
         }
     }
 
+    public void testGetRootCategoryIDs() {
+        addWorldClassification();
+        MCRCategoryID find = category.getId();
+        List<MCRCategoryID> classIds = DAO.getRootCategoryIDs();
+        assertEquals("Result size does not match.", 1, classIds.size());
+        assertEquals("Returned MCRCategoryID does not match.", find, classIds.get(0));
+    }
+
     public void testGetRootCategory() {
         addWorldClassification();
         // Europe

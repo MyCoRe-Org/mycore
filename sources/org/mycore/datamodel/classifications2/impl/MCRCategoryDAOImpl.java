@@ -34,6 +34,7 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Restrictions;
 import org.hibernate.criterion.Subqueries;
 
 import org.mycore.backend.hibernate.MCRHIBConnection;
@@ -53,6 +54,10 @@ import org.mycore.datamodel.classifications2.MCRLabel;
  */
 public class MCRCategoryDAOImpl implements MCRCategoryDAO {
 
+    private static final int LEVEL_START_VALUE = 0;
+
+    private static final int LEFT_START_VALUE = 0;
+
     private static final Logger LOGGER = Logger.getLogger(MCRCategoryDAOImpl.class);
 
     private static final Class<MCRCategoryImpl> CATEGRORY_CLASS = MCRCategoryImpl.class;
@@ -61,8 +66,8 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         if (exist(category.getId())) {
             throw new MCRException("Cannot add category. A category with ID " + category.getId() + " allready exists");
         }
-        int leftStart = 0;
-        int levelStart = 0;
+        int leftStart = LEFT_START_VALUE;
+        int levelStart = LEVEL_START_VALUE;
         final MCRHIBConnection connection = MCRHIBConnection.instance();
         Session session = connection.getSession();
         MCRCategoryImpl parent = null;
@@ -171,6 +176,22 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
             parents.add(category);
         }
         return parents;
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<MCRCategoryID> getRootCategoryIDs() {
+        Session session = MCRHIBConnection.instance().getSession();
+        Criteria c = session.createCriteria(CATEGRORY_CLASS);
+        c.add(Restrictions.eq("left", LEFT_START_VALUE));
+        // Have to copy category IDs until Jira HHH-2628 is solved
+        // c.setProjection(Projections.property("id"));
+        // return c.list();
+        List<MCRCategory> result = c.list();
+        List<MCRCategoryID> classIds = new ArrayList<MCRCategoryID>(result.size());
+        for (MCRCategory cat : result) {
+            classIds.add(cat.getId());
+        }
+        return classIds;
     }
 
     public MCRCategory getRootCategory(MCRCategoryID baseID, int childLevel) {
