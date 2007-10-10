@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
 <!-- ============================================== -->
-<!-- $Revision: 1.72 $ $Date: 2007-08-10 13:19:14 $ -->
+<!-- $Revision: 1.73 $ $Date: 2007-10-10 12:01:03 $ -->
 <!-- ============================================== --> 
 
 <xsl:stylesheet 
@@ -102,6 +102,13 @@
       <tr>
         <td>
         
+          <!-- Workaround for browser behavior: Use a hidden submit button,
+               so that when user hits the enter key, really submit the form, 
+               instead of executing the [+] button of the first repeater -->
+          <xsl:if test="//repeater">
+            <input style="width:0px; height:0px; border-width:0px; float:left;" value="submit" type="submit" tabindex="99" />
+          </xsl:if>
+          
           <!-- ======== start at the root panel ======== -->
           <xsl:apply-templates select="panel[@id=current()/@root]">
             <xsl:with-param name="var" select="@var" />
