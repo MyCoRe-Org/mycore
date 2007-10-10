@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
 <!-- ============================================== -->
-<!-- $Revision: 1.73 $ $Date: 2007-10-10 12:01:03 $ -->
+<!-- $Revision: 1.74 $ $Date: 2007-10-10 13:32:28 $ -->
 <!-- ============================================== --> 
 
 <xsl:stylesheet 
@@ -1280,12 +1280,20 @@
       <xsl:attribute name="disabled">disabled</xsl:attribute>
     </xsl:if>
     
-    <xsl:variable name="vars" select="ancestor::editor/input/var[(@name=$var) or starts-with(@name,concat($var,'['))]" />
-    
-    <xsl:apply-templates select="item" mode="editor.list">
-      <xsl:with-param name="vars"    select="$vars"   />
-      <xsl:with-param name="default" select="$default" />
-    </xsl:apply-templates>
+    <xsl:choose>
+      <xsl:when test="$multi = 'true'">
+        <xsl:apply-templates select="item" mode="editor.list">
+          <xsl:with-param name="vars"    select="ancestor::editor/input/var[(@name=$var) or starts-with(@name,concat($var,'['))]" />
+          <xsl:with-param name="default" select="$default" />
+        </xsl:apply-templates>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:apply-templates select="item" mode="editor.list">
+          <xsl:with-param name="vars"    select="ancestor::editor/input/var[@name=$var]" />
+          <xsl:with-param name="default" select="$default" />
+        </xsl:apply-templates>
+      </xsl:otherwise>
+    </xsl:choose>
   </select>
 </xsl:template>
 
