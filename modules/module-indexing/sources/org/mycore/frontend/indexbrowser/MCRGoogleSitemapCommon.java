@@ -97,7 +97,7 @@ public final class MCRGoogleSitemapCommon {
     /** The constructor */
     public MCRGoogleSitemapCommon() {
         objidlist = new ArrayList<String>();
-        if ((numberOfURLs < 1) || (numberOfURLs > 50000)) numberOfURLs = 30000;
+        if ((numberOfURLs < 1) || (numberOfURLs > 50000)) numberOfURLs = 50000;
     }
 
     /**
