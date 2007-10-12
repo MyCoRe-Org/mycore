@@ -151,7 +151,8 @@ public class MCRLoginServlet extends MCRServlet {
                 StringBuffer groups = new StringBuffer();
                 List<String> groupList = MCRUserMgr.instance().retrieveUser(uid).getGroupIDs();
                 for (int i = 0; i < groupList.size(); i++) {
-                    if (i != 0) groups.append(" ");
+                    if (i != 0)
+                        groups.append(" ");
                     groups.append((String) groupList.get(i));
                 }
                 mcrSession.put("XSL.CurrentGroups", groups.toString());
@@ -161,7 +162,7 @@ public class MCRLoginServlet extends MCRServlet {
                 job.getRequest().setAttribute("lang", mcrSession.getCurrentLanguage());
                 job.getRequest().removeAttribute("mode");
                 job.getRequest().setAttribute("mode", "Select");
-                rd.forward(job.getRequest(), job.getResponse());
+                job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(addParameter(backto_url, "reload", "true")));
                 return;
             }
 
@@ -180,11 +181,8 @@ public class MCRLoginServlet extends MCRServlet {
                 throw e;
             }
         }
-
         root.addContent(new org.jdom.Element("backto_url").addContent(backto_url));
         doLayout(job, "login", jdomDoc); // use the stylesheet
-
-        // mcr_user-login-*.xsl
     }
 
     /**
@@ -214,4 +212,5 @@ public class MCRLoginServlet extends MCRServlet {
         }
         return url + "&" + name + "=" + value;
     }
+
 }
