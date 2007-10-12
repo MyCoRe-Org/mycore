@@ -55,7 +55,8 @@ public class MCRBroadcastingServlet extends MCRServlet {
             answer = new Element("addReceiver").setText("done");
         } else if (request.getParameter("mode").equals("clearReceiverList") && access()) {
             clearReceiverList();
-            answer = new Element("clearReceiverList").setText("done");
+            answer = getReceiverListAsXML(session);
+            transformByXSL = true;
         } else if (request.getParameter("mode").equals("getReceiverList") && access()) {
             answer = getReceiverListAsXML(session);
             transformByXSL = true;
@@ -104,7 +105,7 @@ public class MCRBroadcastingServlet extends MCRServlet {
 
     private final Element getReceiverDetails(MCRSession session) {
         Element details = new Element("details").addContent(new Element("login").setText(session.getCurrentUserID())).addContent(
-                new Element("ip").setText(session.getCurrentIP())).addContent(new Element("session-id").setText(session.getID()));
+                        new Element("ip").setText(session.getCurrentIP())).addContent(new Element("session-id").setText(session.getID()));
         return details;
     }
 
@@ -112,7 +113,7 @@ public class MCRBroadcastingServlet extends MCRServlet {
         // if (!cache.isEmpty() && cache.get("bcRecList") != null) {
         String key = getKey(request, session);
         if ((session.getCurrentUserID().equals("gast") && bcRecList.get(session.getID()) != null)
-                || (!session.getCurrentUserID().equals("gast") && bcRecList.get(key) != null))
+                        || (!session.getCurrentUserID().equals("gast") && bcRecList.get(key) != null))
             return true;
         return false;
     }
