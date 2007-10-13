@@ -51,6 +51,7 @@ import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 
 import org.mycore.common.MCRCache;
+import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.xml.MCRURIResolver;
@@ -68,8 +69,23 @@ import org.mycore.frontend.servlets.MCRServletJob;
 public class MCREditorServlet extends MCRServlet {
     protected final static Logger logger = Logger.getLogger(MCREditorServlet.class);
 
-    protected final static MCRCache sessions = new MCRCache(200, "EditorServlet Sessions");
-
+    /**
+     * For each user session, the state of all editor forms most recently used
+     * is kept in a cache. The number of editor form data that is kept is controlled
+     * by the property MCR.EditorFramework.MaxEditorsInSession.
+     */
+    private static MCRCache getEditorSessionCache() {
+        String keyEditorSessions = "editorSessions";
+        MCRSession current = MCRSessionMgr.getCurrentSession();
+        MCRCache editorsInSession = (MCRCache) (current.get(keyEditorSessions));
+        if (editorsInSession == null) {
+            int maxEditors = MCRConfiguration.instance().getInt("MCR.EditorFramework.MaxEditorsInSession",10);
+            editorsInSession = new MCRCache(maxEditors, "Editor data in session");
+            current.put(keyEditorSessions, editorsInSession);
+        }
+        return editorsInSession;
+    }
+    
     public void doGetPost(MCRServletJob job) throws ServletException, java.io.IOException {
         HttpServletRequest req = job.getRequest();
         HttpServletResponse res = job.getResponse();
@@ -95,14 +111,16 @@ public class MCREditorServlet extends MCRServlet {
         String sessionID = req.getParameter("XSL.editor.session.id");
         Element editorResolved = null;
 
-        if ((sessionID == null) || (sessions.get(sessionID) == null)) {
+        if (sessionID != null)
+            editorResolved = (Element)(getEditorSessionCache().get(sessionID));
+
+        if ((editorResolved == null) || (sessionID == null)) {
             Map parameters = req.getParameterMap();
             String ref = req.getParameter("_ref");
             String uri = req.getParameter("_uri");
             boolean validate = "true".equals(req.getParameter("_validate"));
             editorResolved = startSession(parameters, ref, uri, validate);
-        } else
-            editorResolved = (Element) (sessions.get(sessionID));
+        }
 
         getLayoutService().sendXML(req, res, new Document((Element) (editorResolved.clone())));
     }
@@ -116,7 +134,7 @@ public class MCREditorServlet extends MCRServlet {
 
         logger.debug("Editor session " + sessionID + " show popup " + ref);
 
-        Element editor = (Element) (sessions.get(sessionID));
+        Element editor = (Element)(getEditorSessionCache().get(sessionID));
         Element popup = MCREditorDefReader.findElementByID(ref, editor);
         Element clone = (Element) (popup.clone());
 
@@ -144,15 +162,16 @@ public class MCREditorServlet extends MCRServlet {
 
         for (Element editor: editors ) {
             Element editorResolved = null;
-            if ((sessionID == null) || (sessions.get(sessionID) == null))
+            if( sessionID != null ) 
+                editorResolved = (Element)(getEditorSessionCache().get(sessionID));
+            
+            if ((sessionID == null) || (editorResolved == null))
             {
                 Map parameters = request.getParameterMap();
                 boolean validate = "true".equals(editor.getAttributeValue("validate", "false"));
                 String ref = editor.getAttributeValue("id");
                 editorResolved = startSession(parameters, ref, uri, validate);
             }
-            else
-                editorResolved = (Element) (sessions.get(sessionID));
 
             editor.removeContent();
             editor.addContent(editorResolved.cloneContent());
@@ -196,7 +215,7 @@ public class MCREditorServlet extends MCRServlet {
 
         String sessionID = buildSessionID();
         editor.setAttribute("session", sessionID);
-        sessions.put(sessionID, editor);
+        getEditorSessionCache().put(sessionID, editor);
         logger.debug("Storing editor under session id " + sessionID);
 
         return editor;
@@ -352,7 +371,7 @@ public class MCREditorServlet extends MCRServlet {
         logger.debug("Editor: process submit");
 
         String sessionID = parms.getParameter("_session");
-        Element editor = (Element) (sessions.get(sessionID));
+        Element editor = (Element)(getEditorSessionCache().get(sessionID));
 
         if (editor == null) {
             logger.error("No editor for session <" + sessionID + ">");
@@ -576,7 +595,7 @@ public class MCREditorServlet extends MCRServlet {
         String webpage = parms.getParameter("subselect.webpage");
         String sessionID = parms.getParameter("subselect.session");
 
-        Element editor = (Element) (sessions.get(sessionID));
+        Element editor = (Element)(getEditorSessionCache().get(sessionID));
         MCREditorSubmission subnew = new MCREditorSubmission(editor, variables, root, parms);
 
         editor.removeChild("input");
