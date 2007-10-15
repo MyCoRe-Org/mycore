@@ -139,6 +139,23 @@ public class MCREditorSubmission {
         setRepeatsFromVariables();
     }
 
+    MCREditorSubmission( Element editor )
+    {
+      Element input = editor.getChild( "input" );
+      List children = input.getChildren();
+
+      for( int i = 0; i < children.size(); i++ )
+      {
+        Element var = (Element)( children.get( i ) );
+        String path = var.getAttributeValue( "name" );
+        String value = var.getAttributeValue( "value" );
+        addVariable( path, value );
+      }
+
+      Collections.sort( variables );
+      setRepeatsFromVariables();
+    }
+    
     private void setVariablesFromXML(String prefix, Element element, Hashtable predecessors) {
         String key = element.getName();
         setVariablesFromXML(prefix, key, element, predecessors);

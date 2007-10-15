@@ -74,7 +74,7 @@ public class MCREditorServlet extends MCRServlet {
      * is kept in a cache. The number of editor form data that is kept is controlled
      * by the property MCR.EditorFramework.MaxEditorsInSession.
      */
-    private static MCRCache getEditorSessionCache() {
+    static MCRCache getEditorSessionCache() {
         String keyEditorSessions = "editorSessions";
         MCRSession current = MCRSessionMgr.getCurrentSession();
         MCRCache editorsInSession = (MCRCache) (current.get(keyEditorSessions));
