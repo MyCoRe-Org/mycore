@@ -1,0 +1,7 @@
+form#createNewPermForm #createNewRule{
+		display: none;
+}
+
+form#createNewRule{
+		display: none;
+}
