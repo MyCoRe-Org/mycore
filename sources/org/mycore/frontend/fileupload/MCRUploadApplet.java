@@ -60,6 +60,8 @@ import javax.swing.filechooser.FileFilter;
  * @version $Revision$ $Date$
  */
 public class MCRUploadApplet extends JApplet {
+    private static final long serialVersionUID = -118475099247635561L;
+
     protected String uploadId;
 
     protected String peerURL;
@@ -73,7 +75,11 @@ public class MCRUploadApplet extends JApplet {
     protected JButton locationButton;
 
     protected JFileChooser locationChooser;
-    
+
+    protected static File lastDirectory;
+
+    private static final File DRIVE_C = new File("C:\\");
+
     public void init() {
         uploadId = getParameter("uploadId");
         targetURL = getParameter("url");
@@ -93,6 +99,7 @@ public class MCRUploadApplet extends JApplet {
         System.out.println("Background color: " + bg.toString());
         setBackground(bg);
         setLocale();
+        System.out.println("Last working directory: " + ((lastDirectory == null) ? null : lastDirectory.getAbsolutePath()));
 
         chooserButton = new JButton(translateI18N("MCRUploadApplet.select"));
         chooserButton.addActionListener(new ActionListener() {
@@ -142,10 +149,10 @@ public class MCRUploadApplet extends JApplet {
             });
         }
 
-        File c = new File("C:\\");
-
-        if (c.exists()) {
-            locationChooser.setCurrentDirectory(c);
+        if (lastDirectory != null) {
+            locationChooser.setCurrentDirectory(lastDirectory);
+        } else if (DRIVE_C.exists()) {
+            locationChooser.setCurrentDirectory(DRIVE_C);
         }
 
         JPanel content = new JPanel();
@@ -200,6 +207,8 @@ public class MCRUploadApplet extends JApplet {
         int result = locationChooser.showDialog(this, translateI18N("MCRUploadApplet.choose"));
 
         if (result == JFileChooser.APPROVE_OPTION) {
+            System.out.println("Saving current working directory: " + locationChooser.getCurrentDirectory().getAbsolutePath());
+            lastDirectory = locationChooser.getCurrentDirectory();
             doUpload(locationChooser.getSelectedFiles());
         }
     }
