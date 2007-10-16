@@ -652,7 +652,7 @@ public class MCREditorSubmission {
                 node = parent.getAttribute(var.getAttributeName());
             }
 
-            FileItem file = parms.getFileItem(var.getPath());
+            FileItem file = ( parms == null ? null : parms.getFileItem(var.getPath()) );
 
             if (file != null) {
                 file2node.put(file, node);
