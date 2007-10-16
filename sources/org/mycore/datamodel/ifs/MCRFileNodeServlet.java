@@ -212,7 +212,21 @@ public class MCRFileNodeServlet extends MCRServlet {
     private void sendDirectory(HttpServletRequest req, HttpServletResponse res, MCRDirectory dir) throws IOException {
         LOGGER.info("MCRFileNodeServlet: Sending listing of directory " + dir.getName());
         Document jdom = MCRDirectoryXML.getInstance().getDirectoryXML(dir);
-        getLayoutService().doLayout(req, res, jdom);
+        layoutDirectory(req, res, jdom);
+        
+    }
+    
+    /**
+     * Called to layout the directory structure
+     * @author Robert Stephan
+     * @param req the html request
+     * @param res the html response
+     * @param jdom the jdom document
+     * @throws IOException
+     * @see overwritten in JSPDocportal
+     */
+    protected void layoutDirectory(HttpServletRequest req, HttpServletResponse res, Document jdom) throws IOException{
+    	getLayoutService().doLayout(req, res, jdom);
     }
 
     
