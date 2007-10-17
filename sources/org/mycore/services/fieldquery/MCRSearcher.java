@@ -145,7 +145,7 @@ public abstract class MCRSearcher extends MCREventHandlerBase implements MCREven
     }
 
     protected void handleObjectRepaired(MCREvent evt, MCRObject obj) {
-        handleObjectUpdated(evt, obj);
+      handleObjectCreated(evt, obj);
     }
     
     protected void undoObjectCreated(MCREvent evt, MCRObject obj) {
@@ -224,5 +224,11 @@ public abstract class MCRSearcher extends MCREventHandlerBase implements MCREven
      * Removes all entries from index.
      */
     public void clearIndex() {
+    }
+    
+    /**
+     * Removes all entries of a field with a given value from index.
+     */
+    public void clearIndex(String fieldname, String value) {
     }
 }
