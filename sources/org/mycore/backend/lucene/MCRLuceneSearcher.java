@@ -471,6 +471,17 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
       }
     }
     
+    public void clearIndex(String fieldname, String value) {
+      try
+      {
+          deleteLuceneDocument(fieldname, value);
+      } catch (Exception e)
+      {
+        LOGGER.error(e.getClass().getName() + ": " + e.getMessage());
+        LOGGER.error(MCRException.getStackTraceAsString(e));
+      }
+    }
+    
     public void close() {
         LOGGER.info("Closing "+toString()+"...");
         modifyExecutor.shutdown();
