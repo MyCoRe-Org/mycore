@@ -499,6 +499,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         newCateg.setLabels(new HashMap<String, MCRLabel>(category.getLabels()));
         newCateg.setRoot(category.root);
         newCateg.setURI(category.getURI());
+        newCateg.setLevel(category.getLevel());
         if (childAmount > 0) {
             for (MCRCategory child : category.getChildren()) {
                 newCateg.getChildren().add(copyDeep((MCRCategoryImpl) child, level - 1));

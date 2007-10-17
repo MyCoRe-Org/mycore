@@ -32,7 +32,6 @@ import java.util.List;
 import org.hibernate.criterion.Projections;
 import org.jdom.Document;
 
-import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRHibTestCase;
 import org.mycore.common.xml.MCRXMLHelper;
@@ -131,6 +130,8 @@ public class MCRCategoryDAOImplTest extends MCRHibTestCase {
         assertTrue("Children present with child Level 1.", rootCategory.getChildren().get(0).getChildren().isEmpty());
         assertEquals("Category count does not match with child Level 1.\n" + MCRStringTransformer.getString(rootCategory), category.getChildren().size(),
                 rootCategory.getChildren().size());
+        assertEquals("Children of Level 1 do not know that they are at the first level.\n" + MCRStringTransformer.getString(rootCategory), 1, rootCategory
+                .getChildren().get(0).getLevel());
         rootCategory = DAO.getCategory(category.getId(), -1);
         assertEquals("Did not get all categories." + MCRStringTransformer.getString(rootCategory), countNodes(category), countNodes(rootCategory));
     }
