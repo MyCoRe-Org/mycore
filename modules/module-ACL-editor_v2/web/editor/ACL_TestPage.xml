@@ -4,9 +4,7 @@
 <MyCoReWebPage>
 
 	<section title="ACL Editor" xml:lang="de">
-		<acl-testpage id="ACL-PermissionFilter">
-			<include uri="webapp:modules/module-ACL-editor/web/editor/editor-ACL_Filter.xml" />
-		</acl-testpage>
+		<mcr_acl_editor/>
 	</section>
 
 </MyCoReWebPage>

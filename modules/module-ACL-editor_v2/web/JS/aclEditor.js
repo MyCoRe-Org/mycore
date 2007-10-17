@@ -1,5 +1,5 @@
 function $(id){return document.getElementById(id)}
-function N(name){return document.getElementsByName(name)[0]}
+function N(name){return document.getElementsByName(name)}
 
 function initAclEditor(){
 	var editor = $('ACL-Editor');
@@ -7,18 +7,62 @@ function initAclEditor(){
 
 function initPermEditor(){
 	var editor = $('ACL-Perm-Editor');
+	var mappingTable = getChildrenById(editor, "table", "mapping_table");
 	
 	if (editor.status != "initialized"){
 	
-		mappingLines = getChildrenById(editor, "tr", "mapping_line");
+		var mappingLines = getChildrenById(editor, "tr", "mapping_line");
 	
 		for (var i = 0; i < mappingLines.length; i++){
 			mappingLines[i].addEventListener("mouseover", markup, false);
 			mappingLines[i].addEventListener("mouseout", unmark, false);
+			delCheckBox = getChildrenByName(mappingLines[i], "input", "delete_mapping")[0];
+			//delCheckBox.selBox = mappingLines[i].getElementsByTagName("select")[0];
+			delCheckBox.addEventListener("change", setDeleted, false);
 		}
 		
 		editor.status = "initialized";
 	}
+	
+	var delAll = getChildrenById(editor, "input", "delAll")[0];
+	delAll.addEventListener("click", deleteAll, false);
+	
+}
+
+function deleteAll(e){
+	var node = e.currentTarget;
+	var editor = $('ACL-Perm-Editor');
+	var mappingTable = getChildrenById(editor, "table", "mapping_table");
+	var checkBoxes = getChildrenByName(mappingTable[0], "input", "delete_mapping");
+	
+	for (var i = 0; i < checkBoxes.length; i++){
+		if (checkBoxes[i].checked == false){
+			//checkBoxes[i].checked = true;
+			checkBoxes[i].click();
+		}
+	}
+	
+	node.value = "nichts loeschen";
+	node.removeEventListener("click", deleteAll, false);
+	node.addEventListener("click", deleteNothing, false);
+}
+
+function deleteNothing(e){
+	var node = e.currentTarget;
+	var editor = $('ACL-Perm-Editor');
+	var mappingTable = getChildrenById(editor, "table", "mapping_table");
+	var checkBoxes = getChildrenByName(mappingTable[0], "input", "delete_mapping");
+	
+	for (var i = 0; i < checkBoxes.length; i++){
+		if (checkBoxes[i].checked == true){
+			//checkBoxes[i].checked = false;
+			checkBoxes[i].click();
+		}
+	}
+	
+	node.value = "alles loeschen";
+	node.removeEventListener("click", deleteNothing, false);
+	node.addEventListener("click", deleteAll, false);
 }
 
 function changeVisibility(node){
@@ -29,8 +73,8 @@ function changeVisibility(node){
 }
 
 function setChanged(e){
-	changed = "changed$";
-	node = e.currentTarget;
+	var changed = "changed$";
+	var node = e.currentTarget;
 	
 	if (!node.name.match("changed") && e.which != 0){
 		node.name = changed + node.name;
@@ -38,26 +82,40 @@ function setChanged(e){
 }
 
 function setDeleted(e){
-	deleted = "deleted$";
-	node = e.currentTarget;
+	var deleted = "deleted$";
+	var node = e.currentTarget;
+	var objid = getChildrenById(node.parentNode.parentNode, "td", "OBJID");
+	var acpool = getChildrenById(node.parentNode.parentNode, "td", "ACPOOL");
 	
-	if (!node.name.match("deleted") && e.which != 0){
-		node.name = changed + node.name;
+	if (node.type.toLowerCase() == "checkbox"){
+		if (node.checked == true){
+			var newInput = document.createElement("input");
+			newInput.name = deleted + node.value;
+			newInput.id = deleted + node.value;
+	
+			node.appendChild(newInput);
+			objid[0].style.textDecoration = "line-through";
+			acpool[0].style.textDecoration = "line-through";
+		} else if (node.checked == false){
+			node.removeChild($(deleted + node.value));
+			objid[0].style.textDecoration = "";
+			acpool[0].style.textDecoration = "";
+		}
 	}
 }
 
 function markup(e){
-	node = e.currentTarget;
+	var node = e.currentTarget;
 	node.style.backgroundColor="red";
 }
 
 function unmark(e){
-	node = e.currentTarget;
+	var node = e.currentTarget;
 	node.style.backgroundColor="";
 }
 
 function getChildrenById(parent, childTagName, id){
-	children = parent.getElementsByTagName(childTagName);
+	var children = parent.getElementsByTagName(childTagName);
 	var array = [];
 	
 	for (var i = 0; i < children.length; i++){
@@ -66,4 +124,27 @@ function getChildrenById(parent, childTagName, id){
 	}
 	
 	return array;
+}
+
+function getChildrenByName(parent, childTagName, name){
+	var children = parent.getElementsByTagName(childTagName);
+	var array = [];
+	
+	for (var i = 0; i < children.length; i++){
+		if (children[i].name == name)
+			array = array.concat(children[i]);
+	}
+	
+	return array;
+}
+
+function startsWith(string, pattern){
+	var begin = string.substr(0,pattern.length);
+	
+	alert(string);
+	
+	if (begin == pattern)
+		return true;
+	else
+		return false;
 }

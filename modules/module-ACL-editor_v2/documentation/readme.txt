@@ -9,19 +9,23 @@ Features:
 	 - embedding reduced editors into webpages (not implemented)
 		
 Implementation:
-	- in this version the ACL editor is "Editor-Framework" centric, this means
-	  the editors are using Editor-Framework xml
-	- the MCRACLEditorServlet is responsible for delivering ACL data from DB as XML to
-	  to the editors. On the other side the editors send their data to the servlet for processing
-	- MCRACLHIBAccess is the connection to the DB
-	- MCRACLXMLProcessing "convert" the data from DB to xml and vice versa
+	- in this version we are using Javascript to manipulate the HTML
+	- changing values will be catch by a JS-Function
+	- submit send everything to the servlet
+	- filter for chaged values and synchronize with the DB
+	
+Mapping editor:
+	- creating new mapping: send directly to the servlet, parsing ObjId, AcPool, Rid -> DB 
+	- only rules are changeable
+	- change Rid: JS setChanged -> append "changed$" to tag ID -> submit to servlet -> filter for "changed$"
+					-> extract ObjId, AcPool from tag ID, get RID from parameter mapping -> DB
+
 	
 BUGS:
-	- deleting rules is possible, even it is still in use
-	- using more than one editor in the same webpage causing problems
 	
 TODO:
 	- fixing Bugs
 	- embedded modus
 	- some security checking
 	- validation of the inputs
+	- batch processing (delete, make changes)

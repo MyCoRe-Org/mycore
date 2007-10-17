@@ -1,55 +1,51 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xalan="http://xml.apache.org/xalan">
-	<xsl:include href="MyCoReLayout.xsl" />
-
-	<xsl:variable name="PageTitle" select="'Module-ACL Editor'" />
+		<xsl:param name="ServletsBaseURL"/>
+	    <xsl:param name="WebApplicationBaseURL"/>
+	    
+	    <!-- redirectURL is the position where you came from -->
+		<xsl:variable name="redirectURL">
+				<xsl:if test="/mcr_access_set/redirect">
+					<xsl:value-of select="concat('&amp;redirect=', /mcr_access_set/redirect)"/>
+				</xsl:if>
+		</xsl:variable>
 
 	<xsl:template match="/mcr_access_set">
 		<xsl:variable name="ruleItems" select="document(concat($ServletsBaseURL,'MCRACLEditorServlet_v2?mode=dataRequest&amp;action=getRuleAsItems'))" />
+		
+		
 		<div id="ACL-Perm-Editor" onMouseover="initPermEditor()">
 			<script type="text/javascript" src="{concat($WebApplicationBaseURL,'modules/module-ACL-editor_v2/web/JS/aclEditor.js')}" language="JavaScript"></script>
 			<link rel="stylesheet" type="text/css" href="{concat($WebApplicationBaseURL,'modules/module-ACL-editor_v2/web/CSS/acl_editor.css')}" />
+			
+			<!-- New Mapping -->
+			<xsl:call-template name="createNewMapping">
+				<xsl:with-param name="ruleItems" select="$ruleItems" />
+			</xsl:call-template>
 
-			<div id="createNewPerm">
-				<input type="button" value="neue Regel" onclick="changeVisibility($('createNewPermForm'))" />
-				<form id="createNewPermForm" xmlns:encoder="xalan://java.net.URLEncoder" xmlns:xalan="http://xml.apache.org/xalan"
-					action="{concat($ServletsBaseURL,'MCRACLEditorServlet_v2?mode=dataRequest&amp;action=createNewPerm')}" method="post" accept-charset="UTF-8">
-					<table>
-						<tr>
-							<td>
-								<input name="newPermOBJID" value="" />
-							</td>
-							<td>
-								<input name="newPermACPOOL" value="" />
-							</td>
-							<td>
-								<xsl:apply-templates select="xalan:nodeset($ruleItems)/items">
-									<xsl:with-param name="rid" select="RID" />
-									<xsl:with-param name="name" select="'newPermRID'" />
-								</xsl:apply-templates>
-							</td>
-						</tr>
-						<tr>
-							<td>
-								<input type="submit" value="Anlegen" />
-							</td>
-						</tr>
-					</table>
-				</form>
-
-			</div>
-
+			<!-- Filter -->
 			<xsl:apply-templates select="mcr_access_filter" />
 
+			<!-- Mapping Table -->
 			<form xmlns:encoder="xalan://java.net.URLEncoder" xmlns:xalan="http://xml.apache.org/xalan"
 				action="{concat($ServletsBaseURL,'MCRACLEditorServlet_v2?mode=dataRequest&amp;action=submitPerm')}" method="post" accept-charset="UTF-8">
-				<xsl:variable name="map_line_id" select="concat(OBJID,'$',ACPOOL)"/>
-				<table>
+				<table id="mapping_table">
+					<tr id="mapping_head">
+						<td>
+							<input id="delAll" type="button" value="alles Löschen" />
+						</td>
+						<td>ObjId</td>
+						<td>AcPool</td>
+						<td>RID</td>
+					</tr>
 					<xsl:for-each select="mcr_access">
 						<tr id="mapping_line">
+							<td id="delete">
+								<input type="checkbox" name="delete_mapping" value="{concat(OBJID,'$',ACPOOL)}" />
+							</td>
 							<td id="OBJID">
-								<xsl:value-of select="OBJID"/>
+								<xsl:value-of select="OBJID" />
 							</td>
 							<td id="ACPOOL">
 								<xsl:value-of select="ACPOOL" />
@@ -57,7 +53,7 @@
 							<td>
 								<xsl:apply-templates select="xalan:nodeset($ruleItems)/items">
 									<xsl:with-param name="rid" select="RID" />
-									<xsl:with-param name="name" select="concat($map_line_id)" />
+									<xsl:with-param name="name" select="concat(OBJID,'$',ACPOOL)" />
 								</xsl:apply-templates>
 							</td>
 						</tr>
@@ -68,9 +64,44 @@
 		</div>
 	</xsl:template>
 
+	<!-- Template for creating new access mapping -->
+	<xsl:template name="createNewMapping">
+		<xsl:param name="ruleItems" />
+		
+		<div id="createNewPerm">
+			<input type="button" value="neue Regel" onclick="changeVisibility($('createNewPermForm'))" />
+			<form id="createNewPermForm" xmlns:encoder="xalan://java.net.URLEncoder" xmlns:xalan="http://xml.apache.org/xalan"
+				action="{concat($ServletsBaseURL,'MCRACLEditorServlet_v2?mode=dataRequest&amp;action=createNewPerm', $redirectURL)}" method="post" accept-charset="UTF-8">
+				<table>
+					<tr>
+						<td>
+							<input name="newPermOBJID" value="" />
+						</td>
+						<td>
+							<input name="newPermACPOOL" value="" />
+						</td>
+						<td>
+							<xsl:apply-templates select="xalan:nodeset($ruleItems)/items">
+								<xsl:with-param name="rid" select="RID" />
+								<xsl:with-param name="name" select="'newPermRID'" />
+							</xsl:apply-templates>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<input type="submit" value="Anlegen" />
+						</td>
+					</tr>
+				</table>
+			</form>
+
+		</div>
+	</xsl:template>
+
+	<!-- Template for filter -->
 	<xsl:template match="mcr_access_filter">
 		<form xmlns:encoder="xalan://java.net.URLEncoder" xmlns:xalan="http://xml.apache.org/xalan"
-			action="{concat($ServletsBaseURL,'MCRACLEditorServlet_v2?mode=dataRequest&amp;action=setFilter')}" method="post" accept-charset="UTF-8">
+			action="{concat($ServletsBaseURL,'MCRACLEditorServlet_v2?mode=dataRequest&amp;action=setFilter', $redirectURL)}" method="post" accept-charset="UTF-8">
 			<table>
 				<tr>
 					<td>

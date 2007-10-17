@@ -46,7 +46,7 @@
 								<table>
 									<tr>
 										<td>
-											<input type="button" name="{RID}" value="{RID}" onclick="changeVisibility(N('{concat('Rule$',RID)}'))"/>
+											<input type="button" name="{RID}" value="{RID}" onclick="changeVisibility(N('{concat('Rule$',RID)}')[0])"/>
 										</td>
 										<td>
 											<input name="{concat('RuleDesc$',RID)}" value="{DESCRIPTION}" onkeypress="setChanged(event)"/>

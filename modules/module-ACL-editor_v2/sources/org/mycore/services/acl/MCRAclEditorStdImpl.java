@@ -31,6 +31,10 @@ public class MCRAclEditorStdImpl extends MCRAclEditor {
     /***************************************************************************
      * Implementing abstract methods
      **************************************************************************/
+    @Override
+    public Element getACLEditor(HttpServletRequest request) {
+        return new Element("mcr_acl_editor");
+    }
 
     @Override
     public Element dataRequest(HttpServletRequest request) {
@@ -41,6 +45,10 @@ public class MCRAclEditorStdImpl extends MCRAclEditor {
 
         if (action.equals("setFilter"))
             elem = setFilter(request);
+        else if (action.equals("getPermEditor"))
+            elem = getPermEditor(request);
+        else if (action.equals("getRuleEditor"))
+            elem = getRuleEditor(request);
         else if (action.equals("deleteFilter"))
             elem = getPermission(null, null);
         else if (action.equals("createNewPerm"))
@@ -50,32 +58,40 @@ public class MCRAclEditorStdImpl extends MCRAclEditor {
         else if (action.equals("getRuleAsItems"))
             elem = getRuleAsItems(request);
         else if (action.equals("submitPerm"))
-            elem = processSubmissionPerm(request);
+            elem = processPermSubmission(request);
         else if (action.equals("submitRule"))
-            elem = processSubmissionRule(request);
+            elem = processRuleSubmission(request);
 
         return elem;
     }
-
-    @Override
-    public Element getPermEditor(HttpServletRequest request) {
-        String objidFilter = request.getParameter("objid");
-        String acpoolFilter = request.getParameter("acpool");
-
-        return getPermission(objidFilter, acpoolFilter);
-    }
-
-    @Override
-    public Element getRuleEditor(HttpServletRequest request) {
-        Element elem = XMLProcessing.ruleSet2XML(HIBA.getAccessRule());
-        return elem;
-    }
-
     // End implementing abstract methods
 
     /***************************************************************************
      * Mapping stuff
      **************************************************************************/
+    
+    private Element getPermEditor(HttpServletRequest request) {
+        String redirURL = request.getParameter("redirect");
+        LOGGER.debug("Redirect URL: " + redirURL);
+
+        String objidFilter = request.getParameter("objid");
+        String acpoolFilter = request.getParameter("acpool");
+
+        if (redirURL != null && !redirURL.equals(""))
+            return getPermission(objidFilter, acpoolFilter, redirURL);
+        else
+            return getPermission(objidFilter, acpoolFilter);
+    }
+
+    private Element getPermission(String objIdFilter, String acPoolFilter, String redirect) {
+        Element redir = new Element("redirect");
+        redir.addContent(redirect);
+
+        Element perm = getPermission(objIdFilter, acPoolFilter);
+        perm.addContent(redir);
+
+        return perm;
+    }
 
     private Element getPermission(String objIdFilter, String acPoolFilter) {
         Element elem = XMLProcessing.access2XML(HIBA.getAccessPermission(objIdFilter, acPoolFilter), true);
@@ -101,10 +117,17 @@ public class MCRAclEditorStdImpl extends MCRAclEditor {
         MCRRuleMapping perm = XMLProcessing.createRuleMapping(ruleId, acPool, objId);
         MCRAccessStore.getInstance().createAccessDefinition(perm);
 
-        return getPermission(null, null);
+        String redirURL = request.getParameter("redirect");
+        LOGGER.debug("Redirect URL:" + redirURL);
+        if (redirURL != null) {
+            Element redir = new Element("redirect");
+            redir.addContent(redirURL);
+            return redir;
+        } else
+            return getPermission(null, null);
     }
 
-    private Element processSubmissionPerm(HttpServletRequest request) {
+    private Element processPermSubmission(HttpServletRequest request) {
         LOGGER.debug("Processing Mapping submission.");
 
         Map<String, String[]> parameterMap = request.getParameterMap();
@@ -176,8 +199,16 @@ public class MCRAclEditorStdImpl extends MCRAclEditor {
 
         LOGGER.debug("ObjIdFilter: " + objIdFilter);
         LOGGER.debug("AcPoolFilter: " + acPoolFilter);
-
-        return getPermission(objIdFilter, acPoolFilter);
+        
+        String redirURL = request.getParameter("redirect");
+        LOGGER.debug("Redirect URL:" + redirURL);
+        if (redirURL != null) {
+            Element redir = new Element("redirect");
+            redir.addContent(redirURL);
+            redir.addContent(getFilterElem(objIdFilter, acPoolFilter));
+            return redir;
+        } else
+            return getPermission(objIdFilter, acPoolFilter);
     }
 
     // End Mapping stuff
@@ -186,6 +217,11 @@ public class MCRAclEditorStdImpl extends MCRAclEditor {
      * Rule stuff
      **************************************************************************/
 
+    private Element getRuleEditor(HttpServletRequest request) {
+        Element elem = XMLProcessing.ruleSet2XML(HIBA.getAccessRule());
+        return elem;
+    }
+    
     private Element createNewRule(HttpServletRequest request) {
         MCRACCESSRULE accessRule = new MCRACCESSRULE();
         MCRAccessInterface AI = MCRAccessControlSystem.instance();
@@ -228,7 +264,7 @@ public class MCRAclEditorStdImpl extends MCRAclEditor {
         return elem;
     }
 
-    private Element processSubmissionRule(HttpServletRequest request) {
+    private Element processRuleSubmission(HttpServletRequest request) {
         LOGGER.debug("Processing Rule submission.");
 
         Map<String, String[]> parameterMap = request.getParameterMap();
@@ -250,7 +286,7 @@ public class MCRAclEditorStdImpl extends MCRAclEditor {
 
             if (key.contains(change) || key.contains(delete)) {
                 LOGGER.debug("Param key: " + key);
-                
+
                 ridNew = new String(key.substring(key.lastIndexOf("$") + 1, key.length()));
                 LOGGER.debug("new: " + ridNew + " - old: " + ridOld);
 

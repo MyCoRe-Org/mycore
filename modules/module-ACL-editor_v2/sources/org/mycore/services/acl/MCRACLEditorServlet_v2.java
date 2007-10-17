@@ -39,39 +39,38 @@ public class MCRACLEditorServlet_v2 extends MCRServlet {
         HttpServletRequest request = job.getRequest();
         HttpServletResponse response = job.getResponse();
         String mode = request.getParameter("mode");
+
         LOGGER.debug("Mode: " + mode);
 
         String layout = "html";
 
-        boolean doLayout = false;
         boolean mcrWebPage = false;
         Element answer = null;
 
         String errorMsg = "The request did not contain a valid mode for this servlet!";
 
         MCRAclEditor aclEditor = MCRAclEditor.instance();
+        if (mode.equals("getACLEditor")) {
+            answer = aclEditor.getACLEditor(request);
 
-        if (mode.equals("getPermEditor")) {
-            answer = aclEditor.getPermEditor(request);
-
-            doLayout = true;
-        }else if (mode.equals("getRuleEditor")) {
-            answer = aclEditor.getRuleEditor(request);
-
-            doLayout = true;
-        }else if (mode.equals("dataRequest")) {
+        } 
+        
+//        else if (mode.equals("getPermEditor")) {
+//            answer = aclEditor.getPermEditor(request);
+//
+//        } else if (mode.equals("getRuleEditor")) {
+//            answer = aclEditor.getRuleEditor(request);
+//
+//        } 
+        
+        else if (mode.equals("dataRequest")) {
             answer = aclEditor.dataRequest(request);
-            
-            if (answer == null)
-                LOGGER.debug("Answer is NULL");
 
-            doLayout = true;
-        }else {
+        } else {
             job.getResponse().sendError(HttpServletResponse.SC_BAD_REQUEST, errorMsg);
         }
 
-        if (doLayout)
-            doLayout(request, response, answer, layout, mcrWebPage);
+        doLayout(request, response, answer, layout, mcrWebPage);
 
     }
 
