@@ -50,6 +50,9 @@ import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.common.MCRXMLTableManager;
 
+import org.mycore.services.fieldquery.MCRFieldDef;
+import org.mycore.services.fieldquery.MCRSearcher;
+import org.mycore.services.fieldquery.MCRSearcherFactory;
 /**
  * Provides static methods that implement commands for the MyCoRe command line
  * interface.
@@ -671,6 +674,9 @@ public class MCRObjectCommands extends MCRAbstractCommands {
             LOGGER.warn("No ID's was found for type " + type + ".");
             return;
         }
+        String index = MCRFieldDef.getDef("objectType").getIndex();
+        MCRSearcher searcher = MCRSearcherFactory.getSearcherForIndex( index );
+        searcher.clearIndex("objectType", type);
         for (String stid : ar) {
             MCRObject obj = new MCRObject();
             obj.repairPersitenceDatastore(stid);
