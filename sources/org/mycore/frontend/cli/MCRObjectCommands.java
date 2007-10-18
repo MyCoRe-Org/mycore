@@ -50,7 +50,14 @@ import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.common.MCRXMLTableManager;
 
+import org.mycore.parsers.bool.MCRCondition;
 import org.mycore.services.fieldquery.MCRFieldDef;
+import org.mycore.services.fieldquery.MCRFieldValue;
+import org.mycore.services.fieldquery.MCRQuery;
+import org.mycore.services.fieldquery.MCRQueryManager;
+import org.mycore.services.fieldquery.MCRQueryParser;
+import org.mycore.services.fieldquery.MCRHit;
+import org.mycore.services.fieldquery.MCRResults;
 import org.mycore.services.fieldquery.MCRSearcher;
 import org.mycore.services.fieldquery.MCRSearcherFactory;
 /**
@@ -71,6 +78,9 @@ public class MCRObjectCommands extends MCRAbstractCommands {
     /** static compiled transformer stylesheets */
     private static Hashtable<String, javax.xml.transform.Transformer> translist = new Hashtable<String, javax.xml.transform.Transformer>();
 
+    /** build with query, used to repair searchindex, delete, export */
+    private static MCRResults selected = null;
+    
     /**
      * The empty constructor.
      */
@@ -122,6 +132,24 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         command.add(com);
 
         com = new MCRCommand("repair metadata search of ID {0}", "org.mycore.frontend.cli.MCRObjectCommands.repairMetadataSearchForID String", "Read the SQL store table of MCRObject XML files with MCRObjectID {0} and restore them to the search store.");
+        command.add(com);
+
+        com = new MCRCommand("select objects with query {0}", "org.mycore.frontend.cli.MCRObjectCommands.selectObjectsWithQuery String", "Select MCRObjects with MCRQueryString {0}.");
+        command.add(com);
+
+        com = new MCRCommand("delete selected", "org.mycore.frontend.cli.MCRObjectCommands.deleteSelected", "Removes selected MCRObjects.");
+        command.add(com);
+        
+        com = new MCRCommand("export selected to directory {0} with {1}", "org.mycore.frontend.cli.MCRObjectCommands.exportSelected String String", "Stores selected MCRObjects to the directory {0} with the stylesheet {1}-object.xsl. For {1} save is the default.");
+        command.add(com);
+        
+        com = new MCRCommand("remove selected from searchindex {0}", "org.mycore.frontend.cli.MCRObjectCommands.removeFromSearchindex String", "Remove selected MCRObjects from searchindex {0}.");
+        command.add(com);
+        
+        com = new MCRCommand("check selected in sql store", "org.mycore.frontend.cli.MCRObjectCommands.checkSelected", "Checks existence of selected MCRObjects in SQL store and deletes missing ones from search index.");
+        command.add(com);
+        
+        com = new MCRCommand("check metadata search of type {0}", "org.mycore.frontend.cli.MCRObjectCommands.checkMetadataSearch String", "Checks existence of MCRObjects of type {0} in search index and rapairs missing ones in search index.");
         command.add(com);
     }
 
@@ -674,9 +702,9 @@ public class MCRObjectCommands extends MCRAbstractCommands {
             LOGGER.warn("No ID's was found for type " + type + ".");
             return;
         }
-        String index = MCRFieldDef.getDef("objectType").getIndex();
-        MCRSearcher searcher = MCRSearcherFactory.getSearcherForIndex( index );
-        searcher.clearIndex("objectType", type);
+        
+        removeFromIndex("objectType", type);
+        
         for (String stid : ar) {
             MCRObject obj = new MCRObject();
             obj.repairPersitenceDatastore(stid);
@@ -705,9 +733,192 @@ public class MCRObjectCommands extends MCRAbstractCommands {
             return;
         }
 
+        removeFromIndex("id", id);
+        
         MCRObject obj = new MCRObject();
         obj.repairPersitenceDatastore(mid);
         LOGGER.info("Repaired " + mid.getId());
         LOGGER.info(" ");
     }
+    
+    /**
+     * The method removes entries from searchindex.
+     * 
+     * @param fieldname
+     *            Name of field used to delete entries
+     * @param value
+     *            Value of the field
+     */
+    private static final void removeFromIndex(String fieldname, String value)
+    {
+      MCRFieldDef fd = MCRFieldDef.getDef( fieldname);
+      String index = fd.getIndex();
+      MCRSearcher searcher = MCRSearcherFactory.getSearcherForIndex( index );
+      MCRFieldValue fv = new MCRFieldValue(fd, value);
+      searcher.clearIndex(fieldname, fv.getValue());
+    }
+    
+    /**
+     * Builds a resulset with a query. Used in later command to do work with.
+     * 
+     * @param querystring
+     *            MCRQuery as String
+     */
+    public static final void selectObjectsWithQuery(String querystring) {
+        LOGGER.info("Build Resultset with query " + querystring);
+
+        MCRCondition cond = (new MCRQueryParser()).parse(querystring);
+        MCRQuery query = new MCRQuery(cond);
+        selected = MCRQueryManager.search(query);
+        
+        LOGGER.info("Resultset built");
+        LOGGER.info(" ");
+    }
+    
+    /**
+     * Delete all selected MCRObjects from the datastore.
+     */
+    public static final void deleteSelected()  throws MCRActiveLinkException {
+      LOGGER.info("Start removing selected MCRObjects");
+      
+      if (null == selected)
+      {
+        LOGGER.info("No Resultset to work with, use command \"select objects with query {0}\" to build one");
+        LOGGER.info(" ");
+        return;
+      }
+      for (int i=0; i<selected.getNumHits(); i++)
+      {
+        MCRHit hit = selected.getHit(i);
+        delete(hit.getID());
+      }
+      LOGGER.info("Selected MCRObjects deleted");
+      LOGGER.info(" ");
+    }
+    
+    /* Export selected MCRObjects to a file named <em>MCRObjectID</em> .xml in a
+    * directory. The method use the converter stylesheet mcr_<em>style</em>_object.xsl.
+    * 
+    * @param dirname
+    *            the dirname to store the object
+    * @param style
+    *            the type of the stylesheet
+    */
+   public static final void exportSelected(String dirname, String style) {
+      LOGGER.info("Start exporting selected MCRObjects");
+      
+      if (null == selected)
+      {
+        LOGGER.info("No Resultset to work with, use command \"select objects with query {0}\" to build one");
+        LOGGER.info(" ");
+        return;
+      }
+      for (int i=0; i<selected.getNumHits(); i++)
+      {
+        MCRHit hit = selected.getHit(i);
+        String ID = hit.getID();
+        export(ID, ID, dirname, style);
+      }
+      LOGGER.info("Selected MCRObjects exported");
+      LOGGER.info(" ");
+    }
+    
+   /**
+    * The method removes all selected entries from search index.
+    * 
+    * @param index
+    *            index of searcher
+    */
+   public static final void removeFromSearchindex(String index) {
+     LOGGER.info("Start removing selected entries from search index " + index);
+     
+     MCRSearcher searcher = MCRSearcherFactory.getSearcherForIndex( index );
+
+     if (null == selected)
+     {
+       LOGGER.info("No Resultset to work with, use command \"select objects with query {0}\" to build one");
+       LOGGER.info(" ");
+       return;
+     }
+     for (int i=0; i<selected.getNumHits(); i++)
+     {
+       MCRHit hit = selected.getHit(i);
+       searcher.removeFromIndex(hit.getID());
+     }
+     LOGGER.info("Selected entries from search index removed");
+     LOGGER.info(" ");
+   }
+   
+   /**
+    * The method checks the existence of selected MCRObjects in SQL store.
+    * 
+    */
+   public static final void checkSelected() {
+     LOGGER.info("Start checking existence of selected MCRObjects in sql store");
+     
+     if (null == selected)
+     {
+       LOGGER.info("No Resultset to work with, use command \"select objects with query {0}\" to build one");
+       LOGGER.info(" ");
+       return;
+     }
+     
+     int instore = 0;
+     int notinstore = 0;
+     
+     for (int i=0; i<selected.getNumHits(); i++)
+     {
+       MCRHit hit = selected.getHit(i);
+       String ID = hit.getID();
+       if (MCRObject.existInDatastore(ID))
+       {
+         instore++;
+       }
+       else
+       {
+         LOGGER.info("is not in store " + ID + " delete from search index ...");
+         removeFromIndex("id", ID);
+         notinstore++;
+       }
+     }
+     
+     LOGGER.info("entries in Resultset    : " + selected.getNumHits());
+     LOGGER.info("entries in SQL Store    : " + instore);
+     LOGGER.info("entries NOT in SQL Store: " + notinstore);
+     LOGGER.info(" ");
+   }
+   
+   /**
+    * Checks existence of MCRObjectID type {0} in search index and rapairs missing ones in search index.
+    * 
+    * @param type
+    *            the MCRObjectID type
+    */
+   public static final void checkMetadataSearch(String type) {
+       LOGGER.info("Start the check for type " + type);
+       String typetest = CONFIG.getString("MCR.Metadata.Type." + type, "");
+
+       if (typetest.length() == 0) {
+           LOGGER.error("The type " + type + " was not found.");
+           return;
+       }
+       List<String> ar = (List<String>) MCRXMLTableManager.instance().retrieveAllIDs(type);
+       if (ar.size() == 0) {
+           LOGGER.warn("No ID's was found for type " + type + ".");
+           return;
+       }
+       
+       for (String stid : ar) {
+           String querystring = "id = " + stid; 
+           MCRCondition cond = (new MCRQueryParser()).parse(querystring);
+           MCRQuery query = new MCRQuery(cond);
+           MCRResults results = MCRQueryManager.search(query);
+           if (1 != results.getNumHits())
+           {
+             repairMetadataSearchForID(stid);
+//             MCRObject obj = new MCRObject();
+//             obj.repairPersitenceDatastore(stid);
+           }
+       }
+   }
 }
