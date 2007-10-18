@@ -54,6 +54,8 @@ import org.mycore.common.MCRCache;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
+import org.mycore.common.events.MCRSessionEvent;
+import org.mycore.common.events.MCRSessionListener;
 import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
@@ -66,8 +68,24 @@ import org.mycore.frontend.servlets.MCRServletJob;
  * @author Frank Lützenkirchen
  * @version $Revision$ $Date$
  */
-public class MCREditorServlet extends MCRServlet {
+public class MCREditorServlet extends MCRServlet implements MCRSessionListener {
+    private static final long serialVersionUID = 1L;
+
     protected final static Logger logger = Logger.getLogger(MCREditorServlet.class);
+
+    private final static String EDITOR_SESSIONS_KEY = "editorSessions";
+
+    @Override
+    public void init() throws ServletException {
+        super.init();
+        MCRSessionMgr.addSessionListener(this);
+    }
+
+    @Override
+    public void destroy() {
+        super.destroy();
+        MCRSessionMgr.removeSessionListener(this);
+    }
 
     /**
      * For each user session, the state of all editor forms most recently used
@@ -75,17 +93,29 @@ public class MCREditorServlet extends MCRServlet {
      * by the property MCR.EditorFramework.MaxEditorsInSession.
      */
     static MCRCache getEditorSessionCache() {
-        String keyEditorSessions = "editorSessions";
+        
         MCRSession current = MCRSessionMgr.getCurrentSession();
-        MCRCache editorsInSession = (MCRCache) (current.get(keyEditorSessions));
+        MCRCache editorsInSession = (MCRCache) (current.get(EDITOR_SESSIONS_KEY));
         if (editorsInSession == null) {
             int maxEditors = MCRConfiguration.instance().getInt("MCR.EditorFramework.MaxEditorsInSession",10);
-            editorsInSession = new MCRCache(maxEditors, "Editor data in session");
-            current.put(keyEditorSessions, editorsInSession);
+            editorsInSession = new MCRCache(maxEditors, "Editor data in MCRSessions, MCRSession=" + current.getID());
+            current.put(EDITOR_SESSIONS_KEY, editorsInSession);
         }
         return editorsInSession;
     }
     
+    public void sessionEvent(MCRSessionEvent event) {
+        if (event.getType() == MCRSessionEvent.Type.destroyed) {
+            // close MCRCache instance cleanly
+            MCRSession current = event.getSession();
+            MCRCache editorsInSession = (MCRCache) current.get(EDITOR_SESSIONS_KEY);
+            if (editorsInSession != null) {
+                logger.info(EDITOR_SESSIONS_KEY + " is NOT null");
+                editorsInSession.close();
+            }
+        }
+    }
+
     public void doGetPost(MCRServletJob job) throws ServletException, java.io.IOException {
         HttpServletRequest req = job.getRequest();
         HttpServletResponse res = job.getResponse();

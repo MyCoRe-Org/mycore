@@ -26,6 +26,7 @@ package org.mycore.common;
 import java.lang.management.ManagementFactory;
 
 import javax.management.InstanceAlreadyExistsException;
+import javax.management.InstanceNotFoundException;
 import javax.management.MBeanRegistrationException;
 import javax.management.MBeanServer;
 import javax.management.MalformedObjectNameException;
@@ -34,18 +35,18 @@ import javax.management.ObjectName;
 import javax.management.RuntimeOperationsException;
 
 public class MCRCacheJMXBridge {
-    
-    public static final void registerMe(MCRCache cache){
-        Object mbean=new MCRCacheManager(cache);
+
+    public static final void registerMe(MCRCache cache) {
+        Object mbean = new MCRCacheManager(cache);
         ObjectName name;
         try {
-            name=new ObjectName(MCRConfiguration.instance().getString("MCR.NameOfProject","MyCoRe-Application").replace(':',' ' )+":type=MCRCache,component="+cache.type);
+            name = getObjectName(cache);
         } catch (MalformedObjectNameException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
             return;
         }
-        MBeanServer mbs=ManagementFactory.getPlatformMBeanServer();
+        MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
         try {
             mbs.registerMBean(mbean, name);
         } catch (InstanceAlreadyExistsException e) {
@@ -61,6 +62,35 @@ public class MCRCacheJMXBridge {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
+    }
+
+    public static final void unregisterMe(MCRCache cache) {
+        ObjectName name;
+        try {
+            name = getObjectName(cache);
+        } catch (MalformedObjectNameException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            return;
+        }
+        MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+        try {
+            mbs.unregisterMBean(name);
+        } catch (MBeanRegistrationException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (RuntimeOperationsException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (InstanceNotFoundException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
+    private static ObjectName getObjectName(MCRCache cache) throws MalformedObjectNameException {
+        return new ObjectName(MCRConfiguration.instance().getString("MCR.NameOfProject", "MyCoRe-Application").replace(':', ' ') + ":type=MCRCache,component="
+                + cache.type);
     }
 
 }

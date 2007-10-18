@@ -381,4 +381,9 @@ public class MCRCache {
         cache.get("c");
         System.out.println(cache);
     }
+    
+    public void close() {
+        MCRCacheJMXBridge.unregisterMe(this);
+        clear();
+    }
 }

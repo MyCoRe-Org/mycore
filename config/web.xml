@@ -47,6 +47,7 @@
   <servlet id="XMLEditor">
     <servlet-name>XMLEditor</servlet-name>
     <servlet-class>org.mycore.frontend.editor.MCREditorServlet</servlet-class>
+    <load-on-startup>100</load-on-startup>
   </servlet>
   <servlet id="MCRUpload">
     <servlet-name>MCRUploadServlet</servlet-name>
