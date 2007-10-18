@@ -33,8 +33,10 @@ import java.util.NoSuchElementException;
 import org.apache.log4j.Logger;
 import org.mycore.parsers.bool.MCRAndCondition;
 import org.mycore.parsers.bool.MCRCondition;
+import org.mycore.parsers.bool.MCRFalseCondition;
 import org.mycore.parsers.bool.MCRNotCondition;
 import org.mycore.parsers.bool.MCROrCondition;
+import org.mycore.parsers.bool.MCRTrueCondition;
 
 /**
  * Executes queries on all configured searchers and returns query results.
@@ -175,6 +177,10 @@ public class MCRQueryManager {
 
     /** Executes query, if necessary splits into subqueries for each index */
     private static MCRResults buildResults(MCRCondition cond, int maxResults, List<MCRSortBy> sortBy, boolean addSortData) {
+        if (cond instanceof MCRTrueCondition || cond instanceof MCRFalseCondition){
+            //empty query => empty results
+            return new MCRResults();
+        }
         String index = getIndex(cond);
         if (index != mixed) {
             // All fields are from same index, just one searcher
