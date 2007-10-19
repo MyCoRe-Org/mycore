@@ -5,3 +5,11 @@ form#createNewPermForm #createNewRule{
 form#createNewRule{
 		display: none;
 }
+
+tr#mapping_head, tr#rule_head{
+	font-weight: bold;
+}
+
+.deleted {
+	text-decoration: line-through;
+}

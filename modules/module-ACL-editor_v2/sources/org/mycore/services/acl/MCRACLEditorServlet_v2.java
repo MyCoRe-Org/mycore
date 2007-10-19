@@ -55,14 +55,6 @@ public class MCRACLEditorServlet_v2 extends MCRServlet {
 
         } 
         
-//        else if (mode.equals("getPermEditor")) {
-//            answer = aclEditor.getPermEditor(request);
-//
-//        } else if (mode.equals("getRuleEditor")) {
-//            answer = aclEditor.getRuleEditor(request);
-//
-//        } 
-        
         else if (mode.equals("dataRequest")) {
             answer = aclEditor.dataRequest(request);
 

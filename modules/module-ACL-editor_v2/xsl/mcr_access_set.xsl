@@ -1,24 +1,25 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
-<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xalan="http://xml.apache.org/xalan">
-		<xsl:param name="ServletsBaseURL"/>
-	    <xsl:param name="WebApplicationBaseURL"/>
-	    
-	    <!-- redirectURL is the position where you came from -->
-		<xsl:variable name="redirectURL">
-				<xsl:if test="/mcr_access_set/redirect">
-					<xsl:value-of select="concat('&amp;redirect=', /mcr_access_set/redirect)"/>
-				</xsl:if>
-		</xsl:variable>
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xalan="http://xml.apache.org/xalan"
+	xmlns:java="http://xml.apache.org/xalan/java">
+
+	<!-- 
+		see mcr_acl_editor_common.xsl for definition of following
+		
+		redirectURL
+		servletName
+		editorURL
+		dataRequest
+	-->
+	<xsl:include href="mcr_acl_editor_common.xsl" />
 
 	<xsl:template match="/mcr_access_set">
-		<xsl:variable name="ruleItems" select="document(concat($ServletsBaseURL,'MCRACLEditorServlet_v2?mode=dataRequest&amp;action=getRuleAsItems'))" />
-		
-		
+		<xsl:variable name="ruleItems" select="document(concat($dataRequest, '&amp;action=getRuleAsItems'))" />
+
+
 		<div id="ACL-Perm-Editor" onMouseover="initPermEditor()">
-			<script type="text/javascript" src="{concat($WebApplicationBaseURL,'modules/module-ACL-editor_v2/web/JS/aclEditor.js')}" language="JavaScript"></script>
-			<link rel="stylesheet" type="text/css" href="{concat($WebApplicationBaseURL,'modules/module-ACL-editor_v2/web/CSS/acl_editor.css')}" />
-			
+			<!-- ACL-Perm-Editor will be included into ACL Editor so link for JavaScript and CSS will be defined in mcr_acl_edior.xsl -->
+
 			<!-- New Mapping -->
 			<xsl:call-template name="createNewMapping">
 				<xsl:with-param name="ruleItems" select="$ruleItems" />
@@ -29,7 +30,7 @@
 
 			<!-- Mapping Table -->
 			<form xmlns:encoder="xalan://java.net.URLEncoder" xmlns:xalan="http://xml.apache.org/xalan"
-				action="{concat($ServletsBaseURL,'MCRACLEditorServlet_v2?mode=dataRequest&amp;action=submitPerm')}" method="post" accept-charset="UTF-8">
+				action="{concat($dataRequest, '&amp;action=submitPerm')}" method="post" accept-charset="UTF-8">
 				<table id="mapping_table">
 					<tr id="mapping_head">
 						<td>
@@ -67,11 +68,11 @@
 	<!-- Template for creating new access mapping -->
 	<xsl:template name="createNewMapping">
 		<xsl:param name="ruleItems" />
-		
+
 		<div id="createNewPerm">
 			<input type="button" value="neue Regel" onclick="changeVisibility($('createNewPermForm'))" />
 			<form id="createNewPermForm" xmlns:encoder="xalan://java.net.URLEncoder" xmlns:xalan="http://xml.apache.org/xalan"
-				action="{concat($ServletsBaseURL,'MCRACLEditorServlet_v2?mode=dataRequest&amp;action=createNewPerm', $redirectURL)}" method="post" accept-charset="UTF-8">
+				action="{concat($dataRequest, '&amp;action=createNewPerm', $redirectURL)}" method="post" accept-charset="UTF-8">
 				<table>
 					<tr>
 						<td>
@@ -101,7 +102,7 @@
 	<!-- Template for filter -->
 	<xsl:template match="mcr_access_filter">
 		<form xmlns:encoder="xalan://java.net.URLEncoder" xmlns:xalan="http://xml.apache.org/xalan"
-			action="{concat($ServletsBaseURL,'MCRACLEditorServlet_v2?mode=dataRequest&amp;action=setFilter', $redirectURL)}" method="post" accept-charset="UTF-8">
+			action="{concat($dataRequest, '&amp;action=setFilter', $redirectURL)}" method="post" accept-charset="UTF-8">
 			<table>
 				<tr>
 					<td>
@@ -122,6 +123,7 @@
 		</form>
 	</xsl:template>
 
+	<!-- Template for drop down box of Rid's -->
 	<xsl:template match="items">
 		<xsl:param name="rid" />
 		<xsl:param name="name" />

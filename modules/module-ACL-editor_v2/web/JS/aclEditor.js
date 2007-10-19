@@ -29,6 +29,30 @@ function initPermEditor(){
 	
 }
 
+function initRuleEditor(){
+	var editor = $('ACL-Rule-Editor');
+	var ruleTable = getChildrenById(editor, "table", "rule_table");
+	
+	if (editor.status != "initialized"){
+	
+		var ruleLines = getChildrenById(editor, "tr", "rule_line");
+	
+		for (var i = 0; i < ruleLines.length; i++){
+			ruleLines[i].addEventListener("mouseover", markup, false);
+			ruleLines[i].addEventListener("mouseout", unmark, false);
+			delCheckBox = getChildrenByName(ruleLines[i], "input", "delete_rule")[0];
+			//delCheckBox.selBox = mappingLines[i].getElementsByTagName("select")[0];
+			delCheckBox.addEventListener("change", setDeleted, false);
+		}
+		
+		editor.status = "initialized";
+	}
+	
+	var delAll = getChildrenById(editor, "input", "delAll")[0];
+	delAll.addEventListener("click", deleteAll, false);
+	
+}
+
 function deleteAll(e){
 	var node = e.currentTarget;
 	var editor = $('ACL-Perm-Editor');
@@ -84,8 +108,8 @@ function setChanged(e){
 function setDeleted(e){
 	var deleted = "deleted$";
 	var node = e.currentTarget;
-	var objid = getChildrenById(node.parentNode.parentNode, "td", "OBJID");
-	var acpool = getChildrenById(node.parentNode.parentNode, "td", "ACPOOL");
+	//var objid = getChildrenById(node.parentNode.parentNode, "td", "OBJID");
+	//var acpool = getChildrenById(node.parentNode.parentNode, "td", "ACPOOL");
 	
 	if (node.type.toLowerCase() == "checkbox"){
 		if (node.checked == true){
@@ -94,12 +118,14 @@ function setDeleted(e){
 			newInput.id = deleted + node.value;
 	
 			node.appendChild(newInput);
-			objid[0].style.textDecoration = "line-through";
-			acpool[0].style.textDecoration = "line-through";
+			//objid[0].style.textDecoration = "line-through";
+			//acpool[0].style.textDecoration = "line-through";
+			node.parentNode.parentNode.className = "deleted";
 		} else if (node.checked == false){
 			node.removeChild($(deleted + node.value));
-			objid[0].style.textDecoration = "";
-			acpool[0].style.textDecoration = "";
+			//objid[0].style.textDecoration = "";
+			//acpool[0].style.textDecoration = "";
+			node.parentNode.parentNode.className = "";
 		}
 	}
 }
