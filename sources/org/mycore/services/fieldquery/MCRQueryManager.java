@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 import org.apache.log4j.Logger;
+import org.mycore.common.MCRUsageException;
 import org.mycore.parsers.bool.MCRAndCondition;
 import org.mycore.parsers.bool.MCRCondition;
 import org.mycore.parsers.bool.MCRFalseCondition;
@@ -178,8 +179,8 @@ public class MCRQueryManager {
     /** Executes query, if necessary splits into subqueries for each index */
     private static MCRResults buildResults(MCRCondition cond, int maxResults, List<MCRSortBy> sortBy, boolean addSortData) {
         if (cond instanceof MCRTrueCondition || cond instanceof MCRFalseCondition){
-            //empty query => empty results
-            return new MCRResults();
+            String msg = "Your query makes no sense. What do you mean when you search for '" + cond.toString() + "'?";
+            throw new MCRUsageException(msg);
         }
         String index = getIndex(cond);
         if (index != mixed) {
