@@ -169,7 +169,7 @@ public class MCRUserCommands extends MCRAbstractCommands {
      * properties were set, mcradmin with password mycore will be used.
      */
     public static void initSuperuser() throws MCRException {
-        String suser = CONFIG.getString("MCR.Users.Superuser.Username", "root");
+        String suser = CONFIG.getString("MCR.Users.Superuser.UserName", "root");
         String spasswd = CONFIG.getString("MCR.Users.Superuser.UserPasswd", "alleswirdgut");
         String sgroup = CONFIG.getString("MCR.Users.Superuser.GroupName", "admingroup");
         String guser = CONFIG.getString("MCR.Users.Guestuser.UserName", "gast");
