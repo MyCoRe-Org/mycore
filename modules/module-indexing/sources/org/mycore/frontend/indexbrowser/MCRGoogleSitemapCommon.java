@@ -260,11 +260,13 @@ public final class MCRGoogleSitemapCommon {
         }
         File dir = new File(sb.toString());
         File[] li = dir.listFiles();
-        for (File fi : li) {
-            if (fi.getName().startsWith("sitemap_google")) {
-                LOGGER.debug("Remove file " + fi.getName());
-                fi.delete();
-            }
+        if(li!=null){
+        	for (File fi : li) {
+        		if (fi.getName().startsWith("sitemap_google")) {
+        			LOGGER.debug("Remove file " + fi.getName());
+        			fi.delete();
+        		}
+        	}
         }
     }
 }
