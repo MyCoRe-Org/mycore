@@ -29,17 +29,16 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
+import java.io.Writer;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 import java.util.StringTokenizer;
-import java.util.TooManyListenersException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpServletResponseWrapper;
 import javax.servlet.http.HttpSession;
 import javax.xml.transform.Source;
 import javax.xml.transform.Templates;
@@ -56,12 +55,9 @@ import org.apache.log4j.Logger;
 import org.apache.xalan.templates.ElemTemplate;
 import org.apache.xalan.templates.ElemTemplateElement;
 import org.apache.xalan.trace.GenerateEvent;
-import org.apache.xalan.trace.PrintTraceListener;
 import org.apache.xalan.trace.SelectionEvent;
-import org.apache.xalan.trace.TraceListener;
 import org.apache.xalan.trace.TraceManager;
 import org.apache.xalan.trace.TracerEvent;
-
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
@@ -153,6 +149,38 @@ public class MCRLayoutService implements org.apache.xalan.trace.TraceListener {
             transform(res, new org.jdom.transform.JDOMSource(jdom), docType, parameters, styleFile);
     }
 
+    /**
+     * writes the transformation result directly into the Writer
+     * uses the HttpServletResponse only for error messages
+     */
+    public void doLayout(HttpServletRequest req, HttpServletResponse res, Writer out, org.jdom.Document jdom) throws IOException {
+		String docType = (jdom.getDocType() == null ? jdom.getRootElement().getName() 
+				: jdom.getDocType().getElementName());
+		Properties parameters = buildXSLParameters(req);
+		File styleFile = chooseStyleFile(req, parameters, docType);
+		if (styleFile == null)
+			new org.jdom.output.XMLOutputter().output(jdom, out);
+		else {
+			Templates stylesheet = buildCompiledStylesheet(styleFile);
+			Transformer transformer = buildTransformer(stylesheet);
+			setXSLParameters(transformer, parameters);
+			try {
+				transformer.transform(new org.jdom.transform.JDOMSource(jdom), new StreamResult(out));
+			} catch (TransformerException ex) {
+		            String msg = "Error while transforming XML using XSL stylesheet: " + ex.getMessageAndLocation();
+		            throw new MCRException(msg, ex);
+			} catch (MCRException ex) {
+				// Check if it is an error page to suppress later recursively
+				// generating an error page when there is an error in the
+				// stylesheet
+				if (!"mcr_error".equals(docType)) throw ex;
+				String msg = "Error while generating error page!";
+				LOGGER.warn(msg, ex);				
+				res.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, msg);
+			}
+		}
+	}
+    
     public void doLayout(HttpServletRequest req, HttpServletResponse res, org.w3c.dom.Document dom) throws IOException {
         String docType = (dom.getDoctype() == null ? dom.getDocumentElement().getTagName() : dom.getDoctype().getName());
         Properties parameters = buildXSLParameters(req);
