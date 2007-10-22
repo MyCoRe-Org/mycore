@@ -77,14 +77,20 @@ function showData() {
 	groupIndex=0;
 	userIndex=0;
 
-	var usrHeader =	document.createElement("h1");
+	var usrHeader =	document.createElement("h2");
 	usrHeader.innerHTML=userHdr;
-	var grpHeader =	document.createElement("h1");
+	var grpHeader =	document.createElement("h2");
 	grpHeader.innerHTML=groupHdr;
-	$("usersList").innerHTML="";
-    $("usersList").appendChild(usrHeader);
-	$("groupsList").innerHTML="";
-	$("groupsList").appendChild(grpHeader);
+	var usrList = document.createElement("ul");
+	usrList.setAttribute("id", "usersList");
+	var grpList = document.createElement("ul");
+	grpList.setAttribute("id", "groupsList");
+	$("users").innerHTML="";
+    $("users").appendChild(usrHeader);
+    $("users").appendChild(usrList);
+	$("groups").innerHTML="";
+	$("groups").appendChild(grpHeader);
+	$("groups").appendChild(grpList);
 	
 	data=req.responseText.parseJSON();
 	
@@ -261,7 +267,7 @@ function updateGroup() {
 
 //Aufbauen des Nutzer-Elements in die Gruppenliste
 function createGroupUser(user,group) {
-	var User=document.createElement("div");
+	var User=document.createElement("li");
 	User.className="usersElement";
 	User.setAttribute("id",user+"_"+group);
 	User.innerHTML=user;
@@ -270,10 +276,10 @@ function createGroupUser(user,group) {
 
 //Aufbauen des Nutzer-Elements in die Nutzerliste
 function createUserElement(user,name) {
-	var userContainer=document.createElement("div");
+	var userContainer=document.createElement("li");
 	var usrImg=document.createElement("img");
 	var usrElement=document.createElement("div")
-	usrImg.setAttribute("id","avatar");
+	usrImg.className="avatar";
 	usrImg.setAttribute("src",userImg);
 	userContainer.className="usersElement";
 	userContainer.setAttribute("id",user);
@@ -287,9 +293,9 @@ function createUserElement(user,name) {
 //Aufbauen eines Gruppen-Element
 function createGroupElement(group,description) {
 	var id=group;
-	var groupElement=document.createElement("div");
-	var link=document.createElement("a");
-	link.setAttribute("href","#");
+	var groupElement=document.createElement("li");
+	var link=document.createElement("span");
+	link.className="clickable";
 	link.setAttribute("onclick","Effect.toggle('Content_"+group+"','blind')");
 	link.innerHTML=id;
 	var handle=document.createElement("img");
@@ -300,7 +306,7 @@ function createGroupElement(group,description) {
 	groupElement.appendChild(link);
 	groupElement.appendChild(handle);
 	groupElement.setAttribute("TITLE","header=[Description] body=["+description+"]");
-	var content=document.createElement("div");
+	var content=document.createElement("ul");
 	content.className="groupsContent";
 	id="Content_"+group;
 	content.setAttribute("id",id);
