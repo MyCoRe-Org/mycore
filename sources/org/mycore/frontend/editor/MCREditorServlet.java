@@ -630,6 +630,7 @@ public class MCREditorServlet extends MCRServlet implements MCRSessionListener {
 
         editor.removeChild("input");
         editor.removeChild("repeats");
+        editor.removeChild("failed");
         editor.addContent(subnew.buildInputElements());
         editor.addContent(subnew.buildRepeatElements());
 
