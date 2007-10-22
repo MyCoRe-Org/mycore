@@ -32,8 +32,8 @@ import net.sf.json.JSONObject;
 
 import org.apache.log4j.Logger;
 import org.jdom.Document;
+
 import org.mycore.common.MCRConfiguration;
-import org.mycore.common.MCRException;
 import org.mycore.services.i18n.MCRTranslation;
 import org.mycore.user.MCRGroup;
 import org.mycore.user.MCRUser;
@@ -50,13 +50,9 @@ public class MCRUserAjaxServlet extends MCRServlet {
 
     private static final long serialVersionUID = 1L;
 
-    private static Logger LOGGER = Logger.getLogger(MCRUserMgr.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(MCRUserMgr.class.getName());
 
-    private MCRConfiguration CONFIG;
-
-    public MCRUserAjaxServlet() {
-        CONFIG = MCRConfiguration.instance();
-    }
+    private static final MCRConfiguration CONFIG = MCRConfiguration.instance();
 
     /**
      * Modes: users - get all data( groups with users ) update- if username is
@@ -331,6 +327,7 @@ public class MCRUserAjaxServlet extends MCRServlet {
         json.put("error", error);
         LOGGER.info("JSON STRING" + json.toString());
         job.getResponse().setContentType("application/x-json");
+        job.getResponse().setCharacterEncoding(CONFIG.getString("MCR.Request.CharEncoding", "UTF-8"));
         job.getResponse().getWriter().print(json);
     }
 
