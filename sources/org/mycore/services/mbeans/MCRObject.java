@@ -39,7 +39,7 @@ public class MCRObject extends MCRCommandWrapperMBean implements MCRObjectMBean 
 
     public static void register() {
         MCRObject instance = new MCRObject();
-        MCRJMXBridge.registerMe(instance, "Persistence Operations", instance.getName());
+        MCRJMXBridge.register(instance, "Persistence Operations", instance.getName());
     }
 
     public synchronized boolean loadFromDirectory(String directory) {

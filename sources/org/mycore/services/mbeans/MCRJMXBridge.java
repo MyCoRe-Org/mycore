@@ -24,20 +24,36 @@
 package org.mycore.services.mbeans;
 
 import java.lang.management.ManagementFactory;
+import java.lang.ref.WeakReference;
+import java.util.ArrayList;
+import java.util.Iterator;
 
 import javax.management.MBeanServer;
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
 
+import org.apache.log4j.Logger;
+
 import org.mycore.common.MCRConfiguration;
+import org.mycore.common.events.MCRShutdownHandler;
+import org.mycore.common.events.MCRShutdownHandler.Closeable;
 
-public class MCRJMXBridge {
+public class MCRJMXBridge implements Closeable {
 
-    public static void registerMe(Object mbean, String type, String component) {
+    static final MCRJMXBridge SINGLETON = new MCRJMXBridge();
+
+    private static final Logger LOGGER = Logger.getLogger(MCRJMXBridge.class);
+
+    private static java.util.List<WeakReference<ObjectName>> ONAME_LIST = new ArrayList<WeakReference<ObjectName>>();
+
+    private MCRJMXBridge() {
+        MCRShutdownHandler.getInstance().addCloseable(this);
+    }
+
+    public static void register(Object mbean, String type, String component) {
         ObjectName name;
         try {
-            name = new ObjectName(MCRConfiguration.instance().getString("MCR.NameOfProject", "MyCoRe-Application").replace(':', ' ') + ":type=" + type
-                    + ",component=" + component);
+            name = getObjectName(type, component);
         } catch (MalformedObjectNameException e) {
             e.printStackTrace();
             return;
@@ -45,9 +61,55 @@ public class MCRJMXBridge {
         MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
         try {
             mbs.registerMBean(mbean, name);
+            ONAME_LIST.add(new WeakReference<ObjectName>(name));
         } catch (Exception e) {
             e.printStackTrace();
         }
 
+    }
+
+    public static void unregister(String type, String component) {
+        ObjectName name;
+        try {
+            name = getObjectName(type, component);
+        } catch (MalformedObjectNameException e) {
+            e.printStackTrace();
+            return;
+        }
+        MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+        try {
+            mbs.unregisterMBean(name);
+            // As WeakReference does not overwrite Object.equals():
+            for (WeakReference<ObjectName> wr : ONAME_LIST) {
+                if (wr.get().equals(name)) {
+                    ONAME_LIST.remove(wr);
+                    break;
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    private static ObjectName getObjectName(String type, String component) throws MalformedObjectNameException {
+        return new ObjectName(MCRConfiguration.instance().getString("MCR.NameOfProject", "MyCoRe-Application").replace(':', ' ') + ":type=" + type
+                + ",component=" + component);
+    }
+
+    public void close() {
+        LOGGER.info("Shutting down " + MCRJMXBridge.class.getSimpleName());
+        MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+        Iterator<WeakReference<ObjectName>> wrIterator = ONAME_LIST.iterator();
+        while (wrIterator.hasNext()){
+            try {
+                ObjectName objectName = wrIterator.next().get();
+                LOGGER.info("Unregister " + objectName.getCanonicalName());
+                mbs.unregisterMBean(objectName);
+                wrIterator.remove();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 }

@@ -124,7 +124,7 @@ public class MCRHIBConnection implements Closeable, MCRSessionListener {
     private static void registerStatisticsService() {
         StatisticsService stats = new StatisticsService();
         stats.setSessionFactory(SESSION_FACTORY);
-        MCRJMXBridge.registerMe(stats, "Hibernate", "Statistics");
+        MCRJMXBridge.register(stats, "Hibernate", "Statistics");
     }
 
     /**

@@ -42,7 +42,7 @@ public class MCRDerivate extends MCRCommandWrapperMBean implements MCRDerivateMB
 
     public static void register() {
         MCRDerivate instance = new MCRDerivate();
-        MCRJMXBridge.registerMe(instance, "Persistence Operations", instance.getName());
+        MCRJMXBridge.register(instance, "Persistence Operations", instance.getName());
     }
 
     /*

@@ -25,6 +25,8 @@ package org.mycore.common;
 
 import java.util.Hashtable;
 
+import org.mycore.services.mbeans.MCRJMXBridge;
+
 /**
  * Instances of this class can be used as object cache. Each MCRCache has a
  * certain capacity, the maximum number of objects the cache will hold. When the
@@ -101,7 +103,8 @@ public class MCRCache {
     public MCRCache(int capacity, String type) {
         setCapacity(capacity);
         this.type=type;
-        MCRCacheJMXBridge.registerMe(this);
+        Object mbean = new MCRCacheManager(this);
+        MCRJMXBridge.register(mbean, "MCRCache", type);
     }
 
     /**
@@ -383,7 +386,7 @@ public class MCRCache {
     }
     
     public void close() {
-        MCRCacheJMXBridge.unregisterMe(this);
+        MCRJMXBridge.unregister("MCRCache", this.type);
         clear();
     }
 }
