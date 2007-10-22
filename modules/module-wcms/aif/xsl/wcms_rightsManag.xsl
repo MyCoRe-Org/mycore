@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation"
     xmlns:layoutUtils="xalan:///org.mycore.frontend.MCRLayoutUtilities" xmlns:wcmsUtils="xalan:///org.mycore.frontend.wcms.MCRWCMSUtilities">
-    <xsl:include href="start-acl-editor.xsl" />
+    <xsl:include href="mcr_acl_editor.xsl" />
 
     <xsl:variable name="perm">
         <xsl:call-template name="wcms.rightsManagement.getPermission" />
@@ -97,7 +97,7 @@
             <xsl:when test="$perm=$write">
                 <xsl:value-of select="i18n:translate('wcms.rightsManag.write.filter.descr')" />
             </xsl:when>
-        </xsl:choose>        
+        </xsl:choose>
         <br />
         <form action="{$ServletsBaseURL}MCRWCMSAdminServlet{$JSessionID}" id="userFilter">
             <input type="hidden" name="action" value="{$manage-wcms}" />
@@ -179,27 +179,42 @@
                 </xsl:choose>
             </td>
             <!-- editor buttons -->
-            <xsl:variable name="aclEditorAddress">
-                <xsl:call-template name="aclEditor.getAddress">
-                    <xsl:with-param name="objIdFilter" select="layoutUtils:getWebpageACLID(@href)" />
-                    <xsl:with-param name="acpoolFilter" select="$perm" />
-                </xsl:call-template>
-            </xsl:variable>
             <td>
                 <xsl:choose>
                     <xsl:when test="$hasRule='true'">
-                        <a href="{$aclEditorAddress}">
+                        <xsl:variable name="aclEditorAddress_edit">
+                            <xsl:call-template name="aclEditor.embMapping.getAddress">
+                                <xsl:with-param name="objId" select="layoutUtils:getWebpageACLID(@href)" />
+                                <xsl:with-param name="permission" select="$perm" />
+                                <xsl:with-param name="action" select="'edit'" />
+                            </xsl:call-template>
+                        </xsl:variable>
+                        <xsl:variable name="aclEditorAddress_delete">
+                            <xsl:call-template name="aclEditor.embMapping.getAddress">
+                                <xsl:with-param name="objId" select="layoutUtils:getWebpageACLID(@href)" />
+                                <xsl:with-param name="permission" select="$perm" />
+                                <xsl:with-param name="action" select="'delete'" />
+                            </xsl:call-template>
+                        </xsl:variable>
+                        <a href="{$aclEditorAddress_edit}">
                             <img width="18" height="13" src="{concat($WebApplicationBaseURL,'/modules/module-wcms/aif/web/images/editRule.gif')}"
                                 title="{i18n:translate('wcms.rightsManag.acl.edit')}" alt="{i18n:translate('wcms.rightsManag.acl.edit')}" />
                         </a>
                         ,
-                        <a href="{$aclEditorAddress}">
+                        <a href="{$aclEditorAddress_delete}">
                             <img width="18" height="13" src="{concat($WebApplicationBaseURL,'/modules/module-wcms/aif/web/images/deleteRule.gif')}"
                                 title="{i18n:translate('wcms.rightsManag.acl.delete')}" alt="{i18n:translate('wcms.rightsManag.acl.delete')}" />
                         </a>
                     </xsl:when>
                     <xsl:otherwise>
-                        <a href="{$aclEditorAddress}">
+                        <xsl:variable name="aclEditorAddress_add">
+                            <xsl:call-template name="aclEditor.embMapping.getAddress">
+                                <xsl:with-param name="objId" select="layoutUtils:getWebpageACLID(@href)" />
+                                <xsl:with-param name="permission" select="$perm" />
+                                <xsl:with-param name="action" select="'add'" />
+                            </xsl:call-template>
+                        </xsl:variable>
+                        <a href="{$aclEditorAddress_add}">
                             <img width="18" height="13" src="{concat($WebApplicationBaseURL,'/modules/module-wcms/aif/web/images/addRule.gif')}"
                                 title="{i18n:translate('wcms.rightsManag.acl.add')}" alt="{i18n:translate('wcms.rightsManag.acl.add')}" />
                         </a>
