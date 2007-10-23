@@ -107,6 +107,4 @@ public interface CacheManager {
      *            original image height
      */
     void setImgSize(MCRFile image, int width, int height);
-
-    String listCacheDir();
 }
