@@ -4,12 +4,15 @@
 	xmlns:java="http://xml.apache.org/xalan/java">
 
 	<!-- 
-		see mcr_acl_editor_common.xsl for definition of following
+		see mcr_acl_editor_common.xsl for definition of following variables
 		
 		redirectURL
 		servletName
 		editorURL
+		aclEditorURL
 		dataRequest
+		permEditor
+		ruleEditor
 	-->
 	<xsl:include href="mcr_acl_editor_common.xsl" />
 
@@ -20,70 +23,151 @@
 		<div id="ACL-Perm-Editor" onMouseover="initPermEditor()">
 			<!-- ACL-Perm-Editor will be included into ACL Editor so link for JavaScript and CSS will be defined in mcr_acl_edior.xsl -->
 
-			<!-- New Mapping -->
-			<xsl:call-template name="createNewMapping">
-				<xsl:with-param name="ruleItems" select="$ruleItems" />
-			</xsl:call-template>
+			<xsl:choose>
+				<xsl:when test="(@emb = 'true') and (@cmd = $add)">
+					<!-- New Mapping -->
+					<xsl:call-template name="createNewMapping">
+						<xsl:with-param name="objId" select="mcr_access_filter/objid" />
+						<xsl:with-param name="acPool" select="mcr_access_filter/acpool" />
+						<xsl:with-param name="ruleItems" select="$ruleItems" />
+						<xsl:with-param name="hide" select="'true'" />
+					</xsl:call-template>
+				</xsl:when>
+				<xsl:when test="not(@emb = 'true')">
+					<!-- New Mapping -->
+					<xsl:call-template name="createNewMapping">
+						<xsl:with-param name="ruleItems" select="$ruleItems" />
+					</xsl:call-template>
 
-			<!-- Filter -->
-			<xsl:apply-templates select="mcr_access_filter" />
+					<!-- Filter -->
+					<xsl:apply-templates select="mcr_access_filter" />
+				</xsl:when>
+			</xsl:choose>
 
-			<!-- Mapping Table -->
-			<form xmlns:encoder="xalan://java.net.URLEncoder" xmlns:xalan="http://xml.apache.org/xalan"
-				action="{concat($dataRequest, '&amp;action=submitPerm')}" method="post" accept-charset="UTF-8">
-				<table id="mapping_table">
-					<tr id="mapping_head">
-						<td>
-							<input id="delAll" type="button" value="alles Löschen" />
-						</td>
-						<td>ObjId</td>
-						<td>AcPool</td>
-						<td>RID</td>
-					</tr>
-					<xsl:for-each select="mcr_access">
-						<tr id="mapping_line">
-							<td id="delete">
-								<input type="checkbox" name="delete_mapping" value="{concat(OBJID,'$',ACPOOL)}" />
-							</td>
-							<td id="OBJID">
-								<xsl:value-of select="OBJID" />
-							</td>
-							<td id="ACPOOL">
-								<xsl:value-of select="ACPOOL" />
-							</td>
-							<td>
-								<xsl:apply-templates select="xalan:nodeset($ruleItems)/items">
-									<xsl:with-param name="rid" select="RID" />
-									<xsl:with-param name="name" select="concat(OBJID,'$',ACPOOL)" />
-								</xsl:apply-templates>
-							</td>
-						</tr>
-					</xsl:for-each>
-				</table>
-				<input type="submit" value="Speichern" />
-			</form>
+			<xsl:choose>
+				<xsl:when test="not(@cmd = $add) and not(@cmd = $delete)">
+					<!-- Mapping Table -->
+					<form name="MappingTableForm" xmlns:encoder="xalan://java.net.URLEncoder" xmlns:xalan="http://xml.apache.org/xalan"
+						action="{concat($dataRequest, '&amp;action=submitPerm', $redirectURL)}" method="post" accept-charset="UTF-8">
+						<table id="mapping_table">
+							<xsl:if test="not(@cmd = $edit)">
+								<tr id="mapping_head">
+
+									<td>
+										<input id="delAll" type="button" value="alles Löschen" />
+									</td>
+									<td>ObjId</td>
+									<td>AcPool</td>
+									<td>RID</td>
+								</tr>
+							</xsl:if>
+							<xsl:for-each select="mcr_access">
+								<tr id="mapping_line">
+									<xsl:if test="not(../@cmd = $edit)">
+										<td id="delete">
+											<input type="checkbox" name="delete_mapping" value="{concat(OBJID,'$',ACPOOL)}" />
+										</td>
+										<td id="OBJID">
+											<xsl:value-of select="OBJID" />
+										</td>
+										<td id="ACPOOL">
+											<xsl:value-of select="ACPOOL" />
+										</td>
+									</xsl:if>
+									<td>
+										<xsl:apply-templates select="xalan:nodeset($ruleItems)/items">
+											<xsl:with-param name="rid" select="RID" />
+											<xsl:with-param name="name" select="concat(OBJID,'$',ACPOOL)" />
+										</xsl:apply-templates>
+									</td>
+								</tr>
+							</xsl:for-each>
+						</table>
+						<input type="submit" value="Speichern" />
+						<xsl:if test="@cmd = $add">
+							<input type="button" value="Abbrechen" onclick="history.back()" />
+						</xsl:if>
+					</form>
+				</xsl:when>
+				<xsl:when test="@cmd = $delete">
+					<form name="MappingTableForm" xmlns:encoder="xalan://java.net.URLEncoder" xmlns:xalan="http://xml.apache.org/xalan"
+						action="{concat($dataRequest, '&amp;action=submitPerm', $redirectURL)}" method="post" accept-charset="UTF-8">
+						<xsl:for-each select="mcr_access">
+							Mapping fuer
+							"<xsl:value-of select="OBJID" />"
+							mit der Regel
+							"<xsl:value-of select="ACPOOL" />"
+							wirklich loeschen?
+							<br />
+							<input type="hidden" name="{concat('deleted$',OBJID,'$',ACPOOL)}" value="{concat('deleted$',OBJID,'$',ACPOOL)}" />
+							<input type="submit" value="Loeschen" />
+							<input type="button" value="Nicht loeschen" onclick="history.back()" />
+						</xsl:for-each>
+					</form>
+				</xsl:when>
+			</xsl:choose>
 		</div>
+	</xsl:template>
+
+	<!-- Template for input field -->
+	<xsl:template name="inputField">
+		<xsl:param name="name" />
+		<xsl:param name="value" />
+		<xsl:param name="editable" />
+
+		<xsl:choose>
+			<xsl:when test="boolean($editable)">
+				<input name="{$name}" value="{$value}" />
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:value-of select="$value" />
+			</xsl:otherwise>
+		</xsl:choose>
 	</xsl:template>
 
 	<!-- Template for creating new access mapping -->
 	<xsl:template name="createNewMapping">
 		<xsl:param name="ruleItems" />
+		<xsl:param name="objId" />
+		<xsl:param name="acPool" />
+		<xsl:param name="rid" />
+		<xsl:param name="hide" />
+
+		<xsl:variable name="display">
+			<xsl:choose>
+				<xsl:when test="$hide = 'true'">
+					<xsl:value-of select="'display: none;'" />
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:value-of select="'display: block;'" />
+				</xsl:otherwise>
+			</xsl:choose>
+		</xsl:variable>
 
 		<div id="createNewPerm">
-			<input type="button" value="neue Regel" onclick="changeVisibility($('createNewPermForm'))" />
-			<form id="createNewPermForm" xmlns:encoder="xalan://java.net.URLEncoder" xmlns:xalan="http://xml.apache.org/xalan"
+			<!--			<input type="button" value="neue Regel" onclick="changeVisibility($('createNewPermForm'))" />-->
+			<form id="createNewPermForm" name="NewPermForm" xmlns:encoder="xalan://java.net.URLEncoder" xmlns:xalan="http://xml.apache.org/xalan"
 				action="{concat($dataRequest, '&amp;action=createNewPerm', $redirectURL)}" method="post" accept-charset="UTF-8">
 				<table>
 					<tr>
-						<td>
-							<input name="newPermOBJID" value="" />
-						</td>
-						<td>
-							<input name="newPermACPOOL" value="" />
-						</td>
+						<xsl:choose>
+							<xsl:when test="not(@cmd = $add)">
+								<td>
+									<input name="newPermOBJID" value="{$objId}" />
+								</td>
+								<td>
+									<input name="newPermACPOOL" value="{$acPool}" />
+								</td>
+							</xsl:when>
+							<xsl:otherwise>
+								<input type="hidden" name="newPermOBJID" value="{$objId}" />
+								<input type="hidden" name="newPermACPOOL" value="{$acPool}" />
+							</xsl:otherwise>
+						</xsl:choose>
+
 						<td>
 							<xsl:apply-templates select="xalan:nodeset($ruleItems)/items">
-								<xsl:with-param name="rid" select="RID" />
+								<xsl:with-param name="rid" select="$rid" />
 								<xsl:with-param name="name" select="'newPermRID'" />
 							</xsl:apply-templates>
 						</td>
@@ -101,7 +185,7 @@
 
 	<!-- Template for filter -->
 	<xsl:template match="mcr_access_filter">
-		<form xmlns:encoder="xalan://java.net.URLEncoder" xmlns:xalan="http://xml.apache.org/xalan"
+		<form name="AclFilterForm" xmlns:encoder="xalan://java.net.URLEncoder" xmlns:xalan="http://xml.apache.org/xalan"
 			action="{concat($dataRequest, '&amp;action=setFilter', $redirectURL)}" method="post" accept-charset="UTF-8">
 			<table>
 				<tr>

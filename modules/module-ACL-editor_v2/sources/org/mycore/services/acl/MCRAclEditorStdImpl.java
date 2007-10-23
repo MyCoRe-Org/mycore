@@ -34,12 +34,30 @@ public class MCRAclEditorStdImpl extends MCRAclEditor {
      **************************************************************************/
     @Override
     public Element getACLEditor(HttpServletRequest request) {
+        Element aclEditor = ACLEditor();
         String type = request.getParameter("editor");
-        
+        String cmd = request.getParameter("cmd");
+
+        String objIdFilter = request.getParameter("objid");
+        String acPoolFilter = request.getParameter("acpool");
+
+        String redirectURL = request.getParameter("redir");
+
+        LOGGER.debug("Redirect: " + redirectURL);
+
         if (type == null)
             type = "permEditor";
-        
-        return ACLEditor().addContent(editorType(type));
+
+        if (cmd != null)
+            aclEditor.addContent(editorCmd(cmd));
+
+        if (redirectURL != null && !redirectURL.equals(""))
+            aclEditor.addContent(redirect(redirectURL));
+
+        aclEditor.addContent(editorType(type));
+        aclEditor.addContent(getFilterElem(objIdFilter, acPoolFilter));
+
+        return aclEditor;
     }
 
     @Override
@@ -79,26 +97,32 @@ public class MCRAclEditorStdImpl extends MCRAclEditor {
      **************************************************************************/
 
     private Element getPermEditor(HttpServletRequest request) {
-        String redirURL = request.getParameter("redirect");
-        LOGGER.debug("Redirect URL: " + redirURL);
-
         String objidFilter = request.getParameter("objid");
         String acpoolFilter = request.getParameter("acpool");
+        String embedded = request.getParameter("emb");
+        String cmd = request.getParameter("cmd");
 
-        if (redirURL != null && !redirURL.equals(""))
-            return getPermission(objidFilter, acpoolFilter, redirURL);
-        else
-            return getPermission(objidFilter, acpoolFilter);
-    }
+        String redirectURL = request.getParameter("redir");
+        
+        LOGGER.debug("Redirect: " + redirectURL);
+        LOGGER.debug("ObjId: " + objidFilter);
+        LOGGER.debug("AcPool: " + acpoolFilter);
 
-    private Element getPermission(String objIdFilter, String acPoolFilter, String redirect) {
-        Element redir = new Element("redirect");
-        redir.addContent(redirect);
+        Element permEditor = getPermission(objidFilter, acpoolFilter);
 
-        Element perm = getPermission(objIdFilter, acPoolFilter);
-        perm.addContent(redir);
+        
+        if (redirectURL != null && !redirectURL.equals(""))
+            permEditor.addContent(redirect(redirectURL));
 
-        return perm;
+        if (embedded != null) {
+            permEditor.setAttribute("emb", "true");
+        }
+
+        if (cmd != null) {
+            permEditor.setAttribute("cmd", cmd);
+        }
+
+        return permEditor;
     }
 
     private Element getPermission(String objIdFilter, String acPoolFilter) {
@@ -125,7 +149,18 @@ public class MCRAclEditorStdImpl extends MCRAclEditor {
         MCRRuleMapping perm = XMLProcessing.createRuleMapping(ruleId, acPool, objId);
         MCRAccessStore.getInstance().createAccessDefinition(perm);
 
-        Element editor = ACLEditor().addContent(editorType("permEditor"));
+//        Element editor = ACLEditor().addContent(editorType("permEditor"));
+//        return editor;
+        
+        String redirectURL = request.getParameter("redir");
+
+        Element editor;
+
+        if (redirectURL != null && !redirectURL.equals(""))
+            editor = redirect(redirectURL);
+        else
+            editor = ACLEditor().addContent(editorType("permEditor"));
+
         return editor;
     }
 
@@ -174,7 +209,15 @@ public class MCRAclEditorStdImpl extends MCRAclEditor {
 
         HIBA.savePermChanges(diffMap);
 
-        Element editor = ACLEditor().addContent(editorType("permEditor"));
+        String redirectURL = request.getParameter("redir");
+
+        Element editor;
+
+        if (redirectURL != null && !redirectURL.equals(""))
+            editor = redirect(redirectURL);
+        else
+            editor = ACLEditor().addContent(editorType("permEditor"));
+
         return editor;
     }
 
@@ -236,7 +279,7 @@ public class MCRAclEditorStdImpl extends MCRAclEditor {
 
         LOGGER.debug("Rule: " + rule);
         LOGGER.debug("Desc: " + desc);
-        
+
         Element editor = ACLEditor().addContent(editorType("ruleEditor"));
         return editor;
     }
@@ -359,17 +402,30 @@ public class MCRAclEditorStdImpl extends MCRAclEditor {
 
         return accessrule;
     }
+
     // End Rule stuff
-    
+
     public Element ACLEditor() {
         Element element = new Element("mcr_acl_editor");
         return element;
     }
-    
+
     private Content editorType(String type) {
         Element editorType = new Element("editor");
         editorType.addContent(type);
         return editorType;
+    }
+
+    private Content editorCmd(String cmd) {
+        Element editorType = new Element("cmd");
+        editorType.addContent(cmd);
+        return editorType;
+    }
+
+    private Element redirect(String url) {
+        Element redirect = new Element("redirect");
+        redirect.addContent(url);
+        return redirect;
     }
 
 }

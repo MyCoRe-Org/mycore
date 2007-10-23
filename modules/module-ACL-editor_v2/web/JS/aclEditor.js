@@ -25,7 +25,8 @@ function initPermEditor(){
 	}
 	
 	var delAll = getChildrenById(editor, "input", "delAll")[0];
-	delAll.addEventListener("click", deleteAll, false);
+	if (delAll != null)
+		delAll.addEventListener("click", deleteAll, false);
 	
 }
 
@@ -49,7 +50,8 @@ function initRuleEditor(){
 	}
 	
 	var delAll = getChildrenById(editor, "input", "delAll")[0];
-	delAll.addEventListener("click", deleteAll, false);
+	if (delAll != null)
+		delAll.addEventListener("click", deleteAll, false);
 	
 }
 

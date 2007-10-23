@@ -53,8 +53,8 @@ public class MCRACLEditorServlet_v2 extends MCRServlet {
         if (mode.equals("getACLEditor")) {
             answer = aclEditor.getACLEditor(request);
 
-        } 
-        
+        }
+
         else if (mode.equals("dataRequest")) {
             answer = aclEditor.dataRequest(request);
 
@@ -62,7 +62,13 @@ public class MCRACLEditorServlet_v2 extends MCRServlet {
             job.getResponse().sendError(HttpServletResponse.SC_BAD_REQUEST, errorMsg);
         }
 
-        doLayout(request, response, answer, layout, mcrWebPage);
+        if (answer.getName().equals("redirect")) {
+            LOGGER.debug("Redirect: " + answer.getText());
+            redirect(response, answer.getText());
+        } else {
+            LOGGER.debug("Normal doLayout!");
+            doLayout(request, response, answer, layout, mcrWebPage);
+        }
 
     }
 

@@ -22,10 +22,14 @@ Mapping editor:
 
 	
 BUGS:
+	- maybe some bugs in JavaScript
+	- scrolling in dropdown box (Rid) is slow
 	
 TODO:
 	- fixing Bugs
-	- embedded modus
-	- some security checking
-	- validation of the inputs
-	- batch processing (delete, make changes)
+	- embedded modus (improvements)
+	- security checking
+	- validation of changes (removing rules which are in use, override existing mappings/ rules)
+	- batch processing (change Rid on mappings)
+	- wrapping long page in mapping editor
+	- removing old ACL-Editor (Editor Framework version)

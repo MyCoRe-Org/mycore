@@ -34,17 +34,17 @@ public class MCRACLHIBAccess {
     public List getAccessPermission(String objidFilter, String acpoolFilter, String ridFilter) {
         Criteria query = MCRHIBConnection.instance().getSession().createCriteria(MCRACCESS.class);
 
-        if (objidFilter != null) {
+        if (objidFilter != null && !objidFilter.equals("")) {
             LOGGER.info("OBJID Filter: " + objidFilter + "\t" + objidFilter.replaceAll("\\*", "%"));
             query = query.add(Restrictions.like("key.objid", objidFilter.replaceAll("\\*", "%")));
         }
 
-        if (acpoolFilter != null) {
-            LOGGER.info("OBJID Filter: " + acpoolFilter + "\t" + acpoolFilter.replaceAll("\\*", "%"));
+        if (acpoolFilter != null && !acpoolFilter.equals("")) {
+            LOGGER.info("ACPOOL Filter: " + acpoolFilter + "\t" + acpoolFilter.replaceAll("\\*", "%"));
             query = query.add(Restrictions.like("key.acpool", acpoolFilter.replaceAll("\\*", "%")));
         }
 
-        if (ridFilter != null) {
+        if (ridFilter != null && !ridFilter.equals("")) {
             LOGGER.info("RID Filter: " + ridFilter);
             query = query.add(Restrictions.like("rule.rid", ridFilter.replaceAll("\\*", "%")));
         }

@@ -4,14 +4,19 @@
 	<xsl:include href="MyCoReLayout.xsl" />
 
 	<!-- 
-		see mcr_acl_editor_common.xsl for definition of following
+		see mcr_acl_editor_common.xsl for definition of following variables
 		
 		redirectURL
 		servletName
 		editorURL
+		aclEditorURL
 		dataRequest
 		permEditor
 		ruleEditor
+		
+		add
+		edit
+		delete
 	-->
 
 	<xsl:include href="mcr_acl_editor_common.xsl" />
@@ -35,7 +40,7 @@
 
 			<xsl:choose>
 				<xsl:when test="editor = $permEditor">
-					<a href="{concat($editorURL, '?mode=getACLEditor&amp;editor=ruleEditor', $filter)}">
+					<a href="{concat($aclEditorURL, '&amp;editor=ruleEditor', $filter)}">
 						<xsl:value-of select="$ruleEditor" />
 					</a>
 
@@ -44,7 +49,7 @@
 
 				</xsl:when>
 				<xsl:when test="editor = $ruleEditor">
-					<a href="{concat($editorURL, '?mode=getACLEditor&amp;editor=permEditor', $filter)}">
+					<a href="{concat($aclEditorURL, '&amp;editor=permEditor', $filter)}">
 						<xsl:value-of select="$permEditor" />
 					</a>
 
@@ -52,29 +57,33 @@
 					<xsl:copy-of select="document($ruleEditor)" />
 
 				</xsl:when>
+				<xsl:when test="editor = $embPermEditor">
+					<xsl:variable name="redirectURL" select="redirect"/>
+					<xsl:variable name="embPermEditor" select="concat($dataRequest, '&amp;action=getPermEditor&amp;emb=true&amp;cmd=', cmd, $filter)" />
+					<xsl:copy-of select="document(concat($embPermEditor, '&amp;redir=', $redirectURL))" />
+
+				</xsl:when>
 			</xsl:choose>
-			
+
 		</div>
 	</xsl:template>
 
-	<xsl:template name="buildFilter">
-		<xsl:param name="objIdFilter" />
-		<xsl:param name="acPoolFilter" />
+	<xsl:template name="getEmbPermEditor">
+		<xsl:param name="objId" />
+		<xsl:param name="acPool" />
 
-		<xsl:variable name="objId" select="'&amp;objid='" />
-		<xsl:variable name="acPool" select="'&amp;acpool='" />
+		<xsl:if test="($objId != '') and ($acPool != '')">
+			<xsl:variable name="filter">
+				<xsl:call-template name="buildFilter">
+					<xsl:with-param name="objIdFilter" select="$objId" />
+					<xsl:with-param name="acPoolFilter" select="$acPool" />
+				</xsl:call-template>
+			</xsl:variable>
 
-		<xsl:choose>
-			<xsl:when test="($objIdFilter != '') and ($acPoolFilter != '')">
-				<xsl:value-of select="concat($objId, $objIdFilter, $acPool, $acPoolFilter)" />
-			</xsl:when>
-			<xsl:when test="$objIdFilter != ''">
-				<xsl:value-of select="concat($objId, $objIdFilter)" />
-			</xsl:when>
-			<xsl:when test="$acPoolFilter != ''">
-				<xsl:value-of select="concat($acPool, $acPoolFilter)" />
-			</xsl:when>
-		</xsl:choose>
+			<xsl:variable name="embPermEditor" select="concat($aclEditorURL, '&amp;editor=embPermEditor', $filter)" />
+			<xsl:copy-of select="document($embPermEditor)" />
+		</xsl:if>
+
 	</xsl:template>
 
 </xsl:stylesheet>

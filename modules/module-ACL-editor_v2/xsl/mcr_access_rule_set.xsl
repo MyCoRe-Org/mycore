@@ -3,12 +3,15 @@
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xalan="http://xml.apache.org/xalan">
 
 	<!-- 
-		see mcr_acl_editor_common.xsl for definition of following
+		see mcr_acl_editor_common.xsl for definition of following variables
 		
 		redirectURL
 		servletName
 		editorURL
+		aclEditorURL
 		dataRequest
+		permEditor
+		ruleEditor
 	-->
 	<xsl:include href="mcr_acl_editor_common.xsl" />
 	<xsl:variable name="currentEditor" select="concat('&amp;editor=', $ruleEditor)" />
@@ -56,24 +59,18 @@
 						<td>Rule</td>
 					</tr>
 					<xsl:for-each select="mcr_access_rule">
-<!--						<tr>-->
-<!--							<td>-->
-<!--								<table>-->
-									<tr id="rule_line">
-										<td id="delete">
-											<input type="checkbox" name="delete_rule" value="{RID}" />
-										</td>
-										<td>
-											<input type="button" name="{RID}" value="{RID}" onclick="changeVisibility(N('{concat('Rule$',RID)}')[0])" />
-										</td>
-										<td>
-											<input name="{concat('RuleDesc$',RID)}" value="{DESCRIPTION}" onkeypress="setChanged(event)" />
-										</td>
-<!--									</tr>-->
-<!--								</table>-->
-<!--							</td>-->
-<!--						</tr>-->
-<!--						<tr>-->
+
+						<tr id="rule_line">
+							<td id="delete">
+								<input type="checkbox" name="delete_rule" value="{RID}" />
+							</td>
+							<td>
+								<input type="button" name="{RID}" value="{RID}" onclick="changeVisibility(N('{concat('Rule$',RID)}')[0])" />
+							</td>
+							<td>
+								<input name="{concat('RuleDesc$',RID)}" value="{DESCRIPTION}" onkeypress="setChanged(event)" />
+							</td>
+
 							<td>
 								<textarea cols="50" rows="4" style="display:none;" name="{concat('Rule$',RID)}" onkeypress="setChanged(event)">
 									<xsl:value-of select="RULE" />
