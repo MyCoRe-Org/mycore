@@ -282,7 +282,7 @@ public class MCRServlet extends HttpServlet {
             if (getProperty(req, INITIAL_SERVLET_NAME_KEY).equals(getServletName())) {
                 // current Servlet not called via RequestDispatcher
                 try {
-                    if( tx != null ) tx.commit();
+                    if( tx != null && tx.isActive()) tx.commit();
                 } catch (RuntimeException e) {
                     MCRHIBConnection.instance().getSession().close();
                     tx = MCRHIBConnection.instance().getSession().beginTransaction();
