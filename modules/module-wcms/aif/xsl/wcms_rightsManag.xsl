@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation"
     xmlns:layoutUtils="xalan:///org.mycore.frontend.MCRLayoutUtilities" xmlns:wcmsUtils="xalan:///org.mycore.frontend.wcms.MCRWCMSUtilities">
-    <xsl:include href="mcr_acl_editor.xsl" />
+    <xsl:include href="start-acl-editor.xsl" />
 
     <xsl:variable name="perm">
         <xsl:call-template name="wcms.rightsManagement.getPermission" />
