@@ -133,7 +133,7 @@ public class MCRImgCacheManager implements CacheManager {
 
         if (cacheNode != null && cacheNode instanceof MCRDirectory) {
             LOGGER.debug("MCRImgCacheManager - deleteImage");
-            LOGGER.debug("Delte : " + cacheNode.getName());
+            LOGGER.debug("Delete : " + cacheNode.getName());
             ((MCRDirectory) cacheNode).delete();
         } else
             LOGGER.debug("Could not delete " + image.getName() + "from cache!");
@@ -141,17 +141,20 @@ public class MCRImgCacheManager implements CacheManager {
 
     public boolean existInCache(MCRFile image, String filename) {
         MCRDirectory cacheNode = (MCRDirectory) MCRFilesystemNode.getRootNode(buildPath(image));
-        String parentName = image.getParent().getName();
-        String origName = image.getAbsolutePath() + "/" +image.getName();
-        
-        if (cacheNode == null && !parentName.startsWith(CACHE_FOLDER)) {
-            LOGGER.debug("Cache node does not exist for " + origName);
+        MCRDirectory parent = image.getParent();
+        String parentName = "";
+        if (parent != null)
+            parentName = parent.getName();
+
+        if (parentName.startsWith(CACHE_FOLDER)) {
+            return true;
+        } else if (cacheNode == null) {
             return false;
         } else {
             MCRFilesystemNode cachedImg = cacheNode.getChild(filename);
             String absolutePath = cacheNode.getAbsolutePath();
-            
-            if (cachedImg != null && cachedImg instanceof MCRFile ) {
+
+            if (cachedImg != null && cachedImg instanceof MCRFile) {
                 LOGGER.debug("Cache version " + filename + " exist in " + absolutePath);
                 return true;
             } else {
