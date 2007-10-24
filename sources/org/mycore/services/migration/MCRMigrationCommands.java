@@ -28,6 +28,9 @@ public class MCRMigrationCommands extends MCRAbstractCommands {
         com = new MCRCommand("internal accessmigration step {0}", "org.mycore.services.migration.MCRMigrationCommands.migrateAccess int",
                 "Internal commands for access system migration");
         command.add(com);
+        com = new MCRCommand("migrate module-imaging", "org.mycore.services.migration.MCRMigrationCommands.migrateImageCache",
+                "The command migrates the access system to MyCoRe 2.0.");
+        command.add(com);
     }
 
     public static List<String> migrateUser() {
@@ -101,5 +104,9 @@ public class MCRMigrationCommands extends MCRAbstractCommands {
         default:
             throw new MCRException("MCRACCESS migration step " + step + " is unknown.");
         }
+    }
+
+    public static void migrateImageCache() {
+        MCRImageCacheMigrationHelper.removeImageCacheRoot();
     }
 }
