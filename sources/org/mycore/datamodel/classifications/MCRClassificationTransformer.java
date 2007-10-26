@@ -349,6 +349,7 @@ public class MCRClassificationTransformer {
     }
 
     private static class CategoryFactory {
+
         @SuppressWarnings("unchecked")
         static MCRCategoryItem getCategory(Element e) {
             MCRCategoryItem c = new MCRCategoryItem();
@@ -384,15 +385,13 @@ public class MCRClassificationTransformer {
 
         private static void fillCategory(MCRClassificationObject c, MCRCategoryItem item, Map map, int levels, boolean withCounter) {
             if (levels != 0) {
-                List<MCRCategoryItem> children = item.getCategories();
-                for (int i = 0; i < children.size(); i++) {
-                    MCRCategoryItem child = (MCRCategoryItem) children.get(i);
+                item.getCategories().addAll(Arrays.asList(MCRClassificationManager.instance().retrieveChildren(item.getClassID(), item.getId())));
+                for (MCRCategoryItem child : item.getCategories()) {
                     if (withCounter) {
                         int count = getNumberOfObjects(item.getClassID(), item.getId(), map);
                         child.setNumberOfObjects(count);
                     }
                     child.setClassID(item.getClassID());
-                    c.getCategories().add(child);
                     fillCategory(child, child, map, levels - 1, withCounter);
                 }
             }
