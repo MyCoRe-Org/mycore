@@ -56,7 +56,9 @@ public class MCRCategoryTransformer {
     private static final String STANDARD_LABEL = "{text}";
 
     /**
-     * transforms a <code>MCRClassificationItem</code> into a JDOM Document.
+     * transforms a <code>MCRCategory</code> into a JDOM Document.
+     * 
+     * The Document will have a root tag with name "mycoreclass".
      * 
      * @param cl
      *            Classification
@@ -68,6 +70,23 @@ public class MCRCategoryTransformer {
             MCRCategLinkServiceFactory.getInstance().countLinks(getAllCategIDs(cl));
         }
         return MetaDataElementFactory.getDocument(cl, countMap);
+    }
+
+    /**
+     * transforms a <code>MCRCategory</code> into a JDOM Element.
+     * 
+     * The element will have the tag name "category".
+     * 
+     * @param category
+     *            a category of a classification
+     * @return
+     */
+    public static Element getMetaDataElement(MCRCategory category, boolean withCounter) {
+        Map<MCRCategoryID, Number> countMap = null;
+        if (withCounter) {
+            MCRCategLinkServiceFactory.getInstance().countLinks(getAllCategIDs(category));
+        }
+        return MetaDataElementFactory.getElement(category, countMap);
     }
 
     /**
