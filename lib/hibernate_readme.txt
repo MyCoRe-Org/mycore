@@ -1,6 +1,6 @@
 Hibernate - Relational Persistence for Idiomatic Java
 =====================================================
-version 3.0.5, 25 May 2005
+version 3.2.5, July 31, 2007
 
 Instructions
 ------------
@@ -42,7 +42,7 @@ Tests:
    (1) copy your JDBC driver to the lib directory
    (2) edit etc/hibernate.properties
    (3) run "ant junitreport" or "build junitreport"
-   (4) see test_output/index.html
+   (4) see build/test-reports/index.html
 
 
 Other Stuff
