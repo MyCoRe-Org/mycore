@@ -40,20 +40,36 @@ public class MCRRPCProvider extends RPCProvider {
 
     private final static Logger LOGGER = Logger.getLogger(MCRRPCProvider.class);
     
+    private static long counter = 0;
+    
     /**
      * Wraps WebService method invocation with hibernate transaction
      */
     protected Object invokeMethod(MessageContext mc, Method method, Object obj, Object[] argValues) throws Exception {
-        LOGGER.info( "WebService call to " + method.getDeclaringClass().getName() + ":" + method.getName() );
+        counter++;
+        LOGGER.info("WebService call #" + counter + " to " + method.getDeclaringClass().getName() + ":" + method.getName());
         Transaction tx = MCRHIBConnection.instance().getSession().beginTransaction();
+        long millis = System.currentTimeMillis();
+        Object result;
+
         try {
-            Object result = super.invokeMethod(mc, method, obj, argValues);
-            tx.commit();
-            LOGGER.debug( "WebService returned from " + method.getDeclaringClass().getName() + ":" + method.getName() );
-            return result;
+            result = super.invokeMethod(mc, method, obj, argValues);
+            try {
+                if (tx != null && tx.isActive())
+                    tx.commit();
+            } catch (RuntimeException ex) {
+                MCRHIBConnection.instance().getSession().close();
+            }
         } catch (Exception ex) {
-            tx.rollback();
+            LOGGER.error("Exception while processing WebService " + method.getName());
+            LOGGER.error(ex.getClass().getName() + ": " + ex.getLocalizedMessage());
+            LOGGER.error(ex);
+            if (tx != null)
+                tx.rollback();
             throw ex;
         }
+
+        LOGGER.info("WebService call #" + counter + " finished in " + (System.currentTimeMillis() - millis) + " ms");
+        return result;
     }
 }
