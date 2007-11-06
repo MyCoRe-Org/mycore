@@ -107,17 +107,16 @@ public class MCRClassificationEditor {
                 return false;
             }
 
-            
-            MCRCategoryItem categ=MCRClassificationQuery.findCategory(classif, categid);
-            
+            MCRCategoryItem categ = MCRClassificationQuery.findCategory(classif, categid);
+            MCRClassificationObject parent = MCRClassificationQuery.findParent(classif, categ);
+
             newCateg = setNewJDOMCategElement(newCateg);
             newCateg.setAttribute("counter", "0");
             if (MCRClassificationQuery.findCategory(classif, newID) == null) {
                 MCRCategoryItem newCategory = MCRClassificationTransformer.getCategory(newCateg);
-                List<MCRCategoryItem> categs = classif.getCategories();
-                int prevIndex=categs.indexOf(categ);
-                categs.add(prevIndex+1,newCategory);
-                classif.setCatgegories(categs);
+                List<MCRCategoryItem> categs = parent.getCategories();
+                int prevIndex = categs.indexOf(categ);
+                categs.add(prevIndex + 1, newCategory);
                 MCRClassificationBrowserData.getClassificationPool().updateClassification(classif);
                 String sessionID = MCRSessionMgr.getCurrentSession().getID();
                 MCRClassificationBrowserData.ClassUserTable.put(classif.getId(), sessionID);
@@ -405,7 +404,7 @@ public class MCRClassificationEditor {
 
     private boolean moveRight(MCRCategoryItem cat) {
         MCRClassificationObject parent = MCRClassificationQuery.findParent(classif, cat);
-        LOGGER.info("Parent ID is: "+parent.getId());
+        LOGGER.info("Parent ID is: " + parent.getId());
         if (parent.getCategories().size() == 1) {
             return false;
         }
@@ -416,22 +415,22 @@ public class MCRClassificationEditor {
         }
         parent.getCategories().get(index).getCategories().add(cat);
         cat.setParentID(parent.getCategories().get(index).getId());
-        LOGGER.info("ParentID after moving right: "+cat.getParentID());
+        LOGGER.info("ParentID after moving right: " + cat.getParentID());
         return true;
     }
 
     private boolean moveLeft(MCRCategoryItem cat) {
-        MCRClassificationObject parent= MCRClassificationQuery.findCategory(classif, cat.getParentID());
-        
+        MCRClassificationObject parent = MCRClassificationQuery.findCategory(classif, cat.getParentID());
+
         if (!(parent instanceof MCRCategoryItem) || parent == null) {
             return false;
         }
-        
-        MCRClassificationObject grandParent = MCRClassificationQuery.findParent(classif,(MCRCategoryItem) parent);
+
+        MCRClassificationObject grandParent = MCRClassificationQuery.findParent(classif, (MCRCategoryItem) parent);
         if (grandParent == null) {
             grandParent = classif;
         }
-        
+
         int oldIndex = parent.getCategories().indexOf(cat);
         parent.getCategories().remove(oldIndex);
         grandParent.getCategories().add(cat);
