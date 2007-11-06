@@ -442,12 +442,12 @@ public class MCRClassificationEditor {
 
     public boolean saveAll() {
         final boolean saveAll = MCRClassificationBrowserData.getClassificationPool().saveAll();
-        MCRClassificationBrowserData.clearCurrentUserClassTable();
+        MCRClassificationBrowserData.clearUserClassTable(MCRSessionMgr.getCurrentSession());
         return saveAll;
     }
 
     public boolean purgeAll() {
-        MCRClassificationBrowserData.clearCurrentUserClassTable();
+        MCRClassificationBrowserData.clearUserClassTable(MCRSessionMgr.getCurrentSession());
         return MCRClassificationBrowserData.getClassificationPool().purgeAll();
     }
 

@@ -43,6 +43,8 @@ import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
+import org.mycore.common.events.MCRSessionEvent;
+import org.mycore.common.events.MCRSessionListener;
 import org.mycore.datamodel.classifications.MCRCategoryItem;
 import org.mycore.datamodel.classifications.MCRClassificationItem;
 import org.mycore.datamodel.classifications.MCRClassificationObject;
@@ -107,6 +109,25 @@ public class MCRClassificationBrowserData {
     int totalNumOfDocs = 0;
 
     public static Map<String, String> ClassUserTable = new Hashtable<String, String>();
+
+    private static MCRSessionListener ClassUserTableCleaner = new MCRSessionListener() {
+
+        public void sessionEvent(MCRSessionEvent event) {
+            switch (event.getType()) {
+            case destroyed:
+                clearUserClassTable(event.getSession());
+                break;
+            default:
+                LOGGER.debug("Skipping event: " + event.getType());
+                break;
+            }
+        }
+
+    };
+    
+    static {
+        MCRSessionMgr.addSessionListener(ClassUserTableCleaner);
+    }
 
     public MCRClassificationBrowserData(final String u, final String mode, final String actclid, final String actEditorCategid) throws Exception {
         uri = u;
@@ -205,7 +226,8 @@ public class MCRClassificationBrowserData {
     private void setObjectTypes(final String browserClass) {
         try {
             // NOTE: read *.Doctype for compatiblity reasons
-            objectType = config.getString("MCR.ClassificationBrowser." + browserClass + ".Objecttype", config.getString("MCR.ClassificationBrowser." + browserClass + ".Doctype", null));
+            objectType = config.getString("MCR.ClassificationBrowser." + browserClass + ".Objecttype", config.getString("MCR.ClassificationBrowser."
+                    + browserClass + ".Doctype", null));
         } catch (final org.mycore.common.MCRConfigurationException noDoctype) {
             objectType = config.getString("MCR.ClassificationBrowser.default.ObjectType", config.getString("MCR.ClassificationBrowser.default.Doctype"));
         }
@@ -416,11 +438,10 @@ public class MCRClassificationBrowserData {
                 if (ClassUserTable.get(id) != sessionID) {
                     MCRSession oldsession = MCRSessionMgr.getSession(ClassUserTable.get(id));
                     if (null != oldsession)
-                      cli.setAttribute("userEdited", oldsession.getCurrentUserID());
-                    else
-                    {
-                      ClassUserTable.remove(id);
-                      cli.setAttribute("userEdited", "false");
+                        cli.setAttribute("userEdited", oldsession.getCurrentUserID());
+                    else {
+                        ClassUserTable.remove(id);
+                        cli.setAttribute("userEdited", "false");
                     }
                 } else {
                     cli.setAttribute("userEdited", "false");
@@ -771,15 +792,17 @@ public class MCRClassificationBrowserData {
             itemnum[i] = i;
         }
         // debug
-        //for (int i = 0; i < itemnum.length; i++) {
-        //    System.out.println("===> " + i + "  " + itemnum[i] + "  " + itemname.get(itemnum[i]));
-        //}
+        // for (int i = 0; i < itemnum.length; i++) {
+        // System.out.println("===> " + i + " " + itemnum[i] + " " +
+        // itemname.get(itemnum[i]));
+        // }
         // sort
         sortMyTreePerLevel(0, itemname.size(), 1, itemname, itemlevel, itemnum);
         // debug
-        //for (int i = 0; i < itemnum.length; i++) {
-        //    System.out.println("---> " + i + "  " + itemnum[i] + "  " + itemname.get(itemnum[i]));
-        //}
+        // for (int i = 0; i < itemnum.length; i++) {
+        // System.out.println("---> " + i + " " + itemnum[i] + " " +
+        // itemname.get(itemnum[i]));
+        // }
         // write back
         for (int i = 0; i < itemnum.length; i++) {
             navitree.addContent(itemelm.get(itemnum[i]));
@@ -790,40 +813,43 @@ public class MCRClassificationBrowserData {
     private final void sortMyTreePerLevel(int von, int bis, int level, ArrayList<String> itemname, ArrayList<Integer> itemlevel, int[] itemnum) {
         if (von == bis)
             return;
-        //System.out.println("$$$>" + von + "  " + bis);
+        // System.out.println("$$$>" + von + " " + bis);
         for (int i = von; i < bis - 1; i++) {
-            //System.out.println("III>" + i + "  " + itemname.get(itemnum[i]));
+            // System.out.println("III>" + i + " " + itemname.get(itemnum[i]));
             if (itemlevel.get(itemnum[i]) != level) {
-                //System.out.println("%%%> inner sort");
+                // System.out.println("%%%> inner sort");
                 int start = i;
                 int stop = start;
                 while (stop + 1 < bis && itemlevel.get(itemnum[stop + 1]).intValue() > level) {
                     stop++;
                 }
-                //System.out.println("--------------------");
-                sortMyTreePerLevel(start, stop+1, level + 2, itemname, itemlevel, itemnum);
-                //System.out.println("--------------------");
-                i = stop+1;
-                if (i >= bis) continue;
+                // System.out.println("--------------------");
+                sortMyTreePerLevel(start, stop + 1, level + 2, itemname, itemlevel, itemnum);
+                // System.out.println("--------------------");
+                i = stop + 1;
+                if (i >= bis)
+                    continue;
             }
             String aktitem = itemname.get(itemnum[i]);
             for (int j = i + 1; j < bis; j++) {
                 if (level != itemlevel.get(itemnum[j]).intValue())
                     continue;
-                //System.out.println("%%%>" + i + "  " + aktitem + "  " + j + "  " + itemname.get(itemnum[j]) + "  " + level + "  " + itemlevel.get(itemnum[j]).intValue());
+                // System.out.println("%%%>" + i + " " + aktitem + " " + j + " "
+                // + itemname.get(itemnum[j]) + " " + level + " " +
+                // itemlevel.get(itemnum[j]).intValue());
                 if (aktitem.compareTo(itemname.get(itemnum[j])) > 0) {
                     // must switch
-                    //System.out.println("%%%> swap " + i + " with " + j);
+                    // System.out.println("%%%> swap " + i + " with " + j);
                     int[] swap = itemnum.clone();
                     itemnum[i] = itemnum[j];
                     int ii = i;
                     for (int jj = j; jj < bis; jj++) {
-                        //System.out.println("* " + ii + "  " + jj);
+                        // System.out.println("* " + ii + " " + jj);
                         itemnum[ii] = swap[jj];
                         ii++;
                     }
                     for (int jj = i; jj < j; jj++) {
-                        //System.out.println("# " + ii + "  " + jj);
+                        // System.out.println("# " + ii + " " + jj);
                         itemnum[ii] = swap[jj];
                         ii++;
                     }
@@ -869,12 +895,13 @@ public class MCRClassificationBrowserData {
         return new MCRLabel();
     }
 
-    public static void clearCurrentUserClassTable() {
+    public static void clearUserClassTable(MCRSession session) {
         final String curSessionID = MCRSessionMgr.getCurrentSession().getID();
         final Iterator<Map.Entry<String, String>> it = ClassUserTable.entrySet().iterator();
         while (it.hasNext()) {
             Map.Entry<String, String> entry = it.next();
-            if (entry.getKey().equals(curSessionID)) {
+            if (entry.getValue().equals(curSessionID)) {
+                LOGGER.info("Release classification " + entry.getKey() + " lock.");
                 it.remove();
             }
         }
