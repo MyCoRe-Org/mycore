@@ -896,7 +896,7 @@ public class MCRClassificationBrowserData {
     }
 
     public static void clearUserClassTable(MCRSession session) {
-        final String curSessionID = MCRSessionMgr.getCurrentSession().getID();
+        final String curSessionID = session.getID();
         final Iterator<Map.Entry<String, String>> it = ClassUserTable.entrySet().iterator();
         while (it.hasNext()) {
             Map.Entry<String, String> entry = it.next();
