@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!-- ============================================== -->
-<!-- $Revision: 1.12 $ $Date: 2007-06-04 06:19:16 $ -->
+<!-- $Revision: 1.13 $ $Date: 2007-11-06 16:57:10 $ -->
 <!-- ============================================== -->
 
 <!-- +
@@ -60,8 +60,8 @@
     <xsl:variable name="canCreate" select="../userCanCreate" />
     <xsl:variable name="canEdit" select="../userCanEdit" />
     <xsl:variable name="canDelete" select="../userCanDelete" />
-    <xsl:variable name="uri" select="uri" />
-    <xsl:variable name="path" select="concat($WebApplicationBaseURL, 'browse/', $uri,'?mode=edit')" />
+    <xsl:variable name="uri" select="../uri" />
+    <xsl:variable name="path" select="concat($WebApplicationBaseURL, 'browse', $uri,'?mode=edit')" />
     <xsl:variable name="edited" select="edited" />
 
     <xsl:variable name="classnew" select="concat($WebApplicationBaseURL, 'images/classnew.gif')" />

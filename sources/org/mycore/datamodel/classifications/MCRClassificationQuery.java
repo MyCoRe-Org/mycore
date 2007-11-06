@@ -168,8 +168,9 @@ public class MCRClassificationQuery {
             return co;
         }
         for (MCRCategoryItem category:co.getCategories()){
-            if (findParentInClassificationObject(category, cat) != null){
-                return category;
+            MCRClassificationObject parent = findParentInClassificationObject(category, cat);
+            if (parent != null){
+                return parent;
             }
         }
         return null;

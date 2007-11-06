@@ -106,9 +106,10 @@ public class MCRClassificationEditor {
                 LOGGER.error("The category ID's are not different.");
                 return false;
             }
-
             MCRCategoryItem categ = MCRClassificationQuery.findCategory(classif, categid);
+            LOGGER.debug("findCategory for categID " + categid + " returned: " + categ.id);
             MCRClassificationObject parent = MCRClassificationQuery.findParent(classif, categ);
+            LOGGER.debug("findParent for categID " + categ.id + " returned: " + parent.id);
 
             newCateg = setNewJDOMCategElement(newCateg);
             newCateg.setAttribute("counter", "0");
@@ -116,6 +117,7 @@ public class MCRClassificationEditor {
                 MCRCategoryItem newCategory = MCRClassificationTransformer.getCategory(newCateg);
                 List<MCRCategoryItem> categs = parent.getCategories();
                 int prevIndex = categs.indexOf(categ);
+                LOGGER.debug("Position of " + categ.id + " in " + parent.id + " is:" + prevIndex);
                 categs.add(prevIndex + 1, newCategory);
                 MCRClassificationBrowserData.getClassificationPool().updateClassification(classif);
                 String sessionID = MCRSessionMgr.getCurrentSession().getID();
@@ -124,8 +126,7 @@ public class MCRClassificationEditor {
             }
             return false;
         } catch (Exception e1) {
-            e1.printStackTrace();
-            LOGGER.error("Classification creation fails. Reason is:" + e1.getMessage());
+            LOGGER.error("Classification creation fails.", e1);
             return false;
         }
 
@@ -472,7 +473,8 @@ public class MCRClassificationEditor {
             if (parent != null) {
 
                 MCRLinkTableManager mcl = MCRLinkTableManager.instance();
-                if (categToDelete.getClassID().equals(categToDelete.getId())) {
+                LOGGER.debug("categToDelete: " + (categToDelete == null ? null : categToDelete.id));
+                if (classif.getId().equals(categToDelete.getId())) {
                     cnt = mcl.countReferenceCategory(categToDelete.getClassID(), "", null, null);
                 } else {
                     cnt = mcl.countReferenceCategory(categToDelete.getClassID(), categToDelete.getId(), null, null);
@@ -492,7 +494,7 @@ public class MCRClassificationEditor {
             // 0 ist ok
             return cnt;
         } catch (Exception e1) {
-            LOGGER.error("Categorie delete failed - the Reason is:" + e1.getMessage());
+            LOGGER.error("Categorie delete failed.", e1);
             return 1;
         }
     }
