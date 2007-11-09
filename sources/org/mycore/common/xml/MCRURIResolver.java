@@ -645,7 +645,7 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
         }
 
         /**
-         * Reads XML from a HTTP request to this web application.
+         * Reads XML from a static file within the web application.
          * 
          * @param uri
          *            the URI in the format request:path/to/servlet
