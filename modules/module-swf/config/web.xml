@@ -27,6 +27,14 @@
   <servlet-name>MCRCheckEditACLServlet</servlet-name>
   <servlet-class>org.mycore.frontend.servlets.MCRCheckEditACLServlet</servlet-class>
 </servlet>
+<servlet id="MCRCheckCommitDerivateServlet">
+  <servlet-name>MCRCheckCommitDerivateServlet</servlet-name>
+  <servlet-class>org.mycore.frontend.servlets.MCRCheckCommitDerivateServlet</servlet-class>
+</servlet>
+<servlet id="MCRCheckEditDerivateServlet">
+  <servlet-name>MCRCheckEditDerivateServlet</servlet-name>
+  <servlet-class>org.mycore.frontend.servlets.MCRCheckEditDerivateServlet</servlet-class>
+</servlet>
 <servlet id="MCRListWorkflowServlet">
   <servlet-name>MCRListWorkflowServlet</servlet-name>
   <servlet-class>org.mycore.frontend.servlets.MCRListWorkflowServlet</servlet-class>
@@ -59,6 +67,14 @@
 <servlet-mapping>
   <servlet-name>MCRCheckEditACLServlet</servlet-name>
   <url-pattern>/servlets/MCRCheckEditACLServlet</url-pattern>
+</servlet-mapping>
+<servlet-mapping>
+  <servlet-name>MCRCheckCommitDerivateServlet</servlet-name>
+  <url-pattern>/servlets/MCRCheckCommitDerivateServlet</url-pattern>
+</servlet-mapping>
+<servlet-mapping>
+  <servlet-name>MCRCheckEditDerivateServlet</servlet-name>
+  <url-pattern>/servlets/MCRCheckEditDerivateServlet</url-pattern>
 </servlet-mapping>
 <servlet-mapping>
   <servlet-name>MCRListWorkflowServlet</servlet-name>

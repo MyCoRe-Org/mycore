@@ -47,13 +47,16 @@ public class MCRObjectDerivate {
 
     private MCRMetaIFS internals = null;
 
+    private ArrayList<MCRMetaLangText> titles = null;
     /**
      * This is the constructor of the MCRObjectDerivate class. All data are set
      * to null.
      */
     public MCRObjectDerivate() {
+        linkmeta = null;
         externals = new ArrayList<MCRMetaLink>();
         internals = null;
+        titles = new ArrayList<MCRMetaLangText>();
     }
 
     /**
@@ -77,27 +80,39 @@ public class MCRObjectDerivate {
         if (externals_element != null) {
             List external_element_list = externals_element.getChildren();
             int external_len = external_element_list.size();
-
             for (int i = 0; i < external_len; i++) {
                 org.jdom.Element external_element = (org.jdom.Element) external_element_list.get(i);
                 MCRMetaLink eLink = new MCRMetaLink();
-                link.setDataPart("external");
-                link.setFromDOM(external_element);
+                eLink.setDataPart("external");
+                eLink.setFromDOM(external_element);
                 externals.add(eLink);
             }
         }
 
         // Internal part
         org.jdom.Element internals_element = derivate_element.getChild("internals");
-
         if (internals_element != null) {
             org.jdom.Element internal_element = internals_element.getChild("internal");
-
             if (internal_element != null) {
                 internals = new MCRMetaIFS();
                 internals.setDataPart("internal");
                 internals.setFromDOM(internal_element);
             }
+        }
+        
+        // Title part
+        org.jdom.Element titles_element = derivate_element.getChild("titles");
+        titles.clear();
+        if (titles_element != null) {
+            List title_element_list = titles_element.getChildren();
+            int title_len = title_element_list.size();
+            for (int i = 0; i < title_len; i++) {
+                org.jdom.Element title_element = (org.jdom.Element) title_element_list.get(i);
+                MCRMetaLangText text = new MCRMetaLangText();
+                text.setDataPart("title");
+                text.setFromDOM(title_element);
+                titles.add(text);
+            }            
         }
     }
 
@@ -106,9 +121,11 @@ public class MCRObjectDerivate {
      * @deprecated
      * @see #getMetaLink()
      */
+    /**
     public final int getLinkMetaSize() {
         return 0;
     }
+*/
 
     /**
      * This method get a single link from the linkmeta list as a
@@ -120,12 +137,14 @@ public class MCRObjectDerivate {
      * @see #getMetaLink()
      * @return a metadata link as MCRMetaLinkID
      */
+    /**
     public final MCRMetaLinkID getLinkMeta(int index) throws IndexOutOfBoundsException {
         if ((index != 0)) {
             throw new IndexOutOfBoundsException("Index error in getLinkMeta.");
         }
         return getMetaLink();
     }
+    */
 
     /**
      * returns link to the MCRObject.
@@ -161,10 +180,32 @@ public class MCRObjectDerivate {
      */
     public final MCRMetaLink getExternal(int index) throws IndexOutOfBoundsException {
         if ((index < 0) || (index > externals.size())) {
-            throw new IndexOutOfBoundsException("Index error in getExternal.");
+            throw new IndexOutOfBoundsException("Index error in getExternal("+Integer.toString(index)+").");
         }
 
         return externals.get(index);
+    }
+
+    /**
+     * This method return the size of the title array.
+     */
+    public final int getTitleSize() {
+        return titles.size();
+    }
+
+    /**
+     * This method get a single text from the titles list as a MCRMetaLangText.
+     * 
+     * @exception IndexOutOfBoundsException
+     *                throw this exception, if the index is false
+     * @return a title text as MCRMetaLangText
+     */
+    public final MCRMetaLangText getTitle(int index) throws IndexOutOfBoundsException {
+        if ((index < 0) || (index > titles.size())) {
+            throw new IndexOutOfBoundsException("Index error in getTitle("+Integer.toString(index)+").");
+        }
+
+        return titles.get(index);
     }
 
     /**
@@ -214,11 +255,9 @@ public class MCRObjectDerivate {
             org.jdom.Element extEl = new org.jdom.Element("externals");
             extEl.setAttribute("class", "MCRMetaLink");
             extEl.setAttribute("heritable", "false");
-
             for (int i = 0; i < externals.size(); i++) {
                 extEl.addContent(externals.get(i).createXML());
             }
-
             elm.addContent(extEl);
         }
 
@@ -230,6 +269,16 @@ public class MCRObjectDerivate {
             elm.addContent(intEl);
         }
 
+        if (titles.size() != 0) {
+            org.jdom.Element titEl = new org.jdom.Element("titles");
+            titEl.setAttribute("class", "MCRMetaLangText");
+            titEl.setAttribute("heritable", "false");
+            for (int i = 0; i < titles.size(); i++) {
+                titEl.addContent(titles.get(i).createXML());
+            }
+            elm.addContent(titEl);
+        }
+        
         return elm;
     }
 

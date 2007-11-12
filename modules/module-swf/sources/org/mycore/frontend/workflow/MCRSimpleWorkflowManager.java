@@ -38,7 +38,6 @@ import org.jaxen.jdom.JDOMXPath;
 import org.jdom.Document;
 import org.jdom.Element;
 
-import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.common.MCRConfiguration;
 import static org.mycore.common.MCRConstants.*;
 import org.mycore.common.MCRUtils;

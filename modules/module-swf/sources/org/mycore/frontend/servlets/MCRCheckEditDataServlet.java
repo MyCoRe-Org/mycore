@@ -82,7 +82,7 @@ public class MCRCheckEditDataServlet extends MCRCheckDataBase {
 		String appl = CONFIG.getString("MCR.SWF.Mail.ApplicationID", "DocPortal");
 		String subject = "Automatically generated message from " + appl;
 		StringBuffer text = new StringBuffer();
-		text.append("Es wurde ein Objekt vom Typ ").append(ID.getTypeId()).append(" mit der ID ").append(ID.getId()).append(" im Workflow bearbeitet.");
+		text.append("An object with type ").append(ID.getTypeId()).append(" and ID ").append(ID.getId()).append(" was changed in the workflow.");
 		LOGGER.info(text.toString());
 
 		try {

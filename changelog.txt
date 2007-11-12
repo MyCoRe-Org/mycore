@@ -25,7 +25,8 @@ Version 2.0 (Head)
 - Upgrade to FCK-Editor 2.4
 - compiles on Java 6
 - The file deprecated.properties contains a list of properties that should (but must not) be renamed
-
+- Add a titel field based on MCRMetaLangText in the data model of derivates.
+ 
 Version 1.3
 ===========
  - Removed the old persistence layer

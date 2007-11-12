@@ -729,23 +729,19 @@ public class MCRStartEditorServlet extends MCRServlet {
             return;
         }
 
-        MCRDerivate der = new MCRDerivate();
-        der.receiveFromDatastore(mysemcrid);
-
-        org.jdom.Element textfield = new org.jdom.Element("textfield");
-        org.jdom.Element defa = new org.jdom.Element("default");
-        defa.setText(der.getLabel());
-        textfield.addContent(defa);
-        MCRSessionMgr.getCurrentSession().put("seditder", textfield);
         StringBuffer sb = new StringBuffer();
-        sb.append(getBaseURL()).append(pagedir).append("editor_form_commit-derivate.xml");
-
         Properties params = new Properties();
-        params.put("cancelUrl", getBaseURL() + cancelpage);
+        sb.append("request:receive/").append(mysemcrid).append("?XSL.Style=editor");
+        params.put("sourceUri", sb.toString());
+        sb = new StringBuffer();
+        sb.append(getBaseURL()).append("receive/").append(myremcrid);
+        params.put("cancelUrl", sb.toString());
         params.put("se_mcrid", mysemcrid);
         params.put("re_mcrid", myremcrid);
         params.put("type", mytype);
         params.put("step", mystep);
+        sb = new StringBuffer();
+        sb.append(getBaseURL()).append(pagedir).append("editor_form_commit-derivate.xml");
         job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(buildRedirectURL(sb.toString(), params)));
     }
 
@@ -769,15 +765,16 @@ public class MCRStartEditorServlet extends MCRServlet {
 
         StringBuffer sb = new StringBuffer();
         // TODO: should transform mcrobject and use "session:" to save roundtrip
-        sb.append("request:receive/").append(mytfmcrid).append("?XSL.Style=editor");
-
-        String base = getBaseURL() + myfile;
         Properties params = new Properties();
+        sb.append("request:receive/").append(mytfmcrid).append("?XSL.Style=editor");
         params.put("sourceUri", sb.toString());
-        params.put("cancelUrl", getBaseURL() + cancelpage);
+        sb = new StringBuffer();
+        sb.append(getBaseURL()).append("receive/").append(mytfmcrid);
+        params.put("cancelUrl", sb.toString());
         params.put("mcrid", mytfmcrid);
         params.put("type", mytype);
         params.put("step", mystep);
+        String base = getBaseURL() + myfile;
         job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(buildRedirectURL(base, params)));
     }
 
@@ -830,40 +827,6 @@ public class MCRStartEditorServlet extends MCRServlet {
 
         StringBuffer sb = new StringBuffer();
         sb.append(getBaseURL()).append("servlets/MCRFileNodeServlet/").append(mysemcrid).append("/?hosts=local");
-        job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(sb.toString()));
-    }
-
-    /**
-     * The method set the label of a derivate object that is stored in the
-     * server. The method use the input parameter: <b>type</b>,<b>step</b>
-     * <b>se_mcrid</b> and <b>re_mcrid</b>. Access rigths must be 'writedb'.
-     * 
-     * @param job
-     *            the MCRServletJob instance
-     */
-    public void ssetlabel(MCRServletJob job) throws IOException {
-        if (!MCRAccessManager.checkPermission(myremcrid, "writedb")) {
-            job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + usererrorpage));
-            return;
-        }
-        if (mysemcrid.length() == 0) {
-            job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + mcriderrorpage));
-            return;
-        }
-
-        MCRDerivate der = new MCRDerivate();
-        der.receiveFromDatastore(mysemcrid);
-        der.setLabel(extparm);
-
-        try {
-            der.updateXMLInDatastore();
-        } catch (MCRException ex) {
-            LOGGER.error("Exception while store to derivate " + mysemcrid);
-        }
-
-        MCRObjectID ID = new MCRObjectID(myremcrid);
-        StringBuffer sb = new StringBuffer(getBaseURL());
-        sb.append("receive/").append(myremcrid);
         job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(sb.toString()));
     }
 
@@ -1173,26 +1136,17 @@ public class MCRStartEditorServlet extends MCRServlet {
             return;
         }
 
-        StringBuffer sb = new StringBuffer();
-        sb.append(WFM.getDirectoryPath(mytype)).append(SLASH).append(mysemcrid).append(".xml");
-
-        MCRDerivate der = new MCRDerivate();
-        der.setFromURI(sb.toString());
-
-        org.jdom.Element textfield = new org.jdom.Element("textfield");
-        org.jdom.Element defa = new org.jdom.Element("default");
-        defa.setText(der.getLabel());
-        textfield.addContent(defa);
-        MCRSessionMgr.getCurrentSession().put("weditder", textfield);
-        sb = new StringBuffer();
-        sb.append(getBaseURL()).append(pagedir).append("editor_form_editor-derivate.xml");
-
         Properties params = new Properties();
+        StringBuffer sb = new StringBuffer();
+        sb.append("file://").append(WFM.getDirectoryPath(mytype)).append(SLASH).append(mysemcrid).append(".xml");
+        params.put("sourceUri", sb.toString());
         params.put("cancelUrl", getBaseURL() + cancelpage);
         params.put("se_mcrid", mysemcrid);
         params.put("re_mcrid", myremcrid);
         params.put("type", mytype);
         params.put("step", mystep);
+        sb = new StringBuffer();
+        sb.append(getBaseURL()).append(pagedir).append("editor_form_editor-derivate.xml");
         job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(buildRedirectURL(sb.toString(), params)));
     }
 
@@ -1327,10 +1281,6 @@ public class MCRStartEditorServlet extends MCRServlet {
             der.getDerivate().getInternals().setMainDoc(extparm.substring(mysemcrid.length() + 1 + 12, extparm.length()));
         }
 
-        if (extparm.startsWith("####label####")) {
-            der.setLabel(extparm.substring(13, extparm.length()));
-        }
-
         byte[] outxml = MCRUtils.getByteArray(der.createXML());
 
         try {
@@ -1344,19 +1294,6 @@ public class MCRStartEditorServlet extends MCRServlet {
         sb = new StringBuffer();
         sb.append(pagedir).append("editor_").append(mytype).append("_editor.xml");
         job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + sb.toString()));
-    }
-
-    /**
-     * The method start the editor to modify a derivate object that is stored in
-     * the workflow. The method use the input parameter: <b>type</b>,<b>step</b>
-     * <b>re_mcrid</b> and <b>se_mcrid</b>. Access rigths must be 'writewf'.
-     * 
-     * @param job
-     *            the MCRServletJob instance
-     */
-    public void wsetlabel(MCRServletJob job) throws IOException {
-        extparm = "####label####" + extparm;
-        wsetfile(job);
     }
 
     /**
