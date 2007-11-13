@@ -24,7 +24,7 @@
         <xsl:param name="objIdFilter" select="'#$#null#$#'" />
         <xsl:param name="acpoolFilter" select="'#$#null#$#'" />
 
-        <xsl:variable name="tmpURL" select="concat($WebApplicationBaseURL, 'modules/module-ACL-editor/web/editor/editor-ACL_start.xml')" />
+        <xsl:variable name="tmpURL" select="concat($WebApplicationBaseURL, 'servlets/MCRACLEditorServlet_v2?mode=getACLEditor')" />
 
         <xsl:choose>
             <xsl:when test="$objIdFilter='#$#null#$#' and $acpoolFilter='#$#null#$#'">
