@@ -20,7 +20,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.hibernate.Session;
 
+import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 import org.mycore.datamodel.common.MCRXMLTableManager;
@@ -34,8 +36,8 @@ public class MCRImgCacheCommands extends MCRAbstractCommands {
     private static final MCRConfiguration CONFIG = MCRConfiguration.instance();
 
     private static Logger LOGGER = Logger.getLogger(MCRImgCacheCommands.class.getName());
-    
-    private static String SUPPORTED_CONTENT_TYPES = CONFIG.getString("MCR.Module-iview.SupportedContentTypes");
+
+    private static String SUPPORTED_CONTENT_TYPES = CONFIG.getString("MCR.Module-iview.SupportedContentTypes").toLowerCase();
 
     private static final int CACHE_WIDTH = CONFIG.getInt("MCR.Module-iview.cache.size.width");
 
@@ -85,14 +87,35 @@ public class MCRImgCacheCommands extends MCRAbstractCommands {
         return returns;
     }
 
-    public static List<String> deleteCache() {
-        MCRXMLTableManager xmlTableManager = MCRXMLTableManager.instance();
-        List<String> derivateList = xmlTableManager.retrieveAllIDs("derivate");
-        List<String> returns = new ArrayList<String>(derivateList.size());
-        for (String derivateID : derivateList) {
-            returns.add("delete image cache for derivate " + derivateID);
+    public static void deleteCache() {
+        MCRDirectory dir = (MCRDirectory) MCRFilesystemNode.getRootNode(MCRImgCacheManager.CACHE_FOLDER);
+
+        if (dir == null) {
+            LOGGER.warn("Cache does not exists.");
         }
-        return returns;
+
+        while (dir != null) {
+            try {
+                LOGGER.debug("Try deleting cache folder.");
+                dir.delete();
+                dir = (MCRDirectory) MCRFilesystemNode.getRootNode(MCRImgCacheManager.CACHE_FOLDER);
+            } catch (Exception e) {
+                LOGGER.info("Maybe inconsistency of image cache! Try to clean up.");
+                Session dbSession = MCRHIBConnection.instance().getSession();
+
+                int deletedEntities = dbSession.createQuery("delete from MCRFSNODES node where node.owner = :owner").setString("owner",
+                        MCRImgCacheManager.CACHE_FOLDER).executeUpdate();
+                dir = (MCRDirectory) MCRFilesystemNode.getRootNode(MCRImgCacheManager.CACHE_FOLDER);
+
+                if (dir != null) {
+                    throw new MCRException("Big mess!!! Send Developer a mail!");
+                }
+                LOGGER.info("Deleted " + deletedEntities + " Entities. Image cache cleaned!");
+            }
+
+        }
+
+        LOGGER.info("Cache deleted!");
     }
 
     public static List<String> cacheDerivate(String ID) {
@@ -157,7 +180,7 @@ public class MCRImgCacheCommands extends MCRAbstractCommands {
         else
             throw new MCRException("File " + ID + " does not exist!");
 
-        if (SUPPORTED_CONTENT_TYPES.indexOf(imgFile.getContentTypeID()) > -1) {
+        if (isSupported(imgFile.getContentTypeID())) {
             MCRImgCacheManager cache = MCRImgCacheManager.instance();
             imgFile.removeAdditionalData("ImageMetaData");
             cache.deleteImage(imgFile);
@@ -175,7 +198,7 @@ public class MCRImgCacheCommands extends MCRAbstractCommands {
                 files.addAll(getSuppFiles(dir));
             } else {
                 MCRFile file = (MCRFile) node;
-                if (SUPPORTED_CONTENT_TYPES.indexOf(file.getContentTypeID()) > -1) {
+                if (isSupported(file.getContentTypeID())) {
                     files.add(file);
                 }
             }
@@ -195,11 +218,10 @@ public class MCRImgCacheCommands extends MCRAbstractCommands {
         try {
             InputStream imgInputStream = image.getContentAsInputStream();
 
-            if (SUPPORTED_CONTENT_TYPES.indexOf(fileType) > -1) {
+            if (isSupported(fileType)) {
                 if (LOGGER.isDebugEnabled()) {
                     LOGGER.debug("MCRImgCacheCommands - " + filename);
                     LOGGER.debug("File type " + fileType + " supported in file list - " + SUPPORTED_CONTENT_TYPES);
-                    LOGGER.debug("Index in file list: " + SUPPORTED_CONTENT_TYPES.indexOf(fileType));
                 }
                 CacheManager cache = MCRImgCacheManager.instance();
                 MCRImgProcessor processor = new MCRImgProcessor();
@@ -288,7 +310,6 @@ public class MCRImgCacheCommands extends MCRAbstractCommands {
                     if (LOGGER.isDebugEnabled()) {
                         LOGGER.debug("MCRImgCacheCommands - " + filename);
                         LOGGER.debug("File type " + fileType + " not supported in file list - " + SUPPORTED_CONTENT_TYPES);
-                        LOGGER.debug("Index in file list: " +SUPPORTED_CONTENT_TYPES.indexOf(fileType));
                     }
                 }
             }
@@ -298,5 +319,9 @@ public class MCRImgCacheCommands extends MCRAbstractCommands {
             LOGGER.error(e);
             LOGGER.info("Loading image " + image.getName() + " failed!");
         }
+    }
+
+    private static boolean isSupported(String fileType) {
+        return SUPPORTED_CONTENT_TYPES.indexOf(fileType.toLowerCase()) > -1;
     }
 }
