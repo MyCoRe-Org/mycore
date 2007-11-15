@@ -169,11 +169,11 @@ public class MCRUserCommands extends MCRAbstractCommands {
      * properties were set, mcradmin with password mycore will be used.
      */
     public static void initSuperuser() throws MCRException {
-        String suser = CONFIG.getString("MCR.Users.Superuser.UserName", "root");
+        String suser = CONFIG.getString("MCR.Users.Superuser.UserName", "administrator");
         String spasswd = CONFIG.getString("MCR.Users.Superuser.UserPasswd", "alleswirdgut");
         String sgroup = CONFIG.getString("MCR.Users.Superuser.GroupName", "admingroup");
-        String guser = CONFIG.getString("MCR.Users.Guestuser.UserName", "gast");
-        String gpasswd = CONFIG.getString("MCR.Users.Guestuser.UserPasswd", "gast");
+        String guser = CONFIG.getString("MCR.Users.Guestuser.UserName", "guest");
+        String gpasswd = CONFIG.getString("MCR.Users.Guestuser.UserPasswd", "guest");
         String ggroup = CONFIG.getString("MCR.Users.Guestuser.GroupName", "guestgroup");
 
         // If CONFIGuration parameter defines that we use password encryption:

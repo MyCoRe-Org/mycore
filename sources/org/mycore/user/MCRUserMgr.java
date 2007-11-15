@@ -135,7 +135,7 @@ public class MCRUserMgr {
             return;
         }
         // For this action you must have list rights.
-        if (!AI.checkPermission("administrate-user") && !session.getCurrentUserID().equals("root")) {
+        if (!AI.checkPermission("administrate-user") && !session.getCurrentUserID().equals("administrator")) {
             locked = false;
             throw new MCRException("The session does not have the permission \"administrate-user\"!");
         }
