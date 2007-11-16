@@ -36,6 +36,7 @@ import javax.xml.transform.sax.TransformerHandler;
 import javax.xml.transform.stream.StreamSource;
 
 import org.apache.log4j.Logger;
+import org.jdom.xpath.XPath;
 import org.mycore.access.MCRAccessInterface;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRConfiguration;
@@ -135,10 +136,12 @@ public class MCRListWorkflowServlet extends MCRServlet {
         ArrayList<String> derderid = new ArrayList<String>();
         ArrayList<String> dermain = new ArrayList<String>();
         ArrayList<String> derlabel = new ArrayList<String>();
+        ArrayList<String> dertitle = new ArrayList<String>();
         org.jdom.Document der_in;
         org.jdom.Element der;
         String mainfile;
         String label;
+        String title;
         String derid;
         String objid;
         String dername;
@@ -153,39 +156,32 @@ public class MCRListWorkflowServlet extends MCRServlet {
 
             try {
                 der_in = MCRXMLHelper.parseURI(sd.toString(), false);
-
                 // LOGGER.debug("Derivate file "+dername+" was readed.");
                 der = der_in.getRootElement();
                 label = der.getAttributeValue("label");
                 derid = der.getAttributeValue("ID");
+                title = "";
 
-                org.jdom.Element s1 = der.getChild("derivate");
-
-                if (s1 != null) {
-                    org.jdom.Element s2 = s1.getChild("linkmetas");
-
-                    if (s2 != null) {
-                        org.jdom.Element s3 = s2.getChild("linkmeta");
-
-                        if (s3 != null) {
-                            objid = s3.getAttributeValue("href", XLINK_NAMESPACE);
-                        }
-                    }
-
-                    s2 = s1.getChild("internals");
-
-                    if (s2 != null) {
-                        org.jdom.Element s3 = s2.getChild("internal");
-
-                        if (s3 != null) {
-                            mainfile = s3.getAttributeValue("maindoc");
-                        }
-                    }
+                XPath objidpath = XPath.newInstance("/mycorederivate/derivate/linkmetas/linkmeta");
+                XPath maindocpath = XPath.newInstance("/mycorederivate/derivate/internals/internal");
+                XPath titlepath = XPath.newInstance("/mycorederivate/derivate/titles/title[lang(\'" + lang + "\')]");
+                for (Object node : objidpath.selectNodes(der_in)) {
+                    org.jdom.Element elm = (org.jdom.Element) node;
+                    objid = elm.getAttributeValue("href", XLINK_NAMESPACE);
+                }
+                for (Object node : maindocpath.selectNodes(der_in)) {
+                    org.jdom.Element elm = (org.jdom.Element) node;
+                    mainfile = elm.getAttributeValue("maindoc");
+                }
+                for (Object node : titlepath.selectNodes(der_in)) {
+                    org.jdom.Element elm = (org.jdom.Element) node;
+                    title = elm.getText();
                 }
 
                 derobjid.add(objid);
                 derderid.add(derid);
                 derlabel.add(label);
+                dertitle.add(title);
                 dermain.add(mainfile);
             } catch (Exception ex) {
                 if (LOGGER.isDebugEnabled()) {
@@ -216,7 +212,7 @@ public class MCRListWorkflowServlet extends MCRServlet {
         // initialize transformer
         MCRXSLTransformation transform = MCRXSLTransformation.getInstance();
         TransformerHandler handler = transform.getTransformerHandler(transform.getStylesheet(new StreamSource(styleFile)));
-        Map<String,String> parameters = new HashMap<String,String>();
+        Map<String, String> parameters = new HashMap<String, String>();
         parameters.put("DefaultLang", DefaultLang);
         parameters.put("CurrentLang", lang);
         MCRXSLTransformation.setParameters(handler, parameters);
@@ -285,6 +281,10 @@ public class MCRListWorkflowServlet extends MCRServlet {
                         org.jdom.Element deriv = new org.jdom.Element("derivate");
                         deriv.setAttribute("ID", (String) derderid.get(j));
                         deriv.setAttribute("label", (String) derlabel.get(j));
+                        title = (String) dertitle.get(j);
+                        if ((title != null) && (title.length() != 0)) {
+                            deriv.setAttribute("title",title);
+                        }
 
                         File dir = new File(dirname, derpath);
                         LOGGER.debug("Derivate under " + dir.getName());
@@ -328,7 +328,7 @@ public class MCRListWorkflowServlet extends MCRServlet {
         }
 
         org.jdom.Document workflow_doc = new org.jdom.Document(root);
-        getLayoutService().doLayout(job.getRequest(),job.getResponse(),workflow_doc);
+        getLayoutService().doLayout(job.getRequest(), job.getResponse(), workflow_doc);
     }
 
     /**

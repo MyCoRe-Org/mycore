@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!-- ============================================== -->
-<!-- $Revision: 1.1 $ $Date: 2007-11-12 09:00:14 $ -->
+<!-- $Revision: 1.2 $ $Date: 2007-11-16 10:50:07 $ -->
 <!-- ============================================== -->
 
 <xsl:stylesheet
@@ -200,7 +200,14 @@
         <table width="100%" cellpadding="0" cellspacing="0">
          <tr>
           <td valign="top" align="left">
-           <xsl:value-of select="@label" />&#160;
+            <xsl:choose>
+              <xsl:when test="@title">
+                <xsl:value-of select="@title" />&#160;
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:value-of select="@label" />&#160;
+              </xsl:otherwise>
+            </xsl:choose>  
           </td>
           <td width="10" />
           <td valign="top" width="30">
