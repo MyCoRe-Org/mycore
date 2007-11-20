@@ -223,7 +223,7 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
     private static String getMainFilePath(MCRDirectory root) {
         MCRDirectory parent = root;
         while (parent.hasChildren()) {
-            MCRFilesystemNode[] children = parent.getChildren();
+            MCRFilesystemNode[] children = parent.getChildren(MCRDirectory.SORT_BY_NAME);
             if (children[0] instanceof MCRDirectory) {
                 parent = (MCRDirectory) children[0];
             }
