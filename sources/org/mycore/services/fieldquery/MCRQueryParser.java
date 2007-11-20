@@ -134,7 +134,7 @@ public class MCRQueryParser extends MCRBooleanClauseParser {
         if (!"date".equals(datatype) && vonbis)
           value = normalizeHistoryDate(oper,value);
         LOGGER.debug(value);
-        if ("date".equals(datatype) && "$today".equals(value))
+        if ("date".equals(datatype) && "TODAY".equals(value))
         {
           value = getToday();
         }
