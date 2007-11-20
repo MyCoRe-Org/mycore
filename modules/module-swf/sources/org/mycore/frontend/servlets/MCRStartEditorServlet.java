@@ -124,7 +124,7 @@ public class MCRStartEditorServlet extends MCRServlet {
 
         protected String mysemcrid = null; // the metadata ID
 
-        protected MCRObjectID tempid = null;
+        protected MCRObjectID mcrmysemcrid = null;
 
         protected String myremcrid = null; // the metadata ID
 
@@ -229,7 +229,7 @@ public class MCRStartEditorServlet extends MCRServlet {
             cd.mysemcrid = "";
         } else {
             try {
-                cd.tempid = new MCRObjectID(cd.mysemcrid);
+                cd.mcrmysemcrid = new MCRObjectID(cd.mysemcrid);
             } catch (Exception e) {
                 cd.mysemcrid = "";
             }
@@ -1091,7 +1091,7 @@ public class MCRStartEditorServlet extends MCRServlet {
 
         // read file
         StringBuffer sb = new StringBuffer();
-        sb.append(CONFIG.getString("MCR.SWF.Directory." + cd.tempid.getTypeId())).append(SLASH).append(cd.mysemcrid).append(".xml");
+        sb.append(CONFIG.getString("MCR.SWF.Directory." + cd.mcrmysemcrid.getTypeId())).append(SLASH).append(cd.mysemcrid).append(".xml");
         org.jdom.Element service = null;
         try {
             File fi = new File(sb.toString());
