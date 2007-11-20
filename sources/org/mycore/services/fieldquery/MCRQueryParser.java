@@ -24,6 +24,7 @@
 package org.mycore.services.fieldquery;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
@@ -93,23 +94,23 @@ public class MCRQueryParser extends MCRBooleanClauseParser {
                 oc.addChild(buildConditions(st.nextToken(), oper, value));
             return oc;
         } else if (field.contains("-")) 
-        { // MCRMetaHistoryDate condition von-bis
+        { // date and MCRMetaHistoryDate condition von-bis
             StringTokenizer st = new StringTokenizer(field, "- ");
             String fieldFrom = st.nextToken();
             String fieldTo = st.nextToken();
             if (oper.equals("=")) {
                 // von-bis = x --> (von <= x) AND (bis >= x)
                 MCRAndCondition ac = new MCRAndCondition();
-                ac.addChild(buildCondition(fieldFrom, "<=", normalizeHistoryDate("<=",value)));
-                ac.addChild(buildCondition(fieldTo, ">=", normalizeHistoryDate(">=",value)));
+                ac.addChild(buildCondition(fieldFrom, "<=", value, true));
+                ac.addChild(buildCondition(fieldTo, ">=", value, true ));
                 return ac;
             } else if (oper.contains("<"))
-                return buildCondition(fieldFrom, oper, normalizeHistoryDate(oper,value));
+                return buildCondition(fieldFrom, oper, value, true);
             else
                 // oper.contains( ">" )
-                return buildCondition(fieldTo, oper, normalizeHistoryDate(oper,value));
+                return buildCondition(fieldTo, oper, value, true);
         } else
-            return buildCondition(field, oper, value);
+            return buildCondition(field, oper, value, false);
     }
 
     /**
@@ -121,13 +122,39 @@ public class MCRQueryParser extends MCRBooleanClauseParser {
      *            the condition operator
      * @param value
      *            the condition value
+     * @param vonbis
+     *            is a 'from to' query, used for date and MetaHistoryDate
      * @return
      */
-    private MCRQueryCondition buildCondition(String field, String oper, String value) {
+    private MCRQueryCondition buildCondition(String field, String oper, String value, boolean vonbis) {
         MCRFieldDef def = MCRFieldDef.getDef(field);
         if (def == null)
             throw new MCRParseException("Field not defined: <" + field + ">");
+        String datatype = def.getDataType();
+        if (!"date".equals(datatype) && vonbis)
+          value = normalizeHistoryDate(oper,value);
+        LOGGER.debug(value);
+        if ("date".equals(datatype) && "$today".equals(value))
+        {
+          value = getToday();
+        }
         return new MCRQueryCondition(def, oper, value);
+    }
+    
+    private String getToday()  {
+       GregorianCalendar cal = null;
+       String today = "";
+       int year, month, day;
+
+       cal = new GregorianCalendar();
+
+       year = cal.get(Calendar.YEAR);
+       month = cal.get(Calendar.MONTH) + 1;
+       day = cal.get(Calendar.DAY_OF_MONTH);
+
+       today = String.valueOf(day) + "." + String.valueOf(month) + "." + String.valueOf(year);
+
+       return today;
     }
 
     /** Pattern for MCRQueryConditions expressed as String */
