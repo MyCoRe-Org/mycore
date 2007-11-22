@@ -46,13 +46,13 @@ import org.jdom.input.DOMBuilder;
 public class MCRQueryClientWebService extends MCRQueryClientBase {
 
     /** The AXIS service object */
-    private static Service service = new Service();
+    protected static Service service = new Service();
 
     /** The description of the doQuery service operation */
-    private static OperationDesc operation;
+    protected static OperationDesc operation;
 
     /** The complete WebService URL * */
-    private String endpoint = "";
+    protected String endpoint = "";
 
     static {
         String xmlsoap = "http://xml.apache.org/xml-soap";
