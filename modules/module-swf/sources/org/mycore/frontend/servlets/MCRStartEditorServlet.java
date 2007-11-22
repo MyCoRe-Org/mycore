@@ -113,7 +113,7 @@ public class MCRStartEditorServlet extends MCRServlet {
     protected static String deleteerrorpage = pagedir + CONFIG.getString("MCR.SWF.PageErrorDelete", "editor_error_delete.xml");
 
     // common data
-    private static class CommonData {
+    protected static class CommonData {
         protected String mystep = null; // the special step for todo
 
         protected String mytype = null; // the metadata type
