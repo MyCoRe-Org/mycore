@@ -175,7 +175,7 @@ public class MCRStartEditorServlet extends MCRServlet {
 
         // get the current language
         String mylang = mcrSession.getCurrentLanguage();
-        LOGGER.info("LANG = " + mylang);
+        LOGGER.debug("LANG = " + mylang);
 
         // read the parameter
         // get the step
@@ -183,7 +183,7 @@ public class MCRStartEditorServlet extends MCRServlet {
         if (cd.mystep == null) {
             cd.mystep = "";
         }
-        LOGGER.info("STEP = " + cd.mystep);
+        LOGGER.debug("STEP = " + cd.mystep);
 
         // get the type
         cd.mytype = getProperty(job.getRequest(), "type");
@@ -193,21 +193,21 @@ public class MCRStartEditorServlet extends MCRServlet {
         if (cd.mytype.length() == 0) {
             cd.mytype = CONFIG.getString("MCR.SWF.Project.Type", "document");
         }
-        LOGGER.info("TYPE = " + cd.mytype);
+        LOGGER.debug("TYPE = " + cd.mytype);
 
         // get the layout
         String mylayout = getProperty(job.getRequest(), "layout");
         if (mylayout == null) {
             mylayout = "";
         }
-        LOGGER.info("LAYOUT = " + mylayout);
+        LOGGER.debug("LAYOUT = " + mylayout);
 
         // get what is to do
         String mytodo = getProperty(job.getRequest(), "todo");
         if ((mytodo == null) || ((mytodo = mytodo.trim()).length() == 0)) {
             mytodo = "wrongtodo";
         }
-        LOGGER.info("TODO = " + mytodo);
+        LOGGER.debug("TODO = " + mytodo);
 
         // get the MCRObjectID from the text filed (TF)
         cd.mytfmcrid = getProperty(job.getRequest(), "tf_mcrid");
@@ -221,7 +221,7 @@ public class MCRStartEditorServlet extends MCRServlet {
             String myproject = CONFIG.getString("MCR.SWF.Project.ID." + cd.mytype, "MCR");
             cd.mytfmcrid = getNextMCRTFID(myproject, cd.mytype);
         }
-        LOGGER.info("MCRID (TF) = " + cd.mytfmcrid);
+        LOGGER.debug("MCRID (TF) = " + cd.mytfmcrid);
 
         // get the MCRObjectID from the selcet field (SE)
         cd.mysemcrid = getProperty(job.getRequest(), "se_mcrid");
@@ -234,7 +234,7 @@ public class MCRStartEditorServlet extends MCRServlet {
                 cd.mysemcrid = "";
             }
         }
-        LOGGER.info("MCRID (SE) = " + cd.mysemcrid);
+        LOGGER.debug("MCRID (SE) = " + cd.mysemcrid);
 
         // get the MCRObjectID from the relation field (RE)
         cd.myremcrid = getProperty(job.getRequest(), "re_mcrid");
@@ -247,10 +247,10 @@ public class MCRStartEditorServlet extends MCRServlet {
                 cd.myremcrid = "";
             }
         }
-        LOGGER.info("MCRID (RE) = " + cd.myremcrid);
+        LOGGER.debug("MCRID (RE) = " + cd.myremcrid);
 
         // appending parameter
-        cd.extparm = getProperty(job.getRequest(), "cd.extparm");
+        cd.extparm = getProperty(job.getRequest(), "extparm");
         LOGGER.info("EXTPARM = " + cd.extparm);
 
         LOGGER.debug("Base URL : " + getBaseURL());
@@ -626,6 +626,7 @@ public class MCRStartEditorServlet extends MCRServlet {
      * @param ruleelm
      *            The XML access condition from the ACL system
      */
+    @SuppressWarnings("unchecked")
     private final org.jdom.Element normalizeACLforSWF(org.jdom.Element ruleelm) {
         if (LOGGER.isDebugEnabled()) {
             try {
@@ -1223,7 +1224,7 @@ public class MCRStartEditorServlet extends MCRServlet {
 
         // start changes for submitting xml templates
         LOGGER.debug("calling buildXMLTemplate...");
-        Enumeration e = job.getRequest().getParameterNames();
+        Enumeration<?> e = job.getRequest().getParameterNames();
         HashMap<String, String> templatePairs = new HashMap<String, String>();
         while (e.hasMoreElements()) {
             String name = (String) (e.nextElement());
