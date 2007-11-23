@@ -162,7 +162,7 @@ public class MCRFileMetadataManager {
      * @return the MCRFilesystemNode with that ID, or null if no such node
      *         exists.
      */
-    public MCRFilesystemNode retrieveNode(String ID) throws MCRPersistenceException {
+    MCRFilesystemNode retrieveNode(String ID) throws MCRPersistenceException {
         MCRFilesystemNode n = (MCRFilesystemNode) (cache.get(ID));
         return ((n != null) ? n : store.retrieveNode(ID));
     }
@@ -177,7 +177,7 @@ public class MCRFileMetadataManager {
      * @return the MCRFilesystemNode with that owner, or null if no such node
      *         exists.
      */
-    public MCRFilesystemNode retrieveRootNode(String ownerID) throws MCRPersistenceException {
+    MCRFilesystemNode retrieveRootNode(String ownerID) throws MCRPersistenceException {
         String ID = store.retrieveRootNodeID(ownerID);
 
         return ((ID == null) ? null : retrieveNode(ID));
