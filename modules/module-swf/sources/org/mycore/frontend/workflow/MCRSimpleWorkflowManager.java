@@ -81,9 +81,9 @@ public class MCRSimpleWorkflowManager {
     static String sender = "";
 
     // table of workflow directories mail addresses
-    private Hashtable ht = null;
+    private Hashtable<String, String> ht = null;
 
-    private Hashtable mt = null;
+    private Hashtable<String, ArrayList<String>> mt = null;
 
     /**
      * Returns the workflow manager singleton.
@@ -106,8 +106,8 @@ public class MCRSimpleWorkflowManager {
         sender = config.getString("MCR.Mail.Address", "mcradmin@localhost");
 
         // int tables
-        ht = new Hashtable();
-        mt = new Hashtable();
+        ht = new Hashtable<String, String>();
+        mt = new Hashtable<String, ArrayList<String>>();
     }
 
     /**
@@ -120,7 +120,7 @@ public class MCRSimpleWorkflowManager {
      */
     public final String getDirectoryPath(String type) {
         if (ht.containsKey(type)) {
-            return (String) ht.get(type);
+            return ht.get(type);
         }
 
         String dirname = config.getString("MCR.SWF.Directory." + type, null);
@@ -147,21 +147,21 @@ public class MCRSimpleWorkflowManager {
      *            the todo action String from the workflow.
      * @return the List of the information mail addresses
      */
-    public final List getMailAddress(String type, String todo) {
+    public final List<String> getMailAddress(String type, String todo) {
         if ((type == null) || ((type = type.trim()).length() == 0)) {
-            return new ArrayList();
+            return new ArrayList<String>();
         }
 
         if ((todo == null) || ((todo = todo.trim()).length() == 0)) {
-            return new ArrayList();
+            return new ArrayList<String>();
         }
 
         if (mt.containsKey(type + "_" + todo)) {
-            return (List) mt.get(type + "_" + todo);
+            return mt.get(type + "_" + todo);
         }
 
         String mailaddr = config.getString("MCR.SWF.Mail." + type + "." + todo, "");
-        ArrayList li = new ArrayList();
+        ArrayList<String> li = new ArrayList<String>();
 
         if ((mailaddr == null) || ((mailaddr = mailaddr.trim()).length() == 0)) {
             mt.put(type, li);
@@ -198,9 +198,9 @@ public class MCRSimpleWorkflowManager {
      *            the MCRObjectID type attribute
      * @return an ArrayList of file names
      */
-    public final ArrayList getAllObjectFileNames(String type) {
+    public final ArrayList<String> getAllObjectFileNames(String type) {
         String dirname = getDirectoryPath(type);
-        ArrayList workfiles = new ArrayList();
+        ArrayList<String> workfiles = new ArrayList<String>();
 
         if (!dirname.equals(".")) {
             File dir = new File(dirname);
@@ -232,9 +232,9 @@ public class MCRSimpleWorkflowManager {
      *            the MCRObjectID type attribute
      * @return an ArrayList of file names
      */
-    public final ArrayList getAllDerivateFileNames(String type) {
+    public final ArrayList<String> getAllDerivateFileNames(String type) {
         String dirname = getDirectoryPath(type);
-        ArrayList workfiles = new ArrayList();
+        ArrayList<String> workfiles = new ArrayList<String>();
 
         if (!dirname.equals(".")) {
             File dir = new File(dirname);
@@ -343,10 +343,10 @@ public class MCRSimpleWorkflowManager {
         }
 
         // remove derivate
-        ArrayList derifiles = getAllDerivateFileNames(type);
+        ArrayList<String> derifiles = getAllDerivateFileNames(type);
 
         for (int i = 0; i < derifiles.size(); i++) {
-            String dername = (String) derifiles.get(i);
+            String dername = derifiles.get(i);
             logger.debug("Check the derivate file " + dername);
 
             if (isDerivateOfObject(type, dername, ID)) {
@@ -363,6 +363,7 @@ public class MCRSimpleWorkflowManager {
      * @param id
      *            the MCRObjectID of the derivate object as String
      */
+    @SuppressWarnings("unchecked")
     public final void deleteDerivateObject(String type, String id) {
         logger.debug("Delete the derivate " + id);
 
@@ -455,10 +456,10 @@ public class MCRSimpleWorkflowManager {
             return false;
         }
 
-        ArrayList derifiles = getAllDerivateFileNames(type);
+        ArrayList<String> derifiles = getAllDerivateFileNames(type);
 
         for (int i = 0; i < derifiles.size(); i++) {
-            String dername = (String) derifiles.get(i);
+            String dername = derifiles.get(i);
             logger.debug("Check the derivate file " + dername);
 
             if (isDerivateOfObject(type, dername, ID)) {
@@ -659,6 +660,7 @@ public class MCRSimpleWorkflowManager {
      *            the permission for the ACL system
      * @return the XML tree of the condition
      */
+    @SuppressWarnings("unchecked")
     public final org.jdom.Element getRuleFromFile(String id, String permission) {
         // read data
         MCRObjectID mcrid = new MCRObjectID(id);
