@@ -111,7 +111,9 @@ public class MCRObjectDerivate {
                 MCRMetaLangText text = new MCRMetaLangText();
                 text.setDataPart("title");
                 text.setFromDOM(title_element);
-                titles.add(text);
+                if (text.isValid()) {
+                    titles.add(text);
+                }
             }            
         }
     }
