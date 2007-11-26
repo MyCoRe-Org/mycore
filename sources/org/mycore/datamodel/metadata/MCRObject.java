@@ -452,10 +452,10 @@ final public class MCRObject extends MCRBase {
 
             try {
                 der.deleteFromDatastore(getStructure().getDerivate(i).getXLinkHref());
-            } catch (MCRException e) {
+            } catch (Exception e) {
                 logger.debug(MCRException.getStackTraceAsString(e));
                 logger.error(e.getMessage());
-                logger.error("Error while deleting derivate.");
+                logger.error("Error while deleting derivate"+getStructure().getDerivate(i).getXLinkHref()+".");
             }
         }
 
