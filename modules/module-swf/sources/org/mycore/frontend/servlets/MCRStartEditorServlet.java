@@ -54,6 +54,7 @@ import org.mycore.datamodel.metadata.MCRMetaNBN;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.MCRObjectService;
+import org.mycore.frontend.MCRWebsiteWriteProtection;
 import org.mycore.frontend.fileupload.MCRUploadHandlerIFS;
 import org.mycore.frontend.fileupload.MCRUploadHandlerMyCoRe;
 import org.mycore.frontend.workflow.MCRSimpleWorkflowManager;
@@ -168,6 +169,9 @@ public class MCRStartEditorServlet extends MCRServlet {
      * <br />
      */
     public void doGetPost(MCRServletJob job) throws Exception {
+        
+        MCRWebsiteWriteProtection.verifyAccess(job.getRequest(), job.getResponse());
+        
         // get the MCRSession object for the current thread from the session
         // manager.
         MCRSession mcrSession = MCRSessionMgr.getCurrentSession();

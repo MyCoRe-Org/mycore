@@ -34,6 +34,7 @@ import org.apache.log4j.Logger;
 import org.jdom.Document;
 
 import org.mycore.common.MCRConfiguration;
+import org.mycore.frontend.MCRWebsiteWriteProtection;
 import org.mycore.services.i18n.MCRTranslation;
 import org.mycore.user.MCRGroup;
 import org.mycore.user.MCRUser;
@@ -62,7 +63,7 @@ public class MCRUserAjaxServlet extends MCRServlet {
      * the group
      */
     public void doGetPost(MCRServletJob job) throws IOException {
-
+        MCRWebsiteWriteProtection.verifyAccess(job.getRequest(), job.getResponse());
         try {
             String mode = getProperty(job.getRequest(), "mode");
             String username = getProperty(job.getRequest(), "user");
@@ -103,14 +104,14 @@ public class MCRUserAjaxServlet extends MCRServlet {
             }
         } catch (Exception e) {
             generateErrorPage(job.getRequest(), job.getResponse(), HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage(), e, false);
-        }        
+        }
     }
 
     @SuppressWarnings("unchecked")
     private void completeDelete(MCRServletJob job, String groupName) throws Exception {
         MCRGroup group = MCRUserMgr.instance().retrieveGroup(groupName);
         Boolean primaryGroup = false;
-        ArrayList<String> primaryUsers=new ArrayList<String>();
+        ArrayList<String> primaryUsers = new ArrayList<String>();
 
         // Copy the current MemberUserList in a temporary copy to avoid
         // incomplete delete of all users.
@@ -127,7 +128,7 @@ public class MCRUserAjaxServlet extends MCRServlet {
                 primaryUsers.add(user.toString());
             }
         }
-        
+
         if (!primaryGroup) {
             for (Object user : tempCopy) {
                 LOGGER.info("USER TO BE DELETED: " + user);
@@ -290,11 +291,11 @@ public class MCRUserAjaxServlet extends MCRServlet {
         JSONArray groups = new JSONArray();
         JSONArray error = new JSONArray();
 
-        for (String id:userIDs) {
+        for (String id : userIDs) {
             MCRUser UserToAdd = MCRUserMgr.instance().retrieveUser(id);
-            if(UserToAdd==null)
+            if (UserToAdd == null)
                 LOGGER.info("USERTOADD is NULL");
-            if(UserToAdd.getUserContact()==null)
+            if (UserToAdd.getUserContact() == null)
                 LOGGER.info("USERCONTACT IS NULL");
             JSONObject user = new JSONObject();
             user.put("userID", id);
@@ -302,7 +303,7 @@ public class MCRUserAjaxServlet extends MCRServlet {
             users.put(user);
         }
 
-        for (String groupID:groupsIDs) {
+        for (String groupID : groupsIDs) {
             MCRGroup gruppe = MCRUserMgr.instance().retrieveGroup(groupID);
             ArrayList memUsers = MCRUserMgr.instance().retrieveGroup(groupID).getMemberUserIDs();
             JSONArray memUserList = new JSONArray();

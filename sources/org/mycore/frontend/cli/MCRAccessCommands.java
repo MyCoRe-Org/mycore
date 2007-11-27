@@ -64,38 +64,54 @@ public class MCRAccessCommands extends MCRAbstractCommands {
         MCRCommand com = null;
 
         com = new MCRCommand("load permissions data from file {0}", "org.mycore.frontend.cli.MCRAccessCommands.loadPermissionsFromFile String",
-                "The command loads the permissions data of the access control system with data from the file {0}.");
+                        "The command loads the permissions data of the access control system with data from the file {0}.");
         command.add(com);
 
         com = new MCRCommand("list all permissions", "org.mycore.frontend.cli.MCRAccessCommands.listAllPermissions", "List all permission entries.");
         command.add(com);
 
         com = new MCRCommand("delete all permissions", "org.mycore.frontend.cli.MCRAccessCommands.deleteAllPermissions",
-                "Remove all permission entries from the Access Control System.");
+                        "Remove all permission entries from the Access Control System.");
         command.add(com);
 
         com = new MCRCommand("export all permissions to file {0}", "org.mycore.frontend.cli.MCRAccessCommands.exportAllPermissionsToFile String",
-                "Export all permissions from the Access Control System to the file {0}.");
+                        "Export all permissions from the Access Control System to the file {0}.");
         command.add(com);
 
         com = new MCRCommand("update permission {0} for id {1} with rulefile {2} described by {3}",
-                "org.mycore.frontend.cli.MCRAccessCommands.permissionUpdateForID String String String String",
-                "The command updates access rule for a given id of a given permission with a given special rule");
+                        "org.mycore.frontend.cli.MCRAccessCommands.permissionUpdateForID String String String String",
+                        "The command updates access rule for a given id of a given permission with a given special rule");
         command.add(com);
 
         com = new MCRCommand("update permission {0} for id {1} with rulefile {2}",
-                "org.mycore.frontend.cli.MCRAccessCommands.permissionUpdateForID String String String",
-                "The command updates access rule for a given id of a given permission with a given special rule");
+                        "org.mycore.frontend.cli.MCRAccessCommands.permissionUpdateForID String String String",
+                        "The command updates access rule for a given id of a given permission with a given special rule");
         command.add(com);
 
         com = new MCRCommand("update permission {0} for documentType {1} with rulefile {2} described by {3}",
-                "org.mycore.frontend.cli.MCRAccessCommands.permissionUpdateForDocumentType String String String String",
-                "The command updates access rule for a given permission and all ids of a given MCRObject-Type with a given special rule");
+                        "org.mycore.frontend.cli.MCRAccessCommands.permissionUpdateForDocumentType String String String String",
+                        "The command updates access rule for a given permission and all ids of a given MCRObject-Type with a given special rule");
         command.add(com);
 
         com = new MCRCommand("update permission {0} for documentType {1} with rulefile {2}",
-                "org.mycore.frontend.cli.MCRAccessCommands.permissionUpdateForDocumentType String String String",
-                "The command updates access rule for a given permission and all ids of a given MCRObject-Type with a given special rule");
+                        "org.mycore.frontend.cli.MCRAccessCommands.permissionUpdateForDocumentType String String String",
+                        "The command updates access rule for a given permission and all ids of a given MCRObject-Type with a given special rule");
+        command.add(com);
+
+        com = new MCRCommand(
+                        "set website read only {0}",
+                        "org.mycore.frontend.MCRWebsiteWriteProtection.activate String",
+                        "Usage: <command> <message>, This command set the whole website into read only mode and provides the given message to users. Nobody, except super user can write on system, using web frontend");
+        command.add(com);
+
+        com = new MCRCommand(
+                        "set website read only",
+                        "org.mycore.frontend.MCRWebsiteWriteProtection.activate",
+                        "This command set the whole website into read only mode. An already configurated message will be displayed to users. Nobody, except super user can write on system, using web frontend");
+        command.add(com);
+
+        com = new MCRCommand("unset website read only", "org.mycore.frontend.MCRWebsiteWriteProtection.deactivate",
+                        "This command removes the write protection (read only) from website. After unsetting anybody can write as usual, using web frontend");
         command.add(com);
     }
 

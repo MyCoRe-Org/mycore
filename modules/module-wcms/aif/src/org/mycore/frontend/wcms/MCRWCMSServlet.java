@@ -39,6 +39,7 @@ import org.mycore.access.MCRAccessInterface;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
+import org.mycore.frontend.MCRWebsiteWriteProtection;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
 
@@ -56,6 +57,7 @@ public abstract class MCRWCMSServlet extends MCRServlet {
     protected static final String LOGINSERVLET_URL = getServletBaseURL() + "MCRLoginServlet";
 
     protected void doGetPost(MCRServletJob job) throws Exception {
+        MCRWebsiteWriteProtection.verifyAccess(job.getRequest(), job.getResponse());
         if (accessGeneral()) {
             // set some global required params
             MCRSession session = MCRSessionMgr.getCurrentSession();
