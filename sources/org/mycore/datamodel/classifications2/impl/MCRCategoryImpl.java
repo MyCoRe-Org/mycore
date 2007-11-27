@@ -279,6 +279,18 @@ public class MCRCategoryImpl extends MCRAbstractCategoryImpl implements Serializ
             // don't use setParent() as it call add() from ChildList
             catImpl.parent = parent;
             catImpl.setRoot(root);
+            if (parent != null) {
+                catImpl.level = parent.getLevel() + 1;
+            } else if (category.isCategory()) {
+                LOGGER.warn("Something went wrong here, category has no parent and is no root category: " + category.getId());
+            }
+            //copy children to temporary list
+            List<MCRCategory> children=new ArrayList<MCRCategory>(catImpl.getChildren().size());
+            children.addAll(catImpl.getChildren());
+            //remove old children
+            catImpl.getChildren().clear();
+            //add new wrapped children
+            catImpl.getChildren().addAll(wrapCategories(children, catImpl, root));
             return catImpl;
         }
         LOGGER.debug("wrap Category: " + category.getId());
@@ -287,6 +299,7 @@ public class MCRCategoryImpl extends MCRAbstractCategoryImpl implements Serializ
         catImpl.labels = category.getLabels();
         catImpl.parent = parent;
         catImpl.setRoot(root);
+        catImpl.level = parent.getLevel() + 1;
         catImpl.children = new ArrayList<MCRCategory>(category.getChildren().size());
         catImpl.getChildren().addAll(wrapCategories(category.getChildren(), catImpl, root));
         return catImpl;
