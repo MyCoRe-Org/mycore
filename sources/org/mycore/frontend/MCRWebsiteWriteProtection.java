@@ -19,21 +19,27 @@ import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.xml.MCRLayoutService;
 import org.mycore.datamodel.metadata.MCRObjectID;
 
-public class MCRWebsiteWriteProtection {
-    static String FS = System.getProperty("file.separator");
+public final class MCRWebsiteWriteProtection {
+    static final private String FS = System.getProperty("file.separator");
 
     static MCRConfiguration MCR_CONFIG = MCRConfiguration.instance();
 
-    static private String CONFIG_FOLDER_PATH = MCR_CONFIG.getString("MCR.datadir") + FS + "config";
+    static final private String CONFIG_FOLDER_PATH = MCR_CONFIG.getString("MCR.datadir") + FS + "config";
 
-    static private String CONFIG_FILE_PATH = new String(CONFIG_FOLDER_PATH + FS + "config-writeProtectionWebsite.xml");
+    static final private String CONFIG_FILE_PATH = new String(CONFIG_FOLDER_PATH + FS + "config-writeProtectionWebsite.xml");
+
+    static final private File CONFIG_FILE = new File(CONFIG_FILE_PATH);
+
+    static private long CONFIG_CACHE_INITTIME = 0;
+
+    static private Element CONFIG_CACHE = null;
 
     /**
      * speed up the check
      * 
      * @return true if write access is currently active, false if not
      */
-    public static boolean isActive() {
+    public final static boolean isActive() {
         // if superuser is online, return false
         String superUser = MCR_CONFIG.getString("MCR.Users.Superuser.UserName");
         if (MCRSessionMgr.getCurrentSession().getCurrentUserID().equals(superUser))
@@ -47,7 +53,7 @@ public class MCRWebsiteWriteProtection {
         return Boolean.valueOf(protection);
     }
 
-    public static org.w3c.dom.Document getMessage() throws JDOMException, IOException {
+    public final static org.w3c.dom.Document getMessage() throws JDOMException, IOException {
         Element config = getConfiguration();
         if (config == null)
             return new DOMOutputter().output(new Document());
@@ -58,24 +64,31 @@ public class MCRWebsiteWriteProtection {
         }
     }
 
-    private static Element getConfiguration() {
+    private final static Element getConfiguration() {
         // try to get file
         File configFolder = new File(CONFIG_FOLDER_PATH);
         if (!configFolder.exists())
             configFolder.mkdir();
         // file exist?, return it's content
-        File configFile = new File(CONFIG_FILE_PATH);
-        if (configFile.exists()) {
-            SAXBuilder builder = new SAXBuilder();
+        if (CONFIG_FILE.exists()) {
             Element config = null;
-            try {
-                config = builder.build(configFile).getRootElement();
-            } catch (JDOMException e) {
-                e.printStackTrace();
-                return null;
-            } catch (IOException e) {
-                e.printStackTrace();
-                return null;
+            // try to get from cache
+            if (cacheValid())
+                config = CONFIG_CACHE;
+            // parse it
+            else {
+                SAXBuilder builder = new SAXBuilder();
+                try {
+                    config = builder.build(CONFIG_FILE).getRootElement();
+                    // update cache
+                    updateCache(config);
+                } catch (JDOMException e) {
+                    e.printStackTrace();
+                    return null;
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    return null;
+                }
             }
             return config;
         } else {
@@ -86,18 +99,26 @@ public class MCRWebsiteWriteProtection {
         }
     }
 
-    private static void setConfiguration(Element configXML) {
+    private final static void setConfiguration(Element configXML) {
         try {
             // save
             XMLOutputter xmlOut = new XMLOutputter();
-            File configFile = new File(CONFIG_FILE_PATH);
-            FileOutputStream fos = new FileOutputStream(configFile);
+            FileOutputStream fos = new FileOutputStream(CONFIG_FILE);
             xmlOut.output(configXML, fos);
             fos.flush();
             fos.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
+        updateCache(configXML);
+    }
+
+    /**
+     * @param configXML
+     */
+    private static void updateCache(Element configXML) {
+        CONFIG_CACHE = configXML;
+        CONFIG_CACHE_INITTIME = System.currentTimeMillis();
     }
 
     private static Element configToJDOM(boolean protection, String message) {
@@ -108,7 +129,7 @@ public class MCRWebsiteWriteProtection {
     }
 
     // to be used by cli
-    public static void activate() {
+    public final static void activate() {
         // create file, set param in file to true, add message to file
         Element config = getConfiguration();
         config.getChild("protectionEnabled").setText("true");
@@ -116,7 +137,7 @@ public class MCRWebsiteWriteProtection {
     }
 
     // to be used by cli
-    public static void activate(String message) {
+    public final static void activate(String message) {
         // create file, set param in file to true, add message to file
         Element config = getConfiguration();
         config.getChild("protectionEnabled").setText("true");
@@ -125,20 +146,31 @@ public class MCRWebsiteWriteProtection {
     }
 
     // to be used by cli
-    public static void deactivate() {
+    public final static void deactivate() {
         // set param in file to false
         Element config = getConfiguration();
         config.getChild("protectionEnabled").setText("false");
         setConfiguration(config);
     }
 
-    public static void verifyAccess(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public final static void verifyAccess(HttpServletRequest request, HttpServletResponse response) throws IOException {
         if (MCRWebsiteWriteProtection.isActive()) {
             response.setStatus(HttpServletResponse.SC_MOVED_TEMPORARILY);
             String pageURL = MCR_CONFIG.getString("MCR.baseurl") + MCR_CONFIG.getString("MCR.WriteProtectionWebsite.ErrorPage");
             response.sendRedirect(response.encodeRedirectURL(pageURL));
         }
+    }
 
+    /**
+     * Verifies if the cache of configuration is valid.
+     * 
+     * @return true if valid, false if note
+     */
+    private final static boolean cacheValid() {
+        if ((CONFIG_CACHE == null) || (CONFIG_CACHE_INITTIME < CONFIG_FILE.lastModified()))
+            return false;
+        else
+            return true;
     }
 
 }
