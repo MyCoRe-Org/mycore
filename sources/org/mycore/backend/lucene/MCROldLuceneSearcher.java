@@ -23,11 +23,9 @@
 
 package org.mycore.backend.lucene;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Iterator;
 import java.util.Enumeration;
@@ -49,8 +47,6 @@ import org.apache.lucene.search.TermQuery;
 import org.jdom.Element;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
-import org.mycore.common.MCRNormalizer;
-import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.parsers.bool.MCRCondition;
 import org.mycore.services.fieldquery.MCRFieldDef;
 import org.mycore.services.fieldquery.MCRFieldValue;
@@ -105,23 +101,6 @@ public class MCROldLuceneSearcher extends MCRSearcher {
             throw new org.mycore.common.MCRConfigurationException(msg);
         }
 
-        LOCK_DIR = config.getString("MCR.Lucene.LockDir");
-        LOGGER.info("MCR.Lucene.LockDir: " + LOCK_DIR);
-        f = new File(LOCK_DIR);
-        if (!f.exists())
-            f.mkdirs();
-        if (!f.isDirectory()) {
-            String msg = LOCK_DIR + " is not a directory!";
-            throw new org.mycore.common.MCRConfigurationException(msg);
-        }
-        if (!f.canWrite()) {
-            String msg = LOCK_DIR + " is not writeable!";
-            throw new org.mycore.common.MCRConfigurationException(msg);
-        }
-
-        System.setProperty("org.apache.lucene.lockDir", LOCK_DIR);
-        deleteLuceneLocks(LOCK_DIR, 0);
-
         try {
             IndexWriter writer = getLuceneWriter(IndexDir, FIRST);
             FIRST = false;
@@ -147,30 +126,6 @@ public class MCROldLuceneSearcher extends MCRSearcher {
             }
         }
 
-    }
-
-    private static void deleteLuceneLocks(String lockDir, long age) {
-        File file = new File(lockDir);
-
-        GregorianCalendar cal = new GregorianCalendar();
-
-        File f[] = file.listFiles();
-        for (int i = 0; i < f.length; i++) {
-            if (!f[i].isDirectory()) {
-                String n = f[i].getName().toLowerCase();
-                if (n.startsWith("lucene") && n.endsWith(".lock")) {
-                    long l = (cal.getTimeInMillis() - f[i].lastModified()) / 1000; // age
-                                                                                    // of
-                                                                                    // file
-                                                                                    // in
-                                                                                    // seconds
-                    if (l > age) {
-                        LOGGER.info("Delete lucene lock file " + f[i].getAbsolutePath() + " Age " + l);
-                        f[i].delete();
-                    }
-                }
-            }
-        }
     }
 
     public void addToIndex(String entryID, String returnID, List fields) {
@@ -250,8 +205,13 @@ public class MCROldLuceneSearcher extends MCRSearcher {
      */
     private static synchronized void addDocumentToLucene(Document doc, Analyzer analyzer, String indexDir, boolean first) throws Exception {
         IndexWriter writer = getLuceneWriter(indexDir, first);
-        writer.addDocument(doc, analyzer);
-        writer.close();
+        try
+        {
+          writer.addDocument(doc, analyzer);
+        } finally 
+        {
+          writer.close();
+        }
     }
 
     /**
@@ -380,7 +340,6 @@ public class MCROldLuceneSearcher extends MCRSearcher {
         } catch (IOException e) {
             LOGGER.error(e.getClass().getName() + ": " + e.getMessage());
             LOGGER.error(MCRException.getStackTraceAsString(e));
-            deleteLuceneLocks(LOCK_DIR, 100);
         }
 
         Hits hits = searcher.search( luceneQuery );
