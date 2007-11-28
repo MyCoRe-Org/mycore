@@ -34,6 +34,7 @@ import org.apache.log4j.Logger;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
+import org.mycore.frontend.MCRWebsiteWriteProtection;
 import org.mycore.frontend.editor.MCREditorSubmission;
 import org.mycore.frontend.editor.MCRRequestParameters;
 import org.mycore.user.MCRGroup;
@@ -76,6 +77,8 @@ public class MCRUserEditorServlet extends MCRUserAdminGUICommons {
      *             for errors from the servlet engine.
      */
     public void doGetPost(MCRServletJob job) throws IOException {
+
+        MCRWebsiteWriteProtection.verifyAccess(job.getRequest(), job.getResponse());
 
         String mode = getProperty(job.getRequest(), "mode");
 
@@ -166,7 +169,7 @@ public class MCRUserEditorServlet extends MCRUserAdminGUICommons {
 
         for (int i = 0; i < groupIDs.size(); i++) {
             org.jdom.Element item = new org.jdom.Element("item").setAttribute("value", (String) groupIDs.get(i))
-                    .setAttribute("label", (String) groupIDs.get(i));
+                            .setAttribute("label", (String) groupIDs.get(i));
             root.addContent(item);
         }
 
@@ -224,7 +227,7 @@ public class MCRUserEditorServlet extends MCRUserAdminGUICommons {
 
         for (int i = 0; i < groupIDs.size(); i++) {
             org.jdom.Element item = new org.jdom.Element("item").setAttribute("value", (String) groupIDs.get(i))
-                    .setAttribute("label", (String) groupIDs.get(i));
+                            .setAttribute("label", (String) groupIDs.get(i));
             root.addContent(item);
         }
 

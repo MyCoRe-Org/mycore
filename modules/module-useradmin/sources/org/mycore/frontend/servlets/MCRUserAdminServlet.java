@@ -29,6 +29,8 @@ import java.util.Properties;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
 
+import org.mycore.frontend.MCRWebsiteWriteProtection;
+
 /**
  * This servlet controls the web interface for the editors of the user
  * management of the mycore system.
@@ -60,6 +62,9 @@ public class MCRUserAdminServlet extends MCRUserAdminGUICommons {
      *             for java I/O errors.
      */
     public void doGetPost(MCRServletJob job) throws IOException {
+
+        MCRWebsiteWriteProtection.verifyAccess(job.getRequest(), job.getResponse());
+
         // Read the mode from the HTTP request, dispatch to subsequent methods
         String mode = getProperty(job.getRequest(), "mode");
 
@@ -73,10 +78,10 @@ public class MCRUserAdminServlet extends MCRUserAdminGUICommons {
             modifyUser(job);
         } else if (mode.equals("listalluser")) {
             listallUser(job);
-        }else if (mode.equals("newgroup")) {
-        	createGroup(job);
-        }else if (mode.equals("modifygroup")){
-        	modifyGroup(job);
+        } else if (mode.equals("newgroup")) {
+            createGroup(job);
+        } else if (mode.equals("modifygroup")) {
+            modifyGroup(job);
         } else { // no valid mode
 
             String msg = "The request did not contain a valid mode for this servlet!";
@@ -111,10 +116,10 @@ public class MCRUserAdminServlet extends MCRUserAdminGUICommons {
 
         return;
     }
-    
+
     /**
-     * This method handles the create group use case. The MyCoRe editor framework
-     * is used to obtain an XML representation of a new group account.
+     * This method handles the create group use case. The MyCoRe editor
+     * framework is used to obtain an XML representation of a new group account.
      * 
      * @param job
      *            The MCRServletJob instance
@@ -137,7 +142,7 @@ public class MCRUserAdminServlet extends MCRUserAdminGUICommons {
         job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(buildRedirectURL(base, params)));
 
         return;
-    }    
+    }
 
     /**
      * This method handles the list all users use case. The result is the XML of
@@ -185,7 +190,7 @@ public class MCRUserAdminServlet extends MCRUserAdminGUICommons {
 
         return;
     }
-    
+
     /**
      * This method is still experimental !
      */
@@ -207,5 +212,5 @@ public class MCRUserAdminServlet extends MCRUserAdminGUICommons {
         job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(buildRedirectURL(base, params)));
 
         return;
-    }    
+    }
 }

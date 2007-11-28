@@ -31,6 +31,7 @@ import org.jdom.Document;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
+import org.mycore.frontend.MCRWebsiteWriteProtection;
 import org.mycore.user.MCRUser;
 import org.mycore.user.MCRUserMgr;
 
@@ -56,8 +57,8 @@ public class MCRUserServlet extends MCRServlet {
      */
     public void init() throws ServletException {
         super.init();
-        GUEST_ID = CONFIG.getString("MCR.Users.Guestuser.UserName","gast");
-        GUEST_PWD = CONFIG.getString("MCR.Users.Guestuser.UserPasswd","gast");
+        GUEST_ID = CONFIG.getString("MCR.Users.Guestuser.UserName", "gast");
+        GUEST_PWD = CONFIG.getString("MCR.Users.Guestuser.UserPasswd", "gast");
     }
 
     /**
@@ -80,8 +81,10 @@ public class MCRUserServlet extends MCRServlet {
         }
 
         if (mode.equals("ChangePwd")) {
+            MCRWebsiteWriteProtection.verifyAccess(job.getRequest(), job.getResponse());
             changePwd(job);
         } else if (mode.equals("CreatePwdDialog")) {
+            MCRWebsiteWriteProtection.verifyAccess(job.getRequest(), job.getResponse());
             createPwdDialog(job);
         } else if (mode.equals("Select")) {
             selectTask(job);
@@ -92,7 +95,7 @@ public class MCRUserServlet extends MCRServlet {
             String backto_url = getProperty(job.getRequest(), "url");
 
             if (backto_url.length() == 0) {
-            	return;
+                return;
             }
             job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(backto_url));
             return;
@@ -224,8 +227,8 @@ public class MCRUserServlet extends MCRServlet {
     }
 
     /**
-     * creates a jdom document with elements needed by all modes this
-     * servlet can run.
+     * creates a jdom document with elements needed by all modes this servlet
+     * can run.
      * 
      * @param job
      *            The MCRServletJob instance
@@ -234,11 +237,11 @@ public class MCRUserServlet extends MCRServlet {
     protected org.jdom.Document createJdomDocBase(MCRServletJob job) {
         // Get the MCRSession object for the current thread from the session
         // manager.
-    	String backto_url = null;
-    	String url = job.getRequest().getParameter("url");
-    	if(url != null && url.trim().length() > 0) {
-    		backto_url = url.trim();
-    	}
+        String backto_url = null;
+        String url = job.getRequest().getParameter("url");
+        if (url != null && url.trim().length() > 0) {
+            backto_url = url.trim();
+        }
 
         org.jdom.Element root = new org.jdom.Element("mcr_user");
         org.jdom.Document jdomDoc = new org.jdom.Document(root);
@@ -268,6 +271,6 @@ public class MCRUserServlet extends MCRServlet {
      */
     protected void doLayout(MCRServletJob job, String style, Document jdomDoc) throws IOException {
         job.getRequest().setAttribute("XSL.Style", style);
-        getLayoutService().doLayout(job.getRequest(),job.getResponse(),jdomDoc);
+        getLayoutService().doLayout(job.getRequest(), job.getResponse(), jdomDoc);
     }
 }
