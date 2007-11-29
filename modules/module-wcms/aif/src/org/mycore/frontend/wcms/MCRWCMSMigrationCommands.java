@@ -90,7 +90,7 @@ public class MCRWCMSMigrationCommands extends MCRAbstractCommands {
         // 2.3
         Hashtable ht3 = getUserAndGroups(simulate, ht1, dbOrig);
         // 3.1
-        Hashtable groupDescr_groupID = createGroups(simulate, ht3);
+        Hashtable groupDescr_groupID = createGroups(simulate, ht3, props);
         // 3.2
         assignUsers(simulate, ht3, dbOrig, groupDescr_groupID);
         // 3.3
@@ -164,7 +164,8 @@ public class MCRWCMSMigrationCommands extends MCRAbstractCommands {
         LOGGER.info(getSimText(simulate) + "user assignment to groups finished sucessfully");
     }
 
-    private static Hashtable createGroups(boolean simulate, Hashtable userAndGroups) {
+    private static Hashtable createGroups(boolean simulate, Hashtable userAndGroups, Properties props) {
+        String superUserID = props.getProperty("MCR.Users.Superuser.UserName", "administrator");
         MCRUserMgr uMan = MCRUserMgr.instance();
         int pos = 0;
         Hashtable groupID_groupDes = new Hashtable();
@@ -181,7 +182,7 @@ public class MCRWCMSMigrationCommands extends MCRAbstractCommands {
             MCRGroup mcrGroup = new MCRGroup();
             mcrGroup.setID(mcrGroupID);
             mcrGroup.setDescription(groupName);
-            mcrGroup.addAdminUserID("root");
+            mcrGroup.addAdminUserID(superUserID);
             // store in db
             if (!simulate)
                 uMan.createGroup(mcrGroup);
