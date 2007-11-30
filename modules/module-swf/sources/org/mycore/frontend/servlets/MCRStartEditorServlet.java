@@ -158,7 +158,7 @@ public class MCRStartEditorServlet extends MCRServlet {
      * <li>If the MCRObjectID is not correct it calls
      * <em>editor_error_mcrid.xml</em>.</li>
      * <br />
-     * <li>If a store error is occured it calls <em>editor_error_store.xml</em>.
+     * <li>If a store error is occurred it calls <em>editor_error_store.xml</em>.
      * </li>
      * <br />
      * <li>If <b>CANCEL </b> was pressed it calls <em>editor_cancel.xml</em>.
@@ -227,7 +227,7 @@ public class MCRStartEditorServlet extends MCRServlet {
         }
         LOGGER.debug("MCRID (TF) = " + cd.mytfmcrid);
 
-        // get the MCRObjectID from the selcet field (SE)
+        // get the MCRObjectID from the select field (SE)
         cd.mysemcrid = getProperty(job.getRequest(), "se_mcrid");
         if (cd.mysemcrid == null) {
             cd.mysemcrid = "";
@@ -341,7 +341,7 @@ public class MCRStartEditorServlet extends MCRServlet {
     /**
      * The method start the editor add a file to a derivate object that is
      * stored in the server. The method use the input parameter: <b>type</b>,<b>step</b>
-     * <b>se_mcrid</b> and <b>re_mcrid</b>. Access rigths must be 'writedb'.
+     * <b>se_mcrid</b> and <b>re_mcrid</b>. Access rights must be 'writedb'.
      * 
      * @param job
      *            the MCRServletJob instance
@@ -421,7 +421,7 @@ public class MCRStartEditorServlet extends MCRServlet {
     /**
      * The method delete a derivate object that is stored in the server. The
      * method use the input parameter: <b>type</b>,<b>step</b> and
-     * <b>tf_mcrid</b>. Access rigths must be 'writedb'.
+     * <b>tf_mcrid</b>. Access rights must be 'writedb'.
      * 
      * @param job
      *            the MCRServletJob instance
@@ -449,15 +449,15 @@ public class MCRStartEditorServlet extends MCRServlet {
             cd.myfile = deleteerrorpage;
         }
 
-        List addr = WFM.getMailAddress(cd.mytype, "sdelder");
+        List <String>addr = WFM.getMailAddress(cd.mytype, "sdelder");
 
         if (addr.size() != 0) {
             String sender = WFM.getMailSender();
             String appl = CONFIG.getString("MCR.SWF.Mail.ApplicationID", "DocPortal");
             String subject = "Automatically generated message from " + appl;
             StringBuffer text = new StringBuffer();
-            text.append("Es wurde ein Derivate mit der ID ").append(cd.mysemcrid).append(" des Objektes mit der ID ").append(cd.mysemcrid).append(
-                    " aus dem Server gel�scht.");
+            text.append("The derivate with ID ").append(cd.mysemcrid).append(" from the object with ID ").append(cd.mysemcrid).append(
+                    " was removed from server.");
             LOGGER.info(text.toString());
 
             try {
@@ -472,7 +472,7 @@ public class MCRStartEditorServlet extends MCRServlet {
     /**
      * The method delete a file from a derivate object that is stored in the
      * server. The method use the input parameter: <b>type</b>,<b>step</b>
-     * <b>se_mcrid</b> and <b>re_mcrid</b>. Access rigths must be 'deletedb'.
+     * <b>se_mcrid</b> and <b>re_mcrid</b>. Access rights must be 'deletedb'.
      * 
      * @param job
      *            the MCRServletJob instance
@@ -527,7 +527,7 @@ public class MCRStartEditorServlet extends MCRServlet {
     /**
      * The method delete a metadata object that is stored in the server. The
      * method use the input parameter: <b>type</b>,<b>step</b> and
-     * <b>tf_mcrid</b>. Access rigths must be 'writedb'.
+     * <b>tf_mcrid</b>. Access rights must be 'writedb'.
      * 
      * @param job
      *            the MCRServletJob instance
@@ -556,14 +556,14 @@ public class MCRStartEditorServlet extends MCRServlet {
             cd.myfile = deleteerrorpage;
         }
 
-        List addr = WFM.getMailAddress(cd.mytype, "sdelobj");
+        List <String>addr = WFM.getMailAddress(cd.mytype, "sdelobj");
 
         if (addr.size() != 0) {
             String sender = WFM.getMailSender();
             String appl = CONFIG.getString("MCR.SWF.Mail.ApplicationID", "DocPortal");
             String subject = "Automaticaly message from " + appl;
             StringBuffer text = new StringBuffer();
-            text.append("Es wurde ein Objekt vom Typ ").append(cd.mytype).append(" mit der ID ").append(cd.mytfmcrid).append(" aus dem Server gel�scht.");
+            text.append("The object with type ").append(cd.mytype).append(" with ID ").append(cd.mytfmcrid).append(" was removed from server.");
             LOGGER.info(text.toString());
 
             try {
@@ -578,7 +578,7 @@ public class MCRStartEditorServlet extends MCRServlet {
     /**
      * The method start the editor to modify ACL of a metadata object that is
      * stored in the server. The method use the input parameter: <b>type</b>,<b>step</b>
-     * and <b>tf_mcrid</b>. Access rigths must be 'writedb'.
+     * and <b>tf_mcrid</b>. Access rights must be 'writedb'.
      * 
      * @param job
      *            the MCRServletJob instance
@@ -595,8 +595,7 @@ public class MCRStartEditorServlet extends MCRServlet {
 
         // read object
         MCRObjectService service = new MCRObjectService();
-        // obj.receiveFromDatastore(cd.mysemcrid);
-        List permlist = AI.getPermissionsForID(cd.mysemcrid);
+        List <String>permlist = AI.getPermissionsForID(cd.mysemcrid);
         for (int i = 0; i < permlist.size(); i++) {
             org.jdom.Element ruleelm = AI.getRule(cd.mysemcrid, (String) permlist.get(i));
             ruleelm = normalizeACLforSWF(ruleelm);
@@ -624,7 +623,7 @@ public class MCRStartEditorServlet extends MCRServlet {
 
     /**
      * Normalize the ACL to use in the SWF ACL editor. Some single conditions
-     * are one step to high in the hierarchie of the conditin tree. This method
+     * are one step to high in the hierarchy of the condition tree. This method
      * move it down and normalized the output.
      * 
      * @param ruleelm
@@ -721,7 +720,7 @@ public class MCRStartEditorServlet extends MCRServlet {
     /**
      * The method start the editor to modify a derivate object that is stored in
      * the server. The method use the input parameter: <b>type</b>,<b>step</b>
-     * <b>se_mcrid</b> and <b>se_mcrid</b>. Access rigths must be 'writedb'.
+     * <b>se_mcrid</b> and <b>se_mcrid</b>. Access rights must be 'writedb'.
      * 
      * @param job
      *            the MCRServletJob instance
@@ -755,7 +754,7 @@ public class MCRStartEditorServlet extends MCRServlet {
     /**
      * The method start the editor to modify a metadata object that is stored in
      * the server. The method use the input parameter: <b>type</b>,<b>step</b>
-     * and <b>tf_mcrid</b>. Access rigths must be 'writedb'.
+     * and <b>tf_mcrid</b>. Access rights must be 'writedb'.
      * 
      * @param job
      *            the MCRServletJob instance
@@ -788,7 +787,7 @@ public class MCRStartEditorServlet extends MCRServlet {
     /**
      * The method set a new derivate object that is stored in the server. The
      * method use the input parameter: <b>type</b>,<b>step</b> <b>se_mcrid</b>
-     * and <b>re_mcrid</b>. Access rigths must be 'writedb'.
+     * and <b>re_mcrid</b>. Access rights must be 'writedb'.
      * 
      * @param job
      *            the MCRServletJob instance
@@ -798,16 +797,15 @@ public class MCRStartEditorServlet extends MCRServlet {
             job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + usererrorpage));
             return;
         }
-
-        cd.mysemcrid = WFM.createDerivateInServer(cd.myremcrid);
         cd.mystep = "addfile";
+        cd.mysemcrid = WFM.getNextDrivateID(new MCRObjectID(cd.myremcrid)).getId();
         saddfile(job, cd);
     }
 
     /**
      * The method set the main file of a derivate object that is stored in the
      * server. The method use the input parameter: <b>type</b>,<b>step</b>
-     * <b>se_mcrid</b> and <b>re_mcrid</b>. Access rigths must be 'writedb'.
+     * <b>se_mcrid</b> and <b>re_mcrid</b>. Access rights must be 'writedb'.
      * 
      * @param job
      *            the MCRServletJob instance
@@ -840,7 +838,7 @@ public class MCRStartEditorServlet extends MCRServlet {
     /**
      * The method start the file upload to add to the metadata object that is
      * stored in the workflow. The method use the input parameter: <b>type</b>,
-     * <b>step</b>, <b>re_mcrid</b> and <b>se_mcrid</b>. Access rigths must
+     * <b>step</b>, <b>re_mcrid</b> and <b>se_mcrid</b>. Access rights must
      * be 'create-'type.
      * 
      * @param job
@@ -874,7 +872,7 @@ public class MCRStartEditorServlet extends MCRServlet {
     /**
      * The method commit a object including all derivates that is stored in the
      * workflow to the server. The method use the input parameter: <b>type</b>,<b>step</b>
-     * and <b>se_mcrid</b>. Access rigths must be 'writedb'.
+     * and <b>se_mcrid</b>. Access rights must be 'writedb'.
      * 
      * @param job
      *            the MCRServletJob instance
@@ -894,15 +892,15 @@ public class MCRStartEditorServlet extends MCRServlet {
             if (WFM.commitMetadataObject(cd.mytype, cd.mysemcrid)) {
                 WFM.deleteMetadataObject(cd.mytype, cd.mysemcrid);
 
-                List addr = WFM.getMailAddress(cd.mytype, "wcommit");
+                List <String>addr = WFM.getMailAddress(cd.mytype, "wcommit");
 
                 if (addr.size() != 0) {
                     String sender = WFM.getMailSender();
                     String appl = CONFIG.getString("MCR.SWF.Mail.ApplicationID", "DocPortal");
                     String subject = "Automaticaly message from " + appl;
                     StringBuffer text = new StringBuffer();
-                    text.append("Es wurde ein Objekt vom Typ ").append(cd.mytype).append(" mit der ID ").append(cd.mysemcrid).append(
-                            " aus dem Workflow in das System geladen.");
+                    text.append("The object of type ").append(cd.mytype).append(" with ID ").append(cd.mysemcrid).append(
+                            " was commited from workflow to the server.");
                     LOGGER.info(text.toString());
 
                     try {
@@ -933,7 +931,7 @@ public class MCRStartEditorServlet extends MCRServlet {
     /**
      * The method delete a derivate from an object that is stored in the
      * workflow. The method use the input parameter: <b>type</b>,<b>step</b>
-     * <b>se_mcrid</b> and <b>re_mcrid</b>. Access rigths must be 'deletewf'.
+     * <b>se_mcrid</b> and <b>re_mcrid</b>. Access rights must be 'deletewf'.
      * 
      * @param job
      *            the MCRServletJob instance
@@ -962,7 +960,7 @@ public class MCRStartEditorServlet extends MCRServlet {
             String appl = CONFIG.getString("MCR.SWF.Mail.ApplicationID", "DocPortal");
             String subject = "Automaticaly message from " + appl;
             StringBuffer text = new StringBuffer();
-            text.append("Es wurde ein Derivate mit der ID ").append(cd.mysemcrid).append(" aus dem Workflow gel�scht.");
+            text.append("The derivate with ID ").append(cd.mysemcrid).append(" was removed from workflow.");
             LOGGER.info(text.toString());
 
             try {
@@ -977,7 +975,7 @@ public class MCRStartEditorServlet extends MCRServlet {
     /**
      * The method delete a file from the derivate object that is stored in the
      * workflow. The method use the input parameter: <b>type</b>,<b>step</b>
-     * <b>se_mcrid</b> and <b>re_mcrid</b>. Access rigths must be 'deletewf'.
+     * <b>se_mcrid</b> and <b>re_mcrid</b>. Access rights must be 'deletewf'.
      * 
      * @param job
      *            the MCRServletJob instance
@@ -1034,7 +1032,7 @@ public class MCRStartEditorServlet extends MCRServlet {
     /**
      * The method delete a metadata object that is stored in the workflow. The
      * method use the input parameter: <b>type</b>,<b>step</b> and
-     * <b>se_mcrid</b>. Access rigths must be 'deletewf'.
+     * <b>se_mcrid</b>. Access rights must be 'deletewf'.
      * 
      * @param job
      *            the MCRServletJob instance
@@ -1056,14 +1054,14 @@ public class MCRStartEditorServlet extends MCRServlet {
         new MCRObjectID(cd.mysemcrid);
         WFM.deleteMetadataObject(cd.mytype, cd.mysemcrid);
 
-        List addr = WFM.getMailAddress(cd.mytype, "wdelobj");
+        List <String>addr = WFM.getMailAddress(cd.mytype, "wdelobj");
 
         if (addr.size() != 0) {
             String sender = WFM.getMailSender();
             String appl = CONFIG.getString("MCR.SWF.Mail.ApplicationID", "DocPortal");
             String subject = "Automaticaly message from " + appl;
             StringBuffer text = new StringBuffer();
-            text.append("Es wurde ein Objekt vom Typ ").append(cd.mytype).append(" mit der ID ").append(cd.mysemcrid).append(" aus dem Workflow gel�scht.");
+            text.append("The object of type ").append(cd.mytype).append(" with ID ").append(cd.mysemcrid).append(" was removed from the workflow.");
             LOGGER.info(text.toString());
 
             try {
@@ -1078,7 +1076,7 @@ public class MCRStartEditorServlet extends MCRServlet {
     /**
      * The method start the editor to modify the metadata object ACL that is
      * stored in the workflow. The method use the input parameter: <b>type</b>,<b>step</b>
-     * and <b>se_mcrid</b>. Access rigths must be 'writewf'.
+     * and <b>se_mcrid</b>. Access rights must be 'writewf'.
      * 
      * @param job
      *            the MCRServletJob instance
@@ -1127,7 +1125,7 @@ public class MCRStartEditorServlet extends MCRServlet {
     /**
      * The method start the editor modify derivate metadata that is stored in
      * the workflow. The method use the input parameter: <b>type</b>,<b>step</b>
-     * <b>re_mcrid</b> and <b>se_mcrid</b>. Access rigths must be 'writewf'.
+     * <b>re_mcrid</b> and <b>se_mcrid</b>. Access rights must be 'writewf'.
      * 
      * @param job
      *            the MCRServletJob instance
@@ -1160,7 +1158,7 @@ public class MCRStartEditorServlet extends MCRServlet {
     /**
      * The method start the editor to modify a metadata object that is stored in
      * the workflow. The method use the input parameter: <b>type</b>,<b>step</b>
-     * and <b>se_mcrid</b>. Access rigths must be 'writewf'.
+     * and <b>se_mcrid</b>. Access rights must be 'writewf'.
      * 
      * @param job
      *            the MCRServletJob instance
@@ -1191,7 +1189,7 @@ public class MCRStartEditorServlet extends MCRServlet {
      * The method build a new derivate and start the file upload to add to the
      * metadata object that is stored in the workflow. The method use the input
      * parameter: <b>type</b>, <b>step</b>, <b>re_mcrid</b> and <b>se_mcrid</b>.
-     * Access rigths must be 'create-'type.
+     * Access rights must be 'create-'type.
      * 
      * @param job
      *            the MCRServletJob instance
@@ -1204,14 +1202,14 @@ public class MCRStartEditorServlet extends MCRServlet {
         }
 
         cd.myremcrid = cd.mysemcrid;
-        cd.mysemcrid = WFM.createDerivateInWorkflow(cd.myremcrid);
+        cd.mysemcrid = WFM.getNextDrivateID(new MCRObjectID(cd.myremcrid)).getId();
         waddfile(job, cd);
     }
 
     /**
      * The method start the editor to create new metadata object that will be
      * stored in the workflow. The method use the input parameter: <b>type</b>,<b>step</b>
-     * and <b>tf_mcrid</b>. Access rigths must be 'create-'type.
+     * and <b>tf_mcrid</b>. Access rights must be 'create-'type.
      * 
      * @param job
      *            the MCRServletJob instance
@@ -1261,7 +1259,7 @@ public class MCRStartEditorServlet extends MCRServlet {
     /**
      * The method start the editor to modify a derivate object that is stored in
      * the workflow. The method use the input parameter: <b>type</b>,<b>step</b>
-     * <b>re_mcrid</b> and <b>se_mcrid</b>. Access rigths must be 'writewf'.
+     * <b>re_mcrid</b> and <b>se_mcrid</b>. Access rights must be 'writewf'.
      * 
      * @param job
      *            the MCRServletJob instance
@@ -1304,7 +1302,7 @@ public class MCRStartEditorServlet extends MCRServlet {
 
     /**
      * This method implements the error exit to <em>index.xml</em> if the
-     * action method was not found or has an error. It implemets the TODO
+     * action method was not found or has an error. It implements the TODO
      * 'wrongtodo'.
      * 
      * @param job

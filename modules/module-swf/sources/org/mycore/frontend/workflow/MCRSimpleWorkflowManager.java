@@ -25,8 +25,6 @@
 package org.mycore.frontend.workflow;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
@@ -509,7 +507,7 @@ public class MCRSimpleWorkflowManager {
      * The method return the next free derivate ID. It looks in the current
      * workflow directory and in the server.
      */
-    private synchronized final MCRObjectID getNextDrivateID(MCRObjectID ID) {
+    public synchronized final MCRObjectID getNextDrivateID(MCRObjectID ID) {
         String myproject = ID.getProjectId() + "_derivate";
         MCRObjectID dmcridnext = new MCRObjectID();
         dmcridnext.setNextFreeId(myproject);
@@ -541,66 +539,6 @@ public class MCRSimpleWorkflowManager {
     /**
      * The method create a new MCRDerivate and store them to the directory of
      * the workflow that correspons with the type of the given object
-     * MCRObjectID with the name of itseslf. Also it create a directory with
-     * the same new name. This new derivate ID will return.
-     * 
-     * @param objmcrid
-     *            the MCRObjectID of the related object
-     * @return the MCRObjectID of the derivate
-     */
-    public final String createDerivateInWorkflow(String objmcrid) {
-        // prepare the derivate MCRObjectID
-        MCRObjectID ID = new MCRObjectID(objmcrid);
-        MCRObjectID DD = getNextDrivateID(ID);
-        logger.debug("New derivate ID " + DD.getId());
-        String workdir = getDirectoryPath(ID.getTypeId());
-
-        // create a new directory
-        String dirname = workdir + File.separator + DD.getId();
-        File dir = new File(dirname);
-        dir.mkdir();
-        logger.debug("Directory " + dirname + " created.");
-
-        // get derivate xml object
-        MCRDerivate der = createDerivate(ID, DD);
-        byte[] outxml = MCRUtils.getByteArray(der.createXML());
-        String fullname = workdir + File.separator + DD.getId() + ".xml";
-        try {
-            FileOutputStream out = new FileOutputStream(fullname);
-            out.write(outxml);
-            out.flush();
-        } catch (IOException ex) {
-            logger.error(ex.getMessage());
-            logger.error("Exception while store to file " + fullname);
-            return "";
-        }
-        logger.info("Derivate " + DD.getId() + " stored under " + fullname + ".");
-        return DD.getId();
-    }
-
-    /**
-     * The method create a new MCRDerivate and store them in the server. This new derivate ID will return.
-     * 
-     * @param objmcrid
-     *            the MCRObjectID of the related object
-     * @return the MCRObjectID of the derivate
-     */
-    public final String createDerivateInServer(String objmcrid) {
-        // prepare the derivate MCRObjectID
-        MCRObjectID ID = new MCRObjectID(objmcrid);
-        MCRObjectID DD = getNextDrivateID(ID);
-        logger.debug("New derivate ID " + DD.getId());
-
-        // get derivate xml object
-        MCRDerivate der = createDerivate(ID, DD);
-        der.updateInDatastore();
-        logger.info("Derivate " + DD.getId() + " stored in server.");
-        return DD.getId();
-    }
-
-    /**
-     * The method create a new MCRDerivate and store them to the directory of
-     * the workflow that correspons with the type of the given object
      * MCRObjectID with the name of itseslf. Also ti create a ne directory with
      * the same new name. This new derivate ID was returned.
      * 
@@ -610,7 +548,7 @@ public class MCRSimpleWorkflowManager {
      *            the flag to show that the data came from a server
      * @return the MCRObjectID of the derivate
      */
-    private final MCRDerivate createDerivate(MCRObjectID ID, MCRObjectID DD) {
+    public final MCRDerivate createDerivate(MCRObjectID ID, MCRObjectID DD) {
         // build the derivate XML file
         MCRDerivate der = new MCRDerivate();
         der.setId(DD);
@@ -625,8 +563,8 @@ public class MCRSimpleWorkflowManager {
         internal.setMainDoc("");
         der.getDerivate().setInternals(internal);
 
+        /*
         MCRObject obj = new MCRObject();
-
         try {
             obj.receiveFromDatastore(ID);
             MCRObjectService serv = obj.getService();
@@ -641,6 +579,7 @@ public class MCRSimpleWorkflowManager {
                 logger.warn("Read error of " + workdir + File.separator + ID.getId() + ".xml");
             }
         }
+        */
         MCRObjectService service = new MCRObjectService();
         org.jdom.Element elm = service.createXML();
         MCREditorOutValidator.setDefaultDerivateACLs(elm);

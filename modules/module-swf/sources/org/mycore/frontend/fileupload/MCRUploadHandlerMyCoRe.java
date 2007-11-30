@@ -34,6 +34,7 @@ import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRUtils;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.frontend.workflow.MCRSimpleWorkflowManager;
 
 /**
  * This class stores files uploaded from the client applet as derivates into the
@@ -41,7 +42,7 @@ import org.mycore.datamodel.metadata.MCRObjectID;
  * 
  * @author Harald Richter
  * @author Jens Kupferschmidt
- * @author Frank Lützenkirchen
+ * @author Frank L\u00fctzenkirchen
  * 
  * @version $Revision$ $Date$
  * 
@@ -79,14 +80,14 @@ public class MCRUploadHandlerMyCoRe extends MCRUploadHandler {
             new MCRObjectID(docId);
             this.docId = docId;
         } catch (Exception e) {
-            logger.debug("Error while creating MCRObjectID.",e);
+            logger.debug("Error while creating MCRObjectID : "+docId,e);
         }
 
         try {
             new MCRObjectID(derId);
             this.derId = derId;
         } catch (Exception e) {
-            logger.debug("Error while creating MCRObjectID.",e);
+            logger.debug("Error while creating MCRObjectID : "+derId,e);
         }
     }
 
@@ -96,7 +97,7 @@ public class MCRUploadHandlerMyCoRe extends MCRUploadHandler {
     public void startUpload(int numFiles) throws Exception {
         MCRObjectID ID = new MCRObjectID(docId);
         MCRConfiguration config = MCRConfiguration.instance();
-        String workdir = config.getString("MCR.editor_" + ID.getTypeId() + "_directory", "/");
+        String workdir = config.getString("MCR.SWF.Directory." + ID.getTypeId() , "/");
         dirname = workdir + File.separator + derId;
     }
 
@@ -107,6 +108,14 @@ public class MCRUploadHandlerMyCoRe extends MCRUploadHandler {
         // convert path
         String fname = path.replace(' ', '_');
         File fdir = null;
+        try {
+            fdir = new File(dirname);
+            if (!fdir.isDirectory()) {
+                fdir.mkdir();
+                logger.debug("Create directory " + dirname);
+            }
+        } catch (Exception e) {
+        }
         String newdir = dirname;
         StringTokenizer st = new StringTokenizer(fname, "/");
         int i = st.countTokens();
@@ -118,7 +127,6 @@ public class MCRUploadHandlerMyCoRe extends MCRUploadHandler {
 
             try {
                 fdir = new File(newdir);
-
                 if (!fdir.isDirectory()) {
                     fdir.mkdir();
                     logger.debug("Create directory " + newdir);
@@ -161,10 +169,21 @@ public class MCRUploadHandlerMyCoRe extends MCRUploadHandler {
      * 
      */
     public void finishUpload() throws Exception {
+        // check for content
+        File fdir = new File(dirname);
+        if (fdir.list().length == 0) {
+            fdir.delete();
+            logger.warn("No file were uploaded, delete directory " + dirname+" and return.");
+            return;
+        }
         // add the mainfile entry
+        MCRDerivate der = new MCRDerivate();
         try {
-            MCRDerivate der = new MCRDerivate();
+            try {
             der.setFromURI(dirname + ".xml");
+            } catch (Exception e) {
+                der = MCRSimpleWorkflowManager.instance().createDerivate(new MCRObjectID(docId), new MCRObjectID(derId));
+            }
 
             if (der.getDerivate().getInternals().getMainDoc().length() == 0) {
                 der.getDerivate().getInternals().setMainDoc(mainfile);
