@@ -220,6 +220,8 @@ function showGroup() {
     	sendRequest(url,showData);
 	}
 	new Draggable(data.gruppe.name,{revert:true,handle:data.gruppe.name+"_link"});
+	url=servletBaseURL+"MCRUserAjaxServlet?mode=users";
+	sendRequest(url,showData);
 }
 //Löschen eines Nutzers
 function deleteUser() {
