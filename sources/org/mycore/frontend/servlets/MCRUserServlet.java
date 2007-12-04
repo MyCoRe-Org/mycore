@@ -85,7 +85,8 @@ public class MCRUserServlet extends MCRServlet {
                 return;
             changePwd(job);
         } else if (mode.equals("CreatePwdDialog")) {
-            MCRWebsiteWriteProtection.printInfoPageIfNoAccess(job.getRequest(), job.getResponse());
+            if (MCRWebsiteWriteProtection.printInfoPageIfNoAccess(job.getRequest(), job.getResponse()))
+                return;
             createPwdDialog(job);
         } else if (mode.equals("Select")) {
             selectTask(job);
