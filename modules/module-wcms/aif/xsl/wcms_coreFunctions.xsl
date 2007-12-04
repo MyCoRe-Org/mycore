@@ -139,7 +139,14 @@
             <div class="rightmenu">
                 <ul class="menu">
                     <li>
-                        <a href="{$WebApplicationBaseURL}">
+                        <xsl:variable name="exitAddress">
+                            <xsl:call-template name="UrlSetParam">
+                                <xsl:with-param name="url" select="concat($WebApplicationBaseURL, $loaded_navigation_xml/@hrefStartingPage)" />
+                                <xsl:with-param name="par" select="'XSL.lastPage.SESSION'" />
+                                <xsl:with-param name="value" select="$loaded_navigation_xml/@hrefStartingPage" />
+                            </xsl:call-template>
+                        </xsl:variable>
+                        <a href="{$exitAddress}">
                             <xsl:value-of select="i18n:translate('wcms.labels.close')" />
                         </a>
                     </li>
@@ -155,8 +162,8 @@
                             <a href="{$ServletsBaseURL}MCRWCMSAdminServlet{$JSessionID}?action=choose">
                                 <xsl:if test="$menupunkt='Bearbeiten'">
                                     <xsl:attribute name="class">
-										<xsl:value-of select="'current'" />
-									</xsl:attribute>
+                                        <xsl:value-of select="'current'" />
+                                    </xsl:attribute>
                                 </xsl:if>
                                 <xsl:value-of select="i18n:translate('wcms.labels.edit')" />
                             </a>
@@ -175,8 +182,8 @@
                             <a href="{$ServletsBaseURL}MCRWCMSAdminServlet{$JSessionID}?action=managGlobal">
                                 <xsl:if test="$menupunkt='Einstellungen'">
                                     <xsl:attribute name="class">
-										<xsl:value-of select="'current'" />
-									</xsl:attribute>
+                                        <xsl:value-of select="'current'" />
+                                    </xsl:attribute>
                                 </xsl:if>
                                 <xsl:value-of select="i18n:translate('wcms.setup')" />
                             </a>
@@ -185,8 +192,8 @@
                             <a href="{$ServletsBaseURL}MCRWCMSAdminServlet{$JSessionID}?action=logs&amp;sort=date&amp;sortOrder=descending">
                                 <xsl:if test="$menupunkt='Statistik'">
                                     <xsl:attribute name="class">
-										<xsl:value-of select="'current'" />
-									</xsl:attribute>
+                                        <xsl:value-of select="'current'" />
+                                    </xsl:attribute>
                                 </xsl:if>
                                 <xsl:value-of select="i18n:translate('wcms.stats')" />
                             </a>
