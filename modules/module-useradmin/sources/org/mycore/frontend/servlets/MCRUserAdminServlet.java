@@ -63,7 +63,8 @@ public class MCRUserAdminServlet extends MCRUserAdminGUICommons {
      */
     public void doGetPost(MCRServletJob job) throws IOException {
 
-        MCRWebsiteWriteProtection.verifyAccess(job.getRequest(), job.getResponse());
+        if (MCRWebsiteWriteProtection.printInfoPageIfNoAccess(job.getRequest(), job.getResponse()))
+            return;
 
         // Read the mode from the HTTP request, dispatch to subsequent methods
         String mode = getProperty(job.getRequest(), "mode");

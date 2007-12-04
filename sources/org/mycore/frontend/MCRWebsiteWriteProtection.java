@@ -153,12 +153,14 @@ public final class MCRWebsiteWriteProtection {
         setConfiguration(config);
     }
 
-    public final static void verifyAccess(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public final static boolean printInfoPageIfNoAccess(HttpServletRequest request, HttpServletResponse response) throws IOException {
         if (MCRWebsiteWriteProtection.isActive()) {
             response.setStatus(HttpServletResponse.SC_MOVED_TEMPORARILY);
             String pageURL = MCR_CONFIG.getString("MCR.baseurl") + MCR_CONFIG.getString("MCR.WriteProtectionWebsite.ErrorPage");
             response.sendRedirect(response.encodeRedirectURL(pageURL));
+            return true;
         }
+        return false;
     }
 
     /**

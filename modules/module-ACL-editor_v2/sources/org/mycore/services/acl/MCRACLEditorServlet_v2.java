@@ -19,7 +19,9 @@ import org.mycore.backend.hibernate.tables.MCRACCESS;
 import org.mycore.backend.hibernate.tables.MCRACCESSPK;
 import org.mycore.backend.hibernate.tables.MCRACCESSRULE;
 import org.mycore.common.MCRConfigurationException;
+import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.xml.MCRURIResolver;
+import org.mycore.frontend.MCRWebsiteWriteProtection;
 import org.mycore.frontend.editor.MCREditorServlet;
 import org.mycore.frontend.editor.MCREditorSubmission;
 import org.mycore.frontend.servlets.MCRServlet;
@@ -39,6 +41,9 @@ public class MCRACLEditorServlet_v2 extends MCRServlet {
         HttpServletRequest request = job.getRequest();
         HttpServletResponse response = job.getResponse();
         String mode = request.getParameter("mode");
+
+        if (MCRWebsiteWriteProtection.printInfoPageIfNoAccess(request, response))
+            return;
 
         LOGGER.debug("Mode: " + mode);
 

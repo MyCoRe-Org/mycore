@@ -170,7 +170,8 @@ public class MCRStartEditorServlet extends MCRServlet {
      */
     public void doGetPost(MCRServletJob job) throws Exception {
         
-        MCRWebsiteWriteProtection.verifyAccess(job.getRequest(), job.getResponse());
+        if (MCRWebsiteWriteProtection.printInfoPageIfNoAccess(job.getRequest(), job.getResponse()))
+            return;
         
         // get the MCRSession object for the current thread from the session
         // manager.

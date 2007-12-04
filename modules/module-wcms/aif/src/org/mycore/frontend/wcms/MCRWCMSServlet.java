@@ -57,7 +57,8 @@ public abstract class MCRWCMSServlet extends MCRServlet {
     protected static final String LOGINSERVLET_URL = getServletBaseURL() + "MCRLoginServlet";
 
     protected void doGetPost(MCRServletJob job) throws Exception {
-        MCRWebsiteWriteProtection.verifyAccess(job.getRequest(), job.getResponse());
+        if (MCRWebsiteWriteProtection.printInfoPageIfNoAccess(job.getRequest(), job.getResponse()))
+            return;
         if (accessGeneral()) {
             // set some global required params
             MCRSession session = MCRSessionMgr.getCurrentSession();

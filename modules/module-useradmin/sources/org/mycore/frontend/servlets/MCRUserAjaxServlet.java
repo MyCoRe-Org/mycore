@@ -63,7 +63,8 @@ public class MCRUserAjaxServlet extends MCRServlet {
      * the group
      */
     public void doGetPost(MCRServletJob job) throws IOException {
-        MCRWebsiteWriteProtection.verifyAccess(job.getRequest(), job.getResponse());
+        if (MCRWebsiteWriteProtection.printInfoPageIfNoAccess(job.getRequest(), job.getResponse()))
+            return;
         try {
             String mode = getProperty(job.getRequest(), "mode");
             String username = getProperty(job.getRequest(), "user");
