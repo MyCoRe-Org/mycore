@@ -370,7 +370,7 @@ template:
 										</td>
 										<td>
 											<input type="text" size="80"
-												maxlength="200" name="href"
+												maxlength="512" name="href"
 												value=""/>
 										</td>
 									</tr>
