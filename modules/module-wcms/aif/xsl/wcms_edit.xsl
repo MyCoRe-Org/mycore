@@ -389,8 +389,8 @@ template:
 												<!-- external new content -->
 												<xsl:when
 													test="/cms/action = 'add'">
-													<input type="text" size="200"
-														maxlength="256"
+													<input type="text" size="512"
+														maxlength="512"
 														name="href"
 														class="input">
 														<xsl:attribute
