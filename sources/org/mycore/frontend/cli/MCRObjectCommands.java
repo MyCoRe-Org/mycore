@@ -151,6 +151,9 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         
         com = new MCRCommand("check metadata search of type {0}", "org.mycore.frontend.cli.MCRObjectCommands.checkMetadataSearch String", "Checks existence of MCRObjects of type {0} in search index and rapairs missing ones in search index.");
         command.add(com);
+        
+        com = new MCRCommand("set mode {0} of searcher for index {1}", "org.mycore.frontend.cli.MCRObjectCommands.notifySearcher String String", "Notify Searcher of Index {1} what is going on {0}.");
+        command.add(com);
     }
 
     /**
@@ -703,6 +706,8 @@ public class MCRObjectCommands extends MCRAbstractCommands {
             return;
         }
         
+        MCRSearcher searcher = getSearcherForField( "objectType" );
+
         removeFromIndex("objectType", type);
         
         for (String stid : ar) {
@@ -710,6 +715,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
             obj.repairPersitenceDatastore(stid);
             LOGGER.info("Repaired " + stid);
         }
+        
     }
 
     /**
@@ -752,10 +758,16 @@ public class MCRObjectCommands extends MCRAbstractCommands {
     private static final void removeFromIndex(String fieldname, String value)
     {
       MCRFieldDef fd = MCRFieldDef.getDef( fieldname);
-      String index = fd.getIndex();
-      MCRSearcher searcher = MCRSearcherFactory.getSearcherForIndex( index );
+      MCRSearcher searcher = getSearcherForField( fieldname );
       MCRFieldValue fv = new MCRFieldValue(fd, value);
       searcher.clearIndex(fieldname, fv.getValue());
+    }
+    
+    private static final MCRSearcher getSearcherForField(String fieldname)
+    {
+      MCRFieldDef fd = MCRFieldDef.getDef( fieldname);
+      String index = fd.getIndex();
+      return MCRSearcherFactory.getSearcherForIndex( index );
     }
     
     /**
@@ -920,5 +932,21 @@ public class MCRObjectCommands extends MCRAbstractCommands {
 //             obj.repairPersitenceDatastore(stid);
            }
        }
+   }
+   /**
+    * Inform Searcher what is going on.
+    * 
+    * @param mode
+    *            what is going on, for example
+    *            rebuild
+    *            insert
+    *            ...
+    *            finish
+    * @param index
+    *            of searcher            
+    */
+   public static final void notifySearcher(String mode, String index) {
+     MCRSearcher searcher = MCRSearcherFactory.getSearcherForIndex( index );
+     searcher.notifySearcher(mode);
    }
 }
