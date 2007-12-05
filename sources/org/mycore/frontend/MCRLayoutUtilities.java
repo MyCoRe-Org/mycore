@@ -227,9 +227,10 @@ public class MCRLayoutUtilities {
             access = am.checkPermission(objID, permission);
         return access;
     }
-    
+
     /**
-     * Verifies a single item on access according to $permission and for a given user 
+     * Verifies a single item on access according to $permission and for a given
+     * user
      * 
      * @param permission
      * @param item
@@ -244,7 +245,7 @@ public class MCRLayoutUtilities {
         if (am.hasRule(objID, permission))
             access = am.checkPermission(objID, permission, user);
         return access;
-    }    
+    }
 
     /**
      * Verifies if the cache of navigation.xml is valid.
@@ -325,4 +326,13 @@ public class MCRLayoutUtilities {
         return READ_PERMISSION_WEBPAGE;
     }
 
+    public static String getLastValidPageID() {
+        String page = (String) MCRSessionMgr.getCurrentSession().get("lastPageID");
+        return (page == null ? "" : page);
+    }
+
+    public static String setLastValidPageID(String pageID) {
+        MCRSessionMgr.getCurrentSession().put("lastPageID", pageID);
+        return "";
+    }
 }
