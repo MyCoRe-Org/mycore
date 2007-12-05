@@ -139,14 +139,7 @@
             <div class="rightmenu">
                 <ul class="menu">
                     <li>
-                        <xsl:variable name="exitAddress">
-                            <xsl:call-template name="UrlSetParam">
-                                <xsl:with-param name="url" select="concat($WebApplicationBaseURL, $loaded_navigation_xml/@hrefStartingPage)" />
-                                <xsl:with-param name="par" select="'XSL.lastPage.SESSION'" />
-                                <xsl:with-param name="value" select="$loaded_navigation_xml/@hrefStartingPage" />
-                            </xsl:call-template>
-                        </xsl:variable>
-                        <a href="{$exitAddress}">
+                        <a href="{$MCR.baseurl}">
                             <xsl:value-of select="i18n:translate('wcms.labels.close')" />
                         </a>
                     </li>
