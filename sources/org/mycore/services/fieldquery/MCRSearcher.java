@@ -231,4 +231,16 @@ public abstract class MCRSearcher extends MCREventHandlerBase implements MCREven
      */
     public void clearIndex(String fieldname, String value) {
     }
+    
+    /**
+     * Inform Searcher what is going on.
+     * Searcher can use this to speed up indexing. MCRLuceneSearcher for example uses a Ramdirectory
+     *  rebuild
+     *  insert
+     *  ...
+     *  finish
+     */
+    public void notifySearcher(String mode) {
+    }
+    
 }
