@@ -42,13 +42,15 @@ import org.apache.lucene.analysis.de.GermanAnalyzer;
 import org.apache.lucene.analysis.SimpleAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
-import org.apache.lucene.index.IndexModifier;
+import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.Hits;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
+import org.apache.lucene.store.Directory;
+import org.apache.lucene.store.RAMDirectory;
 import org.jdom.Element;
 
 import org.mycore.common.MCRConfiguration;
@@ -76,8 +78,6 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
     /** The logger */
     private final static Logger LOGGER = Logger.getLogger(MCRLuceneSearcher.class);
 
-    static File LOCK_DIR;
-
     static int INT_BEFORE = 10;
 
     static int DEC_BEFORE = 10;
@@ -90,8 +90,14 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
 
     File IndexDir;
 
-    private IndexModifyExecutor modifyExecutor;
-
+    private IndexWriteExecutor modifyExecutor;
+   
+    private boolean useRamDir = false;
+    
+    private RAMDirectory ramDir = null;
+    private IndexWriter writerRamDir;
+    private int ramDirEntries = 0;
+   
     public void init(String ID) {
         super.init(ID);
 
@@ -109,22 +115,6 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
             throw new MCRConfigurationException(msg);
         }
 
-        LOCK_DIR = new File(config.getString("MCR.Lucene.LockDir"));
-        LOGGER.info("MCR.Lucene.LockDir: " + LOCK_DIR);
-        if (!LOCK_DIR.exists())
-            LOCK_DIR.mkdirs();
-        if (!LOCK_DIR.isDirectory()) {
-            String msg = LOCK_DIR + " is not a directory!";
-            throw new MCRConfigurationException(msg);
-        }
-        if (!LOCK_DIR.canWrite()) {
-            String msg = LOCK_DIR + " is not writeable!";
-            throw new MCRConfigurationException(msg);
-        }
-
-        System.setProperty("org.apache.lucene.lockDir", LOCK_DIR.getAbsolutePath());
-        deleteLuceneLocks(LOCK_DIR, 0);
-        
         // is index directory initialized, .....?
         try {
           IndexWriter writer = MCRLuceneTools.getLuceneWriter(config.getString(prefix + "IndexDir"), true);
@@ -137,11 +127,16 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
           LOGGER.error(MCRException.getStackTraceAsString(e));
       }
 
+      deleteLuceneLockFile();
+      
+      long writeLockTimeout = config.getLong( "MCR.Lucene.writeLockTimeout", 5000 );
+      LOGGER.debug( "Property MCR.Lucene.writeLockTimeout: " + writeLockTimeout);
+      IndexWriter.setDefaultWriteLockTimeout(writeLockTimeout);
 
         try {
-            modifyExecutor = new IndexModifyExecutor(new LinkedBlockingQueue<Runnable>(),IndexDir);
+            modifyExecutor = new IndexWriteExecutor(new LinkedBlockingQueue<Runnable>(),IndexDir);
         } catch (Exception e) {
-            throw new MCRException("Cannot start IndexModifier thread.", e);
+            throw new MCRException("Cannot start IndexWriter thread.", e);
         }
         // should work like GermanAnalyzer without stemming and removing of stopwords
         SimpleAnalyzer simpleAnalyzer = new SimpleAnalyzer();
@@ -154,24 +149,22 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
         }
         MCRShutdownHandler.getInstance().addCloseable(this);
     }
+    
+    private void deleteLuceneLockFile()
+    {
+      GregorianCalendar cal = new GregorianCalendar();
 
-    private static void deleteLuceneLocks(File lockDir, long age) {
-        GregorianCalendar cal = new GregorianCalendar();
-
-        File f[] = lockDir.listFiles();
-        for (int i = 0; i < f.length; i++) {
-            if (!f[i].isDirectory()) {
-                String n = f[i].getName().toLowerCase();
-                if (n.startsWith("lucene") && n.endsWith(".lock")) {
-                    // age of file in seconds
-                    long l = (cal.getTimeInMillis() - f[i].lastModified()) / 1000;
-                    if (l > age) {
-                        LOGGER.info("Delete lucene lock file " + f[i].getAbsolutePath() + " Age " + l);
-                        f[i].delete();
-                    }
-                }
-            }
+      File file = new File( IndexDir, "write.lock" );
+      
+      if ( file.exists() )
+      {
+        long l = (cal.getTimeInMillis() - file.lastModified())/1000;   // age of file in seconds
+        if ( l > 100 )
+        {
+           LOGGER.info("Delete lucene lock file " + file.getAbsolutePath() + " Age " + l  );
+           file.delete();
         }
+      }
     }
 
     public static String handleNumber(String content, String type, long add) {
@@ -227,7 +220,7 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
      */
     public void deleteLuceneDocument(String fieldname, String id) throws Exception {
         Term deleteTerm = new Term(fieldname, id);
-        IndexModifierAction modifyAction = IndexModifierAction.removeAction(modifyExecutor, deleteTerm);
+        IndexWriterAction modifyAction = IndexWriterAction.removeAction(modifyExecutor, deleteTerm);
         modifyIndex(modifyAction);
     }
 
@@ -265,7 +258,6 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
         } catch (IOException e) {
             LOGGER.error(e.getClass().getName() + ": " + e.getMessage());
             LOGGER.error(MCRException.getStackTraceAsString(e));
-            deleteLuceneLocks(LOCK_DIR, 100);
         }
 
         Hits hits = searcher.search( luceneQuery );
@@ -331,7 +323,7 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
 
     public void addToIndex(String entryID, String returnID, List fields) {
         LOGGER.info("MCRLuceneSearcher indexing data of " + entryID);
-
+        
         if ((fields == null) || (fields.size() == 0)) {
             return;
         }
@@ -356,11 +348,27 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
      * 
      */
     private void addDocumentToLucene(Document doc, Analyzer analyzer) throws Exception {
-        IndexModifierAction modifyAction = IndexModifierAction.addAction(modifyExecutor, doc, analyzer);
-        modifyIndex(modifyAction);
+        if (useRamDir)
+        {
+          writerRamDir.addDocument(doc, analyzer );
+          ramDirEntries++;
+          if (ramDirEntries > 200)
+          {
+            writerRamDir.close();
+            IndexWriterAction modifyAction = IndexWriterAction.addRamDir(modifyExecutor, ramDir);
+            modifyIndex(modifyAction);
+            ramDir        = new RAMDirectory();
+            writerRamDir  = new IndexWriter( ramDir, analyzer, true );
+            ramDirEntries = 0;
+          }
+        } else
+        {
+          IndexWriterAction modifyAction = IndexWriterAction.addAction(modifyExecutor, doc, analyzer);
+          modifyIndex(modifyAction);
+        }
     }
 
-    private void modifyIndex(IndexModifierAction modifyAction) {
+    private void modifyIndex(IndexWriterAction modifyAction) {
         modifyExecutor.submit(modifyAction);
     }
 
@@ -482,7 +490,51 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
       }
     }
     
+    public void notifySearcher(String mode)
+    {
+      LOGGER.info("mode: " + mode);
+      
+      handleRamDir();
+      
+      useRamDir = false;
+      
+      if ("rebuild".equals(mode) || "insert".equals(mode))
+      {
+        try
+        {
+          ramDir        = new RAMDirectory();
+          writerRamDir  = new IndexWriter( ramDir, analyzer, true );
+          ramDirEntries = 0;
+          useRamDir = true;
+        }catch (Exception e)
+        {
+        }
+      } else  if ( !"finish".equals(mode))
+        LOGGER.error("invalid mode " + mode);
+    }
+    
+    private void handleRamDir()
+    {
+      if (useRamDir)
+      {
+        try
+        {
+          writerRamDir.close();
+        } catch (IOException e)
+        {
+          LOGGER.error(e.getClass().getName() + ": " + e.getMessage());
+          LOGGER.error(MCRException.getStackTraceAsString(e));
+        }
+        if (ramDirEntries > 0)
+        {
+          IndexWriterAction modifyAction = IndexWriterAction.addRamDir(modifyExecutor, ramDir);
+          modifyIndex(modifyAction);
+        }
+      }
+    }
+    
     public void close() {
+        handleRamDir();
         LOGGER.info("Closing "+toString()+"...");
         modifyExecutor.shutdown();
         try {
@@ -497,14 +549,14 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
         return getClass().getSimpleName()+":"+ID;
     }
 
-    private static class IndexModifyExecutor extends ThreadPoolExecutor {
+    private static class IndexWriteExecutor extends ThreadPoolExecutor {
         boolean modifierClosed, firstJob, closeModifierEarly;
 
-        private IndexModifier indexModifier;
+        private IndexWriter indexWriter;
 
         private File indexDir;
 
-        public IndexModifyExecutor(BlockingQueue<Runnable> workQueue, File indexDir) {
+        public IndexWriteExecutor(BlockingQueue<Runnable> workQueue, File indexDir) {
             //single thread mode
             super(1, 1, 0, TimeUnit.SECONDS, workQueue);
             this.indexDir = indexDir;
@@ -519,40 +571,40 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
             if (firstJob)
                 firstJob=false;
             if (getQueue().isEmpty() || closeModifierEarly)
-                closeIndexModifier();
+                closeIndexWriter();
         }
 
         @Override
         protected void beforeExecute(Thread t, Runnable r) {
             super.beforeExecute(t, r);
             if (modifierClosed)
-                openIndexModifier();
+                openIndexWriter();
         }
 
-        private void openIndexModifier() {
+        private void openIndexWriter() {
             try {
                 LOGGER.debug("Opening Lucene index for writing.");
-                indexModifier = getLuceneModifier(indexDir, firstJob);
+                indexWriter = getLuceneWriter(indexDir, firstJob);
             } catch (Exception e) {
-                LOGGER.warn("Error while reopening IndexModifier.", e);
+                LOGGER.warn("Error while reopening IndexWriter.", e);
             }
             modifierClosed = false;
         }
 
-        private void closeIndexModifier() {
+        private void closeIndexWriter() {
             try {
                 LOGGER.debug("Writing Lucene index changes to disk.");
-                indexModifier.close();
+                indexWriter.close();
             } catch (IOException e) {
-                LOGGER.warn("Error while closing IndexModifier.", e);
+                LOGGER.warn("Error while closing IndexWriter.", e);
             } catch (IllegalStateException e) {
-                LOGGER.debug("IndexModifier was allready closed.");
+                LOGGER.debug("IndexWriter was allready closed.");
             }
             modifierClosed = true;
         }
 
-        private static IndexModifier getLuceneModifier(File indexDir, boolean first) throws Exception {
-            IndexModifier modifier;
+        private static IndexWriter getLuceneWriter(File indexDir, boolean first) throws Exception {
+            IndexWriter modifier;
             Analyzer analyzer = new GermanAnalyzer();
             boolean create = false;
             //check if indexDir is empty before creating a new index
@@ -560,75 +612,94 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
                 LOGGER.info("No Entries in Directory, initialize: " + indexDir);
                 create = true;
             }
-            modifier = new IndexModifier(indexDir, analyzer, create);
+            modifier = new IndexWriter(indexDir, analyzer, create);
             modifier.setMergeFactor(200);
             modifier.setMaxBufferedDocs(2000);
             return modifier;
         }
 
-        public IndexModifier getIndexModifier() {
-            return indexModifier;
+        public IndexWriter getIndexWriter() {
+          return indexWriter;
         }
+        
     }
 
-    private static class IndexModifierAction implements Runnable {
-        private IndexModifyExecutor executor;
+    private static class IndexWriterAction implements Runnable {
+        private IndexWriteExecutor executor;
 
         private Document doc;
 
         private Analyzer analyzer;
+        
+        private boolean add = false;
 
         private boolean delete = false;
 
         private Term deleteTerm;
-
-        private IndexModifierAction(IndexModifyExecutor executor) {
+        
+        private RAMDirectory ramDir;
+        
+        private IndexWriterAction(IndexWriteExecutor executor) {
             this.executor = executor;
         }
 
-        public static IndexModifierAction addAction(IndexModifyExecutor executor, Document doc, Analyzer analyzer) {
-            IndexModifierAction e = new IndexModifierAction(executor);
+        public static IndexWriterAction addAction(IndexWriteExecutor executor, Document doc, Analyzer analyzer) {
+            IndexWriterAction e = new IndexWriterAction(executor);
             e.doc = doc;
             e.analyzer = analyzer;
+            e.add = true;
             return e;
         }
 
-        public static IndexModifierAction removeAction(IndexModifyExecutor executor, Term deleteTerm) {
-            IndexModifierAction e = new IndexModifierAction(executor);
-            e.delete = true;
-            e.deleteTerm = deleteTerm;
-            return e;
-        }
+        public static IndexWriterAction removeAction(IndexWriteExecutor executor, Term deleteTerm) {
+          IndexWriterAction e = new IndexWriterAction(executor);
+          e.delete = true;
+          e.deleteTerm = deleteTerm;
+          return e;
+      }
+
+        public static IndexWriterAction addRamDir(IndexWriteExecutor executor, RAMDirectory ramDir) {
+          IndexWriterAction e = new IndexWriterAction(executor);
+          e.ramDir = ramDir;
+          return e;
+      }
 
         public void run() {
             try {
                 if (delete) {
                     deleteDocument();
-                } else {
+                } else if (add)
+                {
                     addDocument();
-                }
+                } else addDirectory();
             } catch (IOException e) {
-                LOGGER.error("Error while writing Lucene Document: " + doc.toString(), e);
+                LOGGER.error("Error while writing Lucene Index ", e);
             }
         }
 
         private void addDocument() throws IOException {
             LOGGER.debug("add Document:" + toString());
-            executor.getIndexModifier().addDocument(doc, analyzer);
+            executor.getIndexWriter().addDocument(doc, analyzer);
             LOGGER.debug("adding done.");
         }
 
         private void deleteDocument() throws IOException {
-            LOGGER.debug("delete Document:" + toString());
-            executor.getIndexModifier().deleteDocuments(deleteTerm);
-        }
+          LOGGER.debug("delete Document:" + toString());
+          executor.getIndexWriter().deleteDocuments(deleteTerm);
+      }
+        
+        private void addDirectory() throws IOException {
+          LOGGER.debug("add Directory");
+          executor.getIndexWriter().addIndexes(new Directory[] { ramDir });
+          LOGGER.debug("Adding done.");
+      }
 
         public String toString() {
             if (doc != null)
                 return doc.toString();
             if (deleteTerm != null)
                 return deleteTerm.toString();
-            return "empty IndexModifierAction";
+            return "empty IndexWriterAction";
         }
     }
 }
