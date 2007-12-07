@@ -931,12 +931,10 @@ public class MCRWCMSActionServlet extends MCRWCMSServlet {
             validate(root);
             actElem = findActElem(root, attribute, avalue);
 
-            if (((Element) actElem.getParent()).getAttributeValue(parentAttribute) == null) {
+            // check if parent element is not <item>, because it has an @dir
+            if (((Element) actElem.getParent()).getAttributeValue(altParentAttribute) != null) {
                 while (actElem.getParent() instanceof org.jdom.Element) {
-                    if (((Element) actElem.getParent()).getAttributeValue(altParentAttribute) != null) {
-                        reval = ((Element) actElem.getParent()).getAttributeValue(altParentAttribute) + reval;
-                    }
-
+                    reval = ((Element) actElem.getParent()).getAttributeValue(altParentAttribute) + reval;
                     actElem = (Element) actElem.getParent();
                 }
             } else {
