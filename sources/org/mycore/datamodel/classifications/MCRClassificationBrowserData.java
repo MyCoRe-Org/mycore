@@ -27,7 +27,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.TreeSet;
 import java.util.Set;
 import java.util.Hashtable;
 import java.util.Map;
@@ -76,7 +75,7 @@ public class MCRClassificationBrowserData {
     private static final MCRAccessInterface AI = MCRAccessManager.getAccessImpl();
 
     // private Vector lines;
-    private ArrayList lines;
+    private ArrayList<Element> lines;
 
     private MCRClassificationItem classif;
 
@@ -287,7 +286,7 @@ public class MCRClassificationBrowserData {
 
     private final void setClassification(final String classifID) throws Exception {
         classif = getClassificationPool().getClassificationAsPojo(classifID);
-        lines = new ArrayList();
+        lines = new ArrayList<Element>();
         totalNumOfDocs = 0;
         putCategoriesintoLines(-1, classif.getCategories(), 1);
         LOGGER.debug("Arraylist of CategItems initialized - Size " + lines.size());
@@ -318,7 +317,7 @@ public class MCRClassificationBrowserData {
         // remove double entries from path
         // (if an entry appears the 2nd time it will not be displayed -> so we
         // can remove it here)
-        final TreeSet<String> result = new TreeSet<String>();
+        final ArrayList<String> result = new ArrayList<String>();
         for (int i = 0; i < len; i++) {
             final String x = cati[i];
             if (result.contains(x)) {
@@ -331,9 +330,9 @@ public class MCRClassificationBrowserData {
         // reinitialisieren
         categFields = new String[result.size()];
         int j = 0;
-        final Iterator it = result.iterator();
+        final Iterator<String> it = result.iterator();
         while (it.hasNext()) {
-            final String s = (String) it.next();
+            final String s = it.next();
             categFields[j] = s;
             j++;
             path += "/" + s;
@@ -367,7 +366,7 @@ public class MCRClassificationBrowserData {
         if (i >= lines.size()) {
             return null;
         }
-        return (Element) lines.get(i);
+        return lines.get(i);
     }
 
     @SuppressWarnings("unchecked")
@@ -375,7 +374,7 @@ public class MCRClassificationBrowserData {
         LOGGER.debug("Start Explore Arraylist of CategItems  ");
         int i = startpos;
         for (int j = 0, k = children.size(); j < k; j++) {
-            MCRCategoryItem categ = (MCRCategoryItem) children.get(j);
+            MCRCategoryItem categ = children.get(j);
             Element child = MCRCategoryElementFactory.getCategoryElement(categ, classif.isCounterEnabled());
             lines.add(++i, setTreeline(child, level + 1));
             if (startpos == -1) {
@@ -501,8 +500,6 @@ public class MCRClassificationBrowserData {
 
     public org.jdom.Document createXmlTree(final String lang) throws Exception {
 
-        // final MCRClassificationItem cl =
-        // getClassificationPool().getClassificationAsPojo(getClassification().getId());
         MCRClassificationPool cp = getClassificationPool();
         MCRClassificationItem cl = cp.getClassificationAsPojo(getClassification().getId());
         MCRLabel labels = getLabel(cl, lang);
@@ -632,7 +629,7 @@ public class MCRClassificationBrowserData {
 
             final int level = Integer.parseInt(line.getAttributeValue("level"));
 
-            // fï¿½r Sortierung schon mal die leveltiefe bestimmen
+            // für Sortierung schon mal die leveltiefe bestimmen
             LOGGER.debug(" NumDocs - " + numDocs);
 
             if (emptyLeafs.endsWith("no") && numDocs == 0) {
