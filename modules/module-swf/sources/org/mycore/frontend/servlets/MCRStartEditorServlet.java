@@ -55,7 +55,7 @@ import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.MCRObjectService;
 import org.mycore.frontend.MCRWebsiteWriteProtection;
-import org.mycore.frontend.fileupload.MCRUploadHandlerIFS;
+import org.mycore.frontend.fileupload.MCRSWFUploadHandlerIFS;
 import org.mycore.frontend.fileupload.MCRUploadHandlerMyCoRe;
 import org.mycore.frontend.workflow.MCRSimpleWorkflowManager;
 import org.mycore.services.urn.MCRURNManager;
@@ -354,7 +354,7 @@ public class MCRStartEditorServlet extends MCRServlet {
         }
 
         StringBuffer sb = new StringBuffer(getBaseURL()).append("receive/").append(cd.myremcrid);
-        MCRUploadHandlerIFS fuh = new MCRUploadHandlerIFS(cd.myremcrid, cd.mysemcrid, sb.toString());
+        MCRSWFUploadHandlerIFS fuh = new MCRSWFUploadHandlerIFS(cd.myremcrid, cd.mysemcrid, sb.toString());
         String fuhid = fuh.getID();
         cd.myfile = pagedir + "fileupload_commit.xml";
 

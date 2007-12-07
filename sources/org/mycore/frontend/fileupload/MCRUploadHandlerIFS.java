@@ -24,24 +24,26 @@
 package org.mycore.frontend.fileupload;
 
 import java.io.InputStream;
-import java.util.Iterator;
 import java.util.List;
 import java.util.StringTokenizer;
 
+import org.apache.log4j.Logger;
+
 import org.mycore.access.MCRAccessInterface;
 import org.mycore.access.MCRAccessManager;
+import org.mycore.common.MCRConfiguration;
 import org.mycore.datamodel.ifs.MCRDirectory;
 import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.ifs.MCRFilesystemNode;
 import org.mycore.datamodel.metadata.MCRDerivate;
+import org.mycore.datamodel.metadata.MCRMetaIFS;
+import org.mycore.datamodel.metadata.MCRMetaLinkID;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.frontend.workflow.MCRSimpleWorkflowManager;
 
 /**
  * handles uploads via the UploadApplet and store files directly into the IFS.
  * 
  * @author Thomas Scheffler (yagee)
- * @author Jens Kupferschmidt
  * 
  * @version $Revision$ $Date$
  * 
@@ -49,60 +51,42 @@ import org.mycore.frontend.workflow.MCRSimpleWorkflowManager;
  */
 public class MCRUploadHandlerIFS extends MCRUploadHandler {
 
-    MCRDerivate derivate;
+    protected MCRDerivate derivate;
 
-    MCRDirectory rootDir;
+    protected MCRDirectory rootDir;
 
-    boolean newDerivate;
+    protected boolean newDerivate;
 
-    private String docId;
+    private static final String ID_TYPE = "derivate";
 
-    private String derId;
+    private static final String PROJECT = MCRConfiguration.instance().getString("MCR.SWF.Project.ID", "MCR");
 
-    /**
-     * The constructor for this class. It set all data to handle with IFS upload
-     * store.
-     * 
-     * @param docId
-     *            the document ID
-     * @param derId
-     *            the derivate ID
-     * @param url
-     *            an URL string. Not used in this implementation.
-     */
+    private static final Logger LOGGER = Logger.getLogger(MCRUploadHandlerIFS.class);
+
+    private static final MCRConfiguration CONFIG = MCRConfiguration.instance();
+
     public MCRUploadHandlerIFS(String docId, String derId, String url) {
         super();
         this.url = url;
-        logger.debug("MCRUploadHandlerMyCoRe DocID: " + docId + " DerId: " + derId);
+        init(docId, derId);
+    }
 
-        try {
-            new MCRObjectID(docId);
-            this.docId = docId;
-        } catch (Exception e) {
-            logger.debug("Error while creating MCRObjectID : " + docId, e);
-        }
-
+    protected void init(String docId, String derId) {
         if (derId == null) {
-            this.derId = MCRSimpleWorkflowManager.instance().getNextDrivateID(new MCRObjectID(docId)).getId();
+            // create new derivate
+            LOGGER.debug("derId=null create derivate with next free ID");
+            createNewDerivate(docId, getFreeDerivateID());
         } else {
-            try {
-                new MCRObjectID(derId);
-                this.derId = derId;
-            } catch (Exception e) {
-                logger.debug("Error while creating MCRObjectID : " + derId, e);
+            if (MCRDerivate.existInDatastore(derId)) {
+                LOGGER.debug("Derivate allready exists: "+derId);
+                newDerivate = false;
+                derivate = new MCRDerivate();
+                derivate.receiveFromDatastore(derId);
+            } else {
+                // create new derivate with given ID
+                LOGGER.debug("derId='"+derId+"' create derivate with that ID");
+                createNewDerivate(docId, new MCRObjectID(derId));
             }
-        }
-
-        newDerivate = true;
-        if (MCRDerivate.existInDatastore(this.derId)) {
-            logger.debug("Derivate allready exists: " + this.derId);
-            newDerivate = false;
-            derivate = new MCRDerivate();
-            derivate.receiveFromDatastore(derId);
-        } else {
-            // create new derivate with given ID
-            logger.debug("Create derivate with that ID" + derId);
-            derivate = MCRSimpleWorkflowManager.instance().createDerivate(new MCRObjectID(this.docId), new MCRObjectID(this.derId));
         }
     }
 
@@ -111,7 +95,7 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
      */
     public void startUpload(int numFiles) throws Exception {
         if (newDerivate) {
-            logger.debug("Create new derivate with id: " + derivate.getId() + "in the server.");
+            LOGGER.debug("Create new derivate with id: " + derivate.getId());
             derivate.createInDatastore();
         }
         rootDir = getRootDir(derivate.getId().toString());
@@ -141,16 +125,17 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
     }
 
     public synchronized long receiveFile(String path, InputStream in, long length, String md5) throws Exception {
-        logger.debug("adding file: " + path);
+        LOGGER.debug("adding file: " + path);
         MCRFile file = getNewFile(path);
         file.setContentFrom(in);
-
+        
         long myLength = file.getSize();
-        if (myLength >= length)
-            return myLength;
-        else {
-            file.delete(); // Incomplete file transfer, user canceled upload
-            return 0;
+        if( myLength >= length )
+          return myLength;
+        else
+        {
+          file.delete(); // Incomplete file transfer, user canceled upload
+          return 0;
         }
     }
 
@@ -159,24 +144,42 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
      * 
      */
     public void finishUpload() throws Exception {
-        // existing files
-        MCRFilesystemNode root = MCRFilesystemNode.getRootNode(derId);
-        if (!(root instanceof MCRDirectory) || !((MCRDirectory)root).hasChildren()) {
-            derivate.deleteFromDatastore(derivate.getId().getId());
-            logger.warn("No file were uploaded, delete entry in database for " + derId + " and return.");
-            return;
-        }
-        // set main file
+        String mainfile = getMainFilePath(rootDir);
         if (newDerivate) {
-            setDefaultPermissions(derivate.getId());
-        }
-        String mf = derivate.getDerivate().getInternals().getMainDoc();
-        if (mf.trim().length() == 0) {
-            String mainfile = getMainFilePath(rootDir);
             derivate.getDerivate().getInternals().setMainDoc(mainfile);
-            derivate.updateXMLInDatastore();
-
+            derivate.updateInDatastore();
+            setDefaultPermissions(derivate.getId());
+        } else {
+            String mf = derivate.getDerivate().getInternals().getMainDoc();
+            if (mf.trim().length() == 0) {
+                derivate.getDerivate().getInternals().setMainDoc(mainfile);
+                derivate.updateXMLInDatastore();
+            }
         }
+    }
+
+    private static MCRObjectID getFreeDerivateID() {
+        MCRObjectID derivateID = new MCRObjectID();
+        derivateID.setNextFreeId(PROJECT + '_' + ID_TYPE);
+        return derivateID;
+    }
+
+    private void createNewDerivate(String docId, MCRObjectID newDerID) {
+        newDerivate = true;
+        derivate = new MCRDerivate();
+        derivate.setId(newDerID);
+        String schema = CONFIG.getString("MCR.Metadata.Config.derivate", "datamodel-derivate.xml").replaceAll(".xml", ".xsd");
+        derivate.setSchema(schema);
+        derivate.setLabel("data object from " + docId);
+        // set link to Object
+        MCRMetaLinkID linkId = new MCRMetaLinkID();
+        linkId.setSubTag("linkmetas");
+        linkId.setReference(docId, null, null);
+        MCRMetaIFS ifs = new MCRMetaIFS();
+        ifs.setSubTag("internal");
+        ifs.setSourcePath(null);
+        derivate.getDerivate().setInternals(ifs);
+        derivate.getDerivate().setLinkMeta(linkId);
     }
 
     private MCRFile getNewFile(String path) {
@@ -206,18 +209,10 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
                 }
             }
         }
-        logger.error("Please investigate getNewFile() method in IFS upload handler. Server shouldn't get to this point!");
+        LOGGER.error("Please investigate getNewFile() method in IFS upload handler. Server shouldn't get to this point!");
         return null;
     }
 
-    /**
-     * This method return the MCRDirectory root element of IFS for the given
-     * derivate ID.
-     * 
-     * @param derID
-     *            the derivate ID as IFS owner
-     * @return a MCRDirectory instance of the root directory
-     */
     private static MCRDirectory getRootDir(String derID) {
         MCRFilesystemNode root = MCRFilesystemNode.getRootNode(derID);
         if (!(root instanceof MCRDirectory)) {
@@ -227,7 +222,7 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
         return rootDir;
     }
 
-    private static String getMainFilePath(MCRDirectory root) {
+    protected static String getMainFilePath(MCRDirectory root) {
         MCRDirectory parent = root;
         while (parent.hasChildren()) {
             MCRFilesystemNode[] children = parent.getChildren(MCRDirectory.SORT_BY_NAME);
@@ -242,11 +237,11 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
         return "";
     }
 
-    private static void setDefaultPermissions(MCRObjectID derID) {
+    @SuppressWarnings("unchecked")
+    protected static void setDefaultPermissions(MCRObjectID derID) {
         MCRAccessInterface AI = MCRAccessManager.getAccessImpl();
-        List<?> configuredPermissions = AI.getAccessPermissionsFromConfiguration();
-        for (Iterator <?>it = configuredPermissions.iterator(); it.hasNext();) {
-            String permission = (String) it.next();
+        List<String> configuredPermissions = AI.getAccessPermissionsFromConfiguration();
+        for (String permission:configuredPermissions) {
             MCRAccessManager.addRule(derID, permission, MCRAccessManager.getTrueRule(), "default derivate rule");
         }
     }
