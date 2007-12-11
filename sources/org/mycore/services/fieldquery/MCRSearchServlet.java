@@ -24,6 +24,8 @@
 package org.mycore.services.fieldquery;
 
 import java.io.IOException;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
@@ -200,18 +202,25 @@ public class MCRSearchServlet extends MCRServlet {
             query.addContent(sortBy);
             
             Enumeration sortNames = request.getParameterNames();
+            Vector<String> sf = new Vector<String>();
             while (sortNames.hasMoreElements()) {
                 String name = (String) (sortNames.nextElement());
-                if (name.endsWith(".sortField"))
+                if (name.contains(".sortField"))
                 {
-                  String sortField = name.substring(0, name.length()-10);
-                  Element field = new Element("field");
-                  field.setAttribute("name", sortField);
-                  field.setAttribute("order", getReqParameter(request, name, "ascending"));
-                  sortBy.addContent(field);
+                  sf.add(name);
                 }
             }
             
+            Collections.sort(sf, new MCRSortfieldComparator());
+            for (int i=0;i<sf.size();i++)
+            {
+              String name = (String)sf.elementAt(i);
+              name = name.substring(0, name.indexOf(".sortField"));
+              Element field = new Element("field");
+              field.setAttribute("name", name);
+              field.setAttribute("order", getReqParameter(request, name, "ascending"));
+              sortBy.addContent(field);
+            }
             
             Element conditions = new Element("conditions");
             query.addContent(conditions);
@@ -395,4 +404,16 @@ public class MCRSearchServlet extends MCRServlet {
         }
         res.sendRedirect(res.encodeRedirectURL(sb.toString()));
     }
+    
+    private class MCRSortfieldComparator implements Comparator {
+      
+      public int compare(Object arg0, Object arg1) {
+        String s0 = (String)arg0;
+        s0 = s0.substring(s0.indexOf(".sortField"));
+        String s1 = (String)arg1; 
+        s1 = s1.substring(s1.indexOf(".sortField"));
+        return s0.compareTo(s1);
+      }
+    };
 }
+
