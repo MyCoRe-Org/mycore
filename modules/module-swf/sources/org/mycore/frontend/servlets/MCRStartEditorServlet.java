@@ -56,7 +56,7 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.MCRObjectService;
 import org.mycore.frontend.MCRWebsiteWriteProtection;
 import org.mycore.frontend.fileupload.MCRSWFUploadHandlerIFS;
-import org.mycore.frontend.fileupload.MCRUploadHandlerMyCoRe;
+import org.mycore.frontend.fileupload.MCRSWFUploadHandlerMyCoRe;
 import org.mycore.frontend.workflow.MCRSimpleWorkflowManager;
 import org.mycore.services.urn.MCRURNManager;
 
@@ -854,7 +854,7 @@ public class MCRStartEditorServlet extends MCRServlet {
         StringBuffer sb = new StringBuffer(pagedir);
         sb.append("editor_").append(cd.mytype).append("_editor.xml");
 
-        String fuhid = new MCRUploadHandlerMyCoRe(cd.myremcrid, cd.mysemcrid, "new", getBaseURL() + sb.toString()).getID();
+        String fuhid = new MCRSWFUploadHandlerMyCoRe(cd.myremcrid, cd.mysemcrid, "new", getBaseURL() + sb.toString()).getID();
         cd.myfile = pagedir + "fileupload_new.xml";
 
         String base = getBaseURL() + cd.myfile;

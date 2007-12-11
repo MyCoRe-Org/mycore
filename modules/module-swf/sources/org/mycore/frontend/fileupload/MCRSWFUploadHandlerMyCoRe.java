@@ -48,7 +48,7 @@ import org.mycore.frontend.workflow.MCRSimpleWorkflowManager;
  * 
  * @see MCRUploadHandler
  */
-public class MCRUploadHandlerMyCoRe extends MCRUploadHandler {
+public class MCRSWFUploadHandlerMyCoRe extends MCRUploadHandler {
     private String mainfile = "";
 
     private String dirname;
@@ -72,7 +72,7 @@ public class MCRUploadHandlerMyCoRe extends MCRUploadHandler {
      * @param url
      *            when MCRUploadApplet is finished this url will be shown
      */
-    public MCRUploadHandlerMyCoRe(String docId, String derId, String mode, String url) {
+    public MCRSWFUploadHandlerMyCoRe(String docId, String derId, String mode, String url) {
         this.url = url;
         logger.debug("MCRUploadHandlerMyCoRe DocID: " + docId + " DerId: " + derId + " Mode: " + mode);
 
