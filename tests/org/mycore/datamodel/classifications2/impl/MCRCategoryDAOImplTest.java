@@ -245,6 +245,20 @@ public class MCRCategoryDAOImplTest extends MCRHibTestCase {
         assertEquals("Label does not match.", description, rootNode.getLabels().get(lang).getDescription());
     }
 
+    /**
+     * tests relink child to grantparent and removal of parent.
+     * @throws URISyntaxException
+     */
+    public void testReplaceCategoryShiftCase() {
+        addWorldClassification();
+        MCRCategory europe = category.getChildren().get(0);
+        MCRCategory germany = europe.getChildren().get(0);
+        europe.getChildren().remove(0);
+        category.getChildren().remove(0);
+        category.getChildren().add(germany);
+        DAO.replaceCategory(category);
+    }
+    
     private MCRCategoryImpl getRootCategoryFromSession() {
         return (MCRCategoryImpl) sessionFactory.getCurrentSession().get(MCRCategoryImpl.class, ((MCRCategoryImpl) category).getInternalID());
     }
