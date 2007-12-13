@@ -23,6 +23,7 @@
 
 package org.mycore.backend.sql;
 
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
@@ -31,6 +32,10 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 import org.apache.log4j.Logger;
+import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.input.SAXBuilder;
+import org.jdom.xpath.XPath;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRPersistenceException;
 
@@ -53,7 +58,7 @@ import org.mycore.common.MCRPersistenceException;
  * @see #doQuery( String)
  * @see java.sql.Connection
  * @see MCRSQLConnectionPool
- * @author Frank Lützenkirchen
+ * @author Frank L\u00fctzenkirchen
  * @author Johannes Buehler
  * @version $Revision$ $Date$
  */
@@ -81,11 +86,33 @@ public class MCRSQLConnection {
     private static String password;
 
     static {
-        MCRConfiguration config = MCRConfiguration.instance();
-        url = config.getString("MCR.Persistence.SQL.Database.URL");
-        userID = config.getString("MCR.Persistence.SQL.Database.Userid", "");
-        password = config.getString("MCR.Persistence.SQL.Database.Passwd", "");
-        maxUsages = config.getInt("MCR.Persistence.SQL.Database.Connections.MaxUsages", Integer.MAX_VALUE);
+        try {
+            logger.debug("Read the hibernate configuration from /hibernate.cfg.xml");
+            InputStream in = MCRSQLConnection.class.getResourceAsStream("/hibernate.cfg.xml");
+            Document cfg = (new SAXBuilder()).build(in);
+            XPath xpath_url = XPath.newInstance("/hibernate-configuration/session-factory/property[@name='connection.url']");
+            XPath xpath_uid = XPath.newInstance("/hibernate-configuration/session-factory/property[@name='connection.username']");
+            XPath xpath_pwd = XPath.newInstance("/hibernate-configuration/session-factory/property[@name='connection.password']");
+            Element elm = (Element) xpath_url.selectSingleNode(cfg);
+            url = elm.getTextNormalize();
+            elm = (Element) xpath_uid.selectSingleNode(cfg);
+            userID = elm.getTextNormalize();
+            elm = (Element) xpath_pwd.selectSingleNode(cfg);
+            password = elm.getTextNormalize();
+            maxUsages = Integer.MAX_VALUE;
+        } catch (Exception e) {
+            // read deprecated configuration values
+            logger.debug("Can't read /hibernate.cfg.xml, try to read property values.");
+            MCRConfiguration config = MCRConfiguration.instance();
+            url = config.getString("MCR.Persistence.SQL.Database.URL");
+            userID = config.getString("MCR.Persistence.SQL.Database.Userid", "");
+            password = config.getString("MCR.Persistence.SQL.Database.Passwd", "");
+            maxUsages = config.getInt("MCR.Persistence.SQL.Database.Connections.MaxUsages", Integer.MAX_VALUE);
+        }
+        logger.debug("Initalize SQL connection - url "+url);
+        logger.debug("Initalize SQL connection - userID "+userID);
+        logger.debug("Initalize SQL connection - password "+password);
+        logger.debug("Initalize SQL connection - maxUsages "+maxUsages);
     }
 
     /**
@@ -116,7 +143,7 @@ public class MCRSQLConnection {
         logger.debug("MCRSQLConnection: Building connection to JDBC datastore using URL " + url);
 
         try {
-            if ( ( userID != null ) && ( userID.trim().length() > 0 ) ) {
+            if ((userID != null) && (userID.trim().length() > 0)) {
                 connection = DriverManager.getConnection(url, userID, password);
             } else {
                 connection = DriverManager.getConnection(url);

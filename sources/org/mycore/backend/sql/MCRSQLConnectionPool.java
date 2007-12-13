@@ -23,6 +23,7 @@
 
 package org.mycore.backend.sql;
 
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -30,6 +31,10 @@ import java.sql.Statement;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
+import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.input.SAXBuilder;
+import org.jdom.xpath.XPath;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
@@ -41,7 +46,7 @@ import org.mycore.common.MCRPersistenceException;
  * 
  * @see MCRSQLConnection
  * 
- * @author Frank Lützenkirchen
+ * @author Frank L\u00fctzenkirchen
  * @author Jens Kupferschmidt
  * 
  * @version $Revision$ $Date$
@@ -87,16 +92,31 @@ public class MCRSQLConnectionPool {
      *             if the JDBC driver could not be loaded
      */
     protected MCRSQLConnectionPool() throws MCRPersistenceException {
-        MCRConfiguration config = MCRConfiguration.instance();
-
         logger.info("Building JDBC connection pool...");
-        maxNumConnections = config.getInt("MCR.Persistence.SQL.Connections.Max", 1);
-
-        int initNumConnections = config.getInt("MCR.Persistence.SQL.Connections.Init", maxNumConnections);
-        String driver = config.getString("MCR.Persistence.SQL.Driver");
-        logger.debug("MCR.Persistence.SQL.Driver: " + driver);
-
-        testStatement = config.getString("MCR.Persistence.SQL.Connections.TestQuery", "select * from mcraccessrules");
+        String driver = "";
+        int initNumConnections = 1;
+        try {
+            logger.debug("Read the hibernate configuration from /hibernate.cfg.xml");
+            InputStream in = MCRSQLConnection.class.getResourceAsStream("/hibernate.cfg.xml");
+            Document cfg = (new SAXBuilder()).build(in);
+            XPath xpath_driver = XPath.newInstance("/hibernate-configuration/session-factory/property[@name='connection.driver_class']");
+            Element elm = (Element) xpath_driver.selectSingleNode(cfg);
+            driver = elm.getTextNormalize();
+            maxNumConnections = 2;
+            testStatement = "select * from mcraccessrule";
+        } catch (Exception e) {
+            // read deprecated configuration values
+            logger.debug("Can't read /hibernate.cfg.xml, try to read property values.");
+            MCRConfiguration config = MCRConfiguration.instance();
+            maxNumConnections = config.getInt("MCR.Persistence.SQL.Connections.Max", 2);
+            initNumConnections = config.getInt("MCR.Persistence.SQL.Connections.Init", maxNumConnections);
+            driver = config.getString("MCR.Persistence.SQL.Driver");
+            logger.debug("MCR.Persistence.SQL.Driver: " + driver);
+            testStatement = config.getString("MCR.Persistence.SQL.Connections.TestQuery", "select * from mcraccessrule");
+        }
+        logger.debug("Initalize SQL connection pool - driver " + driver);
+        logger.debug("Initalize SQL connection pool - maxNumConnections " + maxNumConnections);
+        logger.debug("Initalize SQL connection pool - initNumConnections " + initNumConnections);
 
         try {
             Class.forName(driver);
