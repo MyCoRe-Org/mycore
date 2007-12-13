@@ -106,7 +106,7 @@ public class MCRShutdownHandler {
 
     void shutDown() {
         System.out.println(system+" Shutting down system, please wait...\n");
-        LOGGER.info("requests: " + requests.toString());
+        LOGGER.debug("requests: " + requests.toString());
         synchronized (requests) {
             shuttingDown = true;
             for (Iterator it = requests.iterator(); it.hasNext();) {
