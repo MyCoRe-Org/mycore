@@ -21,4 +21,4 @@
 # MCR.System.Jars=ant.jar jai/jai_codec.jar jai/jai_core.jar mysql-connector-java.jar
 
 #######################################################################
-
+mycore-modules=module-accessadmin,module-ACL-editor_v2,module-broadcasting,module-classhandler,module-imaging,module-indexing,module-swf,module-useradmin,module-wcms,module-webservices,module-z3950
