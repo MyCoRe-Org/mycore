@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
-  <!-- =================================================================== -->
-  <!-- MyCoRe build file for use with Apache Ant                           -->
-  <!-- $Revision: 1.141 $ $Date: 2007-12-17 16:57:40 $                      -->
-  <!-- =================================================================== -->
+<!-- =================================================================== -->
+<!-- MyCoRe build file for use with Apache Ant                           -->
+<!-- $Revision: 1.142 $ $Date: 2007-12-17 17:02:30 $                      -->
+<!-- =================================================================== -->
 
 <project name="MyCoRe" default="usage" basedir=".">
 
@@ -12,20 +12,20 @@
   <!-- =================================================================== -->
 
   <!-- Javac properties -->
-  <property name="debug"          value="on" />
-  <property name="optimize"       value="on" />
-  <property name="deprecation"    value="off" />
-  <property name="javatarget"     value="1.5" />
-  <property name="sourcerelease"  value="1.5" />
+  <property name="debug" value="on" />
+  <property name="optimize" value="on" />
+  <property name="deprecation" value="off" />
+  <property name="javatarget" value="1.5" />
+  <property name="sourcerelease" value="1.5" />
   <!--property name="build.compiler"     value="jikes"/-->
   <property name="sourceencoding" value="ISO-8859-15" />
   <property name="env.MYCORE_HOME" value="." />
-	
+
   <!-- Read in all environment variables -->
   <property environment="env" />
 
   <path id="mycore.jars">
-    <fileset dir="${basedir}/lib" includes="*.jar"/>
+    <fileset dir="${basedir}/lib" includes="*.jar" />
   </path>
 
   <taskdef resource="net/sf/antcontrib/antcontrib.properties" classpathref="mycore.jars" />
@@ -33,13 +33,13 @@
   <taskdef name="for" classname="net.sf.antcontrib.logic.For" classpathref="mycore.jars" />
   <!-- Read in properties from config/build.properties -->
   <if>
-      <not>
-    	<available file="${basedir}/config/build.properties"/>
-      </not>
-      <then>
-        <echo level="warning">Cannot find ${basedir}/config/build.properties using template</echo>
-        <copy tofile="${basedir}/config/build.properties" file="${basedir}/config/build.properties.template"/>
-      </then>
+    <not>
+      <available file="${basedir}/config/build.properties" />
+    </not>
+    <then>
+      <echo level="warning">Cannot find ${basedir}/config/build.properties using template</echo>
+      <copy tofile="${basedir}/config/build.properties" file="${basedir}/config/build.properties.template" />
+    </then>
   </if>
   <property file="${basedir}/config/build.properties" />
 
@@ -78,13 +78,13 @@
   </if>
   <path id="mycore.classpath">
     <pathelement location="${basedir}/classes" />
-    <fileset dir="${basedir}/lib" includes="*.jar"/>
-		<!--
+    <fileset dir="${basedir}/lib" includes="*.jar" />
+    <!--
     <fileset dir="${ant.library.dir}" includes="*junit*.jar"/>
 			-->
-    <fileset dir="${ant.library.dir}" includes="ant.jar"/>
+    <fileset dir="${ant.library.dir}" includes="ant.jar" />
     <path refid="jdbc.classpath" />
-    <path refid="share.classpath"  />
+    <path refid="share.classpath" />
   </path>
 
   <macrodef name="modulePreHook">
@@ -155,20 +155,20 @@
   <!-- =================================================================== -->
 
   <target name="info" depends="init" description="display software and os versions">
-    <modulePreHook target="info"/>
+    <modulePreHook target="info" />
     <property name="output.classpath" refid="mycore.classpath" />
 
     <echo level="info">Base directory   : ${basedir}</echo>
     <echo level="info">Operating system : ${os.name} Version ${os.version} on ${os.arch} </echo>
     <echo level="info">Java version     : JDK ${ant.java.version} Version ${java.version} from ${java.vendor}</echo>
     <echo level="info">Java home        : ${java.home}</echo>
-    <echo level="info">Ant build file   : $Revision: 1.141 $ $Date: 2007-12-17 16:57:40 $</echo>
+    <echo level="info">Ant build file   : $Revision: 1.142 $ $Date: 2007-12-17 17:02:30 $</echo>
     <echo level="info">Ant version      : ${ant.version}</echo>
     <echo level="info">Ant home         : ${ant.home}</echo>
     <echo level="info">Ant libdir       : ${ant.library.dir}</echo>
     <echo level="info">System CLASSPATH : ${build.sysclasspath}</echo>
     <echo level="info">Active CLASSPATH : ${output.classpath}</echo>
-    <moduleHook target="info"/>
+    <moduleHook target="info" />
   </target>
 
   <!-- =================================================================== -->
@@ -183,90 +183,90 @@
   </target>
 
   <!-- System CLASSPATH is completely ignored! -->
-  <property name="build.sysclasspath" value="ignore"/>
+  <property name="build.sysclasspath" value="ignore" />
 
   <!-- =================================================================== -->
   <!-- Runs JUnit test cases                                               -->
   <!-- =================================================================== -->
 
-	<target name="test" depends="init,compile_testcases">
-	    <junit printsummary="on" fork="true">
-	    	<classpath>
-	    	    <path refid="mycore.classpath"/>
-	    	  	<pathelement location="${basedir}/tests"/>
-	    	</classpath>
-	    	<formatter type="brief" usefile="false"/>
-	    	<batchtest>
-	    		<fileset dir="${basedir}/classes/">
-	    			<include name="**/*Test*.class"/>
-	    			<exclude name="**/FulltextTester.class"/>
-	    			<exclude name="**/MCRTestCase.class"/>
-	    			<exclude name="**/MCRHibTestCase.class"/>
-	    	    </fileset>
-	    	</batchtest>
-		</junit>    
-	</target>
-	<target name="compile_testcases">
-		<echo level="info">Compiling JUnit test cases...</echo>
-	    <antcall target="javac">
-	      <param name="altdir" value="${basedir}/tests"/>
-	      <param name="packages" value="**/*Test*"/>
-	    </antcall>
-	</target>
+  <target name="test" depends="init,compile_testcases">
+    <junit printsummary="on" fork="true">
+      <classpath>
+        <path refid="mycore.classpath" />
+        <pathelement location="${basedir}/tests" />
+      </classpath>
+      <formatter type="brief" usefile="false" />
+      <batchtest>
+        <fileset dir="${basedir}/classes/">
+          <include name="**/*Test*.class" />
+          <exclude name="**/FulltextTester.class" />
+          <exclude name="**/MCRTestCase.class" />
+          <exclude name="**/MCRHibTestCase.class" />
+        </fileset>
+      </batchtest>
+    </junit>
+  </target>
+  <target name="compile_testcases">
+    <echo level="info">Compiling JUnit test cases...</echo>
+    <antcall target="javac">
+      <param name="altdir" value="${basedir}/tests" />
+      <param name="packages" value="**/*Test*" />
+    </antcall>
+  </target>
 
   <!-- =================================================================== -->
   <!-- Creates a mycore-for-*.jar file containing all compiled MyCoRe classes  -->
   <!-- =================================================================== -->
 
   <target name="jar" depends="compile" description="creates lib/mycore.jar">
-    <modulePreHook target="jar"/>
+    <modulePreHook target="jar" />
     <property name="jarfile" value="mycore.jar" />
     <echo level="info">Creating ${jarfile} containing all compiled classes...</echo>
-    <jar 
-      destfile="${basedir}/lib/${jarfile}"
-    >
-      <fileset dir="${basedir}/classes" includes="**/*.class"            />
-      <fileset dir="${basedir}/classes" includes="META-INF/services/*"   />
-      <fileset dir="${basedir}/schema"  includes="*.xsd *.dtd"           />
-      <fileset dir="${basedir}/config"  includes="build.properties"      />
-      <fileset dir="${basedir}/config"  includes="deprecated.properties" />
+    <jar destfile="${basedir}/lib/${jarfile}">
+      <fileset dir="${basedir}/classes" includes="**/*.class" />
+      <fileset dir="${basedir}/classes" includes="META-INF/services/*" />
+      <fileset dir="${basedir}/schema" includes="*.xsd *.dtd" />
+      <fileset dir="${basedir}/config" includes="build.properties" />
+      <fileset dir="${basedir}/config" includes="deprecated.properties" />
     </jar>
-    <moduleHook target="jar"/>
+    <moduleHook target="jar" />
   </target>
-  
+
   <!-- =================================================================== -->
   <!-- Compiles the sources from directory sources to directory classes    -->
   <!-- =================================================================== -->
 
   <target name="javac" depends="init">
     <echo level="info">Compiling ${packages}</echo>
-  	<condition property="altdir" value="">
-  		<not><isset property="altdir"/></not>
-  	</condition>
+    <condition property="altdir" value="">
+      <not>
+        <isset property="altdir" />
+      </not>
+    </condition>
     <javac srcdir="${basedir}/sources:${altdir}"
            destdir="${basedir}/classes"
            includes="${packages}"
-    	   excludes="${excludes}"
+           excludes="${excludes}"
            classpathref="mycore.classpath"
            debug="${debug}"
            optimize="${optimize}"
-	       target="${javatarget}"
-	       source="${sourcerelease}"
-	       encoding="${sourceencoding}"
-    	   fork="yes"
+           target="${javatarget}"
+           source="${sourcerelease}"
+           encoding="${sourceencoding}"
+           fork="yes"
            deprecation="${deprecation}">
     </javac>
     <echo level="info">---------------------------------------------------------</echo>
   </target>
 
   <target name="compile" description="compiles all sources to classes directory">
-    <modulePreHook target="compile"/>
+    <modulePreHook target="compile" />
     <echo level="info">Compiling MyCoRe non-module classes...</echo>
     <antcall target="javac">
-       <param name="packages" value="org/mycore/**"/>
-       <param name="excludes" value="${mcr.exclude}"/>
+      <param name="packages" value="org/mycore/**" />
+      <param name="excludes" value="${mcr.exclude}" />
     </antcall>
-    <moduleHook target="compile"/>
+    <moduleHook target="compile" />
   </target>
 
   <!-- =================================================================== -->
@@ -275,7 +275,7 @@
 
   <target name="up2date">
 
-    <path id="javadocs.classpath" refid="mycore.classpath"/>
+    <path id="javadocs.classpath" refid="mycore.classpath" />
 
     <path id="sourcepath">
       <dirset dir="${basedir}" includes="sources" />
@@ -288,7 +288,7 @@
         <uptodate>
           <srcfiles dir="${basedir}" includes="**/*.java" />
           <srcfiles dir="${basedir}" includes="**/*.html" />
-          <mapper type="merge" to="${basedir}/documentation/html/overview-tree.html"/>
+          <mapper type="merge" to="${basedir}/documentation/html/overview-tree.html" />
         </uptodate>
       </not>
     </condition>
@@ -298,7 +298,7 @@
         <uptodate>
           <srcfiles dir="${basedir}" includes="**/*.java" />
           <srcfiles dir="${doclets}" includes="pdfdoclet-mycore.properties" />
-          <mapper type="merge" to="${basedir}/documentation/pdf/javadocs.pdf"/>
+          <mapper type="merge" to="${basedir}/documentation/pdf/javadocs.pdf" />
         </uptodate>
       </not>
     </condition>
@@ -309,42 +309,43 @@
   <!-- Create the HTML JavaDocs from sources                               -->
   <!-- =================================================================== -->
 
-  <target name="javadocs" depends="init,up2date" if="javadocs.outdated" description="creates JavaDoc API documentation in HTML format">
-    <modulePreHook target="javadocs"/>
+  <target name="javadocs"
+          depends="init,up2date"
+          if="javadocs.outdated"
+          description="creates JavaDoc API documentation in HTML format">
+    <modulePreHook target="javadocs" />
     <echo level="info">Building the MyCoRe JavaDoc API documentation...</echo>
 
     <mkdir dir="${basedir}/documentation/html" />
-    <javadoc
-      packagenames        = "*"
-      encoding            = "${sourceencoding}"
-      sourcepathref       = "sourcepath"
-      destdir             = "${basedir}/documentation/html"
-      classpathref        = "javadocs.classpath"
-      author              = "true"
-      version             = "true"
-      use                 = "true"
-      access              = "package"
-      splitindex          = "true"
-      linksource          = "true"
-      windowtitle         = "MyCoRe JavaDoc Documentation"
-      doctitle            = "MyCoRe Source Code JavaDoc Documentation"
-    >
-      <group title="MyCoRe Datamodel"                           packages="org.mycore.datamodel*" />
-      <group title="MyCoRe Persistence Backend Implementations" packages="org.mycore.backend*"   />
-      <group title="MyCoRe User Interface Frontend"             packages="org.mycore.frontend*"  />
-      <group title="MyCoRe Common Functionality"                packages="org.mycore.common*"    />
-      <group title="MyCoRe Services"                            packages="org.mycore.services*"  />
-      <group title="MyCoRe User and Group Management"           packages="org.mycore.user*"      />
+    <javadoc packagenames="*"
+             encoding="${sourceencoding}"
+             sourcepathref="sourcepath"
+             destdir="${basedir}/documentation/html"
+             classpathref="javadocs.classpath"
+             author="true"
+             version="true"
+             use="true"
+             access="package"
+             splitindex="true"
+             linksource="true"
+             windowtitle="MyCoRe JavaDoc Documentation"
+             doctitle="MyCoRe Source Code JavaDoc Documentation">
+      <group title="MyCoRe Datamodel" packages="org.mycore.datamodel*" />
+      <group title="MyCoRe Persistence Backend Implementations" packages="org.mycore.backend*" />
+      <group title="MyCoRe User Interface Frontend" packages="org.mycore.frontend*" />
+      <group title="MyCoRe Common Functionality" packages="org.mycore.common*" />
+      <group title="MyCoRe Services" packages="org.mycore.services*" />
+      <group title="MyCoRe User and Group Management" packages="org.mycore.user*" />
 
-      <link href="http://java.sun.com/j2se/1.5.0/docs/api/"/>
-      <link href="http://jakarta.apache.org/tomcat/tomcat-5.0-doc/servletapi"/>
-      <link href="http://java.sun.com/xml/jaxp/dist/1.1/docs/api/"/>
-      <link href="http://www.jdom.org/docs/apidocs"/>
-      <link href="http://logging.apache.org/log4j/docs/api/"/>
+      <link href="http://java.sun.com/j2se/1.5.0/docs/api/" />
+      <link href="http://jakarta.apache.org/tomcat/tomcat-5.0-doc/servletapi" />
+      <link href="http://java.sun.com/xml/jaxp/dist/1.1/docs/api/" />
+      <link href="http://www.jdom.org/docs/apidocs" />
+      <link href="http://logging.apache.org/log4j/docs/api/" />
       <link href="http://jakarta.apache.org/lucene/docs/api/" />
       <link href="http://www.hibernate.org/hib_docs/v3/api/" />
     </javadoc>
-    <moduleHook target="javadocs"/>
+    <moduleHook target="javadocs" />
   </target>
 
   <!-- =================================================================== -->
@@ -355,22 +356,18 @@
     <echo level="info"> Building the MyCoRe JavaDoc API documentation as PDF...</echo>
 
     <mkdir dir="${basedir}/documentation/pdf" />
-    <javadoc
-      packagenames        = "*"
-      excludepackagenames = "${exclude.cm7},${exclude.cm8}"
-      sourcepathref       = "sourcepath"
-      classpathref        = "javadocs.classpath"
-      author              = "true"
-      version             = "true"
-      access              = "package"
-    >
-      <doclet 
-        name = "com.tarsec.javadoc.pdfdoclet.PDFDoclet"
-        path = "${doclets}/itext-0.92.jar:${doclets}/pdfdoclet.jar" >                                                                                         
-        <param name="-pdf"    value="${basedir}/documentation/pdf/javadocs.pdf" />             
-        <param name="-config" value="${doclets}/pdfdoclet-mycore.properties" />  
-      </doclet>             
- 
+    <javadoc packagenames="*"
+             excludepackagenames="${exclude.cm7},${exclude.cm8}"
+             sourcepathref="sourcepath"
+             classpathref="javadocs.classpath"
+             author="true"
+             version="true"
+             access="package">
+      <doclet name="com.tarsec.javadoc.pdfdoclet.PDFDoclet" path="${doclets}/itext-0.92.jar:${doclets}/pdfdoclet.jar">
+        <param name="-pdf" value="${basedir}/documentation/pdf/javadocs.pdf" />
+        <param name="-config" value="${doclets}/pdfdoclet-mycore.properties" />
+      </doclet>
+
     </javadoc>
   </target>
 
@@ -379,15 +376,15 @@
   <!-- =================================================================== -->
 
   <target name="clean" description="Removes all files generated by this build file">
-    <modulePreHook target="clean"/>
+    <modulePreHook target="clean" />
     <echo level="info">Cleaning up...</echo>
-    <delete dir="${basedir}/classes"  />
+    <delete dir="${basedir}/classes" />
     <delete dir="${basedir}/documentation/html" />
     <delete dir="${basedir}/documentation/pdf" />
-    <delete includeEmptyDirs="true" >
+    <delete includeEmptyDirs="true">
       <fileset dir="${basedir}/lib" includes="mycore*.jar" />
     </delete>
-    <moduleHook target="clean"/>
+    <moduleHook target="clean" />
   </target>
 
   <!-- =================================================================== -->
@@ -395,11 +392,7 @@
   <!-- =================================================================== -->
 
   <target name="update">
-    <cvs
-      cvsroot="${CVSRoot}"
-      command="update -dP"
-      dest="${basedir}"
-    />
+    <cvs cvsroot="${CVSRoot}" command="update -dP" dest="${basedir}" />
   </target>
 
   <!-- =================================================================== -->
@@ -424,13 +417,13 @@
       <arg value="-module=mycore" />
       <arg value="-output=buildhtmlreport" />
       <arg value="-viewcvsurl=http://www.mycore.de/cvs/viewvc.cgi" />
-      <arg value="-dir=${basedir}/documentation/changelogs/${year}" /> 
+      <arg value="-dir=${basedir}/documentation/changelogs/${year}" />
     </exec>
 
-    <move file="${basedir}/documentation/changelogs/${year}/cvschangelogbuilder_mycore.html" 
-        tofile="${basedir}/documentation/changelogs/${year}/index.html" />
+    <move file="${basedir}/documentation/changelogs/${year}/cvschangelogbuilder_mycore.html"
+          tofile="${basedir}/documentation/changelogs/${year}/index.html" />
   </target>
-  
+
   <!-- =================================================================== -->
   <!-- Do work after a CVS commit...                                       -->
   <!-- =================================================================== -->
@@ -441,8 +434,8 @@
     <antcall target="javadocs" />
     <antcall target="java2pdf" />
 
-    <chmod dir="${basedir}/documentation" type="file" perm="ugo+r"  includes="**/*" /> 
-    <chmod dir="${basedir}/documentation" type="dir"  perm="ugo+rx" includes="**/*" />
+    <chmod dir="${basedir}/documentation" type="file" perm="ugo+r" includes="**/*" />
+    <chmod dir="${basedir}/documentation" type="dir" perm="ugo+rx" includes="**/*" />
   </target>
 
   <!-- =================================================================== -->
@@ -465,36 +458,33 @@
   </target>
 
   <target name="distribution.module">
-    <property name="Distrib.TmpDir"     value="tmp"      />
-    <property name="Distrib.TargetDir"  value="/mcr/www/download" />
-    <property name="Distrib.CVSRoot"    value=":pserver:anoncvs@server.mycore.de:/cvs" />
+    <property name="Distrib.TmpDir" value="tmp" />
+    <property name="Distrib.TargetDir" value="/mcr/www/download" />
+    <property name="Distrib.CVSRoot" value=":pserver:anoncvs@server.mycore.de:/cvs" />
     <property name="Distrib.ReleaseTag" value="release_1_3_fixes" />
-    <property name="Distrib.ReleaseNr"  value="1.3.beta" />
+    <property name="Distrib.ReleaseNr" value="1.3.beta" />
 
     <delete dir="${Distrib.TmpDir}" />
 
-    <mkdir dir="${Distrib.TmpDir}"    />
+    <mkdir dir="${Distrib.TmpDir}" />
     <mkdir dir="${Distrib.TargetDir}" />
 
-    <cvs
-      cvsroot="${Distrib.CVSRoot}"
-      command="checkout -r ${Distrib.ReleaseTag} ${Distrib.Module}"
-      dest="${Distrib.TmpDir}"
-    />
+    <cvs cvsroot="${Distrib.CVSRoot}"
+         command="checkout -r ${Distrib.ReleaseTag} ${Distrib.Module}"
+         dest="${Distrib.TmpDir}" />
 
     <zip destfile="${Distrib.TargetDir}/${Distrib.ZipFile}-${Distrib.ReleaseNr}.zip"
-      basedir="${Distrib.TmpDir}"
-      includes="${Distrib.Module}/**"
-      encoding="ISO_8859_1"
-    />
+         basedir="${Distrib.TmpDir}"
+         includes="${Distrib.Module}/**"
+         encoding="ISO_8859_1" />
 
     <tar tarfile="${Distrib.TmpDir}/${Distrib.ZipFile}-${Distrib.ReleaseNr}.tar"
-      basedir="${Distrib.TmpDir}"
-      includes="${Distrib.Module}/**"
-      longfile="gnu"
-    />
+         basedir="${Distrib.TmpDir}"
+         includes="${Distrib.Module}/**"
+         longfile="gnu" />
 
-    <gzip src="${Distrib.TmpDir}/${Distrib.ZipFile}-${Distrib.ReleaseNr}.tar" zipfile="${Distrib.TargetDir}/${Distrib.ZipFile}-${Distrib.ReleaseNr}.tar.gz" />
+    <gzip src="${Distrib.TmpDir}/${Distrib.ZipFile}-${Distrib.ReleaseNr}.tar"
+          zipfile="${Distrib.TargetDir}/${Distrib.ZipFile}-${Distrib.ReleaseNr}.tar.gz" />
 
     <delete dir="${Distrib.TmpDir}" />
 
