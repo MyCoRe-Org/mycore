@@ -2,7 +2,7 @@
 
 <!-- =================================================================== -->
 <!-- MyCoRe build file for use with Apache Ant                           -->
-<!-- $Revision: 1.142 $ $Date: 2007-12-17 17:02:30 $                      -->
+<!-- $Revision: 1.143 $ $Date: 2007-12-18 16:24:47 $                      -->
 <!-- =================================================================== -->
 
 <project name="MyCoRe" default="usage" basedir=".">
@@ -20,6 +20,15 @@
   <!--property name="build.compiler"     value="jikes"/-->
   <property name="sourceencoding" value="ISO-8859-15" />
   <property name="env.MYCORE_HOME" value="." />
+
+  <condition property="ant1.7">
+    <available classname="org.apache.tools.ant.taskdefs.condition.AntVersion" />
+  </condition>
+  <fail unless="ant1.7">
+    Ant too old.
+    Sorry your ant version is too old. You need at least "Ant 1.7.0".
+    You have: ${ant.version}
+  </fail>
 
   <!-- Read in all environment variables -->
   <property environment="env" />
@@ -162,7 +171,7 @@
     <echo level="info">Operating system : ${os.name} Version ${os.version} on ${os.arch} </echo>
     <echo level="info">Java version     : JDK ${ant.java.version} Version ${java.version} from ${java.vendor}</echo>
     <echo level="info">Java home        : ${java.home}</echo>
-    <echo level="info">Ant build file   : $Revision: 1.142 $ $Date: 2007-12-17 17:02:30 $</echo>
+    <echo level="info">Ant build file   : $Revision: 1.143 $ $Date: 2007-12-18 16:24:47 $</echo>
     <echo level="info">Ant version      : ${ant.version}</echo>
     <echo level="info">Ant home         : ${ant.home}</echo>
     <echo level="info">Ant libdir       : ${ant.library.dir}</echo>
