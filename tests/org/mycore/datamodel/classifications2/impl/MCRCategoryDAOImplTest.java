@@ -221,6 +221,7 @@ public class MCRCategoryDAOImplTest extends MCRHibTestCase {
         DAO.replaceCategory(category2);
         startNewTransaction();
         MCRCategory rootNode = getRootCategoryFromSession();
+        System.out.println("rootNode:\n" + MCRStringTransformer.getString(rootNode));
         assertEquals("Category count does not match.", countNodes(category2), countNodes(rootNode));
         assertEquals("Label count does not match.", category2.getChildren().get(0).getLabels().size(), rootNode.getChildren().get(0).getLabels().size());
     }
@@ -247,6 +248,7 @@ public class MCRCategoryDAOImplTest extends MCRHibTestCase {
 
     /**
      * tests relink child to grantparent and removal of parent.
+     * 
      * @throws URISyntaxException
      */
     public void testReplaceCategoryShiftCase() {
@@ -257,8 +259,12 @@ public class MCRCategoryDAOImplTest extends MCRHibTestCase {
         category.getChildren().remove(0);
         category.getChildren().add(germany);
         DAO.replaceCategory(category);
+        startNewTransaction();
+        MCRCategory rootNode = getRootCategoryFromSession();
+        assertEquals("Category count does not match.", countNodes(category), countNodes(rootNode));
+        assertEquals("Label count does not match.", category.getChildren().get(0).getLabels().size(), rootNode.getChildren().get(0).getLabels().size());
     }
-    
+
     private MCRCategoryImpl getRootCategoryFromSession() {
         return (MCRCategoryImpl) sessionFactory.getCurrentSession().get(MCRCategoryImpl.class, ((MCRCategoryImpl) category).getInternalID());
     }
