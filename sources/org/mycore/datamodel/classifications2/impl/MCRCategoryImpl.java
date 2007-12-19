@@ -32,6 +32,7 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.hibernate.collection.PersistentList;
 
+import org.mycore.common.MCRException;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRLabel;
 
@@ -274,6 +275,9 @@ public class MCRCategoryImpl extends MCRAbstractCategoryImpl implements Serializ
 
     static MCRCategoryImpl wrapCategory(MCRCategory category, MCRCategory parent, MCRCategory root) {
         MCRCategoryImpl catImpl;
+        if (category.getParent()!=null && category.getParent()!=parent){
+            throw new MCRException("MCRCategory is already attached to a different parent.");
+        }
         if (category instanceof MCRCategoryImpl) {
             catImpl = (MCRCategoryImpl) category;
             // don't use setParent() as it call add() from ChildList
