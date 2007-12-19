@@ -307,9 +307,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         // old Map with all Categories referenced by ID
         Map<MCRCategoryID, MCRCategoryImpl> oldMap = new HashMap<MCRCategoryID, MCRCategoryImpl>();
         fillIDMap(oldMap, oldCategory);
-        // detatch from session (all sub categories are fetched)
-        session.evict(oldCategory);
-        MCRCategoryImpl newCategoryImpl = MCRCategoryImpl.wrapCategory(newCategory, oldCategory.getParent(), oldCategory.getRoot());
+        MCRCategoryImpl newCategoryImpl = MCRCategoryImpl.wrapCategory(copyDeep(newCategory, -1), oldCategory.getParent(), oldCategory.getRoot());
         // new Map with all Categories referenced by ID
         Map<MCRCategoryID, MCRCategoryImpl> newMap = new HashMap<MCRCategoryID, MCRCategoryImpl>();
         fillIDMap(newMap, newCategoryImpl);
@@ -322,25 +320,11 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         for (MCRCategoryImpl category : newMap.values()) {
             MCRCategoryImpl oldValue = oldMap.get(category.getId());
             if (oldValue != null) {
-                // category.setInternalID(oldValue.getInternalID());
-                MCRCategoryImpl parent = (MCRCategoryImpl) category.getParent();
-                if (parent != null) {
-                    // get new parent of modified category tree here (by parent
-                    // category id)
-                    parent = (MCRCategoryImpl) findCategory(newCategoryImpl, category.getParent().getId());
-                    int pos = category.getPositionInParent();
-                    parent.getChildren().remove(pos);
-                    oldValue.detachFromParent();
-                    parent.getChildren().add(pos, oldValue);
-                    // set parent here
-                    oldValue.parent = parent;
-                    oldValue.getChildren().clear();
-                    oldValue.getChildren().addAll(MCRCategoryImpl.wrapCategories(detachCategories(category.getChildren()), oldValue, oldValue.getRoot()));
-                } else {
-                    category.setInternalID(oldValue.getInternalID());
-                }
+                copyCategoryToNewTree(newCategoryImpl, category, oldValue);
             }
         }
+        // detatch from session (all sub categories are fetched)
+        session.evict(oldCategory);
         // calculate left, right and level values
         int diffNodes = newMap.size() - oldMap.size();
         LOGGER.debug("Update changes classification node size by: " + diffNodes);
@@ -505,7 +489,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         return (newParent.getLeft() > oldParent.getLeft());
     }
 
-    private static MCRCategoryImpl copyDeep(MCRCategoryImpl category, int level) {
+    private static MCRCategoryImpl copyDeep(MCRCategory category, int level) {
         if (category == null) {
             return null;
         }
@@ -520,7 +504,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         newCateg.setChildren(new ArrayList<MCRCategory>(childAmount));
         newCateg.setId(category.getId());
         newCateg.setLabels(new HashMap<String, MCRLabel>(category.getLabels()));
-        newCateg.setRoot(category.root);
+        newCateg.setRoot(category.getRoot());
         newCateg.setURI(category.getURI());
         newCateg.setLevel(category.getLevel());
         if (childAmount > 0) {
@@ -543,10 +527,63 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
     }
 
     /**
+     * copies <code>previousVersion</code> into the place of
+     * <code>category</code> in <code>newTree</code>. All changes of
+     * <code>category</code> are applied to <code>previousVersion</code>.
+     * 
+     * @param newTree
+     *            new root of MCRCategory tree
+     * @param category
+     *            new version containing all changes
+     * @param previousVersion
+     *            oldVersion allready stored in database
+     */
+    private static void copyCategoryToNewTree(MCRCategoryImpl newTree, MCRCategoryImpl category, MCRCategoryImpl previousVersion) {
+        // category.setInternalID(oldValue.getInternalID());
+        MCRCategoryImpl parent = (MCRCategoryImpl) category.getParent();
+        if (parent != null) {
+            // get new parent of modified category tree here (by parent
+            // category id)
+            parent = (MCRCategoryImpl) findCategory(newTree, category.getParent().getId());
+            int pos = category.getPositionInParent();
+            parent.getChildren().remove(pos);
+            previousVersion.detachFromParent();
+            parent.getChildren().add(pos, previousVersion);
+            // set parent here
+            previousVersion.parent = parent;
+            previousVersion.getChildren().clear();
+            previousVersion.getChildren().addAll(
+                    MCRCategoryImpl.wrapCategories(detachCategories(category.getChildren()), previousVersion, previousVersion.getRoot()));
+            for (String lang : category.getLabels().keySet()) {
+                MCRLabel oldLabel = previousVersion.getLabels().get(lang);
+                MCRLabel newLabel = category.getLabels().get(lang);
+                if (oldLabel == null) {
+                    // copy new label
+                    previousVersion.getLabels().put(lang, category.getLabels().get(lang));
+                } else {
+                    if (!oldLabel.getText().equals(newLabel.getText())) {
+                        oldLabel.setText(newLabel.getText());
+                    }
+                    if (!oldLabel.getDescription().equals(newLabel.getDescription())) {
+                        oldLabel.setDescription(newLabel.getDescription());
+                    }
+                }
+            }
+            for (String lang : previousVersion.getLabels().keySet()) {
+                // remove labels that are not present in new version
+                if (!category.getLabels().containsKey(lang))
+                    previousVersion.getLabels().remove(lang);
+            }
+        } else {
+            category.setInternalID(previousVersion.getInternalID());
+        }
+    }
+
+    /**
      * finds a MCRCategory with <code>id</code> somewhere below
      * <code>root</code>.
      */
-    private MCRCategory findCategory(MCRCategory root, MCRCategoryID id) {
+    private static MCRCategory findCategory(MCRCategory root, MCRCategoryID id) {
         if (root.getId().equals(id)) {
             return root;
         }
@@ -562,7 +599,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
     /**
      * detaches all elements in list from their parent.
      */
-    private List<MCRCategory> detachCategories(List<MCRCategory> list) {
+    private static List<MCRCategory> detachCategories(List<MCRCategory> list) {
         ArrayList<MCRCategory> categories = new ArrayList<MCRCategory>(list.size());
         categories.addAll(list);
         for (MCRCategory category : categories) {
