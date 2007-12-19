@@ -310,13 +310,35 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         // detatch from session (all sub categories are fetched)
         session.evict(oldCategory);
         MCRCategoryImpl newCategoryImpl = MCRCategoryImpl.wrapCategory(newCategory, oldCategory.getParent(), oldCategory.getRoot());
+        // new Map with all Categories referenced by ID
         Map<MCRCategoryID, MCRCategoryImpl> newMap = new HashMap<MCRCategoryID, MCRCategoryImpl>();
         fillIDMap(newMap, newCategoryImpl);
-        // set internalID of known categories
+        /*
+         * copy elements from the new tree to the old tree. fixes bug #1848710
+         * (Classification save fails after shilfting categories)
+         * 
+         * set internalID for the new rootCategory
+         */
         for (MCRCategoryImpl category : newMap.values()) {
             MCRCategoryImpl oldValue = oldMap.get(category.getId());
             if (oldValue != null) {
-                category.setInternalID(oldValue.getInternalID());
+                // category.setInternalID(oldValue.getInternalID());
+                MCRCategoryImpl parent = (MCRCategoryImpl) category.getParent();
+                if (parent != null) {
+                    // get new parent of modified category tree here (by parent
+                    // category id)
+                    parent = (MCRCategoryImpl) findCategory(newCategoryImpl, category.getParent().getId());
+                    int pos = category.getPositionInParent();
+                    parent.getChildren().remove(pos);
+                    oldValue.detachFromParent();
+                    parent.getChildren().add(pos, oldValue);
+                    // set parent here
+                    oldValue.parent = parent;
+                    oldValue.getChildren().clear();
+                    oldValue.getChildren().addAll(MCRCategoryImpl.wrapCategories(detachCategories(category.getChildren()), oldValue, oldValue.getRoot()));
+                } else {
+                    category.setInternalID(oldValue.getInternalID());
+                }
             }
         }
         // calculate left, right and level values
@@ -339,6 +361,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         for (MCRCategoryImpl category : oldMap.values()) {
             if (!newMap.containsKey(category.getId())) {
                 LOGGER.info("Deleting category :" + category.getId());
+                category.detachFromParent();
                 session.delete(category);
             }
         }
@@ -517,6 +540,38 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
             return null;
         }
         return (MCRCategoryImpl) session.get(CATEGRORY_CLASS, internalID);
+    }
+
+    /**
+     * finds a MCRCategory with <code>id</code> somewhere below
+     * <code>root</code>.
+     */
+    private MCRCategory findCategory(MCRCategory root, MCRCategoryID id) {
+        if (root.getId().equals(id)) {
+            return root;
+        }
+        for (MCRCategory child : root.getChildren()) {
+            MCRCategory rv = findCategory(child, id);
+            if (rv != null) {
+                return rv;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * detaches all elements in list from their parent.
+     */
+    private List<MCRCategory> detachCategories(List<MCRCategory> list) {
+        ArrayList<MCRCategory> categories = new ArrayList<MCRCategory>(list.size());
+        categories.addAll(list);
+        for (MCRCategory category : categories) {
+            if (!(category instanceof MCRCategoryImpl)) {
+                throw new IllegalArgumentException("This method just works for MCRCategoryImpl");
+            }
+            ((MCRAbstractCategoryImpl) category).detachFromParent();
+        }
+        return categories;
     }
 
     private static void fillIDMap(Map<MCRCategoryID, MCRCategoryImpl> map, MCRCategoryImpl category) {
