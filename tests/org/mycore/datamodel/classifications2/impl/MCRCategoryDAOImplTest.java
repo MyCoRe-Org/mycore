@@ -221,7 +221,6 @@ public class MCRCategoryDAOImplTest extends MCRHibTestCase {
         DAO.replaceCategory(category2);
         startNewTransaction();
         MCRCategory rootNode = getRootCategoryFromSession();
-        System.out.println("rootNode:\n" + MCRStringTransformer.getString(rootNode));
         assertEquals("Category count does not match.", countNodes(category2), countNodes(rootNode));
         assertEquals("Label count does not match.", category2.getChildren().get(0).getLabels().size(), rootNode.getChildren().get(0).getLabels().size());
     }
