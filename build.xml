@@ -2,7 +2,7 @@
 
 <!-- =================================================================== -->
 <!-- MyCoRe build file for use with Apache Ant                           -->
-<!-- $Revision: 1.143 $ $Date: 2007-12-18 16:24:47 $                      -->
+<!-- $Revision: 1.144 $ $Date: 2007-12-20 10:58:54 $                      -->
 <!-- =================================================================== -->
 
 <project name="MyCoRe" default="usage" basedir=".">
@@ -59,22 +59,6 @@
   <property name="doclets" value="/mcr/cvs/doclets" />
 
   <if>
-    <isset property="MCR.JDBCStore.BaseDir" />
-    <then>
-      <path id="jdbc.classpath.temp">
-        <fileset dir="${MCR.JDBCStore.BaseDir}" includes="_dummy_ ${MCR.JDBCStore.Jars}" />
-        <dirset dir="${MCR.JDBCStore.BaseDir}" includes="_dummy_ ${MCR.JDBCStore.ClassesDirs}" />
-      </path>
-      <path id="jdbc.libpath.temp">
-        <dirset dir="${MCR.JDBCStore.BaseDir}" includes="_dummy_ ${MCR.JDBCStore.LibPath}" />
-      </path>
-    </then>
-    <else>
-      <path id="jdbc.classpath" />
-      <path id="jdbc.libpath" />
-    </else>
-  </if>
-  <if>
     <isset property="MCR.System.SharedJarsDir" />
     <then>
       <path id="share.classpath">
@@ -92,7 +76,6 @@
     <fileset dir="${ant.library.dir}" includes="*junit*.jar"/>
 			-->
     <fileset dir="${ant.library.dir}" includes="ant.jar" />
-    <path refid="jdbc.classpath" />
     <path refid="share.classpath" />
   </path>
 
@@ -171,7 +154,7 @@
     <echo level="info">Operating system : ${os.name} Version ${os.version} on ${os.arch} </echo>
     <echo level="info">Java version     : JDK ${ant.java.version} Version ${java.version} from ${java.vendor}</echo>
     <echo level="info">Java home        : ${java.home}</echo>
-    <echo level="info">Ant build file   : $Revision: 1.143 $ $Date: 2007-12-18 16:24:47 $</echo>
+    <echo level="info">Ant build file   : $Revision: 1.144 $ $Date: 2007-12-20 10:58:54 $</echo>
     <echo level="info">Ant version      : ${ant.version}</echo>
     <echo level="info">Ant home         : ${ant.home}</echo>
     <echo level="info">Ant libdir       : ${ant.library.dir}</echo>
