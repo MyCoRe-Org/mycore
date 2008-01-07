@@ -68,9 +68,9 @@ public class MCRUser extends MCRUserObject implements MCRPrincipal, Principal {
 
     /** Object representing user address information */
     protected MCRUserContact userContact;
-    
+
     /** A list of groups (IDs) where this user is a member of */
-    protected List<String> groupIDs = null;    
+    protected List<String> groupIDs = null;
 
     /**
      * Default constructor. It is used to create a user object with empty
@@ -90,8 +90,6 @@ public class MCRUser extends MCRUserObject implements MCRPrincipal, Principal {
         groupIDs = new ArrayList<String>();
         userContact = new MCRUserContact();
     }
-
-
 
     /**
      * This minimal constructor only takes the user ID as a parameter. For all
@@ -162,8 +160,10 @@ public class MCRUser extends MCRUserObject implements MCRPrincipal, Principal {
      * @param cellphone
      *            number of cellular phone, if available
      */
-    public MCRUser(int numID, String ID, String creator, Timestamp creationDate, Timestamp modifiedDate, boolean idEnabled, boolean updateAllowed, String description, String passwd, String primaryGroupID, List<String> groupIDs, String salutation, String firstname, String lastname, String street, String city, String postalcode, String country, String state, String institution, String faculty,
-            String department, String institute, String telephone, String fax, String email, String cellphone) throws MCRException, Exception {
+    public MCRUser(int numID, String ID, String creator, Timestamp creationDate, Timestamp modifiedDate, boolean idEnabled, boolean updateAllowed,
+            String description, String passwd, String primaryGroupID, List<String> groupIDs, String salutation, String firstname, String lastname,
+            String street, String city, String postalcode, String country, String state, String institution, String faculty, String department,
+            String institute, String telephone, String fax, String email, String cellphone) throws MCRException, Exception {
         // The following data will never be changed by update
         super.ID = trim(ID, id_len);
         this.numID = numID;
@@ -190,7 +190,8 @@ public class MCRUser extends MCRUserObject implements MCRPrincipal, Principal {
         this.primaryGroupID = trim(primaryGroupID, id_len);
         this.groupIDs = groupIDs;
 
-        this.userContact = new MCRUserContact(salutation, firstname, lastname, street, city, postalcode, country, state, institution, faculty, department, institute, telephone, fax, email, cellphone);
+        this.userContact = new MCRUserContact(salutation, firstname, lastname, street, city, postalcode, country, state, institution, faculty, department,
+                institute, telephone, fax, email, cellphone);
     }
 
     /**
@@ -298,7 +299,7 @@ public class MCRUser extends MCRUserObject implements MCRPrincipal, Principal {
     public final String getID() {
         return ID;
     }
-    
+
     /**
      * This method removes a group from the groups list of the user object. This
      * list is the list of group IDs where this user or group itself is a member
@@ -315,8 +316,8 @@ public class MCRUser extends MCRUserObject implements MCRPrincipal, Principal {
         if (groupIDs.contains(groupID)) {
             groupIDs.remove(groupID);
         }
-    }   
-    
+    }
+
     /**
      * This method adds a group to the groups list of the user object. This is
      * the list of group IDs where this user or group itself is a member of, not
@@ -333,7 +334,7 @@ public class MCRUser extends MCRUserObject implements MCRPrincipal, Principal {
         if (!groupIDs.contains(groupID)) {
             groupIDs.add(groupID);
         }
-    }    
+    }
 
     /**
      * This method determines the list of all groups the user is a member of,
@@ -344,7 +345,7 @@ public class MCRUser extends MCRUserObject implements MCRPrincipal, Principal {
      * @return list of all groups the user is a member of
      */
     public final List<String> getAllGroupIDs() {
-    	return groupIDs;
+        return groupIDs;
     }
 
     /**
@@ -394,7 +395,7 @@ public class MCRUser extends MCRUserObject implements MCRPrincipal, Principal {
      * @return Returns true if the user is a member of the given group.
      */
     public boolean isMemberOf(MCRGroup group) {
-        if (groupIDs.contains(group.getID())) {
+        if (this.getPrimaryGroupID().equals(group.getID()) || groupIDs.contains(group.getID())) {
             return true;
         }
 
@@ -529,7 +530,8 @@ public class MCRUser extends MCRUserObject implements MCRPrincipal, Principal {
      * @return this user data as JDOM element
      */
     public org.jdom.Element toJDOMElement() throws MCRException {
-        org.jdom.Element user = new org.jdom.Element("user").setAttribute("numID", Integer.toString(numID)).setAttribute("ID", ID).setAttribute("id_enabled", (idEnabled) ? "true" : "false").setAttribute("update_allowed", (updateAllowed) ? "true" : "false");
+        org.jdom.Element user = new org.jdom.Element("user").setAttribute("numID", Integer.toString(numID)).setAttribute("ID", ID).setAttribute("id_enabled",
+                (idEnabled) ? "true" : "false").setAttribute("update_allowed", (updateAllowed) ? "true" : "false");
         org.jdom.Element Creator = new org.jdom.Element("user.creator").setText(super.creator);
         org.jdom.Element CreationDate = new org.jdom.Element("user.creation_date").setText(super.creationDate.toString());
         org.jdom.Element ModifiedDate = new org.jdom.Element("user.last_modified").setText(super.modifiedDate.toString());
@@ -546,7 +548,8 @@ public class MCRUser extends MCRUserObject implements MCRPrincipal, Principal {
         }
 
         // Aggregate user element
-        user.addContent(Creator).addContent(CreationDate).addContent(ModifiedDate).addContent(Passwd).addContent(Description).addContent(Primarygroup).addContent(userContact.toJDOMElement()).addContent(Groups);
+        user.addContent(Creator).addContent(CreationDate).addContent(ModifiedDate).addContent(Passwd).addContent(Description).addContent(Primarygroup)
+                .addContent(userContact.toJDOMElement()).addContent(Groups);
 
         return user;
     }
@@ -560,7 +563,7 @@ public class MCRUser extends MCRUserObject implements MCRPrincipal, Principal {
         logger.debug("groupIDs #         = " + groupIDs.size());
         for (int i = 0; i < groupIDs.size(); i++) {
             logger.debug("groupIDs           = " + ((String) groupIDs.get(i)));
-        }        
+        }
         userContact.debug();
     }
 
@@ -583,7 +586,7 @@ public class MCRUser extends MCRUserObject implements MCRPrincipal, Principal {
         } else if (primaryGroup.getAdminUserIDs().contains(currentUserID)) {
             return true;
         } else { // check if the current user is (direct, not implicit)
-                    // member
+            // member
 
             // of one of the admGroups
             ArrayList admGroupIDs = primaryGroup.getAdminGroupIDs();
@@ -599,21 +602,21 @@ public class MCRUser extends MCRUserObject implements MCRPrincipal, Principal {
 
         throw new MCRException("The current user " + currentUserID + " has no right to modify the user " + this.ID + ".");
     }
-    
+
     /**
      * @return This method returns the list of groups as a ArrayList of strings.
      *         These are the groups where the object itself is a member of.
      */
     public final List<String> getGroupIDs() {
         return groupIDs;
-    }    
-    
-    public final int getGroupCount(){
-           try{
-               return groupIDs.size();
-           }catch(Exception e){
-               return 0;
-           }
+    }
+
+    public final int getGroupCount() {
+        try {
+            return groupIDs.size();
+        } catch (Exception e) {
+            return 0;
+        }
     }
 
     /**
@@ -622,40 +625,38 @@ public class MCRUser extends MCRUserObject implements MCRPrincipal, Principal {
     public String getName() {
         return getID();
     }
-    
+
     /**
      * @see #getID()
      */
     public String toString() {
         return getID();
     }
-    
-    public boolean equals(Object obj){
-        if (!(obj instanceof MCRUser)){
+
+    public boolean equals(Object obj) {
+        if (!(obj instanceof MCRUser)) {
             return false;
         }
-        MCRUser u=(MCRUser)obj;
-        if (this==u){
+        MCRUser u = (MCRUser) obj;
+        if (this == u) {
             return true;
         }
-        if (this.hashCode()!=this.hashCode()){
-            //acording to the hashCode() contract
+        if (this.hashCode() != this.hashCode()) {
+            // acording to the hashCode() contract
             return false;
         }
         return fastEquals(u);
     }
-    
-    private boolean fastEquals(MCRUser u){
-        return (
-                ((this.getID()==u.getID()) || (this.getID().equals(u.getID()))) &&
-                ((this.getUserContact()==u.getUserContact()) || (this.getUserContact().equals(u.getUserContact())))
-               );
+
+    private boolean fastEquals(MCRUser u) {
+        return (((this.getID() == u.getID()) || (this.getID().equals(u.getID()))) && ((this.getUserContact() == u.getUserContact()) || (this.getUserContact()
+                .equals(u.getUserContact()))));
     }
-    
+
     public int hashCode() {
-        int result=17;
-        result=37*result+getID().hashCode();
-        result=37*result+getUserContact().hashCode();
+        int result = 17;
+        result = 37 * result + getID().hashCode();
+        result = 37 * result + getUserContact().hashCode();
         return result;
     }
 }
