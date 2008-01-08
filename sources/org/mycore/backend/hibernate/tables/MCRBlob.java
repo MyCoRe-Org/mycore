@@ -29,6 +29,10 @@ import java.io.OutputStream;
 import java.sql.Blob;
 import java.sql.SQLException;
 
+import org.apache.log4j.Logger;
+
+import org.mycore.common.MCRException;
+
 public class MCRBlob implements java.sql.Blob {
     byte[] data;
 
@@ -56,13 +60,22 @@ public class MCRBlob implements java.sql.Blob {
         throw new IllegalArgumentException("not implemented");
     }
 
-    public byte[] getBytes(long pos, int length) {
-        if ((pos + length) > data.length) {
-            length = (int) (data.length - pos);
+    public byte[] getBytes(long pos, int length) throws SQLException {
+        if (pos < 1)
+            throw new SQLException("The ordinal position is less than 1: " + pos);
+        if (pos > Integer.MAX_VALUE)
+            throw new ArrayIndexOutOfBoundsException("Ordinal position grater than " + Integer.MAX_VALUE + " is not supported:" + pos);
+        if (length < 0)
+            throw new SQLException("The number of consecutive bytes to be copied must be 0 or greater: " + length);
+        // first byte is position 1 according to java.sql API, but position 0 in
+        // array
+        int arrayPos = (int) (pos - 1);
+        if ((arrayPos + length) > data.length) {
+            length = (int) (data.length - arrayPos);
         }
 
         byte[] result = new byte[length];
-        System.arraycopy(data, (int) pos, result, 0, length);
+        System.arraycopy(data, arrayPos, result, 0, length);
 
         return result;
     }
@@ -73,23 +86,29 @@ public class MCRBlob implements java.sql.Blob {
 
     // Determines the byte position at which the specified byte pattern begins
     // within the BLOB value that this Blob object represents.
-    public long position(byte[] pattern, long start) {
-        int t;
-        searchloop: for (t = (int) start; t < data.length; t++) {
+    public long position(byte[] pattern, long start) throws SQLException {
+        if (start < 1)
+            throw new SQLException("The start position is less than 1: " + start);
+        if (start > Integer.MAX_VALUE)
+            throw new ArrayIndexOutOfBoundsException("Start position grater than " + Integer.MAX_VALUE + " is not supported:" + start);
+        int arrayPos;
+        // first byte is position 1 according to java.sql API, but position 0 in
+        // array
+        searchloop: for (arrayPos = (int) start - 1; arrayPos < data.length; arrayPos++) {
             int s;
-            int len = data.length - t;
+            int len = data.length - arrayPos;
 
-            if (pattern.length > (data.length - t)) {
+            if (pattern.length > (data.length - arrayPos)) {
                 break searchloop;
             }
 
             for (s = 0; s < len; s++) {
-                if (pattern[s] != data[t]) {
+                if (pattern[s] != data[arrayPos]) {
                     continue searchloop;
                 }
             }
-
-            return t;
+            // again first byte in java.sql API is at position 1
+            return arrayPos + 1;
         }
 
         return -1;
@@ -105,30 +124,33 @@ public class MCRBlob implements java.sql.Blob {
 
     public static byte[] getBytes(Blob blob) {
         try {
-            java.io.InputStream in = blob.getBinaryStream();
-            byte[] b = new byte[in.available()];
-            int t;
-
-            for (t = 0; t < b.length; t++)
-                b[t] = (byte) in.read();
-
-            return b;
+            if (blob.length() > Integer.MAX_VALUE) {
+                throw new MCRException("Blobs longer than " + Integer.MAX_VALUE + " are not supported: " + blob.length());
+            }
+            return blob.getBytes(1, (int) blob.length());
         } catch (java.sql.SQLException e) {
-            e.printStackTrace();
-
-            return null;
-        } catch (java.io.IOException e) {
-            e.printStackTrace();
-
+            // TODO: check if this should be thrown
+            Logger.getLogger(MCRBlob.class).error("Caught SQLException." + e);
             return null;
         }
     }
 
     public void free() throws SQLException {
-        data=null;
+        data = null;
     }
 
     public InputStream getBinaryStream(long pos, long length) throws SQLException {
-        return new ByteArrayInputStream(data, (int)pos, (int)length);
+        if (pos < 1)
+            throw new SQLException("The ordinal position is less than 1: " + pos);
+        if (pos > data.length)
+            throw new ArrayIndexOutOfBoundsException("Ordinal position is greater than the number of bytes (" + data.length + ") in the Blob: " + length);
+        if (length < 0)
+            throw new SQLException("The number of consecutive bytes to be copied must be 0 or greater: " + length);
+        if ((pos + length) > data.length)
+            throw new SQLException("The ordinal position(" + pos + ") + the length(" + length + ") in bytes are greater than the number of bytes ("
+                    + data.length + ") in the Blob.");
+        // first byte is position 1 according to java.sql API, but position 0 in
+        // array
+        return new ByteArrayInputStream(data, (int) pos - 1, (int) length);
     }
 }
