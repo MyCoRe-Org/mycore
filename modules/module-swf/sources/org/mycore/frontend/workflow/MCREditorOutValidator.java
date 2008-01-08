@@ -115,7 +115,8 @@ public class MCREditorOutValidator {
         HashMap<String, Method> methods = new HashMap<String, Method>();
         Method[] m = MCREditorOutValidator.class.getDeclaredMethods();
         for (int i = 0; i < m.length; i++) {
-            if (!m[i].getName().startsWith("checkMCR") || !((m[i].getParameterTypes().length == 1) && m[i].getParameterTypes()[0] == Element.class && m[i].getReturnType() == Boolean.TYPE)) {
+            if (!m[i].getName().startsWith("checkMCR")
+                    || !((m[i].getParameterTypes().length == 1) && m[i].getParameterTypes()[0] == Element.class && m[i].getReturnType() == Boolean.TYPE)) {
                 continue;
             }
             LOGGER.debug("adding Method " + m[i].getName());
@@ -144,11 +145,13 @@ public class MCREditorOutValidator {
         this.errorlog = new ArrayList<String>();
         this.input = jdom_in;
         this.id = id;
-        byte[] xml = MCRUtils.getByteArray(input);
-        System.out.println(new String(xml));
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("XML before validation:\n" + new String(MCRUtils.getByteArray(input)));
+        }
         checkObject();
-        xml = MCRUtils.getByteArray(input);
-        System.out.println(new String(xml));
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("XML after validation:\n" + new String(MCRUtils.getByteArray(input)));
+        }
     }
 
     /**
