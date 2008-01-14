@@ -64,6 +64,27 @@ public class MCRFileNodeServlet extends MCRServlet {
     // property!
     private static String accessErrorPage = CONFIG.getString("MCR.Access.Page.Error", "");
 
+    @Override
+    protected long getLastModified(HttpServletRequest request) {
+        try {
+            String ownerID = getOwnerID(request);
+            MCRFilesystemNode root = MCRFilesystemNode.getRootNode(ownerID);
+            int pos = ownerID.length() + 1;
+            StringBuffer path = new StringBuffer(request.getPathInfo().substring(pos));
+            if ((path.charAt(path.length() - 1) == '/') && path.length() > 1) {
+                path.deleteCharAt(path.length() - 1);
+            }
+            MCRFilesystemNode node = ((MCRDirectory) root).getChildByPath(path.toString());
+            final long lastModified = node.getLastModified().getTimeInMillis();
+            LOGGER.debug("getLastModified returned: " + lastModified);
+            return lastModified;
+        } catch (RuntimeException e) {
+            // any error would let us return -1 here
+            LOGGER.info("Error while getting last modified date.", e);
+            return -1;
+        }
+    }
+
     /**
      * Handles the HTTP request
      */
@@ -213,29 +234,33 @@ public class MCRFileNodeServlet extends MCRServlet {
         LOGGER.info("MCRFileNodeServlet: Sending listing of directory " + dir.getName());
         Document jdom = MCRDirectoryXML.getInstance().getDirectoryXML(dir);
         layoutDirectory(req, res, jdom);
-        
+
     }
-    
+
     /**
      * Called to layout the directory structure
+     * 
      * @author Robert Stephan
-     * @param req the html request
-     * @param res the html response
-     * @param jdom the jdom document
+     * @param req
+     *            the html request
+     * @param res
+     *            the html response
+     * @param jdom
+     *            the jdom document
      * @throws IOException
      * @see overwritten in JSPDocportal
      */
-    protected void layoutDirectory(HttpServletRequest req, HttpServletResponse res, Document jdom) throws IOException{
-    	getLayoutService().doLayout(req, res, jdom);
+    protected void layoutDirectory(HttpServletRequest req, HttpServletResponse res, Document jdom) throws IOException {
+        getLayoutService().doLayout(req, res, jdom);
     }
 
-    
-    /** 
-     *  Forwards the error to generate the output
-     *  @author A.Schaar
-     *  @see its overwritten in jspdocportal 
+    /**
+     * Forwards the error to generate the output
+     * 
+     * @author A.Schaar
+     * @see its overwritten in jspdocportal
      */
-    protected void errorPage ( HttpServletRequest req, HttpServletResponse res, int error, String msg, Exception ex, boolean xmlstyle)  throws IOException {
-        generateErrorPage(req, res, error,msg, ex, xmlstyle);    	    
+    protected void errorPage(HttpServletRequest req, HttpServletResponse res, int error, String msg, Exception ex, boolean xmlstyle) throws IOException {
+        generateErrorPage(req, res, error, msg, ex, xmlstyle);
     }
 }
