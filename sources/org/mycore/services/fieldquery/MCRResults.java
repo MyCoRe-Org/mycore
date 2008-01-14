@@ -50,7 +50,7 @@ import org.jdom.Element;
  * @author Jens Kupferschmidt
  * @version $Revision$ $Date$
  */
-public class MCRResults {
+public class MCRResults implements Iterable<MCRHit> {
     /** The list of MCRHit objects */
     private ArrayList<MCRHit> hits = new ArrayList<MCRHit>();
 
@@ -313,5 +313,9 @@ public class MCRResults {
         int numHits = other.getNumHits();
         for (int i = 0; i < numHits; i++)
             this.addHit(other.getHit(i));
+    }
+
+    public Iterator<MCRHit> iterator() {
+        return hits.iterator();
     }
 }
