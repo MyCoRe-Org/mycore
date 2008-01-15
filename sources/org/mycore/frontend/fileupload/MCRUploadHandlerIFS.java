@@ -24,10 +24,13 @@
 package org.mycore.frontend.fileupload;
 
 import java.io.InputStream;
+import java.io.StringWriter;
 import java.util.List;
 import java.util.StringTokenizer;
 
 import org.apache.log4j.Logger;
+import org.jdom.output.Format;
+import org.jdom.output.XMLOutputter;
 
 import org.mycore.access.MCRAccessInterface;
 import org.mycore.access.MCRAccessManager;
@@ -55,7 +58,7 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
 
     protected MCRDirectory rootDir;
 
-    protected boolean newDerivate;
+    protected boolean newDerivate = true;
 
     private static final String ID_TYPE = "derivate";
 
@@ -78,13 +81,13 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
             createNewDerivate(docId, getFreeDerivateID());
         } else {
             if (MCRDerivate.existInDatastore(derId)) {
-                LOGGER.debug("Derivate allready exists: "+derId);
+                LOGGER.debug("Derivate allready exists: " + derId);
                 newDerivate = false;
                 derivate = new MCRDerivate();
                 derivate.receiveFromDatastore(derId);
             } else {
                 // create new derivate with given ID
-                LOGGER.debug("derId='"+derId+"' create derivate with that ID");
+                LOGGER.debug("derId='" + derId + "' create derivate with that ID");
                 createNewDerivate(docId, new MCRObjectID(derId));
             }
         }
@@ -128,14 +131,13 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
         LOGGER.debug("adding file: " + path);
         MCRFile file = getNewFile(path);
         file.setContentFrom(in);
-        
+
         long myLength = file.getSize();
-        if( myLength >= length )
-          return myLength;
-        else
-        {
-          file.delete(); // Incomplete file transfer, user canceled upload
-          return 0;
+        if (myLength >= length)
+            return myLength;
+        else {
+            file.delete(); // Incomplete file transfer, user canceled upload
+            return 0;
         }
     }
 
@@ -147,7 +149,7 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
         String mainfile = getMainFilePath(rootDir);
         if (newDerivate) {
             derivate.getDerivate().getInternals().setMainDoc(mainfile);
-            derivate.updateInDatastore();
+            derivate.updateXMLInDatastore();
             setDefaultPermissions(derivate.getId());
         } else {
             String mf = derivate.getDerivate().getInternals().getMainDoc();
@@ -164,7 +166,7 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
         return derivateID;
     }
 
-    private void createNewDerivate(String docId, MCRObjectID newDerID) {
+    protected void createNewDerivate(String docId, MCRObjectID newDerID) {
         newDerivate = true;
         derivate = new MCRDerivate();
         derivate.setId(newDerID);
@@ -173,7 +175,7 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
         derivate.setLabel("data object from " + docId);
         // set link to Object
         MCRMetaLinkID linkId = new MCRMetaLinkID();
-        linkId.setSubTag("linkmetas");
+        linkId.setSubTag("linkmeta");
         linkId.setReference(docId, null, null);
         MCRMetaIFS ifs = new MCRMetaIFS();
         ifs.setSubTag("internal");
@@ -241,7 +243,7 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
     protected static void setDefaultPermissions(MCRObjectID derID) {
         MCRAccessInterface AI = MCRAccessManager.getAccessImpl();
         List<String> configuredPermissions = AI.getAccessPermissionsFromConfiguration();
-        for (String permission:configuredPermissions) {
+        for (String permission : configuredPermissions) {
             MCRAccessManager.addRule(derID, permission, MCRAccessManager.getTrueRule(), "default derivate rule");
         }
     }

@@ -41,6 +41,7 @@ import org.mycore.frontend.workflow.MCRSimpleWorkflowManager;
  */
 public class MCRSWFUploadHandlerIFS extends MCRUploadHandlerIFS {
     private static final Logger LOGGER = Logger.getLogger(MCRSWFUploadHandlerIFS.class);
+
     /**
      * The constructor for this class. It set all data to handle with IFS upload
      * store.
@@ -85,8 +86,8 @@ public class MCRSWFUploadHandlerIFS extends MCRUploadHandlerIFS {
             derivate.receiveFromDatastore(derId);
         } else {
             // create new derivate with given ID
-            LOGGER.debug("Create derivate with that ID" + derId);
-            derivate = MCRSimpleWorkflowManager.instance().createDerivate(new MCRObjectID(docId), new MCRObjectID(derId));
+            LOGGER.debug("Create derivate with ID: " + derId);
+            createNewDerivate(docId, new MCRObjectID(derId));
         }
     }
 
