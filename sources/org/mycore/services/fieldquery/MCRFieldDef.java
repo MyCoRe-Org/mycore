@@ -1,5 +1,5 @@
 /*
- * $RCSfile$
+ * $HeadURL$
  * $Revision$ $Date$
  *
  * This file is part of ***  M y C o R e  ***
