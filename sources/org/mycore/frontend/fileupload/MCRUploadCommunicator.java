@@ -213,7 +213,7 @@ public class MCRUploadCommunicator {
             upm.progressFile(num);
             
             // Send a "ping" to MCRUploadServlet so that server keeps HTTP Session alive
-            if( ( System.currentTimeMillis() - lastPing ) > 60000 )
+            if( ( System.currentTimeMillis() - lastPing ) > 10000 )
             {
               lastPing = System.currentTimeMillis();
               Hashtable ping = new Hashtable();
