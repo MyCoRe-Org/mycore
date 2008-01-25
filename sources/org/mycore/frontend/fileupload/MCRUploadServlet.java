@@ -55,6 +55,7 @@ import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
+import org.mycore.frontend.MCRWebsiteWriteProtection;
 import org.mycore.frontend.editor.MCREditorSubmission;
 import org.mycore.frontend.editor.MCRRequestParameters;
 import org.mycore.frontend.servlets.MCRServlet;
@@ -233,7 +234,15 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
             handler.unregister();
 
             return;
-        } else if (method.equals("startUploadSession")) {
+        }
+        
+        if(MCRWebsiteWriteProtection.isActive())
+        {
+          sendException( res, new MCRException("System is currently in read-only mode") );
+          return;
+        }
+        
+        if (method.equals("startUploadSession")) {
             String uploadId = req.getParameter("uploadId");
             int numFiles = Integer.parseInt(req.getParameter("numFiles"));
             MCRUploadHandlerManager.getHandler(uploadId).startUpload(numFiles);

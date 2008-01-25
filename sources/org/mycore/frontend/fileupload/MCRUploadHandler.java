@@ -1,5 +1,4 @@
 /*
- * $RCSfile$
  * $Revision$ $Date$
  *
  * This file is part of ***  M y C o R e  ***
@@ -26,6 +25,8 @@ package org.mycore.frontend.fileupload;
 import java.io.InputStream;
 
 import org.apache.log4j.Logger;
+import org.mycore.common.MCRException;
+import org.mycore.frontend.MCRWebsiteWriteProtection;
 
 /**
  * This class does the server-side of uploading files from a client browser,
@@ -53,6 +54,9 @@ public abstract class MCRUploadHandler {
 
     /** Creates a new upload handler and registers it at the handler manager * */
     protected MCRUploadHandler() {
+        if(MCRWebsiteWriteProtection.isActive())
+            throw new MCRException("System is currently in read-only mode");
+
         this.uploadID = Long.toString(System.currentTimeMillis(), 36);
         MCRUploadHandlerManager.register(this);
     }
