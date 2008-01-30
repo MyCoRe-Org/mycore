@@ -28,6 +28,9 @@ import java.net.InetAddress;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.hibernate.Transaction;
+
+import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.common.MCRConfigurationException;
 
 /**
@@ -44,6 +47,8 @@ public class MCRServletJob {
 
     /** The HttpServletResponse object */
     private HttpServletResponse theResponse = null;
+
+    private Transaction transaction = null;
 
     /**
      * The constructor takes the given objects and stores them in private
@@ -67,6 +72,39 @@ public class MCRServletJob {
     /** returns the HttpServletResponse object */
     public HttpServletResponse getResponse() {
         return theResponse;
+    }
+
+    /**
+     * starts a new database transaction.
+     */
+    public void beginTransaction() {
+        transaction = MCRHIBConnection.instance().getSession().beginTransaction();
+    }
+
+    /**
+     * commits the database transaction.
+     * Commit is only done if {@link #isTransactionActive()} returns true.
+     */
+    public void commitTransaction() {
+        if (isTransactionActive())
+            transaction.commit();
+    }
+
+    /**
+     * forces the database transaction to roll back.
+     * Roll back is only performed if {@link #isTransactionActive()} returns true.
+     */
+    public void rollbackTransaction() {
+        if (isTransactionActive())
+            transaction.rollback();
+    }
+
+    /**
+     * Is the transaction still alive?
+     * @return true if the transaction is still alive
+     */
+    public boolean isTransactionActive() {
+        return transaction != null && transaction.isActive();
     }
 
     /** returns true if the current http request was issued from the local host * */

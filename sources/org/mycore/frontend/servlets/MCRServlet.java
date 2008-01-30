@@ -44,7 +44,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
-import org.hibernate.Transaction;
 import org.jdom.DocType;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -63,10 +62,10 @@ import org.mycore.datamodel.common.MCRActiveLinkException;
 /**
  * This is the superclass of all MyCoRe servlets. It provides helper methods for
  * logging and managing the current session data. Part of the code has been
- * taken from MilessServlet.java written by Frank L�tzenkirchen.
+ * taken from MilessServlet.java written by Frank Lützenkirchen.
  * 
  * @author Detlev Degenhardt
- * @author Frank L�tzenkirchen
+ * @author Frank Lützenkirchen
  * @author Thomas Scheffler (yagee)
  * 
  * @version $Revision$ $Date$
@@ -234,7 +233,7 @@ public class MCRServlet extends HttpServlet {
             prepareURLs(getServletContext(), req);
         }
 
-        Transaction tx = null;
+        MCRServletJob job = new MCRServletJob(req, res);
 
         try {
             MCRSession session = getSession(req, getServletName());
@@ -255,7 +254,6 @@ public class MCRServlet extends HttpServlet {
             msg.append(" user=").append(session.getCurrentUserID());
             LOGGER.info(msg.toString());
 
-            MCRServletJob job = new MCRServletJob(req, res);
 
             String lang = getProperty(req, "lang");
 
@@ -272,7 +270,7 @@ public class MCRServlet extends HttpServlet {
             putParamsToSession(req);
             if (getProperty(req, INITIAL_SERVLET_NAME_KEY).equals(getServletName())) {
                 // current Servlet not called via RequestDispatcher
-                tx = MCRHIBConnection.instance().getSession().beginTransaction();
+                job.beginTransaction();
             }
             if (GETorPOST == GET) {
                 doGet(job);
@@ -282,18 +280,18 @@ public class MCRServlet extends HttpServlet {
             if (getProperty(req, INITIAL_SERVLET_NAME_KEY).equals(getServletName())) {
                 // current Servlet not called via RequestDispatcher
                 try {
-                    if( tx != null && tx.isActive()) tx.commit();
+                    job.commitTransaction();
                 } catch (RuntimeException e) {
                     MCRHIBConnection.instance().getSession().close();
-                    tx = MCRHIBConnection.instance().getSession().beginTransaction();
+                    job.beginTransaction();
                     generateErrorPage(req, res, 500, e.getMessage(), e, false);
-                    tx.commit();
+                    job.commitTransaction();
                 }
             }
         } catch (Exception ex) {
             if (getProperty(req, INITIAL_SERVLET_NAME_KEY).equals(getServletName())) {
                 // current Servlet not called via RequestDispatcher
-              if( tx != null ) tx.rollback();
+              job.rollbackTransaction();
             }
             if (ex instanceof ServletException) {
                 throw (ServletException) ex;
@@ -301,9 +299,9 @@ public class MCRServlet extends HttpServlet {
                 throw (IOException) ex;
             } else {
                 handleException(ex);
-                tx = MCRHIBConnection.instance().getSession().beginTransaction();
+                job.beginTransaction();
                 generateErrorPage(req, res, 500, ex.getMessage(), ex, false);
-                tx.commit();
+                job.commitTransaction();
             }
         } finally {
             // Release current MCRSession from current Thread,

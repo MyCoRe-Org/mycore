@@ -102,7 +102,7 @@ public class MCRFileNodeServlet extends MCRServlet {
         if (!isParametersValid(request, response)) {
             return;
         }
-        handleLocalRequest(request, response);
+        handleLocalRequest(job);
     }
 
     private boolean isParametersValid(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -125,7 +125,9 @@ public class MCRFileNodeServlet extends MCRServlet {
      * @throws IOException
      * @throws ServletException
      */
-    private void handleLocalRequest(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    private void handleLocalRequest(MCRServletJob job) throws IOException {
+        HttpServletRequest request = job.getRequest();
+        HttpServletResponse response = job.getResponse();
         String ownerID = getOwnerID(request);
         // local node to be retrieved
         MCRFilesystemNode root;
@@ -154,7 +156,7 @@ public class MCRFileNodeServlet extends MCRServlet {
                 errorPage(request, response, HttpServletResponse.SC_NOT_FOUND, msg, new MCRException(msg), false);
                 return;
             }
-            sendFile(request, response, (MCRFile) root);
+            sendFile(job, (MCRFile) root);
             return;
         }
 
@@ -173,7 +175,7 @@ public class MCRFileNodeServlet extends MCRServlet {
             errorPage(request, response, HttpServletResponse.SC_NOT_FOUND, msg, new MCRException(msg), false);
             return;
         } else if (node instanceof MCRFile) {
-            sendFile(request, response, (MCRFile) node);
+            sendFile(job, (MCRFile) node);
             return;
         } else {
             sendDirectory(request, response, (MCRDirectory) node);
@@ -206,7 +208,9 @@ public class MCRFileNodeServlet extends MCRServlet {
      * parameters that contain the timecodes where to start and/or stop
      * streaming.
      */
-    private void sendFile(HttpServletRequest req, HttpServletResponse res, MCRFile file) throws IOException {
+    private void sendFile(MCRServletJob job, MCRFile file) throws IOException {
+        HttpServletRequest req = job.getRequest();
+        HttpServletResponse res = job.getResponse();
         if (!MCRAccessManager.checkPermissionForReadingDerivate(file.getOwnerID())) {
             LOGGER.info("MCRFileNodeServlet: AccessForbidden to " + file.getName());
             res.sendRedirect(res.encodeRedirectURL(getBaseURL() + accessErrorPage));
@@ -228,7 +232,8 @@ public class MCRFileNodeServlet extends MCRServlet {
         {
             res.setContentType(file.getContentType().getMimeType());
             res.setContentLength((int) (file.getSize()));
-
+            // no transaction needed to copy long streams over slow connections
+            job.commitTransaction();
             OutputStream out = new BufferedOutputStream(res.getOutputStream());
             file.getContentTo(out);
             out.close();
