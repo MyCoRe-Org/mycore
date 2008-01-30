@@ -32,8 +32,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
+import org.hibernate.Transaction;
 import org.jdom.Document;
 import org.mycore.access.MCRAccessManager;
+import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.common.MCRException;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
@@ -46,11 +48,12 @@ import org.mycore.frontend.servlets.MCRServletJob;
  * the node is a MCRDirectory, the contents of that directory will be forwareded
  * to MCRLayoutService as XML data to display a detailed directory listing.
  * 
- * @author Frank Lützenkirchen
+ * @author Frank LÃ¼tzenkirchen
  * @author Jens Kupferschmidt
  * @author Thomas Scheffler (yagee)
  * 
- * @version $Revision$ $Date$
+ * @version $Revision$ $Date: 2008-01-14 11:02:17 +0000 (Mo, 14 Jan
+ *          2008) $
  */
 public class MCRFileNodeServlet extends MCRServlet {
     private static final long serialVersionUID = 1L;
@@ -66,8 +69,10 @@ public class MCRFileNodeServlet extends MCRServlet {
 
     @Override
     protected long getLastModified(HttpServletRequest request) {
+        Transaction tx = null;
         try {
             String ownerID = getOwnerID(request);
+            tx = MCRHIBConnection.instance().getSession().beginTransaction();
             MCRFilesystemNode root = MCRFilesystemNode.getRootNode(ownerID);
             int pos = ownerID.length() + 1;
             StringBuffer path = new StringBuffer(request.getPathInfo().substring(pos));
@@ -76,9 +81,12 @@ public class MCRFileNodeServlet extends MCRServlet {
             }
             MCRFilesystemNode node = ((MCRDirectory) root).getChildByPath(path.toString());
             final long lastModified = node.getLastModified().getTimeInMillis();
+            tx.commit();
             LOGGER.debug("getLastModified returned: " + lastModified);
             return lastModified;
         } catch (RuntimeException e) {
+            if (tx != null && tx.isActive())
+                tx.rollback();
             // any error would let us return -1 here
             LOGGER.info("Error while getting last modified date.", e);
             return -1;
