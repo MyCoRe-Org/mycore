@@ -13,11 +13,8 @@
 
 <project name="DocPortalInstaller" default="install" basedir=".">
   <property name="destdir"     value="c:/java/install" />
-  <property name="mailserver"  value="mailout.uni-due.de" />
-  <property name="mailaddress" value="luetzenkirchen@ub.uni-duisburg-essen.de" />
-
-  <property name="cvsroot" value=":pserver:anoncvs@server.mycore.de:/cvs" />  
-  <property name="revision" value="HEAD" />
+  <property name="mailserver"  value="xmailout.uni-due.de" />
+  <property name="mailaddress" value="xluetzenkirchen@ub.uni-duisburg-essen.de" />
 
   <target name="install" >
     <echo>
@@ -38,16 +35,24 @@
     <echo>
 
     ========================================  
-      CVS CheckOut ...
+      SVN export from head ...
     ========================================  
 
     </echo>
-    <cvs cvsroot="${cvsroot}" command="co -P -r ${revision} mycore docportal" dest="${destdir}" />
-    <cvs cvsroot="${cvsroot}" command="co -P mycore content/defaultsample" dest="${destdir}" />
-  	<!--
-    <cvs cvsroot="${cvsroot}" command="co -P mycore content/defaultsample" dest="${destdir}" />
-    <cvs cvsroot="${cvsroot}" command="co -P -r myliwi docportal" dest="${destdir}" />
-    -->
+    <antcall target="svn">
+      <param name="srcUrl"   value="http://server.mycore.de/svn/mycore/trunk" />
+      <param name="destPath" value="${destdir}/mycore" />
+    </antcall>
+
+    <antcall target="svn">
+      <param name="srcUrl"   value="http://server.mycore.de/svn/docportal/trunk" />
+      <param name="destPath" value="${destdir}/docportal" />
+    </antcall>
+
+    <antcall target="svn">
+      <param name="srcUrl"   value="http://server.mycore.de/svn/content/trunk/defaultsample" />
+      <param name="destPath" value="${destdir}/content/defaultsample" />
+    </antcall>
     <echo>
 
     ========================================  
@@ -259,5 +264,39 @@
       <arg value="${destdir}/docportal/build/bin/${command}.sh"/>
     </exec>
   </target>
+
+	
+  <target name="svn">
+    <antcall target="svn.windows">
+      <param name="srcUrl"   value="${srcUrl}" />
+      <param name="destPath" value="${destPath}" />
+    </antcall>
+    <antcall target="svn.unix">
+      <param name="command" value="${command}" />
+    </antcall>
+  </target>
   
+  <target name="svn.windows" if="os.is.windows">
+    <echo>adadad${destPath}</echo>
+    <exec executable="cmd" spawn="false">
+      <arg value="/c"/>
+      <arg value="svn"/>
+      <arg value="export"/>
+      <arg value="--force"/>
+      <arg value="${srcUrl}"/>
+      <arg value="${destPath}"/>
+    </exec>
+  </target>
+  
+  <target name="svn.unix" if="os.is.unix">
+    <exec executable="nohup" spawn="false">
+      <arg value="/bin/sh"/>
+      <arg value="svn"/>
+      <arg value="export"/>
+      <arg value="--force"/>
+      <arg value="${srcUrl}"/>
+      <arg value="${destPath}"/>
+    </exec>
+  </target>
+	
 </project>
