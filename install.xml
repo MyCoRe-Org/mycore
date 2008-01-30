@@ -290,7 +290,6 @@
   
   <target name="svn.unix" if="os.is.unix">
     <exec executable="nohup" spawn="false">
-      <arg value="/bin/sh"/>
       <arg value="svn"/>
       <arg value="export"/>
       <arg value="--force"/>
