@@ -1038,6 +1038,11 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
 
         public Element resolveElement(String uri) {
             String target = uri.substring(uri.indexOf(":") + 1);
+            // fixes exceptions if suburi is empty like "mcrobject:"
+            String subUri = target.substring(target.indexOf(":") + 1);
+            if (subUri.length() == 0)
+                return new Element("null");
+            // end fix
             LOGGER.debug("Ensuring xml is not null: " + target);
             try {
                 Element result = MCRURIResolver.instance().resolve(target);
