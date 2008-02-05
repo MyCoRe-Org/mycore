@@ -165,7 +165,7 @@ public class MCRUserMgr {
             }
 
             MCRGroup primaryGroup = retrieveGroup(currentUser.getPrimaryGroupID(), true);
-            ArrayList mbrUserIDs = primaryGroup.getMemberUserIDs();
+            ArrayList<String> mbrUserIDs = primaryGroup.getMemberUserIDs();
 
             if (!mbrUserIDs.contains(currentUser.getID())) {
                 LOGGER.error("user : '" + currentUser.getID() + "' error: is not member of" + " primary group '" + currentUser.getPrimaryGroupID() + "'!");
@@ -182,7 +182,7 @@ public class MCRUserMgr {
             MCRGroup currentGroup = retrieveGroup(gid, true);
 
             // check the admin users
-            ArrayList admUserIDs = currentGroup.getAdminUserIDs();
+            ArrayList<String> admUserIDs = currentGroup.getAdminUserIDs();
 
             for (int j = 0; j < admUserIDs.size(); j++) {
                 if (!mcrUserStore.existsUser((String) admUserIDs.get(j))) {
@@ -191,7 +191,7 @@ public class MCRUserMgr {
             }
 
             // check the admin groups
-            ArrayList admGroupIDs = currentGroup.getAdminGroupIDs();
+            ArrayList<String> admGroupIDs = currentGroup.getAdminGroupIDs();
 
             for (int j = 0; j < admGroupIDs.size(); j++) {
                 if (!mcrUserStore.existsGroup((String) admGroupIDs.get(j))) {
@@ -200,7 +200,7 @@ public class MCRUserMgr {
             }
 
             // check the users (members)
-            ArrayList mbrUserIDs = currentGroup.getMemberUserIDs();
+            ArrayList<String> mbrUserIDs = currentGroup.getMemberUserIDs();
 
             for (int j = 0; j < mbrUserIDs.size(); j++) {
                 if (!mcrUserStore.existsUser((String) mbrUserIDs.get(j))) {
@@ -253,7 +253,7 @@ public class MCRUserMgr {
         // whether they exist at all.
         group.addAdminUserID(admin.getID());
 
-        ArrayList admUserIDs = group.getAdminUserIDs();
+        ArrayList<String> admUserIDs = group.getAdminUserIDs();
 
         for (int j = 0; j < admUserIDs.size(); j++) {
             if (!mcrUserStore.existsUser((String) admUserIDs.get(j))) {
@@ -263,7 +263,7 @@ public class MCRUserMgr {
 
         group.addAdminGroupID(admin.getPrimaryGroupID());
 
-        ArrayList admGroupIDs = group.getAdminGroupIDs();
+        ArrayList<String> admGroupIDs = group.getAdminGroupIDs();
 
         for (int j = 0; j < admGroupIDs.size(); j++) {
             if (((String) admGroupIDs.get(j)).equals(group.getID())) {
@@ -641,9 +641,9 @@ public class MCRUserMgr {
      * 
      * @return set of groups the given user is a member of
      */
-    public final Set<MCRGroup> getGroupsContainingUser(MCRUser user, Set groups) {
+    public final Set<MCRGroup> getGroupsContainingUser(MCRUser user, Set<MCRGroup> groups) {
         Set<MCRGroup> set = new HashSet<MCRGroup>();
-        Iterator iterator = groups.iterator();
+        Iterator<MCRGroup> iterator = groups.iterator();
 
         while (iterator.hasNext()) {
             Object element = iterator.next();
@@ -685,7 +685,7 @@ public class MCRUserMgr {
      * @return maximum value of the numerical user IDs
      */
     public final int getMaxUserNumID() throws MCRException {
-        // whitout checking a permission, because we only want to see it
+        // without checking a permission, because we only want to see it
         return mcrUserStore.getMaxUserNumID();
     }
 
@@ -819,7 +819,7 @@ public class MCRUserMgr {
     public final synchronized void initializeGroup(MCRGroup group, String creator) throws MCRException {
         if (locked) { // This is very unlikely to happen since we are just
 
-            // initialising the system.
+            // initializing the system.
             throw new MCRException("The user component is locked. At the moment write access is denied.");
         }
 
@@ -1001,9 +1001,9 @@ public class MCRUserMgr {
      * @return set of groups according to the given set of group IDs
      * @throws MCRException
      */
-    public final Set<MCRGroup> retrieveGroups(Set groupIDs) throws MCRException {
+    public final Set<MCRGroup> retrieveGroups(Set<String> groupIDs) throws MCRException {
         Set<MCRGroup> groups = new HashSet<MCRGroup>();
-        Iterator iterator = groupIDs.iterator();
+        Iterator<String> iterator = groupIDs.iterator();
 
         while (iterator.hasNext()) {
             Object object = iterator.next();
@@ -1087,9 +1087,9 @@ public class MCRUserMgr {
      * @return set of users according to the given set of user IDs
      * @throws MCRException
      */
-    public final Set<MCRUser> retrieveUsers(Set userIDs) {
+    public final Set<MCRUser> retrieveUsers(Set<String> userIDs) {
         Set<MCRUser> users = new HashSet<MCRUser>();
-        Iterator iterator = userIDs.iterator();
+        Iterator<String> iterator = userIDs.iterator();
 
         while (iterator.hasNext()) {
             Object object = iterator.next();

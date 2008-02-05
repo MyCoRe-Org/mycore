@@ -32,6 +32,8 @@ import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.List;
 
+import org.jdom.Document;
+import org.jdom.Element;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
@@ -205,7 +207,7 @@ public class MCRUser extends MCRUserObject implements MCRPrincipal, Principal {
      * @param useEncryption
      *            flag to determine if the password has to be encrypted
      */
-    public MCRUser(org.jdom.Element elm, boolean useEncryption) {
+    public MCRUser(Element elm, boolean useEncryption) {
         this(elm);
 
         if (useEncryption) {
@@ -221,7 +223,7 @@ public class MCRUser extends MCRUserObject implements MCRPrincipal, Principal {
      * @param elm
      *            JDOM Element defining a user
      */
-    public MCRUser(org.jdom.Element elm) {
+    public MCRUser(Element elm) {
         this();
 
         if (!elm.getName().equals("user")) {
@@ -264,19 +266,19 @@ public class MCRUser extends MCRUserObject implements MCRPrincipal, Principal {
         this.description = trim(elm.getChildTextTrim("user.description"), description_len);
         this.primaryGroupID = trim(elm.getChildTextTrim("user.primary_group"), id_len);
 
-        org.jdom.Element contactElement = elm.getChild("user.contact");
+        Element contactElement = elm.getChild("user.contact");
 
         if (contactElement != null) {
             userContact = new MCRUserContact(contactElement);
         }
 
-        org.jdom.Element userGroupElement = elm.getChild("user.groups");
+        Element userGroupElement = elm.getChild("user.groups");
 
         if (userGroupElement != null) {
-            List groupIDList = userGroupElement.getChildren();
+            List<Element> groupIDList = userGroupElement.getChildren();
 
             for (int j = 0; j < groupIDList.size(); j++) {
-                org.jdom.Element groupID = (org.jdom.Element) groupIDList.get(j);
+                Element groupID = (Element) groupIDList.get(j);
 
                 if (!(groupID.getTextTrim()).equals("")) {
                     groupIDs.add(groupID.getTextTrim());
@@ -417,7 +419,7 @@ public class MCRUser extends MCRUserObject implements MCRPrincipal, Principal {
      * @return returns true if all required fields have been provided
      */
     public boolean isValid() {
-        ArrayList requiredUserAttributes = MCRUserPolicy.instance().getRequiredUserAttributes();
+        ArrayList<String> requiredUserAttributes = MCRUserPolicy.instance().getRequiredUserAttributes();
         boolean test = true;
 
         if (requiredUserAttributes.contains("userID")) {
@@ -510,14 +512,14 @@ public class MCRUser extends MCRUserObject implements MCRPrincipal, Principal {
     /**
      * @return This method returns the user or group object as a JDOM document.
      */
-    public org.jdom.Document toJDOMDocument() throws MCRException {
-        org.jdom.Element root = new org.jdom.Element("mycoreuser");
+    public Document toJDOMDocument() throws MCRException {
+        Element root = new Element("mycoreuser");
         root.addNamespaceDeclaration(XSI_NAMESPACE);
         root.addNamespaceDeclaration(XLINK_NAMESPACE);
         root.setAttribute("noNamespaceSchemaLocation", "MCRUser.xsd", XSI_NAMESPACE);
         root.addContent(this.toJDOMElement());
 
-        org.jdom.Document jdomDoc = new org.jdom.Document(root);
+        Document jdomDoc = new Document(root);
 
         return jdomDoc;
     }
@@ -529,21 +531,21 @@ public class MCRUser extends MCRUserObject implements MCRPrincipal, Principal {
      * 
      * @return this user data as JDOM element
      */
-    public org.jdom.Element toJDOMElement() throws MCRException {
-        org.jdom.Element user = new org.jdom.Element("user").setAttribute("numID", Integer.toString(numID)).setAttribute("ID", ID).setAttribute("id_enabled",
+    public Element toJDOMElement() throws MCRException {
+        Element user = new Element("user").setAttribute("numID", Integer.toString(numID)).setAttribute("ID", ID).setAttribute("id_enabled",
                 (idEnabled) ? "true" : "false").setAttribute("update_allowed", (updateAllowed) ? "true" : "false");
-        org.jdom.Element Creator = new org.jdom.Element("user.creator").setText(super.creator);
-        org.jdom.Element CreationDate = new org.jdom.Element("user.creation_date").setText(super.creationDate.toString());
-        org.jdom.Element ModifiedDate = new org.jdom.Element("user.last_modified").setText(super.modifiedDate.toString());
-        org.jdom.Element Passwd = new org.jdom.Element("user.password").setText(passwd);
-        org.jdom.Element Description = new org.jdom.Element("user.description").setText(super.description);
-        org.jdom.Element Primarygroup = new org.jdom.Element("user.primary_group").setText(primaryGroupID);
+        Element Creator = new Element("user.creator").setText(super.creator);
+        Element CreationDate = new Element("user.creation_date").setText(super.creationDate.toString());
+        Element ModifiedDate = new Element("user.last_modified").setText(super.modifiedDate.toString());
+        Element Passwd = new Element("user.password").setText(passwd);
+        Element Description = new Element("user.description").setText(super.description);
+        Element Primarygroup = new Element("user.primary_group").setText(primaryGroupID);
 
         // Loop over all group IDs
-        org.jdom.Element Groups = new org.jdom.Element("user.groups");
+        Element Groups = new Element("user.groups");
 
         for (int i = 0; i < groupIDs.size(); i++) {
-            org.jdom.Element groupID = new org.jdom.Element("groups.groupID").setText((String) groupIDs.get(i));
+            Element groupID = new Element("groups.groupID").setText((String) groupIDs.get(i));
             Groups.addContent(groupID);
         }
 
@@ -589,7 +591,7 @@ public class MCRUser extends MCRUserObject implements MCRPrincipal, Principal {
             // member
 
             // of one of the admGroups
-            ArrayList admGroupIDs = primaryGroup.getAdminGroupIDs();
+            ArrayList<String> admGroupIDs = primaryGroup.getAdminGroupIDs();
 
             for (int i = 0; i < admGroupIDs.size(); i++) {
                 MCRGroup currentGroup = MCRUserMgr.instance().retrieveGroup((String) admGroupIDs.get(i), false);
