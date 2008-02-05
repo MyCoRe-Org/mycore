@@ -1,0 +1,53 @@
+<!-- **************************************************************** -->
+<!-- Servlets and mappings of wcms                                    -->
+<!-- **************************************************************** -->
+
+<servlet id="MCRWCMSLoginServlet">
+	<servlet-name> MCRWCMSLoginServlet </servlet-name>
+	<servlet-class> org.mycore.frontend.wcms.MCRWCMSLoginServlet </servlet-class>
+</servlet>
+<servlet id="MCRWCMSChooseServlet">
+	<servlet-name> MCRWCMSChooseServlet </servlet-name>
+	<servlet-class> org.mycore.frontend.wcms.MCRWCMSChooseServlet </servlet-class>
+</servlet>
+<servlet id="MCRWCMSActionServlet">
+	<servlet-name> MCRWCMSActionServlet </servlet-name>
+	<servlet-class> org.mycore.frontend.wcms.MCRWCMSActionServlet </servlet-class>
+</servlet>
+<servlet id="MCRWCMSAdminServlet">
+	<servlet-name> MCRWCMSAdminServlet </servlet-name>
+	<servlet-class> org.mycore.frontend.wcms.MCRWCMSAdminServlet </servlet-class>
+</servlet>
+<servlet id="MCRWCMSFileUploadServlet">
+	<servlet-name> MCRWCMSFileUploadServlet </servlet-name>
+	<servlet-class> org.mycore.frontend.wcms.MCRWCMSFileUploadServlet </servlet-class>
+</servlet>
+<servlet id="MCRWCMSGetStaticHTMLServlet">
+	<servlet-name> MCRWCMSGetStaticHTMLServlet </servlet-name>
+	<servlet-class> org.mycore.frontend.wcms.MCRWCMSGetStaticHTMLServlet </servlet-class>
+</servlet>
+
+<servlet-mapping>
+	<servlet-name> MCRWCMSLoginServlet </servlet-name>
+	<url-pattern> /servlets/MCRWCMSLoginServlet </url-pattern>
+</servlet-mapping>
+<servlet-mapping>
+	<servlet-name> MCRWCMSChooseServlet </servlet-name>
+	<url-pattern> /servlets/MCRWCMSChooseServlet </url-pattern>
+</servlet-mapping>
+<servlet-mapping>
+	<servlet-name> MCRWCMSActionServlet </servlet-name>
+	<url-pattern> /servlets/MCRWCMSActionServlet </url-pattern>
+</servlet-mapping>
+<servlet-mapping>
+	<servlet-name> MCRWCMSAdminServlet </servlet-name>
+	<url-pattern> /servlets/MCRWCMSAdminServlet </url-pattern>
+</servlet-mapping>
+<servlet-mapping>
+	<servlet-name> MCRWCMSFileUploadServlet </servlet-name>
+	<url-pattern> /servlets/MCRWCMSFileUploadServlet </url-pattern>
+</servlet-mapping>
+<servlet-mapping>
+	<servlet-name> MCRWCMSGetStaticHTMLServlet </servlet-name>
+	<url-pattern> /servlets/MCRWCMSGetStaticHTMLServlet </url-pattern>
+</servlet-mapping>

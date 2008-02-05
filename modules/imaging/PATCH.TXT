@@ -1,0 +1,13 @@
+Patch #001, 2007-07-27
+========================================================================
+Affected component:
+imaging -> image cache (and all components that use this cache, 
+e.g  iview)
+
+The following steps are repairing the image-cache*:
+*Consider, that this patch will probably take a lot of time! It depends on
+the number of images that be stored in MyCoRe.
+
+  1. Start Command-Line-Interface of your MyCoRe-Application (e.g. DocPortal) 
+  2. execute: 'delete image cache for all derivates'
+  3. execute: 'create image cache for all derivates'

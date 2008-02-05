@@ -1,0 +1,86 @@
+
+<!-- **************************************************************** -->
+<!-- Servlets and mappings of swf                                     -->
+<!-- **************************************************************** -->
+
+<servlet id="MCRStartEditor">
+  <servlet-name>MCRStartEditorServlet</servlet-name>
+  <servlet-class>org.mycore.frontend.servlets.MCRStartEditorServlet</servlet-class>
+</servlet>
+<servlet id="MCRCheckNewDataServlet">
+  <servlet-name>MCRCheckNewDataServlet</servlet-name>
+  <servlet-class>org.mycore.frontend.servlets.MCRCheckNewDataServlet</servlet-class>
+</servlet>
+<servlet id="MCRCheckEditDataServlet">
+  <servlet-name>MCRCheckEditDataServlet</servlet-name>
+  <servlet-class>org.mycore.frontend.servlets.MCRCheckEditDataServlet</servlet-class>
+</servlet>
+<servlet id="MCRCheckCommitDataServlet">
+  <servlet-name>MCRCheckCommitDataServlet</servlet-name>
+  <servlet-class>org.mycore.frontend.servlets.MCRCheckCommitDataServlet</servlet-class>
+</servlet>
+<servlet id="MCRCheckCommitACLServlet">
+  <servlet-name>MCRCheckCommitACLServlet</servlet-name>
+  <servlet-class>org.mycore.frontend.servlets.MCRCheckCommitACLServlet</servlet-class>
+</servlet>
+<servlet id="MCRCheckEditACLServlet">
+  <servlet-name>MCRCheckEditACLServlet</servlet-name>
+  <servlet-class>org.mycore.frontend.servlets.MCRCheckEditACLServlet</servlet-class>
+</servlet>
+<servlet id="MCRCheckCommitDerivateServlet">
+  <servlet-name>MCRCheckCommitDerivateServlet</servlet-name>
+  <servlet-class>org.mycore.frontend.servlets.MCRCheckCommitDerivateServlet</servlet-class>
+</servlet>
+<servlet id="MCRCheckEditDerivateServlet">
+  <servlet-name>MCRCheckEditDerivateServlet</servlet-name>
+  <servlet-class>org.mycore.frontend.servlets.MCRCheckEditDerivateServlet</servlet-class>
+</servlet>
+<servlet id="MCRListWorkflowServlet">
+  <servlet-name>MCRListWorkflowServlet</servlet-name>
+  <servlet-class>org.mycore.frontend.servlets.MCRListWorkflowServlet</servlet-class>
+</servlet>
+<servlet id="MCRFileViewWorkflowServlet">
+  <servlet-name>MCRFileViewWorkflowServlet</servlet-name>
+  <servlet-class>org.mycore.frontend.servlets.MCRFileViewWorkflowServlet</servlet-class>
+</servlet>
+
+<servlet-mapping>
+  <servlet-name>MCRStartEditorServlet</servlet-name>
+  <url-pattern>/servlets/MCRStartEditorServlet</url-pattern>
+</servlet-mapping>
+<servlet-mapping>
+  <servlet-name>MCRCheckNewDataServlet</servlet-name>
+  <url-pattern>/servlets/MCRCheckNewDataServlet</url-pattern>
+</servlet-mapping>
+<servlet-mapping>
+  <servlet-name>MCRCheckEditDataServlet</servlet-name>
+  <url-pattern>/servlets/MCRCheckEditDataServlet</url-pattern>
+</servlet-mapping>
+<servlet-mapping>
+  <servlet-name>MCRCheckCommitDataServlet</servlet-name>
+  <url-pattern>/servlets/MCRCheckCommitDataServlet</url-pattern>
+</servlet-mapping>
+<servlet-mapping>
+  <servlet-name>MCRCheckCommitACLServlet</servlet-name>
+  <url-pattern>/servlets/MCRCheckCommitACLServlet</url-pattern>
+</servlet-mapping>
+<servlet-mapping>
+  <servlet-name>MCRCheckEditACLServlet</servlet-name>
+  <url-pattern>/servlets/MCRCheckEditACLServlet</url-pattern>
+</servlet-mapping>
+<servlet-mapping>
+  <servlet-name>MCRCheckCommitDerivateServlet</servlet-name>
+  <url-pattern>/servlets/MCRCheckCommitDerivateServlet</url-pattern>
+</servlet-mapping>
+<servlet-mapping>
+  <servlet-name>MCRCheckEditDerivateServlet</servlet-name>
+  <url-pattern>/servlets/MCRCheckEditDerivateServlet</url-pattern>
+</servlet-mapping>
+<servlet-mapping>
+  <servlet-name>MCRListWorkflowServlet</servlet-name>
+  <url-pattern>/servlets/MCRListWorkflowServlet</url-pattern>
+</servlet-mapping>
+<servlet-mapping>
+  <servlet-name>MCRFileViewWorkflowServlet</servlet-name>
+  <url-pattern>/servlets/MCRFileViewWorkflowServlet/*</url-pattern>
+</servlet-mapping>

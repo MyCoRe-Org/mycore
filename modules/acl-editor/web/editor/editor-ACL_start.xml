@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="ISO_8859-1"?>
+<!DOCTYPE MyCoReWebPage>
+
+<MyCoReWebPage>
+
+	<section title="ACL Editor" xml:lang="de">
+		<editor id="ACL-PermissionFilter">
+			<include uri="webapp:modules/acl-editor/web/editor/editor-ACL_Filter.xml" />
+		</editor>
+		<editor id="ACL-PermissionEditor">
+			<include uri="webapp:modules/acl-editor/web/editor/editor-ACL_Permissions.xml" />
+		</editor>
+	</section>
+
+</MyCoReWebPage>
+
+

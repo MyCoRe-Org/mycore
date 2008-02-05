@@ -1,0 +1,14 @@
+
+<!-- **************************************************************** -->
+<!-- Servlets and mappings of z3950                                   -->
+<!-- **************************************************************** -->
+ 
+<servlet id="MCRZ3950Servlet">
+  <servlet-name>MCRZ3950Servlet</servlet-name>
+  <servlet-class>org.mycore.services.z3950.MCRZ3950Servlet</servlet-class>
+</servlet>
+
+<servlet-mapping>
+  <servlet-name>MCRZ3950Servlet</servlet-name>
+  <url-pattern>/servlets/MCRZ3950Servlet</url-pattern>
+</servlet-mapping>

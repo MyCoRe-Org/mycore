@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!-- ============================================== -->
+<!--      MyCoRe-WebService build file for use with ANT        -->
+<!-- $Revision: 1.2 $ $Date: 2006-11-22 12:20:38 $ -->
+<!-- ============================================== -->
+
+<project name="MyCoReModule - Z3950" default="usage" basedir=".">
+
+	<!-- ============================================== -->
+
+	<property name="build.sysclasspath" value="last" />
+
+	<!-- ============================================== -->
+
+	<target name="version">
+		<echo level="info">
+           Ant version: ${ant.version}
+      Java JDK version: ${java.version} 
+      Operating system: ${os.name}, version: ${os.version}, architecture: ${os.arch}
+    </echo>
+	</target>
+
+	<!-- ============================================== -->
+
+	<target name="usage">
+		<echo level="info">
+      Use the ant tool to plug in MyCoRe-Z3950-Module:
+      Usage: ant [target] [target] [target] ...
+
+      Available targets for MyCoRe-Z3950 are:
+        compile            compiles the Java Sources
+        webapps            copy files to webapps
+        clean              delete directory build
+		</echo>
+	</target>
+	
+  <!-- =================================================================== -->
+  <!-- Compiles the sources from directory sources to directory classes    -->
+  <!-- =================================================================== -->
+
+  <target name="init">
+    <mkdir dir="${basedir}/classes" />
+    <path id="mycore.classpath">
+      <fileset dir="${basedir}/lib" includes="*.jar"/>
+    </path>
+  </target>
+
+  <target name="javac" depends="init" >
+    <echo level="info">Compiling ${packages}</echo>
+    <javac srcdir="${basedir}/modules/z3950/sources"
+           destdir="${basedir}/classes"
+           includes="${packages}"
+           classpathref="mycore.classpath"
+           debug="${debug}"
+           optimize="${optimize}"
+           target="${javatarget}"
+           source="${sourcerelease}"
+           encoding="${sourceencoding}"
+           deprecation="${deprecation}">
+    </javac>
+  </target>
+
+  <target name="compile">
+   <echo level="info">Compiling Module MyCoRe-Z3950 classes...</echo>
+   <antcall target="javac">
+     <param name="packages" value="org/**"/>
+   </antcall>
+  </target>
+
+  <!-- =================================================================== -->
+  <target name="webapps">
+    <echo level="info">
+      Copying web application files of module "Z3950"
+    </echo>
+<!--
+    <property name="webapps-libdir" value="webapps/WEB-INF/lib"/>  	
+  	<property name="modules-home" value="${env.MYCORE_HOME}" />
+    <copy todir="${webapps-libdir}">
+      <fileset dir="${modules-home}/modules/webservices/lib" includes="*.jar" />
+    </copy>
+-->
+  </target>
+
+  
+  <!-- ============================================== -->
+
+    <target name="clean">
+  </target>
+  
+</project>

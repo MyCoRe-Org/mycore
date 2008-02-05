@@ -23,11 +23,11 @@
 #######################################################################
 #
 # The called modules in order of their use. If you use the 
-# module-imaging you must do the 'ant install' call under
-# UNINSTALLED_module-imaging.
+# imaging you must do the 'ant install' call under
+# UNINSTALLED_imaging.
 #
 #######################################################################
 
-  MCR.Modules.MyCoRe=module-accessadmin,module-ACL-editor_v2,module-broadcasting,module-classhandler,module-indexing,module-swf,module-useradmin,module-wcms,module-webservices,module-z3950
-# MCR.Modules.MyCoRe=module-accessadmin,module-ACL-editor_v2,module-broadcasting,module-classhandler,module-imaging,module-indexing,module-swf,module-useradmin,module-wcms,module-webservices,module-z3950
+  MCR.Modules.MyCoRe=accessadmin,acl-editor,broadcasting,classhandler,indexing,swf,useradmin,wcms,webservices,z3950
+# MCR.Modules.MyCoRe=accessadmin,acl-editor,broadcasting,classhandler,imaging,indexing,swf,useradmin,wcms,webservices,z3950
 

@@ -1,0 +1,34 @@
+
+<!-- **************************************************************** -->
+<!-- Servlets and mappings of classhandler                            -->
+<!-- **************************************************************** -->
+
+<servlet id="MCRClassBrowser">
+  <servlet-name>MCRClassificationBrowser</servlet-name>
+  <servlet-class>org.mycore.frontend.servlets.MCRClassificationBrowser</servlet-class>
+</servlet>
+<servlet id="MCRStartClassEditor">
+  <servlet-name>MCRStartClassEditorServlet</servlet-name>
+  <servlet-class>org.mycore.frontend.servlets.MCRStartClassEditorServlet</servlet-class>
+</servlet>
+<servlet id="MCRCheckClassACLServlet">
+  <servlet-name>MCRCheckClassACLServlet</servlet-name>
+  <servlet-class>org.mycore.frontend.servlets.MCRCheckClassACLServlet</servlet-class>
+</servlet>
+
+<servlet-mapping>
+  <servlet-name>MCRStartClassEditorServlet</servlet-name>
+  <url-pattern>/servlets/MCRStartClassEditorServlet</url-pattern>
+</servlet-mapping>
+<servlet-mapping>
+  <servlet-name>MCRCheckClassACLServlet</servlet-name>
+  <url-pattern>/servlets/MCRCheckClassACLServlet</url-pattern>
+</servlet-mapping>
+<servlet-mapping>
+  <servlet-name>MCRClassificationBrowser</servlet-name>
+  <url-pattern>/browse</url-pattern>
+</servlet-mapping>
+<servlet-mapping>
+  <servlet-name>MCRClassificationBrowser</servlet-name>
+  <url-pattern>/browse/*</url-pattern>
+</servlet-mapping>
