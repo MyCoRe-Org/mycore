@@ -82,7 +82,7 @@
   <macrodef name="modulePreHook">
     <attribute name="target" />
     <sequential>
-      <for list="${mycore-modules}" param="module" parallel="false">
+      <for list="${MCR.Modules.MyCoRe}" param="module" parallel="false">
         <sequential>
           <if>
             <resourcecount when="greater" count="0">
@@ -108,7 +108,7 @@
   <macrodef name="moduleHook">
     <attribute name="target" />
     <sequential>
-      <for list="${mycore-modules}" param="module" parallel="false">
+      <for list="${MCR.Modules.MyCoRe}" param="module" parallel="false">
         <sequential>
           <if>
             <resourcecount when="greater" count="0">
