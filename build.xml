@@ -396,12 +396,22 @@
     </echo>
 
     <mkdir dir="${basedir}/documentation/changelogs" />
-
-    <tstamp>
-      <format property="year" pattern="yyyy" />
-    </tstamp>
-
-    <mkdir dir="${basedir}/documentation/changelogs/${year}" />
+    <mkdir dir="${basedir}/documentation/changelogs/statsvn" />
+    <exec executable="svn" output="${basedir}/documentation/changelogs/statsvn/svnlog.xml">
+      <arg line="log -v --xml" />
+    </exec>
+    <java jar="../../doclets/statsvn.jar" fork="true">
+      <arg value="${basedir}/documentation/changelogs/statsvn/svnlog.xml" />
+      <arg value="." />
+      <arg value="-title" />
+      <arg value="MyCoRe" />
+      <arg value="-output-dir" />
+      <arg value="${basedir}/documentation/changelogs/statsvn" />
+      <arg value="-viewvc" />
+      <arg value="http://www.mycore.de/viewvc/viewvc.cgi/mycore/trunk" />
+      <arg value="-bugzilla" />
+      <arg value="https://sourceforge.net/tracker/index.php?func=detail&amp;aid=%s&amp;group_id=92005&amp;atid=599192" />
+    </java>
   </target>
 
   <!-- =================================================================== -->
