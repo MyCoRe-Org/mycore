@@ -264,38 +264,14 @@
       <arg value="${destdir}/docportal/build/bin/${command}.sh"/>
     </exec>
   </target>
-
 	
   <target name="svn">
-    <antcall target="svn.windows">
-      <param name="srcUrl"   value="${srcUrl}" />
-      <param name="destPath" value="${destPath}" />
-    </antcall>
-    <antcall target="svn.unix">
-      <param name="command" value="${command}" />
-    </antcall>
-  </target>
-  
-  <target name="svn.windows" if="os.is.windows">
-    <echo>adadad${destPath}</echo>
-    <exec executable="cmd" spawn="false">
-      <arg value="/c"/>
-      <arg value="svn"/>
+    <exec executable="svn" spawn="false">
       <arg value="export"/>
       <arg value="--force"/>
       <arg value="${srcUrl}"/>
       <arg value="${destPath}"/>
     </exec>
   </target>
-  
-  <target name="svn.unix" if="os.is.unix">
-    <exec executable="nohup" spawn="false">
-      <arg value="svn"/>
-      <arg value="export"/>
-      <arg value="--force"/>
-      <arg value="${srcUrl}"/>
-      <arg value="${destPath}"/>
-    </exec>
-  </target>
-	
+
 </project>
