@@ -425,14 +425,17 @@
   <target name="distribution">
     <antcall target="distribution.module">
       <param name="Distrib.Module" value="mycore" />
+      <param name="Distrib.SubDir" value="" />
       <param name="Distrib.ZipFile" value="mycore" />
     </antcall>
     <antcall target="distribution.module">
       <param name="Distrib.Module" value="docportal" />
+      <param name="Distrib.SubDir" value="" />
       <param name="Distrib.ZipFile" value="docportal" />
     </antcall>
     <antcall target="distribution.module">
-      <param name="Distrib.Module" value="content/defaultsample" />
+      <param name="Distrib.Module" value="content" />
+      <param name="Distrib.SubDir" value="defaultsample" />
       <param name="Distrib.ZipFile" value="defaultsample" />
     </antcall>
   </target>
@@ -440,7 +443,7 @@
   <target name="distribution.module">
     <property name="Distrib.TmpDir" value="tmp" />
     <property name="Distrib.TargetDir" value="/mcr/www/download" />
-    <property name="Distrib.SVNRoot" value="file:///svn/" />
+    <property name="Distrib.Tag" value="release_1_3_beta" />
     <property name="Distrib.ReleaseNr" value="1.3.beta" />
 
     <delete dir="${Distrib.TmpDir}" />
@@ -450,11 +453,9 @@
 
     <exec executable="svn" spawn="true">
       <arg value="export" />
-      <arg value="${Distrib.SVNRoot}" />
+      <arg value="file:///svn/${Distrib.Module}/tags/${Distrib.ReleaseTag}/${Distrib.SubDir}" />
+      <arg value="${Distrib.TmpDir}/${Distrib.Module}" />
     </exec>
-    <cvs cvsroot="${Distrib.CVSRoot}"
-         command="checkout -r ${Distrib.ReleaseTag} ${Distrib.Module}"
-         dest="${Distrib.TmpDir}" />
 
     <zip destfile="${Distrib.TargetDir}/${Distrib.ZipFile}-${Distrib.ReleaseNr}.zip"
          basedir="${Distrib.TmpDir}"
