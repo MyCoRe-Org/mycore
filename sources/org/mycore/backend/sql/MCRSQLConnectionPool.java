@@ -23,21 +23,19 @@
 
 package org.mycore.backend.sql;
 
-import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.List;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
-import org.jdom.Document;
 import org.jdom.Element;
-import org.jdom.input.SAXBuilder;
-import org.jdom.xpath.XPath;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
+import org.mycore.common.xml.MCRURIResolver;
 
 /**
  * This class implements a pool of database connections to a relational database
@@ -67,8 +65,20 @@ public class MCRSQLConnectionPool {
     /** A SQL select statement configured to test the connection works */
     protected String testStatement;
 
+    /** The maximum number of usages of this connection * */
+    static int maxUsages;
+
+    /** The maximum age a connection can be before it is reconnected */
+    static long maxAge;
+
+    static String url;
+
+    static String userID;
+
+    static String password;
+
     /** The logger */
-    private static Logger logger = Logger.getLogger("org.mycore.backend.sql");
+    private static Logger LOGGER = Logger.getLogger( MCRSQLConnectionPool.class );
 
     /**
      * Returns the connection pool singleton.
@@ -92,44 +102,60 @@ public class MCRSQLConnectionPool {
      *             if the JDBC driver could not be loaded
      */
     protected MCRSQLConnectionPool() throws MCRPersistenceException {
-        logger.info("Building JDBC connection pool...");
-        String driver = "";
-        int initNumConnections = 1;
+        LOGGER.info("Building JDBC connection pool...");
+
+        String driver = null;
+
+        LOGGER.debug("Reading database configuration from hibernate.cfg.xml");
         try {
-            logger.debug("Read the hibernate configuration from /hibernate.cfg.xml");
-            InputStream in = MCRSQLConnection.class.getResourceAsStream("/hibernate.cfg.xml");
-            Document cfg = (new SAXBuilder()).build(in);
-            XPath xpath_driver = XPath.newInstance("/hibernate-configuration/session-factory/property[@name='connection.driver_class']");
-            Element elm = (Element) xpath_driver.selectSingleNode(cfg);
-            driver = elm.getTextNormalize();
-            maxNumConnections = 2;
-            testStatement = "select * from mcraccessrule";
-        } catch (Exception e) {
-            // read deprecated configuration values
-            logger.debug("Can't read /hibernate.cfg.xml, try to read property values.");
+            Element cfg = MCRURIResolver.instance().resolve("resource:hibernate.cfg.xml");
+            List<Element> properties = cfg.getChild("session-factory").getChildren("property");
+            for (Element property : properties) {
+                String name = property.getAttributeValue("name");
+                if ("connection.driver_class".equals(name))
+                    driver = property.getTextNormalize();
+                else if ("connection.url".equals(name))
+                    url = property.getTextNormalize();
+                if ("connection.username".equals(name))
+                    userID = property.getTextNormalize();
+                if ("connection.password".equals(name))
+                    password = property.getTextNormalize();
+            }
+        } catch (Exception ex) {
+            // Read deprecated configuration values
+            LOGGER.debug("Can't read hibernate.cfg.xml, try to read property values...");
             MCRConfiguration config = MCRConfiguration.instance();
-            maxNumConnections = config.getInt("MCR.Persistence.SQL.Connections.Max", 2);
-            initNumConnections = config.getInt("MCR.Persistence.SQL.Connections.Init", maxNumConnections);
             driver = config.getString("MCR.Persistence.SQL.Driver");
-            logger.debug("MCR.Persistence.SQL.Driver: " + driver);
-            testStatement = config.getString("MCR.Persistence.SQL.Connections.TestQuery", "select * from mcraccessrule");
+            url = config.getString("MCR.Persistence.SQL.Database.URL");
+            userID = config.getString("MCR.Persistence.SQL.Database.Userid", "");
+            password = config.getString("MCR.Persistence.SQL.Database.Passwd", "");
         }
-        logger.debug("Initalize SQL connection pool - driver " + driver);
-        logger.debug("Initalize SQL connection pool - maxNumConnections " + maxNumConnections);
-        logger.debug("Initalize SQL connection pool - initNumConnections " + initNumConnections);
+
+        LOGGER.debug("Initalize SQL connections, driver: " + driver);
+        LOGGER.debug("Initalize SQL connections, url: " + url);
+        LOGGER.debug("Initalize SQL connections, userID: " + userID);
 
         try {
-            Class.forName(driver);
-        } // Load the JDBC driver
-        catch (Exception exc) {
+            Class.forName(driver); // Load the JDBC driver
+        } catch (Exception exc) {
             String msg = "Could not load JDBC driver class " + driver;
             throw new MCRPersistenceException(msg, exc);
         }
 
+        // Some properties are NOT deprecated, as long as this class is used
+        // anywhere
+        MCRConfiguration config = MCRConfiguration.instance();
+        maxNumConnections = config.getInt("MCR.Persistence.SQL.Connections.Max", 6);
+        int initNumConnections = config.getInt("MCR.Persistence.SQL.Connections.Init", maxNumConnections);
+        testStatement = config.getString("MCR.Persistence.SQL.Connections.TestQuery", "select * from mcraccessrule");
+        maxUsages = config.getInt("MCR.Persistence.SQL.Database.Connections.MaxUsages", 1000);
+        maxAge = config.getLong("MCR.Persistence.SQL.Database.Connections.MaxAge", 3600 * 1000); // 1
+                                                                                                    // hour
+
         // Build the initial number of JDBC connections
         for (int i = 0; i < initNumConnections; i++) {
             freeConnections.addElement(new MCRSQLConnection());
-            logger.info("Initialize a MCRSQLConnection.");
+            LOGGER.info("Initialize a MCRSQLConnection.");
         }
     }
 
@@ -145,13 +171,13 @@ public class MCRSQLConnectionPool {
      *             if there was a problem while building the connection
      */
     public synchronized MCRSQLConnection getConnection() throws MCRPersistenceException {
-        logger.debug("getConnection(), currently " + usedConnections.size() + " used, " + freeConnections.size() + " free");
+        LOGGER.debug("getConnection(), currently " + usedConnections.size() + " used, " + freeConnections.size() + " free");
         // Wait for a free connection
 
         int waitCount = 0, maxWaitCount = 20;
         while ((usedConnections.size() == maxNumConnections) && (waitCount < maxWaitCount)) {
             waitCount++;
-            logger.debug("All connections in use, waiting for a free connection, try # " + waitCount);
+            LOGGER.debug("All connections in use, waiting for a free connection, try # " + waitCount);
             try {
                 wait(1000);
             } catch (InterruptedException ignored) {
@@ -179,8 +205,8 @@ public class MCRSQLConnectionPool {
                     rs.close();
                     st.close();
                 } catch (SQLException ex) {
-                    logger.debug("Error while checking existing connection:" + ex.getMessage(), ex);
-                    logger.debug("Connection may be closed, trying to create a new one.");
+                    LOGGER.debug("Error while checking existing connection:" + ex.getMessage(), ex);
+                    LOGGER.debug("Connection may be closed, trying to create a new one.");
                     try {
                         connection.close();
                     } catch (Exception ignored) {
@@ -219,7 +245,7 @@ public class MCRSQLConnectionPool {
             freeConnections.addElement(connection);
         }
 
-        logger.debug("releaseConnection(), currently " + usedConnections.size() + " used, " + freeConnections.size() + " free");
+        LOGGER.debug("releaseConnection(), currently " + usedConnections.size() + " used, " + freeConnections.size() + " free");
         notifyAll();
     }
 
@@ -243,6 +269,6 @@ public class MCRSQLConnectionPool {
      * @return the logger.
      */
     static final Logger getLogger() {
-        return logger;
+        return LOGGER;
     }
 }
