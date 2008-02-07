@@ -23,7 +23,11 @@
 
 package org.mycore.common;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.List;
 
 import org.mycore.services.mbeans.MCRJMXBridge;
 
@@ -388,5 +392,13 @@ public class MCRCache {
     public void close() {
         MCRJMXBridge.unregister("MCRCache", this.type);
         clear();
+    }
+    
+    
+    /**
+     * Returns an iterable list of keys to the cached objects. 
+     */
+    public List<Object> keys(){
+    	return Collections.list(index.keys());
     }
 }

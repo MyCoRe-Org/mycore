@@ -195,7 +195,11 @@ public class MCRIndexBrowserData {
     }
 
     protected static void deleteIndexCacheOfObjectType(String objectType) {
-        INDEX_CACHE.remove(objectType);
+    	for(Object o: INDEX_CACHE.keys()){
+    		if(o.toString().contains(objectType)){
+    			INDEX_CACHE.remove(o);
+    		}
+    	}
     }
 
     public MCRIndexBrowserData(String search, String mode, String path, String fromTo, String mask) {
