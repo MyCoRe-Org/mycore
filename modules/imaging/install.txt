@@ -35,7 +35,11 @@ stored in a MyCoRe repository.
 1. Installation
 ========================
 
-Make sure that this modules is included in $MYCORE_HOME/config/build.properties.
+Make sure this modules is included in $MYCORE_HOME/config/build.properties
+
+Enable Module-Imaging
+- vim $MYCORE_HOME/config/build.properties 
+- add "imaging" as value to property "MCR.Modules.MyCoRe"
 
 Rebuild mycore.jar by
 -- cd $MYCORE_HOME
