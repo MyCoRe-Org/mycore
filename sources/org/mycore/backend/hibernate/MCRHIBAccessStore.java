@@ -83,10 +83,14 @@ public class MCRHIBAccessStore extends MCRAccessStore {
 
         if (!existAccessDefinition(rulemapping.getPool(), rulemapping.getObjId())) {
             Session session = MCRHIBConnection.instance().getSession();
+            MCRACCESSRULE accessRule = getAccessRule(rulemapping.getRuleId());
+            if (accessRule==null){
+                throw new NullPointerException("Cannot map a null rule.");
+            }
             MCRACCESS accdef = new MCRACCESS();
 
             accdef.setKey(new MCRACCESSPK(rulemapping.getPool(), rulemapping.getObjId()));
-            accdef.setRule(getAccessRule(rulemapping.getRuleId()));
+            accdef.setRule(accessRule);
             accdef.setCreator(rulemapping.getCreator());
             accdef.setCreationdate(Timestamp.valueOf(DATE_FORMAT.format(rulemapping.getCreationdate())));
             session.save(accdef);
@@ -149,9 +153,13 @@ public class MCRHIBAccessStore extends MCRAccessStore {
      */
     public void updateAccessDefinition(MCRRuleMapping rulemapping) {
         Session session = MCRHIBConnection.instance().getSession();
+        MCRACCESSRULE accessRule = getAccessRule(rulemapping.getRuleId());
+        if (accessRule==null){
+            throw new NullPointerException("Cannot map a null rule.");
+        }
         // update
         MCRACCESS accdef = (MCRACCESS) session.get(MCRACCESS.class, new MCRACCESSPK(rulemapping.getPool(), rulemapping.getObjId()));
-        accdef.setRule(getAccessRule(rulemapping.getRuleId()));
+        accdef.setRule(accessRule);
         accdef.setCreator(rulemapping.getCreator());
         accdef.setCreationdate(Timestamp.valueOf(DATE_FORMAT.format(rulemapping.getCreationdate())));
         session.update(accdef);
