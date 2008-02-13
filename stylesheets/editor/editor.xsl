@@ -198,7 +198,9 @@
       <xsl:value-of select="substring-after($RequestURL,$WebApplicationBaseURL)" />
       <xsl:choose>
         <xsl:when test="contains($RequestURL,'?')">
-          <xsl:text>&amp;</xsl:text>
+          <xsl:if test="not(substring($RequestURL,string-length($RequestURL))='&amp;')">
+            <xsl:text>&amp;</xsl:text>
+          </xsl:if>
         </xsl:when>
         <xsl:otherwise>
           <xsl:text>?</xsl:text>
