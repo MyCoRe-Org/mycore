@@ -445,9 +445,13 @@ public class MCREditorServlet extends MCRServlet implements MCRSessionListener {
                 sb.append("?subselect.session=").append(sessionID);
                 sb.append("&subselect.varpath=").append(var);
                 sb.append("&subselect.webpage=").append(webpage);
-                sb.append("&XSL.editor.cancel.url=").append(getBaseURL());
-                sb.append(parms.getParameter("_webpage"));
-                sb.append("XSL.editor.session.id=").append(sessionID);
+                
+                String wp = getBaseURL() + parms.getParameter("_webpage");
+                if(! wp.contains("XSL.editor.session.id")) {
+                    wp += "XSL.editor.session.id=" + sessionID;    
+                }
+                String cancelURL = URLEncoder.encode(wp,"UTF-8"); 
+                sb.append("&cancelURL=").append(cancelURL);
             } else if ("webpage".equals(subselect.getAttributeValue("type"))) {
                 sb.append(subselect.getAttributeValue("href"));
                 if (subselect.getAttributeValue("href").indexOf("?") > 0)
