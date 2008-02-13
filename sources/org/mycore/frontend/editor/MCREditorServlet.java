@@ -504,9 +504,12 @@ public class MCREditorServlet extends MCRServlet implements MCRSessionListener {
 
             // Redirect to webpage to reload editor form
             StringBuffer sb = new StringBuffer(getBaseURL());
-            sb.append(parms.getParameter("_webpage"));
-            sb.append("XSL.editor.session.id=");
-            sb.append(sessionID);
+            String wp = parms.getParameter("_webpage");
+            sb.append(wp);
+            if(! wp.contains("XSL.editor.session.id=")) {
+              sb.append("XSL.editor.session.id=");
+              sb.append(sessionID);
+            }
 
             logger.debug("Editor redirect to " + sb.toString());
             res.sendRedirect(res.encodeRedirectURL(sb.toString()));
@@ -533,9 +536,12 @@ public class MCREditorServlet extends MCRServlet implements MCRSessionListener {
 
             // Redirect to webpage to reload editor form
             StringBuffer sb = new StringBuffer(getBaseURL());
-            sb.append(parms.getParameter("_webpage"));
-            sb.append("XSL.editor.session.id=");
-            sb.append(sessionID);
+            String wp = parms.getParameter("_webpage");
+            sb.append(wp);
+            if(! wp.contains("XSL.editor.session.id=")) {
+                sb.append("XSL.editor.session.id=");
+                sb.append(sessionID);
+            }
             logger.debug("Editor redirect to " + sb.toString());
             res.sendRedirect(res.encodeRedirectURL(sb.toString()));
 
@@ -637,8 +643,10 @@ public class MCREditorServlet extends MCRServlet implements MCRSessionListener {
         // Redirect to webpage to reload editor form
         StringBuffer sb = new StringBuffer(getBaseURL());
         sb.append(webpage);
-        sb.append("XSL.editor.session.id=");
-        sb.append(sessionID);
+        if(! webpage.contains( "XSL.editor.session.id=" )) {
+            sb.append("XSL.editor.session.id=");
+            sb.append(sessionID);
+        }
 
         logger.debug("Editor redirect to " + sb.toString());
         res.sendRedirect(res.encodeRedirectURL(sb.toString()));
