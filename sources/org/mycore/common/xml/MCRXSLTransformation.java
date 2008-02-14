@@ -24,6 +24,7 @@
 package org.mycore.common.xml;
 
 import java.io.File;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Collections;
 import java.util.HashMap;
@@ -249,6 +250,20 @@ public class MCRXSLTransformation {
      */
     public static org.jdom.Document transform(org.jdom.Document in, String stylesheet) {
         return transform(in,stylesheet,emptyParameters);
+    }
+
+    /**
+     * Method transform. Transforms a JDOM-Document <i>in </i> with a given
+     * <i>stylesheet </i> to a new document.
+     * 
+     * @param in
+     *            A JDOM-Document.
+     * @param stylesheet
+     *            The InputStream of the stylesheet.
+     * @return Document The new document or null, if an exception was thrown.
+     */
+    public static org.jdom.Document transform(org.jdom.Document in, InputStream stylesheet) {
+        return transform(in,new StreamSource(stylesheet),emptyParameters);
     }
 
     /**
