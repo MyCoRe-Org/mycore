@@ -72,12 +72,14 @@ import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUsageException;
 import org.mycore.common.MCRUtils;
+import org.mycore.common.xml.MCRXSLTransformation;
 import org.mycore.datamodel.classifications.MCRClassificationItem;
 import org.mycore.datamodel.classifications.MCRClassificationQuery;
 import org.mycore.datamodel.classifications.MCRClassificationTransformer;
 import org.mycore.datamodel.common.MCRXMLTableManager;
 import org.mycore.datamodel.ifs.MCRDirectoryXML;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.frontend.cli.MCRDerivateCommands;
 import org.mycore.frontend.editor.MCREditorDataResolver;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.services.fieldquery.MCRQuery;
@@ -169,6 +171,7 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
         supportedSchemes.put("buildxml", new MCRBuildXMLResolver());
         supportedSchemes.put("notnull", new MCRNotNullResolver());
         supportedSchemes.put("editorData", new MCREditorDataResolver());
+        supportedSchemes.put("xslStyle", new MCRXslStyleResolver());
         return supportedSchemes;
     }
 
@@ -1056,6 +1059,64 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
                 LOGGER.info("MCRNotNullResolver caught exception: " + ex.getLocalizedMessage());
                 LOGGER.debug(ex.getStackTrace());
                 LOGGER.debug("MCRNotNullResolver returning empty xml");
+                return new Element("null");
+            }
+        }
+    }
+
+    /**
+     * Transform result of other resolver with stylesheet.
+     * 
+     * Usage: xslStyle:<stylesheet>:<anyMyCoReURI>
+     * 
+     * To <stylesheet> is extension .xsl added. File is searched in classpath.
+     * 
+     */
+    private static class MCRXslStyleResolver implements MCRResolver {
+
+        public Element resolveElement(String uri) {
+            String help       = uri.substring(uri.indexOf(":") + 1);
+            String stylesheet = new StringTokenizer(help, ":").nextToken();
+            String target     = help.substring(help.indexOf(":") + 1);
+            
+            String subUri = target.substring(target.indexOf(":") + 1);
+            if (subUri.length() == 0)
+                return new Element("null");
+            
+            try {
+                Element result = MCRURIResolver.instance().resolve(target);
+                if (result != null)
+                {
+                	InputStream in = this.getClass().getResourceAsStream("/" + stylesheet + ".xsl");
+                	
+                	if (in == null)
+                	{
+                        LOGGER.info("MCRXslStyleResolver stylesheet not found : " + stylesheet + ".xsl");
+                        return new Element("null");
+                	}
+                	LOGGER.debug("Transform with stylesheet " + stylesheet);
+                	
+                	Document doc = result.getDocument();
+                	if (doc == null)
+                		doc = new Document(result);
+                	
+                	Document xx = MCRXSLTransformation.transform(doc, in);
+                	if (!xx.hasRootElement())
+                	{
+                        LOGGER.info("MCRXslStyleResolver no root element after transformation ");
+                        return new Element("null");
+                	}
+                	LOGGER.debug("MCRXslStyleResolver root element after transformation is " + xx.getRootElement().getName());
+                    return xx.getRootElement();
+                }
+                else {
+                    LOGGER.debug("MCRXslStyleResolver returning empty xml");
+                    return new Element("null");
+                }
+            } catch (Exception ex) {
+                LOGGER.info("MCRXslStyleResolver caught exception: " + ex.getLocalizedMessage());
+                LOGGER.debug(ex.getStackTrace());
+                LOGGER.debug("MCRXslStyleResolver returning empty xml");
                 return new Element("null");
             }
         }
