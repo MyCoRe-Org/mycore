@@ -15,6 +15,8 @@ import org.jdom.DocType;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.Namespace;
+import org.mycore.access.MCRAccessInterface;
+import org.mycore.access.MCRAccessManager;
 import org.mycore.backend.hibernate.tables.MCRACCESS;
 import org.mycore.backend.hibernate.tables.MCRACCESSPK;
 import org.mycore.backend.hibernate.tables.MCRACCESSRULE;
@@ -26,12 +28,15 @@ import org.mycore.frontend.editor.MCREditorServlet;
 import org.mycore.frontend.editor.MCREditorSubmission;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
+import org.mycore.user.MCRUserMgr;
 
 public class MCRACLEditorServlet_v2 extends MCRServlet {
 
     private static final long serialVersionUID = 1L;
 
     private static Logger LOGGER = Logger.getLogger(MCRACLEditorServlet_v2.class);
+
+    protected static final String LOGINSERVLET_URL = getServletBaseURL() + "MCRLoginServlet";
 
     public void init() throws MCRConfigurationException, ServletException {
         super.init();
@@ -41,6 +46,8 @@ public class MCRACLEditorServlet_v2 extends MCRServlet {
         HttpServletRequest request = job.getRequest();
         HttpServletResponse response = job.getResponse();
         String mode = request.getParameter("mode");
+
+        verifyAccess(job);
 
         if (MCRWebsiteWriteProtection.printInfoPageIfNoAccess(request, response))
             return;
@@ -75,6 +82,13 @@ public class MCRACLEditorServlet_v2 extends MCRServlet {
             doLayout(request, response, answer, layout, mcrWebPage);
         }
 
+    }
+
+    public void verifyAccess(MCRServletJob job) throws IOException {
+        if (!MCRAccessManager.getAccessImpl().checkPermission("use-aclEditor")) {
+            LOGGER.info("Access denied for userID=" + MCRUserMgr.instance().getCurrentUser().getID());
+            job.getResponse().sendRedirect(LOGINSERVLET_URL);
+        }
     }
 
     private void redirect(HttpServletResponse response, String redirectURL, String objidFilter, String acpoolFilter) {
