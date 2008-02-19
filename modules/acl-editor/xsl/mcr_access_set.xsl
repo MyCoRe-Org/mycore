@@ -4,7 +4,8 @@
     xmlns:java="http://xml.apache.org/xalan/java" xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation">
     <xsl:param name="toc.pageSize" select="20" />
     <xsl:param name="toc.pos" select="1" />
-    <xsl:variable name="permEditorURL" select="concat($WebApplicationBaseURL,'servlets/MCRACLEditorServlet_v2?mode=getACLEditor&amp;editor=permEditor')" />
+    <xsl:variable name="permEditorURL"
+        select="concat($WebApplicationBaseURL,'servlets/MCRACLEditorServlet_v2?mode=dataRequest&amp;action=setFilter&amp;ObjIdFilter=',//objid,'&amp;AcPoolFilter=',//acpool)" />
     <!-- 
         see mcr_acl_editor_common.xsl for definition of following variables
         
@@ -278,7 +279,7 @@
     <!-- Template for filter -->
     <xsl:template match="mcr_access_filter">
         <form name="AclFilterForm" xmlns:encoder="xalan://java.net.URLEncoder" xmlns:xalan="http://xml.apache.org/xalan"
-            action="{concat($dataRequest, '&amp;action=setFilter', $redirectURL)}" method="post" accept-charset="UTF-8">
+            action="{concat($dataRequest, '&amp;action=setFilter&amp;XSL.toc.pos.SESSION=1', $redirectURL)}" method="post" accept-charset="UTF-8">
             <table>
                 <tr>
                     <td colspan="5">
@@ -351,11 +352,13 @@
         <xsl:variable name="numChildren">
             <xsl:value-of select="count(xalan:nodeset($childrenXML)/mcr_access)" />
         </xsl:variable>
-        <form xmlns:encoder="xalan://java.net.URLEncoder" xmlns:xalan="http://xml.apache.org/xalan" action="{$permEditorURL}" method="post"
-            accept-charset="UTF-8">
+        <form xmlns:encoder="xalan://java.net.URLEncoder" xmlns:xalan="http://xml.apache.org/xalan" action="{$permEditorURL}&amp;XSL.toc.pos.SESSION=1"
+            method="post" accept-charset="UTF-8">
             <table>
                 <tr>
-                    <td><b>Gruppierung der Ergebnisse:</b></td>
+                    <td>
+                        <b>Gruppierung der Ergebnisse:</b>
+                    </td>
                 </tr>
                 <tr>
                     <td>
