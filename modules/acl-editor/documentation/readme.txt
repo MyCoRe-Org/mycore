@@ -24,6 +24,7 @@ Mapping editor:
 BUGS:
 	- maybe some bugs in JavaScript
 	- scrolling in dropdown box (Rid) is slow
+	- permEditor: safe -> filter gets lost 
 	
 TODO:
 	- fixing Bugs
