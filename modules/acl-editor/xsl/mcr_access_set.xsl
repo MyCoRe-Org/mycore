@@ -51,37 +51,38 @@
             <xsl:choose>
                 <xsl:when test="not(@cmd = $add) and not(@cmd = $delete)">
                     <!-- Mapping Table -->
-                    <br />
-                    <br />
-                    <table id="mapping_table" style="border:solid 1px;">
-                        <tr>
-                            <th align="left">
-                                <b>System contained rule assignments:</b>
-                                <br />
-                                <br />
-                                <br />
-                            </th>
-                        </tr>
-                        <!-- tabs -->
-                        <tr>
-                            <td>
-                                <xsl:call-template name="mcr_access.printTOCNavi">
-                                    <xsl:with-param name="childrenXML" select="." />
-                                </xsl:call-template>
-
-                            </td>
-                        </tr>
-                        <!-- Filter -->
-                        <xsl:if test="not(@emb = 'true')">
+                    <form name="MappingTableForm" xmlns:encoder="xalan://java.net.URLEncoder" xmlns:xalan="http://xml.apache.org/xalan"
+                        action="{concat($dataRequest, '&amp;action=submitPerm', $redirectURL)}" method="post" accept-charset="UTF-8">
+                        <br />
+                        <br />
+                        <table id="mapping_table" style="border:solid 1px;">
+                            <tr>
+                                <th align="left">
+                                    <b>System contained rule assignments:</b>
+                                    <br />
+                                    <br />
+                                    <br />
+                                </th>
+                            </tr>
+                            <!-- tabs -->
                             <tr>
                                 <td>
-                                    <xsl:apply-templates select="mcr_access_filter" />
-                                    <br />
+                                    <xsl:call-template name="mcr_access.printTOCNavi">
+                                        <xsl:with-param name="childrenXML" select="." />
+                                    </xsl:call-template>
+
                                 </td>
                             </tr>
-                        </xsl:if>
-                        <form name="MappingTableForm" xmlns:encoder="xalan://java.net.URLEncoder" xmlns:xalan="http://xml.apache.org/xalan"
-                            action="{concat($dataRequest, '&amp;action=submitPerm', $redirectURL)}" method="post" accept-charset="UTF-8">
+                            <!-- Filter -->
+                            <xsl:if test="not(@emb = 'true')">
+                                <tr>
+                                    <td>
+                                        <xsl:apply-templates select="mcr_access_filter" />
+                                        <br />
+                                    </td>
+                                </tr>
+                            </xsl:if>
+
                             <!-- handle tabs reqs -->
                             <xsl:variable name="toc.pos.verif">
                                 <xsl:choose>
@@ -163,8 +164,9 @@
                                     </xsl:if>
                                 </td>
                             </tr>
-                        </form>
-                    </table>
+
+                        </table>
+                    </form>
                 </xsl:when>
                 <xsl:when test="@cmd = $delete">
                     <form name="MappingTableForm" xmlns:encoder="xalan://java.net.URLEncoder" xmlns:xalan="http://xml.apache.org/xalan"
