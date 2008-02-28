@@ -99,20 +99,7 @@ public class MCRCStoreVFS extends MCRContentStore {
 
     protected void doDeleteContent(String storageId) throws Exception {
         FileObject targetObject = fsManager.resolveFile(getBase(), storageId);
-        FileObject parent = targetObject.getParent();
         targetObject.delete();
-
-        // Delete parent slot directories, if empty
-        String baseDirPath = getBase().getName().getPathDecoded();
-        while (!parent.getName().getPathDecoded().equals(baseDirPath)) {
-            if (parent.getChildren().length > 0)
-                break;
-
-            targetObject = parent;
-            parent = targetObject.getParent();
-            if (!targetObject.delete())
-                break;
-        }
     }
 
     protected void doRetrieveContent(MCRFileReader file, OutputStream target) throws Exception {
