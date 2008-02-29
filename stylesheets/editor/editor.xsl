@@ -33,6 +33,19 @@
 <xsl:variable name="head.additional">
   <xsl:if test="//textarea[@wysiwygEditor='true']">
     <script type="text/javascript" src="{$WebApplicationBaseURL}fck/fckeditor.js" />
+    <script type="text/javascript">
+      <xsl:text>
+        function startFCK( path, width, height )
+        {
+          var fck = new FCKeditor( path );
+          fck.BasePath = '</xsl:text><xsl:value-of select="concat($WebApplicationBaseURL,'fck/')" /><xsl:text>';
+          fck.Width = width;
+          fck.Height = height;
+          fck.ToolbarSet = 'mcr';
+          fck.ReplaceTextarea();
+        }
+      </xsl:text>
+    </script>
   </xsl:if>
 </xsl:variable>
 
@@ -67,21 +80,6 @@
 <!-- ======== handles editor included within a static webpage ======== -->
 
 <xsl:template match="editor">
-  <!-- ======== include fckEditor if needed ======== -->
-  <xsl:if test="components//textarea[@wysiwygEditor='true']">
-    <script type="text/javascript"><xsl:text>
-      window.onload = function()
-      {
-</xsl:text>
-      <xsl:for-each select="components//textarea[@wysiwygEditor='true']">
-<xsl:text>        </xsl:text><xsl:value-of select="concat('startFCK',generate-id(.),'();')" /><xsl:text>
-</xsl:text>
-      </xsl:for-each>
-<xsl:text>      }
-</xsl:text>
-    </script>
-  </xsl:if>
-  
   <!-- ======== build nested panel structure ======== -->
   <xsl:apply-templates select="components" />
 </xsl:template>
@@ -912,29 +910,6 @@
   </xsl:if>
   <xsl:if test="local-name() = 'textarea'">
   
-    <!-- ======== Use the WYSIWYG HTML Editor? ======== -->
-    <xsl:if test="@wysiwygEditor='true'">
-      <script type="text/javascript"><xsl:text>
-        function </xsl:text><xsl:value-of select="concat('startFCK',generate-id(.),'()')" /><xsl:text>
-        {
-      	  var oFCKeditor = new FCKeditor( '</xsl:text>
-      	  <xsl:value-of select="$var" />
-      	  <xsl:text>' ) ;
-      	  oFCKeditor.BasePath	= '</xsl:text>
-      	  <xsl:value-of select="concat($WebApplicationBaseURL,'fck/')" />
-      	  <xsl:text>' ;
-      	  oFCKeditor.Height = </xsl:text>
-      	  <xsl:value-of select="@editorHeight" />
-      	  <xsl:text> ;
-      	  oFCKeditor.Width = </xsl:text>
-      	  <xsl:value-of select="@editorWidth" />
-      	  <xsl:text> ;
-          oFCKeditor.ToolbarSet = 'mcr' ;
-      	  oFCKeditor.ReplaceTextarea() ;
-        }
-        </xsl:text></script>
-    </xsl:if>
-    
     <xsl:text disable-output-escaping="yes">&lt;textarea tabindex="1" </xsl:text>
       <xsl:text>cols="</xsl:text><xsl:value-of select="@width"/><xsl:text>" </xsl:text>
       <xsl:text>rows="</xsl:text><xsl:value-of select="@height"/><xsl:text>" </xsl:text>
@@ -944,6 +919,20 @@
 
       <xsl:value-of select="$value" disable-output-escaping="yes" />
     <xsl:text disable-output-escaping="yes">&lt;/textarea&gt;</xsl:text>
+    
+    <!-- ======== Use the WYSIWYG HTML Editor? ======== -->
+    <xsl:if test="@wysiwygEditor='true'">
+      <script type="text/javascript">
+        <xsl:text>startFCK('</xsl:text>
+        <xsl:value-of select="$var" />
+        <xsl:text>',</xsl:text>
+        <xsl:value-of select="@editorWidth" />
+        <xsl:text>,</xsl:text>
+        <xsl:value-of select="@editorHeight" />
+        <xsl:text>);</xsl:text>
+      </script>
+    </xsl:if>
+    
   </xsl:if>
 </xsl:template>
 
