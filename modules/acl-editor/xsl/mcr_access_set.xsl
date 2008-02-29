@@ -56,25 +56,26 @@
                         <br />
                         <br />
                         <table id="mapping_table" style="border:solid 1px;">
-                            <tr>
-                                <th align="left">
-                                    <b>System contained rule assignments:</b>
-                                    <br />
-                                    <br />
-                                    <br />
-                                </th>
-                            </tr>
-                            <!-- tabs -->
-                            <tr>
-                                <td>
-                                    <xsl:call-template name="mcr_access.printTOCNavi">
-                                        <xsl:with-param name="childrenXML" select="." />
-                                    </xsl:call-template>
-
-                                </td>
-                            </tr>
-                            <!-- Filter -->
                             <xsl:if test="not(@emb = 'true')">
+                                <tr>
+                                    <th align="left">
+                                        <b>System contained rule assignments:</b>
+                                        <br />
+                                        <br />
+                                        <br />
+                                    </th>
+                                </tr>
+                                <!-- tabs -->
+                                <tr>
+                                    <td>
+                                        <xsl:call-template name="mcr_access.printTOCNavi">
+                                            <xsl:with-param name="childrenXML" select="." />
+                                        </xsl:call-template>
+
+                                    </td>
+                                </tr>
+                                <!-- Filter -->
+
                                 <tr>
                                     <td>
                                         <xsl:apply-templates select="mcr_access_filter" />
@@ -230,14 +231,16 @@
             <form id="createNewPermForm" name="NewPermForm" xmlns:encoder="xalan://java.net.URLEncoder" xmlns:xalan="http://xml.apache.org/xalan"
                 action="{concat($dataRequest, '&amp;action=createNewPerm', $redirectURL)}" method="post" accept-charset="UTF-8">
                 <table style="border:solid 1px;">
-                    <tr>
-                        <th align="left">
-                            <b>Add new rule assignment:</b>
-                            <br />
-                            <br />
-                            <br />
-                        </th>
-                    </tr>
+                    <xsl:if test="not(@emb = 'true')">
+                        <tr>
+                            <th align="left">
+                                <b>Add new rule assignment:</b>
+                                <br />
+                                <br />
+                                <br />
+                            </th>
+                        </tr>
+                    </xsl:if>
                     <xsl:choose>
                         <xsl:when test="not(@cmd = $add)">
                             <tr>
