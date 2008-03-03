@@ -41,6 +41,7 @@ import org.mycore.datamodel.classifications.MCRClassificationQuery;
 import org.mycore.datamodel.classifications.MCRClassificationTransformer;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.MCRObjectService;
+import org.mycore.frontend.MCRWebsiteWriteProtection;
 import org.mycore.frontend.editor.MCREditorSubmission;
 import org.mycore.frontend.editor.MCRRequestParameters;
 
@@ -55,7 +56,8 @@ import org.mycore.frontend.editor.MCRRequestParameters;
  * 
  * @author Anja Schaar
  * @author Jens Kupferschmidt
- * @version $Revision$ $Date$
+ * @version $Revision$ $Date: 2008-02-06 17:27:24 +0000 (Mi, 06 Feb
+ *          2008) $
  */
 
 public class MCRStartClassEditorServlet extends MCRServlet {
@@ -129,6 +131,7 @@ public class MCRStartClassEditorServlet extends MCRServlet {
         String iderrorpage = pagedir + CONFIG.getString("MCR.classeditor_page_error_delete", "editor_error_delete.xml");
         String imerrorpage = pagedir + CONFIG.getString("MCR.classeditor_page_error_move", "classeditor_error_move.xml");
         String imperrorpage = pagedir + CONFIG.getString("MCR.classeditor_page_error_import", "classeditor_error_import.xml");
+        String maintenanceerrorpage = pagedir + CONFIG.getString("MCR.classeditor_page_error_maintenance", "classeditor_error_maintenance.xml");
 
         // change the ACLs of classification
         if ("acl-classification".equals(todo)) {
@@ -260,7 +263,7 @@ public class MCRStartClassEditorServlet extends MCRServlet {
             if (!clE.isLocked(clid)) {
                 boolean cnt = clE.deleteClassification(clid);
                 if (cnt) { // deleted, no more references
-                    path = getBaseURL()+"browse?mode=edit";
+                    path = getBaseURL() + "browse?mode=edit";
                     job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(path));
                 } else { // not delete cause references exist
                     job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + iderrorpage));
@@ -284,8 +287,9 @@ public class MCRStartClassEditorServlet extends MCRServlet {
         }
 
         else if ("save-all".equals(todo)) {
-
-            if (clE.saveAll()) {
+            if (MCRWebsiteWriteProtection.isActive()) {
+                job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + maintenanceerrorpage));
+            } else if (clE.saveAll()) {
                 job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(path + "&clid=" + clid));
             } else {
                 job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + imerrorpage));
