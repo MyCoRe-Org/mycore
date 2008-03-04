@@ -53,15 +53,16 @@ import org.mycore.common.MCRException;
  * 
  * @author Mathias Hegner
  * @author Jens Kupferschmidt
- * @version $Revision$ $Date$
+ * @version $Revision$ $Date: 2008-02-06 18:27:24 +0100 (Mi, 06 Feb
+ *          2008) $
  */
 public class MCRObjectStructure {
 
     private MCRMetaLinkID parent = null;
 
-    private ArrayList children = null;
+    private ArrayList<MCRMetaLinkID> children = null;
 
-    private ArrayList derivates = null;
+    private ArrayList<MCRMetaLinkID> derivates = null;
 
     private Logger logger = null;
 
@@ -71,8 +72,8 @@ public class MCRObjectStructure {
      * are MCRMetaLink's.
      */
     public MCRObjectStructure(Logger log) {
-        children = new ArrayList();
-        derivates = new ArrayList();
+        children = new ArrayList<MCRMetaLinkID>();
+        derivates = new ArrayList<MCRMetaLinkID>();
         logger = log;
     }
 
@@ -252,7 +253,12 @@ public class MCRObjectStructure {
      *            the link to be added as MCRMetaLinkID
      */
     public final void addDerivate(MCRMetaLinkID add_derivate) {
-        derivates.add(add_derivate);
+        MCRObjectID href = add_derivate.getXLinkHrefID();
+        if (MCRDerivate.existInDatastore(href)) {
+            derivates.add(add_derivate);
+        } else {
+            logger.warn("Can't find derivate "+href.getId()+" ,ignored.");
+        }
     }
 
     /**

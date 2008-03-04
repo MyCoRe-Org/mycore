@@ -31,7 +31,6 @@ import java.util.List;
 
 import org.jdom.Document;
 import org.jdom.Element;
-import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
