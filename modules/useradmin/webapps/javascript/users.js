@@ -1,8 +1,8 @@
 /*Author: Radi Radichev*/
 
 var url;  //URL für den Request
-var req;	//Request Variable
 var data;	//JSON Document 
+var req;
 var background; //Background Color
 
 var userToUpdate;
@@ -25,8 +25,8 @@ function initialize() {
 		accept:["usersElement","groupsElement"],
 		onDrop:function(element,drop) {
 			userToUpdate=element.lastChild.innerHTML;
-			groupToUpdate=element.parentNode.parentNode.id;
-			if(groupToUpdate=="userManagement") {
+			groupToUpdate=element.parentNode.parentNode.parentNode.id;
+			if(groupToUpdate=="users") {
 				groupToUpdate=null;
 			}
 			if(userToUpdate==undefined) {
@@ -41,7 +41,8 @@ function initialize() {
 				if(result==true) {
 					deleteUser();
 				} else {
-					updateGroup();
+					url=servletBaseURL+"MCRUserAjaxServlet?mode=users";
+					sendRequest(url,showData);
 				}
 			}
 		}});
@@ -53,26 +54,16 @@ function initialize() {
 
 //Request aufbauen und senden, funct ist eine Funktion die ausgeführt werden soll wenn der Request endet.
 function sendRequest(url,funct) {
-
-try {
-        if( window.XMLHttpRequest ) {
-          req = new XMLHttpRequest();
-        } else if( window.ActiveXObject ) {
-          req = new ActiveXObject( "Microsoft.XMLHTTP" );
-        } else {
-          alert( "Ihr Webbrowser unterstuetzt leider kein Ajax!" );
-        }
-        req.open( "GET", url, true );
-        req.onreadystatechange = funct;
-        req.send( null );
-      } catch( e ) {
-        alert( "Fehler: " + e );
-      }
-	
+	new Ajax.Request(url,{
+		onSuccess:function(transport) {
+			funct(transport);
+		}
+	});
 }
 
+
 //Alle Daten anzeigen.
-function showData() {
+function showData(req) {
 	//Zähler für eindeutige IDs
 	groupIndex=0;
 	userIndex=0;
@@ -92,8 +83,9 @@ function showData() {
 	$("groups").appendChild(grpHeader);
 	$("groups").appendChild(grpList);
 	
-	data=req.responseText.parseJSON();
-	
+	responseTxt=req.responseText;
+	data=responseTxt.evalJSON();
+	if (document.all) { Droppables.drops = [] }
 	data.users.each(
 		function(user) {
 			itemIndex++;
@@ -102,11 +94,41 @@ function showData() {
 		}
 	);
 	
+	Droppables.add("trash",{
+		accept:["usersElement","groupsElement"],
+		onDrop:function(element,drop) {
+			userToUpdate=element.lastChild.innerHTML;
+			groupToUpdate=element.parentNode.parentNode.parentNode.id;
+			if(groupToUpdate=="users") {
+				groupToUpdate=null;
+			}
+			if(userToUpdate==undefined) {
+				userToUpdate=element.innerHTML;
+			}
+			if(element.className=="groupsElement")
+			{
+				deleteGroup(element.id);
+			} else {
+				new Effect.Puff(element.id);
+				var result=confirm(confirmDeleteUser);
+				if(result==true) {
+					deleteUser();
+				} else {
+					url=servletBaseURL+"MCRUserAjaxServlet?mode=users";
+					sendRequest(url,showData);
+				}
+			}
+		}});
+		
 	data.groups.each(
 		function(group) {
 			groupIndex++;
 			$("groupsList").appendChild(createGroupElement(group.name,group.desc));
 			$("Content_"+group.name).style.display="none";
+			var tempEl=document.getElementById("link_"+group.name);
+			Event.observe(tempEl,'click',function() {
+				Effect.toggle('Content_'+group.name,'appear');
+			},false);			
 			Droppables.add(group.name, {
 				accept:"usersElement",
 				onDrop:function(element,drop) {
@@ -116,10 +138,12 @@ function showData() {
 				}
 			}
 			);
+			var outer=document.createElement("div");
+			$(group.name).lastChild.appendChild(outer);
 			data.groups[groupIndex-1].users.each(
 				function(user) {
 					userIndex++;
-					$(group.name).lastChild.appendChild(createGroupUser(user,group.name));
+					outer.appendChild(createGroupUser(user,group.name));
 					new Draggable(user+"_"+group.name,{revert:true});
 				}
 			);
@@ -135,7 +159,6 @@ function showData() {
 		url=servletBaseURL+"MCRUserAjaxServlet?mode=users";
     	sendRequest(url,showData);
 	}
-	
 }
 
 
@@ -143,13 +166,18 @@ function highlightGroups() {
 
 	data.users.each(
 		function(user) {
-			$(user.userID).setAttribute("onmouseover","highlight('"+user.userID+"')");
-			$(user.userID).setAttribute("onmouseout","turnBack('"+user.userID+"')");
+			var userEl=document.getElementById(user.userID);
+			Event.observe(userEl,'mouseover',function() {
+				markGroups(user.userID);
+			});
+			Event.observe(userEl,'mouseout',function() {
+				turnBack(user.userID);
+			});
 		}
 	);
 }
 
-function highlight(username) {
+function markGroups(username) {
 	groupsIndex=0;
 	groupsArray=new Array();
 	data.groups.each(
@@ -190,12 +218,39 @@ function turnBack(username) {
 	}
 } 
 //nur die veränderte Gruppe aktualisieren
-function showGroup() {
-	data=req.responseText.parseJSON();
-	
+function showGroup(req) {
+	responseTxt=req.responseText;
+	data=responseTxt.evalJSON();
 	$(data.gruppe.name).innerHTML="";
-	
+	 if (document.all) { Droppables.drops = [] }
 	$(data.gruppe.name).appendChild(createGroupElement(data.gruppe.name,data.gruppe.desc));
+	
+	Droppables.add("trash",{
+		accept:["usersElement","groupsElement"],
+		onDrop:function(element,drop) {
+			userToUpdate=element.lastChild.innerHTML;
+			groupToUpdate=element.parentNode.parentNode.parentNode.id;
+			if(groupToUpdate=="users") {
+				groupToUpdate=null;
+			}
+			if(userToUpdate==undefined) {
+				userToUpdate=element.innerHTML;
+			}
+			if(element.className=="groupsElement")
+			{
+				deleteGroup(element.id);
+			} else {
+				new Effect.Puff(element.id);
+				var result=confirm(confirmDeleteUser);
+				if(result==true) {
+					deleteUser();
+				} else {
+					url=servletBaseURL+"MCRUserAjaxServlet?mode=users";
+					sendRequest(url,showData);
+				}
+			}
+		}});
+		
 	Droppables.add(data.gruppe.name, {
 		accept:"usersElement",
 		onDrop:function(element,drop) {
@@ -205,10 +260,12 @@ function showGroup() {
 		}
 	}
 	);
+	var outer=document.createElement("div");
+	$(data.gruppe.name).lastChild.appendChild(outer);
 	data.gruppe.users.each(
 		function(user) {
 			userIndex++;
-			$(data.gruppe.name).lastChild.appendChild(createGroupUser(user,data.gruppe.name));
+			outer.appendChild(createGroupUser(user,data.gruppe.name));
 			new Draggable(user+"_"+data.gruppe.name,{revert:true});
 		}
 	);
@@ -241,8 +298,10 @@ function deleteGroup(id) {
 	} 
 }
 
-function completeDeleteGroup() {
-	var data=req.responseText.parseJSON();
+function completeDeleteGroup(req) {
+	//var data=req.responseText.parseJSON();
+	responseTxt=req.responseText;
+	data=responseTxt.evalJSON();
 	if(data.response=="ok") {
 		url=servletBaseURL+"MCRUserAjaxServlet?mode=users";
     	sendRequest(url,showData);
@@ -283,9 +342,9 @@ function createUserElement(user,name) {
 	var usrElement=document.createElement("div")
 	usrImg.className="avatar";
 	usrImg.setAttribute("src",userImg);
-	userContainer.className="usersElement";
-	userContainer.setAttribute("id",user);
-	userContainer.setAttribute("TITLE","header=[Real Name] body=["+name+"]");
+	Element.addClassName(userContainer,"usersElement");
+	Element.writeAttribute(userContainer,{'id':user});
+	Element.writeAttribute(userContainer,{'title':'header=[Real Name] body=['+name+']'});
 	usrElement.innerHTML=user;
 	userContainer.appendChild(usrImg);
 	userContainer.appendChild(usrElement);
@@ -296,18 +355,19 @@ function createUserElement(user,name) {
 function createGroupElement(group,description) {
 	var id=group;
 	var groupElement=document.createElement("li");
-	var link=document.createElement("span");
+	var link=document.createElement("a");
 	link.className="clickable";
-	link.setAttribute("onclick","Effect.toggle('Content_"+group+"','blind')");
+	link.setAttribute("href","#");
+	link.setAttribute("id","link_"+id);
 	link.innerHTML=id;
 	var handle=document.createElement("img");
 	handle.setAttribute("src",grpHandle);
 	handle.setAttribute("id",id+"_link");
-	groupElement.className="groupsElement";
-	groupElement.setAttribute("id",id);
+	Element.addClassName(groupElement,"groupsElement");
+	Element.writeAttribute(groupElement,{'id':id});
+	Element.writeAttribute(groupElement,{'title':'header=[Description] body=['+description+']'});
 	groupElement.appendChild(link);
 	groupElement.appendChild(handle);
-	groupElement.setAttribute("TITLE","header=[Description] body=["+description+"]");
 	var content=document.createElement("ul");
 	content.className="groupsContent";
 	id="Content_"+group;
@@ -316,4 +376,6 @@ function createGroupElement(group,description) {
 	return groupElement;
 }
 
-
+function aufklappen(id) {
+	Effect.toggle('Content_'+id,'appear');
+}

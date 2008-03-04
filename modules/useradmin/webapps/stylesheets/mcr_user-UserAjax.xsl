@@ -10,10 +10,11 @@
 
   <xsl:template match="/mcr_user">
 
-    <script src="{$WebApplicationBaseURL}javascript/json.js" type="text/javascript"></script>
+    <script src="{$WebApplicationBaseURL}javascript/json2.js" type="text/javascript"></script>
     <script src="{$WebApplicationBaseURL}javascript/prototype.js" type="text/javascript"></script>
     <script src="{$WebApplicationBaseURL}javascript/scriptaculous.js" type="text/javascript"></script>
     <script src="{$WebApplicationBaseURL}javascript/boxover.js" type="text/javascript"></script>
+    <script src="{$WebApplicationBaseURL}javascript/effects.js" type="text/javascript"></script>
     <script type="text/javascript">
       <xsl:value-of select="concat('var servletBaseURL=&#x22;',$ServletsBaseURL,'&#x22;;')" />
       <xsl:value-of
@@ -28,7 +29,7 @@
       <xsl:value-of select="concat('var primaryGroup=&#x22;',i18n:translate('users.error.primaryGroup'),'&#x22;;')" />
       <xsl:value-of select="concat('var groupNotEmpty=&#x22;',i18n:translate('users.confirm.groupNotEmpty'),'&#x22;;')" />
     </script>
-    <script src="{$WebApplicationBaseURL}javascript/users.js" type="text/javascript" />
+    <script src="{$WebApplicationBaseURL}javascript/users.js" type="text/javascript"></script>
 
     <link href="{$WebApplicationBaseURL}templates/master/{$template}/CSS/style_userManagement.css" rel="stylesheet"
       type="text/css" />
@@ -38,11 +39,13 @@
           <p>Bitte aktivieren Sie JavaScript, um die Nutzerverwaltung benutzen zu können</p>
         </noscript>
         <div id="userManagement">
-          <div id="users" />
-          <div id="groups" />
-          <img src="{$WebApplicationBaseURL}templates/master/{$template}/IMAGES/trash.png" alt="Trash" id="trash" />
+          <div id="users" ></div>
+          <div id="groups" ></div>
+          <img src="{$WebApplicationBaseURL}templates/master/{$template}/IMAGES/trash.png" alt="Trash" id="trash" ></img>
         </div>
-        <script type="text/javascript">initialize();</script>
+        <script type="text/javascript"><!--//--><![CDATA[//><!--
+        initialize();
+        //--><!]]></script>
       </xsl:when>
       <xsl:otherwise>
         <xsl:value-of select="i18n:translate('metaData.accessDenied')" />

@@ -154,7 +154,7 @@ public class MCRUserAjaxServlet extends MCRServlet {
 
     private void deleteGroup(MCRServletJob job, String groupName) throws Exception {
         MCRGroup group = MCRUserMgr.instance().retrieveGroup(groupName);
-        if (group.getMemberUserIDs() == null) {
+        if (group.getMemberUserIDs().isEmpty()) {
             MCRUserMgr.instance().deleteGroup(groupName);
             JSONObject json = new JSONObject();
             json.put("response", "ok");
