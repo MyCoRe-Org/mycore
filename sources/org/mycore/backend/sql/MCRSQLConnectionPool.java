@@ -24,9 +24,6 @@
 package org.mycore.backend.sql;
 
 import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.List;
 import java.util.Vector;
 
@@ -70,7 +67,7 @@ public class MCRSQLConnectionPool {
 
     /** The maximum age a connection can be before it is reconnected */
     static long maxAge;
-
+    
     static String url;
 
     static String userID;
@@ -147,7 +144,6 @@ public class MCRSQLConnectionPool {
         MCRConfiguration config = MCRConfiguration.instance();
         maxNumConnections = config.getInt("MCR.Persistence.SQL.Connections.Max", 6);
         int initNumConnections = config.getInt("MCR.Persistence.SQL.Connections.Init", maxNumConnections);
-        testStatement = config.getString("MCR.Persistence.SQL.Connections.TestQuery", "select * from mcraccessrule");
         maxUsages = config.getInt("MCR.Persistence.SQL.Database.Connections.MaxUsages", 1000);
         maxAge = config.getLong("MCR.Persistence.SQL.Database.Connections.MaxAge", 3600 * 1000); // 1
                                                                                                     // hour
@@ -171,21 +167,26 @@ public class MCRSQLConnectionPool {
      *             if there was a problem while building the connection
      */
     public synchronized MCRSQLConnection getConnection() throws MCRPersistenceException {
-        LOGGER.debug("getConnection(), currently " + usedConnections.size() + " used, " + freeConnections.size() + " free");
-        // Wait for a free connection
+        if (usedConnections.size() == maxNumConnections) {
+            LOGGER.debug("waiting for database connection...");
 
-        int waitCount = 0, maxWaitCount = 20;
-        while ((usedConnections.size() == maxNumConnections) && (waitCount < maxWaitCount)) {
-            waitCount++;
-            LOGGER.debug("All connections in use, waiting for a free connection, try # " + waitCount);
-            try {
-                wait(1000);
-            } catch (InterruptedException ignored) {
+            long maxWaitTime = 20000;
+            long startTime = System.currentTimeMillis();
+            long timeWaited = 0;
+
+            do {
+                try {
+                    wait(maxWaitTime);
+                } catch (InterruptedException ignored) {
+                }
+                timeWaited = System.currentTimeMillis() - startTime;
+            } while ((usedConnections.size() == maxNumConnections) && (timeWaited <= maxWaitTime));
+
+            LOGGER.debug("waited " + timeWaited + " ms for database connection");
+            if (usedConnections.size() == maxNumConnections) {
+                String msg = "Waited " + timeWaited + " ms, but no database connection is free for use";
+                throw new MCRException(msg);
             }
-        }
-        if (waitCount == maxWaitCount) {
-            String msg = "Waited a long time, but no database connection is free for use";
-            throw new MCRException(msg);
         }
 
         MCRSQLConnection connection;
@@ -196,24 +197,6 @@ public class MCRSQLConnectionPool {
         else {
             connection = (MCRSQLConnection) (freeConnections.firstElement());
             freeConnections.removeElement(connection);
-
-            // Ensure connection still works
-            if (testStatement != null) {
-                try {
-                    Statement st = connection.getJDBCConnection().createStatement();
-                    ResultSet rs = st.executeQuery(testStatement);
-                    rs.close();
-                    st.close();
-                } catch (SQLException ex) {
-                    LOGGER.debug("Error while checking existing connection:" + ex.getMessage(), ex);
-                    LOGGER.debug("Connection may be closed, trying to create a new one.");
-                    try {
-                        connection.close();
-                    } catch (Exception ignored) {
-                    }
-                    connection = new MCRSQLConnection();
-                }
-            }
         }
 
         usedConnections.addElement(connection);
@@ -245,7 +228,6 @@ public class MCRSQLConnectionPool {
             freeConnections.addElement(connection);
         }
 
-        LOGGER.debug("releaseConnection(), currently " + usedConnections.size() + " used, " + freeConnections.size() + " free");
         notifyAll();
     }
 
@@ -261,14 +243,5 @@ public class MCRSQLConnectionPool {
                 ((Connection) (freeConnections.elementAt(i))).close();
         } catch (Exception ignored) {
         }
-    }
-
-    /**
-     * The method return the logger for org.mycore.backend.cm8 .
-     * 
-     * @return the logger.
-     */
-    static final Logger getLogger() {
-        return LOGGER;
     }
 }

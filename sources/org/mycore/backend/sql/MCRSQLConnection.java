@@ -89,9 +89,7 @@ public class MCRSQLConnection {
     }
 
     private void buildJDBCConnection() throws MCRPersistenceException {
-        Logger logger = MCRSQLConnectionPool.getLogger();
-
-        logger.debug("MCRSQLConnection: Building connection to JDBC datastore " + MCRSQLConnectionPool.url);
+        LOGGER.debug("MCRSQLConnection: Building connection to JDBC datastore " + MCRSQLConnectionPool.url);
 
         try {
             if ((MCRSQLConnectionPool.userID != null) && (MCRSQLConnectionPool.userID.trim().length() > 0)) {
@@ -129,7 +127,7 @@ public class MCRSQLConnection {
             LOGGER.debug("MCRSQLConnection: Closing connection to JDBC datastore");
             connection.close();
         } catch (Exception exc) {
-            MCRSQLConnectionPool.getLogger().warn("Exception while closing JDBC connection", exc);
+            LOGGER.warn("Exception while closing JDBC connection", exc);
         }
     }
 
@@ -180,9 +178,8 @@ public class MCRSQLConnection {
             stmt.executeUpdate(statement);
             stmt.close();
         } catch (SQLException ex) {
-            Logger logger = MCRSQLConnectionPool.getLogger();
-            logger.debug("MCRSQLConnection doUpdate: " + statement);
-            logger.debug(ex.getMessage());
+            LOGGER.debug("MCRSQLConnection doUpdate: " + statement);
+            LOGGER.debug(ex.getMessage());
             throw new MCRPersistenceException("Error while executing SQL update statement: " + statement, ex);
         }
     }
