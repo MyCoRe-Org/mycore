@@ -110,7 +110,7 @@ public class MCREditorServlet extends MCRServlet implements MCRSessionListener {
             MCRSession current = event.getSession();
             MCRCache editorsInSession = (MCRCache) current.get(EDITOR_SESSIONS_KEY);
             if (editorsInSession != null) {
-                logger.info(EDITOR_SESSIONS_KEY + " is NOT null");
+                logger.debug(EDITOR_SESSIONS_KEY + " is NOT null");
                 editorsInSession.close();
             }
         }
