@@ -416,9 +416,13 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
             Map<String, MCRResolver> map = new HashMap<String, MCRResolver>();
             for (Entry entry : props.entrySet()) {
                 try {
+                	String scheme = entry.getKey().toString();
+                	scheme = scheme.substring(scheme.lastIndexOf('.')+1);
+                	LOGGER.info("Adding Resolver " + entry.getValue().toString() + " for URI scheme " + scheme);
                     Class cl = Class.forName(entry.getValue().toString());
-                    map.put(entry.getKey().toString(), (MCRResolver) cl.newInstance());
+                    map.put(scheme, (MCRResolver) cl.newInstance());
                 } catch (Exception e) {
+                	LOGGER.error("Cannot instantiate " + entry.getValue() + " for URI scheme " + entry.getKey());
                     throw new MCRException("Cannot instantiate " + entry.getValue() + " for URI scheme " + entry.getKey(), e);
                 }
             }
