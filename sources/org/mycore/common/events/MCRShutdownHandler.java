@@ -23,11 +23,13 @@
  **/
 package org.mycore.common.events;
 
+import java.beans.Introspector;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
 import org.mycore.common.MCRConfiguration;
@@ -72,7 +74,7 @@ public class MCRShutdownHandler {
 
     private static Logger LOGGER = Logger.getLogger(MCRShutdownHandler.class);
 
-    private static final Set requests = Collections.synchronizedSet(new HashSet());
+    private static final Set<Closeable> requests = Collections.synchronizedSet(new HashSet<Closeable>());
     
     private static final String system = MCRConfiguration.instance().getString("MCR.CommandLineInterface.SystemName", "MyCoRe") + ":";
 
@@ -109,8 +111,8 @@ public class MCRShutdownHandler {
         LOGGER.debug("requests: " + requests.toString());
         synchronized (requests) {
             shuttingDown = true;
-            for (Iterator it = requests.iterator(); it.hasNext();) {
-                MCRShutdownHandler.Closeable c = (MCRShutdownHandler.Closeable) it.next();
+            for (Iterator<Closeable> it = requests.iterator(); it.hasNext();) {
+                MCRShutdownHandler.Closeable c = it.next();
                 LOGGER.debug("Closing: " + c.toString());
                 c.close();
                 it.remove();
@@ -119,6 +121,9 @@ public class MCRShutdownHandler {
         System.out.println(system+" closing any remaining MCRSession instances, please wait...\n");
         MCRSessionMgr.close();
         System.out.println(system + " Goodbye, and remember: \"Alles wird gut.\"\n");
+        LogManager.shutdown();
+        //may be needed in webapp to release file handles correctly.
+        Introspector.flushCaches();
     }
 
 }
