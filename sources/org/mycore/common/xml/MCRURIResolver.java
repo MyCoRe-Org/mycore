@@ -79,7 +79,6 @@ import org.mycore.datamodel.classifications.MCRClassificationTransformer;
 import org.mycore.datamodel.common.MCRXMLTableManager;
 import org.mycore.datamodel.ifs.MCRDirectoryXML;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.frontend.cli.MCRDerivateCommands;
 import org.mycore.frontend.editor.MCREditorDataResolver;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.services.fieldquery.MCRQuery;
@@ -151,6 +150,7 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
 
     private HashMap<String, MCRResolver> getResolverMapping() {
         final Map<String, MCRResolver> extResolverMapping = EXT_RESOLVER.getResolverMapping();
+        extResolverMapping.putAll(new MCRModuleResolverProvider().getResolverMapping());
         // set Map to final size with loadfactor: full
         HashMap<String, MCRResolver> supportedSchemes = new HashMap<String, MCRResolver>(10 + extResolverMapping.size(), 1);
         // don't let interal mapping be overwritten
