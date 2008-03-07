@@ -59,9 +59,6 @@ public class MCRSQLConnectionPool {
     /** The maximum number of connections that will be built */
     protected int maxNumConnections;
 
-    /** A SQL select statement configured to test the connection works */
-    protected String testStatement;
-
     /** The maximum number of usages of this connection * */
     static int maxUsages;
 
