@@ -170,17 +170,6 @@
     <url-pattern>/servlets/MCRLinkServlet</url-pattern>
   </servlet-mapping>
 
-  <!-- uncomment for administration interface -->
-  <!-- <servlet id="MCRAdminServlet"> -->
-  <!--  <servlet-name>MCRAdminServlet</servlet-name> -->
-  <!--  <servlet-class>org.mycore.frontend.servlets.MCRAdminServlet</servlet-class> -->
-  <!--</servlet> -->
-  <!-- <servlet-mapping> -->
-  <!--         <servlet-name>MCRAdminServlet</servlet-name> -->
-  <!--         <url-pattern>/admin</url-pattern> -->
-  <!-- </servlet-mapping> -->
-  <!-- administration interface end -->
-
   <!-- **************************************************************** -->
   <!-- General configuration                                            -->
   <!-- **************************************************************** -->
