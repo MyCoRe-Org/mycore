@@ -26,7 +26,7 @@ function initialize() {
 		onDrop:function(element,drop) {
 			userToUpdate=element.lastChild.innerHTML;
 			groupToUpdate=element.parentNode.parentNode.parentNode.id;
-			if(groupToUpdate=="users") {
+			if(groupToUpdate=="userManagement") {
 				groupToUpdate=null;
 			}
 			if(userToUpdate==undefined) {
