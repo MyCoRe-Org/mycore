@@ -68,7 +68,8 @@ import org.mycore.datamodel.common.MCRActiveLinkException;
  * @author Frank Lützenkirchen
  * @author Thomas Scheffler (yagee)
  * 
- * @version $Revision$ $Date$
+ * @version $Revision$ $Date: 2008-02-06 17:27:24 +0000 (Mi, 06 Feb
+ *          2008) $
  */
 public class MCRServlet extends HttpServlet {
     private static final String INITIAL_SERVLET_NAME_KEY = "currentServletName";
@@ -95,6 +96,8 @@ public class MCRServlet extends HttpServlet {
 
     private static MCRLayoutService LAYOUT_SERVICE;
 
+    public static final String BASE_URL_ATTRIBUTE = "org.mycore.base.url";
+
     public static MCRLayoutService getLayoutService() {
         return LAYOUT_SERVICE;
     }
@@ -109,11 +112,22 @@ public class MCRServlet extends HttpServlet {
 
     /** returns the base URL of the mycore system */
     public static String getBaseURL() {
+        MCRSession session = MCRSessionMgr.getCurrentSession();
+        Object value = session.get(BASE_URL_ATTRIBUTE);
+        if (value != null) {
+            LOGGER.debug("Returning BaseURL from user session.");
+            return value.toString();
+        }
         return BASE_URL;
     }
 
     /** returns the servlet base URL of the mycore system */
     public static String getServletBaseURL() {
+        MCRSession session = MCRSessionMgr.getCurrentSession();
+        Object value = session.get(BASE_URL_ATTRIBUTE);
+        if (value != null) {
+            return value.toString() + "servlets/";
+        }
         return SERVLET_URL;
     }
 
@@ -122,13 +136,7 @@ public class MCRServlet extends HttpServlet {
      * the mycore system.
      */
     private static synchronized void prepareURLs(ServletContext context, HttpServletRequest req) {
-        String contextPath = req.getContextPath();
-
-        if (contextPath == null) {
-            contextPath = "";
-        }
-
-        contextPath += "/";
+        String contextPath = req.getContextPath() + "/";
 
         String requestURL = req.getRequestURL().toString();
         int pos = requestURL.indexOf(contextPath, 9);
@@ -254,7 +262,6 @@ public class MCRServlet extends HttpServlet {
             msg.append(" user=").append(session.getCurrentUserID());
             LOGGER.info(msg.toString());
 
-
             String lang = getProperty(req, "lang");
 
             if ((lang != null) && (lang.trim().length() != 0)) {
@@ -264,6 +271,11 @@ public class MCRServlet extends HttpServlet {
             // Set the IP of the current session
             if (session.getCurrentIP().length() == 0) {
                 session.setCurrentIP(getRemoteAddr(req));
+            }
+
+            // set BASE_URL_ATTRIBUTE to MCRSession
+            if (req.getAttribute(BASE_URL_ATTRIBUTE) != null) {
+                session.put(BASE_URL_ATTRIBUTE, req.getAttribute(BASE_URL_ATTRIBUTE));
             }
 
             // Store XSL.*.SESSION parameters to MCRSession
@@ -291,7 +303,7 @@ public class MCRServlet extends HttpServlet {
         } catch (Exception ex) {
             if (getProperty(req, INITIAL_SERVLET_NAME_KEY).equals(getServletName())) {
                 // current Servlet not called via RequestDispatcher
-              job.rollbackTransaction();
+                job.rollbackTransaction();
             }
             if (ex instanceof ServletException) {
                 throw (ServletException) ex;
@@ -431,7 +443,7 @@ public class MCRServlet extends HttpServlet {
         LOGGER.debug("Sending redirect to " + redirectURL.toString());
         return redirectURL.toString();
     }
-    
+
     protected void generateActiveLinkErrorpage(HttpServletRequest request, HttpServletResponse response, String msg, MCRActiveLinkException activeLinks)
             throws IOException {
         StringBuffer msgBuf = new StringBuffer(msg);
@@ -480,11 +492,11 @@ public class MCRServlet extends HttpServlet {
     }
 
     /** The IP addresses of trusted web proxies */
-    protected static Set<String> trustedProxies = new HashSet<String>(); 
-    
+    protected static Set<String> trustedProxies = new HashSet<String>();
+
     /**
-     * Builds a list of trusted proxy IPs from MCR.Request.TrustedProxies.
-     * The IP address of the local host is automatically added to this list.
+     * Builds a list of trusted proxy IPs from MCR.Request.TrustedProxies. The
+     * IP address of the local host is automatically added to this list.
      */
     protected static synchronized void initTrustedProxies() {
         String sTrustedProxies = MCRConfiguration.instance().getString("MCR.Request.TrustedProxies", "");
