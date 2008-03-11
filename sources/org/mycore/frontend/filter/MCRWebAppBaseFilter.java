@@ -39,7 +39,7 @@ public class MCRWebAppBaseFilter implements Filter {
 
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException, ServletException {
         // check if BASE_URL_ATTRIBUTE is present
-        if (req.getAttribute(MCRServlet.BASE_URL_ATTRIBUTE) != null) {
+        if (req.getAttribute(MCRServlet.BASE_URL_ATTRIBUTE) == null) {
             HttpServletRequest request = (HttpServletRequest) req;
             StringBuilder webappBase = new StringBuilder(request.getScheme());
             webappBase.append("://").append(request.getServerName());
