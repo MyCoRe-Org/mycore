@@ -1095,8 +1095,13 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
                 	
                 	if (in == null)
                 	{
-                        LOGGER.info("MCRXslStyleResolver stylesheet not found : " + stylesheet + ".xsl");
-                        return new Element("null");
+                        File f = new File(context.getRealPath("/WEB-INF/stylesheets/" + stylesheet + ".xsl"));
+                        try {
+							in = new FileInputStream(f);
+						} catch (FileNotFoundException e) {
+							LOGGER.error("MCRXslStyleResolver stylesheet neither in classpath nor in /WEB-INF/stylesheets/ found : " + stylesheet + ".xsl");
+							return new Element("null");
+						}
                 	}
                 	LOGGER.debug("Transform with stylesheet " + stylesheet);
                 	
