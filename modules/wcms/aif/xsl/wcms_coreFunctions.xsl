@@ -139,7 +139,7 @@
             <div class="rightmenu">
                 <ul class="menu">
                     <li>
-                        <a href="{$MCR.baseurl}">
+                        <a href="{$WebApplicationBaseURL}">
                             <xsl:value-of select="i18n:translate('wcms.labels.close')" />
                         </a>
                     </li>
