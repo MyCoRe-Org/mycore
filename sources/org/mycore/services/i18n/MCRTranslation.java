@@ -62,7 +62,7 @@ public class MCRTranslation {
     	String result;
         Locale currentLocale = getCurrentLocale();
         LOGGER.debug("Translation for current locale: " + currentLocale.getLanguage());
-        ResourceBundle message = ResourceBundle.getBundle("/messages", currentLocale);
+        ResourceBundle message = ResourceBundle.getBundle("messages", currentLocale);
         
         try { 
         	result = message.getString(label);
@@ -119,7 +119,7 @@ public class MCRTranslation {
     }
 
     static String[] getStringArray(String masked) {
-        List a = new LinkedList();
+        List<String> a = new LinkedList<String>();
         boolean mask = false;
         StringBuffer buf = new StringBuffer();
         if (masked == null) {
