@@ -921,9 +921,13 @@ public class MCRStartEditorServlet extends MCRServlet {
                 generateActiveLinkErrorpage(job.getRequest(), job.getResponse(), "Error while commiting work to the server.", e);
                 return;
             } catch (Exception se) {
+                LOGGER.debug(se.getMessage());
+                se.printStackTrace();
                 cd.myfile = storeerrorpage;
             }
         } catch (MCRException e) {
+            LOGGER.debug(e.getMessage());
+            LOGGER.debug(e.getStackTraceAsString());
             cd.myfile = storeerrorpage;
         }
         job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + cd.myfile));

@@ -26,7 +26,7 @@ package org.mycore.common.events;
 import org.apache.log4j.Logger;
 
 import org.mycore.common.MCRConfiguration;
-import org.mycore.datamodel.classifications.MCRClassification;
+import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRObject;
@@ -117,7 +117,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
         }
 
         if (evt.getObjectType().equals(MCREvent.CLASS_TYPE)) {
-            MCRClassification cl = (MCRClassification) (evt.get("class"));
+            MCRCategory cl = (MCRCategory) (evt.get("class"));
             if (cl != null) {
                 logger.debug(getClass().getName() + " handling " + cl.getId() + " " + evt.getEventType());
                 if (evt.getEventType().equals(MCREvent.CREATE_EVENT)) {
@@ -212,7 +212,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
         }
         
         if (evt.getObjectType().equals(MCREvent.CLASS_TYPE)) {
-            MCRClassification obj = (MCRClassification) (evt.get("class"));
+            MCRCategory obj = (MCRCategory) (evt.get("class"));
             if (obj != null) {
                 logger.debug(getClass().getName() + " handling " + obj.getId() + " " + evt.getEventType());
                 if (evt.getEventType().equals(MCREvent.CREATE_EVENT)) {
@@ -248,7 +248,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
      * @param obj
      *            the MCRClassification that caused the event
      */
-    protected void handleClassificationCreated(MCREvent evt, MCRClassification obj) {
+    protected void handleClassificationCreated(MCREvent evt, MCRCategory obj) {
         doNothing(evt, obj);
     }
 
@@ -261,7 +261,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
      * @param obj
      *            the MCRClassification that caused the event
      */
-    protected void handleClassificationUpdated(MCREvent evt, MCRClassification obj) {
+    protected void handleClassificationUpdated(MCREvent evt, MCRCategory obj) {
         doNothing(evt, obj);
     }
 
@@ -274,7 +274,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
      * @param obj
      *            the MCRClassification that caused the event
      */
-    protected void handleClassificationDeleted(MCREvent evt,  MCRClassification obj) {
+    protected void handleClassificationDeleted(MCREvent evt,  MCRCategory obj) {
         doNothing(evt, obj);
     }
 
@@ -287,7 +287,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
      * @param obj
      *            the MCRClassification that caused the event
      */
-    protected void handleClassificationRepaired(MCREvent evt, MCRClassification obj) {
+    protected void handleClassificationRepaired(MCREvent evt, MCRCategory obj) {
         doNothing(evt, obj);
     }
 
@@ -456,7 +456,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
      * @param obj
      *            the MCRClassification that caused the event
      */
-    protected void undoClassificationCreated(MCREvent evt, MCRClassification obj) {
+    protected void undoClassificationCreated(MCREvent evt, MCRCategory obj) {
         doNothing(evt, obj);
     }
 
@@ -469,7 +469,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
      * @param obj
      *            the MCRClassification that caused the event
      */
-    protected void undoClassificationUpdated(MCREvent evt, MCRClassification obj) {
+    protected void undoClassificationUpdated(MCREvent evt, MCRCategory obj) {
         doNothing(evt, obj);
     }
 
@@ -482,7 +482,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
      * @param obj
      *            the MCRClassification that caused the event
      */
-    protected void undoClassificationDeleted(MCREvent evt, MCRClassification obj) {
+    protected void undoClassificationDeleted(MCREvent evt, MCRCategory obj) {
         doNothing(evt, obj);
     }
 
@@ -495,7 +495,7 @@ public abstract class MCREventHandlerBase implements MCREventHandler {
      * @param obj
      *            the MCRClassification that caused the event
      */
-    protected void undoClassificationRepaired(MCREvent evt, MCRClassification obj) {
+    protected void undoClassificationRepaired(MCREvent evt, MCRCategory obj) {
         doNothing(evt, obj);
     }
 

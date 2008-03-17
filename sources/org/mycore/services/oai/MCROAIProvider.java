@@ -1,5 +1,5 @@
 /**
- * 
+ * $RCSfile$
  * $Revision$ $Date$
  *
  * This file is part of ** M y C o R e **
@@ -57,12 +57,14 @@ import org.jdom.Namespace;
 import org.jdom.ProcessingInstruction;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
+
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRException;
 import org.mycore.common.xml.MCRXSLTransformation;
-import org.mycore.datamodel.classifications.MCRCategoryItem;
-import org.mycore.datamodel.classifications.MCRClassification;
-import org.mycore.datamodel.classifications.MCRLabel;
+import org.mycore.datamodel.classifications2.MCRCategory;
+import org.mycore.datamodel.classifications2.MCRCategoryID;
+import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
+import org.mycore.datamodel.classifications2.MCRLabel;
 import org.mycore.datamodel.metadata.MCRMetaClassification;
 import org.mycore.datamodel.metadata.MCRMetaElement;
 import org.mycore.datamodel.metadata.MCRObject;
@@ -119,7 +121,8 @@ public class MCROAIProvider extends MCRServlet {
         oaiProviderFriends = CONFIG.getString("MCR.OAI.Friends", "");
         oaiResumptionTokenTimeOut = CONFIG.getInt("MCR.OAI.Resumptiontoken.Timeout", 72);
         maxReturns = CONFIG.getInt("MCR.OAI.MaxReturns", 10);
-        resStore = (MCROAIResumptionTokenStore) CONFIG.getInstanceOf("MCR.OAI.Resumptiontoken.Store", "org.mycore.backend.hibernate.MCRHIBResumptionTokenStore");
+        resStore = (MCROAIResumptionTokenStore) CONFIG
+                .getInstanceOf("MCR.OAI.Resumptiontoken.Store", "org.mycore.backend.hibernate.MCRHIBResumptionTokenStore");
         baseurl = CONFIG.getString("MCR.baseurl", "");
     }
 
@@ -464,7 +467,8 @@ public class MCROAIProvider extends MCRServlet {
                         Namespace xsi = Namespace.getNamespace("xsi", STR_SCHEMA_INSTANCE);
                         eDC.addNamespaceDeclaration(dc);
                         eDC.addNamespaceDeclaration(xsi);
-                        eDC.setAttribute("schemaLocation", STR_OAI_NAMESPACE + STR_OAI_VERSION + "/oai_dc/ " + STR_OAI_NAMESPACE + STR_OAI_VERSION + "/oai_dc.xsd", xsi);
+                        eDC.setAttribute("schemaLocation", STR_OAI_NAMESPACE + STR_OAI_VERSION + "/oai_dc/ " + STR_OAI_NAMESPACE + STR_OAI_VERSION
+                                + "/oai_dc.xsd", xsi);
                         Element eDescription = new Element("description", dc);
                         eDescription.addContent(setArray[5]);
                         eDC.addContent(eDescription);
@@ -860,7 +864,8 @@ public class MCROAIProvider extends MCRServlet {
                     Namespace xsi = Namespace.getNamespace("xsi", STR_SCHEMA_INSTANCE);
                     eDC.addNamespaceDeclaration(dc);
                     eDC.addNamespaceDeclaration(xsi);
-                    eDC.setAttribute("schemaLocation", STR_OAI_NAMESPACE + STR_OAI_VERSION + "/oai_dc/ " + STR_OAI_NAMESPACE + STR_OAI_VERSION + "/oai_dc.xsd", xsi);
+                    eDC.setAttribute("schemaLocation", STR_OAI_NAMESPACE + STR_OAI_VERSION + "/oai_dc/ " + STR_OAI_NAMESPACE + STR_OAI_VERSION + "/oai_dc.xsd",
+                            xsi);
                     Element eDescription = new Element("description", dc);
                     eDescription.addContent(set[2]);
                     eDC.addContent(eDescription);
@@ -1565,18 +1570,18 @@ public class MCROAIProvider extends MCRServlet {
                     String classificationId = classification.getClassId();
                     if (classifications.contains(classificationId)) {
                         String categoryId = classification.getCategId();
-                        MCRCategoryItem category = MCRClassification.retrieveCategoryItem(classificationId, categoryId);
-                        List labels = category.getLabels();
+                        MCRCategory category = MCRCategoryDAOFactory.getInstance().getCategory(new MCRCategoryID(classificationId, categoryId), -1);
+                        Collection<org.mycore.datamodel.classifications2.MCRLabel> labels = category.getLabels().values();
                         boolean found = false;
-                        for (int l = 0; l < labels.size(); l++) {
-                            if (((MCRLabel) labels.get(l)).getLang().equals("x-dini")) {
-                                setSpec.append(" ").append(((MCRLabel) labels.get(l)).getText());
+                        for (MCRLabel label : labels) {
+                            if (label.getLang().equals("x-dini")) {
+                                setSpec.append(" ").append(label.getText());
                                 found = true;
                                 break;
                             }
                         }
                         if (!found) {
-                            categoryId = category.getParentID() + ":" + categoryId;
+                            categoryId = category.getParent().getId().getID() + ":" + categoryId;
                             setSpec.append(" ").append(categoryId);
                         }
                     }

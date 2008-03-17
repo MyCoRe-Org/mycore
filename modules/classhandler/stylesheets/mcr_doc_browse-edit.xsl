@@ -527,7 +527,7 @@
                         <td>
                           <form action="{$WebApplicationBaseURL}servlets/MCRStartClassEditorServlet{$HttpSession}" method="get">
                             <input type="hidden" name="path" value='{$path}' />
-                            <input type="hidden" name="clid" value='' />
+                            <input type="hidden" name="clid" value='{$classifID}' />
                             <input type="hidden" name="todo" value='save-all' />
                             <input type="submit" class="button" name="saveAll" value="{i18n:translate('Browse.saveClass')}" />
                           </form>
@@ -577,7 +577,7 @@
         <xsl:variable name="browserClass" select="@browserClass" />
         <xsl:variable name="classifID" select="@ID" />
         <xsl:variable name="counter" select="@counter" />
-        <xsl:variable name="categpath" select="concat($WebApplicationBaseURL, 'browse/', $browserClass,$HttpSession, '?mode=edit&amp;clid=',$classifID )" />
+        <xsl:variable name="categpath" select="concat($WebApplicationBaseURL, 'browse/',$browserClass, $HttpSession, '?mode=edit&amp;clid=',$classifID )" />
         <xsl:variable name="edited" select="@edited" />
         <xsl:variable name="userEdited" select="@userEdited" />
         <xsl:variable name="canEdit" select="@userCanEdit" />
@@ -628,9 +628,9 @@
                   </td>						
                   <xsl:if test="$edited='false'">
                     <td width="25" valign="top">
-                      <a target="new" alt="$classifID" onclick="fensterCodice('{$WebApplicationBaseURL}receive/{$classifID}{$HttpSession}');return false;"
-                        href="{$WebApplicationBaseURL}receive/{$classifID}{$HttpSession}">
-                        <input onclick="fensterCodice('{$WebApplicationBaseURL}receive/{$classifID}{$HttpSession});return false;" type="image"
+                      <a target="new" alt="$classifID" onclick="fensterCodice('{$WebApplicationBaseURL}servlets/MCRClassExportServlet?id={$classifID}');return false;"
+                        href="{$WebApplicationBaseURL}servlets/MCRClassExportServlet?id={$classifID}{$HttpSession}">
+                        <input onclick="fensterCodice('{$WebApplicationBaseURL}servlets/MCRClassExportServlet?id={$classifID}');return false;" type="image"
                           src='{$classexport}' title="{i18n:translate('Browse.classExport')}" />
                       </a>
                     </td>
@@ -721,9 +721,9 @@
                   </td>					
                   <xsl:if test="$edited='false'">
                     <td width="25" valign="top">
-                      <a target="new" alt="$classifID" onclick="fensterCodice('{$WebApplicationBaseURL}receive/{$classifID}{$HttpSession}');return false;"
-                        href="{$WebApplicationBaseURL}receive/{$classifID}{$HttpSession}">
-                        <input onclick="fensterCodice('{$WebApplicationBaseURL}receive/{$classifID}{$HttpSession});return false;" type="image"
+                      <a target="new" alt="$classifID" onclick="fensterCodice('{$WebApplicationBaseURL}servlets/MCRClassExportServlet?id={$classifID}');return false;"
+                        href="{$WebApplicationBaseURL}servlets/MCRClassExportServlet?id={$classifID}">
+                        <input onclick="fensterCodice('{$WebApplicationBaseURL}servlets/MCRClassExportServlet?id={$classifID}{$HttpSession}');return false;" type="image"
                           src='{$classexport}' title="{i18n:translate('Browse.classExport')}" />
                       </a>
                     </td>

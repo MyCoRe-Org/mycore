@@ -24,7 +24,8 @@
 package org.mycore.datamodel.metadata;
 
 import org.mycore.common.MCRException;
-import org.mycore.datamodel.classifications.MCRClassificationManager;
+import org.mycore.datamodel.classifications2.MCRCategoryID;
+import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.common.MCRXMLTableManager;
 
 /**
@@ -80,7 +81,8 @@ public class MCRMetaClassification extends MCRMetaDefault {
      * @exception MCRException if the set_subtag value, the set_classid value or
      * the set_categid are null, empty, too long or not a MCRObjectID
      */
-    public MCRMetaClassification(String set_datapart, String set_subtag, int set_inherted, String set_type, String set_classid, String set_categid) throws MCRException {
+    public MCRMetaClassification(String set_datapart, String set_subtag, int set_inherted, String set_type, String set_classid, String set_categid)
+            throws MCRException {
         super(set_datapart, set_subtag, "en", set_type, set_inherted);
         setValue(set_classid, set_categid);
     }
@@ -204,11 +206,11 @@ public class MCRMetaClassification extends MCRMetaDefault {
             if (!MCRXMLTableManager.instance().exist(new MCRObjectID(classid))) {
                 return false;
             }
-            if (MCRClassificationManager.instance().retrieveCategoryItem(classid, categid) == null) {
+            if (!MCRCategoryDAOFactory.getInstance().exist(new MCRCategoryID(classid, categid))) {
                 return false;
             }
         } catch (Exception e) {
-        	LOGGER.debug("Error validating classification "+classid, e);
+            LOGGER.debug("Error validating classification " + classid, e);
             return false;
         }
 

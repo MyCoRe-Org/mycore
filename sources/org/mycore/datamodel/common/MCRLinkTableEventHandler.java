@@ -23,10 +23,16 @@
 
 package org.mycore.datamodel.common;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandlerBase;
-import org.mycore.datamodel.classifications.MCRCategoryItem;
-import org.mycore.datamodel.classifications.MCRClassification;
+import org.mycore.datamodel.classifications2.MCRCategLinkServiceFactory;
+import org.mycore.datamodel.classifications2.MCRCategoryID;
+import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
+import org.mycore.datamodel.classifications2.MCRObjectReference;
 import org.mycore.datamodel.metadata.MCRMetaClassification;
 import org.mycore.datamodel.metadata.MCRMetaElement;
 import org.mycore.datamodel.metadata.MCRMetaInterface;
@@ -60,6 +66,7 @@ public class MCRLinkTableEventHandler extends MCREventHandlerBase {
         // delete old entries
         MCRObjectID mcr_id = obj.getId();
         mcr_linktable.deleteReferenceLink(mcr_id);
+        MCRCategLinkServiceFactory.getInstance().deleteLinks(Collections.nCopies(1, obj.getId().toString()));
         // set new entries
         MCRObjectMetadata meta = obj.getMetadata();
         MCRMetaElement elm = null;
@@ -68,13 +75,15 @@ public class MCRLinkTableEventHandler extends MCREventHandlerBase {
             // TODO: add undo events
             checkLinkTargets(obj);
         }
+        Collection<MCRCategoryID> categories = new ArrayList<MCRCategoryID>();
         for (int i = 0; i < meta.size(); i++) {
             elm = meta.getMetadataElement(i);
             for (int j = 0; j < elm.size(); j++) {
                 inf = elm.getElement(j);
                 if (inf instanceof MCRMetaClassification) {
-                    mcr_linktable.addClassificationLink(mcr_id, new MCRObjectID(((MCRMetaClassification) inf).getClassId()), ((MCRMetaClassification) inf)
-                            .getCategId());
+                    String classId = ((MCRMetaClassification) inf).getClassId();
+                    String categId = ((MCRMetaClassification) inf).getCategId();
+                    categories.add(new MCRCategoryID(classId, categId));
                     continue;
                 }
                 if (inf instanceof MCRMetaLinkID) {
@@ -82,6 +91,10 @@ public class MCRLinkTableEventHandler extends MCREventHandlerBase {
                     continue;
                 }
             }
+        }
+        if (categories.size() > 0) {
+            MCRObjectReference objectReference = new MCRObjectReference(mcr_id.toString(), mcr_id.getTypeId());
+            MCRCategLinkServiceFactory.getInstance().setLinks(objectReference, categories);
         }
         // delete all derivate references
         // NOTE: Derivates are deleted by handleObjectDeleted() above
@@ -108,8 +121,8 @@ public class MCRLinkTableEventHandler extends MCREventHandlerBase {
                 if (inf instanceof MCRMetaClassification) {
                     String classID = ((MCRMetaClassification) inf).getClassId();
                     String categID = ((MCRMetaClassification) inf).getCategId();
-                    MCRCategoryItem categ = MCRClassification.retrieveCategoryItem(classID, categID);
-                    if (categ != null) {
+                    boolean exists = MCRCategoryDAOFactory.getInstance().exist(new MCRCategoryID(classID, categID));
+                    if (exists) {
                         continue;
                     }
                     MCRActiveLinkException activeLink = new MCRActiveLinkException("Failure while adding link!. Destination does not exist.");

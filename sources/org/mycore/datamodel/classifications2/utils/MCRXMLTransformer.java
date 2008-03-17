@@ -50,7 +50,7 @@ public class MCRXMLTransformer {
         return category;
     }
 
-    private static MCRCategory getCategory(String classID, Element e, int level) {
+    public static MCRCategory getCategory(String classID, Element e, int level) {
         MCRCategoryImpl category = new MCRCategoryImpl();
         category.setId(new MCRCategoryID(classID, e.getAttributeValue("ID")));
         category.setLabels(getLabel(e.getChildren("label")));

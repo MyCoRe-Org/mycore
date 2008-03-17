@@ -31,8 +31,6 @@ import org.apache.log4j.Logger;
 
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
-import org.mycore.datamodel.classifications.MCRCategoryItem;
-import org.mycore.datamodel.classifications.MCRClassification;
 import org.mycore.datamodel.metadata.MCRObjectID;
 
 /**
@@ -45,8 +43,6 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 public class MCRLinkTableManager {
     /** The list of entry types */
     public static final String ENTRY_TYPE_CHILD = "child";
-
-    public static final String ENTRY_TYPE_CLASSID = "classid";
 
     public static final String ENTRY_TYPE_DERIVATE = "derivate";
 
@@ -109,7 +105,7 @@ public class MCRLinkTableManager {
      *         warning to the logger.
      */
     private final boolean checkType(String type) {
-        if (type.equals(ENTRY_TYPE_CHILD) || type.equals(ENTRY_TYPE_CLASSID) || type.equals(ENTRY_TYPE_DERIVATE) || type.equals(ENTRY_TYPE_PARENT) || type.equals(ENTRY_TYPE_REFERENCE)) {
+        if (type.equals(ENTRY_TYPE_CHILD) || type.equals(ENTRY_TYPE_DERIVATE) || type.equals(ENTRY_TYPE_PARENT) || type.equals(ENTRY_TYPE_REFERENCE)) {
             return true;
         }
         logger.warn("The value " + type + " is not a defined type for the link table.");
@@ -164,7 +160,8 @@ public class MCRLinkTableManager {
             attr = "";
         }
 
-        StringBuffer sb = new StringBuffer().append("Link in table ").append(type).append(" add for ").append(from).append("<-->").append(to).append(" with ").append(type).append(" and ").append(attr);
+        StringBuffer sb = new StringBuffer().append("Link in table ").append(type).append(" add for ").append(from).append("<-->").append(to).append(" with ")
+                .append(type).append(" and ").append(attr);
         logger.debug(sb.toString());
 
         try {
@@ -229,79 +226,6 @@ public class MCRLinkTableManager {
         } catch (Exception e) {
             e.printStackTrace();
             logger.warn("An error occured while deleting a dataset from the" + " reference link table, deleting is not succesful.");
-        }
-    }
-
-    /**
-     * The method add a classification link.
-     * 
-     * @param from
-     *            the source of the reference as MCRObjectID
-     * @param classid
-     *            the target classification id as MCRObjectID
-     * @param categid
-     *            the target category id ad String
-     */
-    public void addClassificationLink(MCRObjectID from, MCRObjectID classid, String categid) {
-        addClassificationLink(from.getId(), classid.getId(), categid);
-    }
-
-    /**
-     * The method add a classification link.
-     * 
-     * @param from
-     *            the source of the reference as String
-     * @param classid
-     *            the target classification id as String
-     * @param categid
-     *            the target category id ad String
-     */
-    public void addClassificationLink(String from, String classid, String categid) {
-        addReferenceLink(from, classid + "##" + categid, ENTRY_TYPE_CLASSID, "");
-        MCRCategoryItem categitem = MCRClassification.retrieveCategoryItem(classid, categid);
-        if (categitem.getParentID() != null) {
-            addClassificationLink(from, classid, categitem.getParentID());
-        }
-    }
-
-    /**
-     * The method delete a classification link.
-     * 
-     * @param from
-     *            the source of the reference as MCRObjectID
-     */
-    public void deleteClassificationLink(MCRObjectID from) {
-        deleteReferenceLink(from.getId());
-    }
-
-    /**
-     * The method delete a classification link.
-     * 
-     * @param from
-     *            the source of the reference as String
-     */
-    public void deleteClassificationLink(String from) {
-        deleteReferenceLink(from);
-    }
-
-    /**
-     * removes a link from an object to a category and it's ancestors.
-     * 
-     * WARNING: This could result in an inconsistent system if you don't keep
-     * track of links in the childlist.
-     * 
-     * @param from
-     *            the source of the reference as MCRObjectID
-     * @param classid
-     *            target Classification ID
-     * @param categid
-     *            target Category ID in Classification classid
-     */
-    public void deleteClassificationLink(String from, String classid, String categid) {
-        deleteReferenceLink(from, classid + "##" + categid, ENTRY_TYPE_CLASSID);
-        MCRCategoryItem categitem = MCRClassification.retrieveCategoryItem(classid, categid);
-        if (categitem.getParentID() != null) {
-            deleteClassificationLink(from, classid, categitem.getParentID());
         }
     }
 
@@ -400,49 +324,6 @@ public class MCRLinkTableManager {
      */
     public int countReferenceCategory(String classid, String categid) {
         return countReferenceLinkTo(classid + "##" + categid, null, null);
-    }
-
-    /**
-     * The method count the number of references to a category of a
-     * classification.
-     * 
-     * @param classid
-     *            the classification ID as String
-     * @param categid
-     *            the category ID as String
-     * @param types
-     *            Array of document type slected by the mcrfrom content
-     * @param restriction
-     *            a first part of the to ID as String, it can be null
-     * @return the number of references
-     */
-    public int countReferenceCategory(String classid, String categid, String[] types, String restriction) {
-        if ((classid == null) || ((classid = classid.trim()).length() == 0)) {
-            logger.warn("The to value of classification ID is null or empty.");
-            return 0;
-        }
-        if (categid == null) {
-            categid = "";
-        }
-        StringBuffer sb = new StringBuffer(classid);
-        sb.append("##").append(categid).append('%');
-
-        try {
-            if (((types != null) && (types.length > 0))) {
-                String mydoctype = "";
-                int cnt = 0;
-                int idt = 0;
-                for (idt = 0; idt < types.length; idt++) {
-                    mydoctype = types[idt];
-                    cnt += persistenceclass.countTo(mydoctype, sb.toString(), ENTRY_TYPE_CLASSID, restriction);
-                }
-                return cnt;
-            }
-            return persistenceclass.countTo(null, sb.toString(), ENTRY_TYPE_CLASSID, restriction);
-        } catch (Exception e) {
-            logger.warn("An error occured while searching for references of " + sb.toString() + ".");
-        }
-        return 0;
     }
 
     /**
@@ -589,42 +470,6 @@ public class MCRLinkTableManager {
             logger.warn("An error occured while searching for references from " + from + ".");
             return new LinkedList();
         }
-    }
-
-    /**
-     * The method retun a list of links for the given classification and
-     * category.
-     * 
-     * @param classid
-     *            the classification ID
-     * @param categid
-     *            the category of this classification
-     * @return a list of ID's
-     */
-    public List getLinksToCategory(String classid, String categid) {
-        return getSourceOf(classid + "##" + categid, ENTRY_TYPE_CLASSID);
-    }
-
-    /**
-     * The method return the first link of a given category of a classification.
-     * 
-     * @param classid
-     *            the classification ID
-     * @param categid
-     *            the category of this classification
-     * @return a list of ID's
-     */
-    public List getFirstLinksToCategory(String classid, String categid) {
-        MCRCategoryItem categ = MCRClassification.retrieveCategoryItem(classid, categid);
-        List<List> categList = getLinksToCategory(classid, categid);
-        List<MCRCategoryItem> childs = categ.getCategories();
-        String[] childIDs = new String[childs.size()];
-        for (int i = 0; i < childIDs.length; i++) {
-            childIDs[i] = new StringBuffer(classid).append("##").append(((MCRCategoryItem) childs.get(i)).getClassID()).toString();
-        }
-        List childrenList = getSourceOf(childIDs, ENTRY_TYPE_CLASSID);
-        categList.removeAll(childrenList);
-        return categList;
     }
 
 }

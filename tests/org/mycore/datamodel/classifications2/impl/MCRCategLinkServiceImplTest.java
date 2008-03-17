@@ -45,8 +45,6 @@ import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.MCRObjectReference;
 import org.mycore.datamodel.classifications2.utils.MCRXMLTransformer;
 
-;
-
 /**
  * @author Thomas Scheffler (yagee)
  * 

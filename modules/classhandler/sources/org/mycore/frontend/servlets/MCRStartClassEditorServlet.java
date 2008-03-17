@@ -1,5 +1,5 @@
 /**
- * 
+ * $RCSfile: MCRStartClassEditorServlet.java,v $
  * $Revision$ $Date$
  *
  * This file is part of ** M y C o R e **
@@ -33,15 +33,13 @@ import org.jdom.Element;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUtils;
-import org.mycore.datamodel.classifications.MCRCategoryItem;
 import org.mycore.datamodel.classifications.MCRClassificationBrowserData;
 import org.mycore.datamodel.classifications.MCRClassificationEditor;
-import org.mycore.datamodel.classifications.MCRClassificationItem;
-import org.mycore.datamodel.classifications.MCRClassificationQuery;
-import org.mycore.datamodel.classifications.MCRClassificationTransformer;
+import org.mycore.datamodel.classifications2.MCRCategory;
+import org.mycore.datamodel.classifications2.MCRCategoryID;
+import org.mycore.datamodel.classifications2.utils.MCRCategoryTransformer;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.MCRObjectService;
-import org.mycore.frontend.MCRWebsiteWriteProtection;
 import org.mycore.frontend.editor.MCREditorSubmission;
 import org.mycore.frontend.editor.MCRRequestParameters;
 
@@ -56,8 +54,7 @@ import org.mycore.frontend.editor.MCRRequestParameters;
  * 
  * @author Anja Schaar
  * @author Jens Kupferschmidt
- * @version $Revision$ $Date: 2008-02-06 17:27:24 +0000 (Mi, 06 Feb
- *          2008) $
+ * @version $Revision$ $Date$
  */
 
 public class MCRStartClassEditorServlet extends MCRServlet {
@@ -85,8 +82,6 @@ public class MCRStartClassEditorServlet extends MCRServlet {
      */
     public void doGetPost(MCRServletJob job) throws Exception {
 
-        // MCRSession session = MCRSessionMgr.getCurrentSession();
-
         // read the XML data if given from Editorsession
         MCREditorSubmission sub = (MCREditorSubmission) (job.getRequest().getAttribute("MCREditorSubmission"));
 
@@ -109,6 +104,7 @@ public class MCRStartClassEditorServlet extends MCRServlet {
         // get the Classification
         clid = parms.getParameter("clid"); // getProperty(job.getRequest(),
         // "clid");
+        
         categid = parms.getParameter("categid"); // getProperty(job.getRequest(),
         // "categid");
 
@@ -131,7 +127,6 @@ public class MCRStartClassEditorServlet extends MCRServlet {
         String iderrorpage = pagedir + CONFIG.getString("MCR.classeditor_page_error_delete", "editor_error_delete.xml");
         String imerrorpage = pagedir + CONFIG.getString("MCR.classeditor_page_error_move", "classeditor_error_move.xml");
         String imperrorpage = pagedir + CONFIG.getString("MCR.classeditor_page_error_import", "classeditor_error_import.xml");
-        String maintenanceerrorpage = pagedir + CONFIG.getString("MCR.classeditor_page_error_maintenance", "classeditor_error_maintenance.xml");
 
         // change the ACLs of classification
         if ("acl-classification".equals(todo)) {
@@ -187,12 +182,14 @@ public class MCRStartClassEditorServlet extends MCRServlet {
                 if ("create-category".equals(todo2)) {
                     // create
                     if (!clE.isLocked(clid)) {
-                        bret = clE.createCategoryInClassification(indoc, clid, categid);
+                        MCRCategoryID id = new MCRCategoryID(clid, categid);
+                        bret = clE.createCategoryInClassification(indoc, id);
                     }
                 } else {
                     // modify
                     if (!clE.isLocked(clid)) {
-                        bret = clE.modifyCategoryInClassification(indoc, clid, categid);
+                        MCRCategoryID id = new MCRCategoryID(clid, categid);
+                        bret = clE.modifyCategoryInClassification(indoc, id);
                     }
                 }
                 if (bret)
@@ -287,9 +284,8 @@ public class MCRStartClassEditorServlet extends MCRServlet {
         }
 
         else if ("save-all".equals(todo)) {
-            if (MCRWebsiteWriteProtection.isActive()) {
-                job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + maintenanceerrorpage));
-            } else if (clE.saveAll()) {
+
+            if (clE.saveAll()) {
                 job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(path + "&clid=" + clid));
             } else {
                 job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + imerrorpage));
@@ -310,19 +306,21 @@ public class MCRStartClassEditorServlet extends MCRServlet {
             final String sessionObjectID = "classificationEditor";
             Properties params = new Properties();
             StringBuffer sb = new StringBuffer();
-            boolean isEdited = MCRClassificationBrowserData.getClassificationPool().isEdited(clid);
-            MCRClassificationItem classif = null;
+            boolean isEdited = MCRClassificationBrowserData.getClassificationPool().isEdited(MCRCategoryID.rootID(clid));
+            MCRCategory classif = null;
             if (isEdited) {
-                classif = MCRClassificationBrowserData.getClassificationPool().getClassificationAsPojo(clid);
+                classif = MCRClassificationBrowserData.getClassificationPool().getClassificationAsPojo(MCRCategoryID.rootID(clid), false);
+                LOGGER.info("CLASSIF: "+classif.getId());
             }
 
             if ("modify-classification".equals(todo)) {
-                if (isEdited) {
-                    sb.append("session:").append(sessionObjectID);
-                    MCRSessionMgr.getCurrentSession().put(sessionObjectID, MCRClassificationTransformer.getMetaDataDocument(classif).getRootElement());
-                } else {
-                    sb.append("classification:metadata:0:children:").append(clid);
-                }
+                 if (isEdited) {
+                 sb.append("session:").append(sessionObjectID);
+                 MCRSessionMgr.getCurrentSession().put(sessionObjectID,
+                 MCRCategoryTransformer.getMetaDataDocument(classif,true).getRootElement());
+                 } else {
+                 sb.append("classification:metadata:0:children:").append(clid);
+                 }
                 params.put("sourceUri", sb.toString());
 
             }
@@ -341,12 +339,13 @@ public class MCRStartClassEditorServlet extends MCRServlet {
             if ("modify-category".equals(todo)) {
                 if (isEdited) {
                     sb.append("session:").append(sessionObjectID);
-                    MCRClassificationItem copy = classif.clone();
-                    MCRCategoryItem cat = MCRClassificationQuery.findCategory(copy, categid);
-                    cat.getCategories().clear();
-                    copy.getCategories().clear();
-                    copy.getCategories().add(cat);
-                    MCRSessionMgr.getCurrentSession().put(sessionObjectID, MCRClassificationTransformer.getMetaDataDocument(copy).getRootElement());
+                    Element classRoot = new Element("mycoreclass").setAttribute("ID", classif.getId().getRootID());
+                    Element categs = new Element("categories");
+                    MCRCategoryID id = new MCRCategoryID(classif.getId().getRootID(), categid);
+                    MCRCategory cat = clE.findCategory(classif, id);
+                    categs.addContent(MCRCategoryTransformer.getMetaDataElement(cat, true));
+                    classRoot.addContent(categs);
+                    MCRSessionMgr.getCurrentSession().put(sessionObjectID, classRoot);
                 } else {
                     sb.append("classification:metadata:0:children:").append(clid).append(':').append(categid);
                 }
@@ -354,12 +353,12 @@ public class MCRStartClassEditorServlet extends MCRServlet {
                 params.put("categid", categid);
             }
             if ("create-category".equals(todo)) {
-                if (isEdited) {
-                    sb.append("session:").append(sessionObjectID);
-                    MCRSessionMgr.getCurrentSession().put(sessionObjectID, MCRClassificationTransformer.getMetaDataDocument(classif).getRootElement());
-                } else {
-                    sb.append("classification:metadata:0:children:").append(clid);
-                }
+                 if (isEdited) {
+                 sb.append("session:").append(sessionObjectID);
+                 MCRSessionMgr.getCurrentSession().put(sessionObjectID, MCRCategoryTransformer.getMetaDataDocument(classif,true).getRootElement());
+                 } else {
+                 sb.append("classification:metadata:0:children:").append(clid);
+                 }
                 params.put("sourceUri", sb.toString());
                 params.put("categid", categid);
             }

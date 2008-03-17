@@ -1,5 +1,5 @@
 /*
- * 
+ * $RCSfile: MCRClassificationBrowserData.java,v $
  * $Revision$ $Date$
  *
  * This file is part of ***  M y C o R e  ***
@@ -42,13 +42,13 @@ import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
+import org.mycore.common.MCRUtils;
 import org.mycore.common.events.MCRSessionEvent;
 import org.mycore.common.events.MCRSessionListener;
-import org.mycore.datamodel.classifications.MCRCategoryItem;
-import org.mycore.datamodel.classifications.MCRClassificationItem;
-import org.mycore.datamodel.classifications.MCRClassificationObject;
-import org.mycore.datamodel.classifications.MCRLabel;
-import org.mycore.datamodel.classifications.MCRClassificationQuery;
+import org.mycore.datamodel.classifications2.MCRCategLinkServiceFactory;
+import org.mycore.datamodel.classifications2.MCRCategory;
+import org.mycore.datamodel.classifications2.MCRCategoryID;
+import org.mycore.datamodel.classifications2.MCRLabel;
 
 /**
  * Instances of MCRClassificationBrowser contain the data of the currently
@@ -60,7 +60,6 @@ import org.mycore.datamodel.classifications.MCRClassificationQuery;
  * 
  */
 public class MCRClassificationBrowserData {
-    protected boolean showComments;
 
     protected String pageName;
 
@@ -74,10 +73,9 @@ public class MCRClassificationBrowserData {
 
     private static final MCRAccessInterface AI = MCRAccessManager.getAccessImpl();
 
-    // private Vector lines;
-    private ArrayList<Element> lines;
+    private ArrayList lines;
 
-    private MCRClassificationItem classif;
+    private MCRCategory classif;
 
     private String startPath = "";
 
@@ -91,11 +89,11 @@ public class MCRClassificationBrowserData {
 
     private String view = null;
 
-    private String comments = null;
+    private boolean comments = false;
 
     private String searchField = "";
 
-    private String sort = null;
+    private boolean sort = false;
 
     private String objectType = null;
 
@@ -123,7 +121,7 @@ public class MCRClassificationBrowserData {
         }
 
     };
-    
+
     static {
         MCRSessionMgr.addSessionListener(ClassUserTableCleaner);
     }
@@ -131,7 +129,7 @@ public class MCRClassificationBrowserData {
     public MCRClassificationBrowserData(final String u, final String mode, final String actclid, final String actEditorCategid) throws Exception {
         uri = u;
         config = MCRConfiguration.instance();
-        LOGGER.info(" incomming Path " + uri);
+        LOGGER.debug(" incomming Path " + uri);
 
         final String[] uriParts = uri.split("/"); // mySplit();
         LOGGER.info(" Start");
@@ -171,20 +169,17 @@ public class MCRClassificationBrowserData {
             view = config.getString("MCR.ClassificationBrowser.default.View");
         }
         setObjectTypes(browserClass);
-        try {
-            sort = config.getString("MCR.ClassificationBrowser." + browserClass + ".Sort");
-            comments = config.getString("MCR.ClassificationBrowser." + browserClass + ".Comments");
-            restriction = config.getString("MCR.ClassificationBrowser." + browserClass + ".Restriction");
-        } catch (final org.mycore.common.MCRConfigurationException ig) {
-            // ignore for this parameters, the are optionally
-            ;
-        }
+
+        sort = config.getBoolean("MCR.ClassificationBrowser." + browserClass + ".Sort", false);
+        comments = config.getBoolean("MCR.ClassificationBrowser." + browserClass + ".Comments", false);
+        restriction = config.getString("MCR.ClassificationBrowser." + browserClass + ".Restriction", null);
+
         startPath = browserClass;
 
         if ("edit".equals(mode)) {
             pageName = config.getString("MCR.classeditor.EmbeddingPage");
             xslStyle = config.getString("MCR.classeditor.Style");
-            sort = "false";
+            sort = false;
             view = "tree";
 
             if (classifID.length() == 0) {
@@ -198,15 +193,11 @@ public class MCRClassificationBrowserData {
         if (view == null || !view.endsWith("flat")) {
             view = "tree";
         }
-        if (comments == null) {
-            comments = "false";
-        }
         LOGGER.info("uriParts length: " + uriParts.length);
         clearPath(uriParts);
-        setClassification(classifID);
+        MCRCategoryID id = MCRCategoryID.rootID(classifID);
+        setClassification(id);
         setActualPath(actEditorCategid);
-
-        showComments = comments.endsWith("true") ? true : false;
 
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug(" SetClassification " + classifID);
@@ -249,7 +240,7 @@ public class MCRClassificationBrowserData {
      * displayed should be shown.
      */
     public boolean showComments() {
-        return showComments;
+        return comments;
     }
 
     /**
@@ -266,7 +257,7 @@ public class MCRClassificationBrowserData {
         return xslStyle;
     }
 
-    public MCRClassificationItem getClassification() {
+    public MCRCategory getClassification() {
         return classif;
     }
 
@@ -284,11 +275,11 @@ public class MCRClassificationBrowserData {
         return cover;
     }
 
-    private final void setClassification(final String classifID) throws Exception {
-        classif = getClassificationPool().getClassificationAsPojo(classifID);
-        lines = new ArrayList<Element>();
+    public final void setClassification(final MCRCategoryID classifID) throws Exception {
+        classif = getClassificationPool().getClassificationAsPojo(classifID, true);
+        lines = new ArrayList();
         totalNumOfDocs = 0;
-        putCategoriesintoLines(-1, classif.getCategories(), 1);
+        putCategoriesintoLines(-1, classif.getChildren());
         LOGGER.debug("Arraylist of CategItems initialized - Size " + lines.size());
     }
 
@@ -330,55 +321,63 @@ public class MCRClassificationBrowserData {
         // reinitialisieren
         categFields = new String[result.size()];
         int j = 0;
-        final Iterator<String> it = result.iterator();
-        while (it.hasNext()) {
-            final String s = it.next();
-            categFields[j] = s;
+        for (String uriPart : result) {
+            categFields[j] = uriPart;
             j++;
-            path += "/" + s;
+            path += "/" + uriPart;
         }
         this.uri = path;
     }
 
     private void setActualPath(final String actEditorCategid) throws Exception {
         actItemID = lastItemID = "";
-        for (String element : categFields) {
-            update(element);
+
+        for (String categID : categFields) {
+            update(categID);
             lastItemID = actItemID;
-            actItemID = element;
+            actItemID = categID;
         }
         if (actEditorCategid != null) {
             actItemID = lastItemID = actEditorCategid;
         }
     }
 
-    private Element setTreeline(final Element cat, final int level) {
-        cat.setAttribute("level", String.valueOf(level));
-        if (cat.getChildren("category").size() != 0) {
-            cat.setAttribute("hasChildren", "T");
+    private Element setTreeline(MCRCategory categ, Map<MCRCategoryID, Number> countMap) {
+        Element categElement = MCRCategoryElementFactory.getCategoryElement(categ, true, countMap.get(categ.getId()).intValue());
+        categElement.setAttribute("level", String.valueOf(categ.getLevel() + 1));
+        MCRCategory category = findCategory(classif, categ.getId().getID());
+
+        if (category.hasChildren()) {
+            categElement.setAttribute("hasChildren", "T");
         } else {
-            cat.setAttribute("hasChildren", " ");
+            categElement.setAttribute("hasChildren", " ");
         }
-        return cat;
+        return categElement;
     }
 
     private Element getTreeline(final int i) {
         if (i >= lines.size()) {
             return null;
         }
-        return lines.get(i);
+        return (Element) lines.get(i);
     }
 
     @SuppressWarnings("unchecked")
-    private void putCategoriesintoLines(final int startpos, final List<MCRCategoryItem> children, final int level) {
+    private void putCategoriesintoLines(final int startpos, final List<MCRCategory> children) {
         LOGGER.debug("Start Explore Arraylist of CategItems  ");
         int i = startpos;
-        for (int j = 0, k = children.size(); j < k; j++) {
-            MCRCategoryItem categ = children.get(j);
-            Element child = MCRCategoryElementFactory.getCategoryElement(categ, classif.isCounterEnabled());
-            lines.add(++i, setTreeline(child, level + 1));
+        List<MCRCategoryID> ids = new ArrayList<MCRCategoryID>();
+
+        for (MCRCategory cat : children) {
+            ids.add(cat.getId());
+        }
+
+        Map<MCRCategoryID, Number> countMap = MCRCategLinkServiceFactory.getInstance().countLinks(ids);
+
+        for (MCRCategory cat : children) {
+            lines.add(++i, setTreeline(cat, countMap));
             if (startpos == -1) {
-                totalNumOfDocs += categ.getNumberOfObjects();
+                totalNumOfDocs += countMap.get(cat.getId()).intValue();
             }
         }
         LOGGER.debug("End Explore - Arraylist of CategItems ");
@@ -401,29 +400,29 @@ public class MCRClassificationBrowserData {
         String browserClass = "";
         String Counter = "";
 
-        final Set<String> allIDs = getClassificationPool().getAllIDs();
-        List<String> ids = new ArrayList<String>(allIDs.size());
+        final Set<MCRCategoryID> allIDs = getClassificationPool().getAllIDs();
+        List<MCRCategoryID> ids = new ArrayList<MCRCategoryID>(allIDs.size());
         ids.addAll(allIDs);
-        Collections.sort(ids);
+        // Collections.sort(ids);
 
-        for (String id : ids) {
-            MCRClassificationItem classif = getClassificationPool().getClassificationAsPojo(id);
+        for (MCRCategoryID id : ids) {
+            MCRCategory classif = getClassificationPool().getClassificationAsPojo(id, false);
             Element cli = getBrowseElement(classif);
             String sessionID = MCRSessionMgr.getCurrentSession().getID();
             // set browser type
             try {
-                browserClass = config.getString("MCR.classeditor." + classif.getId());
+                browserClass = config.getString("MCR.classeditor." + classif.getId().getRootID());
             } catch (final Exception ignore) {
                 browserClass = "default";
             }
             // set permissions
             if (getClassificationPool().isEdited(id) == false) {
-                if (AI.checkPermission(id, "writedb")) {
+                if (AI.checkPermission(id.getRootID(), "writedb")) {
                     cli.setAttribute("userCanEdit", "true");
                 } else {
                     cli.setAttribute("userCanEdit", "false");
                 }
-                if (AI.checkPermission(id, "deletedb")) {
+                if (AI.checkPermission(id.getRootID(), "deletedb")) {
                     cli.setAttribute("userCanDelete", "true");
                 } else {
                     cli.setAttribute("userCanDelete", "false");
@@ -433,13 +432,13 @@ public class MCRClassificationBrowserData {
                 cli.setAttribute("userCanDelete", "true");
             }
             // set done flag
-            if (ClassUserTable.containsKey(id)) {
-                if (ClassUserTable.get(id) != sessionID) {
-                    MCRSession oldsession = MCRSessionMgr.getSession(ClassUserTable.get(id));
+            if (ClassUserTable.containsKey(id.getRootID())) {
+                if (ClassUserTable.get(id.getRootID()) != sessionID) {
+                    MCRSession oldsession = MCRSessionMgr.getSession(ClassUserTable.get(id.getRootID()));
                     if (null != oldsession)
                         cli.setAttribute("userEdited", oldsession.getCurrentUserID());
                     else {
-                        ClassUserTable.remove(id);
+                        ClassUserTable.remove(id.getRootID());
                         cli.setAttribute("userEdited", "false");
                     }
                 } else {
@@ -458,11 +457,7 @@ public class MCRClassificationBrowserData {
             setObjectTypes(browserClass);
 
             try {
-                int cnt = 0;
-                for (MCRCategoryItem cat : classif.getCategories()) {
-                    cnt += cat.getNumberOfObjects();
-                }
-                Counter = Integer.toString(cnt);
+                Counter = MCRCategLinkServiceFactory.getInstance().countLinks(Collections.nCopies(1, classif.getId())).get(classif.getId()).toString();
             } catch (Exception ignore) {
                 Counter = "NaN";
             }
@@ -472,10 +467,10 @@ public class MCRClassificationBrowserData {
         return new Document(xDocument);
     }
 
-    private static Element getBrowseElement(MCRClassificationItem classif) {
+    private static Element getBrowseElement(MCRCategory classif) {
         Element ce = new Element("classification");
-        ce.setAttribute("ID", classif.getId());
-        for (MCRLabel label : classif.getLabels()) {
+        ce.setAttribute("ID", classif.getId().getRootID());
+        for (MCRLabel label : classif.getLabels().values()) {
             Element labelElement = new Element("label");
             if (label.getLang() != null) {
                 labelElement.setAttribute("lang", label.getLang(), Namespace.XML_NAMESPACE);
@@ -500,26 +495,27 @@ public class MCRClassificationBrowserData {
 
     public org.jdom.Document createXmlTree(final String lang) throws Exception {
 
+        LOGGER.debug("Show tree for classification:" + classif.getId());
+        final MCRCategory cl = getClassificationPool().getClassificationAsPojo(classif.getId(), true);
         MCRClassificationPool cp = getClassificationPool();
-        MCRClassificationItem cl = cp.getClassificationAsPojo(getClassification().getId());
         MCRLabel labels = getLabel(cl, lang);
         Element xDocument = new Element("classificationBrowse");
 
         final Element xID = new Element("classifID");
-        xID.addContent(cl.getId());
+        xID.addContent(cl.getId().getRootID());
         xDocument.addContent(xID);
 
         final Element xUserEdited = new Element("userEdited");
-        if (ClassUserTable.containsKey(cl.getId())) {
-            xUserEdited.addContent(MCRSessionMgr.getSession(ClassUserTable.get(cl.getId())).getCurrentUserID());
+        if (ClassUserTable.containsKey(cl.getId().getRootID())) {
+            xUserEdited.addContent(MCRSessionMgr.getSession(ClassUserTable.get(cl.getId().getRootID())).getCurrentUserID());
         } else {
             xUserEdited.addContent("false");
         }
         xDocument.addContent(xUserEdited);
 
         final Element xSessionID = new Element("session");
-        if (ClassUserTable.containsKey(cl.getId())) {
-            xSessionID.addContent(ClassUserTable.get(cl.getId()));
+        if (ClassUserTable.containsKey(cl.getId().getRootID())) {
+            xSessionID.addContent(ClassUserTable.get(cl.getId().getRootID()));
         } else {
             xSessionID.addContent("");
         }
@@ -568,10 +564,10 @@ public class MCRClassificationBrowserData {
             String permString = String.valueOf(AI.checkPermission("create-classification"));
             CreateButton.addContent(permString);
             xDocument.addContent(CreateButton);
-            permString = String.valueOf(AI.checkPermission(cl.getId(), "writedb"));
+            permString = String.valueOf(AI.checkPermission(cl.getId().getRootID(), "writedb"));
             EditButton.addContent(permString);
             xDocument.addContent(EditButton);
-            permString = String.valueOf(AI.checkPermission(cl.getId(), "deletedb"));
+            permString = String.valueOf(AI.checkPermission(cl.getId().getRootID(), "deletedb"));
             DeleteButton.addContent(permString);
             xDocument.addContent(DeleteButton);
         } else {
@@ -586,7 +582,7 @@ public class MCRClassificationBrowserData {
 
         // data as XML from outputNavigationTree
         final Element xNavtree = new Element("navigationtree");
-        xNavtree.setAttribute("classifID", cl.getId());
+        xNavtree.setAttribute("classifID", cl.getId().getRootID());
         xNavtree.setAttribute("categID", actItemID);
         xNavtree.setAttribute("predecessor", lastItemID);
         xNavtree.setAttribute("emptyLeafs", emptyLeafs);
@@ -615,7 +611,6 @@ public class MCRClassificationBrowserData {
             final String catid = line.getAttributeValue("ID");
             int numDocs = 0;
             if (line.getAttributeValue("counter") != null) {
-                LOGGER.info("COUNTER ATTRIBUTE: " + line.getAttributeValue("counter"));
                 numDocs = Integer.parseInt(line.getAttributeValue("counter"));
             }
             final String status = line.getAttributeValue("hasChildren");
@@ -629,7 +624,7 @@ public class MCRClassificationBrowserData {
 
             final int level = Integer.parseInt(line.getAttributeValue("level"));
 
-            // für Sortierung schon mal die leveltiefe bestimmen
+            // fï¿½r Sortierung schon mal die leveltiefe bestimmen
             LOGGER.debug(" NumDocs - " + numDocs);
 
             if (emptyLeafs.endsWith("no") && numDocs == 0) {
@@ -677,11 +672,7 @@ public class MCRClassificationBrowserData {
 
             if (numLength > 0) {
                 String search = uri;
-                if (catid.equalsIgnoreCase(actItemID)) {
-                    search += "/..";
-                } else {
-                    search += "/" + catid;
-                }
+                search += "/" + catid;
 
                 if (search.indexOf("//") > 0)
                     search = search.substring(0, search.indexOf("//")) + search.substring(search.indexOf("//") + 1);
@@ -706,6 +697,7 @@ public class MCRClassificationBrowserData {
             xDocument = sortMyTree(xDocument);
         }
         Document doc = new org.jdom.Document(xDocument);
+        //MCRUtils.writeJDOMToSysout(doc);
         return doc;
     }
 
@@ -713,8 +705,10 @@ public class MCRClassificationBrowserData {
         int lastLevel = 0;
         boolean hideLevel = false;
 
-        MCRCategoryItem cat = MCRClassificationQuery.findCategory(classif, categID);
-        LOGGER.debug(this.getClass() + " update CategoryTree for: " + categID);
+        MCRCategory parent = MCRClassificationBrowserData.getClassificationPool().getClassificationAsPojo(classif.getId(), true);
+        MCRCategory cat = findCategory(parent, categID);
+
+        LOGGER.debug(" update CategoryTree for: " + categID);
         Element line;
         for (int i = 0; i < lines.size(); i++) {
             line = getTreeline(i);
@@ -724,7 +718,6 @@ public class MCRClassificationBrowserData {
 
             hideLevel = hideLevel && (level > lastLevel);
             LOGGER.debug(" compare CategoryTree on " + i + "_" + catid + " to " + categID);
-
             if (view.endsWith("tree")) {
                 if (hideLevel) {
                     lines.remove(i--);
@@ -739,8 +732,7 @@ public class MCRClassificationBrowserData {
                     // children
                     {
                         line.setAttribute("hasChildren", "F");
-
-                        putCategoriesintoLines(i, cat.getCategories(), level + 1);
+                        putCategoriesintoLines(i, cat.getChildren());
                     }
                 }
             } else {
@@ -748,7 +740,7 @@ public class MCRClassificationBrowserData {
                     line.setAttribute("level", "0");
                     LOGGER.info(" expand " + catid);
                     line.setAttribute("hasChildren", "F");
-                    putCategoriesintoLines(i, new MCRCategoryItem().getCategories(), level + 1);
+                    putCategoriesintoLines(i, cat.getChildren());
                 } else {
                     LOGGER.debug(" remove lines " + i + "_" + catid);
                     lines.remove(i--);
@@ -883,8 +875,8 @@ public class MCRClassificationBrowserData {
         return classPool;
     }
 
-    private static MCRLabel getLabel(MCRClassificationObject co, String lang) {
-        for (MCRLabel label : co.getLabels()) {
+    private static MCRLabel getLabel(MCRCategory co, String lang) {
+        for (MCRLabel label : co.getLabels().values()) {
             if (label.getLang().equals(lang)) {
                 return label;
             }
@@ -904,18 +896,38 @@ public class MCRClassificationBrowserData {
         }
     }
 
+    private MCRCategory findCategory(MCRCategory parent, String id) {
+        MCRCategory found = null;
+        for (MCRCategory cat : parent.getChildren()) {
+            if (cat.getId().getID().equals(id)) {
+                found = cat;
+                LOGGER.debug("Found Category: " + found.getId().getID());
+                break;
+            }
+            MCRCategory rFound = findCategory(cat, id);
+            if (rFound != null) {
+                found = rFound;
+                break;
+            }
+        }
+
+        return found;
+    }
+
     private static class MCRCategoryElementFactory {
-        static Element getCategoryElement(MCRCategoryItem category, boolean withCounter) {
+        static Element getCategoryElement(MCRCategory category, boolean withCounter, int numberObjects) {
             Element ce = new Element("category");
-            ce.setAttribute("ID", category.getId());
+            Map<String, MCRLabel> labels = category.getLabels();
+            ce.setAttribute("ID", category.getId().getID());
             if (withCounter) {
-                ce.setAttribute("counter", Integer.toString(category.getNumberOfObjects()));
+                ce.setAttribute("counter", Integer.toString(numberObjects));
             }
-            for (MCRLabel label : category.getLabels()) {
-                ce.addContent(getElement(label));
+
+            for (String key : labels.keySet()) {
+                ce.addContent(getElement(labels.get(key)));
             }
-            for (MCRCategoryItem child : category.getCategories()) {
-                ce.addContent(getCategoryElement(child, withCounter));
+            for (MCRCategory child : category.getChildren()) {
+                ce.addContent(getCategoryElement(child, withCounter, numberObjects));
             }
             return ce;
         }

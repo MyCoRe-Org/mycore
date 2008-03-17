@@ -8,8 +8,6 @@ import org.apache.log4j.Logger;
 import org.jdom.Element;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRUtils;
-import org.mycore.datamodel.classifications.MCRCategoryItem;
-import org.mycore.datamodel.classifications.MCRClassification;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.common.MCRXMLTableManager;
 import org.mycore.parsers.bool.MCRCondition;
@@ -18,6 +16,9 @@ import org.mycore.services.fieldquery.MCRResults;
 
 import org.mycore.services.fieldquery.*;
 
+import org.mycore.datamodel.classifications2.MCRCategory;
+import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
+import org.mycore.datamodel.classifications2.MCRCategoryID;
 /**
  * Diese Klasse ist eine Implementierung eines Suchservice fï¿½r die Z39.50-
  * Schnittstelle. Dabei werden nur Z39.50-Anfragen im Prefixformat
@@ -131,11 +132,10 @@ public class MCRZ3950QueryService implements MCRZ3950Query {
                     Element e = (Element) it.next();
                     String classificationId = e.getAttributeValue("classid");
                     String categoryId = e.getAttributeValue("categid");
-                    MCRCategoryItem category = 
-                        MCRClassification.retrieveCategoryItem(classificationId,
-                                                        categoryId);
-                    // Fï¿½lle den Knoten mit dem Klassifiaktions-Label
-                    e.setText((String)(category.getLabels()).get(0).getText());
+                    MCRCategory category = MCRCategoryDAOFactory.getInstance().getCategory(new MCRCategoryID(classificationId, categoryId), -1);
+//                  Fülle den Knoten mit dem Klassifiaktions-Label
+//                  TODO: please change: language is random
+                    e.setText(category.getLabels().values().iterator().next().getText());
                 }
             }
         }
@@ -151,7 +151,7 @@ public class MCRZ3950QueryService implements MCRZ3950Query {
 
     public void setIndex(int index) {
         this.index = index;
-//        mycoreResults = mycoreResults.exportElementToContainer(index);
+        // mycoreResults = mycoreResults.exportElementToContainer(index);
     }
 
     public String getQuery() {
@@ -163,4 +163,3 @@ public class MCRZ3950QueryService implements MCRZ3950Query {
     }
 
 }
-

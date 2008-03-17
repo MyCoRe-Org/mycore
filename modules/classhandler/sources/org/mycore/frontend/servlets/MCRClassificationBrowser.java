@@ -62,7 +62,7 @@ public class MCRClassificationBrowser extends MCRServlet {
         lang = mcrSession.getCurrentLanguage();
 
         /*
-         * the urn with information abaut classification-propertie and category
+         * the urn with information about classification-property and category
          */
         String uri = "";
         if (job.getRequest().getPathInfo() != null)
@@ -85,6 +85,11 @@ public class MCRClassificationBrowser extends MCRServlet {
         LOGGER.debug("Browsing  Mode = " + mode);
 
         try {
+            LOGGER.debug("Creation of BData.");
+            LOGGER.debug("URI: "+uri);
+            LOGGER.debug("MODE: "+mode);
+            LOGGER.debug("ACTCLID: "+actclid);
+            LOGGER.debug("ACTCATEG: "+actcateg);
             mcrSession.BData = new MCRClassificationBrowserData(uri, mode, actclid, actcateg);
         } catch (MCRConfigurationException cErr) {
             generateErrorPage(job.getRequest(), job.getResponse(), HttpServletResponse.SC_INTERNAL_SERVER_ERROR, cErr.getMessage(), cErr, false);
@@ -92,7 +97,8 @@ public class MCRClassificationBrowser extends MCRServlet {
 
         Document jdomFile = getEmbeddingPage(mcrSession.BData.getPageName());
         Document jdom = null;
-        if (mode.equalsIgnoreCase("edit") && (actclid.length() == 0 && uri.length() == 0)) {
+ 
+        if (mode.equalsIgnoreCase("edit") && (actclid.length() == 0 && ((uri.length() == 0) || uri.equalsIgnoreCase("/default")))) {
             // alle Klasifikationen auflisten (auch die nicht eingebundenen)
             jdom = mcrSession.BData.createXmlTreeforAllClassifications();
 

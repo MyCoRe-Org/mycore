@@ -72,10 +72,12 @@ import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUsageException;
 import org.mycore.common.MCRUtils;
-import org.mycore.common.xml.MCRXSLTransformation;
-import org.mycore.datamodel.classifications.MCRClassificationItem;
-import org.mycore.datamodel.classifications.MCRClassificationQuery;
-import org.mycore.datamodel.classifications.MCRClassificationTransformer;
+import org.mycore.datamodel.classifications2.MCRCategory;
+import org.mycore.datamodel.classifications2.MCRCategoryDAO;
+import org.mycore.datamodel.classifications2.MCRCategoryID;
+import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
+import org.mycore.datamodel.classifications2.utils.MCRCategoryTransformer;
+import org.mycore.datamodel.classifications2.utils.MCRXMLTransformer;
 import org.mycore.datamodel.common.MCRXMLTableManager;
 import org.mycore.datamodel.ifs.MCRDirectoryXML;
 import org.mycore.datamodel.metadata.MCRObjectID;
@@ -891,7 +893,8 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
             } catch (UnsupportedEncodingException e) {
                 categ = categID.toString();
             }
-            MCRClassificationItem cl = null;
+            MCRCategory cl = null;
+            MCRCategoryDAO dao = MCRCategoryDAOFactory.getInstance();
             String labelFormat = getLabelFormat(format);
             boolean withCounter = false;
             if ((labelFormat != null) && (labelFormat.indexOf("{count}") != -1)) {
@@ -900,16 +903,28 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
             LOGGER.debug("start MCRClassificationQuery");
             if (axis.equals("children")) {
                 if (categ.length() > 0) {
-                    cl = MCRClassificationQuery.getClassification(classID, categ, levels, withCounter);
+                    cl = dao.getCategory(new MCRCategoryID(classID, categ), levels);
+//                  MCRClassificationQuery.getClassification(classID, categ,levels, withCounter);
                 } else {
-                    cl = MCRClassificationQuery.getClassification(classID, levels, withCounter);
+                    cl = dao.getCategory(MCRCategoryID.rootID(classID), levels);
+//                  MCRClassificationQuery.getClassification(classID, levels, withCounter);                    
+                }
+                if (cl == null) {
+                    return null;
+                }
+                if (withCounter) {
+//                  TODO: get number of linked objects here
                 }
             } else if (axis.equals("parents")) {
                 if (categ.length() == 0) {
                     LOGGER.error("Cannot resolve parent axis without a CategID. URI: " + uri);
                     throw new IllegalArgumentException("Invalid format (categID is required in mode 'parents') of uri for retrieval of classification: " + uri);
                 }
-                cl = MCRClassificationQuery.getClassificationHierarchie(classID, categ, levels, withCounter);
+                cl = dao.getRootCategory(new MCRCategoryID(classID, categ), levels);
+                if (cl == null) {
+                    return null;
+                }
+//              MCRClassificationQuery.getClassificationHierarchie(classID,categ, levels, withCounter);
             }
 
             Element returns;
@@ -917,12 +932,12 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
             if (format.startsWith("editor")) {
                 boolean sort = shouldSortCategories(classID);
                 if (labelFormat == null) {
-                    returns = MCRClassificationTransformer.getEditorDocument(cl, sort).getRootElement();
+                    returns = MCRCategoryTransformer.getEditorDocument(cl, sort).getRootElement();
                 } else {
-                    returns = MCRClassificationTransformer.getEditorDocument(cl, labelFormat, sort).getRootElement();
+                    returns = MCRCategoryTransformer.getEditorDocument(cl, labelFormat, sort).getRootElement();
                 }
             } else if (format.equals("metadata")) {
-                returns = MCRClassificationTransformer.getMetaDataDocument(cl).getRootElement();
+                returns = MCRCategoryTransformer.getMetaDataDocument(cl, withCounter).getRootElement();
             } else {
                 LOGGER.error("Unknown target format given. URI: " + uri);
                 throw new IllegalArgumentException("Invalid target format (" + format + ") in uri for retrieval of classification: " + uri);

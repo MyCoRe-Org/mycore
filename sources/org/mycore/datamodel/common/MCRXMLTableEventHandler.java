@@ -25,10 +25,8 @@ package org.mycore.datamodel.common;
 
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandlerBase;
-import org.mycore.datamodel.classifications.MCRClassification;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRObject;
-import org.mycore.datamodel.metadata.MCRObjectID;
 
 /**
  * This class manages all operations of the XMLTables for operations of an
@@ -39,47 +37,6 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 public class MCRXMLTableEventHandler extends MCREventHandlerBase {
 
     static MCRXMLTableManager mcr_xmltable = MCRXMLTableManager.instance();
-
-    /**
-     * This method add the data to SQL table of XML data via MCRXMLTableManager.
-     * 
-     * @param evt
-     *            the event that occured
-     * @param obj
-     *            the MCRClassification that caused the event
-     */
-    protected final void handleClassificationCreated(MCREvent evt, MCRClassification obj) {
-        org.jdom.Document doc = obj.createXML();
-        mcr_xmltable.create(new MCRObjectID(obj.getId()), doc);
-    }
-
-    /**
-     * This method update the data to SQL table of XML data via
-     * MCRXMLTableManager.
-     * 
-     * @param evt
-     *            the event that occured
-     * @param obj
-     *            the MCRClassification that caused the event
-     */
-    protected final void handleClassificationUpdated(MCREvent evt, MCRClassification obj) {
-        mcr_xmltable.delete(new MCRObjectID(obj.getId()));
-        org.jdom.Document doc = obj.createXML();
-        mcr_xmltable.create(new MCRObjectID(obj.getId()), doc);
-    }
-
-    /**
-     * This method delete the XML data from SQL table data via
-     * MCRXMLTableManager.
-     * 
-     * @param evt
-     *            the event that occured
-     * @param obj
-     *            the MCRClassification that caused the event
-     */
-    protected final void handleClassificationDeleted(MCREvent evt, MCRClassification obj) {
-        mcr_xmltable.delete(new MCRObjectID(obj.getId()));
-    }
 
     /**
      * This method add the data to SQL table of XML data via MCRXMLTableManager.

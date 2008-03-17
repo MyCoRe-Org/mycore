@@ -1,7 +1,6 @@
 package org.mycore.services.imaging;
 
 import org.apache.log4j.Logger;
-
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandlerBase;
 import org.mycore.datamodel.ifs.MCRFile;

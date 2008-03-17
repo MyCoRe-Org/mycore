@@ -23,7 +23,8 @@
 
 package org.mycore.common;
 
-import static org.mycore.common.events.MCRSessionEvent.Type.*;
+import static org.mycore.common.events.MCRSessionEvent.Type.activated;
+import static org.mycore.common.events.MCRSessionEvent.Type.passivated;
 
 import java.util.Collections;
 import java.util.HashMap;

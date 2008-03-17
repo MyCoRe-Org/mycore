@@ -1,13 +1,19 @@
 package org.mycore.services.migration;
 
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import org.apache.log4j.Logger;
 
+import org.jdom.Document;
 import org.mycore.common.MCRException;
+import org.mycore.datamodel.classifications2.MCRCategory;
+import org.mycore.datamodel.classifications2.MCRCategoryDAO;
+import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
+import org.mycore.datamodel.classifications2.utils.MCRXMLTransformer;
+import org.mycore.datamodel.common.MCRXMLTableManager;
+import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.cli.MCRAbstractCommands;
 import org.mycore.frontend.cli.MCRCommand;
 
@@ -29,6 +35,20 @@ public class MCRMigrationCommands extends MCRAbstractCommands {
         com = new MCRCommand("internal accessmigration step {0}", "org.mycore.services.migration.MCRMigrationCommands.migrateAccess int",
                 "Internal commands for access system migration");
         command.add(com);
+        com = new MCRCommand("migrate classifications", "org.mycore.services.migration.MCRMigrationCommands.migrateClassifications",
+                "Internal commands for classification migration");
+        command.add(com);
+    }
+
+    public static void migrateClassifications() {
+        List<String> classIds=MCRXMLTableManager.instance().retrieveAllIDs("class");
+        MCRCategoryDAO dao = MCRCategoryDAOFactory.getInstance();
+        
+        for (String classID:classIds){
+            Document cl=MCRXMLTableManager.instance().readDocument(new MCRObjectID(classID));
+            MCRCategory cat=MCRXMLTransformer.getCategory(cl);
+            dao.addCategory(null, cat);
+        }
     }
 
     public static List<String> migrateUser() {

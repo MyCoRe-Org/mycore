@@ -74,6 +74,10 @@
     <servlet-name>MCRObjectServlet</servlet-name>
     <servlet-class>org.mycore.frontend.servlets.MCRObjectServlet</servlet-class>
   </servlet>
+  <servlet id="MCRClassification">
+    <servlet-name>MCRClassExportServlet</servlet-name>
+    <servlet-class>org.mycore.frontend.servlets.MCRClassExportServlet</servlet-class>
+  </servlet>
   <servlet id="MCRSearch">
     <servlet-name>MCRSearchServlet</servlet-name>
     <servlet-class>org.mycore.services.fieldquery.MCRSearchServlet</servlet-class>
@@ -170,6 +174,10 @@
   <servlet-mapping>
     <servlet-name>MCRObjectServlet</servlet-name>
     <url-pattern>/receive/*</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>MCRClassExportServlet</servlet-name>
+    <url-pattern>/servlets/MCRClassExportServlet</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
     <servlet-name>MCRSearchServlet</servlet-name>
