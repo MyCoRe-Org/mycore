@@ -245,6 +245,7 @@ public class MCRServlet extends HttpServlet {
 
         try {
             MCRSession session = getSession(req, getServletName());
+            session.put("MCRServletJob", job);
 
             String c = getClass().getName();
             c = c.substring(c.lastIndexOf(".") + 1);
@@ -316,6 +317,7 @@ public class MCRServlet extends HttpServlet {
                 job.commitTransaction();
             }
         } finally {
+        	MCRSessionMgr.getCurrentSession().deleteObject("MCRServletJob");
             // Release current MCRSession from current Thread,
             // in case that Thread pooling will be used by servlet engine
             if (getProperty(req, INITIAL_SERVLET_NAME_KEY).equals(getServletName())) {
