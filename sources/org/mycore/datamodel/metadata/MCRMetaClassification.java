@@ -203,9 +203,6 @@ public class MCRMetaClassification extends MCRMetaDefault {
         }
 
         try {
-            if (!MCRXMLTableManager.instance().exist(new MCRObjectID(classid))) {
-                return false;
-            }
             if (!MCRCategoryDAOFactory.getInstance().exist(new MCRCategoryID(classid, categid))) {
                 return false;
             }
