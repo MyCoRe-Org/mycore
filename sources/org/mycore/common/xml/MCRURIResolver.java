@@ -51,6 +51,7 @@ import java.util.regex.Pattern;
 import javax.servlet.ServletContext;
 import javax.xml.transform.Source;
 import javax.xml.transform.TransformerException;
+import javax.xml.transform.stream.StreamSource;
 
 import org.apache.log4j.Logger;
 import org.jdom.Document;
@@ -1010,18 +1011,6 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
             return "0";
         }
 
-        private static Hashtable<String, String> getParameterMap(String key) {
-            String[] param;
-            StringTokenizer tok = new StringTokenizer(key, "&");
-            Hashtable<String, String> params = new Hashtable<String, String>();
-
-            while (tok.hasMoreTokens()) {
-                param = tok.nextToken().split("=");
-                params.put(param[0], param[1]);
-            }
-            return params;
-        }
-
         private static Document getQueryDocument(String query, String sortby, String order, String maxResults) {
             Element queryElement = new Element("query");
             queryElement.setAttribute("maxResults", maxResults);
@@ -1049,6 +1038,18 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
 
     }
 
+    private static Hashtable<String, String> getParameterMap(String key) {
+    	String[] param;
+    	StringTokenizer tok = new StringTokenizer(key, "&");
+    	Hashtable<String, String> params = new Hashtable<String, String>();
+    	
+    	while (tok.hasMoreTokens()) {
+    		param = tok.nextToken().split("=");
+    		params.put(param[0], param[1]);
+    	}
+    	return params;
+    }
+    
     /**
      * Ensures that the return of the given uri is never null. When the return
      * is null, or the uri throws an exception, this resolver will return an
@@ -1086,7 +1087,7 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
     /**
      * Transform result of other resolver with stylesheet.
      * 
-     * Usage: xslStyle:<stylesheet>:<anyMyCoReURI>
+     * Usage: xslStyle:<stylesheet><?param1=value1<&param2=value2>>:<anyMyCoReURI>
      * 
      * To <stylesheet> is extension .xsl added. File is searched in classpath.
      * 
@@ -1103,6 +1104,15 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
                 return new Element("null");
             
             try {
+            	Hashtable<String, String> params = null; 
+            	StringTokenizer tok = new StringTokenizer(stylesheet, "?");
+            	stylesheet = tok.nextToken();
+            	
+            	if( tok.hasMoreTokens())
+            	{
+            		params = getParameterMap(tok.nextToken());
+            	}
+            	
                 Element result = MCRURIResolver.instance().resolve(target);
                 if (result != null)
                 {
@@ -1124,7 +1134,11 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
                 	if (doc == null)
                 		doc = new Document(result);
                 	
-                	Document xx = MCRXSLTransformation.transform(doc, in);
+                    Properties parameters = MCRLayoutService.buildXSLParameters();
+                    if ( null != params)
+                    	parameters.putAll(params);
+                    
+                	Document xx = MCRXSLTransformation.transform(doc, new StreamSource(in), parameters);
                 	if (!xx.hasRootElement())
                 	{
                         LOGGER.info("MCRXslStyleResolver no root element after transformation ");
