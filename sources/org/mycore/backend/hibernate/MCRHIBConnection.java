@@ -71,6 +71,12 @@ public class MCRHIBConnection implements Closeable, MCRSessionListener {
 
     private static Logger LOGGER = Logger.getLogger(MCRHIBConnection.class);
 
+    @Override
+    protected void finalize() throws Throwable {
+        System.out.println("\n"+this.getClass()+"is finalized!\n");
+        super.finalize();
+    }
+
     public static synchronized MCRHIBConnection instance() throws MCRPersistenceException {
         if (SINGLETON == null) {
             SINGLETON = new MCRHIBConnection();
@@ -199,6 +205,8 @@ public class MCRHIBConnection implements Closeable, MCRSessionListener {
             }
         }
         SESSION_FACTORY.close();
+        SESSION_FACTORY=null;
+        SINGLETON=null;
     }
 
     public void handleStatistics(Statistics stats) throws FileNotFoundException, IOException {

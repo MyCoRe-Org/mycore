@@ -48,8 +48,6 @@ import org.mycore.backend.hibernate.tables.MCRACCESSRULE;
  * 
  */
 public class MCRHIBAccessStore extends MCRAccessStore {
-    final protected static MCRHIBConnection hibconnection = MCRHIBConnection.instance();
-
     private static final DateFormat DATE_FORMAT = new SimpleDateFormat(sqlDateformat);
 
     public MCRHIBAccessStore() {
