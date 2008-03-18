@@ -259,20 +259,6 @@ public class MCRXSLTransformation {
      * @param in
      *            A JDOM-Document.
      * @param stylesheet
-     *            The InputStream of the stylesheet.
-     * @return Document The new document or null, if an exception was thrown.
-     */
-    public static org.jdom.Document transform(org.jdom.Document in, InputStream stylesheet) {
-        return transform(in,new StreamSource(stylesheet),emptyParameters);
-    }
-
-    /**
-     * Method transform. Transforms a JDOM-Document <i>in </i> with a given
-     * <i>stylesheet </i> to a new document.
-     * 
-     * @param in
-     *            A JDOM-Document.
-     * @param stylesheet
      *            The Filename with complete path (this is not a servlet!) of
      *            the stylesheet.
      * @param parameters
