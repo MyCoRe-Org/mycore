@@ -1,16 +1,28 @@
 package org.mycore.services.migration;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
 import org.apache.log4j.Logger;
 
+import org.hibernate.Criteria;
+import org.hibernate.Session;
+import org.hibernate.criterion.Restrictions;
 import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.JDOMException;
+import org.jdom.xpath.XPath;
+import org.mycore.backend.hibernate.MCRHIBConnection;
+import org.mycore.backend.hibernate.tables.MCRLINKHREF;
 import org.mycore.common.MCRException;
+import org.mycore.datamodel.classifications2.MCRCategLinkServiceFactory;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
+import org.mycore.datamodel.classifications2.MCRCategoryID;
+import org.mycore.datamodel.classifications2.MCRObjectReference;
 import org.mycore.datamodel.classifications2.utils.MCRXMLTransformer;
 import org.mycore.datamodel.common.MCRXMLTableManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
@@ -40,14 +52,48 @@ public class MCRMigrationCommands extends MCRAbstractCommands {
         command.add(com);
     }
 
-    public static void migrateClassifications() {
-        List<String> classIds=MCRXMLTableManager.instance().retrieveAllIDs("class");
+    public static void migrateClassifications() throws JDOMException {
+        List<String> classIds = MCRXMLTableManager.instance().retrieveAllIDs("class");
         MCRCategoryDAO dao = MCRCategoryDAOFactory.getInstance();
-        
-        for (String classID:classIds){
-            Document cl=MCRXMLTableManager.instance().readDocument(new MCRObjectID(classID));
-            MCRCategory cat=MCRXMLTransformer.getCategory(cl);
+        XPath classSelector = XPath.newInstance("/mycoreobject/metadata/*[@class='MCRMetaClassification']/*");
+        LOGGER.info("Migrating classifications and categories...");
+        for (String classID : classIds) {
+            MCRObjectID objID = new MCRObjectID(classID);
+            Document cl = MCRXMLTableManager.instance().readDocument(objID);
+            MCRCategory cat = MCRXMLTransformer.getCategory(cl);
             dao.addCategory(null, cat);
+            MCRXMLTableManager.instance().delete(objID);
+        }
+
+        LOGGER.info("Migrating object links....");
+        // migrate object links
+        List<String> objectTypes = MCRXMLTableManager.instance().getAllAllowedMCRObjectIDTypes();
+        for (String objectType : objectTypes) {
+            List<String> objID = MCRXMLTableManager.instance().retrieveAllIDs(objectType);
+            // for
+            for (String id : objID) {
+                Collection<MCRCategoryID> categories = new ArrayList<MCRCategoryID>();
+
+                Document obj = MCRXMLTableManager.instance().readDocument(new MCRObjectID(id));
+                List<Element> classElements = classSelector.selectNodes(obj);
+                for (Element el : classElements) {
+                    String clid = el.getAttributeValue("classid");
+                    String catid = el.getAttributeValue("categid");
+                    categories.add(new MCRCategoryID(clid, catid));
+                }
+                if (categories.size() > 0) {
+                    MCRObjectReference objectReference = new MCRObjectReference(id, objectType);
+                    MCRCategLinkServiceFactory.getInstance().setLinks(objectReference, categories);
+
+                }
+            }
+
+        }
+        LOGGER.info("Deleting old object links...");
+        final Session session = MCRHIBConnection.instance().getSession();
+        Criteria c = session.createCriteria(MCRLINKHREF.class).add(Restrictions.eq("key.mcrtype", "classid"));
+        for (Object classLink : c.list()) {
+            session.delete(classLink);
         }
     }
 
