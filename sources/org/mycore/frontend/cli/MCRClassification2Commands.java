@@ -44,13 +44,13 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
     private static final MCRCategoryDAO DAO = new MCRCategoryDAOImpl();
 
     public MCRClassification2Commands() {
-        command.add(new MCRCommand("load classification2 from file {0}", "org.mycore.frontend.cli.MCRClassification2Commands.loadFromFile String",
+        command.add(new MCRCommand("load classification from file {0}", "org.mycore.frontend.cli.MCRClassification2Commands.loadFromFile String",
                 "The command add a new classification form file {0} to the system."));
-        command.add(new MCRCommand("update classification2 from file {0}", "org.mycore.frontend.cli.MCRClassification2Commands.updateFromFile String",
+        command.add(new MCRCommand("update classification from file {0}", "org.mycore.frontend.cli.MCRClassification2Commands.updateFromFile String",
                 "The command add a new classification form file {0} to the system."));
-        command.add(new MCRCommand("delete classification2 {0}", "org.mycore.frontend.cli.MCRClassification2Commands.delete String",
+        command.add(new MCRCommand("delete classification {0}", "org.mycore.frontend.cli.MCRClassification2Commands.delete String",
                 "The command remove the classification with MCRObjectID {0} from the system."));
-        command.add(new MCRCommand("count classification2 children of {0}", "org.mycore.frontend.cli.MCRClassification2Commands.countChildren String",
+        command.add(new MCRCommand("count classification children of {0}", "org.mycore.frontend.cli.MCRClassification2Commands.countChildren String",
                 "The command remove the classification with MCRObjectID {0} from the system."));
     }
 
