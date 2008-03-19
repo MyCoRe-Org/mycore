@@ -31,6 +31,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Writer;
 import java.util.Enumeration;
+import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
@@ -38,7 +39,6 @@ import java.util.StringTokenizer;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpServletResponseWrapper;
 import javax.servlet.http.HttpSession;
 import javax.xml.transform.Source;
 import javax.xml.transform.Templates;
@@ -52,6 +52,9 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
 import org.apache.log4j.Logger;
+import org.jdom.Document;
+import org.jdom.transform.JDOMResult;
+import org.jdom.transform.JDOMSource;
 import org.apache.xalan.templates.ElemTemplate;
 import org.apache.xalan.templates.ElemTemplateElement;
 import org.apache.xalan.trace.GenerateEvent;
@@ -96,8 +99,18 @@ public class MCRLayoutService implements org.apache.xalan.trace.TraceListener {
     /** The logger */
     private final static Logger LOGGER = Logger.getLogger(MCRLayoutService.class);
 
-    public MCRLayoutService(String stylesheetsDir) {
+    private static final MCRLayoutService singleton = new MCRLayoutService();
+    
+    public static MCRLayoutService instance()
+    {
+    	return singleton;
+    }
+    
+    public void setStylesheetsDir(String stylesheetsDir) {
         this.stylesheetsDir = stylesheetsDir;
+    }
+    
+    private MCRLayoutService() {
         // System.setProperty("javax.xml.transform.TransformerFactory",
         // "org.apache.xalan.xsltc.trax.TransformerFactoryImpl");
         System.setProperty("javax.xml.transform.TransformerFactory", "org.apache.xalan.processor.TransformerFactoryImpl");
@@ -204,6 +217,24 @@ public class MCRLayoutService implements org.apache.xalan.trace.TraceListener {
         FileInputStream fis = new FileInputStream(file);
         doLayout(req, res, fis);
         fis.close();
+    }
+
+    public Document doLayout(Document doc, String stylesheetName, Hashtable<String, String> params) throws Exception {
+        Properties parameters = buildXSLParameters();
+        if ( null != params)
+        	parameters.putAll(params);
+        File styleFile = getStylesheetFile(stylesheetName);
+        if ( styleFile == null)
+        {
+            LOGGER.error("Stylesheet not found: " + stylesheetName);
+        	return null;
+        }
+        Templates stylesheet = buildCompiledStylesheet(styleFile);
+        Transformer transformer = buildTransformer(stylesheet);
+        setXSLParameters(transformer, parameters);
+        JDOMResult out = new JDOMResult();
+        transformer.transform(new JDOMSource(doc), out);
+        return out.getDocument();
     }
 
     private void transform(HttpServletResponse res, Source sourceXML, String docType, Properties parameters, File styleFile) throws IOException {
