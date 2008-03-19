@@ -51,7 +51,6 @@ import java.util.regex.Pattern;
 import javax.servlet.ServletContext;
 import javax.xml.transform.Source;
 import javax.xml.transform.TransformerException;
-import javax.xml.transform.stream.StreamSource;
 
 import org.apache.log4j.Logger;
 import org.jdom.Document;
@@ -78,7 +77,6 @@ import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.utils.MCRCategoryTransformer;
-import org.mycore.datamodel.classifications2.utils.MCRXMLTransformer;
 import org.mycore.datamodel.common.MCRXMLTableManager;
 import org.mycore.datamodel.ifs.MCRDirectoryXML;
 import org.mycore.datamodel.metadata.MCRObjectID;
@@ -1116,29 +1114,10 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
                 Element result = MCRURIResolver.instance().resolve(target);
                 if (result != null)
                 {
-                	InputStream in = this.getClass().getResourceAsStream("/" + stylesheet + ".xsl");
-                	
-                	if (in == null)
-                	{
-                        File f = new File(context.getRealPath("/WEB-INF/stylesheets/" + stylesheet + ".xsl"));
-                        try {
-							in = new FileInputStream(f);
-						} catch (FileNotFoundException e) {
-							LOGGER.error("MCRXslStyleResolver stylesheet neither in classpath nor in /WEB-INF/stylesheets/ found : " + stylesheet + ".xsl");
-							return new Element("null");
-						}
-                	}
-                	LOGGER.debug("Transform with stylesheet " + stylesheet);
-                	
                 	Document doc = result.getDocument();
-                	if (doc == null)
+                	if ( doc == null )
                 		doc = new Document(result);
-                	
-                    Properties parameters = MCRLayoutService.buildXSLParameters();
-                    if ( null != params)
-                    	parameters.putAll(params);
-                    
-                	Document xx = MCRXSLTransformation.transform(doc, new StreamSource(in), parameters);
+                	Document xx = MCRLayoutService.instance().doLayout(doc, stylesheet + ".xsl", params);
                 	if (!xx.hasRootElement())
                 	{
                         LOGGER.info("MCRXslStyleResolver no root element after transformation ");
