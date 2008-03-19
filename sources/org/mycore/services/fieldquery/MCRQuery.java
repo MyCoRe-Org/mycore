@@ -55,7 +55,7 @@ public class MCRQuery {
      *            the query conditions
      */
     public MCRQuery(MCRCondition cond) {
-        this.cond = cond;
+        this.cond = MCRQueryParser.normalizeCondition(cond);
     }
 
     /**
@@ -70,7 +70,7 @@ public class MCRQuery {
      *            the maximum number of results to return
      */
     public MCRQuery(MCRCondition cond, List<MCRSortBy> sortBy, int maxResults) {
-        this.cond = cond;
+        this.cond = MCRQueryParser.normalizeCondition(cond);
         this.setSortBy(sortBy);
         this.setMaxResults(maxResults);
     }

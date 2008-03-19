@@ -204,7 +204,7 @@ public class MCRQueryParser extends MCRBooleanClauseParser {
      * simpler conditions if the condition value contains phrases surrounded 
      * by '...' or wildcard search with * or ?.
      */
-    private MCRCondition normalizeCondition(MCRCondition cond) {
+    static MCRCondition normalizeCondition(MCRCondition cond) {
         if (cond == null) return null;
         else if (cond instanceof MCRAndCondition) {
             MCRAndCondition ac = (MCRAndCondition) cond;
