@@ -49,7 +49,8 @@ import org.mycore.datamodel.classifications2.MCRLabel;
  * 
  * @author Thomas Scheffler (yagee)
  * 
- * @version $Revision$ $Date$
+ * @version $Revision$ $Date: 2008-02-06 17:27:24 +0000 (Mi, 06 Feb
+ *          2008) $
  * @since 2.0
  */
 public class MCRCategoryDAOImpl implements MCRCategoryDAO {
@@ -88,7 +89,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
             parent.getChildren().add(category);
         }
         session.save(category);
-        LOGGER.info("Categorie saved.");
+        LOGGER.info(new StringBuilder("Category ").append(category.getId()).append(" saved.").toString());
     }
 
     public void deleteCategory(MCRCategoryID id) {
