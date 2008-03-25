@@ -151,7 +151,7 @@ public class MCRLayoutService implements org.apache.xalan.trace.TraceListener {
 
     public void doLayout(HttpServletRequest req, HttpServletResponse res, org.jdom.Document jdom) throws IOException {
         String docType = (jdom.getDocType() == null ? jdom.getRootElement().getName() : jdom.getDocType().getElementName());
-        Properties parameters = buildXSLParameters();
+        Properties parameters = buildXSLParameters(req);
         File styleFile = chooseStyleFile(req, parameters, docType);
         if (styleFile == null)
             sendXML(req, res, jdom);
@@ -166,7 +166,7 @@ public class MCRLayoutService implements org.apache.xalan.trace.TraceListener {
     public void doLayout(HttpServletRequest req, HttpServletResponse res, Writer out, org.jdom.Document jdom) throws IOException {
 		String docType = (jdom.getDocType() == null ? jdom.getRootElement().getName() 
 				: jdom.getDocType().getElementName());
-		Properties parameters = buildXSLParameters();
+		Properties parameters = buildXSLParameters(req);
 		File styleFile = chooseStyleFile(req, parameters, docType);
 		if (styleFile == null)
 			new org.jdom.output.XMLOutputter().output(jdom, out);
@@ -193,7 +193,7 @@ public class MCRLayoutService implements org.apache.xalan.trace.TraceListener {
     
     public void doLayout(HttpServletRequest req, HttpServletResponse res, org.w3c.dom.Document dom) throws IOException {
         String docType = (dom.getDoctype() == null ? dom.getDocumentElement().getTagName() : dom.getDoctype().getName());
-        Properties parameters = buildXSLParameters();
+        Properties parameters = buildXSLParameters(req);
         File styleFile = chooseStyleFile(req, parameters, docType);
         if (styleFile == null)
             sendXML(req, res, dom);
@@ -205,7 +205,7 @@ public class MCRLayoutService implements org.apache.xalan.trace.TraceListener {
         MCRContentInputStream cis = new MCRContentInputStream(is);
         String docType = MCRUtils.parseDocumentType(new ByteArrayInputStream(cis.getHeader()));
 
-        Properties parameters = buildXSLParameters();
+        Properties parameters = buildXSLParameters(req);
         File styleFile = chooseStyleFile(req, parameters, docType);
         if (styleFile == null)
             sendXML(req, res, cis);
@@ -220,7 +220,13 @@ public class MCRLayoutService implements org.apache.xalan.trace.TraceListener {
     }
 
     public Document doLayout(Document doc, String stylesheetName, Hashtable<String, String> params) throws Exception {
-        Properties parameters = buildXSLParameters();
+    	HttpServletRequest req = null;
+    	MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
+    	MCRServletJob job = (MCRServletJob)mcrSession.get("MCRServletJob");
+    	if ( job != null )
+    		req = job.getRequest();
+    	
+        Properties parameters = buildXSLParameters(req);
         if ( null != params)
         	parameters.putAll(params);
         File styleFile = getStylesheetFile(stylesheetName);
@@ -275,13 +281,7 @@ public class MCRLayoutService implements org.apache.xalan.trace.TraceListener {
         throw new MCRException("XSL stylesheet not found: " + styleName);
     }
 
-    public static  Properties buildXSLParameters() {
-    	HttpServletRequest request = null;
-    	MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
-    	MCRServletJob job = (MCRServletJob)mcrSession.get("MCRServletJob");
-    	if ( job != null )
-    		request = job.getRequest();
-    	
+    public static  Properties buildXSLParameters(HttpServletRequest request) {
         // PROPERTIES: Read all properties from system configuration
         Properties parameters = (Properties) (MCRConfiguration.instance().getProperties().clone());
         // added properties of MCRSession and request
@@ -316,16 +316,18 @@ public class MCRLayoutService implements org.apache.xalan.trace.TraceListener {
             parameters.put("CurrentGroups", groups.toString());
         }
 
+    	MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
+    	
         // set parameters
         parameters.put("CurrentUser", uid);
         parameters.put("DefaultLang", MCRConfiguration.instance().getString("MCR.Metadata.DefaultLang", "en"));
         parameters.put("CurrentLang", mcrSession.getCurrentLanguage());
+        parameters.put("WebApplicationBaseURL", MCRServlet.getBaseURL());
+        parameters.put("ServletsBaseURL", MCRServlet.getServletBaseURL());
         
         if (request != null) 
         {
 			parameters.put("RequestURL", getCompleteURL(request));
-			parameters.put("WebApplicationBaseURL", MCRServlet.getBaseURL());
-			parameters.put("ServletsBaseURL", MCRServlet.getServletBaseURL());
 			parameters.put("Referer", (request.getHeader("Referer") != null) ? request.getHeader("Referer") : "");
 		}
 

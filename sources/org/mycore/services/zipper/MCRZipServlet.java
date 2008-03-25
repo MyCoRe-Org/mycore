@@ -294,7 +294,7 @@ public class MCRZipServlet extends MCRServlet {
      */
     protected void sendObject(Document jdom, HttpServletRequest req, ZipOutputStream out) throws IOException {
         // zip the object's Metadata
-        Properties parameters = getLayoutService().buildXSLParameters();
+        Properties parameters = getLayoutService().buildXSLParameters(req);
         sendZipped(jdom, parameters, out);
 
         // zip all derivates
