@@ -4,7 +4,7 @@
 <editor id="editor-broadcasting">
 	<source uri="webapp:modules/broadcasting/config/mcr-module-broadcasting.xml" />
 	<target type="webapp" name="modules/broadcasting/config/mcr-module-broadcasting.xml"/>
-	<cancel url="MCRBroadcastingServlet?mode=getReceiverList"/>
+	<cancel url="servlets/MCRBroadcastingServlet?mode=getReceiverList"/>
 
 	<components root="editor-broadcasting" var="/mcr-module-broadcasting">
 		<panel id="editor-broadcasting" lines="on">
