@@ -1,16 +1,7 @@
-<?xml version="1.0" encoding="ISO_8859-1"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE MyCoReWebPage>
 
 <MyCoReWebPage>
-
-<head>
-  <maintitle xml:lang="de">Benutzerverwaltung</maintitle>
-  <maintitle xml:lang="en">User management</maintitle>
-  <pagetitle xml:lang="de">Erzeugen einer neuen Benutzergruppe</pagetitle>
-  <pagetitle xml:lang="en">Create a new user group</pagetitle>
-  <buttons xml:lang="de" />
-</head>
-
 <section title="Neuanlegen einer Gruppe" xml:lang="de">
   <editor id="creategroup"><include uri="webapp:editor/editor-creategroup.xml" /></editor>
 </section>

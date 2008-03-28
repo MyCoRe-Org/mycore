@@ -1,15 +1,9 @@
-<?xml version="1.0" encoding="ISO_8859-1"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE MyCoReWebPage>
 
 <MyCoReWebPage>
-  <head>
-    <maintitle xml:lang="de">Benutzerverwaltung</maintitle>
-    <maintitle xml:lang="en">User administration</maintitle>
-    <pagetitle xml:lang="de">Bearbeitung erfolgreich</pagetitle>
-    <pagetitle xml:lang="en">Action successful</pagetitle>
-  </head>
 
-  <section title="Bearbeitung erfolgreich durchgeführt" xml:lang="de">
+  <section title="Bearbeitung erfolgreich durchgefÃ¼hrt" xml:lang="de">
     <table class="frame">
       <tr>
         <td>
@@ -56,6 +50,7 @@
       </tr>
     </table>
   </section>
+
 </MyCoReWebPage>
 
 

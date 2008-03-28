@@ -1,13 +1,7 @@
-<?xml version="1.0" encoding="ISO_8859-1"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE MyCoReWebPage>
 
 <MyCoReWebPage>
-  <head>
-    <maintitle xml:lang="de">Benutzerverwaltung</maintitle>
-    <maintitle xml:lang="en">User administration</maintitle>
-    <pagetitle xml:lang="de">Unzureichende Privilegien</pagetitle>
-    <pagetitle xml:lang="en">Unsufficient privileges</pagetitle>
-  </head>
 
   <section title="Keine ausreichenden Privilegien" xml:lang="de">
     <table class="frame">
@@ -21,7 +15,7 @@
               <tr align="center">
                 <td align="center">
                   <font color="red">
-                    Dieser Nutzer bzw. diese Nutzerin besitzt für die gewünschte 
+                    Dieser Nutzer bzw. diese Nutzerin besitzt fÃ¼r die gewÃ¼nschte 
                     Aktion nicht die notwendigen Privilegien!
                   </font>
                 </td>
@@ -61,6 +55,7 @@
       </tr>
     </table>
   </section>
+
 </MyCoReWebPage>
 
 

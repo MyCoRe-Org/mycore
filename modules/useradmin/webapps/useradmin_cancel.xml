@@ -1,14 +1,7 @@
-<?xml version="1.0" encoding="ISO_8859-1"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE MyCoReWebPage>
 
 <MyCoReWebPage>
-  <head>
-    <maintitle xml:lang="de">Benutzerverwaltung</maintitle>
-    <maintitle xml:lang="en">User administration</maintitle>
-    <pagetitle xml:lang="de">Bearbeitung abgebrochen</pagetitle>
-    <pagetitle xml:lang="en">Action canceled</pagetitle>
-  </head>
-
   <section title="Bearbeitung abgebrochen" xml:lang="de">
     <table class="frame">
       <tr>
@@ -56,6 +49,7 @@
       </tr>
     </table>
   </section>
+
 </MyCoReWebPage>
 
 
