@@ -77,11 +77,11 @@ public class MCRACLEditorServlet_v2 extends MCRServlet {
         if (answer.getName().equals("redirect")) {
             LOGGER.debug("Redirect: " + answer.getText());
             redirect(response, answer.getText());
-        } else {
+        } 
+        else {
             LOGGER.debug("Normal doLayout!");
             doLayout(request, response, answer, layout, mcrWebPage);
         }
-
     }
 
     public void verifyAccess(MCRServletJob job) throws IOException {

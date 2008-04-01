@@ -352,8 +352,15 @@ public class MCRAclEditorStdImpl extends MCRAclEditor {
         diffMap.put("delete", deleteRule);
 
         HIBA.saveRuleChanges(diffMap);
+        String redirectURL = request.getParameter("redir");
 
-        Element editor = ACLEditor().addContent(editorType("ruleEditor"));
+        Element editor;
+
+        if (redirectURL != null && !redirectURL.equals(""))
+            editor = redirect(redirectURL);
+        else
+            editor = ACLEditor().addContent(editorType("ruleEditor"));
+        
         return editor;
     }
 

@@ -53,6 +53,8 @@
                     <!-- Mapping Table -->
                     <form name="MappingTableForm" xmlns:encoder="xalan://java.net.URLEncoder" xmlns:xalan="http://xml.apache.org/xalan"
                         action="{concat($dataRequest, '&amp;action=submitPerm', $redirectURL)}" method="post" accept-charset="UTF-8">
+                        <input type="hidden" name="redir" value="{$aclEditorURL}" />
+                        
                         <br />
                         <br />
                         <table id="mapping_table" style="border:solid 1px;">
@@ -230,6 +232,7 @@
             <br />
             <form id="createNewPermForm" name="NewPermForm" xmlns:encoder="xalan://java.net.URLEncoder" xmlns:xalan="http://xml.apache.org/xalan"
                 action="{concat($dataRequest, '&amp;action=createNewPerm', $redirectURL)}" method="post" accept-charset="UTF-8">
+                <input type="hidden" name="redir" value="{$aclEditorURL}" />
                 <table style="border:solid 1px;">
                     <xsl:if test="not(@emb = 'true')">
                         <tr>

@@ -49,6 +49,7 @@
 
 			<form xmlns:encoder="xalan://java.net.URLEncoder" xmlns:xalan="http://xml.apache.org/xalan"
 				action="{concat($dataRequest, '&amp;action=submitRule')}" method="post" accept-charset="UTF-8">
+                <input type="hidden" name="redir" value="{concat($aclEditorURL,$currentEditor)}" />
 				<table id="rule_table">
 					<tr id="rule_head">
 						<td>
