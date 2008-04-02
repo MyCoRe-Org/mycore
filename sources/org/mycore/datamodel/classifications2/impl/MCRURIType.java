@@ -150,7 +150,7 @@ public class MCRURIType implements UserType {
      * 
      * @see org.hibernate.usertype.UserType#returnedClass()
      */
-    public Class returnedClass() {
+    public Class<URI> returnedClass() {
         return URI.class;
     }
 

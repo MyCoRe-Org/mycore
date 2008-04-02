@@ -35,7 +35,6 @@ import org.hibernate.Session;
 
 import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.datamodel.classifications2.MCRCategLinkService;
-import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.MCRObjectReference;
 
@@ -47,8 +46,6 @@ import org.mycore.datamodel.classifications2.MCRObjectReference;
  * @since 2.0
  */
 public class MCRCategLinkServiceImpl implements MCRCategLinkService {
-
-    static MCRCategoryDAO DAO = new MCRCategoryDAOImpl();
 
     private static Logger LOGGER = Logger.getLogger(MCRCategLinkServiceImpl.class);
 
