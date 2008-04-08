@@ -24,12 +24,14 @@
 package org.mycore.services.webservices;
 
 import java.lang.reflect.Method;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.axis.MessageContext;
 import org.apache.axis.providers.java.RPCProvider;
 import org.apache.log4j.Logger;
 import org.hibernate.Transaction;
 import org.mycore.backend.hibernate.MCRHIBConnection;
+import org.mycore.common.MCRSessionMgr;
 
 /**
  * Wraps WebService method invocation with hibernate transaction
@@ -40,14 +42,14 @@ public class MCRRPCProvider extends RPCProvider {
 
     private final static Logger LOGGER = Logger.getLogger(MCRRPCProvider.class);
     
-    private static long counter = 0;
+    private static AtomicInteger counter = new AtomicInteger();
     
     /**
      * Wraps WebService method invocation with hibernate transaction
      */
     protected Object invokeMethod(MessageContext mc, Method method, Object obj, Object[] argValues) throws Exception {
-        counter++;
-        LOGGER.info("WebService call #" + counter + " to " + method.getDeclaringClass().getName() + ":" + method.getName());
+        int count = counter.incrementAndGet();
+        LOGGER.info("WebService call #" + count + " to " + method.getDeclaringClass().getName() + ":" + method.getName());
         Transaction tx = MCRHIBConnection.instance().getSession().beginTransaction();
         long millis = System.currentTimeMillis();
         Object result;
@@ -68,8 +70,11 @@ public class MCRRPCProvider extends RPCProvider {
                 tx.rollback();
             throw ex;
         }
+        finally{
+            MCRSessionMgr.getCurrentSession().close();
+        }
 
-        LOGGER.info("WebService call #" + counter + " finished in " + (System.currentTimeMillis() - millis) + " ms");
+        LOGGER.info("WebService call #" + count + " finished in " + (System.currentTimeMillis() - millis) + " ms");
         return result;
     }
 }
