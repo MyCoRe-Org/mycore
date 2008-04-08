@@ -30,14 +30,13 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 import org.apache.log4j.Logger;
-import org.jdom.Document;
-import org.jdom.Element;
-import org.jdom.output.XMLOutputter;
 
 import org.mycore.common.MCRConfiguration;
 import org.mycore.datamodel.metadata.MCRMetaISO8601Date;
+import org.mycore.parsers.bool.MCRCondition;
 import org.mycore.services.fieldquery.MCRQuery;
 import org.mycore.services.fieldquery.MCRQueryManager;
+import org.mycore.services.fieldquery.MCRQueryParser;
 import org.mycore.services.fieldquery.MCRResults;
 
 /**
@@ -150,22 +149,15 @@ public class MCRXMLFunctions {
     }
 
     public static int getQueryHitCount(String query) {
-        Element queryElement = new Element("query");
-        queryElement.setAttribute("maxResults", "0");
-        queryElement.setAttribute("numPerPage", "0");
-        Document input = new Document(queryElement);
-        Element conditions = new Element("conditions");
-        queryElement.addContent(conditions);
-        conditions.setAttribute("format", "text");
-        conditions.addContent(query);
-        if (LOGGER.isDebugEnabled()) {
-            XMLOutputter out = new XMLOutputter(org.jdom.output.Format.getPrettyFormat());
-            LOGGER.debug(out.outputString(input));
-        }
+        MCRCondition condition = new MCRQueryParser().parse( query );
+        MCRQuery q = new MCRQuery( condition );
         long start = System.currentTimeMillis();
-        MCRResults result = MCRQueryManager.search(MCRQuery.parseXML(input));
-        long qtime = System.currentTimeMillis() - start;
-        LOGGER.debug("total query time: " + qtime);
+        MCRResults result = MCRQueryManager.search( q );
+        if( LOGGER.isDebugEnabled() )
+        {
+          long qtime = System.currentTimeMillis() - start;
+          LOGGER.debug("total query time: " + qtime);
+        }
         return result.getNumHits();
     }
 }
