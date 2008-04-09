@@ -221,9 +221,14 @@ public class MCRStartEditorServlet extends MCRServlet {
         } catch (Exception e) {
             cd.mytfmcrid = "";
         }
+        
 
         if ((cd.mytfmcrid == null) || ((cd.mytfmcrid = cd.mytfmcrid.trim()).length() == 0)) {
-            String myproject = CONFIG.getString("MCR.SWF.Project.ID." + cd.mytype, "MCR");
+            String myproject = getProperty(job.getRequest(), "project");
+            if (myproject == null) {
+                myproject = CONFIG.getString("MCR.SWF.Project.ID." + cd.mytype, "MCR");
+            }
+            LOGGER.info("Project = " + myproject);
             cd.mytfmcrid = getNextMCRTFID(myproject, cd.mytype);
         }
         LOGGER.debug("MCRID (TF) = " + cd.mytfmcrid);
