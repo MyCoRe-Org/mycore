@@ -42,7 +42,7 @@ import org.apache.lucene.analysis.de.GermanAnalyzer;
 import org.apache.lucene.analysis.SimpleAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
-import org.apache.lucene.index.CorruptIndexException;
+import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.Hits;
@@ -97,6 +97,8 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
     private RAMDirectory ramDir = null;
     private IndexWriter writerRamDir;
     private int ramDirEntries = 0;
+    private IndexReader indexReader;
+    private IndexSearcher indexSearcher;
    
     public void init(String ID) {
         super.init(ID);
@@ -119,6 +121,8 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
         try {
           IndexWriter writer = MCRLuceneTools.getLuceneWriter(config.getString(prefix + "IndexDir"), true);
           writer.close();
+          indexReader   = IndexReader.open(IndexDir.getAbsolutePath());
+          indexSearcher = new IndexSearcher(indexReader);
       } catch (IOException e) {
           LOGGER.error(e.getClass().getName() + ": " + e.getMessage());
           LOGGER.error(MCRException.getStackTraceAsString(e));
@@ -251,23 +255,32 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
     private MCRResults getLuceneHits(Query luceneQuery, int maxResults, List<MCRSortBy> sortBy, boolean addSortData) throws Exception {
         if (maxResults <= 0)
             maxResults = 1000000;
+        
+        Hits hits;
+        int found;
 
-        IndexSearcher searcher = null;
-        try {
-            searcher = new IndexSearcher(IndexDir.getAbsolutePath());
-        } catch (IOException e) {
-            LOGGER.error(e.getClass().getName() + ": " + e.getMessage());
-            LOGGER.error(MCRException.getStackTraceAsString(e));
-        }
+        synchronized (CONFIG) {
+			long start = System.currentTimeMillis();
+			try {
+				IndexReader newReader = indexReader.reopen();
+				if (newReader != indexReader) {
+					LOGGER.info("new Searcher for index: " + ID);
+					indexReader.close();
+					indexSearcher.close();
+					indexReader = newReader;
+					indexSearcher = new IndexSearcher(indexReader);
+				}
 
-        Hits hits = searcher.search( luceneQuery );
-        int found = hits.length();
-        //TopDocs hits = searcher.search(luceneQuery, null, maxResults);
-        //int found = hits.scoreDocs.length;
-
-        LOGGER.info("Number of Objects found : " + found);
-
-        MCRResults result = new MCRResults();
+			} catch (IOException e) {
+				LOGGER.error(e.getClass().getName() + ": " + e.getMessage());
+				LOGGER.error(MCRException.getStackTraceAsString(e));
+			}
+			hits = indexSearcher.search(luceneQuery);
+			found = hits.length();
+			LOGGER.info("Number of Objects found : " + found + " Time for Search: "	+ (System.currentTimeMillis() - start));
+		}
+        
+		MCRResults result = new MCRResults();
 
         for (int i = 0; i < found; i++) {
             org.apache.lucene.document.Document doc = hits.doc(i);
@@ -280,8 +293,6 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
             addSortDataToHit(sortBy, doc, hit, score);
             result.addHit(hit);
         }
-
-        searcher.close();
 
         return result;
     }
@@ -441,12 +452,6 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
 
     public void addSortData(Iterator hits, List<MCRSortBy> sortBy) {
         try {
-            IndexSearcher searcher = new IndexSearcher(IndexDir.getAbsolutePath());
-    
-            if (null == searcher) {
-                return;
-            }
-    
             while (hits.hasNext()) {
                 MCRHit hit = (MCRHit) hits.next();
                 String id = hit.getID();
@@ -454,14 +459,12 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
     
                 TermQuery qu = new TermQuery(te1);
     
-                Hits hitl = searcher.search(qu);
+                Hits hitl = indexSearcher.search(qu);
                 if (hitl.length() > 0) {
                     org.apache.lucene.document.Document doc = hitl.doc(0);
                     addSortDataToHit(sortBy, doc, hit, null);
                 }
             }
-    
-            searcher.close();
         } catch (IOException e) {
             LOGGER.error("Exception in MCRLuceneSearcher (addSortData)", e);
         }
@@ -534,6 +537,14 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
     }
     
     public void close() {
+    	try {
+			if (null != indexReader)
+				indexReader.close();
+			if (null != indexSearcher)
+				indexSearcher.close();
+		} catch (IOException e1) {
+            LOGGER.warn("Error while closing indexreader "+toString(),e1);
+		}
         handleRamDir();
         LOGGER.info("Closing "+toString()+"...");
         modifyExecutor.shutdown();
