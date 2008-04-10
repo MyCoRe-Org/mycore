@@ -1148,6 +1148,9 @@ public class MCRUserMgr {
         // Check permissions
         MCRSession session = MCRSessionMgr.getCurrentSession();
         MCRUser user = retrieveUser(userID, false);
+        if (user == null) {
+            throw new MCRException("Cant find user with ID " + userID + "!");
+        }
 
         if (!user.isUpdateAllowed()) {
             throw new MCRException("The update for the user " + userID + " is not allowed!");
