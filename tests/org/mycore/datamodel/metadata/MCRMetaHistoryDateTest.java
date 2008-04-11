@@ -27,8 +27,6 @@ package org.mycore.datamodel.metadata;
 import com.ibm.icu.util.Calendar;
 import com.ibm.icu.util.GregorianCalendar;
 
-import org.apache.log4j.Logger;
-import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRTestCase;
 
 /**
