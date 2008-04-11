@@ -71,7 +71,7 @@ public class MCRCategoryID implements Serializable {
     public int hashCode() {
         final int PRIME = 31;
         int result = 1;
-        result = PRIME * result + ((ID == null) ? 0 : ID.hashCode());
+        result = PRIME * result + ((ID == null || ID.length() == 0) ? 0 : ID.hashCode());
         result = PRIME * result + ((rootID == null) ? 0 : rootID.hashCode());
         return result;
     }
@@ -91,9 +91,9 @@ public class MCRCategoryID implements Serializable {
             return false;
         final MCRCategoryID other = (MCRCategoryID) obj;
         if (ID == null) {
-            if (other.ID != null)
+            if (other.ID != null && other.ID.length() > 0)
                 return false;
-        } else if (!ID.equals(other.ID))
+        } else if (!ID.equals(other.ID) && (ID.length() > 0 || (other.ID != null && other.ID.length() >= 0)))
             return false;
         if (rootID == null) {
             if (other.rootID != null)
@@ -107,7 +107,7 @@ public class MCRCategoryID implements Serializable {
      * @return the ID
      */
     public String getID() {
-        return ID;
+        return ID == null ? "" : ID;
     }
 
     /**
@@ -140,7 +140,10 @@ public class MCRCategoryID implements Serializable {
      */
     @Override
     public String toString() {
-        return getRootID() + ((getID().length() > 0) ? ":" + getID() : "");
+        if (ID == null || ID.length() == 0)
+            return rootID;
+        StringBuilder str = new StringBuilder(this.rootID).append(':').append(ID);
+        return str.toString();
     }
 
 }

@@ -11,42 +11,42 @@
       <many-to-one name="category" class="MCRCategoryImpl" cascade="none" />
       <component name="objectReference">
         <property name="objectID" access="field" />
-        <property name="type" column="objectType" access="field" />
+        <property name="type" column="objectType" access="field" length="70"/>
       </component>
     </natural-id>
     <query name="NumberPerCategID">
       <![CDATA[
-SELECT cat.id, count(*), cat.internalID
+SELECT cat.rootID, cat.categID, count(*), cat.internalID
   FROM MCRCategoryImpl cat, MCRCategoryLink link WHERE
     cat.internalID IN (
       SELECT c1.internalID FROM MCRCategoryImpl c1 WHERE
-        c1.id.rootID=:classID AND
-        c1.id.ID IN (:categIDs)
+        c1.rootID=:classID AND
+        c1.categID IN (:categIDs)
     ) AND
     link.category IN (
       SELECT internalID FROM MCRCategoryImpl c2 WHERE
-        c2.id.rootID = cat.id.rootID AND
+        c2.rootID = cat.rootID AND
         c2.left BETWEEN cat.left AND cat.right
     )
-  GROUP BY cat.internalID, cat.id.rootID, cat.id.ID
+  GROUP BY cat.internalID, cat.rootID, cat.categID
       ]]>
     </query>
     <query name="NumberByTypePerCategID">
       <![CDATA[
-SELECT cat.id, count(*), cat.internalID
+SELECT cat.rootID, cat.categID, count(*), cat.internalID
   FROM MCRCategoryImpl cat, MCRCategoryLink link WHERE
     cat.internalID IN (
       SELECT c1.internalID FROM MCRCategoryImpl c1 WHERE
-        c1.id.rootID=:classID AND
-        c1.id.ID IN (:categIDs)
+        c1.rootID=:classID AND
+        c1.categID IN (:categIDs)
     ) AND
     link.objectReference.type=:type AND
     link.category IN (
       SELECT internalID FROM MCRCategoryImpl c2 WHERE
-        c2.id.rootID = cat.id.rootID AND
+        c2.rootID = cat.rootID AND
         c2.left BETWEEN cat.left AND cat.right
     )
-  GROUP BY cat.internalID, cat.id.rootID, cat.id.ID
+  GROUP BY cat.internalID, cat.rootID, cat.categID
       ]]>
     </query>
     <query name="deleteByObjectID">
@@ -71,7 +71,7 @@ SELECT objectReference.objectID FROM MCRCategoryLink WHERE category.id=:category
     </query>
     <query name="categoriesByObjectID">
       <![CDATA[
-SELECT category.id FROM MCRCategoryLink WHERE objectReference.objectID=:id
+SELECT category.rootID, category.categID FROM MCRCategoryLink WHERE objectReference.objectID=:id
       ]]>
     </query>
     <!--  -->

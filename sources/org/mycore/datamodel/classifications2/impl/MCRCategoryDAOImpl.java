@@ -25,6 +25,7 @@ package org.mycore.datamodel.classifications2.impl;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -32,6 +33,7 @@ import org.apache.log4j.Logger;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.Session;
+import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
@@ -121,7 +123,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
      */
     public boolean exist(MCRCategoryID id) {
         Criteria criteria = MCRHIBConnection.instance().getSession().createCriteria(CATEGRORY_CLASS);
-        criteria.setProjection(Projections.rowCount()).add(MCRCategoryExpression.eq(id));
+        criteria.setProjection(Projections.rowCount()).add(getCategoryCriterion(id));
         Number result = (Number) criteria.uniqueResult();
         if (result == null) {
             return false;
@@ -163,7 +165,8 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         Session session = MCRHIBConnection.instance().getSession();
         Criteria c = session.createCriteria(CATEGRORY_CLASS).add(
                 Subqueries.propertyEq("parent", DetachedCriteria.forClass(CATEGRORY_CLASS).setProjection(Projections.property("internalID")).add(
-                        MCRCategoryExpression.eq(cid))));
+                        getCategoryCriterion(cid))));
+        c.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
         return (List<MCRCategory>) c.list();
     }
 
@@ -184,13 +187,11 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         Session session = MCRHIBConnection.instance().getSession();
         Criteria c = session.createCriteria(CATEGRORY_CLASS);
         c.add(Restrictions.eq("left", LEFT_START_VALUE));
-        // Have to copy category IDs until Jira HHH-2628 is solved
-        // c.setProjection(Projections.property("id"));
-        // return c.list();
-        List<MCRCategory> result = c.list();
+        c.setProjection(Projections.projectionList().add(Projections.property("rootID")).add(Projections.property("categID")));
+        List<Object[]> result = c.list();
         List<MCRCategoryID> classIds = new ArrayList<MCRCategoryID>(result.size());
-        for (MCRCategory cat : result) {
-            classIds.add(cat.getId());
+        for (Object[] cat : result) {
+            classIds.add(new MCRCategoryID(cat[0].toString(), cat[1].toString()));
         }
         return classIds;
     }
@@ -314,18 +315,17 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         fillIDMap(newMap, newCategoryImpl);
         /*
          * copy elements from the new tree to the old tree. fixes bug #1848710
-         * (Classification save fails after shilfting categories)
+         * (Classification save fails after shifting categories)
          * 
          * set internalID for the new rootCategory
          */
+        session.evict(oldCategory);
         for (MCRCategoryImpl category : newMap.values()) {
             MCRCategoryImpl oldValue = oldMap.get(category.getId());
             if (oldValue != null) {
                 copyCategoryToNewTree(newCategoryImpl, category, oldValue);
             }
         }
-        // detatch from session (all sub categories are fetched)
-        session.evict(oldCategory);
         // calculate left, right and level values
         int diffNodes = newMap.size() - oldMap.size();
         LOGGER.debug("Update changes classification node size by: " + diffNodes);
@@ -490,6 +490,10 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         return (newParent.getLeft() > oldParent.getLeft());
     }
 
+    private static Criterion getCategoryCriterion(MCRCategoryID id) {
+        return Restrictions.naturalId().set("rootID", id.getRootID()).set("categID", id.getID());
+    }
+
     private static MCRCategoryImpl copyDeep(MCRCategory category, int level) {
         if (category == null) {
             return null;
@@ -517,14 +521,8 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
     }
 
     static MCRCategoryImpl getByNaturalID(Session session, MCRCategoryID id) {
-        final Criteria criteria = session.createCriteria(CATEGRORY_CLASS).setProjection(Projections.id());
-        Integer internalID = (Integer) criteria.setCacheable(true).add(MCRCategoryExpression.eq(id)).uniqueResult();
-        LOGGER.debug("getByNaturalID(" + id + "): " + internalID);
-        if (internalID == null) {
-            LOGGER.warn("Could not find requested MCRCategory id id: " + id);
-            return null;
-        }
-        return (MCRCategoryImpl) session.get(CATEGRORY_CLASS, internalID);
+        final Criteria criteria = session.createCriteria(CATEGRORY_CLASS);
+        return (MCRCategoryImpl) criteria.setCacheable(true).add(getCategoryCriterion(id)).uniqueResult();
     }
 
     /**
@@ -540,7 +538,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
      *            oldVersion allready stored in database
      */
     private static void copyCategoryToNewTree(MCRCategoryImpl newTree, MCRCategoryImpl category, MCRCategoryImpl previousVersion) {
-        // category.setInternalID(oldValue.getInternalID());
+        category.setInternalID(previousVersion.getInternalID());
         MCRCategoryImpl parent = (MCRCategoryImpl) category.getParent();
         if (parent != null) {
             // get new parent of modified category tree here (by parent
@@ -570,10 +568,11 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
                     }
                 }
             }
-            for (String lang : previousVersion.getLabels().keySet()) {
+            Iterator<MCRLabel> labels = previousVersion.getLabels().values().iterator();
+            while (labels.hasNext()) {
                 // remove labels that are not present in new version
-                if (!category.getLabels().containsKey(lang))
-                    previousVersion.getLabels().remove(lang);
+                if (!category.getLabels().containsKey(labels.next().getLang()))
+                    labels.remove();
             }
         } else {
             category.setInternalID(previousVersion.getInternalID());
@@ -623,7 +622,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         Session session = MCRHIBConnection.instance().getSession();
         Criteria c = session.createCriteria(CATEGRORY_CLASS).setProjection(
                 Projections.projectionList().add(Projections.property("left")).add(Projections.property("right")));
-        c.add(MCRCategoryExpression.eq(id));
+        c.add(getCategoryCriterion(id));
         Object[] result = (Object[]) c.uniqueResult();
         Integer[] iResult = new Integer[] { (Integer) result[0], (Integer) result[1] };
         return iResult;
@@ -633,7 +632,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         Session session = MCRHIBConnection.instance().getSession();
         Criteria c = session.createCriteria(CATEGRORY_CLASS).setProjection(Projections.rowCount());
         c.add(Subqueries.propertyEq("parent", DetachedCriteria.forClass(CATEGRORY_CLASS).setProjection(Projections.property("internalID")).add(
-                MCRCategoryExpression.eq(id))));
+                getCategoryCriterion(id))));
         return ((Number) c.uniqueResult()).intValue();
     }
 

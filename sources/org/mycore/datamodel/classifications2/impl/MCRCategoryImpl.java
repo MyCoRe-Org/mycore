@@ -34,13 +34,15 @@ import org.hibernate.collection.PersistentList;
 
 import org.mycore.common.MCRException;
 import org.mycore.datamodel.classifications2.MCRCategory;
+import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.MCRLabel;
 
 /**
  * 
  * @author Thomas Scheffler (yagee)
  * 
- * @version $Revision$ $Date$
+ * @version $Revision$ $Date: 2008-02-06 17:27:24 +0000 (Mi, 06 Feb
+ *          2008) $
  * @since 2.0
  */
 public class MCRCategoryImpl extends MCRAbstractCategoryImpl implements Serializable {
@@ -275,7 +277,7 @@ public class MCRCategoryImpl extends MCRAbstractCategoryImpl implements Serializ
 
     static MCRCategoryImpl wrapCategory(MCRCategory category, MCRCategory parent, MCRCategory root) {
         MCRCategoryImpl catImpl;
-        if (category.getParent()!=null && category.getParent()!=parent){
+        if (category.getParent() != null && category.getParent() != parent) {
             throw new MCRException("MCRCategory is already attached to a different parent.");
         }
         if (category instanceof MCRCategoryImpl) {
@@ -288,12 +290,12 @@ public class MCRCategoryImpl extends MCRAbstractCategoryImpl implements Serializ
             } else if (category.isCategory()) {
                 LOGGER.warn("Something went wrong here, category has no parent and is no root category: " + category.getId());
             }
-            //copy children to temporary list
-            List<MCRCategory> children=new ArrayList<MCRCategory>(catImpl.getChildren().size());
+            // copy children to temporary list
+            List<MCRCategory> children = new ArrayList<MCRCategory>(catImpl.getChildren().size());
             children.addAll(catImpl.getChildren());
-            //remove old children
+            // remove old children
             catImpl.getChildren().clear();
-            //add new wrapped children
+            // add new wrapped children
             catImpl.getChildren().addAll(wrapCategories(children, catImpl, root));
             return catImpl;
         }
@@ -322,6 +324,30 @@ public class MCRCategoryImpl extends MCRAbstractCategoryImpl implements Serializ
      */
     public void setInternalID(int internalID) {
         this.internalID = internalID;
+    }
+
+    public void setRootID(String rootID) {
+        if (this.getId() == null)
+            setId(new MCRCategoryID(rootID, null));
+        else if (!this.getId().getRootID().equals(rootID)) {
+            setId(new MCRCategoryID(rootID, this.getId().getID()));
+        }
+    }
+
+    public void setCategID(String categID) {
+        if (this.getId() == null)
+            setId(new MCRCategoryID(null, categID));
+        else if (!this.getId().getID().equals(categID)) {
+            setId(new MCRCategoryID(this.getId().getRootID(), categID));
+        }
+    }
+
+    public String getRootID() {
+        return getId() == null ? null : getId().getRootID();
+    }
+
+    public String getCategID() {
+        return getId() == null ? null : getId().getID();
     }
 
 }

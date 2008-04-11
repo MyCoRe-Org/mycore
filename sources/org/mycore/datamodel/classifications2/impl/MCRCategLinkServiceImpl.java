@@ -88,8 +88,8 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
             }
             List<Object[]> result = q.list();
             for (Object[] sr : result) {
-                MCRCategoryID key = (MCRCategoryID) sr[0];
-                Number value = (Number) sr[1];
+                MCRCategoryID key = new MCRCategoryID(sr[0].toString(), sr[1].toString());
+                Number value = (Number) sr[2];
                 countLinks.put(key, value);
             }
         }
@@ -136,7 +136,12 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
         Session session = MCRHIBConnection.instance().getSession();
         Query q = session.getNamedQuery(LINK_CLASS.getName() + ".categoriesByObjectID");
         q.setParameter("id", id);
-        return q.list();
+        List<Object[]> result = q.list();
+        ArrayList<MCRCategoryID> returns=new ArrayList<MCRCategoryID>(result.size());
+        for (Object[] idValues:result){
+            returns.add(new MCRCategoryID(idValues[0].toString(),idValues[1].toString()));
+        }
+        return returns;
     }
 
     public void setLinks(MCRObjectReference objectReference, Collection<MCRCategoryID> categories) {
