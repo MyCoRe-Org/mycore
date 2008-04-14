@@ -33,10 +33,6 @@
     <servlet-name>MCRFSMapperServlet</servlet-name>
     <servlet-class>org.mycore.frontend.servlets.MCRFSMapperServlet</servlet-class>
   </servlet>
-  <servlet id="Login">
-    <servlet-name>MCRLoginServlet</servlet-name>
-    <servlet-class>org.mycore.user.MCRLoginServlet</servlet-class>
-  </servlet>
   <servlet id="OAIProvider">
     <servlet-name>MCROAIProvider</servlet-name>
     <servlet-class>org.mycore.services.oai.MCROAIProvider</servlet-class>
@@ -44,10 +40,6 @@
   <servlet id="StaticXMLFile">
     <servlet-name>MCRStaticXMLFileServlet</servlet-name>
     <servlet-class>org.mycore.frontend.servlets.MCRStaticXMLFileServlet</servlet-class>
-  </servlet>
-  <servlet id="User">
-    <servlet-name>MCRUserServlet</servlet-name>
-    <servlet-class>org.mycore.frontend.servlets.MCRUserServlet</servlet-class>
   </servlet>
   <servlet id="XMLEditor">
     <servlet-name>XMLEditor</servlet-name>
@@ -104,11 +96,6 @@
   </filter-mapping>
   <filter-mapping>
     <filter-name>UriResolverDebugFilter</filter-name>
-    <servlet-name>MCRLoginServlet</servlet-name>
-    <dispatcher>REQUEST</dispatcher>
-  </filter-mapping>
-  <filter-mapping>
-    <filter-name>UriResolverDebugFilter</filter-name>
     <servlet-name>MCRIndexBrowserServlet</servlet-name>
     <dispatcher>REQUEST</dispatcher>
   </filter-mapping>
@@ -132,16 +119,8 @@
     <url-pattern>/servlets/MCRFileNodeServlet/*</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
-    <servlet-name>MCRLoginServlet</servlet-name>
-    <url-pattern>/servlets/MCRLoginServlet</url-pattern>
-  </servlet-mapping>
-  <servlet-mapping>
     <servlet-name>MCROAIProvider</servlet-name>
     <url-pattern>/servlets/MCROAIProvider</url-pattern>
-  </servlet-mapping>
-  <servlet-mapping>
-    <servlet-name>MCRUserServlet</servlet-name>
-    <url-pattern>/servlets/MCRUserServlet</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
     <servlet-name>XMLEditor</servlet-name>
