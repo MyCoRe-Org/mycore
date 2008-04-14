@@ -16,9 +16,9 @@
       <key>
         <column name="category" />
       </key>
-      <map-key type="string" formula="lang" />
+      <map-key type="string" column="lang" />
       <composite-element class="org.mycore.datamodel.classifications2.MCRLabel">
-        <property name="lang" />
+        <property name="lang" formula="lang"/>
         <property name="text" />
         <property name="description" not-null="false" />
       </composite-element>
