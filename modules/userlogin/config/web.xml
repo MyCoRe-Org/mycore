@@ -1,0 +1,28 @@
+
+<!-- **************************************************************** -->
+<!-- Servlets and mappings of userlogin                               -->
+<!-- **************************************************************** -->
+
+  <servlet id="User">
+    <servlet-name>MCRUserServlet</servlet-name>
+    <servlet-class>org.mycore.frontend.servlets.MCRUserServlet</servlet-class>
+  </servlet>
+  <servlet id="Login">
+    <servlet-name>MCRLoginServlet</servlet-name>
+    <servlet-class>org.mycore.frontend.servlets.MCRLoginServlet</servlet-class>
+  </servlet>
+
+  <filter-mapping>
+    <filter-name>UriResolverDebugFilter</filter-name>
+    <servlet-name>MCRLoginServlet</servlet-name>
+    <dispatcher>REQUEST</dispatcher>
+  </filter-mapping>
+  <servlet-mapping>
+    <servlet-name>MCRUserServlet</servlet-name>
+    <url-pattern>/servlets/MCRUserServlet</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>MCRLoginServlet</servlet-name>
+    <url-pattern>/servlets/MCRLoginServlet</url-pattern>
+  </servlet-mapping>
+
