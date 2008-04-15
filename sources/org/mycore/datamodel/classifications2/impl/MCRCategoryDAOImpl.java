@@ -124,6 +124,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
     public boolean exist(MCRCategoryID id) {
         Criteria criteria = MCRHIBConnection.instance().getSession().createCriteria(CATEGRORY_CLASS);
         criteria.setProjection(Projections.rowCount()).add(getCategoryCriterion(id));
+        criteria.setCacheable(true);
         Number result = (Number) criteria.uniqueResult();
         if (result == null) {
             return false;
@@ -141,6 +142,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         q.setInteger("right", leftRight[1]);
         q.setString("lang", lang);
         q.setString("text", text);
+        q.setCacheable(true);
         return (List<MCRCategory>) q.list();
     }
 
@@ -167,6 +169,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
                 Subqueries.propertyEq("parent", DetachedCriteria.forClass(CATEGRORY_CLASS).setProjection(Projections.property("internalID")).add(
                         getCategoryCriterion(cid))));
         c.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
+        c.setCacheable(true);
         return (List<MCRCategory>) c.list();
     }
 
@@ -188,6 +191,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         Criteria c = session.createCriteria(CATEGRORY_CLASS);
         c.add(Restrictions.eq("left", LEFT_START_VALUE));
         c.setProjection(Projections.projectionList().add(Projections.property("rootID")).add(Projections.property("categID")));
+        c.setCacheable(true);
         List<Object[]> result = c.list();
         List<MCRCategoryID> classIds = new ArrayList<MCRCategoryID>(result.size());
         for (Object[] cat : result) {

@@ -27,12 +27,17 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.lang.management.ManagementFactory;
 import java.util.Iterator;
+
+import net.sf.ehcache.CacheManager;
+import net.sf.ehcache.management.ManagementService;
 
 import org.apache.log4j.Logger;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
+import org.hibernate.cfg.Environment;
 import org.hibernate.jmx.StatisticsService;
 import org.hibernate.mapping.Table;
 import org.hibernate.stat.Statistics;
@@ -73,7 +78,7 @@ public class MCRHIBConnection implements Closeable, MCRSessionListener {
 
     @Override
     protected void finalize() throws Throwable {
-        System.out.println("\n"+this.getClass()+"is finalized!\n");
+        System.out.println("\n" + this.getClass() + "is finalized!\n");
         super.finalize();
     }
 
@@ -130,7 +135,15 @@ public class MCRHIBConnection implements Closeable, MCRSessionListener {
     private static void registerStatisticsService() {
         StatisticsService stats = new StatisticsService();
         stats.setSessionFactory(SESSION_FACTORY);
-        MCRJMXBridge.register(stats, "Hibernate", "Statistics");
+        final String hibernateBaseName = "Hibernate";
+        MCRJMXBridge.register(stats, hibernateBaseName, "Statistics");
+        String cacheProviderClass = HIBCFG.getProperty(Environment.CACHE_PROVIDER);
+        LOGGER.debug("Cacheprovider is: " + cacheProviderClass);
+        if (cacheProviderClass != null && cacheProviderClass.equals("net.sf.ehcache.hibernate.SingletonEhCacheProvider")) {
+            CacheManager cacheMgr = CacheManager.getInstance();
+            cacheMgr.setName(MCRConfiguration.instance().getString("MCR.NameOfProject", "MyCoRe-Application").replace(':', ' '));
+            ManagementService.registerMBeans(cacheMgr, ManagementFactory.getPlatformMBeanServer(), true, true, true, true);
+        }
     }
 
     /**
@@ -205,8 +218,8 @@ public class MCRHIBConnection implements Closeable, MCRSessionListener {
             }
         }
         SESSION_FACTORY.close();
-        SESSION_FACTORY=null;
-        SINGLETON=null;
+        SESSION_FACTORY = null;
+        SINGLETON = null;
     }
 
     public void handleStatistics(Statistics stats) throws FileNotFoundException, IOException {

@@ -118,6 +118,7 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
     public Collection<String> getLinksFromCategory(MCRCategoryID id) {
         Session session = MCRHIBConnection.instance().getSession();
         Query q = session.getNamedQuery(LINK_CLASS.getName() + ".ObjectIDByCategory");
+        q.setCacheable(true);
         q.setParameter("category", id);
         return q.list();
     }
@@ -126,6 +127,7 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
     public Collection<String> getLinksFromCategoryForType(MCRCategoryID id, String type) {
         Session session = MCRHIBConnection.instance().getSession();
         Query q = session.getNamedQuery(LINK_CLASS.getName() + ".ObjectIDByCategoryAndType");
+        q.setCacheable(true);
         q.setParameter("category", id);
         q.setParameter("type", id);
         return q.list();
@@ -135,6 +137,7 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
     public Collection<MCRCategoryID> getLinksFromObject(String id) {
         Session session = MCRHIBConnection.instance().getSession();
         Query q = session.getNamedQuery(LINK_CLASS.getName() + ".categoriesByObjectID");
+        q.setCacheable(true);
         q.setParameter("id", id);
         List<Object[]> result = q.list();
         ArrayList<MCRCategoryID> returns=new ArrayList<MCRCategoryID>(result.size());
