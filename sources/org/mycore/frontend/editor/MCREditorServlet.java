@@ -514,6 +514,9 @@ public class MCREditorServlet extends MCRServlet implements MCRSessionListener {
               sb.append("XSL.editor.session.id=");
               sb.append(sessionID);
             }
+            
+            path = path.replace('/','_').replace('@','_').replace('[','_').replace(']','_');
+            sb.append("#rep").append(path);
 
             logger.debug("Editor redirect to " + sb.toString());
             res.sendRedirect(res.encodeRedirectURL(sb.toString()));

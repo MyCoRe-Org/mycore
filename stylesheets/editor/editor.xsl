@@ -312,6 +312,7 @@
   </xsl:variable>
 
   <tr>
+    <a name="rep{translate($var,'/@[]','____')}" />
     <xsl:if test="@pos = 'left'">
       <xsl:call-template name="repeater.pmud">
         <xsl:with-param name="var"    select="$var" />
