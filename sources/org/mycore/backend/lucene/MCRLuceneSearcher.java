@@ -26,6 +26,7 @@ package org.mycore.backend.lucene;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.Iterator;
@@ -281,6 +282,7 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
 		}
         
 		MCRResults result = new MCRResults();
+        DecimalFormat df = new DecimalFormat("0.00000000000");
 
         for (int i = 0; i < found; i++) {
             org.apache.lucene.document.Document doc = hits.doc(i);
@@ -288,7 +290,7 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
 
             String id = doc.get("returnid");
             MCRHit hit = new MCRHit(id);
-            String score = Float.toString(hits.score(i));
+            String score = df.format(hits.score(i));
             //String score = Float.toString(hits.scoreDocs[i].score);
             addSortDataToHit(sortBy, doc, hit, score);
             result.addHit(hit);
