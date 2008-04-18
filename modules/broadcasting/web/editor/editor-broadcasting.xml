@@ -1,9 +1,9 @@
-<?xml version="1.0" encoding="ISO_8859-1"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE editor>
 
 <editor id="editor-broadcasting">
 	<source uri="webapp:modules/broadcasting/config/mcr-module-broadcasting.xml" />
-	<target type="webapp" name="modules/broadcasting/config/mcr-module-broadcasting.xml"/>
+	<target type="webapp" name="modules/broadcasting/config/mcr-module-broadcasting.xml" url="MCRBroadcastingServlet?mode=getReceiverList"/>
 	<cancel url="servlets/MCRBroadcastingServlet?mode=getReceiverList"/>
 
 	<components root="editor-broadcasting" var="/mcr-module-broadcasting">
@@ -164,7 +164,7 @@
 											<cell row="10" col="1">
 												<list width="150" type="dropdown">
 													<item value="">
-														<label xml:lang="de">(bitte auswählen)</label>
+														<label xml:lang="de">(bitte auswÃ¤hlen)</label>
 														<label xml:lang="en">(choose a value)</label>
 													</item>
 													<include uri="request:servlets/MCRUserEditorServlet?mode=getAssignableGroupsForUser" cacheable="false" />
@@ -197,7 +197,7 @@
 											<cell row="10" col="1">
 												<list width="150" type="dropdown">
 													<item value="">
-														<label xml:lang="de">(bitte auswählen)</label>
+														<label xml:lang="de">(bitte auswÃ¤hlen)</label>
 														<label xml:lang="en">(choose a value)</label>
 													</item>
 													<include uri="request:servlets/MCRUserEditorServlet?mode=getAllUsers" cacheable="false" />
