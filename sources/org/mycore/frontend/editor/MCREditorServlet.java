@@ -65,7 +65,7 @@ import org.mycore.frontend.servlets.MCRServletJob;
  * converts the submitted data into a JDOM XML document for further processing.
  * It can also handle file uploads.
  * 
- * @author Frank Lützenkirchen
+ * @author Frank Lï¿½tzenkirchen
  * @version $Revision$ $Date$
  */
 public class MCREditorServlet extends MCRServlet implements MCRSessionListener {
@@ -627,7 +627,7 @@ public class MCREditorServlet extends MCRServlet implements MCRSessionListener {
       
       String url = sub.getParameters().getParameter("_target-url");
       Element cancel = editor.getChild("cancel");
-      if( ( cancel != null ) && ( cancel.getAttributeValue( "url" ) != null ) )
+      if( ((url ==null) || (url.length() == 0)) && ( cancel != null ) && ( cancel.getAttributeValue( "url" ) != null ) )
         url = cancel.getAttributeValue( "url" );
         
       logger.debug("EditorServlet redirecting to " + url);
