@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
+<?xml version="1.0" encoding="UTF-8"?>
 
 <!-- ============================================== -->
 <!--  MyCoRe - Module-Broadcasting 					-->
@@ -11,7 +11,9 @@
 <!-- ============================================== -->
 
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-	xmlns:xalan="http://xml.apache.org/xalan">
+	xmlns:xalan="http://xml.apache.org/xalan"
+    xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation"
+	>
 	
 	<xsl:include href="MyCoReLayout.xsl"/>
 	<xsl:variable name="PageTitle" select="'Module-Broadcasting Monitoring'"/>
@@ -27,7 +29,7 @@
 				<table width="100%">
 					<!-- general infos -->
 					<tr>
-						<th align="left">General setup: <a href="{concat($WebApplicationBaseURL,'modules/broadcasting/web/editor/editor_start_broadcasting.xml')}" >edit</a></th>
+						<th align="left"><xsl:value-of select="i18n:translate('broadcasting.label.setup')" />&#160;<a href="{concat($WebApplicationBaseURL,'modules/broadcasting/web/editor/editor_start_broadcasting.xml')}" ><xsl:value-of select="i18n:translate('broadcasting.label.edit')" /></a></th>
 					</tr>
 					<tr>
 						<td>
@@ -37,7 +39,7 @@
 					<xsl:call-template name="lineBreak"/>
 					<!-- receiver list -->
 					<tr>
-						<th align="left">Receiver list:</th>
+						<th align="left"><xsl:value-of select="i18n:translate('broadcasting.label.receiver')" /></th>
 					</tr>
 					<tr>
 						<td>
@@ -50,7 +52,7 @@
 						<xsl:otherwise>
 							<!-- clear receiver list -->
 							<tr>
-								<th align="left">Clear receiver list:</th>
+								<th align="left"><xsl:value-of select="i18n:translate('broadcasting.label.clearlist')" /></th>
 							</tr>
 							<tr>
 								<td>
@@ -64,7 +66,7 @@
 			<xsl:otherwise>
 				<table width="100%">
 					<tr>
-						<td align="left">No access.</td>
+						<td align="left"><xsl:value-of select="i18n:translate('broadcasting.label.noaccess')" /></td>
 					</tr>
 				</table>
 			</xsl:otherwise>
@@ -78,15 +80,15 @@
 	<xsl:template match="receiverList">
 		<xsl:choose>
 			<xsl:when test="empty" >
-				<xsl:copy-of select="'Empty. No messages have been received, yet.'"/>
+				<xsl:value-of select="i18n:translate('broadcasting.message.receive')"/>
 			</xsl:when>
 			<xsl:otherwise>
 				<table style="border:solid 1px;" width="100%">
 					<tr>
-						<th align="left">Login name</th>
-						<th align="left">IP</th>
-						<th align="left">Session-ID</th>
-						<th align="left">Safed key</th>
+						<th align="left"><xsl:value-of select="i18n:translate('broadcasting.list.login')" /></th>
+						<th align="left"><xsl:value-of select="i18n:translate('broadcasting.list.ip')" /></th>
+						<th align="left"><xsl:value-of select="i18n:translate('broadcasting.list.session')" /></th>
+						<th align="left"><xsl:value-of select="i18n:translate('broadcasting.list.key')" /></th>
 					</tr>
 					<xsl:apply-templates select="receiver"/>
 				</table>
@@ -113,7 +115,7 @@
 	</xsl:template>
 	<!-- ======================================================================================== -->
 	<xsl:template name="clearReceiverList">
-		<a href="{$servlet}?mode=clearReceiverList">Clear receiver list </a>
+		<a href="{$servlet}?mode=clearReceiverList"><xsl:value-of select="i18n:translate('broadcasting.label.clearlist')" /></a>
 	</xsl:template>
 	<!-- ======================================================================================== -->
 	<xsl:template name="lineBreak">
@@ -131,25 +133,25 @@
 		</xsl:variable>
 		<table style="border:solid 1px;" >
 			<tr>
-				<th align="left">Power:</th>
+				<th align="left"><xsl:value-of select="i18n:translate('broadcasting.label.power')" /></th>
 				<td>
 					<xsl:value-of select="xalan:nodeset($config)//power/text()"/>
 				</td>
 			</tr>
 			<tr>
-				<th align="left">on air time:</th>
+				<th align="left"><xsl:value-of select="i18n:translate('broadcasting.label.onair')" /></th>
 				<td>
 					<xsl:value-of select="xalan:nodeset($config)//onAirTime/@send"/>
 				</td>
 			</tr>						
 			<tr>
-				<th align="left">refresh rate:</th>
+				<th align="left"><xsl:value-of select="i18n:translate('broadcasting.label.refresh')" /></th>
 				<td>
-					<xsl:value-of select="xalan:nodeset($config)//refreshRate/text()"/> sec
+					<xsl:value-of select="xalan:nodeset($config)//refreshRate/text()"/>&#160;<xsl:value-of select="i18n:translate('broadcasting.label.sec')" />
 				</td>
 			</tr>
 			<tr>
-				<th align="left">session sensitive:</th>
+				<th align="left"><xsl:value-of select="i18n:translate('broadcasting.label.sens')" /></th>
 				<td>
 					<xsl:value-of select="xalan:nodeset($config)//sessionSensitive/text()"/> 
 				</td>

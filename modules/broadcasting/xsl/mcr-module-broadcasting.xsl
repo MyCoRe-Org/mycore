@@ -10,7 +10,11 @@
 <!--												-->
 <!-- ============================================== -->
 
-<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xalan="http://xml.apache.org/xalan">
+<xsl:stylesheet version="1.0" 
+	xmlns:xsl="http://www.w3.org/1999/XSL/Transform" 
+	xmlns:xalan="http://xml.apache.org/xalan"
+    xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation"
+	>
 	
 	<xsl:param name="WebApplicationBaseURL"/>
 	<xsl:param name="CurrentGroups"/>
@@ -73,14 +77,14 @@
 	</xsl:template>
 	<!-- ======================================================================================== -->
 	<xsl:template name="send.noSignal">
-		<signal>off</signal>
+		<signal><xsl:value-of select="i18n:translate('broadcasting.signal.off')" /></signal>
 	</xsl:template>
 	<!-- ======================================================================================== -->
 	<xsl:template name="send.message">
 		<xsl:variable name="message.body">
 			<xsl:call-template name="get.message"/>
 		</xsl:variable>
-		<signal>on</signal>
+		<signal><xsl:value-of select="i18n:translate('broadcasting.signal.on')" /></signal>
 		<message.header>
 			<xsl:copy-of select="message.header/text()"/>
 		</message.header>

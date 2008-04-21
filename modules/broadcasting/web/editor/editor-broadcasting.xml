@@ -11,53 +11,33 @@
 			<cell row="10" col="1">
 				<panel id="setting" lines="on">
 					<cell row="10" col="1">
-						<text>
-							<label xml:land="de">Power:</label>
-						</text>
+						<text i18n="broadcasting.editor.label.power"/>
 					</cell>
 					<cell row="10" col="2" var="power">
 						<list type="radio" rows="1">
-							<item value="on">
-								<label xml:lang="de">An</label>
-							</item>
-							<item value="off">
-								<label xml:lang="de">Aus</label>
-							</item>
+							<item value="on" i18n="broadcasting.signal.on"/>
+							<item value="off" i18n="broadcasting.signal.off"/>
 						</list>
 					</cell>
 					
 					<cell row="20" col="1">
-						<text>
-							<label xml:land="de">On Air Time:</label>
-						</text>
+						<text i18n="broadcasting.editor.label.onair"/>
 					</cell>
 					<cell row="20" col="2" var="onAirTime">
 						<panel id="onAirTime" lines="on">
 							<cell row="10" col="1" var="@send">
 								<list type="radio" rows="1">
-									<item value="ever">
-										<label xml:lang="de">Immer</label>
-									</item>
-									<item value="never">
-										<label xml:lang="de">Nie</label>
-									</item>
+									<item value="ever" i18n="broadcasting.editor.common.ever"/>
+									<item value="never" i18n="broadcasting.editor.common.never"/>
 								</list>
 							</cell>
 							
 							<cell row="20" col="1" var="from">
-								<text>
-									<label xml:lang="de">
-										<span style="margin-right:10px;">Von</span>
-									</label>
-								</text>
+								<text i18n="broadcasting.editor.common.from" />
 								<textfield width="30" />
 							</cell>
 							<cell row="20" col="2" var="to">
-								<text>
-									<label xml:lang="de">
-										<span style="margin-left:10px; margin-right:10px;">Bis</span>
-									</label>
-								</text>
+								<text i18n="broadcasting.editor.common.to" />
 								<textfield width="30" />
 							</cell>
 						</panel>
@@ -65,30 +45,20 @@
 					</cell>
 					
 					<cell row="30" col="1">
-						<text>
-							<label xml:land="de">Refresh rate:</label>
-						</text>
+						<text i18n="broadcasting.editor.label.refresh"/>
 					</cell>
 					<cell row="30" col="2" var="refreshRate">
 						<textfield width="10" />
-						<text>
-							<label xml:lang="de">Sekunde(n)</label>
-						</text>
+						<text i18n="broadcasting.editor.label.sec"/>
 					</cell>
 					
 					<cell row="40" col="1">
-						<text>
-							<label xml:land="de">Session sensitive:</label>
-						</text>
+						<text i18n="broadcasting.editor.label.sens" />
 					</cell>
 					<cell row="40" col="2" var="sessionSensitive">
 						<list type="radio" rows="1">
-							<item value="true">
-								<label xml:lang="de">Ja</label>
-							</item>
-							<item value="false">
-								<label xml:lang="de">Nein</label>
-							</item>
+							<item value="true" i18n="broadcasting.editor.common.yes"/>
+							<item value="false" i18n="broadcasting.editor.common.no"/>
 						</list>
 						<text>
 							<label>
@@ -103,36 +73,26 @@
 					
 
 					<cell row="50" col="1">
-						<text>
-							<label xml:land="de">Message Header:</label>
-						</text>
+						<text i18n="broadcasting.editor.label.header" />
 					</cell>
 					<cell row="50" col="2" var="message.header">
 						<textfield width="50" />
 					</cell>
 
 					<cell row="60" col="1">
-						<text>
-							<label xml:land="de">Message Tail:</label>
-						</text>
+						<text i18n="broadcasting.editor.label.tail" />
 					</cell>
 					<cell row="60" col="2" var="message.tail">
 						<textfield width="50" />
 					</cell>
 
 					<cell row="70" col="1">
-						<text>
-							<label xml:land="de">Allow guest group:</label>
-						</text>
+						<text i18n="broadcasting.editor.label.allowguest" />
 					</cell>
 					<cell row="70" col="2" var="receivers/@allowGuestGroup">
 						<list type="radio" rows="1">
-							<item value="true">
-								<label xml:lang="de">Ja</label>
-							</item>
-							<item value="false">
-								<label xml:lang="de">Nein</label>
-							</item>
+							<item value="true" i18n="broadcasting.editor.common.yes"/>
+							<item value="false" i18n="broadcasting.editor.common.no"/>
 						</list>
 						<text>
 							<label>
@@ -151,9 +111,7 @@
 						<repeater min="0" max="1024">
 							<panel id="receiver.group">
 								<cell row="10" col="1">
-									<text>
-										<label xml:land="de">Nachricht an Gruppe:</label>
-									</text>
+									<text i18n="broadcasting.editor.label.togroup"/>
 								</cell>
 								<cell row="10" col="2" var="group">
 									<repeater min="0" max="1024">
@@ -163,10 +121,7 @@
 											</cell> -->
 											<cell row="10" col="1">
 												<list width="150" type="dropdown">
-													<item value="">
-														<label xml:lang="de">(bitte auswählen)</label>
-														<label xml:lang="en">(choose a value)</label>
-													</item>
+													<item value="" i18n="broadcasting.editor.common.select"/>
 													<include uri="request:servlets/MCRUserEditorServlet?mode=getAssignableGroupsForUser" cacheable="false" />
 												</list>
 											</cell>
@@ -184,9 +139,7 @@
 						<repeater min="0" max="1024">
 							<panel id="receiver.user">
 								<cell row="10" col="1">
-									<text>
-										<label xml:land="de">Nachricht an Benutzer:</label>
-									</text>
+									<text i18n="broadcasting.editor.label.touser"/>
 								</cell>
 								<cell row="10" col="2" var="user">
 									<repeater min="0" max="1024">
@@ -196,10 +149,7 @@
 											</cell> -->
 											<cell row="10" col="1">
 												<list width="150" type="dropdown">
-													<item value="">
-														<label xml:lang="de">(bitte auswählen)</label>
-														<label xml:lang="en">(choose a value)</label>
-													</item>
+													<item value="" i18n="broadcasting.editor.common.select"/>
 													<include uri="request:servlets/MCRUserEditorServlet?mode=getAllUsers" cacheable="false" />
 												</list>
 											</cell>
@@ -222,12 +172,12 @@
 				<panel id="buttons" lines="on">
 					<cell row="10" col="2">
 						<submitButton width="100px">
-							<label xml:lang="de">OK</label>
+							<label i18n="broadcasting.editor.button.submit"/>
 						</submitButton>
 					</cell>
 					<cell row="10" col="1">
 						<cancelButton width="100px">
-							<label xml:lang="de">Abbrechen</label>
+							<label i18n="broadcasting.editor.button.cancel"/>
 						</cancelButton>
 					</cell>
 				</panel>
