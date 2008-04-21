@@ -174,7 +174,7 @@ public class MCROAIProvider extends MCRServlet {
 
     private static final String STR_SCHEMA_INSTANCE = "http://www.w3.org/2001/XMLSchema-instance";
 
-    private static final String STR_GRANULARITY = "yyyy-MM-dd'T'HH:mm:dd'Z'";
+    private static final String STR_GRANULARITY = "yyyy-MM-dd'T'HH:mm:ss'Z'";
 
     private static final String STR_GRANULARITY_SHORT = "yyyy-MM-dd";
 
