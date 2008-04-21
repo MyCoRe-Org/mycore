@@ -43,7 +43,7 @@
 	    </echo>
 
         <antcall target="javac">
-            <param name="packages" value="org/mycore/frontend/servlest/**" />
+            <param name="packages" value="org/mycore/frontend/servlets/**" />
         </antcall>
     </target>
 
