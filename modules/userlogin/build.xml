@@ -5,21 +5,11 @@
 <!-- $Revision: 1.1 $ $Date: 2008/04/11 09:09:38 $                      -->
 <!-- =================================================================== -->
 
-<project name="MyCoReModule - UserLogin" default="usage" basedir=".">
+<project name="MyCoReModule - UserLogin" default="usage" basedir="../..">
 
 	<property name="build.sysclasspath" value="last" />
-
-	<!-- =================================================================== -->
-	<!-- The info target                                                     -->
-	<!-- =================================================================== -->
-
-	<target name="info">
-		<echo level="info">
-           Ant version: ${ant.version}
-      Java JDK version: ${java.version}
-      Operating system: ${os.name}, version: ${os.version}, architecture: ${os.arch}
-    </echo>
-	</target>
+	<property name="module.base" value="userlogin" />
+	<property name="module.dir" value="${basedir}/modules/${module.base}" />
 
 	<!-- =================================================================== -->
 	<!-- Help on usage                                                       -->
@@ -27,35 +17,48 @@
 
 	<target name="usage">
 		<echo level="info">
-      Usage:
-        ant [target]
 
       Available targets are:
-        info                 --> Shows Java/Ant/Operating System version
-        compile              --> Compiles all sources under the sample directory
-    </echo>
-	</target>
+        compile              --> Compiles all sources of this module
 
+      Please do not use any of the other targets, they are internal.
+		</echo>
+	</target>
+	
 	<!-- =================================================================== -->
-	<!-- Initalization of directories and CLASSPATH, LIBPATH                 -->
+	<!-- Info                                                                -->
 	<!-- =================================================================== -->
+
+	<target name="info">
+		<echo>${ant.project.name} will include programs login part of the web application.</echo>
+	</target>
+	
+    <!-- =================================================================== -->
+    <!-- Compiles the sources from directory sources to directory classes    -->
+    <!-- =================================================================== -->
+
+    <target name="compile">
+        <echo level="info">
+			compiling ${ant.project.name} classes
+	    </echo>
+
+        <antcall target="javac">
+            <param name="packages" value="org/mycore/frontend/servlets/**" />
+        </antcall>
+    </target>
 
 	<target name="init">
 		<mkdir dir="${basedir}/classes" />
 		<path id="mycore.classpath">
-			<fileset dir="${basedir}/lib" includes="*.jar" />
+			<fileset dir="${basedir}/lib" includes="*.jar"/>
 		</path>
 	</target>
 
-	<!-- =================================================================== -->
-	<!-- Compiles all application classes                                    -->
-	<!-- =================================================================== -->
-
-	<target name="javac" depends="init">
-		<echo level="info">Compiling ${packages}</echo>
-		<javac srcdir="${basedir}/modules/userlogin/sources" 
-			destdir="${basedir}/classes" 
-			includes="${packages}" 
+    <target name="javac" depends="init">
+        <echo level="info">compiling ${packages}</echo>
+        <javac 
+			srcdir="${module.dir}/sources" 
+			destdir="${basedir}/classes" includes="${packages}" 
 			classpathref="mycore.classpath" 
 			debug="${debug}" 
 			optimize="${optimize}" 
@@ -63,15 +66,8 @@
 			source="${sourcerelease}" 
 			encoding="${sourceencoding}" 
 			deprecation="${deprecation}">
-		</javac>
-	</target>
-
-	<target name="compile">
-		<echo level="info">Compiling module UserLogin sources</echo>
-		<antcall target="javac">
-			<param name="packages" value="org/mycore/**" />
-		</antcall>
-	</target>
+        </javac>
+    </target>
 
 	<!-- =================================================================== -->
 
