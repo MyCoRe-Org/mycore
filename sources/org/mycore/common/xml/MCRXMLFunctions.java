@@ -125,15 +125,21 @@ public class MCRXMLFunctions {
         mcrdate.setFormat(isoFormat);
         mcrdate.setDate(isoDate);
         Date date = mcrdate.getDate();
-        return (date == null) ? "?"+isoDate+"?" : df.format(date);
+        return (date == null) ? "?" + isoDate + "?" : df.format(date);
     }
 
     public static String getISODate(String simpleDate, String simpleFormat, String isoFormat) throws ParseException {
-        SimpleDateFormat df = new SimpleDateFormat(simpleFormat);
-        df.setTimeZone(TimeZone.getTimeZone("UTC")); // or else testcase
-                                                        // "1964-02-24" would
-                                                        // result "1964-02-23"
-        Date date = df.parse(simpleDate);
+        Date date;
+        if (simpleFormat.equals("long")) {
+            date = new Date(Long.parseLong(simpleDate));
+        } else {
+            SimpleDateFormat df = new SimpleDateFormat(simpleFormat);
+            df.setTimeZone(TimeZone.getTimeZone("UTC")); 
+            // or else testcase
+            // "1964-02-24" would
+            // result "1964-02-23"
+            date = df.parse(simpleDate);
+        }
         MCRMetaISO8601Date mcrdate = new MCRMetaISO8601Date();
         mcrdate.setDate(date);
         mcrdate.setFormat(isoFormat);
@@ -149,14 +155,13 @@ public class MCRXMLFunctions {
     }
 
     public static int getQueryHitCount(String query) {
-        MCRCondition condition = new MCRQueryParser().parse( query );
-        MCRQuery q = new MCRQuery( condition );
+        MCRCondition condition = new MCRQueryParser().parse(query);
+        MCRQuery q = new MCRQuery(condition);
         long start = System.currentTimeMillis();
-        MCRResults result = MCRQueryManager.search( q );
-        if( LOGGER.isDebugEnabled() )
-        {
-          long qtime = System.currentTimeMillis() - start;
-          LOGGER.debug("total query time: " + qtime);
+        MCRResults result = MCRQueryManager.search(q);
+        if (LOGGER.isDebugEnabled()) {
+            long qtime = System.currentTimeMillis() - start;
+            LOGGER.debug("total query time: " + qtime);
         }
         return result.getNumHits();
     }
