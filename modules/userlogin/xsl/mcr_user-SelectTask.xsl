@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!-- ============================================== -->
-<!-- $Revision: 1.1 $ $Date: 2008/04/11 09:09:38 $ -->
+<!-- $Revision: 1.9 $ $Date: 2007-02-16 11:53:43 $ -->
 <!-- ============================================== -->
 
 <!-- +
@@ -32,28 +32,52 @@
 <xsl:include href="MyCoReLayout.xsl" />
 
 <xsl:variable name="heading">
-	<xsl:choose>
-     <xsl:when test="$CurrentLang = 'ar'" >
-       [&#160;<xsl:value-of select="$CurrentUser"/>&#160;]
-       <xsl:value-of select="concat(':', i18n:translate('userlogin.tasks.currentAccount'))"/>&#160;&#160;
-     </xsl:when>
-     <xsl:otherwise>
-       <xsl:value-of select="concat(i18n:translate('userlogin.tasks.currentAccount'),' :')"/>&#160;&#160;
-       [&#160;<xsl:value-of select="$CurrentUser"/>&#160;]
-     </xsl:otherwise>
-	</xsl:choose>
+    <xsl:value-of select="i18n:translate('userlogin.tasks.currentAccount')"/>&#160;&#160;
+    [&#160;<xsl:value-of select="$CurrentUser"/>&#160;]
 </xsl:variable>
 
 <xsl:variable name="MainTitle" select="i18n:translate('titles.mainTitle')"/>
 <xsl:variable name="PageTitle" select="i18n:translate('titles.pageTitle.selectTask')"/>
 
 <xsl:template name="userAction">
-	<center>
-		<xsl:value-of select="i18n:translate('userlogin.tasks.selectTask.hint')"/>
-	</center>
+	<p />
+    <xsl:value-of select="i18n:translate('userlogin.tasks.selectTask.todo')" /> <!-- "What do you want to do?" -->
+	<p />
+    <ul>
+        <li>
+            <a href="{$href-login}&amp;uid={$CurrentUser}">
+                <xsl:value-of select="i18n:translate('userlogin.tasks.selectTask.return')" /> <!-- "Back to the MyCoRe application" -->
+            </a>
+        </li>
+        <li>
+            <a href="{$href-user}&amp;mode=CreatePwdDialog">
+                <xsl:value-of select="i18n:translate('userlogin.tasks.selectTask.changePwd')" /> <!-- "Change password" -->
+            </a>
+        </li>
+        <li>
+            <a href="{$href-login}">
+                <xsl:value-of select="i18n:translate('userlogin.tasks.selectTask.changeUser')" /> <!-- "Change user" -->
+            </a>
+        </li>
+        <li>
+            <a href="{$href-user}&amp;mode=ShowUser">
+                <xsl:value-of select="i18n:translate('userlogin.tasks.selectTask.showUser')" /> <!-- "Show data of the current user account" -->
+            </a>
+        </li>
+        <li>
+            <a href="{$href-login}&amp;uid={$guest_id}&amp;pwd={$guest_pwd}">
+                <xsl:value-of select="i18n:translate('userlogin.tasks.selectTask.logout')"/> <!-- "Logout and work as guest user" -->
+            </a>
+        </li>
+    </ul>
 </xsl:template>
-
+	
 <xsl:template name="userStatus">
+      <xsl:if test="/mcr_user/@pwd_change_ok='true'">
+		<p class="status">
+            <xsl:value-of select="i18n:translate('userlogin.tasks.selectTask.changePwdOk')"/>
+        </p>
+      </xsl:if>
 </xsl:template>
 
 </xsl:stylesheet>
