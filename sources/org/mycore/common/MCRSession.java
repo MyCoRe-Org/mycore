@@ -45,9 +45,10 @@ import org.mycore.datamodel.classifications.MCRClassificationBrowserData;
  * 
  * @author Detlev Degenhardt
  * @author Jens Kupferschmidt
- * @author Frank Lützenkirchen
+ * @author Frank Lï¿½tzenkirchen
  * 
- * @version $Revision$ $Date$
+ * @version $Revision$ $Date: 2008-03-17 17:12:15 +0100 (Mo, 17 Mrz
+ *          2008) $
  */
 public class MCRSession implements Cloneable {
     /** A map storing arbitrary session data * */
@@ -75,7 +76,7 @@ public class MCRSession implements Cloneable {
     /** The unique ID of this session */
     private String sessionID = null;
 
-    /** -ASC- für MCRClassificationBrowser Class session daten */
+    /** -ASC- fï¿½r MCRClassificationBrowser Class session daten */
     public MCRClassificationBrowserData BData = null;
 
     private String FullName = null;
@@ -84,7 +85,7 @@ public class MCRSession implements Cloneable {
 
     private String ip = null;
 
-    private long loginTime, lastAccessTime, thisAccesstime;
+    private long loginTime, lastAccessTime, thisAccessTime, createTime;
 
     /**
      * The constructor of a MCRSession. As default the user ID is set to the
@@ -103,12 +104,14 @@ public class MCRSession implements Cloneable {
 
         LOGGER.debug("MCRSession created " + sessionID);
         setLoginTime();
+        createTime = loginTime;
+
     }
 
     public final void setLoginTime() {
         loginTime = System.currentTimeMillis();
         lastAccessTime = loginTime;
-        thisAccesstime = loginTime;
+        thisAccessTime = loginTime;
     }
 
     /**
@@ -282,8 +285,8 @@ public class MCRSession implements Cloneable {
      * @see MCRSessionMgr#setCurrentSession(MCRSession)
      */
     void activate() {
-        lastAccessTime = thisAccesstime;
-        thisAccesstime = System.currentTimeMillis();
+        lastAccessTime = thisAccessTime;
+        thisAccessTime = System.currentTimeMillis();
         accessCount.incrementAndGet();
         if (currentThreadCount.get().getAndIncrement() == 0) {
             fireSessionEvent(activated, concurrentAccess.incrementAndGet());
@@ -335,6 +338,14 @@ public class MCRSession implements Cloneable {
         for (MCRSessionListener listener : list) {
             listener.sessionEvent(event);
         }
+    }
+
+    public long getThisAccessTime() {
+        return thisAccessTime;
+    }
+
+    public long getCreateTime() {
+        return createTime;
     }
 
 }
