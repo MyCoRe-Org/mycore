@@ -39,8 +39,6 @@ import org.mycore.user.MCRUserMgr;
 public class MCRSessionListingServlet extends MCRServlet {
     private static final long serialVersionUID = 1L;
 
-    private static Logger LOGGER = Logger.getLogger(MCRSessionListingServlet.class);
-
     private static final String PARAMS_PREFIX = "sessionListing.";
 
     public void doGetPost(MCRServletJob job) throws Exception {
