@@ -170,6 +170,7 @@ public class MCRLinkTableEventHandler extends MCREventHandlerBase {
     protected final void handleObjectDeleted(MCREvent evt, MCRObject obj) {
         MCRObjectID mcr_id = obj.getId();
         mcr_linktable.deleteReferenceLink(mcr_id);
+        MCRCategLinkServiceFactory.getInstance().deleteLink(mcr_id.getId());
     }
 
     /**
