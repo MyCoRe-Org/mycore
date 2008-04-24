@@ -202,4 +202,8 @@ public class MCRSessionMgr {
         listenersLock.writeLock().unlock();
     }
 
+    public static Map<String, MCRSession> getAllSessions() {
+        return sessions;
+    }
+
 }
