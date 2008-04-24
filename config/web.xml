@@ -78,7 +78,11 @@
     <servlet-name>MCRLinkServlet</servlet-name>
     <servlet-class>org.mycore.frontend.servlets.MCRLinkServlet</servlet-class>
   </servlet>
-
+  <servlet id="MCRSessionListingServlet">
+    <servlet-name>MCRSessionListingServlet</servlet-name>
+    <servlet-class>org.mycore.frontend.servlets.MCRSessionListingServlet</servlet-class>
+  </servlet>
+  
   <filter-mapping>
     <filter-name>WebAppBaseFilter</filter-name>
     <url-pattern>/*</url-pattern>
@@ -166,6 +170,10 @@
     <servlet-name>MCRLinkServlet</servlet-name>
     <url-pattern>/servlets/MCRLinkServlet</url-pattern>
   </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>MCRSessionListingServlet</servlet-name>
+    <url-pattern>/servlets/MCRSessionListingServlet</url-pattern>
+  </servlet-mapping>  
 
   <!-- **************************************************************** -->
   <!-- General configuration                                            -->
