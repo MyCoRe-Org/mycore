@@ -72,6 +72,7 @@ import org.mycore.common.MCRUtils;
 import org.mycore.datamodel.ifs.MCRContentInputStream;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
+import org.mycore.user.MCRUser;
 import org.mycore.user.MCRUserMgr;
 import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
@@ -80,7 +81,7 @@ import org.xml.sax.SAXException;
  * Does the layout for other MyCoRe servlets by transforming XML input to
  * various output formats, using XSL stylesheets.
  * 
- * @author Frank Lützenkirchen
+ * @author Frank Lï¿½tzenkirchen
  * @author Thomas Scheffler (yagee)
  * 
  * @version $Revision$ $Date$
@@ -305,12 +306,12 @@ public class MCRLayoutService implements org.apache.xalan.trace.TraceListener {
 
         boolean setCurrentGroups = MCRConfiguration.instance().getBoolean("MCR.Users.SetCurrentGroups", true);
         if (setCurrentGroups) { // for MyCoRe applications, always true
-            StringBuffer groups = new StringBuffer();
-
-            List<String> groupList = MCRUserMgr.instance().retrieveUser(uid).getGroupIDs();
+            final MCRUser mcrUser = MCRUserMgr.instance().retrieveUser(uid);
+            StringBuffer groups = new StringBuffer(mcrUser.getPrimaryGroupID());
+            List<String> groupList = mcrUser.getGroupIDs();
             for (int i = 0; i < groupList.size(); i++) {
                 if (i != 0)
-                    groups.append(" ");
+                    groups.append(' ');
                 groups.append((String) groupList.get(i));
             }
             parameters.put("CurrentGroups", groups.toString());
