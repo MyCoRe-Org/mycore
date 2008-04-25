@@ -324,13 +324,26 @@ public class MCRSearchServlet extends MCRServlet {
         if (root.getChild("conditions").getAttributeValue("format", "xml").equals("xml")) {
             // Query is in XML format
 
-            // Rename condition elements from search mask:
-            // condition1 -> condition
+            // Rename condition elements from search mask: condition1 -> condition
+            // Transform condition with multiple values into OR condition
             Iterator it = root.getDescendants(new ElementFilter());
             while (it.hasNext()) {
                 Element elem = (Element) it.next();
                 if ((!elem.getName().equals("conditions")) && elem.getName().startsWith("condition"))
                     elem.setName("condition");
+                else if (elem.getName().equals("value"))
+                {
+                  Element parent = elem.getParentElement();
+                  parent.removeAttribute("value");
+                  parent.setAttribute("children","true");
+
+                  elem.setName("condition");
+                  elem.setAttribute("field",parent.getAttributeValue("field"));
+                  elem.setAttribute("operator",parent.getAttributeValue("operator"));
+                  elem.setAttribute("value",elem.getText());
+                  elem.removeContent();
+                  
+                }
             }
 
             // Find condition fields without values
@@ -338,7 +351,13 @@ public class MCRSearchServlet extends MCRServlet {
             Vector<Element> help = new Vector<Element>();
             while (it.hasNext()) {
                 Element condition = (Element) it.next();
-                if (condition.getAttribute("value") == null) {
+                if (condition.getAttribute("children") != null) {
+                    // Transform into OR condition
+                    condition.setName("boolean");
+                    condition.setAttribute("operator","or");
+                    condition.removeAttribute("children");
+                }
+                else if (condition.getAttribute("value") == null) {
                     help.add(condition);
                 }
             }
