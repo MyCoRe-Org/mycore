@@ -25,7 +25,6 @@ package org.mycore.frontend.servlets;
 import java.io.IOException;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.mycore.access.MCRAccessManager;
@@ -57,23 +56,6 @@ public class MCRSessionListingServlet extends MCRServlet {
         // dispatch mode
         if (mode.equals("listSessions"))
             listSessions(job);
-        else if (mode.equals("destroySession")) {
-            destroySession(job);
-        }
-    }
-
-    private void destroySession(MCRServletJob job) {
-        // session id transmitted ?
-        String sessionID = null;
-        String paramSession = PARAMS_PREFIX + "sessionID";
-        if (job.getRequest().getParameter(paramSession) != null && !job.getRequest().getParameter(paramSession).equals(""))
-            sessionID = job.getRequest().getParameter(paramSession).trim();
-        else
-            throw new MCRException("Session can't be destroyed, because '" + PARAMS_PREFIX + "sessionID' parameter not given.");
-
-        // destroy
-        MCRSessionMgr.getSession(sessionID).close();
-
     }
 
     private void listSessions(MCRServletJob job) {
