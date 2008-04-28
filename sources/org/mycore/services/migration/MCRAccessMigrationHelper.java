@@ -30,14 +30,16 @@ import java.sql.Statement;
 import java.util.Properties;
 
 import org.hibernate.Session;
+import org.hibernate.persister.entity.Joinable;
 
 import org.mycore.backend.hibernate.MCRHIBConnection;
+import org.mycore.backend.hibernate.tables.MCRACCESS;
 import org.mycore.common.MCRConfiguration;
 
 /**
  * @author Thomas Scheffler (yagee)
  * 
- * @version $Revision$ $Date$
+ * @version $Revision$ 
  */
 class MCRAccessMigrationHelper {
 
@@ -54,12 +56,13 @@ class MCRAccessMigrationHelper {
     }
 
     static void dropTable() throws SQLException {
-        Connection con = MCRHIBConnection.instance().getSession().connection();
+        Session session = MCRHIBConnection.instance().getSession();
+        String tableName = getTableName();
+        Connection con = session.connection();
         Statement stmt = con.createStatement();
-        stmt.executeUpdate("DROP TABLE MCRACCESS");
+        stmt.executeUpdate("DROP TABLE " + tableName);
         stmt.close();
         con.commit();
-        Session session = MCRHIBConnection.instance().getSession();
         session.clear();
     }
 
@@ -67,6 +70,15 @@ class MCRAccessMigrationHelper {
         final File exportFile = getExportFile();
         exportFile.delete();
         exportFile.getParentFile().delete();
+    }
+
+    private static String getTableName() {
+        Session session = MCRHIBConnection.instance().getSession();
+        if (session.getSessionFactory() instanceof Joinable) {
+            return ((Joinable) session.getSessionFactory().getClassMetadata(MCRACCESS.class)).getTableName();
+        } else {
+            return MCRACCESS.class.getSimpleName();
+        }
     }
 
 }
