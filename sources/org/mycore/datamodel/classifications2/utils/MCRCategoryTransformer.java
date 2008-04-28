@@ -49,7 +49,8 @@ import org.mycore.datamodel.classifications2.MCRLabel;
  * 
  * @author Thomas Scheffler (yagee)
  * 
- * @version $Revision$ $Date$
+ * @version $Revision$ $Date: 2008-02-06 17:27:24 +0000 (Mi, 06 Feb
+ *          2008) $
  */
 public class MCRCategoryTransformer {
 
@@ -67,7 +68,7 @@ public class MCRCategoryTransformer {
     public static Document getMetaDataDocument(MCRCategory cl, boolean withCounter) {
         Map<MCRCategoryID, Number> countMap = null;
         if (withCounter) {
-            MCRCategLinkServiceFactory.getInstance().countLinks(getAllCategIDs(cl));
+            countMap = MCRCategLinkServiceFactory.getInstance().countLinks(getAllCategIDs(cl));
         }
         return MetaDataElementFactory.getDocument(cl, countMap);
     }
@@ -84,7 +85,7 @@ public class MCRCategoryTransformer {
     public static Element getMetaDataElement(MCRCategory category, boolean withCounter) {
         Map<MCRCategoryID, Number> countMap = null;
         if (withCounter) {
-            MCRCategLinkServiceFactory.getInstance().countLinks(getAllCategIDs(category));
+            countMap = MCRCategLinkServiceFactory.getInstance().countLinks(getAllCategIDs(category));
         }
         return MetaDataElementFactory.getElement(category, countMap);
     }
