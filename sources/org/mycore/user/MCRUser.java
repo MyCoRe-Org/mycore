@@ -345,6 +345,7 @@ public class MCRUser extends MCRUserObject implements MCRPrincipal, Principal {
      * u is considered to be an implicit member of groups G2 and G3.
      * 
      * @return list of all groups the user is a member of
+     * @deprecated use getGroupIDs instead
      */
     public final List<String> getAllGroupIDs() {
         return groupIDs;
