@@ -30,7 +30,8 @@ import java.io.Serializable;
  * associated MCRCategory instance is a root category (a classification).
  * 
  * @author Thomas Scheffler (yagee)
- * @version $Revision$ $Date$
+ * @version $Revision$ $Date: 2008-04-11 09:14:19 +0000 (Fr, 11 Apr
+ *          2008) $
  * @since 2.0
  */
 public class MCRCategoryID implements Serializable {
@@ -60,6 +61,10 @@ public class MCRCategoryID implements Serializable {
     public static MCRCategoryID rootID(String rootID) {
         String root = rootID.intern();
         return new MCRCategoryID(root, "");
+    }
+
+    public boolean isRootID() {
+        return ID == null || ID.equals("");
     }
 
     /*

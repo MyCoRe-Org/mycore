@@ -201,7 +201,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
     }
 
     public MCRCategory getRootCategory(MCRCategoryID baseID, int childLevel) {
-        if (baseID.getID() == null) {
+        if (baseID.isRootID()) {
             return getCategory(baseID, childLevel);
         }
         Session session = MCRHIBConnection.instance().getSession();
