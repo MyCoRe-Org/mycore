@@ -28,6 +28,6 @@
 #
 #######################################################################
 
-  MCR.Modules.MyCoRe=acl-editor,broadcasting,classhandler,indexing,swf,useradmin,userlogin,wcms,webcli,webservices,z3950
-# MCR.Modules.MyCoRe=acl-editor,broadcasting,classhandler,imaging,indexing,swf,useradmin,userlogin,wcms,webcli,webservices,z3950
+  MCR.Modules.MyCoRe=acl-editor,broadcasting,classhandler,indexing,swf,useradmin,userlogin,wcms,webservices,z3950
+# MCR.Modules.MyCoRe=acl-editor,broadcasting,classhandler,imaging,indexing,swf,useradmin,userlogin,wcms,webservices,z3950
 
