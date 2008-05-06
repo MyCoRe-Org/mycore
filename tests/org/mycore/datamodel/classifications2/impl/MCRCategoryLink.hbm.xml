@@ -18,11 +18,8 @@
       <![CDATA[
 SELECT cat.rootID, cat.categID, count(*), cat.internalID
   FROM MCRCategoryImpl cat, MCRCategoryLink link WHERE
-    cat.internalID IN (
-      SELECT c1.internalID FROM MCRCategoryImpl c1 WHERE
-        c1.rootID=:classID AND
-        c1.categID IN (:categIDs)
-    ) AND
+    cat.rootID=:classID AND
+    cat.categID IN (:categIDs) AND
     link.category IN (
       SELECT internalID FROM MCRCategoryImpl c2 WHERE
         c2.rootID = cat.rootID AND
@@ -35,11 +32,8 @@ SELECT cat.rootID, cat.categID, count(*), cat.internalID
       <![CDATA[
 SELECT cat.rootID, cat.categID, count(*), cat.internalID
   FROM MCRCategoryImpl cat, MCRCategoryLink link WHERE
-    cat.internalID IN (
-      SELECT c1.internalID FROM MCRCategoryImpl c1 WHERE
-        c1.rootID=:classID AND
-        c1.categID IN (:categIDs)
-    ) AND
+    cat.rootID=:classID AND
+    cat.categID IN (:categIDs) AND
     link.objectReference.type=:type AND
     link.category IN (
       SELECT internalID FROM MCRCategoryImpl c2 WHERE
