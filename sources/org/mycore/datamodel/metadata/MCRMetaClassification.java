@@ -38,7 +38,8 @@ import org.mycore.datamodel.common.MCRXMLTableManager;
  * &lt;/tag&gt; <br>
  * 
  * @author Jens Kupferschmidt
- * @version $Revision$ $Date$
+ * @version $Revision$ $Date: 2008-03-18 22:53:44 +0000 (Di, 18 Mrz
+ *          2008) $
  */
 public class MCRMetaClassification extends MCRMetaDefault {
     /** The length of the classification ID * */
@@ -201,17 +202,7 @@ public class MCRMetaClassification extends MCRMetaDefault {
         if (!super.isValid()) {
             return false;
         }
-
-        try {
-            if (!MCRCategoryDAOFactory.getInstance().exist(new MCRCategoryID(classid, categid))) {
-                return false;
-            }
-        } catch (Exception e) {
-            LOGGER.debug("Error validating classification " + classid, e);
-            return false;
-        }
-
-        return true;
+        return classid != null && classid.length() > 0 && categid != null && categid.length() > 0;
     }
 
     /**
