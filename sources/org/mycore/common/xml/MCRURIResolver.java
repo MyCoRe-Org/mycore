@@ -417,13 +417,13 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
             Map<String, MCRResolver> map = new HashMap<String, MCRResolver>();
             for (Entry entry : props.entrySet()) {
                 try {
-                	String scheme = entry.getKey().toString();
-                	scheme = scheme.substring(scheme.lastIndexOf('.')+1);
-                	LOGGER.info("Adding Resolver " + entry.getValue().toString() + " for URI scheme " + scheme);
+                    String scheme = entry.getKey().toString();
+                    scheme = scheme.substring(scheme.lastIndexOf('.') + 1);
+                    LOGGER.info("Adding Resolver " + entry.getValue().toString() + " for URI scheme " + scheme);
                     Class cl = Class.forName(entry.getValue().toString());
                     map.put(scheme, (MCRResolver) cl.newInstance());
                 } catch (Exception e) {
-                	LOGGER.error("Cannot instantiate " + entry.getValue() + " for URI scheme " + entry.getKey());
+                    LOGGER.error("Cannot instantiate " + entry.getValue() + " for URI scheme " + entry.getKey());
                     throw new MCRException("Cannot instantiate " + entry.getValue() + " for URI scheme " + entry.getKey(), e);
                 }
             }
@@ -839,6 +839,10 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
 
         private static final String SORT_CONFIG_PREFIX = CONFIG_PREFIX + "Classification.Sort.";
 
+        private static final MCRCache categoryCache = new MCRCache(CONFIG.getInt(CONFIG_PREFIX + "Classification.CacheSize", 1000), "URIResolver categories");
+
+        private static final MCRCategoryDAO DAO = MCRCategoryDAOFactory.getInstance();
+
         public MCRClassificationResolver() {
         }
 
@@ -892,51 +896,41 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
             } catch (UnsupportedEncodingException e) {
                 categ = categID.toString();
             }
-            MCRCategory cl = null;
-            MCRCategoryDAO dao = MCRCategoryDAOFactory.getInstance();
-            String labelFormat = getLabelFormat(format);
-            boolean withCounter = false;
-            if ((labelFormat != null) && (labelFormat.indexOf("{count}") != -1)) {
-                withCounter = true;
-            }
-            LOGGER.debug("start MCRClassificationQuery");
-            if (axis.equals("children")) {
-                if (categ.length() > 0) {
-                    cl = dao.getCategory(new MCRCategoryID(classID, categ), levels);
-//                  MCRClassificationQuery.getClassification(classID, categ,levels, withCounter);
-                } else {
-                    cl = dao.getCategory(MCRCategoryID.rootID(classID), levels);
-//                  MCRClassificationQuery.getClassification(classID, levels, withCounter);                    
+            MCRCategory cl = getFromCache(classID, categ, axis, levels);
+            if (cl == null) {
+                LOGGER.debug("categoryCache entry invalid or not found: start MCRClassificationQuery");
+                if (axis.equals("children")) {
+                    if (categ.length() > 0) {
+                        cl = DAO.getCategory(new MCRCategoryID(classID, categ), levels);
+                    } else {
+                        cl = DAO.getCategory(MCRCategoryID.rootID(classID), levels);
+                    }
+                } else if (axis.equals("parents")) {
+                    if (categ.length() == 0) {
+                        LOGGER.error("Cannot resolve parent axis without a CategID. URI: " + uri);
+                        throw new IllegalArgumentException("Invalid format (categID is required in mode 'parents') of uri for retrieval of classification: "
+                                + uri);
+                    }
+                    cl = DAO.getRootCategory(new MCRCategoryID(classID, categ), levels);
                 }
                 if (cl == null) {
                     return null;
                 }
-                if (withCounter) {
-//                  TODO: get number of linked objects here
-                }
-            } else if (axis.equals("parents")) {
-                if (categ.length() == 0) {
-                    LOGGER.error("Cannot resolve parent axis without a CategID. URI: " + uri);
-                    throw new IllegalArgumentException("Invalid format (categID is required in mode 'parents') of uri for retrieval of classification: " + uri);
-                }
-                cl = dao.getRootCategory(new MCRCategoryID(classID, categ), levels);
-                if (cl == null) {
-                    return null;
-                }
-//              MCRClassificationQuery.getClassificationHierarchie(classID,categ, levels, withCounter);
+                addToCache(classID, categ, axis, levels, cl);
             }
 
             Element returns;
             LOGGER.debug("start transformation of ClassificationQuery");
             if (format.startsWith("editor")) {
                 boolean sort = shouldSortCategories(classID);
+                String labelFormat = getLabelFormat(format);
                 if (labelFormat == null) {
                     returns = MCRCategoryTransformer.getEditorDocument(cl, sort).getRootElement();
                 } else {
                     returns = MCRCategoryTransformer.getEditorDocument(cl, labelFormat, sort).getRootElement();
                 }
             } else if (format.equals("metadata")) {
-                returns = MCRCategoryTransformer.getMetaDataDocument(cl, withCounter).getRootElement();
+                returns = MCRCategoryTransformer.getMetaDataDocument(cl, false).getRootElement();
             } else {
                 LOGGER.error("Unknown target format given. URI: " + uri);
                 throw new IllegalArgumentException("Invalid target format (" + format + ") in uri for retrieval of classification: " + uri);
@@ -956,6 +950,28 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
 
         private static boolean shouldSortCategories(String classId) {
             return CONFIG.getBoolean(SORT_CONFIG_PREFIX + classId, true);
+        }
+
+        private static MCRCategory getFromCache(String classID, String categID, String axis, int levels) {
+            String key = getCacheKey(classID, categID, axis, levels);
+            MCRCategory cacheEntry = (MCRCategory) categoryCache.getIfUpToDate(key, DAO.getLastModified());
+            return cacheEntry;
+        }
+
+        private static void addToCache(String classID, String categID, String axis, int levels, MCRCategory category) {
+            String key = getCacheKey(classID, categID, axis, levels);
+            categoryCache.put(key, category);
+        }
+
+        private static String getCacheKey(String classID, String categID, String axis, int levels) {
+            char delim = '~';
+            StringBuilder sb = new StringBuilder(classID);
+            sb.append(delim).append(axis);
+            if (categID != null) {
+                sb.append(delim).append(categID);
+            }
+            sb.append(delim).append(levels);
+            return sb.toString();
         }
 
     }
@@ -1037,17 +1053,17 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
     }
 
     private static Hashtable<String, String> getParameterMap(String key) {
-    	String[] param;
-    	StringTokenizer tok = new StringTokenizer(key, "&");
-    	Hashtable<String, String> params = new Hashtable<String, String>();
-    	
-    	while (tok.hasMoreTokens()) {
-    		param = tok.nextToken().split("=");
-    		params.put(param[0], param[1]);
-    	}
-    	return params;
+        String[] param;
+        StringTokenizer tok = new StringTokenizer(key, "&");
+        Hashtable<String, String> params = new Hashtable<String, String>();
+
+        while (tok.hasMoreTokens()) {
+            param = tok.nextToken().split("=");
+            params.put(param[0], param[1]);
+        }
+        return params;
     }
-    
+
     /**
      * Ensures that the return of the given uri is never null. When the return
      * is null, or the uri throws an exception, this resolver will return an
@@ -1093,40 +1109,36 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
     private static class MCRXslStyleResolver implements MCRResolver {
 
         public Element resolveElement(String uri) {
-            String help       = uri.substring(uri.indexOf(":") + 1);
+            String help = uri.substring(uri.indexOf(":") + 1);
             String stylesheet = new StringTokenizer(help, ":").nextToken();
-            String target     = help.substring(help.indexOf(":") + 1);
-            
+            String target = help.substring(help.indexOf(":") + 1);
+
             String subUri = target.substring(target.indexOf(":") + 1);
             if (subUri.length() == 0)
                 return new Element("null");
-            
+
             try {
-            	Hashtable<String, String> params = null; 
-            	StringTokenizer tok = new StringTokenizer(stylesheet, "?");
-            	stylesheet = tok.nextToken();
-            	
-            	if( tok.hasMoreTokens())
-            	{
-            		params = getParameterMap(tok.nextToken());
-            	}
-            	
+                Hashtable<String, String> params = null;
+                StringTokenizer tok = new StringTokenizer(stylesheet, "?");
+                stylesheet = tok.nextToken();
+
+                if (tok.hasMoreTokens()) {
+                    params = getParameterMap(tok.nextToken());
+                }
+
                 Element result = MCRURIResolver.instance().resolve(target);
-                if (result != null)
-                {
-                	Document doc = result.getDocument();
-                	if ( doc == null )
-                		doc = new Document(result);
-                	Document xx = MCRLayoutService.instance().doLayout(doc, stylesheet + ".xsl", params);
-                	if (!xx.hasRootElement())
-                	{
+                if (result != null) {
+                    Document doc = result.getDocument();
+                    if (doc == null)
+                        doc = new Document(result);
+                    Document xx = MCRLayoutService.instance().doLayout(doc, stylesheet + ".xsl", params);
+                    if (!xx.hasRootElement()) {
                         LOGGER.info("MCRXslStyleResolver no root element after transformation ");
                         return new Element("null");
-                	}
-                	LOGGER.debug("MCRXslStyleResolver root element after transformation is " + xx.getRootElement().getName());
+                    }
+                    LOGGER.debug("MCRXslStyleResolver root element after transformation is " + xx.getRootElement().getName());
                     return xx.getRootElement();
-                }
-                else {
+                } else {
                     LOGGER.debug("MCRXslStyleResolver returning empty xml");
                     return new Element("null");
                 }

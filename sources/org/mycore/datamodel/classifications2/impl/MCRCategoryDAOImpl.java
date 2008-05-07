@@ -61,6 +61,8 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
 
     private static final int LEFT_START_VALUE = 0;
 
+    private static long LAST_MODIFIED = System.currentTimeMillis();
+
     private static final Logger LOGGER = Logger.getLogger(MCRCategoryDAOImpl.class);
 
     private static final Class<MCRCategoryImpl> CATEGRORY_CLASS = MCRCategoryImpl.class;
@@ -92,6 +94,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         }
         session.save(category);
         LOGGER.info(new StringBuilder("Category ").append(category.getId()).append(" saved.").toString());
+        updateTimeStamp();
     }
 
     public void deleteCategory(MCRCategoryID id) {
@@ -114,6 +117,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
             // decrement left and right values by nodes
             updateLeftRightValue(connection, category.getLeft(), increment);
         }
+        updateTimeStamp();
     }
 
     /*
@@ -295,12 +299,14 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
             LOGGER.debug("Updating new parent " + newParent.getId());
             session.update(newParent);
         }
+        updateTimeStamp();
     }
 
     public void removeLabel(MCRCategoryID id, String lang) {
         Session session = MCRHIBConnection.instance().getSession();
         MCRCategoryImpl category = getByNaturalID(session, id);
         category.getLabels().remove(lang);
+        updateTimeStamp();
     }
 
     public void replaceCategory(MCRCategory newCategory) throws IllegalArgumentException {
@@ -355,6 +361,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
             }
         }
         session.saveOrUpdate(newCategoryImpl);
+        updateTimeStamp();
     }
 
     public void setLabel(MCRCategoryID id, MCRLabel label) {
@@ -362,6 +369,15 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         MCRCategoryImpl category = getByNaturalID(session, id);
         category.getLabels().put(label.getLang(), label);
         session.update(category);
+        updateTimeStamp();
+    }
+
+    public long getLastModified() {
+        return LAST_MODIFIED;
+    }
+
+    private static void updateTimeStamp() {
+        LAST_MODIFIED = System.currentTimeMillis();
     }
 
     /**
