@@ -24,9 +24,6 @@
 package org.mycore.datamodel.metadata;
 
 import org.mycore.common.MCRException;
-import org.mycore.datamodel.classifications2.MCRCategoryID;
-import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
-import org.mycore.datamodel.common.MCRXMLTableManager;
 
 /**
  * This class implements all method for handling with the MCRMetaClassification
