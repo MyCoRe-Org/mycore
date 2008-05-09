@@ -729,8 +729,6 @@ public class MCRObjectCommands extends MCRAbstractCommands {
             return;
         }
 
-        MCRSearcher searcher = getSearcherForField("objectType");
-
         removeFromIndex("objectType", type);
 
         for (String stid : ar) {
