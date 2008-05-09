@@ -589,9 +589,9 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
 
         @Override
         protected void beforeExecute(Thread t, Runnable r) {
-            super.beforeExecute(t, r);
             if (modifierClosed)
                 openIndexWriter();
+            super.beforeExecute(t, r);
         }
 
         private void openIndexWriter() {
