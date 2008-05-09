@@ -34,6 +34,8 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 
 import org.mycore.backend.hibernate.MCRHIBConnection;
+import org.mycore.common.MCRCache;
+import org.mycore.common.MCRConfiguration;
 import org.mycore.datamodel.classifications2.MCRCategLinkService;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.MCRObjectReference;
@@ -42,7 +44,8 @@ import org.mycore.datamodel.classifications2.MCRObjectReference;
  * 
  * @author Thomas Scheffler (yagee)
  * 
- * @version $Revision$ $Date$
+ * @version $Revision$ $Date: 2008-04-15 14:06:12 +0000 (Di, 15 Apr
+ *          2008) $
  * @since 2.0
  */
 public class MCRCategLinkServiceImpl implements MCRCategLinkService {
@@ -50,6 +53,11 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
     private static Logger LOGGER = Logger.getLogger(MCRCategLinkServiceImpl.class);
 
     private static Class<MCRCategoryLink> LINK_CLASS = MCRCategoryLink.class;
+
+    private static MCRCache categCache = new MCRCache(MCRConfiguration.instance().getInt("MCR.Classifications.LinkServiceImpl.CategCache.Size", 1000),
+            "MCRCategLinkService category cache");
+
+    private static MCRCategoryDAOImpl DAO = new MCRCategoryDAOImpl();
 
     @SuppressWarnings("unchecked")
     public Map<MCRCategoryID, Number> countLinks(Collection<MCRCategoryID> categIDs) {
@@ -140,9 +148,9 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
         q.setCacheable(true);
         q.setParameter("id", id);
         List<Object[]> result = q.list();
-        ArrayList<MCRCategoryID> returns=new ArrayList<MCRCategoryID>(result.size());
-        for (Object[] idValues:result){
-            returns.add(new MCRCategoryID(idValues[0].toString(),idValues[1].toString()));
+        ArrayList<MCRCategoryID> returns = new ArrayList<MCRCategoryID>(result.size());
+        for (Object[] idValues : result) {
+            returns.add(new MCRCategoryID(idValues[0].toString(), idValues[1].toString()));
         }
         return returns;
     }
@@ -150,10 +158,19 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
     public void setLinks(MCRObjectReference objectReference, Collection<MCRCategoryID> categories) {
         Session session = MCRHIBConnection.instance().getSession();
         for (MCRCategoryID categID : categories) {
-            MCRCategoryLink link = new MCRCategoryLink(MCRCategoryDAOImpl.getByNaturalID(session, categID), objectReference);
+            MCRCategoryLink link = new MCRCategoryLink(getMCRCategory(session, categID), objectReference);
             LOGGER.debug("Adding Link from " + link.getCategory().getId() + "(" + link.getCategory().getInternalID() + ") to " + objectReference.getObjectID());
             session.save(link);
             LOGGER.debug("===DONE: " + link.id);
         }
+    }
+
+    private static MCRCategoryImpl getMCRCategory(Session session, MCRCategoryID categID) {
+        MCRCategoryImpl categ = (MCRCategoryImpl) categCache.getIfUpToDate(categID, DAO.getLastModified());
+        if (categ != null)
+            return categ;
+        categ = MCRCategoryDAOImpl.getByNaturalID(session, categID);
+        categCache.put(categID, categ);
+        return categ;
     }
 }
