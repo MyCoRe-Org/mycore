@@ -205,9 +205,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
                 mycore_obj.deleteFromDatastore(id);
                 LOGGER.info(mycore_obj.getId() + " deleted.");
             } catch (MCRException ex) {
-                LOGGER.error("Can't delete " + mycore_obj.getId().getId() + ".");
-                LOGGER.error(ex.getMessage());
-                LOGGER.debug(ex.getStackTraceAsString());
+                LOGGER.error("Can't delete " + mycore_obj.getId().getId() + ".", ex);
             }
         }
     }
@@ -225,10 +223,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
             mycore_obj.deleteFromDatastore(ID);
             LOGGER.info(mycore_obj.getId().getId() + " deleted.");
         } catch (MCRException ex) {
-            LOGGER.debug(ex.getStackTraceAsString());
-            LOGGER.error(ex.getMessage());
-            LOGGER.error("Can't delete " + mycore_obj.getId().getId() + ".");
-            LOGGER.error("");
+            LOGGER.error("Can't delete " + mycore_obj.getId().getId() + ".", ex);
         }
     }
 
@@ -264,7 +259,6 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         } catch (MCRException ex) {
             LOGGER.debug(ex.getStackTraceAsString());
             LOGGER.error(ex.getMessage());
-            LOGGER.error("");
         }
     }
 
@@ -397,16 +391,14 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         MCRObject mycore_obj = new MCRObject();
         mycore_obj.setImportMode(importMode);
         mycore_obj.setFromURI(file.getAbsolutePath());
-        LOGGER.info("Label --> " + mycore_obj.getLabel());
+        LOGGER.debug("Label --> " + mycore_obj.getLabel());
 
         if (update) {
             mycore_obj.updateInDatastore();
             LOGGER.info(mycore_obj.getId().getId() + " updated.");
-            LOGGER.info("");
         } else {
             mycore_obj.createInDatastore();
             LOGGER.info(mycore_obj.getId().getId() + " loaded.");
-            LOGGER.info("");
         }
 
         return true;
@@ -426,7 +418,6 @@ public class MCRObjectCommands extends MCRAbstractCommands {
             LOGGER.info("The next free ID  is " + mcr_id.getId());
         } catch (MCRException ex) {
             LOGGER.error(ex.getMessage());
-            LOGGER.error("");
         }
     }
 
@@ -445,7 +436,6 @@ public class MCRObjectCommands extends MCRAbstractCommands {
             LOGGER.info("The last used ID  is " + mcr_id.getId());
         } catch (MCRException ex) {
             LOGGER.error(ex.getMessage());
-            LOGGER.error("");
         }
     }
 
@@ -652,7 +642,6 @@ public class MCRObjectCommands extends MCRAbstractCommands {
             out.flush();
         }
         LOGGER.info("Object " + nid.toString() + " saved to " + xmlOutput.getCanonicalPath() + ".");
-        LOGGER.info("");
         return true;
     }
 
@@ -670,7 +659,6 @@ public class MCRObjectCommands extends MCRAbstractCommands {
             LOGGER.info(id.getId());
         } catch (MCRException ex) {
             LOGGER.error(ex.getMessage());
-            LOGGER.error("");
         }
     }
 
@@ -689,7 +677,6 @@ public class MCRObjectCommands extends MCRAbstractCommands {
             LOGGER.info(mcr_id.getId());
         } catch (MCRException ex) {
             LOGGER.error(ex.getMessage());
-            LOGGER.error("");
         }
     }
 
@@ -770,8 +757,6 @@ public class MCRObjectCommands extends MCRAbstractCommands {
             mid = new MCRObjectID(id);
         } catch (Exception e) {
             LOGGER.error("The String " + id + " is not a MCRObjectID.");
-            LOGGER.info(" ");
-
             return;
         }
 
@@ -780,7 +765,6 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         MCRObject obj = new MCRObject();
         obj.repairPersitenceDatastore(mid);
         LOGGER.info("Repaired " + mid.getId());
-        LOGGER.info(" ");
     }
 
     /**
@@ -833,7 +817,6 @@ public class MCRObjectCommands extends MCRAbstractCommands {
 
         if (null == getSelectedObjectIDs()) {
             LOGGER.info("No Resultset to work with, use command \"select objects with query {0}\" to build one");
-            LOGGER.info(" ");
             return;
         }
         for (String id : getSelectedObjectIDs()) {
@@ -941,8 +924,6 @@ public class MCRObjectCommands extends MCRAbstractCommands {
             MCRResults results = MCRQueryManager.search(query);
             if (1 != results.getNumHits()) {
                 repairMetadataSearchForID(stid);
-                // MCRObject obj = new MCRObject();
-                // obj.repairPersitenceDatastore(stid);
             }
         }
     }
