@@ -25,13 +25,12 @@ package org.mycore.datamodel.common;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandlerBase;
 import org.mycore.datamodel.classifications2.MCRCategLinkServiceFactory;
-import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
+import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.MCRObjectReference;
 import org.mycore.datamodel.metadata.MCRMetaClassification;
 import org.mycore.datamodel.metadata.MCRMetaElement;
@@ -63,10 +62,7 @@ public class MCRLinkTableEventHandler extends MCREventHandlerBase {
      *            the MCRObject that caused the event
      */
     protected final void handleObjectCreated(MCREvent evt, MCRObject obj) {
-        // delete old entries
         MCRObjectID mcr_id = obj.getId();
-        mcr_linktable.deleteReferenceLink(mcr_id);
-        MCRCategLinkServiceFactory.getInstance().deleteLinks(Collections.nCopies(1, obj.getId().toString()));
         // set new entries
         MCRObjectMetadata meta = obj.getMetadata();
         MCRMetaElement elm = null;
@@ -96,9 +92,6 @@ public class MCRLinkTableEventHandler extends MCREventHandlerBase {
             MCRObjectReference objectReference = new MCRObjectReference(mcr_id.toString(), mcr_id.getTypeId());
             MCRCategLinkServiceFactory.getInstance().setLinks(objectReference, categories);
         }
-        // delete all derivate references
-        // NOTE: Derivates are deleted by handleObjectDeleted() above
-        // mcr_linktable.deleteReferenceLink(obj.getId().toString(),MCRLinkTableManager.ENTRY_TYPE_DERIVATE,"");
         // add derivate referece
         MCRObjectStructure struct = obj.getStructure();
         int dersize = struct.getDerivateSize();
@@ -107,6 +100,11 @@ public class MCRLinkTableEventHandler extends MCREventHandlerBase {
             mcr_linktable.addReferenceLink(obj.getId(), lid.getXLinkHrefID(), MCRLinkTableManager.ENTRY_TYPE_DERIVATE, "");
         }
 
+    }
+
+    private void deleteOldLinks(MCRObjectID mcr_id) {
+        mcr_linktable.deleteReferenceLink(mcr_id);
+        MCRCategLinkServiceFactory.getInstance().deleteLink(mcr_id.getId());
     }
 
     private void checkLinkTargets(MCRObject obj) {
@@ -155,7 +153,7 @@ public class MCRLinkTableEventHandler extends MCREventHandlerBase {
      *            the MCRObject that caused the event
      */
     protected final void handleObjectUpdated(MCREvent evt, MCRObject obj) {
-        handleObjectCreated(evt, obj);
+        handleObjectRepaired(evt, obj);
     }
 
     /**
@@ -168,9 +166,7 @@ public class MCRLinkTableEventHandler extends MCREventHandlerBase {
      *            the MCRObject that caused the event
      */
     protected final void handleObjectDeleted(MCREvent evt, MCRObject obj) {
-        MCRObjectID mcr_id = obj.getId();
-        mcr_linktable.deleteReferenceLink(mcr_id);
-        MCRCategLinkServiceFactory.getInstance().deleteLink(mcr_id.getId());
+        deleteOldLinks(obj.getId());
     }
 
     /**
@@ -183,6 +179,7 @@ public class MCRLinkTableEventHandler extends MCREventHandlerBase {
      *            the MCRObject that caused the event
      */
     protected final void handleObjectRepaired(MCREvent evt, MCRObject obj) {
+        handleObjectDeleted(evt, obj);
         handleObjectCreated(evt, obj);
     }
 
