@@ -40,6 +40,7 @@ import java.util.StringTokenizer;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import javax.xml.transform.Result;
 import javax.xml.transform.Source;
 import javax.xml.transform.Templates;
 import javax.xml.transform.Transformer;
@@ -47,10 +48,14 @@ import javax.xml.transform.TransformerConfigurationException;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.sax.SAXResult;
 import javax.xml.transform.sax.SAXTransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
+import org.apache.avalon.framework.logger.Log4JLogger;
+import org.apache.fop.apps.Driver;
+import org.apache.fop.messaging.MessageHandler;
 import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.transform.JDOMResult;
@@ -81,7 +86,7 @@ import org.xml.sax.SAXException;
  * Does the layout for other MyCoRe servlets by transforming XML input to
  * various output formats, using XSL stylesheets.
  * 
- * @author Frank Lï¿½tzenkirchen
+ * @author Frank Lützenkirchen
  * @author Thomas Scheffler (yagee)
  * 
  * @version $Revision$ $Date$
@@ -99,6 +104,8 @@ public class MCRLayoutService implements org.apache.xalan.trace.TraceListener {
 
     /** The logger */
     private final static Logger LOGGER = Logger.getLogger(MCRLayoutService.class);
+
+    private final static org.apache.avalon.framework.logger.Logger FOPLOG = new Log4JLogger( LOGGER );
 
     private static final MCRLayoutService singleton = new MCRLayoutService();
     
@@ -124,6 +131,8 @@ public class MCRLayoutService implements org.apache.xalan.trace.TraceListener {
 
         factory = (SAXTransformerFactory) (tf);
         factory.setURIResolver(MCRURIResolver.instance());
+
+        MessageHandler.setScreenLogger(FOPLOG);
     }
 
     public void sendXML(HttpServletRequest req, HttpServletResponse res, org.jdom.Document jdom) throws IOException {
@@ -527,18 +536,31 @@ public class MCRLayoutService implements org.apache.xalan.trace.TraceListener {
      *            the response object to send the result to
      */
     private void transform(Source xml, Templates xsl, Transformer transformer, HttpServletResponse response) throws IOException, MCRException {
+
         // Set content type from "<xsl:output media-type = "...">
         // Set char encoding from "<xsl:output encoding = "...">
         String ct = xsl.getOutputProperties().getProperty("media-type");
         String enc = xsl.getOutputProperties().getProperty("encoding");
         response.setCharacterEncoding(enc);
         response.setContentType(ct + "; charset=" + enc);
-        LOGGER.debug("MCRLayoutService starts to output " + ct + "; charset=" + enc);
 
         OutputStream out = response.getOutputStream();
+        Result result = null;
+
+        if ("application/pdf".equals(ct)) {
+            Driver driver = new Driver();
+            driver.setLogger(FOPLOG);
+            driver.setRenderer(Driver.RENDER_PDF);
+            driver.setOutputStream(out);
+            result = new SAXResult(driver.getContentHandler());
+        } else {
+            result = new StreamResult(out);
+        }
+
+        LOGGER.debug("MCRLayoutService starts to output " + response.getContentType());
 
         try {
-            transformer.transform(xml, new StreamResult(out));
+            transformer.transform(xml, result);
         } catch (TransformerException ex) {
             String msg = "Error while transforming XML using XSL stylesheet: " + ex.getMessageAndLocation();
             throw new MCRException(msg, ex);
@@ -548,8 +570,9 @@ public class MCRLayoutService implements org.apache.xalan.trace.TraceListener {
     }
     
     /**
-     * Traces the execution of xsl stylesheet elements in debug mode. The trace is
-     * written to the log, and in parallel as comment elements to the output html.
+     * Traces the execution of xsl stylesheet elements in debug mode. The trace
+     * is written to the log, and in parallel as comment elements to the output
+     * html.
      */
     public void trace(TracerEvent ev) {
         ElemTemplateElement ete = ev.m_styleNode; // Current position in stylesheet
