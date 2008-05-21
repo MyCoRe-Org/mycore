@@ -8,7 +8,6 @@
 <!-- *** Language List *** -->
 
   <list id="Slang" width="60" type="dropdown" default="de">
-    <item value="ar" i18n="common.list.slang.ar"/>
     <item value="de" i18n="common.list.slang.de"/>
     <item value="en" i18n="common.list.slang.en"/>
   </list>
