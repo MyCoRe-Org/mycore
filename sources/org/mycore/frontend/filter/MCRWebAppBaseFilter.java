@@ -36,15 +36,23 @@ import javax.servlet.http.HttpServletRequest;
 import org.mycore.frontend.servlets.MCRServlet;
 
 public class MCRWebAppBaseFilter implements Filter {
+    private static final String PROXY_HEADER = "X-Forwarded-Host";
 
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException, ServletException {
         // check if BASE_URL_ATTRIBUTE is present
         if (req.getAttribute(MCRServlet.BASE_URL_ATTRIBUTE) == null) {
             HttpServletRequest request = (HttpServletRequest) req;
             StringBuilder webappBase = new StringBuilder(request.getScheme());
-            webappBase.append("://").append(request.getServerName());
-            if (!(request.getLocalPort() == 80 || (request.isSecure() && request.getLocalPort() == 443))) {
-                webappBase.append(':').append(request.getLocalPort());
+            webappBase.append("://");
+            String proxyHost = request.getHeader(PROXY_HEADER);
+            if (proxyHost != null) {
+                //proxy detected, use proxy host and port
+                webappBase.append(proxyHost);
+            } else {
+                webappBase.append(request.getServerName());
+                if (!(request.getLocalPort() == 80 || (request.isSecure() && request.getLocalPort() == 443))) {
+                    webappBase.append(':').append(request.getLocalPort());
+                }
             }
             webappBase.append(request.getContextPath()).append('/');
             request.setAttribute(MCRServlet.BASE_URL_ATTRIBUTE, webappBase);
