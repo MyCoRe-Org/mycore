@@ -62,7 +62,7 @@ public final class MCRGoogleSitemapCommon {
     private static final String basedir = MCRConfiguration.instance().getString("MCR.basedir", "");
 
     /** The base URL */
-    private static final String baseurl = MCRConfiguration.instance().getString("MCR.baseurl", "");
+    private  String baseurl = MCRConfiguration.instance().getString("MCR.baseurl", "");
 
     /** The webapps directory path from configuration */
     private static final String cdir = MCRConfiguration.instance().getString("MCR.GoogleSitemap.Directory", "");
@@ -98,6 +98,11 @@ public final class MCRGoogleSitemapCommon {
     public MCRGoogleSitemapCommon() {
         objidlist = new ArrayList<String>();
         if ((numberOfURLs < 1) || (numberOfURLs > 50000)) numberOfURLs = 50000;
+    }
+    
+    public MCRGoogleSitemapCommon(String baseURL){
+        this();
+        this.baseurl=baseURL;
     }
 
     /**

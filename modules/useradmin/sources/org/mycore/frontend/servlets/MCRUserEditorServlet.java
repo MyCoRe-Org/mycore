@@ -78,7 +78,7 @@ public class MCRUserEditorServlet extends MCRUserAdminGUICommons {
      */
     public void doGetPost(MCRServletJob job) throws IOException {
 
-        if (MCRWebsiteWriteProtection.printInfoPageIfNoAccess(job.getRequest(), job.getResponse()))
+        if (MCRWebsiteWriteProtection.printInfoPageIfNoAccess(job.getRequest(), job.getResponse(), getBaseURL()))
             return;
 
         String mode = getProperty(job.getRequest(), "mode");

@@ -49,7 +49,7 @@ public class MCRACLEditorServlet_v2 extends MCRServlet {
 
         verifyAccess(job);
 
-        if (MCRWebsiteWriteProtection.printInfoPageIfNoAccess(request, response))
+        if (MCRWebsiteWriteProtection.printInfoPageIfNoAccess(request, response, getBaseURL()))
             return;
 
         LOGGER.debug("Mode: " + mode);

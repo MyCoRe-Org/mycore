@@ -7,17 +7,15 @@ import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
 import org.jdom.output.DOMOutputter;
 import org.jdom.output.XMLOutputter;
+
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.xml.MCRLayoutService;
-import org.mycore.datamodel.metadata.MCRObjectID;
 
 public final class MCRWebsiteWriteProtection {
     static final private String FS = System.getProperty("file.separator");
@@ -153,10 +151,10 @@ public final class MCRWebsiteWriteProtection {
         setConfiguration(config);
     }
 
-    public final static boolean printInfoPageIfNoAccess(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public final static boolean printInfoPageIfNoAccess(HttpServletRequest request, HttpServletResponse response, String baseURL) throws IOException {
         if (MCRWebsiteWriteProtection.isActive()) {
             response.setStatus(HttpServletResponse.SC_MOVED_TEMPORARILY);
-            String pageURL = MCR_CONFIG.getString("MCR.baseurl") + MCR_CONFIG.getString("MCR.WriteProtectionWebsite.ErrorPage");
+            String pageURL = baseURL + MCR_CONFIG.getString("MCR.WriteProtectionWebsite.ErrorPage");
             response.sendRedirect(response.encodeRedirectURL(pageURL));
             return true;
         }

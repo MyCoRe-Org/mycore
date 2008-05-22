@@ -58,7 +58,7 @@ public final class MCRGoogleSitemapServlet extends MCRServlet {
      *            a MCRServletJob instance
      */
     public void doGetPost(MCRServletJob job) throws Exception {
-        MCRGoogleSitemapCommon common = new MCRGoogleSitemapCommon();
+        MCRGoogleSitemapCommon common = new MCRGoogleSitemapCommon(getBaseURL());
         int number = common.checkSitemapFile();
         LOGGER.debug("Build Google number of URL files " + Integer.toString(number) + ".");
         Document jdom = null;

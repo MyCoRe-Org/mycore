@@ -74,7 +74,7 @@ import org.mycore.frontend.servlets.MCRServletJob;
 /**
  * This class implements an OAI Data Provider for MyCoRe and Miless
  * 
- * @author Werner Greßhoff
+ * @author Werner Greï¿½hoff
  * @author Heiko Helmbrecht
  * 
  * @version $Revision$ $Date$
@@ -106,9 +106,6 @@ public class MCROAIProvider extends MCRServlet {
 
     private static MCROAIResumptionTokenStore resStore;
 
-    // Base URL from the configuration
-    private static String baseurl;
-
     static {
         Properties props = CONFIG.getProperties("MCR.OAI.Repository.Identifier.");
         oaiConfig = new HashMap();
@@ -123,7 +120,6 @@ public class MCROAIProvider extends MCRServlet {
         maxReturns = CONFIG.getInt("MCR.OAI.MaxReturns", 10);
         resStore = (MCROAIResumptionTokenStore) CONFIG
                 .getInstanceOf("MCR.OAI.Resumptiontoken.Store", "org.mycore.backend.hibernate.MCRHIBResumptionTokenStore");
-        baseurl = CONFIG.getString("MCR.baseurl", "");
     }
 
     // property name for the implementing class of MCROAIQuery
@@ -287,7 +283,7 @@ public class MCROAIProvider extends MCRServlet {
             // <?xml-stylesheet type='text/xsl' href='/content/oai/oai2.xsl' ?>
             File f = new File(getServletContext().getRealPath("content/oai/oai2.xsl"));
             if (f.exists()) {
-                String myURL = new String(baseurl);
+                String myURL = getBaseURL();
                 if (myURL.length() == 0) {
                     String contextPath = request.getContextPath();
                     if (contextPath == null) {
@@ -617,8 +613,8 @@ public class MCROAIProvider extends MCRServlet {
         eRequest.setAttribute("verb", "Identify");
         Element eIdentify = new Element("Identify", ns);
         eIdentify.addContent(newElementWithContent("repositoryName", ns, repositoryName));
-        if (baseurl.length() != 0) {
-            eIdentify.addContent(newElementWithContent("baseURL", ns, baseurl + "servlets/MCROAIProvider"));
+        if (getBaseURL().length() != 0) {
+            eIdentify.addContent(newElementWithContent("baseURL", ns, getBaseURL() + "servlets/MCROAIProvider"));
         } else {
             eIdentify.addContent(newElementWithContent("baseURL", ns, request.getRequestURL().toString().split(";")[0]));
         }
@@ -1502,9 +1498,9 @@ public class MCROAIProvider extends MCRServlet {
             parameters.put("JSessionID", ";jsessionid=" + session.getId());
         }
         // set connection URL
-        if (baseurl.length() != 0) {
-            parameters.put("ServletsBaseURL", baseurl + "servlets/");
-            parameters.put("WebApplicationBaseURL", baseurl);
+        if (getBaseURL().length() != 0) {
+            parameters.put("ServletsBaseURL", getBaseURL() + "servlets/");
+            parameters.put("WebApplicationBaseURL", getBaseURL());
         } else {
             String contextPath = request.getContextPath() + "/";
             int pos = request.getRequestURL().indexOf(contextPath, 9);
@@ -1513,7 +1509,7 @@ public class MCROAIProvider extends MCRServlet {
             parameters.put("ServletsBaseURL", servletsBaseURL);
             parameters.put("WebApplicationBaseURL", webApplicationBaseURL);
         }
-        // DNB erlaubt in Epicur-Beschreibung keinen Inhalt für das Element
+        // DNB erlaubt in Epicur-Beschreibung keinen Inhalt fï¿½r das Element
         // <resupply>
         // String email = CONFIG.getString("MCR.oai.epicur.responseemail", "");
         // if(format.contains("epicur")&& !email.equals("")){
