@@ -94,11 +94,11 @@ public class MCRUserServlet extends MCRServlet {
         LOGGER.debug("Mode     : "+mode);
 
         if (mode.equals("ChangePwd")) {
-            if (MCRWebsiteWriteProtection.printInfoPageIfNoAccess(job.getRequest(), job.getResponse()))
+            if (MCRWebsiteWriteProtection.printInfoPageIfNoAccess(job.getRequest(), job.getResponse(), getBaseURL()))
                 return;
             changePwd(job);
         } else if (mode.equals("CreatePwdDialog")) {
-            if (MCRWebsiteWriteProtection.printInfoPageIfNoAccess(job.getRequest(), job.getResponse()))
+            if (MCRWebsiteWriteProtection.printInfoPageIfNoAccess(job.getRequest(), job.getResponse(), getBaseURL()))
                 return;
             createPwdDialog(job);
         } else if (mode.equals("Select")) {
