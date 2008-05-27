@@ -37,7 +37,11 @@ public class MCRLayoutUtilities {
 
     private static Document NAVI;
 
-    private static final File NAVFILE = new File(MCRConfiguration.instance().getString("MCR.navigationFile").replace('/', File.separatorChar));
+    private static final String NAV_LOC_DEFAULT = MCRConfiguration.instance().getString("MCR.basedir")
+                    + "build/webapps/config/navigation.xml".replace('/', File.separatorChar);
+
+    private static final File NAVFILE = new File(MCRConfiguration.instance().getString("MCR.navigationFile", NAV_LOC_DEFAULT).replace('/',
+                    File.separatorChar));
 
     private static final boolean ACCESS_CONTROLL_ON = MCRConfiguration.instance().getBoolean("MCR.Website.ReadAccessVerification", true);
 
