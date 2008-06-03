@@ -186,10 +186,13 @@ public class MCRCommandLineInterface {
 
         while (true) {
             if (commandQueue.isEmpty()) {
-                if (interactiveMode)
-                    command = readCommandFromPrompt();
-                else
-                    System.exit(0);
+                if (interactiveMode){
+                	command = readCommandFromPrompt();
+                }
+                else{
+                   // System.exit(0);
+                	break;
+                }
             } else {
                 command = (String) commandQueue.firstElement();
                 commandQueue.removeElementAt(0);
