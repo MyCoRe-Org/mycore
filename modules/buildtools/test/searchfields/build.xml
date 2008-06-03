@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!-- =================================================================== -->
+<!-- MyCoRe sample application build file for use with Apache Ant        -->
+<!-- $Revision$ $Date$                      -->
+<!-- =================================================================== -->
+
+<project name="Test" basedir="." default="test">
+	<property environment="env" />
+	<condition property="env.JAVA_HOME" value="/usr/lib/java" else="c:/Programme/Java/jdk1.6.0_03">
+		<os family="unix" />
+	</condition>
+	<condition property="ant.library.dir" value="${ant.home}/lib">
+			<os family="unix" />
+	</condition>
+	<property name="env.MYCORE_HOME" location="./../../../../../mycore" />
+    <path id="classpath_buildtools">
+        <fileset dir="${env.MYCORE_HOME}/lib" includes="*.jar" />
+    </path>
+	<target name="test">
+		<taskdef name="mergesearchfields" classname="org.mycore.buildtools.anttasks.MCRMergeSearchfieldsXMLTask"
+		classpathref="classpath_buildtools" /> 
+		<copy file="searchfields.demo.org.xml" tofile="searchfields.demo.xml" />
+		<mergesearchfields 	basefile="searchfields.demo.xml" 
+							deltafile="searchfields.demo.delta.xml" /> 
+	</target>
+</project>

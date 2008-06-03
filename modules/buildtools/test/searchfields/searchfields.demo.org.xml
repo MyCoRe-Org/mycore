@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<searchfields xmlns="http://www.mycore.org/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mycore.org/ searchfields.xsd">
+  <!-- Search in MCRObject metadata -->
+  <index id="metadata">
+    <field name="identifier" objects="document" source="objectMetadata" type="identifier" value="text()" xpath="/mycoreobject/metadata/identifiers/identifier"/>
+    <field name="ddc" objects="document" source="objectCategory" type="identifier" value="@ID" xpath="/mycoreobject/metadata/subjects/subject"/>
+    <!-- ... -->
+  </index>
+</searchfields>
