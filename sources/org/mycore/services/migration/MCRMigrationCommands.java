@@ -25,6 +25,7 @@ import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.MCRObjectReference;
 import org.mycore.datamodel.classifications2.utils.MCRXMLTransformer;
 import org.mycore.datamodel.common.MCRXMLTableManager;
+import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.cli.MCRAbstractCommands;
 import org.mycore.frontend.cli.MCRCommand;
@@ -35,20 +36,17 @@ public class MCRMigrationCommands extends MCRAbstractCommands {
     public MCRMigrationCommands() {
         MCRCommand com = null;
 
-        com = new MCRCommand("migrate user", "org.mycore.services.migration.MCRMigrationCommands.migrateUser",
-                "The command migrates the user management to MyCoRe 2.0.");
+        com = new MCRCommand("migrate user", "org.mycore.services.migration.MCRMigrationCommands.migrateUser", "The command migrates the user management to MyCoRe 2.0.");
         command.add(com);
-        com = new MCRCommand("internal usermigration step {0}", "org.mycore.services.migration.MCRMigrationCommands.migrateUser int",
-                "Internal commands for user migration");
+        com = new MCRCommand("internal usermigration step {0}", "org.mycore.services.migration.MCRMigrationCommands.migrateUser int", "Internal commands for user migration");
         command.add(com);
-        com = new MCRCommand("migrate mcraccess", "org.mycore.services.migration.MCRMigrationCommands.migrateAccess",
-                "The command migrates the access system to MyCoRe 2.0.");
+        com = new MCRCommand("migrate mcraccess", "org.mycore.services.migration.MCRMigrationCommands.migrateAccess", "The command migrates the access system to MyCoRe 2.0.");
         command.add(com);
-        com = new MCRCommand("internal accessmigration step {0}", "org.mycore.services.migration.MCRMigrationCommands.migrateAccess int",
-                "Internal commands for access system migration");
+        com = new MCRCommand("internal accessmigration step {0}", "org.mycore.services.migration.MCRMigrationCommands.migrateAccess int", "Internal commands for access system migration");
         command.add(com);
-        com = new MCRCommand("migrate classifications", "org.mycore.services.migration.MCRMigrationCommands.migrateClassifications",
-                "Internal commands for classification migration");
+        com = new MCRCommand("migrate classifications", "org.mycore.services.migration.MCRMigrationCommands.migrateClassifications", "Internal commands for classification migration");
+        command.add(com);
+        com = new MCRCommand("migrate  history date in type {0}", "org.mycore.services.migration.MCRMigrationCommands.migrateMCRMetaHistoryDate String", "Internal commands for the migration of the MCRMetaHistoryDate text lines to multi languages for MyCoRe type {0}");
         command.add(com);
     }
 
@@ -167,6 +165,27 @@ public class MCRMigrationCommands extends MCRAbstractCommands {
             return Collections.emptyList();
         default:
             throw new MCRException("MCRACCESS migration step " + step + " is unknown.");
+        }
+    }
+
+    /**
+     * This method migrate the MCRMetaHistoryDate text entries from a single
+     * text to multi language texts as sequence of XML text elements. The method
+     * read the data to the API and store it to the backend again.
+     * 
+     * @param type
+     *            the MyCoRe data type which includes a MCRMetaHistoryDate
+     *            element
+     * @throws Exception
+     */
+    public static void migrateMCRMetaHistoryDate(String type) throws Exception {
+        MCRXMLTableManager tm = MCRXMLTableManager.instance();
+        MCRObject obj = null;
+        for (String id : tm.retrieveAllIDs(type)) {
+            MCRObjectID oid = new MCRObjectID(id);
+            obj.receiveFromDatastore(oid);
+            obj.updateInDatastore();
+            
         }
     }
 }

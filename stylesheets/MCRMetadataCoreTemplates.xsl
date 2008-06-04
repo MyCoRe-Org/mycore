@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!-- ============================================== -->
-<!-- $Revision: 1.35 $ $Date: 2007-06-21 12:06:55 $ -->
+<!-- $Revision: 1.3 $ $Date: 2008/05/23 13:12:14 $ -->
 <!-- ============================================== -->
 
 <xsl:stylesheet
@@ -197,14 +197,16 @@
   fixed="MCRMetaISO8601Date" />
 </xsl:template>
 
-<!-- Template for the metadata MCRMetaHistorykDate -->
+<!-- Template for the metadata MCRMetaHistoryDate -->
 
 <xsl:template match="mcrmetahistorydate">
 <xsd:sequence>
  <xsd:element name="{@name}" minOccurs="{@minOccurs}" maxOccurs="{@maxOccurs}">
   <xsd:complexType>
    <xsd:all>
-    <xsd:element name="text" type="xsd:string" minOccurs='1' maxOccurs='1'/>
+    <xsd:sequence>
+     <xsd:element name="text" type="xsd:string" minOccurs="1"/>
+    </xsd:sequence>
     <xsd:element name="von"  type="xsd:string" minOccurs='0' maxOccurs='1'/>
     <xsd:element name="ivon"  type="xsd:integer" minOccurs='0' maxOccurs='1'/>
     <xsd:element name="bis"  type="xsd:string" minOccurs='0' maxOccurs='1'/>

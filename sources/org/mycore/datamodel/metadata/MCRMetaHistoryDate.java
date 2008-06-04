@@ -23,13 +23,23 @@
 
 package org.mycore.datamodel.metadata;
 
-import java.util.Locale;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
-import com.ibm.icu.text.SimpleDateFormat;
+import org.apache.log4j.Logger;
+import org.mycore.common.MCRCalendar;
+import org.mycore.common.MCRException;
+
 import com.ibm.icu.util.Calendar;
 import com.ibm.icu.util.GregorianCalendar;
-
-import org.mycore.common.MCRException;
+import org.jdom.*;
+import org.jdom.input.SAXBuilder;
+import org.jdom.output.Format;
+import org.jdom.output.XMLOutputter;
 
 /**
  * This class implements all methods for handling with the MCRMetaHistoryDate
@@ -37,40 +47,20 @@ import org.mycore.common.MCRException;
  * 
  * @author Juergen Vogler
  * @author Jens Kupferschmidt
+ * @author Thomas Junge
  * @version $Revision$ $Date$
  * @see http://icu.sourceforge.net/
  */
 public class MCRMetaHistoryDate extends MCRMetaDefault {
+
+    /** Logger */
+    protected static Logger LOGGER = Logger.getLogger(MCRMetaHistoryDate.class.getName());
+
     /** The maximal length of 'text' */
     public static final int MCRHISTORYDATE_MAX_TEXT = 128;
 
-    /** Tag for buddhist calendar */
-    public static String TAG_BUDDHIST = "buddhist";
-
-    public static String TAG_CHINESE = "chinese";
-
-    public static String TAG_COPTIC = "coptic";
-
-    public static String TAG_ETHIOPIC = "ethiopic";
-
-    public static String TAG_GREGORIAN = "gregorian";
-
-    public static String TAG_HEBREW = "hebrew";
-
-    public static String TAG_ISLAMIC = "islamic";
-
-    public static String TAG_ISLAMIC_CIVIL = "islamic-civil";
-
-    public static String TAG_JAPANESE = "japanese";
-
-    /** Minimum Julian Day number is 0 = 01.01.4713 BC */
-    public static int MIN_JULIAN_DAY_NUMBER = 0;
-
-    /** Maximum Julian Day number is 3182057 = 31.12.3999 */
-    public static int MAX_JULIAN_DAY_NUMBER = 3182057;
-
     // Data of this class
-    private String text;
+    private ArrayList<MCRMetaHistoryDateTexts> texts;
 
     private Calendar von;
 
@@ -82,23 +72,17 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
 
     private String calendar;
 
-    // all available calendars of ICU
-    // private static String CALENDARS[] = { TAG_BUDDHIST, TAG_CHINESE,
-    // TAG_COPTIC, TAG_ETHIOPIC, TAG_GREGORIAN, TAG_HEBREW, TAG_ISLAMIC,
-    // TAG_ISLAMIC_CIVIL, TAG_JAPANESE };
-    private static String CALENDARS[] = { TAG_GREGORIAN };
-
     /**
      * This is the constructor. <br>
-     * The language element was set to <b>en </b>. The text element is set to an
-     * empty string. The calendar is set to 'Gregorian Calendar'. The von value
-     * is set to MIN_JULIAN_DAY_NUMBER, the bis value is set to
+     * The language element was set to configured default. The text element is
+     * set to an empty string. The calendar is set to 'Gregorian Calendar'. The
+     * von value is set to MIN_JULIAN_DAY_NUMBER, the bis value is set to
      * MAX_JULIAN_DAY_NUMBER;
      */
     public MCRMetaHistoryDate() {
         super();
-        text = "";
-        calendar = CALENDARS[0];
+        texts = new ArrayList<MCRMetaHistoryDateTexts>();
+        calendar = MCRCalendar.CALENDARS_INPUT[0];
         setDefaultVon();
         setDefaultBis();
     }
@@ -111,8 +95,7 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
      * is null or empty an exception was throwed. The type element was set to
      * the value of <em>set_type<em>, if it is null, an empty string was set
      * to the type element.<br />
-     * The text element is set to
-     * an empty string. The calendar is set to 'Gregorian Calendar'. The von value 
+     * The text element is set to an empty string. The calendar is set to 'Gregorian Calendar'. The von value 
      * is set to MIN_JULIAN_DAY_NUMBER, the bis value is set to MAX_JULIAN_DAY_NUMBER;
      *
      * @param set_datapart     the global part of the elements like 'metadata'
@@ -125,379 +108,188 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
      */
     public MCRMetaHistoryDate(String set_datapart, String set_subtag, String default_lang, String set_type, int set_inherted) throws MCRException {
         super(set_datapart, set_subtag, default_lang, set_type, set_inherted);
-        text = "";
-        calendar = CALENDARS[0];
+        texts = new ArrayList<MCRMetaHistoryDateTexts>();
+        calendar = MCRCalendar.CALENDARS_INPUT[0];
         setDefaultVon();
         setDefaultBis();
     }
 
     /**
-     * This method convert a ancient date to a GregorianCalendar value. The
-     * syntax for the input is [-|AD|BC][[[t]t.][m]m.][yyy]y [AD|BC] in a a
-     * given calendar.
+     * This method set the text field for the default language. If data exists,
+     * it overwrites the value of text.
      * 
-     * @param datestr
-     *            the date as string.
-     * @param last
-     *            the value is true if the date should be filled with the
-     *            highest value of month or day like 12 or 31 else it fill the
-     *            date with the lowest value 1 for month and day.
-     * @param cal
-     *            the calendar as String, one of CALENDARS. 'gregorian' is the
-     *            default.
-     * @return the GregorianCalendar date value or null if an error was occured.
+     * @param text
+     *            the text string for a date or range
      */
-    public static final GregorianCalendar getGregorianHistoryDate(String datestr, boolean last) {
-        return (GregorianCalendar) getHistoryDate(datestr, last, TAG_GREGORIAN);
+    public final void setText(String set_text) {
+        setText(set_text, lang);
     }
 
     /**
-     * This method convert a ancient date to a Calendar value. The syntax for
-     * the gregorian input is [-|AD|BC][[[t]t.][m]m.][yyy]y [AD|BC].
+     * This method set the text field for the given language. If data exists, it
+     * overwrites the value of text.
      * 
-     * @param datestr
-     *            the date as string.
-     * @param last
-     *            the value is true if the date should be filled with the
-     *            highest value of month or day like 12 or 31 else it fill the
-     *            date with the lowest value 1 for month and day.
-     * @param calstr
-     *            the calendar as String, one of CALENDARS . 'gregorian' is the
-     *            default.
-     * @return the GregorianCalendar date value or null if an error was occured.
+     * @param text
+     *            the text string for a date or range
+     * @param lang
+     *            the language of the text in the ISO format
      */
-    public static final Calendar getHistoryDate(String datestr, boolean last, String calstr) {
-        // check String
-        datestr = datestr.trim();
-        if (datestr == null) {
-            return null;
-        }
-        if (datestr.length() > 18) {
-            return null;
-        }
-        if (datestr.length() == 0) {
-            return null;
-        }
-        // Check calendar
-        String caltmp;
-        if (calstr == null) {
-            caltmp = TAG_GREGORIAN;
-        } else {
-            caltmp = null;
-            for (int i = 0; i < CALENDARS.length; i++) {
-                if (CALENDARS[i].equals(calstr)) {
-                    caltmp = calstr;
-                    break;
-                }
-            }
-            if (caltmp == null) {
-                caltmp = TAG_GREGORIAN;
-            }
-        }
-        if (caltmp.equals("gregorian")) {
-            return getDateAsGregorianCalendar(datestr, last);
-        }
-        return new GregorianCalendar();
-    }
-
-    /**
-     * This method convert a ancient date to a GregorianCalendar value. The
-     * syntax for the gregorian input is [-|AD|BC][[[t]t.][m]m.][yyy]y [AD|BC].
-     * 
-     * @param datestr
-     *            the date as string.
-     * @param last
-     *            the value is true if the date should be filled with the
-     *            highest value of month or day like 12 or 31 else it fill the
-     *            date with the lowest value 1 for month and day.
-     * @return the GregorianCalendar date value or null if an error was occured.
-     */
-    private static final GregorianCalendar getDateAsGregorianCalendar(String datestr, boolean last) {
-        // check data
-        try {
-            // suche nach v. Chr.
-            boolean bc = false;
-            int start = 0;
-            int ende = datestr.length();
-            if (datestr.substring(0, 1).equals("-")) {
-                bc = true;
-                start = 1;
-            } else {
-                if (datestr.length() > 2) {
-                    int i = datestr.indexOf("AD");
-                    if (i != -1) {
-                        if (i == 0) {
-                            bc = false;
-                            start = 2;
-                        } else {
-                            bc = false;
-                            start = 0;
-                            ende = i - 1;
-                        }
-                    }
-                    i = datestr.indexOf("BC");
-                    if (i != -1) {
-                        if (i == 0) {
-                            bc = true;
-                            start = 2;
-                        } else {
-                            bc = true;
-                            start = 0;
-                            ende = i - 1;
-                        }
-                    }
-                }
-                if (datestr.length() > 7) {
-                    int i = datestr.indexOf("n. Chr.");
-                    if (i != -1) {
-                        if (i == 0) {
-                            bc = false;
-                            start = 7;
-                        } else {
-                            bc = false;
-                            start = 0;
-                            ende = i - 1;
-                        }
-                    }
-                    i = datestr.indexOf("v. Chr.");
-                    if (i != -1) {
-                        if (i == 0) {
-                            bc = true;
-                            start = 7;
-                        } else {
-                            bc = true;
-                            start = 0;
-                            ende = i - 1;
-                        }
-                    }
-                }
-            }
-            datestr = datestr.substring(start, ende).trim();
-
-            // deutsch oder ISO?
-            start = 0;
-            boolean iso = false;
-            String token = ".";
-
-            if (datestr.indexOf("-", start + 1) != -1) {
-                iso = true;
-                token = "-";
-            }
-
-            // Punkte/Striche ermitteln
-            int firstdot = datestr.indexOf(token, start + 1);
-            int secdot = -1;
-
-            if (firstdot != -1) {
-                secdot = datestr.indexOf(token, firstdot + 1);
-            }
-
-            // selektiern der Werte
-            int day = 0;
-
-            // selektiern der Werte
-            int mon = 0;
-
-            // selektiern der Werte
-            int year = 0;
-
-            if (secdot != -1) {
-                if (iso) {
-                    year = Integer.parseInt(datestr.substring(start, firstdot));
-                    mon = Integer.parseInt(datestr.substring(firstdot + 1, secdot)) - 1;
-                    day = Integer.parseInt(datestr.substring(secdot + 1, datestr.length()));
-                } else {
-                    day = Integer.parseInt(datestr.substring(start, firstdot));
-                    mon = Integer.parseInt(datestr.substring(firstdot + 1, secdot)) - 1;
-                    year = Integer.parseInt(datestr.substring(secdot + 1, datestr.length()));
-                }
-            } else {
-                if (firstdot != -1) {
-                    if (iso) {
-                        year = Integer.parseInt(datestr.substring(start, firstdot)) - 1;
-                        mon = Integer.parseInt(datestr.substring(firstdot + 1, datestr.length()));
-                    } else {
-                        mon = Integer.parseInt(datestr.substring(start, firstdot)) - 1;
-                        year = Integer.parseInt(datestr.substring(firstdot + 1, datestr.length()));
-                    }
-
-                    if (last) {
-                        if (mon == 0) {
-                            day = 31;
-                        }
-
-                        if (mon == 1) {
-                            day = 28;
-                        }
-
-                        if (mon == 2) {
-                            day = 31;
-                        }
-
-                        if (mon == 3) {
-                            day = 30;
-                        }
-
-                        if (mon == 4) {
-                            day = 31;
-                        }
-
-                        if (mon == 5) {
-                            day = 30;
-                        }
-
-                        if (mon == 6) {
-                            day = 31;
-                        }
-
-                        if (mon == 7) {
-                            day = 31;
-                        }
-
-                        if (mon == 8) {
-                            day = 30;
-                        }
-
-                        if (mon == 9) {
-                            day = 31;
-                        }
-
-                        if (mon == 10) {
-                            day = 30;
-                        }
-
-                        if (mon == 11) {
-                            day = 31;
-                        }
-                    } else {
-                        day = 1;
-                    }
-                } else {
-                    year = Integer.parseInt(datestr.substring(start, datestr.length()));
-
-                    if (last) {
-                        mon = 11;
-                        day = 31;
-                    } else {
-                        mon = 0;
-                        day = 1;
-                    }
-                }
-            }
-
-            // setzten AD/BC
-            GregorianCalendar newdate = new GregorianCalendar();
-            newdate.set(year, mon, day);
-
-            if (bc) {
-                newdate.set(GregorianCalendar.ERA, GregorianCalendar.BC);
-            } else {
-                newdate.set(GregorianCalendar.ERA, GregorianCalendar.AD);
-            }
-
-            return newdate;
-        } catch (Exception e) {
-            throw new MCRException("The ancient gregorian date is false.", e);
-        }
-    }
-
-    /**
-     * This method return the Julian Day number for a given Calendar instance.
-     * 
-     * @param date
-     *            an instance of a Calendar
-     * @return the Julian Day number
-     */
-    public static final int getJulianDayNumber(Calendar date) {
-        return date.get(Calendar.JULIAN_DAY);
-    }
-
-    /**
-     * This methode returns the date as string.
-     * 
-     * @param date
-     *            the GregorianCalendar date
-     * 
-     * @return the date string
-     */
-    public static final String getDateToGregorianString(Calendar date) {
-        if (date == null) {
-            return "";
-        }
-        SimpleDateFormat formatter = new SimpleDateFormat("dd.MM.yyyy G", (new Locale("en")));
-        formatter.setCalendar(date);
-        return formatter.format(date.getTime());
-    }
-
-    /**
-     * The method set the text value.
-     */
-    public final void setText(String set) {
-        if (set == null) {
-            text = "";
+    public final void setText(String set_text, String set_lang) {
+        if (set_text == null) {
             LOGGER.warn("The text field of MCRMeataHistoryDate is empty.");
             return;
         }
-        if (set.length() <= MCRHISTORYDATE_MAX_TEXT) {
-            text = set.trim();
+        if (set_text.length() <= MCRHISTORYDATE_MAX_TEXT) {
+            set_text = set_text.trim();
         } else {
-            text = set.substring(0, MCRHISTORYDATE_MAX_TEXT);
+            set_text = set_text.substring(0, MCRHISTORYDATE_MAX_TEXT);
         }
+        if (set_lang == null || set_lang.length() == 0) {
+            addText(set_text, lang);
+        } else {
+            addText(set_text, set_lang);
+        }
+    }
+
+    /**
+     * This method add a MCRMetaHistoryDateTexts instance to the ArrayList of
+     * texts.
+     * 
+     * @param text
+     *            the text- String
+     * @param lang
+     *            the lang- String
+     */
+
+    public final void addText(String set_text, String set_lang) {
+        if (set_text == null) {
+            LOGGER.warn("The text field of MCRMeataHistoryDate is empty.");
+            return;
+        }
+        if (set_lang == null || set_lang.length() == 0) {
+            LOGGER.warn("The lang field of MCRMeataHistoryDate is empty.");
+            return;
+        }
+        for (int i = 0; i < texts.size(); i++) {
+            if (texts.get(i).getLang().equals(set_lang)) {
+                texts.remove(i);
+                break;
+            }
+        }
+        texts.add(new MCRMetaHistoryDateTexts(set_text, set_lang));
+    }
+
+    /**
+     * This method return the MCRMetaHistoryDateTexts instance with the
+     * corresponding language.
+     * 
+     * @param lang
+     *            the language String in ISO format
+     * @return an instance of MCRMetaHistoryDateTexts or null
+     */
+    public final MCRMetaHistoryDateTexts getText(String set_lang) {
+        if (set_lang == null)
+            return null;
+        for (int i = 0; i < texts.size(); i++) {
+            if (texts.get(i).getLang().equals(set_lang)) {
+                return texts.get(i);
+            }
+        }
+        return null;
+    }
+
+    /**
+     * This method return the MCRMetaHistoryDateTexts instance of the indexed
+     * element of the ArrayList.
+     * 
+     * @param index
+     *            the index of ArryList texts
+     * @return an instance of MCRMetaHistoryDateTexts or null
+     */
+    public final MCRMetaHistoryDateTexts getText(int index) {
+        if ((index >= 0) && (index < texts.size())) {
+            return texts.get(index);
+        }
+        return null;
+    }
+
+    /**
+     * This method read the ArryList texts
+     * 
+     * @return an ArrayList of MCRMetaHistoryDateTexts instances
+     */
+    public final ArrayList<MCRMetaHistoryDateTexts> getTexts() {
+        return this.texts;
+    }
+
+    /**
+     * This method read the size of texts
+     * 
+     * @return the size of the ArrayList of language dependence texts
+     */
+    public final int TextSize() {
+        return texts.size();
     }
 
     /**
      * The method set the calendar String value.
+     * 
+     * @param calstr
+     *            the calendar as String, one of CALENDARS.
      */
     public final void setCalendar(String calstr) {
         if (calstr == null) {
-            calendar = TAG_GREGORIAN;
-            LOGGER.warn("The calendar field of MCRMeataHistoryDate is set to " + TAG_GREGORIAN + ".");
+            calendar = MCRCalendar.TAG_GREGORIAN;
+            LOGGER.warn("The calendar field of MCRMeataHistoryDate is set to default " + MCRCalendar.TAG_GREGORIAN + ".");
             return;
         }
-        for (int i = 0; i < CALENDARS.length; i++) {
-            if (CALENDARS[i].equals(calstr)) {
+        for (int i = 0; i < MCRCalendar.CALENDARS_INPUT.length; i++) {
+            if (MCRCalendar.CALENDARS_INPUT[i].equals(calstr)) {
                 calendar = calstr;
                 return;
             }
         }
-        calendar = TAG_GREGORIAN;
-        LOGGER.warn("The calendar field of MCRMeataHistoryDate is set to " + TAG_GREGORIAN + ".");
+        calendar = MCRCalendar.TAG_GREGORIAN;
+        LOGGER.warn("The calendar field of MCRMeataHistoryDate is set to default " + MCRCalendar.TAG_GREGORIAN + ".");
     }
 
     /**
      * The method set the calendar String value.
+     * 
+     * @param cal
+     *            the date of the calendar.
      */
     public final void setCalendar(Calendar cal) {
         if (cal instanceof GregorianCalendar) {
-            calendar = TAG_GREGORIAN;
+            calendar = MCRCalendar.TAG_GREGORIAN;
             return;
         }
-        calendar = TAG_GREGORIAN;
+        calendar = MCRCalendar.TAG_GREGORIAN;
     }
 
     /**
      * The method set the von values to the default.
      */
     public final void setDefaultVon() {
-        ivon = MIN_JULIAN_DAY_NUMBER;
+        ivon = MCRCalendar.MIN_JULIAN_DAY_NUMBER;
         von = (Calendar) new GregorianCalendar();
-        von.set(GregorianCalendar.JULIAN_DAY, MIN_JULIAN_DAY_NUMBER);
+        von.set(GregorianCalendar.JULIAN_DAY, MCRCalendar.MIN_JULIAN_DAY_NUMBER);
     }
 
     /**
-     * The method set thebis values to the default.
+     * The method set the bis values to the default.
      */
     public final void setDefaultBis() {
-        ibis = MAX_JULIAN_DAY_NUMBER;
+        ibis = MCRCalendar.MAX_JULIAN_DAY_NUMBER;
         bis = (Calendar) new GregorianCalendar();
-        bis.set(GregorianCalendar.JULIAN_DAY, MAX_JULIAN_DAY_NUMBER);
+        bis.set(GregorianCalendar.JULIAN_DAY, MCRCalendar.MAX_JULIAN_DAY_NUMBER);
     }
 
     /**
-     * This methode set the von to the given date of a supported calendar.
+     * This method set the von to the given date of a supported calendar.
      * 
      * @param set_date
-     *            the date of a ICU supported calendar
+     *            the date of a ICU supported calendar.
      */
     public final void setVonDate(Calendar set_date) {
         if (set_date == null) {
@@ -507,10 +299,11 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
         }
         ivon = set_date.get(GregorianCalendar.JULIAN_DAY);
         von = set_date;
+
     }
 
     /**
-     * This methode set the von to the given date.
+     * This method set the von to the given date.
      * 
      * @param set_date
      *            a date string
@@ -520,7 +313,7 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
     public final void setVonDate(String set_date, String calstr) {
         Calendar c = von;
         try {
-            c = getHistoryDate(set_date, false, calstr);
+            c = MCRCalendar.getGregorianHistoryDate(set_date, false, calstr);
         } catch (Exception e) {
             LOGGER.warn("The von date " + set_date + " for calendar " + calstr + " is false.");
             c = null;
@@ -529,7 +322,7 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
     }
 
     /**
-     * This methode set the bis to the given date of a supported calendar.
+     * This method set the bis to the given date of a supported calendar.
      * 
      * @param set_date
      *            the date of a ICU supported calendar
@@ -545,7 +338,7 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
     }
 
     /**
-     * This methode set the bis to the given date.
+     * This method set the bis to the given date.
      * 
      * @param set_date
      *            a date string
@@ -555,7 +348,7 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
     public final void setBisDate(String set_date, String calstr) {
         Calendar c = bis;
         try {
-            c = getHistoryDate(set_date, true, calstr);
+            c = MCRCalendar.getGregorianHistoryDate(set_date, true, calstr);
         } catch (Exception e) {
             LOGGER.warn("The bis date " + set_date + " for calendar " + calstr + " is false.");
             c = null;
@@ -566,10 +359,18 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
     /**
      * This method get the 'text' text element.
      * 
-     * @return the text string
+     * @return the text String of the default language or an empty String
+     * @deprecated
      */
     public final String getText() {
-        return text;
+        if (texts.size() > 0) {
+            MCRMetaHistoryDateTexts h = getText(lang);
+            if (h != null)
+                return h.getText();
+            else
+                return "";
+        }
+        return "";
     }
 
     /**
@@ -591,12 +392,12 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
     }
 
     /**
-     * This methode return the von as string.
+     * This method return the von as string.
      * 
      * @return the date
      */
     public final String getVonToGregorianString() {
-        return getDateToGregorianString(von);
+        return MCRCalendar.getDateToFormattedString(von);
     }
 
     /**
@@ -618,12 +419,12 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
     }
 
     /**
-     * This methode return the bis as string.
+     * This method return the bis as string.
      * 
      * @return the date
      */
     public final String getBisToGregorianString() {
-        return getDateToGregorianString(bis);
+        return MCRCalendar.getDateToFormattedString(bis);
     }
 
     /**
@@ -644,7 +445,21 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
      */
     public void setFromDOM(org.jdom.Element element) {
         super.setFromDOM(element);
-        setText(element.getChildTextTrim("text"));
+        texts.clear(); // clear
+
+        String langn = "";
+        String textn;
+        Iterator<org.jdom.Element> textchild = element.getChildren("text").iterator();
+        while (textchild.hasNext()) {
+            Element elmt = (Element) textchild.next();
+            textn = elmt.getText();
+            langn = elmt.getAttributeValue("lang", org.jdom.Namespace.XML_NAMESPACE);
+            if (langn != null) {
+                setText(textn, langn);
+            } else {
+                setText(textn);
+            }
+        }
         setCalendar(element.getChildTextTrim("calendar"));
         setVonDate(element.getChildTextTrim("von"), calendar);
         setBisDate(element.getChildTextTrim("bis"), calendar);
@@ -667,38 +482,28 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
         org.jdom.Element elm = new org.jdom.Element(subtag);
         elm.setAttribute("lang", lang, org.jdom.Namespace.XML_NAMESPACE);
         elm.setAttribute("inherited", Integer.toString(inherited));
-
+        for (int i = 0; i < texts.size(); i++) {
+            org.jdom.Element elmt = new org.jdom.Element("text");
+            elmt.addContent((String) texts.get(i).getText());
+            elmt.setAttribute("lang", texts.get(i).getLang(), org.jdom.Namespace.XML_NAMESPACE);
+            elm.addContent(elmt);
+        }
         if ((type != null) && ((type = type.trim()).length() != 0)) {
             elm.setAttribute("type", type);
         }
-
-        if ((text = text.trim()).length() != 0) {
-            elm.addContent(new org.jdom.Element("text").addContent(text));
-        }
-
         if ((calendar = calendar.trim()).length() != 0) {
             elm.addContent(new org.jdom.Element("calendar").addContent(calendar));
         }
 
         if (von != null) {
             elm.addContent(new org.jdom.Element("ivon").addContent(Integer.toString(ivon)));
-            if (calendar.equals(TAG_GREGORIAN)) {
-                elm.addContent(new org.jdom.Element("von").addContent(getVonToGregorianString()));
-            } else {
-                elm.addContent(new org.jdom.Element("von").addContent(getVonToGregorianString()));
-            }
+            elm.addContent(new org.jdom.Element("von").addContent(getVonToGregorianString()));
         }
 
         if (bis != null) {
             elm.addContent(new org.jdom.Element("ibis").addContent(Integer.toString(ibis)));
-            if (calendar.equals(TAG_GREGORIAN)) {
-                elm.addContent(new org.jdom.Element("bis").addContent(getBisToGregorianString()));
-            } else {
-
-                elm.addContent(new org.jdom.Element("bis").addContent(getBisToGregorianString()));
-            }
+            elm.addContent(new org.jdom.Element("bis").addContent(getBisToGregorianString()));
         }
-
         return elm;
     }
 
@@ -715,7 +520,7 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
      * @return a boolean value
      */
     public boolean isValid() {
-        if ((text == null) || (text.length() == 0) || (von == null) || (bis == null) || (calendar == null)) {
+        if ((texts.size() == 0) || (von == null) || (bis == null) || (calendar == null)) {
             return false;
         }
         if (ibis < ivon) {
@@ -732,11 +537,13 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
      */
     public Object clone() {
         MCRMetaHistoryDate out = new MCRMetaHistoryDate(datapart, subtag, lang, type, inherited);
-        out.setText(text);
+        for (int i = 0; i < texts.size(); i++) {
+            MCRMetaHistoryDateTexts h = texts.get(i);
+            out.setText(h.getText(), h.getLang());
+        }
         out.setVonDate(von);
         out.setBisDate(bis);
         out.setCalendar(calendar);
-
         return out;
     }
 
@@ -746,17 +553,79 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
     public void debug() {
         LOGGER.debug("Start Class : MCRMetaHistoryDate");
         super.debugDefault();
-        LOGGER.debug("Text               = " + text);
+        for (int i = 0; i < texts.size(); i++) {
+            LOGGER.debug("Text / lang         = " + texts.get(i).getText() + " / " + texts.get(i).getLang());
+        }
         LOGGER.debug("Calendar           = " + calendar);
-        if (calendar.equals(TAG_GREGORIAN)) {
+        if (calendar.equals(MCRCalendar.TAG_GREGORIAN)) {
             LOGGER.debug("Von (String)       = " + getVonToGregorianString());
         }
         LOGGER.debug("Von (JulianDay)    = " + ivon);
-        if (calendar.equals(TAG_GREGORIAN)) {
+        if (calendar.equals(MCRCalendar.TAG_GREGORIAN)) {
             LOGGER.debug("Bis (String)       = " + getBisToGregorianString());
         }
         LOGGER.debug("Bis (JulianDay)    = " + ibis);
         LOGGER.debug("Stop");
         LOGGER.debug("");
     }
+
+    /**
+     * This class describes the structure of pair of language an text. The
+     * language notation is in the ISO format.
+     * 
+     */
+    protected class MCRMetaHistoryDateTexts {
+        private String datetext;
+
+        private String lang;
+
+        public MCRMetaHistoryDateTexts() {
+        }
+
+        public MCRMetaHistoryDateTexts(String datetext, String lang) {
+            this.datetext = datetext;
+            this.lang = lang;
+        }
+
+        /**
+         * This method get the datetext element as field text (String) .
+         * 
+         * @return the datetext
+         */
+
+        public String getText() {
+            return this.datetext;
+        }
+
+        /**
+         * This method set the datetext element as field text (String) .
+         * 
+         * @param datetext
+         *            the text String of a date value
+         */
+        public void setText(String datetext) {
+            this.datetext = datetext;
+        }
+
+        /**
+         * This method get the lang element as language field (String) .
+         * 
+         * @return the lang
+         */
+        public String getLang() {
+            return this.lang;
+        }
+
+        /**
+         * This method set the lang element as language field (String) .
+         * 
+         * @param the
+         *            language String of a date value
+         */
+        public void setLang(String lang) {
+            this.lang = lang;
+        }
+
+    }
+
 }

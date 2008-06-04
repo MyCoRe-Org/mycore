@@ -34,7 +34,7 @@ import com.ibm.icu.util.GregorianCalendar;
 
 import org.apache.log4j.Logger;
 import org.jdom.Element;
-import org.mycore.datamodel.metadata.MCRMetaHistoryDate;
+import org.mycore.common.MCRCalendar;
 import org.mycore.datamodel.metadata.MCRMetaISO8601Date;
 import org.mycore.parsers.bool.MCRAndCondition;
 import org.mycore.parsers.bool.MCRBooleanClauseParser;
@@ -48,7 +48,7 @@ import org.mycore.parsers.bool.MCRParseException;
  * 
  * @see MCRSearcher
  * 
- * @author Frank Lützenkirchen
+ * @author Frank L\u00fctzenkirchen
  */
 public class MCRQueryParser extends MCRBooleanClauseParser {
 
@@ -376,13 +376,13 @@ public class MCRQueryParser extends MCRBooleanClauseParser {
     private static String normalizeHistoryDate(String operator, String date) {
         GregorianCalendar cal = null;
         if (operator.equals(">"))
-            cal = MCRMetaHistoryDate.getGregorianHistoryDate(date, true);
+            cal = MCRCalendar.getGregorianHistoryDate(date, true);
         if (operator.equals("<"))
-            cal = MCRMetaHistoryDate.getGregorianHistoryDate(date, false);
+            cal = MCRCalendar.getGregorianHistoryDate(date, false);
         if (operator.equals(">="))
-            cal = MCRMetaHistoryDate.getGregorianHistoryDate(date, false);
+            cal = MCRCalendar.getGregorianHistoryDate(date, false);
         if (operator.equals("<="))
-            cal = MCRMetaHistoryDate.getGregorianHistoryDate(date, true);
-        return String.valueOf(MCRMetaHistoryDate.getJulianDayNumber(cal));
+            cal = MCRCalendar.getGregorianHistoryDate(date, true);
+        return String.valueOf(MCRCalendar.getJulianDayNumber(cal));
     }
 }
