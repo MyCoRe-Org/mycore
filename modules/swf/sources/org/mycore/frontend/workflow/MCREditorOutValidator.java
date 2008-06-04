@@ -115,8 +115,7 @@ public class MCREditorOutValidator {
         HashMap<String, Method> methods = new HashMap<String, Method>();
         Method[] m = MCREditorOutValidator.class.getDeclaredMethods();
         for (int i = 0; i < m.length; i++) {
-            if (!m[i].getName().startsWith("checkMCR")
-                    || !((m[i].getParameterTypes().length == 1) && m[i].getParameterTypes()[0] == Element.class && m[i].getReturnType() == Boolean.TYPE)) {
+            if (!m[i].getName().startsWith("checkMCR") || !((m[i].getParameterTypes().length == 1) && m[i].getParameterTypes()[0] == Element.class && m[i].getReturnType() == Boolean.TYPE)) {
                 continue;
             }
             LOGGER.debug("adding Method " + m[i].getName());
@@ -337,6 +336,13 @@ public class MCREditorOutValidator {
      * @param datasubtag
      */
     boolean checkMCRMetaHistoryDate(Element datasubtag) {
+        List<Element> children = datasubtag.getChildren("text");
+        for (int i = 0; i < children.size(); i++) {
+            Element child = children.get(i);
+            if (child.getAttribute("lang") != null) {
+                child.getAttribute("lang").setNamespace(XML_NAMESPACE);
+            }
+        }
         return checkMetaObjectWithLang(datasubtag, MCRMetaHistoryDate.class);
     }
 
