@@ -25,6 +25,7 @@ package org.mycore.datamodel.common;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandlerBase;
@@ -71,7 +72,8 @@ public class MCRLinkTableEventHandler extends MCREventHandlerBase {
             // TODO: add undo events
             checkLinkTargets(obj);
         }
-        Collection<MCRCategoryID> categories = new ArrayList<MCRCategoryID>();
+        //use Set for category collection to remove duplicates if there are any
+        Collection<MCRCategoryID> categories = new HashSet<MCRCategoryID>();
         for (int i = 0; i < meta.size(); i++) {
             elm = meta.getMetadataElement(i);
             for (int j = 0; j < elm.size(); j++) {
