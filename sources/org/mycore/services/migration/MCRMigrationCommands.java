@@ -46,7 +46,7 @@ public class MCRMigrationCommands extends MCRAbstractCommands {
         command.add(com);
         com = new MCRCommand("migrate classifications", "org.mycore.services.migration.MCRMigrationCommands.migrateClassifications", "Internal commands for classification migration");
         command.add(com);
-        com = new MCRCommand("migrate  history date in type {0}", "org.mycore.services.migration.MCRMigrationCommands.migrateMCRMetaHistoryDate String", "Internal commands for the migration of the MCRMetaHistoryDate text lines to multi languages for MyCoRe type {0}");
+        com = new MCRCommand("migrate history date in type {0}", "org.mycore.services.migration.MCRMigrationCommands.migrateMCRMetaHistoryDate String", "Internal commands for the migration of the MCRMetaHistoryDate text lines to multi languages for MyCoRe type {0}");
         command.add(com);
     }
 
@@ -182,10 +182,10 @@ public class MCRMigrationCommands extends MCRAbstractCommands {
         MCRXMLTableManager tm = MCRXMLTableManager.instance();
         MCRObject obj = null;
         for (String id : tm.retrieveAllIDs(type)) {
+            obj = new MCRObject();
             MCRObjectID oid = new MCRObjectID(id);
             obj.receiveFromDatastore(oid);
             obj.updateInDatastore();
-            
         }
     }
 }
