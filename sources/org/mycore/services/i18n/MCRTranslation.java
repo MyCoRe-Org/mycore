@@ -23,10 +23,12 @@
  **/
 package org.mycore.services.i18n;
 
+import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Properties;
 import java.util.ResourceBundle;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -46,8 +48,13 @@ import org.mycore.common.MCRSessionMgr;
  */
 public class MCRTranslation {
 
+    private static final String DEPRECATED_MESSAGES_PROPERTIES = "/deprecated-messages.properties";
+
     private static final Logger LOGGER = Logger.getLogger(MCRTranslation.class);
+
     private static final Pattern ARRAY_DETECTOR = Pattern.compile(";");
+
+    private static Properties deprecatedMapping = loadProperties();
 
     /**
      * provides translation for the given label (property key).
@@ -59,19 +66,31 @@ public class MCRTranslation {
      * @return translated String
      */
     public static String translate(String label) {
-    	String result;
+        String result = null;
         Locale currentLocale = getCurrentLocale();
         LOGGER.debug("Translation for current locale: " + currentLocale.getLanguage());
         ResourceBundle message = ResourceBundle.getBundle("messages", currentLocale);
-        
-        try { 
-        	result = message.getString(label);
+
+        try {
+            result = message.getString(label);
             LOGGER.debug("Translation for " + label + "=" + result);
         } catch (java.util.MissingResourceException mre) {
-        	result = "???" + label + "???";
-        	LOGGER.debug(mre.getMessage());	
+            // try to get new key if 'label' is deprecated
+            if (deprecatedMapping.keySet().contains(label)) {
+                String newLabel = deprecatedMapping.getProperty(label);
+                try {
+                    result = message.getString(newLabel);
+                } catch (java.util.MissingResourceException e) {
+                }
+                if (result != null) {
+                    LOGGER.warn("Usage of deprected I18N key '" + label + "'. Pleas use '" + newLabel + "' instead.");
+                    return result;
+                }
+            }
+            result = "???" + label + "???";
+            LOGGER.debug(mre.getMessage());
         }
-         
+
         return result;
     }
 
@@ -99,9 +118,10 @@ public class MCRTranslation {
      * provides translation for the given label (property key).
      * 
      * The current locale that is needed for translation is gathered by the
-     * language of the current MCRSession. Be aware that any occurence of ';' and '\' in <code>argument</code> has to be masked by '\'. You can
-     * use ';' to build an array of arguments: "foo;bar" would result
-     * in {"foo","bar"} (the array)
+     * language of the current MCRSession. Be aware that any occurence of ';'
+     * and '\' in <code>argument</code> has to be masked by '\'. You can use
+     * ';' to build an array of arguments: "foo;bar" would result in
+     * {"foo","bar"} (the array)
      * 
      * @param label
      * @param argument
@@ -158,21 +178,31 @@ public class MCRTranslation {
     }
 
     static boolean isArray(String masked) {
-        Matcher m=ARRAY_DETECTOR.matcher(masked);
-        while (m.find()){
-            int pos=m.start();
-            int count=0;
-            for (int i=pos-1;i>0;i--){
-                if (masked.charAt(i)=='\\')
+        Matcher m = ARRAY_DETECTOR.matcher(masked);
+        while (m.find()) {
+            int pos = m.start();
+            int count = 0;
+            for (int i = pos - 1; i > 0; i--) {
+                if (masked.charAt(i) == '\\')
                     count++;
                 else
                     break;
             }
-            if (count % 2 == 0){
+            if (count % 2 == 0) {
                 return true;
             }
         }
         return false;
+    }
+
+    static Properties loadProperties() {
+        Properties deprecatedMapping = new Properties();
+        try {
+            deprecatedMapping.load(MCRTranslation.class.getResourceAsStream(DEPRECATED_MESSAGES_PROPERTIES));
+        } catch (IOException e) {
+            LOGGER.warn("Could not load resource '" + DEPRECATED_MESSAGES_PROPERTIES + "'.", e);
+        }
+        return deprecatedMapping;
     }
 
 }
