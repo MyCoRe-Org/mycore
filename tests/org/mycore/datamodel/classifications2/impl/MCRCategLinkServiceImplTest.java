@@ -56,7 +56,7 @@ public class MCRCategLinkServiceImplTest extends MCRHibTestCase {
 
     private Collection<MCRCategoryLink> testLinks;
 
-    private static MCRCategLinkServiceImpl SERVICE = new MCRCategLinkServiceImpl();
+    private static MCRCategLinkServiceImpl SERVICE = null;
 
     private static final Logger LOGGER = Logger.getLogger(MCRCategLinkServiceImplTest.class);
 
@@ -67,6 +67,9 @@ public class MCRCategLinkServiceImplTest extends MCRHibTestCase {
      */
     protected void setUp() throws Exception {
         super.setUp();
+        if (SERVICE == null) {
+            SERVICE = new MCRCategLinkServiceImpl();
+        }
         loadWorldClassification();
         MCRCategoryImpl germany = (MCRCategoryImpl) category.getChildren().get(0).getChildren().get(0);
         MCRCategoryImpl uk = (MCRCategoryImpl) category.getChildren().get(0).getChildren().get(1);
