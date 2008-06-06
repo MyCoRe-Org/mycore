@@ -54,7 +54,9 @@ public class MCRTranslation {
 
     private static final Pattern ARRAY_DETECTOR = Pattern.compile(";");
 
-    private static Properties deprecatedMapping = loadProperties();
+    private static Properties DEPRECATED_MAPPING = loadProperties();
+
+    private static boolean DEPRECATED_MESSAGES_PRESENT = false;
 
     /**
      * provides translation for the given label (property key).
@@ -76,14 +78,16 @@ public class MCRTranslation {
             LOGGER.debug("Translation for " + label + "=" + result);
         } catch (java.util.MissingResourceException mre) {
             // try to get new key if 'label' is deprecated
-            if (deprecatedMapping.keySet().contains(label)) {
-                String newLabel = deprecatedMapping.getProperty(label);
+            if (DEPRECATED_MESSAGES_PRESENT) {
+                LOGGER.warn("Could not load resource '" + DEPRECATED_MESSAGES_PROPERTIES + "' to check for depreacted I18N keys.");
+            } else if (DEPRECATED_MAPPING.keySet().contains(label)) {
+                String newLabel = DEPRECATED_MAPPING.getProperty(label);
                 try {
                     result = message.getString(newLabel);
                 } catch (java.util.MissingResourceException e) {
                 }
                 if (result != null) {
-                    LOGGER.warn("Usage of deprected I18N key '" + label + "'. Pleas use '" + newLabel + "' instead.");
+                    LOGGER.warn("Usage of deprected I18N key '" + label + "'. Please use '" + newLabel + "' instead.");
                     return result;
                 }
             }
@@ -199,8 +203,9 @@ public class MCRTranslation {
         Properties deprecatedMapping = new Properties();
         try {
             deprecatedMapping.load(MCRTranslation.class.getResourceAsStream(DEPRECATED_MESSAGES_PROPERTIES));
+            DEPRECATED_MESSAGES_PRESENT = true;
         } catch (IOException e) {
-            LOGGER.warn("Could not load resource '" + DEPRECATED_MESSAGES_PROPERTIES + "'.", e);
+            LOGGER.debug("Could not load resource '" + DEPRECATED_MESSAGES_PROPERTIES + "'.", e);
         }
         return deprecatedMapping;
     }
