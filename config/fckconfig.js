@@ -1,29 +1,29 @@
 /*
  * FCKeditor - The text editor for Internet - http://www.fckeditor.net
  * Copyright (C) 2003-2007 Frederico Caldeira Knabben
- * 
+ *
  * == BEGIN LICENSE ==
- * 
+ *
  * Licensed under the terms of any of the following licenses at your
  * choice:
- * 
+ *
  *  - GNU General Public License Version 2 or later (the "GPL")
  *    http://www.gnu.org/licenses/gpl.html
- * 
+ *
  *  - GNU Lesser General Public License Version 2.1 or later (the "LGPL")
  *    http://www.gnu.org/licenses/lgpl.html
- * 
+ *
  *  - Mozilla Public License Version 1.1 or later (the "MPL")
  *    http://www.mozilla.org/MPL/MPL-1.1.html
- * 
+ *
  * == END LICENSE ==
- * 
+ *
  * File Name: fckconfig.js
  * 	Editor configuration settings.
- * 	
+ *
  * 	Follow this link for more information:
  * 	http://wiki.fckeditor.net/Developer%27s_Guide/Configuration/Configurations_Settings
- * 
+ *
  * File Authors:
  * 		Frederico Caldeira Knabben (www.fckeditor.net)
  */
@@ -70,7 +70,7 @@ FCKConfig.ProcessNumericEntities = true ;
 
 FCKConfig.AdditionalNumericEntities = ''  ;		// Single Quote: "'"
 
-FCKConfig.FillEmptyBlocks	= true ;
+FCKConfig.FillEmptyBlocks	= false ;    // false -> fix whitespace error
 
 FCKConfig.FormatSource		= true ;
 FCKConfig.FormatOutput		= true ;
@@ -192,17 +192,17 @@ FCKConfig.BodyClass = '' ;
 // The option switches between trying to keep the html structure or do the changes so the content looks like it was in Word
 FCKConfig.CleanWordKeepsStructure = false ;
 
-// The following value defines which File Browser connector and Quick Upload 
+// The following value defines which File Browser connector and Quick Upload
 // "uploader" to use. It is valid for the default implementaion and it is here
-// just to make this configuration file cleaner. 
-// It is not possible to change this value using an external file or even 
-// inline when creating the editor instance. In that cases you must set the 
+// just to make this configuration file cleaner.
+// It is not possible to change this value using an external file or even
+// inline when creating the editor instance. In that cases you must set the
 // values of LinkBrowserURL, ImageBrowserURL and so on.
 // Custom implementations should just ignore it.
 var _FileBrowserLanguage	= 'asp' ;	// asp | aspx | cfm | lasso | perl | php | py
 var _QuickUploadLanguage	= 'asp' ;	// asp | aspx | cfm | lasso | php
 
-// Don't care about the following line. It just calculates the correct connector 
+// Don't care about the following line. It just calculates the correct connector
 // extension to use for the default File Browser (Perl uses "cgi").
 var _FileBrowserExtension = _FileBrowserLanguage == 'perl' ? 'cgi' : _FileBrowserLanguage ;
 
