@@ -206,6 +206,7 @@ public class MCRTranslation {
             final InputStream propertiesStream = MCRTranslation.class.getResourceAsStream(DEPRECATED_MESSAGES_PROPERTIES);
             if (propertiesStream == null) {
                 LOGGER.warn("Could find resource '" + DEPRECATED_MESSAGES_PROPERTIES + "'.");
+                return deprecatedMapping;
             }
             deprecatedMapping.load(propertiesStream);
             DEPRECATED_MESSAGES_PRESENT = true;
