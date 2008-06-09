@@ -24,6 +24,7 @@
 package org.mycore.services.i18n;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.text.MessageFormat;
 import java.util.LinkedList;
 import java.util.List;
@@ -202,10 +203,14 @@ public class MCRTranslation {
     static Properties loadProperties() {
         Properties deprecatedMapping = new Properties();
         try {
-            deprecatedMapping.load(MCRTranslation.class.getResourceAsStream(DEPRECATED_MESSAGES_PROPERTIES));
+            final InputStream propertiesStream = MCRTranslation.class.getResourceAsStream(DEPRECATED_MESSAGES_PROPERTIES);
+            if (propertiesStream == null) {
+                LOGGER.warn("Could find resource '" + DEPRECATED_MESSAGES_PROPERTIES + "'.");
+            }
+            deprecatedMapping.load(propertiesStream);
             DEPRECATED_MESSAGES_PRESENT = true;
         } catch (IOException e) {
-            LOGGER.debug("Could not load resource '" + DEPRECATED_MESSAGES_PROPERTIES + "'.", e);
+            LOGGER.warn("Could not load resource '" + DEPRECATED_MESSAGES_PROPERTIES + "'.", e);
         }
         return deprecatedMapping;
     }
