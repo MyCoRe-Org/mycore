@@ -27,7 +27,9 @@
   <property name="target.javadocs" location="${target.dir}/javadocs" />
   <property name="target.docs" location="${target.dir}/docs" />
   <property name="target.libs" location="${target.dir}/lib" />
+  <property name="target.jarbase" location="${target.dir}/jarbase" />
   <property name="components.dir" location="${basedir}/components" />
+  <property name="target.version" value="2.0" />
 
   <condition property="ant1.7">
     <available classname="org.apache.tools.ant.taskdefs.condition.AntVersion" />
@@ -174,6 +176,16 @@
   <!-- =================================================================== -->
 
   <target name="init">
+    <!-- find out revision number of HEAD, need svn installed -->
+    <exec executable="svn" outputproperty="svnlog.out">
+      <arg line="log ${basedir} -q -l1" />
+    </exec>
+    <echo level="debug">${svnlog.out}</echo>
+    <propertyregex property="revision.number" input="${svnlog.out}" select="\1">
+      <regexp pattern="r([0-9]*)" />
+    </propertyregex>
+    <echo level="info">MyCoRe Revision found: ${revision.number}</echo>
+    <property name="mycore.version" value="${target.version} r${revision.number}" />
   </target>
 
   <!-- System CLASSPATH is completely ignored! -->
@@ -217,12 +229,17 @@
     <property name="jarfile" value="mycore.jar" />
     <echo level="info">Creating ${jarfile} containing all compiled classes...</echo>
     <mkdir dir="${target.libs}" />
+    <antcall target="jar.copy-xsl" />
+    <antcall target="jar.copy-config" />
+    <antcall target="jar.copy-schema" />
+    <antcall target="jar.copy-components" />
     <jar destfile="${target.libs}/${jarfile}">
       <fileset dir="${target.classes}" includes="**/*.class" />
       <fileset dir="${target.classes}" includes="META-INF/services/*" />
-      <fileset dir="${basedir}/schema" includes="*.xsd *.dtd" />
-      <fileset dir="${basedir}/config" includes="build.properties" />
-      <fileset dir="${basedir}/config" includes="deprecated.properties" />
+      <fileset dir="${target.jarbase}" />
+      <manifest>
+        <attribute name="MCR-Version" value="${target.version} r${revision.number}" />
+      </manifest>
     </jar>
     <copy todir="${target.libs}">
       <mapper type="flatten" />
@@ -230,6 +247,66 @@
       <fileset dir="${components.dir}" includes="*/lib/*.jar" />
     </copy>
     <moduleHook target="jar" />
+  </target>
+
+  <!-- - - - - - - - - - - - - - - - - - 
+          target: jar.copy-xsl                      
+         - - - - - - - - - - - - - - - - - -->
+  <target name="jar.copy-xsl">
+    <mkdir dir="${target.jarbase}/xsl" />
+    <copy todir="${target.jarbase}/xsl" flatten="true">
+      <fileset dir="${basedir}/xsl" includes="*.xsl" />
+      <fileset dir="${components.dir}">
+        <include name="*/xsl/*.xsl" />
+      </fileset>
+    </copy>
+  </target>
+  <!-- - - - - - - - - - - - - - - - - - 
+          target: jar.copy-config                      
+         - - - - - - - - - - - - - - - - - -->
+  <target name="jar.copy-config">
+    <mkdir dir="${target.jarbase}/config" />
+    <copy todir="${target.jarbase}/config">
+      <fileset dir="${basedir}/config" includes="build.properties" />
+      <fileset dir="${basedir}/config" includes="deprecated.properties" />
+    </copy>
+  </target>
+  <!-- - - - - - - - - - - - - - - - - - 
+          target: jar.copy-schema                      
+         - - - - - - - - - - - - - - - - - -->
+  <target name="jar.copy-schema">
+    <mkdir dir="${target.jarbase}/schema" />
+    <copy todir="${target.jarbase}/schema" flatten="true">
+      <fileset dir="${basedir}/schema" includes="*.dtd *.xsd" />
+      <fileset dir="${components.dir}">
+        <include name="*/schema/*.dtd" />
+        <include name="*/schema/*.xsd" />
+      </fileset>
+    </copy>
+  </target>
+
+  <!-- - - - - - - - - - - - - - - - - - 
+          target: jar.copy-components                   
+         - - - - - - - - - - - - - - - - - -->
+  <target name="jar.copy-components">
+    <mkdir dir="${target.jarbase}/components" />
+    <for param="component">
+      <dirset dir="${components.dir}">
+        <include name="*" />
+      </dirset>
+      <sequential>
+        <basename file="@{component}" property="component.name.@{component}" />
+        <echo level="debug">Copying files of component ${component.name.@{component}}</echo>
+        <mkdir dir="${target.jarbase}/components/${component.name.@{component}}" />
+        <copy todir="${target.jarbase}/components/${component.name.@{component}}">
+          <fileset dir="${components.dir}/${component.name.@{component}}">
+            <include name="config/*" />
+            <include name="web/*" />
+            <include name="integrate.xml" />
+          </fileset>
+        </copy>
+      </sequential>
+    </for>
   </target>
 
   <!-- =================================================================== -->
@@ -259,7 +336,7 @@
     </javac>
   </target>
 
-  <target name="compile" description="compiles all sources to classes directory">
+  <target name="compile" depends="init" description="compiles all sources to classes directory">
     <modulePreHook target="compile" />
     <echo level="info">Compiling MyCoRe classes...</echo>
     <copy todir="${target.sources}">
@@ -270,6 +347,17 @@
     <copy todir="${target.sources}">
       <fileset dir="${basedir}/sources" />
     </copy>
+    <echo file="${target.sources}/org/mycore/MCRCoreVersion.java">
+      <![CDATA[
+package org.mycore;
+/** Generated in ANT */
+public class MCRCoreVersion{
+  public static final String VERSION = "${target.version}";
+  public static final int    REVISON = ${revision.number};
+  public static final String COMPLETE = "${target.version} r${revision.number}";
+}
+]]>
+    </echo>
     <antcall target="javac">
       <param name="packages" value="org/mycore/**" />
       <param name="excludes" value="${mcr.exclude}" />
