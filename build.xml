@@ -17,9 +17,17 @@
   <property name="deprecation" value="off" />
   <property name="javatarget" value="1.5" />
   <property name="sourcerelease" value="1.5" />
-  <!--property name="build.compiler"     value="jikes"/-->
   <property name="sourceencoding" value="ISO-8859-15" />
   <property name="env.MYCORE_HOME" value="." />
+  <!-- Path definitions -->
+  <property name="target.dir" location="${basedir}/build" />
+  <property name="target.sources" location="${target.dir}/sources" />
+  <property name="target.classes" location="${target.dir}/classes" />
+  <property name="target.config" location="${target.dir}/config" />
+  <property name="target.javadocs" location="${target.dir}/javadocs" />
+  <property name="target.docs" location="${target.dir}/docs" />
+  <property name="target.libs" location="${target.dir}/lib" />
+  <property name="components.dir" location="${basedir}/components" />
 
   <condition property="ant1.7">
     <available classname="org.apache.tools.ant.taskdefs.condition.AntVersion" />
@@ -35,7 +43,11 @@
 
   <path id="mycore.jars">
     <fileset dir="${basedir}/lib" includes="*.jar" />
+    <fileset dir="${components.dir}" includes="*/lib/*.jar" />
   </path>
+  <fileset id="components.sources" dir="${components.dir}">
+    <include name="*/sources/**" />
+  </fileset>
 
   <taskdef resource="net/sf/antcontrib/antcontrib.properties" classpathref="mycore.jars" />
   <!-- for task is not included in antcontrib.properties by default -->
@@ -67,11 +79,8 @@
     </else>
   </if>
   <path id="mycore.classpath">
-    <pathelement location="${basedir}/classes" />
-    <fileset dir="${basedir}/lib" includes="*.jar" />
-    <!--
-    <fileset dir="${ant.library.dir}" includes="*junit*.jar"/>
-			-->
+    <pathelement location="${target.classes}" />
+    <path refid="mycore.jars" />
     <fileset dir="${ant.library.dir}" includes="ant.jar" />
     <path refid="share.classpath" />
   </path>
@@ -167,7 +176,7 @@
   <target name="init">
     <echo level="info">Initializing directories...</echo>
 
-    <mkdir dir="${basedir}/classes" />
+    <mkdir dir="${target.classes}" />
 
   </target>
 
@@ -186,7 +195,7 @@
       </classpath>
       <formatter type="brief" usefile="false" />
       <batchtest>
-        <fileset dir="${basedir}/classes/">
+        <fileset dir="${target.classes}">
           <include name="**/*Test*.class" />
           <exclude name="**/FulltextTester.class" />
           <exclude name="**/MCRTestCase.class" />
@@ -211,13 +220,19 @@
     <modulePreHook target="jar" />
     <property name="jarfile" value="mycore.jar" />
     <echo level="info">Creating ${jarfile} containing all compiled classes...</echo>
-    <jar destfile="${basedir}/lib/${jarfile}">
-      <fileset dir="${basedir}/classes" includes="**/*.class" />
-      <fileset dir="${basedir}/classes" includes="META-INF/services/*" />
+    <mkdir dir="${target.libs}" />
+    <jar destfile="${target.libs}/${jarfile}">
+      <fileset dir="${target.classes}" includes="**/*.class" />
+      <fileset dir="${target.classes}" includes="META-INF/services/*" />
       <fileset dir="${basedir}/schema" includes="*.xsd *.dtd" />
       <fileset dir="${basedir}/config" includes="build.properties" />
       <fileset dir="${basedir}/config" includes="deprecated.properties" />
     </jar>
+    <copy todir="${target.libs}">
+      <mapper type="flatten" />
+      <fileset dir="${basedir}/lib" includes="*.jar" />
+      <fileset dir="${components.dir}" includes="*/lib/*.jar" />
+    </copy>
     <moduleHook target="jar" />
   </target>
 
@@ -232,8 +247,8 @@
         <isset property="altdir" />
       </not>
     </condition>
-    <javac srcdir="${basedir}/sources:${altdir}"
-           destdir="${basedir}/classes"
+    <javac srcdir="${target.sources}:${altdir}"
+           destdir="${target.classes}"
            includes="${packages}"
            excludes="${excludes}"
            classpathref="mycore.classpath"
@@ -245,12 +260,19 @@
            fork="yes"
            deprecation="${deprecation}">
     </javac>
-    <echo level="info">---------------------------------------------------------</echo>
   </target>
 
   <target name="compile" description="compiles all sources to classes directory">
     <modulePreHook target="compile" />
-    <echo level="info">Compiling MyCoRe non-module classes...</echo>
+    <echo level="info">Compiling MyCoRe classes...</echo>
+    <copy todir="${target.sources}">
+      <!-- removes <modulename>/sources from filename -->
+      <mapper type="regexp" from="^[a-zA-Z]+/sources/(.*)$$" to="\1" />
+      <fileset refid="components.sources" />
+    </copy>
+    <copy todir="${target.sources}">
+      <fileset dir="${basedir}/sources" />
+    </copy>
     <antcall target="javac">
       <param name="packages" value="org/mycore/**" />
       <param name="excludes" value="${mcr.exclude}" />
@@ -305,11 +327,11 @@
     <modulePreHook target="javadocs" />
     <echo level="info">Building the MyCoRe JavaDoc API documentation...</echo>
 
-    <mkdir dir="${basedir}/documentation/html" />
+    <mkdir dir="${target.javadocs}" />
     <javadoc packagenames="*"
              encoding="${sourceencoding}"
              sourcepathref="sourcepath"
-             destdir="${basedir}/documentation/html"
+             destdir="${target.javadocs}"
              classpathref="javadocs.classpath"
              author="true"
              version="true"
@@ -344,7 +366,7 @@
   <target name="java2pdf" depends="init,up2date" if="pdf.outdated">
     <echo level="info"> Building the MyCoRe JavaDoc API documentation as PDF...</echo>
 
-    <mkdir dir="${basedir}/documentation/pdf" />
+    <mkdir dir="${target.docs}" />
     <javadoc packagenames="*"
              sourcepathref="sourcepath"
              classpathref="javadocs.classpath"
@@ -352,7 +374,7 @@
              version="true"
              access="package">
       <doclet name="com.tarsec.javadoc.pdfdoclet.PDFDoclet" path="${doclets}/itext-0.92.jar:${doclets}/pdfdoclet.jar">
-        <param name="-pdf" value="${basedir}/documentation/pdf/javadocs.pdf" />
+        <param name="-pdf" value="${target.docs}/javadocs.pdf" />
         <param name="-config" value="${doclets}/pdfdoclet-mycore.properties" />
       </doclet>
 
@@ -366,12 +388,7 @@
   <target name="clean" description="Removes all files generated by this build file">
     <modulePreHook target="clean" />
     <echo level="info">Cleaning up...</echo>
-    <delete dir="${basedir}/classes" />
-    <delete dir="${basedir}/documentation/html" />
-    <delete dir="${basedir}/documentation/pdf" />
-    <delete includeEmptyDirs="true">
-      <fileset dir="${basedir}/lib" includes="mycore*.jar" />
-    </delete>
+    <delete dir="${target.dir}" />
     <moduleHook target="clean" />
   </target>
 
