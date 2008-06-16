@@ -174,10 +174,6 @@
   <!-- =================================================================== -->
 
   <target name="init">
-    <echo level="info">Initializing directories...</echo>
-
-    <mkdir dir="${target.classes}" />
-
   </target>
 
   <!-- System CLASSPATH is completely ignored! -->
@@ -247,6 +243,7 @@
         <isset property="altdir" />
       </not>
     </condition>
+    <mkdir dir="${target.classes}" />
     <javac srcdir="${target.sources}:${altdir}"
            destdir="${target.classes}"
            includes="${packages}"
