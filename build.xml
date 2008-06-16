@@ -92,13 +92,13 @@
         <sequential>
           <if>
             <resourcecount when="greater" count="0">
-              <fileset dir="." includes="modules/@module/build.xml">
+              <fileset dir="." includes="components/@module/build.xml">
                 <containsregexp expression="\u003ctarget.*name=\u0022pre.@{target}\u0022" />
               </fileset>
             </resourcecount>
             <then>
               <subant target="pre.@{target}" inheritall="true" inheritrefs="true">
-                <fileset dir="." includes="modules/@module/build.xml">
+                <fileset dir="." includes="components/@module/build.xml">
                   <containsregexp expression="\u003ctarget.*name=\u0022pre.@{target}\u0022" />
                 </fileset>
               </subant>
@@ -118,13 +118,13 @@
         <sequential>
           <if>
             <resourcecount when="greater" count="0">
-              <fileset dir="." includes="modules/@{module}/build.xml">
+              <fileset dir="." includes="components/@{module}/build.xml">
                 <containsregexp expression="\u003ctarget.*name=\u0022@{target}\u0022" />
               </fileset>
             </resourcecount>
             <then>
               <subant target="@{target}" inheritall="true" inheritrefs="true">
-                <fileset dir="." includes="modules/@{module}/build.xml">
+                <fileset dir="." includes="components/@{module}/build.xml">
                   <containsregexp expression="\u003ctarget.*name=\u0022@{target}\u0022" />
                 </fileset>
               </subant>
@@ -287,8 +287,8 @@
 
     <path id="sourcepath">
       <dirset dir="${basedir}" includes="sources" />
-      <dirset dir="${basedir}" includes="modules/*/**/src" />
-      <dirset dir="${basedir}" includes="modules/*/sources" />
+      <dirset dir="${basedir}" includes="components/*/**/src" />
+      <dirset dir="${basedir}" includes="components/*/sources" />
     </path>
 
     <condition property="javadocs.outdated">
