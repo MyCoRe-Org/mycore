@@ -3,6 +3,7 @@ package org.mycore.services.migration;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -50,6 +51,7 @@ public class MCRMigrationCommands extends MCRAbstractCommands {
         command.add(com);
     }
 
+    @SuppressWarnings("unchecked")
     public static void migrateClassifications() throws JDOMException {
         List<String> classIds = MCRXMLTableManager.instance().retrieveAllIDs("class");
         MCRCategoryDAO dao = MCRCategoryDAOFactory.getInstance();
@@ -70,7 +72,7 @@ public class MCRMigrationCommands extends MCRAbstractCommands {
             List<String> objID = MCRXMLTableManager.instance().retrieveAllIDs(objectType);
             // for
             for (String id : objID) {
-                Collection<MCRCategoryID> categories = new ArrayList<MCRCategoryID>();
+                Collection<MCRCategoryID> categories = new HashSet<MCRCategoryID>();
 
                 Document obj = MCRXMLTableManager.instance().readDocument(new MCRObjectID(id));
                 List<Element> classElements = classSelector.selectNodes(obj);
