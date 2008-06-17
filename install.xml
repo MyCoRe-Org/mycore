@@ -13,6 +13,7 @@
 
 <project name="DocPortalInstaller" default="install" basedir=".">
   <property name="destdir"     value="c:/java/install" />
+  <property name="jai.libdir"   value="c:/java/jai/lib/ext" />
   <property name="mailserver"  value="xmailout.uni-due.de" />
   <property name="mailaddress" value="xluetzenkirchen@ub.uni-duisburg-essen.de" />
 
@@ -39,17 +40,17 @@
     ========================================  
 
     </echo>
-    <antcall target="svn">
+    <antcall target="svn.checkout">
       <param name="srcUrl"   value="http://server.mycore.de/svn/mycore/trunk" />
       <param name="destPath" value="${destdir}/mycore" />
     </antcall>
 
-    <antcall target="svn">
+    <antcall target="svn.export">
       <param name="srcUrl"   value="http://server.mycore.de/svn/docportal/trunk" />
       <param name="destPath" value="${destdir}/docportal" />
     </antcall>
 
-    <antcall target="svn">
+    <antcall target="svn.export">
       <param name="srcUrl"   value="http://server.mycore.de/svn/content/trunk/defaultsample" />
       <param name="destPath" value="${destdir}/content/defaultsample" />
     </antcall>
@@ -61,6 +62,10 @@
 
     </echo>
     <copy file="${destdir}/mycore/config/build.properties.template" tofile="${destdir}/mycore/config/build.properties" />
+    <mkdir dir="${destdir}/mycore/build/lib" />
+    <copy todir="${destdir}/mycore/lib">
+      <fileset dir="${jai.libdir}" includes="*.jar" />
+    </copy>
     <ant dir="${destdir}/mycore" antfile="build.xml" target="jar" inheritAll="false" inheritRefs="false" />    
     <echo>
 
@@ -265,9 +270,18 @@
     </exec>
   </target>
 	
-  <target name="svn">
+  <target name="svn.export">
     <exec executable="svn" spawn="false">
       <arg value="export"/>
+      <arg value="--force"/>
+      <arg value="${srcUrl}"/>
+      <arg value="${destPath}"/>
+    </exec>
+  </target>
+
+  <target name="svn.checkout">
+    <exec executable="svn" spawn="false">
+      <arg value="checkout"/>
       <arg value="--force"/>
       <arg value="${srcUrl}"/>
       <arg value="${destPath}"/>
