@@ -50,6 +50,9 @@
   <fileset id="components.sources" dir="${components.dir}">
     <include name="*/sources/**" />
   </fileset>
+  <fileset id="components.resources" dir="${components.dir}">
+    <include name="*/resources/**" />
+  </fileset>
 
   <taskdef resource="net/sf/antcontrib/antcontrib.properties" classpathref="mycore.jars" />
   <!-- for task is not included in antcontrib.properties by default -->
@@ -232,6 +235,7 @@
     <antcall target="jar.copy-xsl" />
     <antcall target="jar.copy-config" />
     <antcall target="jar.copy-schema" />
+    <antcall target="jar.copy-resources" />
     <antcall target="jar.copy-components" />
     <jar destfile="${target.libs}/${jarfile}">
       <fileset dir="${target.classes}" includes="**/*.class" />
@@ -284,7 +288,19 @@
       </fileset>
     </copy>
   </target>
-
+  <!-- - - - - - - - - - - - - - - - - - 
+          target: jar.copy-resources                      
+         - - - - - - - - - - - - - - - - - -->
+  <target name="jar.copy-resources">
+    <copy todir="${target.jarbase}" failonerror="false">
+      <fileset dir="${basedir}/resources" />
+    </copy>
+    <copy todir="${target.jarbase}">
+      <!-- removes <modulename>/resources from filename -->
+      <mapper type="regexp" from="^[a-zA-Z]+/resources/(.*)$$" to="\1" />
+      <fileset refid="components.resources" />
+    </copy>
+  </target>
   <!-- - - - - - - - - - - - - - - - - - 
           target: jar.copy-components                   
          - - - - - - - - - - - - - - - - - -->
