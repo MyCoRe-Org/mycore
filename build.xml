@@ -181,7 +181,7 @@
   <target name="init">
     <!-- find out revision number of HEAD, need svn installed -->
     <exec executable="svn" outputproperty="svnlog.out">
-      <arg line="log ${basedir} -q -l1" />
+      <arg line="log ${basedir} -q --limit 1" />
     </exec>
     <echo level="debug">${svnlog.out}</echo>
     <propertyregex property="revision.number" input="${svnlog.out}" select="\1">
