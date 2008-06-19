@@ -63,7 +63,7 @@
     </echo>
     <copy file="${destdir}/mycore/config/build.properties.template" tofile="${destdir}/mycore/config/build.properties" />
     <mkdir dir="${destdir}/mycore/build/lib" />
-    <copy todir="${destdir}/mycore/lib">
+    <copy todir="${destdir}/mycore/lib" failonerror="false">
       <fileset dir="${jai.libdir}" includes="*.jar" />
     </copy>
     <ant dir="${destdir}/mycore" antfile="build.xml" target="jar" inheritAll="false" inheritRefs="false" />    
