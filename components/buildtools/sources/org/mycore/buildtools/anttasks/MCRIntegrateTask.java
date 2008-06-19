@@ -25,11 +25,15 @@ package org.mycore.buildtools.anttasks;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
+import org.apache.tools.ant.Task;
 import org.apache.tools.ant.taskdefs.Expand;
 import org.apache.tools.ant.taskdefs.SubAnt;
 import org.apache.tools.ant.types.Path;
@@ -41,11 +45,11 @@ import org.apache.tools.ant.types.Reference;
  * 
  * @author Thomas Scheffler (yagee)
  */
-public class MCRIntegrateTask extends SubAnt {
+public class MCRIntegrateTask extends Task {
 
     private Path classPath;
 
-    private String mcrVersion;
+    private String mcrVersion, target;
 
     private File buildDir, mycoreJarFile = null;
 
@@ -66,9 +70,19 @@ public class MCRIntegrateTask extends SubAnt {
             throw new BuildException("Could not find a valid mycore.jar in classPath.", ex);
         }
         extractComponents();
-        setBuildpath(new Path(getProject(), buildDir.getAbsolutePath()));
-        setAntfile("integrate.xml");
+        callSubAnt();
         super.execute();
+    }
+
+    private void callSubAnt() {
+        if (target == null)
+            throw new BuildException("Cannot integrate MyCoRe components. No 'target' definied.");
+        SubAnt subAnt = new SubAnt();
+        subAnt.bindToOwner(this);
+        subAnt.setBuildpath(new Path(getProject(), buildDir.getAbsolutePath()));
+        subAnt.setAntfile("integrate.xml");
+        subAnt.setTarget(target);
+        subAnt.execute();
     }
 
     private void extractComponents() {
@@ -85,6 +99,9 @@ public class MCRIntegrateTask extends SubAnt {
         PatternSet expandSet = new PatternSet();
         expandSet.setProject(getProject());
         expandSet.setIncludes("integrate.xml components/**");
+        for (String excluded : getExcludedComponents()) {
+            expandSet.setExcludes(new StringBuilder("components/").append(excluded).append("/**").toString());
+        }
         expandTask.addPatternset(expandSet);
         expandTask.execute();
     }
@@ -134,6 +151,23 @@ public class MCRIntegrateTask extends SubAnt {
             return true;
         }
         return false;
+    }
+
+    private Set<String> getExcludedComponents() {
+        String excludedValue = getProject().getProperty("MCR.Components.Exclude");
+        if (excludedValue == null)
+            return Collections.emptySet();
+        log("Excluding " + excludedValue + " from integration.");
+        HashSet<String> excludedComponents = new HashSet<String>();
+        String[] excludedValues = excludedValue.split(",");
+        for (String component : excludedValues) {
+            excludedComponents.add(component.trim());
+        }
+        return excludedComponents;
+    }
+
+    public void setTarget(String target) {
+        this.target = target;
     }
 
 }
