@@ -47,9 +47,6 @@
     <fileset dir="${basedir}/lib" includes="*.jar" />
     <fileset dir="${components.dir}" includes="*/lib/*.jar" />
   </path>
-  <fileset id="components.sources" dir="${components.dir}">
-    <include name="*/sources/**" />
-  </fileset>
   <fileset id="components.resources" dir="${components.dir}">
     <include name="*/resources/**" />
   </fileset>
@@ -89,7 +86,7 @@
     <fileset dir="${ant.library.dir}" includes="ant.jar" />
     <path refid="share.classpath" />
   </path>
-
+  
   <macrodef name="modulePreHook">
     <attribute name="target" />
     <sequential>
@@ -189,6 +186,18 @@
     </propertyregex>
     <echo level="info">MyCoRe Revision found: ${revision.number}</echo>
     <property name="mycore.version" value="${target.version} r${revision.number}" />
+    <!-- include imaging component only if JAI is available -->
+    <condition property="jai.available">
+      <available classname="javax.media.jai.JAI" classpathref="mycore.classpath" />
+    </condition>
+
+    <path id="sources.path">
+      <dirset dir="${basedir}" includes="sources" />
+      <dirset dir="${basedir}" includes="build/sources" />
+      <dirset dir="${components.dir}" includes="*/sources">
+        <exclude name="imaging/sources" unless="jai.available"/>
+      </dirset>
+    </path>
   </target>
 
   <!-- System CLASSPATH is completely ignored! -->
@@ -241,6 +250,7 @@
       <fileset dir="${target.classes}" includes="**/*.class" />
       <fileset dir="${target.classes}" includes="META-INF/services/*" />
       <fileset dir="${target.jarbase}" />
+      <fileset dir="${basedir}" includes="integrate.xml" />
       <manifest>
         <attribute name="MCR-Version" value="${target.version} r${revision.number}" />
       </manifest>
@@ -297,7 +307,7 @@
     </copy>
     <copy todir="${target.jarbase}">
       <!-- removes <modulename>/resources from filename -->
-      <mapper type="regexp" from="^[a-zA-Z]+/resources/(.*)$$" to="\1" />
+      <mapper type="regexp" from="^[^/\\]+[/\\]resources[/\\](.*)$$" to="\1" />
       <fileset refid="components.resources" />
     </copy>
   </target>
@@ -337,8 +347,7 @@
       </not>
     </condition>
     <mkdir dir="${target.classes}" />
-    <javac srcdir="${target.sources}:${altdir}"
-           destdir="${target.classes}"
+    <javac destdir="${target.classes}"
            includes="${packages}"
            excludes="${excludes}"
            classpathref="mycore.classpath"
@@ -349,20 +358,14 @@
            encoding="${sourceencoding}"
            fork="yes"
            deprecation="${deprecation}">
+      <src><path refid="sources.path"/></src>
     </javac>
   </target>
 
   <target name="compile" depends="init" description="compiles all sources to classes directory">
     <modulePreHook target="compile" />
     <echo level="info">Compiling MyCoRe classes...</echo>
-    <copy todir="${target.sources}">
-      <!-- removes <modulename>/sources from filename -->
-      <mapper type="regexp" from="^[a-zA-Z]+/sources/(.*)$$" to="\1" />
-      <fileset refid="components.sources" />
-    </copy>
-    <copy todir="${target.sources}">
-      <fileset dir="${basedir}/sources" />
-    </copy>
+    <mkdir dir="${target.sources}/org/mycore"/>
     <echo file="${target.sources}/org/mycore/MCRCoreVersion.java">
       <![CDATA[
 package org.mycore;
