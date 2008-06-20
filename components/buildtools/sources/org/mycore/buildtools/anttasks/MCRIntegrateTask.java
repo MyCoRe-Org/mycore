@@ -24,6 +24,7 @@
 package org.mycore.buildtools.anttasks;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.HashSet;
@@ -31,14 +32,26 @@ import java.util.Set;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.Task;
 import org.apache.tools.ant.taskdefs.Expand;
+import org.apache.tools.ant.taskdefs.Property;
 import org.apache.tools.ant.taskdefs.SubAnt;
 import org.apache.tools.ant.types.Path;
 import org.apache.tools.ant.types.PatternSet;
 import org.apache.tools.ant.types.Reference;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 /**
  * Calls a given target of the integrate.xml inside a MyCoRe jar file.
@@ -49,6 +62,8 @@ public class MCRIntegrateTask extends Task {
 
     private Path classPath;
 
+    private Reference classPathRef;
+
     private String mcrVersion, target;
 
     private File buildDir, mycoreJarFile = null;
@@ -56,6 +71,10 @@ public class MCRIntegrateTask extends Task {
     private JarFile mycoreJar;
 
     private boolean scanEveryJarFile = false;
+
+    private DocumentBuilder docBuilder;
+
+    private TransformerFactory transformerFactory;
 
     @Override
     public void execute() {
@@ -70,6 +89,11 @@ public class MCRIntegrateTask extends Task {
             throw new BuildException("Could not find a valid mycore.jar in classPath.", ex);
         }
         extractComponents();
+        try {
+            writeIntegrationHelperFile();
+        } catch (Exception e) {
+            throw new BuildException("Cannot generate integration helper file.", e);
+        }
         callSubAnt();
         super.execute();
     }
@@ -81,7 +105,13 @@ public class MCRIntegrateTask extends Task {
         subAnt.bindToOwner(this);
         subAnt.setBuildpath(new Path(getProject(), buildDir.getAbsolutePath()));
         subAnt.setAntfile("integrate.xml");
+        final Property baseDir = new Property();
+        baseDir.setLocation(buildDir);
+        baseDir.setName("integration.dir");
+        subAnt.addProperty(baseDir);
         subAnt.setTarget(target);
+        subAnt.setInheritall(true);
+        subAnt.setInheritrefs(true);
         subAnt.execute();
     }
 
@@ -98,7 +128,7 @@ public class MCRIntegrateTask extends Task {
         expandTask.setSrc(mycoreJarFile);
         PatternSet expandSet = new PatternSet();
         expandSet.setProject(getProject());
-        expandSet.setIncludes("integrate.xml components/**");
+        expandSet.setIncludes("integrate.xml config/** components/**");
         for (String excluded : getExcludedComponents()) {
             expandSet.setExcludes(new StringBuilder("components/").append(excluded).append("/**").toString());
         }
@@ -116,6 +146,7 @@ public class MCRIntegrateTask extends Task {
             classPath = new Path(getProject());
         }
         classPath.createPath().setRefid(ref);
+        classPathRef = ref;
     }
 
     private void findMycoreJarInPath(Path path) throws IOException {
@@ -168,6 +199,35 @@ public class MCRIntegrateTask extends Task {
 
     public void setTarget(String target) {
         this.target = target;
+    }
+
+    private void writeIntegrationHelperFile() throws IOException, TransformerConfigurationException, TransformerException {
+        Document doc = docBuilder.newDocument();
+        Element project = doc.createElement("project");
+        project.setAttribute("name", "integrationhelper");
+        doc.appendChild(project);
+        Element path = doc.createElement("path");
+        path.setAttribute("id", "integration.classpath");
+        for (String pathElement : classPath.list()) {
+            Element child=doc.createElement("pathelement");
+            child.setAttribute("location", pathElement);
+            path.appendChild(child);
+        }
+        project.appendChild(path);
+        FileOutputStream out= new FileOutputStream(new File(buildDir,"helper.xml"));
+        transformerFactory.newTransformer().transform(new DOMSource(doc), new StreamResult(out));
+        out.close();
+    }
+
+    public void init() {
+        super.init();
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        transformerFactory = TransformerFactory.newInstance();
+        try {
+            docBuilder = factory.newDocumentBuilder();
+        } catch (ParserConfigurationException e) {
+            throw new BuildException("Can not instanciate DocumentBuilder");
+        }
     }
 
 }
