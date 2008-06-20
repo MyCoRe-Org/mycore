@@ -251,6 +251,7 @@
       <fileset dir="${target.classes}" includes="META-INF/services/*" />
       <fileset dir="${target.jarbase}" />
       <fileset dir="${basedir}" includes="integrate.xml" />
+      <fileset dir="${basedir}" includes="config/*" excludes="config/*.template" />
       <manifest>
         <attribute name="MCR-Version" value="${target.version} r${revision.number}" />
       </manifest>
