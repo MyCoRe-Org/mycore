@@ -214,7 +214,7 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
             }
         }
         if (href.indexOf(":") == -1) {
-            return null;
+            return tryResolveXSL(href);
         }
 
         String scheme = getScheme(href);
@@ -224,6 +224,19 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
                 return new JDOMSource(resolveURI(href));
             } catch (Exception e) {
                 throw new TransformerException("Error while resolving: " + href, e);
+            }
+        }
+        return null;
+    }
+
+    private Source tryResolveXSL(String href) {
+        if (href.endsWith(".xsl")) {
+            final String resourceName = "/xsl/" + href;
+            try {
+                LOGGER.debug("Trying to resolve "+href+" from resource" + resourceName);
+                return new JDOMSource(SUPPORTED_SCHEMES.get("resource").resolveElement(resourceName));
+            } catch (Exception e) {
+                LOGGER.debug("could not find Stylesheet " + href + " in resource " + resourceName);
             }
         }
         return null;

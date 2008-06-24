@@ -30,7 +30,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.jar.JarFile;
-import java.util.jar.Manifest;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -60,33 +59,41 @@ import org.w3c.dom.Element;
  */
 public class MCRIntegrateTask extends Task {
 
+    private static final String MYCORE_JAR_PROPERTY = "mcr.integrate.mycore.jar";
+
     private Path classPath;
 
-    private Reference classPathRef;
-
-    private String mcrVersion, target;
+    private String target;
 
     private File buildDir, mycoreJarFile = null;
 
     private JarFile mycoreJar;
 
-    private boolean scanEveryJarFile = false;
-
     private DocumentBuilder docBuilder;
 
     private TransformerFactory transformerFactory;
 
+    private Reference classPathRef;
+
+    @Override
+    public void init() {
+        super.init();
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        transformerFactory = TransformerFactory.newInstance();
+        try {
+            docBuilder = factory.newDocumentBuilder();
+        } catch (ParserConfigurationException e) {
+            throw new BuildException("Can not instanciate DocumentBuilder");
+        }
+    }
+
     @Override
     public void execute() {
         log("classPath:" + classPath, Project.MSG_DEBUG);
-        Exception ex = null;
         try {
-            findMycoreJarInPath(classPath);
+            getMyCoReJar();
         } catch (IOException e) {
-            ex = e;
-        }
-        if (mycoreJar == null) {
-            throw new BuildException("Could not find a valid mycore.jar in classPath.", ex);
+            throw new BuildException("Cannot find a MyCoRe JAR file in classpath.", e);
         }
         extractComponents();
         try {
@@ -96,6 +103,45 @@ public class MCRIntegrateTask extends Task {
         }
         callSubAnt();
         super.execute();
+    }
+
+    public void setClassPathRef(Reference ref) {
+        if (classPath == null) {
+            classPath = new Path(getProject());
+        }
+        classPath.createPath().setRefid(ref);
+        classPathRef = ref;
+    }
+
+    public void setTarget(String target) {
+        this.target = target;
+    }
+
+    private void getMyCoReJar() throws IOException {
+        if (mycoreJarFile == null) {
+            Exception ex = null;
+            try {
+                String pathName = getProject().getProperty(MYCORE_JAR_PROPERTY);
+                if (pathName == null) {
+                    MCRGetMyCoReJarTask findTask = new MCRGetMyCoReJarTask();
+                    findTask.bindToOwner(this);
+                    findTask.setProperty(MYCORE_JAR_PROPERTY);
+                    findTask.setClassPathRef(classPathRef);
+                    findTask.execute();
+                    pathName = getProject().getProperty(MYCORE_JAR_PROPERTY);
+                }
+                log("Found MyCoRe in "+pathName,Project.MSG_DEBUG);
+                mycoreJarFile = new File(pathName);
+            } catch (RuntimeException e) {
+                ex = e;
+            }
+            if (mycoreJarFile == null) {
+                throw new BuildException("Could not find a valid mycore.jar in classPath.", ex);
+            }
+        }
+        if (mycoreJar == null) {
+            mycoreJar = new JarFile(mycoreJarFile);
+        }
     }
 
     private void callSubAnt() {
@@ -141,49 +187,6 @@ public class MCRIntegrateTask extends Task {
         return new File(buildDir, "components");
     }
 
-    public void setClassPathRef(Reference ref) {
-        if (classPath == null) {
-            classPath = new Path(getProject());
-        }
-        classPath.createPath().setRefid(ref);
-        classPathRef = ref;
-    }
-
-    private void findMycoreJarInPath(Path path) throws IOException {
-        for (String part : path.list()) {
-            log("Checking pathElement:" + part, Project.MSG_DEBUG);
-            File candidate = new File(part);
-            if (scanEveryJarFile || candidate.getName().startsWith("mycore")) {
-                if (isMyCoReJAR(candidate)) {
-                    log("Found mycore " + mcrVersion + " in " + candidate.getAbsolutePath());
-                    break;
-                }
-            }
-        }
-        if (this.mycoreJar == null) {
-            log("Did not found a mycore jar file starting with 'mycore' in classPath. Now scanning every jar file for a MyCoRe manifest.");
-            scanEveryJarFile = true;
-            findMycoreJarInPath(path);
-        }
-    }
-
-    private boolean isMyCoReJAR(File candidate) throws IOException {
-        JarFile mycoreJar = new JarFile(candidate);
-        Manifest manifest = mycoreJar.getManifest();
-        if (manifest == null || manifest.getMainAttributes() == null)
-            return false;
-        // Assume it's a mycore jar file if 'MCR-Version' attribute is present
-        // in jar file
-        final String mcrVersion = manifest.getMainAttributes().getValue("MCR-Version");
-        if (mcrVersion != null) {
-            this.mcrVersion = mcrVersion;
-            this.mycoreJar = mycoreJar;
-            this.mycoreJarFile = candidate;
-            return true;
-        }
-        return false;
-    }
-
     private Set<String> getExcludedComponents() {
         String excludedValue = getProject().getProperty("MCR.Components.Exclude");
         if (excludedValue == null)
@@ -197,10 +200,6 @@ public class MCRIntegrateTask extends Task {
         return excludedComponents;
     }
 
-    public void setTarget(String target) {
-        this.target = target;
-    }
-
     private void writeIntegrationHelperFile() throws IOException, TransformerConfigurationException, TransformerException {
         Document doc = docBuilder.newDocument();
         Element project = doc.createElement("project");
@@ -209,25 +208,14 @@ public class MCRIntegrateTask extends Task {
         Element path = doc.createElement("path");
         path.setAttribute("id", "integration.classpath");
         for (String pathElement : classPath.list()) {
-            Element child=doc.createElement("pathelement");
+            Element child = doc.createElement("pathelement");
             child.setAttribute("location", pathElement);
             path.appendChild(child);
         }
         project.appendChild(path);
-        FileOutputStream out= new FileOutputStream(new File(buildDir,"helper.xml"));
+        FileOutputStream out = new FileOutputStream(new File(buildDir, "helper.xml"));
         transformerFactory.newTransformer().transform(new DOMSource(doc), new StreamResult(out));
         out.close();
-    }
-
-    public void init() {
-        super.init();
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        transformerFactory = TransformerFactory.newInstance();
-        try {
-            docBuilder = factory.newDocumentBuilder();
-        } catch (ParserConfigurationException e) {
-            throw new BuildException("Can not instanciate DocumentBuilder");
-        }
     }
 
 }

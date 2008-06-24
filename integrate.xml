@@ -7,6 +7,7 @@
   <taskdef resource="net/sf/antcontrib/antcontrib.properties" classpathref="integration.classpath" />
   <!-- for task is not included in antcontrib.properties by default -->
   <taskdef name="for" classname="net.sf.antcontrib.logic.For" classpathref="integration.classpath" />
+  <taskdef name="xmltask" classname="com.oopsconsultancy.xmltask.ant.XmlTask" classpathref="integration.classpath" />
 
   <macrodef name="componentPreHook">
     <attribute name="target" />
@@ -60,7 +61,16 @@
       </for>
     </sequential>
   </macrodef>
-
+  <macrodef name="merge.web.xml">
+    <attribute name="web.xml.file" />
+    <sequential>
+      <echo level="info">Merging @{web.xml.file} into ${build.webapps}/WEB-INF/web.xml</echo>
+      <xmltask source="${build.webapps}/WEB-INF/web.xml" dest="${build.webapps}/WEB-INF/web.xml">
+        <insert path="/:web-app/:session-config" position="before" file="@{web.xml.file}" />
+      </xmltask>
+      <replace file="${build.webapps}/WEB-INF/web.xml" token='xmlns=""' />
+    </sequential>
+  </macrodef>
 
   <!-- ================================= 
           target: mycore.properties              
@@ -87,5 +97,25 @@
     <echoproperties />
   </target>
 
+  <!-- ================================= 
+          target: webapp              
+         ================================= -->
+  <target name="webapp" description="--> integrates component in web application">
+    <componentPreHook target="webapp" />
+    <copy tofile="${build.webapps}/WEB-INF/web.xml" file="${integration.dir}/config/web.xml" overwrite="true" />
+    <copy todir="${build.webapps}">
+      <mapper type="regexp" from="^[^/\\]+[/\\]web[/\\](.*)$$" to="\1" />
+      <fileset dir="${integration.dir}/components" includes="*/web/**" />
+    </copy>
+    <for param="web.xml.file">
+      <fileset id="web.xml.components" dir="${integration.dir}/components">
+        <include name="*/config/web.xml" />
+      </fileset>
+      <sequential>
+        <merge.web.xml web.xml.file="@{web.xml.file}" />
+      </sequential>
+    </for>
+    <componentHook target="webapp" />
+  </target>
 
 </project>

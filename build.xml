@@ -86,7 +86,7 @@
     <fileset dir="${ant.library.dir}" includes="ant.jar" />
     <path refid="share.classpath" />
   </path>
-  
+
   <macrodef name="modulePreHook">
     <attribute name="target" />
     <sequential>
@@ -195,7 +195,7 @@
       <dirset dir="${basedir}" includes="sources" />
       <dirset dir="${basedir}" includes="build/sources" />
       <dirset dir="${components.dir}" includes="*/sources">
-        <exclude name="imaging/sources" unless="jai.available"/>
+        <exclude name="imaging/sources" unless="jai.available" />
       </dirset>
     </path>
   </target>
@@ -270,7 +270,7 @@
   <target name="jar.copy-xsl">
     <mkdir dir="${target.jarbase}/xsl" />
     <copy todir="${target.jarbase}/xsl" flatten="true">
-      <fileset dir="${basedir}/xsl" includes="*.xsl" />
+      <fileset dir="${basedir}/xsl" includes="**/*.xsl" />
       <fileset dir="${components.dir}">
         <include name="*/xsl/*.xsl" />
       </fileset>
@@ -311,6 +311,16 @@
       <mapper type="regexp" from="^[^/\\]+[/\\]resources[/\\](.*)$$" to="\1" />
       <fileset refid="components.resources" />
     </copy>
+    <if>
+      <not>
+        <available file="${target.jarbase}/mycoreobject.dtd" />
+      </not>
+      <then>
+        <echo file="${target.jarbase}/mycoreobject.dtd">
+          <![CDATA[<!ELEMENT mycoreobject ANY>
+    ]]></echo>
+      </then>
+    </if>
   </target>
   <!-- - - - - - - - - - - - - - - - - - 
           target: jar.copy-components                   
@@ -359,14 +369,16 @@
            encoding="${sourceencoding}"
            fork="yes"
            deprecation="${deprecation}">
-      <src><path refid="sources.path"/></src>
+      <src>
+        <path refid="sources.path" />
+      </src>
     </javac>
   </target>
 
   <target name="compile" depends="init" description="compiles all sources to classes directory">
     <modulePreHook target="compile" />
     <echo level="info">Compiling MyCoRe classes...</echo>
-    <mkdir dir="${target.sources}/org/mycore"/>
+    <mkdir dir="${target.sources}/org/mycore" />
     <echo file="${target.sources}/org/mycore/MCRCoreVersion.java">
       <![CDATA[
 package org.mycore;

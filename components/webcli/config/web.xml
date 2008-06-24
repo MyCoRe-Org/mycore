@@ -1,0 +1,13 @@
+<!-- **************************************************************** -->
+<!-- Servlets and mappings of webcli                                  -->
+<!-- **************************************************************** -->
+
+<servlet id="MCRWebCLIServlet">
+  <servlet-name>MCRWebCLIServlet</servlet-name>
+  <servlet-class>org.mycore.frontend.servlets.MCRWebCLIServlet</servlet-class>
+</servlet>
+
+<servlet-mapping>
+  <servlet-name>MCRWebCLIServlet</servlet-name>
+  <url-pattern>/servlets/MCRWebCLIServlet</url-pattern>
+</servlet-mapping>
