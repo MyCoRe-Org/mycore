@@ -282,7 +282,6 @@
   <target name="svn.checkout">
     <exec executable="svn" spawn="false">
       <arg value="checkout"/>
-      <arg value="--force"/>
       <arg value="${srcUrl}"/>
       <arg value="${destPath}"/>
     </exec>
