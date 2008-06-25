@@ -176,19 +176,19 @@
     <echo>
 
     ========================================  
-      Build web application ...
-    ========================================  
-
-    </echo>
-    <ant dir="${destdir}/docportal" antfile="build.xml" target="webapps"              inheritAll="false" inheritRefs="false" />    
-    <echo>
-
-    ========================================  
       Load default sample content ...
     ========================================  
 
     </echo>
     <ant dir="${destdir}/content/defaultsample" antfile="build.xml" target="load" inheritAll="false" inheritRefs="false" />    
+    <echo>
+
+    ========================================  
+      Build web application ...
+    ========================================  
+
+    </echo>
+    <ant dir="${destdir}/docportal" antfile="build.xml" target="webapps"              inheritAll="false" inheritRefs="false" />    
     <echo>
 
     ========================================  
