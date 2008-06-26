@@ -325,8 +325,7 @@
   
   </xsl:for-each>
   </table>
-
-  </xsl:if>
+  
 </xsl:template>
 
 <!-- ======== handle repeated component ======== -->
