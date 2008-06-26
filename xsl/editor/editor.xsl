@@ -29,6 +29,8 @@
   <xsl:text disable-output-escaping="yes">&amp;nbsp;&amp;nbsp;&amp;nbsp;</xsl:text>
 </xsl:variable>
 
+<xsl:variable name="nodes" select="//node()" />
+
 <!-- ======== FCK Editor JavaScript laden ======== -->
 <xsl:variable name="head.additional">
   <xsl:if test="//textarea[@wysiwygEditor='true']">
@@ -250,7 +252,6 @@
 <xsl:template match="repeater">
   <xsl:param name="var"      />
   <xsl:param name="pos"      />
-  <xsl:param name="num.next" />
 
   <!-- find number of repeats of related xml input element -->
   <xsl:variable name="num">
@@ -276,23 +277,6 @@
 
   <table cellspacing="0">
   
-    <!-- ======== iterate rows in repeater ======== -->
-    <xsl:call-template name="repeater.row">
-      <xsl:with-param name="var" select="$var" />
-      <xsl:with-param name="pos" select="$pos" />
-      <xsl:with-param name="num" select="$num" />
-    </xsl:call-template>
-    
-  </table>
-</xsl:template>
-
-<!-- ======== handle repeater row ======== -->
-<xsl:template name="repeater.row">
-  <xsl:param name="row.nr" select="'1'" />
-  <xsl:param name="num" />
-  <xsl:param name="var" />
-  <xsl:param name="pos" />
-
   <xsl:variable name="min">
     <xsl:choose>
       <xsl:when test="@min">
@@ -311,41 +295,37 @@
     </xsl:choose>
   </xsl:variable>
 
+  <xsl:variable name="rep" select="." />
+
+  <xsl:for-each select="$nodes[(position() &lt;= number($min)) or (position() &lt;= number($num))]">
+  
   <tr>
-    <a name="rep{translate($var,'/@[]','____')}" />
-    <xsl:if test="@pos = 'left'">
+    <xsl:if test="$rep/@pos = 'left'">
       <xsl:call-template name="repeater.pmud">
         <xsl:with-param name="var"    select="$var" />
         <xsl:with-param name="num"    select="$num" />
         <xsl:with-param name="min"    select="$min" />
         <xsl:with-param name="max"    select="$max" />
-        <xsl:with-param name="row.nr" select="$row.nr" />
       </xsl:call-template>
     </xsl:if>
     <xsl:call-template name="repeated.component">
       <xsl:with-param name="var"    select="$var" />
       <xsl:with-param name="pos"    select="$pos" />
-      <xsl:with-param name="row.nr" select="$row.nr" />
+      <xsl:with-param name="rep"    select="$rep" />
     </xsl:call-template>
-    <xsl:if test="( string-length(@pos) = 0 ) or (@pos = 'right')">
+    <xsl:if test="( string-length($rep/@pos) = 0 ) or ($rep/@pos = 'right')">
       <xsl:call-template name="repeater.pmud">
         <xsl:with-param name="var"    select="$var" />
         <xsl:with-param name="num"    select="$num" />
         <xsl:with-param name="min"    select="$min" />
         <xsl:with-param name="max"    select="$max" />
-        <xsl:with-param name="row.nr" select="$row.nr" />
       </xsl:call-template>
     </xsl:if>
   </tr>
+  
+  </xsl:for-each>
+  </table>
 
-  <!-- ======== output another repeated row ======== -->
-  <xsl:if test="($row.nr &lt; $min) or ($row.nr &lt; $num)">
-    <xsl:call-template name="repeater.row">
-      <xsl:with-param name="row.nr" select="1 + $row.nr" />
-      <xsl:with-param name="num" select="$num" />
-      <xsl:with-param name="var" select="$var" />
-      <xsl:with-param name="pos" select="$pos" />
-    </xsl:call-template>
   </xsl:if>
 </xsl:template>
 
@@ -353,7 +333,7 @@
 <xsl:template name="repeated.component">
   <xsl:param name="var" />
   <xsl:param name="pos" />
-  <xsl:param name="row.nr" />
+  <xsl:param name="rep" />
 
   <!-- ======== build the "position number" of this repeated component ======== -->
   <xsl:variable name="pos.new">
@@ -361,27 +341,27 @@
     <xsl:if test="$pos">
       <xsl:text>.</xsl:text>
     </xsl:if>
-    <xsl:value-of select="$row.nr" />
+    <xsl:value-of select="position()" />
   </xsl:variable>
 
   <!-- ======== build variable path for repeated component ======== -->
   <xsl:variable name="var.new">
     <xsl:value-of select="$var" />
-    <xsl:if test="$row.nr &gt; 1">
+    <xsl:if test="position() &gt; 1">
       <xsl:value-of select="$editor.delimiter.pos.start" />
-      <xsl:value-of select="$row.nr" />
+      <xsl:value-of select="position()" />
       <xsl:value-of select="$editor.delimiter.pos.end" />
     </xsl:if>
   </xsl:variable>
  
   <td>
-  
-    <xsl:call-template name="cell">
-      <xsl:with-param name="var"   select="$var.new" />
-      <xsl:with-param name="pos"   select="$pos.new" />
-      <xsl:with-param name="first" select="not(@pos='left')" />
-    </xsl:call-template>
-    
+    <a class="anchor" name="rep{translate($var.new,'/@[]','____')}" />
+    <xsl:for-each select="$rep">  
+      <xsl:call-template name="cell">
+        <xsl:with-param name="var"   select="$var.new" />
+        <xsl:with-param name="pos"   select="$pos.new" />
+      </xsl:call-template>
+    </xsl:for-each>
   </td>
 </xsl:template>
 
@@ -391,7 +371,6 @@
   <xsl:param name="num" />
   <xsl:param name="min" />
   <xsl:param name="max" />
-  <xsl:param name="row.nr" />
 
   <td>
     <!-- ======== set align / valign ======== -->
@@ -403,7 +382,7 @@
       <td>
         <xsl:choose>
           <xsl:when test="$num &lt; $max">
-            <input tabindex="999" type="image" name="{$editor.delimiter.internal}p-{$var}-{$row.nr}" src="{$WebApplicationBaseURL}images/pmud-plus.png"/>
+            <input tabindex="999" type="image" name="{$editor.delimiter.internal}p-{$var}-{position()}" src="{$WebApplicationBaseURL}images/pmud-plus.png"/>
           </xsl:when>
           <xsl:otherwise><img src="{$WebApplicationBaseURL}images/pmud-blank.png" border="0" /></xsl:otherwise>
         </xsl:choose>
@@ -411,23 +390,23 @@
       <td>
         <xsl:choose>
           <xsl:when test="$num &gt; 1">
-            <input tabindex="999" type="image" name="{$editor.delimiter.internal}m-{$var}-{$row.nr}" src="{$WebApplicationBaseURL}images/pmud-minus.png"/>
+            <input tabindex="999" type="image" name="{$editor.delimiter.internal}m-{$var}-{position()}" src="{$WebApplicationBaseURL}images/pmud-minus.png"/>
           </xsl:when>
           <xsl:otherwise><img src="{$WebApplicationBaseURL}images/pmud-blank.png" border="0" /></xsl:otherwise>
         </xsl:choose>
       </td>
       <td>
         <xsl:choose>
-          <xsl:when test="($row.nr &lt; $num) or ($row.nr &lt; $min)">
-            <input tabindex="999" type="image" name="{$editor.delimiter.internal}d-{$var}-{$row.nr}" src="{$WebApplicationBaseURL}images/pmud-down.png"/>
+          <xsl:when test="(position() &lt; $num) or (position() &lt; $min)">
+            <input tabindex="999" type="image" name="{$editor.delimiter.internal}d-{$var}-{position()}" src="{$WebApplicationBaseURL}images/pmud-down.png"/>
           </xsl:when>
           <xsl:otherwise><img src="{$WebApplicationBaseURL}images/pmud-blank.png" border="0" /></xsl:otherwise>
         </xsl:choose>
       </td>
       <td>
         <xsl:choose>
-          <xsl:when test="$row.nr &gt; 1">
-            <input tabindex="999" type="image" name="{$editor.delimiter.internal}u-{$var}-{$row.nr}" src="{$WebApplicationBaseURL}images/pmud-up.png"/>
+          <xsl:when test="position() &gt; 1">
+            <input tabindex="999" type="image" name="{$editor.delimiter.internal}u-{$var}-{position()}" src="{$WebApplicationBaseURL}images/pmud-up.png"/>
           </xsl:when>
           <xsl:otherwise><img src="{$WebApplicationBaseURL}images/pmud-blank.png" border="0" /></xsl:otherwise>
         </xsl:choose>
@@ -442,7 +421,6 @@
 <xsl:template match="panel">
   <xsl:param name="var"      />
   <xsl:param name="pos" select="1" />
-  <xsl:param name="num.next" />
 
   <!-- ======== include cells of other panels by include/@ref ======== -->
   <xsl:variable name="cells" select="ancestor::components/panel[@id = current()/include/@ref]/cell|cell" />
@@ -463,22 +441,61 @@
       </tr>
     </xsl:if>
 
-    <!-- ======== iterate rows in panel ======== -->
-    <xsl:call-template name="editor.row">
-      <xsl:with-param name="cells" select="$cells" />
-      <xsl:with-param name="var"   select="$var"   />
-      <xsl:with-param name="pos"   select="$pos"   />
-    </xsl:call-template>
-    
+    <xsl:for-each select="$cells">
+      <xsl:sort select="@row" data-type="number" />
+      
+      <!-- for each row in panel (handle only first occurrence) -->
+      <xsl:if test="count($cells[(@row=current()/@row) and (@col &lt; current()/@col)]) = 0">
+        <tr>
+          <xsl:variable name="currentRow" select="@row" />
+          <xsl:for-each select="$cells">
+            <xsl:sort select="@col" data-type="number" />
+            <xsl:sort select="@row" data-type="number" />
+            
+            <xsl:choose>
+              <xsl:when test="@row=$currentRow">
+                <!-- output cell in current row and column -->
+                <td>
+                  <xsl:copy-of select="@colspan" />
+                  <xsl:call-template name="cell">
+                    <xsl:with-param name="var" select="$var" />
+                    <xsl:with-param name="pos">
+                      <xsl:value-of select="$pos" />
+                      <xsl:if test="$pos">
+                        <xsl:text>.</xsl:text>
+                      </xsl:if>
+                      <xsl:choose>
+                        <xsl:when test="@sortnr">
+                          <xsl:value-of select="@sortnr"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                          <xsl:value-of select="1 + count($cells[(@row &lt; current()/@row) or ( (@row = current()/@row) and (@col &lt; current()/@col) )])" />
+                        </xsl:otherwise>
+                      </xsl:choose>
+                    </xsl:with-param>
+                  </xsl:call-template>
+                </td>
+              </xsl:when>
+              <xsl:when test="count($cells[(@col=current()/@col) and (@row &lt; current()/@row)]) = 0">
+                <!-- Output necessary empty cells to complete table structure -->
+                <xsl:if test="count($cells[(@row = $currentRow) and ((@col=current()/@col) or ((@col &lt; current()/@col) and (@col+@colspan &gt;= current()/@col))) ]) = 0">
+                  <td/>
+                </xsl:if>
+              </xsl:when>
+            </xsl:choose>
+          </xsl:for-each>
+        </tr>
+      </xsl:if>          
+    </xsl:for-each>
   </table>
-
+  
   <!-- ======== handle hidden fields ======== -->
   <xsl:apply-templates select="ancestor::components/panel[@id = current()/include/@ref]/hidden|hidden">
-    <xsl:with-param name="cells" select="$cells" />
-    <xsl:with-param name="var"   select="$var"   />
-    <xsl:with-param name="pos"   select="$pos"   />
+    <xsl:with-param name="cells"  select="$cells" />
+    <xsl:with-param name="var"    select="$var"   />
+    <xsl:with-param name="pos"    select="$pos"   />
   </xsl:apply-templates>
-
+  
   <!-- ======== handle panel validation conditions ======== -->
   <xsl:for-each select="ancestor::components/panel[@id = current()/include/@ref]/condition|condition">
     <input type="hidden" name="{$editor.delimiter.internal}cond-{$var}" value="{@id}" />
@@ -487,122 +504,10 @@
   
 </xsl:template>
 
-<!-- ======== handle row in panel ======== -->
-<xsl:template name="editor.row">
-  <xsl:param name="row.nr" select="'1'" />
-  <xsl:param name="cells" />
-  <xsl:param name="var" />
-  <xsl:param name="pos" />
-
-  <xsl:if test="count($cells[@row=$row.nr]) &gt; 0">
-    <tr>
-      <!-- ======== iterate through columns of this row ======== -->
-      <xsl:call-template name="editor.col">
-        <xsl:with-param name="row.nr" select="$row.nr" />
-        <xsl:with-param name="cells"  select="$cells"  />
-        <xsl:with-param name="var"    select="$var"    />
-        <xsl:with-param name="pos"    select="$pos"    />
-      </xsl:call-template>
-    </tr>
-  </xsl:if>
-  
-  <!-- ======== iterate through all rows ======== -->
-  <xsl:if test="$cells[@row &gt; $row.nr]">
-    <xsl:call-template name="editor.row">
-      <xsl:with-param name="row.nr" select="1 + $row.nr" />
-      <xsl:with-param name="cells"  select="$cells" />
-      <xsl:with-param name="var"    select="$var"   />
-      <xsl:with-param name="pos"    select="$pos"   />
-    </xsl:call-template>
-  </xsl:if>
-</xsl:template>
-
-<!-- ======== handle column in row ======== -->
-<xsl:template name="editor.col">
-  <xsl:param name="row.nr" select="'1'" />
-  <xsl:param name="col.nr" select="'1'" />
-  <xsl:param name="cells" />
-  <xsl:param name="var" />
-  <xsl:param name="pos" />
-
-  <!-- ======== find colspan for this cell ======== -->
-  <xsl:variable name="my.col.span" select="$cells[(@row=$row.nr) and (@col=$col.nr)]/@colspan" />
-  <xsl:variable name="col.span">
-    <xsl:choose>
-      <xsl:when test="$my.col.span">
-        <xsl:value-of select="$my.col.span" />
-      </xsl:when>
-      <xsl:otherwise>1</xsl:otherwise>
-    </xsl:choose>
-  </xsl:variable>
-
-  <!-- ======== is this the last column?  ======== -->
-  <xsl:variable name="num.next" select="count($cells[@col &gt; (number($col.nr) + number($col.span) - 1)])"/>
-  <xsl:variable name="num.prev" select="count($cells[(@col &lt; number($col.nr)) and (@row = $row.nr)])"/>
-  
-  <td colspan="{$col.span}">
-    <xsl:variable name="the.cell" select="$cells[(@row=$row.nr) and (@col=$col.nr)][1]" />
-
-    <!-- ======== if there is no cell here, add space ======== -->
-    <xsl:if test="count($the.cell) = 0">
-      <xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>
-    </xsl:if>
-
-    <!-- ======== if there is a cell here, handle it ======== -->
-    <xsl:if test="count($the.cell) &gt; 0">
-
-      <!-- ======== find the "position number" of this cell in panel ======== -->
-      <xsl:variable name="pos.new">
-        <xsl:value-of select="$pos" />
-        <xsl:if test="$pos">
-          <xsl:text>.</xsl:text>
-        </xsl:if> 
-        <xsl:choose>
-          <xsl:when test="$the.cell/@sortnr">
-            <xsl:value-of select="$the.cell/@sortnr"/>
-          </xsl:when>
-          <xsl:otherwise> 
-            <xsl:value-of select="1 + count($cells[(@row &lt; $row.nr) or ( (@row = $row.nr) and (@col &lt; $col.nr) )])" />
-          </xsl:otherwise>
-        </xsl:choose>
-      </xsl:variable>
- 
-      <!-- ======== set ID of this cell for later reference ======== -->
-      <xsl:attribute name="id">
-        <xsl:value-of select="$pos.new" />
-      </xsl:attribute>
-
-      <!-- ======== if there is a cell here, handle it ======== -->
-      <xsl:for-each select="$the.cell">
-        <xsl:call-template name="cell">
-          <xsl:with-param name="var"      select="$var"      />
-          <xsl:with-param name="pos"      select="$pos.new"  />
-          <xsl:with-param name="num.next" select="$num.next" />
-          <xsl:with-param name="first"    select="$num.prev = 0" />
-        </xsl:call-template>
-      </xsl:for-each>
-
-    </xsl:if>
-  </td>
-
-  <!-- ======== iterate through all other columns ======== -->
-  <xsl:if test="$num.next &gt; 0">
-    <xsl:call-template name="editor.col">
-      <xsl:with-param name="row.nr" select="$row.nr" />
-      <xsl:with-param name="col.nr" select="number($col.nr) + number($col.span)" />
-      <xsl:with-param name="cells"  select="$cells" />
-      <xsl:with-param name="var"    select="$var"   />
-      <xsl:with-param name="pos"    select="$pos"   />
-    </xsl:call-template>
-  </xsl:if>
-</xsl:template>
-
 <!-- ======== handle cell or repeater content ======== -->
 <xsl:template name="cell">
   <xsl:param name="var" />
   <xsl:param name="pos" />
-  <xsl:param name="num.next" select="'0'" />
-  <xsl:param name="first" />
 
   <!-- ======== build new variable path ======== -->
   <xsl:variable name="var.new">
@@ -625,7 +530,6 @@
     <xsl:apply-templates select=".">
       <xsl:with-param name="var"      select="$var.new"  />
       <xsl:with-param name="pos"      select="$pos"      />
-      <xsl:with-param name="num.next" select="$num.next" />
     </xsl:apply-templates>
 
     <!-- ======== show failed input validation message ======== -->
@@ -1342,4 +1246,3 @@
 <!-- ========================================================================= -->
 
 </xsl:stylesheet>
-
