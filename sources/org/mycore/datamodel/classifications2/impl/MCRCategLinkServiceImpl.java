@@ -37,6 +37,7 @@ import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.datamodel.classifications2.MCRCategLinkService;
+import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.MCRObjectReference;
 
@@ -44,8 +45,7 @@ import org.mycore.datamodel.classifications2.MCRObjectReference;
  * 
  * @author Thomas Scheffler (yagee)
  * 
- * @version $Revision$ $Date: 2008-04-15 14:06:12 +0000 (Di, 15 Apr
- *          2008) $
+ * @version $Revision$ $Date$
  * @since 2.0
  */
 public class MCRCategLinkServiceImpl implements MCRCategLinkService {
@@ -54,8 +54,7 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
 
     private static Class<MCRCategoryLink> LINK_CLASS = MCRCategoryLink.class;
 
-    private static MCRCache categCache = new MCRCache(MCRConfiguration.instance().getInt("MCR.Classifications.LinkServiceImpl.CategCache.Size", 1000),
-            "MCRCategLinkService category cache");
+    private static MCRCache categCache = new MCRCache(MCRConfiguration.instance().getInt("MCR.Classifications.LinkServiceImpl.CategCache.Size", 1000), "MCRCategLinkService category cache");
 
     private static MCRCategoryDAOImpl DAO = new MCRCategoryDAOImpl();
 
@@ -90,15 +89,28 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
             // query can take long time, please cache result
             q.setCacheable(true);
             q.setParameter("classID", classID);
-            q.setParameterList("categIDs", entry.getValue());
             if (restrictedByType) {
                 q.setParameter("type", type);
             }
+            //get object count for every category (not accumulated)
             List<Object[]> result = q.list();
             for (Object[] sr : result) {
                 MCRCategoryID key = new MCRCategoryID(sr[0].toString(), sr[1].toString());
                 Number value = (Number) sr[2];
                 countLinks.put(key, value);
+                //accumulate manually due to performance problems in MySQL
+                List<MCRCategory> parents = DAO.getParents(key);
+                for (MCRCategory parent : parents) {
+                    MCRCategoryID parentID = parent.getId();
+                    if (!parentID.toString().equals(classID)) {
+                        Number counter = countLinks.get(parentID);
+                        if (counter != null) {
+                            countLinks.put(parentID, new Integer(counter.intValue() + value.intValue()));
+                        } else {
+                            countLinks.put(parentID, value);
+                        }
+                    }
+                }
             }
         }
         // overwrites zero count where database returned a value
