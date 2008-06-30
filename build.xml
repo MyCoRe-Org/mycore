@@ -370,7 +370,10 @@
            fork="yes"
            deprecation="${deprecation}">
       <src>
-        <path refid="sources.path" />
+        <path>
+          <path refid="sources.path"/>
+          <path path="${altdir}"/>
+        </path>
       </src>
     </javac>
   </target>
