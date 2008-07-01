@@ -95,24 +95,31 @@ public class MCRXMLResource {
      *             if resource cannot be parsed
      */
     public Document getResource(String name, ClassLoader classLoader) throws IOException, JDOMException {
+        URLConnection con = getResourceURLConnection(name, classLoader);
+        if (con == null)
+            return null;
+        LOGGER.debug(name + " last modified: " + con.getLastModified());
+        CacheEntry entry = (CacheEntry) resourceCache.getIfUpToDate(name, con.getLastModified());
+        if (entry != null && entry.resourceURL.equals(con.getURL())) {
+            LOGGER.debug("Using cached resource " + name);
+            return entry.doc;
+        }
+        entry = new CacheEntry();
+        resourceCache.put(name, entry);
+        entry.resourceURL = con.getURL();
+        Document doc = getDocument(con);
+        entry.doc = doc;
+        return entry.doc;
+    }
+
+    private URLConnection getResourceURLConnection(String name, ClassLoader classLoader) throws IOException {
         LOGGER.debug("Reading xml from classpath resource " + name);
         URL url = classLoader.getResource(name);
         LOGGER.debug("Resource URL:" + url);
         if (url == null)
             return null;
         URLConnection con = url.openConnection();
-        LOGGER.debug(name + " last modified: " + con.getLastModified());
-        CacheEntry entry = (CacheEntry) resourceCache.getIfUpToDate(name, con.getLastModified());
-        if (entry != null && entry.resourceURL.equals(url)) {
-            LOGGER.debug("Using cached resource " + name);
-            return entry.doc;
-        }
-        entry = new CacheEntry();
-        resourceCache.put(name, entry);
-        entry.resourceURL = url;
-        Document doc = getDocument(con);
-        entry.doc = doc;
-        return entry.doc;
+        return con;
     }
 
     private Document getDocument(URLConnection con) throws JDOMException, IOException {
@@ -121,6 +128,15 @@ public class MCRXMLResource {
         builder.setEntityResolver(MCRURIResolver.instance());
         Document doc = builder.build(con.getInputStream());
         return doc;
+    }
+
+    public long getLastModified(String name, ClassLoader classLoader) throws IOException {
+        URLConnection con = getResourceURLConnection(name, classLoader);
+        return con == null ? -1 : con.getLastModified();
+    }
+
+    public boolean exists(String name, ClassLoader classLoader) throws IOException {
+        return getResourceURLConnection(name, classLoader) != null;
     }
 
     private static class CacheEntry {
