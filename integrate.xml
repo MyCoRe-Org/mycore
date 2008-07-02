@@ -16,7 +16,7 @@
         <sequential>
           <if>
             <resourcecount when="greater" count="0">
-              <fileset dir="${integration.dir}" includes="components/@{component}/build.xml">
+              <fileset dir="${integration.dir}" includes="components/@{component}/integrate.xml">
                 <containsregexp expression="\u003ctarget.*name=\u0022pre.@{target}\u0022" />
               </fileset>
             </resourcecount>
@@ -42,7 +42,7 @@
         <sequential>
           <if>
             <resourcecount when="greater" count="0">
-              <fileset dir="${integration.dir}" includes="components/@{component}/build.xml">
+              <fileset dir="${integration.dir}" includes="components/@{component}/integrate.xml">
                 <containsregexp expression="\u003ctarget.*name=\u0022@{target}\u0022" />
               </fileset>
             </resourcecount>
