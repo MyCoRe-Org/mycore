@@ -1,6 +1,6 @@
 /*
  * 
- * $Revision: 1.14 $ $Date: 2008/06/05 05:28:31 $
+ * $Revision$ $Date$
  *
  * This file is part of ***  M y C o R e  ***
  * See http://www.mycore.de/ for details.
@@ -23,8 +23,12 @@
 
 package org.mycore.datamodel.metadata;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.mycore.common.MCRCalendar;
@@ -33,6 +37,9 @@ import org.mycore.common.MCRException;
 import com.ibm.icu.util.Calendar;
 import com.ibm.icu.util.GregorianCalendar;
 import org.jdom.*;
+import org.jdom.input.SAXBuilder;
+import org.jdom.output.Format;
+import org.jdom.output.XMLOutputter;
 
 /**
  * This class implements all methods for handling with the MCRMetaHistoryDate
@@ -41,7 +48,7 @@ import org.jdom.*;
  * @author Juergen Vogler
  * @author Jens Kupferschmidt
  * @author Thomas Junge
- * @version $Revision: 1.14 $ $Date: 2008/06/05 05:28:31 $
+ * @version $Revision$ $Date$
  * @see http://icu.sourceforge.net/
  */
 public class MCRMetaHistoryDate extends MCRMetaDefault {
