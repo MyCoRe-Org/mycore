@@ -37,17 +37,23 @@ public class MCRMigrationCommands extends MCRAbstractCommands {
     public MCRMigrationCommands() {
         MCRCommand com = null;
 
-        com = new MCRCommand("migrate user", "org.mycore.services.migration.MCRMigrationCommands.migrateUser", "The command migrates the user management to MyCoRe 2.0.");
+        com = new MCRCommand("migrate user", "org.mycore.services.migration.MCRMigrationCommands.migrateUser",
+                "The command migrates the user management to MyCoRe 2.0.");
         command.add(com);
-        com = new MCRCommand("internal usermigration step {0}", "org.mycore.services.migration.MCRMigrationCommands.migrateUser int", "Internal commands for user migration");
+        com = new MCRCommand("internal usermigration step {0}", "org.mycore.services.migration.MCRMigrationCommands.migrateUser int",
+                "Internal commands for user migration");
         command.add(com);
-        com = new MCRCommand("migrate mcraccess", "org.mycore.services.migration.MCRMigrationCommands.migrateAccess", "The command migrates the access system to MyCoRe 2.0.");
+        com = new MCRCommand("migrate mcraccess", "org.mycore.services.migration.MCRMigrationCommands.migrateAccess",
+                "The command migrates the access system to MyCoRe 2.0.");
         command.add(com);
-        com = new MCRCommand("internal accessmigration step {0}", "org.mycore.services.migration.MCRMigrationCommands.migrateAccess int", "Internal commands for access system migration");
+        com = new MCRCommand("internal accessmigration step {0}", "org.mycore.services.migration.MCRMigrationCommands.migrateAccess int",
+                "Internal commands for access system migration");
         command.add(com);
-        com = new MCRCommand("migrate classifications", "org.mycore.services.migration.MCRMigrationCommands.migrateClassifications", "Internal commands for classification migration");
+        com = new MCRCommand("migrate classifications", "org.mycore.services.migration.MCRMigrationCommands.migrateClassifications",
+                "Internal commands for classification migration");
         command.add(com);
-        com = new MCRCommand("migrate history date in type {0}", "org.mycore.services.migration.MCRMigrationCommands.migrateMCRMetaHistoryDate String", "Internal commands for the migration of the MCRMetaHistoryDate text lines to multi languages for MyCoRe type {0}");
+        com = new MCRCommand("migrate history date in type {0}", "org.mycore.services.migration.MCRMigrationCommands.migrateMCRMetaHistoryDate String",
+                "Internal commands for the migration of the MCRMetaHistoryDate text lines to multi languages for MyCoRe type {0}");
         command.add(com);
     }
 
@@ -70,8 +76,10 @@ public class MCRMigrationCommands extends MCRAbstractCommands {
         List<String> objectTypes = MCRXMLTableManager.instance().getAllAllowedMCRObjectIDTypes();
         for (String objectType : objectTypes) {
             List<String> objID = MCRXMLTableManager.instance().retrieveAllIDs(objectType);
+            LOGGER.info("Processing object type " + objectType + " with " + objID.size() + " objects.");
             // for
             for (String id : objID) {
+                LOGGER.debug("Processing object " + id);
                 Collection<MCRCategoryID> categories = new HashSet<MCRCategoryID>();
 
                 Document obj = MCRXMLTableManager.instance().readDocument(new MCRObjectID(id));
@@ -83,8 +91,11 @@ public class MCRMigrationCommands extends MCRAbstractCommands {
                 }
                 if (categories.size() > 0) {
                     MCRObjectReference objectReference = new MCRObjectReference(id, objectType);
-                    MCRCategLinkServiceFactory.getInstance().setLinks(objectReference, categories);
-
+                    try {
+                        MCRCategLinkServiceFactory.getInstance().setLinks(objectReference, categories);
+                    } catch (Exception e) {
+                        LOGGER.error("Error occured while creating category links for object " + id, e);
+                    }
                 }
             }
 
