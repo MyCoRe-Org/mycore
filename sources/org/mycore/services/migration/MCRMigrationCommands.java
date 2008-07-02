@@ -75,6 +75,10 @@ public class MCRMigrationCommands extends MCRAbstractCommands {
         // migrate object links
         List<String> objectTypes = MCRXMLTableManager.instance().getAllAllowedMCRObjectIDTypes();
         for (String objectType : objectTypes) {
+            if (objectType.equals("derivate")) {
+                LOGGER.debug("Skipping objectType derivate...");
+                continue;
+            }
             List<String> objID = MCRXMLTableManager.instance().retrieveAllIDs(objectType);
             LOGGER.info("Processing object type " + objectType + " with " + objID.size() + " objects.");
             // for
@@ -182,13 +186,11 @@ public class MCRMigrationCommands extends MCRAbstractCommands {
     }
 
     /**
-     * This method migrate the MCRMetaHistoryDate text entries from a single
-     * text to multi language texts as sequence of XML text elements. The method
-     * read the data to the API and store it to the backend again.
+     * This method migrate the MCRMetaHistoryDate text entries from a single text to multi language texts as sequence of
+     * XML text elements. The method read the data to the API and store it to the backend again.
      * 
      * @param type
-     *            the MyCoRe data type which includes a MCRMetaHistoryDate
-     *            element
+     *            the MyCoRe data type which includes a MCRMetaHistoryDate element
      * @throws Exception
      */
     public static void migrateMCRMetaHistoryDate(String type) throws Exception {
