@@ -36,6 +36,7 @@ import org.hibernate.Session;
 import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRConfiguration;
+import org.mycore.common.MCRException;
 import org.mycore.datamodel.classifications2.MCRCategLinkService;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
@@ -45,7 +46,8 @@ import org.mycore.datamodel.classifications2.MCRObjectReference;
  * 
  * @author Thomas Scheffler (yagee)
  * 
- * @version $Revision$ $Date$
+ * @version $Revision$ $Date: 2008-06-30 10:08:19 +0200 (Mo, 30. Jun
+ *          2008) $
  * @since 2.0
  */
 public class MCRCategLinkServiceImpl implements MCRCategLinkService {
@@ -54,7 +56,8 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
 
     private static Class<MCRCategoryLink> LINK_CLASS = MCRCategoryLink.class;
 
-    private static MCRCache categCache = new MCRCache(MCRConfiguration.instance().getInt("MCR.Classifications.LinkServiceImpl.CategCache.Size", 1000), "MCRCategLinkService category cache");
+    private static MCRCache categCache = new MCRCache(MCRConfiguration.instance().getInt("MCR.Classifications.LinkServiceImpl.CategCache.Size", 1000),
+            "MCRCategLinkService category cache");
 
     private static MCRCategoryDAOImpl DAO = new MCRCategoryDAOImpl();
 
@@ -92,13 +95,13 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
             if (restrictedByType) {
                 q.setParameter("type", type);
             }
-            //get object count for every category (not accumulated)
+            // get object count for every category (not accumulated)
             List<Object[]> result = q.list();
             for (Object[] sr : result) {
                 MCRCategoryID key = new MCRCategoryID(sr[0].toString(), sr[1].toString());
                 Number value = (Number) sr[2];
                 countLinks.put(key, value);
-                //accumulate manually due to performance problems in MySQL
+                // accumulate manually due to performance problems in MySQL
                 List<MCRCategory> parents = DAO.getParents(key);
                 for (MCRCategory parent : parents) {
                     MCRCategoryID parentID = parent.getId();
@@ -182,6 +185,9 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
         if (categ != null)
             return categ;
         categ = MCRCategoryDAOImpl.getByNaturalID(session, categID);
+        if (categ == null) {
+            throw new MCRException("Category " + categID + " does not exists");
+        }
         categCache.put(categID, categ);
         return categ;
     }
