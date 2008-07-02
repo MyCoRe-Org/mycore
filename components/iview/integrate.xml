@@ -1,0 +1,37 @@
+<project name="iview">
+  <import file="../../integrate.xml" />
+  <condition property="jai.available">
+    <available classname="javax.media.jai.JAI" classpathref="integration.classpath" />
+  </condition>
+  <property name="iview.classpath" refid="integration.classpath" />
+  <echo>BaseDIR: ${basedir}</echo>
+  <echo>JAI: ${jai.available}</echo>
+  <echo>classpath: ${iview.classpath}</echo>
+  <!-- - - - - - - - - - - - - - - - - - 
+          target: mycore.properties                      
+         - - - - - - - - - - - - - - - - - -->
+  <target name="mycore.properties" if="jai.available">
+    <echo level="info">adding MCRImgCacheCommands to CLI</echo>
+    <mcr-config action="addInclude"
+                propertyfile="${build.config}/mycore.properties"
+                key="MCR.CLI.Classes.Internal"
+                value="org.mycore.services.imaging.MCRImgCacheCommands" />
+  </target>
+
+  <!-- - - - - - - - - - - - - - - - - - 
+          target: checkJAI                      
+         - - - - - - - - - - - - - - - - - -->
+  <target name="checkJAI" unless="jai.available">
+    <echo level="info">delete some files</echo>
+    <delete dir="." failonerror="false">
+      <include name="config/**" />
+      <include name="web/**" />
+    </delete>
+  </target>
+
+  <target name="pre.mycore.properties" depends="checkJAI" />
+  <target name="pre.i18n" depends="checkJAI" />
+  <target name="pre.webapp" depends="checkJAI" />
+  <target name="pre.scripts" depends="checkJAI" />
+
+</project>
