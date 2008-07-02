@@ -23,23 +23,17 @@
 
 package org.mycore.datamodel.metadata;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.mycore.common.MCRCalendar;
-import org.mycore.common.MCRException;
+import org.jdom.Element;
 
 import com.ibm.icu.util.Calendar;
 import com.ibm.icu.util.GregorianCalendar;
-import org.jdom.*;
-import org.jdom.input.SAXBuilder;
-import org.jdom.output.Format;
-import org.jdom.output.XMLOutputter;
+
+import org.mycore.common.MCRCalendar;
+import org.mycore.common.MCRException;
 
 /**
  * This class implements all methods for handling with the MCRMetaHistoryDate
