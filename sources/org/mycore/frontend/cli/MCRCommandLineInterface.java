@@ -63,7 +63,7 @@ import org.mycore.datamodel.common.MCRActiveLinkException;
  * 
  * @see MCRCommand
  * 
- * @author Frank L�tzenkirchen
+ * @author Frank L\u00fctzenkirchen
  * @author Detlev Degenhardt
  * @author Jens Kupferschmidt
  * @author Thomas Scheffler (yagee)
@@ -190,8 +190,8 @@ public class MCRCommandLineInterface {
                 	command = readCommandFromPrompt();
                 }
                 else{
-                   // System.exit(0);
-                	break;
+                    System.exit(0);
+                	// break;
                 }
             } else {
                 command = (String) commandQueue.firstElement();
