@@ -73,11 +73,12 @@
     <isset property="MCR.System.SharedJarsDir" />
     <then>
       <path id="share.classpath">
-        <fileset dir="${MCR.System.SharedJarsDir}" includes="_dummy_ ${MCR.System.Jars}" />
+        <fileset dir="${MCR.System.SharedJarsDir}" includes="_dummy_ ${MCR.System.Jars}" id="shared.jars" />
       </path>
     </then>
     <else>
       <path id="share.classpath" />
+      <fileset id="shared.jars" dir="${basedir}" excludes="**"/>
     </else>
   </if>
   <path id="mycore.classpath">
@@ -196,6 +197,7 @@
       <dirset dir="${basedir}" includes="build/sources" />
       <dirset dir="${components.dir}" includes="*/sources">
         <exclude name="imaging/sources" unless="jai.available" />
+        <exclude name="iview/sources" unless="jai.available" />
       </dirset>
     </path>
   </target>
@@ -260,6 +262,7 @@
       <mapper type="flatten" />
       <fileset dir="${basedir}/lib" includes="*.jar" />
       <fileset dir="${components.dir}" includes="*/lib/*.jar" />
+      <fileset refid="shared.jars"/>
     </copy>
     <moduleHook target="jar" />
   </target>

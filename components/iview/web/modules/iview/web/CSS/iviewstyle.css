@@ -1,0 +1,598 @@
+/*                                              */
+/* Image Viewer - MCR-IView 1.0, 05-2006        */
+/* +++++++++++++++++++++++++++++++++++++        */
+/*                                              */
+/* Andreas Trappe   - concept, devel. in misc.  */
+/* Britta Kapitzki  - Design                    */
+/* Thomas Scheffler - html prototype            */
+/* Stephan Schmidt  - html prototype            */
+/*                                              */
+
+
+/*
+Colors:
+    mid-blue:   #85A6BC;
+    light-blue: #E2E6E9;
+    dark-blue:  #3A596D;
+    yellow:     #F4BA30;
+*/
+
+  html, body { 
+    margin: 0px;
+    font-family: Arial,Helvetica,sans-serif;
+    font-size: medium;
+/*    height: 100%;    */
+    }
+
+/* =================================================================== */
+/* .border class is responsible for the border around everything you   */
+/* can see                                                         */
+/* =================================================================== */
+.border{
+    position: relative;
+    min-height: 100%;
+    height: auto !important;
+    height: 100%;
+
+}
+
+  table.outerMenu {
+    width: 100%;
+
+    border: none;
+    margin-left: auto;
+    margin-right: auto;
+    table-layout: fixed;
+    border-collapse:collapse;
+    }
+
+  table.innerMenu {
+    width: 273px;
+    height: 100%;
+    margin: 0px;
+    border: none;
+    padding: 0px;
+    border-collapse:collapse;
+    }
+
+  td.innerMenu {
+    white-space: nowrap;
+    padding: 0px;
+    }
+
+  #iview-roller {
+    width: 40px;
+    background-color: #85A6BC;
+    color: white;
+    border-right: white 3px solid;
+    vertical-align: middle;
+    text-align: center;
+    border-left: 1px #85A6BC solid;
+    }
+  #iview-roller img {
+    display: block;
+    vertical-align: middle;
+    margin: 4px auto;
+    }
+
+  #iview-navigation {
+    width: 190px;
+    height: 45px;
+    background-color: #E2E6E9;
+    color: black;
+    border-right: white 3px solid;
+    padding: 0px 5px;
+    }
+  #iview-navigation img {
+    vertical-align: middle;
+    margin: 4px 2px;
+    }
+
+  #iview-simplesize {
+    width: 70px;
+    height: 45px;
+    background-color: #E2E6E9;
+    color: black;
+    border-right: white 2px solid;
+    vertical-align: middle;
+    padding: 0px 5px;
+    }
+  #iview-simplesize img {
+    vertical-align: middle;
+    margin: 4px 2px;
+    }
+ 
+  a.iview-simplesize { 
+    background-image:url('../images/fit-size.gif');
+    display: block;
+    line-height:21px;
+    width:27px;
+    text-decoration: none;
+    }
+  a:hover.iview-simplesize { 
+    background-image:url('../images/fit-size2.gif');
+    text-decoration: none; 
+    }
+
+  a.iview-simplewidth { 
+    background-image:url('../images/fit-width.gif');
+    display: block;
+    line-height:15px;
+    width:31px;
+    text-decoration: none;
+    }
+  a:hover.iview-simplewidth { 
+    background-image:url('../images/fit-width2.gif');
+    text-decoration: none; 
+    }
+
+  a.iview-scrolling { 
+    color: #FFFFFF;
+    font-size: 80%;
+    text-decoration: none;
+    text-align: center;
+    }
+  a:hover.iview-scrolling { 
+    color: #E2E6E9;
+    }
+
+  a.iview-filemenusaved { 
+    background-image:url('../images/save-disabled.gif');
+    display: block;
+    line-height:23px;
+    width:24px;
+    text-decoration: none;
+    }
+  a:hover.iview-filemenusaved { 
+    background-image:url('../images/save-disabled2.gif');
+    text-decoration: none; 
+    }
+
+  a.iview-filemenusendd { 
+    background-image:url('../images/mail-disabled.gif');
+    display: block;
+    line-height:23px;
+    width:26px;
+    text-decoration: none;
+    }
+  a:hover.iview-filemenusendd { 
+    background-image:url('../images/mail-disabled2.gif');
+    text-decoration: none; 
+    }
+  
+  a.iview-displayswitchthumbs { 
+    background-image:url('../images/display-thumbs.gif');
+    display: block;
+    line-height:21px;
+    width:21px;
+    text-decoration: none;
+    }
+  a:hover.iview-displayswitchthumbs { 
+    background-image:url('../images/display-thumbs2.gif');
+    text-decoration: none; 
+    }
+  
+  a.iview-displayswitchpicture { 
+    background-image:url('../images/display-picture.gif');
+    display: block;
+    line-height:21px;
+    width:18px;
+    text-decoration: none;
+    }
+  a:hover.iview-displayswitchpicture { 
+    background-image:url('../images/display-picture2.gif');
+    text-decoration: none; 
+    }
+ 
+  a.iview-displayswitchtext { 
+    background-image:url('../images/display-text.gif');
+    display: block;
+    line-height:21px;
+    width:17px;
+    text-decoration: none;
+    }
+  a:hover.iview-displayswitchtext { 
+    background-image:url('../images/display-text2.gif');
+    text-decoration: none; 
+    }
+ 
+ 
+  a.iview-viewoptionssmall { 
+    background-image:url('../images/resize-smaller.gif');
+    display: block;
+    line-height:17px;
+    width:20px;
+    text-decoration: none;
+    }
+  a:hover.iview-viewoptionssmall { 
+    background-image:url('../images/resize-smaller2.gif');
+    text-decoration: none; 
+    }
+
+  a.iview-viewoptionslarg { 
+    background-image:url('../images/resize-larger.gif');
+    display: block;
+    line-height:17px;
+    width:20px;
+    text-decoration: none;
+    }
+  a:hover.iview-viewoptionslarg { 
+    background-image:url('../images/resize-larger2.gif');
+    text-decoration: none; 
+    }
+
+  a.iview-viewoptionsclose { 
+    background-image:url('../images/close.gif');
+    display: block;
+    line-height:17px;
+    width:13px;
+    text-decoration: none;
+    }
+  a:hover.iview-viewoptionsclose { 
+    background-image:url('../images/close2.gif');
+    text-decoration: none; 
+    }
+
+
+  a.iview-navigationfirst { 
+    background-image:url('../images/nav-first.gif');
+    display: block;
+    line-height:26px;
+    width:26px;
+    text-decoration: none;
+    }
+  a:hover.iview-navigationfirst { 
+    background-image:url('../images/nav-first2.gif');
+    text-decoration: none; 
+    }
+
+  a.iview-navigationback { 
+    background-image:url('../images/nav-back.gif');
+    display: block;
+    line-height:26px;
+    width:26px;
+    text-decoration: none;
+    }
+  a:hover.iview-navigationback { 
+    background-image:url('../images/nav-back2.gif');
+    text-decoration: none; 
+    }
+
+  a.iview-navigationforward { 
+    background-image:url('../images/nav-forward.gif');
+    display: block;
+    line-height:26px;
+    width:26px;
+    text-decoration: none;
+    }
+  a:hover.iview-navigationforward { 
+    background-image:url('../images/nav-forward2.gif');
+    text-decoration: none; 
+    }
+
+  a.iview-navigationlast { 
+    background-image:url('../images/nav-last.gif');
+    display: block;
+    line-height:26px;
+    width:26px;
+    text-decoration: none;
+    }
+  a:hover.iview-navigationlast { 
+    background-image:url('../images/nav-last2.gif');
+    text-decoration: none; 
+    }
+
+
+  a.iview-orientationup { 
+    background-image:url('../images/move-up.gif');
+    display: block;
+    line-height:5px;
+    width:9px;
+    text-decoration: none;
+    }
+  a:hover.iview-orientationup { 
+    background-image:url('../images/move-up2.gif');
+    text-decoration: none; 
+    }
+
+  a.iview-orientationleft { 
+    background-image:url('../images/move-left.gif');
+    display: block;
+    line-height:9px;
+    width:5px;
+    text-decoration: none;
+    }
+  a:hover.iview-orientationleft { 
+    background-image:url('../images/move-left2.gif');
+    text-decoration: none; 
+    }
+  
+  a.iview-orientationsample { 
+    background-image:url('../images/move-sample.gif');
+    display: block;
+    line-height:58px;
+    width:56px;
+    text-decoration: none;
+    }
+  a:hover.iview-orientationsample { 
+    background-image:url('../images/move-sample2.gif');
+    text-decoration: none; 
+    }
+
+  a.iview-orientationright { 
+    background-image:url('../images/move-right.gif');
+    display: block;
+    line-height:9px;
+    width:5px;
+    text-decoration: none;
+    }
+  a:hover.iview-orientationright { 
+    background-image:url('../images/move-right2.gif');
+    text-decoration: none; 
+    }
+
+  a.iview-orientationdown { 
+    background-image:url('../images/move-down.gif');
+    display: block;
+    text-align: center;
+    line-height:5px;
+    width:9px;
+    text-decoration: none;
+    }
+  a:hover.iview-orientationdown { 
+    background-image:url('../images/move-down2.gif');
+    text-decoration: none; 
+    }
+
+
+  a.iview-smalllogol { 
+    background-image:url('../images/small-logo.gif');
+    display: block;
+    text-align: center;
+    line-height:74px;
+    width:18px;
+    text-decoration: none;
+    }
+  a:hover.iview-smalllogol { 
+    background-image:url('../images/small-logo2.gif');
+    text-decoration: none; 
+    }
+
+
+a.dummyview { 
+    background-image:url('../images/roll-out-small.gif');
+    display: block;
+    text-align: center;
+    line-height:14px;
+    width:11px;
+    text-decoration: none;
+    }
+  a:hover.dummyview { 
+    background-image:url('../images/roll-out-small2.gif');
+    text-decoration: none; 
+    }
+
+
+a.dummyview2 { 
+    background-image:url('../images/roll-out.gif');
+    display: block;
+    text-align: center;
+    line-height:21px;
+    width:15px;
+    text-decoration: none;
+    }
+  a:hover.dummyview2 { 
+    background-image:url('../images/roll-out2.gif');
+    text-decoration: none; 
+    }
+
+a.dummyview3 { 
+    background-image:url('../images/roll-in.gif');
+    display: block;
+    text-align: center;
+    line-height:21px;
+    width:15px;
+    text-decoration: none;
+    }
+  a:hover.dummyview3 { 
+    background-image:url('../images/roll-in2.gif');
+    text-decoration: none; 
+    }
+
+a.iview-resizein { 
+    background-image:url('../images/zoomin.gif');
+    display: block;
+    line-height:30px;
+    width:30px;
+    text-decoration: none;
+    }
+  a:hover.iview-resizein { 
+    background-image:url('../images/zoomin2.gif');
+    text-decoration: none; 
+    }
+
+
+a.iview-resizeout { 
+    background-image:url('../images/zoomout.gif');
+    display: block;
+    line-height:26px;
+    width:26px;
+    text-decoration: none;
+    }
+  a:hover.iview-resizeout { 
+    background-image:url('../images/zoomout2.gif');
+    text-decoration: none; 
+    }
+
+  #iview-filemenu {
+    width: 85px;
+    height: 46px;
+    background-color: #3A596D;
+    color: white;
+    /* border-right: white 1px solid; */
+    border: none;
+    vertical-align: middle;
+    padding: 5px;
+  }
+  #iview-filemenu img {
+    vertical-align: middle;
+    margin: 4px 6px;
+    }
+  #iview-filemenu span.highlight {
+    background-color: transparent;
+    color: #F4BA30;
+    font-size: 23px;
+    font-weight: bolder;
+    margin: 4px 6px;
+    position: relative;
+    top: 3px;
+    }
+
+  #iview-displayswitch {
+    background-color: #3A596D;
+    width: 118px;
+    height: 46px;    
+    color: white;
+    margin: 0px;
+    border-left: white 1px solid;
+    border-right: white 1px solid;
+    padding: 5px;
+  }
+  #iview-displayswitch img {
+    vertical-align: middle;
+    margin: 4px 6px;
+    padding: 5px;
+    }
+
+  #iview-viewoptions {
+    width: 66px;
+    height: 46px;  
+    border: none;
+    margin: 0px;
+    padding-left: 5px;
+    background-color: #3A596D;
+    color: white;
+  }
+  #iview-viewoptions img {
+    vertical-align: middle;
+    margin: 4px 6px;
+    }
+
+  #iview-smalllogo {
+    width: 40px;
+    background-color: #85A6BC;
+    color: white;
+    text-align: center;
+    border-top: white 3px solid;
+    border-right: white 3px solid;
+    border-left: 1px #85A6BC solid;
+    vertical-align:top;
+    padding:5px;    
+    }
+  #iview-smalllogo img{
+    display: block;
+    margin: 10px auto;
+    }
+
+  #iview-sorting {
+    background-color: #E2E6E9;
+    color: black;
+    border-top: white 3px solid;
+    border-right: white 3px solid;
+    }
+  #iview-sorting fieldset {
+    border: none;
+    font-size: 80%;
+  }
+  #iview-sorting select {
+    margin: 2px 2px;
+  }
+  #iview-sorting input {
+    margin: 2px 2px;
+  }
+
+  #iview-resize {
+    background-color: #E2E6E9;
+    color: black;
+    border-top: white 3px solid;
+    border-right: white 3px solid;
+    }
+  #iview-resize form {
+    border: none;
+    font-size: 80%;
+  }
+  #iview-resize select {
+    margin: 2px 2px;
+  }
+  #iview-resize input {
+    margin: 2px 2px;
+  }
+
+  #iview-orientation {
+    background-color: #E2E6E9;
+    color: black;
+    border-top: white 4px solid;
+    height:120px;
+    }
+    
+  #iview-orientation table {
+    margin: 4px auto;
+    }
+  #iview-orientation td.h-nav {
+    text-align:center;
+    }
+  #iview-orientation td.v-nav {
+    vertical-align:middle;
+    }
+  #iview-orientation img {
+    display:block;
+    margin:auto;
+    }
+  #iview-orientation td.thumbnail {
+    border: #3A596D 2px solid;
+    }
+
+  #iview-fileproperties {
+    background-color: #85A6BC;
+    color: white;
+    height: 90px;
+    font-size: 11px;
+    border-top: white 1px solid;
+    border-left: white 0px solid;    
+  }
+  #iview-fileproperties p{
+    margin: 10px 20px;
+  }
+  #iview-fileproperties img{
+    float: right;
+    margin: 5px;
+  }
+
+  #iview-baseline {
+    background-color: #85A6BC;
+    color: white;
+    border-left: 1px #85A6BC solid;
+    }
+
+  #iview-content {
+/*      height:100%;*/
+    padding: 5px;
+    border: 1px #85A6BC solid;
+    }
+
+  #content-container {
+/*      height:500px; */
+    width:100%;
+    overflow:auto;
+    }
+
+  #iview-navinput {
+    width: 52px;
+    text-align: center;
+    border-width: 1px;
+    margin-left: 2px;
+    margin-right: 2px;
+    border: solid #85A6BC 1px;
+    font-size: 75%;
+    padding: 0.3em 0.1em;
+  }

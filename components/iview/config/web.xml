@@ -1,0 +1,13 @@
+<!-- **************************************************************** -->
+<!-- Servlets and mappings of iview                                   -->
+<!-- **************************************************************** -->
+
+<servlet id="MCRIViewServlet">
+  <servlet-name>MCRIViewServlet</servlet-name>
+  <servlet-class>org.mycore.frontend.iview.MCRIViewServlet</servlet-class>
+</servlet>
+
+<servlet-mapping>
+  <servlet-name>MCRIViewServlet</servlet-name>
+  <url-pattern>/servlets/MCRIViewServlet/*</url-pattern>
+</servlet-mapping>
