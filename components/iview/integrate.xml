@@ -23,7 +23,7 @@
     </delete>
   </target>
 
-  <target name="pre.mycore.properties" depends="checkJAI" />
+  <target name="pre.config" depends="checkJAI" />
   <target name="pre.i18n" depends="checkJAI" />
   <target name="pre.webapp" depends="checkJAI" />
   <target name="pre.scripts" depends="checkJAI" />
