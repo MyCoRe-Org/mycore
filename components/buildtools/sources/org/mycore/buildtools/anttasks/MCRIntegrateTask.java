@@ -202,9 +202,11 @@ public class MCRIntegrateTask extends Task {
 
     private void writeIntegrationHelperFile() throws IOException, TransformerConfigurationException, TransformerException {
         Document doc = docBuilder.newDocument();
+        //create ant project file
         Element project = doc.createElement("project");
         project.setAttribute("name", "integrationhelper");
         doc.appendChild(project);
+        //add integration.classpath definied by setClassPathRef()
         Element path = doc.createElement("path");
         path.setAttribute("id", "integration.classpath");
         for (String pathElement : classPath.list()) {
@@ -213,6 +215,11 @@ public class MCRIntegrateTask extends Task {
             path.appendChild(child);
         }
         project.appendChild(path);
+        //add property mycore.jar as a hint to mycore.jar file
+        Element mycoreProperty=doc.createElement("property");
+        mycoreProperty.setAttribute("name", "mycore.jar");
+        mycoreProperty.setAttribute("location", mycoreJarFile.getAbsolutePath());
+        project.appendChild(mycoreProperty);
         FileOutputStream out = new FileOutputStream(new File(buildDir, "helper.xml"));
         transformerFactory.newTransformer().transform(new DOMSource(doc), new StreamResult(out));
         out.close();

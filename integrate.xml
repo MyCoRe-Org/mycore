@@ -141,6 +141,14 @@
   </target>
 
   <!-- ================================= 
+          target: compile              
+         ================================= -->
+  <target name="compile" description="--> compiles component code for the application">
+    <componentPreHook target="compile" />
+    <componentHook target="compile" />
+  </target>
+
+  <!-- ================================= 
           target: create.default-rules              
          ================================= -->
   <target name="create.default-rules" description="--> adds some default ACL rules to the application">
@@ -149,11 +157,35 @@
   </target>
 
   <!-- ================================= 
+          target: create.scripts              
+         ================================= -->
+  <target name="create.scripts" description="--> adds component scripts to the application">
+    <componentPreHook target="create.scripts" />
+    <componentHook target="create.scripts" />
+  </target>
+
+  <!-- ================================= 
           target: create.user              
          ================================= -->
   <target name="create.user" description="--> adds user to the application">
     <componentPreHook target="create.user" />
     <componentHook target="create.user" />
+  </target>
+
+  <!-- ================================= 
+          target: deploy              
+         ================================= -->
+  <target name="webservice.deploy" description="--> deploys components to the web application">
+    <componentPreHook target="webservice.deploy" />
+    <componentHook target="webservice.deploy" />
+  </target>
+
+  <!-- ================================= 
+          target: undeply              
+         ================================= -->
+  <target name="webservice.undeploy" description="--> undeploys components from the web application">
+    <componentPreHook target="webservice.undeploy" />
+    <componentHook target="webservice.undeploy" />
   </target>
 
 </project>
