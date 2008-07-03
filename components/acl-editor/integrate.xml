@@ -1,4 +1,4 @@
-<project name="iview">
+<project name="acl-editor">
   <import file="../../integrate.xml" />
   <!-- - - - - - - - - - - - - - - - - - 
           target: create.default-rules                      
