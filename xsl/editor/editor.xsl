@@ -418,11 +418,11 @@
 
 <!-- ======== handle panel ======== -->
 <xsl:template match="panel">
-  <xsl:param name="var"      />
+  <xsl:param name="var" />
   <xsl:param name="pos" select="1" />
 
-  <!-- ======== include cells of other panels by include/@ref ======== -->
-  <xsl:variable name="cells" select="ancestor::components/panel[@id = current()/include/@ref]/cell|cell" />
+  <xsl:variable name="cells1" select="ancestor::components/panel[@id = current()/include/@ref]/cell|cell" /> 
+  <xsl:variable name="cells2" select="ancestor::components/panel[@id = current()/include/@ref]/cell|cell" /> 
 
   <table cellspacing="0">
     <xsl:if test="ancestor::editor/failed/field[@sortnr=$pos]">
@@ -440,21 +440,23 @@
       </tr>
     </xsl:if>
 
-    <xsl:for-each select="$cells">
+    <xsl:for-each select="$cells1">
       <xsl:sort select="@row" data-type="number" />
+      <xsl:sort select="@col" data-type="number" />
       
       <!-- for each row in panel (handle only first occurrence) -->
-      <xsl:if test="count($cells[(@row=current()/@row) and (number(@col) &lt; number(current()/@col))]) = 0">
+      <xsl:if test="count($cells1[(@row=current()/@row) and (number(@col) &lt; number(current()/@col))])=0">
         <tr>
           <xsl:variable name="currentRow" select="@row" />
-          <xsl:for-each select="$cells">
+          
+          <xsl:for-each select="$cells2">
             <xsl:sort select="@col" data-type="number" />
             <xsl:sort select="@row" data-type="number" />
-            
+             
             <xsl:choose>
               <xsl:when test="@row=$currentRow">
-                <!-- output cell in current row and column -->
                 <td>
+                  <xsl:value-of select="@row" />:<xsl:value-of select="@col" />
                   <xsl:copy-of select="@colspan" />
                   <xsl:call-template name="cell">
                     <xsl:with-param name="var" select="$var" />
@@ -468,31 +470,32 @@
                           <xsl:value-of select="@sortnr"/>
                         </xsl:when>
                         <xsl:otherwise>
-                          <xsl:value-of select="1 + count($cells[(number(@row) &lt; number(current()/@row)) or ( (@row = current()/@row) and (number(@col) &lt; number(current()/@col)) )])" />
+                          <xsl:value-of select="1 + count($cells2[(number(@row) &lt; number(current()/@row)) or ( (@row = current()/@row) and (number(@col) &lt; number(current()/@col)) )])" />
                         </xsl:otherwise>
                       </xsl:choose>
                     </xsl:with-param>
                   </xsl:call-template>
                 </td>
               </xsl:when>
-              <xsl:when test="count($cells[(@col=current()/@col) and (number(@row) &lt; number(current()/@row))]) = 0">
+              <!-- For each first occurrence of a column that does NOT exist in the current row ... -->
+              <xsl:when test="count($cells2[(@col=current()/@col) and (number(@row) &lt; number(current()/@row))]) = 0">
                 <!-- Output necessary empty cells to complete table structure -->
-                <xsl:if test="count($cells[(@row = $currentRow) and ((@col=current()/@col) or ((number(@col) &lt; number(current()/@col)) and (number(@col)+number(@colspan) &gt;= number(current()/@col)))) ]) = 0">
+                <xsl:if test="count($cells2[(@row = $currentRow) and ((@col=current()/@col) or ((number(@col) &lt; number(current()/@col)) and (number(@col)+number(@colspan) &gt;= number(current()/@col)))) ]) = 0">
                   <td/>
                 </xsl:if>
               </xsl:when>
             </xsl:choose>
           </xsl:for-each>
         </tr>
-      </xsl:if>          
+      </xsl:if>
     </xsl:for-each>
   </table>
   
   <!-- ======== handle hidden fields ======== -->
   <xsl:apply-templates select="ancestor::components/panel[@id = current()/include/@ref]/hidden|hidden">
-    <xsl:with-param name="cells"  select="$cells" />
-    <xsl:with-param name="var"    select="$var"   />
-    <xsl:with-param name="pos"    select="$pos"   />
+    <xsl:with-param name="cells" select="$cells1" />
+    <xsl:with-param name="var"   select="$var"    />
+    <xsl:with-param name="pos"   select="$pos"    />
   </xsl:apply-templates>
   
   <!-- ======== handle panel validation conditions ======== -->
