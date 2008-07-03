@@ -166,6 +166,7 @@ public class MCRIntegrateTask extends Task {
             expandSet.setExcludes(new StringBuilder("components/").append(excluded).append("/**").toString());
         }
         expandTask.addPatternset(expandSet);
+        expandTask.setOverwrite(false);
         expandTask.execute();
     }
 
