@@ -1,0 +1,43 @@
+#dropmenudiv{
+position:absolute;
+border:1px solid black;
+border-bottom-width: 0;
+font:normal 12px Verdana;
+
+}
+
+#dropmenudiv a{
+width: 100%;
+display: block;
+text-indent: 3px;
+padding: 2px 0;
+margin: 2px;
+text-decoration: none;
+font-weight: bold;
+color: #3a596d;
+}
+
+#dropmenudiv a:hover{ /*hover background color*/
+background-color: #85a6bc;
+}
+
+#dropmenudiv table{
+line-height:10px;
+z-index:100;
+width: 100%;
+display: block;
+text-indent: 3px;
+border-bottom: 1px solid black;
+text-decoration: none;
+font-weight: bold;
+color: #3a596d;
+}
+
+
+
+/* Sample CSS definition for the example list. Remove if desired 
+.navlist li {
+list-style-type: square;
+width: 135px;
+background-color: #85a6bc;
+}*/
