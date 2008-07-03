@@ -75,6 +75,26 @@
   </macrodef>
 
   <!-- ================================= 
+          target: invoke.cli             
+         ================================= -->
+  <target name="invoke.cli">
+    <path id="cli.classpath">
+      <pathelement location="${build.config}" />
+      <pathelement location="${build.classes}" />
+      <path refid="integration.classpath" />
+    </path>
+    <java classname="org.mycore.frontend.cli.MCRCommandLineInterface"
+          dir="${cli.directory}"
+          fork="yes"
+          maxmemory="${java.maxmemory}"
+          classpathref="cli.classpath"
+          failonerror="true">
+      <arg line="${cli.command}" />
+      <env key="LIBPATH" value="${env.LIBPATH}" />
+      <env key="LD_LIBRARY_PATH" value="${env.LD_LIBRARY_PATH}" />
+    </java>
+  </target>
+  <!-- ================================= 
           target: mycore.properties              
          ================================= -->
   <target name="mycore.properties" description="--> generates mycore.properties file">
