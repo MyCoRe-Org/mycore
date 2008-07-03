@@ -31,6 +31,7 @@ import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Vector;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -100,7 +101,8 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
     private int ramDirEntries = 0;
     private IndexReader indexReader;
     private IndexSearcher indexSearcher;
-   
+    private Vector<MCRFieldDef> addableFields = new Vector<MCRFieldDef>();
+    
     public void init(String ID) {
         super.init(ID);
 
@@ -151,6 +153,8 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
             if ("name".equals(fd.getDataType())) {
                 ((PerFieldAnalyzerWrapper) analyzer).addAnalyzer(fd.getName(), simpleAnalyzer);
             }
+            if (fd.isAddable())
+            	addableFields.add(fd); 
         }
         MCRShutdownHandler.getInstance().addCloseable(this);
     }
@@ -290,6 +294,18 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
 
             String id = doc.get("returnid");
             MCRHit hit = new MCRHit(id);
+            
+            for (int j=0;j<addableFields.size();j++)
+            {
+            	MCRFieldDef fd = addableFields.elementAt(j);
+            	String value = doc.get(fd.getName());
+            	if (null != value)
+                {
+                    MCRFieldValue fv = new MCRFieldValue(fd, value);
+                    hit.addMetaData(fv);
+                }
+            }
+           
             String score = df.format(hits.score(i));
             //String score = Float.toString(hits.scoreDocs[i].score);
             addSortDataToHit(sortBy, doc, hit, score);

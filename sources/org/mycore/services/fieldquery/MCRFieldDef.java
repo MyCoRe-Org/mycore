@@ -110,6 +110,11 @@ public class MCRFieldDef {
     private String source;
 
     /**
+     * If true, the content of this field will be added by searcher as metadata in hit
+     */
+    private boolean addable = false;
+
+    /**
      * @return the searchfields-configuration file as jdom-element
      */
     public static Element getConfigFile() {
@@ -124,6 +129,7 @@ public class MCRFieldDef {
         this.sortable = "true".equals(def.getAttributeValue("sortable"));
         this.objects = def.getAttributeValue("objects", (String) null);
         this.source = def.getAttributeValue("source");
+        this.addable = "true".equals(def.getAttributeValue("addable"));
 
         fieldTable.put(name, this);
         buildForEachXSL(def);
@@ -192,6 +198,15 @@ public class MCRFieldDef {
      */
     public boolean isSortable() {
         return sortable;
+    }
+
+    /**
+     * Returns true if this field should be added by searcher to hit
+     * 
+     * @return true, if this field should be added by searcher to hit
+     */
+    public boolean isAddable() {
+        return addable;
     }
 
     /**
