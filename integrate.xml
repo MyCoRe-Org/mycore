@@ -121,6 +121,26 @@
   </target>
 
   <!-- ================================= 
+          target: i18n              
+         ================================= -->
+  <target name="i18n" description="--> adds i18n keys to the web application">
+    <componentPreHook target="i18n" />
+    <concat destfile="${build.config}/messages_en.properties" append="false">
+      <fileset file="${integration.dir}/config/messages_en.properties" />
+      <fileset id="mycore.components.properties" dir="${integration.dir}/components">
+        <include name="*/config/messages_en.properties" />
+      </fileset>
+    </concat>
+    <concat destfile="${build.config}/messages_de.properties" append="false">
+      <fileset file="${integration.dir}/config/messages_de.properties" />
+      <fileset id="mycore.components.properties" dir="${integration.dir}/components">
+        <include name="*/config/messages_de.properties" />
+      </fileset>
+    </concat>
+    <componentHook target="i18n" />
+  </target>
+
+  <!-- ================================= 
           target: create.default-rules              
          ================================= -->
   <target name="create.default-rules" description="--> adds some default ACL rules to the application">
@@ -128,5 +148,12 @@
     <componentHook target="create.default-rules" />
   </target>
 
+  <!-- ================================= 
+          target: create.user              
+         ================================= -->
+  <target name="create.user" description="--> adds user to the application">
+    <componentPreHook target="create.user" />
+    <componentHook target="create.user" />
+  </target>
 
 </project>

@@ -1,0 +1,38 @@
+<project name="broadcasting">
+  <import file="../../integrate.xml" />
+  <!-- - - - - - - - - - - - - - - - - - 
+          target: create.user                      
+         - - - - - - - - - - - - - - - - -
+-->
+  <target name="create.user">
+    <property name="commands.file" value="${basedir}/commands.txt" />
+    <echo file="${commands.file}" append="false">
+change to user ${MCR.Users.Superuser.UserName} with ${MCR.Users.Superuser.UserPasswd}
+create group data from file broadcastinggroup.xml
+add user ${MCR.Users.Superuser.UserName} as member to group broadcastinggroup    	
+check user data consistency
+	</echo>
+    <antcall target="invoke.cli">
+      <param name="cli.directory" value="${basedir}/config/access" />
+      <param name="cli.command" value="process ${commands.file}" />
+    </antcall>
+    <delete file="${commands.file}" />
+  </target>
+
+  <!-- - - - - - - - - - - - - - - - - - 
+          target: create.default-rules                      
+         - - - - - - - - - - - - - - - - -
+-->
+  <target name="create.default-rules">
+    <property name="commands.file" value="${basedir}/commands.txt" />
+    <echo file="${commands.file}" append="false">
+update permission manage for id module-broadcasting with rulefile grant-broadcastinggroup.xml described by members of broadcastinggroup    	
+update permission read for id webpage:/servlets/MCRBroadcastingServlet?mode=getReceiverList with rulefile grant-broadcastinggroup.xml described by members of broadcastinggroup    	    	
+	</echo>
+    <antcall target="invoke.cli">
+      <param name="cli.directory" value="${basedir}/config/access" />
+      <param name="cli.command" value="process ${commands.file}" />
+    </antcall>
+    <delete file="${commands.file}" />
+  </target>
+</project>
