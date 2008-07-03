@@ -340,7 +340,7 @@
         <mkdir dir="${target.jarbase}/components/${component.name.@{component}}" />
         <copy todir="${target.jarbase}/components/${component.name.@{component}}">
           <fileset dir="${components.dir}/${component.name.@{component}}">
-            <include name="config/*" />
+            <include name="config/**" />
             <include name="web/**" />
             <include name="integrate.xml" />
           </fileset>
