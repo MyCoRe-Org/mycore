@@ -16,7 +16,9 @@
         <sequential>
           <if>
             <resourcecount when="greater" count="0">
-              <fileset dir="${integration.dir}" includes="components/@{component}/integrate.xml" id="integrate.pre.@{target}">
+              <fileset dir="${integration.dir}"
+                       includes="components/@{component}/integrate.xml"
+                       id="integrate.pre.@{target}">
                 <containsregexp expression="\u003ctarget.*name=\u0022pre.@{target}\u0022" />
               </fileset>
             </resourcecount>
@@ -41,7 +43,9 @@
         <sequential>
           <if>
             <resourcecount when="greater" count="0">
-              <fileset dir="${integration.dir}" includes="components/@{component}/integrate.xml" id="integrate.@{target}">
+              <fileset dir="${integration.dir}"
+                       includes="components/@{component}/integrate.xml"
+                       id="integrate.@{target}">
                 <containsregexp expression="\u003ctarget.*name=\u0022@{target}\u0022" />
               </fileset>
             </resourcecount>
@@ -115,5 +119,14 @@
     </for>
     <componentHook target="webapp" />
   </target>
+
+  <!-- ================================= 
+          target: create.default-rules              
+         ================================= -->
+  <target name="create.default-rules" description="--> adds some default ACL rules to the application">
+    <componentPreHook target="create.default-rules" />
+    <componentHook target="create.default-rules" />
+  </target>
+
 
 </project>
