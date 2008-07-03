@@ -1,9 +1,9 @@
 <project name="wcms">
   <import file="../../integrate.xml" />
   <!-- - - - - - - - - - - - - - - - - - 
-          target: mycore.properties                      
+          target: config                      
          - - - - - - - - - - - - - - - - - -->
-  <target name="mycore.properties">
+  <target name="config">
     <mcr-config action="addInclude"
                 propertyfile="${build.config}/mycore.properties"
                 key="MCR.CLI.Classes.Internal"

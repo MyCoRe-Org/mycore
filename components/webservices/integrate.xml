@@ -4,15 +4,21 @@
   <property name="wsurl" value="${MCR.baseurl}services/MCRWebService" />
 
   <!-- - - - - - - - - - - - - - - - - - 
+          target: config                      
+         - - - - - - - - - - - - - - - - - -->
+  <target name="config" description="copies deployment descriptors">
+    <copy todir="${build.config}">
+      <fileset dir="${basedir}/config" includes="*.wsdd" />
+    </copy>
+  </target>
+
+  <!-- - - - - - - - - - - - - - - - - - 
           target: compile                      
          - - - - - - - - - - - - - - - - - -->
   <target name="compile" description="Build and compiles all webservice classes">
     <echo level="info">
 			compiling ${ant.project.name}
     </echo>
-    <copy todir="${build.config}">
-      <fileset dir="${basedir}/config" includes="*.wsdd" />
-    </copy>
     <antcall target="wsdl2java" />
     <mkdir dir="${build.classes}" />
     <javac destdir="${build.classes}" classpathref="integration.classpath" encoding="ISO-8859-1">

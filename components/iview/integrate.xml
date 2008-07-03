@@ -4,9 +4,9 @@
     <available classname="javax.media.jai.JAI" classpathref="integration.classpath" />
   </condition>
   <!-- - - - - - - - - - - - - - - - - - 
-          target: mycore.properties                      
+          target: config                      
          - - - - - - - - - - - - - - - - - -->
-  <target name="mycore.properties" if="jai.available">
+  <target name="config" if="jai.available">
     <mcr-config action="addInclude"
                 propertyfile="${build.config}/mycore.properties"
                 key="MCR.CLI.Classes.Internal"

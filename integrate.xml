@@ -95,12 +95,12 @@
     </java>
   </target>
   <!-- ================================= 
-          target: mycore.properties              
+          target: config              
          ================================= -->
-  <target name="mycore.properties" description="--> generates mycore.properties file">
+  <target name="config" description="--> generates mycore.properties file">
     <property name="mycore.properties.target" location="${build.config}/mycore.properties" />
     <copy todir="${build.config}" overwrite="true" file="${integration.dir}/config/mycore.properties" />
-    <componentPreHook target="mycore.properties" />
+    <componentPreHook target="config" />
     <for param="component.property" trim="true">
       <fileset id="mycore.components.properties" dir="${integration.dir}/components">
         <include name="*/config/mycore.properties" />
@@ -109,7 +109,7 @@
         <mcr-config propertyfile="${build.config}/mycore.properties" mergeFile="@{component.property}" />
       </sequential>
     </for>
-    <componentHook target="mycore.properties" />
+    <componentHook target="config" />
   </target>
 
   <!-- ================================= 
