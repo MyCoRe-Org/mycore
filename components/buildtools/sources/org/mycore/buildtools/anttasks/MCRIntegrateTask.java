@@ -1,25 +1,12 @@
 /**
- * $RCSfile: MCRIntegrateTask.java,v $
- * $Revision: 1.0 $ $Date: 18.06.2008 09:40:38 $
- *
- * This file is part of ** M y C o R e **
- * Visit our homepage at http://www.mycore.de/ for details.
- *
- * This program is free software; you can use it, redistribute it
- * and / or modify it under the terms of the GNU General Public License
- * (GPL) as published by the Free Software Foundation; either version 2
- * of the License or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program, normally in the file license.txt.
- * If not, write to the Free Software Foundation Inc.,
- * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
- *
+ * $RCSfile: MCRIntegrateTask.java,v $ $Revision: 1.0 $ $Date: 18.06.2008 09:40:38 $ This file is part of ** M y C o R e
+ * ** Visit our homepage at http://www.mycore.de/ for details. This program is free software; you can use it,
+ * redistribute it and / or modify it under the terms of the GNU General Public License (GPL) as published by the Free
+ * Software Foundation; either version 2 of the License or (at your option) any later version. This program is
+ * distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details. You should
+ * have received a copy of the GNU General Public License along with this program, normally in the file license.txt. If
+ * not, write to the Free Software Foundation Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307 USA
  **/
 package org.mycore.buildtools.anttasks;
 
@@ -130,7 +117,7 @@ public class MCRIntegrateTask extends Task {
                     findTask.execute();
                     pathName = getProject().getProperty(MYCORE_JAR_PROPERTY);
                 }
-                log("Found MyCoRe in "+pathName,Project.MSG_DEBUG);
+                log("Found MyCoRe in " + pathName, Project.MSG_DEBUG);
                 mycoreJarFile = new File(pathName);
             } catch (RuntimeException e) {
                 ex = e;
@@ -189,7 +176,7 @@ public class MCRIntegrateTask extends Task {
 
     private Set<String> getExcludedComponents() {
         String excludedValue = getProject().getProperty("MCR.Components.Exclude");
-        if (excludedValue == null)
+        if (excludedValue == null || excludedValue.trim().length() == 0)
             return Collections.emptySet();
         log("Excluding " + excludedValue + " from integration.");
         HashSet<String> excludedComponents = new HashSet<String>();
@@ -202,11 +189,11 @@ public class MCRIntegrateTask extends Task {
 
     private void writeIntegrationHelperFile() throws IOException, TransformerConfigurationException, TransformerException {
         Document doc = docBuilder.newDocument();
-        //create ant project file
+        // create ant project file
         Element project = doc.createElement("project");
         project.setAttribute("name", "integrationhelper");
         doc.appendChild(project);
-        //add integration.classpath definied by setClassPathRef()
+        // add integration.classpath definied by setClassPathRef()
         Element path = doc.createElement("path");
         path.setAttribute("id", "integration.classpath");
         for (String pathElement : classPath.list()) {
@@ -215,8 +202,8 @@ public class MCRIntegrateTask extends Task {
             path.appendChild(child);
         }
         project.appendChild(path);
-        //add property mycore.jar as a hint to mycore.jar file
-        Element mycoreProperty=doc.createElement("property");
+        // add property mycore.jar as a hint to mycore.jar file
+        Element mycoreProperty = doc.createElement("property");
         mycoreProperty.setAttribute("name", "mycore.jar");
         mycoreProperty.setAttribute("location", mycoreJarFile.getAbsolutePath());
         project.appendChild(mycoreProperty);
