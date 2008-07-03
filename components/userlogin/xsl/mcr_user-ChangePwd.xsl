@@ -40,10 +40,10 @@
 	<xsl:choose>
      <xsl:when test="$CurrentLang = 'ar'" >
        [&#160;<xsl:value-of select="$CurrentUser"/>&#160;]
-       <xsl:value-of select="concat(':', i18n:translate('userlogin.tasks.currentAccount'))"/>&#160;&#160;
+       <xsl:value-of select="concat(':', i18n:translate('component.userlogin.tasks.currentAccount'))"/>&#160;&#160;
      </xsl:when>
      <xsl:otherwise>
-       <xsl:value-of select="concat(i18n:translate('userlogin.tasks.currentAccount'),' :')"/>&#160;&#160;
+       <xsl:value-of select="concat(i18n:translate('component.userlogin.tasks.currentAccount'),' :')"/>&#160;&#160;
        [&#160;<xsl:value-of select="$CurrentUser"/>&#160;]
      </xsl:otherwise>
 	</xsl:choose>
@@ -68,38 +68,38 @@
            <xsl:when test="$CurrentLang = 'ar'" >
 			<tr>
                 <td class="inputField"><input name="pwd_1" type="password" maxlength="30"/></td>
-				<td class="inputCaption_ar"><xsl:value-of select="concat(':' , i18n:translate('userlogin.tasks.changePass.newPass'))"/></td>                
+				<td class="inputCaption_ar"><xsl:value-of select="concat(':' , i18n:translate('component.userlogin.tasks.changePass.newPass'))"/></td>                
             </tr>
             <tr>
                 <td class="inputField" ><input name="pwd_2" type="password" maxlength="30"/></td>
-				<td class="inputCaption_ar"><xsl:value-of select="concat(':' , i18n:translate('userlogin.tasks.changePass.repeatPass'))"/></td>              
+				<td class="inputCaption_ar"><xsl:value-of select="concat(':' , i18n:translate('component.userlogin.tasks.changePass.repeatPass'))"/></td>              
             </tr>
             <tr >
                 <th colspan="2">
-                    <xsl:value-of select="i18n:translate('userlogin.tasks.changePass.securityNote')"/>
+                    <xsl:value-of select="i18n:translate('component.userlogin.tasks.changePass.securityNote')"/>
                 </th>
             </tr>
             <tr>
                 <td class="inputField" ><input name="oldpwd" type="password" maxlength="30"/></td>
-				<td class="inputCaption_ar"><xsl:value-of select="concat(':' , i18n:translate('userlogin.tasks.changePass.oldPass'))"/></td>               
+				<td class="inputCaption_ar"><xsl:value-of select="concat(':' , i18n:translate('component.userlogin.tasks.changePass.oldPass'))"/></td>               
             </tr>
 		   </xsl:when>
            <xsl:otherwise>
             <tr>
-                <td class="inputCaption"><xsl:value-of select="concat(i18n:translate('userlogin.tasks.changePass.newPass'), ':')"/></td>
+                <td class="inputCaption"><xsl:value-of select="concat(i18n:translate('component.userlogin.tasks.changePass.newPass'), ':')"/></td>
                 <td class="inputField"><input name="pwd_1" type="password" maxlength="30"/></td>
             </tr>
             <tr>
-                <td class="inputCaption"><xsl:value-of select="concat(i18n:translate('userlogin.tasks.changePass.repeatPass'), ':')"/></td>
+                <td class="inputCaption"><xsl:value-of select="concat(i18n:translate('component.userlogin.tasks.changePass.repeatPass'), ':')"/></td>
                 <td class="inputField"><input name="pwd_2" type="password" maxlength="30"/></td>
             </tr>
             <tr >
                 <th colspan="2">
-                    <xsl:value-of select="i18n:translate('userlogin.tasks.changePass.securityNote')"/>
+                    <xsl:value-of select="i18n:translate('component.userlogin.tasks.changePass.securityNote')"/>
                 </th>
             </tr>
             <tr>
-                <td class="inputCaption"><xsl:value-of select="concat(i18n:translate('userlogin.tasks.changePass.oldPass'), ':')"/></td>
+                <td class="inputCaption"><xsl:value-of select="concat(i18n:translate('component.userlogin.tasks.changePass.oldPass'), ':')"/></td>
                 <td class="inputField" ><input name="oldpwd" type="password" maxlength="30"/></td>
             </tr>
 		  </xsl:otherwise>
@@ -109,10 +109,10 @@
 		<p/>
 		<xsl:choose>
 			<xsl:when test="$CurrentLang = 'ar' ">
-				<input type="submit" class="button_ar" value="{i18n:translate('userlogin.tasks.changePass.submit')} &gt;&gt;" name="ChangePwdSubmit"/>
+				<input type="submit" class="button_ar" value="{i18n:translate('component.userlogin.tasks.changePass.submit')} &gt;&gt;" name="ChangePwdSubmit"/>
 			</xsl:when>
 			<xsl:otherwise>
-				<input type="submit" class="button" value="{i18n:translate('userlogin.tasks.changePass.submit')} &gt;&gt;" name="ChangePwdSubmit"/>
+				<input type="submit" class="button" value="{i18n:translate('component.userlogin.tasks.changePass.submit')} &gt;&gt;" name="ChangePwdSubmit"/>
 			</xsl:otherwise>
 	    </xsl:choose>
     </form>
@@ -121,17 +121,17 @@
 <xsl:template name="userStatus">
     <xsl:if test="/mcr_user/@new_pwd_mismatch='true' or /mcr_user/@old_pwd_mismatch='true' or /mcr_user/error">
 		<p class="status">
-            <xsl:value-of select="i18n:translate('userlogin.tasks.changePass.failed')"/>
+            <xsl:value-of select="i18n:translate('component.userlogin.tasks.changePass.failed')"/>
         </p>
     </xsl:if>
     <xsl:if test="@new_pwd_mismatch='true'">
 		<p class="status">
-            <xsl:value-of select="i18n:translate('userlogin.tasks.changePass.newPassMismatch')"/>
+            <xsl:value-of select="i18n:translate('component.userlogin.tasks.changePass.newPassMismatch')"/>
         </p>
     </xsl:if>
     <xsl:if test="@old_pwd_mismatch='true'">
 		<p class="status">
-            <xsl:value-of select="i18n:translate('userlogin.tasks.changePass.oldPassMismatch')"/>
+            <xsl:value-of select="i18n:translate('component.userlogin.tasks.changePass.oldPassMismatch')"/>
         </p>
     </xsl:if>
     <xsl:if test="/mcr_user/error">

@@ -40,17 +40,17 @@
 	<xsl:choose>
      <xsl:when test="$CurrentLang = 'ar'" >
        [&#160;<xsl:value-of select="$CurrentUser"/>&#160;]
-       <xsl:value-of select="concat(':', i18n:translate('userlogin.tasks.currentAccount'))"/>&#160;&#160;
+       <xsl:value-of select="concat(':', i18n:translate('component.userlogin.tasks.currentAccount'))"/>&#160;&#160;
      </xsl:when>
      <xsl:otherwise>
-       <xsl:value-of select="concat(i18n:translate('userlogin.tasks.currentAccount'),' :')"/>&#160;&#160;
+       <xsl:value-of select="concat(i18n:translate('component.userlogin.tasks.currentAccount'),' :')"/>&#160;&#160;
        [&#160;<xsl:value-of select="$CurrentUser"/>&#160;]
      </xsl:otherwise>
 	</xsl:choose>
 </xsl:variable>
     
-<xsl:variable name="MainTitle" select="i18n:translate('titles.mainTitle')"/>
-<xsl:variable name="PageTitle" select="i18n:translate('titles.pageTitle.login')"/>
+<xsl:variable name="MainTitle" select="i18n:translate('common.titles.mainTitle')"/>
+<xsl:variable name="PageTitle" select="i18n:translate('component.userlogin.titles.pageTitle.login')"/>
 
 <xsl:template name="userAction">
 	<p />
@@ -62,20 +62,20 @@
 		<xsl:when test="$CurrentLang = 'ar' ">
 			<tr>
 				<td class="inputField_ar"><input name="uid" type="text" maxlength="30"/></td>
-                <td class="inputCaption_ar"><xsl:value-of select="concat(i18n:translate('userlogin.tasks.login.account'),' ')"/></td>               
+                <td class="inputCaption_ar"><xsl:value-of select="concat(i18n:translate('component.userlogin.tasks.login.account'),' ')"/></td>               
 			</tr>
 			<tr>
 				<td class="inputField_ar"><input name="pwd" type="password" maxlength="30"/></td>
-                <td class="inputCaption_ar"><xsl:value-of select="concat(i18n:translate('userlogin.tasks.login.password'),' ')"/></td>           
+                <td class="inputCaption_ar"><xsl:value-of select="concat(i18n:translate('component.userlogin.tasks.login.password'),' ')"/></td>           
 			</tr>		
 		</xsl:when>
 	    <xsl:otherwise>
             <tr>
-                <td class="inputCaption"><xsl:value-of select="concat(i18n:translate('userlogin.tasks.login.account'),' :')"/></td>
+                <td class="inputCaption"><xsl:value-of select="concat(i18n:translate('component.userlogin.tasks.login.account'),' :')"/></td>
                 <td class="inputField"><input name="uid" type="text" maxlength="30"/></td>
             </tr>
             <tr>
-                <td class="inputCaption"><xsl:value-of select="concat(i18n:translate('userlogin.tasks.login.password'),' :')"/></td>
+                <td class="inputCaption"><xsl:value-of select="concat(i18n:translate('component.userlogin.tasks.login.password'),' :')"/></td>
                 <td class="inputField"><input name="pwd" type="password" maxlength="30"/></td>
             </tr>
 	    </xsl:otherwise>
@@ -86,10 +86,10 @@
 		
 		<xsl:choose>
 			<xsl:when test="$CurrentLang = 'ar' ">
-				<input class="button" type="submit" value="{i18n:translate('buttons.login')} &gt;&gt;" name="LoginSubmit"/>
+				<input class="button" type="submit" value="{i18n:translate('component.userlogin.button.login')} &gt;&gt;" name="LoginSubmit"/>
 			</xsl:when>
 			<xsl:otherwise>
-				<input class="button_ar" type="submit" value="{i18n:translate('buttons.login')} &gt;&gt;" name="LoginSubmit"/>
+				<input class="button_ar" type="submit" value="{i18n:translate('component.userlogin.button.login')} &gt;&gt;" name="LoginSubmit"/>
 			</xsl:otherwise>
 	    </xsl:choose>
     </form>
@@ -98,22 +98,22 @@
 <xsl:template name="userStatus">
     <xsl:if test="/mcr_user/@invalid_password='true' or /mcr_user/@unknown_user='true' or /mcr_user/@user_disabled='true'">
 		<p class="status">
-            <xsl:value-of select="i18n:translate('userlogin.tasks.login.failed')"/>
+            <xsl:value-of select="i18n:translate('component.userlogin.tasks.login.failed')"/>
         </p>
     </xsl:if>
     <xsl:if test="/mcr_user/@invalid_password='true'">
 		<p class="status">
-            <xsl:value-of select="i18n:translate('userlogin.tasks.login.invalidPwd')"/>
+            <xsl:value-of select="i18n:translate('component.userlogin.tasks.login.invalidPwd')"/>
         </p>
     </xsl:if>
     <xsl:if test="/mcr_user/@unknown_user='true'">
 		<p class="status">
-            <xsl:value-of select="i18n:translate('userlogin.tasks.login.userUnknown')"/>
+            <xsl:value-of select="i18n:translate('component.userlogin.tasks.login.userUnknown')"/>
         </p>
     </xsl:if>
     <xsl:if test="/mcr_user/@user_disabled='true'">
 		<p class="status">
-            <xsl:value-of select="i18n:translate('userlogin.tasks.login.userDisabled')"/>
+            <xsl:value-of select="i18n:translate('component.userlogin.tasks.login.userDisabled')"/>
         </p>
     </xsl:if>
 </xsl:template>
