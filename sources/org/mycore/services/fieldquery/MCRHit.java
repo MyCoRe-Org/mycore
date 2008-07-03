@@ -214,7 +214,8 @@ public class MCRHit {
 
         // Copy other hit meta data
         if (other.metaData.size() > 0) {
-            this.metaData.add(null); // used as a delimiter
+        	if (this.metaData.size() > 0)
+                this.metaData.add(null); // used as a delimiter
             this.metaData.addAll(other.metaData);
         }
     }
