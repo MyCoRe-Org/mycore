@@ -264,7 +264,7 @@
   </xsl:variable>
   <xsl:variable name="num.visible">
     <xsl:choose>
-      <xsl:when test="@min and ($num &lt; @min)">
+      <xsl:when test="@min and (number($num) &lt; number(@min))">
         <xsl:value-of select="@min" />
       </xsl:when>
       <xsl:otherwise>
@@ -380,7 +380,7 @@
   
       <td>
         <xsl:choose>
-          <xsl:when test="$num &lt; $max">
+          <xsl:when test="number($num) &lt; number($max)">
             <input tabindex="999" type="image" name="{$editor.delimiter.internal}p-{$var}-{position()}" src="{$WebApplicationBaseURL}images/pmud-plus.png"/>
           </xsl:when>
           <xsl:otherwise><img src="{$WebApplicationBaseURL}images/pmud-blank.png" border="0" /></xsl:otherwise>
@@ -388,7 +388,7 @@
       </td>
       <td>
         <xsl:choose>
-          <xsl:when test="$num &gt; 1">
+          <xsl:when test="number($num) &gt; 1">
             <input tabindex="999" type="image" name="{$editor.delimiter.internal}m-{$var}-{position()}" src="{$WebApplicationBaseURL}images/pmud-minus.png"/>
           </xsl:when>
           <xsl:otherwise><img src="{$WebApplicationBaseURL}images/pmud-blank.png" border="0" /></xsl:otherwise>
@@ -396,7 +396,7 @@
       </td>
       <td>
         <xsl:choose>
-          <xsl:when test="(position() &lt; $num) or (position() &lt; $min)">
+          <xsl:when test="(position() &lt; number($num)) or (position() &lt; number($min))">
             <input tabindex="999" type="image" name="{$editor.delimiter.internal}d-{$var}-{position()}" src="{$WebApplicationBaseURL}images/pmud-down.png"/>
           </xsl:when>
           <xsl:otherwise><img src="{$WebApplicationBaseURL}images/pmud-blank.png" border="0" /></xsl:otherwise>
@@ -444,7 +444,7 @@
       <xsl:sort select="@row" data-type="number" />
       
       <!-- for each row in panel (handle only first occurrence) -->
-      <xsl:if test="count($cells[(@row=current()/@row) and (@col &lt; current()/@col)]) = 0">
+      <xsl:if test="count($cells[(@row=current()/@row) and (number(@col) &lt; number(current()/@col))]) = 0">
         <tr>
           <xsl:variable name="currentRow" select="@row" />
           <xsl:for-each select="$cells">
@@ -468,16 +468,16 @@
                           <xsl:value-of select="@sortnr"/>
                         </xsl:when>
                         <xsl:otherwise>
-                          <xsl:value-of select="1 + count($cells[(@row &lt; current()/@row) or ( (@row = current()/@row) and (@col &lt; current()/@col) )])" />
+                          <xsl:value-of select="1 + count($cells[(number(@row) &lt; number(current()/@row)) or ( (@row = current()/@row) and (number(@col) &lt; number(current()/@col)) )])" />
                         </xsl:otherwise>
                       </xsl:choose>
                     </xsl:with-param>
                   </xsl:call-template>
                 </td>
               </xsl:when>
-              <xsl:when test="count($cells[(@col=current()/@col) and (@row &lt; current()/@row)]) = 0">
+              <xsl:when test="count($cells[(@col=current()/@col) and (number(@row) &lt; number(current()/@row))]) = 0">
                 <!-- Output necessary empty cells to complete table structure -->
-                <xsl:if test="count($cells[(@row = $currentRow) and ((@col=current()/@col) or ((@col &lt; current()/@col) and (@col+@colspan &gt;= current()/@col))) ]) = 0">
+                <xsl:if test="count($cells[(@row = $currentRow) and ((@col=current()/@col) or ((number(@col) &lt; number(current()/@col)) and (number(@col)+number(@colspan) &gt;= number(current()/@col)))) ]) = 0">
                   <td/>
                 </xsl:if>
               </xsl:when>
