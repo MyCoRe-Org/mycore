@@ -49,8 +49,8 @@
 	</xsl:choose>
 </xsl:variable>
 
-<xsl:variable name="MainTitle" select="i18n:translate('titles.mainTitle')"/>
-<xsl:variable name="PageTitle" select="i18n:translate('titles.pageTitle.changePass')"/>
+<xsl:variable name="MainTitle" select="i18n:translate('common.titles.mainTitle')"/>
+<xsl:variable name="PageTitle" select="i18n:translate('component.userlogin.titles.pageTitle.changePass')"/>
 
 <xsl:template name="userAction">
     <!-- +
