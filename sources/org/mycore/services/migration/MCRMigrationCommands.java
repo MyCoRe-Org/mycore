@@ -28,6 +28,7 @@ import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.MCRObjectReference;
 import org.mycore.datamodel.classifications2.utils.MCRXMLTransformer;
 import org.mycore.datamodel.common.MCRXMLTableManager;
+import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.cli.MCRAbstractCommands;
 import org.mycore.frontend.cli.MCRCommand;
@@ -35,49 +36,61 @@ import org.mycore.frontend.cli.MCRCommand;
 public class MCRMigrationCommands extends MCRAbstractCommands {
     private static Logger LOGGER = Logger.getLogger(MCRMigrationCommands.class);
 
+    private static final MCRCategoryDAO DAO = MCRCategoryDAOFactory.getInstance();
+
+    private static final MCRXMLTableManager XML_TABLE = MCRXMLTableManager.instance();
+
+    private static final MCRCategLinkService CATAG_LINK_SERVICE = MCRCategLinkServiceFactory.getInstance();
+
     public MCRMigrationCommands() {
         MCRCommand com = null;
 
         com = new MCRCommand("migrate user", "org.mycore.services.migration.MCRMigrationCommands.migrateUser",
-                        "The command migrates the user management to MyCoRe 2.0.");
+                "The command migrates the user management to MyCoRe 2.0.");
         command.add(com);
         com = new MCRCommand("internal usermigration step {0}", "org.mycore.services.migration.MCRMigrationCommands.migrateUser int",
-                        "Internal commands for user migration");
+                "Internal commands for user migration");
         command.add(com);
         com = new MCRCommand("migrate mcraccess", "org.mycore.services.migration.MCRMigrationCommands.migrateAccess",
-                        "The command migrates the access system to MyCoRe 2.0.");
+                "The command migrates the access system to MyCoRe 2.0.");
         command.add(com);
         com = new MCRCommand("internal accessmigration step {0}", "org.mycore.services.migration.MCRMigrationCommands.migrateAccess int",
-                        "Internal commands for access system migration");
+                "Internal commands for access system migration");
         command.add(com);
         com = new MCRCommand("migrate classifications", "org.mycore.services.migration.MCRMigrationCommands.migrateClassifications",
-                        "Internal commands for classification migration");
+                "Internal commands for classification migration");
+        command.add(com);
+        com = new MCRCommand("migrate history date in type {0}", "org.mycore.services.migration.MCRMigrationCommands.migrateMCRMetaHistoryDate String",
+                "Internal commands for the migration of the MCRMetaHistoryDate text lines to multi languages for MyCoRe type {0}");
         command.add(com);
     }
 
-    @SuppressWarnings("unchecked")
     public static void migrateClassifications() throws JDOMException {
+        createCategories();
+        migrateCategoryLinks();
+        deleteOldCategoryLinks();
+    }
+
+    private static void createCategories() {
         List<String> classIds = MCRXMLTableManager.instance().retrieveAllIDs("class");
-        MCRCategoryDAO dao = MCRCategoryDAOFactory.getInstance();
-        String xpathExpr = "/mycoreobject/metadata/*[@class='MCRMetaClassification']/*";
-        XPath classSelector = XPath.newInstance(xpathExpr);
         LOGGER.info("Migrating classifications and categories...");
         for (String classID : classIds) {
             MCRObjectID objID = new MCRObjectID(classID);
             Document cl = MCRXMLTableManager.instance().readDocument(objID);
             MCRCategory cat = MCRXMLTransformer.getCategory(cl);
-            dao.addCategory(null, cat);
+            DAO.addCategory(null, cat);
             MCRXMLTableManager.instance().delete(objID);
         }
+    }
 
+    @SuppressWarnings("unchecked")
+    private static void migrateCategoryLinks() throws JDOMException {
         LOGGER.info("Migrating object links....");
-        // init
-        LOGGER.debug("retrieving all relevant objects id's");
-        List<String> objIDs = getAllObjIDs();
-        int lengthAbs = objIDs.size();
-        MCRXMLTableManager xmlTable = MCRXMLTableManager.instance();
-        MCRCategLinkService clsf = MCRCategLinkServiceFactory.getInstance();
-        LOGGER.debug(lengthAbs + "object id's retrieved");
+        XPath classSelector = XPath.newInstance("/mycoreobject/metadata/*[@class='MCRMetaClassification']/*");
+        LOGGER.debug("Retrieving all relevant objects IDs.");
+        List<String> objIDs = getAllObjectIDsForCategories();
+        int objectsTotal = objIDs.size();
+        LOGGER.debug(objectsTotal + "object IDs retrieved");
 
         // pass through found objects
         int pos = 0;
@@ -86,13 +99,13 @@ public class MCRMigrationCommands extends MCRAbstractCommands {
             pos++;
             LOGGER.debug("Processing object " + id);
             Collection<MCRCategoryID> categories = new HashSet<MCRCategoryID>();
-            LOGGER.debug("parsing " + id);
-            if (xmlTable.exist(new MCRObjectID(id))) {
-                Document obj = xmlTable.readDocument(new MCRObjectID(id));
-                LOGGER.debug("executing XPATH " + xpathExpr);
+            if (XML_TABLE.exist(new MCRObjectID(id))) {
+                LOGGER.debug("Parsing XML of object " + id);
+                Document obj = XML_TABLE.readDocument(new MCRObjectID(id));
+                LOGGER.debug("executing XPATH " + classSelector.getXPath());
                 List<Element> classElements = classSelector.selectNodes(obj);
-                int length = classElements.size();
-                LOGGER.debug("passing through " + length + " found category ids");
+                int categoryCount = classElements.size();
+                LOGGER.debug("found "+categoryCount+" category ids");
                 for (Element el : classElements) {
                     String clid = el.getAttributeValue("classid");
                     String catid = el.getAttributeValue("categid");
@@ -103,21 +116,22 @@ public class MCRMigrationCommands extends MCRAbstractCommands {
                     String type = id.substring(id.indexOf("_") + 1, id.lastIndexOf("_") - 1);
                     MCRObjectReference objectReference = new MCRObjectReference(id, type);
                     try {
-                        clsf.setLinks(objectReference, categories);
+                        CATAG_LINK_SERVICE.setLinks(objectReference, categories);
                     } catch (Exception e) {
                         LOGGER.error("Error occured while creating category links for object " + id, e);
                     }
                 }
-                if (pos % 100 == 0 || pos == lengthAbs) {
-                    long currTime = System.currentTimeMillis();
-                    long finishTime = currTime + ((currTime - startTime) * (lengthAbs - pos) / pos);
-                    LOGGER.info(((float) (pos / lengthAbs) * 100) + " %, estimated finish time is " + new Date(finishTime));
+                if (pos % 100 == 0 || pos == objectsTotal) {
+                    long currentTime = System.currentTimeMillis();
+                    long finishTime = currentTime + ((currentTime - startTime) * (objectsTotal - pos) / pos);
+                    LOGGER.info(((float) (pos / objectsTotal) * 100) + " %, estimated finish time is " + new Date(finishTime));
                 }
             } else
-                LOGGER.warn("stored link from " + id + " found, that is not in database");
+                LOGGER.warn("Object " + id + " linked to category, but it is not in database.");
         }
+    }
 
-        // }
+    private static void deleteOldCategoryLinks() {
         LOGGER.info("Deleting old object links...");
         final Session session = MCRHIBConnection.instance().getSession();
         Criteria c = session.createCriteria(MCRLINKHREF.class).add(Restrictions.eq("key.mcrtype", "classid"));
@@ -127,16 +141,11 @@ public class MCRMigrationCommands extends MCRAbstractCommands {
     }
 
     @SuppressWarnings("unchecked")
-    public static List<String> getAllObjIDs() {
+    private static List<String> getAllObjectIDsForCategories() {
         Session session = MCRHIBConnection.instance().getSession();
         Criteria c = session.createCriteria(MCRLINKHREF.class);
         c.setProjection(Projections.distinct(Projections.property("key.mcrfrom")));
         c.add(Restrictions.eq("key.mcrtype", "classid"));
-        // String query = "select DISTINCT MCRFROM from MCRLINKHREF where
-        // MCRTYPE = 'classid'";
-        // String query = "select key.mcrfrom from MCRLINKHREF where key.mcrtype
-        // = 'classid'";
-        // List<String> l = session.createQuery(query).list();
         return c.list();
     }
 
@@ -210,6 +219,25 @@ public class MCRMigrationCommands extends MCRAbstractCommands {
             return Collections.emptyList();
         default:
             throw new MCRException("MCRACCESS migration step " + step + " is unknown.");
+        }
+    }
+
+    /**
+     * This method migrate the MCRMetaHistoryDate text entries from a single text to multi language texts as sequence of
+     * XML text elements. The method read the data to the API and store it to the backend again.
+     * 
+     * @param type
+     *            the MyCoRe data type which includes a MCRMetaHistoryDate element
+     * @throws Exception
+     */
+    public static void migrateMCRMetaHistoryDate(String type) throws Exception {
+        MCRXMLTableManager tm = MCRXMLTableManager.instance();
+        MCRObject obj = null;
+        for (String id : tm.retrieveAllIDs(type)) {
+            obj = new MCRObject();
+            MCRObjectID oid = new MCRObjectID(id);
+            obj.receiveFromDatastore(oid);
+            obj.updateInDatastore();
         }
     }
 }
