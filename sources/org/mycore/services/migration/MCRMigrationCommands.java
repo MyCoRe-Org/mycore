@@ -46,22 +46,22 @@ public class MCRMigrationCommands extends MCRAbstractCommands {
         MCRCommand com = null;
 
         com = new MCRCommand("migrate user", "org.mycore.services.migration.MCRMigrationCommands.migrateUser",
-                "The command migrates the user management to MyCoRe 2.0.");
+                        "The command migrates the user management to MyCoRe 2.0.");
         command.add(com);
         com = new MCRCommand("internal usermigration step {0}", "org.mycore.services.migration.MCRMigrationCommands.migrateUser int",
-                "Internal commands for user migration");
+                        "Internal commands for user migration");
         command.add(com);
         com = new MCRCommand("migrate mcraccess", "org.mycore.services.migration.MCRMigrationCommands.migrateAccess",
-                "The command migrates the access system to MyCoRe 2.0.");
+                        "The command migrates the access system to MyCoRe 2.0.");
         command.add(com);
         com = new MCRCommand("internal accessmigration step {0}", "org.mycore.services.migration.MCRMigrationCommands.migrateAccess int",
-                "Internal commands for access system migration");
+                        "Internal commands for access system migration");
         command.add(com);
         com = new MCRCommand("migrate classifications", "org.mycore.services.migration.MCRMigrationCommands.migrateClassifications",
-                "Internal commands for classification migration");
+                        "Internal commands for classification migration");
         command.add(com);
         com = new MCRCommand("migrate history date in type {0}", "org.mycore.services.migration.MCRMigrationCommands.migrateMCRMetaHistoryDate String",
-                "Internal commands for the migration of the MCRMetaHistoryDate text lines to multi languages for MyCoRe type {0}");
+                        "Internal commands for the migration of the MCRMetaHistoryDate text lines to multi languages for MyCoRe type {0}");
         command.add(com);
     }
 
@@ -105,7 +105,7 @@ public class MCRMigrationCommands extends MCRAbstractCommands {
                 LOGGER.debug("executing XPATH " + classSelector.getXPath());
                 List<Element> classElements = classSelector.selectNodes(obj);
                 int categoryCount = classElements.size();
-                LOGGER.debug("found "+categoryCount+" category ids");
+                LOGGER.debug("found " + categoryCount + " category ids");
                 for (Element el : classElements) {
                     String clid = el.getAttributeValue("classid");
                     String catid = el.getAttributeValue("categid");
@@ -124,7 +124,7 @@ public class MCRMigrationCommands extends MCRAbstractCommands {
                 if (pos % 100 == 0 || pos == objectsTotal) {
                     long currentTime = System.currentTimeMillis();
                     long finishTime = currentTime + ((currentTime - startTime) * (objectsTotal - pos) / pos);
-                    LOGGER.info(((float) (pos / objectsTotal) * 100) + " %, estimated finish time is " + new Date(finishTime));
+                    LOGGER.info(((pos / objectsTotal) * 100) + " % (" + pos + "/" + objectsTotal + "), estimated finish time is " + new Date(finishTime));
                 }
             } else
                 LOGGER.warn("Object " + id + " linked to category, but it is not in database.");
@@ -223,11 +223,13 @@ public class MCRMigrationCommands extends MCRAbstractCommands {
     }
 
     /**
-     * This method migrate the MCRMetaHistoryDate text entries from a single text to multi language texts as sequence of
-     * XML text elements. The method read the data to the API and store it to the backend again.
+     * This method migrate the MCRMetaHistoryDate text entries from a single
+     * text to multi language texts as sequence of XML text elements. The method
+     * read the data to the API and store it to the backend again.
      * 
      * @param type
-     *            the MyCoRe data type which includes a MCRMetaHistoryDate element
+     *            the MyCoRe data type which includes a MCRMetaHistoryDate
+     *            element
      * @throws Exception
      */
     public static void migrateMCRMetaHistoryDate(String type) throws Exception {
