@@ -25,13 +25,12 @@
   </condition>
 
   <target name="install">
-    <antcall target="get" />
+    <antcall target="download" />
     <antcall target="build" />
-    <antcall target="load" />
-    <antcall target="homepage" />
+    <antcall target="stop" />
   </target>
   
-  <target name="get" >
+  <target name="download" >
     <mkdir dir="${destdir}" />
     <echo>
 
@@ -117,9 +116,6 @@
 
     </echo>
     <ant dir="${destdir}/docportal" antfile="build.xml" target="create.scripts"     inheritAll="false" inheritRefs="false" />    
-  </target>
-  
-  <target name="load">
     <echo>
 
     ========================================  
@@ -195,9 +191,6 @@
 
     </echo>
     <ant dir="${destdir}/docportal" antfile="build.xml" target="webapps"              inheritAll="false" inheritRefs="false" />    
-  </target>
-  
-  <target name="homepage">
     <echo>  
 
     ========================================  
@@ -208,6 +201,9 @@
     <antcall target="run">
       <param name="command" value="jettystart" />
     </antcall>
+  </target>
+  
+  <target name="stop">
     <sleep seconds="30" />
     <echo>
 
