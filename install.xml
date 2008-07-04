@@ -13,25 +13,25 @@
 
 <project name="DocPortalInstaller" default="install" basedir=".">
   <property name="destdir"     value="c:/java/install" />
-  <property name="jai.libdir"   value="c:/java/jai/lib/ext" />
-  <property name="mailserver"  value="xmailout.uni-due.de" />
-  <property name="mailaddress" value="xluetzenkirchen@ub.uni-duisburg-essen.de" />
+  <property name="jai.libdir"  value="C:/Java/jai-1_1_2/lib" />
+  <property name="mailserver"  value="mailout.uni-due.de" />
+  <property name="mailaddress" value="luetzenkirchen@ub.uni-duisburg-essen.de" />
 
-  <target name="install" >
-    <echo>
+  <condition property="os.is.unix">
+    <os family="unix" />
+  </condition>
+  <condition property="os.is.windows">
+    <os family="dos" />
+  </condition>
 
-    ========================================  
-      Prepare ...
-    ========================================  
-
-    </echo>
-    <condition property="os.is.unix">
-      <os family="unix" />
-    </condition>
-    <condition property="os.is.windows">
-      <os family="dos" />
-    </condition>
-    <delete dir="${destdir}" excludes="install.xml" />
+  <target name="install">
+    <antcall target="get" />
+    <antcall target="build" />
+    <antcall target="load" />
+    <antcall target="homepage" />
+  </target>
+  
+  <target name="get" >
     <mkdir dir="${destdir}" />
     <echo>
 
@@ -54,6 +54,9 @@
       <param name="srcUrl"   value="http://server.mycore.de/svn/content/trunk/defaultsample" />
       <param name="destPath" value="${destdir}/content/defaultsample" />
     </antcall>
+  </target>
+  
+  <target name="build">
     <echo>
 
     ========================================  
@@ -101,7 +104,7 @@
     <echo>
 
     ========================================  
-      Build third party jar ...
+      Build jar ...
     ========================================  
 
     </echo>
@@ -114,6 +117,9 @@
 
     </echo>
     <ant dir="${destdir}/docportal" antfile="build.xml" target="create.scripts"     inheritAll="false" inheritRefs="false" />    
+  </target>
+  
+  <target name="load">
     <echo>
 
     ========================================  
@@ -124,7 +130,7 @@
     <antcall target="run">
       <param name="command" value="hsqldbstart" />
     </antcall>
-    <sleep seconds="20" />
+    <sleep seconds="30" />
     <echo>
 
     ========================================  
@@ -189,7 +195,10 @@
 
     </echo>
     <ant dir="${destdir}/docportal" antfile="build.xml" target="webapps"              inheritAll="false" inheritRefs="false" />    
-    <echo>
+  </target>
+  
+  <target name="homepage">
+    <echo>  
 
     ========================================  
       Start web application server ...
@@ -199,7 +208,7 @@
     <antcall target="run">
       <param name="command" value="jettystart" />
     </antcall>
-    <sleep seconds="20" />
+    <sleep seconds="30" />
     <echo>
 
     ========================================  
