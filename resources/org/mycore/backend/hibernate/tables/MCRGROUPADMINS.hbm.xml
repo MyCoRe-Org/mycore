@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping package="org.mycore.backend.hibernate.tables">
+  <class name="MCRGROUPADMINS" table="MCRGROUPADMINS" >
+    <composite-id class="MCRGROUPADMINSPK" name="key">
+      <key-many-to-one name="gid" class="MCRGROUPS"/>
+      <key-many-to-one name="userid" class="MCRUSERS"/>
+      <key-many-to-one name="groupid" class="MCRGROUPS"/>
+    </composite-id>
+  </class>
+</hibernate-mapping>
+

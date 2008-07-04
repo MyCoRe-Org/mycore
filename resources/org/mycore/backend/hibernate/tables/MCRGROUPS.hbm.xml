@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping package="org.mycore.backend.hibernate.tables">
+  <class name="MCRGROUPS" table="MCRGROUPS">
+    <id name="gid" type="string" length="32">
+      <generator class="assigned" />
+    </id>
+    <property name="creator" type="string" length="20" not-null="true" />
+    <property name="creationdate" type="timestamp" not-null="true" />
+    <property name="modifieddate" type="timestamp" not-null="true" />
+    <property name="description" type="string" length="200" not-null="true" />
+  </class>
+</hibernate-mapping>
+

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping package="org.mycore.backend.hibernate.tables">
+  <class name="MCRUSERS" table="MCRUSERS">
+    <id name="uid" type="string" length="20">
+      <generator class="assigned" />
+    </id>
+    <property name="numid" unique="true"/>
+    <property name="creator" type="string" length="20" not-null="true" />
+    <property name="creationdate" type="timestamp" not-null="false" />
+    <property name="modifieddate" type="timestamp" not-null="false" />
+    <property name="description" type="string" length="200" not-null="false" />
+    <property name="passwd" type="string" length="128" not-null="true" />
+    <property name="enabled" type="string" length="8" not-null="true" />
+    <property name="upd" type="string" length="8" not-null="true" />
+    <property name="salutation" type="string" length="24" not-null="false" />
+    <property name="firstname" type="string" length="64" not-null="false" />
+    <property name="lastname" type="string" length="32" not-null="false" />
+    <property name="street" type="string" length="64" not-null="false" />
+    <property name="city" type="string" length="32" not-null="false" />
+    <property name="postalcode" type="string" length="32" not-null="false" />
+    <property name="country" type="string" length="32" not-null="false" />
+    <property name="state" type="string" length="32" not-null="false" />
+    <property name="institution" type="string" length="64" not-null="false" />
+    <property name="faculty" type="string" length="64" not-null="false" />
+    <property name="department" type="string" length="64" not-null="false" />
+    <property name="institute" type="string" length="64" not-null="false" />
+    <property name="telephone" type="string" length="32" not-null="false" />
+    <property name="fax" type="string" length="32" not-null="false" />
+    <property name="email" type="string" length="64" not-null="false" />
+    <property name="cellphone" type="string" length="32" not-null="false" />
+    <many-to-one name="primgroup" class="MCRGROUPS" not-null="true" />
+  </class>
+</hibernate-mapping>
+

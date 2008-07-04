@@ -73,6 +73,16 @@
       <replace file="${build.webapps}/WEB-INF/web.xml" token='xmlns=""' />
     </sequential>
   </macrodef>
+  <macrodef name="AddHibernateMapping">
+    <attribute name="class" />
+    <sequential>
+      <echo level="info">Adding @{class} to hibernate-configuration</echo>
+      <propertyregex property="@{class}.resource" input="@{class}" regexp="\." replace="/"/>
+      <xmltask source="${build.config}/hibernate.cfg.xml" dest="${build.config}/hibernate.cfg.xml" public="-//Hibernate/Hibernate Configuration DTD 3.0//EN" system="http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd">
+        <insert path="/hibernate-configuration/session-factory" xml="&lt;mapping resource=&#x22;${@{class}.resource}.hbm.xml&#x22; /&gt;" />
+      </xmltask>
+    </sequential>
+  </macrodef>
 
   <!-- ================================= 
           target: invoke.cli             
@@ -109,6 +119,14 @@
         <mcr-config propertyfile="${build.config}/mycore.properties" mergeFile="@{component.property}" />
       </sequential>
     </for>
+    <for param="table.class"
+         list="MCRACCESS,MCRCSTORE,MCRGROUPADMINS,MCRGROUPS,MCRURN,MCRXMLTABLE,MCRACCESSRULE,MCRFSNODES,MCRGROUPMEMBERS,MCRRESUMPTIONTOKEN,MCRUSERS">
+      <sequential>
+        <AddHibernateMapping class="org.mycore.backend.hibernate.tables.@{table.class}" />
+      </sequential>
+    </for>
+    <AddHibernateMapping class="org.mycore.datamodel.classifications2.impl.MCRCategoryImpl" />
+    <AddHibernateMapping class="org.mycore.datamodel.classifications2.impl.MCRCategoryLink" />
     <componentHook target="config" />
   </target>
 

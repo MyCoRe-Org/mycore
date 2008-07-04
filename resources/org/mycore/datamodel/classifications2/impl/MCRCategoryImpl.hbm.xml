@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping package="org.mycore.datamodel.classifications2.impl">
+  <class name="MCRCategoryImpl" table="MCRCategory">
+    <cache usage="nonstrict-read-write" />
+    <id name="internalID" access="field">
+      <generator class="native" />
+    </id>
+    <natural-id>
+        <property name="rootID" type="string" column="ClassID" length="32" />
+        <property name="categID" type="string" column="CategID" length="32" not-null="false" />
+    </natural-id>
+    <property name="URI" length="254" not-null="false" type="org.mycore.datamodel.classifications2.impl.MCRURIType" />
+    <map name="labels" cascade="all" table="MCRCategoryLabels" fetch="join" lazy="false">
+      <cache usage="nonstrict-read-write" />
+      <key>
+        <column name="category" />
+      </key>
+      <map-key type="string" column="lang" />
+      <composite-element class="org.mycore.datamodel.classifications2.MCRLabel">
+        <property name="lang" formula="lang"/>
+        <property name="text" />
+        <property name="description" not-null="false" />
+      </composite-element>
+    </map>
+    <list name="children" cascade="all" inverse="true" access="field">
+      <key column="parentID" />
+      <list-index column="positionInParent" />
+      <one-to-many class="MCRCategoryImpl" />
+    </list>
+    <property name="positionInParent" />
+    <!-- Values to go up hierarchy fast -->
+    <many-to-one name="parent" class="MCRCategoryImpl" not-null="false" cascade="none" column="parentID" access="field" />
+
+    <many-to-one name="root" insert="false" update="false" class="MCRCategoryImpl" cascade="none"
+      formula="(SELECT cat.internalID FROM MCRCategory cat WHERE (cat.ClassID=ClassID and cat.CategID=''))">
+    </many-to-one>
+
+    <!-- Values to aquire child categories fast -->
+    <property name="level" />
+    <property name="left" column="leftValue" />
+    <property name="right" column="rightValue" />
+
+    <!-- some queries used by MCRCategoryDAOImpl -->
+    <query name="deleteCategory">
+      <![CDATA[DELETE from MCRCategoryImpl as cat
+                  WHERE cat.rootID=:rootID and
+                    cat.left BETWEEN (SELECT sub1.left from MCRCategoryImpl as sub1 where sub1.rootID=:rootID and sub1.categID=:ID)
+                    and (SELECT sub2.right from MCRCategoryImpl as sub2 where sub2.rootID=:rootID and sub2.categID=:ID)
+      ]]>
+    </query>
+    <query name="updateLeft">
+      <![CDATA[
+UPDATE MCRCategoryImpl cat SET cat.left=cat.left+:increment WHERE cat.left >= :left
+      ]]>
+    </query>
+    <query name="updateRight">
+      <![CDATA[
+UPDATE MCRCategoryImpl cat SET cat.right=cat.right+:increment WHERE cat.right >= :left
+      ]]>
+    </query>
+    <query name="updateLeftWithMax">
+      <![CDATA[
+UPDATE MCRCategoryImpl cat SET cat.left=cat.left+:increment WHERE cat.left > :left and cat.left <= :max
+      ]]>
+    </query>
+    <query name="updateRightWithMax">
+      <![CDATA[
+UPDATE MCRCategoryImpl cat SET cat.right=cat.right+:increment WHERE cat.right > :right and cat.right <= :max
+      ]]>
+    </query>
+    <query name="byLabel">
+      <![CDATA[
+FROM MCRCategoryImpl as cat
+  INNER JOIN cat.labels as label
+  WHERE cat.rootID=:rootID AND
+    cat.left BETWEEN :left and :right AND
+    label.lang=:lang AND
+    label.text=:text
+      ]]>
+    </query>
+  </class>
+</hibernate-mapping>
