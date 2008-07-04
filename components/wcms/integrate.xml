@@ -1,16 +1,6 @@
 <project name="wcms">
   <import file="../../integrate.xml" />
   <!-- - - - - - - - - - - - - - - - - - 
-          target: config                      
-         - - - - - - - - - - - - - - - - - -->
-  <target name="config">
-    <mcr-config action="addInclude"
-                propertyfile="${build.config}/mycore.properties"
-                key="MCR.CLI.Classes.Internal"
-                value="org.mycore.frontend.wcms.MCRWCMSMigrationCommands" />
-  </target>
-
-  <!-- - - - - - - - - - - - - - - - - - 
           target: create.default-rules                      
          - - - - - - - - - - - - - - - - -
 -->

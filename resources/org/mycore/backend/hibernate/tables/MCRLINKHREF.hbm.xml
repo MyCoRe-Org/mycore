@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+
+<hibernate-mapping package="org.mycore.backend.hibernate.tables">
+  <class name="MCRLINKHREF" table="MCRLINKHREF">
+    <composite-id class="MCRLINKHREFPK" name="key">
+      <key-property name="mcrfrom" type="string" column="MCRFROM" length="64" />
+      <key-property name="mcrto" type="string" column="MCRTO" length="194" />
+      <key-property name="mcrtype" type="string" column="MCRTYPE" length="75" />
+    </composite-id>
+    <property name="mcrattr" type="string" column="MCRATTR" length="194" not-null="false" unique="false" />
+  </class>
+</hibernate-mapping>
+
