@@ -456,7 +456,6 @@
             <xsl:choose>
               <xsl:when test="@row=$currentRow">
                 <td>
-                  <xsl:value-of select="@row" />:<xsl:value-of select="@col" />
                   <xsl:copy-of select="@colspan" />
                   <xsl:call-template name="cell">
                     <xsl:with-param name="var" select="$var" />
