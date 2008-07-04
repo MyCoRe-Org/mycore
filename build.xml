@@ -179,11 +179,11 @@
   <target name="init">
     <!-- find out revision number of HEAD, need svn installed -->
     <exec executable="svn" outputproperty="svnlog.out">
-      <arg line="log ${basedir} -q --limit 1" />
+      <arg line="info ${basedir}" />
     </exec>
     <echo level="debug">${svnlog.out}</echo>
     <propertyregex property="revision.number" input="${svnlog.out}" select="\1">
-      <regexp pattern="r([0-9]*)" />
+      <regexp pattern="evision: ([0-9]*)" />
     </propertyregex>
     <echo level="info">MyCoRe Revision found: ${revision.number}</echo>
     <property name="mycore.version" value="${target.version} r${revision.number}" />
