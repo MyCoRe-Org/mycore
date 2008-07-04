@@ -19,6 +19,8 @@
   <property name="sourcerelease" value="1.5" />
   <property name="sourceencoding" value="ISO-8859-15" />
   <property name="env.MYCORE_HOME" value="." />
+  <!-- System CLASSPATH is concatenated to any specified classpaths at the end! -->
+  <property name="build.sysclasspath" value="last" />
   <!-- Path definitions -->
   <property name="target.dir" location="${basedir}/build" />
   <property name="target.sources" location="${target.dir}/sources" />
@@ -201,9 +203,6 @@
       </dirset>
     </path>
   </target>
-
-  <!-- System CLASSPATH is completely ignored! -->
-  <property name="build.sysclasspath" value="ignore" />
 
   <!-- =================================================================== -->
   <!-- Runs JUnit test cases                                               -->
