@@ -80,7 +80,7 @@
     </then>
     <else>
       <path id="share.classpath" />
-      <fileset id="shared.jars" dir="${basedir}" excludes="**"/>
+      <fileset id="shared.jars" dir="${basedir}" excludes="**" />
     </else>
   </if>
   <path id="mycore.classpath">
@@ -88,6 +88,8 @@
     <path refid="mycore.jars" />
     <fileset dir="${ant.library.dir}" includes="ant.jar" />
     <path refid="share.classpath" />
+    <pathelement location="${basedir}/resources" />
+    <dirset dir="${components.dir}" includes="*/resources" />
   </path>
 
   <macrodef name="modulePreHook">
@@ -261,7 +263,7 @@
       <mapper type="flatten" />
       <fileset dir="${basedir}/lib" includes="*.jar" />
       <fileset dir="${components.dir}" includes="*/lib/*.jar" />
-      <fileset refid="shared.jars"/>
+      <fileset refid="shared.jars" />
     </copy>
     <moduleHook target="jar" />
   </target>
@@ -373,8 +375,8 @@
            deprecation="${deprecation}">
       <src>
         <path>
-          <path refid="sources.path"/>
-          <path path="${altdir}"/>
+          <path refid="sources.path" />
+          <path path="${altdir}" />
         </path>
       </src>
     </javac>
