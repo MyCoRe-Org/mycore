@@ -138,6 +138,17 @@ public class MCRCategLinkServiceImplTest extends MCRHibTestCase {
 
     /**
      * Test method for
+     * {@link org.mycore.datamodel.classifications2.impl.MCRCategLinkServiceImpl#getLinksFromCategory(MCRCategoryID)}.
+     */
+    public void testGetLinksFromCategory() {
+        addTestLinks();
+        startNewTransaction();
+        MCRCategoryLink link = testLinks.iterator().next();
+        assertTrue("Did not find object: " + link.getObjectReference(), SERVICE.getLinksFromCategory(link.getCategory().getId()).contains(link.getObjectReference().getObjectID()));
+    }
+
+    /**
+     * Test method for
      * {@link org.mycore.datamodel.classifications2.impl.MCRCategLinkServiceImpl#countLinks(java.util.Collection)}.
      */
     public void testCountLinks() {
