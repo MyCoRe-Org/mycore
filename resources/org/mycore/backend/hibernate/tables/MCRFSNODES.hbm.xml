@@ -3,7 +3,7 @@
 
 <hibernate-mapping package="org.mycore.backend.hibernate.tables">
   <class name="MCRFSNODES" table="MCRFSNODES">
-    <id column="ID" name="id" type="string">
+    <id column="ID" name="id" type="string" length="16">
       <generator class="assigned" />
     </id>
     <property name="pid" type="string" column="PID" length="16" not-null="false" unique="false" />
