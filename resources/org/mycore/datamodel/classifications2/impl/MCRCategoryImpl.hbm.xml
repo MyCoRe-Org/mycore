@@ -9,7 +9,7 @@
     </id>
     <natural-id>
         <property name="rootID" type="string" column="ClassID" length="32" />
-        <property name="categID" type="string" column="CategID" length="32" not-null="false" />
+        <property name="categID" type="string" column="CategID" length="128" not-null="false" />
     </natural-id>
     <property name="URI" length="254" not-null="false" type="org.mycore.datamodel.classifications2.impl.MCRURIType" />
     <map name="labels" cascade="all" table="MCRCategoryLabels" fetch="join" lazy="false">
