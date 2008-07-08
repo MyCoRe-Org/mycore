@@ -38,12 +38,12 @@ DELETE FROM MCRCategoryLink WHERE objectReference.objectID IN (:ids)
     </query>
     <query name="ObjectIDByCategory">
       <![CDATA[
-SELECT objectReference.objectID FROM MCRCategoryLink WHERE category.id=:category
+SELECT objectReference.objectID FROM MCRCategoryLink WHERE category.rootID=:rootID and category.categID=:categID
       ]]>
     </query>
     <query name="ObjectIDByCategoryAndType">
       <![CDATA[
-SELECT objectReference.objectID FROM MCRCategoryLink WHERE category.id=:category and objectReference.type=:type
+SELECT objectReference.objectID FROM MCRCategoryLink WHERE category.rootID=:rootID and category.categID=:categID and objectReference.type=:type
       ]]>
     </query>
     <query name="categoriesByObjectID">

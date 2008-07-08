@@ -1,25 +1,10 @@
 /**
- * 
- * $Revision$ $Date$
- *
- * This file is part of ** M y C o R e **
- * Visit our homepage at http://www.mycore.de/ for details.
- *
- * This program is free software; you can use it, redistribute it
- * and / or modify it under the terms of the GNU General Public License
- * (GPL) as published by the Free Software Foundation; either version 2
- * of the License or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program, normally in the file license.txt.
- * If not, write to the Free Software Foundation Inc.,
- * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
- *
+ * $Revision$ $Date$ This file is part of ** M y C o R e ** Visit our homepage at http://www.mycore.de/
+ * for details. This program is free software; you can use it, redistribute it and / or modify it under the terms of the GNU General Public License (GPL) as
+ * published by the Free Software Foundation; either version 2 of the License or (at your option) any later version. This program is distributed in the hope
+ * that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License for more details. You should have received a copy of the GNU General Public License along with this program, normally in the file
+ * license.txt. If not, write to the Free Software Foundation Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307 USA
  **/
 package org.mycore.datamodel.classifications2.impl;
 
@@ -46,10 +31,7 @@ import org.mycore.datamodel.classifications2.MCRObjectReference;
 import org.mycore.datamodel.classifications2.utils.MCRXMLTransformer;
 
 /**
- * @author Thomas Scheffler (yagee)
- * 
- * Need to insert some things here
- * 
+ * @author Thomas Scheffler (yagee) Need to insert some things here
  */
 public class MCRCategLinkServiceImplTest extends MCRHibTestCase {
     private MCRCategory category;
@@ -62,7 +44,6 @@ public class MCRCategLinkServiceImplTest extends MCRHibTestCase {
 
     /*
      * (non-Javadoc)
-     * 
      * @see org.mycore.common.MCRHibTestCase#setUp()
      */
     protected void setUp() throws Exception {
@@ -85,7 +66,6 @@ public class MCRCategLinkServiceImplTest extends MCRHibTestCase {
 
     /*
      * (non-Javadoc)
-     * 
      * @see org.mycore.common.MCRHibTestCase#tearDown()
      */
     protected void tearDown() throws Exception {
@@ -94,7 +74,8 @@ public class MCRCategLinkServiceImplTest extends MCRHibTestCase {
 
     /**
      * Test method for
-     * {@link org.mycore.datamodel.classifications2.impl.MCRCategLinkServiceImpl#setLinks(org.mycore.datamodel.classifications2.MCRObjectReference, java.util.Collection)}.
+     * {@link org.mycore.datamodel.classifications2.impl.MCRCategLinkServiceImpl#setLinks(org.mycore.datamodel.classifications2.MCRObjectReference, java.util.Collection)}
+     * .
      */
     public void testSetLinks() {
         addTestLinks();
@@ -103,8 +84,7 @@ public class MCRCategLinkServiceImplTest extends MCRHibTestCase {
     }
 
     /**
-     * Test method for
-     * {@link org.mycore.datamodel.classifications2.impl.MCRCategLinkServiceImpl#deleteLink(java.lang.String)}.
+     * Test method for {@link org.mycore.datamodel.classifications2.impl.MCRCategLinkServiceImpl#deleteLink(java.lang.String)}.
      */
     public void testDeleteLink() {
         addTestLinks();
@@ -114,8 +94,7 @@ public class MCRCategLinkServiceImplTest extends MCRHibTestCase {
     }
 
     /**
-     * Test method for
-     * {@link org.mycore.datamodel.classifications2.impl.MCRCategLinkServiceImpl#deleteLinks(java.util.Collection)}.
+     * Test method for {@link org.mycore.datamodel.classifications2.impl.MCRCategLinkServiceImpl#deleteLinks(java.util.Collection)}.
      */
     public void testDeleteLinks() {
         addTestLinks();
@@ -125,8 +104,7 @@ public class MCRCategLinkServiceImplTest extends MCRHibTestCase {
     }
 
     /**
-     * Test method for
-     * {@link org.mycore.datamodel.classifications2.impl.MCRCategLinkServiceImpl#getLinksFromObject(java.lang.String)}.
+     * Test method for {@link org.mycore.datamodel.classifications2.impl.MCRCategLinkServiceImpl#getLinksFromObject(java.lang.String)}.
      */
     public void testGetLinksFromObject() {
         addTestLinks();
@@ -137,19 +115,44 @@ public class MCRCategLinkServiceImplTest extends MCRHibTestCase {
     }
 
     /**
-     * Test method for
-     * {@link org.mycore.datamodel.classifications2.impl.MCRCategLinkServiceImpl#getLinksFromCategory(MCRCategoryID)}.
+     * Test method for {@link org.mycore.datamodel.classifications2.impl.MCRCategLinkServiceImpl#getLinksFromCategory(MCRCategoryID)}.
      */
     public void testGetLinksFromCategory() {
         addTestLinks();
         startNewTransaction();
         MCRCategoryLink link = testLinks.iterator().next();
-        assertTrue("Did not find object: " + link.getObjectReference(), SERVICE.getLinksFromCategory(link.getCategory().getId()).contains(link.getObjectReference().getObjectID()));
+        assertTrue("Did not find object: " + link.getObjectReference(), SERVICE.getLinksFromCategory(link.getCategory().getId()).contains(
+                link.getObjectReference().getObjectID()));
     }
 
     /**
-     * Test method for
-     * {@link org.mycore.datamodel.classifications2.impl.MCRCategLinkServiceImpl#countLinks(java.util.Collection)}.
+     * Test method for {@link org.mycore.datamodel.classifications2.impl.MCRCategLinkServiceImpl#getLinksFromCategoryForType(MCRCategoryID, String)}.
+     */
+    public void testGetLinksFromCategoryForType() {
+        addTestLinks();
+        startNewTransaction();
+        MCRCategoryLink link = testLinks.iterator().next();
+        final String objectType = link.getObjectReference().getType();
+        final MCRCategoryID categoryID = link.getCategory().getId();
+        final String objectID = link.getObjectReference().getObjectID();
+        final Collection<String> result = SERVICE.getLinksFromCategoryForType(categoryID, objectType);
+        assertTrue("Did not find object: " + link.getObjectReference(), result.contains(objectID));
+        for (String id : result) {
+            String type = getType(id);
+            assertEquals("Wrong return type detected: " + id, objectType, type);
+        }
+    }
+
+    private String getType(String objectID) {
+        for (MCRCategoryLink link : testLinks) {
+            if (link.getObjectReference().getObjectID().equals(objectID))
+                return link.getObjectReference().getType();
+        }
+        return null;
+    }
+
+    /**
+     * Test method for {@link org.mycore.datamodel.classifications2.impl.MCRCategLinkServiceImpl#countLinks(java.util.Collection)}.
      */
     public void testCountLinks() {
         addTestLinks();
@@ -164,8 +167,7 @@ public class MCRCategLinkServiceImplTest extends MCRHibTestCase {
     }
 
     /**
-     * Test method for
-     * {@link org.mycore.datamodel.classifications2.impl.MCRCategLinkServiceImpl#countLinksForType(Collection, String)}.
+     * Test method for {@link org.mycore.datamodel.classifications2.impl.MCRCategLinkServiceImpl#countLinksForType(Collection, String)}.
      */
     public void testCountLinksForType() {
         addTestLinks();

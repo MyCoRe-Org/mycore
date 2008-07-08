@@ -142,7 +142,8 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
         Session session = MCRHIBConnection.instance().getSession();
         Query q = session.getNamedQuery(LINK_CLASS.getName() + ".ObjectIDByCategory");
         q.setCacheable(true);
-        q.setParameter("category", id);
+        q.setParameter("rootID", id.getRootID());
+        q.setParameter("categID", id.getID());
         return q.list();
     }
 
@@ -151,8 +152,9 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
         Session session = MCRHIBConnection.instance().getSession();
         Query q = session.getNamedQuery(LINK_CLASS.getName() + ".ObjectIDByCategoryAndType");
         q.setCacheable(true);
-        q.setParameter("category", id);
-        q.setParameter("type", id);
+        q.setParameter("rootID", id.getRootID());
+        q.setParameter("categID", id.getID());
+        q.setParameter("type", type);
         return q.list();
     }
 
