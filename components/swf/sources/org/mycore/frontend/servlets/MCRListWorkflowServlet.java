@@ -33,10 +33,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.xml.transform.sax.TransformerHandler;
-import javax.xml.transform.stream.StreamSource;
 
 import org.apache.log4j.Logger;
+import org.jdom.Document;
+import org.jdom.transform.JDOMSource;
 import org.jdom.xpath.XPath;
+
 import org.mycore.access.MCRAccessInterface;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRConfiguration;
@@ -44,6 +46,7 @@ import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUtils;
 import org.mycore.common.xml.MCRXMLHelper;
+import org.mycore.common.xml.MCRXMLResource;
 import org.mycore.common.xml.MCRXSLTransformation;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectService;
@@ -193,8 +196,8 @@ public class MCRListWorkflowServlet extends MCRServlet {
 
         // create a XML JDOM tree with master tag mcr_workflow
         // prepare the transformer stylesheet
-        String xslfile = "mycoreobject-" + type + "-to-workflow.xsl";
-        File styleFile = getStylesheetFile("/WEB-INF/stylesheets/", xslfile);
+        String xslfile = "/xsl/mycoreobject-" + type + "-to-workflow.xsl";
+        Document styleSheet = MCRXMLResource.instance().getResource(xslfile);
 
         // build the frame of mcr_workflow
         org.jdom.Element root = new org.jdom.Element("mcr_workflow");
@@ -211,7 +214,7 @@ public class MCRListWorkflowServlet extends MCRServlet {
 
         // initialize transformer
         MCRXSLTransformation transform = MCRXSLTransformation.getInstance();
-        TransformerHandler handler = transform.getTransformerHandler(transform.getStylesheet(new StreamSource(styleFile)));
+        TransformerHandler handler = transform.getTransformerHandler(transform.getStylesheet(new JDOMSource(styleSheet)));
         Map<String, String> parameters = new HashMap<String, String>();
         parameters.put("DefaultLang", DefaultLang);
         parameters.put("CurrentLang", lang);
@@ -329,27 +332,5 @@ public class MCRListWorkflowServlet extends MCRServlet {
 
         org.jdom.Document workflow_doc = new org.jdom.Document(root);
         getLayoutService().doLayout(job.getRequest(), job.getResponse(), workflow_doc);
-    }
-
-    /**
-     * Gets a File object for the given filename and directory, or returns null
-     * if no such file exists.
-     */
-    protected File getStylesheetFile(String dir, String name) {
-        String path = getServletContext().getRealPath(dir + name);
-        File file = new File(path);
-
-        if (!file.exists()) {
-            LOGGER.debug("MCRListWorkflowServlet did not find stylesheet " + name);
-
-            return null;
-        }
-
-        if (!file.canRead()) {
-            String msg = "XSL stylesheet " + path + " not readable";
-            throw new MCRConfigurationException(msg);
-        }
-
-        return file;
     }
 }
