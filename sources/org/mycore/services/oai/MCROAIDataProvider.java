@@ -58,12 +58,16 @@ import javax.servlet.http.HttpSession;
 import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
+import org.jdom.JDOMException;
 import org.jdom.Namespace;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
+import org.jdom.transform.JDOMSource;
+
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRException;
+import org.mycore.common.xml.MCRXMLResource;
 import org.mycore.common.xml.MCRXSLTransformation;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
@@ -1274,8 +1278,10 @@ public class MCROAIDataProvider extends MCRServlet {
      * @param header
      *            The document so far
      * @return Document The document with all new elements added.
+     * @throws JDOMException 
+     * @throws IOException 
      */
-    private org.jdom.Document getRecord(HttpServletRequest request, org.jdom.Document header) {
+    private org.jdom.Document getRecord(HttpServletRequest request, org.jdom.Document header) throws IOException, JDOMException {
         org.jdom.Document document = header;
         Element eRoot = document.getRootElement();
         Namespace ns = eRoot.getNamespace();
@@ -1383,8 +1389,10 @@ public class MCROAIDataProvider extends MCRServlet {
      * @param header
      *            The document so far
      * @return Document The document with all new elements added.
+     * @throws JDOMException 
+     * @throws IOException 
      */
-    private org.jdom.Document listRecords(HttpServletRequest request, org.jdom.Document header) {
+    private org.jdom.Document listRecords(HttpServletRequest request, org.jdom.Document header) throws IOException, JDOMException {
         org.jdom.Document document = header;
         Element eRoot = document.getRootElement();
         Namespace ns = eRoot.getNamespace();
@@ -1795,8 +1803,10 @@ public class MCROAIDataProvider extends MCRServlet {
      * @param format
      *            name of the transforming stylesheet
      * @return document the transformed Jdom-Document
+     * @throws JDOMException 
+     * @throws IOException 
      */
-    private Document doMCRXSLTransformation(HttpServletRequest request, Document document, String format) {
+    private Document doMCRXSLTransformation(HttpServletRequest request, Document document, String format) throws IOException, JDOMException {
         String contextPath = request.getContextPath() + "/";
         int pos = request.getRequestURL().indexOf(contextPath, 9);
         String servletsBaseURL = request.getRequestURL().substring(0, pos) + contextPath + "servlets/";
@@ -1809,7 +1819,7 @@ public class MCROAIDataProvider extends MCRServlet {
 
         parameters.put("ServletsBaseURL", servletsBaseURL);
 
-        return MCRXSLTransformation.transform(document, getServletContext().getRealPath("/WEB-INF/stylesheets/" + format), parameters);
+        return MCRXSLTransformation.transform(document, new JDOMSource(MCRXMLResource.instance().getResource("/xsl/"+ format)), parameters);
     }
 
     class TokenFileFilter implements FilenameFilter {

@@ -1,25 +1,10 @@
 /**
- * $RCSfile$
- * $Revision$ $Date$
- *
- * This file is part of ** M y C o R e **
- * Visit our homepage at http://www.mycore.de/ for details.
- *
- * This program is free software; you can use it, redistribute it
- * and / or modify it under the terms of the GNU General Public License
- * (GPL) as published by the Free Software Foundation; either version 2
- * of the License or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program, normally in the file license.txt.
- * If not, write to the Free Software Foundation Inc.,
- * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
- *
+ * $RCSfile$ $Revision$ $Date$ This file is part of ** M y C o R e ** Visit our homepage at http://www.mycore.de/ for details. This program is free software;
+ * you can use it, redistribute it and / or modify it under the terms of the GNU General Public License (GPL) as published by the Free Software Foundation;
+ * either version 2 of the License or (at your option) any later version. This program is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details. You
+ * should have received a copy of the GNU General Public License along with this program, normally in the file license.txt. If not, write to the Free Software
+ * Foundation Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307 USA
  **/
 
 package org.mycore.services.oai;
@@ -53,13 +38,16 @@ import javax.servlet.http.HttpSession;
 import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
+import org.jdom.JDOMException;
 import org.jdom.Namespace;
 import org.jdom.ProcessingInstruction;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
+import org.jdom.transform.JDOMSource;
 
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRException;
+import org.mycore.common.xml.MCRXMLResource;
 import org.mycore.common.xml.MCRXSLTransformation;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
@@ -76,13 +64,11 @@ import org.mycore.frontend.servlets.MCRServletJob;
  * 
  * @author Werner Gre�hoff
  * @author Heiko Helmbrecht
- * 
  * @version $Revision$ $Date$
  */
 public class MCROAIProvider extends MCRServlet {
     /**
-     * <code>serialVersionUID</code> introduced for compatibility with JDK 1.4
-     * (a should have)
+     * <code>serialVersionUID</code> introduced for compatibility with JDK 1.4 (a should have)
      */
     private static final long serialVersionUID = 4121136939476267829L;
 
@@ -203,28 +189,28 @@ public class MCROAIProvider extends MCRServlet {
      * 
      * @param MCRServlet
      *            job
-     * 
+     * @throws JDOMException 
      * @throws ServletException
      * @throws IOException
      */
-    protected void doGetPost(MCRServletJob job) {
+    protected void doGetPost(MCRServletJob job) throws JDOMException {
         HttpServletRequest request = job.getRequest();
         HttpServletResponse response = job.getResponse();
         processRequest(request, response);
     }
 
     /**
-     * Method processRequest. Processes requests for both HTTP <code>GET</code>
-     * and <code>POST</code> methods.
+     * Method processRequest. Processes requests for both HTTP <code>GET</code> and <code>POST</code> methods.
      * 
      * @param request
      *            servlet request
      * @param response
      *            servlet response
+     * @throws JDOMException 
      * @throws ServletException
      * @throws IOException
      */
-    protected void processRequest(HttpServletRequest request, HttpServletResponse response) {
+    protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws JDOMException {
         response.setContentType("text/xml; charset=UTF-8");
 
         // Exceptions must be caught...
@@ -321,8 +307,7 @@ public class MCROAIProvider extends MCRServlet {
     }
 
     /**
-     * Method getParameter. Extracts the value of <i>p </i> out of <i>request
-     * </i> and returns it.
+     * Method getParameter. Extracts the value of <i>p </i> out of <i>request </i> and returns it.
      * 
      * @param p
      *            The name of the parameter to extract.
@@ -392,8 +377,7 @@ public class MCROAIProvider extends MCRServlet {
     }
 
     /**
-     * Method newElementWithContent. Create a new JDOM-Element with some
-     * content.
+     * Method newElementWithContent. Create a new JDOM-Element with some content.
      * 
      * @param elementName
      *            the element name to be created.
@@ -409,8 +393,7 @@ public class MCROAIProvider extends MCRServlet {
     }
 
     /**
-     * Method listFromResumptionToken. Get the element list from the Resumption
-     * Token File and add them to the <i>list </i>.
+     * Method listFromResumptionToken. Get the element list from the Resumption Token File and add them to the <i>list </i>.
      * 
      * @param list
      *            The list to which the new Elements are added.
@@ -554,8 +537,8 @@ public class MCROAIProvider extends MCRServlet {
     /**
      * Method getUTCDate. The actual date and time (GMT).
      * 
-     * @param timeout.
-     *            offset (in hours) to add to get a future time.
+     * @param timeout
+     *            . offset (in hours) to add to get a future time.
      * @return String the date and time as string.
      */
     private String getUTCDate(int timeout) {
@@ -665,8 +648,7 @@ public class MCROAIProvider extends MCRServlet {
     }
 
     /**
-     * Method listMetadataFormats. Implementation of the OAI Verb
-     * ListMetadataFormats.
+     * Method listMetadataFormats. Implementation of the OAI Verb ListMetadataFormats.
      * 
      * @param request
      *            The servlet request.
@@ -1102,8 +1084,10 @@ public class MCROAIProvider extends MCRServlet {
      * @param header
      *            The document so far
      * @return Document The document with all new elements added.
+     * @throws JDOMException 
+     * @throws IOException 
      */
-    private org.jdom.Document getRecord(HttpServletRequest request, org.jdom.Document header) {
+    private org.jdom.Document getRecord(HttpServletRequest request, org.jdom.Document header) throws IOException, JDOMException {
         org.jdom.Document document = header;
         Element eRoot = document.getRootElement();
         Namespace ns = eRoot.getNamespace();
@@ -1199,8 +1183,10 @@ public class MCROAIProvider extends MCRServlet {
      * @param header
      *            The document so far
      * @return Document The document with all new elements added.
+     * @throws JDOMException 
+     * @throws IOException 
      */
-    private org.jdom.Document listRecords(HttpServletRequest request, org.jdom.Document header) {
+    private org.jdom.Document listRecords(HttpServletRequest request, org.jdom.Document header) throws IOException, JDOMException {
         org.jdom.Document document = header;
         Element eRoot = document.getRootElement();
         Namespace ns = eRoot.getNamespace();
@@ -1409,8 +1395,7 @@ public class MCROAIProvider extends MCRServlet {
     }
 
     /**
-     * Method legalOAIIdentifier. Extract the identifier from a legal OAI
-     * identifier or throw a MCRException.
+     * Method legalOAIIdentifier. Extract the identifier from a legal OAI identifier or throw a MCRException.
      * 
      * @param identifier
      *            a legal MCRException
@@ -1480,8 +1465,7 @@ public class MCROAIProvider extends MCRServlet {
     }
 
     /**
-     * Method doMCRXSLTransformation. Executes the XSL-Transformation of the
-     * OAI-Metadata
+     * Method doMCRXSLTransformation. Executes the XSL-Transformation of the OAI-Metadata
      * 
      * @param request
      * @param document
@@ -1489,8 +1473,10 @@ public class MCROAIProvider extends MCRServlet {
      * @param format
      *            name of the transforming stylesheet
      * @return document the transformed Jdom-Document
+     * @throws JDOMException 
+     * @throws IOException 
      */
-    private Document doMCRXSLTransformation(HttpServletRequest request, Document document, String format) {
+    private Document doMCRXSLTransformation(HttpServletRequest request, Document document, String format) throws IOException, JDOMException {
         // biuld common property
         HttpSession session = request.getSession(false);
         Properties parameters = new Properties();
@@ -1515,7 +1501,7 @@ public class MCROAIProvider extends MCRServlet {
         // if(format.contains("epicur")&& !email.equals("")){
         // parameters.put("ResponseEmail", email);
         // }
-        return MCRXSLTransformation.transform(document, getServletContext().getRealPath("/WEB-INF/stylesheets/" + format), parameters);
+        return MCRXSLTransformation.transform(document, new JDOMSource(MCRXMLResource.instance().getResource("/xsl/" + format)), parameters);
     }
 
     static MCROAIConfigBean getConfigBean(String instance) {
@@ -1527,8 +1513,7 @@ public class MCROAIProvider extends MCRServlet {
     }
 
     /**
-     * Method getHeader. Gets the header information from the MCRObject
-     * <i>object </i>.
+     * Method getHeader. Gets the header information from the MCRObject <i>object </i>.
      * 
      * @param object
      *            The MCRObject
@@ -1536,9 +1521,8 @@ public class MCROAIProvider extends MCRServlet {
      *            The objectId as String representation
      * @param repositoryId
      *            The repository id
-     * @return String[] Array of three Strings: the identifier, a datestamp
-     *         (modification date) and a string with a blank separated list of
-     *         categories the element is classified in
+     * @return String[] Array of three Strings: the identifier, a datestamp (modification date) and a string with a blank separated list of categories the
+     *         element is classified in
      */
     public static String[] getHeader(MCRObject object, String objectId, String repositoryId, String instance) {
         Date date = object.getService().getDate("modifydate");

@@ -104,10 +104,8 @@ public class MCRServlet extends HttpServlet {
 
     public void init() throws ServletException {
         super.init();
-        String dir = getServletContext().getRealPath("WEB-INF/stylesheets");
         if (LAYOUT_SERVICE == null) {
         	LAYOUT_SERVICE = MCRLayoutService.instance();
-            LAYOUT_SERVICE.setStylesheetsDir(dir);
         }
     }
 

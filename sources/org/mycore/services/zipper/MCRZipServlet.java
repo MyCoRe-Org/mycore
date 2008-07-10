@@ -46,10 +46,14 @@ import javax.xml.transform.sax.TransformerHandler;
 import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
+import org.jdom.JDOMException;
+import org.jdom.transform.JDOMSource;
+
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRException;
+import org.mycore.common.xml.MCRXMLResource;
 import org.mycore.common.xml.MCRXSLTransformation;
 import org.mycore.datamodel.ifs.MCRDirectory;
 import org.mycore.datamodel.ifs.MCRFile;
@@ -208,15 +212,16 @@ public class MCRZipServlet extends MCRServlet {
      * @param parameters
      *            Parameters, that can be needed in the transforming
      *            XSL-Stylesheet
+     * @throws JDOMException 
      */
-    protected void sendZipped(Document jdom, Properties parameters, ZipOutputStream out) throws IOException {
+    protected void sendZipped(Document jdom, Properties parameters, ZipOutputStream out) throws IOException, JDOMException {
         ZipEntry ze = new ZipEntry("metadata.xml");
         ze.setTime(new Date().getTime());
         out.putNextEntry(ze);
 
-        String stylesheetFullPath = getServletContext().getRealPath("/WEB-INF/stylesheets/" + stylesheet);
+        Document stylesheet=MCRXMLResource.instance().getResource("/xsl/"+this.stylesheet);
         MCRXSLTransformation transformation = MCRXSLTransformation.getInstance();
-        Templates templates = transformation.getStylesheet(stylesheetFullPath);
+        Templates templates = transformation.getStylesheet(new JDOMSource(stylesheet));
         TransformerHandler th = transformation.getTransformerHandler(templates);
         MCRXSLTransformation.setParameters(th, parameters);
         transformation.transform(jdom, th, out);
@@ -290,9 +295,10 @@ public class MCRZipServlet extends MCRServlet {
      * 
      * @param jdom
      *            the JDOM of the given MycoreObject
+     * @throws JDOMException 
      *  
      */
-    protected void sendObject(Document jdom, HttpServletRequest req, ZipOutputStream out) throws IOException {
+    protected void sendObject(Document jdom, HttpServletRequest req, ZipOutputStream out) throws IOException, JDOMException {
         // zip the object's Metadata
         Properties parameters = getLayoutService().buildXSLParameters(req);
         sendZipped(jdom, parameters, out);
