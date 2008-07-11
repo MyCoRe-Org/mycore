@@ -3,15 +3,6 @@
 
 <MyCoReWebPage>
 
-<head>
- <maintitle xml:lang="de">MyCoRe</maintitle>
- <maintitle xml:lang="en">MyCoRe</maintitle>
- <pagetitle xml:lang="de">Klassifikationseditor Abbruch</pagetitle>
- <pagetitle xml:lang="en">Cancel Classification Editor</pagetitle>
- <HttpForward>browse?mode=edit</HttpForward>
-	
-</head>
-
 <section title="Klassifikationseditor Abbruch" xml:lang="de">
 <center>
 <table width="80%">

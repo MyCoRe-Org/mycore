@@ -8,14 +8,14 @@
 <!-- *** Language List *** -->
 
   <list id="Slang" width="60" type="dropdown" default="de">
-    <item value="de" i18n="common.list.slang.de"/>
-    <item value="en" i18n="common.list.slang.en"/>
+    <item value="de" i18n="component.classhandler.list.slang.de"/>
+    <item value="en" i18n="component.classhandler.list.slang.en"/>
   </list>
 
 <!-- *** Data for the buttons ** -->
 
-  <submitButton id="BSubmit" width="100px" i18n="buttons.save" />
-  <cancelButton id="BCancel" width="100px" i18n="buttons.cancel" />
+  <submitButton id="BSubmit" width="100px" i18n="common.button.save" />
+  <cancelButton id="BCancel" width="100px" i18n="common.button.cancel" />
 
   <panel id="TwoButtons">
     <cell col="1" row="1" anchor="WEST" ref="BCancel"/>

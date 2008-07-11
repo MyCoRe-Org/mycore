@@ -1,21 +1,16 @@
-<?xml version="1.0" encoding="ISO_8859-1"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE MyCoReWebPage>
 
 <MyCoReWebPage>
-<head>
- <maintitle xml:lang="de">MyCoRe</maintitle>
- <maintitle xml:lang="en">MyCoRe</maintitle>
- <pagetitle xml:lang="de">Wartungsmodus ist aktiv</pagetitle>
- <pagetitle xml:lang="en">Maintenance mode is active</pagetitle>
-</head>
-<section title="Kein Speichern während des Wartungsmodus möglich" xml:lang="de">
+
+<section title="Kein Speichern wÃ¤hrend des Wartungsmodus mÃ¶glich" xml:lang="de">
 <center>
 <table width="80%">
  <tr align="center">
   <td align="center">
 <font color="red">
-   Aktuell befindet sich das System im Wartungsmodus und Schreibzugriffe sind vorübergehend deaktiviert.<br/>
-   Für die aktuelle Sitzung bleiben die Änderungen erhalten und können nach der Wartungsphase gespeichert werden. 
+   Aktuell befindet sich das System im Wartungsmodus und Schreibzugriffe sind vorÃ¼bergehend deaktiviert.<br/>
+   FÃ¼r die aktuelle Sitzung bleiben die Ã„nderungen erhalten und kÃ¶nnen nach der Wartungsphase gespeichert werden. 
 </font>
   </td>
  </tr>

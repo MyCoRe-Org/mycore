@@ -21,8 +21,8 @@
   xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation"
   exclude-result-prefixes="xlink">
 	
-<xsl:variable name="Navigation.title"  select="i18n:translate('titles.pageTitle.chooseClass')" />
-<xsl:variable name="MainTitle" select="i18n:translate('titles.mainTitle')"/>
+<xsl:variable name="Navigation.title"  select="i18n:translate('component.classhandler.titles.pageTitle.chooseClass')" />
+<xsl:variable name="MainTitle" select="i18n:translate('common.titles.mainTitle')"/>
 <xsl:variable name="PageTitle" select="$Navigation.title"/>
 
 <!-- ========== Subselect Parameter ========== -->
@@ -84,7 +84,7 @@
 <tr>
  <td style="width:60%;" class="desc">
  <form action="{$WebApplicationBaseURL}{$subselect.webpage}?XSL.editor.session.id={$subselect.session}" method="post">
-   <input type="submit" class="submit" value="{i18n:translate('Browse.cancelSel')}" />
+   <input type="submit" class="submit" value="{i18n:translate('component.classhandler.browse.cancelSel')}" />
    <br/>
 
  </form>

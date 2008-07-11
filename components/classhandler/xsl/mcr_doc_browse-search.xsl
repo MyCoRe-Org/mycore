@@ -23,8 +23,8 @@
 
 <xsl:include href="MyCoReLayout.xsl"/>
 
-<xsl:variable name="Navigation.title" select="i18n:translate('titles.pageTitle.classBrowse')" />
-<xsl:variable name="MainTitle" select="i18n:translate('titles.mainTitle')"/>
+<xsl:variable name="Navigation.title" select="i18n:translate('component.classhandler.titles.pageTitle.classBrowse')" />
+<xsl:variable name="MainTitle" select="i18n:translate('common.titles.mainTitle')"/>
 <xsl:variable name="PageTitle" select="$Navigation.title"/>
 
 <!-- The main template -->
@@ -38,7 +38,7 @@
 <table id="metaHeading" cellpadding="0" cellspacing="0">
   <tr>
      <td class="titles">
-         <xsl:value-of select="concat(i18n:translate('Browse.numOf'),' :')" />
+         <xsl:value-of select="concat(i18n:translate('component.classhandler.browse.numOf'),' :')" />
             <xsl:value-of select="cntDocuments" />
      </td>
      <td class="browseCtrl">
@@ -99,7 +99,7 @@
        </xsl:variable>
 
        <td  class="desc" nowrap="yes">
-       <xsl:value-of select="i18n:translate('Browse.docs',$h6)"/> 
+       <xsl:value-of select="i18n:translate('component.classhandler.browse.docs',$h6)"/> 
        </td>
        <td class="desc">
           <xsl:choose>

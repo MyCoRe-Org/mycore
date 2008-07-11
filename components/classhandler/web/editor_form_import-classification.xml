@@ -24,7 +24,7 @@
   <include uri="webapp:editor/imports-common-classhandler.xml" />
 
   <headline anchor="CENTER">
-   <text i18n="classedit.headline.impclass" />
+   <text i18n="component.classhandler.headline.impclass" />
   </headline>
 
   <panel id="import-classification">	  	  
@@ -48,8 +48,8 @@
   <panel id="RBupdate" lines="on">
     <cell row="1" col="1" anchor="WEST" var="update">
 	  <list id="Supdate" width="400" type="radio" cols="2" default="true">
-        <item value="true" default="true" i18n="classedit.label.impclass.aclid" />
-        <item value="false" i18n="classedit.label.impclass.bclid" />
+        <item value="true" default="true" i18n="component.classhandler.label.impclass.aclid" />
+        <item value="false" i18n="component.classhandler.label.impclass.bclid" />
       </list>		
     </cell>  
   </panel>

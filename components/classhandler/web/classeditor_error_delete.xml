@@ -1,23 +1,17 @@
-<?xml version="1.0" encoding="ISO_8859-1"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE MyCoReWebPage>
 
 <MyCoReWebPage>
-<head>
- <maintitle xml:lang="de">MyCoRe</maintitle>
- <maintitle xml:lang="en">MyCoRe</maintitle>
- <pagetitle xml:lang="de">Klassifikationseditor Fehler</pagetitle>
- <pagetitle xml:lang="en">Error Classification Editor</pagetitle>
-</head>
 
-<section title="Fehler: Löschen eienr Klassifikation/Kategorie" xml:lang="de">
+<section title="Fehler: LÃ¶schen eienr Klassifikation/Kategorie" xml:lang="de">
 <center>
 <table width="80%">
  <tr align="center">
   <td align="center">
 <font color="red">
-   Beim Löschen der Klassifikation/Kategorie gab es ein Problem.<br/>
-   Die Klassifikation/Kategorie wurden nicht gelöscht. <br/>
-   Es können nur Klassifikationen/Kategorien gelöscht werden, 
+   Beim LÃ¶schen der Klassifikation/Kategorie gab es ein Problem.<br/>
+   Die Klassifikation/Kategorie wurden nicht gelÃ¶scht. <br/>
+   Es kÃ¶nnen nur Klassifikationen/Kategorien gelÃ¶scht werden, 
    die noch nicht referenziert sind (Dokumentanzahl=0).
 </font>
   </td>

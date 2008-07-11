@@ -17,9 +17,9 @@
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xlink="http://www.w3.org/1999/xlink"
   xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation" exclude-result-prefixes="xlink">
 
-  <xsl:variable name="Navigation.title" select="i18n:translate('titles.pageTitle.classEdit')" />
-  <xsl:variable name="MainTitle" select="i18n:translate('titles.mainTitle')" />
-  <xsl:variable name="PageTitle" select="i18n:translate('titles.pageTitle.classEdit')" />
+  <xsl:variable name="Navigation.title" select="i18n:translate('component.classhandler.titles.pageTitle.classEdit')" />
+  <xsl:variable name="MainTitle" select="i18n:translate('common.titles.mainTitle')" />
+  <xsl:variable name="PageTitle" select="i18n:translate('component.classhandler.titles.pageTitle.classEdit')" />
 
   <!-- The main template -->
   <xsl:template match="classificationBrowser">
@@ -83,7 +83,7 @@
         </td>
         <td style="text-align:right;padding-right:88px;">
           <a href='{$hrefstart}'>
-            <xsl:value-of select="i18n:translate('Browse.showAllClass')" />
+            <xsl:value-of select="i18n:translate('component.classhandler.browse.showAllClass')" />
           </a>
         </td>
       </tr>
@@ -93,7 +93,7 @@
           <xsl:if test="$userEdited != 'false'">
             <br />
             <b>
-              <xsl:value-of select="i18n:translate('Browse.editError')" />
+              <xsl:value-of select="i18n:translate('component.classhandler.browse.editError')" />
             </b>
             &#160;
             <xsl:value-of select="$userEdited" />
@@ -152,7 +152,7 @@
                                     <input type="hidden" name="path" value='{$path}' />
                                     <input type="hidden" name="clid" value='{$classifID}' />
                                     <input type="hidden" name="categid" value='{col[2]/@lineID}' />
-                                    <input type="image" src='{$classleft}' title="{i18n:translate('Browse.moveLeft')}" />
+                                    <input type="image" src='{$classleft}' title="{i18n:translate('component.classhandler.browse.moveLeft')}" />
                                   </form>
                                 </xsl:when>
                                 <xsl:otherwise>
@@ -170,7 +170,7 @@
                                     <input type="hidden" name="path" value='{$href1}' />
                                     <input type="hidden" name="clid" value='{$classifID}' />
                                     <input type="hidden" name="categid" value='{col[2]/@lineID}' />
-                                    <input type="image" src='{$classright}' title="{i18n:translate('Browse.moveRight')}" />
+                                    <input type="image" src='{$classright}' title="{i18n:translate('component.classhandler.browse.moveRight')}" />
                                   </form>
                                 </xsl:when>
                                 <xsl:otherwise>
@@ -188,7 +188,7 @@
                                     <input type="hidden" name="path" value='{$path}' />
                                     <input type="hidden" name="clid" value='{$classifID}' />
                                     <input type="hidden" name="categid" value='{col[2]/@lineID}' />
-                                    <input type="image" src='{$classdown}' title="{i18n:translate('Browse.moveDown')}" />
+                                    <input type="image" src='{$classdown}' title="{i18n:translate('component.classhandler.browse.moveDown')}" />
                                   </form>
                                 </xsl:when>
                                 <xsl:otherwise>
@@ -206,7 +206,7 @@
                                     <input type="hidden" name="path" value='{$path}' />
                                     <input type="hidden" name="clid" value='{$classifID}' />
                                     <input type="hidden" name="categid" value='{col[2]/@lineID}' />
-                                    <input type="image" src='{$classup}' title="{i18n:translate('Browse.moveUp')}" />
+                                    <input type="image" src='{$classup}' title="{i18n:translate('component.classhandler.browse.moveUp')}" />
                                   </form>
                                 </xsl:when>
                                 <xsl:otherwise>
@@ -224,7 +224,7 @@
                                     <input type="hidden" name="path" value='{$path}' />
                                     <input type="hidden" name="clid" value='{$classifID}' />
                                     <input type="hidden" name="categid" value='{col[2]/@lineID}' />
-                                    <input type="image" src='{$classdelete}' title="{i18n:translate('Browse.deleteCat')}" />
+                                    <input type="image" src='{$classdelete}' title="{i18n:translate('component.classhandler.browse.deleteCat')}" />
                                   </form>
                                 </xsl:when>
                                 <xsl:otherwise>
@@ -240,7 +240,7 @@
                                 <input type="hidden" name="path" value='{$path}' />
                                 <input type="hidden" name="clid" value='{$classifID}' />
                                 <input type="hidden" name="categid" value='{col[2]/@lineID}' />
-                                <input type="image" src='{$classedit}' title="{i18n:translate('Browse.editCat')}" />
+                                <input type="image" src='{$classedit}' title="{i18n:translate('component.classhandler.browse.editCat')}" />
                               </form>
                             </td>  						   
 							
@@ -251,7 +251,7 @@
                                 <input type="hidden" name="path" value='{$path}' />
                                 <input type="hidden" name="clid" value='{$classifID}' />
                                 <input type="hidden" name="categid" value='{col[2]/@lineID}' />
-                                <input type="image" src='{$classnew}' title="{i18n:translate('Browse.newUnderCatInsert')}" />
+                                <input type="image" src='{$classnew}' title="{i18n:translate('component.classhandler.browse.newUnderCatInsert')}" />
                               </form>
                             </td>
                                        
@@ -313,7 +313,7 @@
                     	<xsl:value-of select="$h4" />	
                   </xsl:variable>
                   &#160;
-                  <xsl:value-of select="i18n:translate('Browse.docs',$h6)" />
+                  <xsl:value-of select="i18n:translate('component.classhandler.browse.docs',$h6)" />
                 </td>  
 				    
 			  </tr>  			  
@@ -347,7 +347,7 @@
                     	<xsl:value-of select="$h4" />	
                   </xsl:variable>
                   &#160;
-                  <xsl:value-of select="i18n:translate('Browse.docs',$h6)" />
+                  <xsl:value-of select="i18n:translate('component.classhandler.browse.docs',$h6)" />
                 </td>
 				  
                 <td class="{$trStyle}">
@@ -398,7 +398,7 @@
                                 <input type="hidden" name="path" value='{$path}' />
                                 <input type="hidden" name="clid" value='{$classifID}' />
                                 <input type="hidden" name="categid" value='{col[2]/@lineID}' />
-                                <input type="image" src='{$classnew}' title="{i18n:translate('Browse.newUnderCatInsert')}" />
+                                <input type="image" src='{$classnew}' title="{i18n:translate('component.classhandler.browse.newUnderCatInsert')}" />
                               </form>
                             </td>
                             <td width="23">
@@ -408,7 +408,7 @@
                                 <input type="hidden" name="path" value='{$path}' />
                                 <input type="hidden" name="clid" value='{$classifID}' />
                                 <input type="hidden" name="categid" value='{col[2]/@lineID}' />
-                                <input type="image" src='{$classedit}' title="{i18n:translate('Browse.editCat')}" />
+                                <input type="image" src='{$classedit}' title="{i18n:translate('component.classhandler.browse.editCat')}" />
                               </form>
                             </td>
                             <td width="23">
@@ -420,7 +420,7 @@
                                     <input type="hidden" name="path" value='{$path}' />
                                     <input type="hidden" name="clid" value='{$classifID}' />
                                     <input type="hidden" name="categid" value='{col[2]/@lineID}' />
-                                    <input type="image" src='{$classdelete}' title="{i18n:translate('Browse.deleteCat')}" />
+                                    <input type="image" src='{$classdelete}' title="{i18n:translate('component.classhandler.browse.deleteCat')}" />
                                   </form>
                                 </xsl:when>
                                 <xsl:otherwise>
@@ -437,7 +437,7 @@
                                     <input type="hidden" name="path" value='{$path}' />
                                     <input type="hidden" name="clid" value='{$classifID}' />
                                     <input type="hidden" name="categid" value='{col[2]/@lineID}' />
-                                    <input type="image" src='{$classup}' title="{i18n:translate('Browse.moveUp')}" />
+                                    <input type="image" src='{$classup}' title="{i18n:translate('component.classhandler.browse.moveUp')}" />
                                   </form>
                                 </xsl:when>
                                 <xsl:otherwise>
@@ -454,7 +454,7 @@
                                     <input type="hidden" name="path" value='{$path}' />
                                     <input type="hidden" name="clid" value='{$classifID}' />
                                     <input type="hidden" name="categid" value='{col[2]/@lineID}' />
-                                    <input type="image" src='{$classdown}' title="{i18n:translate('Browse.moveDown')}" />
+                                    <input type="image" src='{$classdown}' title="{i18n:translate('component.classhandler.browse.moveDown')}" />
                                   </form>
                                 </xsl:when>
                                 <xsl:otherwise>
@@ -471,7 +471,7 @@
                                     <input type="hidden" name="path" value='{$path}' />
                                     <input type="hidden" name="clid" value='{$classifID}' />
                                     <input type="hidden" name="categid" value='{col[2]/@lineID}' />
-                                    <input type="image" src='{$classleft}' title="{i18n:translate('Browse.moveLeft')}" />
+                                    <input type="image" src='{$classleft}' title="{i18n:translate('component.classhandler.browse.moveLeft')}" />
                                   </form>
                                 </xsl:when>
                                 <xsl:otherwise>
@@ -488,7 +488,7 @@
                                     <input type="hidden" name="path" value='{$href1}' />
                                     <input type="hidden" name="clid" value='{$classifID}' />
                                     <input type="hidden" name="categid" value='{col[2]/@lineID}' />
-                                    <input type="image" src='{$classright}' title="{i18n:translate('Browse.moveRight')}" />
+                                    <input type="image" src='{$classright}' title="{i18n:translate('component.classhandler.browse.moveRight')}" />
                                   </form>
                                 </xsl:when>
                                 <xsl:otherwise>
@@ -521,7 +521,7 @@
                             <input type="hidden" name="path" value='{$path}' />
                             <input type="hidden" name="clid" value='{$classifID}' />
                             <input type="hidden" name="categid" value='empty' />
-                            <input type="submit" class="button" name="newcateg" value="{i18n:translate('Browse.newCat')}" />
+                            <input type="submit" class="button" name="newcateg" value="{i18n:translate('component.classhandler.browse.newCat')}" />
                           </form>
                         </td>
                         <td>
@@ -529,7 +529,7 @@
                             <input type="hidden" name="path" value='{$path}' />
                             <input type="hidden" name="clid" value='{$classifID}' />
                             <input type="hidden" name="todo" value='save-all' />
-                            <input type="submit" class="button" name="saveAll" value="{i18n:translate('Browse.saveClass')}" />
+                            <input type="submit" class="button" name="saveAll" value="{i18n:translate('component.classhandler.browse.saveClass')}" />
                           </form>
                         </td>
                         <td>
@@ -537,7 +537,7 @@
                             <input type="hidden" name="path" value='{$path}' />
                             <input type="hidden" name="clid" value='' />
                             <input type="hidden" name="todo" value='purge-all' />
-                            <input type="submit" class="button" name="purgeAll" value="{i18n:translate('Browse.discardClass')}" />
+                            <input type="submit" class="button" name="purgeAll" value="{i18n:translate('component.classhandler.browse.discardClass')}" />
                           </form>
                         </td>
                       </tr>
@@ -611,7 +611,7 @@
                           <input type="hidden" name="todo" value='delete-classification' />
                           <input type="hidden" name="path" value='{$categpath}' />
                           <input type="hidden" name="clid" value='{$classifID}' />
-                          <input type="image" src='{$classdelete}' title="{i18n:translate('Browse.classDelete')}" />
+                          <input type="image" src='{$classdelete}' title="{i18n:translate('component.classhandler.browse.classDelete')}" />
                         </form>
                       </xsl:if>
                       <xsl:if test="$counter > 0">
@@ -623,7 +623,7 @@
                     <form action="{$WebApplicationBaseURL}servlets/MCRStartClassEditorServlet{$HttpSession}" method="get">
                       <input type="hidden" name="todo" value='acl-classification' />
                       <input type="hidden" name="clid" value='{$classifID}' />
-                      <input type="image" src='{$classacl}' title="{i18n:translate('Browse.classACL')}" />
+                      <input type="image" src='{$classacl}' title="{i18n:translate('component.classhandler.browse.classACL')}" />
                     </form>
                   </td>						
                   <xsl:if test="$edited='false'">
@@ -631,7 +631,7 @@
                       <a target="new" alt="$classifID" onclick="fensterCodice('{$WebApplicationBaseURL}servlets/MCRClassExportServlet?id={$classifID}');return false;"
                         href="{$WebApplicationBaseURL}servlets/MCRClassExportServlet?id={$classifID}{$HttpSession}">
                         <input onclick="fensterCodice('{$WebApplicationBaseURL}servlets/MCRClassExportServlet?id={$classifID}');return false;" type="image"
-                          src='{$classexport}' title="{i18n:translate('Browse.classExport')}" />
+                          src='{$classexport}' title="{i18n:translate('component.classhandler.browse.classExport')}" />
                       </a>
                     </td>
                   </xsl:if>				  	
@@ -640,7 +640,7 @@
                       <input type="hidden" name="todo" value='modify-classification' />
                       <input type="hidden" name="path" value='{$categpath}' />
                       <input type="hidden" name="clid" value='{$classifID}' />
-                      <input type="image" src='{$classedit}' title="{i18n:translate('Browse.classDescEdit')}" />
+                      <input type="image" src='{$classedit}' title="{i18n:translate('component.classhandler.browse.classDescEdit')}" />
                     </form>
                   </td>
 								
@@ -661,7 +661,7 @@
             </xsl:choose>
             <xsl:if test="$edited='true'">
               <span class="classEdited">
-                <xsl:value-of select="concat(' ',i18n:translate('Browse.edited'))" />
+                <xsl:value-of select="concat(' ',i18n:translate('component.classhandler.browse.edited'))" />
               </span>
             </xsl:if>
             <br />
@@ -671,7 +671,7 @@
           </td>
 		  
           <td nowrap="yes" class="classeditor_arabic_td3">
-            <xsl:value-of select="i18n:translate('Browse.docs',$h6)" />
+            <xsl:value-of select="i18n:translate('component.classhandler.browse.docs',$h6)" />
           </td>				 
 		</tr>			
 		</xsl:when>
@@ -679,7 +679,7 @@
         <tr valign="top">	  
 			
           <td nowrap="yes" class="classeditor">
-            <xsl:value-of select="i18n:translate('Browse.docs',$h6)" />
+            <xsl:value-of select="i18n:translate('component.classhandler.browse.docs',$h6)" />
           </td>
         
 		  <td class="classeditor">
@@ -695,7 +695,7 @@
             </xsl:choose>
             <xsl:if test="$edited='true'">
               <span class="classEdited">
-                <xsl:value-of select="concat(' ',i18n:translate('Browse.edited'))" />
+                <xsl:value-of select="concat(' ',i18n:translate('component.classhandler.browse.edited'))" />
               </span>
             </xsl:if>
             <br />
@@ -716,7 +716,7 @@
                       <input type="hidden" name="todo" value='modify-classification' />
                       <input type="hidden" name="path" value='{$categpath}' />
                       <input type="hidden" name="clid" value='{$classifID}' />
-                      <input type="image" src='{$classedit}' title="{i18n:translate('Browse.classDescEdit')}" />
+                      <input type="image" src='{$classedit}' title="{i18n:translate('component.classhandler.browse.classDescEdit')}" />
                     </form>
                   </td>					
                   <xsl:if test="$edited='false'">
@@ -724,7 +724,7 @@
                       <a target="new" alt="$classifID" onclick="fensterCodice('{$WebApplicationBaseURL}servlets/MCRClassExportServlet?id={$classifID}');return false;"
                         href="{$WebApplicationBaseURL}servlets/MCRClassExportServlet?id={$classifID}">
                         <input onclick="fensterCodice('{$WebApplicationBaseURL}servlets/MCRClassExportServlet?id={$classifID}{$HttpSession}');return false;" type="image"
-                          src='{$classexport}' title="{i18n:translate('Browse.classExport')}" />
+                          src='{$classexport}' title="{i18n:translate('component.classhandler.browse.classExport')}" />
                       </a>
                     </td>
                   </xsl:if>					
@@ -732,7 +732,7 @@
                     <form action="{$WebApplicationBaseURL}servlets/MCRStartClassEditorServlet{$HttpSession}" method="get">
                       <input type="hidden" name="todo" value='acl-classification' />
                       <input type="hidden" name="clid" value='{$classifID}' />
-                      <input type="image" src='{$classacl}' title="{i18n:translate('Browse.classACL')}" />
+                      <input type="image" src='{$classacl}' title="{i18n:translate('component.classhandler.browse.classACL')}" />
                     </form>
                   </td>                  
 				  <td width="25" valign="top">
@@ -742,7 +742,7 @@
                           <input type="hidden" name="todo" value='delete-classification' />
                           <input type="hidden" name="path" value='{$categpath}' />
                           <input type="hidden" name="clid" value='{$classifID}' />
-                          <input type="image" src='{$classdelete}' title="{i18n:translate('Browse.classDelete')}" />
+                          <input type="image" src='{$classdelete}' title="{i18n:translate('component.classhandler.browse.classDelete')}" />
                         </form>
                       </xsl:if>
                       <xsl:if test="$counter > 0">
@@ -775,7 +775,7 @@
                     <input type="hidden" name="path" value='{$path}' />
                     <input type="hidden" name="clid" value='' />
                     <input type="hidden" name="todo" value='purge-all' />
-                    <input type="submit" class="button" name="purgeAll" value="{i18n:translate('Browse.discardClass')}" />
+                    <input type="submit" class="button" name="purgeAll" value="{i18n:translate('component.classhandler.browse.discardClass')}" />
                   </form>
                 </td>  
 				<td>
@@ -783,7 +783,7 @@
                     <input type="hidden" name="path" value='{$path}' />
                     <input type="hidden" name="clid" value='' />
                     <input type="hidden" name="todo" value='save-all' />
-                    <input type="submit" class="button" name="saveAll" value="{i18n:translate('Browse.saveClass')}" />
+                    <input type="submit" class="button" name="saveAll" value="{i18n:translate('component.classhandler.browse.saveClass')}" />
                   </form>
                 </td> 
 				<td>
@@ -791,7 +791,7 @@
                     <input type="hidden" name="path" value='{$path}' />
                     <input type="hidden" name="clid" value='' />
                     <input type="hidden" name="todo" value='import-classification' />
-                    <input type="submit" class="button" name="importClass" value="{i18n:translate('Browse.importClass')}" />
+                    <input type="submit" class="button" name="importClass" value="{i18n:translate('component.classhandler.browse.importClass')}" />
                   </form>
                 </td>  
 				<td>
@@ -799,7 +799,7 @@
                     <input type="hidden" name="path" value='{$path}' />
                     <input type="hidden" name="clid" value='' />
                     <input type="hidden" name="todo" value='create-classification' />
-                    <input type="submit" class="button" name="newClass" value="{i18n:translate('Browse.newClass')}" />
+                    <input type="submit" class="button" name="newClass" value="{i18n:translate('component.classhandler.browse.newClass')}" />
                   </form>
                 </td>  
 			  </tr>    
@@ -811,7 +811,7 @@
                     <input type="hidden" name="path" value='{$path}' />
                     <input type="hidden" name="clid" value='' />
                     <input type="hidden" name="todo" value='create-classification' />
-                    <input type="submit" class="button" name="newClass" value="{i18n:translate('Browse.newClass')}" />
+                    <input type="submit" class="button" name="newClass" value="{i18n:translate('component.classhandler.browse.newClass')}" />
                   </form>
                 </td>
                 <td>
@@ -819,7 +819,7 @@
                     <input type="hidden" name="path" value='{$path}' />
                     <input type="hidden" name="clid" value='' />
                     <input type="hidden" name="todo" value='import-classification' />
-                    <input type="submit" class="button" name="importClass" value="{i18n:translate('Browse.importClass')}" />
+                    <input type="submit" class="button" name="importClass" value="{i18n:translate('component.classhandler.browse.importClass')}" />
                   </form>
                 </td>
                 <td>
@@ -827,7 +827,7 @@
                     <input type="hidden" name="path" value='{$path}' />
                     <input type="hidden" name="clid" value='' />
                     <input type="hidden" name="todo" value='save-all' />
-                    <input type="submit" class="button" name="saveAll" value="{i18n:translate('Browse.saveClass')}" />
+                    <input type="submit" class="button" name="saveAll" value="{i18n:translate('component.classhandler.browse.saveClass')}" />
                   </form>
                 </td>
                 <td>
@@ -835,7 +835,7 @@
                     <input type="hidden" name="path" value='{$path}' />
                     <input type="hidden" name="clid" value='' />
                     <input type="hidden" name="todo" value='purge-all' />
-                    <input type="submit" class="button" name="purgeAll" value="{i18n:translate('Browse.discardClass')}" />
+                    <input type="submit" class="button" name="purgeAll" value="{i18n:translate('component.classhandler.browse.discardClass')}" />
                   </form>
                 </td>
               </tr>
