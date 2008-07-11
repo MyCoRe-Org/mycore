@@ -545,7 +545,7 @@
       </xsl:if>
     </xsl:if>
   
-    <xsl:if test="contains('textfield textarea password file list checkbox display ', concat(name(),' '))">
+    <xsl:if test="contains('textfield textarea password file list checkbox display bdo ', concat(name(),' '))">
       <!-- ======== hidden field for sorting the entry ======== -->
       <!-- ======== hidden field for identifying entry ======== -->
       <input type="hidden" name="{$editor.delimiter.internal}sortnr-{$var.new}" value="{$pos}" />
@@ -1242,6 +1242,19 @@
     <xsl:with-param name="default" select="$default" />
     <xsl:with-param name="indent"  select="concat($editor.list.indent,$indent)" />
   </xsl:apply-templates>
+</xsl:template>
+
+<!-- ======== bidirectional overwrite ======== -->
+
+<xsl:template match="bdo">
+  <xsl:param name="var" />
+
+  <bdo>
+    <xsl:copy-of select="@*" />
+    <xsl:apply-templates select="*">
+      <xsl:with-param name="var" select="$var" />
+    </xsl:apply-templates>
+  </bdo>
 </xsl:template>
 
 <!-- ========================================================================= -->
