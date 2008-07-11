@@ -222,20 +222,11 @@ public class MCRHIBXMLStore implements MCRXMLTableInterface {
      * @return true if the MCRObjectID exist, else return false
      */
     public final boolean exist(String mcrid, int version) {
-        boolean exists = false;
-
-        Session session = getSession();
         MCRXMLTABLEPK pk = new MCRXMLTABLEPK(mcrid, version);
-        if (session.get(MCRXMLTABLE.class, pk) != null) {
+        if (getSession().get(MCRXMLTABLE.class, pk) != null) {
             return true;
         }
-        StringBuffer query = new StringBuffer("select key.id from MCRXMLTABLE where MCRID = '").append(mcrid).append("' and MCRVERSION = ").append(
-                version);
-        List<?> l = session.createQuery(query.toString()).list();
-        if (l.size() > 0) {
-            exists = true;
-        }
-        return exists;
+        return false;
     }
 
     /**
