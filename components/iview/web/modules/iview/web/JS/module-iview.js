@@ -125,6 +125,11 @@ function setupHighlight(x, y, sf, zoom, thumbWidth, thumbHeight) {
     } 
 }
 
+function switchImage(url) {
+    document.getElementById('imageSwitcher').action = url;
+    document.getElementById('imageSwitcher').submit();
+}
+
 /************************************************/
 /************************************************/
 /*** internal functions *************************/

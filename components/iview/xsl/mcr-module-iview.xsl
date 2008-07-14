@@ -758,10 +758,7 @@
                     </xsl:choose>
                 </td>
                 <td>
-                    <xsl:variable name="imageNumber">
-                        <xsl:value-of select="concat($currentNodePosition+1,'/',count(/mcr-module/iview/content/nodes/node[@type='file']))" />
-                    </xsl:variable>
-                    <input id="iview-navinput" value="{$imageNumber}" />
+                    <xsl:call-template name="imageSwitcher" />
                 </td>
                 <td>
                     <!--next-->
@@ -806,7 +803,38 @@
             </tr>
         </table>
     </xsl:template>
+
     <!--  #####################################################################################################################-->
+
+    <xsl:template name="imageSwitcher">
+        <xsl:variable name="switchURLPrefix">
+            <xsl:value-of select="concat($iview.home,$path)" />
+        </xsl:variable>
+        <form id="imageSwitcher" action="" method="post">
+            <input type="hidden" name="mode" value="generateLayout" />
+            <input type="hidden" name="XSL.MCR.Module-iview.move" value="reset" />
+            <p>
+                <select size="1" onChange="switchImage(this.value)">
+                    <xsl:for-each select="/mcr-module/iview/content/nodes/node[@type='file']">
+                        <option value="{$switchURLPrefix}/{name/text()}">
+                            <xsl:choose>
+                                <xsl:when test="$currentNodePosition+1 = position()">
+                                    <xsl:attribute name="selected" value="selected" />
+                                    <xsl:value-of select="concat(position(),'/',count(/mcr-module/iview/content/nodes/node[@type='file']))" />
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:value-of select="position()" />
+                                </xsl:otherwise>
+                            </xsl:choose>
+                        </option>
+                    </xsl:for-each>
+                </select>
+            </p>
+        </form>
+    </xsl:template>
+
+    <!--  #####################################################################################################################-->
+
     <xsl:template name="thumbnails">
         <table border="0">
             <tr>
