@@ -81,7 +81,8 @@ public class MCRSessionContext extends ThreadLocalSessionContext implements MCRS
             if (event.getConcurrentAccessors() <= 1) {
                 // save Session for later use;
                 LOGGER.debug("Saving hibernate Session for later use in " + mcrSession);
-                mcrSession.put(SESSION_KEY, currentSession);
+                //mcrSession.put(SESSION_KEY, currentSession);
+                autoCloseSession(currentSession);
             } else {
                 autoCloseSession(currentSession);
             }
