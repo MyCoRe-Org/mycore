@@ -1,24 +1,10 @@
 /*
- * 
- * $Revision$ $Date$
- *
- * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
- *
- * This program is free software; you can use it, redistribute it
- * and / or modify it under the terms of the GNU General Public License
- * (GPL) as published by the Free Software Foundation; either version 2
- * of the License or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program, in a file called gpl.txt or license.txt.
- * If not, write to the Free Software Foundation Inc.,
- * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
+ * $Revision$ $Date$ This file is part of M y C o R e See http://www.mycore.de/ for details. This program
+ * is free software; you can use it, redistribute it and / or modify it under the terms of the GNU General Public License (GPL) as published by the Free
+ * Software Foundation; either version 2 of the License or (at your option) any later version. This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+ * more details. You should have received a copy of the GNU General Public License along with this program, in a file called gpl.txt or license.txt. If not,
+ * write to the Free Software Foundation Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307 USA
  */
 
 package org.mycore.datamodel.ifs;
@@ -85,7 +71,15 @@ public abstract class MCRFilesystemNode {
         this(name, parent.ID, parent.ownerID);
     }
 
+    protected MCRFilesystemNode(String name, MCRDirectory parent, boolean checkName) {
+        this(name, parent.ID, parent.ownerID, checkName);
+    }
+
     private MCRFilesystemNode(String name, String parentID, String ownerID) {
+        this(name, parentID, ownerID, true);
+    }
+
+    private MCRFilesystemNode(String name, String parentID, String ownerID, boolean doExistCheck) {
         MCRArgumentChecker.ensureNotEmpty(ownerID, "owner ID");
 
         this.ID = manager.createNodeID();
@@ -94,8 +88,7 @@ public abstract class MCRFilesystemNode {
         this.size = 0;
         this.lastModified = new GregorianCalendar();
         this.label = null;
-
-        checkName(name);
+        checkName(name, doExistCheck);
         this.name = name;
     }
 
@@ -136,14 +129,14 @@ public abstract class MCRFilesystemNode {
         this.deleted = true;
     }
 
-    protected void checkName(String name) {
+    protected void checkName(String name, boolean doExistCheck) {
         MCRArgumentChecker.ensureNotEmpty(name, "name");
 
         boolean error = (name.indexOf("/") + name.indexOf("\\")) != -2;
         String errorMsg = "Filesystem node name must not contain '\' or '/' characters: " + name;
         MCRArgumentChecker.ensureIsFalse(error, errorMsg);
 
-        if (hasParent()) {
+        if (hasParent() && doExistCheck) {
             boolean exists = getParent().hasChild(name);
             String existsMsg = "A node with this name already exists: " + name;
             MCRArgumentChecker.ensureIsFalse(exists, existsMsg);
@@ -210,7 +203,7 @@ public abstract class MCRFilesystemNode {
             return;
         }
 
-        checkName(name);
+        checkName(name, true);
         this.name = name;
         this.lastModified = new GregorianCalendar();
 
@@ -313,10 +306,8 @@ public abstract class MCRFilesystemNode {
     }
 
     /**
-     * Takes a file size in bytes and formats it as a string for output. For
-     * values &lt; 5 KB the output format is for example "320 Byte". For values
-     * &gt; 5 KB the output format is for example "6,8 KB". For values &gt; 1 MB
-     * the output format is for example "3,45 MB".
+     * Takes a file size in bytes and formats it as a string for output. For values &lt; 5 KB the output format is for example "320 Byte". For values &gt; 5 KB
+     * the output format is for example "6,8 KB". For values &gt; 1 MB the output format is for example "3,45 MB".
      */
     public static String getSizeFormatted(long bytes) {
         String sizeUnit;
@@ -356,9 +347,8 @@ public abstract class MCRFilesystemNode {
     }
 
     /**
-     * Stores additional XML data for this node. The name of the data element is
-     * used as unique key for storing data. If data with this name already
-     * exists, it is overwritten.
+     * Stores additional XML data for this node. The name of the data element is used as unique key for storing data. If data with this name already exists, it
+     * is overwritten.
      * 
      * @param data
      *            the additional XML data to be saved
@@ -380,7 +370,7 @@ public abstract class MCRFilesystemNode {
         Element child = doc.getRootElement().getChild(data.getName());
         if (child != null)
             child.detach();
-        doc.getRootElement().addContent((Element)(data.clone()));
+        doc.getRootElement().addContent((Element) (data.clone()));
         dataFile.setContentFrom(doc);
     }
 

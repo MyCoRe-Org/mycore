@@ -171,6 +171,7 @@ public class MCRData2Fields {
         boolean foundSourceFileAdditional = false;
 
         // Handle source FILE_TEXT_CONTENT
+        LOGGER.debug("Handle source FILE_TEXT_CONTENT");
         List<MCRFieldDef> fieldDefList = MCRFieldDef.getFieldDefs(index);
         for (int i = 0; i < fieldDefList.size(); i++) {
             MCRFieldDef fieldDef = fieldDefList.get(i);
@@ -190,6 +191,7 @@ public class MCRData2Fields {
 
         // Handle source FILE_XML_CONTENT
         if (foundSourceXMLContent) {
+            LOGGER.debug("Handle source FILE_XML_CONTENT");
             Templates stylesheet = buildStylesheet(index, MCRFieldDef.FILE_XML_CONTENT);
             Document xml = null;
             try {
@@ -204,6 +206,7 @@ public class MCRData2Fields {
 
         // Handle source FILE_METADATA
         if (foundSourceFileMetadata) {
+            LOGGER.debug("Handle source FILE_METADATA");
             Templates stylesheet = buildStylesheet(index, MCRFieldDef.FILE_METADATA);
             Document xml = file.createXML();
             values.addAll(buildValues(stylesheet, xml, file.getContentTypeID()));
@@ -211,6 +214,7 @@ public class MCRData2Fields {
 
         // Handle source FILE_ADDITIONAL_DATA
         if (foundSourceFileAdditional) {
+            LOGGER.debug("Handle source FILE_ADDITIONAL_DATA");
             Templates stylesheet = buildStylesheet(index, MCRFieldDef.FILE_ADDITIONAL_DATA);
             Document xml = null;
             try {

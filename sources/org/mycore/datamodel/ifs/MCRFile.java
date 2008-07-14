@@ -1,24 +1,10 @@
 /*
- * 
- * $Revision$ $Date$
- *
- * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
- *
- * This program is free software; you can use it, redistribute it
- * and / or modify it under the terms of the GNU General Public License
- * (GPL) as published by the Free Software Foundation; either version 2
- * of the License or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program, in a file called gpl.txt or license.txt.
- * If not, write to the Free Software Foundation Inc.,
- * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
+ * $Revision$ $Date$ This file is part of M y C o R e See http://www.mycore.de/ for details. This program
+ * is free software; you can use it, redistribute it and / or modify it under the terms of the GNU General Public License (GPL) as published by the Free
+ * Software Foundation; either version 2 of the License or (at your option) any later version. This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+ * more details. You should have received a copy of the GNU General Public License along with this program, in a file called gpl.txt or license.txt. If not,
+ * write to the Free Software Foundation Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307 USA
  */
 
 package org.mycore.datamodel.ifs;
@@ -74,9 +60,8 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
     protected boolean isNew;
 
     /**
-     * Creates a new and empty root MCRFile with the given filename, belonging
-     * to the given ownerID. The file is assumed to be a standalone "root file"
-     * that has no parent directory.
+     * Creates a new and empty root MCRFile with the given filename, belonging to the given ownerID. The file is assumed to be a standalone "root file" that has
+     * no parent directory.
      * 
      * @param name
      *            the filename of the new MCRFile
@@ -91,19 +76,33 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
     }
 
     /**
-     * Creates a new, empty MCRFile with the given filename in the parent
-     * MCRDirectory.
+     * Creates a new, empty MCRFile with the given filename in the parent MCRDirectory.
      * 
      * @param name
      *            the filename of the new MCRFile
      * @param parent
      *            the parent directory that will contain the new child
-     * 
      * @throws MCRUsageException
      *             if that directory already contains a child with that name
      */
     public MCRFile(String name, MCRDirectory parent) {
-        super(name, parent);
+        this(name, parent, true);
+    }
+
+    /**
+     * Creates a new, empty MCRFile with the given filename in the parent MCRDirectory.
+     * 
+     * @param name
+     *            the filename of the new MCRFile
+     * @param parent
+     *            the parent directory that will contain the new child
+     * @param doExistCheck
+     *              checks if file with that Name already exists 
+     * @throws MCRUsageException
+     *             if that directory already contains a child with that name
+     */
+    public MCRFile(String name, MCRDirectory parent, boolean doExistCheck) {
+        super(name, parent, doExistCheck);
         initContentFields();
         isNew = true;
         storeNew();
@@ -112,7 +111,8 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
     /**
      * Internal constructor, do not use on your own.
      */
-    MCRFile(String ID, String parentID, String ownerID, String name, String label, long size, GregorianCalendar date, String storeID, String storageID, String fctID, String md5) {
+    MCRFile(String ID, String parentID, String ownerID, String name, String label, long size, GregorianCalendar date, String storeID, String storageID,
+            String fctID, String md5) {
         super(ID, parentID, ownerID, name, label, size, date);
 
         this.storageID = storageID;
@@ -134,13 +134,11 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
     }
 
     /**
-     * Returns the root MCRFile that has no parent and is logically owned by the
-     * object with the given ID.
+     * Returns the root MCRFile that has no parent and is logically owned by the object with the given ID.
      * 
      * @param ownerID
      *            the ID of the logical owner of that file
-     * @return the root MCRFile stored for that owner ID, or null if no such
-     *         file exists
+     * @return the root MCRFile stored for that owner ID, or null if no such file exists
      */
     public static MCRFile getRootFile(String ownerID) {
         return (MCRFile) (MCRFilesystemNode.getRootNode(ownerID));
@@ -161,8 +159,7 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
     /**
      * Returns the file extension of this file's name
      * 
-     * @return the file extension, or an empty string if the file has no
-     *         extension
+     * @return the file extension, or an empty string if the file has no extension
      */
     public String getExtension() {
         ensureNotDeleted();
@@ -186,8 +183,7 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
     }
 
     /**
-     * Returns the ID of the MCRContentStore implementation that holds the
-     * content of this file
+     * Returns the ID of the MCRContentStore implementation that holds the content of this file
      */
     public String getStoreID() {
         ensureNotDeleted();
@@ -196,8 +192,7 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
     }
 
     /**
-     * Returns the storage ID that identifies the place where the
-     * MCRContentStore has stored the content of this file
+     * Returns the storage ID that identifies the place where the MCRContentStore has stored the content of this file
      */
     public String getStorageID() {
         ensureNotDeleted();
@@ -208,8 +203,7 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
     /**
      * Returns the MCRContentStore instance that holds the content of this file
      * 
-     * @return the MCRContentStore instance that holds the content of this file,
-     *         or null if no content is stored
+     * @return the MCRContentStore instance that holds the content of this file, or null if no content is stored
      */
     protected MCRContentStore getContentStore() {
         if (storeID.length() == 0) {
@@ -219,9 +213,8 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
     }
 
     /**
-     * Reads the content of this file from a java.lang.String and stores its
-     * text as bytes, encoded in the default encoding of the platform where this
-     * is running.
+     * Reads the content of this file from a java.lang.String and stores its text as bytes, encoded in the default encoding of the platform where this is
+     * running.
      * 
      * @param source
      *            the String that is the file's content
@@ -235,8 +228,7 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
     }
 
     /**
-     * Reads the content of this file from a java.lang.String and stores its
-     * text as bytes, encoded in the encoding given, in an MCRContentStore.
+     * Reads the content of this file from a java.lang.String and stores its text as bytes, encoded in the encoding given, in an MCRContentStore.
      * 
      * @param source
      *            the String that is the file's content
@@ -253,12 +245,10 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
     }
 
     /**
-     * Reads the content of this file from a source file in the local filesystem
-     * and stores it in an MCRContentStore.
+     * Reads the content of this file from a source file in the local filesystem and stores it in an MCRContentStore.
      * 
      * @param source
-     *            the file in the local host's filesystem thats content should
-     *            be imported
+     *            the file in the local host's filesystem thats content should be imported
      */
     public void setContentFrom(File source) throws MCRPersistenceException {
         MCRArgumentChecker.ensureNotNull(source, "source file");
@@ -275,8 +265,7 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
     }
 
     /**
-     * Reads the content of this file from a byte array and stores it in an
-     * MCRContentStore.
+     * Reads the content of this file from a byte array and stores it in an MCRContentStore.
      * 
      * @param source
      *            the file's content
@@ -306,9 +295,8 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
     }
 
     /**
-     * Reads the content of this file from the source InputStream and stores it
-     * in an MCRContentStore. InputStream does NOT get closed at end of process,
-     * this must be done by invoking code if required/appropriate.
+     * Reads the content of this file from the source InputStream and stores it in an MCRContentStore. InputStream does NOT get closed at end of process, this
+     * must be done by invoking code if required/appropriate.
      * 
      * @param source
      *            the source for the file's content bytes
@@ -367,9 +355,8 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
     }
 
     /**
-     * Deletes this file and its content stored in the system. Note that after
-     * calling this method, the file object is deleted and invalid and can not
-     * be used any more.
+     * Deletes this file and its content stored in the system. Note that after calling this method, the file object is deleted and invalid and can not be used
+     * any more.
      */
     public void delete() throws MCRPersistenceException {
         ensureNotDeleted();
@@ -397,9 +384,8 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
     }
 
     /**
-     * Gets an InputStream to read the content of this file from the underlying
-     * store. It is important that you close() the stream when you are finished
-     * reading content from it.
+     * Gets an InputStream to read the content of this file from the underlying store. It is important that you close() the stream when you are finished reading
+     * content from it.
      * 
      * @return an InputStream to read the file's content from
      * @throws IOException
@@ -460,8 +446,7 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
     }
 
     /**
-     * Gets the content of this file as a string, using the default encoding of
-     * the system environment
+     * Gets the content of this file as a string, using the default encoding of the system environment
      * 
      * @return the file's content as a String
      */
@@ -485,8 +470,7 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
     }
 
     /**
-     * Returns true, if this file is stored in a content store that provides an
-     * MCRAudioVideoExtender for audio/video streaming and additional metadata
+     * Returns true, if this file is stored in a content store that provides an MCRAudioVideoExtender for audio/video streaming and additional metadata
      */
     public boolean hasAudioVideoExtender() {
         ensureNotDeleted();
@@ -498,8 +482,7 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
     }
 
     /**
-     * Returns the AudioVideoExtender in case this file is streaming audio/video
-     * and stored in a ContentStore that supports this
+     * Returns the AudioVideoExtender in case this file is streaming audio/video and stored in a ContentStore that supports this
      */
     public MCRAudioVideoExtender getAudioVideoExtender() {
         ensureNotDeleted();
@@ -541,9 +524,8 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
     }
 
     /**
-     * Build a XML representation of all technical metadata of this MCRFile and
-     * its MCRAudioVideoExtender, if present. That xml can be used for indexing
-     * this data.
+     * Build a XML representation of all technical metadata of this MCRFile and its MCRAudioVideoExtender, if present. That xml can be used for indexing this
+     * data.
      */
     public Document createXML() {
         Element root = new Element("file");

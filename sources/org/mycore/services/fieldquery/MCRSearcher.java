@@ -1,24 +1,10 @@
 /*
- * 
- * $Revision$ $Date$
- *
- * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
- *
- * This program is free software; you can use it, redistribute it
- * and / or modify it under the terms of the GNU General Public License
- * (GPL) as published by the Free Software Foundation; either version 2
- * of the License or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program, in a file called gpl.txt or license.txt.
- * If not, write to the Free Software Foundation Inc.,
- * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
+ * $Revision$ $Date$ This file is part of M y C o R e See http://www.mycore.de/ for details. This program
+ * is free software; you can use it, redistribute it and / or modify it under the terms of the GNU General Public License (GPL) as published by the Free
+ * Software Foundation; either version 2 of the License or (at your option) any later version. This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+ * more details. You should have received a copy of the GNU General Public License along with this program, in a file called gpl.txt or license.txt. If not,
+ * write to the Free Software Foundation Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307 USA
  */
 
 package org.mycore.services.fieldquery;
@@ -27,6 +13,8 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+
+import org.mycore.common.MCRCache;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandler;
@@ -37,14 +25,11 @@ import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.parsers.bool.MCRCondition;
 
 /**
- * Abstract base class for searchers and indexers. Searcher implementations for
- * a specific backend must be implemented as a subclass. This class implements
- * MCREventHandler. Indexers can easily be implemented by overwriting the two
- * methods addToIndex and removeFromIndex. Searchers are implemented by
- * overwriting the method search. Searchers that do not need indexing or do this
- * on their own can simply ignore the add/remove methods.
+ * Abstract base class for searchers and indexers. Searcher implementations for a specific backend must be implemented as a subclass. This class implements
+ * MCREventHandler. Indexers can easily be implemented by overwriting the two methods addToIndex and removeFromIndex. Searchers are implemented by overwriting
+ * the method search. Searchers that do not need indexing or do this on their own can simply ignore the add/remove methods.
  * 
- * @author Frank Lï¿½tzenkirchen
+ * @author Frank Lützenkirchen
  */
 public abstract class MCRSearcher extends MCREventHandlerBase implements MCREventHandler {
     /** The logger */
@@ -58,6 +43,9 @@ public abstract class MCRSearcher extends MCREventHandlerBase implements MCREven
 
     /** The ID of the index this searcher handles * */
     protected String index;
+
+    protected static MCRCache RETURN_ID_CACHE = new MCRCache(MCRConfiguration.instance().getInt("MCR.Searcher.ReturnID.Cache", 100),
+            "MCRSearcher ReturnID Cache");
 
     /**
      * Initializes the searcher and sets its unique ID.
@@ -89,17 +77,22 @@ public abstract class MCRSearcher extends MCREventHandlerBase implements MCREven
 
     private String getReturnID(MCRFile file) {
         // Maybe fieldquery is used in application without link table manager
-        if( MCRConfiguration.instance().getString( "MCR.Persistence.LinkTable.Store.Class", null ) == null ) 
-          return file.getID();
-            
+        if (MCRConfiguration.instance().getString("MCR.Persistence.LinkTable.Store.Class", null) == null)
+            return file.getID();
+
         String ownerID = file.getOwnerID();
-        
+        String returnID = (String) RETURN_ID_CACHE.get(ownerID);
+        if (returnID != null)
+            return returnID;
+
         List list = MCRLinkTableManager.instance().getSourceOf(ownerID, MCRLinkTableManager.ENTRY_TYPE_DERIVATE);
         if ((list == null) || (list.size() == 0))
             return file.getID();
-        
+
         // Return ID of MCRObject this MCRFile belongs to
-        return (String) (list.get(0)); 
+        returnID = (String) (list.get(0));
+        RETURN_ID_CACHE.put(ownerID, returnID);
+        return returnID;
     }
 
     protected void handleFileCreated(MCREvent evt, MCRFile file) {
@@ -145,23 +138,21 @@ public abstract class MCRSearcher extends MCREventHandlerBase implements MCREven
     }
 
     protected void handleObjectRepaired(MCREvent evt, MCRObject obj) {
-      handleObjectCreated(evt, obj);
+        handleObjectCreated(evt, obj);
     }
-    
+
     protected void undoObjectCreated(MCREvent evt, MCRObject obj) {
-      handleObjectDeleted(evt, obj);
+        handleObjectDeleted(evt, obj);
     }
 
     protected void undoObjectDeleted(MCREvent evt, MCRObject obj) {
-      handleObjectCreated(evt, obj);
+        handleObjectCreated(evt, obj);
     }
 
     /**
-     * Adds field values to the search index. Searchers that need an indexer
-     * must overwrite this method to store the values in their backend index. If
-     * this class is configured as event handler, this method is automatically
-     * called when objects are created or updated. The field values have been
-     * extracted from the object's data as defined by searchfields.xml
+     * Adds field values to the search index. Searchers that need an indexer must overwrite this method to store the values in their backend index. If this
+     * class is configured as event handler, this method is automatically called when objects are created or updated. The field values have been extracted from
+     * the object's data as defined by searchfields.xml
      * 
      * @param entryID
      *            the unique ID of this entry in the index
@@ -174,10 +165,8 @@ public abstract class MCRSearcher extends MCREventHandlerBase implements MCREven
     }
 
     /**
-     * Removes the values of the given entry from the backend index. Searchers
-     * that need an indexer must overwrite this method to delete the values in
-     * their backend index. If this class is configured as event handler, this
-     * method is automatically called when objects are deleted or updated.
+     * Removes the values of the given entry from the backend index. Searchers that need an indexer must overwrite this method to delete the values in their
+     * backend index. If this class is configured as event handler, this method is automatically called when objects are deleted or updated.
      * 
      * @param entryID
      *            the unique ID of this entry in the index
@@ -186,31 +175,24 @@ public abstract class MCRSearcher extends MCREventHandlerBase implements MCREven
     }
 
     /**
-     * Executes a query on this searcher. The query MUST only refer to fields
-     * that are managed by this searcher.
+     * Executes a query on this searcher. The query MUST only refer to fields that are managed by this searcher.
      * 
      * @param cond
      *            the query condition
      * @param maxResults
      *            the maximum number of results to return, 0 means all results
      * @param sortBy
-     *            a not-null list of MCRSortBy sort criteria. The list is empty
-     *            if the results should not be sorted
+     *            a not-null list of MCRSortBy sort criteria. The list is empty if the results should not be sorted
      * @param addSortData
-     *            if false, backend should sort results itself while executing
-     *            the query. If this is not possible or the parameter is true,
-     *            backend should not sort the results itself, but only store the
-     *            data of the fields in the sortBy list which are needed to sort
-     *            later
+     *            if false, backend should sort results itself while executing the query. If this is not possible or the parameter is true, backend should not
+     *            sort the results itself, but only store the data of the fields in the sortBy list which are needed to sort later
      * @return the query results
      */
     public abstract MCRResults search(MCRCondition condition, int maxResults, List<MCRSortBy> sortBy, boolean addSortData);
 
     /**
-     * Adds field values needed for sorting for those hits that do not have sort
-     * data set already. Subclasses must overwrite this method, otherwise
-     * sorting results will not always work correctly. The default
-     * implementation in this class does nothing.
+     * Adds field values needed for sorting for those hits that do not have sort data set already. Subclasses must overwrite this method, otherwise sorting
+     * results will not always work correctly. The default implementation in this class does nothing.
      * 
      * @param hits
      *            the MCRHit objects that do not have sort data set
@@ -225,22 +207,17 @@ public abstract class MCRSearcher extends MCREventHandlerBase implements MCREven
      */
     public void clearIndex() {
     }
-    
+
     /**
      * Removes all entries of a field with a given value from index.
      */
     public void clearIndex(String fieldname, String value) {
     }
-    
+
     /**
-     * Inform Searcher what is going on.
-     * Searcher can use this to speed up indexing. MCRLuceneSearcher for example uses a Ramdirectory
-     *  rebuild
-     *  insert
-     *  ...
-     *  finish
+     * Inform Searcher what is going on. Searcher can use this to speed up indexing. MCRLuceneSearcher for example uses a Ramdirectory rebuild insert ... finish
      */
     public void notifySearcher(String mode) {
     }
-    
+
 }

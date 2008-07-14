@@ -1,24 +1,10 @@
 /*
- * 
- * $Revision$ $Date$
- *
- * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
- *
- * This program is free software; you can use it, redistribute it
- * and / or modify it under the terms of the GNU General Public License
- * (GPL) as published by the Free Software Foundation; either version 2
- * of the License or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program, in a file called gpl.txt or license.txt.
- * If not, write to the Free Software Foundation Inc.,
- * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
+ * $Revision$ $Date$ This file is part of M y C o R e See http://www.mycore.de/ for details. This program
+ * is free software; you can use it, redistribute it and / or modify it under the terms of the GNU General Public License (GPL) as published by the Free
+ * Software Foundation; either version 2 of the License or (at your option) any later version. This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+ * more details. You should have received a copy of the GNU General Public License along with this program, in a file called gpl.txt or license.txt. If not,
+ * write to the Free Software Foundation Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307 USA
  */
 
 package org.mycore.datamodel.ifs;
@@ -32,37 +18,26 @@ import org.mycore.common.MCRException;
 import org.mycore.common.MCRUtils;
 
 /**
- * Imports or exports complete directory trees with all contained files and
- * subdirectories between the local host's filesystem and the internal
- * MCRDirectory structures.
+ * Imports or exports complete directory trees with all contained files and subdirectories between the local host's filesystem and the internal MCRDirectory
+ * structures.
  * 
  * @author Frank Lützenkirchen
  * @version $Revision$ $Date$
  */
 public class MCRFileImportExport {
     /**
-     * Imports the contents of a local file or directory into a newly created
-     * MCRDirectory that is owned by the given owner ID. The new MCRDirectory
-     * will have the same name as the owner ID.
-     * 
-     * If the local object is a file, a MCRFile with the same name will be
-     * created or updated in that MCRDirectory. If the local object is a
-     * directory, all contained subdirectories and files will be imported into
-     * the newly created MCRDirectory. That means that after finishing this
-     * method, the complete directory structure will have been imported and
-     * mapped from the local filesystem's structure. The method checks the
-     * contents of each local file to be imported. If the file's content has not
-     * changed for existing files, the internal MCRFile will not be updated. If
-     * there is any exception while importing the local contents, the system
-     * will try to undo this operation by completely deleting all content that
-     * was imported so far.
+     * Imports the contents of a local file or directory into a newly created MCRDirectory that is owned by the given owner ID. The new MCRDirectory will have
+     * the same name as the owner ID. If the local object is a file, a MCRFile with the same name will be created or updated in that MCRDirectory. If the local
+     * object is a directory, all contained subdirectories and files will be imported into the newly created MCRDirectory. That means that after finishing this
+     * method, the complete directory structure will have been imported and mapped from the local filesystem's structure. The method checks the contents of each
+     * local file to be imported. If the file's content has not changed for existing files, the internal MCRFile will not be updated. If there is any exception
+     * while importing the local contents, the system will try to undo this operation by completely deleting all content that was imported so far.
      * 
      * @param local
      *            the local file or directory to be imported
      * @param ownerID
      *            the ID of the logical owner of the content that will be stored
-     * @return a new MCRDirectory that will contain all imported files and
-     *         directories as instances of MCRFilesystemNode children.
+     * @return a new MCRDirectory that will contain all imported files and directories as instances of MCRFilesystemNode children.
      */
     public static MCRDirectory importFiles(File local, String ownerID) {
         MCRArgumentChecker.ensureNotEmpty(ownerID, "owner ID");
@@ -88,27 +63,18 @@ public class MCRFileImportExport {
     }
 
     /**
-     * Imports the contents of a local file or directory into an existing
-     * MCRDirectory that is owned by the given owner ID. The new MCRDirectory
-     * will have the same name as the owner ID.
-     * 
-     * If the local object is a file, a MCRFile with the same name will be
-     * created or updated in that MCRDirectory. If the local object is a
-     * directory, all contained subdirectories and files will be imported into
-     * the newly created MCRDirectory. That means that after finishing this
-     * method, the complete directory structure will have been imported and
-     * mapped from the local filesystem's structure. The method checks the
-     * contents of each local file to be imported. If the file's content has not
-     * changed for existing files, the internal MCRFile will not be updated. If
-     * there is any exception while importing the local contents, the system
-     * will stop with the last state and break the work.
+     * Imports the contents of a local file or directory into an existing MCRDirectory that is owned by the given owner ID. The new MCRDirectory will have the
+     * same name as the owner ID. If the local object is a file, a MCRFile with the same name will be created or updated in that MCRDirectory. If the local
+     * object is a directory, all contained subdirectories and files will be imported into the newly created MCRDirectory. That means that after finishing this
+     * method, the complete directory structure will have been imported and mapped from the local filesystem's structure. The method checks the contents of each
+     * local file to be imported. If the file's content has not changed for existing files, the internal MCRFile will not be updated. If there is any exception
+     * while importing the local contents, the system will stop with the last state and break the work.
      * 
      * @param local
      *            the local file or directory to be imported
      * @param ownerID
      *            the ID of the logical owner of the content that will be stored
-     * @return a new MCRDirectory that will contain all imported files and
-     *         directories as instances of MCRFilesystemNode children.
+     * @return a new MCRDirectory that will contain all imported files and directories as instances of MCRFilesystemNode children.
      */
     public static MCRDirectory addFiles(File local, String ownerID) {
         MCRArgumentChecker.ensureNotEmpty(ownerID, "owner ID");
@@ -128,25 +94,17 @@ public class MCRFileImportExport {
     }
 
     /**
-     * Imports the contents of a local file or directory into the MyCoRe
-     * Internal Filesystem. If the local object is a file, a MCRFile with the
-     * same name will be created or updated in the given MCRDirectory. If the
-     * local object is a directory, all contained subdirectories and files will
-     * be imported into the given MCRDirectory. That means that after finishing
-     * this method, the complete directory structure will have been imported and
-     * mapped from the local filesystem's structure. The method checks the
-     * contents of each local file to be imported. If the file's content has not
-     * changed for existing files, the internal MCRFile will not be updated. If
-     * an internal directory is updated from a local directory, new files will
-     * be added, existing files will be updated if necessary, but files that
-     * already exist in the given MCRDirectory but not in the local filesystem
-     * will be kept and will not be deleted.
+     * Imports the contents of a local file or directory into the MyCoRe Internal Filesystem. If the local object is a file, a MCRFile with the same name will
+     * be created or updated in the given MCRDirectory. If the local object is a directory, all contained subdirectories and files will be imported into the
+     * given MCRDirectory. That means that after finishing this method, the complete directory structure will have been imported and mapped from the local
+     * filesystem's structure. The method checks the contents of each local file to be imported. If the file's content has not changed for existing files, the
+     * internal MCRFile will not be updated. If an internal directory is updated from a local directory, new files will be added, existing files will be updated
+     * if necessary, but files that already exist in the given MCRDirectory but not in the local filesystem will be kept and will not be deleted.
      * 
      * @param local
      *            the local file or directory
      * @param dir
-     *            an existing MCRDirectory where to store the imported contents
-     *            of the local filesystem.
+     *            an existing MCRDirectory where to store the imported contents of the local filesystem.
      */
     public static void importFiles(File local, MCRDirectory dir) {
         MCRArgumentChecker.ensureNotNull(local, "local file");
@@ -169,7 +127,7 @@ public class MCRFileImportExport {
             }
 
             if (existing == null) { // Create new, empty MCRFile
-                file = new MCRFile(name, dir);
+                file = new MCRFile(name, dir, false);
             } else {
                 file = (MCRFile) existing; // Update existing MCRFile
 
@@ -221,7 +179,7 @@ public class MCRFileImportExport {
                     }
 
                     if (existing == null) { // Create new directory
-                        internalDir = new MCRDirectory(name, dir);
+                        internalDir = new MCRDirectory(name, dir, false);
                     } else {
                         internalDir = (MCRDirectory) existing;
                     }
@@ -233,9 +191,8 @@ public class MCRFileImportExport {
     }
 
     /**
-     * Exports all contents of the given MCRDirectory to the local filesystem,
-     * including all subdirectories and stored files. If the local object is a
-     * file, the parent directory of that file will be used for exporting.
+     * Exports all contents of the given MCRDirectory to the local filesystem, including all subdirectories and stored files. If the local object is a file, the
+     * parent directory of that file will be used for exporting.
      * 
      * @param local
      *            the local directory where to export the contents to
