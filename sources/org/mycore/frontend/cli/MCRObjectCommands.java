@@ -1,24 +1,10 @@
 /*
- * 
- * $Revision$ $Date$
- *
- * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
- *
- * This program is free software; you can use it, redistribute it
- * and / or modify it under the terms of the GNU General Public License
- * (GPL) as published by the Free Software Foundation; either version 2
- * of the License or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program, in a file called gpl.txt or license.txt.
- * If not, write to the Free Software Foundation Inc.,
- * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
+ * $Revision$ $Date$ This file is part of M y C o R e See http://www.mycore.de/ for details. This program
+ * is free software; you can use it, redistribute it and / or modify it under the terms of the GNU General Public License (GPL) as published by the Free
+ * Software Foundation; either version 2 of the License or (at your option) any later version. This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+ * more details. You should have received a copy of the GNU General Public License along with this program, in a file called gpl.txt or license.txt. If not,
+ * write to the Free Software Foundation Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307 USA
  */
 
 package org.mycore.frontend.cli;
@@ -64,8 +50,7 @@ import org.mycore.services.fieldquery.MCRSearcher;
 import org.mycore.services.fieldquery.MCRSearcherFactory;
 
 /**
- * Provides static methods that implement commands for the MyCoRe command line
- * interface.
+ * Provides static methods that implement commands for the MyCoRe command line interface.
  * 
  * @author Jens Kupferschmidt
  * @author Frank Luetzenkirchen
@@ -185,7 +170,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
     @SuppressWarnings("unchecked")
     public static List<String> getSelectedObjectIDs() {
         final List<String> list = (List<String>) MCRSessionMgr.getCurrentSession().get("mcrSelectedObjects");
-        if (list==null){
+        if (list == null) {
             return Collections.EMPTY_LIST;
         }
         return list;
@@ -197,17 +182,13 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      * @param type
      *            the type of the MCRObjects that should be deleted
      */
-    public static final void deleteAllObjects(String type) throws MCRActiveLinkException {
-        MCRObject mycore_obj = new MCRObject();
-        MCRXMLTableManager tm = MCRXMLTableManager.instance();
-        for (String id : tm.retrieveAllIDs(type)) {
-            try {
-                mycore_obj.deleteFromDatastore(id);
-                LOGGER.info(mycore_obj.getId() + " deleted.");
-            } catch (MCRException ex) {
-                LOGGER.error("Can't delete " + mycore_obj.getId().getId() + ".", ex);
-            }
+    public static final List<String> deleteAllObjects(String type) throws MCRActiveLinkException {
+        final List<String> objectIds = MCRXMLTableManager.instance().retrieveAllIDs(type);
+        List<String> cmds = new ArrayList<String>(objectIds.size());
+        for (String id : objectIds) {
+            cmds.add("delete object " + id);
         }
+        return cmds;
     }
 
     /**
@@ -440,8 +421,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
     }
 
     /**
-     * Export an MCRObject to a file named <em>MCRObjectID</em> .xml in a
-     * directory. The method use the converter stylesheet mcr_<em>style</em>_object.xsl.
+     * Export an MCRObject to a file named <em>MCRObjectID</em> .xml in a directory. The method use the converter stylesheet mcr_<em>style</em>_object.xsl.
      * 
      * @param ID
      *            the ID of the MCRObject to be save.
@@ -455,9 +435,8 @@ public class MCRObjectCommands extends MCRAbstractCommands {
     }
 
     /**
-     * Save any MCRObject's to files named <em>MCRObjectID</em> .xml in a
-     * directory. The saving starts with fromID and runs to toID. ID's they was
-     * not found will skiped. The method use the converter stylesheet mcr_<em>style</em>_object.xsl.
+     * Save any MCRObject's to files named <em>MCRObjectID</em> .xml in a directory. The saving starts with fromID and runs to toID. ID's they was not found
+     * will skiped. The method use the converter stylesheet mcr_<em>style</em>_object.xsl.
      * 
      * @param fromID
      *            the ID of the MCRObject from be save.
@@ -509,9 +488,8 @@ public class MCRObjectCommands extends MCRAbstractCommands {
     }
 
     /**
-     * Save all MCRObject's to files named <em>MCRObjectID</em> .xml in a
-     * <em>dirname</em>directory for the data type <em>type</em>. The
-     * method use the converter stylesheet mcr_<em>style</em>_object.xsl.
+     * Save all MCRObject's to files named <em>MCRObjectID</em> .xml in a <em>dirname</em>directory for the data type <em>type</em>. The method use the
+     * converter stylesheet mcr_<em>style</em>_object.xsl.
      * 
      * @param fromID
      *            the ID of the MCRObject from be save.
@@ -522,37 +500,25 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      * @param style
      *            the type of the stylesheet
      */
-    public static final void exportAllObjects(String type, String dirname, String style) {
+    public static final List<String> exportAllObjects(String type, String dirname, String style) {
         // check dirname
         File dir = new File(dirname);
 
         if (dir.isFile()) {
             LOGGER.error(dirname + " is not a dirctory.");
-            return;
+            return Collections.emptyList();
         }
-        Transformer trans;
-        try {
-            trans = getTransformer(style);
-        } catch (Exception e) {
-            LOGGER.error("Error while getting transformer:", e);
-            return;
+        List<String> objectIds = MCRXMLTableManager.instance().retrieveAllIDs(type);
+        List<String> cmds = new ArrayList<String>(objectIds.size());
+        for (String id : objectIds) {
+            cmds.add(new StringBuilder("export object from ").append(id).append(" to ").append(id).append(" to directory ").append(dirname).append(" with ")
+                    .append(style).toString());
         }
-        MCRXMLTableManager tm = MCRXMLTableManager.instance();
-        for (String id : tm.retrieveAllIDs(type)) {
-            MCRObjectID oid = new MCRObjectID(id);
-            try {
-                exportMCRObject(dir, trans, oid);
-            } catch (Exception ex) {
-                LOGGER.error(ex.getMessage());
-                LOGGER.error("Exception while store file to " + dir.getAbsolutePath());
-                return;
-            }
-        }
+        return cmds;
     }
 
     /**
-     * The method search for a stylesheet mcr_<em>style</em>_object.xsl and
-     * build the transformer. Default is <em>mcr_save-object.xsl</em>.
+     * The method search for a stylesheet mcr_<em>style</em>_object.xsl and build the transformer. Default is <em>mcr_save-object.xsl</em>.
      * 
      * @param style
      *            the style attribute for the transformer stylesheet
@@ -596,19 +562,13 @@ public class MCRObjectCommands extends MCRAbstractCommands {
     }
 
     /**
-     * The method read a MCRObject and use the transformer to write the data to
-     * a file. They are any steps to handel errors and save the damaged data.
+     * The method read a MCRObject and use the transformer to write the data to a file. They are any steps to handel errors and save the damaged data.
      * <ul>
-     * <li> Read data for object ID in the MCRObject, add ACL's and store it as
-     * checked and transformed XML. Return true.</li>
-     * <li> If it can't find a transformer instance (no script file found) it
-     * store the checked data with ACL's native in the file. Warning and return
+     * <li>Read data for object ID in the MCRObject, add ACL's and store it as checked and transformed XML. Return true.</li>
+     * <li>If it can't find a transformer instance (no script file found) it store the checked data with ACL's native in the file. Warning and return true.</li>
+     * <li>If it get an exception while build the MCRObject, it try to read the XML blob and stor it without check and ACL's to the file. Warning and return
      * true.</li>
-     * <li> If it get an exception while build the MCRObject, it try to read the
-     * XML blob and stor it without check and ACL's to the file. Warning and
-     * return true.</li>
-     * <li> If it get an exception while store the native data without check,
-     * ACÖ's and transformation it return a warning and false.</li>
+     * <li>If it get an exception while store the native data without check, ACÖ's and transformation it return a warning and false.</li>
      * </ul>
      * 
      * @param dir
@@ -709,39 +669,37 @@ public class MCRObjectCommands extends MCRAbstractCommands {
     }
 
     /**
-     * The method start the repair of the metadata search for a given
-     * MCRObjectID type.
+     * The method start the repair of the metadata search for a given MCRObjectID type.
      * 
      * @param type
      *            the MCRObjectID type
      */
-    public static final void repairMetadataSearch(String type) {
+    public static final List<String> repairMetadataSearch(String type) {
         LOGGER.info("Start the repair for type " + type);
         String typetest = CONFIG.getString("MCR.Metadata.Type." + type, "");
 
         if (typetest.length() == 0) {
             LOGGER.error("The type " + type + " was not found.");
-            return;
+            return Collections.emptyList();
         }
         List<String> ar = (List<String>) MCRXMLTableManager.instance().retrieveAllIDs(type);
         if (ar.size() == 0) {
             LOGGER.warn("No ID's was found for type " + type + ".");
-            return;
+            return Collections.emptyList();
         }
 
         removeFromIndex("objectType", type);
+        List<String> cmds = new ArrayList<String>(ar.size());
 
         for (String stid : ar) {
-            MCRObject obj = new MCRObject();
-            obj.repairPersitenceDatastore(stid);
-            LOGGER.info("Repaired " + stid);
+            cmds.add("repair metadata search of ID " + stid);
         }
+        return cmds;
 
     }
 
     /**
-     * The method start the repair of the metadata search for a given
-     * MCRObjectID as String.
+     * The method start the repair of the metadata search for a given MCRObjectID as String.
      * 
      * @param id
      *            the MCRObjectID as String
@@ -824,23 +782,23 @@ public class MCRObjectCommands extends MCRAbstractCommands {
     }
 
     /*
-     * Export selected MCRObjects to a file named <em>MCRObjectID</em> .xml in
-     * a directory. The method use the converter stylesheet mcr_<em>style</em>_object.xsl.
-     * 
-     * @param dirname the dirname to store the object @param style the type of
-     * the stylesheet
+     * Export selected MCRObjects to a file named <em>MCRObjectID</em> .xml in a directory. The method use the converter stylesheet
+     * mcr_<em>style</em>_object.xsl.
+     * @param dirname the dirname to store the object @param style the type of the stylesheet
      */
-    public static final void exportSelected(String dirname, String style) {
+    public static final List<String> exportSelected(String dirname, String style) {
         LOGGER.info("Start exporting selected MCRObjects");
 
         if (null == getSelectedObjectIDs()) {
             LOGGER.info("No Resultset to work with, use command \"select objects with query {0}\" to build one");
-            return;
+            return Collections.emptyList();
         }
+        List<String> cmds = new ArrayList<String>(getSelectedObjectIDs().size());
         for (String id : getSelectedObjectIDs()) {
-            export(id, id, dirname, style);
+            cmds.add(new StringBuilder("export object from ").append(id).append(" to ").append(id).append(" to directory ").append(dirname).append(" with ")
+                    .append(style).toString());
         }
-        LOGGER.info("Selected MCRObjects exported");
+        return cmds;
     }
 
     /**
@@ -866,7 +824,6 @@ public class MCRObjectCommands extends MCRAbstractCommands {
 
     /**
      * The method checks the existence of selected MCRObjects in SQL store.
-     * 
      */
     public static final void checkSelected() {
         LOGGER.info("Start checking existence of selected MCRObjects in sql store");
@@ -895,8 +852,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
     }
 
     /**
-     * Checks existence of MCRObjectID type {0} in search index and rapairs
-     * missing ones in search index.
+     * Checks existence of MCRObjectID type {0} in search index and rapairs missing ones in search index.
      * 
      * @param type
      *            the MCRObjectID type

@@ -1,24 +1,12 @@
 /*
- * 
  * $Revision$ $Date$
- *
- * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
- *
- * This program is free software; you can use it, redistribute it
- * and / or modify it under the terms of the GNU General Public License
- * (GPL) as published by the Free Software Foundation; either version 2
- * of the License or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program, in a file called gpl.txt or license.txt.
- * If not, write to the Free Software Foundation Inc.,
- * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
+ * 
+ * This file is part of M y C o R e See http://www.mycore.de/ for details. This program is free software; you can use it, redistribute it and / or modify it
+ * under the terms of the GNU General Public License (GPL) as published by the Free Software Foundation; either version 2 of the License or (at your option) any
+ * later version. This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details. You should have received a copy of the GNU General Public License
+ * along with this program, in a file called gpl.txt or license.txt. If not, write to the Free Software Foundation Inc., 59 Temple Place - Suite 330, Boston, MA
+ * 02111-1307 USA
  */
 
 package org.mycore.frontend.cli;
@@ -29,6 +17,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.xml.transform.Transformer;
@@ -53,8 +42,7 @@ import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 
 /**
- * Provides static methods that implement commands for the MyCoRe command line
- * interface.
+ * Provides static methods that implement commands for the MyCoRe command line interface.
  * 
  * @author Jens Kupferschmidt
  * @author Frank Luetzenkirchen
@@ -78,63 +66,70 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
 
         MCRCommand com = null;
 
-        com = new MCRCommand("delete all derivates", "org.mycore.frontend.cli.MCRDerivateCommands.deleteAllDerivates", "Removes all derivates from the repository");
+        com = new MCRCommand("delete all derivates", "org.mycore.frontend.cli.MCRDerivateCommands.deleteAllDerivates",
+                "Removes all derivates from the repository");
         command.add(com);
 
-        com = new MCRCommand("delete derivate from {0} to {1}", "org.mycore.frontend.cli.MCRDerivateCommands.delete String String", "The command remove derivates in the number range between the MCRObjectID {0} and {1}.");
+        com = new MCRCommand("delete derivate from {0} to {1}", "org.mycore.frontend.cli.MCRDerivateCommands.delete String String",
+                "The command remove derivates in the number range between the MCRObjectID {0} and {1}.");
         command.add(com);
 
-        com = new MCRCommand("delete derivate {0}", "org.mycore.frontend.cli.MCRDerivateCommands.delete String", "The command remove a derivate with the MCRObjectID {0}");
+        com = new MCRCommand("delete derivate {0}", "org.mycore.frontend.cli.MCRDerivateCommands.delete String",
+                "The command remove a derivate with the MCRObjectID {0}");
         command.add(com);
 
-        com = new MCRCommand("load derivate from file {0}", "org.mycore.frontend.cli.MCRDerivateCommands.loadFromFile String", "The command add a derivate form the file {0} to the system.");
+        com = new MCRCommand("load derivate from file {0}", "org.mycore.frontend.cli.MCRDerivateCommands.loadFromFile String",
+                "The command add a derivate form the file {0} to the system.");
         command.add(com);
 
-        com = new MCRCommand("update derivate from file {0}", "org.mycore.frontend.cli.MCRDerivateCommands.updateFromFile String", "The command update a derivate form the file {0} in the system.");
+        com = new MCRCommand("update derivate from file {0}", "org.mycore.frontend.cli.MCRDerivateCommands.updateFromFile String",
+                "The command update a derivate form the file {0} in the system.");
         command.add(com);
 
-        com = new MCRCommand("load all derivates from directory {0}", "org.mycore.frontend.cli.MCRDerivateCommands.loadFromDirectory String", "The command load all derivates form the directory {0} to the system.");
+        com = new MCRCommand("load all derivates from directory {0}", "org.mycore.frontend.cli.MCRDerivateCommands.loadFromDirectory String",
+                "The command load all derivates form the directory {0} to the system.");
         command.add(com);
 
-        com = new MCRCommand("update all derivates from directory {0}", "org.mycore.frontend.cli.MCRDerivateCommands.updateFromDirectory String", "The command update all derivates form the directory {0} in the system.");
+        com = new MCRCommand("update all derivates from directory {0}", "org.mycore.frontend.cli.MCRDerivateCommands.updateFromDirectory String",
+                "The command update all derivates form the directory {0} in the system.");
         command.add(com);
 
-        com = new MCRCommand("export derivate {0} to directory {1} with {2}", "org.mycore.frontend.cli.MCRDerivateCommands.export String String String", "The command store the derivate with the MCRObjectID {0} to the directory {1} with the stylesheet {2}-object.xsl. For {2} save is the default.");
+        com = new MCRCommand("export derivate {0} to directory {1} with {2}", "org.mycore.frontend.cli.MCRDerivateCommands.export String String String",
+                "The command store the derivate with the MCRObjectID {0} to the directory {1} with the stylesheet {2}-object.xsl. For {2} save is the default.");
         command.add(com);
 
-        com = new MCRCommand("export derivate from {0} to {1} to directory {2} with {3}", "org.mycore.frontend.cli.MCRDerivateCommands.export String String String String", "The command store all derivates with MCRObjectID's between {0} and {1} to the directory {2} with the stylesheet {3}-object.xsl. For {3} save is the default.");
+        com = new MCRCommand("export derivate from {0} to {1} to directory {2} with {3}",
+                "org.mycore.frontend.cli.MCRDerivateCommands.export String String String String",
+                "The command store all derivates with MCRObjectID's between {0} and {1} to the directory {2} with the stylesheet {3}-object.xsl. For {3} save is the default.");
         command.add(com);
 
-        com = new MCRCommand("export all derivates to directory {0} with {1}", "org.mycore.frontend.cli.MCRDerivateCommands.exportAllDerivates String String", "Stores all derivates to the directory {0} with the stylesheet mcr_{1}-derivate.xsl. For {1} save is the default.");
+        com = new MCRCommand("export all derivates to directory {0} with {1}", "org.mycore.frontend.cli.MCRDerivateCommands.exportAllDerivates String String",
+                "Stores all derivates to the directory {0} with the stylesheet mcr_{1}-derivate.xsl. For {1} save is the default.");
         command.add(com);
 
-        com = new MCRCommand("show loadable derivate of {0} to directory {1}", "org.mycore.frontend.cli.MCRDerivateCommands.show String String", "The command store the derivate with the MCRObjectID {0} to the directory {1}, without ifs-metadata");
+        com = new MCRCommand("show loadable derivate of {0} to directory {1}", "org.mycore.frontend.cli.MCRDerivateCommands.show String String",
+                "The command store the derivate with the MCRObjectID {0} to the directory {1}, without ifs-metadata");
         command.add(com);
 
-        com = new MCRCommand("repair derivate search of type derivate", "org.mycore.frontend.cli.MCRDerivateCommands.repairDerivateSearch", "The command read the Content store and reindex the derivate search stores.");
+        com = new MCRCommand("repair derivate search of type derivate", "org.mycore.frontend.cli.MCRDerivateCommands.repairDerivateSearch",
+                "The command read the Content store and reindex the derivate search stores.");
         command.add(com);
 
-        com = new MCRCommand("repair derivate search of ID {0}", "org.mycore.frontend.cli.MCRDerivateCommands.repairDerivateSearchForID String", "The command read the Content store for MCRObjectID {0} and reindex the derivate search store.");
+        com = new MCRCommand("repair derivate search of ID {0}", "org.mycore.frontend.cli.MCRDerivateCommands.repairDerivateSearchForID String",
+                "The command read the Content store for MCRObjectID {0} and reindex the derivate search store.");
         command.add(com);
     }
 
     /**
      * deletes all MCRDerivate from the datastore.
      */
-    public static void deleteAllDerivates() {
-        MCRDerivate der = new MCRDerivate();
-        MCRXMLTableManager tm = MCRXMLTableManager.instance();
-        List<String> ids = tm.retrieveAllIDs("derivate");
+    public static List<String> deleteAllDerivates() {
+        List<String> ids = MCRXMLTableManager.instance().retrieveAllIDs("derivate");
+        List<String> cmds = new ArrayList<String>(ids.size());
         for (String id : ids) {
-            try {
-                der.deleteFromDatastore(id);
-                LOGGER.info(der.getId().getId() + " deleted.");
-            } catch (MCRException ex) {
-                LOGGER.error("Can't delete " + der.getId() + ".");
-                LOGGER.error(ex.getMessage());
-                LOGGER.debug(ex.getStackTraceAsString());
-            }
+            cmds.add("delete derivate " + id);
         }
+        return cmds;
     }
 
     /**
@@ -225,8 +220,8 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
 
         List<String> cmds = new ArrayList<String>();
         for (String file : list)
-            if ( file.endsWith(".xml") && file.contains( "derivate" ) )
-                cmds.add( ( update ? "update" : "load" ) + " derivate from file " + new File( dir, file ).getAbsolutePath() );
+            if (file.endsWith(".xml") && file.contains("derivate"))
+                cmds.add((update ? "update" : "load") + " derivate from file " + new File(dir, file).getAbsolutePath());
 
         return cmds;
     }
@@ -340,11 +335,8 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
     }
 
     /**
-     * Save an MCRDerivate to a file named <em>MCRObjectID</em> .xml in a
-     * directory with <em>dirname</em> and store the derivate objects in a
-     * directory under them named <em>MCRObjectID</em>. The IFS-Attribute of
-     * the derivate files aren't saved, for reloading purpose after deleting a
-     * derivate in the datastore
+     * Save an MCRDerivate to a file named <em>MCRObjectID</em> .xml in a directory with <em>dirname</em> and store the derivate objects in a directory under
+     * them named <em>MCRObjectID</em>. The IFS-Attribute of the derivate files aren't saved, for reloading purpose after deleting a derivate in the datastore
      * 
      * @param ID
      *            the ID of the MCRDerivate to be save.
@@ -352,14 +344,12 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
      *            the dirname to store the derivate
      */
     public static void show(String ID, String dirname) {
-        export(ID, ID, dirname, "save", false);
+        export(ID, ID, dirname, "save");
     }
 
     /**
-     * Save an MCRDerivate to a file named <em>MCRObjectID</em> .xml in a
-     * directory with <em>dirname</em> and store the derivate objects in a
-     * directory under them named <em>MCRObjectID</em>. The method use the
-     * converter stylesheet mcr_<em>style</em>_object.xsl.
+     * Save an MCRDerivate to a file named <em>MCRObjectID</em> .xml in a directory with <em>dirname</em> and store the derivate objects in a directory under
+     * them named <em>MCRObjectID</em>. The method use the converter stylesheet mcr_<em>style</em>_object.xsl.
      * 
      * @param ID
      *            the ID of the MCRDerivate to be save.
@@ -369,14 +359,12 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
      *            the type of the stylesheet
      */
     public static void export(String ID, String dirname, String style) {
-        export(ID, ID, dirname, style, true);
+        export(ID, ID, dirname, style);
     }
 
     /**
-     * Save any MCRDerivate's to files named <em>MCRObjectID</em> .xml in a
-     * directory and the objects under them named <em>MCRObjectID</em>. The
-     * saving starts with fromID and runs to toID. ID's they was not found will
-     * skiped. The method use the converter stylesheet mcr_<em>style</em>_object.xsl.
+     * Export any MCRDerivate's to files named <em>MCRObjectID</em> .xml in a directory and the objects under them named <em>MCRObjectID</em>. The saving starts
+     * with fromID and runs to toID. ID's they was not found will skiped. The method use the converter stylesheet mcr_<em>style</em>_object.xsl.
      * 
      * @param fromID
      *            the ID of the MCRObject from be save.
@@ -388,31 +376,6 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
      *            the type of the stylesheet
      */
     public static void export(String fromID, String toID, String dirname, String style) {
-        export(fromID, toID, dirname, style, false); // :NOTE: false was the
-        // default, but
-        // is not equal to "single" save
-    }
-
-    /**
-     * Export any MCRDerivate's to files named <em>MCRObjectID</em> .xml in a
-     * directory and the objects under them named <em>MCRObjectID</em>. The
-     * saving starts with fromID and runs to toID. ID's they was not found will
-     * skiped. The method use the converter stylesheet mcr_<em>style</em>_object.xsl.
-     * 
-     * @param fromID
-     *            the ID of the MCRObject from be save.
-     * @param toID
-     *            the ID of the MCRObject to be save.
-     * @param dirname
-     *            the filename to store the object
-     * @param style
-     *            the type of the stylesheet
-     */
-    public static void export(String fromID, String toID, String dirname, String style, boolean withIfsID) {
-        LOGGER.debug("withIfsID (" + withIfsID + ") will never used"); // FIXME:
-        // use or
-        // remove
-        // withIfsID
         // check fromID and toID
         MCRObjectID fid = null;
         MCRObjectID tid = null;
@@ -465,30 +428,20 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
         LOGGER.info(k + " Object's stored under " + dir.getAbsolutePath() + ".");
     }
 
-    public static void exportAllDerivates(String dirname, String style) {
+    public static List<String> exportAllDerivates(String dirname, String style) {
         // check dirname
         File dir = new File(dirname);
 
         if (dir.isFile()) {
-            LOGGER.error(dirname + " is not a dirctory.");
-
-            return;
+            throw new MCRException(dirname + " is not a dirctory.");
         }
 
-        Transformer trans = getTransformer(style);
-
-        MCRXMLTableManager tm = MCRXMLTableManager.instance();
-        List<String> ids = tm.retrieveAllIDs("derivate");
+        List<String> ids = MCRXMLTableManager.instance().retrieveAllIDs("derivate");
+        List<String> cmds = new ArrayList<String>(ids.size());
         for (String id : ids) {
-            MCRObjectID oid = new MCRObjectID(id);
-            try {
-                exportDerivate(dir, trans, oid);
-            } catch (Exception ex) {
-                LOGGER.error(ex.getMessage());
-                LOGGER.error("Exception while store file to " + dir.getAbsolutePath());
-                return;
-            }
+            cmds.add(new StringBuilder("export derivate ").append(id).append(" to directory ").append(dirname).append(" with ").append(style).toString());
         }
+        return cmds;
     }
 
     /**
@@ -588,18 +541,18 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
     /**
      * The method start the repair the content search index for all derivates.
      */
-    public static void repairDerivateSearch() {
+    public static List<String> repairDerivateSearch() {
         LOGGER.info("Start the repair for type derivate.");
-        List<String> ar = MCRXMLTableManager.instance().retrieveAllIDs("derivate");
-        if (ar.size() == 0) {
+        List<String> ids = MCRXMLTableManager.instance().retrieveAllIDs("derivate");
+        if (ids.size() == 0) {
             LOGGER.warn("No ID's was found for type derivate.");
-            return;
+            return Collections.emptyList();
         }
-        for (String stid : ar) {
-            MCRDerivate der = new MCRDerivate();
-            der.repairPersitenceDatastore(stid);
-            LOGGER.info("Repaired " + stid);
+        List<String> cmds = new ArrayList<String>(ids.size());
+        for (String id : ids) {
+            cmds.add("repair derivate search of ID " + id);
         }
+        return cmds;
     }
 
     /**
