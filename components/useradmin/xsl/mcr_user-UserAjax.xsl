@@ -6,7 +6,7 @@
   <xsl:include href="MyCoReLayout.xsl" />
 
   <xsl:variable name="MainTitle" select="i18n:translate('titles.mainTitle')" />
-  <xsl:variable name="PageTitle" select="i18n:translate('titles.pageTitle.contactData')" />
+  <xsl:variable name="PageTitle" select="i18n:translate('component.userlogin.titles.pageTitle.contactData')" />
 
   <xsl:template match="/mcr_user">
 
