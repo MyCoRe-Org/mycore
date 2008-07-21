@@ -23,51 +23,51 @@
 <!-- ======== internal langauge dependency variables ======== -->
 
 <xsl:variable name="Empty.Workflow">
- <xsl:value-of select="i18n:translate('swf.empty.workflow')" />
+ <xsl:value-of select="i18n:translate('component.swf.empty.workflow')" />
 </xsl:variable>
 
 <xsl:variable name="Empty.Derivate">
- <xsl:value-of select="i18n:translate('swf.empty.derivate')" />
+ <xsl:value-of select="i18n:translate('component.swf.empty.derivate')" />
 </xsl:variable>
 
 <xsl:variable name="Derivate.AddDerivate">
- <xsl:value-of select="i18n:translate('swf.derivate.addDerivate')" />
+ <xsl:value-of select="i18n:translate('component.swf.derivate.addDerivate')" />
 </xsl:variable>
 
 <xsl:variable name="Derivate.AddFile">
- <xsl:value-of select="i18n:translate('swf.derivate.addFile')" />
+ <xsl:value-of select="i18n:translate('component.swf.derivate.addFile')" />
 </xsl:variable>
 
 <xsl:variable name="Derivate.DelDerivate">
- <xsl:value-of select="i18n:translate('swf.derivate.delDerivate')" />
+ <xsl:value-of select="i18n:translate('component.swf.derivate.delDerivate')" />
 </xsl:variable>
 
 <xsl:variable name="Derivate.EditDerivate">
- <xsl:value-of select="i18n:translate('swf.derivate.editDerivate')" />
+ <xsl:value-of select="i18n:translate('component.swf.derivate.editDerivate')" />
 </xsl:variable>
 
 <xsl:variable name="Derivate.SetFile">
- <xsl:value-of select="i18n:translate('swf.derivate.setFile')" />
+ <xsl:value-of select="i18n:translate('component.swf.derivate.setFile')" />
 </xsl:variable>
 
 <xsl:variable name="Derivate.DelFile">
- <xsl:value-of select="i18n:translate('swf.derivate.delFile')" />
+ <xsl:value-of select="i18n:translate('component.swf.derivate.delFile')" />
 </xsl:variable>
 
 <xsl:variable name="Object.EditObject">
- <xsl:value-of select="i18n:translate('swf.object.editObject')" />
+ <xsl:value-of select="i18n:translate('component.swf.object.editObject')" />
 </xsl:variable>
 
 <xsl:variable name="Object.CommitObject">
- <xsl:value-of select="i18n:translate('swf.object.commitObject')" />
+ <xsl:value-of select="i18n:translate('component.swf.object.commitObject')" />
 </xsl:variable>
 
 <xsl:variable name="Object.DelObject">
- <xsl:value-of select="i18n:translate('swf.object.delObject')" />
+ <xsl:value-of select="i18n:translate('component.swf.object.delObject')" />
 </xsl:variable>
 
 <xsl:variable name="Object.EditACL">
- <xsl:value-of select="i18n:translate('swf.object.editACL')" />
+ <xsl:value-of select="i18n:translate('component.swf.object.editACL')" />
 </xsl:variable>
 
 <!-- ======== handles workflow ======== -->
