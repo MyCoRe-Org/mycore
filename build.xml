@@ -395,9 +395,12 @@
 package org.mycore;
 /** Generated in ANT */
 public class MCRCoreVersion{
-  public static final String VERSION = "${target.version}";
-  public static final int    REVISON = ${revision.number};
+  public static final String VERSION  = "${target.version}";
+  public static final int    REVISION = ${revision.number};
   public static final String COMPLETE = "${target.version} r${revision.number}";
+  public static String getVersion(){return VERSION;}
+  public static int getRevision(){return REVISION;}
+  public static String getCompleteVersion(){return COMPLETE;}
 }
 ]]>
     </echo>
