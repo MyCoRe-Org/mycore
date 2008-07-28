@@ -55,9 +55,9 @@ public class MCRTranslation {
 
     private static final Pattern ARRAY_DETECTOR = Pattern.compile(";");
 
-    private static Properties DEPRECATED_MAPPING = loadProperties();
-
     private static boolean DEPRECATED_MESSAGES_PRESENT = false;
+
+    private static Properties DEPRECATED_MAPPING = loadProperties();
 
     /**
      * provides translation for the given label (property key).
@@ -79,7 +79,7 @@ public class MCRTranslation {
             LOGGER.debug("Translation for " + label + "=" + result);
         } catch (java.util.MissingResourceException mre) {
             // try to get new key if 'label' is deprecated
-            if (DEPRECATED_MESSAGES_PRESENT) {
+            if (!DEPRECATED_MESSAGES_PRESENT) {
                 LOGGER.warn("Could not load resource '" + DEPRECATED_MESSAGES_PROPERTIES + "' to check for depreacted I18N keys.");
             } else if (DEPRECATED_MAPPING.keySet().contains(label)) {
                 String newLabel = DEPRECATED_MAPPING.getProperty(label);
@@ -205,7 +205,7 @@ public class MCRTranslation {
         try {
             final InputStream propertiesStream = MCRTranslation.class.getResourceAsStream(DEPRECATED_MESSAGES_PROPERTIES);
             if (propertiesStream == null) {
-                LOGGER.warn("Could find resource '" + DEPRECATED_MESSAGES_PROPERTIES + "'.");
+                LOGGER.warn("Could not find resource '" + DEPRECATED_MESSAGES_PROPERTIES + "'.");
                 return deprecatedMapping;
             }
             deprecatedMapping.load(propertiesStream);
