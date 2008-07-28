@@ -254,7 +254,6 @@
       <fileset dir="${target.classes}" includes="META-INF/services/*" />
       <fileset dir="${target.jarbase}" />
       <fileset dir="${basedir}" includes="integrate.xml" />
-      <fileset dir="${basedir}" includes="config/*" excludes="config/*.template" />
       <manifest>
         <attribute name="MCR-Version" value="${target.version} r${revision.number}" />
       </manifest>
@@ -286,8 +285,13 @@
   <target name="jar.copy-config">
     <mkdir dir="${target.jarbase}/config" />
     <copy todir="${target.jarbase}/config">
-      <fileset dir="${basedir}/config" includes="build.properties" />
-      <fileset dir="${basedir}/config" includes="deprecated.properties" />
+      <fileset dir="${basedir}/config">
+        <exclude name="*.template" />
+        <exclude name="deprecated*" />
+      </fileset>
+    </copy>
+    <copy todir="${target.jarbase}">
+      <fileset dir="${basedir}/config" includes="deprecated*" />
     </copy>
   </target>
   <!-- - - - - - - - - - - - - - - - - - 
