@@ -382,12 +382,12 @@ public class MCRUserMgr {
 
             // now update the other groups
             for (int i = 0; i < groupIDs.size(); i++) {
-            	if(!primGroup.getID().equals(groupIDs.get(i))){
-            		MCRGroup otherGroup = retrieveGroup((String) groupIDs.get(i), true);
-            		otherGroup.addMemberUserID(user.getID());
-            		groupCache.remove(otherGroup.getID());
-            		mcrUserStore.updateGroup(otherGroup);
-            	}
+                if (!primGroup.getID().equals(groupIDs.get(i))) {
+                    MCRGroup otherGroup = retrieveGroup((String) groupIDs.get(i), true);
+                    otherGroup.addMemberUserID(user.getID());
+                    groupCache.remove(otherGroup.getID());
+                    mcrUserStore.updateGroup(otherGroup);
+                }
             }
         } catch (MCRException ex) {
             // Since something went wrong we delete the previously created user.
@@ -923,6 +923,10 @@ public class MCRUserMgr {
      */
     public synchronized boolean login(String userID, String passwd) throws MCRException {
         MCRUser loginUser = retrieveUser(userID, false);
+
+        if (loginUser == null) {
+            throw new MCRException("Login denied. User does not exist: " + userID);
+        }
 
         if (loginUser.isEnabled()) {
             if (useEncryption) {
