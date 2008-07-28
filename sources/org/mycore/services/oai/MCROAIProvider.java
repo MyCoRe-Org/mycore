@@ -1501,7 +1501,7 @@ public class MCROAIProvider extends MCRServlet {
         // if(format.contains("epicur")&& !email.equals("")){
         // parameters.put("ResponseEmail", email);
         // }
-        return MCRXSLTransformation.transform(document, new JDOMSource(MCRXMLResource.instance().getResource("/xsl/" + format)), parameters);
+        return MCRXSLTransformation.transform(document, new JDOMSource(MCRXMLResource.instance().getResource("xsl/" + format)), parameters);
     }
 
     static MCROAIConfigBean getConfigBean(String instance) {

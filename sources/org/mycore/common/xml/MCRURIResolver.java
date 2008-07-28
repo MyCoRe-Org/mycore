@@ -223,6 +223,7 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
             try {
                 return new JDOMSource(resolveURI(href));
             } catch (Exception e) {
+                LOGGER.error("Error while resolving: " + href, e);
                 throw new TransformerException("Error while resolving: " + href, e);
             }
         }
@@ -231,9 +232,9 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
 
     private Source tryResolveXSL(String href) {
         if (href.endsWith(".xsl")) {
-            final String resourceName = "/xsl/" + href;
+            final String resourceName = "xsl/" + href;
             try {
-                LOGGER.debug("Trying to resolve " + href + " from resource" + resourceName);
+                LOGGER.debug("Trying to resolve " + href + " from resource " + resourceName);
                 return new JDOMSource(SUPPORTED_SCHEMES.get("resource").resolveElement(resourceName));
             } catch (Exception e) {
                 LOGGER.error("could not find Stylesheet " + href + " in resource " + resourceName);

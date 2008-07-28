@@ -219,7 +219,7 @@ public class MCRZipServlet extends MCRServlet {
         ze.setTime(new Date().getTime());
         out.putNextEntry(ze);
 
-        Document stylesheet=MCRXMLResource.instance().getResource("/xsl/"+this.stylesheet);
+        Document stylesheet=MCRXMLResource.instance().getResource("xsl/"+this.stylesheet);
         MCRXSLTransformation transformation = MCRXSLTransformation.getInstance();
         Templates templates = transformation.getStylesheet(new JDOMSource(stylesheet));
         TransformerHandler th = transformation.getTransformerHandler(templates);

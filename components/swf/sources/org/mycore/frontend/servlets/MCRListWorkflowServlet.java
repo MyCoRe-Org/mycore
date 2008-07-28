@@ -196,7 +196,7 @@ public class MCRListWorkflowServlet extends MCRServlet {
 
         // create a XML JDOM tree with master tag mcr_workflow
         // prepare the transformer stylesheet
-        String xslfile = "/xsl/mycoreobject-" + type + "-to-workflow.xsl";
+        String xslfile = "xsl/mycoreobject-" + type + "-to-workflow.xsl";
         Document styleSheet = MCRXMLResource.instance().getResource(xslfile);
 
         // build the frame of mcr_workflow

@@ -416,7 +416,7 @@ public class MCRLayoutService implements org.apache.xalan.trace.TraceListener {
      * Builds the filename of the stylesheet to use, e. g. "playlist-simple.xsl"
      */
     private String buildStylesheetName(String docType, String style) {
-        StringBuffer filename = new StringBuffer("/xsl/").append(docType);
+        StringBuffer filename = new StringBuffer("xsl/").append(docType);
 
         if (!"default".equals(style)) {
             filename.append("-");

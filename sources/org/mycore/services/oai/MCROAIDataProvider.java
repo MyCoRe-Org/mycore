@@ -1819,7 +1819,7 @@ public class MCROAIDataProvider extends MCRServlet {
 
         parameters.put("ServletsBaseURL", servletsBaseURL);
 
-        return MCRXSLTransformation.transform(document, new JDOMSource(MCRXMLResource.instance().getResource("/xsl/"+ format)), parameters);
+        return MCRXSLTransformation.transform(document, new JDOMSource(MCRXMLResource.instance().getResource("xsl/"+ format)), parameters);
     }
 
     class TokenFileFilter implements FilenameFilter {
