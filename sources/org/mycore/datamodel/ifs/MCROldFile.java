@@ -23,6 +23,7 @@
 
 package org.mycore.datamodel.ifs;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -31,9 +32,21 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.GregorianCalendar;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.StringTokenizer;
 
+import org.apache.log4j.Logger;
 import org.mycore.common.MCRArgumentChecker;
+import org.mycore.common.MCRNormalizer;
 import org.mycore.common.MCRPersistenceException;
+import org.mycore.datamodel.metadata.MCRMetaISO8601Date;
+import org.mycore.services.fieldquery.MCRFieldDef;
+import org.mycore.services.fieldquery.MCRFieldValue;
+import org.mycore.services.fieldquery.MCRSearcher;
+import org.mycore.services.fieldquery.MCRSearcherFactory;
+import org.mycore.services.plugins.FilterPluginTransformException;
+import org.mycore.services.plugins.TextFilterPluginManager;
 
 /**
  * Represents a stored file with its metadata and content. USED BY MILESS 1.3
@@ -44,6 +57,8 @@ import org.mycore.common.MCRPersistenceException;
  * @deprecated use MCRFile
  */
 public class MCROldFile implements MCRFileReader {
+    private static final Logger LOGGER = Logger.getLogger(MCROldFile.class);
+    
     /** The ID of the store that holds this file's content */
     protected String storeID;
 
@@ -288,12 +303,13 @@ public class MCROldFile implements MCRFileReader {
      * stores it in the ContentStore given
      */
     public void setContentFrom(MCRContentInputStream source, MCRContentStore store) throws MCRPersistenceException {
-        if (source.getHeader().length == 0) {
+    	if (source.getHeader().length == 0) {
             storageID = "";
             storeID = "";
         } else {
             storageID = store.storeContent(this, source);
             storeID = store.getID();
+            addToIndex();
         }
 
         size = source.getLength();
@@ -306,6 +322,7 @@ public class MCROldFile implements MCRFileReader {
     public void deleteContent() throws MCRPersistenceException {
         if (storageID.length() != 0) {
             getContentStore().deleteContent(storageID);
+            removeFromIndex();
         }
 
         storageID = "";
@@ -423,6 +440,141 @@ public class MCROldFile implements MCRFileReader {
     public org.jdom.Document getContentAsJDOM() throws MCRPersistenceException, IOException, org.jdom.JDOMException {
       return new org.jdom.input.SAXBuilder().build(getContentAsInputStream());
   }
+    
+    public static MCRSearcher getSearcher()
+    {
+        try {
+			return MCRSearcherFactory.getSearcherForIndex( "milcontent" );
+		} catch (RuntimeException e) {
+			return null;
+		}
+    }
+    
+    private static TextFilterPluginManager PLUGIN_MANAGER = null;
+    
+    private void removeFromIndex() {
+        MCRFieldDef fd = MCRFieldDef.getDef("milcontent");
+        if ( null == fd || !fd.isUsedForObjectType(getContentTypeID()))
+        {
+       		return;
+        }
+        
+        MCRSearcher searcher = getSearcher();
+        if ( null == searcher )
+        	return;
+   		searcher.removeFromIndex(storageID);
+    }
 
+    private void addToIndex()
+    {
+        MCRFieldDef fd = MCRFieldDef.getDef("milcontent");
+        if ( null == fd || !fd.isUsedForObjectType(getContentTypeID()))
+        {
+       		return;
+        }
+        
+        MCRSearcher searcher = getSearcher();
+        if ( null == searcher )
+        	return;
+        
+        if (PLUGIN_MANAGER == null) {
+            PLUGIN_MANAGER = TextFilterPluginManager.getInstance();
+        }
+        
+        MCRFileContentType ct = getContentType();
+        if (!PLUGIN_MANAGER.isSupported(ct)) {
+        	String mimeType = ct.getMimeType();
+        	if ( mimeType != null && mimeType.indexOf('/') != -1)
+        	{
+        		String mimeSubType = mimeType.substring(mimeType.indexOf('/') + 1);
+        		LOGGER.info("Use Mime Subtype to determine Plugin: " + mimeSubType);
+        		ct = MCRFileContentTypeFactory.getType(mimeSubType);
+        	}
+        }
+        
+        if (PLUGIN_MANAGER.isSupported(ct)) {
+            LOGGER.info("####### Index MCRFile: " + getPath());
 
+            String s;
+			StringBuffer text = new StringBuffer();;
+			try {
+				BufferedReader in = new BufferedReader(PLUGIN_MANAGER.transform(ct, getContentAsInputStream()));
+				while ((s = in.readLine()) != null) {
+				    text.append(s).append(" ");
+				}
+			} catch (FilterPluginTransformException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+            s = text.toString();
+            s = MCRNormalizer.normalizeString(s);
+            List<MCRFieldValue> fields = new ArrayList<MCRFieldValue>(); 
+            MCRFieldDef field = MCRFieldDef.getDef( "milcontent" );
+            fields.add(new MCRFieldValue(field, s));
+            
+            StringTokenizer tok = new StringTokenizer(ownerID, "_");
+            String documentID = tok.nextToken();
+            String derivateID = tok.nextToken();
+            
+            field = MCRFieldDef.getDef( "fileID" );
+            fields.add(new MCRFieldValue(field, this.getID()));
+            
+            field = MCRFieldDef.getDef( "DerivateID" );
+            fields.add(new MCRFieldValue(field, derivateID));
+            
+            field = MCRFieldDef.getDef( "fileName" );
+            fields.add(new MCRFieldValue(field, this.getFileName()));
+            
+            field = MCRFieldDef.getDef( "filePath" );
+            fields.add(new MCRFieldValue(field, this.getPath()));
+            
+            field = MCRFieldDef.getDef( "fileSize" );
+            fields.add(new MCRFieldValue(field, Long.toString(this.getSize())));
+            
+            field = MCRFieldDef.getDef( "fileExtension" );
+            fields.add(new MCRFieldValue(field, this.getExtension()));
+            
+            field = MCRFieldDef.getDef( "fileContentTypeID" );
+            fields.add(new MCRFieldValue(field, this.getContentTypeID()));
+            
+            field = MCRFieldDef.getDef( "fileContentType" );
+            fields.add(new MCRFieldValue(field, this.getContentType().getLabel()));
+            
+            MCRMetaISO8601Date iDate = new MCRMetaISO8601Date();
+            iDate.setDate(this.getLastModified().getTime());
+            field = MCRFieldDef.getDef( "fileDateModified" );
+            fields.add(new MCRFieldValue(field, iDate.getISOString()));
+
+            if (this.hasAudioVideoExtender()) {
+                MCRAudioVideoExtender ext = this.getAudioVideoExtender();
+                
+                field = MCRFieldDef.getDef( "avBitRate" );
+                fields.add(new MCRFieldValue(field, String.valueOf(ext.getBitRate())));
+                
+                field = MCRFieldDef.getDef( "avFrameRate" );
+                fields.add(new MCRFieldValue(field, String.valueOf(ext.getFrameRate())));
+                
+                field = MCRFieldDef.getDef( "avDuration" );
+                fields.add(new MCRFieldValue(field, ext.getDurationTimecode()));
+                
+                field = MCRFieldDef.getDef( "avMediaType" );
+                fields.add(new MCRFieldValue(field, ((ext.getMediaType() == MCRAudioVideoExtender.AUDIO) ? "audio" : "video")));
+            }
+            
+            field = MCRFieldDef.getDef( "milobject" );
+            fields.add(new MCRFieldValue(field, "file"));
+            
+            searcher.addToIndex(storageID, documentID, fields);
+        }
+    }
+
+    public void repairSearch()
+    {
+      	removeFromIndex();
+       	addToIndex();
+    }
 }
