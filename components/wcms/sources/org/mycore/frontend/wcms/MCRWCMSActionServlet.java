@@ -933,10 +933,8 @@ public class MCRWCMSActionServlet extends MCRWCMSServlet {
 
             // check if parent element is not <item>, because it has an @dir
             if (((Element) actElem.getParent()).getAttributeValue(altParentAttribute) != null) {
-                while (actElem.getParent() instanceof org.jdom.Element) {
                     reval = ((Element) actElem.getParent()).getAttributeValue(altParentAttribute) + reval;
                     actElem = (Element) actElem.getParent();
-                }
             } else {
                 reval = ((Element) actElem.getParent()).getAttributeValue(parentAttribute);
             }
@@ -1618,10 +1616,17 @@ public class MCRWCMSActionServlet extends MCRWCMSServlet {
                 labelPath = labelPath.substring(0, labelPath.indexOf('/') + 1) + label;
                 href = getParentAttribute(naviFile, "href", href, "href", "dir");
 
+                // not a root item (direct child of a menu node )
                 if (href.toLowerCase().endsWith(".xml") || href.toLowerCase().endsWith(".html")) {
                     fileName = href.substring(0, href.lastIndexOf('.')) + '/' + link;
-                } else {
-                    fileName = href + link;
+                } 
+                // a root item shall be created
+                else {
+                    String nameOfFile= link.trim();
+                    String pathToFile = href.trim();
+                    if (!pathToFile.endsWith(Character.toString(fs))) 
+                        pathToFile = pathToFile + fs;
+                    fileName = pathToFile + nameOfFile;
                 }
 
                 href = (String) mcrSession.get("href");
