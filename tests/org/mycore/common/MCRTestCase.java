@@ -25,15 +25,15 @@ public class MCRTestCase extends TestCase {
             System.getProperties().setProperty("MCR.Configuration.File", properties.getAbsolutePath());
         }
         CONFIG = MCRConfiguration.instance();
-        boolean setPropertie = false;
+        boolean setProperty = false;
         if (isDebugEnabled())
-            setPropertie = setProperty("log4j.rootLogger", "DEBUG, stdout", false) ? true : setPropertie;
+            setProperty = setProperty("log4j.rootLogger", "DEBUG, stdout", false) ? true : setProperty;
         else
-            setPropertie = setProperty("log4j.rootLogger", "INFO, stdout", false) ? true : setPropertie;
-        setPropertie = setProperty("log4j.appender.stdout", "org.apache.log4j.ConsoleAppender", false) ? true : setPropertie;
-        setPropertie = setProperty("log4j.appender.stdout.layout", "org.apache.log4j.PatternLayout", false) ? true : setPropertie;
-        setPropertie = setProperty("log4j.appender.stdout.layout.ConversionPattern", "%-5p %m%n", false) ? true : setPropertie;
-        if (setPropertie) {
+            setProperty = setProperty("log4j.rootLogger", "INFO, stdout", false) ? true : setProperty;
+        setProperty = setProperty("log4j.appender.stdout", "org.apache.log4j.ConsoleAppender", false) ? true : setProperty;
+        setProperty = setProperty("log4j.appender.stdout.layout", "org.apache.log4j.PatternLayout", false) ? true : setProperty;
+        setProperty = setProperty("log4j.appender.stdout.layout.ConversionPattern", "%-5p %m%n", false) ? true : setProperty;
+        if (setProperty) {
             CONFIG.configureLogging();
         }
     }
