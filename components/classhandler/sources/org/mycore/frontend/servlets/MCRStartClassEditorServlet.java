@@ -128,6 +128,11 @@ public class MCRStartClassEditorServlet extends MCRServlet {
         String imerrorpage = pagedir + CONFIG.getString("MCR.classeditor_page_error_move", "classeditor_error_move.xml");
         String imperrorpage = pagedir + CONFIG.getString("MCR.classeditor_page_error_import", "classeditor_error_import.xml");
 
+        String referrer=job.getRequest().getHeader("Referer");
+        if(referrer==null||referrer.equals("")) {
+            referrer=getBaseURL() + cancelpage;
+        }
+
         // change the ACLs of classification
         if ("acl-classification".equals(todo)) {
             if (!(AI.checkPermission(clid, "writedb"))) {
@@ -156,7 +161,7 @@ public class MCRStartClassEditorServlet extends MCRServlet {
             String base = getBaseURL() + "editor_form_modify-classificationacl.xml";
             Properties params = new Properties();
             params.put("sourceUri", "session:service");
-            params.put("cancelUrl", getBaseURL() + cancelpage);
+            params.put("cancelUrl",referrer );
             params.put("mcrid", clid);
             job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(buildRedirectURL(base, params)));
             return;
@@ -273,7 +278,7 @@ public class MCRStartClassEditorServlet extends MCRServlet {
         else if ("import-classification".equals(todo)) {
             String base = getBaseURL() + myfile;
             Properties params = new Properties();
-            params.put("cancelUrl", getBaseURL() + cancelpage);
+            params.put("cancelUrl", referrer);
             params.put("clid", clid);
             params.put("path", path);
             params.put("todo2", todo);
@@ -362,7 +367,7 @@ public class MCRStartClassEditorServlet extends MCRServlet {
                 params.put("sourceUri", sb.toString());
                 params.put("categid", categid);
             }
-            params.put("cancelUrl", getBaseURL() + cancelpage);
+            params.put("cancelUrl", referrer);
             params.put("clid", clid);
             params.put("path", path);
             params.put("todo2", todo);

@@ -366,7 +366,7 @@ public class MCRStartEditorServlet extends MCRServlet {
         String base = getBaseURL() + cd.myfile;
         Properties params = new Properties();
         params.put("XSL.UploadID", fuhid);
-        params.put("cancelUrl", getBaseURL() + cancelpage);
+        params.put("cancelUrl", getReferer(job));
         params.put("XSL.target.param.1", "method=formBasedUpload");
         params.put("XSL.target.param.2", "uploadId=" + fuhid);
         params.put("mcrid", cd.mysemcrid);
@@ -598,7 +598,7 @@ public class MCRStartEditorServlet extends MCRServlet {
             job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + mcriderrorpage));
             return;
         }
-
+        
         // read object
         MCRObjectService service = new MCRObjectService();
         List <String>permlist = AI.getPermissionsForID(cd.mysemcrid);
@@ -620,7 +620,7 @@ public class MCRStartEditorServlet extends MCRServlet {
         String base = getBaseURL() + cd.myfile;
         Properties params = new Properties();
         params.put("sourceUri", "session:service");
-        params.put("cancelUrl", getBaseURL() + cancelpage);
+        params.put("cancelUrl", getReferer(job));
         params.put("mcrid", cd.mysemcrid);
         params.put("type", cd.mytype);
         params.put("step", cd.mystep);
@@ -865,7 +865,7 @@ public class MCRStartEditorServlet extends MCRServlet {
         String base = getBaseURL() + cd.myfile;
         Properties params = new Properties();
         params.put("XSL.UploadID", fuhid);
-        params.put("cancelUrl", getBaseURL() + cancelpage);
+        params.put("cancelUrl", getReferer(job));
         params.put("XSL.target.param.1", "method=formBasedUpload");
         params.put("XSL.target.param.2", "uploadId=" + fuhid);
         params.put("mcrid", cd.mysemcrid);
@@ -1125,7 +1125,7 @@ public class MCRStartEditorServlet extends MCRServlet {
         String base = getBaseURL() + cd.myfile;
         Properties params = new Properties();
         params.put("sourceUri", "session:service");
-        params.put("cancelUrl", getBaseURL() + cancelpage);
+        params.put("cancelUrl", getReferer(job));
         params.put("mcrid", cd.mysemcrid);
         params.put("type", cd.mytype);
         params.put("step", cd.mystep);
@@ -1155,7 +1155,7 @@ public class MCRStartEditorServlet extends MCRServlet {
         StringBuffer sb = new StringBuffer();
         sb.append("file://").append(WFM.getDirectoryPath(cd.mytype)).append(SLASH).append(cd.mysemcrid).append(".xml");
         params.put("sourceUri", sb.toString());
-        params.put("cancelUrl", getBaseURL() + cancelpage);
+        params.put("cancelUrl", getReferer(job));
         params.put("se_mcrid", cd.mysemcrid);
         params.put("re_mcrid", cd.myremcrid);
         params.put("type", cd.mytype);
@@ -1188,7 +1188,7 @@ public class MCRStartEditorServlet extends MCRServlet {
         String base = getBaseURL() + cd.myfile;
         Properties params = new Properties();
         params.put("sourceUri", wfFile.toURI().toString());
-        params.put("cancelUrl", getBaseURL() + cancelpage);
+        params.put("cancelUrl", getReferer(job));
         params.put("mcrid", cd.mysemcrid);
         params.put("type", cd.mytype);
         params.put("step", cd.mystep);
@@ -1259,7 +1259,7 @@ public class MCRStartEditorServlet extends MCRServlet {
         }
         // end changes
 
-        params.put("cancelUrl", getBaseURL() + cancelpage);
+        params.put("cancelUrl", getReferer(job));
         params.put("mcrid", cd.mytfmcrid);
         params.put("type", cd.mytype);
         params.put("step", cd.mystep);
@@ -1324,4 +1324,11 @@ public class MCRStartEditorServlet extends MCRServlet {
         job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(sb.toString()));
     }
 
+    private String getReferer(MCRServletJob job) {
+        String referrer=job.getRequest().getHeader("Referer");
+        if(referrer==null||referrer.equals("")) {
+            referrer=getBaseURL() + cancelpage;
+        }
+        return referrer;
+    }
 }

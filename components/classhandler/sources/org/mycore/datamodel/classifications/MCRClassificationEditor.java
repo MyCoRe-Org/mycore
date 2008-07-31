@@ -481,6 +481,7 @@ public class MCRClassificationEditor {
                     String sessionID = MCRSessionMgr.getCurrentSession().getID();
                     MCRClassificationBrowserData.ClassUserTable.put(classif.getId().getRootID(), sessionID);
                     cnt = links.size();
+                    LOGGER.info("Classif: "+classif.getId().getRootID());
                 }
             } else {
                 LOGGER.warn("Category " + categid + " in classification: " + clid + " not found! - nothing todo");
@@ -488,7 +489,8 @@ public class MCRClassificationEditor {
 
             return cnt;
         } catch (Exception e1) {
-            LOGGER.error("Categorie delete failed - the Reason is:" + e1.getMessage());
+            LOGGER.error("Categorie delete failed - the Reason is:" + e1.getMessage()+" "+e1.toString());
+            e1.printStackTrace();
             return 1;
         }
     }
