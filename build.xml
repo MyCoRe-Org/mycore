@@ -298,8 +298,7 @@
           target: jar.copy-schema                      
          - - - - - - - - - - - - - - - - - -->
   <target name="jar.copy-schema">
-    <mkdir dir="${target.jarbase}/schema" />
-    <copy todir="${target.jarbase}/schema" flatten="true">
+    <copy todir="${target.jarbase}" flatten="true">
       <fileset dir="${basedir}/schema" includes="*.dtd *.xsd" />
       <fileset dir="${components.dir}">
         <include name="*/schema/*.dtd" />
