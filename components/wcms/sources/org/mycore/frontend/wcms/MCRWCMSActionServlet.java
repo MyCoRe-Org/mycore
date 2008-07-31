@@ -216,8 +216,7 @@ public class MCRWCMSActionServlet extends MCRWCMSServlet {
     MCRSession mcrSession = null;
 
     /**
-     * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
-     * methods.
+     * Processes requests for both HTTP <code>GET</code> and <code>POST</code> methods.
      * 
      * @param request
      *            servlet request
@@ -226,20 +225,18 @@ public class MCRWCMSActionServlet extends MCRWCMSServlet {
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response) {
 
-        logger.debug("########################################");
         logger.debug("procReq");
-        logger.debug("########################################");
 
         mcrSession = MCRSessionMgr.getCurrentSession();
 
         setReq(request);
         setResp(response);
         setback();
-        setbackaddr();
+        setBackAddress();
         initParam(getReq());
 
         if (!realyDel.equals("false")) {
-            doItAll(hrefFile, action, mode, addAtPosition);
+            doItAll(request, hrefFile, action, mode, addAtPosition);
         } else {
             sessionParam = "choose";
             generateOutput(error, label, fileName);
@@ -273,7 +270,6 @@ public class MCRWCMSActionServlet extends MCRWCMSServlet {
             // rootNodes Iterator used in case of action==delete &&
             // realyDel==false
             Iterator rootNodesIterator = rootNodes.iterator();
-
             while (rootNodesIterator.hasNext()) {
                 Element rootNode = (Element) rootNodesIterator.next();
                 rootOut.addContent(new Element("rootNode").setAttribute("href", rootNode.getAttributeValue("href")).setText(rootNode.getTextTrim()));
@@ -328,16 +324,13 @@ public class MCRWCMSActionServlet extends MCRWCMSServlet {
             if (error != null) {
                 SAXBuilder saxb = new SAXBuilder();
                 saxb.setEntityResolver(new ResolveDTD());
-
                 Document saxDoc = new Document();
 
                 if (!action.equals("translate")) {
                     try {
                         saxDoc = saxb.build(new StringReader(content));
-
                         Element html = saxDoc.getRootElement();
                         html.detach();
-
                         Element contentElem = new Element("section");
                         contentElem.addContent(html);
                         rootOut.addContent(contentElem);
@@ -346,32 +339,21 @@ public class MCRWCMSActionServlet extends MCRWCMSServlet {
                         try {
                             String contentTmp = "<section>" + content + "</section>";
                             saxDoc = saxb.build(new StringReader(contentTmp));
-
                             Element html = saxDoc.getRootElement();
                             html.detach();
-
                             Element contentElem = new Element("section");
                             contentElem.setContent(html);
                             rootOut.addContent(contentElem);
                             rootOut.addContent(new Element("error").setText(error));
                         } catch (Exception e) {
-                            /*
-                             * Element contentElem = new Element("content");
-                             * contentElem.addContent(content);
-                             * rootOut.addContent(contentElem);
-                             */
                             rootOut.addContent(new Element("error").setText(error));
-
-                            // e.printStackTrace();
                         }
                     }
                 } else {
                     try {
                         saxDoc = saxb.build(new StringReader(contentCurrentLang));
-
                         Element html = saxDoc.getRootElement();
                         html.detach();
-
                         Element contentElem = new Element("section");
                         contentElem.addContent(html);
                         rootOut.addContent(contentElem);
@@ -380,23 +362,14 @@ public class MCRWCMSActionServlet extends MCRWCMSServlet {
                         try {
                             String contentCurrentLangTmp = "<section>" + contentCurrentLang + "</section>";
                             saxDoc = saxb.build(new StringReader(contentCurrentLangTmp));
-
                             Element html = saxDoc.getRootElement();
                             html.detach();
-
                             Element contentElem = new Element("section");
                             contentElem.setContent(html);
                             rootOut.addContent(contentElem);
                             rootOut.addContent(new Element("error").setText(error));
                         } catch (Exception e) {
-                            /*
-                             * Element contentElem = new Element("content");
-                             * contentElem.addContent(contentCurrentLang);
-                             * rootOut.addContent(contentElem);
-                             */
                             rootOut.addContent(new Element("error").setText(error));
-
-                            // e.printStackTrace();
                         }
                     }
                 }
@@ -408,31 +381,29 @@ public class MCRWCMSActionServlet extends MCRWCMSServlet {
 
             // if you used the edittool
             if (getback()) {
-                if ((checkInput()) == false) {
-                    // request.setAttribute("XSL.Style", "xml");
-                    getLayoutService().doLayout(request, response, jdom);
-                } else {
+                if (error == null) {
                     // if new intern child, predecossor or successor created, go
                     // to it
                     if (action.equals("add") && mode.equals("intern")) {
                         if (addAtPosition.equals("child")) {
-                            int length = getbackaddr().length();
-                            help = getbackaddr().substring(0, (length - 4));
+                            int length = getBackAddress().length();
+                            help = getBackAddress().substring(0, (length - 4));
                             filepos = fileName.lastIndexOf("/");
                             jump = help.concat(fileName.substring(filepos));
                         } else {
                             filepos = fileName.lastIndexOf("/");
-                            int neighbarpos = getbackaddr().lastIndexOf("/");
-                            help = getbackaddr().substring(0, neighbarpos);
+                            int neighbarpos = getBackAddress().lastIndexOf("/");
+                            help = getBackAddress().substring(0, neighbarpos);
                             jump = help.concat(fileName.substring(filepos));
-
                         }
                     }
                     // on edit or external link go back to initiator address
                     else {
-                        jump = getbackaddr();
+                        jump = getBackAddress();
                     }
                     response.sendRedirect(jump);
+                } else {
+                    getLayoutService().doLayout(request, response, jdom);
                 }
             } else {
                 getLayoutService().doLayout(request, response, jdom);
@@ -456,9 +427,8 @@ public class MCRWCMSActionServlet extends MCRWCMSServlet {
             writeJDOMDocumentToFile(doc, footer);
 
             /*
-             * XMLOutputter xmlout = new
-             * XMLOutputter(Format.getRawFormat().setTextMode(Format.TextMode.PRESERVE).setEncoding("UTF-8"));
-             * xmlout.output(doc, new FileOutputStream(footer));
+             * XMLOutputter xmlout = new XMLOutputter(Format.getRawFormat().setTextMode(Format.TextMode.PRESERVE).setEncoding("UTF-8")); xmlout.output(doc, new
+             * FileOutputStream(footer));
              */
         } catch (Exception e) {
             e.printStackTrace();
@@ -491,9 +461,8 @@ public class MCRWCMSActionServlet extends MCRWCMSServlet {
             writeJDOMDocumentToFile(doc, hrefFile);
 
             /*
-             * XMLOutputter xmlout = new
-             * XMLOutputter(Format.getRawFormat().setTextMode(Format.TextMode.PRESERVE).setEncoding("UTF-8"));
-             * xmlout.output(doc, new FileOutputStream(hrefFile));
+             * XMLOutputter xmlout = new XMLOutputter(Format.getRawFormat().setTextMode(Format.TextMode.PRESERVE).setEncoding("UTF-8")); xmlout.output(doc, new
+             * FileOutputStream(hrefFile));
              */
         } catch (Exception e) {
             e.printStackTrace();
@@ -541,9 +510,8 @@ public class MCRWCMSActionServlet extends MCRWCMSServlet {
             writeJDOMDocumentToFile(doc, logFile);
 
             /*
-             * XMLOutputter xmlout = new
-             * XMLOutputter(Format.getRawFormat().setTextMode(Format.TextMode.PRESERVE).setEncoding("UTF-8"));
-             * xmlout.output(doc, new FileOutputStream(logFile));
+             * XMLOutputter xmlout = new XMLOutputter(Format.getRawFormat().setTextMode(Format.TextMode.PRESERVE).setEncoding("UTF-8")); xmlout.output(doc, new
+             * FileOutputStream(logFile));
              */
         } catch (Exception e) {
             e.printStackTrace();
@@ -753,9 +721,8 @@ public class MCRWCMSActionServlet extends MCRWCMSServlet {
                 writeJDOMDocumentToFile(doc, inputFile);
 
                 /*
-                 * XMLOutputter xmlout = new
-                 * XMLOutputter(Format.getRawFormat().setTextMode(Format.TextMode.PRESERVE).setEncoding("UTF-8"));
-                 * xmlout.output(doc, new FileOutputStream(inputFile));
+                 * XMLOutputter xmlout = new XMLOutputter(Format.getRawFormat().setTextMode(Format.TextMode.PRESERVE).setEncoding("UTF-8")); xmlout.output(doc,
+                 * new FileOutputStream(inputFile));
                  */
             } catch (Exception e) {
             }
@@ -846,8 +813,7 @@ public class MCRWCMSActionServlet extends MCRWCMSServlet {
                 writeJDOMDocumentToFile(doc, inputFile);
 
                 /*
-                 * XMLOutputter outputter = new
-                 * XMLOutputter(Format.getRawFormat().setTextMode(Format.TextMode.PRESERVE).setEncoding("UTF-8"));
+                 * XMLOutputter outputter = new XMLOutputter(Format.getRawFormat().setTextMode(Format.TextMode.PRESERVE).setEncoding("UTF-8"));
                  * outputter.output(doc, new FileOutputStream(inputFile));
                  */
             } catch (Exception e) {
@@ -866,8 +832,7 @@ public class MCRWCMSActionServlet extends MCRWCMSServlet {
                 writeJDOMDocumentToFile(doc, inputFile);
 
                 /*
-                 * XMLOutputter outputter = new
-                 * XMLOutputter(Format.getRawFormat().setTextMode(Format.TextMode.PRESERVE).setEncoding("UTF-8"));
+                 * XMLOutputter outputter = new XMLOutputter(Format.getRawFormat().setTextMode(Format.TextMode.PRESERVE).setEncoding("UTF-8"));
                  * outputter.output(doc, new FileOutputStream(inputFile));
                  */
             } catch (Exception e) {
@@ -901,9 +866,8 @@ public class MCRWCMSActionServlet extends MCRWCMSServlet {
                 writeJDOMDocumentToFile(doc, inputFile);
 
                 /*
-                 * XMLOutputter xmlout = new
-                 * XMLOutputter(Format.getRawFormat().setTextMode(Format.TextMode.PRESERVE).setEncoding("UTF-8"));
-                 * xmlout.output(doc, new FileOutputStream(inputFile));
+                 * XMLOutputter xmlout = new XMLOutputter(Format.getRawFormat().setTextMode(Format.TextMode.PRESERVE).setEncoding("UTF-8")); xmlout.output(doc,
+                 * new FileOutputStream(inputFile));
                  */
             } catch (Exception e) {
             }
@@ -919,9 +883,8 @@ public class MCRWCMSActionServlet extends MCRWCMSServlet {
 
     public String getParentAttribute(File inputFile, String attribute, String avalue, String parentAttribute, String altParentAttribute) {
         /*
-         * builds a jdom document from inputFile searches for Element with given
-         * attribute and value returns value of attribut of parent or
-         * alternative value if previous one dosen't exist
+         * builds a jdom document from inputFile searches for Element with given attribute and value returns value of attribut of parent or alternative value if
+         * previous one dosen't exist
          */
         String reval = "";
 
@@ -933,8 +896,8 @@ public class MCRWCMSActionServlet extends MCRWCMSServlet {
 
             // check if parent element is not <item>, because it has an @dir
             if (((Element) actElem.getParent()).getAttributeValue(altParentAttribute) != null) {
-                    reval = ((Element) actElem.getParent()).getAttributeValue(altParentAttribute) + reval;
-                    actElem = (Element) actElem.getParent();
+                reval = ((Element) actElem.getParent()).getAttributeValue(altParentAttribute) + reval;
+                actElem = (Element) actElem.getParent();
             } else {
                 reval = ((Element) actElem.getParent()).getAttributeValue(parentAttribute);
             }
@@ -974,27 +937,22 @@ public class MCRWCMSActionServlet extends MCRWCMSServlet {
             if (action.equals("edit")) {
                 if (mode.equals("intern")) {
                     try {
-                        // Document storedHTML = new Document();
+                        Element formHTML = getXMLAsJDOM(content).getRootElement();
 
-                        try {
-                            Element formHTML = getXMLAsJDOM(content).getRootElement();
+                        html2BeStored = getXMLAsJDOM(hrefFile);
 
-                            html2BeStored = getXMLAsJDOM(hrefFile);
+                        Element storedHTMLRoot = html2BeStored.getRootElement();
+                        validate(storedHTMLRoot);
 
-                            Element storedHTMLRoot = html2BeStored.getRootElement();
-                            validate(storedHTMLRoot);
-
-                            Element contentSection = findActElem(storedHTMLRoot, "lang", defaultLang, ns);
-                            contentSection.setAttribute("title", label);
-                            if (formHTML.getName().equals("dummyRoot")) {
-                                contentSection.setContent(formHTML.cloneContent());
-                            } else
-                                contentSection.setContent((Element) formHTML.clone());
-                        } catch (Exception ex) {
-                            logger.error("Error while updating document, update rejected.", ex);
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
+                        Element contentSection = findActElem(storedHTMLRoot, "lang", defaultLang, ns);
+                        contentSection.setAttribute("title", label);
+                        if (formHTML.getName().equals("dummyRoot")) {
+                            contentSection.setContent(formHTML.cloneContent());
+                        } else
+                            contentSection.setContent((Element) formHTML.clone());
+                    } catch (Exception ex) {
+                        error = "Error while updating document, update rejected.";
+                        return;
                     }
                 } else {
                     return;
@@ -1056,29 +1014,27 @@ public class MCRWCMSActionServlet extends MCRWCMSServlet {
         }
     }
 
-    public boolean checkInput() {
+    public boolean validInput() {
         if (!action.equals("delete") && (((fileName == null) || fileName.equals("")) || ((label == null) || label.equals("")))) {
             error = "emptyFormField";
-
             return false;
         }
-
-        /*
-         * if (action.equals("add") && hrefFile.exists()) { error =
-         * "fileAllreadyExists"; System.out.println("File gibts schon"); return
-         * false; }
-         */
         return true;
     }
 
-    public void doItAll(File hrefFile, String action, String mode, String addAtPosition) {
-        logger.debug("addAtPosition (" + addAtPosition + ") will never be used."); // FIXME:
-        // use
-        // or
-        // remove
-        // addAtPosition
+    public boolean validInput(HttpServletRequest request) {
+        boolean contentValid = getXMLAsJDOM(request.getParameter("content")) != null;
+        if (!contentValid) {
+            error = "invalidXHTML";
+            return false;
+        }
+        return validInput();
+    }
+
+    public void doItAll(HttpServletRequest request, File hrefFile, String action, String mode, String addAtPosition) {
+
         // verify if html form was filled in correctly
-        if ((checkInput()) == false) {
+        if (!validInput(request)) {
             sessionParam = "action";
             generateOutput(error, label, fileName);
             return;
@@ -1302,52 +1258,43 @@ public class MCRWCMSActionServlet extends MCRWCMSServlet {
      * @return JDOM Document
      */
     public Document getXMLAsJDOM(Object xmlSource) {
-        logger.debug("########################################");
         logger.debug("inside getXMLAsJDOM(Object xmlSource)");
-        logger.debug("########################################");
         SAXBuilder builder = new SAXBuilder();
         Document jdomDoc = new Document();
 
         try {
             if (xmlSource instanceof String) {
-                logger.debug("########################################");
                 logger.debug("instanceof String=" + xmlSource);
-                logger.debug("########################################");
                 jdomDoc = builder.build(new ByteArrayInputStream(((String) xmlSource).getBytes("UTF-8")));
             }
             if (xmlSource instanceof File) {
-                logger.debug("########################################");
                 logger.debug("instanceof File=" + xmlSource);
-                logger.debug("########################################");
                 jdomDoc = builder.build((File) xmlSource);
             }
             if (xmlSource instanceof InputStream) {
-                logger.debug("########################################");
                 logger.debug("instanceof InputStream=" + xmlSource);
-                logger.debug("########################################");
                 jdomDoc = builder.build((InputStream) xmlSource);
             }
             if (xmlSource instanceof URL) {
-                logger.debug("########################################");
                 logger.debug("instanceof URL=" + xmlSource);
-                logger.debug("########################################");
                 jdomDoc = builder.build((URL) xmlSource);
             }
         } catch (JDOMException e) {
             // no root element ?
             String extendedXML = addRootElement((String) xmlSource);
             try {
-                logger.debug("########################################");
                 logger.debug("JDOMException occurred -> adding root tag =" + extendedXML);
-                logger.debug("########################################");
                 jdomDoc = builder.build(new ByteArrayInputStream((extendedXML).getBytes("UTF-8")));
             } catch (UnsupportedEncodingException e1) {
                 e1.printStackTrace();
             } catch (JDOMException e1) {
-                logger.debug("##########################################################");
-                logger.debug("JDOMException after root tag added occurred -> using JTidy");
-                logger.debug("##########################################################");
-                jdomDoc = validateSource(xmlSource);
+                try {
+                    logger.debug("JDOMException after root tag added occurred -> using JTidy");
+                    jdomDoc = validateSource(xmlSource);
+                } catch (Exception e2) {
+                    jdomDoc = null;
+                    logger.error("XHTML-Content could not be transformed with JTidyto into valid XHTML");
+                }
                 e1.printStackTrace();
             } catch (IOException e1) {
                 e1.printStackTrace();
@@ -1370,11 +1317,8 @@ public class MCRWCMSActionServlet extends MCRWCMSServlet {
         PrintWriter pw = new PrintWriter(sw);
 
         /*
-         * Construct a new JTidy object and get Configuration |
-         * ---------------------------------------------------+ At first,
-         * allways try to parse the Document as XHTML. Only if an unknown
-         * Element is found and JTidy wants to discard it, the Output format is
-         * set to XML.
+         * Construct a new JTidy object and get Configuration | ---------------------------------------------------+ At first, allways try to parse the Document
+         * as XHTML. Only if an unknown Element is found and JTidy wants to discard it, the Output format is set to XML.
          */
         Tidy tidy = new Tidy();
         tidy = getTidyConfig(tidy, "xhtml");
@@ -1540,8 +1484,7 @@ public class MCRWCMSActionServlet extends MCRWCMSServlet {
         currentLangLabel = request.getParameter("label_currentLang");
 
         /*
-         * if (content != null ) { if ( content.endsWith("\n") ) content =
-         * content.substring(0, content.length() - 2); }
+         * if (content != null ) { if ( content.endsWith("\n") ) content = content.substring(0, content.length() - 2); }
          */
         /* check for dynamic content bindings */
         /* add */
@@ -1619,12 +1562,12 @@ public class MCRWCMSActionServlet extends MCRWCMSServlet {
                 // not a root item (direct child of a menu node )
                 if (href.toLowerCase().endsWith(".xml") || href.toLowerCase().endsWith(".html")) {
                     fileName = href.substring(0, href.lastIndexOf('.')) + '/' + link;
-                } 
+                }
                 // a root item shall be created
                 else {
-                    String nameOfFile= link.trim();
+                    String nameOfFile = link.trim();
                     String pathToFile = href.trim();
-                    if (!pathToFile.endsWith(Character.toString(fs))) 
+                    if (!pathToFile.endsWith(Character.toString(fs)))
                         pathToFile = pathToFile + fs;
                     fileName = pathToFile + nameOfFile;
                 }
@@ -1717,8 +1660,7 @@ public class MCRWCMSActionServlet extends MCRWCMSServlet {
     /**
      * @author m5brmi-s
      * 
-     * TODO To change the template for this generated type comment go to Window -
-     * Preferences - Java - Code Style - Code Templates
+     * TODO To change the template for this generated type comment go to Window - Preferences - Java - Code Style - Code Templates
      */
     public static class ResolveDTD implements EntityResolver {
         public InputSource resolveEntity(String publicId, String systemId) {
@@ -1738,11 +1680,11 @@ public class MCRWCMSActionServlet extends MCRWCMSServlet {
         }
     }
 
-    public String getbackaddr() {
+    public String getBackAddress() {
         return this.backaddr;
     }
 
-    public void setbackaddr() {
+    public void setBackAddress() {
         this.backaddr = request.getParameter("address");
     }
 }

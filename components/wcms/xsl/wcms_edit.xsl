@@ -783,10 +783,8 @@ template:
 								select="i18n:translate('wcms.errors.notValidXHTML')"/>
 						</xsl:when>
 						<xsl:when test=" /cms/error = 'invalidXHTML' ">
-							<xsl:value-of
+							<xsl:value-of 
 								select="i18n:translate('wcms.errors.invalidXHTML')"/>
-							<a target="_blank" href="http://validator.w3.org/">
-								XHTML-Validator</a>
 						</xsl:when>
 						<xsl:otherwise>
 							<xsl:value-of
