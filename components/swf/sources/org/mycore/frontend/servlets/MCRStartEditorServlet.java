@@ -1325,10 +1325,11 @@ public class MCRStartEditorServlet extends MCRServlet {
     }
 
     private String getReferer(MCRServletJob job) {
-        String referrer=job.getRequest().getHeader("Referer");
-        if(referrer==null||referrer.equals("")) {
-            referrer=getBaseURL() + cancelpage;
+        String referer=job.getRequest().getHeader("Referer");
+        if(referer==null||referer.equals("")) {
+            referer=getBaseURL() + cancelpage;
         }
-        return referrer;
+        LOGGER.debug("Referer: "+referer);
+        return referer;
     }
 }
