@@ -1014,21 +1014,19 @@ public class MCRWCMSActionServlet extends MCRWCMSServlet {
         }
     }
 
-    public boolean validInput() {
-        if (!action.equals("delete") && (((fileName == null) || fileName.equals("")) || ((label == null) || label.equals("")))) {
-            error = "emptyFormField";
-            return false;
-        }
-        return true;
-    }
-
     public boolean validInput(HttpServletRequest request) {
+        // page valid xhtml ?
         boolean contentValid = getXMLAsJDOM(request.getParameter("content")) != null;
         if (!contentValid) {
             error = "invalidXHTML";
             return false;
         }
-        return validInput();
+        // no file name or page title provided
+        if (!action.equals("delete") && (((fileName == null) || fileName.equals("")) || ((label == null) || label.equals("")))) {
+            error = "emptyFormField";
+            return false;
+        }
+        return true;
     }
 
     public void doItAll(HttpServletRequest request, File hrefFile, String action, String mode, String addAtPosition) {
