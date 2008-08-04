@@ -203,16 +203,22 @@
 <xsd:sequence>
  <xsd:element name="{@name}" minOccurs="{@minOccurs}" maxOccurs="{@maxOccurs}">
   <xsd:complexType>
-   <xsd:all>
-    <xsd:sequence>
-     <xsd:element name="text" type="xsd:string" minOccurs="1"/>
-    </xsd:sequence>
-    <xsd:element name="von"  type="xsd:string" minOccurs='0' maxOccurs='1'/>
-    <xsd:element name="ivon"  type="xsd:integer" minOccurs='0' maxOccurs='1'/>
-    <xsd:element name="bis"  type="xsd:string" minOccurs='0' maxOccurs='1'/>
-    <xsd:element name="ibis"  type="xsd:integer" minOccurs='0' maxOccurs='1'/>
+   <xsd:sequence>
+    <xsd:element name="text" minOccurs="1" maxOccurs="unbounded" >
+     <xsd:complexType>
+      <xsd:simpleContent>
+       <xsd:extension base="xsd:string">
+        <xsd:attribute ref="xml:lang" use="optional" />
+       </xsd:extension>
+      </xsd:simpleContent>
+     </xsd:complexType>
+	</xsd:element>
     <xsd:element name="calendar"  type="xsd:string" minOccurs='0' maxOccurs='1'/>
-   </xsd:all>
+    <xsd:element name="ivon"  type="xsd:integer" minOccurs='0' maxOccurs='1'/>
+    <xsd:element name="von"  type="xsd:string" minOccurs='0' maxOccurs='1'/>
+    <xsd:element name="ibis"  type="xsd:integer" minOccurs='0' maxOccurs='1'/>
+    <xsd:element name="bis"  type="xsd:string" minOccurs='0' maxOccurs='1'/>
+   </xsd:sequence>
    <xsd:attribute name="type" use="optional" type="xsd:string" />
    <xsd:attribute name="inherited" use="optional" type="xsd:integer" />
    <xsd:attribute ref="xml:lang" />
