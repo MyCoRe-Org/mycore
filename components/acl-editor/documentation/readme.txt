@@ -37,3 +37,4 @@ TODO:
 	- Grouping of long AC-Lists realised by Java not by XSL, like now. 
 	   -- the problem with XSL is that big XML's (e.g 10000 tags) have to be 
 	      fully loaded as JDOM. This will take memory and speed as well.
+	- nothing new
