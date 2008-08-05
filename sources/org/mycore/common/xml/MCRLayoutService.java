@@ -100,9 +100,6 @@ public class MCRLayoutService implements org.apache.xalan.trace.TraceListener {
 
     private static MCRXMLResource XML_RESOURCE = MCRXMLResource.instance();
 
-    /** The directory containing the xsl files */
-    private String stylesheetsDir;
-
     /** The XSL transformer factory to use */
     private SAXTransformerFactory factory;
 
@@ -115,10 +112,6 @@ public class MCRLayoutService implements org.apache.xalan.trace.TraceListener {
 
     public static MCRLayoutService instance() {
         return singleton;
-    }
-
-    public void setStylesheetsDir(String stylesheetsDir) {
-        this.stylesheetsDir = stylesheetsDir;
     }
 
     private MCRLayoutService() {
@@ -242,12 +235,7 @@ public class MCRLayoutService implements org.apache.xalan.trace.TraceListener {
         Properties parameters = buildXSLParameters(req);
         if (null != params)
             parameters.putAll(params);
-        File styleFile = getStylesheetFile(stylesheetName);
-        if (styleFile == null) {
-            LOGGER.error("Stylesheet not found: " + stylesheetName);
-            return null;
-        }
-        Templates stylesheet = buildCompiledStylesheet(styleFile);
+        Templates stylesheet = buildCompiledStylesheet(stylesheetName);
         Transformer transformer = buildTransformer(stylesheet);
         setXSLParameters(transformer, parameters);
         JDOMResult out = new JDOMResult();
@@ -426,61 +414,6 @@ public class MCRLayoutService implements org.apache.xalan.trace.TraceListener {
         filename.append(".xsl");
 
         return filename.toString();
-    }
-
-    /**
-     * Gets a File object for the given filename and directory, or returns null
-     * if no such file exists.
-     */
-    private File getStylesheetFile(String name) {
-        File file = new File(stylesheetsDir, name);
-
-        if (!file.exists()) {
-            LOGGER.debug("MCRLayoutService did not find stylesheet " + name);
-            return null;
-        }
-
-        if (!file.canRead()) {
-            String msg = "XSL stylesheet " + name + " not readable";
-            throw new MCRConfigurationException(msg);
-        }
-
-        return file;
-    }
-
-    /**
-     * Reads an XSL stylesheet from the given file and returns it as compiled
-     * XSL Templates object.
-     * 
-     * @param file
-     *            the File that contains the XSL stylesheet
-     * @return the compiled stylesheet
-     */
-    private Templates buildCompiledStylesheet(File file) throws MCRConfigurationException {
-        String path = file.getPath();
-        long time = file.lastModified();
-
-        Templates stylesheet = (Templates) (STYLESHEETS_CACHE.getIfUpToDate(path, time));
-
-        if (stylesheet == null) {
-            try {
-                stylesheet = factory.newTemplates(new StreamSource(file));
-                LOGGER.debug("MCRLayoutService compiled stylesheet " + file.getName());
-            } catch (TransformerConfigurationException exc) {
-                String msg = "Error while compiling XSL stylesheet " + file.getName() + ": " + exc.getMessageAndLocation();
-                throw new MCRConfigurationException(msg, exc);
-            }
-            try {
-                STYLESHEETS_CACHE.put(path, stylesheet);
-            } catch (MCRUsageException exc) {
-                String msg = "Error while putting XSL stylesheet in cache " + file.getName();
-                throw new MCRConfigurationException(msg, exc);
-            }
-        } else {
-            LOGGER.debug("MCRLayoutService using cached stylesheet " + file.getName());
-        }
-
-        return stylesheet;
     }
 
     private Templates buildCompiledStylesheet(String resource) {
