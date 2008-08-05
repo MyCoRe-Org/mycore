@@ -73,13 +73,21 @@
       <replace file="${build.webapps}/WEB-INF/web.xml" token='xmlns=""' />
     </sequential>
   </macrodef>
+  <xmlcatalog id="hibernateDTD" classpathref="integration.classpath">
+    <dtd publicid="-//Hibernate/Hibernate Configuration DTD 3.0//EN" location="hibernate-configuration-3.0.dtd" />
+  </xmlcatalog>
   <macrodef name="AddHibernateMapping">
     <attribute name="class" />
     <sequential>
       <echo level="info">Adding @{class} to hibernate-configuration</echo>
-      <propertyregex property="@{class}.resource" input="@{class}" regexp="\." replace="/"/>
-      <xmltask source="${build.config}/hibernate.cfg.xml" dest="${build.config}/hibernate.cfg.xml" public="-//Hibernate/Hibernate Configuration DTD 3.0//EN" system="http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd">
-        <insert path="/hibernate-configuration/session-factory" xml="&lt;mapping resource=&#x22;${@{class}.resource}.hbm.xml&#x22; /&gt;" />
+      <propertyregex property="@{class}.resource" input="@{class}" regexp="\." replace="/" />
+      <xmltask source="${build.config}/hibernate.cfg.xml"
+               dest="${build.config}/hibernate.cfg.xml"
+               public="-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+               system="http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd">
+        <xmlcatalog refid="hibernateDTD" />
+        <insert path="/hibernate-configuration/session-factory"
+                xml="&lt;mapping resource=&#x22;${@{class}.resource}.hbm.xml&#x22; /&gt;" />
       </xmltask>
     </sequential>
   </macrodef>
