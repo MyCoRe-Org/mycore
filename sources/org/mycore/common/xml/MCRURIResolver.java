@@ -1143,7 +1143,7 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
                     Document doc = result.getDocument();
                     if (doc == null)
                         doc = new Document(result);
-                    Document xx = MCRLayoutService.instance().doLayout(doc, stylesheet + ".xsl", params);
+                    Document xx = MCRLayoutService.instance().doLayout(doc, "xsl/" + stylesheet + ".xsl", params);
                     if (!xx.hasRootElement()) {
                         LOGGER.info("MCRXslStyleResolver no root element after transformation ");
                         return new Element("null");
