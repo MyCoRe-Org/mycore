@@ -1,6 +1,6 @@
 <project name="MyCoRe Components integration">
   <property name="components.order"
-            value="acl-editor,broadcasting,buildtools,classhandler,imaging,indexing,iview,migration13-20,swf,useradmin,userlogin,wcms,webservices,z3950" />
+            value="acl-editor,broadcasting,buildtools,classhandler,imaging,indexing,iview,migration13-20,swf,useradmin,userlogin,wcms,webcli,webservices,z3950" />
 
   <import file="${integration.dir}/helper.xml" />
   <taskdef classname="org.mycore.common.MCRConfigurationTask" name="mcr-config" classpathref="integration.classpath" />
