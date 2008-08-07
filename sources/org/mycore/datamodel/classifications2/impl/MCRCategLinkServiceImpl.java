@@ -61,7 +61,6 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
 
     private static MCRCategoryDAOImpl DAO = new MCRCategoryDAOImpl();
 
-    @SuppressWarnings("unchecked")
     public Map<MCRCategoryID, Number> countLinks(Collection<MCRCategoryID> categIDs) {
         return countLinksForType(categIDs, null);
     }
@@ -105,13 +104,11 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
                 List<MCRCategory> parents = DAO.getParents(key);
                 for (MCRCategory parent : parents) {
                     MCRCategoryID parentID = parent.getId();
-                    if (!parentID.toString().equals(classID)) {
-                        Number counter = countLinks.get(parentID);
-                        if (counter != null) {
-                            countLinks.put(parentID, new Integer(counter.intValue() + value.intValue()));
-                        } else {
-                            countLinks.put(parentID, value);
-                        }
+                    Number counter = countLinks.get(parentID);
+                    if (counter != null) {
+                        countLinks.put(parentID, new Integer(counter.intValue() + value.intValue()));
+                    } else {
+                        countLinks.put(parentID, value);
                     }
                 }
             }
