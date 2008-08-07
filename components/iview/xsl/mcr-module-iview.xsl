@@ -42,6 +42,12 @@
     <xsl:variable name="fileToBeDisplayedPath">
         <xsl:call-template name="get.fileToBeDisplayedPath" />
     </xsl:variable>
+    <xsl:variable name="fileToBeDisplayed">
+        <xsl:call-template name="get.mcrModuleIview.substringAfter">
+            <xsl:with-param name="mcrModuleIview.string" select="$fileToBeDisplayedPath" />
+            <xsl:with-param name="mcrModuleIview.patternString" select="'/'" />
+        </xsl:call-template>
+    </xsl:variable>
 
     <xsl:variable name="imageToBeDisplayedPath">
         <xsl:value-of select="concat($iview.home,$fileToBeDisplayedPath,$HttpSession,'?mode=getImage')" />
@@ -911,7 +917,7 @@
     <xsl:template name="get.fileToBeDisplayedPath.previous">
         <xsl:if test="($fileToBeDisplayedPath != '')">
             <xsl:for-each select="/mcr-module/iview/content/nodes/node[@type='file']">
-                <xsl:if test="contains($fileToBeDisplayedPath,name) and (preceding-sibling::node()[@type='file']/name != '') ">
+                <xsl:if test="($fileToBeDisplayed = name/text()) and (preceding-sibling::node()[@type='file']/name != '') ">
                     <xsl:for-each select="preceding-sibling::node()[@type='file']">
                         <xsl:if test="position()=last()">
                             <xsl:value-of select="concat($path,'/',name)" />
@@ -927,8 +933,8 @@
     <xsl:template name="get.fileToBeDisplayedPath.next">
         <xsl:if test="($fileToBeDisplayedPath != '')">
             <xsl:for-each select="/mcr-module/iview/content/nodes/node[@type='file']">
-                <xsl:if test="contains($fileToBeDisplayedPath,name) and (following-sibling::node()[@type='file']/name != '')">
-                    <xsl:value-of select="concat($path,'/',following-sibling::node()[@type='file']/name)" />
+                <xsl:if test="($fileToBeDisplayed = name/text()) and (following-sibling::node()[@type='file']/name/text() != '')">
+                    <xsl:value-of select="concat($path,'/',following-sibling::node()[@type='file']/name/text())" />
                 </xsl:if>
             </xsl:for-each>
         </xsl:if>
@@ -939,7 +945,7 @@
     <xsl:template name="get.fileToBeDisplayedPath.first">
         <xsl:if test="($fileToBeDisplayedPath != '')">
             <xsl:for-each select="/mcr-module/iview/content/nodes/node[@type='file']">
-                <xsl:if test="contains($fileToBeDisplayedPath,name) and (preceding-sibling::node()[@type='file']/name != '')">
+                <xsl:if test="($fileToBeDisplayed = name/text()) and (preceding-sibling::node()[@type='file']/name != '')">
                     <xsl:value-of select="concat($path,'/',/mcr-module/iview/content/nodes/node[@type='file' and position()=1]/name)" />
                 </xsl:if>
             </xsl:for-each>
@@ -951,8 +957,8 @@
     <xsl:template name="get.fileToBeDisplayedPath.last">
         <xsl:if test="($fileToBeDisplayedPath != '')">
             <xsl:for-each select="/mcr-module/iview/content/nodes/node[@type='file']">
-                <xsl:if test="contains($fileToBeDisplayedPath,name) and (following-sibling::node()[@type='file']/name != '')">
-                    <xsl:value-of select="concat($path,'/',/mcr-module/iview/content/nodes/node[@type='file' and position()=last()]/name)" />
+                <xsl:if test="($fileToBeDisplayed = name/text()) and (following-sibling::node()[@type='file']/name != '')">
+                    <xsl:value-of select="concat($path,'/',/mcr-module/iview/content/nodes/node[@type='file' and (position() = last())]/name/text())" />
                 </xsl:if>
             </xsl:for-each>
         </xsl:if>
@@ -976,7 +982,8 @@
     <xsl:template name="get.currentNodePosition">
         <xsl:if test="($fileToBeDisplayedPath != '')">
             <xsl:for-each select="/mcr-module/iview/content/nodes/node[@type='file']">
-                <xsl:if test="contains($fileToBeDisplayedPath,name)">
+                <!-- <xsl:if test="contains($fileToBeDisplayedPath, name/text())"> -->
+                <xsl:if test="$fileToBeDisplayed = name/text()">
                     <xsl:value-of select="count(preceding-sibling::node()[@type='file'])" />
                 </xsl:if>
             </xsl:for-each>
@@ -985,4 +992,37 @@
 
 
     <!--  #####################################################################################################################-->
+    <xsl:template name="get.mcrModuleIview.substringAfter">
+        <xsl:param name="mcrModuleIview.string" />
+        <xsl:param name="mcrModuleIview.patternString" />
+
+        <xsl:choose>
+            <xsl:when test="contains($mcrModuleIview.string, $mcrModuleIview.patternString)">
+                <xsl:call-template name="get.mcrModuleIview.substringAfter">
+                    <xsl:with-param name="mcrModuleIview.string" select="substring-after($mcrModuleIview.string, $mcrModuleIview.patternString)" />
+                    <xsl:with-param name="mcrModuleIview.patternString" select="$mcrModuleIview.patternString" />
+                </xsl:call-template>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:value-of select="$mcrModuleIview.string" />
+            </xsl:otherwise>
+        </xsl:choose>
+
+    </xsl:template>
+
+    <!--  #####################################################################################################################-->
+
 </xsl:stylesheet>
+
+
+
+
+
+
+
+
+
+
+
+
+
