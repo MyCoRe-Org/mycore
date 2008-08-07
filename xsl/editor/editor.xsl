@@ -9,6 +9,8 @@
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   xmlns:xalan="http://xml.apache.org/xalan"
   xmlns:encoder="xalan://java.net.URLEncoder"
+  exclude-result-prefixes="xsl xalan encoder i18n"
+  xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation"
 >
 
 <!-- ========================================================================= -->
@@ -16,14 +18,6 @@
 <xsl:include href="editor-common.xsl" />
 
 <!-- ======== http request parameters ======== -->
-
-<!-- ======== constants, do not change ======== -->
-<xsl:variable name="editor.delimiter.internal"  select="'_'" />
-<xsl:variable name="editor.delimiter.root"      select="'/'" />
-<xsl:variable name="editor.delimiter.element"   select="'/'" />
-<xsl:variable name="editor.delimiter.attribute" select="'@'" />
-<xsl:variable name="editor.delimiter.pos.start" select="'['" />
-<xsl:variable name="editor.delimiter.pos.end"   select="']'" />
 
 <xsl:variable name="editor.list.indent">
   <xsl:text disable-output-escaping="yes">&amp;nbsp;&amp;nbsp;&amp;nbsp;</xsl:text>
@@ -157,10 +151,10 @@
   <!-- ======== target type servlet or url or xml display ======== -->
   <xsl:choose>
     <xsl:when test="../target/@type">
-      <input type="hidden" name="{$editor.delimiter.internal}target-type" value="{../target/@type}" />
+      <input type="hidden" name="_target-type" value="{../target/@type}" />
     </xsl:when>
     <xsl:otherwise>
-      <input type="hidden" name="{$editor.delimiter.internal}target-type" value="display" />
+      <input type="hidden" name="_target-type" value="display" />
     </xsl:otherwise>
   </xsl:choose>
 
@@ -171,29 +165,29 @@
             <xsl:with-param name="url" select="../target/@url" />
         </xsl:call-template>
     </xsl:variable>
-    <input type="hidden" name="{$editor.delimiter.internal}target-url" value="{$url}" />
+    <input type="hidden" name="_target-url" value="{$url}" />
   </xsl:if>
 
   <!-- ======== target servlet name ======== -->
   <xsl:if test="../target/@name">
-    <input type="hidden" name="{$editor.delimiter.internal}target-name" value="{../target/@name}" />
+    <input type="hidden" name="_target-name" value="{../target/@name}" />
   </xsl:if>
 
   <!-- ======== target output format xml or name=value ======== -->
   <xsl:choose>
     <xsl:when test="../target/@format">
-      <input type="hidden" name="{$editor.delimiter.internal}target-format" value="{../target/@format}" />
+      <input type="hidden" name="_target-format" value="{../target/@format}" />
     </xsl:when>
     <xsl:otherwise>
-      <input type="hidden" name="{$editor.delimiter.internal}target-format" value="xml" />
+      <input type="hidden" name="_target-format" value="xml" />
     </xsl:otherwise>
   </xsl:choose>
 
   <!-- ======== send editor session ID to servlet ======== -->
-  <input type="hidden" name="{$editor.delimiter.internal}session" value="{../@session}" />
-  <input type="hidden" name="{$editor.delimiter.internal}action"  value="submit" />
-  <input type="hidden" name="{$editor.delimiter.internal}root"    value="{@var}" />
-  <input type="hidden" name="{$editor.delimiter.internal}webpage">
+  <input type="hidden" name="_session" value="{../@session}" />
+  <input type="hidden" name="_action"  value="submit" />
+  <input type="hidden" name="_root"    value="{@var}" />
+  <input type="hidden" name="_webpage">
     <xsl:attribute name="value">
       <xsl:value-of select="substring-after($RequestURL,$WebApplicationBaseURL)" />
       <xsl:choose>
@@ -273,7 +267,7 @@
     </xsl:choose>
   </xsl:variable>
 
-  <input type="hidden" name="{$editor.delimiter.internal}n-{$var}" value="{$num.visible}" />
+  <input type="hidden" name="_n-{$var}" value="{$num.visible}" />
 
   <table cellspacing="0">
   
@@ -347,9 +341,9 @@
   <xsl:variable name="var.new">
     <xsl:value-of select="$var" />
     <xsl:if test="position() &gt; 1">
-      <xsl:value-of select="$editor.delimiter.pos.start" />
+      <xsl:text>[</xsl:text>
       <xsl:value-of select="position()" />
-      <xsl:value-of select="$editor.delimiter.pos.end" />
+      <xsl:text>]</xsl:text>
     </xsl:if>
   </xsl:variable>
  
@@ -381,7 +375,7 @@
       <td>
         <xsl:choose>
           <xsl:when test="number($num) &lt; number($max)">
-            <input tabindex="999" type="image" name="{$editor.delimiter.internal}p-{$var}-{position()}" src="{$WebApplicationBaseURL}images/pmud-plus.png"/>
+            <input tabindex="999" type="image" name="_p-{$var}-{position()}" src="{$WebApplicationBaseURL}images/pmud-plus.png"/>
           </xsl:when>
           <xsl:otherwise><img src="{$WebApplicationBaseURL}images/pmud-blank.png" border="0" /></xsl:otherwise>
         </xsl:choose>
@@ -389,7 +383,7 @@
       <td>
         <xsl:choose>
           <xsl:when test="number($num) &gt; 1">
-            <input tabindex="999" type="image" name="{$editor.delimiter.internal}m-{$var}-{position()}" src="{$WebApplicationBaseURL}images/pmud-minus.png"/>
+            <input tabindex="999" type="image" name="_m-{$var}-{position()}" src="{$WebApplicationBaseURL}images/pmud-minus.png"/>
           </xsl:when>
           <xsl:otherwise><img src="{$WebApplicationBaseURL}images/pmud-blank.png" border="0" /></xsl:otherwise>
         </xsl:choose>
@@ -397,7 +391,7 @@
       <td>
         <xsl:choose>
           <xsl:when test="(position() &lt; number($num)) or (position() &lt; number($min))">
-            <input tabindex="999" type="image" name="{$editor.delimiter.internal}d-{$var}-{position()}" src="{$WebApplicationBaseURL}images/pmud-down.png"/>
+            <input tabindex="999" type="image" name="_d-{$var}-{position()}" src="{$WebApplicationBaseURL}images/pmud-down.png"/>
           </xsl:when>
           <xsl:otherwise><img src="{$WebApplicationBaseURL}images/pmud-blank.png" border="0" /></xsl:otherwise>
         </xsl:choose>
@@ -405,7 +399,7 @@
       <td>
         <xsl:choose>
           <xsl:when test="position() &gt; 1">
-            <input tabindex="999" type="image" name="{$editor.delimiter.internal}u-{$var}-{position()}" src="{$WebApplicationBaseURL}images/pmud-up.png"/>
+            <input tabindex="999" type="image" name="_u-{$var}-{position()}" src="{$WebApplicationBaseURL}images/pmud-up.png"/>
           </xsl:when>
           <xsl:otherwise><img src="{$WebApplicationBaseURL}images/pmud-blank.png" border="0" /></xsl:otherwise>
         </xsl:choose>
@@ -499,8 +493,8 @@
   
   <!-- ======== handle panel validation conditions ======== -->
   <xsl:for-each select="ancestor::components/panel[@id = current()/include/@ref]/condition|condition">
-    <input type="hidden" name="{$editor.delimiter.internal}cond-{$var}" value="{@id}" />
-    <input type="hidden" name="{$editor.delimiter.internal}sortnr-{$var}" value="{$pos}" />
+    <input type="hidden" name="_cond-{$var}" value="{@id}" />
+    <input type="hidden" name="_sortnr-{$var}" value="{$pos}" />
   </xsl:for-each>
   
 </xsl:template>
@@ -548,11 +542,27 @@
     <xsl:if test="contains('textfield textarea password file list checkbox display bdo ', concat(name(),' '))">
       <!-- ======== hidden field for sorting the entry ======== -->
       <!-- ======== hidden field for identifying entry ======== -->
-      <input type="hidden" name="{$editor.delimiter.internal}sortnr-{$var.new}" value="{$pos}" />
-      <input type="hidden" name="{$editor.delimiter.internal}id@{$var.new}" value="{@id}" />
+      <input type="hidden" name="_sortnr-{$var.new}" value="{$pos}" />
+      <input type="hidden" name="_id@{$var.new}" value="{@id}" />
     </xsl:if>
   </xsl:for-each>
 
+</xsl:template>
+
+<!-- ======== set CSS class|style attributes ======== -->
+<xsl:template name="editor.set.css">
+  <xsl:param name="$class" />
+  
+  <xsl:choose>
+    <xsl:when test="@class|@style">
+      <xsl:copy-of select="@class|@style" />
+    </xsl:when>
+    <xsl:when test="string-length($class) &gt; 0">
+      <xsl:attribute name="class">
+        <xsl:value-of select="$class" />
+      </xsl:attribute>
+    </xsl:when>
+  </xsl:choose>
 </xsl:template>
 
 <xsl:template name="editor.set.anchor">
@@ -613,7 +623,7 @@
 
   <xsl:value-of select="$var" />
   <xsl:if test="(string-length($var) &gt; 0) and (string-length(@var) &gt; 0)">
-    <xsl:value-of select="$editor.delimiter.element" />
+    <xsl:text>/</xsl:text>
   </xsl:if>
   <xsl:call-template name="subst.cond">
     <xsl:with-param name="rest" select="@var" />
@@ -717,20 +727,20 @@
   <xsl:choose>
     <!-- ======== copy all elements, attributes and child elements with current xpath to hidden field ======== -->  
     <xsl:when test="@descendants='true'">
-      <xsl:for-each select="ancestor::editor/input/var[ (@name = $var.new) or ( starts-with(@name,$var.new) and ( starts-with(substring-after(@name,$var.new),$editor.delimiter.element) or starts-with(substring-after(@name,$var.new),$editor.delimiter.pos.start) ) ) ]">
+      <xsl:for-each select="ancestor::editor/input/var[ (@name = $var.new) or ( starts-with(@name,$var.new) and ( starts-with(substring-after(@name,$var.new),'/') or starts-with(substring-after(@name,$var.new),'[') ) ) ]">
         <input type="hidden" name="{@name}" value="{@value}" />
-        <input type="hidden" name="{$editor.delimiter.internal}sortnr-{@name}" value="{$pos.new}.{position()}" />
+        <input type="hidden" name="_sortnr-{@name}" value="{$pos.new}.{position()}" />
       </xsl:for-each>
     </xsl:when>
     <!-- ======== copy single source value to hidden field ======== -->
     <xsl:when test="ancestor::editor/input/var[@name = $var.new]">
       <input type="hidden" name="{$var.new}" value="{ancestor::editor/input/var[@name = $var.new]/@value}" />
-      <input type="hidden" name="{$editor.delimiter.internal}sortnr-{$var.new}" value="{$pos.new}" />
+      <input type="hidden" name="_sortnr-{$var.new}" value="{$pos.new}" />
     </xsl:when>
     <!-- ======== copy default value to hidden field ======== -->
     <xsl:when test="@default">
       <input type="hidden" name="{$var.new}" value="{@default}" />
-      <input type="hidden" name="{$editor.delimiter.internal}sortnr-{$var.new}" value="{$pos.new}" />
+      <input type="hidden" name="_sortnr-{$var.new}" value="{$pos.new}" />
     </xsl:when>
   </xsl:choose>
 
@@ -856,7 +866,7 @@
     <xsl:text>Existierende Datei auf dem Server: </xsl:text>
     <strong><xsl:value-of select="$source" /></strong>
     <br/>
-    <input tabindex="1" type="checkbox" name="{$editor.delimiter.internal}delete-{$var}" value="true" />
+    <input tabindex="1" type="checkbox" name="_delete-{$var}" value="true" />
     <xsl:text> löschen </xsl:text>
     <input type="hidden" name="{$var}" value="{$source}" />
     <xsl:text>und/oder ersetzen durch diese Datei: </xsl:text>
@@ -893,7 +903,7 @@
     <xsl:call-template name="output.label" />
   </xsl:variable>
 
-  <input tabindex="1" type="submit" value="{$label}" name="{$editor.delimiter.internal}s-{@id}-{$var}">
+  <input tabindex="1" type="submit" value="{$label}" name="_s-{@id}-{$var}">
     <xsl:if test="@width">
       <xsl:attribute name="style">width:<xsl:value-of select="@width" /></xsl:attribute>
     </xsl:if>
