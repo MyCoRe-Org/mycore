@@ -94,9 +94,12 @@ public class MCRObjectServlet extends MCRServlet {
             String editorID = getEditorID(job.getRequest());
             setBrowseParameters(job, id, host, editorID);
 
-            if (host == MCRHit.LOCAL)
-                getLayoutService().doLayout(job.getRequest(), job.getResponse(), requestLocalObject(job));
-            else
+            if (host == MCRHit.LOCAL) {
+                final Document localObject = requestLocalObject(job);
+                if (localObject == null)
+                    return;
+                getLayoutService().doLayout(job.getRequest(), job.getResponse(), localObject);
+            } else
                 getLayoutService().doLayout(job.getRequest(), job.getResponse(), requestRemoteObject(job));
         } catch (MCRException e) {
             generateErrorPage(job.getRequest(), job.getResponse(), HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error while retrieving MCRObject with ID: "
