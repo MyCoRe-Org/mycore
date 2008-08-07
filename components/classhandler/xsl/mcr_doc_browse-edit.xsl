@@ -535,7 +535,7 @@
                         <td>
                           <form action="{$WebApplicationBaseURL}servlets/MCRStartClassEditorServlet{$HttpSession}" method="get">
                             <input type="hidden" name="path" value='{$path}' />
-                            <input type="hidden" name="clid" value='' />
+                            <input type="hidden" name="clid" value='{$classifID}' />
                             <input type="hidden" name="todo" value='purge-all' />
                             <input type="submit" class="button" name="purgeAll" value="{i18n:translate('component.classhandler.browse.discardClass')}" />
                           </form>
