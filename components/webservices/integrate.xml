@@ -63,6 +63,7 @@
     <taskdef name="axis-java2wsdl"
              classname="org.apache.axis.tools.ant.wsdl.Java2WsdlAntTask"
              classpathref="integration.classpath" />
+    <mkdir dir="${build.config}" />
     <axis-java2wsdl classname="org.mycore.services.webservices.MCRWS"
                     namespace="wsclient.services.mycore.org"
                     location="${wsurl}"
@@ -107,7 +108,7 @@ java -Xms128m -Xmx512m -classpath "${AXISCLASSPATH}" org.mycore.services.wsclien
     </echo>
     <chmod file="${build.bin}/wsclient.sh" perm="755" />
   </target>
-  
+
   <!-- - - - - - - - - - - - - - - - - - 
           target: deploy                      
          - - - - - - - - - - - - - - - - - -->
@@ -147,5 +148,5 @@ java -Xms128m -Xmx512m -classpath "${AXISCLASSPATH}" org.mycore.services.wsclien
                 username="${MCR.WebService.Admin}"
                 password="${MCR.WebService.AdminPasswd}" />
   </target>
-  
+
 </project>
