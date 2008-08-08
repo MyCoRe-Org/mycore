@@ -116,8 +116,8 @@
       <xsl:when test="descendant::file">
         <xsl:text>post</xsl:text>
       </xsl:when>
-      <xsl:when test="../target/@method">
-        <xsl:value-of select="../target/@method" />
+      <xsl:when test="target/@method">
+        <xsl:value-of select="target/@method" />
       </xsl:when>
       <xsl:otherwise>
         <xsl:text>post</xsl:text>
@@ -137,8 +137,8 @@
 
   <!-- ======== target type servlet or url or xml display ======== -->
   <xsl:choose>
-    <xsl:when test="../target/@type">
-      <input type="hidden" name="_target-type" value="{../target/@type}" />
+    <xsl:when test="target/@type">
+      <input type="hidden" name="_target-type" value="{target/@type}" />
     </xsl:when>
     <xsl:otherwise>
       <input type="hidden" name="_target-type" value="display" />
@@ -146,24 +146,24 @@
   </xsl:choose>
 
   <!-- ======== target url ======== -->
-  <xsl:if test="../target/@url">
+  <xsl:if test="target/@url">
     <xsl:variable name="url">
         <xsl:call-template name="UrlAddSession">
-            <xsl:with-param name="url" select="../target/@url" />
+            <xsl:with-param name="url" select="target/@url" />
         </xsl:call-template>
     </xsl:variable>
     <input type="hidden" name="_target-url" value="{$url}" />
   </xsl:if>
 
   <!-- ======== target servlet name ======== -->
-  <xsl:if test="../target/@name">
-    <input type="hidden" name="_target-name" value="{../target/@name}" />
+  <xsl:if test="target/@name">
+    <input type="hidden" name="_target-name" value="{target/@name}" />
   </xsl:if>
 
   <!-- ======== target output format xml or name=value ======== -->
   <xsl:choose>
-    <xsl:when test="../target/@format">
-      <input type="hidden" name="_target-format" value="{../target/@format}" />
+    <xsl:when test="target/@format">
+      <input type="hidden" name="_target-format" value="{target/@format}" />
     </xsl:when>
     <xsl:otherwise>
       <input type="hidden" name="_target-format" value="xml" />
@@ -171,7 +171,7 @@
   </xsl:choose>
 
   <!-- ======== send editor session ID to servlet ======== -->
-  <input type="hidden" name="_session" value="{../@session}" />
+  <input type="hidden" name="_session" value="{@session}" />
   <input type="hidden" name="_action"  value="submit" />
   <input type="hidden" name="_root"    value="{@var}" />
   <input type="hidden" name="_webpage">
@@ -191,12 +191,12 @@
   </input>
 
   <!-- ======== durchreichen der target parameter ======== -->
-  <xsl:for-each select="../target-parameters/target-parameter">
+  <xsl:for-each select="target-parameters/target-parameter">
     <input type="hidden" name="{@name}" value="{text()}" />
   </xsl:for-each>
 
   <!-- ======== Cancel URL durchreichen ======== -->
-  <input type="hidden" name="_cancelURL" value="{../cancel/@url}" />
+  <input type="hidden" name="_cancelURL" value="{cancel/@url}" />
 </xsl:template>
 
 <!-- ======== headline ======== -->
