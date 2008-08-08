@@ -622,6 +622,9 @@
   </xsl:variable>
 
   <input tabindex="9999" type="button" onClick="window.open('{$url}','help','{$properties}');">
+    <xsl:call-template name="editor.set.css">
+      <xsl:with-param name="class" select="button" />
+    </xsl:call-template>
     <xsl:attribute name="value">
       <xsl:choose>
         <xsl:when test="button[lang($CurrentLang)]">
