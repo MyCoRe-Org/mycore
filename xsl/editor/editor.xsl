@@ -71,10 +71,10 @@
 
 <xsl:template match="editor">
   <form>
-    <xsl:call-template name="editor.set.form.attrib" />    
     <xsl:call-template name="editor.set.css">
       <xsl:with-param name="class" select="'editor'" />
     </xsl:call-template>
+    <xsl:call-template name="editor.set.form.attrib" />    
     <fieldset>
       <xsl:call-template name="editor.set.css">
         <xsl:with-param name="class" select="'editor'" />
