@@ -485,8 +485,8 @@
 
     <!-- ======== handle nested component (textfield, textarea, ...) ======== -->
     <xsl:apply-templates select=".">
-      <xsl:with-param name="var"      select="$var.new"  />
-      <xsl:with-param name="pos"      select="$pos"      />
+      <xsl:with-param name="var" select="$var.new" />
+      <xsl:with-param name="pos" select="$pos"     />
     </xsl:apply-templates>
 
     <!-- ======== show failed input validation message ======== -->
@@ -633,7 +633,9 @@
         <xsl:when test="button">
           <xsl:value-of select="button"/>
         </xsl:when>
-        <xsl:otherwise> ? </xsl:otherwise>
+        <xsl:otherwise>
+          <xsl:value-of select="i18n:translate('editor.helpButton')" />
+        </xsl:otherwise>
       </xsl:choose>
     </xsl:attribute>
   </input>
@@ -820,12 +822,16 @@
   
   <!-- ======== if older value exists, display controls to delete old file ======== -->
   <xsl:if test="string-length($source) != 0">
-    <label class="label">Existierende Datei auf dem Server: </label>
+    <label class="label">
+      <xsl:value-of select="i18n:translate('editor.fileExists')" />:<xsl:text />
+    </label>
     <span class="output"><xsl:value-of select="$source" /></span>
     <br/>
     <input type="hidden" name="{$var}" value="{$source}" />
     <input id="del-{$var}" tabindex="1" type="checkbox" class="checkbox" name="_delete-{$var}" value="true" />
-    <label class="label" for="del-{$var}"> löschen und/oder ersetzen durch diese Datei: </label>
+    <label class="label" for="del-{$var}">
+      <xsl:value-of select="i18n:translate('editor.fileDelete')" />:<xsl:text />
+    </label>
     <br/>
   </xsl:if>
 
