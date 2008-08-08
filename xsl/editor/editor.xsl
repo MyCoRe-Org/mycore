@@ -516,15 +516,16 @@
   <xsl:param name="class" />
   
   <xsl:choose>
-    <xsl:when test="@class|@style">
-      <xsl:copy-of select="@class|@style" />
+    <xsl:when test="@class">
+      <xsl:copy-of select="@class" />
     </xsl:when>
-    <xsl:when test="string-length($class) &gt; 0">
+    <xsl:otherwise>
       <xsl:attribute name="class">
         <xsl:value-of select="$class" />
       </xsl:attribute>
-    </xsl:when>
+    </xsl:otherwise>
   </xsl:choose>
+  <xsl:copy-of select="@style" />
 </xsl:template>
 
 <xsl:template name="editor.set.anchor">
