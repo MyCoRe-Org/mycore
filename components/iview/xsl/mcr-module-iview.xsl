@@ -825,7 +825,7 @@
                         <option value="{$switchURLPrefix}/{name/text()}">
                             <xsl:choose>
                                 <xsl:when test="$currentNodePosition+1 = position()">
-                                    <xsl:attribute name="selected" value="selected" />
+                                    <xsl:attribute name="selected">selected</xsl:attribute>
                                     <xsl:value-of select="concat(position(),'/',count(/mcr-module/iview/content/nodes/node[@type='file']))" />
                                 </xsl:when>
                                 <xsl:otherwise>
