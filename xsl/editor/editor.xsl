@@ -515,7 +515,7 @@
 
 <!-- ======== set CSS class|style attributes ======== -->
 <xsl:template name="editor.set.css">
-  <xsl:param name="$class" />
+  <xsl:param name="class" />
   
   <xsl:choose>
     <xsl:when test="@class|@style">
