@@ -1042,14 +1042,14 @@
         <xsl:attribute name="checked">checked</xsl:attribute>
       </xsl:when>
     </xsl:choose>
-    <xsl:for-each select="../list">
+    <xsl:for-each select="parent::list">
       <xsl:call-template name="editor.set.css">
         <xsl:with-param name="class" select="'editorRadio'" />
       </xsl:call-template>
     </xsl:for-each>    
   </input>
   <label for="radio-{$var}">
-    <xsl:for-each select="../list">
+    <xsl:for-each select="parent::list">
       <xsl:call-template name="editor.set.css">
         <xsl:with-param name="class" select="'editorRadio'" />
       </xsl:call-template>
@@ -1072,14 +1072,14 @@
         <xsl:attribute name="checked">checked</xsl:attribute>
       </xsl:when>
     </xsl:choose>
-    <xsl:for-each select="../list">
+    <xsl:for-each select="parent::list">
       <xsl:call-template name="editor.set.css">
         <xsl:with-param name="class" select="'editorCheckbox'" />
       </xsl:call-template>
     </xsl:for-each>    
   </input>
   <label for="check-{$var}">
-    <xsl:for-each select="../list">
+    <xsl:for-each select="parent::list">
       <xsl:call-template name="editor.set.css">
         <xsl:with-param name="class" select="'editorCheckbox'" />
       </xsl:call-template>
