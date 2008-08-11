@@ -623,7 +623,7 @@
 
   <input tabindex="9999" type="button" onClick="window.open('{$url}','help','{$properties}');">
     <xsl:call-template name="editor.set.css">
-      <xsl:with-param name="class" select="editorButton" />
+      <xsl:with-param name="class" select="'editorButton'" />
     </xsl:call-template>
     <xsl:attribute name="value">
       <xsl:choose>
@@ -769,7 +769,7 @@
     <input tabindex="1" type="text" size="{@width}" name="{$var}" value="{$value}">
       <xsl:copy-of select="@maxlength" />
       <xsl:call-template name="editor.set.css">
-        <xsl:with-param name="class" select="editorTextfield" />
+        <xsl:with-param name="class" select="'editorTextfield'" />
       </xsl:call-template>
     </input>
   </xsl:if>
@@ -1033,7 +1033,7 @@
   <xsl:param name="var"     />
   <xsl:param name="default" />
 
-  <input id="radio-{$var}" tabindex="1" type="radio" name="{$var}" value="@value}">
+  <input id="radio-{$var}" tabindex="1" type="radio" name="{$var}" value="{@value}">
     <xsl:choose>
       <xsl:when test="ancestor::editor/input/var[((@name=$var) or starts-with(@name,concat($var,'['))) and (@value=current()/@value)]">
         <xsl:attribute name="checked">checked</xsl:attribute>
