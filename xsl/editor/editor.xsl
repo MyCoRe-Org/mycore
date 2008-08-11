@@ -203,7 +203,7 @@
 <xsl:template match="headline">
   <legend>
     <xsl:call-template name="editor.set.css">
-      <xsl:with-param name="class" select="'headline'" />
+      <xsl:with-param name="class" select="'editorHeadline'" />
     </xsl:call-template>
     <xsl:apply-templates select="text | output">
       <xsl:with-param name="var" select="../@var" />
@@ -213,7 +213,7 @@
 
 <!-- ======== validation errors exist ======== -->
 <xsl:template match="failed">
-  <div class="message">
+  <div class="editorMessage">
     <xsl:for-each select="ancestor::editor/validationMessage">
       <xsl:call-template name="output.label" />
     </xsl:for-each>
@@ -269,7 +269,7 @@
 
   <table>
     <xsl:call-template name="editor.set.css">
-      <xsl:with-param name="class" select="'repeater'" />
+      <xsl:with-param name="class" select="'editorRepeater'" />
     </xsl:call-template>
   
     <xsl:for-each select="$nodes[(position() &lt;= number($min)) or (position() &lt;= number($num))]">
@@ -327,7 +327,7 @@
   </xsl:variable>
  
   <td>
-    <a class="anchor" name="rep{translate($var.new,'/@[]','____')}" />
+    <a class="editorAnchor" name="rep{translate($var.new,'/@[]','____')}" />
     <xsl:for-each select="$rep">  
       <xsl:call-template name="cell">
         <xsl:with-param name="var"   select="$var.new" />
@@ -344,22 +344,22 @@
   <xsl:param name="min" />
   <xsl:param name="max" />
 
-  <td class="pmud">
+  <td class="editorPMUD">
     <xsl:if test="number($num) &lt; number($max)">
       <input tabindex="999" type="image" name="_p-{$var}-{position()}" src="{$WebApplicationBaseURL}images/pmud-plus.png"/>
     </xsl:if>
   </td>
-  <td class="pmud">
+  <td class="editorPMUD">
     <xsl:if test="number($num) &gt; 1">
       <input tabindex="999" type="image" name="_m-{$var}-{position()}" src="{$WebApplicationBaseURL}images/pmud-minus.png"/>
     </xsl:if>
   </td>
-  <td class="pmud">
+  <td class="editorPMUD">
     <xsl:if test="(position() &lt; number($num)) or (position() &lt; number($min))">
       <input tabindex="999" type="image" name="_d-{$var}-{position()}" src="{$WebApplicationBaseURL}images/pmud-down.png"/>
     </xsl:if>
   </td>
-  <td class="pmud">
+  <td class="editorPMUD">
     <xsl:if test="position() &gt; 1">
       <input tabindex="999" type="image" name="_u-{$var}-{position()}" src="{$WebApplicationBaseURL}images/pmud-up.png"/>
     </xsl:if>
@@ -376,7 +376,7 @@
 
   <table>
     <xsl:call-template name="editor.set.css">
-      <xsl:with-param name="class" select="'panel'" />
+      <xsl:with-param name="class" select="'editorPanel'" />
     </xsl:call-template>
     <xsl:if test="ancestor::editor/failed/field[@sortnr=$pos]">
       <xsl:attribute name="class">editorValidationFailed</xsl:attribute>
@@ -473,7 +473,7 @@
   <!-- ======== set align / valign / css ======== -->
   <xsl:call-template name="editor.set.anchor" />
   <xsl:call-template name="editor.set.css">
-    <xsl:with-param name="class" select="'cell'" />
+    <xsl:with-param name="class" select="'editorCell'" />
   </xsl:call-template>
 
   <!-- ======== handle referenced or embedded component ======== -->
@@ -623,7 +623,7 @@
 
   <input tabindex="9999" type="button" onClick="window.open('{$url}','help','{$properties}');">
     <xsl:call-template name="editor.set.css">
-      <xsl:with-param name="class" select="button" />
+      <xsl:with-param name="class" select="editorButton" />
     </xsl:call-template>
     <xsl:attribute name="value">
       <xsl:choose>
@@ -697,7 +697,7 @@
 
 <!-- ======== label text ======== -->
 <xsl:template match="text">
-  <label class="text">
+  <label class="editorText">
     <xsl:call-template name="output.label" />
   </label>
 </xsl:template>
@@ -706,7 +706,7 @@
 <xsl:template match="display">
   <xsl:param name="var" />
   
-  <span class="output">
+  <span class="editorOutput">
     <xsl:choose>
       <xsl:when test="ancestor::editor/input/var[@name = $var]">
         <input type="hidden" name="{$var}" value="{ancestor::editor/input/var[@name = $var]/@value}" />
@@ -732,7 +732,7 @@
   <!-- ======== get the value of this field from xml source ======== -->
   <xsl:variable name="selected.cell" select="ancestor::editor/input/var[@name=$var.new]" />
   
-  <span class="output">
+  <span class="editorOutput">
     <xsl:choose>
       <xsl:when test="$selected.cell">
         <xsl:value-of select="$selected.cell/@value" disable-output-escaping="yes" />
@@ -769,7 +769,7 @@
     <input tabindex="1" type="text" size="{@width}" name="{$var}" value="{$value}">
       <xsl:copy-of select="@maxlength" />
       <xsl:call-template name="editor.set.css">
-        <xsl:with-param name="class" select="textfield" />
+        <xsl:with-param name="class" select="editorTextfield" />
       </xsl:call-template>
     </input>
   </xsl:if>
@@ -790,7 +790,7 @@
           </xsl:if>
         </xsl:when>
         <xsl:otherwise>
-          <xsl:text>class="textarea" </xsl:text>
+          <xsl:text>class="editorTextarea" </xsl:text>
         </xsl:otherwise>
       </xsl:choose>
       <xsl:text disable-output-escaping="yes">&gt;</xsl:text>
@@ -825,14 +825,14 @@
   
   <!-- ======== if older value exists, display controls to delete old file ======== -->
   <xsl:if test="string-length($source) != 0">
-    <label class="label">
+    <label class="editorLabel">
       <xsl:value-of select="i18n:translate('editor.fileExists')" />:<xsl:text />
     </label>
-    <span class="output"><xsl:value-of select="$source" /></span>
+    <span class="editorOutput"><xsl:value-of select="$source" /></span>
     <br/>
     <input type="hidden" name="{$var}" value="{$source}" />
-    <input id="del-{$var}" tabindex="1" type="checkbox" class="checkbox" name="_delete-{$var}" value="true" />
-    <label class="label" for="del-{$var}">
+    <input id="del-{$var}" tabindex="1" type="checkbox" class="editorCheckbox" name="_delete-{$var}" value="true" />
+    <label class="editorLabel" for="del-{$var}">
       <xsl:value-of select="i18n:translate('editor.fileDelete')" />:<xsl:text />
     </label>
     <br/>
@@ -841,7 +841,7 @@
   <input tabindex="1" type="file" size="{@width}" name="{$var}">
     <xsl:copy-of select="@accept|@maxlength" />
     <xsl:call-template name="editor.set.css">
-      <xsl:with-param name="class" select="'file'" />
+      <xsl:with-param name="class" select="'editorFile'" />
     </xsl:call-template>
   </input>
 </xsl:template>
@@ -857,7 +857,7 @@
 
   <input tabindex="1" type="password" size="{@width}" value="{$source}" name="{$var}">
     <xsl:call-template name="editor.set.css">
-      <xsl:with-param name="class" select="'password'" />
+      <xsl:with-param name="class" select="'editorPassword'" />
     </xsl:call-template>
   </input>
 </xsl:template>
@@ -867,7 +867,7 @@
   <xsl:param name="var" />
   <input tabindex="1" type="submit" name="_s-{@id}-{$var}">
     <xsl:call-template name="editor.set.css">
-      <xsl:with-param name="class" select="'button'" />
+      <xsl:with-param name="class" select="'editorButton'" />
     </xsl:call-template>
     <xsl:attribute name="value">
       <xsl:call-template name="output.label" />
@@ -904,7 +904,7 @@
   <xsl:param name="url"   />
   <input tabindex="999" type="button" onClick="self.location.href='{$url}'">
     <xsl:call-template name="editor.set.css">
-      <xsl:with-param name="class" select="'button'" />
+      <xsl:with-param name="class" select="'editorButton'" />
     </xsl:call-template>
     <xsl:attribute name="value">
       <xsl:call-template name="output.label" />
@@ -916,7 +916,7 @@
 <xsl:template match="submitButton">
   <input tabindex="1" type="submit">
     <xsl:call-template name="editor.set.css">
-      <xsl:with-param name="class" select="'button'" />
+      <xsl:with-param name="class" select="'editorButton'" />
     </xsl:call-template>
     <xsl:attribute name="value">
       <xsl:call-template name="output.label" />
@@ -988,7 +988,7 @@
 
   <table>
     <xsl:call-template name="editor.set.css">
-      <xsl:with-param name="class" select="'list'" />
+      <xsl:with-param name="class" select="'editorList'" />
     </xsl:call-template>
     <xsl:for-each select="item">
 
@@ -1044,14 +1044,14 @@
     </xsl:choose>
     <xsl:for-each select="../list">
       <xsl:call-template name="editor.set.css">
-        <xsl:with-param name="class" select="'radio'" />
+        <xsl:with-param name="class" select="'editorRadio'" />
       </xsl:call-template>
     </xsl:for-each>    
   </input>
   <label for="radio-{$var}">
     <xsl:for-each select="../list">
       <xsl:call-template name="editor.set.css">
-        <xsl:with-param name="class" select="'radio'" />
+        <xsl:with-param name="class" select="'editorRadio'" />
       </xsl:call-template>
     </xsl:for-each>    
     <xsl:call-template name="output.label" />
@@ -1074,14 +1074,14 @@
     </xsl:choose>
     <xsl:for-each select="../list">
       <xsl:call-template name="editor.set.css">
-        <xsl:with-param name="class" select="'checkbox'" />
+        <xsl:with-param name="class" select="'editorCheckbox'" />
       </xsl:call-template>
     </xsl:for-each>    
   </input>
   <label for="check-{$var}">
     <xsl:for-each select="../list">
       <xsl:call-template name="editor.set.css">
-        <xsl:with-param name="class" select="'checkbox'" />
+        <xsl:with-param name="class" select="'editorCheckbox'" />
       </xsl:call-template>
     </xsl:for-each>    
     <xsl:call-template name="output.label" />
@@ -1107,12 +1107,12 @@
       </xsl:when>
     </xsl:choose>
     <xsl:call-template name="editor.set.css">
-      <xsl:with-param name="class" select="'checkbox'" />
+      <xsl:with-param name="class" select="'editorCheckbox'" />
     </xsl:call-template>
   </input>
   <label for="check-{$var}">
     <xsl:call-template name="editor.set.css">
-      <xsl:with-param name="class" select="'checkbox'" />
+      <xsl:with-param name="class" select="'editorCheckbox'" />
     </xsl:call-template>
     <xsl:call-template name="output.label" />
   </label>
@@ -1154,7 +1154,7 @@
     </xsl:if>
 
     <xsl:call-template name="editor.set.css">
-      <xsl:with-param name="class" select="'list'" />
+      <xsl:with-param name="class" select="'editorList'" />
     </xsl:call-template>
     
     <xsl:choose>
