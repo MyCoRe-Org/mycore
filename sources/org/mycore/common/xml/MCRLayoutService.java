@@ -40,6 +40,7 @@ import java.util.StringTokenizer;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import javax.xml.transform.ErrorListener;
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
 import javax.xml.transform.Templates;
@@ -127,6 +128,19 @@ public class MCRLayoutService implements org.apache.xalan.trace.TraceListener {
 
         factory = (SAXTransformerFactory) (tf);
         factory.setURIResolver(MCRURIResolver.instance());
+        factory.setErrorListener(new ErrorListener() {
+            public void error(TransformerException ex) {
+                LOGGER.error(ex.getMessageAndLocation());
+                throw new MCRException("Error in transformer factory", ex);
+            }
+            public void fatalError(TransformerException ex) {
+                LOGGER.error(ex.getMessageAndLocation());
+                throw new MCRException("Fatal error in transformer factory", ex);
+            }
+            public void warning(TransformerException ex) {
+                LOGGER.warn(ex.getMessageAndLocation());
+            }
+        });
 
         MessageHandler.setScreenLogger(FOPLOG);
     }
