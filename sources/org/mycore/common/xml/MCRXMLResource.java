@@ -23,7 +23,10 @@
  **/
 package org.mycore.common.xml;
 
+import java.io.BufferedInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
 
@@ -34,6 +37,7 @@ import org.jdom.input.SAXBuilder;
 
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRConfiguration;
+import org.mycore.common.MCRUtils;
 
 /**
  * provides a cache for reading XML resources.
@@ -67,7 +71,7 @@ public class MCRXMLResource {
     }
 
     /**
-     * returns document using ClassLoader of MCRXMLResource class
+     * Returns JDOM Document using ClassLoader of MCRXMLResource class
      * 
      * @param name
      *            resource name
@@ -78,7 +82,18 @@ public class MCRXMLResource {
     }
 
     /**
-     * returns parsed XML resource as Document.
+     * returns xml as byte array using ClassLoader of MCRXMLResource class
+     * 
+     * @param name
+     *            resource name
+     * @see MCRXMLResource#getRawResource(String, ClassLoader)
+     */
+    public byte[] getRawResource(String name) throws IOException {
+        return getRawResource(name, this.getClass().getClassLoader());
+    }
+    
+    /**
+     * Returns parsed XML resource as JDOM Document.
      * 
      * A cache is used to avoid reparsing if the source of the resource did not
      * change.
@@ -112,6 +127,30 @@ public class MCRXMLResource {
         return entry.doc;
     }
 
+    /**
+     * Returns raw XML resource as byte array. Note that no cache will be used.
+     * 
+     * @param name
+     *            the resource name
+     * @param classLoader
+     *            a ClassLoader that should be used to locate the resource
+     * @return unparsed xml of the resource or <code>null</code> if the
+     *         resource is not found
+     * @throws IOException
+     *             if resource cannot be loaded
+     */
+    public byte[] getRawResource(String name, ClassLoader classLoader) throws IOException {
+        URLConnection con = getResourceURLConnection(name, classLoader);
+        if (con == null)
+            return null;
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        InputStream in = new BufferedInputStream(con.getInputStream());
+        MCRUtils.copyStream(in, baos);
+        in.close();
+        baos.close();
+        return baos.toByteArray();
+    }
+
     private URLConnection getResourceURLConnection(String name, ClassLoader classLoader) throws IOException {
         LOGGER.debug("Reading xml from classpath resource " + name);
         URL url = classLoader.getResource(name);
@@ -141,8 +180,6 @@ public class MCRXMLResource {
 
     private static class CacheEntry {
         URL resourceURL;
-
         Document doc;
     }
-
 }

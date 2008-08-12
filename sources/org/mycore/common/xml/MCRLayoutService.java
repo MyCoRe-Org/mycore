@@ -43,6 +43,7 @@ import javax.servlet.http.HttpSession;
 import javax.xml.transform.ErrorListener;
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
+import javax.xml.transform.SourceLocator;
 import javax.xml.transform.Templates;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
@@ -64,6 +65,7 @@ import org.apache.xalan.trace.GenerateEvent;
 import org.apache.xalan.trace.SelectionEvent;
 import org.apache.xalan.trace.TraceManager;
 import org.apache.xalan.trace.TracerEvent;
+import org.apache.xml.utils.WrappedRuntimeException;
 import org.jdom.Document;
 import org.jdom.transform.JDOMResult;
 import org.jdom.transform.JDOMSource;
@@ -76,7 +78,6 @@ import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.MCRUsageException;
 import org.mycore.common.MCRUtils;
 import org.mycore.datamodel.ifs.MCRContentInputStream;
 import org.mycore.frontend.servlets.MCRServlet;
@@ -130,11 +131,9 @@ public class MCRLayoutService implements org.apache.xalan.trace.TraceListener {
         factory.setURIResolver(MCRURIResolver.instance());
         factory.setErrorListener(new ErrorListener() {
             public void error(TransformerException ex) {
-                LOGGER.error(ex.getMessageAndLocation());
                 throw new MCRException("Error in transformer factory", ex);
             }
             public void fatalError(TransformerException ex) {
-                LOGGER.error(ex.getMessageAndLocation());
                 throw new MCRException("Fatal error in transformer factory", ex);
             }
             public void warning(TransformerException ex) {
@@ -439,15 +438,11 @@ public class MCRLayoutService implements org.apache.xalan.trace.TraceListener {
         }
         if (stylesheet == null) {
             try {
-                final Document styleDoc = XML_RESOURCE.getResource(resource, this.getClass().getClassLoader());
-                stylesheet = factory.newTemplates(new JDOMSource(styleDoc));
+                byte[] bytes = XML_RESOURCE.getRawResource(resource, this.getClass().getClassLoader());
+                stylesheet = factory.newTemplates(new StreamSource(new ByteArrayInputStream(bytes)));
                 LOGGER.debug("MCRLayoutService compiled stylesheet resource " + resource);
-            } catch (TransformerConfigurationException exc) {
-                String msg = "Error while compiling XSL stylesheet " + resource + ": " + exc.getMessageAndLocation();
-                throw new MCRConfigurationException(msg, exc);
             } catch (Exception exc) {
-                String msg = "Error while compiling XSL stylesheet " + resource;
-                throw new MCRConfigurationException(msg, exc);
+                reportCompileError(resource, exc);
             }
             STYLESHEETS_CACHE.put(resource, stylesheet);
         } else {
@@ -455,6 +450,49 @@ public class MCRLayoutService implements org.apache.xalan.trace.TraceListener {
         }
 
         return stylesheet;
+    }
+
+    private void reportCompileError(String resource, Exception exc) {
+        StringBuffer msg = new StringBuffer( "Error compiling XSL stylesheet " );
+        msg.append( resource );
+        
+        while( exc != null )
+        {
+          if( exc instanceof MCRException )
+          {
+            MCRException mex = (MCRException)exc;
+            msg.append( "\n" ).append( mex.getMessage() );
+            exc = mex.getException();
+          }
+          else if( exc instanceof TransformerException )
+          {
+            TransformerException tex = (TransformerException)exc;
+            msg.append( "\n" ).append( tex.getMessage() );
+            SourceLocator sl = tex.getLocator();
+            if( sl != null )
+                msg.append( " at line " ).append( sl.getLineNumber() ).append( " column " ).append( sl.getColumnNumber() );
+            
+            if( tex.getCause() instanceof Exception ) 
+                exc = (Exception)( tex.getCause() );
+            else 
+                exc = null;
+          }
+          else if( exc instanceof WrappedRuntimeException )
+          {
+            exc = ((WrappedRuntimeException)exc).getException();
+          }
+          else
+          {
+            msg.append( "\n" ).append( exc.getMessage() );
+            if( exc.getCause() instanceof Exception )
+              exc = (Exception)( exc.getCause() );
+            else
+              exc = null;
+          }
+        }
+        
+        LOGGER.error( msg );
+        throw new MCRConfigurationException(msg.toString(), exc);
     }
 
     /**
