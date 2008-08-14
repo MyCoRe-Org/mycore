@@ -61,6 +61,7 @@
 											<xs:documentation>if source=objectCategory, the ID of the classification where the categories come from</xs:documentation>
 										</xs:annotation>
 									</xs:attribute>
+									<xs:attribute name="addable" type="xs:string" use="optional"/>
 								</xs:complexType>
 							</xs:element>
 						</xs:sequence>
