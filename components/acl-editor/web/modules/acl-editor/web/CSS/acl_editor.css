@@ -2,8 +2,9 @@ form#createNewPermForm #createNewRule{
 		display: none;
 }
 
-form#createNewRule{
-		display: none;
+div#createNewRule{
+	margin-top: 10px;
+		border: solid 1px;
 }
 
 tr#mapping_head, tr#rule_head{
@@ -12,4 +13,95 @@ tr#mapping_head, tr#rule_head{
 
 .deleted {
 	text-decoration: line-through;
+}
+
+div.visButton {
+	background-color: gray;
+	/*padding: 1px;*/
+	color: white;
+	width:11px;
+	height:11px;
+	text-align: center;
+	vertical-align: middle;
+	padding-bottom: 4px;
+	font-weight: bold;
+	
+}
+
+div.visButton:hover {
+	background-color: #14516E;
+	cursor: pointer;
+}
+
+div.button {
+	background-color: gray;
+	/*padding: 1px;*/
+	color: white;
+	width:auto;
+	height:auto;
+	text-align: center;
+	vertical-align: middle;
+	padding-bottom: 4px;
+	font-weight: bold;
+	float: left;
+	margin: 2px;
+	padding: 2px;
+}
+
+div.button:hover {
+	background-color: #14516E;
+	cursor: pointer;
+}
+
+div.markAllDel {
+	float:right;
+	margin-right:7px;
+}
+
+tr#delAllBox td{
+	text-align: right;
+	padding-right: 7px;	
+	padding-top: 10px;
+	padding-bottom: 15px;
+}
+
+tr#delAllBox td#openAll, tr#delAllBox td#delButton{
+	text-align: left;
+}
+
+#rule_table {
+	width:100%;
+}
+
+tr#delButton td{
+	border-top: solid 1px;
+	padding-top: 10px;
+	padding-bottom: 15px;
+}
+
+td#delInactiv {
+		color: gray;
+}
+td#delInactiv {
+	cursor: pointer;
+}
+
+td#delInactiv:hover div{
+	display: block;
+}
+
+div.delInfo {
+	color: black;
+	position: absolute;
+	margin-top: -45px;
+	right: 30px;
+	border: solid 1px;
+	background-color: #f5f0ed;
+	display: none;
+	padding: 10px;
+}
+
+tr.ruleField {
+	display: none;
+	visibility: collapse;
 }

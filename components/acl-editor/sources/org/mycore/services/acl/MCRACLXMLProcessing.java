@@ -112,6 +112,7 @@ public class MCRACLXMLProcessing {
 
     public Element ruleSet2XML(List ruleList) {
         Element mcrAccessRuleSet = new Element("mcr_access_rule_set");
+        MCRACLHIBAccess HIBA = new MCRACLHIBAccess();
 
         if (ruleList == null) {
             MCRACCESSRULE emptyRule = new MCRACCESSRULE();
@@ -130,7 +131,8 @@ public class MCRACLXMLProcessing {
 
             mcrAccessRule.addContent(new Element("RuleStyle").addContent("plain"));
 
-            mcrAccessRule.addContent(new Element("RID").addContent(rule.getRid()));
+            String rid = rule.getRid();
+            mcrAccessRule.addContent(new Element("RID").addContent(rid));
             mcrAccessRule.addContent(new Element("RULE").addContent(rule.getRule()));
 
             String descr = rule.getDescription();
@@ -139,6 +141,12 @@ public class MCRACLXMLProcessing {
                 mcrAccessRule.addContent(new Element("DESCRIPTION").addContent(descr));
             else
                 mcrAccessRule.addContent(new Element("DESCRIPTION").addContent(""));
+
+            if (HIBA.ruleIsInUse(rid).isEmpty()) {
+                mcrAccessRule.addContent(new Element("inUse").addContent("false"));
+            } else {
+                mcrAccessRule.addContent(new Element("inUse").addContent("true"));
+            }
 
             mcrAccessRuleSet.addContent(mcrAccessRule);
 
@@ -164,8 +172,6 @@ public class MCRACLXMLProcessing {
         String ruleStyle = "";
 
         List rulesList = editedRulesRoot.getChildren();
-
-        
 
         Iterator iterator = rulesList.iterator();
         while (iterator.hasNext()) {

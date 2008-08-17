@@ -6,6 +6,7 @@ import java.io.StringReader;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -20,6 +21,7 @@ import org.mycore.access.MCRAccessInterface;
 import org.mycore.access.mcrimpl.MCRAccessControlSystem;
 import org.mycore.access.mcrimpl.MCRAccessStore;
 import org.mycore.access.mcrimpl.MCRRuleMapping;
+import org.mycore.backend.hibernate.tables.MCRACCESS;
 import org.mycore.backend.hibernate.tables.MCRACCESSRULE;
 
 import com.ibm.icu.util.StringTokenizer;
@@ -34,6 +36,7 @@ public class MCRAclEditorStdImpl extends MCRAclEditor {
      **************************************************************************/
     @Override
     public Element getACLEditor(HttpServletRequest request) {
+        LOGGER.debug("Request String: " + request.getQueryString());
         Element aclEditor = ACLEditor();
         String type = request.getParameter("editor");
         String cmd = request.getParameter("cmd");
@@ -86,6 +89,10 @@ public class MCRAclEditorStdImpl extends MCRAclEditor {
             elem = processPermSubmission(request);
         else if (action.equals("submitRule"))
             elem = processRuleSubmission(request);
+        else if (action.equals("delAllRules"))
+            elem = deleteAllRules(request);
+        else if (action.equals("delAllPerms"))
+            elem = deleteAllPerms(request);
 
         return elem;
     }
@@ -103,14 +110,13 @@ public class MCRAclEditorStdImpl extends MCRAclEditor {
         String cmd = request.getParameter("cmd");
 
         String redirectURL = request.getParameter("redir");
-        
+
         LOGGER.debug("Redirect: " + redirectURL);
         LOGGER.debug("ObjId: " + objidFilter);
         LOGGER.debug("AcPool: " + acpoolFilter);
 
         Element permEditor = getPermission(objidFilter, acpoolFilter);
 
-        
         if (redirectURL != null && !redirectURL.equals(""))
             permEditor.addContent(redirect(redirectURL));
 
@@ -149,9 +155,6 @@ public class MCRAclEditorStdImpl extends MCRAclEditor {
         MCRRuleMapping perm = XMLProcessing.createRuleMapping(ruleId, acPool, objId);
         MCRAccessStore.getInstance().createAccessDefinition(perm);
 
-//        Element editor = ACLEditor().addContent(editorType("permEditor"));
-//        return editor;
-        
         String redirectURL = request.getParameter("redir");
 
         Element editor;
@@ -217,6 +220,41 @@ public class MCRAclEditorStdImpl extends MCRAclEditor {
             editor = redirect(redirectURL);
         else
             editor = ACLEditor().addContent(editorType("permEditor"));
+
+        return editor;
+    }
+
+    private Element deleteAllPerms(HttpServletRequest request) {
+        String objidFilter = request.getParameter("objid");
+        String acpoolFilter = request.getParameter("acpool");
+        List<MCRACCESS> accessList = HIBA.getAccessPermission(objidFilter, acpoolFilter);
+        HashMap<String, LinkedList<MCRRuleMapping>> diffMap = new HashMap<String, LinkedList<MCRRuleMapping>>();
+        LinkedList<MCRRuleMapping> deleteAccess = new LinkedList<MCRRuleMapping>();
+
+        for (Iterator iter = accessList.iterator(); iter.hasNext();) {
+            MCRACCESS currentAcc = (MCRACCESS) iter.next();
+            String rid = currentAcc.getRule().getRid();
+            String acpool = currentAcc.getKey().getAcpool();
+            String objid = currentAcc.getKey().getObjid();
+
+            MCRRuleMapping ruleMapping = XMLProcessing.createRuleMapping(rid, acpool, objid);
+            deleteAccess.add(ruleMapping);
+        }
+        diffMap.put("delete", deleteAccess);
+
+        HIBA.savePermChanges(diffMap);
+
+        String redirectURL = request.getParameter("redir");
+        LOGGER.debug("Redirect URL: " + redirectURL);
+
+        Element editor;
+
+        if (redirectURL != null && !redirectURL.equals(""))
+            editor = redirect(redirectURL);
+        else {
+            editor = ACLEditor().addContent(editorType("permEditor"));
+            editor.addContent(getFilterElem(objidFilter, acpoolFilter));
+        }
 
         return editor;
     }
@@ -360,7 +398,36 @@ public class MCRAclEditorStdImpl extends MCRAclEditor {
             editor = redirect(redirectURL);
         else
             editor = ACLEditor().addContent(editorType("ruleEditor"));
-        
+
+        return editor;
+    }
+
+    private Element deleteAllRules(HttpServletRequest request) {
+        LOGGER.debug("Delete all rules.");
+
+        HashMap diffMap = new HashMap();
+
+        List<MCRACCESSRULE> ruleList = HIBA.getAccessRule();
+        LinkedList<String> deleteRule = new LinkedList<String>();
+
+        for (Iterator iter = ruleList.iterator(); iter.hasNext();) {
+            MCRACCESSRULE rule = (MCRACCESSRULE) iter.next();
+            String currentRid = rule.getRid();
+            LOGGER.debug("Delete: " + currentRid);
+            deleteRule.add(currentRid);
+        }
+        diffMap.put("delete", deleteRule);
+
+        HIBA.saveRuleChanges(diffMap);
+        String redirectURL = request.getParameter("redir");
+
+        Element editor;
+
+        if (redirectURL != null && !redirectURL.equals(""))
+            editor = redirect(redirectURL);
+        else
+            editor = ACLEditor().addContent(editorType("ruleEditor"));
+
         return editor;
     }
 

@@ -1,6 +1,31 @@
 function $(id){return document.getElementById(id)}
 function N(name){return document.getElementsByName(name)}
 
+function getElementsByName_iefix(tag, name) {
+     var elem = document.getElementsByTagName(tag);
+     
+     var arr = new Array();
+     for(i = 0,iarr = 0; i < elem.length; i++) {
+          att = elem[i].getAttribute("name");
+          if(att == name) {
+               arr[iarr] = elem[i];
+               iarr++;
+          }
+     }
+     return arr;
+}
+
+function isIE() {
+	var browser = navigator.userAgent;
+	if (browser.indexOf("MSIE") != -1) {
+		return true;
+	} else {
+		return false;
+	}
+}
+
+var IE = isIE();
+
 function initAclEditor(){
 	var editor = $('ACL-Editor');
 }
@@ -14,10 +39,7 @@ function initPermEditor(){
 		var mappingLines = getChildrenById(editor, "tr", "mapping_line");
 	
 		for (var i = 0; i < mappingLines.length; i++){
-			mappingLines[i].addEventListener("mouseover", markup, false);
-			mappingLines[i].addEventListener("mouseout", unmark, false);
 			delCheckBox = getChildrenByName(mappingLines[i], "input", "delete_mapping")[0];
-			//delCheckBox.selBox = mappingLines[i].getElementsByTagName("select")[0];
 			delCheckBox.addEventListener("change", setDeleted, false);
 		}
 		
@@ -36,23 +58,30 @@ function initRuleEditor(){
 	
 	if (editor.status != "initialized"){
 	
-		var ruleLines = getChildrenById(editor, "tr", "rule_line");
+		var ruleLines = document.getElementsByName("rule_line"); //getChildrenById(editor, "tr", "rule_line");
 	
 		for (var i = 0; i < ruleLines.length; i++){
-			ruleLines[i].addEventListener("mouseover", markup, false);
-			ruleLines[i].addEventListener("mouseout", unmark, false);
 			delCheckBox = getChildrenByName(ruleLines[i], "input", "delete_rule")[0];
-			//delCheckBox.selBox = mappingLines[i].getElementsByTagName("select")[0];
 			delCheckBox.addEventListener("change", setDeleted, false);
 		}
 		
 		editor.status = "initialized";
 	}
 	
-	var delAll = getChildrenById(editor, "input", "delAll")[0];
+	var delAll = document.getElementById("delAll");
 	if (delAll != null)
-		delAll.addEventListener("click", deleteAll, false);
+		delAll.addEventListener("click", deleteAllR, false);
 	
+}
+
+function deleteAllFromDB(url,msg){
+	var chk = window.confirm(msg);
+	
+	//alert(redir)
+	
+	if (chk == true) {
+		self.location.href=url;
+	}
 }
 
 function deleteAll(e){
@@ -91,11 +120,150 @@ function deleteNothing(e){
 	node.addEventListener("click", deleteAll, false);
 }
 
-function changeVisibility(node){
-	if (node.style.display=="none")
-		node.style.display="block";
-	else
-		node.style.display="none";
+function deleteAllR(e){
+	var node = e.currentTarget;
+	var checkBoxes = document.getElementsByName("delete_rule");
+
+	for (var i = 0; i < checkBoxes.length; i++){
+		if ((checkBoxes[i].checked == false) && (node.checked == true)){
+			checkBoxes[i].click();
+		}
+	}
+	
+	node.removeEventListener("click", deleteAllR, false);
+	node.addEventListener("click", deleteNothingR, false);
+}
+
+function deleteNothingR(e){
+	var node = e.currentTarget;
+	var checkBoxes = document.getElementsByName("delete_rule");
+	
+	for (var i = 0; i < checkBoxes.length; i++){
+		if ((checkBoxes[i].checked == true) && (node.checked == false)){
+			checkBoxes[i].click();
+		}
+	}
+	
+	node.removeEventListener("click", deleteNothingR, false);
+	node.addEventListener("click", deleteAllR, false);
+}
+
+function changeVisibility(nodeName,button){
+	var node = document.getElementById(nodeName);
+	var status = null;
+	
+	if (IE){
+		status = node.currentStyle.display;
+		
+		if (status == "none"){
+			node.style.display = "block";
+			button.firstChild.nodeValue="-";
+		} else{
+			node.style.display = "none";
+			button.firstChild.nodeValue="+";
+		}
+	}
+	else {
+		node.style.display="table-row";
+		status = document.defaultView.getComputedStyle(node, null).visibility;
+		
+		if (status == "collapse"){
+			node.style.visibility = "visible";
+			button.firstChild.nodeValue="-";
+		} else{
+			node.style.visibility="collapse";
+			button.firstChild.nodeValue="+";
+		}
+	}
+}
+
+function initOpenAll(button,expandLabel, collapsLabel){
+	button.expandLabel = expandLabel;
+	button.collapsLabel = collapsLabel;
+	try {
+		button.addEventListener("click", openAll, false);
+	} catch(e) {
+		button.attachEvent("onclick", openAll,false);
+	}
+	button.onmouseover = null;
+}
+
+function openAll(e){
+	var expButtons = document.getElementsByName("visButton");
+	var ruleLines = document.getElementsByName("rule_line");
+	
+	if (IE){
+		expButtons = getElementsByName_iefix("div","visButton");
+		ruleLines = getElementsByName_iefix("tr","rule_line");
+	}
+	
+	button = e.currentTarget;
+	var status = null;
+	
+	for (var i = 0; i < ruleLines.length; i++){
+		currentNodeId = ruleLines[i].id.replace("Rule","RuleField");
+		currentNode = $(currentNodeId);
+		
+		try{
+			status = currentNode.currentStyle.display;
+		} catch(e) {
+			status = document.defaultView.getComputedStyle(currentNode, null).visibility;
+		}
+		
+		if (status == "collapse" || status == "none") {
+			changeVisibility(currentNodeId,expButtons[i]);
+		}
+	}
+	
+	alert(button.nodeName)
+	button.firstChild.replaceData(0,button.firstChild.nodeValue.length,button.collapsLabel);
+	
+	
+	try {
+		button.removeEventListener("click", openAll, false);
+		button.addEventListener("click",collapsAll,false);
+	} catch(e){
+		alert(e)
+		button.detachEvent("onclick", openAll);
+		button.attachEvent("onclick",collapsAll);
+	}
+}
+
+function collapsAll(e){
+	var expButtons = document.getElementsByName("visButton");
+	var ruleLines = document.getElementsByName("rule_line");
+	
+	if (IE){
+		expButtons = getElementsByName_iefix("div","visButton");
+		ruleLines = getElementsByName_iefix("tr","rule_line");
+	}
+	
+	button = e.currentTarget;
+	var status = null;
+	
+	for (var i = 0; i < ruleLines.length; i++){
+		currentNodeId = ruleLines[i].id.replace("Rule","RuleField");
+		currentNode = $(currentNodeId);
+		
+		if (IE) {
+			status = currentNode.currentStyle.display;
+		} else{
+			status = document.defaultView.getComputedStyle(currentNode, null).visibility;
+		}
+		
+		if (status == "visible" || status == "block") {
+			changeVisibility(currentNodeId,expButtons[i]);
+		}
+	}
+	button.firstChild.replaceData(0,button.firstChild.nodeValue.length,button.expandLabel);
+	
+	try {
+		button.removeEventListener("click", collapsAll, false);
+		button.addEventListener("click",openAll,false);
+	} catch(e){
+		button.detachEvent("onclick", collapsAll);
+		button.attachEvent("onclick",openAll);
+	}
 }
 
 function setChanged(e){
@@ -134,12 +302,15 @@ function setDeleted(e){
 
 function markup(e){
 	var node = e.currentTarget;
-	node.style.backgroundColor="red";
+	//node.style.backgroundColor="red";
+	node.style.backgroundColor="#14516E";
+	node.style.color="#EFF4F6";
 }
 
 function unmark(e){
 	var node = e.currentTarget;
 	node.style.backgroundColor="";
+	node.style.color="";
 }
 
 function getChildrenById(parent, childTagName, id){

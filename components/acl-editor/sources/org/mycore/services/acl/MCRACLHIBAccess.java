@@ -7,9 +7,10 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.hibernate.Criteria;
+import org.hibernate.Query;
+import org.hibernate.Session;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
-import org.mycore.access.MCRAccessInterface;
 import org.mycore.access.mcrimpl.MCRAccessControlSystem;
 import org.mycore.access.mcrimpl.MCRAccessRule;
 import org.mycore.access.mcrimpl.MCRAccessStore;
@@ -18,6 +19,7 @@ import org.mycore.access.mcrimpl.MCRRuleStore;
 import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.backend.hibernate.tables.MCRACCESS;
 import org.mycore.backend.hibernate.tables.MCRACCESSRULE;
+import org.mycore.common.MCRCache;
 
 public class MCRACLHIBAccess {
 
@@ -57,7 +59,9 @@ public class MCRACLHIBAccess {
 
     public List getAccessRule() {
         Criteria query = MCRHIBConnection.instance().getSession().createCriteria(MCRACCESSRULE.class);
-        return query.list();
+        List list = query.list();
+
+        return list;
     }
 
     public void savePermChanges(Map diffMap) {
@@ -88,7 +92,7 @@ public class MCRACLHIBAccess {
 
     public void saveRuleChanges(Map diffMap) {
         MCRRuleStore ruleStore = MCRRuleStore.getInstance();
-        MCRAccessInterface AI = MCRAccessControlSystem.instance();
+        MCRCache cache = MCRAccessControlSystem.getCache();
 
         List updateList = (List) diffMap.get("update");
         List saveList = (List) diffMap.get("save");
@@ -106,19 +110,41 @@ public class MCRACLHIBAccess {
                 debugMSG.append(desc);
 
                 LOGGER.debug(debugMSG.toString());
-
-                ruleStore.updateRule(new MCRAccessRule(rid, "ACL-Editor", new Date(), ruleString, desc));
+                MCRAccessRule accessRule = new MCRAccessRule(rid, "ACL-Editor", new Date(), ruleString, desc);
+                ruleStore.updateRule(accessRule);
+                cache.put(rid, accessRule);
             }
 
         if (saveList != null)
             for (Iterator it = saveList.iterator(); it.hasNext();) {
-                MCRACCESSRULE accessRule = (MCRACCESSRULE) it.next();
-                AI.createRule(accessRule.getRule(), "ACL-Editor", accessRule.getDescription());
+                MCRACCESSRULE rule = (MCRACCESSRULE) it.next();
+                String rid = rule.getRid();
+                String ruleString = rule.getRule();
+                String desc = rule.getDescription();
+                MCRAccessRule accessRule = new MCRAccessRule(rid, "ACL-Editor", new Date(), ruleString, desc);
+
+                ruleStore.createRule(accessRule);
+                cache.put(rid, accessRule); // upadte cache
             }
 
         if (deleteList != null)
             for (Iterator it = deleteList.iterator(); it.hasNext();) {
-                ruleStore.deleteRule((String) it.next());
+                String rid = (String) it.next();
+
+                if (ruleIsInUse(rid).isEmpty()) {
+                    ruleStore.deleteRule(rid);
+                    cache.remove(rid);
+                    LOGGER.debug("Rule " + rid + " deleted!");
+                } else {
+                    LOGGER.debug("Rule " + rid + " is in use, don't deleted!");
+                }
             }
+
+    }
+
+    public List ruleIsInUse(String ruleid) {
+        Session session = MCRHIBConnection.instance().getSession();
+        Query query = session.createQuery("from MCRACCESS as accdef where accdef.rule.rid = '" + ruleid + "'");
+        return query.list();
     }
 }

@@ -1,9 +1,6 @@
 package org.mycore.services.acl;
 
 import java.io.IOException;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 
 import javax.servlet.ServletException;
@@ -14,18 +11,9 @@ import org.apache.log4j.Logger;
 import org.jdom.DocType;
 import org.jdom.Document;
 import org.jdom.Element;
-import org.jdom.Namespace;
-import org.mycore.access.MCRAccessInterface;
 import org.mycore.access.MCRAccessManager;
-import org.mycore.backend.hibernate.tables.MCRACCESS;
-import org.mycore.backend.hibernate.tables.MCRACCESSPK;
-import org.mycore.backend.hibernate.tables.MCRACCESSRULE;
 import org.mycore.common.MCRConfigurationException;
-import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.frontend.MCRWebsiteWriteProtection;
-import org.mycore.frontend.editor.MCREditorServlet;
-import org.mycore.frontend.editor.MCREditorSubmission;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.user.MCRUserMgr;
@@ -77,8 +65,7 @@ public class MCRACLEditorServlet_v2 extends MCRServlet {
         if (answer.getName().equals("redirect")) {
             LOGGER.debug("Redirect: " + answer.getText());
             redirect(response, answer.getText());
-        } 
-        else {
+        } else {
             LOGGER.debug("Normal doLayout!");
             doLayout(request, response, answer, layout, mcrWebPage);
         }
