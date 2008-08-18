@@ -49,6 +49,7 @@ div.button {
 }
 
 div.button:hover {
+	/* IE has no hover, this is set via javacript see aclEditor.js*/
 	background-color: #14516E;
 	cursor: pointer;
 }

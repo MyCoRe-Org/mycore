@@ -180,12 +180,32 @@ function changeVisibility(nodeName,button){
 function initOpenAll(button,expandLabel, collapsLabel){
 	button.expandLabel = expandLabel;
 	button.collapsLabel = collapsLabel;
-	try {
-		button.addEventListener("click", openAll, false);
-	} catch(e) {
-		button.attachEvent("onclick", openAll,false);
+	
+	if (button.init != true){
+		try {
+			button.addEventListener("click", openAll, false);
+		} catch(e) {
+			button.onclick=openAll;
+			button.onmouseout=unsetStyleIE;
+		}
+		button.init = true;
 	}
-	button.onmouseover = null;
+	//button.onmouseover = null;
+	
+	if (IE){
+		button.inactColor=button.currentStyle.backgroundColor;
+		button.inactCursor=button.currentStyle.cursor;
+		button.style.backgroundColor="#14516E";
+		button.style.cursor="pointer";
+		
+	}
+}
+
+// for IE only, it has no :hover
+function unsetStyleIE(e){
+	button=this;
+	button.style.backgroundColor=button.inactColor;
+	button.currentStyle.cursor=button.inactCursor;
 }
 
 function openAll(e){
@@ -197,7 +217,13 @@ function openAll(e){
 		ruleLines = getElementsByName_iefix("tr","rule_line");
 	}
 	
-	button = e.currentTarget;
+	// there is no currentTarget in IE
+	try{
+		button = e.currentTarget;
+	} catch(error){
+		button=this;
+	}
+	
 	var status = null;
 	
 	for (var i = 0; i < ruleLines.length; i++){
@@ -206,7 +232,7 @@ function openAll(e){
 		
 		try{
 			status = currentNode.currentStyle.display;
-		} catch(e) {
+		} catch(error) {
 			status = document.defaultView.getComputedStyle(currentNode, null).visibility;
 		}
 		
@@ -215,17 +241,14 @@ function openAll(e){
 		}
 	}
 	
-	alert(button.nodeName)
 	button.firstChild.replaceData(0,button.firstChild.nodeValue.length,button.collapsLabel);
 	
 	
 	try {
 		button.removeEventListener("click", openAll, false);
 		button.addEventListener("click",collapsAll,false);
-	} catch(e){
-		alert(e)
-		button.detachEvent("onclick", openAll);
-		button.attachEvent("onclick",collapsAll);
+	} catch(error){
+		button.onclick=collapsAll;
 	}
 }
 
@@ -238,16 +261,21 @@ function collapsAll(e){
 		ruleLines = getElementsByName_iefix("tr","rule_line");
 	}
 	
-	button = e.currentTarget;
+	try{
+		button = e.currentTarget;
+	} catch(error){
+		button=this;
+	}
+	
 	var status = null;
 	
 	for (var i = 0; i < ruleLines.length; i++){
 		currentNodeId = ruleLines[i].id.replace("Rule","RuleField");
 		currentNode = $(currentNodeId);
 		
-		if (IE) {
+		try{
 			status = currentNode.currentStyle.display;
-		} else{
+		} catch(error) {
 			status = document.defaultView.getComputedStyle(currentNode, null).visibility;
 		}
 		
@@ -255,14 +283,14 @@ function collapsAll(e){
 			changeVisibility(currentNodeId,expButtons[i]);
 		}
 	}
+	
 	button.firstChild.replaceData(0,button.firstChild.nodeValue.length,button.expandLabel);
 	
 	try {
 		button.removeEventListener("click", collapsAll, false);
 		button.addEventListener("click",openAll,false);
 	} catch(e){
-		button.detachEvent("onclick", collapsAll);
-		button.attachEvent("onclick",openAll);
+		button.onclick=openAll;
 	}
 }
 
