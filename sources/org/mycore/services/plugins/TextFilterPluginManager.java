@@ -26,6 +26,7 @@ package org.mycore.services.plugins;
 import java.io.File;
 import java.io.InputStream;
 import java.io.Reader;
+import java.io.StringReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Collection;
@@ -189,7 +190,12 @@ public class TextFilterPluginManager {
      */
     public Reader transform(MCRFileContentType ct, InputStream input) throws FilterPluginTransformException {
         if (isSupported(ct)) {
-            return getPlugin(ct).transform(ct, input);
+            try {
+                return getPlugin(ct).transform(ct, input);
+            } catch (Exception ex) {
+                LOGGER.warn("Exception in text filter plug-in:", ex);
+                return new StringReader("");
+            }
         }
 
         return null;
