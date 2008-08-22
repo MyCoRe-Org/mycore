@@ -99,6 +99,7 @@
     <path id="cli.classpath">
       <pathelement location="${build.config}" />
       <pathelement location="${build.classes}" />
+      <pathelement location="${build.schema}" />
       <path refid="integration.classpath" />
     </path>
     <java classname="org.mycore.frontend.cli.MCRCommandLineInterface"
