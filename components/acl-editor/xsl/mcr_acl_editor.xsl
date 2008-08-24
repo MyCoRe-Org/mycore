@@ -36,8 +36,8 @@
         </xsl:variable>
 
         <div id="ACL-Editor">
-            <script type="text/javascript" src="{$javaScript}" language="JavaScript" />
-            <link rel="stylesheet" type="text/css" href="{$css}" />
+<!--            <script type="text/javascript" src="{$javaScript}" language="JavaScript" />-->
+<!--            <link rel="stylesheet" type="text/css" href="{$css}" />-->
 
             <xsl:choose>
                 <xsl:when test="editor = $permEditor">
