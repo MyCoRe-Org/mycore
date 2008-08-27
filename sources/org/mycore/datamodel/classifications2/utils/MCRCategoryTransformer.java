@@ -217,8 +217,7 @@ public class MCRCategoryTransformer {
              * countMatcher.group(2) is most inner expression string like document
              */
             if (countMatcher.find()) {
-                //final String countParameter = countMatcher.group();
-                if (countMatcher.group(1).length() == 0)
+                if (countMatcher.group(1) == null)
                     countMap = MCRCategLinkServiceFactory.getInstance().countLinks(getAllCategIDs(cl));
                 else {
                     //group(2) contains objectType
