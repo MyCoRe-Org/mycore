@@ -340,7 +340,7 @@ public class MCRFieldDef {
         else
             xsl.addContent(forEach1);
 
-        List<Namespace> namespaces = fieldDef.getAdditionalNamespaces();
+        List<Namespace> namespaces = fieldDef.getDocument().getRootElement().getAdditionalNamespaces();
         for( Namespace ns : namespaces )
         { xsl.addNamespaceDeclaration( ns ); }
         
