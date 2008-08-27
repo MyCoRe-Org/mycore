@@ -340,6 +340,10 @@ public class MCRFieldDef {
         else
             xsl.addContent(forEach1);
 
+        List<Namespace> namespaces = fieldDef.getAdditionalNamespaces();
+        for( Namespace ns : namespaces )
+        { xsl.addNamespaceDeclaration( ns ); }
+        
         if (MCRFieldDef.OBJECT_CATEGORY.equals(fieldDef.getAttributeValue("source"))) {
             // current(): <format classid="DocPortal_class_00000006"
             // categid="FORMAT0002"/>
