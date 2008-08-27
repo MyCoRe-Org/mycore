@@ -525,8 +525,14 @@
       </xsl:attribute>
     </xsl:otherwise>
   </xsl:choose>
+  
   <xsl:copy-of select="@style" />
-  <xsl:copy-of select="@cssid" />
+  
+  <xsl:if test="@cssid">
+    <xsl:attribute name="id">
+      <xsl:value-of select="@cssid" />
+    </xsl:attribute>
+  </xsl:if>
 </xsl:template>
 
 <xsl:template name="editor.set.anchor">
