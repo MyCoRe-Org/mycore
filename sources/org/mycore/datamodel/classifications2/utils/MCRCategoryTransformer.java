@@ -222,7 +222,6 @@ public class MCRCategoryTransformer {
                 else {
                     //group(2) contains objectType
                     String objectType = countMatcher.group(2);
-                    System.out.println("\n\n\n####\nSearching for objectType:" + objectType);
                     countMap = MCRCategLinkServiceFactory.getInstance().countLinksForType(getAllCategIDs(cl), objectType);
                 }
             }
