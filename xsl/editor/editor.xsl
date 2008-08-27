@@ -511,7 +511,7 @@
 
 </xsl:template>
 
-<!-- ======== set CSS class|style attributes ======== -->
+<!-- ======== set CSS class|style|id attributes ======== -->
 <xsl:template name="editor.set.css">
   <xsl:param name="class" />
   
@@ -526,6 +526,7 @@
     </xsl:otherwise>
   </xsl:choose>
   <xsl:copy-of select="@style" />
+  <xsl:copy-of select="@cssid" />
 </xsl:template>
 
 <xsl:template name="editor.set.anchor">
