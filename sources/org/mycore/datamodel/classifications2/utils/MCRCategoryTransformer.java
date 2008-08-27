@@ -35,6 +35,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.jdom.Document;
@@ -203,14 +204,28 @@ public class MCRCategoryTransformer {
 
         private static final Pattern DESCR_PATTERN = Pattern.compile("\\{description\\}");
 
-        private static final Pattern COUNT_PATTERN = Pattern.compile("\\{count\\}");
+        private static final Pattern COUNT_PATTERN = Pattern.compile("\\{count(:([^\\)]+))?\\}");
 
         @SuppressWarnings("unchecked")
         static Document getDocument(MCRCategory cl, String labelFormat, boolean sort) {
             Document cd = new Document(new Element("items"));
             Map<MCRCategoryID, Number> countMap = null;
-            if (COUNT_PATTERN.matcher(labelFormat).find()) {
-                countMap = MCRCategLinkServiceFactory.getInstance().countLinks(getAllCategIDs(cl));
+            final Matcher countMatcher = COUNT_PATTERN.matcher(labelFormat);
+            /*
+             * countMatcher.group(0) is the whole expression string like {count:document}
+             * countMatcher.group(1) is first inner expression string like :document
+             * countMatcher.group(2) is most inner expression string like document
+             */
+            if (countMatcher.find()) {
+                //final String countParameter = countMatcher.group();
+                if (countMatcher.group(1).length() == 0)
+                    countMap = MCRCategLinkServiceFactory.getInstance().countLinks(getAllCategIDs(cl));
+                else {
+                    //group(2) contains objectType
+                    String objectType = countMatcher.group(2);
+                    System.out.println("\n\n\n####\nSearching for objectType:" + objectType);
+                    countMap = MCRCategLinkServiceFactory.getInstance().countLinksForType(getAllCategIDs(cl), objectType);
+                }
             }
             for (MCRCategory category : cl.getChildren()) {
                 cd.getRootElement().addContent(getElement(category, labelFormat, countMap));
