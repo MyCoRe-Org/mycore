@@ -25,11 +25,11 @@ package org.mycore.datamodel.classifications;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
-import java.util.Hashtable;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.jdom.Document;
@@ -42,7 +42,6 @@ import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.MCRUtils;
 import org.mycore.common.events.MCRSessionEvent;
 import org.mycore.common.events.MCRSessionListener;
 import org.mycore.datamodel.classifications2.MCRCategLinkServiceFactory;
@@ -73,7 +72,7 @@ public class MCRClassificationBrowserData {
 
     private static final MCRAccessInterface AI = MCRAccessManager.getAccessImpl();
 
-    private ArrayList lines;
+    private ArrayList<Element> lines;
 
     private MCRCategory classif;
 
@@ -214,6 +213,7 @@ public class MCRClassificationBrowserData {
     }
 
     private void setObjectTypes(final String browserClass) {
+        LOGGER.debug("setObjectTypes("+browserClass+")");
         try {
             // NOTE: read *.Doctype for compatiblity reasons
             objectType = config.getString("MCR.ClassificationBrowser." + browserClass + ".Objecttype", config.getString("MCR.ClassificationBrowser."
@@ -261,14 +261,14 @@ public class MCRClassificationBrowserData {
         return classif;
     }
 
+    @SuppressWarnings("unchecked")
     public org.jdom.Document loadTreeIntoSite(final org.jdom.Document cover, final org.jdom.Document browser) {
         final Element placeholder = cover.getRootElement().getChild("classificationBrowser");
         LOGGER.info(" Found Entry at " + placeholder);
         if (placeholder != null) {
-            final List children = browser.getRootElement().getChildren();
-            for (int j = 0; j < children.size(); j++) {
-                final Element child = (Element) ((Element) children.get(j)).clone();
-                placeholder.addContent(child);
+            final List<Element> children = browser.getRootElement().getChildren();
+            for (Element child:children){
+                placeholder.addContent((Element)child.clone());
             }
         }
         LOGGER.debug(cover);
@@ -277,7 +277,7 @@ public class MCRClassificationBrowserData {
 
     public final void setClassification(final MCRCategoryID classifID) throws Exception {
         classif = getClassificationPool().getClassificationAsPojo(classifID, true);
-        lines = new ArrayList();
+        lines = new ArrayList<Element>();
         totalNumOfDocs = 0;
         putCategoriesintoLines(-1, classif.getChildren());
         LOGGER.debug("Arraylist of CategItems initialized - Size " + lines.size());
@@ -359,10 +359,9 @@ public class MCRClassificationBrowserData {
         if (i >= lines.size()) {
             return null;
         }
-        return (Element) lines.get(i);
+        return lines.get(i);
     }
 
-    @SuppressWarnings("unchecked")
     private void putCategoriesintoLines(final int startpos, final List<MCRCategory> children) {
         LOGGER.debug("Start Explore Arraylist of CategItems  ");
         int i = startpos;
@@ -384,7 +383,7 @@ public class MCRClassificationBrowserData {
     }
 
     public org.jdom.Document createXmlTreeforAllClassifications() throws Exception {
-
+        LOGGER.debug("create XML tree for all classifications");
         final Element xDocument = new Element("classificationbrowse");
         final Element CreateClassButton = new Element("userCanCreate");
         if (AI.checkPermission("create-classification")) {
@@ -399,15 +398,19 @@ public class MCRClassificationBrowserData {
         xDocument.addContent(xNavtree);
         String browserClass = "";
         String Counter = "";
-
+        
+        LOGGER.debug("get all classification IDs");
         final Set<MCRCategoryID> allIDs = getClassificationPool().getAllIDs();
         List<MCRCategoryID> ids = new ArrayList<MCRCategoryID>(allIDs.size());
         ids.addAll(allIDs);
-        // Collections.sort(ids);
+        LOGGER.debug("fetched all classification IDs");
 
         for (MCRCategoryID id : ids) {
+            LOGGER.debug("get classification "+id);
             MCRCategory classif = getClassificationPool().getClassificationAsPojo(id, false);
+            LOGGER.debug("get browse element");
             Element cli = getBrowseElement(classif);
+            LOGGER.debug("get browse element ... done");
             String sessionID = MCRSessionMgr.getCurrentSession().getID();
             // set browser type
             try {
@@ -455,12 +458,13 @@ public class MCRClassificationBrowserData {
             }
             cli.setAttribute("browserClass", browserClass);
             setObjectTypes(browserClass);
-
+            LOGGER.debug("counting linked objects");
             try {
                 Counter = MCRCategLinkServiceFactory.getInstance().countLinks(Collections.nCopies(1, classif.getId())).get(classif.getId()).toString();
             } catch (Exception ignore) {
                 Counter = "NaN";
             }
+            LOGGER.debug("counting linked objects ... done");
             cli.setAttribute("counter", Counter);
             xNavtree.addContent(cli);
         }
