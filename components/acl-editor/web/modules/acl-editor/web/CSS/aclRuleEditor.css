@@ -1,9 +1,18 @@
 /*
  * Class for formular buttons
  */
+ 
+form {
+    margin: 0px;
+    padding: 0px; 
+}
+
 #aclRuleEditor .button{
 	margin-top: 2px;
-	border: solid 1px black;
+	border-top: solid 1px white;
+	border-left: solid 1px white;
+	border-bottom: solid 1px black;
+	border-right: solid 1px black;
 }
 
 #aclCreateNewRuleBox, #aclEditRuleBox {

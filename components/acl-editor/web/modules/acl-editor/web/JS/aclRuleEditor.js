@@ -1,4 +1,20 @@
-var ruleBox;
+/* include aclClickButtons.js */
+
+var ruleBox = new aclRuleBox();
+
+function aclRuleBox(){
+    this.detailsButtons = new Array();
+    this.delCheckboxes = new Array();
+}
+
+aclRuleBox.prototype.addButton = function(button){
+    this.detailsButtons = this.detailsButtons.concat(button)
+}
+
+aclRuleBox.prototype.addCheckbox = function(checkbox){
+    this.delCheckboxes = this.delCheckboxes.concat(checkbox)
+}
+
 var setup = false;
 
 /************************************************************************
@@ -12,32 +28,44 @@ function aclRuleEditorSetup(){
     if (!this.setup){
         this.onmouseover = null;
     
-        initAclDetailsButtons();
+        initAclEditRuleBox();
         
-        initAclDetailsAllButton();
-        
-        initAclDelAllRulesButton();
-    
         this.setup = true;
         
     }
 }   
 
 /*
- * Init the "+"-details button
+ * Init the edit rule box
  */
-function initAclDetailsButtons(){
-    ruleBox = document.getElementById("aclEditRuleBox");
-    ruleBox.detailsButtons = new Array();
+function initAclEditRuleBox(){
+    var ruleBoxElem = document.getElementById("aclEditRuleBox");
+    //ruleBox.detailsButtons = new Array();
+    //ruleBox.delCheckboxes = new Array();
     
-    var ruleTables = ruleBox.getElementsByTagName("table");
+    // rule tables
+    var ruleTables = ruleBoxElem.getElementsByTagName("table");
     
     for (i=0; i < ruleTables.length; i++){
         var currentTable = ruleTables[i];
-        var currentButton = initRuleTable(currentTable);
+        var ruleTableObj = initRuleTable(currentTable);
+        var currentButton = ruleTableObj.detailsButton;
+        var currentCheckbox = ruleTableObj.delCheckbox;
         
-        ruleBox.detailsButtons = ruleBox.detailsButtons.concat(currentButton);
+        if (ruleBox){
+            //ruleBox.detailsButtons = ruleBox.detailsButtons.concat(currentButton);
+            //ruleBox.delCheckboxes = ruleBox.delCheckboxes.concat(currentCheckbox);
+            ruleBox.addButton(currentButton)
+            ruleBox.addCheckbox(currentCheckbox)
+            ruleBox.elem = ruleBoxElem;
+        }
     }
+    
+    initAclDetailsAllButton();
+        
+    initAclDelAllRulesButton();
+
+    initAclDelAllRulesCheckBox();
 }
 
 /*
@@ -51,10 +79,10 @@ function initRuleTable(table){
     var ruleInUseId = "RuleInUse$" + table.id;
     var button = new Object();
     
-    // init the checkbox
+    // init the delete checkbox
     var checkBox;
     if(checkBox = document.getElementById(checkBoxId))
-        checkBox.onchange = setRuleAsDeleted;
+        checkBox.onclick = setRuleAsDeleted;
     
     // making the hover info message for rules 
     // wich can not be set as deleted
@@ -83,7 +111,10 @@ function initRuleTable(table){
         
     }
     
-    return button.obj;
+    var ruleTable = new Object();
+    ruleTable.detailsButton = button.obj;
+    ruleTable.delCheckbox = checkBox;
+    return ruleTable;
 }
 
 /*
@@ -127,6 +158,16 @@ function initAclDelAllRulesButton(){
                 };
                 
     delAllRulesButton = createClickButton("delAllRulesButton", delAllRulesSpec);
+}
+
+/*
+ * Init the delete all rules checkbox
+ */
+function initAclDelAllRulesCheckBox(){
+    var delAllRulesCheckBox = document.getElementById("delAllRulesCheckBox");
+    
+    if (delAllRulesCheckBox)
+        delAllRulesCheckBox.onclick = setAllRulesAsDeleted;
 }
 
 /************************************************************************
@@ -219,21 +260,39 @@ function detailsSwitch(event){
  * Set the rule as deleted when checkbox is pressed
  */
 function setRuleAsDeleted(event){
+    
     var deleted = "deleted$";
     var node = this;
+    var ruleBoxForm = document.getElementById("aclEditRuleBoxForm");
     
     if (node.type.toLowerCase() == "checkbox"){
         if (node.checked == true){
             var newInput = document.createElement("input");
+            newInput.setAttribute("type", "hidden");
             newInput.name = deleted + node.value;
             newInput.id = deleted + node.value;
     
-            node.appendChild(newInput);
+            ruleBoxForm.appendChild(newInput);
         } else if (node.checked == false){
             var nodeMarkedAsDeleted = document.getElementById(deleted + node.value);
             if (nodeMarkedAsDeleted)
-                node.removeChild(nodeMarkedAsDeleted);
+                ruleBoxForm.removeChild(nodeMarkedAsDeleted);
         }
+    }
+    
+}
+
+/*
+ * Set all rules as deleted when checkbox is pressed
+ */
+function setAllRulesAsDeleted(event){
+    var delRuleCheckboxes = ruleBox.delCheckboxes;
+    
+    for (i=0; i < delRuleCheckboxes.length; i++){
+        var currentCheckbox = delRuleCheckboxes[i];
+        
+        if (currentCheckbox)
+        currentCheckbox.click();
     }
 }
 
@@ -310,5 +369,5 @@ function displRuleInUseMsg(event){
 
 function removeRuleInUseMsg(event){
     this.msgWindow.style.display = "none";
-    this.msgWindow.removeChild(this.msgWindow.debug);
+    //this.msgWindow.removeChild(this.msgWindow.debug);
 }

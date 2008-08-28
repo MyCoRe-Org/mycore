@@ -16,10 +16,11 @@
     -->
     <xsl:include href="mcr_acl_editor_common.xsl" />
     <xsl:variable name="currentEditor" select="concat('&amp;editor=', $ruleEditor)" />
-    <xsl:variable name="descriptionLabel" select="concat(i18n:translate('acl-editor.label.description'),':')" />
-    <xsl:variable name="ruleLabel" select="concat(i18n:translate('acl-editor.label.rule'),':')" />
-    <xsl:variable name="ruleIdLabel" select="concat(i18n:translate('acl-editor.label.ruleID'),':')" />
-    <xsl:variable name="deleteLabel" select="concat(i18n:translate('acl-editor.label.delete'),':')" />
+    <xsl:variable name="labelDescription" select="concat(i18n:translate('acl-editor.label.description'),':')" />
+    <xsl:variable name="labelRule" select="concat(i18n:translate('acl-editor.label.rule'),':')" />
+    <xsl:variable name="labelRuleId" select="concat(i18n:translate('acl-editor.label.ruleID'),':')" />
+    <xsl:variable name="labelDelete" select="concat(i18n:translate('acl-editor.label.delete'),':')" />
+    
     <xsl:variable name="inUseInfoMsg" select="i18n:translate('acl-editor.msg.delInfo')" />
     <xsl:variable name="inUseInfoMsgID" select="'aclInUseInfoMsg'" />
     
@@ -45,7 +46,7 @@
                             <table class="aclRuleTable">
                                 <tr>
                                     <td class="label">
-                                        <xsl:value-of select="$descriptionLabel" />
+                                        <xsl:value-of select="$labelDescription" />
                                     </td>
                                     <td>
                                         <!-- New rule description -->
@@ -54,7 +55,7 @@
                                 </tr>
                                 <tr>
                                     <td class="label">
-                                        <xsl:value-of select="$ruleLabel" />
+                                        <xsl:value-of select="$labelRule" />
                                     </td>
                                     <td>
                                         <!-- New rule string -->
@@ -99,7 +100,7 @@
                                                 <xsl:value-of select="concat(i18n:translate('acl-editor.label.markAll'),':')" />
                                             </td>
                                             <td>
-                                                <input class="checkBox" type="checkbox" id="delAll" />
+                                                <input class="checkBox" type="checkbox" id="delAllRulesCheckBox" />
                                             </td>
                                         </tr>
                                     </table>
@@ -107,7 +108,7 @@
                             </tr>
                         </table>
                     </div>
-                    <form xmlns:encoder="xalan://java.net.URLEncoder" xmlns:xalan="http://xml.apache.org/xalan"
+                    <form id="aclEditRuleBoxForm" xmlns:encoder="xalan://java.net.URLEncoder" xmlns:xalan="http://xml.apache.org/xalan"
                         action="{concat($dataRequest, '&amp;action=submitRule')}" method="post" accept-charset="UTF-8">
                         <input type="hidden" name="redir" value="{concat($aclEditorURL,$currentEditor)}" />
 
@@ -123,7 +124,7 @@
                                         <div class="detailsSwitch clickButtonOut" id="{$ruleFieldButtonID}">+</div>
                                     </td>
                                     <td>
-                                        <xsl:value-of select="$ruleIdLabel" />
+                                        <xsl:value-of select="$labelRuleId" />
                                     </td>
                                     <td class="ruleID">
                                         <xsl:value-of select="RID" />
@@ -136,7 +137,7 @@
                                                 <table>
                                                     <tr>
                                                         <td>
-                                                            <xsl:value-of select="$deleteLabel" />
+                                                            <xsl:value-of select="$labelDelete" />
                                                         </td>
                                                         <td>
                                                             <input class="checkBox" type="checkbox" disabled="disabled" name="delete_rule" value="{RID}" />
@@ -150,7 +151,7 @@
                                                 <table>
                                                     <tr>
                                                         <td>
-                                                            <xsl:value-of select="$deleteLabel" />
+                                                            <xsl:value-of select="$labelDelete" />
                                                         </td>
                                                         <td>
                                                             <input id="{$checkBoxID}" class="checkBox" type="checkbox" name="delete_rule" value="{RID}" />
@@ -164,7 +165,7 @@
                                 <tr>
                                     <td class="buttonCol"></td>
                                     <td class="label">
-                                        <xsl:value-of select="$descriptionLabel" />
+                                        <xsl:value-of select="$labelDescription" />
                                     </td>
                                     <td id="Description">
                                         <input class="input" name="{concat('RuleDesc$',RID)}" value="{DESCRIPTION}" onkeypress="setChanged(event)" />
@@ -173,7 +174,7 @@
                                 <tr class="ruleField" id="{$ruleFieldID}">
                                     <td class="buttonCol"></td>
                                     <td class="label">
-                                        <xsl:value-of select="$ruleLabel" />
+                                        <xsl:value-of select="$labelRule" />
                                     </td>
                                     <td id="ruleField">
                                         <textarea class="textarea" name="{concat('Rule$',RID)}" onkeypress="setChanged(event)">

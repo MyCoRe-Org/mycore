@@ -24,14 +24,22 @@
         select="concat($WebApplicationBaseURL,'servlets/MCRACLEditorServlet_v2',$HttpSession,'?mode=dataRequest&amp;action=setFilter&amp;ObjIdFilter=',//objid,'&amp;AcPoolFilter=',//acpool)" />
 
 
+    <xsl:variable name="aclPermEditorCSS" select="concat($WebApplicationBaseURL,'modules/acl-editor/web/CSS/aclPermEditor.css')" />
+    <xsl:variable name="aclPermEditorJS" select="concat($WebApplicationBaseURL,'modules/acl-editor/web/JS/aclPermEditor.js')" />
+    <xsl:variable name="aclClickButtonsJS" select="concat($WebApplicationBaseURL,'modules/acl-editor/web/JS/aclClickButtons.js')" />
 
+    <xsl:variable name="labelObjID" select="concat(i18n:translate('acl-editor.label.objID'),':')" />
+    <xsl:variable name="labelPermission" select="concat(i18n:translate('acl-editor.label.permission'),':')" />
+    <xsl:variable name="labelRule" select="concat(i18n:translate('acl-editor.label.rule'),':')" />
 
     <xsl:template match="/mcr_access_set">
         <xsl:variable name="ruleItems" select="document(concat($dataRequest, '&amp;action=getRuleAsItems'))" />
 
 
-        <div id="ACL-Perm-Editor" onMouseover="initPermEditor()">
-            <!-- ACL-Perm-Editor will be included into ACL Editor so link for JavaScript and CSS will be defined in mcr_acl_edior.xsl -->
+        <div id="aclPermEditor" onMouseover="aclPermEditorSetup()">
+            <script type="text/javascript" src="{$aclPermEditorJS}" language="JavaScript"></script>
+            <script type="text/javascript" src="{$aclClickButtonsJS}" language="JavaScript"></script>
+            <link rel="stylesheet" type="text/css" href="{$aclPermEditorCSS}"></link>
             <xsl:choose>
                 <xsl:when test="(@emb = 'true') and (@cmd = $add)">
                     <!-- New Mapping -->
@@ -47,158 +55,210 @@
                     <xsl:call-template name="createNewMapping">
                         <xsl:with-param name="ruleItems" select="$ruleItems" />
                     </xsl:call-template>
-                    <!-- Filter 
-                        <xsl:apply-templates select="mcr_access_filter" />-->
                 </xsl:when>
             </xsl:choose>
 
             <xsl:choose>
                 <xsl:when test="not(@cmd = $add) and not(@cmd = $delete)">
                     <!-- Mapping Table -->
-                    <form name="MappingTableForm" xmlns:encoder="xalan://java.net.URLEncoder" xmlns:xalan="http://xml.apache.org/xalan"
-                        action="{concat($dataRequest, '&amp;action=submitPerm', $redirectURL)}" method="post" accept-charset="UTF-8">
-                        <input type="hidden" name="redir" value="{$aclEditorURL}" />
+                    <xsl:variable name="labelScra" select="concat(i18n:translate('acl-editor.label.scra'),':')" />
 
-                        <br />
-                        <br />
-                        <table id="mapping_table" style="border:solid 1px black;">
-                            <xsl:if test="not(@emb = 'true')">
-                                <tr>
-                                    <th align="left">
-                                        <b>
-                                            <xsl:value-of select="i18n:translate('acl-editor.label.scra')" />
-                                            :
-                                        </b>
-                                        <br />
-                                        <br />
-                                        <br />
-                                    </th>
-                                </tr>
-                                <!-- tabs -->
-                                <tr>
-                                    <td>
-                                        <xsl:call-template name="mcr_access.printTOCNavi">
-                                            <xsl:with-param name="childrenXML" select="." />
-                                        </xsl:call-template>
+                    <div id="aclEditPermBox">
+                        <xsl:if test="not(@emb = 'true')">
+                            <div class="aclPermEditorLabel">
+                                <xsl:value-of select="$labelScra" />
+                            </div>
 
-                                    </td>
-                                </tr>
-                                <!-- Filter -->
+                            <div class="permFilterBox">
+                                <xsl:apply-templates select="mcr_access_filter" />
+                            </div>
 
-                                <tr>
-                                    <td>
-                                        <xsl:apply-templates select="mcr_access_filter" />
-                                        <br />
-                                    </td>
-                                </tr>
-                            </xsl:if>
+                            <div class="permTocNaviResultsBox">
+                                <xsl:call-template name="mcr_access.printTOCNavi">
+                                    <xsl:with-param name="childrenXML" select="." />
+                                </xsl:call-template>
+                            </div>
+                        </xsl:if>
 
-                            <!-- handle tabs reqs -->
-                            <xsl:variable name="toc.pos.verif">
-                                <xsl:choose>
-                                    <xsl:when test="$toc.pageSize>count(./mcr_access)">
-                                        <xsl:value-of select="1" />
-                                    </xsl:when>
-                                    <xsl:otherwise>
-                                        <xsl:value-of select="$toc.pos" />
-                                    </xsl:otherwise>
-                                </xsl:choose>
-                            </xsl:variable>
-                            <!-- create rows -->
-                            <tr id="delButton">
-                                <td>
-                                    <xsl:variable name="delURL">
-                                        <xsl:value-of select="concat($dataRequest, '&amp;action=delAllPerms&amp;objid=',//objid,'&amp;acpool=',//acpool)" />
-                                    </xsl:variable>
-                                    <!--                                    <input type="button" value="{i18n:translate('acl-editor.button.delAllPerms')}" onclick="deleteAllFromDB('{$delURL}', 'Permissions')" />-->
-                                    <div class="button"
-                                        onclick="deleteAllFromDB('{concat($dataRequest, '&amp;action=delAllRules')}','{i18n:translate('acl-editor.msg.delAllPerms')}')">
-                                        <xsl:value-of select="i18n:translate('acl-editor.button.delAllPerms')" />
-                                    </div>
-                                    <div class="markAllDel">
-                                        <xsl:value-of select="concat(i18n:translate('acl-editor.label.markAll'),':')" />
-                                        <input type="checkbox" id="delAll" />
-                                    </div>
-                                </td>
-                            </tr>
+                        <div class="aclPermTableBox">
+                            <div class="menu">
+                                <table>
+                                    <tr>
+                                        <td>
+                                            <xsl:variable name="delURL">
+                                                <xsl:value-of
+                                                    select="concat($dataRequest, '&amp;action=delAllPerms&amp;objid=',//objid,'&amp;acpool=',//acpool)" />
+                                            </xsl:variable>
+                                            <div class="clickButtonOut" id="delAllAclPerms" cmd="{$delURL}"
+                                                msg="{i18n:translate('acl-editor.msg.delAllPerms')}">
+                                                <xsl:value-of select="i18n:translate('acl-editor.button.delAllPerms')" />
+                                            </div>
+                                        </td>
+                                        <td class="space"></td>
+                                        <td>
+                                            <div class="checkBoxRow">
+                                                <table>
+                                                    <tr>
+                                                        <td>
+                                                            <xsl:value-of select="concat(i18n:translate('acl-editor.label.markAll'),':')" />
+                                                        </td>
+                                                        <td>
+                                                            <input class="checkBox" type="checkbox" id="delAllCheckBox" />
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </div>
 
-                            <xsl:for-each select="mcr_access[(position()>=$toc.pos.verif) and ($toc.pos.verif+$toc.pageSize>position())]">
-                                <tr id="mapping_line">
+                            <form id="aclEditPermBoxForm" name="MappingTableForm" xmlns:encoder="xalan://java.net.URLEncoder"
+                                xmlns:xalan="http://xml.apache.org/xalan" action="{concat($dataRequest, '&amp;action=submitPerm', $redirectURL)}" method="post"
+                                accept-charset="UTF-8">
+                                <input type="hidden" name="redir" value="{$aclEditorURL}" />
+
+                                <!-- handle tabs reqs -->
+                                <xsl:variable name="toc.pos.verif">
                                     <xsl:choose>
-                                        <xsl:when test="not(../@cmd = $edit)">
-                                            <td>
-                                                <table
-                                                    style="width:100%;border-left:solid 20px;border-left-color:gray;border-top:solid 1px black;border-left-color:gray;">
-                                                    <tr>
-                                                        <td>
-                                                            <xsl:value-of select="concat(i18n:translate('acl-editor.label.objID'),':')" />
-                                                        </td>
-                                                        <td id="OBJID">
-                                                            <b>
-                                                                <xsl:value-of select="OBJID" />
-                                                            </b>
-                                                        </td>
-                                                        <td id="delete">
-                                                            <xsl:value-of select="i18n:translate('acl-editor.label.delete')" />
-                                                            :
-                                                            <input type="checkbox" name="delete_mapping" value="{concat(OBJID,'$',ACPOOL)}" />
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>
-                                                            <xsl:value-of select="i18n:translate('acl-editor.label.permission')" />
-                                                            :
-                                                        </td>
-                                                        <td id="ACPOOL">
-                                                            <b>
+                                        <xsl:when test="$toc.pageSize>count(./mcr_access)">
+                                            <xsl:value-of select="1" />
+                                        </xsl:when>
+                                        <xsl:otherwise>
+                                            <xsl:value-of select="$toc.pos" />
+                                        </xsl:otherwise>
+                                    </xsl:choose>
+                                </xsl:variable>
+                                <xsl:choose>
+                                    <xsl:when test="count(./mcr_access)>0">
+                                        <xsl:for-each select="mcr_access[(position()>=$toc.pos.verif) and ($toc.pos.verif+$toc.pageSize>position())]">
+                                            <xsl:variable name="aclPermTableID" select="concat(OBJID,'$',ACPOOL)" />
+                                            <table id="{$aclPermTableID}" class="aclPermTable">
+                                                <xsl:choose>
+                                                    <xsl:when test="not(../@cmd = $edit)">
+                                                        <tr>
+                                                            <td class="label">
+                                                                <xsl:value-of select="$labelObjID" />
+                                                            </td>
+                                                            <td id="OBJID">
+                                                                <div class="value">
+                                                                    <xsl:value-of select="OBJID" />
+                                                                </div>
+                                                            </td>
+                                                            <td>
+                                                                <div class="checkBoxRow">
+                                                                    <table>
+                                                                        <tr>
+                                                                            <td>
+                                                                                <xsl:value-of select="concat(i18n:translate('acl-editor.label.delete'),':')" />
+                                                                            </td>
+                                                                            <td>
+                                                                                <input id="{concat('checkBox$',$aclPermTableID)}" class="checkBox"
+                                                                                    type="checkbox" value="{concat(OBJID,'$',ACPOOL)}" />
+                                                                            </td>
+                                                                        </tr>
+                                                                    </table>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="label">
+                                                                <xsl:value-of select="$labelPermission" />
+                                                            </td>
+                                                            <td class="value" id="ACPOOL">
                                                                 <xsl:value-of select="ACPOOL" />
-                                                            </b>
-                                                        </td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td>
-                                                            <xsl:value-of select="i18n:translate('acl-editor.label.rule')" />
-                                                            :
-                                                        </td>
-                                                        <td>
-                                                            <b>
+                                                            </td>
+                                                            <td></td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="label">
+                                                                <xsl:value-of select="$labelRule" />
+                                                            </td>
+                                                            <td class="ruleSelctBox">
+                                                                <!--
+                                                                    <div id="{concat('select$',$aclPermTableID)}">
+                                                                    <xsl:value-of select="RID"></xsl:value-of>
+                                                                    </div>
+                                                                -->
+                                                                <xsl:apply-templates select="xalan:nodeset($ruleItems)/items">
+                                                                    <xsl:with-param name="rid" select="RID" />
+                                                                    <xsl:with-param name="selectId" select="concat('select$',$aclPermTableID)" />
+                                                                    <xsl:with-param name="name" select="$aclPermTableID" />
+                                                                </xsl:apply-templates>
+
+                                                            </td>
+                                                            <td></td>
+                                                        </tr>
+                                                    </xsl:when>
+                                                    <xsl:otherwise>
+                                                        <tr>
+                                                            <td>
                                                                 <xsl:apply-templates select="xalan:nodeset($ruleItems)/items">
                                                                     <xsl:with-param name="rid" select="RID" />
                                                                     <xsl:with-param name="name" select="concat(OBJID,'$',ACPOOL)" />
                                                                 </xsl:apply-templates>
-                                                            </b>
-                                                        </td>
-                                                    </tr>
-                                                </table>
-                                                <br />
-                                            </td>
-                                        </xsl:when>
-                                        <xsl:otherwise>
-                                            <td>
-                                                <xsl:apply-templates select="xalan:nodeset($ruleItems)/items">
-                                                    <xsl:with-param name="rid" select="RID" />
-                                                    <xsl:with-param name="name" select="concat(OBJID,'$',ACPOOL)" />
-                                                </xsl:apply-templates>
-                                            </td>
-                                        </xsl:otherwise>
-                                    </xsl:choose>
-                                </tr>
-                            </xsl:for-each>
-                            <tr>
-                                <td>
-                                    <input type="submit" value="{i18n:translate('acl-editor.button.saveChg')}" />
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>
-                                    <xsl:if test="@cmd = $add">
-                                        <input type="button" value="{i18n:translate('acl-editor.button.cancel')}" onclick="history.back()" />
-                                    </xsl:if>
-                                </td>
-                            </tr>
+                                                            </td>
+                                                        </tr>
+                                                    </xsl:otherwise>
+                                                </xsl:choose>
+                                            </table>
+                                        </xsl:for-each>
+                                    </xsl:when>
+                                    <xsl:otherwise>
+                                        <table class="aclPermTable">
+                                            <tr>
+                                                <td>
+                                                    <table>
+                                                        <tr>
+                                                            <td>
+                                                                <xsl:value-of select="i18n:translate('acl-editor.msg.noFilterResults')" />
+                                                            </td>
+                                                            <td></td>
 
-                        </table>
-                    </form>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>
+                                                                <xsl:value-of select="$labelObjID" />
+                                                            </td>
+                                                            <td>
+                                                                <xsl:value-of select="$labelPermission" />
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td>
+                                                                <xsl:value-of select="mcr_access_filter/objid" />
+                                                            </td>
+                                                            <td>
+                                                                <xsl:value-of select="mcr_access_filter/acpool" />
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </xsl:otherwise>
+                                </xsl:choose>
+                                <table class="saveButtonBar">
+                                    <tr>
+                                        <td>
+                                            <input class="button" type="submit" value="{i18n:translate('acl-editor.button.saveChg')}" />
+                                        </td>
+                                    </tr>
+                                    <xsl:if test="@cmd = $add">
+                                        <tr>
+                                            <td>
+
+                                                <input class="button" type="button" value="{i18n:translate('acl-editor.button.cancel')}"
+                                                    onclick="history.back()" />
+
+                                            </td>
+                                        </tr>
+                                    </xsl:if>
+                                </table>
+
+                            </form>
+                        </div>
+                    </div>
                 </xsl:when>
                 <xsl:when test="@cmd = $delete">
                     <form name="MappingTableForm" xmlns:encoder="xalan://java.net.URLEncoder" xmlns:xalan="http://xml.apache.org/xalan"
@@ -257,43 +317,36 @@
             </xsl:choose>
         </xsl:variable>
 
-        <div id="createNewPerm">
-            <br />
+        <xsl:variable name="labelAddRuleAssignment" select="concat(i18n:translate('acl-editor.label.addRuleAss'),':')" />
+
+        <div id="aclCreateNewPermBox">
+            <xsl:if test="not(@emb = 'true')">
+                <div class="aclPermEditorLabel">
+                    <xsl:value-of select="$labelAddRuleAssignment" />
+                </div>
+            </xsl:if>
+
             <form id="createNewPermForm" name="NewPermForm" xmlns:encoder="xalan://java.net.URLEncoder" xmlns:xalan="http://xml.apache.org/xalan"
                 action="{concat($dataRequest, '&amp;action=createNewPerm', $redirectURL)}" method="post" accept-charset="UTF-8">
                 <input type="hidden" name="redir" value="{$aclEditorURL}" />
-                <table style="border:solid 1px;">
-                    <xsl:if test="not(@emb = 'true')">
-                        <tr>
-                            <th align="left">
-                                <b>
-                                    <xsl:value-of select="i18n:translate('acl-editor.label.addRuleAss')" />
-                                    :
-                                </b>
-                                <br />
-                                <br />
-                                <br />
-                            </th>
-                        </tr>
-                    </xsl:if>
+
+                <table class="aclCreateNewPermTable">
                     <xsl:choose>
                         <xsl:when test="not(@cmd = $add)">
                             <tr>
-                                <td>
-                                    <xsl:value-of select="i18n:translate('acl-editor.label.objID')" />
-                                    :
+                                <td class="label">
+                                    <xsl:value-of select="$labelObjID" />
                                 </td>
                                 <td>
-                                    <input name="newPermOBJID" value="{$objId}" size="60" />
+                                    <input id="newPermObjId" class="input" name="newPermOBJID" value="{$objId}" />
                                 </td>
                             </tr>
                             <tr>
-                                <td>
-                                    <xsl:value-of select="i18n:translate('acl-editor.label.permission')" />
-                                    :
+                                <td class="label">
+                                    <xsl:value-of select="$labelPermission" />
                                 </td>
                                 <td>
-                                    <input name="newPermACPOOL" value="{$acPool}" size="60" />
+                                    <input id="newPermAcpool" class="input" name="newPermACPOOL" value="{$acPool}" />
                                 </td>
                             </tr>
                         </xsl:when>
@@ -303,20 +356,24 @@
                         </xsl:otherwise>
                     </xsl:choose>
                     <tr>
-                        <td>
-                            <xsl:value-of select="i18n:translate('acl-editor.label.rule')" />
-                            :
+                        <td class="label">
+                            <xsl:value-of select="$labelRule" />
                         </td>
                         <td>
                             <xsl:apply-templates select="xalan:nodeset($ruleItems)/items">
                                 <xsl:with-param name="rid" select="$rid" />
+                                <xsl:with-param name="selectId" select="'createNewPermFormSelBox'" />
                                 <xsl:with-param name="name" select="'newPermRID'" />
                             </xsl:apply-templates>
                         </td>
                     </tr>
                     <tr>
+                        <td></td>
                         <td colspan="2">
-                            <input type="submit" value="{i18n:translate('acl-editor.button.create')}" />
+                            <input id="newPermSubmitButton" class="button" type="button" value="{i18n:translate('acl-editor.button.create')}"
+                                msgSelBox="{i18n:translate('acl-editor.msg.noRuleSelected')}" 
+                                msgObjId="{i18n:translate('acl-editor.msg.emptyObjId')}"
+                                msgAcPool="{i18n:translate('acl-editor.msg.emptyAcPool')}"/>
                         </td>
                     </tr>
 
@@ -330,43 +387,49 @@
 
     <!-- Template for filter -->
     <xsl:template match="mcr_access_filter">
-        <form name="AclFilterForm" xmlns:encoder="xalan://java.net.URLEncoder" xmlns:xalan="http://xml.apache.org/xalan"
-            action="{concat($dataRequest, '&amp;XSL.toc.pos.SESSION=1&amp;action=setFilter', $redirectURL)}" method="post" accept-charset="UTF-8">
+        <xsl:variable name="labelFilterList" select="concat(i18n:translate('acl-editor.label.filterList'),':')" />
+        <xsl:variable name="labelInsertID" select="concat(i18n:translate('acl-editor.label.insertID'),':')" />
+        <xsl:variable name="labelInsertPerm" select="concat(i18n:translate('acl-editor.label.insertPerm'),':')" />
+        <xsl:variable name="filterRedirURL"
+            select="concat($dataRequest, '&amp;XSL.toc.pos.SESSION=1&amp;action=setFilter&amp;ObjIdFilter=',objid,'&amp;AcPoolFilter=',acpool,$redirectURL)" />
+        <xsl:variable name="filterURL" select="concat($dataRequest, '&amp;XSL.toc.pos.SESSION=1&amp;action=setFilter',$redirectURL)" />
+
+        <form name="AclFilterForm" xmlns:encoder="xalan://java.net.URLEncoder" xmlns:xalan="http://xml.apache.org/xalan" action="{$filterURL}" method="post"
+            accept-charset="UTF-8">
+            <input type="hidden" name="redir" value="{$filterURL}" />
             <table>
                 <tr>
-                    <td colspan="5">
-                        <b>
-                            <xsl:value-of select="i18n:translate('acl-editor.label.filterList')" />
-                            :
-                        </b>
+                    <td class="label" colspan="5">
+                        <xsl:value-of select="$labelFilterList" />
                     </td>
                 </tr>
                 <tr>
                     <td></td>
                     <td>
-                        <xsl:value-of select="i18n:translate('acl-editor.label.insertID')" />
-                        :
+                        <xsl:value-of select="$labelInsertID" />
                     </td>
-                    <td colspan="3">
-                        <xsl:value-of select="i18n:translate('acl-editor.label.insertPerm')" />
-                        :
+                    <td>
+                        <xsl:value-of select="$labelInsertPerm')" />
                     </td>
+                    <td></td>
+                    <td></td>
                 </tr>
                 <tr>
                     <td>
 
                     </td>
                     <td>
-                        <input name="ObjIdFilter" value="{objid}" />
+                        <input class="input" name="ObjIdFilter" value="{objid}" />
                     </td>
                     <td>
-                        <input name="AcPoolFilter" value="{acpool}" />
+                        <input class="input" name="AcPoolFilter" value="{acpool}" />
                     </td>
                     <td>
-                        <input type="submit" value="{i18n:translate('acl-editor.button.filter')}" />
+                        <input class="button" type="submit" value="{i18n:translate('acl-editor.button.filter')}" />
                     </td>
                     <td>
-                        <input onClick="self.location.href='{concat($ServletsBaseURL,'MCRACLEditorServlet_v2?mode=dataRequest&amp;action=deleteFilter')}'"
+                        <input class="button"
+                            onClick="self.location.href='{concat($ServletsBaseURL,'MCRACLEditorServlet_v2?mode=dataRequest&amp;action=deleteFilter')}'"
                             value="{i18n:translate('acl-editor.button.clearFilter')}" type="button" />
                     </td>
 
@@ -376,16 +439,23 @@
     </xsl:template>
 
     <!-- Template for drop down box of Rid's -->
+    <!--<xsl:template match="items">
+        <div id="aclRuleSelBox" class="hidden">
+        <xsl:for-each select="item">
+        <div label="{@label}" value="{@value}" />
+        </xsl:for-each>
+        </div>
+        
+        </xsl:template>
+    -->
     <xsl:template match="items">
         <xsl:param name="rid" />
+        <xsl:param name="selectId" />
+        <xsl:param name="selectInputId" />
         <xsl:param name="name" />
 
-        <select size="1" name="{$name}">
-            <xsl:if test="$rid != ''">
-                <xsl:attribute name="onchange">
-                    <xsl:value-of select="'setChanged(event)'" />
-                </xsl:attribute>
-            </xsl:if>
+
+        <select id="{$selectId}" class="input" size="1" name="{$name}">
             <option value="'bitte waehlen'">
                 <xsl:value-of select="i18n:translate('acl-editor.label.choose')" />
             </option>
@@ -393,13 +463,14 @@
                 <option value="{@value}">
                     <xsl:if test="@value=$rid">
                         <xsl:attribute name="selected">selected<xsl:value-of select="i18n:translate('acl-editor.label.selected')" />
-                        </xsl:attribute>
+        </xsl:attribute>
                     </xsl:if>
                     <xsl:value-of select="@label" />
 
                 </option>
             </xsl:for-each>
         </select>
+
     </xsl:template>
 
     <!-- =============================================================================================================================== -->
@@ -417,34 +488,49 @@
         <xsl:variable name="numChildren">
             <xsl:value-of select="count(xalan:nodeset($childrenXML)/mcr_access)" />
         </xsl:variable>
+
+        <xsl:variable name="labelGor" select="concat(i18n:translate('acl-editor.label.gor'),':')" />
+        <xsl:variable name="labelResults" select="concat(i18n:translate('acl-editor.label.results'),':')" />
+        <xsl:variable name="labelResultsPerPage" select="concat(i18n:translate('acl-editor.label.resultsPerPage'),':')" />
+
         <form xmlns:encoder="xalan://java.net.URLEncoder" xmlns:xalan="http://xml.apache.org/xalan" action="{$permEditorURL}" method="post"
             accept-charset="UTF-8">
-            <!--            <input type="hidden" name="redir" value="{$permEditorURL}" />-->
-            <table>
+            <input type="hidden" name="redir" value="{$permEditorURL}" />
+
+            <table class="permTocNaviResultsTable">
                 <tr>
-                    <td>
-                        <b>
-                            <xsl:value-of select="i18n:translate('acl-editor.label.gor')" />
-                            :
-                        </b>
+                    <td class="label">
+                        <xsl:value-of select="$labelGor" />
                     </td>
                 </tr>
                 <tr>
                     <td>
-                        <xsl:value-of select="i18n:translate('acl-editor.label.results')" />
-                        :
-                        <b>
-                            <xsl:value-of select="$numChildren" />
-                        </b>
+                        <table>
+                            <tr>
+                                <td>
+                                    <xsl:value-of select="$labelResults" />
+                                </td>
 
-                        <xsl:value-of select="concat(',&#32;', i18n:translate('acl-editor.label.resultsPerPage'))" />
-                        :
+                                <td class="numChildren">
+                                    <!-- &#32; is space  -->
+                                    <xsl:value-of select="concat($numChildren,',&#32;')" />
+                                </td>
 
-                        <input name="XSL.toc.pageSize.SESSION" value="{$toc.pageSize}" size="3" />
+                                <td>
+                                    <xsl:value-of select="$labelResultsPerPage" />
+                                </td>
 
-                        <xsl:call-template name="mcr_access.printTOCNavi.chooseHitPage">
-                            <xsl:with-param name="children" select="$childrenXML" />
-                        </xsl:call-template>
+                                <td>
+                                    <input class="input" name="XSL.toc.pageSize.SESSION" value="{$toc.pageSize}" size="3" />
+                                </td>
+
+                                <td>
+                                    <xsl:call-template name="mcr_access.printTOCNavi.chooseHitPage">
+                                        <xsl:with-param name="children" select="$childrenXML" />
+                                    </xsl:call-template>
+                                </td>
+                            </tr>
+                        </table>
                     </td>
                 </tr>
             </table>
