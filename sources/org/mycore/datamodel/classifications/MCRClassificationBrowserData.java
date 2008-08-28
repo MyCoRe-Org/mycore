@@ -25,6 +25,7 @@ package org.mycore.datamodel.classifications;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
@@ -225,9 +226,7 @@ public class MCRClassificationBrowserData {
         if (objectType != null) {
             objectTypeArray = objectType.split(",");
         } else {
-            objectTypeArray = new String[1];
-            objectTypeArray[0] = "document";
-            LOGGER.warn("No object type was found - document was set");
+            objectTypeArray = new String[0];
         }
     }
 
@@ -370,8 +369,26 @@ public class MCRClassificationBrowserData {
         for (MCRCategory cat : children) {
             ids.add(cat.getId());
         }
-
-        Map<MCRCategoryID, Number> countMap = MCRCategLinkServiceFactory.getInstance().countLinks(ids);
+        Map<MCRCategoryID, Number> countMap=null;
+        if (objectTypeArray.length==0)
+            countMap = MCRCategLinkServiceFactory.getInstance().countLinks(ids);
+        else if (objectTypeArray.length==1){
+            countMap = MCRCategLinkServiceFactory.getInstance().countLinksForType(ids, objectTypeArray[0]);
+        }
+        else {
+            countMap=new HashMap<MCRCategoryID, Number>(ids.size());
+            for (String type:objectTypeArray){
+                for (Map.Entry<MCRCategoryID, Number> entry:MCRCategLinkServiceFactory.getInstance().countLinksForType(ids, type).entrySet()){
+                    Number value=countMap.get(entry.getKey());
+                    if (value==null){
+                        value=entry.getValue();
+                    } else {
+                        value = value.intValue() + entry.getValue().intValue();
+                    }
+                    countMap.put(entry.getKey(), value);
+                }
+            }
+        }
 
         for (MCRCategory cat : children) {
             lines.add(++i, setTreeline(cat, countMap));

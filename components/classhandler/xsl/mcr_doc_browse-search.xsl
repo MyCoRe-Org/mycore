@@ -60,15 +60,18 @@
  <xsl:variable name="predecessor" select="@predecessor" />
  <xsl:variable name="classifID" select="@classifID" />
  <xsl:variable name="view" select="@view" />
- <xsl:variable name="doctype" select="@doctype" />
  <xsl:variable name="restriction" select="@restriction" />
- <xsl:variable name="search_attribute" select="@searchField" />
 
  <xsl:for-each select="row">
    <xsl:variable name="href1" select="concat($WebApplicationBaseURL, 'browse', col[2]/@searchbase, $HttpSession)" />
    <xsl:variable name="actnode" select="position()" />  
-
-   <xsl:variable name="href2" select="concat($ServletsBaseURL, 'MCRSearchServlet', $HttpSession, '?query=(',$search,'+=+', col[2]/@lineID, ')+and+',$doctype,'&amp;numPerPage=10','&amp;mask=browse/',$type)" />
+   <xsl:variable name="query">
+    <xsl:value-of select="concat('(',$search,'+=+', col[2]/@lineID, ')')"/>
+    <xsl:if test="string-length(../@doctype)>0">
+      <xsl:value-of select="concat('+and+', ../@doctype)"/>
+    </xsl:if>
+   </xsl:variable>
+   <xsl:variable name="href2" select="concat($ServletsBaseURL, 'MCRSearchServlet', $HttpSession, '?query=',$query,'&amp;numPerPage=10','&amp;mask=browse/',$type)" />
    <xsl:variable name="img1"  select="concat($WebApplicationBaseURL, 'images/', col[1]/@folder1, '.gif')" />
    <xsl:variable name="img2"  select="concat($WebApplicationBaseURL, 'images/', col[1]/@folder2, '.gif')" />
    <xsl:variable name="img3"  select="concat($WebApplicationBaseURL, 'images/folder_blank.gif')" />
