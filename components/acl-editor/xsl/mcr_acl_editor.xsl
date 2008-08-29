@@ -22,10 +22,19 @@
 
     <xsl:include href="mcr_acl_editor_common.xsl" />
 
-    <xsl:variable name="PageTitle" select="'ACL Editor'" />
+    <xsl:variable name="PageTitle">
+        <xsl:choose>
+            <xsl:when test="//editor = $permEditor">
+                <xsl:value-of select="i18n:translate('acl-editor.permEditor')" />
+            </xsl:when>
+            <xsl:when test="//editor = $ruleEditor">
+                <xsl:value-of select="i18n:translate('acl-editor.ruleEditor')" />
+            </xsl:when>
+        </xsl:choose>
+    </xsl:variable>
 
-    <xsl:variable name="javaScript" select="concat($WebApplicationBaseURL,'modules/acl-editor/web/JS/aclEditor.js')" />
-    <xsl:variable name="css" select="concat($WebApplicationBaseURL,'modules/acl-editor/web/CSS/acl_editor.css')" />
+    <!--    <xsl:variable name="javaScript" select="concat($WebApplicationBaseURL,'modules/acl-editor/web/JS/aclEditor.js')" />-->
+    <!--    <xsl:variable name="css" select="concat($WebApplicationBaseURL,'modules/acl-editor/web/CSS/acl_editor.css')" />-->
 
     <xsl:template match="mcr_acl_editor">
         <xsl:variable name="filter">
@@ -36,8 +45,6 @@
         </xsl:variable>
 
         <div id="ACL-Editor">
-<!--            <script type="text/javascript" src="{$javaScript}" language="JavaScript" />-->
-<!--            <link rel="stylesheet" type="text/css" href="{$css}" />-->
 
             <xsl:choose>
                 <xsl:when test="editor = $permEditor">
