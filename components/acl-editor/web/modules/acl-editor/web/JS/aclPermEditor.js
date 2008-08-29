@@ -53,7 +53,12 @@ function initDelAllAclPermsButton(){
  */
 function initDelAllAclPermsCheckbox(){
     var delAllCheckbox = document.getElementById("delAllCheckBox");
-    
+    delAllCheckbox.label = document.getElementById("checkBoxRowLabel");
+    if(document.all)
+        delAllCheckbox.labelChecked = delAllCheckbox.getAttributeNode("labelChecked").value;
+    else
+        delAllCheckbox.labelChecked = delAllCheckbox.getAttribute("labelChecked");
+    delAllCheckbox.labelStd = delAllCheckbox.label.innerHTML;
     
     delAllCheckbox.onclick = function(event){
         var checkBoxes = permBox.delPermsCheckboxes;
@@ -64,6 +69,11 @@ function initDelAllAclPermsCheckbox(){
             if (this.checked != currentCheckbox.checked)
                 currentCheckbox.click();
         }
+        
+        if (this.checked)
+            this.label.innerHTML = this.labelChecked;
+        else
+            this.label.innerHTML = this.labelStd;
     }
 }
 

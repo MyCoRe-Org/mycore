@@ -38,7 +38,7 @@
             <div id="aclRuleEditor" onmouseover="aclRuleEditorSetup()">
                 <div id="aclCreateNewRuleBox">
                     <div class="aclRuleEditorlabel">
-                        <xsl:value-of select="concat(i18n:translate('acl-editor.label.newRule'),':')" />
+                        <xsl:value-of select="i18n:translate('acl-editor.label.newRule')" />
                     </div>
                     <div id="aclCreateNewRuleForm">
                         <form xmlns:encoder="xalan://java.net.URLEncoder" xmlns:xalan="http://xml.apache.org/xalan"
@@ -75,118 +75,122 @@
                 </div><!-- End aclCreateNewRuleBox -->
 
                 <div id="aclEditRuleBox">
-                    <div class="menu">
-                        <table>
-                            <tr>
-                                <td class="openAll">
-                                    <!-- Details button -->
-                                    <div id="detailsAllButton" class="clickButtonOut" altLabel="{i18n:translate('acl-editor.button.collapsAll')}">
-                                        <xsl:value-of select="i18n:translate('acl-editor.button.expandAll')" />
-                                    </div>
-                                </td>
-                                <td class="deleteAll">
-                                    <!-- Delete all rules button -->
-                                    <div id="delAllRulesButton" class="clickButtonOut"
-                                        cmd="{concat($dataRequest, '&amp;action=delAllRules')}" msg="{i18n:translate('acl-editor.msg.delAllRules')}">
-                                        <xsl:value-of select="i18n:translate('acl-editor.button.delAllRules')" />
-                                    </div>
-                                </td>
-                                <td class="checkBoxRow">
-                                    
-                                    <table>
-                                        <tr>
-                                            <td class="space"> </td>
-                                            <td>
-                                                <xsl:value-of select="concat(i18n:translate('acl-editor.label.markAll'),':')" />
-                                            </td>
-                                            <td>
-                                                <input class="checkBox" type="checkbox" id="delAllRulesCheckBox" />
-                                            </td>
-                                        </tr>
-                                    </table>
-                                </td>
-                            </tr>
-                        </table>
+                    <div class="aclRuleEditorlabel">
+                        <xsl:value-of select="i18n:translate('acl-editor.label.ruleSys')" />
                     </div>
-                    <form id="aclEditRuleBoxForm" xmlns:encoder="xalan://java.net.URLEncoder" xmlns:xalan="http://xml.apache.org/xalan"
-                        action="{concat($dataRequest, '&amp;action=submitRule')}" method="post" accept-charset="UTF-8">
-                        <input type="hidden" name="redir" value="{concat($aclEditorURL,$currentEditor)}" />
-
-                        <xsl:for-each select="mcr_access_rule">
-                            <xsl:variable name="ruleFieldID" select="concat('RuleField$',RID)"/>
-                            <xsl:variable name="ruleFieldButtonID" select="concat('RuleFieldButton$',RID)"/>
-                            <xsl:variable name="checkBoxID" select="concat('CheckBox$',RID)"/>
-                            <xsl:variable name="ruleInUseID" select="concat('RuleInUse$',RID)"/>
-                            <table class="aclRuleTable" id="{RID}">
-                                <tr name="rule_line" id="{concat('Rule$',RID)}">
-                                    <td class="buttonCol">
-                                        <!-- Button for details -->
-                                        <div class="detailsSwitch clickButtonOut" id="{$ruleFieldButtonID}">+</div>
-                                    </td>
-                                    <td>
-                                        <xsl:value-of select="$labelRuleId" />
-                                    </td>
-                                    <td class="ruleID">
-                                        <xsl:value-of select="RID" />
-                                    </td>
-
-                                    <!-- Delete checkbox -->
-                                    <xsl:choose>
-                                        <xsl:when test="inUse = 'true'">
-                                            <td id="{$ruleInUseID}" class="delInactiv" hoverMsg="{$inUseInfoMsg}" msgID="{$inUseInfoMsgID}">
-                                                <table>
-                                                    <tr>
-                                                        <td>
-                                                            <xsl:value-of select="$labelDelete" />
-                                                        </td>
-                                                        <td>
-                                                            <input class="checkBox" type="checkbox" disabled="disabled" name="delete_rule" value="{RID}" />
-                                                        </td>
-                                                    </tr>
-                                                </table>
-                                            </td>
-                                        </xsl:when>
-                                        <xsl:when test="inUse = 'false'">
-                                            <td class="delActiv">
-                                                <table>
-                                                    <tr>
-                                                        <td>
-                                                            <xsl:value-of select="$labelDelete" />
-                                                        </td>
-                                                        <td>
-                                                            <input id="{$checkBoxID}" class="checkBox" type="checkbox" name="delete_rule" value="{RID}" />
-                                                        </td>
-                                                    </tr>
-                                                </table>
-                                            </td>
-                                        </xsl:when>
-                                    </xsl:choose>
-                                </tr>
+                    <div class="aclRuleTableBox">
+                        <div class="menu">
+                            <table>
                                 <tr>
-                                    <td class="buttonCol"></td>
-                                    <td class="label">
-                                        <xsl:value-of select="$labelDescription" />
+                                    <td class="openAll">
+                                        <!-- Details button -->
+                                        <div id="detailsAllButton" class="clickButtonOut" altLabel="{i18n:translate('acl-editor.button.collapsAll')}">
+                                            <xsl:value-of select="i18n:translate('acl-editor.button.expandAll')" />
+                                        </div>
                                     </td>
-                                    <td id="Description">
-                                        <input class="input" name="{concat('RuleDesc$',RID)}" value="{DESCRIPTION}" onkeypress="setChanged(event)" />
+                                    <td class="deleteAll">
+                                        <!-- Delete all rules button -->
+                                        <div id="delAllRulesButton" class="clickButtonOut" cmd="{concat($dataRequest, '&amp;action=delAllRules')}"
+                                            msg="{i18n:translate('acl-editor.msg.delAllRules')}">
+                                            <xsl:value-of select="i18n:translate('acl-editor.button.delAllRules')" />
+                                        </div>
                                     </td>
-                                </tr>
-                                <tr class="ruleField" id="{$ruleFieldID}">
-                                    <td class="buttonCol"></td>
-                                    <td class="label">
-                                        <xsl:value-of select="$labelRule" />
-                                    </td>
-                                    <td id="ruleField">
-                                        <textarea class="textarea" name="{concat('Rule$',RID)}" onkeypress="setChanged(event)">
-                                            <xsl:value-of select="RULE" />
-                                        </textarea>
+                                    <td class="checkBoxRow">
+
+                                        <table>
+                                            <tr>
+                                                <td class="space"></td>
+                                                <td>
+                                                    <xsl:value-of select="concat(i18n:translate('acl-editor.label.markAll'),':')" />
+                                                </td>
+                                                <td>
+                                                    <input class="checkBox" type="checkbox" id="delAllRulesCheckBox" />
+                                                </td>
+                                            </tr>
+                                        </table>
                                     </td>
                                 </tr>
                             </table>
-                            <hr/>
-                        </xsl:for-each>
-                        <input class="button" type="submit" value="{i18n:translate('acl-editor.button.saveChg')}" />
-                    </form>
+                        </div>
+                        <form id="aclEditRuleBoxForm" xmlns:encoder="xalan://java.net.URLEncoder" xmlns:xalan="http://xml.apache.org/xalan"
+                            action="{concat($dataRequest, '&amp;action=submitRule')}" method="post" accept-charset="UTF-8">
+                            <input type="hidden" name="redir" value="{concat($aclEditorURL,$currentEditor)}" />
+
+                            <xsl:for-each select="mcr_access_rule">
+                                <xsl:variable name="ruleFieldID" select="concat('RuleField$',RID)" />
+                                <xsl:variable name="ruleFieldButtonID" select="concat('RuleFieldButton$',RID)" />
+                                <xsl:variable name="checkBoxID" select="concat('CheckBox$',RID)" />
+                                <xsl:variable name="ruleInUseID" select="concat('RuleInUse$',RID)" />
+                                <table class="aclRuleTable" id="{RID}">
+                                    <tr name="rule_line" id="{concat('Rule$',RID)}">
+                                        <td class="buttonCol">
+                                            <!-- Button for details -->
+                                            <div class="detailsSwitch clickButtonOut" id="{$ruleFieldButtonID}">+</div>
+                                        </td>
+                                        <td>
+                                            <xsl:value-of select="$labelRuleId" />
+                                        </td>
+                                        <td class="ruleID">
+                                            <xsl:value-of select="RID" />
+                                        </td>
+
+                                        <!-- Delete checkbox -->
+                                        <xsl:choose>
+                                            <xsl:when test="inUse = 'true'">
+                                                <td id="{$ruleInUseID}" class="delInactiv" hoverMsg="{$inUseInfoMsg}" msgID="{$inUseInfoMsgID}">
+                                                    <table>
+                                                        <tr>
+                                                            <td>
+                                                                <xsl:value-of select="$labelDelete" />
+                                                            </td>
+                                                            <td>
+                                                                <input class="checkBox" type="checkbox" disabled="disabled" name="delete_rule" value="{RID}" />
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                </td>
+                                            </xsl:when>
+                                            <xsl:when test="inUse = 'false'">
+                                                <td class="delActiv">
+                                                    <table>
+                                                        <tr>
+                                                            <td>
+                                                                <xsl:value-of select="$labelDelete" />
+                                                            </td>
+                                                            <td>
+                                                                <input id="{$checkBoxID}" class="checkBox" type="checkbox" name="delete_rule" value="{RID}" />
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                </td>
+                                            </xsl:when>
+                                        </xsl:choose>
+                                    </tr>
+                                    <tr>
+                                        <td class="buttonCol"></td>
+                                        <td class="label">
+                                            <xsl:value-of select="$labelDescription" />
+                                        </td>
+                                        <td id="Description">
+                                            <input class="input" name="{concat('RuleDesc$',RID)}" value="{DESCRIPTION}" onkeypress="setChanged(event)" />
+                                        </td>
+                                    </tr>
+                                    <tr class="ruleField" id="{$ruleFieldID}">
+                                        <td class="buttonCol"></td>
+                                        <td class="label">
+                                            <xsl:value-of select="$labelRule" />
+                                        </td>
+                                        <td id="ruleField">
+                                            <textarea class="textarea" name="{concat('Rule$',RID)}" onkeypress="setChanged(event)">
+                                                <xsl:value-of select="RULE" />
+                                            </textarea>
+                                        </td>
+                                    </tr>
+                                </table>
+                            </xsl:for-each>
+                            <input class="button" type="submit" value="{i18n:translate('acl-editor.button.saveChg')}" />
+                        </form>
+                    </div>
                 </div><!-- End aclEditRuleBox -->
                 <div id="{$inUseInfoMsgID}" class="msgWindow"><xsl:value-of select="$inUseInfoMsg"/></div>
             </div><!-- End aclRuleEditor -->

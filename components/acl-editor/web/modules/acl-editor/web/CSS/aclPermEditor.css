@@ -23,10 +23,6 @@ form {
 	border: solid 2px red;
 }
 
-/** html #aclPermEditor .input{
-    width: 200px;   
-}*/
-
 #aclPermEditor .button{
 	margin-top: 2px;
 	border-top: solid 1px white;
@@ -38,19 +34,8 @@ form {
 #aclCreateNewPermBox, #aclEditPermBox{
 	background-color: #edeff5;
 	border: solid 1px black;
-	/*padding: 3px;*/
 	margin-top: 10px;
 	margin-bottom: 10px;
-}
-
-.aclPermTable{
-    width: 100%; 
-    border: solid 1px #484848;
-    border-left: solid 4px gray;
-    margin-top: 2px;
-    margin-bottom: 2px;
-    padding-top: 2px;
-    padding-bottom: 2px;
 }
 
 .aclCreateNewPermTable {
@@ -140,15 +125,41 @@ form {
     border-top-color: #d8d8d8;
 }
 
+/*
+ * Editing permission box
+ */
+#aclEditPermBox .checkBox {
+	border: none;
+}
+
 .aclPermTableBox .menu table{
 	width: 100%;
+}
+
+.aclPermTableBox .menu .checkBoxRow{
+    text-align: right;
 }
 
 .aclPermTableBox .menu .space {
     width: 30%;    
 }
 
-.aclPermTableBox .checkBoxRow table{
+.aclPermTable{
+    width: 100%; 
+    border: solid 1px #484848;
+    border-left: solid 4px gray;
+    margin-top: 2px;
+    margin-bottom: 2px;
+    padding-top: 2px;
+    padding-bottom: 2px;
+}
+
+.aclPermTable .delCheckBoxRow{
+    text-align: right;
+    width: 10%;
+}
+
+.aclPermTable .delCheckBoxRow table{
     text-align: right;
 	width: 100%;
 }
@@ -161,23 +172,16 @@ form {
 .aclPermTable .value {
     overflow: scroll;
     font-weight: bold;
-    max-width: 80%;
-}
-
-#aclEditPermBox .checkBox {
-	border: none;
-}
-
-.delCheckBoxRow{
-    overflow: hidden;
-    background-color: red;
-    max-width: 10px;
+    max-width: 75%;
 }
 
 .selBox{
     border: solid 1px black;
 }
 
+/*
+ * Misc
+ */
 .hidden, .selBox .value,.selBox table{
     display: none;
 }

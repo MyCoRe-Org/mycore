@@ -61,7 +61,7 @@
             <xsl:choose>
                 <xsl:when test="not(@cmd = $add) and not(@cmd = $delete)">
                     <!-- Mapping Table -->
-                    <xsl:variable name="labelScra" select="concat(i18n:translate('acl-editor.label.scra'),':')" />
+                    <xsl:variable name="labelScra" select="i18n:translate('acl-editor.label.scra')" />
 
                     <div id="aclEditPermBox">
                         <xsl:if test="not(@emb = 'true')">
@@ -99,11 +99,12 @@
                                             <div class="checkBoxRow">
                                                 <table>
                                                     <tr>
-                                                        <td>
+                                                        <td id="checkBoxRowLabel">
                                                             <xsl:value-of select="concat(i18n:translate('acl-editor.label.markAll'),':')" />
                                                         </td>
                                                         <td>
-                                                            <input class="checkBox" type="checkbox" id="delAllCheckBox" />
+                                                            <input class="checkBox" type="checkbox" id="delAllCheckBox"
+                                                                labelChecked="{concat(i18n:translate('acl-editor.label.delAllChecked'),':')}" />
                                                         </td>
                                                     </tr>
                                                 </table>
@@ -140,25 +141,23 @@
                                                             <td class="label">
                                                                 <xsl:value-of select="$labelObjID" />
                                                             </td>
-                                                            <td id="OBJID">
-                                                                <div class="value">
+                                                            <td id="OBJID" class="value">
+                                                                <div>
                                                                     <xsl:value-of select="OBJID" />
                                                                 </div>
                                                             </td>
-                                                            <td>
-                                                                <div class="checkBoxRow">
-                                                                    <table>
-                                                                        <tr>
-                                                                            <td>
-                                                                                <xsl:value-of select="concat(i18n:translate('acl-editor.label.delete'),':')" />
-                                                                            </td>
-                                                                            <td>
-                                                                                <input id="{concat('checkBox$',$aclPermTableID)}" class="checkBox"
-                                                                                    type="checkbox" value="{concat(OBJID,'$',ACPOOL)}" />
-                                                                            </td>
-                                                                        </tr>
-                                                                    </table>
-                                                                </div>
+                                                            <td class="delCheckBoxRow">
+                                                                <table>
+                                                                    <tr>
+                                                                        <td>
+                                                                            <xsl:value-of select="concat(i18n:translate('acl-editor.label.delete'),':')" />
+                                                                        </td>
+                                                                        <td>
+                                                                            <input id="{concat('checkBox$',$aclPermTableID)}" class="checkBox" type="checkbox"
+                                                                                value="{concat(OBJID,'$',ACPOOL)}" />
+                                                                        </td>
+                                                                    </tr>
+                                                                </table>
                                                             </td>
                                                         </tr>
                                                         <tr>
@@ -317,7 +316,7 @@
             </xsl:choose>
         </xsl:variable>
 
-        <xsl:variable name="labelAddRuleAssignment" select="concat(i18n:translate('acl-editor.label.addRuleAss'),':')" />
+        <xsl:variable name="labelAddRuleAssignment" select="i18n:translate('acl-editor.label.addRuleAss')" />
 
         <div id="aclCreateNewPermBox">
             <xsl:if test="not(@emb = 'true')">
@@ -371,9 +370,8 @@
                         <td></td>
                         <td colspan="2">
                             <input id="newPermSubmitButton" class="button" type="button" value="{i18n:translate('acl-editor.button.create')}"
-                                msgSelBox="{i18n:translate('acl-editor.msg.noRuleSelected')}" 
-                                msgObjId="{i18n:translate('acl-editor.msg.emptyObjId')}"
-                                msgAcPool="{i18n:translate('acl-editor.msg.emptyAcPool')}"/>
+                                msgSelBox="{i18n:translate('acl-editor.msg.noRuleSelected')}" msgObjId="{i18n:translate('acl-editor.msg.emptyObjId')}"
+                                msgAcPool="{i18n:translate('acl-editor.msg.emptyAcPool')}" />
                         </td>
                     </tr>
 

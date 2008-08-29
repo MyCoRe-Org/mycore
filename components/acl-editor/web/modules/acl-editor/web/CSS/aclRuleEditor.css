@@ -18,13 +18,25 @@ form {
 #aclCreateNewRuleBox, #aclEditRuleBox {
 	background-color: #edeff5;
 	border: solid 1px black;
-	padding: 3px;
 	margin-top: 10px;
 	margin-bottom: 10px;
 }
 
+#aclCreateNewRuleBox #aclCreateNewRuleForm {
+    padding: 3px;
+}
+
 .aclRuleTable {
 	width: 100%;
+}
+
+#aclEditRuleBox .aclRuleTable {
+	border: solid 1px #484848;
+    border-left: solid 4px gray;
+    margin-top: 2px;
+    margin-bottom: 2px;
+    padding-top: 2px;
+    padding-bottom: 2px;
 }
 
 .aclRuleTable .buttonCol{
@@ -75,14 +87,24 @@ form {
 
 .aclRuleEditorlabel {
 	font-weight: bold;
-	padding: 3px;
+    padding: 3px;
+	width: 100%;
+	background-color: #f5f3ed;
+	vertical-align: middle;
+	display: table-caption;
+	border-bottom: solid 1px black;
 }
 
 /*
  *  ACL editing rules box
  */
+#aclEditRuleBox .aclRuleTableBox {
+    padding: 3px;
+}
+
 #aclEditRuleBox .menu {
 	border: solid 1px black;
+	background-color: #f4f5ed;
 }
 
 #aclEditRuleBox .menu table{
