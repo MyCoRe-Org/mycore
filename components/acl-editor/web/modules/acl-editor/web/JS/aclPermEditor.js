@@ -17,7 +17,7 @@ var setup = false;
  ************************************************************************/
  
 /*
- * Init the rule editor
+ * Init the permission editor
  */
 function aclPermEditorSetup(){
     if (!this.setup){

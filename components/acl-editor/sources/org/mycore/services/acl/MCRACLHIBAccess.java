@@ -20,8 +20,10 @@ import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.backend.hibernate.tables.MCRACCESS;
 import org.mycore.backend.hibernate.tables.MCRACCESSRULE;
 import org.mycore.common.MCRCache;
+import org.mycore.common.MCRSessionMgr;
 
 public class MCRACLHIBAccess {
+    String uid = MCRSessionMgr.getCurrentSession().getCurrentUserID();
 
     private static Logger LOGGER = Logger.getLogger(MCRACLHIBAccess.class);
 
@@ -110,7 +112,7 @@ public class MCRACLHIBAccess {
                 debugMSG.append(desc);
 
                 LOGGER.debug(debugMSG.toString());
-                MCRAccessRule accessRule = new MCRAccessRule(rid, "ACL-Editor", new Date(), ruleString, desc);
+                MCRAccessRule accessRule = new MCRAccessRule(rid, uid, new Date(), ruleString, desc);
                 ruleStore.updateRule(accessRule);
                 cache.put(rid, accessRule);
             }
@@ -121,7 +123,7 @@ public class MCRACLHIBAccess {
                 String rid = rule.getRid();
                 String ruleString = rule.getRule();
                 String desc = rule.getDescription();
-                MCRAccessRule accessRule = new MCRAccessRule(rid, "ACL-Editor", new Date(), ruleString, desc);
+                MCRAccessRule accessRule = new MCRAccessRule(rid, uid, new Date(), ruleString, desc);
 
                 ruleStore.createRule(accessRule);
                 cache.put(rid, accessRule); // upadte cache

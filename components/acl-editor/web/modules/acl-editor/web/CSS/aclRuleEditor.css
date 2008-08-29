@@ -22,7 +22,7 @@ form {
 	margin-bottom: 10px;
 }
 
-#aclCreateNewRuleBox #aclCreateNewRuleForm {
+#aclCreateNewRuleBox .aclCreateNewRule {
     padding: 3px;
 }
 
@@ -183,8 +183,13 @@ form {
     height: 30px; 
 }
    
-/******************************/
-/* IE Tan-Hack 				  */
-/* for Internet Explorer only */
-/******************************/
+#aclCreateNewRuleForm .faultyInput{
+    width: 80%;
+    border: solid 2px red;
+}
 
+.faultyTextarea{
+	width: 80%;
+	height: 100px;
+	border: solid 2px red;
+}

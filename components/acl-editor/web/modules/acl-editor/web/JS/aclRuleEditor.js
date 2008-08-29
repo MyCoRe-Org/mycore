@@ -30,10 +30,21 @@ function aclRuleEditorSetup(){
     
         initAclEditRuleBox();
         
+        initCreateNewRuleButton()
+        
         this.setup = true;
         
     }
 }   
+
+/*
+ * Init the create new rule submit button
+ */
+function initCreateNewRuleButton(){
+    var submitButton = document.getElementById("createNewRuleButon");
+    
+    submitButton.onclick = createNewRule;
+}
 
 /*
  * Init the edit rule box
@@ -370,4 +381,42 @@ function displRuleInUseMsg(event){
 function removeRuleInUseMsg(event){
     this.msgWindow.style.display = "none";
     //this.msgWindow.removeChild(this.msgWindow.debug);
+}
+
+function createNewRule(event){
+    var msg = "";
+    var msgDesc = this.getAttribute("msgDesc"); 
+    var msgRule = this.getAttribute("msgRule");
+    var descElem = document.getElementById("aclNewRuleDesc");
+    var ruleElem = document.getElementById("aclNewRuleStr");
+    var descStr = descElem.value;
+    var ruleStr = ruleElem.value;
+    var noErrors = true;
+    
+    if (descStr.removeSpace().length <= 0){
+        noErrors = false;
+        msg = msg + "\n" + msgDesc;
+        descElem.className = "faultyInput";
+    } else {
+        descElem.className = "input";
+    }
+    
+    if (ruleStr.removeSpace().length <= 0){
+        noErrors = false;
+        msg = msg + "\n" + msgRule;
+        ruleElem.className = "faultyTextarea";
+    } else {
+        ruleElem.className = "textarea";
+    }
+    
+    if (noErrors)
+        document.getElementById("aclCreateNewRuleForm").submit();
+    else
+        alert(msg)
+    
+    
+}
+
+String.prototype.removeSpace = function() {
+  return this.replace(/\s+/g, "");
 }

@@ -23,6 +23,8 @@ import org.mycore.access.mcrimpl.MCRAccessStore;
 import org.mycore.access.mcrimpl.MCRRuleMapping;
 import org.mycore.backend.hibernate.tables.MCRACCESS;
 import org.mycore.backend.hibernate.tables.MCRACCESSRULE;
+import org.mycore.common.MCRSessionMgr;
+import org.mycore.frontend.servlets.MCRServlet;
 
 import com.ibm.icu.util.StringTokenizer;
 
@@ -147,6 +149,7 @@ public class MCRAclEditorStdImpl extends MCRAclEditor {
         String objId = request.getParameter("newPermOBJID");
         String acPool = request.getParameter("newPermACPOOL");
         String ruleId = request.getParameter("newPermRID");
+        String uid = MCRServlet.getProperty(request, "uid");
 
         LOGGER.debug("ObjId: " + objId);
         LOGGER.debug("AcPool: " + acPool);
@@ -230,12 +233,14 @@ public class MCRAclEditorStdImpl extends MCRAclEditor {
         List<MCRACCESS> accessList = HIBA.getAccessPermission(objidFilter, acpoolFilter);
         HashMap<String, LinkedList<MCRRuleMapping>> diffMap = new HashMap<String, LinkedList<MCRRuleMapping>>();
         LinkedList<MCRRuleMapping> deleteAccess = new LinkedList<MCRRuleMapping>();
-
+        
         for (Iterator iter = accessList.iterator(); iter.hasNext();) {
             MCRACCESS currentAcc = (MCRACCESS) iter.next();
             String rid = currentAcc.getRule().getRid();
             String acpool = currentAcc.getKey().getAcpool();
             String objid = currentAcc.getKey().getObjid();
+            
+            
 
             MCRRuleMapping ruleMapping = XMLProcessing.createRuleMapping(rid, acpool, objid);
             deleteAccess.add(ruleMapping);
@@ -306,14 +311,17 @@ public class MCRAclEditorStdImpl extends MCRAclEditor {
         MCRAccessInterface AI = MCRAccessControlSystem.instance();
         String rule = request.getParameter("newRule").trim();
         String desc = request.getParameter("newRuleDesc");
+        String uid = MCRSessionMgr.getCurrentSession().getCurrentUserID();
 
         if (rule.startsWith("<"))
             rule = ruleFromXML(rule);
 
         accessRule.setRule(rule);
         accessRule.setDescription(desc);
+        
+        LOGGER.debug("User ID: " + uid);
 
-        AI.createRule(accessRule.getRule(), "ACL-Editor", accessRule.getDescription());
+        AI.createRule(accessRule.getRule(), uid, accessRule.getDescription());
 
         LOGGER.debug("Rule: " + rule);
         LOGGER.debug("Desc: " + desc);
@@ -347,7 +355,8 @@ public class MCRAclEditorStdImpl extends MCRAclEditor {
 
     private Element processRuleSubmission(HttpServletRequest request) {
         LOGGER.debug("Processing Rule submission.");
-
+        
+        String uid = MCRServlet.getProperty(request, "uid");
         Map<String, String[]> parameterMap = request.getParameterMap();
         Set<String> keySet = parameterMap.keySet();
         Iterator<String> iter = keySet.iterator();
@@ -405,6 +414,7 @@ public class MCRAclEditorStdImpl extends MCRAclEditor {
     private Element deleteAllRules(HttpServletRequest request) {
         LOGGER.debug("Delete all rules.");
 
+        String uid = MCRServlet.getProperty(request, "uid");
         HashMap diffMap = new HashMap();
 
         List<MCRACCESSRULE> ruleList = HIBA.getAccessRule();
