@@ -226,16 +226,16 @@ public class MCRAccessCommands extends MCRAbstractCommands {
             if (description.equals(""))
                 description = "No description";
             org.jdom.Element rule = AI.getRule(permission);
-            System.out.println("       " + permission);
-            System.out.println("           " + description);
+            LOGGER.info("       " + permission);
+            LOGGER.info("           " + description);
             if (rule != null) {
                 org.jdom.output.XMLOutputter o = new org.jdom.output.XMLOutputter();
-                System.out.println("           " + o.outputString(rule));
+                LOGGER.info("           " + o.outputString(rule));
             }
         }
         if (noPermissionsDefined)
-            System.out.println("No permissions defined");
-        System.out.println();
+        	LOGGER.warn("No permissions defined");
+        LOGGER.info("");
     }
 
     /**
@@ -278,15 +278,14 @@ public class MCRAccessCommands extends MCRAbstractCommands {
 
     private static Element getRuleFromFile(String strFileRule) {
         if (!checkFilename(strFileRule)) {
-            System.out.println("wrong file format or file doesn't exist");
+            LOGGER.warn("Wrong file format or file doesn't exist");
             return null;
         }
         Document ruleDom = MCRXMLHelper.parseURI(strFileRule);
         Element rule = ruleDom.getRootElement();
         if (!rule.getName().equals("condition")) {
-            System.out.println("root element is not valid");
-            System.out.println("a valid rule would be for example:");
-            System.out.println("<condition format=\"xml\"><boolean operator=\"true\" /></condition>");
+            LOGGER.warn("ROOT element is not valid, a valid rule would be for example:");
+            LOGGER.warn("<condition format=\"xml\"><boolean operator=\"true\" /></condition>");
             return null;
         }
         return rule;
