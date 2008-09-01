@@ -53,6 +53,8 @@ function initDelAllAclPermsButton(){
  */
 function initDelAllAclPermsCheckbox(){
     var delAllCheckbox = document.getElementById("delAllCheckBox");
+    
+    if (delAllCheckbox){
     delAllCheckbox.label = document.getElementById("checkBoxRowLabel");
     if(document.all)
         delAllCheckbox.labelChecked = delAllCheckbox.getAttributeNode("labelChecked").value;
@@ -74,6 +76,7 @@ function initDelAllAclPermsCheckbox(){
             this.label.innerHTML = this.labelChecked;
         else
             this.label.innerHTML = this.labelStd;
+    }
     }
 }
 
@@ -104,6 +107,8 @@ function initCreateNewRuleSubmit(){
  */
 function initAclEditPermBox(){
     var permBoxElem = document.getElementById("aclEditPermBox");
+    
+    if (permBoxElem){
     var tables = permBoxElem.getElementsByTagName("table");
     
     for (i=0; i < tables.length; i++){
@@ -127,6 +132,7 @@ function initAclEditPermBox(){
             
             currentSelectBox.onchange = setRuleChanged;
         }
+    }
     }
 }
 

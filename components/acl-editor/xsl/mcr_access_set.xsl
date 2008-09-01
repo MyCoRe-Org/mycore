@@ -350,8 +350,8 @@
                             </tr>
                         </xsl:when>
                         <xsl:otherwise>
-                            <input type="hidden" name="newPermOBJID" value="{$objId}" />
-                            <input type="hidden" name="newPermACPOOL" value="{$acPool}" />
+                            <input id="newPermObjId" type="hidden" name="newPermOBJID" value="{$objId}" />
+                            <input id="newPermAcpool" type="hidden" name="newPermACPOOL" value="{$acPool}" />
                         </xsl:otherwise>
                     </xsl:choose>
                     <tr>
