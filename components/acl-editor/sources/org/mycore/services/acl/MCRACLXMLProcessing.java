@@ -379,19 +379,6 @@ public class MCRACLXMLProcessing {
     public MCRRuleMapping createRuleMapping(String rid, String acpool, String objid) {
         MCRRuleMapping ruleMapping = new MCRRuleMapping();
         
-        
-        if (rid == null || rid.trim().length() <= 0){
-        	throw new MCRException("The rule ID should not be null, empty or just spaces");
-        }
-        
-        if (acpool == null || acpool.trim().length() <= 0){
-            throw new MCRException("The AcPool ID should not be null, empty or just spaces");
-        }
-        
-        if (objid == null || objid.trim().length() <= 0){
-            throw new MCRException("The object ID should not be null, empty or just spaces");
-        }
-
         ruleMapping.setCreator(uid);
         ruleMapping.setCreationdate(new Date());
         ruleMapping.setPool(acpool);

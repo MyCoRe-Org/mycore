@@ -20,6 +20,7 @@ import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.backend.hibernate.tables.MCRACCESS;
 import org.mycore.backend.hibernate.tables.MCRACCESSRULE;
 import org.mycore.common.MCRCache;
+import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
 
 public class MCRACLHIBAccess {
@@ -75,13 +76,31 @@ public class MCRACLHIBAccess {
 
         if (updateList != null) {
             for (Iterator it = updateList.iterator(); it.hasNext();) {
-                accessStore.updateAccessDefinition((MCRRuleMapping) it.next());
+                MCRRuleMapping accDef = (MCRRuleMapping) it.next();
+                
+                String rid = accDef.getRuleId();
+                if (rid == null || rid.trim().length() <= 0){
+                    throw new MCRException("The rule ID should not be null, empty or just spaces");
+                }
+                
+                String acpool = accDef.getPool();
+                if (acpool == null || acpool.trim().length() <= 0){
+                    throw new MCRException("The AcPool ID should not be null, empty or just spaces");
+                }
+                
+                String objid = accDef.getObjId();
+                if (objid == null || objid.trim().length() <= 0){
+                    throw new MCRException("The object ID should not be null, empty or just spaces");
+                }
+                
+                accessStore.updateAccessDefinition(accDef);
             }
         }
 
         if (saveList != null) {
             for (Iterator it = saveList.iterator(); it.hasNext();) {
-                accessStore.createAccessDefinition((MCRRuleMapping) it.next());
+                MCRRuleMapping next = (MCRRuleMapping) it.next();
+                accessStore.createAccessDefinition(next);
             }
         }
 

@@ -407,7 +407,7 @@
                         <xsl:value-of select="$labelInsertID" />
                     </td>
                     <td>
-                        <xsl:value-of select="$labelInsertPerm')" />
+                        <xsl:value-of select="$labelInsertPerm" />
                     </td>
                     <td></td>
                     <td></td>
