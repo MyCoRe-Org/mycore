@@ -326,7 +326,16 @@ public class MCRAclEditorStdImpl extends MCRAclEditor {
         LOGGER.debug("Rule: " + rule);
         LOGGER.debug("Desc: " + desc);
 
-        Element editor = ACLEditor().addContent(editorType("ruleEditor"));
+        String redirectURL = request.getParameter("redir");
+        LOGGER.debug("Redirect URL: " + redirectURL);
+
+        Element editor;
+
+        if (redirectURL != null && !redirectURL.equals(""))
+            editor = redirect(redirectURL);
+        else
+            editor = ACLEditor().addContent(editorType("ruleEditor"));
+        
         return editor;
     }
 

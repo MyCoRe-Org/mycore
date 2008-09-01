@@ -43,6 +43,7 @@
                     <div class="aclCreateNewRule">
                         <form id="aclCreateNewRuleForm" xmlns:encoder="xalan://java.net.URLEncoder" xmlns:xalan="http://xml.apache.org/xalan"
                             action="{concat($dataRequest, '&amp;action=createNewRule')}" method="post" accept-charset="UTF-8">
+                            <input type="hidden" name="redir" value="{concat($aclEditorURL,$currentEditor)}" />
                             <table class="aclRuleTable">
                                 <tr>
                                     <td class="label">
