@@ -25,6 +25,7 @@ package org.mycore.datamodel.metadata;
 
 import org.apache.log4j.Logger;
 
+import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 
 /**
@@ -46,7 +47,7 @@ public abstract class MCRMetaDefault implements MCRMetaInterface {
     // common data
     protected static final String NL = System.getProperties().getProperty("line.separator");
 
-    protected static final String DEFAULT_LANGUAGE = "en";
+    protected static final String DEFAULT_LANGUAGE = MCRConfiguration.instance().getString("MCR.Metadata.DefaultLang","en");
 
     protected static final String DEFAULT_DATAPART = "metadata";
 

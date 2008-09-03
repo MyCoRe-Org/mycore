@@ -54,7 +54,7 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
     public static final int MCRHISTORYDATE_MAX_TEXT = 128;
 
     // Data of this class
-    private ArrayList<MCRMetaHistoryDateTexts> texts;
+    private ArrayList<MCRMetaHistoryDateText> texts;
 
     private Calendar von;
 
@@ -75,7 +75,7 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
      */
     public MCRMetaHistoryDate() {
         super();
-        texts = new ArrayList<MCRMetaHistoryDateTexts>();
+        texts = new ArrayList<MCRMetaHistoryDateText>();
         calendar = MCRCalendar.CALENDARS_INPUT[0];
         setDefaultVon();
         setDefaultBis();
@@ -102,7 +102,7 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
      */
     public MCRMetaHistoryDate(String set_datapart, String set_subtag, String default_lang, String set_type, int set_inherted) throws MCRException {
         super(set_datapart, set_subtag, default_lang, set_type, set_inherted);
-        texts = new ArrayList<MCRMetaHistoryDateTexts>();
+        texts = new ArrayList<MCRMetaHistoryDateText>();
         calendar = MCRCalendar.CALENDARS_INPUT[0];
         setDefaultVon();
         setDefaultBis();
@@ -170,7 +170,7 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
                 break;
             }
         }
-        texts.add(new MCRMetaHistoryDateTexts(set_text, set_lang));
+        texts.add(new MCRMetaHistoryDateText(set_text, set_lang));
     }
 
     /**
@@ -181,7 +181,7 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
      *            the language String in ISO format
      * @return an instance of MCRMetaHistoryDateTexts or null
      */
-    public final MCRMetaHistoryDateTexts getText(String set_lang) {
+    public final MCRMetaHistoryDateText getText(String set_lang) {
         if (set_lang == null)
             return null;
         for (int i = 0; i < texts.size(); i++) {
@@ -200,7 +200,7 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
      *            the index of ArryList texts
      * @return an instance of MCRMetaHistoryDateTexts or null
      */
-    public final MCRMetaHistoryDateTexts getText(int index) {
+    public final MCRMetaHistoryDateText getText(int index) {
         if ((index >= 0) && (index < texts.size())) {
             return texts.get(index);
         }
@@ -212,7 +212,7 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
      * 
      * @return an ArrayList of MCRMetaHistoryDateTexts instances
      */
-    public final ArrayList<MCRMetaHistoryDateTexts> getTexts() {
+    public final ArrayList<MCRMetaHistoryDateText> getTexts() {
         return this.texts;
     }
 
@@ -358,7 +358,7 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
      */
     public final String getText() {
         if (texts.size() > 0) {
-            MCRMetaHistoryDateTexts h = getText(lang);
+            MCRMetaHistoryDateText h = getText(lang);
             if (h != null)
                 return h.getText();
             else
@@ -505,16 +505,24 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
      * This method checks the validation of the content of this class. The
      * method returns <em>false</em> if
      * <ul>
-     * <li>the text is null or
-     * <li>the von is null or
-     * <li>the bis is null
+     * <li>the number of texts is 0 (empty texts are delete)
+     * <li>von is null or bis is null or calendar is null
      * </ul>
      * otherwise the method returns <em>true</em>.
      * 
      * @return a boolean value
      */
     public boolean isValid() {
-        if ((texts.size() == 0) || (von == null) || (bis == null) || (calendar == null)) {
+        for (int i = 0; i < texts.size(); i++) {
+            MCRMetaHistoryDateText textitem = texts.get(i);
+            if (!textitem.isValid()) {
+                texts.remove(i);
+                i--;
+            }
+        }
+        if (texts.size() == 0)
+            return false;
+        if ((von == null) || (bis == null) || (calendar == null)) {
             return false;
         }
         if (ibis < ivon) {
@@ -532,7 +540,7 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
     public Object clone() {
         MCRMetaHistoryDate out = new MCRMetaHistoryDate(datapart, subtag, lang, type, inherited);
         for (int i = 0; i < texts.size(); i++) {
-            MCRMetaHistoryDateTexts h = texts.get(i);
+            MCRMetaHistoryDateText h = texts.get(i);
             out.setText(h.getText(), h.getLang());
         }
         out.setVonDate(von);
@@ -568,17 +576,19 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
      * language notation is in the ISO format.
      * 
      */
-    protected class MCRMetaHistoryDateTexts {
+    protected class MCRMetaHistoryDateText {
         private String datetext;
 
         private String lang;
 
-        public MCRMetaHistoryDateTexts() {
+        public MCRMetaHistoryDateText() {
+            this.datetext = "";
+            this.lang = DEFAULT_LANGUAGE;
         }
 
-        public MCRMetaHistoryDateTexts(String datetext, String lang) {
-            this.datetext = datetext;
-            this.lang = lang;
+        public MCRMetaHistoryDateText(String datetext, String lang) {
+            setText(datetext);
+            setLang(lang);
         }
 
         /**
@@ -598,7 +608,11 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
          *            the text String of a date value
          */
         public void setText(String datetext) {
-            this.datetext = datetext;
+            if (datetext == null) {
+                this.datetext = "";
+            } else {
+                this.datetext = datetext;
+            }
         }
 
         /**
@@ -617,7 +631,21 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
          *            language String of a date value
          */
         public void setLang(String lang) {
-            this.lang = lang;
+            if (lang == null) {
+                this.lang = DEFAULT_LANGUAGE;
+            } else {
+                this.lang = lang;
+            }
+        }
+        
+        /**
+         * This mehtod validate the content. If lang and text are not empty, it return true otherwise it return false.
+         * 
+         * @return true if the content is valid.
+         */
+        public boolean isValid() {
+            if ((this.lang.length() == 0) || (this.datetext.length() == 0)) return false;
+            return true;
         }
 
     }
