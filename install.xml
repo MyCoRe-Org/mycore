@@ -107,7 +107,7 @@
     ========================================  
 
     </echo>
-    <ant dir="${destdir}/docportal" antfile="build.xml" target="jar"                inheritAll="false" inheritRefs="false" />    
+    <ant dir="${destdir}/docportal" antfile="build.xml" target="create.jar"         inheritAll="false" inheritRefs="false" />    
     <echo>
 
     ========================================  
@@ -127,14 +127,6 @@
       <param name="command" value="hsqldbstart" />
     </antcall>
     <sleep seconds="30" />
-    <echo>
-
-    ========================================  
-      Create SQL tables ...
-    ========================================  
-
-    </echo>
-    <ant dir="${destdir}/docportal" antfile="build.xml" target="create.metastore"     inheritAll="false" inheritRefs="false" />    
     <echo>
 
     ========================================  
@@ -162,14 +154,6 @@
     <echo>
 
     ========================================  
-      Generate key for applet signing ...
-    ========================================  
-
-    </echo>
-    <ant dir="${destdir}/docportal" antfile="build.xml" target="create.genkeys"       inheritAll="false" inheritRefs="false" />    
-    <echo>
-
-    ========================================  
       Generate search masks ...
     ========================================  
 
@@ -182,7 +166,7 @@
     ========================================  
 
     </echo>
-    <ant dir="${destdir}/content/defaultsample" antfile="build.xml" target="load" inheritAll="false" inheritRefs="false" />    
+    <ant dir="${destdir}/content/defaultsample" antfile="build.xml" target="load"     inheritAll="false" inheritRefs="false" />    
     <echo>
 
     ========================================  
@@ -190,7 +174,7 @@
     ========================================  
 
     </echo>
-    <ant dir="${destdir}/docportal" antfile="build.xml" target="webapps"              inheritAll="false" inheritRefs="false" />    
+    <ant dir="${destdir}/docportal" antfile="build.xml" target="create.webapp"        inheritAll="false" inheritRefs="false" />    
     <echo>  
 
     ========================================  
