@@ -325,7 +325,7 @@ template:
                         </xsl:otherwise>
                     </xsl:choose>
                     <option value="9">
-                        <xsl:value-of select="'======================')"/>
+                        <xsl:value-of select="'======================'"/>
                     </option>
                 </xsl:if>
                 <option value="1{@href}">
