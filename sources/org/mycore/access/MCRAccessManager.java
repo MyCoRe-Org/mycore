@@ -282,6 +282,10 @@ public class MCRAccessManager {
     	booleanOp.setAttribute("operator", "false");
     	condition.addContent(booleanOp);
     	return condition;
-    }    
+    }
+    
+    public static boolean hasRule(String id, String permission){
+        return getPermissionsForID(id).contains(permission);
+    }
 
 }

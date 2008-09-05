@@ -30,7 +30,7 @@ import java.util.Properties;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.log4j.Logger;
 import org.jdom.Element;
-import org.mycore.common.MCRSession;
+
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUtils;
 import org.mycore.datamodel.classifications.MCRClassificationBrowserData;
@@ -39,7 +39,6 @@ import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.utils.MCRCategoryTransformer;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.datamodel.metadata.MCRObjectService;
 import org.mycore.frontend.editor.MCREditorSubmission;
 import org.mycore.frontend.editor.MCRRequestParameters;
 
@@ -131,40 +130,6 @@ public class MCRStartClassEditorServlet extends MCRServlet {
         String referrer=job.getRequest().getHeader("Referer");
         if(referrer==null||referrer.equals("")) {
             referrer=getBaseURL() + cancelpage;
-        }
-
-        // change the ACLs of classification
-        if ("acl-classification".equals(todo)) {
-            if (!(AI.checkPermission(clid, "writedb"))) {
-                job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + usererrorpage));
-                return;
-            }
-            org.jdom.Element serviceelm = null;
-            MCRObjectService serv = new MCRObjectService();
-
-            List permlist = AI.getPermissionsForID(clid);
-            for (int i = 0; i < permlist.size(); i++) {
-                org.jdom.Element ruleelm = AI.getRule(clid, (String) permlist.get(i));
-                ruleelm = normalizeACLforSWF(ruleelm);
-                serv.addRule((String) permlist.get(i), ruleelm);
-            }
-            serviceelm = serv.createXML();
-            if (LOGGER.isDebugEnabled()) {
-                org.jdom.Document dof = new org.jdom.Document();
-                dof.addContent(serviceelm);
-                byte[] xml = MCRUtils.getByteArray(dof);
-                System.out.println(new String(xml));
-            }
-
-            MCRSession session = MCRSessionMgr.getCurrentSession();
-            session.put("service", serviceelm);
-            String base = getBaseURL() + "editor_form_modify-classificationacl.xml";
-            Properties params = new Properties();
-            params.put("sourceUri", "session:service");
-            params.put("cancelUrl",referrer );
-            params.put("mcrid", clid);
-            job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(buildRedirectURL(base, params)));
-            return;
         }
 
         if (!(AI.checkPermission("create-classification"))) {

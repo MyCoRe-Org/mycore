@@ -10,7 +10,10 @@
     2005-30-10 +
   -->
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xlink="http://www.w3.org/1999/xlink"
-  xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation" exclude-result-prefixes="xlink">
+  xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation" xmlns:acl="xalan://org.mycore.access.MCRAccessManager"
+   exclude-result-prefixes="xlink i18n acl xsl">
+  <xsl:include href="start-acl-editor.xsl"/>
+  <xsl:param name="MCR.Users.Superuser.UserName" />
   <xsl:variable name="Navigation.title" select="i18n:translate('component.classhandler.titles.pageTitle.classEdit')" />
   <xsl:variable name="MainTitle" select="i18n:translate('common.titles.mainTitle')" />
   <xsl:variable name="PageTitle" select="i18n:translate('component.classhandler.titles.pageTitle.classEdit')" />
@@ -220,14 +223,32 @@
                         <img src="{$imgEmpty}" border="0" width="21" />
                       </xsl:if>
                     </xsl:if>
-                  </td>	
-				  <td width="25" valign="top">
-                    <form action="{$WebApplicationBaseURL}servlets/MCRStartClassEditorServlet{$HttpSession}" method="get">
-                      <input type="hidden" name="todo" value='acl-classification' />
-                      <input type="hidden" name="clid" value='{$classifID}' />
-                      <input type="image" src='{$classacl}' title="{i18n:translate('component.classhandler.browse.classACL')}" />
-                    </form>
-                  </td>						
+                  </td>
+                  <xsl:if test="$CurrentUser = $MCR.Users.Superuser.UserName">
+                    <td width="25" valign="top">
+                      <xsl:variable name="aclEditorAddress_edit">
+                        <xsl:choose>
+                          <xsl:when test="acl:hasRule($classifID, 'writedb')">
+                            <xsl:call-template name="aclEditor.embMapping.getAddress">
+                                <xsl:with-param name="objId" select="$classifID" />
+                                <xsl:with-param name="action" select="'edit'" />
+                            </xsl:call-template>
+                          </xsl:when>
+                          <xsl:otherwise>
+                            <xsl:call-template name="aclEditor.embMapping.getAddress">
+                                <xsl:with-param name="objId" select="$classifID" />
+                                <xsl:with-param name="action" select="'add'" />
+                                <xsl:with-param name="permission" select="'writedb'" />
+                            </xsl:call-template>
+                          </xsl:otherwise>
+                        </xsl:choose>
+                      </xsl:variable>
+                      <a href="{$aclEditorAddress_edit}">
+                          <img width="18" height="13" src="{$classacl}"
+                              title="{i18n:translate('wcms.rightsManag.acl.edit')}" alt="{i18n:translate('component.classhandler.browse.classACL')}" />
+                      </a>
+                    </td>
+                  </xsl:if>						
                   <xsl:if test="$edited='false'">
                     <td width="25" valign="top">
                       <a target="new" alt="$classifID" onclick="fensterCodice('{$WebApplicationBaseURL}servlets/MCRClassExportServlet?id={$classifID}');return false;"
@@ -330,13 +351,31 @@
                       </a>
                     </td>
                   </xsl:if>					
-                  <td width="25" valign="top">
-                    <form action="{$WebApplicationBaseURL}servlets/MCRStartClassEditorServlet{$HttpSession}" method="get">
-                      <input type="hidden" name="todo" value='acl-classification' />
-                      <input type="hidden" name="clid" value='{$classifID}' />
-                      <input type="image" src='{$classacl}' title="{i18n:translate('component.classhandler.browse.classACL')}" />
-                    </form>
-                  </td>                  
+                  <xsl:if test="$CurrentUser = $MCR.Users.Superuser.UserName">
+                    <td width="25" valign="top">
+                      <xsl:variable name="aclEditorAddress_edit">
+                        <xsl:choose>
+                          <xsl:when test="acl:hasRule($classifID, 'writedb')">
+                            <xsl:call-template name="aclEditor.embMapping.getAddress">
+                                <xsl:with-param name="objId" select="$classifID" />
+                                <xsl:with-param name="action" select="'edit'" />
+                            </xsl:call-template>
+                          </xsl:when>
+                          <xsl:otherwise>
+                            <xsl:call-template name="aclEditor.embMapping.getAddress">
+                                <xsl:with-param name="objId" select="$classifID" />
+                                <xsl:with-param name="action" select="'add'" />
+                                <xsl:with-param name="permission" select="'writedb'" />
+                            </xsl:call-template>
+                          </xsl:otherwise>
+                        </xsl:choose>
+                      </xsl:variable>
+                      <a href="{$aclEditorAddress_edit}">
+                          <img width="18" height="13" src="{$classacl}"
+                              title="{i18n:translate('wcms.rightsManag.acl.edit')}" alt="{i18n:translate('component.classhandler.browse.classACL')}" />
+                      </a>
+                    </td>
+                  </xsl:if>						
 				  <td width="25" valign="top">
                     <xsl:if test="($canDelete = 'true')">
                       <xsl:if test="$counter = 0">
@@ -359,8 +398,6 @@
         </tr>
 	  </xsl:otherwise>
 	  </xsl:choose>
-		  
-		  
 		  
       </xsl:for-each>
       <xsl:if test="($canCreate = 'true')">
