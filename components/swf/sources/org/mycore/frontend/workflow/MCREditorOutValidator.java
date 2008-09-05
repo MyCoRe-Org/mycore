@@ -61,9 +61,11 @@ import org.mycore.datamodel.metadata.MCRMetaHistoryDate;
 import org.mycore.datamodel.metadata.MCRMetaISO8601Date;
 import org.mycore.datamodel.metadata.MCRMetaInstitutionName;
 import org.mycore.datamodel.metadata.MCRMetaInterface;
+import org.mycore.datamodel.metadata.MCRMetaISBN;
 import org.mycore.datamodel.metadata.MCRMetaLangText;
 import org.mycore.datamodel.metadata.MCRMetaLink;
 import org.mycore.datamodel.metadata.MCRMetaLinkID;
+import org.mycore.datamodel.metadata.MCRMetaNBN;
 import org.mycore.datamodel.metadata.MCRMetaNumber;
 import org.mycore.datamodel.metadata.MCRMetaPersonName;
 import org.mycore.datamodel.metadata.MCRObject;
@@ -397,6 +399,20 @@ public class MCREditorOutValidator {
      */
     boolean checkMCRMetaAccessRule(Element datasubtag) {
         return checkMetaObjectWithLang(datasubtag, MCRMetaAccessRule.class);
+    }
+
+    /**
+     * @param datasubtag
+     */
+    boolean checkMCRMetaNBN(Element datasubtag) {
+        return checkMetaObjectWithLang(datasubtag, MCRMetaNBN.class);
+    }
+
+    /**
+     * @param datasubtag
+     */
+    boolean checkMCRMetaISBN(Element datasubtag) {
+        return checkMetaObjectWithLang(datasubtag, MCRMetaISBN.class);
     }
 
     /**
