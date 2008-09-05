@@ -21,21 +21,20 @@ import org.mycore.datamodel.classifications2.utils.MCRCategoryTransformer;
 public class MCRClassExportServlet extends MCRServlet {
 
     private static final long serialVersionUID = 1L;
-    
+
     private static MCRCategoryDAO DAO = MCRCategoryDAOFactory.getInstance();
 
-    public void doGetPost(MCRServletJob job) throws Exception,MCRException {
+    public void doGetPost(MCRServletJob job) throws Exception, MCRException {
         try {
             String id = getProperty(job.getRequest(), "id");
-            if(id==null)
+            if (id == null)
                 throw new MCRException("Classification ID is null!");
             MCRCategoryID catId = MCRCategoryID.rootID(id);
             MCRCategory category = DAO.getCategory(catId, -1);
-            if(category==null)
-                throw new MCRException("Cannot find classification with id: "+id);
+            if (category == null)
+                throw new MCRException("Cannot find classification with id: " + id);
             Document jdom = MCRCategoryTransformer.getMetaDataDocument(category, true);
-            getLayoutService().doLayout(job.getRequest(), job.getResponse(), jdom);
-
+            getLayoutService().sendXML(job.getRequest(), job.getResponse(), jdom);
         } catch (Exception e) {
             generateErrorPage(job.getRequest(), job.getResponse(), HttpServletResponse.SC_INTERNAL_SERVER_ERROR, e.getMessage(), e, false);
         }
