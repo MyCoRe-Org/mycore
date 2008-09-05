@@ -24,7 +24,7 @@ public class MCRACLEditorServlet_v2 extends MCRServlet {
 
     private static Logger LOGGER = Logger.getLogger(MCRACLEditorServlet_v2.class);
 
-    protected static final String LOGINSERVLET_URL = getServletBaseURL() + "MCRLoginServlet";
+    protected static final String LOGINSERVLET_URL = "MCRLoginServlet";
 
     public void init() throws MCRConfigurationException, ServletException {
         super.init();
@@ -74,7 +74,7 @@ public class MCRACLEditorServlet_v2 extends MCRServlet {
     public void verifyAccess(MCRServletJob job) throws IOException {
         if (!MCRAccessManager.getAccessImpl().checkPermission("use-aclEditor")) {
             LOGGER.info("Access denied for userID=" + MCRUserMgr.instance().getCurrentUser().getID());
-            job.getResponse().sendRedirect(LOGINSERVLET_URL);
+            job.getResponse().sendRedirect(getServletBaseURL() + LOGINSERVLET_URL);
         }
     }
 
