@@ -26,7 +26,6 @@ package org.mycore.frontend.servlets;
 import java.io.IOException;
 import java.util.List;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 
 import org.apache.log4j.Logger;
@@ -35,8 +34,6 @@ import org.jdom.Document;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.frontend.servlets.MCRServlet;
-import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.user.MCRUserMgr;
 
 /**
@@ -92,20 +89,21 @@ public class MCRLoginServlet extends MCRServlet {
             backto_url = (backto_url.trim().length() == 0) ? null : backto_url.trim();
         }
         if (backto_url == null) {
-            backto_url = MCRServlet.getBaseURL();
+            String referer = job.getRequest().getHeader("Referer");
+            backto_url = (referer != null) ? referer : MCRServlet.getBaseURL();
         }
-        LOGGER.debug("SessionID: "+mcrSession.getID());
-        LOGGER.debug("CurrentID: "+mcrSession.getCurrentUserID());
-        LOGGER.debug("UID :      "+uid);
-        LOGGER.debug("PWD :      "+pwd);
-        LOGGER.debug("URL :      "+backto_url);
+        LOGGER.debug("SessionID: " + mcrSession.getID());
+        LOGGER.debug("CurrentID: " + mcrSession.getCurrentUserID());
+        LOGGER.debug("UID :      " + uid);
+        LOGGER.debug("PWD :      " + pwd);
+        LOGGER.debug("URL :      " + backto_url);
 
         // Do not change login, just redirect to given url:
         if (mcrSession.getCurrentUserID().equals(uid)) {
             job.getResponse().setHeader("Cache-Control", "no-cache");
             job.getResponse().setHeader("Pragma", "no-cache");
             job.getResponse().setHeader("Expires", "0");
-            job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(addParameter(backto_url, "reload", "true")));
+            job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(backto_url));
             return;
         }
 
@@ -118,7 +116,7 @@ public class MCRLoginServlet extends MCRServlet {
             job.getResponse().setHeader("Cache-Control", "no-cache");
             job.getResponse().setHeader("Pragma", "no-cache");
             job.getResponse().setHeader("Expires", "0");
-            job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(addParameter(backto_url, "reload", "true")));
+            job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(backto_url));
             return;
         }
 
@@ -163,12 +161,9 @@ public class MCRLoginServlet extends MCRServlet {
                 }
                 mcrSession.put("XSL.CurrentGroups", groups.toString());
 
-                RequestDispatcher rd = getServletContext().getNamedDispatcher("MCRUserServlet");
-                job.getRequest().removeAttribute("lang");
-                job.getRequest().setAttribute("lang", mcrSession.getCurrentLanguage());
                 job.getRequest().removeAttribute("mode");
                 job.getRequest().setAttribute("mode", "Select");
-                job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(addParameter(backto_url, "reload", "true")));
+                job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(backto_url));
                 return;
             }
 
@@ -210,13 +205,6 @@ public class MCRLoginServlet extends MCRServlet {
     protected void doLayout(MCRServletJob job, String style, Document jdomDoc) throws IOException {
         job.getRequest().setAttribute("XSL.Style", style);
         getLayoutService().doLayout(job.getRequest(), job.getResponse(), jdomDoc);
-    }
-
-    private static final String addParameter(String url, String name, String value) {
-        if (url.indexOf("?") == -1) {
-            return url + "?" + name + "=" + value;
-        }
-        return url + "&" + name + "=" + value;
     }
 
 }
