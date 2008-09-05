@@ -13,7 +13,6 @@
   xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation" xmlns:acl="xalan://org.mycore.access.MCRAccessManager"
    exclude-result-prefixes="xlink i18n acl xsl">
   <xsl:include href="start-acl-editor.xsl"/>
-  <xsl:param name="MCR.Users.Superuser.UserName" />
   <xsl:variable name="Navigation.title" select="i18n:translate('component.classhandler.titles.pageTitle.classEdit')" />
   <xsl:variable name="MainTitle" select="i18n:translate('common.titles.mainTitle')" />
   <xsl:variable name="PageTitle" select="i18n:translate('component.classhandler.titles.pageTitle.classEdit')" />
@@ -224,7 +223,7 @@
                       </xsl:if>
                     </xsl:if>
                   </td>
-                  <xsl:if test="$CurrentUser = $MCR.Users.Superuser.UserName">
+                  <xsl:if test="acl:checkPermission('use-aclEditor')">
                     <td width="25" valign="top">
                       <xsl:variable name="aclEditorAddress_edit">
                         <xsl:choose>
@@ -351,7 +350,7 @@
                       </a>
                     </td>
                   </xsl:if>					
-                  <xsl:if test="$CurrentUser = $MCR.Users.Superuser.UserName">
+                  <xsl:if test="acl:checkPermission('use-aclEditor')">
                     <td width="25" valign="top">
                       <xsl:variable name="aclEditorAddress_edit">
                         <xsl:choose>
