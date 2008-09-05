@@ -1,7 +1,6 @@
 package org.mycore.services.acl;
 
 import java.io.IOException;
-import java.util.Properties;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -11,6 +10,7 @@ import org.apache.log4j.Logger;
 import org.jdom.DocType;
 import org.jdom.Document;
 import org.jdom.Element;
+
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.frontend.MCRWebsiteWriteProtection;
@@ -74,29 +74,11 @@ public class MCRACLEditorServlet_v2 extends MCRServlet {
     public void verifyAccess(MCRServletJob job) throws IOException {
         if (!MCRAccessManager.getAccessImpl().checkPermission("use-aclEditor")) {
             LOGGER.info("Access denied for userID=" + MCRUserMgr.instance().getCurrentUser().getID());
-            job.getResponse().sendRedirect(getServletBaseURL() + LOGINSERVLET_URL);
+            final String queryString = (job.getRequest().getQueryString() != null) ? "?" + job.getRequest().getQueryString() : ":";
+            job.getResponse().sendRedirect(
+                    job.getResponse()
+                            .encodeRedirectURL(getServletBaseURL() + LOGINSERVLET_URL + "?url=" + job.getRequest().getRequestURL().append(queryString)));
         }
-    }
-
-    private void redirect(HttpServletResponse response, String redirectURL, String objidFilter, String acpoolFilter) {
-        Properties parameters = new Properties();
-        boolean addParam = false;
-
-        if (objidFilter != null) {
-            parameters.put("objid", objidFilter);
-            addParam = true;
-        }
-
-        if (acpoolFilter != null) {
-            parameters.put("acpool", acpoolFilter);
-            addParam = true;
-        }
-
-        if (addParam) {
-            redirectURL = buildRedirectURL(redirectURL, parameters);
-            LOGGER.debug("Redirect to: " + redirectURL);
-        }
-        redirect(response, redirectURL);
     }
 
     private void redirect(HttpServletResponse response, String url) {
