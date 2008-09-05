@@ -85,6 +85,8 @@ function initDelAllAclPermsCheckbox(){
  */
 function initCreateNewRuleSubmit(){
     var newRuleSubmitButton = document.getElementById("newPermSubmitButton");
+    
+    if (newRuleSubmitButton){
     var newRuleSelectBox = document.getElementById("createNewPermFormSelBox");
     var newPermObjId = document.getElementById("newPermObjId");
     var newPermAcpool = document.getElementById("newPermAcpool");
@@ -98,7 +100,7 @@ function initCreateNewRuleSubmit(){
     newRuleSelectBox.onchange = function(event){
         this.changed = true;
     }
-    
+    }
     
 }
 
@@ -120,17 +122,20 @@ function initAclEditPermBox(){
             
         var currentTable = tables[i];
         if (className == "aclPermTable"){
+            
             var currentID = currentTable.id;
             var checkBoxID = 'checkBox$' + currentID;
             var currentCheckBox = document.getElementById(checkBoxID);
             
+            if (currentCheckBox){
             currentCheckBox.onclick = setPermAsDeleted;
             permBox.delPermsCheckboxes = permBox.delPermsCheckboxes.concat(currentCheckBox);
+            }
             
             var selectID = 'select$' + currentID;
             var currentSelectBox = document.getElementById(selectID);
-            
-            currentSelectBox.onchange = setRuleChanged;
+            if(currentSelectBox)
+                currentSelectBox.onchange = setRuleChanged;
         }
     }
     }

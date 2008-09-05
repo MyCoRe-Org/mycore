@@ -81,6 +81,7 @@
                         </xsl:if>
 
                         <div class="aclPermTableBox">
+                            <xsl:if test="not(@emb = 'true')">
                             <div class="menu">
                                 <table>
                                     <tr>
@@ -113,6 +114,7 @@
                                     </tr>
                                 </table>
                             </div>
+                            </xsl:if>
 
                             <form id="aclEditPermBoxForm" name="MappingTableForm" xmlns:encoder="xalan://java.net.URLEncoder"
                                 xmlns:xalan="http://xml.apache.org/xalan" action="{concat($dataRequest, '&amp;action=submitPerm', $redirectURL)}" method="post"
@@ -194,7 +196,8 @@
                                                             <td>
                                                                 <xsl:apply-templates select="xalan:nodeset($ruleItems)/items">
                                                                     <xsl:with-param name="rid" select="RID" />
-                                                                    <xsl:with-param name="name" select="concat(OBJID,'$',ACPOOL)" />
+                                                                    <xsl:with-param name="selectId" select="concat('select$',$aclPermTableID)" />
+                                                                    <xsl:with-param name="name" select="$aclPermTableID" />
                                                                 </xsl:apply-templates>
                                                             </td>
                                                         </tr>
