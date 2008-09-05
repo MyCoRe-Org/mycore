@@ -43,8 +43,8 @@ import java.util.concurrent.TimeUnit;
 import org.apache.log4j.Logger;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.PerFieldAnalyzerWrapper;
-import org.apache.lucene.analysis.de.GermanAnalyzer;
 import org.apache.lucene.analysis.SimpleAnalyzer;
+import org.apache.lucene.analysis.de.GermanAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.index.IndexReader;
@@ -100,10 +100,15 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
     private boolean useRamDir = false;
 
     private RAMDirectory ramDir = null;
+
     private IndexWriter writerRamDir;
+
     private int ramDirEntries = 0;
+
     private IndexReader indexReader;
+
     private IndexSearcher indexSearcher;
+
     private Vector<MCRFieldDef> addableFields = new Vector<MCRFieldDef>();
 
     public void init(String ID) {
@@ -569,6 +574,8 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
 
         private ScheduledFuture<?> delayedFuture;
 
+        private int maxIndexWriteActions;
+
         public IndexWriteExecutor(BlockingQueue<Runnable> workQueue, File indexDir) {
             // single thread mode
             super(1, 1, 0, TimeUnit.SECONDS, workQueue);
@@ -576,6 +583,7 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
             modifierClosed = true;
             firstJob = true;
             closeModifierEarly = MCRConfiguration.instance().getBoolean("MCR.Lucene.closeModifierEarly", false);
+            maxIndexWriteActions = MCRConfiguration.instance().getInt("MCR.Lucene.maxIndexWriteActions", 500);
         }
 
         @Override
@@ -583,10 +591,10 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
             super.afterExecute(r, t);
             if (firstJob)
                 firstJob = false;
-            if (closeModifierEarly)
+            if (closeModifierEarly || this.getCompletedTaskCount() % maxIndexWriteActions == 0)
                 closeIndexWriter();
             else {
-                delayedFuture = scheduler.schedule(delayedCloser, 20, TimeUnit.SECONDS);
+                delayedFuture = scheduler.schedule(delayedCloser, 2, TimeUnit.SECONDS);
             }
         }
 
