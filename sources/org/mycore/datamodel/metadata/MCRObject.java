@@ -739,19 +739,35 @@ final public class MCRObject extends MCRBase {
         boolean updatechildren = false;
         MCRObjectMetadata md = getMetadata();
         MCRObjectMetadata mdold = old.getMetadata();
+        int numheritablemd = 0;
+        int numheritablemdold = 0;
         for (int i = 0; i < md.size(); i++) {
             MCRMetaElement melm = md.getMetadataElement(i);
             if (melm.getHeritable()) {
+                numheritablemd++;
                 try {
                     MCRMetaElement melmold = mdold.getMetadataElement(melm.getTag());
                     Element jelm = melm.createXML(false);
                     Element jelmold = melmold.createXML(false);
-                    if (!MCRXMLHelper.deepEqual(new Document(jelmold), new Document(jelm)))
-                    	updatechildren = true;
+                    if (!MCRXMLHelper.deepEqual(new Document(jelmold), new Document(jelm))) {
+                        updatechildren = true;
+                        break;
+                    }
                 } catch (RuntimeException e) {
                     updatechildren = true;
                 }
             }
+        }
+        if (!updatechildren) {
+            for (int i = 0; i < mdold.size(); i++) {
+                MCRMetaElement melmold = mdold.getMetadataElement(i);
+                if (melmold.getHeritable()) {
+                    numheritablemdold++;
+                }
+            }
+        }
+        if (numheritablemd != numheritablemdold) {
+            updatechildren = true;
         }
         if (updatechildren) {
             for (int i = 0; i < mcr_struct.getChildSize(); i++) {
