@@ -33,7 +33,7 @@ public class MCRRemoteFileServlet extends MCRServlet {
         if (pathname != null && !pathname.equals("")) {
             f = new File(pathname);
 
-            if (mode.equals("exists")) {
+            /*if (mode.equals("exists")) {
                 output(response, exists());
             } else if (mode.equals("isAbsolute")) {
                 output(response, isAbsolute());
@@ -54,7 +54,7 @@ public class MCRRemoteFileServlet extends MCRServlet {
             } else if (mode.equals("canExecute")) {
                 boolean canExecute = f.canExecute();
                 output(response, String.valueOf(canExecute));
-            }
+            }*/
         } else
             output(response, "Error!");
     }
@@ -65,7 +65,7 @@ public class MCRRemoteFileServlet extends MCRServlet {
         out.close();
     }
 
-    private String canExecute() {
+    /*private String canExecute() {
         return String.valueOf(f.canExecute());
     }
 
@@ -254,6 +254,6 @@ public class MCRRemoteFileServlet extends MCRServlet {
 
     public URL toURL() throws MalformedURLException {
         return f.toURL();
-    }
+    }*/
 
 }

@@ -83,7 +83,7 @@ public class MCRRemoteFile extends File {
         return remoteCheck;
     }
 
-    public boolean canExecute() {
+    /*public boolean canExecute() {
         return remoteCheck("canExecute");
     }
 
@@ -281,6 +281,6 @@ public class MCRRemoteFile extends File {
 
     public URL toURL() throws MalformedURLException {
         return f.toURL();
-    }
+    }*/
 
 }
