@@ -259,28 +259,6 @@ abstract public class MCRCheckDataBase extends MCRCheckBase {
                 section.addContent(1, center);
                 p = new org.jdom.Element("p");
                 section.addContent(2, p);
-
-                // the edit button
-                org.jdom.Element form = section.getChild("form");
-                form.setAttribute("action", job.getResponse().encodeRedirectURL(getBaseURL() + "servlets/MCRStartEditorServlet"+sessionID));
-
-                org.jdom.Element input1 = new org.jdom.Element("input");
-                input1.setAttribute("name", "lang");
-                input1.setAttribute("type", "hidden");
-                input1.setAttribute("value", lang);
-                form.addContent(input1);
-
-                org.jdom.Element input2 = new org.jdom.Element("input");
-                input2.setAttribute("name", "se_mcrid");
-                input2.setAttribute("type", "hidden");
-                input2.setAttribute("value", ID.getId());
-                form.addContent(input2);
-
-                org.jdom.Element input3 = new org.jdom.Element("input");
-                input3.setAttribute("name", "type");
-                input3.setAttribute("type", "hidden");
-                input3.setAttribute("value", ID.getTypeId());
-                form.addContent(input3);
             }
         } catch (org.jdom.JDOMException e) {
             throw new MCRException("Can't read editor file " + myfile + " or it has a parse error.", e);
