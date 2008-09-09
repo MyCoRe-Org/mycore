@@ -38,24 +38,12 @@ import org.mycore.user.MCRUserMgr;
 public class MCRSessionListingServlet extends MCRServlet {
     private static final long serialVersionUID = 1L;
 
-    private static final String PARAMS_PREFIX = "sessionListing.";
-
     public void doGetPost(MCRServletJob job) throws Exception {
 
         if (!access())
             throw new MCRException("Access denied. Please authorise.");
 
-        // get requested mode
-        String mode = null;
-        String modeParam = PARAMS_PREFIX + "mode";
-        if (job.getRequest().getParameter(modeParam) != null && !job.getRequest().getParameter(modeParam).equals(""))
-            mode = job.getRequest().getParameter(modeParam);
-        else
-            throw new MCRException("Request can't be processed, because no 'mode' parameter given.");
-
-        // dispatch mode
-        if (mode.equals("listSessions"))
-            listSessions(job);
+        listSessions(job);
     }
 
     private void listSessions(MCRServletJob job) {
