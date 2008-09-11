@@ -68,6 +68,7 @@ import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
+import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUsageException;
@@ -79,6 +80,7 @@ import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.utils.MCRCategoryTransformer;
 import org.mycore.datamodel.common.MCRXMLTableManager;
 import org.mycore.datamodel.ifs.MCRDirectoryXML;
+import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.editor.MCREditorDataResolver;
 import org.mycore.frontend.servlets.MCRServlet;
@@ -159,6 +161,7 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
         supportedSchemes.put("webapp", new MCRWebAppResolver());
         supportedSchemes.put("file", new MCRFileResolver());
         supportedSchemes.put("ifs", new MCRIFSResolver());
+        supportedSchemes.put("mcrfile", new MCRMCRFileResolver());
         supportedSchemes.put("mcrobject", new MCRObjectResolver());
         supportedSchemes.put("mcrws", new MCRWSResolver());
         supportedSchemes.put("http", new MCRHttpResolver());
@@ -776,6 +779,25 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
                 path = path.substring(0, i);
             }
             return MCRDirectoryXML.getInstance().getDirectory(path, hosts).getRootElement();
+        }
+
+    }
+
+    private static class MCRMCRFileResolver implements MCRResolver {
+        public Element resolveElement(String uri)  throws IOException, JDOMException {
+            LOGGER.debug("Reading xml from MCRFile " + uri);
+
+            String id = uri.substring(uri.indexOf(":") + 1);
+            
+            Element ele = null;
+
+            try {
+				ele = MCRFile.getFile(id).getContentAsJDOM().detachRootElement();
+			} catch (MCRPersistenceException e) {
+				LOGGER.error("Cannot resolve MCRFile with id " + id);
+			}
+            
+            return ele;
         }
 
     }
