@@ -72,7 +72,7 @@ public abstract class MCRBase {
     protected boolean importMode = false;
 
     // logger
-    static Logger logger = Logger.getLogger(MCRBase.class.getPackage().getName());
+    static Logger LOGGER = Logger.getLogger(MCRBase.class.getPackage().getName());
 
     /**
      * Load static data for all MCRObjects
@@ -85,7 +85,7 @@ public abstract class MCRBase {
 
         // Default Encoding
         mcr_encoding = mcr_conf.getString("MCR.Metadata.DefaultEncoding", DEFAULT_ENCODING);
-        logger.debug("Encoding = " + mcr_encoding);
+        LOGGER.debug("Encoding = " + mcr_encoding);
     }
 
     /**

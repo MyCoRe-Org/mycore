@@ -328,4 +328,18 @@ final public class MCRMetaAddress extends MCRMetaDefault {
     public Object clone() {
         return new MCRMetaAddress(datapart, subtag, DEFAULT_LANGUAGE, type, inherited, country, state, zipcode, city, street, number);
     }
+    
+    /**
+     * This method put debug data to the logger (for the debug mode).
+     */
+    public final void debug() {
+        super.debugDefault();
+        LOGGER.debug("Country            = " + country);
+        LOGGER.debug("State              = " + state);
+        LOGGER.debug("Zipcode            = " + zipcode);
+        LOGGER.debug("City               = " + city);
+        LOGGER.debug("Street             = " + street);
+        LOGGER.debug("Number             = " + number);
+        LOGGER.debug(" ");
+    }
 }

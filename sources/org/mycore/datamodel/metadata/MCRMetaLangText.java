@@ -251,9 +251,9 @@ public class MCRMetaLangText extends MCRMetaDefault {
      * This method put debug data to the logger (for the debug mode).
      */
     public final void debug() {
-        LOGGER.debug("Start Class : MCRMetaLangText");
         super.debugDefault();
         LOGGER.debug("Format             = " + form);
         LOGGER.debug("Text               = " + text);
+        LOGGER.debug(" ");
     }
 }

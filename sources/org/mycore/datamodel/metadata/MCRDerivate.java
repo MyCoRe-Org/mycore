@@ -57,8 +57,6 @@ final public class MCRDerivate extends MCRBase {
     // the object content
     private MCRObjectDerivate mcr_derivate = null;
 
-    private static final Logger LOGGER = Logger.getLogger(MCRDerivate.class);
-
     /**
      * This is the constructor of the MCRDerivate class. It make an instance of
      * the parser class and the metadata class.

@@ -58,7 +58,7 @@ public class MCRMetaElement {
     private String META_PACKAGE_NAME = "org.mycore.datamodel.metadata.";
 
     // logger
-    static Logger logger = Logger.getLogger(MCRMetaElement.class.getName());
+    static Logger LOGGER = Logger.getLogger(MCRMetaElement.class.getName());
 
     // MetaElement data
     private String lang = null;
@@ -469,11 +469,15 @@ public class MCRMetaElement {
      * This method put debug data to the logger (for the debug mode).
      */
     public final void debug() {
-        logger.debug("ClassName          = " + classname);
-        logger.debug("Tag                = " + tag);
-        logger.debug("Language           = " + lang);
-        logger.debug("Heritable          = " + String.valueOf(heritable));
-        logger.debug("NotInherit         = " + String.valueOf(notinherit));
-        logger.debug("Elements           = " + String.valueOf(list.size()));
+        LOGGER.debug("ClassName          = " + classname);
+        LOGGER.debug("Tag                = " + tag);
+        LOGGER.debug("Language           = " + lang);
+        LOGGER.debug("Heritable          = " + String.valueOf(heritable));
+        LOGGER.debug("NotInherit         = " + String.valueOf(notinherit));
+        LOGGER.debug("Elements           = " + String.valueOf(list.size()));
+        LOGGER.debug(" ");
+        for (int i=0;i<list.size();i++) {
+            list.get(i).debug();
+        }
     }
 }

@@ -348,7 +348,6 @@ final public class MCRMetaPersonName extends MCRMetaDefault {
      * This method put debug data to the logger (for the debug mode).
      */
     public final void debug() {
-        LOGGER.debug("Start Class : MCRMetaPersonName");
         super.debugDefault();
         LOGGER.debug("Firstname          = " + firstname);
         LOGGER.debug("Callname           = " + callname);
@@ -357,7 +356,6 @@ final public class MCRMetaPersonName extends MCRMetaDefault {
         LOGGER.debug("Academic           = " + academic);
         LOGGER.debug("Peerage            = " + peerage);
         LOGGER.debug("Prefix             = " + prefix);
-        LOGGER.debug("Stop");
         LOGGER.debug("");
     }
 }

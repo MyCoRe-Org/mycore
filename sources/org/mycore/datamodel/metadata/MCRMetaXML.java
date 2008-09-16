@@ -38,7 +38,7 @@ import org.mycore.common.MCRException;
  * 
  * @author Thomas Scheffler (yagee)
  * @author Jens Kupferschmidt
- * @author Johannes Bühler
+ * @author Johannes B\u00fchler
  * @version $Revision$ $Date$
  */
 public class MCRMetaXML extends MCRMetaDefault {
@@ -143,7 +143,6 @@ public class MCRMetaXML extends MCRMetaDefault {
      * This method put debug data to the logger (for the debug mode).
      */
     public void debug() {
-        LOGGER.debug("Start Class : MCRMetaXML");
         super.debugDefault();
         LOGGER.debug("Number of contents  = \n" + content.size());
     }

@@ -414,7 +414,6 @@ public class MCRMetaLink extends MCRMetaDefault {
      * This method put debug data to the logger (for the debug mode).
      */
     public final void debug() {
-        LOGGER.debug("Start Class : MCRMetaLink");
         super.debugDefault();
         LOGGER.debug("Link Type          = " + linktype);
         LOGGER.debug("Label              = " + label);
@@ -422,7 +421,6 @@ public class MCRMetaLink extends MCRMetaDefault {
         LOGGER.debug("HREF               = " + href);
         LOGGER.debug("FROM               = " + from);
         LOGGER.debug("TO                 = " + to);
-        LOGGER.debug("Stop");
         LOGGER.debug("");
     }
 }

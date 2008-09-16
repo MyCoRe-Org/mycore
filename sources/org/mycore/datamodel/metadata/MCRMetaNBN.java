@@ -189,7 +189,6 @@ public class MCRMetaNBN extends MCRMetaDefault {
      * This method put debug data to the logger (for the debug mode).
      */
     public final void debug() {
-        LOGGER.debug("Start Class : MCRMetaNBN");
         super.debugDefault();
         LOGGER.debug("NBN                = " + nbn);
     }

@@ -247,9 +247,9 @@ public class MCRMetaAccessRule extends MCRMetaDefault {
      * This method put debug data to the logger (for the debug mode).
      */
     public final void debug() {
-        LOGGER.debug("Start Class : MCRMetaAccessRule");
         super.debugDefault();
         LOGGER.debug("Permission         = " + permission);
         LOGGER.debug("Rule               = " + "condition");
+        LOGGER.debug(" ");
     }
 }

@@ -553,7 +553,6 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
      * This method put debug data to the logger (for the debug mode).
      */
     public void debug() {
-        LOGGER.debug("Start Class : MCRMetaHistoryDate");
         super.debugDefault();
         for (int i = 0; i < texts.size(); i++) {
             LOGGER.debug("Text / lang         = " + texts.get(i).getText() + " / " + texts.get(i).getLang());
@@ -649,5 +648,4 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
         }
 
     }
-
 }

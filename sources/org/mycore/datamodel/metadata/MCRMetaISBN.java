@@ -255,7 +255,6 @@ public class MCRMetaISBN extends MCRMetaDefault {
      * This method put debug data to the logger (for the debug mode).
      */
     public final void debug() {
-        LOGGER.debug("Start Class : MCRMetaISBN");
         super.debugDefault();
         LOGGER.debug("ISBN               = " + isbn);
     }

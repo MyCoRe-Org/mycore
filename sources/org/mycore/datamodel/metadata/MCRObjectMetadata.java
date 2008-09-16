@@ -26,6 +26,7 @@ package org.mycore.datamodel.metadata;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.jdom.Namespace;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
@@ -42,6 +43,9 @@ import org.mycore.common.MCRUtils;
  * @version $Revision$ $Date$
  */
 public class MCRObjectMetadata {
+    // logger
+    static Logger LOGGER = Logger.getLogger(MCRMetaElement.class.getName());
+
     // common data
     private String default_lang = null;
 
@@ -356,5 +360,14 @@ public class MCRObjectMetadata {
         }
 
         return true;
+    }
+    
+    /**
+     * This method put debug data to the logger (for the debug mode).
+     */
+    public final void debug() {
+        for (int i = 0; i < tag_names.size(); i++) {
+            meta_list.get(i).debug();
+        }
     }
 }

@@ -268,4 +268,13 @@ final public class MCRMetaBoolean extends MCRMetaDefault {
     public final Object clone() {
         return new MCRMetaBoolean(datapart, subtag, lang, type, inherited, value);
     }
+
+    /**
+     * This method put debug data to the logger (for the debug mode).
+     */
+    public final void debug() {
+        super.debugDefault();
+        LOGGER.debug("Value              = " + Boolean.toString(value));
+        LOGGER.debug(" ");
+    }
 }
