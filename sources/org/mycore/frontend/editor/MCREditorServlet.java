@@ -530,8 +530,7 @@ public class MCREditorServlet extends MCRServlet implements MCRSessionListener {
 
         MCREditorSubmission sub = new MCREditorSubmission(parms, editor, true);
 
-        if (sub.errors()) // validation failed, go back to editor form in
-        // webpage
+        if (sub.errors()) // validation failed, go back to editor form in webpage
         {
             editor.removeChild("input");
             editor.removeChild("repeats");
@@ -563,7 +562,7 @@ public class MCREditorServlet extends MCRServlet implements MCRSessionListener {
         } else if (targetType.equals("url")) {
             sendToURL(req, res);
         } else if (targetType.equals("webapp")) {
-          sendToWebAppFile(req, res, sub, editor);
+            sendToWebAppFile(req, res, sub, editor);
         } else if (targetType.equals("debug")) {
             sendToDebug(res, sub);
         } else if (targetType.equals("display")) {
