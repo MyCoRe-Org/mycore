@@ -72,16 +72,16 @@
             </cell>
 
             <!-- *** Additional groups *** -->
-            <cell row="8" col="1" anchor="EAST">
+            <cell row="8" col="1" anchor="NORTHEAST">
                 <text id="LAdditionalGroups" i18n="useradmin.user.additional.label" />
             </cell>
-            <cell row="8" col="2" anchor="WEST" var="user/user.groups/groups.groupID" sortnr="20">
+            <cell row="8" col="2" anchor="NORTHWEST" var="user/user.groups/groups.groupID" sortnr="20">
                 <list width="150" type="multirow" multiple="true" rows="5">
                     <item value="" i18n="useradmin.user.additional.select" />
                     <include uri="request:servlets/MCRUserEditorServlet?mode=getAssignableGroupsForUser"  cacheable="false" />
                 </list>
             </cell>
-            <cell row="8" col="3" anchor="EAST">
+            <cell row="8" col="3" anchor="NORTHEAST">
                 <helpPopup id="HAdditionalGroups" width="400px" height="200px">
                     <label i18n="useradmin.user.additional.help" />
                 </helpPopup>
@@ -90,7 +90,7 @@
             <!-- *** Contact information *** -->
             <cell row="9" col="1" ref="VSpace50" anchor="EAST" />
             <cell row="9" col="2" anchor="WEST">
-                <text id="LContactInfo" i18n="useradmin.user.contact.label" />
+                <text style="font-weight:bold" id="LContactInfo" i18n="useradmin.user.contact.label" />
             </cell>
 
             <!-- *** Salutation *** -->
