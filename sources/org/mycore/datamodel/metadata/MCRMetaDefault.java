@@ -371,6 +371,14 @@ public abstract class MCRMetaDefault implements MCRMetaInterface {
     /**
      * This method put debug data to the logger (for the debug mode).
      */
+    public void debug() {
+        debugDefault();
+        LOGGER.debug(" ");
+    }
+    
+    /**
+     * This method put common debug data to the logger (for the debug mode).
+     */
     public final void debugDefault() {
         LOGGER.debug("SubTag             = " + subtag);
         LOGGER.debug("Language           = " + lang);
