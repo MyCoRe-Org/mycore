@@ -50,8 +50,8 @@ public class MCREditorDataResolver implements MCRResolver {
         String sessionID = tokens[1];
         String xPath = tokens[2];
         
-        LOGGER.info("XXXX sessionID = " + sessionID);
-        LOGGER.info("XXXX xPath     = " + xPath);
+        LOGGER.debug("MCREditorDataResolver editor session = " + sessionID);
+        LOGGER.debug("MCREditorDataResolver xPath = " + xPath);
 
         Element editor = (Element) (MCREditorServlet.getEditorSessionCache().get(sessionID));
         MCREditorSubmission sub = new MCREditorSubmission(editor);
