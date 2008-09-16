@@ -935,21 +935,11 @@
 <xsl:template match="list">
   <xsl:param name="var" />
 
-  <!-- When any value exists, do not use the given default value -->
-  <xsl:variable name="default">
-    <xsl:choose>
-      <xsl:when test="(string-length(@default)=0) or (@default and ancestor::editor/input/var[(@name=$var) or starts-with(@name,concat($var,'['))])">
-        <xsl:text>--DuMmY--</xsl:text>
-      </xsl:when>
-      <xsl:otherwise><xsl:value-of select="@default" /></xsl:otherwise>
-    </xsl:choose>
-  </xsl:variable>
-
   <!-- ====== type multirow ======== -->
   <xsl:if test="@type='multirow'">
     <xsl:call-template name="editor.list">
       <xsl:with-param name="var"     select="$var"      />
-      <xsl:with-param name="default" select="$default"  />
+      <xsl:with-param name="default" select="@default"  />
       <xsl:with-param name="rows"    select="@rows"     />
       <xsl:with-param name="multi"   select="@multiple" />
     </xsl:call-template>
@@ -958,14 +948,14 @@
   <xsl:if test="@type='dropdown'">
     <xsl:call-template name="editor.list">
       <xsl:with-param name="var"     select="$var"      />
-      <xsl:with-param name="default" select="$default"  />
+      <xsl:with-param name="default" select="@default"  />
     </xsl:call-template>
   </xsl:if>
   <!-- ====== type radio ======== -->
   <xsl:if test="(@type='radio') or (@type='checkbox')">
     <xsl:call-template name="editor.list.radio.cb">
       <xsl:with-param name="var"     select="$var"      />
-      <xsl:with-param name="default" select="$default"  />
+      <xsl:with-param name="default" select="@default"  />
     </xsl:call-template>
   </xsl:if>
 </xsl:template>
@@ -1045,7 +1035,10 @@
       <xsl:when test="ancestor::editor/input/var[((@name=$var) or starts-with(@name,concat($var,'['))) and (@value=current()/@value)]">
         <xsl:attribute name="checked">checked</xsl:attribute>
       </xsl:when>
-      <xsl:when test="$default = current()/@value">
+      <xsl:when test="ancestor::editor/input/var[(@name=$var) or starts-with(@name,concat($var,'['))]">
+        <!-- do not use default value(s) if there is any value given in source data -->
+      </xsl:when>
+      <xsl:when test="(@value = $default) or (@checked = 'true')">
         <xsl:attribute name="checked">checked</xsl:attribute>
       </xsl:when>
     </xsl:choose>
@@ -1075,7 +1068,10 @@
       <xsl:when test="ancestor::editor/input/var[((@name=$var) or starts-with(@name,concat($var,'['))) and (@value=current()/@value)]">
         <xsl:attribute name="checked">checked</xsl:attribute>
       </xsl:when>
-      <xsl:when test="$default = current()/@value">
+      <xsl:when test="ancestor::editor/input/var[(@name=$var) or starts-with(@name,concat($var,'['))]">
+        <!-- do not use default value(s) if there is any value given in source data -->
+      </xsl:when>
+      <xsl:when test="(@value = $default) or (@checked = 'true')">
         <xsl:attribute name="checked">checked</xsl:attribute>
       </xsl:when>
     </xsl:choose>
@@ -1214,7 +1210,10 @@
       <xsl:when test="$vars[@value=current()/@value]">
         <xsl:attribute name="selected">selected</xsl:attribute>
       </xsl:when>
-      <xsl:when test="$default=current()/@value">
+      <xsl:when test="count($vars) &gt; 0">
+        <!-- do not use default value(s) if there is any value given in source data -->
+      </xsl:when>
+      <xsl:when test="(@value = $default) or (@checked = 'true')">
         <xsl:attribute name="selected">selected</xsl:attribute>
       </xsl:when>
     </xsl:choose>
