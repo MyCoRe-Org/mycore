@@ -55,24 +55,29 @@ import org.jdom.transform.JDOMSource;
  * MyCoRe packages. The class is implemented as singleton and should be very
  * easy to use. So here is an example:
  * 
- * <PRE>// Get an instance of the class MCRXSLTransformation transformation =
- * MCRXSLTransformation.getInstance(); // Get the template: myStylesheet could
- * be a String (i.e. a filename), // a File or a StreamSource Templates
- * templates = transformation.getStylesheet(myStylesheet); // Next, you are in
- * need of a TransformerHandler: TransformerHandler th =
- * transformation.getTransformerHandler(templates); // Now you are able to set
- * some properties (if you want!): Properties parameters = new Properties(); ...
- * transformation.setParameters(th, parameters); // Finally, you need an
- * OutputStream and might get at work: OutputStream out =
- * response.getOutputStream(); transformation.transform(jdom, th, out); // You
- * might also want to transform into something different, // perhaps a ZIP-File:
+ * <PRE>
+ * // Get an instance of the class 
+ * MCRXSLTransformation transformation = MCRXSLTransformation.getInstance(); 
+ * // Get the template: myStylesheet could be a String (i.e. a filename), 
+ * // a File or a StreamSource Templates
+ * templates = transformation.getStylesheet(myStylesheet); 
+ * // Next, you are in need of a TransformerHandler: 
+ * TransformerHandler th = transformation.getTransformerHandler(templates); 
+ * // Now you are able to set some properties (if you want!): 
+ * Properties parameters = new Properties(); ...
+ * transformation.setParameters(th, parameters); 
+ * // Finally, you need an OutputStream and might get at work: 
+ * OutputStream out = response.getOutputStream(); 
+ * transformation.transform(jdom, th, out); 
+ * // You might also want to transform into something different, perhaps a ZIP-File:
  * OutputStream out = new ZipOutputStream(response.getOutputStream());
- * ((ZipOutputStream) out).setLevel(Deflater.BEST_COMPRESSION); ZipEntry ze =
- * new ZipEntry("_index.htm"); ((ZipOutputStream) out).putNextEntry(ze); ... //
- * After all this work is done, you could close the OutputStream: out.close(); //
- * This is not done by <CODE>transform</CODE>, the later example // should
- * show, why.
- * 
+ * ((ZipOutputStream) out).setLevel(Deflater.BEST_COMPRESSION); 
+ * ZipEntry ze = new ZipEntry("_index.htm"); 
+ * ((ZipOutputStream) out).putNextEntry(ze); ... 
+ * // After all this work is done, you could close the OutputStream: 
+ * out.close(); 
+ * // This is not done by <CODE>transform</CODE>, the later example 
+ * // should show, why. * 
  * </PRE>
  * 
  * @author Werner Gresshoff
