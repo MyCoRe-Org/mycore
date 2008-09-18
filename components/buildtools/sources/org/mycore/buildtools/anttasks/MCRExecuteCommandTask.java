@@ -23,12 +23,14 @@
 package org.mycore.buildtools.anttasks;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.tools.ant.BuildException;
+import org.apache.tools.ant.Project;
 import org.apache.tools.ant.Task;
 import org.mycore.frontend.cli.MCRCommandLineInterface;
 
@@ -66,6 +68,7 @@ public class MCRExecuteCommandTask extends Task {
 	 */
 	public void execute() throws BuildException {
 		System.out.println(commands);
+		commands = getProject().replaceProperties(commands);
 		BufferedReader reader = new BufferedReader(new StringReader(commands));
 		String line;
 		List<String> list = new ArrayList<String>();
@@ -86,7 +89,12 @@ public class MCRExecuteCommandTask extends Task {
 		for (String s : list) {
 			sbCommands.append(s).append(";;");
 		}
-
-		MCRCommandLineInterface.main(new String[] { sbCommands.toString() });
+				
+		try{
+			MCRCommandLineInterface.main(new String[] { sbCommands.toString() });
+		}
+		catch(SecurityException e){
+			//catches System.exit() in MCRCommandLineInterface.main()
+		}
 	}
 }
