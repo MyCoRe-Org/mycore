@@ -31,6 +31,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
+import org.apache.batik.dom.util.HashTable;
 import org.jdom.Document;
 import org.jdom.Element;
 
@@ -46,7 +47,7 @@ import org.jdom.Element;
  * @see MCRHit
  * 
  * @author Arne Seifert
- * @author Frank Lützenkirchen
+ * @author Frank L\u00fctzenkirchen
  * @author Jens Kupferschmidt
  * @version $Revision$ $Date$
  */
@@ -54,11 +55,14 @@ public class MCRResults implements Iterable<MCRHit> {
     /** The list of MCRHit objects */
     private ArrayList<MCRHit> hits = new ArrayList<MCRHit>();
 
+    /** The state of the connection */
+    private HashTable hostconnection = new HashTable();
+
     /**
      * A map containing MCRHit IDs used for and/or operations on two different
      * MCRResult objects
      */
-    private HashMap<String,MCRHit> map = new HashMap<String,MCRHit>();
+    private HashMap<String, MCRHit> map = new HashMap<String, MCRHit>();
 
     /** If true, this results are already sorted */
     private boolean isSorted = false;
@@ -219,6 +223,20 @@ public class MCRResults implements Iterable<MCRHit> {
         results.setAttribute("sorted", Boolean.toString(isSorted()));
         results.setAttribute("numHits", String.valueOf(getNumHits()));
 
+        for (int i = 0; i < hostconnection.size(); i++) {
+            Element connection = new Element("hostconnection", MCRFieldDef.mcrns);
+            connection.setAttribute("host", (String) hostconnection.key(i));
+            String msg = (String) hostconnection.item(i);
+            if (msg == null) msg = "";
+            connection.setAttribute("message", msg);
+            if (msg.length() == 0) {
+                connection.setAttribute("connection", "true");
+            } else {
+                connection.setAttribute("connection", "false");
+            }
+            results.addContent(connection);
+        }
+
         for (int i = min; i <= max; i++)
             results.addContent(hits.get(i).buildXML());
 
@@ -249,9 +267,16 @@ public class MCRResults implements Iterable<MCRHit> {
         int numHitsBefore = this.getNumHits();
         int numRemoteHits = Integer.parseInt(xml.getAttributeValue("numHits"));
 
-        List hitList = xml.getChildren();
-        hits.ensureCapacity(numHitsBefore + numRemoteHits);
+        List connectionList = xml.getChildren("hostconnection", MCRFieldDef.mcrns);
+        for (Iterator it = connectionList.iterator(); it.hasNext();) {
+            Element connectionElement = (Element) (it.next());
+            String conKey = connectionElement.getAttributeValue("host");
+            String conValue = connectionElement.getAttributeValue("message");
+            hostconnection.put(conKey, conValue);
+        }
 
+        List hitList = xml.getChildren("hit", MCRFieldDef.mcrns);
+        hits.ensureCapacity(numHitsBefore + numRemoteHits);
         for (Iterator it = hitList.iterator(); it.hasNext();) {
             Element hitElement = (Element) (it.next());
             MCRHit hit = MCRHit.parseXML(hitElement, hostAlias);
@@ -317,5 +342,18 @@ public class MCRResults implements Iterable<MCRHit> {
 
     public Iterator<MCRHit> iterator() {
         return hits.iterator();
+    }
+
+    /**
+     * Set the state of the connection of a host alias.
+     * 
+     * @param host
+     *            the host alias
+     * @param msg
+     *            the exception message of the connection or an empty string
+     */
+    public void setHostConnection(String host, String msg) {
+        if (msg == null) msg = "";
+        hostconnection.put(host, msg);
     }
 }

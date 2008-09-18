@@ -40,7 +40,8 @@ import org.jdom.input.DOMBuilder;
 /*
  * This class is the implementation for remote access via Webservices
  * 
- * @author Jens Kupferschmidt @author Frank L�tzenkirchen
+ * @author Jens Kupferschmidt
+ * @author Frank L\u00fctzenkirchen
  */
 
 public class MCRQueryClientWebService extends MCRQueryClientBase {
@@ -132,10 +133,12 @@ public class MCRQueryClientWebService extends MCRQueryClientBase {
             // Process xml response
             Document response = new DOMBuilder().build(outDoc);
             int numHits = results.merge(response, alias);
+            results.setHostConnection(alias, "");
             LOGGER.debug("Received " + numHits + " hits from host " + alias);
         } catch (Exception ex) {
             String msg = "Exception while querying remote host " + alias;
             LOGGER.error(msg, ex);
+            results.setHostConnection(alias, msg+ " : "+ex.getLocalizedMessage());
         }
     }
 
