@@ -217,7 +217,8 @@ abstract public class MCRCheckDataBase extends MCRCheckBase {
         org.jdom.Document jdom = null;
 
         try {
-            InputStream in = (new URL(getBaseURL() + myfile + "?XSL.Style=xml")).openStream();
+            //TODO: Access File directly
+            InputStream in = new URL(getBaseURL() + myfile + sessionID + "?XSL.Style=xml").openStream();
 
             if (in == null) {
                 throw new MCRConfigurationException("Can't read editor file " + myfile);
