@@ -105,9 +105,9 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
 
     private int ramDirEntries = 0;
 
-    private IndexReader indexReader;
+    private IndexReader indexReader = null;
 
-    private IndexSearcher indexSearcher;
+    private IndexSearcher indexSearcher = null;
 
     private Vector<MCRFieldDef> addableFields = new Vector<MCRFieldDef>();
 
@@ -132,8 +132,6 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
         try {
             IndexWriter writer = MCRLuceneTools.getLuceneWriter(config.getString(prefix + "IndexDir"), true);
             writer.close();
-            indexReader = IndexReader.open(IndexDir.getAbsolutePath());
-            indexSearcher = new IndexSearcher(indexReader);
         } catch (IOException e) {
             LOGGER.error(e.getClass().getName() + ": " + e.getMessage());
             LOGGER.error(MCRException.getStackTraceAsString(e));
@@ -272,6 +270,11 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
         synchronized (CONFIG) {
             long start = System.currentTimeMillis();
             try {
+            	if ( indexReader == null && indexSearcher == null) {
+                    indexReader = IndexReader.open(IndexDir.getAbsolutePath());
+                    indexSearcher = new IndexSearcher(indexReader);
+            	}
+            	else {
                 IndexReader newReader = indexReader.reopen();
                 if (newReader != indexReader) {
                     LOGGER.info("new Searcher for index: " + ID);
@@ -280,6 +283,7 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
                     indexReader = newReader;
                     indexSearcher = new IndexSearcher(indexReader);
                 }
+            	}
 
             } catch (IOException e) {
                 LOGGER.error(e.getClass().getName() + ": " + e.getMessage());
@@ -379,7 +383,7 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
         if (useRamDir) {
             writerRamDir.addDocument(doc, analyzer);
             ramDirEntries++;
-            if (ramDirEntries > 200) {
+            if (ramDirEntries > 5000) {
                 writerRamDir.close();
                 IndexWriterAction modifyAction = IndexWriterAction.addRamDir(modifyExecutor, ramDir);
                 modifyIndex(modifyAction);
@@ -518,7 +522,12 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
                 useRamDir = true;
             } catch (Exception e) {
             }
-        } else if (!"finish".equals(mode))
+        } else if ("optimize".equals(mode))
+        {
+            IndexWriterAction modifyAction = IndexWriterAction.optimizeAction(modifyExecutor);
+            modifyIndex(modifyAction);
+        }
+        else if (!"finish".equals(mode))
             LOGGER.error("invalid mode " + mode);
     }
 
@@ -680,6 +689,8 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
 
         private boolean delete = false;
 
+        private boolean optimize = false;
+
         private Term deleteTerm;
 
         private RAMDirectory ramDir;
@@ -703,6 +714,12 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
             return e;
         }
 
+        public static IndexWriterAction optimizeAction(IndexWriteExecutor executor) {
+            IndexWriterAction e = new IndexWriterAction(executor);
+            e.optimize = true;
+            return e;
+        }
+
         public static IndexWriterAction addRamDir(IndexWriteExecutor executor, RAMDirectory ramDir) {
             IndexWriterAction e = new IndexWriterAction(executor);
             e.ramDir = ramDir;
@@ -715,6 +732,8 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
                     deleteDocument();
                 } else if (add) {
                     addDocument();
+                } else if (optimize) {
+                    optimizeIndex();
                 } else
                     addDirectory();
             } catch (IOException e) {
@@ -733,10 +752,16 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
             executor.getIndexWriter().deleteDocuments(deleteTerm);
         }
 
+        private void optimizeIndex() throws IOException {
+            LOGGER.info("optimize Index:" + toString());
+            executor.getIndexWriter().optimize();
+            LOGGER.info("Optimizing done.");
+        }
+
         private void addDirectory() throws IOException {
-            LOGGER.debug("add Directory");
-            executor.getIndexWriter().addIndexes(new Directory[] { ramDir });
-            LOGGER.debug("Adding done.");
+            LOGGER.info("add Directory");
+            executor.getIndexWriter().addIndexesNoOptimize(new Directory[] { ramDir });
+            LOGGER.info("Adding done.");
         }
 
         public String toString() {
