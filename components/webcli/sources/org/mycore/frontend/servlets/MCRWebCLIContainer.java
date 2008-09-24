@@ -226,6 +226,10 @@ class MCRWebCLIContainer {
                     saveQueue(command);
                 }
                 return false;
+            } finally {
+                tx = MCRHIBConnection.instance().getSession().beginTransaction();
+                MCRHIBConnection.instance().getSession().clear();
+                tx.commit();
             }
             return true;
         }

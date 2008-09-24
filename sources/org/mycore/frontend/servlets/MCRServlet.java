@@ -317,6 +317,9 @@ public class MCRServlet extends HttpServlet {
             }
         } finally {
         	MCRSessionMgr.getCurrentSession().deleteObject("MCRServletJob");
+        	job.beginTransaction();
+        	MCRHIBConnection.instance().getSession().clear();
+        	job.commitTransaction();
             // Release current MCRSession from current Thread,
             // in case that Thread pooling will be used by servlet engine
             if (getProperty(req, INITIAL_SERVLET_NAME_KEY).equals(getServletName())) {
