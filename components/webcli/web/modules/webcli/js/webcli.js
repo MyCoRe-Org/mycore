@@ -16,6 +16,35 @@ if (webCLIServlet==null){
 	var webCLIServlet='../../servlets/MCRWebCLIServlet';
 	console.debug("webCLIServlet is not set trying: "+webCLIServlet);
 }
+
+function RingBuffer(/*int*/ size){
+	this.maxSize=size;
+	this.curSize=0;
+	this.buffer=new Array();
+	this.add=function(/*String*/ str){
+		if (this.curSize == this.maxSize) this.buffer.shift();
+		else this.curSize++;
+		this.buffer.push(str);
+	}
+	this.clear=function(){
+		this.buffer.splice(0,this.curSize);
+		this.curSize = 0;
+	}
+	this.getEntries=function(){
+		return this.buffer.slice(0,this.curSize)
+	}
+	this.resize=function(/*int*/ size){
+		if (size == this.maxSize) return;
+		webcli.logDebug("Resize ring buffer from "+ this.maxSize+" to "+size);
+		if (this.maxSize < size) {
+			for (var i = this.maxSize; i < size; i++){
+				this.buffer.shift();
+			}
+		}
+		this.maxSize = size;
+	}
+}
+
 var test;
 var webcli={
 	"failedData"	:	null,
@@ -235,23 +264,30 @@ var webcli={
 		"processSettings"		:	function(dialogFields){
 			webcli.logs.setRefreshRate(dialogFields.logRefreshSetting);
 			webcli.commands.setRefreshRate(dialogFields.queueRefreshSetting);
+			webcli.logs.ringBuffer.resize(Math.floor(dialogFields.logHistorySize));
 		},
 		"handleSlider"			:	function(/*String*/ id, value){
 			element = dojo.byId(id);
 			element.value = value;
 			label = dojo.byId(id+".label").getElementsByTagName("div")[0].getElementsByTagName("span")[0];
-			label.firstChild.nodeValue = document.createTextNode(dojox.string.sprintf("%.2f\u00A0s",(value/1000))).nodeValue;
+			if (id == 'logHistorySize') {
+				label.firstChild.nodeValue = document.createTextNode(dojox.string.sprintf("%d\u00A0lines",value)).nodeValue;
+			} else {
+				label.firstChild.nodeValue = document.createTextNode(dojox.string.sprintf("%.2f\u00A0s",(value/1000))).nodeValue;
+			}
 		},
 		"showSettings"			:	function(){
 			dijit.registry.byId('settingsDialog').show();
 			dijit.registry.byId('logRefreshSetting').setValue(webcli.logs.getRefreshRate(), true);
 			dijit.registry.byId('queueRefreshSetting').setValue(webcli.commands.getRefreshRate(), true);
+			dijit.registry.byId('logHistorySize').setValue(webcli.logs.ringBuffer.maxSize, true);
 		}
 	},
 	"logs"	:	{
 		"refreshRate"		:	1000,
 		"autoScroll"		:	true,
 		"refreshReady"		:	true,
+		"ringBuffer"		:	new RingBuffer(50),
 		"_callback"			:	function(data, ioArgs) {
 			webcli.logDebug("webcli.logs._callback started");
 			var logs= dojo.fromJson(data).logs;
@@ -259,7 +295,8 @@ var webcli={
 				webcli.logDebug("writing logs");
 			}
 			dojo.forEach(logs, function(line){
-				webcli.logs.writeln(line);
+				webcli.logDebug(line);
+				webcli.logs.addLogLine(line);
 			});
 			webcli.logDebug("enabled logs.refreshReady");
 			webcli.logs.refreshReady=true;
@@ -284,26 +321,25 @@ var webcli={
 				webcli.logs.refreshHandler=window.setInterval("webcli.logs.refresh()", rate);
 			}
 		},
-		"writeln"			:	function(/*String*/ str){
-			webcli.logDebug(str);
-			test=dojo.byId("logs");
-			var text=document.createTextNode(str.logLevel+": "+str.message+"\r\n");
-			var logElement=dojo.byId("logs").getElementsByTagName("pre")[0];
-			if (logElement.firstChild==null){
-				//<pre> is empty
-				logElement.appendChild(text);
-			} else {
-				logElement.firstChild.appendData(text.nodeValue);
-			}
-			if (webcli.logs.autoScroll==true){
-				logElement.scrollTop = logElement.scrollHeight - logElement.offsetHeight + 100;
-			}
-		},
 		"clear"			:	function(){
 			var logElement=dojo.byId("logs").getElementsByTagName("pre")[0];
-			if (logElement.firstChild!=null){
-				//just clear logs if writeln(str) runned at least once
-				logElement.firstChild.nodeValue="";
+			if (logElement.hasChildNodes()){
+				while (logElement.childNodes.length > 0) {
+					logElement.removeChild(logElement.firstChild);
+				}
+			}
+		},
+		"addLogLine"	:	function(/*LogEntry*/ line) {
+			var logElement=dojo.byId("logs").getElementsByTagName("pre")[0];
+			var text=document.createTextNode(line.logLevel+": "+line.message+"\r\n");
+			var oldSize=webcli.logs.ringBuffer.curSize;
+			webcli.logs.ringBuffer.add(line);
+			if (oldSize == webcli.logs.ringBuffer.curSize){
+				logElement.removeChild(logElement.firstChild);
+			}
+			logElement.appendChild(text);
+			if (webcli.logs.autoScroll==true){
+				logElement.scrollTop = logElement.scrollHeight - logElement.offsetHeight + 100;
 			}
 		},
 		"refreshHandler"	:	null,
