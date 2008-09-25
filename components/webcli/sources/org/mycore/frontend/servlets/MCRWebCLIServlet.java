@@ -5,6 +5,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.StringTokenizer;
 
@@ -110,7 +111,7 @@ public class MCRWebCLIServlet extends MCRServlet {
                     printJSONObject(commandsJSON, job.getResponse());
                     return;
                 } else if (request.equals("getCommandQueue")) {
-                    printJSONObject(new JSONObject().put("commandQueue", getCurrentSessionContainer(true, hsession).getCommandQueue()), job.getResponse());
+                    printJSONObject(new JSONObject().put("commandQueue", new LinkedList<String>(getCurrentSessionContainer(true, hsession).getCommandQueue())), job.getResponse());
                     return;
                 }
             }
