@@ -287,19 +287,28 @@ var webcli={
 		"refreshRate"		:	1000,
 		"autoScroll"		:	true,
 		"refreshReady"		:	true,
+		"startTime"			:	null,
 		"ringBuffer"		:	new RingBuffer(50),
+		"logBuffer"		:   null,
 		"_callback"			:	function(data, ioArgs) {
 			webcli.logDebug("webcli.logs._callback started");
+			var midTime=new Date();
 			var logs= dojo.fromJson(data).logs;
 			if (logs.length > 0){
 				webcli.logDebug("writing logs");
 			}
-			dojo.forEach(logs, function(line){
-				webcli.logDebug(line);
-				webcli.logs.addLogLine(line);
-			});
+			//remove logs that will never be displayed
+			while (logs.length > webcli.logs.ringBuffer.maxSize)
+				logs.shift();
+			webcli.logs.logBuffer=logs;
 			webcli.logDebug("enabled logs.refreshReady");
 			webcli.logs.refreshReady=true;
+			//webcli.logs.refreshHandler = window.setInterval("webcli.logs.refresh()", webcli.logs.refreshRate);
+			var endTime=new Date();
+			if (logs.length > 0){
+				webcli.logs.updateLogLines();
+				webcli.logDebug("count logs:"+logs.length+"   midTime="+(midTime.getTime() - webcli.logs.startTime.getTime())+" ms,    endTime="+(endTime.getTime()-midTime.getTime())+" ms");
+			}
 		},
 		"toggleAutoScroll"	:	function(){
 			if (webcli.logs.autoScroll==true){
@@ -329,15 +338,19 @@ var webcli={
 				}
 			}
 		},
-		"addLogLine"	:	function(/*LogEntry*/ line) {
+		"updateLogLines"	:	function() {
 			var logElement=dojo.byId("logs").getElementsByTagName("pre")[0];
-			var text=document.createTextNode(line.logLevel+": "+line.message+"\r\n");
 			var oldSize=webcli.logs.ringBuffer.curSize;
-			webcli.logs.ringBuffer.add(line);
-			if (oldSize == webcli.logs.ringBuffer.curSize){
+			dojo.forEach(webcli.logs.logBuffer, function(line){
+				webcli.logs.ringBuffer.add(line);
+				logElement.appendChild(document.createTextNode(line.logLevel+": "+line.message+"\r\n"));
+			});
+			var curSize = oldSize + webcli.logs.logBuffer.length;
+			//remove old log lines
+			while (curSize > webcli.logs.ringBuffer.maxSize){
 				logElement.removeChild(logElement.firstChild);
+				curSize--;
 			}
-			logElement.appendChild(text);
 			if (webcli.logs.autoScroll==true){
 				logElement.scrollTop = logElement.scrollHeight - logElement.offsetHeight + 100;
 			}
@@ -346,8 +359,10 @@ var webcli={
 		"refresh"			:	function(){
 			webcli.logDebug("logs: webcli.doRefresh = "+webcli.doRefresh);
 			if (webcli.doRefresh==true){
+				//window.clearInterval(webcli.logs.refreshHandler);
 				if (webcli.logs.refreshReady==true){
 					webcli.logs.refreshReady=false;
+					webcli.logs.startTime = new Date();
 					dojo.xhrGet({
 						url: webCLIServlet,
 						load: webcli.logs._callback,

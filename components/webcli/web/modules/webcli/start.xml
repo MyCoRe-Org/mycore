@@ -79,11 +79,11 @@ webcli.logs.clear();
                 </td>
                 <td>
                   <div id="logHistorySize" name="logHistorySize" dojoType="dijit.form.HorizontalSlider"
-                    value="50" minimum="10" maximum="5000" intermediateChanges="true" showButtons="true"
+                    value="10" minimum="10" maximum="5000" intermediateChanges="true" showButtons="true"
                     onChange="webcli.gui.handleSlider(this.id, arguments[0]);" style="width:300px;">
                     <ol dojoType="dijit.form.HorizontalRuleLabels" container="bottomDecoration"
                       style="height:1em;font-size:75%;color:gray;" id="logHistorySize.label">
-                      <li>1 lines</li>
+                      <li>10 lines</li>
                     </ol>
                     <ol dojoType="dijit.form.HorizontalRuleLabels" container="topDecoration"
                       style="height:1em;font-size:75%;color:gray;">
