@@ -37,6 +37,9 @@ import org.jdom.Namespace;
  * @version $Revision$ $Date$
  */
 public final class MCRConstants {
+    /** MyCoRe version */
+    public final static String VERSION = "2.0";
+    
     /** The URL of the XLink */
     private final static String XLINK_URL = "http://www.w3.org/1999/xlink";
     public final static Namespace XLINK_NAMESPACE = Namespace.getNamespace("xlink", XLINK_URL);

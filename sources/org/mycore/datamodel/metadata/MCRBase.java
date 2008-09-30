@@ -28,6 +28,7 @@ import static org.mycore.common.MCRConstants.DEFAULT_ENCODING;
 import org.apache.log4j.Logger;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
+import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.datamodel.common.MCRActiveLinkException;
@@ -95,12 +96,12 @@ public abstract class MCRBase {
      * @exception MCRException
      *                general Exception of MyCoRe
      * @exception MCRConfigurationException
-     *                a special exception for configuartion data
+     *                a special exception for configuration data
      */
     public MCRBase() throws MCRException, MCRConfigurationException {
         mcr_id = new MCRObjectID();
         mcr_label = "";
-        mcr_version = "1.3";
+        mcr_version = MCRConstants.VERSION;
         mcr_schema = "";
 
         // Service class
@@ -207,7 +208,7 @@ public abstract class MCRBase {
      * This methode set the MyCoRe version to the string 'Version 1.3'.
      */
     public final void setVersion() {
-        mcr_version = "Version 1.3";
+        mcr_version = MCRConstants.VERSION;
     }
 
     /**
