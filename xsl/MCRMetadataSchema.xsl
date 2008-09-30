@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!-- ============================================== -->
-<!-- $Revision: 1.11 $ $Date: 2007-03-08 13:44:46 $ -->
+<!-- $Revision: 1.1 $ $Date: 2008/07/01 11:57:45 $ -->
 <!-- ============================================== -->
 
 <xsl:stylesheet
@@ -110,7 +110,7 @@
 
 <xsl:template match="/configuration/metadata">
  <xsd:complexType name="MCRObjectMetadata">
-  <xsd:sequence>
+  <xsd:all>
  <xsl:for-each select="element">
   <xsd:element name="{@name}" minOccurs="{@minOccurs}" maxOccurs="{@maxOccurs}">
    <xsd:complexType>
@@ -122,7 +122,7 @@
  </xsl:for-each>
 
    <xsl:value-of select="$newline"/>
-  </xsd:sequence>
+  </xsd:all>
   <xsd:attribute ref="xml:lang" />
  </xsd:complexType>
 
