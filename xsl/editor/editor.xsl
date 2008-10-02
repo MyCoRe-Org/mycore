@@ -17,7 +17,19 @@
 
 <xsl:include href="editor-common.xsl" />
 
-<xsl:variable name="nodes" select="//node()" />
+<xsl:variable name="nodes.tmp">
+  <a></a><a></a><a></a><a></a><a></a><a></a><a></a><a></a><a></a><a></a>
+  <a></a><a></a><a></a><a></a><a></a><a></a><a></a><a></a><a></a><a></a>
+  <a></a><a></a><a></a><a></a><a></a><a></a><a></a><a></a><a></a><a></a>
+  <a></a><a></a><a></a><a></a><a></a><a></a><a></a><a></a><a></a><a></a>
+  <a></a><a></a><a></a><a></a><a></a><a></a><a></a><a></a><a></a><a></a>
+  <a></a><a></a><a></a><a></a><a></a><a></a><a></a><a></a><a></a><a></a>
+  <a></a><a></a><a></a><a></a><a></a><a></a><a></a><a></a><a></a><a></a>
+  <a></a><a></a><a></a><a></a><a></a><a></a><a></a><a></a><a></a><a></a>
+  <a></a><a></a><a></a><a></a><a></a><a></a><a></a><a></a><a></a><a></a>
+  <a></a><a></a><a></a><a></a><a></a><a></a><a></a><a></a><a></a><a></a>
+</xsl:variable>
+<xsl:variable name="nodes" select="xalan:nodeset($nodes.tmp)" />
 
 <!-- ======== FCK Editor JavaScript laden ======== -->
 <xsl:variable name="head.additional">
@@ -273,7 +285,7 @@
       <xsl:with-param name="class" select="'editorRepeater'" />
     </xsl:call-template>
   
-    <xsl:for-each select="$nodes[(position() &lt;= number($min)) or (position() &lt;= number($num))]">
+    <xsl:for-each select="$nodes/a[(position() &lt;= number($min)) or (position() &lt;= number($num))]">
       <tr>
         <xsl:if test="$rep/@pos = 'left'">
           <xsl:call-template name="repeater.pmud">
