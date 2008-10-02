@@ -17,20 +17,6 @@
 
 <xsl:include href="editor-common.xsl" />
 
-<xsl:variable name="nodes.tmp">
-  <a></a><a></a><a></a><a></a><a></a><a></a><a></a><a></a><a></a><a></a>
-  <a></a><a></a><a></a><a></a><a></a><a></a><a></a><a></a><a></a><a></a>
-  <a></a><a></a><a></a><a></a><a></a><a></a><a></a><a></a><a></a><a></a>
-  <a></a><a></a><a></a><a></a><a></a><a></a><a></a><a></a><a></a><a></a>
-  <a></a><a></a><a></a><a></a><a></a><a></a><a></a><a></a><a></a><a></a>
-  <a></a><a></a><a></a><a></a><a></a><a></a><a></a><a></a><a></a><a></a>
-  <a></a><a></a><a></a><a></a><a></a><a></a><a></a><a></a><a></a><a></a>
-  <a></a><a></a><a></a><a></a><a></a><a></a><a></a><a></a><a></a><a></a>
-  <a></a><a></a><a></a><a></a><a></a><a></a><a></a><a></a><a></a><a></a>
-  <a></a><a></a><a></a><a></a><a></a><a></a><a></a><a></a><a></a><a></a>
-</xsl:variable>
-<xsl:variable name="nodes" select="xalan:nodeset($nodes.tmp)" />
-
 <!-- ======== FCK Editor JavaScript laden ======== -->
 <xsl:variable name="head.additional">
   <xsl:if test="//textarea[@wysiwygEditor='true']">
@@ -81,7 +67,8 @@
 
 <!-- ======== handles editor ======== -->
 
-<xsl:template match="editor">
+<xsl:template match="editor" xmlns:system="xalan://java.lang.System">
+  <xsl:variable name="time" select="system:currentTimeMillis()" />
   <form>
     <xsl:call-template name="editor.set.css">
       <xsl:with-param name="class" select="'editor'" />
@@ -94,6 +81,9 @@
       <xsl:apply-templates select="components" />
     </fieldset>
   </form>
+  <!-- 
+  <xsl:value-of select="number(system:currentTimeMillis())-number($time)" /> ms<xsl:text/>
+  -->
 </xsl:template>
 
 <!-- ======== handle components ======== -->
@@ -233,6 +223,16 @@
 </xsl:template>
 
 <!-- ======== handle repeater ======== -->
+
+<xsl:variable name="nodes.tmp"> <!-- This determines max repeats for repeater -->
+  <a/><a/><a/><a/><a/><a/><a/><a/><a/><a/><a/><a/><a/><a/><a/><a/><a/><a/><a/><a/>
+  <a/><a/><a/><a/><a/><a/><a/><a/><a/><a/><a/><a/><a/><a/><a/><a/><a/><a/><a/><a/>
+  <a/><a/><a/><a/><a/><a/><a/><a/><a/><a/><a/><a/><a/><a/><a/><a/><a/><a/><a/><a/>
+  <a/><a/><a/><a/><a/><a/><a/><a/><a/><a/><a/><a/><a/><a/><a/><a/><a/><a/><a/><a/>
+  <a/><a/><a/><a/><a/><a/><a/><a/><a/><a/><a/><a/><a/><a/><a/><a/><a/><a/><a/><a/>
+</xsl:variable>
+<xsl:variable name="nodes" select="xalan:nodeset($nodes.tmp)" />
+
 <xsl:template match="repeater">
   <xsl:param name="var"      />
   <xsl:param name="pos"      />
@@ -279,8 +279,7 @@
 
   <xsl:variable name="rep" select="." />
 
-  <table xmlns:system="xalan://java.lang.System">
-    <xsl:variable name="time" select="system:currentTimeMillis()" />
+  <table>
     <xsl:call-template name="editor.set.css">
       <xsl:with-param name="class" select="'editorRepeater'" />
     </xsl:call-template>
@@ -310,9 +309,6 @@
         </xsl:if>
       </tr>
     </xsl:for-each>
-    <!-- 
-    <tr><td><xsl:value-of select="number(system:currentTimeMillis())-number($time)" /> ms</td></tr>
-    -->
   </table>
   
 </xsl:template>
@@ -971,39 +967,45 @@
   </input>
 </xsl:template>
 
-<!-- ======== list ======== -->
-<xsl:template match="list">
+<!-- ======== dropdown list ======== -->
+<xsl:template match="list[@type='dropdown']">
   <xsl:param name="var" />
 
-  <!-- ====== type multirow ======== -->
-  <xsl:if test="@type='multirow'">
-    <xsl:call-template name="editor.list">
-      <xsl:with-param name="var"     select="$var"      />
-      <xsl:with-param name="default" select="@default"  />
-      <xsl:with-param name="rows"    select="@rows"     />
-      <xsl:with-param name="multi"   select="@multiple" />
+  <select tabindex="1" name="{$var}" size="1">
+    <xsl:if test="@disabled='true'">
+      <xsl:attribute name="disabled">disabled</xsl:attribute>
+    </xsl:if>
+    <xsl:call-template name="editor.set.css">
+      <xsl:with-param name="class" select="'editorList'" />
     </xsl:call-template>
-  </xsl:if>
-  <!-- ====== type dropdown ======== -->
-  <xsl:if test="@type='dropdown'">
-    <xsl:call-template name="editor.list">
-      <xsl:with-param name="var"     select="$var"      />
-      <xsl:with-param name="default" select="@default"  />
-    </xsl:call-template>
-  </xsl:if>
-  <!-- ====== type radio ======== -->
-  <xsl:if test="(@type='radio') or (@type='checkbox')">
-    <xsl:call-template name="editor.list.radio.cb">
-      <xsl:with-param name="var"     select="$var"      />
-      <xsl:with-param name="default" select="@default"  />
-    </xsl:call-template>
-  </xsl:if>
+   
+    <xsl:apply-templates select="item">
+      <xsl:with-param name="vars"    select="ancestor::editor/input/var[@name=$var]" />
+      <xsl:with-param name="default" select="@default" />
+    </xsl:apply-templates>
+  </select>
 </xsl:template>
 
-<!-- ======== handle list of radio ======== -->
-<xsl:template name="editor.list.radio.cb">
-  <xsl:param name="var"     />
-  <xsl:param name="default" />
+<!-- ======== multirow list ======== -->
+<xsl:template match="list[@type='multirow']">
+  <xsl:param name="var" />
+
+  <select tabindex="1" name="{$var}" size="{@rows}" multiple="multiple">
+    <xsl:call-template name="editor.set.css">
+      <xsl:with-param name="class" select="'editorList'" />
+    </xsl:call-template>
+    
+    <xsl:apply-templates select="item">
+      <xsl:with-param name="vars"    select="ancestor::editor/input/var[(@name=$var) or starts-with(@name,concat($var,'['))]" />
+      <xsl:with-param name="default" select="@default" />
+    </xsl:apply-templates>
+  </select>
+</xsl:template>
+
+<!-- ======== list of radio or checkbox ======== -->
+<xsl:template match="list[(@type='radio') or (@type='checkbox')]">
+  <xsl:param name="var" />
+  <xsl:variable name="default" select="@default" />
 
   <xsl:variable name="last" select="count(item)-1" />
 
@@ -1180,43 +1182,6 @@
   </div>
 </xsl:template>
 
-<!-- ======== handle multirow or dropdown ======== -->
-<xsl:template name="editor.list">
-  <xsl:param name="var"     />
-  <xsl:param name="default" />
-  <xsl:param name="rows"  select="'1'"/>
-  <xsl:param name="multi" select="'false'"/>
-
-  <!-- ======== html select list ======== -->
-  <select tabindex="1" name="{$var}" size="{$rows}">
-    <xsl:if test="$multi = 'true'">
-      <xsl:attribute name="multiple">multiple</xsl:attribute>
-    </xsl:if>
-    <xsl:if test="@disabled='true'">
-      <xsl:attribute name="disabled">disabled</xsl:attribute>
-    </xsl:if>
-
-    <xsl:call-template name="editor.set.css">
-      <xsl:with-param name="class" select="'editorList'" />
-    </xsl:call-template>
-    
-    <xsl:choose>
-      <xsl:when test="$multi = 'true'">
-        <xsl:apply-templates select="item" mode="editor.list">
-          <xsl:with-param name="vars"    select="ancestor::editor/input/var[(@name=$var) or starts-with(@name,concat($var,'['))]" />
-          <xsl:with-param name="default" select="$default" />
-        </xsl:apply-templates>
-      </xsl:when>
-      <xsl:otherwise>
-        <xsl:apply-templates select="item" mode="editor.list">
-          <xsl:with-param name="vars"    select="ancestor::editor/input/var[@name=$var]" />
-          <xsl:with-param name="default" select="$default" />
-        </xsl:apply-templates>
-      </xsl:otherwise>
-    </xsl:choose>
-  </select>
-</xsl:template>
-
 <!-- ======== If url is relative, add WebApplicationBaseURL and make it absolute ======== -->
 <xsl:template name="build.editor.url">
   <xsl:param name="url" />
@@ -1239,8 +1204,13 @@
 </xsl:template>
 
 <!-- ======== html select list option ======== -->
-<xsl:template match="item" mode="editor.list">
-  <xsl:param name="vars"     />
+
+<xsl:variable name="editor.list.indent">
+  <xsl:text disable-output-escaping="yes">&amp;nbsp;&amp;nbsp;&amp;nbsp;</xsl:text>
+</xsl:variable>
+
+<xsl:template match="item">
+  <xsl:param name="vars"    />
   <xsl:param name="default" />
   <xsl:param name="indent" select="''"/>
 
@@ -1264,11 +1234,7 @@
 
   <!-- ======== handle nested items ======== -->
   
-  <xsl:variable name="editor.list.indent">
-    <xsl:text disable-output-escaping="yes">&amp;nbsp;&amp;nbsp;&amp;nbsp;</xsl:text>
-  </xsl:variable>
-
-  <xsl:apply-templates select="item" mode="editor.list">
+  <xsl:apply-templates select="item">
     <xsl:with-param name="vars"    select="$vars"    />
     <xsl:with-param name="default" select="$default" />
     <xsl:with-param name="indent"  select="concat($editor.list.indent,$indent)" />
