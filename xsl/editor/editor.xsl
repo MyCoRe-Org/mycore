@@ -267,7 +267,8 @@
 
   <xsl:variable name="rep" select="." />
 
-  <table>
+  <table xmlns:system="xalan://java.lang.System">
+    <xsl:variable name="time" select="system:currentTimeMillis()" />
     <xsl:call-template name="editor.set.css">
       <xsl:with-param name="class" select="'editorRepeater'" />
     </xsl:call-template>
@@ -297,6 +298,9 @@
         </xsl:if>
       </tr>
     </xsl:for-each>
+    <!-- 
+    <tr><td><xsl:value-of select="number(system:currentTimeMillis())-number($time)" /> ms</td></tr>
+    -->
   </table>
   
 </xsl:template>
@@ -371,8 +375,15 @@
   <xsl:param name="var" />
   <xsl:param name="pos" select="1" />
 
-  <xsl:variable name="cells1" select="ancestor::components/panel[@id = current()/include/@ref]/cell|cell" /> 
-  <xsl:variable name="cells2" select="ancestor::components/panel[@id = current()/include/@ref]/cell|cell" /> 
+  <xsl:variable name="combined" select="ancestor::editor/components/panel[@id=current()/include/@ref]/*|*" />
+  <xsl:variable name="combined.cellpos.tmp">
+    <xsl:for-each select="$combined[name()='cell']">
+      <xsl:sort select="@row" data-type="number" />
+      <xsl:sort select="@col" data-type="number" />
+      <cell row="{@row}" col="{@col}" />
+    </xsl:for-each>
+  </xsl:variable>
+  <xsl:variable name="combined.cellpos" select="xalan:nodeset($combined.cellpos.tmp)" />
 
   <table>
     <xsl:call-template name="editor.set.css">
@@ -392,66 +403,83 @@
         </td>
       </tr>
     </xsl:if>
+    
+    <xsl:variable name="rows.tmp">
+      <xsl:for-each select="$combined.cellpos/cell">
+        <xsl:if test="not(preceding-sibling::cell/@row = current()/@row)">
+          <row nr="{@row}" />
+        </xsl:if>
+      </xsl:for-each>
+    </xsl:variable>
+    <xsl:variable name="rows" select="xalan:nodeset($rows.tmp)" />
 
-    <xsl:for-each select="$cells1">
-      <xsl:sort select="@row" data-type="number" />
-      <xsl:sort select="@col" data-type="number" />
-      
-      <!-- for each row in panel (handle only first occurrence) -->
-      <xsl:if test="count($cells1[(@row=current()/@row) and (number(@col) &lt; number(current()/@col))])=0">
-        <tr>
-          <xsl:variable name="currentRow" select="@row" />
+    <xsl:variable name="cols.tmp">
+      <xsl:for-each select="$combined.cellpos/cell">
+        <xsl:sort select="@col" data-type="number" />
+        <xsl:if test="not(preceding-sibling::cell/@col = current()/@col)">
+          <col nr="{@col}" />
+        </xsl:if>
+      </xsl:for-each>
+    </xsl:variable>
+    <xsl:variable name="cols" select="xalan:nodeset($cols.tmp)" />
+
+    <xsl:for-each select="$rows/row">
+      <xsl:variable name="row" select="@nr" />
+      <tr>
+        <xsl:for-each select="$cols/col">
+          <xsl:variable name="col" select="@nr" />
+          <xsl:variable name="cell" select="$combined[(@row=$row) and (@col=$col)]" />
           
-          <xsl:for-each select="$cells2">
-            <xsl:sort select="@col" data-type="number" />
-            <xsl:sort select="@row" data-type="number" />
-             
-            <xsl:choose>
-              <xsl:when test="@row=$currentRow">
-                <td>
-                  <xsl:copy-of select="@colspan" />
-                  <xsl:call-template name="cell">
-                    <xsl:with-param name="var" select="$var" />
-                    <xsl:with-param name="pos">
-                      <xsl:value-of select="$pos" />
-                      <xsl:if test="$pos">
-                        <xsl:text>.</xsl:text>
-                      </xsl:if>
-                      <xsl:choose>
-                        <xsl:when test="@sortnr">
-                          <xsl:value-of select="@sortnr"/>
-                        </xsl:when>
-                        <xsl:otherwise>
-                          <xsl:value-of select="1 + count($cells2[(number(@row) &lt; number(current()/@row)) or ( (@row = current()/@row) and (number(@col) &lt; number(current()/@col)) )])" />
-                        </xsl:otherwise>
-                      </xsl:choose>
-                    </xsl:with-param>
-                  </xsl:call-template>
-                </td>
-              </xsl:when>
-              <!-- For each first occurrence of a column that does NOT exist in the current row ... -->
-              <xsl:when test="count($cells2[(@col=current()/@col) and (number(@row) &lt; number(current()/@row))]) = 0">
-                <!-- Output necessary empty cells to complete table structure -->
-                <xsl:if test="count($cells2[(@row = $currentRow) and ((@col=current()/@col) or ((number(@col) &lt; number(current()/@col)) and (number(@col)+number(@colspan) &gt;= number(current()/@col)))) ]) = 0">
-                  <td/>
-                </xsl:if>
-              </xsl:when>
-            </xsl:choose>
-          </xsl:for-each>
-        </tr>
-      </xsl:if>
+          <xsl:choose>
+            <xsl:when test="count($cell) &gt; 0">
+              <!-- There is a cell defined for this row and col -->
+              <xsl:for-each select="$cell">
+              <td>
+                <xsl:copy-of select="@colspan" />
+                <xsl:call-template name="cell">
+                  <xsl:with-param name="var" select="$var" />
+                  <xsl:with-param name="pos">
+                    <xsl:value-of select="$pos" />
+                    <xsl:text>.</xsl:text>
+                    <xsl:choose>
+                      <xsl:when test="@sortnr">
+                        <xsl:value-of select="@sortnr"/>
+                      </xsl:when>
+                      <xsl:otherwise>
+                        <xsl:for-each select="$combined.cellpos/cell">
+                          <xsl:if test="(@row=$row) and (@col=$col)">
+                            <xsl:value-of select="position()" />
+                          </xsl:if>
+                        </xsl:for-each> 
+                      </xsl:otherwise>
+                    </xsl:choose>
+                  </xsl:with-param>
+                </xsl:call-template>
+              </td>
+              </xsl:for-each>
+            </xsl:when>
+            <xsl:when test="$combined[ (@row=$row) and (number(@col) &lt; number($col)) and (number(@col)+number(@colspan) &gt;= number($col))]">
+              <!-- There is a cell in this row before this col with a colspan spanning over this col, nothing to do -->
+            </xsl:when>
+            <xsl:otherwise>
+              <!-- We have to insert an empty td cell here -->
+              <td/>
+            </xsl:otherwise>
+          </xsl:choose>          
+        </xsl:for-each>
+      </tr>
     </xsl:for-each>
   </table>
-  
+
   <!-- ======== handle hidden fields ======== -->
-  <xsl:apply-templates select="ancestor::components/panel[@id = current()/include/@ref]/hidden|hidden">
-    <xsl:with-param name="cells" select="$cells1" />
-    <xsl:with-param name="var"   select="$var"    />
-    <xsl:with-param name="pos"   select="$pos"    />
+  <xsl:apply-templates select="$combined[name()='hidden']">
+    <xsl:with-param name="numcells" select="count($combined.cellpos/cell)" />
+    <xsl:with-param name="var" select="$var" />
+    <xsl:with-param name="pos" select="$pos" />
   </xsl:apply-templates>
-  
+
   <!-- ======== handle panel validation conditions ======== -->
-  <xsl:for-each select="ancestor::components/panel[@id = current()/include/@ref]/condition|condition">
+  <xsl:for-each select="$combined[name()='condition']">
     <input type="hidden" name="_cond-{$var}" value="{@id}" />
     <input type="hidden" name="_sortnr-{$var}" value="{$pos}" />
   </xsl:for-each>
@@ -654,9 +682,9 @@
 
 <!-- ======== hidden ======== -->
 <xsl:template match="hidden">
-  <xsl:param name="cells" />
-  <xsl:param name="var"   />
-  <xsl:param name="pos"   />
+  <xsl:param name="numcells" select="'0'" />
+  <xsl:param name="var" />
+  <xsl:param name="pos" />
 
   <xsl:variable name="var.new">
     <xsl:call-template name="editor.build.new.var">
@@ -675,11 +703,11 @@
         <xsl:value-of select="@sortnr"/>
       </xsl:when>
       <xsl:otherwise> 
-        <xsl:value-of select="count($cells) + position()" />
+        <xsl:value-of select="number($numcells) + position()" />
       </xsl:otherwise>
     </xsl:choose>
   </xsl:variable>
-
+  
   <xsl:choose>
     <!-- ======== copy all elements, attributes and child elements with current xpath to hidden field ======== -->  
     <xsl:when test="@descendants='true'">
