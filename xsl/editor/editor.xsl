@@ -17,6 +17,12 @@
 
 <xsl:include href="editor-common.xsl" />
 
+<xsl:key name="components" match="components/*" use="@id" />
+<xsl:key name="vars"       match="editor/input/var" use="@name" />
+<xsl:key name="repeats"    match="editor/repeats/repeat" use="@path" />
+<xsl:key name="failed"     match="editor/failed/field" use="@sortnr" />
+<xsl:key name="conditions" match="condition[@id]" use="@id" />
+
 <!-- ======== FCK Editor JavaScript laden ======== -->
 <xsl:variable name="head.additional">
   <xsl:if test="//textarea[@wysiwygEditor='true']">
@@ -69,7 +75,7 @@
 
 <xsl:template match="editor" xmlns:system="xalan://java.lang.System">
   <xsl:variable name="time" select="system:currentTimeMillis()" />
-  <form>
+  <form action="{$ServletsBaseURL}XMLEditor{$HttpSession}" accept-charset="UTF-8">
     <xsl:call-template name="editor.set.css">
       <xsl:with-param name="class" select="'editor'" />
     </xsl:call-template>
@@ -78,39 +84,29 @@
       <xsl:call-template name="editor.set.css">
         <xsl:with-param name="class" select="'editor'" />
       </xsl:call-template>
-      <xsl:apply-templates select="components" />
+
+      <!-- ======== if exists, output editor headline ======== -->
+      <xsl:apply-templates select="components/headline" />
+
+      <!-- ======== if validation errors exist, display message ======== -->
+      <xsl:apply-templates select="failed" />
+
+      <!-- Workaround for browser behavior: Use a hidden submit button,
+      so that when user hits the enter key, really submit the form, 
+      instead of executing the [+] button of the first repeater -->
+      <input style="width:0px; height:0px; border-width:0px; float:left;" value="submit" type="submit" tabindex="99" />
+
+      <!-- ======== start at the root panel ======== -->
+      <xsl:apply-templates select="key('components',components/@root)">
+        <xsl:with-param name="var" select="components/@var" />
+      </xsl:apply-templates>
     </fieldset>
   </form>
-  <!-- 
-  <xsl:value-of select="number(system:currentTimeMillis())-number($time)" /> ms<xsl:text/>
-  -->
-</xsl:template>
-
-<!-- ======== handle components ======== -->
-<xsl:template match="components">
-  <!-- ======== if exists, output editor headline ======== -->
-  <xsl:apply-templates select="headline" />
-  <!-- ======== if validation errors exist, display message ======== -->
-  <xsl:apply-templates select="../editor/failed" />
-  <!-- Workaround for browser behavior: Use a hidden submit button,
-       so that when user hits the enter key, really submit the form, 
-       instead of executing the [+] button of the first repeater -->
-  <xsl:if test="//repeater">
-    <input style="width:0px; height:0px; border-width:0px; float:left;" value="submit" type="submit" tabindex="99" />
-  </xsl:if>
-  <!-- ======== start at the root panel ======== -->
-  <xsl:apply-templates select="panel[@id=current()/@root]">
-    <xsl:with-param name="var" select="@var" />
-  </xsl:apply-templates>
+  <!-- <xsl:value-of select="number(system:currentTimeMillis())-number($time)" /> ms<xsl:text/> -->
 </xsl:template>
 
 <!-- ======== set form attributes ======== -->
 <xsl:template name="editor.set.form.attrib">    
-
-  <!-- ======== action ======== -->
-  <xsl:attribute name="action">
-    <xsl:value-of select="concat($ServletsBaseURL,'XMLEditor',$HttpSession)"/>
-  </xsl:attribute>
 
   <!-- ======== method ======== -->
   <xsl:attribute name="method">
@@ -133,9 +129,6 @@
       <xsl:text>multipart/form-data</xsl:text>
     </xsl:attribute>
   </xsl:if>
-
-  <!-- ======== charset ======== -->
-  <xsl:attribute name="accept-charset">UTF-8</xsl:attribute>
 
   <!-- ======== target type servlet or url or xml display ======== -->
   <xsl:choose>
@@ -216,7 +209,7 @@
 <!-- ======== validation errors exist ======== -->
 <xsl:template match="failed">
   <div class="editorMessage">
-    <xsl:for-each select="ancestor::editor/validationMessage">
+    <xsl:for-each select="../validationMessage">
       <xsl:call-template name="output.label" />
     </xsl:for-each>
   </div>
@@ -240,8 +233,8 @@
   <!-- find number of repeats of related xml input element -->
   <xsl:variable name="num">
     <xsl:choose>
-      <xsl:when test="ancestor::editor/repeats/repeat[@path=$var]/@value">
-        <xsl:value-of select="ancestor::editor/repeats/repeat[@path=$var]/@value"/>
+      <xsl:when test="key('repeats',$var)">
+        <xsl:value-of select="key('repeats',$var)/@value"/>
       </xsl:when>
       <xsl:otherwise>1</xsl:otherwise>
     </xsl:choose>
@@ -383,7 +376,7 @@
   <xsl:param name="var" />
   <xsl:param name="pos" select="1" />
 
-  <xsl:variable name="combined" select="ancestor::editor/components/panel[@id=current()/include/@ref]/*|*" />
+  <xsl:variable name="combined" select="key('components',include/@ref)/*|*" />
   <xsl:variable name="combined.cellpos.tmp">
     <xsl:for-each select="$combined[name()='cell']">
       <xsl:sort select="@row" data-type="number" />
@@ -397,11 +390,11 @@
     <xsl:call-template name="editor.set.css">
       <xsl:with-param name="class" select="'editorPanel'" />
     </xsl:call-template>
-    <xsl:if test="ancestor::editor/failed/field[@sortnr=$pos]">
+    <xsl:if test="key('failed',$pos)">
       <xsl:attribute name="class">editorValidationFailed</xsl:attribute>
 
       <xsl:variable name="message">
-        <xsl:for-each select="//condition[@id=ancestor::editor/failed/field[@sortnr=$pos]/@condition]">
+        <xsl:for-each select="key('conditions',key('failed',$pos)/@condition)">
           <xsl:call-template name="output.label" />
         </xsl:for-each>
       </xsl:variable>
@@ -513,9 +506,9 @@
   </xsl:call-template>
 
   <!-- ======== handle referenced or embedded component ======== -->
-  <xsl:for-each select="ancestor::components/*[@id = current()/@ref]|*">
+  <xsl:for-each select="key('components',@ref)|*">
 
-    <xsl:if test="(position() = 1) and ancestor::editor/failed/field[@sortnr=$pos] and contains('textfield textarea password file list checkbox display ', concat(name(),' '))">
+    <xsl:if test="(position() = 1) and key('failed',$pos) and contains('textfield textarea password file list checkbox display ', concat(name(),' '))">
       <xsl:attribute name="class">editorValidationFailed</xsl:attribute>
     </xsl:if>
 
@@ -527,9 +520,9 @@
 
     <!-- ======== show failed input validation message ======== -->
     <xsl:if test="contains('textfield textarea password file list checkbox display ', concat(name(),' '))">
-      <xsl:if test="ancestor::editor/failed/field[@sortnr=$pos]">
+      <xsl:if test="key('failed',$pos)">
         <xsl:variable name="message">
-          <xsl:for-each select="//condition[@id=ancestor::editor/failed/field[@sortnr=$pos]/@condition]">
+          <xsl:for-each select="key('conditions',key('failed',$pos)/@condition)">
             <xsl:call-template name="output.label" />
           </xsl:for-each>
         </xsl:variable>
@@ -622,11 +615,11 @@
   </xsl:call-template>
 </xsl:template>
 
+<xsl:variable name="apos">'</xsl:variable>
+
 <!--  title[@type='main'] becomes title__type__main -->
 <xsl:template name="subst.cond">
   <xsl:param name="rest" />
-  
-  <xsl:variable name="apos">'</xsl:variable>
   
   <xsl:choose>
     <xsl:when test="contains($rest,'[@')">
@@ -725,8 +718,8 @@
       </xsl:for-each>
     </xsl:when>
     <!-- ======== copy single source value to hidden field ======== -->
-    <xsl:when test="ancestor::editor/input/var[@name = $var.new]">
-      <input type="hidden" name="{$var.new}" value="{ancestor::editor/input/var[@name = $var.new]/@value}" />
+    <xsl:when test="key('vars',$var.new)">
+      <input type="hidden" name="{$var.new}" value="{key('vars',$var.new)/@value}" />
       <input type="hidden" name="_sortnr-{$var.new}" value="{$pos.new}" />
     </xsl:when>
     <!-- ======== copy default value to hidden field ======== -->
@@ -751,9 +744,9 @@
   
   <span class="editorOutput">
     <xsl:choose>
-      <xsl:when test="ancestor::editor/input/var[@name = $var]">
-        <input type="hidden" name="{$var}" value="{ancestor::editor/input/var[@name = $var]/@value}" />
-        <xsl:value-of select="ancestor::editor/input/var[@name = $var]/@value" />
+      <xsl:when test="key('vars',$var)">
+        <input type="hidden" name="{$var}" value="{key('vars',$var)/@value}" />
+        <xsl:value-of select="key('vars',$var)/@value" />
       </xsl:when>
       <xsl:when test="@default">
         <xsl:value-of select="@default" />
@@ -773,7 +766,7 @@
   </xsl:variable>
 
   <!-- ======== get the value of this field from xml source ======== -->
-  <xsl:variable name="selected.cell" select="ancestor::editor/input/var[@name=$var.new]" />
+  <xsl:variable name="selected.cell" select="key('vars',$var.new)" />
   
   <span class="editorOutput">
     <xsl:choose>
@@ -793,7 +786,9 @@
 
   <!-- ======== get the value of this field from xml source ======== -->
   <xsl:variable name="source">
-    <xsl:value-of select="ancestor::editor/input/var[@name=$var]/@value" />  
+    <xsl:if test="key('vars',$var)">
+      <xsl:value-of select="key('vars',$var)/@value" />  
+    </xsl:if>
   </xsl:variable>
 
   <!-- ======== build the value to display ======== -->
@@ -863,7 +858,9 @@
 
   <!-- ======== get the value of this field from xml source ======== -->
   <xsl:variable name="source">
-    <xsl:value-of select="ancestor::editor/input/var[@name=$var]/@value" />  
+    <xsl:if test="key('vars',$var)">
+      <xsl:value-of select="key('vars',$var)/@value" />  
+    </xsl:if>
   </xsl:variable>
   
   <!-- ======== if older value exists, display controls to delete old file ======== -->
@@ -895,7 +892,9 @@
 
   <!-- ======== get the value of this field from xml source ======== -->
   <xsl:variable name="source">
-    <xsl:value-of select="ancestor::editor/input/var[@name=$var]/@value" />  
+    <xsl:if test="key('vars',$var)">
+      <xsl:value-of select="key('vars',$var)/@value" />  
+    </xsl:if>
   </xsl:variable>
 
   <input tabindex="1" type="password" size="{@width}" value="{$source}" name="{$var}">
@@ -980,7 +979,7 @@
     </xsl:call-template>
    
     <xsl:apply-templates select="item">
-      <xsl:with-param name="vars"    select="ancestor::editor/input/var[@name=$var]" />
+      <xsl:with-param name="vars"    select="key('vars',$var)" />
       <xsl:with-param name="default" select="@default" />
     </xsl:apply-templates>
   </select>
@@ -1139,7 +1138,9 @@
 
   <!-- ======== get the value of this field from xml source ======== -->
   <xsl:variable name="source">
-    <xsl:value-of select="ancestor::editor/input/var[@name=$var]/@value" />  
+    <xsl:if test="key('vars',$var)">
+      <xsl:value-of select="key('vars',$var)/@value" />  
+    </xsl:if>
   </xsl:variable>
 
   <input id="check-{$var}" tabindex="1" type="checkbox" name="{$var}" value="{@value}">
