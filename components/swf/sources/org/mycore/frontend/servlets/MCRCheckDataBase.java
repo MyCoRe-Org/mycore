@@ -126,7 +126,8 @@ abstract public class MCRCheckDataBase extends MCRCheckBase {
         // call the getNextURL and sendMail methods
         String url = getNextURL(ID, okay);
         sendMail(ID);
-        job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + url));
+        if (!job.getResponse().isCommitted())
+            job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + url));
     }
 
     /**
