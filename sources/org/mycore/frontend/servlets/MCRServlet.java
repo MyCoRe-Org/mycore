@@ -293,6 +293,9 @@ public class MCRServlet extends HttpServlet {
                 // current Servlet not called via RequestDispatcher
                 try {
                     job.commitTransaction();
+                    job.beginTransaction();
+                    MCRHIBConnection.instance().getSession().clear();
+                    job.commitTransaction();
                 } catch (RuntimeException e) {
                     MCRHIBConnection.instance().getSession().close();
                     job.beginTransaction();
@@ -317,9 +320,6 @@ public class MCRServlet extends HttpServlet {
             }
         } finally {
         	MCRSessionMgr.getCurrentSession().deleteObject("MCRServletJob");
-        	job.beginTransaction();
-        	MCRHIBConnection.instance().getSession().clear();
-        	job.commitTransaction();
             // Release current MCRSession from current Thread,
             // in case that Thread pooling will be used by servlet engine
             if (getProperty(req, INITIAL_SERVLET_NAME_KEY).equals(getServletName())) {
