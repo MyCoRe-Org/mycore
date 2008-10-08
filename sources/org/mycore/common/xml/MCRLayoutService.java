@@ -24,6 +24,7 @@
 package org.mycore.common.xml;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -566,7 +567,7 @@ public class MCRLayoutService implements org.apache.xalan.trace.TraceListener {
         response.setCharacterEncoding(enc);
         response.setContentType(ct + "; charset=" + enc);
 
-        OutputStream out = response.getOutputStream();
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
         Result result = null;
 
         if ("application/pdf".equals(ct)) {
@@ -589,6 +590,10 @@ public class MCRLayoutService implements org.apache.xalan.trace.TraceListener {
         } finally {
             out.close();
         }
+        
+        OutputStream sos = response.getOutputStream(); 
+        sos.write( out.toByteArray() );
+        sos.close();
     }
 
     /**
