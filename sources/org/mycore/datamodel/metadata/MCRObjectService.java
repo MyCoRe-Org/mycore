@@ -476,8 +476,6 @@ public class MCRObjectService {
         if (dates.size() != 0) {
             org.jdom.Element elmm = new org.jdom.Element("servdates");
             elmm.setAttribute("class", "MCRMetaISO8601Date");
-            elmm.setAttribute("heritable", "false");
-            elmm.setAttribute("notinherit", "false");
 
             for (int i = 0; i < dates.size(); i++) {
                 elmm.addContent(dates.get(i).createXML());
@@ -489,8 +487,6 @@ public class MCRObjectService {
         if (rules.size() != 0) {
             org.jdom.Element elmm = new org.jdom.Element("servacls");
             elmm.setAttribute("class", "MCRMetaAccessRule");
-            elmm.setAttribute("heritable", "false");
-            elmm.setAttribute("notinherit", "false");
 
             for (int i = 0; i < rules.size(); i++) {
                 elmm.addContent(rules.get(i).createXML());
@@ -502,8 +498,6 @@ public class MCRObjectService {
         if (flags.size() != 0) {
             org.jdom.Element elmm = new org.jdom.Element("servflags");
             elmm.setAttribute("class", "MCRMetaLangText");
-            elmm.setAttribute("heritable", "false");
-            elmm.setAttribute("notinherit", "false");
 
             for (int i = 0; i < flags.size(); i++) {
                 elmm.addContent(flags.get(i).createXML());

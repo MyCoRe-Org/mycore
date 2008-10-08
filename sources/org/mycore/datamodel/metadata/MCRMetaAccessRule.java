@@ -199,7 +199,6 @@ public class MCRMetaAccessRule extends MCRMetaDefault {
             throw new MCRException("The content of MCRMetaAccessRule is not valid.");
         }
         org.jdom.Element elm = new org.jdom.Element(subtag);
-        elm.setAttribute("lang", lang, Namespace.XML_NAMESPACE);
         elm.setAttribute("inherited", Integer.toString(inherited));
         if ((permission != null) && ((permission = permission.trim()).length() != 0)) {
             elm.setAttribute("permission", permission);

@@ -379,8 +379,6 @@ public class MCRObjectStructure {
         if (children.size() > 0) {
             org.jdom.Element elmm = new org.jdom.Element("children");
             elmm.setAttribute("class", "MCRMetaLinkID");
-            elmm.setAttribute("heritable", "false");
-            elmm.setAttribute("notinherit", "false");
 
             for (i = 0; i < children.size(); ++i) {
                 elmm.addContent(((MCRMetaLink) children.get(i)).createXML());
@@ -392,8 +390,6 @@ public class MCRObjectStructure {
         if (parent != null) {
             org.jdom.Element elmm = new org.jdom.Element("parents");
             elmm.setAttribute("class", "MCRMetaLinkID");
-            elmm.setAttribute("heritable", "false");
-            elmm.setAttribute("notinherit", "false");
             elmm.addContent(parent.createXML());
             elm.addContent(elmm);
         }
@@ -401,8 +397,6 @@ public class MCRObjectStructure {
         if (derivates.size() > 0) {
             org.jdom.Element elmm = new org.jdom.Element("derobjects");
             elmm.setAttribute("class", "MCRMetaLinkID");
-            elmm.setAttribute("heritable", "false");
-            elmm.setAttribute("notinherit", "false");
 
             for (i = 0; i < derivates.size(); ++i) {
                 elmm.addContent(((MCRMetaLink) derivates.get(i)).createXML());
