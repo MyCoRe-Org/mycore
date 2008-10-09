@@ -216,10 +216,7 @@ public class MCREditorServlet extends MCRServlet implements MCRSessionListener {
         logger.debug("Editor start editor session from " + ref + "@" + uri);
 
         Element param = getTargetParameters(parameters);
-        Element editor = MCREditorDefReader.readDef(uri, ref, validate);
-
-        setDefault(editor, "cell", "row", "1");
-        setDefault(editor, "cell", "col", "1");
+        Element editor = new MCREditorDefReader(uri, ref, validate).getEditor();
 
         if (param != null) {
             editor.addContent(param);
@@ -304,15 +301,6 @@ public class MCREditorServlet extends MCRServlet implements MCRSessionListener {
         return null; // Fall back, no matches at all 
     }
     
-    private static void setDefault(Element editor, String filter, String attrib, String value) {
-        Iterator it = editor.getDescendants(new ElementFilter(filter));
-        while (it.hasNext()) {
-            Element e = (Element) (it.next());
-            if (e.getAttribute(attrib) == null)
-                e.setAttribute(attrib, value);
-        }
-    }
-
     private static Element getTargetParameters(Map parameters) {
         Element tps = new Element("target-parameters");
         Iterator keys = parameters.keySet().iterator();

@@ -1,6 +1,6 @@
 /*
- * 
- * $Revision$ $Date$
+ * $Revision$ 
+ * $Date$
  *
  * This file is part of ***  M y C o R e  ***
  * See http://www.mycore.de/ for details.
@@ -24,271 +24,351 @@
 package org.mycore.frontend.editor;
 
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Properties;
 
 import org.apache.log4j.Logger;
-import org.jdom.Comment;
+import org.jdom.Content;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.Namespace;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
-import org.mycore.common.MCRCache;
-import org.mycore.common.MCRException;
+import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.common.xml.MCRXMLHelper;
 
-public class MCREditorDefReader {
+/*
+ * Reads in definition of editor forms like search mask and data input forms.
+ * Resolves includes and prepares editor form for output. 
+ */
+public class MCREditorDefReader 
+{
+  private final static Logger LOGGER = Logger.getLogger( MCREditorDefReader.class );
+  
+  private Element editor; 
+  
+  HashMap<String,Element> id2component = new HashMap<String,Element>();
+  HashMap<Element,String> referencing2ref = new HashMap<Element,String>();
 
-    private final static Logger logger = Logger.getLogger(MCREditorDefReader.class);
+  /**
+   * Reads the editor definition from the given URI
+   * 
+   * @param validate
+   *            if true, validate editor definition against schema
+   */
+  MCREditorDefReader( String uri, String ref, boolean validate ) 
+  {
+    long time = System.nanoTime();
+    
+    Element include = new Element( "include" ).setAttribute( "uri", uri );
+    if( ( ref != null ) && ( ref.length() > 0 ) ) include.setAttribute( "ref", ref );
+    
+    editor = new Element( "editor" );
+    editor.setAttribute( "id", ref );
+    editor.addContent( include );
+    resolveChildren( editor );
+    resolveReferences();
+    if( validate ) validate( uri, ref );
+    
+    time =  ( System.nanoTime() - time ) / 1000000;
+    LOGGER.info( "Finished reading editor definition in " + time + " ms" );
+  }
+  
+  private void validate( String uri, String ref )
+  {
+    if( ( ref != null ) && ( ref.length() > 0 ) ) uri += "#" + ref;
+    LOGGER.info( "Validating editor " + uri + "..." );
+    
+    Document doc = new Document( editor );
+    Namespace xsi = Namespace.getNamespace( "xsi", "http://www.w3.org/2001/XMLSchema-instance" );
+    editor.setAttribute( "noNamespaceSchemaLocation", "editor.xsd", xsi );
 
-    /**
-     * Reads the editor definition from the given URI
-     * 
-     * @param validate
-     *            if true, validate editor definition against schema
-     */
-    static Element readDef(String uri, String ref, boolean validate) {
-        Element editor = new Element("editor");
-        editor.setAttribute("id", ref);
-        editor.addContent(resolveInclude(uri, ref, true).getIncludedElements());
+    XMLOutputter xout = new XMLOutputter();
+    xout.setFormat( Format.getPrettyFormat() );
+    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+    try 
+    {
+      xout.output( doc, baos );
+      baos.close();
+      MCRXMLHelper.parseXML( baos.toByteArray(), true );
+    } 
+    catch( Exception ex ) 
+    {
+      String msg = "Error validating editor " + uri;
+      LOGGER.error( msg );
+      throw new MCRConfigurationException( msg, ex );
+    }
 
-        if (validate) {
-            Document doc = new Document(editor);
-            Namespace xsi = Namespace.getNamespace("xsi", "http://www.w3.org/2001/XMLSchema-instance");
-            editor.setAttribute("noNamespaceSchemaLocation", "editor.xsd", xsi);
+    editor.detach();
+    editor.removeAttribute("noNamespaceSchemaLocation", xsi);
+    LOGGER.info( "Validation succeeded." );
+  }
 
-            XMLOutputter xout = new XMLOutputter();
-            xout.setFormat(Format.getPrettyFormat());
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            try {
-                xout.output(doc, baos);
-                baos.close();
-            } catch (IOException ex) {
-                throw new MCRException("Exception while validating editor definition", ex);
-            }
-
-            logger.info("Validating editor definition against XML schema...");
-            try {
-                MCRXMLHelper.parseXML(baos.toByteArray(), true);
-            } catch (Exception ex) {
-                logger.error("Editor definition did not validate.");
-                return buildDummyEditorForErrorMessage(uri, ex, editor2String(doc));
-            }
-            logger.info("Editor definition successfully validated.");
-            editor.detach();
-            editor.removeAttribute("noNamespaceSchemaLocation", xsi);
+  /**
+   * Returns the complete editor with all references resolved 
+   */
+  Element getEditor()
+  { return editor; }
+  
+  /**
+   * Recursively removes include elements that are direct or indirect children
+   * of the given container element and replaces them with the included
+   * resource. Includes that may be contained in included resources are
+   * recursively resolved, too.
+   * 
+   * @param element
+   *            The element where to start resolving includes
+   */
+  private boolean resolveIncludes( Element element )
+  {
+    boolean replaced = false;
+    
+    String ref = element.getAttributeValue( "ref", "" );
+    if( element.getName().equals( "include" ) )
+    {
+      String uri = element.getAttributeValue( "uri" );
+      if( uri != null )
+      {
+        LOGGER.info( "Including " + uri + ( (ref.length() > 0) ? "#" + ref : "" ) ); 
+        Element parent = element.getParentElement();
+        int pos = parent.indexOf( element );
+      
+        Element container = MCRURIResolver.instance().resolve( uri );
+        List<Content> found;
+        
+        if( ref.length() == 0 )
+          found = container.cloneContent();
+        else
+        {
+          found = findContent( container, ref );
+          ref = "";
         }
-
-        return editor;
+        replaced = true;
+        parent.addContent( pos, found );
+        element.detach();
+      }
+    }
+    else
+    {
+      String id = element.getAttributeValue( "id", "" );
+      if( id.length() > 0 ) id2component.put( id, element );
+      
+      setDefaultAttributes( element );
+      fixConditionedVariables( element );
+      resolveChildren( element );
     }
 
-    private static String editor2String(Document doc) {
-        XMLOutputter xout = new XMLOutputter();
-        xout.setFormat(Format.getPrettyFormat());
-        return xout.outputString(doc);
+    if( ref.length() > 0 ) referencing2ref.put( element, ref );
+    return replaced;
+  }
+  
+  private void resolveChildren( Element parent )
+  {
+    for( int i = 0; i < parent.getContentSize(); i++ )
+    {
+      Content child = parent.getContent( i );
+      if( ( child instanceof Element ) && resolveIncludes( (Element)child ) ) i--;
     }
+  }
 
-    private static Element buildDummyEditorForErrorMessage(String uri, Exception ex, String editorDef) {
-        Element editor = new Element("editor");
-        editor.setAttribute("id", "validationError");
-        Element components = new Element("components");
-        components.setAttribute("root", "root");
-        editor.addContent(components);
-        Element headline = new Element("headline");
-        components.addContent(headline);
-        Element text = new Element("text");
-        text.setAttribute("label", "Error in editor definition: " + uri);
-        headline.addContent(text);
-        Element panel = new Element("panel");
-        panel.setAttribute("lines", "off");
-        panel.setAttribute("id", "root");
-        components.addContent(panel);
-        Element cell = new Element("cell");
-        cell.setAttribute("row", "1");
-        cell.setAttribute("col", "1");
-        panel.addContent(cell);
-        Element tf = new Element("textarea");
-        tf.setAttribute("width", "80");
-        tf.setAttribute("height", "1");
-        tf.setAttribute("wrap", "off");
-        tf.setAttribute("default", ex.getLocalizedMessage());
-        cell.addContent(tf);
-        cell = new Element("cell");
-        cell.setAttribute("row", "2");
-        cell.setAttribute("col", "1");
-        panel.addContent(cell);
-        Element ta = new Element("textarea");
-        ta.setAttribute("width", "80");
-        ta.setAttribute("height", "30");
-        ta.setAttribute("wrap", "off");
-        Element def = new Element("default");
-        def.addContent(editorDef);
-        ta.addContent(def);
-        cell.addContent(ta);
-        return editor;
+  private List<Content> findContent( Element candidate, String id )
+  {
+    if( id.equals( candidate.getAttributeValue( "id" ) ) )
+      return candidate.cloneContent();
+    else
+    {
+      for( Element child : (List<Element>)( candidate.getChildren() ) )
+      { 
+        List<Content> found = findContent( child, id );
+        if( found != null ) return found;
+      }
+      return null;
     }
+  }
+  
+  /**
+   * Returns that direct or indirect child element of the given element, thats
+   * ID attribute has the given value.
+   * 
+   * @param id
+   *            the value the ID attribute must have
+   * @param candidate
+   *            the element to start searching with
+   * @return the element below that has the given ID, or null if no such
+   *         element exists.
+   */
+  static Element findElementByID( String id, Element candidate )
+  {
+    if( id.equals( candidate.getAttributeValue( "id" ) ) )
+      return candidate;
+    else
+    {
+      for( Element child : (List<Element>)( candidate.getChildren() ) )
+      { 
+        Element found = findElementByID( id, child );
+        if( found != null ) return found;
+      }
+      return null;
+    }
+  }
+  
+  /**
+   * Recursively resolves references by the @ref attribute and
+   * replaces them with the referenced component.
+   */
+  private void resolveReferences()
+  {
+    for( Iterator it = referencing2ref.keySet().iterator() ; it.hasNext(); )
+    {
+      Element referencing = (Element)(it.next());
+      String id = referencing2ref.get( referencing );
+      LOGGER.debug( "Resolving reference to " + id ); 
 
-    /**
-     * Returns that direct or indirect child element of the given element, thats
-     * ID attribute has the given value.
-     * 
-     * @param id
-     *            the value the ID attribute must have
-     * @param parent
-     *            the element to start searching with
-     * @return the child element that has the given ID, or null if no such
-     *         element exists.
-     */
-    static Element findElementByID(String id, Element parent) {
-        List children = parent.getChildren();
-
-        for (int i = 0; i < children.size(); i++) {
-            Element child = (Element) (children.get(i));
-
-            if (id.equals(child.getAttributeValue("id"))) {
-                return child;
-            }
-            Element found = findElementByID(id, child);
-
-            if (found != null) {
-                return found;
-            }
+      Element found = id2component.get( id );
+      if( found == null )
+      {
+        String msg = "Reference to component " + id + " could not be resolved";
+        throw new MCRConfigurationException( msg );
+      }
+      
+      String name = referencing.getName();
+      referencing.removeAttribute( "ref" );
+      it.remove();
+      
+      if( name.equals( "cell" ) || name.equals( "repeater" ) )
+      {
+        if( found.getParentElement().getName().equals( "components" ) )
+          referencing.addContent( 0, found.detach() );
+        else
+          referencing.addContent( 0, (Element)(found.clone()) );
+      }
+      else if( name.equals( "panel" ) )
+      {
+        if( referencing2ref.containsValue( id ) )
+          referencing.addContent( 0, found.cloneContent() );
+        else
+        {
+          found.detach();
+          List<Content> content = found.getContent();
+          for( int i = 0; ! content.isEmpty(); i++ )
+          {
+            Content child = content.remove( 0 );
+            referencing.addContent( i, child );
+          }
         }
-
-        return null;
+      }
+      else if( name.equals( "include" ) )
+      {
+        Element parent = referencing.getParentElement();
+        int pos = parent.indexOf( referencing );
+        referencing.detach();
+        
+        if( referencing2ref.containsValue( id ) )
+          parent.addContent( pos, found.cloneContent() );
+        else
+        {
+          found.detach();
+          List<Content> content = found.getContent();
+          for( int i = pos; ! content.isEmpty(); i++ )
+          {
+            Content child = content.remove( 0 );
+            parent.addContent( i, child );
+          }
+        }
+      }
     }
 
-    /**
-     * A cache of reusable resolved includes. Key is URI and IDREF, cached value
-     * is a container element that holds the resolved includes.
-     */
-    protected static MCRCache includesCache = new MCRCache(100, "EditorDefReader Includes");
+    Element components = editor.getChild( "components" );
+    String root = components.getAttributeValue( "root" );
+    components.removeAttribute( "root" );
+    
+    for( int i = 0; i < components.getContentSize(); i++ )
+    {
+      Content child = components.getContent( i );
+      if( ! ( child instanceof Element ) ) continue;
+      if( ((Element)child).getName().equals( "headline" ) ) continue;
+      if( ! root.equals( ((Element)child).getAttributeValue( "id" ) ) )
+        components.removeContent( i-- );
+    }  
+  }
 
-    /**
-     * Resolves the uri and idref to a list of elements to include. If idref is
-     * null or empty, the root element at the given URI is used and its children
-     * are returned as includes. If idref is not empty, the direct or indirect
-     * child element of the element at URI is looked up, and its children are
-     * used. All contained includes are resolved recursively, so the returned
-     * result is include-free.
-     * 
-     * @param uri
-     *            the URI where to get the elements from
-     * @param idref
-     *            if not null, include contents of element with that ID
-     * @return a List of resolved, included elements
-     */
-    protected static MCRResolvedInclude resolveInclude(String uri, String idref, boolean cacheable) {
-        if (idref == null) {
-            idref = "";
-        }
-
-        // May be the included resource is already in the cache
-        String key = idref + "@" + uri;
-
-        MCREditorServlet.logger.debug("Editor resolving include " + key);
-
-        Element cached = (Element) (includesCache.get(key));
-
-        if (cached != null) {
-            MCREditorServlet.logger.debug("Editor resolved include from cache: " + key);
-
-            return new MCRResolvedInclude(cached, cacheable, uri, idref);
-        }
-
-        // Get the elements to include from uri
-        Element container = MCRURIResolver.instance().resolve(uri);
-
-        // If idref is given, include contents of element with that id
-        if (idref.length() > 0) {
-            container = findElementByID(idref, container);
-        }
-
-        // Recursively resolve include elements in the included resource
-        cacheable = resolveIncludes(container) && cacheable;
-        MCREditorServlet.logger.debug("Editor resolved include " + key + " is cacheable? " + cacheable);
-
-        if (cacheable) {
-            includesCache.put(key, container);
-        }
-
-        return new MCRResolvedInclude(container, cacheable, uri, idref);
+  /**
+   * This map contains default attribute values to set for a given element name
+   */
+  private static HashMap<String,Properties> defaultAttributes = new HashMap<String,Properties>();
+  
+  static
+  {
+    defaultAttributes.put( "cell", new Properties() );
+    defaultAttributes.get( "cell" ).setProperty( "row", "1" );
+    defaultAttributes.get( "cell" ).setProperty( "col", "1" );
+    defaultAttributes.get( "cell" ).setProperty( "class", "editorCell" );
+    defaultAttributes.put( "headline", new Properties() );
+    defaultAttributes.get( "headline" ).setProperty( "class", "editorHeadline" );
+    defaultAttributes.put( "repeater", new Properties() );
+    defaultAttributes.get( "repeater" ).setProperty( "class", "editorRepeater" );
+    defaultAttributes.get( "repeater" ).setProperty( "min", "1" );
+    defaultAttributes.get( "repeater" ).setProperty( "max", "10" );
+    defaultAttributes.put( "panel", new Properties() );
+    defaultAttributes.get( "panel" ).setProperty( "class", "editorPanel" );
+    defaultAttributes.put( "editor", new Properties() );
+    defaultAttributes.get( "editor" ).setProperty( "class", "editor" );
+    defaultAttributes.put( "helpPopup", new Properties() );
+    defaultAttributes.get( "helpPopup" ).setProperty( "class", "editorButton" );
+    defaultAttributes.put( "textfield", new Properties() );
+    defaultAttributes.get( "textfield" ).setProperty( "class", "editorTextfield" );
+    defaultAttributes.put( "textarea", new Properties() );
+    defaultAttributes.get( "textarea" ).setProperty( "class", "editorTextarea" );
+    defaultAttributes.put( "file", new Properties() );
+    defaultAttributes.get( "file" ).setProperty( "class", "editorFile" );
+    defaultAttributes.put( "password", new Properties() );
+    defaultAttributes.get( "password" ).setProperty( "class", "editorPassword" );
+    defaultAttributes.put( "subselect", new Properties() );
+    defaultAttributes.get( "subselect" ).setProperty( "class", "editorButton" );
+    defaultAttributes.put( "submitButton", new Properties() );
+    defaultAttributes.get( "submitButton" ).setProperty( "class", "editorButton" );
+    defaultAttributes.put( "cancelButton", new Properties() );
+    defaultAttributes.get( "cancelButton" ).setProperty( "class", "editorButton" );
+    defaultAttributes.put( "button", new Properties() );
+    defaultAttributes.get( "button" ).setProperty( "class", "editorButton" );
+    defaultAttributes.put( "list", new Properties() );
+    defaultAttributes.get( "list" ).setProperty( "class", "editorList" );
+    defaultAttributes.put( "checkbox", new Properties() );
+    defaultAttributes.get( "checkbox" ).setProperty( "class", "editorCheckbox" );
+  }
+  
+  /**
+   * Sets default attribute values for the given element, if any
+   */
+  private void setDefaultAttributes( Element element ) 
+  {
+    Properties defaults = defaultAttributes.get( element.getName() );
+    if( defaults == null ) return;
+    for( Iterator it = defaults.keySet().iterator() ; it.hasNext(); )
+    {
+      String key = (String)( it.next() );
+      if( element.getAttribute( key )  == null )
+        element.setAttribute( key, defaults.getProperty( key ) );
     }
+  }
 
-    /**
-     * Recursively removes include elements that are direct or indirect children
-     * of the given container element and replaces them with the included
-     * resource. Includes that may be contained in included resources are
-     * recursively resolved, too.
-     * 
-     * @param container
-     *            The element where to start resolving includes
-     */
-    protected static boolean resolveIncludes(Element container) {
-        boolean allCacheable = true;
-        List children = container.getContent();
-
-        for (int i = 0; i < children.size(); i++) {
-            if (!(children.get(i) instanceof Element))
-                continue;
-            Element child = (Element) (children.get(i));
-
-            if (child.getName().equals("include")) {
-                String ref = child.getAttributeValue("ref");
-                String uri = child.getAttributeValue("uri");
-
-                if ((uri == null) || (uri.trim().length() == 0)) {
-                    continue;
-                }
-
-                boolean includeCacheable = !"false".equals(child.getAttributeValue("cacheable"));
-                allCacheable = allCacheable && includeCacheable;
-
-                children.remove(child);
-
-                MCRResolvedInclude ri = resolveInclude(uri, ref, includeCacheable);
-                children.addAll(i--, ri.getIncludedElements());
-                allCacheable = allCacheable && ri.isCacheable();
-            } else {
-                allCacheable = allCacheable & resolveIncludes(child);
-            }
-        }
-
-        return allCacheable;
+  /** 
+   * Transforms @var attribute values that have a condition like
+   * title[@type='main'] into escaped internal syntax
+   * title__type__main 
+   */
+  private void fixConditionedVariables( Element element )
+  {
+    String var = element.getAttributeValue( "var", "" ); 
+    if( var.contains( "[@" ) )
+    {
+      var = var.replace( "[@", "__" );
+      var = var.replace( "='", "__" );
+      var = var.replace( "']", "" );
+      element.setAttribute( "var", var );
     }
-}
-
-class MCRResolvedInclude {
-    private List included;
-
-    private boolean cacheable;
-
-    MCRResolvedInclude(Element container, boolean cacheable, String uri, String idref) {
-        this.cacheable = cacheable;
-        this.included = new java.util.Vector();
-
-        String src = uri;
-        if ((idref != null) && (idref.trim().length() != 0))
-            src += "#" + idref;
-        included.add(new Comment(" ========== Begin of include from " + src + " ========== "));
-
-        List children = container.getChildren();
-
-        for (int i = 0; i < children.size(); i++) {
-            Element child = (Element) (children.get(i));
-            included.add(child.clone());
-        }
-
-        included.add(new Comment(" ========== End of include from " + src + " ========== "));
-    }
-
-    boolean isCacheable() {
-        return cacheable;
-    }
-
-    List getIncludedElements() {
-        return included;
-    }
+  }
 }
