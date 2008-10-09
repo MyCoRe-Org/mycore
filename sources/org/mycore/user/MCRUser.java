@@ -98,7 +98,7 @@ public class MCRUser extends MCRUserObject implements MCRPrincipal, Principal {
      * other attributes the default constructor is invoked. This constructor is
      * used by the access control system.
      * 
-     * @param ID
+     * @param id
      *            the named user ID
      */
     public MCRUser(String id) {
@@ -112,9 +112,6 @@ public class MCRUser extends MCRUserObject implements MCRPrincipal, Principal {
      *            (int) the numerical user ID
      * @param ID
      *            the named user ID
-     * @creator the creator name
-     * @creationDate the timestamp of creation
-     * @modifiedDate the timestamp of modification
      * @param idEnabled
      *            (boolean) specifies whether the account is disabled or enabled
      * @param updateAllowed

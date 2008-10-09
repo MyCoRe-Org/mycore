@@ -65,7 +65,7 @@ public interface MCRAccessInterface {
      * generate rule string from xml
      * 
      * @param rule
-     * @return
+     * @return the normalized rule string
      */
     public String getNormalizedRuleString(Element rule);
     
@@ -336,7 +336,7 @@ public interface MCRAccessInterface {
      * list all object-related Access Permissions that are defined 
      * in configuration files
      * 
-     * @return
+     * @return a List of permissiond from the configuration
      */
     public List getAccessPermissionsFromConfiguration();  
     

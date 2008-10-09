@@ -356,7 +356,7 @@ public class MCRUserContact {
      * output is used by the corresponding user object to create a full XML
      * representation of the user.
      * 
-     * @returns JDOM Element including data fields of this class
+     * @return JDOM Element including data fields of this class
      */
     public final org.jdom.Element toJDOMElement() {
         org.jdom.Element address = new org.jdom.Element("user.contact");

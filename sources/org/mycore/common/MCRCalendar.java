@@ -45,7 +45,7 @@ import org.mycore.common.MCRException;
  * @author Jens Kupferschmidt
  * @author Thomas Junge
  * @version $Revision: 1.8 $ $Date: 2008/05/28 13:43:31 $
- * @see http://icu.sourceforge.net/
+ * @see <a href="http://icu.sourceforge.net/">http://icu.sourceforge.net/</a>
  */
 public class MCRCalendar {
 

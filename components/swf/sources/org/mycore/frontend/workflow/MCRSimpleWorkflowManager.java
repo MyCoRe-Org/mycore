@@ -56,14 +56,7 @@ import org.mycore.frontend.cli.MCRObjectCommands;
  * @author Jens Kupferschmidt
  * @version $Revision$ $Date$
  */
-/**
- * @author mcradmin
- *
- */
-/**
- * @author mcradmin
- * 
- */
+
 public class MCRSimpleWorkflowManager {
 
     /** The link table manager singleton */
@@ -542,10 +535,10 @@ public class MCRSimpleWorkflowManager {
      * MCRObjectID with the name of itseslf. Also ti create a ne directory with
      * the same new name. This new derivate ID was returned.
      * 
-     * @param objmcrid
+     * @param ID
      *            the MCRObjectID of the related object
-     * @param server
-     *            the flag to show that the data came from a server
+     * @param DD
+     *            the MCRObjectID of the related derivate
      * @return the MCRObjectID of the derivate
      */
     public final MCRDerivate createDerivate(MCRObjectID ID, MCRObjectID DD) {

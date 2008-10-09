@@ -68,7 +68,7 @@ public class MCRMetaLangText extends MCRMetaDefault {
      * @param default_lang     the default language
      * @param set_type         the optional type string
      * @param set_inherted     a value >= 0
-     * @param_set_form         the format string, if it is empty 'plain' is set.
+     * @param set_form         the format string, if it is empty 'plain' is set.
      * @param set_text         the text string
      * @exception MCRException if the set_subtag value is null or empty
      */

@@ -194,8 +194,10 @@ public class MCRAccessManager {
      * certain action.
      * 
      * @param id
+     *            the MCRObjectID of the object
      * @param permission
-     * @return
+     *            the access permission for the rule
+     * @return true if the permission for the id is given
      */
     public static boolean checkPermission(String id, String permission) {
       return ACCESS_STRATEGY.checkPermission(id, permission);   
@@ -206,7 +208,8 @@ public class MCRAccessManager {
      * certain action.
      * 
      * @param permission
-     * @return
+     *            the access permission for the rule
+     * @return true if the permission exist
      */
     public static boolean checkPermission(String permission) {
       return getAccessImpl().checkPermission(permission);   
@@ -215,11 +218,11 @@ public class MCRAccessManager {
     /**
      * checks whether the current user has the permission to read/see a derivate
      *        check is also against the mcrobject, the derivate belongs to
-     *        both checks must return true
+     *        both checks must return true <br />
+     *        it is needed in MCRFileNodeServlet and MCRZipServlet
      * @param derID
      *        String ID of a MyCoRe-Derivate
      * @return true if the access is allowed otherwise it return false
-     * @see is needed in MCRFileNodeServlet and MCRZipServlet
      */
     public static boolean checkPermissionForReadingDerivate(String derID){
     	// derID must be a derivate ID
@@ -260,7 +263,8 @@ public class MCRAccessManager {
     
     /**
      * return a rule, that allows something for everybody
-     * @return
+     * 
+     * @return a rule, that allows something for everybody
      */
     public static Element getTrueRule(){
     	Element condition = new Element("condition");
@@ -273,7 +277,8 @@ public class MCRAccessManager {
     
     /**
      * return a rule, that forbids something for all, but superuser
-     * @return
+     * 
+     * @return a rule, that forbids something for all, but superuser
      */
     public static Element getFalseRule(){
     	Element condition = new Element("condition");
@@ -284,6 +289,14 @@ public class MCRAccessManager {
     	return condition;
     }
     
+    /**
+     * return true if a rule for the id exist
+     * 
+     * @param id
+     *           the MCRObjectID of the object
+     * @param permission
+     *            the access permission for the rule
+     */
     public static boolean hasRule(String id, String permission){
         return getPermissionsForID(id).contains(permission);
     }

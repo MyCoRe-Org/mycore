@@ -276,7 +276,7 @@ public class MCRAccessBaseImpl implements MCRAccessInterface {
      * just returns the String of Access Permissions configured in
      * property "MCR.AccessPermissions"
      * 
-     * @return
+     * @return the permissions as List
      */
     public List getAccessPermissionsFromConfiguration(){
     	String[] permissions = AccessPermissions.split(",");

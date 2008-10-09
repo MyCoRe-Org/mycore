@@ -63,7 +63,7 @@ import org.xml.sax.helpers.DefaultHandler;
  * programming API.
  * 
  * @author Jens Kupferschmidt
- * @author Frank L�tzenkirchen
+ * @author Frank L\u00fctzenkirchen
  * @author Thomas Scheffler (yagee)
  * 
  * @version $Revision$ $Date$
@@ -532,8 +532,8 @@ public class MCRUtils {
     /**
      * The method cut a HashSet for a maximum of items.
      * 
-     * @hashin The incoming HashSet
-     * @maxitem The maximum number of items
+     * @param hashin The incoming HashSet
+     * @param maxitem The maximum number of items
      * @return the cutted HashSet
      */
     public static final HashSet cutHashSet(HashSet hashin, int maxitems) {
@@ -558,8 +558,8 @@ public class MCRUtils {
     /**
      * The method cut an ArrayList for a maximum of items.
      * 
-     * @arrayin The incoming ArrayList
-     * @maxitem The maximum number of items
+     * @param arrayin The incoming ArrayList
+     * @param maxitem The maximum number of items
      * @return the cutted ArrayList
      */
     public static final ArrayList cutArrayList(ArrayList arrayin, int maxitems) {

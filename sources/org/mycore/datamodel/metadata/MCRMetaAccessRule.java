@@ -68,7 +68,7 @@ public class MCRMetaAccessRule extends MCRMetaDefault {
      * @param default_lang     the default language
      * @param set_type         the optional type string
      * @param set_inherted     a value >= 0
-     * @param_set_permission         the format string, if it is empty 'READ' will be set.
+     * @param set_permission         the format string, if it is empty 'READ' will be set.
      * @param set_condition    the JDOM Element included the condition tree
      * @exception MCRException if the set_subtag value or set_condition is null or empty
      */
@@ -90,7 +90,7 @@ public class MCRMetaAccessRule extends MCRMetaDefault {
     /**
      * This method set the permission and the condition.
      * 
-     * @param_set_permission the format string, if it is empty 'READ' will be set.
+     * @param set_permission the format string, if it is empty 'READ' will be set.
      * @param set_condition
      *            the JDOM Element included the condition tree
      * @exception MCRException
