@@ -46,6 +46,7 @@ import org.mycore.common.xml.MCRXMLHelper;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
+import org.mycore.datamodel.classifications2.MCRLabel;
 import org.mycore.datamodel.classifications2.impl.MCRCategoryDAOImpl;
 import org.mycore.datamodel.classifications2.utils.MCRCategoryTransformer;
 import org.mycore.datamodel.classifications2.utils.MCRXMLTransformer;
@@ -65,26 +66,16 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
     public static final String DEFAULT_TRANSFORMER = "save-classification.xsl";
 
     public MCRClassification2Commands() {
-        command.add(new MCRCommand("load classification from file {0}", "org.mycore.frontend.cli.MCRClassification2Commands.loadFromFile String",
-                "The command add a new classification form file {0} to the system."));
-        command.add(new MCRCommand("update classification from file {0}", "org.mycore.frontend.cli.MCRClassification2Commands.updateFromFile String",
-                "The command add a new classification form file {0} to the system."));
-        command.add(new MCRCommand("delete classification {0}", "org.mycore.frontend.cli.MCRClassification2Commands.delete String",
-                "The command remove the classification with MCRObjectID {0} from the system."));
-        command.add(new MCRCommand("load all classifications from directory {0}",
-                "org.mycore.frontend.cli.MCRClassification2Commands.loadFromDirectory String",
-                "The command add all classifications in the directory {0} to the system."));
-        command.add(new MCRCommand("update all classifications from directory {0}",
-                "org.mycore.frontend.cli.MCRClassification2Commands.updateFromDirectory String",
-                "The command update all classifications in the directory {0} to the system."));
-        command
-                .add(new MCRCommand("export classification {0} to {1} with {2}",
-                        "org.mycore.frontend.cli.MCRClassification2Commands.export String String String",
-                        "The command store the classification with MCRObjectID {0} to the file named {1} with the stylesheet {2}-object.xsl. For {2} save is the default.."));
-        command.add(new MCRCommand("export all classifications to {0} with {1}", "org.mycore.frontend.cli.MCRClassification2Commands.exportAll String String",
-                "The command store all classifications to the directory with name {0} with the stylesheet {1}-object.xsl. For {1} save is the default."));
-        command.add(new MCRCommand("count classification children of {0}", "org.mycore.frontend.cli.MCRClassification2Commands.countChildren String",
-                "The command remove the classification with MCRObjectID {0} from the system."));
+        command.add(new MCRCommand("load classification from file {0}", "org.mycore.frontend.cli.MCRClassification2Commands.loadFromFile String", "The command add a new classification form file {0} to the system."));
+        command.add(new MCRCommand("update classification from file {0}", "org.mycore.frontend.cli.MCRClassification2Commands.updateFromFile String", "The command add a new classification form file {0} to the system."));
+        command.add(new MCRCommand("delete classification {0}", "org.mycore.frontend.cli.MCRClassification2Commands.delete String", "The command remove the classification with MCRObjectID {0} from the system."));
+        command.add(new MCRCommand("load all classifications from directory {0}", "org.mycore.frontend.cli.MCRClassification2Commands.loadFromDirectory String", "The command add all classifications in the directory {0} to the system."));
+        command.add(new MCRCommand("update all classifications from directory {0}", "org.mycore.frontend.cli.MCRClassification2Commands.updateFromDirectory String", "The command update all classifications in the directory {0} to the system."));
+        command.add(new MCRCommand("export classification {0} to {1} with {2}", "org.mycore.frontend.cli.MCRClassification2Commands.export String String String", "The command store the classification with MCRObjectID {0} to the file named {1} with the stylesheet {2}-object.xsl. For {2} save is the default.."));
+        command.add(new MCRCommand("export all classifications to {0} with {1}", "org.mycore.frontend.cli.MCRClassification2Commands.exportAll String String", "The command store all classifications to the directory with name {0} with the stylesheet {1}-object.xsl. For {1} save is the default."));
+        command.add(new MCRCommand("count classification children of {0}", "org.mycore.frontend.cli.MCRClassification2Commands.countChildren String", "The command remove the classification with MCRObjectID {0} from the system."));
+        command.add(new MCRCommand("list classification {0}", "org.mycore.frontend.cli.MCRClassification2Commands.listClassification String", "The command list the classification with MCRObjectID {0}."));
+        command.add(new MCRCommand("list all classifications", "org.mycore.frontend.cli.MCRClassification2Commands.listAllClassifications", "The command list all classification stored in the database."));
     }
 
     /**
@@ -206,7 +197,8 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
      * @param filename
      *            the filename to store the classification
      * @param style
-     *            the name part of the stylesheet like <em>style</em>-classification.xsl
+     *            the name part of the stylesheet like <em>style</em>
+     *            -classification.xsl
      * @return false if an error was occured, else true
      */
     public static boolean export(String ID, String dirname, String style) throws Exception {
@@ -282,7 +274,8 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
      * @param dirname
      *            the directory name to store all classifications
      * @param style
-     *            the name part of the stylesheet like <em>style</em>-classification.xsl
+     *            the name part of the stylesheet like <em>style</em>
+     *            -classification.xsl
      * @return false if an error was occured, else true
      */
     public static boolean exportAll(String dirname, String style) throws Exception {
@@ -292,5 +285,52 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
             ret = ret & export(id.getRootID(), dirname, style);
         }
         return ret;
+    }
+
+    /**
+     * List all IDs of all classifications stored in the database
+     */
+    public static void listAllClassifications() {
+        List<MCRCategoryID> allClassIds = DAO.getRootCategoryIDs();
+        for (MCRCategoryID id : allClassIds) {
+            LOGGER.info(id.getRootID());
+        }
+        LOGGER.info("");
+    }
+
+    /**
+     * List a MCRClassification.
+     * 
+     * @param classid
+     *            the MCRObjectID of the classification
+     */
+    public static void listClassification(String classid) {
+        MCRCategoryID clid = MCRCategoryID.rootID(classid);
+        MCRCategory cl = DAO.getCategory(clid, -1);
+        LOGGER.info(classid);
+        if (cl != null) {
+            listCategory(cl);
+        } else {
+            LOGGER.error("Can't find classification " + classid);
+        }
+    }
+
+    private static void listCategory(MCRCategory categ) {
+        int level = categ.getLevel();
+        StringBuffer sb = new StringBuffer(128);
+        for (int i = 0; i < level * 2; i++) {
+            sb.append(' ');
+        }
+        String space = sb.toString();
+        if (categ.isCategory()) {
+            LOGGER.info(space + "  ID    : " + categ.getId().getID());
+        }
+        for (MCRLabel label : categ.getLabels().values()) {
+            LOGGER.info(space + "  Label : (" + label.getLang() + ") " + label.getText());
+        }
+        List<MCRCategory> children = categ.getChildren();
+        for (MCRCategory child : children) {
+            listCategory(child);
+        }
     }
 }
