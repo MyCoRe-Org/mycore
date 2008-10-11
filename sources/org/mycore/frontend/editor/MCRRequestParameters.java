@@ -42,7 +42,7 @@ import org.mycore.common.MCRException;
 
 /**
  * Wrapper class around an HTTP request that allows to treat both ordinary form
- * submisstion and multipart/form-data submissions with uploaded files in the
+ * submission and multipart/form-data submissions with uploaded files in the
  * same way.
  * 
  * @author Frank Lützenkirchen
