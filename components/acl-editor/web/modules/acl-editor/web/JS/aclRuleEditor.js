@@ -88,7 +88,19 @@ function initRuleTable(table){
     var targetId = "RuleField$" + table.id;
     var checkBoxId = "CheckBox$" + table.id;
     var ruleInUseId = "RuleInUse$" + table.id;
+    var ruleDescId = "RuleDesc$" + table.id;
+    var ruleStringId = "RuleString$" + table.id;
     var button = new Object();
+    
+    // init the description field
+    var ruleDesc;
+    if(ruleDesc = document.getElementById(ruleDescId))
+        ruleDesc.onchange = setChanged;
+    
+    // init the description field
+    var ruleString;
+    if(ruleString = document.getElementById(ruleStringId))
+        ruleString.onchange = setChanged;
     
     // init the delete checkbox
     var checkBox;
@@ -419,4 +431,17 @@ function createNewRule(event){
 
 String.prototype.removeSpace = function() {
   return this.replace(/\s+/g, "");
+}
+
+/*
+ * When rules get changed
+ */
+function setChanged(event){
+    var changed = "changed$";
+    
+    var name = this.name;
+    
+    if (!name.match("changed")){
+        this.name = changed + name;
+    }
 }

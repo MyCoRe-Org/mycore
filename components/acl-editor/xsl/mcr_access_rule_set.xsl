@@ -173,8 +173,8 @@
                                         <td class="label">
                                             <xsl:value-of select="$labelDescription" />
                                         </td>
-                                        <td id="Description">
-                                            <input class="input" name="{concat('RuleDesc$',RID)}" value="{DESCRIPTION}" onkeypress="setChanged(event)" />
+                                        <td>
+                                            <input class="input" id="{concat('RuleDesc$',RID)}" name="{concat('RuleDesc$',RID)}" value="{DESCRIPTION}" />
                                         </td>
                                     </tr>
                                     <tr class="ruleField" id="{$ruleFieldID}">
@@ -182,8 +182,8 @@
                                         <td class="label">
                                             <xsl:value-of select="$labelRule" />
                                         </td>
-                                        <td id="ruleField">
-                                            <textarea class="textarea" name="{concat('Rule$',RID)}" onkeypress="setChanged(event)">
+                                        <td>
+                                            <textarea class="textarea" id="{concat('RuleString$',RID)}" name="{concat('Rule$',RID)}" >
                                                 <xsl:value-of select="RULE" />
                                             </textarea>
                                         </td>
