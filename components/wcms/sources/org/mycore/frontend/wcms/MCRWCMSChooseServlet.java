@@ -143,9 +143,11 @@ public class MCRWCMSChooseServlet extends MCRWCMSServlet {
             action = "false";
         }
 
+        File[] contentTemplates = new File(CONFIG.getString("MCR.templatePath") + "content/".replace('/', File.separatorChar)).listFiles();
         File[] masterTemplates = new File(CONFIG.getString("MCR.templatePath") + "master/".replace('/', File.separatorChar)).listFiles();
         template = request.getParameter("template");
 
+        File conTemp = new File(CONFIG.getString("MCR.templatePath") + "content/".replace('/', File.separatorChar));
         Element templates = new Element("templates");
         defaultLangContentOutput = null;
         currentLangContentOutput = null;
@@ -360,6 +362,15 @@ public class MCRWCMSChooseServlet extends MCRWCMSServlet {
                 rootOut.addContent(new Element("rootNode").setAttribute("href", rootNode.getAttributeValue("href")).setText(rootNode.getTextTrim()));
             }
 
+            Element contentTemp = new Element("content");
+
+            for (int i = 0; i < contentTemplates.length; i++) {
+                if (!contentTemplates[i].isDirectory()) {
+                    contentTemp.addContent(new Element("template").setText(contentTemplates[i].getName()));
+                }
+            }
+
+            templates.addContent(contentTemp);
             rootOut.addContent(templates);
         }
         /**
@@ -455,7 +466,10 @@ public class MCRWCMSChooseServlet extends MCRWCMSServlet {
             }
         }
 
+        Element content = new Element("content");
+        content.addContent(new Element("template").setText(conTemp.toString()));
         templates.addContent(master);
+        templates.addContent(content);
         rootOut.addContent(templates);
 
         /**
