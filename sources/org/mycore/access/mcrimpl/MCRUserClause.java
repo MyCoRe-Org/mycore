@@ -27,6 +27,7 @@ import org.jdom.Attribute;
 import org.jdom.Element;
 import org.mycore.parsers.bool.MCRCondition;
 import org.mycore.parsers.bool.MCRConditionVisitor;
+import org.mycore.user.MCRUserFacade;
 
 /**
  * Implementation of a (user xy) clause
@@ -44,7 +45,7 @@ class MCRUserClause implements MCRCondition {
 
     public boolean evaluate(Object o) {
         MCRAccessData data = (MCRAccessData) o;
-        return this.user.equals(data.getUser().getID()) ^ this.not;
+        return this.user.equals(MCRUserFacade.getCurrentUser()) ^ this.not;
     }
 
     public String toString() {

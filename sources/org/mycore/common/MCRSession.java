@@ -26,6 +26,7 @@ package org.mycore.common;
 import static org.mycore.common.events.MCRSessionEvent.Type.activated;
 import static org.mycore.common.events.MCRSessionEvent.Type.passivated;
 
+import java.security.Principal;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -38,6 +39,7 @@ import org.apache.log4j.Logger;
 import org.mycore.common.events.MCRSessionEvent;
 import org.mycore.common.events.MCRSessionListener;
 import org.mycore.datamodel.classifications.MCRClassificationBrowserData;
+import org.mycore.frontend.servlets.MCRServletJob;
 
 /**
  * Instances of this class collect information kept during a session like the
@@ -346,6 +348,23 @@ public class MCRSession implements Cloneable {
 
     public long getCreateTime() {
         return createTime;
+    }
+    
+    public Principal getUserPrincipal(){
+        MCRServletJob job=(MCRServletJob) get("MCRServletJob");
+        if (job==null)
+            return null;
+        return job.getRequest().getUserPrincipal();
+    }
+    
+    public boolean isPrincipalInRole(String role){
+        Principal p=getUserPrincipal();
+        if (p==null)
+            return false;
+        MCRServletJob job=(MCRServletJob) get("MCRServletJob");
+        if (job==null)
+            return false;
+        return job.getRequest().isUserInRole(role);
     }
 
 }

@@ -28,6 +28,7 @@ import org.jdom.Element;
 import org.mycore.parsers.bool.MCRCondition;
 import org.mycore.parsers.bool.MCRConditionVisitor;
 import org.mycore.user.MCRGroup;
+import org.mycore.user.MCRUserFacade;
 
 /**
  * Implementation of a (group xy) clause
@@ -48,7 +49,7 @@ class MCRGroupClause implements MCRCondition {
 
     public boolean evaluate(Object o) {
         MCRAccessData data = (MCRAccessData) o;
-        return data.getUser().isMemberOf(group) ^ this.not;
+        return MCRUserFacade.isUserInGroup(group.getID()) ^ this.not;
     }
 
     public String toString() {
