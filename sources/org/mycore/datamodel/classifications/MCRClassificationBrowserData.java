@@ -214,7 +214,7 @@ public class MCRClassificationBrowserData {
     }
 
     private void setObjectTypes(final String browserClass) {
-        LOGGER.debug("setObjectTypes("+browserClass+")");
+        LOGGER.debug("setObjectTypes(" + browserClass + ")");
         try {
             // NOTE: read *.Doctype for compatiblity reasons
             objectType = config.getString("MCR.ClassificationBrowser." + browserClass + ".Objecttype", config.getString("MCR.ClassificationBrowser."
@@ -266,8 +266,8 @@ public class MCRClassificationBrowserData {
         LOGGER.info(" Found Entry at " + placeholder);
         if (placeholder != null) {
             final List<Element> children = browser.getRootElement().getChildren();
-            for (Element child:children){
-                placeholder.addContent((Element)child.clone());
+            for (Element child : children) {
+                placeholder.addContent((Element) child.clone());
             }
         }
         LOGGER.debug(cover);
@@ -369,19 +369,18 @@ public class MCRClassificationBrowserData {
         for (MCRCategory cat : children) {
             ids.add(cat.getId());
         }
-        Map<MCRCategoryID, Number> countMap=null;
-        if (objectTypeArray.length==0)
+        Map<MCRCategoryID, Number> countMap = null;
+        if (objectTypeArray.length == 0)
             countMap = MCRCategLinkServiceFactory.getInstance().countLinks(ids);
-        else if (objectTypeArray.length==1){
+        else if (objectTypeArray.length == 1) {
             countMap = MCRCategLinkServiceFactory.getInstance().countLinksForType(ids, objectTypeArray[0]);
-        }
-        else {
-            countMap=new HashMap<MCRCategoryID, Number>(ids.size());
-            for (String type:objectTypeArray){
-                for (Map.Entry<MCRCategoryID, Number> entry:MCRCategLinkServiceFactory.getInstance().countLinksForType(ids, type).entrySet()){
-                    Number value=countMap.get(entry.getKey());
-                    if (value==null){
-                        value=entry.getValue();
+        } else {
+            countMap = new HashMap<MCRCategoryID, Number>(ids.size());
+            for (String type : objectTypeArray) {
+                for (Map.Entry<MCRCategoryID, Number> entry : MCRCategLinkServiceFactory.getInstance().countLinksForType(ids, type).entrySet()) {
+                    Number value = countMap.get(entry.getKey());
+                    if (value == null) {
+                        value = entry.getValue();
                     } else {
                         value = value.intValue() + entry.getValue().intValue();
                     }
@@ -415,7 +414,7 @@ public class MCRClassificationBrowserData {
         xDocument.addContent(xNavtree);
         String browserClass = "";
         String Counter = "";
-        
+
         LOGGER.debug("get all classification IDs");
         final Set<MCRCategoryID> allIDs = getClassificationPool().getAllIDs();
         List<MCRCategoryID> ids = new ArrayList<MCRCategoryID>(allIDs.size());
@@ -423,7 +422,7 @@ public class MCRClassificationBrowserData {
         LOGGER.debug("fetched all classification IDs");
 
         for (MCRCategoryID id : ids) {
-            LOGGER.debug("get classification "+id);
+            LOGGER.debug("get classification " + id);
             MCRCategory classif = getClassificationPool().getClassificationAsPojo(id, false);
             LOGGER.debug("get browse element");
             Element cli = getBrowseElement(classif);
@@ -477,12 +476,12 @@ public class MCRClassificationBrowserData {
             setObjectTypes(browserClass);
             LOGGER.debug("counting linked objects");
             try {
-                Counter = MCRCategLinkServiceFactory.getInstance().countLinks(Collections.nCopies(1, classif.getId())).get(classif.getId()).toString();
+                Counter = String.valueOf(MCRCategLinkServiceFactory.getInstance().hasLinks(classif.getId()));
             } catch (Exception ignore) {
-                Counter = "NaN";
+                Counter = "unknown";
             }
             LOGGER.debug("counting linked objects ... done");
-            cli.setAttribute("counter", Counter);
+            cli.setAttribute("hasLinks", Counter);
             xNavtree.addContent(cli);
         }
         return new Document(xDocument);

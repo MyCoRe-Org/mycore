@@ -180,6 +180,13 @@ public class MCRCategLinkServiceImplTest extends MCRHibTestCase {
         assertEquals("Returned amount of MCRCategoryIDs does not match.", categIDs.size(), map.size());
         assertEquals("Count of Europe links does not match.", 2, map.get(category.getChildren().get(0).getId()).intValue());
     }
+    
+    public void testHasLinks(){
+        assertFalse("Classification should not be in use", SERVICE.hasLinks(category.getId()));
+        addTestLinks();
+        startNewTransaction();
+        assertTrue("Classification should be in use", SERVICE.hasLinks(category.getId()));
+    }
 
     private void loadWorldClassification() throws URISyntaxException {
         URL worlClassUrl = this.getClass().getResource(WORLD_CLASS_RESOURCE_NAME);
@@ -191,6 +198,11 @@ public class MCRCategLinkServiceImplTest extends MCRHibTestCase {
         for (MCRCategoryLink link : testLinks) {
             SERVICE.setLinks(link.getObjectReference(), Collections.nCopies(1, link.getCategory().getId()));
         }
+    }
+
+    @Override
+    protected boolean isDebugEnabled() {
+        return true;
     }
 
 }

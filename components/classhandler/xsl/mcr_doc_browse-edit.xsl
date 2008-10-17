@@ -180,21 +180,12 @@
 
         <xsl:variable name="browserClass" select="@browserClass" />
         <xsl:variable name="classifID" select="@ID" />
-        <xsl:variable name="counter" select="@counter" />
+        <xsl:variable name="hasLinks" select="@hasLinks" />
         <xsl:variable name="categpath" select="concat($WebApplicationBaseURL, 'browse/',$browserClass, $HttpSession, '?mode=edit&amp;clid=',$classifID )" />
         <xsl:variable name="edited" select="@edited" />
         <xsl:variable name="userEdited" select="@userEdited" />
         <xsl:variable name="canEdit" select="@userCanEdit" />
         <xsl:variable name="canDelete" select="@userCanDelete" />
-        <xsl:variable name="h2" select="string-length(@counter)" />
-        <xsl:variable name="h3" select="4 - $h2" />
-        <xsl:variable name="h4" select="@counter" />
-        <xsl:variable name="h6">
-          <xsl:if test="$h3 > 0">
-            <xsl:value-of select="substring('____', 1, $h3)" />
-          </xsl:if>
-          <xsl:value-of select="$h4" />
-        </xsl:variable>		  
 		  
 		<xsl:choose>
         <xsl:when test="$CurrentLang = 'ar'">
@@ -210,7 +201,7 @@
 				  <td width="200">&#160;</td>	
 				  <td width="25" valign="top">
                     <xsl:if test="($canDelete = 'true')">
-                      <xsl:if test="$counter = 0">
+                      <xsl:if test="$hasLinks = 'false'">
                         <form action="{$WebApplicationBaseURL}servlets/MCRStartClassEditorServlet{$HttpSession}" method="get">
                           <input type="hidden" name="todo" value='delete-classification' />
                           <input type="hidden" name="path" value='{$categpath}' />
@@ -218,7 +209,7 @@
                           <input type="image" src='{$classdelete}' title="{i18n:translate('component.classhandler.browse.classDelete')}" />
                         </form>
                       </xsl:if>
-                      <xsl:if test="$counter > 0">
+                      <xsl:if test="$hasLinks != 'false'">
                         <img src="{$imgEmpty}" border="0" width="21" />
                       </xsl:if>
                     </xsl:if>
@@ -291,19 +282,11 @@
               <xsl:value-of select="label/@description" />
             </xsl:if>
           </td>
-		  
-          <td nowrap="yes" class="classeditor_arabic_td3">
-            <xsl:value-of select="i18n:translate('component.classhandler.browse.docs',$h6)" />
-          </td>				 
 		</tr>			
 		</xsl:when>
         <xsl:otherwise>	  
         <tr valign="top">	  
 			
-          <td nowrap="yes" class="classeditor">
-            <xsl:value-of select="i18n:translate('component.classhandler.browse.docs',$h6)" />
-          </td>
-        
 		  <td class="classeditor">
             <xsl:choose>
               <xsl:when test="$browserClass != ''">
@@ -377,7 +360,7 @@
                   </xsl:if>						
 				  <td width="25" valign="top">
                     <xsl:if test="($canDelete = 'true')">
-                      <xsl:if test="$counter = 0">
+                      <xsl:if test="$hasLinks = 'false'">
                         <form action="{$WebApplicationBaseURL}servlets/MCRStartClassEditorServlet{$HttpSession}" method="get">
                           <input type="hidden" name="todo" value='delete-classification' />
                           <input type="hidden" name="path" value='{$categpath}' />
@@ -385,7 +368,7 @@
                           <input type="image" src='{$classdelete}' title="{i18n:translate('component.classhandler.browse.classDelete')}" />
                         </form>
                       </xsl:if>
-                      <xsl:if test="$counter > 0">
+                      <xsl:if test="$hasLinks != 'false'">
                         <img src="{$imgEmpty}" border="0" width="21" />
                       </xsl:if>
                     </xsl:if>

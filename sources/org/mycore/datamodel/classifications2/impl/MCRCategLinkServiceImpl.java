@@ -30,8 +30,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.Session;
+import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Restrictions;
 
 import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.common.MCRCache;
@@ -189,5 +192,30 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
         }
         categCache.put(categID, categ);
         return categ;
+    }
+
+    @SuppressWarnings("unchecked")
+    public boolean hasLinks(MCRCategoryID categID) {
+        if (!categID.isRootID()) {
+            throw new IllegalArgumentException(categID + " is not a root category.");
+        }
+        Session session = MCRHIBConnection.instance().getSession();
+        LOGGER.debug("first fetch min and max internalID of classification " + categID);
+        Criteria minMaxCriteria = session.createCriteria(MCRCategoryImpl.class);
+        minMaxCriteria.setProjection(Projections.projectionList().add(Projections.min("internalID")).add(Projections.max("internalID")));
+        minMaxCriteria.add(Restrictions.eq("rootID", categID.getRootID()));
+        final Object[] minMaxResult = (Object[]) minMaxCriteria.uniqueResult();
+        Number[] minMax =  new Number[]{(Number)minMaxResult[0],(Number)minMaxResult[1]};
+        LOGGER.debug("try to find a linked categories between " + minMax[0] + " and " + minMax[1]);
+        Criteria categoryLinkCriteria = session.createCriteria(MCRCategoryLink.class);
+        categoryLinkCriteria.add(Restrictions.between("category.internalID", minMax[0], minMax[1]));
+        categoryLinkCriteria.setProjection(Projections.distinct(Projections.property("category")));
+        List<MCRCategory> categories = categoryLinkCriteria.list();
+        LOGGER.debug("check if a single linked category is part of " + categID);
+        for (MCRCategory category : categories) {
+            if (category.getId().getRootID().equals(categID.getRootID()))
+                return true;
+        }
+        return false;
     }
 }

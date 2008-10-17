@@ -35,6 +35,15 @@ import java.util.Map;
 public interface MCRCategLinkService {
 
     /**
+     * Checks if links to a collection of categories.
+     * 
+     * @param categID
+     *            the id of a root category (classification)
+     * @return true if the classification is used
+     */
+    public abstract boolean hasLinks(MCRCategoryID categID);
+
+    /**
      * Counts links to a collection of categories.
      * 
      * @param categIDs
