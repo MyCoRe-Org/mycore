@@ -82,7 +82,6 @@ import org.mycore.datamodel.common.MCRXMLTableManager;
 import org.mycore.datamodel.ifs.MCRDirectoryXML;
 import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.frontend.editor.MCREditorDataResolver;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.services.fieldquery.MCRQuery;
 import org.mycore.services.fieldquery.MCRQueryClient;
@@ -174,7 +173,6 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
         supportedSchemes.put("query", new MCRQueryResolver());
         supportedSchemes.put("buildxml", new MCRBuildXMLResolver());
         supportedSchemes.put("notnull", new MCRNotNullResolver());
-        supportedSchemes.put("editorData", new MCREditorDataResolver());
         supportedSchemes.put("xslStyle", new MCRXslStyleResolver());
         return supportedSchemes;
     }
