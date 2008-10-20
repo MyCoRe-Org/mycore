@@ -174,6 +174,7 @@
     <xsl:variable name="classright" select="concat($WebApplicationBaseURL, 'images/classright.gif')" />
     <xsl:variable name="classexport" select="concat($WebApplicationBaseURL, 'images/classexport.gif')" />
     <xsl:variable name="imgEmpty" select="concat($WebApplicationBaseURL, 'images/emtyDot1Pix.gif')" />
+    <xsl:variable name="use-aclEditor" select="acl:checkPermission('use-aclEditor')" />
 	  
     <table cellspacing="0" cellpadding="0" border="0">
       <xsl:for-each select="classification">
@@ -333,7 +334,7 @@
                       </a>
                     </td>
                   </xsl:if>					
-                  <xsl:if test="acl:checkPermission('use-aclEditor')">
+                  <xsl:if test="$use-aclEditor">
                     <td width="25" valign="top">
                       <xsl:variable name="aclEditorAddress_edit">
                         <xsl:choose>

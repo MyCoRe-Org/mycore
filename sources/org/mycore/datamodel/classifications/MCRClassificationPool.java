@@ -147,7 +147,7 @@ public class MCRClassificationPool {
         if (classif != null) {
             return classif;
         } else {
-            MCRCategory cl = DAO.getCategory(clid, writeAccess ? -1 : 1);
+            MCRCategory cl = DAO.getCategory(clid, writeAccess ? -1 : 0);
             return cl;
         }
     }
