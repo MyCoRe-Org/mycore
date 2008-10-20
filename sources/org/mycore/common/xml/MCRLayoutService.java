@@ -99,7 +99,7 @@ import org.mycore.user.MCRUserMgr;
 public class MCRLayoutService implements org.apache.xalan.trace.TraceListener {
 
     /** A cache of already compiled stylesheets */
-    private static MCRCache STYLESHEETS_CACHE = new MCRCache(100, "XSLT Stylesheets");
+    private static MCRCache STYLESHEETS_CACHE = new MCRCache(MCRConfiguration.instance().getInt("MCR.LayoutService.XSLCacheSize",100), "XSLT Stylesheets");
 
     private static MCRXMLResource XML_RESOURCE = MCRXMLResource.instance();
 
