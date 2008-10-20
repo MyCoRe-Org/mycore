@@ -183,9 +183,11 @@ public class MCRCategLinkServiceImplTest extends MCRHibTestCase {
     
     public void testHasLinks(){
         assertFalse("Classification should not be in use", SERVICE.hasLinks(category.getId()));
+        assertFalse("Category should not be in use", SERVICE.hasLinks(category.getChildren().get(0).getId()));
         addTestLinks();
         startNewTransaction();
         assertTrue("Classification should be in use", SERVICE.hasLinks(category.getId()));
+        assertTrue("Category should be in use", SERVICE.hasLinks(category.getChildren().get(0).getId()));
     }
 
     private void loadWorldClassification() throws URISyntaxException {
@@ -198,11 +200,6 @@ public class MCRCategLinkServiceImplTest extends MCRHibTestCase {
         for (MCRCategoryLink link : testLinks) {
             SERVICE.setLinks(link.getObjectReference(), Collections.nCopies(1, link.getCategory().getId()));
         }
-    }
-
-    @Override
-    protected boolean isDebugEnabled() {
-        return true;
     }
 
 }
