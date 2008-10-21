@@ -58,6 +58,7 @@ public class MCRCategLinkServiceImplTest extends MCRHibTestCase {
         testLinks = new ArrayList<MCRCategoryLink>();
         testLinks.add(new MCRCategoryLink(germany, new MCRObjectReference("Jena", "city")));
         testLinks.add(new MCRCategoryLink(germany, new MCRObjectReference("Thüringen", "state")));
+        testLinks.add(new MCRCategoryLink(germany, new MCRObjectReference("Hessen", "state")));
         testLinks.add(new MCRCategoryLink(germany, new MCRObjectReference("Saale", "river")));
         testLinks.add(new MCRCategoryLink(uk, new MCRObjectReference("London", "city")));
         testLinks.add(new MCRCategoryLink(uk, new MCRObjectReference("England", "state")));
@@ -163,7 +164,7 @@ public class MCRCategLinkServiceImplTest extends MCRHibTestCase {
         LOGGER.debug("****List of returned map");
         LOGGER.debug(map);
         assertEquals("Returned amount of MCRCategoryIDs does not match.", categIDs.size(), map.size());
-        assertEquals("Count of Europe links does not match.", 6, map.get(category.getChildren().get(0).getId()).intValue());
+        assertEquals("Count of Europe links does not match.", 7, map.get(category.getChildren().get(0).getId()).intValue());
     }
 
     /**
@@ -182,12 +183,13 @@ public class MCRCategLinkServiceImplTest extends MCRHibTestCase {
     }
     
     public void testHasLinks(){
+        MCRCategoryImpl germany = (MCRCategoryImpl) category.getChildren().get(0).getChildren().get(0);
         assertFalse("Classification should not be in use", SERVICE.hasLinks(category.getId()));
-        assertFalse("Category should not be in use", SERVICE.hasLinks(category.getChildren().get(0).getId()));
+        assertFalse("Category should not be in use", SERVICE.hasLinks(germany.getId()));
         addTestLinks();
         startNewTransaction();
         assertTrue("Classification should be in use", SERVICE.hasLinks(category.getId()));
-        assertTrue("Category should be in use", SERVICE.hasLinks(category.getChildren().get(0).getId()));
+        assertTrue("Category should be in use", SERVICE.hasLinks(germany.getId()));
     }
 
     private void loadWorldClassification() throws URISyntaxException {

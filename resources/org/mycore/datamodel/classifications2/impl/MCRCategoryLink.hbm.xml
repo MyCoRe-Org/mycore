@@ -53,12 +53,7 @@ SELECT category.rootID, category.categID FROM MCRCategoryLink WHERE objectRefere
     </query>
     <query name="hasLinks">
       <![CDATA[
-SELECT
-  CASE
-    WHEN category.internalID IN (:internalIDs) THEN true
-    ELSE false
-  END
-  FROM MCRCategoryLink
+SELECT 'true' FROM MCRCategoryLink WHERE category.internalID IN (:internalIDs)
       ]]>
     </query>
     <!--  -->

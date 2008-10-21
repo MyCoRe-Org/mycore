@@ -35,17 +35,7 @@
 <xsl:variable name="path"  select="concat($WebApplicationBaseURL, 'browse/', uri)" />
 	
 <div id="classificationBrowser" >
-<table id="metaHeading" cellpadding="0" cellspacing="0">
-  <tr>
-     <td class="titles">
-         <xsl:value-of select="concat(i18n:translate('component.classhandler.browse.numOf'),' :')" />
-            <xsl:value-of select="cntDocuments" />
-     </td>
-     <td class="browseCtrl">
-            <a href='{$hrefstart}' ><xsl:value-of select="description" /></a>
-     </td>
-    </tr>
-</table>
+   <a href='{$hrefstart}' ><xsl:value-of select="description" /></a>
 <!-- IE Fix for padding and border -->
 <hr/>
 
@@ -92,21 +82,9 @@
          </xsl:otherwise>
         </xsl:choose>
        </td >
-       <xsl:variable name="h2" select="string-length(col[2]/@numDocs)" />
-       <xsl:variable name="h3" select="4 - $h2" />
-       <xsl:variable name="h4" select="col[2]/@numDocs" />
-       <xsl:variable name="h6">
-         <xsl:if test="$h3 > 0">
-           <xsl:value-of select="substring('____', 1, $h3)"/>
-         </xsl:if><xsl:value-of select="$h4"/>
-       </xsl:variable>
-
-       <td  class="desc" nowrap="yes">
-       <xsl:value-of select="i18n:translate('component.classhandler.browse.docs',$h6)"/> 
-       </td>
        <td class="desc">
           <xsl:choose>
-            <xsl:when test="col[2]/@numDocs > 0">
+            <xsl:when test="col[2]/@hasLinks='true'">
               <a href='{$href2}'><xsl:value-of select="col[2]/text()" /></a>
             </xsl:when>
             <xsl:otherwise>

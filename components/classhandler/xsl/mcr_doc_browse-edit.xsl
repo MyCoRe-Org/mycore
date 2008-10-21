@@ -86,18 +86,11 @@
                     <xsl:apply-templates select="." mode="categoryText">
                       <xsl:with-param name="cellStyle" select="'classeditor_arabic_s2_td4'" />
                     </xsl:apply-templates>
-                    <xsl:apply-templates select="." mode="folderColumn">
-                      <xsl:with-param name="cellStyle" select="'classeditor_arabic_s2_td5'" />
-                    </xsl:apply-templates>
             	  </tr>  			  
                 </xsl:when>
                 <xsl:otherwise>
                   <!-- language is not arabic -->				  
     			  <tr valign="top">
-    				  
-    				<xsl:apply-templates select="." mode="folderColumn">
-                      <xsl:with-param name="cellStyle" select="$trStyle" />
-                    </xsl:apply-templates>
                     <xsl:apply-templates select="." mode="categoryText">
                       <xsl:with-param name="cellStyle" select="$trStyle" />
                     </xsl:apply-templates>
@@ -108,7 +101,8 @@
                     <xsl:apply-templates select="." mode="editButtons">
                       <xsl:with-param name="cellStyle" select="$trStyle" />
                     </xsl:apply-templates>
-    				  
+    				<td>
+                    </td>  
                   </tr>			  
     			</xsl:otherwise>
               </xsl:choose>
@@ -215,7 +209,7 @@
                       </xsl:if>
                     </xsl:if>
                   </td>
-                  <xsl:if test="acl:checkPermission('use-aclEditor')">
+                  <xsl:if test="$use-aclEditor">
                     <td width="25" valign="top">
                       <xsl:variable name="aclEditorAddress_edit">
                         <xsl:choose>
@@ -497,35 +491,6 @@
   </xsl:template>
   <xsl:include href="MyCoReLayout.xsl" />
   
-  <xsl:template match="row" mode="folderColumn">
-    <xsl:param name="cellStyle" />
-    <td class="{$cellStyle}" nowrap="yes">
-      <xsl:call-template name="lineLevelLoop">
-        <xsl:with-param name="anz" select="col[1]/@lineLevel" />
-        <xsl:with-param name="img" select="concat($WebApplicationBaseURL, 'images/folder_blank.gif')" />
-      </xsl:call-template>
-      <xsl:choose>
-        <xsl:when test="col[1]/@plusminusbase">
-          <a href="{concat($WebApplicationBaseURL, 'browse', col[2]/@searchbase,$HttpSession,'?mode=edit&amp;clid=',../@classifID)}">
-            <img border="0" src="{concat($WebApplicationBaseURL, 'images/', col[1]/@folder1, '.gif')}" />
-          </a>
-        </xsl:when>
-        <xsl:otherwise>
-          <img border="0" src="{concat($WebApplicationBaseURL, 'images/', col[1]/@folder1, '.gif')}" />
-        </xsl:otherwise>
-      </xsl:choose>
-      <xsl:variable name="h2" select="string-length(col[2]/@numDocs)" />
-      <xsl:variable name="h3" select="4 - $h2" />
-      <xsl:variable name="h4" select="col[2]/@numDocs" />
-      <xsl:variable name="h6">
-        <xsl:if test="$h3 > 0">
-          <xsl:value-of select="substring('____', 1, $h3)" />
-        </xsl:if>
-        <xsl:value-of select="$h4" />
-      </xsl:variable>
-      <xsl:value-of select="i18n:translate('component.classhandler.browse.docs',$h6)" />
-    </td>
-  </xsl:template>
   <xsl:template match="row" mode="categoryText">
     <xsl:param name="cellStyle" />
     <td class="{$cellStyle}">
@@ -613,7 +578,7 @@
                   <xsl:with-param name="todo" select="'delete-category'"/>
                   <xsl:with-param name="image" select="concat($WebApplicationBaseURL, 'images/classdelete.gif')"/>
                   <xsl:with-param name="imageTitle" select="i18n:translate('component.classhandler.browse.deleteCat')"/>
-                  <xsl:with-param name="notEmpty" select="(col[2]/@numDocs = 0) and (../../userCanEdit = 'true')"/>
+                  <xsl:with-param name="notEmpty" select="(col[2]/@hasLinks = 'false') and (../../userCanEdit = 'true')"/>
                 </xsl:apply-templates>
                 <xsl:apply-templates select="." mode="editButton">
                   <xsl:with-param name="todo" select="'up-category'"/>
