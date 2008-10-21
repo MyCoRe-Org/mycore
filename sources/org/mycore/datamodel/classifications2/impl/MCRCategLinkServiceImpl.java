@@ -36,6 +36,7 @@ import org.hibernate.Session;
 import org.hibernate.criterion.Projection;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.sql.CaseFragment;
 
 import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.common.MCRCache;
@@ -208,12 +209,12 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
         }
         List<Number> internalIDs = classCriteria.list();
         LOGGER.debug("check if a single linked category is part of " + categID);
-        Criteria linkCriteria = session.createCriteria(MCRCategoryLink.class);
-        linkCriteria.setProjection(Projections.count("id"));
-        linkCriteria.add(Restrictions.in("category.internalID", internalIDs));
-        if (((Number) linkCriteria.uniqueResult()).intValue() > 0) {
-            return true;
-        }
-        return false;
+        Query linkQuery = session.getNamedQuery(LINK_CLASS.getName() + ".hasLinks");
+        linkQuery.setParameterList("internalIDs", internalIDs);
+        final Object dbResult = linkQuery.uniqueResult();
+        //some dbms may return null in ELSE case of linkQuery above
+        if (dbResult == null)
+            return false;
+        return ((Boolean) dbResult).booleanValue();
     }
 }
