@@ -605,10 +605,7 @@ public class MCRClassificationBrowserData {
         while ((line = getTreeline(i++)) != null) {
 
             final String catid = line.getAttributeValue("ID");
-            boolean hasLinks=false;
-            if (line.getAttributeValue("hasLinks") != null) {
-                hasLinks = Boolean.parseBoolean(line.getAttributeValue("hasLinks"));
-            }
+            boolean hasLinks = MCRCategLinkServiceFactory.getInstance().hasLinks(new MCRCategoryID(cl.getId().getRootID(), catid));
             final String status = line.getAttributeValue("hasChildren");
 
             Element label = (Element) XPath.selectSingleNode(line, "label[lang('" + lang + "')]");
@@ -666,7 +663,7 @@ public class MCRClassificationBrowserData {
 
             xCol2.setAttribute("searchbase", search);
             xCol2.setAttribute("lineID", catid);
-            xCol2.setAttribute("hasLinks", String.valueOf(MCRCategLinkServiceFactory.getInstance().hasLinks(new MCRCategoryID(cl.getId().getRootID(),catid))));
+            xCol2.setAttribute("hasLinks", String.valueOf(hasLinks));
 
             xCol2.addContent(text);
 
