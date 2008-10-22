@@ -59,7 +59,7 @@ import org.mycore.datamodel.metadata.MCRObject;
  * using the text filter plug-ins, and any plain XML document.
  * 
  * @see MCRSearcher#addToIndex(String, List)
- * @author Frank Lützenkirchen
+ * @author Frank Lï¿½tzenkirchen
  */
 public class MCRData2Fields {
 
@@ -68,7 +68,7 @@ public class MCRData2Fields {
 
     /** The XSL transformer factory to use */
     private static SAXTransformerFactory factory;
-    
+
     /** A template element to be used for building individual stylesheet */
     private static Element xslTemplate;
 
@@ -129,7 +129,7 @@ public class MCRData2Fields {
             }
 
             try {
-                stylesheet = factory.newTemplates( new JDOMSource( new Document( root ) ) );
+                stylesheet = factory.newTemplates(new JDOMSource(new Document(root)));
             } catch (TransformerConfigurationException exc) {
                 String msg = "Error while compiling XSL stylesheet: " + exc.getMessageAndLocation();
                 throw new MCRConfigurationException(msg, exc);
@@ -176,8 +176,7 @@ public class MCRData2Fields {
         // Handle source FILE_TEXT_CONTENT
         LOGGER.debug("Handle source FILE_TEXT_CONTENT");
         List<MCRFieldDef> fieldDefList = MCRFieldDef.getFieldDefs(index);
-        for (int i = 0; i < fieldDefList.size(); i++) {
-            MCRFieldDef fieldDef = fieldDefList.get(i);
+        for (MCRFieldDef fieldDef : fieldDefList) {
             if (!fieldDef.isUsedForObjectType(file.getContentTypeID()))
                 continue;
 
@@ -246,6 +245,7 @@ public class MCRData2Fields {
         Templates stylesheet = buildStylesheet(index, MCRFieldDef.XML);
         return buildValues(stylesheet, doc, doc.getRootElement().getName());
     }
+
     /**
      * Extracts field values for indexing from the given JDOM xml document.
      * 
@@ -255,9 +255,9 @@ public class MCRData2Fields {
      *            the ID of the index as defined in searchfields.xml
      * @return a List of MCRFieldValue objects that contain name, type and value
      */
-    public static List<MCRFieldValue> buildFields(byte[] xml, String index, String rootTagName) {
-        Templates stylesheet = buildStylesheet(index, MCRFieldDef.XML);
-        return buildValues(stylesheet, xml, rootTagName);
+    public static List<MCRFieldValue> buildFields(byte[] xml, String index, String source, String objectType) {
+        Templates stylesheet = buildStylesheet(index, source);
+        return buildValues(stylesheet, xml, objectType);
     }
 
     /** Transforms xml input to search field values using XSL * */
