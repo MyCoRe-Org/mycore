@@ -75,7 +75,7 @@ public abstract class MCRSearcher extends MCREventHandlerBase implements MCREven
         return index;
     }
 
-    private String getReturnID(MCRFile file) {
+    public String getReturnID(MCRFile file) {
         // Maybe fieldquery is used in application without link table manager
         if (MCRConfiguration.instance().getString("MCR.Persistence.LinkTable.Store.Class", null) == null)
             return file.getID();
