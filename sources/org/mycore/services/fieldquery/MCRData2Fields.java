@@ -292,7 +292,7 @@ public class MCRData2Fields {
         if (fieldValues != null)
             for (int i = 0; i < fieldValues.size(); i++) {
                 Element fieldValue = (Element) (fieldValues.get(i));
-                String value = fieldValue.getChildTextTrim("value", MCRFieldDef.mcrns);
+                String value = fieldValue.getTextTrim();
                 String name = fieldValue.getAttributeValue("name");
                 MCRFieldDef def = MCRFieldDef.getDef(name);
 

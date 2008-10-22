@@ -367,31 +367,11 @@ public class MCRFieldDef {
         fieldValue.setAttribute("name", getName());
         forEach1.addContent(fieldValue);
 
-        // <mcr:value>
-        Element valueElem = new Element("value", mcrns);
-        fieldValue.addContent(valueElem);
-
         // <xsl:value-of select="{@value}" />
         String valueExpr = fieldDef.getAttributeValue("value");
         Element valueOf = new Element("value-of", xslns);
         valueOf.setAttribute("select", valueExpr);
-        valueElem.addContent(valueOf);
-
-        List attributes = fieldDef.getChildren("attribute", mcrns);
-
-        for (int j = 0; j < attributes.size(); j++) {
-            Element attribDef = (Element) (attributes.get(j));
-
-            // <mcr:attribute name="{@name}">
-            Element attribute = new Element("attribute", mcrns);
-            fieldValue.addContent(attribute);
-            attribute.setAttribute("name", attribDef.getAttributeValue("name"));
-
-            // <xsl:value-of select="{@value}" />
-            valueOf = new Element("value-of", xslns);
-            valueOf.setAttribute("select", attribDef.getAttributeValue("value"));
-            attribute.addContent(valueOf);
-        }
+        fieldValue.addContent(valueOf);
 
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("---------- XSL for search field \"" + name + "\" ----------");
