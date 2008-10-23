@@ -107,6 +107,8 @@ public class MCRSearcherCommands extends MCRAbstractCommands {
             ScrollableResults result = xmlCriteria.scroll();
             while (result.next()) {
                 MCRXMLTABLE xmlEntry = (MCRXMLTABLE) result.get(0);
+                if (xmlEntry.getType().equals("derivate"))
+                    continue;
                 addMetaToIndex(xmlEntry, false, searcher);
             }
             searcher.notifySearcher("finish");
@@ -178,7 +180,8 @@ public class MCRSearcherCommands extends MCRAbstractCommands {
     }
 
     private static void addMetaToIndex(MCRXMLTABLE xmlEntry, boolean update, MCRSearcher searcher) {
-        List<MCRFieldValue> fields = MCRData2Fields.buildFields(xmlEntry.getXmlByteArray(), searcher.getIndex(), MCRFieldDef.OBJECT_METADATA+MCRFieldDef.OBJECT_CATEGORY, xmlEntry.getType());
+        List<MCRFieldValue> fields = MCRData2Fields.buildFields(xmlEntry.getXmlByteArray(), searcher.getIndex(), MCRFieldDef.OBJECT_METADATA
+                + MCRFieldDef.OBJECT_CATEGORY, xmlEntry.getType());
         if (update)
             searcher.removeFromIndex(xmlEntry.getId());
         searcher.addToIndex(xmlEntry.getId(), xmlEntry.getId(), fields);
