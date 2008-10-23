@@ -362,9 +362,8 @@ public class MCRFieldDef {
             forEach1 = forEach2;
         }
 
-        // <mcr:fieldValue>
-        Element fieldValue = new Element("fieldValue", mcrns);
-        fieldValue.setAttribute("name", getName());
+        // <name>value</name>
+        Element fieldValue = new Element(getName());
         forEach1.addContent(fieldValue);
 
         // <xsl:value-of select="{@value}" />
