@@ -210,10 +210,10 @@ public class MCREditorSubmission {
     /** Fills a table of constraints on attributes, e.g. title[@type='main'] */
     private void buildAttribTable(Element root) {
         constraints = new Hashtable();
-        Iterator iter = root.getDescendants(new ElementFilter("cell"));
+        Iterator iter = root.getDescendants(new ElementFilter());
         while (iter.hasNext()) {
-            Element cell = (Element) (iter.next());
-            String var = cell.getAttributeValue("var");
+            Element elem = (Element) (iter.next());
+            String var = elem.getAttributeValue("var");
             if ((var != null) && (var.indexOf("[@") > 0)) {
                 int pos1 = var.indexOf("[@");
                 int pos2 = var.indexOf("=", pos1);

@@ -228,6 +228,7 @@ public class MCREditorServlet extends MCRServlet implements MCRSessionListener {
             logger.info("Editor reading XML input from " + sourceURI);
             Element input = MCRURIResolver.instance().resolve(sourceURI);
             MCREditorSubmission sub = new MCREditorSubmission(input, editor);
+            MCREditorDefReader.fixConditionedVariables( editor );
             editor.addContent(sub.buildInputElements());
             editor.addContent(sub.buildRepeatElements());
         }

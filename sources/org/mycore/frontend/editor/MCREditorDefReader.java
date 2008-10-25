@@ -34,6 +34,7 @@ import org.jdom.Content;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.Namespace;
+import org.jdom.filter.ElementFilter;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.mycore.common.MCRConfigurationException;
@@ -157,7 +158,6 @@ public class MCREditorDefReader
       if( id.length() > 0 ) id2component.put( id, element );
       
       setDefaultAttributes( element );
-      fixConditionedVariables( element );
       resolveChildren( element );
     }
 
@@ -360,15 +360,19 @@ public class MCREditorDefReader
    * title[@type='main'] into escaped internal syntax
    * title__type__main 
    */
-  private void fixConditionedVariables( Element element )
+  static void fixConditionedVariables( Element editor )
   {
-    String var = element.getAttributeValue( "var", "" ); 
-    if( var.contains( "[@" ) )
+    for( Iterator iter = editor.getDescendants(new ElementFilter()); iter.hasNext(); )
     {
-      var = var.replace( "[@", "__" );
-      var = var.replace( "='", "__" );
-      var = var.replace( "']", "" );
-      element.setAttribute( "var", var );
+      Element element = (Element) (iter.next());
+      String var = element.getAttributeValue( "var", "" ); 
+      if( var.contains( "[@" ) )
+      {
+        var = var.replace( "[@", "__" );
+        var = var.replace( "='", "__" );
+        var = var.replace( "']", "" );
+        element.setAttribute( "var", var );
+      } 
     }
   }
 }
