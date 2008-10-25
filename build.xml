@@ -522,16 +522,6 @@ public class MCRCoreVersion{
   </target>
 
   <!-- =================================================================== -->
-  <!-- Update current working directory from SVN repository                -->
-  <!-- =================================================================== -->
-
-  <target name="update">
-    <exec executable="svn" spawn="true">
-      <arg value="update" />
-    </exec>
-  </target>
-
-  <!-- =================================================================== -->
   <!-- Build SVN ChangeLog                                                 -->
   <!-- =================================================================== -->
 
@@ -565,7 +555,6 @@ public class MCRCoreVersion{
   <!-- =================================================================== -->
 
   <target name="postcommit">
-    <antcall target="update" />
     <antcall target="jar" />
     <antcall target="changelog" />
     <antcall target="javadocs" />
