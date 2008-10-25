@@ -27,7 +27,6 @@
   <property name="target.classes" location="${target.dir}/classes" />
   <property name="target.config" location="${target.dir}/config" />
   <property name="target.javadocs" location="${target.dir}/javadocs" />
-  <property name="target.docs" location="${target.dir}/docs" />
   <property name="target.libs" location="${target.dir}/lib" />
   <property name="target.jarbase" location="${target.dir}/jarbase" />
   <property name="components.dir" location="${basedir}/components" />
@@ -429,7 +428,7 @@ public class MCRCoreVersion{
         <uptodate>
           <srcfiles dir="${basedir}" includes="**/*.java" />
           <srcfiles dir="${basedir}" includes="**/*.html" />
-          <mapper type="merge" to="${basedir}/documentation/html/overview-tree.html" />
+          <mapper type="merge" to="${target.javadocs}/overview-tree.html" />
         </uptodate>
       </not>
     </condition>
@@ -439,7 +438,7 @@ public class MCRCoreVersion{
         <uptodate>
           <srcfiles dir="${basedir}" includes="**/*.java" />
           <srcfiles dir="${doclets}" includes="pdfdoclet-mycore.properties" />
-          <mapper type="merge" to="${basedir}/documentation/pdf/javadocs.pdf" />
+          <mapper type="merge" to="${target.javadocs}/javadocs.pdf" />
         </uptodate>
       </not>
     </condition>
@@ -496,7 +495,7 @@ public class MCRCoreVersion{
   <target name="java2pdf" depends="init,up2date" if="pdf.outdated">
     <echo level="info"> Building the MyCoRe JavaDoc API documentation as PDF...</echo>
 
-    <mkdir dir="${target.docs}" />
+    <mkdir dir="${target.javadocs}" />
     <javadoc packagenames="*"
              sourcepathref="sourcepath"
              classpathref="javadocs.classpath"
@@ -504,7 +503,7 @@ public class MCRCoreVersion{
              version="true"
              access="package">
       <doclet name="com.tarsec.javadoc.pdfdoclet.PDFDoclet" path="${doclets}/itext-0.92.jar:${doclets}/pdfdoclet.jar">
-        <param name="-pdf" value="${target.docs}/javadocs.pdf" />
+        <param name="-pdf" value="${target.javadocs}/javadocs.pdf" />
         <param name="-config" value="${doclets}/pdfdoclet-mycore.properties" />
       </doclet>
 
@@ -542,18 +541,18 @@ public class MCRCoreVersion{
       Building SVN ChangeLog, please be patient...
     </echo>
 
-    <mkdir dir="${basedir}/documentation/changelogs" />
-    <mkdir dir="${basedir}/documentation/changelogs/statsvn" />
-    <exec executable="svn" output="${basedir}/documentation/changelogs/statsvn/svnlog.xml">
+    <mkdir dir="${basedir}/changelogs" />
+    <mkdir dir="${basedir}/changelogs/statsvn" />
+    <exec executable="svn" output="${basedir}/changelogs/statsvn/svnlog.xml">
       <arg line="log -v --xml" />
     </exec>
     <java jar="../../doclets/statsvn.jar" fork="true">
-      <arg value="${basedir}/documentation/changelogs/statsvn/svnlog.xml" />
+      <arg value="${basedir}/changelogs/statsvn/svnlog.xml" />
       <arg value="." />
       <arg value="-title" />
       <arg value="MyCoRe" />
       <arg value="-output-dir" />
-      <arg value="${basedir}/documentation/changelogs/statsvn" />
+      <arg value="${basedir}/changelogs/statsvn" />
       <arg value="-viewvc" />
       <arg value="http://www.mycore.de/viewvc/viewvc.cgi/mycore/trunk" />
       <arg value="-bugzilla" />
@@ -571,9 +570,6 @@ public class MCRCoreVersion{
     <antcall target="changelog" />
     <antcall target="javadocs" />
     <antcall target="java2pdf" />
-
-    <chmod dir="${basedir}/documentation" type="file" perm="ugo+r" includes="**/*" />
-    <chmod dir="${basedir}/documentation" type="dir" perm="ugo+rx" includes="**/*" />
   </target>
 
   <!-- =================================================================== -->
