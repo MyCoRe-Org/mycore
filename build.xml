@@ -567,6 +567,7 @@ public class MCRCoreVersion{
 
   <target name="postcommit">
     <antcall target="update" />
+    <antcall target="jar" />
     <antcall target="changelog" />
     <antcall target="javadocs" />
     <antcall target="java2pdf" />
