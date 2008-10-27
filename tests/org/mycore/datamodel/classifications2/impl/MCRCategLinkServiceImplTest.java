@@ -181,11 +181,13 @@ public class MCRCategLinkServiceImplTest extends MCRHibTestCase {
         assertEquals("Returned amount of MCRCategoryIDs does not match.", categIDs.size(), map.size());
         assertEquals("Count of Europe links does not match.", 2, map.get(category.getChildren().get(0).getId()).intValue());
     }
-    
-    public void testHasLinks(){
+
+    public void testHasLinks() {
         MCRCategoryImpl germany = (MCRCategoryImpl) category.getChildren().get(0).getChildren().get(0);
         assertFalse("Classification should not be in use", SERVICE.hasLinks(category.getId()));
         assertFalse("Category should not be in use", SERVICE.hasLinks(germany.getId()));
+        assertFalse("Category does not exist and should be not in use", SERVICE.hasLinks(MCRCategoryID.rootID("foo")));
+        assertFalse("Category does not exist and should be not in use", SERVICE.hasLinks(new MCRCategoryID("foo", "bar")));
         addTestLinks();
         startNewTransaction();
         assertTrue("Classification should be in use", SERVICE.hasLinks(category.getId()));

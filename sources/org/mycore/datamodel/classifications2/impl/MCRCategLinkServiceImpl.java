@@ -203,9 +203,17 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
         classCriteria.add(Restrictions.eq("rootID", categID.getRootID()));
         if (!categID.isRootID()) {
             MCRCategoryImpl category = MCRCategoryDAOImpl.getByNaturalID(session, categID);
+            if (category == null) {
+                LOGGER.warn("Category does not exist: " + categID);
+                return false;
+            }
             classCriteria.add(Restrictions.between("left", category.getLeft(), category.getRight()));
         }
         List<Number> internalIDs = classCriteria.list();
+        if (internalIDs.size() == 0) {
+            LOGGER.warn("Category does not exist: " + categID);
+            return false;
+        }
         LOGGER.debug("check if a single linked category is part of " + categID);
         Query linkQuery = session.getNamedQuery(LINK_CLASS.getName() + ".hasLinks");
         linkQuery.setParameterList("internalIDs", internalIDs);
