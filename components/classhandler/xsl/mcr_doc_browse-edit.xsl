@@ -86,11 +86,18 @@
                     <xsl:apply-templates select="." mode="categoryText">
                       <xsl:with-param name="cellStyle" select="'classeditor_arabic_s2_td4'" />
                     </xsl:apply-templates>
+                    <xsl:apply-templates select="." mode="folderColumn">
+                      <xsl:with-param name="cellStyle" select="'classeditor_arabic_s2_td5'" />
+                    </xsl:apply-templates>
             	  </tr>  			  
                 </xsl:when>
                 <xsl:otherwise>
                   <!-- language is not arabic -->				  
     			  <tr valign="top">
+    				  
+    				<xsl:apply-templates select="." mode="folderColumn">
+                      <xsl:with-param name="cellStyle" select="$trStyle" />
+                    </xsl:apply-templates>
                     <xsl:apply-templates select="." mode="categoryText">
                       <xsl:with-param name="cellStyle" select="$trStyle" />
                     </xsl:apply-templates>
@@ -101,8 +108,7 @@
                     <xsl:apply-templates select="." mode="editButtons">
                       <xsl:with-param name="cellStyle" select="$trStyle" />
                     </xsl:apply-templates>
-    				<td>
-                    </td>  
+    				  
                   </tr>			  
     			</xsl:otherwise>
               </xsl:choose>
@@ -209,7 +215,7 @@
                       </xsl:if>
                     </xsl:if>
                   </td>
-                  <xsl:if test="$use-aclEditor">
+                  <xsl:if test="acl:checkPermission('use-aclEditor')">
                     <td width="25" valign="top">
                       <xsl:variable name="aclEditorAddress_edit">
                         <xsl:choose>
@@ -491,6 +497,25 @@
   </xsl:template>
   <xsl:include href="MyCoReLayout.xsl" />
   
+  <xsl:template match="row" mode="folderColumn">
+    <xsl:param name="cellStyle" />
+    <td class="{$cellStyle}" nowrap="yes">
+      <xsl:call-template name="lineLevelLoop">
+        <xsl:with-param name="anz" select="col[1]/@lineLevel" />
+        <xsl:with-param name="img" select="concat($WebApplicationBaseURL, 'images/folder_blank.gif')" />
+      </xsl:call-template>
+      <xsl:choose>
+        <xsl:when test="col[1]/@plusminusbase">
+          <a href="{concat($WebApplicationBaseURL, 'browse', col[2]/@searchbase,$HttpSession,'?mode=edit&amp;clid=',../@classifID)}">
+            <img border="0" src="{concat($WebApplicationBaseURL, 'images/', col[1]/@folder1, '.gif')}" />
+          </a>
+        </xsl:when>
+        <xsl:otherwise>
+          <img border="0" src="{concat($WebApplicationBaseURL, 'images/', col[1]/@folder1, '.gif')}" />
+        </xsl:otherwise>
+      </xsl:choose>
+    </td>
+  </xsl:template>
   <xsl:template match="row" mode="categoryText">
     <xsl:param name="cellStyle" />
     <td class="{$cellStyle}">
