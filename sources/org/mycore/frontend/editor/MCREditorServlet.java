@@ -232,9 +232,11 @@ public class MCREditorServlet extends MCRServlet implements MCRSessionListener {
             editor.addContent(sub.buildInputElements());
             editor.addContent(sub.buildRepeatElements());
         }
-        else
+        else {
+            MCREditorDefReader.fixConditionedVariables( editor );
             logger.debug("Editor is started empty without XML input");
-        
+        }      
+
         String cancelURL = replaceParameters(editor, "cancel", "url", parameters);
         logger.debug("Editor cancel url is " + cancelURL );
         editor.removeChildren("cancel");
