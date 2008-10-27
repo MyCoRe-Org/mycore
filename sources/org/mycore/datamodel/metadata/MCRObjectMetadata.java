@@ -117,7 +117,19 @@ public class MCRObjectMetadata {
 
         return heritMeta;
     }
-
+    
+    /**
+     * <em>removeInheritedMetadata</em> removes all inherited metadata elements  
+     * 
+     */    
+    public final void removeInheritedMetadata() {
+        for (int i = 0; i < size(); ++i) {
+            MCRMetaElement me = meta_list.get(i);
+            if (me.getHeritable())
+                me.removeInheritedObject();
+        }
+    }
+    
     /**
      * This method append MCRMetaElement's from a given MCRObjectMetadata to
      * this data set.

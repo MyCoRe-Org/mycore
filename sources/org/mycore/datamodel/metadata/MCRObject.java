@@ -698,7 +698,11 @@ final public class MCRObject extends MCRBase {
             try {
                 MCRObject parent = new MCRObject();
                 parent.receiveFromDatastore(parent_id);
+                // remove already embedded inherited tags
+                mcr_metadata.removeInheritedMetadata();
+                // insert heritable tags
                 mcr_metadata.appendMetadata(parent.getMetadata().getHeritableMetadata());
+                
             } catch (Exception e) {
                 LOGGER.error(MCRException.getStackTraceAsString(e));
                 LOGGER.error("Error while merging metadata in this object.");
