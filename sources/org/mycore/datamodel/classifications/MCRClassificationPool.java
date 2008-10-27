@@ -2,17 +2,16 @@ package org.mycore.datamodel.classifications;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.MCRUtils;
 
+import org.mycore.common.MCRSessionMgr;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
-import org.mycore.datamodel.classifications2.utils.MCRCategoryTransformer;
 
 /**
  * @author Radi Radichev
@@ -21,29 +20,18 @@ import org.mycore.datamodel.classifications2.utils.MCRCategoryTransformer;
 
 public class MCRClassificationPool {
 
+    /**
+     * stores all edited classifications
+     */
     private HashMap<MCRCategoryID, MCRCategory> classifications = new HashMap<MCRCategoryID, MCRCategory>(); // A
-
-    // Hash
-    // map
-    // to
-    // store
-    // all
-    // edited
-    // classifications
 
     static Logger LOGGER = Logger.getLogger(MCRClassificationPool.class);
 
     private static MCRCategoryDAO DAO = MCRCategoryDAOFactory.getInstance();
 
     public MCRClassificationPool() {
+        //store reference of classifications in current session
         MCRSessionMgr.getCurrentSession().put("classifications", classifications); // Put
-        // the
-        // hash
-        // map
-        // in
-        // the
-        // current
-        // session
     }
 
     /**
@@ -65,18 +53,21 @@ public class MCRClassificationPool {
      * @return
      */
     public boolean saveAll() {
-
-        for (MCRCategory clas : classifications.values()) {
+        synchronized (classifications) {
+            Iterator<MCRCategory> rootCategories = classifications.values().iterator();
             try {
-                LOGGER.debug("Classification to be saved: " + clas.getId());
-                if (DAO.exist(clas.getId())) {
-                    DAO.replaceCategory(clas);
-                } else {
-                    DAO.addCategory(null, clas);
+                while (rootCategories.hasNext()) {
+                    MCRCategory clas = rootCategories.next();
+                    LOGGER.debug("Classification to be saved: " + clas.getId());
+                    if (DAO.exist(clas.getId())) {
+                        DAO.replaceCategory(clas);
+                    } else {
+                        DAO.addCategory(null, clas);
+                    }
+                    rootCategories.remove();
                 }
-                classifications.remove(clas.getId());
             } catch (Exception e) {
-                e.printStackTrace();
+                LOGGER.warn("Error while saving all classifications.", e);
                 return false;
             }
         }
@@ -122,16 +113,15 @@ public class MCRClassificationPool {
         LOGGER.info("Classification: " + cl.getId() + " added to session!");
     }
 
-
     /**
      * Delete a classfication from the pool
      * @param cl
      */
     public void deleteClassification(MCRCategoryID cl) {
-        if(classifications.containsKey(cl))
+        if (classifications.containsKey(cl))
             classifications.remove(cl);
     }
-    
+
     /**
      * This method checks to see if the classification which is expected is in
      * the Session (when edited) or it takes the classification from the
