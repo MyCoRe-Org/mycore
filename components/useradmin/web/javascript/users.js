@@ -350,7 +350,7 @@ function createUserElement(user,name, surname) {
 	Element.writeAttribute(userContainer,{'name':surname});
 	Element.writeAttribute(userContainer,{'id':user});
 	Element.writeAttribute(userContainer,{'title':'header=[Real Name] body=['+name+']'});
-	usrElement.innerHTML='"' + user + '"';
+	usrElement.innerHTML=user;
 	
 	userContainer.appendChild(usrImg);
 	if (surname != "" || name != ""){
