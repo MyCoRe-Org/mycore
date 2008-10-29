@@ -21,8 +21,14 @@ package org.mycore.frontend.servlets;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
@@ -32,7 +38,6 @@ import net.sf.json.JSONObject;
 
 import org.apache.log4j.Logger;
 import org.jdom.Document;
-
 import org.mycore.common.MCRConfiguration;
 import org.mycore.frontend.MCRWebsiteWriteProtection;
 import org.mycore.services.i18n.MCRTranslation;
@@ -45,6 +50,7 @@ import org.mycore.user.MCRUserMgr;
  * administration, with help from Ajax
  * 
  * @author Radi Radichev
+ * @author Huu Chi Vu
  * 
  */
 public class MCRUserAjaxServlet extends MCRServlet {
@@ -139,14 +145,14 @@ public class MCRUserAjaxServlet extends MCRServlet {
             MCRUserMgr.instance().deleteGroup(groupName);
             JSONObject json = new JSONObject();
             json.put("response", "ok");
-            LOGGER.info("JSON STRING" + json.toString());
+            LOGGER.debug("JSON STRING" + json.toString());
             job.getResponse().setContentType("application/x-json");
             job.getResponse().getWriter().print(json);
         } else {
             JSONObject json = new JSONObject();
             json.put("error", "primaryGroup");
             json.put("users", primaryUsers);
-            LOGGER.info("JSON STRING" + json.toString());
+            LOGGER.debug("JSON STRING" + json.toString());
             job.getResponse().setContentType("application/x-json");
             job.getResponse().getWriter().print(json);
         }
@@ -158,14 +164,14 @@ public class MCRUserAjaxServlet extends MCRServlet {
             MCRUserMgr.instance().deleteGroup(groupName);
             JSONObject json = new JSONObject();
             json.put("response", "ok");
-            LOGGER.info("JSON STRING" + json.toString());
+            LOGGER.debug("JSON STRING" + json.toString());
             job.getResponse().setContentType("application/x-json");
             job.getResponse().getWriter().print(json);
         } else {
             JSONObject json = new JSONObject();
             json.put("error", "hasMembers");
             json.put("group", groupName);
-            LOGGER.info("JSON STRING" + json.toString());
+            LOGGER.debug("JSON STRING" + json.toString());
             job.getResponse().setContentType("application/x-json");
             job.getResponse().getWriter().print(json);
         }
@@ -291,19 +297,44 @@ public class MCRUserAjaxServlet extends MCRServlet {
         JSONArray users = new JSONArray();
         JSONArray groups = new JSONArray();
         JSONArray error = new JSONArray();
-
+        
+        List<String> newID = Collections.synchronizedList(new LinkedList<String>());
+        Map idMap = new HashMap();
+        MCRUser UserToAdd;
+        String lastName;
+        String firstName;
+        // this for loop collect the users for a later sorting
+        // sort for lastname, firstname then id
         for (String id : userIDs) {
-            MCRUser UserToAdd = MCRUserMgr.instance().retrieveUser(id);
+            UserToAdd = MCRUserMgr.instance().retrieveUser(id);
+            
             if (UserToAdd == null)
-                LOGGER.info("USERTOADD is NULL");
+                LOGGER.debug("USERTOADD is NULL");
             if (UserToAdd.getUserContact() == null)
-                LOGGER.info("USERCONTACT IS NULL");
+                LOGGER.debug("USERCONTACT IS NULL");
+            
+            lastName = UserToAdd.getUserContact().getLastName();
+            firstName = UserToAdd.getUserContact().getFirstName();
+            
             JSONObject user = new JSONObject();
+            // the field name for the JSON object differ from the java
+            // variable name, because it's not a modification from the original
+            // creator.
+            user.put("name", firstName);
+            user.put("surname", lastName);
             user.put("userID", id);
-            user.put("name", UserToAdd.getUserContact().getFirstName() + " " + UserToAdd.getUserContact().getLastName());
+            idMap.put(lastName + firstName + id, user);
+        }
+        
+        Set idKeys = Collections.synchronizedSet(new TreeSet(idMap.keySet()));
+        
+        for (Iterator iterator = idKeys.iterator(); iterator.hasNext();) {
+            Object idKey = (Object) iterator.next();
+            JSONObject user = (JSONObject ) idMap.get(idKey);
+            
             users.put(user);
         }
-
+        
         for (String groupID : groupsIDs) {
             MCRGroup gruppe = MCRUserMgr.instance().retrieveGroup(groupID);
             ArrayList memUsers = MCRUserMgr.instance().retrieveGroup(groupID).getMemberUserIDs();
@@ -327,7 +358,7 @@ public class MCRUserAjaxServlet extends MCRServlet {
         json.put("users", users);
         json.put("groups", groups);
         json.put("error", error);
-        LOGGER.info("JSON STRING" + json.toString());
+        LOGGER.debug("JSON STRING" + json.toString());
         job.getResponse().setContentType("application/x-json");
         job.getResponse().setCharacterEncoding(CONFIG.getString("MCR.Request.CharEncoding", "UTF-8"));
         job.getResponse().getWriter().print(json);

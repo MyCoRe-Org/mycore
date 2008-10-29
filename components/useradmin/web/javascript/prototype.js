@@ -4014,7 +4014,7 @@ var Position = {
   // set to true if needed, warning: firefox performance problems
   // NOT neeeded for page scrolling, only if draggable contained in
   // scrollable elements
-  includeScrollOffsets: false,
+  includeScrollOffsets: true,
 
   // must be called before calling withinIncludingScrolloffset, every time the
   // page is scrolled

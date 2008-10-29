@@ -1,6 +1,6 @@
 /*Author: Radi Radichev*/
 
-var url;  //URL für den Request
+var url;  //URL fï¿½r den Request
 var data;	//JSON Document 
 var req;
 var background; //Background Color
@@ -20,16 +20,18 @@ function initialize() {
 	data="";
 	
 	$("userManagement").style.display="block";
-	//Den Mülleimer initialisieren
+	//Den Mï¿½lleimer initialisieren
 	Droppables.add("trash",{
 		accept:["usersElement","groupsElement"],
 		onDrop:function(element,drop) {
+	        var msg = confirmDeleteUser;
 			userToUpdate=element.lastChild.innerHTML;
 			groupToUpdate=element.parentNode.parentNode.parentNode.id;
 			if(groupToUpdate=="userManagement") {
 				groupToUpdate=null;
 			}
 			if(userToUpdate==undefined) {
+			    msg = confirmRemoveUserFromGroup;
 				userToUpdate=element.innerHTML;
 			}
 			if(element.className=="groupsElement")
@@ -37,7 +39,7 @@ function initialize() {
 				deleteGroup(element.id);
 			} else {
 				new Effect.Puff(element.id);
-				var result=confirm(confirmDeleteUser);
+				var result=confirm(msg);
 				if(result==true) {
 					deleteUser();
 				} else {
@@ -49,10 +51,9 @@ function initialize() {
 	//Einen Request zum Server schicken, damit die Daten angezeigt werden.
 	url=servletBaseURL+"MCRUserAjaxServlet?mode=users";
 	sendRequest(url,showData);
-	
 }
 
-//Request aufbauen und senden, funct ist eine Funktion die ausgeführt werden soll wenn der Request endet.
+//Request aufbauen und senden, funct ist eine Funktion die ausgefï¿½hrt werden soll wenn der Request endet.
 function sendRequest(url,funct) {
 	new Ajax.Request(url,{
 		onSuccess:function(transport) {
@@ -64,10 +65,10 @@ function sendRequest(url,funct) {
 
 //Alle Daten anzeigen.
 function showData(req) {
-	//Zähler für eindeutige IDs
+    
+	//Zï¿½hler fï¿½r eindeutige IDs
 	groupIndex=0;
 	userIndex=0;
-
 	var usrHeader =	document.createElement("h2");
 	usrHeader.innerHTML=userHdr;
 	var grpHeader =	document.createElement("h2");
@@ -86,10 +87,11 @@ function showData(req) {
 	responseTxt=req.responseText;
 	data=responseTxt.evalJSON();
 	if (document.all) { Droppables.drops = [] }
+	
 	data.users.each(
 		function(user) {
 			itemIndex++;
-			$("usersList").appendChild(createUserElement(user.userID,user.name));
+			$("usersList").appendChild(createUserElement(user.userID,user.name, user.surname));
 			new Draggable(user.userID,{revert:true});
 		}
 	);
@@ -159,6 +161,7 @@ function showData(req) {
 		url=servletBaseURL+"MCRUserAjaxServlet?mode=users";
     	sendRequest(url,showData);
 	}
+	
 }
 
 
@@ -217,7 +220,7 @@ function turnBack(username) {
 		$(groupsArray[i]).style.backgroundColor=background;
 	}
 } 
-//nur die veränderte Gruppe aktualisieren
+//nur die verï¿½nderte Gruppe aktualisieren
 function showGroup(req) {
 	responseTxt=req.responseText;
 	data=responseTxt.evalJSON();
@@ -280,7 +283,7 @@ function showGroup(req) {
 	url=servletBaseURL+"MCRUserAjaxServlet?mode=users";
 	sendRequest(url,showData);
 }
-//Löschen eines Nutzers
+//Lï¿½schen eines Nutzers
 function deleteUser() {
 	url=servletBaseURL+"MCRUserAjaxServlet?mode=delete&user="+userToUpdate+"&group="+groupToUpdate;
 	if(groupToUpdate!=null) {
@@ -320,7 +323,7 @@ function completeDeleteGroup(req) {
    		sendRequest(url,showData);
     }
 }
-//Hinzufügen eines Nutzers in eine Gruppe
+//Hinzufï¿½gen eines Nutzers in eine Gruppe
 function updateGroup() {
 	url=servletBaseURL+"MCRUserAjaxServlet?mode=update&user="+userToUpdate+"&group="+groupToUpdate;
     sendRequest(url,showGroup);
@@ -336,17 +339,24 @@ function createGroupUser(user,group) {
 }
 
 //Aufbauen des Nutzer-Elements in die Nutzerliste
-function createUserElement(user,name) {
+function createUserElement(user,name, surname) {
 	var userContainer=document.createElement("li");
 	var usrImg=document.createElement("img");
 	var usrElement=document.createElement("div")
+	var usrName=document.createElement("div")
 	usrImg.className="avatar";
 	usrImg.setAttribute("src",userImg);
 	Element.addClassName(userContainer,"usersElement");
+	Element.writeAttribute(userContainer,{'name':surname});
 	Element.writeAttribute(userContainer,{'id':user});
 	Element.writeAttribute(userContainer,{'title':'header=[Real Name] body=['+name+']'});
-	usrElement.innerHTML=user;
+	usrElement.innerHTML='"' + user + '"';
+	
 	userContainer.appendChild(usrImg);
+	if (surname != "" || name != ""){
+        usrName.innerHTML= surname + ", " + name;
+        userContainer.appendChild(usrName);
+    }
 	userContainer.appendChild(usrElement);
 	return userContainer;
 }
@@ -377,5 +387,5 @@ function createGroupElement(group,description) {
 }
 
 function aufklappen(id) {
-	Effect.toggle('Content_'+id,'appear');
+	Effect.toggle('Content_'+id,'appear',{ delay: 0.001 });
 }

@@ -20,6 +20,10 @@
       <xsl:value-of
         select="concat('var confirmDeleteUser=&#x22;',i18n:translate('users.confirm.deleteUser'),'&#x22;;')" />
       <xsl:value-of
+        select="concat('var confirmRemoveUserFromGroup=&#x22;',i18n:translate('users.confirm.removeUserFromGroup'),'&#x22;;')" />
+      <xsl:value-of
+        select="concat('var cantDeleteUser=&#x22;',i18n:translate('users.error.cantDeleteUser'),'&#x22;;')" />
+      <xsl:value-of
         select="concat('var userImg=&#x22;',$WebApplicationBaseURL,'templates/master/',$template,'/IMAGES/system-users.png','&#x22;;')" />
       <xsl:value-of
         select="concat('var grpHandle=&#x22;',$WebApplicationBaseURL,'templates/master/',$template,'/IMAGES/handle.png','&#x22;;')" />
