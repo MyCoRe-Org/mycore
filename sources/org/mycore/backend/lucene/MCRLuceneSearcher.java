@@ -55,6 +55,7 @@ import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.store.Directory;
+import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.store.RAMDirectory;
 import org.jdom.Element;
 
@@ -270,20 +271,24 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
         synchronized (CONFIG) {
             long start = System.currentTimeMillis();
             try {
-            	if ( indexReader == null && indexSearcher == null) {
-                    indexReader = IndexReader.open(IndexDir.getAbsolutePath());
+                if (indexReader == null && indexSearcher == null) {
+                    //Lucene 2.4.0 has problems with initializing IndexReader with File|String
+                    //see https://issues.apache.org/jira/browse/LUCENE-1430
+                    FSDirectory indexDir = FSDirectory.getDirectory(IndexDir.getAbsolutePath());
+                    indexReader = IndexReader.open(indexDir);
                     indexSearcher = new IndexSearcher(indexReader);
-            	}
-            	else {
-                IndexReader newReader = indexReader.reopen();
-                if (newReader != indexReader) {
-                    LOGGER.info("new Searcher for index: " + ID);
-                    indexReader.close();
-                    indexSearcher.close();
-                    indexReader = newReader;
-                    indexSearcher = new IndexSearcher(indexReader);
+                } else {
+                    if (!indexReader.isCurrent()) {
+                        IndexReader newReader = indexReader.reopen();
+                        if (newReader != indexReader) {
+                            LOGGER.info("new Searcher for index: " + ID);
+                            indexReader.close();
+                            indexSearcher.close();
+                            indexReader = newReader;
+                            indexSearcher = new IndexSearcher(indexReader);
+                        }
+                    }
                 }
-            	}
 
             } catch (IOException e) {
                 LOGGER.error(e.getClass().getName() + ": " + e.getMessage());
@@ -522,12 +527,10 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
                 useRamDir = true;
             } catch (Exception e) {
             }
-        } else if ("optimize".equals(mode))
-        {
+        } else if ("optimize".equals(mode)) {
             IndexWriterAction modifyAction = IndexWriterAction.optimizeAction(modifyExecutor);
             modifyIndex(modifyAction);
-        }
-        else if (!"finish".equals(mode))
+        } else if (!"finish".equals(mode))
             LOGGER.error("invalid mode " + mode);
     }
 
