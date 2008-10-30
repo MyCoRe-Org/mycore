@@ -89,6 +89,9 @@ public class MCRDirectoryXML {
         addDate(root, "lastModified", dir.getLastModified());
         addString(root, "size", String.valueOf(dir.getSize()));
 
+        String label = dir.getLabel();
+        if( label != null ) addString(root, "label", label );
+
         Element numChildren = new Element("numChildren");
         root.addContent(numChildren);
 
@@ -115,6 +118,10 @@ public class MCRDirectoryXML {
             nodes.addContent(node);
 
             addString(node, "name", children[i].getName());
+            
+            label = children[i].getLabel();
+            if( label != null ) addString(node, "label", label );
+            
             addString(node, "size", String.valueOf(children[i].getSize()));
             addDate(node, "lastModified", children[i].getLastModified());
 
@@ -135,6 +142,12 @@ public class MCRDirectoryXML {
             } else {
                 node.setAttribute("type", "directory");
             }
+            
+            try {
+              Document additional = children[i].getAllAdditionalData();
+              if( additional != null )
+                node.addContent( additional.detachRootElement() );
+            } catch(Exception ignored) {}
         }
 
         return doc;
