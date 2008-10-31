@@ -72,8 +72,7 @@
 
 <!-- ======== handles editor ======== -->
 
-<xsl:template match="editor" xmlns:system="xalan://java.lang.System">
-  <xsl:variable name="time" select="system:nanoTime()" />
+<xsl:template match="editor">
   <form action="{$ServletsBaseURL}XMLEditor{$HttpSession}" accept-charset="UTF-8">
     <xsl:call-template name="editor.set.css" />
     <xsl:call-template name="editor.set.form.attrib" />    
@@ -97,7 +96,6 @@
       </xsl:apply-templates>
     </fieldset>
   </form>
-  <xsl:value-of select="round((number(system:nanoTime())-number($time)) div 1000000)" /> ms<xsl:text/>
 </xsl:template>
 
 <!-- ======== set form attributes ======== -->
