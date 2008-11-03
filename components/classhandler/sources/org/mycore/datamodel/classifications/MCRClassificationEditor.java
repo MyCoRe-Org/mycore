@@ -115,10 +115,10 @@ public class MCRClassificationEditor {
 
             if (!DAO.exist(newID)) {
                 if (!id.getID().equals("empty")) {
-                    
+
                     MCRCategory prevCateg = findCategory(classif, id);
                     LOGGER.debug("Previous Category: " + prevCateg.getId() + " found.");
-                    
+
                     MCRCategory newCategory = MCRXMLTransformer.getCategory(id.getRootID(), newCateg, 1);
                     prevCateg.getChildren().add(newCategory);
                     MCRClassificationBrowserData.getClassificationPool().updateClassification(classif);
@@ -127,7 +127,7 @@ public class MCRClassificationEditor {
                     return true;
                 } else {
                     MCRCategory newCategory = MCRXMLTransformer.getCategory(id.getRootID(), newCateg, 1);
-                    LOGGER.debug("Adding category:" + newCategory.getId()+" to classification: "+classif.getId());
+                    LOGGER.debug("Adding category:" + newCategory.getId() + " to classification: " + classif.getId());
                     classif.getChildren().add(newCategory);
                     MCRClassificationBrowserData.getClassificationPool().updateClassification(classif);
                     String sessionID = MCRSessionMgr.getCurrentSession().getID();
@@ -481,7 +481,7 @@ public class MCRClassificationEditor {
                     String sessionID = MCRSessionMgr.getCurrentSession().getID();
                     MCRClassificationBrowserData.ClassUserTable.put(classif.getId().getRootID(), sessionID);
                     cnt = links.size();
-                    LOGGER.info("Classif: "+classif.getId().getRootID());
+                    LOGGER.info("Classif: " + classif.getId().getRootID());
                 }
             } else {
                 LOGGER.warn("Category " + categid + " in classification: " + clid + " not found! - nothing todo");
@@ -489,7 +489,7 @@ public class MCRClassificationEditor {
 
             return cnt;
         } catch (Exception e1) {
-            LOGGER.error("Categorie delete failed - the Reason is:" + e1.getMessage()+" "+e1.toString());
+            LOGGER.error("Categorie delete failed - the Reason is:" + e1.getMessage() + " " + e1.toString());
             e1.printStackTrace();
             return 1;
         }
@@ -506,9 +506,12 @@ public class MCRClassificationEditor {
         LOGGER.debug("Start delete classification " + clid);
         try {
             MCRCategoryID mcrclid = MCRCategoryID.rootID(clid);
-            MCRCategoryDAOFactory.getInstance().deleteCategory(mcrclid);
-            LOGGER.debug("Classification: " + clid + " deleted.");
+            //only delete with DAO if Classification really exists.
+            if (DAO.exist(mcrclid)) {
+                DAO.deleteCategory(mcrclid);
+            }
             MCRClassificationBrowserData.getClassificationPool().deleteClassification(mcrclid);
+            LOGGER.debug("Classification: " + clid + " deleted.");
             return true;
         } catch (Exception e) {
             LOGGER.error("Classification delete failed - the Reason is:" + e.getMessage() + " .");

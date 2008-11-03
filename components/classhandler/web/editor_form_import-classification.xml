@@ -1,63 +1,58 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE MyCoReWebPage>
 
-<!-- ============================================== -->
-<!-- $Revision: 1.4 $ $Date: 2007-05-04 11:35:52 $ -->
-<!-- ============================================== -->
+  <!-- ============================================== -->
+  <!-- $Revision: 1.4 $ $Date: 2007-05-04 11:35:52 $ -->
+  <!-- ============================================== -->
 
 <MyCoReWebPage>
 
-<section title="Importieren einer Klassifikation" xml:lang="de">
-</section>
+  <section title="Importieren einer Klassifikation" xml:lang="de">
+  </section>
 
-<section title="Import a new classification" xml:lang="en">
-</section>
+  <section title="Import a new classification" xml:lang="en">
+  </section>
 
-<section xml:lang="all">
-<editor id="import-class">
- <source uri="{sourceUri}" />
- <target type="servlet" name="MCRStartClassEditorServlet" method="get" format="xml" />
- <cancel url="{cancelUrl}" />
- 
- <components root="import-classification" var="/mycoreclass">
+  <section xml:lang="all">
+    <editor id="import-class">
+      <source uri="{sourceUri}" />
+      <target type="servlet" name="MCRStartClassEditorServlet" method="get" format="xml" />
+      <cancel url="{cancelUrl}" />
 
-  <include uri="webapp:editor/imports-common-classhandler.xml" />
+      <components root="import-classification" var="/mycoreclass">
 
-  <headline anchor="CENTER">
-   <text i18n="component.classhandler.headline.impclass" />
-  </headline>
+        <include uri="webapp:editor/imports-common-classhandler.xml" />
 
-  <panel id="import-classification">	  	  
-    <cell col="1" row="1" anchor="NORTHWEST" ref="LFileP" />
-    <cell col="2" row="1" anchor="NORTHWEST" ref="DFileUploadDoc" />
-    <cell col="3" row="1" anchor="NORTHWEST" >
-      <space width="20" height="0" />
-    </cell>
-    <cell col="4" row="1" anchor="WEST" ref="HFile" />
-    <cell col="2" row="2" anchor="NORTHWEST" ref="DFileUploadHint" />
-    <cell col="2" row="3" anchor="NORTHWEST" ref="RBupdate" />
-    <cell col="1" row="4" anchor="EAST"      ref="TwoButtons"  />
-  </panel>
-	 
-  <panel id="DFileUploadDoc" lines="on">
-    <cell row="1" col="1" anchor="WEST" var="pathes/path">
-      <file width="60" maxlength="50000000" />
-    </cell>  
-  </panel>
-	 
-  <panel id="RBupdate" lines="on">
-    <cell row="1" col="1" anchor="WEST" var="update">
-	  <list id="Supdate" width="400" type="radio" cols="2" default="true">
-        <item value="true" default="true" i18n="component.classhandler.label.impclass.aclid" />
-        <item value="false" i18n="component.classhandler.label.impclass.bclid" />
-      </list>		
-    </cell>  
-  </panel>
+        <headline anchor="CENTER">
+          <text i18n="component.classhandler.headline.impclass" />
+        </headline>
 
- </components>
-</editor>
-</section>
-	
+        <panel id="import-classification">
+          <cell row="1" col="1" anchor="NORTHWEST">
+            <text i18n="component.classhandler.label.impclass.file" />
+          </cell>
+          <cell row="1" col="2" anchor="NORTHWEST" var="pathes/path">
+            <file width="60" maxlength="50000000" />
+          </cell>
+          <cell col="1" row="4" anchor="EAST" ref="TwoButtons" />
+        </panel>
+
+        <panel id="DFileUploadDoc" lines="on">
+        </panel>
+
+        <panel id="RBupdate" lines="on">
+          <cell row="1" col="1" anchor="WEST" var="update">
+            <list id="Supdate" width="400" type="radio" cols="2" default="true">
+              <item value="false" default="false" i18n="component.classhandler.label.impclass.aclid" />
+              <item value="true" i18n="component.classhandler.label.impclass.bclid" />
+            </list>
+          </cell>
+        </panel>
+
+      </components>
+    </editor>
+  </section>
+
 </MyCoReWebPage>
 
 
