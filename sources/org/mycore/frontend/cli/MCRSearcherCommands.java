@@ -98,12 +98,10 @@ public class MCRSearcherCommands extends MCRAbstractCommands {
             Session session = MCRHIBConnection.instance().getSession();
             Criteria xmlCriteria = session.createCriteria(MCRXMLTABLE.class);
             for (Object result : xmlCriteria.list()) {
-                long start = System.currentTimeMillis();
                 MCRXMLTABLE xmlEntry = (MCRXMLTABLE) result;
                 if (xmlEntry.getType().equals("derivate"))
                     continue;
                 addMetaToIndex(xmlEntry, false, searcher);
-                MCRCommandLineInterface.addMillis(System.currentTimeMillis() - start);
             }
             searcher.notifySearcher("finish");
             LOGGER.info("Done building index " + searcherID);
