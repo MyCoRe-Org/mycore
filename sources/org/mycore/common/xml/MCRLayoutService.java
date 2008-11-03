@@ -99,7 +99,7 @@ import org.mycore.user.MCRUserMgr;
 public class MCRLayoutService implements org.apache.xalan.trace.TraceListener {
 
     /** A cache of already compiled stylesheets */
-    private static MCRCache STYLESHEETS_CACHE = new MCRCache(MCRConfiguration.instance().getInt("MCR.LayoutService.XSLCacheSize",100), "XSLT Stylesheets");
+    private static MCRCache STYLESHEETS_CACHE = new MCRCache(MCRConfiguration.instance().getInt("MCR.LayoutService.XSLCacheSize", 100), "XSLT Stylesheets");
 
     private static MCRXMLResource XML_RESOURCE = MCRXMLResource.instance();
 
@@ -134,9 +134,11 @@ public class MCRLayoutService implements org.apache.xalan.trace.TraceListener {
             public void error(TransformerException ex) {
                 throw new MCRException("Error in transformer factory", ex);
             }
+
             public void fatalError(TransformerException ex) {
                 throw new MCRException("Fatal error in transformer factory", ex);
             }
+
             public void warning(TransformerException ex) {
                 LOGGER.warn(ex.getMessageAndLocation());
             }
@@ -240,17 +242,16 @@ public class MCRLayoutService implements org.apache.xalan.trace.TraceListener {
     }
 
     public Document doLayout(Document doc, String stylesheetName, Hashtable<String, String> params) throws Exception {
-        HttpServletRequest req = null;
         MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
         MCRServletJob job = (MCRServletJob) mcrSession.get("MCRServletJob");
-        if (job != null)
-            req = job.getRequest();
-
-        Properties parameters = buildXSLParameters(req);
-        if (null != params)
-            parameters.putAll(params);
         Templates stylesheet = buildCompiledStylesheet(stylesheetName);
         Transformer transformer = buildTransformer(stylesheet);
+        Properties parameters = new Properties();
+        if (job != null) {
+            parameters = buildXSLParameters(job.getRequest());
+            if (null != params)
+                parameters = new Properties();
+        }
         setXSLParameters(transformer, parameters);
         JDOMResult out = new JDOMResult();
         transformer.transform(new JDOMSource(doc), out);
@@ -277,9 +278,8 @@ public class MCRLayoutService implements org.apache.xalan.trace.TraceListener {
         }
     }
 
-
     private void transform(HttpServletResponse res, Source sourceXML, String docType, Properties parameters, String resourceName) throws IOException {
-        Templates stylesheet=buildCompiledStylesheet(resourceName);
+        Templates stylesheet = buildCompiledStylesheet(resourceName);
         transform(res, sourceXML, docType, parameters, stylesheet);
     }
 
@@ -288,9 +288,9 @@ public class MCRLayoutService implements org.apache.xalan.trace.TraceListener {
         LOGGER.debug("MCRLayoutService using style " + style);
 
         String styleName = buildStylesheetName(docType, style);
-        boolean resourceExist=false;
+        boolean resourceExist = false;
         try {
-            resourceExist=XML_RESOURCE.exists(styleName, this.getClass().getClassLoader());
+            resourceExist = XML_RESOURCE.exists(styleName, this.getClass().getClassLoader());
             if (resourceExist) {
                 return styleName;
             }
@@ -454,45 +454,37 @@ public class MCRLayoutService implements org.apache.xalan.trace.TraceListener {
     }
 
     private void reportCompileError(String resource, Exception exc) {
-        StringBuffer msg = new StringBuffer( "Error compiling XSL stylesheet " );
-        msg.append( resource );
-        
-        while( exc != null )
-        {
-          if( exc instanceof MCRException )
-          {
-            MCRException mex = (MCRException)exc;
-            msg.append( "\n" ).append( mex.getMessage() );
-            exc = mex.getException();
-          }
-          else if( exc instanceof TransformerException )
-          {
-            TransformerException tex = (TransformerException)exc;
-            msg.append( "\n" ).append( tex.getMessage() );
-            SourceLocator sl = tex.getLocator();
-            if( sl != null )
-                msg.append( " at line " ).append( sl.getLineNumber() ).append( " column " ).append( sl.getColumnNumber() );
-            
-            if( tex.getCause() instanceof Exception ) 
-                exc = (Exception)( tex.getCause() );
-            else 
-                exc = null;
-          }
-          else if( exc instanceof WrappedRuntimeException )
-          {
-            exc = ((WrappedRuntimeException)exc).getException();
-          }
-          else
-          {
-            msg.append( "\n" ).append( exc.getMessage() );
-            if( exc.getCause() instanceof Exception )
-              exc = (Exception)( exc.getCause() );
-            else
-              exc = null;
-          }
+        StringBuffer msg = new StringBuffer("Error compiling XSL stylesheet ");
+        msg.append(resource);
+
+        while (exc != null) {
+            if (exc instanceof MCRException) {
+                MCRException mex = (MCRException) exc;
+                msg.append("\n").append(mex.getMessage());
+                exc = mex.getException();
+            } else if (exc instanceof TransformerException) {
+                TransformerException tex = (TransformerException) exc;
+                msg.append("\n").append(tex.getMessage());
+                SourceLocator sl = tex.getLocator();
+                if (sl != null)
+                    msg.append(" at line ").append(sl.getLineNumber()).append(" column ").append(sl.getColumnNumber());
+
+                if (tex.getCause() instanceof Exception)
+                    exc = (Exception) (tex.getCause());
+                else
+                    exc = null;
+            } else if (exc instanceof WrappedRuntimeException) {
+                exc = ((WrappedRuntimeException) exc).getException();
+            } else {
+                msg.append("\n").append(exc.getMessage());
+                if (exc.getCause() instanceof Exception)
+                    exc = (Exception) (exc.getCause());
+                else
+                    exc = null;
+            }
         }
-        
-        LOGGER.error( msg );
+
+        LOGGER.error(msg);
         throw new MCRConfigurationException(msg.toString(), exc);
     }
 
@@ -590,9 +582,9 @@ public class MCRLayoutService implements org.apache.xalan.trace.TraceListener {
         } finally {
             out.close();
         }
-        
-        OutputStream sos = response.getOutputStream(); 
-        sos.write( out.toByteArray() );
+
+        OutputStream sos = response.getOutputStream();
+        sos.write(out.toByteArray());
         sos.close();
     }
 
