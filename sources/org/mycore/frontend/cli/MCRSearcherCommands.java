@@ -32,7 +32,6 @@ import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.hibernate.Criteria;
-import org.hibernate.ScrollableResults;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 import org.jdom.Document;
@@ -45,10 +44,8 @@ import org.mycore.backend.hibernate.tables.MCRFSNODES;
 import org.mycore.backend.hibernate.tables.MCRXMLTABLE;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.xml.MCRXMLResource;
-import org.mycore.datamodel.common.MCRXMLTableManager;
 import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.ifs.MCRFileMetadataManager;
-import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.services.fieldquery.MCRData2Fields;
 import org.mycore.services.fieldquery.MCRFieldDef;
 import org.mycore.services.fieldquery.MCRFieldValue;
@@ -72,10 +69,6 @@ public class MCRSearcherCommands extends MCRAbstractCommands {
     private static final String SEARCHER_CLASS_SUFFIX = ".Class";
 
     private static final String SEARCHER_INDEX_SUFFIX = ".Index";
-
-    private static enum XMLRootNames {
-        mycoreobject, mycorederivate
-    }
 
     private static final Namespace MYCORE_NS = Namespace.getNamespace("mcr", "http://www.mycore.org/");
 
@@ -104,12 +97,13 @@ public class MCRSearcherCommands extends MCRAbstractCommands {
             searcher.notifySearcher("insert");
             Session session = MCRHIBConnection.instance().getSession();
             Criteria xmlCriteria = session.createCriteria(MCRXMLTABLE.class);
-            ScrollableResults result = xmlCriteria.scroll();
-            while (result.next()) {
-                MCRXMLTABLE xmlEntry = (MCRXMLTABLE) result.get(0);
+            for (Object result : xmlCriteria.list()) {
+                long start = System.currentTimeMillis();
+                MCRXMLTABLE xmlEntry = (MCRXMLTABLE) result;
                 if (xmlEntry.getType().equals("derivate"))
                     continue;
                 addMetaToIndex(xmlEntry, false, searcher);
+                MCRCommandLineInterface.addMillis(System.currentTimeMillis() - start);
             }
             searcher.notifySearcher("finish");
             LOGGER.info("Done building index " + searcherID);
@@ -136,15 +130,15 @@ public class MCRSearcherCommands extends MCRAbstractCommands {
             Session session = MCRHIBConnection.instance().getSession();
             Criteria fileCriteria = session.createCriteria(MCRFSNODES.class);
             fileCriteria.add(Restrictions.eq("type", "F"));
-            ScrollableResults result = fileCriteria.scroll();
-            while (result.next()) {
-                MCRFSNODES node = (MCRFSNODES) result.get(0);
+            for (Object result : fileCriteria.list()) {
+                MCRFSNODES node = (MCRFSNODES) result;
                 GregorianCalendar greg = new GregorianCalendar();
                 greg.setTime(node.getDate());
                 MCRFile file = (MCRFile) MCRFileMetadataManager.instance().buildNode(node.getType(), node.getId(), node.getPid(), node.getOwner(),
                         node.getName(), node.getLabel(), node.getSize(), greg, node.getStoreid(), node.getStorageid(), node.getFctid(), node.getMd5(),
                         node.getNumchdd(), node.getNumchdf(), node.getNumchtd(), node.getNumchtf());
                 addFileToIndex(file, false, searcher);
+                session.evict(result);
             }
             searcher.notifySearcher("finish");
             LOGGER.info("Done building index " + searcherID);
