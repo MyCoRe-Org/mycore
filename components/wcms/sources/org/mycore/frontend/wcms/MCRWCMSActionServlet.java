@@ -664,8 +664,20 @@ public class MCRWCMSActionServlet extends MCRWCMSServlet {
             try {
                 Document doc = getXMLAsJDOM(inputFile);
                 Element root = doc.getRootElement();
+
+                // Bug work around. When a page as neighboor of a link shall be created, the mode will changed
+                // by a sub method (valitate) of getParentAttribute. This behaviour is not correct.
+                // So, the mode will be kept as set before.
+                String modeBefore = new String(mode);
+
                 if (!mcrSession.get("mode").toString().equals("extern"))
                     validate(root);
+
+                // Bug work around. When a page as neighboor of a link shall be created, the mode will changed
+                // by a sub method (valitate) of getParentAttribute. This behaviour is not correct.
+                // So, the mode will be kept as set before.
+                if (!mode.equals(modeBefore))
+                    mode = modeBefore;
 
                 Element actElem = findActElem(root, attribute, avalue);
                 List neighbors = ((Element) actElem.getParent()).getChildren();
@@ -1555,7 +1567,19 @@ public class MCRWCMSActionServlet extends MCRWCMSServlet {
             } else {
                 // implement here (add, intern, predecessor, successor)1
                 labelPath = labelPath.substring(0, labelPath.indexOf('/') + 1) + label;
+
+                // Bug work around. When a page as neighboor of a link shall be created, the mode will changed
+                // by a sub method (valitate) of getParentAttribute. This behaviour is not correct.
+                // So, the mode will be kept as set before.
+                String modeBefore = new String(mode);
+
                 href = getParentAttribute(naviFile, "href", href, "href", "dir");
+
+                // Bug work around. When a page as neighboor of a link shall be created, the mode will changed
+                // by a sub method (valitate) of getParentAttribute. This behaviour is not correct.
+                // So, the mode will be kept as set before.
+                if (!mode.equals(modeBefore))
+                    mode = modeBefore;
 
                 // not a root item (direct child of a menu node )
                 if (href.toLowerCase().endsWith(".xml") || href.toLowerCase().endsWith(".html")) {
