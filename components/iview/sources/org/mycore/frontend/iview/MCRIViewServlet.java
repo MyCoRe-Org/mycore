@@ -591,6 +591,7 @@ public class MCRIViewServlet extends MCRServlet {
                         MCRFile file = (MCRFile) (children[i]);
                         addChild(node, "contentType", file.getContentTypeID());
                         addChild(node, "md5", file.getMD5());
+                        addChild(node, "label", file.getLabel());
                     } else
                         node.setAttribute("type", "directory");
                 }
