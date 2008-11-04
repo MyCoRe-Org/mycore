@@ -254,8 +254,7 @@
           <xsl:call-template name="repeater.pmud">
             <xsl:with-param name="var" select="$var" />
             <xsl:with-param name="num" select="$num" />
-            <xsl:with-param name="min" select="$rep/@min" />
-            <xsl:with-param name="max" select="$rep/@max" />
+            <xsl:with-param name="rep" select="$rep" />
           </xsl:call-template>
         </xsl:if>
         <xsl:call-template name="repeated.component">
@@ -267,8 +266,7 @@
           <xsl:call-template name="repeater.pmud">
             <xsl:with-param name="var" select="$var" />
             <xsl:with-param name="num" select="$num" />
-            <xsl:with-param name="min" select="$rep/@min" />
-            <xsl:with-param name="max" select="$rep/@max" />
+            <xsl:with-param name="rep" select="$rep" />
           </xsl:call-template>
         </xsl:if>
       </tr>
@@ -317,11 +315,10 @@
 <xsl:template name="repeater.pmud">
   <xsl:param name="var" />
   <xsl:param name="num" />
-  <xsl:param name="min" />
-  <xsl:param name="max" />
+  <xsl:param name="rep" />
 
   <td class="editorPMUD">
-    <xsl:if test="number($num) &lt; number($max)">
+    <xsl:if test="number($num) &lt; number($rep/@max)">
       <input tabindex="999" type="image" name="_p-{$var}-{position()}" src="{$WebApplicationBaseURL}images/pmud-plus.png"/>
     </xsl:if>
   </td>
@@ -330,16 +327,21 @@
       <input tabindex="999" type="image" name="_m-{$var}-{position()}" src="{$WebApplicationBaseURL}images/pmud-minus.png"/>
     </xsl:if>
   </td>
-  <td class="editorPMUD">
-    <xsl:if test="(position() &lt; number($num)) or (position() &lt; number($min))">
-      <input tabindex="999" type="image" name="_d-{$var}-{position()}" src="{$WebApplicationBaseURL}images/pmud-down.png"/>
-    </xsl:if>
-  </td>
-  <td class="editorPMUD">
-    <xsl:if test="position() &gt; 1">
-      <input tabindex="999" type="image" name="_u-{$var}-{position()}" src="{$WebApplicationBaseURL}images/pmud-up.png"/>
-    </xsl:if>
-  </td>
+  <xsl:choose>
+    <xsl:when test="$rep/@arrows='false'" />
+    <xsl:otherwise>
+      <td class="editorPMUD">
+        <xsl:if test="(position() &lt; number($num)) or (position() &lt; number($rep/@min))">
+          <input tabindex="999" type="image" name="_d-{$var}-{position()}" src="{$WebApplicationBaseURL}images/pmud-down.png"/>
+        </xsl:if>
+      </td>
+      <td class="editorPMUD">
+        <xsl:if test="position() &gt; 1">
+          <input tabindex="999" type="image" name="_u-{$var}-{position()}" src="{$WebApplicationBaseURL}images/pmud-up.png"/>
+        </xsl:if>
+      </td>
+    </xsl:otherwise>
+  </xsl:choose>
 </xsl:template>
 
 <!-- ======== handle panel ======== -->
