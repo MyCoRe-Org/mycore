@@ -200,26 +200,6 @@
     <echo>
 
     ========================================  
-      Stop web application server ...
-    ========================================  
-
-    </echo>
-    <antcall target="run">
-      <param name="command" value="jettystop" />
-    </antcall>
-    <echo>
-
-    ========================================  
-      Stop HSQLDB ...
-    ========================================  
-
-    </echo>
-    <antcall target="run">
-      <param name="command" value="hsqldbstop" />
-    </antcall>
-    <echo>
-
-    ========================================  
       Show HTML downloaded ...
     ========================================  
 
