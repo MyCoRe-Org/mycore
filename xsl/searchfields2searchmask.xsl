@@ -253,7 +253,7 @@
     </xsl:if>
     
     <cell row="{number($pos)*2}" col="1" colspan="2" anchor="NORTHWEST" var="conditions/boolean/boolean/condition{$pos}">
-      <repeater min="1" max="10">
+      <repeater min="1" max="10" arrows="false">
         <panel>
         
           <cell row="1" col="1" anchor="EAST" width="200px" var="@field">
