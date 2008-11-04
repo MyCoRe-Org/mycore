@@ -513,6 +513,10 @@
             <xsl:value-of select="concat(i18n:translate('iview.name'),':')" />
             <xsl:value-of select="name" />
             <br />
+            <xsl:if test="label">
+              <xsl:value-of select="label" />
+              <br />
+            </xsl:if>
             <xsl:value-of select="concat(i18n:translate('iview.fileSize'),':')" />
             <xsl:value-of select="size" />
             <xsl:value-of select="concat(i18n:translate('iview.bytes'),':')" />
