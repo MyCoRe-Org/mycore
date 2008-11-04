@@ -372,6 +372,11 @@ public class MCREditorServlet extends MCRServlet implements MCRSessionListener {
 
             if (name.length() > 5) {
                 name = root + "/" + name.substring(5);
+                if (name.contains("[@")) {
+                    name = name.replace("[@", "__");
+                    name = name.replace("='", "__");
+                    name = name.replace("']", "");
+                }                
             } else {
                 name = root;
             }
