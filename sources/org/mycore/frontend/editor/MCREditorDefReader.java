@@ -283,7 +283,6 @@ public class MCREditorDefReader
 
     Element components = editor.getChild( "components" );
     String root = components.getAttributeValue( "root" );
-    components.removeAttribute( "root" );
     
     for( int i = 0; i < components.getContentSize(); i++ )
     {
