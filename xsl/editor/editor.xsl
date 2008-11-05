@@ -76,7 +76,7 @@
   <form action="{$ServletsBaseURL}XMLEditor{$HttpSession}" accept-charset="UTF-8">
     <xsl:call-template name="editor.set.css" />
     <xsl:call-template name="editor.set.form.attrib" />    
-    <fieldset>
+    <table cellspacing="0">
       <xsl:call-template name="editor.set.css" />
 
       <!-- ======== if exists, output editor headline ======== -->
@@ -91,10 +91,14 @@
       <input style="width:0px; height:0px; border-width:0px; float:left;" value="submit" type="submit" tabindex="99" />
 
       <!-- ======== start at the root panel ======== -->
-      <xsl:apply-templates select="components/panel">
-        <xsl:with-param name="var" select="components/@var" />
-      </xsl:apply-templates>
-    </fieldset>
+      <tr>
+        <td>
+          <xsl:apply-templates select="components/panel">
+            <xsl:with-param name="var" select="components/@var" />
+          </xsl:apply-templates>
+        </td>
+      </tr>
+    </table>
   </form>
 </xsl:template>
 
@@ -189,21 +193,26 @@
 
 <!-- ======== headline ======== -->
 <xsl:template match="headline">
-  <legend>
-    <xsl:call-template name="editor.set.css" />
-    <xsl:apply-templates select="text | output">
-      <xsl:with-param name="var" select="../@var" />
-    </xsl:apply-templates>
-  </legend>
+  <tr> 
+    <td>
+      <xsl:call-template name="editor.set.css" />
+      <xsl:call-template name="editor.set.anchor" />
+      <xsl:apply-templates select="text | output">
+        <xsl:with-param name="var" select="../@var" />
+      </xsl:apply-templates>
+    </td>
+  </tr>
 </xsl:template>
 
 <!-- ======== validation errors exist ======== -->
 <xsl:template match="failed">
-  <div class="editorMessage">
-    <xsl:for-each select="../validationMessage">
-      <xsl:call-template name="output.label" />
-    </xsl:for-each>
-  </div>
+  <tr>
+    <td class="editorValidationMessage">
+      <xsl:for-each select="ancestor::editor/validationMessage">
+        <xsl:call-template name="output.label" />
+      </xsl:for-each>
+    </td>
+  </tr>
 </xsl:template>
 
 <!-- ======== handle repeater ======== -->

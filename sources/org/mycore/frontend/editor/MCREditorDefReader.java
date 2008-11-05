@@ -70,7 +70,7 @@ public class MCREditorDefReader
     editor = new Element( "editor" );
     editor.setAttribute( "id", ref );
     editor.addContent( include );
-    resolveChildren( editor );
+    resolveIncludes( editor );
     resolveReferences();
     if( validate ) validate( uri, ref );
     

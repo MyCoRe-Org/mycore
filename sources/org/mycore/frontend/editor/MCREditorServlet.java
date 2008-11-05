@@ -206,6 +206,7 @@ public class MCREditorServlet extends MCRServlet implements MCRSessionListener {
             editor.removeContent();
             editor.addContent(editorResolved.cloneContent());
             editor.setAttribute("session", editorResolved.getAttributeValue("session"));
+            editor.setAttribute("class", editorResolved.getAttributeValue("class"));
         }
     }
 
