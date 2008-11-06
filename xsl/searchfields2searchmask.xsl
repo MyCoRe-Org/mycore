@@ -421,7 +421,7 @@
       
   <cell row="96" col="2" anchor="NORTHWEST" var="hosts/host">
     <list type="checkbox" cols="2">
-      <include uri="request:hosts.xml" />
+      <include uri="xslStyle:hosts:webapp:hosts.xml" />
     </list>
   </cell>
 </xsl:template>
