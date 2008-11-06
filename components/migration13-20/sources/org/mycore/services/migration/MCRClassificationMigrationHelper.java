@@ -69,6 +69,7 @@ public class MCRClassificationMigrationHelper {
         // pass through found objects
         int pos = 0;
         long startTime = System.currentTimeMillis();
+        Session session = MCRHIBConnection.instance().getSession();
         for (String id : objIDs) {
             pos++;
             LOGGER.debug("Processing object " + id);
@@ -98,8 +99,10 @@ public class MCRClassificationMigrationHelper {
                 if (pos % 100 == 0 || pos == objectsTotal) {
                     long currentTime = System.currentTimeMillis();
                     long finishTime = currentTime + ((currentTime - startTime) * (objectsTotal - pos) / pos);
-                    LOGGER.info(((pos / objectsTotal) * 100) + " % (" + pos + "/" + objectsTotal + "), estimated finish time is "
-                            + new Date(finishTime));
+                    LOGGER.info(((pos / objectsTotal) * 100) + " % (" + pos + "/" + objectsTotal + "), estimated finish time is " + new Date(finishTime));
+                    //flush a batch of inserts and release memory:
+                    session.flush();
+                    session.clear();
                 }
             } else
                 LOGGER.warn("Object " + id + " linked to category, but it is not in database.");
