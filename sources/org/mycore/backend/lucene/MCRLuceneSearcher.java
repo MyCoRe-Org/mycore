@@ -449,6 +449,7 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
                 }
             } else {
                 if ("date".equals(type) || "time".equals(type) || "timestamp".equals(type)) {
+                    content = content.replaceAll( "\\D", "" ); // Remove any non-digits
                     type = "identifier";
                 } else if ("boolean".equals(type)) {
                     content = "true".equals(content) ? "1" : "0";

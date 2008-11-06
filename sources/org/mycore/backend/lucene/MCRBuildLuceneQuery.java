@@ -194,8 +194,6 @@ public class MCRBuildLuceneQuery {
 
             return pq;
         } else if ("text".equals(fieldtype) && "fuzzy".equals(operator)) // 1.9.05
-                                                                            // future
-                                                                            // use
         {
             Term te;
             value = fixQuery(value);
@@ -203,8 +201,6 @@ public class MCRBuildLuceneQuery {
 
             return new FuzzyQuery(te);
         } else if ("text".equals(fieldtype) && "range".equals(operator)) // 1.9.05
-                                                                            // future
-                                                                            // use
         {
             String lower = null;
             String upper = null;
@@ -342,6 +338,7 @@ public class MCRBuildLuceneQuery {
         if (value.length() == 0) {
             return null;
         }
+        value = value.replaceAll( "\\D", "" ); // Remove any non-digits
         
         String lower = null;
         String upper = null;
