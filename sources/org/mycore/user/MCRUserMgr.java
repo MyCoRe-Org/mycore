@@ -722,87 +722,82 @@ public class MCRUserMgr {
      *            The user or group object which will be imported
      */
     public final synchronized void importUserObject(MCRUserObject obj) throws MCRException {
-        try {
-            // Check that the user system is not locked
-            if (locked) {
-                throw new MCRException("The user component is locked. At the moment write access is denied.");
-            }
-
-            // is it not NULL
-            if (obj == null) {
-                throw new MCRException("The provided user system object is null.");
-            }
-
-            // Check validation
-            if (!obj.isValid()) {
-                throw new MCRException("The data of the provided user or group object is not valid.");
-            }
-
-            // backup up creator and dates
-            String creator = obj.getCreator();
-            java.sql.Timestamp created = obj.getCreationDate();
-            java.sql.Timestamp modified = obj.getModifiedDate();
-
-            // now create the user or group
-            if (obj instanceof MCRUser) {
-                final MCRUser user = (MCRUser) obj;
-                // Check exist user
-                if (mcrUserStore.existsUser(user.getID())) {
-                    throw new MCRException("The user '" + obj.getID() + "' already exists!");
-                }
-                // Check if the primary group exists
-                String primarygroup = user.getPrimaryGroupID();
-                if (!mcrUserStore.existsGroup(primarygroup)) {
-                    throw new MCRException("The primary group of the user '" + obj.getID() + "' does not exist.");
-                }
-                // Check if the groups the user will be a member of really exist
-                List<String> groupIDs = user.getGroupIDs();
-                for (int i = 0; i < groupIDs.size(); i++) {
-                    if (!mcrUserStore.existsGroup((String) groupIDs.get(i))) {
-                        throw new MCRException("The user '" + obj.getID() + "' is linked to the unknown group '" + groupIDs.get(i) + "'.");
-                    }
-                }
-                // At first create the user. The user must be created before
-                // updating the groups because the existence of the user will
-                // be checked while updating the groups.
-                mcrUserStore.createUser(user);
-                // now we update the primary group
-                MCRGroup primGroup = mcrUserStore.retrieveGroup(primarygroup);
-                primGroup.addMemberUserID(user.getID());
-                groupCache.remove(primGroup.getID());
-                mcrUserStore.updateGroup(primGroup);
-                // now update the other groups
-                for (int i = 0; i < groupIDs.size(); i++) {
-                    MCRGroup otherGroup = retrieveGroup((String) groupIDs.get(i), true);
-                    otherGroup.addMemberUserID(user.getID());
-                    groupCache.remove(otherGroup.getID());
-                    mcrUserStore.updateGroup(otherGroup);
-                }
-
-            } else {
-                // Check exist group
-                if (mcrUserStore.existsGroup(((MCRGroup) obj).getID())) {
-                    throw new MCRException("The group '" + obj.getID() + "' already exists!");
-                }
-                // create data
-                mcrUserStore.createGroup((MCRGroup) obj);
-            }
-
-            // finally set the old values and update the user or group
-            obj.setCreator(creator);
-            obj.setCreationDate(created);
-            obj.setModifiedDate(modified);
-
-            if (obj instanceof MCRUser) {
-                mcrUserStore.updateUser((MCRUser) obj);
-            } else {
-                mcrUserStore.updateGroup((MCRGroup) obj);
-            }
-            LOGGER.info("User or group with ID " + obj.getID() + " imported.");
-        } catch (MCRException ex) {
-            setLock(false);
-            throw new MCRException("Can't import user or group.", ex);
+        // Check that the user system is not locked
+        if (locked) {
+            throw new MCRException("The user component is locked. At the moment write access is denied.");
         }
+
+        // is it not NULL
+        if (obj == null) {
+            throw new MCRException("The provided user system object is null.");
+        }
+
+        // Check validation
+        if (!obj.isValid()) {
+            throw new MCRException("The data of the provided user or group object is not valid.");
+        }
+
+        // backup up creator and dates
+        String creator = obj.getCreator();
+        java.sql.Timestamp created = obj.getCreationDate();
+        java.sql.Timestamp modified = obj.getModifiedDate();
+
+        // now create the user or group
+        if (obj instanceof MCRUser) {
+            final MCRUser user = (MCRUser) obj;
+            // Check exist user
+            if (mcrUserStore.existsUser(user.getID())) {
+                throw new MCRException("The user '" + obj.getID() + "' already exists!");
+            }
+            // Check if the primary group exists
+            String primarygroup = user.getPrimaryGroupID();
+            if (!mcrUserStore.existsGroup(primarygroup)) {
+                throw new MCRException("The primary group of the user '" + obj.getID() + "' does not exist.");
+            }
+            // Check if the groups the user will be a member of really exist
+            List<String> groupIDs = user.getGroupIDs();
+            for (int i = 0; i < groupIDs.size(); i++) {
+                if (!mcrUserStore.existsGroup((String) groupIDs.get(i))) {
+                    throw new MCRException("The user '" + obj.getID() + "' is linked to the unknown group '" + groupIDs.get(i) + "'.");
+                }
+            }
+            // At first create the user. The user must be created before
+            // updating the groups because the existence of the user will
+            // be checked while updating the groups.
+            mcrUserStore.createUser(user);
+            // now we update the primary group
+            MCRGroup primGroup = mcrUserStore.retrieveGroup(primarygroup);
+            primGroup.addMemberUserID(user.getID());
+            groupCache.remove(primGroup.getID());
+            mcrUserStore.updateGroup(primGroup);
+            // now update the other groups
+            for (int i = 0; i < groupIDs.size(); i++) {
+                MCRGroup otherGroup = retrieveGroup((String) groupIDs.get(i), true);
+                otherGroup.addMemberUserID(user.getID());
+                groupCache.remove(otherGroup.getID());
+                mcrUserStore.updateGroup(otherGroup);
+            }
+
+        } else {
+            // Check exist group
+            if (mcrUserStore.existsGroup(((MCRGroup) obj).getID())) {
+                throw new MCRException("The group '" + obj.getID() + "' already exists!");
+            }
+            // create data
+            mcrUserStore.createGroup((MCRGroup) obj);
+        }
+
+        // finally set the old values and update the user or group
+        obj.setCreator(creator);
+        obj.setCreationDate(created);
+        obj.setModifiedDate(modified);
+
+        if (obj instanceof MCRUser) {
+            mcrUserStore.updateUser((MCRUser) obj);
+        } else {
+            mcrUserStore.updateGroup((MCRGroup) obj);
+        }
+        LOGGER.info("User or group with ID " + obj.getID() + " imported.");
     }
 
     /**
