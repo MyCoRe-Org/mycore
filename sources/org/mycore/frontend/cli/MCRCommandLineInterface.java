@@ -24,15 +24,18 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.Vector;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.apache.log4j.Logger;
 import org.hibernate.Transaction;
@@ -79,6 +82,8 @@ public class MCRCommandLineInterface {
 
     /** The standard input console where the user enters commands */
     protected static BufferedReader console = new BufferedReader(new InputStreamReader(System.in));
+
+    protected static ConcurrentLinkedQueue<Number> benchList = new ConcurrentLinkedQueue<Number>();
 
     /** The current session */
     private static MCRSession session = null;
@@ -150,6 +155,7 @@ public class MCRCommandLineInterface {
         logger = Logger.getLogger(MCRCommandLineInterface.class);
         session = MCRSessionMgr.getCurrentSession();
         session.setCurrentIP(MCRSession.getLocalIP());
+        session.setCurrentUserID(config.getString("MCR.Users.Superuser.UserName", "administrator"));
         MCRSessionMgr.setCurrentSession(session);
         system = config.getString("MCR.CommandLineInterface.SystemName", "MyCoRe") + ":";
 
@@ -185,17 +191,27 @@ public class MCRCommandLineInterface {
         }
 
         String command = null;
+        String firstCommand = null;
 
         while (true) {
             if (commandQueue.isEmpty()) {
                 if (interactiveMode) {
                     command = readCommandFromPrompt();
                 } else {
+                    if (firstCommand != null)
+                        try {
+                            saveMillis(firstCommand);
+                        } catch (IOException e) {
+                            // TODO Auto-generated catch block
+                            e.printStackTrace();
+                        }
                     exit();
                     // break;
                 }
             } else {
                 command = (String) commandQueue.firstElement();
+                if (firstCommand == null)
+                    firstCommand = command;
                 commandQueue.removeElementAt(0);
                 System.out.println(system + "> " + command);
             }
@@ -271,9 +287,10 @@ public class MCRCommandLineInterface {
                 }
             }
             tx.commit();
-            if (commandsReturned != null)
+            if (commandsReturned != null) {
                 System.out.printf("%s Command processed (%d ms)\n", system, (end - start));
-            else {
+                addMillis(end - start);
+            } else {
                 if (interactiveMode)
                     System.out.printf("%s Command not understood. Enter 'help' to get a list of commands.\n", system);
                 else
@@ -619,6 +636,23 @@ public class MCRCommandLineInterface {
 
     public static void skipOnError() {
         SKIP_FAILED_COMMAND = true;
+    }
+
+    public static void addMillis(long l) {
+        benchList.add(l);
+    }
+
+    public static void clearMillis() {
+        benchList.clear();
+    }
+
+    public static void saveMillis(String fileBaseName) throws IOException {
+        PrintStream fout = new PrintStream(fileBaseName + ".dat");
+
+        for (int i = 1; !benchList.isEmpty(); i++) {
+            fout.printf("%d %d\n", i, benchList.poll().intValue());
+        }
+        fout.close();
     }
 
     /**
