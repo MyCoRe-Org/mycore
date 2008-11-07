@@ -537,7 +537,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         }
         LOGGER.debug("Will load transformer stylesheet " + xslfile + "for export.");
 
-        InputStream in = MCRObjectCommands.class.getResourceAsStream("/" + xslfile);
+        InputStream in = MCRObjectCommands.class.getResourceAsStream("xsl/" + xslfile);
         if (in == null) {
             in = MCRObjectCommands.class.getResourceAsStream(DEFAULT_TRANSFORMER);
         }

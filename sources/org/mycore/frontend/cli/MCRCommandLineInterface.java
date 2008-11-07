@@ -53,7 +53,7 @@ import org.mycore.user.MCRUserMgr;
  * <code>MCRCommand</code>.
  * 
  * @see MCRCommand
- * @author Frank L\u00fctzenkirchen
+ * @author Frank Lützenkirchen
  * @author Detlev Degenhardt
  * @author Jens Kupferschmidt
  * @author Thomas Scheffler (yagee)
