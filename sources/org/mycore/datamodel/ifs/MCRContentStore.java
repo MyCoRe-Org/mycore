@@ -167,7 +167,18 @@ public abstract class MCRContentStore {
      *        use doRetrieveContent(MCRFileReader file) instead
      */
     public void retrieveContent(MCRFileReader file, OutputStream target) throws MCRException {
-        MCRUtils.copyStream(retrieveContent(file), target);
+        InputStream in = null;
+        try {
+            in = retrieveContent(file);
+            MCRUtils.copyStream(in, target);
+        } finally {
+            if (in != null) {
+                try {
+                    in.close();
+                } catch (Exception ignored) {
+                }
+            }
+        }
     }
 
     /**
@@ -176,11 +187,11 @@ public abstract class MCRContentStore {
      * this store instance.
      * 
      * @param file
-     *            the MCRFile thats content should be retrieved
+     *          the MCRFile thats content should be retrieved
      * @param target
-     *            the OutputStream to write the file content to
-     * @deprecated
-     *        use doRetrieveContent(MCRFileReader file) instead
+     *          the OutputStream to write the file content to
+     * @deprecated 
+     *          use doRetrieveContent(MCRFileReader file) instead
      */
     protected abstract void doRetrieveContent(MCRFileReader file, OutputStream target) throws Exception;
 
