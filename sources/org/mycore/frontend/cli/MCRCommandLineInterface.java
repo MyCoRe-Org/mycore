@@ -197,7 +197,7 @@ public class MCRCommandLineInterface {
                 if (interactiveMode) {
                     command = readCommandFromPrompt();
                 } else {
-                    if (firstCommand != null && config.getBoolean("MCR.CLI.SaveRuntimeStatistics", false));
+                    if (firstCommand != null && config.getBoolean("MCR.CLI.SaveRuntimeStatistics", false))
                         try {
                             saveMillis(firstCommand);
                         } catch (IOException e) {
