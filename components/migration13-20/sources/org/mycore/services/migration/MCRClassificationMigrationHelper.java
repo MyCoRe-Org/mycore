@@ -113,10 +113,8 @@ public class MCRClassificationMigrationHelper {
     static void deleteOldCategoryLinks() {
         LOGGER.info("Deleting old object links...");
         final Session session = MCRHIBConnection.instance().getSession();
-        Criteria c = session.createCriteria(MCRLINKHREF.class).add(Restrictions.eq("key.mcrtype", "classid"));
-        for (Object classLink : c.list()) {
-            session.delete(classLink);
-        }
+        int deleted = session.createQuery("DELETE FROM MCRLINKHREF WHERE key.mcrtype='classid'").executeUpdate();
+        LOGGER.info(deleted + " object links deleted.");
     }
 
     @SuppressWarnings("unchecked")
