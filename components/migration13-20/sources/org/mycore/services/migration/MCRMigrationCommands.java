@@ -7,6 +7,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.jdom.JDOMException;
 
+import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRException;
 import org.mycore.datamodel.common.MCRXMLTableManager;
 import org.mycore.datamodel.metadata.MCRObject;
@@ -46,6 +47,7 @@ public class MCRMigrationCommands extends MCRAbstractCommands {
     public static List<String> migrateClassifications() throws JDOMException {
         List<String> cmds = new ArrayList<String>();
         for (int i = 1; i < 4; i++) {
+            cmds.add("internal classificationmigration step " + i);
             cmds.add("internal classificationmigration step " + i);
         }
         return cmds;
@@ -97,9 +99,19 @@ public class MCRMigrationCommands extends MCRAbstractCommands {
             MCRUserMigrationHelper.cleanupUserFile();
             return Collections.emptyList();
         case 8:
-            return Collections.nCopies(1, "import group data from file " + MCRUserMigrationHelper.getGroupFile().getAbsolutePath());
+            ArrayList<String> groupImportCommands = new ArrayList<String>(2);
+            //check if super user has the right to modify group (delete permission - if not)
+            if (!MCRAccessManager.checkPermission("modify-group"))
+                groupImportCommands.add("delete permission modify-group for id POOLPRIVILEGE");
+            groupImportCommands.add("import group data from file " + MCRUserMigrationHelper.getGroupFile().getAbsolutePath());
+            return groupImportCommands;
         case 9:
-            return Collections.nCopies(1, "import user data from file " + MCRUserMigrationHelper.getUserFile().getAbsolutePath());
+            ArrayList<String> userImportCommands = new ArrayList<String>(2);
+            //check if super user has the right to modify user (delete permission - if not)
+            if (!MCRAccessManager.checkPermission("modify-user"))
+                userImportCommands.add("delete permission modify-user for id POOLPRIVILEGE");
+            userImportCommands.add("import user data from file " + MCRUserMigrationHelper.getUserFile().getAbsolutePath());
+            return userImportCommands;
         case 10:
             MCRUserMigrationHelper.updateAdmins();
             return Collections.emptyList();
