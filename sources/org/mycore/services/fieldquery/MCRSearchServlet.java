@@ -215,10 +215,11 @@ public class MCRSearchServlet extends MCRServlet {
             for (int i=0;i<sf.size();i++)
             {
               String name = (String)sf.elementAt(i);
+              String order = getReqParameter(request, name, "ascending");
               name = name.substring(0, name.indexOf(".sortField"));
               Element field = new Element("field");
               field.setAttribute("name", name);
-              field.setAttribute("order", getReqParameter(request, name, "ascending"));
+              field.setAttribute("order", order);
               sortBy.addContent(field);
             }
             
