@@ -99,7 +99,8 @@ public class MCRClassificationMigrationHelper {
                 if (pos % 100 == 0 || pos == objectsTotal) {
                     long currentTime = System.currentTimeMillis();
                     long finishTime = currentTime + ((currentTime - startTime) * (objectsTotal - pos) / pos);
-                    LOGGER.info(((pos / objectsTotal) * 100) + " % (" + pos + "/" + objectsTotal + "), estimated finish time is " + new Date(finishTime));
+                    LOGGER.info((100d * (double) pos / (double) objectsTotal) + " % (" + pos + "/" + objectsTotal + "), estimated finish time is "
+                            + new Date(finishTime));
                     //flush a batch of inserts and release memory:
                     session.flush();
                     session.clear();
