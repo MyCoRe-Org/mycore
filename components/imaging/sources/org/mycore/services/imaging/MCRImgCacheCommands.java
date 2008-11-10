@@ -130,7 +130,7 @@ public class MCRImgCacheCommands extends MCRAbstractCommands {
 
         List<MCRFile> supportedFiles = getSuppFiles(derivate);
         for (MCRFile image : supportedFiles) {
-            returns.add("delete image cache for file " + image.getID());
+            returns.add("create image cache for file " + image.getID());
         }
         return returns;
     }
