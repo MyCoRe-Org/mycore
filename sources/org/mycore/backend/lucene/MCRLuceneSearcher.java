@@ -35,6 +35,7 @@ import java.util.Vector;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -624,7 +625,12 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
                 if (delayedFuture != null && !delayedFuture.isDone()) {
                     cancelDelayedIndexCloser();
                 }
-                delayedFuture = scheduler.schedule(delayedCloser, 2, TimeUnit.SECONDS);
+                try {
+                    delayedFuture = scheduler.schedule(delayedCloser, 2, TimeUnit.SECONDS);
+                } catch (RejectedExecutionException e) {
+                    LOGGER.warn("Cannot schedule delayed IndexWriter closer. Closing IndexWriter now.");
+                    closeIndexWriter();
+                }
             }
         }
 
