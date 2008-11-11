@@ -29,8 +29,8 @@ import java.util.Map;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.mycore.datamodel.classifications2.MCRCategory;
-import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
+import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.MCRLabel;
 
 /**
@@ -84,6 +84,11 @@ public abstract class MCRAbstractCategoryImpl implements MCRCategory {
     }
 
     public MCRCategory getRoot() {
+        if (getId().isRootID())
+            return this;
+        if (this.root == null && getParent() != null) {
+            this.root = getParent().getRoot();
+        }
         return root;
     }
 
@@ -108,7 +113,7 @@ public abstract class MCRAbstractCategoryImpl implements MCRCategory {
     }
 
     public final boolean isClassification() {
-        return (root != null && this.id.equals(root.getId()));
+        return getId().isRootID();
     }
 
     public void setId(MCRCategoryID id) {

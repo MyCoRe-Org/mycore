@@ -33,10 +33,6 @@
     <!-- Values to go up hierarchy fast -->
     <many-to-one name="parent" class="MCRCategoryImpl" not-null="false" cascade="none" column="parentID" access="field" />
 
-    <many-to-one name="root" insert="false" update="false" class="MCRCategoryImpl" cascade="none"
-      formula="(SELECT cat.internalID FROM MCRCategory cat WHERE (cat.ClassID=ClassID and cat.CategID=''))">
-    </many-to-one>
-
     <!-- Values to aquire child categories fast -->
     <property name="level" />
     <property name="left" column="leftValue" />
