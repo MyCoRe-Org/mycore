@@ -6,7 +6,7 @@
 <section xml:lang="all">
   <p>Dies ist ein Test, ein paar leere Floskeln als Lückenfüller.</p>
   
-  <classificationBrowser classification="PACS" category="" 
+  <classificationBrowser classification="DocPortal_class_00000002" category="" 
     uri="true" description="true" 
     class="test" style="" />
   
