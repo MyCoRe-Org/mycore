@@ -159,7 +159,11 @@ public class MCRCategoryImpl extends MCRAbstractCategoryImpl implements Serializ
         return level;
     }
 
-    /**
+    public boolean hasChildren() {
+        return (right - left) > 1;
+    }
+
+        /**
      * @return the positionInParent
      */
     public int getPositionInParent() {
