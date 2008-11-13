@@ -5,7 +5,11 @@
 
 <section xml:lang="all">
   <p>Dies ist ein Test, ein paar leere Floskeln als Lückenfüller.</p>
-  <classificationBrowser classification="DocPortal_class_00000002" />
+  
+  <classificationBrowser classification="PACS" category="" 
+    uri="true" description="true" 
+    class="test" style="" />
+  
   <p>Der Test ist hier beendet.</p>
 </section>
 

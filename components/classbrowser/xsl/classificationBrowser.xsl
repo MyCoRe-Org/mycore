@@ -1,24 +1,40 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
-<!-- ============================================== -->
-<!-- $Revision: 1.9 $ $Date: 2007-10-15 09:58:16 $ -->
-<!-- ============================================== --> 
+<!-- 
+  XSL to include a classification browser into any MyCoReWebPage.
 
-<xsl:stylesheet 
-  version="1.0" 
-  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
->
+  Usage:
+  <classificationBrowser 
+    classification="{ClassificationID}" 
+    category="{CategoryID to start with, optional}" 
+    uri="{true|false, whether to include URI from classification data}" 
+    description="{true|false, whether to include description from category label}" 
+    class="{CSS class, default is 'classificationBrowser'}" 
+    style="{XSL.Style to use, default is classificationBrowserData.xsl}" 
+  />
+ -->
+
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
 <xsl:template match="classificationBrowser">
-  <div class="classificationBrowser">
+  <div>
+    <xsl:attribute name="class">
+      <xsl:choose>
+        <xsl:when test="string-length(@class) &gt; 0">
+          <xsl:value-of select="@class" />
+        </xsl:when>
+        <xsl:otherwise>classificationBrowser</xsl:otherwise>
+      </xsl:choose>
+    </xsl:attribute>
+    
     <script type="text/javascript" src="/javascript/prototype.js"></script>
     <script language="JavaScript">
-      /* <![CDATA[ */
+      /* &lt;![CDATA[ */
      
-      function toogle(classifID,categID)
+      function toogle(categID)
       {
-        var childrenID = 'cbChildren_' + classifID + '_' + categID;
-        var button = document.getElementById( 'cbButton_' + classifID + '_' + categID )
+        var childrenID = 'cbChildren_<xsl:value-of select="@classification" />_' + categID;
+        var button = document.getElementById( 'cbButton_<xsl:value-of select="@classification" />_' + categID );
         var children = document.getElementById( childrenID );
         
         if( button.value == '-' )
@@ -33,12 +49,15 @@
           children.className='cbVisible';
           new Ajax.Updater( childrenID, '/servlets/ClassificationBrowser', 
           { parameters: { 
-            classification : classifID,
-            category : categID
+            classification : '<xsl:value-of select="@classification" />',
+            category       : categID,
+            uri            : '<xsl:value-of select="@uri" />',
+            description    : '<xsl:value-of select="@description" />',
+            style          : '<xsl:value-of select="@style" />'
           } } );      
         } 
       }
-      /* ]]> */
+      /* ]]&gt; */
     </script>
     
     <xsl:variable name="id" select="generate-id(.)" />
@@ -48,7 +67,10 @@
         new Ajax.Updater( '<xsl:value-of select="$id" />', '/servlets/ClassificationBrowser', 
         { parameters : { 
           classification : '<xsl:value-of select="@classification" />', 
-          category       : '<xsl:value-of select="@category" />' 
+          category       : '<xsl:value-of select="@category" />',
+          uri            : '<xsl:value-of select="@uri" />',
+          description    : '<xsl:value-of select="@description" />',
+          style          : '<xsl:value-of select="@style" />'
         } } );
       </script>
     </div>
