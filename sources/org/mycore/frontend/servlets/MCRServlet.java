@@ -141,6 +141,8 @@ public class MCRServlet extends HttpServlet {
         int pos = requestURL.indexOf(contextPath, 9);
 
         BASE_URL = CONFIG.getString("MCR.baseurl", requestURL.substring(0, pos) + contextPath);
+        if (!BASE_URL.endsWith("/"))
+        	BASE_URL = BASE_URL + "/";
         SERVLET_URL = BASE_URL + "servlets/";
         MCRURIResolver.init(context, getBaseURL());
     }
