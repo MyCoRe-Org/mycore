@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE MyCoReWebPage>
+
+<MyCoReWebPage>
+
+<section xml:lang="all">
+  <p>Dies ist ein Test, ein paar leere Floskeln als Lückenfüller.</p>
+  <classificationBrowser classification="PACS" />
+  <p>Der Test ist hier beendet.</p>
+</section>
+
+</MyCoReWebPage>
+
+

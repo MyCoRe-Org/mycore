@@ -1,0 +1,9 @@
+  <servlet id="ClassificationBrowser2">
+    <servlet-name>ClassificationBrowser2</servlet-name>
+    <servlet-class>org.mycore.frontend.servlets.MCRClassificationBrowser2</servlet-class>
+  </servlet>
+
+  <servlet-mapping>
+    <servlet-name>ClassificationBrowser2</servlet-name>
+    <url-pattern>/servlets/ClassificationBrowser</url-pattern>
+  </servlet-mapping>
