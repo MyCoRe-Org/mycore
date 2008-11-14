@@ -33,9 +33,7 @@
   </pre></code>
   
   <classificationBrowser classification="DocPortal_class_00000002" sortBy="label"
-    objectType="document" field="origin" parameters="maxResults=100&amp;numPerPage=10" />
-  
-  <p>Derzeit sind noch nicht alle Funktionen implementiert.</p>
+    objectType="document" field="origin" countLinks="true" parameters="maxResults=100&amp;numPerPage=10" />
 </section>
 
 </MyCoReWebPage>
