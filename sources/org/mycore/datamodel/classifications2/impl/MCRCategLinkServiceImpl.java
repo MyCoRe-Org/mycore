@@ -90,6 +90,7 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
         // for every classID do:
         for (Map.Entry<String, Collection<String>> entry : perClassID.entrySet()) {
             String classID = entry.getKey();
+            LOGGER.debug("counting links for classification: "+classID);
             Query q = session.getNamedQuery(LINK_CLASS.getName() + queryName);
             // query can take long time, please cache result
             q.setCacheable(true);
@@ -108,6 +109,7 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
         }
         // overwrites zero count where database returned a value
         returns.putAll(countLinks);
+        LOGGER.debug("returning countMap");
         return returns;
     }
 
@@ -185,28 +187,41 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
     }
 
     @SuppressWarnings("unchecked")
-    public boolean hasLinks(MCRCategoryID categID) {
+    public Map<MCRCategoryID, Boolean> hasLinks(Collection<MCRCategoryID> categIDs) {
+        //a rather simple implementation
+        boolean useSingleDBQuery = MCRConfiguration.instance().getBoolean("MCR.Classifications.LinkServiceImpl.HasLinks.SingleQuery", false);
+        Map<MCRCategoryID, Number> countMap = useSingleDBQuery ? countLinks(categIDs) : null;
+        HashMap<MCRCategoryID, Boolean> boolMap = new HashMap<MCRCategoryID, Boolean>(categIDs.size());
         Session session = MCRHIBConnection.instance().getSession();
-        LOGGER.debug("first fetch all internalID of all category under " + categID);
-        Criteria classCriteria = session.createCriteria(MCRCategoryImpl.class);
-        classCriteria.setProjection(Projections.property("internalID"));
-        classCriteria.add(Restrictions.eq("rootID", categID.getRootID()));
-        if (!categID.isRootID()) {
-            MCRCategoryImpl category = MCRCategoryDAOImpl.getByNaturalID(session, categID);
-            if (category == null) {
-                LOGGER.warn("Category does not exist: " + categID);
-                return false;
+        for (MCRCategoryID categID : categIDs) {
+            if (useSingleDBQuery) {
+                boolMap.put(categID, countMap.get(categID).intValue() > 0 ? Boolean.TRUE : Boolean.FALSE);
+            } else {
+                LOGGER.debug("first fetch all internalID of all category under " + categID);
+                Criteria classCriteria = session.createCriteria(MCRCategoryImpl.class);
+                classCriteria.setProjection(Projections.property("internalID"));
+                classCriteria.add(Restrictions.eq("rootID", categID.getRootID()));
+                if (!categID.isRootID()) {
+                    MCRCategoryImpl category = MCRCategoryDAOImpl.getByNaturalID(session, categID);
+                    if (category == null) {
+                        LOGGER.warn("Category does not exist: " + categID);
+                        boolMap.put(categID, false);
+                        continue;
+                    }
+                    classCriteria.add(Restrictions.between("left", category.getLeft(), category.getRight()));
+                }
+                List<Number> internalIDs = classCriteria.list();
+                if (internalIDs.size() == 0) {
+                    LOGGER.warn("Category does not exist: " + categID);
+                    boolMap.put(categID, false);
+                    continue;
+                }
+                LOGGER.debug("check if a single linked category is part of " + categID);
+                Query linkQuery = session.getNamedQuery(LINK_CLASS.getName() + ".hasLinks");
+                linkQuery.setParameterList("internalIDs", internalIDs);
+                boolMap.put(categID, linkQuery.iterate().hasNext());
             }
-            classCriteria.add(Restrictions.between("left", category.getLeft(), category.getRight()));
         }
-        List<Number> internalIDs = classCriteria.list();
-        if (internalIDs.size() == 0) {
-            LOGGER.warn("Category does not exist: " + categID);
-            return false;
-        }
-        LOGGER.debug("check if a single linked category is part of " + categID);
-        Query linkQuery = session.getNamedQuery(LINK_CLASS.getName() + ".hasLinks");
-        linkQuery.setParameterList("internalIDs", internalIDs);
-        return linkQuery.iterate().hasNext();
+        return boolMap;
     }
 }

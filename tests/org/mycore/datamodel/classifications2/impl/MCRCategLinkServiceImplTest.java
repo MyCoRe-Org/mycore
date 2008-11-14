@@ -187,14 +187,14 @@ public class MCRCategLinkServiceImplTest extends MCRHibTestCase {
 
     public void testHasLinks() {
         MCRCategoryImpl germany = (MCRCategoryImpl) category.getChildren().get(0).getChildren().get(0);
-        assertFalse("Classification should not be in use", SERVICE.hasLinks(category.getId()));
-        assertFalse("Category should not be in use", SERVICE.hasLinks(germany.getId()));
-        assertFalse("Category does not exist and should be not in use", SERVICE.hasLinks(MCRCategoryID.rootID("foo")));
-        assertFalse("Category does not exist and should be not in use", SERVICE.hasLinks(new MCRCategoryID("foo", "bar")));
+        Collection<MCRCategoryID> germanyCol=Collections.nCopies(1, germany.getId());
+        Collection<MCRCategoryID> worldCol=Collections.nCopies(1, category.getId());
+        assertFalse("Classification should not be in use", SERVICE.hasLinks(worldCol).get(category.getId()).booleanValue());
+        assertFalse("Category should not be in use", SERVICE.hasLinks(germanyCol).get(germany.getId()).booleanValue());
         addTestLinks();
         startNewTransaction();
-        assertTrue("Classification should be in use", SERVICE.hasLinks(category.getId()));
-        assertTrue("Category should be in use", SERVICE.hasLinks(germany.getId()));
+        assertTrue("Classification should be in use", SERVICE.hasLinks(worldCol).get(category.getId()).booleanValue());
+        assertTrue("Category should be in use", SERVICE.hasLinks(germanyCol).get(germany.getId()).booleanValue());
     }
 
     private void loadWorldClassification() throws URISyntaxException {

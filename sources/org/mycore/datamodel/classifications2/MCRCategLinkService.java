@@ -41,7 +41,7 @@ public interface MCRCategLinkService {
      *            the id of a category
      * @return true if the classification is used
      */
-    public abstract boolean hasLinks(MCRCategoryID categID);
+    public abstract Map<MCRCategoryID, Boolean> hasLinks(Collection<MCRCategoryID> categIDs);
 
     /**
      * Counts links to a collection of categories.

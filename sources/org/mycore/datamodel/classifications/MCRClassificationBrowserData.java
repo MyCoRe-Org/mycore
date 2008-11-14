@@ -393,11 +393,10 @@ public class MCRClassificationBrowserData {
 
         LOGGER.debug("get all classification IDs");
         final Set<MCRCategoryID> allIDs = getClassificationPool().getAllIDs();
-        List<MCRCategoryID> ids = new ArrayList<MCRCategoryID>(allIDs.size());
-        ids.addAll(allIDs);
-        LOGGER.debug("fetched all classification IDs");
+        LOGGER.debug("query classification links");
+        final Map<MCRCategoryID, Boolean> countMap = MCRCategLinkServiceFactory.getInstance().hasLinks(allIDs);
 
-        for (MCRCategoryID id : ids) {
+        for (MCRCategoryID id : countMap.keySet()) {
             LOGGER.debug("get classification " + id);
             MCRCategory classif = getClassificationPool().getClassificationAsPojo(id, false);
             LOGGER.debug("get browse element");
@@ -451,13 +450,8 @@ public class MCRClassificationBrowserData {
             cli.setAttribute("browserClass", browserClass);
             setObjectTypes(browserClass);
             LOGGER.debug("counting linked objects");
-            try {
-                Counter = String.valueOf(MCRCategLinkServiceFactory.getInstance().hasLinks(classif.getId()));
-            } catch (Exception ignore) {
-                Counter = "unknown";
-            }
             LOGGER.debug("counting linked objects ... done");
-            cli.setAttribute("hasLinks", Counter);
+            cli.setAttribute("hasLinks", String.valueOf(countMap.get(id).booleanValue()));
             xNavtree.addContent(cli);
         }
         return new Document(xDocument);
@@ -493,6 +487,7 @@ public class MCRClassificationBrowserData {
 
         LOGGER.debug("Show tree for classification:" + classif.getId());
         final MCRCategory cl = getClassificationPool().getClassificationAsPojo(classif.getId(), true);
+        LOGGER.debug("Got classification");
         MCRClassificationPool cp = getClassificationPool();
         MCRLabel labels = getLabel(cl, lang);
         Element xDocument = new Element("classificationBrowse");
@@ -554,7 +549,7 @@ public class MCRClassificationBrowserData {
         final Element CreateButton = new Element("userCanCreate");
         final Element EditButton = new Element("userCanEdit");
         final Element DeleteButton = new Element("userCanDelete");
-
+        LOGGER.debug("now we check this right for the current user");
         // now we check this right for the current user
         if (cp.isEdited(getClassification().getId()) == false) {
             String permString = String.valueOf(AI.checkPermission("create-classification"));
@@ -602,10 +597,20 @@ public class MCRClassificationBrowserData {
 
         int i = 0;
         Element line;
+        List<MCRCategoryID> ids = new ArrayList<MCRCategoryID>();
+        LOGGER.debug("process tree lines: fetch ids");
+        while ((line = getTreeline(i++)) != null) {
+            final String catid = line.getAttributeValue("ID");
+            ids.add(new MCRCategoryID(cl.getId().getRootID(), catid));
+        }
+        i = 0;
+        LOGGER.debug("fetch Map<MCRCategoryID,Boolean>");
+        Map<MCRCategoryID, Boolean> countMap = MCRCategLinkServiceFactory.getInstance().hasLinks(ids);
+        LOGGER.debug("process tree lines: build xml tree");
         while ((line = getTreeline(i++)) != null) {
 
             final String catid = line.getAttributeValue("ID");
-            boolean hasLinks = MCRCategLinkServiceFactory.getInstance().hasLinks(new MCRCategoryID(cl.getId().getRootID(), catid));
+            boolean hasLinks = countMap.get(new MCRCategoryID(cl.getId().getRootID(), catid)).booleanValue();
             final String status = line.getAttributeValue("hasChildren");
 
             Element label = (Element) XPath.selectSingleNode(line, "label[lang('" + lang + "')]");
@@ -673,6 +678,7 @@ public class MCRClassificationBrowserData {
                 comment.setText(description);
             }
         }
+        LOGGER.debug("Building XML document");
 
         xNavtree.setAttribute("rowcount", "" + i);
         xDocument.addContent(xNavtree);
