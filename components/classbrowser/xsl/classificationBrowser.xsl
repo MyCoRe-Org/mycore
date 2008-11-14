@@ -58,6 +58,7 @@
             field          : '<xsl:value-of select="@field" />',
             parameters     : '<xsl:value-of select="@parameters" />',
             restriction    : '<xsl:value-of select="@restriction" />',
+            countResults   : '<xsl:value-of select="@countResults" />',
             addURI         : '<xsl:value-of select="@addURI" />',
             addDescription : '<xsl:value-of select="@addDescription" />',
             style          : '<xsl:value-of select="@style" />'
@@ -80,6 +81,7 @@
           field          : '<xsl:value-of select="@field" />',
           parameters     : '<xsl:value-of select="@parameters" />',
           restriction    : '<xsl:value-of select="@restriction" />',
+          countResults   : '<xsl:value-of select="@countResults" />',
           addURI         : '<xsl:value-of select="@addURI" />',
           addDescription : '<xsl:value-of select="@addDescription" />',
           style          : '<xsl:value-of select="@style" />'

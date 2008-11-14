@@ -41,6 +41,13 @@ import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.MCRLabel;
 import org.mycore.frontend.servlets.MCRServlet;
+import org.mycore.parsers.bool.MCRAndCondition;
+import org.mycore.parsers.bool.MCRCondition;
+import org.mycore.services.fieldquery.MCRFieldDef;
+import org.mycore.services.fieldquery.MCRQuery;
+import org.mycore.services.fieldquery.MCRQueryCondition;
+import org.mycore.services.fieldquery.MCRQueryManager;
+import org.mycore.services.fieldquery.MCRQueryParser;
 
 /**
  * This servlet provides a way to visually navigate through the tree of
@@ -68,23 +75,40 @@ public class MCRClassificationBrowser2 extends MCRServlet
     
     String classifID  = req.getParameter( "classification" ); // Classification ID
     String categID    = req.getParameter( "category" );       // Category ID to start with
-    LOGGER.info( "ClassificationBrowser " + classifID + " " + ( categID == null ? "" : categID ) );   
 
     String objectType  = req.getParameter( "objectType" );  // MCRObject type to search and count
     String field       = req.getParameter( "field" );       // Search field that maps category
     String restriction = req.getParameter( "restriction" ); // Additional query expression
     String parameters  = req.getParameter( "parameters" );  // MCRSearchServlet maxResults=x&numPerPage=y&...
 
+    boolean countResults = Boolean.valueOf( req.getParameter( "countResults" ) ); // count query results?
+    
     boolean uri   = Boolean.valueOf( req.getParameter( "addURI" ) ); // if true, add uri
     boolean descr = Boolean.valueOf( req.getParameter( "addDescription" ) ); // if true, add description
     
+    LOGGER.info( "ClassificationBrowser " + classifID + " " + ( categID == null ? "" : categID ) );   
+
     MCRCategoryID id = new MCRCategoryID( classifID, categID );
     List<MCRCategory> children = MCRCategoryDAOFactory.getInstance().getChildren(id);
     Element xml = new Element( "classificationBrowserData" );
     xml.setAttribute( "classification", classifID );
-    if( objectType != null ) xml.setAttribute( "objectType", objectType );
-    if( field != null ) xml.setAttribute( "field", field );
-    if( restriction != null ) xml.setAttribute( "restriction", restriction );
+
+    MCRAndCondition queryCondition = new MCRAndCondition();
+    MCRQueryCondition categCondition = new MCRQueryCondition( MCRFieldDef.getDef( field ), "=", "DUMMY" );
+    queryCondition.addChild( categCondition );
+
+    if( objectType != null )
+    {
+      xml.setAttribute( "objectType", objectType );
+      MCRCondition cond = new MCRQueryCondition( MCRFieldDef.getDef( "objectType" ), "=", objectType );
+      queryCondition.addChild( cond );
+    }
+    if( restriction != null )
+    { 
+      MCRCondition cond = new MCRQueryParser().parse( restriction );
+      queryCondition.addChild( cond );
+    }
+    
     if( parameters != null ) xml.setAttribute( "parameters", parameters );
     
     List<Element> data = new ArrayList<Element>();
@@ -93,8 +117,18 @@ public class MCRClassificationBrowser2 extends MCRServlet
       Element category = new Element( "category" );
       data.add( category );
 
-      category.setAttribute( "id", child.getId().getID() );
+      String childID = child.getId().getID();
+
+      category.setAttribute( "id", childID );
       category.setAttribute( "children", Boolean.toString( child.hasChildren() ) );
+      category.setAttribute( "query", queryCondition.toString() );
+
+      categCondition.setValue( childID );
+      if( countResults )
+      {
+        int numResults = MCRQueryManager.search( new MCRQuery( queryCondition ) ).getNumHits();
+        category.setAttribute( "numResults", String.valueOf( numResults ) );
+      }
       
       if( uri && ( child.getURI() != null ) ) 
         category.addContent( new Element( "uri" ).setText( child.getURI().toString() ) );

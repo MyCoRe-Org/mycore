@@ -22,34 +22,13 @@
         <xsl:if test="@children = 'true'">
           <input id="cbButton_{$id}" type="button" value="+" onclick="toogle('{@id}');" />
         </xsl:if>
+        <xsl:text> </xsl:text>
         <span class="cbID"><xsl:value-of select="@id" /></span>
-        <a>
-          <xsl:variable name="query">
-            <xsl:text>(</xsl:text>
-            <xsl:value-of select="../@field" />
-            <xsl:text> = </xsl:text>
-            <xsl:value-of select="@id" />
-            <xsl:text>)</xsl:text>
-            <xsl:if test="string-length(../@objectType) &gt; 0">
-              <xsl:text> and (objectType = </xsl:text>
-              <xsl:value-of select="../@objectType" />
-              <xsl:text>)</xsl:text>
-            </xsl:if>
-            <xsl:if test="string-length(../@restriction) &gt; 0">
-              <xsl:text> and (</xsl:text>
-              <xsl:value-of select="../@restriction" />
-              <xsl:text>)</xsl:text>
-            </xsl:if>
-          </xsl:variable>
-          <xsl:attribute name="href">
-            <xsl:value-of select="$ServletsBaseURL" />
-            <xsl:text>MCRSearchServlet?query=</xsl:text>
-            <xsl:value-of select="encoder:encode($query)" />
-            <xsl:if test="string-length(../@parameters) &gt; 0">
-              <xsl:text>&amp;</xsl:text>
-              <xsl:value-of select="../@parameters" />
-            </xsl:if>
-          </xsl:attribute>
+        <xsl:text> </xsl:text>
+        <xsl:if test="@numResults">
+          <span class="cbNum"><xsl:value-of select="@numResults" /></span>
+        </xsl:if>
+        <a href="{$ServletsBaseURL}MCRSearchServlet?query={encoder:encode(@query)}&amp;{../@parameters}">
           <xsl:value-of select="label" />
         </a>
         <xsl:if test="uri">
