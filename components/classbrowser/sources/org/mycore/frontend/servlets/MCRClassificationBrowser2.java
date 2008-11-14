@@ -97,13 +97,13 @@ public class MCRClassificationBrowser2 extends MCRServlet
     MCRQueryCondition categCondition = new MCRQueryCondition( MCRFieldDef.getDef( field ), "=", "DUMMY" );
     queryCondition.addChild( categCondition );
 
-    if( objectType != null )
+    if( ( objectType != null ) && ( objectType.trim().length() > 0 ) )
     {
       xml.setAttribute( "objectType", objectType );
       MCRCondition cond = new MCRQueryCondition( MCRFieldDef.getDef( "objectType" ), "=", objectType );
       queryCondition.addChild( cond );
     }
-    if( restriction != null )
+    if( ( restriction != null ) && ( restriction.trim().length() > 0 ) )
     { 
       MCRCondition cond = new MCRQueryParser().parse( restriction );
       queryCondition.addChild( cond );
@@ -121,9 +121,10 @@ public class MCRClassificationBrowser2 extends MCRServlet
 
       category.setAttribute( "id", childID );
       category.setAttribute( "children", Boolean.toString( child.hasChildren() ) );
-      category.setAttribute( "query", queryCondition.toString() );
 
       categCondition.setValue( childID );
+      category.setAttribute( "query", queryCondition.toString() );
+
       if( countResults )
       {
         int numResults = MCRQueryManager.search( new MCRQuery( queryCondition ) ).getNumHits();

@@ -27,14 +27,14 @@
     Demo:
   
   <classificationBrowser classification="DocPortal_class_00000002" sortBy="label"
-    objectType="document" field="origin" parameters="maxResults=100&amp;numPerPage=10" />
+    objectType="document" field="origin" countResults="true" parameters="maxResults=100&amp;numPerPage=10" />
     ]]>
   </pre></code>
   
   <classificationBrowser classification="DocPortal_class_00000002" sortBy="label"
-    objectType="document" field="origin" parameters="maxResults=100&amp;numPerPage=10" />
+    objectType="document" field="origin" countResults="true" parameters="maxResults=100&amp;numPerPage=10" />
   
-  <p>Derzeit sind noch nicht alle Funktionen implementiert, insbes. fehlt noch das Zählen.</p>
+  <p>Derzeit sind noch nicht alle Funktionen implementiert.</p>
 </section>
 
 </MyCoReWebPage>
