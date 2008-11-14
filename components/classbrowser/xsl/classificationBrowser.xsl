@@ -18,6 +18,8 @@
 
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
+<xsl:param name="RequestURL" />
+
 <xsl:template match="classificationBrowser">
   <div>
     <xsl:attribute name="class">
@@ -32,51 +34,12 @@
     <script type="text/javascript" src="/javascript/prototype.js"></script>
     <script language="JavaScript">
       /* &lt;![CDATA[ */
-     
-      function toogle(categID)
-      {
-        var childrenID = 'cbChildren_<xsl:value-of select="@classification" />_' + categID;
-        var button = document.getElementById( 'cbButton_<xsl:value-of select="@classification" />_' + categID );
-        var children = document.getElementById( childrenID );
-        
-        if( button.value == '-' )
-        {
-          button.value = '+';
-          children.className='cbHidden';
-          children.innerHTML = '';
-        }
-        else
-        {
-          button.value = '-';
-          children.className='cbVisible';
-          new Ajax.Updater( childrenID, '/servlets/ClassificationBrowser', 
-          { parameters: { 
-            classification : '<xsl:value-of select="@classification" />',
-            category       : categID,
-            sortBy         : '<xsl:value-of select="@sortBy" />',
-            objectType     : '<xsl:value-of select="@objectType" />',
-            field          : '<xsl:value-of select="@field" />',
-            parameters     : '<xsl:value-of select="@parameters" />',
-            restriction    : '<xsl:value-of select="@restriction" />',
-            countResults   : '<xsl:value-of select="@countResults" />',
-            countLinks     : '<xsl:value-of select="@countLinks" />',
-            addURI         : '<xsl:value-of select="@addURI" />',
-            addDescription : '<xsl:value-of select="@addDescription" />',
-            style          : '<xsl:value-of select="@style" />'
-          } } );      
-        } 
-      }
-      /* ]]&gt; */
-    </script>
-    
-    <xsl:variable name="id" select="generate-id(.)" />
-    
-    <div id="{$id}" class="cbVisible">
-      <script language="JavaScript">
-        new Ajax.Updater( '<xsl:value-of select="$id" />', '/servlets/ClassificationBrowser', 
-        { parameters : { 
-          classification : '<xsl:value-of select="@classification" />', 
-          category       : '<xsl:value-of select="@category" />',
+      
+      function update(elementID,categID) {
+        new Ajax.Updater( elementID, '/servlets/ClassificationBrowser', 
+        { parameters: { 
+          classification : '<xsl:value-of select="@classification" />',
+          category       : categID,
           sortBy         : '<xsl:value-of select="@sortBy" />',
           objectType     : '<xsl:value-of select="@objectType" />',
           field          : '<xsl:value-of select="@field" />',
@@ -86,8 +49,35 @@
           countLinks     : '<xsl:value-of select="@countLinks" />',
           addURI         : '<xsl:value-of select="@addURI" />',
           addDescription : '<xsl:value-of select="@addDescription" />',
-          style          : '<xsl:value-of select="@style" />'
-        } } );
+          style          : '<xsl:value-of select="@style" />',
+          webpage        : '<xsl:value-of select="$RequestURL" />'
+        } } );      
+      }
+     
+      function toogle(categID) {
+        var childrenID = 'cbChildren_<xsl:value-of select="@classification" />_' + categID;
+        var button = document.getElementById( 'cbButton_<xsl:value-of select="@classification" />_' + categID );
+        var children = document.getElementById( childrenID );
+        
+        if( button.value == '-' ) {
+          button.value = '+';
+          children.className='cbHidden';
+          children.innerHTML = '';
+        }
+        else {
+          button.value = '-';
+          children.className='cbVisible';
+          update( childrenID, categID );
+        } 
+      }
+
+      /* ]]&gt; */
+    </script>
+    
+    <xsl:variable name="id" select="generate-id(.)" />
+    <div id="{$id}" class="cbVisible">
+      <script language="JavaScript">
+        update('<xsl:value-of select="$id" />','<xsl:value-of select="@category" />');
       </script>
     </div>
   </div>

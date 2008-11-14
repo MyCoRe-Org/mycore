@@ -1,5 +1,4 @@
 /*
- * 
  * $Revision: 13278 $ $Date: 2008-03-17 17:12:15 +0100 (Mo, 17 Mrz 2008) $
  *
  * This file is part of ***  M y C o R e  ***
@@ -23,6 +22,8 @@
 
 package org.mycore.frontend.servlets;
 
+import java.io.IOException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -36,7 +37,6 @@ import org.jdom.Document;
 import org.jdom.Element;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.datamodel.classifications2.MCRCategLinkService;
 import org.mycore.datamodel.classifications2.MCRCategLinkServiceFactory;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
@@ -59,132 +59,148 @@ import org.mycore.services.fieldquery.MCRQueryParser;
  * 
  * @author Frank Lützenkirchen
  */
-public class MCRClassificationBrowser2 extends MCRServlet 
-{
-  private static final long serialVersionUID = 1L;
-  
-  private static final Logger LOGGER = Logger.getLogger( MCRClassificationBrowser2.class );
-  
-  private static final String defaultLang = MCRConfiguration.instance().getString( "MCR.Metadata.DefaultLang", "en" );
+public class MCRClassificationBrowser2 extends MCRServlet {
+    private static final long serialVersionUID = 1L;
 
-  public void doGetPost( MCRServletJob job ) throws Exception 
-  {
-    long time = System.nanoTime();
-    
-    String currentLang = MCRSessionMgr.getCurrentSession().getCurrentLanguage();
-    
-    HttpServletRequest req = job.getRequest();
-    
-    String classifID  = req.getParameter( "classification" ); // Classification ID
-    String categID    = req.getParameter( "category" );       // Category ID to start with
+    private static final Logger LOGGER = Logger.getLogger(MCRClassificationBrowser2.class);
 
-    String objectType  = req.getParameter( "objectType" );  // MCRObject type to search and count
-    String field       = req.getParameter( "field" );       // Search field that maps category
-    String restriction = req.getParameter( "restriction" ); // Additional query expression
-    String parameters  = req.getParameter( "parameters" );  // MCRSearchServlet maxResults=x&numPerPage=y&...
+    private static final String defaultLang = MCRConfiguration.instance().getString("MCR.Metadata.DefaultLang", "en");
 
-    boolean countResults = Boolean.valueOf( req.getParameter( "countResults" ) ); // count query results?
-    boolean countLinks   = Boolean.valueOf( req.getParameter( "countLinks" ) );   // count category links?
-    
-    boolean uri   = Boolean.valueOf( req.getParameter( "addURI" ) ); // if true, add uri
-    boolean descr = Boolean.valueOf( req.getParameter( "addDescription" ) ); // if true, add description
-    
-    LOGGER.info( "ClassificationBrowser " + classifID + " " + ( categID == null ? "" : categID ) );   
+    public void doGetPost(MCRServletJob job) throws Exception {
+        long time = System.nanoTime();
 
-    MCRCategoryID id = new MCRCategoryID( classifID, categID );
-    List<MCRCategory> children = MCRCategoryDAOFactory.getInstance().getChildren(id);
-    Element xml = new Element( "classificationBrowserData" );
-    xml.setAttribute( "classification", classifID );
+        HttpServletRequest req = job.getRequest();
 
-    MCRAndCondition queryCondition = new MCRAndCondition();
-    MCRQueryCondition categCondition = new MCRQueryCondition( MCRFieldDef.getDef( field ), "=", "DUMMY" );
-    queryCondition.addChild( categCondition );
+        String classifID = req.getParameter("classification");
+        String categID = req.getParameter("category");
+        String objectType = req.getParameter("objectType");
+        String field = req.getParameter("field");
+        String restriction = req.getParameter("restriction");
+        String parameters = req.getParameter("parameters");
 
-    if( ( objectType != null ) && ( objectType.trim().length() > 0 ) )
-    {
-      xml.setAttribute( "objectType", objectType );
-      MCRCondition cond = new MCRQueryCondition( MCRFieldDef.getDef( "objectType" ), "=", objectType );
-      queryCondition.addChild( cond );
+        boolean countResults = Boolean.valueOf(req.getParameter("countResults"));
+        boolean uri = Boolean.valueOf(req.getParameter("addURI"));
+
+        LOGGER.info("ClassificationBrowser " + classifID + " " + (categID == null ? "" : categID));
+
+        MCRCategoryID id = new MCRCategoryID(classifID, categID);
+        Element xml = new Element("classificationBrowserData");
+        xml.setAttribute("classification", classifID);
+        xml.setAttribute("webpage",req.getParameter("webpage"));
+
+        MCRAndCondition queryCondition = new MCRAndCondition();
+        MCRQueryCondition categCondition = new MCRQueryCondition(MCRFieldDef.getDef(field), "=", "DUMMY");
+        queryCondition.addChild(categCondition);
+
+        if ((objectType != null) && (objectType.trim().length() > 0)) {
+            xml.setAttribute("objectType", objectType);
+            MCRCondition cond = new MCRQueryCondition(MCRFieldDef.getDef("objectType"), "=", objectType);
+            queryCondition.addChild(cond);
+        }
+        if ((restriction != null) && (restriction.trim().length() > 0)) {
+            MCRCondition cond = new MCRQueryParser().parse(restriction);
+            queryCondition.addChild(cond);
+        }
+
+        if (parameters != null)
+            xml.setAttribute("parameters", parameters);
+
+        List<Element> data = new ArrayList<Element>();
+        List<MCRCategory> children = MCRCategoryDAOFactory.getInstance().getChildren(id);
+        for (MCRCategory child : children) {
+            Element category = new Element("category");
+            data.add(category);
+
+            String childID = child.getId().getID();
+
+            category.setAttribute("id", childID);
+            category.setAttribute("children", Boolean.toString(child.hasChildren()));
+
+            categCondition.setValue(childID);
+            category.setAttribute("query", URLEncoder.encode(queryCondition.toString(),"UTF-8"));
+
+            if (countResults) {
+                int numResults = MCRQueryManager.search(new MCRQuery(queryCondition)).getNumHits();
+                category.setAttribute("numResults", String.valueOf(numResults));
+            }
+
+            if (uri && (child.getURI() != null))
+                category.addContent(new Element("uri").setText(child.getURI().toString()));
+
+            addLabel(req, child, category);
+        }
+
+        countLinks(req, objectType, id, data);
+        sortCategories(req, data);
+        xml.addContent(data);
+        renderToHTML(job, req, xml);
+
+        time = (System.nanoTime() - time) / 1000000;
+        LOGGER.info("ClassificationBrowser finished in " + time + " ms");
     }
-    if( ( restriction != null ) && ( restriction.trim().length() > 0 ) )
-    { 
-      MCRCondition cond = new MCRQueryParser().parse( restriction );
-      queryCondition.addChild( cond );
+
+    /**
+     * Add label in current lang, otherwise default lang, optional with
+     * description
+     */
+    private void addLabel(HttpServletRequest req, MCRCategory child, Element category) {
+        String currentLang = MCRSessionMgr.getCurrentSession().getCurrentLanguage();
+
+        Map<String, MCRLabel> labels = child.getLabels();
+        MCRLabel label = labels.get(currentLang);
+        if (label == null)
+            label = labels.get(defaultLang);
+        if (label == null)
+            label = labels.entrySet().iterator().next().getValue();
+
+        category.addContent(new Element("label").setText(label.getText()));
+
+        // if true, add description
+        boolean descr = Boolean.valueOf(req.getParameter("addDescription"));
+        if (descr && (label.getDescription() != null))
+            category.addContent(new Element("description").setText(label.getDescription()));
     }
-    
-    if( parameters != null ) xml.setAttribute( "parameters", parameters );
-    
-    List<Element> data = new ArrayList<Element>();
-    for( MCRCategory child : children )
-    {
-      Element category = new Element( "category" );
-      data.add( category );
 
-      String childID = child.getId().getID();
-
-      category.setAttribute( "id", childID );
-      category.setAttribute( "children", Boolean.toString( child.hasChildren() ) );
-
-      categCondition.setValue( childID );
-      category.setAttribute( "query", queryCondition.toString() );
-
-      if( countResults )
-      {
-        int numResults = MCRQueryManager.search( new MCRQuery( queryCondition ) ).getNumHits();
-        category.setAttribute( "numResults", String.valueOf( numResults ) );
-      }
-      
-      if( uri && ( child.getURI() != null ) ) 
-        category.addContent( new Element( "uri" ).setText( child.getURI().toString() ) );
-
-      // Get label in current lang, otherwise default lang, otherwise whatever available
-      Map<String,MCRLabel> labels = child.getLabels();
-      MCRLabel label = labels.get( currentLang );
-      if( label == null ) label = labels.get( defaultLang );
-      if( label == null ) label = labels.entrySet().iterator().next().getValue();
-      
-      category.addContent( new Element( "label" ).setText( label.getText() ) );
-      if( descr && ( label.getDescription() != null ) ) 
-        category.addContent( new Element( "description" ).setText( label.getDescription() ) );
+    /** Add link count to each category */
+    private void countLinks(HttpServletRequest req, String objectType, MCRCategoryID id, List<Element> data) {
+        if (!Boolean.valueOf(req.getParameter("countLinks")))
+            return;
+        if (objectType.trim().length() == 0)
+            objectType = null;
+        String classifID = id.getRootID();
+        Map<MCRCategoryID, Number> count = MCRCategLinkServiceFactory.getInstance().countLinksForType(id, objectType);
+        for (Element child : data) {
+            MCRCategoryID childID = new MCRCategoryID(classifID, child.getAttributeValue("id"));
+            Number num = count.get(childID);
+            if (num != null)
+                child.setAttribute("numLinks", String.valueOf(num.intValue()));
+            else
+                child.setAttribute("numLinks", "0");
+        }
     }
-    
-    if( countLinks )
-    {
-      if( objectType.trim().length() == 0 ) objectType = null;
-      Map<MCRCategoryID,Number> count = MCRCategLinkServiceFactory.getInstance().countLinksForType(id, objectType);
-      for( Element child : data )
-      {
-        MCRCategoryID childID = new MCRCategoryID( classifID, child.getAttributeValue( "id" ) );
-        Number num = count.get( childID );
-        if( num != null )
-          child.setAttribute( "numLinks", String.valueOf( num.intValue() ) );
-        else
-          child.setAttribute( "numLinks", "0" );
-      }
+
+    /** Sorts by id, by label in current language, or keeps natural order */
+    private void sortCategories(HttpServletRequest req, List<Element> data) {
+        final String sortBy = req.getParameter("sortBy");
+        if (sortBy != null)
+            Collections.sort(data, new Comparator<Element>() {
+                public int compare(Element a, Element b) {
+                    if ("id".equals(sortBy))
+                        return (a.getAttributeValue("id").compareTo(b.getAttributeValue("id")));
+                    else if ("label".equals(sortBy))
+                        return (a.getChildText("label").compareToIgnoreCase(b.getChildText("label")));
+                    else
+                        return 0;
+                }
+            });
     }
-    
-    // Sort categories by id, by label or keep natural sort order
-    final String sortBy = req.getParameter( "sortBy" ); // id, label or nothing ("")
-    if( sortBy != null ) Collections.sort( data, new Comparator<Element>()
-    {        
-      public int compare( Element a, Element b )
-      {
-        if( "id".equals( sortBy ) )
-          return( a.getAttributeValue( "id" ).compareTo( b.getAttributeValue( "id" ) ) );
-        else if( "label".equals( sortBy ) )
-          return( a.getChildText( "label" ).compareToIgnoreCase( b.getChildText( "label" ) ) );
-        else
-          return 0;
-      }
-    } );
-    xml.addContent( data );
 
-    String style = req.getParameter( "style" ); // XSL.Style, optional
-    if( ( style != null ) && ( style.length() > 0 ) )
-      req.setAttribute( "XSL.Style", style );
+    /** Sends output to client browser */
+    private void renderToHTML(MCRServletJob job, HttpServletRequest req, Element xml) throws IOException {
+        String style = req.getParameter("style"); // XSL.Style, optional
+        if ((style != null) && (style.length() > 0))
+            req.setAttribute("XSL.Style", style);
 
-    MCRServlet.getLayoutService().doLayout( req, job.getResponse(), new Document( xml ) );
-    time = ( System.nanoTime() - time ) / 1000000;
-    LOGGER.info( "ClassificationBrowser finished in " + time + " ms" );
-  }
+        MCRServlet.getLayoutService().doLayout(req, job.getResponse(), new Document(xml));
+    }
 }
