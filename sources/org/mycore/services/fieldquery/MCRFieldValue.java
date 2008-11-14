@@ -63,9 +63,7 @@ public class MCRFieldValue {
      */
     public MCRFieldValue(MCRFieldDef field, String value) {
         this.field = field;
-        this.value = value;
-        if (field.getDataType().equals("text") || field.getDataType().equals("name"))
-            this.value = MCRNormalizer.normalizeString(value);
+        setValue(value);
     }
 
     /**
@@ -87,6 +85,17 @@ public class MCRFieldValue {
      */
     public MCRFieldDef getField() {
         return field;
+    }
+    
+    /**
+     * Sets or updates the field value
+     * @param value the value, whicht will be normalized
+     */
+    public void setValue(String value) {
+        if (field.getDataType().equals("text") || field.getDataType().equals("name"))
+            this.value = MCRNormalizer.normalizeString(value);
+        else
+            this.value = value;
     }
 
     /**
