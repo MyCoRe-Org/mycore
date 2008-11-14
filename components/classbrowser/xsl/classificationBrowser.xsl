@@ -4,16 +4,21 @@
   XSL to include a classification browser into any MyCoReWebPage.
 
   Usage:
-  <classificationBrowser 
-    classification="{ClassificationID}" 
-    category="{CategoryID to start with, optional}" 
-    objectType="{MCRObject type, optional}"
-    sortBy="{id|label, optional sort order of categories}"
-    addURI="{true|false, whether to include URI from classification data}" 
-    addDescription="{true|false, whether to include description from category label}" 
-    class="{CSS class, default is 'classificationBrowser'}" 
-    style="{XSL.Style to use, default is classificationBrowserData.xsl}" 
-  />
+    <classificationBrowser 
+      classification="{ClassificationID}" 
+      category="{CategoryID to start with, optional}" 
+      sortBy="{id|label, optional sort order of categories}"
+      objectType="{MCRObject type, optional}"
+      field="{search field for category queries in this classification}"
+      restriction="{additional query expression}"
+      parameters="{additional MCRSearchServlet parameters}"
+      countResults="{true|false, default false, whether to execute queries to count results}"
+      countLinks="{true|false, default false, whether to count links to each category}"
+      addURI="{true|false, whether to include URI from classification data}" 
+      addDescription="{true|false, whether to include description from category label}" 
+      class="{CSS class, default is 'classificationBrowser'}" 
+      style="{XSL.Style to use, default is classificationBrowserData.xsl}" 
+    />
  -->
 
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
