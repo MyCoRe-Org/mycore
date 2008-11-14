@@ -6,9 +6,13 @@
   sends data of all child categories of the requested node.
  -->
 
-<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+<xsl:stylesheet version="1.0" 
+  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+  xmlns:encoder="xalan://java.net.URLEncoder">
 
 <xsl:output method="xml" omit-xml-declaration="yes" />
+
+<xsl:param name="ServletsBaseURL" />
 
 <xsl:template match="/classificationBrowserData">
   <ul class="cbList">
@@ -19,11 +23,39 @@
           <input id="cbButton_{$id}" type="button" value="+" onclick="toogle('{@id}');" />
         </xsl:if>
         <span class="cbID"><xsl:value-of select="@id" /></span>
-        <span class="cbLabel"><xsl:value-of select="label" /></span>
-        <xsl:if test="../@uri and uri">
+        <a>
+          <xsl:variable name="query">
+            <xsl:text>(</xsl:text>
+            <xsl:value-of select="../@field" />
+            <xsl:text> = </xsl:text>
+            <xsl:value-of select="@id" />
+            <xsl:text>)</xsl:text>
+            <xsl:if test="string-length(../@objectType) &gt; 0">
+              <xsl:text> and (objectType = </xsl:text>
+              <xsl:value-of select="../@objectType" />
+              <xsl:text>)</xsl:text>
+            </xsl:if>
+            <xsl:if test="string-length(../@restriction) &gt; 0">
+              <xsl:text> and (</xsl:text>
+              <xsl:value-of select="../@restriction" />
+              <xsl:text>)</xsl:text>
+            </xsl:if>
+          </xsl:variable>
+          <xsl:attribute name="href">
+            <xsl:value-of select="$ServletsBaseURL" />
+            <xsl:text>MCRSearchServlet?query=</xsl:text>
+            <xsl:value-of select="encoder:encode($query)" />
+            <xsl:if test="string-length(../@parameters) &gt; 0">
+              <xsl:text>&amp;</xsl:text>
+              <xsl:value-of select="../@parameters" />
+            </xsl:if>
+          </xsl:attribute>
+          <xsl:value-of select="label" />
+        </a>
+        <xsl:if test="uri">
           <a href="{uri}" class="cbURI"><xsl:value-of select="uri" /></a>
         </xsl:if>
-        <xsl:if test="../@description and description">
+        <xsl:if test="description">
           <p class="cbDescription"><xsl:value-of select="description" /></p>
         </xsl:if>
         <xsl:if test="@children = 'true'">

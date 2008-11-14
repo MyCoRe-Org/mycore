@@ -23,6 +23,9 @@
 
 package org.mycore.frontend.servlets;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
@@ -63,21 +66,32 @@ public class MCRClassificationBrowser2 extends MCRServlet
     
     HttpServletRequest req = job.getRequest();
     
-    String classifID = req.getParameter( "classification" ); // Classification ID
-    String categID   = req.getParameter( "category" );       // Category ID to start with
-    LOGGER.info( "ClassificationBrowser " + classifID + ( categID == null ? "" : categID ) );   
-    
-    boolean uri   = Boolean.valueOf( req.getParameter( "uri" ) ); // if true, add uri
-    boolean descr = Boolean.valueOf( req.getParameter( "description" ) ); // if true, add description
+    String classifID  = req.getParameter( "classification" ); // Classification ID
+    String categID    = req.getParameter( "category" );       // Category ID to start with
+    LOGGER.info( "ClassificationBrowser " + classifID + " " + ( categID == null ? "" : categID ) );   
+
+    String objectType  = req.getParameter( "objectType" );  // MCRObject type to search and count
+    String field       = req.getParameter( "field" );       // Search field that maps category
+    String restriction = req.getParameter( "restriction" ); // Additional query expression
+    String parameters  = req.getParameter( "parameters" );  // MCRSearchServlet maxResults=x&numPerPage=y&...
+
+    boolean uri   = Boolean.valueOf( req.getParameter( "addURI" ) ); // if true, add uri
+    boolean descr = Boolean.valueOf( req.getParameter( "addDescription" ) ); // if true, add description
     
     MCRCategoryID id = new MCRCategoryID( classifID, categID );
     List<MCRCategory> children = MCRCategoryDAOFactory.getInstance().getChildren(id);
     Element xml = new Element( "classificationBrowserData" );
     xml.setAttribute( "classification", classifID );
+    if( objectType != null ) xml.setAttribute( "objectType", objectType );
+    if( field != null ) xml.setAttribute( "field", field );
+    if( restriction != null ) xml.setAttribute( "restriction", restriction );
+    if( parameters != null ) xml.setAttribute( "parameters", parameters );
+    
+    List<Element> data = new ArrayList<Element>();
     for( MCRCategory child : children )
     {
       Element category = new Element( "category" );
-      xml.addContent( category );
+      data.add( category );
 
       category.setAttribute( "id", child.getId().getID() );
       category.setAttribute( "children", Boolean.toString( child.hasChildren() ) );
@@ -95,6 +109,22 @@ public class MCRClassificationBrowser2 extends MCRServlet
       if( descr && ( label.getDescription() != null ) ) 
         category.addContent( new Element( "description" ).setText( label.getDescription() ) );
     }
+    
+    // Sort categories by id, by label or keep natural sort order
+    final String sortBy = req.getParameter( "sortBy" ); // id, label or nothing ("")
+    if( sortBy != null ) Collections.sort( data, new Comparator<Element>()
+    {        
+      public int compare( Element a, Element b )
+      {
+        if( "id".equals( sortBy ) )
+          return( a.getAttributeValue( "id" ).compareTo( b.getAttributeValue( "id" ) ) );
+        else if( "label".equals( sortBy ) )
+          return( a.getChildText( "label" ).compareToIgnoreCase( b.getChildText( "label" ) ) );
+        else
+          return 0;
+      }
+    } );
+    xml.addContent( data );
 
     String style = req.getParameter( "style" ); // XSL.Style, optional
     if( ( style != null ) && ( style.length() > 0 ) )
@@ -102,6 +132,6 @@ public class MCRClassificationBrowser2 extends MCRServlet
 
     MCRServlet.getLayoutService().doLayout( req, job.getResponse(), new Document( xml ) );
     time = ( System.nanoTime() - time ) / 1000000;
-    LOGGER.debug( "ClassificationBrowser finished in " + time + " ms" );
+    LOGGER.info( "ClassificationBrowser finished in " + time + " ms" );
   }
 }

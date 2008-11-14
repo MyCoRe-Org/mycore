@@ -4,13 +4,36 @@
 <MyCoReWebPage>
 
 <section xml:lang="all">
-  <p>Dies ist ein Test, ein paar leere Floskeln als Lückenfüller.</p>
+  <p>Der neue Klassifikationsbrowser kann an beliebiger Stelle in eine MyCoReWebPage eingebunden werden.</p>
+  <code><pre>
+    <![CDATA[
+    Syntax:
+    
+    <classificationBrowser 
+      classification="{ClassificationID}" 
+      category="{CategoryID to start with, optional}" 
+      sortBy="{id|label, optional sort order of categories}"
+      objectType="{MCRObject type, optional}"
+      field="{search field for category queries in this classification}"
+      restriction="{additional query expression}"
+      parameters="{additional MCRSearchServlet parameters}"
+      addURI="{true|false, whether to include URI from classification data}" 
+      addDescription="{true|false, whether to include description from category label}" 
+      class="{CSS class, default is 'classificationBrowser'}" 
+      style="{XSL.Style to use, default is classificationBrowserData.xsl}" 
+    />
   
-  <classificationBrowser classification="DocPortal_class_00000002" category="" 
-    uri="true" description="true" 
-    class="test" style="" />
+    Demo:
   
-  <p>Der Test ist hier beendet.</p>
+  <classificationBrowser classification="DocPortal_class_00000002" sortBy="label"
+    objectType="document" field="origin" parameters="maxResults=100&amp;numPerPage=10" />
+    ]]>
+  </pre></code>
+  
+  <classificationBrowser classification="DocPortal_class_00000002" sortBy="label"
+    objectType="document" field="origin" parameters="maxResults=100&amp;numPerPage=10" />
+  
+  <p>Derzeit sind noch nicht alle Funktionen implementiert, insbes. fehlt noch das Zählen.</p>
 </section>
 
 </MyCoReWebPage>

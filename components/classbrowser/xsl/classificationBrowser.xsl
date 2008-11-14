@@ -7,8 +7,10 @@
   <classificationBrowser 
     classification="{ClassificationID}" 
     category="{CategoryID to start with, optional}" 
-    uri="{true|false, whether to include URI from classification data}" 
-    description="{true|false, whether to include description from category label}" 
+    objectType="{MCRObject type, optional}"
+    sortBy="{id|label, optional sort order of categories}"
+    addURI="{true|false, whether to include URI from classification data}" 
+    addDescription="{true|false, whether to include description from category label}" 
     class="{CSS class, default is 'classificationBrowser'}" 
     style="{XSL.Style to use, default is classificationBrowserData.xsl}" 
   />
@@ -51,8 +53,13 @@
           { parameters: { 
             classification : '<xsl:value-of select="@classification" />',
             category       : categID,
-            uri            : '<xsl:value-of select="@uri" />',
-            description    : '<xsl:value-of select="@description" />',
+            sortBy         : '<xsl:value-of select="@sortBy" />',
+            objectType     : '<xsl:value-of select="@objectType" />',
+            field          : '<xsl:value-of select="@field" />',
+            parameters     : '<xsl:value-of select="@parameters" />',
+            restriction    : '<xsl:value-of select="@restriction" />',
+            addURI         : '<xsl:value-of select="@addURI" />',
+            addDescription : '<xsl:value-of select="@addDescription" />',
             style          : '<xsl:value-of select="@style" />'
           } } );      
         } 
@@ -68,8 +75,13 @@
         { parameters : { 
           classification : '<xsl:value-of select="@classification" />', 
           category       : '<xsl:value-of select="@category" />',
-          uri            : '<xsl:value-of select="@uri" />',
-          description    : '<xsl:value-of select="@description" />',
+          sortBy         : '<xsl:value-of select="@sortBy" />',
+          objectType     : '<xsl:value-of select="@objectType" />',
+          field          : '<xsl:value-of select="@field" />',
+          parameters     : '<xsl:value-of select="@parameters" />',
+          restriction    : '<xsl:value-of select="@restriction" />',
+          addURI         : '<xsl:value-of select="@addURI" />',
+          addDescription : '<xsl:value-of select="@addDescription" />',
           style          : '<xsl:value-of select="@style" />'
         } } );
       </script>
