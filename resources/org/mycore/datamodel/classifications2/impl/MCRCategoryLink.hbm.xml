@@ -16,14 +16,29 @@
     </natural-id>
     <query name="NumberPerCategID">
       <![CDATA[
-SELECT cat.rootID, cat.categID, count(*) FROM MCRCategoryImpl cat, MCRCategoryLink link 
-		  WHERE (cat.rootID=:classID AND cat.internalID = link.category) group by cat.rootID, cat.categID
+SELECT cat.categID, count(distinct link.objectReference.objectID) as num
+  FROM MCRCategoryLink link, MCRCategoryImpl cat, MCRCategoryImpl cattree
+  WHERE cattree.internalID = link.category
+    AND cattree.rootID=:classID
+    AND cat.rootID=:classID
+    AND cat.categID in (:categIDs)
+    AND cat.left <= cattree.left
+    AND cat.right >= cattree.right
+  GROUP BY cat.categID
       ]]>
     </query>
     <query name="NumberByTypePerCategID">
       <![CDATA[
-SELECT cat.rootID, cat.categID, count(*) FROM MCRCategoryImpl cat, MCRCategoryLink link 
-		  WHERE (cat.rootID=:classID AND link.objectReference.type=:type AND cat.internalID = link.category) group by cat.rootID, cat.categID
+SELECT cat.categID, count(distinct link.objectReference.objectID) as num
+  FROM MCRCategoryLink link, MCRCategoryImpl cat, MCRCategoryImpl cattree
+  WHERE cattree.internalID = link.category
+    AND link.objectReference.type=:type
+    AND cattree.rootID=:classID
+    AND cat.rootID=:classID
+    AND cat.categID in (:categIDs)
+    AND cat.left <= cattree.left
+    AND cat.right >= cattree.right
+  GROUP BY cat.categID
       ]]>
     </query>
     <query name="deleteByObjectID">

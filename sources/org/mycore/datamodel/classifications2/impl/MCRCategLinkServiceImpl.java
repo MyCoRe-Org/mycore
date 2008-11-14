@@ -94,26 +94,16 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
             // query can take long time, please cache result
             q.setCacheable(true);
             q.setParameter("classID", classID);
+            q.setParameterList("categIDs", entry.getValue());
             if (restrictedByType) {
                 q.setParameter("type", type);
             }
             // get object count for every category (not accumulated)
             List<Object[]> result = q.list();
             for (Object[] sr : result) {
-                MCRCategoryID key = new MCRCategoryID(sr[0].toString(), sr[1].toString());
-                Number value = (Number) sr[2];
+                MCRCategoryID key = new MCRCategoryID(classID, sr[0].toString());
+                Number value = (Number) sr[1];
                 countLinks.put(key, value);
-                // accumulate manually due to performance problems in MySQL
-                List<MCRCategory> parents = DAO.getParents(key);
-                for (MCRCategory parent : parents) {
-                    MCRCategoryID parentID = parent.getId();
-                    Number counter = countLinks.get(parentID);
-                    if (counter != null) {
-                        countLinks.put(parentID, new Integer(counter.intValue() + value.intValue()));
-                    } else {
-                        countLinks.put(parentID, value);
-                    }
-                }
             }
         }
         // overwrites zero count where database returned a value
