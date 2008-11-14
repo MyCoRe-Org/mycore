@@ -113,6 +113,36 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
         return returns;
     }
 
+    public Map<MCRCategoryID, Number> countLinks(MCRCategoryID parentID) {
+        return countLinksForType(parentID, null);
+    }
+    
+    @SuppressWarnings("unchecked")
+    public Map<MCRCategoryID, Number> countLinksForType(MCRCategoryID parentID, String type) {
+        boolean restrictedByType = (type != null);
+        String queryName = restrictedByType ? ".NumberByTypePerChildOfParentID" : ".NumberPerChildOfParentID";
+        // TODO: initialize all categIDs with link count of zero
+        Session session = MCRHIBConnection.instance().getSession();
+        Map<MCRCategoryID, Number> countLinks = new HashMap<MCRCategoryID, Number>();
+        String classID = parentID.getRootID();
+        Query q = session.getNamedQuery(LINK_CLASS.getName() + queryName);
+        // query can take long time, please cache result
+        q.setCacheable(true);
+        q.setParameter("classID", classID);
+        q.setParameter("parentID", parentID.getID());
+        if (restrictedByType) {
+            q.setParameter("type", type);
+        }
+        // get object count for every category (not accumulated)
+        List<Object[]> result = q.list();
+        for (Object[] sr : result) {
+            MCRCategoryID key = new MCRCategoryID(classID, sr[0].toString());
+            Number value = (Number) sr[1];
+            countLinks.put(key, value);
+        }
+        return countLinks;
+    }
+
     public void deleteLink(String id) {
         Session session = MCRHIBConnection.instance().getSession();
         Query q = session.getNamedQuery(LINK_CLASS.getName() + ".deleteByObjectID");

@@ -64,6 +64,26 @@ public interface MCRCategLinkService {
     public abstract Map<MCRCategoryID, Number> countLinksForType(Collection<MCRCategoryID> categIDs, String type);
 
     /**
+     * Counts links to child categories of a given parent category.
+     * 
+     * @param parentID
+     *            MCRCategoryID of parent, counting is done for each child
+     * @return a Map with MCRCategoryID as key and the number of links as value
+     */
+    public abstract Map<MCRCategoryID, Number> countLinks(MCRCategoryID parentID);
+
+    /**
+     * Counts links to child categories of a given parent category.
+     * 
+     * @param parentID
+     *            MCRCategoryID of parent, counting is done for each child
+     * @param type
+     *            restrict links that refer to object of this type
+     * @return a Map with MCRCategoryID as key and the number of links as value
+     */
+    public abstract Map<MCRCategoryID, Number> countLinksForType(MCRCategoryID parentID, String type);
+
+    /**
      * Delete all links that refer to the given Object ID.
      * 
      * @param id

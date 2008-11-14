@@ -39,6 +39,31 @@ SELECT cat.categID, count(distinct link.objectReference.objectID) as num
   GROUP BY cat.categID
       ]]>
     </query>
+    <query name="NumberPerChildOfParentID">
+      <![CDATA[
+SELECT cat.categID, count(distinct link.objectReference.objectID) as num
+  FROM MCRCategoryLink link, MCRCategoryImpl cat, MCRCategoryImpl cattree
+  WHERE cattree.internalID = link.category
+    AND cattree.rootID=:classID
+    AND cat.rootID=:classID
+    AND cat.parent.internalID=:parentID
+    AND cattree.left BETWEEN cat.left AND cat.right
+  GROUP BY cat.categID
+      ]]>
+    </query>
+    <query name="NumberByTypePerChildOfParentID">
+      <![CDATA[
+SELECT cat.categID, count(distinct link.objectReference.objectID) as num
+  FROM MCRCategoryLink link, MCRCategoryImpl cat, MCRCategoryImpl cattree
+  WHERE cattree.internalID = link.category
+    AND link.objectReference.type=:type
+    AND cattree.rootID=:classID
+    AND cat.rootID=:classID
+    AND cat.parent.internalID=:parentID
+    AND cattree.left BETWEEN cat.left AND cat.right
+  GROUP BY cat.categID
+      ]]>
+    </query>
     <query name="deleteByObjectID">
       <![CDATA[
 DELETE FROM MCRCategoryLink WHERE objectReference.objectID=:id
