@@ -22,8 +22,7 @@ SELECT cat.categID, count(distinct link.objectReference.objectID) as num
     AND cattree.rootID=:classID
     AND cat.rootID=:classID
     AND cat.categID in (:categIDs)
-    AND cat.left <= cattree.left
-    AND cat.right >= cattree.right
+    AND cattree.left BETWEEN cat.left AND cat.right
   GROUP BY cat.categID
       ]]>
     </query>
@@ -36,8 +35,7 @@ SELECT cat.categID, count(distinct link.objectReference.objectID) as num
     AND cattree.rootID=:classID
     AND cat.rootID=:classID
     AND cat.categID in (:categIDs)
-    AND cat.left <= cattree.left
-    AND cat.right >= cattree.right
+    AND cattree.left BETWEEN cat.left AND cat.right
   GROUP BY cat.categID
       ]]>
     </query>
