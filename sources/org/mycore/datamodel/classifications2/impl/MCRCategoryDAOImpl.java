@@ -89,7 +89,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         LOGGER.debug("Calculating LEFT,RIGHT and LEVEL attributes. Done! Nodes: " + nodes);
         if (parentID != null) {
             final int increment = nodes * 2;
-            updateLeftRightValue(connection, leftStart, increment);
+            updateLeftRightValue(connection, parentID.getRootID(), leftStart, increment);
             parent.getChildren().add(category);
         }
         session.save(category);
@@ -115,7 +115,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
             int nodes = 1 + (category.getRight() - category.getLeft()) / 2;
             final int increment = nodes * -2;
             // decrement left and right values by nodes
-            updateLeftRightValue(connection, category.getLeft(), increment);
+            updateLeftRightValue(connection, category.getRootID(), category.getLeft(), increment);
         }
         updateTimeStamp();
     }
@@ -150,7 +150,6 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         return (List<MCRCategory>) q.list();
     }
 
-    @SuppressWarnings("unchecked")
     public MCRCategory getCategory(MCRCategoryID id, int childLevel) {
         Session session = MCRHIBConnection.instance().getSession();
         MCRCategoryImpl category = getByNaturalID(session, id);
@@ -345,7 +344,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
             final int maxLeft = ((MCRCategoryImpl) oldCategory.getRoot()).getRight();
             final int right = getRightSiblingOrParent((MCRCategoryImpl) oldCategory.getParent(), oldCategory.getPositionInParent() + 1).getRight();
             final int maxRight = maxLeft;
-            updateLeftRightValueMax(connection, left, maxLeft, right, maxRight, increment);
+            updateLeftRightValueMax(connection, newCategory.getId().getRootID(), left, maxLeft, right, maxRight, increment);
         }
         calculateLeftRightAndLevel(newCategoryImpl, oldCategory.getLevel(), oldCategory.getLeft());
         if (oldCategory.isCategory()) {
@@ -661,21 +660,23 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
      * @param left
      * @param increment
      */
-    private static void updateLeftRightValue(MCRHIBConnection connection, int left, final int increment) {
+    private static void updateLeftRightValue(MCRHIBConnection connection, String classID, int left, final int increment) {
         Session session = connection.getSession();
         LOGGER.debug("LEFT AND RIGHT values need updates. Left=" + left + ", increment by: " + increment);
         Query leftQuery = session.getNamedQuery(CATEGRORY_CLASS.getName() + ".updateLeft");
         leftQuery.setInteger("left", left);
         leftQuery.setInteger("increment", increment);
+        leftQuery.setString("classID", classID);
         int leftChanges = leftQuery.executeUpdate();
         Query rightQuery = session.getNamedQuery(CATEGRORY_CLASS.getName() + ".updateRight");
         rightQuery.setInteger("left", left);
         rightQuery.setInteger("increment", increment);
+        rightQuery.setString("classID", classID);
         int rightChanges = rightQuery.executeUpdate();
         LOGGER.debug("Updated " + leftChanges + " left and " + rightChanges + " right values.");
     }
 
-    private static void updateLeftRightValueMax(MCRHIBConnection connection, int left, int maxLeft, int right, int maxRight, final int increment) {
+    private static void updateLeftRightValueMax(MCRHIBConnection connection, String classID, int left, int maxLeft, int right, int maxRight, final int increment) {
         Session session = connection.getSession();
         LOGGER.debug("LEFT AND RIGHT values need updates. Left=" + left + ", MaxLeft=" + maxLeft + ", Right=" + right + ", MaxRight=" + maxRight
                 + " increment by: " + increment);
@@ -683,11 +684,13 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         leftQuery.setInteger("left", left);
         leftQuery.setInteger("max", maxLeft);
         leftQuery.setInteger("increment", increment);
+        leftQuery.setString("classID", classID);
         int leftChanges = leftQuery.executeUpdate();
         Query rightQuery = session.getNamedQuery(CATEGRORY_CLASS.getName() + ".updateRightWithMax");
         rightQuery.setInteger("right", right);
         rightQuery.setInteger("max", maxRight);
         rightQuery.setInteger("increment", increment);
+        rightQuery.setString("classID", classID);
         int rightChanges = rightQuery.executeUpdate();
         LOGGER.debug("Updated " + leftChanges + " left and " + rightChanges + " right values.");
     }
@@ -700,7 +703,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
             MCRCategoryImpl leftSiblingOrParent = getLeftSiblingOrParent(newParent, index);
             int newLeft = leftSiblingOrParent.getLeft();
             int newRight = (leftSiblingOrParent == newParent) ? newLeft + 1 : leftSiblingOrParent.getRight();
-            updateLeftRightValueMax(connection, newLeft, left, newRight, right, increment);
+            updateLeftRightValueMax(connection, newParent.getRootID(), newLeft, left, newRight, right, increment);
             connection.getSession().refresh(newParent);
         } else {
             MCRCategoryImpl rightSiblingOrOfAncestor = getRightSiblingOrOfAncestor(newParent, index);
@@ -712,7 +715,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
                 // Update at least newParent
                 minRight = maxRight - 1;
             }
-            updateLeftRightValueMax(connection, left, maxLeft, minRight, maxRight, increment);
+            updateLeftRightValueMax(connection, newParent.getRootID(), left, maxLeft, minRight, maxRight, increment);
             connection.getSession().refresh(rightSiblingOrOfAncestor);
         }
     }
@@ -725,7 +728,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
             MCRCategoryImpl leftSibling = getLeftSiblingOrParent(newParent, index);
             int maxLeft = leftSibling.getLeft();
             int maxRight = leftSibling.getRight();
-            updateLeftRightValueMax(connection, right, maxLeft, left, maxRight, increment);
+            updateLeftRightValueMax(connection, newParent.getRootID(), right, maxLeft, left, maxRight, increment);
             connection.getSession().refresh(newParent);
         } else {
             int maxLeft = getLeftSiblingOrParent(newParent, index).getLeft();
@@ -736,7 +739,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
             }
             MCRCategoryImpl leftSiblingOrOfAncestor = getLeftSiblingOrOfAncestor(newParent, index);
             int maxRight = leftSiblingOrOfAncestor.getRight();
-            updateLeftRightValueMax(connection, minLeft, maxLeft, right, maxRight, increment);
+            updateLeftRightValueMax(connection, newParent.getRootID(), minLeft, maxLeft, right, maxRight, increment);
             connection.getSession().refresh(leftSiblingOrOfAncestor);
         }
     }
