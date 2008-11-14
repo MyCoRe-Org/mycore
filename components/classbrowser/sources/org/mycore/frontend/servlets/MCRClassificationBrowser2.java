@@ -36,6 +36,8 @@ import org.jdom.Document;
 import org.jdom.Element;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRSessionMgr;
+import org.mycore.datamodel.classifications2.MCRCategLinkService;
+import org.mycore.datamodel.classifications2.MCRCategLinkServiceFactory;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
@@ -82,6 +84,7 @@ public class MCRClassificationBrowser2 extends MCRServlet
     String parameters  = req.getParameter( "parameters" );  // MCRSearchServlet maxResults=x&numPerPage=y&...
 
     boolean countResults = Boolean.valueOf( req.getParameter( "countResults" ) ); // count query results?
+    boolean countLinks   = Boolean.valueOf( req.getParameter( "countLinks" ) );   // count category links?
     
     boolean uri   = Boolean.valueOf( req.getParameter( "addURI" ) ); // if true, add uri
     boolean descr = Boolean.valueOf( req.getParameter( "addDescription" ) ); // if true, add description
@@ -143,6 +146,21 @@ public class MCRClassificationBrowser2 extends MCRServlet
       category.addContent( new Element( "label" ).setText( label.getText() ) );
       if( descr && ( label.getDescription() != null ) ) 
         category.addContent( new Element( "description" ).setText( label.getDescription() ) );
+    }
+    
+    if( countLinks )
+    {
+      if( objectType.trim().length() == 0 ) objectType = null;
+      Map<MCRCategoryID,Number> count = MCRCategLinkServiceFactory.getInstance().countLinksForType(id, objectType);
+      for( Element child : data )
+      {
+        MCRCategoryID childID = new MCRCategoryID( classifID, child.getAttributeValue( "id" ) );
+        Number num = count.get( childID );
+        if( num != null )
+          child.setAttribute( "numLinks", String.valueOf( num.intValue() ) );
+        else
+          child.setAttribute( "numLinks", "0" );
+      }
     }
     
     // Sort categories by id, by label or keep natural sort order

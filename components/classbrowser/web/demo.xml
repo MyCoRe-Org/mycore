@@ -18,6 +18,7 @@
       restriction="{additional query expression}"
       parameters="{additional MCRSearchServlet parameters}"
       countResults="true|false, default false, whether to execute queries to count results"
+      countLinks="true|false, default false, whether to count links to each category"
       addURI="{true|false, whether to include URI from classification data}" 
       addDescription="{true|false, whether to include description from category label}" 
       class="{CSS class, default is 'classificationBrowser'}" 
@@ -27,12 +28,12 @@
     Demo:
   
   <classificationBrowser classification="DocPortal_class_00000002" sortBy="label"
-    objectType="document" field="origin" countResults="true" parameters="maxResults=100&amp;numPerPage=10" />
+    objectType="document" field="origin" countLinks="true" parameters="maxResults=100&amp;numPerPage=10" />
     ]]>
   </pre></code>
   
   <classificationBrowser classification="DocPortal_class_00000002" sortBy="label"
-    objectType="document" field="origin" countResults="true" parameters="maxResults=100&amp;numPerPage=10" />
+    objectType="document" field="origin" countLinks="true" parameters="maxResults=100&amp;numPerPage=10" />
   
   <p>Derzeit sind noch nicht alle Funktionen implementiert.</p>
 </section>

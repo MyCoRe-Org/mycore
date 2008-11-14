@@ -28,6 +28,9 @@
         <xsl:if test="@numResults">
           <span class="cbNum"><xsl:value-of select="@numResults" /></span>
         </xsl:if>
+        <xsl:if test="@numLinks">
+          <span class="cbNum"><xsl:value-of select="@numLinks" /></span>
+        </xsl:if>
         <a href="{$ServletsBaseURL}MCRSearchServlet?query={encoder:encode(@query)}&amp;{../@parameters}">
           <xsl:value-of select="label" />
         </a>
