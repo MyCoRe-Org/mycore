@@ -60,9 +60,12 @@ public class MCRCategLinkServiceImplTest extends MCRHibTestCase {
         testLinks.add(new MCRCategoryLink(germany, new MCRObjectReference("Thüringen", "state")));
         testLinks.add(new MCRCategoryLink(germany, new MCRObjectReference("Hessen", "state")));
         testLinks.add(new MCRCategoryLink(germany, new MCRObjectReference("Saale", "river")));
+        final MCRObjectReference northSeaReference = new MCRObjectReference("North Sea", "sea");
+        testLinks.add(new MCRCategoryLink(germany, northSeaReference));
         testLinks.add(new MCRCategoryLink(uk, new MCRObjectReference("London", "city")));
         testLinks.add(new MCRCategoryLink(uk, new MCRObjectReference("England", "state")));
         testLinks.add(new MCRCategoryLink(uk, new MCRObjectReference("Thames", "river")));
+        testLinks.add(new MCRCategoryLink(uk, northSeaReference));
     }
 
     /*
@@ -164,7 +167,7 @@ public class MCRCategLinkServiceImplTest extends MCRHibTestCase {
         LOGGER.debug("****List of returned map");
         LOGGER.debug(map);
         assertEquals("Returned amount of MCRCategoryIDs does not match.", categIDs.size(), map.size());
-        assertEquals("Count of Europe links does not match.", 7, map.get(category.getChildren().get(0).getId()).intValue());
+        assertEquals("Count of Europe links does not match.", 8, map.get(category.getChildren().get(0).getId()).intValue());
     }
 
     /**
