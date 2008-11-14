@@ -50,7 +50,7 @@
           addURI         : '<xsl:value-of select="@addURI" />',
           addDescription : '<xsl:value-of select="@addDescription" />',
           style          : '<xsl:value-of select="@style" />',
-          webpage        : '<xsl:value-of select="$RequestURL" />'
+          webpage        : '<xsl:value-of select="substring-after(substring($RequestURL,9),'/')" />'
         } } );      
       }
      
