@@ -27,6 +27,7 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -79,9 +80,13 @@ public class MCRClassificationBrowser2 extends MCRServlet {
         String parameters = req.getParameter("parameters");
 
         boolean countResults = Boolean.valueOf(req.getParameter("countResults"));
-        boolean emptyLeaves = Boolean.valueOf(req.getParameter("emptyLeaves"));
         boolean uri = Boolean.valueOf(req.getParameter("addURI"));
 
+        String el = req.getParameter("emptyLeaves");
+        boolean emptyLeaves = true;
+        if ((el != null) && (el.trim().length() > 0))
+            emptyLeaves = Boolean.valueOf(el);  
+        
         LOGGER.info("ClassificationBrowser " + classifID + " " + (categID == null ? "" : categID));
 
         MCRCategoryID id = new MCRCategoryID(classifID, categID);
@@ -134,7 +139,7 @@ public class MCRClassificationBrowser2 extends MCRServlet {
             addLabel(req, child, category);
         }
 
-        countLinks(req, objectType, id, data);
+        countLinks(req, emptyLeaves, objectType, id, data);
         sortCategories(req, data);
         xml.addContent(data);
         renderToHTML(job, req, xml);
@@ -166,22 +171,20 @@ public class MCRClassificationBrowser2 extends MCRServlet {
     }
 
     /** Add link count to each category */
-    private void countLinks(HttpServletRequest req, String objectType, MCRCategoryID id, List<Element> data) {
+    private void countLinks(HttpServletRequest req, boolean emptyLeaves, String objectType, MCRCategoryID id, List<Element> data) {
         if (!Boolean.valueOf(req.getParameter("countLinks")))
             return;
-
-        boolean emptyLeaves = Boolean.valueOf(req.getParameter("emptyLeaves"));
-        
         if (objectType.trim().length() == 0)
             objectType = null;
         String classifID = id.getRootID();
         Map<MCRCategoryID, Number> count = MCRCategLinkServiceFactory.getInstance().countLinksForType(id, objectType);
-        for (Element child : data) {
+        for (Iterator<Element> it = data.iterator(); it.hasNext();) {
+            Element child = it.next();
             MCRCategoryID childID = new MCRCategoryID(classifID, child.getAttributeValue("id"));
             int num = (count.containsKey(childID) ? count.get(childID).intValue() : 0);
             child.setAttribute("numLinks", String.valueOf(num));
             if ((!emptyLeaves) && (num < 1))
-                data.remove(child);
+                it.remove();
         }
     }
 
