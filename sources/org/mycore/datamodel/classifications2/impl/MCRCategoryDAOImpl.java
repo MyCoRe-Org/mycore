@@ -150,10 +150,28 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         return (List<MCRCategory>) q.list();
     }
 
+    @SuppressWarnings("unchecked")
     public MCRCategory getCategory(MCRCategoryID id, int childLevel) {
         Session session = MCRHIBConnection.instance().getSession();
-        MCRCategoryImpl category = getByNaturalID(session, id);
-        return copyDeep(category, childLevel);
+        final boolean fetchAllChildren = childLevel < 0;
+        Query q = null;
+        if (id.isRootID()) {
+            q = session.getNamedQuery(CATEGRORY_CLASS.getName() + (fetchAllChildren ? ".prefetchClassQuery" : ".prefetchClassLevelQuery"));
+            if (!fetchAllChildren)
+                q.setInteger("endlevel", childLevel);
+            q.setString("classID", id.getRootID());
+        } else {
+            //normal category
+            MCRCategoryImpl category = getByNaturalID(session, id);
+            q = session.getNamedQuery(CATEGRORY_CLASS.getName() + (fetchAllChildren ? ".prefetchCategQuery" : ".prefetchCategLevelQuery"));
+            if (!fetchAllChildren)
+                q.setInteger("endlevel", childLevel);
+            q.setString("classID", id.getRootID());
+            q.setInteger("left", category.getLeft());
+            q.setInteger("right", category.getLeft());
+        }
+        List<MCRCategoryImpl> result = q.list();
+        return buildCategoryFromPrefetchedList(result);
     }
 
     /*
@@ -511,6 +529,28 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
 
     private static Criterion getCategoryCriterion(MCRCategoryID id) {
         return Restrictions.naturalId().set("rootID", id.getRootID()).set("categID", id.getID());
+    }
+
+    private static final MCRCategoryImpl buildCategoryFromPrefetchedList(List<MCRCategoryImpl> list) {
+        MCRCategoryImpl baseCat = null;
+        MCRCategoryImpl currentParent = null;
+        for (MCRCategoryImpl currentCat : list) {
+            System.out.println("curLevel: " + currentCat.getLevel() + ", id=" + currentCat.getId());
+            //make a save copy
+            currentCat = copyDeep(currentCat, 0);
+            if (baseCat == null) {
+                baseCat = currentCat;
+                currentParent = currentCat;
+            } else {
+                //check if currentCat is child of currentParent
+                while (currentParent.getLevel() >= currentCat.getLevel()) {
+                    //we have to go some levels up
+                    currentParent = (MCRCategoryImpl) currentParent.getParent();
+                } //got parent of currentCat as currentParent
+                currentParent.getChildren().add(currentCat);
+            }
+        }
+        return baseCat;
     }
 
     private static MCRCategoryImpl copyDeep(MCRCategory category, int level) {

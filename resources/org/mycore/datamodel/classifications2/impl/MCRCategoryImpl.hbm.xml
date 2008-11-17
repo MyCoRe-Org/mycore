@@ -76,5 +76,45 @@ FROM MCRCategoryImpl as cat
     label.text=:text
       ]]>
     </query>
+    <query name="prefetchClassQuery">
+      <![CDATA[
+SELECT DISTINCT cat
+FROM MCRCategoryImpl as cat
+  LEFT JOIN cat.labels as label
+  WHERE cat.rootID=:classID
+  ORDER BY cat.left 
+      ]]>
+    </query>
+    <query name="prefetchClassLevelQuery">
+      <![CDATA[
+SELECT DISTINCT cat
+FROM MCRCategoryImpl as cat
+  LEFT JOIN cat.labels as label
+  WHERE cat.rootID=:classID
+    AND cat.level <= :endlevel
+  ORDER BY cat.left 
+      ]]>
+    </query>
+    <query name="prefetchCategQuery">
+      <![CDATA[
+SELECT DISTINCT cat
+FROM MCRCategoryImpl as cat
+  LEFT JOIN cat.labels as label
+  WHERE cat.rootID=:classID
+    AND cat.left BETWEEN :left and :right
+  ORDER BY cat.left 
+      ]]>
+    </query>
+    <query name="prefetchCategLevelQuery">
+      <![CDATA[
+SELECT DISTINCT cat
+FROM MCRCategoryImpl as cat
+  LEFT JOIN cat.labels as label
+  WHERE cat.rootID=:classID
+    AND cat.left BETWEEN :left and :right
+    AND cat.level <= :endlevel
+  ORDER BY cat.left 
+      ]]>
+    </query>
   </class>
 </hibernate-mapping>
