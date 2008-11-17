@@ -9,32 +9,32 @@
     <![CDATA[
     Syntax:
     
-    <classificationBrowser 
+    <classificationbrowser 
       classification="{ClassificationID}" 
       category="{CategoryID to start with, optional}" 
-      sortBy="{id|label, optional sort order of categories}"
-      objectType="{MCRObject type, optional}"
+      sortby="{id|label, optional sort order of categories}"
+      objecttype="{MCRObject type, optional}"
       field="{search field for category queries in this classification}"
       restriction="{additional query expression}"
       parameters="{additional MCRSearchServlet parameters}"
-      countResults="{true|false, default false, whether to execute queries to count results}"
-      countLinks="{true|false, default false, whether to count links to each category}"
-      emptyLeaves="{true|false, when false and counting activated, skip empty leaves}"
-      addURI="{true|false, whether to include URI from classification data}" 
-      addDescription="{true|false, whether to include description from category label}" 
+      countresults="{true|false, default false, whether to execute queries to count results}"
+      countlinks="{true|false, default false, whether to count links to each category}"
+      emptyleaves="{true|false, when false and counting activated, skip empty leaves}"
+      adduri="{true|false, whether to include URI from classification data}" 
+      adddescription="{true|false, whether to include description from category label}" 
       class="{CSS class, default is 'classificationBrowser'}" 
       style="{XSL.Style to use, default is classificationBrowserData.xsl}" 
     />
   
     Demo:
   
-  <classificationBrowser classification="DocPortal_class_00000002" sortBy="label"
-    objectType="document" field="origin" countLinks="true" parameters="maxResults=100&amp;numPerPage=10" />
+  <classificationbrowser classification="DocPortal_class_00000002" sortby="label"
+    objecttype="document" field="origin" countlinks="true" parameters="maxResults=100&amp;numPerPage=10" />
     ]]>
   </pre></code>
   
-  <classificationBrowser classification="DocPortal_class_00000002" sortBy="label"
-    objectType="document" field="origin" countLinks="true" parameters="maxResults=100&amp;numPerPage=10" />
+  <classificationbrowser classification="DocPortal_class_00000002" sortby="label"
+    objecttype="document" field="origin" countlinks="true" parameters="maxResults=100&amp;numPerPage=10" />
 </section>
 
 </MyCoReWebPage>

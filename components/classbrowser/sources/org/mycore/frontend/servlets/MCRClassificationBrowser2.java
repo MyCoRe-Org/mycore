@@ -74,15 +74,15 @@ public class MCRClassificationBrowser2 extends MCRServlet {
 
         String classifID = req.getParameter("classification");
         String categID = req.getParameter("category");
-        String objectType = req.getParameter("objectType");
+        String objectType = req.getParameter("objecttype");
         String field = req.getParameter("field");
         String restriction = req.getParameter("restriction");
         String parameters = req.getParameter("parameters");
 
-        boolean countResults = Boolean.valueOf(req.getParameter("countResults"));
-        boolean uri = Boolean.valueOf(req.getParameter("addURI"));
+        boolean countResults = Boolean.valueOf(req.getParameter("countresults"));
+        boolean uri = Boolean.valueOf(req.getParameter("adduri"));
 
-        String el = req.getParameter("emptyLeaves");
+        String el = req.getParameter("emptyleaves");
         boolean emptyLeaves = true;
         if ((el != null) && (el.trim().length() > 0))
             emptyLeaves = Boolean.valueOf(el);  
@@ -165,14 +165,14 @@ public class MCRClassificationBrowser2 extends MCRServlet {
         category.addContent(new Element("label").setText(label.getText()));
 
         // if true, add description
-        boolean descr = Boolean.valueOf(req.getParameter("addDescription"));
+        boolean descr = Boolean.valueOf(req.getParameter("adddescription"));
         if (descr && (label.getDescription() != null))
             category.addContent(new Element("description").setText(label.getDescription()));
     }
 
     /** Add link count to each category */
     private void countLinks(HttpServletRequest req, boolean emptyLeaves, String objectType, MCRCategoryID id, List<Element> data) {
-        if (!Boolean.valueOf(req.getParameter("countLinks")))
+        if (!Boolean.valueOf(req.getParameter("countlinks")))
             return;
         if (objectType.trim().length() == 0)
             objectType = null;
@@ -190,7 +190,7 @@ public class MCRClassificationBrowser2 extends MCRServlet {
 
     /** Sorts by id, by label in current language, or keeps natural order */
     private void sortCategories(HttpServletRequest req, List<Element> data) {
-        final String sortBy = req.getParameter("sortBy");
+        final String sortBy = req.getParameter("sortby");
         if (sortBy != null)
             Collections.sort(data, new Comparator<Element>() {
                 public int compare(Element a, Element b) {

@@ -7,16 +7,16 @@
     <classificationBrowser 
       classification="{ClassificationID}" 
       category="{CategoryID to start with, optional}" 
-      sortBy="{id|label, optional sort order of categories}"
-      objectType="{MCRObject type, optional}"
+      sortby="{id|label, optional sort order of categories}"
+      objecttype="{MCRObject type, optional}"
       field="{search field for category queries in this classification}"
       restriction="{additional query expression}"
       parameters="{additional MCRSearchServlet parameters}"
-      countResults="{true|false, default false, whether to execute queries to count results}"
-      countLinks="{true|false, default false, whether to count links to each category}"
-      emptyLeaves="{true|false, when false and counting activated, skip empty leaves}"
-      addURI="{true|false, whether to include URI from classification data}" 
-      addDescription="{true|false, whether to include description from category label}" 
+      countresults="{true|false, default false, whether to execute queries to count results}"
+      countlinks="{true|false, default false, whether to count links to each category}"
+      emptyleaves="{true|false, when false and counting activated, skip empty leaves}"
+      adduri="{true|false, whether to include URI from classification data}" 
+      adddescription="{true|false, whether to include description from category label}" 
       class="{CSS class, default is 'classificationBrowser'}" 
       style="{XSL.Style to use, default is classificationBrowserData.xsl}" 
     />
@@ -28,7 +28,7 @@
 <xsl:param name="ServletsBaseURL" />
 <xsl:param name="RequestURL" />
 
-<xsl:template match="classificationBrowser">
+<xsl:template match="classificationbrowser">
   <div>
     <xsl:attribute name="class">
       <xsl:choose>
@@ -48,16 +48,16 @@
         { parameters: { 
           classification : '<xsl:value-of select="@classification" />',
           category       : categID,
-          sortBy         : '<xsl:value-of select="@sortBy" />',
-          objectType     : '<xsl:value-of select="@objectType" />',
+          sortby         : '<xsl:value-of select="@sortby" />',
+          objecttype     : '<xsl:value-of select="@objecttype" />',
           field          : '<xsl:value-of select="@field" />',
           parameters     : '<xsl:value-of select="@parameters" />',
           restriction    : '<xsl:value-of select="@restriction" />',
-          countResults   : '<xsl:value-of select="@countResults" />',
-          countLinks     : '<xsl:value-of select="@countLinks" />',
-          emptyLeaves    : '<xsl:value-of select="@emptyLeaves" />',
-          addURI         : '<xsl:value-of select="@addURI" />',
-          addDescription : '<xsl:value-of select="@addDescription" />',
+          countresults   : '<xsl:value-of select="@countresults" />',
+          countlinks     : '<xsl:value-of select="@countlinks" />',
+          emptyleaves    : '<xsl:value-of select="@emptyleaves" />',
+          adduri         : '<xsl:value-of select="@adduri" />',
+          adddescription : '<xsl:value-of select="@adddescription" />',
           style          : '<xsl:value-of select="@style" />',
           webpage        : '<xsl:value-of select="substring-after(substring($RequestURL,9),'/')" />'
         } } );      
