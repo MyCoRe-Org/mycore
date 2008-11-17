@@ -24,6 +24,8 @@
 
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
+<xsl:param name="WebApplicationBaseURL" />
+<xsl:param name="ServletsBaseURL" />
 <xsl:param name="RequestURL" />
 
 <xsl:template match="classificationBrowser">
@@ -37,12 +39,12 @@
       </xsl:choose>
     </xsl:attribute>
     
-    <script type="text/javascript" src="/javascript/prototype.js"></script>
+    <script type="text/javascript" src="<xsl:value-of select="$WebApplicationBaseURL" />javascript/prototype.js"></script>
     <script language="JavaScript">
       /* &lt;![CDATA[ */
       
       function update(elementID,categID) {
-        new Ajax.Updater( elementID, '/servlets/ClassificationBrowser', 
+        new Ajax.Updater( elementID, '<xsl:value-of select="$ServletsBaseURL" />ClassificationBrowser', 
         { parameters: { 
           classification : '<xsl:value-of select="@classification" />',
           category       : categID,
