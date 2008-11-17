@@ -24,7 +24,6 @@
 
 package org.mycore.frontend.servlets;
 
-import java.util.List;
 import java.util.Properties;
 
 import org.apache.commons.fileupload.FileItem;
@@ -32,7 +31,6 @@ import org.apache.log4j.Logger;
 import org.jdom.Element;
 
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.MCRUtils;
 import org.mycore.datamodel.classifications.MCRClassificationBrowserData;
 import org.mycore.datamodel.classifications.MCRClassificationEditor;
 import org.mycore.datamodel.classifications2.MCRCategory;
@@ -132,9 +130,21 @@ public class MCRStartClassEditorServlet extends MCRServlet {
             referrer = getBaseURL() + cancelpage;
         }
 
-        if (!(AI.checkPermission("create-classification"))) {
-            job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + usererrorpage));
-            return;
+        if (needsCreatePrivilege(todo, todo2)) {
+            if (!(AI.checkPermission("create-classification"))) {
+                job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + usererrorpage));
+                return;
+            }
+        } else if (needsDeleteRight(todo, todo2)){
+            if (!(AI.checkPermission(clid, "deletedb"))){
+                job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + usererrorpage));
+                return;
+            }
+        } else {
+            if (!(AI.checkPermission(clid, "writedb"))){
+                job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + usererrorpage));
+                return;
+            }
         }
 
         // nach Editoraufruf von new/modify auf commit
@@ -347,83 +357,19 @@ public class MCRStartClassEditorServlet extends MCRServlet {
 
     }
 
-    /**
-     * Normalize the ACL to use in the SWF ACL editor. Some single conditions
-     * are one step to high in the hierarchie of the conditin tree. This method
-     * move it down and normalized the output.
-     * 
-     * @param ruleelm
-     *            The XML access condition from the ACL system
-     */
-    private final org.jdom.Element normalizeACLforSWF(org.jdom.Element ruleelm) {
-        if (LOGGER.isDebugEnabled()) {
-            try {
-                MCRUtils.writeJDOMToSysout(new org.jdom.Document().addContent(ruleelm));
-            } catch (Exception e) {
-
-            }
+    private boolean needsCreatePrivilege(String todo, String todo2) {
+        if (todo.equals("commit-classification")) {
+            if (todo2.equals("create-classification") || todo2.equals("import-classification"))
+                return true;
         }
-        org.jdom.Element newcondition = new org.jdom.Element("condition");
-        newcondition.setAttribute("format", "xml");
-        org.jdom.Element newwrapperand = new org.jdom.Element("boolean");
-        newwrapperand.setAttribute("operator", "and");
-        newcondition.addContent(newwrapperand);
-        if (ruleelm == null) {
-            return newcondition;
-        }
-        try {
-            org.jdom.Element newtrue = new org.jdom.Element("boolean");
-            newtrue.setAttribute("operator", "true");
-            org.jdom.Element oldwrapperand = ruleelm.getChild("boolean");
-            if (oldwrapperand == null) {
-                return newcondition;
-            }
+        return false;
+    }
 
-            org.jdom.Element newuser = (org.jdom.Element) newtrue.detach();
-            org.jdom.Element newdate = (org.jdom.Element) newtrue.detach();
-            org.jdom.Element newip = (org.jdom.Element) newtrue.detach();
-            org.jdom.Element newelm = null;
-
-            List<org.jdom.Element> parts = oldwrapperand.getChildren();
-            for (int i = 0; i < parts.size(); i++) {
-                if (i > 2)
-                    break;
-                org.jdom.Element oldelm = (org.jdom.Element) parts.get(i).detach();
-                if (oldelm.getChildren().size() == 0)
-                    continue;
-                if (oldelm.getName().equals("condition")) {
-                    org.jdom.Element newwrapper = new org.jdom.Element("boolean");
-                    newwrapper.setAttribute("operator", "or");
-                    newwrapper.addContent(oldelm);
-                    newelm = newwrapper;
-                } else {
-                    newelm = oldelm;
-                }
-                String testfield = "";
-                List<org.jdom.Element> innercond = newelm.getChildren();
-                for (int j = 0; j < innercond.size(); j++) {
-                    org.jdom.Element cond = (org.jdom.Element) innercond.get(j);
-                    if (cond.getName().equals("condition")) {
-                        testfield = cond.getAttributeValue("field");
-                    }
-                }
-                if (testfield.equals("user") || testfield.equals("group")) {
-                    newuser = newelm;
-                }
-                if (testfield.equals("date")) {
-                    newdate = newelm;
-                }
-                if (testfield.equals("ip")) {
-                    newip = newelm;
-                }
-            }
-            newwrapperand.addContent(newuser.detach());
-            newwrapperand.addContent(newdate.detach());
-            newwrapperand.addContent(newip.detach());
-        } catch (Exception e) {
-            e.printStackTrace();
+    private boolean needsDeleteRight(String todo, String todo2) {
+        if (todo.equals("delete-classification")) {
+            return true;
         }
-        return newcondition;
+        return false;
     }
 
 }
