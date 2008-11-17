@@ -535,7 +535,6 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         MCRCategoryImpl baseCat = null;
         MCRCategoryImpl currentParent = null;
         for (MCRCategoryImpl currentCat : list) {
-            System.out.println("curLevel: " + currentCat.getLevel() + ", id=" + currentCat.getId());
             //make a save copy
             currentCat = copyDeep(currentCat, 0);
             if (baseCat == null) {
