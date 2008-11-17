@@ -123,13 +123,14 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
         String queryName = restrictedByType ? ".NumberByTypePerChildOfParentID" : ".NumberPerChildOfParentID";
         // TODO: initialize all categIDs with link count of zero
         Session session = MCRHIBConnection.instance().getSession();
+        MCRCategoryImpl parent = getMCRCategory(session, parentID);
         Map<MCRCategoryID, Number> countLinks = new HashMap<MCRCategoryID, Number>();
         String classID = parentID.getRootID();
         Query q = session.getNamedQuery(LINK_CLASS.getName() + queryName);
         // query can take long time, please cache result
         q.setCacheable(true);
         q.setParameter("classID", classID);
-        q.setParameter("parentID", parentID.getID());
+        q.setParameter("parentID", parent.getInternalID());
         if (restrictedByType) {
             q.setParameter("type", type);
         }

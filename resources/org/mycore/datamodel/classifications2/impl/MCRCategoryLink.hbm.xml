@@ -46,7 +46,7 @@ SELECT cat.categID, count(distinct link.objectReference.objectID) as num
   WHERE cattree.internalID = link.category
     AND cattree.rootID=:classID
     AND cat.rootID=:classID
-    AND cat.parent.categID=:parentID
+    AND cat.parent.internalID=:parentID
     AND cattree.left BETWEEN cat.left AND cat.right
   GROUP BY cat.categID
       ]]>
@@ -59,7 +59,7 @@ SELECT cat.categID, count(distinct link.objectReference.objectID) as num
     AND link.objectReference.type=:type
     AND cattree.rootID=:classID
     AND cat.rootID=:classID
-    AND cat.parent.categID=:parentID
+    AND cat.parent.internalID=:parentID
     AND cattree.left BETWEEN cat.left AND cat.right
   GROUP BY cat.categID
       ]]>
