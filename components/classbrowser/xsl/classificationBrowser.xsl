@@ -14,6 +14,7 @@
       parameters="{additional MCRSearchServlet parameters}"
       countResults="{true|false, default false, whether to execute queries to count results}"
       countLinks="{true|false, default false, whether to count links to each category}"
+      emptyLeaves="{true|false, when false and counting activated, skip empty leaves}"
       addURI="{true|false, whether to include URI from classification data}" 
       addDescription="{true|false, whether to include description from category label}" 
       class="{CSS class, default is 'classificationBrowser'}" 
@@ -52,6 +53,7 @@
           restriction    : '<xsl:value-of select="@restriction" />',
           countResults   : '<xsl:value-of select="@countResults" />',
           countLinks     : '<xsl:value-of select="@countLinks" />',
+          emptyLeaves    : '<xsl:value-of select="@emptyLeaves" />',
           addURI         : '<xsl:value-of select="@addURI" />',
           addDescription : '<xsl:value-of select="@addDescription" />',
           style          : '<xsl:value-of select="@style" />',

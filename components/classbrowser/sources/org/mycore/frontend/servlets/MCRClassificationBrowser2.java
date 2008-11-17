@@ -79,6 +79,7 @@ public class MCRClassificationBrowser2 extends MCRServlet {
         String parameters = req.getParameter("parameters");
 
         boolean countResults = Boolean.valueOf(req.getParameter("countResults"));
+        boolean emptyLeaves = Boolean.valueOf(req.getParameter("emptyLeaves"));
         boolean uri = Boolean.valueOf(req.getParameter("addURI"));
 
         LOGGER.info("ClassificationBrowser " + classifID + " " + (categID == null ? "" : categID));
@@ -108,8 +109,15 @@ public class MCRClassificationBrowser2 extends MCRServlet {
         List<Element> data = new ArrayList<Element>();
         List<MCRCategory> children = MCRCategoryDAOFactory.getInstance().getChildren(id);
         for (MCRCategory child : children) {
+            int numResults = (countResults ? MCRQueryManager.search(new MCRQuery(queryCondition)).getNumHits() : 1);
+
+            if ((!emptyLeaves) && (numResults < 1))
+                continue;
+
             Element category = new Element("category");
             data.add(category);
+            if (countResults)
+                category.setAttribute("numResults", String.valueOf(numResults));
 
             String childID = child.getId().getID();
 
@@ -119,10 +127,6 @@ public class MCRClassificationBrowser2 extends MCRServlet {
             categCondition.setValue(childID);
             category.setAttribute("query", URLEncoder.encode(queryCondition.toString(),"UTF-8"));
 
-            if (countResults) {
-                int numResults = MCRQueryManager.search(new MCRQuery(queryCondition)).getNumHits();
-                category.setAttribute("numResults", String.valueOf(numResults));
-            }
 
             if (uri && (child.getURI() != null))
                 category.addContent(new Element("uri").setText(child.getURI().toString()));
@@ -165,17 +169,19 @@ public class MCRClassificationBrowser2 extends MCRServlet {
     private void countLinks(HttpServletRequest req, String objectType, MCRCategoryID id, List<Element> data) {
         if (!Boolean.valueOf(req.getParameter("countLinks")))
             return;
+
+        boolean emptyLeaves = Boolean.valueOf(req.getParameter("emptyLeaves"));
+        
         if (objectType.trim().length() == 0)
             objectType = null;
         String classifID = id.getRootID();
         Map<MCRCategoryID, Number> count = MCRCategLinkServiceFactory.getInstance().countLinksForType(id, objectType);
         for (Element child : data) {
             MCRCategoryID childID = new MCRCategoryID(classifID, child.getAttributeValue("id"));
-            Number num = count.get(childID);
-            if (num != null)
-                child.setAttribute("numLinks", String.valueOf(num.intValue()));
-            else
-                child.setAttribute("numLinks", "0");
+            int num = (count.containsKey(childID) ? count.get(childID).intValue() : 0);
+            child.setAttribute("numLinks", String.valueOf(num));
+            if ((!emptyLeaves) && (num < 1))
+                data.remove(child);
         }
     }
 
