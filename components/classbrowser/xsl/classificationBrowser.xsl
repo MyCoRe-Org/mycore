@@ -39,7 +39,7 @@
       </xsl:choose>
     </xsl:attribute>
     
-    <script type="text/javascript" src="<xsl:value-of select="$WebApplicationBaseURL" />javascript/prototype.js"></script>
+    <script type="text/javascript" src="{$WebApplicationBaseURL}javascript/prototype.js"></script>
     <script language="JavaScript">
       /* &lt;![CDATA[ */
       
