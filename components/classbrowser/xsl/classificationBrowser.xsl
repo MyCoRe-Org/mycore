@@ -59,7 +59,7 @@
           adduri         : '<xsl:value-of select="@adduri" />',
           adddescription : '<xsl:value-of select="@adddescription" />',
           style          : '<xsl:value-of select="@style" />',
-          webpage        : '<xsl:value-of select="substring-after(substring($RequestURL,9),'/')" />'
+          webpage        : '<xsl:value-of select="substring-after($RequestURL,$WebApplicationBaseURL)" />'
         } } );      
       }
      
