@@ -12,18 +12,17 @@
         <property name="categID" type="string" column="CategID" length="128" not-null="false" />
     </natural-id>
     <property name="URI" length="254" not-null="false" type="org.mycore.datamodel.classifications2.impl.MCRURIType" />
-    <map name="labels" cascade="all" table="MCRCategoryLabels" fetch="join" lazy="false">
+    <set name="labels" cascade="all" table="MCRCategoryLabels" fetch="join" lazy="false">
       <cache usage="nonstrict-read-write" />
       <key>
         <column name="category" />
       </key>
-      <map-key type="string" column="lang" />
       <composite-element class="org.mycore.datamodel.classifications2.MCRLabel">
-        <property name="lang" formula="lang"/>
+        <property name="lang" />
         <property name="text" />
         <property name="description" not-null="false" />
       </composite-element>
-    </map>
+    </set>
     <list name="children" cascade="all" inverse="true" access="field">
       <key column="parentID" />
       <list-index column="positionInParent" />
@@ -80,7 +79,7 @@ FROM MCRCategoryImpl as cat
       <![CDATA[
 SELECT DISTINCT cat
 FROM MCRCategoryImpl as cat
-  LEFT JOIN cat.labels as label
+  LEFT JOIN FETCH cat.labels as label
   WHERE cat.rootID=:classID
   ORDER BY cat.left 
       ]]>
@@ -89,7 +88,7 @@ FROM MCRCategoryImpl as cat
       <![CDATA[
 SELECT DISTINCT cat
 FROM MCRCategoryImpl as cat
-  LEFT JOIN cat.labels as label
+  LEFT JOIN FETCH cat.labels as label
   WHERE cat.rootID=:classID
     AND cat.level <= :endlevel
   ORDER BY cat.left 
@@ -99,7 +98,7 @@ FROM MCRCategoryImpl as cat
       <![CDATA[
 SELECT DISTINCT cat
 FROM MCRCategoryImpl as cat
-  LEFT JOIN cat.labels as label
+  LEFT JOIN FETCH cat.labels as label
   WHERE cat.rootID=:classID
     AND cat.left BETWEEN :left and :right
   ORDER BY cat.left 
@@ -109,7 +108,7 @@ FROM MCRCategoryImpl as cat
       <![CDATA[
 SELECT DISTINCT cat
 FROM MCRCategoryImpl as cat
-  LEFT JOIN cat.labels as label
+  LEFT JOIN FETCH cat.labels as label
   WHERE cat.rootID=:classID
     AND cat.left BETWEEN :left and :right
     AND cat.level <= :endlevel

@@ -325,7 +325,7 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
         if (categ.isCategory()) {
             LOGGER.info(space + "  ID    : " + categ.getId().getID());
         }
-        for (MCRLabel label : categ.getLabels().values()) {
+        for (MCRLabel label : categ.getLabels()) {
             LOGGER.info(space + "  Label : (" + label.getLang() + ") " + label.getText());
         }
         List<MCRCategory> children = categ.getChildren();

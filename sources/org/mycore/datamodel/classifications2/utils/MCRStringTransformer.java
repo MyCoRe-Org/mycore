@@ -42,7 +42,7 @@ public class MCRStringTransformer {
         }
         sb.append(category.getId());
         sb.append('[');
-        printLabels(category.getLabels().values(), sb);
+        printLabels(category.getLabels(), sb);
         sb.append(']');
         sb.append('\n');
         for (MCRCategory child : category.getChildren()) {

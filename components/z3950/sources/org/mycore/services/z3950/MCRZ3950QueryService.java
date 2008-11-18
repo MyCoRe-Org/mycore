@@ -135,7 +135,7 @@ public class MCRZ3950QueryService implements MCRZ3950Query {
                     MCRCategory category = MCRCategoryDAOFactory.getInstance().getCategory(new MCRCategoryID(classificationId, categoryId), -1);
 //                  Fülle den Knoten mit dem Klassifiaktions-Label
 //                  TODO: please change: language is random
-                    e.setText(category.getLabels().values().iterator().next().getText());
+                    e.setText(category.getLabels().iterator().next().getText());
                 }
             }
         }

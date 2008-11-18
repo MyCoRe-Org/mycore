@@ -132,7 +132,7 @@ public class MCRCategoryTransformer {
             cd.getRootElement().setAttribute("noNamespaceSchemaLocation", "MCRClassification.xsd", XSI_NAMESPACE);
             cd.getRootElement().setAttribute("ID", cl.getId().getRootID());
             cd.getRootElement().addNamespaceDeclaration(XLINK_NAMESPACE);
-            for (MCRLabel label : cl.getLabels().values()) {
+            for (MCRLabel label : cl.getLabels()) {
                 cd.getRootElement().addContent(getElement(label));
             }
             Element categories = new Element("categories");
@@ -168,7 +168,7 @@ public class MCRCategoryTransformer {
             if (number != null) {
                 ce.setAttribute("counter", Integer.toString(number.intValue()));
             }
-            for (MCRLabel label : category.getLabels().values()) {
+            for (MCRLabel label : category.getLabels()) {
                 ce.addContent(getElement(label));
             }
             if (category.getURI() != null) {
@@ -283,7 +283,7 @@ public class MCRCategoryTransformer {
         static Element getElement(MCRCategory category, String labelFormat, Map<MCRCategoryID, Number> countMap) {
             Element ce = new Element("item");
             ce.setAttribute("value", category.getId().getID());
-            for (MCRLabel label : category.getLabels().values()) {
+            for (MCRLabel label : category.getLabels()) {
                 ce.addContent(getElement(label, category, labelFormat, countMap));
             }
             for (MCRCategory cat : category.getChildren()) {

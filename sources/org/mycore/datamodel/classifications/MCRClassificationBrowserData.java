@@ -24,6 +24,7 @@
 package org.mycore.datamodel.classifications;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
@@ -389,7 +390,6 @@ public class MCRClassificationBrowserData {
         final Element xNavtree = new Element("classificationlist");
         xDocument.addContent(xNavtree);
         String browserClass = "";
-        String Counter = "";
 
         LOGGER.debug("get all classification IDs");
         final Set<MCRCategoryID> allIDs = getClassificationPool().getAllIDs();
@@ -460,7 +460,7 @@ public class MCRClassificationBrowserData {
     private static Element getBrowseElement(MCRCategory classif) {
         Element ce = new Element("classification");
         ce.setAttribute("ID", classif.getId().getRootID());
-        for (MCRLabel label : classif.getLabels().values()) {
+        for (MCRLabel label : classif.getLabels()) {
             Element labelElement = new Element("label");
             if (label.getLang() != null) {
                 labelElement.setAttribute("lang", label.getLang(), Namespace.XML_NAMESPACE);
@@ -854,7 +854,7 @@ public class MCRClassificationBrowserData {
     }
 
     private static MCRLabel getLabel(MCRCategory co, String lang) {
-        for (MCRLabel label : co.getLabels().values()) {
+        for (MCRLabel label : co.getLabels()) {
             if (label.getLang().equals(lang)) {
                 return label;
             }
@@ -895,14 +895,14 @@ public class MCRClassificationBrowserData {
     private static class MCRCategoryElementFactory {
         static Element getCategoryElement(MCRCategory category, boolean withCounter, int numberObjects) {
             Element ce = new Element("category");
-            Map<String, MCRLabel> labels = category.getLabels();
+            Collection<MCRLabel> labels = category.getLabels();
             ce.setAttribute("ID", category.getId().getID());
             if (withCounter) {
                 ce.setAttribute("counter", Integer.toString(numberObjects));
             }
 
-            for (String key : labels.keySet()) {
-                ce.addContent(getElement(labels.get(key)));
+            for (MCRLabel label : labels) {
+                ce.addContent(getElement(label));
             }
             for (MCRCategory child : category.getChildren()) {
                 ce.addContent(getCategoryElement(child, withCounter, numberObjects));

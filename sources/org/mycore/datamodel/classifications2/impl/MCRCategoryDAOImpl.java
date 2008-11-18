@@ -25,6 +25,7 @@ package org.mycore.datamodel.classifications2.impl;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -322,8 +323,11 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
     public void removeLabel(MCRCategoryID id, String lang) {
         Session session = MCRHIBConnection.instance().getSession();
         MCRCategoryImpl category = getByNaturalID(session, id);
-        category.getLabels().remove(lang);
-        updateTimeStamp();
+        MCRLabel oldLabel = category.getLabel(lang);
+        if (oldLabel != null) {
+            category.getLabels().remove(oldLabel);
+            updateTimeStamp();
+        }
     }
 
     public void replaceCategory(MCRCategory newCategory) throws IllegalArgumentException {
@@ -384,7 +388,11 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
     public void setLabel(MCRCategoryID id, MCRLabel label) {
         Session session = MCRHIBConnection.instance().getSession();
         MCRCategoryImpl category = getByNaturalID(session, id);
-        category.getLabels().put(label.getLang(), label);
+        MCRLabel oldLabel = category.getLabel(label.getLang());
+        if (oldLabel != null) {
+            category.getLabels().remove(oldLabel);
+        }
+        category.getLabels().add(label);
         session.update(category);
         updateTimeStamp();
     }
@@ -566,7 +574,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         }
         newCateg.setChildren(new ArrayList<MCRCategory>(childAmount));
         newCateg.setId(category.getId());
-        newCateg.setLabels(new HashMap<String, MCRLabel>(category.getLabels()));
+        newCateg.setLabels(new HashSet<MCRLabel>(category.getLabels()));
         newCateg.setRoot(category.getRoot());
         newCateg.setURI(category.getURI());
         newCateg.setLevel(category.getLevel());
@@ -611,12 +619,11 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
             previousVersion.getChildren().clear();
             previousVersion.getChildren().addAll(
                     MCRCategoryImpl.wrapCategories(detachCategories(category.getChildren()), previousVersion, previousVersion.getRoot()));
-            for (String lang : category.getLabels().keySet()) {
-                MCRLabel oldLabel = previousVersion.getLabels().get(lang);
-                MCRLabel newLabel = category.getLabels().get(lang);
+            for (MCRLabel newLabel : category.getLabels()) {
+                MCRLabel oldLabel = previousVersion.getLabel(newLabel.getLang());
                 if (oldLabel == null) {
                     // copy new label
-                    previousVersion.getLabels().put(lang, category.getLabels().get(lang));
+                    previousVersion.getLabels().add(newLabel);
                 } else {
                     if (!oldLabel.getText().equals(newLabel.getText())) {
                         oldLabel.setText(newLabel.getText());
@@ -626,10 +633,10 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
                     }
                 }
             }
-            Iterator<MCRLabel> labels = previousVersion.getLabels().values().iterator();
+            Iterator<MCRLabel> labels = previousVersion.getLabels().iterator();
             while (labels.hasNext()) {
                 // remove labels that are not present in new version
-                if (!category.getLabels().containsKey(labels.next().getLang()))
+                if (category.getLabel(labels.next().getLang()) == null)
                     labels.remove();
             }
         } else {

@@ -24,10 +24,12 @@
 package org.mycore.datamodel.classifications2.impl;
 
 import java.net.URI;
+import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import org.mycore.common.MCRConfiguration;
+import org.mycore.common.MCRSessionMgr;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
@@ -49,11 +51,13 @@ public abstract class MCRAbstractCategoryImpl implements MCRCategory {
 
     private URI URI;
 
-    protected Map<String, MCRLabel> labels;
+    protected Collection<MCRLabel> labels;
 
     protected List<MCRCategory> children;
 
     protected final ReentrantReadWriteLock childrenLock = new ReentrantReadWriteLock();
+
+    private static final String defaultLang = MCRConfiguration.instance().getString("MCR.Metadata.DefaultLang", "en");
 
     public MCRAbstractCategoryImpl() {
         super();
@@ -79,7 +83,7 @@ public abstract class MCRAbstractCategoryImpl implements MCRCategory {
         return id;
     }
 
-    public Map<String, MCRLabel> getLabels() {
+    public Collection<MCRLabel> getLabels() {
         return labels;
     }
 
@@ -148,6 +152,24 @@ public abstract class MCRAbstractCategoryImpl implements MCRCategory {
             this.parent.getChildren().remove(this);
             this.parent = null;
         }
+    }
+
+    public MCRLabel getCurrentLabel() {
+        MCRLabel label = getLabel(MCRSessionMgr.getCurrentSession().getCurrentLanguage());
+        if (label != null)
+            return label;
+        label = getLabel(defaultLang);
+        if (label != null)
+            return label;
+        return labels.iterator().next();
+    }
+
+    public MCRLabel getLabel(String lang) {
+        for (MCRLabel label : labels) {
+            if (label.getLang().equals(lang))
+                return label;
+        }
+        return null;
     }
 
 }

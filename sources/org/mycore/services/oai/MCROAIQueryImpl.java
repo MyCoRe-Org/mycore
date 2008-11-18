@@ -125,7 +125,7 @@ public class MCROAIQueryImpl implements MCROAIQuery {
             return ar;
         for (int i = 0; i < categories.size(); i++) {
             MCRCategory category = (MCRCategory) categories.get(i);
-            Collection<org.mycore.datamodel.classifications2.MCRLabel> labels = category.getLabels().values();
+            Collection<org.mycore.datamodel.classifications2.MCRLabel> labels = category.getLabels();
             for (MCRLabel label : labels) {
                 if ("x-dini".equals(label.getLang())) {
                     String[] set = new String[3];

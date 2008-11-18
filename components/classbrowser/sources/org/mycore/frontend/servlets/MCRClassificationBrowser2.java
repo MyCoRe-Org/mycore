@@ -36,14 +36,12 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
-import org.mycore.common.MCRConfiguration;
-import org.mycore.common.MCRSessionMgr;
+
 import org.mycore.datamodel.classifications2.MCRCategLinkServiceFactory;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.MCRLabel;
-import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.parsers.bool.MCRAndCondition;
 import org.mycore.parsers.bool.MCRCondition;
 import org.mycore.services.fieldquery.MCRFieldDef;
@@ -58,14 +56,12 @@ import org.mycore.services.fieldquery.MCRQueryParser;
  * using classificationBrowserData.xsl on the server side, then sent to
  * the client browser, where AJAX does the rest.
  * 
- * @author Frank Lützenkirchen
+ * @author Frank LÃ¼tzenkirchen
  */
 public class MCRClassificationBrowser2 extends MCRServlet {
     private static final long serialVersionUID = 1L;
 
     private static final Logger LOGGER = Logger.getLogger(MCRClassificationBrowser2.class);
-
-    private static final String defaultLang = MCRConfiguration.instance().getString("MCR.Metadata.DefaultLang", "en");
 
     public void doGetPost(MCRServletJob job) throws Exception {
         long time = System.nanoTime();
@@ -85,14 +81,14 @@ public class MCRClassificationBrowser2 extends MCRServlet {
         String el = req.getParameter("emptyleaves");
         boolean emptyLeaves = true;
         if ((el != null) && (el.trim().length() > 0))
-            emptyLeaves = Boolean.valueOf(el);  
-        
+            emptyLeaves = Boolean.valueOf(el);
+
         LOGGER.info("ClassificationBrowser " + classifID + " " + (categID == null ? "" : categID));
 
         MCRCategoryID id = new MCRCategoryID(classifID, categID);
         Element xml = new Element("classificationBrowserData");
         xml.setAttribute("classification", classifID);
-        xml.setAttribute("webpage",req.getParameter("webpage"));
+        xml.setAttribute("webpage", req.getParameter("webpage"));
 
         MCRAndCondition queryCondition = new MCRAndCondition();
         MCRQueryCondition categCondition = new MCRQueryCondition(MCRFieldDef.getDef(field), "=", "DUMMY");
@@ -130,8 +126,7 @@ public class MCRClassificationBrowser2 extends MCRServlet {
             category.setAttribute("children", Boolean.toString(child.hasChildren()));
 
             categCondition.setValue(childID);
-            category.setAttribute("query", URLEncoder.encode(queryCondition.toString(),"UTF-8"));
-
+            category.setAttribute("query", URLEncoder.encode(queryCondition.toString(), "UTF-8"));
 
             if (uri && (child.getURI() != null))
                 category.addContent(new Element("uri").setText(child.getURI().toString()));
@@ -153,14 +148,7 @@ public class MCRClassificationBrowser2 extends MCRServlet {
      * description
      */
     private void addLabel(HttpServletRequest req, MCRCategory child, Element category) {
-        String currentLang = MCRSessionMgr.getCurrentSession().getCurrentLanguage();
-
-        Map<String, MCRLabel> labels = child.getLabels();
-        MCRLabel label = labels.get(currentLang);
-        if (label == null)
-            label = labels.get(defaultLang);
-        if (label == null)
-            label = labels.entrySet().iterator().next().getValue();
+        MCRLabel label = child.getCurrentLabel();
 
         category.addContent(new Element("label").setText(label.getText()));
 
