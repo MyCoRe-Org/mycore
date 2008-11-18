@@ -37,6 +37,8 @@ import org.jdom.Document;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.common.MCRException;
+import org.mycore.common.MCRSession;
+import org.mycore.common.MCRSessionMgr;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
 
@@ -90,6 +92,17 @@ public class MCRFileNodeServlet extends MCRServlet {
             // any error would let us return -1 here
             LOGGER.info("Error while getting last modified date.", e);
             return -1;
+        } finally {
+            /*
+             * A new MCRSession may be created due to MCRHIBConnection implementation.
+             * As the MCRSession is not bound to a HttpSession that is closed automatically,
+             * we close it here, if no IP address is known.
+             */
+            MCRSession session = MCRSessionMgr.getCurrentSession();
+            if (session.getCurrentIP().length() < 7) {
+                //it's a stalled session close it
+                session.close();
+            }
         }
     }
 
