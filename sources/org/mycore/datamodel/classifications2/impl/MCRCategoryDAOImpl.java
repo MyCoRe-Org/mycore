@@ -166,7 +166,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
             MCRCategoryImpl category = getByNaturalID(session, id);
             q = session.getNamedQuery(CATEGRORY_CLASS.getName() + (fetchAllChildren ? ".prefetchCategQuery" : ".prefetchCategLevelQuery"));
             if (!fetchAllChildren)
-                q.setInteger("endlevel", childLevel);
+                q.setInteger("endlevel", category.getLevel() + childLevel);
             q.setString("classID", id.getRootID());
             q.setInteger("left", category.getLeft());
             q.setInteger("right", category.getLeft());

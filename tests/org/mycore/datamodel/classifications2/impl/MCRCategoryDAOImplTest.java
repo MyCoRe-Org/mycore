@@ -127,15 +127,18 @@ public class MCRCategoryDAOImplTest extends MCRHibTestCase {
         MCRCategory rootCategory = DAO.getCategory(category.getId(), 0);
         assertTrue("Children present with child Level 0.", rootCategory.getChildren().isEmpty());
         rootCategory = DAO.getCategory(category.getId(), 1);
-        assertTrue("Children present with child Level 1.", rootCategory.getChildren().get(0).getChildren().isEmpty());
+        MCRCategory origSubCategory = rootCategory.getChildren().get(0);
+        assertTrue("Children present with child Level 1.", origSubCategory.getChildren().isEmpty());
         assertEquals("Category count does not match with child Level 1.\n" + MCRStringTransformer.getString(rootCategory), category.getChildren().size(),
                 rootCategory.getChildren().size());
-        assertEquals("Children of Level 1 do not know that they are at the first level.\n" + MCRStringTransformer.getString(rootCategory), 1, rootCategory
-                .getChildren().get(0).getLevel());
+        assertEquals("Children of Level 1 do not know that they are at the first level.\n" + MCRStringTransformer.getString(rootCategory), 1, origSubCategory.getLevel());
         System.out.println("Fetching complete class");
         rootCategory = DAO.getCategory(category.getId(), -1);
         System.out.println("Done fetching complete class");
         assertEquals("Did not get all categories." + MCRStringTransformer.getString(rootCategory), countNodes(category), countNodes(rootCategory));
+        MCRCategory subCategory=DAO.getCategory(origSubCategory.getId(), 0);
+        assertNotNull("Did not return ", subCategory);
+        assertEquals("ObjectIDs did not match", origSubCategory.getId(), subCategory.getId());
     }
 
     public void testGetChildren() {
