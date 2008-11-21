@@ -170,6 +170,14 @@ public class MCRCategoryDAOImplTest extends MCRHibTestCase {
         assertEquals("Returned MCRCategoryID does not match.", find, classIds.get(0));
     }
 
+    public void testGetRootCategories() {
+        addWorldClassification();
+        MCRCategoryID find = category.getId();
+        List<MCRCategory> classes = DAO.getRootCategories();
+        assertEquals("Result size does not match.", 1, classes.size());
+        assertEquals("Returned MCRCategoryID does not match.", find, classes.get(0).getId());
+    }
+
     public void testGetRootCategory() {
         addWorldClassification();
         // Europe

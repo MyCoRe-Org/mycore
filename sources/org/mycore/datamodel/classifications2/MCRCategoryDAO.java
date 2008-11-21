@@ -113,6 +113,13 @@ public interface MCRCategoryDAO {
     public abstract List<MCRCategoryID> getRootCategoryIDs();
 
     /**
+     * Returns all categories that do not have a parent category.
+     * 
+     * @return list of category IDs
+     */
+    public abstract List<MCRCategory> getRootCategories();
+
+    /**
      * Returns the root Category with ancestor axis of the specified category
      * and childLevel levels of subcategories.
      * 

@@ -222,6 +222,21 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         return classIds;
     }
 
+    @SuppressWarnings("unchecked")
+    public List<MCRCategory> getRootCategories() {
+        Session session = MCRHIBConnection.instance().getSession();
+        Criteria c = session.createCriteria(CATEGRORY_CLASS);
+        c.add(Restrictions.eq("left", LEFT_START_VALUE));
+        c.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
+        c.setCacheable(true);
+        List<MCRCategoryImpl> result=c.list();
+        List<MCRCategory> classes=new ArrayList<MCRCategory>(result.size());
+        for (MCRCategoryImpl cat:result){
+            classes.add(copyDeep(cat, 0));
+        }
+        return classes;
+    }
+
     public MCRCategory getRootCategory(MCRCategoryID baseID, int childLevel) {
         if (baseID.isRootID()) {
             return getCategory(baseID, childLevel);
@@ -551,15 +566,12 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
             } else {
                 //check if currentCat is child of currentParent
                 if (currentParent.getLevel() + 1 < currentCat.getLevel()) {
-                    LOGGER.info("go down a level");
                     currentParent = (MCRCategoryImpl) currentParent.getChildren().get(currentParent.getChildren().size() - 1);
                 } else
                     while (currentParent.getLevel() >= currentCat.getLevel()) {
                         //we have to go some levels up
-                        LOGGER.info("go up a level");
                         currentParent = (MCRCategoryImpl) currentParent.getParent();
                     } //got parent of currentCat as currentParent
-                LOGGER.info("currentParent: " + currentParent.getLevel() + " currentCat: " + currentCat.getLevel());
                 currentParent.getChildren().add(currentCat);
             }
         }
