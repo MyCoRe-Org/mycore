@@ -159,12 +159,14 @@ public class MCRCategoryImpl extends MCRAbstractCategoryImpl implements Serializ
     }
 
     public boolean hasChildren() {
-        return (right - left) > 1;
+        if (right != left)
+            return (right - left) > 1;
+        return super.hasChildren();
     }
 
-        /**
-     * @return the positionInParent
-     */
+    /**
+    * @return the positionInParent
+    */
     public int getPositionInParent() {
         LOGGER.debug("getposition called for " + getId() + " with: " + this.positionInParent);
         if (parent == null) {

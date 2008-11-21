@@ -550,10 +550,16 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
                 currentParent = currentCat;
             } else {
                 //check if currentCat is child of currentParent
-                while (currentParent.getLevel() >= currentCat.getLevel()) {
-                    //we have to go some levels up
-                    currentParent = (MCRCategoryImpl) currentParent.getParent();
-                } //got parent of currentCat as currentParent
+                if (currentParent.getLevel() + 1 < currentCat.getLevel()) {
+                    LOGGER.info("go down a level");
+                    currentParent = (MCRCategoryImpl) currentParent.getChildren().get(currentParent.getChildren().size() - 1);
+                } else
+                    while (currentParent.getLevel() >= currentCat.getLevel()) {
+                        //we have to go some levels up
+                        LOGGER.info("go up a level");
+                        currentParent = (MCRCategoryImpl) currentParent.getParent();
+                    } //got parent of currentCat as currentParent
+                LOGGER.info("currentParent: " + currentParent.getLevel() + " currentCat: " + currentCat.getLevel());
                 currentParent.getChildren().add(currentCat);
             }
         }
@@ -578,6 +584,11 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         newCateg.setRoot(category.getRoot());
         newCateg.setURI(category.getURI());
         newCateg.setLevel(category.getLevel());
+        if (category instanceof MCRCategoryImpl) {
+            //to allow optimized hasChildren() to work without db query
+            newCateg.setLeft(((MCRCategoryImpl) category).getLeft());
+            newCateg.setRight(((MCRCategoryImpl) category).getRight());
+        }
         if (childAmount > 0) {
             for (MCRCategory child : category.getChildren()) {
                 newCateg.getChildren().add(copyDeep((MCRCategoryImpl) child, level - 1));
