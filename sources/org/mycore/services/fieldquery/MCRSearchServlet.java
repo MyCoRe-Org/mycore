@@ -50,7 +50,7 @@ import org.mycore.parsers.bool.MCRCondition;
 /**
  * This servlet executes queries and presents result pages.
  * 
- * @author Frank Lützenkirchen
+ * @author Frank Lï¿½tzenkirchen
  * @author Harald Richter
  */
 public class MCRSearchServlet extends MCRServlet {
@@ -344,6 +344,9 @@ public class MCRSearchServlet extends MCRServlet {
                   elem.setAttribute("value",elem.getText());
                   elem.removeContent();
                   
+                }
+                else if(elem.getName().startsWith("boolean")){
+                	elem.setName("boolean");
                 }
             }
 
