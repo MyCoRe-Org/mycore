@@ -344,6 +344,9 @@ public class MCRSearchServlet extends MCRServlet {
                   elem.removeContent();
                   
                 }
+                else if(elem.getName().startsWith("boolean")){
+                	elem.setName("boolean");
+                }
             }
 
             // Find condition fields without values
