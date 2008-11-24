@@ -1,10 +1,10 @@
 <project name="broadcasting">
   <import file="../../integrate.xml" />
   <!-- - - - - - - - - - - - - - - - - - 
-          target: create.user                      
+          target: create.users                      
          - - - - - - - - - - - - - - - - -
 -->
-  <target name="create.user">
+  <target name="create.users">
     <property name="commands.file" value="${basedir}/commands.txt" />
     <echo file="${commands.file}" append="false">
 change to user ${MCR.Users.Superuser.UserName} with ${MCR.Users.Superuser.UserPasswd}

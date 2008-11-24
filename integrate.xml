@@ -212,11 +212,11 @@
   </target>
 
   <!-- ================================= 
-          target: create.user              
+          target: create.users              
          ================================= -->
-  <target name="create.user" description="--> adds user to the application">
-    <componentPreHook target="create.user" />
-    <componentHook target="create.user" />
+  <target name="create.users" description="--> adds user to the application">
+    <componentPreHook target="create.users" />
+    <componentHook target="create.users" />
   </target>
 
   <!-- ================================= 
