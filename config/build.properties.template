@@ -17,8 +17,8 @@
 
 # MCR.System.SharedJarsDir=/usr/share/java
 # MCR.System.Jars=ant.jar
-# MCR.System.Jars=ant.jar jai/jai_codec.jar jai/jai_core.jar
-# MCR.System.Jars=ant.jar jai/jai_codec.jar jai/jai_core.jar mysql-connector-java.jar
+# MCR.System.Jars=ant.jar jai/jai_codec.jar jai/jai_core.jar jai/mlibwrapper_jai.jar
+# MCR.System.Jars=ant.jar jai/jai_codec.jar jai/jai_core.jar jai/mlibwrapper_jai.jar mysql-connector-java.jar
 
 #######################################################################
 #
