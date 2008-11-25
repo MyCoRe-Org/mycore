@@ -258,7 +258,7 @@ public class MCRSearchServlet extends MCRServlet {
                 Enumeration names = request.getParameterNames();
                 while (names.hasMoreElements()) {
                     String name = (String) (names.nextElement());
-                    if (name.endsWith(".operator") || name.endsWith(".sortField"))
+                    if (name.endsWith(".operator") || name.contains(".sortField"))
                         continue;
                     if (" maxResults numPerPage mask ".indexOf(" " + name + " ") >= 0)
                         continue;
