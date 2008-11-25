@@ -29,12 +29,11 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.jdom.Element;
-import org.jdom.input.SAXBuilder;
 
+import org.mycore.common.MCRConfiguration;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandlerBase;
 import org.mycore.common.xml.MCRXMLHelper;
-import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.metadata.MCRBase;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRObject;
@@ -56,12 +55,14 @@ public class MCRAccessEventHandler extends MCREventHandlerBase {
     private static String storedrules = CONFIG.getString("MCR.Access.StorePermissions", "read,write,delete");
 
     // get the standard read rule from config or it's the true rule
-    private static String strReadRule = CONFIG.getString("MCR.Access.Rule.STANDARD-READ-RULE", "<condition format=\"xml\"><boolean operator=\"true\" /></condition>");
+    private static String strReadRule = CONFIG.getString("MCR.Access.Rule.STANDARD-READ-RULE",
+            "<condition format=\"xml\"><boolean operator=\"true\" /></condition>");
 
     private static Element readrule = (Element) MCRXMLHelper.parseXML(strReadRule, false).getRootElement().detach();
 
     // get the standard edit rule from config or it's the true rule
-    private static String strEditRule = CONFIG.getString("MCR.Access.Rule.STANDARD-EDIT-RULE", "<condition format=\"xml\"><boolean operator=\"true\" /></condition>");
+    private static String strEditRule = CONFIG.getString("MCR.Access.Rule.STANDARD-EDIT-RULE",
+            "<condition format=\"xml\"><boolean operator=\"true\" /></condition>");
 
     private static Element editrule = (Element) MCRXMLHelper.parseXML(strEditRule, false).getRootElement().detach();
 
@@ -75,7 +76,7 @@ public class MCRAccessEventHandler extends MCREventHandlerBase {
      *            the MCRObject that caused the event
      */
     protected void handleObjectCreated(MCREvent evt, MCRObject obj) {
-        handleBaseCreated(obj);
+        handleBaseCreated(obj, MCRConfiguration.instance().getBoolean("MCR.Access.AddObjectDefaultRule", true));
     }
 
     /**
@@ -88,7 +89,7 @@ public class MCRAccessEventHandler extends MCREventHandlerBase {
      *            the MCRObject that caused the event
      */
     protected void handleObjectUpdated(MCREvent evt, MCRObject obj) {
-        handleBaseUpdated(obj);
+        handleBaseUpdated(obj, MCRConfiguration.instance().getBoolean("MCR.Access.AddObjectDefaultRule", true));
     }
 
     /**
@@ -127,7 +128,7 @@ public class MCRAccessEventHandler extends MCREventHandlerBase {
      *            the MCRDerivate that caused the event
      */
     protected void handleDerivateCreated(MCREvent evt, MCRDerivate der) {
-        handleBaseCreated(der);
+        handleBaseCreated(der, MCRConfiguration.instance().getBoolean("MCR.Access.AddDerivateDefaultRule", true));
     }
 
     /**
@@ -140,7 +141,7 @@ public class MCRAccessEventHandler extends MCREventHandlerBase {
      *            the MCRDerivate that caused the event
      */
     protected void handleDerivateUpdated(MCREvent evt, MCRDerivate der) {
-        handleBaseUpdated(der);
+        handleBaseUpdated(der, MCRConfiguration.instance().getBoolean("MCR.Access.AddDerivateDefaultRule", true));
     }
 
     /**
@@ -169,7 +170,7 @@ public class MCRAccessEventHandler extends MCREventHandlerBase {
         // Do nothing
     }
 
-    private void handleBaseCreated(MCRBase base) {
+    private void handleBaseCreated(MCRBase base, boolean addDefaultRules) {
         // save the start time
         long t1 = System.currentTimeMillis();
 
@@ -180,7 +181,7 @@ public class MCRAccessEventHandler extends MCREventHandlerBase {
             aclsize = li.size();
         }
         int rulesize = base.getService().getRulesSize();
-        if ((rulesize == 0) && (aclsize == 0)) {
+        if ((rulesize == 0) && (aclsize == 0) && addDefaultRules) {
             setDefaultPermissions(base.getId().getId(), true);
             LOGGER.warn("The ACL conditions for this object are empty!");
         }
@@ -200,7 +201,7 @@ public class MCRAccessEventHandler extends MCREventHandlerBase {
         LOGGER.debug("MCRAccessEventHandler create: done in " + diff + " sec.");
     }
 
-    private void handleBaseUpdated(MCRBase base) {
+    private void handleBaseUpdated(MCRBase base, boolean addDefaultRules) {
         // save the start time
         long t1 = System.currentTimeMillis();
 
@@ -211,7 +212,7 @@ public class MCRAccessEventHandler extends MCREventHandlerBase {
             aclsize = li.size();
         }
         int rulesize = base.getService().getRulesSize();
-        if ((rulesize == 0) && (aclsize == 0)) {
+        if ((rulesize == 0) && (aclsize == 0) && addDefaultRules) {
             setDefaultPermissions(base.getId().getId(), false);
             LOGGER.warn("The ACL conditions for this object was empty!");
         }
