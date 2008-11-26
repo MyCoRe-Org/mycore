@@ -345,20 +345,22 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
             MCRSortBy sb = sortBy.get(j);
             MCRFieldDef fds = sb.getField();
             if (null != fds) {
-                String field = fds.getName();
-                String values[] = doc.getValues(field);
-                if (null != values) {
-                    for (int i = 0; i < values.length; i++) {
-                        MCRFieldDef fd = MCRFieldDef.getDef(field);
-                        MCRFieldValue fv = new MCRFieldValue(fd, values[i]);
-                        hit.addSortData(fv);
-                    }
-                } else if ("score".equals(field) && null != score) {
-                    MCRFieldDef fd = MCRFieldDef.getDef(field);
-                    MCRFieldValue fv = new MCRFieldValue(fd, score);
-                    hit.addSortData(fv);
-                }
-            }
+				String field = fds.getName();
+				if ("score".equals(field)) {
+					if (null != score) {
+						MCRFieldDef fd = MCRFieldDef.getDef(field);
+						MCRFieldValue fv = new MCRFieldValue(fd, score);
+						hit.addSortData(fv);
+					}
+				} else {
+					String values[] = doc.getValues(field);
+					for (int i = 0; i < values.length; i++) {
+						MCRFieldDef fd = MCRFieldDef.getDef(field);
+						MCRFieldValue fv = new MCRFieldValue(fd, values[i]);
+						hit.addSortData(fv);
+					}
+				}
+			}
         }
     }
 
