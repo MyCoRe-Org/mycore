@@ -155,7 +155,7 @@ function delAllAclPerms(event){
     var chk = window.confirm(msg);
     
     if (chk == true) {
-        self.location.href=cmd;
+        document.getElementById("delAllAclPermsForm").submit();
     }
 }
 
