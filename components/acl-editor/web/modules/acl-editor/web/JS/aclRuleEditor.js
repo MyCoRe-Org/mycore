@@ -206,7 +206,7 @@ function delAllRules(event){
     var chk = window.confirm(msg);
     
     if (chk == true) {
-        self.location.href=cmd;
+        document.getElementById("delAllRulesForm").submit();
     }
 }
 
