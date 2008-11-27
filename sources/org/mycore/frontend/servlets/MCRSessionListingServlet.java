@@ -22,11 +22,12 @@
 
 package org.mycore.frontend.servlets;
 
-import java.io.IOException;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.Collection;
 
 import org.jdom.Document;
 import org.jdom.Element;
+
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
@@ -40,19 +41,19 @@ public class MCRSessionListingServlet extends MCRServlet {
 
     public void doGetPost(MCRServletJob job) throws Exception {
 
-        if (!access())
+        if (!MCRAccessManager.checkPermission("manage-sessions"))
             throw new MCRException("Access denied. Please authorise.");
 
-        listSessions(job);
+        Document sessionsXML = listSessions(job);
+        MCRLayoutService.instance().doLayout(job.getRequest(), job.getResponse(), sessionsXML);
     }
 
-    private void listSessions(MCRServletJob job) {
-        Map<String, MCRSession> sessions = MCRSessionMgr.getAllSessions();
-        java.util.Iterator<MCRSession> sessionList = sessions.values().iterator();
+    private Document listSessions(MCRServletJob job) {
+        //copy all session to new collection (fixes: ConcurrentModificationException)
+        Collection<MCRSession> sessions = new ArrayList<MCRSession>(MCRSessionMgr.getAllSessions().values());
         Element sessionsXML = new Element("sessionListing");
         MCRUserMgr um = MCRUserMgr.instance();
-        while (sessionList.hasNext()) {
-            MCRSession session = (MCRSession) sessionList.next();
+        for (MCRSession session : sessions) {
             Element sessionXML = new Element("session");
             sessionXML.addContent(new Element("id").setText(session.getID()));
             sessionXML.addContent(new Element("login").setText(session.getCurrentUserID()));
@@ -67,16 +68,7 @@ public class MCRSessionListingServlet extends MCRServlet {
             sessionXML.addContent(new Element("loginTime").setText(Long.toString(session.getLoginTime())));
             sessionsXML.addContent(sessionXML);
         }
-        try {
-            MCRLayoutService.instance().doLayout(job.getRequest(), job.getResponse(), new Document(sessionsXML));
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-    }
-
-    private boolean access() {
-        return MCRAccessManager.checkPermission("manage-sessions");
+        return new Document(sessionsXML);
     }
 
 }
