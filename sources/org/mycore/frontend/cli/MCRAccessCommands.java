@@ -1,6 +1,6 @@
 /*
  * 
- * $Revision$ $Date$
+ * $Revision: 1.11 $ $Date: 2008/11/27 07:58:28 $
  *
  * This file is part of ***  M y C o R e  ***
  * See http://www.mycore.de/ for details.
@@ -48,7 +48,8 @@ import org.mycore.common.xml.MCRXMLHelper;
  * which can be used by the command line interface.
  * 
  * @author Heiko Helmbrecht
- * @version $Revision$ $Date$
+ * @author Jens Kupferschmidt
+ * @version $Revision: 1.11 $ $Date: 2008/11/27 07:58:28 $
  */
 public class MCRAccessCommands extends MCRAbstractCommands {
     /** The logger */
@@ -62,71 +63,52 @@ public class MCRAccessCommands extends MCRAbstractCommands {
 
         MCRCommand com = null;
 
-        com = new MCRCommand("load permissions data from file {0}", "org.mycore.frontend.cli.MCRAccessCommands.loadPermissionsFromFile String",
-                "The command loads the permissions data of the access control system with data from the file {0}.");
+        com = new MCRCommand("load permissions data from file {0}", "org.mycore.frontend.cli.MCRAccessCommands.loadPermissionsFromFile String", "The command loads the permissions data of the access control system with data from the file {0}.");
         command.add(com);
 
         com = new MCRCommand("list all permissions", "org.mycore.frontend.cli.MCRAccessCommands.listAllPermissions", "List all permission entries.");
         command.add(com);
 
-        com = new MCRCommand("delete all permissions", "org.mycore.frontend.cli.MCRAccessCommands.deleteAllPermissions",
-                "Remove all permission entries from the Access Control System.");
+        com = new MCRCommand("delete permission {0}", "org.mycore.frontend.cli.MCRAccessCommands.deletePermission String", "Remove a named permission entriy from the Access Control System.");
         command.add(com);
 
-        com = new MCRCommand("export all permissions to file {0}", "org.mycore.frontend.cli.MCRAccessCommands.exportAllPermissionsToFile String",
-                "Export all permissions from the Access Control System to the file {0}.");
+        com = new MCRCommand("delete all permissions", "org.mycore.frontend.cli.MCRAccessCommands.deleteAllPermissions", "Remove all permission entries from the Access Control System.");
         command.add(com);
 
-        com = new MCRCommand("update permission {0} for id {1} with rulefile {2} described by {3}",
-                "org.mycore.frontend.cli.MCRAccessCommands.permissionUpdateForID String String String String",
-                "The command updates access rule for a given id of a given permission with a given special rule");
+        com = new MCRCommand("export all permissions to file {0}", "org.mycore.frontend.cli.MCRAccessCommands.exportAllPermissionsToFile String", "Export all permissions from the Access Control System to the file {0}.");
         command.add(com);
 
-        com = new MCRCommand("update permission {0} for id {1} with rulefile {2}",
-                "org.mycore.frontend.cli.MCRAccessCommands.permissionUpdateForID String String String",
-                "The command updates access rule for a given id of a given permission with a given special rule");
+        com = new MCRCommand("update permission {0} for id {1} with rulefile {2} described by {3}", "org.mycore.frontend.cli.MCRAccessCommands.permissionUpdateForID String String String String", "The command updates access rule for a given id of a given permission with a given special rule");
         command.add(com);
 
-        com = new MCRCommand("update permission {0} for selected with rulefile {2} described by {3}",
-                "org.mycore.frontend.cli.MCRAccessCommands.permissionUpdateForSelected String String String",
-                "The command updates access rule for a given permission and all ids of a given MCRObject-Type with a given special rule");
+        com = new MCRCommand("update permission {0} for id {1} with rulefile {2}", "org.mycore.frontend.cli.MCRAccessCommands.permissionUpdateForID String String String", "The command updates access rule for a given id of a given permission with a given special rule");
         command.add(com);
 
-        com = new MCRCommand("update permission {0} for selected with rulefile {2}",
-                "org.mycore.frontend.cli.MCRAccessCommands.permissionUpdateForSelected String String",
-                "The command updates access rule for a given permission and all ids of a given MCRObject-Type with a given special rule");
+        com = new MCRCommand("update permission {0} for selected with rulefile {2} described by {3}", "org.mycore.frontend.cli.MCRAccessCommands.permissionUpdateForSelected String String String", "The command updates access rule for a given permission and all ids of a given MCRObject-Type with a given special rule");
         command.add(com);
 
-        com = new MCRCommand("delete permission {0} for id {1}", "org.mycore.frontend.cli.MCRAccessCommands.permissionDeleteForID String String",
-                "The command delete access rule for a given id of a given permission");
+        com = new MCRCommand("update permission {0} for selected with rulefile {2}", "org.mycore.frontend.cli.MCRAccessCommands.permissionUpdateForSelected String String", "The command updates access rule for a given permission and all ids of a given MCRObject-Type with a given special rule");
         command.add(com);
 
-        com = new MCRCommand("delete all permissions for id {1}", "org.mycore.frontend.cli.MCRAccessCommands.permissionDeleteAllForID String",
-                "The command delete all access rules for a given id");
+        com = new MCRCommand("delete permission {0} for id {1}", "org.mycore.frontend.cli.MCRAccessCommands.permissionDeleteForID String String", "The command delete access rule for a given id of a given permission");
         command.add(com);
 
-        com = new MCRCommand("delete permission {0} for selected", "org.mycore.frontend.cli.MCRAccessCommands.permissionDeleteForSelected String",
-                "The command delete access rule for a query selected set of object ids of a given permission");
+        com = new MCRCommand("delete all permissions for id {1}", "org.mycore.frontend.cli.MCRAccessCommands.permissionDeleteAllForID String", "The command delete all access rules for a given id");
         command.add(com);
 
-        com = new MCRCommand("delete all permissions for selected", "org.mycore.frontend.cli.MCRAccessCommands.permissionDeleteAllForSelected",
-                "The command delete all access rules for a query selected set of object ids");
+        com = new MCRCommand("delete permission {0} for selected", "org.mycore.frontend.cli.MCRAccessCommands.permissionDeleteForSelected String", "The command delete access rule for a query selected set of object ids of a given permission");
         command.add(com);
 
-        com = new MCRCommand(
-                "set website read only {0}",
-                "org.mycore.frontend.MCRWebsiteWriteProtection.activate String",
-                "Usage: <command> <message>, This command set the whole website into read only mode and provides the given message to users. Nobody, except super user can write on system, using web frontend");
+        com = new MCRCommand("delete all permissions for selected", "org.mycore.frontend.cli.MCRAccessCommands.permissionDeleteAllForSelected", "The command delete all access rules for a query selected set of object ids");
         command.add(com);
 
-        com = new MCRCommand(
-                "set website read only",
-                "org.mycore.frontend.MCRWebsiteWriteProtection.activate",
-                "This command set the whole website into read only mode. An already configurated message will be displayed to users. Nobody, except super user can write on system, using web frontend");
+        com = new MCRCommand("set website read only {0}", "org.mycore.frontend.MCRWebsiteWriteProtection.activate String", "Usage: <command> <message>, This command set the whole website into read only mode and provides the given message to users. Nobody, except super user can write on system, using web frontend");
         command.add(com);
 
-        com = new MCRCommand("unset website read only", "org.mycore.frontend.MCRWebsiteWriteProtection.deactivate",
-                "This command removes the write protection (read only) from website. After unsetting anybody can write as usual, using web frontend");
+        com = new MCRCommand("set website read only", "org.mycore.frontend.MCRWebsiteWriteProtection.activate", "This command set the whole website into read only mode. An already configurated message will be displayed to users. Nobody, except super user can write on system, using web frontend");
+        command.add(com);
+
+        com = new MCRCommand("unset website read only", "org.mycore.frontend.MCRWebsiteWriteProtection.deactivate", "This command removes the write protection (read only) from website. After unsetting anybody can write as usual, using web frontend");
         command.add(com);
     }
 
@@ -179,7 +161,7 @@ public class MCRAccessCommands extends MCRAbstractCommands {
 
         for (Iterator it = listelm.iterator(); it.hasNext();) {
             Element mcrpermission = (Element) it.next();
-            String permissionName = mcrpermission.getAttributeValue("name").trim().toLowerCase();
+            String permissionName = mcrpermission.getAttributeValue("name").trim();
             String ruleDescription = mcrpermission.getAttributeValue("ruledescription");
             if (ruleDescription == null)
                 ruleDescription = "";
@@ -201,7 +183,7 @@ public class MCRAccessCommands extends MCRAbstractCommands {
     }
 
     /**
-     * deletes all permissions
+     * delete all permissions
      */
     @SuppressWarnings("unchecked")
     public static void deleteAllPermissions() throws Exception {
@@ -209,6 +191,17 @@ public class MCRAccessCommands extends MCRAbstractCommands {
         for (String permission : (List<String>) AI.getPermissions()) {
             AI.removeRule(permission);
         }
+    }
+
+    /**
+     * delete the permission {0}
+     * 
+     * @param permission
+     *            the name of the permission
+     */
+    public static void deletePermission(String permission) throws Exception {
+        MCRAccessInterface AI = MCRAccessManager.getAccessImpl();
+        AI.removeRule(permission);
     }
 
     /**
@@ -234,7 +227,7 @@ public class MCRAccessCommands extends MCRAbstractCommands {
             }
         }
         if (noPermissionsDefined)
-        	LOGGER.warn("No permissions defined");
+            LOGGER.warn("No permissions defined");
         LOGGER.info("");
     }
 
