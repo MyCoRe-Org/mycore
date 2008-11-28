@@ -51,6 +51,7 @@ import org.hibernate.Transaction;
 import org.jdom.Element;
 import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.common.MCRCache;
+import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
@@ -94,7 +95,8 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
             return; // already inited?
 
         try {
-            String host = new java.net.URL(getBaseURL()).getHost();
+            //query property directly (not via getBaseURL()), saves a stalled MCRSession
+            String host = new java.net.URL(MCRConfiguration.instance().getString("MCR.baseurl")).getHost();
             String defIP = InetAddress.getByName(host).getHostAddress();
             int defPort = 22471; // my birthday is the default upload port
             serverIP = CONFIG.getString("MCR.FileUpload.IP", defIP);
