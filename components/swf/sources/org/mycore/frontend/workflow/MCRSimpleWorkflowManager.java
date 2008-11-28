@@ -590,7 +590,7 @@ public class MCRSimpleWorkflowManager {
      *            the MCRObjectID as string
      * @param permission
      *            the permission for the ACL system
-     * @return the XML tree of the condition
+     * @return the XML tree of the condition or null if the permission is not defined
      */
     @SuppressWarnings("unchecked")
     public final org.jdom.Element getRuleFromFile(String id, String permission) {
@@ -612,6 +612,6 @@ public class MCRSimpleWorkflowManager {
         } catch (Exception ex) {
             logger.error("Can't read file " + fn);
         }
-        return new org.jdom.Element("condition").setAttribute("format", "xml");
+        return null;
     }
 }

@@ -885,7 +885,7 @@ public class MCRStartEditorServlet extends MCRServlet {
      */
     public void wcommit(MCRServletJob job, CommonData cd) throws IOException {
         org.jdom.Element rule = WFM.getRuleFromFile(cd.mysemcrid, "writedb");
-        if (!AI.checkPermission(rule)) {
+        if (rule!=null && !AI.checkPermission(rule)) {
             job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + usererrorpage));
             return;
         }
@@ -948,7 +948,7 @@ public class MCRStartEditorServlet extends MCRServlet {
      */
     public void wdelder(MCRServletJob job, CommonData cd) throws IOException {
         org.jdom.Element rule = WFM.getRuleFromFile(cd.myremcrid, "deletewf");
-        if (!AI.checkPermission(rule)) {
+        if (rule!=null && !AI.checkPermission(rule)) {
             job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + usererrorpage));
             return;
         }
@@ -992,7 +992,7 @@ public class MCRStartEditorServlet extends MCRServlet {
      */
     public void wdelfile(MCRServletJob job, CommonData cd) throws IOException {
         org.jdom.Element rule = WFM.getRuleFromFile(cd.myremcrid, "deletewf");
-        if (!AI.checkPermission(rule)) {
+        if (rule!=null && !AI.checkPermission(rule)) {
             job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + usererrorpage));
             return;
         }
@@ -1049,7 +1049,7 @@ public class MCRStartEditorServlet extends MCRServlet {
      */
     public void wdelobj(MCRServletJob job, CommonData cd) throws IOException {
         org.jdom.Element rule = WFM.getRuleFromFile(cd.mysemcrid, "deletewf");
-        if (!AI.checkPermission(rule)) {
+        if (rule!=null && !AI.checkPermission(rule)) {
             job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + usererrorpage));
             return;
         }
@@ -1093,7 +1093,7 @@ public class MCRStartEditorServlet extends MCRServlet {
      */
     public void weditacl(MCRServletJob job, CommonData cd) throws IOException {
         org.jdom.Element rule = WFM.getRuleFromFile(cd.mysemcrid, "writewf");
-        if (!AI.checkPermission(rule)) {
+        if (rule!=null && !AI.checkPermission(rule)) {
             job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + usererrorpage));
             return;
         }
@@ -1142,7 +1142,7 @@ public class MCRStartEditorServlet extends MCRServlet {
      */
     public void weditder(MCRServletJob job, CommonData cd) throws IOException {
         org.jdom.Element rule = WFM.getRuleFromFile(cd.myremcrid, "writewf");
-        if (!AI.checkPermission(rule)) {
+        if (rule!=null && !AI.checkPermission(rule)) {
             job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + usererrorpage));
             return;
         }
@@ -1175,7 +1175,7 @@ public class MCRStartEditorServlet extends MCRServlet {
      */
     public void weditobj(MCRServletJob job, CommonData cd) throws IOException {
         org.jdom.Element rule = WFM.getRuleFromFile(cd.mysemcrid, "writewf");
-        if (!AI.checkPermission(rule)) {
+        if (rule!=null && !AI.checkPermission(rule)) {
             job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + usererrorpage));
             return;
         }
@@ -1276,7 +1276,7 @@ public class MCRStartEditorServlet extends MCRServlet {
      */
     public void wsetfile(MCRServletJob job, CommonData cd) throws IOException {
         org.jdom.Element rule = WFM.getRuleFromFile(cd.myremcrid, "writewf");
-        if (!AI.checkPermission(rule)) {
+        if (rule!=null && !AI.checkPermission(rule)) {
             job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + usererrorpage));
             return;
         }
