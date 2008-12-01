@@ -398,7 +398,9 @@ public class MCRLayoutService implements org.apache.xalan.trace.TraceListener {
         for (Enumeration e = request.getAttributeNames(); e.hasMoreElements();) {
             String name = e.nextElement().toString();
             if (name.startsWith("XSL.") && !name.endsWith(".SESSION")) {
-                props.put(name.substring(4), request.getAttribute(name).toString());
+                final Object attributeValue = request.getAttribute(name);
+                if (attributeValue != null)
+                    props.put(name.substring(4), attributeValue.toString());
             }
         }
         return props;
