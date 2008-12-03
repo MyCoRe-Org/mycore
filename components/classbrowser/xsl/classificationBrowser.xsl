@@ -4,7 +4,7 @@
   XSL to include a classification browser into any MyCoReWebPage.
 
   Usage:
-    <classificationBrowser 
+    <classificationbrowser 
       classification="{ClassificationID}" 
       category="{CategoryID to start with, optional}" 
       sortby="{id|label, optional sort order of categories}"
