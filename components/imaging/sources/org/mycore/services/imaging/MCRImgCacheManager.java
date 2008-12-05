@@ -17,8 +17,10 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import org.apache.log4j.Logger;
+import org.hibernate.Session;
 import org.jdom.Element;
 import org.jdom.JDOMException;
+import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.common.MCRException;
 import org.mycore.datamodel.ifs.MCRDirectory;
 import org.mycore.datamodel.ifs.MCRFile;
@@ -66,7 +68,10 @@ public class MCRImgCacheManager implements CacheManager {
     }
 
     private MCRImgCacheManager() {
+        cacheInIFS = (MCRDirectory) MCRFilesystemNode.getRootNode(CACHE_FOLDER);
+        
         if (cacheInIFS == null) {
+            LOGGER.info("Img Cache not exist, creating new one");
             try {
                 cacheInIFS = new MCRDirectory(CACHE_FOLDER, CACHE_FOLDER);
             } catch (Exception e) {
@@ -276,11 +281,37 @@ public class MCRImgCacheManager implements CacheManager {
         return existInCache(image, dimToString(size));
     }
 
-    public static void deleteCache() {
+    public void deleteCache() {
         MCRFilesystemNode[] children = cacheInIFS.getChildren();
 
         for (int i = 0; i < children.length; i++) {
             children[i].delete();
+        }
+        
+        MCRDirectory dir = (MCRDirectory) MCRFilesystemNode.getRootNode(MCRImgCacheManager.CACHE_FOLDER);
+
+        if (dir == null) {
+            LOGGER.warn("Cache does not exists.");
+        }
+
+        while (dir != null) {
+            try {
+                LOGGER.debug("Try deleting cache folder.");
+                dir.delete();
+                dir = (MCRDirectory) MCRFilesystemNode.getRootNode(MCRImgCacheManager.CACHE_FOLDER);
+            } catch (Exception e) {
+                LOGGER.info("Maybe inconsistency of image cache! Try to clean up.");
+                Session dbSession = MCRHIBConnection.instance().getSession();
+
+                int deletedEntities = dbSession.createQuery("delete from MCRFSNODES node where node.owner = :owner").setString("owner",
+                        MCRImgCacheManager.CACHE_FOLDER).executeUpdate();
+                dir = (MCRDirectory) MCRFilesystemNode.getRootNode(MCRImgCacheManager.CACHE_FOLDER);
+
+                if (dir != null) {
+                    throw new MCRException("Big mess!!! Send Developer a mail!");
+                }
+                LOGGER.info("Deleted " + deletedEntities + " Entities. Image cache cleaned!");
+            }
         }
     }
 }

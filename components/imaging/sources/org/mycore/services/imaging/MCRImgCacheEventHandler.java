@@ -49,7 +49,7 @@ public class MCRImgCacheEventHandler extends MCREventHandlerBase {
      */
     protected void handleFileDeleted(MCREvent evt, MCRFile file) {
         MCRImgCacheManager imgCache = MCRImgCacheManager.instance();
-        if (imgCache.existInCache(file)) {
+        if (!file.getOwnerID().equals(MCRImgCacheManager.CACHE_FOLDER) && imgCache.existInCache(file)) {
             try {
                 MCRImgCacheCommands.deleteCachedFile(file.getID());
             } catch (Exception e) {

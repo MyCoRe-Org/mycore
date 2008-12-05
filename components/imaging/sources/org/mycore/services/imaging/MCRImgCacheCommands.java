@@ -88,7 +88,7 @@ public class MCRImgCacheCommands extends MCRAbstractCommands {
     }
 
     public static void deleteCache() {
-        MCRImgCacheManager.deleteCache();
+        MCRImgCacheManager.instance().deleteCache();
         LOGGER.info("Cache deleted!");
     }
 
