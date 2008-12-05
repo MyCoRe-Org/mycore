@@ -177,7 +177,7 @@ public class MCRHIBXMLStore implements MCRXMLTableInterface {
         Blob blob = (Blob) session.createCriteria(MCRXMLTABLE.class).setProjection(Projections.property("xml")).add(Restrictions.eq("key", pk)).uniqueResult();
         try {
             return blob.getBinaryStream();
-        } catch (SQLException e) {
+        } catch (Exception e) {
             throw new MCRPersistenceException("Cannot get Blob for " + mcrid, e);
         }
     }
