@@ -21,13 +21,3 @@
 # MCR.System.Jars=ant.jar jai/jai_codec.jar jai/jai_core.jar jai/mlibwrapper_jai.jar mysql-connector-java.jar
 
 #######################################################################
-#
-# The called modules in order of their use. If you use the 
-# imaging you must do the 'ant install' call under
-# UNINSTALLED_imaging.
-#
-#######################################################################
-
-  MCR.Modules.MyCoRe=acl-editor,broadcasting,classhandler,indexing,swf,useradmin,userlogin,wcms,webservices,z3950
-# MCR.Modules.MyCoRe=acl-editor,broadcasting,classhandler,imaging,indexing,swf,useradmin,userlogin,wcms,webservices,z3950
-
