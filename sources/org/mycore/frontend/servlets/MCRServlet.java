@@ -443,6 +443,8 @@ public class MCRServlet extends HttpServlet {
                 value = URLEncoder.encode(parameters.getProperty(name), "UTF-8");
             } catch (UnsupportedEncodingException ex) {
                 value = parameters.getProperty(name);
+            } catch (NullPointerException npe) {
+                throw new MCRException("NullPointerException while encoding "+name,npe);
             }
             redirectURL.append(name).append("=").append(value);
         }
