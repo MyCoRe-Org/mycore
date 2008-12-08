@@ -72,8 +72,16 @@ public class MCRTranslation {
         String result = null;
         Locale currentLocale = getCurrentLocale();
         LOGGER.debug("Translation for current locale: " + currentLocale.getLanguage());
-        ResourceBundle message = ResourceBundle.getBundle("messages", currentLocale);
 
+        // workaround for bug with indonesian
+        // INDONESIAN      ID     OCEANIC/INDONESIAN [*Changed 1989 from original ISO 639:1988, IN]
+        // Java doesn't work with id
+        if (currentLocale.getLanguage().equals("id")) {
+            currentLocale = new Locale("in");
+            LOGGER.debug("Translation for current locale: " + currentLocale.getLanguage());
+        }
+
+        ResourceBundle message = ResourceBundle.getBundle("messages", currentLocale);
         try {
             result = message.getString(label);
             LOGGER.debug("Translation for " + label + "=" + result);
