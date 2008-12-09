@@ -302,6 +302,10 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
      *            the source for the file's content bytes
      */
     public void setContentFrom(InputStream source) throws MCRPersistenceException {
+        setContentFrom(source, true);
+    }
+
+    public long setContentFrom(InputStream source, boolean storeContentChange) throws MCRPersistenceException {
         ensureNotDeleted();
 
         String old_md5 = this.md5;
@@ -327,36 +331,39 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
         size = cis.getLength();
         md5 = cis.getMD5String();
 
-        boolean changed = ((size != old_size) || (!md5.equals(old_md5)));
-
-        if (changed) {
-            lastModified = new GregorianCalendar();
-        }
-
-        manager.storeNode(this);
-
-        if (changed && hasParent()) {
-            getParent().sizeOfChildChanged(old_size, size);
-        }
-
         if (old_storageID.length() != 0) {
             old_store.deleteContent(old_storageID);
         }
 
-        // If file content has changed, call event handlers to index content
+        boolean changed = ((size != old_size) || (!md5.equals(old_md5)));
+
         if (changed) {
-            String type = (isNew ? MCREvent.CREATE_EVENT : MCREvent.UPDATE_EVENT);
-            MCREvent event = new MCREvent(MCREvent.FILE_TYPE, type);
-            event.put("file", this);
-            MCREventManager.instance().handleEvent(event);
+            lastModified = new GregorianCalendar();
+            if(storeContentChange) storeContentChange(size - old_size);
         }
+        
+        return size - old_size;
+    }
+
+    public void storeContentChange(long sizeDiff) {
+        manager.storeNode(this);
+
+        if (hasParent())
+            getParent().sizeOfChildChanged(sizeDiff);
+
+        // If file content has changed, call event handlers to index content
+        String type = (isNew ? MCREvent.CREATE_EVENT : MCREvent.UPDATE_EVENT);
+        MCREvent event = new MCREvent(MCREvent.FILE_TYPE, type);
+        event.put("file", this);
+        MCREventManager.instance().handleEvent(event);
 
         isNew = false;
     }
 
     /**
-     * Deletes this file and its content stored in the system. Note that after calling this method, the file object is deleted and invalid and can not be used
-     * any more.
+     * Deletes this file and its content stored in the system. Note that after
+     * calling this method, the file object is deleted and invalid and can not
+     * be used any more.
      */
     public void delete() throws MCRPersistenceException {
         ensureNotDeleted();
@@ -370,7 +377,7 @@ public class MCRFile extends MCRFilesystemNode implements MCRFileReader {
             MCREventManager.instance().handleEvent(event);
 
             if (hasParent()) {
-                getParent().sizeOfChildChanged(size, 0);
+                getParent().sizeOfChildChanged(-size);
             }
         }
 

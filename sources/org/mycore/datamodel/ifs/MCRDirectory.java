@@ -388,15 +388,14 @@ public class MCRDirectory extends MCRFilesystemNode {
     /**
      * Internal method that is called when the size of a child node has changed, to update the total size of the parent directory.
      */
-    protected void sizeOfChildChanged(long oldSize, long newSize) {
-        this.size -= oldSize;
-        this.size += newSize;
+    protected void sizeOfChildChanged(long sizeDiff) {
+        this.size += sizeDiff;
         this.lastModified = new GregorianCalendar();
 
         manager.storeNode(this);
 
         if (hasParent()) {
-            getParent().sizeOfChildChanged(oldSize, newSize);
+            getParent().sizeOfChildChanged(sizeDiff);
         }
     }
 
