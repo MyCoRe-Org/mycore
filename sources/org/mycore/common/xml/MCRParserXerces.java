@@ -116,7 +116,7 @@ public class MCRParserXerces implements MCRParserInterface, ErrorHandler {
      *             if XML could not be parsed
      * @return the parsed XML stream as a DOM document
      */
-    public synchronized Document parseURI(String uri, boolean validate) {
+    public Document parseURI(String uri, boolean validate) {
         return parse(new InputSource(uri), validate);
     }
 
@@ -204,7 +204,7 @@ public class MCRParserXerces implements MCRParserInterface, ErrorHandler {
      *             if XML could not be parsed
      * @return the parsed XML stream as a DOM document
      */
-    private synchronized Document parse(InputSource source, boolean validate) {
+    private Document parse(InputSource source, boolean validate) {
         SAXBuilder builder = (validate ? this.builderValid : this.builder);
 
         try {
