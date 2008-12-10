@@ -112,6 +112,9 @@ public abstract class MCRUploadHandler {
      * bytes stored. The UploadHandler can also compare the MD5 checksum calculated
      * at the client side with its own checksum, to detect magical transfer errors.
      * 
+     * This method is not covered by a database transaction.
+     * The implementation has to handle transactions by itself.
+     * 
      * @param path
      *            the path and filename of the file
      * @param in

@@ -28,10 +28,13 @@ import java.util.List;
 import java.util.StringTokenizer;
 
 import org.apache.log4j.Logger;
+import org.hibernate.Transaction;
 
 import org.mycore.access.MCRAccessInterface;
 import org.mycore.access.MCRAccessManager;
+import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.common.MCRConfiguration;
+import org.mycore.common.MCRException;
 import org.mycore.datamodel.ifs.MCRDirectory;
 import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.ifs.MCRFilesystemNode;
@@ -56,6 +59,8 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
     protected MCRDirectory rootDir;
 
     protected boolean newDerivate = true;
+
+    private Transaction tx;
 
     private static final String ID_TYPE = "derivate";
 
@@ -125,15 +130,30 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
     }
 
     public synchronized long receiveFile(String path, InputStream in, long length, String md5) throws Exception {
-        LOGGER.debug("adding file: " + path);
-        MCRFile file = getNewFile(path);
-        file.setContentFrom(in);
+        try {
+            LOGGER.debug("adding file: " + path);
+            startTransaction();
+            MCRFile file = getNewFile(path);
+            commitTransaction();
+            long sizeDiff = file.setContentFrom(in, false);
+            startTransaction();
+            file.storeContentChange(sizeDiff);
+            commitTransaction();
 
-        long myLength = file.getSize();
-        if (myLength >= length)
-            return myLength;
-        else {
-            file.delete(); // Incomplete file transfer, user canceled upload
+            long myLength = file.getSize();
+            if (myLength >= length)
+                return myLength;
+            else {
+                file.delete(); // Incomplete file transfer, user canceled upload
+                return 0;
+            }
+        } catch (Exception e) {
+            LOGGER.error("Error while uploading file: "+path,e);
+            try {
+                rollbackTransaction();
+            } catch (Exception e2) {
+                LOGGER.debug("Error while rolling back transaction",e);
+            }
             return 0;
         }
     }
@@ -245,6 +265,32 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
                 MCRAccessManager.addRule(derID, permission, MCRAccessManager.getTrueRule(), "default derivate rule");
             }
         }
+    }
+
+    protected void startTransaction() {
+        LOGGER.debug("Starting transaction");
+        if (tx == null || !tx.isActive())
+            tx = MCRHIBConnection.instance().getSession().beginTransaction();
+        else
+            throw new MCRException("Transaction already started");
+    }
+
+    protected void commitTransaction() {
+        LOGGER.debug("Committing transaction");
+        if (tx != null) {
+            tx.commit();
+            tx = null;
+        } else
+            throw new NullPointerException("Cannot commit transaction");
+    }
+
+    protected void rollbackTransaction() {
+        LOGGER.debug("Rolling back transaction");
+        if (tx != null) {
+            tx.rollback();
+            tx = null;
+        } else
+            throw new NullPointerException("Cannot rollback transaction");
     }
 
 }

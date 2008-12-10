@@ -135,7 +135,6 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
     public void handleUpload(Socket socket) {
         LOGGER.info("Client applet connected to socket now.");
 
-        Transaction tx = null;
         try {
             DataOutputStream dos = new DataOutputStream(socket.getOutputStream());
             ZipInputStream zis = new ZipInputStream(socket.getInputStream());
@@ -163,7 +162,6 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
                     MCRSessionMgr.setCurrentSession(session);
             }
             //start transaction after MCRSession is initialized
-            tx = MCRHIBConnection.instance().getSession().beginTransaction();
             long numBytesStored = MCRUploadHandlerManager.getHandler(uploadId).receiveFile(path, zis, length, md5);
 
             LOGGER.debug("Stored incoming file content");
@@ -172,11 +170,8 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
             dos.flush();
 
             LOGGER.info("File transfer completed successfully.");
-            tx.commit();
         } catch (Exception ex) {
             LOGGER.error("Exception while receiving and storing file content from applet:", ex);
-            if (tx != null)
-                tx.rollback();
         } finally {
             try {
                 if (socket != null) {
@@ -304,6 +299,7 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
                 int numFiles = paths.size();
                 LOGGER.info("UploadHandler uploading " + numFiles + " file(s)");
                 handler.startUpload(numFiles);
+                job.commitTransaction();
 
                 for (int i = 0; i < numFiles; i++) {
                     FileItem item = sub.getFile(paths.get(i));
@@ -318,6 +314,7 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
                     } else
                         handler.receiveFile(path, in, 0, null);
                 }
+                job.beginTransaction();
 
                 handler.finishUpload();
             }
