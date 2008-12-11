@@ -1561,8 +1561,12 @@ public class MCROAIProvider extends MCRServlet {
                             }
                         }
                         if (!found) {
-                            categoryId = category.getParent().getId().getID() + ":" + categoryId;
-                            setSpec.append(" ").append(categoryId);
+                        	MCRCategory parent;
+                            while ((parent = category.getParent()) != null) {
+                            	categoryId = parent.getId().getID() + ":" + categoryId;
+                            	category = parent;
+                            }	
+                        	setSpec.append(" ").append(categoryId);
                         }
                     }
                 }
