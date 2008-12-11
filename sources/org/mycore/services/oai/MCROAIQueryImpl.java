@@ -114,7 +114,9 @@ public class MCROAIQueryImpl implements MCROAIQuery {
         List<String[]> list = new ArrayList<String[]>();
         for (int i = 0; i < classifications.length; i++) {
             MCRCategory cl = MCRCategoryDAOFactory.getInstance().getCategory(MCRCategoryID.rootID(classifications[i]), -1);
-            list.addAll(addXDINI(cl.getChildren()));
+            if(cl!=null){
+            	list.addAll(addXDINI(cl.getChildren()));
+            }
         }
         return list;
     }
