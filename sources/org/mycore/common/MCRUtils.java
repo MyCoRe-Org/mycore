@@ -90,6 +90,10 @@ public class MCRUtils {
      */
     static {
         StringBuffer sb;
+        // add id as workaround
+        langlist.add("id");
+        countrylist.add("ID");
+        // add codes from locale
         for ( Locale l : Locale.getAvailableLocales()) {
             sb = new StringBuffer(l.getLanguage());
             langlist.add(sb.toString());
