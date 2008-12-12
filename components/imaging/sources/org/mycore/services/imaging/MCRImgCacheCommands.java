@@ -87,9 +87,14 @@ public class MCRImgCacheCommands extends MCRAbstractCommands {
         return returns;
     }
 
-    public static void deleteCache() {
-        MCRImgCacheManager.instance().deleteCache();
-        LOGGER.info("Cache deleted!");
+    public static List<String> deleteCache() {
+        MCRXMLTableManager xmlTableManager = MCRXMLTableManager.instance();
+        List<String> derivateList = xmlTableManager.retrieveAllIDs("derivate");
+        List<String> returns = new ArrayList<String>(derivateList.size());
+        for (String derivateID : derivateList) {
+            returns.add("delete image cache for derivate " + derivateID);
+        }
+        return returns;
     }
 
     public static List<String> cacheDerivate(String ID) {
