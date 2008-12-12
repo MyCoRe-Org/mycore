@@ -100,7 +100,7 @@ public class MCROAIProvider extends MCRServlet {
             String instance = propName.substring("MCR.OAI.Repository.Identifier.".length());
             oaiConfig.put(instance, new MCROAIConfigBean(instance));
         }
-        oaiAdminEmail = CONFIG.getString("MCR.OAI.AdmineMail");
+        oaiAdminEmail = CONFIG.getString("MCR.OAI.AdmineMail", "");
         oaiProviderFriends = CONFIG.getString("MCR.OAI.Friends", "");
         oaiResumptionTokenTimeOut = CONFIG.getInt("MCR.OAI.Resumptiontoken.Timeout", 72);
         maxReturns = CONFIG.getInt("MCR.OAI.MaxReturns", 10);
@@ -159,6 +159,8 @@ public class MCROAIProvider extends MCRServlet {
     private static final String STR_GRANULARITY = "yyyy-MM-dd'T'HH:mm:ss'Z'";
 
     private static final String STR_GRANULARITY_SHORT = "yyyy-MM-dd";
+    
+    private static final String STR_REPOSITORY_GRANULARITY = "YYYY-MM-DD";
 
     private static final String STR_FIRST_DATE = "2000-01-01";
 
@@ -267,7 +269,7 @@ public class MCROAIProvider extends MCRServlet {
                 }
             }
             // <?xml-stylesheet type='text/xsl' href='/content/oai/oai2.xsl' ?>
-            File f = new File(getServletContext().getRealPath("content/oai/oai2.xsl"));
+            File f = new File(getServletContext().getRealPath("oai/oai2.xsl"));
             if (f.exists()) {
                 String myURL = getBaseURL();
                 if (myURL.length() == 0) {
@@ -283,7 +285,7 @@ public class MCROAIProvider extends MCRServlet {
                 Map<String, String> pairs = new HashMap<String, String>();
                 pairs.put("type", "text/xsl");
 
-                pairs.put("href", myURL + "content/oai/oai2.xsl");
+                pairs.put("href", myURL + "oai/oai2.xsl");
                 ProcessingInstruction pi = new ProcessingInstruction("xml-stylesheet", pairs);
                 document.addContent(0, pi);
             }
@@ -519,7 +521,7 @@ public class MCROAIProvider extends MCRServlet {
     private Date getDate(String date) {
         logger.debug("Given date: " + date);
         SimpleDateFormat dateFormat = new SimpleDateFormat(STR_GRANULARITY);
-        if (date.length() > STR_GRANULARITY.length()) {
+        if (date.length() > STR_REPOSITORY_GRANULARITY.length()) {
             return null;
         }
         ParsePosition pos = new ParsePosition(0);
@@ -605,7 +607,7 @@ public class MCROAIProvider extends MCRServlet {
         eIdentify.addContent(newElementWithContent("adminEmail", ns, oaiAdminEmail));
         eIdentify.addContent(newElementWithContent("earliestDatestamp", ns, STR_FIRST_DATE));
         eIdentify.addContent(newElementWithContent("deletedRecord", ns, "no"));
-        eIdentify.addContent(newElementWithContent("granularity", ns, "YYYY-MM-DD"));
+        eIdentify.addContent(newElementWithContent("granularity", ns, STR_REPOSITORY_GRANULARITY));
         // If we don't support compression, this SHOULD NOT be mentioned, so it
         // is outmarked
         // eIdentify.addContent(newElementWithContent("compression", ns,
@@ -937,6 +939,10 @@ public class MCROAIProvider extends MCRServlet {
                         logger.info("Anfrage 'listIdentifiers' enthaelt fehlerhafte Parameter.");
                         return addError(document, "noRecordsMatch", ERR_NO_RECORDS_MATCH);
                     }
+                    if(from[0].length()!=until[0].length()){
+                    	   logger.info("Anfrage 'listIdentifiers' enthaelt fehlerhafte Parameter (Granularität von from und until muss gleich sein.)");
+                    	   return addError(document, "badArgument", ERR_ILLEGAL_ARGUMENT);
+                    }
                 }
                 maxArguments++;
             }
@@ -1230,6 +1236,10 @@ public class MCROAIProvider extends MCRServlet {
                         logger.info("Anfrage 'listRecords' enthaelt nicht das richtige Datumsformat.");
                         return addError(document, "noRecordsMatch", ERR_NO_RECORDS_MATCH);
                     }
+                    if(from[0].length()!=until[0].length()){
+                 	   logger.info("Anfrage 'listIdentifiers' enthaelt fehlerhafte Parameter (Granularität von from und until muss gleich sein.)");
+                 	   return addError(document, "badArgument", ERR_ILLEGAL_ARGUMENT);
+                 }
                 }
                 maxArguments++;
             }
