@@ -158,6 +158,10 @@
     <url-pattern>/servlets/MCROAIProvider</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
+    <servlet-name>MCROAIProvider</servlet-name>
+    <url-pattern>/oai</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
     <servlet-name>XMLEditor</servlet-name>
     <url-pattern>/servlets/XMLEditor</url-pattern>
   </servlet-mapping>
