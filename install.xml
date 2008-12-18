@@ -126,7 +126,7 @@
     <antcall target="run">
       <param name="command" value="hsqldbstart" />
     </antcall>
-    <sleep seconds="30" />
+    <sleep seconds="15" />
     <echo>
 
     ========================================  
@@ -188,7 +188,7 @@
   </target>
   
   <target name="stop">
-    <sleep seconds="30" />
+    <sleep seconds="15" />
     <echo>
 
     ========================================  
@@ -196,7 +196,7 @@
     ========================================  
 
     </echo>
-    <get src="http://localhost:8291/content/below/index.xml" dest="${destdir}/homepage.html" verbose="on" />
+    <get src="http://127.0.0.1:8291/content/below/index.xml" dest="${destdir}/homepage.html" verbose="on" />
     <echo>
 
     ========================================  
