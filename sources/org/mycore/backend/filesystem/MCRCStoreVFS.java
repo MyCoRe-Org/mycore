@@ -33,6 +33,7 @@ import org.apache.commons.vfs.FileSystemManager;
 import org.apache.commons.vfs.FileSystemOptions;
 import org.apache.commons.vfs.VFS;
 import org.apache.commons.vfs.provider.sftp.SftpFileSystemConfigBuilder;
+import org.apache.log4j.Logger;
 
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
@@ -76,6 +77,8 @@ public class MCRCStoreVFS extends MCRContentStore {
 
     private String uri;
 
+    private static final Logger LOGGER = Logger.getLogger(MCRCStoreVFS.class);
+
     protected String doStoreContent(MCRFileReader file, MCRContentInputStream source) throws Exception {
         StringBuffer storageId = new StringBuffer();
 
@@ -99,7 +102,13 @@ public class MCRCStoreVFS extends MCRContentStore {
 
     protected void doDeleteContent(String storageId) throws Exception {
         FileObject targetObject = fsManager.resolveFile(getBase(), storageId);
-        targetObject.delete();
+        LOGGER.debug("Delete fired on: "+targetObject);
+        LOGGER.debug("targetObject.class = "+targetObject.getClass().getName());
+        if (targetObject.delete()){
+            LOGGER.debug("Delete of "+targetObject+" was successful.");
+        } else {
+            LOGGER.warn("Delete of "+targetObject+" was NOT successful (w/o errors given).");
+        }
     }
 
     protected void doRetrieveContent(MCRFileReader file, OutputStream target) throws Exception {
