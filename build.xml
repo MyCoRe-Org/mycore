@@ -25,6 +25,8 @@
   <property name="target.dir" location="${basedir}/build" />
   <property name="target.sources" location="${target.dir}/sources" />
   <property name="target.classes" location="${target.dir}/classes" />
+  <property name="target.appletbase" location="${target.dir}/upload-applet" />
+  <property name="target.appletclasses" location="${target.appletbase}/classes" />
   <property name="target.config" location="${target.dir}/config" />
   <property name="target.javadocs" location="${target.dir}/javadocs" />
   <property name="target.libs" location="${target.dir}/lib" />
@@ -248,6 +250,7 @@
     <antcall target="jar.copy-schema" />
     <antcall target="jar.copy-resources" />
     <antcall target="jar.copy-components" />
+    <antcall target="jar.upload-applet" />
     <jar destfile="${target.libs}/${jarfile}">
       <fileset dir="${target.classes}" includes="**/*.class" />
       <fileset dir="${target.classes}" includes="META-INF/services/*" />
@@ -403,10 +406,41 @@ public class MCRCoreVersion{
 ]]>
     </echo>
     <antcall target="javac">
-      <param name="packages" value="org/mycore/**" />
+      <param name="packages" value="**" />
       <param name="excludes" value="${mcr.exclude}" />
     </antcall>
     <moduleHook target="compile" />
+  </target>
+  
+  <target name="compile.upload-applet" depends="init">
+    <mkdir dir="${target.appletclasses}"/>
+    <javac destdir="${target.appletclasses}"
+           includes="org/mycore/frontend/fileupload/**"
+      	   excludes="org/mycore/frontend/fileupload/*Handler* org/mycore/frontend/fileupload/*Servlet*"
+           classpathref="mycore.classpath"
+           debug="${debug}"
+           optimize="${optimize}"
+           target="1.4"
+           source="1.4"
+           encoding="${sourceencoding}"
+      	   fork="yes"
+           deprecation="${deprecation}">
+      <src>
+        <path refid="sources.path" />
+      </src>
+    </javac>
+  </target>
+  
+  <target name="jar.upload-applet" depends="compile.upload-applet">
+    <copy file="${basedir}/config/messages_de.MCRUploadApplet"
+          tofile="${target.appletclasses}/messages_de.properties"
+          preservelastmodified="true" />
+    <copy file="${basedir}/config/messages_en.MCRUploadApplet"
+          tofile="${target.appletclasses}/messages_en.properties"
+          preservelastmodified="true" />
+    <jar jarfile="${target.jarbase}/uploadApplet-unsigned.jar">
+      <fileset dir="${target.appletclasses}" />
+    </jar>
   </target>
 
   <!-- =================================================================== -->
