@@ -77,7 +77,7 @@ public abstract class MCRAbstractCategoryImpl implements MCRCategory {
         return children;
     }
 
-    abstract void setChildren(List<MCRCategory> children);
+    protected abstract void setChildren(List<MCRCategory> children);
 
     public MCRCategoryID getId() {
         return id;
