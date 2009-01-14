@@ -25,19 +25,21 @@ package org.mycore.backend.hibernate;
 
 import java.io.InputStream;
 import java.sql.Blob;
-import java.sql.SQLException;
+import java.util.AbstractList;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
-
 import org.mycore.backend.hibernate.tables.MCRXMLTABLE;
 import org.mycore.backend.hibernate.tables.MCRXMLTABLEPK;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRPersistenceException;
+import org.mycore.datamodel.common.MCRObjectIDDate;
 import org.mycore.datamodel.common.MCRXMLTableInterface;
 import org.mycore.datamodel.metadata.MCRObjectID;
 
@@ -100,7 +102,7 @@ public class MCRHIBXMLStore implements MCRXMLTableInterface {
      * @exception MCRPersistenceException
      *                the method arguments are not correct
      */
-    public synchronized final void create(String mcrid, byte[] xml, int version) throws MCRPersistenceException {
+    public synchronized final void create(String mcrid, byte[] xml, int version, Date lastModified) throws MCRPersistenceException {
         if (mcrid == null) {
             throw new MCRPersistenceException("The MCRObjectID is null.");
         }
@@ -116,6 +118,7 @@ public class MCRHIBXMLStore implements MCRXMLTableInterface {
             tab.setKey(pk);
             tab.setType(this.type);
         }
+        tab.setLastModified(lastModified);
         tab.setXmlByteArray(xml);
         logger.debug("Inserting " + mcrid + "/" + version + "/" + this.type + " into database MCRXMLTABLE");
         session.save(tab);
@@ -149,12 +152,13 @@ public class MCRHIBXMLStore implements MCRXMLTableInterface {
      * @exception MCRPersistenceException
      *                the method arguments are not correct
      */
-    public synchronized final void update(String mcrid, byte[] xml, int version) throws MCRPersistenceException {
+    public synchronized final void update(String mcrid, byte[] xml, int version, Date lastModified) throws MCRPersistenceException {
         Session session = getSession();
         MCRXMLTABLE xmlEntry = (MCRXMLTABLE) session.load(MCRXMLTABLE.class, new MCRXMLTABLEPK(mcrid, version));
         xmlEntry.setVersion(version);
         xmlEntry.setType(this.type);
         xmlEntry.setXmlByteArray(xml);
+        xmlEntry.setLastModified(lastModified);
         logger.debug("Updateing " + mcrid + "/" + version + "/" + this.type + " in database");
         session.update(xmlEntry);
     }
@@ -174,7 +178,8 @@ public class MCRHIBXMLStore implements MCRXMLTableInterface {
     public final InputStream retrieve(String mcrid, int version) throws MCRPersistenceException {
         Session session = getSession();
         MCRXMLTABLEPK pk = new MCRXMLTABLEPK(mcrid, version);
-        Blob blob = (Blob) session.createCriteria(MCRXMLTABLE.class).setProjection(Projections.property("xml")).add(Restrictions.eq("key", pk)).uniqueResult();
+        Blob blob = (Blob) session.createCriteria(MCRXMLTABLE.class).setProjection(Projections.property("xml")).add(
+                Restrictions.eq("key", pk)).uniqueResult();
         try {
             return blob.getBinaryStream();
         } catch (Exception e) {
@@ -202,7 +207,8 @@ public class MCRHIBXMLStore implements MCRXMLTableInterface {
 
         Session session = getSession();
         //TODO: SQL -> Criteria
-        List<?> l = session.createQuery("select max(key.id) from " + classname + " where MCRID like '" + project + "_" + type + "%'").list();
+        List<?> l = session.createQuery("select max(key.id) from " + classname + " where MCRID like '" + project + "_" + type + "%'")
+                .list();
         if (l.size() > 0 && l.get(0) != null) {
             String max = (String) l.get(0);
             if (max == null)
@@ -275,6 +281,45 @@ public class MCRHIBXMLStore implements MCRXMLTableInterface {
 
         for (t = 0; t < l.size(); t++) {
             logger.debug(l.get(0));
+        }
+    }
+
+    public List<MCRObjectIDDate> listObjectDates(String type) {
+        Session session = getSession();
+        Criteria criteria = session.createCriteria(MCRXMLTABLE.class).add(Restrictions.eq("type", type)).setProjection(
+                Projections.projectionList().add(Projections.property("key.id")).add(Projections.property("lastModified")));
+        List<?> result = criteria.list();
+        return new MCRObjectIDDateList(result);
+    }
+
+    private static class MCRObjectIDDateList extends AbstractList<MCRObjectIDDate> {
+        
+        List<?> result;
+        
+        public MCRObjectIDDateList(List<?> result){
+            this.result=result;
+        }
+
+        @Override
+        public MCRObjectIDDate get(final int index) {
+            return new MCRObjectIDDate(){
+                
+                private Object[] entry=(Object[]) result.get(index);
+
+                public String getId() {
+                    return entry[0].toString();
+                }
+
+                public Date getLastModified() {
+                    return (Date)entry[1];
+                }
+                
+            };
+        }
+
+        @Override
+        public int size() {
+            return result.size();
         }
     }
 }

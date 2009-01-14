@@ -28,18 +28,19 @@ import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
+import java.util.List;
 
 import org.apache.log4j.Logger;
-
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.Namespace;
-import org.jdom.xpath.XPath;
-
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+import org.joda.time.format.DateTimeFormatter;
+import org.joda.time.format.ISODateTimeFormat;
 import org.mycore.common.MCRConfiguration;
+import org.mycore.datamodel.common.MCRObjectIDDate;
 import org.mycore.datamodel.common.MCRXMLTableManager;
-import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.frontend.servlets.MCRServlet;
 
 /**
  * This class implements all common methods th create the Google sitemap data.
@@ -62,7 +63,7 @@ public final class MCRGoogleSitemapCommon {
     private static final String basedir = MCRConfiguration.instance().getString("MCR.basedir", "");
 
     /** The base URL */
-    private  String baseurl = MCRConfiguration.instance().getString("MCR.baseurl", "");
+    private String baseurl = MCRConfiguration.instance().getString("MCR.baseurl", "");
 
     /** The webapps directory path from configuration */
     private static final String cdir = MCRConfiguration.instance().getString("MCR.GoogleSitemap.Directory", "");
@@ -92,17 +93,18 @@ public final class MCRGoogleSitemapCommon {
     private static final String SLASH = System.getProperty("file.separator");
 
     /** local data */
-    private ArrayList<String> objidlist = null;
+    private List<MCRObjectIDDate> objidlist = null;
 
     /** The constructor */
     public MCRGoogleSitemapCommon() {
-        objidlist = new ArrayList<String>();
-        if ((numberOfURLs < 1) || (numberOfURLs > 50000)) numberOfURLs = 50000;
+        objidlist = new ArrayList<MCRObjectIDDate>();
+        if ((numberOfURLs < 1) || (numberOfURLs > 50000))
+            numberOfURLs = 50000;
     }
-    
-    public MCRGoogleSitemapCommon(String baseURL){
+
+    public MCRGoogleSitemapCommon(String baseURL) {
         this();
-        this.baseurl=baseURL;
+        this.baseurl = baseURL;
     }
 
     /**
@@ -117,9 +119,7 @@ public final class MCRGoogleSitemapCommon {
     protected final int checkSitemapFile() {
         int number = 0;
         for (String type : types) {
-            for (Object objID : tm.retrieveAllIDs(type)) {
-                objidlist.add(objID.toString());
-            }
+            objidlist.addAll(tm.listObjectDates(type));
         }
         number = objidlist.size() / numberOfURLs;
         if (objidlist.size() % numberOfURLs != 0)
@@ -162,26 +162,11 @@ public final class MCRGoogleSitemapCommon {
         // build document frame
         Element urlset = new Element("urlset", ns);
         Document jdom = new Document(urlset);
+        DateTimeFormatter formatter = ISODateTimeFormat.dateTime().withZone(DateTimeZone.UTC);
 
         // build over all types
-        Document doc = null;
-        XPath xpath = XPath.newInstance("/mycoreobject/service/servdates/servdate[@type='modifydate']");
-        for (int i = 0; i < objidlist.size(); i++) {
-            String mcrID = objidlist.get(i);
-            doc = tm.readDocument(new MCRObjectID(mcrID));
-            Element servDate = (Element) xpath.selectSingleNode(doc);
-            StringBuffer sb = new StringBuffer(1024);
-            sb.append(baseurl).append(objectPath).append(mcrID);
-            if ((style != null) && (style.trim().length() > 0)) {
-                sb.append("?XSL.Style=").append(style);
-            }
-            // build entry
-            Element url = new Element("url", ns);
-            url.addContent(new Element("loc", ns).addContent(sb.toString()));
-            url.addContent(new Element("changefreq", ns).addContent(freq));
-            url.addContent(new Element("lastmod", ns).addContent(servDate.getText()));
-            urlset.addContent(url);
-
+        for (MCRObjectIDDate objectIDDate : objidlist) {
+            urlset.addContent(buildURLElement(formatter, objectIDDate));
         }
         return jdom;
     }
@@ -198,33 +183,36 @@ public final class MCRGoogleSitemapCommon {
         // build document frame
         Element urlset = new Element("urlset", ns);
         Document jdom = new Document(urlset);
+        DateTimeFormatter formatter = ISODateTimeFormat.dateTime().withZone(DateTimeZone.UTC);
 
         // build over all types
-        Document doc = null;
-        XPath xpath = XPath.newInstance("/mycoreobject/service/servdates/servdate[@type='modifydate']");
         int start = numberOfURLs * (number);
         int stop = numberOfURLs * (number + 1);
         if (stop > objidlist.size())
             stop = objidlist.size();
         LOGGER.debug("Build Google URL in range from " + Integer.toString(start) + " to " + Integer.toString(stop - 1) + ".");
         for (int i = start; i < stop; i++) {
-            String mcrID = objidlist.get(i);
-            doc = tm.readDocument(new MCRObjectID(mcrID));
-            Element servDate = (Element) xpath.selectSingleNode(doc);
-            StringBuffer sb = new StringBuffer(1024);
-            sb.append(baseurl).append(objectPath).append(mcrID);
-            if ((style != null) && (style.trim().length() > 0)) {
-                sb.append("?XSL.Style=").append(style);
-            }
-            // build entry
-            Element url = new Element("url", ns);
-            url.addContent(new Element("loc", ns).addContent(sb.toString()));
-            url.addContent(new Element("changefreq", ns).addContent(freq));
-            url.addContent(new Element("lastmod", ns).addContent(servDate.getText()));
-            urlset.addContent(url);
+            MCRObjectIDDate objectIDDate = objidlist.get(i);
+            urlset.addContent(buildURLElement(formatter, objectIDDate));
 
         }
         return jdom;
+    }
+
+    private Element buildURLElement(DateTimeFormatter formatter, MCRObjectIDDate objectIDDate) {
+        String mcrID = objectIDDate.getId();
+        DateTime dt = new DateTime(objectIDDate.getLastModified().getTime());
+        StringBuffer sb = new StringBuffer(1024);
+        sb.append(baseurl).append(objectPath).append(mcrID);
+        if ((style != null) && (style.trim().length() > 0)) {
+            sb.append("?XSL.Style=").append(style);
+        }
+        // build entry
+        Element url = new Element("url", ns);
+        url.addContent(new Element("loc", ns).addContent(sb.toString()));
+        url.addContent(new Element("changefreq", ns).addContent(freq));
+        url.addContent(new Element("lastmod", ns).addContent(formatter.print(dt)));
+        return url;
     }
 
     /**
@@ -265,13 +253,13 @@ public final class MCRGoogleSitemapCommon {
         }
         File dir = new File(sb.toString());
         File[] li = dir.listFiles();
-        if(li!=null){
-        	for (File fi : li) {
-        		if (fi.getName().startsWith("sitemap_google")) {
-        			LOGGER.debug("Remove file " + fi.getName());
-        			fi.delete();
-        		}
-        	}
+        if (li != null) {
+            for (File fi : li) {
+                if (fi.getName().startsWith("sitemap_google")) {
+                    LOGGER.debug("Remove file " + fi.getName());
+                    fi.delete();
+                }
+            }
         }
     }
 }

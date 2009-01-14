@@ -48,7 +48,7 @@ public class MCRXMLTableEventHandler extends MCREventHandlerBase {
      */
     protected final void handleObjectCreated(MCREvent evt, MCRObject obj) {
         org.jdom.Document doc = obj.createXML();
-        mcr_xmltable.create(obj.getId(), doc);
+        mcr_xmltable.create(obj.getId(), doc, obj.getService().getDate("modifydate"));
     }
 
     /**
@@ -61,7 +61,7 @@ public class MCRXMLTableEventHandler extends MCREventHandlerBase {
      *            the MCRObject that caused the event
      */
     protected final void handleObjectUpdated(MCREvent evt, MCRObject obj) {
-        mcr_xmltable.update(obj.getId(), obj.createXML());
+        mcr_xmltable.update(obj.getId(), obj.createXML(), obj.getService().getDate("modifydate"));
     }
 
     /**
@@ -87,7 +87,7 @@ public class MCRXMLTableEventHandler extends MCREventHandlerBase {
      */
     protected final void handleDerivateCreated(MCREvent evt, MCRDerivate der) {
         org.jdom.Document doc = der.createXML();
-        mcr_xmltable.create(der.getId(), doc);
+        mcr_xmltable.create(der.getId(), doc, der.getService().getDate("modifydate"));
     }
 
     /**
@@ -100,7 +100,7 @@ public class MCRXMLTableEventHandler extends MCREventHandlerBase {
      *            the MCRObject that caused the event
      */
     protected final void handleDerivateUpdated(MCREvent evt, MCRDerivate der) {
-        mcr_xmltable.update(der.getId(), der.createXML());
+        mcr_xmltable.update(der.getId(), der.createXML(), der.getService().getDate("modifydate"));
     }
 
     /**
