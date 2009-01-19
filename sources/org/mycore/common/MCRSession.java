@@ -47,7 +47,7 @@ import org.mycore.frontend.servlets.MCRServletJob;
  * 
  * @author Detlev Degenhardt
  * @author Jens Kupferschmidt
- * @author Frank L�tzenkirchen
+ * @author Frank L\u00fctzenkirchen
  * 
  * @version $Revision$ $Date: 2008-03-17 17:12:15 +0100 (Mo, 17 Mrz
  *          2008) $
@@ -78,7 +78,7 @@ public class MCRSession implements Cloneable {
     /** The unique ID of this session */
     private String sessionID = null;
 
-    /** -ASC- f�r MCRClassificationBrowser Class session daten */
+    /** -ASC- for MCRClassificationBrowser Class session data */
     public MCRClassificationBrowserData BData = null;
 
     private String FullName = null;
