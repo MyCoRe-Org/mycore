@@ -8,10 +8,12 @@
       <generator class="native" />
     </id>
     <natural-id mutable="true">
-      <many-to-one name="category" class="MCRCategoryImpl" cascade="none" />
+      <many-to-one name="category" class="MCRCategoryImpl"
+        cascade="none" />
       <component name="objectReference">
         <property name="objectID" access="field" />
-        <property name="type" column="objectType" access="field" length="70"/>
+        <property name="type" column="objectType" access="field"
+          length="70" />
       </component>
     </natural-id>
     <query name="NumberPerCategID">
@@ -39,6 +41,24 @@ SELECT cat.categID, count(distinct link.objectReference.objectID) as num
   GROUP BY cat.categID
       ]]>
     </query>
+    <!-- Tuned Query for MySQL -->
+    <sql-query name="NumberByTypePerCategID.MySQLDialect">
+      <return-scalar column="categID" type="string" />
+      <return-scalar column="num" type="integer" />
+      <![CDATA[
+SELECT cat.categID, count(distinct link.objectID) as num
+  FROM MCRCategory cat
+	STRAIGHT_JOIN MCRCategory cattree
+		ON cattree.leftValue BETWEEN cat.leftValue AND cat.rightValue
+	STRAIGHT_JOIN MCRCategoryLink link
+		ON cattree.internalID = link.category
+	WHERE cat.ClassID= :classID
+	  AND cattree.ClassID= :classID
+	  AND link.objectType= :type
+	  AND cat.CategID in (:categIDs)
+	GROUP BY cat.categID
+      ]]>
+    </sql-query>
     <query name="NumberPerChildOfParentID">
       <![CDATA[
 SELECT cat.categID, count(distinct link.objectReference.objectID) as num

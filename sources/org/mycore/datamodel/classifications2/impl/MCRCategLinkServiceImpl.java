@@ -35,13 +35,11 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
-
 import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 import org.mycore.datamodel.classifications2.MCRCategLinkService;
-import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.MCRObjectReference;
 
@@ -54,6 +52,8 @@ import org.mycore.datamodel.classifications2.MCRObjectReference;
  * @since 2.0
  */
 public class MCRCategLinkServiceImpl implements MCRCategLinkService {
+
+    private static final MCRHIBConnection HIB_CONNECTION_INSTANCE = MCRHIBConnection.instance();
 
     private static Logger LOGGER = Logger.getLogger(MCRCategLinkServiceImpl.class);
 
@@ -85,13 +85,12 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
             // initialize all categIDs with link count of zero
             returns.put(id, 0);
         }
-        Session session = MCRHIBConnection.instance().getSession();
         Map<MCRCategoryID, Number> countLinks = new HashMap<MCRCategoryID, Number>();
         // for every classID do:
         for (Map.Entry<String, Collection<String>> entry : perClassID.entrySet()) {
             String classID = entry.getKey();
             LOGGER.debug("counting links for classification: "+classID);
-            Query q = session.getNamedQuery(LINK_CLASS.getName() + queryName);
+            Query q = HIB_CONNECTION_INSTANCE.getNamedQuery(LINK_CLASS.getName() + queryName);
             // query can take long time, please cache result
             q.setCacheable(true);
             q.setParameter("classID", classID);
@@ -122,11 +121,11 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
         boolean restrictedByType = (type != null);
         String queryName = restrictedByType ? ".NumberByTypePerChildOfParentID" : ".NumberPerChildOfParentID";
         // TODO: initialize all categIDs with link count of zero
-        Session session = MCRHIBConnection.instance().getSession();
+        Session session = HIB_CONNECTION_INSTANCE.getSession();
         MCRCategoryImpl parent = getMCRCategory(session, parentID);
         Map<MCRCategoryID, Number> countLinks = new HashMap<MCRCategoryID, Number>();
         String classID = parentID.getRootID();
-        Query q = session.getNamedQuery(LINK_CLASS.getName() + queryName);
+        Query q = HIB_CONNECTION_INSTANCE.getNamedQuery(LINK_CLASS.getName() + queryName);
         // query can take long time, please cache result
         q.setCacheable(true);
         q.setParameter("classID", classID);
@@ -145,16 +144,14 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
     }
 
     public void deleteLink(String id) {
-        Session session = MCRHIBConnection.instance().getSession();
-        Query q = session.getNamedQuery(LINK_CLASS.getName() + ".deleteByObjectID");
+        Query q = HIB_CONNECTION_INSTANCE.getNamedQuery(LINK_CLASS.getName() + ".deleteByObjectID");
         q.setParameter("id", id);
         int deleted = q.executeUpdate();
         LOGGER.debug("Number of Links deleted: " + deleted);
     }
 
     public void deleteLinks(Collection<String> ids) {
-        Session session = MCRHIBConnection.instance().getSession();
-        Query q = session.getNamedQuery(LINK_CLASS.getName() + ".deleteByObjectCollection");
+        Query q = HIB_CONNECTION_INSTANCE.getNamedQuery(LINK_CLASS.getName() + ".deleteByObjectCollection");
         q.setParameterList("ids", ids);
         int deleted = q.executeUpdate();
         LOGGER.debug("Number of Links deleted: " + deleted);
@@ -162,8 +159,7 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
 
     @SuppressWarnings("unchecked")
     public Collection<String> getLinksFromCategory(MCRCategoryID id) {
-        Session session = MCRHIBConnection.instance().getSession();
-        Query q = session.getNamedQuery(LINK_CLASS.getName() + ".ObjectIDByCategory");
+        Query q = HIB_CONNECTION_INSTANCE.getNamedQuery(LINK_CLASS.getName() + ".ObjectIDByCategory");
         q.setCacheable(true);
         q.setParameter("rootID", id.getRootID());
         q.setParameter("categID", id.getID());
@@ -172,8 +168,7 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
 
     @SuppressWarnings("unchecked")
     public Collection<String> getLinksFromCategoryForType(MCRCategoryID id, String type) {
-        Session session = MCRHIBConnection.instance().getSession();
-        Query q = session.getNamedQuery(LINK_CLASS.getName() + ".ObjectIDByCategoryAndType");
+        Query q = HIB_CONNECTION_INSTANCE.getNamedQuery(LINK_CLASS.getName() + ".ObjectIDByCategoryAndType");
         q.setCacheable(true);
         q.setParameter("rootID", id.getRootID());
         q.setParameter("categID", id.getID());
@@ -183,8 +178,7 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
 
     @SuppressWarnings("unchecked")
     public Collection<MCRCategoryID> getLinksFromObject(String id) {
-        Session session = MCRHIBConnection.instance().getSession();
-        Query q = session.getNamedQuery(LINK_CLASS.getName() + ".categoriesByObjectID");
+        Query q = HIB_CONNECTION_INSTANCE.getNamedQuery(LINK_CLASS.getName() + ".categoriesByObjectID");
         q.setCacheable(true);
         q.setParameter("id", id);
         List<Object[]> result = q.list();
@@ -196,7 +190,7 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
     }
 
     public void setLinks(MCRObjectReference objectReference, Collection<MCRCategoryID> categories) {
-        Session session = MCRHIBConnection.instance().getSession();
+        Session session = HIB_CONNECTION_INSTANCE.getSession();
         for (MCRCategoryID categID : categories) {
             MCRCategoryLink link = new MCRCategoryLink(getMCRCategory(session, categID), objectReference);
             LOGGER.debug("Adding Link from " + link.getCategory().getId() + "(" + link.getCategory().getInternalID() + ") to " + objectReference.getObjectID());
@@ -223,7 +217,7 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
         boolean useSingleDBQuery = MCRConfiguration.instance().getBoolean("MCR.Classifications.LinkServiceImpl.HasLinks.SingleQuery", false);
         Map<MCRCategoryID, Number> countMap = useSingleDBQuery ? countLinks(categIDs) : null;
         HashMap<MCRCategoryID, Boolean> boolMap = new HashMap<MCRCategoryID, Boolean>(categIDs.size());
-        Session session = MCRHIBConnection.instance().getSession();
+        Session session = HIB_CONNECTION_INSTANCE.getSession();
         for (MCRCategoryID categID : categIDs) {
             if (useSingleDBQuery) {
                 boolMap.put(categID, countMap.get(categID).intValue() > 0 ? Boolean.TRUE : Boolean.FALSE);
@@ -248,7 +242,7 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
                     continue;
                 }
                 LOGGER.debug("check if a single linked category is part of " + categID);
-                Query linkQuery = session.getNamedQuery(LINK_CLASS.getName() + ".hasLinks");
+                Query linkQuery = HIB_CONNECTION_INSTANCE.getNamedQuery(LINK_CLASS.getName() + ".hasLinks");
                 linkQuery.setParameterList("internalIDs", internalIDs);
                 boolMap.put(categID, linkQuery.iterate().hasNext());
             }
