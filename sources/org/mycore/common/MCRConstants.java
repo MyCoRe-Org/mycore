@@ -34,6 +34,7 @@ import org.jdom.Namespace;
  * 
  * @author Jens Kupferschmidt
  * @author Thomas Scheffler (yagee)
+ * @author Stefan Freitag (sasf)
  * @version $Revision$ $Date$
  */
 public final class MCRConstants {
@@ -51,6 +52,19 @@ public final class MCRConstants {
     /** The URL of the XSL */
     private final static String XSL_URL = "http://www.w3.org/1999/XSL/Transform";
     public final static Namespace XSL_NAMESPACE = Namespace.getNamespace("xsl", XSL_URL);
+    
+    /** The URL of the METS */
+    private final static String METS_URL = "http://www.loc.gov/METS/";
+    public final static Namespace METS_NAMESPACE = Namespace.getNamespace("mets", METS_URL);
+    
+    /** The URL of the DV */
+    private final static String DV_URL = "http://dfg-viewer.de/";
+    public final static Namespace DV_NAMESPACE = Namespace.getNamespace("dv", DV_URL);
+    
+    /** The URL of the MODS */
+    private final static String MODS_URL = "http://www.loc.gov/mods/v3";
+    public final static Namespace MODS_NAMESPACE = Namespace.getNamespace("mods", MODS_URL);
+    
 
     /** The default encoding */
     public final static String DEFAULT_ENCODING = "UTF-8";
