@@ -17,25 +17,29 @@ import java.util.GregorianCalendar;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
-import org.mycore.common.MCRArgumentChecker;
+import org.mycore.common.MCRUsageException;
 
 /**
  * Represents a stored file or directory node with its metadata and content.
  * 
- * @author Frank Lützenkirchen
+ * @author Frank L\u00fctzenkirchen
  * @version $Revision$ $Date$
  */
 public abstract class MCRFilesystemNode {
     protected static MCRFileMetadataManager manager = MCRFileMetadataManager.instance();
 
     public static MCRFilesystemNode getNode(String ID) {
-        MCRArgumentChecker.ensureNotEmpty(ID, "ID");
+        if (ID == null || ID.trim().length() == 0) {
+            throw new MCRUsageException("ID is an empty String or null");
+        }
 
         return manager.retrieveNode(ID);
     }
 
     public static MCRFilesystemNode getRootNode(String ownerID) {
-        MCRArgumentChecker.ensureNotEmpty(ownerID, "ownerID");
+        if (ownerID == null || ownerID.trim().length() == 0) {
+            throw new MCRUsageException("owner ID is an empty String or null");
+        }
 
         return manager.retrieveRootNode(ownerID);
     }
@@ -80,7 +84,9 @@ public abstract class MCRFilesystemNode {
     }
 
     private MCRFilesystemNode(String name, String parentID, String ownerID, boolean doExistCheck) {
-        MCRArgumentChecker.ensureNotEmpty(ownerID, "owner ID");
+        if (ownerID == null || ownerID.trim().length() == 0) {
+            throw new MCRUsageException("owner ID is an empty String or null");
+        }
 
         this.ID = manager.createNodeID();
         this.parentID = parentID;
@@ -129,17 +135,44 @@ public abstract class MCRFilesystemNode {
         this.deleted = true;
     }
 
+    /*
+     * protected void checkName(String name, boolean doExistCheck) {
+     * MCRArgumentChecker.ensureNotEmpty(name, "name");
+     * 
+     * boolean error = (name.indexOf("/") + name.indexOf("\\")) != -2; String
+     * errorMsg =
+     * "Filesystem node name must not contain '\' or '/' characters: " + name;
+     * MCRArgumentChecker.ensureIsFalse(error, errorMsg);
+     * 
+     * if (hasParent() && doExistCheck) { boolean exists =
+     * getParent().hasChild(name); String existsMsg =
+     * "A node with this name already exists: " + name;
+     * MCRArgumentChecker.ensureIsFalse(exists, existsMsg); } }
+     */
+
+    /**
+     * Changed method because of problems with update of files.
+     * 
+     * @author Stefan Freitag
+     * 
+     */
     protected void checkName(String name, boolean doExistCheck) {
-        MCRArgumentChecker.ensureNotEmpty(name, "name");
+
+        if (name == null)
+            throw new MCRUsageException(name + " is null.");
 
         boolean error = (name.indexOf("/") + name.indexOf("\\")) != -2;
         String errorMsg = "Filesystem node name must not contain '\' or '/' characters: " + name;
-        MCRArgumentChecker.ensureIsFalse(error, errorMsg);
+        if (error)
+            throw new MCRUsageException(errorMsg);
 
         if (hasParent() && doExistCheck) {
             boolean exists = getParent().hasChild(name);
-            String existsMsg = "A node with this name already exists: " + name;
-            MCRArgumentChecker.ensureIsFalse(exists, existsMsg);
+            if (exists) {
+                getParent().getChild(name).delete();
+                System.out.println(name + " exists already, file was deleted...");
+                checkName(name, true);
+            }
         }
     }
 
@@ -190,7 +223,9 @@ public abstract class MCRFilesystemNode {
     }
 
     protected void ensureNotDeleted() {
-        MCRArgumentChecker.ensureIsFalse(deleted, "Do not use this node, it is deleted");
+        if (deleted) {
+            throw new MCRUsageException("Do not use this node, it is deleted");
+        }
     }
 
     /**
@@ -306,8 +341,10 @@ public abstract class MCRFilesystemNode {
     }
 
     /**
-     * Takes a file size in bytes and formats it as a string for output. For values &lt; 5 KB the output format is for example "320 Byte". For values &gt; 5 KB
-     * the output format is for example "6,8 KB". For values &gt; 1 MB the output format is for example "3,45 MB".
+     * Takes a file size in bytes and formats it as a string for output. For
+     * values &lt; 5 KB the output format is for example "320 Byte". For values
+     * &gt; 5 KB the output format is for example "6,8 KB". For values &gt; 1 MB
+     * the output format is for example "3,45 MB".
      */
     public static String getSizeFormatted(long bytes) {
         String sizeUnit;
@@ -347,8 +384,9 @@ public abstract class MCRFilesystemNode {
     }
 
     /**
-     * Stores additional XML data for this node. The name of the data element is used as unique key for storing data. If data with this name already exists, it
-     * is overwritten.
+     * Stores additional XML data for this node. The name of the data element is
+     * used as unique key for storing data. If data with this name already
+     * exists, it is overwritten.
      * 
      * @param data
      *            the additional XML data to be saved
