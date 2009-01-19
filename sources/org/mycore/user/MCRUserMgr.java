@@ -58,7 +58,7 @@ public class MCRUserMgr {
     /** The LOGGER and the configuration */
     private static Logger LOGGER = Logger.getLogger(MCRUserMgr.class.getName());
 
-    private static MCRConfiguration config = null;
+    private static MCRConfiguration CONFIG = null;
 
     private static MCRAccessInterface AI;
 
@@ -87,10 +87,10 @@ public class MCRUserMgr {
      * private constructor to create the singleton instance.
      */
     private MCRUserMgr() throws MCRException {
-        config = MCRConfiguration.instance();
+        CONFIG = MCRConfiguration.instance();
 
-        String userStoreName = config.getString("MCR.Persistence.User.Store.Class");
-        useEncryption = config.getBoolean("MCR.Users.UsePasswordEncryption", false);
+        String userStoreName = CONFIG.getString("MCR.Persistence.User.Store.Class");
+        useEncryption = CONFIG.getBoolean("MCR.Users.UsePasswordEncryption", false);
 
         try {
             mcrUserStore = (MCRUserStore) Class.forName(userStoreName).newInstance();
@@ -1294,7 +1294,7 @@ public class MCRUserMgr {
         }
 
         // Check the permissions
-        if (!AI.checkPermission("modify-user")) {
+        if (!AI.checkPermission("modify-user") && !AI.checkPermission("modify-contact")) {
             throw new MCRException("The current user does not have the permission to modify this user!");
         }
 
