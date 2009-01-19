@@ -81,7 +81,7 @@ public class MCRServlet extends HttpServlet {
 
     protected static final MCRAccessInterface AI = MCRAccessManager.getAccessImpl();
 
-    private static Logger LOGGER = Logger.getLogger(MCRServlet.class);;
+    private static Logger LOGGER = Logger.getLogger(MCRServlet.class);
 
     private static String BASE_URL;
 
