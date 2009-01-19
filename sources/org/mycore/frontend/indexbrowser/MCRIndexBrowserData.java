@@ -195,11 +195,11 @@ public class MCRIndexBrowserData {
     }
 
     protected static void deleteIndexCacheOfObjectType(String objectType) {
-    	for(Object o: INDEX_CACHE.keys()){
-    		if(o.toString().contains(objectType)){
-    			INDEX_CACHE.remove(o);
-    		}
-    	}
+        for (Object o : INDEX_CACHE.keys()) {
+            if (o.toString().contains(objectType)) {
+                INDEX_CACHE.remove(o);
+            }
+        }
     }
 
     public MCRIndexBrowserData(String search, String mode, String path, String fromTo, String mask) {
@@ -395,7 +395,12 @@ public class MCRIndexBrowserData {
     private MCRQuery buildQuery() {
         MCRAndCondition cAnd = new MCRAndCondition();
 
-        MCRFieldDef field = MCRFieldDef.getDef("objectType");
+        MCRFieldDef field;
+        if (indexConfig.table.indexOf("_") == -1) {
+            field = MCRFieldDef.getDef("objectType");
+        } else {
+            field = MCRFieldDef.getDef("objectBase");
+        }
 
         if (indexConfig.table.indexOf(",") != -1) {
             MCROrCondition cOr = new MCROrCondition();
@@ -409,7 +414,6 @@ public class MCRIndexBrowserData {
         }
 
         field = MCRFieldDef.getDef(indexConfig.browseField);
-        // String value = br.search == null ? "*" : br.search + "*";
         String value = browseData.search == null ? "*" : browseData.search;
         String operator = getOperator();
 
