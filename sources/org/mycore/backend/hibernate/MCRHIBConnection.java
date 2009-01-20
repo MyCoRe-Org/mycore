@@ -118,7 +118,7 @@ public class MCRHIBConnection implements Closeable, MCRSessionListener {
         String resource = System.getProperty("MCR.Hibernate.Configuration", "hibernate.cfg.xml");
         HIBCFG = new Configuration().configure(resource);
         String dialect = HIBCFG.getProperty("hibernate.dialect");
-        DIALECT = dialect.substring(dialect.lastIndexOf('.'));
+        DIALECT = dialect.substring(dialect.lastIndexOf('.') + 1);
         LOGGER.info("Hibernate configured");
     }
 
@@ -300,8 +300,8 @@ public class MCRHIBConnection implements Closeable, MCRSessionListener {
      * @return Query defined in mapping
      */
     public Query getNamedQuery(String name) {
-        String dialectQueryName = name+"."+DIALECT;
-        if (HIBCFG.getNamedSQLQueries().containsKey(dialectQueryName)){
+        String dialectQueryName = name + "." + DIALECT;
+        if (HIBCFG.getNamedSQLQueries().containsKey(dialectQueryName)) {
             LOGGER.debug("Using query named:" + dialectQueryName);
             return getSession().getNamedQuery(dialectQueryName);
         }
