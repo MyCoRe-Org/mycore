@@ -7,10 +7,8 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.jdom.JDOMException;
-
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRException;
-import org.mycore.datamodel.common.MCRXMLTableInterface;
 import org.mycore.datamodel.common.MCRXMLTableManager;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRObject;
@@ -42,10 +40,6 @@ public class MCRMigrationCommands extends MCRAbstractCommands {
         com = new MCRCommand("internal classificationmigration step {0}",
                 "org.mycore.services.migration.MCRMigrationCommands.migrateClassifications int",
                 "Internal commands for classification migration");
-        command.add(com);
-        com = new MCRCommand("migrate history date in type {0}",
-                "org.mycore.services.migration.MCRMigrationCommands.migrateMCRMetaHistoryDate String",
-                "Internal commands for the migration of the MCRMetaHistoryDate text lines to multi languages for MyCoRe type {0}");
         command.add(com);
         com = new MCRCommand("migrate MCRXMLTABLE", "org.mycore.services.migration.MCRMigrationCommands.migrateMCRXMLTable",
                 "Migrates of the MCRXMLTable layout to the 2.0 format");
@@ -161,26 +155,6 @@ public class MCRMigrationCommands extends MCRAbstractCommands {
             return Collections.emptyList();
         default:
             throw new MCRException("MCRACCESS migration step " + step + " is unknown.");
-        }
-    }
-
-    /**
-     * This method migrate the MCRMetaHistoryDate text entries from a single text to multi language texts as sequence of XML text elements. The method read the
-     * data to the API and store it to the backend again.
-     * 
-     * @param type
-     *            the MyCoRe data type which includes a MCRMetaHistoryDate element
-     * @throws Exception
-     */
-    public static void migrateMCRMetaHistoryDate(String type) throws Exception {
-        MCRXMLTableManager tm = MCRXMLTableManager.instance();
-        MCRObject obj = null;
-        for (String id : tm.retrieveAllIDs(type)) {
-            obj = new MCRObject();
-            MCRObjectID oid = new MCRObjectID(id);
-            obj.receiveFromDatastore(oid);
-            obj.setImportMode(true);
-            obj.updateInDatastore();
         }
     }
 
