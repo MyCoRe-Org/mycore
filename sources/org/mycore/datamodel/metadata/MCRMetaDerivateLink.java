@@ -20,4 +20,13 @@ public class MCRMetaDerivateLink extends MCRMetaLink {
         return (MCRFile) ((MCRDirectory) MCRFile.getRootNode(owner)).getChildByPath(path);
     }
 
+    @Override
+    public boolean isValid() {
+        if (getLinkedFile() == null) {
+            LOGGER.error("File not found: " + super.href);
+            return false;
+        }
+        return super.isValid();
+    }
+
 }
