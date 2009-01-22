@@ -11,7 +11,7 @@ load permissions data from file permissions.xml
 update permission write for id webpage:navigation with rulefile grant-admingroup.xml described by ${acl-description.admins}
 update permission write for id webpage:/content/below/index.xml with rulefile grant-group_editor1_editor2.xml described by editors  	
 update permission write for id webpage:/content/main/search.xml with rulefile grant-group_editor1_editor2.xml described by editors
-update permission write for id webpage:/content/main/docu/general.xml with rulefile grant-group_editor1_editor2.xml	described by editors
+update permission write for id webpage:/content/main/docu/general.xml with rulefile grant-group_editor1_editor2.xml described by editors
 update permission read for id webpage:/servlets/MCRWCMSLoginServlet with rulefile grant-group_admin_editor1_editor2.xml described by ${acl-description.admins}
 	    </echo>
     <antcall target="invoke.cli">
