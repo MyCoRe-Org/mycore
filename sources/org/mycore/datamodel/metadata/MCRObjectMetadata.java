@@ -24,6 +24,7 @@
 package org.mycore.datamodel.metadata;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -117,19 +118,27 @@ public class MCRObjectMetadata {
 
         return heritMeta;
     }
-    
+
     /**
      * <em>removeInheritedMetadata</em> removes all inherited metadata elements  
      * 
-     */    
+     */
     public final void removeInheritedMetadata() {
-        for (int i = 0; i < size(); ++i) {
-            MCRMetaElement me = meta_list.get(i);
+        Iterator<MCRMetaElement> elements = meta_list.iterator();
+        int counter = 0;
+        while (elements.hasNext()) {
+            MCRMetaElement me = elements.next();
             if (me.getHeritable())
                 me.removeInheritedObject();
+            //remove meta element if empty (else isValid() will fail)
+            if (me.size() == 0) {
+                elements.remove();
+                tag_names.remove(counter);
+            }
+            counter++;
         }
     }
-    
+
     /**
      * This method append MCRMetaElement's from a given MCRObjectMetadata to
      * this data set.
@@ -373,7 +382,7 @@ public class MCRObjectMetadata {
 
         return true;
     }
-    
+
     /**
      * This method put debug data to the logger (for the debug mode).
      */
