@@ -173,7 +173,7 @@ public class MCRObjectMetadata {
                 }
             } else {
                 tag_names.add(newtag);
-                newelm.setHeritable(true);
+                newelm.setNotInherit(false);
                 meta_list.add(newelm);
             }
         }
