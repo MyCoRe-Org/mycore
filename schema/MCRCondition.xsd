@@ -15,6 +15,14 @@
 </xsd:complexType>
 
 <xsd:complexType name="MCRBoolean">
+  <xsd:sequence>
+    <xsd:element maxOccurs="unbounded" minOccurs="0" type="MCRSimpleCondition" name="condition" />
+    <xsd:element maxOccurs="unbounded" minOccurs="0" type="MCRInnerBoolean" name="boolean" />
+  </xsd:sequence>
+ <xsd:attribute use="required" type="xsd:string" name="operator"/>
+</xsd:complexType>
+
+<xsd:complexType name="MCRInnerBoolean">
  <xsd:sequence>
     <xsd:element maxOccurs="unbounded" minOccurs="0" type="MCRSimpleCondition" name="condition" />
  </xsd:sequence>
