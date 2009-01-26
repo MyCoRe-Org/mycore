@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!-- ============================================== -->
-<!-- $Revision: 1.2 $ $Date: 2007-11-16 10:50:07 $ -->
+<!-- $Revision: 1.3 $ $Date: 2008/12/01 13:34:24 $ -->
 <!-- ============================================== -->
 
 <xsl:stylesheet
@@ -73,13 +73,24 @@
 <!-- ======== handles workflow ======== -->
 
 <xsl:template match="workflow">
-	<xsl.copy select="."/>
- <xsl:variable name="url" select="concat($ServletsBaseURL,'MCRListWorkflowServlet',$JSessionID,'?XSL.Style=xml&amp;type=',@type,'&amp;step=',@step)" />
+ <xsl.copy select="."/>
+ <xsl:variable name="url">
+  <xsl:choose>
+   <xsl:when test="@base">
+	<xsl:value-of select="concat($ServletsBaseURL,'MCRListWorkflowServlet',$JSessionID,'?XSL.Style=xml&amp;base=',@base,'&amp;step=',@step)" />
+   </xsl:when>
+   <xsl:otherwise>
+	<xsl:value-of select="concat($ServletsBaseURL,'MCRListWorkflowServlet',$JSessionID,'?XSL.Style=xml&amp;type=',@type,'&amp;step=',@step)" />	   
+   </xsl:otherwise>
+  </xsl:choose>
+ </xsl:variable> 
  <xsl:apply-templates select="document($url)/mcr_workflow" />
 </xsl:template>
 
 <xsl:template match="/mcr_workflow">
- <xsl:variable name="type"><xsl:value-of select="@type" /></xsl:variable>
+ <xsl:variable name="type">
+	<xsl:value-of select="@type" />
+ </xsl:variable>
  <xsl:variable name="step"><xsl:value-of select="@step" /></xsl:variable>
  <xsl:choose>
   <xsl:when test="item">
@@ -138,7 +149,6 @@
            <input name="se_mcrid" type="hidden">
            <xsl:attribute name="value"><xsl:value-of select="@ID" /></xsl:attribute>
            </input>
-            <input name="type" type="hidden" value="{$type}" />
             <input name="step" type="hidden" value="{$step}" />
             <input name="todo" type="hidden" value="weditobj" />
             <input type="image" src="{$WebApplicationBaseURL}images/workflow_objedit.gif" title="{$Object.EditObject}"/>
@@ -154,7 +164,6 @@
            <input name="tf_mcrid" type="hidden">
            <xsl:attribute name="value"><xsl:value-of select="@ID" /></xsl:attribute>
            </input>
-            <input name="type" type="hidden" value="acl" />
             <input name="step" type="hidden" value="{$step}" />
             <input name="todo" type="hidden" value="weditacl" />
             <input type="image" src="{$WebApplicationBaseURL}images/workflow_acledit.gif" title="{$Object.EditACL}"/>
