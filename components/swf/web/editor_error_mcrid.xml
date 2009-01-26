@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="ISO_8859-1"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE MyCoReWebPage>
 
 <MyCoReWebPage>
@@ -31,6 +31,34 @@
 </center>
 </section>
 
+<section title="MCRObjectID خلل في" xml:lang="ar">
+<center>
+<table width="80%">
+ <tr align="center">
+  <td align="center">
+<font color="red">
+ ! خاطأ MCRObjectID المعرّف 
+</font>
+  </td>
+ </tr>
+</table>
+</center>
+</section>
+
+<section title="MCRObjectID tidak benar" xml:lang="id">
+<center>
+<table width="80%">
+ <tr align="center">
+  <td align="center">
+<font color="red">
+   MCRObjectID tidak benar!
+</font>
+  </td>
+ </tr>
+</table>
+</center>
+</section>
+	
 </MyCoReWebPage>
 
 

@@ -1,17 +1,17 @@
-<?xml version="1.0" encoding="ISO_8859-1"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE MyCoReWebPage>
 
 <MyCoReWebPage>
 
-<section title="L�schfehler" xml:lang="de">
+<section title="Löschfehler" xml:lang="de">
 <center>
 <table width="80%">
  <tr align="center">
   <td align="center">
 <font color="red">
-   Beim L�schen der Daten aus dem Server gab es ein Problem.
-   Die Daten wurden nicht gel�scht.
-   Bitte sprechen Sie mit dem Systemadministrator dar�ber.
+   Beim Löschen der Daten aus dem Server gab es ein Problem.
+   Die Daten wurden nicht gelöscht.
+   Bitte sprechen Sie mit dem Systemadministrator darüber.
 </font>
   </td>
  </tr>
@@ -34,6 +34,38 @@
 </table>
 </center>
 </section>
+
+<section title="خطأ في الحذف" xml:lang="ar">
+<center>
+<table width="80%">
+ <tr align="center">
+  <td align="center">
+<font color="red">
+  .حدث خلل خلال عملية الحذف
+.لم يتم حذف المعطيات
+.المرجوا الإتصال بإدارة المشروع
+</font>
+  </td>
+ </tr>
+</table>
+</center>
+</section>
+
+<section title="Masalah sewaktu menghapuskan data" xml:lang="id">
+<center>
+<table width="80%">
+ <tr align="center">
+  <td align="center">
+<font color="red">
+   Sewaktu menghapuskan data muncul sebuah masalah pada server.
+   Data tidak jadi dihapuskan.
+   Tolonglah menghubungi administrator sistem.
+</font>
+  </td>
+ </tr>
+</table>
+</center>
+</section>	
 
 </MyCoReWebPage>
 

@@ -4,13 +4,53 @@
 <MyCoReWebPage>
 
 <section title="Löschen der Daten" xml:lang="de">
+<center>
+<table width="80%">
+ <tr align="center">
+  <td align="center">
 <strong>Das Löschen der Daten war erfolgreich.</strong>
+  </td>
+ </tr>
+</table>
+</center>
 </section>
 
 <section title="Remove the data" xml:lang="en">
+<center>
+<table width="80%">
+ <tr align="center">
+  <td align="center">
 <strong>The dataset was removed sccessfuly.</strong>
+  </td>
+ </tr>
+</table>
+</center>
 </section>
 
+<section title="حذف المعطيات" xml:lang="ar">
+<center>
+<table width="80%">
+ <tr align="center">
+  <td align="center">
+<strong>.تم حذف المعطيات بنجاح</strong>
+  </td>
+ </tr>
+</table>
+</center>
+</section>
+
+<section title="Hapuskan Data" xml:lang="id">
+<center>
+<table width="80%">
+ <tr align="center">
+  <td align="center">
+<strong>Penghapusan data telah selasai.</strong>
+  </td>
+ </tr>
+</table>
+</center>
+</section>
+	
 </MyCoReWebPage>
 
 

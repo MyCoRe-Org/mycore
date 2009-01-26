@@ -1,14 +1,7 @@
-<?xml version="1.0" encoding="ISO_8859-1"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE MyCoReWebPage>
 
 <MyCoReWebPage>
-
-<head>
- <maintitle xml:lang="de">DocPortal</maintitle>
- <maintitle xml:lang="en">DocPortal</maintitle>
- <pagetitle xml:lang="de">Editor Abbruch</pagetitle>
- <pagetitle xml:lang="en">Cancel Editor</pagetitle>
-</head>
 
 <section title="Editor Abbruch" xml:lang="de">
 <center>
@@ -38,6 +31,34 @@
 </center>
 </section>
 
+<section title="إلغاء المحرر" xml:lang="ar">
+<center>
+<table width="80%">
+ <tr align="center">
+  <td align="center">
+<font color="red">
+   .تم إلغاء العمل من طرف المستخدم
+</font>
+  </td>
+ </tr>
+</table>
+</center>
+</section>
+
+<section title="Batalkan Editor" xml:lang="id">
+<center>
+<table width="80%">
+ <tr align="center">
+  <td align="center">
+<font color="red">
+   Progres dibatalkan oleh pemakai.
+</font>
+  </td>
+ </tr>
+</table>
+</center>
+</section>
+	
 </MyCoReWebPage>
 
 
