@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<imports>
+
+  <headline anchor="CENTER">
+   <text i18n="component.swf.editor.derivate.headline" />
+  </headline>
+
+  <panel id="editor-derivate">
+    <hidden var="@ID"/>
+    <hidden var="@version"/>
+
+    <hidden var="derivate/linkmetas" descendants="true"/>
+	  
+    <hidden var="derivate/externals" descendants="true"/>
+
+    <hidden var="derivate/internals" descendants="true"/>
+
+    <hidden var="service/servdates" descendants="true"/>
+
+    <hidden var="service/servacls" descendants="true"/>
+
+    <hidden var="service/servflags" descendants="true"/>
+
+    <cell col="1" row="1" anchor="NORTHWEST" ref="LlaP" />
+    <cell col="2" row="1" anchor="NORTHWEST" ref="RlaP"/>
+    <cell col="3" row="1" anchor="NORTHWEST">
+      <space width="20" height="0"/>
+    </cell>
+    <cell col="4" row="1" anchor="NORTHWEST" ref="HlaP" />
+	  
+	<cell col="1" row="2" anchor="NORTHWEST" ref="LDERtitle"/>
+    <cell col="2" row="2" anchor="NORTHWEST" ref="DDERtitle"/>
+    <cell col="3" row="2" anchor="NORTHWEST">
+      <space width="20" height="0"/>
+    </cell>
+    <cell col="4" row="2" anchor="NORTHWEST" ref="HDERtitle"/>
+	
+    <cell col="1" row="3" anchor="NORTHWEST">
+      <space width="0px" height="20px"/>
+    </cell>
+    
+    <cell col="1" row="4"/>
+    <cell col="2" row="4" anchor="WEST" ref="TwoButtons"/>
+
+    <cell col="1" row="5" anchor="NORTHWEST">
+      <space width="0px" height="20px"/>
+    </cell>
+	  
+  </panel>
+	
+  <panel id="RlaP">
+    <cell col="1" row="1" anchor="NORTHWEST" var="@label" sortnr="1">
+      <textfield id="Zla" width="48" maxlength="64">
+        <condition id="Cola" required="true" i18n="component.swf.editor.derivate.la.cond" />
+      </textfield>
+    </cell>
+  </panel>
+
+  <text id="LlaP" i18n="component.swf.editor.derivate.la.labelp" />
+
+  <helpPopup id="HlaP" width="400" height="250" i18n="component.swf.editor.derivate.la.helpp" />
+
+  <text id="LDERtitle" i18n="component.swf.editor.derivate.title.label" />
+
+  <panel id="DDERtitle">
+    <hidden var="derivate/titles/@class" default="MCRMetaLangText"/>
+    <hidden var="derivate/titles/@notinherit" default="false"/>
+    <hidden var="derivate/titles/@heritable" default="true"/>
+    <cell col="1" row="1" anchor="NORTHWEST" var="derivate/titles/title">
+      <repeater min="1" max="10" ref="DDERtitleRep" pos="right"/>
+    </cell>
+  </panel>
+    
+  <panel id="DDERtitleRep">
+    <cell col="1" row="1" anchor="WEST" ref="Slang" var="@lang" sortnr="2"/>
+    <cell col="1" row="2" anchor="NORTHWEST" sortnr="2" >
+      <textfield id="ZtitleRep" width="52" maxlength="1024"/>
+    </cell>
+  </panel>
+
+  <helpPopup id="HDERtitle" width="400" height="250" i18n="component.swf.editor.derivate.title.help" />
+	
+<!-- *** Data for the buttons ** -->
+
+  <submitButton id="BSubmit" width="100px" i18n="common.button.save" />
+  <cancelButton id="BCancel" width="100px" i18n="common.button.cancel" />
+
+  <panel id="TwoButtons">
+    <cell col="1" row="1" anchor="WEST" ref="BCancel"/>
+    <cell col="2" row="1" anchor="WEST" ref="BSubmit" var="save"/>
+  </panel>
+	
+</imports>
+

@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- ============================================== -->
+<!-- $Revision: 1.4 $ $Date: 2008/10/16 11:37:05 $ -->
+<!-- ============================================== -->
+
+<imports>
+
+  <headline anchor="CENTER">
+   <text i18n="component.swf.editor.acl.headline" />
+  </headline>
+	
+  <panel id="editor-acls-rtl">
+   <hidden var="servdates" descendants="true"/>
+
+   <hidden var="servflags" descendants="true"/>
+	  
+   <cell col="1" row="1" anchor="NORTHWEST">
+    <space width="5px" height="5px"/>
+   </cell>
+   <cell col="3" row="1" anchor="NORTHWEST">
+    <space width="5px" height="5px"/>
+   </cell>
+
+   <hidden var="servacls/@class" default="MCRMetaAccessRules"/>
+   <hidden var="servacls/@notinherit" default="false"/>
+   <hidden var="servacls/@heritable" default="true"/>
+   <cell col="2" row="2" anchor="NORTHWEST" var="servacls/servacl">
+    <repeater min="1" max="10" ref="OnePermission" pos="left"/>
+   </cell>
+	  
+   <cell col="1" row="3" anchor="NORTHWEST">
+    <space width="0px" height="5px"/>
+   </cell>
+
+   <cell col="2" row="4" anchor="NORTHWEST" ref="showButton" />
+
+   <cell col="1" row="5" anchor="NORTHWEST">
+    <space width="0px" height="5px"/>
+   </cell>
+  </panel>
+
+  <panel id="showButton">
+   <cell col="1" row="1" anchor="NORTHWEST">
+    <space width="100px"/>
+   </cell>
+   <cell col="2" row="1" anchor="WEST" ref="TwoButtons"/>
+  </panel>
+	
+  <panel id="OnePermission">
+   <hidden var="@inherited" default="0"/>
+   <hidden var="@lang" default="de"/>
+   <cell col="4" row="1" anchor="NORTHWEST" >
+    <text id="TPermission" i18n="component.swf.editor.acl.permission.label" />
+   </cell>
+   <cell col="3" row="1" anchor="NORTHWEST" ref="ListPermission" var="@permission" sortnr="1"/>
+   <hidden var="condition/@format" default="xml" sortnr="2"/>
+   <hidden var="condition/boolean/@operator" default="and" />
+   <cell col="4" row="2" anchor="NORTHWEST" >
+    <text id="TUserGroup" i18n="component.swf.editor.acl.ug.label" />
+   </cell>
+   <cell col="3" row="2" anchor="NORTHWEST" ref="AllUser" />
+   <cell col="4" row="3" anchor="NORTHWEST" >
+    <text id="TUserGroup" i18n="component.swf.editor.acl.date.label" />
+   </cell>
+   <cell col="3" row="3" anchor="NORTHWEST" ref="AllDate" />
+   <cell col="4" row="4" anchor="NORTHWEST" >
+    <text id="TUserGroup" i18n="component.swf.editor.acl.ip.label" />
+   </cell>
+   <cell col="3" row="4" anchor="NORTHWEST" ref="AllIP" />
+   <cell col="4" row="5" anchor="NORTHWEST">
+    <space width="0px" height="20px"/>
+   </cell>
+  </panel>
+	
+  <!-- *** Data for one permission *** -->
+	
+  <panel id="AllUser">
+   <cell col="3" row="1" anchor="NORTHWEST" var="condition/boolean/boolean/@operator" default="or" sortnr="2">
+	 <bdo dir="rtl"> 	   
+	  <list width="160" type="dropdown">
+		<item value="and" i18n="component.swf.editor.acl.condition.and" />
+		<item value="or" i18n="component.swf.editor.acl.condition.or" />
+	  </list>
+     </bdo>
+   </cell>
+   <cell col="2" row="1" anchor="NORTHWEST" var="condition/boolean/boolean/condition" >
+    <repeater min="1" max="100" ref="OneUser" pos="left"/>
+   </cell>
+  </panel>
+	
+  <panel id="OneUser">
+   <cell col="3" row="1" anchor="NORTHWEST" var="@field" sortnr="3">
+	 <bdo dir="rtl"> 
+	  <list width="160" type="dropdown">
+		<item value="user"><label i18n="component.swf.editor.acl.condition.user"/></item>
+		<item value="group"><label i18n="component.swf.editor.acl.condition.group"/></item>
+	  </list>
+     </bdo>
+   </cell>
+   <cell col="2" row="1" anchor="NORTHWEST" var="@operator" sortnr="3">
+	 <bdo dir="rtl">  	   
+	  <list width="160" type="dropdown">
+		<item value="="><label i18n="component.swf.editor.acl.condition.equal"/></item>
+		<item value="!="><label i18n="component.swf.editor.acl.condition.notequal"/></item>
+	  </list>
+     </bdo>
+   </cell>
+   <cell col="1" row="1" anchor="NORTHWEST" ref="TFzeile128" var="@value" sortnr="3"/>
+  </panel>
+	
+  <panel id="AllDate">
+   <cell col="3" row="1" anchor="NORTHWEST" var="condition/boolean/boolean[2]/@operator" default="and" sortnr="4">
+	 <bdo dir="rtl">  	   
+	  <list width="160" type="dropdown">
+		<item value="and" i18n="component.swf.editor.acl.condition.and" />
+		<item value="or" i18n="component.swf.editor.acl.condition.or" />
+	  </list>
+     </bdo>
+   </cell>   
+   <cell col="2" row="1" anchor="NORTHWEST" var="condition/boolean/boolean[2]/condition" >
+    <repeater min="1" max="100" ref="OneDate" pos="left"/>
+   </cell>
+  </panel>
+	
+  <panel id="OneDate">
+   <cell col="3" row="1" anchor="NORTHWEST" var="@field" sortnr="5">
+	 <bdo dir="rtl">	   
+	  <list width="160" type="dropdown">
+		<item value="date"><label i18n="component.swf.editor.acl.condition.date"/></item>
+	  </list>
+     </bdo>
+   </cell>
+   <cell col="2" row="1" anchor="NORTHWEST" var="@operator" sortnr="5">
+	 <bdo dir="rtl">
+	  <list width="160" type="dropdown">
+		<item value="="><label i18n="component.swf.editor.acl.condition.equal"/></item>
+		<item value="!="><label i18n="component.swf.editor.acl.condition.notequal"/></item>
+		<item value="&gt;"><label i18n="component.swf.editor.acl.condition.greater"/></item>
+		<item value="&gt;="><label i18n="component.swf.editor.acl.condition.greaterequal"/></item>
+		<item value="&lt;"><label i18n="component.swf.editor.acl.condition.lower"/></item>
+		<item value="&lt;="><label i18n="component.swf.editor.acl.condition.lowerequal"/></item>
+	  </list>
+     </bdo>
+   </cell>
+   <cell col="1" row="1" anchor="NORTHWEST" ref="TFzeile128" var="@value" sortnr="5"/>
+  </panel>
+	
+  <panel id="AllIP">
+   <cell col="3" row="1" anchor="NORTHWEST" var="condition/boolean/boolean[3]/@operator" default="or" sortnr="6">
+	 <bdo dir="rtl">
+	  <list width="160" type="dropdown">
+		<item value="and" i18n="component.swf.editor.acl.condition.and" />
+		<item value="or" i18n="component.swf.editor.acl.condition.or" />
+	  </list>
+     </bdo>
+   </cell>
+   <cell col="2" row="1" anchor="NORTHWEST" var="condition/boolean/boolean[3]/condition" >
+    <repeater min="1" max="100" ref="OneIP" pos="left"/>
+   </cell>
+  </panel>
+	
+  <panel id="OneIP">
+  <cell col="3" row="1" anchor="NORTHWEST" var="@field" sortnr="7">
+	 <bdo dir="rtl">
+	   <list width="160" type="dropdown">
+		 <item value="ip"><label i18n="component.swf.editor.acl.condition.ip"/></item>
+	   </list>
+     </bdo>
+   </cell>
+   <cell col="2" row="1" anchor="NORTHWEST" var="@operator" sortnr="7">
+	 <bdo dir="rtl">
+	  <list width="160" type="dropdown" >
+	    <item value="="><label i18n="component.swf.editor.acl.condition.equal"/></item>
+		<item value="!="><label i18n="component.swf.editor.acl.condition.notequal"/></item>
+	  </list>
+	 </bdo>
+   </cell>
+   <cell col="1" row="1" anchor="NORTHWEST" ref="TFzeile128" var="@value" sortnr="7"/>
+  </panel>
+	
+  <!-- *** Data for the buttons ** -->
+
+  <submitButton id="BSubmit" width="100px" i18n="common.button.save" />
+  <cancelButton id="BCancel" width="100px" i18n="common.button.cancel" />
+
+  <panel id="TwoButtons">
+    <cell col="1" row="1" anchor="WEST" ref="BCancel"/>
+    <cell col="2" row="1" anchor="WEST" ref="BSubmit" var="save"/>
+  </panel>
+
+  <!-- *** Data for predefinitions *** -->
+	
+  <textfield id="TFzeile128" width="20" maxlength="32"/>
+	
+  <list id="ListAndOr" width="160" type="dropdown">
+    <item value="and" i18n="component.swf.editor.acl.condition.and" />
+    <item value="or" i18n="component.swf.editor.acl.condition.or" />
+  </list>
+
+  <list id="ListUser" width="160" type="dropdown">
+    <item value="user"><label i18n="component.swf.editor.acl.condition.user"/></item>
+    <item value="group"><label i18n="component.swf.editor.acl.condition.group"/></item>
+  </list>
+
+  <list id="OperUser" width="160" type="dropdown">
+    <item value="="><label i18n="component.swf.editor.acl.condition.equal"/></item>
+    <item value="!="><label i18n="component.swf.editor.acl.condition.notequal"/></item>
+  </list>
+
+  <list id="ListDate" width="160" type="dropdown">
+    <item value="date"><label i18n="component.swf.editor.acl.condition.date"/></item>
+  </list>
+
+  <list id="OperDate" width="160" type="dropdown">
+    <item value="="><label i18n="component.swf.editor.acl.condition.equal"/></item>
+    <item value="!="><label i18n="component.swf.editor.acl.condition.notequal"/></item>
+    <item value="&gt;"><label i18n="component.swf.editor.acl.condition.greater"/></item>
+    <item value="&gt;="><label i18n="component.swf.editor.acl.condition.greaterequal"/></item>
+    <item value="&lt;"><label i18n="component.swf.editor.acl.condition.lower"/></item>
+    <item value="&lt;="><label i18n="component.swf.editor.acl.condition.lowerequal"/></item>
+  </list>
+
+  <list id="ListIP" width="160" type="dropdown">
+    <item value="ip"><label i18n="component.swf.editor.acl.condition.ip"/></item>
+  </list>
+
+  <list id="OperIP" width="160" type="dropdown">
+    <item value="="><label i18n="component.swf.editor.acl.condition.equal"/></item>
+    <item value="!="><label i18n="component.swf.editor.acl.condition.notequal"/></item>
+  </list>
+
+</imports>
