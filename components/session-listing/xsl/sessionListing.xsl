@@ -5,7 +5,7 @@
 
     <xsl:include href="MyCoReLayout.xsl" />
 
-    <xsl:param name="PageTitle" select="i18n:translate('sessionListing.pageTitle')" />
+    <xsl:param name="PageTitle" select="i18n:translate('component.session-listing.pageTitle')" />
 
     <!-- URL's -->
     <xsl:variable name="sessionListing.baseURL">
@@ -46,7 +46,7 @@
             <td colspan="7">
                 <b>
                     <xsl:value-of
-                        select="concat(i18n:translate('sessionListing.userTotal'),' ',count(session),', ',i18n:translate('sessionListing.userLoggedIn'),' ',count(session/login[text()!='gast']))" />
+                        select="concat(i18n:translate('component.session-listing.userTotal'),' ',count(session),', ',i18n:translate('component.session-listing.userLoggedIn'),' ',count(session/login[text()!='gast']))" />
                 </b>
             </td>
         </tr>
@@ -61,37 +61,37 @@
         <tr>
             <th align="left">#</th>
             <th align="left">
-                <xsl:value-of select="i18n:translate('sessionListing.name')" />
+                <xsl:value-of select="i18n:translate('component.session-listing.name')" />
                 <a href="{$sortURL}=userRealName" alt="sortieren" title="sortieren">
                     <xsl:value-of select="' ^'" />
                 </a>
             </th>
             <th align="left">
-                <xsl:value-of select="i18n:translate('sessionListing.login')" />
+                <xsl:value-of select="i18n:translate('component.session-listing.login')" />
                 <a href="{$sortURL}=login" alt="sortieren" title="sortieren">
                     <xsl:value-of select="' ^'" />
                 </a>
             </th>
             <th align="left">
-                <xsl:value-of select="i18n:translate('sessionListing.ip')" />
+                <xsl:value-of select="i18n:translate('component.session-listing.ip')" />
                 <a href="{$sortURL}=ip" alt="sortieren" title="sortieren">
                     <xsl:value-of select="' ^'" />
                 </a>
             </th>
             <th align="left">
-                <xsl:value-of select="i18n:translate('sessionListing.firstAccess')" />
+                <xsl:value-of select="i18n:translate('component.session-listing.firstAccess')" />
                 <a href="{$sortURL}=createTime" alt="sortieren" title="sortieren">
                     <xsl:value-of select="' ^'" />
                 </a>
             </th>
             <th align="left">
-                <xsl:value-of select="i18n:translate('sessionListing.lastAccess')" />
+                <xsl:value-of select="i18n:translate('component.session-listing.lastAccess')" />
                 <a href="{$sortURL}=lastAccessTime" alt="sortieren" title="sortieren">
                     <xsl:value-of select="' ^'" />
                 </a>
             </th>
             <th align="left">
-                <xsl:value-of select="i18n:translate('sessionListing.loginSince')" />
+                <xsl:value-of select="i18n:translate('component.session-listing.loginSince')" />
                 <a href="{$sortURL}=loginTime" alt="sortieren" title="sortieren">
                     <xsl:value-of select="' ^'" />
                 </a>
@@ -216,10 +216,10 @@
                 <tr>
                     <td>
                         <b>
-                            <xsl:value-of select="i18n:translate('sessionListing.sizeOfTable')" />
+                            <xsl:value-of select="i18n:translate('component.session-listing.sizeOfTable')" />
                         </b>
                         <input name="XSL.sessionListing.toc.pageSize.SESSION" value="{$sessionListing.toc.pageSize}" size="3" />
-                        <xsl:value-of select="i18n:translate('sessionListing.rowsPerPage')" />
+                        <xsl:value-of select="i18n:translate('component.session-listing.rowsPerPage')" />
                         <xsl:call-template name="sessionListing.grouping.chooseHitPage">
                             <xsl:with-param name="children" select="." />
                         </xsl:call-template>
@@ -242,7 +242,7 @@
         </xsl:variable>
         <xsl:if test="number($numberOfChildren)>number($sessionListing.toc.pageSize)">
             <b>
-                <xsl:value-of select="i18n:translate('sessionListing.choosePage')" />
+                <xsl:value-of select="i18n:translate('component.session-listing.choosePage')" />
             </b>
             <xsl:for-each select="xalan:nodeset($children)/session[number($numberOfHitPages)>=position()]">
                 <xsl:variable name="jumpToPos">
@@ -254,8 +254,8 @@
                     </xsl:when>
                     <xsl:otherwise>
                         <a href="{concat($sessionListing.listSessionsURL,'&amp;XSL.sessionListing.toc.pos.SESSION=',$jumpToPos+1)}"
-                            alt="{i18n:translate('sessionListing.goToPage')}{concat(' ',position())}"
-                            title="{i18n:translate('sessionListing.goToPage')} {concat(' ',position())}">
+                            alt="{i18n:translate('component.session-listing.goToPage')}{concat(' ',position())}"
+                            title="{i18n:translate('component.session-listing.goToPage')} {concat(' ',position())}">
                             <xsl:value-of select="concat(' ',position(),' ')" />
                         </a>
                     </xsl:otherwise>
