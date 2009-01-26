@@ -1,0 +1,15 @@
+
+  <!-- **************************************************************** -->
+  <!-- Servlets and mapping for broadcasting                            -->
+  <!-- **************************************************************** -->
+
+  <servlet id="MCRSessionListingServlet">
+    <servlet-name>MCRSessionListingServlet</servlet-name>
+    <servlet-class>org.mycore.frontend.servlets.MCRSessionListingServlet</servlet-class>
+  </servlet>
+  
+  <servlet-mapping>
+    <servlet-name>MCRSessionListingServlet</servlet-name>
+    <url-pattern>/servlets/MCRSessionListingServlet</url-pattern>
+  </servlet-mapping>  
+
