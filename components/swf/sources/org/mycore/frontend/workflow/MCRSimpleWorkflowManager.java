@@ -37,6 +37,8 @@ import org.jdom.Document;
 import org.jdom.Element;
 
 import org.mycore.common.MCRConfiguration;
+import org.mycore.common.MCRException;
+
 import static org.mycore.common.MCRConstants.*;
 import org.mycore.common.MCRUtils;
 import org.mycore.common.xml.MCRXMLHelper;
@@ -109,22 +111,26 @@ public class MCRSimpleWorkflowManager {
      *            the MCRObjectID type
      * @return the string of the workflow directory path
      */
-    public final String getDirectoryPath(String type) {
-        if (ht.containsKey(type)) {
-            return ht.get(type);
+    public final String getDirectoryPath(String base) {
+        System.out.println("========================"+base);
+        if (ht.containsKey(base)) {
+            return ht.get(base);
         }
-
-        String dirname = config.getString("MCR.SWF.Directory." + type, null);
-
+        String dirname = config.getString("MCR.SWF.Directory." + base, null);
         if (dirname == null) {
-            ht.put(type, ".");
-            logger.warn("No workflow directory path of " + type + " is in the configuration.");
-
-            return ".";
+            int ibase = base.indexOf('_');
+            String type = null;
+            if (ibase != -1) {
+                type = base.substring(ibase + 1);
+                dirname = config.getString("MCR.SWF.Directory." + type, null);
+            }
+            if (dirname == null) {
+                ht.put(base, ".");
+                logger.warn("No workflow directory path of " + base + " is in the configuration.");
+                return ".";
+            }
         }
-
-        ht.put(type, dirname);
-
+        ht.put(base, dirname);
         return dirname;
     }
 
@@ -132,14 +138,14 @@ public class MCRSimpleWorkflowManager {
      * The method return the information mail address for a given MCRObjectID
      * type.
      * 
-     * @param type
-     *            the MCRObjectID type
+     * @param base
+     *            the MCRObjectID base
      * @param todo
      *            the todo action String from the workflow.
      * @return the List of the information mail addresses
      */
-    public final List<String> getMailAddress(String type, String todo) {
-        if ((type == null) || ((type = type.trim()).length() == 0)) {
+    public final List<String> getMailAddress(String base, String todo) {
+        if ((base == null) || ((base = base.trim()).length() == 0)) {
             return new ArrayList<String>();
         }
 
@@ -147,27 +153,35 @@ public class MCRSimpleWorkflowManager {
             return new ArrayList<String>();
         }
 
-        if (mt.containsKey(type + "_" + todo)) {
-            return mt.get(type + "_" + todo);
+        if (mt.containsKey(base + "_" + todo)) {
+            return mt.get(base + "_" + todo);
         }
 
-        String mailaddr = config.getString("MCR.SWF.Mail." + type + "." + todo, "");
+        String mailaddr = config.getString("MCR.SWF.Mail." + base + "." + todo, "");
         ArrayList<String> li = new ArrayList<String>();
 
         if ((mailaddr == null) || ((mailaddr = mailaddr.trim()).length() == 0)) {
-            mt.put(type, li);
-            logger.warn("No mail address for MCR.SWF.Mail." + type + "." + todo + " is in the configuration.");
-
-            return li;
+            int i = base.indexOf('_');
+            if (i != -1) {
+                String type = base.substring(i+1);
+                mailaddr = config.getString("MCR.SWF.Mail." + type + "." + todo, "");
+                if ((mailaddr == null) || ((mailaddr = mailaddr.trim()).length() == 0)) {
+                    mt.put(base, li);
+                    logger.warn("No mail address for MCR.SWF.Mail." + base + "." + todo + " is in the configuration.");
+                    return li;
+                }
+            } else {
+                mt.put(base, li);
+                logger.warn("No mail address for MCR.SWF.Mail." + base + "." + todo + " is in the configuration.");
+                return li;
+            }
         }
 
         StringTokenizer st = new StringTokenizer(mailaddr, ",");
-
         while (st.hasMoreTokens()) {
             li.add(st.nextToken());
         }
-
-        mt.put(type, li);
+        mt.put(base, li);
 
         return li;
     }
@@ -185,12 +199,12 @@ public class MCRSimpleWorkflowManager {
      * The method return a ArrayList of file names from objects they are under
      * .../workflow/ <em>type/...type...</em>.
      * 
-     * @param type
-     *            the MCRObjectID type attribute
+     * @param base
+     *            the MCRObjectID base attribute
      * @return an ArrayList of file names
      */
-    public final ArrayList<String> getAllObjectFileNames(String type) {
-        String dirname = getDirectoryPath(type);
+    public final ArrayList<String> getAllObjectFileNames(String base) {
+        String dirname = getDirectoryPath(base);
         ArrayList<String> workfiles = new ArrayList<String>();
 
         if (!dirname.equals(".")) {
@@ -203,7 +217,7 @@ public class MCRSimpleWorkflowManager {
 
             if (dirl != null) {
                 for (int i = 0; i < dirl.length; i++) {
-                    if ((dirl[i].indexOf(type) != -1) && (dirl[i].endsWith(".xml"))) {
+                    if ((dirl[i].indexOf(base) != -1) && (dirl[i].endsWith(".xml"))) {
                         workfiles.add(dirl[i]);
                     }
                 }
@@ -223,10 +237,9 @@ public class MCRSimpleWorkflowManager {
      *            the MCRObjectID type attribute
      * @return an ArrayList of file names
      */
-    public final ArrayList<String> getAllDerivateFileNames(String type) {
-        String dirname = getDirectoryPath(type);
+    public final ArrayList<String> getAllDerivateFileNames(String base) {
+        String dirname = getDirectoryPath(base);
         ArrayList<String> workfiles = new ArrayList<String>();
-
         if (!dirname.equals(".")) {
             File dir = new File(dirname);
             String[] dirl = null;
@@ -242,10 +255,8 @@ public class MCRSimpleWorkflowManager {
                     }
                 }
             }
-
             java.util.Collections.sort(workfiles);
         }
-
         return workfiles;
     }
 
@@ -254,8 +265,6 @@ public class MCRSimpleWorkflowManager {
      * workflow directory of <em>type</em> and check that this derivate
      * reference the given <em>ID</em>.
      * 
-     * @param type
-     *            the MCRObjectID type
      * @param filename
      *            the file name of the derivate
      * @param ID
@@ -263,8 +272,8 @@ public class MCRSimpleWorkflowManager {
      * @return true if the derivate refernce the metadata object, else return
      *         false
      */
-    public final boolean isDerivateOfObject(String type, String filename, String ID) {
-        String dirname = getDirectoryPath(type);
+    public final boolean isDerivateOfObject(String filename, MCRObjectID ID) {
+        String dirname = getDirectoryPath(ID.getBase());
         String fname = dirname + File.separator + filename;
         org.jdom.Document workflow_in = null;
 
@@ -300,10 +309,9 @@ public class MCRSimpleWorkflowManager {
         String DID = linkmeta.getAttributeValue("href", XLINK_NAMESPACE);
         logger.debug("The linked object ID of derivate is " + DID);
 
-        if (!ID.equals(DID)) {
+        if (!ID.getId().equals(DID)) {
             return false;
         }
-
         return true;
     }
 
@@ -311,14 +319,12 @@ public class MCRSimpleWorkflowManager {
      * The method removes a metadata object with all referenced derivate objects
      * from the workflow.
      * 
-     * @param type
-     *            the MCRObjectID type of the metadata object
      * @param ID
-     *            the ID of the metadata object
+     *            the MCRObjectID of the metadata object
      */
-    public final void deleteMetadataObject(String type, String ID) {
+    public final void deleteMetadataObject(MCRObjectID ID) {
         // remove metadate
-        String fn = getDirectoryPath(type) + File.separator + ID + ".xml";
+        String fn = getDirectoryPath(ID.getBase()) + File.separator + ID + ".xml";
 
         try {
             File fi = new File(fn);
@@ -334,14 +340,19 @@ public class MCRSimpleWorkflowManager {
         }
 
         // remove derivate
-        ArrayList<String> derifiles = getAllDerivateFileNames(type);
+        ArrayList<String> derifiles = getAllDerivateFileNames(ID.getBase());
 
         for (int i = 0; i < derifiles.size(); i++) {
             String dername = derifiles.get(i);
             logger.debug("Check the derivate file " + dername);
 
-            if (isDerivateOfObject(type, dername, ID)) {
-                deleteDerivateObject(type, dername.substring(0, dername.length() - 4));
+            if (isDerivateOfObject(dername, ID)) {
+                try {
+                    MCRObjectID DID = new MCRObjectID(dername.substring(0, dername.length() - 4));
+
+                    deleteDerivateObject(ID, DID);
+                } catch (MCRException ex) {
+                }
             }
         }
     }
@@ -349,18 +360,15 @@ public class MCRSimpleWorkflowManager {
     /**
      * The method removes a derivate object from the workflow.
      * 
-     * @param type
+     * @param ID
      *            the MCRObjectID type of the metadata object
-     * @param id
+     * @param DID
      *            the MCRObjectID of the derivate object as String
      */
-    @SuppressWarnings("unchecked")
-    public final void deleteDerivateObject(String type, String id) {
-        logger.debug("Delete the derivate " + id);
-
+    public final void deleteDerivateObject(MCRObjectID ID, MCRObjectID DID) {
+        logger.debug("Delete the derivate " + DID.getId());
         // remove the XML file
-        String fn = getDirectoryPath(type) + File.separator + id;
-
+        String fn = getDirectoryPath(ID.getBase()) + File.separator + DID.getId();
         try {
             File fi = new File(fn + ".xml");
 
@@ -373,11 +381,9 @@ public class MCRSimpleWorkflowManager {
         } catch (Exception ex) {
             logger.error("Can't remove file " + fn + ".xml");
         }
-
         // remove all derivate objects
         try {
             File fi = new File(fn);
-
             if (fi.isDirectory() && fi.canWrite()) {
                 // delete files
                 ArrayList dellist = MCRUtils.getAllFileNames(fi);
@@ -392,7 +398,6 @@ public class MCRSimpleWorkflowManager {
                         logger.error("Can't remove file " + na);
                     }
                 }
-
                 // delete subirectories
                 dellist = MCRUtils.getAllDirectoryNames(fi);
 
@@ -406,7 +411,6 @@ public class MCRSimpleWorkflowManager {
                         logger.error("Can't remove directory " + na);
                     }
                 }
-
                 if (fi.delete()) {
                     logger.debug("Directory " + fn + " removed.");
                 } else {
@@ -424,16 +428,14 @@ public class MCRSimpleWorkflowManager {
      * The method commit a metadata object with all referenced derivate objects
      * from the workflow to the data store.
      * 
-     * @param type
-     *            the MCRObjectID type of the metadata object
      * @param ID
      *            the ID of the metadata object
      * @throws MCRActiveLinkException
      *             if links to the object exist prior loading
      */
-    public final boolean commitMetadataObject(String type, String ID) throws MCRActiveLinkException {
+    public final boolean commitMetadataObject(MCRObjectID ID) throws MCRActiveLinkException {
         // commit metadata
-        String fn = getDirectoryPath(type) + File.separator + ID + ".xml";
+        String fn = getDirectoryPath(ID.getBase()) + File.separator + ID + ".xml";
 
         if (MCRObject.existInDatastore(ID)) {
             MCRObjectCommands.updateFromFile(fn, false);
@@ -447,16 +449,16 @@ public class MCRSimpleWorkflowManager {
             return false;
         }
 
-        ArrayList<String> derifiles = getAllDerivateFileNames(type);
+        ArrayList<String> derifiles = getAllDerivateFileNames(ID.getBase());
 
         for (int i = 0; i < derifiles.size(); i++) {
             String dername = derifiles.get(i);
             logger.debug("Check the derivate file " + dername);
 
-            if (isDerivateOfObject(type, dername, ID)) {
-                fn = getDirectoryPath(type) + File.separator + dername;
+            if (isDerivateOfObject(dername, ID)) {
+                fn = getDirectoryPath(ID.getBase()) + File.separator + dername;
 
-                if (!loadDerivate(ID, fn)) {
+                if (!loadDerivate(ID.getId(), fn)) {
                     return false;
                 }
             }
@@ -469,15 +471,13 @@ public class MCRSimpleWorkflowManager {
      * The method commit a derivate object with update method from the workflow
      * to the data store.
      * 
-     * @param type
-     *            the MCRObjectID type of the metadata object
      * @param ID
-     *            the ID as String of the derivate object
+     *            the MCRObjectID as String of the derivate object
      */
-    public final boolean commitDerivateObject(String type, String ID) {
-        String fn = getDirectoryPath(type) + File.separator + ID + ".xml";
+    public final boolean commitDerivateObject(MCRObjectID ID) {
+        String fn = getDirectoryPath(ID.getBase()) + File.separator + ID.getId() + ".xml";
 
-        return loadDerivate(ID, fn);
+        return loadDerivate(ID.getId(), fn);
     }
 
     private boolean loadDerivate(String ID, String filename) {
@@ -505,7 +505,7 @@ public class MCRSimpleWorkflowManager {
         MCRObjectID dmcridnext = new MCRObjectID();
         dmcridnext.setNextFreeId(myproject);
 
-        String workdir = getDirectoryPath(ID.getTypeId());
+        String workdir = getDirectoryPath(ID.getBase());
         File workf = new File(workdir);
         if (workf.isDirectory()) {
             String[] list = workf.list();
@@ -556,23 +556,6 @@ public class MCRSimpleWorkflowManager {
         internal.setMainDoc("");
         der.getDerivate().setInternals(internal);
 
-        /*
-        MCRObject obj = new MCRObject();
-        try {
-            obj.receiveFromDatastore(ID);
-            MCRObjectService serv = obj.getService();
-            der.setService(serv);
-        } catch (Exception e) {
-            String workdir = getDirectoryPath(ID.getTypeId());
-            try {
-                obj.setFromURI(workdir + File.separator + ID.getId() + ".xml");
-                MCRObjectService serv = obj.getService();
-                der.setService(serv);
-            } catch (Exception e2) {
-                logger.warn("Read error of " + workdir + File.separator + ID.getId() + ".xml");
-            }
-        }
-        */
         MCRObjectService service = new MCRObjectService();
         org.jdom.Element elm = service.createXML();
         MCREditorOutValidator.setDefaultDerivateACLs(elm);
@@ -587,24 +570,22 @@ public class MCRSimpleWorkflowManager {
      * for a given permission.
      * 
      * @param id
-     *            the MCRObjectID as string
+     *            the MCRObjectID 
      * @param permission
      *            the permission for the ACL system
      * @return the XML tree of the condition or null if the permission is not defined
      */
-    @SuppressWarnings("unchecked")
-    public final org.jdom.Element getRuleFromFile(String id, String permission) {
+    public final org.jdom.Element getRuleFromFile(MCRObjectID mcrid, String permission) {
         // read data
-        MCRObjectID mcrid = new MCRObjectID(id);
-        String fn = getDirectoryPath(mcrid.getTypeId()) + File.separator + id + ".xml";
+        String fn = getDirectoryPath(mcrid.getBase()) + File.separator + mcrid.getId() + ".xml";
         try {
             File fi = new File(fn);
             if (fi.isFile() && fi.canRead()) {
-                Document wfDoc=MCRXMLHelper.parseURI(fn, false);
-                XPath path = new JDOMXPath("/*/service/servacls/servacl[@permission='"+permission+"']/condition");
+                Document wfDoc = MCRXMLHelper.parseURI(fn, false);
+                XPath path = new JDOMXPath("/*/service/servacls/servacl[@permission='" + permission + "']/condition");
                 List results = path.selectNodes(wfDoc);
-                if (results.size()>0){
-                    return (Element)((Element)results.get(0)).detach();
+                if (results.size() > 0) {
+                    return (Element) ((Element) results.get(0)).detach();
                 }
             } else {
                 logger.error("Can't read file " + fn);

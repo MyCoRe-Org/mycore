@@ -117,8 +117,7 @@ public class MCREditorOutValidator {
         HashMap<String, Method> methods = new HashMap<String, Method>();
         Method[] m = MCREditorOutValidator.class.getDeclaredMethods();
         for (int i = 0; i < m.length; i++) {
-            if (!m[i].getName().startsWith("checkMCR")
-                    || !((m[i].getParameterTypes().length == 1) && m[i].getParameterTypes()[0] == Element.class && m[i].getReturnType() == Boolean.TYPE)) {
+            if (!m[i].getName().startsWith("checkMCR") || !((m[i].getParameterTypes().length == 1) && m[i].getParameterTypes()[0] == Element.class && m[i].getReturnType() == Boolean.TYPE)) {
                 continue;
             }
             LOGGER.debug("adding Method " + m[i].getName());
@@ -516,74 +515,76 @@ public class MCREditorOutValidator {
      */
     @SuppressWarnings("unchecked")
     private void setDefaultObjectACLs(org.jdom.Element service) {
-        if (MCRConfiguration.instance().getBoolean("MCR.Access.AddObjectDefaultRule", true)) {
-            String resource = "/editor_default_acls_" + id.getTypeId() + ".xml";
-            // Read stylesheet and add user
-            InputStream aclxml = MCREditorOutValidator.class.getResourceAsStream(resource);
+        String resourcetype = "/editor_default_acls_" + id.getTypeId() + ".xml";
+        String resourcebase = "/editor_default_acls_" + id.getBase() + ".xml";
+        // Read stylesheet and add user
+        InputStream aclxml = MCREditorOutValidator.class.getResourceAsStream(resourcebase);
+        if (aclxml == null) {
+            aclxml = MCREditorOutValidator.class.getResourceAsStream(resourcetype);
             if (aclxml == null) {
-                LOGGER.warn("Can't find default object ACL file " + resource.substring(1));
-                resource = "/editor_default_acls.xml"; // fallback
+                LOGGER.warn("Can't find default object ACL file " + resourcebase.substring(1) + " or " + resourcetype.substring(1));
+                String resource = "/editor_default_acls.xml"; // fallback
                 aclxml = MCREditorOutValidator.class.getResourceAsStream(resource);
-            }
-            if (aclxml == null) {
-                return;
-            }
-            try {
-                Document xml = SAX_BUILDER.build(aclxml);
-                Element acls = xml.getRootElement().getChild("servacls");
-                if (acls == null) {
+                if (aclxml == null) {
                     return;
                 }
-                for (Iterator<Element> it = acls.getChildren().iterator(); it.hasNext();) {
-                    Element acl = it.next();
-                    String perm = acl.getAttributeValue("permission");
-                    if (!adduserlist.contains(perm)) {
-                        continue;
-                    }
-                    Element condition = acl.getChild("condition");
-                    if (condition == null) {
-                        continue;
-                    }
-                    Element rootbool = condition.getChild("boolean");
-                    if (rootbool == null) {
-                        continue;
-                    }
-                    for (Iterator<Element> boolIt = rootbool.getChildren("boolean").iterator(); boolIt.hasNext();) {
-                        Element orbool = boolIt.next();
-                        for (Iterator<Element> condIt = orbool.getChildren("condition").iterator(); condIt.hasNext();) {
-                            Element firstcond = condIt.next();
-                            if (firstcond == null) {
-                                continue;
-                            }
-                            String value = firstcond.getAttributeValue("value");
-                            if (value == null)
-                                continue;
-                            if (value.equals("$CurrentUser")) {
-                                String thisuser = MCRSessionMgr.getCurrentSession().getCurrentUserID();
-                                firstcond.setAttribute("value", thisuser);
-                                continue;
-                            }
-                            if (value.equals("$CurrentGroup")) {
-                                String thisuser = MCRSessionMgr.getCurrentSession().getCurrentUserID();
-                                List<String> ar = MCRUserMgr.instance().getGroupsContainingUser(thisuser);
-                                firstcond.setAttribute("value", ar.get(0));
-                                continue;
-                            }
-                            int i = value.indexOf("$CurrentIP");
-                            if (i != -1) {
-                                String thisip = MCRSessionMgr.getCurrentSession().getCurrentIP();
-                                StringBuffer sb = new StringBuffer(64);
-                                sb.append(value.substring(0, i)).append(thisip).append(value.substring(i + 10, value.length()));
-                                firstcond.setAttribute("value", sb.toString());
-                                continue;
-                            }
+            }
+        }
+        try {
+            Document xml = SAX_BUILDER.build(aclxml);
+            Element acls = xml.getRootElement().getChild("servacls");
+            if (acls == null) {
+                return;
+            }
+            for (Iterator<Element> it = acls.getChildren().iterator(); it.hasNext();) {
+                Element acl = it.next();
+                String perm = acl.getAttributeValue("permission");
+                if (!adduserlist.contains(perm)) {
+                    continue;
+                }
+                Element condition = acl.getChild("condition");
+                if (condition == null) {
+                    continue;
+                }
+                Element rootbool = condition.getChild("boolean");
+                if (rootbool == null) {
+                    continue;
+                }
+                for (Iterator<Element> boolIt = rootbool.getChildren("boolean").iterator(); boolIt.hasNext();) {
+                    Element orbool = boolIt.next();
+                    for (Iterator<Element> condIt = orbool.getChildren("condition").iterator(); condIt.hasNext();) {
+                        Element firstcond = condIt.next();
+                        if (firstcond == null) {
+                            continue;
+                        }
+                        String value = firstcond.getAttributeValue("value");
+                        if (value == null)
+                            continue;
+                        if (value.equals("$CurrentUser")) {
+                            String thisuser = MCRSessionMgr.getCurrentSession().getCurrentUserID();
+                            firstcond.setAttribute("value", thisuser);
+                            continue;
+                        }
+                        if (value.equals("$CurrentGroup")) {
+                            String thisuser = MCRSessionMgr.getCurrentSession().getCurrentUserID();
+                            List<String> ar = MCRUserMgr.instance().getGroupsContainingUser(thisuser);
+                            firstcond.setAttribute("value", ar.get(0));
+                            continue;
+                        }
+                        int i = value.indexOf("$CurrentIP");
+                        if (i != -1) {
+                            String thisip = MCRSessionMgr.getCurrentSession().getCurrentIP();
+                            StringBuffer sb = new StringBuffer(64);
+                            sb.append(value.substring(0, i)).append(thisip).append(value.substring(i + 10, value.length()));
+                            firstcond.setAttribute("value", sb.toString());
+                            continue;
                         }
                     }
                 }
-                service.addContent(acls.detach());
-            } catch (Exception e) {
-                LOGGER.warn("Error while parsing file " + resource, e);
             }
+            service.addContent(acls.detach());
+        } catch (Exception e) {
+            LOGGER.warn("Error while parsing file " + resourcebase + " or " + resourcetype, e);
         }
     }
 
@@ -629,22 +630,20 @@ public class MCREditorOutValidator {
      * @param service
      */
     protected static void setDefaultDerivateACLs(org.jdom.Element service) {
-        if (MCRConfiguration.instance().getBoolean("MCR.Access.AddDerivateDefaultRule", true)) {
-            // Read stylesheet and add user
-            InputStream aclxml = MCREditorOutValidator.class.getResourceAsStream("/editor_default_acls_derivate.xml");
-            if (aclxml == null) {
-                LOGGER.warn("Can't find default derivate ACL file editor_default_acls_derivate.xml.");
-                return;
+        // Read stylesheet and add user
+        InputStream aclxml = MCREditorOutValidator.class.getResourceAsStream("/editor_default_acls_derivate.xml");
+        if (aclxml == null) {
+            LOGGER.warn("Can't find default derivate ACL file editor_default_acls_derivate.xml.");
+            return;
+        }
+        try {
+            org.jdom.Document xml = (SAX_BUILDER).build(aclxml);
+            org.jdom.Element acls = xml.getRootElement().getChild("servacls");
+            if (acls != null) {
+                service.addContent(acls.detach());
             }
-            try {
-                org.jdom.Document xml = (SAX_BUILDER).build(aclxml);
-                org.jdom.Element acls = xml.getRootElement().getChild("servacls");
-                if (acls != null) {
-                    service.addContent(acls.detach());
-                }
-            } catch (Exception e) {
-                LOGGER.warn("Error while parsing file editor_default_acls_derivate.xml.");
-            }
+        } catch (Exception e) {
+            LOGGER.warn("Error while parsing file editor_default_acls_derivate.xml.");
         }
     }
 

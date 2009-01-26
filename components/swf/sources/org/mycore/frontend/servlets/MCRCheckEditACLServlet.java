@@ -61,10 +61,10 @@ public class MCRCheckEditACLServlet extends MCRCheckACLBase {
     protected String getNextURL(MCRObjectID ID, boolean okay) throws MCRActiveLinkException {
         StringBuffer sb = new StringBuffer();
         if (okay) {
-            sb.append(CONFIG.getString("MCR.SWF.PageDir", "")).append("editor_").append(ID.getTypeId()).append("_editor.xml");
+            sb.append(getWorkflowFile(pagedir,ID.getBase()));
         } else {
 
-            sb.append(CONFIG.getString("MCR.SWF.PageDir", "")).append(CONFIG.getString("MCR.SWF.PageErrorStore", "editor_error_store.xml"));
+            sb.append(pagedir).append(CONFIG.getString("MCR.SWF.PageErrorStore", "editor_error_store.xml"));
         }
         return sb.toString();
     }
@@ -76,7 +76,7 @@ public class MCRCheckEditACLServlet extends MCRCheckACLBase {
      *            the MCRObjectID of the MCRObject
      */
     public final void sendMail(MCRObjectID ID) {
-        List addr = WFM.getMailAddress(ID.getTypeId(), "weditacl");
+        List addr = WFM.getMailAddress(ID.getBase(), "weditacl");
 
         if (addr.size() == 0) {
             return;
@@ -108,7 +108,7 @@ public class MCRCheckEditACLServlet extends MCRCheckACLBase {
      *            the MCRObjectID
      */
     public final boolean storeService(org.jdom.Element outelm, MCRServletJob job, MCRObjectID ID) {
-        String fn = WFM.getDirectoryPath(ID.getTypeId()) + File.separator + ID.getId() + ".xml";
+        String fn = WFM.getDirectoryPath(ID.getBase()) + File.separator + ID.getId() + ".xml";
         MCRObject obj = new MCRObject();
         obj.setFromURI(fn);
         MCRObjectService service = new MCRObjectService();

@@ -55,16 +55,16 @@ public class MCRCheckCommitDataServlet extends MCRCheckDataBase {
     public final String getNextURL(MCRObjectID ID, boolean okay) throws MCRActiveLinkException {
         // commit to the server
         MCRSimpleWorkflowManager wfm = MCRSimpleWorkflowManager.instance();
-        okay = wfm.commitMetadataObject(ID.getTypeId(), ID.getId());
+        okay = wfm.commitMetadataObject(ID);
 
         StringBuffer sb = new StringBuffer();
         if (okay) {
             // then delete the data
-            wfm.deleteMetadataObject(ID.getTypeId(), ID.getId());
+            wfm.deleteMetadataObject(ID);
             // return all is ready
             sb.append("receive/").append(ID.getId());
         } else {
-            sb.append(CONFIG.getString("MCR.SWF.PageDir", "")).append(CONFIG.getString("MCR.SWF.PageErrorStore", "editor_error_store.xml"));
+            sb.append(pagedir).append(CONFIG.getString("MCR.SWF.PageErrorStore", "editor_error_store.xml"));
         }
         return sb.toString();
     }

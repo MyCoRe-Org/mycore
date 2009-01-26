@@ -56,10 +56,10 @@ public class MCRCheckEditDataServlet extends MCRCheckDataBase {
     protected String getNextURL(MCRObjectID ID, boolean okay) throws MCRActiveLinkException {
         StringBuffer sb = new StringBuffer();
         if (okay) {
-            sb.append(CONFIG.getString("MCR.SWF.PageDir", "")).append("editor_").append(ID.getTypeId()).append("_editor.xml");
+            sb.append(getWorkflowFile(pagedir, ID.getBase()));
         } else {
 
-            sb.append(CONFIG.getString("MCR.SWF.PageDir", "")).append(CONFIG.getString("MCR.SWF.PageErrorStore", "editor_error_store.xml"));
+            sb.append(pagedir).append(CONFIG.getString("MCR.SWF.PageErrorStore", "editor_error_store.xml"));
         }
         return sb.toString();
     }

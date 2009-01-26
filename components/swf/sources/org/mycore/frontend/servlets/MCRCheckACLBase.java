@@ -46,6 +46,9 @@ import org.mycore.frontend.editor.MCRRequestParameters;
  * @version $Revision$ $Date$
  */
 abstract public class MCRCheckACLBase extends MCRCheckBase {
+
+    private static final long serialVersionUID = 1L;
+
     /**
      * This method overrides doGetPost of MCRServlet and handels all actions
      * against the ACL data.

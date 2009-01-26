@@ -106,7 +106,7 @@ public class MCRCheckEditDerivateServlet extends MCRCheckBase {
 
             // update data
             StringBuffer sb = new StringBuffer();
-            sb.append(WFM.getDirectoryPath(objID.getTypeId())).append(File.separator).append(derID.getId()).append(".xml");
+            sb.append(WFM.getDirectoryPath(objID.getBase())).append(File.separator).append(derID.getId()).append(".xml");
             MCRUtils.writeJDOMToFile(indoc, new File(sb.toString()));
             okay = true;
             url = getNextURL(objID, okay);
@@ -131,9 +131,9 @@ public class MCRCheckEditDerivateServlet extends MCRCheckBase {
         StringBuffer sb = new StringBuffer();
         if (okay) {
             // return all is ready
-            sb.append(CONFIG.getString("MCR.SWF.PageDir", "")).append("editor_").append(ID.getTypeId()).append("_editor.xml");
+            sb.append(getWorkflowFile(pagedir, ID.getBase()));
         } else {
-            sb.append(CONFIG.getString("MCR.SWF.PageDir", "")).append(CONFIG.getString("MCR.SWF.PageErrorStore", "editor_error_store.xml"));
+            sb.append(pagedir).append(CONFIG.getString("MCR.SWF.PageErrorStore", "editor_error_store.xml"));
         }
         return sb.toString();
     }

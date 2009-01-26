@@ -111,7 +111,10 @@ abstract public class MCRCheckDataBase extends MCRCheckBase {
 
         // Save the incoming to a file
         byte[] outxml = MCRUtils.getByteArray(indoc);
-        String savedir = CONFIG.getString("MCR.SWF.Directory." + ID.getTypeId());
+        String savedir = CONFIG.getString("MCR.SWF.Directory." + ID.getBase(),null);
+        if ((savedir == null) || (savedir.trim().length() == 0)) {
+            savedir = CONFIG.getString("MCR.SWF.Directory." + ID.getTypeId());
+        }
         String NL = System.getProperty("file.separator");
         String fullname = savedir + NL + ID.getId() + ".xml";
         storeMetadata(outxml, job, ID, fullname);
