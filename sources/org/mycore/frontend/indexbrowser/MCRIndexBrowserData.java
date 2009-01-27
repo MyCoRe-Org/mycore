@@ -395,25 +395,41 @@ public class MCRIndexBrowserData {
     private MCRQuery buildQuery() {
         MCRAndCondition cAnd = new MCRAndCondition();
 
-        MCRFieldDef field;
-        if (indexConfig.table.indexOf("_") == -1) {
-            field = MCRFieldDef.getDef("objectType");
-        } else {
-            field = MCRFieldDef.getDef("objectBase");
-        }
-
+        MCRFieldDef fieldproject;
+        MCRFieldDef fieldtype;
         if (indexConfig.table.indexOf(",") != -1) {
             MCROrCondition cOr = new MCROrCondition();
             StringTokenizer st = new StringTokenizer(indexConfig.table, ",");
             while (st.hasMoreTokens()) {
-                cOr.addChild(new MCRQueryCondition(field, "=", st.nextToken()));
+                String next = st.nextToken();
+                int ilen = next.indexOf("_");
+                if (ilen == -1) {
+                    fieldtype = MCRFieldDef.getDef("objectType");
+                    cOr.addChild(new MCRQueryCondition(fieldtype, "=", next));
+                }else {
+                    MCRAndCondition iAnd = new MCRAndCondition(); 
+                    fieldtype = MCRFieldDef.getDef("objectType");
+                    iAnd.addChild(new MCRQueryCondition(fieldtype, "=", next.substring(ilen + 1, next.length())));
+                    fieldproject = MCRFieldDef.getDef("objectProject");
+                    iAnd.addChild(new MCRQueryCondition(fieldproject, "=", next.substring(0, ilen)));
+                    cOr.addChild(iAnd);
+                }
             }
             cAnd.addChild(cOr);
         } else {
-            cAnd.addChild(new MCRQueryCondition(field, "=", indexConfig.table));
+            int ilen = indexConfig.table.indexOf("_");
+            if (ilen == -1) {
+                fieldtype = MCRFieldDef.getDef("objectType");
+                cAnd.addChild(new MCRQueryCondition(fieldtype, "=", indexConfig.table));
+            } else {
+                fieldtype = MCRFieldDef.getDef("objectType");
+                cAnd.addChild(new MCRQueryCondition(fieldtype, "=", indexConfig.table.substring(ilen + 1, indexConfig.table.length())));
+                fieldproject = MCRFieldDef.getDef("objectProject");
+                cAnd.addChild(new MCRQueryCondition(fieldproject, "=", indexConfig.table.substring(0, ilen)));
+            }
         }
 
-        field = MCRFieldDef.getDef(indexConfig.browseField);
+        MCRFieldDef field = MCRFieldDef.getDef(indexConfig.browseField);
         String value = browseData.search == null ? "*" : browseData.search;
         String operator = getOperator();
 
