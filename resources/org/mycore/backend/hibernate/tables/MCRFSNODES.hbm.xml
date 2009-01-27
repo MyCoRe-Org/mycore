@@ -10,7 +10,7 @@
     <property name="type" type="string" column="TYPE" length="1" not-null="true" unique="false" />
     <property name="owner" type="string" column="OWNER" length="64" not-null="true" unique="false" />
     <property name="name" type="string" column="NAME" length="250" not-null="true" unique="false" />
-    <property name="label" type="string" column="LABEL" length="250" not-null="false" unique="true" />
+    <property name="label" type="string" column="LABEL" length="250" not-null="false" unique="false" />
     <property name="size" type="long" column="SIZE" not-null="true" unique="false" />
     <property name="date" type="timestamp" column="DATE" not-null="false" unique="false" />
     <property name="storeid" type="string" column="STOREID" length="32" not-null="false" unique="false" />
