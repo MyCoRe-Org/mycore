@@ -134,8 +134,8 @@ public class MCRObjectMetadata {
             if (me.size() == 0) {
                 elements.remove();
                 tag_names.remove(counter);
-            }
-            counter++;
+            } else
+                counter++;
         }
     }
 
