@@ -168,7 +168,8 @@ public class MCRUserMgr {
             ArrayList<String> mbrUserIDs = primaryGroup.getMemberUserIDs();
 
             if (!mbrUserIDs.contains(currentUser.getID())) {
-                LOGGER.error("user : '" + currentUser.getID() + "' error: is not member of" + " primary group '" + currentUser.getPrimaryGroupID() + "'!");
+                LOGGER.error("user : '" + currentUser.getID() + "' error: is not member of" + " primary group '"
+                        + currentUser.getPrimaryGroupID() + "'!");
             }
         }
 
@@ -186,7 +187,8 @@ public class MCRUserMgr {
 
             for (int j = 0; j < admUserIDs.size(); j++) {
                 if (!mcrUserStore.existsUser((String) admUserIDs.get(j))) {
-                    LOGGER.error("group: '" + currentGroup.getID() + "' error: unknown admin" + " user '" + (String) admUserIDs.get(j) + "'!");
+                    LOGGER.error("group: '" + currentGroup.getID() + "' error: unknown admin" + " user '" + (String) admUserIDs.get(j)
+                            + "'!");
                 }
             }
 
@@ -195,7 +197,8 @@ public class MCRUserMgr {
 
             for (int j = 0; j < admGroupIDs.size(); j++) {
                 if (!mcrUserStore.existsGroup((String) admGroupIDs.get(j))) {
-                    LOGGER.error("group: '" + currentGroup.getID() + "' error: unknown admin" + " group '" + (String) admGroupIDs.get(j) + "'!");
+                    LOGGER.error("group: '" + currentGroup.getID() + "' error: unknown admin" + " group '" + (String) admGroupIDs.get(j)
+                            + "'!");
                 }
             }
 
@@ -969,8 +972,7 @@ public class MCRUserMgr {
         // In order to compare a modified group object with the persistent one
         // we must
         // be able to force this method to get the group from the store
-        MCRGroup reqGroup;
-        reqGroup = (bFromDataStore) ? null : (MCRGroup) groupCache.get(groupID);
+        MCRGroup reqGroup = bFromDataStore ? null : (MCRGroup) groupCache.get(groupID);
 
         if (reqGroup == null) { // We do not have this group in the cache.
             try {
@@ -1052,11 +1054,7 @@ public class MCRUserMgr {
         // In order to compare a modified user object with the persistent one we
         // must
         // be able to force this method to get the user from the store
-        MCRUser reqUser = null;
-
-        if (bFromDataStore) {
-            reqUser = (MCRUser) userCache.get(userID);
-        }
+        MCRUser reqUser = bFromDataStore ? null : (MCRUser) userCache.get(userID);
 
         if (reqUser == null) { // We do not have this user in the cache
 
@@ -1395,7 +1393,8 @@ public class MCRUserMgr {
 
             if (!mcrUserStore.existsGroup(gid)) {
                 StringBuffer msg = new StringBuffer("You tried to update ");
-                msg.append((updUser instanceof MCRUser) ? "user '" : "group '").append(ID).append("' with the unknown group '").append(gid).append("'.");
+                msg.append((updUser instanceof MCRUser) ? "user '" : "group '").append(ID).append("' with the unknown group '").append(gid)
+                        .append("'.");
                 throw new MCRException(msg.toString());
             }
 
