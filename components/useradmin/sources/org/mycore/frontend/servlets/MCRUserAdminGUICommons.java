@@ -24,10 +24,6 @@
 package org.mycore.frontend.servlets;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.util.Enumeration;
-import java.util.Properties;
 
 import javax.servlet.ServletException;
 
@@ -42,6 +38,9 @@ import org.mycore.common.MCRSessionMgr;
  * @version $Revision$ $Date$
  */
 public class MCRUserAdminGUICommons extends MCRServlet {
+
+    private static final long serialVersionUID = 1L;
+
     protected String pageDir = null;
 
     protected String noPrivsPage = null;
