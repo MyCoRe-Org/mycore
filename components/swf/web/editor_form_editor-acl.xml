@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE MyCoReWebPage>
+
+<MyCoReWebPage>
+
+<section title="Bearbeiten der Zugriffsrechte" xml:lang="de">
+</section>
+
+<section title="Edit the access rights" xml:lang="en">
+</section>
+
+<section title="معالجة حقوق الوصول" xml:lang="ar">
+</section>
+
+<section title="Merubah hak akses" xml:lang="id">
+</section>
+
+<section xml:lang="de" alt="en,id">
+	<editor id="editor-acl-ltr">
+	
+		 <source uri="{sourceUri}" />
+		 <target type="servlet" name="MCRCheckEditACLServlet" method="post" format="xml" />
+		 <cancel url="{cancelUrl}" />
+		
+		 <validationMessage i18n="common.validationMessage" />
+		
+		 <components root="editor-acls-ltr" var="/service">
+		  <include uri="webapp:editor/imports-editor-acl-ltr.xml"/>
+		  <include uri="webapp:editor/imports-editor-acl-project.xml"/>
+		 </components>
+	</editor>
+</section>
+
+<section xml:lang="ar">
+	<div align="right">
+		<editor id="editor-acl-rtl">
+		
+			 <source uri="{sourceUri}" />
+			 <target type="servlet" name="MCRCheckEditACLServlet" method="post" format="xml" />
+			 <cancel url="{cancelUrl}" />
+			
+			 <validationMessage i18n="common.validationMessage" />
+			
+			 <components root="editor-acls-rtl" var="/service">
+			  <include uri="webapp:editor/imports-editor-acl-rtl.xml"/>
+			  <include uri="webapp:editor/imports-editor-acl-project.xml"/>
+			 </components>
+		</editor>
+	</div>
+</section>
+
+</MyCoReWebPage>
+
+
