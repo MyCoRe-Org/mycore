@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE MyCoReWebPage>
+
+<MyCoReWebPage>
+
+<section title="Bearbeiten eines Derivates" xml:lang="de">
+  <p>Bearbeiten eines Derivates:</p>
+</section>
+
+<section title="Edit an object (derivate)" xml:lang="en">
+  <p>Edit derivate data:</p>
+</section>
+
+<section xml:lang="all">
+  <editor id="editor-editor-derivate">
+     <source uri="{sourceUri}" />
+     <target type="servlet" name="MCRCheckEditDerivateServlet" method="post" format="xml"/>
+     <cancel url="{cancelUrl}" />
+
+     <components root="editor-derivate" var="/mycorederivate">
+      <include uri="webapp:editor/imports-common.xml"/>
+      <include uri="webapp:editor/imports-editor-derivate.xml"/>
+     </components>
+  </editor>
+</section>
+
+</MyCoReWebPage>
