@@ -3,11 +3,19 @@
 
 <MyCoReWebPage>
 <section title="Neuanlegen einer Gruppe" xml:lang="de">
-  <editor id="creategroup"><include uri="webapp:editor/editor-creategroup.xml" /></editor>
+  <editor id="creategroup-ltr"><include uri="webapp:editor/editor-creategroup-ltr.xml" /></editor>
 </section>
 
 <section title="Create a new user group" xml:lang="en">
-  <editor id="creategroup"><include uri="webapp:editor/editor-creategroup.xml" /></editor>
+  <editor id="creategroup-ltr"><include uri="webapp:editor/editor-creategroup-ltr.xml" /></editor>
+</section>
+
+<section title="Create a new user group" xml:lang="ar">
+  <editor id="creategroup-rtl"><include uri="webapp:editor/editor-creategroup-rtl.xml" /></editor>
+</section>
+
+<section title="Membuka group baru" xml:lang="id">
+  <editor id="creategroup-ltr"><include uri="webapp:editor/editor-creategroup-ltr.xml" /></editor>
 </section>
 
 </MyCoReWebPage>

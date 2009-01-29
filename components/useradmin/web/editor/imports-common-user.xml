@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!-- ============================================== -->
-<!-- $Revision: 1.2 $ $Date: 2008/03/27 09:27:49 $ -->
+<!-- $Revision: 1.2 $ $Date: 2009/01/14 14:07:04 $ -->
 <!-- ============================================== -->
 
 <imports>
@@ -30,8 +30,8 @@
 
   <!-- *** Definitions of buttons *** -->
 
-  <submitButton id="BSubmit" width="100px" i18n="useradmin.common.button.save" />
-  <cancelButton id="BCancel" width="100px" i18n="useradmin.common.button.cancel" />
+  <submitButton id="BSubmit" width="100px" i18n="component.useradmin.common.button.save" />
+  <cancelButton id="BCancel" width="100px" i18n="component.useradmin.common.button.cancel" />
 
   <panel id="TwoButtons">
     <cell col="1" row="1" anchor="WEST" ref="BCancel"/>

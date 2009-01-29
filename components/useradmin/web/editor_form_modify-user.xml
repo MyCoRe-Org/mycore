@@ -4,11 +4,19 @@
 <MyCoReWebPage>
 
 <section title="Editieren eines Benutzers" xml:lang="de">
-  <editor id="modifyuser"><include uri="webapp:editor/editor-modifyuser.xml" /></editor>
+  <editor id="modifyuser-ltr"><include uri="webapp:editor/editor-modifyuser-ltr.xml" /></editor>
 </section>
 
 <section title="Modify an existing user account" xml:lang="en">
-  <editor id="modifyuser"><include uri="webapp:editor/editor-modifyuser.xml" /></editor>
+  <editor id="modifyuser-ltr"><include uri="webapp:editor/editor-modifyuser-ltr.xml" /></editor>
+</section>
+
+<section title="Modify an existing user account" xml:lang="ar">
+  <editor id="modifyuser-rtl"><include uri="webapp:editor/editor-modifyuser-rtl.xml" /></editor>
+</section>
+
+<section title="Merubah account pemakai" xml:lang="id">
+  <editor id="modifyuser-ltr"><include uri="webapp:editor/editor-modifyuser-ltr.xml" /></editor>
 </section>
 
 </MyCoReWebPage>

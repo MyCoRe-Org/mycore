@@ -56,6 +56,58 @@
     </table>
   </section>
 
+  <section title="Insufficient privileges" xml:lang="ar">
+    <table class="frame">
+      <tr>
+        <td>
+          <p></p>
+          <br />
+          <p></p>
+          <center>
+            <table width="80%">
+              <tr align="center">
+                <td align="center">
+                  <font color="red">
+                    This login has insufficient privileges to perform the desired action!
+                  </font>
+                </td>
+              </tr>
+            </table> 
+          </center>
+          <p></p>
+          <br />
+          <p></p>
+        </td>
+      </tr>
+    </table>
+  </section>
+
+  <section title="Insufficient privileges" xml:lang="id">
+    <table class="frame">
+      <tr>
+        <td>
+          <p></p>
+          <br />
+          <p></p>
+          <center>
+            <table width="80%">
+              <tr align="center">
+                <td align="center">
+                  <font color="red">
+                    Dengan login ini aksi tersebut tidak bisa dilakukkan!
+                  </font>
+                </td>
+              </tr>
+            </table> 
+          </center>
+          <p></p>
+          <br />
+          <p></p>
+        </td>
+      </tr>
+    </table>
+  </section>
+
 </MyCoReWebPage>
 
 

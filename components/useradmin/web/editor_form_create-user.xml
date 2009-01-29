@@ -4,11 +4,19 @@
 <MyCoReWebPage>
 
 <section title="Neuanlegen eines Benutzers" xml:lang="de">
-  <editor id="createuser"><include uri="webapp:editor/editor-createuser.xml" /></editor>
+  <editor id="createuser-ltr"><include uri="webapp:editor/editor-createuser-ltr.xml" /></editor>
 </section>
 
 <section title="Create a new user account" xml:lang="en">
-  <editor id="createuser"><include uri="webapp:editor/editor-createuser.xml" /></editor>
+  <editor id="createuser-ltr"><include uri="webapp:editor/editor-createuser-ltr.xml" /></editor>
+</section>
+
+<section title="Create a new user account" xml:lang="ar">
+  <editor id="createuser-rtl"><include uri="webapp:editor/editor-createuser-rtl.xml" /></editor>
+</section>
+
+<section title="Membuka account pemakai yang baru" xml:lang="id">
+  <editor id="createuser-ltr"><include uri="webapp:editor/editor-createuser-ltr.xml" /></editor>
 </section>
 
 </MyCoReWebPage>

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE MyCoReWebPage>
+
+<MyCoReWebPage>
+
+<section title="Editieren der Kontaktdaten" xml:lang="de">
+  <editor id="modifycontact-ltr"><include uri="webapp:editor/editor-modifycontact-ltr.xml" /></editor>
+</section>
+
+<section title="Modify contact data" xml:lang="en">
+  <editor id="modifycontact-ltr"><include uri="webapp:editor/editor-modifycontact-ltr.xml" /></editor>
+</section>
+
+<section title="Modify contact data" xml:lang="ar">
+  <editor id="modifycontact-rtl"><include uri="webapp:editor/editor-modifycontact-rtl.xml" /></editor>
+</section>
+
+<section title="Merubah data kontak" xml:lang="id">
+  <editor id="modifycontact-ltr"><include uri="webapp:editor/editor-modifycontact-ltr.xml" /></editor>
+</section>
+
+</MyCoReWebPage>
