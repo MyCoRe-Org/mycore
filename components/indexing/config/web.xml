@@ -16,3 +16,8 @@
   <servlet-name>MCRGoogleSitemapServlet</servlet-name>
   <url-pattern>/sitemap_google.xml</url-pattern>
 </servlet-mapping>
+<filter-mapping>
+  <filter-name>UserAgentFilter</filter-name>
+  <servlet-name>MCRGoogleSitemapServlet</servlet-name>
+  <dispatcher>REQUEST</dispatcher>
+</filter-mapping>

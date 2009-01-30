@@ -32,3 +32,9 @@
   <servlet-name>MCRClassificationBrowser</servlet-name>
   <url-pattern>/browse/*</url-pattern>
 </servlet-mapping>
+
+<filter-mapping>
+  <filter-name>UserAgentFilter</filter-name>
+  <servlet-name>MCRClassificationBrowser</servlet-name>
+  <dispatcher>REQUEST</dispatcher>
+</filter-mapping>
