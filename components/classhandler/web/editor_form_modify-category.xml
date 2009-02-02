@@ -16,7 +16,7 @@
 <section xml:lang="all">
 <editor id="modify-categ">
  <source uri="{sourceUri}" />
- <target type="servlet" name="MCRStartClassEditorServlet" method="get" format="xml" />
+ <target type="servlet" name="MCRStartClassEditorServlet" method="post" format="xml" />
  <cancel url="{cancelUrl}" />
 
  <components root="modify-category" var="/mycoreclass">

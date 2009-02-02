@@ -11,7 +11,7 @@
 
 <section xml:lang="all">
 <editor id="create-categ">
- <target type="servlet" name="MCRStartClassEditorServlet" method="get" format="xml" />
+ <target type="servlet" name="MCRStartClassEditorServlet" method="post" format="xml" />
  <cancel url="{cancelUrl}" />
  
  <components root="create-category" var="/mycoreclass">
