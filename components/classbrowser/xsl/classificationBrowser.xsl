@@ -44,8 +44,9 @@
       /* &lt;![CDATA[ */
       
       function update(elementID,categID) {
-        new Ajax.Updater( elementID, '<xsl:value-of select="$ServletsBaseURL" />ClassificationBrowser', 
+        new Ajax.Updater( elementID, '<xsl:value-of select="concat($ServletsBaseURL,'ClassificationBrowser')" />', 
         { parameters: { 
+          "XSL.template" : '<xsl:value-of select="$template" />',
           classification : '<xsl:value-of select="@classification" />',
           category       : categID,
           sortby         : '<xsl:value-of select="@sortby" />',
@@ -63,18 +64,24 @@
         } } );      
       }
      
-      function toogle(categID) {
+      function toogle(categID, closedImageURL, openImageURL) {
         var childrenID = 'cbChildren_<xsl:value-of select="@classification" />_' + categID;
         var button = document.getElementById( 'cbButton_<xsl:value-of select="@classification" />_' + categID );
         var children = document.getElementById( childrenID );
         
         if( button.value == '-' ) {
           button.value = '+';
+          if (button.type == 'image' &amp;&amp; closedImageURL.length > 0){
+            button.src=closedImageURL;
+          }
           children.className='cbHidden';
           children.innerHTML = '';
         }
         else {
           button.value = '-';
+          if (button.type == 'image' &amp;&amp; openImageURL.length > 0){
+            button.src=openImageURL;
+          }
           children.className='cbVisible';
           update( childrenID, categID );
         } 
