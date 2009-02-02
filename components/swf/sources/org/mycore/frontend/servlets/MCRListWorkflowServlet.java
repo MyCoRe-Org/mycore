@@ -38,8 +38,6 @@ import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.transform.JDOMSource;
 import org.jdom.xpath.XPath;
-
-import org.mycore.access.MCRAccessInterface;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
@@ -88,9 +86,6 @@ public class MCRListWorkflowServlet extends MCRServlet {
     private static String SLASH = System.getProperty("file.separator");
 
     private static String DefaultLang = null;
-
-    // The Access Manager
-    private static MCRAccessInterface AI = MCRAccessManager.getAccessImpl();
 
     /** Initialisation of the servlet */
     public void init() throws MCRConfigurationException, javax.servlet.ServletException {
@@ -153,11 +148,11 @@ public class MCRListWorkflowServlet extends MCRServlet {
         ArrayList workfiles = new ArrayList();
         ArrayList derifiles = new ArrayList();
 
-        if (AI.checkPermission("create-" + base)) {
+        if (MCRAccessManager.checkPermission("create-" + base)) {
             workfiles = WFM.getAllObjectFileNames(base);
             derifiles = WFM.getAllDerivateFileNames(base);
         } else {
-            if (AI.checkPermission("create-" + type)) {
+            if (MCRAccessManager.checkPermission("create-" + type)) {
                 workfiles = WFM.getAllObjectFileNames(type);
                 derifiles = WFM.getAllDerivateFileNames(type);
             }
@@ -293,7 +288,7 @@ public class MCRListWorkflowServlet extends MCRServlet {
                     writedb = service.getRule(j).getCondition();
                     bwritedb = AI.checkPermission(writedb);
                 } else {
-                    bwritedb = AI.checkPermission(obj.getId().toString(), "writedb");
+                    bwritedb = MCRAccessManager.checkPermission(obj.getId().toString(), "writedb");
                 }
             } catch (Exception ex) {
                 if (LOGGER.isDebugEnabled()) {
