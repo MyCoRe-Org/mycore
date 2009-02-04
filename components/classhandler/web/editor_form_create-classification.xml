@@ -49,26 +49,11 @@
 	  <text i18n="component.classhandler.label.label.p" class="editorlabel"/>
 	</cell>		  
     <cell col="2" row="3" var="label" anchor="NORTHWEST" >
-		   <repeater min="1" max="10" ref="RNewClassLabel" />      
+		   <repeater min="1" max="10" ref="RLabel" />      
 	</cell>	      	  	   	 	  	    	  	  
     <cell col="1" row="5" colspan="2" anchor="NORTHWEST"><space width="1px" height="10px" /></cell>		  
   </panel>
 	 
-  <panel id="RNewClassLabel">
-	<cell col="1" row="1" anchor="NORTHWEST" ref="Slang" var="@lang" default="de"/>    	  
-    <cell col="2" row="1" anchor="NORTHWEST">	  
-	  <text i18n="component.classhandler.label.lang" class="editorlabel"/>
-	</cell>
-    <cell col="1" row="2" anchor="NORTHWEST" ref="TFzeile1024" var="@text"  />	  
-    <cell col="2" row="2" anchor="NORTHWEST">	  
-	  <text i18n="component.classhandler.label.text.p" class="editorlabel"/>
-	</cell>	  
-    <cell col="1" row="3" anchor="NORTHWEST" ref="TFzeile1024"  var="@description"  />	  
-    <cell col="2" row="3" anchor="NORTHWEST">	  
-	  <text i18n="component.classhandler.label.description" class="editorlabel"/>
-	</cell>	  	  
-  </panel>
-
   <text id="AClid" i18n="component.classhandler.label.addclass.aclid" class="editorlabel"/>
 
 <!-- *** End *** -->

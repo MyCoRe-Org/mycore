@@ -1,32 +1,54 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!-- ============================================== -->
-<!-- $Revision: 1.2 $ $Date: 2007-05-09 06:16:37 $ -->
-<!-- ============================================== -->
+  <!-- ============================================== -->
+  <!-- $Revision: 1.2 $ $Date: 2007-05-09 06:16:37 $ -->
+  <!-- ============================================== -->
 
 <imports>
-<!-- *** Language List *** -->
+  <!-- *** Language List *** -->
 
   <list id="Slang" width="60" type="dropdown" default="de">
-    <item value="de" i18n="component.classhandler.list.slang.de"/>
-    <item value="en" i18n="component.classhandler.list.slang.en"/>
+    <item value="de" i18n="component.classhandler.list.slang.de" />
+    <item value="en" i18n="component.classhandler.list.slang.en" />
   </list>
 
-<!-- *** Data for the buttons ** -->
+  <!-- *** Data for the buttons ** -->
 
-  <submitButton id="BSubmit" width="100px" i18n="component.classhandler.edit.ok" />
-  <cancelButton id="BCancel" width="100px" i18n="component.classhandler.edit.cancel" />
+  <submitButton id="BSubmit" width="100px"
+    i18n="component.classhandler.edit.ok" />
+  <cancelButton id="BCancel" width="100px"
+    i18n="component.classhandler.edit.cancel" />
 
   <panel id="TwoButtons">
-    <cell col="1" row="1" anchor="WEST" ref="BCancel"/>
-    <cell col="2" row="1" anchor="WEST" ref="BSubmit" var="save"/>
+    <cell col="1" row="1" anchor="WEST" ref="BCancel" />
+    <cell col="2" row="1" anchor="WEST" ref="BSubmit" var="save" />
   </panel>
 
-<!-- *** Text fields *** -->
+  <!-- *** Text fields *** -->
 
-  <textfield id="TFzeile128" width="32" maxlength="32"/>
-  <textfield id="TFzeile1024" width="48" maxlength="1024"/>
+  <textfield id="TFzeile128" width="32" maxlength="32" />
+  <textfield id="TFzeile1024" width="48" maxlength="1024" />
 
-<!-- *** End *** -->
+  <panel id="RLabel">
+    <cell col="1" row="1" anchor="NORTHWEST" ref="Slang" var="@lang"
+      default="de" />
+    <cell col="2" row="1" anchor="NORTHWEST">
+      <text i18n="component.classhandler.label.lang" class="editorlabel" />
+    </cell>
+    <cell col="1" row="2" anchor="NORTHWEST" var="@text">
+      <textfield width="48" maxlength="1024" id="classCategLabel">
+        <condition id="cond.label.required" required="true" i18n="component.classhandler.condition.labelText"/>
+      </textfield>
+    </cell>
+    <cell col="2" row="2" anchor="NORTHWEST">
+      <text i18n="component.classhandler.label.text.p" class="editorlabel" />
+    </cell>
+    <cell col="1" row="3" anchor="NORTHWEST" ref="TFzeile1024" var="@description" />
+    <cell col="2" row="3" anchor="NORTHWEST">
+      <text i18n="component.classhandler.label.description" class="editorlabel" />
+    </cell>
+  </panel>
+
+  <!-- *** End *** -->
 
 </imports>
