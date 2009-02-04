@@ -159,6 +159,9 @@ public class MCRCategoryImpl extends MCRAbstractCategoryImpl implements Serializ
     }
 
     public boolean hasChildren() {
+        //if children is initialized and has objects use it and don't depend on db values
+        if (this.children != null && this.children.size() > 0)
+            return true;
         if (right != left)
             return (right - left) > 1;
         return super.hasChildren();
