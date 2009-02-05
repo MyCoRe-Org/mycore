@@ -25,11 +25,11 @@ package org.mycore.frontend.servlets;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
 
 import org.mycore.access.MCRAccessManager;
-import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.xml.MCRLayoutService;
@@ -37,38 +37,63 @@ import org.mycore.user.MCRUserContact;
 import org.mycore.user.MCRUserMgr;
 
 public class MCRSessionListingServlet extends MCRServlet {
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-    public void doGetPost(MCRServletJob job) throws Exception {
+	private static Logger LOGGER = Logger.getLogger(MCRServlet.class);
 
-        if (!MCRAccessManager.checkPermission("manage-sessions"))
-            throw new MCRException("Access denied. Please authorise.");
+	private static String errorpage = "access_deny.xml";
 
-        Document sessionsXML = listSessions(job);
-        MCRLayoutService.instance().doLayout(job.getRequest(), job.getResponse(), sessionsXML);
-    }
+	public void doGetPost(MCRServletJob job) throws Exception {
 
-    private Document listSessions(MCRServletJob job) {
-        //copy all session to new collection (fixes: ConcurrentModificationException)
-        Collection<MCRSession> sessions = new ArrayList<MCRSession>(MCRSessionMgr.getAllSessions().values());
-        Element sessionsXML = new Element("sessionListing");
-        MCRUserMgr um = MCRUserMgr.instance();
-        for (MCRSession session : sessions) {
-            Element sessionXML = new Element("session");
-            sessionXML.addContent(new Element("id").setText(session.getID()));
-            sessionXML.addContent(new Element("login").setText(session.getCurrentUserID()));
-            sessionXML.addContent(new Element("ip").setText(session.getCurrentIP()));
-            if (session.getCurrentUserID() != null) {
-                MCRUserContact userContacts = um.retrieveUser(session.getCurrentUserID()).getUserContact();
-                String userRealName = userContacts.getFirstName() + " " + userContacts.getLastName();
-                sessionXML.addContent(new Element("userRealName").setText(userRealName));
-            }
-            sessionXML.addContent(new Element("createTime").setText(Long.toString(session.getCreateTime())));
-            sessionXML.addContent(new Element("lastAccessTime").setText(Long.toString(session.getLastAccessedTime())));
-            sessionXML.addContent(new Element("loginTime").setText(Long.toString(session.getLoginTime())));
-            sessionsXML.addContent(sessionXML);
-        }
-        return new Document(sessionsXML);
-    }
+		if (!MCRAccessManager.checkPermission("manage-sessions")) {
+			String user = MCRSessionMgr.getCurrentSession().getCurrentUserID();
+			if (user == null || user.length() == 0) {
+				user = "guest";
+			}
+			LOGGER.warn("The user " + user
+					+ " want to show session list but access is denied.");
+			job.getResponse().sendRedirect(
+					job.getResponse().encodeRedirectURL(
+							getBaseURL() + errorpage));
+			return;
+		}
+
+		Document sessionsXML = listSessions(job);
+		MCRLayoutService.instance().doLayout(job.getRequest(),
+				job.getResponse(), sessionsXML);
+	}
+
+	private Document listSessions(MCRServletJob job) {
+		// copy all session to new collection (fixes:
+		// ConcurrentModificationException)
+		Collection<MCRSession> sessions = new ArrayList<MCRSession>(
+				MCRSessionMgr.getAllSessions().values());
+		Element sessionsXML = new Element("sessionListing");
+		MCRUserMgr um = MCRUserMgr.instance();
+		for (MCRSession session : sessions) {
+			Element sessionXML = new Element("session");
+			sessionXML.addContent(new Element("id").setText(session.getID()));
+			sessionXML.addContent(new Element("login").setText(session
+					.getCurrentUserID()));
+			sessionXML.addContent(new Element("ip").setText(session
+					.getCurrentIP()));
+			if (session.getCurrentUserID() != null) {
+				MCRUserContact userContacts = um.retrieveUser(
+						session.getCurrentUserID()).getUserContact();
+				String userRealName = userContacts.getFirstName() + " "
+						+ userContacts.getLastName();
+				sessionXML.addContent(new Element("userRealName")
+						.setText(userRealName));
+			}
+			sessionXML.addContent(new Element("createTime").setText(Long
+					.toString(session.getCreateTime())));
+			sessionXML.addContent(new Element("lastAccessTime").setText(Long
+					.toString(session.getLastAccessedTime())));
+			sessionXML.addContent(new Element("loginTime").setText(Long
+					.toString(session.getLoginTime())));
+			sessionsXML.addContent(sessionXML);
+		}
+		return new Document(sessionsXML);
+	}
 
 }
