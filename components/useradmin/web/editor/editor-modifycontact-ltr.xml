@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE editor>
+
+<editor id="modifycontact">
+
+    <source uri="request:servlets/MCRUserEditorServlet?mode=retrieveuserxml&amp;uid={uid}" />
+    <target type="servlet" name="MCRUserEditorServlet" method="post" format="xml" /> 
+    <cancel url="{cancelUrl}" />
+    
+    <components root="modify-contact-ltr" var="/mycoreuser">
+        <include uri="webapp:editor/imports-common-user.xml" />
+        <headline anchor="CENTER">
+            <text i18n="component.useradmin.common.headMessage" />
+        </headline>
+
+        <panel id="modify-contact-ltr" lines="off">
+            <cell row="1" col="1" ref="VSpace5" anchor="EAST" />
+			
+            <hidden var="user/@ID" descendants="true"/>
+            <hidden var="user/@numID" descendants="true"/>
+            <hidden var="user/@id_enabled" descendants="true"/>
+            <hidden var="user/@update_allowed" descendants="true"/>
+            <hidden var="user/user.creator" descendants="true"/>
+            <hidden var="user/user.creation.date" descendants="true"/>
+            <hidden var="user/user.last_modified" descendants="true"/>
+            <hidden var="user/user.password" descendants="true"/>
+            <hidden var="user/user.description" descendants="true"/>
+            <hidden var="user/user.primary_group" descendants="true"/>
+            <hidden var="user/user.groups" descendants="true"/>
+			
+            <!-- *** Contact information *** -->
+            <cell row="9" col="1" ref="VSpace50" anchor="EAST" />
+            <cell row="9" col="2" anchor="WEST">
+                <text style="font-weight:bold;" id="LContactInfo" i18n="component.useradmin.user.contact.label" />
+            </cell>
+
+            <!-- *** Salutation *** -->
+            <cell row="10" col="1" anchor="EAST">
+                <text id="LSalutation" i18n="component.useradmin.user.salutation.label" />
+            </cell>
+            <cell row="10" col="2" anchor="WEST" ref="TFzeile20" var="user/user.contact/contact.salutation" sortnr="5" />
+
+            <!-- *** First name *** -->
+            <cell row="11" col="1" anchor="EAST">
+                <text id="LFirstName" i18n="component.useradmin.user.firstname.label" />
+            </cell>
+            <cell row="11" col="2" anchor="WEST" ref="TFzeile48" var="user/user.contact/contact.firstname" sortnr="6" />
+
+            <!-- *** Last name *** -->
+            <cell row="12" col="1" anchor="EAST">
+                <text id="LLastName" i18n="component.useradmin.user.lastname.label" />
+            </cell>
+            <cell row="12" col="2" anchor="WEST" ref="TFzeile48" var="user/user.contact/contact.lastname" sortnr="7" />
+
+            <!-- *** Street *** -->
+            <cell row="13" col="1" anchor="EAST">
+                <text id="LStreet" i18n="component.useradmin.user.street.label" />
+            </cell>
+            <cell row="13" col="2" anchor="WEST" ref="TFzeile48" var="user/user.contact/contact.street" sortnr="8" />
+
+            <!-- *** City *** -->
+            <cell row="14" col="1" anchor="EAST">
+                <text id="LCity" i18n="component.useradmin.user.city.label" />
+            </cell>
+            <cell row="14" col="2" anchor="WEST" ref="TFzeile48" var="user/user.contact/contact.city" sortnr="9" />
+
+            <!-- *** Postal code *** -->
+            <cell row="15" col="1" anchor="EAST">
+                <text id="LPostalCode" i18n="component.useradmin.user.postale.label" />
+            </cell>
+            <cell row="15" col="2" anchor="WEST" ref="TFzeile10" var="user/user.contact/contact.postalcode" sortnr="10" />
+
+            <!-- *** Country *** -->
+            <cell row="16" col="1" anchor="EAST">
+                <text id="LCountry" i18n="component.useradmin.user.country.label" />
+            </cell>
+            <cell row="16" col="2" anchor="WEST" ref="TFzeile48" var="user/user.contact/contact.country" sortnr="11" />
+
+            <!-- *** Institution *** -->
+            <cell row="17" col="1" anchor="EAST">
+                <text id="LInstitution" i18n="component.useradmin.user.institution.label" />
+            </cell>
+            <cell row="17" col="2" anchor="WEST" ref="TFzeile48" var="user/user.contact/contact.institution" sortnr="12" />
+
+            <!-- *** Faculty *** -->
+            <cell row="18" col="1" anchor="EAST">
+                <text id="LFaculty" i18n="component.useradmin.user.faculty.label" />
+            </cell>
+            <cell row="18" col="2" anchor="WEST" ref="TFzeile48" var="user/user.contact/contact.faculty" sortnr="13" />
+
+            <!-- *** Department *** -->
+            <cell row="19" col="1" anchor="EAST">
+                <text id="LDepartment" i18n="component.useradmin.user.department.label" />
+            </cell>
+            <cell row="19" col="2" anchor="WEST" ref="TFzeile48" var="user/user.contact/contact.department" sortnr="14" />
+
+            <!-- *** Institute *** -->
+            <cell row="20" col="1" anchor="EAST">
+                <text id="LInstitute" i18n="component.useradmin.user.institute.label" />
+            </cell>
+            <cell row="20" col="2" anchor="WEST" ref="TFzeile48" var="user/user.contact/contact.institute" sortnr="15" />
+
+            <!-- *** Email *** -->
+            <cell row="21" col="1" anchor="EAST">
+                <text id="LEmail" i18n="component.useradmin.user.email.label" />
+            </cell>
+            <cell row="21" col="2" anchor="WEST" ref="TFzeile48" var="user/user.contact/contact.email" sortnr="16" />
+
+            <!-- *** Telephone *** -->
+            <cell row="22" col="1" anchor="EAST">
+                <text id="LTelephone" i18n="component.useradmin.user.phone.label" />
+            </cell>
+            <cell row="22" col="2" anchor="WEST" ref="TFzeile20" var="user/user.contact/contact.telephone" sortnr="17" />
+
+            <!-- *** Fax *** -->
+            <cell row="23" col="1" anchor="EAST">
+                <text id="LFax" i18n="component.useradmin.user.fax.label" />
+            </cell>
+            <cell row="23" col="2" anchor="WEST" ref="TFzeile20" var="user/user.contact/contact.fax" sortnr="18" />
+
+            <!-- *** Cellphone *** -->
+            <cell row="24" col="1" anchor="EAST">
+                <text id="LCellPhone" i18n="component.useradmin.user.mobile.label" />
+            </cell>
+            <cell row="24" col="2" anchor="WEST" ref="TFzeile20" var="user/user.contact/contact.cellphone" sortnr="19" />
+
+            <!-- *** Buttons *** -->
+            <cell row="99"  col="1" ref="VSpace25" anchor="WEST" />
+            <cell row="100" col="1" ref="BSubmit"  anchor="EAST" />
+            <cell row="100" col="2" ref="BCancel"  anchor="WEST" />
+            <cell row="101" col="1" ref="VSpace5"  anchor="WEST" />
+        </panel>
+    </components>
+</editor>
