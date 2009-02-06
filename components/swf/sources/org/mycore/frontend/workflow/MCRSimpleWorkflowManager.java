@@ -139,7 +139,7 @@ public class MCRSimpleWorkflowManager {
      * type.
      * 
      * @param base
-     *            the MCRObjectID base
+     *            the MCRObjectID base or MCRObjectID type
      * @param todo
      *            the todo action String from the workflow.
      * @return the List of the information mail addresses
