@@ -112,7 +112,6 @@ public class MCRSimpleWorkflowManager {
      * @return the string of the workflow directory path
      */
     public final String getDirectoryPath(String base) {
-        System.out.println("========================"+base);
         if (ht.containsKey(base)) {
             return ht.get(base);
         }

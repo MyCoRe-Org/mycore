@@ -4,24 +4,45 @@
 <MyCoReWebPage>
 
 <section title="Bearbeiten eines Derivates" xml:lang="de">
-  <p>Bearbeiten eines Derivates:</p>
 </section>
 
 <section title="Edit an object (derivate)" xml:lang="en">
-  <p>Edit derivate data:</p>
 </section>
 
-<section xml:lang="all">
-  <editor id="editor-editor-derivate">
+<section title="معالجة عنصر البيانات" xml:lang="ar">
+</section>
+
+<section title="Mengedit sebuah obyek (derivat)" xml:lang="id">
+</section>
+
+<section xml:lang="de" alt="en,id">
+  <editor id="editor-commit-derivate">
      <source uri="{sourceUri}" />
      <target type="servlet" name="MCRCheckEditDerivateServlet" method="post" format="xml"/>
      <cancel url="{cancelUrl}" />
 
      <components root="editor-derivate" var="/mycorederivate">
       <include uri="webapp:editor/imports-common.xml"/>
-      <include uri="webapp:editor/imports-editor-derivate.xml"/>
+      <include uri="webapp:editor/imports-editor-derivate-common.xml"/>
+      <include uri="webapp:editor/imports-editor-derivate-ltr.xml"/>
      </components>
   </editor>
+</section>
+
+<section xml:lang="ar">
+<div align="right">
+  <editor id="editor-commit-derivate-ar">
+     <source uri="{sourceUri}" />
+     <target type="servlet" name="MCRCheckEditDerivateServlet" method="post" format="xml"/>
+     <cancel url="{cancelUrl}" />
+
+     <components root="editor-derivate" var="/mycorederivate">
+      <include uri="webapp:editor/imports-common.xml"/>
+      <include uri="webapp:editor/imports-editor-derivate-common.xml"/>
+      <include uri="webapp:editor/imports-editor-derivate-rtl.xml"/>
+     </components>
+  </editor>
+</div>
 </section>
 
 </MyCoReWebPage>

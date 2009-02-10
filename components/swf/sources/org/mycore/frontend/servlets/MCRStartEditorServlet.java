@@ -26,7 +26,6 @@ package org.mycore.frontend.servlets;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -857,13 +856,13 @@ public class MCRStartEditorServlet extends MCRServlet {
      *            the MCRServletJob instance
      */
     public void waddfile(MCRServletJob job, CommonData cd) throws IOException {
-        if (!AI.checkPermission("create-" + cd.mytype)) {
+        if (!AI.checkPermission("create-" + cd.myremcrid.getTypeId())) {
             job.getResponse().sendRedirect(getBaseURL() + usererrorpage);
             return;
         }
 
         StringBuffer sb = new StringBuffer(pagedir);
-        sb.append("editor_").append(cd.mytype).append("_editor.xml");
+        sb.append("editor_").append(cd.myremcrid.getTypeId()).append("_editor.xml");
 
         String fuhid = new MCRSWFUploadHandlerMyCoRe(cd.myremcrid.getId(), cd.mysemcrid.getId(), "new", getBaseURL() + sb.toString()).getID();
         cd.myfile = pagedir + "fileupload_new.xml";
@@ -967,7 +966,7 @@ public class MCRStartEditorServlet extends MCRServlet {
         }
 
         StringBuffer sb = new StringBuffer(pagedir);
-        sb.append("editor_").append(cd.mytype).append("_editor.xml");
+        sb.append("editor_").append(cd.myremcrid.getTypeId()).append("_editor.xml");
 
         WFM.deleteDerivateObject(cd.myremcrid, cd.mysemcrid);
 
@@ -1046,7 +1045,7 @@ public class MCRStartEditorServlet extends MCRServlet {
         }
 
         StringBuffer sb = new StringBuffer();
-        sb.append(getBaseURL()).append(pagedir).append("editor_").append(cd.mytype).append("_editor.xml");
+        sb.append(getBaseURL()).append(pagedir).append("editor_").append(cd.myremcrid.getTypeId()).append("_editor.xml");
         job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(sb.toString()));
     }
 
@@ -1351,7 +1350,7 @@ public class MCRStartEditorServlet extends MCRServlet {
         }
 
         sb = new StringBuffer();
-        sb.append(pagedir).append("editor_").append(cd.mytype).append("_editor.xml");
+        sb.append(pagedir).append("editor_").append(cd.myremcrid.getTypeId()).append("_editor.xml");
         job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + sb.toString()));
     }
 
