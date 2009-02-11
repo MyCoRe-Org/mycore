@@ -45,7 +45,6 @@ import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
 import org.jdom.xpath.XPath;
-
 import org.mycore.access.MCRAccessInterface;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRConfiguration;
@@ -58,10 +57,10 @@ import org.mycore.datamodel.metadata.MCRMetaBoolean;
 import org.mycore.datamodel.metadata.MCRMetaClassification;
 import org.mycore.datamodel.metadata.MCRMetaDate;
 import org.mycore.datamodel.metadata.MCRMetaHistoryDate;
+import org.mycore.datamodel.metadata.MCRMetaISBN;
 import org.mycore.datamodel.metadata.MCRMetaISO8601Date;
 import org.mycore.datamodel.metadata.MCRMetaInstitutionName;
 import org.mycore.datamodel.metadata.MCRMetaInterface;
-import org.mycore.datamodel.metadata.MCRMetaISBN;
 import org.mycore.datamodel.metadata.MCRMetaLangText;
 import org.mycore.datamodel.metadata.MCRMetaLink;
 import org.mycore.datamodel.metadata.MCRMetaLinkID;
@@ -105,7 +104,7 @@ public class MCREditorOutValidator {
 
     private static Logger LOGGER = Logger.getLogger(MCREditorOutValidator.class);
 
-    private static final Map checkMethods;
+    private static final Map<String, Method> checkMethods;
 
     private static final ArrayList<String> adduserlist;
 
@@ -117,7 +116,8 @@ public class MCREditorOutValidator {
         HashMap<String, Method> methods = new HashMap<String, Method>();
         Method[] m = MCREditorOutValidator.class.getDeclaredMethods();
         for (int i = 0; i < m.length; i++) {
-            if (!m[i].getName().startsWith("checkMCR") || !((m[i].getParameterTypes().length == 1) && m[i].getParameterTypes()[0] == Element.class && m[i].getReturnType() == Boolean.TYPE)) {
+            if (!m[i].getName().startsWith("checkMCR")
+                    || !((m[i].getParameterTypes().length == 1) && m[i].getParameterTypes()[0] == Element.class && m[i].getReturnType() == Boolean.TYPE)) {
                 continue;
             }
             LOGGER.debug("adding Method " + m[i].getName());
@@ -204,6 +204,7 @@ public class MCREditorOutValidator {
     /**
      * @param datatag
      */
+    @SuppressWarnings("unchecked")
     private boolean checkMetaTags(Element datatag) {
         String mcrclass = datatag.getAttributeValue("class");
         List datataglist = datatag.getChildren();
@@ -226,10 +227,12 @@ public class MCREditorOutValidator {
                     LOGGER.warn("Error while invoking " + m.getName(), e);
                 }
             } else {
-                LOGGER.warn("Tag <" + datatag.getName() + "> of type " + mcrclass + " has no validator defined, fallback to default behaviour");
+                LOGGER.warn("Tag <" + datatag.getName() + "> of type " + mcrclass
+                        + " has no validator defined, fallback to default behaviour");
                 // try to create MCRMetaInterface instance
                 try {
-                    Class metaClass = Class.forName(mcrclass);
+                    Class<? extends MCRMetaInterface> metaClass = (Class<? extends MCRMetaInterface>) Class
+                            .forName("org.mycore.datamodel.metadata" + mcrclass);
                     // just checks if class would validate this element
                     if (!checkMetaObject(datasubtag, metaClass)) {
                         datatagIt.remove();
@@ -245,9 +248,9 @@ public class MCREditorOutValidator {
         return true;
     }
 
-    private boolean checkMetaObject(Element datasubtag, Class metaClass) {
+    private boolean checkMetaObject(Element datasubtag, Class<? extends MCRMetaInterface> metaClass) {
         try {
-            MCRMetaInterface test = (MCRMetaInterface) metaClass.newInstance();
+            MCRMetaInterface test = metaClass.newInstance();
             test.setFromDOM(datasubtag);
 
             if (!test.isValid()) {
@@ -260,14 +263,14 @@ public class MCREditorOutValidator {
         return true;
     }
 
-    private boolean checkMetaObjectWithLang(Element datasubtag, Class metaClass) {
+    private boolean checkMetaObjectWithLang(Element datasubtag, Class<? extends MCRMetaInterface> metaClass) {
         if (datasubtag.getAttribute("lang") != null) {
             datasubtag.getAttribute("lang").setNamespace(XML_NAMESPACE);
         }
         return checkMetaObject(datasubtag, metaClass);
     }
 
-    private boolean checkMetaObjectWithLangNotEmpty(Element datasubtag, Class metaClass) {
+    private boolean checkMetaObjectWithLangNotEmpty(Element datasubtag, Class<? extends MCRMetaInterface> metaClass) {
         String text = datasubtag.getTextTrim();
         if ((text == null) || (text.length() == 0)) {
             return false;
@@ -275,7 +278,7 @@ public class MCREditorOutValidator {
         return checkMetaObjectWithLang(datasubtag, metaClass);
     }
 
-    private boolean checkMetaObjectWithLinks(Element datasubtag, Class metaClass) {
+    private boolean checkMetaObjectWithLinks(Element datasubtag, Class<? extends MCRMetaInterface> metaClass) {
         String href = datasubtag.getAttributeValue("href");
         if (href == null) {
             return false;
