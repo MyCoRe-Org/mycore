@@ -11,8 +11,10 @@
   <editor id="modifycontact-ltr"><include uri="webapp:editor/editor-modifycontact-ltr.xml" /></editor>
 </section>
 
-<section title="Modify contact data" xml:lang="ar">
-  <editor id="modifycontact-rtl"><include uri="webapp:editor/editor-modifycontact-rtl.xml" /></editor>
+<section title="تعديل بيانات المستخدم" xml:lang="ar">
+	<div class="editorForm_rtl">
+		  <editor id="modifycontact-rtl"><include uri="webapp:editor/editor-modifycontact-rtl.xml" /></editor>
+	</div>
 </section>
 
 <section title="Merubah data kontak" xml:lang="id">

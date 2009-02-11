@@ -12,7 +12,9 @@
 </section>
 
 <section title="Modify an existing user account" xml:lang="ar">
-  <editor id="modifyuser-rtl"><include uri="webapp:editor/editor-modifyuser-rtl.xml" /></editor>
+	<div class="editorForm_rtl">
+		<editor id="modifyuser-rtl"><include uri="webapp:editor/editor-modifyuser-rtl.xml" /></editor>
+	</div>	
 </section>
 
 <section title="Merubah account pemakai" xml:lang="id">

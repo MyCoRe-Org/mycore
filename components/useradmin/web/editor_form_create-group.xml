@@ -11,7 +11,9 @@
 </section>
 
 <section title="Create a new user group" xml:lang="ar">
-  <editor id="creategroup-rtl"><include uri="webapp:editor/editor-creategroup-rtl.xml" /></editor>
+	<div class="editorForm_rtl">
+		<editor id="creategroup-rtl"><include uri="webapp:editor/editor-creategroup-rtl.xml" /></editor>
+	</div>
 </section>
 
 <section title="Membuka group baru" xml:lang="id">

@@ -14,76 +14,90 @@
         </headline>
 
         <panel id="create-group-rtl" lines="off">
-            <cell row="1" col="1" ref="VSpace5" anchor="EAST" />
-
+            <cell row="1" col="1" anchor="WEST" >
+				<space width="10px" height="0"/>
+			</cell>
+            <cell row="1" col="2" anchor="WEST" />
+            <cell row="1" col="3" anchor="WEST" >
+				<space width="10px" height="0"/>
+			</cell>
+            <cell row="1" col="4" anchor="WEST" />
+            <cell row="1" col="5" anchor="WEST" >
+				<space width="10px" height="0"/>
+			</cell>
+            <cell row="1" col="6" anchor="WEST" />
+            <cell row="1" col="7" anchor="WEST" >
+				<space width="10px" height="0"/>
+			</cell>		
+			
             <!-- *** User group data *** -->
-            <cell row="2" col="1" anchor="EAST">
+            <cell row="2" col="3" anchor="WEST">
                 <text id="LAccount" i18n="component.useradmin.group.account.label" />
             </cell>
-            <cell row="2" col="2" anchor="WEST" ref="TFzeile20" var="group/@ID" sortnr="1" />
-            <cell row="2" col="3" anchor="EAST" >
+            <cell row="2" col="4" anchor="WEST" ref="TFzeile20" var="group/@ID" sortnr="1" />
+            <cell row="2" col="2" anchor="WEST" >
                 <helpPopup id="HAccount" width="400px" height="200px" i18n="component.useradmin.group.account.help" />
             </cell>
 
             <!-- *** Description *** -->
-            <cell row="4" col="1" anchor="EAST">
+            <cell row="4" col="6" anchor="WEST">
                 <text id="LDescription" i18n="component.useradmin.group.description.label" />
             </cell>
-            <cell row="4" col="2" anchor="WEST" ref="TFzeile48" var="group/group.description" sortnr="3"/>
-            <cell row="4" col="3" anchor="EAST">
+            <cell row="4" col="4" anchor="WEST" ref="TFzeile48" var="group/group.description" sortnr="3"/>
+            <cell row="4" col="2" anchor="WEST">
                 <helpPopup id="HDescription" width="400px" height="200px" i18n="component.useradmin.group.description.help" />
             </cell>
 
 
             <!-- *** Group Amins *** -->
-            <cell row="6" col="1" anchor="EAST">
+            <cell row="6" col="6" anchor="WEST">
                 <text id="LAdminUsers" i18n="component.useradmin.group.adminuser.label" />
             </cell>
-            <cell row="6" col="2" anchor="WEST" var="group/group.admins/admins.userID" sortnr="20">
+            <cell row="6" col="4" anchor="WEST" var="group/group.admins/admins.userID" sortnr="20">
                 <list width="150" type="multirow" multiple="true" rows="5">
                     <item value="" i18n="component.useradmin.group.adminuser.select" />
                     <include uri="request:servlets/MCRUserEditorServlet?mode=getAllUsers"  cacheable="false" />
                 </list>
             </cell>
-            <cell row="6" col="3" anchor="EAST">
+            <cell row="6" col="2" anchor="WEST">
                 <helpPopup id="HGroupAdminUsers" width="400px" height="200px" i18n="component.useradmin.group.adminuser.help" />
             </cell>            
             
             
-            <cell row="8" col="1" anchor="EAST">
+            <cell row="8" col="6" anchor="WEST">
                 <text id="LAdminGroups" i18n="component.useradmin.group.admingroup.label" />
             </cell>
-            <cell row="8" col="2" anchor="WEST" var="group/group.admins/admins.groupID" sortnr="20">
+            <cell row="8" col="4" anchor="WEST" var="group/group.admins/admins.groupID" sortnr="20">
                 <list width="150" type="multirow" multiple="true" rows="5">
                     <item value="" i18n="component.useradmin.group.admingroup.select" />
                     <include uri="request:servlets/MCRUserEditorServlet?mode=getAllGroups"  cacheable="false" />
                 </list>
             </cell>
-            <cell row="8" col="3" anchor="EAST">
+            <cell row="8" col="2" anchor="WEST">
                 <helpPopup id="HGroupAdminGroups" width="400px" height="200px" i18n="component.useradmin.group.admingroup.help" />
             </cell>
             
             
             
             <!-- *** Group Members *** -->
-            <cell row="10" col="1" anchor="EAST">
+            <cell row="10" col="6" anchor="WEST">
                 <text id="LGroupMembers" i18n="component.useradmin.group.groupmember.label" />
             </cell>
-            <cell row="10" col="2" anchor="WEST" var="group/group.members/members.userID" sortnr="20">
+            <cell row="10" col="4" anchor="WEST" var="group/group.members/members.userID" sortnr="20">
                 <list width="150" type="multirow" multiple="true" rows="5">
                     <item value="" i18n="component.useradmin.group.groupmember.select" />
                     <include uri="request:servlets/MCRUserEditorServlet?mode=getAllUsers"  cacheable="false" />
                 </list>
             </cell>
-            <cell row="10" col="3" anchor="EAST">
+            <cell row="10" col="2" anchor="WEST">
                 <helpPopup id="HGroupAdminUsers" width="400px" height="200px" i18n="component.useradmin.group.groupmember.help" />
             </cell>                        
             
             <!-- *** Buttons *** -->
-            <cell row="99"  col="1" ref="VSpace25" anchor="WEST" />
-            <cell row="100" col="1" ref="BSubmit"  anchor="EAST" />
-            <cell row="100" col="2" ref="BCancel"  anchor="WEST" />
-            <cell row="101" col="1" ref="VSpace5"  anchor="WEST" />
+            <cell row="99"  col="1" anchor="WEST" />
+            <cell row="100" col="4" ref="BSubmit"  anchor="EAST" />
+            <cell row="100" col="4" ref="BCancel"  anchor="WEST" />
+            <cell row="101" col="1" anchor="WEST" />
         </panel>
     </components>
 </editor>
