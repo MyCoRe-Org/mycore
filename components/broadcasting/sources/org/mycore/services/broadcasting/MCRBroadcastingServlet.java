@@ -70,7 +70,7 @@ public class MCRBroadcastingServlet extends MCRServlet {
     }
 
     private static boolean access() {
-        return MCRAccessManager.getAccessImpl().checkPermission("module-broadcasting", "manage");
+        return MCRAccessManager.getAccessImpl().checkPermission("broadcasting") || MCRAccessManager.getAccessImpl().checkPermission("module-broadcasting", "manage");
     }
 
     private Element getReceiverListAsXML(MCRSession session) {
