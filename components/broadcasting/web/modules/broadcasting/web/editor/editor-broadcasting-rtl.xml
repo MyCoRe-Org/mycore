@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE editor>
+
+<editor id="editor-broadcasting">
+	<source uri="webapp:modules/broadcasting/config/mcr-module-broadcasting.xml" />
+	<target type="webapp" name="modules/broadcasting/config/mcr-module-broadcasting.xml" url="MCRBroadcastingServlet?mode=getReceiverList"/>
+	<cancel url="servlets/MCRBroadcastingServlet?mode=getReceiverList"/>
+
+	<components root="editor-broadcasting" var="/mcr-module-broadcasting">
+		<panel id="editor-broadcasting" lines="on">
+			<cell row="10" col="1">
+				<panel id="setting" lines="on">
+					<cell row="10" col="1">
+						<text i18n="component.broadcasting.editor.label.power"/>
+					</cell>
+					<cell row="10" col="2" var="power">
+						<list type="radio" rows="1">
+							<item value="on" i18n="component.broadcasting.signal.on"/>
+							<item value="off" i18n="component.broadcasting.signal.off"/>
+						</list>
+					</cell>
+					
+					<cell row="20" col="1">
+						<text i18n="component.broadcasting.editor.label.onair"/>
+					</cell>
+					<cell row="20" col="2" var="onAirTime">
+						<panel id="onAirTime" lines="on">
+							<cell row="10" col="1" var="@send">
+								<list type="radio" rows="1">
+									<item value="ever" i18n="component.broadcasting.editor.common.ever"/>
+									<item value="never" i18n="component.broadcasting.editor.common.never"/>
+								</list>
+							</cell>
+							
+							<cell row="20" col="1" var="from">
+								<text i18n="component.broadcasting.editor.common.from" />
+								<textfield width="30" />
+							</cell>
+							<cell row="20" col="2" var="to">
+								<text i18n="component.broadcasting.editor.common.to" />
+								<textfield width="30" />
+							</cell>
+						</panel>
+						<space width="20px" height="10px"/>
+					</cell>
+					
+					<cell row="30" col="1">
+						<text i18n="component.broadcasting.editor.label.refresh"/>
+					</cell>
+					<cell row="30" col="2" var="refreshRate">
+						<textfield width="10" />
+						<text i18n="component.broadcasting.editor.label.sec"/>
+					</cell>
+					
+					<cell row="40" col="1">
+						<text i18n="component.broadcasting.editor.label.sens" />
+					</cell>
+					<cell row="40" col="2" var="sessionSensitive">
+						<list type="radio" rows="1">
+							<item value="true" i18n="component.broadcasting.editor.common.yes"/>
+							<item value="false" i18n="component.broadcasting.editor.common.no"/>
+						</list>
+						<text>
+							<label>
+								<hr />
+							</label>
+						</text>
+						<space width="20px" height="20px"/>
+					</cell>
+
+
+					<!-- ***************** MESSAGES ******************* -->
+					
+
+					<cell row="50" col="1">
+						<text i18n="component.broadcasting.editor.label.header" />
+					</cell>
+					<cell row="50" col="2" var="message.header">
+						<textfield width="50" />
+					</cell>
+
+					<cell row="60" col="1">
+						<text i18n="component.broadcasting.editor.label.tail" />
+					</cell>
+					<cell row="60" col="2" var="message.tail">
+						<textfield width="50" />
+					</cell>
+
+					<cell row="70" col="1">
+						<text i18n="component.broadcasting.editor.label.allowguest" />
+					</cell>
+					<cell row="70" col="2" var="receivers/@allowGuestGroup">
+						<list type="radio" rows="1">
+							<item value="true" i18n="component.broadcasting.editor.common.yes"/>
+							<item value="false" i18n="component.broadcasting.editor.common.no"/>
+						</list>
+						<text>
+							<label>
+								<hr />
+							</label>
+						</text>
+					</cell>
+				</panel>
+			</cell>
+			
+			<!-- ############################################################################ -->
+			
+			<cell row="20" col="1">
+				<panel id="messages" lines="on">
+					<cell row="10" col="1" var="receivers/groups" anchor="WEST">
+						<repeater min="0" max="1024">
+							<panel id="receiver.group">
+								<cell row="10" col="1">
+									<text i18n="component.broadcasting.editor.label.togroup"/>
+								</cell>
+								<cell row="10" col="2" var="group">
+									<repeater min="0" max="1024">
+										<panel id="receiver.grouplist">
+											<!-- <cell row="10" col="1">
+												<textfield width="20" />
+											</cell> -->
+											<cell row="10" col="1">
+												<list width="150" type="dropdown">
+													<item value="" i18n="component.broadcasting.editor.common.select"/>
+													<include uri="request:servlets/MCRUserEditorServlet?mode=getAssignableGroupsForUser" cacheable="false" />
+												</list>
+											</cell>
+										</panel>
+									</repeater>
+								</cell>
+								<cell row="20" col="2" var="message.body">
+									<textarea width="50" height="10" />
+								</cell>
+							</panel>
+						</repeater>
+					</cell>
+					
+					<cell row="20" col="1" var="receivers/users" anchor="WEST">
+						<repeater min="0" max="1024">
+							<panel id="receiver.user">
+								<cell row="10" col="1">
+									<text i18n="component.broadcasting.editor.label.touser"/>
+								</cell>
+								<cell row="10" col="2" var="user">
+									<repeater min="0" max="1024">
+										<panel id="receiver.userlist">
+											<!-- <cell row="10" col="1">
+												<textfield width="20" />
+											</cell> -->
+											<cell row="10" col="1">
+												<list width="150" type="dropdown">
+													<item value="" i18n="component.broadcasting.editor.common.select"/>
+													<include uri="request:servlets/MCRUserEditorServlet?mode=getAllUsers" cacheable="false" />
+												</list>
+											</cell>
+										</panel>
+									</repeater>
+								</cell>
+								<cell row="20" col="2" var="message.body">
+									<textarea width="50" height="10" />
+								</cell>
+							</panel>
+						</repeater>
+					</cell>
+				</panel>
+			</cell>
+			
+			<!-- ************************** BUTTONS ************************ -->
+			
+			<cell row="30" col="1" anchor="CENTER">
+				<space width="20px" height="30px" />
+				<panel id="buttons" lines="on">
+					<cell row="10" col="2">
+						<submitButton width="100px">
+							<label i18n="component.broadcasting.editor.button.submit"/>
+						</submitButton>
+					</cell>
+					<cell row="10" col="1">
+						<cancelButton width="100px">
+							<label i18n="component.broadcasting.editor.button.cancel"/>
+						</cancelButton>
+					</cell>
+				</panel>
+			</cell>
+		</panel>
+	</components>
+</editor>
+

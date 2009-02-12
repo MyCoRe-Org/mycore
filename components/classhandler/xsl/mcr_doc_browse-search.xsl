@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!-- ============================================== -->
-<!-- $Revision: 1.4 $ $Date: 2007-08-16 06:51:55 $ -->
+<!-- $Revision: 1.3 $ $Date: 2008/07/11 12:23:10 $ -->
 <!-- ============================================== -->
 
 <!-- +
@@ -35,7 +35,18 @@
 <xsl:variable name="path"  select="concat($WebApplicationBaseURL, 'browse/', uri)" />
 	
 <div id="classificationBrowser" >
-   <a href='{$hrefstart}' ><xsl:value-of select="description" /></a>
+<table id="metaHeading" cellpadding="0" cellspacing="0" width="100%">
+  <tr>
+     <td class="titles">
+         <xsl:value-of select="concat(i18n:translate('component.classhandler.browse.numOf'),' :')" />
+         <xsl:value-of select="cntDocuments" />
+		 &#160;&#160;
+     </td>
+     <td class="browseCtrl" style="text-align:right">
+            <a href='{$hrefstart}' ><xsl:value-of select="description" /></a>
+     </td>
+    </tr>
+</table>
 <!-- IE Fix for padding and border -->
 <hr/>
 
@@ -50,18 +61,15 @@
  <xsl:variable name="predecessor" select="@predecessor" />
  <xsl:variable name="classifID" select="@classifID" />
  <xsl:variable name="view" select="@view" />
+ <xsl:variable name="doctype" select="@doctype" />
  <xsl:variable name="restriction" select="@restriction" />
+ <xsl:variable name="search_attribute" select="@searchField" />
 
  <xsl:for-each select="row">
    <xsl:variable name="href1" select="concat($WebApplicationBaseURL, 'browse', col[2]/@searchbase, $HttpSession)" />
    <xsl:variable name="actnode" select="position()" />  
-   <xsl:variable name="query">
-    <xsl:value-of select="concat('(',$search,'+=+', col[2]/@lineID, ')')"/>
-    <xsl:if test="string-length(../@doctype)>0">
-      <xsl:value-of select="concat('+and+', ../@doctype)"/>
-    </xsl:if>
-   </xsl:variable>
-   <xsl:variable name="href2" select="concat($ServletsBaseURL, 'MCRSearchServlet', $HttpSession, '?query=',$query,'&amp;numPerPage=10','&amp;mask=browse/',$type)" />
+
+   <xsl:variable name="href2" select="concat($ServletsBaseURL, 'MCRSearchServlet', $HttpSession, '?query=(',$search,'+=+', col[2]/@lineID, ')+and+',$doctype,'&amp;numPerPage=10','&amp;mask=browse/',$type)" />
    <xsl:variable name="img1"  select="concat($WebApplicationBaseURL, 'images/', col[1]/@folder1, '.gif')" />
    <xsl:variable name="img2"  select="concat($WebApplicationBaseURL, 'images/', col[1]/@folder2, '.gif')" />
    <xsl:variable name="img3"  select="concat($WebApplicationBaseURL, 'images/folder_blank.gif')" />
@@ -82,9 +90,21 @@
          </xsl:otherwise>
         </xsl:choose>
        </td >
+       <xsl:variable name="h2" select="string-length(col[2]/@numDocs)" />
+       <xsl:variable name="h3" select="4 - $h2" />
+       <xsl:variable name="h4" select="col[2]/@numDocs" />
+       <xsl:variable name="h6">
+         <xsl:if test="$h3 > 0">
+           <xsl:value-of select="substring('____', 1, $h3)"/>
+         </xsl:if><xsl:value-of select="$h4"/>
+       </xsl:variable>
+
+       <td  class="desc" nowrap="yes">
+       <xsl:value-of select="i18n:translate('component.classhandler.browse.docs',$h6)"/> 
+       </td>
        <td class="desc">
           <xsl:choose>
-            <xsl:when test="col[2]/@hasLinks='true'">
+            <xsl:when test="col[2]/@numDocs > 0">
               <a href='{$href2}'><xsl:value-of select="col[2]/text()" /></a>
             </xsl:when>
             <xsl:otherwise>

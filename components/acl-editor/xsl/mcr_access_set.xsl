@@ -13,9 +13,9 @@
     <xsl:variable name="aclPermEditorCSS" select="concat($WebApplicationBaseURL,'modules/acl-editor/web/CSS/aclPermEditor.css')" />
     <xsl:variable name="aclPermEditorJS" select="concat($WebApplicationBaseURL,'modules/acl-editor/web/JS/aclPermEditor.js')" />
     <xsl:variable name="aclClickButtonsJS" select="concat($WebApplicationBaseURL,'modules/acl-editor/web/JS/aclClickButtons.js')" />
-    <xsl:variable name="labelObjID" select="concat(i18n:translate('acl-editor.label.objID'),':')" />
-    <xsl:variable name="labelPermission" select="concat(i18n:translate('acl-editor.label.permission'),':')" />
-    <xsl:variable name="labelRule" select="concat(i18n:translate('acl-editor.label.rule'),':')" />
+    <xsl:variable name="labelObjID" select="concat(i18n:translate('component.acl-editor.label.objID'),':')" />
+    <xsl:variable name="labelPermission" select="concat(i18n:translate('component.acl-editor.label.permission'),':')" />
+    <xsl:variable name="labelRule" select="concat(i18n:translate('component.acl-editor.label.rule'),':')" />
     <xsl:template match="/mcr_access_set">
         <xsl:variable name="ruleItems" select="document(concat($dataRequest, '&amp;action=getRuleAsItems'))" />
         <div id="aclPermEditor" onMouseover="aclPermEditorSetup()">
@@ -42,7 +42,7 @@
             <xsl:choose>
                 <xsl:when test="not(@cmd = $add) and not(@cmd = $delete)">
                     <!-- Mapping Table -->
-                    <xsl:variable name="labelScra" select="i18n:translate('acl-editor.label.scra')" />
+                    <xsl:variable name="labelScra" select="i18n:translate('component.acl-editor.label.scra')" />
                     <div id="aclEditPermBox">
                         <xsl:if test="not(@emb = 'true')">
                             <div class="aclPermEditorLabel">
@@ -71,7 +71,7 @@
                                                     xmlns:xalan="http://xml.apache.org/xalan" action="{$delURL}"
                                                     method="post" accept-charset="UTF-8">
                                                     <input type="hidden" name="redir" value="{$aclEditorURL}" />
-                                                    <input id="delAllAclPerms" class="clickButtonOut" type="button" value="{i18n:translate('acl-editor.button.delAllPerms')}" msg="{i18n:translate('acl-editor.msg.delAllPerms')}"/>
+                                                    <input id="delAllAclPerms" class="clickButtonOut" type="button" value="{i18n:translate('component.acl-editor.button.delAllPerms')}" msg="{i18n:translate('component.acl-editor.msg.delAllPerms')}"/>
                                                 </form>
                                             </td>
                                             <td class="space"></td>
@@ -80,11 +80,11 @@
                                                     <table>
                                                         <tr>
                                                             <td id="checkBoxRowLabel">
-                                                                <xsl:value-of select="concat(i18n:translate('acl-editor.label.markAll'),':')" />
+                                                                <xsl:value-of select="concat(i18n:translate('component.acl-editor.label.markAll'),':')" />
                                                             </td>
                                                             <td>
                                                                 <input class="checkBox" type="checkbox" id="delAllCheckBox"
-                                                                    labelChecked="{concat(i18n:translate('acl-editor.label.delAllChecked'),':')}" />
+                                                                    labelChecked="{concat(i18n:translate('component.acl-editor.label.delAllChecked'),':')}" />
                                                             </td>
                                                         </tr>
                                                     </table>
@@ -129,7 +129,7 @@
                                                                 <table>
                                                                     <tr>
                                                                         <td>
-                                                                            <xsl:value-of select="concat(i18n:translate('acl-editor.label.delete'),':')" />
+                                                                            <xsl:value-of select="concat(i18n:translate('component.acl-editor.label.delete'),':')" />
                                                                         </td>
                                                                         <td>
                                                                             <input id="{concat('checkBox$',$aclPermTableID)}" class="checkBox" type="checkbox"
@@ -188,7 +188,7 @@
                                                     <table>
                                                         <tr>
                                                             <td>
-                                                                <xsl:value-of select="i18n:translate('acl-editor.msg.noFilterResults')" />
+                                                                <xsl:value-of select="i18n:translate('component.acl-editor.msg.noFilterResults')" />
                                                             </td>
                                                             <td></td>
                                                         </tr>
@@ -217,13 +217,13 @@
                                 <table class="saveButtonBar">
                                     <tr>
                                         <td>
-                                            <input class="button" type="submit" value="{i18n:translate('acl-editor.button.saveChg')}" />
+                                            <input class="button" type="submit" value="{i18n:translate('component.acl-editor.button.saveChg')}" />
                                         </td>
                                     </tr>
                                     <xsl:if test="@cmd = $add">
                                         <tr>
                                             <td>
-                                                <input class="button" type="button" value="{i18n:translate('acl-editor.button.cancel')}" onclick="history.back()" />
+                                                <input class="button" type="button" value="{i18n:translate('component.acl-editor.button.cancel')}" onclick="history.back()" />
                                             </td>
                                         </tr>
                                     </xsl:if>
@@ -286,7 +286,7 @@
                 </xsl:otherwise>
             </xsl:choose>
         </xsl:variable>
-        <xsl:variable name="labelAddRuleAssignment" select="i18n:translate('acl-editor.label.addRuleAss')" />
+        <xsl:variable name="labelAddRuleAssignment" select="i18n:translate('component.acl-editor.label.addRuleAss')" />
         <div id="aclCreateNewPermBox">
             <xsl:if test="not(@emb = 'true')">
                 <div class="aclPermEditorLabel">
@@ -336,8 +336,8 @@
                     <tr>
                         <td></td>
                         <td colspan="2">
-                            <input id="newPermSubmitButton" class="button" type="button" value="{i18n:translate('acl-editor.button.create')}" msgSelBox="{i18n:translate('acl-editor.msg.noRuleSelected')}"
-                                msgObjId="{i18n:translate('acl-editor.msg.emptyObjId')}" msgAcPool="{i18n:translate('acl-editor.msg.emptyAcPool')}" />
+                            <input id="newPermSubmitButton" class="button" type="button" value="{i18n:translate('component.acl-editor.button.create')}" msgSelBox="{i18n:translate('component.acl-editor.msg.noRuleSelected')}"
+                                msgObjId="{i18n:translate('component.acl-editor.msg.emptyObjId')}" msgAcPool="{i18n:translate('component.acl-editor.msg.emptyAcPool')}" />
                         </td>
                     </tr>
                 </table>
@@ -349,9 +349,9 @@
 
     <!-- Template for filter -->
     <xsl:template match="mcr_access_filter">
-        <xsl:variable name="labelFilterList" select="concat(i18n:translate('acl-editor.label.filterList'),':')" />
-        <xsl:variable name="labelInsertID" select="concat(i18n:translate('acl-editor.label.insertID'),':')" />
-        <xsl:variable name="labelInsertPerm" select="concat(i18n:translate('acl-editor.label.insertPerm'),':')" />
+        <xsl:variable name="labelFilterList" select="concat(i18n:translate('component.acl-editor.label.filterList'),':')" />
+        <xsl:variable name="labelInsertID" select="concat(i18n:translate('component.acl-editor.label.insertID'),':')" />
+        <xsl:variable name="labelInsertPerm" select="concat(i18n:translate('component.acl-editor.label.insertPerm'),':')" />
         <xsl:variable name="filterRedirURL"
             select="concat($dataRequest, '&amp;XSL.toc.pos.SESSION=1&amp;action=setFilter&amp;ObjIdFilter=',objid,'&amp;AcPoolFilter=',acpool,$redirectURL)" />
         <xsl:variable name="filterURL" select="concat($dataRequest, '&amp;XSL.toc.pos.SESSION=1&amp;action=setFilter',$redirectURL)" />
@@ -385,11 +385,11 @@
                         <input class="input" name="AcPoolFilter" value="{acpool}" />
                     </td>
                     <td>
-                        <input class="button" type="submit" value="{i18n:translate('acl-editor.button.filter')}" />
+                        <input class="button" type="submit" value="{i18n:translate('component.acl-editor.button.filter')}" />
                     </td>
                     <td>
                         <input class="button" onClick="self.location.href='{concat($ServletsBaseURL,'MCRACLEditorServlet_v2?mode=dataRequest&amp;action=deleteFilter')}'"
-                            value="{i18n:translate('acl-editor.button.clearFilter')}" type="button" />
+                            value="{i18n:translate('component.acl-editor.button.clearFilter')}" type="button" />
                     </td>
                 </tr>
             </table>
@@ -408,12 +408,12 @@
         <xsl:param name="name" />
         <select id="{$selectId}" class="input" size="1" name="{$name}">
             <option value="'bitte waehlen'">
-                <xsl:value-of select="i18n:translate('acl-editor.label.choose')" />
+                <xsl:value-of select="i18n:translate('component.acl-editor.label.choose')" />
             </option>
             <xsl:for-each select="item">
                 <option value="{@value}">
                     <xsl:if test="@value=$rid">
-                        <xsl:attribute name="selected">selected<xsl:value-of select="i18n:translate('acl-editor.label.selected')" />
+                        <xsl:attribute name="selected">selected<xsl:value-of select="i18n:translate('component.acl-editor.label.selected')" />
         </xsl:attribute>
                     </xsl:if>
                     <xsl:value-of select="@label" />
@@ -435,9 +435,9 @@
         <xsl:variable name="numChildren">
             <xsl:value-of select="count(xalan:nodeset($childrenXML)/mcr_access)" />
         </xsl:variable>
-        <xsl:variable name="labelGor" select="concat(i18n:translate('acl-editor.label.gor'),':')" />
-        <xsl:variable name="labelResults" select="concat(i18n:translate('acl-editor.label.results'),':')" />
-        <xsl:variable name="labelResultsPerPage" select="concat(i18n:translate('acl-editor.label.resultsPerPage'),':')" />
+        <xsl:variable name="labelGor" select="concat(i18n:translate('component.acl-editor.label.gor'),':')" />
+        <xsl:variable name="labelResults" select="concat(i18n:translate('component.acl-editor.label.results'),':')" />
+        <xsl:variable name="labelResultsPerPage" select="concat(i18n:translate('component.acl-editor.label.resultsPerPage'),':')" />
         <form xmlns:encoder="xalan://java.net.URLEncoder" xmlns:xalan="http://xml.apache.org/xalan" action="{$permEditorURL}" method="post" accept-charset="UTF-8">
             <input type="hidden" name="redir" value="{$permEditorURL}" />
             <table class="permTocNaviResultsTable">
@@ -488,7 +488,7 @@
             <xsl:value-of select="ceiling(number($numberOfChildren) div number($toc.pageSize))" />
         </xsl:variable>
         <xsl:if test="number($numberOfChildren)>number($toc.pageSize)">
-            <xsl:value-of select="concat(',&#32;', i18n:translate('acl-editor.label.resultPages'))" />
+            <xsl:value-of select="concat(',&#32;', i18n:translate('component.acl-editor.label.resultPages'))" />
             :
             <xsl:for-each select="xalan:nodeset($children)/mcr_access[number($numberOfHitPages)>=position()]">
                 <xsl:variable name="jumpToPos">

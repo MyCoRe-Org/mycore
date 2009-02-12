@@ -1,20 +1,32 @@
-<?xml version="1.0" encoding="ISO_8859-1"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE MyCoReWebPage>
 
 <MyCoReWebPage>
 
-<section title="Message broadcasting" xml:lang="de">
-  <p>Nachrichten verschicken.</p>
+<section title="Nachrichten verschicken." xml:lang="de">
 </section>
 
-<section title="Create a new author" xml:lang="en">
-  <p>Sending messages.</p>
+<section title="Sending messages." xml:lang="en">
 </section>
 
-<section xml:lang="all">
-  <editor id="editor-author-author">
-      <include uri="webapp:modules/broadcasting/web/editor/editor-broadcasting.xml"/>
+<section title="Sending messages." xml:lang="id">
+</section>
+
+<section title="إرسال رسالة" xml:lang="ar">
+</section>
+
+<section xml:lang="de" alt="en,id">
+  <editor id="editor-broadcasting-ltr">
+      <include uri="webapp:modules/broadcasting/web/editor/editor-broadcasting-ltr.xml"/>
   </editor>
+</section>
+
+<section xml:lang="ar">
+<div align="right">
+  <editor id="editor-broadcasting-ltr">
+      <include uri="webapp:modules/broadcasting/web/editor/editor-broadcasting-rtl.xml"/>
+  </editor>
+</div>
 </section>
 
 </MyCoReWebPage>

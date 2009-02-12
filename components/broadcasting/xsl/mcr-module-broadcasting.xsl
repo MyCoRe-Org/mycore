@@ -77,14 +77,14 @@
 	</xsl:template>
 	<!-- ======================================================================================== -->
 	<xsl:template name="send.noSignal">
-		<signal><xsl:value-of select="i18n:translate('broadcasting.signal.off')" /></signal>
+		<signal><xsl:value-of select="i18n:translate('component.broadcasting.signal.off')" /></signal>
 	</xsl:template>
 	<!-- ======================================================================================== -->
 	<xsl:template name="send.message">
 		<xsl:variable name="message.body">
 			<xsl:call-template name="get.message"/>
 		</xsl:variable>
-		<signal><xsl:value-of select="i18n:translate('broadcasting.signal.on')" /></signal>
+		<signal><xsl:value-of select="i18n:translate('component.broadcasting.signal.on')" /></signal>
 		<message.header>
 			<xsl:copy-of select="message.header/text()"/>
 		</message.header>

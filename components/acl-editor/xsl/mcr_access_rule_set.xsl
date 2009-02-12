@@ -5,11 +5,11 @@
     -->
     <xsl:include href="mcr_acl_editor_common.xsl" />
     <xsl:variable name="currentEditor" select="concat('&amp;editor=', $ruleEditor)" />
-    <xsl:variable name="labelDescription" select="concat(i18n:translate('acl-editor.label.description'),':')" />
-    <xsl:variable name="labelRule" select="concat(i18n:translate('acl-editor.label.rule'),':')" />
-    <xsl:variable name="labelRuleId" select="concat(i18n:translate('acl-editor.label.ruleID'),':')" />
-    <xsl:variable name="labelDelete" select="concat(i18n:translate('acl-editor.label.delete'),':')" />
-    <xsl:variable name="inUseInfoMsg" select="i18n:translate('acl-editor.msg.delInfo')" />
+    <xsl:variable name="labelDescription" select="concat(i18n:translate('component.acl-editor.label.description'),':')" />
+    <xsl:variable name="labelRule" select="concat(i18n:translate('component.acl-editor.label.rule'),':')" />
+    <xsl:variable name="labelRuleId" select="concat(i18n:translate('component.acl-editor.label.ruleID'),':')" />
+    <xsl:variable name="labelDelete" select="concat(i18n:translate('component.acl-editor.label.delete'),':')" />
+    <xsl:variable name="inUseInfoMsg" select="i18n:translate('component.acl-editor.msg.delInfo')" />
     <xsl:variable name="inUseInfoMsgID" select="'aclInUseInfoMsg'" />
     <xsl:variable name="aclRuleEditorJS" select="concat($WebApplicationBaseURL,'modules/acl-editor/web/JS/aclRuleEditor.js')" />
     <xsl:variable name="aclClickButtonsJS" select="concat($WebApplicationBaseURL,'modules/acl-editor/web/JS/aclClickButtons.js')" />
@@ -23,7 +23,7 @@
             <div id="aclRuleEditor" onmouseover="aclRuleEditorSetup()">
                 <div id="aclCreateNewRuleBox">
                     <div class="aclRuleEditorlabel">
-                        <xsl:value-of select="i18n:translate('acl-editor.label.newRule')" />
+                        <xsl:value-of select="i18n:translate('component.acl-editor.label.newRule')" />
                     </div>
                     <div class="aclCreateNewRule">
                         <form id="aclCreateNewRuleForm" xmlns:encoder="xalan://java.net.URLEncoder" xmlns:xalan="http://xml.apache.org/xalan"
@@ -51,8 +51,8 @@
                                 <tr>
                                     <td></td>
                                     <td>
-                                        <input id="createNewRuleButon" class="button" type="button" value="{i18n:translate('acl-editor.button.create')}"
-                                            msgDesc="{i18n:translate('acl-editor.msg.emptyDesc')}" msgRule="{i18n:translate('acl-editor.msg.emptyRule')}" />
+                                        <input id="createNewRuleButon" class="button" type="button" value="{i18n:translate('component.acl-editor.button.create')}"
+                                            msgDesc="{i18n:translate('component.acl-editor.msg.emptyDesc')}" msgRule="{i18n:translate('component.acl-editor.msg.emptyRule')}" />
                                     </td>
                                 </tr>
                             </table>
@@ -61,7 +61,7 @@
                 </div><!-- End aclCreateNewRuleBox -->
                 <div id="aclEditRuleBox">
                     <div class="aclRuleEditorlabel">
-                        <xsl:value-of select="i18n:translate('acl-editor.label.ruleSys')" />
+                        <xsl:value-of select="i18n:translate('component.acl-editor.label.ruleSys')" />
                     </div>
                     <div class="aclRuleTableBox">
                         <div class="menu">
@@ -69,20 +69,20 @@
                                 <tr>
                                     <td class="openAll">
                                         <!-- Details button -->
-                                        <div id="detailsAllButton" class="clickButtonOut" altLabel="{i18n:translate('acl-editor.button.collapsAll')}">
-                                            <xsl:value-of select="i18n:translate('acl-editor.button.expandAll')" />
+                                        <div id="detailsAllButton" class="clickButtonOut" altLabel="{i18n:translate('component.acl-editor.button.collapsAll')}">
+                                            <xsl:value-of select="i18n:translate('component.acl-editor.button.expandAll')" />
                                         </div>
                                     </td>
                                     <td class="deleteAll">
                                         <!-- Delete all rules button -->
-                                        <!--<div id="delAllRulesButton" class="clickButtonOut" cmd="{concat($dataRequest, '&amp;action=delAllRules')}" msg="{i18n:translate('acl-editor.msg.delAllRules')}">
-                                            <xsl:value-of select="i18n:translate('acl-editor.button.delAllRules')" />
+                                        <!--<div id="delAllRulesButton" class="clickButtonOut" cmd="{concat($dataRequest, '&amp;action=delAllRules')}" msg="{i18n:translate('component.acl-editor.msg.delAllRules')}">
+                                            <xsl:value-of select="i18n:translate('component.acl-editor.button.delAllRules')" />
                                         </div>
                                         --><form id="delAllRulesForm" name="MappingTableForm" xmlns:encoder="xalan://java.net.URLEncoder" xmlns:xalan="http://xml.apache.org/xalan"
                                             action="{concat($dataRequest, '&amp;action=delAllRules')}" method="post" accept-charset="UTF-8">
                                             <input type="hidden" name="redir" value="{concat($aclEditorURL,$currentEditor)}" />
-                                            <input id="delAllRulesButton" class="clickButtonOut" type="button" value="{i18n:translate('acl-editor.button.delAllRules')}"
-                                                msg="{i18n:translate('acl-editor.msg.delAllRules')}" />
+                                            <input id="delAllRulesButton" class="clickButtonOut" type="button" value="{i18n:translate('component.acl-editor.button.delAllRules')}"
+                                                msg="{i18n:translate('component.acl-editor.msg.delAllRules')}" />
                                         </form>
                                     </td>
                                     <td class="checkBoxRow">
@@ -90,7 +90,7 @@
                                             <tr>
                                                 <td class="space"></td>
                                                 <td>
-                                                    <xsl:value-of select="concat(i18n:translate('acl-editor.label.markAll'),':')" />
+                                                    <xsl:value-of select="concat(i18n:translate('component.acl-editor.label.markAll'),':')" />
                                                 </td>
                                                 <td>
                                                     <input class="checkBox" type="checkbox" id="delAllRulesCheckBox" />
@@ -176,7 +176,7 @@
                                     </tr>
                                 </table>
                             </xsl:for-each>
-                            <input class="button" type="submit" value="{i18n:translate('acl-editor.button.saveChg')}" />
+                            <input class="button" type="submit" value="{i18n:translate('component.acl-editor.button.saveChg')}" />
                         </form>
                     </div>
                 </div><!-- End aclEditRuleBox -->

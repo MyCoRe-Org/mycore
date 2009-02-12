@@ -25,10 +25,10 @@
     <xsl:variable name="PageTitle">
         <xsl:choose>
             <xsl:when test="//editor = $permEditor">
-                <xsl:value-of select="i18n:translate('acl-editor.permEditor')" />
+                <xsl:value-of select="i18n:translate('component.acl-editor.permEditor')" />
             </xsl:when>
             <xsl:when test="//editor = $ruleEditor">
-                <xsl:value-of select="i18n:translate('acl-editor.ruleEditor')" />
+                <xsl:value-of select="i18n:translate('component.acl-editor.ruleEditor')" />
             </xsl:when>
         </xsl:choose>
     </xsl:variable>
@@ -49,7 +49,7 @@
             <xsl:choose>
                 <xsl:when test="editor = $permEditor">
                     <a href="{concat($aclEditorURL, '&amp;editor=ruleEditor', $filter)}">
-                        <xsl:value-of select="i18n:translate('acl-editor.ruleEditor')" />
+                        <xsl:value-of select="i18n:translate('component.acl-editor.ruleEditor')" />
                     </a>
 
                     <xsl:variable name="permEditor" select="concat($dataRequest, '&amp;action=getPermEditor', $filter)" />
@@ -58,7 +58,7 @@
                 </xsl:when>
                 <xsl:when test="editor = $ruleEditor">
                     <a href="{concat($aclEditorURL, '&amp;editor=permEditor', $filter)}">
-                        <xsl:value-of select="i18n:translate('acl-editor.permEditor')" />
+                        <xsl:value-of select="i18n:translate('component.acl-editor.permEditor')" />
                     </a>
 
                     <xsl:variable name="ruleEditor" select="concat($dataRequest, '&amp;action=getRuleEditor')" />
