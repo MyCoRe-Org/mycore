@@ -34,6 +34,42 @@
 </table>
 </center>
 </section>
+	
+	
+<section title="Classification Editor canceled" xml:lang="ar">
+<center>
+<table width="80%">
+ <tr align="center">
+  <td align="center">
+<font color="red">
+   لقد تم إيقاف العمل بمحرر التصنيفات من طرف المستخدم
+   <span dir="rtl">.</span>
+   <br/>
+   <br/>	
+   و سيتم التحويل إلى صفحة البداية لمحرر التصنيفات
+   <span dir="rtl">.</span> 	
+</font>
+  </td>
+ </tr>
+</table>
+</center>
+</section>
+	
+<section title="Membatalkan aksi dengan editor classification" xml:lang="id">
+<center>
+<table width="80%">
+ <tr align="center">
+  <td align="center">
+<font color="red">
+   Editor classification dibatalkan oleh pemakai.<br/>
+   <br/>	
+   Sebentar lagi halaman muka editor classification akan muncul.	
+</font>
+  </td>
+ </tr>
+</table>
+</center>
+</section>
 
 </MyCoReWebPage>
 
