@@ -1,5 +1,6 @@
 Version 2.0 (Head)
 =============
+2008-02-13: Added namespace support for editor forms.
 - Editor Framework: Added xsl template to dynamically include editor from any xsl stylesheet
 - Editor Framework: Added input validation using XSL condition for a complete panel
 - Added stylesheet to generate search masks from searchfields.xml
