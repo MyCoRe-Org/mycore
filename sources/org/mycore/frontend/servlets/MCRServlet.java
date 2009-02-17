@@ -62,10 +62,10 @@ import org.mycore.datamodel.common.MCRActiveLinkException;
 /**
  * This is the superclass of all MyCoRe servlets. It provides helper methods for
  * logging and managing the current session data. Part of the code has been
- * taken from MilessServlet.java written by Frank LÃ¼tzenkirchen.
+ * taken from MilessServlet.java written by Frank Lützenkirchen.
  * 
  * @author Detlev Degenhardt
- * @author Frank LÃ¼tzenkirchen
+ * @author Frank Lützenkirchen
  * @author Thomas Scheffler (yagee)
  * 
  * @version $Revision$ $Date: 2008-02-06 17:27:24 +0000 (Mi, 06 Feb
@@ -89,11 +89,6 @@ public class MCRServlet extends HttpServlet {
 
     private static final boolean ENABLE_BROWSER_CACHE = CONFIG.getBoolean("MCR.Servlet.BrowserCache.enable", false);
 
-    // These values serve to remember if we have a GET or POST request
-    private final static boolean GET = true;
-
-    private final static boolean POST = false;
-
     private static MCRLayoutService LAYOUT_SERVICE;
 
     public static final String BASE_URL_ATTRIBUTE = "org.mycore.base.url";
@@ -105,7 +100,7 @@ public class MCRServlet extends HttpServlet {
     public void init() throws ServletException {
         super.init();
         if (LAYOUT_SERVICE == null) {
-        	LAYOUT_SERVICE = MCRLayoutService.instance();
+            LAYOUT_SERVICE = MCRLayoutService.instance();
         }
     }
 
@@ -142,7 +137,7 @@ public class MCRServlet extends HttpServlet {
 
         BASE_URL = CONFIG.getString("MCR.baseurl", requestURL.substring(0, pos) + contextPath);
         if (!BASE_URL.endsWith("/"))
-        	BASE_URL = BASE_URL + "/";
+            BASE_URL = BASE_URL + "/";
         SERVLET_URL = BASE_URL + "servlets/";
         MCRURIResolver.init(context, getBaseURL());
     }
@@ -151,7 +146,7 @@ public class MCRServlet extends HttpServlet {
     // doGetPost(),
     // i.e. GET- and POST requests are handled by one method only.
     public void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
-        doGetPost(req, res, GET);
+        doGetPost(req, res);
     }
 
     protected void doGet(MCRServletJob job) throws Exception {
@@ -159,7 +154,7 @@ public class MCRServlet extends HttpServlet {
     }
 
     public void doPost(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
-        doGetPost(req, res, POST);
+        doGetPost(req, res);
     }
 
     protected void doPost(MCRServletJob job) throws Exception {
@@ -209,15 +204,12 @@ public class MCRServlet extends HttpServlet {
      *            the HTTP request instance
      * @param res
      *            the HTTP response instance
-     * @param GETorPOST
-     *            boolean value to remember if we have a GET or POST request
-     * 
      * @exception IOException
      *                for java I/O errors.
      * @exception ServletException
      *                for errors from the servlet engine.
      */
-    private void doGetPost(HttpServletRequest req, HttpServletResponse res, boolean GETorPOST) throws ServletException, IOException {
+    private void doGetPost(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
         if (CONFIG == null) {
             // removes NullPointerException below, if somehow Servlet is not yet
             // intialized
@@ -255,11 +247,6 @@ public class MCRServlet extends HttpServlet {
             msg.append(c);
             msg.append(" ip=");
             msg.append(getRemoteAddr(req));
-
-            /*
-             * msg.append(theSession.isNew() ? " new" : " old"); msg.append("
-             * http=").append(theSession.getId());
-             */
             msg.append(" mcr=").append(session.getID());
             msg.append(" user=").append(session.getCurrentUserID());
             LOGGER.info(msg.toString());
@@ -282,33 +269,15 @@ public class MCRServlet extends HttpServlet {
 
             // Store XSL.*.SESSION parameters to MCRSession
             putParamsToSession(req);
-            if (getProperty(req, INITIAL_SERVLET_NAME_KEY).equals(getServletName())) {
-                // current Servlet not called via RequestDispatcher
-                job.beginTransaction();
-            }
-            if (GETorPOST == GET) {
-                doGet(job);
-            } else {
-                doPost(job);
-            }
-            if (getProperty(req, INITIAL_SERVLET_NAME_KEY).equals(getServletName())) {
-                // current Servlet not called via RequestDispatcher
-                try {
-                    job.commitTransaction();
-                    job.beginTransaction();
-                    MCRHIBConnection.instance().getSession().clear();
-                    job.commitTransaction();
-                } catch (RuntimeException e) {
-                    MCRHIBConnection.instance().getSession().close();
-                    job.beginTransaction();
-                    generateErrorPage(req, res, 500, e.getMessage(), e, false);
-                    job.commitTransaction();
-                }
-            }
+            //transaction around 1st phase of request
+            Exception thinkException = processThinkPhase(job);
+            //first phase completed, start rendering phase
+            processRenderingPhase(job, thinkException);
         } catch (Exception ex) {
             if (getProperty(req, INITIAL_SERVLET_NAME_KEY).equals(getServletName())) {
                 // current Servlet not called via RequestDispatcher
                 job.rollbackTransaction();
+                MCRHIBConnection.instance().getSession().close();
             }
             if (ex instanceof ServletException) {
                 throw (ServletException) ex;
@@ -321,7 +290,7 @@ public class MCRServlet extends HttpServlet {
                 job.commitTransaction();
             }
         } finally {
-        	MCRSessionMgr.getCurrentSession().deleteObject("MCRServletJob");
+            MCRSessionMgr.getCurrentSession().deleteObject("MCRServletJob");
             // Release current MCRSession from current Thread,
             // in case that Thread pooling will be used by servlet engine
             if (getProperty(req, INITIAL_SERVLET_NAME_KEY).equals(getServletName())) {
@@ -329,6 +298,77 @@ public class MCRServlet extends HttpServlet {
                 MCRSessionMgr.releaseCurrentSession();
             }
         }
+    }
+
+    private Exception processThinkPhase(MCRServletJob job) {
+        try {
+            if (getProperty(job.getRequest(), INITIAL_SERVLET_NAME_KEY).equals(getServletName())) {
+                // current Servlet not called via RequestDispatcher
+                job.beginTransaction();
+            }
+            think(job);
+            if (getProperty(job.getRequest(), INITIAL_SERVLET_NAME_KEY).equals(getServletName())) {
+                // current Servlet not called via RequestDispatcher
+                job.commitTransaction();
+                job.beginTransaction();
+                MCRHIBConnection.instance().getSession().clear();
+                job.commitTransaction();
+            }
+        } catch (Exception ex) {
+            if (getProperty(job.getRequest(), INITIAL_SERVLET_NAME_KEY).equals(getServletName())) {
+                // current Servlet not called via RequestDispatcher
+                job.rollbackTransaction();
+                MCRHIBConnection.instance().getSession().close();
+            }
+            return ex;
+        }
+        return null;
+    }
+
+    /**
+     * 1st phase of doGetPost.
+     * 
+     * This method has a seperate transaction. Per default id does nothing as a fallback to the old behaviour.
+     * @param job
+     * @throws Exception
+     * @see #render(MCRServletJob, Exception)
+     */
+    protected void think(MCRServletJob job) throws Exception {
+        //not implemented by default
+    }
+
+    private void processRenderingPhase(MCRServletJob job, Exception thinkException) throws Exception {
+        if (getProperty(job.getRequest(), INITIAL_SERVLET_NAME_KEY).equals(getServletName())) {
+            // current Servlet not called via RequestDispatcher
+            job.beginTransaction();
+        }
+        render(job, thinkException);
+        if (getProperty(job.getRequest(), INITIAL_SERVLET_NAME_KEY).equals(getServletName())) {
+            // current Servlet not called via RequestDispatcher
+            job.commitTransaction();
+            job.beginTransaction();
+            MCRHIBConnection.instance().getSession().clear();
+            job.commitTransaction();
+        }
+    }
+
+    /**
+     * 2nd phase of doGetPost
+     * 
+     * This method has a seperate transaction and gets the same MCRServletJob from the first phase (think)
+     * and any exception that occurs at the first phase.
+     * 
+     * By default this method calls doGetPost(MCRServletJob) as a fallback to the old behaviour.
+     * 
+     * @param job same instance as of think(MCRServlet job)
+     * @param ex any exception thrown by think(MCRServletJob) or transaction commit
+     * @throws Exception if render could not handle <code>ex</code> to produce a nice user page
+     */
+    protected void render(MCRServletJob job, Exception ex) throws Exception {
+        if (job.getRequest().getMethod().equals("POST"))
+            doPost(job);
+        else
+            doGet(job);
     }
 
     /**
@@ -369,8 +409,8 @@ public class MCRServlet extends HttpServlet {
         LOGGER.debug(trace);
     }
 
-    protected void generateErrorPage(HttpServletRequest request, HttpServletResponse response, int error, String msg, Exception ex, boolean xmlstyle)
-            throws IOException {
+    protected void generateErrorPage(HttpServletRequest request, HttpServletResponse response, int error, String msg, Exception ex,
+            boolean xmlstyle) throws IOException {
         LOGGER.error(getClass().getName() + ": Error " + error + " occured. The following message was given: " + msg, ex);
 
         String rootname = "mcr_error";
@@ -410,7 +450,8 @@ public class MCRServlet extends HttpServlet {
             return;
         } else {
             if (request.getAttribute(requestAttr) != null) {
-                LOGGER.warn("Could not send error page. Generating error page failed. The original message:\n" + request.getAttribute(requestAttr));
+                LOGGER.warn("Could not send error page. Generating error page failed. The original message:\n"
+                        + request.getAttribute(requestAttr));
             } else {
                 LOGGER.warn("Could not send error page. Response allready commited. The following message was given:\n" + msg);
             }
@@ -444,7 +485,7 @@ public class MCRServlet extends HttpServlet {
             } catch (UnsupportedEncodingException ex) {
                 value = parameters.getProperty(name);
             } catch (NullPointerException npe) {
-                throw new MCRException("NullPointerException while encoding "+name,npe);
+                throw new MCRException("NullPointerException while encoding " + name, npe);
             }
             redirectURL.append(name).append("=").append(value);
         }
@@ -452,10 +493,11 @@ public class MCRServlet extends HttpServlet {
         return redirectURL.toString();
     }
 
-    protected void generateActiveLinkErrorpage(HttpServletRequest request, HttpServletResponse response, String msg, MCRActiveLinkException activeLinks)
-            throws IOException {
+    protected void generateActiveLinkErrorpage(HttpServletRequest request, HttpServletResponse response, String msg,
+            MCRActiveLinkException activeLinks) throws IOException {
         StringBuffer msgBuf = new StringBuffer(msg);
-        msgBuf.append("\nThere are links active preventing the commit of work, see error message for details. The following links where affected:");
+        msgBuf
+                .append("\nThere are links active preventing the commit of work, see error message for details. The following links where affected:");
         Map<String, Collection<String>> links = activeLinks.getActiveLinks();
         Iterator<Map.Entry<String, Collection<String>>> entryIt = links.entrySet().iterator();
         while (entryIt.hasNext()) {
@@ -480,8 +522,8 @@ public class MCRServlet extends HttpServlet {
     protected long getLastModified(HttpServletRequest request) {
         if (ENABLE_BROWSER_CACHE) {
             // we can cache every (local) request
-            long lastModified = (MCRSessionMgr.getCurrentSession().getLoginTime() > CONFIG.getSystemLastModified()) ? MCRSessionMgr.getCurrentSession()
-                    .getLoginTime() : CONFIG.getSystemLastModified();
+            long lastModified = (MCRSessionMgr.getCurrentSession().getLoginTime() > CONFIG.getSystemLastModified()) ? MCRSessionMgr
+                    .getCurrentSession().getLoginTime() : CONFIG.getSystemLastModified();
             LOGGER.info("LastModified: " + lastModified);
             return lastModified;
         }
@@ -576,8 +618,8 @@ public class MCRServlet extends HttpServlet {
                 // parameter is not empty -> store
                 if (!request.getParameter(name).trim().equals("")) {
                     mcrSession.put(key, request.getParameter(name));
-                    LOGGER.debug("Found HTTP-Req.-Parameter " + name + "=" + request.getParameter(name) + " that should be saved in session, safed " + key
-                            + "=" + request.getParameter(name));
+                    LOGGER.debug("Found HTTP-Req.-Parameter " + name + "=" + request.getParameter(name)
+                            + " that should be saved in session, safed " + key + "=" + request.getParameter(name));
                 }
                 // paramter is empty -> do not store and if contained in
                 // session, remove from it
@@ -594,8 +636,8 @@ public class MCRServlet extends HttpServlet {
                 // attribute is not empty -> store
                 if (!request.getAttribute(name).toString().trim().equals("")) {
                     mcrSession.put(key, request.getAttribute(name));
-                    LOGGER.debug("Found HTTP-Req.-Attribute " + name + "=" + request.getParameter(name) + " that should be saved in session, safed " + key
-                            + "=" + request.getParameter(name));
+                    LOGGER.debug("Found HTTP-Req.-Attribute " + name + "=" + request.getParameter(name)
+                            + " that should be saved in session, safed " + key + "=" + request.getParameter(name));
                 }
                 // attribute is empty -> do not store and if contained in
                 // session, remove from it
