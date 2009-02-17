@@ -24,11 +24,13 @@
 
 package org.mycore.frontend.servlets;
 
+import java.io.IOException;
 import java.util.Properties;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.log4j.Logger;
 import org.jdom.Element;
+import org.jdom.output.XMLOutputter;
 
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.datamodel.classifications.MCRClassificationBrowserData;
@@ -72,12 +74,16 @@ public class MCRStartClassEditorServlet extends MCRServlet {
 
     private static MCRClassificationEditor clE = new MCRClassificationEditor();
 
+    private static enum ReturnStatus {
+        success, fail
+    }
+
     /**
      * Replace the doGetPost method of MCRServlet. This method will be called
      * two times when using the classification editor. Firtst time it prepare
      * date for the editor and second time it execute the operation.
      */
-    public void doGetPost(MCRServletJob job) throws Exception {
+    public void think(MCRServletJob job) throws Exception {
 
         // read the XML data if given from Editorsession
         MCREditorSubmission sub = (MCREditorSubmission) (job.getRequest().getAttribute("MCREditorSubmission"));
@@ -91,19 +97,14 @@ public class MCRStartClassEditorServlet extends MCRServlet {
         }
 
         // read the parameter
-        todo = parms.getParameter("todo"); // getProperty(job.getRequest(),
-        // "todo");
-        todo2 = parms.getParameter("todo2"); // getProperty(job.getRequest(),
-        // "todo2");
-        path = parms.getParameter("path"); // getProperty(job.getRequest(),
-        // "path");
+        todo = parms.getParameter("todo");
+        todo2 = parms.getParameter("todo2");
+        path = parms.getParameter("path");
 
         // get the Classification
-        clid = parms.getParameter("clid"); // getProperty(job.getRequest(),
-        // "clid");
+        clid = parms.getParameter("clid");
 
-        categid = parms.getParameter("categid"); // getProperty(job.getRequest(),
-        // "categid");
+        categid = parms.getParameter("categid");
 
         if (todo == null)
             todo = "";
@@ -124,6 +125,8 @@ public class MCRStartClassEditorServlet extends MCRServlet {
         String iderrorpage = pagedir + CONFIG.getString("MCR.classeditor_page_error_delete", "editor_error_delete.xml");
         String imerrorpage = pagedir + CONFIG.getString("MCR.classeditor_page_error_move", "classeditor_error_move.xml");
         String imperrorpage = pagedir + CONFIG.getString("MCR.classeditor_page_error_import", "classeditor_error_import.xml");
+        String isaveerrorpage = pagedir + CONFIG.getString("MCR.classeditor_page_error_save", "classeditor_error_save.xml");
+        String ipurgeerrorpage = pagedir + CONFIG.getString("MCR.classeditor_page_error_purge", "classeditor_error_purge.xml");
 
         String referrer = job.getRequest().getHeader("Referer");
         if (referrer == null || referrer.equals("")) {
@@ -132,17 +135,17 @@ public class MCRStartClassEditorServlet extends MCRServlet {
 
         if (needsCreatePrivilege(todo, todo2)) {
             if (!(AI.checkPermission("create-classification"))) {
-                job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + usererrorpage));
+                setResponsePage(job, ReturnStatus.fail, getBaseURL() + usererrorpage);
                 return;
             }
-        } else if (needsDeleteRight(todo, todo2)){
-            if (!(AI.checkPermission(clid, "deletedb"))){
-                job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + usererrorpage));
+        } else if (needsDeleteRight(todo, todo2)) {
+            if (!(AI.checkPermission(clid, "deletedb"))) {
+                setResponsePage(job, ReturnStatus.fail, getBaseURL() + usererrorpage);
                 return;
             }
         } else {
-            if (!(AI.checkPermission(clid, "writedb"))){
-                job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + usererrorpage));
+            if (!(AI.checkPermission(clid, "writedb"))) {
+                setResponsePage(job, ReturnStatus.fail, getBaseURL() + usererrorpage);
                 return;
             }
         }
@@ -153,10 +156,10 @@ public class MCRStartClassEditorServlet extends MCRServlet {
             boolean bret = false;
 
             // for debug
-            /*
-             * XMLOutputter outputter = new XMLOutputter();
-             * LOGGER.debug(outputter.outputString(indoc));
-             */
+            if (LOGGER.isDebugEnabled()) {
+                XMLOutputter outputter = new XMLOutputter();
+                LOGGER.debug(outputter.outputString(indoc));
+            }
 
             if ("create-category".equals(todo2) || "modify-category".equals(todo2)) {
                 if ("create-category".equals(todo2)) {
@@ -173,7 +176,7 @@ public class MCRStartClassEditorServlet extends MCRServlet {
                     }
                 }
                 if (bret)
-                    job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(path + "&categid=" + categid + "&clid=" + clid));
+                    setResponsePage(job, ReturnStatus.success, path + "&categid=" + categid + "&clid=" + clid);
             } else {
                 if (path.indexOf("&clid") > 0) {
                     // Classification abschneiden um wieder auf der
@@ -194,17 +197,14 @@ public class MCRStartClassEditorServlet extends MCRServlet {
                     bret = clE.importClassification(update, fname);
                     clE.deleteTempFile();
                     if (!bret) {
-                        job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + imperrorpage));
+                        setResponsePage(job, ReturnStatus.fail, getBaseURL() + imperrorpage);
                         return;
                     }
                 }
                 if (bret)
-                    job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(path));
-
+                    setResponsePage(job, ReturnStatus.success, path);
             }
-            if (!bret) {
-                job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + icerrorpage));
-            }
+            setResponsePage(job, ReturnStatus.fail, getBaseURL() + icerrorpage);
             return;
         }
 
@@ -214,10 +214,9 @@ public class MCRStartClassEditorServlet extends MCRServlet {
                 bret = clE.moveCategoryInClassification(categid, clid, todo.substring(0, todo.indexOf("-")));
             }
             if (bret) {
-                job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(path + "&categid=" + categid + "&clid=" + clid));
-            } else {
-                job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + imerrorpage));
+                setResponsePage(job, ReturnStatus.success, path + "&categid=" + categid + "&clid=" + clid);
             }
+            setResponsePage(job, ReturnStatus.fail, getBaseURL() + imerrorpage);
             return;
         }
 
@@ -228,10 +227,10 @@ public class MCRStartClassEditorServlet extends MCRServlet {
                 int cnt = clE.deleteCategoryInClassification(clid, categid);
 
                 if (cnt == 0) { // deleted, no more references
-                    job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(path + "&clid=" + clid));
-                } else { // not delete cause references exist
-                    job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + iderrorpage));
+                    setResponsePage(job, ReturnStatus.success, path + "&clid=" + clid);
                 }
+                // not delete cause references exist
+                setResponsePage(job, ReturnStatus.fail, getBaseURL() + iderrorpage);
             }
             return;
         }
@@ -242,10 +241,10 @@ public class MCRStartClassEditorServlet extends MCRServlet {
                 boolean cnt = clE.deleteClassification(clid);
                 if (cnt) { // deleted, no more references
                     path = getBaseURL() + "browse?mode=edit";
-                    job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(path));
-                } else { // not delete cause references exist
-                    job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + iderrorpage));
+                    setResponsePage(job, ReturnStatus.success, path);
                 }
+                // not delete cause references exist
+                setResponsePage(job, ReturnStatus.fail, getBaseURL() + iderrorpage);
             }
             return;
         }
@@ -259,29 +258,26 @@ public class MCRStartClassEditorServlet extends MCRServlet {
             params.put("path", path);
             params.put("todo2", todo);
             params.put("todo", "commit-classification");
-            job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(buildRedirectURL(base, params)));
+            setResponsePage(job, ReturnStatus.success, buildRedirectURL(base, params));
             return;
-
         }
 
         else if ("save-all".equals(todo)) {
-
             if (clE.saveAll()) {
-                job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(path + "&clid=" + clid));
-            } else {
-                job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + imerrorpage));
+                setResponsePage(job, ReturnStatus.success, path + "&clid=" + clid);
             }
+            setResponsePage(job, ReturnStatus.fail, getBaseURL() + isaveerrorpage);
             return;
         } else if ("purge-all".equals(todo)) {
             if (clE.purgeAll()) {
-                job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(path + "&clid=" + clid));
-            } else {
-                job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + imerrorpage));
+                setResponsePage(job, ReturnStatus.success, path + "&clid=" + clid);
             }
+            setResponsePage(job, ReturnStatus.fail, getBaseURL() + ipurgeerrorpage);
             return;
         }
         // first call of editor, build the editor dialogue
-        if ("create-category".equals(todo) || "modify-category".equals(todo) || "create-classification".equals(todo) || "modify-classification".equals(todo)) {
+        if ("create-category".equals(todo) || "modify-category".equals(todo) || "create-classification".equals(todo)
+                || "modify-classification".equals(todo)) {
 
             String base = getBaseURL() + myfile;
             final String sessionObjectID = "classificationEditor";
@@ -297,7 +293,8 @@ public class MCRStartClassEditorServlet extends MCRServlet {
             if ("modify-classification".equals(todo)) {
                 if (isEdited) {
                     sb.append("session:").append(sessionObjectID);
-                    MCRSessionMgr.getCurrentSession().put(sessionObjectID, MCRCategoryTransformer.getMetaDataDocument(classif, true).getRootElement());
+                    MCRSessionMgr.getCurrentSession().put(sessionObjectID,
+                            MCRCategoryTransformer.getMetaDataDocument(classif, true).getRootElement());
                 } else {
                     sb.append("classification:metadata:0:children:").append(clid);
                 }
@@ -335,7 +332,8 @@ public class MCRStartClassEditorServlet extends MCRServlet {
             if ("create-category".equals(todo)) {
                 if (isEdited) {
                     sb.append("session:").append(sessionObjectID);
-                    MCRSessionMgr.getCurrentSession().put(sessionObjectID, MCRCategoryTransformer.getMetaDataDocument(classif, true).getRootElement());
+                    MCRSessionMgr.getCurrentSession().put(sessionObjectID,
+                            MCRCategoryTransformer.getMetaDataDocument(classif, true).getRootElement());
                 } else {
                     sb.append("classification:metadata:0:children:").append(clid);
                 }
@@ -347,14 +345,38 @@ public class MCRStartClassEditorServlet extends MCRServlet {
             params.put("path", path);
             params.put("todo2", todo);
             params.put("todo", "commit-classification");
-            job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(buildRedirectURL(base, params)));
+            setResponsePage(job, ReturnStatus.success, buildRedirectURL(base, params));
             return;
         }
-
         /* Wrong input data, write warning log */
         LOGGER.warn("MCRStartClassEditorServlet default Case - Nothing to do ? " + todo);
-        job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(path));
+        setResponsePage(job, ReturnStatus.success, path);
+    }
 
+    public void setResponsePage(MCRServletJob job, ReturnStatus status, String url) {
+        String key = MCRStartClassEditorServlet.class.toString();
+        String value = job.getResponse().encodeRedirectURL(url);
+        key += "." + status;
+        job.getRequest().setAttribute(key, value);
+    }
+
+    public String getResponsePage(MCRServletJob job, ReturnStatus status) {
+        String key = MCRStartClassEditorServlet.class.toString() + "." + status;
+        return (String) job.getRequest().getAttribute(key);
+    }
+
+    public void render(MCRServletJob job, Exception thinkException) throws IOException {
+        String successURL = getResponsePage(job, ReturnStatus.success);
+        String failURL = getResponsePage(job, ReturnStatus.fail);
+
+        if (thinkException == null && successURL != null) {
+            job.getResponse().sendRedirect(successURL);
+        } else {
+            if (failURL != null)
+                job.getResponse().sendRedirect(failURL);
+            else
+                generateErrorPage(job.getRequest(), job.getResponse(), 500, thinkException.getMessage(), thinkException, false);
+        }
     }
 
     private boolean needsCreatePrivilege(String todo, String todo2) {
