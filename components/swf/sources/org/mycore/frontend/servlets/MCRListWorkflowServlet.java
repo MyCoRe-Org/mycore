@@ -131,7 +131,7 @@ public class MCRListWorkflowServlet extends MCRServlet {
         if (((base == null) && (type == null)) || (step == null)) {
             throw new MCRException("Wrong parameter input.");
         }
-        
+
         // get the lang
         String lang = MCRSessionMgr.getCurrentSession().getCurrentLanguage();
         LOGGER.debug("MCRListWorkflowServlet : lang = " + lang);
@@ -145,24 +145,27 @@ public class MCRListWorkflowServlet extends MCRServlet {
             }
         }
         // read directory
-        ArrayList workfiles = new ArrayList();
-        ArrayList derifiles = new ArrayList();
+        ArrayList<String> workfiles;
+        ArrayList<String> derifiles;
 
-        if (MCRAccessManager.checkPermission("create-" + base)) {
+        if (base != null && MCRAccessManager.checkPermission("create-" + base)) {
             workfiles = WFM.getAllObjectFileNames(base);
             derifiles = WFM.getAllDerivateFileNames(base);
         } else {
             if (MCRAccessManager.checkPermission("create-" + type)) {
                 workfiles = WFM.getAllObjectFileNames(type);
                 derifiles = WFM.getAllDerivateFileNames(type);
+            } else {
+                workfiles = new ArrayList<String>();
+                derifiles = new ArrayList<String>();
             }
         }
-        
+
         String dirname = null;
         if (base != null) {
             dirname = WFM.getDirectoryPath(base);
         } else {
-            dirname = WFM.getDirectoryPath(type);            
+            dirname = WFM.getDirectoryPath(type);
         }
 
         // read the derivate XML files
@@ -334,7 +337,7 @@ public class MCRListWorkflowServlet extends MCRServlet {
                         LOGGER.debug("Derivate under " + dir.getName());
 
                         if (dir.isDirectory()) {
-                            ArrayList dirlist = MCRUtils.getAllFileNames(dir);
+                            ArrayList<String> dirlist = MCRUtils.getAllFileNames(dir);
 
                             for (int k = 0; k < dirlist.size(); k++) {
                                 org.jdom.Element file = new org.jdom.Element("file");
