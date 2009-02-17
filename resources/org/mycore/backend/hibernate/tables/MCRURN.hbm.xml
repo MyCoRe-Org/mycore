@@ -7,6 +7,7 @@
       <key-property name="mcrid" type="string" column="MCRID" length="64" />
       <key-property name="mcrurn" type="string" column="MCRURN" length="194" />
     </composite-id>
+    <property name="path"/>
+    <property name="filename"/>
   </class>
 </hibernate-mapping>
-
