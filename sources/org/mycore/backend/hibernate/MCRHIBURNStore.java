@@ -74,6 +74,36 @@ public class MCRHIBURNStore implements MCRURNStore {
         logger.debug("Inserting " + id + "/" + urn + " into database");
         session.saveOrUpdate(tab);
     }
+    
+    /**
+     * The method creates a new item in the datastore.
+     * 
+     * @param urn
+     *            a URN
+     * @param id
+     *            the MCRObjectID as String
+     * @param path
+     *            the path of the derivate in the IFS
+     * @exception MCRPersistenceException
+     *                the method arguments are not correct
+     */
+    public synchronized final void create(String urn, String id, String path, String filename)
+            throws MCRPersistenceException {
+        if (urn == null || (urn.length() == 0)) {
+            throw new MCRPersistenceException("The URN is null.");
+        }
+        if (id == null || (id.length() == 0)) {
+            throw new MCRPersistenceException("The MCRObjectID is null.");
+        }
+        if (path == null || (path.length() == 0)) {
+            throw new MCRPersistenceException("The Path is null.");
+        }
+
+        Session session = getSession();
+        MCRURN tab = new MCRURN(id, urn, path,filename);
+        logger.debug("Inserting " + id + "/" + urn + "(" + path + filename + ") into database");
+        session.saveOrUpdate(tab);
+    }
 
     /**
      * Assigns the given urn to the given document ID
@@ -87,6 +117,23 @@ public class MCRHIBURNStore implements MCRURNStore {
      */
     public void assignURN(String urn, String id) {
         create(urn, id);
+    }
+    
+    /**
+     * Assigns the given urn to the given derivate ID
+     * 
+     * @param urn
+     *            a URN
+     * @param id
+     *            the MCRObjectID as String
+     * @param path
+     *            the path of the derivate
+     * @exception MCRPersistenceException
+     *                the method arguments are not correct
+     */
+
+    public void assignURN(String urn, String id, String path, String filename) {
+        create(urn, id, path, filename);
     }
 
     /**

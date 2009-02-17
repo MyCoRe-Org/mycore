@@ -32,6 +32,8 @@ package org.mycore.backend.hibernate.tables;
  */
 public class MCRURN {
     private MCRURNPK key;
+    private String path;
+    private String filename;
 
     /**
      * The constructor of the class MCRURN
@@ -52,6 +54,22 @@ public class MCRURN {
         this.key = new MCRURNPK();
         key.setMcrid(id);
         key.setMcrurn(urn);
+    }
+
+    /**
+     * The constructor of the class MCRURN
+     * 
+     * @param id
+     *            The document ID
+     * @param urn
+     *            The URN
+     */
+    public MCRURN(String id, String urn, String path, String filename) {
+        this.key = new MCRURNPK();
+        key.setMcrid(id);
+        key.setMcrurn(urn);
+        this.path = path;
+        this.filename = filename;
     }
 
     /**
@@ -114,4 +132,33 @@ public class MCRURN {
         key.setMcrurn(urn);
     }
 
+    /**
+     * @return the path
+     */
+    public String getPath() {
+        return path;
+    }
+
+    /**
+     * @param path
+     *            the path to set
+     */
+    public void setPath(String path) {
+        this.path = path;
+    }
+
+    /**
+     * @return the filename
+     */
+    public String getFilename() {
+        return filename;
+    }
+
+    /**
+     * @param filename
+     *            the filename to set
+     */
+    public void setFilename(String filename) {
+        this.filename = filename;
+    }
 }

@@ -212,6 +212,21 @@ public class MCRURNManager {
         store.assignURN(urn, documentID);
     }
 
+    /** 
+     * Assigns the given urn to the given derivate ID 
+     * @param urn 
+     *      the urn to assign
+     * @param derivateID 
+     *      the id of the derivate
+     * @param path 
+     *      the path of the derivate in the internal filesystem
+     * @param filename 
+     *      the filename
+     */
+    public static void assignURN(String urn, String derivateID, String path, String filename) {
+        store.assignURN(urn, derivateID, path, filename);
+    }
+    
     /**
      * Retrieves the URN that is assigned to the given document ID
      * 

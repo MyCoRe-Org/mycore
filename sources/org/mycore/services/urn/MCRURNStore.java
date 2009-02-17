@@ -35,6 +35,9 @@ public interface MCRURNStore {
     /** Assigns the given urn to the given document ID */
     public void assignURN(String urn, String documentID);
 
+    /** Assigns the given urn to the given derivate ID */
+    public void assignURN(String urn, String derivate, String path, String filename);
+    
     /**
      * Retrieves the URN that is assigned to the given document ID
      * 
