@@ -30,7 +30,6 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
-import java.util.StringTokenizer;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.log4j.Logger;
@@ -165,7 +164,7 @@ public class MCREditorSubmission {
     private String getNamespacePrefix( Namespace ns )
     {
       if( ( ns == null ) || ns.equals( Namespace.NO_NAMESPACE ) ) return "";
-      Iterator it = nsMap.keySet().iterator();
+      Iterator<String> it = nsMap.keySet().iterator();
       while( it.hasNext() )
       {
         String key = (String)( it.next() );
@@ -703,6 +702,7 @@ public class MCREditorSubmission {
         List<Namespace> namespaces = components.getAdditionalNamespaces();
         for (Namespace ns : namespaces)
             nsMap.put(ns.getPrefix(), ns);
+        nsMap.put("xml", Namespace.XML_NAMESPACE);
     }
 
     /**
