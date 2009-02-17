@@ -23,8 +23,8 @@
 
 package org.mycore.common;
 
-import static org.mycore.common.MCRConstants.DEFAULT_ENCODING;
 import static org.mycore.common.MCRConstants.DATE_FORMAT;
+import static org.mycore.common.MCRConstants.DEFAULT_ENCODING;
 
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
@@ -483,9 +483,9 @@ public class MCRUtils {
      *            available COMMAND_XYZ
      * @return merged HashSet
      */
-    public static final HashSet mergeHashSets(HashSet set1, HashSet set2, char operation) {
-        HashSet merged = new HashSet();
-        Object id;
+    public static final <T> HashSet<T> mergeHashSets(HashSet<? extends T> set1, HashSet<? extends T> set2, char operation) {
+        HashSet<T> merged = new HashSet<T>();
+        T id;
 
         switch (operation) {
         case COMMAND_OR:
@@ -496,7 +496,7 @@ public class MCRUtils {
 
         case COMMAND_AND:
 
-            for (Iterator it = set1.iterator(); it.hasNext();) {
+            for (Iterator<? extends T> it = set1.iterator(); it.hasNext();) {
                 id = it.next();
 
                 if (set2.contains(id)) {
@@ -508,7 +508,7 @@ public class MCRUtils {
 
         case COMMAND_XOR:
 
-            for (Iterator it = set1.iterator(); it.hasNext();) {
+            for (Iterator<? extends T> it = set1.iterator(); it.hasNext();) {
                 id = it.next();
 
                 if (!set2.contains(id)) {
@@ -516,7 +516,7 @@ public class MCRUtils {
                 }
             }
 
-            for (Iterator it = set2.iterator(); it.hasNext();) {
+            for (Iterator<? extends T> it = set2.iterator(); it.hasNext();) {
                 id = it.next();
 
                 if (!set1.contains(id) && !merged.contains(id)) {
@@ -534,39 +534,13 @@ public class MCRUtils {
     }
 
     /**
-     * The method cut a HashSet for a maximum of items.
-     * 
-     * @param hashin The incoming HashSet
-     * @param maxitem The maximum number of items
-     * @return the cutted HashSet
-     */
-    public static final HashSet cutHashSet(HashSet hashin, int maxitems) {
-        if (hashin == null) {
-            throw new MCRException("Input HashSet is null.");
-        }
-
-        if (maxitems < 1) {
-            LOGGER.warn("The maximum items are lower then 1.");
-        }
-
-        HashSet hashout = new HashSet();
-        int i = 0;
-
-        for (Iterator it = hashin.iterator(); it.hasNext() && (i < maxitems); i++) {
-            hashout.add(it.next());
-        }
-
-        return hashout;
-    }
-
-    /**
      * The method cut an ArrayList for a maximum of items.
      * 
      * @param arrayin The incoming ArrayList
      * @param maxitem The maximum number of items
      * @return the cutted ArrayList
      */
-    public static final ArrayList cutArrayList(ArrayList arrayin, int maxitems) {
+    public static final <T> ArrayList<T> cutArrayList(ArrayList<? extends T> arrayin, int maxitems) {
         if (arrayin == null) {
             throw new MCRException("Input ArrayList is null.");
         }
@@ -575,13 +549,12 @@ public class MCRUtils {
             LOGGER.warn("The maximum items are lower then 1.");
         }
 
-        ArrayList arrayout = new ArrayList();
+        ArrayList<T> arrayout = new ArrayList<T>();
         int i = 0;
 
-        for (Iterator it = arrayin.iterator(); it.hasNext() && (i < maxitems); i++) {
+        for (Iterator<? extends T> it = arrayin.iterator(); it.hasNext() && (i < maxitems); i++) {
             arrayout.add(it.next());
         }
-
         return arrayout;
     }
 
@@ -776,8 +749,8 @@ public class MCRUtils {
      *            the File instance of the basic directory
      * @return an ArrayList with file names as pathes
      */
-    public static ArrayList getAllFileNames(File basedir) {
-        ArrayList out = new ArrayList();
+    public static ArrayList<String> getAllFileNames(File basedir) {
+        ArrayList<String> out = new ArrayList<String>();
         File[] stage = basedir.listFiles();
 
         for (int i = 0; i < stage.length; i++) {
@@ -803,8 +776,8 @@ public class MCRUtils {
      *            the part of directory path
      * @return an ArrayList with file names as pathes
      */
-    public static ArrayList getAllFileNames(File basedir, String path) {
-        ArrayList out = new ArrayList();
+    public static ArrayList<String> getAllFileNames(File basedir, String path) {
+        ArrayList<String> out = new ArrayList<String>();
         File[] stage = basedir.listFiles();
 
         for (int i = 0; i < stage.length; i++) {
@@ -828,8 +801,8 @@ public class MCRUtils {
      *            the File instance of the basic directory
      * @return an ArrayList with directory names as pathes
      */
-    public static ArrayList getAllDirectoryNames(File basedir) {
-        ArrayList out = new ArrayList();
+    public static ArrayList<String> getAllDirectoryNames(File basedir) {
+        ArrayList<String> out = new ArrayList<String>();
         File[] stage = basedir.listFiles();
 
         for (int i = 0; i < stage.length; i++) {
@@ -852,8 +825,8 @@ public class MCRUtils {
      *            the part of directory path
      * @return an ArrayList with directory names as pathes
      */
-    public static ArrayList getAllDirectoryNames(File basedir, String path) {
-        ArrayList out = new ArrayList();
+    public static ArrayList<String> getAllDirectoryNames(File basedir, String path) {
+        ArrayList<String> out = new ArrayList<String>();
         File[] stage = basedir.listFiles();
 
         for (int i = 0; i < stage.length; i++) {
