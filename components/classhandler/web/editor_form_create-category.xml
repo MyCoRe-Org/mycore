@@ -9,13 +9,7 @@
 <section title="Create a new category for the given classification" xml:lang="en">
 </section>
 
-<section title="إنشاء صنف جديد إل التصنيف المذكور " xml:lang="ar">
-</section>
-
-<section title="Membuka kategori baru untuk classification ini" xml:lang="id">
-</section>
-		
-<section xml:lang="en" alt="de,id">
+<section xml:lang="all">
 <editor id="create-categ">
  <target type="servlet" name="MCRStartClassEditorServlet" method="post" format="xml" />
  <cancel url="{cancelUrl}" />
@@ -66,7 +60,7 @@
 	  <text i18n="component.classhandler.label.label.p" class="editorlabel"/>
 	</cell>		  
     <cell col="2" row="3" var="category/label" anchor="NORTHWEST" >
-		   <repeater min="1" max="10" ref="RNewCategLabel" />      
+		   <repeater min="1" max="10" ref="RLabel" />      
 	</cell>	      	  	
     <cell col="1" row="4" anchor="NORTHWEST">	  
 	  <text i18n="component.classhandler.label.url" class="editorlabel"/>
@@ -74,22 +68,6 @@
     <cell col="2" row="4" anchor="NORTHWEST" ref="TFzeile1024" var="category/url/@href" default="de" />   
 	   	 	  	    	  	  
     <cell col="1" row="5" anchor="NORTHWEST"><space width="1px" height="10px" /></cell>		  
-  </panel>
-	 
-  <panel id="RNewCategLabel">
-	<cell col="1" row="1" anchor="NORTHWEST" ref="Slang" var="@lang" default="de"/>    	  
-    <cell col="2" row="1" anchor="NORTHWEST">	  
-	  <text i18n="component.classhandler.label.lang" class="editorlabel"/>
-	</cell>
-    <cell col="1" row="2" anchor="NORTHWEST" ref="TFzeile1024" var="@text"  />	  
-    <cell col="2" row="2" anchor="NORTHWEST">	  
-	  <text i18n="component.classhandler.label.text.p" class="editorlabel"/>
-	</cell>	  
-    <cell col="1" row="3" anchor="NORTHWEST" ref="TFzeile1024"  var="@description"  />	  
-    <cell col="2" row="3" anchor="NORTHWEST">	  
-	  <text i18n="component.classhandler.label.description" class="editorlabel"/>
-	</cell>	  
-	  
   </panel>
 	 	 
   <text id="AClid" i18n="component.classhandler.label.addcateg.aclid" class="editorlabel"/>
@@ -99,94 +77,6 @@
  </components>
 </editor>
 </section>
-
-<section xml:lang="ar">
-<bdo dir="rtl">
-<editor id="create-categ">
- <target type="servlet" name="MCRStartClassEditorServlet" method="get" format="xml" />
- <cancel url="{cancelUrl}" />
- 
- <components root="create-category" var="/mycoreclass">
-
-  <include uri="webapp:editor/imports-common-classhandler.xml" />
-
-  <headline anchor="CENTER" >	  
-    <text i18n="component.classhandler.headline.addcateg" />
-  </headline>
-
-  <panel id="create-category">	  	  
-	<cell col="1" row="1" colspan="2" anchor="NORTHWEST" ref="Class" />	  	  	  
-	<cell col="1" row="2" colspan="2" anchor="NORTHWEST"><space width="1px" height="10px" /></cell>		  
-	<cell col="1" row="3" colspan="2" anchor="NORTHWEST" var="categories" ref="NewCateg" />	  	  	    	  
-	<cell col="1" row="4" colspan="2" anchor="NORTHWEST"><space width="1px" height="10px" /></cell>		  
-    <cell col="1" row="5" colspan="2" anchor="EAST"      ref="TwoButtons"  />
-  </panel>
-	 	 
-  <panel id="Class">
-    <hidden var="@ID" />
-    <hidden var="label" descendants="true"/>
-    <cell col="1" row="1" colspan="2" anchor="NORTHWEST" ref="AClid" />	  
-    <cell col="1" row="2" anchor="NORTHWEST">	  
-	  <text i18n="component.classhandler.label.id" class="editorlabel"/>		
-	</cell>	
-    <cell col="2" row="2" anchor="NORTHWEST" ><output var="@ID"/></cell>  
-    <cell col="1" row="3" anchor="NORTHWEST">	  
-	  <text i18n="component.classhandler.label.label" class="editorlabel"/>		
-	</cell>	
-    <cell col="2" row="3" anchor="NORTHWEST" ><output var="label/@text"/></cell>    
-    <cell col="1" row="4" anchor="NORTHWEST">	  
-	  <text i18n="component.classhandler.label.description" class="editorlabel"/>
-	</cell>	
-    <cell col="2" row="4" anchor="NORTHWEST" ><output var="label/@description"/></cell>  	  
-  </panel>
-	 	 
-  <panel id="NewCateg">
-    <hidden var="category/@counter" default="0" />
-    <cell col="1" row="1" colspan="2" anchor="NORTHWEST" ref="BClid" />	  	  	  
-    <cell col="1" row="2" anchor="NORTHWEST">	  
-	  <text i18n="component.classhandler.label.id.p" class="editorlabel" />
-	</cell>	
-    <cell col="2" row="2" anchor="NORTHWEST" ref="TFzeile128" var="category/@ID" />
-	  	  
-    <cell col="1" row="3" anchor="NORTHWEST">	  
-	  <text i18n="component.classhandler.label.label.p" class="editorlabel"/>
-	</cell>		  
-    <cell col="2" row="3" var="category/label" anchor="NORTHWEST" >
-		   <repeater min="1" max="10" ref="RNewCategLabel" />      
-	</cell>	      	  	
-    <cell col="1" row="4" anchor="NORTHWEST">	  
-	  <text i18n="component.classhandler.label.url" class="editorlabel"/>
-	</cell>		  	  
-    <cell col="2" row="4" anchor="NORTHWEST" ref="TFzeile1024" var="category/url/@href" default="de" />   
-	   	 	  	    	  	  
-    <cell col="1" row="5" anchor="NORTHWEST"><space width="1px" height="10px" /></cell>		  
-  </panel>
-	 
-  <panel id="RNewCategLabel">
-	<cell col="1" row="1" anchor="NORTHWEST" ref="Slang" var="@lang" default="de"/>    	  
-    <cell col="2" row="1" anchor="NORTHWEST">	  
-	  <text i18n="component.classhandler.label.lang" class="editorlabel"/>
-	</cell>
-    <cell col="1" row="2" anchor="NORTHWEST" ref="TFzeile1024" var="@text"  />	  
-    <cell col="2" row="2" anchor="NORTHWEST">	  
-	  <text i18n="component.classhandler.label.text.p" class="editorlabel"/>
-	</cell>	  
-    <cell col="1" row="3" anchor="NORTHWEST" ref="TFzeile1024"  var="@description"  />	  
-    <cell col="2" row="3" anchor="NORTHWEST">	  
-	  <text i18n="component.classhandler.label.description" class="editorlabel"/>
-	</cell>	  
-	  
-  </panel>
-	 	 
-  <text id="AClid" i18n="component.classhandler.label.addcateg.aclid" class="editorlabel"/>
-  <text id="BClid" i18n="component.classhandler.label.addcateg.bclid" class="editorlabel"/>
-<!-- *** End *** -->
-
- </components>
-</editor>
-</bdo>
-</section>
-
 </MyCoReWebPage>
 
 
