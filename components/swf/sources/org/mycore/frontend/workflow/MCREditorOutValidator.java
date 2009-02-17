@@ -197,7 +197,7 @@ public class MCREditorOutValidator {
      * 
      * @return log entries for the whole validation process
      */
-    public List getErrorLog() {
+    public List<String> getErrorLog() {
         return errorlog;
     }
 
@@ -279,8 +279,8 @@ public class MCREditorOutValidator {
     }
 
     private boolean checkMetaObjectWithLinks(Element datasubtag, Class<? extends MCRMetaInterface> metaClass) {
-        String href = datasubtag.getAttributeValue("href");
-        if (href == null) {
+        if (datasubtag.getAttributeValue("href") == null && datasubtag.getAttributeValue("href", XLINK_NAMESPACE) == null) {
+            LOGGER.debug(datasubtag.getName() + " has no href attribute defined");
             return false;
         }
         if (datasubtag.getAttribute("xtype") != null) {
@@ -606,6 +606,7 @@ public class MCREditorOutValidator {
             Element datatag = (Element) metaIt.next();
             if (!checkMetaTags(datatag)) {
                 // e.g. datatag is empty
+                LOGGER.debug("Removing element :" + datatag.getName());
                 metaIt.remove();
             }
         }
