@@ -158,6 +158,28 @@ public class MCRHIBURNStore implements MCRURNStore {
     }
 
     /**
+     * The method remove a item for the URN from the datastore.
+     * 
+     * @param objID
+     *            an object id 
+     * @exception MCRPersistenceException
+     *                the method argument is not correct
+     */
+    public synchronized final void deleteByObjectID(String objID) throws MCRPersistenceException {
+        if (objID == null || (objID.length() == 0)) {
+            throw new MCRPersistenceException("The object id is null.");
+        }
+
+        StringBuffer sb = new StringBuffer();
+        sb.append("delete from ").append(classname).append(" where MCRID = '").append(objID).append(
+                "'");
+
+        Session session = getSession();
+        int deleted = session.createQuery(sb.toString()).executeUpdate();
+        logger.debug(deleted + " references deleted.");
+    }
+    
+    /**
      * Removes the urn (and assigned document ID) from the persistent store
      * 
      * @param urn
@@ -192,7 +214,19 @@ public class MCRHIBURNStore implements MCRURNStore {
         ret = (String) returns.get(0);
         return ret;
     }
-
+    /**
+     * Removes the urn (and assigned document ID) from the persistent store by the given 
+     * object id
+     * 
+     * @param urn
+     *            a URN
+     * @exception MCRPersistenceException
+     *                the method argument is not correct
+     */    
+    public void removeURNByObjectID(String objID){
+        deleteByObjectID(objID);
+    }
+    
     /**
      * Retrieves the URN that is assigned to the given document ID
      * 

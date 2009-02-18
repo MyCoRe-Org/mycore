@@ -56,4 +56,10 @@ public interface MCRURNStore {
      * Removes the urn (and assigned document ID) from the persistent store
      */
     public void removeURN(String urn);
+    
+    /**
+     * Removes the urn (and assigned document ID) from the persistent store by the 
+     * given object id
+     */
+    public void removeURNByObjectID(String objID);
 }

@@ -253,6 +253,13 @@ public class MCRURNManager {
     }
     
     /**
+     * Removes the urn (and assigned document ID) from the persistent store
+     */
+    public static void removeURNByObjectID(String objID) {
+        store.removeURNByObjectID(objID);
+    }
+    
+    /**
      * Create and Assign a new URN to the given Document
      * Ensure that new created URNs do not allready exist in URN store
      * @param documentID a MCRID
