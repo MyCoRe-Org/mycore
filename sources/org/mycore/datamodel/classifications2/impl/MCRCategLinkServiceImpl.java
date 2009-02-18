@@ -53,16 +53,20 @@ import org.mycore.datamodel.classifications2.MCRObjectReference;
  */
 public class MCRCategLinkServiceImpl implements MCRCategLinkService {
 
-    private static final MCRHIBConnection HIB_CONNECTION_INSTANCE = MCRHIBConnection.instance();
+    private static MCRHIBConnection HIB_CONNECTION_INSTANCE;
 
     private static Logger LOGGER = Logger.getLogger(MCRCategLinkServiceImpl.class);
 
     private static Class<MCRCategoryLink> LINK_CLASS = MCRCategoryLink.class;
 
-    private static MCRCache categCache = new MCRCache(MCRConfiguration.instance().getInt("MCR.Classifications.LinkServiceImpl.CategCache.Size", 1000),
-            "MCRCategLinkService category cache");
+    private static MCRCache categCache = new MCRCache(MCRConfiguration.instance().getInt(
+            "MCR.Classifications.LinkServiceImpl.CategCache.Size", 1000), "MCRCategLinkService category cache");
 
     private static MCRCategoryDAOImpl DAO = new MCRCategoryDAOImpl();
+
+    public MCRCategLinkServiceImpl() {
+        HIB_CONNECTION_INSTANCE = MCRHIBConnection.instance();
+    }
 
     public Map<MCRCategoryID, Number> countLinks(Collection<MCRCategoryID> categIDs) {
         return countLinksForType(categIDs, null);
@@ -89,7 +93,7 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
         // for every classID do:
         for (Map.Entry<String, Collection<String>> entry : perClassID.entrySet()) {
             String classID = entry.getKey();
-            LOGGER.debug("counting links for classification: "+classID);
+            LOGGER.debug("counting links for classification: " + classID);
             Query q = HIB_CONNECTION_INSTANCE.getNamedQuery(LINK_CLASS.getName() + queryName);
             // query can take long time, please cache result
             q.setCacheable(true);
@@ -115,7 +119,7 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
     public Map<MCRCategoryID, Number> countLinks(MCRCategoryID parentID) {
         return countLinksForType(parentID, null);
     }
-    
+
     @SuppressWarnings("unchecked")
     public Map<MCRCategoryID, Number> countLinksForType(MCRCategoryID parentID, String type) {
         boolean restrictedByType = (type != null);
@@ -193,7 +197,8 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
         Session session = HIB_CONNECTION_INSTANCE.getSession();
         for (MCRCategoryID categID : categories) {
             MCRCategoryLink link = new MCRCategoryLink(getMCRCategory(session, categID), objectReference);
-            LOGGER.debug("Adding Link from " + link.getCategory().getId() + "(" + link.getCategory().getInternalID() + ") to " + objectReference.getObjectID());
+            LOGGER.debug("Adding Link from " + link.getCategory().getId() + "(" + link.getCategory().getInternalID() + ") to "
+                    + objectReference.getObjectID());
             session.save(link);
             LOGGER.debug("===DONE: " + link.id);
         }
@@ -214,7 +219,8 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
     @SuppressWarnings("unchecked")
     public Map<MCRCategoryID, Boolean> hasLinks(Collection<MCRCategoryID> categIDs) {
         //a rather simple implementation
-        boolean useSingleDBQuery = MCRConfiguration.instance().getBoolean("MCR.Classifications.LinkServiceImpl.HasLinks.SingleQuery", false);
+        boolean useSingleDBQuery = MCRConfiguration.instance()
+                .getBoolean("MCR.Classifications.LinkServiceImpl.HasLinks.SingleQuery", false);
         Map<MCRCategoryID, Number> countMap = useSingleDBQuery ? countLinks(categIDs) : null;
         HashMap<MCRCategoryID, Boolean> boolMap = new HashMap<MCRCategoryID, Boolean>(categIDs.size());
         Session session = HIB_CONNECTION_INSTANCE.getSession();
@@ -243,8 +249,23 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
                 }
                 LOGGER.debug("check if a single linked category is part of " + categID);
                 Query linkQuery = HIB_CONNECTION_INSTANCE.getNamedQuery(LINK_CLASS.getName() + ".hasLinks");
-                linkQuery.setParameterList("internalIDs", internalIDs);
-                boolMap.put(categID, linkQuery.iterate().hasNext());
+                /*
+                 * do query in chunks of 5000 internalIDs
+                 * this prevents StackOverflowErrors in hibernate 
+                 */
+                int size = internalIDs.size();
+                int maxSize = 5000;
+                LOGGER.warn("internalIDs size:" + size);
+                for (int i = 0; i < Math.ceil(size / (double) maxSize); i++) {
+                    int begin = i * maxSize;
+                    int end = i * maxSize + maxSize - 1;
+                    if (end >= size)
+                        end = size - 1;
+                    List<Number> idParam = internalIDs.subList(begin, end);
+                    linkQuery.setParameterList("internalIDs", idParam);
+                    linkQuery.setMaxResults(1);
+                    boolMap.put(categID, linkQuery.iterate().hasNext());
+                }
             }
         }
         return boolMap;
