@@ -670,7 +670,8 @@
 
 <!-- ======== label text ======== -->
 <xsl:template match="text">
-  <label class="editorText">
+  <label>
+    <xsl:call-template name="editor.set.css" />
     <xsl:call-template name="output.label" />
   </label>
 </xsl:template>

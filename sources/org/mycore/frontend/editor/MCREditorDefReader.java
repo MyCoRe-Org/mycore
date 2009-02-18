@@ -317,6 +317,8 @@ public class MCREditorDefReader
     defaultAttributes.get( "editor" ).setProperty( "class", "editor" );
     defaultAttributes.put( "helpPopup", new Properties() );
     defaultAttributes.get( "helpPopup" ).setProperty( "class", "editorButton" );
+    defaultAttributes.put( "text", new Properties() );
+    defaultAttributes.get( "text" ).setProperty( "class", "editorText" );
     defaultAttributes.put( "textfield", new Properties() );
     defaultAttributes.get( "textfield" ).setProperty( "class", "editorTextfield" );
     defaultAttributes.put( "textarea", new Properties() );
