@@ -57,7 +57,7 @@ public class MCRClassificationBrowser extends MCRServlet {
         /*
          * default classification
          */
-        LOGGER.debug("Start brwosing in classifications");
+        LOGGER.debug("Start browsing in classifications");
         MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
         lang = mcrSession.getCurrentLanguage();
 
@@ -106,9 +106,7 @@ public class MCRClassificationBrowser extends MCRServlet {
             jdom = mcrSession.BData.createXmlTree(lang);
         }
         jdom = mcrSession.BData.loadTreeIntoSite(jdomFile, jdom);
-        doLayout(job, mcrSession.BData.getXslStyle(), jdom); // use the
-        // stylesheet-postfix
-        // from properties
+        doLayout(job, mcrSession.BData.getXslStyle(), jdom); // use the stylesheet-postfix from properties
     }
 
     private org.jdom.Document getEmbeddingPage(String coverPage) throws Exception {
