@@ -255,7 +255,6 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
                  */
                 int size = internalIDs.size();
                 int maxSize = 5000;
-                LOGGER.warn("internalIDs size:" + size);
                 for (int i = 0; i < Math.ceil(size / (double) maxSize); i++) {
                     int begin = i * maxSize;
                     int end = i * maxSize + maxSize - 1;
