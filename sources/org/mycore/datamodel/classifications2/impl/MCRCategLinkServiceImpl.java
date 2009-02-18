@@ -47,8 +47,7 @@ import org.mycore.datamodel.classifications2.MCRObjectReference;
  * 
  * @author Thomas Scheffler (yagee)
  * 
- * @version $Revision$ $Date: 2008-06-30 10:08:19 +0200 (Mo, 30. Jun
- *          2008) $
+ * @version $Revision$ $Date$
  * @since 2.0
  */
 public class MCRCategLinkServiceImpl implements MCRCategLinkService {
@@ -255,11 +254,12 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
                  */
                 int size = internalIDs.size();
                 int maxSize = 5000;
+                LOGGER.debug("internalIDs size:" + size);
                 for (int i = 0; i < Math.ceil(size / (double) maxSize); i++) {
                     int begin = i * maxSize;
-                    int end = i * maxSize + maxSize - 1;
+                    int end = i * maxSize + maxSize;
                     if (end >= size)
-                        end = size - 1;
+                        end = size;
                     List<Number> idParam = internalIDs.subList(begin, end);
                     linkQuery.setParameterList("internalIDs", idParam);
                     linkQuery.setMaxResults(1);
