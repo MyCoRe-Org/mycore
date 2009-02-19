@@ -252,6 +252,35 @@ public class MCRHIBURNStore implements MCRURNStore {
     }
 
     /**
+     * Checks wether an object has an urn assigned or not
+     * 
+     * @param id
+     *            the MCRObjectID as String
+     * @return true if an urn is assigned to the given object, false otherwise
+     */
+    public final boolean hasURNAssigned(String id) throws MCRPersistenceException {
+        if (id == null || (id.length() == 0)) {
+            return false;
+        }
+
+        Session session = getSession();
+        StringBuffer querySB = new StringBuffer("select key.mcrurn from ").append(classname)
+                .append(" where key.mcrid='").append(id).append("'");
+        logger.debug("HQL-Statement: " + querySB.toString());
+        List returns;
+        returns = session.createQuery(querySB.toString()).list();
+        if(returns == null) {
+            return false;
+        }
+        
+        if (returns.size() > 0){
+            return true;
+        }else {
+            return false;
+        }
+    }
+    
+    /**
      * This method check that the URN exist in this store.
      * 
      * @return true if the URN exist, else return false

@@ -38,6 +38,7 @@ import org.mycore.services.fieldquery.MCRQuery;
 import org.mycore.services.fieldquery.MCRQueryManager;
 import org.mycore.services.fieldquery.MCRQueryParser;
 import org.mycore.services.fieldquery.MCRResults;
+import org.mycore.services.urn.MCRURNManager;
 
 /**
  * @author Thomas Scheffler (yagee)
@@ -164,5 +165,20 @@ public class MCRXMLFunctions {
             LOGGER.debug("total query time: " + qtime);
         }
         return result.getNumHits();
+    }
+    
+    /**
+     * @return true if the given object has an urn assigned, false otherwise
+     * */
+    public static boolean hasURNDefined(String objId) {
+        if (objId == null) {
+            return false;
+        }
+        try {
+            return MCRURNManager.hasURNAssigned(objId);
+        } catch (Exception ex) {
+            LOGGER.error("Error while retrieving urn from database for object " + objId, ex);
+            return false;
+        }
     }
 }

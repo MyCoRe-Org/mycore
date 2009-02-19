@@ -62,4 +62,7 @@ public interface MCRURNStore {
      * given object id
      */
     public void removeURNByObjectID(String objID);
+    
+    /**Checks wether an object or derivate has an urn assigned*/
+    public boolean hasURNAssigned(String objId);
 }

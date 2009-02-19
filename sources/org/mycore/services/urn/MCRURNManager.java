@@ -212,6 +212,13 @@ public class MCRURNManager {
         store.assignURN(urn, documentID);
     }
 
+    /**
+     * @return true if the given object has an urn assigned
+     * */
+    public static boolean hasURNAssigned(String objId){
+        return store.hasURNAssigned(objId);
+    }
+    
     /** 
      * Assigns the given urn to the given derivate ID 
      * @param urn 
