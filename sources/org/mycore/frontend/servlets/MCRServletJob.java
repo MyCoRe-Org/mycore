@@ -31,6 +31,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.hibernate.Transaction;
 
 import org.mycore.backend.hibernate.MCRHIBConnection;
+import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
 
 /**
@@ -48,6 +49,8 @@ public class MCRServletJob {
     /** The HttpServletResponse object */
     private HttpServletResponse theResponse = null;
 
+    private boolean dataBaseAccess;
+
     private Transaction transaction = null;
 
     /**
@@ -62,6 +65,7 @@ public class MCRServletJob {
     public MCRServletJob(HttpServletRequest theRequest, HttpServletResponse theResponse) {
         this.theRequest = theRequest;
         this.theResponse = theResponse;
+        this.dataBaseAccess = MCRConfiguration.instance().getBoolean("MCR.Persistence.Database.Enable", true);
     }
 
     /** returns the HttpServletRequest object */
@@ -78,7 +82,8 @@ public class MCRServletJob {
      * starts a new database transaction.
      */
     public void beginTransaction() {
-        transaction = MCRHIBConnection.instance().getSession().beginTransaction();
+        if (dataBaseAccess)
+            transaction = MCRHIBConnection.instance().getSession().beginTransaction();
     }
 
     /**
@@ -86,8 +91,12 @@ public class MCRServletJob {
      * Commit is only done if {@link #isTransactionActive()} returns true.
      */
     public void commitTransaction() {
-        if (isTransactionActive())
+        if (isTransactionActive()) {
             transaction.commit();
+            beginTransaction();
+            MCRHIBConnection.instance().getSession().clear();
+            transaction.commit();
+        }
     }
 
     /**
@@ -95,8 +104,10 @@ public class MCRServletJob {
      * Roll back is only performed if {@link #isTransactionActive()} returns true.
      */
     public void rollbackTransaction() {
-        if (isTransactionActive())
+        if (isTransactionActive()) {
             transaction.rollback();
+            MCRHIBConnection.instance().getSession().close();
+        }
     }
 
     /**
@@ -104,7 +115,7 @@ public class MCRServletJob {
      * @return true if the transaction is still alive
      */
     public boolean isTransactionActive() {
-        return transaction != null && transaction.isActive();
+        return dataBaseAccess && transaction != null && transaction.isActive();
     }
 
     /** returns true if the current http request was issued from the local host * */

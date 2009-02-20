@@ -47,10 +47,8 @@ import org.apache.log4j.Logger;
 import org.jdom.DocType;
 import org.jdom.Document;
 import org.jdom.Element;
-
 import org.mycore.access.MCRAccessInterface;
 import org.mycore.access.MCRAccessManager;
-import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
@@ -277,7 +275,6 @@ public class MCRServlet extends HttpServlet {
             if (getProperty(req, INITIAL_SERVLET_NAME_KEY).equals(getServletName())) {
                 // current Servlet not called via RequestDispatcher
                 job.rollbackTransaction();
-                MCRHIBConnection.instance().getSession().close();
             }
             if (ex instanceof ServletException) {
                 throw (ServletException) ex;
@@ -310,15 +307,11 @@ public class MCRServlet extends HttpServlet {
             if (getProperty(job.getRequest(), INITIAL_SERVLET_NAME_KEY).equals(getServletName())) {
                 // current Servlet not called via RequestDispatcher
                 job.commitTransaction();
-                job.beginTransaction();
-                MCRHIBConnection.instance().getSession().clear();
-                job.commitTransaction();
             }
         } catch (Exception ex) {
             if (getProperty(job.getRequest(), INITIAL_SERVLET_NAME_KEY).equals(getServletName())) {
                 // current Servlet not called via RequestDispatcher
                 job.rollbackTransaction();
-                MCRHIBConnection.instance().getSession().close();
             }
             return ex;
         }
@@ -345,9 +338,6 @@ public class MCRServlet extends HttpServlet {
         render(job, thinkException);
         if (getProperty(job.getRequest(), INITIAL_SERVLET_NAME_KEY).equals(getServletName())) {
             // current Servlet not called via RequestDispatcher
-            job.commitTransaction();
-            job.beginTransaction();
-            MCRHIBConnection.instance().getSession().clear();
             job.commitTransaction();
         }
     }
