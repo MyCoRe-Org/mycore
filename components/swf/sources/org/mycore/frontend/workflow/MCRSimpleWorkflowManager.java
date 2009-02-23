@@ -74,7 +74,7 @@ public class MCRSimpleWorkflowManager {
     static String sender = "";
 
     // table of workflow directories mail addresses
-    private Hashtable<String, String> ht = null;
+    private Hashtable<String, File> ht = null;
 
     private Hashtable<String, ArrayList<String>> mt = null;
 
@@ -99,7 +99,7 @@ public class MCRSimpleWorkflowManager {
         sender = config.getString("MCR.Mail.Address", "mcradmin@localhost");
 
         // int tables
-        ht = new Hashtable<String, String>();
+        ht = new Hashtable<String, File>();
         mt = new Hashtable<String, ArrayList<String>>();
     }
 
@@ -111,26 +111,30 @@ public class MCRSimpleWorkflowManager {
      *            the MCRObjectID type
      * @return the string of the workflow directory path
      */
-    public final String getDirectoryPath(String base) {
+    public final File getDirectoryPath(String base) {
         if (ht.containsKey(base)) {
             return ht.get(base);
         }
         String dirname = config.getString("MCR.SWF.Directory." + base, null);
         if (dirname == null) {
             int ibase = base.indexOf('_');
-            String type = null;
             if (ibase != -1) {
-                type = base.substring(ibase + 1);
+                String type = base.substring(ibase + 1);
                 dirname = config.getString("MCR.SWF.Directory." + type, null);
             }
             if (dirname == null) {
-                ht.put(base, ".");
+                final File currentDir = new File(".");
+                ht.put(base, currentDir);
                 logger.warn("No workflow directory path of " + base + " is in the configuration.");
-                return ".";
+                return currentDir;
             }
         }
-        ht.put(base, dirname);
-        return dirname;
+        File dir = new File(dirname);
+        if (!dir.exists()) {
+            dir.mkdirs();
+        }
+        ht.put(base, dir);
+        return dir;
     }
 
     /**
@@ -162,7 +166,7 @@ public class MCRSimpleWorkflowManager {
         if ((mailaddr == null) || ((mailaddr = mailaddr.trim()).length() == 0)) {
             int i = base.indexOf('_');
             if (i != -1) {
-                String type = base.substring(i+1);
+                String type = base.substring(i + 1);
                 mailaddr = config.getString("MCR.SWF.Mail." + type + "." + todo, "");
                 if ((mailaddr == null) || ((mailaddr = mailaddr.trim()).length() == 0)) {
                     mt.put(base, li);
@@ -203,27 +207,24 @@ public class MCRSimpleWorkflowManager {
      * @return an ArrayList of file names
      */
     public final ArrayList<String> getAllObjectFileNames(String base) {
-        String dirname = getDirectoryPath(base);
+        File dir = getDirectoryPath(base);
         ArrayList<String> workfiles = new ArrayList<String>();
 
-        if (!dirname.equals(".")) {
-            File dir = new File(dirname);
-            String[] dirl = null;
+        String[] dirl = null;
 
-            if (dir.isDirectory()) {
-                dirl = dir.list();
-            }
+        if (dir.isDirectory()) {
+            dirl = dir.list();
+        }
 
-            if (dirl != null) {
-                for (int i = 0; i < dirl.length; i++) {
-                    if ((dirl[i].indexOf(base) != -1) && (dirl[i].endsWith(".xml"))) {
-                        workfiles.add(dirl[i]);
-                    }
+        if (dirl != null) {
+            for (int i = 0; i < dirl.length; i++) {
+                if ((dirl[i].indexOf(base) != -1) && (dirl[i].endsWith(".xml"))) {
+                    workfiles.add(dirl[i]);
                 }
             }
-
-            java.util.Collections.sort(workfiles);
         }
+
+        java.util.Collections.sort(workfiles);
 
         return workfiles;
     }
@@ -237,25 +238,22 @@ public class MCRSimpleWorkflowManager {
      * @return an ArrayList of file names
      */
     public final ArrayList<String> getAllDerivateFileNames(String base) {
-        String dirname = getDirectoryPath(base);
+        File dir = getDirectoryPath(base);
         ArrayList<String> workfiles = new ArrayList<String>();
-        if (!dirname.equals(".")) {
-            File dir = new File(dirname);
-            String[] dirl = null;
+        String[] dirl = null;
 
-            if (dir.isDirectory()) {
-                dirl = dir.list();
-            }
+        if (dir.isDirectory()) {
+            dirl = dir.list();
+        }
 
-            if (dirl != null) {
-                for (int i = 0; i < dirl.length; i++) {
-                    if ((dirl[i].indexOf("_derivate_") != -1) && (dirl[i].endsWith(".xml"))) {
-                        workfiles.add(dirl[i]);
-                    }
+        if (dirl != null) {
+            for (int i = 0; i < dirl.length; i++) {
+                if ((dirl[i].indexOf("_derivate_") != -1) && (dirl[i].endsWith(".xml"))) {
+                    workfiles.add(dirl[i]);
                 }
             }
-            java.util.Collections.sort(workfiles);
         }
+        java.util.Collections.sort(workfiles);
         return workfiles;
     }
 
@@ -272,12 +270,12 @@ public class MCRSimpleWorkflowManager {
      *         false
      */
     public final boolean isDerivateOfObject(String filename, MCRObjectID ID) {
-        String dirname = getDirectoryPath(ID.getBase());
-        String fname = dirname + File.separator + filename;
+        File dir = getDirectoryPath(ID.getBase());
+        File fname = new File(dir, filename);
         org.jdom.Document workflow_in = null;
 
         try {
-            workflow_in = MCRXMLHelper.parseURI(fname);
+            workflow_in = MCRXMLHelper.parseURI(fname.toURI().toString());
             logger.debug("Readed from workflow " + fname);
         } catch (Exception ex) {
             logger.error("Error while reading XML workflow file " + filename);
@@ -385,7 +383,7 @@ public class MCRSimpleWorkflowManager {
             File fi = new File(fn);
             if (fi.isDirectory() && fi.canWrite()) {
                 // delete files
-                ArrayList dellist = MCRUtils.getAllFileNames(fi);
+                ArrayList<String> dellist = MCRUtils.getAllFileNames(fi);
 
                 for (int j = 0; j < dellist.size(); j++) {
                     String na = (String) dellist.get(j);
@@ -504,10 +502,9 @@ public class MCRSimpleWorkflowManager {
         MCRObjectID dmcridnext = new MCRObjectID();
         dmcridnext.setNextFreeId(myproject);
 
-        String workdir = getDirectoryPath(ID.getBase());
-        File workf = new File(workdir);
-        if (workf.isDirectory()) {
-            String[] list = workf.list();
+        File workdir = getDirectoryPath(ID.getBase());
+        if (workdir.isDirectory()) {
+            String[] list = workdir.list();
             for (int i = 0; i < list.length; i++) {
                 if (!list[i].startsWith(myproject)) {
                     continue;

@@ -307,34 +307,26 @@ public class MCRStartEditorServlet extends MCRServlet {
         MCRObjectID mcridnext = new MCRObjectID();
         mcridnext.setNextFreeId(myproject + "_" + mytype);
 
-        String workdir = CONFIG.getString("MCR.SWF.Directory." + myproject + "_" + mytype, "/");
-        File workf = new File(workdir);
-        if (!workf.isDirectory()) {
-            workdir = CONFIG.getString("MCR.SWF.Directory." + mytype, "/");
-            workf = new File(workdir);
-        }
+        File workdir = MCRSimpleWorkflowManager.instance().getDirectoryPath(myproject + "_" + mytype);
+        String[] list = workdir.list();
 
-        if (workf.isDirectory()) {
-            String[] list = workf.list();
+        for (int i = 0; i < list.length; i++) {
+            if (!list[i].startsWith(myproject)) {
+                continue;
+            }
 
-            for (int i = 0; i < list.length; i++) {
-                if (!list[i].startsWith(myproject)) {
-                    continue;
-                }
+            try {
+                MCRObjectID mcriddir = new MCRObjectID(list[i].substring(0, list[i].length() - 4));
 
-                try {
-                    MCRObjectID mcriddir = new MCRObjectID(list[i].substring(0, list[i].length() - 4));
-
-                    if (mcridnext.getNumberAsInteger() <= mcriddir.getNumberAsInteger()) {
-                        int mylastnumber = mcriddir.getNumberAsInteger() + 1;
-                        while ((mylastnumber % number_distance) != 0) {
-                            mylastnumber += 1;
-                        }
-                        mcriddir.setNumber(mylastnumber);
-                        mcridnext = mcriddir;
+                if (mcridnext.getNumberAsInteger() <= mcriddir.getNumberAsInteger()) {
+                    int mylastnumber = mcriddir.getNumberAsInteger() + 1;
+                    while ((mylastnumber % number_distance) != 0) {
+                        mylastnumber += 1;
                     }
-                } catch (Exception e) {
+                    mcriddir.setNumber(mylastnumber);
+                    mcridnext = mcriddir;
                 }
+            } catch (Exception e) {
             }
         }
 
@@ -461,7 +453,8 @@ public class MCRStartEditorServlet extends MCRServlet {
             String appl = CONFIG.getString("MCR.SWF.Mail.ApplicationID", "DocPortal");
             String subject = "Automatically generated message from " + appl;
             StringBuffer text = new StringBuffer();
-            text.append("The derivate with ID ").append(cd.mysemcrid).append(" from the object with ID ").append(cd.mysemcrid).append(" was removed from server.");
+            text.append("The derivate with ID ").append(cd.mysemcrid).append(" from the object with ID ").append(cd.mysemcrid).append(
+                    " was removed from server.");
             LOGGER.info(text.toString());
 
             try {
@@ -570,7 +563,8 @@ public class MCRStartEditorServlet extends MCRServlet {
             String appl = CONFIG.getString("MCR.SWF.Mail.ApplicationID", "DocPortal");
             String subject = "Automaticaly message from " + appl;
             StringBuffer text = new StringBuffer();
-            text.append("The object with type ").append(cd.mytype).append(" with ID ").append(cd.mytfmcrid).append(" was removed from server.");
+            text.append("The object with type ").append(cd.mytype).append(" with ID ").append(cd.mytfmcrid).append(
+                    " was removed from server.");
             LOGGER.info(text.toString());
 
             try {
@@ -864,7 +858,8 @@ public class MCRStartEditorServlet extends MCRServlet {
         StringBuffer sb = new StringBuffer(pagedir);
         sb.append("editor_").append(cd.myremcrid.getTypeId()).append("_editor.xml");
 
-        String fuhid = new MCRSWFUploadHandlerMyCoRe(cd.myremcrid.getId(), cd.mysemcrid.getId(), "new", getBaseURL() + sb.toString()).getID();
+        String fuhid = new MCRSWFUploadHandlerMyCoRe(cd.myremcrid.getId(), cd.mysemcrid.getId(), "new", getBaseURL() + sb.toString())
+                .getID();
         cd.myfile = pagedir + "fileupload_new.xml";
 
         String base = getBaseURL() + cd.myfile;
@@ -914,7 +909,8 @@ public class MCRStartEditorServlet extends MCRServlet {
                     String appl = CONFIG.getString("MCR.SWF.Mail.ApplicationID", "DocPortal");
                     String subject = "Automaticaly message from " + appl;
                     StringBuffer text = new StringBuffer();
-                    text.append("The object of type ").append(cd.mytype).append(" with ID ").append(cd.mysemcrid).append(" was commited from workflow to the server.");
+                    text.append("The object of type ").append(cd.mytype).append(" with ID ").append(cd.mysemcrid).append(
+                            " was commited from workflow to the server.");
                     LOGGER.info(text.toString());
 
                     try {
@@ -1029,7 +1025,7 @@ public class MCRStartEditorServlet extends MCRServlet {
         }
 
         if (all > 1) {
-            String derpath = WFM.getDirectoryPath(cd.myproject + "_" + cd.mytype);
+            File derpath = WFM.getDirectoryPath(cd.myproject + "_" + cd.mytype);
             i = cd.extparm.indexOf("####filename####");
 
             if (i != -1) {
@@ -1082,7 +1078,8 @@ public class MCRStartEditorServlet extends MCRServlet {
             String appl = CONFIG.getString("MCR.SWF.Mail.ApplicationID", "MyCoRe");
             String subject = "Automaticaly message from " + appl;
             StringBuffer text = new StringBuffer();
-            text.append("The object of type ").append(cd.mytype).append(" with ID ").append(cd.mysemcrid).append(" was removed from the workflow.");
+            text.append("The object of type ").append(cd.mytype).append(" with ID ").append(cd.mysemcrid).append(
+                    " was removed from the workflow.");
             LOGGER.info(text.toString());
 
             try {
@@ -1143,25 +1140,23 @@ public class MCRStartEditorServlet extends MCRServlet {
         }
 
         // read file
-        String path = WFM.getDirectoryPath(cd.mysemcrid.getBase());
-        StringBuffer sb = new StringBuffer();
-        sb.append(path).append(SLASH).append(cd.mysemcrid).append(".xml");
+        File path = WFM.getDirectoryPath(cd.mysemcrid.getBase());
+        File fi = new File(path, cd.mysemcrid+".xml");
         org.jdom.Element service = null;
         try {
-            File fi = new File(sb.toString());
             if (fi.isFile() && fi.canRead()) {
                 MCRObject obj = new MCRObject();
-                obj.setFromURI(sb.toString());
+                obj.setFromURI(fi.toURI().toString());
                 service = obj.getService().createXML();
             } else {
-                LOGGER.error("Can't read file " + sb.toString());
+                LOGGER.error("Can't read file " + fi.getAbsolutePath());
             }
         } catch (Exception ex) {
             ex.printStackTrace();
-            LOGGER.error("Can't read file " + sb.toString());
+            LOGGER.error("Can't read file " + fi.getAbsolutePath());
         }
 
-        sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append(pagedir).append("editor_form_").append(cd.mystep).append("-acl.xml");
         MCRSession session = MCRSessionMgr.getCurrentSession();
         session.put("service", service);

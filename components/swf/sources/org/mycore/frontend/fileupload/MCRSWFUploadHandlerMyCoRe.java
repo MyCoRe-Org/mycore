@@ -30,7 +30,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.StringTokenizer;
 
-import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRUtils;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRObjectID;
@@ -51,7 +50,7 @@ import org.mycore.frontend.workflow.MCRSimpleWorkflowManager;
 public class MCRSWFUploadHandlerMyCoRe extends MCRUploadHandler {
     private String mainfile = "";
 
-    private String dirname;
+    private File dirname;
 
     private String docId;
 
@@ -96,9 +95,8 @@ public class MCRSWFUploadHandlerMyCoRe extends MCRUploadHandler {
      */
     public void startUpload(int numFiles) throws Exception {
         MCRObjectID ID = new MCRObjectID(docId);
-        MCRConfiguration config = MCRConfiguration.instance();
-        String workdir = config.getString("MCR.SWF.Directory." + ID.getTypeId() , "/");
-        dirname = workdir + File.separator + derId;
+        File workdir = MCRSimpleWorkflowManager.instance().getDirectoryPath(ID.getTypeId());
+        dirname = new File(workdir, derId);
     }
 
     public long receiveFile(String path, InputStream in, long length, String md5) throws Exception {
@@ -107,28 +105,25 @@ public class MCRSWFUploadHandlerMyCoRe extends MCRUploadHandler {
 
         // convert path
         String fname = path.replace(' ', '_');
-        File fdir = null;
         try {
-            fdir = new File(dirname);
-            if (!fdir.isDirectory()) {
-                fdir.mkdir();
+            if (!dirname.isDirectory()) {
+                dirname.mkdir();
                 logger.debug("Create directory " + dirname);
             }
         } catch (Exception e) {
         }
-        String newdir = dirname;
+        File newdir = dirname;
         StringTokenizer st = new StringTokenizer(fname, "/");
         int i = st.countTokens();
         int j = 0;
 
         while (j < (i - 1)) {
-            newdir = newdir + File.separatorChar + st.nextToken();
+            newdir = new File(newdir, st.nextToken());
             j++;
 
             try {
-                fdir = new File(newdir);
-                if (!fdir.isDirectory()) {
-                    fdir.mkdir();
+                if (!newdir.isDirectory()) {
+                    newdir.mkdir();
                     logger.debug("Create directory " + newdir);
                 }
             } catch (Exception e) {
@@ -170,9 +165,8 @@ public class MCRSWFUploadHandlerMyCoRe extends MCRUploadHandler {
      */
     public void finishUpload() throws Exception {
         // check for content
-        File fdir = new File(dirname);
-        if (fdir.list().length == 0) {
-            fdir.delete();
+        if (dirname.list().length == 0) {
+            dirname.delete();
             logger.warn("No file were uploaded, delete directory " + dirname+" and return.");
             return;
         }
@@ -180,7 +174,7 @@ public class MCRSWFUploadHandlerMyCoRe extends MCRUploadHandler {
         MCRDerivate der = new MCRDerivate();
         try {
             try {
-            der.setFromURI(dirname + ".xml");
+            der.setFromURI(dirname.getAbsolutePath() + ".xml");
             } catch (Exception e) {
                 der = MCRSimpleWorkflowManager.instance().createDerivate(new MCRObjectID(docId), new MCRObjectID(derId));
             }
@@ -191,7 +185,7 @@ public class MCRSWFUploadHandlerMyCoRe extends MCRUploadHandler {
                 byte[] outxml = MCRUtils.getByteArray(der.createXML());
 
                 try {
-                    FileOutputStream out = new FileOutputStream(dirname + ".xml");
+                    FileOutputStream out = new FileOutputStream(dirname.getAbsolutePath() + ".xml");
                     out.write(outxml);
                     out.flush();
                 } catch (IOException ex) {

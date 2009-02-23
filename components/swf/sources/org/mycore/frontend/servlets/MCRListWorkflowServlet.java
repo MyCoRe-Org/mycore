@@ -161,7 +161,7 @@ public class MCRListWorkflowServlet extends MCRServlet {
             }
         }
 
-        String dirname = null;
+        File dirname = null;
         if (base != null) {
             dirname = WFM.getDirectoryPath(base);
         } else {
@@ -186,13 +186,13 @@ public class MCRListWorkflowServlet extends MCRServlet {
         for (int i = 0; i < derifiles.size(); i++) {
             dername = (String) derifiles.get(i);
 
-            StringBuffer sd = (new StringBuffer(dirname)).append(SLASH).append(dername);
+            File derivateFile = new File(dirname, dername);
             mainfile = "";
             label = "Derivate of " + dername.substring(0, dername.length() - 4);
             objid = "";
 
             try {
-                der_in = MCRXMLHelper.parseURI(sd.toString(), false);
+                der_in = MCRXMLHelper.parseURI(derivateFile.toURI().toString(), false);
                 // LOGGER.debug("Derivate file "+dername+" was readed.");
                 der = der_in.getRootElement();
                 label = der.getAttributeValue("label");
@@ -264,11 +264,11 @@ public class MCRListWorkflowServlet extends MCRServlet {
         // run the loop over all objects in the workflow
         for (int i = 0; i < workfiles.size(); i++) {
             String wfile = (String) workfiles.get(i);
-            StringBuffer sb = (new StringBuffer(dirname)).append(SLASH).append(wfile);
+            File wf = new File(dirname, wfile);
             org.jdom.Element elm = null;
 
             try {
-                workflow_in = MCRXMLHelper.parseURI(sb.toString(), false);
+                workflow_in = MCRXMLHelper.parseURI(wf.toURI().toString(), false);
                 MCRObject obj = new MCRObject();
                 obj.setFromJDOM(workflow_in);
                 MCRObjectService service = obj.getService();

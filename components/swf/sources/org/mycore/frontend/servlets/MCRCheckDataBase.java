@@ -23,6 +23,7 @@
 
 package org.mycore.frontend.servlets;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -41,6 +42,7 @@ import org.mycore.common.MCRUtils;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.editor.MCREditorSubmission;
 import org.mycore.frontend.editor.MCRRequestParameters;
+import org.mycore.frontend.workflow.MCRSimpleWorkflowManager;
 
 /**
  * This class is the superclass of servlets which checks the MCREditorServlet
@@ -111,20 +113,16 @@ abstract public class MCRCheckDataBase extends MCRCheckBase {
 
         // Save the incoming to a file
         byte[] outxml = MCRUtils.getByteArray(indoc);
-        String savedir = CONFIG.getString("MCR.SWF.Directory." + ID.getBase(),null);
-        if ((savedir == null) || (savedir.trim().length() == 0)) {
-            savedir = CONFIG.getString("MCR.SWF.Directory." + ID.getTypeId());
-        }
-        String NL = System.getProperty("file.separator");
-        String fullname = savedir + NL + ID.getId() + ".xml";
-        storeMetadata(outxml, job, ID, fullname);
+        File savedir = MCRSimpleWorkflowManager.instance().getDirectoryPath(ID.getBase());
+        File fullname = new File(savedir, ID.getId() + ".xml");
+        storeMetadata(outxml, job, ID, fullname.getAbsolutePath());
 
         // create a metadata object and prepare it
         org.jdom.Document outdoc = prepareMetadata((org.jdom.Document) indoc.clone(), ID, job, lang);
         outxml = MCRUtils.getByteArray(outdoc);
 
         // Save the prepared metadata object
-        boolean okay = storeMetadata(outxml, job, ID, fullname);
+        boolean okay = storeMetadata(outxml, job, ID, fullname.getAbsolutePath());
 
         // call the getNextURL and sendMail methods
         String url = getNextURL(ID, okay);
@@ -197,7 +195,7 @@ abstract public class MCRCheckDataBase extends MCRCheckBase {
     /**
      * A method to handle valid errors.
      */
-    private final void errorHandlerValid(MCRServletJob job, List logtext, MCRObjectID ID, String lang) throws Exception {
+    private final void errorHandlerValid(MCRServletJob job, List<String> logtext, MCRObjectID ID, String lang) throws Exception {
         if (logtext.size() == 0) {
             return;
         }
@@ -209,7 +207,7 @@ abstract public class MCRCheckDataBase extends MCRCheckBase {
             String jSessionID = CONFIG.getString("MCR.Session.Param", ";jsessionid=");
             sessionID = jSessionID + session.getId();
         }
-        
+
         // write to the log file
         for (int i = 0; i < logtext.size(); i++) {
             LOGGER.error(logtext.get(i));
