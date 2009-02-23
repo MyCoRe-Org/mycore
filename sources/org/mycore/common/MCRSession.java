@@ -36,6 +36,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.log4j.Logger;
 
+import org.hibernate.Transaction;
+import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.common.events.MCRSessionEvent;
 import org.mycore.common.events.MCRSessionListener;
 import org.mycore.datamodel.classifications.MCRClassificationBrowserData;
@@ -89,6 +91,10 @@ public class MCRSession implements Cloneable {
 
     private long loginTime, lastAccessTime, thisAccessTime, createTime;
 
+    private boolean dataBaseAccess;
+
+    private Transaction transaction = null;
+
     /**
      * The constructor of a MCRSession. As default the user ID is set to the
      * value of the property variable named 'MCR.Users.Guestuser.UserName'.
@@ -97,6 +103,8 @@ public class MCRSession implements Cloneable {
         MCRConfiguration config = MCRConfiguration.instance();
         userID = config.getString("MCR.Users.Guestuser.UserName", "gast");
         language = config.getString("MCR.Metadata.DefaultLang", "de");
+        dataBaseAccess = MCRConfiguration.instance().getBoolean("MCR.Persistence.Database.Enable", true);
+
         accessCount = new AtomicInteger();
         concurrentAccess = new AtomicInteger();
 
@@ -365,6 +373,46 @@ public class MCRSession implements Cloneable {
         if (job==null)
             return false;
         return job.getRequest().isUserInRole(role);
+    }
+
+    /**
+     * starts a new database transaction.
+     */
+    public void beginTransaction() {
+        if (dataBaseAccess)
+            transaction = MCRHIBConnection.instance().getSession().beginTransaction();
+    }
+
+    /**
+     * commits the database transaction.
+     * Commit is only done if {@link #isTransactionActive()} returns true.
+     */
+    public void commitTransaction() {
+        if (isTransactionActive()) {
+            transaction.commit();
+            beginTransaction();
+            MCRHIBConnection.instance().getSession().clear();
+            transaction.commit();
+        }
+    }
+
+    /**
+     * forces the database transaction to roll back.
+     * Roll back is only performed if {@link #isTransactionActive()} returns true.
+     */
+    public void rollbackTransaction() {
+        if (isTransactionActive()) {
+            transaction.rollback();
+            MCRHIBConnection.instance().getSession().close();
+        }
+    }
+
+    /**
+     * Is the transaction still alive?
+     * @return true if the transaction is still alive
+     */
+    public boolean isTransactionActive() {
+        return dataBaseAccess && transaction != null && transaction.isActive();
     }
 
 }

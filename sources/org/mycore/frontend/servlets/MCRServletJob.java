@@ -49,8 +49,6 @@ public class MCRServletJob {
     /** The HttpServletResponse object */
     private HttpServletResponse theResponse = null;
 
-    private boolean dataBaseAccess;
-
     private Transaction transaction = null;
 
     /**
@@ -65,7 +63,6 @@ public class MCRServletJob {
     public MCRServletJob(HttpServletRequest theRequest, HttpServletResponse theResponse) {
         this.theRequest = theRequest;
         this.theResponse = theResponse;
-        this.dataBaseAccess = MCRConfiguration.instance().getBoolean("MCR.Persistence.Database.Enable", true);
     }
 
     /** returns the HttpServletRequest object */
@@ -76,46 +73,6 @@ public class MCRServletJob {
     /** returns the HttpServletResponse object */
     public HttpServletResponse getResponse() {
         return theResponse;
-    }
-
-    /**
-     * starts a new database transaction.
-     */
-    public void beginTransaction() {
-        if (dataBaseAccess)
-            transaction = MCRHIBConnection.instance().getSession().beginTransaction();
-    }
-
-    /**
-     * commits the database transaction.
-     * Commit is only done if {@link #isTransactionActive()} returns true.
-     */
-    public void commitTransaction() {
-        if (isTransactionActive()) {
-            transaction.commit();
-            beginTransaction();
-            MCRHIBConnection.instance().getSession().clear();
-            transaction.commit();
-        }
-    }
-
-    /**
-     * forces the database transaction to roll back.
-     * Roll back is only performed if {@link #isTransactionActive()} returns true.
-     */
-    public void rollbackTransaction() {
-        if (isTransactionActive()) {
-            transaction.rollback();
-            MCRHIBConnection.instance().getSession().close();
-        }
-    }
-
-    /**
-     * Is the transaction still alive?
-     * @return true if the transaction is still alive
-     */
-    public boolean isTransactionActive() {
-        return dataBaseAccess && transaction != null && transaction.isActive();
     }
 
     /** returns true if the current http request was issued from the local host * */

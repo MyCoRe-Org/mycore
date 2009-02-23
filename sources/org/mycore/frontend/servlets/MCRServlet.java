@@ -234,8 +234,8 @@ public class MCRServlet extends HttpServlet {
 
         MCRServletJob job = new MCRServletJob(req, res);
 
+        MCRSession session = getSession(req, getServletName());
         try {
-            MCRSession session = getSession(req, getServletName());
             session.put("MCRServletJob", job);
 
             String c = getClass().getName();
@@ -274,7 +274,7 @@ public class MCRServlet extends HttpServlet {
         } catch (Exception ex) {
             if (getProperty(req, INITIAL_SERVLET_NAME_KEY).equals(getServletName())) {
                 // current Servlet not called via RequestDispatcher
-                job.rollbackTransaction();
+                session.rollbackTransaction();
             }
             if (ex instanceof ServletException) {
                 throw (ServletException) ex;
@@ -282,9 +282,9 @@ public class MCRServlet extends HttpServlet {
                 throw (IOException) ex;
             } else {
                 handleException(ex);
-                job.beginTransaction();
+                session.beginTransaction();
                 generateErrorPage(req, res, 500, ex.getMessage(), ex, false);
-                job.commitTransaction();
+                session.commitTransaction();
             }
         } finally {
             MCRSessionMgr.getCurrentSession().deleteObject("MCRServletJob");
@@ -298,20 +298,21 @@ public class MCRServlet extends HttpServlet {
     }
 
     private Exception processThinkPhase(MCRServletJob job) {
+        MCRSession session=MCRSessionMgr.getCurrentSession();
         try {
             if (getProperty(job.getRequest(), INITIAL_SERVLET_NAME_KEY).equals(getServletName())) {
                 // current Servlet not called via RequestDispatcher
-                job.beginTransaction();
+                session.beginTransaction();
             }
             think(job);
             if (getProperty(job.getRequest(), INITIAL_SERVLET_NAME_KEY).equals(getServletName())) {
                 // current Servlet not called via RequestDispatcher
-                job.commitTransaction();
+                session.commitTransaction();
             }
         } catch (Exception ex) {
             if (getProperty(job.getRequest(), INITIAL_SERVLET_NAME_KEY).equals(getServletName())) {
                 // current Servlet not called via RequestDispatcher
-                job.rollbackTransaction();
+                session.rollbackTransaction();
             }
             return ex;
         }
@@ -331,14 +332,15 @@ public class MCRServlet extends HttpServlet {
     }
 
     private void processRenderingPhase(MCRServletJob job, Exception thinkException) throws Exception {
+        MCRSession session=MCRSessionMgr.getCurrentSession();
         if (getProperty(job.getRequest(), INITIAL_SERVLET_NAME_KEY).equals(getServletName())) {
             // current Servlet not called via RequestDispatcher
-            job.beginTransaction();
+            session.beginTransaction();
         }
         render(job, thinkException);
         if (getProperty(job.getRequest(), INITIAL_SERVLET_NAME_KEY).equals(getServletName())) {
             // current Servlet not called via RequestDispatcher
-            job.commitTransaction();
+            session.commitTransaction();
         }
     }
 

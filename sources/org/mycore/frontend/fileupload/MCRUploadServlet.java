@@ -47,9 +47,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.log4j.Logger;
-import org.hibernate.Transaction;
 import org.jdom.Element;
-import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
@@ -243,13 +241,14 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
             return;
         }
 
+        MCRSession session=MCRSessionMgr.getCurrentSession();
         if (method.equals("startUploadSession")) {
             String uploadId = req.getParameter("uploadId");
             int numFiles = Integer.parseInt(req.getParameter("numFiles"));
             MCRUploadHandlerManager.getHandler(uploadId).startUpload(numFiles);
 
             // Remember current MCRSession for upload
-            String sessionID = MCRSessionMgr.getCurrentSession().getID();
+            String sessionID = session.getID();
             sessionIDs.put(uploadId, sessionID);
 
             LOGGER.info("UploadServlet start session " + uploadId);
@@ -299,7 +298,7 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
                 int numFiles = paths.size();
                 LOGGER.info("UploadHandler uploading " + numFiles + " file(s)");
                 handler.startUpload(numFiles);
-                job.commitTransaction();
+                session.commitTransaction();
 
                 for (int i = 0; i < numFiles; i++) {
                     FileItem item = sub.getFile(paths.get(i));
@@ -314,7 +313,7 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
                     } else
                         handler.receiveFile(path, in, 0, null);
                 }
-                job.beginTransaction();
+                session.beginTransaction();
 
                 handler.finishUpload();
             }

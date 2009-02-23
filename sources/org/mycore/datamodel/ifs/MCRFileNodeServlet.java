@@ -246,7 +246,7 @@ public class MCRFileNodeServlet extends MCRServlet {
             res.setContentType(file.getContentType().getMimeType());
             res.setContentLength((int) (file.getSize()));
             // no transaction needed to copy long streams over slow connections
-            job.commitTransaction();
+            MCRSessionMgr.getCurrentSession().commitTransaction();
             OutputStream out = new BufferedOutputStream(res.getOutputStream());
             file.getContentTo(out);
             out.close();
