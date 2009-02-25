@@ -1,88 +1,113 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE MyCoReWebPage>
 
-<!-- ============================================== -->
-<!-- $Revision: 1.4 $ $Date: 2007-05-04 11:35:52 $ -->
-<!-- ============================================== -->
+  <!-- ============================================== -->
+  <!-- $Revision: 1.4 $ $Date: 2007-05-04 11:35:52 $ -->
+  <!-- ============================================== -->
 
 <MyCoReWebPage>
 
-<section title="Ändern einer Kategorie in einer Klassifikation " xml:lang="de">
-</section>
+  <section title="Ändern einer Kategorie in einer Klassifikation "
+    xml:lang="de">
+  </section>
 
-<section title="Update a category for the given classification" xml:lang="en">
-</section>
+  <section title="Update a category for the given classification"
+    xml:lang="en">
+  </section>
 
-<section xml:lang="all">
-<editor id="modify-categ">
- <source uri="{sourceUri}" />
- <target type="servlet" name="MCRStartClassEditorServlet" method="post" format="xml" />
- <cancel url="{cancelUrl}" />
+  <section xml:lang="all">
+    <editor id="modify-categ">
+      <source uri="{sourceUri}" />
+      <target type="servlet" name="MCRStartClassEditorServlet"
+        method="post" format="xml" />
+      <cancel url="{cancelUrl}" />
 
- <components root="modify-category" var="/mycoreclass">
+      <components root="modify-category" var="/mycoreclass"
+        xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xlink="http://www.w3.org/1999/xlink"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 
-  <include uri="webapp:editor/imports-common-classhandler.xml" />
+        <include uri="webapp:editor/imports-common-classhandler.xml" />
 
-  <headline anchor="CENTER">
-   <text i18n="component.classhandler.headline.modcateg" />
-  </headline>
-	 
-  <panel id="modify-category">	  	  
-	<cell col="1" row="1" colspan="2" anchor="NORTHWEST"  ref="Class" />	  	  	  
-	<cell col="1" row="2" colspan="2" anchor="NORTHWEST"><space width="1px" height="10px" /></cell>		  
-	<cell col="1" row="5" colspan="2" anchor="NORTHWEST"  var="categories" ref="NewCateg" />	  	  	    	  
-	<cell col="1" row="4" colspan="2" anchor="NORTHWEST"><space width="1px" height="10px" /></cell>	
-    <cell col="1" row="6" colspan="2" anchor="EAST"      ref="TwoButtons"  />
-  </panel>
-	 	 
-  <panel id="Class">
-    <hidden var="@ID" />
-    <hidden var="label" descendants="true" />
-    <cell col="1" row="1" colspan="2" anchor="NORTHWEST" ref="AClid" />	  
-    <cell col="1" row="2" anchor="NORTHWEST">	  
-	  <text i18n="component.classhandler.label.id" class="editorlabel"/>
-	</cell>	
-    <cell col="2" row="2" anchor="NORTHWEST"><output var="@ID" /></cell>  
-    <cell col="1" row="3" anchor="NORTHWEST">	  
-	  <text i18n="component.classhandler.label.label" class="editorlabel"/>
-	</cell>	
-    <cell col="2" row="3" anchor="NORTHWEST" ><output var="label/@text"/></cell>    
-    <cell col="1" row="4" anchor="NORTHWEST">	  
-	  <text i18n="component.classhandler.label.description" class="editorlabel"/>
-	</cell>	
-    <cell col="2" row="4" anchor="NORTHWEST" ><output var="label/@description"/></cell>  	  
-  </panel>
-	 	 
-  <panel id="NewCateg">
-    <hidden var="category/@counter" default="0" />	  
-    <hidden var="category/@ID" default="0" />	  
-    <cell col="1" row="1"  colspan="2" anchor="NORTHWEST" ref="BClid" />	  	  	  
-    <cell col="1" row="2" anchor="NORTHWEST">	  
-	  <text i18n="component.classhandler.label.id.p" class="editorlabel" />
-	</cell>	
-    <cell col="2" row="2" anchor="NORTHWEST"><output var="category/@ID" default=" "/></cell>
-	  	  
-    <cell col="1" row="3" anchor="NORTHWEST">	  
-	  <text i18n="component.classhandler.label.label.p" class="editorlabel"/>
-	</cell>		  
-    <cell col="2" row="3" var="category/label" anchor="NORTHWEST" >
-		   <repeater min="1" max="10" ref="RLabel" />      
-	</cell>	      	  	
-    <cell col="1" row="4" anchor="NORTHWEST">	  
-	  <text i18n="component.classhandler.label.url" class="editorlabel"/>
-	</cell>		  	  
-    <cell col="2" row="4" anchor="NORTHWEST" ref="TFzeile1024" var="category/url/@href" default="de" />   
-	   	 	  	    	  	  
-    <cell col="1" row="5" anchor="NORTHWEST"><space width="1px" height="10px" /></cell>		  
-  </panel>
-	 	 
-  <text id="AClid" i18n="component.classhandler.label.modcateg.aclid" class="editorlabel"/>
-  <text id="BClid" i18n="component.classhandler.label.modcateg.aclid" class="editorlabel"/>
-<!-- *** End *** -->
+        <headline anchor="CENTER">
+          <text i18n="component.classhandler.headline.modcateg" />
+        </headline>
 
- </components>
-</editor>
-</section>
+        <panel id="modify-category">
+          <cell col="1" row="1" colspan="2" anchor="NORTHWEST" ref="Class" />
+          <cell col="1" row="2" colspan="2" anchor="NORTHWEST">
+            <space width="1px" height="10px" />
+          </cell>
+          <cell col="1" row="5" colspan="2" anchor="NORTHWEST" var="categories"
+            ref="NewCateg" />
+          <cell col="1" row="4" colspan="2" anchor="NORTHWEST">
+            <space width="1px" height="10px" />
+          </cell>
+          <cell col="1" row="6" colspan="2" anchor="EAST" ref="TwoButtons" />
+        </panel>
+
+        <panel id="Class">
+          <hidden var="@ID" />
+          <hidden var="label" descendants="true" />
+          <cell col="1" row="1" colspan="2" anchor="NORTHWEST" ref="AClid" />
+          <cell col="1" row="2" anchor="NORTHWEST">
+            <text i18n="component.classhandler.label.id" class="editorlabel" />
+          </cell>
+          <cell col="2" row="2" anchor="NORTHWEST">
+            <output var="@ID" />
+          </cell>
+          <cell col="1" row="3" anchor="NORTHWEST">
+            <text i18n="component.classhandler.label.label" class="editorlabel" />
+          </cell>
+          <cell col="2" row="3" anchor="NORTHWEST">
+            <output var="label/@text" />
+          </cell>
+          <cell col="1" row="4" anchor="NORTHWEST">
+            <text i18n="component.classhandler.label.description"
+              class="editorlabel" />
+          </cell>
+          <cell col="2" row="4" anchor="NORTHWEST">
+            <output var="label/@description" />
+          </cell>
+        </panel>
+
+        <panel id="NewCateg">
+          <hidden var="category/@counter" default="0" />
+          <hidden var="category/@ID" default="0" />
+          <cell col="1" row="1" colspan="2" anchor="NORTHWEST" ref="BClid" />
+          <cell col="1" row="2" anchor="NORTHWEST">
+            <text i18n="component.classhandler.label.id.p" class="editorlabel" />
+          </cell>
+          <cell col="2" row="2" anchor="NORTHWEST">
+            <output var="category/@ID" default=" " />
+          </cell>
+
+          <cell col="1" row="3" anchor="NORTHWEST">
+            <text i18n="component.classhandler.label.label.p"
+              class="editorlabel" />
+          </cell>
+          <cell col="2" row="3" var="category/label" anchor="NORTHWEST">
+            <repeater min="1" max="10" ref="RLabel" />
+          </cell>
+          <cell col="1" row="4" anchor="NORTHWEST">
+            <text i18n="component.classhandler.label.url" class="editorlabel" />
+          </cell>
+          <cell col="2" row="4" anchor="NORTHWEST" ref="TFzeile1024"
+            var="category/url/@href" default="de" />
+
+          <cell col="1" row="5" anchor="NORTHWEST">
+            <space width="1px" height="10px" />
+          </cell>
+        </panel>
+
+        <text id="AClid" i18n="component.classhandler.label.modcateg.aclid"
+          class="editorlabel" />
+        <text id="BClid" i18n="component.classhandler.label.modcateg.aclid"
+          class="editorlabel" />
+        <!-- *** End *** -->
+
+      </components>
+    </editor>
+  </section>
 </MyCoReWebPage>
 
 
