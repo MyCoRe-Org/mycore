@@ -395,13 +395,18 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
             parent.getChildren().set(oldCategory.getPositionInParent(), newCategoryImpl);
         }
         // delete removed categories
+        boolean categoryRemoved = false;
         for (MCRCategoryImpl category : oldMap.values()) {
             if (!newMap.containsKey(category.getId())) {
                 LOGGER.info("Deleting category :" + category.getId());
                 category.detachFromParent();
                 session.delete(category);
+                categoryRemoved = true;
             }
         }
+        // important to flush here as positionInParent could collide with deleted categories
+        if (categoryRemoved)
+            session.flush();
         session.saveOrUpdate(newCategoryImpl);
         updateTimeStamp();
     }
