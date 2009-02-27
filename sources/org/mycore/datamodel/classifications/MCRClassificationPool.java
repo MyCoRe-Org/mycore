@@ -82,6 +82,7 @@ public class MCRClassificationPool {
             LOGGER.debug("Getting all categories that where moved to left or right");
             HashSet<MCRCategoryID> modifiedCategories = new HashSet<MCRCategoryID>();
             for (MCRCategoryID categID : getMovedCategories()) {
+                LOGGER.debug("Getting sub categories of "+categID);
                 MCRCategory cat = findCategory(classCopy.get(MCRCategoryID.rootID(categID.getRootID())), categID);
                 modifiedCategories.addAll(getSubTree(cat));
             }
@@ -89,6 +90,7 @@ public class MCRClassificationPool {
             HashSet<String> linkedObjects = new HashSet<String>();
             MCRCategLinkService linkService = MCRCategLinkServiceFactory.getInstance();
             for (MCRCategoryID cat:modifiedCategories){
+                LOGGER.debug("Getting linked objects for "+cat);
                 linkedObjects.addAll(linkService.getLinksFromCategory(cat));
             }
             for (String objectID:linkedObjects){
@@ -101,6 +103,7 @@ public class MCRClassificationPool {
 
     private static Collection<MCRCategoryID> getSubTree(MCRCategory subTreeNode) {
         ArrayList<MCRCategoryID> children = new ArrayList<MCRCategoryID>();
+        children.add(subTreeNode.getId());
         for (MCRCategory child : subTreeNode.getChildren()) {
             children.addAll(getSubTree(child));
         }
