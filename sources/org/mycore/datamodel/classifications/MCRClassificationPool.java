@@ -1,5 +1,7 @@
 package org.mycore.datamodel.classifications;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -8,10 +10,13 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 
 import org.mycore.common.MCRSessionMgr;
+import org.mycore.datamodel.classifications2.MCRCategLinkService;
+import org.mycore.datamodel.classifications2.MCRCategLinkServiceFactory;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAO;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
+import org.mycore.frontend.cli.MCRObjectCommands;
 
 /**
  * @author Radi Radichev
@@ -23,7 +28,9 @@ public class MCRClassificationPool {
     /**
      * stores all edited classifications
      */
-    private HashMap<MCRCategoryID, MCRCategory> classifications = new HashMap<MCRCategoryID, MCRCategory>(); // A
+    private HashMap<MCRCategoryID, MCRCategory> classifications = new HashMap<MCRCategoryID, MCRCategory>();
+
+    private HashSet<MCRCategoryID> movedCategories = new HashSet<MCRCategoryID>();
 
     static Logger LOGGER = Logger.getLogger(MCRClassificationPool.class);
 
@@ -54,6 +61,8 @@ public class MCRClassificationPool {
      */
     public boolean saveAll() {
         synchronized (classifications) {
+            HashMap<MCRCategoryID, MCRCategory> classCopy = new HashMap<MCRCategoryID, MCRCategory>();
+            classCopy.putAll(classifications);
             Iterator<MCRCategory> rootCategories = classifications.values().iterator();
             try {
                 while (rootCategories.hasNext()) {
@@ -70,8 +79,50 @@ public class MCRClassificationPool {
                 LOGGER.warn("Error while saving all classifications.", e);
                 return false;
             }
+            LOGGER.debug("Getting all categories that where moved to left or right");
+            HashSet<MCRCategoryID> modifiedCategories = new HashSet<MCRCategoryID>();
+            for (MCRCategoryID categID : getMovedCategories()) {
+                MCRCategory cat = findCategory(classCopy.get(MCRCategoryID.rootID(categID.getRootID())), categID);
+                modifiedCategories.addAll(getSubTree(cat));
+            }
+            LOGGER.debug("Getting all objects that where affected my category movements");
+            HashSet<String> linkedObjects = new HashSet<String>();
+            MCRCategLinkService linkService = MCRCategLinkServiceFactory.getInstance();
+            for (MCRCategoryID cat:modifiedCategories){
+                linkedObjects.addAll(linkService.getLinksFromCategory(cat));
+            }
+            for (String objectID:linkedObjects){
+                MCRObjectCommands.repairMetadataSearchForID(objectID);
+            }
+            movedCategories.clear();
         }
         return true;
+    }
+
+    private static Collection<MCRCategoryID> getSubTree(MCRCategory subTreeNode) {
+        ArrayList<MCRCategoryID> children = new ArrayList<MCRCategoryID>();
+        for (MCRCategory child : subTreeNode.getChildren()) {
+            children.addAll(getSubTree(child));
+        }
+        return children;
+    }
+
+    private static MCRCategory findCategory(MCRCategory parent, MCRCategoryID id) {
+        MCRCategory found = null;
+        for (MCRCategory cat : parent.getChildren()) {
+            if (cat.getId().equals(id)) {
+                found = cat;
+                LOGGER.debug("Found Category: " + found.getId().getID());
+                break;
+            }
+            MCRCategory rFound = findCategory(cat, id);
+            if (rFound != null) {
+                found = rFound;
+                break;
+            }
+        }
+
+        return found;
     }
 
     /**
@@ -84,6 +135,7 @@ public class MCRClassificationPool {
         LOGGER.debug("Purging all in progress...");
         synchronized (classifications) {
             classifications.clear();
+            movedCategories.clear();
         }
         return true;
     }
@@ -140,6 +192,10 @@ public class MCRClassificationPool {
             MCRCategory cl = DAO.getCategory(clid, writeAccess ? -1 : 0);
             return cl;
         }
+    }
+
+    public HashSet<MCRCategoryID> getMovedCategories() {
+        return movedCategories;
     }
 
 }

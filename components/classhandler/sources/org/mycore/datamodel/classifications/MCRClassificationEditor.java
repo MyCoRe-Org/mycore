@@ -423,6 +423,7 @@ public class MCRClassificationEditor {
             index--;
         }
         parent.getChildren().get(index).getChildren().add(cat);
+        MCRClassificationBrowserData.getClassificationPool().getMovedCategories().add(cat.getId());
         return true;
     }
 
@@ -443,8 +444,8 @@ public class MCRClassificationEditor {
         parent.getChildren().remove(oldIndex);
 
         grandParent.getChildren().add(newIndex + 1, cat);
+        MCRClassificationBrowserData.getClassificationPool().getMovedCategories().add(cat.getId());
         return true;
-
     }
 
     public boolean saveAll() {

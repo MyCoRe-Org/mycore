@@ -343,9 +343,8 @@ public class MCRClassificationBrowserData {
     private Element setTreeline(MCRCategory categ) {
         Element categElement = MCRCategoryElementFactory.getCategoryElement(categ, false, 0);
         categElement.setAttribute("level", String.valueOf(categ.getLevel() + 1));
-        MCRCategory category = findCategory(classif, categ.getId().getID());
 
-        if (category.hasChildren()) {
+        if (categ.hasChildren()) {
             categElement.setAttribute("hasChildren", "T");
         } else {
             categElement.setAttribute("hasChildren", " ");
