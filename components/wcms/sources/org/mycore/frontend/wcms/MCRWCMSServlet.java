@@ -54,7 +54,6 @@ public abstract class MCRWCMSServlet extends MCRServlet {
 
     protected static final String VALIDATOR = "JTidy";
 
-    protected static final String LOGINSERVLET_URL = getServletBaseURL() + "MCRLoginServlet";
 
     protected void doGetPost(MCRServletJob job) throws Exception {
         if (MCRWebsiteWriteProtection.printInfoPageIfNoAccess(job.getRequest(), job.getResponse(), getBaseURL()))
@@ -69,8 +68,10 @@ public abstract class MCRWCMSServlet extends MCRServlet {
             session.put("rootNodes", new ArrayList());
             // forward
             processRequest(job.getRequest(), job.getResponse());
-        } else
+        } else{
+            String LOGINSERVLET_URL = getServletBaseURL() + "MCRLoginServlet";
             job.getResponse().sendRedirect(LOGINSERVLET_URL);
+        }
     }
 
     protected final boolean accessGeneral() {
