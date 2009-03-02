@@ -38,9 +38,9 @@ import org.jdom.Element;
 public class MCRBooleanClauseParser {
     private static Pattern bracket = Pattern.compile("\\([^)(]*\\)");
     
-    private static Pattern and = Pattern.compile("\\b[aA][nN][dD]\\b");
+    private static Pattern and = Pattern.compile("[)\\s]+[aA][nN][dD][\\s(]+");
 
-    private static Pattern or = Pattern.compile("\\b[oO][rR]\\b");
+    private static Pattern or = Pattern.compile("[)\\s]+[oO][rR][\\s(]+");
 
     private static Pattern marker = Pattern.compile("@<([0-9]*)>@");
 
