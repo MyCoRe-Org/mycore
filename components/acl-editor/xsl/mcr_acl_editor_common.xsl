@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 
-<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xalan="http://xml.apache.org/xalan">
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xalan="http://xml.apache.org/xalan" xmlns:encoder="xalan://java.net.URLEncoder">
     <xsl:param name="ServletsBaseURL" />
     <xsl:param name="WebApplicationBaseURL" />
     <xsl:param name="RequestURL" />
@@ -35,12 +35,14 @@
         <xsl:variable name="objId" select="'&amp;objid='" />
         <xsl:variable name="acPool" select="'&amp;acpool='" />
 
+        <xsl:variable name="objIdFilterEncoded" select="encoder:encode(encoder:encode($objIdFilter))"/>
+        
         <xsl:choose>
-            <xsl:when test="($objIdFilter != '') and ($acPoolFilter != '')">
-                <xsl:value-of select="concat($objId, $objIdFilter, $acPool, $acPoolFilter)" />
+            <xsl:when test="($objIdFilterEncoded != '') and ($acPoolFilter != '')">
+                <xsl:value-of select="concat($objId, $objIdFilterEncoded, $acPool, $acPoolFilter)" />
             </xsl:when>
-            <xsl:when test="$objIdFilter != ''">
-                <xsl:value-of select="concat($objId, $objIdFilter)" />
+            <xsl:when test="$objIdFilterEncoded != ''">
+                <xsl:value-of select="concat($objId, $objIdFilterEncoded)" />
             </xsl:when>
             <xsl:when test="$acPoolFilter != ''">
                 <xsl:value-of select="concat($acPool, $acPoolFilter)" />
