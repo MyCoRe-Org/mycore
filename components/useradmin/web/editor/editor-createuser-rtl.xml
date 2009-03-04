@@ -65,7 +65,7 @@
             <!-- *** Update allowed? *** -->
             <cell row="6" col="4" anchor="WEST" var="user/@update_allowed">
                 <checkbox value="true" checked="true"> 
-                    <label i18n="component.useradmin.user.changeabel.label" />
+                    <label i18n="component.useradmin.user.changeable.label" />
                 </checkbox>
             </cell>
 
