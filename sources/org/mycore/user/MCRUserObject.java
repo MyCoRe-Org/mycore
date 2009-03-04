@@ -96,9 +96,7 @@ abstract class MCRUserObject {
      *            Timestamp to set the creation date
      */
     public final void setCreationDate(Timestamp time) {
-        if (modificationIsAllowed()) {
             creationDate = time;
-        }
     }
 
     /**
@@ -106,9 +104,7 @@ abstract class MCRUserObject {
      * called.
      */
     public final void setCreationDate() {
-        if (modificationIsAllowed()) {
             creationDate = new Timestamp(new GregorianCalendar().getTime().getTime());
-        }
     }
 
     /**
@@ -119,9 +115,7 @@ abstract class MCRUserObject {
      *            Timestamp to set the modified date
      */
     public final void setModifiedDate(Timestamp time) {
-        if (modificationIsAllowed()) {
             modifiedDate = time;
-        }
     }
 
     /**
@@ -129,9 +123,7 @@ abstract class MCRUserObject {
      * called.
      */
     public final void setModifiedDate() {
-        if (modificationIsAllowed()) {
             modifiedDate = new Timestamp(new GregorianCalendar().getTime().getTime());
-        }
     }
 
     /**
@@ -141,9 +133,7 @@ abstract class MCRUserObject {
      *            the creator of a user or group
      */
     public final void setCreator(String creator) {
-        if (modificationIsAllowed()) {
             this.creator = trim(creator);
-        }
     }
 
     /**
@@ -192,13 +182,6 @@ abstract class MCRUserObject {
      * or group object as a JDOM element.
      */
     abstract public org.jdom.Element toJDOMElement() throws MCRException;
-
-    /**
-     * This method must be implemented by a subclass and the returns true if the
-     * current user or session may modify the current user object, false
-     * otherwise.
-     */
-    abstract public boolean modificationIsAllowed() throws MCRException;
 
     /**
      * This method must be implemented by a subclass and returns the the ID of

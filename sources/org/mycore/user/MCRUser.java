@@ -50,7 +50,8 @@ import org.mycore.common.MCRSessionMgr;
  * @author Jens Kupferschmidt
  * @author Thomas Scheffler (yagee)
  * @author Heiko Helmbrecht
- * @version $Revision$ $Date$
+ * @version $Revision$ $Date: 2008-10-09 11:30:08 +0200 (Do, 09. Okt
+ *          2008) $
  */
 public class MCRUser extends MCRUserObject implements MCRPrincipal, Principal {
     /** The numerical ID of the MyCoRe user unit (either user ID or group ID) */
@@ -159,10 +160,7 @@ public class MCRUser extends MCRUserObject implements MCRPrincipal, Principal {
      * @param cellphone
      *            number of cellular phone, if available
      */
-    public MCRUser(int numID, String ID, String creator, Timestamp creationDate, Timestamp modifiedDate, boolean idEnabled, boolean updateAllowed,
-            String description, String passwd, String primaryGroupID, List<String> groupIDs, String salutation, String firstname, String lastname,
-            String street, String city, String postalcode, String country, String state, String institution, String faculty, String department,
-            String institute, String telephone, String fax, String email, String cellphone) throws MCRException, Exception {
+    public MCRUser(int numID, String ID, String creator, Timestamp creationDate, Timestamp modifiedDate, boolean idEnabled, boolean updateAllowed, String description, String passwd, String primaryGroupID, List<String> groupIDs, String salutation, String firstname, String lastname, String street, String city, String postalcode, String country, String state, String institution, String faculty, String department, String institute, String telephone, String fax, String email, String cellphone) throws MCRException, Exception {
         // The following data will never be changed by update
         super.ID = trim(ID, id_len);
         this.numID = numID;
@@ -189,8 +187,7 @@ public class MCRUser extends MCRUserObject implements MCRPrincipal, Principal {
         this.primaryGroupID = trim(primaryGroupID, id_len);
         this.groupIDs = groupIDs;
 
-        this.userContact = new MCRUserContact(salutation, firstname, lastname, street, city, postalcode, country, state, institution, faculty, department,
-                institute, telephone, fax, email, cellphone);
+        this.userContact = new MCRUserContact(salutation, firstname, lastname, street, city, postalcode, country, state, institution, faculty, department, institute, telephone, fax, email, cellphone);
     }
 
     /**
@@ -530,8 +527,7 @@ public class MCRUser extends MCRUserObject implements MCRPrincipal, Principal {
      * @return this user data as JDOM element
      */
     public Element toJDOMElement() throws MCRException {
-        Element user = new Element("user").setAttribute("numID", Integer.toString(numID)).setAttribute("ID", ID).setAttribute("id_enabled",
-                (idEnabled) ? "true" : "false").setAttribute("update_allowed", (updateAllowed) ? "true" : "false");
+        Element user = new Element("user").setAttribute("numID", Integer.toString(numID)).setAttribute("ID", ID).setAttribute("id_enabled", (idEnabled) ? "true" : "false").setAttribute("update_allowed", (updateAllowed) ? "true" : "false");
         Element Creator = new Element("user.creator").setText(super.creator);
         Element CreationDate = new Element("user.creation_date").setText(super.creationDate.toString());
         Element ModifiedDate = new Element("user.last_modified").setText(super.modifiedDate.toString());
@@ -539,18 +535,18 @@ public class MCRUser extends MCRUserObject implements MCRPrincipal, Principal {
         Element Description = new Element("user.description").setText(super.description);
         Element Primarygroup = new Element("user.primary_group").setText(primaryGroupID);
 
-        // Loop over all group IDs
-        Element Groups = new Element("user.groups");
-
-        for (int i = 0; i < groupIDs.size(); i++) {
-            Element groupID = new Element("groups.groupID").setText((String) groupIDs.get(i));
-            Groups.addContent(groupID);
-        }
-
         // Aggregate user element
-        user.addContent(Creator).addContent(CreationDate).addContent(ModifiedDate).addContent(Passwd).addContent(Description).addContent(Primarygroup)
-                .addContent(userContact.toJDOMElement()).addContent(Groups);
+        user.addContent(Creator).addContent(CreationDate).addContent(ModifiedDate).addContent(Passwd).addContent(Description).addContent(Primarygroup).addContent(userContact.toJDOMElement());
 
+        // Loop over all group IDs
+        if (groupIDs.size() != 0) {
+            Element Groups = new Element("user.groups");
+            for (int i = 0; i < groupIDs.size(); i++) {
+                Element groupID = new Element("groups.groupID").setText((String) groupIDs.get(i));
+                Groups.addContent(groupID);
+            }
+            user.addContent(Groups);
+        }
         return user;
     }
 
@@ -649,8 +645,7 @@ public class MCRUser extends MCRUserObject implements MCRPrincipal, Principal {
     }
 
     private boolean fastEquals(MCRUser u) {
-        return (((this.getID() == u.getID()) || (this.getID().equals(u.getID()))) && ((this.getUserContact() == u.getUserContact()) || (this.getUserContact()
-                .equals(u.getUserContact()))));
+        return (((this.getID() == u.getID()) || (this.getID().equals(u.getID()))) && ((this.getUserContact() == u.getUserContact()) || (this.getUserContact().equals(u.getUserContact()))));
     }
 
     public int hashCode() {

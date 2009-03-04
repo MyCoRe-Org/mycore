@@ -253,7 +253,7 @@ public class MCRGroup extends MCRUserObject implements MCRPrincipal {
 	 * privileges for the group.
 	 * 
 	 * @param groupID
-	 *            ID of the group added to the group admin list
+	 *            ID of the group added to the group administrator list
 	 */
 	public void addAdminGroupID(String groupID) throws MCRException {
 		addAndUpdate(groupID, admGroupIDs);
@@ -280,20 +280,34 @@ public class MCRGroup extends MCRUserObject implements MCRPrincipal {
 	}
 
 	/**
-	 * @return This method returns the list of admin groups as a ArrayList of
+	 * @return This method returns the list of administrator groups as a ArrayList of
 	 *         strings.
 	 */
 	public final ArrayList<String> getAdminGroupIDs() {
 		return admGroupIDs;
 	}
 
+    /**
+     * This method set the list of administrator groups as a ArrayList of Strings.
+     */
+    public final void setAdminGroupIDs(ArrayList<String> array) {
+        admGroupIDs = array;
+    }
+
 	/**
-	 * @return This method returns the list of admin users as a ArrayList of
+	 * @return This method returns the list of administrator users as a ArrayList of
 	 *         strings.
 	 */
 	public final ArrayList<String> getAdminUserIDs() {
 		return admUserIDs;
 	}
+
+    /**
+     * This method set the list of administrator users as a ArrayList of Strings.
+     */
+    public final void setAdminUserIDs(ArrayList<String> array) {
+        admUserIDs = array;
+    }
 
 	/**
 	 * @return This method returns the user list (group members) as a ArrayList
@@ -370,15 +384,6 @@ public class MCRGroup extends MCRUserObject implements MCRPrincipal {
 	}
 
 	/**
-	 * This method cleans the list of member users.
-	 */
-	protected final void cleanMemberUserID() throws MCRException {
-		if (modificationIsAllowed()) {
-			mbrUserIDs.clear();
-		}
-	}
-
-	/**
 	 * This method removes a group from the list of groups with administrative
 	 * privileges for this group.
 	 * 
@@ -390,6 +395,13 @@ public class MCRGroup extends MCRUserObject implements MCRPrincipal {
 	}
 
 	/**
+	 * This method remove all administrator group IDs.
+	 */
+	public void removeAllAdminGroupID() {
+	    admGroupIDs.clear();
+	}
+	
+	/**
 	 * This method removes a user from the list of administrators of the group.
 	 * 
 	 * @param userID
@@ -399,6 +411,13 @@ public class MCRGroup extends MCRUserObject implements MCRPrincipal {
 		removeAndUpdate(userID, admUserIDs);
 	}
 
+    /**
+     * This method remove all administrator group IDs.
+     */
+    public void removeAllAdminUserID() {
+        admUserIDs.clear();
+    }
+    
 	/**
 	 * This method removes a user from the users list (members) of the group.
 	 * 
@@ -409,6 +428,13 @@ public class MCRGroup extends MCRUserObject implements MCRPrincipal {
 		removeAndUpdate(userID, mbrUserIDs);
 	}
 
+    /**
+     * This method remove all administrator group IDs.
+     */
+    public void removeAllMemberUserID() {
+        mbrUserIDs.clear();
+    }
+    
 	/**
 	 * @return This method returns the user or group object as a JDOM document.
 	 */
@@ -442,14 +468,14 @@ public class MCRGroup extends MCRUserObject implements MCRPrincipal {
 		Element admins = new Element("group.admins");
 		Element members = new Element("group.members");
 
-		// Loop over all admin user IDs
+		// Loop over all administrator user IDs
 		for (int i = 0; i < admUserIDs.size(); i++) {
 			Element admUserID = new Element("admins.userID")
 					.setText((String) admUserIDs.get(i));
 			admins.addContent(admUserID);
 		}
 
-		// Loop over all admin group IDs
+		// Loop over all administrator group IDs
 		for (int i = 0; i < admGroupIDs.size(); i++) {
 			Element admGroupID = new Element("admins.groupID")
 					.setText((String) admGroupIDs.get(i));
@@ -501,10 +527,8 @@ public class MCRGroup extends MCRUserObject implements MCRPrincipal {
 	 */
 	private void addAndUpdate(String s, ArrayList<String> vec)
 			throws MCRException {
-		if (modificationIsAllowed()) {
 			if (!vec.contains(s)) {
 				vec.add(s);
-			}
 		}
 	}
 
@@ -519,22 +543,9 @@ public class MCRGroup extends MCRUserObject implements MCRPrincipal {
 	 */
 	private void removeAndUpdate(String s, ArrayList<String> vec)
 			throws MCRException {
-		if (modificationIsAllowed()) {
 			if (vec.contains(s)) {
 				vec.remove(s);
-			}
 		}
 	}
 
-	/**
-	 * This private helper method checks if the modification of the group object
-	 * is allowed for the current user/session.
-	 */
-	public final boolean modificationIsAllowed() throws MCRException {
-		if (AI.checkPermission("modify-group")) {
-			return true;
-		} else {
-			return false;
-		}
-	}
 }

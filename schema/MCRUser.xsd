@@ -15,7 +15,7 @@
 </xsd:complexType>
 
 <xsd:complexType name="User">
- <xsd:sequence>
+ <xsd:all>
   <xsd:element maxOccurs="1" minOccurs="0" type="xsd:string" name="user.creator"/>
   <xsd:element maxOccurs="1" minOccurs="0" type="xsd:string" name="user.creation_date"/>
   <xsd:element maxOccurs="1" minOccurs="0" type="xsd:string" name="user.last_modified"/>
@@ -36,7 +36,7 @@
     </xsd:sequence>
    </xsd:complexType>
   </xsd:element>
- </xsd:sequence>
+ </xsd:all>
  <xsd:attribute use="required" type="xsd:string" name="ID"/>
  <xsd:attribute use="required" type="xsd:string" name="numID"/>
  <xsd:attribute use="required" type="xsd:boolean" name="id_enabled"/>
