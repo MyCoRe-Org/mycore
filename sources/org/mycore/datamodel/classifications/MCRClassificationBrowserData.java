@@ -614,6 +614,9 @@ public class MCRClassificationBrowserData {
 
             Element label = (Element) XPath.selectSingleNode(line, "label[lang('" + lang + "')]");
             if (label == null) {
+                label = (Element) XPath.selectSingleNode(line, "label[lang('" + MCRConfiguration.instance().getString("MCR.Metadata.DefaultLang", "en") + "')]");
+            }
+            if (label == null) {
                 label = (Element) XPath.selectSingleNode(line, "label");
             }
             final String text = label.getAttributeValue("text");
