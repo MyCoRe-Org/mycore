@@ -65,6 +65,8 @@ public abstract class MCRStoredNode extends MCRNode
       labels.put( label.getAttributeValue( "lang" ), label.getTextTrim() );  
   }
   
+  protected abstract void repairMetadata() throws Exception;
+  
   public void renameTo( String name ) throws Exception
   {
     String oldName = getName();

@@ -102,9 +102,20 @@ public class MCRDirectory extends MCRStoredNode
   protected void readChildData( MCRStoredNode child ) throws Exception
   {
     Element entry = findEntry( child.getName() );
-    child.readChildData( entry );
+    if( entry != null ) child.readChildData( entry );
   }
   
   public Element getMetadata()
   { return metadata; }
+  
+  public void repairMetadata() throws Exception
+  {
+    metadata = new Document( new Element( "metadata" ) ).getRootElement();
+    writeMetadata();
+    
+    for( MCRNode child : getChildren() )
+      ((MCRStoredNode)child).repairMetadata();
+    
+    writeMetadata();
+  }
 }
