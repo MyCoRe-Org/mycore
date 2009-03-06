@@ -60,6 +60,8 @@ public abstract class MCRNode
   {
     if( isDirectory() ) 
       return fo;
+    else if( getSize() == 0 )
+      return null;
     else if( VFS.getManager().canCreateFileSystem( fo ) )
     {
       FileObject father = fo;
@@ -75,7 +77,7 @@ public abstract class MCRNode
     FileObject father = getFather();
     if( father == null ) return 0;
     
-    if( father.getChild( MCRDirectory.metadataFile  ) != null )
+    if( father.getChild( MCRDirectory.metadataFile ) != null )
       return father.getChildren().length - 1;
     else 
       return father.getChildren().length;
