@@ -99,33 +99,6 @@ public class MCRStore
   public boolean exists( int ownerID ) throws Exception
   { return getSlot( ownerID ).exists(); }
   
-  public MCRFileCollection createCollection() throws Exception
-  { return createCollection( getNextFreeID() ); }
-  
-  public MCRFileCollection createCollection( int ownerID ) throws Exception
-  {
-    FileObject slotDir = getSlot( ownerID );
-    if( slotDir.exists() )
-    {
-      String msg = "Collection " + ownerID + " already exists";
-      throw new MCRConfigurationException( msg );  
-    }
-    slotDir.createFolder();
-    
-    MCRFileCollection coll = new MCRFileCollection( this, ownerID, slotDir );
-    coll.writeMetadata();
-    return coll;
-  }
-
-  public MCRFileCollection retrieveCollection( int ownerID ) throws Exception
-  {
-    FileObject slotDir = getSlot( ownerID );
-    if( ! slotDir.exists() ) 
-      return null;
-    else
-      return new MCRFileCollection( this, ownerID, slotDir );
-  }
-  
   public int getNextFreeID()
   {
     File d = dir;
