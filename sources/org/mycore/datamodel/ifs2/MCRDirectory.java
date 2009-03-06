@@ -32,7 +32,6 @@ public class MCRDirectory extends MCRStoredNode
     fo.createFolder();
     metadata = new Document( new Element( "metadata" ) ).getRootElement();
     writeMetadata();
-    updateMetadata();
   }
   
   public void delete() throws Exception
@@ -70,6 +69,8 @@ public class MCRDirectory extends MCRStoredNode
     xout.setFormat( Format.getPrettyFormat().setEncoding( "UTF-8" ).setIndent( "  " ) );
     xout.output( metadata.getDocument(), out );
     out.close();
+
+    updateMetadata();
   }
   
   protected void updateMetadata( String name, MCRStoredNode child ) throws Exception
