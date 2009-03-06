@@ -58,4 +58,11 @@ public class MCRFile extends MCRStoredNode
 
   public MCRContent getContent()
   { return content; }
+  
+  public String getExtension()
+  {
+    String name = this.getName();
+    int pos = name.lastIndexOf( "." );
+    return( pos == -1 ? "" : name.substring( pos + 1 ) );
+  }
 }
