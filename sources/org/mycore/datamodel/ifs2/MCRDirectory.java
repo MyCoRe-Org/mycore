@@ -58,6 +58,7 @@ public class MCRDirectory extends MCRStoredNode
       metadata = new SAXBuilder().build( in ).getRootElement();
       in.close();
     }
+    else metadata = new Document( new Element( "metadata" ) ).getRootElement();
   }
   
   protected void writeMetadata() throws Exception
@@ -66,7 +67,7 @@ public class MCRDirectory extends MCRStoredNode
     if( ! md.exists() ) md.createFile();
     OutputStream out = md.getContent().getOutputStream();
     XMLOutputter xout = new XMLOutputter();
-    xout.setFormat( Format.getCompactFormat().setEncoding( "UTF-8" ) );
+    xout.setFormat( Format.getPrettyFormat().setEncoding( "UTF-8" ).setIndent( "  " ) );
     xout.output( metadata.getDocument(), out );
     out.close();
   }
@@ -76,7 +77,7 @@ public class MCRDirectory extends MCRStoredNode
     Element entry = findEntry( name );
     if( entry == null )
     {
-      entry = new Element( "node" );
+      entry = new Element( child.isDirectory() ? "dir" : "file" );
       metadata.addContent( entry );
     }
     child.writeChildData( entry );
