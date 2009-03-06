@@ -9,7 +9,10 @@ import java.security.DigestOutputStream;
 import java.security.MessageDigest;
 
 import org.apache.commons.vfs.FileObject;
+import org.apache.commons.vfs.RandomAccessContent;
 import org.apache.commons.vfs.VFS;
+import org.apache.commons.vfs.provider.local.LocalFile;
+import org.apache.commons.vfs.util.RandomAccessMode;
 import org.jdom.Document;
 import org.jdom.input.SAXBuilder;
 import org.jdom.output.Format;
@@ -85,5 +88,18 @@ public abstract class MCRContent
     Document xml = new SAXBuilder().build( in );
     in.close();
     return xml;
+  }
+  
+  public File getLocalFile() throws Exception
+  {
+    if( fo instanceof LocalFile )
+      return new File( fo.getURL().getPath() );
+    else
+      return null;  
+  }
+  
+  public RandomAccessContent getRandomAccess() throws Exception
+  {
+    return fo.getContent().getRandomAccessContent( RandomAccessMode.READ );  
   }
 }
