@@ -99,6 +99,9 @@ public class MCRStore
   public boolean exists( int ownerID ) throws Exception
   { return getSlot( ownerID ).exists(); }
   
+  public MCRFileCollection createCollection() throws Exception
+  { return createCollection( getNextFreeID() ); }
+  
   public MCRFileCollection createCollection( int ownerID ) throws Exception
   {
     FileObject slotDir = getSlot( ownerID );
@@ -121,5 +124,22 @@ public class MCRStore
       return null;
     else
       return new MCRFileCollection( this, ownerID, slotDir );
+  }
+  
+  public int getNextFreeID()
+  {
+    File d = dir;
+    String max = "0";
+    for( int i = 0; i <= slotLength.length; i++ )
+    {
+      File[] children = d.listFiles();
+      for( File child : children )
+      {
+        if( child.getName().compareTo( max ) > 0 )
+          max = child.getName();
+      }
+      d = new File( d, max );
+    }
+    return Integer.parseInt( max ) + 1;
   }
 }
