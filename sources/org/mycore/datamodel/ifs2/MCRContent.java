@@ -18,7 +18,6 @@ import org.jdom.input.SAXBuilder;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.mycore.common.MCRUtils;
-import org.mycore.datamodel.ifs.MCRContentInputStream;
 
 public abstract class MCRContent
 {

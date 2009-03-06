@@ -1,13 +1,11 @@
 package org.mycore.datamodel.ifs2;
 
 import java.io.InputStream;
-import java.io.OutputStream;
 
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.VFS;
 import org.jdom.Element;
 import org.mycore.common.MCRUtils;
-import org.mycore.datamodel.ifs.MCRContentInputStream;
 
 public class MCRFile extends MCRStoredNode
 {
