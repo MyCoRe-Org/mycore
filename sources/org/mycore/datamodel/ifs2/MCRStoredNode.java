@@ -1,5 +1,6 @@
 package org.mycore.datamodel.ifs2;
 
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.SortedMap;
@@ -9,6 +10,7 @@ import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.VFS;
 import org.jdom.Element;
 import org.mycore.common.MCRSessionMgr;
+import org.mycore.datamodel.metadata.MCRMetaISO8601Date;
 
 public abstract class MCRStoredNode extends MCRNode
 {
@@ -35,6 +37,14 @@ public abstract class MCRStoredNode extends MCRNode
   protected void writeChildData( Element entry ) throws Exception
   {
     entry.setAttribute( "name", this.getName() );
+
+    entry.setAttribute( "numChildren", String.valueOf( this.getNumChildren() ) );
+    
+    MCRMetaISO8601Date date = new MCRMetaISO8601Date();
+    date.setDate( new Date( this.getLastModified() ) );
+    date.setFormat( MCRMetaISO8601Date.IsoFormat.COMPLETE_HH_MM_SS );
+    entry.setAttribute( "lastModified", date.getISOString() );
+    
     entry.removeChildren( "label" );
     if( ! labels.isEmpty() )
     {
