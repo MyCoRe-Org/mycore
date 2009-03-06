@@ -86,7 +86,7 @@ public class MCRFile extends MCRStoredNode
     DigestOutputStream dos = new DigestOutputStream( out, digest );
     
     XMLOutputter xout = new XMLOutputter();
-    xout.setFormat( Format.getCompactFormat().setEncoding( "UTF-8" ) );
+    xout.setFormat( Format.getPrettyFormat().setEncoding( "UTF-8" ).setIndent( "  " ) );
     xout.output( xml, dos );
 
     dos.close();
