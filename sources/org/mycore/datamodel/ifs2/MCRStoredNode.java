@@ -1,6 +1,5 @@
 package org.mycore.datamodel.ifs2;
 
-import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.SortedMap;
@@ -41,7 +40,7 @@ public abstract class MCRStoredNode extends MCRNode
     entry.setAttribute( "numChildren", String.valueOf( this.getNumChildren() ) );
     
     MCRMetaISO8601Date date = new MCRMetaISO8601Date();
-    date.setDate( new Date( this.getLastModified() ) );
+    date.setDate( this.getLastModified() );
     date.setFormat( MCRMetaISO8601Date.IsoFormat.COMPLETE_HH_MM_SS );
     entry.setAttribute( "lastModified", date.getISOString() );
     
