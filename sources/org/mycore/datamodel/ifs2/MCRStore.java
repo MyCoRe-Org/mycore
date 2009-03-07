@@ -6,6 +6,7 @@ import java.util.StringTokenizer;
 
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.VFS;
+import org.mycore.backend.sql.MCRSQLConnection;
 import org.mycore.common.MCRConfigurationException;
 
 public class MCRStore 
@@ -104,22 +105,42 @@ public class MCRStore
   public boolean exists( int ownerID ) throws Exception
   { return getSlot( ownerID ).exists(); }
   
-  public int getNextFreeID()
+  
+  protected int offset = 10; // Initially 10, later 1
+  protected int lastID = 0;
+
+  public synchronized int getNextFreeID()
+  {
+    int found = findMaxID();
+    lastID = Math.max( found, lastID );
+    lastID += ( lastID > 0 ? offset : 1 );
+    offset = 1;
+    return lastID;
+  }
+
+  private int findMaxID()
   {
     File d = dir;
-    String max = prefix + nulls.substring( 0, idLength ) + suffix;
+    String max = null;
+    
     for( int i = 0; i <= slotLength.length; i++ )
     {
       File[] children = d.listFiles();
-      if( children != null ) for( File child : children )
+      if( children != null )
       {
-        if( child.getName().compareTo( max ) > 0 )
-          max = child.getName();
+        for( File child : children )
+        {
+          if( child.getName().compareTo( max ) > 0 )
+            max = child.getName();
+          d = new File( d, max );
+        }
       }
-      d = new File( d, max );
     }
+    
+    if( max == null ) return 0;
+    
     max = max.substring( prefix.length() );
     max = max.substring( 0, idLength );
-    return Integer.parseInt( max ) + 1;
+    return Integer.parseInt( max );
   }
 }
