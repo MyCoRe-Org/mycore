@@ -3,18 +3,51 @@ package org.mycore.datamodel.ifs2;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Date;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Properties;
 
 import org.apache.commons.vfs.FileObject;
 import org.jdom.Document;
 import org.jdom.input.SAXBuilder;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
+import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 
 public class MCRMetadataStore extends MCRStore 
 {
-  protected MCRMetadataStore( String id, String baseDir, String slotLayout, String type )
-  { super( id, baseDir, slotLayout, type + "_", ".xml" ); }
+  private static HashMap<String,MCRMetadataStore> stores;
+    
+  static
+  {
+    stores = new HashMap<String,MCRMetadataStore>();
+   
+    // MCR.IFS2.MetadataStore.DocPortal_document.BaseDir=c:\\store
+    // MCR.IFS2.MetadataStore.DocPortal_document.SlotLayout=3-3-2-8
+    
+    String prefix = "MCR.IFS2.MetadataStore.";
+    MCRConfiguration config = MCRConfiguration.instance();
+    Properties prop = config.getProperties( prefix );
+    for( Enumeration keys = prop.keys(); keys.hasMoreElements(); )
+    {
+      String key = (String)(keys.nextElement());
+      if( ! key.endsWith( "BaseDir" ) ) continue;
+      String baseDir = prop.getProperty( key );
+      String type = key.substring( prefix.length(), key.indexOf( ".BaseDir" ) );
+      String slotLayout = config.getString( prefix + type + ".SlotLayout" );
+      new MCRMetadataStore( type, baseDir, slotLayout );
+    }
+  }
+    
+  public static MCRMetadataStore getStore( String type )
+  { return stores.get( type ); }
+    
+  protected MCRMetadataStore( String type, String baseDir, String slotLayout )
+  { 
+    super( type, baseDir, slotLayout, type + "_", ".xml" ); 
+    stores.put( type, this );
+  }
   
   public int create( Document xml ) throws Exception
   {

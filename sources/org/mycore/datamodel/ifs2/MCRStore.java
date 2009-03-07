@@ -4,7 +4,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.List;
 import java.util.StringTokenizer;
 
@@ -20,19 +19,6 @@ public abstract class MCRStore
   protected int[] slotLength;
   protected String prefix; 
   protected String suffix;
-  
-  private static HashMap<String,MCRStore> stores;
-  
-  static
-  {
-    stores = new HashMap<String,MCRStore>();
-    
-    MCRFileStore store = new MCRFileStore( "TEST", "c:\\store", "2-3-8" );
-    stores.put( store.getID(), store );
-  }
-  
-  public static MCRStore getStore( String id )
-  { return stores.get( id ); }
   
   protected MCRStore( String id, String baseDir, String slotLayout, String prefix, String suffix )
   {
@@ -158,7 +144,7 @@ public abstract class MCRStore
   public Enumeration<Integer> listIDs( boolean order )
   { 
     return new Enumeration<Integer>()
-    {
+    { 
       List<File> files = new ArrayList<File>();
       int nextID = -1;
       boolean order;
