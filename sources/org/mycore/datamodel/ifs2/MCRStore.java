@@ -2,13 +2,11 @@ package org.mycore.datamodel.ifs2;
 
 import java.io.File;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.StringTokenizer;
 
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.VFS;
-import org.mycore.backend.sql.MCRSQLConnection;
 import org.mycore.common.MCRConfigurationException;
 
 public class MCRStore 
