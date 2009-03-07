@@ -1,9 +1,11 @@
 package org.mycore.datamodel.ifs2;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.StringTokenizer;
 
+import org.apache.commons.vfs.FileContent;
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileType;
 import org.apache.commons.vfs.VFS;
@@ -45,12 +47,13 @@ public abstract class MCRNode
       return 0;
   }
 
-  public long getLastModified() throws Exception
+  public Date getLastModified() throws Exception
   {
-    if( isFile() )
-      return fo.getContent().getLastModifiedTime();
-    else
-      return 0;
+    FileContent content = fo.getContent();
+    if( content != null )
+      return new Date( content.getLastModifiedTime() );
+    else 
+      return null;
   }
   
   public boolean hasChildren() throws Exception
