@@ -9,23 +9,40 @@ import org.jdom.Document;
 import org.jdom.input.SAXBuilder;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
+import org.mycore.common.MCRException;
 
 public class MCRMetadataStore extends MCRStore 
 {
   protected MCRMetadataStore( String id, String baseDir, String slotLayout, String type )
   { super( id, baseDir, slotLayout, type + "_", ".xml" ); }
   
-  public int store( Document xml ) throws Exception
+  public int create( Document xml ) throws Exception
   {
     int id = getNextFreeID();
-    store( xml, id );
+    create( xml, id );
     return id; 
   }
   
-  public void store( Document xml, int id ) throws Exception
+  public void create( Document xml, int id ) throws Exception
   {
     FileObject fo = getSlot( id );
-    if( ! fo.exists() ) fo.createFile();
+    if( fo.exists() )
+    {
+      String msg = "Metadata object with ID " + id + " already exists in store";
+      throw new MCRException( msg );
+    }
+    fo.createFile();
+    write( xml, getSlot( id ) );
+  }
+  
+  public void update( Document xml, int id ) throws Exception
+  {
+    FileObject fo = getSlot( id );
+    if( ! fo.exists() )
+    {
+      String msg = "Metadata object with ID " + id + " does not exist in store";
+      throw new MCRException( msg );
+    }
     write( xml, getSlot( id ) );
   }
   
