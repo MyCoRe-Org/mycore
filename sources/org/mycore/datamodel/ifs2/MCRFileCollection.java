@@ -1,21 +1,19 @@
 package org.mycore.datamodel.ifs2;
 
+import org.apache.commons.vfs.FileObject;
+
 public class MCRFileCollection extends MCRDirectory 
 {
   private MCRStore store;
-  private int ownerID;
-  
-  public MCRFileCollection( MCRStore store ) throws Exception
-  { this( store, store.getNextFreeID() ); }
-  
-  public MCRFileCollection( MCRStore store, int ownerID ) throws Exception
-  {
-    super( null, store.getSlot( ownerID ) );
-    
-    this.store = store;
-    this.ownerID = ownerID;
+  private int id;
 
-    if( ! fo.exists() )
+  protected MCRFileCollection( MCRStore store, int id, FileObject fo, boolean create ) throws Exception
+  {
+    super( null, fo );
+    this.store = store;
+    this.id = id;
+    
+    if( create )
     {
       fo.createFolder();
       readMetadata();
@@ -30,8 +28,8 @@ public class MCRFileCollection extends MCRDirectory
   public MCRStore getStore()
   { return store; }
   
-  public int getOwnerID()
-  { return ownerID; }
+  public int getID()
+  { return id; }
   
   public String getPath()
   { return ""; }
