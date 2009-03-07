@@ -10,10 +10,12 @@ import org.mycore.common.MCRConfigurationException;
 
 public class MCRStore 
 {
-  private String id;
-  private File dir;
-  private int idLength;
-  private int[] slotLength;
+  protected String id;
+  protected File dir;
+  protected int idLength;
+  protected int[] slotLength;
+  protected String prefix; 
+  protected String suffix;
   
   private static HashMap<String,MCRStore> stores;
   
@@ -21,16 +23,19 @@ public class MCRStore
   {
     stores = new HashMap<String,MCRStore>();
     
-    MCRStore store = new MCRStore( "TEST", "c:\\store", "2-3-8" );
+    MCRStore store = new MCRStore( "TEST", "c:\\store", "2-3-8", "", "" );
     stores.put( store.getID(), store );
   }
   
   public static MCRStore getStore( String id )
   { return stores.get( id ); }
   
-  private MCRStore( String id, String baseDir, String slotLayout )
+  protected MCRStore( String id, String baseDir, String slotLayout, String prefix, String suffix )
   {
     this.id = id;
+    this.prefix = prefix;
+    this.suffix = suffix;
+    
     this.idLength = Integer.parseInt( slotLayout.substring( slotLayout.lastIndexOf( "-" ) + 1 ) );
     
     StringTokenizer st = new StringTokenizer( slotLayout, "-" );
@@ -91,7 +96,7 @@ public class MCRStore
       offset += slotLength[ i ];
       path.append( "/" );
     }
-    path.append( id );
+    path.append( prefix ).append( id ).append( suffix );
     
     return VFS.getManager().resolveFile( dir, path.toString() );
   }
@@ -102,17 +107,19 @@ public class MCRStore
   public int getNextFreeID()
   {
     File d = dir;
-    String max = "0";
+    String max = prefix + nulls.substring( 0, idLength ) + suffix;
     for( int i = 0; i <= slotLength.length; i++ )
     {
       File[] children = d.listFiles();
-      for( File child : children )
+      if( children != null ) for( File child : children )
       {
         if( child.getName().compareTo( max ) > 0 )
           max = child.getName();
       }
       d = new File( d, max );
     }
+    max = max.substring( prefix.length() );
+    max = max.substring( 0, idLength );
     return Integer.parseInt( max ) + 1;
   }
 }
