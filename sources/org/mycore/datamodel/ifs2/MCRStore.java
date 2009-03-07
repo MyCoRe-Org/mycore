@@ -121,7 +121,7 @@ public class MCRStore
   private int findMaxID()
   {
     File d = dir;
-    String max = null;
+    String max = "";
     
     for( int i = 0; i <= slotLength.length; i++ )
     {
@@ -137,7 +137,7 @@ public class MCRStore
       }
     }
     
-    if( max == null ) return 0;
+    if( max == "" ) return 0;
     
     max = max.substring( prefix.length() );
     max = max.substring( 0, idLength );
