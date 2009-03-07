@@ -1,6 +1,8 @@
 package org.mycore.datamodel.ifs2;
 
 import java.io.File;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.StringTokenizer;
 
@@ -117,28 +119,33 @@ public class MCRStore
     offset = 1;
     return lastID;
   }
+  
+  private String findMaxID( File dir, int depth )
+  {
+    String[] children = dir.list();
+    
+    if( ( children == null ) || ( children.length == 0 ) )
+      return null;
+    
+    Arrays.sort( children );
+
+    if( depth == slotLength.length )  
+      return children[ children.length - 1 ];
+        
+    for( int i = children.length - 1; i >= 0; i-- )
+    {
+      File child = new File( dir, children[ i ] );
+      if( ! child.isDirectory() ) continue;
+      String found = findMaxID( child, depth + 1 );
+      if( found != null ) return found;
+    }
+    return null;
+  }
 
   private int findMaxID()
   {
-    File d = dir;
-    String max = "";
-    
-    for( int i = 0; i <= slotLength.length; i++ )
-    {
-      File[] children = d.listFiles();
-      if( children != null )
-      {
-        for( File child : children )
-        {
-          if( child.getName().compareTo( max ) > 0 )
-            max = child.getName();
-          d = new File( d, max );
-        }
-      }
-    }
-    
-    if( max == "" ) return 0;
-    
+    String max = findMaxID( dir, 0 );
+    if( max == null ) return 0;
     max = max.substring( prefix.length() );
     max = max.substring( 0, idLength );
     return Integer.parseInt( max );
