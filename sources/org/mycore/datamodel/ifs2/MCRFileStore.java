@@ -1,6 +1,5 @@
 package org.mycore.datamodel.ifs2;
 
-import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Properties;
@@ -16,6 +15,8 @@ import org.mycore.common.MCRException;
  * 
  * MCR.IFS2.FileStore.STOREID.BaseDir=c:\\store
  * MCR.IFS2.FileStore.STOREID.SlotLayout=3-3-2-8
+ * 
+ * @author Frank Lützenkirchen
  */
 public class MCRFileStore extends MCRStore 
 {
