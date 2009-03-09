@@ -94,6 +94,7 @@ public class MCRGroup extends MCRUserObject implements MCRPrincipal {
 	 */
 	public MCRGroup(String id) {
 		// This constructor is used by the access control system
+	    this();
 		super.ID = id.trim();
 	}
 
