@@ -1,6 +1,6 @@
 /*
- * $Revision: 13085 $ 
- * $Date: 2008-02-06 18:27:24 +0100 (Mi, 06 Feb 2008) $
+ * $Revision$ 
+ * $Date$
  *
  * This file is part of ***  M y C o R e  ***
  * See http://www.mycore.de/ for details.
@@ -35,6 +35,7 @@ import org.jdom.Document;
 import org.jdom.input.SAXBuilder;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
+import org.mycore.common.MCRCache;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 
@@ -45,6 +46,7 @@ import org.mycore.common.MCRException;
  * 
  * MCR.IFS2.MetadataStore.DocPortal_document.BaseDir=c:\\store
  * MCR.IFS2.MetadataStore.DocPortal_document.SlotLayout=4-2-2
+ * MCR.IFS2.MetadataStore.DocPortal_document.CacheSize=100
  * 
  * @author Frank Lützenkirchen
  */
@@ -65,6 +67,7 @@ public class MCRMetadataStore extends MCRStore
    
     // MCR.IFS2.MetadataStore.DocPortal_document.BaseDir=c:\\store
     // MCR.IFS2.MetadataStore.DocPortal_document.SlotLayout=4-2-2
+    // MCR.IFS2.MetadataStore.DocPortal_document.CacheSize=100
     
     String prefix = "MCR.IFS2.MetadataStore.";
     MCRConfiguration config = MCRConfiguration.instance();
@@ -76,7 +79,8 @@ public class MCRMetadataStore extends MCRStore
       String baseDir = prop.getProperty( key );
       String type = key.substring( prefix.length(), key.indexOf( ".BaseDir" ) );
       String slotLayout = config.getString( prefix + type + ".SlotLayout" );
-      new MCRMetadataStore( type, baseDir, slotLayout );
+      int cacheSize = config.getInt( prefix + type + ".CacheSize", 0 );
+      new MCRMetadataStore( type, baseDir, slotLayout, cacheSize );
     }
   }
   
@@ -88,18 +92,27 @@ public class MCRMetadataStore extends MCRStore
    */
   public static MCRMetadataStore getStore( String type )
   { return stores.get( type ); }
-    
+  
+  /**
+   * A cache of retrieved metadata objects. Cache size can be configured 
+   * by property MCR.IFS2.MetadataStore.<TYPE>.CacheSize, and may be 0 for 
+   * disabling the cache.
+   */
+  protected MCRCache cache;
+  
   /**
    * Creates a new metadata store instance. 
    * 
    * @param type the document type that is stored in this store
    * @param baseDir the base directory in the local filesystem storing the data
    * @param slotLayout the layout of slot subdirectories
+   * @param the cache size, to disable cache use a size of 0. 
    */
-  protected MCRMetadataStore( String type, String baseDir, String slotLayout )
+  protected MCRMetadataStore( String type, String baseDir, String slotLayout, int cacheSize )
   { 
     super( type, baseDir, slotLayout, type + "_", ".xml" ); 
     stores.put( type, this );
+    cache = new MCRCache( cacheSize, "Metadata cache for " + type );
   }
   
   /**
@@ -169,15 +182,40 @@ public class MCRMetadataStore extends MCRStore
   }
   
   /**
-   * Returns the XML document stored under the given ID
+   * Returns the XML document stored under the given ID. The result eventually comes
+   * from a cache, so you must not modify it, unless you request a copy of the cached version
    * 
    * @param id the ID of the XML document
+   * @param copy if true, make a copy of potentially cached version
    * @return the XML document stored under that ID, or null when there is no such document
    */
-  public Document retrieve( int id ) throws Exception
+  public Document retrieve( int id, boolean copy ) throws Exception
   {
     FileObject fo = getSlot( id );
     if( ! fo.exists() ) return null;
+    
+    if( cache.getCapacity() == 0 )  return readXML( fo );
+
+    Integer key = new Integer( id );
+    long time = fo.getContent().getLastModifiedTime();
+    Document xml = (Document)( cache.getIfUpToDate( key, time ) );
+      
+    if( xml == null )
+    {
+      xml = readXML( fo );
+      cache.put( key, xml );
+    }
+    return ( copy ? (Document)(xml.clone()) : xml );
+  }
+  
+  /**
+   * Reads the content of the given FileObject and returns it as XML document
+   * 
+   * @param fo the FileObject to read
+   * @return the parsed XML document
+   */
+  protected Document readXML( FileObject fo ) throws Exception
+  {
     InputStream in = fo.getContent().getInputStream();
     Document xml = new SAXBuilder().build( in );
     in.close();
@@ -193,6 +231,7 @@ public class MCRMetadataStore extends MCRStore
   {
     FileObject fo = getSlot( id );
     fo.delete();
+    cache.remove( new Integer( id ) );
   }
   
   /**
