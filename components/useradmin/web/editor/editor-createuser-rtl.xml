@@ -6,6 +6,8 @@
     <target type="servlet" name="MCRUserEditorServlet" method="post" format="xml" /> 
     <cancel url="{cancelUrl}" />
 
+    <validationMessage i18n="component.useradmin.common.validationMessage" />
+
     <components root="create-user-rtl" var="/mycoreuser">
         <include uri="webapp:editor/imports-common-user.xml" />
         <headline anchor="CENTER">
@@ -43,7 +45,9 @@
                 <text id="LPassword" i18n="component.useradmin.user.password.label" />
             </cell>
             <cell row="3" col="4" anchor="WEST" var="user/user.password" sortnr="2">
-                <password width="48" maxlength="128" />
+                <password id="userpw" width="48" maxlength="128" >
+					<condition id="Cuserid" required="true" i18n="component.useradmin.user.password.condition"/>
+				</password>
             </cell>
             
             <!-- *** Description *** -->
@@ -120,7 +124,11 @@
             <cell row="12" col="6" anchor="WEST">
                 <text id="LLastName" i18n="component.useradmin.user.lastname.label" />
             </cell>
-            <cell row="12" col="4" anchor="WEST" ref="TFzeile48" var="user/user.contact/contact.lastname" sortnr="7" />
+            <cell row="12" col="4" anchor="WEST" var="user/user.contact/contact.lastname" sortnr="7">
+				<textfield id="lastname" width="48" maxlength="48" >
+					<condition id="Clastname" required="true" i18n="component.useradmin.user.lastname.condition"/>
+				</textfield>
+            </cell>
 
             <!-- *** Street *** -->
             <cell row="13" col="6" anchor="WEST">
