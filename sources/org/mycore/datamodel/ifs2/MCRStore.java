@@ -302,7 +302,7 @@ public abstract class MCRStore
        * ascending or descending
        */
       boolean order;
-      
+ 
       /**
        * Initializes the enumeration and searches for the first ID to return
        * 
@@ -357,12 +357,34 @@ public abstract class MCRStore
         if( files.isEmpty() ) return 0;
     
         File first = files.remove( 0 );
-        if( first.getName().length() == idLength )
+        if( first.getName().length() == idLength + prefix.length() + suffix.length() )
           return MCRStore.this.slot2id( first.getName() );
     
         addChildren( first );
         return findNextID();
       }
     }.init( order );
+  }
+  
+  /**
+   * Deletes the data stored under the given ID from the store 
+   *
+   * @param id the ID of the document to be deleted
+   */
+  public void delete( int id ) throws Exception
+  {
+    FileObject fo = getSlot( id );
+    FileObject parent = fo.getParent();
+    fo.delete();
+
+    FileObject base = VFS.getManager().resolveFile( dir.getAbsolutePath() );
+    while( ! parent.equals( base ) )
+    {
+      FileObject[] children = parent.getChildren();
+      if( children.length > 0 ) break;
+      fo = parent;
+      parent = fo.getParent();
+      fo.delete();
+    }  
   }
 }

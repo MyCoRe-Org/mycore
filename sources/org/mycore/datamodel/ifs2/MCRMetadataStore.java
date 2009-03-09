@@ -222,15 +222,9 @@ public class MCRMetadataStore extends MCRStore
     return xml;
   }
   
-  /**
-   * Deletes the XML document with the given ID from the store 
-   *
-   * @param id the ID of the document to be deleted
-   */
   public void delete( int id ) throws Exception
   {
-    FileObject fo = getSlot( id );
-    fo.delete();
+    super.delete(id);
     cache.remove( new Integer( id ) );
   }
   
