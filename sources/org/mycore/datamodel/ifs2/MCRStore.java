@@ -326,15 +326,11 @@ public abstract class MCRStore
       private void addChildren( File dir )
       {
         String[] children = dir.list();
-        if( children == null ) return;
+        if( ( children == null ) || ( children.length == 0 ) ) return;
         
         Arrays.sort( children );
-        if( order )
-          for( int i = 0; i < children.length; i++ )
-            files.add( i, new File( dir, children[ i ] ) );
-        else
-          for( int i = children.length - 1; i >= 0; i-- )
-            files.add( i, new File( dir, children[ i ] ) );
+        for( int i = 0; i < children.length; i++ )
+          files.add( ( order ? i : 0 ), new File( dir, children[ i ] ) );
       }
 
       public boolean hasMoreElements()
