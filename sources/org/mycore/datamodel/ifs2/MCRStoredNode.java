@@ -23,6 +23,7 @@
 
 package org.mycore.datamodel.ifs2;
 
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.SortedMap;
@@ -31,6 +32,7 @@ import java.util.TreeMap;
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.VFS;
 import org.jdom.Element;
+import org.jdom.Namespace;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.datamodel.metadata.MCRMetaISO8601Date;
@@ -80,6 +82,8 @@ public abstract class MCRStoredNode extends MCRNode {
             ((MCRDirectory) parent).updateMetadata(this.getName(), this);
     }
 
+    private final static Namespace XMLNS = Namespace.getNamespace("xml", "http://www.w3.org/XML/1998/namespace");
+
     /**
      * Writes metadata of this node to the XML element given.
      * 
@@ -102,7 +106,7 @@ public abstract class MCRStoredNode extends MCRNode {
             while (it.hasNext()) {
                 String lang = it.next();
                 String label = labels.get(lang);
-                entry.addContent(new Element("label").setAttribute("lang", lang).setText(label));
+                entry.addContent(new Element("label").setAttribute("lang", lang, XMLNS).setText(label));
             }
         }
     }
@@ -117,7 +121,7 @@ public abstract class MCRStoredNode extends MCRNode {
     protected void readChildData(Element entry) throws Exception {
         labels.clear();
         for (Element label : (List<Element>) (entry.getChildren("label")))
-            labels.put(label.getAttributeValue("lang"), label.getTextTrim());
+            labels.put(label.getAttributeValue("lang", XMLNS), label.getTextTrim());
     }
 
     /**
@@ -137,9 +141,21 @@ public abstract class MCRStoredNode extends MCRNode {
         FileObject fNew = VFS.getManager().resolveFile(fo.getParent(), name);
         fo.moveTo(fNew);
         fo = fNew;
+        fo.getContent().setLastModifiedTime(System.currentTimeMillis());
 
         if (parent != null)
             ((MCRDirectory) parent).updateMetadata(oldName, this);
+    }
+
+    /**
+     * Sets last modification time of this file to a custom value.
+     * 
+     * @param time
+     *            the time to be stored as last modification time
+     */
+    public void setLastModified(Date time) throws Exception {
+        fo.getContent().setLastModifiedTime(time.getTime());
+        updateMetadata();
     }
 
     /**

@@ -57,6 +57,11 @@ public class MCRFile extends MCRStoredNode {
     protected String md5;
 
     /**
+     * The md5 checksum of the empty file
+     */
+    public final static String MD5_OF_EMPTY_FILE = "d41d8cd98f00b204e9800998ecf8427e";
+
+    /**
      * Returns a MCRFile object representing an existing file already stored in
      * the store.
      * 
@@ -80,7 +85,7 @@ public class MCRFile extends MCRStoredNode {
      */
     public MCRFile(MCRDirectory parent, String name) throws Exception {
         super(parent, VFS.getManager().resolveFile(parent.fo, name));
-        md5 = "d41d8cd98f00b204e9800998ecf8427e"; // md5 of empty file
+        md5 = MD5_OF_EMPTY_FILE;
         fo.createFile();
         updateMetadata();
     }
@@ -107,6 +112,7 @@ public class MCRFile extends MCRStoredNode {
      * this object itself.
      */
     protected void readChildData(Element entry) throws Exception {
+        super.readChildData(entry);
         md5 = entry.getAttributeValue("md5");
     }
 
@@ -131,17 +137,6 @@ public class MCRFile extends MCRStoredNode {
     public void delete() throws Exception {
         super.delete();
         fo.delete();
-    }
-
-    /**
-     * Sets last modification time of this file to a custom value.
-     * 
-     * @param time
-     *            the time to be stored as last modification time
-     */
-    public void setLastModified(long time) throws Exception {
-        fo.getContent().setLastModifiedTime(time);
-        updateMetadata();
     }
 
     /**
