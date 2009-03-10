@@ -41,7 +41,6 @@ import org.mycore.common.MCRException;
  * checksum String while content goes through this input stream.
  * 
  * @author Frank Lützenkirchen
- * @version $Revision$ $Date$
  */
 public class MCRContentInputStream extends FilterInputStream {
     /** The number of bytes that will be read for content type detection */
@@ -52,7 +51,7 @@ public class MCRContentInputStream extends FilterInputStream {
 
     /** The total number of bytes read so far */
     protected long length;
-    
+
     /** The header of the file read */
     protected byte[] header;
 
@@ -91,19 +90,16 @@ public class MCRContentInputStream extends FilterInputStream {
 
     public int read() throws IOException {
         int b;
-        
+
         // if current position is in header buffer, return value from there
-        if( ( header.length > 0 ) && ( length < header.length ) )
-        {
-          b = header[(int)length];
-          length++;
-        }
-        else
-        {
-          b = super.read();
-          if (b != -1) {
-              length++;
-          }
+        if ((header.length > 0) && (length < header.length)) {
+            b = header[(int) length];
+            length++;
+        } else {
+            b = super.read();
+            if (b != -1) {
+                length++;
+            }
         }
 
         return b;
@@ -111,21 +107,18 @@ public class MCRContentInputStream extends FilterInputStream {
 
     public int read(byte[] buf, int off, int len) throws IOException {
         // if current position is in header buffer, return bytes from there
-        if( ( header.length > 0 ) && ( length < header.length ) )
-        {
-          int numAvail = header.length - (int)length;
-          len = Math.min( len, numAvail );
-          System.arraycopy(header,(int)length,buf,off,len);
-          length += len;
-          return len;
-        }
-        else
-        {
-          len = super.read(buf, off, len);
-          if (len != -1) {
-              length += len;
-          }
-          return len;
+        if ((header.length > 0) && (length < header.length)) {
+            int numAvail = header.length - (int) length;
+            len = Math.min(len, numAvail);
+            System.arraycopy(header, (int) length, buf, off, len);
+            length += len;
+            return len;
+        } else {
+            len = super.read(buf, off, len);
+            if (len != -1) {
+                length += len;
+            }
+            return len;
         }
     }
 

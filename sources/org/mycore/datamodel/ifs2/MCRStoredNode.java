@@ -41,160 +41,162 @@ import org.mycore.datamodel.metadata.MCRMetaISO8601Date;
  * 
  * @author Frank Lützenkirchen
  */
-public abstract class MCRStoredNode extends MCRNode
-{
-  private final static String defaultLang = MCRConfiguration.instance().getString( "MCR.Metadata.DefaultLang", "en" ); 
-    
-  /**
-   * The optional labels of this node, in multiple languages.
-   * Key is the xml:lang language ID, value is the label in that language.
-   */
-  protected SortedMap<String,String> labels;
-  
-  /**
-   * Creates a new stored node instance
-   * 
-   * @param parent the parent directory containing this node
-   * @param fo the file object in local filesystem representing this node
-   */
-  protected MCRStoredNode( MCRDirectory parent, FileObject fo ) throws Exception
-  { 
-    super( parent, fo );
-    labels = new TreeMap<String,String>();
-  }
+public abstract class MCRStoredNode extends MCRNode {
+    private final static String defaultLang = MCRConfiguration.instance().getString("MCR.Metadata.DefaultLang", "en");
 
-  /**
-   * Deletes this node with all its data and children
-   */
-  public void delete() throws Exception
-  { 
-    if( parent != null ) 
-     ((MCRDirectory)parent).removeMetadata( this );
-  }
-  
-  /**
-   * Called when metadata of this node was changed, to notify the
-   * parent directory to update its own metadata file 
-   */
-  protected void updateMetadata() throws Exception
-  {
-    if( parent != null )
-      ((MCRDirectory)parent).updateMetadata( this.getName(), this ); 
-  }
+    /**
+     * The optional labels of this node, in multiple languages. Key is the
+     * xml:lang language ID, value is the label in that language.
+     */
+    protected SortedMap<String, String> labels;
 
-  /**
-   * Writes metadata of this node to the XML element given.
-   * 
-   * @param entry the XML element holding the metadata of this node
-   */
-  protected void writeChildData( Element entry ) throws Exception
-  {
-    entry.setAttribute( "name", this.getName() );
-
-    entry.setAttribute( "numChildren", String.valueOf( this.getNumChildren() ) );
-    
-    MCRMetaISO8601Date date = new MCRMetaISO8601Date();
-    date.setDate( this.getLastModified() );
-    date.setFormat( MCRMetaISO8601Date.IsoFormat.COMPLETE_HH_MM_SS );
-    entry.setAttribute( "lastModified", date.getISOString() );
-    
-    entry.removeChildren( "label" );
-    if( ! labels.isEmpty() )
-    {
-      Iterator<String> it = labels.keySet().iterator();
-      while( it.hasNext() )
-      {
-        String lang = it.next();  
-        String label = labels.get( lang );
-        entry.addContent( new Element( "label" ).setAttribute( "lang", lang ).setText( label ) );
-      }
+    /**
+     * Creates a new stored node instance
+     * 
+     * @param parent
+     *            the parent directory containing this node
+     * @param fo
+     *            the file object in local filesystem representing this node
+     */
+    protected MCRStoredNode(MCRDirectory parent, FileObject fo) throws Exception {
+        super(parent, fo);
+        labels = new TreeMap<String, String>();
     }
-  }
 
-  /**
-   * Reads metadata of this node from a stored XML element coming from the 
-   * parent directory
-   * 
-   * @param entry the XML element holding this node's metadata
-   */
-  protected void readChildData( Element entry ) throws Exception
-  { 
-    labels.clear();
-    for( Element label : (List<Element>)( entry.getChildren( "label" ) ) )
-      labels.put( label.getAttributeValue( "lang" ), label.getTextTrim() );  
-  }
+    /**
+     * Deletes this node with all its data and children
+     */
+    public void delete() throws Exception {
+        if (parent != null)
+            ((MCRDirectory) parent).removeMetadata(this);
+    }
 
-  /**
-   * Repairs metadata of this node by rebuilding it from the underlying filesystem
-   */
-  protected abstract void repairMetadata() throws Exception;
+    /**
+     * Called when metadata of this node was changed, to notify the parent
+     * directory to update its own metadata file
+     */
+    protected void updateMetadata() throws Exception {
+        if (parent != null)
+            ((MCRDirectory) parent).updateMetadata(this.getName(), this);
+    }
 
-  /**
-   * Renames this node.
-   * 
-   * @param name the new file name
-   */
-  public void renameTo( String name ) throws Exception
-  {
-    String oldName = getName();
-    FileObject fNew = VFS.getManager().resolveFile( fo.getParent(), name ); 
-    fo.moveTo( fNew );
-    fo = fNew;
-    
-    if( parent != null )
-      ((MCRDirectory)parent).updateMetadata( oldName, this );
-  }
-  
-  /**
-   * Sets a label for this node
-   *  
-   * @param lang the xml:lang language ID
-   * @param label the label in this language
-   */
-  public void setLabel( String lang, String label ) throws Exception
-  { 
-    labels.put( lang, label ); 
-    updateMetadata();
-  }
+    /**
+     * Writes metadata of this node to the XML element given.
+     * 
+     * @param entry
+     *            the XML element holding the metadata of this node
+     */
+    protected void writeChildData(Element entry) throws Exception {
+        entry.setAttribute("name", this.getName());
 
-  /**
-   * Removes all labels set
-   */
-  public void clearLabels() throws Exception
-  {
-    labels.clear();
-    updateMetadata();
-  }
+        entry.setAttribute("numChildren", String.valueOf(this.getNumChildren()));
 
-  /**
-   * Returns all labels, sorted by xml:lang
-   */
-  public SortedMap<String,String> getLabels()
-  { return labels; }
+        MCRMetaISO8601Date date = new MCRMetaISO8601Date();
+        date.setDate(this.getLastModified());
+        date.setFormat(MCRMetaISO8601Date.IsoFormat.COMPLETE_HH_MM_SS);
+        entry.setAttribute("lastModified", date.getISOString());
 
-  /**
-   * Returns the label in the given language
-   * 
-   * @param lang the xml:lang langauge ID
-   * @return the label, or null if there is no label for that language
-   */
-  public String getLabel( String lang )
-  { return labels.get( lang ); }
-  
-  /**
-   * Returns the label in the current language, otherwise in default language,
-   * otherwise the first label defined, if any at all.
-   * 
-   * @return the label
-   */
-  public String getCurrentLabel()
-  {
-    if( labels.isEmpty() ) return null;
-    String lang = MCRSessionMgr.getCurrentSession().getCurrentLanguage();
-    String label = labels.get( lang );
-    if( label != null ) return label;
-    label = labels.get( defaultLang );
-    if( label != null ) return label;
-    return labels.get( labels.firstKey() );
-  }
+        entry.removeChildren("label");
+        if (!labels.isEmpty()) {
+            Iterator<String> it = labels.keySet().iterator();
+            while (it.hasNext()) {
+                String lang = it.next();
+                String label = labels.get(lang);
+                entry.addContent(new Element("label").setAttribute("lang", lang).setText(label));
+            }
+        }
+    }
+
+    /**
+     * Reads metadata of this node from a stored XML element coming from the
+     * parent directory
+     * 
+     * @param entry
+     *            the XML element holding this node's metadata
+     */
+    protected void readChildData(Element entry) throws Exception {
+        labels.clear();
+        for (Element label : (List<Element>) (entry.getChildren("label")))
+            labels.put(label.getAttributeValue("lang"), label.getTextTrim());
+    }
+
+    /**
+     * Repairs metadata of this node by rebuilding it from the underlying
+     * filesystem
+     */
+    protected abstract void repairMetadata() throws Exception;
+
+    /**
+     * Renames this node.
+     * 
+     * @param name
+     *            the new file name
+     */
+    public void renameTo(String name) throws Exception {
+        String oldName = getName();
+        FileObject fNew = VFS.getManager().resolveFile(fo.getParent(), name);
+        fo.moveTo(fNew);
+        fo = fNew;
+
+        if (parent != null)
+            ((MCRDirectory) parent).updateMetadata(oldName, this);
+    }
+
+    /**
+     * Sets a label for this node
+     * 
+     * @param lang
+     *            the xml:lang language ID
+     * @param label
+     *            the label in this language
+     */
+    public void setLabel(String lang, String label) throws Exception {
+        labels.put(lang, label);
+        updateMetadata();
+    }
+
+    /**
+     * Removes all labels set
+     */
+    public void clearLabels() throws Exception {
+        labels.clear();
+        updateMetadata();
+    }
+
+    /**
+     * Returns all labels, sorted by xml:lang
+     */
+    public SortedMap<String, String> getLabels() {
+        return labels;
+    }
+
+    /**
+     * Returns the label in the given language
+     * 
+     * @param lang
+     *            the xml:lang langauge ID
+     * @return the label, or null if there is no label for that language
+     */
+    public String getLabel(String lang) {
+        return labels.get(lang);
+    }
+
+    /**
+     * Returns the label in the current language, otherwise in default language,
+     * otherwise the first label defined, if any at all.
+     * 
+     * @return the label
+     */
+    public String getCurrentLabel() {
+        if (labels.isEmpty())
+            return null;
+        String lang = MCRSessionMgr.getCurrentSession().getCurrentLanguage();
+        String label = labels.get(lang);
+        if (label != null)
+            return label;
+        label = labels.get(defaultLang);
+        if (label != null)
+            return label;
+        return labels.get(labels.firstKey());
+    }
 }

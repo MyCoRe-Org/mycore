@@ -37,7 +37,6 @@ import java.io.InputStream;
  * @see BufferedInputStream
  * 
  * @author Frank Lützenkirchen
- * @version $Revision$ $Date$
  */
 public class MCRBlockingInputStream extends BufferedInputStream {
     /**

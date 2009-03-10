@@ -28,119 +28,124 @@ import java.util.Date;
 import org.jdom.Document;
 
 /**
- * Provides information about a stored version of metadata 
- * and allows to retrieve that version from SVN
+ * Provides information about a stored version of metadata and allows to
+ * retrieve that version from SVN
  * 
  * @author Frank Lützenkirchen
  */
-public class MCRMetadataVersion 
-{
-  /**
-   * The store this version comes from
-   */
-  private MCRVersioningMetadataStore store;  
-    
-  /**
-   * The ID of the metadata document this version belongs to 
-   */
-  private int id;
-    
-  /** 
-   * The revision number of this version
-   */
-  private int revision;
-  
-  /**
-   * The user that created this version
-   */
-  private String user;
-  
-  /**
-   * The date this version was created
-   */
-  private Date date;
-  
-  /**
-   * If true, this version is a deletion of the metadata 
-   */
-  private boolean deleted;
-    
-  /**
-   * Creates a new metadata version info object
-   * 
-   * @param id the ID of the metadata document this version belongs to
-   */
-  MCRMetadataVersion( int id, MCRVersioningMetadataStore store )
-  {
-    this.id = id;
-    this.store = store;
-  }
-  
-  /**
-   * Returns the ID of the metadata object this version belongs to
-   * 
-   * @return the ID of the metadata object this version belongs to
-   */
-  public int getID()
-  { return id; }
-  
-  /**
-   * Returns the store this version comes from
-   */
-  public MCRVersioningMetadataStore getStore()
-  { return store; }
-  
-  /**
-   * Returns the SVN revision number of this version
-   * 
-   * @return the SVN revision number of this version
-   */
-  public int getRevision()
-  { return revision; }
-  
-  /**
-   * Returns the user that created this version
-   * 
-   * @return the user that created this version
-   */
-  public String getUser()
-  { return user; }
-  
-  /**
-   * Returns the date and time this version was created
-   * 
-   * @return the date and time this version was created
-   */
-  public Date getDate()
-  { return date; }
-  
-  /**
-   * If true, this version is a deletion of the metadata
-   * 
-   * @return true, if this version is a deletion
-   */
-  public boolean isDeleted()
-  { return deleted; }
-  
-  /**
-   * Retrieves this version of the metadata
-   * 
-   * @return the metadata document as it was in this version
-   */
-  public Document retrieve()
-  {
-    if( deleted ) return null;
-    return new Document(); 
-  }
-  
-  /**
-   * Replaces the current version of the metadata object with this version,
-   * which means that a new version is created that is identical to this old version.
-   * The stored metadata document is updated to the old version of the metadata. 
-   */
-  public void replaceCurrentVersion() throws Exception
-  {
-    Document xml = retrieve();
-    store.update( xml, id );  
-  }
+public class MCRMetadataVersion {
+    /**
+     * The store this version comes from
+     */
+    private MCRVersioningMetadataStore store;
+
+    /**
+     * The ID of the metadata document this version belongs to
+     */
+    private int id;
+
+    /**
+     * The revision number of this version
+     */
+    private int revision;
+
+    /**
+     * The user that created this version
+     */
+    private String user;
+
+    /**
+     * The date this version was created
+     */
+    private Date date;
+
+    /**
+     * If true, this version is a deletion of the metadata
+     */
+    private boolean deleted;
+
+    /**
+     * Creates a new metadata version info object
+     * 
+     * @param id
+     *            the ID of the metadata document this version belongs to
+     */
+    MCRMetadataVersion(int id, MCRVersioningMetadataStore store) {
+        this.id = id;
+        this.store = store;
+    }
+
+    /**
+     * Returns the ID of the metadata object this version belongs to
+     * 
+     * @return the ID of the metadata object this version belongs to
+     */
+    public int getID() {
+        return id;
+    }
+
+    /**
+     * Returns the store this version comes from
+     */
+    public MCRVersioningMetadataStore getStore() {
+        return store;
+    }
+
+    /**
+     * Returns the SVN revision number of this version
+     * 
+     * @return the SVN revision number of this version
+     */
+    public int getRevision() {
+        return revision;
+    }
+
+    /**
+     * Returns the user that created this version
+     * 
+     * @return the user that created this version
+     */
+    public String getUser() {
+        return user;
+    }
+
+    /**
+     * Returns the date and time this version was created
+     * 
+     * @return the date and time this version was created
+     */
+    public Date getDate() {
+        return date;
+    }
+
+    /**
+     * If true, this version is a deletion of the metadata
+     * 
+     * @return true, if this version is a deletion
+     */
+    public boolean isDeleted() {
+        return deleted;
+    }
+
+    /**
+     * Retrieves this version of the metadata
+     * 
+     * @return the metadata document as it was in this version
+     */
+    public Document retrieve() {
+        if (deleted)
+            return null;
+        return new Document();
+    }
+
+    /**
+     * Replaces the current version of the metadata object with this version,
+     * which means that a new version is created that is identical to this old
+     * version. The stored metadata document is updated to the old version of
+     * the metadata.
+     */
+    public void replaceCurrentVersion() throws Exception {
+        Document xml = retrieve();
+        store.update(xml, id);
+    }
 }

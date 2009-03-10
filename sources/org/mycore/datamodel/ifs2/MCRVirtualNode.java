@@ -26,26 +26,29 @@ package org.mycore.datamodel.ifs2;
 import org.apache.commons.vfs.FileObject;
 
 /**
- * A virtual node in a file collection, which may be a child node of a 
- * container file type like zip or tar. Such files can be browsed and read
- * using this node type.
+ * A virtual node in a file collection, which may be a child node of a container
+ * file type like zip or tar. Such files can be browsed and read using this node
+ * type.
  * 
  * @author Frank Lützenkirchen
  */
-public class MCRVirtualNode extends MCRNode
-{
-  /**
-   * Creates a new virtual node
-   * 
-   * @param parent the parent node containing this node
-   * @param fo the file object in Apache VFS representing this node
-   */
-  protected MCRVirtualNode( MCRNode parent, FileObject fo )
-  { super( parent, fo ); }
+public class MCRVirtualNode extends MCRNode {
+    /**
+     * Creates a new virtual node
+     * 
+     * @param parent
+     *            the parent node containing this node
+     * @param fo
+     *            the file object in Apache VFS representing this node
+     */
+    protected MCRVirtualNode(MCRNode parent, FileObject fo) {
+        super(parent, fo);
+    }
 
-  /**
-   * Returns a virtual node that is a child of this virtual node.
-   */
-  protected MCRVirtualNode buildChildNode( FileObject fo ) throws Exception
-  { return new MCRVirtualNode( this, fo ); }
+    /**
+     * Returns a virtual node that is a child of this virtual node.
+     */
+    protected MCRVirtualNode buildChildNode(FileObject fo) throws Exception {
+        return new MCRVirtualNode(this, fo);
+    }
 }
