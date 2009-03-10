@@ -104,7 +104,9 @@ public class MCRDirectory extends MCRStoredNode {
      * @return an MCRFile or MCRDirectory child
      */
     protected MCRStoredNode buildChildNode(FileObject fo) throws Exception {
-        if (fo.getType().equals(FileType.FILE))
+        if (fo == null)
+            return null;
+        else if (fo.getType().equals(FileType.FILE))
             return new MCRFile(this, fo);
         else
             return new MCRDirectory(this, fo);
