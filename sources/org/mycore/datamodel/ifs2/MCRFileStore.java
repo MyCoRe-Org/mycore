@@ -127,21 +127,19 @@ public class MCRFileStore extends MCRStore {
     }
 
     /**
-     * Returns the file collection stored under the given ID.
+     * Returns the file collection stored under the given ID, or null when no
+     * collection is stored for the given ID.
      * 
      * @param id
      *            the file collection's ID
-     * @return the file collection with the given ID
-     * @throws Exception
-     *             when a collection with that ID does not exist
+     * @return the file collection with the given ID, or null
      */
     public MCRFileCollection retrieve(int id) throws Exception {
         FileObject fo = getSlot(id);
-        if (!fo.exists()) {
-            String msg = "FileCollection with ID " + id + " does not exist";
-            throw new MCRException(msg);
-        }
-        return new MCRFileCollection(this, id, getSlot(id), false);
+        if (!fo.exists())
+            return null;
+        else
+            return new MCRFileCollection(this, id, getSlot(id), false);
     }
 
     /**
