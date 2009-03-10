@@ -127,7 +127,7 @@ public class MCRMetadataStoreTest extends MCRTestCase {
         assertEquals(xml1.toString(), xml2.toString());
     }
 
-    public void testGetLastModified() throws Exception {
+    public void testLastModified() throws Exception {
         Document xml1 = new Document(new Element("root"));
         Date date1 = new Date();
         synchronized (this) {
@@ -142,6 +142,10 @@ public class MCRMetadataStoreTest extends MCRTestCase {
         Document xml2 = new Document(new Element("root"));
         sm.update(xml2);
         assertTrue(sm.getLastModified().after(date2));
+        Date date = new Date(2009, 1, 1);
+        sm.setLastModified(date);
+        sm = store.retrieve(sm.getID());
+        assertEquals(sm.getLastModified(), date);
     }
 
     public void testExists() throws Exception {
