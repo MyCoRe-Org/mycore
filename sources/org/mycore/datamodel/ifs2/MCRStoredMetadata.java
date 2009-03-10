@@ -34,53 +34,62 @@ import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 
 /**
+ * Represents an XML metadata document that is stored in MCRMetadataStore.
+ * 
  * @author Frank Lützenkirchen
  */
 public class MCRStoredMetadata {
-    
+
+    /** The ID of the metadata document */
     protected int id;
+
+    /** The file object in local filesystem storing the data */
     protected FileObject fo;
+
+    /** The store this document is stored in */
     protected MCRMetadataStore store;
-    
-    MCRStoredMetadata( MCRMetadataStore store, FileObject fo, int id )
-    {
-      this.store = store;
-      this.id = id;
-      this.fo = fo;
+
+    /**
+     * Creates a new stored metadata object
+     * 
+     * @param store
+     *            the store this document is stored in
+     * @param fo
+     *            the file object storing the data
+     * @param id
+     *            the ID of the metadata document
+     */
+    MCRStoredMetadata(MCRMetadataStore store, FileObject fo, int id) {
+        this.store = store;
+        this.id = id;
+        this.fo = fo;
     }
-    
-    public Document getXML() throws Exception
-    {
-      InputStream in = fo.getContent().getInputStream();
-      Document xml = new SAXBuilder().build(in);
-      in.close();
-      return xml;
+
+    /**
+     * Creates a new local file to save XML to
+     * 
+     * @param xml
+     *            the XML to save to a new file
+     */
+    void create(Document xml) throws Exception {
+        fo.createFile();
+        save(xml);
     }
-    
-    public int getID()
-    {
-      return id;
+
+    /**
+     * Saves the given XML to the internal file object
+     * 
+     * @param xml
+     *            the XML to save
+     */
+    void save(Document xml) throws Exception {
+        OutputStream out = fo.getContent().getOutputStream();
+        XMLOutputter xout = new XMLOutputter();
+        xout.setFormat(Format.getPrettyFormat().setEncoding("UTF-8").setIndent("  "));
+        xout.output(xml, out);
+        out.close();
     }
-    
-    public MCRMetadataStore getStore()
-    { return store; }
-    
-    public Date getLastModified() throws Exception
-    {
-        long time = fo.getContent().getLastModifiedTime();
-        return new Date(time);
-    }
-    
-    public void setLastModified( Date date ) throws Exception
-    {
-        fo.getContent().setLastModifiedTime( date.getTime() );
-    }
-    
-    public void delete() throws Exception
-    {
-        store.delete(id);
-    }
-    
+
     /**
      * Updates the stored XML document
      * 
@@ -90,17 +99,64 @@ public class MCRStoredMetadata {
     public void update(Document xml) throws Exception {
         save(xml);
     }
-    
-    void create(Document xml) throws Exception {
-        fo.createFile();
-        save(xml);
+
+    /**
+     * Returns the stored XML document
+     * 
+     * @return the stored XML document
+     */
+    public Document getXML() throws Exception {
+        InputStream in = fo.getContent().getInputStream();
+        Document xml = new SAXBuilder().build(in);
+        in.close();
+        return xml;
     }
-    
-    void save(Document xml) throws Exception {
-        OutputStream out = fo.getContent().getOutputStream();
-        XMLOutputter xout = new XMLOutputter();
-        xout.setFormat(Format.getPrettyFormat().setEncoding("UTF-8").setIndent("  "));
-        xout.output(xml, out);
-        out.close();
+
+    /**
+     * Returns the ID of this metadata document
+     * 
+     * @return the ID of this metadata document
+     */
+    public int getID() {
+        return id;
+    }
+
+    /**
+     * Returns the store this metadata document is stored in
+     * 
+     * @return the store this metadata document is stored in
+     */
+    public MCRMetadataStore getStore() {
+        return store;
+    }
+
+    /**
+     * Returns the date this metadata document was last modified
+     * 
+     * @return the date this metadata document was last modified
+     */
+    public Date getLastModified() throws Exception {
+        long time = fo.getContent().getLastModifiedTime();
+        return new Date(time);
+    }
+
+    /**
+     * Sets the date this metadata document was last modified
+     * 
+     * @param date
+     *            the date this metadata document was last modified
+     */
+    public void setLastModified(Date date) throws Exception {
+        fo.getContent().setLastModifiedTime(date.getTime());
+    }
+
+    /**
+     * Deletes the metadata document. This object is invalid afterwards, do not
+     * use it any more.
+     * 
+     * @throws Exception
+     */
+    public void delete() throws Exception {
+        store.delete(id);
     }
 }
