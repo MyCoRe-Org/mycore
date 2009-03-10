@@ -126,9 +126,8 @@ public class MCRMetadataStore extends MCRStore {
             throw new MCRException(msg);
         }
         fo.createFile();
-        MCRStoredMetadata meta = new MCRStoredMetadata(this,fo,id);
-        fo.createFile();
-        meta.save(xml);
+        MCRStoredMetadata meta = new MCRStoredMetadata(this, fo, id);
+        meta.create(xml);
         return meta;
     }
 
@@ -137,13 +136,14 @@ public class MCRMetadataStore extends MCRStore {
      * 
      * @param id
      *            the ID of the XML document
-     * @return the metadata stored under that ID, or null when there is no
-     *         such metadata object
+     * @return the metadata stored under that ID, or null when there is no such
+     *         metadata object
      */
     public MCRStoredMetadata retrieve(int id) throws Exception {
         FileObject fo = getSlot(id);
         if (!fo.exists())
             return null;
-        else return new MCRStoredMetadata( this, fo, id );
+        else
+            return new MCRStoredMetadata(this, fo, id);
     }
 }

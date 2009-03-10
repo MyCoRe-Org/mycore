@@ -38,9 +38,9 @@ import org.jdom.output.XMLOutputter;
  */
 public class MCRStoredMetadata {
     
-    private int id;
-    private FileObject fo;
-    private MCRMetadataStore store;
+    protected int id;
+    protected FileObject fo;
+    protected MCRMetadataStore store;
     
     MCRStoredMetadata( MCRMetadataStore store, FileObject fo, int id )
     {
@@ -88,6 +88,11 @@ public class MCRStoredMetadata {
      *            the XML document to be stored
      */
     public void update(Document xml) throws Exception {
+        save(xml);
+    }
+    
+    void create(Document xml) throws Exception {
+        fo.createFile();
         save(xml);
     }
     
