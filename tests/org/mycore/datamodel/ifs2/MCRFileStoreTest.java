@@ -44,7 +44,7 @@ import org.mycore.common.MCRTestCase;
 public class MCRFileStoreTest extends MCRTestCase {
 
     private static String path;
-    
+
     private MCRFileStore store;
 
     protected void setUp() throws Exception {

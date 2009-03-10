@@ -46,8 +46,9 @@ import org.mycore.common.MCRUtils;
 public class MCRFileTest extends MCRTestCase {
 
     private static String path;
-    
+
     private MCRFileStore store;
+
     private MCRFileCollection col;
 
     protected void setUp() throws Exception {
