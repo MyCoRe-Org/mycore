@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.StringTokenizer;
 
 import org.apache.commons.vfs.FileObject;
+import org.apache.commons.vfs.Selectors;
 import org.apache.commons.vfs.VFS;
 import org.mycore.common.MCRConfigurationException;
 
@@ -373,7 +374,7 @@ public abstract class MCRStore {
     public void delete(int id) throws Exception {
         FileObject fo = getSlot(id);
         FileObject parent = fo.getParent();
-        fo.delete();
+        fo.delete(Selectors.SELECT_ALL);
 
         FileObject base = VFS.getManager().resolveFile(dir.getAbsolutePath());
         while (!parent.equals(base)) {
