@@ -99,15 +99,6 @@ public class MCRFileCollection extends MCRDirectory {
     }
 
     /**
-     * Returns the empty String
-     * 
-     * @return the empty String
-     */
-    public String getPath() {
-        return "";
-    }
-
-    /**
      * Returns this object, because the FileCollection instance is the root of
      * all files and directories contained in the collection.
      * 

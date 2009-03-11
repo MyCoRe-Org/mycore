@@ -82,7 +82,13 @@ public abstract class MCRNode {
      * @throws Exception
      */
     public String getPath() throws Exception {
-        return parent.getPath() + "/" + getName();
+        if (parent != null)
+            if (parent.parent == null)
+                return "/" + getName();
+            else
+                return parent.getPath() + "/" + getName();
+        else
+            return "/";
     }
 
     /**
