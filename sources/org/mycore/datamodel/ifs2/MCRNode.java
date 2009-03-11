@@ -262,14 +262,14 @@ public abstract class MCRNode {
     public MCRNode getNodeByPath(String path) throws Exception {
         MCRNode current = path.startsWith("/") ? getRoot() : this;
         StringTokenizer st = new StringTokenizer(path, "/");
-        while ((current != null) && st.hasMoreTokens()) {
+        while (st.hasMoreTokens() && (current != null)) {
             String name = st.nextToken();
             if (name.equals("."))
                 continue;
             else if (name.equals(".."))
-                current = parent;
+                current = current.getParent();
             else
-                current = getChild(name);
+                current = current.getChild(name);
         }
         return current;
     }
