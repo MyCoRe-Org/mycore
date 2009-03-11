@@ -126,7 +126,7 @@ public class MCRMetadataStore extends MCRStore {
             throw new MCRException(msg);
         }
         fo.createFile();
-        MCRStoredMetadata meta = new MCRStoredMetadata(this, fo, id);
+        MCRStoredMetadata meta = buildMetadataObject(fo, id);
         meta.create(xml);
         return meta;
     }
@@ -144,6 +144,18 @@ public class MCRMetadataStore extends MCRStore {
         if (!fo.exists())
             return null;
         else
-            return new MCRStoredMetadata(this, fo, id);
+            return buildMetadataObject(fo, id);
+    }
+
+    /**
+     * Builds a new stored metadata object in this store
+     * 
+     * @param fo
+     *            the FileObject that stores the data
+     * @param id
+     *            the ID of the metadata object
+     */
+    protected MCRStoredMetadata buildMetadataObject(FileObject fo, int id) {
+        return new MCRStoredMetadata(this, fo, id);
     }
 }
