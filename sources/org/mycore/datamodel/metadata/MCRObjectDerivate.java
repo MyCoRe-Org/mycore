@@ -28,17 +28,19 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
+import org.jdom.Element;
 import org.mycore.common.MCRException;
 
 /**
  * This class implements all methode for handling one derivate data.
  * 
  * @author Jens Kupferschmidt
- * @version $Revision$ $Date$
+ * @version $Revision$ $Date: 2008-02-06 18:27:24 +0100 (Mi, 06. Feb
+ *          2008) $
  */
 public class MCRObjectDerivate {
-    
-    private static final Logger LOGGER=Logger.getLogger(MCRObjectDerivate.class);
+
+    private static final Logger LOGGER = Logger.getLogger(MCRObjectDerivate.class);
 
     // derivate data
     private MCRMetaLinkID linkmeta = null;
@@ -48,6 +50,9 @@ public class MCRObjectDerivate {
     private MCRMetaIFS internals = null;
 
     private ArrayList<MCRMetaLangText> titles = null;
+
+    private ArrayList<Element> files;
+
     /**
      * This is the constructor of the MCRObjectDerivate class. All data are set
      * to null.
@@ -57,6 +62,7 @@ public class MCRObjectDerivate {
         externals = new ArrayList<MCRMetaLink>();
         internals = null;
         titles = new ArrayList<MCRMetaLangText>();
+        files = new ArrayList();
     }
 
     /**
@@ -68,11 +74,12 @@ public class MCRObjectDerivate {
      */
     public final void setFromDOM(org.jdom.Element derivate_element) {
         // Link to Metadata part
-        org.jdom.Element linkmeta_element = derivate_element.getChild("linkmetas").getChild("linkmeta");
+        org.jdom.Element linkmeta_element = derivate_element.getChild("linkmetas").getChild(
+                "linkmeta");
         MCRMetaLinkID link = new MCRMetaLinkID();
         link.setDataPart("linkmeta");
         link.setFromDOM(linkmeta_element);
-        linkmeta=link;
+        linkmeta = link;
 
         // External part
         org.jdom.Element externals_element = derivate_element.getChild("externals");
@@ -99,7 +106,7 @@ public class MCRObjectDerivate {
                 internals.setFromDOM(internal_element);
             }
         }
-        
+
         // Title part
         org.jdom.Element titles_element = derivate_element.getChild("titles");
         titles.clear();
@@ -114,20 +121,47 @@ public class MCRObjectDerivate {
                 if (text.isValid()) {
                     titles.add(text);
                 }
-            }            
+            }
+        }
+
+        // fileset part
+        Element filesetElements = derivate_element.getChild("fileset");
+        if (filesetElements != null) {
+            List<Element> filesInList = filesetElements.getChildren();
+            for (int i = 0; i < filesInList.size(); i++) {
+                Element currentFromList = filesInList.get(i);
+                Element file = new Element("file");
+                Element urn = new Element("urn");
+
+                String value = currentFromList.getAttributeValue("name");
+                if (value != null){
+                    file.setAttribute("name", value);
+                    value = null;
+                }
+                
+                value = currentFromList.getAttributeValue("ifsid");
+                if (value != null){
+                    file.setAttribute("ifsid", value);
+                    value = null;
+                }
+
+                urn.addContent(currentFromList.getChild("urn").getText());
+
+                file.addContent(urn);
+                this.files.add(file);
+            }
         }
     }
 
     /**
      * This method return the size of the linkmeta array.
+     * 
      * @deprecated
      * @see #getMetaLink()
      */
     /**
-    public final int getLinkMetaSize() {
-        return 0;
-    }
-*/
+     * public final int getLinkMetaSize() { return 0; }
+     */
 
     /**
      * This method get a single link from the linkmeta list as a
@@ -140,16 +174,15 @@ public class MCRObjectDerivate {
      * @return a metadata link as MCRMetaLinkID
      */
     /**
-    public final MCRMetaLinkID getLinkMeta(int index) throws IndexOutOfBoundsException {
-        if ((index != 0)) {
-            throw new IndexOutOfBoundsException("Index error in getLinkMeta.");
-        }
-        return getMetaLink();
-    }
-    */
+     * public final MCRMetaLinkID getLinkMeta(int index) throws
+     * IndexOutOfBoundsException { if ((index != 0)) { throw new
+     * IndexOutOfBoundsException("Index error in getLinkMeta."); } return
+     * getMetaLink(); }
+     */
 
     /**
      * returns link to the MCRObject.
+     * 
      * @return a metadata link as MCRMetaLinkID
      */
     public MCRMetaLinkID getMetaLink() {
@@ -163,7 +196,7 @@ public class MCRObjectDerivate {
      *            the MCRMetaLinkID object
      */
     public final void setLinkMeta(MCRMetaLinkID in_link) {
-        linkmeta=in_link;
+        linkmeta = in_link;
     }
 
     /**
@@ -182,7 +215,8 @@ public class MCRObjectDerivate {
      */
     public final MCRMetaLink getExternal(int index) throws IndexOutOfBoundsException {
         if ((index < 0) || (index > externals.size())) {
-            throw new IndexOutOfBoundsException("Index error in getExternal("+Integer.toString(index)+").");
+            throw new IndexOutOfBoundsException("Index error in getExternal("
+                    + Integer.toString(index) + ").");
         }
 
         return externals.get(index);
@@ -204,7 +238,8 @@ public class MCRObjectDerivate {
      */
     public final MCRMetaLangText getTitle(int index) throws IndexOutOfBoundsException {
         if ((index < 0) || (index > titles.size())) {
-            throw new IndexOutOfBoundsException("Index error in getTitle("+Integer.toString(index)+").");
+            throw new IndexOutOfBoundsException("Index error in getTitle("
+                    + Integer.toString(index) + ").");
         }
 
         return titles.get(index);
@@ -280,7 +315,14 @@ public class MCRObjectDerivate {
             }
             elm.addContent(titEl);
         }
-        
+
+        if (files.size() != 0) {
+            Element fileset = new Element("fileset");
+            for (int i = 0; i < files.size(); i++) {
+                fileset.addContent(files.get(i));
+            }
+            elm.addContent(fileset);
+        }
         return elm;
     }
 
@@ -295,11 +337,11 @@ public class MCRObjectDerivate {
      * @return a boolean value
      */
     public final boolean isValid() {
-        if (linkmeta == null){
+        if (linkmeta == null) {
             LOGGER.warn("linkmeta == null");
             return false;
         }
-        if (!linkmeta.getXLinkType().equals("locator")){
+        if (!linkmeta.getXLinkType().equals("locator")) {
             LOGGER.warn("linkmeta type != locator");
             return false;
         }
