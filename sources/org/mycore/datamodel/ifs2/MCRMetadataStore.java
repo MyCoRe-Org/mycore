@@ -30,6 +30,7 @@ import java.util.Properties;
 import org.apache.commons.vfs.FileObject;
 import org.jdom.Document;
 import org.mycore.common.MCRConfiguration;
+import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRException;
 
 /**
@@ -40,6 +41,12 @@ import org.mycore.common.MCRException;
  * MCR.IFS2.MetadataStore.DocPortal_document.BaseDir=c:\\store
  * MCR.IFS2.MetadataStore.DocPortal_document.SlotLayout=4-2-2
  * 
+ * For a versioning store subclass, define the URL of a local SVN repository. If
+ * it does not exist yet, it will be created automatically.
+ * 
+ * MCR.IFS2.MetadataStore.DocPortal_document.SVNRepositoryURL=
+ * file:///c:/storesvn
+ * 
  * @author Frank Lützenkirchen
  */
 public class MCRMetadataStore extends MCRStore {
@@ -47,39 +54,31 @@ public class MCRMetadataStore extends MCRStore {
      * Map of defined metadata stores. Key is the document type, value is the
      * store storing documents of that type.
      */
-    private static HashMap<String, MCRMetadataStore> stores;
+    private static HashMap<String, MCRMetadataStore> stores = new HashMap<String, MCRMetadataStore>();
 
     /**
-     * Reads configuration and initializes defined stores
-     */
-    static {
-        stores = new HashMap<String, MCRMetadataStore>();
-
-        // MCR.IFS2.MetadataStore.DocPortal_document.BaseDir=c:\\store
-        // MCR.IFS2.MetadataStore.DocPortal_document.SlotLayout=4-2-2
-
-        String prefix = "MCR.IFS2.MetadataStore.";
-        MCRConfiguration config = MCRConfiguration.instance();
-        Properties prop = config.getProperties(prefix);
-        for (Enumeration keys = prop.keys(); keys.hasMoreElements();) {
-            String key = (String) (keys.nextElement());
-            if (!key.endsWith("BaseDir"))
-                continue;
-            String baseDir = prop.getProperty(key);
-            String type = key.substring(prefix.length(), key.indexOf(".BaseDir"));
-            String slotLayout = config.getString(prefix + type + ".SlotLayout");
-            new MCRMetadataStore(type, baseDir, slotLayout);
-        }
-    }
-
-    /**
-     * Returns the store storing metadata of the given´type
+     * Returns the store storing metadata of the given type
      * 
      * @param type
      *            the document type
      * @return the store defined for the given metadata type
+     * @throws MCRConfigurationException
+     *             when no store for that type is configured
      */
     public static MCRMetadataStore getStore(String type) {
+        if (!stores.containsKey(type)) {
+            String prefix = "MCR.IFS2.MetadataStore." + type + ".";
+            MCRConfiguration config = MCRConfiguration.instance();
+
+            String baseDir = config.getString(prefix + "BaseDir");
+            String slotLayout = config.getString(prefix + "SlotLayout");
+            String repositoryURL = config.getString(prefix + "SVNRepositoryURL", null);
+
+            if (repositoryURL == null)
+                new MCRMetadataStore(type, baseDir, slotLayout);
+            else
+                new MCRVersioningMetadataStore(type, baseDir, slotLayout, repositoryURL);
+        }
         return stores.get(type);
     }
 
