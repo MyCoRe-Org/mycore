@@ -46,15 +46,16 @@ public class MCRVersioningMetadataStoreTest extends MCRTestCase {
         String path = temp.getAbsolutePath();
         temp.delete();
 
-        setProperty("MCR.IFS2.MetadataStore.TEST.BaseDir", path, true);
-        setProperty("MCR.IFS2.MetadataStore.TEST.SlotLayout", "4-2-2", true);
+        setProperty("MCR.IFS2.Store.TEST.Class", "org.mycore.datamodel.ifs2.MCRVersioningMetadataStore", true);
+        setProperty("MCR.IFS2.Store.TEST.BaseDir", path, true);
+        setProperty("MCR.IFS2.Store.TEST.SlotLayout", "4-2-2", true);
         
         temp = File.createTempFile("base", "");
         path = "file:///" + temp.getAbsolutePath().replace( '\\', '/' );
         temp.delete();
-        setProperty("MCR.IFS2.MetadataStore.TEST.SVNRepositoryURL", path, true);
         
-        store = (MCRVersioningMetadataStore)(MCRMetadataStore.getStore("TEST"));
+        setProperty("MCR.IFS2.Store.TEST.SVNRepositoryURL", path, true);
+        store = MCRVersioningMetadataStore.getStore("TEST");
     }
 
     protected void setUp() throws Exception {

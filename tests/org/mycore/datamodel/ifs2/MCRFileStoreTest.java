@@ -50,8 +50,9 @@ public class MCRFileStoreTest extends MCRTestCase {
         String path = temp.getAbsolutePath();
         temp.delete();
 
-        setProperty("MCR.IFS2.FileStore.TEST.BaseDir", path, true);
-        setProperty("MCR.IFS2.FileStore.TEST.SlotLayout", "4-2-2", true);
+        setProperty("MCR.IFS2.Store.TEST.Class", "org.mycore.datamodel.ifs2.MCRFileStore", true);
+        setProperty("MCR.IFS2.Store.TEST.BaseDir", path, true);
+        setProperty("MCR.IFS2.Store.TEST.SlotLayout", "4-2-2", true);
         store = MCRFileStore.getStore("TEST");
     }
 
