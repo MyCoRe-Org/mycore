@@ -24,9 +24,11 @@
 package org.mycore.datamodel.ifs2;
 
 import java.io.File;
+import java.util.Enumeration;
 
 import org.apache.commons.vfs.Selectors;
 import org.apache.commons.vfs.VFS;
+import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.mycore.common.MCRTestCase;
@@ -39,6 +41,8 @@ import org.tmatesoft.svn.core.io.SVNRepositoryFactory;
  */
 public class MCRVersioningMetadataStoreTest extends MCRTestCase {
 
+    private static Logger LOGGER = Logger.getLogger(MCRVersioningMetadataStoreTest.class);
+    
     protected static MCRVersioningMetadataStore store;
     
     protected void createStore() throws Exception {
@@ -125,5 +129,27 @@ public class MCRVersioningMetadataStoreTest extends MCRTestCase {
         MCRVersionedMetadata sm1 = store.retrieve(id);
         Document xml2 = sm1.getXML();
         assertEquals(xml1.toString(), xml2.toString());
+    }
+
+    public void testPerformance() throws Exception {
+        Document xml = new Document(new Element("root"));
+        LOGGER.info("Storing 10 XML documents in store:");
+        long time = System.currentTimeMillis();
+        for (int i = 0; i < 10; i++)
+            store.create(xml);
+        LOGGER.info("Time: " + (System.currentTimeMillis() - time) + " ms");
+
+        time = System.currentTimeMillis();
+        xml = new Document(new Element("update"));
+        LOGGER.info("Updating 10 XML documents in store:");
+        for (Enumeration<Integer> ids = store.listIDs(MCRMetadataStore.ASCENDING); ids.hasMoreElements();)
+            store.retrieve(ids.nextElement()).update(xml);
+        LOGGER.info("Time: " + (System.currentTimeMillis() - time) + " ms");
+
+        time = System.currentTimeMillis();
+        LOGGER.info("Deleting 10 XML documents from store:");
+        for (Enumeration<Integer> ids = store.listIDs(MCRMetadataStore.ASCENDING); ids.hasMoreElements();)
+            store.delete(ids.nextElement());
+        LOGGER.info("Time: " + (System.currentTimeMillis() - time) + " ms");
     }
 }
