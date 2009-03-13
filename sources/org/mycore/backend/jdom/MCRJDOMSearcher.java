@@ -387,7 +387,7 @@ public class MCRJDOMSearcher extends MCRSearcher {
         return MCRInputValidator.instance().compare(valueA, valueB, operator, "string", null);
     }
 
-    public void addSortData(Iterator hits, List<MCRSortBy> sortBy) {
+    public void addSortData(Iterator<MCRHit> hits, List<MCRSortBy> sortBy) {
         while (hits.hasNext()) {
             MCRHit hit = (MCRHit) hits.next();
             Document data = map.get(hit.getID());

@@ -384,7 +384,7 @@ public class MCROldLuceneSearcher extends MCRSearcher {
         return result;
     }
     
-    public void addSortData(Iterator hits, List<MCRSortBy> sortBy)
+    public void addSortData(Iterator<MCRHit> hits, List<MCRSortBy> sortBy)
     {
       try
       {

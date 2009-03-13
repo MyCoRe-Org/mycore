@@ -98,14 +98,14 @@ public abstract class MCRSearcher extends MCREventHandlerBase implements MCREven
     protected void handleFileCreated(MCREvent evt, MCRFile file) {
         String entryID = file.getID();
         String returnID = getReturnID(file);
-        List fields = MCRData2Fields.buildFields(file, index);
+        List<MCRFieldValue> fields = MCRData2Fields.buildFields(file, index);
         addToIndex(entryID, returnID, fields);
     }
 
     protected void handleFileUpdated(MCREvent evt, MCRFile file) {
         String entryID = file.getID();
         String returnID = getReturnID(file);
-        List fields = MCRData2Fields.buildFields(file, index);
+        List<MCRFieldValue> fields = MCRData2Fields.buildFields(file, index);
         removeFromIndex(entryID);
         addToIndex(entryID, returnID, fields);
     }
@@ -121,13 +121,13 @@ public abstract class MCRSearcher extends MCREventHandlerBase implements MCREven
 
     protected void handleObjectCreated(MCREvent evt, MCRObject obj) {
         String entryID = obj.getId().getId();
-        List fields = MCRData2Fields.buildFields(obj, index);
+        List<MCRFieldValue> fields = MCRData2Fields.buildFields(obj, index);
         addToIndex(entryID, entryID, fields);
     }
 
     protected void handleObjectUpdated(MCREvent evt, MCRObject obj) {
         String entryID = obj.getId().getId();
-        List fields = MCRData2Fields.buildFields(obj, index);
+        List<MCRFieldValue> fields = MCRData2Fields.buildFields(obj, index);
         removeFromIndex(entryID);
         addToIndex(entryID, entryID, fields);
     }
@@ -161,7 +161,7 @@ public abstract class MCRSearcher extends MCREventHandlerBase implements MCREven
      * @param fields
      *            a List of MCRFieldValue objects
      */
-    public void addToIndex(String entryID, String returnID, List fields) {
+    public void addToIndex(String entryID, String returnID, List<MCRFieldValue> fields) {
     }
 
     /**
@@ -199,7 +199,7 @@ public abstract class MCRSearcher extends MCREventHandlerBase implements MCREven
      * @param sortBy
      *            the MCRFieldDef fields that are sort criteria
      */
-    public void addSortData(Iterator hits, List<MCRSortBy> sortBy) {
+    public void addSortData(Iterator<MCRHit> hits, List<MCRSortBy> sortBy) {
     }
 
     /**

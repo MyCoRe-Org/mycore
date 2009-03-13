@@ -24,7 +24,6 @@ package org.mycore.services.fieldquery;
 
 import java.util.ArrayList;
 import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -44,7 +43,7 @@ public class MCRFieldDef {
     /** The logger */
     private static final Logger LOGGER = Logger.getLogger(MCRFieldDef.class);
 
-    private static Hashtable<String,MCRFieldDef> fieldTable = new Hashtable<String,MCRFieldDef>();
+    private static Hashtable<String, MCRFieldDef> fieldTable = new Hashtable<String, MCRFieldDef>();
 
     public final static Namespace xslns = Namespace.getNamespace("xsl", "http://www.w3.org/1999/XSL/Transform");
 
@@ -156,8 +155,7 @@ public class MCRFieldDef {
      */
     public static List<MCRFieldDef> getFieldDefs(String index) {
         List<MCRFieldDef> fields = new ArrayList<MCRFieldDef>();
-        for (Iterator iter = fieldTable.values().iterator(); iter.hasNext();) {
-            MCRFieldDef field = (MCRFieldDef) (iter.next());
+        for (MCRFieldDef field : fieldTable.values()) {
             if (field.index.equals(index))
                 fields.add(field);
         }
@@ -350,7 +348,7 @@ public class MCRFieldDef {
             else
                 current = current.getParentElement();
         }
-        
+
         if (MCRFieldDef.OBJECT_CATEGORY.equals(fieldDef.getAttributeValue("source"))) {
             // current(): <format classid="DocPortal_class_00000006"
             // categid="FORMAT0002"/>

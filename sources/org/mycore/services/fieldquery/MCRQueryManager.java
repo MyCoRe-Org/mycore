@@ -81,6 +81,7 @@ public class MCRQueryManager {
         int maxResults = query.getMaxResults();
 
         // Build results of local query
+        LOGGER.info("Query: "+query.getCondition().toString());
         final MCRResults results = buildResults(query.getCondition(), maxResults, query.getSortBy(), comesFromRemoteHost);
 
         // Add results of remote query
