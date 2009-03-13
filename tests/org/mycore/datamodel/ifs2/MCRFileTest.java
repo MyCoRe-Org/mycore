@@ -45,32 +45,32 @@ import org.mycore.common.MCRUtils;
  */
 public class MCRFileTest extends MCRTestCase {
 
-    private static String path;
-
-    private MCRFileStore store;
+    private static MCRFileStore store;
 
     private MCRFileCollection col;
 
+    protected void createStore() throws Exception {
+        File temp = File.createTempFile("base", "");
+        String path = temp.getAbsolutePath();
+        temp.delete();
+
+        setProperty("MCR.IFS2.FileStore.TEST.BaseDir", path, true);
+        setProperty("MCR.IFS2.FileStore.TEST.SlotLayout", "4-2-2", true);
+        store = MCRFileStore.getStore("TEST");
+    }
+
     protected void setUp() throws Exception {
         super.setUp();
-
-        if (path == null) {
-            File temp = File.createTempFile("base", "");
-            path = temp.getAbsolutePath();
-            temp.delete();
-
-            setProperty("MCR.IFS2.FileStore.TEST.BaseDir", path, true);
-            setProperty("MCR.IFS2.FileStore.TEST.SlotLayout", "4-2-2", true);
-        }
-        VFS.getManager().resolveFile(path).createFolder();
-
-        store = MCRFileStore.getStore("TEST");
+        if (store == null)
+            createStore();
+        else
+            VFS.getManager().resolveFile(store.getBaseDir()).createFolder();
         col = store.create();
     }
 
     protected void tearDown() throws Exception {
         super.tearDown();
-        VFS.getManager().resolveFile(path).delete(Selectors.SELECT_ALL);
+        VFS.getManager().resolveFile(store.getBaseDir()).delete(Selectors.SELECT_ALL);
     }
 
     public void testFileName() throws Exception {

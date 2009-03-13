@@ -43,33 +43,29 @@ import org.mycore.common.MCRTestCase;
  */
 public class MCRFileStoreTest extends MCRTestCase {
 
-    private static String path;
+    private static MCRFileStore store;
 
-    private MCRFileStore store;
+    protected void createStore() throws Exception {
+        File temp = File.createTempFile("base", "");
+        String path = temp.getAbsolutePath();
+        temp.delete();
+
+        setProperty("MCR.IFS2.FileStore.TEST.BaseDir", path, true);
+        setProperty("MCR.IFS2.FileStore.TEST.SlotLayout", "4-2-2", true);
+        store = MCRFileStore.getStore("TEST");
+    }
 
     protected void setUp() throws Exception {
         super.setUp();
-
-        if (path == null) {
-            File temp = File.createTempFile("base", "");
-            path = temp.getAbsolutePath();
-            temp.delete();
-
-            setProperty("MCR.IFS2.FileStore.TEST.BaseDir", path, true);
-            setProperty("MCR.IFS2.FileStore.TEST.SlotLayout", "4-2-2", true);
-        }
-        VFS.getManager().resolveFile(path).createFolder();
-        store = MCRFileStore.getStore("TEST");
+        if (store == null)
+            createStore();
+        else
+            VFS.getManager().resolveFile(store.getBaseDir()).createFolder();
     }
 
     protected void tearDown() throws Exception {
         super.tearDown();
-        VFS.getManager().resolveFile(path).delete(Selectors.SELECT_ALL);
-    }
-
-    public void testGetStore() throws Exception {
-        MCRFileStore store2 = MCRFileStore.getStore("FOO");
-        assertNull(store2);
+        VFS.getManager().resolveFile(store.getBaseDir()).delete(Selectors.SELECT_ALL);
     }
 
     public void testCreate() throws Exception {
