@@ -172,6 +172,6 @@ public class MCRStoredMetadata {
      * @throws Exception
      */
     public void delete() throws Exception {
-        store.delete(id);
+        store.delete(fo);
     }
 }
