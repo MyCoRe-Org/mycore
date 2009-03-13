@@ -122,7 +122,7 @@ public class MCRHit {
      * 
      * @return a unique key for this MCRHit
      */
-    String getKey() {
+    public String getKey() {
         return key;
     }
 

@@ -28,6 +28,8 @@ import java.io.File;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.GregorianCalendar;
 import java.util.Iterator;
 import java.util.List;
@@ -51,6 +53,7 @@ import org.apache.lucene.analysis.SimpleAnalyzer;
 import org.apache.lucene.analysis.de.GermanAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
+import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.Term;
@@ -63,6 +66,7 @@ import org.apache.lucene.search.SortField;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.search.TopFieldDocCollector;
+import org.apache.lucene.search.TopFieldDocs;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.store.RAMDirectory;
@@ -314,7 +318,12 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
                     + (System.currentTimeMillis() - start));
         }
 
-        MCRResults result = new MCRResults();
+        TopFieldDocs topFieldDocs = (TopFieldDocs) collector.topDocs();
+        MCRResults result = new MCRLuceneResults(indexSearcher, topFieldDocs, addableFields);
+        if (result instanceof MCRLuceneResults) {
+            LOGGER.info("Fast returning MCRResults");
+            return result;
+        }
         DecimalFormat df = new DecimalFormat("0.00000000000");
         ScoreDoc[] scoreDocs = collector.topDocs().scoreDocs;
 
@@ -876,5 +885,146 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
             }
         }
 
+    }
+
+    /**
+     * This class is a special Lucene version of MCRResults
+     * It is read only but fast on large result set as it is filled lazy. 
+     * @author Thomas Scheffler (yagee)
+     */
+    private static class MCRLuceneResults extends MCRResults {
+
+        private TopFieldDocs topDocs;
+
+        private IndexSearcher indexSearcher;
+
+        private Collection<MCRFieldDef> addableFields;
+
+        private static final DecimalFormat df = new DecimalFormat("0.00000000000");
+
+        public MCRLuceneResults(IndexSearcher indexSearcher, TopFieldDocs topDocs, Collection<MCRFieldDef> addableFields) {
+            super();
+            this.indexSearcher = indexSearcher;
+            this.topDocs = topDocs;
+            this.addableFields = addableFields;
+            super.hits = new ArrayList<MCRHit>(topDocs.totalHits);
+            super.hits.addAll(Collections.nCopies(topDocs.totalHits, (MCRHit) null));
+            setSorted(true);
+        }
+
+        @Override
+        public void addHit(MCRHit hit) {
+            throw new UnsupportedOperationException("MCRResults are read only");
+        }
+
+        @Override
+        public void and(MCRResults other) {
+            throw new UnsupportedOperationException("MCRResults are read only");
+        }
+
+        @Override
+        public void or(MCRResults other) {
+            throw new UnsupportedOperationException("MCRResults are read only");
+        }
+
+        @Override
+        public MCRHit getHit(int i) {
+            if (i < 0 || i > topDocs.totalHits) {
+                return null;
+            }
+            MCRHit hit = super.getHit(i);
+            if (hit == null) {
+                //initialize
+                try {
+                    hit = getMCRHit(topDocs.scoreDocs[i]);
+                } catch (Exception e) {
+                    throw new MCRException("Error while fetching Lucene document: " + topDocs.scoreDocs[i].doc, e);
+                }
+                super.hits.set(i, hit);
+                super.map.put(hit.getKey(), hit);
+            }
+            return hit;
+        }
+
+        private MCRHit getMCRHit(ScoreDoc scoreDoc) throws CorruptIndexException, IOException {
+            // TODO Auto-generated method stub
+            org.apache.lucene.document.Document doc = indexSearcher.doc(scoreDoc.doc);
+
+            String id = doc.get("returnid");
+            MCRHit hit = new MCRHit(id);
+
+            for (MCRFieldDef fd : addableFields) {
+                String value = doc.get(fd.getName());
+                if (null != value) {
+                    MCRFieldValue fv = new MCRFieldValue(fd, value);
+                    hit.addMetaData(fv);
+                }
+            }
+
+            String score = df.format(scoreDoc.score);
+            addSortDataToHit(doc, hit, score, topDocs.fields);
+            return hit;
+        }
+
+        private static void addSortDataToHit(org.apache.lucene.document.Document doc, MCRHit hit, String score, SortField[] sortFields) {
+            for (SortField sortField : sortFields) {
+                String fieldName;
+                if (sortField.getField().endsWith(SORTABLE_SUFFIX))
+                    fieldName = sortField.getField().substring(0, sortField.getField().length() - SORTABLE_SUFFIX.length());
+                else
+                    fieldName = sortField.getField();
+                if (SortField.FIELD_SCORE == sortField || sortField.getField() == null) {
+                    if (null != score) {
+                        MCRFieldDef fd = MCRFieldDef.getDef("score");
+                        MCRFieldValue fv = new MCRFieldValue(fd, score);
+                        hit.addSortData(fv);
+                    }
+                } else {
+                    String values[] = doc.getValues(sortField.getField());
+                    for (int i = 0; i < values.length; i++) {
+                        MCRFieldValue fv = new MCRFieldValue(MCRFieldDef.getDef(fieldName), values[i]);
+                        hit.addSortData(fv);
+                    }
+                }
+
+            }
+        }
+
+        @Override
+        public int getNumHits() {
+            return topDocs.totalHits;
+        }
+
+        @Override
+        public void cutResults(int maxResults) {
+            while ((hits.size() > maxResults) && (maxResults > 0)) {
+                MCRHit hit = hits.remove(hits.size() - 1);
+                topDocs.totalHits--;
+                if (hit != null)
+                    map.remove(hit.getKey());
+            }
+        }
+
+        @Override
+        public Iterator<MCRHit> iterator() {
+            return new Iterator<MCRHit>() {
+                int i = 0;
+
+                public boolean hasNext() {
+                    return i < topDocs.totalHits;
+                }
+
+                public MCRHit next() {
+                    MCRHit hit = getHit(i);
+                    i++;
+                    return hit;
+                }
+
+                public void remove() {
+                    throw new UnsupportedOperationException("MCRResults are read only");
+                }
+
+            };
+        }
     }
 }

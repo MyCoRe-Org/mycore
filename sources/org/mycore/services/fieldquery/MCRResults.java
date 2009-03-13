@@ -53,7 +53,7 @@ import org.jdom.Element;
  */
 public class MCRResults implements Iterable<MCRHit> {
     /** The list of MCRHit objects */
-    private ArrayList<MCRHit> hits = new ArrayList<MCRHit>();
+    protected ArrayList<MCRHit> hits = new ArrayList<MCRHit>();
 
     /** The state of the connection */
     private HashTable hostconnection = new HashTable();
@@ -62,7 +62,7 @@ public class MCRResults implements Iterable<MCRHit> {
      * A map containing MCRHit IDs used for and/or operations on two different
      * MCRResult objects
      */
-    private HashMap<String, MCRHit> map = new HashMap<String, MCRHit>();
+    protected HashMap<String, MCRHit> map = new HashMap<String, MCRHit>();
 
     /** If true, this results are already sorted */
     private boolean isSorted = false;
@@ -238,7 +238,7 @@ public class MCRResults implements Iterable<MCRHit> {
         }
 
         for (int i = min; i <= max; i++)
-            results.addContent(hits.get(i).buildXML());
+            results.addContent(getHit(i).buildXML());
 
         return results;
     }
