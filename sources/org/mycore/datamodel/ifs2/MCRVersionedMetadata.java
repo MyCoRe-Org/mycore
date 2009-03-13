@@ -24,20 +24,15 @@
 package org.mycore.datamodel.ifs2;
 
 import java.io.ByteArrayInputStream;
-import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import java.util.StringTokenizer;
 
-import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.commons.vfs.FileObject;
 import org.apache.log4j.Logger;
 import org.jdom.Comment;
 import org.jdom.Document;
 import org.tmatesoft.svn.core.SVNCommitInfo;
 import org.tmatesoft.svn.core.SVNNodeKind;
-import org.tmatesoft.svn.core.SVNProperties;
 import org.tmatesoft.svn.core.SVNProperty;
 import org.tmatesoft.svn.core.SVNPropertyValue;
 import org.tmatesoft.svn.core.io.ISVNEditor;

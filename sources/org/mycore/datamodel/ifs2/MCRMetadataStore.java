@@ -23,9 +23,7 @@
 
 package org.mycore.datamodel.ifs2;
 
-import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.Properties;
 
 import org.apache.commons.vfs.FileObject;
 import org.jdom.Document;
