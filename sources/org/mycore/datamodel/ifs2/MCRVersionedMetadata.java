@@ -23,11 +23,26 @@
 
 package org.mycore.datamodel.ifs2;
 
+import java.io.ByteArrayInputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.StringTokenizer;
 
+import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.commons.vfs.FileObject;
+import org.apache.log4j.Logger;
+import org.jdom.Comment;
 import org.jdom.Document;
+import org.tmatesoft.svn.core.SVNCommitInfo;
+import org.tmatesoft.svn.core.SVNNodeKind;
+import org.tmatesoft.svn.core.SVNProperties;
+import org.tmatesoft.svn.core.SVNProperty;
+import org.tmatesoft.svn.core.SVNPropertyValue;
+import org.tmatesoft.svn.core.io.ISVNEditor;
+import org.tmatesoft.svn.core.io.SVNRepository;
+import org.tmatesoft.svn.core.io.diff.SVNDeltaGenerator;
 
 /**
  * Represents an XML metadata document that is stored in a local filesystem
@@ -39,37 +54,143 @@ import org.jdom.Document;
 public class MCRVersionedMetadata extends MCRStoredMetadata {
 
     /**
+     * The logger
+     */
+    protected final static Logger LOGGER = Logger.getLogger(MCRVersionedMetadata.class);
+
+    /**
      * The revision number of the metadata version that is currently in the
      * local filesystem store.
      */
-    protected int revision;
+    protected long revision;
 
     /**
-     * Creates a new metadata object
+     * Creates a new metadata object both in the local store and in the SVN
+     * repository
      * 
      * @param store
      *            the store this object is stored in
      * @param fo
      *            the file storing the data in the local filesystem
      * @param id
-     *            the id of the metadat object
+     *            the id of the metadata object
      */
     MCRVersionedMetadata(MCRMetadataStore store, FileObject fo, int id) {
         super(store, fo, id);
     }
 
+    /**
+     * Stores a new metadata object first in the SVN repository, then
+     * additionally in the local store.
+     * 
+     * @param xml
+     *            the metadata document to store
+     */
     void create(Document xml) throws Exception {
-        // TODO: create in SVN, use revision keyword in comment
+        String commitMsg = "Created metadata object " + store.getID() + "_" + id + " in store";
+        SVNRepository repository = ((MCRVersioningMetadataStore) store).getRepository();
+
+        // Create slot subdirectories in SVN, if not existing yet
+        String[] parts = store.getSlotPathParts(id);
+        List<String> dirsToCreate = new ArrayList<String>();
+        StringBuffer path = new StringBuffer();
+        for (int i = 0; i < parts.length - 1; i++) {
+            path.append(parts[i]);
+            SVNNodeKind nodeKind = repository.checkPath(path.toString(), -1);
+            if (nodeKind.equals(SVNNodeKind.NONE))
+                dirsToCreate.add(path.toString());
+            if (path.length() > 0)
+                path.append('/');
+        }
+
+        ISVNEditor editor = repository.getCommitEditor(commitMsg, null);
+        editor.openRoot(-1);
+
+        for (String dir : dirsToCreate) {
+            LOGGER.info("Create in SVN: directory " + dir);
+            editor.addDir(dir, null, -1);
+            editor.closeDir();
+        }
+
+        // TODO: if keywords exist, do not add again
+        String comment = "\n" + store.getID() + "_" + id + "\n$Revision$\n$Date$\n$Author:$\n";
+        xml.addContent(0, new Comment(comment));
+
+        path.append(parts[parts.length - 1]);
+        String filePath = path.toString();
+        LOGGER.info("Create in SVN: file " + filePath);
+        editor.addFile(filePath, null, -1);
+        editor.applyTextDelta(filePath, null);
+        SVNDeltaGenerator deltaGenerator = new SVNDeltaGenerator();
+        ByteArrayInputStream in = new ByteArrayInputStream(xml2bytes(xml));
+        String checksum = deltaGenerator.sendDelta(filePath, in, editor, true);
+        in.close();
+        editor.changeFileProperty(filePath, SVNProperty.KEYWORDS, SVNPropertyValue.create("Revision Date Author"));
+        editor.changeFileProperty(filePath, SVNProperty.MIME_TYPE, SVNPropertyValue.create("text/xml"));
+        editor.closeFile(filePath, checksum);
+        editor.closeDir();
+
+        // Commit to SVN
+        SVNCommitInfo info = editor.closeEdit();
+        this.revision = info.getNewRevision();
+        LOGGER.info("SVN commit of create finished, new revision " + revision);
+
         super.create(xml);
     }
 
+    /**
+     * Deletes this metadata object in the SVN repository, and in the local
+     * store.
+     */
     public void delete() throws Exception {
-        // TODO: delete in SVN
-        super.delete();
+        String commitMsg = "Deleted metadata object " + store.getID() + "_" + id + " in store";
+        String filePath = store.getSlotPath(id);
+        LOGGER.info("Delete in SVN: file " + filePath);
+
+        SVNRepository repository = ((MCRVersioningMetadataStore) store).getRepository();
+        ISVNEditor editor = repository.getCommitEditor(commitMsg, null);
+        editor.openRoot(-1);
+        editor.deleteEntry(filePath, -1);
+        editor.closeDir();
+
+        // Commit to SVN
+        SVNCommitInfo info = editor.closeEdit();
+        this.revision = info.getNewRevision();
+        LOGGER.info("SVN commit of delete finished, new revision " + revision);
+
+        store.delete(fo);
     }
 
+    /**
+     * Updates this metadata object, first in the SVN repository and then in the
+     * local store
+     * 
+     * @param xml
+     *            the new version of the document metadata
+     */
     public void update(Document xml) throws Exception {
-        // TODO: update in SVN, use revision keyword in comment
+        String commitMsg = "Updated metadata object " + store.getID() + "_" + id + " in store";
+        String filePath = store.getSlotPath(id);
+        LOGGER.info("Update in SVN: file " + filePath);
+
+        SVNRepository repository = ((MCRVersioningMetadataStore) store).getRepository();
+
+        ISVNEditor editor = repository.getCommitEditor(commitMsg, null);
+        editor.openRoot(-1);
+        editor.openFile(filePath, -1);
+        editor.applyTextDelta(filePath, null);
+        SVNDeltaGenerator deltaGenerator = new SVNDeltaGenerator();
+        ByteArrayInputStream in = new ByteArrayInputStream(xml2bytes(xml));
+        String checksum = deltaGenerator.sendDelta(filePath, in, editor, true);
+        in.close();
+        editor.closeFile(filePath, checksum);
+        editor.closeDir();
+
+        // Commit to SVN
+        SVNCommitInfo info = editor.closeEdit();
+        this.revision = info.getNewRevision();
+        LOGGER.info("SVN commit of update finished, new revision " + revision);
+
         super.update(xml);
     }
 
@@ -98,7 +219,7 @@ public class MCRVersionedMetadata extends MCRStoredMetadata {
      * 
      * @return the revision number of the local version
      */
-    public int getRevision() {
+    public long getRevision() {
         return revision;
     }
 

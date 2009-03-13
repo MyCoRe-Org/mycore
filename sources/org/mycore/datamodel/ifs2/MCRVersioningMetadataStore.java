@@ -23,21 +23,60 @@
 
 package org.mycore.datamodel.ifs2;
 
+import java.io.File;
 import java.util.Enumeration;
 
 import org.apache.commons.vfs.FileObject;
+import org.apache.log4j.Logger;
 import org.jdom.Document;
+import org.mycore.common.MCRConfigurationException;
+import org.tmatesoft.svn.core.SVNException;
+import org.tmatesoft.svn.core.SVNURL;
+import org.tmatesoft.svn.core.internal.io.fs.FSRepositoryFactory;
+import org.tmatesoft.svn.core.io.SVNRepository;
+import org.tmatesoft.svn.core.io.SVNRepositoryFactory;
 
 /**
- * Stores metadata both in a local filesystem structure and in a Subversion
- * repository. Metadata changes can be tracked and restored.
+ * Stores metadata objects both in a local filesystem structure and in a
+ * Subversion repository. Changes can be tracked and restored.
  * 
  * @author Frank Lützenkirchen
  */
 public class MCRVersioningMetadataStore extends MCRMetadataStore {
 
-    MCRVersioningMetadataStore(String type, String baseDir, String slotLayout) {
+    protected final static Logger LOGGER = Logger.getLogger(MCRVersioningMetadataStore.class);
+
+    SVNURL repURL;
+
+    static {
+        FSRepositoryFactory.setup();
+    }
+
+    MCRVersioningMetadataStore(String type, String baseDir, String slotLayout, String repositoryURL) {
         super(type, baseDir, slotLayout);
+        try {
+            LOGGER.info("Versioning metadata store " + type + " repository URL: " + repositoryURL);
+            repURL = SVNURL.parseURIDecoded(repositoryURL);
+            File dir = new File(repURL.getPath());
+            if (!dir.exists()) {
+                LOGGER.info("Repository does not exist, creating new SVN repository at " + repositoryURL);
+                repURL = SVNRepositoryFactory.createLocalRepository(dir, true, false);
+            }
+        } catch (SVNException ex) {
+            String msg = "Error initializing SVN repository at URL " + repositoryURL;
+            throw new MCRConfigurationException(msg, ex);
+        }
+    }
+
+    /**
+     * Returns the SVN repository used to manage metadata versions in this
+     * store.
+     * 
+     * @return the SVN repository used to manage metadata versions in this
+     *         store.
+     */
+    SVNRepository getRepository() throws Exception {
+        return SVNRepositoryFactory.create(repURL);
     }
 
     public MCRVersionedMetadata create(Document xml, int id) throws Exception {
