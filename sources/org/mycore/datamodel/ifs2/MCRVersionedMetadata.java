@@ -24,15 +24,22 @@
 package org.mycore.datamodel.ifs2;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.vfs.FileObject;
 import org.apache.log4j.Logger;
 import org.jdom.Comment;
 import org.jdom.Document;
+import org.mycore.common.MCRUtils;
 import org.tmatesoft.svn.core.SVNCommitInfo;
+import org.tmatesoft.svn.core.SVNDirEntry;
+import org.tmatesoft.svn.core.SVNLogEntry;
 import org.tmatesoft.svn.core.SVNNodeKind;
+import org.tmatesoft.svn.core.SVNProperties;
 import org.tmatesoft.svn.core.SVNProperty;
 import org.tmatesoft.svn.core.SVNPropertyValue;
 import org.tmatesoft.svn.core.io.ISVNEditor;
@@ -74,6 +81,10 @@ public class MCRVersionedMetadata extends MCRStoredMetadata {
         super(store, fo, id);
     }
 
+    public MCRVersioningMetadataStore getStore() {
+        return (MCRVersioningMetadataStore) store;
+    }
+
     /**
      * Stores a new metadata object first in the SVN repository, then
      * additionally in the local store.
@@ -83,7 +94,7 @@ public class MCRVersionedMetadata extends MCRStoredMetadata {
      */
     void create(Document xml) throws Exception {
         String commitMsg = "Created metadata object " + store.getID() + "_" + id + " in store";
-        SVNRepository repository = ((MCRVersioningMetadataStore) store).getRepository();
+        SVNRepository repository = getStore().getRepository();
 
         // Create slot subdirectories in SVN, if not existing yet
         String[] parts = store.getSlotPathParts(id);
@@ -142,7 +153,7 @@ public class MCRVersionedMetadata extends MCRStoredMetadata {
         String filePath = store.getSlotPath(id);
         LOGGER.info("Delete in SVN: file " + filePath);
 
-        SVNRepository repository = ((MCRVersioningMetadataStore) store).getRepository();
+        SVNRepository repository = getStore().getRepository();
         ISVNEditor editor = repository.getCommitEditor(commitMsg, null);
         editor.openRoot(-1);
         editor.deleteEntry(filePath, -1);
@@ -168,7 +179,7 @@ public class MCRVersionedMetadata extends MCRStoredMetadata {
         String filePath = store.getSlotPath(id);
         LOGGER.info("Update in SVN: file " + filePath);
 
-        SVNRepository repository = ((MCRVersioningMetadataStore) store).getRepository();
+        SVNRepository repository = getStore().getRepository();
 
         ISVNEditor editor = repository.getCommitEditor(commitMsg, null);
         editor.openRoot(-1);
@@ -194,7 +205,17 @@ public class MCRVersionedMetadata extends MCRStoredMetadata {
      * from Subversion repository HEAD.
      */
     public void update() throws Exception {
-        // TODO: update to HEAD from SVN
+        SVNRepository repository = getStore().getRepository();
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        SVNProperties properties = new SVNProperties();
+        revision = repository.getFile(store.getSlotPath(id), -1, properties, baos);
+        baos.close();
+        ByteArrayInputStream in = new ByteArrayInputStream(baos.toByteArray());
+        OutputStream out = fo.getContent().getOutputStream();
+        MCRUtils.copyStream(in, out);
+        out.close();
+        in.close();
+        // TODO: Check keyword substitution, check revision number
     }
 
     /**
@@ -203,9 +224,14 @@ public class MCRVersionedMetadata extends MCRStoredMetadata {
      * 
      * @return all stored versions of this metadata object
      */
-    public List<MCRMetadataVersion> listVersions() {
-        // TODO: retrieve versions from SVN
-        return new ArrayList<MCRMetadataVersion>();
+    public List<MCRMetadataVersion> listVersions() throws Exception {
+        List<MCRMetadataVersion> versions = new ArrayList<MCRMetadataVersion>();
+        SVNRepository repository = getStore().getRepository();
+        String path = store.getSlotPath(id);
+        Collection<SVNLogEntry> entries = repository.log(new String[] { path }, null, 0, -1, true, true);
+        for (SVNLogEntry entry : entries)
+            versions.add(new MCRMetadataVersion(this, entry));
+        return versions;
     }
 
     /**
@@ -225,7 +251,8 @@ public class MCRVersionedMetadata extends MCRStoredMetadata {
      * @return true, if the local version in store is the latest version
      */
     public boolean isUpToDate() throws Exception {
-        // TODO: check if version in store is up to date
-        return true;
+        SVNRepository repository = getStore().getRepository();
+        SVNDirEntry entry = repository.info(store.getSlotPath(id), -1);
+        return (entry.getRevision() <= revision);
     }
 }

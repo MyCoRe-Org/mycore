@@ -23,9 +23,15 @@
 
 package org.mycore.datamodel.ifs2;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.util.Date;
 
 import org.jdom.Document;
+import org.jdom.input.SAXBuilder;
+import org.tmatesoft.svn.core.SVNLogEntry;
+import org.tmatesoft.svn.core.SVNProperties;
+import org.tmatesoft.svn.core.io.SVNRepository;
 
 /**
  * Provides information about a stored version of metadata and allows to
@@ -42,7 +48,7 @@ public class MCRMetadataVersion {
     /**
      * The revision number of this version
      */
-    private int revision;
+    private long revision;
 
     /**
      * The user that created this version
@@ -60,10 +66,11 @@ public class MCRMetadataVersion {
      * @param id
      *            the ID of the metadata document this version belongs to
      */
-    MCRMetadataVersion(MCRVersionedMetadata vm, int revision) {
+    MCRMetadataVersion(MCRVersionedMetadata vm, SVNLogEntry logEntry) {
         this.vm = vm;
-        this.revision = revision;
-        // TODO: Read data from SVN
+        this.revision = logEntry.getRevision();
+        this.user = logEntry.getAuthor();
+        this.date = logEntry.getDate();
     }
 
     /**
@@ -80,7 +87,7 @@ public class MCRMetadataVersion {
      * 
      * @return the SVN revision number of this version
      */
-    public int getRevision() {
+    public long getRevision() {
         return revision;
     }
 
@@ -107,9 +114,17 @@ public class MCRMetadataVersion {
      * 
      * @return the metadata document as it was in this version
      */
-    public Document retrieve() {
-        // TODO: retrieve from SVN
-        return new Document();
+    public Document retrieve() throws Exception {
+        SVNRepository repository = vm.getStore().getRepository();
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        SVNProperties properties = new SVNProperties();
+        repository.getFile(vm.getStore().getSlotPath(vm.getID()), revision, properties, baos);
+        baos.close();
+        ByteArrayInputStream in = new ByteArrayInputStream(baos.toByteArray());
+        Document xml = new SAXBuilder().build(in);
+        in.close();
+        return xml;
+        // TODO: Check keyword substitution, check revision number
     }
 
     /**
