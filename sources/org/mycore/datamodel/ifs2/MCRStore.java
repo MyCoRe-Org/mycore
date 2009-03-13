@@ -27,12 +27,14 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.List;
 import java.util.StringTokenizer;
 
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.Selectors;
 import org.apache.commons.vfs.VFS;
+import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
 
 /**
@@ -61,9 +63,35 @@ import org.mycore.common.MCRConfigurationException;
  * "DocPortal_document_" and suffix ".xml", the slot name would be
  * "DocPortal_document_00010485.xml" for example.
  * 
+ * MCR.IFS2.Store.ID.Class=org.mycore.datamodel.ifs2.MCRFileStore
+ * 
+ * MCR.IFS2.Store.ID.BaseDir=/foo/bar
+ * 
+ * MCR.IFS2.Store.ID.SlotLayout=4-2-2
+ * 
  * @author Frank Lützenkirchen
  */
 public abstract class MCRStore {
+
+    /**
+     * Map of defined stores, where store ID is the map key.
+     */
+    protected static HashMap<String, MCRStore> stores = new HashMap<String, MCRStore>();
+
+    /**
+     * Returns the store with the given ID
+     * 
+     * @param ID
+     *            the ID of the store
+     */
+    protected static MCRStore getStore(String ID) {
+        if (!stores.containsKey(ID)) {
+            MCRStore store = (MCRStore) (MCRConfiguration.instance().getInstanceOf("MCR.IFS2.Store." + ID + ".Class"));
+            store.init(ID);
+        }
+        return stores.get(ID);
+    }
+
     /** The ID of the store */
     protected String id;
 
@@ -80,29 +108,22 @@ public abstract class MCRStore {
     protected int[] slotLength;
 
     /** The prefix of slot names */
-    protected String prefix;
+    protected String prefix = "";
 
     /** The suffix of slot names */
-    protected String suffix;
+    protected String suffix = "";
 
     /**
-     * Creates a new store instance
-     * 
-     * @param id
-     *            the ID of the store
-     * @param baseDir
-     *            the base directory containing the stored data
-     * @param slotLayout
-     *            the slot subdirectory layout (see class description above)
-     * @param prefix
-     *            the prefix of slot names
-     * @param suffix
-     *            the suffix of slot names
+     * Initializes a new store instance
      */
-    protected MCRStore(String id, String baseDir, String slotLayout, String prefix, String suffix) {
+    protected void init(String id) {
+        stores.put(id, this);
         this.id = id;
-        this.prefix = prefix;
-        this.suffix = suffix;
+
+        String cfg = "MCR.IFS2.Store." + id + ".";
+        MCRConfiguration config = MCRConfiguration.instance();
+        String baseDir = config.getString(cfg + "BaseDir");
+        String slotLayout = config.getString(cfg + "SlotLayout");
 
         this.idLength = 0;
 

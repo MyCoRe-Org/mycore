@@ -24,11 +24,8 @@
 package org.mycore.datamodel.ifs2;
 
 import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Properties;
 
 import org.apache.commons.vfs.FileObject;
-import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 
 /**
@@ -36,65 +33,23 @@ import org.mycore.common.MCRException;
  * 
  * For each store, properties must be defined, for example
  * 
- * MCR.IFS2.FileStore.STOREID.BaseDir=c:\\store
- * MCR.IFS2.FileStore.STOREID.SlotLayout=4-2-2
+ * MCR.IFS2.Store.ID.Class=org.mycore.datamodel.ifs2.MCRFileStore
+ * MCR.IFS2.Store.ID.BaseDir=/foo/bar 
+ * MCR.IFS2.Store.ID.SlotLayout=4-2-2
  * 
  * @author Frank Lützenkirchen
  */
 public class MCRFileStore extends MCRStore {
-    /**
-     * Map of defined file stores. Key is store ID, value is the store with that
-     * ID.
-     */
-    private static HashMap<String, MCRFileStore> stores;
-
-    /**
-     * Reads configuration and initializes stores.
-     */
-    static {
-        stores = new HashMap<String, MCRFileStore>();
-
-        // MCR.IFS2.FileStore.FILES.BaseDir=c:\\store
-        // MCR.IFS2.FileStore.FILES.SlotLayout=4-2-2
-
-        String prefix = "MCR.IFS2.FileStore.";
-        MCRConfiguration config = MCRConfiguration.instance();
-        Properties prop = config.getProperties(prefix);
-        for (Enumeration keys = prop.keys(); keys.hasMoreElements();) {
-            String key = (String) (keys.nextElement());
-            if (!key.endsWith("BaseDir"))
-                continue;
-            String baseDir = prop.getProperty(key);
-            String id = key.substring(prefix.length(), key.indexOf(".BaseDir"));
-            String slotLayout = config.getString(prefix + id + ".SlotLayout");
-            new MCRFileStore(id, baseDir, slotLayout);
-        }
-    }
 
     /**
      * Returns the store with the given ID
      * 
-     * @param id
-     *            the store ID
-     * @return the store with the given ID
+     * @param ID
+     *            the ID of the store
+     * @return the store with that ID
      */
-    public static MCRFileStore getStore(String id) {
-        return stores.get(id);
-    }
-
-    /**
-     * Creates a new file store instance
-     * 
-     * @param id
-     *            the store ID
-     * @param baseDir
-     *            the base directory storing data
-     * @param slotLayout
-     *            the layout of slot subdirectories
-     */
-    protected MCRFileStore(String id, String baseDir, String slotLayout) {
-        super(id, baseDir, slotLayout, "", "");
-        stores.put(id, this);
+    public static MCRFileStore getStore(String type) {
+        return (MCRFileStore) (MCRStore.getStore(type));
     }
 
     /**

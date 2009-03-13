@@ -29,16 +29,24 @@ import java.util.Enumeration;
 import org.apache.commons.vfs.FileObject;
 import org.apache.log4j.Logger;
 import org.jdom.Document;
+import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
+import org.mycore.common.MCRSessionMgr;
 import org.tmatesoft.svn.core.SVNException;
 import org.tmatesoft.svn.core.SVNURL;
+import org.tmatesoft.svn.core.auth.BasicAuthenticationManager;
+import org.tmatesoft.svn.core.auth.SVNAuthentication;
+import org.tmatesoft.svn.core.auth.SVNUserNameAuthentication;
 import org.tmatesoft.svn.core.internal.io.fs.FSRepositoryFactory;
 import org.tmatesoft.svn.core.io.SVNRepository;
 import org.tmatesoft.svn.core.io.SVNRepositoryFactory;
 
 /**
  * Stores metadata objects both in a local filesystem structure and in a
- * Subversion repository. Changes can be tracked and restored.
+ * Subversion repository. Changes can be tracked and restored. To enable
+ * versioning, configure the repository URL, for example
+ * 
+ * MCR.IFS2.Store.DocPortal_document.SVNRepositoryURL=file:///foo/svnroot/
  * 
  * @author Frank Lützenkirchen
  */
@@ -52,8 +60,21 @@ public class MCRVersioningMetadataStore extends MCRMetadataStore {
         FSRepositoryFactory.setup();
     }
 
-    MCRVersioningMetadataStore(String type, String baseDir, String slotLayout, String repositoryURL) {
-        super(type, baseDir, slotLayout);
+    /**
+     * Returns the store for the given metadata document type
+     * 
+     * @param type
+     *            the type of metadata to store
+     * @return the store for this metadata type
+     */
+    public static MCRVersioningMetadataStore getStore(String type) {
+        return (MCRVersioningMetadataStore) (MCRStore.getStore(type));
+    }
+
+    protected void init(String type) {
+        super.init(type);
+
+        String repositoryURL = MCRConfiguration.instance().getString("MCR.IFS2.Store." + type + ".SVNRepositoryURL");
         try {
             LOGGER.info("Versioning metadata store " + type + " repository URL: " + repositoryURL);
             repURL = SVNURL.parseURIDecoded(repositoryURL);
@@ -76,7 +97,12 @@ public class MCRVersioningMetadataStore extends MCRMetadataStore {
      *         store.
      */
     SVNRepository getRepository() throws Exception {
-        return SVNRepositoryFactory.create(repURL);
+        SVNRepository repository = SVNRepositoryFactory.create(repURL);
+        String user = MCRSessionMgr.getCurrentSession().getCurrentUserID();
+        SVNAuthentication[] auth = new SVNAuthentication[] { new SVNUserNameAuthentication(user, false) };
+        BasicAuthenticationManager authManager = new BasicAuthenticationManager(auth);
+        repository.setAuthenticationManager(authManager);
+        return repository;
     }
 
     /**

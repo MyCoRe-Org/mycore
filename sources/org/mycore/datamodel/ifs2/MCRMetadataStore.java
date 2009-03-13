@@ -23,76 +23,46 @@
 
 package org.mycore.datamodel.ifs2;
 
-import java.util.HashMap;
-
 import org.apache.commons.vfs.FileObject;
 import org.jdom.Document;
-import org.mycore.common.MCRConfiguration;
-import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRException;
 
 /**
  * Stores XML metadata documents in a persistent filesystem structure
  * 
- * For each metadata type, a store must be defined as follows:
+ * For each object type, a store must be defined as follows:
  * 
- * MCR.IFS2.MetadataStore.DocPortal_document.BaseDir=c:\\store
- * MCR.IFS2.MetadataStore.DocPortal_document.SlotLayout=4-2-2
  * 
- * For a versioning store subclass, define the URL of a local SVN repository. If
- * it does not exist yet, it will be created automatically.
+ * MCR.IFS2.Store.DocPortal_document.Class=org.mycore.datamodel.ifs2.MCRMetadataStore
+ * MCR.IFS2.Store.DocPortal_document.BaseDir=/foo/bar
+ * MCR.IFS2.Store.DocPortal_document.SlotLayout=4-2-2
  * 
- * MCR.IFS2.MetadataStore.DocPortal_document.SVNRepositoryURL=
- * file:///c:/storesvn
  * 
  * @author Frank Lützenkirchen
  */
 public class MCRMetadataStore extends MCRStore {
-    /**
-     * Map of defined metadata stores. Key is the document type, value is the
-     * store storing documents of that type.
-     */
-    private static HashMap<String, MCRMetadataStore> stores = new HashMap<String, MCRMetadataStore>();
 
     /**
-     * Returns the store storing metadata of the given type
+     * Returns the store for the given metadata document type
      * 
      * @param type
-     *            the document type
-     * @return the store defined for the given metadata type
-     * @throws MCRConfigurationException
-     *             when no store for that type is configured
+     *            the type of metadata to store
+     * @return the store for this metadata type
      */
     public static MCRMetadataStore getStore(String type) {
-        if (!stores.containsKey(type)) {
-            String prefix = "MCR.IFS2.MetadataStore." + type + ".";
-            MCRConfiguration config = MCRConfiguration.instance();
-
-            String baseDir = config.getString(prefix + "BaseDir");
-            String slotLayout = config.getString(prefix + "SlotLayout");
-            String repositoryURL = config.getString(prefix + "SVNRepositoryURL", null);
-
-            if (repositoryURL == null)
-                new MCRMetadataStore(type, baseDir, slotLayout);
-            else
-                new MCRVersioningMetadataStore(type, baseDir, slotLayout, repositoryURL);
-        }
-        return stores.get(type);
+        return (MCRMetadataStore) (MCRStore.getStore(type));
     }
 
     /**
-     * Creates a new metadata store instance.
+     * Initializes a new metadata store instance.
      * 
      * @param type
      *            the document type that is stored in this store
-     * @param baseDir
-     *            the base directory in the local filesystem storing the data
-     * @param slotLayout
-     *            the layout of slot subdirectories
      */
-    protected MCRMetadataStore(String type, String baseDir, String slotLayout) {
-        super(type, baseDir, slotLayout, type + "_", ".xml");
-        stores.put(type, this);
+    protected void init(String type) {
+        super.init(type);
+        this.prefix = type + "_";
+        this.suffix = ".xml";
     }
 
     /**
