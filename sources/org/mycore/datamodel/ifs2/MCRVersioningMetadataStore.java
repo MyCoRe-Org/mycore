@@ -46,7 +46,7 @@ public class MCRVersioningMetadataStore extends MCRMetadataStore {
 
     protected final static Logger LOGGER = Logger.getLogger(MCRVersioningMetadataStore.class);
 
-    SVNURL repURL;
+    protected SVNURL repURL;
 
     static {
         FSRepositoryFactory.setup();
@@ -77,6 +77,17 @@ public class MCRVersioningMetadataStore extends MCRMetadataStore {
      */
     SVNRepository getRepository() throws Exception {
         return SVNRepositoryFactory.create(repURL);
+    }
+
+    /**
+     * Returns the URL of the SVN repository used to manage metadata versions in
+     * this store.
+     * 
+     * @return the URL of the SVN repository used to manage metadata versions in
+     *         this store.
+     */
+    SVNURL getRepositoryURL() throws Exception {
+        return repURL;
     }
 
     public MCRVersionedMetadata create(Document xml, int id) throws Exception {
