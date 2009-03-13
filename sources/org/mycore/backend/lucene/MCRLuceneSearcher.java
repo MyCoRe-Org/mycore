@@ -250,6 +250,10 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
         modifyIndex(modifyAction);
     }
 
+    /**
+     * As opposed to {@link MCRSearcher} the returned MCRResult is read only.
+     * @see MCRSearcher#search(MCRCondition, int, List, boolean)
+     */
     public MCRResults search(MCRCondition condition, int maxResults, List<MCRSortBy> sortBy, boolean addSortData) {
         MCRResults results = new MCRResults();
 
