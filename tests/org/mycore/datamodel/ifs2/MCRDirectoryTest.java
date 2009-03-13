@@ -16,32 +16,32 @@ import org.mycore.common.MCRTestCase;
  */
 public class MCRDirectoryTest extends MCRTestCase {
 
-    private static String path;
-
-    private MCRFileStore store;
+    private static MCRFileStore store;
 
     private MCRFileCollection col;
 
+    protected void createStore() throws Exception {
+        File temp = File.createTempFile("base", "");
+        String path = temp.getAbsolutePath();
+        temp.delete();
+
+        setProperty("MCR.IFS2.FileStore.TEST.BaseDir", path, true);
+        setProperty("MCR.IFS2.FileStore.TEST.SlotLayout", "4-2-2", true);
+        store = MCRFileStore.getStore("TEST");
+    }
+
     protected void setUp() throws Exception {
         super.setUp();
-
-        if (path == null) {
-            File temp = File.createTempFile("base", "");
-            path = temp.getAbsolutePath();
-            temp.delete();
-
-            setProperty("MCR.IFS2.FileStore.TEST.BaseDir", path, true);
-            setProperty("MCR.IFS2.FileStore.TEST.SlotLayout", "4-2-2", true);
-        }
-        VFS.getManager().resolveFile(path).createFolder();
-
-        store = MCRFileStore.getStore("TEST");
+        if (store == null)
+            createStore();
+        else
+            VFS.getManager().resolveFile(store.getBaseDir()).createFolder();
         col = store.create();
     }
 
     protected void tearDown() throws Exception {
         super.tearDown();
-        VFS.getManager().resolveFile(path).delete(Selectors.SELECT_ALL);
+        VFS.getManager().resolveFile(store.getBaseDir()).delete(Selectors.SELECT_ALL);
     }
 
     public void testName() throws Exception {
@@ -149,33 +149,33 @@ public class MCRDirectoryTest extends MCRTestCase {
 
     public void testGetNodeByPath() throws Exception {
         MCRNode node = col.getNodeByPath("/");
-        assertSame(node,col);
+        assertSame(node, col);
         node = col.getNodeByPath(".");
         assertNotNull(node);
-        assertSame(node,col);
+        assertSame(node, col);
         MCRDirectory dir = new MCRDirectory(col, "dir");
         node = col.getNodeByPath("dir");
         assertNotNull(node);
-        assertEquals(node.getName(),"dir");
+        assertEquals(node.getName(), "dir");
         node = col.getNodeByPath("./dir");
         assertNotNull(node);
-        assertEquals(node.getName(),"dir");
+        assertEquals(node.getName(), "dir");
         node = dir.getNodeByPath("..");
         assertNotNull(node);
-        assertSame(node,col);
+        assertSame(node, col);
         MCRDirectory subdir = new MCRDirectory(dir, "subdir");
         node = subdir.getNodeByPath("/");
         assertNotNull(node);
-        assertSame(node,col);
+        assertSame(node, col);
         node = subdir.getNodeByPath("../subdir");
         assertNotNull(node);
-        assertEquals(node.getName(),"subdir");
+        assertEquals(node.getName(), "subdir");
         node = subdir.getNodeByPath("../..");
         assertNotNull(node);
-        assertSame(node,col);
+        assertSame(node, col);
         node = col.getNodeByPath("./dir/subdir");
         assertNotNull(node);
-        assertEquals(node.getName(),"subdir");
+        assertEquals(node.getName(), "subdir");
     }
 
     public void testDelete() throws Exception {
