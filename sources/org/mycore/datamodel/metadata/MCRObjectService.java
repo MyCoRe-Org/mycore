@@ -56,6 +56,7 @@ import org.mycore.common.MCRConfiguration;
  * </ul>
  * 
  * @author Jens Kupferschmidt
+ * @author Matthias Eichner
  * @version $Revision$ $Date$
  */
 public class MCRObjectService {
@@ -90,7 +91,7 @@ public class MCRObjectService {
     }
 
     /**
-     * This methode read the XML input stream part from a DOM part for the
+     * This method read the XML input stream part from a DOM part for the
      * structure data of the document.
      * 
      * @param service_element
@@ -179,11 +180,11 @@ public class MCRObjectService {
      * @return the date as GregorianCalendar
      */
     public final Date getDate(String type) {
-    	MCRMetaISO8601Date isoDate = getISO8601Date(type);
-    	if(isoDate == null){
-        	return null;
-    	}
-		return isoDate.getDate();
+        MCRMetaISO8601Date isoDate = getISO8601Date(type);
+        if(isoDate == null){
+            return null;
+        }
+        return isoDate.getDate();
     }
     
     private final MCRMetaISO8601Date getISO8601Date(String type){
@@ -208,7 +209,7 @@ public class MCRObjectService {
     }
 
     /**
-     * This methode set a date element in the dates list to a actual date value.
+     * This method set a date element in the dates list to a actual date value.
      * If the given type exists, the date was update.
      * 
      * @param type
@@ -219,7 +220,7 @@ public class MCRObjectService {
     }
 
     /**
-     * This methode set a date element in the dates list to a given date value.
+     * This method set a date element in the dates list to a given date value.
      * If the given type exists, the date was update.
      * 
      * @param type
@@ -239,7 +240,7 @@ public class MCRObjectService {
     }
 
     /**
-     * This methode set a date element in the dates list to a given date value.
+     * This method set a date element in the dates list to a given date value.
      * If the given type exists, the date was update.
      * 
      * @param date
@@ -256,7 +257,7 @@ public class MCRObjectService {
     }
 
     /**
-     * This methode add a flag to the flag list.
+     * This method add a flag to the flag list.
      * 
      * @param value -
      *            the new flag as string
@@ -271,7 +272,25 @@ public class MCRObjectService {
     }
 
     /**
-     * This methode get all flags from the flag list as a string.
+     * This method adds a flag to the flag list.
+     * 
+     * @param type
+     *              a type as string
+     * @param value
+     *              the new flag value as string
+     */
+    public final void addFlag(String type, String value) {
+        if ((value == null) || ((value = value.trim()).length() == 0))
+            return;
+        if((type == null) || ((type = type.trim()).length() == 0))
+            type = null;
+
+        MCRMetaLangText flag = new MCRMetaLangText("service", "servflag", null, type, 0, null, value);
+        flags.add(flag);        
+    }
+
+    /**
+     * This method get all flags from the flag list as a string.
      * 
      * @return the flags string
      */
@@ -286,6 +305,38 @@ public class MCRObjectService {
     }
 
     /**
+     * This method returns all flag values of the specified type.
+     * 
+     * @param type
+     *              a type as string.
+     * @return a list of flag values
+     */
+    protected final ArrayList<MCRMetaLangText> getFlagsAsMCRMetaLangText(String type) {
+        ArrayList<MCRMetaLangText> flagList = new ArrayList<MCRMetaLangText>();
+        for(MCRMetaLangText metaLangText : flags) {
+            if(metaLangText.getType() != null && metaLangText.getType().equals(type))
+                flagList.add(metaLangText);
+        }
+        return flagList;
+    }
+
+    /**
+     * This method returns all flag values of the specified type.
+     * 
+     * @param type
+     *              a type as string.
+     * @return a list of flag values
+     */
+    public final ArrayList<String> getFlags(String type) {
+        ArrayList<String> flagList = new ArrayList<String>();
+        ArrayList<MCRMetaLangText> internalList = getFlagsAsMCRMetaLangText(type);
+        for(MCRMetaLangText metaLangText : internalList) {
+            flagList.add(metaLangText.getText());
+        }
+        return flagList;
+    }
+
+    /**
      * This method return the size of the flag list.
      * 
      * @return the size of the flag list
@@ -295,7 +346,7 @@ public class MCRObjectService {
     }
 
     /**
-     * This methode get a single flag from the flag list as a string.
+     * This method get a single flag from the flag list as a string.
      * 
      * @exception IndexOutOfBoundsException
      *                throw this exception, if the index is false
@@ -305,12 +356,25 @@ public class MCRObjectService {
         if ((index < 0) || (index > flags.size())) {
             throw new IndexOutOfBoundsException("Index error in getFlag.");
         }
-
         return flags.get(index).getText();
     }
 
     /**
-     * This methode return a boolean value if the given flag is set or not.
+     * This method gets a single flag type from the flag list as a string.
+     * 
+     * @exception IndexOutOfBoundsException
+     *                throw this exception, if the index is false
+     * @return a flag type
+     */
+    public final String getFlagType(int index) throws IndexOutOfBoundsException {
+        if ((index < 0) || (index > flags.size())) {
+            throw new IndexOutOfBoundsException("Index error in getFlagType.");
+        }
+        return flags.get(index).getType();       
+    }
+
+    /**
+     * This method return a boolean value if the given flag is set or not.
      * 
      * @param value
      *            a searched flag
@@ -331,7 +395,21 @@ public class MCRObjectService {
     }
 
     /**
-     * This methode remove a flag from the flag list.
+     * Proves if the type is set in the flag list.
+     * @param type
+     *              a type as string
+     * @return  true if the flag list contains flags with this type,
+     *          otherwise false
+     */
+    public final boolean isFlagTypeSet(String type) {
+        ArrayList<MCRMetaLangText> internalList = getFlagsAsMCRMetaLangText(type);
+        if(internalList.size() > 0)
+            return true;
+        return false;
+    }
+
+    /**
+     * This method remove a flag from the flag list.
      * 
      * @param index
      *            a index in the list
@@ -345,9 +423,21 @@ public class MCRObjectService {
 
         flags.remove(index);
     }
+    
+    /**
+     * This method removes all flags of the specified type from
+     * the flag list.
+     * 
+     * @param type
+     *            a type as string
+     */
+    public final void removeFlags(String type) {
+        ArrayList<MCRMetaLangText> internalList = getFlagsAsMCRMetaLangText(type);
+        flags.removeAll(internalList);
+    }
 
     /**
-     * This methode set a flag in the flag list.
+     * This method set a flag in the flag list.
      * 
      * @param index
      *            a index in the list
@@ -363,12 +453,35 @@ public class MCRObjectService {
         if ((value == null) || ((value = value.trim()).length() == 0)) {
             return;
         }
-        MCRMetaLangText flag = new MCRMetaLangText("service", "servflag", null, null, 0, null, value);
+        MCRMetaLangText oldFlag = flags.get(index);
+        MCRMetaLangText flag = new MCRMetaLangText("service", "servflag", null, oldFlag.getType(), 0, null, value);
         flags.set(index, flag);
     }
 
     /**
-     * This methode add a rule to the rules list.
+     * This method sets the type value of a flag at the specified index.
+     * 
+     * @param index
+     *            a index in the list
+     * @param value
+     *            the value of a flag as string
+     * @exception IndexOutOfBoundsException
+     *                throw this exception, if the index is false
+     */
+    public final void replaceFlagType(int index, String value) throws IndexOutOfBoundsException {
+        if ((index < 0) || (index > flags.size())) {
+            throw new IndexOutOfBoundsException("Index error in replaceFlag.");
+        }
+        if ((value == null) || ((value = value.trim()).length() == 0)) {
+            return;
+        }
+        MCRMetaLangText oldFlag = flags.get(index);
+        MCRMetaLangText flag = new MCRMetaLangText("service", "servflag", null, value, 0, null, oldFlag.getText());
+        flags.set(index, flag);
+    }
+
+    /**
+     * This method add a rule to the rules list.
      * 
      * @param permission -
      *            the new permission as string
@@ -416,7 +529,7 @@ public class MCRObjectService {
     }
 
     /**
-     * This methode get a single rule from the rules list as a JDOM Element.
+     * This method get a single rule from the rules list as a JDOM Element.
      * 
      * @exception IndexOutOfBoundsException
      *                throw this exception, if the index is false
@@ -430,7 +543,7 @@ public class MCRObjectService {
     }
 
     /**
-     * This methode get a single permission name of rule from the rules list as a
+     * This method get a single permission name of rule from the rules list as a
      * string.
      * 
      * @exception IndexOutOfBoundsException
@@ -445,7 +558,7 @@ public class MCRObjectService {
     }
 
     /**
-     * This methode remove a rule from the rules list.
+     * This method remove a rule from the rules list.
      * 
      * @param index
      *            a index in the list
@@ -460,7 +573,7 @@ public class MCRObjectService {
     }
 
     /**
-     * This methode create a XML stream for all structure data.
+     * This method create a XML stream for all structure data.
      * 
      * @exception MCRException
      *                if the content of this class is not valid
@@ -533,7 +646,7 @@ public class MCRObjectService {
     }
 
     /**
-     * This methode returns the index for the given flag value.
+     * This method returns the index for the given flag value.
      * 
      * @param value
      *            the value of a flag as string
