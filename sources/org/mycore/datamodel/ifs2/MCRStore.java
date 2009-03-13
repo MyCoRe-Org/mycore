@@ -171,14 +171,7 @@ public abstract class MCRStore {
      * @return the file object storing that data
      */
     FileObject getSlot(int ID) throws Exception {
-        String[] parts = getPath(ID);
-        StringBuffer path = new StringBuffer();
-        for (String part : parts) {
-            path.append(part);
-            if (path.length() > 0)
-                path.append('/');
-        }
-        return VFS.getManager().resolveFile(dir, path.toString());
+        return VFS.getManager().resolveFile(dir, getSlotPath(ID));
     }
 
     /**
@@ -189,7 +182,28 @@ public abstract class MCRStore {
      *            the ID of the data
      * @return the relative path storing that data
      */
-    String[] getPath(int ID) {
+    String getSlotPath(int ID) {
+        String[] parts = getSlotPathParts(ID);
+        StringBuffer path = new StringBuffer();
+        for (int i = 0; i < parts.length - 1; i++) {
+            path.append(parts[i]);
+            if (path.length() > 0)
+                path.append('/');
+        }
+        path.append(parts[parts.length - 1]);
+        return path.toString();
+    }
+
+    /**
+     * Returns the parts of the relative path used to store data for the given
+     * ID within the store base directory
+     * 
+     * @param ID
+     *            the ID of the data
+     * @return the directory and file names of the relative path storing that
+     *         data
+     */
+    String[] getSlotPathParts(int ID) {
         String id = nulls + String.valueOf(ID);
         id = id.substring(id.length() - idLength);
 
@@ -398,7 +412,16 @@ public abstract class MCRStore {
      *            the ID of the document to be deleted
      */
     public void delete(int id) throws Exception {
-        FileObject fo = getSlot(id);
+        delete(getSlot(id));
+    }
+
+    /**
+     * Deletes the data stored in the given file object from the store
+     * 
+     * @param fo
+     *            the file object to be deleted
+     */
+    void delete(FileObject fo) throws Exception {
         FileObject parent = fo.getParent();
         fo.delete(Selectors.SELECT_ALL);
 
