@@ -406,8 +406,8 @@ public class MCRIndexBrowserData {
                 if (ilen == -1) {
                     fieldtype = MCRFieldDef.getDef("objectType");
                     cOr.addChild(new MCRQueryCondition(fieldtype, "=", next));
-                }else {
-                    MCRAndCondition iAnd = new MCRAndCondition(); 
+                } else {
+                    MCRAndCondition iAnd = new MCRAndCondition();
                     fieldtype = MCRFieldDef.getDef("objectType");
                     iAnd.addChild(new MCRQueryCondition(fieldtype, "=", next.substring(ilen + 1, next.length())));
                     fieldproject = MCRFieldDef.getDef("objectProject");
@@ -428,18 +428,19 @@ public class MCRIndexBrowserData {
                 cAnd.addChild(new MCRQueryCondition(fieldproject, "=", indexConfig.table.substring(0, ilen)));
             }
         }
+        if (browseData.search != null && browseData.search.length() > 0) {
+            MCRFieldDef field = MCRFieldDef.getDef(indexConfig.browseField);
+            String value = browseData.search == null ? "*" : browseData.search;
+            String operator = getOperator();
 
-        MCRFieldDef field = MCRFieldDef.getDef(indexConfig.browseField);
-        String value = browseData.search == null ? "*" : browseData.search;
-        String operator = getOperator();
-
-        cAnd.addChild(new MCRQueryCondition(field, operator, value));
+            cAnd.addChild(new MCRQueryCondition(field, operator, value));
+        }
 
         boolean order = "ascending".equalsIgnoreCase(indexConfig.order);
         List<MCRSortBy> sortCriteria = new ArrayList<MCRSortBy>();
 
         for (int i = 0; indexConfig.sortFields != null && i < indexConfig.sortFields.length; i++) {
-            field = MCRFieldDef.getDef(indexConfig.sortFields[i]);
+            MCRFieldDef field = MCRFieldDef.getDef(indexConfig.sortFields[i]);
             if (null != field)
                 sortCriteria.add(new MCRSortBy(field, order));
             else
