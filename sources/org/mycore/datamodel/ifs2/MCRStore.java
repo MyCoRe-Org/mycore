@@ -148,6 +148,15 @@ public abstract class MCRStore {
     }
 
     /**
+     * Returns the absolute path of the local base directory
+     * 
+     * @return the base directory storing the data
+     */
+    String getBaseDir() {
+        return dir.getAbsolutePath();
+    }
+
+    /**
      * Used to fill small IDs with leading zeros
      */
     private static String nulls = "00000000000000000000000000000000";
@@ -162,19 +171,36 @@ public abstract class MCRStore {
      * @return the file object storing that data
      */
     FileObject getSlot(int ID) throws Exception {
+        String[] parts = getPath(ID);
+        StringBuffer path = new StringBuffer();
+        for (String part : parts) {
+            path.append(part);
+            if (path.length() > 0)
+                path.append('/');
+        }
+        return VFS.getManager().resolveFile(dir, path.toString());
+    }
+
+    /**
+     * Returns the relative path used to store data for the given ID within the
+     * store base directory
+     * 
+     * @param ID
+     *            the ID of the data
+     * @return the relative path storing that data
+     */
+    String[] getPath(int ID) {
         String id = nulls + String.valueOf(ID);
         id = id.substring(id.length() - idLength);
 
         int offset = 0;
-        StringBuffer path = new StringBuffer();
+        String[] path = new String[slotLength.length + 1];
         for (int i = 0; i < slotLength.length; i++) {
-            path.append(id.substring(offset, offset + slotLength[i]));
+            path[i] = id.substring(offset, offset + slotLength[i]);
             offset += slotLength[i];
-            path.append("/");
         }
-        path.append(prefix).append(id).append(suffix);
-
-        return VFS.getManager().resolveFile(dir, path.toString());
+        path[path.length - 1] = prefix + id + suffix;
+        return path;
     }
 
     /**
