@@ -23,6 +23,7 @@
 
 package org.mycore.datamodel.ifs2;
 
+import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Date;
@@ -84,10 +85,24 @@ public class MCRStoredMetadata {
      */
     void save(Document xml) throws Exception {
         OutputStream out = fo.getContent().getOutputStream();
+        out.write(xml2bytes(xml));
+        out.close();
+    }
+
+    /**
+     * Outputs the xml document's content to a byte array
+     * 
+     * @param xml
+     *            the xml document
+     * @return the xml document written in UTF-8 with pretty formatting
+     */
+    protected byte[] xml2bytes(Document xml) throws Exception {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
         XMLOutputter xout = new XMLOutputter();
         xout.setFormat(Format.getPrettyFormat().setEncoding("UTF-8").setIndent("  "));
         xout.output(xml, out);
         out.close();
+        return out.toByteArray();
     }
 
     /**
