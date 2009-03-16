@@ -132,6 +132,8 @@ public class MCRVersionedMetadata extends MCRStoredMetadata {
         SVNCommitInfo info = editor.closeEdit();
         this.revision = info.getNewRevision();
         LOGGER.info("SVN commit of create finished, new revision " + revision);
+
+        setLastModified( info.getDate() );
     }
 
     /**
@@ -189,6 +191,8 @@ public class MCRVersionedMetadata extends MCRStoredMetadata {
         SVNCommitInfo info = editor.closeEdit();
         this.revision = info.getNewRevision();
         LOGGER.info("SVN commit of update finished, new revision " + revision);
+
+        setLastModified( info.getDate() );
     }
 
     /**
