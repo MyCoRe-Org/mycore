@@ -11,7 +11,9 @@
 <!-- Stephan Schmidt 	- html prototype			-->
 <!-- ============================================== -->
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" 
-    xmlns:xlink="http://www.w3.org/1999/xlink" exclude-result-prefixes="xlink" xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation">
+    xmlns:xlink="http://www.w3.org/1999/xlink" exclude-result-prefixes="xlink" xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation" xmlns:mcrxml="xalan://org.mycore.common.xml.MCRXMLFunctions">
+
+<xsl:variable name="jai.available" select="mcrxml:classAvailable('javax.media.jai.JAI')"/>
 
 <xsl:include href="mcr-module-iview.xsl" />
 <!--

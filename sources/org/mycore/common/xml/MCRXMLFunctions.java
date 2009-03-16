@@ -181,4 +181,15 @@ public class MCRXMLFunctions {
             return false;
         }
     }
+    
+    public static boolean classAvailable(String className){
+        try {
+            Class.forName(className);
+            LOGGER.info("found class: "+className);
+            return true;
+        } catch (ClassNotFoundException e) {
+            LOGGER.info("did not found class: "+className);
+            return false;
+        }
+    }
 }
