@@ -23,14 +23,10 @@
 
 package org.mycore.datamodel.ifs2;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.Date;
 
-import org.jdom.Document;
-import org.jdom.input.SAXBuilder;
 import org.tmatesoft.svn.core.SVNLogEntry;
-import org.tmatesoft.svn.core.SVNProperties;
 import org.tmatesoft.svn.core.io.SVNRepository;
 
 /**
@@ -114,16 +110,12 @@ public class MCRMetadataVersion {
      * 
      * @return the metadata document as it was in this version
      */
-    public Document retrieve() throws Exception {
+    public MCRContent retrieve() throws Exception {
         SVNRepository repository = vm.getStore().getRepository();
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        SVNProperties properties = new SVNProperties();
-        repository.getFile(vm.getStore().getSlotPath(vm.getID()), revision, properties, baos);
+        repository.getFile(vm.getStore().getSlotPath(vm.getID()), revision, null, baos);
         baos.close();
-        ByteArrayInputStream in = new ByteArrayInputStream(baos.toByteArray());
-        Document xml = new SAXBuilder().build(in);
-        in.close();
-        return xml;
+        return new MCRContent(baos.toByteArray());
         // TODO: Check keyword substitution, check revision number
     }
 

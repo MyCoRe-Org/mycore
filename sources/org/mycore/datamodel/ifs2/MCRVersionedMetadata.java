@@ -23,25 +23,18 @@
 
 package org.mycore.datamodel.ifs2;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.OutputStream;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.vfs.FileObject;
 import org.apache.log4j.Logger;
-import org.jdom.Comment;
-import org.jdom.Document;
-import org.mycore.common.MCRUtils;
 import org.tmatesoft.svn.core.SVNCommitInfo;
 import org.tmatesoft.svn.core.SVNDirEntry;
 import org.tmatesoft.svn.core.SVNLogEntry;
 import org.tmatesoft.svn.core.SVNNodeKind;
-import org.tmatesoft.svn.core.SVNProperties;
-import org.tmatesoft.svn.core.SVNProperty;
-import org.tmatesoft.svn.core.SVNPropertyValue;
 import org.tmatesoft.svn.core.io.ISVNEditor;
 import org.tmatesoft.svn.core.io.SVNRepository;
 import org.tmatesoft.svn.core.io.diff.SVNDeltaGenerator;
@@ -79,6 +72,7 @@ public class MCRVersionedMetadata extends MCRStoredMetadata {
      */
     MCRVersionedMetadata(MCRMetadataStore store, FileObject fo, int id) {
         super(store, fo, id);
+        // TODO: set revision of existing data at retrieve()
     }
 
     public MCRVersioningMetadataStore getStore() {
@@ -92,7 +86,10 @@ public class MCRVersionedMetadata extends MCRStoredMetadata {
      * @param xml
      *            the metadata document to store
      */
-    void create(Document xml) throws Exception {
+    void create(MCRContent xml) throws Exception {
+        super.create(xml);
+        xml = new MCRContent(fo);
+
         String commitMsg = "Created metadata object " + store.getID() + "_" + id + " in store";
         SVNRepository repository = getStore().getRepository();
 
@@ -118,21 +115,16 @@ public class MCRVersionedMetadata extends MCRStoredMetadata {
             editor.closeDir();
         }
 
-        // TODO: if keywords exist, do not add again
-        String comment = "\n" + store.getID() + "_" + id + "\n$Revision$\n$Date$\n$Author:$\n";
-        xml.addContent(0, new Comment(comment));
-
         path.append(parts[parts.length - 1]);
         String filePath = path.toString();
         LOGGER.info("Create in SVN: file " + filePath);
         editor.addFile(filePath, null, -1);
         editor.applyTextDelta(filePath, null);
         SVNDeltaGenerator deltaGenerator = new SVNDeltaGenerator();
-        ByteArrayInputStream in = new ByteArrayInputStream(xml2bytes(xml));
+
+        InputStream in = xml.getInputStream();
         String checksum = deltaGenerator.sendDelta(filePath, in, editor, true);
         in.close();
-        editor.changeFileProperty(filePath, SVNProperty.KEYWORDS, SVNPropertyValue.create("Revision Date Author"));
-        editor.changeFileProperty(filePath, SVNProperty.MIME_TYPE, SVNPropertyValue.create("text/xml"));
         editor.closeFile(filePath, checksum);
         editor.closeDir();
 
@@ -140,8 +132,6 @@ public class MCRVersionedMetadata extends MCRStoredMetadata {
         SVNCommitInfo info = editor.closeEdit();
         this.revision = info.getNewRevision();
         LOGGER.info("SVN commit of create finished, new revision " + revision);
-
-        super.create(xml);
     }
 
     /**
@@ -174,7 +164,10 @@ public class MCRVersionedMetadata extends MCRStoredMetadata {
      * @param xml
      *            the new version of the document metadata
      */
-    public void update(Document xml) throws Exception {
+    public void update(MCRContent xml) throws Exception {
+        super.update(xml);
+        xml = new MCRContent(fo);
+
         String commitMsg = "Updated metadata object " + store.getID() + "_" + id + " in store";
         String filePath = store.getSlotPath(id);
         LOGGER.info("Update in SVN: file " + filePath);
@@ -186,7 +179,7 @@ public class MCRVersionedMetadata extends MCRStoredMetadata {
         editor.openFile(filePath, -1);
         editor.applyTextDelta(filePath, null);
         SVNDeltaGenerator deltaGenerator = new SVNDeltaGenerator();
-        ByteArrayInputStream in = new ByteArrayInputStream(xml2bytes(xml));
+        InputStream in = xml.getInputStream();
         String checksum = deltaGenerator.sendDelta(filePath, in, editor, true);
         in.close();
         editor.closeFile(filePath, checksum);
@@ -196,8 +189,6 @@ public class MCRVersionedMetadata extends MCRStoredMetadata {
         SVNCommitInfo info = editor.closeEdit();
         this.revision = info.getNewRevision();
         LOGGER.info("SVN commit of update finished, new revision " + revision);
-
-        super.update(xml);
     }
 
     /**
@@ -207,15 +198,9 @@ public class MCRVersionedMetadata extends MCRStoredMetadata {
     public void update() throws Exception {
         SVNRepository repository = getStore().getRepository();
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        SVNProperties properties = new SVNProperties();
-        revision = repository.getFile(store.getSlotPath(id), -1, properties, baos);
+        revision = repository.getFile(store.getSlotPath(id), -1, null, baos);
         baos.close();
-        ByteArrayInputStream in = new ByteArrayInputStream(baos.toByteArray());
-        OutputStream out = fo.getContent().getOutputStream();
-        MCRUtils.copyStream(in, out);
-        out.close();
-        in.close();
-        // TODO: Check keyword substitution, check revision number
+        new MCRContent(baos.toByteArray()).sendTo(fo);
     }
 
     /**

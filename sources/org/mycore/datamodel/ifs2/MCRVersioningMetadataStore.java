@@ -28,7 +28,6 @@ import java.util.Enumeration;
 
 import org.apache.commons.vfs.FileObject;
 import org.apache.log4j.Logger;
-import org.jdom.Document;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRSessionMgr;
@@ -116,11 +115,11 @@ public class MCRVersioningMetadataStore extends MCRMetadataStore {
         return repURL;
     }
 
-    public MCRVersionedMetadata create(Document xml, int id) throws Exception {
+    public MCRVersionedMetadata create(MCRContent xml, int id) throws Exception {
         return (MCRVersionedMetadata) (super.create(xml, id));
     }
 
-    public MCRVersionedMetadata create(Document xml) throws Exception {
+    public MCRVersionedMetadata create(MCRContent xml) throws Exception {
         return (MCRVersionedMetadata) (super.create(xml));
     }
 

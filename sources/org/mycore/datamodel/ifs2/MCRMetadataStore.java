@@ -24,7 +24,6 @@
 package org.mycore.datamodel.ifs2;
 
 import org.apache.commons.vfs.FileObject;
-import org.jdom.Document;
 import org.mycore.common.MCRException;
 
 /**
@@ -72,7 +71,7 @@ public class MCRMetadataStore extends MCRStore {
      *            the XML document to be stored
      * @return the stored metadata object
      */
-    public MCRStoredMetadata create(Document xml) throws Exception {
+    public MCRStoredMetadata create(MCRContent xml) throws Exception {
         int id = getNextFreeID();
         return create(xml, id);
     }
@@ -86,7 +85,7 @@ public class MCRMetadataStore extends MCRStore {
      *            the ID under which the document should be stored
      * @return the stored metadata object
      */
-    public MCRStoredMetadata create(Document xml, int id) throws Exception {
+    public MCRStoredMetadata create(MCRContent xml, int id) throws Exception {
         FileObject fo = getSlot(id);
         if (fo.exists()) {
             String msg = "Metadata object with ID " + id + " already exists in store";

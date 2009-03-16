@@ -23,16 +23,9 @@
 
 package org.mycore.datamodel.ifs2;
 
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.Date;
 
 import org.apache.commons.vfs.FileObject;
-import org.jdom.Document;
-import org.jdom.input.SAXBuilder;
-import org.jdom.output.Format;
-import org.jdom.output.XMLOutputter;
 
 /**
  * Represents an XML metadata document that is stored in MCRMetadataStore.
@@ -72,38 +65,11 @@ public class MCRStoredMetadata {
      * @param xml
      *            the XML to save to a new file
      */
-    void create(Document xml) throws Exception {
+    void create(MCRContent xml) throws Exception {
         fo.createFile();
-        save(xml);
+        xml.sendTo(fo);
     }
 
-    /**
-     * Saves the given XML to the internal file object
-     * 
-     * @param xml
-     *            the XML to save
-     */
-    void save(Document xml) throws Exception {
-        OutputStream out = fo.getContent().getOutputStream();
-        out.write(xml2bytes(xml));
-        out.close();
-    }
-
-    /**
-     * Outputs the xml document's content to a byte array
-     * 
-     * @param xml
-     *            the xml document
-     * @return the xml document written in UTF-8 with pretty formatting
-     */
-    protected byte[] xml2bytes(Document xml) throws Exception {
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        XMLOutputter xout = new XMLOutputter();
-        xout.setFormat(Format.getPrettyFormat().setEncoding("UTF-8").setIndent("  "));
-        xout.output(xml, out);
-        out.close();
-        return out.toByteArray();
-    }
 
     /**
      * Updates the stored XML document
@@ -111,8 +77,8 @@ public class MCRStoredMetadata {
      * @param xml
      *            the XML document to be stored
      */
-    public void update(Document xml) throws Exception {
-        save(xml);
+    public void update(MCRContent xml) throws Exception {
+        xml.sendTo(fo);
     }
 
     /**
@@ -120,11 +86,8 @@ public class MCRStoredMetadata {
      * 
      * @return the stored XML document
      */
-    public Document getXML() throws Exception {
-        InputStream in = fo.getContent().getInputStream();
-        Document xml = new SAXBuilder().build(in);
-        in.close();
-        return xml;
+    public MCRContent getMetadata() throws Exception {
+        return new MCRContent(fo);
     }
 
     /**
