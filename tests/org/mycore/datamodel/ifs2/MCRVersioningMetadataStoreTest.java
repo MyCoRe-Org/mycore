@@ -25,12 +25,14 @@ package org.mycore.datamodel.ifs2;
 
 import java.io.File;
 import java.util.Enumeration;
+import java.util.List;
 
 import org.apache.commons.vfs.Selectors;
 import org.apache.commons.vfs.VFS;
 import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
+import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRTestCase;
 import org.tmatesoft.svn.core.io.SVNRepositoryFactory;
 
@@ -42,9 +44,9 @@ import org.tmatesoft.svn.core.io.SVNRepositoryFactory;
 public class MCRVersioningMetadataStoreTest extends MCRTestCase {
 
     private static Logger LOGGER = Logger.getLogger(MCRVersioningMetadataStoreTest.class);
-    
+
     protected static MCRVersioningMetadataStore store;
-    
+
     protected void createStore() throws Exception {
         File temp = File.createTempFile("base", "");
         String path = temp.getAbsolutePath();
@@ -53,11 +55,11 @@ public class MCRVersioningMetadataStoreTest extends MCRTestCase {
         setProperty("MCR.IFS2.Store.TEST.Class", "org.mycore.datamodel.ifs2.MCRVersioningMetadataStore", true);
         setProperty("MCR.IFS2.Store.TEST.BaseDir", path, true);
         setProperty("MCR.IFS2.Store.TEST.SlotLayout", "4-2-2", true);
-        
+
         temp = File.createTempFile("base", "");
-        path = "file:///" + temp.getAbsolutePath().replace( '\\', '/' );
+        path = "file:///" + temp.getAbsolutePath().replace('\\', '/');
         temp.delete();
-        
+
         setProperty("MCR.IFS2.Store.TEST.SVNRepositoryURL", path, true);
         store = MCRVersioningMetadataStore.getStore("TEST");
     }
@@ -66,8 +68,7 @@ public class MCRVersioningMetadataStoreTest extends MCRTestCase {
         super.setUp();
         if (store == null)
             createStore();
-        else
-        {
+        else {
             VFS.getManager().resolveFile(store.getBaseDir()).createFolder();
             SVNRepositoryFactory.createLocalRepository(new File(store.getRepositoryURL().getPath()), true, false);
         }
@@ -78,36 +79,38 @@ public class MCRVersioningMetadataStoreTest extends MCRTestCase {
         VFS.getManager().resolveFile(store.getBaseDir()).delete(Selectors.SELECT_ALL);
         VFS.getManager().resolveFile(store.repURL.getPath()).delete(Selectors.SELECT_ALL);
     }
-    
+
     public void testCreateDocument() throws Exception {
         Document xml1 = new Document(new Element("root"));
-        MCRVersionedMetadata sm = store.create(xml1);
-        assertNotNull(sm);
-        int id1 = sm.getID();
-        assertTrue(id1 > 0);
-        MCRVersionedMetadata sm2 = store.retrieve(id1);
-        Document xml2 = sm2.getXML();
+        MCRVersionedMetadata vm = store.create(new MCRContent(xml1));
+        assertNotNull(vm);
+        assertTrue(vm.getID() > 0);
+        assertTrue(vm.getRevision() > 0);
+        MCRVersionedMetadata vm2 = store.retrieve(vm.getID());
+        Document xml2 = vm2.getMetadata().getXML();
         assertEquals(xml1.toString(), xml2.toString());
-        int id2 = store.create(xml1).getID();
-        assertTrue(id2 > id1);
+
+        MCRVersionedMetadata vm3 = store.create(new MCRContent(xml1));
+        assertTrue(vm3.getID() > vm.getID());
+        assertTrue(vm3.getRevision() > vm.getRevision());
     }
 
     public void testCreateDocumentInt() throws Exception {
         int id = store.getNextFreeID();
         assertTrue(id > 0);
         Document xml1 = new Document(new Element("root"));
-        MCRVersionedMetadata sm1 = store.create(xml1, id);
-        assertNotNull(sm1);
-        Document xml2 = store.retrieve(id).getXML();
+        MCRVersionedMetadata vm1 = store.create(new MCRContent(xml1), id);
+        assertNotNull(vm1);
+        Document xml2 = store.retrieve(id).getMetadata().getXML();
         assertEquals(xml1.toString(), xml2.toString());
-        store.create(xml1, id + 1);
-        Document xml3 = store.retrieve(id + 1).getXML();
+        store.create(new MCRContent(xml1), id + 1);
+        Document xml3 = store.retrieve(id + 1).getMetadata().getXML();
         assertEquals(xml1.toString(), xml3.toString());
     }
 
     public void testDelete() throws Exception {
         Document xml1 = new Document(new Element("root"));
-        int id = store.create(xml1).getID();
+        int id = store.create(new MCRContent(xml1)).getID();
         assertTrue(store.exists(id));
         store.delete(id);
         assertFalse(store.exists(id));
@@ -116,19 +119,78 @@ public class MCRVersioningMetadataStoreTest extends MCRTestCase {
 
     public void testUpdate() throws Exception {
         Document xml1 = new Document(new Element("root"));
-        MCRVersionedMetadata sm = store.create(xml1);
+        MCRVersionedMetadata vm = store.create(new MCRContent(xml1));
         Document xml3 = new Document(new Element("update"));
-        sm.update(xml3);
-        Document xml4 = store.retrieve(sm.getID()).getXML();
+        long rev = vm.getRevision();
+        vm.update(new MCRContent(xml3));
+        assertTrue(vm.getRevision() > rev);
+        Document xml4 = store.retrieve(vm.getID()).getMetadata().getXML();
         assertEquals(xml3.toString(), xml4.toString());
     }
 
     public void testRetrieve() throws Exception {
         Document xml1 = new Document(new Element("root"));
-        int id = store.create(xml1).getID();
+        int id = store.create(new MCRContent(xml1)).getID();
         MCRVersionedMetadata sm1 = store.retrieve(id);
-        Document xml2 = sm1.getXML();
+        Document xml2 = sm1.getMetadata().getXML();
         assertEquals(xml1.toString(), xml2.toString());
+    }
+
+    public void testVersioning() throws Exception {
+        Document xml1 = new Document(new Element("bingo"));
+        MCRVersionedMetadata vm = store.create(new MCRContent(xml1));
+        long baseRev = vm.getRevision();
+        assertTrue(vm.isUpToDate());
+
+        List<MCRMetadataVersion> versions = vm.listVersions();
+        assertNotNull(versions);
+        assertEquals(versions.size(), 1);
+        MCRMetadataVersion mv = versions.get(0);
+        assertSame(mv.getMetadataObject(), vm);
+        assertEquals(mv.getRevision(), baseRev);
+        assertEquals(mv.getUser(), MCRSessionMgr.getCurrentSession().getCurrentUserID());
+
+        Document xml2 = new Document(new Element("bango"));
+        vm.update(new MCRContent(xml2));
+        assertTrue(vm.getRevision() > baseRev);
+        assertTrue(vm.isUpToDate());
+
+        versions = vm.listVersions();
+        assertEquals(versions.size(), 2);
+        mv = versions.get(0);
+        assertEquals(mv.getRevision(), baseRev);
+        mv = versions.get(1);
+        assertEquals(mv.getRevision(), vm.getRevision());
+
+        Document xml3 = new Document(new Element("bongo"));
+        vm.update(new MCRContent(xml3));
+
+        versions = vm.listVersions();
+        assertEquals(versions.size(), 3);
+        mv = versions.get(0);
+        assertEquals(mv.getRevision(), baseRev);
+        mv = versions.get(2);
+        assertEquals(mv.getRevision(), vm.getRevision());
+        assertTrue(versions.get(0).getRevision() < versions.get(1).getRevision());
+        assertTrue(versions.get(1).getRevision() < versions.get(2).getRevision());
+        assertTrue(versions.get(0).getDate().before(versions.get(1).getDate()));
+        assertTrue(versions.get(1).getDate().before(versions.get(2).getDate()));
+
+        xml1 = versions.get(0).retrieve().getXML();
+        assertNotNull(xml1);
+        assertEquals("bingo", xml1.getRootElement().getName());
+        xml2 = versions.get(1).retrieve().getXML();
+        assertNotNull(xml2);
+        assertEquals("bango", xml2.getRootElement().getName());
+        xml3 = versions.get(2).retrieve().getXML();
+        assertNotNull(xml1);
+        assertEquals("bongo", xml3.getRootElement().getName());
+
+        versions.get(1).restore();
+        assertTrue(vm.getRevision() > versions.get(2).getRevision());
+        assertTrue(vm.getLastModified().after(versions.get(2).getDate()));
+        assertEquals(vm.getMetadata().getXML().getRootElement().getName(), "bango");
+        assertEquals(vm.listVersions().size(), 4);
     }
 
     public void testPerformance() throws Exception {
@@ -136,14 +198,14 @@ public class MCRVersioningMetadataStoreTest extends MCRTestCase {
         LOGGER.info("Storing 10 XML documents in store:");
         long time = System.currentTimeMillis();
         for (int i = 0; i < 10; i++)
-            store.create(xml);
+            store.create(new MCRContent(xml));
         LOGGER.info("Time: " + (System.currentTimeMillis() - time) + " ms");
 
         time = System.currentTimeMillis();
         xml = new Document(new Element("update"));
         LOGGER.info("Updating 10 XML documents in store:");
         for (Enumeration<Integer> ids = store.listIDs(MCRMetadataStore.ASCENDING); ids.hasMoreElements();)
-            store.retrieve(ids.nextElement()).update(xml);
+            store.retrieve(ids.nextElement()).update(new MCRContent(xml));
         LOGGER.info("Time: " + (System.currentTimeMillis() - time) + " ms");
 
         time = System.currentTimeMillis();
