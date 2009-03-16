@@ -205,7 +205,7 @@ public class MCRHit {
      * @param other
      *            the other hit
      */
-    void merge(MCRHit other) {
+    public void merge(MCRHit other) {
         // Copy other hit sort data
         if (this.sortData.isEmpty() && !other.sortData.isEmpty()) {
             this.sortData.addAll(other.sortData);

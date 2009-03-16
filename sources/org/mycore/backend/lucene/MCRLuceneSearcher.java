@@ -868,6 +868,8 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
 
         private static final DecimalFormat df = new DecimalFormat("0.00000000000");
 
+        private boolean loadComplete = false;
+
         public MCRLuceneResults(IndexSearcher indexSearcher, TopFieldDocs topDocs, Collection<MCRFieldDef> addableFields) {
             super();
             this.indexSearcher = indexSearcher;
@@ -885,25 +887,45 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
         }
 
         @Override
+        protected MCRHit getHit(String key) {
+            if (!loadComplete) {
+                for (int i = 0; i < getNumHits(); i++)
+                    inititializeTopDoc(i);
+                loadComplete = true;
+            }
+            return super.getHit(key);
+        }
+
+        @Override
         public MCRHit getHit(int i) {
             if (i < 0 || i > topDocs.totalHits) {
                 return null;
             }
             MCRHit hit = super.getHit(i);
             if (hit == null) {
-                //initialize
-                try {
-                    hit = getMCRHit(topDocs.scoreDocs[i]);
-                } catch (Exception e) {
-                    if (topDocs.scoreDocs.length <= i) {
-                        throw new MCRException("TopDocs is not initialized.", e);
-                    }
-                    throw new MCRException("Error while fetching Lucene document: " + topDocs.scoreDocs[i].doc, e);
-                }
-                super.hits.set(i, hit);
-                super.map.put(hit.getKey(), hit);
+                inititializeTopDoc(i);
+                hit = super.getHit(i);
             }
             return hit;
+        }
+
+        private void inititializeTopDoc(int i) {
+            //initialize
+            MCRHit hit;
+            try {
+                hit = getMCRHit(topDocs.scoreDocs[i]);
+            } catch (Exception e) {
+                if (topDocs.scoreDocs.length <= i) {
+                    throw new MCRException("TopDocs is not initialized.", e);
+                }
+                throw new MCRException("Error while fetching Lucene document: " + topDocs.scoreDocs[i].doc, e);
+            }
+            super.hits.set(i, hit);
+            MCRHit oldHit = super.map.get(hit.getKey());
+            if (oldHit != null)
+                oldHit.merge(hit);
+            else
+                super.map.put(hit.getKey(), hit);
         }
 
         private MCRHit getMCRHit(ScoreDoc scoreDoc) throws CorruptIndexException, IOException {

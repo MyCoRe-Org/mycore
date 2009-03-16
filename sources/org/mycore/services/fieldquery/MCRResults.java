@@ -24,6 +24,7 @@
 package org.mycore.services.fieldquery;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -132,7 +133,7 @@ public class MCRResults implements Iterable<MCRHit> {
      *            the key of the hit
      * @return the MCRHit, if it exists
      */
-    private MCRHit getHit(String key) {
+    protected MCRHit getHit(String key) {
         if (map.containsKey(key)) {
             return map.get(key);
         }
@@ -306,13 +307,14 @@ public class MCRResults implements Iterable<MCRHit> {
      *            the other result lists
      */
     public static MCRResults intersect(MCRResults... others) {
-        MCRResults totalResult = new MCRResults();
-        for (MCRResults other : others) {
+        final MCRResults firstResultList = others[0];
+        MCRResults totalResult = union(firstResultList);
+        for (MCRResults other : Arrays.asList(others).subList(1, others.length)) {
             // x AND {} is always {}
             if (other.getNumHits() == 0) {
                 totalResult.map.clear();
                 totalResult.hits.clear();
-                continue;
+                return totalResult;
             }
 
             int numHits = totalResult.getNumHits();
