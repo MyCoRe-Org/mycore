@@ -23,7 +23,6 @@
 
 package org.mycore.datamodel.ifs2;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -176,9 +175,9 @@ public class MCRFileStoreTest extends MCRTestCase {
         assertEquals(col.getChildren().size(), 1);
         assertEquals(build.getSize(), 0);
         assertTrue(created.before(build.getLastModified()));
-        build.setContentFrom(new Document(new Element("project")));
+        build.setContent(new MCRContent(new Document(new Element("project"))));
         assertTrue(build.getSize() > 0);
-        assertNotNull(build.getContentAsXML());
+        assertNotNull(build.getContent().getBytes());
         synchronized (this) {
             wait(1000);
         }
@@ -186,7 +185,7 @@ public class MCRFileStoreTest extends MCRTestCase {
         assertEquals(col.getNumChildren(), 2);
         assertTrue(modified.before(col.getLastModified()));
         byte[] content = "Hello World!".getBytes("UTF-8");
-        new MCRFile(dir, "readme.txt").setContentFrom(new ByteArrayInputStream(content));
+        new MCRFile(dir, "readme.txt").setContent(new MCRContent(content));
         MCRFile child = (MCRFile) (dir.getChild("readme.txt"));
         assertNotNull(child);
         assertEquals(child.getSize(), content.length);
