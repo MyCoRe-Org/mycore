@@ -885,16 +885,6 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
         }
 
         @Override
-        public void and(MCRResults other) {
-            throw new UnsupportedOperationException("MCRResults are read only");
-        }
-
-        @Override
-        public void or(MCRResults other) {
-            throw new UnsupportedOperationException("MCRResults are read only");
-        }
-
-        @Override
         public MCRHit getHit(int i) {
             if (i < 0 || i > topDocs.totalHits) {
                 return null;

@@ -227,7 +227,8 @@ public class MCRResults implements Iterable<MCRHit> {
             Element connection = new Element("hostconnection", MCRFieldDef.mcrns);
             connection.setAttribute("host", (String) hostconnection.key(i));
             String msg = (String) hostconnection.item(i);
-            if (msg == null) msg = "";
+            if (msg == null)
+                msg = "";
             connection.setAttribute("message", msg);
             if (msg.length() == 0) {
                 connection.setAttribute("connection", "true");
@@ -302,29 +303,33 @@ public class MCRResults implements Iterable<MCRHit> {
      * lists.
      * 
      * @param other
-     *            the other result list
+     *            the other result lists
      */
-    public void and(MCRResults other) {
-        // x AND {} is always {}
-        if (other.getNumHits() == 0) {
-            map.clear();
-            hits.clear();
-            return;
-        }
+    public static MCRResults intersect(MCRResults... others) {
+        MCRResults totalResult = new MCRResults();
+        for (MCRResults other : others) {
+            // x AND {} is always {}
+            if (other.getNumHits() == 0) {
+                totalResult.map.clear();
+                totalResult.hits.clear();
+                continue;
+            }
 
-        int numHits = this.getNumHits();
-        for (int i = 0; i < numHits; i++) {
-            MCRHit a = this.getHit(i);
-            String key = a.getKey();
-            MCRHit b = other.getHit(key);
+            int numHits = totalResult.getNumHits();
+            for (int i = 0; i < numHits; i++) {
+                MCRHit a = totalResult.getHit(i);
+                String key = a.getKey();
+                MCRHit b = other.getHit(key);
 
-            if (b == null) {
-                map.remove(key);
-                hits.remove(i--);
-                numHits--;
-            } else
-                a.merge(b);
+                if (b == null) {
+                    totalResult.map.remove(key);
+                    totalResult.hits.remove(i--);
+                    numHits--;
+                } else
+                    a.merge(b);
+            }
         }
+        return totalResult;
     }
 
     /**
@@ -332,12 +337,15 @@ public class MCRResults implements Iterable<MCRHit> {
      * list. Combines the MCRHit data of both result lists.
      * 
      * @param other
-     *            the other result list
+     *            the other result lists
      */
-    public void or(MCRResults other) {
-        int numHits = other.getNumHits();
-        for (int i = 0; i < numHits; i++)
-            this.addHit(other.getHit(i));
+    public static MCRResults union(MCRResults... others) {
+        MCRResults totalResult = new MCRResults();
+        for (MCRResults other : others) {
+            for (MCRHit hit : other)
+                totalResult.addHit(hit);
+        }
+        return totalResult;
     }
 
     public Iterator<MCRHit> iterator() {
@@ -353,7 +361,8 @@ public class MCRResults implements Iterable<MCRHit> {
      *            the exception message of the connection or an empty string
      */
     public void setHostConnection(String host, String msg) {
-        if (msg == null) msg = "";
+        if (msg == null)
+            msg = "";
         hostconnection.put(host, msg);
     }
 }
