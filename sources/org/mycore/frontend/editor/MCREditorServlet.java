@@ -203,10 +203,12 @@ public class MCREditorServlet extends MCRServlet implements MCRSessionListener {
                 editorResolved = startSession(parameters, ref, uri, validate);
             }
 
+            String clazz1 = editor.getAttributeValue("class");
+            String clazz2 = editorResolved.getAttributeValue("class");
             editor.removeContent();
             editor.addContent(editorResolved.cloneContent());
             editor.setAttribute("session", editorResolved.getAttributeValue("session"));
-            editor.setAttribute("class", editorResolved.getAttributeValue("class"));
+            editor.setAttribute("class", ( clazz1 == null ? clazz2 : clazz1 ) );
         }
     }
 
