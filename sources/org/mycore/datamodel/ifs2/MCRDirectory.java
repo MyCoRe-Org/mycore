@@ -24,7 +24,6 @@
 package org.mycore.datamodel.ifs2;
 
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.List;
 
 import org.apache.commons.vfs.FileObject;
@@ -34,8 +33,6 @@ import org.apache.commons.vfs.VFS;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.input.SAXBuilder;
-import org.jdom.output.Format;
-import org.jdom.output.XMLOutputter;
 
 /**
  * Represents a directory stored in a file collection, which may contain other
@@ -134,12 +131,7 @@ public class MCRDirectory extends MCRStoredNode {
         FileObject md = VFS.getManager().resolveFile(fo, metadataFile);
         if (!md.exists())
             md.createFile();
-        OutputStream out = md.getContent().getOutputStream();
-        XMLOutputter xout = new XMLOutputter();
-        xout.setFormat(Format.getPrettyFormat().setEncoding("UTF-8").setIndent("  "));
-        xout.output(metadata.getDocument(), out);
-        out.close();
-
+        new MCRContent(metadata.getDocument()).sendTo(md);
         updateMetadata();
     }
 
