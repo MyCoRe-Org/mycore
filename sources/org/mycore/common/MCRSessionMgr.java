@@ -193,10 +193,10 @@ public class MCRSessionMgr {
     static ReentrantReadWriteLock getListenersLock() {
         return listenersLock;
     }
-    
-    public static void close(){
+
+    public static void close() {
         listenersLock.writeLock().lock();
-        for (MCRSession session:sessions.values()){
+        for (MCRSession session : sessions.values().toArray(new MCRSession[0])) {
             session.close();
         }
         listenersLock.writeLock().unlock();

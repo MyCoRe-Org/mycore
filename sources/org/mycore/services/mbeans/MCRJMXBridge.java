@@ -78,7 +78,8 @@ public class MCRJMXBridge implements Closeable {
         }
         MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
         try {
-            mbs.unregisterMBean(name);
+            if (mbs.isRegistered(name))
+                mbs.unregisterMBean(name);
             // As WeakReference does not overwrite Object.equals():
             for (WeakReference<ObjectName> wr : ONAME_LIST) {
                 if (wr.get().equals(name)) {
@@ -93,15 +94,15 @@ public class MCRJMXBridge implements Closeable {
     }
 
     private static ObjectName getObjectName(String type, String component) throws MalformedObjectNameException {
-        return new ObjectName(MCRConfiguration.instance().getString("MCR.NameOfProject", "MyCoRe-Application").replace(':', ' ') + ":type=" + type
-                + ",component=" + component);
+        return new ObjectName(MCRConfiguration.instance().getString("MCR.NameOfProject", "MyCoRe-Application").replace(':', ' ') + ":type="
+                + type + ",component=" + component);
     }
 
     public void close() {
         LOGGER.debug("Shutting down " + MCRJMXBridge.class.getSimpleName());
         MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
         Iterator<WeakReference<ObjectName>> wrIterator = ONAME_LIST.iterator();
-        while (wrIterator.hasNext()){
+        while (wrIterator.hasNext()) {
             try {
                 ObjectName objectName = wrIterator.next().get();
                 LOGGER.debug("Unregister " + objectName.getCanonicalName());
