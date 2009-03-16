@@ -24,23 +24,11 @@
 package org.mycore.datamodel.ifs2;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.security.DigestOutputStream;
-import java.security.MessageDigest;
 
 import org.apache.commons.vfs.FileObject;
-import org.apache.commons.vfs.RandomAccessContent;
 import org.apache.commons.vfs.VFS;
 import org.apache.commons.vfs.provider.local.LocalFile;
-import org.apache.commons.vfs.util.RandomAccessMode;
-import org.jdom.Document;
 import org.jdom.Element;
-import org.jdom.input.SAXBuilder;
-import org.jdom.output.Format;
-import org.jdom.output.XMLOutputter;
 import org.mycore.common.MCRUtils;
 
 /**
@@ -122,10 +110,10 @@ public class MCRFile extends MCRStoredNode {
      * the metadata rebuilt in the parent directory.
      */
     public void repairMetadata() throws Exception {
-        InputStream src = getContentInputStream();
-        MCRContentInputStream cis = new MCRContentInputStream(src);
+        MCRContent content = new MCRContent( fo );
+        MCRContentInputStream cis = content.getContentInputStream();
         MCRUtils.copyStream(cis, null);
-        src.close();
+        cis.close();
         md5 = cis.getMD5String();
         updateMetadata();
     }
@@ -162,124 +150,18 @@ public class MCRFile extends MCRStoredNode {
     }
 
     /**
-     * Sets the content of this file by reading it from the given uri, which may
-     * be a file or http url for example.
+     * Sets the content of this file.
      * 
-     * @param uri
-     *            the location of the file's content to be read
+     * @param content
+     *            the content to be read
      * @return the MD5 checksum of the stored content
      */
-    public String setContentFrom(String uri) throws Exception {
-        FileObject src = VFS.getManager().resolveFile(uri);
-        InputStream in = src.getContent().getInputStream();
-        String md5 = setContentFrom(in);
-        in.close();
-        return md5;
-    }
-
-    /**
-     * Sets the content of this file by reading it from a file in the local
-     * filesystem.
-     * 
-     * @param source
-     *            the local file to read bytes from
-     * @return the MD5 checksum of the stored content
-     */
-    public String setContentFrom(File source) throws Exception {
-        InputStream in = new FileInputStream(source);
-        String md5 = setContentFrom(in);
-        in.close();
-        return md5;
-    }
-
-    /**
-     * Sets the content of this file from an XML document. The XML is stored
-     * using UTF-8 encoding and pretty formatting with indentation.
-     * 
-     * @param xml
-     *            the XML to store as content of this file
-     * @return the MD5 checksum of the stored content
-     */
-    public String setContentFrom(Document xml) throws Exception {
-        OutputStream out = fo.getContent().getOutputStream();
-        MessageDigest digest = MCRContentInputStream.buildMD5Digest();
-        DigestOutputStream dos = new DigestOutputStream(out, digest);
-
-        XMLOutputter xout = new XMLOutputter();
-        xout.setFormat(Format.getPrettyFormat().setEncoding("UTF-8").setIndent("  "));
-        xout.output(xml, dos);
-
-        dos.close();
-        md5 = MCRContentInputStream.getMD5String(digest);
-        updateMetadata();
-        return md5;
-    }
-
-    /**
-     * Sets the content of this file by reading bytes from the given
-     * InputStream.
-     * 
-     * @param source
-     *            the InputStream to read from
-     * @return the MD5 checksum of the stored content
-     */
-    public String setContentFrom(InputStream source) throws Exception {
-        MCRContentInputStream cis = new MCRContentInputStream(source);
-        OutputStream out = fo.getContent().getOutputStream();
-        MCRUtils.copyStream(cis, out);
-        out.close();
+    public String setContent(MCRContent source) throws Exception {
+        MCRContentInputStream cis = source.getContentInputStream();
+        source.sendTo(fo);
         md5 = cis.getMD5String();
         updateMetadata();
         return md5;
-    }
-
-    /**
-     * Returns an InputStream to read this file's content from. Be sure to close
-     * the stream after usage!
-     * 
-     * @return an InputStream on the file content
-     */
-    public InputStream getContentInputStream() throws Exception {
-        return fo.getContent().getInputStream();
-    }
-
-    /**
-     * Writes the content of this file to the given OutputStream. The
-     * OutputStream is not closed afterwards, this is responsibility of the
-     * caller!
-     * 
-     * @param out
-     *            the OutputStream to write to.
-     */
-    public void getContentTo(OutputStream out) throws Exception {
-        InputStream in = fo.getContent().getInputStream();
-        MCRUtils.copyStream(in, out);
-        in.close();
-    }
-
-    /**
-     * Writes the content of this file to a file in the local filesystem.
-     * 
-     * @param target
-     *            the file to write content to
-     */
-    public void getContentTo(File target) throws Exception {
-        OutputStream out = new FileOutputStream(target);
-        getContentTo(out);
-        out.close();
-    }
-
-    /**
-     * Returns the file content as XML document, assuming the file contains
-     * valid XML.
-     * 
-     * @return the XML document stored as file content
-     */
-    public Document getContentAsXML() throws Exception {
-        InputStream in = getContentInputStream();
-        Document xml = new SAXBuilder().build(in);
-        in.close();
-        return xml;
     }
 
     /**
@@ -293,15 +175,5 @@ public class MCRFile extends MCRStoredNode {
             return new File(fo.getURL().getPath());
         else
             return null;
-    }
-
-    /**
-     * Returns the content of this file for random access read. Be sure not to
-     * write to the file using the returned object, use just for reading!
-     * 
-     * @return the content of this file, for random access
-     */
-    public RandomAccessContent getRandomAccessContent() throws Exception {
-        return fo.getContent().getRandomAccessContent(RandomAccessMode.READ);
     }
 }
