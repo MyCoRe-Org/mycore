@@ -31,7 +31,9 @@ import java.util.StringTokenizer;
 import org.apache.commons.vfs.FileContent;
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.FileType;
+import org.apache.commons.vfs.RandomAccessContent;
 import org.apache.commons.vfs.VFS;
+import org.apache.commons.vfs.util.RandomAccessMode;
 
 /**
  * Represents a file, directory or file collection within a file store. Files
@@ -272,5 +274,26 @@ public abstract class MCRNode {
                 current = current.getChild(name);
         }
         return current;
+    }
+
+    /**
+     * Returns the content of this node for output. For a directory, it will
+     * return null.
+     * 
+     * @return the content of the file
+     */
+    public MCRContent getContent() throws Exception {
+        return (isFile() ? new MCRContent(fo) : null);
+    }
+
+    /**
+     * Returns the content of this node for random access read. Be sure not to
+     * write to the node using the returned object, use just for reading! For a
+     * directory, it will return null.
+     * 
+     * @return the content of this file, for random access
+     */
+    public RandomAccessContent getRandomAccessContent() throws Exception {
+        return (isFile() ? fo.getContent().getRandomAccessContent(RandomAccessMode.READ) : null);
     }
 }
