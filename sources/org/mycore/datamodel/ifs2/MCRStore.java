@@ -251,11 +251,16 @@ public abstract class MCRStore {
 
     /**
      * Offset to add to the maximum ID found in the store to build the new ID.
-     * This is normally 1, but initially higher to avoid rare conflicts when
-     * batch import and creating objects through web application occur in
-     * parallel.
+     * This is normally 1, but initially higher to avoid reassigning the same ID
+     * after system restarts. Consider the following example:
+     * 
+     * 1) User creates new document, ID assigned is 10. 2) User deletes document
+     * 10. 3) Web application is restarted. 4) User creates new document, ID
+     * assigned is 20. If offset would always be 1, ID assigned would have been
+     * 10 again, and that is not nice, because we can not distinguish the two
+     * creates easily.
      */
-    protected int offset = 10; // Sicherheitsabstand, initially 10, later 1
+    protected int offset = 11; // Sicherheitsabstand, initially 11, later 1
 
     /**
      * The last ID assigned by this store.
