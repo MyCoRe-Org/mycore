@@ -2,74 +2,26 @@
 <!DOCTYPE MyCoReWebPage>
 
 <MyCoReWebPage>
-
-    <section title="Datenfehler im Eingabeformular" xml:lang="de">
-        <table width="80%" align="center">
-            <tr align="center">
-                <td>
-                    <font color="red">Bei der Prüfung des Eingabeformulars traten die oben genannten Fehler auf.</font>
-                </td>
-            </tr>
-            <tr align="center">
-                <td>
-                    <br />
-                    <br />
-                    <a href="javascript:window.back()">Bearbeiten des fehlerhaften Datensatzes >></a>
-                </td>
-            </tr>
-        </table>
-    </section>
-	
-    <section title="Error(s) in the input formular occurred" xml:lang="en">
-        <table width="80%" align="center">
-            <tr align="center">
-                <td>
-                    <font color="red">Due validation of form input errors displayed above have been found.</font>
-                </td>
-            </tr>
-            <tr align="center">
-                <td>
-                    <br />
-                    <br />
-                    <a href="javascript:window.back()">Correct form data >></a>
-                </td>
-            </tr>
-        </table>
-    </section>
-
-    <section title="خطأ بيناتي في قناع المدخلات" xml:lang="ar">
-        <table width="80%" align="center">
-            <tr align="center">
-                <td>
-					<font color="red">. خلال عملية فحص قناع المدخلات حدث الخلل المذكور أعلاه</font>
-                </td>
-            </tr>
-            <tr align="center">
-                <td>
-                    <br />
-                    <br />
-                    <a href="javascript:window.back()">Correct form data >></a>
-                </td>
-            </tr>
-        </table>
-	</section>
-
-<section title="Data yang salah dalam formulir" xml:lang="id">
-        <table width="80%" align="center">
-            <tr align="center">
-                <td>
-                    <font color="red">Sewaktu pemeriksaan data yang dimasukan ke dalam formulir muncul sebuah masalah (lihat di atas).</font>
-                </td>
-            </tr>
-            <tr align="center">
-                <td>
-                    <br />
-                    <br />
-                    <a href="javascript:window.back()">Memperbaiki set data yang bersalah tersebut >></a>
-                </td>
-            </tr>
-        </table>
-    </section>	
-
+  
+  <section i18n="component.swf.page.error.formular.title" xml:lang="all">
+    <table width="80%" align="center">
+      <tr align="center">
+        <td>
+          <font color="red">
+            <i18n key="component.swf.page.error.formular.text"/>
+          </font>
+        </td>
+      </tr>
+      <tr align="center">
+        <td>
+          <br/>
+          <br/>
+          <a href="javascript:window.back()">
+            <i18n key="component.swf.page.error.formular.hint"/>
+          </a>
+        </td>
+      </tr>
+    </table>
+  </section>
+  
 </MyCoReWebPage>
-

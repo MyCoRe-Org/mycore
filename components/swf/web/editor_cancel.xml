@@ -2,63 +2,19 @@
 <!DOCTYPE MyCoReWebPage>
 
 <MyCoReWebPage>
-
-<section title="Editor Abbruch" xml:lang="de">
-<center>
-<table width="80%">
- <tr align="center">
-  <td align="center">
-<font color="red">
-   Die Arbeit wurde nutzerseitig abgebrochen.
-</font>
-  </td>
- </tr>
-</table>
-</center>
-</section>
-
-<section title="Editor canceld" xml:lang="en">
-<center>
-<table width="80%">
- <tr align="center">
-  <td align="center">
-<font color="red">
-   The job was canceld by the user.
-</font>
-  </td>
- </tr>
-</table>
-</center>
-</section>
-
-<section title="إلغاء المحرر" xml:lang="ar">
-<center>
-<table width="80%">
- <tr align="center">
-  <td align="center">
-<font color="red">
-   .تم إلغاء العمل من طرف المستخدم
-</font>
-  </td>
- </tr>
-</table>
-</center>
-</section>
-
-<section title="Batalkan Editor" xml:lang="id">
-<center>
-<table width="80%">
- <tr align="center">
-  <td align="center">
-<font color="red">
-   Progres dibatalkan oleh pemakai.
-</font>
-  </td>
- </tr>
-</table>
-</center>
-</section>
-	
+  
+  <section i18n="component.swf.page.cancel.text" xml:lang="all">
+    <center>
+      <table width="80%">
+        <tr align="center">
+          <td align="center">
+            <font color="red">
+              <i18n key="component.swf.page.cancel.text"/>
+            </font>
+          </td>
+        </tr>
+      </table>
+    </center>
+  </section>
+  
 </MyCoReWebPage>
-
-

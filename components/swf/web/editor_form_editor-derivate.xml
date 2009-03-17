@@ -2,47 +2,37 @@
 <!DOCTYPE MyCoReWebPage>
 
 <MyCoReWebPage>
-
-<section title="Bearbeiten eines Derivates" xml:lang="de">
-</section>
-
-<section title="Edit an object (derivate)" xml:lang="en">
-</section>
-
-<section title="معالجة عنصر البيانات" xml:lang="ar">
-</section>
-
-<section title="Mengedit sebuah obyek (derivat)" xml:lang="id">
-</section>
-
-<section xml:lang="de" alt="en,id">
-  <editor id="editor-commit-derivate">
-     <source uri="{sourceUri}" />
-     <target type="servlet" name="MCRCheckEditDerivateServlet" method="post" format="xml"/>
-     <cancel url="{cancelUrl}" />
-
-     <components root="editor-derivate" var="/mycorederivate">
-      <include uri="webapp:editor/imports-common.xml"/>
-      <include uri="webapp:editor/imports-editor-derivate-common.xml"/>
-      <include uri="webapp:editor/imports-editor-derivate-ltr.xml"/>
-     </components>
-  </editor>
-</section>
-
-<section xml:lang="ar">
-<div align="right">
-  <editor id="editor-commit-derivate-ar">
-     <source uri="{sourceUri}" />
-     <target type="servlet" name="MCRCheckEditDerivateServlet" method="post" format="xml"/>
-     <cancel url="{cancelUrl}" />
-
-     <components root="editor-derivate" var="/mycorederivate">
-      <include uri="webapp:editor/imports-common.xml"/>
-      <include uri="webapp:editor/imports-editor-derivate-common.xml"/>
-      <include uri="webapp:editor/imports-editor-derivate-rtl.xml"/>
-     </components>
-  </editor>
-</div>
-</section>
-
+  
+  <section i18n="component.swf.page.editor.derivate.title" direction="ltr">
+    <editor id="editor-editor-derivate-ltr">
+      <source uri="{sourceUri}"/>
+      <target type="servlet" name="MCRCheckEditDerivateServlet" method="post" format="xml"/>
+      <cancel url="{cancelUrl}"/>
+      
+      <components root="editor-derivate-ltr" var="/mycorederivate" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+        xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+        <include uri="webapp:editor/imports-common.xml"/>
+        <include uri="webapp:editor/imports-editor-derivate-common.xml"/>
+        <include uri="webapp:editor/imports-editor-derivate-ltr.xml"/>
+      </components>
+    </editor>
+  </section>
+  
+  <section i18n="component.swf.page.editor.derivate.title" direction="rtl">
+    <div align="right">
+      <editor id="editor-editor-derivate-rtl">
+        <source uri="{sourceUri}"/>
+        <target type="servlet" name="MCRCheckEditDerivateServlet" method="post" format="xml"/>
+        <cancel url="{cancelUrl}"/>
+        
+        <components root="editor-derivate-rtl" var="/mycorederivate" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+          xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+          <include uri="webapp:editor/imports-common.xml"/>
+          <include uri="webapp:editor/imports-editor-derivate-common.xml"/>
+          <include uri="webapp:editor/imports-editor-derivate-rtl.xml"/>
+        </components>
+      </editor>
+    </div>
+  </section>
+  
 </MyCoReWebPage>

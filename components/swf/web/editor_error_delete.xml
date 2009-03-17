@@ -2,71 +2,19 @@
 <!DOCTYPE MyCoReWebPage>
 
 <MyCoReWebPage>
-
-<section title="Löschfehler" xml:lang="de">
-<center>
-<table width="80%">
- <tr align="center">
-  <td align="center">
-<font color="red">
-   Beim Löschen der Daten aus dem Server gab es ein Problem.
-   Die Daten wurden nicht gelöscht.
-   Bitte sprechen Sie mit dem Systemadministrator darüber.
-</font>
-  </td>
- </tr>
-</table>
-</center>
-</section>
-
-<section title="Delete error" xml:lang="en">
-<center>
-<table width="80%">
- <tr align="center">
-  <td align="center">
-<font color="red">
-   A delete error on the server was occured.
-   Data were not deleted.
-   Please consult the system administartor.
-</font>
-  </td>
- </tr>
-</table>
-</center>
-</section>
-
-<section title="خطأ في الحذف" xml:lang="ar">
-<center>
-<table width="80%">
- <tr align="center">
-  <td align="center">
-<font color="red">
-  .حدث خلل خلال عملية الحذف
-.لم يتم حذف المعطيات
-.المرجوا الإتصال بإدارة المشروع
-</font>
-  </td>
- </tr>
-</table>
-</center>
-</section>
-
-<section title="Masalah sewaktu menghapuskan data" xml:lang="id">
-<center>
-<table width="80%">
- <tr align="center">
-  <td align="center">
-<font color="red">
-   Sewaktu menghapuskan data muncul sebuah masalah pada server.
-   Data tidak jadi dihapuskan.
-   Tolonglah menghubungi administrator sistem.
-</font>
-  </td>
- </tr>
-</table>
-</center>
-</section>	
-
+  
+  <section i18n="component.swf.page.error.delete.text" xml:lang="all">
+    <center>
+      <table width="80%">
+        <tr align="center">
+          <td align="center">
+            <font color="red">
+              <i18n key="component.swf.page.error.delete.text"/>
+            </font>
+          </td>
+        </tr>
+      </table>
+    </center>
+  </section>
+  
 </MyCoReWebPage>
-
-
