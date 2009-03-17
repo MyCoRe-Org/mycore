@@ -38,6 +38,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -873,7 +874,8 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
 
         private static final String SORT_CONFIG_PREFIX = CONFIG_PREFIX + "Classification.Sort.";
 
-        private static final MCRCache categoryCache = new MCRCache(CONFIG.getInt(CONFIG_PREFIX + "Classification.CacheSize", 1000), "URIResolver categories");
+        private static final MCRCache categoryCache = new MCRCache(CONFIG.getInt(CONFIG_PREFIX + "Classification.CacheSize", 1000),
+                "URIResolver categories");
 
         private static final MCRCategoryDAO DAO = MCRCategoryDAOFactory.getInstance();
 
@@ -897,7 +899,12 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
          */
         public Element resolveElement(String uri) {
             LOGGER.debug("start resolving " + uri);
-            return getClassElement(uri);
+            Element returns = (Element) categoryCache.getIfUpToDate(uri, getSystemLastModified());
+            if (returns == null) {
+                returns = getClassElement(uri);
+                categoryCache.put(uri, returns);
+            }
+            return returns;
         }
 
         private Element getClassElement(String uri) {
@@ -919,8 +926,8 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
             String axis;
             String token = pst.nextToken();
             pst.nextToken(); // :
-            boolean emptyLeaves = ( ! ( "noEmptyLeaves".equals(token) ));
-            if ( ! emptyLeaves) {
+            boolean emptyLeaves = (!("noEmptyLeaves".equals(token)));
+            if (!emptyLeaves) {
                 axis = pst.nextToken();
                 pst.nextToken(); // :
             } else
@@ -940,26 +947,24 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
             } catch (UnsupportedEncodingException e) {
                 categ = categID.toString();
             }
-            MCRCategory cl = getFromCache(classID, categ, axis, levels);
+            MCRCategory cl = null;
+            LOGGER.debug("categoryCache entry invalid or not found: start MCRClassificationQuery");
+            if (axis.equals("children")) {
+                if (categ.length() > 0) {
+                    cl = DAO.getCategory(new MCRCategoryID(classID, categ), levels);
+                } else {
+                    cl = DAO.getCategory(MCRCategoryID.rootID(classID), levels);
+                }
+            } else if (axis.equals("parents")) {
+                if (categ.length() == 0) {
+                    LOGGER.error("Cannot resolve parent axis without a CategID. URI: " + uri);
+                    throw new IllegalArgumentException(
+                            "Invalid format (categID is required in mode 'parents') of uri for retrieval of classification: " + uri);
+                }
+                cl = DAO.getRootCategory(new MCRCategoryID(classID, categ), levels);
+            }
             if (cl == null) {
-                LOGGER.debug("categoryCache entry invalid or not found: start MCRClassificationQuery");
-                if (axis.equals("children")) {
-                    if (categ.length() > 0) {
-                        cl = DAO.getCategory(new MCRCategoryID(classID, categ), levels);
-                    } else {
-                        cl = DAO.getCategory(MCRCategoryID.rootID(classID), levels);
-                    }
-                } else if (axis.equals("parents")) {
-                    if (categ.length() == 0) {
-                        LOGGER.error("Cannot resolve parent axis without a CategID. URI: " + uri);
-                        throw new IllegalArgumentException("Invalid format (categID is required in mode 'parents') of uri for retrieval of classification: " + uri);
-                    }
-                    cl = DAO.getRootCategory(new MCRCategoryID(classID, categ), levels);
-                }
-                if (cl == null) {
-                    return null;
-                }
-                addToCache(classID, categ, axis, levels, cl);
+                return null;
             }
 
             Element returns;
@@ -973,7 +978,7 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
                     returns = MCRCategoryTransformer.getEditorItems(cl, labelFormat, sort, emptyLeaves);
                 }
             } else if (format.equals("metadata")) {
-                returns = (Element)(MCRCategoryTransformer.getMetaDataDocument(cl, false).getRootElement().detach());
+                returns = (Element) (MCRCategoryTransformer.getMetaDataDocument(cl, false).getRootElement().detach());
             } else {
                 LOGGER.error("Unknown target format given. URI: " + uri);
                 throw new IllegalArgumentException("Invalid target format (" + format + ") in uri for retrieval of classification: " + uri);
@@ -995,26 +1000,10 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
             return CONFIG.getBoolean(SORT_CONFIG_PREFIX + classId, true);
         }
 
-        private static MCRCategory getFromCache(String classID, String categID, String axis, int levels) {
-            String key = getCacheKey(classID, categID, axis, levels);
-            MCRCategory cacheEntry = (MCRCategory) categoryCache.getIfUpToDate(key, DAO.getLastModified());
-            return cacheEntry;
-        }
-
-        private static void addToCache(String classID, String categID, String axis, int levels, MCRCategory category) {
-            String key = getCacheKey(classID, categID, axis, levels);
-            categoryCache.put(key, category);
-        }
-
-        private static String getCacheKey(String classID, String categID, String axis, int levels) {
-            char delim = '~';
-            StringBuilder sb = new StringBuilder(classID);
-            sb.append(delim).append(axis);
-            if (categID != null) {
-                sb.append(delim).append(categID);
-            }
-            sb.append(delim).append(levels);
-            return sb.toString();
+        private static long getSystemLastModified() {
+            long xmlLastModified = MCRXMLTableManager.instance().getLastModified().getTime();
+            long classLastModified = DAO.getLastModified();
+            return Math.max(xmlLastModified, classLastModified);
         }
 
     }

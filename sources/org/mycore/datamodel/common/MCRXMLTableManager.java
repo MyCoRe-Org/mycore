@@ -335,13 +335,27 @@ public class MCRXMLTableManager {
 
         return jDoc;
     }
+
     /**
      * lists objects of the specified <code>type</code> and their last modified date. 
      * @param type type of object
      * @return
      */
-    public List<MCRObjectIDDate> listObjectDates(String type){
+    public List<MCRObjectIDDate> listObjectDates(String type) {
         return getXMLTable(type).listObjectDates(type);
     }
-    
+
+    public Date getLastModified() {
+        Date maxDate = null;
+        for (MCRXMLTableInterface xmltable : tablelist.values()) {
+            final Date lastModified = xmltable.getLastModified();
+            if (maxDate == null) {
+                maxDate = lastModified;
+            } else if (maxDate.before(lastModified)) {
+                maxDate = lastModified;
+            }
+        }
+        return maxDate;
+    }
+
 }

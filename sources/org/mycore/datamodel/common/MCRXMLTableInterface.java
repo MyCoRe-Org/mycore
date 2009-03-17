@@ -145,4 +145,10 @@ public interface MCRXMLTableInterface {
      * @return
      */
     public List<MCRObjectIDDate> listObjectDates(String type);
+    
+    /**
+     * returns when the last change was made.
+     * @return a Date of the last change (insert/update/delete)
+     */
+    public Date getLastModified();
 }

@@ -9,8 +9,13 @@
     </composite-id>
     <property name="type" type="string" column="MCRTYPE" length="64" />
     <property name="lastModified" type="timestamp" column="MODIFIED" not-null="false" />
-    <property name="xml" type="org.mycore.backend.hibernate.types.MCRXMLBlobType" column="MCRXML" length="7000000"
-      not-null="false" unique="false" />
+    <property name="xml" type="org.mycore.backend.hibernate.types.MCRXMLBlobType" column="MCRXML" length="7000000" not-null="false"
+      unique="false" />
+    <query name="getLastChange">
+      <![CDATA[
+SELECT max(lastModified), count(*) from MCRXMLTABLE
+      ]]>
+    </query>
   </class>
 </hibernate-mapping>
 
