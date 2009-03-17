@@ -85,6 +85,10 @@ public class MCRXMLTableManager {
         tablelist = new Hashtable<String, MCRXMLTableInterface>();
         jdomCache = new MCRCache(CONFIG.getInt("MCR.Persistence.XML.Store.CacheSize", 100), "XMLTable JDOMs");
         number_distance = CONFIG.getInt("MCR.Metadata.ObjectID.NumberDistance", 1);
+        List<String> objectTypes = getAllAllowedMCRObjectIDTypes();
+        for (String type : objectTypes) {
+            initXMLTable(type);
+        }
     }
 
     /**
@@ -101,10 +105,15 @@ public class MCRXMLTableManager {
             return tablelist.get(type);
         }
 
+        MCRXMLTableInterface inst = initXMLTable(type);
+
+        return inst;
+    }
+
+    private MCRXMLTableInterface initXMLTable(String type) {
         MCRXMLTableInterface inst = (MCRXMLTableInterface) CONFIG.getInstanceOf("MCR.Persistence.XML.Store.Class");
         inst.init(type);
         tablelist.put(type, inst);
-
         return inst;
     }
 
@@ -346,16 +355,7 @@ public class MCRXMLTableManager {
     }
 
     public Date getLastModified() {
-        Date maxDate = null;
-        for (MCRXMLTableInterface xmltable : tablelist.values()) {
-            final Date lastModified = xmltable.getLastModified();
-            if (maxDate == null) {
-                maxDate = lastModified;
-            } else if (maxDate.before(lastModified)) {
-                maxDate = lastModified;
-            }
-        }
-        return maxDate;
+        return tablelist.values().iterator().next().getLastModified();
     }
 
 }
