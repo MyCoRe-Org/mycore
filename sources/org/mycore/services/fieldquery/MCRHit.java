@@ -166,6 +166,10 @@ public class MCRHit {
         return !sortData.isEmpty();
     }
 
+    public List<MCRFieldValue> getSortData() {
+        return sortData;
+    }
+
     /**
      * Compares this hit with another hit by comparing the value of the given
      * search field. Used for sorting results.
