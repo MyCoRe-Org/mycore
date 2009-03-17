@@ -570,8 +570,8 @@ public class MCREditorOutValidator {
                         }
                         if (value.equals("$CurrentGroup")) {
                             String thisuser = MCRSessionMgr.getCurrentSession().getCurrentUserID();
-                            List<String> ar = MCRUserMgr.instance().getGroupsContainingUser(thisuser);
-                            firstcond.setAttribute("value", ar.get(0));
+                            String thisgroup = MCRUserMgr.instance().getPrimaryGroupIDOfUser(thisuser);
+                            firstcond.setAttribute("value", thisgroup);
                             continue;
                         }
                         int i = value.indexOf("$CurrentIP");
@@ -599,8 +599,8 @@ public class MCREditorOutValidator {
             metadata.getAttribute("lang").setNamespace(XML_NAMESPACE);
         }
 
-        List metadatalist = metadata.getChildren();
-        Iterator metaIt = metadatalist.iterator();
+        List <Element> metadatalist = metadata.getChildren();
+        Iterator <Element> metaIt = metadatalist.iterator();
 
         while (metaIt.hasNext()) {
             Element datatag = (Element) metaIt.next();
@@ -616,8 +616,8 @@ public class MCREditorOutValidator {
      * @param structure
      */
     private void checkObjectStructure(Element structure) {
-        List structurelist = structure.getChildren();
-        Iterator structIt = structurelist.iterator();
+        List <Element> structurelist = structure.getChildren();
+        Iterator <Element> structIt = structurelist.iterator();
 
         while (structIt.hasNext()) {
             Element datatag = (Element) structIt.next();
