@@ -130,9 +130,14 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
 
     private static final MCRResolverProvider getExternalResolverProvider() {
         String externalClassName = MCRConfiguration.instance().getString(CONFIG_PREFIX + "ExternalResolver.Class", null);
-        final MCRResolverProvider moduleResolverProvider = new MCRModuleResolverProvider();
+        final MCRResolverProvider emptyResolver = new MCRResolverProvider() {
+            @Override
+            public Map<String, MCRResolver> getResolverMapping() {
+                return new HashMap<String, MCRResolver>();
+            }
+        };
         if (externalClassName == null) {
-            return moduleResolverProvider;
+            return emptyResolver;
         }
         try {
             Class<?> cl = Class.forName(externalClassName);
@@ -140,13 +145,13 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
             return resolverProvider;
         } catch (ClassNotFoundException e) {
             LOGGER.warn("Could not find external Resolver class", e);
-            return moduleResolverProvider;
+            return emptyResolver;
         } catch (InstantiationException e) {
             LOGGER.warn("Could not instantiate external Resolver class", e);
-            return moduleResolverProvider;
+            return emptyResolver;
         } catch (IllegalAccessException e) {
             LOGGER.warn("Could not instantiate external Resolver class", e);
-            return moduleResolverProvider;
+            return emptyResolver;
         }
     }
 
