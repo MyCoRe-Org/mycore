@@ -92,14 +92,19 @@ public class MCRCategoryTransformer {
     }
 
     /**
-     * transforms a <code>Classification</code> into a MCR Editor definition (<code>&lt;items&gt;</code>).
+     * transforms a <code>Classification</code> into a MCR Editor definition (
+     * <code>&lt;items&gt;</code>).
      * 
      * @param cl
      *            Classification
+     * @param sort
+     *            if true, sort items
+     * @param emptyLeaves
+     *            if true, also include empty leaves
      * @return
      */
-    public static Document getEditorDocument(MCRCategory cl, boolean sort) {
-        return ItemElementFactory.getDocument(cl, STANDARD_LABEL, sort);
+    public static Element getEditorItems(MCRCategory cl, boolean sort, boolean emptyLeaves) {
+        return new ItemElementFactory( cl, STANDARD_LABEL, sort, emptyLeaves ).getResult();
     }
 
     /**
@@ -120,10 +125,14 @@ public class MCRCategoryTransformer {
      *            Classification
      * @param labelFormat
      *            format String as specified above
+     * @param sort
+     *            if true, sort items
+     * @param emptyLeaves
+     *            if true, also include empty leaves
      * @return
      */
-    public static Document getEditorDocument(MCRCategory cl, String labelFormat, boolean sort) {
-        return ItemElementFactory.getDocument(cl, labelFormat, sort);
+    public static Element getEditorItems(MCRCategory cl, String labelFormat, boolean sort, boolean emptyLeaves) {
+        return new ItemElementFactory( cl, labelFormat, sort, emptyLeaves ).getResult();
     }
 
     private static class MetaDataElementFactory {
@@ -206,36 +215,86 @@ public class MCRCategoryTransformer {
 
         private static final Pattern COUNT_PATTERN = Pattern.compile("\\{count(:([^\\)]+))?\\}");
 
-        @SuppressWarnings("unchecked")
-        static Document getDocument(MCRCategory cl, String labelFormat, boolean sort) {
-            Document cd = new Document(new Element("items"));
-            Map<MCRCategoryID, Number> countMap = null;
-            final Matcher countMatcher = COUNT_PATTERN.matcher(labelFormat);
+        private String labelFormat;
+        private boolean emptyLeaves;
+        private Map<MCRCategoryID, Number> countMap = null;
+        private Element root;
+        
+        ItemElementFactory(MCRCategory cl, String labelFormat, boolean sort, boolean emptyLeaves) {
+            this.labelFormat = labelFormat;
+            this.emptyLeaves = emptyLeaves;
+
+            Matcher countMatcher = COUNT_PATTERN.matcher(labelFormat);
             /*
-             * countMatcher.group(0) is the whole expression string like {count:document}
-             * countMatcher.group(1) is first inner expression string like :document
-             * countMatcher.group(2) is most inner expression string like document
+             * countMatcher.group(0) is the whole expression string like
+             * {count:document} countMatcher.group(1) is first inner expression
+             * string like :document countMatcher.group(2) is most inner
+             * expression string like document
              */
             if (countMatcher.find()) {
                 if (countMatcher.group(1) == null)
                     countMap = MCRCategLinkServiceFactory.getInstance().countLinks(getAllCategIDs(cl));
                 else {
-                    //group(2) contains objectType
+                    // group(2) contains objectType
                     String objectType = countMatcher.group(2);
                     countMap = MCRCategLinkServiceFactory.getInstance().countLinksForType(getAllCategIDs(cl), objectType);
                 }
+            } else if (!emptyLeaves) {
+                countMap = MCRCategLinkServiceFactory.getInstance().countLinks(getAllCategIDs(cl));
             }
+            
+            root = new Element("items");
             for (MCRCategory category : cl.getChildren()) {
-                cd.getRootElement().addContent(getElement(category, labelFormat, countMap));
+                addChildren(root, category);
             }
             if (sort) {
-                sortItems(cd.getRootElement().getChildren("item"));
+                sortItems(root.getChildren("item"));
             }
-            return cd;
+        }
+        
+        Element getResult() {
+            return root;
+        }
+
+        void addChildren(Element parent, MCRCategory category) {
+            if ((!emptyLeaves) && (countMap.get(category.getId()).intValue() < 1))
+                return;
+
+            Element ce = new Element("item");
+            ce.setAttribute("value", category.getId().getID());
+            parent.addContent(ce);
+
+            for (MCRLabel label : category.getLabels()) {
+                addLabel(ce, label, category);
+            }
+            for (MCRCategory cat : category.getChildren()) {
+                addChildren(ce, cat);
+            }
+        }
+
+        void addLabel(Element item, MCRLabel label, MCRCategory cat) {
+            Element le = new Element("label");
+            item.addContent(le);
+            if ((label.getLang() != null) && (label.getLang().length() > 0)) {
+                le.setAttribute("lang", label.getLang(), XML_NAMESPACE);
+            }
+
+            String labtext = (label.getText() != null ? label.getText() : "");
+            String labdesc = (label.getDescription() != null ? label.getDescription() : "");
+
+            String text = TEXT_PATTERN.matcher(labelFormat).replaceAll(labtext);
+            text = ID_PATTERN.matcher(text).replaceAll(cat.getId().getID());
+            text = DESCR_PATTERN.matcher(text).replaceAll(labdesc);
+            int num = (countMap == null ? -1 : countMap.get(cat.getId()).intValue());
+            if (num >= 0) {
+                text = COUNT_PATTERN.matcher(text).replaceAll(String.valueOf(num));
+            }
+
+            le.setText(text);
         }
 
         @SuppressWarnings("unchecked")
-        private static void sortItems(List<Element> items) {
+        private void sortItems(List<Element> items) {
             sort(items, MCREditorItemComparator.CURRENT_LANG_TEXT_ORDER);
             Iterator<Element> it = items.iterator();
             while (it.hasNext()) {
@@ -247,7 +306,7 @@ public class MCRCategoryTransformer {
             }
         }
 
-        private static void sort(List<Element> list, Comparator<Element> c) {
+        private void sort(List<Element> list, Comparator<Element> c) {
             Element[] a = list.toArray(new Element[list.size()]);
             Arrays.sort(a, c);
             for (int i = 0; i < a.length; i++) {
@@ -256,47 +315,6 @@ public class MCRCategoryTransformer {
             for (int i = 0; i < a.length; i++) {
                 list.add(a[i]);
             }
-        }
-
-        static Element getElement(MCRLabel label, MCRCategory cat, String labelFormat, Map<MCRCategoryID, Number> countMap) {
-            Element le = new Element("label");
-            if (stringNotEmpty(label.getLang())) {
-                le.setAttribute("lang", label.getLang(), XML_NAMESPACE);
-            }
-            le.setText(getLabelText(label, cat, labelFormat, countMap));
-            return le;
-        }
-
-        static String getLabelText(MCRLabel label, MCRCategory cat, String labelFormat, Map<MCRCategoryID, Number> countMap) {
-            String labtext = (label.getText() != null) ? label.getText() : "";
-            String text = TEXT_PATTERN.matcher(labelFormat).replaceAll(labtext);
-            text = ID_PATTERN.matcher(text).replaceAll(cat.getId().getID());
-            String labdesc = (label.getDescription() != null) ? label.getDescription() : "";
-            text = DESCR_PATTERN.matcher(text).replaceAll(labdesc);
-            Number number = (countMap == null) ? null : countMap.get(cat.getId());
-            if (number != null) {
-                text = COUNT_PATTERN.matcher(text).replaceAll(Integer.toString(number.intValue()));
-            }
-            return text;
-        }
-
-        static Element getElement(MCRCategory category, String labelFormat, Map<MCRCategoryID, Number> countMap) {
-            Element ce = new Element("item");
-            ce.setAttribute("value", category.getId().getID());
-            for (MCRLabel label : category.getLabels()) {
-                ce.addContent(getElement(label, category, labelFormat, countMap));
-            }
-            for (MCRCategory cat : category.getChildren()) {
-                ce.addContent(getElement(cat, labelFormat, countMap));
-            }
-            return ce;
-        }
-
-        static boolean stringNotEmpty(String test) {
-            if (test != null && test.length() > 0) {
-                return true;
-            }
-            return false;
         }
     }
 
@@ -308,5 +326,4 @@ public class MCRCategoryTransformer {
         }
         return ids;
     }
-
 }

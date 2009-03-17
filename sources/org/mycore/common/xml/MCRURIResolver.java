@@ -782,19 +782,19 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
     }
 
     private static class MCRMCRFileResolver implements MCRResolver {
-        public Element resolveElement(String uri)  throws IOException, JDOMException {
+        public Element resolveElement(String uri) throws IOException, JDOMException {
             LOGGER.debug("Reading xml from MCRFile " + uri);
 
             String id = uri.substring(uri.indexOf(":") + 1);
-            
+
             Element ele = null;
 
             try {
-				ele = MCRFile.getFile(id).getContentAsJDOM().detachRootElement();
-			} catch (MCRPersistenceException e) {
-				LOGGER.error("Cannot resolve MCRFile with id " + id);
-			}
-            
+                ele = MCRFile.getFile(id).getContentAsJDOM().detachRootElement();
+            } catch (MCRPersistenceException e) {
+                LOGGER.error("Cannot resolve MCRFile with id " + id);
+            }
+
             return ele;
         }
 
@@ -880,7 +880,7 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
          * returns a classification in a specific format.
          * 
          * Syntax:
-         * <code>classification:{editor['['formatAlias']']|metadata}:{Levels}:{parents|children}:{ClassID}[:CategID]
+         * <code>classification:{editor['['formatAlias']']|metadata}:{Levels}[:noEmptyLeaves]:{parents|children}:{ClassID}[:CategID]
          * 
          * formatAlias: MCRConfiguration property MCR.UURResolver.Classification.Format.FormatAlias
          * 
@@ -897,30 +897,39 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
         }
 
         private Element getClassElement(String uri) {
-            String[] parameters = uri.split(":");
-            if (parameters.length < 4) {
+            StringTokenizer pst = new StringTokenizer(uri, ":", true);
+            if (pst.countTokens() < 9) {
                 // sanity check
                 throw new IllegalArgumentException("Invalid format of uri for retrieval of classification: " + uri);
             }
-            String format = parameters[1];
-            String levelS = parameters[2];
-            String axis = parameters[3];
-            String classID = parameters[4];
-            int levels;
-            if (levelS.equals("all")) {
-                levels = -1;
-            } else {
-                levels = Integer.parseInt(levelS);
-            }
+
+            pst.nextToken(); // "classification"
+            pst.nextToken(); // :
+            String format = pst.nextToken();
+            pst.nextToken(); // :
+
+            String levelS = pst.nextToken();
+            pst.nextToken(); // :
+            int levels = ("all".equals(levelS) ? -1 : Integer.parseInt(levelS));
+
+            String axis;
+            String token = pst.nextToken();
+            pst.nextToken(); // :
+            boolean emptyLeaves = ( ! ( "noEmptyLeaves".equals(token) ));
+            if ( ! emptyLeaves) {
+                axis = pst.nextToken();
+                pst.nextToken(); // :
+            } else
+                axis = token;
+
+            String classID = pst.nextToken();
             StringBuffer categID = new StringBuffer();
-            for (int i = 5; i < parameters.length; i++) {
-                categID.append(':').append(parameters[i]);
+            if (pst.hasMoreTokens()) {
+                pst.nextToken(); // :
+                while (pst.hasMoreTokens())
+                    categID.append(pst.nextToken());
             }
-            if (categID.length() > 0) {
-                // categID was specified
-                // remove leading ":" from the for block above
-                categID.deleteCharAt(0);
-            }
+
             String categ;
             try {
                 categ = URLDecoder.decode(categID.toString(), "UTF-8");
@@ -939,8 +948,7 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
                 } else if (axis.equals("parents")) {
                     if (categ.length() == 0) {
                         LOGGER.error("Cannot resolve parent axis without a CategID. URI: " + uri);
-                        throw new IllegalArgumentException("Invalid format (categID is required in mode 'parents') of uri for retrieval of classification: "
-                                + uri);
+                        throw new IllegalArgumentException("Invalid format (categID is required in mode 'parents') of uri for retrieval of classification: " + uri);
                     }
                     cl = DAO.getRootCategory(new MCRCategoryID(classID, categ), levels);
                 }
@@ -956,18 +964,18 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
                 boolean sort = shouldSortCategories(classID);
                 String labelFormat = getLabelFormat(format);
                 if (labelFormat == null) {
-                    returns = MCRCategoryTransformer.getEditorDocument(cl, sort).getRootElement();
+                    returns = MCRCategoryTransformer.getEditorItems(cl, sort, emptyLeaves);
                 } else {
-                    returns = MCRCategoryTransformer.getEditorDocument(cl, labelFormat, sort).getRootElement();
+                    returns = MCRCategoryTransformer.getEditorItems(cl, labelFormat, sort, emptyLeaves);
                 }
             } else if (format.equals("metadata")) {
-                returns = MCRCategoryTransformer.getMetaDataDocument(cl, false).getRootElement();
+                returns = (Element)(MCRCategoryTransformer.getMetaDataDocument(cl, false).getRootElement().detach());
             } else {
                 LOGGER.error("Unknown target format given. URI: " + uri);
                 throw new IllegalArgumentException("Invalid target format (" + format + ") in uri for retrieval of classification: " + uri);
             }
             LOGGER.debug("end resolving " + uri);
-            return (Element) returns.detach();
+            return returns;
         }
 
         private static String getLabelFormat(String editorString) {
