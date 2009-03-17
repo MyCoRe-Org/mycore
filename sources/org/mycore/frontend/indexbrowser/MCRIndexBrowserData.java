@@ -1,6 +1,7 @@
 package org.mycore.frontend.indexbrowser;
 
 import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -20,11 +21,14 @@ import org.mycore.common.MCRCache;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.datamodel.metadata.MCRObject;
+import org.mycore.datamodel.common.MCRXMLTableManager;
+import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.parsers.bool.MCRAndCondition;
 import org.mycore.parsers.bool.MCROrCondition;
 import org.mycore.services.fieldquery.MCRCachedQueryData;
 import org.mycore.services.fieldquery.MCRFieldDef;
+import org.mycore.services.fieldquery.MCRFieldValue;
+import org.mycore.services.fieldquery.MCRHit;
 import org.mycore.services.fieldquery.MCRQuery;
 import org.mycore.services.fieldquery.MCRQueryCondition;
 import org.mycore.services.fieldquery.MCRQueryManager;
@@ -32,17 +36,11 @@ import org.mycore.services.fieldquery.MCRResults;
 import org.mycore.services.fieldquery.MCRSortBy;
 
 public class MCRIndexBrowserData {
-    protected static Logger logger = Logger.getLogger(MCRIndexBrowserData.class);
-
-    protected static final String PREFIX = "MCRIndexBrowserData.";
-
-    protected static final String INDEX_KEY = PREFIX + "list";
-
-    protected static final String QUERY_KEY = PREFIX + "query";
+    protected static Logger LOGGER = Logger.getLogger(MCRIndexBrowserData.class);
 
     private static final long serialVersionUID = 1L;
 
-    private LinkedList<String[]> linkedList1 = new LinkedList<String[]>();
+    private List<String[]> hitList = new LinkedList<String[]>();
 
     private MyBrowseData browseData = new MyBrowseData();
 
@@ -58,128 +56,18 @@ public class MCRIndexBrowserData {
 
     private static final String defaultlang = MCRConfiguration.instance().getString("MCR.Metadata.DefaultLang", "de");
 
-    private static MCRCache INDEX_CACHE = new MCRCache(100, "Cache for already created indexes");
+    private static Hashtable<String, MCRCache> TYPE_CACHE_TABLE = new Hashtable<String, MCRCache>();
 
     private static MCRConfiguration MCR_CONFIG = MCRConfiguration.instance();
 
-    /*
-     * indexCache is build like this:
-     * 
-     * --+ indexCache +---+ MCRObjectType +---+ Cache entries for configured
-     * aliases
-     */
-
-    class MyRangeDelim {
-        int pos;
-
-        String value;
-
-        String diff;
-
-        MyRangeDelim(int pos, String value) {
-            this.pos = pos;
-            this.value = value;
-        }
-    }
-
-    class MyBrowseData {
-        String index;
-
-        int from = 0;
-
-        int to = Integer.MAX_VALUE - 10;
-
-        StringBuffer path;
-
-        String search;
-
-        String mode;
-
-        String mask;
-
-        public void set(String search, String mode, String index, String fromTo, String mask) {
-            this.search = search;
-            this.mode = mode;
-            this.index = index;
-            this.path = new StringBuffer(this.index);
-            this.path.append("/");
-            if (fromTo != null && fromTo.length() > 0) {
-                String from = fromTo.substring(0, fromTo.indexOf("-"));
-                String to = fromTo.substring(fromTo.indexOf("-") + 1);
-                this.addRange(from, to);
-            }
-            this.mask = mask;
-        }
-
-        void addRange(String from, String to) {
-            this.from = Integer.parseInt(from);
-            this.to = Integer.parseInt(to);
-            path.append(this.from);
-            path.append("-");
-            path.append(this.to);
-            path.append("/");
-        }
-
-    }
-
-    class MyIndexConfiguration {
-        String table;
-
-        boolean distinct;
-
-        String browseField;
-
-        String fields;
-
-        String[] outputFields;
-
-        String fieldToSort;
-
-        String[] sortFields;
-
-        String order;
-
-        String filter;
-
-        String style;
-
-        int maxPerPage;
-
-        public void set(String ID) {
-
-            MCRConfiguration config = MCRConfiguration.instance();
-            String prefix = "MCR.IndexBrowser." + ID + ".";
-            table = config.getString(prefix + "Table");
-            distinct = config.getBoolean(prefix + "Distinct", true);
-            browseField = config.getString(prefix + "Searchfield");
-            filter = config.getString(prefix + "FilterCondition", null);
-            maxPerPage = config.getInt(prefix + "MaxPerPage");
-            style = config.getString(prefix + "Style");
-            fields = config.getString(prefix + "ExtraOutputFields", null);
-            fieldToSort = config.getString(prefix + "FieldsToSort", null);
-            order = config.getString(prefix + "Order", "ascending");
-            outputFields = buildFieldList(fields);
-            sortFields = buildFieldList(fieldToSort);
-        }
-
-        private String[] buildFieldList(String myfields) {
-            String[] ff;
-            if ((myfields == null) || (myfields.trim().length() == 0)) {
-                ff = null;
-            } else {
-                StringTokenizer st = new StringTokenizer(myfields, ",");
-                ff = new String[st.countTokens()];
-                for (int i = 0; i < ff.length; i++)
-                    ff[i] = st.nextToken();
-            }
-            return ff;
-        }
+    static void deleteIndexCacheOfObjectType(String objectType) {
+        TYPE_CACHE_TABLE.remove(objectType);
     }
 
     private void initIndexCacheForObjectType(String alias) {
         String objectType = getObjectType(alias);
-        if (INDEX_CACHE.get(objectType) == null)
-            INDEX_CACHE.put(objectType, new MCRCache(1000, "Index cache for object type " + objectType));
+        if (!TYPE_CACHE_TABLE.containsKey(objectType))
+            TYPE_CACHE_TABLE.put(objectType, new MCRCache(1000, "IndexBrowser, objectType=" + objectType));
     }
 
     private static String getObjectType(String alias) {
@@ -191,15 +79,7 @@ public class MCRIndexBrowserData {
 
     private MCRCache getIndexCache(String alias) {
         String objectType = getObjectType(alias);
-        return ((MCRCache) INDEX_CACHE.get(objectType));
-    }
-
-    protected static void deleteIndexCacheOfObjectType(String objectType) {
-        for (Object o : INDEX_CACHE.keys()) {
-            if (o.toString().contains(objectType)) {
-                INDEX_CACHE.remove(o);
-            }
-        }
+        return TYPE_CACHE_TABLE.get(objectType);
     }
 
     public MCRIndexBrowserData(String search, String mode, String path, String fromTo, String mask) {
@@ -208,28 +88,25 @@ public class MCRIndexBrowserData {
         indexConfig.set(browseData.index);
         Element results = buildPageElement();
         int numRows = 0;
-        String cacheKey = browseData.index + "##" + browseData.search + "##" + mode;
+        String cacheKey = browseData.index + "#" + browseData.search + "#" + mode;
 
         if (cached(path, cacheKey)) {
-            MCRCache cache = ((MCRCache) getIndexCache(path).get(getCacheKey(cacheKey)));
-            linkedList1 = (LinkedList<String[]>) (cache.get(INDEX_KEY));
-            numRows = linkedList1.size();
-            myQuery = (MCRQuery) cache.get(QUERY_KEY);
+            CacheEntry entry = ((CacheEntry) getIndexCache(path).get(cacheKey));
+            hitList = entry.list;
+            numRows = hitList.size();
+            myQuery = entry.query;
         } else {
             initIndexCacheForObjectType(path);
-            MCRCache cacheNew = new MCRCache(5, "IndexBrowser Cache key(" + getCacheKey(cacheKey) + ")");
-            getIndexCache(path).put(getCacheKey(cacheKey), cacheNew);
-            // cache = getCache(cacheKey);
+            CacheEntry entry = new CacheEntry();
             numRows = createLinkedListfromSearch();
-            ((MCRCache) getIndexCache(path).get(getCacheKey(cacheKey))).put(INDEX_KEY, linkedList1);
-            ((MCRCache) getIndexCache(path).get(getCacheKey(cacheKey))).put(QUERY_KEY, myQuery);
+            entry.list = hitList;
+            entry.query = myQuery;
+            getIndexCache(path).put(cacheKey, entry);
             // for further search and research (by refine and other posibilities
             // the query must be in the Cache
             new MCRCachedQueryData(mcrResult, myQuery.buildXML(), myQuery.getCondition());
             results.setAttribute("resultid", mcrResult.getID());
         }
-        // resort it for german ...
-        // sortLinkedListForGerman();
         int from = Math.max(0, browseData.from);
         int to = Math.min(numRows, browseData.to + 1);
         int numSelectedRows = to - from;
@@ -241,11 +118,11 @@ public class MCRIndexBrowserData {
 
         if (numSelectedRows <= indexConfig.maxPerPage) {
             // set the metadata for the details only for the shown objects
-            fillLinkedListWithMetadata(from, to);
+            fillHitListWithMetadata(from, to);
 
             // build the xml-result tree with detailed Informations
             for (int i = from; i < to; i++) {
-                String myValues[] = linkedList1.get(i);
+                String myValues[] = hitList.get(i);
 
                 Element v = new Element("value");
                 v.setAttribute("pos", String.valueOf(i));
@@ -277,17 +154,17 @@ public class MCRIndexBrowserData {
             List<MyRangeDelim> delims = new Vector<MyRangeDelim>();
 
             for (int i = from; i < to; i++) {
-                String myValues[] = linkedList1.get(i);
+                String myValues[] = hitList.get(i);
                 delims.add(new MyRangeDelim(i, myValues[1]));
 
                 i = Math.min(i + stepSize, to - 1);
 
-                String myVal[] = linkedList1.get(i);
+                String myVal[] = hitList.get(i);
                 String value = myVal[1];
 
                 if ((i < to) && ((to - i) < 3)) {
                     i = to - 1;
-                    value = linkedList1.get(i)[1];
+                    value = hitList.get(i)[1];
                 }
                 delims.add(new MyRangeDelim(i, value));
             }
@@ -309,7 +186,9 @@ public class MCRIndexBrowserData {
     }
 
     public Document getXMLContent() {
-        logger.debug("Results: \n" + out.outputString(page));
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Results: \n" + out.outputString(page));
+        }
         return new Document(page);
     }
 
@@ -328,8 +207,6 @@ public class MCRIndexBrowserData {
         return results;
     }
 
-    // **************************************************************************
-
     private void buildPrefixDifference(List<MyRangeDelim> delims) {
         for (int i = 0; i < delims.size(); i++) {
             MyRangeDelim curr = (delims.get(i));
@@ -345,8 +222,6 @@ public class MCRIndexBrowserData {
             curr.diff = (a.length() > b.length() ? a : b);
         }
     }
-
-    // **************************************************************************
 
     private void buildXML(Element results, List<MyRangeDelim> delims) {
         for (int i = 0; i < delims.size(); i += 2) {
@@ -370,8 +245,6 @@ public class MCRIndexBrowserData {
         }
     }
 
-    // **************************************************************************
-
     private String buildPrefixDifference(String a, String b) {
         if (a.equals(b))
             return a;
@@ -389,8 +262,6 @@ public class MCRIndexBrowserData {
 
         return pdiff.toString();
     }
-
-    // **************************************************************************
 
     private MCRQuery buildQuery() {
         MCRAndCondition cAnd = new MCRAndCondition();
@@ -444,11 +315,11 @@ public class MCRIndexBrowserData {
             if (null != field)
                 sortCriteria.add(new MCRSortBy(field, order));
             else
-                logger.error("MCRFieldDef not available: " + indexConfig.sortFields[i]);
+                LOGGER.error("MCRFieldDef not available: " + indexConfig.sortFields[i]);
         }
 
         myQuery = new MCRQuery(cAnd, sortCriteria, 0);
-        logger.debug("Query: \n" + out.outputString(myQuery.buildXML()));
+        LOGGER.debug("Query: \n" + out.outputString(myQuery.buildXML()));
         return myQuery;
     }
 
@@ -470,8 +341,6 @@ public class MCRIndexBrowserData {
             return "like";
     }
 
-    // **************************************************************************
-
     private int calculateStepSize(int numSelectedRows, int maxPerPage) {
         for (int i = 1;; i++) {
             double dNum = numSelectedRows;
@@ -485,40 +354,32 @@ public class MCRIndexBrowserData {
     private int createLinkedListfromSearch() {
         buildQuery();
         // at first we must create the full list with all results
-        linkedList1 = new LinkedList<String[]>();
+        hitList = new LinkedList<String[]>();
         mcrResult = MCRQueryManager.search(myQuery);
-        logger.debug("Results found hits:" + mcrResult.getNumHits());
-        Document jResult = new Document(mcrResult.buildXML());
-        List<?> mcrHit = jResult.getRootElement().getChildren();
+        LOGGER.debug("Results found hits:" + mcrResult.getNumHits());
 
-        if (mcrHit != null) {
-            int numRows = mcrHit.size();
-            for (int i = 0; i < numRows; i++) {
-                // for faster results we take the first 2 fields from the mcrhit
-                // they should be set with an searchfield with
-                // type="identifier", to get the exact String
-                int len = 0;
-                if (indexConfig.outputFields != null)
-                    len = indexConfig.outputFields.length;
-                String[] listelm = new String[len + 3];
-                Element child = (Element) (mcrHit.get(i));
-                logger.debug("\n" + out.outputString(child));
+        int len = (indexConfig.outputFields != null) ? indexConfig.outputFields.length + 3 : 3;
 
-                List<?> searchfields = child.getChild("sortData", MCRFieldDef.mcrns).getChildren("field", MCRFieldDef.mcrns);
-                listelm[0] = ((Element) searchfields.get(0)).getValue();
-                if (searchfields.size() > 1)
-                    listelm[1] = ((Element) searchfields.get(1)).getValue();
-                else
-                    listelm[1] = listelm[0];
-
-                listelm[2] = child.getAttributeValue("id");
-                linkedList1.add(listelm);
+        for (MCRHit hit : mcrResult) {
+            String[] listelm = new String[len + 3];
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("\n" + out.outputString(hit.buildXML()));
             }
+            List<MCRFieldValue> sortData = hit.getSortData();
+            //TODO this is kind of ugly
+            listelm[0] = sortData.get(0).getValue();
+            if (sortData.size() > 1) {
+                listelm[1] = sortData.get(0).getValue();
+            } else {
+                listelm[1] = listelm[0];
+            }
+            listelm[2] = hit.getID();
+            hitList.add(listelm);
         }
-        return linkedList1.size();
+        return hitList.size();
     }
 
-    private int fillLinkedListWithMetadata(int from, int to) {
+    private int fillHitListWithMetadata(int from, int to) {
         if (from == 0)
             from = 1;
         // now we take only the objects from metadata for the dataobjects that
@@ -527,21 +388,14 @@ public class MCRIndexBrowserData {
         // only a part
         if (to - from <= indexConfig.maxPerPage && indexConfig.outputFields != null) {
             for (int i = from - 1; i < to; i++) {
-                String[] listelm = linkedList1.get(i);
-                Document od = new Document();
-                MCRObject oo = new MCRObject();
-                try {
-                    od = oo.receiveJDOMFromDatastore(listelm[2]);
-                } catch (Exception yy) {
-                    // object dos'nt exist in Database????
-                    continue;
-                }
+                String[] listelm = hitList.get(i);
+                String id = listelm[2];
+                Document jdomDoc = MCRXMLTableManager.instance().readDocument(new MCRObjectID(id));
                 // outputfields came only from metadataobject
-                setListeElm(od, indexConfig.outputFields, 3, listelm, false);
-                linkedList1.set(i, listelm);
+                setListeElm(jdomDoc, indexConfig.outputFields, 3, listelm, false);
             }
         }
-        return linkedList1.size();
+        return hitList.size();
     }
 
     // reads the values from the metadata of the document
@@ -652,28 +506,128 @@ public class MCRIndexBrowserData {
 
     private boolean cached(String alias, String key) {
         String objType = getObjectType(alias);
-        String cacheKey = getCacheKey(key);
-        if ((((MCRCache) INDEX_CACHE.get(objType)) != null) && ((MCRCache) INDEX_CACHE.get(objType)).get(cacheKey) != null)
+        if (TYPE_CACHE_TABLE.get(objType) != null && TYPE_CACHE_TABLE.get(objType).get(key) != null)
             return true;
-        else
-            return false;
+        return false;
     }
 
-    public static void removeAllCachesStartsWithKey(String key) {
-        String key2 = getCacheKey(key);
-        Iterator iC = MCRSessionMgr.getCurrentSession().getObjectsKeyList();
-        // indexCache.
-        while (iC.hasNext()) {
-            String nextKey = (String) iC.next();
-            if (nextKey.startsWith(key2)) {
-                logger.debug("Remove IndexBrowserCache with KEY" + nextKey);
-                ((MCRCache) MCRSessionMgr.getCurrentSession().get(nextKey)).remove(INDEX_KEY);
-                ((MCRCache) MCRSessionMgr.getCurrentSession().get(nextKey)).remove(QUERY_KEY);
-            }
+    /*
+     * indexCache is build like this:
+     * 
+     * --+ indexCache +---+ MCRObjectType +---+ Cache entries for configured
+     * aliases
+     */
+
+    private static class MyRangeDelim {
+        int pos;
+
+        String value;
+
+        String diff;
+
+        MyRangeDelim(int pos, String value) {
+            this.pos = pos;
+            this.value = value;
         }
     }
 
-    private static String getCacheKey(String key) {
-        return PREFIX + key;
+    private static class MyBrowseData {
+        String index;
+
+        int from = 0;
+
+        int to = Integer.MAX_VALUE - 10;
+
+        StringBuffer path;
+
+        String search;
+
+        String mode;
+
+        String mask;
+
+        public void set(String search, String mode, String index, String fromTo, String mask) {
+            this.search = search;
+            this.mode = mode;
+            this.index = index;
+            this.path = new StringBuffer(this.index);
+            this.path.append("/");
+            if (fromTo != null && fromTo.length() > 0) {
+                String from = fromTo.substring(0, fromTo.indexOf("-"));
+                String to = fromTo.substring(fromTo.indexOf("-") + 1);
+                this.addRange(from, to);
+            }
+            this.mask = mask;
+        }
+
+        void addRange(String from, String to) {
+            this.from = Integer.parseInt(from);
+            this.to = Integer.parseInt(to);
+            path.append(this.from);
+            path.append("-");
+            path.append(this.to);
+            path.append("/");
+        }
+
+    }
+
+    private static class MyIndexConfiguration {
+        String table;
+
+        boolean distinct;
+
+        String browseField;
+
+        String fields;
+
+        String[] outputFields;
+
+        String fieldToSort;
+
+        String[] sortFields;
+
+        String order;
+
+        String filter;
+
+        String style;
+
+        int maxPerPage;
+
+        public void set(String ID) {
+
+            MCRConfiguration config = MCRConfiguration.instance();
+            String prefix = "MCR.IndexBrowser." + ID + ".";
+            table = config.getString(prefix + "Table");
+            distinct = config.getBoolean(prefix + "Distinct", true);
+            browseField = config.getString(prefix + "Searchfield");
+            filter = config.getString(prefix + "FilterCondition", null);
+            maxPerPage = config.getInt(prefix + "MaxPerPage");
+            style = config.getString(prefix + "Style");
+            fields = config.getString(prefix + "ExtraOutputFields", null);
+            fieldToSort = config.getString(prefix + "FieldsToSort", null);
+            order = config.getString(prefix + "Order", "ascending");
+            outputFields = buildFieldList(fields);
+            sortFields = buildFieldList(fieldToSort);
+        }
+
+        private String[] buildFieldList(String myfields) {
+            String[] ff;
+            if ((myfields == null) || (myfields.trim().length() == 0)) {
+                ff = null;
+            } else {
+                StringTokenizer st = new StringTokenizer(myfields, ",");
+                ff = new String[st.countTokens()];
+                for (int i = 0; i < ff.length; i++)
+                    ff[i] = st.nextToken();
+            }
+            return ff;
+        }
+    }
+
+    private static class CacheEntry {
+        List<String[]> list;
+
+        MCRQuery query;
     }
 }
