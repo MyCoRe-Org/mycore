@@ -131,7 +131,6 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
     private static final MCRResolverProvider getExternalResolverProvider() {
         String externalClassName = MCRConfiguration.instance().getString(CONFIG_PREFIX + "ExternalResolver.Class", null);
         final MCRResolverProvider emptyResolver = new MCRResolverProvider() {
-            @Override
             public Map<String, MCRResolver> getResolverMapping() {
                 return new HashMap<String, MCRResolver>();
             }
