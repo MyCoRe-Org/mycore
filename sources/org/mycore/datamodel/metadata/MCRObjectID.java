@@ -183,12 +183,9 @@ public final class MCRObjectID {
                     mcrid.append(i);
                     mylastnumber = i;
                 } else {
-                    mylastnumber += 1;
-
                     while ((mylastnumber % number_distance) != 0) {
                         mylastnumber += 1;
                     }
-
                     mcrid.append(mylastnumber);
                 }
 
