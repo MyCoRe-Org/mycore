@@ -348,25 +348,26 @@
                                             </label>
                                         </td>
                                         <td>
-                                            <xsl:choose>
-                                                <!-- external new content -->
-                                                <xsl:when test="/cms/action = 'add'">
-                                                    <input type="text" size="512" maxlength="512" name="href" id="hrefInput" class="input">
-                                                        <xsl:attribute name="value">
-                                                            http://</xsl:attribute>
-                                                    </input>
-                                                </xsl:when>
+                                            <input type="text" size="512" maxlength="512" name="href" id="hrefInput" class="input">
+                                                <xsl:choose>
+                                                    <!-- external new content -->
+                                                    <xsl:when test="/cms/action = 'add'">
+<!--                                                        <input type="text" size="512" maxlength="512" name="href" id="hrefInput" class="input">-->
+                                                            <xsl:attribute name="value">http://</xsl:attribute>
+<!--                                                        </input>-->
+                                                    </xsl:when>
 
 
-                                                <!-- external existing content -->
-                                                <xsl:when test="/cms/action = 'edit'">
-                                                    <input type="text" size="200" maxlength="256" name="href" class="input">
-                                                        <xsl:attribute name="value">
+                                                    <!-- external existing content -->
+                                                    <xsl:when test="/cms/action = 'edit'">
+<!--                                                        <input type="text" size="200" maxlength="256" name="href" class="input">-->
+                                                            <xsl:attribute name="value">
                                                             <xsl:value-of select="$href" />
                                                         </xsl:attribute>
-                                                    </input>
-                                                </xsl:when>
-                                            </xsl:choose>
+<!--                                                        </input>-->
+                                                    </xsl:when>
+                                                </xsl:choose>
+                                            </input>
                                         </td>
                                     </tr>
                                 </xsl:if>
@@ -745,7 +746,7 @@
                     </td>
                     <td>
 
-                        <input type="text" size="60" maxlength="60" name="label" class="text">
+                        <input id="linkName" type="text" size="60" maxlength="60" name="label" class="text">
                             <xsl:if test=" /cms/action = 'edit' ">
                                 <xsl:attribute name="value">
                                     <xsl:value-of select="/cms/label" />
@@ -774,7 +775,30 @@
                 </a>
             </xsl:when>
             <xsl:otherwise>
-                <a class="button" href="javascript:document.getElementById('editContentID').submit()">
+                <script type="text/javascript">
+                    function submitForm(){
+                        var linkName = document.getElementById('linkName');
+                        var url = document.getElementById('hrefInput');
+                        
+                        var msg = '';
+                        
+                        if (linkName.value == null || linkName.value == ''){
+                            msg = '<xsl:value-of select="concat('Name ', i18n:translate('wcms.msg.notEmpty'))" />\n';
+                        }
+                        
+                        if (url.value == null || url.value == ''){
+                            msg = msg + '<xsl:value-of select="concat('URL ', i18n:translate('wcms.msg.notEmpty'))" />';
+                        } 
+                        
+                        if (msg == ''){
+                            document.getElementById('editContentID').submit();
+                        } else{
+                            alert(msg);
+                        }
+                    }
+                </script>
+<!--                <a class="button" href="javascript:document.getElementById('editContentID').submitForm()">-->
+                <a class="button" href="javascript:submitForm()">
                     <xsl:value-of select="i18n:translate('wcms.labels.saveChanges')" />
                 </a>
             </xsl:otherwise>
