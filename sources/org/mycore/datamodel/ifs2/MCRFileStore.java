@@ -23,7 +23,7 @@
 
 package org.mycore.datamodel.ifs2;
 
-import java.util.Enumeration;
+import java.util.Iterator;
 
 import org.apache.commons.vfs.FileObject;
 import org.mycore.common.MCRException;
@@ -102,7 +102,7 @@ public class MCRFileStore extends MCRStore {
      * @throws Exception
      */
     public void repairAllMetadata() throws Exception {
-        for (Enumeration<Integer> e = listIDs(MCRStore.ASCENDING); e.hasMoreElements();)
-            retrieve(e.nextElement()).repairMetadata();
+        for (Iterator<Integer> e = listIDs(MCRStore.ASCENDING); e.hasNext();)
+            retrieve(e.next()).repairMetadata();
     }
 }

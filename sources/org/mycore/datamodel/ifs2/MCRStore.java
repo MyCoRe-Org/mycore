@@ -26,9 +26,10 @@ package org.mycore.datamodel.ifs2;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.StringTokenizer;
 
 import org.apache.commons.vfs.FileObject;
@@ -36,6 +37,7 @@ import org.apache.commons.vfs.Selectors;
 import org.apache.commons.vfs.VFS;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
+import org.mycore.common.MCRException;
 
 /**
  * Stores metadata files or file collections containing files and directories in
@@ -352,8 +354,8 @@ public abstract class MCRStore {
      *            the order in which IDs should be returned.
      * @return all IDs currently used in the store
      */
-    public Enumeration<Integer> listIDs(boolean order) {
-        return new Enumeration<Integer>() {
+    public Iterator<Integer> listIDs(boolean order) {
+        return new Iterator<Integer>() {
             /**
              * List of files or directories in store not yet handled
              */
@@ -363,6 +365,11 @@ public abstract class MCRStore {
              * The next ID to return, when 0, all IDs have been returned
              */
             int nextID;
+
+            /**
+             * The last ID that was returned
+             */
+            int lastID;
 
             /**
              * The order in which the IDs should be returned, ascending or
@@ -377,7 +384,7 @@ public abstract class MCRStore {
              * @param order
              *            the return order, ascending or descending
              */
-            Enumeration<Integer> init(boolean order) {
+            Iterator<Integer> init(boolean order) {
                 this.order = order;
                 addChildren(dir);
                 nextID = findNextID();
@@ -402,14 +409,28 @@ public abstract class MCRStore {
                     files.add((order ? i : 0), new File(dir, children[i]));
             }
 
-            public boolean hasMoreElements() {
+            public boolean hasNext() {
                 return (nextID > 0);
             }
 
-            public Integer nextElement() {
-                int id = nextID;
+            public Integer next() {
+                if (nextID < 1)
+                    throw new NoSuchElementException();
+
+                lastID = nextID;
                 nextID = findNextID();
-                return id;
+                return lastID;
+            }
+
+            public void remove() {
+                if (lastID == 0)
+                    throw new IllegalStateException();
+                try {
+                    MCRStore.this.delete(lastID);
+                } catch (Exception ex) {
+                    throw new MCRException("Could not delete " + MCRStore.this.getID() + " " + lastID, ex);
+                }
+                lastID = 0;
             }
 
             /**

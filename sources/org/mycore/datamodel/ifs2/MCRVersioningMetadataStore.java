@@ -24,7 +24,7 @@
 package org.mycore.datamodel.ifs2;
 
 import java.io.File;
-import java.util.Enumeration;
+import java.util.Iterator;
 
 import org.apache.commons.vfs.FileObject;
 import org.apache.log4j.Logger;
@@ -131,8 +131,8 @@ public class MCRVersioningMetadataStore extends MCRMetadataStore {
      * Updates all stored metadata to the latest revision in SVN
      */
     public void updateAll() throws Exception {
-        for (Enumeration<Integer> ids = listIDs(true); ids.hasMoreElements();)
-            retrieve(ids.nextElement()).update();
+        for (Iterator<Integer> ids = listIDs(true); ids.hasNext();)
+            retrieve(ids.next()).update();
     }
 
     public void delete(int id) throws Exception {
