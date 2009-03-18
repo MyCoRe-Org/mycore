@@ -369,7 +369,7 @@ public class MCRIndexBrowserData {
             //TODO this is kind of ugly
             listelm[0] = sortData.get(0).getValue();
             if (sortData.size() > 1) {
-                listelm[1] = sortData.get(0).getValue();
+                listelm[1] = sortData.get(1).getValue();
             } else {
                 listelm[1] = listelm[0];
             }
