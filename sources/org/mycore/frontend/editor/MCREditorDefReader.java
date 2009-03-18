@@ -33,11 +33,11 @@ import org.apache.log4j.Logger;
 import org.jdom.Content;
 import org.jdom.Document;
 import org.jdom.Element;
-import org.jdom.Namespace;
 import org.jdom.filter.ElementFilter;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.mycore.common.MCRConfigurationException;
+import org.mycore.common.MCRConstants;
 import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.common.xml.MCRXMLHelper;
 
@@ -84,8 +84,7 @@ public class MCREditorDefReader
     LOGGER.info( "Validating editor " + uri + "..." );
     
     Document doc = new Document( editor );
-    Namespace xsi = Namespace.getNamespace( "xsi", "http://www.w3.org/2001/XMLSchema-instance" );
-    editor.setAttribute( "noNamespaceSchemaLocation", "editor.xsd", xsi );
+    editor.setAttribute( "noNamespaceSchemaLocation", "editor.xsd", MCRConstants.XSI_NAMESPACE );
 
     XMLOutputter xout = new XMLOutputter();
     xout.setFormat( Format.getPrettyFormat() );
@@ -104,7 +103,7 @@ public class MCREditorDefReader
     }
 
     editor.detach();
-    editor.removeAttribute("noNamespaceSchemaLocation", xsi);
+    editor.removeAttribute("noNamespaceSchemaLocation", MCRConstants.XSI_NAMESPACE);
     LOGGER.info( "Validation succeeded." );
   }
 

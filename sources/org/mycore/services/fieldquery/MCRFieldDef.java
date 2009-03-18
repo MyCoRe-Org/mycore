@@ -46,8 +46,6 @@ public class MCRFieldDef {
 
     private static Hashtable<String, MCRFieldDef> fieldTable = new Hashtable<String, MCRFieldDef>();
 
-    public final static Namespace mcrns = Namespace.getNamespace("mcr", "http://www.mycore.org/");
-
     public final static Namespace xalanns = Namespace.getNamespace("xalan", "http://xml.apache.org/xalan");
 
     public final static Namespace extns = Namespace.getNamespace("ext", "xalan://org.mycore.services.fieldquery.MCRData2Fields");
@@ -60,13 +58,13 @@ public class MCRFieldDef {
     static {
         Element def = getConfigFile();
 
-        List children = def.getChildren("index", mcrns);
+        List children = def.getChildren("index", MCRConstants.MCR_NAMESPACE);
 
         for (int i = 0; i < children.size(); i++) {
             Element index = (Element) (children.get(i));
             String id = index.getAttributeValue("id");
 
-            List fields = index.getChildren("field", mcrns);
+            List fields = index.getChildren("field", MCRConstants.MCR_NAMESPACE);
 
             for (int j = 0; j < fields.size(); j++)
                 new MCRFieldDef(id, (Element) fields.get(j));

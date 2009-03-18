@@ -29,6 +29,7 @@ import java.util.Properties;
 import java.util.List;
 
 import org.jdom.Element;
+import org.mycore.common.MCRConstants;
 import org.mycore.common.xml.MCRURIResolver;
 
 /**
@@ -50,13 +51,13 @@ public class MCRFieldType {
      */
     static {
         Element fieldtypes = MCRURIResolver.instance().resolve("resource:fieldtypes.xml");
-        for (Element type : (List<Element>) (fieldtypes.getChildren("type", MCRFieldDef.mcrns))) {
+        for (Element type : (List<Element>) (fieldtypes.getChildren("type", MCRConstants.MCR_NAMESPACE))) {
             String name = type.getAttributeValue("name");
             String def = type.getAttributeValue("default");
             defOps.setProperty(name, def);
 
             List<String> operators = new ArrayList<String>();
-            for (Element oper : (List<Element>) (type.getChildren("operator", MCRFieldDef.mcrns)))
+            for (Element oper : (List<Element>) (type.getChildren("operator", MCRConstants.MCR_NAMESPACE)))
                 operators.add(oper.getAttributeValue("token"));
             allOps.put(name, operators);
         }

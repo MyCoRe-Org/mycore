@@ -35,6 +35,7 @@ import java.util.Random;
 import org.apache.batik.dom.util.HashTable;
 import org.jdom.Document;
 import org.jdom.Element;
+import org.mycore.common.MCRConstants;
 
 /**
  * This class represents the results of a query performed by MCRSearcher.
@@ -219,13 +220,13 @@ public class MCRResults implements Iterable<MCRHit> {
      *         hit child elements
      */
     public Element buildXML(int min, int max) {
-        Element results = new Element("results", MCRFieldDef.mcrns);
+        Element results = new Element("results", MCRConstants.MCR_NAMESPACE);
         results.setAttribute("id", getID());
         results.setAttribute("sorted", Boolean.toString(isSorted()));
         results.setAttribute("numHits", String.valueOf(getNumHits()));
 
         for (int i = 0; i < hostconnection.size(); i++) {
-            Element connection = new Element("hostconnection", MCRFieldDef.mcrns);
+            Element connection = new Element("hostconnection", MCRConstants.MCR_NAMESPACE);
             connection.setAttribute("host", (String) hostconnection.key(i));
             String msg = (String) hostconnection.item(i);
             if (msg == null)
@@ -269,7 +270,7 @@ public class MCRResults implements Iterable<MCRHit> {
         int numHitsBefore = this.getNumHits();
         int numRemoteHits = Integer.parseInt(xml.getAttributeValue("numHits"));
 
-        List connectionList = xml.getChildren("hostconnection", MCRFieldDef.mcrns);
+        List connectionList = xml.getChildren("hostconnection", MCRConstants.MCR_NAMESPACE);
         for (Iterator it = connectionList.iterator(); it.hasNext();) {
             Element connectionElement = (Element) (it.next());
             String conKey = connectionElement.getAttributeValue("host");
@@ -277,7 +278,7 @@ public class MCRResults implements Iterable<MCRHit> {
             hostconnection.put(conKey, conValue);
         }
 
-        List hitList = xml.getChildren("hit", MCRFieldDef.mcrns);
+        List hitList = xml.getChildren("hit", MCRConstants.MCR_NAMESPACE);
         hits.ensureCapacity(numHitsBefore + numRemoteHits);
         for (Iterator it = hitList.iterator(); it.hasNext();) {
             Element hitElement = (Element) (it.next());

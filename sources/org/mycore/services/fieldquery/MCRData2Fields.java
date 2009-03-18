@@ -102,7 +102,7 @@ public class MCRData2Fields {
         template.setAttribute("match", "/");
         xslTemplate.addContent(template);
 
-        Element fieldValues = new Element("fieldValues", MCRFieldDef.mcrns);
+        Element fieldValues = new Element("fieldValues", MCRConstants.MCR_NAMESPACE);
         template.addContent(fieldValues);
     }
 
@@ -112,7 +112,7 @@ public class MCRData2Fields {
 
         if (stylesheet == null) {
             Element root = (Element) (xslTemplate.clone());
-            Element fv = root.getChild("template", MCRConstants.XSL_NAMESPACE).getChild("fieldValues", MCRFieldDef.mcrns);
+            Element fv = root.getChild("template", MCRConstants.XSL_NAMESPACE).getChild("fieldValues", MCRConstants.MCR_NAMESPACE);
 
             List<MCRFieldDef> fieldDefs = MCRFieldDef.getFieldDefs(index);
             for (int i = 0; i < fieldDefs.size(); i++) {

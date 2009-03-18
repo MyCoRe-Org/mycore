@@ -46,6 +46,7 @@ import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.backend.hibernate.tables.MCRFSNODES;
 import org.mycore.backend.hibernate.tables.MCRXMLTABLE;
 import org.mycore.common.MCRConfiguration;
+import org.mycore.common.MCRConstants;
 import org.mycore.common.xml.MCRXMLResource;
 import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.ifs.MCRFileMetadataManager;
@@ -73,8 +74,6 @@ public class MCRSearcherCommands extends MCRAbstractCommands {
     private static final String SEARCHER_CLASS_SUFFIX = ".Class";
 
     private static final String SEARCHER_INDEX_SUFFIX = ".Index";
-
-    private static final Namespace MYCORE_NS = Namespace.getNamespace("mcr", "http://www.mycore.org/");
 
     public MCRSearcherCommands() {
         super();
@@ -169,10 +168,10 @@ public class MCRSearcherCommands extends MCRAbstractCommands {
     private static boolean isIndexType(String index, String type) throws IOException, JDOMException {
         Document searchFields = MCRXMLResource.instance().getResource("searchfields.xml");
         final String indexKey = MCRConfiguration.instance().getString(SEARCHER_PROPERTY_START + index + SEARCHER_INDEX_SUFFIX);
-        for (Object indexElement : searchFields.getRootElement().getChildren("index", MYCORE_NS)) {
+        for (Object indexElement : searchFields.getRootElement().getChildren("index", MCRConstants.MCR_NAMESPACE)) {
             final Element indexE = (Element) indexElement;
             if (indexE.getAttributeValue("id").equals(indexKey))
-                for (Object fieldElement : indexE.getChildren("field", MYCORE_NS)) {
+                for (Object fieldElement : indexE.getChildren("field", MCRConstants.MCR_NAMESPACE)) {
                     String source = ((Element) fieldElement).getAttributeValue("source");
                     if (source.startsWith(type)) {
                         return true;

@@ -31,6 +31,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.jdom.Element;
+import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
 
 /**
@@ -231,12 +232,12 @@ public class MCRHit {
      *         child element and multiple 'metaData' child elements
      */
     public Element buildXML() {
-        Element eHit = new Element("hit", MCRFieldDef.mcrns);
+        Element eHit = new Element("hit", MCRConstants.MCR_NAMESPACE);
         eHit.setAttribute("id", this.id);
         eHit.setAttribute("host", this.host);
 
         if (!sortData.isEmpty()) {
-            Element eSort = new Element("sortData", MCRFieldDef.mcrns);
+            Element eSort = new Element("sortData", MCRConstants.MCR_NAMESPACE);
             eHit.addContent(eSort);
 
             for (int i = 0; i < sortData.size(); i++) {
@@ -254,7 +255,7 @@ public class MCRHit {
                 if ((eMeta != null) && (count == 0))
                     continue;
 
-                eMeta = new Element("metaData", MCRFieldDef.mcrns);
+                eMeta = new Element("metaData", MCRConstants.MCR_NAMESPACE);
                 eHit.addContent(eMeta);
                 count = 0;
                 if (i > 0)
@@ -284,7 +285,7 @@ public class MCRHit {
 
         MCRHit hit = new MCRHit(id, hostAlias);
 
-        Element eSort = xml.getChild("sortData", MCRFieldDef.mcrns);
+        Element eSort = xml.getChild("sortData", MCRConstants.MCR_NAMESPACE);
         if (eSort != null) {
             List children = eSort.getChildren();
             for (Iterator it = children.iterator(); it.hasNext();) {

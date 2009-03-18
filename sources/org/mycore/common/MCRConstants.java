@@ -65,6 +65,10 @@ public final class MCRConstants {
     private final static String MODS_URL = "http://www.loc.gov/mods/v3";
     public final static Namespace MODS_NAMESPACE = Namespace.getNamespace("mods", MODS_URL);
     
+    /** The URL of the MCR */
+    private final static String MCR_URL = "http://www.mycore.org/";
+    public final static Namespace MCR_NAMESPACE = Namespace.getNamespace("mcr", MCR_URL);
+
     /** The default encoding */
     public final static String DEFAULT_ENCODING = "UTF-8";
 

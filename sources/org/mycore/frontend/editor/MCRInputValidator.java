@@ -44,10 +44,10 @@ import javax.xml.transform.stream.StreamResult;
 
 import org.jdom.Document;
 import org.jdom.Element;
-import org.jdom.Namespace;
 import org.jdom.transform.JDOMSource;
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRConfigurationException;
+import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
 
 /**
@@ -114,7 +114,7 @@ public class MCRInputValidator {
         if (xsl == null) {
             xsl = (Document) (stylesheet.clone());
 
-            Element when = xsl.getRootElement().getChild("template", xslns).getChild("choose", xslns).getChild("when", xslns);
+            Element when = xsl.getRootElement().getChild("template", MCRConstants.XSL_NAMESPACE).getChild("choose", MCRConstants.XSL_NAMESPACE).getChild("when", MCRConstants.XSL_NAMESPACE);
             when.setAttribute("test", condition);
             xslcondCache.put(condition, xsl);
         }
@@ -146,27 +146,25 @@ public class MCRInputValidator {
         return validateXSLCondition(xml,condition);
     }
     
-    private Namespace xslns = Namespace.getNamespace("xsl", "http://www.w3.org/1999/XSL/Transform");
-
     /** Prepares a template stylesheet that is used for checking XSL conditions * */
     private synchronized Document prepareStylesheet() {
         Element stylesheet = new Element("stylesheet").setAttribute("version", "1.0");
-        stylesheet.setNamespace(xslns);
+        stylesheet.setNamespace(MCRConstants.XSL_NAMESPACE);
 
-        Element output = new Element("output", xslns);
+        Element output = new Element("output", MCRConstants.XSL_NAMESPACE);
         output.setAttribute("method", "text");
         stylesheet.addContent(output);
 
-        Element template = new Element("template", xslns).setAttribute("match", "/*");
+        Element template = new Element("template", MCRConstants.XSL_NAMESPACE).setAttribute("match", "/*");
         stylesheet.addContent(template);
 
-        Element choose = new Element("choose", xslns);
+        Element choose = new Element("choose", MCRConstants.XSL_NAMESPACE);
         template.addContent(choose);
 
-        Element when = new Element("when", xslns);
+        Element when = new Element("when", MCRConstants.XSL_NAMESPACE);
         when.addContent("t");
 
-        Element otherwise = new Element("otherwise", xslns);
+        Element otherwise = new Element("otherwise", MCRConstants.XSL_NAMESPACE);
         otherwise.addContent("f");
         choose.addContent(when).addContent(otherwise);
 

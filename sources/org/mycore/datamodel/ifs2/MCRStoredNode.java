@@ -34,7 +34,6 @@ import org.apache.commons.vfs.VFS;
 import org.jdom.Element;
 import org.jdom.Namespace;
 import org.mycore.common.MCRConfiguration;
-import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRSessionMgr;
 
 /**

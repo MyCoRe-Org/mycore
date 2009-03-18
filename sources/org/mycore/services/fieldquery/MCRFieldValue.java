@@ -24,6 +24,7 @@
 package org.mycore.services.fieldquery;
 
 import org.jdom.Element;
+import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRNormalizer;
 import org.mycore.datamodel.ifs.MCRFile;
@@ -128,7 +129,7 @@ public class MCRFieldValue {
      *         content
      */
     public Element buildXML() {
-        Element eField = new Element("field", MCRFieldDef.mcrns);
+        Element eField = new Element("field", MCRConstants.MCR_NAMESPACE);
         eField.setAttribute("name", field.getName());
         eField.addContent(value);
         return eField;
