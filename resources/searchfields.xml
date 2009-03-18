@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<searchfields xmlns="http://www.mycore.org/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mycore.org/ searchfields.xsd">
+
+  <!-- Search in MCRObject metadata -->
+  <index id="metadata">
+
+    <!-- Search in service/structural metadata -->  
+    <field name="id"            type="identifier" source="objectMetadata" xpath="/mycoreobject" value="@ID" />
+    <field name="objectProject" type="identifier" source="objectMetadata" xpath="/mycoreobject" value="substring-before(@ID,'_')" />
+    <field name="objectType"    type="identifier" source="objectMetadata" xpath="/mycoreobject" value="substring-before(substring-after(@ID,'_'),'_')" />
+    <field name="link"          type="identifier" source="objectMetadata" xpath="/mycoreobject/descendant::*[@xlink:href]" value="@xlink:href" />
+    <field name="parent"        type="identifier" source="objectMetadata" xpath="/mycoreobject/structure/parents/parent" value="@xlink:href" />
+    <field name="modified"      type="timestamp"  source="objectMetadata" xpath="/mycoreobject/service/servdates/servdate[@type='modifydate']" value="concat(substring(.,1,10),' ',substring(.,12,8))" i18n="editor.search.document.datemod" />
+    <field name="created"       type="timestamp"  source="objectMetadata" xpath="/mycoreobject/service/servdates/servdate[@type='createdate']" value="concat(substring(.,1,10),' ',substring(.,12,8))" sortable="true" />
+
+    <!-- Search in all metadata fields (that have an xml:lang attribute) -->
+    <field name="allMeta"       type="text"       source="objectMetadata" xpath="/mycoreobject/metadata/*/*" value="text()|@xlink:title" i18n="editor.search.metadata" />
+
+  </index>
+
+  <!-- Search in MCRFile metadata and content -->  
+  <index id="content">
+  
+    <!-- Search in fulltext of pdf and txt files -->
+    <field name="content" type="text" source="fileTextContent" objects="html pdf ps txt xml msword95 msword97 msppt rtf odt sxw" i18n="editor.search.fulltext" />
+	
+    <!-- Search in technical metadata of files -->
+    <field name="fileID"            type="identifier" source="fileMetadata" xpath="file/@id" value="." />
+    <field name="DerivateID"        type="identifier" source="fileMetadata" xpath="file/@owner" value="." addable="true" />
+    <field name="fileName"          type="identifier" source="fileMetadata" xpath="file/@name" value="." addable="true" />
+    <field name="filePath"          type="identifier" source="fileMetadata" xpath="file/@path" value="." addable="true" />
+    <field name="fileSize"          type="integer"    source="fileMetadata" xpath="file/@size" value="." />
+    <field name="fileExtension"     type="identifier" source="fileMetadata" xpath="file/@extension" value="." />
+    <field name="fileContentTypeID" type="identifier" source="fileMetadata" xpath="file/contentTypeID" value="." />
+    <field name="fileContentType"   type="text"       source="fileMetadata" xpath="file/@contentType" value="." />
+    <field name="fileDateModified"  type="date"       source="fileMetadata" xpath="file/@modified" value="ext:normalizeDate(string(.))" />
+    
+    <!-- Search in technical metadata of audio/video files -->
+    <field name="avBitRate"         type="integer"    source="fileMetadata" xpath="file/@bitRate" value="." />
+    <field name="avFrameRate"       type="decimal"    source="fileMetadata" xpath="file/@frameRate" value="." />
+    <field name="avDuration"        type="time"       source="fileMetadata" xpath="file/@duration" value="." />
+    <field name="avMediaType"       type="identifier" source="fileMetadata" xpath="file/@mediaType" value="." />
+
+  </index>
+
+</searchfields>
