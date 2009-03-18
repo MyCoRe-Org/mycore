@@ -213,9 +213,10 @@ public abstract class MCRNode {
         if (father != null) {
             FileObject[] childFos = father.getChildren();
             for (int i = 0; i < childFos.length; i++) {
-              String name = childFos[i].getName().getBaseName();
-              MCRNode child = getChild(name);
-              if( child != null ) children.add(child);
+                String name = childFos[i].getName().getBaseName();
+                MCRNode child = getChild(name);
+                if (child != null)
+                    children.add(child);
             }
         }
         return children;

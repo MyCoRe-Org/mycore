@@ -45,10 +45,10 @@ import org.mycore.common.MCRSessionMgr;
 public abstract class MCRStoredNode extends MCRNode {
 
     /**
-     * Any additional data of this node that is not stored in the file object 
+     * Any additional data of this node that is not stored in the file object
      */
     protected Element data;
-    
+
     /**
      * Creates a new stored node instance
      * 
@@ -56,7 +56,9 @@ public abstract class MCRStoredNode extends MCRNode {
      *            the parent directory containing this node
      * @param fo
      *            the file object in local filesystem representing this node
-     * @param data the additional data of this node that is not stored in the file object
+     * @param data
+     *            the additional data of this node that is not stored in the
+     *            file object
      */
     protected MCRStoredNode(MCRDirectory parent, FileObject fo, Element data) throws Exception {
         super(parent, fo);
@@ -90,7 +92,7 @@ public abstract class MCRStoredNode extends MCRNode {
         fo.moveTo(fNew);
         fo = fNew;
         fo.getContent().setLastModifiedTime(System.currentTimeMillis());
-        data.setAttribute("name",name);
+        data.setAttribute("name", name);
         getRoot().saveAdditionalData();
     }
 
@@ -114,17 +116,15 @@ public abstract class MCRStoredNode extends MCRNode {
      */
     public void setLabel(String lang, String label) throws Exception {
         Element found = null;
-        for( Element child : (List<Element>)(data.getChildren("label")) )
-            if( lang.equals( child.getAttributeValue("lang", MCRConstants.XML_NAMESPACE) ) )
-            {
-              found = child;
-              break;
+        for (Element child : (List<Element>) (data.getChildren("label")))
+            if (lang.equals(child.getAttributeValue("lang", MCRConstants.XML_NAMESPACE))) {
+                found = child;
+                break;
             }
 
-        if( found == null )
-        {
-          found = new Element("label").setAttribute("lang", lang, MCRConstants.XML_NAMESPACE );
-          data.addContent(found);
+        if (found == null) {
+            found = new Element("label").setAttribute("lang", lang, MCRConstants.XML_NAMESPACE);
+            data.addContent(found);
         }
         found.setText(label);
         getRoot().saveAdditionalData();
@@ -139,11 +139,12 @@ public abstract class MCRStoredNode extends MCRNode {
     }
 
     /**
-     * Returns a map of all labels, sorted by xml:lang, Key is xml:lang, value is the label for that language.
+     * Returns a map of all labels, sorted by xml:lang, Key is xml:lang, value
+     * is the label for that language.
      */
     public Map<String, String> getLabels() {
-        Map<String,String> labels = new TreeMap<String,String>(); 
-        for( Element label : (List<Element>)(data.getChildren("label")) )
+        Map<String, String> labels = new TreeMap<String, String>();
+        for (Element label : (List<Element>) (data.getChildren("label")))
             labels.put(label.getAttributeValue("lang", MCRConstants.XML_NAMESPACE), label.getText());
         return labels;
     }
@@ -156,8 +157,8 @@ public abstract class MCRStoredNode extends MCRNode {
      * @return the label, or null if there is no label for that language
      */
     public String getLabel(String lang) {
-        for( Element label : (List<Element>)(data.getChildren("label")) )
-            if( lang.equals( label.getAttributeValue("lang", MCRConstants.XML_NAMESPACE) ) )
+        for (Element label : (List<Element>) (data.getChildren("label")))
+            if (lang.equals(label.getAttributeValue("lang", MCRConstants.XML_NAMESPACE)))
                 return label.getText();
         return null;
     }
@@ -173,12 +174,12 @@ public abstract class MCRStoredNode extends MCRNode {
         String label = getLabel(currentLang);
         if (label != null)
             return label;
-        
+
         String defaultLang = MCRConfiguration.instance().getString("MCR.Metadata.DefaultLang", "en");
         label = getLabel(defaultLang);
         if (label != null)
             return label;
-        
+
         return data.getChildText("label");
     }
 }

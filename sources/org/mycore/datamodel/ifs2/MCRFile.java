@@ -112,7 +112,7 @@ public class MCRFile extends MCRStoredNode {
     public String setContent(MCRContent source) throws Exception {
         MCRContentInputStream cis = source.getContentInputStream();
         source.sendTo(fo);
-        String md5 = cis.getMD5String(); 
+        String md5 = cis.getMD5String();
         data.setAttribute("md5", md5);
         getRoot().saveAdditionalData();
         return md5;

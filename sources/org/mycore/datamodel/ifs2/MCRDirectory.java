@@ -63,13 +63,12 @@ public class MCRDirectory extends MCRStoredNode {
         data.setName("dir");
         getRoot().saveAdditionalData();
     }
-    
-    private Element getChildData(String name)
-    {
-      for( Element child : (List<Element>)(data.getChildren()) )
-          if( name.equals(child.getAttributeValue("name")) )
-              return child;
-      return null;
+
+    private Element getChildData(String name) {
+        for (Element child : (List<Element>) (data.getChildren()))
+            if (name.equals(child.getAttributeValue("name")))
+                return child;
+        return null;
     }
 
     /**
@@ -82,7 +81,7 @@ public class MCRDirectory extends MCRStoredNode {
     protected MCRStoredNode buildChildNode(FileObject fo) throws Exception {
         if (fo == null)
             return null;
-        
+
         Element childData = getChildData(fo.getName().getBaseName());
         if (fo.getType().equals(FileType.FILE))
             return new MCRFile(this, fo, childData);

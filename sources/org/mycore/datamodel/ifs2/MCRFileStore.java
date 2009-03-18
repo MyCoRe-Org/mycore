@@ -34,8 +34,7 @@ import org.mycore.common.MCRException;
  * For each store, properties must be defined, for example
  * 
  * MCR.IFS2.Store.ID.Class=org.mycore.datamodel.ifs2.MCRFileStore
- * MCR.IFS2.Store.ID.BaseDir=/foo/bar 
- * MCR.IFS2.Store.ID.SlotLayout=4-2-2
+ * MCR.IFS2.Store.ID.BaseDir=/foo/bar MCR.IFS2.Store.ID.SlotLayout=4-2-2
  * 
  * @author Frank Lützenkirchen
  */
