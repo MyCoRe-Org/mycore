@@ -197,9 +197,6 @@ public abstract class MCRNode {
         FileObject father = getFather();
         if (father == null)
             return 0;
-
-        if (father.getChild(MCRDirectory.metadataFile) != null)
-            return father.getChildren().length - 1;
         else
             return father.getChildren().length;
     }
@@ -216,9 +213,9 @@ public abstract class MCRNode {
         if (father != null) {
             FileObject[] childFos = father.getChildren();
             for (int i = 0; i < childFos.length; i++) {
-                FileObject childFO = childFos[i];
-                if (!childFO.getName().getBaseName().equals(MCRDirectory.metadataFile))
-                    children.add(buildChildNode(childFO));
+              String name = childFos[i].getName().getBaseName();
+              MCRNode child = getChild(name);
+              if( child != null ) children.add(child);
             }
         }
         return children;

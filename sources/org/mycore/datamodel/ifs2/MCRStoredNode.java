@@ -24,18 +24,17 @@
 package org.mycore.datamodel.ifs2;
 
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
-import java.util.SortedMap;
+import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.commons.vfs.FileObject;
+import org.apache.commons.vfs.Selectors;
 import org.apache.commons.vfs.VFS;
 import org.jdom.Element;
-import org.jdom.Namespace;
 import org.mycore.common.MCRConfiguration;
+import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.datamodel.metadata.MCRMetaISO8601Date;
 
 /**
  * A file or directory really stored by importing it from outside the system.
@@ -44,14 +43,12 @@ import org.mycore.datamodel.metadata.MCRMetaISO8601Date;
  * @author Frank Lützenkirchen
  */
 public abstract class MCRStoredNode extends MCRNode {
-    private final static String defaultLang = MCRConfiguration.instance().getString("MCR.Metadata.DefaultLang", "en");
 
     /**
-     * The optional labels of this node, in multiple languages. Key is the
-     * xml:lang language ID, value is the label in that language.
+     * Any additional data of this node that is not stored in the file object 
      */
-    protected SortedMap<String, String> labels;
-
+    protected Element data;
+    
     /**
      * Creates a new stored node instance
      * 
@@ -59,76 +56,28 @@ public abstract class MCRStoredNode extends MCRNode {
      *            the parent directory containing this node
      * @param fo
      *            the file object in local filesystem representing this node
+     * @param data the additional data of this node that is not stored in the file object
      */
-    protected MCRStoredNode(MCRDirectory parent, FileObject fo) throws Exception {
+    protected MCRStoredNode(MCRDirectory parent, FileObject fo, Element data) throws Exception {
         super(parent, fo);
-        labels = new TreeMap<String, String>();
+        this.data = data;
+    }
+
+    protected MCRStoredNode(MCRDirectory parent, String name) throws Exception {
+        super(parent, VFS.getManager().resolveFile(parent.fo, name));
+        this.data = new Element("node");
+        parent.data.addContent(data);
+        data.setAttribute("name", name);
     }
 
     /**
      * Deletes this node with all its data and children
      */
     public void delete() throws Exception {
-        if (parent != null)
-            ((MCRDirectory) parent).removeMetadata(this);
+        data.detach();
+        fo.delete(Selectors.SELECT_ALL);
+        getRoot().saveAdditionalData();
     }
-
-    /**
-     * Called when metadata of this node was changed, to notify the parent
-     * directory to update its own metadata file
-     */
-    protected void updateMetadata() throws Exception {
-        if (parent != null)
-            ((MCRDirectory) parent).updateMetadata(this.getName(), this);
-    }
-
-    private final static Namespace XMLNS = Namespace.getNamespace("xml", "http://www.w3.org/XML/1998/namespace");
-
-    /**
-     * Writes metadata of this node to the XML element given.
-     * 
-     * @param entry
-     *            the XML element holding the metadata of this node
-     */
-    protected void writeChildData(Element entry) throws Exception {
-        entry.setAttribute("name", this.getName());
-
-        entry.setAttribute("numChildren", String.valueOf(this.getNumChildren()));
-
-        MCRMetaISO8601Date date = new MCRMetaISO8601Date();
-        date.setDate(this.getLastModified());
-        date.setFormat(MCRMetaISO8601Date.IsoFormat.COMPLETE_HH_MM_SS);
-        entry.setAttribute("lastModified", date.getISOString());
-
-        entry.removeChildren("label");
-        if (!labels.isEmpty()) {
-            Iterator<String> it = labels.keySet().iterator();
-            while (it.hasNext()) {
-                String lang = it.next();
-                String label = labels.get(lang);
-                entry.addContent(new Element("label").setAttribute("lang", lang, XMLNS).setText(label));
-            }
-        }
-    }
-
-    /**
-     * Reads metadata of this node from a stored XML element coming from the
-     * parent directory
-     * 
-     * @param entry
-     *            the XML element holding this node's metadata
-     */
-    protected void readChildData(Element entry) throws Exception {
-        labels.clear();
-        for (Element label : (List<Element>) (entry.getChildren("label")))
-            labels.put(label.getAttributeValue("lang", XMLNS), label.getTextTrim());
-    }
-
-    /**
-     * Repairs metadata of this node by rebuilding it from the underlying
-     * filesystem
-     */
-    protected abstract void repairMetadata() throws Exception;
 
     /**
      * Renames this node.
@@ -137,14 +86,12 @@ public abstract class MCRStoredNode extends MCRNode {
      *            the new file name
      */
     public void renameTo(String name) throws Exception {
-        String oldName = getName();
         FileObject fNew = VFS.getManager().resolveFile(fo.getParent(), name);
         fo.moveTo(fNew);
         fo = fNew;
         fo.getContent().setLastModifiedTime(System.currentTimeMillis());
-
-        if (parent != null)
-            ((MCRDirectory) parent).updateMetadata(oldName, this);
+        data.setAttribute("name",name);
+        getRoot().saveAdditionalData();
     }
 
     /**
@@ -155,7 +102,6 @@ public abstract class MCRStoredNode extends MCRNode {
      */
     public void setLastModified(Date time) throws Exception {
         fo.getContent().setLastModifiedTime(time.getTime());
-        updateMetadata();
     }
 
     /**
@@ -167,22 +113,38 @@ public abstract class MCRStoredNode extends MCRNode {
      *            the label in this language
      */
     public void setLabel(String lang, String label) throws Exception {
-        labels.put(lang, label);
-        updateMetadata();
+        Element found = null;
+        for( Element child : (List<Element>)(data.getChildren("label")) )
+            if( lang.equals( child.getAttributeValue("lang", MCRConstants.XML_NAMESPACE) ) )
+            {
+              found = child;
+              break;
+            }
+
+        if( found == null )
+        {
+          found = new Element("label").setAttribute("lang", lang, MCRConstants.XML_NAMESPACE );
+          data.addContent(found);
+        }
+        found.setText(label);
+        getRoot().saveAdditionalData();
     }
 
     /**
      * Removes all labels set
      */
     public void clearLabels() throws Exception {
-        labels.clear();
-        updateMetadata();
+        data.removeChildren("label");
+        getRoot().saveAdditionalData();
     }
 
     /**
-     * Returns all labels, sorted by xml:lang
+     * Returns a map of all labels, sorted by xml:lang, Key is xml:lang, value is the label for that language.
      */
-    public SortedMap<String, String> getLabels() {
+    public Map<String, String> getLabels() {
+        Map<String,String> labels = new TreeMap<String,String>(); 
+        for( Element label : (List<Element>)(data.getChildren("label")) )
+            labels.put(label.getAttributeValue("lang", MCRConstants.XML_NAMESPACE), label.getText());
         return labels;
     }
 
@@ -190,11 +152,14 @@ public abstract class MCRStoredNode extends MCRNode {
      * Returns the label in the given language
      * 
      * @param lang
-     *            the xml:lang langauge ID
+     *            the xml:lang language ID
      * @return the label, or null if there is no label for that language
      */
     public String getLabel(String lang) {
-        return labels.get(lang);
+        for( Element label : (List<Element>)(data.getChildren("label")) )
+            if( lang.equals( label.getAttributeValue("lang", MCRConstants.XML_NAMESPACE) ) )
+                return label.getText();
+        return null;
     }
 
     /**
@@ -204,15 +169,16 @@ public abstract class MCRStoredNode extends MCRNode {
      * @return the label
      */
     public String getCurrentLabel() {
-        if (labels.isEmpty())
-            return null;
-        String lang = MCRSessionMgr.getCurrentSession().getCurrentLanguage();
-        String label = labels.get(lang);
+        String currentLang = MCRSessionMgr.getCurrentSession().getCurrentLanguage();
+        String label = getLabel(currentLang);
         if (label != null)
             return label;
-        label = labels.get(defaultLang);
+        
+        String defaultLang = MCRConfiguration.instance().getString("MCR.Metadata.DefaultLang", "en");
+        label = getLabel(defaultLang);
         if (label != null)
             return label;
-        return labels.get(labels.firstKey());
+        
+        return data.getChildText("label");
     }
 }

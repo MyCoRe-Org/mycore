@@ -26,10 +26,8 @@ package org.mycore.datamodel.ifs2;
 import java.io.File;
 
 import org.apache.commons.vfs.FileObject;
-import org.apache.commons.vfs.VFS;
 import org.apache.commons.vfs.provider.local.LocalFile;
 import org.jdom.Element;
-import org.mycore.common.MCRUtils;
 
 /**
  * Represents a file stored in a file collection. This is a file that is
@@ -39,10 +37,6 @@ import org.mycore.common.MCRUtils;
  * 
  */
 public class MCRFile extends MCRStoredNode {
-    /**
-     * The md5 checksum of the file's contents.
-     */
-    protected String md5;
 
     /**
      * The md5 checksum of the empty file
@@ -58,9 +52,8 @@ public class MCRFile extends MCRStoredNode {
      * @param fo
      *            the file in the local underlying filesystem storing this file
      */
-    protected MCRFile(MCRDirectory parent, FileObject fo) throws Exception {
-        super(parent, fo);
-        parent.readChildData(this);
+    protected MCRFile(MCRDirectory parent, FileObject fo, Element data) throws Exception {
+        super(parent, fo, data);
     }
 
     /**
@@ -72,10 +65,11 @@ public class MCRFile extends MCRStoredNode {
      *            the name of the file to be created and stored
      */
     public MCRFile(MCRDirectory parent, String name) throws Exception {
-        super(parent, VFS.getManager().resolveFile(parent.fo, name));
-        md5 = MD5_OF_EMPTY_FILE;
+        super(parent, name);
         fo.createFile();
-        updateMetadata();
+        data.setName("file");
+        data.setAttribute("md5", MD5_OF_EMPTY_FILE);
+        getRoot().saveAdditionalData();
     }
 
     /**
@@ -87,53 +81,12 @@ public class MCRFile extends MCRStoredNode {
     }
 
     /**
-     * Writes all metadata of this file to the given XML element
-     */
-    protected void writeChildData(Element entry) throws Exception {
-        super.writeChildData(entry);
-        entry.setAttribute("md5", this.getMD5());
-        entry.setAttribute("size", String.valueOf(this.getSize()));
-    }
-
-    /**
-     * Reads metadata of this file from the given XML element and stores it in
-     * this object itself.
-     */
-    protected void readChildData(Element entry) throws Exception {
-        super.readChildData(entry);
-        md5 = entry.getAttributeValue("md5");
-    }
-
-    /**
-     * Repairs the metadata of this file by rebuilding it from the underlying
-     * local filesystem. This includes recreation of the md5 checksum. Stores
-     * the metadata rebuilt in the parent directory.
-     */
-    public void repairMetadata() throws Exception {
-        MCRContent content = new MCRContent( fo );
-        MCRContentInputStream cis = content.getContentInputStream();
-        MCRUtils.copyStream(cis, null);
-        cis.close();
-        md5 = cis.getMD5String();
-        updateMetadata();
-    }
-
-    /**
-     * Deletes this file and its content from the store. This object is illegal
-     * afterwards and must not be used any more.
-     */
-    public void delete() throws Exception {
-        super.delete();
-        fo.delete();
-    }
-
-    /**
      * Returns the md5 checksum of the file's content.
      * 
      * @return the md5 checksum of the file's content.
      */
     public String getMD5() {
-        return md5;
+        return data.getAttributeValue("md5");
     }
 
     /**
@@ -159,8 +112,9 @@ public class MCRFile extends MCRStoredNode {
     public String setContent(MCRContent source) throws Exception {
         MCRContentInputStream cis = source.getContentInputStream();
         source.sendTo(fo);
-        md5 = cis.getMD5String();
-        updateMetadata();
+        String md5 = cis.getMD5String(); 
+        data.setAttribute("md5", md5);
+        getRoot().saveAdditionalData();
         return md5;
     }
 

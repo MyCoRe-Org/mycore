@@ -24,6 +24,9 @@
 package org.mycore.datamodel.ifs2;
 
 import org.apache.commons.vfs.FileObject;
+import org.apache.commons.vfs.VFS;
+import org.jdom.Document;
+import org.jdom.Element;
 
 /**
  * Represents a set of files and directories belonging together, that are stored
@@ -42,7 +45,7 @@ public class MCRFileCollection extends MCRDirectory {
      * The ID of this file collection
      */
     private int id;
-
+    
     /**
      * Creates a new file collection in the given store, or retrieves an
      * existing one.
@@ -61,23 +64,40 @@ public class MCRFileCollection extends MCRDirectory {
      *            the collection is assumed existing
      */
     protected MCRFileCollection(MCRStore store, int id, FileObject fo, boolean create) throws Exception {
-        super(null, fo);
+        super(null, fo, null);
         this.store = store;
         this.id = id;
 
-        if (create) {
+        if (create)
+        {
             fo.createFolder();
-            readMetadata();
-            writeMetadata();
-        } else
-            readMetadata();
+            this.data = new Element( "collection" );
+            new Document(data);
+            saveAdditionalData();
+        }
+        else readAdditionalData();
     }
 
+    private final static String dataFile = "mcrdata.xml";
+    
+    private void readAdditionalData() throws Exception
+    {
+      FileObject src = VFS.getManager().resolveFile(fo,dataFile);
+      data = new MCRContent(src).getXML().getRootElement();
+    }
+
+    protected void saveAdditionalData() throws Exception
+    {
+      FileObject target = VFS.getManager().resolveFile(fo,dataFile);
+      new MCRContent( data.getDocument() ).sendTo(target);
+    }
+    
     /**
-     * Does nothing, because a file collection's name is always the empty string
+     * Throws a exception, because a file collection's name is always the empty string
      * and therefore can not be renamed.
      */
     public void renameTo(String name) {
+        throw new UnsupportedOperationException( "File collections can not be renamed" );
     }
 
     /**
@@ -106,5 +126,20 @@ public class MCRFileCollection extends MCRDirectory {
      */
     public MCRFileCollection getRoot() {
         return this;
+    }
+    
+    public int getNumChildren() throws Exception
+    {
+      return super.getNumChildren() - 1;  
+    }
+    
+    public MCRNode getChild(String name) throws Exception {
+        if( dataFile.equals(name) ) return null;
+        else return super.getChild(name);
+    }
+
+    public void repairMetadata()
+    {
+        
     }
 }
