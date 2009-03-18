@@ -332,9 +332,7 @@
     </xsl:if>
   </td>
   <td class="editorPMUD">
-    <xsl:if test="number($num) &gt; 1">
-      <input tabindex="999" type="image" name="_m-{$var}-{position()}" src="{$WebApplicationBaseURL}images/pmud-minus.png"/>
-    </xsl:if>
+    <input tabindex="999" type="image" name="_m-{$var}-{position()}" src="{$WebApplicationBaseURL}images/pmud-minus.png"/>
   </td>
   <xsl:choose>
     <xsl:when test="$rep/@arrows='false'" />
