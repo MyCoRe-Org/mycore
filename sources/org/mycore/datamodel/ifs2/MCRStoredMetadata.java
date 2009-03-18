@@ -66,6 +66,8 @@ public class MCRStoredMetadata {
      *            the XML to save to a new file
      */
     void create(MCRContent xml) throws Exception {
+        if (store.shouldForceXML())
+            xml = new MCRContent(xml.getXML());
         fo.createFile();
         xml.sendTo(fo);
     }
@@ -78,6 +80,8 @@ public class MCRStoredMetadata {
      *            the XML document to be stored
      */
     public void update(MCRContent xml) throws Exception {
+        if (store.shouldForceXML())
+            xml = new MCRContent(xml.getXML());
         xml.sendTo(fo);
     }
 

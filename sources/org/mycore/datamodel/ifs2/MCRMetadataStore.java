@@ -24,23 +24,32 @@
 package org.mycore.datamodel.ifs2;
 
 import org.apache.commons.vfs.FileObject;
+import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 
 /**
- * Stores XML metadata documents in a persistent filesystem structure
+ * Stores XML metadata documents (or optionally any other BLOB data) in a
+ * persistent filesystem structure
  * 
  * For each object type, a store must be defined as follows:
  * 
- * 
- * MCR.IFS2.Store.DocPortal_document.Class=org.mycore.datamodel.ifs2.MCRMetadataStore
+ * MCR.IFS2.Store.DocPortal_document.Class=org.mycore.datamodel.ifs2.MCRMetadataStore 
  * MCR.IFS2.Store.DocPortal_document.BaseDir=/foo/bar
- * MCR.IFS2.Store.DocPortal_document.SlotLayout=4-2-2
- * 
+ * MCR.IFS2.Store.DocPortal_document.SlotLayout=4-2-2 MCR.IFS2.
+ * MCR.IFS2.Store.DocPortal_document.ForceXML=true (which is default)
  * 
  * @author Frank Lützenkirchen
  */
 public class MCRMetadataStore extends MCRStore {
 
+    /**
+     * If true (which is default), store will enforce it gets
+     * XML to store, otherwise any binary content can be stored here.
+     * 
+     * Override with MCR.IFS2.Store.<ObjectType>.ForceXML=true|false
+     */
+    protected boolean forceXML = true;
+    
     /**
      * Returns the store for the given metadata document type
      * 
@@ -62,6 +71,11 @@ public class MCRMetadataStore extends MCRStore {
         super.init(type);
         this.prefix = type + "_";
         this.suffix = ".xml";
+        this.forceXML = MCRConfiguration.instance().getBoolean("MCR.IFS2.Store." + type + ".ForceXML", true);
+    }
+    
+    protected boolean shouldForceXML() {
+        return forceXML;
     }
 
     /**
