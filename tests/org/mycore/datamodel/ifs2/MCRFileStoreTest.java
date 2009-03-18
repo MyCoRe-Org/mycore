@@ -27,7 +27,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
-import java.util.Enumeration;
+import java.util.Iterator;
 
 import org.apache.commons.vfs.Selectors;
 import org.apache.commons.vfs.VFS;
@@ -124,19 +124,19 @@ public class MCRFileStoreTest extends MCRTestCase {
     }
 
     public void testListIDs() throws Exception {
-        Enumeration<Integer> IDs = store.listIDs(true);
-        while (IDs.hasMoreElements())
-            store.delete(IDs.nextElement());
+        Iterator<Integer> IDs = store.listIDs(true);
+        while (IDs.hasNext())
+            store.delete(IDs.next());
         assertFalse(store.exists(1));
-        assertFalse(store.listIDs(true).hasMoreElements());
-        assertFalse(store.listIDs(false).hasMoreElements());
+        assertFalse(store.listIDs(true).hasNext());
+        assertFalse(store.listIDs(false).hasNext());
         store.create();
         store.create();
         store.create();
         ArrayList<Integer> l1 = new ArrayList<Integer>();
         IDs = store.listIDs(true);
-        while (IDs.hasMoreElements()) {
-            int id = IDs.nextElement();
+        while (IDs.hasNext()) {
+            int id = IDs.next();
             if (!l1.isEmpty())
                 assertTrue(id > l1.get(l1.size() - 1));
             l1.add(id);
@@ -144,8 +144,8 @@ public class MCRFileStoreTest extends MCRTestCase {
         assertTrue(l1.size() == 3);
         ArrayList<Integer> l2 = new ArrayList<Integer>();
         IDs = store.listIDs(false);
-        while (IDs.hasMoreElements()) {
-            int id = IDs.nextElement();
+        while (IDs.hasNext()) {
+            int id = IDs.next();
             if (!l2.isEmpty())
                 assertTrue(id < l2.get(l2.size() - 1));
             l2.add(id);

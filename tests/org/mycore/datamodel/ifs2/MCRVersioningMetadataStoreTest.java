@@ -24,7 +24,7 @@
 package org.mycore.datamodel.ifs2;
 
 import java.io.File;
-import java.util.Enumeration;
+import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.vfs.Selectors;
@@ -204,14 +204,16 @@ public class MCRVersioningMetadataStoreTest extends MCRTestCase {
         time = System.currentTimeMillis();
         xml = new Document(new Element("update"));
         LOGGER.info("Updating 10 XML documents in store:");
-        for (Enumeration<Integer> ids = store.listIDs(MCRMetadataStore.ASCENDING); ids.hasMoreElements();)
-            store.retrieve(ids.nextElement()).update(new MCRContent(xml));
+        for (Iterator<Integer> ids = store.listIDs(MCRMetadataStore.ASCENDING); ids.hasNext();)
+            store.retrieve(ids.next()).update(new MCRContent(xml));
         LOGGER.info("Time: " + (System.currentTimeMillis() - time) + " ms");
 
         time = System.currentTimeMillis();
         LOGGER.info("Deleting 10 XML documents from store:");
-        for (Enumeration<Integer> ids = store.listIDs(MCRMetadataStore.ASCENDING); ids.hasMoreElements();)
-            store.delete(ids.nextElement());
+        for (Iterator<Integer> ids = store.listIDs(MCRMetadataStore.ASCENDING); ids.hasNext();) {
+            ids.next();
+            ids.remove();
+        }
         LOGGER.info("Time: " + (System.currentTimeMillis() - time) + " ms");
     }
 }
