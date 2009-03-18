@@ -35,7 +35,7 @@ import org.mycore.datamodel.metadata.MCRDerivate;
  * 
  * @author Jens Kupferschmidt
  */
-public final class MCRContentIndexEventHandler extends MCREventHandlerBase {
+public class MCRContentIndexEventHandler extends MCREventHandlerBase {
 
     private static Logger logger = Logger.getLogger(MCRContentIndexEventHandler.class);
 
