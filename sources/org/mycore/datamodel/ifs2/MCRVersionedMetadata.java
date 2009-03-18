@@ -217,7 +217,7 @@ public class MCRVersionedMetadata extends MCRStoredMetadata {
         List<MCRMetadataVersion> versions = new ArrayList<MCRMetadataVersion>();
         SVNRepository repository = getStore().getRepository();
         String path = store.getSlotPath(id);
-        Collection<SVNLogEntry> entries = repository.log(new String[] { path }, null, 0, -1, true, true);
+        Collection<SVNLogEntry> entries = (Collection<SVNLogEntry>)(repository.log(new String[] { path }, null, 0, -1, true, true));
         for (SVNLogEntry entry : entries)
             versions.add(new MCRMetadataVersion(this, entry));
         return versions;
