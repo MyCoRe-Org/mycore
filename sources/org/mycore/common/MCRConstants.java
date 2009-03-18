@@ -65,6 +65,9 @@ public final class MCRConstants {
     private final static String MODS_URL = "http://www.loc.gov/mods/v3";
     public final static Namespace MODS_NAMESPACE = Namespace.getNamespace("mods", MODS_URL);
     
+    /** The URL of the XML */
+    private final static String XML_URL = "http://www.w3.org/XML/1998/namespace";
+    public final static Namespace XML_NAMESPACE = Namespace.getNamespace("xml", XML_URL);
 
     /** The default encoding */
     public final static String DEFAULT_ENCODING = "UTF-8";
