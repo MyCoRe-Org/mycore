@@ -32,6 +32,7 @@ import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.Selectors;
 import org.apache.commons.vfs.VFS;
 import org.jdom.Element;
+import org.jdom.Namespace;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRSessionMgr;
@@ -117,13 +118,13 @@ public abstract class MCRStoredNode extends MCRNode {
     public void setLabel(String lang, String label) throws Exception {
         Element found = null;
         for (Element child : (List<Element>) (data.getChildren("label")))
-            if (lang.equals(child.getAttributeValue("lang", MCRConstants.XML_NAMESPACE))) {
+            if (lang.equals(child.getAttributeValue("lang", Namespace.XML_NAMESPACE))) {
                 found = child;
                 break;
             }
 
         if (found == null) {
-            found = new Element("label").setAttribute("lang", lang, MCRConstants.XML_NAMESPACE);
+            found = new Element("label").setAttribute("lang", lang, Namespace.XML_NAMESPACE);
             data.addContent(found);
         }
         found.setText(label);
@@ -145,7 +146,7 @@ public abstract class MCRStoredNode extends MCRNode {
     public Map<String, String> getLabels() {
         Map<String, String> labels = new TreeMap<String, String>();
         for (Element label : (List<Element>) (data.getChildren("label")))
-            labels.put(label.getAttributeValue("lang", MCRConstants.XML_NAMESPACE), label.getText());
+            labels.put(label.getAttributeValue("lang", Namespace.XML_NAMESPACE), label.getText());
         return labels;
     }
 
@@ -158,7 +159,7 @@ public abstract class MCRStoredNode extends MCRNode {
      */
     public String getLabel(String lang) {
         for (Element label : (List<Element>) (data.getChildren("label")))
-            if (lang.equals(label.getAttributeValue("lang", MCRConstants.XML_NAMESPACE)))
+            if (lang.equals(label.getAttributeValue("lang", Namespace.XML_NAMESPACE)))
                 return label.getText();
         return null;
     }
