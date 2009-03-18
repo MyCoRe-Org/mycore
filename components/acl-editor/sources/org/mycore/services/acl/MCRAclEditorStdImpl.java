@@ -3,6 +3,8 @@ package org.mycore.services.acl;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -145,8 +147,14 @@ public class MCRAclEditorStdImpl extends MCRAclEditor {
         return elem;
     }
 
-    private Element createNewPerm(HttpServletRequest request) {
-        String objId = request.getParameter("newPermOBJID");
+    private Element createNewPerm(HttpServletRequest request){
+        String objId = "";
+        try {
+            objId = URLDecoder.decode(request.getParameter("newPermOBJID"),"UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
         String acPool = request.getParameter("newPermACPOOL");
         String ruleId = request.getParameter("newPermRID");
         String uid = MCRServlet.getProperty(request, "uid");

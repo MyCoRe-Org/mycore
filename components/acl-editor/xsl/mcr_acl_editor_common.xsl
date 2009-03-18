@@ -35,7 +35,7 @@
         <xsl:variable name="objId" select="'&amp;objid='" />
         <xsl:variable name="acPool" select="'&amp;acpool='" />
 
-        <xsl:variable name="objIdFilterEncoded" select="encoder:encode(encoder:encode($objIdFilter))"/>
+        <xsl:variable name="objIdFilterEncoded" select="encoder:encode($objIdFilter)"/>
         
         <xsl:choose>
             <xsl:when test="($objIdFilterEncoded != '') and ($acPoolFilter != '')">
