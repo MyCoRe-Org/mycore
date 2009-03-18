@@ -36,7 +36,7 @@
     border-color: #000000; /* black */     
 }
 
-#userlogin .button_ar{
+#userlogin .button_rtl{
 	width: 160px;
 	text-align: center;
 	border: 1px;
@@ -56,7 +56,7 @@
     width: 100px;    
 }
 
-#userlogin td.inputField_ar{
+#userlogin td.inputField_rtl{
     font-weight: normal;
     padding-left: 5px;
     border-color: #000000; /* black */
@@ -78,7 +78,7 @@
     width: 200px;
 }
 
-#userlogin td.inputCaption_ar{
+#userlogin td.inputCaption_rtl{
     text-align: right;
     font-weight: bold;
     padding-left: 5px;
@@ -98,7 +98,7 @@
     padding-right: 5px;
 }
 
-#userlogin .metaname_ar {
+#userlogin .metaname_rtl {
     background-color: #b1b8c6;
     text-align: right;
     padding-left: 5px;
@@ -112,7 +112,7 @@
     padding-right: 5px;
 }
 
-#userlogin .metavalue_ar {
+#userlogin .metavalue_rtl {
     background-color: #EDEDED;
     text-align: right;
     padding-left: 5px;
