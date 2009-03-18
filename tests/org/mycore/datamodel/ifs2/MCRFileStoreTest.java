@@ -33,6 +33,7 @@ import org.apache.commons.vfs.Selectors;
 import org.apache.commons.vfs.VFS;
 import org.jdom.Document;
 import org.jdom.Element;
+import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRTestCase;
 
 /**
@@ -189,5 +190,22 @@ public class MCRFileStoreTest extends MCRTestCase {
         MCRFile child = (MCRFile) (dir.getChild("readme.txt"));
         assertNotNull(child);
         assertEquals(child.getSize(), content.length);
+    }
+
+    public void testLabels() throws Exception {
+        MCRFileCollection col = store.create();
+        assertTrue(col.getLabels().isEmpty());
+        assertNull(col.getCurrentLabel());
+        col.setLabel("de", "deutsch");
+        col.setLabel("en", "english");
+        String curr = MCRSessionMgr.getCurrentSession().getCurrentLanguage();
+        String label = col.getLabel(curr);
+        assertEquals(col.getCurrentLabel(), label);
+        assertEquals(col.getLabels().size(), 2);
+        assertEquals(col.getLabel("en"), "english");
+        MCRFileCollection col2 = store.retrieve(col.getID());
+        assertEquals(col2.getLabels().size(), 2);
+        col.clearLabels();
+        assertTrue(col.getLabels().isEmpty());
     }
 }
