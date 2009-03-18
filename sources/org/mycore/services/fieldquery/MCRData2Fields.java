@@ -38,11 +38,13 @@ import javax.xml.transform.stream.StreamSource;
 import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
+import org.jdom.Namespace;
 import org.jdom.output.XMLOutputter;
 import org.jdom.transform.JDOMResult;
 import org.jdom.transform.JDOMSource;
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRConfigurationException;
+import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
 import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.datamodel.ifs.MCRFile;
@@ -85,18 +87,18 @@ public class MCRData2Fields {
 
         xslTemplate = new Element("stylesheet");
         xslTemplate.setAttribute("version", "1.0");
-        xslTemplate.setNamespace(MCRFieldDef.xslns);
-        xslTemplate.addNamespaceDeclaration(MCRFieldDef.xmlns);
-        xslTemplate.addNamespaceDeclaration(MCRFieldDef.xlinkns);
+        xslTemplate.setNamespace(MCRConstants.XSL_NAMESPACE);
+        xslTemplate.addNamespaceDeclaration(Namespace.XML_NAMESPACE);
+        xslTemplate.addNamespaceDeclaration(MCRConstants.XLINK_NAMESPACE);
         xslTemplate.addNamespaceDeclaration(MCRFieldDef.xalanns);
         xslTemplate.addNamespaceDeclaration(MCRFieldDef.extns);
         xslTemplate.setAttribute("extension-element-prefixes", "ext");
 
-        Element param = new Element("param", MCRFieldDef.xslns);
+        Element param = new Element("param", MCRConstants.XSL_NAMESPACE);
         param.setAttribute("name", "objectType");
         xslTemplate.addContent(param);
 
-        Element template = new Element("template", MCRFieldDef.xslns);
+        Element template = new Element("template", MCRConstants.XSL_NAMESPACE);
         template.setAttribute("match", "/");
         xslTemplate.addContent(template);
 
@@ -110,7 +112,7 @@ public class MCRData2Fields {
 
         if (stylesheet == null) {
             Element root = (Element) (xslTemplate.clone());
-            Element fv = root.getChild("template", MCRFieldDef.xslns).getChild("fieldValues", MCRFieldDef.mcrns);
+            Element fv = root.getChild("template", MCRConstants.XSL_NAMESPACE).getChild("fieldValues", MCRFieldDef.mcrns);
 
             List<MCRFieldDef> fieldDefs = MCRFieldDef.getFieldDefs(index);
             for (int i = 0; i < fieldDefs.size(); i++) {

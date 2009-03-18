@@ -30,6 +30,7 @@ import org.apache.log4j.Logger;
 import org.jdom.Element;
 import org.jdom.Namespace;
 import org.jdom.output.XMLOutputter;
+import org.mycore.common.MCRConstants;
 import org.mycore.common.xml.MCRURIResolver;
 
 /**
@@ -45,13 +46,7 @@ public class MCRFieldDef {
 
     private static Hashtable<String, MCRFieldDef> fieldTable = new Hashtable<String, MCRFieldDef>();
 
-    public final static Namespace xslns = Namespace.getNamespace("xsl", "http://www.w3.org/1999/XSL/Transform");
-
     public final static Namespace mcrns = Namespace.getNamespace("mcr", "http://www.mycore.org/");
-
-    public final static Namespace xmlns = Namespace.getNamespace("xml", "http://www.w3.org/XML/1998/namespace");
-
-    public final static Namespace xlinkns = Namespace.getNamespace("xlink", "http://www.w3.org/1999/xlink");
 
     public final static Namespace xalanns = Namespace.getNamespace("xalan", "http://xml.apache.org/xalan");
 
@@ -325,13 +320,13 @@ public class MCRFieldDef {
 
         // <xsl:if test="contains(@objects,$objecType)">
         if (objects != null) {
-            Element xif = new Element("if", xslns);
+            Element xif = new Element("if", MCRConstants.XSL_NAMESPACE);
             xif.setAttribute("test", "contains('" + objects.trim() + "',$objectType)");
             xsl = xif;
         }
 
         // <xsl:for-each select="{@xpath}">
-        Element forEach1 = new Element("for-each", xslns);
+        Element forEach1 = new Element("for-each", MCRConstants.XSL_NAMESPACE);
         forEach1.setAttribute("select", xpath);
         if (xsl == null)
             xsl = forEach1;
@@ -353,7 +348,7 @@ public class MCRFieldDef {
             // current(): <format classid="DocPortal_class_00000006"
             // categid="FORMAT0002"/>
             // URI: classification:metadata:levels:parents:{class}:{categ}
-            Element forEach2 = new Element("for-each", xslns);
+            Element forEach2 = new Element("for-each", MCRConstants.XSL_NAMESPACE);
             forEach1.addContent(forEach2);
             String uri = "document(concat('classification:metadata:0:parents:',current()/@classid,':',current()/@categid))//category";
             forEach2.setAttribute("select", uri);
@@ -366,7 +361,7 @@ public class MCRFieldDef {
 
         // <xsl:value-of select="{@value}" />
         String valueExpr = fieldDef.getAttributeValue("value");
-        Element valueOf = new Element("value-of", xslns);
+        Element valueOf = new Element("value-of", MCRConstants.XSL_NAMESPACE);
         valueOf.setAttribute("select", valueExpr);
         fieldValue.addContent(valueOf);
 
