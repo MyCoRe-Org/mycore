@@ -62,7 +62,8 @@ public class MCRMetadataStoreTest extends MCRTestCase {
         super.setUp();
         if (store == null)
             createStore();
-        else VFS.getManager().resolveFile(store.getBaseDir()).createFolder();
+        else
+            VFS.getManager().resolveFile(store.getBaseDir()).createFolder();
     }
 
     protected void tearDown() throws Exception {
