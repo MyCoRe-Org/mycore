@@ -208,4 +208,51 @@ public class MCRFileStoreTest extends MCRTestCase {
         col.clearLabels();
         assertTrue(col.getLabels().isEmpty());
     }
+    
+    public void testRepairMetadata() throws Exception {
+        MCRFileCollection col = store.create();
+        String xml1 = new MCRContent(col.getMetadata()).getString();
+        col.repairMetadata();
+        String xml2 = new MCRContent(col.getMetadata()).getString();
+        assertEquals(xml1,xml2);
+      
+        MCRDirectory dir = new MCRDirectory(col,"foo");
+        xml1 = new MCRContent(col.getMetadata()).getString();
+        assertFalse(xml2.equals(xml1));
+        dir.delete();
+        xml1 = new MCRContent(col.getMetadata()).getString();
+        assertEquals(xml1,xml2);
+        
+        MCRDirectory dir2 = new MCRDirectory(col,"dir");
+        MCRFile file1 = new MCRFile(col,"test1.txt");
+        file1.setContent(new MCRContent("Test 1"));
+        MCRFile readme = new MCRFile(dir2,"readme.txt");
+        readme.setContent(new MCRContent("Hallo Welt!"));
+        MCRFile file3 = new MCRFile(col,"test2.txt");
+        file3.setContent(new MCRContent("Test 2"));
+        file3.setLabel("de", "Die Testdatei");
+        xml2 = new MCRContent(col.getMetadata()).getString();
+     
+        col.repairMetadata();
+        xml1 = new MCRContent(col.getMetadata()).getString();
+        assertEquals(xml1,xml2);
+
+        file3.clearLabels();
+        xml2 = new MCRContent(col.getMetadata()).getString();
+        String path = col.fo.getName().getPath();
+        System.out.println(path);
+        new File( path, "mcrdata.xml" ).delete();
+        col = store.retrieve(col.getID());
+        xml1 = new MCRContent(col.getMetadata()).getString();
+        assertEquals(xml1,xml2);
+
+        new File( path, "test1.txt" ).delete();
+        File tmp = new File( path, "test3.txt" );
+        tmp.createNewFile();
+        new MCRContent("Hallo Welt!").sendTo(tmp);
+        col.repairMetadata();
+        xml1 = new MCRContent(col.getMetadata()).getString();
+        assertFalse( xml1.contains("name=\"test1.txt\""));
+        assertTrue( xml1.contains("name=\"test3.txt\""));
+    }
 }
