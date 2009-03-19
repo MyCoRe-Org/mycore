@@ -334,7 +334,7 @@ public class MCRHIBXMLStore implements MCRXMLTableInterface {
         Object[] result = (Object[]) lastModifiedQuery.uniqueResult();
         Number objectCount = (Number) result[1];
         Date lastModified = (Date) result[0];
-        if ((this.lastChange == null || this.lastChange.before(lastModified)) && lastModified != null) {
+        if (lastModified != null && (this.lastChange == null || this.lastChange.before(lastModified))) {
             this.lastChange = lastModified;
             this.objectCount = objectCount.longValue();
             return new Date(lastModified.getTime());
