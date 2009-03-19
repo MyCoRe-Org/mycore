@@ -34,6 +34,7 @@ import org.jdom.Document;
 import org.jdom.Element;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRTestCase;
+import org.mycore.common.MCRUsageException;
 import org.tmatesoft.svn.core.io.SVNRepositoryFactory;
 
 /**
@@ -114,7 +115,6 @@ public class MCRVersioningMetadataStoreTest extends MCRTestCase {
         assertTrue(store.exists(id));
         store.delete(id);
         assertFalse(store.exists(id));
-        assertNull(store.retrieve(id));
     }
 
     public void testUpdate() throws Exception {
@@ -211,7 +211,36 @@ public class MCRVersioningMetadataStoreTest extends MCRTestCase {
         assertEquals(MCRMetadataVersion.DELETED, versions.get(2).getType());
         assertEquals(MCRMetadataVersion.CREATED, versions.get(3).getType());
         versions.get(1).restore();
-        assertEquals("bango",vm.getMetadata().getXML().getRootElement().getName());
+        assertEquals("bango", vm.getMetadata().getXML().getRootElement().getName());
+    }
+
+    public void testDeletedVersions() throws Exception {
+        Element root = new Element("bingo");
+        Document xml1 = new Document(root);
+        MCRVersionedMetadata vm = store.create(new MCRContent(xml1));
+        assertFalse(vm.isDeleted());
+
+        vm.delete();
+        assertTrue(vm.isDeleted());
+        assertFalse(store.exists(vm.getID()));
+
+        vm = store.retrieve(vm.getID());
+        assertTrue(vm.isDeleted());
+        List<MCRMetadataVersion> versions = vm.listVersions();
+        MCRMetadataVersion v1 = versions.get(0);
+        MCRMetadataVersion v2 = versions.get(1);
+
+        boolean cannotRestoreDeleted = false;
+        try {
+            v2.restore();
+        } catch (MCRUsageException ex) {
+            cannotRestoreDeleted = true;
+        }
+        assertTrue(cannotRestoreDeleted);
+
+        v1.restore();
+        assertFalse(vm.isDeleted());
+        assertEquals(root.getName(),vm.getMetadata().getXML().getRootElement().getName());
     }
 
     public void testPerformance() throws Exception {

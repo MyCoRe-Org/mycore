@@ -123,8 +123,21 @@ public class MCRVersioningMetadataStore extends MCRMetadataStore {
         return (MCRVersionedMetadata) (super.create(xml));
     }
 
+    /**
+     * Returns the metadata stored under the given ID, or null. Note that this
+     * metadata may not exist currently in the store, it may be a deleted
+     * version, which can be restored then.
+     * 
+     * @param id
+     *            the ID of the XML document
+     * @return the metadata stored under that ID, or null when there is no such
+     *         metadata object
+     */
     public MCRVersionedMetadata retrieve(int id) throws Exception {
-        return (MCRVersionedMetadata) (super.retrieve(id));
+        if (exists(id))
+            return (MCRVersionedMetadata) (super.retrieve(id));
+        else
+            return new MCRVersionedMetadata(this, getSlot(id), id);
     }
 
     /**

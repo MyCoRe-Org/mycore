@@ -26,6 +26,7 @@ package org.mycore.datamodel.ifs2;
 import java.util.Date;
 
 import org.apache.commons.vfs.FileObject;
+import org.mycore.common.MCRUsageException;
 
 /**
  * Represents an XML metadata document that is stored in MCRMetadataStore.
@@ -72,7 +73,6 @@ public class MCRStoredMetadata {
         xml.sendTo(fo);
     }
 
-
     /**
      * Updates the stored XML document
      * 
@@ -80,6 +80,10 @@ public class MCRStoredMetadata {
      *            the XML document to be stored
      */
     public void update(MCRContent xml) throws Exception {
+        if (isDeleted()) {
+            String msg = "You can not update a deleted data object";
+            throw new MCRUsageException(msg);
+        }
         if (store.shouldForceXML())
             xml = new MCRContent(xml.getXML());
         xml.sendTo(fo);
@@ -129,7 +133,8 @@ public class MCRStoredMetadata {
      *            the date this metadata document was last modified
      */
     public void setLastModified(Date date) throws Exception {
-        fo.getContent().setLastModifiedTime(date.getTime());
+        if (!isDeleted())
+            fo.getContent().setLastModifiedTime(date.getTime());
     }
 
     /**
@@ -139,6 +144,14 @@ public class MCRStoredMetadata {
      * @throws Exception
      */
     public void delete() throws Exception {
-        store.delete(fo);
+        if (!isDeleted())
+            store.delete(fo);
+    }
+
+    /**
+     * Returns true if this object is deleted
+     */
+    public boolean isDeleted() throws Exception {
+        return (!fo.exists());
     }
 }

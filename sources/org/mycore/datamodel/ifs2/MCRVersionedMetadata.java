@@ -32,6 +32,7 @@ import java.util.Map;
 
 import org.apache.commons.vfs.FileObject;
 import org.apache.log4j.Logger;
+import org.mycore.common.MCRUsageException;
 import org.tmatesoft.svn.core.SVNCommitInfo;
 import org.tmatesoft.svn.core.SVNDirEntry;
 import org.tmatesoft.svn.core.SVNLogEntry;
@@ -103,8 +104,12 @@ public class MCRVersionedMetadata extends MCRStoredMetadata {
      *            the new version of the document metadata
      */
     public void update(MCRContent xml) throws Exception {
-        super.update(xml);
-        commit("update");
+        if (isDeleted())
+            create(xml);
+        else {
+            super.update(xml);
+            commit("update");
+        }
     }
 
     void commit(String mode) throws Exception {
@@ -164,6 +169,10 @@ public class MCRVersionedMetadata extends MCRStoredMetadata {
      * store.
      */
     public void delete() throws Exception {
+        if (isDeleted()) {
+            String msg = "You can not delete already deleted data: " + id;
+            throw new MCRUsageException(msg);
+        }
         String commitMsg = "Deleted metadata object " + store.getID() + "_" + id + " in store";
 
         SVNRepository repository = getStore().getRepository();
