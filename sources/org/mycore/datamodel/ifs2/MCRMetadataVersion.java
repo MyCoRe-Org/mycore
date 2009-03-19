@@ -159,7 +159,6 @@ public class MCRMetadataVersion {
         repository.getFile(vm.getStore().getSlotPath(vm.getID()), revision, null, baos);
         baos.close();
         return new MCRContent(baos.toByteArray());
-        // TODO: Check keyword substitution, check revision number
     }
 
     /**

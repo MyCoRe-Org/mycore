@@ -37,6 +37,8 @@ import org.tmatesoft.svn.core.SVNDirEntry;
 import org.tmatesoft.svn.core.SVNLogEntry;
 import org.tmatesoft.svn.core.SVNLogEntryPath;
 import org.tmatesoft.svn.core.SVNNodeKind;
+import org.tmatesoft.svn.core.SVNProperty;
+import org.tmatesoft.svn.core.SVNPropertyValue;
 import org.tmatesoft.svn.core.io.ISVNEditor;
 import org.tmatesoft.svn.core.io.SVNRepository;
 import org.tmatesoft.svn.core.io.diff.SVNDeltaGenerator;
@@ -104,27 +106,26 @@ public class MCRVersionedMetadata extends MCRStoredMetadata {
         super.update(xml);
         commit("update");
     }
-    
-    void commit( String mode ) throws Exception
-    {
+
+    void commit(String mode) throws Exception {
         SVNRepository repository = getStore().getRepository();
 
         // Check which paths already exist in SVN
-        String[] paths = store.getSlotPaths( id );
+        String[] paths = store.getSlotPaths(id);
         int existing = paths.length - 1;
-        for( ; existing >= 0; existing-- ) 
-            if (! repository.checkPath(paths[existing], -1).equals(SVNNodeKind.NONE))
+        for (; existing >= 0; existing--)
+            if (!repository.checkPath(paths[existing], -1).equals(SVNNodeKind.NONE))
                 break;
-        
+
         existing += 1;
-        
+
         // Start commit editor
         String commitMsg = mode + "d metadata object " + store.getID() + "_" + id + " in store";
         ISVNEditor editor = repository.getCommitEditor(commitMsg, null);
         editor.openRoot(-1);
 
         // Create directories in SVN that do not exist yet
-        for (int i = existing; i < paths.length -1; i++) {
+        for (int i = existing; i < paths.length - 1; i++) {
             LOGGER.debug("SVN create directory " + paths[i]);
             editor.addDir(paths[i], null, -1);
             editor.closeDir();
@@ -132,17 +133,21 @@ public class MCRVersionedMetadata extends MCRStoredMetadata {
 
         // Commit file changes
         String filePath = paths[paths.length - 1];
-        if( existing < paths.length )
-          editor.addFile( filePath, null, -1);
+        if (existing < paths.length)
+            editor.addFile(filePath, null, -1);
         else
-          editor.openFile( filePath, -1 );
-        
+            editor.openFile(filePath, -1);
+
         editor.applyTextDelta(filePath, null);
         SVNDeltaGenerator deltaGenerator = new SVNDeltaGenerator();
 
         InputStream in = fo.getContent().getInputStream();
         String checksum = deltaGenerator.sendDelta(filePath, in, editor, true);
         in.close();
+
+        if (store.shouldForceXML())
+            editor.changeFileProperty(filePath, SVNProperty.MIME_TYPE, SVNPropertyValue.create("text/xml"));
+
         editor.closeFile(filePath, checksum);
         editor.closeDir(); // root
 
@@ -151,7 +156,7 @@ public class MCRVersionedMetadata extends MCRStoredMetadata {
         this.revision = info.getNewRevision();
         LOGGER.info("SVN commit of " + mode + " finished, new revision " + revision);
 
-        setLastModified( info.getDate() );
+        setLastModified(info.getDate());
     }
 
     /**
@@ -198,18 +203,16 @@ public class MCRVersionedMetadata extends MCRStoredMetadata {
         SVNRepository repository = getStore().getRepository();
         String path = store.getSlotPath(id);
 
-        String dir = ( path.contains("/") ? path.substring( 0,path.lastIndexOf('/') ) : "" );
-        Collection<SVNLogEntry> entries = (Collection<SVNLogEntry>)(repository.log(new String[] { dir }, null, 0, -1, true, true));
-        
+        String dir = (path.contains("/") ? path.substring(0, path.lastIndexOf('/')) : "");
+        Collection<SVNLogEntry> entries = (Collection<SVNLogEntry>) (repository.log(new String[] { dir }, null, 0, -1, true, true));
+
         path = "/" + path;
-        for (SVNLogEntry entry : entries)
-        {
-          Map<String,SVNLogEntryPath> paths = entry.getChangedPaths();
-          if(paths.containsKey(path))
-          {
-            char type = paths.get(path).getType();
-            versions.add(new MCRMetadataVersion(this, entry,type));
-          }
+        for (SVNLogEntry entry : entries) {
+            Map<String, SVNLogEntryPath> paths = entry.getChangedPaths();
+            if (paths.containsKey(path)) {
+                char type = paths.get(path).getType();
+                versions.add(new MCRMetadataVersion(this, entry, type));
+            }
         }
         return versions;
     }
