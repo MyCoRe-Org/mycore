@@ -26,6 +26,7 @@ package org.mycore.datamodel.ifs2;
 import java.io.ByteArrayOutputStream;
 import java.util.Date;
 
+import org.mycore.common.MCRUsageException;
 import org.tmatesoft.svn.core.SVNLogEntry;
 import org.tmatesoft.svn.core.io.SVNRepository;
 
@@ -57,16 +58,41 @@ public class MCRMetadataVersion {
     private Date date;
 
     /**
+     * Was this version result of a create, update or delete?
+     */
+    private char type;
+
+    /**
+     * A version that was created in store
+     */
+    public final static char CREATED = 'A';
+
+    /**
+     * A version that was updated in store
+     */
+    public final static char UPDATED = 'M';
+
+    /**
+     * A version that was deleted in store
+     */
+    public final static char DELETED = 'D';
+
+    /**
      * Creates a new metadata version info object
      * 
-     * @param id
-     *            the ID of the metadata document this version belongs to
+     * @param vm
+     *            the metadata document this version belongs to
+     * @param logEntry
+     *            the log entry from SVN holding data on this version
+     * @param type
+     *            the type of commit
      */
-    MCRMetadataVersion(MCRVersionedMetadata vm, SVNLogEntry logEntry) {
+    MCRMetadataVersion(MCRVersionedMetadata vm, SVNLogEntry logEntry, char type) {
         this.vm = vm;
         this.revision = logEntry.getRevision();
         this.user = logEntry.getAuthor();
         this.date = logEntry.getDate();
+        this.type = type;
     }
 
     /**
@@ -76,6 +102,17 @@ public class MCRMetadataVersion {
      */
     public MCRVersionedMetadata getMetadataObject() {
         return vm;
+    }
+
+    /**
+     * Returns the type of operation this version comes from
+     * 
+     * @see #CREATED
+     * @see #UPDATED
+     * @see #DELETED
+     */
+    public char getType() {
+        return type;
     }
 
     /**
@@ -109,8 +146,14 @@ public class MCRMetadataVersion {
      * Retrieves this version of the metadata
      * 
      * @return the metadata document as it was in this version
+     * @throws MCRUsageException
+     *             if this is a deleted version, which can not be retrieved
      */
     public MCRContent retrieve() throws Exception {
+        if (type == DELETED) {
+            String msg = "You can not retrieve a deleted version, retrieve a previous version instead";
+            throw new MCRUsageException(msg);
+        }
         SVNRepository repository = vm.getStore().getRepository();
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         repository.getFile(vm.getStore().getSlotPath(vm.getID()), revision, null, baos);

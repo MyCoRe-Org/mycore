@@ -149,6 +149,7 @@ public class MCRVersioningMetadataStoreTest extends MCRTestCase {
         assertSame(mv.getMetadataObject(), vm);
         assertEquals(mv.getRevision(), baseRev);
         assertEquals(mv.getUser(), MCRSessionMgr.getCurrentSession().getCurrentUserID());
+        assertEquals(mv.getType(), MCRMetadataVersion.CREATED);
 
         Document xml2 = new Document(new Element("bango"));
         vm.update(new MCRContent(xml2));
@@ -161,6 +162,7 @@ public class MCRVersioningMetadataStoreTest extends MCRTestCase {
         assertEquals(mv.getRevision(), baseRev);
         mv = versions.get(1);
         assertEquals(mv.getRevision(), vm.getRevision());
+        assertEquals(mv.getType(), MCRMetadataVersion.UPDATED);
 
         Document xml3 = new Document(new Element("bongo"));
         vm.update(new MCRContent(xml3));
@@ -191,6 +193,23 @@ public class MCRVersioningMetadataStoreTest extends MCRTestCase {
         assertTrue(vm.getLastModified().after(versions.get(2).getDate()));
         assertEquals(vm.getMetadata().getXML().getRootElement().getName(), "bango");
         assertEquals(vm.listVersions().size(), 4);
+    }
+
+    public void testCreateUpdateDeleteCreate() throws Exception {
+        Element root = new Element("bingo");
+        Document xml1 = new Document(root);
+        MCRVersionedMetadata vm = store.create(new MCRContent(xml1));
+        root.setName("bango");
+        vm.update(new MCRContent(xml1));
+        vm.delete();
+        root.setName("bongo");
+        vm = store.create(new MCRContent(xml1), vm.getID());
+        List<MCRMetadataVersion> versions = vm.listVersions();
+        assertEquals(4, versions.size());
+        assertEquals(MCRMetadataVersion.CREATED, versions.get(0).getType());
+        assertEquals(MCRMetadataVersion.UPDATED, versions.get(1).getType());
+        assertEquals(MCRMetadataVersion.DELETED, versions.get(2).getType());
+        assertEquals(MCRMetadataVersion.CREATED, versions.get(3).getType());
     }
 
     public void testPerformance() throws Exception {

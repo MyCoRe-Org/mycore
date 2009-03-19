@@ -28,12 +28,14 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.vfs.FileObject;
 import org.apache.log4j.Logger;
 import org.tmatesoft.svn.core.SVNCommitInfo;
 import org.tmatesoft.svn.core.SVNDirEntry;
 import org.tmatesoft.svn.core.SVNLogEntry;
+import org.tmatesoft.svn.core.SVNLogEntryPath;
 import org.tmatesoft.svn.core.SVNNodeKind;
 import org.tmatesoft.svn.core.io.ISVNEditor;
 import org.tmatesoft.svn.core.io.SVNRepository;
@@ -195,9 +197,20 @@ public class MCRVersionedMetadata extends MCRStoredMetadata {
         List<MCRMetadataVersion> versions = new ArrayList<MCRMetadataVersion>();
         SVNRepository repository = getStore().getRepository();
         String path = store.getSlotPath(id);
-        Collection<SVNLogEntry> entries = (Collection<SVNLogEntry>)(repository.log(new String[] { path }, null, 0, -1, true, true));
+
+        String dir = ( path.contains("/") ? path.substring( 0,path.lastIndexOf('/') ) : "" );
+        Collection<SVNLogEntry> entries = (Collection<SVNLogEntry>)(repository.log(new String[] { dir }, null, 0, -1, true, true));
+        
+        path = "/" + path;
         for (SVNLogEntry entry : entries)
-            versions.add(new MCRMetadataVersion(this, entry));
+        {
+          Map<String,SVNLogEntryPath> paths = entry.getChangedPaths();
+          if(paths.containsKey(path))
+          {
+            char type = paths.get(path).getType();
+            versions.add(new MCRMetadataVersion(this, entry,type));
+          }
+        }
         return versions;
     }
 
