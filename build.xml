@@ -182,10 +182,10 @@
   <!-- =================================================================== -->
 
   <target name="init">
-    <!-- find out revision number of HEAD, need svn installed -->
-    <exec executable="svn" outputproperty="svnlog.out">
-      <arg line="info ${basedir}" />
-    </exec>
+    <!-- find out revision number of HEAD -->
+    <java classname="org.tmatesoft.svn.cli.svn.SVN" classpathref="mycore.classpath" dir="${basedir}" fork="true" outputproperty="svnlog.out">
+      <arg value="info" />
+    </java>
     <echo level="debug">${svnlog.out}</echo>
     <propertyregex property="revision.number" input="${svnlog.out}" select="\1">
       <regexp pattern="evision: ([0-9]*)" />
@@ -205,6 +205,12 @@
         <exclude name="iview/sources" unless="jai.available" />
       </dirset>
     </path>
+  </target>
+  
+  <target name="foo">
+    <java classname="org.tmatesoft.svn.cli.svn.SVN" classpathref="mycore.classpath" dir="${basedir}">
+      <arg value="info" />
+    </java>
   </target>
 
   <!-- =================================================================== -->
