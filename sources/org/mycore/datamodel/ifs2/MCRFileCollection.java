@@ -25,6 +25,7 @@ package org.mycore.datamodel.ifs2;
 
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.VFS;
+import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
 
@@ -36,6 +37,12 @@ import org.jdom.Element;
  * @author Frank Lützenkirchen
  */
 public class MCRFileCollection extends MCRDirectory {
+
+    /**
+     * The logger
+     */
+    private final static Logger LOGGER = Logger.getLogger(MCRFileCollection.class);
+    
     /**
      * The store this file collection is stored in.
      */
@@ -81,6 +88,12 @@ public class MCRFileCollection extends MCRDirectory {
 
     private void readAdditionalData() throws Exception {
         FileObject src = VFS.getManager().resolveFile(fo, dataFile);
+        if (!src.exists()) {
+            LOGGER.warn("Metadata file is missing, repairing metadata...");
+            this.data = new Element("collection");
+            new Document(data);
+            repairMetadata();
+        }
         data = new MCRContent(src).getXML().getRootElement();
     }
 
@@ -135,8 +148,24 @@ public class MCRFileCollection extends MCRDirectory {
         else
             return super.getChild(name);
     }
+    
+    public String getName()
+    { return ""; }
 
-    public void repairMetadata() {
+    /**
+     * Repairs additional metadata stored for all files and directories in this collection 
+     */
+    public void repairMetadata() throws Exception {
+      super.repairMetadata();
+      data.setName("collection");
+      data.removeAttribute("name");
+      saveAdditionalData();
+    }
 
+    /**
+     * Returns additional metadata stored for all files and directories in this collection 
+     */
+    Document getMetadata() throws Exception {
+      return data.getDocument();
     }
 }

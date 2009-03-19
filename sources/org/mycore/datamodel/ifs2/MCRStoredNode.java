@@ -182,4 +182,9 @@ public abstract class MCRStoredNode extends MCRNode {
 
         return data.getChildText("label");
     }
+    
+    /**
+     * Repairs additional metadata of this node 
+     */
+    abstract void repairMetadata() throws Exception; 
 }

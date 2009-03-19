@@ -27,7 +27,9 @@ import java.io.File;
 
 import org.apache.commons.vfs.FileObject;
 import org.apache.commons.vfs.provider.local.LocalFile;
+import org.apache.log4j.Logger;
 import org.jdom.Element;
+import org.mycore.common.MCRUtils;
 
 /**
  * Represents a file stored in a file collection. This is a file that is
@@ -38,6 +40,8 @@ import org.jdom.Element;
  */
 public class MCRFile extends MCRStoredNode {
 
+    private final static Logger LOGGER = Logger.getLogger(MCRFile.class);
+    
     /**
      * The md5 checksum of the empty file
      */
@@ -129,5 +133,23 @@ public class MCRFile extends MCRStoredNode {
             return new File(fo.getURL().getPath());
         else
             return null;
+    }
+    
+    /**
+     * Repairs additional metadata of this file and all its children 
+     */
+    void repairMetadata() throws Exception {
+        data.setName("file");
+        data.setAttribute("name",getName());
+        data.removeChildren("file");
+        data.removeChildren("directory");
+        MCRContentInputStream cis = getContent().getContentInputStream();
+        MCRUtils.copyStream(cis, null);
+        cis.close();
+        String md5 = cis.getMD5String();
+        if (!md5.equals(data.getAttributeValue("md5"))) {
+            LOGGER.warn("Fixed MD5 of " + getPath() + " to " + md5);
+            data.setAttribute("md5", md5);
+        }
     }
 }

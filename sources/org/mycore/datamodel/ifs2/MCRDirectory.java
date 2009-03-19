@@ -68,7 +68,10 @@ public class MCRDirectory extends MCRStoredNode {
         for (Element child : (List<Element>) (data.getChildren()))
             if (name.equals(child.getAttributeValue("name")))
                 return child;
-        return null;
+        
+        Element childData = new Element( "node" );
+        data.addContent(childData);
+        return childData;
     }
 
     /**
@@ -87,5 +90,21 @@ public class MCRDirectory extends MCRStoredNode {
             return new MCRFile(this, fo, childData);
         else
             return new MCRDirectory(this, fo, childData);
+    }
+
+    /**
+     * Repairs additional metadata of this directory and all its children 
+     */
+    void repairMetadata() throws Exception {
+        data.setName("dir");
+        data.setAttribute("name",getName());
+
+        for (Element childEntry : (List<Element>) (data.getChildren()))
+            childEntry.setName("node");
+
+        for (MCRNode child : getChildren())
+            ((MCRStoredNode) child).repairMetadata();
+
+        data.removeChildren("node");
     }
 }
