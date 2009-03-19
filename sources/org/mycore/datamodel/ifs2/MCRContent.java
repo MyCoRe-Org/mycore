@@ -245,7 +245,6 @@ public class MCRContent {
      * @return content as String
      */
     public String getString(String encoding) throws IOException, UnsupportedEncodingException {
-        checkConsumed();
         return new String(getBytes(), encoding);
     }
 
