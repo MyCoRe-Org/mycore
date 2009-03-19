@@ -93,7 +93,7 @@ public class MCRSession implements Cloneable {
 
     private boolean dataBaseAccess;
 
-    private Transaction transaction = null;
+    private ThreadLocal<Transaction> transaction = new ThreadLocal<Transaction>();
 
     /**
      * The constructor of a MCRSession. As default the user ID is set to the
@@ -357,20 +357,20 @@ public class MCRSession implements Cloneable {
     public long getCreateTime() {
         return createTime;
     }
-    
-    public Principal getUserPrincipal(){
-        MCRServletJob job=(MCRServletJob) get("MCRServletJob");
-        if (job==null)
+
+    public Principal getUserPrincipal() {
+        MCRServletJob job = (MCRServletJob) get("MCRServletJob");
+        if (job == null)
             return null;
         return job.getRequest().getUserPrincipal();
     }
-    
-    public boolean isPrincipalInRole(String role){
-        Principal p=getUserPrincipal();
-        if (p==null)
+
+    public boolean isPrincipalInRole(String role) {
+        Principal p = getUserPrincipal();
+        if (p == null)
             return false;
-        MCRServletJob job=(MCRServletJob) get("MCRServletJob");
-        if (job==null)
+        MCRServletJob job = (MCRServletJob) get("MCRServletJob");
+        if (job == null)
             return false;
         return job.getRequest().isUserInRole(role);
     }
@@ -380,7 +380,7 @@ public class MCRSession implements Cloneable {
      */
     public void beginTransaction() {
         if (dataBaseAccess)
-            transaction = MCRHIBConnection.instance().getSession().beginTransaction();
+            transaction.set(MCRHIBConnection.instance().getSession().beginTransaction());
     }
 
     /**
@@ -389,10 +389,11 @@ public class MCRSession implements Cloneable {
      */
     public void commitTransaction() {
         if (isTransactionActive()) {
-            transaction.commit();
+            transaction.get().commit();
             beginTransaction();
             MCRHIBConnection.instance().getSession().clear();
-            transaction.commit();
+            transaction.get().commit();
+            transaction.remove();
         }
     }
 
@@ -402,8 +403,9 @@ public class MCRSession implements Cloneable {
      */
     public void rollbackTransaction() {
         if (isTransactionActive()) {
-            transaction.rollback();
+            transaction.get().rollback();
             MCRHIBConnection.instance().getSession().close();
+            transaction.remove();
         }
     }
 
@@ -412,7 +414,7 @@ public class MCRSession implements Cloneable {
      * @return true if the transaction is still alive
      */
     public boolean isTransactionActive() {
-        return dataBaseAccess && transaction != null && transaction.isActive();
+        return dataBaseAccess && transaction.get() != null && transaction.get().isActive();
     }
 
 }
