@@ -55,7 +55,7 @@ public class MCRHIBXMLStore implements MCRXMLTableInterface {
 
     private String type;
 
-    private long objectCount = 0;
+    private long objectCount = -1;
 
     private Date lastChange;
 
@@ -334,7 +334,7 @@ public class MCRHIBXMLStore implements MCRXMLTableInterface {
         Object[] result = (Object[]) lastModifiedQuery.uniqueResult();
         Number objectCount = (Number) result[1];
         Date lastModified = (Date) result[0];
-        if (this.lastChange == null || this.lastChange.before(lastModified)) {
+        if ((this.lastChange == null || this.lastChange.before(lastModified)) && lastModified != null) {
             this.lastChange = lastModified;
             this.objectCount = objectCount.longValue();
             return new Date(lastModified.getTime());
@@ -343,6 +343,7 @@ public class MCRHIBXMLStore implements MCRXMLTableInterface {
             if (this.objectCount != objectCount.longValue()) {
                 //an object has been deleted
                 this.lastChange = new Date();
+                this.objectCount = objectCount.longValue();
             }
             return new Date(this.lastChange.getTime());
         }
