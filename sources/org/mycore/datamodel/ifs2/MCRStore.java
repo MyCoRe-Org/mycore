@@ -206,38 +206,35 @@ public abstract class MCRStore {
      * @return the relative path storing that data
      */
     String getSlotPath(int ID) {
-        String[] parts = getSlotPathParts(ID);
-        StringBuffer path = new StringBuffer();
-        for (int i = 0; i < parts.length - 1; i++) {
-            path.append(parts[i]);
-            if (path.length() > 0)
-                path.append('/');
-        }
-        path.append(parts[parts.length - 1]);
-        return path.toString();
+        String[] paths = getSlotPaths(ID);
+        return paths[paths.length - 1];
     }
 
     /**
-     * Returns the parts of the relative path used to store data for the given
-     * ID within the store base directory
+     * Returns the paths of all subdirectories and the slot itself used to store
+     * data for the given ID relative to the store base directory
      * 
      * @param ID
      *            the ID of the data
      * @return the directory and file names of the relative path storing that
      *         data
      */
-    String[] getSlotPathParts(int ID) {
+    String[] getSlotPaths(int ID) {
         String id = nulls + String.valueOf(ID);
         id = id.substring(id.length() - idLength);
 
+        String[] paths = new String[slotLength.length + 1];
+        StringBuffer path = new StringBuffer();
         int offset = 0;
-        String[] path = new String[slotLength.length + 1];
-        for (int i = 0; i < slotLength.length; i++) {
-            path[i] = id.substring(offset, offset + slotLength[i]);
+        for (int i = 0; i < paths.length - 1; i++) {
+            path.append(id.substring(offset, offset + slotLength[i]));
+            paths[i] = path.toString();
+            path.append("/");
             offset += slotLength[i];
         }
-        path[path.length - 1] = prefix + id + suffix;
-        return path;
+        path.append(prefix).append(id).append(suffix);
+        paths[paths.length - 1] = path.toString();
+        return paths;
     }
 
     /**

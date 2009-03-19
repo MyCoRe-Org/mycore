@@ -88,75 +88,7 @@ public class MCRVersionedMetadata extends MCRStoredMetadata {
      */
     void create(MCRContent xml) throws Exception {
         super.create(xml);
-        xml = new MCRContent(fo);
-
-        String commitMsg = "Created metadata object " + store.getID() + "_" + id + " in store";
-        SVNRepository repository = getStore().getRepository();
-
-        // Create slot subdirectories in SVN, if not existing yet
-        String[] parts = store.getSlotPathParts(id);
-        List<String> dirsToCreate = new ArrayList<String>();
-        StringBuffer path = new StringBuffer();
-        for (int i = 0; i < parts.length - 1; i++) {
-            path.append(parts[i]);
-            SVNNodeKind nodeKind = repository.checkPath(path.toString(), -1);
-            if (nodeKind.equals(SVNNodeKind.NONE))
-                dirsToCreate.add(path.toString());
-            if (path.length() > 0)
-                path.append('/');
-        }
-
-        ISVNEditor editor = repository.getCommitEditor(commitMsg, null);
-        editor.openRoot(-1);
-
-        for (String dir : dirsToCreate) {
-            LOGGER.info("Create in SVN: directory " + dir);
-            editor.addDir(dir, null, -1);
-            editor.closeDir();
-        }
-
-        path.append(parts[parts.length - 1]);
-        String filePath = path.toString();
-        LOGGER.info("Create in SVN: file " + filePath);
-        editor.addFile(filePath, null, -1);
-        editor.applyTextDelta(filePath, null);
-        SVNDeltaGenerator deltaGenerator = new SVNDeltaGenerator();
-
-        InputStream in = xml.getInputStream();
-        String checksum = deltaGenerator.sendDelta(filePath, in, editor, true);
-        in.close();
-        editor.closeFile(filePath, checksum);
-        editor.closeDir();
-
-        // Commit to SVN
-        SVNCommitInfo info = editor.closeEdit();
-        this.revision = info.getNewRevision();
-        LOGGER.info("SVN commit of create finished, new revision " + revision);
-
-        setLastModified( info.getDate() );
-    }
-
-    /**
-     * Deletes this metadata object in the SVN repository, and in the local
-     * store.
-     */
-    public void delete() throws Exception {
-        String commitMsg = "Deleted metadata object " + store.getID() + "_" + id + " in store";
-        String filePath = store.getSlotPath(id);
-        LOGGER.info("Delete in SVN: file " + filePath);
-
-        SVNRepository repository = getStore().getRepository();
-        ISVNEditor editor = repository.getCommitEditor(commitMsg, null);
-        editor.openRoot(-1);
-        editor.deleteEntry(filePath, -1);
-        editor.closeDir();
-
-        // Commit to SVN
-        SVNCommitInfo info = editor.closeEdit();
-        this.revision = info.getNewRevision();
-        LOGGER.info("SVN commit of delete finished, new revision " + revision);
-
-        store.delete(fo);
+        commit("create");
     }
 
     /**
@@ -168,31 +100,77 @@ public class MCRVersionedMetadata extends MCRStoredMetadata {
      */
     public void update(MCRContent xml) throws Exception {
         super.update(xml);
-        xml = new MCRContent(fo);
-
-        String commitMsg = "Updated metadata object " + store.getID() + "_" + id + " in store";
-        String filePath = store.getSlotPath(id);
-        LOGGER.info("Update in SVN: file " + filePath);
-
+        commit("update");
+    }
+    
+    void commit( String mode ) throws Exception
+    {
         SVNRepository repository = getStore().getRepository();
 
+        // Check which paths already exist in SVN
+        String[] paths = store.getSlotPaths( id );
+        int existing = paths.length - 1;
+        for( ; existing >= 0; existing-- ) 
+            if (! repository.checkPath(paths[existing], -1).equals(SVNNodeKind.NONE))
+                break;
+        
+        existing += 1;
+        
+        // Start commit editor
+        String commitMsg = mode + "d metadata object " + store.getID() + "_" + id + " in store";
         ISVNEditor editor = repository.getCommitEditor(commitMsg, null);
         editor.openRoot(-1);
-        editor.openFile(filePath, -1);
+
+        // Create directories in SVN that do not exist yet
+        for (int i = existing; i < paths.length -1; i++) {
+            LOGGER.debug("SVN create directory " + paths[i]);
+            editor.addDir(paths[i], null, -1);
+            editor.closeDir();
+        }
+
+        // Commit file changes
+        String filePath = paths[paths.length - 1];
+        if( existing < paths.length )
+          editor.addFile( filePath, null, -1);
+        else
+          editor.openFile( filePath, -1 );
+        
         editor.applyTextDelta(filePath, null);
         SVNDeltaGenerator deltaGenerator = new SVNDeltaGenerator();
-        InputStream in = xml.getInputStream();
+
+        InputStream in = fo.getContent().getInputStream();
         String checksum = deltaGenerator.sendDelta(filePath, in, editor, true);
         in.close();
         editor.closeFile(filePath, checksum);
+        editor.closeDir(); // root
+
+        // Commit to SVN
+        SVNCommitInfo info = editor.closeEdit();
+        this.revision = info.getNewRevision();
+        LOGGER.info("SVN commit of " + mode + " finished, new revision " + revision);
+
+        setLastModified( info.getDate() );
+    }
+
+    /**
+     * Deletes this metadata object in the SVN repository, and in the local
+     * store.
+     */
+    public void delete() throws Exception {
+        String commitMsg = "Deleted metadata object " + store.getID() + "_" + id + " in store";
+
+        SVNRepository repository = getStore().getRepository();
+        ISVNEditor editor = repository.getCommitEditor(commitMsg, null);
+        editor.openRoot(-1);
+        editor.deleteEntry(store.getSlotPath(id), -1);
         editor.closeDir();
 
         // Commit to SVN
         SVNCommitInfo info = editor.closeEdit();
         this.revision = info.getNewRevision();
-        LOGGER.info("SVN commit of update finished, new revision " + revision);
+        LOGGER.info("SVN commit of delete finished, new revision " + revision);
 
-        setLastModified( info.getDate() );
+        store.delete(fo);
     }
 
     /**
