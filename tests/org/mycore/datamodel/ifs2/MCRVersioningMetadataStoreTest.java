@@ -210,6 +210,8 @@ public class MCRVersioningMetadataStoreTest extends MCRTestCase {
         assertEquals(MCRMetadataVersion.UPDATED, versions.get(1).getType());
         assertEquals(MCRMetadataVersion.DELETED, versions.get(2).getType());
         assertEquals(MCRMetadataVersion.CREATED, versions.get(3).getType());
+        versions.get(1).restore();
+        assertEquals("bango",vm.getMetadata().getXML().getRootElement().getName());
     }
 
     public void testPerformance() throws Exception {
