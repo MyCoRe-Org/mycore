@@ -83,7 +83,7 @@ public class MCRFileStoreTest extends MCRTestCase {
         assertTrue(store.exists(id1));
         MCRFileCollection col2 = store.create(id1 + 1);
         assertNotNull(col2);
-        assertEquals(col2.getID(), id1 + 1);
+        assertEquals(id1 + 1, col2.getID());
         assertTrue(store.exists(id1 + 1));
     }
 
@@ -170,22 +170,22 @@ public class MCRFileStoreTest extends MCRTestCase {
         assertNotNull(build);
         Date modified = col.getLastModified();
         assertTrue(modified.after(created));
-        assertEquals(col.getNumChildren(), 1);
-        assertEquals(col.getChildren().size(), 1);
-        assertEquals(build.getSize(), 0);
+        assertEquals(1, col.getNumChildren());
+        assertEquals(1, col.getChildren().size());
+        assertEquals(0, build.getSize());
         assertTrue(created.before(build.getLastModified()));
         build.setContent(new MCRContent(new Document(new Element("project"))));
         assertTrue(build.getSize() > 0);
         assertNotNull(build.getContent().getBytes());
         bzzz();
         MCRDirectory dir = new MCRDirectory(col, "documentation");
-        assertEquals(col.getNumChildren(), 2);
+        assertEquals(2, col.getNumChildren());
         assertTrue(modified.before(col.getLastModified()));
         byte[] content = "Hello World!".getBytes("UTF-8");
         new MCRFile(dir, "readme.txt").setContent(new MCRContent(content));
         MCRFile child = (MCRFile) (dir.getChild("readme.txt"));
         assertNotNull(child);
-        assertEquals(child.getSize(), content.length);
+        assertEquals(content.length, child.getSize());
     }
 
     public void testLabels() throws Exception {
@@ -196,59 +196,59 @@ public class MCRFileStoreTest extends MCRTestCase {
         col.setLabel("en", "english");
         String curr = MCRSessionMgr.getCurrentSession().getCurrentLanguage();
         String label = col.getLabel(curr);
-        assertEquals(col.getCurrentLabel(), label);
-        assertEquals(col.getLabels().size(), 2);
-        assertEquals(col.getLabel("en"), "english");
+        assertEquals(label, col.getCurrentLabel());
+        assertEquals(2, col.getLabels().size());
+        assertEquals("english", col.getLabel("en"));
         MCRFileCollection col2 = store.retrieve(col.getID());
-        assertEquals(col2.getLabels().size(), 2);
+        assertEquals(2, col2.getLabels().size());
         col.clearLabels();
         assertTrue(col.getLabels().isEmpty());
     }
-    
+
     public void testRepairMetadata() throws Exception {
         MCRFileCollection col = store.create();
         String xml1 = new MCRContent(col.getMetadata()).getString();
         col.repairMetadata();
         String xml2 = new MCRContent(col.getMetadata()).getString();
-        assertEquals(xml1,xml2);
-      
-        MCRDirectory dir = new MCRDirectory(col,"foo");
+        assertEquals(xml1, xml2);
+
+        MCRDirectory dir = new MCRDirectory(col, "foo");
         xml1 = new MCRContent(col.getMetadata()).getString();
         assertFalse(xml2.equals(xml1));
         dir.delete();
         xml1 = new MCRContent(col.getMetadata()).getString();
-        assertEquals(xml1,xml2);
-        
-        MCRDirectory dir2 = new MCRDirectory(col,"dir");
-        MCRFile file1 = new MCRFile(col,"test1.txt");
+        assertEquals(xml2, xml1);
+
+        MCRDirectory dir2 = new MCRDirectory(col, "dir");
+        MCRFile file1 = new MCRFile(col, "test1.txt");
         file1.setContent(new MCRContent("Test 1"));
-        MCRFile readme = new MCRFile(dir2,"readme.txt");
+        MCRFile readme = new MCRFile(dir2, "readme.txt");
         readme.setContent(new MCRContent("Hallo Welt!"));
-        MCRFile file3 = new MCRFile(col,"test2.txt");
+        MCRFile file3 = new MCRFile(col, "test2.txt");
         file3.setContent(new MCRContent("Test 2"));
         file3.setLabel("de", "Die Testdatei");
         xml2 = new MCRContent(col.getMetadata()).getString();
-     
+
         col.repairMetadata();
         xml1 = new MCRContent(col.getMetadata()).getString();
-        assertEquals(xml1,xml2);
+        assertEquals(xml2, xml1);
 
         file3.clearLabels();
         xml2 = new MCRContent(col.getMetadata()).getString();
         String path = col.fo.getName().getPath();
         System.out.println(path);
-        new File( path, "mcrdata.xml" ).delete();
+        new File(path, "mcrdata.xml").delete();
         col = store.retrieve(col.getID());
         xml1 = new MCRContent(col.getMetadata()).getString();
-        assertEquals(xml1,xml2);
+        assertEquals(xml2, xml1);
 
-        new File( path, "test1.txt" ).delete();
-        File tmp = new File( path, "test3.txt" );
+        new File(path, "test1.txt").delete();
+        File tmp = new File(path, "test3.txt");
         tmp.createNewFile();
         new MCRContent("Hallo Welt!").sendTo(tmp);
         col.repairMetadata();
         xml1 = new MCRContent(col.getMetadata()).getString();
-        assertFalse( xml1.contains("name=\"test1.txt\""));
-        assertTrue( xml1.contains("name=\"test3.txt\""));
+        assertFalse(xml1.contains("name=\"test1.txt\""));
+        assertTrue(xml1.contains("name=\"test3.txt\""));
     }
 }

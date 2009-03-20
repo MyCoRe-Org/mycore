@@ -123,6 +123,7 @@ public class MCRMetadataStoreTest extends MCRTestCase {
         assertEquals(xml1.toString(), xml2.toString());
     }
 
+    @SuppressWarnings("deprecation")
     public void testLastModified() throws Exception {
         Document xml1 = new Document(new Element("root"));
         Date date1 = new Date();
@@ -141,7 +142,7 @@ public class MCRMetadataStoreTest extends MCRTestCase {
         Date date = new Date(2009, 1, 1);
         sm.setLastModified(date);
         sm = store.retrieve(sm.getID());
-        assertEquals(sm.getLastModified(), date);
+        assertEquals(date, sm.getLastModified());
     }
 
     public void testExists() throws Exception {

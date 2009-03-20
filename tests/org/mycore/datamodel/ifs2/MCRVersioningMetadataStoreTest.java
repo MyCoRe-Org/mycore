@@ -144,12 +144,12 @@ public class MCRVersioningMetadataStoreTest extends MCRTestCase {
 
         List<MCRMetadataVersion> versions = vm.listVersions();
         assertNotNull(versions);
-        assertEquals(versions.size(), 1);
+        assertEquals(1, versions.size());
         MCRMetadataVersion mv = versions.get(0);
         assertSame(mv.getMetadataObject(), vm);
-        assertEquals(mv.getRevision(), baseRev);
-        assertEquals(mv.getUser(), MCRSessionMgr.getCurrentSession().getCurrentUserID());
-        assertEquals(mv.getType(), MCRMetadataVersion.CREATED);
+        assertEquals(baseRev, mv.getRevision());
+        assertEquals(MCRSessionMgr.getCurrentSession().getCurrentUserID(), mv.getUser());
+        assertEquals(MCRMetadataVersion.CREATED, mv.getType());
 
         bzzz();
         Document xml2 = new Document(new Element("bango"));
@@ -158,23 +158,23 @@ public class MCRVersioningMetadataStoreTest extends MCRTestCase {
         assertTrue(vm.isUpToDate());
 
         versions = vm.listVersions();
-        assertEquals(versions.size(), 2);
+        assertEquals(2, versions.size());
         mv = versions.get(0);
-        assertEquals(mv.getRevision(), baseRev);
+        assertEquals(baseRev, mv.getRevision());
         mv = versions.get(1);
-        assertEquals(mv.getRevision(), vm.getRevision());
-        assertEquals(mv.getType(), MCRMetadataVersion.UPDATED);
+        assertEquals(vm.getRevision(), mv.getRevision());
+        assertEquals(MCRMetadataVersion.UPDATED, mv.getType());
 
         bzzz();
         Document xml3 = new Document(new Element("bongo"));
         vm.update(new MCRContent(xml3));
 
         versions = vm.listVersions();
-        assertEquals(versions.size(), 3);
+        assertEquals(3, versions.size());
         mv = versions.get(0);
-        assertEquals(mv.getRevision(), baseRev);
+        assertEquals(baseRev, mv.getRevision());
         mv = versions.get(2);
-        assertEquals(mv.getRevision(), vm.getRevision());
+        assertEquals(vm.getRevision(), mv.getRevision());
         assertTrue(versions.get(0).getRevision() < versions.get(1).getRevision());
         assertTrue(versions.get(1).getRevision() < versions.get(2).getRevision());
         assertTrue(versions.get(0).getDate().before(versions.get(1).getDate()));
@@ -194,8 +194,8 @@ public class MCRVersioningMetadataStoreTest extends MCRTestCase {
         versions.get(1).restore();
         assertTrue(vm.getRevision() > versions.get(2).getRevision());
         assertTrue(vm.getLastModified().after(versions.get(2).getDate()));
-        assertEquals(vm.getMetadata().getXML().getRootElement().getName(), "bango");
-        assertEquals(vm.listVersions().size(), 4);
+        assertEquals("bango", vm.getMetadata().getXML().getRootElement().getName());
+        assertEquals(4, vm.listVersions().size());
     }
 
     public void testCreateUpdateDeleteCreate() throws Exception {
@@ -243,7 +243,7 @@ public class MCRVersioningMetadataStoreTest extends MCRTestCase {
 
         v1.restore();
         assertFalse(vm.isDeleted());
-        assertEquals(root.getName(),vm.getMetadata().getXML().getRootElement().getName());
+        assertEquals(root.getName(), vm.getMetadata().getXML().getRootElement().getName());
     }
 
     public void testPerformance() throws Exception {

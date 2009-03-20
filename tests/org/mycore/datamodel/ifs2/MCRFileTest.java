@@ -77,22 +77,21 @@ public class MCRFileTest extends MCRTestCase {
     public void testFileName() throws Exception {
         MCRFile file = new MCRFile(col, "foo.txt");
         Date created = file.getLastModified();
-        assertEquals(file.getName(), "foo.txt");
-        assertEquals(file.getExtension(), "txt");
-        synchronized (this) {
-            wait(1000);
-        }
+        assertEquals("foo.txt", file.getName());
+        assertEquals("txt", file.getExtension());
+        bzzz();
         file.renameTo("readme");
-        assertEquals(file.getName(), "readme");
-        assertEquals(file.getExtension(), "");
+        assertEquals("readme", file.getName());
+        assertEquals("", file.getExtension());
         assertTrue(file.getLastModified().after(created));
     }
 
+    @SuppressWarnings("deprecation")
     public void testSetLastModified() throws Exception {
         MCRFile file = new MCRFile(col, "foo.txt");
         Date other = new Date(2009, 1, 1);
         file.setLastModified(other);
-        assertEquals(file.getLastModified(), other);
+        assertEquals(other, file.getLastModified());
     }
 
     public void testMD5() throws Exception {
@@ -103,7 +102,7 @@ public class MCRFileTest extends MCRTestCase {
         assertFalse(MCRFile.MD5_OF_EMPTY_FILE.equals(file.getMD5()));
         MCRFileCollection col2 = store.retrieve(col.getID());
         MCRFile child = (MCRFile) (col2.getChild("foo.txt"));
-        assertEquals(child.getMD5(), file.getMD5());
+        assertEquals(file.getMD5(), child.getMD5());
     }
 
     public void testDelete() throws Exception {
@@ -115,9 +114,9 @@ public class MCRFileTest extends MCRTestCase {
     public void testChildren() throws Exception {
         MCRFile file = new MCRFile(col, "foo.txt");
         assertNull(file.getChild("foo"));
-        assertEquals(file.getChildren().size(), 0);
+        assertEquals(0, file.getChildren().size());
         assertFalse(file.hasChildren());
-        assertEquals(file.getNumChildren(), 0);
+        assertEquals(0, file.getNumChildren());
     }
 
     public void testContentFile() throws Exception {
@@ -153,7 +152,7 @@ public class MCRFileTest extends MCRTestCase {
         rac.skipBytes(6);
         InputStream in = rac.getInputStream();
         char c = (char) (in.read());
-        assertEquals(c, 'W');
+        assertEquals('W', c);
         in.close();
         rac.close();
     }
@@ -172,12 +171,12 @@ public class MCRFileTest extends MCRTestCase {
         file.setLabel("en", "english");
         String curr = MCRSessionMgr.getCurrentSession().getCurrentLanguage();
         String label = file.getLabel(curr);
-        assertEquals(file.getCurrentLabel(), label);
-        assertEquals(file.getLabels().size(), 2);
-        assertEquals(file.getLabel("en"), "english");
+        assertEquals(label, file.getCurrentLabel());
+        assertEquals(2, file.getLabels().size());
+        assertEquals("english", file.getLabel("en"));
         MCRFileCollection col2 = store.retrieve(col.getID());
         MCRFile child = (MCRFile) (col2.getChild("foo.txt"));
-        assertEquals(child.getLabels().size(), 2);
+        assertEquals(2, child.getLabels().size());
         file.clearLabels();
         assertTrue(file.getLabels().isEmpty());
     }

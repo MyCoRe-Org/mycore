@@ -48,20 +48,21 @@ public class MCRDirectoryTest extends MCRTestCase {
     public void testName() throws Exception {
         MCRDirectory dir = new MCRDirectory(col, "foo");
         Date created = dir.getLastModified();
-        assertEquals(dir.getName(), "foo");
+        assertEquals("foo", dir.getName());
         synchronized (this) {
             wait(1000);
         }
         dir.renameTo("bar");
-        assertEquals(dir.getName(), "bar");
+        assertEquals("bar", dir.getName());
         assertTrue(dir.getLastModified().after(created));
     }
 
+    @SuppressWarnings("deprecation")
     public void testSetLastModified() throws Exception {
         MCRDirectory dir = new MCRDirectory(col, "foo");
         Date other = new Date(2009, 1, 1);
         dir.setLastModified(other);
-        assertEquals(dir.getLastModified(), other);
+        assertEquals(other, dir.getLastModified());
     }
 
     public void testType() throws Exception {
@@ -78,44 +79,44 @@ public class MCRDirectoryTest extends MCRTestCase {
         dir.setLabel("en", "english");
         String curr = MCRSessionMgr.getCurrentSession().getCurrentLanguage();
         String label = dir.getLabel(curr);
-        assertEquals(dir.getCurrentLabel(), label);
-        assertEquals(dir.getLabels().size(), 2);
-        assertEquals(dir.getLabel("en"), "english");
+        assertEquals(label, dir.getCurrentLabel());
+        assertEquals(2, dir.getLabels().size());
+        assertEquals("english", dir.getLabel("en"));
         MCRFileCollection col2 = store.retrieve(col.getID());
         MCRDirectory child = (MCRDirectory) (col2.getChild("foo"));
-        assertEquals(child.getLabels().size(), 2);
+        assertEquals(2, child.getLabels().size());
         dir.clearLabels();
         assertTrue(dir.getLabels().isEmpty());
     }
 
     public void testGetSize() throws Exception {
         MCRDirectory dir = new MCRDirectory(col, "foo");
-        assertEquals(dir.getSize(), 0);
+        assertEquals(0, dir.getSize());
     }
 
     public void testChildren() throws Exception {
         MCRDirectory parent = new MCRDirectory(col, "foo");
         assertFalse(parent.hasChildren());
-        assertEquals(parent.getNumChildren(), 0);
+        assertEquals(0, parent.getNumChildren());
         assertNotNull(parent.getChildren());
-        assertEquals(parent.getChildren().size(), 0);
+        assertEquals(0, parent.getChildren().size());
         assertNull(parent.getChild("bar"));
 
         new MCRDirectory(parent, "bar");
         assertTrue(parent.hasChildren());
-        assertEquals(parent.getNumChildren(), 1);
+        assertEquals(1, parent.getNumChildren());
         assertNotNull(parent.getChildren());
-        assertEquals(parent.getChildren().size(), 1);
+        assertEquals(1, parent.getChildren().size());
         assertNotNull(parent.getChild("bar"));
         MCRNode fromList = parent.getChildren().get(0);
         assertTrue(fromList instanceof MCRDirectory);
-        assertEquals(fromList.getName(), "bar");
+        assertEquals("bar", fromList.getName());
 
         new MCRFile(parent, "readme.txt");
         assertTrue(parent.hasChildren());
-        assertEquals(parent.getNumChildren(), 2);
+        assertEquals(2, parent.getNumChildren());
         assertNotNull(parent.getChildren());
-        assertEquals(parent.getChildren().size(), 2);
+        assertEquals(2, parent.getChildren().size());
         assertNotNull(parent.getChild("bar"));
         assertNotNull(parent.getChild("readme.txt"));
         List<MCRNode> children = parent.getChildren();
@@ -125,27 +126,27 @@ public class MCRDirectoryTest extends MCRTestCase {
     }
 
     public void testPath() throws Exception {
-        assertEquals(col.getPath(), "/");
+        assertEquals("/", col.getPath());
         MCRDirectory parent = new MCRDirectory(col, "dir");
-        assertEquals(parent.getPath(), "/dir");
+        assertEquals("/dir", parent.getPath());
         MCRDirectory child = new MCRDirectory(parent, "subdir");
-        assertEquals(child.getPath(), "/dir/subdir");
+        assertEquals("/dir/subdir", child.getPath());
         MCRFile file = new MCRFile(child, "readme.txt");
-        assertEquals(file.getPath(), "/dir/subdir/readme.txt");
+        assertEquals("/dir/subdir/readme.txt", file.getPath());
     }
 
     public void testNavigationUpwards() throws Exception {
-        assertEquals(col.getRoot(), col);
+        assertEquals(col, col.getRoot());
         assertNull(col.getParent());
         MCRDirectory dir = new MCRDirectory(col, "dir");
-        assertEquals(dir.getRoot(), col);
-        assertEquals(dir.getParent(), col);
+        assertEquals(col, dir.getRoot());
+        assertEquals(col, dir.getParent());
         MCRDirectory subdir = new MCRDirectory(dir, "subdir");
-        assertEquals(subdir.getRoot(), col);
-        assertEquals(subdir.getParent(), dir);
+        assertEquals(col, subdir.getRoot());
+        assertEquals(dir, subdir.getParent());
         MCRFile file = new MCRFile(subdir, "readme.txt");
-        assertEquals(file.getRoot(), col);
-        assertEquals(file.getParent(), subdir);
+        assertEquals(col, file.getRoot());
+        assertEquals(subdir, file.getParent());
     }
 
     public void testGetNodeByPath() throws Exception {
@@ -157,10 +158,10 @@ public class MCRDirectoryTest extends MCRTestCase {
         MCRDirectory dir = new MCRDirectory(col, "dir");
         node = col.getNodeByPath("dir");
         assertNotNull(node);
-        assertEquals(node.getName(), "dir");
+        assertEquals("dir", node.getName());
         node = col.getNodeByPath("./dir");
         assertNotNull(node);
-        assertEquals(node.getName(), "dir");
+        assertEquals("dir", node.getName());
         node = dir.getNodeByPath("..");
         assertNotNull(node);
         assertSame(node, col);
@@ -170,13 +171,13 @@ public class MCRDirectoryTest extends MCRTestCase {
         assertSame(node, col);
         node = subdir.getNodeByPath("../subdir");
         assertNotNull(node);
-        assertEquals(node.getName(), "subdir");
+        assertEquals("subdir", node.getName());
         node = subdir.getNodeByPath("../..");
         assertNotNull(node);
         assertSame(node, col);
         node = col.getNodeByPath("./dir/subdir");
         assertNotNull(node);
-        assertEquals(node.getName(), "subdir");
+        assertEquals("subdir", node.getName());
     }
 
     public void testDelete() throws Exception {
@@ -184,7 +185,7 @@ public class MCRDirectoryTest extends MCRTestCase {
         MCRDirectory subdir = new MCRDirectory(dir, "subdir");
         new MCRFile(subdir, "readme.txt");
         dir.delete();
-        assertEquals(col.getNumChildren(), 0);
+        assertEquals(0, col.getNumChildren());
         assertFalse(col.hasChildren());
     }
 }
