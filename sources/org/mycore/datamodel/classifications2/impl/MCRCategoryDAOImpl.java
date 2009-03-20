@@ -358,9 +358,14 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         // old Map with all Categories referenced by ID
         Map<MCRCategoryID, MCRCategoryImpl> oldMap = new HashMap<MCRCategoryID, MCRCategoryImpl>();
         fillIDMap(oldMap, oldCategory);
-        MCRCategoryImpl newCategoryImpl = MCRCategoryImpl.wrapCategory(copyDeep(newCategory, -1), oldCategory.getParent(), oldCategory
-                .getRoot());
+        final MCRCategoryImpl copyDeepImpl = copyDeep(newCategory, -1);
+        MCRCategoryImpl newCategoryImpl = MCRCategoryImpl.wrapCategory(copyDeepImpl, oldCategory.getParent(), oldCategory.getRoot());
         // new Map with all Categories referenced by ID
+        Map<MCRCategoryID, MCRCategoryID> oldParents = new HashMap<MCRCategoryID, MCRCategoryID>();
+        for (MCRCategory category : oldMap.values()) {
+            if (category.isCategory())
+                oldParents.put(category.getId(), category.getParent().getId());
+        }
         Map<MCRCategoryID, MCRCategoryImpl> newMap = new HashMap<MCRCategoryID, MCRCategoryImpl>();
         fillIDMap(newMap, newCategoryImpl);
         /*
@@ -395,17 +400,28 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
             parent.getChildren().set(oldCategory.getPositionInParent(), newCategoryImpl);
         }
         // delete removed categories
-        boolean categoryRemoved = false;
+        boolean flushBeforeUpdate = false;
         for (MCRCategoryImpl category : oldMap.values()) {
             if (!newMap.containsKey(category.getId())) {
                 LOGGER.info("Deleting category :" + category.getId());
                 category.detachFromParent();
                 session.delete(category);
-                categoryRemoved = true;
+                flushBeforeUpdate = true;
+            }
+        }
+        // update shifted categories (JUnit testCase testReplaceCategoryShiftCase)
+        fillIDMap(newMap, newCategoryImpl);
+        for (MCRCategoryImpl category : newMap.values()) {
+            if (category.isCategory() && oldParents.containsKey(category.getId())) {
+                if (!oldParents.get(category.getId()).equals(category.getParent().getId())) {
+                    LOGGER.info("updating new parent for " + category.getId());
+                    session.update(category);
+                    flushBeforeUpdate = true;
+                }
             }
         }
         // important to flush here as positionInParent could collide with deleted categories
-        if (categoryRemoved)
+        if (flushBeforeUpdate)
             session.flush();
         session.saveOrUpdate(newCategoryImpl);
         updateTimeStamp();
@@ -714,6 +730,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
 
     private static void fillIDMap(Map<MCRCategoryID, MCRCategoryImpl> map, MCRCategoryImpl category) {
         map.put(category.getId(), category);
+        //        LOGGER.info("Parent for " + category.getId() + ":" + category.getParent());
         for (MCRCategory subCategory : category.getChildren()) {
             fillIDMap(map, (MCRCategoryImpl) subCategory);
         }
