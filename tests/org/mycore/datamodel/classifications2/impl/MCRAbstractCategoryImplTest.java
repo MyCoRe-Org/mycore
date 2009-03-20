@@ -1,7 +1,5 @@
 package org.mycore.datamodel.classifications2.impl;
 
-import java.util.ArrayList;
-import java.util.List;
 
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
@@ -18,14 +16,7 @@ public class MCRAbstractCategoryImplTest extends MCRTestCase {
     }
     
     public void testGetCurrentLabel(){
-        MCRCategory cat=new MCRAbstractCategoryImpl(){
-            {
-                labels=new ArrayList<MCRLabel>();
-            }
-            @Override
-            protected void setChildren(List<MCRCategory> children) {}
-            public int getLevel() {return 0;}
-        };
+        MCRCategory cat=new MCRSimpleAbstractCategoryImpl();
         MCRLabel label1=new MCRLabel("de", "german", null);
         MCRLabel label2=new MCRLabel("fr", "french", null);
         MCRLabel label3=new MCRLabel("at", "austrian", null);
