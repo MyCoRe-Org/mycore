@@ -104,7 +104,7 @@ public class MCRIndexBrowserData {
             getIndexCache(path).put(cacheKey, entry);
             // for further search and research (by refine and other posibilities
             // the query must be in the Cache
-            new MCRCachedQueryData(mcrResult, myQuery.buildXML(), myQuery.getCondition());
+            MCRCachedQueryData.cache(mcrResult, myQuery.buildXML(), myQuery.getCondition());
             results.setAttribute("resultid", mcrResult.getID());
         }
         int from = Math.max(0, browseData.from);

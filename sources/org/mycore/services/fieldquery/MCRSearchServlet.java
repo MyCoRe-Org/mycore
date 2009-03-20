@@ -305,7 +305,7 @@ public class MCRSearchServlet extends MCRServlet {
         String npp = root.getAttributeValue("numPerPage", "0");
 
         // Store query and results in cache
-        new MCRCachedQueryData( result, clonedQuery, cond );
+        MCRCachedQueryData.cache( result, clonedQuery, cond );
 
         // Redirect browser to first results page
         sendRedirect(request, response, result.getID(), npp);
