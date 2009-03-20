@@ -19,6 +19,12 @@
   <property name="sourcerelease" value="1.5" />
   <property name="sourceencoding" value="ISO-8859-15" />
   <property name="env.MYCORE_HOME" value="." />
+  <!-- Junit properties -->
+  <property name="junit.printsummary" value="on" />
+  <property name="junit.showoutput" value="false" />
+  <property name="junit.dir" value="${basedir}" />
+  <property name="junit.formatter.type" value="brief" />
+  <property name="junit.formatter.usefile" value="false" />
   <!-- System CLASSPATH is concatenated to any specified classpaths at the end! -->
   <property name="build.sysclasspath" value="last" />
   <!-- Path definitions -->
@@ -218,13 +224,14 @@
   <!-- =================================================================== -->
 
   <target name="test" depends="init,compile_testcases">
-    <junit printsummary="on" fork="true">
+    <junit printsummary="${junit.printsummary}" fork="true" showoutput="${junit.showoutput}">
       <classpath>
         <path refid="mycore.classpath" />
         <pathelement location="${basedir}/tests" />
       </classpath>
-      <formatter type="brief" usefile="false" />
-      <batchtest>
+      <formatter type="${junit.formatter.type}" usefile="${junit.formatter.usefile}" unless="junit.formatter.classname" />
+      <formatter classname="${junit.formatter.classname}" extension="${junit.formatter.extension}" usefile="${junit.formatter.usefile}" if="junit.formatter.classname" />
+      <batchtest todir="${junit.dir}">
         <fileset dir="${target.classes}">
           <include name="**/*Test*.class" />
           <exclude name="**/FulltextTester.class" />
