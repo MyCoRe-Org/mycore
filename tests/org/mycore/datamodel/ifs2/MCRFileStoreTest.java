@@ -165,9 +165,7 @@ public class MCRFileStoreTest extends MCRTestCase {
         assertTrue(col.getID() > 0);
         Date created = col.getLastModified();
         assertTrue(created.after(first));
-        synchronized (this) {
-            wait(1000);
-        }
+        bzzz();
         MCRFile build = new MCRFile(col, "build.xml");
         assertNotNull(build);
         Date modified = col.getLastModified();
@@ -179,9 +177,7 @@ public class MCRFileStoreTest extends MCRTestCase {
         build.setContent(new MCRContent(new Document(new Element("project"))));
         assertTrue(build.getSize() > 0);
         assertNotNull(build.getContent().getBytes());
-        synchronized (this) {
-            wait(1000);
-        }
+        bzzz();
         MCRDirectory dir = new MCRDirectory(col, "documentation");
         assertEquals(col.getNumChildren(), 2);
         assertTrue(modified.before(col.getLastModified()));

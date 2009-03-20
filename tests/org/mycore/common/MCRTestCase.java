@@ -58,4 +58,15 @@ public class MCRTestCase extends TestCase {
         return false;
     }
 
+    /**
+     * Waits 1,1 seconds and does nothing
+     */
+    protected void bzzz() {
+        synchronized (this) {
+            try {
+                wait(1100);
+            } catch (InterruptedException e) {
+            }
+        }
+    }
 }

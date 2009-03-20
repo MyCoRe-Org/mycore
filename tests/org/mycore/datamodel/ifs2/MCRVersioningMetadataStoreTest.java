@@ -151,6 +151,7 @@ public class MCRVersioningMetadataStoreTest extends MCRTestCase {
         assertEquals(mv.getUser(), MCRSessionMgr.getCurrentSession().getCurrentUserID());
         assertEquals(mv.getType(), MCRMetadataVersion.CREATED);
 
+        bzzz();
         Document xml2 = new Document(new Element("bango"));
         vm.update(new MCRContent(xml2));
         assertTrue(vm.getRevision() > baseRev);
@@ -164,6 +165,7 @@ public class MCRVersioningMetadataStoreTest extends MCRTestCase {
         assertEquals(mv.getRevision(), vm.getRevision());
         assertEquals(mv.getType(), MCRMetadataVersion.UPDATED);
 
+        bzzz();
         Document xml3 = new Document(new Element("bongo"));
         vm.update(new MCRContent(xml3));
 
@@ -188,6 +190,7 @@ public class MCRVersioningMetadataStoreTest extends MCRTestCase {
         assertNotNull(xml1);
         assertEquals("bongo", xml3.getRootElement().getName());
 
+        bzzz();
         versions.get(1).restore();
         assertTrue(vm.getRevision() > versions.get(2).getRevision());
         assertTrue(vm.getLastModified().after(versions.get(2).getDate()));
