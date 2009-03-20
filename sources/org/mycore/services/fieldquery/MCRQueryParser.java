@@ -42,6 +42,7 @@ import org.mycore.parsers.bool.MCRCondition;
 import org.mycore.parsers.bool.MCRNotCondition;
 import org.mycore.parsers.bool.MCROrCondition;
 import org.mycore.parsers.bool.MCRParseException;
+import org.mycore.parsers.bool.MCRSetCondition;
 
 /**
  * Parses query conditions for use in MCRSearcher.
@@ -135,26 +136,16 @@ public class MCRQueryParser extends MCRBooleanClauseParser {
           value = normalizeHistoryDate(oper,value);
         LOGGER.debug(value);
         if ("date".equals(datatype) && "TODAY".equals(value))
-        {
           value = getToday();
-        }
         return new MCRQueryCondition(def, oper, value);
     }
     
     private String getToday()  {
-       GregorianCalendar cal = null;
-       String today = "";
-       int year, month, day;
-
-       cal = new GregorianCalendar();
-
-       year = cal.get(Calendar.YEAR);
-       month = cal.get(Calendar.MONTH) + 1;
-       day = cal.get(Calendar.DAY_OF_MONTH);
-
-       today = String.valueOf(day) + "." + String.valueOf(month) + "." + String.valueOf(year);
-
-       return today;
+       GregorianCalendar cal = new GregorianCalendar();
+       int year = cal.get(Calendar.YEAR);
+       int month = cal.get(Calendar.MONTH) + 1;
+       int day = cal.get(Calendar.DAY_OF_MONTH);
+       return String.valueOf(day) + "." + String.valueOf(month) + "." + String.valueOf(year);
     }
 
     /** Pattern for MCRQueryConditions expressed as String */
@@ -206,62 +197,29 @@ public class MCRQueryParser extends MCRBooleanClauseParser {
      */
     static MCRCondition normalizeCondition(MCRCondition cond) {
         if (cond == null) return null;
-        else if (cond instanceof MCRAndCondition) {
-            MCRAndCondition ac = (MCRAndCondition) cond;
-            List children = ac.getChildren();
-            ac = new MCRAndCondition();  
-            for (int i = 0; (children != null) && (i < children.size()); i++)
+        else if (cond instanceof MCRSetCondition) {
+            MCRSetCondition sc = (MCRSetCondition) cond;
+            List<MCRCondition> children = sc.getChildren();
+            sc = ( sc instanceof MCRAndCondition ? new MCRAndCondition() : new MCROrCondition() );  
+            for (MCRCondition child : children )
             {    
-              MCRCondition child = normalizeCondition((MCRCondition) (children.get(i)));
+              child = normalizeCondition(child);
               if( child == null ) 
                 continue; // Remove empty child conditions
-              else if ( child instanceof MCRAndCondition )
+              else if ( (child instanceof MCRSetCondition) && sc.getOperator().equals( ((MCRSetCondition)child).getOperator() ) ) 
               {
-                // Replace (a AND (b AND c)) with (a AND b AND c)  
-                List grandchildren = ((MCRAndCondition)child).getChildren();
-                for (int j = 0; (grandchildren != null) && (j < grandchildren.size()); j++)
-                {
-                  MCRCondition grandchild = (MCRCondition)(grandchildren.get(j));
-                  ac.addChild(grandchild);  
-                }
+                // Replace (a AND (b AND c)) with (a AND b AND c), same for OR
+                sc.addAll(((MCRSetCondition)child).getChildren());
               }
-              else ac.addChild( child ); 
+              else sc.addChild( child ); 
             }
-            children = ac.getChildren();
-            if ((children == null) || (children.size() == 0))
+            children = sc.getChildren();
+            if (children.size() == 0)
               return null; // Completely remove empty AND condition
             else if( children.size() == 1 )
-              return (MCRCondition) (children.get(0)); // Replace AND with just one child
+              return children.get(0); // Replace AND with just one child
             else 
-              return ac;  
-        } else if (cond instanceof MCROrCondition) {
-            MCROrCondition oc = (MCROrCondition) cond;
-            List children = oc.getChildren();
-            oc = new MCROrCondition();  
-            for (int i = 0; (children != null) && (i < children.size()); i++)
-            {    
-              MCRCondition child = normalizeCondition((MCRCondition) (children.get(i)));
-              if( child == null ) 
-                continue; // Remove empty child conditions
-              else if ( child instanceof MCROrCondition )
-              {
-                // Replace (a OR (b OR c)) with (a OR b OR c)  
-                List grandchildren = ((MCROrCondition)child).getChildren();
-                for (int j = 0; (grandchildren != null) && (j < grandchildren.size()); j++)
-                {
-                  MCRCondition grandchild = (MCRCondition)(grandchildren.get(j));
-                  oc.addChild(grandchild);  
-                }
-              }
-              else oc.addChild( child ); 
-            }
-            children = oc.getChildren();
-            if ((children == null) || (children.size() == 0))
-              return null; // Remove empty OR
-            else if( children.size() == 1 )
-              return (MCRCondition) (children.get(0)); // Replace OR with just one child
-            else 
-              return oc;  
+              return sc;  
         } else if (cond instanceof MCRNotCondition) {
             MCRNotCondition nc = (MCRNotCondition) cond;
             MCRCondition child = normalizeCondition( nc.getChild() ); 

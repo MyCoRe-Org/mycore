@@ -24,9 +24,7 @@
 package org.mycore.services.fieldquery;
 
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -39,6 +37,7 @@ import org.mycore.parsers.bool.MCRCondition;
 import org.mycore.parsers.bool.MCRFalseCondition;
 import org.mycore.parsers.bool.MCRNotCondition;
 import org.mycore.parsers.bool.MCROrCondition;
+import org.mycore.parsers.bool.MCRSetCondition;
 import org.mycore.parsers.bool.MCRTrueCondition;
 
 /**
@@ -117,7 +116,7 @@ public class MCRQueryManager {
             return;
 
         // Iterator over all MCRHits that have no sort data set
-        Iterator hitIterator = new Iterator() {
+        Iterator<MCRHit> hitIterator = new Iterator<MCRHit>() {
             private int i = 0;
 
             private int max = results.getNumHits();
@@ -134,7 +133,7 @@ public class MCRQueryManager {
                 return false;
             }
 
-            public Object next() {
+            public MCRHit next() {
                 if (!hasNext())
                     throw new NoSuchElementException();
 
@@ -164,15 +163,11 @@ public class MCRQueryManager {
         else if (cond instanceof MCRNotCondition)
             return getIndex(((MCRNotCondition) cond).getChild());
 
-        List children = null;
-        if (cond instanceof MCRAndCondition)
-            children = ((MCRAndCondition) cond).getChildren();
-        else
-            children = ((MCROrCondition) cond).getChildren();
+        List<MCRCondition> children = ((MCRSetCondition) cond).getChildren();
 
-        String index = getIndex((MCRCondition) (children.get(0)));
+        String index = getIndex(children.get(0));
         for (int i = 1; i < children.size(); i++) {
-            String other = getIndex((MCRCondition) (children.get(i)));
+            String other = getIndex(children.get(i));
             if (!index.equals(other))
                 return mixed; // mixed indexes here!
         }
@@ -190,16 +185,16 @@ public class MCRQueryManager {
             // All fields are from same index, just one searcher
             MCRSearcher searcher = MCRSearcherFactory.getSearcherForIndex(index);
             return searcher.search(cond, maxResults, sortBy, addSortData);
-        } else if ((cond instanceof MCRAndCondition) || (cond instanceof MCROrCondition)) {
-            return buildCombinedResults(cond, sortBy, false);
+        } else if (cond instanceof MCRSetCondition) {
+            return buildCombinedResults((MCRSetCondition) cond, sortBy, false);
         } else { // Move not down: not(a and/or b)=(not a) and/or (not b)
             MCRCondition child = ((MCRNotCondition) cond).getChild();
-            return buildCombinedResults(child, sortBy, true);
+            return buildCombinedResults((MCRSetCondition) child, sortBy, true);
         }
     }
 
     /** Split query into subqueries for each index, recombine results */
-    private static MCRResults buildCombinedResults(MCRCondition cond, List<MCRSortBy> sortBy, boolean not) {
+    private static MCRResults buildCombinedResults(MCRSetCondition cond, List<MCRSortBy> sortBy, boolean not) {
         boolean and = (cond instanceof MCRAndCondition);
         HashMap<String, List<MCRCondition>> table = groupConditionsByIndex(cond);
         HashMap<String, MCRResults> results = new HashMap<String, MCRResults>();
@@ -211,26 +206,20 @@ public class MCRQueryManager {
         }
         if (and)
             return MCRResults.intersect(results.values().toArray(new MCRResults[0]));
-        return MCRResults.union(results.values().toArray(new MCRResults[0]));
+        else
+            return MCRResults.union(results.values().toArray(new MCRResults[0]));
     }
 
     /**
      * Build a table from index ID to a List of conditions referencing this
      * index
      */
-    private static HashMap<String, List<MCRCondition>> groupConditionsByIndex(MCRCondition cond) {
+    private static HashMap<String, List<MCRCondition>> groupConditionsByIndex(MCRSetCondition cond) {
         HashMap<String, List<MCRCondition>> table = new HashMap<String, List<MCRCondition>>();
-        List children = null;
+        List<MCRCondition> children = cond.getChildren();
 
-        if (cond instanceof MCRAndCondition)
-            children = ((MCRAndCondition) cond).getChildren();
-        else
-            children = ((MCROrCondition) cond).getChildren();
-
-        for (int i = 0; i < children.size(); i++) {
-            MCRCondition child = (MCRCondition) (children.get(i));
+        for (MCRCondition child : children) {
             String index = getIndex(child);
-
             List<MCRCondition> conditions = table.get(index);
             if (conditions == null) {
                 conditions = new ArrayList<MCRCondition>();
@@ -244,19 +233,12 @@ public class MCRQueryManager {
     /** Builds a new condition for all fields from one single index */
     private static MCRCondition buildSubCondition(List<MCRCondition> conditions, boolean and, boolean not) {
         MCRCondition subCond;
-        if (conditions.size() == 1) {
+        if (conditions.size() == 1)
             subCond = conditions.get(0);
-        } else if (and) {
-            MCRAndCondition andCond = new MCRAndCondition();
-            for (int i = 0; i < conditions.size(); i++)
-                andCond.addChild(conditions.get(i));
-            subCond = andCond;
-        } else { // or
-            MCROrCondition orCond = new MCROrCondition();
-            for (int i = 0; i < conditions.size(); i++)
-                orCond.addChild(conditions.get(i));
-            subCond = orCond;
-        }
+        else if (and)
+            subCond = new MCRAndCondition().addAll(conditions);
+        else
+            subCond = new MCROrCondition().addAll(conditions);
         if (not)
             subCond = new MCRNotCondition(subCond);
         return subCond;

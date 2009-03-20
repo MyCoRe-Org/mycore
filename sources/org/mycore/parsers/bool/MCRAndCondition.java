@@ -23,90 +23,23 @@
 
 package org.mycore.parsers.bool;
 
-import java.util.LinkedList;
-import java.util.List;
-
-import org.jdom.Attribute;
-import org.jdom.Element;
-
 /**
  * @author Frank Lützenkirchen
  */
-public class MCRAndCondition implements MCRCondition {
-    private List children;
+public class MCRAndCondition extends MCRSetCondition {
 
     public MCRAndCondition() {
-        this.children = new LinkedList();
+        super("and");
     }
 
     public MCRAndCondition(MCRCondition firstchild) {
-        this.children = new LinkedList();
+        this();
         addChild(firstchild);
     }
 
     public MCRAndCondition(MCRCondition firstchild, MCRCondition secondchild) {
-        this.children = new LinkedList();
+        this();
         addChild(firstchild);
         addChild(secondchild);
-    }
-
-    public void addChild(MCRCondition child) {
-        this.children.add(child);
-    }
-
-    public List getChildren() {
-        return children;
-    }
-
-    public String toString() {
-        StringBuffer sb = new StringBuffer();
-
-        for (int i = 0; i < children.size(); i++) {
-            sb.append("(").append(children.get(i)).append(")");
-
-            if (i < (children.size() - 1)) {
-                sb.append(" AND ");
-            }
-        }
-
-        return sb.toString();
-    }
-
-    public boolean evaluate(Object o) {
-        for (int i = 0; i < children.size(); i++) {
-            if (!((MCRCondition) children.get(i)).evaluate(o)) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    public Element toXML() {
-    	Element cond = new Element("boolean");
-    	cond.setAttribute("operator", "and");
-
-        for (int i = 0; i < children.size(); i++) {
-            MCRCondition child = (MCRCondition) (children.get(i));
-            cond.addContent(child.toXML());
-        }
-
-        return cond;
-    }
-
-    public Element info() {
-        Element el = new Element("info");
-        el.setAttribute(new Attribute("type", "and"));
-        el.setAttribute(new Attribute("children", "" + children.size()));
-
-        return el;
-    }
-
-    public void accept(MCRConditionVisitor visitor) {
-        visitor.visitType(info());
-
-        for (int i = 0; i < children.size(); i++) {
-            ((MCRCondition) children.get(i)).accept(visitor);
-        }
     }
 }
