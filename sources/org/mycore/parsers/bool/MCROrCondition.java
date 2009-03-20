@@ -42,4 +42,11 @@ public class MCROrCondition extends MCRSetCondition {
         addChild(firstchild);
         addChild(secondchild);
     }
+
+    public boolean evaluate(Object o) {
+        for (MCRCondition child : children)
+            if (child.evaluate(o))
+                return true;
+        return false;
+    }
 }

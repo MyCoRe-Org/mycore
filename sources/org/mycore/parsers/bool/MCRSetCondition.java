@@ -33,7 +33,7 @@ import org.jdom.Element;
 /**
  * @author Frank Lützenkirchen
  */
-public class MCRSetCondition implements MCRCondition {
+public abstract class MCRSetCondition implements MCRCondition {
 
     public final static String AND = "and";
 
@@ -75,13 +75,6 @@ public class MCRSetCondition implements MCRCondition {
         return sb.toString();
     }
 
-    public boolean evaluate(Object o) {
-        for (MCRCondition child : children)
-            if (!child.evaluate(o))
-                return false;
-        return true;
-    }
-
     public Element toXML() {
         Element cond = new Element("boolean").setAttribute("operator", operator);
         for (MCRCondition child : children)
@@ -101,4 +94,6 @@ public class MCRSetCondition implements MCRCondition {
         for (MCRCondition child : children)
             child.accept(visitor);
     }
+
+    public abstract boolean evaluate(Object o);
 }
