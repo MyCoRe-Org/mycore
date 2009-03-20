@@ -24,12 +24,10 @@
 // package
 package org.mycore.access;
 
-import java.util.Iterator;
-import java.util.List;
+import java.util.Collection;
 
 import org.apache.log4j.Logger;
 import org.jdom.Element;
-
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandlerBase;
@@ -175,7 +173,7 @@ public class MCRAccessEventHandler extends MCREventHandlerBase {
         long t1 = System.currentTimeMillis();
 
         // create
-        List li = AI.getPermissionsForID(base.getId().getId());
+        Collection<String> li = AI.getPermissionsForID(base.getId().getId());
         int aclsize = 0;
         if (li != null) {
             aclsize = li.size();
@@ -206,7 +204,7 @@ public class MCRAccessEventHandler extends MCREventHandlerBase {
         long t1 = System.currentTimeMillis();
 
         // update
-        List li = AI.getPermissionsForID(base.getId().getId());
+        Collection<String> li = AI.getPermissionsForID(base.getId().getId());
         int aclsize = 0;
         if (li != null) {
             aclsize = li.size();
@@ -256,10 +254,9 @@ public class MCRAccessEventHandler extends MCREventHandlerBase {
      * @param overwrite
      */
     private void setDefaultPermissions(String id, boolean overwrite) {
-        List savedPermissions = MCRAccessManager.getPermissionsForID(id);
-        List configuredPermissions = AI.getAccessPermissionsFromConfiguration();
-        for (Iterator it = configuredPermissions.iterator(); it.hasNext();) {
-            String permission = (String) it.next();
+        Collection<String> savedPermissions = MCRAccessManager.getPermissionsForID(id);
+        Collection<String> configuredPermissions = AI.getAccessPermissionsFromConfiguration();
+        for (String permission: configuredPermissions) {
             if (storedrules.indexOf(permission) != -1) {
                 if (savedPermissions != null && savedPermissions.contains(permission)) {
                     if (overwrite) {

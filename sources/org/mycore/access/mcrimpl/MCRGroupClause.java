@@ -48,7 +48,6 @@ class MCRGroupClause implements MCRCondition {
     }
 
     public boolean evaluate(Object o) {
-        MCRAccessData data = (MCRAccessData) o;
         return MCRUserFacade.isUserInGroup(group.getID()) ^ this.not;
     }
 

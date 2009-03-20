@@ -25,6 +25,7 @@ package org.mycore.access.mcrimpl;
 
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -90,16 +91,16 @@ public class MCRAccessControlSystem extends MCRAccessBaseImpl {
         ruleStore = MCRRuleStore.getInstance();
         accessComp = new MCRAccessConditionsComparator();
 
-        nextFreeRuleID = new HashMap();
+        nextFreeRuleID = new HashMap<String, Integer>();
 
         dummyRule = new MCRAccessRule(null, null, null, null, "dummy rule, always true");
     }
 
     private static MCRAccessControlSystem singleton;
 
-    private static Comparator accessComp;
+    private static Comparator<Element> accessComp;
 
-    private static HashMap nextFreeRuleID;
+    private static HashMap<String, Integer> nextFreeRuleID;
 
     // extended methods
     public static synchronized MCRAccessInterface instance() {
@@ -144,8 +145,7 @@ public class MCRAccessControlSystem extends MCRAccessBaseImpl {
     }
 
     public void removeAllRules(String id) throws MCRException {
-        for (Iterator it = accessStore.getPoolsForObject(id).iterator(); it.hasNext();) {
-            String pool = (String) it.next();
+        for (String pool: accessStore.getPoolsForObject(id)) {
             removeRule(id, pool);
         }
     }
@@ -245,12 +245,12 @@ public class MCRAccessControlSystem extends MCRAccessBaseImpl {
         return "";
     }
 
-    public List getPermissionsForID(String objid) {
-        ArrayList ret = accessStore.getPoolsForObject(objid);
+    public Collection<String> getPermissionsForID(String objid) {
+        Collection<String> ret = accessStore.getPoolsForObject(objid);
         return ret;
     }
 
-    public List getPermissions() {
+    public Collection<String> getPermissions() {
         return accessStore.getPoolsForObject(poolPrivilegeID);
     }
 
@@ -262,7 +262,7 @@ public class MCRAccessControlSystem extends MCRAccessBaseImpl {
         return hasRule(id, null);
     }
 
-    public List getAllControlledIDs() {
+    public Collection<String> getAllControlledIDs() {
         return accessStore.getDistinctStringIDs();
     }
 
@@ -334,7 +334,7 @@ public class MCRAccessControlSystem extends MCRAccessBaseImpl {
         int nextFreeID;
         String sNextFreeID;
         if (nextFreeRuleID.containsKey(prefix)) {
-            nextFreeID = ((Integer) nextFreeRuleID.get(prefix)).intValue();
+            nextFreeID = nextFreeRuleID.get(prefix).intValue();
         } else {
             nextFreeID = ruleStore.getNextFreeRuleID(prefix);
         }
@@ -379,10 +379,10 @@ public class MCRAccessControlSystem extends MCRAccessBaseImpl {
         String ruleString = getNormalizedRuleString(rule);
         String ruleID = ruleIDTable.get(ruleString);
         if ((ruleID == null) || (ruleID.length() == 0)) {
-            ArrayList existingIDs = ruleStore.retrieveRuleIDs(ruleString, description);
+            Collection<String> existingIDs = ruleStore.retrieveRuleIDs(ruleString, description);
             if (existingIDs != null && existingIDs.size() > 0) {
                 // rule yet exists
-                ruleID = (String) existingIDs.get(0);
+                ruleID = existingIDs.iterator().next();
             } else {
                 ruleID = getNextFreeRuleID(systemRulePrefix);
                 MCRAccessRule accessRule = new MCRAccessRule(ruleID, creator, new Date(), ruleString, description);
@@ -407,6 +407,7 @@ public class MCRAccessControlSystem extends MCRAccessBaseImpl {
      *            condition-JDOM of an access-rule
      * @return the normalized JDOM-Rule
      */
+    @SuppressWarnings("unchecked")
     public Element normalize(Element rule) {
         Element newRule = new Element(rule.getName());
         for (Iterator it = rule.getAttributes().iterator(); it.hasNext();) {
@@ -416,14 +417,14 @@ public class MCRAccessControlSystem extends MCRAccessBaseImpl {
         List children = rule.getChildren();
         if (children == null || children.size() == 0)
             return newRule;
-        List newList = new ArrayList();
+        List<Element> newList = new ArrayList<Element>();
         for (Iterator it = children.iterator(); it.hasNext();) {
             Element el = (Element) it.next();
-            newList.add(el.clone());
+            newList.add((Element) el.clone());
         }
         Collections.sort(newList, accessComp);
-        for (Iterator it = newList.iterator(); it.hasNext();) {
-            Element el = (Element) it.next();
+        for (Iterator<Element> it = newList.iterator(); it.hasNext();) {
+            Element el = it.next();
             newRule.addContent(normalize(el));
         }
         return newRule;
@@ -434,11 +435,9 @@ public class MCRAccessControlSystem extends MCRAccessBaseImpl {
      * conditions
      * 
      */
-    private class MCRAccessConditionsComparator implements Comparator {
+    private class MCRAccessConditionsComparator implements Comparator<Element> {
 
-        public int compare(Object arg0, Object arg1) {
-            Element el0 = (Element) arg0;
-            Element el1 = (Element) arg1;
+        public int compare(Element el0, Element el1) {
             String nameEl0 = el0.getName().toLowerCase();
             String nameEl1 = el1.getName().toLowerCase();
             int nameCompare = nameEl0.compareTo(nameEl1);

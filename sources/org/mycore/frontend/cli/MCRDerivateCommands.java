@@ -17,6 +17,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -466,10 +467,10 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
             obj.getDerivate().getInternals().setSourcePath(nid.toString());
             LOGGER.info("New Internal Path ====>" + nid.toString());
             // add ACL's
-            List l = ACCESS_IMPL.getPermissionsForID(nid.toString());
-            for (int i = 0; i < l.size(); i++) {
-                Element rule = ACCESS_IMPL.getRule(nid.toString(), (String) l.get(i));
-                obj.getService().addRule((String) l.get(i), rule);
+            Collection<String> l = ACCESS_IMPL.getPermissionsForID(nid.toString());
+            for (String permission : l) {
+                Element rule = ACCESS_IMPL.getRule(nid.toString(), permission);
+                obj.getService().addRule(permission, rule);
             }
             // build JDOM
             xml = obj.createXML();

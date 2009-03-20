@@ -9,6 +9,7 @@
 
 package org.mycore.services.fieldquery;
 
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
@@ -85,12 +86,12 @@ public abstract class MCRSearcher extends MCREventHandlerBase implements MCREven
         if (returnID != null)
             return returnID;
 
-        List list = MCRLinkTableManager.instance().getSourceOf(ownerID, MCRLinkTableManager.ENTRY_TYPE_DERIVATE);
-        if ((list == null) || (list.size() == 0))
+        Collection<String> list = MCRLinkTableManager.instance().getSourceOf(ownerID, MCRLinkTableManager.ENTRY_TYPE_DERIVATE);
+        if ((list == null) || (list.isEmpty()))
             return file.getID();
 
         // Return ID of MCRObject this MCRFile belongs to
-        returnID = (String) (list.get(0));
+        returnID = list.iterator().next();
         RETURN_ID_CACHE.put(ownerID, returnID);
         return returnID;
     }

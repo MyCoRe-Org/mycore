@@ -31,7 +31,7 @@ import java.util.HashMap;
 public class MCRAccessDefinition {
     
     private String objid;
-    private HashMap pools = new HashMap();
+    private HashMap<String, String> pools = new HashMap<String, String>();
     
     public MCRAccessDefinition(){
         pools.clear();
@@ -45,11 +45,11 @@ public class MCRAccessDefinition {
         objid = value;
     }
     
-    public HashMap getPool(){
+    public HashMap<String, String> getPool(){
         return pools;
     }
     
-    public void setPool(HashMap pool){
+    public void setPool(HashMap<String, String> pool){
         pools = pool;
     }
     

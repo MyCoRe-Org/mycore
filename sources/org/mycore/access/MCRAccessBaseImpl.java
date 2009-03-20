@@ -23,13 +23,12 @@
 
 package org.mycore.access;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
+import java.util.Collection;
+import java.util.Collections;
 
 import org.apache.log4j.Logger;
 import org.jdom.Element;
-
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 import org.mycore.user.MCRUser;
@@ -230,9 +229,8 @@ public class MCRAccessBaseImpl implements MCRAccessInterface {
      * 
      * @see org.mycore.access.MCRAccessInterface#getPermissionsForID(java.lang.String)
      */
-    public List getPermissionsForID(String objid) {
-        ArrayList ret = new ArrayList();
-        return ret;
+    public Collection<String> getPermissionsForID(String objid) {
+        return Collections.emptySet();
     }
     
     /*
@@ -240,9 +238,8 @@ public class MCRAccessBaseImpl implements MCRAccessInterface {
      * 
      * @see org.mycore.access.MCRAccessInterface#getPermissions()
      */
-    public List getPermissions() {
-        ArrayList ret = new ArrayList();
-        return ret;
+    public Collection<String> getPermissions() {
+        return Collections.emptySet();
     }    
 
     /**
@@ -278,7 +275,7 @@ public class MCRAccessBaseImpl implements MCRAccessInterface {
      * 
      * @return the permissions as List
      */
-    public List getAccessPermissionsFromConfiguration(){
+    public Collection<String> getAccessPermissionsFromConfiguration(){
     	String[] permissions = AccessPermissions.split(",");
     	return Arrays.asList(permissions);
     }
@@ -288,7 +285,7 @@ public class MCRAccessBaseImpl implements MCRAccessInterface {
      * 
      * @see org.mycore.access.MCRAccessInterface#getAllControlledIDs()
      */
-    public List getAllControlledIDs() {
+    public Collection<String> getAllControlledIDs() {
         return null;
     }
 

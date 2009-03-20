@@ -22,10 +22,9 @@
  */
 package org.mycore.access;
 
-import java.util.List;
+import java.util.Collection;
 
 import org.jdom.Element;
-
 import org.mycore.common.MCRException;
 import org.mycore.user.MCRUser;
 
@@ -323,14 +322,14 @@ public interface MCRAccessInterface {
      * @return a <code>List</code> of all for <code>id</code> defined
      *         permission
      */
-    public List getPermissionsForID(String id);
+    public Collection<String> getPermissionsForID(String id);
     
     /**
      * lists all a-priori permissions like "create-document".
      * 
      * @return a <code>List</code> of all defined permissions
      */
-    public List getPermissions();  
+    public Collection<String> getPermissions();  
     
     /**
      * list all object-related Access Permissions that are defined 
@@ -338,7 +337,7 @@ public interface MCRAccessInterface {
      * 
      * @return a List of permissiond from the configuration
      */
-    public List getAccessPermissionsFromConfiguration();  
+    public Collection<String> getAccessPermissionsFromConfiguration();  
     
     /**
      * lists all String IDs, a permission is assigned to.
@@ -348,7 +347,7 @@ public interface MCRAccessInterface {
      * 
      * @return a sorted and distinct <code>List</code> of all  <code>String</code> IDs
      */
-    public List getAllControlledIDs();    
+    public Collection<String> getAllControlledIDs();    
 
     /**
      * checks wether a rule with the <code>id</code> and

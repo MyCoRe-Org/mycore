@@ -22,18 +22,16 @@
  */
 package org.mycore.access;
 
-import java.util.List;
+import java.util.Collection;
 
 import org.apache.log4j.Logger;
 import org.jdom.Element;
-
 import org.mycore.access.strategies.MCRAccessCheckStrategy;
 import org.mycore.access.strategies.MCRObjectIDStrategy;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 import org.mycore.datamodel.common.MCRLinkTableManager;
 import org.mycore.datamodel.metadata.MCRObjectID;
-
 
 /**
  * 
@@ -186,9 +184,9 @@ public class MCRAccessManager {
      * @see MCRAccessInterface#checkPermission(String, String)
      */
     public static boolean checkPermission(MCRObjectID id, String permission) {
-        return checkPermission(id.getId(),permission);
+        return checkPermission(id.getId(), permission);
     }
-    
+
     /**
      * determines whether the current user has the permission to perform a
      * certain action.
@@ -200,8 +198,8 @@ public class MCRAccessManager {
      * @return true if the permission for the id is given
      */
     public static boolean checkPermission(String id, String permission) {
-      return ACCESS_STRATEGY.checkPermission(id, permission);   
-  }
+        return ACCESS_STRATEGY.checkPermission(id, permission);
+    }
 
     /**
      * determines whether the current user has the permission to perform a
@@ -212,8 +210,8 @@ public class MCRAccessManager {
      * @return true if the permission exist
      */
     public static boolean checkPermission(String permission) {
-      return getAccessImpl().checkPermission(permission);   
-  }
+        return getAccessImpl().checkPermission(permission);
+    }
 
     /**
      * checks whether the current user has the permission to read/see a derivate
@@ -224,19 +222,19 @@ public class MCRAccessManager {
      *        String ID of a MyCoRe-Derivate
      * @return true if the access is allowed otherwise it return false
      */
-    public static boolean checkPermissionForReadingDerivate(String derID){
-    	// derID must be a derivate ID
-    	boolean accessAllowed = false;
-    	List l = MCRLinkTableManager.instance().getSourceOf(derID,"derivate");
-		if(l != null && l.size() > 0) {
-			accessAllowed = checkPermission((String)l.get(0),"read") && checkPermission(derID,"read");
-		}else {
-			accessAllowed = checkPermission(derID,"read");
-			Logger.getLogger("MCRAccessManager.class").warn("no mcrobject could be found for derivate: " + derID);
-		}
-		return accessAllowed;
+    public static boolean checkPermissionForReadingDerivate(String derID) {
+        // derID must be a derivate ID
+        boolean accessAllowed = false;
+        Collection<String> l = MCRLinkTableManager.instance().getSourceOf(derID, "derivate");
+        if (l != null && !l.isEmpty()) {
+            accessAllowed = checkPermission(l.iterator().next(), "read") && checkPermission(derID, "read");
+        } else {
+            accessAllowed = checkPermission(derID, "read");
+            Logger.getLogger("MCRAccessManager.class").warn("no mcrobject could be found for derivate: " + derID);
+        }
+        return accessAllowed;
     }
-    
+
     /**
      * lists all permissions defined for the <code>id</code>.
      * 
@@ -244,11 +242,11 @@ public class MCRAccessManager {
      *           the ID of the object as String
      * @return a <code>List</code> of all for <code>id</code> defined
      *         permissions
-     */ 
-    public static List getPermissionsForID(String id) {
+     */
+    public static Collection<String> getPermissionsForID(String id) {
         return getAccessImpl().getPermissionsForID(id);
-    } 
-    
+    }
+
     /**
      * lists all permissions defined for the <code>id</code>.
      * 
@@ -256,39 +254,39 @@ public class MCRAccessManager {
      *           the MCRObjectID of the object
      * @return a <code>List</code> of all for <code>id</code> defined
      *         permissions
-     */ 
-    public static List getPermissionsForID(MCRObjectID id) {
+     */
+    public static Collection<String> getPermissionsForID(MCRObjectID id) {
         return getAccessImpl().getPermissionsForID(id.getId());
-    } 
-    
+    }
+
     /**
      * return a rule, that allows something for everybody
      * 
      * @return a rule, that allows something for everybody
      */
-    public static Element getTrueRule(){
-    	Element condition = new Element("condition");
-    	condition.setAttribute("format","xml");
-    	Element booleanOp = new Element("boolean");
-    	booleanOp.setAttribute("operator", "true");
-    	condition.addContent(booleanOp);
-    	return condition;
+    public static Element getTrueRule() {
+        Element condition = new Element("condition");
+        condition.setAttribute("format", "xml");
+        Element booleanOp = new Element("boolean");
+        booleanOp.setAttribute("operator", "true");
+        condition.addContent(booleanOp);
+        return condition;
     }
-    
+
     /**
      * return a rule, that forbids something for all, but superuser
      * 
      * @return a rule, that forbids something for all, but superuser
      */
-    public static Element getFalseRule(){
-    	Element condition = new Element("condition");
-    	condition.setAttribute("format","xml");
-    	Element booleanOp = new Element("boolean");
-    	booleanOp.setAttribute("operator", "false");
-    	condition.addContent(booleanOp);
-    	return condition;
+    public static Element getFalseRule() {
+        Element condition = new Element("condition");
+        condition.setAttribute("format", "xml");
+        Element booleanOp = new Element("boolean");
+        booleanOp.setAttribute("operator", "false");
+        condition.addContent(booleanOp);
+        return condition;
     }
-    
+
     /**
      * return true if a rule for the id exist
      * 
@@ -297,7 +295,7 @@ public class MCRAccessManager {
      * @param permission
      *            the access permission for the rule
      */
-    public static boolean hasRule(String id, String permission){
+    public static boolean hasRule(String id, String permission) {
         return getPermissionsForID(id).contains(permission);
     }
 

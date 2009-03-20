@@ -24,12 +24,11 @@
 package org.mycore.frontend.fileupload;
 
 import java.io.InputStream;
-import java.util.List;
+import java.util.Collection;
 import java.util.StringTokenizer;
 
 import org.apache.log4j.Logger;
 import org.hibernate.Transaction;
-
 import org.mycore.access.MCRAccessInterface;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.backend.hibernate.MCRHIBConnection;
@@ -256,11 +255,10 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
         return "";
     }
 
-    @SuppressWarnings("unchecked")
     protected static void setDefaultPermissions(MCRObjectID derID) {
         if (CONFIG.getBoolean("MCR.Access.AddDerivateDefaultRule", true)) {
             MCRAccessInterface AI = MCRAccessManager.getAccessImpl();
-            List<String> configuredPermissions = AI.getAccessPermissionsFromConfiguration();
+            Collection<String> configuredPermissions = AI.getAccessPermissionsFromConfiguration();
             for (String permission : configuredPermissions) {
                 MCRAccessManager.addRule(derID, permission, MCRAccessManager.getTrueRule(), "default derivate rule");
             }

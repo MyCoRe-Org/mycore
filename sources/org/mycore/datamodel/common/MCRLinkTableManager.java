@@ -23,12 +23,12 @@
 
 package org.mycore.datamodel.common;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 import org.mycore.datamodel.metadata.MCRObjectID;
@@ -308,7 +308,7 @@ public class MCRLinkTableManager {
      * 
      * @return a Map with key=categID and value=counted number of references
      */
-    public Map countReferenceCategory(String classid) {
+    public Map<String, Number> countReferenceCategory(String classid) {
         return persistenceclass.getCountedMapOfMCRTO(classid);
     }
 
@@ -333,7 +333,7 @@ public class MCRLinkTableManager {
      *            The MCRObjectID to referenced.
      * @return List of Strings (Source-IDs)
      */
-    public List getSourceOf(MCRObjectID to) {
+    public Collection<String> getSourceOf(MCRObjectID to) {
         return getSourceOf(to.getId());
     }
 
@@ -344,17 +344,17 @@ public class MCRLinkTableManager {
      *            The ID to referenced.
      * @return List of Strings (Source-IDs)
      */
-    public List getSourceOf(String to) {
+    public Collection<String> getSourceOf(String to) {
         if ((to == null) || (to.length() == 0)) {
             logger.warn("The to value of a reference link is false, the link was not found in the link table");
-            return new LinkedList();
+            return Collections.emptyList();
         }
 
         try {
             return persistenceclass.getSourcesOf(to, null);
         } catch (Exception e) {
             logger.warn("An error occured while searching for references to " + to + ".");
-            return new LinkedList();
+            return Collections.emptyList();
         }
     }
 
@@ -368,7 +368,7 @@ public class MCRLinkTableManager {
      *            link reference type
      * @return List of Strings (Source-IDs)
      */
-    public List getSourceOf(MCRObjectID to, String type) {
+    public Collection<String> getSourceOf(MCRObjectID to, String type) {
         return getSourceOf(to.getId(), type);
     }
 
@@ -382,14 +382,14 @@ public class MCRLinkTableManager {
      *            link reference type
      * @return List of Strings (Source-IDs)
      */
-    public List getSourceOf(String to, String type) {
+    public Collection<String> getSourceOf(String to, String type) {
         if ((to == null) || (to.length() == 0)) {
             logger.warn("The to value of a reference link is false, the link was not found in the link table");
-            return new LinkedList();
+            return Collections.emptyList();
         }
         if ((type == null) || (type.length() == 0)) {
             logger.warn("The type value of a reference link is false, the link was not found in the link table");
-            return new LinkedList();
+            return Collections.emptyList();
         }
         checkType(type);
 
@@ -397,7 +397,7 @@ public class MCRLinkTableManager {
             return persistenceclass.getSourcesOf(to, type);
         } catch (Exception e) {
             logger.warn("An error occured while searching for references to " + to + " with " + type + ".");
-            return new LinkedList();
+            return Collections.emptyList();
         }
     }
 
@@ -411,15 +411,15 @@ public class MCRLinkTableManager {
      *            type of the refernce
      * @return a list of ID's
      */
-    public List getSourceOf(String[] to, String type) {
+    public Collection<String> getSourceOf(String[] to, String type) {
         if ((to == null) || (to.length == 0)) {
             logger.warn("The to value of a reference link is false, the link was not found in the link table");
-            return new LinkedList();
+            return Collections.emptyList();
         }
-        LinkedList ll = new LinkedList();
+        LinkedList<String> ll = new LinkedList<String>();
         try {
-            for (int i = 0; i < to.length; i++) {
-                ll.add(persistenceclass.getSourcesOf(to[i], type));
+            for (String singleTo : to) {
+                ll.addAll(persistenceclass.getSourcesOf(singleTo, type));
             }
             return ll;
         } catch (Exception e) {
@@ -438,7 +438,7 @@ public class MCRLinkTableManager {
      *            link reference type
      * @return List of Strings (Source-IDs)
      */
-    public List getDestinationOf(MCRObjectID from, String type) {
+    public Collection<String> getDestinationOf(MCRObjectID from, String type) {
         return getDestinationOf(from.getId(), type);
     }
 
@@ -453,14 +453,14 @@ public class MCRLinkTableManager {
      *            classid, child, parent, reference and derivate.
      * @return List of Strings (Destination-IDs)
      */
-    public List getDestinationOf(String from, String type) {
+    public Collection<String> getDestinationOf(String from, String type) {
         if ((from == null) || (from.length() == 0)) {
             logger.warn("The to value of a reference link is false, the link was not found in the link table");
-            return new LinkedList();
+            return Collections.emptyList();
         }
         if ((type == null) || (type.length() == 0)) {
             logger.warn("The type value of a reference link is false, the link was not found in the link table");
-            return new LinkedList();
+            return Collections.emptyList();
         }
         checkType(type);
 
@@ -468,7 +468,7 @@ public class MCRLinkTableManager {
             return persistenceclass.getDestinationsOf(from, type);
         } catch (Exception e) {
             logger.warn("An error occured while searching for references from " + from + ".");
-            return new LinkedList();
+            return Collections.emptyList();
         }
     }
 

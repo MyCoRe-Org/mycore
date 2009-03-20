@@ -103,10 +103,11 @@ public class MCRHIBAccessStore extends MCRAccessStore {
      * @param objid
      * @return boolean value
      */
+    @SuppressWarnings("unchecked")
     private boolean existAccessDefinition(String pool, String objid) {
         Session session = MCRHIBConnection.instance().getSession();
         MCRACCESSPK key = new MCRACCESSPK(pool, objid);
-        List l = session.createCriteria(MCRACCESS.class).add(Restrictions.eq("key", key)).list();
+        List<MCRACCESS> l = session.createCriteria(MCRACCESS.class).add(Restrictions.eq("key", key)).list();
         if (l.size() == 1) {
             return true;
         }
@@ -190,12 +191,13 @@ public class MCRHIBAccessStore extends MCRAccessStore {
         return rulemapping;
     }
 
-    public ArrayList getMappedObjectId(String pool) {
+    @SuppressWarnings("unchecked")
+    public ArrayList<String> getMappedObjectId(String pool) {
 
         Session session = MCRHIBConnection.instance().getSession();
         ArrayList<String> ret = new ArrayList<String>();
 
-        List l = session.createQuery("from MCRACCESS where ACPOOL = '" + pool + "'").list();
+        List<MCRACCESS> l = session.createQuery("from MCRACCESS where ACPOOL = '" + pool + "'").list();
         for (int i = 0; i < l.size(); i++) {
             ret.add(((MCRACCESS) l.get(i)).getKey().getObjid());
         }
@@ -203,11 +205,12 @@ public class MCRHIBAccessStore extends MCRAccessStore {
         return ret;
     }
 
-    public ArrayList getPoolsForObject(String objid) {
+    @SuppressWarnings("unchecked")
+    public ArrayList<String> getPoolsForObject(String objid) {
 
         Session session = MCRHIBConnection.instance().getSession();
         ArrayList<String> ret = new ArrayList<String>();
-        List l = session.createQuery("from MCRACCESS where OBJID = '" + objid + "'").list();
+        List<MCRACCESS> l = session.createQuery("from MCRACCESS where OBJID = '" + objid + "'").list();
         for (int i = 0; i < l.size(); i++) {
             MCRACCESS access = (MCRACCESS) l.get(i);
             ret.add(access.getKey().getAcpool());
@@ -216,11 +219,12 @@ public class MCRHIBAccessStore extends MCRAccessStore {
         return ret;
     }
 
-    public ArrayList getDatabasePools() {
+    @SuppressWarnings("unchecked")
+    public ArrayList<String> getDatabasePools() {
 
         ArrayList<String> ret = new ArrayList<String>();
         Session session = MCRHIBConnection.instance().getSession();
-        List l = session.createCriteria(MCRACCESS.class).list();
+        List<MCRACCESS> l = session.createCriteria(MCRACCESS.class).list();
         for (int i = 0; i < l.size(); i++) {
             if (!ret.contains(((MCRACCESS) l.get(i)).getKey().getAcpool())) {
                 ret.add(((MCRACCESS) l.get(i)).getKey().getAcpool());
@@ -229,8 +233,9 @@ public class MCRHIBAccessStore extends MCRAccessStore {
         return ret;
     }
 
+    @SuppressWarnings("unchecked")
     public List getDistinctStringIDs() {
-        List ret = new ArrayList();
+        List<String> ret;
         Session session = MCRHIBConnection.instance().getSession();
         String query = "select distinct(key.objid) from MCRACCESS order by OBJID";
         ret = session.createQuery(query).list();

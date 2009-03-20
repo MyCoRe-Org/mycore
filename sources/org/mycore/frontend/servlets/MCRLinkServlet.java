@@ -24,8 +24,8 @@
 package org.mycore.frontend.servlets;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
+import java.util.Collections;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -102,15 +102,15 @@ public class MCRLinkServlet extends MCRServlet {
 
             if (host.equals(MCRHit.LOCAL)) {
                 MCRResults results = new MCRResults();
-                List links = new ArrayList();
+                Collection<String> links = Collections.emptyList();
                 // Look for links
                 if ((from != null) && (from.length() != 0)) {
                     links = LM.getDestinationOf(from, type);
                 } else {
                     links = LM.getSourceOf(to, type);
                 }
-                for (int i = 0; i < links.size(); i++) {
-                    MCRHit hit = new MCRHit((String) links.get(i));
+                for (String link : links) {
+                    MCRHit hit = new MCRHit(link);
                     results.addHit(hit);
                 }
                 // build XML
@@ -121,7 +121,8 @@ public class MCRLinkServlet extends MCRServlet {
                 LOGGER.warn("Remote host access is not supported, use the WebService access!");
             }
         } catch (MCRException e) {
-            generateErrorPage(job.getRequest(), job.getResponse(), HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error while retrieving link for ID: " + from + " - " + to + " - " + type, e, false);
+            generateErrorPage(job.getRequest(), job.getResponse(), HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error while retrieving link for ID: " + from
+                    + " - " + to + " - " + type, e, false);
             return;
         }
     }

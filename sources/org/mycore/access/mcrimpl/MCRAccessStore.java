@@ -23,10 +23,11 @@
 
 package org.mycore.access.mcrimpl;
 
-import java.util.ArrayList;
-import java.util.Hashtable;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.mycore.common.MCRConfiguration;
@@ -54,23 +55,23 @@ public abstract class MCRAccessStore {
     public abstract void updateAccessDefinition(MCRRuleMapping accessdata);
 
     public abstract MCRRuleMapping getAccessDefinition(String pool, String objid);
-    
-    public abstract ArrayList getMappedObjectId(String pool); // ArrayList with ObjID's as String
-    
-    public abstract ArrayList getPoolsForObject(String objid); // ArrayList with pools as String
-   
-    public abstract ArrayList getDatabasePools();
-    
-    public abstract boolean existsRule(String objid, String pool) ;
-    
+
+    public abstract Collection<String> getMappedObjectId(String pool); // ArrayList with ObjID's as String
+
+    public abstract Collection<String> getPoolsForObject(String objid); // ArrayList with pools as String
+
+    public abstract Collection<String> getDatabasePools();
+
+    public abstract boolean existsRule(String objid, String pool);
+
     /**
      * 
-     * @return a list of all String IDs an access rule is assigned to
+     * @return a collection of all String IDs an access rule is assigned to
      */
-    public abstract List getDistinctStringIDs() ;    
-    
+    public abstract Collection<String> getDistinctStringIDs();
+
     public static Logger logger = Logger.getLogger(MCRAccessStore.class.getName());
-    
+
     final protected static String sqlDateformat = "yyyy-MM-dd HH:mm:ss";
 
     final protected static String SQLAccessCtrlRule = MCRConfiguration.instance().getString("MCR.Persistence.Access.Store.Table.Rule", "MCRACCESSRULE");
@@ -84,7 +85,8 @@ public abstract class MCRAccessStore {
     public static MCRAccessStore getInstance() {
         try {
             if (implementation == null) {
-                implementation = (MCRAccessStore) MCRConfiguration.instance().getSingleInstanceOf("MCR.Persistence.Access.Store.Class", "org.mycore.backend.hibernate.MCRHIBAccessStore");
+                implementation = (MCRAccessStore) MCRConfiguration.instance().getSingleInstanceOf("MCR.Persistence.Access.Store.Class",
+                        "org.mycore.backend.hibernate.MCRHIBAccessStore");
             }
         } catch (Exception e) {
             logger.error(e);
@@ -92,22 +94,12 @@ public abstract class MCRAccessStore {
 
         return implementation;
     }
-    
-    public static List getPools(){
-        try{
-            List ret = new LinkedList();
-            String[] pool = AccessPools.split(",");
-            
-            for (int i=0; i<pool.length; i++){
-                ret.add(pool[i]);
-            }
-            return ret;
-        }catch(Exception e){
-            logger.error(e);
-            return null;
-        }
+
+    public static Collection<String> getPools() {
+        String[] pool = AccessPools.split(",");
+        return Arrays.asList(pool);
     }
-   
+
     /**
      * alle Elemente eines Datentypes aufbereiten
      * @param type document type
@@ -115,68 +107,69 @@ public abstract class MCRAccessStore {
      * @return List of MCRAccessDefinition
      * @see MCRAccessDefinition
      */
-    public List getDefinition(String type) {
-        try{
-            Hashtable sqlDefinition = new Hashtable();
-            List pools = MCRAccessStore.getInstance().getDatabasePools();
+    public Collection<MCRAccessDefinition> getDefinition(String type) {
+        try {
+            HashMap<String, Collection<String>> sqlDefinition = new HashMap<String, Collection<String>>();
+            Collection<String> pools = MCRAccessStore.getInstance().getDatabasePools();
             //merge pools
             pools.removeAll(getPools());
             pools.addAll(getPools());
 
-            for(int i=0; i<pools.size(); i++){
-                sqlDefinition.put(pools.get(i),MCRAccessStore.getInstance().getMappedObjectId((String)pools.get(i)));
+            for (String pool : pools) {
+                sqlDefinition.put(pool, MCRAccessStore.getInstance().getMappedObjectId(pool));
             }
-               
-            List ret = new LinkedList();
-            List elements = new LinkedList();
+
+            Collection<MCRAccessDefinition> ret = new LinkedList<MCRAccessDefinition>();
+            Collection<String> elements;
             MCRAccessDefinition def = null;
-            
-            if (MCRConfiguration.instance().getBoolean("MCR.Metadata.Type." + type)){
+
+            if (MCRConfiguration.instance().getBoolean("MCR.Metadata.Type." + type)) {
                 elements = MCRXMLTableManager.instance().retrieveAllIDs(type);
-            }
-            
-            for (int i=0; i<elements.size(); i++){
-                def =  new MCRAccessDefinition();
-                def.setObjID((String)elements.get(i));
-                for(int j=0; j<pools.size(); j++){
-                    List l = (List) sqlDefinition.get(pools.get(j));
-                    if (l.contains(elements.get(i))){
-                        def.addPool((String)pools.get(j),"X");
-                    }else{
-                        def.addPool((String)pools.get(j)," ");
+            } else
+                return Collections.emptySet();
+
+            for (String element : elements) {
+                def = new MCRAccessDefinition();
+                def.setObjID(element);
+                for (String pool : pools) {
+                    Collection<String> l = sqlDefinition.get(pool);
+                    if (l.contains(element)) {
+                        def.addPool(pool, "X");
+                    } else {
+                        def.addPool(pool, " ");
                     }
                 }
                 ret.add(def);
             }
             return ret;
-        }catch(Exception e){
+        } catch (Exception e) {
             logger.error("definition loading failed: ", e);
             return null;
         }
     }
-    
-    public List getRules(String objid){
-        try{
-            List pools = MCRAccessStore.getInstance().getDatabasePools();
+
+    public Collection<MCRAccessDefinition> getRules(String objid) {
+        try {
+            Collection<String> pools = MCRAccessStore.getInstance().getDatabasePools();
             //merge pools
             pools.removeAll(getPools());
             pools.addAll(getPools());
 
-            List ret = new LinkedList();
+            Collection<MCRAccessDefinition> ret = new LinkedList<MCRAccessDefinition>();
             //List elements = new LinkedList();
             MCRAccessDefinition def = new MCRAccessDefinition();
             def.setObjID(objid);
-            for(int j=0; j<pools.size(); j++){
-                String rule = getRuleID(objid, (String)pools.get(j));
-                if (rule!=null){
-                    def.addPool((String)pools.get(j),rule);
-                }else{
-                    def.addPool((String)pools.get(j)," ");
+            for (String pool : pools) {
+                String rule = getRuleID(objid, pool);
+                if (rule != null) {
+                    def.addPool(pool, rule);
+                } else {
+                    def.addPool(pool, " ");
                 }
             }
             ret.add(def);
             return ret;
-        }catch(Exception e){
+        } catch (Exception e) {
             logger.error("definition loading failed: ");
             return null;
         }

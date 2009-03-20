@@ -31,6 +31,7 @@ import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -503,8 +504,8 @@ public class MCREditorOutValidator {
 
             }
         }
-        List li = AI.getPermissionsForID(id.getId());
-        if ((li != null) && (li.size() > 0)) {
+        Collection<String> li = AI.getPermissionsForID(id.getId());
+        if ((li != null) && !li.isEmpty()) {
             hasacls = true;
         }
         if (!hasacls)

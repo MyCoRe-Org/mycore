@@ -31,6 +31,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
@@ -563,8 +564,7 @@ public class MCRStartEditorServlet extends MCRServlet {
             String appl = CONFIG.getString("MCR.SWF.Mail.ApplicationID", "DocPortal");
             String subject = "Automaticaly message from " + appl;
             StringBuffer text = new StringBuffer();
-            text.append("The object with type ").append(cd.mytype).append(" with ID ").append(cd.mytfmcrid).append(
-                    " was removed from server.");
+            text.append("The object with type ").append(cd.mytype).append(" with ID ").append(cd.mytfmcrid).append(" was removed from server.");
             LOGGER.info(text.toString());
 
             try {
@@ -585,7 +585,6 @@ public class MCRStartEditorServlet extends MCRServlet {
      * @param job
      *            the MCRServletJob instance
      */
-    @SuppressWarnings("unchecked")
     public void seditacl(MCRServletJob job, CommonData cd) throws IOException {
         if (!MCRAccessManager.checkPermission(cd.mysemcrid, "writedb")) {
             job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + usererrorpage));
@@ -598,11 +597,11 @@ public class MCRStartEditorServlet extends MCRServlet {
 
         // read object
         MCRObjectService service = new MCRObjectService();
-        List<String> permlist = AI.getPermissionsForID(cd.mysemcrid.getId());
-        for (int i = 0; i < permlist.size(); i++) {
-            org.jdom.Element ruleelm = AI.getRule(cd.mysemcrid.getId(), (String) permlist.get(i));
+        Collection<String> permlist = AI.getPermissionsForID(cd.mysemcrid.getId());
+        for (String permission : permlist) {
+            org.jdom.Element ruleelm = AI.getRule(cd.mysemcrid.getId(), permission);
             ruleelm = normalizeACLforSWF(ruleelm);
-            service.addRule((String) permlist.get(i), ruleelm);
+            service.addRule(permission, ruleelm);
         }
         org.jdom.Element serviceelm = service.createXML();
         if (LOGGER.isDebugEnabled()) {
@@ -858,8 +857,7 @@ public class MCRStartEditorServlet extends MCRServlet {
         StringBuffer sb = new StringBuffer(pagedir);
         sb.append("editor_").append(cd.myremcrid.getTypeId()).append("_editor.xml");
 
-        String fuhid = new MCRSWFUploadHandlerMyCoRe(cd.myremcrid.getId(), cd.mysemcrid.getId(), "new", getBaseURL() + sb.toString())
-                .getID();
+        String fuhid = new MCRSWFUploadHandlerMyCoRe(cd.myremcrid.getId(), cd.mysemcrid.getId(), "new", getBaseURL() + sb.toString()).getID();
         cd.myfile = pagedir + "fileupload_new.xml";
 
         String base = getBaseURL() + cd.myfile;
@@ -930,11 +928,11 @@ public class MCRStartEditorServlet extends MCRServlet {
                 generateActiveLinkErrorpage(job.getRequest(), job.getResponse(), "Error while commiting work to the server.", e);
                 return;
             } catch (Exception se) {
-                LOGGER.error(se.getMessage(),se);
+                LOGGER.error(se.getMessage(), se);
                 cd.myfile = storeerrorpage;
             }
         } catch (MCRException e) {
-            LOGGER.error(e.getMessage(),e);
+            LOGGER.error(e.getMessage(), e);
             cd.myfile = storeerrorpage;
         }
         job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + cd.myfile));
@@ -1076,8 +1074,7 @@ public class MCRStartEditorServlet extends MCRServlet {
             String appl = CONFIG.getString("MCR.SWF.Mail.ApplicationID", "MyCoRe");
             String subject = "Automaticaly message from " + appl;
             StringBuffer text = new StringBuffer();
-            text.append("The object of type ").append(cd.mytype).append(" with ID ").append(cd.mysemcrid).append(
-                    " was removed from the workflow.");
+            text.append("The object of type ").append(cd.mytype).append(" with ID ").append(cd.mysemcrid).append(" was removed from the workflow.");
             LOGGER.info(text.toString());
 
             try {
@@ -1139,7 +1136,7 @@ public class MCRStartEditorServlet extends MCRServlet {
 
         // read file
         File path = WFM.getDirectoryPath(cd.mysemcrid.getBase());
-        File fi = new File(path, cd.mysemcrid+".xml");
+        File fi = new File(path, cd.mysemcrid + ".xml");
         org.jdom.Element service = null;
         try {
             if (fi.isFile() && fi.canRead()) {

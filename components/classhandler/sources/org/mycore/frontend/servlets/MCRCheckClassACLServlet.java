@@ -26,6 +26,7 @@ package org.mycore.frontend.servlets;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -255,7 +256,7 @@ public class MCRCheckClassACLServlet extends MCRServlet {
      */
     public final boolean storeService(org.jdom.Element outelm, MCRServletJob job, MCRObjectID ID) {
         // check current state
-        List li = AI.getPermissionsForID(ID.getId());
+        Collection<String> li = AI.getPermissionsForID(ID.getId());
         int aclsize = 0;
         if (li != null) {
             aclsize = li.size();

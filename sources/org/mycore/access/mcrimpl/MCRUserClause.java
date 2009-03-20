@@ -44,7 +44,6 @@ class MCRUserClause implements MCRCondition {
     }
 
     public boolean evaluate(Object o) {
-        MCRAccessData data = (MCRAccessData) o;
         return this.user.equals(MCRUserFacade.getCurrentUser()) ^ this.not;
     }
 

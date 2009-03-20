@@ -23,6 +23,7 @@
 
 package org.mycore.backend.hibernate;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -176,15 +177,16 @@ public class MCRHIBLinkTableStore implements MCRLinkTableInterface {
      * mcrto;
      * 
      */
-    public Map getCountedMapOfMCRTO(String mcrtoPrefix) {
-        Map<Object, Object> map = new HashMap<Object, Object>();
+    @SuppressWarnings("unchecked")
+    public Map<String, Number> getCountedMapOfMCRTO(String mcrtoPrefix) {
+        Map<String, Number> map = new HashMap<String, Number>();
         Session session = getSession();
         String query = "select count(key.mcrfrom), key.mcrto from " + classname + " where MCRTO like '" + mcrtoPrefix + "%' group by key.mcrto";
         logger.debug("HQL-Statement: " + query);
-        Iterator results = session.createQuery(query).list().iterator();
+        Iterator<Object[]> results = session.createQuery(query).list().iterator();
         while (results.hasNext()) {
             Object[] row = (Object[]) results.next();
-            map.put(row[1], row[0]);
+            map.put((String) row[1], (Number) row[0]);
         }
         return map;
     }
@@ -200,7 +202,8 @@ public class MCRHIBLinkTableStore implements MCRLinkTableInterface {
      *            child, classid, parent, reference and derivate.
      * @return List of Strings (Source-IDs)
      */
-    public List getSourcesOf(String to, String type) {
+    @SuppressWarnings("unchecked")
+    public Collection<String> getSourcesOf(String to, String type) {
         Session session = getSession();
         StringBuffer querySB = new StringBuffer("select key.mcrfrom from ").append(classname).append(" where MCRTO='").append(to).append("'");
         if ((type != null) && (type.trim().length() > 0)) {
@@ -208,8 +211,7 @@ public class MCRHIBLinkTableStore implements MCRLinkTableInterface {
         }
         String query = querySB.toString();
         logger.debug("HQL-Statement: " + query);
-        List returns;
-        returns = session.createQuery(query).list();
+        List<String> returns = session.createQuery(query).list();
         return returns;
     }
 
@@ -223,7 +225,8 @@ public class MCRHIBLinkTableStore implements MCRLinkTableInterface {
      *            child, classid, parent, reference and derivate.
      * @return List of Strings (Destination-IDs)
      */
-    public List getDestinationsOf(String source, String type) {
+    @SuppressWarnings("unchecked")
+    public Collection<String> getDestinationsOf(String source, String type) {
         Session session = getSession();
         StringBuffer querySB = new StringBuffer("select key.mcrto from ").append(classname).append(" where MCRFROM='").append(source).append("'");
         if ((type != null) && (type.trim().length() != 0)) {
@@ -231,8 +234,7 @@ public class MCRHIBLinkTableStore implements MCRLinkTableInterface {
         }
         String query = querySB.toString();
         logger.debug("HQL-Statement: " + query);
-        List returns;
-        returns = session.createQuery(query).list();
+        List<String> returns = session.createQuery(query).list();
         return returns;
     }
 

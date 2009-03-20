@@ -23,7 +23,7 @@
 
 package org.mycore.access.mcrimpl;
 
-import java.util.ArrayList;
+import java.util.Collection;
 
 import org.apache.log4j.Logger;
 import org.mycore.common.MCRConfiguration;
@@ -48,9 +48,9 @@ public abstract class MCRRuleStore {
 
     public abstract boolean existsRule(String ruleid);
     
-    public abstract ArrayList retrieveAllIDs();
+    public abstract Collection<String> retrieveAllIDs();
     
-    public abstract ArrayList retrieveRuleIDs(String ruleExpression, String description);
+    public abstract Collection<String> retrieveRuleIDs(String ruleExpression, String description);
     
     public abstract int getNextFreeRuleID(String prefix);
 

@@ -26,15 +26,13 @@ package org.mycore.datamodel.metadata;
 import static org.mycore.common.MCRConstants.XLINK_NAMESPACE;
 import static org.mycore.common.MCRConstants.XSI_NAMESPACE;
 
-import java.util.Iterator;
-import java.util.List;
+import java.util.Collection;
 
 import org.jdom.Document;
 import org.jdom.Element;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
-import org.mycore.common.MCRUtils;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventManager;
 import org.mycore.common.xml.MCRXMLHelper;
@@ -428,14 +426,12 @@ final public class MCRObject extends MCRBase {
         }
 
         // check for active links
-        List sources = MCRLinkTableManager.instance().getSourceOf(mcr_id);
+        Collection<String> sources = MCRLinkTableManager.instance().getSourceOf(mcr_id);
         LOGGER.debug("Sources size:" + sources.size());
         if (sources.size() > 0) {
-            MCRActiveLinkException activeLinks = new MCRActiveLinkException(new StringBuffer("Error while deleting object ").append(mcr_id.toString()).append(". This object is still referenced by other objects and can not be removed until all links are released.").toString());
-            String curSource;
-            Iterator it = sources.iterator();
-            while (it.hasNext()) {
-                curSource = (String) it.next();
+            MCRActiveLinkException activeLinks = new MCRActiveLinkException(new StringBuffer("Error while deleting object ").append(mcr_id.toString()).append(
+                    ". This object is still referenced by other objects and can not be removed until all links are released.").toString());
+            for (String curSource : sources) {
                 activeLinks.addLink(curSource, mcr_id.toString());
             }
             throw activeLinks;
@@ -702,7 +698,7 @@ final public class MCRObject extends MCRBase {
                 mcr_metadata.removeInheritedMetadata();
                 // insert heritable tags
                 mcr_metadata.appendMetadata(parent.getMetadata().getHeritableMetadata());
-                
+
             } catch (Exception e) {
                 LOGGER.error(MCRException.getStackTraceAsString(e));
                 LOGGER.error("Error while merging metadata in this object.");

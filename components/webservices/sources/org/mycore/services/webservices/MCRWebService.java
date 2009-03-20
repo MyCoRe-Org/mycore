@@ -23,15 +23,14 @@
 
 package org.mycore.services.webservices;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
+import java.util.Collections;
 
 import org.apache.log4j.Logger;
-
 import org.jdom.Document;
+import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.datamodel.common.MCRLinkTableManager;
 import org.mycore.datamodel.common.MCRXMLTableManager;
-import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.services.fieldquery.MCRHit;
 import org.mycore.services.fieldquery.MCRQuery;
@@ -76,9 +75,9 @@ public class MCRWebService implements MCRWS {
      * @see MCRWS#MCRDoRetrieveClassification(java.lang.String,
      *      java.lang.String, java.lang.String)
      */
-    public org.w3c.dom.Document MCRDoRetrieveClassification(String level, String type, String classID, String categID, String format ) throws Exception {
-        if ( null == format )
-          format = "metadata";
+    public org.w3c.dom.Document MCRDoRetrieveClassification(String level, String type, String classID, String categID, String format) throws Exception {
+        if (null == format)
+            format = "metadata";
 
         String uri = "classification:" + format + ":" + level + ":" + type + ":" + classID + ":" + categID;
         org.jdom.Element cl = MCRURIResolver.instance().resolve(uri);
@@ -88,7 +87,7 @@ public class MCRWebService implements MCRWS {
             logger.debug(outputter.outputString(cl));
         }
 
-        org.jdom.Document d = new org.jdom.Document( (org.jdom.Element)( cl.clone() ) );
+        org.jdom.Document d = new org.jdom.Document((org.jdom.Element) (cl.clone()));
         return new org.jdom.output.DOMOutputter().output(d);
     }
 
@@ -131,22 +130,22 @@ public class MCRWebService implements MCRWS {
         if (to == null)
             to = "";
         if ((from.length() != 0) || (to.length() != 0)) {
-          logger.debug("Input parameter : type=" + type + "   from=" + from + "   to=" + to);
-          List links = new ArrayList();
-          MCRLinkTableManager LM = MCRLinkTableManager.instance();
-          // Look for links
-          if ((from = from.trim()).length() != 0) {
-            // logger.debug("Use MCRLinkTableManager.getDestinationOf("+from+","+type+")");
-            links = LM.getDestinationOf(from, type);
-        } else {
-            // logger.debug("Use MCRLinkTableManager.getSourceOf("+to+","+type+")");
-            links = LM.getSourceOf(to, type);
-        }
-        // logger.debug("Get "+(new Integer(links.size())).toString()+" results");
-        for (int i = 0; i < links.size(); i++) {
-            MCRHit hit = new MCRHit((String) links.get(i));
-            results.addHit(hit);
-        }
+            logger.debug("Input parameter : type=" + type + "   from=" + from + "   to=" + to);
+            Collection<String> links = Collections.emptyList();
+            MCRLinkTableManager LM = MCRLinkTableManager.instance();
+            // Look for links
+            if ((from = from.trim()).length() != 0) {
+                // logger.debug("Use MCRLinkTableManager.getDestinationOf("+from+","+type+")");
+                links = LM.getDestinationOf(from, type);
+            } else {
+                // logger.debug("Use MCRLinkTableManager.getSourceOf("+to+","+type+")");
+                links = LM.getSourceOf(to, type);
+            }
+            // logger.debug("Get "+(new Integer(links.size())).toString()+" results");
+            for (String link : links) {
+                MCRHit hit = new MCRHit(link);
+                results.addHit(hit);
+            }
         } else {
             logger.warn("Input parameter from and to are empty!");
         }
@@ -155,5 +154,5 @@ public class MCRWebService implements MCRWS {
         org.jdom.output.DOMOutputter doo = new org.jdom.output.DOMOutputter();
         return doo.output(result);
     }
-    
+
 }

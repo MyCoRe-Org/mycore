@@ -27,6 +27,7 @@ import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import org.hibernate.Session;
@@ -79,13 +80,14 @@ public class MCRHIBRuleStore extends MCRRuleStore {
      * with given data
      * 
      */
-    public ArrayList retrieveRuleIDs(String ruleExpression, String description) {
+    @SuppressWarnings("unchecked")
+    public Collection<String> retrieveRuleIDs(String ruleExpression, String description) {
         ArrayList<String> ret = new ArrayList<String>();
         Session session = MCRHIBConnection.instance().getSession();
-        List l = session.createCriteria(MCRACCESSRULE.class).add(Restrictions.like("rule", ruleExpression)).add(Restrictions.like("description", description))
-                .list();
+        List<MCRACCESSRULE> l = session.createCriteria(MCRACCESSRULE.class).add(Restrictions.like("rule", ruleExpression)).add(
+                Restrictions.like("description", description)).list();
         for (int i = 0; i < l.size(); i++) {
-            ret.add(((MCRACCESSRULE) l.get(i)).getRid());
+            ret.add(l.get(i).getRid());
         }
         return ret;
     }
@@ -96,7 +98,7 @@ public class MCRHIBRuleStore extends MCRRuleStore {
      */
     public void updateRule(MCRAccessRule rule) {
         Session session = MCRHIBConnection.instance().getSession();
-        MCRACCESSRULE hibrule = (MCRACCESSRULE)session.get(MCRACCESSRULE.class, rule.getId());
+        MCRACCESSRULE hibrule = (MCRACCESSRULE) session.get(MCRACCESSRULE.class, rule.getId());
 
         DateFormat df = new SimpleDateFormat(sqlDateformat);
         hibrule.setCreationdate(Timestamp.valueOf(df.format(rule.getCreationTime())));
@@ -159,14 +161,15 @@ public class MCRHIBRuleStore extends MCRRuleStore {
         return rule;
     }
 
-    public ArrayList retrieveAllIDs() {
+    @SuppressWarnings("unchecked")
+    public Collection<String> retrieveAllIDs() {
         init();
 
         Session session = MCRHIBConnection.instance().getSession();
         ArrayList<String> ret = new ArrayList<String>();
-        List l = session.createCriteria(MCRACCESSRULE.class).list();
+        List<MCRACCESSRULE> l = session.createCriteria(MCRACCESSRULE.class).list();
         for (int i = 0; i < l.size(); i++) {
-            ret.add(((MCRACCESSRULE) l.get(i)).getRid());
+            ret.add(l.get(i).getRid());
         }
         return ret;
     }
@@ -179,20 +182,22 @@ public class MCRHIBRuleStore extends MCRRuleStore {
      * @return boolean value
      * @throws MCRException
      */
+    @SuppressWarnings("unchecked")
     public boolean existsRule(String ruleid) throws MCRException {
 
         Session session = MCRHIBConnection.instance().getSession();
-        List l = session.createCriteria(MCRACCESSRULE.class).add(Restrictions.eq("rid", ruleid)).list();
+        List<MCRACCESSRULE> l = session.createCriteria(MCRACCESSRULE.class).add(Restrictions.eq("rid", ruleid)).list();
         if (l.size() == 1) {
             return true;
         }
         return false;
     }
 
+    @SuppressWarnings("unchecked")
     public int getNextFreeRuleID(String prefix) {
         int ret = 1;
         Session session = MCRHIBConnection.instance().getSession();
-        List l = session.createQuery("select max(rid) from MCRACCESSRULE where rid like '" + prefix + "%'").list();
+        List<String> l = session.createQuery("select max(rid) from MCRACCESSRULE where rid like '" + prefix + "%'").list();
         if (l.size() > 0) {
             String max = (String) l.get(0);
             if (max == null) {

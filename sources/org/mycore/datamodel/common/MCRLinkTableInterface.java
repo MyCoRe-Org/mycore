@@ -23,7 +23,7 @@
 
 package org.mycore.datamodel.common;
 
-import java.util.List;
+import java.util.Collection;
 import java.util.Map;
 
 /**
@@ -88,7 +88,7 @@ public interface MCRLinkTableInterface {
      * mcrto;
      * 
      */
-    public Map getCountedMapOfMCRTO(String mcrtoPrefix);
+    public Map<String, Number> getCountedMapOfMCRTO(String mcrtoPrefix);
 
     /**
      * Returns a List of all link sources of <code>to</code> and a special
@@ -101,7 +101,7 @@ public interface MCRLinkTableInterface {
      *            classid, child, parent, reference and derivate.
      * @return List of Strings (Source-IDs)
      */
-    public List getSourcesOf(String to, String type);
+    public Collection<String> getSourcesOf(String to, String type);
 
     /**
      * Returns a List of all link destination of <code>from</code> and a
@@ -114,6 +114,6 @@ public interface MCRLinkTableInterface {
      *            classid, child, parent, reference and derivate.
      * @return List of Strings (Destination-IDs)
      */
-    public List getDestinationsOf(String from, String type);
+    public Collection<String> getDestinationsOf(String from, String type);
 
 }
