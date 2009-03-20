@@ -117,8 +117,12 @@ public class MCRHIBConnection implements Closeable, MCRSessionListener {
     private void buildConfiguration() {
         String resource = System.getProperty("MCR.Hibernate.Configuration", "hibernate.cfg.xml");
         HIBCFG = new Configuration().configure(resource);
-        String dialect = HIBCFG.getProperty("hibernate.dialect");
-        DIALECT = dialect.substring(dialect.lastIndexOf('.') + 1);
+        if (MCRConfiguration.instance().getBoolean("MCR.Hibernate.DialectQueries", false)) {
+            String dialect = HIBCFG.getProperty("hibernate.dialect");
+            DIALECT = dialect.substring(dialect.lastIndexOf('.') + 1);
+        } else {
+            DIALECT = null;
+        }
         LOGGER.info("Hibernate configured");
     }
 
@@ -300,10 +304,14 @@ public class MCRHIBConnection implements Closeable, MCRSessionListener {
      * @return Query defined in mapping
      */
     public Query getNamedQuery(String name) {
-        String dialectQueryName = name + "." + DIALECT;
-        if (HIBCFG.getNamedSQLQueries().containsKey(dialectQueryName)) {
-            LOGGER.debug("Using query named:" + dialectQueryName);
-            return getSession().getNamedQuery(dialectQueryName);
+        if (DIALECT != null) {
+            String dialectQueryName = name + "." + DIALECT;
+            if (HIBCFG.getNamedSQLQueries().containsKey(dialectQueryName)) {
+                LOGGER.debug("Using query named:" + dialectQueryName);
+                return getSession().getNamedQuery(dialectQueryName);
+            }
+        } else {
+            LOGGER.debug("Dialect specific queries are not enabled");
         }
         LOGGER.debug("Using query named:" + name);
         return getSession().getNamedQuery(name);
