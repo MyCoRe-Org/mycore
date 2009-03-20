@@ -26,6 +26,7 @@ package org.mycore.services.fieldquery;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -197,17 +198,26 @@ public class MCRQueryManager {
     private static MCRResults buildCombinedResults(MCRSetCondition cond, List<MCRSortBy> sortBy, boolean not) {
         boolean and = (cond instanceof MCRAndCondition);
         HashMap<String, List<MCRCondition>> table = groupConditionsByIndex(cond);
-        HashMap<String, MCRResults> results = new HashMap<String, MCRResults>();
+        List<MCRResults> results = new LinkedList<MCRResults>();
+
         for (Map.Entry<String, List<MCRCondition>> mapEntry : table.entrySet()) {
             List<MCRCondition> conditions = mapEntry.getValue();
-            MCRCondition subCond = buildSubCondition(conditions, and, not);
-            MCRResults subResults = buildResults(subCond, 0, sortBy, true);
-            results.put(mapEntry.getKey(), subResults);
+            String index = mapEntry.getKey();
+            if (!index.equals(mixed)) {
+                MCRCondition subCond = buildSubCondition(conditions, and, not);
+                results.add(buildResults(subCond, 0, sortBy, true));
+            } else
+                for (MCRCondition subCond : conditions) {
+                    if (not)
+                        subCond = new MCRNotCondition(subCond);
+                    results.add(buildResults(subCond, 0, sortBy, true));
+                }
         }
+
         if (and)
-            return MCRResults.intersect(results.values().toArray(new MCRResults[0]));
+            return MCRResults.intersect(results.toArray(new MCRResults[0]));
         else
-            return MCRResults.union(results.values().toArray(new MCRResults[0]));
+            return MCRResults.union(results.toArray(new MCRResults[0]));
     }
 
     /**
