@@ -109,8 +109,7 @@ public class MCRClassificationBrowser2 extends MCRServlet {
 
         List<Element> data = new ArrayList<Element>();
         MCRCategory category = MCRCategoryDAOFactory.getInstance().getCategory(id, 1);
-        List<MCRCategory> children = MCRCategoryDAOFactory.getInstance().getChildren(id);
-        for (MCRCategory child : children) {
+        for (MCRCategory child : category.getChildren()) {
             String childID = child.getId().getID();
             categCondition.setValue(childID);
             int numResults = (countResults ? MCRQueryManager.search(new MCRQuery(queryCondition)).getNumHits() : 1);
