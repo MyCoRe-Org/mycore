@@ -57,10 +57,12 @@ public abstract class MCRAbstractCategoryImpl implements MCRCategory {
 
     protected final ReentrantReadWriteLock childrenLock = new ReentrantReadWriteLock();
 
-    private static final String defaultLang = MCRConfiguration.instance().getString("MCR.Metadata.DefaultLang", "en");
+    private static String defaultLang;
 
     public MCRAbstractCategoryImpl() {
         super();
+        if (defaultLang == null)
+            defaultLang = MCRConfiguration.instance().getString("MCR.Metadata.DefaultLang", "en");
     }
 
     public List<MCRCategory> getChildren() {
@@ -158,6 +160,7 @@ public abstract class MCRAbstractCategoryImpl implements MCRCategory {
         MCRLabel label = getLabel(MCRSessionMgr.getCurrentSession().getCurrentLanguage());
         if (label != null)
             return label;
+        System.out.println("current Language:" + defaultLang);
         label = getLabel(defaultLang);
         if (label != null)
             return label;
