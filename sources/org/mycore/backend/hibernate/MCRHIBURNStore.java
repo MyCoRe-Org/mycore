@@ -74,7 +74,7 @@ public class MCRHIBURNStore implements MCRURNStore {
         logger.debug("Inserting " + id + "/" + urn + " into database");
         session.saveOrUpdate(tab);
     }
-    
+
     /**
      * The method creates a new item in the datastore.
      * 
@@ -87,8 +87,7 @@ public class MCRHIBURNStore implements MCRURNStore {
      * @exception MCRPersistenceException
      *                the method arguments are not correct
      */
-    public synchronized final void create(String urn, String id, String path, String filename)
-            throws MCRPersistenceException {
+    public synchronized final void create(String urn, String id, String path, String filename) throws MCRPersistenceException {
         if (urn == null || (urn.length() == 0)) {
             throw new MCRPersistenceException("The URN is null.");
         }
@@ -100,7 +99,7 @@ public class MCRHIBURNStore implements MCRURNStore {
         }
 
         Session session = getSession();
-        MCRURN tab = new MCRURN(id, urn, path,filename);
+        MCRURN tab = new MCRURN(id, urn, path, filename);
         logger.debug("Inserting " + id + "/" + urn + "(" + path + filename + ") into database");
         session.saveOrUpdate(tab);
     }
@@ -118,7 +117,7 @@ public class MCRHIBURNStore implements MCRURNStore {
     public void assignURN(String urn, String id) {
         create(urn, id);
     }
-    
+
     /**
      * Assigns the given urn to the given derivate ID
      * 
@@ -171,14 +170,13 @@ public class MCRHIBURNStore implements MCRURNStore {
         }
 
         StringBuffer sb = new StringBuffer();
-        sb.append("delete from ").append(classname).append(" where MCRID = '").append(objID).append(
-                "'");
+        sb.append("delete from ").append(classname).append(" where MCRID = '").append(objID).append("'");
 
         Session session = getSession();
         int deleted = session.createQuery(sb.toString()).executeUpdate();
         logger.debug(deleted + " references deleted.");
     }
-    
+
     /**
      * Removes the urn (and assigned document ID) from the persistent store
      * 
@@ -198,22 +196,21 @@ public class MCRHIBURNStore implements MCRURNStore {
      *            the MCRObjectID as String
      * @return the urn, or null if no urn is assigned to this ID
      */
+    @SuppressWarnings("unchecked")
     public final String getURNforDocument(String id) throws MCRPersistenceException {
         if (id == null || (id.length() == 0)) {
             return null;
         }
 
         Session session = getSession();
-        String ret = null;
         StringBuffer querySB = new StringBuffer("select key.mcrurn from ").append(classname).append(" where key.mcrid='").append(id).append("'");
         logger.debug("HQL-Statement: " + querySB.toString());
-        List returns;
-        returns = session.createQuery(querySB.toString()).list();
+        List<String> returns = session.createQuery(querySB.toString()).list();
         if (returns.size() != 1)
-            return ret;
-        ret = (String) returns.get(0);
-        return ret;
+            return null;
+        return returns.get(0);
     }
+
     /**
      * Removes the urn (and assigned document ID) from the persistent store by the given 
      * object id
@@ -222,11 +219,11 @@ public class MCRHIBURNStore implements MCRURNStore {
      *            a URN
      * @exception MCRPersistenceException
      *                the method argument is not correct
-     */    
-    public void removeURNByObjectID(String objID){
+     */
+    public void removeURNByObjectID(String objID) {
         deleteByObjectID(objID);
     }
-    
+
     /**
      * Retrieves the URN that is assigned to the given document ID
      * 
@@ -234,21 +231,19 @@ public class MCRHIBURNStore implements MCRURNStore {
      *            the URN as String
      * @return the document ID, or null if no urn is assigned to this ID
      */
+    @SuppressWarnings("unchecked")
     public final String getDocumentIDforURN(String urn) throws MCRPersistenceException {
         if (urn == null || (urn.length() == 0)) {
             return null;
         }
 
         Session session = getSession();
-        String ret = null;
         StringBuffer querySB = new StringBuffer("select key.mcrid from ").append(classname).append(" where key.mcrurn='").append(urn).append("'");
         logger.debug("HQL-Statement: " + querySB.toString());
-        List returns;
-        returns = session.createQuery(querySB.toString()).list();
+        List<String> returns = session.createQuery(querySB.toString()).list();
         if (returns.size() != 1)
-            return ret;
-        ret = (String) returns.get(0);
-        return ret;
+            return null;
+        return returns.get(0);
     }
 
     /**
@@ -258,33 +253,28 @@ public class MCRHIBURNStore implements MCRURNStore {
      *            the MCRObjectID as String
      * @return true if an urn is assigned to the given object, false otherwise
      */
+    @SuppressWarnings("unchecked")
     public final boolean hasURNAssigned(String id) throws MCRPersistenceException {
         if (id == null || (id.length() == 0)) {
             return false;
         }
 
         Session session = getSession();
-        StringBuffer querySB = new StringBuffer("select key.mcrurn from ").append(classname)
-                .append(" where key.mcrid='").append(id).append("'");
+        StringBuffer querySB = new StringBuffer("select key.mcrurn from ").append(classname).append(" where key.mcrid='").append(id).append("'");
         logger.debug("HQL-Statement: " + querySB.toString());
-        List returns;
-        returns = session.createQuery(querySB.toString()).list();
-        if(returns == null) {
+        List<String> returns = session.createQuery(querySB.toString()).list();
+        if (returns == null || returns.isEmpty()) {
             return false;
         }
-        
-        if (returns.size() > 0){
-            return true;
-        }else {
-            return false;
-        }
+        return true;
     }
-    
+
     /**
      * This method check that the URN exist in this store.
      * 
      * @return true if the URN exist, else return false
      */
+    @SuppressWarnings("unchecked")
     public final boolean exist(String urn) {
         boolean exists = false;
         if (urn == null || (urn.length() == 0)) {
@@ -293,8 +283,8 @@ public class MCRHIBURNStore implements MCRURNStore {
 
         Session session = getSession();
         StringBuffer query = new StringBuffer("select key.mcrid from ").append(classname).append(" where key.mcrurn = '").append(urn).append("'");
-        List l = session.createQuery(query.toString()).list();
-        if (l.size() > 0) {
+        List<String> l = session.createQuery(query.toString()).list();
+        if (!l.isEmpty()) {
             exists = true;
         }
         return exists;

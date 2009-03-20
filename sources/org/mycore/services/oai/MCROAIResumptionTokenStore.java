@@ -16,9 +16,9 @@ import java.util.List;
  */
 public interface MCROAIResumptionTokenStore {
     
-    public List getResumptionTokenHits(String resumptionTokenID, int requestedSize, int maxResults);
+    public List<String[]> getResumptionTokenHits(String resumptionTokenID, int requestedSize, int maxResults);
     
-    public void createResumptionToken(String id, String prefix, String instance, List resultList);
+    public void createResumptionToken(String id, String prefix, String instance, List<?> resultList);
     
     public String getPrefix(String token);
     

@@ -50,12 +50,13 @@ public class MCRHIBCStore extends MCRContentStore {
         // MCRConfiguration config = MCRConfiguration.instance();
     }
 
+    @SuppressWarnings("unchecked")
     private synchronized int getNextFreeID() throws Exception {
         Session session = MCRHIBConnection.instance().getSession();
-        List l = session.createQuery("select max(storageid) from MCRCSTORE").list();
+        List<Number> l = session.createQuery("select max(storageid) from MCRCSTORE").list();
 
         if (l.size() > 0) {
-            int max = ((Integer) l.get(0)).intValue();
+            int max = l.get(0).intValue();
             return max + 1;
         }
         return 1;
@@ -75,20 +76,22 @@ public class MCRHIBCStore extends MCRContentStore {
         return storageID;
     }
 
+    @SuppressWarnings("unchecked")
     protected synchronized void doDeleteContent(String ID) throws Exception {
         int storageID = Integer.valueOf(ID).intValue();
         Session session = MCRHIBConnection.instance().getSession();
-        List l = session.createQuery("from MCRCSTORE where storageid=" + storageID).list();
+        List<MCRCSTORE> l = session.createQuery("from MCRCSTORE where storageid=" + storageID).list();
 
         for (int t = 0; t < l.size(); t++) {
             session.delete(l.get(t));
         }
     }
 
+    @SuppressWarnings("unchecked")
     protected void doRetrieveContent(MCRFileReader file, OutputStream target) throws Exception {
         int storageID = Integer.valueOf(file.getStorageID()).intValue();
         Session session = MCRHIBConnection.instance().getSession();
-        List l = session.createQuery("from MCRCSTORE where storageid=" + storageID).list();
+        List<MCRCSTORE> l = session.createQuery("from MCRCSTORE where storageid=" + storageID).list();
 
         if (l.size() < 1) {
             throw new MCRException("No such content: " + storageID);

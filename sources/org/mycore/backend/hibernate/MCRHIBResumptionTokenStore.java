@@ -24,22 +24,19 @@
 
 package org.mycore.backend.hibernate;
 
-import java.util.Date;
 import java.util.ArrayList;
-import java.util.Iterator;
-
-import org.apache.log4j.Logger;
-
-import org.hibernate.*;
-import org.hibernate.criterion.Restrictions;
-
+import java.util.Date;
 import java.util.List;
 
-import org.mycore.common.*;
+import org.apache.log4j.Logger;
+import org.hibernate.Session;
+import org.hibernate.criterion.Restrictions;
+import org.mycore.backend.hibernate.tables.MCRRESUMPTIONTOKEN;
+import org.mycore.common.MCRConfiguration;
+import org.mycore.common.MCRConfigurationException;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.services.oai.MCROAIProvider;
 import org.mycore.services.oai.MCROAIResumptionTokenStore;
-import org.mycore.backend.hibernate.tables.*;
 
 /**
  * This class implements the MCRHIBResumptionTokenStore
@@ -81,6 +78,7 @@ public class MCRHIBResumptionTokenStore implements MCROAIResumptionTokenStore {
 
     }
 
+    @SuppressWarnings("unchecked")
     public void deleteOutdatedTokens() {
         int timeout_h = 0;
         try {
@@ -96,14 +94,13 @@ public class MCRHIBResumptionTokenStore implements MCROAIResumptionTokenStore {
         Session session = MCRHIBConnection.instance().getSession();
         ;
 
-        List delList = session.createCriteria(MCRRESUMPTIONTOKEN.class).add(Restrictions.le("created", new Date(outdateTime))).list();
-        for (Iterator it = delList.iterator(); it.hasNext();) {
-            MCRRESUMPTIONTOKEN token = (MCRRESUMPTIONTOKEN) it.next();
+        List<MCRRESUMPTIONTOKEN> delList = session.createCriteria(MCRRESUMPTIONTOKEN.class).add(Restrictions.le("created", new Date(outdateTime))).list();
+        for (MCRRESUMPTIONTOKEN token : delList) {
             session.delete(token);
         }
     }
 
-    public final List getResumptionTokenHits(String resumptionTokenID, int requestedSize, int maxResults) {
+    public final List<String[]> getResumptionTokenHits(String resumptionTokenID, int requestedSize, int maxResults) {
 
         String sepOAIHIT = config.getString(STR_OAI_SEPARATOR_OAIHIT, ";");
         String sepSpec = config.getString(STR_OAI_SEPARATOR_SPEC, "###");
@@ -118,7 +115,7 @@ public class MCRHIBResumptionTokenStore implements MCROAIResumptionTokenStore {
         String instance = resumptionToken.getInstance();
         String repositoryID = config.getString(STR_OAI_REPOSITORY_IDENTIFIER + "." + instance);
 
-        int totalSize = (int)resumptionToken.getCompleteSize();
+        int totalSize = (int) resumptionToken.getCompleteSize();
         int hitNrFrom = totalSize - requestedSize;
         int maxLoop = Math.min(totalSize - 1, hitNrFrom + maxResults - 1);
 
@@ -191,16 +188,16 @@ public class MCRHIBResumptionTokenStore implements MCROAIResumptionTokenStore {
      * @param resultList:
      *            List delivered of OAIQueryService for the new resumptionToken
      */
-    public final void createResumptionToken(String id, String prefix, String instance, List resultList) {
+    public final void createResumptionToken(String id, String prefix, String instance, List<?> resultList) {
         String sepOAIHIT = config.getString(STR_OAI_SEPARATOR_OAIHIT, ";");
         String sepSpec = config.getString(STR_OAI_SEPARATOR_SPEC, "###");
         StringBuffer sbHitBlob = new StringBuffer("");
-        for (Iterator it = resultList.iterator(); it.hasNext();) {
+        for (Object result:resultList) {
             if (!prefix.equals("set")) {
-                sbHitBlob.append((String) it.next());
+                sbHitBlob.append((String) result);
                 sbHitBlob.append(sepOAIHIT);
             } else {
-                String[] arSpec = (String[]) it.next();
+                String[] arSpec = (String[]) result;
                 String spec = arSpec[0];
                 String specName = (arSpec[1] != null) ? arSpec[1] : "";
                 String specDescription = (arSpec[2] != null) ? arSpec[2] : "";

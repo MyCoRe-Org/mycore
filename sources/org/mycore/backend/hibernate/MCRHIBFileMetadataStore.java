@@ -24,17 +24,14 @@
 package org.mycore.backend.hibernate;
 
 import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.List;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.hibernate.Criteria;
-import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
-
 import org.mycore.backend.hibernate.tables.MCRFSNODES;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.datamodel.ifs.MCRDirectory;
@@ -126,17 +123,18 @@ public class MCRHIBFileMetadataStore implements MCRFileMetadataStore {
         session.saveOrUpdate(fs);
     }
 
+    @SuppressWarnings("unchecked")
     public String retrieveRootNodeID(String ownerID) throws MCRPersistenceException {
         Session session = getSession();
         if (ownerID.equals("imgCache")) {
+            //TODO: use projection to retrieve ID
             StringBuffer sb = (new StringBuffer("from MCRFSNODES where OWNER = '")).append(ownerID).append("' and PID is NULL");
-            List l = new ArrayList();
-            l = session.createQuery(sb.toString()).list();
+            List<MCRFSNODES> l = session.createQuery(sb.toString()).list();
             if (l.size() < 1) {
                 logger.warn("There is no fsnode with OWNER = " + ownerID);
                 return null;
             }
-            return ((MCRFSNODES) (l.get(0))).getId();
+            return l.get(0).getId();
         } else {
             StringBuffer sb = (new StringBuffer("select id from MCRFSNODES where OWNER = '")).append(ownerID).append("' and PID is NULL");
             String nodeID = (String) session.createQuery(sb.toString()).uniqueResult();
@@ -150,7 +148,7 @@ public class MCRHIBFileMetadataStore implements MCRFileMetadataStore {
 
     public MCRFilesystemNode retrieveChild(String parentID, String name) {
         Session session = getSession();
-        Criteria c=session.createCriteria(MCRFSNODES.class);
+        Criteria c = session.createCriteria(MCRFSNODES.class);
         c.add(Restrictions.eq("pid", parentID));
         c.add(Restrictions.eq("name", name));
         MCRFSNODES node = (MCRFSNODES) c.uniqueResult();
@@ -162,19 +160,19 @@ public class MCRHIBFileMetadataStore implements MCRFileMetadataStore {
         return buildNode(node);
     }
 
-    public Vector retrieveChildrenIDs(String parentID) throws MCRPersistenceException {
+    @SuppressWarnings("unchecked")
+    public Vector<String> retrieveChildrenIDs(String parentID) throws MCRPersistenceException {
         Session session = getSession();
-        List l = new ArrayList();
-        l = session.createQuery("from MCRFSNODES where PID = '" + parentID + "'").list();
+        List<MCRFSNODES> l = session.createQuery("from MCRFSNODES where PID = '" + parentID + "'").list();
 
         if (l.size() == 0) {
-            return new Vector();
+            return new Vector<String>();
         }
 
         Vector<String> v = new Vector<String>(l.size());
 
         for (int t = 0; t < l.size(); t++) {
-            v.add(t, ((MCRFSNODES) l.get(t)).getId());
+            v.add(t, l.get(t).getId());
         }
 
         return v;

@@ -189,7 +189,6 @@ public class MCRHIBCtrlCommands extends MCRAbstractCommands {
         bout.close();
     }
 
-    @SuppressWarnings("unchecked")
     private static void importFile(String file, final String entityName) throws DocumentException {
         File importFile = new File(file);
         if (importFile.exists() && importFile.isDirectory()) {
