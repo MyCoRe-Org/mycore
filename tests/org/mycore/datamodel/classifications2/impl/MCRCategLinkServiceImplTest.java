@@ -17,12 +17,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.jdom.Document;
-
 import org.mycore.common.MCRHibTestCase;
 import org.mycore.common.xml.MCRXMLHelper;
 import org.mycore.datamodel.classifications2.MCRCategory;
@@ -84,7 +83,8 @@ public class MCRCategLinkServiceImplTest extends MCRHibTestCase {
     public void testSetLinks() {
         addTestLinks();
         startNewTransaction();
-        assertEquals("Link count does not match.", testLinks.size(), sessionFactory.getCurrentSession().createCriteria(MCRCategoryLink.class).list().size());
+        assertEquals("Link count does not match.", testLinks.size(), sessionFactory.getCurrentSession().createCriteria(
+                MCRCategoryLink.class).list().size());
     }
 
     /**
@@ -94,7 +94,8 @@ public class MCRCategLinkServiceImplTest extends MCRHibTestCase {
         addTestLinks();
         startNewTransaction();
         SERVICE.deleteLink("London");
-        assertEquals("Link count does not match.", testLinks.size() - 1, sessionFactory.getCurrentSession().createCriteria(MCRCategoryLink.class).list().size());
+        assertEquals("Link count does not match.", testLinks.size() - 1, sessionFactory.getCurrentSession().createCriteria(
+                MCRCategoryLink.class).list().size());
     }
 
     /**
@@ -104,7 +105,8 @@ public class MCRCategLinkServiceImplTest extends MCRHibTestCase {
         addTestLinks();
         startNewTransaction();
         SERVICE.deleteLinks(Arrays.asList("London", "England"));
-        assertEquals("Link count does not match.", testLinks.size() - 2, sessionFactory.getCurrentSession().createCriteria(MCRCategoryLink.class).list().size());
+        assertEquals("Link count does not match.", testLinks.size() - 2, sessionFactory.getCurrentSession().createCriteria(
+                MCRCategoryLink.class).list().size());
     }
 
     /**
@@ -114,8 +116,8 @@ public class MCRCategLinkServiceImplTest extends MCRHibTestCase {
         addTestLinks();
         startNewTransaction();
         MCRCategoryLink link = testLinks.iterator().next();
-        assertTrue("Did not find category: " + link.getCategory().getId(), SERVICE.getLinksFromObject(link.getObjectReference().getObjectID()).contains(
-                link.getCategory().getId()));
+        assertTrue("Did not find category: " + link.getCategory().getId(), SERVICE.getLinksFromObject(
+                link.getObjectReference().getObjectID()).contains(link.getCategory().getId()));
     }
 
     /**
@@ -161,12 +163,10 @@ public class MCRCategLinkServiceImplTest extends MCRHibTestCase {
     public void testCountLinks() {
         addTestLinks();
         startNewTransaction();
-        List<MCRCategoryID> categIDs = Arrays.asList(category.getId(), category.getChildren().get(0).getId(), category.getChildren().get(0).getChildren()
-                .get(0).getId(), category.getChildren().get(0).getChildren().get(1).getId(), category.getChildren().get(0).getChildren().get(2).getId());
-        Map<MCRCategoryID, Number> map = SERVICE.countLinks(categIDs);
+        Map<MCRCategoryID, Number> map = SERVICE.countLinks(category);
         LOGGER.debug("****List of returned map");
         LOGGER.debug(map);
-        assertEquals("Returned amount of MCRCategoryIDs does not match.", categIDs.size(), map.size());
+        assertEquals("Returned amount of MCRCategoryIDs does not match.", getAllCategIDs(category).size(), map.size());
         assertEquals("Count of Europe links does not match.", 8, map.get(category.getChildren().get(0).getId()).intValue());
     }
 
@@ -176,25 +176,21 @@ public class MCRCategLinkServiceImplTest extends MCRHibTestCase {
     public void testCountLinksForType() {
         addTestLinks();
         startNewTransaction();
-        List<MCRCategoryID> categIDs = Arrays.asList(category.getId(), category.getChildren().get(0).getId(), category.getChildren().get(0).getChildren()
-                .get(0).getId(), category.getChildren().get(0).getChildren().get(1).getId(), category.getChildren().get(0).getChildren().get(2).getId());
-        Map<MCRCategoryID, Number> map = SERVICE.countLinksForType(categIDs, "city");
+        Map<MCRCategoryID, Number> map = SERVICE.countLinksForType(category, "city");
         LOGGER.debug("****List of returned map");
         LOGGER.debug(map);
-        assertEquals("Returned amount of MCRCategoryIDs does not match.", categIDs.size(), map.size());
+        assertEquals("Returned amount of MCRCategoryIDs does not match.", getAllCategIDs(category).size(), map.size());
         assertEquals("Count of Europe links does not match.", 2, map.get(category.getChildren().get(0).getId()).intValue());
     }
 
     public void testHasLinks() {
         MCRCategoryImpl germany = (MCRCategoryImpl) category.getChildren().get(0).getChildren().get(0);
-        Collection<MCRCategoryID> germanyCol=Collections.nCopies(1, germany.getId());
-        Collection<MCRCategoryID> worldCol=Collections.nCopies(1, category.getId());
-        assertFalse("Classification should not be in use", SERVICE.hasLinks(worldCol).get(category.getId()).booleanValue());
-        assertFalse("Category should not be in use", SERVICE.hasLinks(germanyCol).get(germany.getId()).booleanValue());
+        assertFalse("Classification should not be in use", SERVICE.hasLinks(category).get(category.getId()).booleanValue());
+        assertFalse("Category should not be in use", SERVICE.hasLinks(germany).get(germany.getId()).booleanValue());
         addTestLinks();
         startNewTransaction();
-        assertTrue("Classification should be in use", SERVICE.hasLinks(worldCol).get(category.getId()).booleanValue());
-        assertTrue("Category should be in use", SERVICE.hasLinks(germanyCol).get(germany.getId()).booleanValue());
+        assertTrue("Classification should be in use", SERVICE.hasLinks(category).get(category.getId()).booleanValue());
+        assertTrue("Category should be in use", SERVICE.hasLinks(germany).get(germany.getId()).booleanValue());
     }
 
     private void loadWorldClassification() throws URISyntaxException {
@@ -207,6 +203,15 @@ public class MCRCategLinkServiceImplTest extends MCRHibTestCase {
         for (MCRCategoryLink link : testLinks) {
             SERVICE.setLinks(link.getObjectReference(), Collections.nCopies(1, link.getCategory().getId()));
         }
+    }
+
+    private static Collection<MCRCategoryID> getAllCategIDs(MCRCategory category) {
+        HashSet<MCRCategoryID> ids = new HashSet<MCRCategoryID>();
+        ids.add(category.getId());
+        for (MCRCategory cat : category.getChildren()) {
+            ids.addAll(getAllCategIDs(cat));
+        }
+        return ids;
     }
 
 }

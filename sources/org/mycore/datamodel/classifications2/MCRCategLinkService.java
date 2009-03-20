@@ -37,51 +37,31 @@ public interface MCRCategLinkService {
     /**
      * Checks if a categories id refered by objects.
      * 
-     * @param categID
-     *            the id of a category
+     * @param category
+     *            a subtree rooted at a MCRCategory for which links should be counted
      * @return true if the classification is used
      */
-    public abstract Map<MCRCategoryID, Boolean> hasLinks(Collection<MCRCategoryID> categIDs);
+    public abstract Map<MCRCategoryID, Boolean> hasLinks(MCRCategory category);
+
+    /**
+     * Counts links to a collection of categories.
+     * 
+     * @param category
+     *            a subtree rooted at a MCRCategory for which links should be counted
+     * @return a Map with MCRCategoryID as key and the number of links as value
+     */
+    public abstract Map<MCRCategoryID, Number> countLinks(MCRCategory category);
 
     /**
      * Counts links to a collection of categories.
      * 
      * @param categIDs
-     *            Collection of MCRCategoryID which links should be counted
-     * @return a Map with MCRCategoryID as key and the number of links as value
-     */
-    public abstract Map<MCRCategoryID, Number> countLinks(Collection<MCRCategoryID> categIDs);
-
-    /**
-     * Counts links to a collection of categories.
-     * 
-     * @param categIDs
-     *            Collection of MCRCategoryID which links should be counted
+     *            a subtree rooted at a MCRCategory for which links should be counted
      * @param type
      *            restrict links that refer to object of this type
      * @return a Map with MCRCategoryID as key and the number of links as value
      */
-    public abstract Map<MCRCategoryID, Number> countLinksForType(Collection<MCRCategoryID> categIDs, String type);
-
-    /**
-     * Counts links to child categories of a given parent category.
-     * 
-     * @param parentID
-     *            MCRCategoryID of parent, counting is done for each child
-     * @return a Map with MCRCategoryID as key and the number of links as value
-     */
-    public abstract Map<MCRCategoryID, Number> countLinks(MCRCategoryID parentID);
-
-    /**
-     * Counts links to child categories of a given parent category.
-     * 
-     * @param parentID
-     *            MCRCategoryID of parent, counting is done for each child
-     * @param type
-     *            restrict links that refer to object of this type
-     * @return a Map with MCRCategoryID as key and the number of links as value
-     */
-    public abstract Map<MCRCategoryID, Number> countLinksForType(MCRCategoryID parentID, String type);
+    public abstract Map<MCRCategoryID, Number> countLinksForType(MCRCategory category, String type);
 
     /**
      * Delete all links that refer to the given Object ID.

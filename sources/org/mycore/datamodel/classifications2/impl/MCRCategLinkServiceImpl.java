@@ -26,6 +26,7 @@ package org.mycore.datamodel.classifications2.impl;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -40,6 +41,7 @@ import org.mycore.common.MCRCache;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 import org.mycore.datamodel.classifications2.MCRCategLinkService;
+import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.MCRObjectReference;
 
@@ -67,72 +69,27 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
         HIB_CONNECTION_INSTANCE = MCRHIBConnection.instance();
     }
 
-    public Map<MCRCategoryID, Number> countLinks(Collection<MCRCategoryID> categIDs) {
-        return countLinksForType(categIDs, null);
+    public Map<MCRCategoryID, Number> countLinks(MCRCategory parent) {
+        return countLinksForType(parent, null);
     }
 
     @SuppressWarnings("unchecked")
-    public Map<MCRCategoryID, Number> countLinksForType(Collection<MCRCategoryID> categIDs, String type) {
-        boolean restrictedByType = (type != null);
-        String queryName = restrictedByType ? ".NumberByTypePerCategID" : ".NumberPerCategID";
-        Map<MCRCategoryID, Number> returns = new HashMap<MCRCategoryID, Number>();
-        // ensure that all categIDs are grouped per classID
-        Map<String, Collection<String>> perClassID = new HashMap<String, Collection<String>>();
-        for (MCRCategoryID id : categIDs) {
-            Collection<String> categs = perClassID.get(id.getRootID());
-            if (categs == null) {
-                categs = new ArrayList<String>(categIDs.size());
-                perClassID.put(id.getRootID(), categs);
-            }
-            categs.add(id.getID());
-            // initialize all categIDs with link count of zero
-            returns.put(id, 0);
-        }
-        Map<MCRCategoryID, Number> countLinks = new HashMap<MCRCategoryID, Number>();
-        // for every classID do:
-        for (Map.Entry<String, Collection<String>> entry : perClassID.entrySet()) {
-            String classID = entry.getKey();
-            LOGGER.debug("counting links for classification: " + classID);
-            Query q = HIB_CONNECTION_INSTANCE.getNamedQuery(LINK_CLASS.getName() + queryName);
-            // query can take long time, please cache result
-            q.setCacheable(true);
-            q.setParameter("classID", classID);
-            q.setParameterList("categIDs", entry.getValue());
-            if (restrictedByType) {
-                q.setParameter("type", type);
-            }
-            // get object count for every category (not accumulated)
-            List<Object[]> result = q.list();
-            for (Object[] sr : result) {
-                MCRCategoryID key = new MCRCategoryID(classID, sr[0].toString());
-                Number value = (Number) sr[1];
-                countLinks.put(key, value);
-            }
-        }
-        // overwrites zero count where database returned a value
-        returns.putAll(countLinks);
-        LOGGER.debug("returning countMap");
-        return returns;
-    }
-
-    public Map<MCRCategoryID, Number> countLinks(MCRCategoryID parentID) {
-        return countLinksForType(parentID, null);
-    }
-
-    @SuppressWarnings("unchecked")
-    public Map<MCRCategoryID, Number> countLinksForType(MCRCategoryID parentID, String type) {
+    public Map<MCRCategoryID, Number> countLinksForType(MCRCategory parent, String type) {
         boolean restrictedByType = (type != null);
         String queryName = restrictedByType ? ".NumberByTypePerChildOfParentID" : ".NumberPerChildOfParentID";
-        // TODO: initialize all categIDs with link count of zero
-        Session session = HIB_CONNECTION_INSTANCE.getSession();
-        MCRCategoryImpl parent = getMCRCategory(session, parentID);
         Map<MCRCategoryID, Number> countLinks = new HashMap<MCRCategoryID, Number>();
-        String classID = parentID.getRootID();
+        for (MCRCategoryID id : getAllCategIDs(parent)) {
+            // initialize all categIDs with link count of zero
+            countLinks.put(id, 0);
+        }
+        Session session = HIB_CONNECTION_INSTANCE.getSession();
+        parent = getMCRCategory(session, parent.getId());
+        String classID = parent.getId().getRootID();
         Query q = HIB_CONNECTION_INSTANCE.getNamedQuery(LINK_CLASS.getName() + queryName);
         // query can take long time, please cache result
         q.setCacheable(true);
         q.setParameter("classID", classID);
-        q.setParameter("parentID", parent.getInternalID());
+        q.setParameter("parentID", ((MCRCategoryImpl) parent).getInternalID());
         if (restrictedByType) {
             q.setParameter("type", type);
         }
@@ -216,14 +173,15 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
     }
 
     @SuppressWarnings("unchecked")
-    public Map<MCRCategoryID, Boolean> hasLinks(Collection<MCRCategoryID> categIDs) {
+    public Map<MCRCategoryID, Boolean> hasLinks(MCRCategory category) {
         //a rather simple implementation
         boolean useSingleDBQuery = MCRConfiguration.instance()
                 .getBoolean("MCR.Classifications.LinkServiceImpl.HasLinks.SingleQuery", false);
-        Map<MCRCategoryID, Number> countMap = useSingleDBQuery ? countLinks(categIDs) : null;
-        HashMap<MCRCategoryID, Boolean> boolMap = new HashMap<MCRCategoryID, Boolean>(categIDs.size());
+        Map<MCRCategoryID, Number> countMap = useSingleDBQuery ? countLinks(category) : null;
+        final Collection<MCRCategoryID> allCategIDs = getAllCategIDs(category);
+        HashMap<MCRCategoryID, Boolean> boolMap = new HashMap<MCRCategoryID, Boolean>(allCategIDs.size());
         Session session = HIB_CONNECTION_INSTANCE.getSession();
-        for (MCRCategoryID categID : categIDs) {
+        for (MCRCategoryID categID : allCategIDs) {
             if (useSingleDBQuery) {
                 boolMap.put(categID, countMap.get(categID).intValue() > 0 ? Boolean.TRUE : Boolean.FALSE);
             } else {
@@ -232,13 +190,13 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
                 classCriteria.setProjection(Projections.property("internalID"));
                 classCriteria.add(Restrictions.eq("rootID", categID.getRootID()));
                 if (!categID.isRootID()) {
-                    MCRCategoryImpl category = MCRCategoryDAOImpl.getByNaturalID(session, categID);
+                    MCRCategoryImpl categoryImpl = MCRCategoryDAOImpl.getByNaturalID(session, categID);
                     if (category == null) {
                         LOGGER.warn("Category does not exist: " + categID);
                         boolMap.put(categID, false);
                         continue;
                     }
-                    classCriteria.add(Restrictions.between("left", category.getLeft(), category.getRight()));
+                    classCriteria.add(Restrictions.between("left", categoryImpl.getLeft(), categoryImpl.getRight()));
                 }
                 List<Number> internalIDs = classCriteria.list();
                 if (internalIDs.size() == 0) {
@@ -268,5 +226,14 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
             }
         }
         return boolMap;
+    }
+
+    private static Collection<MCRCategoryID> getAllCategIDs(MCRCategory category) {
+        HashSet<MCRCategoryID> ids = new HashSet<MCRCategoryID>();
+        ids.add(category.getId());
+        for (MCRCategory cat : category.getChildren()) {
+            ids.addAll(getAllCategIDs(cat));
+        }
+        return ids;
     }
 }

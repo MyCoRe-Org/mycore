@@ -25,6 +25,7 @@ package org.mycore.datamodel.classifications;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
@@ -125,7 +126,8 @@ public class MCRClassificationBrowserData {
         MCRSessionMgr.addSessionListener(ClassUserTableCleaner);
     }
 
-    public MCRClassificationBrowserData(final String u, final String mode, final String actclid, final String actEditorCategid) throws Exception {
+    public MCRClassificationBrowserData(final String u, final String mode, final String actclid, final String actEditorCategid)
+            throws Exception {
         uri = u;
         config = MCRConfiguration.instance();
         LOGGER.debug(" incomming Path " + uri);
@@ -216,10 +218,11 @@ public class MCRClassificationBrowserData {
         LOGGER.debug("setObjectTypes(" + browserClass + ")");
         try {
             // NOTE: read *.Doctype for compatiblity reasons
-            objectType = config.getString("MCR.ClassificationBrowser." + browserClass + ".Objecttype", config.getString("MCR.ClassificationBrowser."
-                    + browserClass + ".Doctype", null));
+            objectType = config.getString("MCR.ClassificationBrowser." + browserClass + ".Objecttype", config.getString(
+                    "MCR.ClassificationBrowser." + browserClass + ".Doctype", null));
         } catch (final org.mycore.common.MCRConfigurationException noDoctype) {
-            objectType = config.getString("MCR.ClassificationBrowser.default.ObjectType", config.getString("MCR.ClassificationBrowser.default.Doctype"));
+            objectType = config.getString("MCR.ClassificationBrowser.default.ObjectType", config
+                    .getString("MCR.ClassificationBrowser.default.Doctype"));
         }
 
         if (objectType != null) {
@@ -390,10 +393,12 @@ public class MCRClassificationBrowserData {
         xDocument.addContent(xNavtree);
         String browserClass = "";
 
-        LOGGER.debug("get all classification IDs");
-        final Set<MCRCategoryID> allIDs = getClassificationPool().getAllIDs();
         LOGGER.debug("query classification links");
-        final Map<MCRCategoryID, Boolean> countMap = MCRCategLinkServiceFactory.getInstance().hasLinks(allIDs);
+        final Map<MCRCategoryID, Boolean> countMap = new HashMap<MCRCategoryID, Boolean>();
+        for (MCRCategoryID classID : getClassificationPool().getAllIDs()) {
+            MCRCategory classif = getClassificationPool().getClassificationAsPojo(classID, false);
+            countMap.putAll(MCRCategLinkServiceFactory.getInstance().hasLinks(classif));
+        }
 
         for (MCRCategoryID id : countMap.keySet()) {
             LOGGER.debug("get classification " + id);
@@ -604,7 +609,7 @@ public class MCRClassificationBrowserData {
         }
         i = 0;
         LOGGER.debug("fetch Map<MCRCategoryID,Boolean>");
-        Map<MCRCategoryID, Boolean> countMap = MCRCategLinkServiceFactory.getInstance().hasLinks(ids);
+        Map<MCRCategoryID, Boolean> countMap = MCRCategLinkServiceFactory.getInstance().hasLinks(getClassification());
         LOGGER.debug("process tree lines: build xml tree");
         while ((line = getTreeline(i++)) != null) {
 
@@ -614,7 +619,8 @@ public class MCRClassificationBrowserData {
 
             Element label = (Element) XPath.selectSingleNode(line, "label[lang('" + lang + "')]");
             if (label == null) {
-                label = (Element) XPath.selectSingleNode(line, "label[lang('" + MCRConfiguration.instance().getString("MCR.Metadata.DefaultLang", "en") + "')]");
+                label = (Element) XPath.selectSingleNode(line, "label[lang('"
+                        + MCRConfiguration.instance().getString("MCR.Metadata.DefaultLang", "en") + "')]");
             }
             if (label == null) {
                 label = (Element) XPath.selectSingleNode(line, "label");
@@ -791,7 +797,8 @@ public class MCRClassificationBrowserData {
         return xDoc;
     }
 
-    private final void sortMyTreePerLevel(int von, int bis, int level, ArrayList<String> itemname, ArrayList<Integer> itemlevel, int[] itemnum) {
+    private final void sortMyTreePerLevel(int von, int bis, int level, ArrayList<String> itemname, ArrayList<Integer> itemlevel,
+            int[] itemnum) {
         if (von == bis)
             return;
         // System.out.println("$$$>" + von + " " + bis);

@@ -29,9 +29,7 @@ import static org.mycore.common.MCRConstants.XSI_NAMESPACE;
 
 import java.net.URI;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -40,7 +38,6 @@ import java.util.regex.Pattern;
 
 import org.jdom.Document;
 import org.jdom.Element;
-
 import org.mycore.datamodel.classifications2.MCRCategLinkServiceFactory;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
@@ -69,7 +66,7 @@ public class MCRCategoryTransformer {
     public static Document getMetaDataDocument(MCRCategory cl, boolean withCounter) {
         Map<MCRCategoryID, Number> countMap = null;
         if (withCounter) {
-            countMap = MCRCategLinkServiceFactory.getInstance().countLinks(getAllCategIDs(cl));
+            countMap = MCRCategLinkServiceFactory.getInstance().countLinks(cl);
         }
         return MetaDataElementFactory.getDocument(cl, countMap);
     }
@@ -86,7 +83,7 @@ public class MCRCategoryTransformer {
     public static Element getMetaDataElement(MCRCategory category, boolean withCounter) {
         Map<MCRCategoryID, Number> countMap = null;
         if (withCounter) {
-            countMap = MCRCategLinkServiceFactory.getInstance().countLinks(getAllCategIDs(category));
+            countMap = MCRCategLinkServiceFactory.getInstance().countLinks(category);
         }
         return MetaDataElementFactory.getElement(category, countMap);
     }
@@ -233,14 +230,14 @@ public class MCRCategoryTransformer {
              */
             if (countMatcher.find()) {
                 if (countMatcher.group(1) == null)
-                    countMap = MCRCategLinkServiceFactory.getInstance().countLinks(getAllCategIDs(cl));
+                    countMap = MCRCategLinkServiceFactory.getInstance().countLinks(cl);
                 else {
                     // group(2) contains objectType
                     String objectType = countMatcher.group(2);
-                    countMap = MCRCategLinkServiceFactory.getInstance().countLinksForType(getAllCategIDs(cl), objectType);
+                    countMap = MCRCategLinkServiceFactory.getInstance().countLinksForType(cl, objectType);
                 }
             } else if (!emptyLeaves) {
-                countMap = MCRCategLinkServiceFactory.getInstance().countLinks(getAllCategIDs(cl));
+                countMap = MCRCategLinkServiceFactory.getInstance().countLinks(cl);
             }
             
             root = new Element("items");
@@ -316,14 +313,5 @@ public class MCRCategoryTransformer {
                 list.add(a[i]);
             }
         }
-    }
-
-    private static Collection<MCRCategoryID> getAllCategIDs(MCRCategory category) {
-        HashSet<MCRCategoryID> ids = new HashSet<MCRCategoryID>();
-        ids.add(category.getId());
-        for (MCRCategory cat : category.getChildren()) {
-            ids.addAll(getAllCategIDs(cat));
-        }
-        return ids;
     }
 }
