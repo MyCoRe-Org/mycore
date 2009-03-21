@@ -214,31 +214,24 @@
   </target>
   
   <!-- =================================================================== -->
-  <!-- Does svn update on the working directory                            -->
-  <!-- =================================================================== -->
-
-  <target name="update">
-    <exec executable="svn">
-      <arg line="update" />
-    </exec>
-  </target>
-  
-  <!-- =================================================================== -->
   <!-- Runs CruiseControl build                                            -->
   <!-- =================================================================== -->
 
   <target name="cc.build">
-    <antcall target="clean" />
-    <antcall target="jar">
-      <param name="deprecation" value="on" />
-    </antcall>
+    <exec executable="svn">
+      <arg line="update" />
+    </exec>
+    <ant target="clean" />
+    <ant target="jar">
+      <property name="deprecation" value="on" />
+    </ant>
     <mkdir dir="${target.dir}/tests" />
-    <antcall target="test">
-      <param name="junit.printsummary" value="off" />
-      <param name="junit.formatter.type" value="xml" />
-      <param name="junit.formatter.usefile" value="true" />
-      <param name="junit.dir" value="${target.dir}/tests" />
-    </antcall>
+    <ant target="test">
+      <property name="junit.printsummary" value="off" />
+      <property name="junit.formatter.type" value="xml" />
+      <property name="junit.formatter.usefile" value="true" />
+      <property name="junit.dir" value="${target.dir}/tests" />
+    </ant>
   </target>
 
   <!-- =================================================================== -->
