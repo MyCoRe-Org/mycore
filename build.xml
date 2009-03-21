@@ -230,13 +230,14 @@
   <target name="cc.build">
     <antcall target="clean" />
     <antcall target="jar">
-      <property name="deprecation" value="on" />
+      <param name="deprecation" value="on" />
     </antcall>
+    <mkdir dir="${target.dir}/tests" />
     <antcall target="test">
-      <property name="junit.printsummary" value="off" />
-      <property name="junit.formatter.type" value="xml" />
-      <property name="junit.formatter.usefile" value="true" />
-      <property name="junit.dir" value="/mcr/ci/logs/mycore" />
+      <param name="junit.printsummary" value="off" />
+      <param name="junit.formatter.type" value="xml" />
+      <param name="junit.formatter.usefile" value="true" />
+      <param name="junit.dir" value="${target.dir}/tests" />
     </antcall>
   </target>
 
