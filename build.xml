@@ -213,10 +213,31 @@
     </path>
   </target>
   
-  <target name="foo">
-    <java classname="org.tmatesoft.svn.cli.svn.SVN" classpathref="mycore.classpath" dir="${basedir}">
-      <arg value="info" />
-    </java>
+  <!-- =================================================================== -->
+  <!-- Does svn update on the working directory                            -->
+  <!-- =================================================================== -->
+
+  <target name="update">
+    <exec executable="svn">
+      <arg line="update" />
+    </exec>
+  </target>
+  
+  <!-- =================================================================== -->
+  <!-- Runs CruiseControl build                                            -->
+  <!-- =================================================================== -->
+
+  <target name="cc.build">
+    <antcall target="clean" />
+    <antcall target="jar">
+      <property name="deprecation" value="on" />
+    </antcall>
+    <antcall target="test">
+      <property name="junit.printsummary" value="off" />
+      <property name="junit.formatter.type" value="xml" />
+      <property name="junit.formatter.usefile" value="true" />
+      <property name="junit.dir" value="/mcr/ci/logs/mycore" />
+    </antcall>
   </target>
 
   <!-- =================================================================== -->
