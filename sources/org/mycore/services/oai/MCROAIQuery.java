@@ -53,7 +53,7 @@ public interface MCROAIQuery {
      * @return List A list that contains an array of three Strings: the category
      *         id, the label and a description
      */
-    public List listSets(String instance);
+    public List<String[]> listSets(String instance);
 
     /**
      * Method listIdentifiers. Gets a list of identifiers with max.
@@ -73,7 +73,7 @@ public interface MCROAIQuery {
      *         identifier, a datestamp (modification date) and a string with a
      *         blank separated list of categories the element is classified in
      */
-    public List listIdentifiers(String[] set, String[] from, String[] until, String metadataPrefix, String instance);
+    public List<String> listIdentifiers(String[] set, String[] from, String[] until, String metadataPrefix, String instance);
 
     /**
      * Method getRecord. Gets a metadata record with the given <i>id </id>.
@@ -89,7 +89,7 @@ public interface MCROAIQuery {
      *         blank separated list of categories the element is classified in
      *         and a JDOM element with the metadata of the record
      */
-    public List getRecord(String id, String metadataPrefix, String instance);
+    public List<Object> getRecord(String id, String metadataPrefix, String instance);
 
     /**
      * Method listRecords. Gets a list of metadata records with max.
@@ -109,7 +109,7 @@ public interface MCROAIQuery {
      *         identifier, a datestamp (modification date) and a string with a
      *         blank separated list of categories the element is classified in
      */
-    public List listRecords(String[] set, String[] from, String[] until, String metadataPrefix, String instance);
+    public List<String> listRecords(String[] set, String[] from, String[] until, String metadataPrefix, String instance);
 
     /**
      * Method hasMore.

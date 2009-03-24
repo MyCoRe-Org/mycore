@@ -21,9 +21,7 @@ import java.util.Date;
 import java.util.Enumeration;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Map;
 import java.util.Properties;
 import java.util.StringTokenizer;
@@ -44,14 +42,13 @@ import org.jdom.ProcessingInstruction;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.jdom.transform.JDOMSource;
-
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRException;
 import org.mycore.common.xml.MCRXMLResource;
 import org.mycore.common.xml.MCRXSLTransformation;
 import org.mycore.datamodel.classifications2.MCRCategory;
-import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
+import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.MCRLabel;
 import org.mycore.datamodel.metadata.MCRMetaClassification;
 import org.mycore.datamodel.metadata.MCRMetaElement;
@@ -76,7 +73,7 @@ public class MCROAIProvider extends MCRServlet {
 
     private static Logger logger = Logger.getLogger(MCROAIProvider.class);
 
-    private static HashMap oaiConfig;
+    private static HashMap<String, MCROAIConfigBean> oaiConfig;
 
     // e-mail of oai-administrator
     private static String oaiAdminEmail;
@@ -94,8 +91,8 @@ public class MCROAIProvider extends MCRServlet {
 
     static {
         Properties props = CONFIG.getProperties("MCR.OAI.Repository.Identifier.");
-        oaiConfig = new HashMap();
-        for (Enumeration en = props.propertyNames(); en.hasMoreElements();) {
+        oaiConfig = new HashMap<String, MCROAIConfigBean>();
+        for (Enumeration<?> en = props.propertyNames(); en.hasMoreElements();) {
             String propName = (String) en.nextElement();
             String instance = propName.substring("MCR.OAI.Repository.Identifier.".length());
             oaiConfig.put(instance, new MCROAIConfigBean(instance));
@@ -104,8 +101,8 @@ public class MCROAIProvider extends MCRServlet {
         oaiProviderFriends = CONFIG.getString("MCR.OAI.Friends", "");
         oaiResumptionTokenTimeOut = CONFIG.getInt("MCR.OAI.Resumptiontoken.Timeout", 72);
         maxReturns = CONFIG.getInt("MCR.OAI.MaxReturns", 10);
-        resStore = (MCROAIResumptionTokenStore) CONFIG
-                .getInstanceOf("MCR.OAI.Resumptiontoken.Store", "org.mycore.backend.hibernate.MCRHIBResumptionTokenStore");
+        resStore = (MCROAIResumptionTokenStore) CONFIG.getInstanceOf("MCR.OAI.Resumptiontoken.Store",
+                "org.mycore.backend.hibernate.MCRHIBResumptionTokenStore");
     }
 
     // property name for the implementing class of MCROAIQuery
@@ -159,7 +156,7 @@ public class MCROAIProvider extends MCRServlet {
     private static final String STR_GRANULARITY = "yyyy-MM-dd'T'HH:mm:ss'Z'";
 
     private static final String STR_GRANULARITY_SHORT = "yyyy-MM-dd";
-    
+
     private static final String STR_REPOSITORY_GRANULARITY = "YYYY-MM-DD";
 
     private static final String STR_FIRST_DATE = "2000-01-01";
@@ -178,7 +175,8 @@ public class MCROAIProvider extends MCRServlet {
 
     private static final String ERR_UNKNOWN_FORMAT = "Unknown metadata format";
 
-    private static final String[] STR_VERBS = { "GetRecord", "Identify", "ListIdentifiers", "ListMetadataFormats", "ListRecords", "ListSets" };
+    private static final String[] STR_VERBS = { "GetRecord", "Identify", "ListIdentifiers", "ListMetadataFormats", "ListRecords",
+            "ListSets" };
 
     /**
      * Method destroy. Automatically destroys the Servlet.
@@ -317,13 +315,14 @@ public class MCROAIProvider extends MCRServlet {
      *            The HttpServletRequest to extract the parameter from.
      * @return String[] The values of the parameter.
      */
+    @SuppressWarnings("unchecked")
     private String[] getParameter(String p, HttpServletRequest request) {
-        Enumeration parameters = request.getParameterNames();
+        Enumeration<String> parameters = request.getParameterNames();
         String parameter = null;
         String[] paramValues = null;
 
         while (parameters.hasMoreElements()) {
-            parameter = (String) parameters.nextElement();
+            parameter = parameters.nextElement();
             if (parameter.equalsIgnoreCase(p)) {
                 paramValues = request.getParameterValues(parameter);
                 logger.debug("Parameter mit Wert " + p + " gefunden.");
@@ -359,18 +358,16 @@ public class MCROAIProvider extends MCRServlet {
      * @param maxargs
      * @return boolean True, if too much parameters were found
      */
+    @SuppressWarnings("unchecked")
     private boolean badArguments(HttpServletRequest request, int maxargs) {
-        Map parameterMap = request.getParameterMap();
+        Map<String, String[]> parameterMap = request.getParameterMap();
         if (parameterMap.size() > maxargs) {
             return true;
         }
 
         // If there are no wrong parameters, it it possible some
         // parameters are doubled
-        Collection values = parameterMap.values();
-        Iterator iterator = values.iterator();
-        while (iterator.hasNext()) {
-            String[] value = (String[]) iterator.next();
+        for (String[] value : parameterMap.values()) {
             if (value.length > 1) {
                 return true;
             }
@@ -410,7 +407,8 @@ public class MCROAIProvider extends MCRServlet {
      * @return Element The new List
      * @throws IOException
      */
-    private Element listFromResumptionToken(Element list, String resumptionToken, String prefix, Namespace ns, String listType) throws IOException {
+    private Element listFromResumptionToken(Element list, String resumptionToken, String prefix, Namespace ns, String listType)
+            throws IOException {
 
         try {
             String[] array = resumptionToken.split("x");
@@ -427,11 +425,9 @@ public class MCROAIProvider extends MCRServlet {
                 endObject = resumptionSize;
             }
 
-            List result = resStore.getResumptionTokenHits(resumptionTokenID, resumptionSize, maxReturns);
+            List<String[]> result = resStore.getResumptionTokenHits(resumptionTokenID, resumptionSize, maxReturns);
             if (listType.equals("set")) {
-                Iterator iterator = result.iterator();
-                while (iterator.hasNext()) {
-                    String[] setArray = (String[]) iterator.next();
+                for (String[] setArray : result) {
 
                     Element eSet = new Element("set", ns);
                     eSet = setSpec(eSet, setArray[2], ns);
@@ -448,8 +444,8 @@ public class MCROAIProvider extends MCRServlet {
                         Namespace xsi = Namespace.getNamespace("xsi", STR_SCHEMA_INSTANCE);
                         eDC.addNamespaceDeclaration(dc);
                         eDC.addNamespaceDeclaration(xsi);
-                        eDC.setAttribute("schemaLocation", STR_OAI_NAMESPACE + STR_OAI_VERSION + "/oai_dc/ " + STR_OAI_NAMESPACE + STR_OAI_VERSION
-                                + "/oai_dc.xsd", xsi);
+                        eDC.setAttribute("schemaLocation", STR_OAI_NAMESPACE + STR_OAI_VERSION + "/oai_dc/ " + STR_OAI_NAMESPACE
+                                + STR_OAI_VERSION + "/oai_dc.xsd", xsi);
                         Element eDescription = new Element("description", dc);
                         eDescription.addContent(setArray[5]);
                         eDC.addContent(eDescription);
@@ -461,12 +457,8 @@ public class MCROAIProvider extends MCRServlet {
                 }
             } else {
 
-                Iterator iterator = result.iterator();
-
-                while (iterator.hasNext()) {
+                for (String[] identifier : result) {
                     elementCounter++;
-
-                    String[] identifier = (String[]) iterator.next();
 
                     if ((maxReturns == 0) || (elementCounter <= maxReturns)) {
                         Element eHeader = new Element("header", ns);
@@ -618,12 +610,14 @@ public class MCROAIProvider extends MCRServlet {
         Element eOAIIdentifier = new Element("oai-identifier", idns);
         Namespace xsi = Namespace.getNamespace("xsi", STR_SCHEMA_INSTANCE);
         eOAIIdentifier.addNamespaceDeclaration(xsi);
-        eOAIIdentifier.setAttribute("schemaLocation", STR_OAI_NAMESPACE + "2.0/oai-identifier " + STR_OAI_NAMESPACE + "2.0/oai-identifier.xsd", xsi);
+        eOAIIdentifier.setAttribute("schemaLocation", STR_OAI_NAMESPACE + "2.0/oai-identifier " + STR_OAI_NAMESPACE
+                + "2.0/oai-identifier.xsd", xsi);
 
         eOAIIdentifier.addContent(newElementWithContent("scheme", idns, "oai"));
         eOAIIdentifier.addContent(newElementWithContent("repositoryIdentifier", idns, repositoryIdentifier));
         eOAIIdentifier.addContent(newElementWithContent("delimiter", idns, ":"));
-        eOAIIdentifier.addContent(newElementWithContent("sampleIdentifier", idns, "oai:" + repositoryIdentifier + ":MyCoReDemoDC_Document_1"));
+        eOAIIdentifier.addContent(newElementWithContent("sampleIdentifier", idns, "oai:" + repositoryIdentifier
+                + ":MyCoReDemoDC_Document_1"));
 
         eOAIDescription.addContent(eOAIIdentifier);
         eIdentify.addContent(eOAIDescription);
@@ -677,7 +671,7 @@ public class MCROAIProvider extends MCRServlet {
         String identifier[] = getParameter("identifier", request);
         // If an identifier was given, this will be the record to
         // check, if the metadata is supported
-        List record = null;
+        List<Object> record = null;
         if (identifier == null) {
             if (badArguments(request, 1)) {
                 logger.info("Anfrage 'listMetadataFormats' wurde wegen fehlendem Parameter abgebrochen.");
@@ -720,7 +714,7 @@ public class MCROAIProvider extends MCRServlet {
         eListMetadataFormats.addContent(dcMetadataFormat);
 
         Properties properties = CONFIG.getProperties(STR_OAI_METADATA_NAMESPACE);
-        Enumeration propertiesNames = properties.propertyNames();
+        Enumeration<?> propertiesNames = properties.propertyNames();
         while (propertiesNames.hasMoreElements()) {
             String name = (String) propertiesNames.nextElement();
             String metadataPrefix = name.substring(name.lastIndexOf(".") + 1);
@@ -740,8 +734,10 @@ public class MCROAIProvider extends MCRServlet {
             }
             Element eMetadataFormat = new Element("metadataFormat", ns);
             eMetadataFormat.addContent(newElementWithContent("metadataPrefix", ns, metadataPrefix));
-            eMetadataFormat.addContent(newElementWithContent("schema", ns, CONFIG.getString(STR_OAI_METADATA_SCHEMA + "." + metadataPrefix)));
-            eMetadataFormat.addContent(newElementWithContent("metadataNamespace", ns, CONFIG.getString(STR_OAI_METADATA_NAMESPACE + "." + metadataPrefix)));
+            eMetadataFormat
+                    .addContent(newElementWithContent("schema", ns, CONFIG.getString(STR_OAI_METADATA_SCHEMA + "." + metadataPrefix)));
+            eMetadataFormat.addContent(newElementWithContent("metadataNamespace", ns, CONFIG.getString(STR_OAI_METADATA_NAMESPACE + "."
+                    + metadataPrefix)));
             eListMetadataFormats.addContent(eMetadataFormat);
         }
 
@@ -801,7 +797,6 @@ public class MCROAIProvider extends MCRServlet {
             return document;
         }
 
-        List sets = null;
         MCROAIQuery query = null;
 
         try {
@@ -811,19 +806,15 @@ public class MCROAIProvider extends MCRServlet {
             return addError(document, "badResumptionToken", mcrx.getMessage());
         }
 
-        sets = new ArrayList(query.listSets(getServletName()));
+        List<String[]> sets = new ArrayList<String[]>(query.listSets(getServletName()));
 
         if (sets != null) {
-            ListIterator iterator = sets.listIterator();
-
             int elementCounter = 0;
             String sResumptionToken = null;
-            List resumptionList = new ArrayList();
-            List specs = new ArrayList();
+            List<String[]> resumptionList = new ArrayList<String[]>();
+            List<String> specs = new ArrayList<String>();
 
-            while (iterator.hasNext()) {
-                String[] set = (String[]) iterator.next();
-
+            for (String[] set : sets) {
                 Element eSet = new Element("set", ns);
                 eSet = setSpec(eSet, set[0], ns);
                 String content = eSet.getChildText("setSpec", ns);
@@ -844,8 +835,8 @@ public class MCROAIProvider extends MCRServlet {
                     Namespace xsi = Namespace.getNamespace("xsi", STR_SCHEMA_INSTANCE);
                     eDC.addNamespaceDeclaration(dc);
                     eDC.addNamespaceDeclaration(xsi);
-                    eDC.setAttribute("schemaLocation", STR_OAI_NAMESPACE + STR_OAI_VERSION + "/oai_dc/ " + STR_OAI_NAMESPACE + STR_OAI_VERSION + "/oai_dc.xsd",
-                            xsi);
+                    eDC.setAttribute("schemaLocation", STR_OAI_NAMESPACE + STR_OAI_VERSION + "/oai_dc/ " + STR_OAI_NAMESPACE
+                            + STR_OAI_VERSION + "/oai_dc.xsd", xsi);
                     Element eDescription = new Element("description", dc);
                     eDescription.addContent(set[2]);
                     eDC.addContent(eDescription);
@@ -939,9 +930,10 @@ public class MCROAIProvider extends MCRServlet {
                         logger.info("Anfrage 'listIdentifiers' enthaelt fehlerhafte Parameter.");
                         return addError(document, "noRecordsMatch", ERR_NO_RECORDS_MATCH);
                     }
-                    if(from[0].length()!=until[0].length()){
-                    	   logger.info("Anfrage 'listIdentifiers' enthaelt fehlerhafte Parameter (Granularität von from und until muss gleich sein.)");
-                    	   return addError(document, "badArgument", ERR_ILLEGAL_ARGUMENT);
+                    if (from[0].length() != until[0].length()) {
+                        logger
+                                .info("Anfrage 'listIdentifiers' enthaelt fehlerhafte Parameter (Granularität von from und until muss gleich sein.)");
+                        return addError(document, "badArgument", ERR_ILLEGAL_ARGUMENT);
                     }
                 }
                 maxArguments++;
@@ -1020,7 +1012,7 @@ public class MCROAIProvider extends MCRServlet {
 
         int elementCounter = 0;
         String sResumptionToken = null;
-        List resumptionList = new ArrayList();
+        List<String> resumptionList = new ArrayList<String>();
         MCROAIQuery query = null;
         try {
 
@@ -1033,11 +1025,9 @@ public class MCROAIProvider extends MCRServlet {
         String instance = getServletName();
         String repositoryID = getConfigBean(instance).getRepositoryIdentifier();
         do {
-            List result = query.listIdentifiers(set, from, until, prefix, instance);
+            List<String> result = query.listIdentifiers(set, from, until, prefix, instance);
             if (result != null) {
-                Iterator iterator = result.iterator();
-                while (iterator.hasNext()) {
-                    String objectId = (String) iterator.next();
+                for (String objectId : result) {
                     elementCounter++;
                     if ((maxReturns == 0) || (elementCounter <= maxReturns)) {
                         MCRObject object = new MCRObject();
@@ -1102,7 +1092,8 @@ public class MCROAIProvider extends MCRServlet {
         String identifier[] = getParameter("identifier", request);
         // Then: check if there was an metadataPrefix in the request (required)
         String metadataPrefix[] = getParameter("metadataPrefix", request);
-        if ((identifier == null) || (metadataPrefix == null) || (identifier.length != 1) || (metadataPrefix.length != 1) || badArguments(request, 3)) {
+        if ((identifier == null) || (metadataPrefix == null) || (identifier.length != 1) || (metadataPrefix.length != 1)
+                || badArguments(request, 3)) {
             logger.info("Anfrage 'getRecord' wurde wegen fehlendem Parameter abgebrochen.");
             return addError(document, "badArgument", ERR_ILLEGAL_ARGUMENT);
         }
@@ -1141,13 +1132,11 @@ public class MCROAIProvider extends MCRServlet {
         }
 
         if (query.exists(id)) {
-            List record = query.getRecord(id, metadataPrefix[0], getServletName());
+            List<Object> record = query.getRecord(id, metadataPrefix[0], getServletName());
             Element eGetRecord = new Element("GetRecord", ns);
 
             if (record != null) {
-                ListIterator iterator = record.listIterator();
-
-                String[] array = (String[]) iterator.next();
+                String[] array = (String[]) record.get(0);
 
                 Element eHeader = new Element("header", ns);
                 eHeader.addContent(newElementWithContent("identifier", ns, array[0]));
@@ -1157,7 +1146,7 @@ public class MCROAIProvider extends MCRServlet {
                 Element eRecord = new Element("record", ns);
                 eRecord.addContent(eHeader);
 
-                Element eMetadata = (Element) iterator.next();
+                Element eMetadata = (Element) record.get(1);
                 eRecord.addContent(eMetadata);
 
                 eGetRecord.addContent(eRecord);
@@ -1236,10 +1225,11 @@ public class MCROAIProvider extends MCRServlet {
                         logger.info("Anfrage 'listRecords' enthaelt nicht das richtige Datumsformat.");
                         return addError(document, "noRecordsMatch", ERR_NO_RECORDS_MATCH);
                     }
-                    if(from[0].length()!=until[0].length()){
-                 	   logger.info("Anfrage 'listIdentifiers' enthaelt fehlerhafte Parameter (Granularität von from und until muss gleich sein.)");
-                 	   return addError(document, "badArgument", ERR_ILLEGAL_ARGUMENT);
-                 }
+                    if (from[0].length() != until[0].length()) {
+                        logger
+                                .info("Anfrage 'listIdentifiers' enthaelt fehlerhafte Parameter (Granularität von from und until muss gleich sein.)");
+                        return addError(document, "badArgument", ERR_ILLEGAL_ARGUMENT);
+                    }
                 }
                 maxArguments++;
             }
@@ -1326,7 +1316,7 @@ public class MCROAIProvider extends MCRServlet {
         int elementCounter = 0;
 
         String sResumptionToken = null;
-        List resumptionList = new ArrayList();
+        List<String> resumptionList = new ArrayList<String>();
         MCROAIQuery query = null;
         try {
 
@@ -1339,11 +1329,9 @@ public class MCROAIProvider extends MCRServlet {
         String repositoryID = getConfigBean(instance).getRepositoryIdentifier();
 
         do {
-            List result = query.listRecords(set, from, until, prefix, instance);
+            List<String> result = query.listRecords(set, from, until, prefix, instance);
             if (result != null) {
-                Iterator iterator = result.iterator();
-                while (iterator.hasNext()) {
-                    String objectId = (String) iterator.next();
+                for (String objectId : result) {
                     elementCounter++;
 
                     if ((maxReturns == 0) || (elementCounter <= maxReturns)) {
@@ -1515,7 +1503,7 @@ public class MCROAIProvider extends MCRServlet {
     }
 
     static MCROAIConfigBean getConfigBean(String instance) {
-        return (MCROAIConfigBean) oaiConfig.get(instance);
+        return oaiConfig.get(instance);
     }
 
     static int getMaximalHitsize() {
@@ -1549,7 +1537,7 @@ public class MCROAIProvider extends MCRServlet {
         identifier[2] = new String("");
         identifier[3] = objectId;
 
-        List classifications = Arrays.asList(MCROAIProvider.getConfigBean(instance).getClassificationIDs());
+        List<String> classifications = Arrays.asList(MCROAIProvider.getConfigBean(instance).getClassificationIDs());
 
         for (int j = 0; j < object.getMetadata().size(); j++) {
             if (object.getMetadata().getMetadataElement(j).getClassName().equals("MCRMetaClassification")) {
@@ -1560,7 +1548,8 @@ public class MCROAIProvider extends MCRServlet {
                     String classificationId = classification.getClassId();
                     if (classifications.contains(classificationId)) {
                         String categoryId = classification.getCategId();
-                        MCRCategory category = MCRCategoryDAOFactory.getInstance().getCategory(new MCRCategoryID(classificationId, categoryId), -1);
+                        MCRCategory category = MCRCategoryDAOFactory.getInstance().getCategory(
+                                new MCRCategoryID(classificationId, categoryId), -1);
                         Collection<org.mycore.datamodel.classifications2.MCRLabel> labels = category.getLabels();
                         boolean found = false;
                         for (MCRLabel label : labels) {
@@ -1571,12 +1560,12 @@ public class MCROAIProvider extends MCRServlet {
                             }
                         }
                         if (!found) {
-                        	MCRCategory parent;
+                            MCRCategory parent;
                             while ((parent = category.getParent()) != null) {
-                            	categoryId = parent.getId().getID() + ":" + categoryId;
-                            	category = parent;
-                            }	
-                        	setSpec.append(" ").append(categoryId);
+                                categoryId = parent.getId().getID() + ":" + categoryId;
+                                category = parent;
+                            }
+                            setSpec.append(" ").append(categoryId);
                         }
                     }
                 }

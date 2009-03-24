@@ -18,7 +18,7 @@ public class MCROAIConfigBean {
 	//	 you can define for each instance of your application a special restriction
 	private String queryRestriction;
 	//	 searchfields from searchfields.xml relevant for oai list set
-	private List searchFields = new ArrayList();
+	private List<String> searchFields = new ArrayList<String>();
 	//	 classificationID relevant for the oai list set
 	private String[] classificationIDs=new String[]{};
 
@@ -39,7 +39,7 @@ public class MCROAIConfigBean {
     				lstClassificationIDs.add(classIDs[j]);
     			}
     		}   	
-    		this.classificationIDs =(String[]) lstClassificationIDs.toArray(new String[]{});
+    		this.classificationIDs =lstClassificationIDs.toArray(new String[]{});
     	
     		if(this.classificationIDs.length == 0){
     			logger.error("no classification entry found in MCR.OAI.Setscheme.Classids." + instance);
@@ -105,11 +105,11 @@ public class MCROAIConfigBean {
 		this.queryRestriction = queryRestriction;
 	}
 
-	public List getSearchFields() {
+	public List<String> getSearchFields() {
 		return searchFields;
 	}
 
-	public void setSearchFields(List searchFields) {
+	public void setSearchFields(List<String> searchFields) {
 		this.searchFields = searchFields;
 	}
 
