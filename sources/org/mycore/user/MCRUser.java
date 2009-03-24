@@ -34,6 +34,7 @@ import java.util.List;
 
 import org.jdom.Document;
 import org.jdom.Element;
+import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
@@ -224,6 +225,7 @@ public class MCRUser extends MCRUserObject implements MCRPrincipal, Principal {
      * @param elm
      *            JDOM Element defining a user
      */
+    @SuppressWarnings("unchecked")
     public MCRUser(Element elm) {
         this();
 
@@ -582,7 +584,7 @@ public class MCRUser extends MCRUserObject implements MCRPrincipal, Principal {
 
         MCRGroup primaryGroup = MCRUserMgr.instance().retrieveGroup(primaryGroupID, false);
 
-        if (AI.checkPermission("modify-user")) {
+        if (MCRAccessManager.checkPermission("modify-user")) {
             return true;
         } else if (this.ID.equals(currentUserID) || this.creator.equals(currentUserID)) {
             return true;

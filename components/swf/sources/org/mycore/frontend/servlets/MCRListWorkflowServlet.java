@@ -38,6 +38,7 @@ import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.transform.JDOMSource;
 import org.jdom.xpath.XPath;
+import org.mycore.access.MCRAccessInterface;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
@@ -261,6 +262,7 @@ public class MCRListWorkflowServlet extends MCRServlet {
         parameters.put("DefaultLang", DefaultLang);
         parameters.put("CurrentLang", lang);
         MCRXSLTransformation.setParameters(handler, parameters);
+        MCRAccessInterface ai = MCRAccessManager.getAccessImpl();
         // run the loop over all objects in the workflow
         for (int i = 0; i < workfiles.size(); i++) {
             String wfile = (String) workfiles.get(i);
@@ -275,21 +277,21 @@ public class MCRListWorkflowServlet extends MCRServlet {
                 int j = service.getRuleIndex("writewf");
                 if (j != -1) {
                     writewf = service.getRule(j).getCondition();
-                    if (!AI.checkPermission(writewf)) {
+                    if (!ai.checkPermission(writewf)) {
                         continue;
                     }
                 }
                 j = service.getRuleIndex("deletewf");
                 if (j != -1) {
                     deletewf = service.getRule(j).getCondition();
-                    bdeletewf = AI.checkPermission(deletewf);
+                    bdeletewf = ai.checkPermission(deletewf);
                 } else {
                     bdeletewf = true;
                 }
                 j = service.getRuleIndex("writedb");
                 if (j != -1) {
                     writedb = service.getRule(j).getCondition();
-                    bwritedb = AI.checkPermission(writedb);
+                    bwritedb = ai.checkPermission(writedb);
                 } else {
                     bwritedb = MCRAccessManager.checkPermission(obj.getId().toString(), "writedb");
                 }

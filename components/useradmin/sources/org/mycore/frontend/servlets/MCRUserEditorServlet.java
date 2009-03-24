@@ -31,6 +31,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 
+import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
@@ -133,12 +134,13 @@ public class MCRUserEditorServlet extends MCRUserAdminGUICommons {
             // current user.
             MCRUser currentUser = MCRUserMgr.instance().retrieveUser(currentUserID);
 
-            if (AI.checkPermission("administrate-user")) {
+            if (MCRAccessManager.checkPermission("administrate-user")) {
                 groupIDs = MCRUserMgr.instance().getAllGroupIDs();
-            } else if (AI.checkPermission("create-user")) {
+            } else if (MCRAccessManager.checkPermission("create-user")) {
                 groupIDs = currentUser.getGroupIDs();
             } else {
-                LOGGER.warn("MCRUserEditorServlet: not enough permissions! " + "Someone might have tried to call the new user form directly.");
+                LOGGER.warn("MCRUserEditorServlet: not enough permissions! "
+                        + "Someone might have tried to call the new user form directly.");
                 showNoPrivsPage(job);
                 return;
             }
@@ -151,8 +153,8 @@ public class MCRUserEditorServlet extends MCRUserAdminGUICommons {
         org.jdom.Element root = new org.jdom.Element("items");
 
         for (int i = 0; i < groupIDs.size(); i++) {
-            org.jdom.Element item = new org.jdom.Element("item").setAttribute("value", (String) groupIDs.get(i))
-                            .setAttribute("label", (String) groupIDs.get(i));
+            org.jdom.Element item = new org.jdom.Element("item").setAttribute("value", (String) groupIDs.get(i)).setAttribute("label",
+                    (String) groupIDs.get(i));
             root.addContent(item);
         }
 
@@ -174,9 +176,9 @@ public class MCRUserEditorServlet extends MCRUserAdminGUICommons {
      */
     private void getAllGroups(MCRServletJob job) throws IOException {
         List<String> groupIDs;
-        if (!AI.checkPermission("modify-user") && !AI.checkPermission("modify-contact")) {
+        if (!MCRAccessManager.checkPermission("modify-user") && !MCRAccessManager.checkPermission("modify-contact")) {
             showNoPrivsPage(job);
-            return;            
+            return;
         }
         groupIDs = MCRUserMgr.instance().getAllGroupIDs();
 
@@ -184,8 +186,8 @@ public class MCRUserEditorServlet extends MCRUserAdminGUICommons {
         org.jdom.Element root = new org.jdom.Element("items");
 
         for (int i = 0; i < groupIDs.size(); i++) {
-            org.jdom.Element item = new org.jdom.Element("item").setAttribute("value", (String) groupIDs.get(i))
-                            .setAttribute("label", (String) groupIDs.get(i));
+            org.jdom.Element item = new org.jdom.Element("item").setAttribute("value", (String) groupIDs.get(i)).setAttribute("label",
+                    (String) groupIDs.get(i));
             root.addContent(item);
         }
 
@@ -207,9 +209,9 @@ public class MCRUserEditorServlet extends MCRUserAdminGUICommons {
      */
     private void getAllUsers(MCRServletJob job) throws IOException {
         List<String> userIDs;
-        if (!AI.checkPermission("modify-user") && !AI.checkPermission("modify-contact")) {
+        if (!MCRAccessManager.checkPermission("modify-user") && !MCRAccessManager.checkPermission("modify-contact")) {
             showNoPrivsPage(job);
-            return;            
+            return;
         }
         userIDs = MCRUserMgr.instance().getAllUserIDs();
 
@@ -217,7 +219,8 @@ public class MCRUserEditorServlet extends MCRUserAdminGUICommons {
         org.jdom.Element root = new org.jdom.Element("items");
 
         for (int i = 0; i < userIDs.size(); i++) {
-            org.jdom.Element item = new org.jdom.Element("item").setAttribute("value", (String) userIDs.get(i)).setAttribute("label", (String) userIDs.get(i));
+            org.jdom.Element item = new org.jdom.Element("item").setAttribute("value", (String) userIDs.get(i)).setAttribute("label",
+                    (String) userIDs.get(i));
             root.addContent(item);
         }
 
@@ -240,9 +243,9 @@ public class MCRUserEditorServlet extends MCRUserAdminGUICommons {
      */
     private void retrieveAllUserXML(MCRServletJob job) throws IOException {
         // We first check the privileges for this use case
-        if (!AI.checkPermission("modify-user") && !AI.checkPermission("modify-contact")) {
+        if (!MCRAccessManager.checkPermission("modify-user") && !MCRAccessManager.checkPermission("modify-contact")) {
             showNoPrivsPage(job);
-            return;            
+            return;
         }
 
         try {
@@ -262,9 +265,9 @@ public class MCRUserEditorServlet extends MCRUserAdminGUICommons {
      */
     private void retrieveUserXML(MCRServletJob job) throws IOException {
         // We first check the privileges for this use case
-        if (!AI.checkPermission("modify-user") && !AI.checkPermission("modify-contact")) {
+        if (!MCRAccessManager.checkPermission("modify-user") && !MCRAccessManager.checkPermission("modify-contact")) {
             showNoPrivsPage(job);
-            return;            
+            return;
         }
 
         try {
@@ -286,9 +289,9 @@ public class MCRUserEditorServlet extends MCRUserAdminGUICommons {
      */
     private void retrieveGroupXML(MCRServletJob job) throws IOException {
         // We first check the privileges for this use case
-        if (!AI.checkPermission("modify-user") && !AI.checkPermission("modify-contact")) {
+        if (!MCRAccessManager.checkPermission("modify-user") && !MCRAccessManager.checkPermission("modify-contact")) {
             showNoPrivsPage(job);
-            return;            
+            return;
         }
 
         try {
@@ -334,7 +337,8 @@ public class MCRUserEditorServlet extends MCRUserAdminGUICommons {
         String useCase = parms.getParameter("usecase");
 
         // Determine the use case
-        if ((useCase.equals("create-user") || useCase.equals("modify-user") || useCase.equals("modify-contact")) && jdomDoc.getRootElement().getName().equals("mycoreuser")) {
+        if ((useCase.equals("create-user") || useCase.equals("modify-user") || useCase.equals("modify-contact"))
+                && jdomDoc.getRootElement().getName().equals("mycoreuser")) {
             String numID = Integer.toString(MCRUserMgr.instance().getMaxUserNumID() + 1);
             jdomDoc.getRootElement().getChild("user").setAttribute("numID", numID);
 
@@ -361,9 +365,9 @@ public class MCRUserEditorServlet extends MCRUserAdminGUICommons {
                     MCRUser olduser = umgr.retrieveUser(uid);
                     MCRUser thisUser = null;
                     if (olduser.getPassword().compareTo(newpwd) == 0) {
-                        thisUser = new MCRUser(userElement, false);                        
+                        thisUser = new MCRUser(userElement, false);
                     } else {
-                    thisUser = new MCRUser(userElement, true);
+                        thisUser = new MCRUser(userElement, true);
                     }
                     MCRUserMgr.instance().updateUser(thisUser);
                 }
@@ -371,11 +375,13 @@ public class MCRUserEditorServlet extends MCRUserAdminGUICommons {
                 // doLayout(job, "xml", jdomDoc, true);
                 showOkPage(job);
             } catch (MCRException ex) {
-                generateErrorPage(job.getRequest(), job.getResponse(), HttpServletResponse.SC_INTERNAL_SERVER_ERROR, ex.getMessage(), ex, false);
+                generateErrorPage(job.getRequest(), job.getResponse(), HttpServletResponse.SC_INTERNAL_SERVER_ERROR, ex.getMessage(), ex,
+                        false);
 
                 return;
             }
-        } else if ((useCase.equals("create-group") || useCase.equals("modify-group")) && jdomDoc.getRootElement().getName().equals("mycoregroup")) {
+        } else if ((useCase.equals("create-group") || useCase.equals("modify-group"))
+                && jdomDoc.getRootElement().getName().equals("mycoregroup")) {
             try {
                 String groupID = jdomDoc.getRootElement().getChild("group").getAttributeValue("ID");
                 if (groupID == null)
@@ -389,7 +395,8 @@ public class MCRUserEditorServlet extends MCRUserAdminGUICommons {
                 // doLayout(job, "xml", jdomDoc, true);
                 showOkPage(job);
             } catch (MCRException ex) {
-                generateErrorPage(job.getRequest(), job.getResponse(), HttpServletResponse.SC_INTERNAL_SERVER_ERROR, ex.getMessage(), ex, false);
+                generateErrorPage(job.getRequest(), job.getResponse(), HttpServletResponse.SC_INTERNAL_SERVER_ERROR, ex.getMessage(), ex,
+                        false);
                 return;
             }
         } else {

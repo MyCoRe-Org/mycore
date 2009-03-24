@@ -28,7 +28,6 @@ import static org.mycore.common.MCRConstants.XLINK_NAMESPACE;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 import java.util.regex.Matcher;
@@ -48,18 +47,18 @@ import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.transform.JDOMSource;
-
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRException;
+import org.mycore.common.xml.MCRLayoutService;
 import org.mycore.common.xml.MCRXMLResource;
 import org.mycore.common.xml.MCRXSLTransformation;
+import org.mycore.datamodel.common.MCRXMLTableManager;
 import org.mycore.datamodel.ifs.MCRDirectory;
 import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.ifs.MCRFilesystemNode;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.datamodel.common.MCRXMLTableManager;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
 
@@ -81,8 +80,10 @@ import org.mycore.frontend.servlets.MCRServletJob;
  */
 public class MCRZipServlet extends MCRServlet {
     private static final long serialVersionUID = 1L;
+
     // The Log4J logger
     private static Logger LOGGER = Logger.getLogger(MCRZipServlet.class.getName());
+
     private static String accessErrorPage = CONFIG.getString("MCR.Access.Page.Error");
 
     protected MCRXMLTableManager xmltable = null;
@@ -153,7 +154,7 @@ public class MCRZipServlet extends MCRServlet {
                 out.close();
             } else {
                 Document jdom = xmltable.readDocument(mcrid);
-                if (!AI.checkPermission(id, "read")) {
+                if (!MCRAccessManager.checkPermission(id, "read")) {
                     LOGGER.info("MCRFileNodeServlet: AccessForbidden to " + id);
                     res.sendRedirect(res.encodeRedirectURL(getBaseURL() + accessErrorPage));
                     return;
@@ -163,9 +164,10 @@ public class MCRZipServlet extends MCRServlet {
                 out.close();
             }
         } catch (Exception e) {
-            String msg = "Das Zip-File konnte nicht ordnungsgem�ss erstellt werden, " + "Bitte �berpr�fen Sie die eingegebenen Parameter";
+            String msg = "Das Zip-File konnte nicht ordnungsgem�ss erstellt werden, "
+                    + "Bitte �berpr�fen Sie die eingegebenen Parameter";
             res.reset();
-            generateErrorPage(req, res, HttpServletResponse.SC_BAD_REQUEST, msg, new MCRException("zip-Error!",e), false);
+            generateErrorPage(req, res, HttpServletResponse.SC_BAD_REQUEST, msg, new MCRException("zip-Error!", e), false);
         }
     }
 
@@ -176,7 +178,7 @@ public class MCRZipServlet extends MCRServlet {
      *            MCRFile, that has to be zipped
      */
     protected void sendZipped(MCRFile file, ZipOutputStream out) throws IOException {
-        LOGGER.debug("zipping "+file.getPath());
+        LOGGER.debug("zipping " + file.getPath());
         ZipEntry ze = new ZipEntry(file.getPath());
         ze.setTime(file.getLastModified().getTime().getTime());
         out.putNextEntry(ze);
@@ -219,7 +221,7 @@ public class MCRZipServlet extends MCRServlet {
         ze.setTime(new Date().getTime());
         out.putNextEntry(ze);
 
-        Document stylesheet=MCRXMLResource.instance().getResource("xsl/"+this.stylesheet);
+        Document stylesheet = MCRXMLResource.instance().getResource("xsl/" + this.stylesheet);
         MCRXSLTransformation transformation = MCRXSLTransformation.getInstance();
         Templates templates = transformation.getStylesheet(new JDOMSource(stylesheet));
         TransformerHandler th = transformation.getTransformerHandler(templates);
@@ -241,7 +243,7 @@ public class MCRZipServlet extends MCRServlet {
      *            is zipped
      */
     protected void sendDerivate(String ownerID, String dirpath, ZipOutputStream out) throws IOException {
-    	
+
         MCRFilesystemNode root;
         MCRDirectory rootdirectory;
         MCRFilesystemNode zipdirectory;
@@ -298,24 +300,24 @@ public class MCRZipServlet extends MCRServlet {
      * @throws JDOMException 
      *  
      */
+    @SuppressWarnings("unchecked")
     protected void sendObject(Document jdom, HttpServletRequest req, ZipOutputStream out) throws IOException, JDOMException {
         // zip the object's Metadata
-        Properties parameters = getLayoutService().buildXSLParameters(req);
+        Properties parameters = MCRLayoutService.buildXSLParameters(req);
         sendZipped(jdom, parameters, out);
 
         // zip all derivates
-        List li = jdom.getRootElement().getChild("structure").getChild("derobjects").getChildren("derobject");
+        List<Element> li = jdom.getRootElement().getChild("structure").getChild("derobjects").getChildren("derobject");
 
-        for (Iterator it = li.iterator(); it.hasNext();) {
-            Element el = (Element) it.next();
+        for (Element el : li) {
             LOGGER.debug(el.getName());
 
             if (el.getAttributeValue("inherited").equals("0")) {
                 String ownerID = el.getAttributeValue("href", XLINK_NAMESPACE);
                 // here the access check is tested only against the derivate
-                if(AI.checkPermission(ownerID,"read")) {
-                	String dir = null;
-                    sendDerivate(ownerID, dir, out);	
+                if (MCRAccessManager.checkPermission(ownerID, "read")) {
+                    String dir = null;
+                    sendDerivate(ownerID, dir, out);
                 }
             }
         }

@@ -40,7 +40,6 @@ import java.net.URLDecoder;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
 import java.util.StringTokenizer;
@@ -60,7 +59,6 @@ import org.jdom.input.DOMBuilder;
 import org.jdom.input.SAXBuilder;
 import org.jdom.output.XMLOutputter;
 import org.jdom.transform.JDOMSource;
-import org.mycore.access.MCRAccessInterface;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRConfiguration;
@@ -834,19 +832,15 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
 
             Element container = new Element("servacls").setAttribute("class", "MCRMetaAccessRule");
 
-            MCRAccessInterface AI = MCRAccessManager.getAccessImpl();
-
             if (action.equals("all")) {
-                Iterator it = AI.getPermissionsForID(objId).iterator();
-                while (it.hasNext()) {
-                    action = it.next().toString();
+                for (String permission : MCRAccessManager.getPermissionsForID(objId)) {
                     // one pool Element under access per defined AccessRule in
                     // Pool
                     // for (Object-)ID
-                    addRule(container, action, AI.getRule(objId, action));
+                    addRule(container, permission, MCRAccessManager.getAccessImpl().getRule(objId, permission));
                 }
             } else {
-                addRule(container, action, AI.getRule(objId, action));
+                addRule(container, action, MCRAccessManager.getAccessImpl().getRule(objId, action));
             }
 
             return container;

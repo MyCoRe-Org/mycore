@@ -42,6 +42,7 @@ import javax.servlet.ServletException;
 
 import org.apache.log4j.Logger;
 
+import org.mycore.access.MCRAccessInterface;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRMailer;
@@ -83,6 +84,8 @@ import org.mycore.services.urn.MCRURNManager;
 public class MCRStartEditorServlet extends MCRServlet {
 
     private static final long serialVersionUID = 1L;
+
+    private static final MCRAccessInterface AI = MCRAccessManager.getAccessImpl();
 
     // The configuration
     protected static Logger LOGGER = Logger.getLogger(MCRStartEditorServlet.class);
@@ -597,7 +600,7 @@ public class MCRStartEditorServlet extends MCRServlet {
 
         // read object
         MCRObjectService service = new MCRObjectService();
-        Collection<String> permlist = AI.getPermissionsForID(cd.mysemcrid.getId());
+        Collection<String> permlist = MCRAccessManager.getPermissionsForID(cd.mysemcrid.getId());
         for (String permission : permlist) {
             org.jdom.Element ruleelm = AI.getRule(cd.mysemcrid.getId(), permission);
             ruleelm = normalizeACLforSWF(ruleelm);
@@ -849,7 +852,7 @@ public class MCRStartEditorServlet extends MCRServlet {
      *            the MCRServletJob instance
      */
     public void waddfile(MCRServletJob job, CommonData cd) throws IOException {
-        if (!AI.checkPermission("create-" + cd.myremcrid.getTypeId())) {
+        if (!MCRAccessManager.checkPermission("create-" + cd.myremcrid.getTypeId())) {
             job.getResponse().sendRedirect(getBaseURL() + usererrorpage);
             return;
         }
@@ -1238,7 +1241,7 @@ public class MCRStartEditorServlet extends MCRServlet {
      *            the MCRServletJob instance
      */
     public void wnewder(MCRServletJob job, CommonData cd) throws IOException {
-        if (!AI.checkPermission("create-" + cd.mytype)) {
+        if (!MCRAccessManager.checkPermission("create-" + cd.mytype)) {
             (new MCRObjectID()).decrementOneFreeId((cd.mytfmcrid).getBase());
             job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + usererrorpage));
             return;
@@ -1259,7 +1262,7 @@ public class MCRStartEditorServlet extends MCRServlet {
      *            the MCRServletJob instance
      */
     public void wnewobj(MCRServletJob job, CommonData cd) throws IOException {
-        if ((!AI.checkPermission("create-" + cd.mytfmcrid.getBase())) && (!AI.checkPermission("create-" + cd.mytype))) {
+        if ((!AI.checkPermission("create-" + cd.mytfmcrid.getBase())) && (!MCRAccessManager.checkPermission("create-" + cd.mytype))) {
             (new MCRObjectID()).decrementOneFreeId((cd.mytfmcrid).getBase());
             job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + usererrorpage));
             return;

@@ -30,15 +30,12 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.Namespace;
 import org.jdom.xpath.XPath;
-
-import org.mycore.access.MCRAccessInterface;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRSession;
@@ -70,8 +67,6 @@ public class MCRClassificationBrowserData {
     private static MCRConfiguration config;
 
     private static final Logger LOGGER = Logger.getLogger(MCRClassificationBrowserData.class);
-
-    private static final MCRAccessInterface AI = MCRAccessManager.getAccessImpl();
 
     private ArrayList<Element> lines;
 
@@ -381,7 +376,7 @@ public class MCRClassificationBrowserData {
         LOGGER.debug("create XML tree for all classifications");
         final Element xDocument = new Element("classificationbrowse");
         final Element CreateClassButton = new Element("userCanCreate");
-        if (AI.checkPermission("create-classification")) {
+        if (MCRAccessManager.checkPermission("create-classification")) {
             CreateClassButton.addContent("true");
         } else {
             CreateClassButton.addContent("false");
@@ -415,12 +410,12 @@ public class MCRClassificationBrowserData {
             }
             // set permissions
             if (getClassificationPool().isEdited(id) == false) {
-                if (AI.checkPermission(id.getRootID(), "writedb")) {
+                if (MCRAccessManager.checkPermission(id.getRootID(), "writedb")) {
                     cli.setAttribute("userCanEdit", "true");
                 } else {
                     cli.setAttribute("userCanEdit", "false");
                 }
-                if (AI.checkPermission(id.getRootID(), "deletedb")) {
+                if (MCRAccessManager.checkPermission(id.getRootID(), "deletedb")) {
                     cli.setAttribute("userCanDelete", "true");
                 } else {
                     cli.setAttribute("userCanDelete", "false");
@@ -556,13 +551,13 @@ public class MCRClassificationBrowserData {
         LOGGER.debug("now we check this right for the current user");
         // now we check this right for the current user
         if (cp.isEdited(getClassification().getId()) == false) {
-            String permString = String.valueOf(AI.checkPermission("create-classification"));
+            String permString = String.valueOf(MCRAccessManager.checkPermission("create-classification"));
             CreateButton.addContent(permString);
             xDocument.addContent(CreateButton);
-            permString = String.valueOf(AI.checkPermission(cl.getId().getRootID(), "writedb"));
+            permString = String.valueOf(MCRAccessManager.checkPermission(cl.getId().getRootID(), "writedb"));
             EditButton.addContent(permString);
             xDocument.addContent(EditButton);
-            permString = String.valueOf(AI.checkPermission(cl.getId().getRootID(), "deletedb"));
+            permString = String.valueOf(MCRAccessManager.checkPermission(cl.getId().getRootID(), "deletedb"));
             DeleteButton.addContent(permString);
             xDocument.addContent(DeleteButton);
         } else {

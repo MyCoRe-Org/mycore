@@ -47,8 +47,6 @@ import org.apache.log4j.Logger;
 import org.jdom.DocType;
 import org.jdom.Document;
 import org.jdom.Element;
-import org.mycore.access.MCRAccessInterface;
-import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
@@ -76,8 +74,6 @@ public class MCRServlet extends HttpServlet {
 
     // Some configuration details
     protected static final MCRConfiguration CONFIG = MCRConfiguration.instance();
-
-    protected static final MCRAccessInterface AI = MCRAccessManager.getAccessImpl();
 
     private static Logger LOGGER = Logger.getLogger(MCRServlet.class);
 
@@ -463,7 +459,7 @@ public class MCRServlet extends HttpServlet {
     protected String buildRedirectURL(String baseURL, Properties parameters) {
         StringBuilder redirectURL = new StringBuilder(baseURL);
         boolean first = true;
-        for (Enumeration e = parameters.keys(); e.hasMoreElements();) {
+        for (Enumeration<?> e = parameters.keys(); e.hasMoreElements();) {
             if (first) {
                 redirectURL.append("?");
                 first = false;
@@ -600,11 +596,12 @@ public class MCRServlet extends HttpServlet {
         return req.getRemoteAddr();
     }
 
+    @SuppressWarnings("unchecked")
     private static void putParamsToSession(HttpServletRequest request) {
         MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
 
-        for (Enumeration e = request.getParameterNames(); e.hasMoreElements();) {
-            String name = e.nextElement().toString();
+        for (Enumeration<String> e = request.getParameterNames(); e.hasMoreElements();) {
+            String name = e.nextElement();
             if (name.startsWith("XSL.") && name.endsWith(".SESSION")) {
                 String key = name.substring(0, name.length() - 8);
                 // parameter is not empty -> store
@@ -621,8 +618,8 @@ public class MCRServlet extends HttpServlet {
                 }
             }
         }
-        for (Enumeration e = request.getAttributeNames(); e.hasMoreElements();) {
-            String name = e.nextElement().toString();
+        for (Enumeration<String> e = request.getAttributeNames(); e.hasMoreElements();) {
+            String name = e.nextElement();
             if (name.startsWith("XSL.") && name.endsWith(".SESSION")) {
                 String key = name.substring(0, name.length() - 8);
                 // attribute is not empty -> store

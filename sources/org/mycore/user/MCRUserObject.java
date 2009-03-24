@@ -27,8 +27,6 @@ import java.sql.Timestamp;
 import java.util.GregorianCalendar;
 
 import org.apache.log4j.Logger;
-import org.mycore.access.MCRAccessInterface;
-import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 
@@ -46,8 +44,6 @@ abstract class MCRUserObject {
     protected static Logger logger = Logger.getLogger(MCRUserObject.class.getName());
 
     protected static MCRConfiguration config = null;
-    
-    protected static MCRAccessInterface AI = MCRAccessManager.getAccessImpl();
 
     /** The maximum length of user and group names */
     public static final int id_len = 20;

@@ -32,6 +32,7 @@ import org.apache.log4j.Logger;
 import org.jdom.Element;
 import org.jdom.output.XMLOutputter;
 
+import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.datamodel.classifications.MCRClassificationBrowserData;
 import org.mycore.datamodel.classifications.MCRClassificationEditor;
@@ -134,17 +135,17 @@ public class MCRStartClassEditorServlet extends MCRServlet {
         }
 
         if (needsCreatePrivilege(todo, todo2)) {
-            if (!(AI.checkPermission("create-classification"))) {
+            if (!(MCRAccessManager.checkPermission("create-classification"))) {
                 setResponsePage(job, ReturnStatus.fail, getBaseURL() + usererrorpage);
                 return;
             }
         } else if (needsDeleteRight(todo, todo2)) {
-            if (!(AI.checkPermission(clid, "deletedb"))) {
+            if (!(MCRAccessManager.checkPermission(clid, "deletedb"))) {
                 setResponsePage(job, ReturnStatus.fail, getBaseURL() + usererrorpage);
                 return;
             }
         } else {
-            if (!(AI.checkPermission(clid, "writedb"))) {
+            if (!(MCRAccessManager.checkPermission(clid, "writedb"))) {
                 setResponsePage(job, ReturnStatus.fail, getBaseURL() + usererrorpage);
                 return;
             }

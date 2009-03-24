@@ -30,10 +30,7 @@ import java.net.URL;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-
 import org.jdom.Document;
-import org.mycore.access.MCRAccessInterface;
-import org.mycore.access.MCRAccessManager;
 import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.workflow.MCREditorOutValidator;
@@ -56,9 +53,6 @@ abstract public class MCRCheckBase extends MCRServlet {
     // The file separator
     String NL = System.getProperty("file.separator");
 
-    // The Access Manager
-    protected static MCRAccessInterface AI = MCRAccessManager.getAccessImpl();
-
     // The Workflow Manager
     protected static MCRSimpleWorkflowManager WFM = MCRSimpleWorkflowManager.instance();
 
@@ -68,7 +62,7 @@ abstract public class MCRCheckBase extends MCRServlet {
     // pagedir
     protected static String pagedir = CONFIG.getString("MCR.SWF.PageDir", "");
 
-    protected List errorlog;
+    protected List<String> errorlog;
 
     /**
      * The method return an URL with the next working step. If okay flag is

@@ -26,7 +26,6 @@ package org.mycore.frontend.wcms;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -44,8 +43,6 @@ import org.mycore.access.MCRAccessInterface;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.xml.MCRURIResolver;
-import org.mycore.frontend.MCRLayoutUtilities;
 import org.mycore.user.MCRUser;
 import org.mycore.user.MCRUserMgr;
 
@@ -100,7 +97,7 @@ public class MCRWCMSAdminServlet extends MCRWCMSServlet {
                 url = url + "?XSL.href=" + request.getParameter("XSL.href");
                 // archived navi version requested
                 if (request.getParameter("XSL.navi") != null && !request.getParameter("XSL.navi").equals("")
-                                && !request.getParameter("XSL.navi").toString().subSequence(0, 4).equals("http")) {
+                        && !request.getParameter("XSL.navi").toString().subSequence(0, 4).equals("http")) {
                     url = url + "&XSL.navi=" + request.getParameter("XSL.navi");
                     response.sendRedirect(response.encodeRedirectURL(url));
                 } else
@@ -158,12 +155,10 @@ public class MCRWCMSAdminServlet extends MCRWCMSServlet {
     private Element getWCMSAdminUsers(String permission) {
         MCRUserMgr um = MCRUserMgr.instance();
         MCRAccessInterface am = MCRAccessManager.getAccessImpl();
-        List userIDs = um.getAllUserIDs();
-        Iterator userIt = userIDs.iterator();
+        List<String> userIDs = um.getAllUserIDs();
         Element adminUsers = (new Element("users")).setAttribute("filter", "administrators");
         boolean adminsFound = false;
-        while (userIt.hasNext()) {
-            String userID = (String) userIt.next();
+        for (String userID : userIDs) {
             MCRUser mcrUser = um.retrieveUser(userID);
             if (am.checkPermission(permission, mcrUser)) {
                 adminUsers.addContent(mcrUser.toJDOMElement());
@@ -203,18 +198,18 @@ public class MCRWCMSAdminServlet extends MCRWCMSServlet {
         return null;
     }
 
+    @SuppressWarnings("unchecked")
     public void generateXML_managPage(MCRSession mcrSession, Element root) {
-        List rootNodes = (List) mcrSession.get("rootNodes");
-        File[] contentTemplates = new File((CONFIG.getString("MCR.templatePath") + "content/").replace('/', File.separatorChar)).listFiles();
+        List<Element> rootNodes = (List<Element>) mcrSession.get("rootNodes");
+        File[] contentTemplates = new File((CONFIG.getString("MCR.templatePath") + "content/").replace('/', File.separatorChar))
+                .listFiles();
         root.addContent(new Element("userRealName").setText(mcrSession.get("userRealName").toString()));
         root.addContent(new Element("userClass").setText(mcrSession.get("userClass").toString()));
         root.addContent(new Element("error").setText(""));
 
-        Iterator rootNodesIterator = rootNodes.iterator();
-
-        while (rootNodesIterator.hasNext()) {
-            Element rootNode = (Element) rootNodesIterator.next();
-            root.addContent(new Element("rootNode").setAttribute("href", rootNode.getAttributeValue("href")).setText(rootNode.getTextTrim()));
+        for (Element rootNode : rootNodes) {
+            root.addContent(new Element("rootNode").setAttribute("href", rootNode.getAttributeValue("href"))
+                    .setText(rootNode.getTextTrim()));
         }
 
         Element templates = new Element("templates");

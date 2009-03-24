@@ -30,7 +30,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.mycore.access.MCRAccessInterface;
+import org.jdom.Element;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRException;
@@ -59,9 +59,6 @@ public class MCRCheckClassACLServlet extends MCRServlet {
 
     // The logger
     protected static Logger LOGGER = Logger.getLogger(MCRCheckClassACLServlet.class);
-
-    // The Access Manager
-    protected static MCRAccessInterface AI = MCRAccessManager.getAccessImpl();
 
     // the configured permissions
     private static String storedrules = CONFIG.getString("MCR.Access.StorePermissions", "read,write,delete");
@@ -101,7 +98,7 @@ public class MCRCheckClassACLServlet extends MCRServlet {
         LOGGER.info("LANG = " + lang);
 
         // create a service object and prepare it
-        org.jdom.Element outelm = prepareService((org.jdom.Document) indoc.clone(), ID, job, lang);
+        Element outelm = prepareService((org.jdom.Document) indoc.clone(), ID, job, lang);
 
         // Save the prepared metadata object
         boolean okay = storeService(outelm, job, ID);
@@ -157,33 +154,34 @@ public class MCRCheckClassACLServlet extends MCRServlet {
      * @param lang
      *            the current language
      */
-    protected org.jdom.Element prepareService(org.jdom.Document jdom_in, MCRObjectID ID, MCRServletJob job, String lang) throws Exception {
-        org.jdom.Element elm_out = null;
+    @SuppressWarnings("unchecked")
+    protected Element prepareService(org.jdom.Document jdom_in, MCRObjectID ID, MCRServletJob job, String lang) throws Exception {
+        Element elm_out = null;
         ArrayList <String>logtext = new ArrayList<String>();
-        org.jdom.Element root = jdom_in.getRootElement();
+        Element root = jdom_in.getRootElement();
         if (root != null) {
-            org.jdom.Element servacls = root.getChild("servacls");
+            Element servacls = root.getChild("servacls");
             if (servacls != null) {
-                List servacllist = servacls.getChildren("servacl");
+                List<Element> servacllist = servacls.getChildren("servacl");
                 if (servacllist.size() != 0) {
                     for (int i = 0; i < servacllist.size(); i++) {
-                        org.jdom.Element servacl = (org.jdom.Element) servacllist.get(i);
-                        org.jdom.Element outcond = servacl.getChild("condition");
+                        Element servacl = servacllist.get(i);
+                        Element outcond = servacl.getChild("condition");
                         if (outcond != null) {
-                            org.jdom.Element outbool = outcond.getChild("boolean");
+                            Element outbool = outcond.getChild("boolean");
                             if (outbool != null) {
-                                List inbool = outbool.getChildren("boolean");
+                                List<Element> inbool = outbool.getChildren("boolean");
                                 String outoper = outbool.getAttributeValue("operator");
                                 if (inbool.size() != 0 && outoper != null && !outoper.equals("true")) {
                                     for (int j = 0; j < inbool.size(); j++) {
-                                        List incondlist = ((org.jdom.Element) inbool.get(j)).getChildren("condition");
+                                        List<Element> incondlist = inbool.get(j).getChildren("condition");
                                         int k = incondlist.size();
                                         if (k != 0) {
                                             for (int l = 0; l < k; l++) {
-                                                org.jdom.Element incond = (org.jdom.Element) incondlist.get(l);
+                                                Element incond = incondlist.get(l);
                                                 String condvalue = incond.getAttributeValue("value");
                                                 if (condvalue == null || (condvalue = condvalue.trim()).length() == 0) {
-                                                    ((org.jdom.Element) inbool.get(j)).removeContent(incond);
+                                                    ((Element) inbool.get(j)).removeContent(incond);
                                                     k--;
                                                     l--;
                                                     continue;
@@ -191,7 +189,7 @@ public class MCRCheckClassACLServlet extends MCRServlet {
                                                 String condfield = incond.getAttributeValue("field");
                                                 if (condfield.equals("user")) {
                                                     if (!UM.existUser(condvalue)) {
-                                                        ((org.jdom.Element) inbool.get(j)).removeContent(incond);
+                                                        ((Element) inbool.get(j)).removeContent(incond);
                                                         k--;
                                                         l--;
                                                         continue;
@@ -199,7 +197,7 @@ public class MCRCheckClassACLServlet extends MCRServlet {
                                                 }
                                                 if (condfield.equals("group")) {
                                                     if (!UM.existGroup(condvalue)) {
-                                                        ((org.jdom.Element) inbool.get(j)).removeContent(incond);
+                                                        ((Element) inbool.get(j)).removeContent(incond);
                                                         k--;
                                                         l--;
                                                         continue;
@@ -207,9 +205,9 @@ public class MCRCheckClassACLServlet extends MCRServlet {
                                                 }
                                             }
                                             if (k == 1) {
-                                                org.jdom.Element newtrue = new org.jdom.Element("boolean");
+                                                Element newtrue = new Element("boolean");
                                                 newtrue.setAttribute("operator", "true");
-                                                ((org.jdom.Element) inbool.get(j)).addContent(newtrue);
+                                                ((Element) inbool.get(j)).addContent(newtrue);
                                             }
                                         } else {
                                             logtext.add("Can't find an inner condition element.");
@@ -221,7 +219,7 @@ public class MCRCheckClassACLServlet extends MCRServlet {
                                     }
                                 }
                             } else {
-                                outbool = new org.jdom.Element("boolean");
+                                outbool = new Element("boolean");
                                 outbool.setAttribute("operator", "true");
                                 outcond.addContent(outbool);
                             }
@@ -238,7 +236,7 @@ public class MCRCheckClassACLServlet extends MCRServlet {
         } else {
             logtext.add("The service part is null.");
         }
-        elm_out = (org.jdom.Element) root.clone();
+        elm_out = (Element) root.clone();
         errorHandlerValid(job, logtext, ID, lang);
         return elm_out;
     }
@@ -254,9 +252,9 @@ public class MCRCheckClassACLServlet extends MCRServlet {
      * @param ID
      *            the MCRObjectID
      */
-    public final boolean storeService(org.jdom.Element outelm, MCRServletJob job, MCRObjectID ID) {
+    public final boolean storeService(Element outelm, MCRServletJob job, MCRObjectID ID) {
         // check current state
-        Collection<String> li = AI.getPermissionsForID(ID.getId());
+        Collection<String> li = MCRAccessManager.getPermissionsForID(ID.getId());
         int aclsize = 0;
         if (li != null) {
             aclsize = li.size();
@@ -278,7 +276,7 @@ public class MCRCheckClassACLServlet extends MCRServlet {
             LOGGER.warn("The new ACL conditions for classification" + ID.getId() + " are empty!");
         }
         while (0 < rulesize) {
-            org.jdom.Element conditions = serv.getRule(0).getCondition();
+            Element conditions = serv.getRule(0).getCondition();
             String permission = serv.getRule(0).getPermission();
             if (storedrules.indexOf(permission) != -1) {
                 if (li.contains(permission)) {
@@ -307,7 +305,8 @@ public class MCRCheckClassACLServlet extends MCRServlet {
      * @param lang
      *            the current language
      */
-    private final void errorHandlerValid(MCRServletJob job, List logtext, MCRObjectID ID, String lang) throws Exception {
+    @SuppressWarnings("unchecked")
+    private final void errorHandlerValid(MCRServletJob job, List<String> logtext, MCRObjectID ID, String lang) throws Exception {
         if (logtext.size() == 0) {
             return;
         }
@@ -331,29 +330,29 @@ public class MCRCheckClassACLServlet extends MCRServlet {
 
             jdom = new org.jdom.input.SAXBuilder().build(in);
 
-            org.jdom.Element root = jdom.getRootElement();
-            List sectionlist = root.getChildren("section");
+            Element root = jdom.getRootElement();
+            List<Element> sectionlist = root.getChildren("section");
 
             for (int i = 0; i < sectionlist.size(); i++) {
-                org.jdom.Element section = (org.jdom.Element) sectionlist.get(i);
+                Element section = (Element) sectionlist.get(i);
 
                 if (!section.getAttributeValue("lang", org.jdom.Namespace.XML_NAMESPACE).equals(lang.toLowerCase())) {
                     continue;
                 }
 
-                org.jdom.Element p = new org.jdom.Element("p");
+                Element p = new Element("p");
                 section.addContent(0, p);
 
-                org.jdom.Element center = new org.jdom.Element("center");
+                Element center = new Element("center");
 
                 // the error message
-                org.jdom.Element table = new org.jdom.Element("table");
+                Element table = new Element("table");
                 table.setAttribute("width", "80%");
 
                 for (int j = 0; j < logtext.size(); j++) {
-                    org.jdom.Element tr = new org.jdom.Element("tr");
-                    org.jdom.Element td = new org.jdom.Element("td");
-                    org.jdom.Element el = new org.jdom.Element("font");
+                    Element tr = new Element("tr");
+                    Element td = new Element("td");
+                    Element el = new Element("font");
                     el.setAttribute("color", "red");
                     el.addContent((String) logtext.get(j));
                     td.addContent(el);
@@ -363,26 +362,26 @@ public class MCRCheckClassACLServlet extends MCRServlet {
 
                 center.addContent(table);
                 section.addContent(1, center);
-                p = new org.jdom.Element("p");
+                p = new Element("p");
                 section.addContent(2, p);
 
                 // the edit button
-                org.jdom.Element form = section.getChild("form");
+                Element form = section.getChild("form");
                 form.setAttribute("action", job.getResponse().encodeRedirectURL(getBaseURL() + "servlets/MCRStartEditorServlet"));
 
-                org.jdom.Element input1 = new org.jdom.Element("input");
+                Element input1 = new Element("input");
                 input1.setAttribute("name", "lang");
                 input1.setAttribute("type", "hidden");
                 input1.setAttribute("value", lang);
                 form.addContent(input1);
 
-                org.jdom.Element input2 = new org.jdom.Element("input");
+                Element input2 = new Element("input");
                 input2.setAttribute("name", "se_mcrid");
                 input2.setAttribute("type", "hidden");
                 input2.setAttribute("value", ID.getId());
                 form.addContent(input2);
 
-                org.jdom.Element input3 = new org.jdom.Element("input");
+                Element input3 = new Element("input");
                 input3.setAttribute("name", "type");
                 input3.setAttribute("type", "hidden");
                 input3.setAttribute("value", ID.getTypeId());

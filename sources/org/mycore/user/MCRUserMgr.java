@@ -33,7 +33,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.mycore.access.MCRAccessInterface;
+import org.jdom.Element;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRConfiguration;
@@ -61,7 +61,7 @@ public class MCRUserMgr {
 
     private static MCRConfiguration CONFIG = null;
 
-    private static MCRAccessInterface AI;
+    //    private static MCRAccessInterface AI;
 
     /**
      * flag that determines whether write access to the data is denied (true) or
@@ -103,8 +103,6 @@ public class MCRUserMgr {
         // This might also be
         groupCache = new MCRCache(10, "UserMgr groups"); // read from
         // mycore.properties....
-
-        AI = MCRAccessManager.getAccessImpl();
     }
 
     /**
@@ -136,7 +134,7 @@ public class MCRUserMgr {
             return;
         }
         // For this action you must have list rights.
-        if (!AI.checkPermission("administrate-user") && !session.getCurrentUserID().equals("administrator")) {
+        if (!MCRAccessManager.checkPermission("administrate-user") && !session.getCurrentUserID().equals("administrator")) {
             locked = false;
             throw new MCRException("The session does not have the permission \"administrate-user\"!");
         }
@@ -169,7 +167,8 @@ public class MCRUserMgr {
             ArrayList<String> mbrUserIDs = primaryGroup.getMemberUserIDs();
 
             if (!mbrUserIDs.contains(currentUser.getID())) {
-                LOGGER.error("user : '" + currentUser.getID() + "' error: is not member of" + " primary group '" + currentUser.getPrimaryGroupID() + "'!");
+                LOGGER.error("user : '" + currentUser.getID() + "' error: is not member of" + " primary group '"
+                        + currentUser.getPrimaryGroupID() + "'!");
             }
         }
 
@@ -187,7 +186,8 @@ public class MCRUserMgr {
 
             for (int j = 0; j < admUserIDs.size(); j++) {
                 if (!mcrUserStore.existsUser((String) admUserIDs.get(j))) {
-                    LOGGER.error("group: '" + currentGroup.getID() + "' error: unknown admin" + " user '" + (String) admUserIDs.get(j) + "'!");
+                    LOGGER.error("group: '" + currentGroup.getID() + "' error: unknown admin" + " user '" + (String) admUserIDs.get(j)
+                            + "'!");
                 }
             }
 
@@ -196,7 +196,8 @@ public class MCRUserMgr {
 
             for (int j = 0; j < admGroupIDs.size(); j++) {
                 if (!mcrUserStore.existsGroup((String) admGroupIDs.get(j))) {
-                    LOGGER.error("group: '" + currentGroup.getID() + "' error: unknown admin" + " group '" + (String) admGroupIDs.get(j) + "'!");
+                    LOGGER.error("group: '" + currentGroup.getID() + "' error: unknown admin" + " group '" + (String) admGroupIDs.get(j)
+                            + "'!");
                 }
             }
 
@@ -226,7 +227,7 @@ public class MCRUserMgr {
             throw new MCRException("The user component is locked. At the moment write access is denied.");
         }
         // Check the permissions
-        if ((!AI.checkPermission("create-group"))) {
+        if ((!MCRAccessManager.checkPermission("create-group"))) {
             throw new MCRException("The current user does not have the permission to create a group!");
         }
         createGroupInternal(group);
@@ -316,7 +317,7 @@ public class MCRUserMgr {
             throw new MCRException("The user component is locked. At the moment write access is denied.");
         }
         // Check the permissions
-        if (!AI.checkPermission("create-user")) {
+        if (!MCRAccessManager.checkPermission("create-user")) {
             throw new MCRException("The current user does not have the permission to create a user!");
         }
         createUserInternal(user);
@@ -353,13 +354,6 @@ public class MCRUserMgr {
             if (!mcrUserStore.existsGroup(gid)) {
                 throw new MCRException("The user '" + user.getID() + "' is linked to the unknown group '" + gid + "'.");
             }
-
-            // With the following we test if the current user may modify the
-            // groups this user
-            // will be a member of. It is important to check this prior to
-            // creating the user
-            // such that we do not have to make a rollback.
-            MCRGroup linkedGroup = this.retrieveGroup(gid, true);
         }
         try {
             // Set some data by the manager
@@ -415,7 +409,7 @@ public class MCRUserMgr {
             throw new MCRException("The user component is locked. At the moment write" + " access is denied.");
         }
         // Check the permissions
-        if (!AI.checkPermission("delete-group")) {
+        if (!MCRAccessManager.checkPermission("delete-group")) {
             throw new MCRException("The current user does not have the permission to delete a group!");
         }
         deleteGroupInternal(groupID);
@@ -440,7 +434,8 @@ public class MCRUserMgr {
         List<String> primUserIDs = mcrUserStore.getUserIDsWithPrimaryGroup(groupID);
 
         if (primUserIDs.iterator().hasNext()) {
-            throw new MCRException("Group '" + groupID + "' can't be deleted since there" + " are users with '" + groupID + "' as their primary group. First update or" + " delete the users!");
+            throw new MCRException("Group '" + groupID + "' can't be deleted since there" + " are users with '" + groupID
+                    + "' as their primary group. First update or" + " delete the users!");
         }
 
         try {
@@ -489,7 +484,7 @@ public class MCRUserMgr {
             throw new MCRException("The user component is locked. At the moment write" + " access is denied.");
         }
         // Check the permission
-        if (!AI.checkPermission("delete-user")) {
+        if (!MCRAccessManager.checkPermission("delete-user")) {
             throw new MCRException("The current user does not have the permission to delete a user!");
         }
         deleteUserInternal(userID);
@@ -810,6 +805,7 @@ public class MCRUserMgr {
      * @param userfile
      *            the JDOM tree of the MCRUsers data input
      */
+    @SuppressWarnings("unchecked")
     public final void importUserSystemFromFiles(org.jdom.Element groups, org.jdom.Element users) throws MCRException {
         // check authorization
         MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
@@ -827,8 +823,8 @@ public class MCRUserMgr {
             throw new MCRException("The input JDOM tree is null.");
         }
         // clean user system
-        ArrayList<String> uids = (ArrayList) mcrUserStore.getAllUserIDs();
-        ArrayList<String> gids = (ArrayList) mcrUserStore.getAllGroupIDs();
+        List<String> uids = mcrUserStore.getAllUserIDs();
+        List<String> gids = mcrUserStore.getAllGroupIDs();
         for (int i = 0; i < uids.size(); i++) {
             deleteUserInternal(uids.get(i));
         }
@@ -837,9 +833,9 @@ public class MCRUserMgr {
         }
         LOGGER.info("The user system is clean now.");
         // load elementary group entries
-        List<org.jdom.Element> grouplistelm = groups.getChildren();
-        for (int i = 0; i < grouplistelm.size(); i++) {
-            MCRGroup gin = new MCRGroup((org.jdom.Element) grouplistelm.get(i));
+        List<Element> grouplistelm = groups.getChildren();
+        for (Element groupElement : grouplistelm) {
+            MCRGroup gin = new MCRGroup(groupElement);
             if (!gin.isValid()) {
                 throw new MCRException("The data of the provided group object is not valid.");
             }
@@ -854,9 +850,9 @@ public class MCRUserMgr {
             LOGGER.info("Elementary data of group " + gin.getID() + " are imported.");
         }
         // load user entries without encryption password
-        List<org.jdom.Element> listelm = users.getChildren();
-        for (int i = 0; i < listelm.size(); i++) {
-            MCRUser u = new MCRUser((org.jdom.Element) listelm.get(i), false);
+        List<Element> listelm = users.getChildren();
+        for (Element userElement : listelm) {
+            MCRUser u = new MCRUser(userElement, false);
             if (!u.isValid()) {
                 throw new MCRException("The data of the provided user object is not valid.");
             }
@@ -1135,7 +1131,7 @@ public class MCRUserMgr {
      */
     public final synchronized void setLock(boolean locked) {
         // Check the permissions
-        if (!AI.checkPermission("administrate-user")) {
+        if (!MCRAccessManager.checkPermission("administrate-user")) {
             throw new MCRException("The current user does not have the permission to  'administrate-user'!");
         }
 
@@ -1180,7 +1176,7 @@ public class MCRUserMgr {
         if (session.getCurrentUserID().equals(userID)) {
             test = true;
         } else {
-            if (AI.checkPermission("administrate-user")) {
+            if (MCRAccessManager.checkPermission("administrate-user")) {
                 test = true;
             }
         }
@@ -1211,7 +1207,7 @@ public class MCRUserMgr {
             throw new MCRException("The user component is locked. At the moment write access is denied.");
         }
         // Check the permission
-        if (!AI.checkPermission("modify-group")) {
+        if (!MCRAccessManager.checkPermission("modify-group")) {
             throw new MCRException("The current user does not have the permission to modify this group!");
         }
         updateGroupInternal(updGroup);
@@ -1319,7 +1315,7 @@ public class MCRUserMgr {
         }
 
         // Check the permissions
-        if (!AI.checkPermission("modify-user") && !AI.checkPermission("modify-contact")) {
+        if (!MCRAccessManager.checkPermission("modify-user") && !MCRAccessManager.checkPermission("modify-contact")) {
             throw new MCRException("The current user does not have the permission to modify this user!");
         }
 
@@ -1340,16 +1336,6 @@ public class MCRUserMgr {
         try {
             // get the user directly from the datastore
             MCRUser oldUser = mcrUserStore.retrieveUser(updUser.getID());
-
-            // Check whether the primary group has changed and if so, if the
-            // current user
-            // may modify the old and new primary group. In order to avoid a
-            // rollback we only
-            // test here, changes will be made later.
-            if (!updUser.getPrimaryGroupID().equals(oldUser.getPrimaryGroupID())) {
-                MCRGroup testGroup = retrieveGroup(updUser.getPrimaryGroupID(), false);
-                testGroup = retrieveGroup(oldUser.getPrimaryGroupID(), false);
-            }
 
             // We have to check whether the membership to some of the groups of
             // this user changed.
@@ -1418,11 +1404,10 @@ public class MCRUserMgr {
 
             if (!mcrUserStore.existsGroup(gid)) {
                 StringBuffer msg = new StringBuffer("You tried to update ");
-                msg.append((updUser instanceof MCRUser) ? "user '" : "group '").append(ID).append("' with the unknown group '").append(gid).append("'.");
+                msg.append((updUser instanceof MCRUser) ? "user '" : "group '").append(ID).append("' with the unknown group '").append(gid)
+                        .append("'.");
                 throw new MCRException(msg.toString());
             }
-
-            MCRGroup linkedGroup = retrieveGroup(gid);
         }
 
         // update groups where this User is a new member of
@@ -1461,7 +1446,7 @@ public class MCRUserMgr {
         }
 
         // Check the permissions
-        if (!AI.checkPermission("administrate-user")) {
+        if (!MCRAccessManager.checkPermission("administrate-user")) {
             throw new MCRException("The session does not have the permission  'administrate-user'!");
         }
 

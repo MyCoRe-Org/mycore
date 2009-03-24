@@ -46,7 +46,6 @@ import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
 import org.jdom.xpath.XPath;
-import org.mycore.access.MCRAccessInterface;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
@@ -108,9 +107,6 @@ public class MCREditorOutValidator {
     private static final Map<String, Method> checkMethods;
 
     private static final ArrayList<String> adduserlist;
-
-    // The Access Manager
-    protected static MCRAccessInterface AI = MCRAccessManager.getAccessImpl();
 
     static {
         // save all check methods in a Map for later usage
@@ -341,6 +337,7 @@ public class MCREditorOutValidator {
     /**
      * @param datasubtag
      */
+    @SuppressWarnings("unchecked")
     boolean checkMCRMetaHistoryDate(Element datasubtag) {
         List<Element> children = datasubtag.getChildren("text");
         for (int i = 0; i < children.size(); i++) {
@@ -455,56 +452,40 @@ public class MCREditorOutValidator {
     /**
      * @param service
      */
+    @SuppressWarnings("unchecked")
     private void checkObjectService(Element root, Element service) {
         if (service == null) {
             service = new org.jdom.Element("service");
             root.addContent(service);
         }
-        List servicelist = service.getChildren();
+        List<Element> servicelist = service.getChildren();
         if (servicelist == null) {
             setDefaultObjectACLs(service);
             return;
         }
-        Iterator serviceIt = servicelist.iterator();
-
         boolean hasacls = false;
-        while (serviceIt.hasNext()) {
-            Element datatag = (Element) serviceIt.next();
-
+        for (Element datatag : servicelist) {
             if (datatag.getName().equals("servdates")) {
-                List servdatelist = datatag.getChildren();
-                int servdatelistlen = servdatelist.size();
-                for (int h = 0; h < servdatelistlen; h++) {
-                    org.jdom.Element servdate = (org.jdom.Element) servdatelist.get(h);
+                List<Element> servdatelist = datatag.getChildren();
+                for (Element servdate : servdatelist) {
                     checkMCRMetaISO8601Date(servdate);
                 }
-
             }
             if (datatag.getName().equals("servacls")) {
                 hasacls = true;
-                List servacllist = datatag.getChildren();
-                if (servacllist != null) {
-                    int servacllistlen = servacllist.size();
-                    for (int h = 0; h < servacllistlen; h++) {
-                        org.jdom.Element servacl = (org.jdom.Element) servacllist.get(h);
-                        checkMCRMetaAccessRule(servacl);
-                    }
+                List<Element> servacllist = datatag.getChildren();
+                for (org.jdom.Element servacl : servacllist) {
+                    checkMCRMetaAccessRule(servacl);
                 }
-
             }
             if (datatag.getName().equals("servflags")) {
-                List servflaglist = datatag.getChildren();
-                if (servflaglist != null) {
-                    int servflaglistlen = servflaglist.size();
-                    for (int h = 0; h < servflaglistlen; h++) {
-                        org.jdom.Element servflag = (org.jdom.Element) servflaglist.get(h);
-                        checkMCRMetaLangText(servflag);
-                    }
+                List<Element> servflaglist = datatag.getChildren();
+                for (org.jdom.Element servflag : servflaglist) {
+                    checkMCRMetaLangText(servflag);
                 }
-
             }
         }
-        Collection<String> li = AI.getPermissionsForID(id.getId());
+        Collection<String> li = MCRAccessManager.getPermissionsForID(id.getId());
         if ((li != null) && !li.isEmpty()) {
             hasacls = true;
         }
@@ -595,13 +576,14 @@ public class MCREditorOutValidator {
     /**
      * @param metadata
      */
+    @SuppressWarnings("unchecked")
     private void checkObjectMetadata(Element metadata) {
         if (metadata.getAttribute("lang") != null) {
             metadata.getAttribute("lang").setNamespace(XML_NAMESPACE);
         }
 
-        List <Element> metadatalist = metadata.getChildren();
-        Iterator <Element> metaIt = metadatalist.iterator();
+        List<Element> metadatalist = metadata.getChildren();
+        Iterator<Element> metaIt = metadatalist.iterator();
 
         while (metaIt.hasNext()) {
             Element datatag = (Element) metaIt.next();
@@ -616,9 +598,10 @@ public class MCREditorOutValidator {
     /**
      * @param structure
      */
+    @SuppressWarnings("unchecked")
     private void checkObjectStructure(Element structure) {
-        List <Element> structurelist = structure.getChildren();
-        Iterator <Element> structIt = structurelist.iterator();
+        List<Element> structurelist = structure.getChildren();
+        Iterator<Element> structIt = structurelist.iterator();
 
         while (structIt.hasNext()) {
             Element datatag = (Element) structIt.next();

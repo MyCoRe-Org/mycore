@@ -29,6 +29,7 @@ import java.util.Properties;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
 
+import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.frontend.MCRWebsiteWriteProtection;
 
@@ -102,7 +103,7 @@ public class MCRUserAdminServlet extends MCRUserAdminGUICommons {
      */
     private void createUser(MCRServletJob job) throws IOException {
         // We first check the privileges for this use case
-        if (!AI.checkPermission("create-user")) {
+        if (!MCRAccessManager.checkPermission("create-user")) {
             showNoPrivsPage(job);
             return;
         }
@@ -128,7 +129,7 @@ public class MCRUserAdminServlet extends MCRUserAdminGUICommons {
      */
     private void createGroup(MCRServletJob job) throws IOException {
         // We first check the privileges for this use case
-        if (!AI.checkPermission("create-group")) {
+        if (!MCRAccessManager.checkPermission("create-group")) {
             showNoPrivsPage(job);
             return;
         }
@@ -153,7 +154,7 @@ public class MCRUserAdminServlet extends MCRUserAdminGUICommons {
      */
     private void listallUser(MCRServletJob job) throws IOException {
         // We first check the privileges for this use case
-        if (!AI.checkPermission("administrate-user")) {
+        if (!MCRAccessManager.checkPermission("administrate-user")) {
             showNoPrivsPage(job);
 
             return;
@@ -170,7 +171,7 @@ public class MCRUserAdminServlet extends MCRUserAdminGUICommons {
      */
     private void modifyUser(MCRServletJob job) throws IOException {
         // We first check the privileges for this use case
-        if (!AI.checkPermission("modify-user")) {
+        if (!MCRAccessManager.checkPermission("modify-user")) {
             showNoPrivsPage(job);
             return;
         }
@@ -196,7 +197,7 @@ public class MCRUserAdminServlet extends MCRUserAdminGUICommons {
      */
     private void modifyContact(MCRServletJob job) throws IOException {
         // get the system guest user
-        if (!AI.checkPermission("modify-user") && !AI.checkPermission("modify-contact")) {
+        if (!MCRAccessManager.checkPermission("modify-user") && !MCRAccessManager.checkPermission("modify-contact")) {
             showNoPrivsPage(job);
             return;            
         }
@@ -218,7 +219,7 @@ public class MCRUserAdminServlet extends MCRUserAdminGUICommons {
      */
     private void modifyGroup(MCRServletJob job) throws IOException {
         // We first check the privileges for this use case
-        if (!AI.checkPermission("modify-user")) {
+        if (!MCRAccessManager.checkPermission("modify-user")) {
             showNoPrivsPage(job);
             return;
         }

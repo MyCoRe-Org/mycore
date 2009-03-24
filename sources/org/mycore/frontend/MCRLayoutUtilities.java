@@ -31,7 +31,7 @@ public class MCRLayoutUtilities {
 
     private final static Logger LOGGER = Logger.getLogger(MCRLayoutUtilities.class);
 
-    private static HashMap itemStore = new HashMap();
+    private static HashMap<String, Element> itemStore = new HashMap<String, Element>();
 
     private static long CACHE_INITTIME = 0;
 
@@ -201,7 +201,7 @@ public class MCRLayoutUtilities {
     private static Element getItem(String webpageID) {
         if (!naviCacheValid())
             itemStore.clear();
-        Element item = (Element) itemStore.get(webpageID);
+        Element item = itemStore.get(webpageID);
         if (item == null) {
             XPath xpath;
             try {
@@ -225,10 +225,9 @@ public class MCRLayoutUtilities {
      * @return
      */
     public static boolean itemAccess(String permission, Element item, boolean access) {
-        MCRAccessInterface am = MCRAccessManager.getAccessImpl();
         String objID = getWebpageACLID(item);
-        if (am.hasRule(objID, permission))
-            access = am.checkPermission(objID, permission);
+        if (MCRAccessManager.hasRule(objID, permission))
+            access = MCRAccessManager.checkPermission(objID, permission);
         return access;
     }
 
