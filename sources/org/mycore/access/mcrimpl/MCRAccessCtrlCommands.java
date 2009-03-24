@@ -24,8 +24,6 @@
 package org.mycore.access.mcrimpl;
 
 import org.apache.log4j.Logger;
-
-import org.mycore.access.MCRAccessInterface;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.frontend.cli.MCRAbstractCommands;
 import org.mycore.frontend.cli.MCRCommand;
