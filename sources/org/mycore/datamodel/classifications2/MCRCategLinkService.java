@@ -48,9 +48,11 @@ public interface MCRCategLinkService {
      * 
      * @param category
      *            a subtree rooted at a MCRCategory for which links should be counted
+     * @param childrenOnly
+     *            if only direct children of category should be queried (query may be more optimized)
      * @return a Map with MCRCategoryID as key and the number of links as value
      */
-    public abstract Map<MCRCategoryID, Number> countLinks(MCRCategory category);
+    public abstract Map<MCRCategoryID, Number> countLinks(MCRCategory category, boolean childrenOnly);
 
     /**
      * Counts links to a collection of categories.
@@ -59,9 +61,11 @@ public interface MCRCategLinkService {
      *            a subtree rooted at a MCRCategory for which links should be counted
      * @param type
      *            restrict links that refer to object of this type
+     * @param childrenOnly
+     *            if only direct children of category should be queried (query may be more optimized)
      * @return a Map with MCRCategoryID as key and the number of links as value
      */
-    public abstract Map<MCRCategoryID, Number> countLinksForType(MCRCategory category, String type);
+    public abstract Map<MCRCategoryID, Number> countLinksForType(MCRCategory category, String type, boolean childrenOnly);
 
     /**
      * Delete all links that refer to the given Object ID.

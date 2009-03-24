@@ -16,19 +16,18 @@
           length="70" />
       </component>
     </natural-id>
-    <query name="NumberPerCategID">
+    <query name="NumberPerClassID">
       <![CDATA[
 SELECT cat.categID, count(distinct link.objectReference.objectID) as num
   FROM MCRCategoryLink link, MCRCategoryImpl cat, MCRCategoryImpl cattree
   WHERE cattree.internalID = link.category
     AND cattree.rootID=:classID
     AND cat.rootID=:classID
-    AND cat.categID in (:categIDs)
     AND cattree.left BETWEEN cat.left AND cat.right
   GROUP BY cat.categID
       ]]>
     </query>
-    <query name="NumberByTypePerCategID">
+    <query name="NumberByTypePerClassID">
       <![CDATA[
 SELECT cat.categID, count(distinct link.objectReference.objectID) as num
   FROM MCRCategoryLink link, MCRCategoryImpl cat, MCRCategoryImpl cattree
@@ -36,7 +35,6 @@ SELECT cat.categID, count(distinct link.objectReference.objectID) as num
     AND link.objectReference.type=:type
     AND cattree.rootID=:classID
     AND cat.rootID=:classID
-    AND cat.categID in (:categIDs)
     AND cattree.left BETWEEN cat.left AND cat.right
   GROUP BY cat.categID
       ]]>
@@ -65,7 +63,6 @@ SELECT cat.categID, count(distinct link.objectReference.objectID) as num
   FROM MCRCategoryLink link, MCRCategoryImpl cat, MCRCategoryImpl cattree
   WHERE cattree.internalID = link.category
     AND cattree.rootID=:classID
-    AND cat.rootID=:classID
     AND cat.parent.internalID=:parentID
     AND cattree.left BETWEEN cat.left AND cat.right
   GROUP BY cat.categID
@@ -78,7 +75,6 @@ SELECT cat.categID, count(distinct link.objectReference.objectID) as num
   WHERE cattree.internalID = link.category
     AND link.objectReference.type=:type
     AND cattree.rootID=:classID
-    AND cat.rootID=:classID
     AND cat.parent.internalID=:parentID
     AND cattree.left BETWEEN cat.left AND cat.right
   GROUP BY cat.categID

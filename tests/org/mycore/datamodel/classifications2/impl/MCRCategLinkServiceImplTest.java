@@ -163,11 +163,12 @@ public class MCRCategLinkServiceImplTest extends MCRHibTestCase {
     public void testCountLinks() {
         addTestLinks();
         startNewTransaction();
-        Map<MCRCategoryID, Number> map = SERVICE.countLinks(category);
+        Map<MCRCategoryID, Number> map = SERVICE.countLinks(category, false);
         LOGGER.debug("****List of returned map");
         LOGGER.debug(map);
         assertEquals("Returned amount of MCRCategoryIDs does not match.", getAllCategIDs(category).size(), map.size());
         assertEquals("Count of Europe links does not match.", 8, map.get(category.getChildren().get(0).getId()).intValue());
+        assertEquals("Count of Germany links does not match.", 5, map.get(category.getChildren().get(0).getChildren().get(0).getId()).intValue());
     }
 
     /**
@@ -176,7 +177,7 @@ public class MCRCategLinkServiceImplTest extends MCRHibTestCase {
     public void testCountLinksForType() {
         addTestLinks();
         startNewTransaction();
-        Map<MCRCategoryID, Number> map = SERVICE.countLinksForType(category, "city");
+        Map<MCRCategoryID, Number> map = SERVICE.countLinksForType(category, "city", false);
         LOGGER.debug("****List of returned map");
         LOGGER.debug(map);
         assertEquals("Returned amount of MCRCategoryIDs does not match.", getAllCategIDs(category).size(), map.size());
