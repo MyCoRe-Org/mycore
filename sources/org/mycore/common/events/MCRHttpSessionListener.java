@@ -58,13 +58,14 @@ public class MCRHttpSessionListener implements HttpSessionListener, HttpSessionB
      * 
      * @see javax.servlet.http.HttpSessionListener#sessionDestroyed(javax.servlet.http.HttpSessionEvent)
      */
+    @SuppressWarnings("unchecked")
     public void sessionDestroyed(HttpSessionEvent hse) {
         // clear MCRSessions
         LOGGER.debug("HttpSession will be destroyed, clearing up.");
         HttpSession httpSession = hse.getSession();
         LOGGER.debug("Removing any MCRSessions from HttpSession");
-        for (Enumeration e = httpSession.getAttributeNames(); e.hasMoreElements();) {
-            String key = e.nextElement().toString();
+        for (Enumeration<String> e = httpSession.getAttributeNames(); e.hasMoreElements();) {
+            String key = e.nextElement();
             if (httpSession.getAttribute(key) instanceof MCRSession) {
                 MCRSession mcrSession = (MCRSession) httpSession.getAttribute(key);
                 mcrSession.close();

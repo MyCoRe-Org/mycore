@@ -65,10 +65,10 @@ public class MCREventManager {
     }
 
     /** Table of all configured event handlers * */
-    private Hashtable handlers;
+    private Hashtable<String, List<MCREventHandler>> handlers;
 
     private MCREventManager() {
-        handlers = new Hashtable();
+        handlers = new Hashtable<String, List<MCREventHandler>>();
 
         MCRConfiguration config = MCRConfiguration.instance();
 
@@ -80,11 +80,12 @@ public class MCREventManager {
             return;
         }
 
-        List names = new ArrayList();
-        names.addAll(props.keySet());
+        List<String> names = new ArrayList<String>(props.size());
+        for (Object name : props.keySet())
+            names.add(name.toString());
         Collections.sort(names);
 
-        List instances = null;
+        List<MCREventHandler> instances = null;
 
         for (int i = 0; i < names.size(); i++) {
             String name = (String) (names.get(i));
@@ -98,7 +99,7 @@ public class MCREventManager {
             String mode = st.nextToken(); // "Class" or "Indexer"
 
             if (nr == 1) {
-                instances = new ArrayList();
+                instances = new ArrayList<MCREventHandler>();
                 handlers.put(type, instances);
             }
 
@@ -107,7 +108,7 @@ public class MCREventManager {
             Object handler = null;
 
             if ("Class".equals(mode)) {
-                if (config.getString(name).length()==0){
+                if (config.getString(name).length() == 0) {
                     //if property from mycore.properties is overwritten with empty value
                     //by mycore.properties.private
                     continue;
@@ -122,7 +123,7 @@ public class MCREventManager {
                 throw new MCRConfigurationException(msg);
             }
 
-            instances.add(handler);
+            instances.add((MCREventHandler) handler);
         }
     }
 
@@ -149,7 +150,7 @@ public class MCREventManager {
      *            the order in which the event handlers are called
      */
     public void handleEvent(MCREvent evt, boolean direction) {
-        List list = (List) (handlers.get(evt.getObjectType()));
+        List<MCREventHandler> list = (handlers.get(evt.getObjectType()));
         if (list == null)
             return;
 
@@ -159,7 +160,7 @@ public class MCREventManager {
         int undoPos = first;
 
         for (int i = first; i != last + step; i += step) {
-            MCREventHandler eh = (MCREventHandler) (list.get(i));
+            MCREventHandler eh = list.get(i);
             logger.debug("EventManager " + evt.getObjectType() + " " + evt.getEventType() + " calling handler " + eh.getClass().getName());
 
             try {
@@ -177,7 +178,8 @@ public class MCREventManager {
         // Rollback by calling undo of successfull handlers
         for (int i = undoPos - step; i != first - step; i -= step) {
             MCREventHandler eh = (MCREventHandler) (list.get(i));
-            logger.debug("EventManager " + evt.getObjectType() + " " + evt.getEventType() + " calling undo of handler " + eh.getClass().getName());
+            logger.debug("EventManager " + evt.getObjectType() + " " + evt.getEventType() + " calling undo of handler "
+                    + eh.getClass().getName());
 
             try {
                 eh.undoHandleEvent(evt);

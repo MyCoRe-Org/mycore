@@ -32,7 +32,7 @@ package org.mycore.common.events;
  * 
  * @author Frank Luetzenkirchen
  */
-public class MCREvent extends java.util.Hashtable {
+public class MCREvent extends java.util.Hashtable<String, Object> {
     /**
      * Default version ID
      */
