@@ -75,7 +75,7 @@ public class MCRFileTest extends MCRTestCase {
     }
 
     public void testFileName() throws Exception {
-        MCRFile file = new MCRFile(col, "foo.txt");
+        MCRFile file = col.createFile("foo.txt");
         Date created = file.getLastModified();
         assertEquals("foo.txt", file.getName());
         assertEquals("txt", file.getExtension());
@@ -88,14 +88,14 @@ public class MCRFileTest extends MCRTestCase {
 
     @SuppressWarnings("deprecation")
     public void testSetLastModified() throws Exception {
-        MCRFile file = new MCRFile(col, "foo.txt");
+        MCRFile file = col.createFile("foo.txt");
         Date other = new Date(2009, 1, 1);
         file.setLastModified(other);
         assertEquals(other, file.getLastModified());
     }
 
     public void testMD5() throws Exception {
-        MCRFile file = new MCRFile(col, "foo.txt");
+        MCRFile file = col.createFile("foo.txt");
         assertEquals(MCRFile.MD5_OF_EMPTY_FILE, file.getMD5());
         byte[] content = "Hello World".getBytes("UTF-8");
         file.setContent(new MCRContent(content));
@@ -106,13 +106,13 @@ public class MCRFileTest extends MCRTestCase {
     }
 
     public void testDelete() throws Exception {
-        MCRFile file = new MCRFile(col, "foo.txt");
+        MCRFile file = col.createFile("foo.txt");
         file.delete();
         assertNull(col.getChild("foo.txt"));
     }
 
     public void testChildren() throws Exception {
-        MCRFile file = new MCRFile(col, "foo.txt");
+        MCRFile file = col.createFile("foo.txt");
         assertNull(file.getChild("foo"));
         assertEquals(0, file.getChildren().size());
         assertFalse(file.hasChildren());
@@ -120,7 +120,7 @@ public class MCRFileTest extends MCRTestCase {
     }
 
     public void testContentFile() throws Exception {
-        MCRFile file = new MCRFile(col, "foo.txt");
+        MCRFile file = col.createFile("foo.txt");
         File src = File.createTempFile("foo", "txt");
         src.deleteOnExit();
         byte[] content = "Hello World".getBytes("UTF-8");
@@ -136,7 +136,7 @@ public class MCRFileTest extends MCRTestCase {
     }
 
     public void testContentXML() throws Exception {
-        MCRFile file = new MCRFile(col, "foo.xml");
+        MCRFile file = col.createFile("foo.xml");
         Document xml = new Document(new Element("root"));
         file.setContent(new MCRContent(xml));
         assertFalse(MCRFile.MD5_OF_EMPTY_FILE.equals(file.getMD5()));
@@ -145,7 +145,7 @@ public class MCRFileTest extends MCRTestCase {
     }
 
     public void testRandomAccessContent() throws Exception {
-        MCRFile file = new MCRFile(col, "foo.txt");
+        MCRFile file = col.createFile("foo.txt");
         byte[] content = "Hello World".getBytes("UTF-8");
         file.setContent(new MCRContent(content));
         RandomAccessContent rac = file.getRandomAccessContent();
@@ -158,13 +158,13 @@ public class MCRFileTest extends MCRTestCase {
     }
 
     public void testType() throws Exception {
-        MCRFile file = new MCRFile(col, "foo.txt");
+        MCRFile file = col.createFile("foo.txt");
         assertTrue(file.isFile());
         assertFalse(file.isDirectory());
     }
 
     public void testLabels() throws Exception {
-        MCRFile file = new MCRFile(col, "foo.txt");
+        MCRFile file = col.createFile("foo.txt");
         assertTrue(file.getLabels().isEmpty());
         assertNull(file.getCurrentLabel());
         file.setLabel("de", "deutsch");

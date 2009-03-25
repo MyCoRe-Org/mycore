@@ -50,26 +50,46 @@ public class MCRDirectory extends MCRStoredNode {
     }
 
     /**
-     * Creates a new MCRDirectory in the store.
+     * Create a new MCRDirectory that does not exist yet
      * 
      * @param parent
      *            the parent directory of this directory
      * @param name
+     *            the name of the new subdirectory to create
+     */
+    protected MCRDirectory(MCRDirectory parent, String name) throws Exception {
+        super(parent, name, "dir");
+        fo.createFolder();
+        getRoot().saveAdditionalData();
+    }
+
+    /**
+     * Creates a new subdirectory within this directory
+     * 
+     * @param name
      *            the name of the new directory
      */
-    public MCRDirectory(MCRDirectory parent, String name) throws Exception {
-        super(parent, name);
-        fo.createFolder();
-        data.setName("dir");
-        getRoot().saveAdditionalData();
+    public MCRDirectory createDir(String name) throws Exception {
+        return new MCRDirectory(this, name);
+    }
+
+    /**
+     * Creates a new file within this directory
+     * 
+     * @param name
+     *            the name of the new file
+     */
+    public MCRFile createFile(String name) throws Exception {
+        return new MCRFile(this, name);
     }
 
     private Element getChildData(String name) {
         for (Element child : (List<Element>) (data.getChildren()))
             if (name.equals(child.getAttributeValue("name")))
                 return child;
-        
-        Element childData = new Element( "node" );
+
+        Element childData = new Element("node");
+        childData.setAttribute("name", name);
         data.addContent(childData);
         return childData;
     }
@@ -93,11 +113,11 @@ public class MCRDirectory extends MCRStoredNode {
     }
 
     /**
-     * Repairs additional metadata of this directory and all its children 
+     * Repairs additional metadata of this directory and all its children
      */
     void repairMetadata() throws Exception {
         data.setName("dir");
-        data.setAttribute("name",getName());
+        data.setAttribute("name", getName());
 
         for (Element childEntry : (List<Element>) (data.getChildren()))
             childEntry.setName("node");

@@ -50,7 +50,7 @@ public abstract class MCRStoredNode extends MCRNode {
     protected Element data;
 
     /**
-     * Creates a new stored node instance
+     * Returns a stored node instance that already exists
      * 
      * @param parent
      *            the parent directory containing this node
@@ -65,11 +65,21 @@ public abstract class MCRStoredNode extends MCRNode {
         this.data = data;
     }
 
-    protected MCRStoredNode(MCRDirectory parent, String name) throws Exception {
+    /**
+     * Creates a new stored node
+     * 
+     * @param parent
+     *            the parent directory
+     * @param name
+     *            the name of the node
+     * @param type
+     *            the node type, dir or file
+     */
+    protected MCRStoredNode(MCRDirectory parent, String name, String type) throws Exception {
         super(parent, VFS.getManager().resolveFile(parent.fo, name));
-        this.data = new Element("node");
-        parent.data.addContent(data);
+        data = new Element(type);
         data.setAttribute("name", name);
+        parent.data.addContent(data);
     }
 
     /**
@@ -182,9 +192,9 @@ public abstract class MCRStoredNode extends MCRNode {
 
         return data.getChildText("label");
     }
-    
+
     /**
-     * Repairs additional metadata of this node 
+     * Repairs additional metadata of this node
      */
-    abstract void repairMetadata() throws Exception; 
+    abstract void repairMetadata() throws Exception;
 }

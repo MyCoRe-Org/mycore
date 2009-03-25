@@ -166,7 +166,7 @@ public class MCRFileStoreTest extends MCRTestCase {
         Date created = col.getLastModified();
         assertTrue(created.after(first));
         bzzz();
-        MCRFile build = new MCRFile(col, "build.xml");
+        MCRFile build = col.createFile("build.xml");
         assertNotNull(build);
         Date modified = col.getLastModified();
         assertTrue(modified.after(created));
@@ -178,11 +178,11 @@ public class MCRFileStoreTest extends MCRTestCase {
         assertTrue(build.getSize() > 0);
         assertNotNull(build.getContent().getBytes());
         bzzz();
-        MCRDirectory dir = new MCRDirectory(col, "documentation");
+        MCRDirectory dir = col.createDir("documentation");
         assertEquals(2, col.getNumChildren());
         assertTrue(modified.before(col.getLastModified()));
         byte[] content = "Hello World!".getBytes("UTF-8");
-        new MCRFile(dir, "readme.txt").setContent(new MCRContent(content));
+        dir.createFile("readme.txt").setContent(new MCRContent(content));
         MCRFile child = (MCRFile) (dir.getChild("readme.txt"));
         assertNotNull(child);
         assertEquals(content.length, child.getSize());
@@ -212,19 +212,19 @@ public class MCRFileStoreTest extends MCRTestCase {
         String xml2 = new MCRContent(col.getMetadata()).getString();
         assertEquals(xml1, xml2);
 
-        MCRDirectory dir = new MCRDirectory(col, "foo");
+        MCRDirectory dir = col.createDir("foo");
         xml1 = new MCRContent(col.getMetadata()).getString();
         assertFalse(xml2.equals(xml1));
         dir.delete();
         xml1 = new MCRContent(col.getMetadata()).getString();
         assertEquals(xml2, xml1);
 
-        MCRDirectory dir2 = new MCRDirectory(col, "dir");
-        MCRFile file1 = new MCRFile(col, "test1.txt");
+        MCRDirectory dir2 = col.createDir("dir");
+        MCRFile file1 = col.createFile("test1.txt");
         file1.setContent(new MCRContent("Test 1"));
-        MCRFile readme = new MCRFile(dir2, "readme.txt");
+        MCRFile readme = dir2.createFile("readme.txt");
         readme.setContent(new MCRContent("Hallo Welt!"));
-        MCRFile file3 = new MCRFile(col, "test2.txt");
+        MCRFile file3 = col.createFile("test2.txt");
         file3.setContent(new MCRContent("Test 2"));
         file3.setLabel("de", "Die Testdatei");
         xml2 = new MCRContent(col.getMetadata()).getString();

@@ -41,7 +41,7 @@ import org.mycore.common.MCRUtils;
 public class MCRFile extends MCRStoredNode {
 
     private final static Logger LOGGER = Logger.getLogger(MCRFile.class);
-    
+
     /**
      * The md5 checksum of the empty file
      */
@@ -61,18 +61,17 @@ public class MCRFile extends MCRStoredNode {
     }
 
     /**
-     * Creates a new MCRFile and stores it in the underlying local filesystem.
+     * Creates a new MCRFile that does not exist yet
      * 
      * @param parent
-     *            the parent directory containing this file
+     *            the parent directory
      * @param name
-     *            the name of the file to be created and stored
+     *            the file name
      */
-    public MCRFile(MCRDirectory parent, String name) throws Exception {
-        super(parent, name);
+    protected MCRFile(MCRDirectory parent, String name) throws Exception {
+        super(parent, name, "file");
         fo.createFile();
-        data.setName("file");
-        data.setAttribute("md5", MD5_OF_EMPTY_FILE);
+        data.setAttribute("md5", MCRFile.MD5_OF_EMPTY_FILE);
         getRoot().saveAdditionalData();
     }
 
@@ -134,13 +133,13 @@ public class MCRFile extends MCRStoredNode {
         else
             return null;
     }
-    
+
     /**
-     * Repairs additional metadata of this file and all its children 
+     * Repairs additional metadata of this file and all its children
      */
     void repairMetadata() throws Exception {
         data.setName("file");
-        data.setAttribute("name",getName());
+        data.setAttribute("name", getName());
         data.removeChildren("file");
         data.removeChildren("directory");
         MCRContentInputStream cis = getContent().getContentInputStream();
