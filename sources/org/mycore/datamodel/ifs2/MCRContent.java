@@ -42,7 +42,6 @@ import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
-import org.mycore.common.MCRException;
 import org.mycore.common.MCRUsageException;
 import org.mycore.common.MCRUtils;
 

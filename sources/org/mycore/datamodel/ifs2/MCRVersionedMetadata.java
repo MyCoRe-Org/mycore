@@ -217,7 +217,7 @@ public class MCRVersionedMetadata extends MCRStoredMetadata {
 
         path = "/" + path;
         for (SVNLogEntry entry : entries) {
-            Map<String, SVNLogEntryPath> paths = entry.getChangedPaths();
+            Map<String, SVNLogEntryPath> paths = (Map<String, SVNLogEntryPath>)(entry.getChangedPaths());
             if (paths.containsKey(path)) {
                 char type = paths.get(path).getType();
                 versions.add(new MCRMetadataVersion(this, entry, type));
