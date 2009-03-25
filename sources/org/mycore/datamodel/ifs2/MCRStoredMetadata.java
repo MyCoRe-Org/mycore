@@ -68,7 +68,7 @@ public class MCRStoredMetadata {
      */
     void create(MCRContent xml) throws Exception {
         if (store.shouldForceXML())
-            xml = MCRContent.readFrom(xml.asXML());
+            xml = xml.ensureXML();
         fo.createFile();
         xml.sendTo(fo);
     }
@@ -85,7 +85,7 @@ public class MCRStoredMetadata {
             throw new MCRUsageException(msg);
         }
         if (store.shouldForceXML())
-            xml = MCRContent.readFrom(xml.asXML());
+            xml = xml.ensureXML();
         xml.sendTo(fo);
     }
 

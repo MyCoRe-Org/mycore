@@ -68,6 +68,11 @@ public class MCRContent {
     protected boolean consumed = false;
 
     /**
+     * If true, we are absolutely sure that source is XML
+     */
+    protected boolean isXML = false;
+
+    /**
      * Creates content from a String, using UTF-8 encoding
      * 
      * @param text
@@ -132,7 +137,9 @@ public class MCRContent {
         xout.setFormat(Format.getPrettyFormat().setEncoding("UTF-8").setIndent("  "));
         xout.output(xml, out);
         out.close();
-        return readFrom(out.toByteArray());
+        MCRContent content = readFrom(out.toByteArray());
+        content.isXML = true;
+        return content;
     }
 
     /**
@@ -157,6 +164,16 @@ public class MCRContent {
      */
     public static MCRContent readFrom(URL url) throws FileSystemException {
         return readFrom(VFS.getManager().resolveFile(url.toExternalForm()));
+    }
+
+    /**
+     * Ensures that content is XML
+     */
+    public MCRContent ensureXML() throws Exception {
+        if (isXML)
+            return this;
+        else
+            return MCRContent.readFrom(asXML());
     }
 
     /**
