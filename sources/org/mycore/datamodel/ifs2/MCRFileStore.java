@@ -77,7 +77,7 @@ public class MCRFileStore extends MCRStore {
             String msg = "FileCollection with ID " + id + " already exists";
             throw new MCRException(msg);
         }
-        return new MCRFileCollection(this, id, getSlot(id), true);
+        return new MCRFileCollection(this, id);
     }
 
     /**
@@ -93,7 +93,7 @@ public class MCRFileStore extends MCRStore {
         if (!fo.exists())
             return null;
         else
-            return new MCRFileCollection(this, id, getSlot(id), false);
+            return new MCRFileCollection(this, id);
     }
 
     /**

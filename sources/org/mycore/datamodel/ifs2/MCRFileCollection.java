@@ -42,7 +42,7 @@ public class MCRFileCollection extends MCRDirectory {
      * The logger
      */
     private final static Logger LOGGER = Logger.getLogger(MCRFileCollection.class);
-    
+
     /**
      * The store this file collection is stored in.
      */
@@ -63,25 +63,18 @@ public class MCRFileCollection extends MCRDirectory {
      *            the store this file collection is stored in
      * @param id
      *            the ID of this file collection
-     * @param fo
-     *            the directory in the local filesystem storing this file
-     *            collection
-     * @param create
-     *            if true, a new folder for the collection is created, otherwise
-     *            the collection is assumed existing
      */
-    protected MCRFileCollection(MCRStore store, int id, FileObject fo, boolean create) throws Exception {
-        super(null, fo, null);
+    protected MCRFileCollection(MCRStore store, int id) throws Exception {
+        super(null, store.getSlot(id), new Element("collection"));
         this.store = store;
         this.id = id;
-
-        if (create) {
+        if (fo.exists())
+            readAdditionalData();
+        else {
             fo.createFolder();
-            this.data = new Element("collection");
             new Document(data);
             saveAdditionalData();
-        } else
-            readAdditionalData();
+        }
     }
 
     private final static String dataFile = "mcrdata.xml";
@@ -148,24 +141,27 @@ public class MCRFileCollection extends MCRDirectory {
         else
             return super.getChild(name);
     }
-    
-    public String getName()
-    { return ""; }
 
-    /**
-     * Repairs additional metadata stored for all files and directories in this collection 
-     */
-    public void repairMetadata() throws Exception {
-      super.repairMetadata();
-      data.setName("collection");
-      data.removeAttribute("name");
-      saveAdditionalData();
+    public String getName() {
+        return "";
     }
 
     /**
-     * Returns additional metadata stored for all files and directories in this collection 
+     * Repairs additional metadata stored for all files and directories in this
+     * collection
+     */
+    public void repairMetadata() throws Exception {
+        super.repairMetadata();
+        data.setName("collection");
+        data.removeAttribute("name");
+        saveAdditionalData();
+    }
+
+    /**
+     * Returns additional metadata stored for all files and directories in this
+     * collection
      */
     Document getMetadata() throws Exception {
-      return data.getDocument();
+        return data.getDocument();
     }
 }
