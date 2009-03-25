@@ -37,6 +37,8 @@ import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
 
+import org.mycore.common.MCRConfigurationException;
+import org.mycore.common.MCRException;
 import org.mycore.datamodel.classifications2.MCRCategLinkServiceFactory;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
@@ -91,7 +93,10 @@ public class MCRClassificationBrowser2 extends MCRServlet {
         xml.setAttribute("webpage", req.getParameter("webpage"));
 
         MCRAndCondition queryCondition = new MCRAndCondition();
-        MCRQueryCondition categCondition = new MCRQueryCondition(MCRFieldDef.getDef(field), "=", "DUMMY");
+        final MCRFieldDef fieldDef = MCRFieldDef.getDef(field);
+        if (fieldDef == null)
+            throw new MCRConfigurationException("Search field '" + field + "' is not defined.");
+        MCRQueryCondition categCondition = new MCRQueryCondition(fieldDef, "=", "DUMMY");
         queryCondition.addChild(categCondition);
 
         if ((objectType != null) && (objectType.trim().length() > 0)) {

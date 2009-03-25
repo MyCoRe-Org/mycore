@@ -24,6 +24,7 @@
 package org.mycore.services.fieldquery;
 
 import org.jdom.Element;
+import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRNormalizer;
@@ -63,6 +64,8 @@ public class MCRFieldValue {
      *            the value of the field, as a String
      */
     public MCRFieldValue(MCRFieldDef field, String value) {
+        if (field == null)
+            throw new NullPointerException("MCRFieldDef cannot be null.");
         this.field = field;
         setValue(value);
     }
@@ -77,6 +80,8 @@ public class MCRFieldValue {
      *            when indexing data
      */
     MCRFieldValue(MCRFieldDef field, MCRFile file) {
+        if (field == null)
+            throw new NullPointerException("MCRFieldDef cannot be null.");
         this.field = field;
         this.file = file;
     }
@@ -87,7 +92,7 @@ public class MCRFieldValue {
     public MCRFieldDef getField() {
         return field;
     }
-    
+
     /**
      * Sets or updates the field value
      * @param value the value, whicht will be normalized
@@ -153,7 +158,8 @@ public class MCRFieldValue {
 
         return new MCRFieldValue(MCRFieldDef.getDef(name), value);
     }
-    
-    public String toString()
-    { return this.field.getName() + " = " + this.value; }
+
+    public String toString() {
+        return this.field.getName() + " = " + this.value;
+    }
 }
