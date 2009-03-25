@@ -42,6 +42,7 @@ import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
+import org.mycore.common.MCRException;
 import org.mycore.common.MCRUsageException;
 import org.mycore.common.MCRUtils;
 
@@ -73,8 +74,8 @@ public class MCRContent {
      * @param text
      *            the content
      */
-    public MCRContent(String text) throws IOException, UnsupportedEncodingException {
-        this(text, "UTF-8");
+    public static MCRContent readFrom(String text) throws IOException, UnsupportedEncodingException {
+        return readFrom(text, "UTF-8");
     }
 
     /**
@@ -85,8 +86,8 @@ public class MCRContent {
      * @param encoding
      *            the encoding to be used to write bytes
      */
-    public MCRContent(String text, String encoding) throws IOException, UnsupportedEncodingException {
-        this(text.getBytes(encoding));
+    public static MCRContent readFrom(String text, String encoding) throws IOException, UnsupportedEncodingException {
+        return readFrom(text.getBytes(encoding));
     }
 
     /**
@@ -95,8 +96,8 @@ public class MCRContent {
      * @param file
      *            the local file to read
      */
-    public MCRContent(File file) throws IOException {
-        this(new FileInputStream(file));
+    public static MCRContent readFrom(File file) throws IOException {
+        return readFrom(new FileInputStream(file));
     }
 
     /**
@@ -105,8 +106,8 @@ public class MCRContent {
      * @param fo
      *            the file object to read content from
      */
-    public MCRContent(FileObject fo) throws FileSystemException {
-        this(fo.getContent().getInputStream());
+    public static MCRContent readFrom(FileObject fo) throws FileSystemException {
+        return readFrom(fo.getContent().getInputStream());
     }
 
     /**
@@ -115,8 +116,8 @@ public class MCRContent {
      * @param bytes
      *            the content's bytes
      */
-    public MCRContent(byte[] bytes) throws IOException {
-        this(new ByteArrayInputStream(bytes));
+    public static MCRContent readFrom(byte[] bytes) throws IOException {
+        return readFrom(new ByteArrayInputStream(bytes));
     }
 
     /**
@@ -126,13 +127,13 @@ public class MCRContent {
      * @param xml
      *            the XML document to read in as content
      */
-    public MCRContent(Document xml) throws Exception {
+    public static MCRContent readFrom(Document xml) throws Exception {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         XMLOutputter xout = new XMLOutputter();
         xout.setFormat(Format.getPrettyFormat().setEncoding("UTF-8").setIndent("  "));
         xout.output(xml, out);
         out.close();
-        in = new ByteArrayInputStream(out.toByteArray());
+        return readFrom(out.toByteArray());
     }
 
     /**
@@ -141,7 +142,11 @@ public class MCRContent {
      * @param in
      *            the input stream to read content from
      */
-    public MCRContent(InputStream in) {
+    public static MCRContent readFrom(InputStream in) {
+        return new MCRContent(in);
+    }
+
+    private MCRContent(InputStream in) {
         this.in = in;
     }
 
@@ -151,8 +156,8 @@ public class MCRContent {
      * @param url
      *            the url to read content from
      */
-    public MCRContent(URL url) throws FileSystemException {
-        this(VFS.getManager().resolveFile(url.toExternalForm()));
+    public static MCRContent readFrom(URL url) throws FileSystemException {
+        return readFrom(VFS.getManager().resolveFile(url.toExternalForm()));
     }
 
     /**
@@ -218,7 +223,7 @@ public class MCRContent {
      * 
      * @return the XML document parsed from content
      */
-    public Document getXML() throws JDOMException, IOException {
+    public Document asXML() throws JDOMException, IOException {
         checkConsumed();
         Document xml = new SAXBuilder().build(in);
         in.close();
@@ -230,7 +235,7 @@ public class MCRContent {
      * 
      * @return the content
      */
-    public byte[] getBytes() throws IOException {
+    public byte[] asByteArray() throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         sendTo(baos);
         baos.close();
@@ -244,8 +249,8 @@ public class MCRContent {
      *            the encoding to use to build the characters
      * @return content as String
      */
-    public String getString(String encoding) throws IOException, UnsupportedEncodingException {
-        return new String(getBytes(), encoding);
+    public String asString(String encoding) throws IOException, UnsupportedEncodingException {
+        return new String(asByteArray(), encoding);
     }
 
     /**
@@ -253,8 +258,8 @@ public class MCRContent {
      * 
      * @return content as String
      */
-    public String getString() throws Exception {
-        return getString("UTF-8");
+    public String asString() throws IOException, UnsupportedEncodingException {
+        return asString("UTF-8");
     }
 
     /**
@@ -277,9 +282,9 @@ public class MCRContent {
      */
     public MCRContent[] makeCopies(int numCopies) throws IOException {
         MCRContent[] copies = new MCRContent[numCopies];
-        byte[] content = getBytes();
+        byte[] bytes = asByteArray();
         for (int i = 0; i < numCopies; i++)
-            copies[i] = new MCRContent(content);
+            copies[i] = MCRContent.readFrom(bytes);
         return copies;
     }
 }

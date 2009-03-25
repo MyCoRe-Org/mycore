@@ -281,7 +281,7 @@ public abstract class MCRNode {
      * @return the content of the file
      */
     public MCRContent getContent() throws Exception {
-        return (isFile() ? new MCRContent(fo) : null);
+        return (isFile() ? MCRContent.readFrom(fo) : null);
     }
 
     /**

@@ -68,7 +68,7 @@ public class MCRStoredMetadata {
      */
     void create(MCRContent xml) throws Exception {
         if (store.shouldForceXML())
-            xml = new MCRContent(xml.getXML());
+            xml = MCRContent.readFrom(xml.asXML());
         fo.createFile();
         xml.sendTo(fo);
     }
@@ -85,7 +85,7 @@ public class MCRStoredMetadata {
             throw new MCRUsageException(msg);
         }
         if (store.shouldForceXML())
-            xml = new MCRContent(xml.getXML());
+            xml = MCRContent.readFrom(xml.asXML());
         xml.sendTo(fo);
     }
 
@@ -95,7 +95,7 @@ public class MCRStoredMetadata {
      * @return the stored XML document
      */
     public MCRContent getMetadata() throws Exception {
-        return new MCRContent(fo);
+        return MCRContent.readFrom(fo);
     }
 
     /**

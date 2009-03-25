@@ -94,12 +94,12 @@ public class MCRFileCollection extends MCRDirectory {
             new Document(data);
             repairMetadata();
         }
-        data = new MCRContent(src).getXML().getRootElement();
+        data = MCRContent.readFrom(src).asXML().getRootElement();
     }
 
     protected void saveAdditionalData() throws Exception {
         FileObject target = VFS.getManager().resolveFile(fo, dataFile);
-        new MCRContent(data.getDocument()).sendTo(target);
+        MCRContent.readFrom(data.getDocument()).sendTo(target);
     }
 
     /**

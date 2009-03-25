@@ -98,7 +98,7 @@ public class MCRFileTest extends MCRTestCase {
         MCRFile file = col.createFile("foo.txt");
         assertEquals(MCRFile.MD5_OF_EMPTY_FILE, file.getMD5());
         byte[] content = "Hello World".getBytes("UTF-8");
-        file.setContent(new MCRContent(content));
+        file.setContent(MCRContent.readFrom(content));
         assertFalse(MCRFile.MD5_OF_EMPTY_FILE.equals(file.getMD5()));
         MCRFileCollection col2 = store.retrieve(col.getID());
         MCRFile child = (MCRFile) (col2.getChild("foo.txt"));
@@ -127,7 +127,7 @@ public class MCRFileTest extends MCRTestCase {
         FileOutputStream fo = new FileOutputStream(src);
         MCRUtils.copyStream(new ByteArrayInputStream(content), fo);
         fo.close();
-        file.setContent(new MCRContent(src));
+        file.setContent(MCRContent.readFrom(src));
         assertFalse(MCRFile.MD5_OF_EMPTY_FILE.equals(file.getMD5()));
         assertEquals(11, file.getSize());
         src.delete();
@@ -138,16 +138,16 @@ public class MCRFileTest extends MCRTestCase {
     public void testContentXML() throws Exception {
         MCRFile file = col.createFile("foo.xml");
         Document xml = new Document(new Element("root"));
-        file.setContent(new MCRContent(xml));
+        file.setContent(MCRContent.readFrom(xml));
         assertFalse(MCRFile.MD5_OF_EMPTY_FILE.equals(file.getMD5()));
-        Document xml2 = file.getContent().getXML();
+        Document xml2 = file.getContent().asXML();
         assertEquals("root", xml2.getRootElement().getName());
     }
 
     public void testRandomAccessContent() throws Exception {
         MCRFile file = col.createFile("foo.txt");
         byte[] content = "Hello World".getBytes("UTF-8");
-        file.setContent(new MCRContent(content));
+        file.setContent(MCRContent.readFrom(content));
         RandomAccessContent rac = file.getRandomAccessContent();
         rac.skipBytes(6);
         InputStream in = rac.getInputStream();

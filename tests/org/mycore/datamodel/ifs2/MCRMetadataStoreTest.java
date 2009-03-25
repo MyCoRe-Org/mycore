@@ -73,14 +73,14 @@ public class MCRMetadataStoreTest extends MCRTestCase {
 
     public void testCreateDocument() throws Exception {
         Document xml1 = new Document(new Element("root"));
-        MCRStoredMetadata sm = store.create(new MCRContent(xml1));
+        MCRStoredMetadata sm = store.create(MCRContent.readFrom(xml1));
         assertNotNull(sm);
         int id1 = sm.getID();
         assertTrue(id1 > 0);
         MCRStoredMetadata sm2 = store.retrieve(id1);
-        Document xml2 = sm2.getMetadata().getXML();
-        assertEquals(xml1.toString(), xml2.toString());
-        int id2 = store.create(new MCRContent(xml1)).getID();
+        MCRContent xml2 = sm2.getMetadata();
+        assertEquals(MCRContent.readFrom(xml1).asString(), xml2.asString());
+        int id2 = store.create(MCRContent.readFrom(xml1)).getID();
         assertTrue(id2 > id1);
     }
 
@@ -88,18 +88,18 @@ public class MCRMetadataStoreTest extends MCRTestCase {
         int id = store.getNextFreeID();
         assertTrue(id > 0);
         Document xml1 = new Document(new Element("root"));
-        MCRStoredMetadata sm1 = store.create(new MCRContent(xml1), id);
+        MCRStoredMetadata sm1 = store.create(MCRContent.readFrom(xml1), id);
         assertNotNull(sm1);
-        Document xml2 = store.retrieve(id).getMetadata().getXML();
-        assertEquals(xml1.toString(), xml2.toString());
-        store.create(new MCRContent(xml1), id + 1);
-        Document xml3 = store.retrieve(id + 1).getMetadata().getXML();
-        assertEquals(xml1.toString(), xml3.toString());
+        MCRContent xml2 = store.retrieve(id).getMetadata();
+        assertEquals(MCRContent.readFrom(xml1).asString(), xml2.asString());
+        store.create(MCRContent.readFrom(xml1), id + 1);
+        MCRContent xml3 = store.retrieve(id + 1).getMetadata();
+        assertEquals(MCRContent.readFrom(xml1).asString(), xml3.asString());
     }
 
     public void testDelete() throws Exception {
         Document xml1 = new Document(new Element("root"));
-        int id = store.create(new MCRContent(xml1)).getID();
+        int id = store.create(MCRContent.readFrom(xml1)).getID();
         assertTrue(store.exists(id));
         store.delete(id);
         assertFalse(store.exists(id));
@@ -108,19 +108,19 @@ public class MCRMetadataStoreTest extends MCRTestCase {
 
     public void testUpdate() throws Exception {
         Document xml1 = new Document(new Element("root"));
-        MCRStoredMetadata sm = store.create(new MCRContent(xml1));
-        Document xml3 = new Document(new Element("update"));
-        sm.update(new MCRContent(xml3));
-        Document xml4 = store.retrieve(sm.getID()).getMetadata().getXML();
-        assertEquals(xml3.toString(), xml4.toString());
+        MCRStoredMetadata sm = store.create(MCRContent.readFrom(xml1));
+        Document xml2 = new Document(new Element("update"));
+        sm.update(MCRContent.readFrom(xml2));
+        MCRContent xml3 = store.retrieve(sm.getID()).getMetadata();
+        assertEquals(MCRContent.readFrom(xml2).asString(), xml3.asString());
     }
 
     public void testRetrieve() throws Exception {
         Document xml1 = new Document(new Element("root"));
-        int id = store.create(new MCRContent(xml1)).getID();
+        int id = store.create(MCRContent.readFrom(xml1)).getID();
         MCRStoredMetadata sm1 = store.retrieve(id);
-        Document xml2 = sm1.getMetadata().getXML();
-        assertEquals(xml1.toString(), xml2.toString());
+        MCRContent xml2 = sm1.getMetadata();
+        assertEquals(MCRContent.readFrom(xml1).asString(), xml2.asString());
     }
 
     @SuppressWarnings("deprecation")
@@ -130,14 +130,14 @@ public class MCRMetadataStoreTest extends MCRTestCase {
         synchronized (this) {
             wait(1000);
         }
-        MCRStoredMetadata sm = store.create(new MCRContent(xml1));
+        MCRStoredMetadata sm = store.create(MCRContent.readFrom(xml1));
         Date date2 = sm.getLastModified();
         assertTrue(date2.after(date1));
         synchronized (this) {
             wait(1000);
         }
         Document xml2 = new Document(new Element("root"));
-        sm.update(new MCRContent(xml2));
+        sm.update(MCRContent.readFrom(xml2));
         assertTrue(sm.getLastModified().after(date2));
         Date date = new Date(2009, 1, 1);
         sm.setLastModified(date);
@@ -149,7 +149,7 @@ public class MCRMetadataStoreTest extends MCRTestCase {
         int id = store.getNextFreeID();
         assertFalse(store.exists(id));
         Document xml1 = new Document(new Element("root"));
-        store.create(new MCRContent(xml1), id);
+        store.create(MCRContent.readFrom(xml1), id);
         assertTrue(store.exists(id));
         store.delete(id);
         assertFalse(store.exists(id));
@@ -160,7 +160,7 @@ public class MCRMetadataStoreTest extends MCRTestCase {
         assertTrue(id1 >= 0);
         assertFalse(store.exists(id1));
         Document xml1 = new Document(new Element("root"));
-        int id2 = store.create(new MCRContent(xml1)).getID();
+        int id2 = store.create(MCRContent.readFrom(xml1)).getID();
         assertTrue(id2 > id1);
         assertTrue(store.getNextFreeID() > id2);
     }
@@ -173,9 +173,9 @@ public class MCRMetadataStoreTest extends MCRTestCase {
         assertFalse(store.listIDs(true).hasNext());
         assertFalse(store.listIDs(false).hasNext());
         Document xml1 = new Document(new Element("root"));
-        store.create(new MCRContent(xml1));
-        store.create(new MCRContent(xml1));
-        store.create(new MCRContent(xml1));
+        store.create(MCRContent.readFrom(xml1));
+        store.create(MCRContent.readFrom(xml1));
+        store.create(MCRContent.readFrom(xml1));
         ArrayList<Integer> l1 = new ArrayList<Integer>();
         IDs = store.listIDs(true);
         while (IDs.hasNext()) {
@@ -203,7 +203,7 @@ public class MCRMetadataStoreTest extends MCRTestCase {
         LOGGER.info("Storing 1.000 XML documents in store:");
         long time = System.currentTimeMillis();
         for (int i = 0; i < 1000; i++)
-            store.create(new MCRContent(xml));
+            store.create(MCRContent.readFrom(xml));
         LOGGER.info("Time: " + (System.currentTimeMillis() - time) + " ms");
 
         LOGGER.info("getLastModified of 1.000 XML documents from store:");
@@ -215,14 +215,14 @@ public class MCRMetadataStoreTest extends MCRTestCase {
         time = System.currentTimeMillis();
         LOGGER.info("Retrieving 1.000 XML documents from store:");
         for (Iterator<Integer> ids = store.listIDs(MCRMetadataStore.ASCENDING); ids.hasNext();)
-            xml = store.retrieve(ids.next()).getMetadata().getXML();
+            xml = store.retrieve(ids.next()).getMetadata().asXML();
         LOGGER.info("Time: " + (System.currentTimeMillis() - time) + " ms");
 
         time = System.currentTimeMillis();
         xml = new Document(new Element("update"));
         LOGGER.info("Updating 1.000 XML documents in store:");
         for (Iterator<Integer> ids = store.listIDs(MCRMetadataStore.ASCENDING); ids.hasNext();)
-            store.retrieve(ids.next()).update(new MCRContent(xml));
+            store.retrieve(ids.next()).update(MCRContent.readFrom(xml));
         LOGGER.info("Time: " + (System.currentTimeMillis() - time) + " ms");
 
         time = System.currentTimeMillis();
