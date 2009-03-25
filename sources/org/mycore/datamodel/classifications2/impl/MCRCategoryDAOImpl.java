@@ -172,7 +172,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
                 q.setInteger("endlevel", category.getLevel() + childLevel);
             q.setString("classID", id.getRootID());
             q.setInteger("left", category.getLeft());
-            q.setInteger("right", category.getLeft());
+            q.setInteger("right", category.getRight());
         }
         List<MCRCategoryImpl> result = q.list();
         return buildCategoryFromPrefetchedList(result);
