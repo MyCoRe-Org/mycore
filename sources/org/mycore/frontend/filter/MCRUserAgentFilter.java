@@ -44,7 +44,7 @@ import org.mycore.common.MCRConfiguration;
  * 
  * If the <code>User-Agent</code> header matches a regular expression
  * defined by the property <code>MCR.Filter.UserAgent</code>
- * (default: "<code>(bot|spider|crawler|mercator|slurp|seek)</code>") the
+ * (default: "<code>(bot|spider|crawler|mercator|slurp|seek|nagios)</code>") the
  * HTTP session is closed after the request.
  * @author Thomas Scheffler (yagee)
  */
@@ -54,7 +54,7 @@ public class MCRUserAgentFilter implements Filter {
     private static final Logger LOGGER = Logger.getLogger(MCRUserAgentFilter.class);
 
     public void init(FilterConfig arg0) throws ServletException {
-        String agentRegEx = MCRConfiguration.instance().getString("MCR.Filter.UserAgent", "(bot|spider|crawler|mercator|slurp|seek)");
+        String agentRegEx = MCRConfiguration.instance().getString("MCR.Filter.UserAgent", "(bot|spider|crawler|mercator|slurp|seek|nagios)");
         agentPattern = Pattern.compile(agentRegEx);
     }
 
@@ -67,15 +67,19 @@ public class MCRUserAgentFilter implements Filter {
         HttpSession session = request.getSession(false);
         if (session != null) {
             String userAgent = request.getHeader("User-Agent");
-            if (agentPattern.matcher(userAgent).find()) {
-                try {
-                    session.invalidate();
-                    LOGGER.info("Closing session: " + userAgent + " matches " + agentPattern);
-                } catch (IllegalStateException e) {
-                    //session is already closed
+            if (userAgent != null) {
+                if (agentPattern.matcher(userAgent).find()) {
+                    try {
+                        session.invalidate();
+                        LOGGER.info("Closing session: " + userAgent + " matches " + agentPattern);
+                    } catch (IllegalStateException e) {
+                        //session is already closed
+                    }
+                } else {
+                    LOGGER.debug(userAgent + " does not match " + agentPattern);
                 }
             } else {
-                LOGGER.debug(userAgent + " does not match " + agentPattern);
+                LOGGER.warn("No User-Agent was send.");
             }
         }
     }
