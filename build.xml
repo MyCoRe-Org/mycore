@@ -285,6 +285,7 @@
       <fileset dir="${target.jarbase}" />
       <fileset dir="${basedir}" includes="integrate.xml" />
       <manifest>
+        <attribute name="Main-Class" value="org.mycore.MCRCoreVersion" />
         <attribute name="MCR-Version" value="${target.version} r${revision.number}" />
       </manifest>
     </jar>
@@ -430,6 +431,9 @@ public class MCRCoreVersion{
   public static String getVersion(){return VERSION;}
   public static int getRevision(){return REVISION;}
   public static String getCompleteVersion(){return COMPLETE;}
+  public static void main(String arg[]){
+    	System.out.printf("MyCoRe\tver: %s\trev: %d\n",VERSION,REVISION);
+  }
 }
 ]]>
     </echo>
