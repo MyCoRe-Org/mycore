@@ -156,6 +156,10 @@
     <copy todir="${build.webapps}">
       <mapper type="regexp" from="^[^/\\]+[/\\]web[/\\](.*)$$" to="\1" />
       <fileset dir="${integration.dir}/components" includes="*/web/**" />
+      <fileset dir="${integration.dir}" includes="web/**" />
+    </copy>
+    <copy todir="${build.webapps}">
+      <fileset dir="${integration.dir}/web" includes="**" />
     </copy>
     <for param="web.xml.file">
       <fileset id="web.xml.components" dir="${integration.dir}/components">

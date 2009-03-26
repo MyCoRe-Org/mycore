@@ -273,6 +273,7 @@
     <property name="jarfile" value="mycore.jar" />
     <echo level="info">Creating ${jarfile} containing all compiled classes...</echo>
     <mkdir dir="${target.libs}" />
+    <antcall target="jar.copy-web" />
     <antcall target="jar.copy-xsl" />
     <antcall target="jar.copy-config" />
     <antcall target="jar.copy-schema" />
@@ -298,6 +299,17 @@
     <moduleHook target="jar" />
   </target>
 
+  <!-- - - - - - - - - - - - - - - - - - 
+          target: jar.copy-xsl                      
+         - - - - - - - - - - - - - - - - - -->
+  <target name="jar.copy-web">
+    <mkdir dir="${target.jarbase}/web" />
+  	<copy todir="${target.jarbase}/web" file="${basedir}/lib/fckEditor.zip"/>
+    <mkdir dir="${target.jarbase}/web/fck" />
+  	<copy todir="${target.jarbase}/web/fck" file="${basedir}/config/fckconfig.js"/>
+    <mkdir dir="${target.jarbase}/web/oai" />
+  	<copy todir="${target.jarbase}/web/oai" file="${basedir}/xsl/oai2.xsl"/>
+  </target>
   <!-- - - - - - - - - - - - - - - - - - 
           target: jar.copy-xsl                      
          - - - - - - - - - - - - - - - - - -->

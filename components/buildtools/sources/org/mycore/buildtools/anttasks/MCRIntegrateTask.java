@@ -161,7 +161,7 @@ public class MCRIntegrateTask extends Task {
         expandTask.setSrc(mycoreJarFile);
         PatternSet expandSet = new PatternSet();
         expandSet.setProject(getProject());
-        expandSet.setIncludes("integrate.xml config/** components/**");
+        expandSet.setIncludes("integrate.xml config/** components/** web/**");
         for (String excluded : getExcludedComponents()) {
             expandSet.setExcludes(new StringBuilder("components/").append(excluded).append("/**").toString());
         }
