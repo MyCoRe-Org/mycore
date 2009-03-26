@@ -53,10 +53,10 @@ import org.mycore.datamodel.ifs.MCRFileReader;
  * @version $Revision$ $Date$
  */
 public class MCRAVExtRealHelix extends MCRAudioVideoExtender {
-    
+
     /** The logger */
-    private final static Logger LOGGER = Logger.getLogger( MCRAVExtRealHelix.class );
-    
+    private final static Logger LOGGER = Logger.getLogger(MCRAVExtRealHelix.class);
+
     public MCRAVExtRealHelix() {
     }
 
@@ -148,11 +148,16 @@ public class MCRAVExtRealHelix extends MCRAudioVideoExtender {
             playerStarterCT = con.getContentType();
         } catch (Exception exc) {
             String msg = "Error parsing metadata from Real Server ViewSource: " + file.getStorageID();
-            LOGGER.warn( msg, exc );
+            LOGGER.warn(msg, exc);
         }
     }
 
     public void getPlayerStarterTo(OutputStream out, String startPos, String stopPos) throws MCRPersistenceException {
+        if (basePlayerStarter == null || basePlayerStarter.length() < 8) {
+            String msg = "Temporary Failure. Could not start streaming of file: " + file.getPath();
+            throw new MCRPersistenceException(msg);
+        }
+
         try {
             StringBuffer cgi = new StringBuffer(basePlayerStarter);
             cgi.append(file.getStorageID());

@@ -32,6 +32,7 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.text.DecimalFormat;
 
+import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
@@ -431,6 +432,7 @@ public abstract class MCRAudioVideoExtender {
     protected String getMetadata(String url) throws MCRPersistenceException {
         try {
             URLConnection connection = getConnection(url);
+            connection.setConnectTimeout(getConnectTimeout());
             ByteArrayOutputStream out = new ByteArrayOutputStream(1024);
             forwardData(connection, out);
 
@@ -439,5 +441,9 @@ public abstract class MCRAudioVideoExtender {
             String msg = "Could not get metadata from Audio/Video Store URL: " + url;
             throw new MCRPersistenceException(msg, exc);
         }
+    }
+
+    protected int getConnectTimeout() {
+        return MCRConfiguration.instance().getInt("MCR.IFS.AVExtender.ConnectTimeout", 0);
     }
 }
