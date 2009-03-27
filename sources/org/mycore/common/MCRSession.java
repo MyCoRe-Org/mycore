@@ -27,15 +27,17 @@ import static org.mycore.common.events.MCRSessionEvent.Type.activated;
 import static org.mycore.common.events.MCRSessionEvent.Type.passivated;
 
 import java.security.Principal;
+import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.log4j.Logger;
-
 import org.hibernate.Transaction;
 import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.common.events.MCRSessionEvent;
@@ -56,7 +58,14 @@ import org.mycore.frontend.servlets.MCRServletJob;
  */
 public class MCRSession implements Cloneable {
     /** A map storing arbitrary session data * */
-    private Map map = new HashMap();
+    private Map<Object, Object> map = new Hashtable<Object, Object>();
+
+    @SuppressWarnings("unchecked")
+    private Map.Entry<Object, Object>[] emptyEntryArray = new Map.Entry[0];
+
+    private List<Map.Entry<Object, Object>> mapEntries;
+
+    private boolean mapChanged = true;
 
     AtomicInteger accessCount;
 
@@ -157,11 +166,28 @@ public class MCRSession implements Cloneable {
     }
 
     /**
+     * Returns a list of all stored object keys within MCRSession.
+     * This method is not thread safe.
+     * I you need thread safe access to all stored objects use {@link MCRSession#getMapEntries()} instead.
      * @return Returns a list of all stored object keys within MCRSession as
      *         java.util.Ierator
      */
-    public Iterator getObjectsKeyList() {
+    public Iterator<Object> getObjectsKeyList() {
         return Collections.unmodifiableSet(map.keySet()).iterator();
+    }
+
+    /**
+     * Returns an unmodifiable list of all entries in this MCRSession
+     * This method is thread safe.
+     */
+    public List<Map.Entry<Object, Object>> getMapEntries() {
+        if (this.mapChanged) {
+            this.mapChanged = false;
+            final Set<Entry<Object, Object>> entrySet = Collections.unmodifiableMap(map).entrySet();
+            final Map.Entry<Object, Object>[] entryArray = entrySet.toArray(emptyEntryArray);
+            this.mapEntries = Collections.unmodifiableList(Arrays.asList(entryArray));
+        }
+        return this.mapEntries;
     }
 
     /** returns the current user ID */
@@ -214,6 +240,7 @@ public class MCRSession implements Cloneable {
 
     /** Stores an object under the given key within the session * */
     public Object put(Object key, Object value) {
+        mapChanged = true;
         return map.put(key, value);
     }
 
@@ -223,6 +250,7 @@ public class MCRSession implements Cloneable {
     }
 
     public void deleteObject(Object key) {
+        mapChanged = true;
         map.remove(key);
     }
 
@@ -270,6 +298,8 @@ public class MCRSession implements Cloneable {
         // clear bound objects
         LOGGER.debug("Clearing local map.");
         map.clear();
+        if (mapEntries != null)
+            mapEntries.clear();
         this.sessionID = null;
     }
 

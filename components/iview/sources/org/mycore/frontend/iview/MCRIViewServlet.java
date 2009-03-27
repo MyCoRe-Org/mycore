@@ -20,6 +20,7 @@ import java.util.Enumeration;
 import java.util.GregorianCalendar;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.StringTokenizer;
 import java.util.Vector;
@@ -115,8 +116,8 @@ public class MCRIViewServlet extends MCRServlet {
 
     public void setMetadata(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-        LOGGER.debug("AJAX: received size of image area - " + "width=" + request.getParameter("XSL.browser.res.width.SESSION") + "px, height="
-                + request.getParameter("XSL.browser.res.height.SESSION") + "...");
+        LOGGER.debug("AJAX: received size of image area - " + "width=" + request.getParameter("XSL.browser.res.width.SESSION")
+                + "px, height=" + request.getParameter("XSL.browser.res.height.SESSION") + "...");
         Properties resolution = new Properties();
         resolution.put("XSL.browser.res.width.SESSION", request.getParameter("XSL.browser.res.width.SESSION"));
         resolution.put("XSL.browser.res.height.SESSION", request.getParameter("XSL.browser.res.height.SESSION"));
@@ -126,7 +127,8 @@ public class MCRIViewServlet extends MCRServlet {
 
     }
 
-    public void generateLayout(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException, JDOMException {
+    public void generateLayout(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException,
+            JDOMException {
 
         MCRFilesystemNode nodeToBeDisplayed = getMCRNodeByRequest(request, response);
         Properties iViewConfig = setIViewConfig(request);
@@ -276,7 +278,8 @@ public class MCRIViewServlet extends MCRServlet {
             // save zoom
             Properties zoomProp = new Properties();
             zoomProp.put("XSL.MCR.Module-iview.navi.zoom.SESSION", java.lang.Float.toString(newZoom));
-            updateIViewConfig(iViewConfig, request, zoomProp, "setZoomOut=" + java.lang.Float.toString(newZoom) + "........................");
+            updateIViewConfig(iViewConfig, request, zoomProp, "setZoomOut=" + java.lang.Float.toString(newZoom)
+                    + "........................");
             // save zoomValue
             setZoomValue(request, newZoom, iViewConfig);
             // move poi
@@ -313,7 +316,8 @@ public class MCRIViewServlet extends MCRServlet {
         }
     }
 
-    private Point calculatePOIAfterZooming(Properties iViewConfig, Point oldPOI, float oldZoom, float newZoom, MCRFilesystemNode fsn, boolean log) {
+    private Point calculatePOIAfterZooming(Properties iViewConfig, Point oldPOI, float oldZoom, float newZoom, MCRFilesystemNode fsn,
+            boolean log) {
 
         Point midpoint = new Point();
         midpoint.x = Math.round(oldPOI.x + (getWidthOfBrowser(iViewConfig) / oldZoom) / 2);
@@ -334,7 +338,8 @@ public class MCRIViewServlet extends MCRServlet {
     private void setZoomValue(HttpServletRequest request, float zoomValue, Properties iViewConfig) {
         Properties zoomValueProp = new Properties();
         zoomValueProp.put("XSL.MCR.Module-iview.navi.zoomValue.SESSION", java.lang.Float.toString(zoomValue));
-        updateIViewConfig(iViewConfig, request, zoomValueProp, "setZoomValue=" + java.lang.Float.toString(zoomValue) + "........................");
+        updateIViewConfig(iViewConfig, request, zoomValueProp, "setZoomValue=" + java.lang.Float.toString(zoomValue)
+                + "........................");
     }
 
     private float getZoomValue(Properties iViewConfig) {
@@ -354,7 +359,8 @@ public class MCRIViewServlet extends MCRServlet {
         newZoom = validateZoom(newZoom);
         // round
         newZoom = roundZoom(newZoom, true);
-        LOGGER.debug("zoom in value calculated = " + java.lang.Float.toString(newZoom) + " (old: " + java.lang.Float.toString(currentZoom) + ")");
+        LOGGER.debug("zoom in value calculated = " + java.lang.Float.toString(newZoom) + " (old: " + java.lang.Float.toString(currentZoom)
+                + ")");
         return newZoom;
     }
 
@@ -374,7 +380,8 @@ public class MCRIViewServlet extends MCRServlet {
         newZoom = validateZoom(newZoom);
         // round
         newZoom = roundZoom(newZoom, true);
-        LOGGER.debug("zoom out value calculated = " + java.lang.Float.toString(newZoom) + " (old: " + java.lang.Float.toString(currentZoom) + ")");
+        LOGGER.debug("zoom out value calculated = " + java.lang.Float.toString(newZoom) + " (old: " + java.lang.Float.toString(currentZoom)
+                + ")");
         return newZoom;
     }
 
@@ -393,7 +400,8 @@ public class MCRIViewServlet extends MCRServlet {
         return verZoom;
     }
 
-    public void getImage(HttpServletRequest request, HttpServletResponse response) throws ServletException, FileNotFoundException, IOException {
+    public void getImage(HttpServletRequest request, HttpServletResponse response) throws ServletException, FileNotFoundException,
+            IOException {
 
         // get right file
         MCRFilesystemNode nodeToBeDisplayed = getMCRNodeByRequest(request, response);
@@ -401,18 +409,20 @@ public class MCRIViewServlet extends MCRServlet {
         if (nodeToBeDisplayed instanceof MCRFile)
             image = (MCRFile) nodeToBeDisplayed;
         else {
-            prepareErrorPage(request, response, "mode=getImage only works with MCRFile, " + "requested MCRFilesystemNode is not of type MCRFile");
+            prepareErrorPage(request, response, "mode=getImage only works with MCRFile, "
+                    + "requested MCRFilesystemNode is not of type MCRFile");
         }
 
         // get viewer properties
-        Properties iViewConfig = getIViewConfig(request);
+        Properties iViewConfig = setIViewConfig(request);
         String zoom = "";
         int availableWidth = 0;
         int availableHeight = 0;
         int xPOI = 0;
         int yPOI = 0;
         // // direct call of getImage to get thumbnail
-        if (request.getParameter("XSL.MCR.Module-iview.navi.zoom") != null && request.getParameter("XSL.MCR.Module-iview.navi.zoom").equals("thumbnail")) {
+        if (request.getParameter("XSL.MCR.Module-iview.navi.zoom") != null
+                && request.getParameter("XSL.MCR.Module-iview.navi.zoom").equals("thumbnail")) {
             zoom = "thumbnail";
         } // // call from IView
         else {
@@ -451,8 +461,8 @@ public class MCRIViewServlet extends MCRServlet {
         } // normal number (10 or 20...)
         else {
             float zoomValue = java.lang.Float.parseFloat(zoom);
-            LOGGER.debug("imgService.getImage(image, xPOI(" + xPOI + "), yPOI(" + yPOI + "), " + "availableWidth(" + availableWidth + "), availableHeight("
-                    + availableHeight + "), zoomValue(" + zoomValue + "), out);");
+            LOGGER.debug("imgService.getImage(image, xPOI(" + xPOI + "), yPOI(" + yPOI + "), " + "availableWidth(" + availableWidth
+                    + "), availableHeight(" + availableHeight + "), zoomValue(" + zoomValue + "), out);");
             imgService.getImage(image, xPOI, yPOI, availableWidth, availableHeight, zoomValue, out);
             timer.stop();
             LOGGER.debug("finished getting image with real given zoom=" + zoomValue + " from ");
@@ -530,8 +540,8 @@ public class MCRIViewServlet extends MCRServlet {
      * generates an JDOM-Element containing a list of supported children of a
      * given node
      */
-    private Element getNodeList(MCRDirectory dir, Properties iViewConfig, HttpServletRequest request, HttpServletResponse response) throws IOException,
-            ServletException, JDOMException {
+    private Element getNodeList(MCRDirectory dir, Properties iViewConfig, HttpServletRequest request, HttpServletResponse response)
+            throws IOException, ServletException, JDOMException {
         // get cached file node list from MCRSession OR init new one
         MCRSession session = MCRSessionMgr.getCurrentSession();
         String cacheObjKey = "IView.FileNodesList";
@@ -547,7 +557,8 @@ public class MCRIViewServlet extends MCRServlet {
         String cachedFileNodeListID = dir.getID();
 
         // get node list from cache
-        if (cachedFileNodeList.get(cachedFileNodeListID) != null && !stringNotEmpty(request.getParameter("XSL.MCR.Module-iview.defaultSort.SESSION"))) {
+        if (cachedFileNodeList.get(cachedFileNodeListID) != null
+                && !stringNotEmpty(request.getParameter("XSL.MCR.Module-iview.defaultSort.SESSION"))) {
             Element nodeList = (Element) cachedFileNodeList.get(cachedFileNodeListID);
             return nodeList;
         }
@@ -620,7 +631,8 @@ public class MCRIViewServlet extends MCRServlet {
         xDate.addContent(time);
     }
 
-    public void prepareErrorPage(HttpServletRequest request, HttpServletResponse response, String errorMessage) throws IOException, ServletException {
+    public void prepareErrorPage(HttpServletRequest request, HttpServletResponse response, String errorMessage) throws IOException,
+            ServletException {
         LOGGER.error(errorMessage);
         generateErrorPage(request, response, HttpServletResponse.SC_BAD_REQUEST, errorMessage, new MCRException(errorMessage), false);
         return;
@@ -631,7 +643,8 @@ public class MCRIViewServlet extends MCRServlet {
         int y = 0;
 
         if (!scrollBar(iViewConfig)) {
-            if (iViewConfig.getProperty("MCR.Module-iview.roi.xpos") != null || iViewConfig.getProperty("MCR.Module-iview.roi.ypos") != null) {
+            if (iViewConfig.getProperty("MCR.Module-iview.roi.xpos") != null
+                    || iViewConfig.getProperty("MCR.Module-iview.roi.ypos") != null) {
                 x = Integer.parseInt(iViewConfig.getProperty("MCR.Module-iview.roi.xpos"));
                 y = Integer.parseInt(iViewConfig.getProperty("MCR.Module-iview.roi.ypos"));
             }
@@ -707,8 +720,9 @@ public class MCRIViewServlet extends MCRServlet {
             LOGGER.debug("x-Distance ==> orig " + deltaX);
         deltaX = (int) (deltaX / getZoomValue(iViewConfig));
         if (log)
-            LOGGER.debug("x-Distance ==> browser resol.(" + getWidthOfBrowser(iViewConfig) + ") / " + "currentZoomValue(" + getZoomValue(iViewConfig) + ") = "
-                    + getWidthOfBrowser(iViewConfig) / getZoomValue(iViewConfig) + " -> rounded = " + deltaX);
+            LOGGER.debug("x-Distance ==> browser resol.(" + getWidthOfBrowser(iViewConfig) + ") / " + "currentZoomValue("
+                    + getZoomValue(iViewConfig) + ") = " + getWidthOfBrowser(iViewConfig) / getZoomValue(iViewConfig) + " -> rounded = "
+                    + deltaX);
 
         return deltaX;
     }
@@ -731,8 +745,9 @@ public class MCRIViewServlet extends MCRServlet {
             LOGGER.debug("y-Distance ==> orig " + deltaY);
         deltaY = (int) (deltaY / getZoomValue(iViewConfig));
         if (log)
-            LOGGER.debug("y-Distance ==> browser resol.(" + getHeightOfBrowser(iViewConfig) + ") / " + "currentZoomValue(" + getZoomValue(iViewConfig) + ") = "
-                    + getHeightOfBrowser(iViewConfig) / getZoomValue(iViewConfig) + " -> rounded = " + deltaY);
+            LOGGER.debug("y-Distance ==> browser resol.(" + getHeightOfBrowser(iViewConfig) + ") / " + "currentZoomValue("
+                    + getZoomValue(iViewConfig) + ") = " + getHeightOfBrowser(iViewConfig) / getZoomValue(iViewConfig) + " -> rounded = "
+                    + deltaY);
         return deltaY;
     }
 
@@ -844,7 +859,8 @@ public class MCRIViewServlet extends MCRServlet {
         }
     }
 
-    public MCRFilesystemNode getMCRNodeByRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    public MCRFilesystemNode getMCRNodeByRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException,
+            IOException {
         String reqPath = request.getPathInfo();
         StringTokenizer st = new StringTokenizer(reqPath, "/");
         String ownerID = st.nextToken(); // ownerID
@@ -863,11 +879,13 @@ public class MCRIViewServlet extends MCRServlet {
             nodeToBeDisplayed = dirOwnerID.getChildByPath(path);
         }
         if (nodeToBeDisplayed != null && !getSupport(nodeToBeDisplayed))
-            prepareErrorPage(request, response, "Error: MCRFilesystemNode=" + nodeToBeDisplayed.getID() + "is not supported by Module-IView");
+            prepareErrorPage(request, response, "Error: MCRFilesystemNode=" + nodeToBeDisplayed.getID()
+                    + "is not supported by Module-IView");
         return nodeToBeDisplayed;
     }
 
-    public void getMetadata(HttpServletRequest request, HttpServletResponse response, StringTokenizer st) throws ServletException, IOException {
+    public void getMetadata(HttpServletRequest request, HttpServletResponse response, StringTokenizer st) throws ServletException,
+            IOException {
 
         // type == "support"
         // verifies if a Derrivat's main file is supported
@@ -884,7 +902,8 @@ public class MCRIViewServlet extends MCRServlet {
                 // get main file
                 MCRFile mainFile = (MCRFile) root.getChildByPath(nameOfMainFile);
                 if (getFileSupport(mainFile)) {
-                    forwardJDOM(request, response, new Element("support").setAttribute("mainFile", mainFile.getAbsolutePath()).setText("true"));
+                    forwardJDOM(request, response, new Element("support").setAttribute("mainFile", mainFile.getAbsolutePath()).setText(
+                            "true"));
                 } else
                     forwardJDOM(request, response, new Element("support").setText("false"));
             } else
@@ -892,23 +911,19 @@ public class MCRIViewServlet extends MCRServlet {
         }
     }
 
-    @SuppressWarnings("unchecked")
     public Properties getIViewConfig(HttpServletRequest request) {
         LOGGER.debug("getting IViewConfig....................................");
         Properties iViewConfig = new Properties();
         // PROPERTIES: Read all properties from mycore.properties
-        iViewConfig = (Properties) (MCRConfiguration.instance().getProperties().clone());
+        iViewConfig.putAll(MCRConfiguration.instance().getProperties());
 
         // SESSION: Read all *.xsl attributes that are stored in the browser's
         // session
         MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
-        Iterator<Object> sessionKeys = mcrSession.getObjectsKeyList();
-        if (mcrSession != null) {
-            while (sessionKeys.hasNext()) {
-                String key = sessionKeys.next().toString();
-                if (key.startsWith("XSL.")) {
-                    iViewConfig.put(key.substring(4), mcrSession.get(key));
-                }
+        for (Map.Entry<Object, Object> entry : mcrSession.getMapEntries()) {
+            String key = entry.getKey().toString();
+            if (key.startsWith("XSL.")) {
+                iViewConfig.put(key.substring(4), entry.getValue());
             }
         }
         return iViewConfig;
@@ -931,8 +946,8 @@ public class MCRIViewServlet extends MCRServlet {
 
                     iViewConfig.put(key4IViewConfig, value);
                     mcrSession.put(key4Session, value);
-                    LOGGER.debug("update IViewConfig: found " + key + "=" + dateUp.getProperty(key) + " that should be saved in session, safed " + key4Session
-                            + "=" + value);
+                    LOGGER.debug("update IViewConfig: found " + key + "=" + dateUp.getProperty(key)
+                            + " that should be saved in session, safed " + key4Session + "=" + value);
                 } else {
                     iViewConfig.put(key.substring(4), value);
                 }
@@ -952,13 +967,10 @@ public class MCRIViewServlet extends MCRServlet {
 
         // SESSION: Read all *.xsl attributes that are stored in the browser
         MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
-        Iterator<Object> sessionKeys = mcrSession.getObjectsKeyList();
-        if (mcrSession != null) {
-            while (sessionKeys.hasNext()) {
-                String name = (String) (sessionKeys.next());
-                if (name.startsWith("XSL.")) {
-                    iViewConfig.put(name.substring(4), mcrSession.get(name));
-                }
+        for (Map.Entry<Object, Object> entry : mcrSession.getMapEntries()) {
+            String key = entry.getKey().toString();
+            if (key.startsWith("XSL.")) {
+                iViewConfig.put(key.substring(4), entry.getValue());
             }
         }
 
@@ -974,8 +986,9 @@ public class MCRIViewServlet extends MCRServlet {
                     iViewConfig.put(name.substring(4, name.length() - 8), request.getParameter(name));
                     if (mcrSession != null) {
                         mcrSession.put(name.substring(0, name.length() - 8), request.getParameter(name));
-                        LOGGER.debug("found HTTP-Req.-Parameter " + name + "=" + request.getParameter(name) + " that should be saved in session, safed "
-                                + name.substring(0, name.length() - 8) + "=" + request.getParameter(name));
+                        LOGGER.debug("found HTTP-Req.-Parameter " + name + "=" + request.getParameter(name)
+                                + " that should be saved in session, safed " + name.substring(0, name.length() - 8) + "="
+                                + request.getParameter(name));
                     }
 
                 }
@@ -994,8 +1007,9 @@ public class MCRIViewServlet extends MCRServlet {
                     iViewConfig.put(name.substring(4, name.length() - 8), request.getAttribute(name));
                     if (mcrSession != null) {
                         mcrSession.put(name.substring(0, name.length() - 8), request.getAttribute(name));
-                        LOGGER.debug("found Req.-Attribut " + name + "=" + request.getAttribute(name) + " that should be saved in session, safed "
-                                + name.substring(0, name.length() - 8) + "=" + request.getAttribute(name));
+                        LOGGER.debug("found Req.-Attribut " + name + "=" + request.getAttribute(name)
+                                + " that should be saved in session, safed " + name.substring(0, name.length() - 8) + "="
+                                + request.getAttribute(name));
                     }
 
                 }

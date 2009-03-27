@@ -35,6 +35,7 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.StringTokenizer;
 
@@ -384,10 +385,11 @@ public class MCRLayoutService implements org.apache.xalan.trace.TraceListener {
                     props.put(name.substring(4), session.getAttribute(name));
             }
         }
-        for (Iterator it = mcrSession.getObjectsKeyList(); it.hasNext();) {
-            String name = it.next().toString();
-            if (name.startsWith("XSL."))
-                props.put(name.substring(4), mcrSession.get(name));
+        for (Map.Entry<Object, Object> entry : mcrSession.getMapEntries()) {
+            String key = entry.getKey().toString();
+            if (key.startsWith("XSL.")) {
+                props.put(key.substring(4), entry.getValue());
+            }
         }
         for (Enumeration e = request.getParameterNames(); e.hasMoreElements();) {
             String name = e.nextElement().toString();
