@@ -44,17 +44,12 @@ SELECT cat.categID, count(distinct link.objectReference.objectID) as num
       <return-scalar column="categID" type="string" />
       <return-scalar column="num" type="integer" />
       <![CDATA[
-SELECT cat.categID, count(distinct link.objectID) as num
-  FROM MCRCategory cat
-	STRAIGHT_JOIN MCRCategory cattree
-		ON cattree.leftValue BETWEEN cat.leftValue AND cat.rightValue
-	STRAIGHT_JOIN MCRCategoryLink link
-		ON cattree.internalID = link.category
-	WHERE cat.ClassID= :classID
-	  AND cattree.ClassID= :classID
-	  AND link.objectType= :type
-	  AND cat.CategID in (:categIDs)
-	GROUP BY cat.categID
+SELECT p.parentCategID as categID, count(distinct link.objectID) as num
+  FROM parents p, MCRCategoryLink link
+  WHERE p.childID = link.category
+    AND link.objectType=:type
+    AND p.ClassID=:classID
+  GROUP BY p.parentCategID
       ]]>
     </sql-query>
     <query name="NumberPerChildOfParentID">
