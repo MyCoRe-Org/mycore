@@ -189,13 +189,30 @@
 
   <target name="init">
     <!-- find out revision number of HEAD -->
-    <java classname="org.tmatesoft.svn.cli.svn.SVN" classpathref="mycore.classpath" dir="${basedir}" fork="true" outputproperty="svnlog.out">
-      <arg value="info" />
-    </java>
-    <echo level="debug">${svnlog.out}</echo>
-    <propertyregex property="revision.number" input="${svnlog.out}" select="\1">
-      <regexp pattern="evision: ([0-9]*)" />
-    </propertyregex>
+  	<if>
+  		<not>
+  			<isset property="revision.number" />
+  		</not>
+  		<then>
+  			<condition property="svn.entries.present">
+  				<available file="${basedir}/.svn/entries"/>
+  			</condition>
+  			<fail unless="svn.entries.present">
+  				SVN REVISION ERROR
+  				Cannot determine Subversion revision number of MyCoRe.
+  				Please run ant with
+  				ant -Drevision.number=&lt;svn revision&gt; &lt;ant target&gt;
+  			</fail>
+	  	    <loadfile srcfile="${basedir}/.svn/entries" property="svn.rev.line">
+	  	        <filterchain>
+	  	            <headfilter lines="1" skip="3"/>
+	  	        </filterchain>
+	  	    </loadfile>
+	  	    <propertyregex property="revision.number" input="${svn.rev.line}" select="\1">
+				<regexp pattern="([0-9]*)" />
+	  	    </propertyregex>
+  		</then>
+  	</if>
     <echo level="info">MyCoRe Revision found: ${revision.number}</echo>
     <property name="mycore.version" value="${target.version} r${revision.number}" />
     <!-- include imaging component only if JAI is available -->
