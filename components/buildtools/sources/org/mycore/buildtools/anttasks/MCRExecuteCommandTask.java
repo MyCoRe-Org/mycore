@@ -23,15 +23,14 @@
 package org.mycore.buildtools.anttasks;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.tools.ant.BuildException;
-import org.apache.tools.ant.Project;
 import org.apache.tools.ant.Task;
+import org.apache.tools.ant.types.LogLevel;
 import org.mycore.frontend.cli.MCRCommandLineInterface;
 
 /**
@@ -67,7 +66,6 @@ public class MCRExecuteCommandTask extends Task {
 	 * @see org.apache.tools.ant.Task#execute()
 	 */
 	public void execute() throws BuildException {
-		System.out.println(commands);
 		commands = getProject().replaceProperties(commands);
 		BufferedReader reader = new BufferedReader(new StringReader(commands));
 		String line;
@@ -84,9 +82,9 @@ public class MCRExecuteCommandTask extends Task {
 		} catch (IOException e) {
 			// do nothing
 		}
-		System.out.println(list.size());
 		StringBuffer sbCommands = new StringBuffer();
 		for (String s : list) {
+		    getProject().log(s, LogLevel.INFO.getLevel());
 			sbCommands.append(s).append(";;");
 		}
 				
