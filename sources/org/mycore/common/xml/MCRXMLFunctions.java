@@ -31,6 +31,9 @@ import java.util.TimeZone;
 
 import org.apache.log4j.Logger;
 
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.datamodel.metadata.MCRMetaISO8601Date;
 import org.mycore.parsers.bool.MCRCondition;
@@ -121,12 +124,11 @@ public class MCRXMLFunctions {
             LOGGER.debug(sb.toString());
         }
         Locale locale = new Locale(iso639Language);
-        SimpleDateFormat df = new SimpleDateFormat(simpleFormat, locale);
         MCRMetaISO8601Date mcrdate = new MCRMetaISO8601Date();
         mcrdate.setFormat(isoFormat);
         mcrdate.setDate(isoDate);
-        Date date = mcrdate.getDate();
-        return (date == null) ? "?" + isoDate + "?" : df.format(date);
+        String formatted=mcrdate.format(simpleFormat, locale);
+        return (formatted == null) ? "?" + isoDate + "?" : formatted;
     }
 
     public static String getISODate(String simpleDate, String simpleFormat, String isoFormat) throws ParseException {

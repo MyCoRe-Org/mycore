@@ -41,6 +41,7 @@ import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
+import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 
@@ -67,13 +68,13 @@ public final class MCRMetaISO8601Date extends MCRMetaDefault {
     private boolean changed = true;
 
     private static final Namespace DEFAULT_NAMESPACE = Namespace.NO_NAMESPACE;
-    
-    private static final MCRConfiguration CONFIG=MCRConfiguration.instance();
+
+    private static final MCRConfiguration CONFIG = MCRConfiguration.instance();
 
     private DateTime dt;
 
     private IsoFormat isoFormat;
-    
+
     public enum IsoFormat {
         YEAR, YEAR_MONTH, COMPLETE, COMPLETE_HH_MM, COMPLETE_HH_MM_SS, COMPLETE_HH_MM_SS_SSS;
 
@@ -190,7 +191,7 @@ public final class MCRMetaISO8601Date extends MCRMetaDefault {
         super.setFromDOM(element);
         setFormat(element.getAttributeValue("format"));
         setDate(element.getTextTrim());
-        this.export=(Element)element.clone();
+        this.export = (Element) element.clone();
     }
 
     /**
@@ -213,8 +214,8 @@ public final class MCRMetaISO8601Date extends MCRMetaDefault {
         try {
             dt = getDateTime(FormatChooser.cropSecondFractions(isoString));
         } catch (RuntimeException e) {
-            boolean strictParsingEnabled=CONFIG.getBoolean("MCR.Metadata.SimpleDateFormat.StrictParsing",true);
-            if (!strictParsingEnabled){
+            boolean strictParsingEnabled = CONFIG.getBoolean("MCR.Metadata.SimpleDateFormat.StrictParsing", true);
+            if (!strictParsingEnabled) {
                 /*
                  * Last line of defence against the worst dates of the universe ;o)
                  */
@@ -227,39 +228,39 @@ public final class MCRMetaISO8601Date extends MCRMetaDefault {
         }
         setDateTime(dt);
     }
-    
-    private DateTime guessDateTime(String date){
-        String locales=CONFIG.getString("MCR.Metadata.SimpleDateFormat.Locales","de_DE");
-        StringTokenizer tok=new StringTokenizer(locales,",");
-        while (tok.hasMoreTokens()){
-            Locale locale= getLocale(tok.nextToken());
-            DateFormat df= DateFormat.getDateInstance(DateFormat.SHORT,locale);
+
+    private DateTime guessDateTime(String date) {
+        String locales = CONFIG.getString("MCR.Metadata.SimpleDateFormat.Locales", "de_DE");
+        StringTokenizer tok = new StringTokenizer(locales, ",");
+        while (tok.hasMoreTokens()) {
+            Locale locale = getLocale(tok.nextToken());
+            DateFormat df = DateFormat.getDateInstance(DateFormat.SHORT, locale);
             df.setTimeZone(TimeZone.getTimeZone("UTC"));
             df.setLenient(true);
-            DateTime result=null;
+            DateTime result = null;
             try {
-                Date pDate=df.parse(date);
-                result=new DateTime(pDate.getTime());
+                Date pDate = df.parse(date);
+                result = new DateTime(pDate.getTime());
                 return result;
             } catch (ParseException e) {
-                LOGGER.warn("Date guess failed for locale: "+locale);                
+                LOGGER.warn("Date guess failed for locale: " + locale);
                 //we need no big exception in the logs, if we can't guess what it is, a warning should be enough
             }
         }
-        LOGGER.error("Error trying to guess date for string: "+date);
+        LOGGER.error("Error trying to guess date for string: " + date);
         return null;
     }
-    
-    private static Locale getLocale(String locale){
-        String lang="",country="";
-        int pos=locale.indexOf("_");
-        if (pos>0){
-            lang=locale.substring(0,pos);
-            country=locale.substring(pos+1);
+
+    private static Locale getLocale(String locale) {
+        String lang = "", country = "";
+        int pos = locale.indexOf("_");
+        if (pos > 0) {
+            lang = locale.substring(0, pos);
+            country = locale.substring(pos + 1);
         } else {
-            lang=locale;
+            lang = locale;
         }
-        return new Locale(lang,country);
+        return new Locale(lang, country);
     }
 
     /**
@@ -268,7 +269,7 @@ public final class MCRMetaISO8601Date extends MCRMetaDefault {
      * @return a new Date instance of the time set in this element
      */
     public final Date getDate() {
-        return (dt == null) ? null : (Date)dt.toDate().clone();
+        return (dt == null) ? null : (Date) dt.toDate().clone();
     }
 
     /**
@@ -343,6 +344,19 @@ public final class MCRMetaISO8601Date extends MCRMetaDefault {
     }
 
     /**
+     * formats the date to a String
+     * @param format as in {@link DateTimeFormat}
+     * @param locale used by format process
+     * @return null if date is not set yet
+     */
+    public String format(String format, Locale locale) {
+        DateTimeFormatter df = DateTimeFormat.forPattern(format);
+        if (locale != null)
+            df = df.withLocale(locale);
+        return (this.dt == null) ? null : df.print(this.dt);
+    }
+
+    /**
      * gets the input and output format.
      * 
      * this is a String that is also exported as static fields by this class, or
@@ -362,12 +376,12 @@ public final class MCRMetaISO8601Date extends MCRMetaDefault {
     public void debug() {
         LOGGER.debug("Start Class : MCRMetaISO8601Date");
         super.debugDefault();
-        LOGGER.debug("Date=" + ((dt==null)?null:dateTimeFormatter.print(dt)));
+        LOGGER.debug("Date=" + ((dt == null) ? null : dateTimeFormatter.print(dt)));
         LOGGER.debug("Format=" + this.isoFormat);
-        XMLOutputter xout=new XMLOutputter(Format.getPrettyFormat());
-        StringWriter sw=new StringWriter();
+        XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat());
+        StringWriter sw = new StringWriter();
         try {
-            xout.output(this.export,sw);
+            xout.output(this.export, sw);
             LOGGER.debug("JDOM=" + sw.toString());
         } catch (IOException e) {
             //ignore
@@ -383,7 +397,7 @@ public final class MCRMetaISO8601Date extends MCRMetaDefault {
      */
     public Object clone() {
         MCRMetaISO8601Date out = new MCRMetaISO8601Date();
-        out.setFromDOM((Element)createXML().clone());
+        out.setFromDOM((Element) createXML().clone());
         return out;
     }
 
@@ -439,7 +453,8 @@ public final class MCRMetaISO8601Date extends MCRMetaDefault {
 
         protected final static DateTimeFormatter UTC_COMPLETE_HH_MM_FORMAT = ISODateTimeFormat.dateHourMinute().withZone(DateTimeZone.UTC);
 
-        protected final static DateTimeFormatter UTC_COMPLETE_HH_MM_SS_FORMAT = ISODateTimeFormat.dateTimeNoMillis().withZone(DateTimeZone.UTC);
+        protected final static DateTimeFormatter UTC_COMPLETE_HH_MM_SS_FORMAT = ISODateTimeFormat.dateTimeNoMillis().withZone(
+                DateTimeZone.UTC);
 
         protected final static DateTimeFormatter UTC_COMPLETE_HH_MM_SS_SSS_FORMAT = ISODateTimeFormat.dateTime().withZone(DateTimeZone.UTC);
 

@@ -11,6 +11,7 @@ public class MCRXMLFunctionsTest extends MCRTestCase {
      */
     public void testFormatISODate() throws ParseException {
         assertEquals("24.02.1964",MCRXMLFunctions.formatISODate("1964-02-24","dd.MM.yyyy","de"));
+        assertEquals("1571", MCRXMLFunctions.formatISODate("1571", "yyyy", "de"));
     }
 
     /*
