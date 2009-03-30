@@ -3,48 +3,12 @@
 
 <MyCoReWebPage>
 
-<section title="Zugriff verweigert" xml:lang="de">
+<section i18n="component.session-listing.page.title" xml:lang="all">
 <center>
 <table width="80%">
  <tr align="center">
   <td align="center">
-<strong>Zugriff verweigert. Sie haben keine Berechtigung diese Seite zu sehen. Melden sie sich bitte am System an.</strong>
-  </td>
- </tr>
-</table>
-</center>
-</section>
-
-<section title="Access deny" xml:lang="en">
-<center>
-<table width="80%">
- <tr align="center">
-  <td align="center">
-<strong>You don't have the necessary access rights on this object!</strong>
-  </td>
- </tr>
-</table>
-</center>
-</section>
-
-<section title="?" xml:lang="ar">
-<center>
-<table width="80%">
- <tr align="center">
-  <td align="center">
-<strong>\u0644\u064A\u0633 \u0644\u0643 \u062D\u0642 \u0627\u0644\u0648\u0635\u0648\u0644 \u0625\u0644\u0649 \u0647\u0630\u0627 \u0627\u0644\u0643\u0627\u0626\u0646 \u061F</strong>
-  </td>
- </tr>
-</table>
-</center>
-</section>
-
-<section title="Tidak berhak" xml:lang="id">
-<center>
-<table width="80%">
- <tr align="center">
-  <td align="center">
-<strong>Anda tidak berhak untuk akses obyek ini!</strong>
+   <i18n key="component.session-listing.page.text"/>
   </td>
  </tr>
 </table>

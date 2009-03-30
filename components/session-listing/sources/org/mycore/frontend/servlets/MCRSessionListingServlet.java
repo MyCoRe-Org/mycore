@@ -29,7 +29,6 @@ import org.jdom.Document;
 import org.jdom.Element;
 
 import org.mycore.access.MCRAccessManager;
-import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.xml.MCRLayoutService;
@@ -42,14 +41,15 @@ public class MCRSessionListingServlet extends MCRServlet {
     public void doGetPost(MCRServletJob job) throws Exception {
 
         if (!MCRAccessManager.checkPermission("manage-sessions"))
-            throw new MCRException("Access denied. Please authorise.");
+            job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + "access_deny.xml"));
 
         Document sessionsXML = listSessions(job);
         MCRLayoutService.instance().doLayout(job.getRequest(), job.getResponse(), sessionsXML);
     }
 
     private Document listSessions(MCRServletJob job) {
-        //copy all session to new collection (fixes: ConcurrentModificationException)
+        // copy all session to new collection (fixes:
+        // ConcurrentModificationException)
         Collection<MCRSession> sessions = new ArrayList<MCRSession>(MCRSessionMgr.getAllSessions().values());
         Element sessionsXML = new Element("sessionListing");
         MCRUserMgr um = MCRUserMgr.instance();
