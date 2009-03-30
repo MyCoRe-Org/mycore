@@ -171,6 +171,10 @@ public class MCRHit {
         return sortData;
     }
 
+    public List<MCRFieldValue> getMetaData() {
+        return metaData;
+    }    
+
     /**
      * Compares this hit with another hit by comparing the value of the given
      * search field. Used for sorting results.
