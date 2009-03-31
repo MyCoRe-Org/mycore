@@ -64,6 +64,8 @@ abstract public class MCRCheckBase extends MCRServlet {
 
     protected List<String> errorlog;
 
+    protected static String usererrorpage = pagedir + CONFIG.getString("MCR.SWF.PageErrorUser", "editor_error_user.xml");
+
     /**
      * The method return an URL with the next working step. If okay flag is
      * true, the object will present else it shows the error page.
@@ -157,6 +159,15 @@ abstract public class MCRCheckBase extends MCRServlet {
             sb = new StringBuffer("");
         }
         return sb.toString();
+    }
+
+    /**
+     * check the access permission
+     * @param ID the mycore ID
+     * @return true if the access is set
+     */
+    protected boolean checkAccess(MCRObjectID ID) {
+        return false;
     }
 
 }

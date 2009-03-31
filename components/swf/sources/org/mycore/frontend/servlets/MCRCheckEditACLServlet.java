@@ -28,6 +28,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
 
+import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRMailer;
 import org.mycore.common.MCRUtils;
 import org.mycore.datamodel.common.MCRActiveLinkException;
@@ -135,4 +136,19 @@ public class MCRCheckEditACLServlet extends MCRCheckACLBase {
         LOGGER.info("Object " + ID.getId() + " stored under " + fn + ".");
         return true;
     }
+    /**
+     * check the access permission
+     * @param ID the mycore ID
+     * @return true if the access is set
+     */
+    protected boolean checkAccess(MCRObjectID ID) {
+        if (MCRAccessManager.checkPermission("create-"+ID.getBase())) {
+            return true;
+        }
+        if (MCRAccessManager.checkPermission("create-"+ID.getTypeId())) {
+            return true;
+        }
+        return false;
+    }
+
 }

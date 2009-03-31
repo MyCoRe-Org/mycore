@@ -28,6 +28,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
@@ -89,6 +90,12 @@ abstract public class MCRCheckACLBase extends MCRCheckBase {
 
         if (!ID.getTypeId().equals(oldtype)) {
             ID = new MCRObjectID(oldmcrid);
+        }
+
+        // check access
+        if (!checkAccess(ID)) {
+            job.getResponse().sendRedirect(getBaseURL() + usererrorpage);
+            return;
         }
 
         // create a service object and prepare it
@@ -333,4 +340,5 @@ abstract public class MCRCheckACLBase extends MCRCheckBase {
         job.getRequest().setAttribute("XSL.Style", lang);
         getLayoutService().doLayout(job.getRequest(), job.getResponse(), jdom);
     }
+    
 }

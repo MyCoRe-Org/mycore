@@ -138,4 +138,17 @@ public class MCRCheckCommitACLServlet extends MCRCheckACLBase {
         LOGGER.info("Update ACLs for ID " + ID.getId() + "in server.");
         return true;
     }
+    
+    /**
+     * check the access permission
+     * @param ID the mycore ID
+     * @return true if the access is set
+     */
+    protected boolean checkAccess(MCRObjectID ID) {
+        if (MCRAccessManager.checkPermission(ID, "writedb")) {
+            return true;
+        }
+        return false;
+    }
+
 }

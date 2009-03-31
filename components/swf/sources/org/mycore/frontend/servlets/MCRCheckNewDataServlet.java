@@ -25,6 +25,7 @@ package org.mycore.frontend.servlets;
 
 import java.util.List;
 
+import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRMailer;
 import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.metadata.MCRObjectID;
@@ -91,4 +92,20 @@ public class MCRCheckNewDataServlet extends MCRCheckDataBase {
             LOGGER.error("Can't send a mail to " + addr);
         }
     }
+    
+    /**
+     * check the access permission
+     * @param ID the mycore ID
+     * @return true if the access is set
+     */
+    protected boolean checkAccess(MCRObjectID ID) {
+        if (MCRAccessManager.checkPermission("create-"+ID.getBase())) {
+            return true;
+        }
+        if (MCRAccessManager.checkPermission("create-"+ID.getTypeId())) {
+            return true;
+        }
+        return false;
+    }
+
 }

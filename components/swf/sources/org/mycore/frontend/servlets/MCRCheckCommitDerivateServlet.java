@@ -28,6 +28,7 @@ import java.util.List;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.xpath.XPath;
+import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRMailer;
 import org.mycore.common.MCRUtils;
 import org.mycore.datamodel.common.MCRActiveLinkException;
@@ -104,6 +105,12 @@ public class MCRCheckCommitDerivateServlet extends MCRCheckBase {
             der.setFromXML(xml, true);
             MCRObjectID objID = der.getDerivate().getMetaLink().getXLinkHrefID();
             
+            // check access
+            if (!checkAccess(objID)) {
+                job.getResponse().sendRedirect(getBaseURL() + usererrorpage);
+                return;
+            }
+
             // update data
             der.updateXMLInDatastore();
             okay = true;
@@ -160,4 +167,17 @@ public class MCRCheckCommitDerivateServlet extends MCRCheckBase {
             LOGGER.error("Can't send a mail to " + addr);
         }
     }
+
+    /**
+     * check the access permission
+     * @param ID the mycore ID
+     * @return true if the access is set
+     */
+    protected boolean checkAccess(MCRObjectID ID) {
+        if (MCRAccessManager.checkPermission(ID, "writedb")) {
+            return true;
+        }
+        return false;
+    }
+
 }

@@ -77,7 +77,7 @@ abstract public class MCRCheckDataBase extends MCRCheckBase {
         LOGGER.debug("XSL.target.param.0 = " + oldmcrid);
         LOGGER.debug("XSL.target.param.1 = " + oldtype);
         LOGGER.debug("XSL.target.param.2 = " + oldstep);
-
+        
         // get the MCRSession object for the current thread from the session
         // manager.
         MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
@@ -109,6 +109,12 @@ abstract public class MCRCheckDataBase extends MCRCheckBase {
 
         if (!hasid) {
             indoc.getRootElement().setAttribute("ID", ID.getId());
+        }
+
+        // check access
+        if (!checkAccess(ID)) {
+            job.getResponse().sendRedirect(getBaseURL() + usererrorpage);
+            return;
         }
 
         // Save the incoming to a file
@@ -270,5 +276,5 @@ abstract public class MCRCheckDataBase extends MCRCheckBase {
         // restart editor
         getLayoutService().doLayout(job.getRequest(), job.getResponse(), jdom);
     }
-
+    
 }
