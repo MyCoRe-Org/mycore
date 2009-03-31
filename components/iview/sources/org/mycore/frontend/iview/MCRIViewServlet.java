@@ -96,8 +96,8 @@ public class MCRIViewServlet extends MCRServlet {
             prepareErrorPage(request, response, "Error: HTTP request path is null");
 
         /*
-         * ############################################################################################################# //
-         * get mode and process
+         * ######################################################################
+         * ####################################### // get mode and process
          */
         timer.start();
         if ((request.getParameter("mode") != null) && (!request.getParameter("mode").equals(""))) {
@@ -449,7 +449,12 @@ public class MCRIViewServlet extends MCRServlet {
             timer.stop();
             LOGGER.debug("finished getting image with zoom=thumbnail from ");
         } else if (zoom.equals("fitToWidth")) {
-            imgService.getImage(image, xPOI, yPOI, availableWidth, availableHeight, out);
+
+            if (scrollBar(iViewConfig)) {
+                imgService.getImage(image, availableWidth, availableHeight, out);
+            } else
+                imgService.getImage(image, xPOI, yPOI, availableWidth, availableHeight, out);
+            
             float zoomValue = imgService.getScaleFactor();
             setZoomValue(request, zoomValue, iViewConfig);
             LOGGER.debug("finished getting image with zoom=fitToWidth(" + zoomValue + ") from ");
@@ -811,8 +816,8 @@ public class MCRIViewServlet extends MCRServlet {
     }
 
     /**
-     * @param node -
-     *            The MCRFilesystemNode to be verified
+     * @param node
+     *            - The MCRFilesystemNode to be verified
      * @return true if module imaging supports this MCRFile or at least one
      *         MCRFile within MCRDirectory, false if no support
      */
