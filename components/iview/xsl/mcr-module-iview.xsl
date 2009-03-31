@@ -480,19 +480,23 @@
     <!--  #####################################################################################################################-->
     <xsl:template name="content">
         <div id="content-container">
-            <xsl:attribute name="style">
-                <xsl:choose>
-                    <xsl:when test="$MCR.Module-iview.scrollBars = 'true'">
-                        <xsl:value-of select="'overflow:scroll;'" />
-                    </xsl:when>
-                    <xsl:otherwise>
-                        <xsl:value-of select="'overflow:hidden;'" />
-                    </xsl:otherwise>
-                </xsl:choose>
-            </xsl:attribute>
-            <xsl:if test="$MCR.Module-iview.style != 'image'">
-                <xsl:call-template name="thumbnails" />
-            </xsl:if>
+            <xsl:choose>
+              <xsl:when test="$MCR.Module-iview.style = 'image'">
+                <xsl:attribute name="style">
+                    <xsl:choose>
+                        <xsl:when test="$MCR.Module-iview.scrollBars = 'true'">
+                            <xsl:value-of select="'overflow:auto;'" />
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:value-of select="'overflow:hidden;'" />
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </xsl:attribute>
+              </xsl:when>
+              <xsl:otherwise>
+                  <xsl:call-template name="thumbnails" />
+              </xsl:otherwise>
+            </xsl:choose>
         </div>
     </xsl:template>
     <!--  #####################################################################################################################-->
