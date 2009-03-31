@@ -16,7 +16,7 @@
           length="70" />
       </component>
     </natural-id>
-    <query name="NumberNumberByTypePerCategID.MySQLDialect">
+    <query name="NumberPerClassID">
       <![CDATA[
 SELECT cat.categID, count(distinct link.objectReference.objectID) as num
   FROM MCRCategoryLink link, MCRCategoryImpl cat, MCRCategoryImpl cattree
@@ -27,6 +27,18 @@ SELECT cat.categID, count(distinct link.objectReference.objectID) as num
   GROUP BY cat.categID
       ]]>
     </query>
+    <!-- Tuned Query for MySQL -->
+    <sql-query name="NumberPerClassID.MySQLDialect">
+      <return-scalar column="categID" type="string" />
+      <return-scalar column="num" type="integer" />
+      <![CDATA[
+SELECT p.parentCategID as categID, count(distinct link.objectID) as num
+  FROM parents p, MCRCategoryLink link
+  WHERE p.childID = link.category
+    AND p.ClassID=:classID
+  GROUP BY p.parentCategID
+      ]]>
+    </sql-query>
     <query name="NumberByTypePerClassID">
       <![CDATA[
 SELECT cat.categID, count(distinct link.objectReference.objectID) as num
