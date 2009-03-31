@@ -273,6 +273,8 @@ public class MCRClassificationBrowserData {
 
     public final void setClassification(final MCRCategoryID classifID) throws Exception {
         classif = getClassificationPool().getClassificationAsPojo(classifID, true);
+        if (classif == null)
+            return;
         lines = new ArrayList<Element>();
         totalNumOfDocs = 0;
         putCategoriesintoLines(-1, classif.getChildren());
@@ -396,6 +398,8 @@ public class MCRClassificationBrowserData {
         }
 
         for (MCRCategoryID id : countMap.keySet()) {
+            if (!id.isRootID())
+                continue;
             LOGGER.debug("get classification " + id);
             MCRCategory classif = getClassificationPool().getClassificationAsPojo(id, false);
             LOGGER.debug("get browse element");
@@ -752,9 +756,10 @@ public class MCRClassificationBrowserData {
         ArrayList<String> itemname = new ArrayList<String>();
         ArrayList<Integer> itemlevel = new ArrayList<Integer>();
         ArrayList<Element> itemelm = new ArrayList<Element>();
-        List navitreelist = navitree.getChildren();
+        @SuppressWarnings("unchecked")
+        List<Element> navitreelist = navitree.getChildren();
         for (int i = 0; i < navitreelist.size(); i++) {
-            final Element child = (Element) (navitreelist.get(i));
+            final Element child = navitreelist.get(i);
             final Element col1 = (Element) (child.getChildren().get(0));
             final Element col2 = (Element) (child.getChildren().get(1));
             final String sText = col2.getText();
@@ -773,18 +778,8 @@ public class MCRClassificationBrowserData {
         for (int i = 0; i < itemname.size(); i++) {
             itemnum[i] = i;
         }
-        // debug
-        // for (int i = 0; i < itemnum.length; i++) {
-        // System.out.println("===> " + i + " " + itemnum[i] + " " +
-        // itemname.get(itemnum[i]));
-        // }
         // sort
         sortMyTreePerLevel(0, itemname.size(), 1, itemname, itemlevel, itemnum);
-        // debug
-        // for (int i = 0; i < itemnum.length; i++) {
-        // System.out.println("---> " + i + " " + itemnum[i] + " " +
-        // itemname.get(itemnum[i]));
-        // }
         // write back
         for (int i = 0; i < itemnum.length; i++) {
             navitree.addContent(itemelm.get(itemnum[i]));

@@ -86,20 +86,21 @@ public class MCRClassificationBrowser extends MCRServlet {
 
         try {
             LOGGER.debug("Creation of BData.");
-            LOGGER.debug("URI: "+uri);
-            LOGGER.debug("MODE: "+mode);
-            LOGGER.debug("ACTCLID: "+actclid);
-            LOGGER.debug("ACTCATEG: "+actcateg);
+            LOGGER.debug("URI: " + uri);
+            LOGGER.debug("MODE: " + mode);
+            LOGGER.debug("ACTCLID: " + actclid);
+            LOGGER.debug("ACTCATEG: " + actcateg);
             mcrSession.BData = new MCRClassificationBrowserData(uri, mode, actclid, actcateg);
         } catch (MCRConfigurationException cErr) {
-            generateErrorPage(job.getRequest(), job.getResponse(), HttpServletResponse.SC_INTERNAL_SERVER_ERROR, cErr.getMessage(), cErr, false);
+            generateErrorPage(job.getRequest(), job.getResponse(), HttpServletResponse.SC_INTERNAL_SERVER_ERROR, cErr.getMessage(), cErr,
+                    false);
         }
 
         Document jdomFile = getEmbeddingPage(mcrSession.BData.getPageName());
         Document jdom = null;
- 
-        if (mode.equalsIgnoreCase("edit") && (actclid.length() == 0 && ((uri.length() == 0) || uri.equalsIgnoreCase("/default")))) {
-            // alle Klasifikationen auflisten (auch die nicht eingebundenen)
+
+        if (mode.equalsIgnoreCase("edit") && mcrSession.BData.getClassification() == null) {
+            // alle Klassifikationen auflisten (auch die nicht eingebundenen)
             jdom = mcrSession.BData.createXmlTreeforAllClassifications();
 
         } else {

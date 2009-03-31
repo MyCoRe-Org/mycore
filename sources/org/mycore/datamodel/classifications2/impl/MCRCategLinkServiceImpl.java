@@ -39,7 +39,6 @@ import org.hibernate.criterion.Restrictions;
 import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRConfiguration;
-import org.mycore.common.MCRException;
 import org.mycore.datamodel.classifications2.MCRCategLinkService;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
@@ -73,7 +72,6 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
         return countLinksForType(parent, null, childrenOnly);
     }
 
-    @SuppressWarnings("unchecked")
     public Map<MCRCategoryID, Number> countLinksForType(MCRCategory parent, String type, boolean childrenOnly) {
         boolean restrictedByType = (type != null);
         String queryName;
@@ -89,9 +87,16 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
             countLinks.put(id, 0);
         }
         Session session = HIB_CONNECTION_INSTANCE.getSession();
-        parent = getMCRCategory(session, parent.getId());
-        LOGGER.info("parentID:" + parent.getId());
-        String classID = parent.getId().getRootID();
+        //have to use rootID here if childrenOnly=false
+        //old classification browser/editor could not determine links correctly otherwise 
+        final MCRCategoryID fetchID = childrenOnly ? parent.getId() : parent.getRoot().getId();
+        parent = getMCRCategory(session, fetchID);
+        if (parent == null) {
+            LOGGER.warn("Could not load category: " + fetchID);
+            return countLinks;
+        }
+        LOGGER.info("parentID:" + fetchID);
+        String classID = fetchID.getRootID();
         Query q = HIB_CONNECTION_INSTANCE.getNamedQuery(LINK_CLASS.getName() + queryName);
         // query can take long time, please cache result
         q.setCacheable(true);
@@ -103,6 +108,7 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
             q.setParameter("type", type);
         }
         // get object count for every category (not accumulated)
+        @SuppressWarnings("unchecked")
         List<Object[]> result = q.list();
         for (Object[] sr : result) {
             MCRCategoryID key = new MCRCategoryID(classID, sr[0].toString());
@@ -175,7 +181,7 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
             return categ;
         categ = MCRCategoryDAOImpl.getByNaturalID(session, categID);
         if (categ == null) {
-            throw new MCRException("Category " + categID + " does not exists");
+            return null;
         }
         categCache.put(categID, categ);
         return categ;
@@ -200,7 +206,7 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
                 classCriteria.add(Restrictions.eq("rootID", categID.getRootID()));
                 if (!categID.isRootID()) {
                     MCRCategoryImpl categoryImpl = MCRCategoryDAOImpl.getByNaturalID(session, categID);
-                    if (category == null) {
+                    if (categoryImpl == null) {
                         LOGGER.warn("Category does not exist: " + categID);
                         boolMap.put(categID, false);
                         continue;
