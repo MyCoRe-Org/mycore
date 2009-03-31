@@ -451,7 +451,7 @@ public class MCRIViewServlet extends MCRServlet {
         } else if (zoom.equals("fitToWidth")) {
 
             if (scrollBar(iViewConfig)) {
-                imgService.getImage(image, availableWidth, availableHeight, out);
+                imgService.getImage(image, availableWidth, availableWidth, out);
             } else
                 imgService.getImage(image, xPOI, yPOI, availableWidth, availableHeight, out);
             
