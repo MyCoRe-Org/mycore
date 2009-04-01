@@ -86,17 +86,13 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
             // initialize all categIDs with link count of zero
             countLinks.put(id, 0);
         }
-        Session session = HIB_CONNECTION_INSTANCE.getSession();
         //have to use rootID here if childrenOnly=false
         //old classification browser/editor could not determine links correctly otherwise 
-        final MCRCategoryID fetchID = childrenOnly ? parent.getId() : parent.getRoot().getId();
-        parent = getMCRCategory(session, fetchID);
-        if (parent == null) {
-            LOGGER.warn("Could not load category: " + fetchID);
-            return countLinks;
+        if (!childrenOnly) {
+            parent = parent.getRoot();
         }
-        LOGGER.info("parentID:" + fetchID);
-        String classID = fetchID.getRootID();
+        LOGGER.info("parentID:" + parent.getId());
+        String classID = parent.getId().getRootID();
         Query q = HIB_CONNECTION_INSTANCE.getNamedQuery(LINK_CLASS.getName() + queryName);
         // query can take long time, please cache result
         q.setCacheable(true);
