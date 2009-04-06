@@ -629,6 +629,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
             //to allow optimized hasChildren() to work without db query
             newCateg.setLeft(((MCRCategoryImpl) category).getLeft());
             newCateg.setRight(((MCRCategoryImpl) category).getRight());
+            newCateg.setInternalID(((MCRCategoryImpl)category).getInternalID());
         }
         if (childAmount > 0) {
             for (MCRCategory child : category.getChildren()) {
