@@ -85,8 +85,6 @@ public class MCRStartEditorServlet extends MCRServlet {
 
     private static final long serialVersionUID = 1L;
 
-    private static final MCRAccessInterface AI = MCRAccessManager.getAccessImpl();
-
     // The configuration
     protected static Logger LOGGER = Logger.getLogger(MCRStartEditorServlet.class);
 
@@ -95,6 +93,9 @@ public class MCRStartEditorServlet extends MCRServlet {
 
     // The file slash
     protected static String SLASH = System.getProperty("file.separator");;
+
+    // the access system
+    private static final MCRAccessInterface AI = MCRAccessManager.getAccessImpl();
 
     // static pages
     protected static String pagedir = CONFIG.getString("MCR.SWF.PageDir", "");
@@ -227,9 +228,8 @@ public class MCRStartEditorServlet extends MCRServlet {
         LOGGER.debug("TYPE = " + cd.mytype);
 
         // get the project name
-        cd.myproject = getProperty(job.getRequest(), "project");
-        if (cd.myproject == null) {
-            cd.myproject = CONFIG.getString("MCR.SWF.Project.ID." + cd.mytype, "MCR");
+        if ((cd.myproject == null) || (cd.myproject.length() == 0)) {
+            cd.myproject = getProperty(job.getRequest(), "project");
         }
         LOGGER.info("Project = " + cd.myproject);
 
@@ -458,7 +458,7 @@ public class MCRStartEditorServlet extends MCRServlet {
             String subject = "Automatically generated message from " + appl;
             StringBuffer text = new StringBuffer();
             text.append("The derivate with ID ").append(cd.mysemcrid).append(" from the object with ID ").append(cd.mysemcrid).append(
-                    " was removed from server.");
+                            " was removed from server.");
             LOGGER.info(text.toString());
 
             try {
@@ -567,7 +567,8 @@ public class MCRStartEditorServlet extends MCRServlet {
             String appl = CONFIG.getString("MCR.SWF.Mail.ApplicationID", "DocPortal");
             String subject = "Automaticaly message from " + appl;
             StringBuffer text = new StringBuffer();
-            text.append("The object with type ").append(cd.mytype).append(" with ID ").append(cd.mytfmcrid).append(" was removed from server.");
+            text.append("The object with type ").append(cd.mytype).append(" with ID ").append(cd.mytfmcrid).append(
+                            " was removed from server.");
             LOGGER.info(text.toString());
 
             try {
@@ -860,7 +861,8 @@ public class MCRStartEditorServlet extends MCRServlet {
         StringBuffer sb = new StringBuffer(pagedir);
         sb.append("editor_").append(cd.myremcrid.getTypeId()).append("_editor.xml");
 
-        String fuhid = new MCRSWFUploadHandlerMyCoRe(cd.myremcrid.getId(), cd.mysemcrid.getId(), "new", getBaseURL() + sb.toString()).getID();
+        String fuhid = new MCRSWFUploadHandlerMyCoRe(cd.myremcrid.getId(), cd.mysemcrid.getId(), "new", getBaseURL() + sb.toString())
+                        .getID();
         cd.myfile = pagedir + "fileupload_new.xml";
 
         String base = getBaseURL() + cd.myfile;
@@ -911,7 +913,7 @@ public class MCRStartEditorServlet extends MCRServlet {
                     String subject = "Automaticaly message from " + appl;
                     StringBuffer text = new StringBuffer();
                     text.append("The object of type ").append(cd.mytype).append(" with ID ").append(cd.mysemcrid).append(
-                            " was commited from workflow to the server.");
+                                    " was commited from workflow to the server.");
                     LOGGER.info(text.toString());
 
                     try {
@@ -1077,7 +1079,8 @@ public class MCRStartEditorServlet extends MCRServlet {
             String appl = CONFIG.getString("MCR.SWF.Mail.ApplicationID", "MyCoRe");
             String subject = "Automaticaly message from " + appl;
             StringBuffer text = new StringBuffer();
-            text.append("The object of type ").append(cd.mytype).append(" with ID ").append(cd.mysemcrid).append(" was removed from the workflow.");
+            text.append("The object of type ").append(cd.mytype).append(" with ID ").append(cd.mysemcrid).append(
+                            " was removed from the workflow.");
             LOGGER.info(text.toString());
 
             try {
@@ -1199,6 +1202,42 @@ public class MCRStartEditorServlet extends MCRServlet {
         sb = new StringBuffer();
         sb.append(getBaseURL()).append(pagedir).append("editor_form_editor-derivate.xml");
         job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(buildRedirectURL(sb.toString(), params)));
+    }
+
+    /**
+     * The method copy a object in the workflow with a a new MCRObjectID.
+     * 
+     * @param cd
+     *            the common data stack
+     * @param job
+     *            the MCRServletJob instance
+     */
+    public void wcopyobj(MCRServletJob job, CommonData cd) throws IOException {
+        org.jdom.Element rule = WFM.getRuleFromFile(cd.mysemcrid, "writewf");
+        if (rule != null && !AI.checkPermission(rule)) {
+            job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + usererrorpage));
+            return;
+        }
+        if (!cd.mysemcrid.isValid()) {
+            job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + mcriderrorpage));
+            return;
+        }
+
+        cd.mytfmcrid = new MCRObjectID(getNextMCRTFID(cd.myproject, cd.mytype));
+        LOGGER.debug("MCRID (TF) = " + cd.mytfmcrid.getId());
+        File outFile = new File(WFM.getDirectoryPath(cd.mytfmcrid.getBase()), cd.mytfmcrid + ".xml");
+        MCRObject copyobj = new MCRObject();
+        copyobj.setFromURI(WFM.getDirectoryPath(cd.mysemcrid.getBase()) + SLASH + cd.mysemcrid + ".xml");
+        copyobj.setId(cd.mytfmcrid);
+        copyobj.setLabel(cd.mytfmcrid.getId());
+        MCRUtils.writeJDOMToFile(copyobj.createXML(), outFile);
+
+        StringBuffer sb = new StringBuffer();
+        sb.append(pagedir).append("editor_").append(cd.myproject).append('_').append(cd.mytype).append("_editor.xml");
+        cd.myfile = sb.toString();
+        String base = getBaseURL() + cd.myfile;
+        Properties params = new Properties();
+        job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(buildRedirectURL(base, params)));
     }
 
     /**
