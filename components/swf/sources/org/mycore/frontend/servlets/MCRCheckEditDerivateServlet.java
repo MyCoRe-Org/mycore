@@ -53,6 +53,8 @@ import static org.mycore.common.MCRConstants.XSI_NAMESPACE;
  */
 public class MCRCheckEditDerivateServlet extends MCRCheckBase {
 
+    private static final long serialVersionUID = 1L;
+
     /**
      * This method overrides doGetPost of MCRServlet. <br />
      */
@@ -138,7 +140,7 @@ public class MCRCheckEditDerivateServlet extends MCRCheckBase {
         StringBuffer sb = new StringBuffer();
         if (okay) {
             // return all is ready
-            sb.append(getWorkflowFile(pagedir, ID.getBase()));
+            sb.append(WFM.getWorkflowFile(pagedir, ID.getBase()));
         } else {
             sb.append(pagedir).append(CONFIG.getString("MCR.SWF.PageErrorStore", "editor_error_store.xml"));
         }
@@ -153,7 +155,7 @@ public class MCRCheckEditDerivateServlet extends MCRCheckBase {
      */
     public final void sendMail(MCRObjectID ID) {
         MCRSimpleWorkflowManager wfm = MCRSimpleWorkflowManager.instance();
-        List addr = wfm.getMailAddress(ID.getTypeId(), "weditder");
+        List<String> addr = wfm.getMailAddress(ID.getTypeId(), "weditder");
         if (addr.size() == 0) {
             return;
         }

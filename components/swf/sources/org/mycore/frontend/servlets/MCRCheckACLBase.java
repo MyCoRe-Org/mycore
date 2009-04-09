@@ -28,7 +28,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;

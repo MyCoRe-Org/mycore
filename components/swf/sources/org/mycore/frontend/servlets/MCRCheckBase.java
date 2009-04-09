@@ -23,10 +23,6 @@
 
 package org.mycore.frontend.servlets;
 
-import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -135,30 +131,6 @@ abstract public class MCRCheckBase extends MCRServlet {
             super(jdom_in, id);
         }
 
-    }
-
-    protected final String getWorkflowFile(String pagedir, String base) {
-        StringBuffer sb = new StringBuffer();
-        sb.append(pagedir).append("editor_").append(base).append("_editor.xml");
-        try {
-            URL url = new URL(getBaseURL() + sb.toString());
-            HttpURLConnection http = (HttpURLConnection)url.openConnection();
-            if (http.getResponseCode() != 200) {
-                int i = base.indexOf('_');
-                sb = new StringBuffer();
-                sb.append(pagedir).append("editor_").append(base.substring(i + 1)).append("_editor.xml");
-                url = new URL(getBaseURL() + sb.toString());
-                http = (HttpURLConnection)url.openConnection();
-                if (http.getResponseCode() != 200) {
-                    sb = new StringBuffer("");
-                }
-            }
-        } catch (MalformedURLException e) {
-            sb = new StringBuffer("");
-        } catch (IOException e) {
-            sb = new StringBuffer("");
-        }
-        return sb.toString();
     }
 
     /**

@@ -85,7 +85,7 @@ public class MCRCheckCommitACLServlet extends MCRCheckACLBase {
      *            the MCRObjectID of the MCRObject
      */
     public final void sendMail(MCRObjectID ID) {
-        List addr = WFM.getMailAddress(ID.getTypeId(), "seditacl");
+        List<String> addr = WFM.getMailAddress(ID.getTypeId(), "seditacl");
 
         if (addr.size() == 0) {
             return;

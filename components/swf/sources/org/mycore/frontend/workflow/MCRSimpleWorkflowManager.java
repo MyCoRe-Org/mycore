@@ -25,6 +25,10 @@
 package org.mycore.frontend.workflow;
 
 import java.io.File;
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
@@ -51,6 +55,7 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.MCRObjectService;
 import org.mycore.frontend.cli.MCRDerivateCommands;
 import org.mycore.frontend.cli.MCRObjectCommands;
+import org.mycore.frontend.servlets.MCRServlet;
 
 /**
  * This class holds methods to manage the workflow file system of MyCoRe.
@@ -591,4 +596,35 @@ public class MCRSimpleWorkflowManager {
         }
         return null;
     }
+    
+    /**
+     * The method return page name of the next URL of the workflow.
+     * @param pagedir the base directory of the WEB application
+     * @param base the MCRObjectID base ID
+     * @return the workflow URL
+     */
+    public final String getWorkflowFile(String pagedir, String base) {
+        StringBuffer sb = new StringBuffer();
+        sb.append(pagedir).append("editor_").append(base).append("_editor.xml");
+        try {
+            URL url = new URL(MCRServlet.getBaseURL() + sb.toString());
+            HttpURLConnection http = (HttpURLConnection)url.openConnection();
+            if (http.getResponseCode() != 200) {
+                int i = base.indexOf('_');
+                sb = new StringBuffer();
+                sb.append(pagedir).append("editor_").append(base.substring(i + 1)).append("_editor.xml");
+                url = new URL(MCRServlet.getBaseURL() + sb.toString());
+                http = (HttpURLConnection)url.openConnection();
+                if (http.getResponseCode() != 200) {
+                    sb = new StringBuffer("");
+                }
+            }
+        } catch (MalformedURLException e) {
+            sb = new StringBuffer("");
+        } catch (IOException e) {
+            sb = new StringBuffer("");
+        }
+        return sb.toString();
+    }
+
 }

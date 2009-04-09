@@ -1232,12 +1232,9 @@ public class MCRStartEditorServlet extends MCRServlet {
         copyobj.setLabel(cd.mytfmcrid.getId());
         MCRUtils.writeJDOMToFile(copyobj.createXML(), outFile);
 
-        StringBuffer sb = new StringBuffer();
-        sb.append(pagedir).append("editor_").append(cd.myproject).append('_').append(cd.mytype).append("_editor.xml");
-        cd.myfile = sb.toString();
-        String base = getBaseURL() + cd.myfile;
+        String base = WFM.getWorkflowFile(pagedir, cd.mytfmcrid.getBase());
         Properties params = new Properties();
-        job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(buildRedirectURL(base, params)));
+        job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(buildRedirectURL(getBaseURL() + base, params)));
     }
 
     /**

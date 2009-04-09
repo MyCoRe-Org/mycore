@@ -151,7 +151,7 @@ public class MCRCheckCommitDerivateServlet extends MCRCheckBase {
      */
     public final void sendMail(MCRObjectID ID) {
         MCRSimpleWorkflowManager wfm = MCRSimpleWorkflowManager.instance();
-        List addr = wfm.getMailAddress(ID.getTypeId(), "seditder");
+        List<String> addr = wfm.getMailAddress(ID.getTypeId(), "seditder");
         if (addr.size() == 0) {
             return;
         }

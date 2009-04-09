@@ -78,7 +78,7 @@ public class MCRCheckCommitDataServlet extends MCRCheckDataBase {
      */
     public final void sendMail(MCRObjectID ID) {
         MCRSimpleWorkflowManager wfm = MCRSimpleWorkflowManager.instance();
-        List addr = wfm.getMailAddress(ID.getTypeId(), "wcommit");
+        List <String> addr = wfm.getMailAddress(ID.getTypeId(), "wcommit");
 
         if (addr.size() == 0) {
             return;
