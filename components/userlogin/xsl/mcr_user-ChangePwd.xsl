@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!-- ============================================== -->
-<!-- $Revision: 1.2 $ $Date: 2008/04/11 11:47:59 $ -->
+<!-- $Revision: 1.4 $ $Date: 2009/03/20 10:42:33 $ -->
 <!-- ============================================== -->
 
 <!-- +
@@ -64,15 +64,16 @@
               <td class="inputField">
                 <input name="pwd_1" type="password" maxlength="30"/>
               </td>
-              <td class="inputCaption_rtl">
+              <td class="inputCaption-rtl">
                 <xsl:value-of select="concat(':' , i18n:translate('component.userlogin.tasks.changePass.newPass'))"/>
               </td>
             </tr>
+            <tr height="5px"/>
             <tr>
               <td class="inputField">
                 <input name="pwd_2" type="password" maxlength="30"/>
               </td>
-              <td class="inputCaption_rtl">
+              <td class="inputCaption-rtl">
                 <xsl:value-of select="concat(':' , i18n:translate('component.userlogin.tasks.changePass.repeatPass'))"/>
               </td>
             </tr>
@@ -85,7 +86,7 @@
               <td class="inputField">
                 <input name="oldpwd" type="password" maxlength="30"/>
               </td>
-              <td class="inputCaption_rtl">
+              <td class="inputCaption-rtl">
                 <xsl:value-of select="concat(':' , i18n:translate('component.userlogin.tasks.changePass.oldPass'))"/>
               </td>
             </tr>
@@ -94,11 +95,12 @@
             <tr>
               <td class="inputCaption">
                 <xsl:value-of select="concat(i18n:translate('component.userlogin.tasks.changePass.newPass'), ':')"/>
-              </td>
+              </td>            
               <td class="inputField">
                 <input name="pwd_1" type="password" maxlength="30"/>
               </td>
             </tr>
+            <tr height="5px"/>              
             <tr>
               <td class="inputCaption">
                 <xsl:value-of select="concat(i18n:translate('component.userlogin.tasks.changePass.repeatPass'), ':')"/>
@@ -127,7 +129,7 @@
       <p/>
       <xsl:choose>
         <xsl:when test="$direction = 'rtl' ">
-          <input type="submit" class="button_rtl" value="{i18n:translate('component.userlogin.tasks.changePass.submit')} &gt;&gt;"
+          <input type="submit" class="button-rtl" value="{i18n:translate('component.userlogin.tasks.changePass.submit')} &gt;&gt;"
             name="ChangePwdSubmit"/>
         </xsl:when>
         <xsl:otherwise>

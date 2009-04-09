@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!-- ============================================== -->
-<!-- $Revision: 1.2 $ $Date: 2008/04/11 11:47:59 $ -->
+<!-- $Revision: 1.4 $ $Date: 2009/03/20 10:42:33 $ -->
 <!-- ============================================== -->
 
 <!-- +
@@ -55,18 +55,19 @@
         <xsl:choose>
           <xsl:when test="$direction = 'rtl' ">
             <tr>
-              <td class="inputField_rtl">
+              <td class="inputField-rtl">
                 <input name="uid" type="text" maxlength="30"/>
               </td>
-              <td class="inputCaption_rtl">
+              <td class="inputCaption-rtl">
                 <xsl:value-of select="concat(i18n:translate('component.userlogin.tasks.login.account'),' ')"/>
               </td>
             </tr>
+            <tr height="5px"/>
             <tr>
-              <td class="inputField_rtl">
+              <td class="inputField-rtl">
                 <input name="pwd" type="password" maxlength="30"/>
               </td>
-              <td class="inputCaption_rtl">
+              <td class="inputCaption-rtl">
                 <xsl:value-of select="concat(i18n:translate('component.userlogin.tasks.login.password'),' ')"/>
               </td>
             </tr>
@@ -80,6 +81,7 @@
                 <input name="uid" type="text" maxlength="30"/>
               </td>
             </tr>
+            <tr height="5px"/>            
             <tr>
               <td class="inputCaption">
                 <xsl:value-of select="concat(i18n:translate('component.userlogin.tasks.login.password'),' :')"/>
@@ -96,7 +98,7 @@
       
       <xsl:choose>
         <xsl:when test="$direction = 'rtl' ">
-          <input class="button_rtl" type="submit" value="{i18n:translate('component.userlogin.button.login')} &gt;&gt;" name="LoginSubmit"/>
+          <input class="button-rtl" type="submit" value="{i18n:translate('component.userlogin.button.login')} &gt;&gt;" name="LoginSubmit"/>
         </xsl:when>
         <xsl:otherwise>
           <input class="button" type="submit" value="{i18n:translate('component.userlogin.button.login')} &gt;&gt;" name="LoginSubmit"/>

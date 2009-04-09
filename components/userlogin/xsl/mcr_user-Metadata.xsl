@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!-- ============================================== -->
-<!-- $Revision: 1.2 $ $Date: 2008/04/11 11:47:59 $ -->
+<!-- $Revision: 1.4 $ $Date: 2009/03/20 10:42:33 $ -->
 <!-- ============================================== -->
 
 <!-- +
@@ -72,84 +72,84 @@
             </th>
           </tr>
           <tr>
-            <td class="metavalue_rtl">
+            <td class="metavalue-rtl">
               <xsl:value-of select="./user/@numID"/>
             </td>
-            <td class="metaname_rtl">
+            <td class="metaname-rtl">
               <xsl:value-of select="i18n:translate('component.userlogin.contact.numID')"/>
             </td>
           </tr>
           <tr>
             <xsl:choose>
               <xsl:when test="./user/@id_enabled='true'">
-                <td class="metavalue_rtl">
+                <td class="metavalue-rtl">
                   <xsl:value-of select="i18n:translate('component.userlogin.contact.enabled')"/>
                 </td>
               </xsl:when>
               <xsl:otherwise>
-                <td class="metavalue_rtl">
+                <td class="metavalue-rtl">
                   <xsl:value-of select="i18n:translate('component.userlogin.contact.disabled')"/>
                 </td>
               </xsl:otherwise>
             </xsl:choose>
-            <td class="metaname_rtl">
+            <td class="metaname-rtl">
               <xsl:value-of select="i18n:translate('component.userlogin.contact.status')"/>
             </td>
           </tr>
           <tr>
             <xsl:choose>
               <xsl:when test="./user/@update_allowed='true'">
-                <td class="metavalue_rtl">
+                <td class="metavalue-rtl">
                   <xsl:value-of select="i18n:translate('component.userlogin.contact.allowed')"/>
                 </td>
               </xsl:when>
               <xsl:otherwise>
-                <td class="metavalue_rtl">
+                <td class="metavalue-rtl">
                   <xsl:value-of select="i18n:translate('component.userlogin.contact.denied')"/>
                 </td>
               </xsl:otherwise>
             </xsl:choose>
-            <td class="metaname_rtl">
+            <td class="metaname-rtl">
               <xsl:value-of select="i18n:translate('component.userlogin.contact.update')"/>
             </td>
           </tr>
           <tr>
-            <td class="metavalue_rtl">
+            <td class="metavalue-rtl">
               <xsl:value-of select="./user/user.creator"/>
             </td>
-            <td class="metaname_rtl">
+            <td class="metaname-rtl">
               <xsl:value-of select="i18n:translate('component.userlogin.contact.creator')"/>
             </td>
           </tr>
           <tr>
-            <td class="metavalue_rtl">
+            <td class="metavalue-rtl">
               <xsl:value-of select="./user/user.creation_date"/>
             </td>
-            <td class="metaname_rtl">
+            <td class="metaname-rtl">
               <xsl:value-of select="i18n:translate('component.userlogin.contact.creationDate')"/>
             </td>
           </tr>
           <tr>
-            <td class="metavalue_rtl">
+            <td class="metavalue-rtl">
               <xsl:value-of select="./user/user.last_modified"/>
             </td>
-            <td class="metaname_rtl">
+            <td class="metaname-rtl">
               <xsl:value-of select="i18n:translate('component.userlogin.contact.lastModified')"/>
             </td>
           </tr>
           <tr>
-            <td class="metavalue_rtl">
+            <td class="metavalue-rtl">
               <xsl:value-of select="./user/user.description"/>
             </td>
-            <td class="metaname_rtl">
+            <td class="metaname-rtl">
               <xsl:value-of select="i18n:translate('component.userlogin.contact.description')"/>
             </td>
           </tr>
           <tr>
-            <td class="metavalue_rtl">
+            <td class="metavalue-rtl">
               <xsl:value-of select="./user/user.primary_group"/>
             </td>
-            <td class="metaname_rtl">
+            <td class="metaname-rtl">
               <xsl:value-of select="i18n:translate('component.userlogin.contact.primaryGroup')"/>
             </td>
           </tr>
@@ -157,13 +157,13 @@
           <!-- Now the groups the user is a member of are displayed... -->
           <tr>
             <xsl:variable name="numGroups" select="count(./user/user.groups/groups.groupID)"/>
-            <td class="metavalue_rtl">
+            <td class="metavalue-rtl">
               <xsl:for-each select="./user/user.groups/groups.groupID">
                 <xsl:value-of select="."/>
                 <br/>
               </xsl:for-each>
             </td>
-            <td class="metaname_rtl">
+            <td class="metaname-rtl">
               <xsl:copy-of select="i18n:translate('component.userlogin.contact.groups')"/>
             </td>
           </tr>
@@ -175,130 +175,130 @@
             </th>
           </tr>
           <tr>
-            <td class="metavalue_rtl">
+            <td class="metavalue-rtl">
               <xsl:value-of select="./user/user.contact/contact.salutation"/>
             </td>
-            <td class="metaname_rtl">
+            <td class="metaname-rtl">
               <xsl:value-of select="i18n:translate('component.userlogin.contact.salutation')"/>
             </td>
           </tr>
           <tr>
-            <td class="metavalue_rtl">
+            <td class="metavalue-rtl">
               <xsl:value-of select="./user/user.contact/contact.firstname"/>
             </td>
-            <td class="metaname_rtl">
+            <td class="metaname-rtl">
               <xsl:value-of select="i18n:translate('component.userlogin.contact.firstName')"/>
             </td>
           </tr>
           <tr>
-            <td class="metavalue_rtl">
+            <td class="metavalue-rtl">
               <xsl:value-of select="./user/user.contact/contact.lastname"/>
             </td>
-            <td class="metaname_rtl">
+            <td class="metaname-rtl">
               <xsl:value-of select="i18n:translate('component.userlogin.contact.lastName')"/>
             </td>
           </tr>
           <tr>
-            <td class="metavalue_rtl">
+            <td class="metavalue-rtl">
               <xsl:value-of select="./user/user.contact/contact.street"/>
             </td>
-            <td class="metaname_rtl">
+            <td class="metaname-rtl">
               <xsl:value-of select="i18n:translate('component.userlogin.contact.street')"/>
             </td>
           </tr>
           <tr>
-            <td class="metavalue_rtl">
+            <td class="metavalue-rtl">
               <xsl:value-of select="./user/user.contact/contact.city"/>
             </td>
-            <td class="metaname_rtl">
+            <td class="metaname-rtl">
               <xsl:value-of select="i18n:translate('component.userlogin.contact.city')"/>
             </td>
           </tr>
           <tr>
-            <td class="metavalue_rtl">
+            <td class="metavalue-rtl">
               <xsl:value-of select="./user/user.contact/contact.postalcode"/>
             </td>
-            <td class="metaname_rtl">
+            <td class="metaname-rtl">
               <xsl:value-of select="i18n:translate('component.userlogin.contact.postalCode')"/>
             </td>
           </tr>
           <tr>
-            <td class="metavalue_rtl">
+            <td class="metavalue-rtl">
               <xsl:value-of select="./user/user.contact/contact.country"/>
             </td>
-            <td class="metaname_rtl">
+            <td class="metaname-rtl">
               <xsl:value-of select="i18n:translate('component.userlogin.contact.country')"/>
             </td>
           </tr>
           <tr>
-            <td class="metavalue_rtl">
+            <td class="metavalue-rtl">
               <xsl:value-of select="./user/user.contact/contact.state"/>
             </td>
-            <td class="metaname_rtl">
+            <td class="metaname-rtl">
               <xsl:value-of select="i18n:translate('component.userlogin.contact.state')"/>
             </td>
           </tr>
           <tr>
-            <td class="metavalue_rtl">
+            <td class="metavalue-rtl">
               <xsl:value-of select="./user/user.contact/contact.institution"/>
             </td>
-            <td class="metaname_rtl">
+            <td class="metaname-rtl">
               <xsl:value-of select="i18n:translate('component.userlogin.contact.institution')"/>
             </td>
           </tr>
           <tr>
-            <td class="metavalue_rtl">
+            <td class="metavalue-rtl">
               <xsl:value-of select="./user/user.contact/contact.faculty"/>
             </td>
-            <td class="metaname_rtl">
+            <td class="metaname-rtl">
               <xsl:value-of select="i18n:translate('component.userlogin.contact.faculty')"/>
             </td>
           </tr>
           <tr>
-            <td class="metavalue_rtl">
+            <td class="metavalue-rtl">
               <xsl:value-of select="./user/user.contact/contact.department"/>
             </td>
-            <td class="metaname_rtl">
+            <td class="metaname-rtl">
               <xsl:value-of select="i18n:translate('component.userlogin.contact.department')"/>
             </td>
           </tr>
           <tr>
-            <td class="metavalue_rtl">
+            <td class="metavalue-rtl">
               <xsl:value-of select="./user/user.contact/contact.institute"/>
             </td>
-            <td class="metaname_rtl">
+            <td class="metaname-rtl">
               <xsl:value-of select="i18n:translate('component.userlogin.contact.institute')"/>
             </td>
           </tr>
           <tr>
-            <td class="metavalue_rtl">
+            <td class="metavalue-rtl">
               <xsl:value-of select="./user/user.contact/contact.telephone"/>
             </td>
-            <td class="metaname_rtl">
+            <td class="metaname-rtl">
               <xsl:value-of select="i18n:translate('component.userlogin.contact.telefon')"/>
             </td>
           </tr>
           <tr>
-            <td class="metavalue_rtl">
+            <td class="metavalue-rtl">
               <xsl:value-of select="./user/user.contact/contact.fax"/>
             </td>
-            <td class="metaname_rtl">
+            <td class="metaname-rtl">
               <xsl:value-of select="i18n:translate('component.userlogin.contact.fax')"/>
             </td>
           </tr>
           <tr>
-            <td class="metavalue_rtl">
+            <td class="metavalue-rtl">
               <xsl:value-of select="./user/user.contact/contact.email"/>
             </td>
-            <td class="metaname_rtl">
+            <td class="metaname-rtl">
               <xsl:value-of select="i18n:translate('component.userlogin.contact.email')"/>
             </td>
           </tr>
           <tr>
-            <td class="metavalue_rtl">
+            <td class="metavalue-rtl">
               <xsl:value-of select="./user/user.contact/contact.cellphone"/>
             </td>
-            <td class="metaname_rtl">
+            <td class="metaname-rtl">
               <xsl:value-of select="i18n:translate('component.userlogin.contact.cell')"/>
             </td>
           </tr>
