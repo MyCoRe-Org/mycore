@@ -123,7 +123,7 @@
                     <td id="iview-roller">
                       <div align="center">
                         <xsl:if test="$MCR.Module-iview.display = 'normal'">
-                          <a class="dummyview3" title="{i18n:translate('iview.advMenu')}" href="{concat($iview.home,$nodeToBeDisplayedPath,$HttpSession,'?mode=generateLayout&amp;XSL.MCR.Module-iview.display.SESSION=extended')}">
+                          <a class="dummyview3" title="{i18n:translate('component.iview.advMenu')}" href="{concat($iview.home,$nodeToBeDisplayedPath,$HttpSession,'?mode=generateLayout&amp;XSL.MCR.Module-iview.display.SESSION=extended')}">
                             <xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>
                           </a>
                         </xsl:if>
@@ -136,12 +136,12 @@
                       <table>
                         <tr>
                           <td>
-                            <a class="iview-simplesize" title="{i18n:translate('iview.adjustSide')}" href="{concat($iview.home,$nodeToBeDisplayedPath,$HttpSession,'?mode=generateLayout&amp;XSL.MCR.Module-iview.navi.zoom.SESSION=fitToScreen')}" align="middle">
+                            <a class="iview-simplesize" title="{i18n:translate('component.iview.adjustSide')}" href="{concat($iview.home,$nodeToBeDisplayedPath,$HttpSession,'?mode=generateLayout&amp;XSL.MCR.Module-iview.navi.zoom.SESSION=fitToScreen')}" align="middle">
                               <xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>
                             </a>
                           </td>
                           <td>
-                            <a class="iview-simplewidth" title="{i18n:translate('iview.adjustWidth')}" href="{concat($iview.home,$nodeToBeDisplayedPath,$HttpSession,'?mode=generateLayout&amp;XSL.MCR.Module-iview.navi.zoom.SESSION=fitToWidth')}" align="middle">
+                            <a class="iview-simplewidth" title="{i18n:translate('component.iview.adjustWidth')}" href="{concat($iview.home,$nodeToBeDisplayedPath,$HttpSession,'?mode=generateLayout&amp;XSL.MCR.Module-iview.navi.zoom.SESSION=fitToWidth')}" align="middle">
                               <xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>
                             </a>
                           </td>
@@ -157,12 +157,12 @@
                                 <xsl:choose>
                                   <xsl:when test="$MCR.Module-iview.scrollBars='true'">
                                     <a class="iview-scrolling" href="{concat($iview.home,$nodeToBeDisplayedPath,$HttpSession,'?mode=generateLayout&amp;XSL.MCR.Module-iview.style.SESSION=image&amp;XSL.MCR.Module-iview.scrollBars.SESSION=false')}" align="middle">
-                                      <xsl:value-of select="i18n:translate('iview.scrolling.switchOff')"/>
+                                      <xsl:value-of select="i18n:translate('component.iview.scrolling.switchOff')"/>
                                     </a>
                                   </xsl:when>
                                   <xsl:otherwise>
                                     <a class="iview-scrolling" href="{concat($iview.home,$nodeToBeDisplayedPath,$HttpSession,'?mode=generateLayout&amp;XSL.MCR.Module-iview.style.SESSION=image&amp;XSL.MCR.Module-iview.scrollBars.SESSION=true')}" align="middle">
-                                      <xsl:value-of select="i18n:translate('iview.scrolling.switchOn')"/>
+                                      <xsl:value-of select="i18n:translate('component.iview.scrolling.switchOn')"/>
                                     </a>
                                   </xsl:otherwise>
                                 </xsl:choose>
@@ -177,7 +177,7 @@
                                 <xsl:variable name="iviewDisplayswitchthumbs">
                                   <xsl:value-of select="concat($iview.home,$nodeToBeDisplayedPath,$HttpSession,'?mode=generateLayout&amp;XSL.MCR.Module-iview.style.SESSION=thumbnails')"/>
                                 </xsl:variable>
-                                <a class="iview-displayswitchthumbs" title="{i18n:translate('iview.thumbs')}" href="{$iviewDisplayswitchthumbs}" align="middle">
+                                <a class="iview-displayswitchthumbs" title="{i18n:translate('component.iview.thumbs')}" href="{$iviewDisplayswitchthumbs}" align="middle">
                                   <xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>
                                 </a>
                               </td>
@@ -185,7 +185,7 @@
                                 <xsl:variable name="iviewDisplayswitchpicture">
                                   <xsl:value-of select="concat($iview.home,$nodeToBeDisplayedPath,$HttpSession,'?mode=generateLayout&amp;XSL.MCR.Module-iview.style.SESSION=image')"/>
                                 </xsl:variable>
-                                <a class="iview-displayswitchpicture" title="{i18n:translate('iview.viewPic')}" href="{$iviewDisplayswitchpicture}" align="middle">
+                                <a class="iview-displayswitchpicture" title="{i18n:translate('component.iview.viewPic')}" href="{$iviewDisplayswitchpicture}" align="middle">
                                   <xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>
                                 </a>
                               </td>
@@ -193,7 +193,7 @@
                                 <xsl:variable name="iviewDisplayswitchtext">
                                   <xsl:value-of select="concat($iview.home,$nodeToBeDisplayedPath,$HttpSession,'?mode=generateLayout&amp;XSL.MCR.Module-iview.style.SESSION=text')"/>
                                 </xsl:variable>
-                                <a class="iview-displayswitchtext" title="{i18n:translate('iview.overview')}" href="{$iviewDisplayswitchtext}" align="middle">
+                                <a class="iview-displayswitchtext" title="{i18n:translate('component.iview.overview')}" href="{$iviewDisplayswitchtext}" align="middle">
                                   <xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>
                                 </a>
                               </td>
@@ -206,12 +206,12 @@
                               <td>
                                 <xsl:choose>
                                   <xsl:when test="$MCR.Module-iview.embedded='true'">
-                                    <a class="iview-viewoptionssmall" title="{concat(i18n:translate('iview.scaleDown'),i18n:translate('iview.inactive'))}" href="#" align="middle">
+                                    <a class="iview-viewoptionssmall" title="{concat(i18n:translate('component.iview.scaleDown'),i18n:translate('component.iview.inactive'))}" href="#" align="middle">
                                       <xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>
                                     </a>
                                   </xsl:when>
                                   <xsl:otherwise>
-                                    <a class="iview-viewoptionssmall" title="{i18n:translate('iview.scaleDown')}" href="{$MCR.Module-iview.lastEmbeddedURL}" align="middle">
+                                    <a class="iview-viewoptionssmall" title="{i18n:translate('component.iview.scaleDown')}" href="{$MCR.Module-iview.lastEmbeddedURL}" align="middle">
                                       <xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>
                                     </a>
                                   </xsl:otherwise>
@@ -220,12 +220,12 @@
                               <td>
                                 <xsl:choose>
                                   <xsl:when test="$MCR.Module-iview.embedded='true'">
-                                    <a class="iview-viewoptionslarg" title="{i18n:translate('iview.scaleUp')}" href="{concat($iview.home,$nodeToBeDisplayedPath,$HttpSession,'?mode=generateLayout&amp;XSL.MCR.Module-iview.embedded.SESSION=false&amp;XSL.MCR.Module-iview.display.SESSION=extended')}" align="middle" target="_parent">
+                                    <a class="iview-viewoptionslarg" title="{i18n:translate('component.iview.scaleUp')}" href="{concat($iview.home,$nodeToBeDisplayedPath,$HttpSession,'?mode=generateLayout&amp;XSL.MCR.Module-iview.embedded.SESSION=false&amp;XSL.MCR.Module-iview.display.SESSION=extended')}" align="middle" target="_parent">
                                       <xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>
                                     </a>
                                   </xsl:when>
                                   <xsl:otherwise>
-                                    <a class="iview-viewoptionslarg" title="{concat(i18n:translate('iview.scaleUp'),i18n:translate('iview.inactive'))}" href="#" align="middle">
+                                    <a class="iview-viewoptionslarg" title="{concat(i18n:translate('component.iview.scaleUp'),i18n:translate('component.iview.inactive'))}" href="#" align="middle">
                                       <xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>
                                     </a>
                                   </xsl:otherwise>
@@ -241,7 +241,7 @@
                     <tr id="iview-enhanced">
                       <td id="iview-smalllogo">
                         <div align="center">
-                          <a class="dummyview2" title="{i18n:translate('iview.hideAdvMenu')}" href="{concat($iview.home,$nodeToBeDisplayedPath,$HttpSession,'?mode=generateLayout&amp;XSL.MCR.Module-iview.display.SESSION=normal')}" align="middle">
+                          <a class="dummyview2" title="{i18n:translate('component.iview.hideAdvMenu')}" href="{concat($iview.home,$nodeToBeDisplayedPath,$HttpSession,'?mode=generateLayout&amp;XSL.MCR.Module-iview.display.SESSION=normal')}" align="middle">
                             <xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>
                           </a>
                         </div>
@@ -303,7 +303,10 @@
             <xsl:variable name="move">
               <xsl:value-of select="concat($generateLayoutPath,'&amp;XSL.MCR.Module-iview.move=up')"/>
             </xsl:variable>
-            <a id="iview-orientationupID" class="iview-orientationup" title="nach oben bewegen" href="{$move}">
+            <xsl:variable name="title">
+              <xsl:value-of select="i18n:translate('component.iview.moveUp')"/>
+            </xsl:variable>
+            <a id="iview-orientationupID" class="iview-orientationup" title="{$title}" href="{$move}">
               <xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>
             </a>
           </div>
@@ -313,6 +316,9 @@
         <td class="v-nav">
           <xsl:variable name="move">
             <xsl:value-of select="concat($generateLayoutPath,'&amp;XSL.MCR.Module-iview.move=left')"/>
+          </xsl:variable>
+          <xsl:variable name="title">
+            <xsl:value-of select="i18n:translate('component.iview.moveLeft')"/>
           </xsl:variable>
           <a id="iview-orientationleftID" class="iview-orientationleft" title="nach links bewegen" href="{$move}" align="middle">
             <xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>
@@ -341,6 +347,9 @@
           <xsl:variable name="move">
             <xsl:value-of select="concat($generateLayoutPath,'&amp;XSL.MCR.Module-iview.move=right')"/>
           </xsl:variable>
+          <xsl:variable name="title">
+            <xsl:value-of select="i18n:translate('component.iview.moveRight')"/>
+          </xsl:variable>
           <a id="iview-orientationrightID" class="iview-orientationright" title="nach rechts bewegen" href="{$move}" align="middle">
             <xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>
           </a>
@@ -351,6 +360,9 @@
           <div align="center">
             <xsl:variable name="move">
               <xsl:value-of select="concat($generateLayoutPath,'&amp;XSL.MCR.Module-iview.move=down')"/>
+            </xsl:variable>
+            <xsl:variable name="title">
+              <xsl:value-of select="i18n:translate('component.iview.moveDown')"/>
             </xsl:variable>
             <a id="iview-orientationdownID" class="iview-orientationdown" title="nach unten bewegen" href="{$move}" align="middle">
               <xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>
@@ -437,18 +449,18 @@
   <xsl:template name="image.info">
     <xsl:param name="node"/>
     <p>
-      <xsl:value-of select="concat(i18n:translate('iview.name'),': ',name)"/>
+      <xsl:value-of select="concat(i18n:translate('component.iview.name'),': ',name)"/>
       <br/>
       <xsl:if test="label">
         <xsl:value-of select="label"/><br/>
       </xsl:if>
-      <xsl:value-of select="concat(i18n:translate('iview.fileSize'),': ',size,' ',i18n:translate('iview.bytes'))"/>
+      <xsl:value-of select="concat(i18n:translate('component.iview.fileSize'),': ',size,' ',i18n:translate('component.iview.bytes'))"/>
       <br/>
-      <xsl:value-of select="concat(i18n:translate('iview.format'),': ',contentType)"/>
+      <xsl:value-of select="concat(i18n:translate('component.iview.format'),': ',contentType)"/>
       <br/>
-      <xsl:value-of select="concat(i18n:translate('iview.imageSize'),': ',/mcr-module/iview/header/origWidth,'x', /mcr-module/iview/header/origHeight, 'px')"/>
+      <xsl:value-of select="concat(i18n:translate('component.iview.imageSize'),': ',/mcr-module/iview/header/origWidth,'x', /mcr-module/iview/header/origHeight, 'px')"/>
       <br/>
-      <xsl:value-of select="concat(i18n:translate('iview.lastChanged'),': ',date)"/>
+      <xsl:value-of select="concat(i18n:translate('component.iview.lastChanged'),': ',date)"/>
     </p>
   </xsl:template>
   <!--  #####################################################################################################################-->
@@ -461,36 +473,36 @@
         <xsl:choose>
           <xsl:when test="$MCR.Module-iview.defaultSort = 'name'">
             <option value="name" selected="selected">
-              <xsl:value-of select="concat(i18n:translate('iview.name'),' ',i18n:translate('iview.current'))"/>
+              <xsl:value-of select="concat(i18n:translate('component.iview.name'),' ',i18n:translate('component.iview.current'))"/>
             </option>
           </xsl:when>
           <xsl:otherwise>
             <option value="name">
-              <xsl:value-of select="i18n:translate('iview.name')"/>
+              <xsl:value-of select="i18n:translate('component.iview.name')"/>
             </option>
           </xsl:otherwise>
         </xsl:choose>
         <xsl:choose>
           <xsl:when test="$MCR.Module-iview.defaultSort = 'size'">
             <option value="size" selected="selected">
-              <xsl:value-of select="concat(i18n:translate('iview.fileSize'),' ',i18n:translate('iview.current'))"/>
+              <xsl:value-of select="concat(i18n:translate('component.iview.fileSize'),' ',i18n:translate('component.iview.current'))"/>
             </option>
           </xsl:when>
           <xsl:otherwise>
             <option value="size">
-              <xsl:value-of select="i18n:translate('iview.fileSize')"/>
+              <xsl:value-of select="i18n:translate('component.iview.fileSize')"/>
             </option>
           </xsl:otherwise>
         </xsl:choose>
         <xsl:choose>
           <xsl:when test="$MCR.Module-iview.defaultSort = 'lastModified'">
             <option value="lastModified" selected="selected">
-              <xsl:value-of select="concat(i18n:translate('iview.lastChanged'),' ',i18n:translate('iview.current'))"/>
+              <xsl:value-of select="concat(i18n:translate('component.iview.lastChanged'),' ',i18n:translate('component.iview.current'))"/>
             </option>
           </xsl:when>
           <xsl:otherwise>
             <option value="lastModified">
-              <xsl:value-of select="i18n:translate('iview.lastChanged')"/>
+              <xsl:value-of select="i18n:translate('component.iview.lastChanged')"/>
             </option>
           </xsl:otherwise>
         </xsl:choose>
@@ -501,18 +513,18 @@
         <xsl:choose>
           <xsl:when test="$MCR.Module-iview.defaultSort.order = 'ascending'">
             <option value="ascending" selected="selected">
-              <xsl:value-of select="concat(i18n:translate('iview.ascending'),' ',i18n:translate('iview.current'))"/>
+              <xsl:value-of select="concat(i18n:translate('component.iview.ascending'),' ',i18n:translate('component.iview.current'))"/>
             </option>
             <option value="descending">
-              <xsl:value-of select="i18n:translate('iview.descending')"/>
+              <xsl:value-of select="i18n:translate('component.iview.descending')"/>
             </option>
           </xsl:when>
           <xsl:otherwise>
             <option value="ascending">
-              <xsl:value-of select="i18n:translate('iview.ascending')"/>
+              <xsl:value-of select="i18n:translate('component.iview.ascending')"/>
             </option>
             <option value="descending" selected="selected">
-              <xsl:value-of select="concat(i18n:translate('iview.descending'),' ',i18n:translate('iview.current'))"/>
+              <xsl:value-of select="concat(i18n:translate('component.iview.descending'),' ',i18n:translate('component.iview.current'))"/>
             </option>
           </xsl:otherwise>
         </xsl:choose>
@@ -524,12 +536,12 @@
     <table Cleaned="text-align: left; width: 100%; height: 25px;" align="center" border="0" cellpadding="0" cellspacing="0">
       <tr>
         <td>
-          <a align="middle" href="{concat($iview.home,$fileToBeDisplayedPath,$HttpSession,'?mode=generateLayout&amp;XSL.MCR.Module-iview.navi.zoom=-0.2')}" title="{i18n:translate('iview.zoomOut')}" class="iview-resizeout">
+          <a align="middle" href="{concat($iview.home,$fileToBeDisplayedPath,$HttpSession,'?mode=generateLayout&amp;XSL.MCR.Module-iview.navi.zoom=-0.2')}" title="{i18n:translate('component.iview.zoomOut')}" class="iview-resizeout">
             <xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>
           </a>
         </td>
         <td>
-          <a align="middle" href="{concat($iview.home,$fileToBeDisplayedPath,$HttpSession,'?mode=generateLayout&amp;XSL.MCR.Module-iview.navi.zoom=+0.2')}" title="{i18n:translate('iview.zoomIn')}" class="iview-resizein">
+          <a align="middle" href="{concat($iview.home,$fileToBeDisplayedPath,$HttpSession,'?mode=generateLayout&amp;XSL.MCR.Module-iview.navi.zoom=+0.2')}" title="{i18n:translate('component.iview.zoomIn')}" class="iview-resizein">
             <xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>
           </a>
         </td>
@@ -588,12 +600,12 @@
         <xsl:choose>
           <xsl:when test="$zoom = 'fitToScreen'">
             <option selected="selected" value="{$zoom}">
-              <xsl:value-of select="i18n:translate('iview.side')"/>
+              <xsl:value-of select="i18n:translate('component.iview.side')"/>
             </option>
           </xsl:when>
           <xsl:when test="$zoom = 'fitToWidth'">
             <option selected="selected" value="{$zoom}">
-              <xsl:value-of select="i18n:translate('iview.width')"/>
+              <xsl:value-of select="i18n:translate('component.iview.width')"/>
             </option>
           </xsl:when>
           <xsl:otherwise>
@@ -607,12 +619,12 @@
         <xsl:choose>
           <xsl:when test="$zoom = 'fitToScreen'">
             <option value="{$zoom}">
-              <xsl:value-of select="i18n:translate('iview.side')"/>
+              <xsl:value-of select="i18n:translate('component.iview.side')"/>
             </option>
           </xsl:when>
           <xsl:when test="$zoom = 'fitToWidth'">
             <option value="{$zoom}">
-              <xsl:value-of select="i18n:translate('iview.width')"/>
+              <xsl:value-of select="i18n:translate('component.iview.width')"/>
             </option>
           </xsl:when>
           <xsl:otherwise>
@@ -635,7 +647,7 @@
               <xsl:variable name="fileToBeDisplayedPath.first.link">
                 <xsl:value-of select="concat($iview.home,$fileToBeDisplayedPath.first,$HttpSession,'?mode=generateLayout&amp;XSL.MCR.Module-iview.move=reset')"/>
               </xsl:variable>
-              <a class="iview-navigationfirst" title="{i18n:translate('iview.firstPic')}" href="{$fileToBeDisplayedPath.first.link}" align="middle">
+              <a class="iview-navigationfirst" title="{i18n:translate('component.iview.firstPic')}" href="{$fileToBeDisplayedPath.first.link}" align="middle">
                 <xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>
               </a>
             </xsl:when>
@@ -651,7 +663,7 @@
               <xsl:variable name="fileToBeDisplayedPath.previous.link">
                 <xsl:value-of select="concat($iview.home,$fileToBeDisplayedPath.previous,$HttpSession,'?mode=generateLayout&amp;XSL.MCR.Module-iview.move=reset')"/>
               </xsl:variable>
-              <a class="iview-navigationback" title="{i18n:translate('iview.prevPic')}" href="{$fileToBeDisplayedPath.previous.link}" align="middle">
+              <a class="iview-navigationback" title="{i18n:translate('component.iview.prevPic')}" href="{$fileToBeDisplayedPath.previous.link}" align="middle">
                 <xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>
               </a>
             </xsl:when>
@@ -670,7 +682,7 @@
               <xsl:variable name="fileToBeDisplayedPath.next.link">
                 <xsl:value-of select="concat($iview.home,$fileToBeDisplayedPath.next,$HttpSession,'?mode=generateLayout&amp;XSL.MCR.Module-iview.move=reset')"/>
               </xsl:variable>
-              <a class="iview-navigationforward" title="{i18n:translate('iview.nextPic')}" href="{$fileToBeDisplayedPath.next.link}" align="middle">
+              <a class="iview-navigationforward" title="{i18n:translate('component.iview.nextPic')}" href="{$fileToBeDisplayedPath.next.link}" align="middle">
                 <xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>
               </a>
             </xsl:when>
@@ -686,7 +698,7 @@
               <xsl:variable name="fileToBeDisplayedPath.last.link">
                 <xsl:value-of select="concat($iview.home,$fileToBeDisplayedPath.last,$HttpSession,'?mode=generateLayout&amp;XSL.MCR.Module-iview.move=reset')"/>
               </xsl:variable>
-              <a class="iview-navigationlast" title="{i18n:translate('iview.lastPic')}" href="{$fileToBeDisplayedPath.last.link}" align="middle">
+              <a class="iview-navigationlast" title="{i18n:translate('component.iview.lastPic')}" href="{$fileToBeDisplayedPath.last.link}" align="middle">
                 <xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>
               </a>
             </xsl:when>
@@ -733,7 +745,7 @@
           <!--if there is a parent directory display link to it-->
           <xsl:if test="/mcr-module/iview/content/parent != ''">
             <a href="{concat($iview.home,iview/content/parent,$HttpSession,'?mode=generateLayout')}">
-              <xsl:value-of select="i18n:translate('iview.parentDir')"/>
+              <xsl:value-of select="i18n:translate('component.iview.parentDir')"/>
             </a>
             <br/>
           </xsl:if>
