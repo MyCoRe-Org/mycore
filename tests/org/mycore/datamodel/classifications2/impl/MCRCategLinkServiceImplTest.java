@@ -169,6 +169,8 @@ public class MCRCategLinkServiceImplTest extends MCRHibTestCase {
         assertEquals("Returned amount of MCRCategoryIDs does not match.", getAllCategIDs(category).size(), map.size());
         assertEquals("Count of Europe links does not match.", 8, map.get(category.getChildren().get(0).getId()).intValue());
         assertEquals("Count of Germany links does not match.", 5, map.get(category.getChildren().get(0).getChildren().get(0).getId()).intValue());
+        map = SERVICE.countLinks(category, true);
+        assertEquals("Count of Europe links does not match.", 8, map.get(category.getChildren().get(0).getId()).intValue());
     }
 
     /**
