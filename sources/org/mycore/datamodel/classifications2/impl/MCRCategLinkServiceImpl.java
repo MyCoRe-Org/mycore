@@ -90,6 +90,9 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
         //old classification browser/editor could not determine links correctly otherwise 
         if (!childrenOnly) {
             parent = parent.getRoot();
+        } else if (!(parent instanceof MCRCategoryImpl) || ((MCRCategoryImpl) parent).getInternalID() == 0) {
+            final Session session = MCRHIBConnection.instance().getSession();
+            parent = MCRCategoryDAOImpl.getByNaturalID(session, parent.getId());
         }
         LOGGER.info("parentID:" + parent.getId());
         String classID = parent.getId().getRootID();
