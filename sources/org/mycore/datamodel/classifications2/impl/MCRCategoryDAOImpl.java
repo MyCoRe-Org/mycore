@@ -86,7 +86,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         LOGGER.debug("Calculating LEFT,RIGHT and LEVEL attributes...");
         final MCRCategoryImpl wrapCategory = MCRCategoryImpl.wrapCategory(category, parent, (parent == null) ? category.getRoot() : parent
                 .getRoot());
-        calculateLeftRightAndLevel(wrapCategory, leftStart, levelStart);
+        wrapCategory.calculateLeftRightAndLevel(leftStart, levelStart);
         // always add +1 for the current node
         int nodes = 1 + (wrapCategory.getRight() - wrapCategory.getLeft()) / 2;
         LOGGER.debug("Calculating LEFT,RIGHT and LEVEL attributes. Done! Nodes: " + nodes);
@@ -187,7 +187,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
     public List<MCRCategory> getChildren(MCRCategoryID cid) {
         LOGGER.debug("Get children of category: " + cid);
         if (!exist(cid)) {
-            return new MCRCategoryImpl.ChildList(null, null);
+            return new MCRCategoryChildList(null, null);
         }
         Session session = getHibConnection().getSession();
         Criteria c = session.createCriteria(CATEGRORY_CLASS).add(
@@ -320,7 +320,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         int leftStart = (index == 0) ? (getLeftRightValues(newParent.getId())[0] + 1) : (getLeftRightValues(newParent.getChildren().get(
                 index - 1).getId())[1] + 1);
         // update Left, Right and Level values
-        calculateLeftRightAndLevel(subTree, leftStart, newParent.getLevel() + 1);
+        subTree.calculateLeftRightAndLevel(leftStart, newParent.getLevel() + 1);
         // only update oldParent if newParent is not its ancestor
         boolean updateOldParent = (oldParent.getLeft() < newParent.getLeft() || oldParent.getRight() > newParent.getRight()) ? true : false;
         // only update newParent if newParent!=oldParent and
@@ -386,15 +386,13 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         LOGGER.debug("Update changes classification node size by: " + diffNodes);
         int increment = diffNodes * 2;
         if (increment != 0 && oldCategory.isCategory()) {
-            final int left = getRightSiblingOrOfAncestor((MCRCategoryImpl) oldCategory.getParent(), oldCategory.getPositionInParent() + 1)
-                    .getLeft();
+            final int left = oldCategory.getRightSiblingOrOfAncestor().getLeft();
             final int maxLeft = ((MCRCategoryImpl) oldCategory.getRoot()).getRight();
-            final int right = getRightSiblingOrParent((MCRCategoryImpl) oldCategory.getParent(), oldCategory.getPositionInParent() + 1)
-                    .getRight();
+            final int right = oldCategory.getRightSiblingOrParent().getRight();
             final int maxRight = maxLeft;
             updateLeftRightValueMax(connection, newCategory.getId().getRootID(), left, maxLeft, right, maxRight, increment);
         }
-        calculateLeftRightAndLevel(newCategoryImpl, oldCategory.getLevel(), oldCategory.getLeft());
+        newCategoryImpl.calculateLeftRightAndLevel(oldCategory.getLevel(), oldCategory.getLeft());
         if (oldCategory.isCategory()) {
             MCRCategoryImpl parent = (MCRCategoryImpl) oldCategory.getParent();
             parent.getChildren().set(oldCategory.getPositionInParent(), newCategoryImpl);
@@ -448,72 +446,6 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
     }
 
     /**
-     * calculates left and right value throug the subtree rooted at
-     * <code>co</code>.
-     * 
-     * @param co
-     *            root node of subtree
-     * @param leftStart
-     *            co.left will be set to this value
-     * @param levelStart
-     *            co.getLevel() will return this value
-     * @return co.right
-     */
-    static int calculateLeftRightAndLevel(MCRCategoryImpl co, int leftStart, int levelStart) {
-        int curValue = leftStart;
-        final int nextLevel = levelStart + 1;
-        co.setLeft(leftStart);
-        co.setLevel(levelStart);
-        for (MCRCategory child : co.getChildren()) {
-            LOGGER.debug(child.getId());
-            curValue = calculateLeftRightAndLevel((MCRCategoryImpl) child, ++curValue, nextLevel);
-        }
-        co.setRight(++curValue);
-        return curValue;
-    }
-
-    static MCRCategoryImpl getLeftSiblingOrOfAncestor(MCRCategoryImpl newParent, int index) {
-        if (index > 0) {
-            // has left sibling
-            return (MCRCategoryImpl) newParent.getChildren().get(index - 1);
-        }
-        if (newParent.getParent() != null) {
-            // recursive call to get left sibling of parent
-            int positionInParent = newParent.getPositionInParent();
-            return getLeftSiblingOrOfAncestor((MCRCategoryImpl) newParent.getParent(), positionInParent);
-        }
-        return newParent;// is root
-    }
-
-    static MCRCategoryImpl getLeftSiblingOrParent(MCRCategoryImpl newParent, int index) {
-        if (index == 0) {
-            return newParent;
-        }
-        return (MCRCategoryImpl) newParent.getChildren().get(index - 1);
-    }
-
-    static MCRCategoryImpl getRightSiblingOrOfAncestor(MCRCategoryImpl newParent, int index) {
-        if (index + 1 < newParent.getChildren().size()) {
-            // has right sibling
-            return (MCRCategoryImpl) newParent.getChildren().get(index + 1);
-        }
-        if (newParent.getParent() != null) {
-            // recursive call to get right sibling of parent
-            int positionInParent = newParent.getPositionInParent();
-            return getRightSiblingOrOfAncestor((MCRCategoryImpl) newParent.getParent(), positionInParent);
-        }
-        return newParent;// is root
-    }
-
-    static MCRCategoryImpl getRightSiblingOrParent(MCRCategoryImpl newParent, int index) {
-        if (index + 1 == newParent.getChildren().size()) {
-            return newParent;
-        }
-        // get Element at index that would be at index+1 after insert
-        return (MCRCategoryImpl) newParent.getChildren().get(index + 1);
-    }
-
-    /**
      * return true if a node moved in Category tree is moved to the right.
      * 
      * If the <code>newParent</code> is not an ancestor node of
@@ -546,8 +478,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
             // newParent is ancestor of oldParent
             MCRCategory node = oldParent;
             while (!node.getParent().getId().equals(newParent.getId())) {
-                // walk ancestor axis up while node not direct child of
-                // newParent
+                // walk ancestor axis up while node not direct child of newParent
                 node = node.getParent();
             }
             if (((MCRCategoryImpl) node).getPositionInParent() < newIndex) {
@@ -560,8 +491,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
                 && !((newParent.getLeft() < oldParent.getLeft() || newParent.getRight() > oldParent.getRight()))) {
             MCRCategory node = newParent;
             while (!node.getParent().getId().equals(oldParent.getId())) {
-                // walk ancestor axis up while node not direct child of
-                // newParent
+                // walk ancestor axis up while node not direct child of newParent
                 node = node.getParent();
             }
             if (((MCRCategoryImpl) node).getPositionInParent() > oldIndex) {
@@ -629,7 +559,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
             //to allow optimized hasChildren() to work without db query
             newCateg.setLeft(((MCRCategoryImpl) category).getLeft());
             newCateg.setRight(((MCRCategoryImpl) category).getRight());
-            newCateg.setInternalID(((MCRCategoryImpl)category).getInternalID());
+            newCateg.setInternalID(((MCRCategoryImpl) category).getInternalID());
         }
         if (childAmount > 0) {
             for (MCRCategory child : category.getChildren()) {
@@ -660,8 +590,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
         category.setInternalID(previousVersion.getInternalID());
         MCRCategoryImpl parent = (MCRCategoryImpl) category.getParent();
         if (parent != null) {
-            // get new parent of modified category tree here (by parent
-            // category id)
+            // get new parent of modified category tree here (by parent category id)
             parent = (MCRCategoryImpl) findCategory(newTree, category.getParent().getId());
             int pos = category.getPositionInParent();
             parent.getChildren().remove(pos);
@@ -731,7 +660,6 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
 
     private static void fillIDMap(Map<MCRCategoryID, MCRCategoryImpl> map, MCRCategoryImpl category) {
         map.put(category.getId(), category);
-        //        LOGGER.info("Parent for " + category.getId() + ":" + category.getParent());
         for (MCRCategory subCategory : category.getChildren()) {
             fillIDMap(map, (MCRCategoryImpl) subCategory);
         }
@@ -798,16 +726,17 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
             int right, int index, int oldIndex) {
         int nodes = 1 + (right - left) / 2;
         int increment = 2 * nodes;
+        MCRCategoryImpl indexedNode = (MCRCategoryImpl) newParent.getChildren().get(index);
         if (newParent == oldParent) {
-            MCRCategoryImpl leftSiblingOrParent = getLeftSiblingOrParent(newParent, index);
+            MCRCategoryImpl leftSiblingOrParent = indexedNode.getLeftSiblingOrParent();
             int newLeft = leftSiblingOrParent.getLeft();
             int newRight = (leftSiblingOrParent == newParent) ? newLeft + 1 : leftSiblingOrParent.getRight();
             updateLeftRightValueMax(connection, newParent.getRootID(), newLeft, left, newRight, right, increment);
             connection.getSession().refresh(newParent);
         } else {
-            MCRCategoryImpl rightSiblingOrOfAncestor = getRightSiblingOrOfAncestor(newParent, index);
+            MCRCategoryImpl rightSiblingOrOfAncestor = indexedNode.getRightSiblingOrOfAncestor();
             int maxLeft = rightSiblingOrOfAncestor.getLeft();
-            MCRCategoryImpl rightSiblingOrParent = getRightSiblingOrParent(newParent, index);
+            MCRCategoryImpl rightSiblingOrParent = indexedNode.getRightSiblingOrParent();
             int maxRight = rightSiblingOrParent.getRight();
             int minRight = right;
             if (maxRight <= right) {
@@ -823,20 +752,21 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
             int right, int index, int oldIndex) {
         int nodes = 1 + (right - left) / 2;
         int increment = -2 * nodes;
+        MCRCategoryImpl indexedNode = (MCRCategoryImpl) newParent.getChildren().get(index);
         if (newParent == oldParent) {
-            MCRCategoryImpl leftSibling = getLeftSiblingOrParent(newParent, index);
+            MCRCategoryImpl leftSibling = indexedNode.getLeftSiblingOrParent();
             int maxLeft = leftSibling.getLeft();
             int maxRight = leftSibling.getRight();
             updateLeftRightValueMax(connection, newParent.getRootID(), right, maxLeft, left, maxRight, increment);
             connection.getSession().refresh(newParent);
         } else {
-            int maxLeft = getLeftSiblingOrParent(newParent, index).getLeft();
+            int maxLeft = indexedNode.getLeftSiblingOrParent().getLeft();
             int minLeft = left;
             if (maxLeft <= left) {
                 // update at least newParent
                 minLeft = maxLeft - 1;
             }
-            MCRCategoryImpl leftSiblingOrOfAncestor = getLeftSiblingOrOfAncestor(newParent, index);
+            MCRCategoryImpl leftSiblingOrOfAncestor = indexedNode.getLeftSiblingOrOfAncestor();
             int maxRight = leftSiblingOrOfAncestor.getRight();
             updateLeftRightValueMax(connection, newParent.getRootID(), minLeft, maxLeft, right, maxRight, increment);
             connection.getSession().refresh(leftSiblingOrOfAncestor);

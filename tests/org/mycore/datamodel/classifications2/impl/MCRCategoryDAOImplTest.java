@@ -1,4 +1,4 @@
-/**
+/*
  * 
  * $Revision$ $Date$
  *
@@ -20,7 +20,7 @@
  * If not, write to the Free Software Foundation Inc.,
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
  *
- **/
+ */
 package org.mycore.datamodel.classifications2.impl;
 
 import java.net.URISyntaxException;
@@ -58,28 +58,6 @@ public class MCRCategoryDAOImplTest extends MCRHibTestCase {
         // TODO Auto-generated method stub
         super.setUp();
         loadWorldClassification();
-    }
-
-    public void testCalculateLeftRightAndLevel() {
-        MCRCategoryImpl co1 = new MCRCategoryImpl();
-        co1.setId(MCRCategoryID.rootID("co1"));
-        assertEquals(2, MCRCategoryDAOImpl.calculateLeftRightAndLevel(co1, 1, 0));
-        assertEquals(0, co1.getLevel());
-        MCRCategoryImpl co2 = new MCRCategoryImpl();
-        co2.setId(new MCRCategoryID(co1.getId().getRootID(), "co2"));
-        co1.getChildren().add(co2);
-        assertEquals(4, MCRCategoryDAOImpl.calculateLeftRightAndLevel(co1, 1, 0));
-        assertEquals(1, co2.getLevel());
-        MCRCategoryImpl co3 = new MCRCategoryImpl();
-        co3.setId(new MCRCategoryID(co1.getId().getRootID(), "co3"));
-        co1.getChildren().add(co3);
-        assertEquals(6, MCRCategoryDAOImpl.calculateLeftRightAndLevel(co1, 1, 0));
-        assertEquals(1, co3.getLevel());
-        MCRCategoryImpl co4 = new MCRCategoryImpl();
-        co4.setId(new MCRCategoryID(co1.getId().getRootID(), "co4"));
-        co3.getChildren().add(co4);
-        assertEquals(8, MCRCategoryDAOImpl.calculateLeftRightAndLevel(co1, 1, 0));
-        assertEquals(2, co4.getLevel());
     }
 
     public void testAddCategory() throws MCRException {
@@ -240,10 +218,11 @@ public class MCRCategoryDAOImplTest extends MCRHibTestCase {
         addWorldClassification();
         DAO.replaceCategory(category2);
         startNewTransaction();
-        MCRCategory rootNode = getRootCategoryFromSession();
+        MCRCategoryImpl rootNode = getRootCategoryFromSession();
         assertEquals("Category count does not match.", countNodes(category2), countNodes(rootNode));
         assertEquals("Label count does not match.", category2.getChildren().get(0).getLabels().size(), rootNode.getChildren().get(0)
                 .getLabels().size());
+        checkLeftRightLevelValue(rootNode, 0, 0);
     }
 
     public void testSetLabel() {
