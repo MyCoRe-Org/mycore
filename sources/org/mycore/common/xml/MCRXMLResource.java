@@ -147,7 +147,6 @@ public class MCRXMLResource {
         InputStream in = new BufferedInputStream(con.getInputStream());
         try {
             MCRUtils.copyStream(in, baos);
-            in.close();
             baos.close();
             return baos.toByteArray();
         } finally {
