@@ -72,14 +72,13 @@ public class MCRCheckEditDataServlet extends MCRCheckDataBase {
 	 *            the MCRObjectID of the MCRObject
 	 */
 	public final void sendMail(MCRObjectID ID) {
-		MCRSimpleWorkflowManager wfm = MCRSimpleWorkflowManager.instance();
-		List<String> addr = wfm.getMailAddress(ID.getTypeId(), "weditobj");
+		List<String> addr = WFM.getMailAddress(ID.getTypeId(), "weditobj");
 
 		if (addr.size() == 0) {
 			return;
 		}
 
-		String sender = wfm.getMailSender();
+		String sender = WFM.getMailSender();
 		String appl = CONFIG.getString("MCR.SWF.Mail.ApplicationID", "DocPortal");
 		String subject = "Automatically generated message from " + appl;
 		StringBuffer text = new StringBuffer();

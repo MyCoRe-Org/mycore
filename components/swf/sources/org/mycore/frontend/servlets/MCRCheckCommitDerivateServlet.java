@@ -150,12 +150,11 @@ public class MCRCheckCommitDerivateServlet extends MCRCheckBase {
      *            the MCRObjectID of the MCRObject
      */
     public final void sendMail(MCRObjectID ID) {
-        MCRSimpleWorkflowManager wfm = MCRSimpleWorkflowManager.instance();
-        List<String> addr = wfm.getMailAddress(ID.getTypeId(), "seditder");
+        List<String> addr = WFM.getMailAddress(ID.getTypeId(), "seditder");
         if (addr.size() == 0) {
             return;
         }
-        String sender = wfm.getMailSender();
+        String sender = WFM.getMailSender();
         String appl = CONFIG.getString("MCR.SWF.Mail.ApplicationID", "MyCoRe");
         String subject = "Automatically generated message from " + appl;
         StringBuffer text = new StringBuffer();

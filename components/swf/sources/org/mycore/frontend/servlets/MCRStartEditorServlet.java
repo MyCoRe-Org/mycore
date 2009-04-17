@@ -301,21 +301,29 @@ public class MCRStartEditorServlet extends MCRServlet {
      * @return the next free MCRObject for the given parameter
      */
     protected final String getNextMCRTFID(String myproject, String mytype) {
-        if ((myproject == null) || (myproject.trim().length() == 0) || (myproject.equals("MCR"))) {
-            myproject = CONFIG.getString("MCR.SWF.Project.ID", "MCR");
-        }
         if ((mytype == null) || (mytype.trim().length() == 0) || (mytype.equals("MCR"))) {
             mytype = "dummy";
+        }
+        if ((myproject == null) || (myproject.trim().length() == 0) || (myproject.equals("MCR"))) {
+            if (mytype.equals("dummy")) {
+                myproject = CONFIG.getString("MCR.SWF.Project.ID", "MCR");
+            } else {
+                myproject = CONFIG.getString("MCR.SWF.Project.ID."+mytype, "MCR");
+            }
         }
 
         MCRObjectID mcridnext = new MCRObjectID();
         mcridnext.setNextFreeId(myproject + "_" + mytype);
 
+        String mytypeString = "_"+mytype+"_";
         File workdir = MCRSimpleWorkflowManager.instance().getDirectoryPath(myproject + "_" + mytype);
         String[] list = workdir.list();
 
         for (int i = 0; i < list.length; i++) {
             if (!list[i].startsWith(myproject)) {
+                continue;
+            }
+            if (list[i].indexOf(mytypeString) == -1) {
                 continue;
             }
 
@@ -458,7 +466,7 @@ public class MCRStartEditorServlet extends MCRServlet {
             String subject = "Automatically generated message from " + appl;
             StringBuffer text = new StringBuffer();
             text.append("The derivate with ID ").append(cd.mysemcrid).append(" from the object with ID ").append(cd.mysemcrid).append(
-                            " was removed from server.");
+                    " was removed from server.");
             LOGGER.info(text.toString());
 
             try {
@@ -568,7 +576,7 @@ public class MCRStartEditorServlet extends MCRServlet {
             String subject = "Automaticaly message from " + appl;
             StringBuffer text = new StringBuffer();
             text.append("The object with type ").append(cd.mytype).append(" with ID ").append(cd.mytfmcrid).append(
-                            " was removed from server.");
+                    " was removed from server.");
             LOGGER.info(text.toString());
 
             try {
@@ -862,7 +870,7 @@ public class MCRStartEditorServlet extends MCRServlet {
         sb.append("editor_").append(cd.myremcrid.getTypeId()).append("_editor.xml");
 
         String fuhid = new MCRSWFUploadHandlerMyCoRe(cd.myremcrid.getId(), cd.mysemcrid.getId(), "new", getBaseURL() + sb.toString())
-                        .getID();
+                .getID();
         cd.myfile = pagedir + "fileupload_new.xml";
 
         String base = getBaseURL() + cd.myfile;
@@ -913,7 +921,7 @@ public class MCRStartEditorServlet extends MCRServlet {
                     String subject = "Automaticaly message from " + appl;
                     StringBuffer text = new StringBuffer();
                     text.append("The object of type ").append(cd.mytype).append(" with ID ").append(cd.mysemcrid).append(
-                                    " was commited from workflow to the server.");
+                            " was commited from workflow to the server.");
                     LOGGER.info(text.toString());
 
                     try {
@@ -1080,7 +1088,7 @@ public class MCRStartEditorServlet extends MCRServlet {
             String subject = "Automaticaly message from " + appl;
             StringBuffer text = new StringBuffer();
             text.append("The object of type ").append(cd.mytype).append(" with ID ").append(cd.mysemcrid).append(
-                            " was removed from the workflow.");
+                    " was removed from the workflow.");
             LOGGER.info(text.toString());
 
             try {
