@@ -50,12 +50,15 @@ import org.mycore.frontend.editor.MCREditorServlet;
  * @version $Revision$ $Date$
  */
 public class MCRStaticXMLFileServlet extends MCRServlet {
+    private static final long serialVersionUID = -9213353868244605750L;
+
     protected final static Logger LOGGER = Logger.getLogger(MCRStaticXMLFileServlet.class);
 
-    protected final static String docTypesIncludingEditors = MCRConfiguration.instance().getString( "MCR.EditorFramework.DocTypes", "MyCoReWebPage" );
-    
-    protected final static HashMap<String,String> docTypesMap = new HashMap<String,String>(); 
-    
+    protected final static String docTypesIncludingEditors = MCRConfiguration.instance().getString("MCR.EditorFramework.DocTypes",
+            "MyCoReWebPage");
+
+    protected final static HashMap<String, String> docTypesMap = new HashMap<String, String>();
+
     public void doGetPost(MCRServletJob job) throws java.io.IOException {
         final HttpServletRequest request = job.getRequest();
         final HttpServletResponse response = job.getResponse();
@@ -74,7 +77,8 @@ public class MCRStaticXMLFileServlet extends MCRServlet {
         processFile(request, response, file);
     }
 
-    static void processFile(final HttpServletRequest request, final HttpServletResponse response, File file) throws FileNotFoundException, IOException, MalformedURLException {
+    static void processFile(final HttpServletRequest request, final HttpServletResponse response, File file) throws FileNotFoundException,
+            IOException, MalformedURLException {
         request.setAttribute("XSL.StaticFilePath", request.getServletPath().substring(1));
         request.setAttribute("XSL.DocumentBaseURL", file.getParent() + File.separator);
         request.setAttribute("XSL.FileName", file.getName());
@@ -82,22 +86,26 @@ public class MCRStaticXMLFileServlet extends MCRServlet {
 
         // Find out XML document type: Is this a static webpage or some other XML?
         FileInputStream fis = new FileInputStream(file);
-        String type = MCRUtils.parseDocumentType(fis);
-        fis.close();
+        String type;
+        try {
+            type = MCRUtils.parseDocumentType(fis);
+        } finally {
+            fis.close();
+        }
 
         // Parse list of document types that may contain editor elements
-        if( docTypesMap.isEmpty() )
-        {
-          StringTokenizer st = new StringTokenizer( docTypesIncludingEditors, ", " );
-          while( st.hasMoreTokens() ) docTypesMap.put( st.nextToken(), null );
+        if (docTypesMap.isEmpty()) {
+            StringTokenizer st = new StringTokenizer(docTypesIncludingEditors, ", ");
+            while (st.hasMoreTokens())
+                docTypesMap.put(st.nextToken(), null);
         }
-        
+
         // For defined document types like static webpages, replace editor elements with complete editor definition
         if (docTypesMap.containsKey(type)) {
             Document xml = MCRXMLHelper.parseURI(file.toURI().toString(), false);
-            MCREditorServlet.replaceEditorElements(request, file.toURL().toString(), xml);
-            getLayoutService().doLayout(request,response,xml);
+            MCREditorServlet.replaceEditorElements(request, file.toURI().toURL().toString(), xml);
+            getLayoutService().doLayout(request, response, xml);
         } else
-            getLayoutService().doLayout(request,response,file);
+            getLayoutService().doLayout(request, response, file);
     }
 }

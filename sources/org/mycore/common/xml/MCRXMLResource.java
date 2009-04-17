@@ -34,7 +34,6 @@ import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
-
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRUtils;
@@ -91,7 +90,7 @@ public class MCRXMLResource {
     public byte[] getRawResource(String name) throws IOException {
         return getRawResource(name, this.getClass().getClassLoader());
     }
-    
+
     /**
      * Returns parsed XML resource as JDOM Document.
      * 
@@ -140,15 +139,20 @@ public class MCRXMLResource {
      *             if resource cannot be loaded
      */
     public byte[] getRawResource(String name, ClassLoader classLoader) throws IOException {
+        ByteArrayOutputStream baos;
         URLConnection con = getResourceURLConnection(name, classLoader);
         if (con == null)
             return null;
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        baos = new ByteArrayOutputStream();
         InputStream in = new BufferedInputStream(con.getInputStream());
-        MCRUtils.copyStream(in, baos);
-        in.close();
-        baos.close();
-        return baos.toByteArray();
+        try {
+            MCRUtils.copyStream(in, baos);
+            in.close();
+            baos.close();
+            return baos.toByteArray();
+        } finally {
+            in.close();
+        }
     }
 
     private URLConnection getResourceURLConnection(String name, ClassLoader classLoader) throws IOException {
@@ -165,8 +169,13 @@ public class MCRXMLResource {
         SAXBuilder builder = new SAXBuilder();
         builder.setValidation(false);
         builder.setEntityResolver(MCRURIResolver.instance());
-        Document doc = builder.build(con.getInputStream());
-        return doc;
+        InputStream in = con.getInputStream();
+        try {
+            Document doc = builder.build(in);
+            return doc;
+        } finally {
+            in.close();
+        }
     }
 
     public long getLastModified(String name, ClassLoader classLoader) throws IOException {
@@ -180,6 +189,7 @@ public class MCRXMLResource {
 
     private static class CacheEntry {
         URL resourceURL;
+
         Document doc;
     }
 }
