@@ -18,7 +18,6 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Enumeration;
 import java.util.GregorianCalendar;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -34,7 +33,6 @@ import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
-
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
@@ -918,20 +916,12 @@ public class MCRIViewServlet extends MCRServlet {
 
     public Properties getIViewConfig(HttpServletRequest request) {
         LOGGER.debug("getting IViewConfig....................................");
-        Properties iViewConfig = new Properties();
-        // PROPERTIES: Read all properties from mycore.properties
-        iViewConfig.putAll(MCRConfiguration.instance().getProperties());
-
-        // SESSION: Read all *.xsl attributes that are stored in the browser's
-        // session
-        MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
-        for (Map.Entry<Object, Object> entry : mcrSession.getMapEntries()) {
-            String key = entry.getKey().toString();
-            if (key.startsWith("XSL.")) {
-                iViewConfig.put(key.substring(4), entry.getValue());
-            }
+        try {
+            return setIViewConfig(request);
+        } catch (UnsupportedEncodingException e) {
+            LOGGER.error("Error while getting IViewConfig from request.", e);
+            return null;
         }
-        return iViewConfig;
     }
 
     public void updateIViewConfig(Properties iViewConfig, HttpServletRequest request, Properties dateUp, String logMessage) {
