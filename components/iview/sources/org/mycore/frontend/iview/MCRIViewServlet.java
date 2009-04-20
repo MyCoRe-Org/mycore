@@ -443,13 +443,13 @@ public class MCRIViewServlet extends MCRServlet {
         if (zoom.equals("thumbnail")) {
             int thumbnailWidth = getWidthOfThumbnail(iViewConfig);
             int thumbnailHeight = getHeightOfThumbnail(iViewConfig);
-            imgService.getImage(image, thumbnailWidth, thumbnailHeight, out);
+            imgService.getImage(image, thumbnailWidth, thumbnailHeight, out, MCRImgService.ScaleMode.normal);
             timer.stop();
             LOGGER.debug("finished getting image with zoom=thumbnail from ");
         } else if (zoom.equals("fitToWidth")) {
 
             if (scrollBar(iViewConfig)) {
-                imgService.getImage(image, availableWidth, availableWidth, out);
+                imgService.getImage(image, availableWidth, availableWidth, out, MCRImgService.ScaleMode.fitWidth);
             } else
                 imgService.getImage(image, xPOI, yPOI, availableWidth, availableHeight, out);
             
@@ -457,7 +457,7 @@ public class MCRIViewServlet extends MCRServlet {
             setZoomValue(request, zoomValue, iViewConfig);
             LOGGER.debug("finished getting image with zoom=fitToWidth(" + zoomValue + ") from ");
         } else if (zoom.equals("fitToScreen")) {
-            imgService.getImage(image, availableWidth, availableHeight, out);
+            imgService.getImage(image, availableWidth, availableHeight, out, MCRImgService.ScaleMode.normal);
             float zoomValue = imgService.getScaleFactor();
             setZoomValue(request, zoomValue, iViewConfig);
             LOGGER.debug("finished getting image with zoom=fitToScreen(" + zoomValue + ") from ");
