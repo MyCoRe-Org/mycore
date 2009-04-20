@@ -123,8 +123,8 @@ public class MCRImgService {
                 input = image.getContentAsInputStream();
             }
 
-            if (!outputFilled) {
-                try {
+            try {
+                if (!outputFilled) {
                     switch (scaleMode) {
                     case fitWidth:
                         processor.resizeFitWidth(input, newWidth, output);
@@ -132,9 +132,9 @@ public class MCRImgService {
                         processor.resize(input, newWidth, newHeight, output);
                         break;
                     }
-                } finally {
-                    input.close();
                 }
+            } finally {
+                input.close();
             }
         } else {
             LOGGER.debug("Get " + filename + " Width x Height - use Processor");
