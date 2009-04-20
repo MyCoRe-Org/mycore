@@ -128,6 +128,7 @@ public class MCRImgService {
                     switch (scaleMode) {
                     case fitWidth:
                         processor.resizeFitWidth(input, newWidth, output);
+                        break;
                     default:
                         processor.resize(input, newWidth, newHeight, output);
                         break;
@@ -143,6 +144,7 @@ public class MCRImgService {
                 switch (scaleMode) {
                 case fitWidth:
                     processor.resizeFitWidth(input, newWidth, output);
+                    break;
                 default:
                     processor.resize(input, newWidth, newHeight, output);
                     break;
