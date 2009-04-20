@@ -173,6 +173,21 @@ public class MCRImgCacheManager implements CacheManager {
         return (existInCache(image, THUMB) || existInCache(image, ORIG) || existInCache(image, CACHE));
     }
 
+    public Dimension getImgDimension(MCRFile image) {
+        Dimension dim = new Dimension();
+        try {
+            Element addData = image.getAdditionalData("ImageMetaData");
+    
+            if (addData != null) {
+                dim.width = Integer.parseInt(addData.getChild("imageSize").getChild("width").getText());
+                dim.height = Integer.parseInt(addData.getChild("imageSize").getChild("height").getText());
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return dim;
+    }
+
     public int getImgWidth(MCRFile image) {
         int width = 0;
 
