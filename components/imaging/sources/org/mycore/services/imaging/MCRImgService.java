@@ -124,8 +124,17 @@ public class MCRImgService {
             }
 
             if (!outputFilled) {
-                processor.resize(input, newWidth, newHeight, output);
-                input.close();
+                try {
+                    switch (scaleMode) {
+                    case fitWidth:
+                        processor.resizeFitWidth(input, newWidth, output);
+                    default:
+                        processor.resize(input, newWidth, newHeight, output);
+                        break;
+                    }
+                } finally {
+                    input.close();
+                }
             }
         } else {
             LOGGER.debug("Get " + filename + " Width x Height - use Processor");
