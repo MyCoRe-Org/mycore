@@ -75,7 +75,8 @@ public class MCRWebService implements MCRWS {
      * @see MCRWS#MCRDoRetrieveClassification(java.lang.String,
      *      java.lang.String, java.lang.String)
      */
-    public org.w3c.dom.Document MCRDoRetrieveClassification(String level, String type, String classID, String categID, String format) throws Exception {
+    public org.w3c.dom.Document MCRDoRetrieveClassification(String level, String type, String classID, String categID, String format)
+            throws Exception {
         if (null == format)
             format = "metadata";
 
@@ -97,20 +98,27 @@ public class MCRWebService implements MCRWS {
      * @see MCRWS#MCRDoQuery(org.w3c.dom.Document)
      */
     public org.w3c.dom.Document MCRDoQuery(org.w3c.dom.Document query) throws Exception {
-        org.jdom.input.DOMBuilder d = new org.jdom.input.DOMBuilder();
-        Document doc = d.build(query);
+        Document doc = null;
+        try {
+            org.jdom.input.DOMBuilder d = new org.jdom.input.DOMBuilder();
+            doc = d.build(query);
 
-        if (logger.isDebugEnabled()) {
+            if (logger.isDebugEnabled()) {
+                org.jdom.output.XMLOutputter outputter = new org.jdom.output.XMLOutputter();
+                logger.debug(outputter.outputString(doc));
+            }
+
+            // Execute query
+            MCRResults res = MCRQueryManager.search(MCRQuery.parseXML(doc), true);
+            Document result = new Document(res.buildXML());
+
+            org.jdom.output.DOMOutputter doo = new org.jdom.output.DOMOutputter();
+            return doo.output(result);
+        } catch (Exception e) {
             org.jdom.output.XMLOutputter outputter = new org.jdom.output.XMLOutputter();
-            logger.debug(outputter.outputString(doc));
+            logger.error("Error while excuting query:\n" + outputter.outputString(doc), e);
+            throw e;
         }
-
-        // Execute query
-        MCRResults res = MCRQueryManager.search(MCRQuery.parseXML(doc), true);
-        Document result = new Document(res.buildXML());
-
-        org.jdom.output.DOMOutputter doo = new org.jdom.output.DOMOutputter();
-        return doo.output(result);
     }
 
     /*

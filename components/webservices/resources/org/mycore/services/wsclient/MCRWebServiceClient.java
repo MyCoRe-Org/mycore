@@ -23,6 +23,7 @@
 
 package org.mycore.services.wsclient;
 
+import java.io.File;
 import java.util.Properties;
 import java.net.URL;
 import java.rmi.Remote;
@@ -31,7 +32,12 @@ import javax.xml.namespace.QName;
 
 import org.hibernate.Transaction;
 import org.mycore.backend.hibernate.MCRHIBConnection;
+import org.mycore.common.MCRConfiguration;
+import org.mycore.common.MCRException;
 import org.mycore.common.xml.MCRURIResolver;
+import org.mycore.parsers.bool.MCRCondition;
+import org.mycore.services.fieldquery.MCRQuery;
+import org.mycore.services.fieldquery.MCRQueryParser;
 
 import org.apache.log4j.Logger;
 
@@ -68,29 +74,19 @@ public class MCRWebServiceClient {
         System.out.println("                 retrieve (mycore object), parameter -mcrid required");
         System.out.println("                 retrievecl (mycore classification), parameters -classID, -level and -catID rquired");
         System.out.println("                 retrievelink (mycore link), parameter -form or -to requiered, -type optional");
-        System.out.println("                 query, parameter -file required");
+        System.out.println("                 query, parameter -file or -query required");
         System.out.println("-mcrid        id of MyCoRe-Object");
         System.out.println("-file         xml file with query");
+        System.out.println("-query        query in text format");
     }
 
     private static void handleParams(String args[], Properties params) {
         for (int i = 0; i < args.length; i = i + 2) {
             String op = args[i];
+            if (op.charAt(0)!='-')
+                throw new MCRException("Unsupported operation: "+op);
             String value = args[i + 1];
-            if ("-endpoint".equals(op))
-                params.setProperty("endpoint", value);
-            else if ("-operation".equals(op))
-                params.setProperty("operation", value);
-            else if ("-mcrid".equals(op))
-                params.setProperty("mcrid", value);
-            else if ("-file".equals(op))
-                params.setProperty("file", value);
-            else if ("-classID".equals(op))
-                params.setProperty("classID", value);
-            else if ("-level".equals(op))
-                params.setProperty("level", value);
-            else if ("-catID".equals(op))
-                params.setProperty("catID", value);
+            params.setProperty(op.substring(1), value);
         }
     }
 
@@ -98,7 +94,8 @@ public class MCRWebServiceClient {
         Transaction tx = MCRHIBConnection.instance().getSession().beginTransaction();
 
         Properties params = new Properties();
-        params.setProperty("endpoint", "http://localhost:8080/docportal/services/MCRWebService");
+        String baseURL=MCRConfiguration.instance().getString("MCR.baseurl","http://localhost:8291/");
+        params.setProperty("endpoint", baseURL+"services/MCRWebService");
         /*
          * params.setProperty("mcrid", "DocPortal_document_00410901");
          * params.setProperty("operation", "retrieve");
@@ -138,11 +135,25 @@ public class MCRWebServiceClient {
                 } else
                     System.out.println("parameter -mcrid missing");
             } else if ("query".equals(operation)) {
-                String file = params.getProperty("file");
-                if (null != file) {
-                    System.out.println("file://" + file);
-                    org.jdom.Element query = MCRURIResolver.instance().resolve("file://" + file);
-                    org.jdom.Document root = new org.jdom.Document(query);
+                String fileName = params.getProperty("file");
+                String query = params.getProperty("query");
+                if (null != fileName) {
+                    File file=new File(fileName);
+                    System.out.println(file.toURI());
+                    org.jdom.Element queryXML = MCRURIResolver.instance().resolve(file.toURI().toString());
+                    org.jdom.Document root = new org.jdom.Document(queryXML);
+                    org.jdom.output.DOMOutputter doo = new org.jdom.output.DOMOutputter();
+
+                    org.w3c.dom.Document result = stub.MCRDoQuery(doo.output(root));
+
+                    org.jdom.input.DOMBuilder d = new org.jdom.input.DOMBuilder();
+                    org.jdom.Document doc = d.build(result);
+                    org.jdom.output.XMLOutputter outputter = new org.jdom.output.XMLOutputter();
+                    logger.info(outputter.outputString(doc));
+                } else if (query!=null){
+                    System.out.println("query:"+query);
+                    MCRCondition queryCond=new MCRQueryParser().parse(query);
+                    org.jdom.Document root = new MCRQuery(queryCond).buildXML();
                     org.jdom.output.DOMOutputter doo = new org.jdom.output.DOMOutputter();
 
                     org.w3c.dom.Document result = stub.MCRDoQuery(doo.output(root));
