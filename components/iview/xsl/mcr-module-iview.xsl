@@ -93,6 +93,16 @@
       <xsl:comment>
         <xsl:value-of select="concat('current language: ',$CurrentLang)"/>
       </xsl:comment>
+      <script type="text/javascript">
+      <xsl:choose>
+        <xsl:when test="$MCR.Module-iview.scrollBars='true'">
+          <xsl:value-of select="'var iviewScrollBars=true;'"/>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:value-of select="'var iviewScrollBars=false;'"/>
+        </xsl:otherwise>
+      </xsl:choose>
+      </script>
       <script src="{$WebApplicationBaseURL}modules/iview/web/JS/module-iview.js" type="text/javascript"/>
       <link href="{$WebApplicationBaseURL}modules/iview/web/CSS/iviewstyle.css" rel="stylesheet"/>
     </head>

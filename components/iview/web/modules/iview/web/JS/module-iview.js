@@ -14,17 +14,44 @@ function setupContentArea() {
     
     var node = document.getElementById("content-container");
     
-    /*var height = getHeight();
-    var width = node.offsetWidth;
-    width = getWidth();*/
-    /*node.style.width = width+"px";
-    node.style.height = height+"px";*/
-    
-    node.style.width = getWidth()+"px";
+    setupScrollbarSize();
+    var iviewContentElement=document.getElementById("iview-content");
+    if (iviewContentElement && iviewContentElement.clientWidth){
+        node.style.width = getBrowserWidth()-(getBrowserWidth()-iviewContentElement.clientWidth)*6+"px";
+    } else {
+    	node.style.width = getWidth()+"px";
+    }
     node.style.height = getHeight()+"px";
-    //alert("setupContentArea successfully...");
-    
-    
+}
+
+function setupScrollbarSize(){
+	 var i = document.createElement('p');
+	 i.style.width = '100%';
+	 i.style.height = '200px';
+
+	 var o = document.createElement('div');
+	 o.style.position = 'absolute';
+	 o.style.top = '0px';
+	 o.style.left = '0px';
+	 o.style.visibility = 'hidden';
+	 o.style.width = '200px';
+	 o.style.height = '150px';
+	 o.style.overflow = 'hidden';
+	 o.appendChild(i);
+
+	 document.body.appendChild(o);
+	 var w1 = i.offsetWidth;
+	 var h1 = i.offsetHeight;
+	 o.style.overflow = 'scroll';
+	 var w2 = i.offsetWidth;
+	 var h2 = i.offsetHeight;
+	 if (w1 == w2) w2 = o.clientWidth;
+	 if (h1 == h2) h2 = o.clientWidth;
+
+	 document.body.removeChild(o);
+
+	 window.scrollbarWidth = w1-w2;
+	 window.scrollbarHeight = h1-h2;
 }
 
 function setupImage(setMetadataURL, imageURL, zoom, origWidth, origHeight) {
@@ -198,10 +225,8 @@ function getImage(imageURL, zoom, origWidth, origHeight) {
     
     div.id = "imageView";
     div.style.position = "relative";
-    //div.style.overflow = "scroll";
-    div.style.width = width + "px";
+    div.style.width = (width-getScrollbarWidth()) + "px";
     div.style.height = height + "px";
-    //div.style.background = "url(" + imageURL + ") no-repeat";
     
     if(scrollMode())
     	{
@@ -238,34 +263,13 @@ function getImage(imageURL, zoom, origWidth, origHeight) {
     
     div.appendChild(img);
     node.appendChild(div)
-    Drag.init(document.getElementById("iPic"));
+    if (!scrollMode()){
+    	Drag.init(document.getElementById("iPic"));
+    }
 }
 
-function scrollMode() { 
-    var test = document.getElementById("content-container").getAttribute("style");
-	    
-    if(testIE())
-    	{
-    	 if(test["overflow"].match("scroll"))
-    	 	{
-    	 	 return true;
-    	 	}
-    	 else 
-    	 	{
-    	 		return false;
-    	 	}
-    	}
-     else
-     	{
-     	 if(test.match("overflow: scroll"))
-    	 	{
-    	 	 return true;
-    	 	}
-    	 else 
-    	 	{
-    	 	return false;
-    	 	}
-     	}	
+function scrollMode() {
+	return iviewScrollBars;
 }
 
 function appendSizeOfImageAreaOnURL(url) {
@@ -302,18 +306,13 @@ function getHeightOfImage() {
 }
 
 function getScrollbarHeight(){
-    if (testIE()){
-        return 15;
-    }
-        else
-        return 29;
+	//defined in setupScrollbarSize() 
+	return window.scrollbarHeight;
 }
+
 function getScrollbarWidth(){
-    if (testIE()){
-        return 13;
-    }
-        else
-        return 15;
+	//defined in setupScrollbarSize() 
+	return window.scrollbarWidth;
 }
 
 function testIE(){
@@ -324,40 +323,29 @@ function testIE(){
 }
 
 function getBrowserHeight () {
-
-  if (window.innerHeight) {
-    return window.innerHeight;
-  } 
-      else if (document.documentElement && document.documentElement.clientHeight) {
+    if (document.documentElement && document.documentElement.clientHeight) {
         return document.documentElement.clientHeight;
-      } 
-          else if (document.body && document.body.clientHeight) {
-            return document.body.clientHeight;
-          } 
-              else if (document.body && document.body.offsetHeight) {
-                return document.body.offsetHeight;
-              } 
-              else {
-                return 0;
-              }
+    } else if (window.innerHeight) {
+    	return window.innerHeight;
+    } else if (document.body && document.body.clientHeight) {
+        return document.body.clientHeight;
+    } else if (document.body && document.body.offsetHeight) {
+    	return document.body.offsetHeight;
+    } 
+    return 0;
 }
+
 function getBrowserWidth () {
-    
-  if (window.innerWidth) {
+  if (document.documentElement && document.documentElement.clientWidth) {
+    return document.documentElement.clientWidth;
+  }  else if (window.innerWidth) {
     return window.innerWidth;
-  } 
-      else if (document.documentElement && document.documentElement.clientWidth) {
-        return document.documentElement.clientWidth;
-      } 
-        else if (document.body && document.body.clientWidth) {
-            return document.body.clientWidth;
-        } 
-            else if (document.body && document.body.offsetWidth) {
-                return document.body.offsetWidth;
-            } 
-            else {
-                return 0;
-            }
+  }  else if (document.body && document.body.clientWidth) {
+	return document.body.clientWidth;
+  } else if (document.body && document.body.offsetWidth) {
+	return document.body.offsetWidth;
+  }
+  return 0;
 }
 
 /************************************************/

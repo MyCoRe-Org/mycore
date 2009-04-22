@@ -54,7 +54,6 @@ public class MCRImgService {
 
         String filename = image.getName();
 
-        boolean outputFilled = false;
         float scaleHelp = 1;
 
         try {
@@ -104,7 +103,6 @@ public class MCRImgService {
                 LOGGER.debug("Get Thumbnail from ImgCache for " + filename);
 
                 cache.getImage(image, MCRImgCacheManager.THUMB, output);
-                outputFilled = true;
                 // newWidth <= cacheWidth && newHeight <= cacheHeight
             } else if ((newWidth <= cacheWidth) && cache.existInCache(image, MCRImgCacheManager.CACHE)) {
                 LOGGER.debug("Get Cache from ImgCache for " + filename);
@@ -123,8 +121,8 @@ public class MCRImgService {
                 input = image.getContentAsInputStream();
             }
 
-            try {
-                if (!outputFilled) {
+            if (input != null) {
+                try {
                     switch (scaleMode) {
                     case fitWidth:
                         processor.resizeFitWidth(input, newWidth, output);
@@ -133,9 +131,9 @@ public class MCRImgService {
                         processor.resize(input, newWidth, newHeight, output);
                         break;
                     }
+                } finally {
+                    input.close();
                 }
-            } finally {
-                input.close();
             }
         } else {
             LOGGER.debug("Get " + filename + " Width x Height - use Processor");
