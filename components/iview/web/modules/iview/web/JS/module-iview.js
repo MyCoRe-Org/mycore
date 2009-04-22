@@ -17,7 +17,7 @@ function setupContentArea() {
     setupScrollbarSize();
     var iviewContentElement=document.getElementById("iview-content");
     if (iviewContentElement && iviewContentElement.clientWidth){
-        node.style.width = getBrowserWidth()-(getBrowserWidth()-iviewContentElement.clientWidth)*6+"px";
+        node.style.width = (getBrowserWidth()-12)+"px";
     } else {
     	node.style.width = getWidth()+"px";
     }
