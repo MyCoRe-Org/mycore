@@ -882,7 +882,17 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
         }
 
         @Override
+        public boolean isReadonly() {
+            return true;
+        }
+
+        @Override
         public void addHit(MCRHit hit) {
+            throw new UnsupportedOperationException("MCRResults are read only");
+        }
+
+        @Override
+        protected int merge(org.jdom.Document doc, String hostAlias) {
             throw new UnsupportedOperationException("MCRResults are read only");
         }
 

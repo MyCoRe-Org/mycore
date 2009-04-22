@@ -265,23 +265,25 @@ public class MCRResults implements Iterable<MCRHit> {
      *            the alias of the host where the hits come from
      * @return the number of hits added
      */
-    int merge(Document doc, String hostAlias) {
+    protected int merge(Document doc, String hostAlias) {
         Element xml = doc.getRootElement();
         int numHitsBefore = this.getNumHits();
         int numRemoteHits = Integer.parseInt(xml.getAttributeValue("numHits"));
 
-        List connectionList = xml.getChildren("hostconnection", MCRConstants.MCR_NAMESPACE);
-        for (Iterator it = connectionList.iterator(); it.hasNext();) {
-            Element connectionElement = (Element) (it.next());
+        @SuppressWarnings("unchecked")
+        List<Element> connectionList = xml.getChildren("hostconnection", MCRConstants.MCR_NAMESPACE);
+        for (Iterator<Element> it = connectionList.iterator(); it.hasNext();) {
+            Element connectionElement = it.next();
             String conKey = connectionElement.getAttributeValue("host");
             String conValue = connectionElement.getAttributeValue("message");
             hostconnection.put(conKey, conValue);
         }
 
-        List hitList = xml.getChildren("hit", MCRConstants.MCR_NAMESPACE);
+        @SuppressWarnings("unchecked")
+        List<Element> hitList = xml.getChildren("hit", MCRConstants.MCR_NAMESPACE);
         hits.ensureCapacity(numHitsBefore + numRemoteHits);
-        for (Iterator it = hitList.iterator(); it.hasNext();) {
-            Element hitElement = (Element) (it.next());
+        for (Iterator<Element> it = hitList.iterator(); it.hasNext();) {
+            Element hitElement = it.next();
             MCRHit hit = MCRHit.parseXML(hitElement, hostAlias);
             hits.add(hit);
             map.put(hit.getKey(), hit);
@@ -367,5 +369,13 @@ public class MCRResults implements Iterable<MCRHit> {
         if (msg == null)
             msg = "";
         hostconnection.put(host, msg);
+    }
+    
+    /**
+     * returns false if {@link #addHit(MCRHit)} and {@link #merge(Document, String)} are safe operations. 
+     * @return
+     */
+    public boolean isReadonly(){
+        return false;
     }
 }

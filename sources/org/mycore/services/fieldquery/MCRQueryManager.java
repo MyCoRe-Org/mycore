@@ -84,7 +84,15 @@ public class MCRQueryManager {
 
         // Build results of local query
         LOGGER.info("Query: " + query.getCondition().toString());
-        final MCRResults results = buildResults(query.getCondition(), maxResults, query.getSortBy(), comesFromRemoteHost);
+        MCRResults results = buildResults(query.getCondition(), maxResults, query.getSortBy(), comesFromRemoteHost);
+        if (results.isReadonly() && !query.getHosts().isEmpty()) {
+            //need to produce a mergeable MCRResults
+            MCRResults mResults = new MCRResults();
+            for (MCRHit hit : results) {
+                mResults.addHit(hit);
+            }
+            results = mResults;
+        }
 
         // Add results of remote query
         MCRQueryClient.search(query, results);
