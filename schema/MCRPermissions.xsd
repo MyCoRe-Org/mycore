@@ -26,7 +26,8 @@
 
 <xsd:complexType name="MCRCondition">
  <xsd:sequence>
-    <xsd:element maxOccurs="unbounded" minOccurs="0" type="MCRBoolean" name="boolean" />
+    <xsd:element maxOccurs="unbounded" minOccurs="0" type="MCRSimpleCondition" name="condition" />
+    <xsd:element maxOccurs="unbounded" minOccurs="0" type="MCRInnerBoolean" name="boolean" />
  </xsd:sequence>
  <xsd:attribute use="optional" type="xsd:string" name="format"/>
 </xsd:complexType>
