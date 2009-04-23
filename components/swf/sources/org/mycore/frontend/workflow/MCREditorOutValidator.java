@@ -324,7 +324,7 @@ public class MCREditorOutValidator {
      * @param datasubtag
      */
     boolean checkMCRMetaAddress(Element datasubtag) {
-        return checkMetaObjectWithLang(datasubtag, MCRMetaAddress.class);
+        return checkMetaObjectWithLangNotEmpty(datasubtag, MCRMetaAddress.class);
     }
 
     /**
