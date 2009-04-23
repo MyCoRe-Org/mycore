@@ -7,6 +7,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.StringTokenizer;
 import java.util.Vector;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.apache.log4j.Logger;
 import org.jdom.Attribute;
@@ -19,6 +20,7 @@ import org.jdom.output.XMLOutputter;
 import org.jdom.xpath.XPath;
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRConfiguration;
+import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.datamodel.common.MCRXMLTableManager;
@@ -58,16 +60,26 @@ public class MCRIndexBrowserData {
 
     private static Hashtable<String, MCRCache> TYPE_CACHE_TABLE = new Hashtable<String, MCRCache>();
 
+    private static ReentrantReadWriteLock TYPE_CACHE_TABLE_LOCK = new ReentrantReadWriteLock();
+
     private static MCRConfiguration MCR_CONFIG = MCRConfiguration.instance();
 
     static void deleteIndexCacheOfObjectType(String objectType) {
+        if (objectType == null)
+            return;
+        TYPE_CACHE_TABLE_LOCK.writeLock().lock();
         TYPE_CACHE_TABLE.remove(objectType);
+        TYPE_CACHE_TABLE_LOCK.writeLock().unlock();
     }
 
     private void initIndexCacheForObjectType(String alias) {
         String objectType = getObjectType(alias);
+        if (objectType == null)
+            throw new MCRException("Could not determine object type for alias: " + alias);
+        TYPE_CACHE_TABLE_LOCK.writeLock().lock();
         if (!TYPE_CACHE_TABLE.containsKey(objectType))
-            TYPE_CACHE_TABLE.put(objectType, new MCRCache(1000, "IndexBrowser, objectType=" + objectType));
+            TYPE_CACHE_TABLE.put(objectType, new MCRCache(1000, "IndexBrowser,objectType=" + objectType));
+        TYPE_CACHE_TABLE_LOCK.writeLock().unlock();
     }
 
     private static String getObjectType(String alias) {
@@ -79,7 +91,12 @@ public class MCRIndexBrowserData {
 
     private MCRCache getIndexCache(String alias) {
         String objectType = getObjectType(alias);
-        return TYPE_CACHE_TABLE.get(objectType);
+        try {
+            TYPE_CACHE_TABLE_LOCK.readLock().lock();
+            return TYPE_CACHE_TABLE.get(objectType);
+        } finally {
+            TYPE_CACHE_TABLE_LOCK.readLock().unlock();
+        }
     }
 
     public MCRIndexBrowserData(String search, String mode, String path, String fromTo, String mask) {
@@ -506,9 +523,14 @@ public class MCRIndexBrowserData {
 
     private boolean cached(String alias, String key) {
         String objType = getObjectType(alias);
-        if (TYPE_CACHE_TABLE.get(objType) != null && TYPE_CACHE_TABLE.get(objType).get(key) != null)
-            return true;
-        return false;
+        try {
+            TYPE_CACHE_TABLE_LOCK.readLock().lock();
+            if (TYPE_CACHE_TABLE.get(objType) != null && TYPE_CACHE_TABLE.get(objType).get(key) != null)
+                return true;
+            return false;
+        } finally {
+            TYPE_CACHE_TABLE_LOCK.readLock().unlock();
+        }
     }
 
     /*
