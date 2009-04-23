@@ -25,7 +25,6 @@ package org.mycore.frontend.servlets;
 
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.metadata.MCRObjectID;
@@ -43,8 +42,6 @@ import org.mycore.user.MCRUserMgr;
 abstract public class MCRCheckBase extends MCRServlet {
 
     private static final long serialVersionUID = 1L;
-
-    protected static Logger LOGGER = Logger.getLogger(MCRCheckBase.class);
 
     // The file separator
     String NL = System.getProperty("file.separator");

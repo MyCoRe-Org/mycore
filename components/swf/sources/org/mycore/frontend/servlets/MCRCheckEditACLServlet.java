@@ -28,6 +28,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRMailer;
 import org.mycore.common.MCRUtils;
@@ -48,6 +49,7 @@ import org.mycore.datamodel.metadata.MCRObjectService;
 public class MCRCheckEditACLServlet extends MCRCheckACLBase {
 
     private static final long serialVersionUID = 1L;
+    private static Logger LOGGER = Logger.getLogger(MCRCheckEditACLServlet.class);
 
     /**
      * The method return an URL with the next working step. If okay flag is

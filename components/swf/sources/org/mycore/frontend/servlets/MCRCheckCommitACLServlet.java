@@ -25,6 +25,7 @@ package org.mycore.frontend.servlets;
 
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRMailer;
 import org.mycore.datamodel.common.MCRActiveLinkException;
@@ -44,6 +45,7 @@ import org.mycore.datamodel.metadata.MCRObjectService;
 public class MCRCheckCommitACLServlet extends MCRCheckACLBase {
 
     private static final long serialVersionUID = 1L;
+    private static Logger LOGGER = Logger.getLogger(MCRCheckCommitACLServlet.class);
 
     private static String storedrules = CONFIG.getString("MCR.Access.StorePermissions", "read,write,delete");
 

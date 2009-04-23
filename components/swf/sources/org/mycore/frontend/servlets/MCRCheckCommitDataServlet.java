@@ -25,6 +25,7 @@ package org.mycore.frontend.servlets;
 
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRMailer;
 import org.mycore.datamodel.common.MCRActiveLinkException;
@@ -43,6 +44,7 @@ import org.mycore.frontend.workflow.MCRSimpleWorkflowManager;
 public class MCRCheckCommitDataServlet extends MCRCheckDataBase {
 
     private static final long serialVersionUID = 1L;
+    private static Logger LOGGER = Logger.getLogger(MCRCheckCommitDataServlet.class);
 
     /**
      * The method is a dummy and return an URL with the next working step.

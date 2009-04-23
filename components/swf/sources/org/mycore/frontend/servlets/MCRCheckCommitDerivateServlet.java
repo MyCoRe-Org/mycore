@@ -23,8 +23,13 @@
 
 package org.mycore.frontend.servlets;
 
+import static org.jdom.Namespace.XML_NAMESPACE;
+import static org.mycore.common.MCRConstants.XLINK_NAMESPACE;
+import static org.mycore.common.MCRConstants.XSI_NAMESPACE;
+
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.xpath.XPath;
@@ -35,11 +40,6 @@ import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.editor.MCREditorSubmission;
-import org.mycore.frontend.workflow.MCRSimpleWorkflowManager;
-
-import static org.jdom.Namespace.XML_NAMESPACE;
-import static org.mycore.common.MCRConstants.XLINK_NAMESPACE;
-import static org.mycore.common.MCRConstants.XSI_NAMESPACE;
 
 /**
  * The servlet store the MCREditorServlet output XML in a file of a MCR type
@@ -53,6 +53,7 @@ import static org.mycore.common.MCRConstants.XSI_NAMESPACE;
 public class MCRCheckCommitDerivateServlet extends MCRCheckBase {
 
     private static final long serialVersionUID = 1L;
+    private static Logger LOGGER = Logger.getLogger(MCRCheckCommitDerivateServlet.class);
 
     /**
      * This method overrides doGetPost of MCRServlet. <br />

@@ -32,7 +32,9 @@ import java.util.List;
 
 import javax.servlet.http.HttpSession;
 
+import org.apache.log4j.Logger;
 import org.jdom.Document;
+import org.jdom.Element;
 
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRException;
@@ -54,7 +56,9 @@ import org.mycore.frontend.workflow.MCRSimpleWorkflowManager;
  * @version $Revision$ $Date$
  */
 abstract public class MCRCheckDataBase extends MCRCheckBase {
-    /**
+    private static final long serialVersionUID = 8744330302159842747L;
+    private static Logger LOGGER = Logger.getLogger(MCRCheckDataBase.class);
+   /**
      * This method overrides doGetPost of MCRServlet. <br />
      */
     public void doGetPost(MCRServletJob job) throws Exception {
@@ -234,29 +238,30 @@ abstract public class MCRCheckDataBase extends MCRCheckBase {
 
             jdom = new org.jdom.input.SAXBuilder().build(in);
 
-            org.jdom.Element root = jdom.getRootElement();
-            List sectionlist = root.getChildren("section");
+            Element root = jdom.getRootElement();
+            @SuppressWarnings("unchecked")
+            List<Element> sectionlist = root.getChildren("section");
 
             for (int i = 0; i < sectionlist.size(); i++) {
-                org.jdom.Element section = (org.jdom.Element) sectionlist.get(i);
+                Element section = sectionlist.get(i);
 
                 if (!section.getAttributeValue("lang", org.jdom.Namespace.XML_NAMESPACE).equals(lang.toLowerCase())) {
                     continue;
                 }
 
-                org.jdom.Element p = new org.jdom.Element("p");
+                Element p = new Element("p");
                 section.addContent(0, p);
 
-                org.jdom.Element center = new org.jdom.Element("center");
+                Element center = new Element("center");
 
                 // the error message
-                org.jdom.Element table = new org.jdom.Element("table");
+                Element table = new Element("table");
                 table.setAttribute("width", "80%");
 
                 for (int j = 0; j < logtext.size(); j++) {
-                    org.jdom.Element tr = new org.jdom.Element("tr");
-                    org.jdom.Element td = new org.jdom.Element("td");
-                    org.jdom.Element el = new org.jdom.Element("font");
+                    Element tr = new Element("tr");
+                    Element td = new Element("td");
+                    Element el = new Element("font");
                     el.setAttribute("color", "red");
                     el.addContent((String) logtext.get(j));
                     td.addContent(el);
@@ -266,7 +271,7 @@ abstract public class MCRCheckDataBase extends MCRCheckBase {
 
                 center.addContent(table);
                 section.addContent(1, center);
-                p = new org.jdom.Element("p");
+                p = new Element("p");
                 section.addContent(2, p);
             }
         } catch (org.jdom.JDOMException e) {

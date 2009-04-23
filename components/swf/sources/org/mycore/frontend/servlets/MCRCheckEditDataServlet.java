@@ -25,11 +25,11 @@ package org.mycore.frontend.servlets;
 
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRMailer;
 import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.frontend.workflow.MCRSimpleWorkflowManager;
 
 /**
  * The servlet store the MCREditorServlet output XML in a file of a MCR type
@@ -43,6 +43,7 @@ import org.mycore.frontend.workflow.MCRSimpleWorkflowManager;
 public class MCRCheckEditDataServlet extends MCRCheckDataBase {
 
     private static final long serialVersionUID = 1L;
+    private static Logger LOGGER = Logger.getLogger(MCRCheckEditDataServlet.class);
 
     /**
      * The method return an URL with the next working step. If okay flag is
