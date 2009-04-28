@@ -60,7 +60,7 @@ public class MCRMailer {
     protected static Session mailSession;
 
     protected static String encoding;
-    
+
     /** How often should MCRMailer try to send mail? */
     protected static int numTries;
 
@@ -72,7 +72,7 @@ public class MCRMailer {
         Properties mailProperties = new Properties();
 
         try {
-            numTries = config.getInt( "MCR.Mail.NumTries", 1 );
+            numTries = config.getInt("MCR.Mail.NumTries", 1);
             mailProperties.setProperty("mail.smtp.host", config.getString("MCR.Mail.Server"));
             mailProperties.setProperty("mail.transport.protocol", config.getString("MCR.Mail.Protocol", "smtp"));
             mailSession = Session.getDefaultInstance(mailProperties, null);
@@ -98,7 +98,7 @@ public class MCRMailer {
     public static void send(String sender, String recipient, String subject, String body) {
         logger.debug("Called plaintext send method with single recipient.");
 
-        ArrayList recipients = new ArrayList();
+        ArrayList<String> recipients = new ArrayList<String>();
         recipients.add(recipient);
         send(sender, null, recipients, null, subject, body, null);
     }
@@ -118,13 +118,13 @@ public class MCRMailer {
      * @param bcc
      *            if true, sender will also get a copy as cc recipient
      */
-    public static void send(String sender, List recipients, String subject, String body, boolean bcc) {
+    public static void send(String sender, List<String> recipients, String subject, String body, boolean bcc) {
         logger.debug("Called plaintext send method with multiple recipients.");
 
-        List bccList = null;
+        List<String> bccList = null;
 
         if (bcc) {
-            bccList = new ArrayList();
+            bccList = new ArrayList<String>();
             bccList.add(sender);
         }
 
@@ -145,10 +145,10 @@ public class MCRMailer {
      * @param body
      *            the textbody of the email
      */
-    public static void send(String sender, String recipient, String subject, String body, List parts) {
+    public static void send(String sender, String recipient, String subject, String body, List<String> parts) {
         logger.debug("Called multipart send method with single recipient.");
 
-        ArrayList recipients = new ArrayList();
+        ArrayList<String> recipients = new ArrayList<String>();
         recipients.add(recipient);
         send(sender, null, recipients, null, subject, body, parts);
     }
@@ -170,13 +170,13 @@ public class MCRMailer {
      * @param bcc
      *            if true, sender will also get a copy as bcc recipient
      */
-    public static void send(String sender, List recipients, String subject, String body, List parts, boolean bcc) {
+    public static void send(String sender, List<String> recipients, String subject, String body, List<String> parts, boolean bcc) {
         logger.debug("Called multipart send method with multiple recipients.");
 
-        List bccList = null;
+        List<String> bccList = null;
 
         if (bcc) {
-            bccList = new ArrayList();
+            bccList = new ArrayList<String>();
             bccList.add(sender);
         }
 
@@ -199,32 +199,36 @@ public class MCRMailer {
     public static void send(Element email) {
         String from = email.getChildTextTrim("from");
 
-        List rptList = email.getChildren("replyTo");
-        List replyTo = new ArrayList();
+        @SuppressWarnings("unchecked")
+        List<Element> rptList = email.getChildren("replyTo");
+        List<String> replyTo = new ArrayList<String>();
 
-        for (int i = 0; i < rptList.size(); i++)
-            replyTo.add(((Element) rptList.get(i)).getTextTrim());
+        for (Element reply : rptList)
+            replyTo.add(reply.getTextTrim());
 
-        List toList = email.getChildren("to");
-        List to = new ArrayList();
+        @SuppressWarnings("unchecked")
+        List<Element> toList = email.getChildren("to");
+        List<String> to = new ArrayList<String>();
 
-        for (int i = 0; i < toList.size(); i++)
-            to.add(((Element) toList.get(i)).getTextTrim());
+        for (Element toElement : toList)
+            to.add(toElement.getTextTrim());
 
-        List bccList = email.getChildren("bcc");
-        List bcc = new ArrayList();
+        @SuppressWarnings("unchecked")
+        List<Element> bccList = email.getChildren("bcc");
+        List<String> bcc = new ArrayList<String>();
 
-        for (int i = 0; i < bccList.size(); i++)
-            bcc.add(((Element) bccList.get(i)).getTextTrim());
+        for (Element bccElement : bccList)
+            bcc.add(bccElement.getTextTrim());
 
         String subject = email.getChildTextTrim("subject");
         String body = email.getChildTextTrim("body");
 
-        List partsList = email.getChildren("part");
-        List parts = new ArrayList();
+        @SuppressWarnings("unchecked")
+        List<Element> partsList = email.getChildren("part");
+        List<String> parts = new ArrayList<String>();
 
-        for (int i = 0; i < partsList.size(); i++)
-            parts.add(((Element) partsList.get(i)).getTextTrim());
+        for (Element partsElement : partsList)
+            parts.add(partsElement.getTextTrim());
 
         send(from, replyTo, to, bcc, subject, body, parts);
     }
@@ -252,13 +256,23 @@ public class MCRMailer {
      *            a List of URL strings which should be added as parts, may be
      *            null
      */
-    public static void send(final String from, final List replyTo, final List to, final List bcc, final String subject, final String body, final List parts) {
+    public static void send(final String from, final List<String> replyTo, final List<String> to, final List<String> bcc,
+            final String subject, final String body, final List<String> parts) {
+        if (to == null || to.size() == 0) {
+            StringBuilder sb = new StringBuilder("No receiver defined for mail\n");
+            sb.append("Subject: ").append(subject).append('\n');
+            sb.append("Body:\n").append(body).append('\n');
+            sb.append("Parts: ").append(parts).append('\n');
+            throw new MCRException(sb.toString());
+        }
         try {
-            if( numTries > 0 ) trySending(from, replyTo, to, bcc, subject, body, parts);
-        } catch (Exception ex){
-            logger.info("Sending email failed: " + ex.getClass().getName() + " " + ex.getMessage());
-            if( numTries < 2 ) return;
-            
+            if (numTries > 0)
+                trySending(from, replyTo, to, bcc, subject, body, parts);
+        } catch (Exception ex) {
+            logger.info("Sending email failed: ", ex);
+            if (numTries < 2)
+                return;
+
             Thread t = new Thread(new Runnable() {
                 public void run() {
                     for (int i = numTries - 1; i > 0; i--) {
@@ -277,7 +291,7 @@ public class MCRMailer {
                             logger.info("Successfully resended email.");
                             break;
                         } catch (Exception ex) {
-                            logger.info("Sending email failed: " + ex.getClass().getName() + " " + ex.getMessage());
+                            logger.info("Sending email failed: ", ex);
                         }
                     }
                 }
@@ -286,7 +300,8 @@ public class MCRMailer {
         }
     }
 
-    private static void trySending(String from, List replyTo, List to, List bcc, String subject, String body, List parts) throws Exception {
+    private static void trySending(String from, List<String> replyTo, List<String> to, List<String> bcc, String subject, String body,
+            List<String> parts) throws Exception {
         MimeMessage msg = new MimeMessage(mailSession);
         msg.setFrom(buildAddress(from));
 
@@ -294,17 +309,17 @@ public class MCRMailer {
             InternetAddress[] adrs = new InternetAddress[replyTo.size()];
 
             for (int i = 0; i < replyTo.size(); i++)
-                adrs[i] = buildAddress((String) (replyTo.get(i)));
+                adrs[i] = buildAddress((replyTo.get(i)));
 
             msg.setReplyTo(adrs);
         }
 
         for (int i = 0; i < to.size(); i++)
-            msg.addRecipient(Message.RecipientType.TO, buildAddress((String) to.get(i)));
+            msg.addRecipient(Message.RecipientType.TO, buildAddress(to.get(i)));
 
         if (bcc != null) {
             for (int i = 0; i < bcc.size(); i++)
-                msg.addRecipient(Message.RecipientType.BCC, buildAddress((String) bcc.get(i)));
+                msg.addRecipient(Message.RecipientType.BCC, buildAddress(bcc.get(i)));
         }
 
         msg.setSentDate(new Date());
@@ -325,17 +340,17 @@ public class MCRMailer {
             for (int i = 0; i < parts.size(); i++) {
                 messagePart = new MimeBodyPart();
 
-                URL url = new URL((String) parts.get(i));
+                URL url = new URL(parts.get(i));
                 DataSource source = new URLDataSource(url);
                 messagePart.setDataHandler(new DataHandler(source));
-                
+
                 String fileName = url.getPath();
-                if (fileName.contains("\\")) 
+                if (fileName.contains("\\"))
                     fileName = fileName.substring(fileName.lastIndexOf("\\") + 1);
-                else if (fileName.contains("/")) 
+                else if (fileName.contains("/"))
                     fileName = fileName.substring(fileName.lastIndexOf("/") + 1);
                 messagePart.setFileName(fileName);
-                
+
                 multipart.addBodyPart(messagePart);
             }
 
