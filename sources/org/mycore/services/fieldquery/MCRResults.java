@@ -310,29 +310,30 @@ public class MCRResults implements Iterable<MCRHit> {
      *            the other result lists
      */
     public static MCRResults intersect(MCRResults... others) {
-        final MCRResults firstResultList = others[0];
-        MCRResults totalResult = union(firstResultList);
-        for (MCRResults other : Arrays.asList(others).subList(1, others.length)) {
+        //check if result is empty
+        for (MCRResults other : others) {
             // x AND {} is always {}
             if (other.getNumHits() == 0) {
-                totalResult.map.clear();
-                totalResult.hits.clear();
-                return totalResult;
+                return new MCRResults();
             }
-
-            int numHits = totalResult.getNumHits();
-            for (int i = 0; i < numHits; i++) {
-                MCRHit a = totalResult.getHit(i);
-                String key = a.getKey();
-                MCRHit b = other.getHit(key);
-
-                if (b == null) {
-                    totalResult.map.remove(key);
-                    totalResult.hits.remove(i--);
-                    numHits--;
-                } else
-                    a.merge(b);
+        }
+        final MCRResults firstResult = others[0];
+        MCRResults totalResult = new MCRResults();
+        final List<MCRResults> subResultList = Arrays.asList(others).subList(1, others.length);
+        //merge everything together
+        for (MCRHit hit : firstResult) {
+            boolean complete = true;
+            final String key = hit.getKey();
+            for (MCRResults other : subResultList) {
+                MCRHit otherHit = other.getHit(key);
+                if (otherHit == null) {
+                    complete = false;
+                    break;
+                }
+                hit.merge(otherHit);
             }
+            if (complete)
+                totalResult.addHit(hit);
         }
         return totalResult;
     }
@@ -370,12 +371,12 @@ public class MCRResults implements Iterable<MCRHit> {
             msg = "";
         hostconnection.put(host, msg);
     }
-    
+
     /**
      * returns false if {@link #addHit(MCRHit)} and {@link #merge(Document, String)} are safe operations. 
      * @return
      */
-    public boolean isReadonly(){
+    public boolean isReadonly() {
         return false;
     }
 }
