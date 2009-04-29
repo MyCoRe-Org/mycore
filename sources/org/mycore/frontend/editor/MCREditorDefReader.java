@@ -25,11 +25,14 @@ package org.mycore.frontend.editor;
 
 import java.io.ByteArrayOutputStream;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.jdom.Attribute;
 import org.jdom.Content;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -71,12 +74,28 @@ public class MCREditorDefReader
     editor.setAttribute( "id", ref );
     editor.addContent( include );
     resolveIncludes( editor );
+    checkDuplicateIDs( editor );
     resolveReferences();
     if( validate ) validate( uri, ref );
     
     time =  ( System.nanoTime() - time ) / 1000000;
     LOGGER.info( "Finished reading editor definition in " + time + " ms" );
   }
+  
+  private void checkDuplicateIDs(Element editor) {
+        Set<String> ids = new HashSet<String>();
+        Iterator<Element> elements = editor.getDescendants(new ElementFilter());
+        while (elements.hasNext()) {
+            String id = elements.next().getAttributeValue("id");
+            if ((id == null) || (id.trim().length() == 0))
+                continue;
+            if (ids.contains(id)) {
+                String msg = "Duplicate ID '" + id + "', already used in editor definition";
+                throw new MCRConfigurationException(msg);
+            } else
+                ids.add(id);
+        }
+    }
   
   private void validate( String uri, String ref )
   {
