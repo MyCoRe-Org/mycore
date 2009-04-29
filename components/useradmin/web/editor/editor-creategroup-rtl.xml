@@ -90,7 +90,7 @@
                 </list>
             </cell>
             <cell row="10" col="2" anchor="WEST">
-                <helpPopup id="HGroupAdminUsers" width="400px" height="200px" i18n="component.useradmin.group.groupmember.help" />
+                <helpPopup id="HGroupMembers" width="400px" height="200px" i18n="component.useradmin.group.groupmember.help" />
             </cell>                        
             
             <!-- *** Buttons *** -->
