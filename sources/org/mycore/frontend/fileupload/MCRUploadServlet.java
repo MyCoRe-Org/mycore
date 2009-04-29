@@ -33,6 +33,7 @@ import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.URLDecoder;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -241,9 +242,23 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
             return;
         }
 
-        MCRSession session=MCRSessionMgr.getCurrentSession();
+        MCRSession session = MCRSessionMgr.getCurrentSession();
         if (method.equals("startUploadSession")) {
             String uploadId = req.getParameter("uploadId");
+            if (uploadId == null) {
+                StringBuilder sb = new StringBuilder("'uploadId' was not submitted. Request:\n");
+                @SuppressWarnings("unchecked")
+                Enumeration<String> headerNames = req.getHeaderNames();
+                while (headerNames.hasMoreElements()) {
+                    String header = headerNames.nextElement();
+                    @SuppressWarnings("unchecked")
+                    Enumeration<String> headerValues = req.getHeaders(header);
+                    while (headerValues.hasMoreElements()) {
+                        sb.append(header).append(':').append(headerValues.nextElement()).append('\n');
+                    }
+                }
+                throw new MCRException(sb.toString());
+            }
             int numFiles = Integer.parseInt(req.getParameter("numFiles"));
             MCRUploadHandlerManager.getHandler(uploadId).startUpload(numFiles);
 
