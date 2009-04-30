@@ -11,7 +11,6 @@
       
       <components root="editor-derivate-ltr" var="/mycorederivate" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
         xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-        <include uri="webapp:editor/imports-common.xml"/>
         <include uri="webapp:editor/imports-editor-derivate-common.xml"/>
         <include uri="webapp:editor/imports-editor-derivate-ltr.xml"/>
       </components>
@@ -27,7 +26,6 @@
         
         <components root="editor-derivate-rtl" var="/mycorederivate" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
           xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-          <include uri="webapp:editor/imports-common.xml"/>
           <include uri="webapp:editor/imports-editor-derivate-common.xml"/>
           <include uri="webapp:editor/imports-editor-derivate-rtl.xml"/>
         </components>
