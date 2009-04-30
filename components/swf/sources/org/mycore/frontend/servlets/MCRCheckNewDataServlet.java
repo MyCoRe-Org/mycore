@@ -99,15 +99,12 @@ public class MCRCheckNewDataServlet extends MCRCheckDataBase {
      * @return true if the access is set
      */
     protected boolean checkAccess(MCRObjectID ID) {
-        System.out.println("11111111111"+ID.getBase());
         if (MCRAccessManager.checkPermission("create-"+ID.getBase())) {
             return true;
         }
-        System.out.println("22222222222"+ID.getTypeId());
         if (MCRAccessManager.checkPermission("create-"+ID.getTypeId())) {
             return true;
         }
-        System.out.println("33333333333"+ID.getId());
         return false;
     }
 
