@@ -135,10 +135,7 @@ public class MCRResults implements Iterable<MCRHit> {
      * @return the MCRHit, if it exists
      */
     protected MCRHit getHit(String key) {
-        if (map.containsKey(key)) {
-            return map.get(key);
-        }
-        return null;
+        return map.get(key);
     }
 
     /**
