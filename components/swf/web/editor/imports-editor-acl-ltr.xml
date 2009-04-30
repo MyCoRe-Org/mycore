@@ -62,11 +62,11 @@
     </cell>
     <cell col="2" row="2" anchor="NORTHWEST" ref="AllUser"/>
     <cell col="1" row="3" anchor="NORTHWEST">
-      <text id="TUserGroup" i18n="component.swf.editor.acl.date.label"/>
+      <text id="TDate" i18n="component.swf.editor.acl.date.label"/>
     </cell>
     <cell col="2" row="3" anchor="NORTHWEST" ref="AllDate"/>
     <cell col="1" row="4" anchor="NORTHWEST">
-      <text id="TUserGroup" i18n="component.swf.editor.acl.ip.label"/>
+      <text id="TIP" i18n="component.swf.editor.acl.ip.label"/>
     </cell>
     <cell col="2" row="4" anchor="NORTHWEST" ref="AllIP"/>
     <cell col="1" row="5" anchor="NORTHWEST">
