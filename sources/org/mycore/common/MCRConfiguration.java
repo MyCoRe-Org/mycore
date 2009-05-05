@@ -26,6 +26,7 @@ package org.mycore.common;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -113,8 +114,8 @@ public class MCRConfiguration {
     protected static MCRConfiguration singleton;
 
     private static Hashtable instanceHolder;
-    
-    private static long systemLastModified;
+
+    static File lastModifiedFile;
 
     /**
      * Returns the single instance of this class that can be used to read and
@@ -152,7 +153,7 @@ public class MCRConfiguration {
         }
         singleton.systemModified();
     }
-    
+
     /**
      * returns the last point in time when the MyCoRe system was last modified.
      * 
@@ -162,7 +163,7 @@ public class MCRConfiguration {
      * @see System#currentTimeMillis()
      */
     public final long getSystemLastModified() {
-        return systemLastModified;
+        return lastModifiedFile.lastModified();
     }
 
     /**
@@ -172,7 +173,7 @@ public class MCRConfiguration {
      * 
      */
     public final void systemModified() {
-        systemLastModified = System.currentTimeMillis();
+        lastModifiedFile.setLastModified(System.currentTimeMillis());
     }
 
     /**
@@ -180,7 +181,7 @@ public class MCRConfiguration {
      * every configuration file
      */
     protected Properties properties;
-    
+
     /**
      * List of deprecated properties with their new name
      */
@@ -193,6 +194,16 @@ public class MCRConfiguration {
         properties = new Properties();
         depr = new Properties();
         reload(true);
+        lastModifiedFile = new File(getString("MCR.datadir"), ".systemTime");
+        if (!lastModifiedFile.exists()) {
+            try {
+                FileOutputStream fout = new FileOutputStream(lastModifiedFile);
+                fout.write(new byte[0]);
+            } catch (Exception e) {
+                throw new MCRException("Error while creating file: " + lastModifiedFile, e);
+            }
+
+        }
     }
 
     /**
@@ -230,10 +241,9 @@ public class MCRConfiguration {
             }
         }
 
-
         substituteReferences();
         substituteDeprecatedProperties();
-        
+
         if (clear) {
             configureLogging();
         }
@@ -269,7 +279,7 @@ public class MCRConfiguration {
             }
         } while (found);
     }
-    
+
     /**
      * Loads file deprecated.properties that can be used to rename old properties.
      * The file contains a list of renamed properties: OldPropertyName=NewPropertyName.
@@ -277,8 +287,7 @@ public class MCRConfiguration {
      * existing mycore.properties files must not be migrated immediately. Users get a
      * warning when their configuration still contains deprecated properties. 
      */
-    private void substituteDeprecatedProperties()
-    {
+    private void substituteDeprecatedProperties() {
         InputStream in = this.getClass().getResourceAsStream("/deprecated.properties");
         if (in == null)
             return;
@@ -433,7 +442,7 @@ public class MCRConfiguration {
      *             instantiated
      */
     public Object getInstanceOf(String name, String defaultname) throws MCRConfigurationException {
-        String classname = getString(name,defaultname);
+        String classname = getString(name, defaultname);
         Class cl;
 
         Logger.getLogger(this.getClass()).debug("Loading Class: " + classname);
@@ -450,13 +459,14 @@ public class MCRConfiguration {
             try {
                 o = cl.newInstance();
             } catch (Exception e) {
-                if ( e instanceof FilterPluginInstantiationException)
-                  Logger.getLogger(this.getClass()).info(e.toString());
+                if (e instanceof FilterPluginInstantiationException)
+                    Logger.getLogger(this.getClass()).info(e.toString());
                 // check for singleton
                 Method[] querymethods = cl.getMethods();
 
                 for (int i = 0; i < querymethods.length; i++) {
-                    if (querymethods[i].getName().toLowerCase().equals("instance") || querymethods[i].getName().toLowerCase().equals("getinstance")) {
+                    if (querymethods[i].getName().toLowerCase().equals("instance")
+                            || querymethods[i].getName().toLowerCase().equals("getinstance")) {
                         Object[] ob = new Object[0];
                         o = querymethods[i].invoke(cl, ob);
 
@@ -519,8 +529,7 @@ public class MCRConfiguration {
     public Object getSingleInstanceOf(String name, String defaultname) throws MCRConfigurationException {
         if (instanceHolder == null) {
             instanceHolder = new Hashtable(); // initialize the hashtable if it's not yet
-        }
-        else if (instanceHolder.containsKey(name)) {
+        } else if (instanceHolder.containsKey(name)) {
             return instanceHolder.get(name); // we have an instance allready, return it
         }
 

@@ -35,7 +35,6 @@ import java.util.Properties;
 
 import org.apache.log4j.Logger;
 import org.jdom.Document;
-
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
@@ -354,8 +353,8 @@ public class MCRXMLTableManager {
         return getXMLTable(type).listObjectDates(type);
     }
 
-    public Date getLastModified() {
-        return tablelist.values().iterator().next().getLastModified();
+    public long getLastModified() {
+        return CONFIG.getSystemLastModified();
     }
 
 }
