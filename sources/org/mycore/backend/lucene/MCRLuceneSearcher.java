@@ -301,7 +301,11 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
                 }
             }
         }
-
+        if (indexReader.maxDoc() == 0) {
+            //lucene index is empty
+            LOGGER.warn("Searching on empty index " + super.index);
+            return new MCRResults();
+        }
         final Sort sortFields = buildSortFields(sortBy);
         TopFieldDocCollector collector = new TopFieldDocCollector(indexReader, sortFields, maxResults);
         indexSearcher.search(luceneQuery, collector);
