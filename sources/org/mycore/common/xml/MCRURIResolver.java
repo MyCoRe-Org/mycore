@@ -993,7 +993,7 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
         }
 
         private static long getSystemLastModified() {
-            long xmlLastModified = MCRXMLTableManager.instance().getLastModified().getTime();
+            long xmlLastModified = MCRXMLTableManager.instance().getLastModified();
             long classLastModified = DAO.getLastModified();
             return Math.max(xmlLastModified, classLastModified);
         }
