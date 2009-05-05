@@ -32,7 +32,6 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.hibernate.Criteria;
-import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
@@ -54,10 +53,6 @@ public class MCRHIBXMLStore implements MCRXMLTableInterface {
     private String classname = "org.mycore.backend.hibernate.tables.MCRXMLTABLE";
 
     private String type;
-
-    private long objectCount = -1;
-
-    private Date lastChange;
 
     /**
      * The constructor for the class MCRHIBXMLStore.
@@ -325,27 +320,6 @@ public class MCRHIBXMLStore implements MCRXMLTableInterface {
         @Override
         public int size() {
             return result.size();
-        }
-    }
-
-    public Date getLastModified() {
-        Session session = getSession();
-        Query lastModifiedQuery = session.getNamedQuery(MCRXMLTABLE.class.getName() + ".getLastChange");
-        Object[] result = (Object[]) lastModifiedQuery.uniqueResult();
-        Number objectCount = (Number) result[1];
-        Date lastModified = (Date) result[0];
-        if (lastModified != null && (this.lastChange == null || this.lastChange.before(lastModified))) {
-            this.lastChange = lastModified;
-            this.objectCount = objectCount.longValue();
-            return new Date(lastModified.getTime());
-        } else {
-            //here this.lastChange = lastModified
-            if (this.objectCount != objectCount.longValue()) {
-                //an object has been deleted
-                this.lastChange = new Date();
-                this.objectCount = objectCount.longValue();
-            }
-            return new Date(this.lastChange.getTime());
         }
     }
 }
