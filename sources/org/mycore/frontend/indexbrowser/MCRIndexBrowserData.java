@@ -76,10 +76,13 @@ public class MCRIndexBrowserData {
         String objectType = getObjectType(alias);
         if (objectType == null)
             throw new MCRException("Could not determine object type for alias: " + alias);
-        TYPE_CACHE_TABLE_LOCK.writeLock().lock();
-        if (!TYPE_CACHE_TABLE.containsKey(objectType))
-            TYPE_CACHE_TABLE.put(objectType, new MCRCache(1000, "IndexBrowser,objectType=" + objectType));
-        TYPE_CACHE_TABLE_LOCK.writeLock().unlock();
+        try {
+            TYPE_CACHE_TABLE_LOCK.writeLock().lock();
+            if (!TYPE_CACHE_TABLE.containsKey(objectType))
+                TYPE_CACHE_TABLE.put(objectType, new MCRCache(1000, "IndexBrowser,objectType=" + objectType));
+        } finally {
+            TYPE_CACHE_TABLE_LOCK.writeLock().unlock();
+        }
     }
 
     private static String getObjectType(String alias) {
@@ -383,6 +386,12 @@ public class MCRIndexBrowserData {
                 LOGGER.debug("\n" + out.outputString(hit.buildXML()));
             }
             List<MCRFieldValue> sortData = hit.getSortData();
+            MCRFieldDef mainSortField = myQuery.getSortBy().get(0).getField();
+            if (sortData.size() == 0 || !sortData.get(0).getField().equals(mainSortField)) {
+                //main sortfield has no value for this hit
+                MCRFieldValue value = new MCRFieldValue(mainSortField, "???undefined???");
+                sortData.add(0, value);
+            }
             //TODO this is kind of ugly
             listelm[0] = sortData.get(0).getValue();
             if (sortData.size() > 1) {
