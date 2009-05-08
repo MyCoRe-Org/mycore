@@ -69,13 +69,11 @@ public final class MCRMetaISO8601Date extends MCRMetaDefault {
 
     private static final Namespace DEFAULT_NAMESPACE = Namespace.NO_NAMESPACE;
 
-    private static final MCRConfiguration CONFIG = MCRConfiguration.instance();
-
     private DateTime dt;
 
     private IsoFormat isoFormat;
 
-    public enum IsoFormat {
+    public static enum IsoFormat {
         YEAR, YEAR_MONTH, COMPLETE, COMPLETE_HH_MM, COMPLETE_HH_MM_SS, COMPLETE_HH_MM_SS_SSS;
 
         public final static String F_YEAR = "YYYY";
@@ -214,7 +212,7 @@ public final class MCRMetaISO8601Date extends MCRMetaDefault {
         try {
             dt = getDateTime(FormatChooser.cropSecondFractions(isoString));
         } catch (RuntimeException e) {
-            boolean strictParsingEnabled = CONFIG.getBoolean("MCR.Metadata.SimpleDateFormat.StrictParsing", true);
+            boolean strictParsingEnabled = MCRConfiguration.instance().getBoolean("MCR.Metadata.SimpleDateFormat.StrictParsing", true);
             if (!strictParsingEnabled) {
                 /*
                  * Last line of defence against the worst dates of the universe ;o)
@@ -230,7 +228,7 @@ public final class MCRMetaISO8601Date extends MCRMetaDefault {
     }
 
     private DateTime guessDateTime(String date) {
-        String locales = CONFIG.getString("MCR.Metadata.SimpleDateFormat.Locales", "de_DE");
+        String locales = MCRConfiguration.instance().getString("MCR.Metadata.SimpleDateFormat.Locales", "de_DE");
         StringTokenizer tok = new StringTokenizer(locales, ",");
         while (tok.hasMoreTokens()) {
             Locale locale = getLocale(tok.nextToken());
