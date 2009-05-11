@@ -55,6 +55,7 @@ import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
+import org.jdom.Namespace;
 import org.jdom.input.DOMBuilder;
 import org.jdom.input.SAXBuilder;
 import org.jdom.output.XMLOutputter;
@@ -175,6 +176,7 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
         supportedSchemes.put("buildxml", new MCRBuildXMLResolver());
         supportedSchemes.put("notnull", new MCRNotNullResolver());
         supportedSchemes.put("xslStyle", new MCRXslStyleResolver());
+        supportedSchemes.put("xslInclude", new MCRXslIncludeResolver());
         return supportedSchemes;
     }
 
@@ -1173,6 +1175,39 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
                 LOGGER.debug("MCRXslStyleResolver returning empty xml");
                 return new Element("null");
             }
+        }
+    }
+
+    /**
+     * <p>Includes xsl files which are set in the mycore.properties file.</p>
+     * Example:
+     *      MCR.URIResolver.xslIncludes.components=iview.xsl,wcms.xsl
+     *      
+     * @return
+     *          A xsl file with the includes as href.
+     */
+    private static class MCRXslIncludeResolver implements MCRResolver {
+
+        public Element resolveElement(String uri) throws Exception {
+            String includePart = uri.substring(uri.indexOf(":") + 1);
+            Namespace xslNamespace = Namespace.getNamespace("xsl", "http://www.w3.org/1999/XSL/Transform");
+
+            Element root = new Element("stylesheet", xslNamespace);
+            root.setAttribute("version", "1.0");
+
+            // get the parameters from mycore.properties
+            Properties props = MCRConfiguration.instance().getProperties("MCR.URIResolver.xslIncludes." + includePart);
+            for(Object o : props.values()) {
+                String propValue = (String)o;
+                String[] includes = propValue.split(",");
+                for(String include : includes) {
+                    // create a new include element
+                    Element includeElement = new Element("include", xslNamespace);
+                    includeElement.setAttribute("href", include);
+                    root.addContent(includeElement);
+                }
+            }
+            return root;
         }
     }
 
