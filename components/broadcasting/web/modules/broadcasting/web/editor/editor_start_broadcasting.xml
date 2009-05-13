@@ -3,30 +3,20 @@
 
 <MyCoReWebPage>
 
-<section title="Nachrichten verschicken." xml:lang="de">
-</section>
-
-<section title="Sending messages." xml:lang="en">
-</section>
-
-<section title="Sending messages." xml:lang="id">
-</section>
-
-<section title="إرسال رسالة" xml:lang="ar">
-</section>
-
-<section xml:lang="de" alt="en,id">
+<section i18n="component.broadcasting.page.start.title" direction="ltr">
   <editor id="editor-broadcasting-ltr">
       <include uri="webapp:modules/broadcasting/web/editor/editor-broadcasting-ltr.xml"/>
   </editor>
 </section>
 
-<section xml:lang="ar">
-<div align="right">
-  <editor id="editor-broadcasting-ltr">
-      <include uri="webapp:modules/broadcasting/web/editor/editor-broadcasting-rtl.xml"/>
-  </editor>
-</div>
+<section i18n="component.broadcasting.page.start.title" direction="rtl">
+	<bdo dir="rtl">
+		<div id="editorForm-rtl">
+		  <editor id="editor-broadcasting-rtl">
+			  <include uri="webapp:modules/broadcasting/web/editor/editor-broadcasting-rtl.xml"/>
+		  </editor>
+		</div>
+	</bdo>
 </section>
 
 </MyCoReWebPage>
