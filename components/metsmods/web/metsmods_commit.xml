@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE MyCoReWebPage>
+
+<MyCoReWebPage>
+
+<section i18n="component.metsmods.page.commit.title" direction="ltr">
+  <p><i18n key="component.metsmods.page.commit.title"/></p>
+  <p /><br /><p />
+  <div class="textnormalnormal">
+    <i18n key="component.metsmods.page.commit.text"/>
+  </div>
+  <p /><br /><p />
+  <metsmods/>
+</section>
+
+<section i18n="component.metsmods.page.commit.title" direction="rtl">
+  <div style="text-align:right">
+  <p><i18n key="component.metsmods.page.commit.title"/></p>
+  <p /><br /><p />
+  <div class="textnormalnormal">
+    <i18n key="component.metsmods.page.commit.text"/>
+  </div>
+  <p /><br /><p />
+  <metsmods/>
+  </div>
+</section>
+
+</MyCoReWebPage>
+
