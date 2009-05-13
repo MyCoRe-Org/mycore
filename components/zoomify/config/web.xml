@@ -1,0 +1,14 @@
+
+<!-- **************************************************************** -->
+<!-- Servlets and mappings of zoomify viewer                          -->
+<!-- **************************************************************** -->
+
+<servlet id="MCRStartZoomifyServlet">
+  <servlet-name>MCRStartZoomifyServlet</servlet-name>
+  <servlet-class>org.mycore.frontend.servlets.MCRStartZoomifyServlet</servlet-class>
+</servlet>
+
+<servlet-mapping>
+  <servlet-name>MCRStartZoomifyServlet</servlet-name>
+  <url-pattern>/servlets/MCRStartZoomifyServlet</url-pattern>
+</servlet-mapping>

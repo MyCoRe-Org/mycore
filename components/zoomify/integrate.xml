@@ -1,0 +1,16 @@
+<project name="component-zoomify">
+	
+  <import file="../../integrate.xml" />
+
+  <target name="pre.webapp" description="Integrate parts in build.webapps" >
+    <!-- add module to MyCoReWebPages.xsl in $build/webapps/WEB-INF/classes/xsl -->
+    <xmltask source="${build.webapps}/WEB-INF/classes/xsl/MyCoReWebPage.xsl" dest="${build.webapps}/WEB-INF/classes/xsl/MyCoReWebPage.xsl">
+      <insert path="/xsl:stylesheet/xsl:include[3]" position="after">
+        <![CDATA[
+        <xsl:include xmlns:xsl="http://www.w3.org/1999/XSL/Transform" href="zoomify.xsl"/>
+        ]]>
+      </insert>
+    </xmltask>
+  </target>
+	
+</project>
