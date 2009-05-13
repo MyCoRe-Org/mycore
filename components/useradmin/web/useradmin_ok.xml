@@ -3,7 +3,7 @@
 
 <MyCoReWebPage>
 
-  <section title="Bearbeitung erfolgreich durchgeführt" xml:lang="de">
+  <section i18n="component.useradmin.page.ok.title" xml:lang="all">
     <table class="frame">
       <tr>
         <td>
@@ -14,7 +14,7 @@
             <table width="80%">
               <tr align="center">
                 <td align="center">
-                  Die Aktion war erfolgreich. 
+                  <i18n key="component.useradmin.page.ok.text"/>
                 </td>
               </tr>
             </table>
@@ -23,78 +23,6 @@
           <br />
           <p></p>
         </td> 
-      </tr>
-    </table>
-  </section>
-
-  <section title="Action successful" xml:lang="en">
-    <table class="frame">
-      <tr>
-        <td>
-          <p></p>
-          <br />
-          <p></p>
-          <center>
-            <table width="80%">
-              <tr align="center">
-                <td align="center">
-                  The action was successful.
-                </td>
-              </tr>
-            </table> 
-          </center>
-          <p></p>
-          <br />
-          <p></p>
-        </td>
-      </tr>
-    </table>
-  </section>
-
-  <section title="Action successful" xml:lang="ar">
-    <table class="frame">
-      <tr>
-        <td>
-          <p></p>
-          <br />
-          <p></p>
-          <center>
-            <table width="80%">
-              <tr align="center">
-                <td align="center">
-                  The action was successful.
-                </td>
-              </tr>
-            </table> 
-          </center>
-          <p></p>
-          <br />
-          <p></p>
-        </td>
-      </tr>
-    </table>
-  </section>
-
-  <section title="Action successful" xml:lang="id">
-    <table class="frame">
-      <tr>
-        <td>
-          <p></p>
-          <br />
-          <p></p>
-          <center>
-            <table width="80%">
-              <tr align="center">
-                <td align="center">
-                  Aksi ini berhasil.
-                </td>
-              </tr>
-            </table> 
-          </center>
-          <p></p>
-          <br />
-          <p></p>
-        </td>
       </tr>
     </table>
   </section>

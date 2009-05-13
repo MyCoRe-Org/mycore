@@ -7,7 +7,10 @@
     <target type="servlet" name="MCRUserEditorServlet" method="post" format="xml" />
     <cancel url="{cancelUrl}" />
     
-    <components root="create-group-ltr" var="/mycoregroup">
+    <components root="create-group-ltr" var="/mycoregroup"
+	 xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+	 xmlns:xlink="http://www.w3.org/1999/xlink"
+     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
         <include uri="webapp:editor/imports-common-user.xml" />
         <headline anchor="CENTER">
             <text i18n="component.useradmin.common.headMessage" />
@@ -76,7 +79,7 @@
                 </list>
             </cell>
             <cell row="10" col="3" anchor="EAST">
-                <helpPopup id="HGroupMembers" width="400px" height="200px" i18n="component.useradmin.group.groupmember.help" />
+                <helpPopup id="HGroupAdminUsers" width="400px" height="200px" i18n="component.useradmin.group.groupmember.help" />
             </cell>                        
             
             <!-- *** Buttons *** -->
