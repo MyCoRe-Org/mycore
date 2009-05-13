@@ -1,4 +1,11 @@
-Version 2.0 (Head)
+
+Version 2.1 (actual head tree)
+==============================
+- Use more then one Apllet in the Application.
+- Integrate the siple Mets/Mods Component.
+- Add a Zoomify component.
+
+Version 2.0
 =============
 2008-02-13: Added namespace support for editor forms.
 - Editor Framework: Added xsl template to dynamically include editor from any xsl stylesheet
