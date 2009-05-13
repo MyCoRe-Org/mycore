@@ -1,0 +1,6 @@
+
+MCRMetsmodsApplet.save = save
+MCRMetsmodsApplet.cancel = cancel
+MCRMetsmodsApplet.title.filename = Filename
+MCRMetsmodsApplet.title.index = #
+MCRMetsmodsApplet.title.orderlabel = Label
