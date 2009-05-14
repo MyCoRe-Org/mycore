@@ -157,7 +157,8 @@ public class MCROAIProvider extends MCRServlet {
 
     private static final String STR_GRANULARITY_SHORT = "yyyy-MM-dd";
 
-    private static final String STR_REPOSITORY_GRANULARITY = "YYYY-MM-DD";
+    //OAI 2.0 Specification says: "the finest harvesting granularity supported by the repository."
+    private static final String STR_REPOSITORY_GRANULARITY = "YYYY-MM-DDThh:mm:ssZ";
 
     private static final String STR_FIRST_DATE = "2000-01-01";
 
@@ -591,7 +592,7 @@ public class MCROAIProvider extends MCRServlet {
         Element eIdentify = new Element("Identify", ns);
         eIdentify.addContent(newElementWithContent("repositoryName", ns, repositoryName));
         if (getBaseURL().length() != 0) {
-            eIdentify.addContent(newElementWithContent("baseURL", ns, getBaseURL() + "servlets/MCROAIProvider"));
+            eIdentify.addContent(newElementWithContent("baseURL", ns, getBaseURL() + configBean.getOAIURLPath()));
         } else {
             eIdentify.addContent(newElementWithContent("baseURL", ns, request.getRequestURL().toString().split(";")[0]));
         }
