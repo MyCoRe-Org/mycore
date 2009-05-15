@@ -229,7 +229,7 @@ public class MCREditorOutValidator {
                 // try to create MCRMetaInterface instance
                 try {
                     Class<? extends MCRMetaInterface> metaClass = (Class<? extends MCRMetaInterface>) Class
-                            .forName("org.mycore.datamodel.metadata" + mcrclass);
+                            .forName("org.mycore.datamodel.metadata." + mcrclass);
                     // just checks if class would validate this element
                     if (!checkMetaObject(datasubtag, metaClass)) {
                         datatagIt.remove();
