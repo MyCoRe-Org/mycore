@@ -267,7 +267,7 @@ public class MCREditorOutValidator {
         return checkMetaObject(datasubtag, metaClass);
     }
 
-    private boolean checkMetaObjectWithLangNotEmpty(Element datasubtag, Class<? extends MCRMetaInterface> metaClass) {
+    private boolean checkMetaObjectWithLangAndText(Element datasubtag, Class<? extends MCRMetaInterface> metaClass) {
         String text = datasubtag.getTextTrim();
         if ((text == null) || (text.length() == 0)) {
             return false;
@@ -275,6 +275,19 @@ public class MCREditorOutValidator {
         return checkMetaObjectWithLang(datasubtag, metaClass);
     }
 
+    /**
+     * Checks if the incoming tag has elements or contains text
+     * @param datasubtag the tag to prove
+     * @param metaClass
+     * @return true if the tag has content, otherwise false
+     */
+    private boolean checkMetaObjectWithLangAndContent(Element datasubtag, Class<? extends MCRMetaInterface> metaClass) {
+        if(datasubtag.getChildren().size() == 0)
+            return checkMetaObjectWithLangAndText(datasubtag, metaClass);
+        return checkMetaObjectWithLang(datasubtag, metaClass);
+    }
+    
+    
     private boolean checkMetaObjectWithLinks(Element datasubtag, Class<? extends MCRMetaInterface> metaClass) {
         if (datasubtag.getAttributeValue("href") == null && datasubtag.getAttributeValue("href", XLINK_NAMESPACE) == null) {
             LOGGER.debug(datasubtag.getName() + " has no href attribute defined");
@@ -324,14 +337,14 @@ public class MCREditorOutValidator {
      * @param datasubtag
      */
     boolean checkMCRMetaAddress(Element datasubtag) {
-        return checkMetaObjectWithLangNotEmpty(datasubtag, MCRMetaAddress.class);
+        return checkMetaObjectWithLangAndContent(datasubtag, MCRMetaAddress.class);
     }
 
     /**
      * @param datasubtag
      */
     boolean checkMCRMetaNumber(Element datasubtag) {
-        return checkMetaObjectWithLangNotEmpty(datasubtag, MCRMetaNumber.class);
+        return checkMetaObjectWithLangAndText(datasubtag, MCRMetaNumber.class);
     }
 
     /**
@@ -353,7 +366,7 @@ public class MCREditorOutValidator {
      * @param datasubtag
      */
     boolean checkMCRMetaDate(Element datasubtag) {
-        return checkMetaObjectWithLangNotEmpty(datasubtag, MCRMetaDate.class);
+        return checkMetaObjectWithLangAndText(datasubtag, MCRMetaDate.class);
     }
 
     /**
@@ -385,14 +398,14 @@ public class MCREditorOutValidator {
      * @param datasubtag
      */
     boolean checkMCRMetaISO8601Date(Element datasubtag) {
-        return checkMetaObjectWithLangNotEmpty(datasubtag, MCRMetaISO8601Date.class);
+        return checkMetaObjectWithLangAndText(datasubtag, MCRMetaISO8601Date.class);
     }
 
     /**
      * @param datasubtag
      */
     boolean checkMCRMetaLangText(Element datasubtag) {
-        return checkMetaObjectWithLangNotEmpty(datasubtag, MCRMetaLangText.class);
+        return checkMetaObjectWithLangAndText(datasubtag, MCRMetaLangText.class);
     }
 
     /**
