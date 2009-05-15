@@ -27,6 +27,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.mycore.access.MCRAccessManager;
+import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRMailer;
 import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.metadata.MCRObjectID;
@@ -61,7 +62,7 @@ public class MCRCheckNewDataServlet extends MCRCheckDataBase {
             sb.append(WFM.getWorkflowFile(pagedir, ID.getBase()));
         } else {
 
-            sb.append(pagedir).append(CONFIG.getString("MCR.SWF.PageErrorStore", "editor_error_store.xml"));
+            sb.append(pagedir).append(MCRConfiguration.instance().getString("MCR.SWF.PageErrorStore", "editor_error_store.xml"));
         }
         return sb.toString();
     }
@@ -80,7 +81,7 @@ public class MCRCheckNewDataServlet extends MCRCheckDataBase {
         }
 
         String sender = WFM.getMailSender();
-        String appl = CONFIG.getString("MCR.SWF.Mail.ApplicationID", "DocPortal");
+        String appl = MCRConfiguration.instance().getString("MCR.SWF.Mail.ApplicationID", "DocPortal");
         String subject = "Automatically generated message from " + appl;
         StringBuffer text = new StringBuffer();
         text.append("A new object with type ").append(ID.getTypeId()).append(" and ID ").append(ID.getId()).append(" was created in the workflow.");

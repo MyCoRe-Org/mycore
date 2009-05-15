@@ -60,6 +60,7 @@ import org.jdom.JDOMException;
 import org.jdom.Namespace;
 import org.jdom.input.SAXBuilder;
 import org.jdom.output.XMLOutputter;
+import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUtils;
@@ -193,7 +194,7 @@ public class MCRWCMSActionServlet extends MCRWCMSServlet {
 
     private String backaddr = null;
 
-    private File naviFile = new File(CONFIG.getString("MCR.navigationFile").replace('/', File.separatorChar));
+    private File naviFile = new File(MCRConfiguration.instance().getString("MCR.navigationFile").replace('/', File.separatorChar));
 
     private HttpServletRequest request;
 
@@ -276,7 +277,7 @@ public class MCRWCMSActionServlet extends MCRWCMSServlet {
             }
 
             if (action.equals("delete")) {
-                File[] contentTemplates = new File((CONFIG.getString("MCR.templatePath") + "content/").replace('/', File.separatorChar)).listFiles();
+                File[] contentTemplates = new File((MCRConfiguration.instance().getString("MCR.templatePath") + "content/").replace('/', File.separatorChar)).listFiles();
                 Element templates = new Element("templates");
                 Element contentTemp = new Element("content");
 
@@ -294,18 +295,18 @@ public class MCRWCMSActionServlet extends MCRWCMSServlet {
 
                 Element images = new Element("images");
                 rootOut.addContent(images);
-                imageList = (new File(CONFIG.getString("MCR.WCMS.imagePath").replace('/', File.separatorChar))).list();
+                imageList = (new File(MCRConfiguration.instance().getString("MCR.WCMS.imagePath").replace('/', File.separatorChar))).list();
 
                 for (int i = 0; i < imageList.length; i++) {
-                    images.addContent(new Element("image").setText(CONFIG.getString("MCR.WCMS.imagePath") + imageList[i]));
+                    images.addContent(new Element("image").setText(MCRConfiguration.instance().getString("MCR.WCMS.imagePath") + imageList[i]));
                 }
 
                 Element documents = new Element("documents");
                 rootOut.addContent(documents);
-                documentList = (new File(CONFIG.getString("MCR.WCMS.documentPath").replace('/', File.separatorChar))).list();
+                documentList = (new File(MCRConfiguration.instance().getString("MCR.WCMS.documentPath").replace('/', File.separatorChar))).list();
 
                 for (int i = 0; i < documentList.length; i++) {
-                    documents.addContent(new Element("document").setText(CONFIG.getString("MCR.WCMS.imagePath") + documentList[i]));
+                    documents.addContent(new Element("document").setText(MCRConfiguration.instance().getString("MCR.WCMS.imagePath") + documentList[i]));
                 }
 
                 Element templates = new Element("templates");
@@ -416,7 +417,7 @@ public class MCRWCMSActionServlet extends MCRWCMSServlet {
 
     public void updateFooterFile() {
         try {
-            File footer = new File(CONFIG.getString("MCR.WCMS.footer").replace('/', File.separatorChar));
+            File footer = new File(MCRConfiguration.instance().getString("MCR.WCMS.footer").replace('/', File.separatorChar));
             Document doc = new Document();
 
             if (!footer.exists())
@@ -473,7 +474,7 @@ public class MCRWCMSActionServlet extends MCRWCMSServlet {
 
     public void writeToLogFile(String action, String contentFileBackup) {
         try {
-            File logFile = new File(CONFIG.getString("MCR.WCMS.logFile").replace('/', File.separatorChar));
+            File logFile = new File(MCRConfiguration.instance().getString("MCR.WCMS.logFile").replace('/', File.separatorChar));
             Document doc;
 
             if (!logFile.exists()) {
@@ -491,7 +492,7 @@ public class MCRWCMSActionServlet extends MCRWCMSServlet {
 
             if (contentFileBackup == null) {
 
-                contentFileBackup = CONFIG.getString("MCR.WCMS.backupPath").replace('/', File.separatorChar) + fileName.substring(1);
+                contentFileBackup = MCRConfiguration.instance().getString("MCR.WCMS.backupPath").replace('/', File.separatorChar) + fileName.substring(1);
             }
 
             if (changeInfo == null) {
@@ -620,9 +621,9 @@ public class MCRWCMSActionServlet extends MCRWCMSServlet {
         File backupFile = null;
 
         if (inputFile.toString().endsWith(fs + "navigation.xml")) {
-            backupFile = new File(CONFIG.getString("MCR.WCMS.backupPath").replace('/', File.separatorChar) + fs + "navi" + fs + "navigation.xml");
+            backupFile = new File(MCRConfiguration.instance().getString("MCR.WCMS.backupPath").replace('/', File.separatorChar) + fs + "navi" + fs + "navigation.xml");
         } else {
-            backupFile = new File(CONFIG.getString("MCR.WCMS.backupPath").replace('/', File.separatorChar) + href.replace('/', File.separatorChar));
+            backupFile = new File(MCRConfiguration.instance().getString("MCR.WCMS.backupPath").replace('/', File.separatorChar) + href.replace('/', File.separatorChar));
         }
 
         if (inputFile.exists()) {
@@ -1462,7 +1463,7 @@ public class MCRWCMSActionServlet extends MCRWCMSServlet {
         hrefFile = null;
         error = href = labelPath = content = label = link = dir = null;
         changeInfo = null;
-        masterTemplates = new File(CONFIG.getString("MCR.templatePath") + "master/".replace('/', File.separatorChar)).listFiles();
+        masterTemplates = new File(MCRConfiguration.instance().getString("MCR.templatePath") + "master/".replace('/', File.separatorChar)).listFiles();
         userID = (String) mcrSession.get("userID");
         userClass = (String) mcrSession.get("userClass");
         userRealName = (String) mcrSession.get("userRealName");
@@ -1657,7 +1658,7 @@ public class MCRWCMSActionServlet extends MCRWCMSServlet {
     public void writeJDOMDocumentToFile(Document jdomDoc, File xmlFile) throws IOException, FileNotFoundException {
         XMLOutputter xmlOut = new XMLOutputter();
         xmlOut.output(jdomDoc, new FileOutputStream(xmlFile));
-        CONFIG.systemModified();
+        MCRConfiguration.instance().systemModified();
     }
 
     /**

@@ -44,6 +44,7 @@ import org.apache.log4j.Logger;
 
 import org.mycore.access.MCRAccessInterface;
 import org.mycore.access.MCRAccessManager;
+import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRMailer;
 import org.mycore.common.MCRSession;
@@ -98,19 +99,19 @@ public class MCRStartEditorServlet extends MCRServlet {
     private static final MCRAccessInterface AI = MCRAccessManager.getAccessImpl();
 
     // static pages
-    protected static String pagedir = CONFIG.getString("MCR.SWF.PageDir", "");
+    protected static String pagedir = MCRConfiguration.instance().getString("MCR.SWF.PageDir", "");
 
-    protected static String cancelpage = pagedir + CONFIG.getString("MCR.SWF.PageCancel", "editor_cancel.xml");
+    protected static String cancelpage = pagedir + MCRConfiguration.instance().getString("MCR.SWF.PageCancel", "editor_cancel.xml");
 
-    protected static String deletepage = pagedir + CONFIG.getString("MCR.SWF.PageDelete", "editor_delete.xml");
+    protected static String deletepage = pagedir + MCRConfiguration.instance().getString("MCR.SWF.PageDelete", "editor_delete.xml");
 
-    protected static String usererrorpage = pagedir + CONFIG.getString("MCR.SWF.PageErrorUser", "editor_error_user.xml");
+    protected static String usererrorpage = pagedir + MCRConfiguration.instance().getString("MCR.SWF.PageErrorUser", "editor_error_user.xml");
 
-    protected static String mcriderrorpage = pagedir + CONFIG.getString("MCR.SWF.PageErrorMcrid", "editor_error_mcrid.xml");
+    protected static String mcriderrorpage = pagedir + MCRConfiguration.instance().getString("MCR.SWF.PageErrorMcrid", "editor_error_mcrid.xml");
 
-    protected static String storeerrorpage = pagedir + CONFIG.getString("MCR.SWF.PageErrorStore", "editor_error_store.xml");
+    protected static String storeerrorpage = pagedir + MCRConfiguration.instance().getString("MCR.SWF.PageErrorStore", "editor_error_store.xml");
 
-    protected static String deleteerrorpage = pagedir + CONFIG.getString("MCR.SWF.PageErrorDelete", "editor_error_delete.xml");
+    protected static String deleteerrorpage = pagedir + MCRConfiguration.instance().getString("MCR.SWF.PageErrorDelete", "editor_error_delete.xml");
 
     // common data
     protected static class CommonData {
@@ -139,7 +140,7 @@ public class MCRStartEditorServlet extends MCRServlet {
 
         // Workflow Manager
         WFM = MCRSimpleWorkflowManager.instance();
-        number_distance = CONFIG.getInt("MCR.Metadata.ObjectID.NumberDistance", 1);
+        number_distance = MCRConfiguration.instance().getInt("MCR.Metadata.ObjectID.NumberDistance", 1);
 
     }
 
@@ -306,9 +307,9 @@ public class MCRStartEditorServlet extends MCRServlet {
         }
         if ((myproject == null) || (myproject.trim().length() == 0) || (myproject.equals("MCR"))) {
             if (mytype.equals("dummy")) {
-                myproject = CONFIG.getString("MCR.SWF.Project.ID", "MCR");
+                myproject = MCRConfiguration.instance().getString("MCR.SWF.Project.ID", "MCR");
             } else {
-                myproject = CONFIG.getString("MCR.SWF.Project.ID."+mytype, "MCR");
+                myproject = MCRConfiguration.instance().getString("MCR.SWF.Project.ID."+mytype, "MCR");
             }
         }
 
@@ -462,7 +463,7 @@ public class MCRStartEditorServlet extends MCRServlet {
 
         if (addr.size() != 0) {
             String sender = WFM.getMailSender();
-            String appl = CONFIG.getString("MCR.SWF.Mail.ApplicationID", "DocPortal");
+            String appl = MCRConfiguration.instance().getString("MCR.SWF.Mail.ApplicationID", "DocPortal");
             String subject = "Automatically generated message from " + appl;
             StringBuffer text = new StringBuffer();
             text.append("The derivate with ID ").append(cd.mysemcrid).append(" from the object with ID ").append(cd.mysemcrid).append(
@@ -572,7 +573,7 @@ public class MCRStartEditorServlet extends MCRServlet {
 
         if (addr.size() != 0) {
             String sender = WFM.getMailSender();
-            String appl = CONFIG.getString("MCR.SWF.Mail.ApplicationID", "DocPortal");
+            String appl = MCRConfiguration.instance().getString("MCR.SWF.Mail.ApplicationID", "DocPortal");
             String subject = "Automaticaly message from " + appl;
             StringBuffer text = new StringBuffer();
             text.append("The object with type ").append(cd.mytype).append(" with ID ").append(cd.mytfmcrid).append(
@@ -917,7 +918,7 @@ public class MCRStartEditorServlet extends MCRServlet {
 
                 if (addr.size() != 0) {
                     String sender = WFM.getMailSender();
-                    String appl = CONFIG.getString("MCR.SWF.Mail.ApplicationID", "DocPortal");
+                    String appl = MCRConfiguration.instance().getString("MCR.SWF.Mail.ApplicationID", "DocPortal");
                     String subject = "Automaticaly message from " + appl;
                     StringBuffer text = new StringBuffer();
                     text.append("The object of type ").append(cd.mytype).append(" with ID ").append(cd.mysemcrid).append(
@@ -982,7 +983,7 @@ public class MCRStartEditorServlet extends MCRServlet {
 
         if (addr.size() != 0) {
             String sender = WFM.getMailSender();
-            String appl = CONFIG.getString("MCR.SWF.Mail.ApplicationID", "DocPortal");
+            String appl = MCRConfiguration.instance().getString("MCR.SWF.Mail.ApplicationID", "DocPortal");
             String subject = "Automaticaly message from " + appl;
             StringBuffer text = new StringBuffer();
             text.append("The derivate with ID ").append(cd.mysemcrid).append(" was removed from workflow.");
@@ -1084,7 +1085,7 @@ public class MCRStartEditorServlet extends MCRServlet {
 
         if (addr.size() != 0) {
             String sender = WFM.getMailSender();
-            String appl = CONFIG.getString("MCR.SWF.Mail.ApplicationID", "MyCoRe");
+            String appl = MCRConfiguration.instance().getString("MCR.SWF.Mail.ApplicationID", "MyCoRe");
             String subject = "Automaticaly message from " + appl;
             StringBuffer text = new StringBuffer();
             text.append("The object of type ").append(cd.mytype).append(" with ID ").append(cd.mysemcrid).append(

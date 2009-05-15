@@ -30,6 +30,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.mycore.access.MCRAccessManager;
+import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRMailer;
 import org.mycore.common.MCRUtils;
 import org.mycore.datamodel.common.MCRActiveLinkException;
@@ -67,7 +68,7 @@ public class MCRCheckEditACLServlet extends MCRCheckACLBase {
             sb.append(WFM.getWorkflowFile(pagedir,ID.getBase()));
         } else {
 
-            sb.append(pagedir).append(CONFIG.getString("MCR.SWF.PageErrorStore", "editor_error_store.xml"));
+            sb.append(pagedir).append(MCRConfiguration.instance().getString("MCR.SWF.PageErrorStore", "editor_error_store.xml"));
         }
         return sb.toString();
     }
@@ -86,7 +87,7 @@ public class MCRCheckEditACLServlet extends MCRCheckACLBase {
         }
 
         String sender = WFM.getMailSender();
-        String appl = CONFIG.getString("MCR.SWF.Mail.ApplicationID", "DocPortal");
+        String appl = MCRConfiguration.instance().getString("MCR.SWF.Mail.ApplicationID", "DocPortal");
         String subject = "Automatically generated message from " + appl;
         StringBuffer text = new StringBuffer();
         text.append("The ACL data of the MyCoRe object of type ").append(ID.getTypeId()).append(" with the ID ").append(ID.getId()).append(" in the workflow was changes.");

@@ -30,6 +30,7 @@ import java.util.Properties;
 
 import org.mycore.access.MCRAccessManager;
 import org.mycore.backend.hibernate.MCRHIBConnection;
+import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
@@ -52,7 +53,7 @@ import org.jdom.output.XMLOutputter;
 
 public class MCRStartMetsModsServlet extends MCRStartEditorServlet {
 
-    private static String metsfile = CONFIG.getString("MCR.MetsMots.ConfigFile", "mets.xml");
+    private static String metsfile = MCRConfiguration.instance().getString("MCR.MetsMots.ConfigFile", "mets.xml");
 
     private Transaction tx;
 

@@ -27,6 +27,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.mycore.access.MCRAccessManager;
+import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRMailer;
 import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.metadata.MCRDerivate;
@@ -47,7 +48,7 @@ public class MCRCheckCommitACLServlet extends MCRCheckACLBase {
     private static final long serialVersionUID = 1L;
     private static Logger LOGGER = Logger.getLogger(MCRCheckCommitACLServlet.class);
 
-    private static String storedrules = CONFIG.getString("MCR.Access.StorePermissions", "read,write,delete");
+    private static String storedrules = MCRConfiguration.instance().getString("MCR.Access.StorePermissions", "read,write,delete");
 
     /**
      * The method return an URL with the next working step. If okay flag is
@@ -75,7 +76,7 @@ public class MCRCheckCommitACLServlet extends MCRCheckACLBase {
             }
             sb.append("receive/").append(ID.getId());
         } else {
-            sb.append(CONFIG.getString("MCR.SWF.PageDir", "")).append(CONFIG.getString("MCR.SWF.PageErrorStore", "editor_error_store.xml"));
+            sb.append(MCRConfiguration.instance().getString("MCR.SWF.PageDir", "")).append(MCRConfiguration.instance().getString("MCR.SWF.PageErrorStore", "editor_error_store.xml"));
         }
         return sb.toString();
     }
@@ -94,7 +95,7 @@ public class MCRCheckCommitACLServlet extends MCRCheckACLBase {
         }
 
         String sender = WFM.getMailSender();
-        String appl = CONFIG.getString("MCR.SWF.Mail.ApplicationID", "DocPortal");
+        String appl = MCRConfiguration.instance().getString("MCR.SWF.Mail.ApplicationID", "DocPortal");
         String subject = "Automatically generated message from " + appl;
         StringBuffer text = new StringBuffer();
         text.append("The ACL data of the MyCoRe object of type ").append(ID.getTypeId()).append(" with the ID ").append(ID.getId()).append(" was changed in the server.");

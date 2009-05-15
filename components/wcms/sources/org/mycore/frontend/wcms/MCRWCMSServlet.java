@@ -37,6 +37,7 @@ import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
 import org.mycore.access.MCRAccessInterface;
 import org.mycore.access.MCRAccessManager;
+import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.frontend.MCRWebsiteWriteProtection;
@@ -86,7 +87,7 @@ public abstract class MCRWCMSServlet extends MCRServlet {
         Element templates = new Element("templates");
 
         // master
-        File[] masterTemplates = new File(CONFIG.getString("MCR.templatePath") + "master/".replace('/', File.separatorChar)).listFiles();
+        File[] masterTemplates = new File(MCRConfiguration.instance().getString("MCR.templatePath") + "master/".replace('/', File.separatorChar)).listFiles();
         Element master = new Element("master");
 
         for (int i = 0; i < masterTemplates.length; i++) {
@@ -132,7 +133,7 @@ public abstract class MCRWCMSServlet extends MCRServlet {
         Element images = new Element("images");
         root.addContent(images);
 
-        File imagePath = new File((CONFIG.getString("MCR.WCMS.imagePath").replace('/', File.separatorChar)));
+        File imagePath = new File((MCRConfiguration.instance().getString("MCR.WCMS.imagePath").replace('/', File.separatorChar)));
 
         if (!imagePath.exists()) {
             imagePath.mkdirs();
@@ -146,13 +147,13 @@ public abstract class MCRWCMSServlet extends MCRServlet {
             }
         }
 
-        root.addContent(new Element("imagePath").setText(CONFIG.getString("MCR.WCMS.imagePath").substring(
-                        CONFIG.getString("MCR.WCMS.imagePath").lastIndexOf("webapps"))));
+        root.addContent(new Element("imagePath").setText(MCRConfiguration.instance().getString("MCR.WCMS.imagePath").substring(
+                        MCRConfiguration.instance().getString("MCR.WCMS.imagePath").lastIndexOf("webapps"))));
 
         Element documents = new Element("documents");
         root.addContent(documents);
 
-        File documentPath = new File((CONFIG.getString("MCR.WCMS.documentPath").replace('/', File.separatorChar)));
+        File documentPath = new File((MCRConfiguration.instance().getString("MCR.WCMS.documentPath").replace('/', File.separatorChar)));
 
         if (!documentPath.exists()) {
             documentPath.mkdirs();
@@ -166,8 +167,8 @@ public abstract class MCRWCMSServlet extends MCRServlet {
             }
         }
 
-        root.addContent(new Element("documentPath").setText(CONFIG.getString("MCR.WCMS.documentPath").substring(
-                        CONFIG.getString("MCR.WCMS.documentPath").lastIndexOf("webapps"))));
+        root.addContent(new Element("documentPath").setText(MCRConfiguration.instance().getString("MCR.WCMS.documentPath").substring(
+                        MCRConfiguration.instance().getString("MCR.WCMS.documentPath").lastIndexOf("webapps"))));
         return templates;
     }
 }

@@ -33,6 +33,7 @@ import org.jdom.Element;
 import org.jdom.output.XMLOutputter;
 
 import org.mycore.access.MCRAccessManager;
+import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.datamodel.classifications.MCRClassificationBrowserData;
 import org.mycore.datamodel.classifications.MCRClassificationEditor;
@@ -117,17 +118,17 @@ public class MCRStartClassEditorServlet extends MCRServlet {
         LOGGER.debug("MCRStartClassEditorServlet CLID: " + clid);
         LOGGER.debug("MCRStartClassEditorServlet CATEGID: " + categid);
 
-        String pagedir = CONFIG.getString("MCR.classeditor_page_dir", "");
+        String pagedir = MCRConfiguration.instance().getString("MCR.classeditor_page_dir", "");
         String myfile = "editor_form_" + todo + ".xml";
 
-        String usererrorpage = pagedir + CONFIG.getString("MCR.classeditor_page_error_user", "editor_error_user.xml");
-        String cancelpage = pagedir + CONFIG.getString("MCR.classeditor_page_cancel", "classeditor_cancel.xml");
-        String icerrorpage = pagedir + CONFIG.getString("MCR.classeditor_page_error_id", "classeditor_error_clid.xml");
-        String iderrorpage = pagedir + CONFIG.getString("MCR.classeditor_page_error_delete", "editor_error_delete.xml");
-        String imerrorpage = pagedir + CONFIG.getString("MCR.classeditor_page_error_move", "classeditor_error_move.xml");
-        String imperrorpage = pagedir + CONFIG.getString("MCR.classeditor_page_error_import", "classeditor_error_import.xml");
-        String isaveerrorpage = pagedir + CONFIG.getString("MCR.classeditor_page_error_save", "classeditor_error_save.xml");
-        String ipurgeerrorpage = pagedir + CONFIG.getString("MCR.classeditor_page_error_purge", "classeditor_error_purge.xml");
+        String usererrorpage = pagedir + MCRConfiguration.instance().getString("MCR.classeditor_page_error_user", "editor_error_user.xml");
+        String cancelpage = pagedir + MCRConfiguration.instance().getString("MCR.classeditor_page_cancel", "classeditor_cancel.xml");
+        String icerrorpage = pagedir + MCRConfiguration.instance().getString("MCR.classeditor_page_error_id", "classeditor_error_clid.xml");
+        String iderrorpage = pagedir + MCRConfiguration.instance().getString("MCR.classeditor_page_error_delete", "editor_error_delete.xml");
+        String imerrorpage = pagedir + MCRConfiguration.instance().getString("MCR.classeditor_page_error_move", "classeditor_error_move.xml");
+        String imperrorpage = pagedir + MCRConfiguration.instance().getString("MCR.classeditor_page_error_import", "classeditor_error_import.xml");
+        String isaveerrorpage = pagedir + MCRConfiguration.instance().getString("MCR.classeditor_page_error_save", "classeditor_error_save.xml");
+        String ipurgeerrorpage = pagedir + MCRConfiguration.instance().getString("MCR.classeditor_page_error_purge", "classeditor_error_purge.xml");
 
         String referrer = job.getRequest().getHeader("Referer");
         if (referrer == null || referrer.equals("")) {
@@ -304,7 +305,7 @@ public class MCRStartClassEditorServlet extends MCRServlet {
             }
             if ("create-classification".equals(todo)) {
                 MCRObjectID cli = new MCRObjectID();
-                String idBase = CONFIG.getString("MCR.SWF.Project.ID", "DocPortal") + "_class";
+                String idBase = MCRConfiguration.instance().getString("MCR.SWF.Project.ID", "DocPortal") + "_class";
                 cli.setNextFreeId(idBase);
 
                 if (!cli.isValid()) {

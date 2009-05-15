@@ -36,6 +36,7 @@ import org.hibernate.Transaction;
 import org.jdom.Document;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.backend.hibernate.MCRHIBConnection;
+import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
@@ -67,7 +68,7 @@ public class MCRFileNodeServlet extends MCRServlet {
     // because in a case of MCRConfigurationException,
     // no Servlet will be instantiated, and thats more bad then a missing
     // property!
-    private static String accessErrorPage = CONFIG.getString("MCR.Access.Page.Error", "");
+    private static String accessErrorPage = MCRConfiguration.instance().getString("MCR.Access.Page.Error", "");
 
     @Override
     protected long getLastModified(HttpServletRequest request) {

@@ -28,6 +28,7 @@ import java.io.IOException;
 import javax.servlet.ServletException;
 
 import org.jdom.Document;
+import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRSessionMgr;
 
 /**
@@ -52,10 +53,10 @@ public class MCRUserAdminGUICommons extends MCRServlet {
     /** Initialisation of the servlet */
     public void init() throws ServletException {
         super.init();
-        pageDir = CONFIG.getString("MCR.Useradmin.PageDir", "");
-        noPrivsPage = pageDir + CONFIG.getString("MCR.Useradmin.Page.ErrorPrivileges", "useradmin_error_privileges.xml");
-        cancelPage = pageDir + CONFIG.getString("MCR.Useradmin.Page.Cancel", "useradmin_cancel.xml");
-        okPage = pageDir + CONFIG.getString("MCR.Useradmin.Page.OK", "useradmin_ok.xml");
+        pageDir = MCRConfiguration.instance().getString("MCR.Useradmin.PageDir", "");
+        noPrivsPage = pageDir + MCRConfiguration.instance().getString("MCR.Useradmin.Page.ErrorPrivileges", "useradmin_error_privileges.xml");
+        cancelPage = pageDir + MCRConfiguration.instance().getString("MCR.Useradmin.Page.Cancel", "useradmin_cancel.xml");
+        okPage = pageDir + MCRConfiguration.instance().getString("MCR.Useradmin.Page.OK", "useradmin_ok.xml");
     }
 
     /**

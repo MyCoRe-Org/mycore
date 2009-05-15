@@ -32,6 +32,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.jdom.Element;
 import org.mycore.access.MCRAccessManager;
+import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
@@ -61,7 +62,7 @@ public class MCRCheckClassACLServlet extends MCRServlet {
     protected static Logger LOGGER = Logger.getLogger(MCRCheckClassACLServlet.class);
 
     // the configured permissions
-    private static String storedrules = CONFIG.getString("MCR.Access.StorePermissions", "read,write,delete");
+    private static String storedrules = MCRConfiguration.instance().getString("MCR.Access.StorePermissions", "read,write,delete");
 
     // The User Manager
     protected static MCRUserMgr UM = MCRUserMgr.instance();
@@ -125,7 +126,7 @@ public class MCRCheckClassACLServlet extends MCRServlet {
         if (okay) {
             sb.append("browse?mode=edit");
         } else {
-            sb.append(CONFIG.getString("MCR.SWF.PageDir", "")).append(CONFIG.getString("MCR.SWF.PageErrorStore", "editor_error_store.xml"));
+            sb.append(MCRConfiguration.instance().getString("MCR.SWF.PageDir", "")).append(MCRConfiguration.instance().getString("MCR.SWF.PageErrorStore", "editor_error_store.xml"));
         }
         return sb.toString();
     }
@@ -317,8 +318,8 @@ public class MCRCheckClassACLServlet extends MCRServlet {
         }
 
         // prepare editor with error messages
-        String pagedir = CONFIG.getString("MCR.editor_page_dir", "");
-        String myfile = pagedir + CONFIG.getString("MCR.editor_page_error_formular", "editor_error_formular.xml");
+        String pagedir = MCRConfiguration.instance().getString("MCR.editor_page_dir", "");
+        String myfile = pagedir + MCRConfiguration.instance().getString("MCR.editor_page_error_formular", "editor_error_formular.xml");
         org.jdom.Document jdom = null;
 
         try {

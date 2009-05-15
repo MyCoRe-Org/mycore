@@ -42,6 +42,7 @@ import org.jdom.ProcessingInstruction;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.jdom.transform.JDOMSource;
+import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRException;
 import org.mycore.common.xml.MCRXMLResource;
@@ -90,18 +91,18 @@ public class MCROAIProvider extends MCRServlet {
     private static MCROAIResumptionTokenStore resStore;
 
     static {
-        Properties props = CONFIG.getProperties("MCR.OAI.Repository.Identifier.");
+        Properties props = MCRConfiguration.instance().getProperties("MCR.OAI.Repository.Identifier.");
         oaiConfig = new HashMap<String, MCROAIConfigBean>();
         for (Enumeration<?> en = props.propertyNames(); en.hasMoreElements();) {
             String propName = (String) en.nextElement();
             String instance = propName.substring("MCR.OAI.Repository.Identifier.".length());
             oaiConfig.put(instance, new MCROAIConfigBean(instance));
         }
-        oaiAdminEmail = CONFIG.getString("MCR.OAI.AdmineMail", "");
-        oaiProviderFriends = CONFIG.getString("MCR.OAI.Friends", "");
-        oaiResumptionTokenTimeOut = CONFIG.getInt("MCR.OAI.Resumptiontoken.Timeout", 72);
-        maxReturns = CONFIG.getInt("MCR.OAI.MaxReturns", 10);
-        resStore = (MCROAIResumptionTokenStore) CONFIG.getInstanceOf("MCR.OAI.Resumptiontoken.Store",
+        oaiAdminEmail = MCRConfiguration.instance().getString("MCR.OAI.AdmineMail", "");
+        oaiProviderFriends = MCRConfiguration.instance().getString("MCR.OAI.Friends", "");
+        oaiResumptionTokenTimeOut = MCRConfiguration.instance().getInt("MCR.OAI.Resumptiontoken.Timeout", 72);
+        maxReturns = MCRConfiguration.instance().getInt("MCR.OAI.MaxReturns", 10);
+        resStore = (MCROAIResumptionTokenStore) MCRConfiguration.instance().getInstanceOf("MCR.OAI.Resumptiontoken.Store",
                 "org.mycore.backend.hibernate.MCRHIBResumptionTokenStore");
     }
 
@@ -662,7 +663,7 @@ public class MCROAIProvider extends MCRServlet {
         MCROAIQuery query = null;
 
         try {
-            query = (MCROAIQuery) CONFIG.getInstanceOf(STR_OAI_QUERYSERVICE);
+            query = (MCROAIQuery) MCRConfiguration.instance().getInstanceOf(STR_OAI_QUERYSERVICE);
         } catch (MCRConfigurationException mcrx) {
             logger.fatal("Missing configuration item: " + STR_OAI_QUERYSERVICE + " is missing.");
             return null;
@@ -714,7 +715,7 @@ public class MCROAIProvider extends MCRServlet {
         dcMetadataFormat.addContent(newElementWithContent("metadataNamespace", ns, STR_DC_NAMESPACE));
         eListMetadataFormats.addContent(dcMetadataFormat);
 
-        Properties properties = CONFIG.getProperties(STR_OAI_METADATA_NAMESPACE);
+        Properties properties = MCRConfiguration.instance().getProperties(STR_OAI_METADATA_NAMESPACE);
         Enumeration<?> propertiesNames = properties.propertyNames();
         while (propertiesNames.hasMoreElements()) {
             String name = (String) propertiesNames.nextElement();
@@ -723,8 +724,8 @@ public class MCROAIProvider extends MCRServlet {
                 // Identifier submitted
                 Element metadata = (Element) record.get(1);
                 try {
-                    String namespace = CONFIG.getString(STR_OAI_METADATA_NAMESPACE + "." + metadataPrefix);
-                    String elementName = CONFIG.getString(STR_OAI_METADATA_ELEMENT + "." + metadataPrefix);
+                    String namespace = MCRConfiguration.instance().getString(STR_OAI_METADATA_NAMESPACE + "." + metadataPrefix);
+                    String elementName = MCRConfiguration.instance().getString(STR_OAI_METADATA_ELEMENT + "." + metadataPrefix);
                     Namespace mns = Namespace.getNamespace(metadataPrefix, namespace);
                     if (metadata.getChild(elementName, mns) == null) {
                         continue;
@@ -736,8 +737,8 @@ public class MCROAIProvider extends MCRServlet {
             Element eMetadataFormat = new Element("metadataFormat", ns);
             eMetadataFormat.addContent(newElementWithContent("metadataPrefix", ns, metadataPrefix));
             eMetadataFormat
-                    .addContent(newElementWithContent("schema", ns, CONFIG.getString(STR_OAI_METADATA_SCHEMA + "." + metadataPrefix)));
-            eMetadataFormat.addContent(newElementWithContent("metadataNamespace", ns, CONFIG.getString(STR_OAI_METADATA_NAMESPACE + "."
+                    .addContent(newElementWithContent("schema", ns, MCRConfiguration.instance().getString(STR_OAI_METADATA_SCHEMA + "." + metadataPrefix)));
+            eMetadataFormat.addContent(newElementWithContent("metadataNamespace", ns, MCRConfiguration.instance().getString(STR_OAI_METADATA_NAMESPACE + "."
                     + metadataPrefix)));
             eListMetadataFormats.addContent(eMetadataFormat);
         }
@@ -801,7 +802,7 @@ public class MCROAIProvider extends MCRServlet {
         MCROAIQuery query = null;
 
         try {
-            query = (MCROAIQuery) CONFIG.getInstanceOf(STR_OAI_QUERYSERVICE);
+            query = (MCROAIQuery) MCRConfiguration.instance().getInstanceOf(STR_OAI_QUERYSERVICE);
         } catch (MCRConfigurationException mcrx) {
             logger.fatal(mcrx.getMessage());
             return addError(document, "badResumptionToken", mcrx.getMessage());
@@ -987,7 +988,7 @@ public class MCROAIProvider extends MCRServlet {
         // Check, if the requested metadata format is supported
         try {
             // check if property is set, else Exception is thrown
-            CONFIG.getString(STR_OAI_METADATA_TRANSFORMER + "." + prefix);
+            MCRConfiguration.instance().getString(STR_OAI_METADATA_TRANSFORMER + "." + prefix);
         } catch (MCRConfigurationException mcrx) {
             logger.info("Anfrage 'listIdentifiers' wegen unbekanntem Metadatenformat " + prefix + " abgebrochen.");
             return addError(document, "cannotDisseminateFormat", ERR_UNKNOWN_FORMAT);
@@ -1017,7 +1018,7 @@ public class MCROAIProvider extends MCRServlet {
         MCROAIQuery query = null;
         try {
 
-            query = (MCROAIQuery) CONFIG.getInstanceOf(STR_OAI_QUERYSERVICE);
+            query = (MCROAIQuery) MCRConfiguration.instance().getInstanceOf(STR_OAI_QUERYSERVICE);
         } catch (MCRConfigurationException e) {
             logger.fatal(e.getMessage());
             return addError(document, "noRecordsMatch", ERR_NO_RECORDS_MATCH);
@@ -1116,7 +1117,7 @@ public class MCROAIProvider extends MCRServlet {
         String format = null;
         // Check, if the requested metadata format is supported
         try {
-            format = CONFIG.getString(STR_OAI_METADATA_TRANSFORMER + "." + metadataPrefix[0]);
+            format = MCRConfiguration.instance().getString(STR_OAI_METADATA_TRANSFORMER + "." + metadataPrefix[0]);
             logger.info("Transformer: " + format);
         } catch (MCRConfigurationException mcrx) {
             logger.info("Anfrage 'getRecord' wurde wegen fehlendem Metadatenformat " + metadataPrefix[0] + " abgebrochen.");
@@ -1126,7 +1127,7 @@ public class MCROAIProvider extends MCRServlet {
         // Then look, if the id exists
         MCROAIQuery query = null;
         try {
-            query = (MCROAIQuery) CONFIG.getInstanceOf(STR_OAI_QUERYSERVICE);
+            query = (MCROAIQuery) MCRConfiguration.instance().getInstanceOf(STR_OAI_QUERYSERVICE);
         } catch (MCRConfigurationException mcrx) {
             logger.fatal(mcrx.getMessage());
             return addError(document, "idDoesNotExist", ERR_UNKNOWN_ID);
@@ -1283,7 +1284,7 @@ public class MCROAIProvider extends MCRServlet {
 
         // Check, if the requested metadata format is supported
         try {
-            format = CONFIG.getString(STR_OAI_METADATA_TRANSFORMER + "." + prefix);
+            format = MCRConfiguration.instance().getString(STR_OAI_METADATA_TRANSFORMER + "." + prefix);
         } catch (MCRConfigurationException mcrx) {
             logger.info("Anfrage 'listRecords' wurde wegen fehlendem Metadatenformat " + prefix + " abgebrochen.");
             return addError(document, "cannotDisseminateFormat", ERR_UNKNOWN_FORMAT);
@@ -1321,7 +1322,7 @@ public class MCROAIProvider extends MCRServlet {
         MCROAIQuery query = null;
         try {
 
-            query = (MCROAIQuery) CONFIG.getInstanceOf(STR_OAI_QUERYSERVICE);
+            query = (MCROAIQuery) MCRConfiguration.instance().getInstanceOf(STR_OAI_QUERYSERVICE);
         } catch (MCRConfigurationException e) {
             logger.fatal(e.getMessage());
             return addError(document, "noRecordsMatch", ERR_NO_RECORDS_MATCH);

@@ -23,7 +23,6 @@
 
 package org.mycore.frontend.servlets;
 
-import java.awt.Font;
 import java.io.IOException;
 
 import javax.servlet.http.HttpServletResponse;
@@ -32,6 +31,7 @@ import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.output.XMLOutputter;
+import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
@@ -44,7 +44,6 @@ import org.mycore.datamodel.metadata.MCRMetaLangText;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.frontend.metsmods.MetsModsUtil;
 
-
 /**
  * This servlet generate and return a XML file including mets and mods data for processing by DFGViewer.
  * 
@@ -52,76 +51,76 @@ import org.mycore.frontend.metsmods.MetsModsUtil;
  *
  */
 
-public class MCRDFGViewerServlet extends MCRStartEditorServlet{
-	
-	private static String metsfile = CONFIG.getString("MCR.MetsMots.ConfigFile", "mets.xml");
-	
-	public void buildMetsMods(MCRServletJob job, CommonData cd)
-	{
-		//load MCRObject via MyCoRe-ID
-		MCRObject mcrobj = new MCRObject();
-		mcrobj.receiveFromDatastore(cd.myremcrid.getId());
-		
-		//extracting mods information like title, id and date
-		MetsModsUtil mmu = new MetsModsUtil();
-		
-		MCRMetaElement metaelm = mcrobj.getMetadataElement("source01s");
-		String doc_title = ((MCRMetaLangText)metaelm.getElement(0)).getText();
-		
-        metaelm = mcrobj.getMetadataElement("source12s");
-        MCRMetaHistoryDate mcrdate = (MCRMetaHistoryDate)metaelm.getElement(0); 
-        String doc_date = mcrdate.getText();
-        
-        Element mods = mmu.init_mods(cd.mysemcrid.getId(), doc_title, "Quelle", "siehe Signatur", doc_date);
-        
-        //now get the existing mets file
-        
-        MCRFilesystemNode node = MCRFilesystemNode.getRootNode(cd.mysemcrid.getId());
-        MCRDirectory dir = (MCRDirectory)node;
-        MCRFile mcrfile = (MCRFile)dir.getChild(metsfile);
-        
-        //if mets file wasn't found, generate error page and return
-        
-        if(mcrfile==null) {
-        	try {
-				generateErrorPage(job.getRequest(), job.getResponse(), HttpServletResponse.SC_BAD_REQUEST, "No Mets file was found!", new MCRException("No mets file was found!"), false);
-				return;
-        	} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-        }
-        
-        //if mets file exist, try to read content as JDOM
-        
-        try {
-			Document metsfile = mcrfile.getContentAsJDOM();
-			
-			//if tag 'dmdSec' already exist, delete the whole section
-			Element dmdSec = metsfile.getRootElement().getChild("dmdSec",MCRConstants.METS_NAMESPACE);
-			if(dmdSec!=null)
-				metsfile.getRootElement().removeChild("dmdSec",MCRConstants.METS_NAMESPACE);
-			
-			//merge the file with mods
-			metsfile.getRootElement().addContent(mods);
-			
-			//try to give back the JDOM structure as servlet answer
-			XMLOutputter xmlout = new XMLOutputter();
-			job.getResponse().setCharacterEncoding("UTF8");
-			xmlout.output(metsfile, job.getResponse().getWriter());
+public class MCRDFGViewerServlet extends MCRStartEditorServlet {
+    private static final long serialVersionUID = 7125675689555945121L;
 
-			
-		} catch (MCRPersistenceException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (JDOMException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-        
-	}
+    private static String metsfile = MCRConfiguration.instance().getString("MCR.MetsMots.ConfigFile", "mets.xml");
+
+    public void buildMetsMods(MCRServletJob job, CommonData cd) {
+        //load MCRObject via MyCoRe-ID
+        MCRObject mcrobj = new MCRObject();
+        mcrobj.receiveFromDatastore(cd.myremcrid.getId());
+
+        //extracting mods information like title, id and date
+        MetsModsUtil mmu = new MetsModsUtil();
+
+        MCRMetaElement metaelm = mcrobj.getMetadataElement("source01s");
+        String doc_title = ((MCRMetaLangText) metaelm.getElement(0)).getText();
+
+        metaelm = mcrobj.getMetadataElement("source12s");
+        MCRMetaHistoryDate mcrdate = (MCRMetaHistoryDate) metaelm.getElement(0);
+        String doc_date = mcrdate.getText();
+
+        Element mods = mmu.init_mods(cd.mysemcrid.getId(), doc_title, "Quelle", "siehe Signatur", doc_date);
+
+        //now get the existing mets file
+
+        MCRFilesystemNode node = MCRFilesystemNode.getRootNode(cd.mysemcrid.getId());
+        MCRDirectory dir = (MCRDirectory) node;
+        MCRFile mcrfile = (MCRFile) dir.getChild(metsfile);
+
+        //if mets file wasn't found, generate error page and return
+
+        if (mcrfile == null) {
+            try {
+                generateErrorPage(job.getRequest(), job.getResponse(), HttpServletResponse.SC_BAD_REQUEST, "No Mets file was found!",
+                        new MCRException("No mets file was found!"), false);
+                return;
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+
+        //if mets file exist, try to read content as JDOM
+
+        try {
+            Document metsfile = mcrfile.getContentAsJDOM();
+
+            //if tag 'dmdSec' already exist, delete the whole section
+            Element dmdSec = metsfile.getRootElement().getChild("dmdSec", MCRConstants.METS_NAMESPACE);
+            if (dmdSec != null)
+                metsfile.getRootElement().removeChild("dmdSec", MCRConstants.METS_NAMESPACE);
+
+            //merge the file with mods
+            metsfile.getRootElement().addContent(mods);
+
+            //try to give back the JDOM structure as servlet answer
+            XMLOutputter xmlout = new XMLOutputter();
+            job.getResponse().setCharacterEncoding("UTF8");
+            xmlout.output(metsfile, job.getResponse().getWriter());
+
+        } catch (MCRPersistenceException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (JDOMException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+    }
 
 }

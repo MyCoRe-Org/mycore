@@ -50,16 +50,16 @@ public class MCRAccessEventHandler extends MCREventHandlerBase {
 
     private static MCRAccessInterface AI = MCRAccessManager.getAccessImpl();
 
-    private static String storedrules = CONFIG.getString("MCR.Access.StorePermissions", "read,write,delete");
+    private static String storedrules = MCRConfiguration.instance().getString("MCR.Access.StorePermissions", "read,write,delete");
 
     // get the standard read rule from config or it's the true rule
-    private static String strReadRule = CONFIG.getString("MCR.Access.Rule.STANDARD-READ-RULE",
+    private static String strReadRule = MCRConfiguration.instance().getString("MCR.Access.Rule.STANDARD-READ-RULE",
             "<condition format=\"xml\"><boolean operator=\"true\" /></condition>");
 
     private static Element readrule = (Element) MCRXMLHelper.parseXML(strReadRule, false).getRootElement().detach();
 
     // get the standard edit rule from config or it's the true rule
-    private static String strEditRule = CONFIG.getString("MCR.Access.Rule.STANDARD-EDIT-RULE",
+    private static String strEditRule = MCRConfiguration.instance().getString("MCR.Access.Rule.STANDARD-EDIT-RULE",
             "<condition format=\"xml\"><boolean operator=\"true\" /></condition>");
 
     private static Element editrule = (Element) MCRXMLHelper.parseXML(strEditRule, false).getRootElement().detach();

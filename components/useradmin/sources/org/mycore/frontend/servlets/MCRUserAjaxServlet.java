@@ -57,9 +57,7 @@ public class MCRUserAjaxServlet extends MCRServlet {
 
     private static final long serialVersionUID = 1L;
 
-    private static final Logger LOGGER = Logger.getLogger(MCRUserMgr.class.getName());
-
-    private static final MCRConfiguration CONFIG = MCRConfiguration.instance();
+    private static Logger LOGGER = Logger.getLogger(MCRUserMgr.class.getName());
 
     /**
      * Modes: users - get all data( groups with users ) update- if username is
@@ -187,7 +185,7 @@ public class MCRUserAjaxServlet extends MCRServlet {
      *         can't be deleted.
      */
     private int removeUser(String nutzer) {
-        String rootUser = CONFIG.getString("MCR.Users.Superuser.UserName");
+        String rootUser = MCRConfiguration.instance().getString("MCR.Users.Superuser.UserName");
         if (!(nutzer.equals(rootUser))) {
             MCRUserMgr.instance().deleteUser(nutzer);
             return 0;
@@ -360,7 +358,7 @@ public class MCRUserAjaxServlet extends MCRServlet {
         json.put("error", error);
         LOGGER.debug("JSON STRING" + json.toString());
         job.getResponse().setContentType("application/x-json");
-        job.getResponse().setCharacterEncoding(CONFIG.getString("MCR.Request.CharEncoding", "UTF-8"));
+        job.getResponse().setCharacterEncoding(MCRConfiguration.instance().getString("MCR.Request.CharEncoding", "UTF-8"));
         job.getResponse().getWriter().print(json);
     }
 

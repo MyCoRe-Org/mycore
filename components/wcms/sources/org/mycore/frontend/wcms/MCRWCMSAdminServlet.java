@@ -41,6 +41,7 @@ import org.jdom.output.XMLOutputter;
 import org.jdom.xpath.XPath;
 import org.mycore.access.MCRAccessInterface;
 import org.mycore.access.MCRAccessManager;
+import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.user.MCRUser;
@@ -50,7 +51,7 @@ public class MCRWCMSAdminServlet extends MCRWCMSServlet {
 
     private static final long serialVersionUID = 1L;
 
-    private static final Logger LOGGER = Logger.getLogger(MCRWCMSAdminServlet.class);
+    private static Logger LOGGER = Logger.getLogger(MCRWCMSAdminServlet.class);
 
     /*
      * (non-Javadoc)
@@ -201,7 +202,7 @@ public class MCRWCMSAdminServlet extends MCRWCMSServlet {
     @SuppressWarnings("unchecked")
     public void generateXML_managPage(MCRSession mcrSession, Element root) {
         List<Element> rootNodes = (List<Element>) mcrSession.get("rootNodes");
-        File[] contentTemplates = new File((CONFIG.getString("MCR.templatePath") + "content/").replace('/', File.separatorChar))
+        File[] contentTemplates = new File((MCRConfiguration.instance().getString("MCR.templatePath") + "content/").replace('/', File.separatorChar))
                 .listFiles();
         root.addContent(new Element("userRealName").setText(mcrSession.get("userRealName").toString()));
         root.addContent(new Element("userClass").setText(mcrSession.get("userClass").toString()));
@@ -231,7 +232,7 @@ public class MCRWCMSAdminServlet extends MCRWCMSServlet {
         String error;
 
         try {
-            File logFile = new File(CONFIG.getString("MCR.WCMS.logFile").replace('/', File.separatorChar));
+            File logFile = new File(MCRConfiguration.instance().getString("MCR.WCMS.logFile").replace('/', File.separatorChar));
 
             if (!logFile.exists()) {
                 error = "Logfile nicht gefunden!";
@@ -256,7 +257,7 @@ public class MCRWCMSAdminServlet extends MCRWCMSServlet {
 
     public void generateXML_saveGlobal(HttpServletRequest request, HttpServletResponse response) {
         try {
-            String pathToNavi = new String(CONFIG.getString("MCR.navigationFile").replace('/', File.separatorChar));
+            String pathToNavi = new String(MCRConfiguration.instance().getString("MCR.navigationFile").replace('/', File.separatorChar));
             Document naviBase = new Document();
             naviBase = XMLFile2JDOM(pathToNavi);
 
@@ -277,7 +278,7 @@ public class MCRWCMSAdminServlet extends MCRWCMSServlet {
                 // save changed naviBase
                 NaviBaseRoot.setAttribute("template", defaultTemplateAIF);
 
-                File navigationBase = new File(CONFIG.getString("MCR.navigationFile").replace('/', File.separatorChar));
+                File navigationBase = new File(MCRConfiguration.instance().getString("MCR.navigationFile").replace('/', File.separatorChar));
                 XMLOutputter xmlOut = new XMLOutputter(Format.getRawFormat().setTextMode(Format.TextMode.PRESERVE).setEncoding("UTF-8"));
                 xmlOut.output(naviBase, new FileOutputStream(navigationBase));
             }

@@ -40,17 +40,18 @@ import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
 
+import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 
 public class MCRWCMSFileUploadServlet extends MCRWCMSServlet {
     private static final long serialVersionUID = 1L;
 
-    private static final File DOCUMENT_DIR = new File(CONFIG.getString("MCR.WCMS.documentPath").replace('/', File.separatorChar));
+    private static File DOCUMENT_DIR = new File(MCRConfiguration.instance().getString("MCR.WCMS.documentPath").replace('/', File.separatorChar));
 
-    private static final File IMAGE_DIR = new File(CONFIG.getString("MCR.WCMS.imagePath").replace('/', File.separatorChar));
+    private static File IMAGE_DIR = new File(MCRConfiguration.instance().getString("MCR.WCMS.imagePath").replace('/', File.separatorChar));
 
-    private static final Logger LOGGER = Logger.getLogger(MCRWCMSFileUploadServlet.class);
+    private static Logger LOGGER = Logger.getLogger(MCRWCMSFileUploadServlet.class);
 
     /**
      * Main program called by doGet and doPost.
@@ -59,7 +60,7 @@ public class MCRWCMSFileUploadServlet extends MCRWCMSServlet {
         boolean isMultiPart = ServletFileUpload.isMultipartContent(request);
 
         if (isMultiPart) {
-            int fileMaxSize = CONFIG.getInt("MCR.WCMS.maxUploadFileSize");
+            int fileMaxSize = MCRConfiguration.instance().getInt("MCR.WCMS.maxUploadFileSize");
 
             FileItemFactory factory = new DiskFileItemFactory();
             ServletFileUpload upload = new ServletFileUpload(factory);

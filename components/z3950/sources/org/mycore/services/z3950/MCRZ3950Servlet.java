@@ -25,8 +25,6 @@ public class MCRZ3950Servlet extends MCRServlet {
 
     private static final long serialVersionUID = 10137452L;
 
-    private static MCRConfiguration config = MCRConfiguration.instance();
-
     private static Logger logger = Logger.getLogger(MCRZ3950Servlet.class);
 
     // Z3950-Anfrage (find), soll im Format "Prefix" sein
@@ -90,7 +88,7 @@ public class MCRZ3950Servlet extends MCRServlet {
 
        try {
            // check if property is set, else Exception is thrown
-           service = (MCRZ3950Query) config.getInstanceOf(MCR_QUERYSERVICE);
+           service = (MCRZ3950Query) MCRConfiguration.instance().getInstanceOf(MCR_QUERYSERVICE);
        } catch (MCRConfigurationException mcrx) {
            logger.fatal("Missing configuration item: " + MCR_QUERYSERVICE + ".", mcrx);
            return;

@@ -72,16 +72,13 @@ public class MCRServlet extends HttpServlet {
 
     private static final long serialVersionUID = 1L;
 
-    // Some configuration details
-    protected static final MCRConfiguration CONFIG = MCRConfiguration.instance();
-
     private static Logger LOGGER = Logger.getLogger(MCRServlet.class);
 
     private static String BASE_URL;
 
     private static String SERVLET_URL;
 
-    private static final boolean ENABLE_BROWSER_CACHE = CONFIG.getBoolean("MCR.Servlet.BrowserCache.enable", false);
+    private static final boolean ENABLE_BROWSER_CACHE = MCRConfiguration.instance().getBoolean("MCR.Servlet.BrowserCache.enable", false);
 
     private static MCRLayoutService LAYOUT_SERVICE;
 
@@ -129,7 +126,7 @@ public class MCRServlet extends HttpServlet {
         String requestURL = req.getRequestURL().toString();
         int pos = requestURL.indexOf(contextPath, 9);
 
-        BASE_URL = CONFIG.getString("MCR.baseurl", requestURL.substring(0, pos) + contextPath);
+        BASE_URL = MCRConfiguration.instance().getString("MCR.baseurl", requestURL.substring(0, pos) + contextPath);
         if (!BASE_URL.endsWith("/"))
             BASE_URL = BASE_URL + "/";
         SERVLET_URL = BASE_URL + "servlets/";
@@ -204,7 +201,7 @@ public class MCRServlet extends HttpServlet {
      *                for errors from the servlet engine.
      */
     private void doGetPost(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
-        if (CONFIG == null) {
+        if (MCRConfiguration.instance() == null) {
             // removes NullPointerException below, if somehow Servlet is not yet
             // intialized
             init();
@@ -215,7 +212,7 @@ public class MCRServlet extends HttpServlet {
 
         if (ReqCharEncoding == null) {
             // Set default to UTF-8
-            ReqCharEncoding = CONFIG.getString("MCR.Request.CharEncoding", "UTF-8");
+            ReqCharEncoding = MCRConfiguration.instance().getString("MCR.Request.CharEncoding", "UTF-8");
             req.setCharacterEncoding(ReqCharEncoding);
             LOGGER.debug("Setting ReqCharEncoding to: " + ReqCharEncoding);
         }
@@ -510,8 +507,8 @@ public class MCRServlet extends HttpServlet {
     protected long getLastModified(HttpServletRequest request) {
         if (ENABLE_BROWSER_CACHE) {
             // we can cache every (local) request
-            long lastModified = (MCRSessionMgr.getCurrentSession().getLoginTime() > CONFIG.getSystemLastModified()) ? MCRSessionMgr
-                    .getCurrentSession().getLoginTime() : CONFIG.getSystemLastModified();
+            long lastModified = (MCRSessionMgr.getCurrentSession().getLoginTime() > MCRConfiguration.instance().getSystemLastModified()) ? MCRSessionMgr
+                    .getCurrentSession().getLoginTime() : MCRConfiguration.instance().getSystemLastModified();
             LOGGER.info("LastModified: " + lastModified);
             return lastModified;
         }

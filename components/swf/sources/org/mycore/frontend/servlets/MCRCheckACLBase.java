@@ -31,6 +31,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
+import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
@@ -268,8 +269,8 @@ abstract public class MCRCheckACLBase extends MCRCheckBase {
         }
 
         // prepare editor with error messages
-        String pagedir = CONFIG.getString("MCR.SWF.PageDir", "");
-        String myfile = pagedir + CONFIG.getString("MCR.SWF.PageErrorFormular", "editor_error_formular.xml");
+        String pagedir = MCRConfiguration.instance().getString("MCR.SWF.PageDir", "");
+        String myfile = pagedir + MCRConfiguration.instance().getString("MCR.SWF.PageErrorFormular", "editor_error_formular.xml");
         Document jdom = null;
 
         try {
