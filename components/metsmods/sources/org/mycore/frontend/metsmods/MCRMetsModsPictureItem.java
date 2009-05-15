@@ -246,13 +246,11 @@ public class MCRMetsModsPictureItem extends JPanel{
 		
 		orderlabel.addFocusListener(new FocusListener(){
 
-			@Override
 			public void focusGained(FocusEvent arg0) {
 				// TODO Auto-generated method stub
 				
 			}
 
-			@Override
 			public void focusLost(FocusEvent arg0) {
 				// TODO Auto-generated method stub
 				changeOL();

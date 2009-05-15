@@ -324,11 +324,9 @@ class MCRWebCLIContainer {
             }
         }
 
-        @Override
         public void close() {
         }
 
-        @Override
         public boolean requiresLayout() {
             return false;
         }
