@@ -95,6 +95,7 @@ public class MCRHIBLinkTableStore implements MCRLinkTableInterface {
         if (l == null) {
             l = new MCRLINKHREF();
             l.setKey(pk);
+           session.save(l);
         }
         l.setMcrattr(attr);
         logger.debug("Inserting " + from + "/" + to + "/" + type + " into database MCRLINKHREF");
@@ -116,7 +117,7 @@ public class MCRHIBLinkTableStore implements MCRLinkTableInterface {
             throw new MCRPersistenceException("The from value is null or empty.");
         }
         StringBuffer sb = new StringBuffer();
-        sb.append("delete from ").append(classname).append(" where MCRFROM = '").append(from).append("'");
+        sb.append("from ").append(classname).append(" where MCRFROM = '").append(from).append("'");
         if ((to != null) && ((to = to.trim()).length() > 0)) {
             sb.append(" and MCRTO = '").append(to).append("'");
         }
@@ -125,10 +126,11 @@ public class MCRHIBLinkTableStore implements MCRLinkTableInterface {
         }
         logger.debug("Deleting " + from + " from database MCRLINKHREF");
         Session session = getSession();
-        int deleted = session.createQuery(sb.toString()).executeUpdate();
-        logger.debug((new Integer(deleted)).toString() + " items deleted.");
+        Iterator<?> it = session.createQuery(sb.toString()).iterate();
+        while(it.hasNext()){
+        	session.delete(it.next());
+        }
     }
-
     /**
      * The method count the number of references with '%from%' and 'to' and
      * optional 'type' and optional 'restriction%' values of the table.
