@@ -33,7 +33,6 @@ import java.io.OutputStream;
 import java.io.Writer;
 import java.util.Enumeration;
 import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -71,9 +70,6 @@ import org.apache.xml.utils.WrappedRuntimeException;
 import org.jdom.Document;
 import org.jdom.transform.JDOMResult;
 import org.jdom.transform.JDOMSource;
-import org.w3c.dom.Node;
-import org.xml.sax.SAXException;
-
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
@@ -86,12 +82,14 @@ import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
 import org.mycore.user.MCRUser;
 import org.mycore.user.MCRUserMgr;
+import org.w3c.dom.Node;
+import org.xml.sax.SAXException;
 
 /**
  * Does the layout for other MyCoRe servlets by transforming XML input to
  * various output formats, using XSL stylesheets.
  * 
- * @author Frank Lützenkirchen
+ * @author Frank Lï¿½tzenkirchen
  * @author Thomas Scheffler (yagee)
  * 
  * @version $Revision$ $Date: 2008-05-21 15:53:52 +0200 (Mi, 21. Mai
@@ -100,7 +98,8 @@ import org.mycore.user.MCRUserMgr;
 public class MCRLayoutService implements org.apache.xalan.trace.TraceListener {
 
     /** A cache of already compiled stylesheets */
-    private static MCRCache STYLESHEETS_CACHE = new MCRCache(MCRConfiguration.instance().getInt("MCR.LayoutService.XSLCacheSize", 100), "XSLT Stylesheets");
+    private static MCRCache STYLESHEETS_CACHE = new MCRCache(MCRConfiguration.instance().getInt("MCR.LayoutService.XSLCacheSize", 100),
+            "XSLT Stylesheets");
 
     private static MCRXMLResource XML_RESOURCE = MCRXMLResource.instance();
 
@@ -259,7 +258,8 @@ public class MCRLayoutService implements org.apache.xalan.trace.TraceListener {
         return out.getDocument();
     }
 
-    private void transform(HttpServletResponse res, Source sourceXML, String docType, Properties parameters, Templates stylesheet) throws IOException {
+    private void transform(HttpServletResponse res, Source sourceXML, String docType, Properties parameters, Templates stylesheet)
+            throws IOException {
         Transformer transformer = buildTransformer(stylesheet);
         setXSLParameters(transformer, parameters);
 
@@ -279,7 +279,8 @@ public class MCRLayoutService implements org.apache.xalan.trace.TraceListener {
         }
     }
 
-    private void transform(HttpServletResponse res, Source sourceXML, String docType, Properties parameters, String resourceName) throws IOException {
+    private void transform(HttpServletResponse res, Source sourceXML, String docType, Properties parameters, String resourceName)
+            throws IOException {
         Templates stylesheet = buildCompiledStylesheet(resourceName);
         transform(res, sourceXML, docType, parameters, stylesheet);
     }
@@ -379,8 +380,9 @@ public class MCRLayoutService implements org.apache.xalan.trace.TraceListener {
         HttpSession session = request.getSession(false);
         MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
         if (session != null) {
-            for (Enumeration e = session.getAttributeNames(); e.hasMoreElements();) {
-                String name = (String) (e.nextElement());
+            for (@SuppressWarnings("unchecked")
+            Enumeration<String> e = session.getAttributeNames(); e.hasMoreElements();) {
+                String name = e.nextElement();
                 if (name.startsWith("XSL."))
                     props.put(name.substring(4), session.getAttribute(name));
             }
@@ -391,14 +393,16 @@ public class MCRLayoutService implements org.apache.xalan.trace.TraceListener {
                 props.put(key.substring(4), entry.getValue());
             }
         }
-        for (Enumeration e = request.getParameterNames(); e.hasMoreElements();) {
-            String name = e.nextElement().toString();
+        for (@SuppressWarnings("unchecked")
+        Enumeration<String> e = request.getParameterNames(); e.hasMoreElements();) {
+            String name = e.nextElement();
             if (name.startsWith("XSL.") && !name.endsWith(".SESSION")) {
                 props.put(name.substring(4), request.getParameter(name));
             }
         }
-        for (Enumeration e = request.getAttributeNames(); e.hasMoreElements();) {
-            String name = e.nextElement().toString();
+        for (@SuppressWarnings("unchecked")
+        Enumeration<String> e = request.getAttributeNames(); e.hasMoreElements();) {
+            String name = e.nextElement();
             if (name.startsWith("XSL.") && !name.endsWith(".SESSION")) {
                 final Object attributeValue = request.getAttribute(name);
                 if (attributeValue != null)
@@ -437,7 +441,8 @@ public class MCRLayoutService implements org.apache.xalan.trace.TraceListener {
     private Templates buildCompiledStylesheet(String resource) {
         Templates stylesheet = null;
         try {
-            stylesheet = (Templates) (STYLESHEETS_CACHE.getIfUpToDate(resource, XML_RESOURCE.getLastModified(resource, this.getClass().getClassLoader())));
+            stylesheet = (Templates) (STYLESHEETS_CACHE.getIfUpToDate(resource, XML_RESOURCE.getLastModified(resource, this.getClass()
+                    .getClassLoader())));
         } catch (IOException e) {
             LOGGER.warn("Could not determine last modified date of resource " + resource);
         }
@@ -531,10 +536,10 @@ public class MCRLayoutService implements org.apache.xalan.trace.TraceListener {
      *            the XSL parameters as name-value pairs
      */
     private void setXSLParameters(Transformer transformer, Properties parameters) {
-        Enumeration names = parameters.propertyNames();
+        Enumeration<?> names = parameters.propertyNames();
 
         while (names.hasMoreElements()) {
-            String name = (String) (names.nextElement());
+            String name = names.nextElement().toString();
             String value = parameters.getProperty(name);
 
             transformer.setParameter(name, value);
@@ -554,7 +559,8 @@ public class MCRLayoutService implements org.apache.xalan.trace.TraceListener {
      * @param response
      *            the response object to send the result to
      */
-    private void transform(Source xml, Templates xsl, Transformer transformer, HttpServletResponse response) throws IOException, MCRException {
+    private void transform(Source xml, Templates xsl, Transformer transformer, HttpServletResponse response) throws IOException,
+            MCRException {
 
         // Set content type from "<xsl:output media-type = "...">
         // Set char encoding from "<xsl:output encoding = "...">
@@ -673,7 +679,8 @@ public class MCRLayoutService implements org.apache.xalan.trace.TraceListener {
      * mode.
      */
     public void selected(SelectionEvent ev) {
-        String log = "Selection <xsl:" + ev.m_styleNode.getTagName() + " " + ev.m_attributeName + "=\"" + ev.m_xpath.getPatternString() + "\">";
+        String log = "Selection <xsl:" + ev.m_styleNode.getTagName() + " " + ev.m_attributeName + "=\"" + ev.m_xpath.getPatternString()
+                + "\">";
         LOGGER.debug(log);
         try {
             if ("true".equals(ev.m_processor.getParameter("DEBUG")))
