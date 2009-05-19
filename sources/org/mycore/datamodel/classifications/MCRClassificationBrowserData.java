@@ -391,17 +391,10 @@ public class MCRClassificationBrowserData {
         String browserClass = "";
 
         LOGGER.debug("query classification links");
-        final Map<MCRCategoryID, Boolean> countMap = new HashMap<MCRCategoryID, Boolean>();
-        for (MCRCategoryID classID : getClassificationPool().getAllIDs()) {
-            MCRCategory classif = getClassificationPool().getClassificationAsPojo(classID, false);
-            countMap.putAll(MCRCategLinkServiceFactory.getInstance().hasLinks(classif));
-        }
-
-        for (MCRCategoryID id : countMap.keySet()) {
-            if (!id.isRootID())
-                continue;
-            LOGGER.debug("get classification " + id);
-            MCRCategory classif = getClassificationPool().getClassificationAsPojo(id, false);
+        MCRClassificationPool classificationPool = getClassificationPool();
+        for (MCRCategoryID classID : classificationPool.getAllIDs()) {
+            MCRCategory classif = classificationPool.getClassificationAsPojo(classID, false);
+            LOGGER.debug("get classification " + classID);
             LOGGER.debug("get browse element");
             Element cli = getBrowseElement(classif);
             LOGGER.debug("get browse element ... done");
@@ -413,13 +406,13 @@ public class MCRClassificationBrowserData {
                 browserClass = "default";
             }
             // set permissions
-            if (getClassificationPool().isEdited(id) == false) {
-                if (MCRAccessManager.checkPermission(id.getRootID(), "writedb")) {
+            if (classificationPool.isEdited(classID) == false) {
+                if (MCRAccessManager.checkPermission(classID.getRootID(), "writedb")) {
                     cli.setAttribute("userCanEdit", "true");
                 } else {
                     cli.setAttribute("userCanEdit", "false");
                 }
-                if (MCRAccessManager.checkPermission(id.getRootID(), "deletedb")) {
+                if (MCRAccessManager.checkPermission(classID.getRootID(), "deletedb")) {
                     cli.setAttribute("userCanDelete", "true");
                 } else {
                     cli.setAttribute("userCanDelete", "false");
@@ -429,13 +422,13 @@ public class MCRClassificationBrowserData {
                 cli.setAttribute("userCanDelete", "true");
             }
             // set done flag
-            if (ClassUserTable.containsKey(id.getRootID())) {
-                if (ClassUserTable.get(id.getRootID()) != sessionID) {
-                    MCRSession oldsession = MCRSessionMgr.getSession(ClassUserTable.get(id.getRootID()));
+            if (ClassUserTable.containsKey(classID.getRootID())) {
+                if (ClassUserTable.get(classID.getRootID()) != sessionID) {
+                    MCRSession oldsession = MCRSessionMgr.getSession(ClassUserTable.get(classID.getRootID()));
                     if (null != oldsession)
                         cli.setAttribute("userEdited", oldsession.getCurrentUserID());
                     else {
-                        ClassUserTable.remove(id.getRootID());
+                        ClassUserTable.remove(classID.getRootID());
                         cli.setAttribute("userEdited", "false");
                     }
                 } else {
@@ -445,7 +438,7 @@ public class MCRClassificationBrowserData {
                 cli.setAttribute("userEdited", "false");
             }
 
-            if (getClassificationPool().isEdited(id)) {
+            if (classificationPool.isEdited(classID)) {
                 cli.setAttribute("edited", "true");
             } else {
                 cli.setAttribute("edited", "false");
@@ -453,8 +446,9 @@ public class MCRClassificationBrowserData {
             cli.setAttribute("browserClass", browserClass);
             setObjectTypes(browserClass);
             LOGGER.debug("counting linked objects");
+            boolean hasLinks = MCRCategLinkServiceFactory.getInstance().hasLinks(classif).get(classID).booleanValue();
             LOGGER.debug("counting linked objects ... done");
-            cli.setAttribute("hasLinks", String.valueOf(countMap.get(id).booleanValue()));
+            cli.setAttribute("hasLinks", String.valueOf(hasLinks));
             xNavtree.addContent(cli);
         }
         return new Document(xDocument);
