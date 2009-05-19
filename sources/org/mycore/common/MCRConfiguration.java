@@ -194,7 +194,16 @@ public class MCRConfiguration {
         properties = new Properties();
         depr = new Properties();
         reload(true);
-        lastModifiedFile = new File(getString("MCR.datadir"), ".systemTime");
+        final String dataDirKey = "MCR.datadir";
+        if (properties.containsKey(dataDirKey)) {
+            lastModifiedFile = new File(getString(dataDirKey), ".systemTime");
+        } else {
+            try {
+                lastModifiedFile = File.createTempFile("MyCoRe", ".systemTime");
+            } catch (IOException e) {
+                throw new MCRException("Could not create temporary file, please set property MCR.datadir");
+            }
+        }
         if (!lastModifiedFile.exists()) {
             try {
                 FileOutputStream fout = new FileOutputStream(lastModifiedFile);
