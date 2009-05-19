@@ -79,7 +79,7 @@ public class MCRIndexBrowserData {
         try {
             TYPE_CACHE_TABLE_LOCK.writeLock().lock();
             if (!TYPE_CACHE_TABLE.containsKey(objectType))
-                TYPE_CACHE_TABLE.put(objectType, new MCRCache(1000, "IndexBrowser,objectType=" + objectType));
+                TYPE_CACHE_TABLE.put(objectType, new MCRCache(1000, "IndexBrowser,objectType=" + objectType.replace(",", "_")));
         } finally {
             TYPE_CACHE_TABLE_LOCK.writeLock().unlock();
         }
