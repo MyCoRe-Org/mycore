@@ -621,6 +621,7 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
                 if (category.getLabel(labels.next().getLang()) == null)
                     labels.remove();
             }
+            previousVersion.setURI(category.getURI());
         } else {
             category.setInternalID(previousVersion.getInternalID());
         }

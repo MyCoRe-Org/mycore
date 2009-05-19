@@ -23,6 +23,7 @@
  */
 package org.mycore.datamodel.classifications2.impl;
 
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.sql.SQLException;
@@ -223,6 +224,9 @@ public class MCRCategoryDAOImplTest extends MCRHibTestCase {
         assertEquals("Label count does not match.", category2.getChildren().get(0).getLabels().size(), rootNode.getChildren().get(0)
                 .getLabels().size());
         checkLeftRightLevelValue(rootNode, 0, 0);
+        final URI germanURI = new URI("http://www.deutschland.de");
+        final MCRCategory germany = rootNode.getChildren().get(0).getChildren().get(0);
+        assertEquals("URI was not updated", germanURI, germany.getURI());
     }
 
     public void testSetLabel() {

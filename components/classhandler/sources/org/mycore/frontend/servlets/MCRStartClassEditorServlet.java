@@ -38,6 +38,7 @@ import org.jdom.output.XMLOutputter;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRSessionMgr;
+import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.datamodel.classifications.MCRClassificationBrowserData;
 import org.mycore.datamodel.classifications.MCRClassificationEditor;
 import org.mycore.datamodel.classifications2.MCRCategory;
@@ -342,12 +343,9 @@ public class MCRStartClassEditorServlet extends MCRServlet {
                     Element categs = new Element("categories");
                     MCRCategoryID id = new MCRCategoryID(classif.getId().getRootID(), categid);
                     MCRCategory cat = clE.findCategory(classif, id);
-                    LOGGER.info("URI: " + cat.getURI());
                     categs.addContent(MCRCategoryTransformer.getMetaDataElement(cat, true));
                     classRoot.addContent(categs);
                     MCRSessionMgr.getCurrentSession().put(sessionObjectID, classRoot);
-                    XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat());
-                    xout.output(classRoot, System.out);
                 } else {
                     sb.append("classification:metadata:0:children:").append(clid).append(':').append(categid);
                 }

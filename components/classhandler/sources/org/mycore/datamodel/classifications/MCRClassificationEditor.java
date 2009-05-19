@@ -163,8 +163,6 @@ public class MCRClassificationEditor {
             String newID = newCateg.getAttributeValue("ID");
             classif = MCRClassificationBrowserData.getClassificationPool().getClassificationAsPojo(MCRCategoryID.rootID(id.getRootID()),
                     true);
-            XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat());
-            xout.output(indoc, System.out);
             // check the category entry
             if (!newID.equalsIgnoreCase(id.getID())) {
                 LOGGER.error("The category ID's are different.");
@@ -178,7 +176,6 @@ public class MCRClassificationEditor {
             }
 
             MCRCategory newCategory = MCRXMLTransformer.getCategory(id.getRootID(), newCateg, 1);
-            LOGGER.info("URL: " + newCategory.getURI());
             //copy new values to old copy of category
             oldCategory.setURI(newCategory.getURI());
             oldCategory.getLabels().clear();
