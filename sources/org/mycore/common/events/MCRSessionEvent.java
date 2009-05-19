@@ -34,7 +34,7 @@ import org.mycore.common.MCRSession;
  */
 public class MCRSessionEvent {
 
-    public enum Type {
+    public static enum Type {
         activated, created, destroyed, passivated;
     }
 
