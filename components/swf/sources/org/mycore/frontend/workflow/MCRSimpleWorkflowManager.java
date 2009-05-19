@@ -53,6 +53,7 @@ import org.mycore.datamodel.metadata.MCRMetaLinkID;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.MCRObjectService;
+import org.mycore.datamodel.metadata.validator.MCREditorOutValidator;
 import org.mycore.frontend.cli.MCRDerivateCommands;
 import org.mycore.frontend.cli.MCRObjectCommands;
 import org.mycore.frontend.servlets.MCRServlet;
@@ -584,7 +585,8 @@ public class MCRSimpleWorkflowManager {
             if (fi.isFile() && fi.canRead()) {
                 Document wfDoc = MCRXMLHelper.parseURI(fn, false);
                 XPath path = new JDOMXPath("/*/service/servacls/servacl[@permission='" + permission + "']/condition");
-                List results = path.selectNodes(wfDoc);
+                @SuppressWarnings("unchecked")
+                List<Element> results = path.selectNodes(wfDoc);
                 if (results.size() > 0) {
                     return (Element) ((Element) results.get(0)).detach();
                 }

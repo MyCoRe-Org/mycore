@@ -143,11 +143,11 @@ public class MCRWCMSChooseServlet extends MCRWCMSServlet {
             action = "false";
         }
 
-        File[] contentTemplates = new File(CONFIG.getString("MCR.templatePath") + "content/".replace('/', File.separatorChar)).listFiles();
-        File[] masterTemplates = new File(CONFIG.getString("MCR.templatePath") + "master/".replace('/', File.separatorChar)).listFiles();
+        File[] contentTemplates = new File(MCRConfiguration.instance().getString("MCR.templatePath") + "content/".replace('/', File.separatorChar)).listFiles();
+        File[] masterTemplates = new File(MCRConfiguration.instance().getString("MCR.templatePath") + "master/".replace('/', File.separatorChar)).listFiles();
         template = request.getParameter("template");
 
-        File conTemp = new File(CONFIG.getString("MCR.templatePath") + "content/".replace('/', File.separatorChar));
+        File conTemp = new File(MCRConfiguration.instance().getString("MCR.templatePath") + "content/".replace('/', File.separatorChar));
         Element templates = new Element("templates");
         defaultLangContentOutput = null;
         currentLangContentOutput = null;
@@ -211,7 +211,7 @@ public class MCRWCMSChooseServlet extends MCRWCMSServlet {
          */
         try {
             SAXBuilder builder = new SAXBuilder();
-            Document doc = builder.build(CONFIG.getString("MCR.navigationFile").replace('/', File.separatorChar));
+            Document doc = builder.build(MCRConfiguration.instance().getString("MCR.navigationFile").replace('/', File.separatorChar));
             Element root = doc.getRootElement();
             validate(root);
         } catch (JDOMException jdome) {
@@ -236,7 +236,7 @@ public class MCRWCMSChooseServlet extends MCRWCMSServlet {
                     ed = sax.build(getServletContext().getRealPath("") + fs + href);
                 } else {
                     // if (mode.equals("intern")) {
-                    String edFiller = (CONFIG.getString("MCR.templatePath") + "content/").replace('/', File.separatorChar) + template;
+                    String edFiller = (MCRConfiguration.instance().getString("MCR.templatePath") + "content/").replace('/', File.separatorChar) + template;
                     ed = sax.build(edFiller);
                     System.out.println(edFiller);
                     // }

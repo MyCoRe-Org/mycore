@@ -84,7 +84,7 @@ public class MCRZipServlet extends MCRServlet {
     // The Log4J logger
     private static Logger LOGGER = Logger.getLogger(MCRZipServlet.class.getName());
 
-    private static String accessErrorPage = CONFIG.getString("MCR.Access.Page.Error");
+    private static String accessErrorPage = MCRConfiguration.instance().getString("MCR.Access.Page.Error");
 
     protected MCRXMLTableManager xmltable = null;
 

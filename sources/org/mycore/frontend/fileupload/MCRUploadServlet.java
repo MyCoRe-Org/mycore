@@ -98,8 +98,8 @@ public final class MCRUploadServlet extends MCRServlet implements Runnable {
             String host = new java.net.URL(MCRConfiguration.instance().getString("MCR.baseurl")).getHost();
             String defIP = InetAddress.getByName(host).getHostAddress();
             int defPort = 22471; // my birthday is the default upload port
-            serverIP = CONFIG.getString("MCR.FileUpload.IP", defIP);
-            serverPort = CONFIG.getInt("MCR.FileUpload.Port", defPort);
+            serverIP = MCRConfiguration.instance().getString("MCR.FileUpload.IP", defIP);
+            serverPort = MCRConfiguration.instance().getInt("MCR.FileUpload.Port", defPort);
 
             LOGGER.info("Opening server socket: ip=" + serverIP + " port=" + serverPort);
             server = new ServerSocket();

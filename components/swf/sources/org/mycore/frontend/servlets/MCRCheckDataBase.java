@@ -27,21 +27,26 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpSession;
 
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
-
+import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUtils;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.datamodel.metadata.validator.MCREditorOutValidator;
 import org.mycore.frontend.editor.MCREditorSubmission;
 import org.mycore.frontend.editor.MCRRequestParameters;
 import org.mycore.frontend.workflow.MCRSimpleWorkflowManager;
@@ -57,10 +62,12 @@ import org.mycore.frontend.workflow.MCRSimpleWorkflowManager;
  */
 abstract public class MCRCheckDataBase extends MCRCheckBase {
     private static final long serialVersionUID = 8744330302159842747L;
+
     private static Logger LOGGER = Logger.getLogger(MCRCheckDataBase.class);
-   /**
-     * This method overrides doGetPost of MCRServlet. <br />
-     */
+
+    /**
+      * This method overrides doGetPost of MCRServlet. <br />
+      */
     public void doGetPost(MCRServletJob job) throws Exception {
         // read the XML data
         MCREditorSubmission sub = (MCREditorSubmission) (job.getRequest().getAttribute("MCREditorSubmission"));
@@ -81,7 +88,7 @@ abstract public class MCRCheckDataBase extends MCRCheckBase {
         LOGGER.debug("XSL.target.param.0 = " + oldmcrid);
         LOGGER.debug("XSL.target.param.1 = " + oldtype);
         LOGGER.debug("XSL.target.param.2 = " + oldstep);
-        
+
         // get the MCRSession object for the current thread from the session
         // manager.
         MCRSession mcrSession = MCRSessionMgr.getCurrentSession();
@@ -129,6 +136,8 @@ abstract public class MCRCheckDataBase extends MCRCheckBase {
 
         // create a metadata object and prepare it
         org.jdom.Document outdoc = prepareMetadata((org.jdom.Document) indoc.clone(), ID, job, lang);
+        if (outdoc == null)
+            return;
         outxml = MCRUtils.getByteArray(outdoc);
 
         // Save the prepared metadata object
@@ -194,27 +203,41 @@ abstract public class MCRCheckDataBase extends MCRCheckBase {
      *            the MCRServletJob data
      * @param lang
      *            the current language
+     * @throws IOException 
      */
-    protected org.jdom.Document prepareMetadata(org.jdom.Document jdom_in, MCRObjectID ID, MCRServletJob job, String lang) throws Exception {
-        EditorValidator ev = new EditorValidator(jdom_in, ID);
-        Document jdom_out = ev.generateValidMyCoReObject();
-        errorHandlerValid(job, ev.getErrorLog(), ID, lang);
-        return jdom_out;
+    protected org.jdom.Document prepareMetadata(org.jdom.Document jdom_in, MCRObjectID ID, MCRServletJob job, String lang)
+            throws IOException {
+        MCREditorOutValidator ev = null;
+        try {
+            ev = new MCREditorOutValidator(jdom_in, ID);
+            Document jdom_out = ev.generateValidMyCoReObject();
+            if (LOGGER.getEffectiveLevel().isGreaterOrEqual(Level.INFO))
+                for (String logMsg : ev.getErrorLog()) {
+                    LOGGER.info(logMsg);
+                }
+            return jdom_out;
+        } catch (Exception e) {
+            List<String> errorLog = ev != null ? ev.getErrorLog() : new ArrayList<String>();
+            StringWriter sw = new StringWriter();
+            PrintWriter pw = new PrintWriter(sw);
+            e.printStackTrace(pw);
+            errorLog.add(sw.toString());
+            pw.close();
+            errorHandlerValid(job, errorLog, ID, lang);
+            return null;
+        }
     }
 
     /**
      * A method to handle valid errors.
+     * @throws IOException 
      */
-    private final void errorHandlerValid(MCRServletJob job, List<String> logtext, MCRObjectID ID, String lang) throws Exception {
-        if (logtext.size() == 0) {
-            return;
-        }
-
+    private final void errorHandlerValid(MCRServletJob job, List<String> logtext, MCRObjectID ID, String lang) throws IOException {
         // handle HttpSession
         String sessionID = "";
         HttpSession session = job.getRequest().getSession(false);
         if (session != null) {
-            String jSessionID = CONFIG.getString("MCR.Session.Param", ";jsessionid=");
+            String jSessionID = MCRConfiguration.instance().getString("MCR.Session.Param", ";jsessionid=");
             sessionID = jSessionID + session.getId();
         }
 
@@ -224,8 +247,8 @@ abstract public class MCRCheckDataBase extends MCRCheckBase {
         }
 
         // prepare editor with error messages
-        String pagedir = CONFIG.getString("MCR.SWF.PageDir", "");
-        String myfile = pagedir + CONFIG.getString("MCR.SWF.PageErrorFormular", "editor_error_formular.xml");
+        String pagedir = MCRConfiguration.instance().getString("MCR.SWF.PageDir", "");
+        String myfile = pagedir + MCRConfiguration.instance().getString("MCR.SWF.PageErrorFormular", "editor_error_formular.xml");
         org.jdom.Document jdom = null;
 
         try {
@@ -245,7 +268,8 @@ abstract public class MCRCheckDataBase extends MCRCheckBase {
             for (int i = 0; i < sectionlist.size(); i++) {
                 Element section = sectionlist.get(i);
 
-                if (!section.getAttributeValue("lang", org.jdom.Namespace.XML_NAMESPACE).equals(lang.toLowerCase())) {
+                final String sectLang = section.getAttributeValue("lang", org.jdom.Namespace.XML_NAMESPACE);
+                if (!sectLang.equals(lang) && !sectLang.equals("all")) {
                     continue;
                 }
 
@@ -258,12 +282,12 @@ abstract public class MCRCheckDataBase extends MCRCheckBase {
                 Element table = new Element("table");
                 table.setAttribute("width", "80%");
 
-                for (int j = 0; j < logtext.size(); j++) {
+                for (String logMsg : logtext) {
                     Element tr = new Element("tr");
                     Element td = new Element("td");
-                    Element el = new Element("font");
-                    el.setAttribute("color", "red");
-                    el.addContent((String) logtext.get(j));
+                    Element el = new Element("pre");
+                    el.setAttribute("style", "color:red;");
+                    el.addContent(logMsg);
                     td.addContent(el);
                     tr.addContent(td);
                     table.addContent(tr);
@@ -273,6 +297,7 @@ abstract public class MCRCheckDataBase extends MCRCheckBase {
                 section.addContent(1, center);
                 p = new Element("p");
                 section.addContent(2, p);
+                break;
             }
         } catch (org.jdom.JDOMException e) {
             throw new MCRException("Can't read editor file " + myfile + " or it has a parse error.", e);
@@ -281,5 +306,5 @@ abstract public class MCRCheckDataBase extends MCRCheckBase {
         // restart editor
         getLayoutService().doLayout(job.getRequest(), job.getResponse(), jdom);
     }
-    
+
 }

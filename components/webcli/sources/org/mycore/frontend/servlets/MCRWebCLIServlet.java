@@ -132,7 +132,7 @@ public class MCRWebCLIServlet extends MCRServlet {
     private static void printJSONObject(JSONObject json, HttpServletResponse response) throws IOException {
         LOGGER.debug("JSON STRING" + json.toString());
         response.setContentType("application/x-json");
-        response.setCharacterEncoding(CONFIG.getString("MCR.Request.CharEncoding", "UTF-8"));
+        response.setCharacterEncoding(MCRConfiguration.instance().getString("MCR.Request.CharEncoding", "UTF-8"));
         response.getWriter().print(json);
     }
 

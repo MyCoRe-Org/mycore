@@ -40,7 +40,7 @@ import org.mycore.common.events.MCRShutdownHandler.Closeable;
 
 public class MCRJMXBridge implements Closeable {
 
-    static final MCRJMXBridge SINGLETON = new MCRJMXBridge();
+    static final WeakReference<MCRJMXBridge> SINGLETON = new WeakReference<MCRJMXBridge>(new MCRJMXBridge());
 
     private static final Logger LOGGER = Logger.getLogger(MCRJMXBridge.class);
 
@@ -112,5 +112,6 @@ public class MCRJMXBridge implements Closeable {
                 e.printStackTrace();
             }
         }
+        SINGLETON.clear();
     }
 }

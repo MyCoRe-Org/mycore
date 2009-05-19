@@ -384,7 +384,7 @@ public class MCRIViewServlet extends MCRServlet {
     }
 
     private float getZoomDistance() {
-        float zoomDist = java.lang.Float.parseFloat((CONFIG.getString("MCR.Module-iview.zoomDistance")));
+        float zoomDist = java.lang.Float.parseFloat((MCRConfiguration.instance().getString("MCR.Module-iview.zoomDistance")));
         LOGGER.debug("getZoomDistance=" + java.lang.Float.toString(zoomDist));
         return zoomDist;
     }
@@ -820,7 +820,7 @@ public class MCRIViewServlet extends MCRServlet {
      *         MCRFile within MCRDirectory, false if no support
      */
     public boolean getSupport(MCRFilesystemNode node) {
-        String suppContTypes = new String(CONFIG.getString("MCR.Module-iview.SupportedContentTypes"));
+        String suppContTypes = new String(MCRConfiguration.instance().getString("MCR.Module-iview.SupportedContentTypes"));
         if (node instanceof MCRDirectory) {
             List<MCRFile> list = new Vector<MCRFile>();
             getFirstSupportedFile(list, suppContTypes, (MCRDirectory) node);
@@ -839,7 +839,7 @@ public class MCRIViewServlet extends MCRServlet {
 
     public boolean getFileSupport(MCRFile file) {
         boolean support = false;
-        String suppContTypes = new String(CONFIG.getString("MCR.Module-iview.SupportedContentTypes"));
+        String suppContTypes = new String(MCRConfiguration.instance().getString("MCR.Module-iview.SupportedContentTypes"));
         if (file instanceof MCRFile && suppContTypes.indexOf(file.getContentTypeID()) > -1)
             support = true;
         return support;

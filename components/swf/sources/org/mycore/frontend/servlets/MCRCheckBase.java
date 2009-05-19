@@ -25,10 +25,9 @@ package org.mycore.frontend.servlets;
 
 import java.util.List;
 
-import org.jdom.Document;
+import org.mycore.common.MCRConfiguration;
 import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.mycore.frontend.workflow.MCREditorOutValidator;
 import org.mycore.frontend.workflow.MCRSimpleWorkflowManager;
 import org.mycore.user.MCRUserMgr;
 
@@ -53,11 +52,11 @@ abstract public class MCRCheckBase extends MCRServlet {
     protected static MCRUserMgr UM = MCRUserMgr.instance();
 
     // pagedir
-    protected static String pagedir = CONFIG.getString("MCR.SWF.PageDir", "");
+    protected static String pagedir = MCRConfiguration.instance().getString("MCR.SWF.PageDir", "");
 
     protected List<String> errorlog;
 
-    protected static String usererrorpage = pagedir + CONFIG.getString("MCR.SWF.PageErrorUser", "editor_error_user.xml");
+    protected static String usererrorpage = pagedir + MCRConfiguration.instance().getString("MCR.SWF.PageErrorUser", "editor_error_user.xml");
 
     /**
      * The method return an URL with the next working step. If okay flag is
@@ -86,48 +85,9 @@ abstract public class MCRCheckBase extends MCRServlet {
      *            the MCRServletJob
      */
     protected void errorHandlerIO(MCRServletJob job) throws Exception {
-        String pagedir = CONFIG.getString("MCR.SWF.PageDir", "");
-        String page = CONFIG.getString("MCR.SWF.PageErrorStore", "");
+        String pagedir = MCRConfiguration.instance().getString("MCR.SWF.PageDir", "");
+        String page = MCRConfiguration.instance().getString("MCR.SWF.PageErrorStore", "");
         job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + pagedir + page));
-    }
-
-    /**
-     * provides a wrappe for editor validation and MCRObject creation.
-     * 
-     * For a new MetaDataType, e.g. MCRMetaFooBaar, create a method
-     * 
-     * <pre>
-     *     boolean checkMCRMetaFooBar(Element)
-     * </pre>
-     * 
-     * use the following methods in that method to do common tasks on element
-     * validation
-     * <ul>
-     * <li>checkMetaObject(Element,Class)</li>
-     * <li>checkMetaObjectWithLang(Element,Class)</li>
-     * <li>checkMetaObjectWithLangNotEmpty(Element,Class)</li>
-     * <li>checkMetaObjectWithLinks(Element,Class)</li>
-     * </ul>
-     * 
-     * @author Thomas Scheffler (yagee)
-     * 
-     * @version $Revision$ $Date$
-     */
-    protected class EditorValidator extends MCREditorOutValidator {
-        /**
-         * instantiate the validator with the editor input <code>jdom_in</code>.
-         * 
-         * <code>id</code> will be set as the MCRObjectID for the resulting
-         * object that can be fetched with
-         * <code>generateValidMyCoReObject()</code>
-         * 
-         * @param jdom_in
-         *            editor input
-         */
-        public EditorValidator(Document jdom_in, MCRObjectID id) {
-            super(jdom_in, id);
-        }
-
     }
 
     /**

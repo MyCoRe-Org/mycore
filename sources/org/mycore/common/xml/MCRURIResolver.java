@@ -229,6 +229,7 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
                 throw new TransformerException("Error while resolving: " + href, e);
             }
         }
+        LOGGER.warn("URI scheme not supported :" + scheme);
         return null;
     }
 
@@ -860,14 +861,12 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
 
         private static final Pattern EDITORFORMAT_PATTERN = Pattern.compile("(\\[)([^\\]]*)(\\])");
 
-        private static final MCRConfiguration CONFIG = MCRConfiguration.instance();
-
         private static final String FORMAT_CONFIG_PREFIX = CONFIG_PREFIX + "Classification.Format.";
 
         private static final String SORT_CONFIG_PREFIX = CONFIG_PREFIX + "Classification.Sort.";
 
-        private static final MCRCache categoryCache = new MCRCache(CONFIG.getInt(CONFIG_PREFIX + "Classification.CacheSize", 1000),
-                "URIResolver categories");
+        private static MCRCache categoryCache = new MCRCache(MCRConfiguration.instance().getInt(CONFIG_PREFIX + "Classification.CacheSize",
+                1000), "URIResolver categories");
 
         private static final MCRCategoryDAO DAO = MCRCategoryDAOFactory.getInstance();
 
@@ -983,13 +982,13 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
             Matcher m = EDITORFORMAT_PATTERN.matcher(editorString);
             if ((m.find()) && (m.groupCount() == 3)) {
                 String formatDef = m.group(2);
-                return CONFIG.getString(FORMAT_CONFIG_PREFIX + formatDef);
+                return MCRConfiguration.instance().getString(FORMAT_CONFIG_PREFIX + formatDef);
             }
             return null;
         }
 
         private static boolean shouldSortCategories(String classId) {
-            return CONFIG.getBoolean(SORT_CONFIG_PREFIX + classId, true);
+            return MCRConfiguration.instance().getBoolean(SORT_CONFIG_PREFIX + classId, true);
         }
 
         private static long getSystemLastModified() {

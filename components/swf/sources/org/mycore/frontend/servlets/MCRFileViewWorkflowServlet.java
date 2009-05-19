@@ -33,6 +33,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
+import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRUtils;
 import org.mycore.datamodel.ifs.MCRContentInputStream;
@@ -90,7 +91,7 @@ public class MCRFileViewWorkflowServlet extends MCRServlet {
         boolean haspriv = true;
 
         // read the file and write to output
-        String dirname = CONFIG.getString("MCR.editor_" + type + "_directory", null);
+        String dirname = MCRConfiguration.instance().getString("MCR.editor_" + type + "_directory", null);
 
         if ((dirname != null) && haspriv) {
             File in = new File(dirname, file);

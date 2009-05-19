@@ -24,8 +24,6 @@
 package org.mycore.common.events;
 
 import org.apache.log4j.Logger;
-
-import org.mycore.common.MCRConfiguration;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.metadata.MCRDerivate;
@@ -40,9 +38,6 @@ import org.mycore.datamodel.metadata.MCRObject;
  */
 public abstract class MCREventHandlerBase implements MCREventHandler {
     private static Logger logger = Logger.getLogger(MCREventHandlerBase.class);
-
-    /** configuration */
-    protected static final MCRConfiguration CONFIG = MCRConfiguration.instance();
 
     /**
      * This method handle all calls for EventHandler for the event types
