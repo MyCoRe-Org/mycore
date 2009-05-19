@@ -30,7 +30,7 @@
   <textfield id="TFzeile1024" width="48" maxlength="1024" />
 
   <panel id="RLabel">
-    <cell col="1" row="1" anchor="NORTHWEST" ref="Slang" var="@lang"
+    <cell col="1" row="1" anchor="NORTHWEST" ref="Slang" var="@xml:lang"
       default="de" />
     <cell col="2" row="1" anchor="NORTHWEST">
       <text i18n="component.classhandler.label.lang" class="editorlabel" />

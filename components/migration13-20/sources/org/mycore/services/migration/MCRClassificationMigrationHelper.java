@@ -8,6 +8,7 @@
  **/
 package org.mycore.services.migration;
 
+import java.net.URISyntaxException;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
@@ -45,7 +46,7 @@ public class MCRClassificationMigrationHelper {
 
     private static Logger LOGGER = Logger.getLogger(MCRClassificationMigrationHelper.class);
 
-    static void createCategories() {
+    static void createCategories() throws URISyntaxException {
         List<String> classIds = MCRXMLTableManager.instance().retrieveAllIDs("class");
         LOGGER.info("Migrating classifications and categories...");
         for (String classID : classIds) {

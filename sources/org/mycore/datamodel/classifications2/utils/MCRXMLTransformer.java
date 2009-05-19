@@ -23,6 +23,8 @@
  **/
 package org.mycore.datamodel.classifications2.utils;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -32,6 +34,7 @@ import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.Namespace;
 
+import static org.mycore.common.MCRConstants.XLINK_NAMESPACE;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.MCRLabel;
@@ -39,7 +42,7 @@ import org.mycore.datamodel.classifications2.impl.MCRCategoryImpl;
 
 public class MCRXMLTransformer {
 
-    public static MCRCategory getCategory(Document xml) {
+    public static MCRCategory getCategory(Document xml) throws URISyntaxException {
         MCRCategoryImpl category = new MCRCategoryImpl();
         category.setRoot(category);
         final String classID = xml.getRootElement().getAttributeValue("ID");
@@ -50,17 +53,22 @@ public class MCRXMLTransformer {
         return category;
     }
 
-    public static MCRCategory getCategory(String classID, Element e, int level) {
+    public static MCRCategory getCategory(String classID, Element e, int level) throws URISyntaxException {
         MCRCategoryImpl category = new MCRCategoryImpl();
         category.setId(new MCRCategoryID(classID, e.getAttributeValue("ID")));
         category.setLabels(getLabel(e.getChildren("label")));
         category.setLevel(level);
+        if (e.getChild("url") != null) {
+            final String uri = e.getChild("url").getAttributeValue("href", XLINK_NAMESPACE);
+            if (uri != null)
+                category.setURI(new URI(uri));
+        }
         category.setChildren(getChildCategories(classID, e.getChildren("category"), level + 1));
         return category;
     }
 
     @SuppressWarnings("unchecked")
-    private static List<MCRCategory> getChildCategories(String classID, List elements, int level) {
+    private static List<MCRCategory> getChildCategories(String classID, List elements, int level) throws URISyntaxException {
         List<MCRCategory> children = new ArrayList<MCRCategory>(elements.size());
         for (Object o : elements) {
             children.add(getCategory(classID, (Element) o, level));

@@ -25,7 +25,6 @@
 package org.mycore.datamodel.classifications;
 
 import static org.jdom.Namespace.XML_NAMESPACE;
-import static org.mycore.common.MCRConstants.XLINK_NAMESPACE;
 import static org.mycore.common.MCRConstants.XSI_NAMESPACE;
 
 import java.io.File;
@@ -37,8 +36,8 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
+import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
-
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
@@ -111,8 +110,6 @@ public class MCRClassificationEditor {
                 return false;
             }
 
-            newCateg = setNewJDOMCategElement(newCateg);
-
             final MCRCategory findCategory = findCategory(classif, newID);
             if (findCategory == null) {
                 if (!id.getID().equals("empty")) {
@@ -166,7 +163,6 @@ public class MCRClassificationEditor {
             String newID = newCateg.getAttributeValue("ID");
             classif = MCRClassificationBrowserData.getClassificationPool().getClassificationAsPojo(MCRCategoryID.rootID(id.getRootID()),
                     true);
-            newCateg = setNewJDOMCategElement(newCateg);
             // check the category entry
             if (!newID.equalsIgnoreCase(id.getID())) {
                 LOGGER.error("The category ID's are different.");
@@ -180,6 +176,8 @@ public class MCRClassificationEditor {
             }
 
             MCRCategory newCategory = MCRXMLTransformer.getCategory(id.getRootID(), newCateg, 1);
+            //copy new values to old copy of category
+            oldCategory.setURI(newCategory.getURI());
             oldCategory.getLabels().clear();
             Collection<MCRLabel> labels = newCategory.getLabels();
             oldCategory.getLabels().addAll(labels);
@@ -269,7 +267,7 @@ public class MCRClassificationEditor {
             if (!MCRClassificationBrowserData.getClassificationPool().getAllIDs().contains(MCRCategoryID.rootID(submittedID))) {
                 cli = MCRCategoryID.rootID(submittedID);
             } else {
-                LOGGER.error("Create an unique ID failed. " + cli.getRootID());
+                LOGGER.error("Create an unique ID failed. " + submittedID);
                 return false;
             }
 
@@ -277,10 +275,9 @@ public class MCRClassificationEditor {
             mycoreclass.setAttribute("noNamespaceSchemaLocation", "MCRClassification.xsd", XSI_NAMESPACE);
             mycoreclass.setAttribute("ID", cli.getRootID());
             mycoreclass.setAttribute("counter", "0");
-            List tagList = clroot.getChildren("label");
-            Element element;
-            for (int i = 0; i < tagList.size(); i++) {
-                element = (Element) tagList.get(i);
+            @SuppressWarnings("unchecked")
+            List<Element> tagList = clroot.getChildren("label");
+            for (Element element : tagList) {
                 Element newE = new Element("label");
                 newE.setAttribute("lang", element.getAttributeValue("lang"), XML_NAMESPACE);
                 newE.setAttribute("text", element.getAttributeValue("text"));
@@ -318,13 +315,11 @@ public class MCRClassificationEditor {
             LOGGER.debug("Start modify classification description for " + clid);
             Element clroot = indoc.getRootElement();
             classif = MCRClassificationBrowserData.getClassificationPool().getClassificationAsPojo(MCRCategoryID.rootID(clid), true);
-            Element element;
-            List tagList = clroot.getChildren("label");
-
             classif.getLabels().clear();
 
-            for (int i = 0; i < tagList.size(); i++) {
-                element = (Element) tagList.get(i);
+            @SuppressWarnings("unchecked")
+            List<Element> tagList = clroot.getChildren("label");
+            for (Element element : tagList) {
                 MCRLabel label = new MCRLabel();
                 label.setLang(element.getAttributeValue("lang"));
                 label.setText(element.getAttributeValue("text"));
@@ -543,21 +538,6 @@ public class MCRClassificationEditor {
         }
 
         return found;
-    }
-
-    private final Element setNewJDOMCategElement(Element newCateg) {
-        List tagList = newCateg.getChildren("label");
-        Element element;
-        for (int i = 0; i < tagList.size(); i++) {
-            element = (Element) tagList.get(i);
-            element.getAttribute("lang").setNamespace(XML_NAMESPACE);
-        }
-        // process url, if given
-        element = newCateg.getChild("url");
-        if (element != null) {
-            element.getAttribute("href").setNamespace(XLINK_NAMESPACE);
-        }
-        return newCateg;
     }
 
     public final void deleteTempFile() {

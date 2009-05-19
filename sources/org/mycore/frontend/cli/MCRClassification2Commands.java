@@ -26,6 +26,7 @@ package org.mycore.frontend.cli;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -106,9 +107,10 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
      * 
      * @param filname
      *            file in mcrclass xml format
+     * @throws URISyntaxException 
      * @see MCRCategoryDAO#addCategory(MCRCategoryID, MCRCategory)
      */
-    public static void loadFromFile(String filename) {
+    public static void loadFromFile(String filename) throws URISyntaxException {
         File file = new File(filename);
         Document xml = MCRXMLHelper.parseURI(file.getPath());
         MCRCategory category = MCRXMLTransformer.getCategory(xml);
@@ -120,9 +122,10 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
      * 
      * @param filename
      *            file in mcrclass xml format
+     * @throws URISyntaxException 
      * @see MCRCategoryDAO#replaceCategory(MCRCategory)
      */
-    public static void updateFromFile(String filename) {
+    public static void updateFromFile(String filename) throws URISyntaxException {
         File file = new File(filename);
         Document xml = MCRXMLHelper.parseURI(file.getPath());
         MCRCategory category = MCRXMLTransformer.getCategory(xml);

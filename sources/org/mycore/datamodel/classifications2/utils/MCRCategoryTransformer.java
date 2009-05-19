@@ -101,7 +101,7 @@ public class MCRCategoryTransformer {
      * @return
      */
     public static Element getEditorItems(MCRCategory cl, boolean sort, boolean emptyLeaves) {
-        return new ItemElementFactory( cl, STANDARD_LABEL, sort, emptyLeaves ).getResult();
+        return new ItemElementFactory(cl, STANDARD_LABEL, sort, emptyLeaves).getResult();
     }
 
     /**
@@ -129,7 +129,7 @@ public class MCRCategoryTransformer {
      * @return
      */
     public static Element getEditorItems(MCRCategory cl, String labelFormat, boolean sort, boolean emptyLeaves) {
-        return new ItemElementFactory( cl, labelFormat, sort, emptyLeaves ).getResult();
+        return new ItemElementFactory(cl, labelFormat, sort, emptyLeaves).getResult();
     }
 
     private static class MetaDataElementFactory {
@@ -138,7 +138,8 @@ public class MCRCategoryTransformer {
             cd.getRootElement().setAttribute("noNamespaceSchemaLocation", "MCRClassification.xsd", XSI_NAMESPACE);
             cd.getRootElement().setAttribute("ID", cl.getId().getRootID());
             cd.getRootElement().addNamespaceDeclaration(XLINK_NAMESPACE);
-            for (MCRLabel label : cl.getLabels()) {
+            MCRCategory root = cl.isClassification() ? cl : cl.getRoot();
+            for (MCRLabel label : root.getLabels()) {
                 cd.getRootElement().addContent(getElement(label));
             }
             Element categories = new Element("categories");
@@ -213,10 +214,13 @@ public class MCRCategoryTransformer {
         private static final Pattern COUNT_PATTERN = Pattern.compile("\\{count(:([^\\)]+))?\\}");
 
         private String labelFormat;
+
         private boolean emptyLeaves;
+
         private Map<MCRCategoryID, Number> countMap = null;
+
         private Element root;
-        
+
         ItemElementFactory(MCRCategory cl, String labelFormat, boolean sort, boolean emptyLeaves) {
             this.labelFormat = labelFormat;
             this.emptyLeaves = emptyLeaves;
@@ -239,16 +243,18 @@ public class MCRCategoryTransformer {
             } else if (!emptyLeaves) {
                 countMap = MCRCategLinkServiceFactory.getInstance().countLinks(cl, false);
             }
-            
+
             root = new Element("items");
             for (MCRCategory category : cl.getChildren()) {
                 addChildren(root, category);
             }
             if (sort) {
-                sortItems(root.getChildren("item"));
+                @SuppressWarnings("unchecked")
+                final List<Element> items = root.getChildren("item");
+                sortItems(items);
             }
         }
-        
+
         Element getResult() {
             return root;
         }
