@@ -1,5 +1,6 @@
 package org.mycore.services.migration;
 
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -59,7 +60,7 @@ public class MCRMigrationCommands extends MCRAbstractCommands {
         return cmds;
     }
 
-    public static void migrateClassifications(int step) throws JDOMException {
+    public static void migrateClassifications(int step) throws JDOMException, URISyntaxException {
         switch (step) {
         case 1:
             MCRClassificationMigrationHelper.createCategories();

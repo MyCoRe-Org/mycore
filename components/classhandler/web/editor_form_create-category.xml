@@ -65,7 +65,7 @@
     <cell col="1" row="4" anchor="NORTHWEST">	  
 	  <text i18n="component.classhandler.label.url" class="editorlabel"/>
 	</cell>		  	  
-    <cell col="2" row="4" anchor="NORTHWEST" ref="TFzeile1024" var="category/url/@href" default="de" />   
+    <cell col="2" row="4" anchor="NORTHWEST" ref="TFzeile1024" var="category/url/@xlink:href" default="de" />   
 	   	 	  	    	  	  
     <cell col="1" row="5" anchor="NORTHWEST"><space width="1px" height="10px" /></cell>		  
   </panel>

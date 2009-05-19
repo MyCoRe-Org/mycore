@@ -24,12 +24,15 @@
 
 package org.mycore.frontend.servlets;
 
+import static org.jdom.Namespace.XML_NAMESPACE;
+
 import java.io.IOException;
 import java.util.Properties;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.log4j.Logger;
 import org.jdom.Element;
+import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 
 import org.mycore.access.MCRAccessManager;
@@ -39,6 +42,7 @@ import org.mycore.datamodel.classifications.MCRClassificationBrowserData;
 import org.mycore.datamodel.classifications.MCRClassificationEditor;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
+import org.mycore.datamodel.classifications2.MCRLabel;
 import org.mycore.datamodel.classifications2.utils.MCRCategoryTransformer;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.editor.MCREditorSubmission;
@@ -124,11 +128,16 @@ public class MCRStartClassEditorServlet extends MCRServlet {
         String usererrorpage = pagedir + MCRConfiguration.instance().getString("MCR.classeditor_page_error_user", "editor_error_user.xml");
         String cancelpage = pagedir + MCRConfiguration.instance().getString("MCR.classeditor_page_cancel", "classeditor_cancel.xml");
         String icerrorpage = pagedir + MCRConfiguration.instance().getString("MCR.classeditor_page_error_id", "classeditor_error_clid.xml");
-        String iderrorpage = pagedir + MCRConfiguration.instance().getString("MCR.classeditor_page_error_delete", "editor_error_delete.xml");
-        String imerrorpage = pagedir + MCRConfiguration.instance().getString("MCR.classeditor_page_error_move", "classeditor_error_move.xml");
-        String imperrorpage = pagedir + MCRConfiguration.instance().getString("MCR.classeditor_page_error_import", "classeditor_error_import.xml");
-        String isaveerrorpage = pagedir + MCRConfiguration.instance().getString("MCR.classeditor_page_error_save", "classeditor_error_save.xml");
-        String ipurgeerrorpage = pagedir + MCRConfiguration.instance().getString("MCR.classeditor_page_error_purge", "classeditor_error_purge.xml");
+        String iderrorpage = pagedir
+                + MCRConfiguration.instance().getString("MCR.classeditor_page_error_delete", "editor_error_delete.xml");
+        String imerrorpage = pagedir
+                + MCRConfiguration.instance().getString("MCR.classeditor_page_error_move", "classeditor_error_move.xml");
+        String imperrorpage = pagedir
+                + MCRConfiguration.instance().getString("MCR.classeditor_page_error_import", "classeditor_error_import.xml");
+        String isaveerrorpage = pagedir
+                + MCRConfiguration.instance().getString("MCR.classeditor_page_error_save", "classeditor_error_save.xml");
+        String ipurgeerrorpage = pagedir
+                + MCRConfiguration.instance().getString("MCR.classeditor_page_error_purge", "classeditor_error_purge.xml");
 
         String referrer = job.getRequest().getHeader("Referer");
         if (referrer == null || referrer.equals("")) {
@@ -319,12 +328,26 @@ public class MCRStartClassEditorServlet extends MCRServlet {
                 if (isEdited) {
                     sb.append("session:").append(sessionObjectID);
                     Element classRoot = new Element("mycoreclass").setAttribute("ID", classif.getId().getRootID());
+                    MCRLabel label = classif.getCurrentLabel();
+                    Element le = new Element("label");
+                    le.setAttribute("lang", label.getLang(), XML_NAMESPACE);
+                    if (label.getText() != null) {
+                        le.setAttribute("text", label.getText());
+                    }
+                    if (label.getDescription() != null) {
+                        le.setAttribute("description", label.getDescription());
+                    }
+                    classRoot.addContent(le);
+
                     Element categs = new Element("categories");
                     MCRCategoryID id = new MCRCategoryID(classif.getId().getRootID(), categid);
                     MCRCategory cat = clE.findCategory(classif, id);
+                    LOGGER.info("URI: " + cat.getURI());
                     categs.addContent(MCRCategoryTransformer.getMetaDataElement(cat, true));
                     classRoot.addContent(categs);
                     MCRSessionMgr.getCurrentSession().put(sessionObjectID, classRoot);
+                    XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat());
+                    xout.output(classRoot, System.out);
                 } else {
                     sb.append("classification:metadata:0:children:").append(clid).append(':').append(categid);
                 }
