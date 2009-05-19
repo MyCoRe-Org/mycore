@@ -949,8 +949,8 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
             MCRHit hit = new MCRHit(id);
 
             for (MCRFieldDef fd : addableFields) {
-                String value = doc.get(fd.getName());
-                if (null != value) {
+                String[] values = doc.getValues(fd.getName());
+                for (String value : values) {
                     MCRFieldValue fv = new MCRFieldValue(fd, value);
                     hit.addMetaData(fv);
                 }
