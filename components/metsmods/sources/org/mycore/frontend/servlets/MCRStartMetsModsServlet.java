@@ -38,7 +38,7 @@ import org.mycore.datamodel.ifs.MCRDirectory;
 import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.ifs.MCRFilesystemNode;
 import org.mycore.frontend.fileupload.MCRSWFUploadHandlerIFS;
-import org.mycore.frontend.metsmods.MetsModsUtil;
+import org.mycore.frontend.metsmods.MCRMetsModsUtil;
 import org.mycore.frontend.servlets.MCRServletJob;
 import org.hibernate.Transaction;
 import org.jdom.*;
@@ -58,9 +58,7 @@ public class MCRStartMetsModsServlet extends MCRStartEditorServlet {
     private Transaction tx;
 
     /**
-     * public void doGetPost(MCRServletJob job) throws Exception {
-     * job.getResponse().getWriter().print("<html><head></head><body><h1>Klappt
-     * (2)!</h1></body></html>"); }
+     * public void doGetPost(MCRServletJob job) throws Exception { job.getResponse().getWriter().print("<html><head></head><body><h1>Klappt (2)!</h1></body></html>"); }
      **/
 
     private void addPicturesToList(MCRDirectory dir, ArrayList<String> list) {
@@ -113,11 +111,38 @@ public class MCRStartMetsModsServlet extends MCRStartEditorServlet {
 
             if (searchForMets(dir) == false) {
                 // build the mets.file
+                String project = cd.myremcrid.getProjectId();
+                MCRConfiguration CONFIG = MCRConfiguration.instance();
+                // owner
+                String owner = CONFIG.getString("MCR.Component.MetsMods." + project + ".owner", "");
+                if (owner.trim().length() == 0) {
+                    owner = CONFIG.getString("MCR.Component.MetsMods.owner", "");
+                }
+                // logo
+                String ownerLogo = CONFIG.getString("MCR.Component.MetsMods." + project + ".ownerLogo", "");
+                if (ownerLogo.trim().length() == 0) {
+                    ownerLogo = CONFIG.getString("MCR.Component.MetsMods.ownerLogo", "");
+                }
+                // site url
+                String ownerSiteURL = CONFIG.getString("MCR.Component.MetsMods." + project + ".ownerSiteURL", "");
+                if (ownerSiteURL.trim().length() == 0) {
+                    ownerSiteURL = CONFIG.getString("MCR.Component.MetsMods.ownerSiteURL", "");
+                }
+                // reference url
+                String referenceURL = CONFIG.getString("MCR.Component.MetsMods." + project + ".referenceURL", "");
+                if (referenceURL.trim().length() == 0) {
+                    referenceURL = CONFIG.getString("MCR.Component.MetsMods.referenceURL", "");
+                }
+                // presentation url
+                String presentationURL = CONFIG.getString("MCR.Component.MetsMods." + project + ".presentationURL", "");
+                if (presentationURL.trim().length() == 0) {
+                    presentationURL = CONFIG.getString("MCR.Component.MetsMods.presentationURL", "");
+                }
 
-                MetsModsUtil mmu = new MetsModsUtil();
+                MCRMetsModsUtil mmu = new MCRMetsModsUtil();
 
                 Element mets = mmu.init_mets(cd.mysemcrid.getId());
-                Element amdSec = mmu.init_amdSec(cd.mysemcrid.getId(), "Bach Archiv Leipzig", "LeipzigLogo", "LeipzigLogoURL", "testreference", "testpresentation");
+                Element amdSec = mmu.init_amdSec(cd.mysemcrid.getId(), owner, ownerLogo, ownerSiteURL, referenceURL, presentationURL);
 
                 mets.addContent(amdSec);
 

@@ -216,7 +216,7 @@ public class MCRMetsModsApplet extends JApplet{
 			di.close();
 			/*MetsModsUtil mmu = new MetsModsUtil();
 			ArrayList piclist = mmu.getFileList(doc);*/
-			doc = MetsModsUtil.getMetsFile(picturelist, doc);
+			doc = MCRMetsModsUtil.getMetsFile(picturelist, doc);
 			
 			XMLOutputter xmlout = new XMLOutputter();
 			//xmlout.output(doc, System.out);
@@ -246,7 +246,7 @@ public class MCRMetsModsApplet extends JApplet{
 			di.close();
 			/*MetsModsUtil mmu = new MetsModsUtil();
 			ArrayList piclist = mmu.getFileList(doc);*/
-			ArrayList piclist = MetsModsUtil.getFileList(doc);
+			ArrayList piclist = MCRMetsModsUtil.getFileList(doc);
 			/*for(int i=0;i<piclist.size();i++)
 				System.out.println(((MCRMetsModsPicture)piclist.get(i)).getPicture()+":"+((MCRMetsModsPicture)piclist.get(i)).getOrder());*/
 			return piclist;

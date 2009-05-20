@@ -24,67 +24,97 @@
 package org.mycore.frontend.servlets;
 
 import java.io.IOException;
+import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.output.XMLOutputter;
+import org.jdom.xpath.XPath;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
+import org.mycore.common.MCRSession;
+import org.mycore.common.MCRSessionMgr;
+import org.mycore.datamodel.common.MCRXMLTableManager;
 import org.mycore.datamodel.ifs.MCRDirectory;
 import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.ifs.MCRFilesystemNode;
-import org.mycore.datamodel.metadata.MCRMetaElement;
-import org.mycore.datamodel.metadata.MCRMetaHistoryDate;
-import org.mycore.datamodel.metadata.MCRMetaLangText;
-import org.mycore.datamodel.metadata.MCRObject;
-import org.mycore.frontend.metsmods.MetsModsUtil;
+import org.mycore.datamodel.metadata.MCRObjectID;
+import org.mycore.frontend.metsmods.MCRMetsModsUtil;
 
 /**
  * This servlet generate and return a XML file including mets and mods data for processing by DFGViewer.
  * 
  * @author Stefan Freitag (sasf)
- *
+ * 
  */
 
 public class MCRDFGViewerServlet extends MCRStartEditorServlet {
     private static final long serialVersionUID = 7125675689555945121L;
 
-    private static String metsfile = MCRConfiguration.instance().getString("MCR.MetsMots.ConfigFile", "mets.xml");
+    /** The logger */
+    private static Logger LOGGER = Logger.getLogger(MCRDFGViewerServlet.class.getName());
+
+    /** The XML table API */
+    static final MCRXMLTableManager tm = MCRXMLTableManager.instance();
+
+    private static String metsfile = MCRConfiguration.instance().getString("MCR.MetsMots.MetsFile", "mets.xml");
 
     public void buildMetsMods(MCRServletJob job, CommonData cd) {
-        //load MCRObject via MyCoRe-ID
-        MCRObject mcrobj = new MCRObject();
-        mcrobj.receiveFromDatastore(cd.myremcrid.getId());
 
-        //extracting mods information like title, id and date
-        MetsModsUtil mmu = new MetsModsUtil();
+        // read configuration
+        MCRConfiguration CONFIG = MCRConfiguration.instance();
+        MCRSession session = MCRSessionMgr.getCurrentSession();
+        String lang = session.getCurrentLanguage();
+        String defa = CONFIG.getString("MCR.Metadata.DefaultLang", "de");
+        String base = cd.myremcrid.getBase();
+        String type = cd.myremcrid.getTypeId();
+        // get title
+        String title = CONFIG.getString("MCR.Component.MetsMods." + base + ".title", "");
+        if (title.trim().length() == 0) {
+            title = CONFIG.getString("MCR.Component.MetsMods." + type + ".title", "");
+        }
+        title = getMetadataValue(title, cd.myremcrid, lang, defa);
+        // get display
+        String display = CONFIG.getString("MCR.Component.MetsMods." + base + ".display", "");
+        if (display.trim().length() == 0) {
+            display = CONFIG.getString("MCR.Component.MetsMods." + type + ".display", "");
+        }
+        display = getMetadataValue(display, cd.myremcrid, lang, defa);
+        // get place
+        String place = CONFIG.getString("MCR.Component.MetsMods." + base + ".place", "");
+        if (place.trim().length() == 0) {
+            place = CONFIG.getString("MCR.Component.MetsMods." + type + ".place", "");
+        }
+        place = getMetadataValue(place, cd.myremcrid, lang, defa);
+        // get date
+        String date = CONFIG.getString("MCR.Component.MetsMods." + base + ".date", "");
+        if (date.trim().length() == 0) {
+            date = CONFIG.getString("MCR.Component.MetsMods." + type + ".date", "");
+        }
+        date = getMetadataValue(date, cd.myremcrid, lang, defa);
 
-        MCRMetaElement metaelm = mcrobj.getMetadataElement("source01s");
-        String doc_title = ((MCRMetaLangText) metaelm.getElement(0)).getText();
+        // extracting mods information like title, id and date
+        MCRMetsModsUtil mmu = new MCRMetsModsUtil();
+        Element mods = mmu.init_mods(cd.mysemcrid.getId(), title, display, place, date);
 
-        metaelm = mcrobj.getMetadataElement("source12s");
-        MCRMetaHistoryDate mcrdate = (MCRMetaHistoryDate) metaelm.getElement(0);
-        String doc_date = mcrdate.getText();
-
-        Element mods = mmu.init_mods(cd.mysemcrid.getId(), doc_title, "Quelle", "siehe Signatur", doc_date);
-
-        //now get the existing mets file
+        // now get the existing mets file
 
         MCRFilesystemNode node = MCRFilesystemNode.getRootNode(cd.mysemcrid.getId());
         MCRDirectory dir = (MCRDirectory) node;
         MCRFile mcrfile = (MCRFile) dir.getChild(metsfile);
 
-        //if mets file wasn't found, generate error page and return
+        // if mets file wasn't found, generate error page and return
 
         if (mcrfile == null) {
             try {
-                generateErrorPage(job.getRequest(), job.getResponse(), HttpServletResponse.SC_BAD_REQUEST, "No Mets file was found!",
-                        new MCRException("No mets file was found!"), false);
+                generateErrorPage(job.getRequest(), job.getResponse(), HttpServletResponse.SC_BAD_REQUEST, "No Mets file was found!", new MCRException(
+                                "No mets file was found!"), false);
                 return;
             } catch (IOException e) {
                 // TODO Auto-generated catch block
@@ -92,20 +122,20 @@ public class MCRDFGViewerServlet extends MCRStartEditorServlet {
             }
         }
 
-        //if mets file exist, try to read content as JDOM
+        // if mets file exist, try to read content as JDOM
 
         try {
             Document metsfile = mcrfile.getContentAsJDOM();
 
-            //if tag 'dmdSec' already exist, delete the whole section
+            // if tag 'dmdSec' already exist, delete the whole section
             Element dmdSec = metsfile.getRootElement().getChild("dmdSec", MCRConstants.METS_NAMESPACE);
             if (dmdSec != null)
                 metsfile.getRootElement().removeChild("dmdSec", MCRConstants.METS_NAMESPACE);
 
-            //merge the file with mods
+            // merge the file with mods
             metsfile.getRootElement().addContent(mods);
 
-            //try to give back the JDOM structure as servlet answer
+            // try to give back the JDOM structure as servlet answer
             XMLOutputter xmlout = new XMLOutputter();
             job.getResponse().setCharacterEncoding("UTF8");
             xmlout.output(metsfile, job.getResponse().getWriter());
@@ -121,6 +151,41 @@ public class MCRDFGViewerServlet extends MCRStartEditorServlet {
             e.printStackTrace();
         }
 
+    }
+
+    @SuppressWarnings("unchecked")
+    private final String getMetadataValue(String conf, MCRObjectID ID, String lang, String defa) {
+        if ((conf == null) || (conf.trim().length() == 0)) {
+            return "";
+        }
+        if (!conf.startsWith("/")) {
+            return conf;
+        }
+        LOGGER.debug("Input parameter: " + conf + "  " + lang + "  " + defa);
+        try {
+            LOGGER.warn("Use lang " + lang + " for get XPath element.");
+            XPath xpathconf = XPath.newInstance(conf);
+            Document doc = tm.readDocument(ID);
+            List<Element> nodes = xpathconf.selectNodes(doc);
+            for (Element node : nodes) {
+                System.out.println(node.getName() + ":" + node.getText());
+                String mylang = node.getAttributeValue("lang", org.jdom.Namespace.XML_NAMESPACE);
+                if (mylang.compareTo(lang) == 0) {
+                    return node.getText();
+                }
+            }
+            for (Element node : nodes) {
+                System.out.println(node.getName() + ":" + node.getText());
+                String mylang = node.getAttributeValue("lang", org.jdom.Namespace.XML_NAMESPACE);
+                if (mylang.compareTo(defa) == 0) {
+                    return node.getText();
+                }
+            }
+        } catch (JDOMException je) {
+            return "";
+
+        }
+        return "";
     }
 
 }

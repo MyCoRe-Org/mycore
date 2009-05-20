@@ -33,7 +33,7 @@ import org.mycore.datamodel.metadata.MCRMetaLangText;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.metsmods.MCRMetsModsPicture;
-import org.mycore.frontend.metsmods.MetsModsUtil;
+import org.mycore.frontend.metsmods.MCRMetsModsUtil;
 import org.jdom.*;
 
 /**
@@ -123,7 +123,7 @@ public class MCRStartZoomifyServlet extends MCRStartEditorServlet{
 			if(getMetsFile(mcrid)!=null)
 			{
 				Document doc = MCRFile.getFile(getMetsFile(mcrid)).getContentAsJDOM();
-				ArrayList<MCRMetsModsPicture> list = MetsModsUtil.getFileList(doc);
+				ArrayList<MCRMetsModsPicture> list = MCRMetsModsUtil.getFileList(doc);
 				for(int j=0;j<list.size();j++)
 				{
 					MCRMetsModsPicture pic = list.get(j);
