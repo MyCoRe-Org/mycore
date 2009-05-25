@@ -233,7 +233,7 @@ public class MCRSearchServlet extends MCRServlet {
                 Element cond = new Element("condition");
                 cond.setAttribute("field", defaultSearchField);
                 cond.setAttribute("operator", defaultOperator );
-                cond.setAttribute("value", getReqParameter(request, "search", null));
+                cond.setAttribute("value", getReqParameter(request, "search", "*"));
 
                 Element b = new Element("boolean");
                 b.setAttribute("operator", "and");
