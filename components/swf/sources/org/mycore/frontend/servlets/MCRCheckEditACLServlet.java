@@ -112,21 +112,21 @@ public class MCRCheckEditACLServlet extends MCRCheckACLBase {
      *            the MCRObjectID
      */
     public final boolean storeService(org.jdom.Element outelm, MCRServletJob job, MCRObjectID ID) {
-        String fn = WFM.getDirectoryPath(ID.getBase()) + File.separator + ID.getId() + ".xml";
+        File impex = new File(WFM.getDirectoryPath(ID.getBase()), ID.getId() + ".xml");
         MCRObject obj = new MCRObject();
-        obj.setFromURI(fn);
+        obj.setFromURI(impex.toURI());
         MCRObjectService service = new MCRObjectService();
         service.setFromDOM(outelm);
         obj.setService(service);
 
         // Save the prepared MCRObject/MCRDerivate to a file
         try {
-            FileOutputStream out = new FileOutputStream(fn);
+            FileOutputStream out = new FileOutputStream(impex);
             out.write(MCRUtils.getByteArray(obj.createXML()));
             out.flush();
         } catch (IOException ex) {
             LOGGER.error(ex.getMessage());
-            LOGGER.error("Exception while store to file " + fn);
+            LOGGER.error("Exception while store to file " + impex);
             try {
                 errorHandlerIO(job);
             } catch (Exception ioe) {
@@ -136,7 +136,7 @@ public class MCRCheckEditACLServlet extends MCRCheckACLBase {
             return false;
         }
 
-        LOGGER.info("Object " + ID.getId() + " stored under " + fn + ".");
+        LOGGER.info("Object " + ID.getId() + " stored under " + impex + ".");
         return true;
     }
     /**

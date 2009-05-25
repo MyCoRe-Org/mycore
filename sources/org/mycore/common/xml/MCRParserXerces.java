@@ -24,14 +24,19 @@
 package org.mycore.common.xml;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
+import java.net.URI;
+import java.net.URL;
+import java.net.URLConnection;
 
 import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.input.SAXBuilder;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
 import org.mycore.common.MCRConfiguration;
@@ -100,7 +105,7 @@ public class MCRParserXerces implements MCRParserInterface, ErrorHandler {
      *             if XML could not be parsed
      * @return the parsed XML stream as a DOM document
      */
-    public Document parseURI(String uri) {
+    public Document parseURI(URI uri) {
         return parseURI(uri, FLAG_VALIDATION);
     }
 
@@ -115,9 +120,20 @@ public class MCRParserXerces implements MCRParserInterface, ErrorHandler {
      * @throws MCRException
      *             if XML could not be parsed
      * @return the parsed XML stream as a DOM document
+     * @throws IOException 
+     * @throws SAXException 
      */
-    public Document parseURI(String uri, boolean validate) {
-        return parse(new InputSource(uri), validate);
+    public Document parseURI(URI uri, boolean validate) {
+        InputSource inputSource = null;
+        try {
+            //use uri as a SystemID
+            inputSource = new InputSource(uri.toString());
+        } catch (Exception e) {
+            throw new MCRException(msg + uri, e);
+        }
+        if (inputSource == null)
+            throw new MCRException("Could not get " + uri);
+        return parse(inputSource, validate);
     }
 
     /**
@@ -210,9 +226,6 @@ public class MCRParserXerces implements MCRParserInterface, ErrorHandler {
         try {
             return builder.build(source);
         } catch (Exception ex) {
-            if (ex instanceof MCRException)
-                throw (MCRException) ex;
-
             throw new MCRException(msg, ex);
         }
     }

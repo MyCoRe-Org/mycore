@@ -193,7 +193,7 @@ public class MCRListWorkflowServlet extends MCRServlet {
             objid = "";
 
             try {
-                der_in = MCRXMLHelper.parseURI(derivateFile.toURI().toString(), false);
+                der_in = MCRXMLHelper.parseURI(derivateFile.toURI(), false);
                 // LOGGER.debug("Derivate file "+dername+" was readed.");
                 der = der_in.getRootElement();
                 label = der.getAttributeValue("label");
@@ -270,7 +270,7 @@ public class MCRListWorkflowServlet extends MCRServlet {
             org.jdom.Element elm = null;
 
             try {
-                workflow_in = MCRXMLHelper.parseURI(wf.toURI().toString(), false);
+                workflow_in = MCRXMLHelper.parseURI(wf.toURI(), false);
                 MCRObject obj = new MCRObject();
                 obj.setFromJDOM(workflow_in);
                 MCRObjectService service = obj.getService();

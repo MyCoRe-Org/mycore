@@ -121,7 +121,7 @@ public class MCRCategoryImplTest extends MCRTestCase {
      */
     private void loadWorldClassification() throws URISyntaxException {
         URL worlClassUrl = this.getClass().getResource(WORLD_CLASS_RESOURCE_NAME);
-        Document xml = MCRXMLHelper.parseURI(worlClassUrl.toURI().toString());
+        Document xml = MCRXMLHelper.parseURI(worlClassUrl.toURI());
         category = MCRCategoryImpl.wrapCategory(MCRXMLTransformer.getCategory(xml), null, null);
         category.calculateLeftRightAndLevel(1, 0);
     }

@@ -23,6 +23,8 @@
  **/
 package org.mycore.common.xml;
 
+import java.net.URI;
+
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRTestCase;
 
@@ -34,8 +36,8 @@ import org.mycore.common.MCRTestCase;
  */
 public class MCRParserXercesTest extends MCRTestCase {
     
-    private String xmlResource=null;
-    private String xmlResourceInvalid=null;
+    private URI xmlResource=null;
+    private URI xmlResourceInvalid=null;
     private MCRParserXerces parser=null;
 
     /* (non-Javadoc)
@@ -45,8 +47,8 @@ public class MCRParserXercesTest extends MCRTestCase {
         super.setUp();
         super.setProperty("MCR.XMLParser.ValidateSchema", "true", false);
         boolean setProperty=super.setProperty("log4j.logger.org.mycore.common.xml.MCRParserXerces", "FATAL", false);
-        xmlResource=MCRParserXercesTest.class.getResource("/MCRParserXercesTest-valid.xml").toString();
-        xmlResourceInvalid=MCRParserXercesTest.class.getResource("/MCRParserXercesTest-invalid.xml").toString();
+        xmlResource=MCRParserXercesTest.class.getResource("/MCRParserXercesTest-valid.xml").toURI();
+        xmlResourceInvalid=MCRParserXercesTest.class.getResource("/MCRParserXercesTest-invalid.xml").toURI();
         parser=new MCRParserXerces();
         if (setProperty) {
             MCRConfiguration.instance().configureLogging();

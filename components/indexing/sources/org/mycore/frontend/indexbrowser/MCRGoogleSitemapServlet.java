@@ -67,7 +67,7 @@ public final class MCRGoogleSitemapServlet extends MCRServlet {
         LOGGER.debug("Build Google check file " + fnsm);
         File fi = new File(fnsm);
         if (fi.isFile()) {
-            jdom = MCRXMLHelper.parseURI(fnsm, false);
+            jdom = MCRXMLHelper.parseURI(fi.toURI(), false);
             if (jdom == null) {
                 if (number == 1) {
                     jdom = common.buildSitemap();

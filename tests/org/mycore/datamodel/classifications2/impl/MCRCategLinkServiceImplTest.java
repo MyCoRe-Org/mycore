@@ -198,7 +198,7 @@ public class MCRCategLinkServiceImplTest extends MCRHibTestCase {
 
     private void loadWorldClassification() throws URISyntaxException {
         URL worlClassUrl = this.getClass().getResource(WORLD_CLASS_RESOURCE_NAME);
-        Document xml = MCRXMLHelper.parseURI(worlClassUrl.toURI().toString());
+        Document xml = MCRXMLHelper.parseURI(worlClassUrl.toURI());
         category = MCRXMLTransformer.getCategory(xml);
     }
 

@@ -26,6 +26,7 @@ package org.mycore.datamodel.metadata;
 import static org.mycore.common.MCRConstants.XLINK_NAMESPACE;
 import static org.mycore.common.MCRConstants.XSI_NAMESPACE;
 
+import java.net.URI;
 import java.util.Collection;
 
 import org.jdom.Document;
@@ -186,7 +187,7 @@ final public class MCRObject extends MCRBase {
      * @exception MCRException
      *                general Exception of MyCoRe
      */
-    public final void setFromURI(String uri) throws MCRException {
+    public final void setFromURI(URI uri) throws MCRException {
         setFromJDOM(MCRXMLHelper.parseURI(uri));
     }
 

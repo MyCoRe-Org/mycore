@@ -62,11 +62,13 @@ public class MCRAccessCommands extends MCRAbstractCommands {
 
         MCRCommand com = null;
 
-        com = new MCRCommand("load permissions data from file {0}", "org.mycore.frontend.cli.MCRAccessCommands.loadPermissionsFromFile String",
+        com = new MCRCommand("load permissions data from file {0}",
+                "org.mycore.frontend.cli.MCRAccessCommands.loadPermissionsFromFile String",
                 "The command loads the permissions data of the access control system with data from the file {0}.");
         command.add(com);
 
-        com = new MCRCommand("list all permissions", "org.mycore.frontend.cli.MCRAccessCommands.listAllPermissions", "List all permission entries.");
+        com = new MCRCommand("list all permissions", "org.mycore.frontend.cli.MCRAccessCommands.listAllPermissions",
+                "List all permission entries.");
         command.add(com);
 
         com = new MCRCommand("delete permission {0}", "org.mycore.frontend.cli.MCRAccessCommands.deletePermission String",
@@ -77,7 +79,8 @@ public class MCRAccessCommands extends MCRAbstractCommands {
                 "Remove all permission entries from the Access Control System.");
         command.add(com);
 
-        com = new MCRCommand("export all permissions to file {0}", "org.mycore.frontend.cli.MCRAccessCommands.exportAllPermissionsToFile String",
+        com = new MCRCommand("export all permissions to file {0}",
+                "org.mycore.frontend.cli.MCRAccessCommands.exportAllPermissionsToFile String",
                 "Export all permissions from the Access Control System to the file {0}.");
         command.add(com);
 
@@ -101,19 +104,23 @@ public class MCRAccessCommands extends MCRAbstractCommands {
                 "The command updates access rule for a given permission and all ids of a given MCRObject-Type with a given special rule");
         command.add(com);
 
-        com = new MCRCommand("delete permission {0} for id {1}", "org.mycore.frontend.cli.MCRAccessCommands.permissionDeleteForID String String",
+        com = new MCRCommand("delete permission {0} for id {1}",
+                "org.mycore.frontend.cli.MCRAccessCommands.permissionDeleteForID String String",
                 "The command delete access rule for a given id of a given permission");
         command.add(com);
 
-        com = new MCRCommand("delete all permissions for id {1}", "org.mycore.frontend.cli.MCRAccessCommands.permissionDeleteAllForID String",
+        com = new MCRCommand("delete all permissions for id {1}",
+                "org.mycore.frontend.cli.MCRAccessCommands.permissionDeleteAllForID String",
                 "The command delete all access rules for a given id");
         command.add(com);
 
-        com = new MCRCommand("delete permission {0} for selected", "org.mycore.frontend.cli.MCRAccessCommands.permissionDeleteForSelected String",
+        com = new MCRCommand("delete permission {0} for selected",
+                "org.mycore.frontend.cli.MCRAccessCommands.permissionDeleteForSelected String",
                 "The command delete access rule for a query selected set of object ids of a given permission");
         command.add(com);
 
-        com = new MCRCommand("delete all permissions for selected", "org.mycore.frontend.cli.MCRAccessCommands.permissionDeleteAllForSelected",
+        com = new MCRCommand("delete all permissions for selected",
+                "org.mycore.frontend.cli.MCRAccessCommands.permissionDeleteAllForSelected",
                 "The command delete all access rules for a query selected set of object ids");
         command.add(com);
 
@@ -170,10 +177,11 @@ public class MCRAccessCommands extends MCRAbstractCommands {
         if (!checkFilename(filename)) {
             return;
         }
+        File input = new File(filename);
 
-        LOGGER.info("Reading file " + filename + " ...");
+        LOGGER.info("Reading file " + input + " ...");
 
-        org.jdom.Document doc = MCRXMLHelper.parseURI(filename, true);
+        org.jdom.Document doc = MCRXMLHelper.parseURI(input.toURI(), true);
         org.jdom.Element rootelm = doc.getRootElement();
 
         if (!rootelm.getName().equals("mcrpermissions")) {
@@ -288,12 +296,13 @@ public class MCRAccessCommands extends MCRAbstractCommands {
         out.output(doc, fos);
     }
 
-    private static Element getRuleFromFile(String strFileRule) {
-        if (!checkFilename(strFileRule)) {
+    private static Element getRuleFromFile(String fileName) {
+        if (!checkFilename(fileName)) {
             LOGGER.warn("Wrong file format or file doesn't exist");
             return null;
         }
-        Document ruleDom = MCRXMLHelper.parseURI(strFileRule);
+        File input = new File(fileName);
+        Document ruleDom = MCRXMLHelper.parseURI(input.toURI());
         Element rule = ruleDom.getRootElement();
         if (!rule.getName().equals("condition")) {
             LOGGER.warn("ROOT element is not valid, a valid rule would be for example:");

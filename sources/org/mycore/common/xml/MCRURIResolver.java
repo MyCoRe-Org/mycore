@@ -653,13 +653,13 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
             Element fromCache = (Element) fileCache.getIfUpToDate(fileURI.toString(), file.lastModified());
 
             if (fromCache != null) {
-                return (Element) (fromCache.clone());
+                return fromCache;
             }
 
             Element parsed = MCRURIResolver.instance().parseStream(new FileInputStream(file));
             fileCache.put(fileURI.toString(), parsed);
 
-            return (Element) (parsed.clone());
+            return parsed;
         }
 
     }
@@ -1196,10 +1196,10 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
 
             // get the parameters from mycore.properties
             Properties props = MCRConfiguration.instance().getProperties("MCR.URIResolver.xslIncludes." + includePart);
-            for(Object o : props.values()) {
-                String propValue = (String)o;
+            for (Object o : props.values()) {
+                String propValue = (String) o;
                 String[] includes = propValue.split(",");
-                for(String include : includes) {
+                for (String include : includes) {
                     // create a new include element
                     Element includeElement = new Element("include", xslNamespace);
                     includeElement.setAttribute("href", include);

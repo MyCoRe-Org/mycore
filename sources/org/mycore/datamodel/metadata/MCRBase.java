@@ -25,6 +25,8 @@ package org.mycore.datamodel.metadata;
 
 import static org.mycore.common.MCRConstants.DEFAULT_ENCODING;
 
+import java.net.URI;
+
 import org.apache.log4j.Logger;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
@@ -165,7 +167,7 @@ public abstract class MCRBase {
      * @exception MCRException
      *                general Exception of MyCoRe
      */
-    public abstract void setFromURI(String uri) throws MCRException;
+    public abstract void setFromURI(URI uri) throws MCRException;
 
     /**
      * This methode read the XML input stream from a byte array into JDOM and

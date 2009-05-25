@@ -281,7 +281,7 @@ public class MCRSimpleWorkflowManager {
         org.jdom.Document workflow_in = null;
 
         try {
-            workflow_in = MCRXMLHelper.parseURI(fname.toURI().toString());
+            workflow_in = MCRXMLHelper.parseURI(fname.toURI());
             logger.debug("Readed from workflow " + fname);
         } catch (Exception ex) {
             logger.error("Error while reading XML workflow file " + filename);
@@ -583,7 +583,7 @@ public class MCRSimpleWorkflowManager {
         try {
             File fi = new File(fn);
             if (fi.isFile() && fi.canRead()) {
-                Document wfDoc = MCRXMLHelper.parseURI(fn, false);
+                Document wfDoc = MCRXMLHelper.parseURI(fi.toURI(), false);
                 XPath path = new JDOMXPath("/*/service/servacls/servacl[@permission='" + permission + "']/condition");
                 @SuppressWarnings("unchecked")
                 List<Element> results = path.selectNodes(wfDoc);
@@ -598,7 +598,7 @@ public class MCRSimpleWorkflowManager {
         }
         return null;
     }
-    
+
     /**
      * The method return page name of the next URL of the workflow.
      * @param pagedir the base directory of the WEB application
@@ -610,13 +610,13 @@ public class MCRSimpleWorkflowManager {
         sb.append(pagedir).append("editor_").append(base).append("_editor.xml");
         try {
             URL url = new URL(MCRServlet.getBaseURL() + sb.toString());
-            HttpURLConnection http = (HttpURLConnection)url.openConnection();
+            HttpURLConnection http = (HttpURLConnection) url.openConnection();
             if (http.getResponseCode() != 200) {
                 int i = base.indexOf('_');
                 sb = new StringBuffer();
                 sb.append(pagedir).append("editor_").append(base.substring(i + 1)).append("_editor.xml");
                 url = new URL(MCRServlet.getBaseURL() + sb.toString());
-                http = (HttpURLConnection)url.openConnection();
+                http = (HttpURLConnection) url.openConnection();
                 if (http.getResponseCode() != 200) {
                     sb = new StringBuffer("");
                 }

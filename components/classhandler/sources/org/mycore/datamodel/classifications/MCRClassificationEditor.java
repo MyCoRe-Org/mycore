@@ -210,23 +210,24 @@ public class MCRClassificationEditor {
      * 
      * @param bUpdate
      *            true if this operation should be a update, else false
-     * @param sFile
+     * @param fileName
      *            the name of classification file
      * @return true if all it's okay, else return false
      */
-    public boolean importClassification(boolean bUpdate, String sFile) {
+    public boolean importClassification(boolean bUpdate, String fileName) {
         LOGGER.debug("Start importNewClassification.");
         try {
             try {
-                LOGGER.info("Reading file " + sFile + " ...\n");
-                Document jdom = MCRXMLHelper.parseURI(sFile);
+                File file = new File(fileName);
+                LOGGER.info("Reading file " + file + " ...\n");
+                Document jdom = MCRXMLHelper.parseURI(file.toURI());
                 MCRCategory classification = MCRXMLTransformer.getCategory(jdom);
 
                 MCRClassificationBrowserData.getClassificationPool().updateClassification(classification);
 
                 return true;
             } catch (MCRException ex) {
-                LOGGER.error("Exception while loading from file " + sFile, ex);
+                LOGGER.error("Exception while loading from file " + fileName, ex);
                 return false;
             }
         } catch (Exception e1) {
