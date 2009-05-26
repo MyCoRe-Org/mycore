@@ -28,17 +28,11 @@ import static org.mycore.common.MCRConstants.XLINK_NAMESPACE;
 import org.mycore.common.MCRException;
 
 /**
- * This class implements all method for generic handling with the MCRMetaLink
- * part of a metadata object. The MCRMetaLink class present two types. At once a
- * reference to an URL. At second a bidirectional link between two URL's.
- * Optional you can append the reference with the label attribute. See to W3C
- * XLink Standard for more informations.
+ * This class implements all method for generic handling with the MCRMetaLink part of a metadata object. The MCRMetaLink class present two types. At once a reference to an URL. At second a bidirectional link between two URL's. Optional you can append the reference with the label attribute. See to W3C XLink Standard for more informations.
  * <p>
  * &lt;tag class="MCRMetaLink"&gt; <br>
- * &lt;subtag xlink:type="locator" xlink:href=" <em>URL</em>"
- * xlink:label="..." xlink:title="..."/&gt; <br>
- * &lt;subtag xlink:type="arc" xlink:from=" <em>URL</em>" xlink:to="URL"/&gt;
- * <br>
+ * &lt;subtag xlink:type="locator" xlink:href=" <em>URL</em>" xlink:label="..." xlink:title="..."/&gt; <br>
+ * &lt;subtag xlink:type="arc" xlink:from=" <em>URL</em>" xlink:to="URL"/&gt; <br>
  * &lt;/tag&gt; <br>
  * 
  * @author Jens Kupferschmidt
@@ -78,8 +72,7 @@ public class MCRMetaLink extends MCRMetaDefault {
 
     /**
      * This is the constructor. <br>
-     * The language element was set to <b>en </b>. All other elemnts was set to
-     * an empty value.
+     * The language element was set to <b>en </b>. All other elemnts was set to an empty value.
      */
     public MCRMetaLink() {
         super();
@@ -93,17 +86,18 @@ public class MCRMetaLink extends MCRMetaDefault {
 
     /**
      * This is the constructor. <br>
-     * The language element was set. If the value of <em>default_lang</em> is
-     * null, empty or false <b>en </b> was set. The subtag element was set to
-     * the value of <em>set_subtag<em>. If the value of <em>set_subtag</em>
-     * is null or empty an exception was throwed.
-     *
-     * @param set_datapart     the global part of the elements like 'metadata'
-     *                         or 'service' or so
-     * @param set_subtag       the name of the subtag
-     * @param default_lang     the default language
-     * @param set_inherted     a value >= 0
-     * @exception MCRException if the set_datapart or set_subtag value is null or empty
+     * The language element was set. If the value of <em>default_lang</em> is null, empty or false <b>en </b> was set. The subtag element was set to the value of <em>set_subtag<em>. If the value of <em>set_subtag</em> is null or empty an exception was throwed.
+     * 
+     * @param set_datapart
+     *            the global part of the elements like 'metadata' or 'service' or so
+     * @param set_subtag
+     *            the name of the subtag
+     * @param default_lang
+     *            the default language
+     * @param set_inherted
+     *            a value >= 0
+     * @exception MCRException
+     *                if the set_datapart or set_subtag value is null or empty
      */
     public MCRMetaLink(String set_datapart, String set_subtag, String default_lang, int set_inherted) throws MCRException {
         super(set_datapart, set_subtag, default_lang, "", set_inherted);
@@ -150,8 +144,7 @@ public class MCRMetaLink extends MCRMetaDefault {
     }
 
     /**
-     * This method set a bidirectional link with xlink:from, xlink:to and
-     * xlink:title.
+     * This method set a bidirectional link with xlink:from, xlink:to and xlink:title.
      * 
      * @param set_from
      *            the source
@@ -210,12 +203,34 @@ public class MCRMetaLink extends MCRMetaDefault {
     }
 
     /**
+     * This method set the xlink:label
+     * 
+     * @param label
+     *            the xlink:label
+     */
+    public final void setXLinkLabel(String label) {
+        if (label != null)
+            this.label = label;
+    }
+
+    /**
      * This method get the xlink:title element.
      * 
      * @return the xlink:title
      */
     public final String getXLinkTitle() {
         return title;
+    }
+
+    /**
+     * This method set the xlink:title
+     * 
+     * @param title
+     *            the xlink:title
+     */
+    public final void setXLinkTitle(String title) {
+        if (title != null)
+            this.title = title;
     }
 
     /**
@@ -237,8 +252,7 @@ public class MCRMetaLink extends MCRMetaDefault {
     }
 
     /**
-     * The methode compare this instance of MCRMetaLink with a input object of
-     * the class type MCRMetaLink. The both instances are equal, if: <br>
+     * The methode compare this instance of MCRMetaLink with a input object of the class type MCRMetaLink. The both instances are equal, if: <br>
      * <ul>
      * <br>
      * <li>for the type 'arc' the 'from' and 'to' element is equal</li>
@@ -269,14 +283,12 @@ public class MCRMetaLink extends MCRMetaDefault {
     }
 
     /**
-     * This method read the XML input stream part from a DOM part for the
-     * metadata of the document.
+     * This method read the XML input stream part from a DOM part for the metadata of the document.
      * 
      * @param element
      *            a relevant DOM element for the metadata
      * @exception MCRException
-     *                if the xlink:type is not locator or arc or if href or from
-     *                and to are null or empty
+     *                if the xlink:type is not locator or arc or if href or from and to are null or empty
      */
     public void setFromDOM(org.jdom.Element element) throws MCRException {
         super.setFromDOM(element);
@@ -309,8 +321,7 @@ public class MCRMetaLink extends MCRMetaDefault {
     }
 
     /**
-     * This method create a XML stream for all data in this class, defined by
-     * the MyCoRe XML MCRMetaLink definition for the given subtag.
+     * This method create a XML stream for all data in this class, defined by the MyCoRe XML MCRMetaLink definition for the given subtag.
      * 
      * @exception MCRException
      *                if the content of this class is not valid
@@ -352,8 +363,7 @@ public class MCRMetaLink extends MCRMetaDefault {
     }
 
     /**
-     * This method check the validation of the content of this class. The method
-     * returns <em>true</em> if
+     * This method check the validation of the content of this class. The method returns <em>true</em> if
      * <ul>
      * <li>the subtag is not null or empty
      * <li>the xlink:type not "locator" or "arc"
