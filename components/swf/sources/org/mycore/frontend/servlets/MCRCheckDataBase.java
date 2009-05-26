@@ -169,8 +169,8 @@ abstract public class MCRCheckDataBase extends MCRCheckBase {
         }
 
         // Save the prepared MCRObject/MCRDerivate to a file
+        FileOutputStream out = new FileOutputStream(fullname);
         try {
-            FileOutputStream out = new FileOutputStream(fullname);
             out.write(outxml);
             out.flush();
         } catch (IOException ex) {
@@ -179,6 +179,8 @@ abstract public class MCRCheckDataBase extends MCRCheckBase {
             errorHandlerIO(job);
 
             return false;
+        } finally {
+            out.close();
         }
 
         LOGGER.info("Object " + ID.getId() + " stored under " + fullname + ".");

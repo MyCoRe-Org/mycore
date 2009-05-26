@@ -68,7 +68,8 @@ public class MCRFileViewWorkflowServlet extends MCRServlet {
         if (requestPath == null) {
             String msg = "Error: HTTP request path is null";
             LOGGER.error(msg);
-            generateErrorPage(req, res, HttpServletResponse.SC_BAD_REQUEST, msg, new MCRException("No path was given in the request"), false);
+            generateErrorPage(req, res, HttpServletResponse.SC_BAD_REQUEST, msg, new MCRException("No path was given in the request"),
+                    false);
 
             return;
         }
@@ -76,7 +77,8 @@ public class MCRFileViewWorkflowServlet extends MCRServlet {
         if (requestPath.length() <= 1) {
             String msg = "Error: HTTP request path is empty";
             LOGGER.error(msg);
-            generateErrorPage(req, res, HttpServletResponse.SC_BAD_REQUEST, msg, new MCRException("Empty path was given in the request"), false);
+            generateErrorPage(req, res, HttpServletResponse.SC_BAD_REQUEST, msg, new MCRException("Empty path was given in the request"),
+                    false);
 
             return;
         }
@@ -99,16 +101,21 @@ public class MCRFileViewWorkflowServlet extends MCRServlet {
             if (in.isFile()) {
                 FileInputStream fin = new FileInputStream(in);
                 MCRContentInputStream cis = new MCRContentInputStream(fin);
-                byte[] header = cis.getHeader();
-                String mime = MCRFileContentTypeFactory.detectType(in.getName(), header).getMimeType();
-                LOGGER.debug("MimeType = " + mime);
-                job.getResponse().setContentType(mime);
-                fin = new FileInputStream(in);
-                job.getResponse().setContentLength((int) (in.length()));
-
                 OutputStream out = new BufferedOutputStream(job.getResponse().getOutputStream());
-                MCRUtils.copyStream(fin, out);
-                out.close();
+                try {
+                    byte[] header = cis.getHeader();
+                    String mime = MCRFileContentTypeFactory.detectType(in.getName(), header).getMimeType();
+                    LOGGER.debug("MimeType = " + mime);
+                    job.getResponse().setContentType(mime);
+                    fin = new FileInputStream(in);
+                    job.getResponse().setContentLength((int) (in.length()));
+
+                    MCRUtils.copyStream(fin, out);
+                } finally {
+                    out.close();
+                    fin.close();
+                    cis.close();
+                }
             } else {
                 LOGGER.warn("File " + in.getName() + " not found.");
             }

@@ -1383,12 +1383,14 @@ public class MCRStartEditorServlet extends MCRServlet {
 
         byte[] outxml = MCRUtils.getByteArray(der.createXML());
 
+        FileOutputStream out = new FileOutputStream(impex);
         try {
-            FileOutputStream out = new FileOutputStream(impex);
             out.write(outxml);
             out.flush();
         } catch (IOException ex) {
             LOGGER.error("Exception while store to file " + impex);
+        } finally {
+            out.close();
         }
 
         StringBuilder sb = new StringBuilder();

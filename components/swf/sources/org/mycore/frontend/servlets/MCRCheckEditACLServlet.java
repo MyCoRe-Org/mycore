@@ -50,6 +50,7 @@ import org.mycore.datamodel.metadata.MCRObjectService;
 public class MCRCheckEditACLServlet extends MCRCheckACLBase {
 
     private static final long serialVersionUID = 1L;
+
     private static Logger LOGGER = Logger.getLogger(MCRCheckEditACLServlet.class);
 
     /**
@@ -65,7 +66,7 @@ public class MCRCheckEditACLServlet extends MCRCheckACLBase {
     protected String getNextURL(MCRObjectID ID, boolean okay) throws MCRActiveLinkException {
         StringBuffer sb = new StringBuffer();
         if (okay) {
-            sb.append(WFM.getWorkflowFile(pagedir,ID.getBase()));
+            sb.append(WFM.getWorkflowFile(pagedir, ID.getBase()));
         } else {
 
             sb.append(pagedir).append(MCRConfiguration.instance().getString("MCR.SWF.PageErrorStore", "editor_error_store.xml"));
@@ -90,7 +91,8 @@ public class MCRCheckEditACLServlet extends MCRCheckACLBase {
         String appl = MCRConfiguration.instance().getString("MCR.SWF.Mail.ApplicationID", "DocPortal");
         String subject = "Automatically generated message from " + appl;
         StringBuffer text = new StringBuffer();
-        text.append("The ACL data of the MyCoRe object of type ").append(ID.getTypeId()).append(" with the ID ").append(ID.getId()).append(" in the workflow was changes.");
+        text.append("The ACL data of the MyCoRe object of type ").append(ID.getTypeId()).append(" with the ID ").append(ID.getId()).append(
+                " in the workflow was changes.");
         LOGGER.info(text.toString());
 
         try {
@@ -120,8 +122,9 @@ public class MCRCheckEditACLServlet extends MCRCheckACLBase {
         obj.setService(service);
 
         // Save the prepared MCRObject/MCRDerivate to a file
+        FileOutputStream out = null;
         try {
-            FileOutputStream out = new FileOutputStream(impex);
+            out = new FileOutputStream(impex);
             out.write(MCRUtils.getByteArray(obj.createXML()));
             out.flush();
         } catch (IOException ex) {
@@ -134,21 +137,29 @@ public class MCRCheckEditACLServlet extends MCRCheckACLBase {
             }
 
             return false;
+        } finally {
+            if (out != null)
+                try {
+                    out.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
         }
 
         LOGGER.info("Object " + ID.getId() + " stored under " + impex + ".");
         return true;
     }
+
     /**
      * check the access permission
      * @param ID the mycore ID
      * @return true if the access is set
      */
     protected boolean checkAccess(MCRObjectID ID) {
-        if (MCRAccessManager.checkPermission("create-"+ID.getBase())) {
+        if (MCRAccessManager.checkPermission("create-" + ID.getBase())) {
             return true;
         }
-        if (MCRAccessManager.checkPermission("create-"+ID.getTypeId())) {
+        if (MCRAccessManager.checkPermission("create-" + ID.getTypeId())) {
             return true;
         }
         return false;
