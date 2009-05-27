@@ -247,7 +247,7 @@ public class MCREditorOutValidator {
         }
         if (datasubtag.getAttribute("xtype") != null) {
             datasubtag.getAttribute("xtype").setNamespace(XLINK_NAMESPACE).setName("type");
-        } else if (datasubtag.getAttribute("type") != null) {
+        } else if (datasubtag.getAttribute("type") != null && datasubtag.getAttribute("type", XLINK_NAMESPACE) == null) {
             datasubtag.getAttribute("type").setNamespace(XLINK_NAMESPACE);
             LOGGER.warn("namespace add for xlink:type attribute in "+datasubtag.getName());
         }
