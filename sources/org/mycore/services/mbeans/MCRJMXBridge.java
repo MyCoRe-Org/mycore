@@ -60,6 +60,9 @@ public class MCRJMXBridge implements Closeable {
         }
         MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
         try {
+        	if (mbs.isRegistered(name)){
+            	unregister(type, component);
+            }
             mbs.registerMBean(mbean, name);
             ONAME_LIST.add(new WeakReference<ObjectName>(name));
         } catch (Exception e) {
