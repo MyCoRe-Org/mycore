@@ -782,7 +782,7 @@ final public class MCRObject extends MCRBase {
     /**
      * The method updates this object in the persistence layer.
      */
-    private final void updateThisInDatastore() throws MCRPersistenceException {
+    public final void updateThisInDatastore() throws MCRPersistenceException {
         if (!importMode || mcr_service.getDate("modifydate") == null) {
             mcr_service.setDate("modifydate");
         }
