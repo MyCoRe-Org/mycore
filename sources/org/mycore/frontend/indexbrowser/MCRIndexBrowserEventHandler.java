@@ -1,6 +1,6 @@
 /*
  * 
- * $Revision$ $Date$
+ * $Revision: 13085 $ $Date: 2008-02-06 18:27:24 +0100 (Mi, 06. Feb 2008) $
  *
  * This file is part of ***  M y C o R e  *** 
  * See http://www.mycore.de/ for details.
@@ -23,12 +23,6 @@
 
 package org.mycore.frontend.indexbrowser;
 
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.Properties;
-
-import org.mycore.common.MCRConfiguration;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventHandlerBase;
 import org.mycore.datamodel.metadata.MCRObject;
@@ -53,6 +47,7 @@ public class MCRIndexBrowserEventHandler extends MCREventHandlerBase {
      */
     protected final void handleObjectCreated(MCREvent evt, MCRObject obj) {
         MCRIndexBrowserData.deleteIndexCacheOfObjectType(getObjectType(obj));
+        MCRIndexBrowserCache.deleteIndexCacheFromHashtable(getObjectType(obj));
     }
 
     private String getObjectType(MCRObject obj) {
@@ -71,6 +66,7 @@ public class MCRIndexBrowserEventHandler extends MCREventHandlerBase {
      */
     protected final void handleObjectUpdated(MCREvent evt, MCRObject obj) {
         MCRIndexBrowserData.deleteIndexCacheOfObjectType(getObjectType(obj));
+        MCRIndexBrowserCache.deleteIndexCacheFromHashtable(getObjectType(obj));
     }
 
     /**
@@ -84,6 +80,7 @@ public class MCRIndexBrowserEventHandler extends MCREventHandlerBase {
      */
     protected final void handleObjectDeleted(MCREvent evt, MCRObject obj) {
         MCRIndexBrowserData.deleteIndexCacheOfObjectType(getObjectType(obj));
+        MCRIndexBrowserCache.deleteIndexCacheFromHashtable(getObjectType(obj));
     }
 
 }

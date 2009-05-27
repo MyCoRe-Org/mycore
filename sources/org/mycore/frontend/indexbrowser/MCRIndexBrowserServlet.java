@@ -1,6 +1,6 @@
 /*
  * 
- * $Revision$ $Date$
+ * $Revision: 15105 $ $Date: 2009-04-23 11:23:28 +0200 (Do, 23. Apr 2009) $
  *
  * This file is part of ***  M y C o R e  ***
  * See http://www.mycore.de/ for details.
@@ -24,20 +24,29 @@
 package org.mycore.frontend.indexbrowser;
 
 import java.util.Enumeration;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
 
 import org.jdom.Document;
+import org.jdom.Element;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
 
 /**
- * @author Anja Schaar, Andreas Trappe
+ * Servlet to create an xml document which is parsed by xsl
+ * to display the index browser results of the current request.
  * 
- * 
+ * @author Anja Schaar, Andreas Trappe, Matthias Eichner
  */
 public class MCRIndexBrowserServlet extends MCRServlet {
 
     private static final long serialVersionUID = 4963472470316616461L;
 
+    protected MCRIndexBrowserIncomingData incomingBrowserData;
+
+    protected MCRIndexBrowserConfig config;
+    
     protected void doGetPost(MCRServletJob job) throws Exception {
         @SuppressWarnings("unchecked")
         Enumeration<String> ee = job.getRequest().getParameterNames();
@@ -46,25 +55,63 @@ public class MCRIndexBrowserServlet extends MCRServlet {
             System.out.println("PARAM: " + param + " VALUE: " + job.getRequest().getParameter(param));
         }
 
-        String search = job.getRequest().getParameter("search");
-        String mode = getMode(job);
-        String searchclass = job.getRequest().getParameter("searchclass");
-        String fromTo = job.getRequest().getParameter("fromTo");
-        String path = job.getRequest().getParameter("path");
+        incomingBrowserData = getIncomingBrowserData(job.getRequest());
+        config = new MCRIndexBrowserConfig(incomingBrowserData.getIndex());
 
-        MCRIndexBrowserData indexbrowser = new MCRIndexBrowserData(search, mode, searchclass, fromTo, path);
-        indexbrowser.getQuery();
-        indexbrowser.getResultList();
-        Document pageContent = indexbrowser.getXMLContent();
+        Document pageContent = null;
+        // if init is true, then create an empty document, otherwise create
+        // the result list
+        if(!incomingBrowserData.isInit()) {
+            pageContent = createResultListDocument();
+        } else {
+            pageContent = createEmptyDocument();
+        }
+
         if (getProperty(job.getRequest(), "XSL.Style") == null) {
-            job.getRequest().setAttribute("XSL.Style", searchclass);
+            job.getRequest().setAttribute("XSL.Style", job.getRequest().getParameter("searchclass"));
         }
         getLayoutService().doLayout(job.getRequest(), job.getResponse(), pageContent);
     }
 
-    private String getMode(MCRServletJob job) {
-        if (job.getRequest().getParameter("mode") != null && !job.getRequest().getParameter("mode").trim().equals("")) {
-            return job.getRequest().getParameter("mode").toLowerCase().trim();
+    /**
+     * Creates a xml document with the results of the index browser.
+     * @return 
+     */
+    protected Document createResultListDocument() {
+        List<MCRIndexBrowserEntry> resultList = null;
+        if(MCRIndexBrowserCache.isCached(incomingBrowserData)) {
+            resultList = MCRIndexBrowserCache.getFromCache(incomingBrowserData);
+        } else {
+            MCRIndexBrowserSearcher searcher = new MCRIndexBrowserSearcher(incomingBrowserData, config);
+            resultList = searcher.doSearch();
+        }
+        MCRIndexBrowserXmlGenerator xmlGen = new MCRIndexBrowserXmlGenerator(resultList, incomingBrowserData, config);
+        return xmlGen.getXMLContent();
+    }
+
+    /**
+     * Creates an empty xml index browser document.
+     * @return a new empty document
+     */
+    protected Document createEmptyDocument() {
+        Element rootElement = MCRIndexBrowserXmlGenerator.buildPageElement(incomingBrowserData);
+        MCRIndexBrowserXmlGenerator.buildResultsElement(rootElement, incomingBrowserData);
+        return new Document(rootElement);
+    }
+
+    protected MCRIndexBrowserIncomingData getIncomingBrowserData(HttpServletRequest request) {
+        String search = request.getParameter("search");
+        String mode = getMode(request);
+        String index = request.getParameter("searchclass");
+        String fromTo = request.getParameter("fromTo");
+        String init = request.getParameter("init");
+
+        return new MCRIndexBrowserIncomingData(search, mode, index, fromTo, init);
+    }
+
+    private String getMode(HttpServletRequest request) {
+        if (request.getParameter("mode") != null && !request.getParameter("mode").trim().equals("")) {
+            return request.getParameter("mode").toLowerCase().trim();
         } else
             return "prefix";
     }
