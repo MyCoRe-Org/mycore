@@ -56,7 +56,7 @@ public class MCRXMLResource {
 
     private MCRXMLResource() {
         if (resourceCache == null) {
-            resourceCache = new MCRCache(MCRConfiguration.instance().getInt("MCR.MCRXMLResouce.Cache.Size", 100), "XML resources");
+            resourceCache = new MCRCache(MCRConfiguration.instance().getInt("MCR.MCRXMLResource.Cache.Size", 100), "XML resources");
         }
     }
 
@@ -112,18 +112,22 @@ public class MCRXMLResource {
         URLConnection con = getResourceURLConnection(name, classLoader);
         if (con == null)
             return null;
-        LOGGER.debug(name + " last modified: " + con.getLastModified());
-        CacheEntry entry = (CacheEntry) resourceCache.getIfUpToDate(name, con.getLastModified());
-        if (entry != null && entry.resourceURL.equals(con.getURL())) {
-            LOGGER.debug("Using cached resource " + name);
+        try {
+            LOGGER.debug(name + " last modified: " + con.getLastModified());
+            CacheEntry entry = (CacheEntry) resourceCache.getIfUpToDate(name, con.getLastModified());
+            if (entry != null && entry.resourceURL.equals(con.getURL())) {
+                LOGGER.debug("Using cached resource " + name);
+                return entry.doc;
+            }
+            entry = new CacheEntry();
+            resourceCache.put(name, entry);
+            entry.resourceURL = con.getURL();
+            Document doc = getDocument(entry.resourceURL);
+            entry.doc = doc;
             return entry.doc;
+        } finally {
+            closeURLConnection(con);
         }
-        entry = new CacheEntry();
-        resourceCache.put(name, entry);
-        entry.resourceURL = con.getURL();
-        Document doc = getDocument(con);
-        entry.doc = doc;
-        return entry.doc;
     }
 
     /**
@@ -150,7 +154,7 @@ public class MCRXMLResource {
             baos.close();
             return baos.toByteArray();
         } finally {
-            in.close();
+            closeURLConnection(con);
         }
     }
 
@@ -164,31 +168,41 @@ public class MCRXMLResource {
         return con;
     }
 
-    private Document getDocument(URLConnection con) throws JDOMException, IOException {
+    private Document getDocument(URL url) throws JDOMException, IOException {
         SAXBuilder builder = new SAXBuilder();
         builder.setValidation(false);
         builder.setEntityResolver(MCRURIResolver.instance());
-        InputStream in = con.getInputStream();
-        try {
-            Document doc = builder.build(in);
-            return doc;
-        } finally {
-            in.close();
-        }
+        Document doc = builder.build(url);
+        return doc;
     }
 
     public long getLastModified(String name, ClassLoader classLoader) throws IOException {
         URLConnection con = getResourceURLConnection(name, classLoader);
-        return con == null ? -1 : con.getLastModified();
+        try {
+            return con == null ? -1 : con.getLastModified();
+        } finally {
+            closeURLConnection(con);
+        }
     }
 
     public boolean exists(String name, ClassLoader classLoader) throws IOException {
-        return getResourceURLConnection(name, classLoader) != null;
+        final URLConnection resourceURLConnection = getResourceURLConnection(name, classLoader);
+        try {
+            return resourceURLConnection != null;
+        } finally {
+            closeURLConnection(resourceURLConnection);
+        }
     }
 
     private static class CacheEntry {
         URL resourceURL;
 
         Document doc;
+    }
+
+    private void closeURLConnection(URLConnection con) throws IOException {
+        if (con == null)
+            return;
+        con.getInputStream().close();
     }
 }
