@@ -102,7 +102,7 @@ public class MCRStaticXMLFileServlet extends MCRServlet {
 
         // For defined document types like static webpages, replace editor elements with complete editor definition
         if (docTypesMap.containsKey(type)) {
-            Document xml = MCRXMLHelper.parseURI(file.toURI().toString(), false);
+            Document xml = MCRXMLHelper.parseURI(file.toURI(), false);
             MCREditorServlet.replaceEditorElements(request, file.toURI().toURL().toString(), xml);
             getLayoutService().doLayout(request, response, xml);
         } else

@@ -24,6 +24,7 @@
 package org.mycore.common.xml;
 
 import java.io.InputStream;
+import java.net.URI;
 
 import org.jdom.Document;
 import org.mycore.common.MCRException;
@@ -47,7 +48,7 @@ public interface MCRParserInterface {
      *                general Exception of MyCoRe
      * @return a document object (DOM)
      */
-    public Document parseURI(String uri) throws MCRException;
+    public Document parseURI(URI uri) throws MCRException;
 
     /**
      * Parses an XML file from a URI and returns it as DOM. Use the given
@@ -61,7 +62,7 @@ public interface MCRParserInterface {
      *             if XML could not be parsed
      * @return the XML file as a DOM object
      */
-    public Document parseURI(String uri, boolean valid) throws MCRException;
+    public Document parseURI(URI uri, boolean valid) throws MCRException;
 
     /**
      * Parses an XML String and returns it as DOM. Use the validation value from

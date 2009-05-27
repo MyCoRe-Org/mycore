@@ -105,13 +105,17 @@ public class MCRStartEditorServlet extends MCRServlet {
 
     protected static String deletepage = pagedir + MCRConfiguration.instance().getString("MCR.SWF.PageDelete", "editor_delete.xml");
 
-    protected static String usererrorpage = pagedir + MCRConfiguration.instance().getString("MCR.SWF.PageErrorUser", "editor_error_user.xml");
+    protected static String usererrorpage = pagedir
+            + MCRConfiguration.instance().getString("MCR.SWF.PageErrorUser", "editor_error_user.xml");
 
-    protected static String mcriderrorpage = pagedir + MCRConfiguration.instance().getString("MCR.SWF.PageErrorMcrid", "editor_error_mcrid.xml");
+    protected static String mcriderrorpage = pagedir
+            + MCRConfiguration.instance().getString("MCR.SWF.PageErrorMcrid", "editor_error_mcrid.xml");
 
-    protected static String storeerrorpage = pagedir + MCRConfiguration.instance().getString("MCR.SWF.PageErrorStore", "editor_error_store.xml");
+    protected static String storeerrorpage = pagedir
+            + MCRConfiguration.instance().getString("MCR.SWF.PageErrorStore", "editor_error_store.xml");
 
-    protected static String deleteerrorpage = pagedir + MCRConfiguration.instance().getString("MCR.SWF.PageErrorDelete", "editor_error_delete.xml");
+    protected static String deleteerrorpage = pagedir
+            + MCRConfiguration.instance().getString("MCR.SWF.PageErrorDelete", "editor_error_delete.xml");
 
     // common data
     protected static class CommonData {
@@ -309,14 +313,14 @@ public class MCRStartEditorServlet extends MCRServlet {
             if (mytype.equals("dummy")) {
                 myproject = MCRConfiguration.instance().getString("MCR.SWF.Project.ID", "MCR");
             } else {
-                myproject = MCRConfiguration.instance().getString("MCR.SWF.Project.ID."+mytype, "MCR");
+                myproject = MCRConfiguration.instance().getString("MCR.SWF.Project.ID." + mytype, "MCR");
             }
         }
 
         MCRObjectID mcridnext = new MCRObjectID();
         mcridnext.setNextFreeId(myproject + "_" + mytype);
 
-        String mytypeString = "_"+mytype+"_";
+        String mytypeString = "_" + mytype + "_";
         File workdir = MCRSimpleWorkflowManager.instance().getDirectoryPath(myproject + "_" + mytype);
         String[] list = workdir.list();
 
@@ -1156,7 +1160,7 @@ public class MCRStartEditorServlet extends MCRServlet {
         try {
             if (fi.isFile() && fi.canRead()) {
                 MCRObject obj = new MCRObject();
-                obj.setFromURI(fi.toURI().toString());
+                obj.setFromURI(fi.toURI());
                 service = obj.getService().createXML();
             } else {
                 LOGGER.error("Can't read file " + fi.getAbsolutePath());
@@ -1236,7 +1240,8 @@ public class MCRStartEditorServlet extends MCRServlet {
         LOGGER.debug("MCRID (TF) = " + cd.mytfmcrid.getId());
         File outFile = new File(WFM.getDirectoryPath(cd.mytfmcrid.getBase()), cd.mytfmcrid + ".xml");
         MCRObject copyobj = new MCRObject();
-        copyobj.setFromURI(WFM.getDirectoryPath(cd.mysemcrid.getBase()) + SLASH + cd.mysemcrid + ".xml");
+        File inFile = new File(WFM.getDirectoryPath(cd.mysemcrid.getBase()), cd.mysemcrid + ".xml");
+        copyobj.setFromURI(inFile.toURI());
         copyobj.setId(cd.mytfmcrid);
         copyobj.setLabel(cd.mytfmcrid.getId());
         MCRUtils.writeJDOMToFile(copyobj.createXML(), outFile);
@@ -1367,11 +1372,10 @@ public class MCRStartEditorServlet extends MCRServlet {
             return;
         }
 
-        StringBuffer sb = new StringBuffer();
-        sb.append(WFM.getDirectoryPath(cd.myproject + "_" + cd.mytype)).append(SLASH).append(cd.mysemcrid).append(".xml");
+        File impex = new File(WFM.getDirectoryPath(cd.myproject + "_" + cd.mytype), cd.mysemcrid + ".xml");
 
         MCRDerivate der = new MCRDerivate();
-        der.setFromURI(sb.toString());
+        der.setFromURI(impex.toURI());
 
         if (cd.extparm.startsWith("####main####")) {
             der.getDerivate().getInternals().setMainDoc(cd.extparm.substring(cd.mysemcrid.getId().length() + 1 + 12, cd.extparm.length()));
@@ -1380,14 +1384,14 @@ public class MCRStartEditorServlet extends MCRServlet {
         byte[] outxml = MCRUtils.getByteArray(der.createXML());
 
         try {
-            FileOutputStream out = new FileOutputStream(sb.toString());
+            FileOutputStream out = new FileOutputStream(impex);
             out.write(outxml);
             out.flush();
         } catch (IOException ex) {
-            LOGGER.error("Exception while store to file " + sb.toString());
+            LOGGER.error("Exception while store to file " + impex);
         }
 
-        sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append(pagedir).append("editor_").append(cd.myremcrid.getTypeId()).append("_editor.xml");
         job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + sb.toString()));
     }

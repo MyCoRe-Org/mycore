@@ -23,6 +23,7 @@
 
 package org.mycore.common.xml;
 
+import java.net.URI;
 import java.util.Iterator;
 import java.util.List;
 
@@ -71,7 +72,7 @@ public class MCRXMLHelper {
      *             if XML could not be parsed
      * @return the XML file as a DOM object
      */
-    public static Document parseURI(String uri) throws MCRException {
+    public static Document parseURI(URI uri) throws MCRException {
         return getParser().parseURI(uri);
     }
 
@@ -87,7 +88,7 @@ public class MCRXMLHelper {
      *             if XML could not be parsed
      * @return the XML file as a DOM object
      */
-    public static Document parseURI(String uri, boolean valid) throws MCRException {
+    public static Document parseURI(URI uri, boolean valid) throws MCRException {
         return getParser().parseURI(uri, valid);
     }
 
@@ -211,8 +212,8 @@ public class MCRXMLHelper {
         }
 
         public static boolean equivalent(DocType d1, DocType d2) {
-            return (((d1.getPublicID() == d2.getPublicID()) || d1.getPublicID().equals(d2.getPublicID())) && ((d1.getSystemID() == d2.getSystemID()) || d1
-                    .getSystemID().equals(d2.getSystemID())));
+            return (((d1.getPublicID() == d2.getPublicID()) || d1.getPublicID().equals(d2.getPublicID())) && ((d1.getSystemID() == d2
+                    .getSystemID()) || d1.getSystemID().equals(d2.getSystemID())));
         }
 
         public static boolean equivalent(Comment c1, Comment c2) {

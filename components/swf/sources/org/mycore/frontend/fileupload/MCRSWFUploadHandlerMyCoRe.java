@@ -79,14 +79,14 @@ public class MCRSWFUploadHandlerMyCoRe extends MCRUploadHandler {
             new MCRObjectID(docId);
             this.docId = docId;
         } catch (Exception e) {
-            logger.debug("Error while creating MCRObjectID : "+docId,e);
+            logger.debug("Error while creating MCRObjectID : " + docId, e);
         }
 
         try {
             new MCRObjectID(derId);
             this.derId = derId;
         } catch (Exception e) {
-            logger.debug("Error while creating MCRObjectID : "+derId,e);
+            logger.debug("Error while creating MCRObjectID : " + derId, e);
         }
     }
 
@@ -148,14 +148,13 @@ public class MCRSWFUploadHandlerMyCoRe extends MCRUploadHandler {
         if (mainfile.length() == 0) {
             mainfile = fname;
         }
-        
+
         long myLength = fout.length();
-        if( myLength >= length )
-          return myLength;
-        else
-        {
-          fout.delete(); // Incomplete file transfer, user canceled upload
-          return 0;
+        if (myLength >= length)
+            return myLength;
+        else {
+            fout.delete(); // Incomplete file transfer, user canceled upload
+            return 0;
         }
     }
 
@@ -167,14 +166,15 @@ public class MCRSWFUploadHandlerMyCoRe extends MCRUploadHandler {
         // check for content
         if (dirname.list().length == 0) {
             dirname.delete();
-            logger.warn("No file were uploaded, delete directory " + dirname+" and return.");
+            logger.warn("No file were uploaded, delete directory " + dirname + " and return.");
             return;
         }
         // add the mainfile entry
         MCRDerivate der = new MCRDerivate();
         try {
             try {
-            der.setFromURI(dirname.getAbsolutePath() + ".xml");
+                File derXMLFile = new File(dirname.getAbsolutePath() + ".xml");
+                der.setFromURI(derXMLFile.toURI());
             } catch (Exception e) {
                 der = MCRSimpleWorkflowManager.instance().createDerivate(new MCRObjectID(docId), new MCRObjectID(derId));
             }

@@ -27,8 +27,8 @@ import static org.mycore.common.MCRConstants.XLINK_NAMESPACE;
 import static org.mycore.common.MCRConstants.XSI_NAMESPACE;
 
 import java.io.File;
+import java.net.URI;
 
-import org.apache.log4j.Logger;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
@@ -132,7 +132,7 @@ final public class MCRDerivate extends MCRBase {
      * @exception MCRException
      *                general Exception of MyCoRe
      */
-    public final void setFromURI(String uri) throws MCRException {
+    public final void setFromURI(URI uri) throws MCRException {
         try {
             jdom_document = MCRXMLHelper.parseURI(uri);
         } catch (Exception e) {

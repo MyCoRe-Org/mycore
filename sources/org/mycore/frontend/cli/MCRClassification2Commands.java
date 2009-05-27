@@ -112,7 +112,7 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
      */
     public static void loadFromFile(String filename) throws URISyntaxException {
         File file = new File(filename);
-        Document xml = MCRXMLHelper.parseURI(file.getPath());
+        Document xml = MCRXMLHelper.parseURI(file.toURI());
         MCRCategory category = MCRXMLTransformer.getCategory(xml);
         DAO.addCategory(null, category);
     }
@@ -127,7 +127,7 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
      */
     public static void updateFromFile(String filename) throws URISyntaxException {
         File file = new File(filename);
-        Document xml = MCRXMLHelper.parseURI(file.getPath());
+        Document xml = MCRXMLHelper.parseURI(file.toURI());
         MCRCategory category = MCRXMLTransformer.getCategory(xml);
         if (DAO.exist(category.getId())) {
             DAO.replaceCategory(category);

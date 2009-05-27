@@ -82,7 +82,8 @@ public class MCRObjectCommands extends MCRAbstractCommands {
                 "Removes MCRObjects in the number range between the MCRObjectID {0} and {1}.");
         command.add(com);
 
-        com = new MCRCommand("delete object {0}", "org.mycore.frontend.cli.MCRObjectCommands.delete String", "Removes a MCRObject with the MCRObjectID {0}");
+        com = new MCRCommand("delete object {0}", "org.mycore.frontend.cli.MCRObjectCommands.delete String",
+                "Removes a MCRObject with the MCRObjectID {0}");
         command.add(com);
 
         com = new MCRCommand("load object from file {0}", "org.mycore.frontend.cli.MCRObjectCommands.loadFromFile String",
@@ -97,16 +98,19 @@ public class MCRObjectCommands extends MCRAbstractCommands {
                 "Updates a MCRObject form the file {0} in the system.");
         command.add(com);
 
-        com = new MCRCommand("update all objects from directory {0}", "org.mycore.frontend.cli.MCRObjectCommands.updateFromDirectory String",
+        com = new MCRCommand("update all objects from directory {0}",
+                "org.mycore.frontend.cli.MCRObjectCommands.updateFromDirectory String",
                 "Updates all MCRObjects form the directory {0} in the system.");
         command.add(com);
 
-        com = new MCRCommand("export object from {0} to {1} to directory {2} with {3}",
+        com = new MCRCommand(
+                "export object from {0} to {1} to directory {2} with {3}",
                 "org.mycore.frontend.cli.MCRObjectCommands.export String String String String",
                 "Stores all MCRObjects with MCRObjectID's between {0} and {1} to the directory {2} with the stylesheet {3}-object.xsl. For {3} save is the default.");
         command.add(com);
 
-        com = new MCRCommand("export object {0} to directory {1} with {2}", "org.mycore.frontend.cli.MCRObjectCommands.export String String String",
+        com = new MCRCommand("export object {0} to directory {1} with {2}",
+                "org.mycore.frontend.cli.MCRObjectCommands.export String String String",
                 "Stores the MCRObject with the MCRObjectID {0} to the directory {1} with the stylesheet {2}-object.xsl. For {2} save is the default.");
         command.add(com);
 
@@ -131,7 +135,8 @@ public class MCRObjectCommands extends MCRAbstractCommands {
                 "Reads the SQL store table of MCRObject XML files for the type {0} and restore them to the search store.");
         command.add(com);
 
-        com = new MCRCommand("repair metadata search of ID {0}", "org.mycore.frontend.cli.MCRObjectCommands.repairMetadataSearchForID String",
+        com = new MCRCommand("repair metadata search of ID {0}",
+                "org.mycore.frontend.cli.MCRObjectCommands.repairMetadataSearchForID String",
                 "Read the SQL store table of MCRObject XML files with MCRObjectID {0} and restore them to the search store.");
         command.add(com);
 
@@ -142,11 +147,13 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         com = new MCRCommand("delete selected", "org.mycore.frontend.cli.MCRObjectCommands.deleteSelected", "Removes selected MCRObjects.");
         command.add(com);
 
-        com = new MCRCommand("export selected to directory {0} with {1}", "org.mycore.frontend.cli.MCRObjectCommands.exportSelected String String",
+        com = new MCRCommand("export selected to directory {0} with {1}",
+                "org.mycore.frontend.cli.MCRObjectCommands.exportSelected String String",
                 "Stores selected MCRObjects to the directory {0} with the stylesheet {1}-object.xsl. For {1} save is the default.");
         command.add(com);
 
-        com = new MCRCommand("remove selected from searchindex {0}", "org.mycore.frontend.cli.MCRObjectCommands.removeFromSearchindex String",
+        com = new MCRCommand("remove selected from searchindex {0}",
+                "org.mycore.frontend.cli.MCRObjectCommands.removeFromSearchindex String",
                 "Remove selected MCRObjects from searchindex {0}.");
         command.add(com);
 
@@ -158,7 +165,8 @@ public class MCRObjectCommands extends MCRAbstractCommands {
                 "Checks existence of MCRObjects of type {0} in search index and rapairs missing ones in search index.");
         command.add(com);
 
-        com = new MCRCommand("set mode {0} of searcher for index {1}", "org.mycore.frontend.cli.MCRObjectCommands.notifySearcher String String",
+        com = new MCRCommand("set mode {0} of searcher for index {1}",
+                "org.mycore.frontend.cli.MCRObjectCommands.notifySearcher String String",
                 "Notify Searcher of Index {1} what is going on {0}.");
         command.add(com);
     }
@@ -371,7 +379,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
 
         MCRObject mycore_obj = new MCRObject();
         mycore_obj.setImportMode(importMode);
-        mycore_obj.setFromURI(file.getAbsolutePath());
+        mycore_obj.setFromURI(file.toURI());
         LOGGER.debug("Label --> " + mycore_obj.getLabel());
 
         if (update) {
@@ -511,8 +519,8 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         List<String> objectIds = MCRXMLTableManager.instance().retrieveAllIDs(type);
         List<String> cmds = new ArrayList<String>(objectIds.size());
         for (String id : objectIds) {
-            cmds.add(new StringBuilder("export object from ").append(id).append(" to ").append(id).append(" to directory ").append(dirname).append(" with ")
-                    .append(style).toString());
+            cmds.add(new StringBuilder("export object from ").append(id).append(" to ").append(id).append(" to directory ").append(dirname)
+                    .append(" with ").append(style).toString());
         }
         return cmds;
     }
@@ -526,7 +534,8 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      * @throws TransformerFactoryConfigurationError
      * @throws TransformerConfigurationException
      */
-    private static final Transformer getTransformer(String style) throws TransformerFactoryConfigurationError, TransformerConfigurationException {
+    private static final Transformer getTransformer(String style) throws TransformerFactoryConfigurationError,
+            TransformerConfigurationException {
         String xslfile = DEFAULT_TRANSFORMER;
         if ((style != null) && (style.trim().length() != 0)) {
             xslfile = style + "-object.xsl";
@@ -582,7 +591,8 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      * @throws TransformerException
      * @throws IOException
      */
-    private static final boolean exportMCRObject(File dir, Transformer trans, MCRObjectID nid) throws FileNotFoundException, TransformerException, IOException {
+    private static final boolean exportMCRObject(File dir, Transformer trans, MCRObjectID nid) throws FileNotFoundException,
+            TransformerException, IOException {
         byte[] xml = null;
         try {
             // if object do'snt exist - no exception is catched!
@@ -643,25 +653,27 @@ public class MCRObjectCommands extends MCRAbstractCommands {
     /**
      * The method parse and check an XML file.
      * 
-     * @param file
+     * @param fileName
      *            the location of the xml file
      */
-    public static final boolean checkXMLFile(String file) {
-        if (!file.endsWith(".xml")) {
-            LOGGER.warn(file + " ignored, does not end with *.xml");
+    public static final boolean checkXMLFile(String fileName) {
+        if (!fileName.endsWith(".xml")) {
+            LOGGER.warn(fileName + " ignored, does not end with *.xml");
 
             return false;
         }
 
-        if (!new File(file).isFile()) {
-            LOGGER.warn(file + " ignored, is not a file.");
+        File file = new File(fileName);
+
+        if (!file.isFile()) {
+            LOGGER.warn(fileName + " ignored, is not a file.");
 
             return false;
         }
 
         LOGGER.info("Reading file " + file + " ...");
 
-        if (MCRXMLHelper.parseURI(file) != null) {
+        if (MCRXMLHelper.parseURI(file.toURI()) != null) {
             LOGGER.info("The file has no XML errors.");
         }
 
@@ -795,8 +807,8 @@ public class MCRObjectCommands extends MCRAbstractCommands {
         }
         List<String> cmds = new ArrayList<String>(getSelectedObjectIDs().size());
         for (String id : getSelectedObjectIDs()) {
-            cmds.add(new StringBuilder("export object from ").append(id).append(" to ").append(id).append(" to directory ").append(dirname).append(" with ")
-                    .append(style).toString());
+            cmds.add(new StringBuilder("export object from ").append(id).append(" to ").append(id).append(" to directory ").append(dirname)
+                    .append(" with ").append(style).toString());
         }
         return cmds;
     }

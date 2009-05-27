@@ -284,13 +284,13 @@ public class MCRCategoryDAOImplTest extends MCRHibTestCase {
      */
     private void loadWorldClassification() throws URISyntaxException {
         URL worlClassUrl = this.getClass().getResource(WORLD_CLASS_RESOURCE_NAME);
-        Document xml = MCRXMLHelper.parseURI(worlClassUrl.toURI().toString());
+        Document xml = MCRXMLHelper.parseURI(worlClassUrl.toURI());
         category = MCRXMLTransformer.getCategory(xml);
     }
 
     private void loadWorldClassification2() throws URISyntaxException {
         URL worlClassUrl = this.getClass().getResource(WORLD_CLASS2_RESOURCE_NAME);
-        Document xml = MCRXMLHelper.parseURI(worlClassUrl.toURI().toString());
+        Document xml = MCRXMLHelper.parseURI(worlClassUrl.toURI());
         category2 = MCRXMLTransformer.getCategory(xml);
     }
 

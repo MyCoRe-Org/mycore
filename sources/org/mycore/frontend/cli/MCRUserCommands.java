@@ -66,58 +66,80 @@ public class MCRUserCommands extends MCRAbstractCommands {
 
         MCRCommand com = null;
 
-        com = new MCRCommand("init superuser", "org.mycore.frontend.cli.MCRUserCommands.initSuperuser", "Initialized the user system. This command runs only if the user database does not exist.");
+        com = new MCRCommand("init superuser", "org.mycore.frontend.cli.MCRUserCommands.initSuperuser",
+                "Initialized the user system. This command runs only if the user database does not exist.");
         command.add(com);
 
-        com = new MCRCommand("check user data consistency", "org.mycore.frontend.cli.MCRUserCommands.checkConsistency", "This command checks the user system for its consistency.");
+        com = new MCRCommand("check user data consistency", "org.mycore.frontend.cli.MCRUserCommands.checkConsistency",
+                "This command checks the user system for its consistency.");
         command.add(com);
 
-        com = new MCRCommand("encrypt passwords in user xml file {0} to file {1}", "org.mycore.frontend.cli.MCRUserCommands.encryptPasswordsInXMLFile String String", "This is a migration tool to change old plain text password entries to encrpted entries.");
+        com = new MCRCommand("encrypt passwords in user xml file {0} to file {1}",
+                "org.mycore.frontend.cli.MCRUserCommands.encryptPasswordsInXMLFile String String",
+                "This is a migration tool to change old plain text password entries to encrpted entries.");
         command.add(com);
 
-        com = new MCRCommand("set password for user {0} to {1}", "org.mycore.frontend.cli.MCRUserCommands.setPassword String String", "This command sets a new password for the user. You must be this user or you must have administrator access.");
+        com = new MCRCommand("set password for user {0} to {1}", "org.mycore.frontend.cli.MCRUserCommands.setPassword String String",
+                "This command sets a new password for the user. You must be this user or you must have administrator access.");
         command.add(com);
 
-        com = new MCRCommand("set user management to ro mode", "org.mycore.frontend.cli.MCRUserCommands.setLock", "The command changes the management mode of the user system to read-only.");
+        com = new MCRCommand("set user management to ro mode", "org.mycore.frontend.cli.MCRUserCommands.setLock",
+                "The command changes the management mode of the user system to read-only.");
         command.add(com);
 
-        com = new MCRCommand("set user management to rw mode", "org.mycore.frontend.cli.MCRUserCommands.setunLock", "The command changes the management mode of the user system to read-write.");
+        com = new MCRCommand("set user management to rw mode", "org.mycore.frontend.cli.MCRUserCommands.setunLock",
+                "The command changes the management mode of the user system to read-write.");
         command.add(com);
 
-        com = new MCRCommand("enable user {0}", "org.mycore.frontend.cli.MCRUserCommands.enableUser String", "The command enables the user for the access.");
+        com = new MCRCommand("enable user {0}", "org.mycore.frontend.cli.MCRUserCommands.enableUser String",
+                "The command enables the user for the access.");
         command.add(com);
 
-        com = new MCRCommand("disable user {0}", "org.mycore.frontend.cli.MCRUserCommands.disableUser String", "The command disables the user from the access.");
+        com = new MCRCommand("disable user {0}", "org.mycore.frontend.cli.MCRUserCommands.disableUser String",
+                "The command disables the user from the access.");
         command.add(com);
 
-        com = new MCRCommand("create group data from file {0}", "org.mycore.frontend.cli.MCRUserCommands.createGroupFromFile String", "The command creates one or more new groups in the user system with data from the file {0}. This create makes a constency check.");
+        com = new MCRCommand("create group data from file {0}", "org.mycore.frontend.cli.MCRUserCommands.createGroupFromFile String",
+                "The command creates one or more new groups in the user system with data from the file {0}. This create makes a constency check.");
         command.add(com);
 
-        com = new MCRCommand("import user system from files {0} {1}", "org.mycore.frontend.cli.MCRUserCommands.importUserSystemFromFiles String String", "The command imports the user system with data from the group file {0} and the user file {1}. The command is designd only for recovery processes.");
+        com = new MCRCommand(
+                "import user system from files {0} {1}",
+                "org.mycore.frontend.cli.MCRUserCommands.importUserSystemFromFiles String String",
+                "The command imports the user system with data from the group file {0} and the user file {1}. The command is designd only for recovery processes.");
         command.add(com);
 
-        com = new MCRCommand("delete group {0}", "org.mycore.frontend.cli.MCRUserCommands.deleteGroup String", "The command delete the group {0} from the user system, but only if it has no user members.");
+        com = new MCRCommand("delete group {0}", "org.mycore.frontend.cli.MCRUserCommands.deleteGroup String",
+                "The command delete the group {0} from the user system, but only if it has no user members.");
         command.add(com);
 
-        com = new MCRCommand("create user data from file {0}", "org.mycore.frontend.cli.MCRUserCommands.createUserFromFile String", "The command create one or more new users in the user system with data from the file {0}.");
+        com = new MCRCommand("create user data from file {0}", "org.mycore.frontend.cli.MCRUserCommands.createUserFromFile String",
+                "The command create one or more new users in the user system with data from the file {0}.");
         command.add(com);
 
-        com = new MCRCommand("update user data from file {0}", "org.mycore.frontend.cli.MCRUserCommands.updateUserFromFile String", "The command update one or more users in the user system with data from the file {0}.");
+        com = new MCRCommand("update user data from file {0}", "org.mycore.frontend.cli.MCRUserCommands.updateUserFromFile String",
+                "The command update one or more users in the user system with data from the file {0}.");
         command.add(com);
 
-        com = new MCRCommand("delete user {0}", "org.mycore.frontend.cli.MCRUserCommands.deleteUser String", "The command delete the user {0}.");
+        com = new MCRCommand("delete user {0}", "org.mycore.frontend.cli.MCRUserCommands.deleteUser String",
+                "The command delete the user {0}.");
         command.add(com);
 
-        com = new MCRCommand("add user {0} as member to group {1}", "org.mycore.frontend.cli.MCRUserCommands.addMemberUserToGroup String String", "The command add a user {0} as secondary member in the group {1}.");
+        com = new MCRCommand("add user {0} as member to group {1}",
+                "org.mycore.frontend.cli.MCRUserCommands.addMemberUserToGroup String String",
+                "The command add a user {0} as secondary member in the group {1}.");
         command.add(com);
 
-        com = new MCRCommand("remove user {0} as member from group {1}", "org.mycore.frontend.cli.MCRUserCommands.removeMemberUserFromGroup String String", "The command remove the user {0} as secondary member from the group {1}.");
+        com = new MCRCommand("remove user {0} as member from group {1}",
+                "org.mycore.frontend.cli.MCRUserCommands.removeMemberUserFromGroup String String",
+                "The command remove the user {0} as secondary member from the group {1}.");
         command.add(com);
 
         com = new MCRCommand("list all groups", "org.mycore.frontend.cli.MCRUserCommands.listAllGroups", "The command list all groups.");
         command.add(com);
 
-        com = new MCRCommand("list group {0}", "org.mycore.frontend.cli.MCRUserCommands.listGroup String", "The command list the group {0}.");
+        com = new MCRCommand("list group {0}", "org.mycore.frontend.cli.MCRUserCommands.listGroup String",
+                "The command list the group {0}.");
         command.add(com);
 
         com = new MCRCommand("list all users", "org.mycore.frontend.cli.MCRUserCommands.listAllUsers", "The command list all users.");
@@ -126,16 +148,20 @@ public class MCRUserCommands extends MCRAbstractCommands {
         com = new MCRCommand("list user {0}", "org.mycore.frontend.cli.MCRUserCommands.listUser String", "The command list the user {0}.");
         command.add(com);
 
-        com = new MCRCommand("export all groups to file {0}", "org.mycore.frontend.cli.MCRUserCommands.exportAllGroupsToFile String", "The command exports all group data to the file {0}.");
+        com = new MCRCommand("export all groups to file {0}", "org.mycore.frontend.cli.MCRUserCommands.exportAllGroupsToFile String",
+                "The command exports all group data to the file {0}.");
         command.add(com);
 
-        com = new MCRCommand("export group {0} to file {1}", "org.mycore.frontend.cli.MCRUserCommands.exportGroupToFile String String", "The command exports the data of group {0} to the file {1}.");
+        com = new MCRCommand("export group {0} to file {1}", "org.mycore.frontend.cli.MCRUserCommands.exportGroupToFile String String",
+                "The command exports the data of group {0} to the file {1}.");
         command.add(com);
 
-        com = new MCRCommand("export all users to file {0}", "org.mycore.frontend.cli.MCRUserCommands.exportAllUsersToFile String", "The command exports all user data to the file {0}.");
+        com = new MCRCommand("export all users to file {0}", "org.mycore.frontend.cli.MCRUserCommands.exportAllUsersToFile String",
+                "The command exports all user data to the file {0}.");
         command.add(com);
 
-        com = new MCRCommand("export user {0} to file {1}", "org.mycore.frontend.cli.MCRUserCommands.exportUserToFile String String", "The command exports the data of user {0} to the file {1}.");
+        com = new MCRCommand("export user {0} to file {1}", "org.mycore.frontend.cli.MCRUserCommands.exportUserToFile String String",
+                "The command exports the data of user {0} to the file {1}.");
         command.add(com);
     }
 
@@ -194,14 +220,16 @@ public class MCRUserCommands extends MCRAbstractCommands {
             ArrayList<String> groupIDs = new ArrayList<String>();
             groupIDs.add(sgroup);
 
-            MCRUser u = new MCRUser(1, suser, suser, null, null, true, true, "Superuser", spasswd, sgroup, groupIDs, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
+            MCRUser u = new MCRUser(1, suser, suser, null, null, true, true, "Superuser", spasswd, sgroup, groupIDs, null, null, null,
+                    null, null, null, null, null, null, null, null, null, null, null, null, null);
 
             MCRUserMgr.instance().initializeUser(u, suser);
         } catch (Exception e) {
             throw new MCRException("Can't create the superuser.", e);
         }
 
-        LOGGER.info("The user " + suser + " with password " + CONFIG.getString("MCR.Users.Superuser.UserPasswd", "alleswirdgut") + " is installed.");
+        LOGGER.info("The user " + suser + " with password " + CONFIG.getString("MCR.Users.Superuser.UserPasswd", "alleswirdgut")
+                + " is installed.");
 
         // the guest group
         try {
@@ -228,7 +256,8 @@ public class MCRUserCommands extends MCRAbstractCommands {
             ArrayList<String> groupIDs = new ArrayList<String>();
             groupIDs.add(ggroup);
 
-            MCRUser u = new MCRUser(2, guser, suser, null, null, true, true, "gast", gpasswd, ggroup, groupIDs, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
+            MCRUser u = new MCRUser(2, guser, suser, null, null, true, true, "gast", gpasswd, ggroup, groupIDs, null, null, null, null,
+                    null, null, null, null, null, null, null, null, null, null, null, null);
 
             MCRUserMgr.instance().initializeUser(u, suser);
         } catch (Exception e) {
@@ -296,11 +325,12 @@ public class MCRUserCommands extends MCRAbstractCommands {
         if (!checkFilename(oldFile)) {
             return;
         }
+        File input = new File(oldFile);
 
-        LOGGER.info("Reading file " + oldFile + " ...");
+        LOGGER.info("Reading file " + input + " ...");
 
         try {
-            Document doc = MCRXMLHelper.parseURI(oldFile, true);
+            Document doc = MCRXMLHelper.parseURI(input.toURI(), true);
             Element rootelm = doc.getRootElement();
 
             if (!rootelm.getName().equals("mycoreuser")) {
@@ -502,10 +532,12 @@ public class MCRUserCommands extends MCRAbstractCommands {
         MCRUser user = MCRUserMgr.instance().retrieveUser(userID);
         LOGGER.info("");
         StringBuffer sb = new StringBuffer();
-        sb.append("       user=").append(user.getID()).append("   real name=").append(user.getUserContact().getFirstName()).append(' ').append(user.getUserContact().getLastName());
+        sb.append("       user=").append(user.getID()).append("   real name=").append(user.getUserContact().getFirstName()).append(' ')
+                .append(user.getUserContact().getLastName());
         LOGGER.info(sb.toString());
         sb = new StringBuffer();
-        sb.append("          number=").append(user.getNumID()).append("   update=").append(user.isUpdateAllowed()).append("   enabled=").append(user.isEnabled());
+        sb.append("          number=").append(user.getNumID()).append("   update=").append(user.isUpdateAllowed()).append("   enabled=")
+                .append(user.isEnabled());
         LOGGER.info(sb.toString());
         sb = new StringBuffer();
         sb.append("          primary group=").append(user.getPrimaryGroupID());
@@ -567,11 +599,11 @@ public class MCRUserCommands extends MCRAbstractCommands {
         if (!checkFilename(filename)) {
             return;
         }
-
-        LOGGER.info("Reading file " + filename + " ...");
+        File input = new File(filename);
+        LOGGER.info("Reading file " + input + " ...");
 
         try {
-            Document doc = MCRXMLHelper.parseURI(filename, true);
+            Document doc = MCRXMLHelper.parseURI(input.toURI(), true);
             Element rootelm = doc.getRootElement();
 
             if (!rootelm.getName().equals("mycoreuser")) {
@@ -605,10 +637,11 @@ public class MCRUserCommands extends MCRAbstractCommands {
             return;
         }
 
-        LOGGER.info("Reading file " + filename + " ...");
+        File input = new File(filename);
+        LOGGER.info("Reading file " + input + " ...");
 
         try {
-            Document doc = MCRXMLHelper.parseURI(filename, true);
+            Document doc = MCRXMLHelper.parseURI(input.toURI(), true);
             Element rootelm = doc.getRootElement();
 
             if (!rootelm.getName().equals("mycoregroup")) {
@@ -634,31 +667,33 @@ public class MCRUserCommands extends MCRAbstractCommands {
      * This method imports groups and user data from XML files. It simply call
      * createGroupFromFile() of the MCRUserManager.
      * 
-     * @param groupfile
+     * @param groupFileName
      *            the filename of the group data input
-     * @param userfile
+     * @param userFileName
      *            the filename of the user data input
      */
-    public static final void importUserSystemFromFiles(String groupfile, String userfile) throws MCRException {
+    public static final void importUserSystemFromFiles(String groupFileName, String userFileName) throws MCRException {
         // check file names
-        if (!checkFilename(groupfile)) {
+        if (!checkFilename(groupFileName)) {
             return;
         }
-        if (!checkFilename(userfile)) {
+        if (!checkFilename(userFileName)) {
             return;
         }
         MCRUserMgr umgr = MCRUserMgr.instance();
         try {
             // read groups
-            LOGGER.info("Reading group file " + groupfile + " ...");
-            Document groupdoc = MCRXMLHelper.parseURI(groupfile, true);
+            File groupFile = new File(groupFileName);
+            LOGGER.info("Reading group file " + groupFile + " ...");
+            Document groupdoc = MCRXMLHelper.parseURI(groupFile.toURI(), true);
             Element grouprootelm = groupdoc.getRootElement();
             if (!grouprootelm.getName().equals("mycoregroup")) {
                 throw new MCRException("The data are not for group.");
             }
             // read users
-            LOGGER.info("Reading user file " + userfile + " ...");
-            Document userdoc = MCRXMLHelper.parseURI(userfile, true);
+            File userfILE = new File(userFileName);
+            LOGGER.info("Reading user file " + userfILE + " ...");
+            Document userdoc = MCRXMLHelper.parseURI(userfILE.toURI(), true);
             Element userrootelm = userdoc.getRootElement();
             if (!userrootelm.getName().equals("mycoreuser")) {
                 throw new MCRException("The data are not for user.");
@@ -700,11 +735,11 @@ public class MCRUserCommands extends MCRAbstractCommands {
         if (!checkFilename(filename)) {
             return;
         }
-
-        LOGGER.info("Reading file " + filename + " ...");
+        File input = new File(filename);
+        LOGGER.info("Reading file " + input + " ...");
 
         try {
-            Document doc = MCRXMLHelper.parseURI(filename, true);
+            Document doc = MCRXMLHelper.parseURI(input.toURI(), true);
             Element rootelm = doc.getRootElement();
 
             if (!rootelm.getName().equals("mycoreuser")) {
