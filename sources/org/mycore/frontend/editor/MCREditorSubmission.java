@@ -158,6 +158,7 @@ public class MCREditorSubmission {
         }
 
         Collections.sort(variables);
+        setAdditionalNamespaces(editor);
         setRepeatsFromVariables();
     }
 
