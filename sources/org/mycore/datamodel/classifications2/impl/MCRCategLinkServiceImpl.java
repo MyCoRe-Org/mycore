@@ -39,6 +39,7 @@ import org.hibernate.criterion.Restrictions;
 import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRConfiguration;
+import org.mycore.common.MCRPersistenceException;
 import org.mycore.datamodel.classifications2.MCRCategLinkService;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
@@ -166,7 +167,10 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
     public void setLinks(MCRObjectReference objectReference, Collection<MCRCategoryID> categories) {
         Session session = HIB_CONNECTION_INSTANCE.getSession();
         for (MCRCategoryID categID : categories) {
-            MCRCategoryLink link = new MCRCategoryLink(getMCRCategory(session, categID), objectReference);
+            final MCRCategoryImpl category = getMCRCategory(session, categID);
+            if (category == null)
+                throw new MCRPersistenceException("Could not link to unknown category " + categID);
+            MCRCategoryLink link = new MCRCategoryLink(category, objectReference);
             LOGGER.debug("Adding Link from " + link.getCategory().getId() + "(" + link.getCategory().getInternalID() + ") to "
                     + objectReference.getObjectID());
             session.save(link);
