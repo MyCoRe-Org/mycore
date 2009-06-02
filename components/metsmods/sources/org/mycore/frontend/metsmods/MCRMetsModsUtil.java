@@ -238,7 +238,8 @@ public class MCRMetsModsUtil {
         Element div_ = new Element("div", MCRConstants.METS_NAMESPACE);
         div_.setAttribute("ID", file_id);
         div_.setAttribute("ORDER", String.valueOf(order));
-        div_.setAttribute("ORDERLABEL", String.valueOf(order));
+            //The following line has changed in order to set the filename as orderlabel...
+        div_.setAttribute("ORDERLABEL", file_id);//String.valueOf(order));
         // The next line is commented out because of a changed behavior of the mets format.
         // div_.setAttribute("type","page");
         Element fptr = new Element("fptr", MCRConstants.METS_NAMESPACE);
