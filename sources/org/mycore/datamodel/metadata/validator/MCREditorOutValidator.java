@@ -228,7 +228,7 @@ public class MCREditorOutValidator {
     public static String checkMetaObjectWithLang(Element datasubtag, Class<? extends MCRMetaInterface> metaClass) {
         if (datasubtag.getAttribute("lang") != null) {
             datasubtag.getAttribute("lang").setNamespace(XML_NAMESPACE);
-            LOGGER.warn("namespace add for xml:lang attribute in "+datasubtag.getName());
+            LOGGER.warn("namespace add for xml:lang attribute in " + datasubtag.getName());
         }
         return checkMetaObject(datasubtag, metaClass, true);
     }
@@ -249,21 +249,21 @@ public class MCREditorOutValidator {
             datasubtag.getAttribute("xtype").setNamespace(XLINK_NAMESPACE).setName("type");
         } else if (datasubtag.getAttribute("type") != null && datasubtag.getAttribute("type", XLINK_NAMESPACE) == null) {
             datasubtag.getAttribute("type").setNamespace(XLINK_NAMESPACE);
-            LOGGER.warn("namespace add for xlink:type attribute in "+datasubtag.getName());
+            LOGGER.warn("namespace add for xlink:type attribute in " + datasubtag.getName());
         }
         if (datasubtag.getAttribute("href") != null) {
             datasubtag.getAttribute("href").setNamespace(XLINK_NAMESPACE);
-            LOGGER.warn("namespace add for xlink:href attribute in "+datasubtag.getName());
+            LOGGER.warn("namespace add for xlink:href attribute in " + datasubtag.getName());
         }
 
         if (datasubtag.getAttribute("title") != null) {
             datasubtag.getAttribute("title").setNamespace(XLINK_NAMESPACE);
-            LOGGER.warn("namespace add for xlink:title attribute in "+datasubtag.getName());
+            LOGGER.warn("namespace add for xlink:title attribute in " + datasubtag.getName());
         }
 
         if (datasubtag.getAttribute("label") != null) {
             datasubtag.getAttribute("label").setNamespace(XLINK_NAMESPACE);
-            LOGGER.warn("namespace add for xlink:label attribute in "+datasubtag.getName());
+            LOGGER.warn("namespace add for xlink:label attribute in " + datasubtag.getName());
         }
         return checkMetaObject(datasubtag, metaClass, false);
     }
@@ -310,7 +310,7 @@ public class MCREditorOutValidator {
                 Element child = children.get(i);
                 if (child.getAttribute("lang") != null) {
                     child.getAttribute("lang").setNamespace(XML_NAMESPACE);
-                    LOGGER.warn("namespace add for xml:lang attribute in "+datasubtag.getName());
+                    LOGGER.warn("namespace add for xml:lang attribute in " + datasubtag.getName());
                 }
             }
             return checkMetaObjectWithLang(datasubtag, MCRMetaHistoryDate.class);
@@ -421,7 +421,7 @@ public class MCREditorOutValidator {
             root.addContent(service);
         }
         List<Element> servicelist = service.getChildren();
-        if (servicelist == null) {
+        if (servicelist.size() == 0) {
             setDefaultObjectACLs(service);
             return;
         }
@@ -433,7 +433,7 @@ public class MCREditorOutValidator {
         if ((li != null) && !li.isEmpty()) {
             hasacls = true;
         }
-        if (!hasacls)
+        if (service.getChild("servacls") == null && !hasacls)
             setDefaultObjectACLs(service);
     }
 
