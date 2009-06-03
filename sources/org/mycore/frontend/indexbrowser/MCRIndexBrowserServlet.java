@@ -84,6 +84,7 @@ public class MCRIndexBrowserServlet extends MCRServlet {
         } else {
             MCRIndexBrowserSearcher searcher = new MCRIndexBrowserSearcher(incomingBrowserData, config);
             resultList = searcher.doSearch();
+            MCRIndexBrowserCache.addToCache(incomingBrowserData, resultList);
         }
         MCRIndexBrowserXmlGenerator xmlGen = new MCRIndexBrowserXmlGenerator(resultList, incomingBrowserData, config);
         return xmlGen.getXMLContent();
