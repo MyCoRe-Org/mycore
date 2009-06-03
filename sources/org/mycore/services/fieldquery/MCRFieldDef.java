@@ -123,7 +123,11 @@ public class MCRFieldDef {
         this.source = def.getAttributeValue("source");
         this.addable = "true".equals(def.getAttributeValue("addable"));
 
-        fieldTable.put(name, this);
+        if(!fieldTable.contains(name)){
+            fieldTable.put(name, this);
+        }else{
+            LOGGER.error("Field \"" + name + "\" is defined repeatedly.");
+        }
         buildForEachXSL(def);
     }
 
