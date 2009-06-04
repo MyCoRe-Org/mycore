@@ -168,12 +168,27 @@ public class MCRWebCLIServlet extends MCRServlet {
         String classes = MCRConfiguration.instance().getString("MCR.CLI.Classes.Internal", "");
         for (StringTokenizer st = new StringTokenizer(classes, ","); st.hasMoreTokens();) {
             String classname = st.nextToken();
-            LOGGER.debug("Will load commands from class " + classname);
+            LOGGER.debug("Will load commands from internal class " + classname);
             Object obj;
             try {
                 obj = Class.forName(classname).newInstance();
             } catch (Exception e) {
-                String msg = "Could not instantiate class " + classname;
+                String msg = "Could not instantiate internal class " + classname;
+                throw new org.mycore.common.MCRConfigurationException(msg, e);
+            }
+            ArrayList<MCRCommand> commands = ((MCRExternalCommandInterface) obj).getPossibleCommands();
+            knownCommands.addAll(commands);
+            addJSONCommand(obj.getClass().getSimpleName(), commands);
+        }
+        classes = MCRConfiguration.instance().getString("MCR.CLI.Classes.External", "");
+        for (StringTokenizer st = new StringTokenizer(classes, ","); st.hasMoreTokens();) {
+            String classname = st.nextToken();
+            LOGGER.debug("Will load commands from external class " + classname);
+            Object obj;
+            try {
+                obj = Class.forName(classname).newInstance();
+            } catch (Exception e) {
+                String msg = "Could not instantiate external class " + classname;
                 throw new org.mycore.common.MCRConfigurationException(msg, e);
             }
             ArrayList<MCRCommand> commands = ((MCRExternalCommandInterface) obj).getPossibleCommands();
