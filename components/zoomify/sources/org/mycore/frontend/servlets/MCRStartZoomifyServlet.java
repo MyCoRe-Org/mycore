@@ -26,6 +26,7 @@ package org.mycore.frontend.servlets;
 import java.util.ArrayList;
 import java.util.Properties;
 
+import org.mycore.common.MCRConfiguration;
 import org.mycore.datamodel.ifs.MCRDirectory;
 import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.metadata.MCRMetaElement;
@@ -90,21 +91,24 @@ public class MCRStartZoomifyServlet extends MCRStartEditorServlet{
 		
 		cd.myfile = pagedir + "zoomify_commit.xml";
 		
-		MCRDirectory mcrdir = MCRDirectory.getRootDirectory(cd.mysemcrid.getId());
+		MCRDirectory mcrdir = MCRDirectory.getRootDirectory(cd.mytfmcrid.getId());
 		String basedir = mcrdir.getName();
 				 
 		MCRObject obj = new MCRObject();
 		obj.receiveFromDatastore(cd.myremcrid);
 		
-		MCRMetaElement metas = obj.getMetadataElement("source01s");
+		MCRConfiguration CONFIG = MCRConfiguration.instance();
+		String type = obj.getId().getTypeId();
+		String idname = CONFIG.getString("MCR.Component.Zoomify."+type+".identifier");
+		MCRMetaElement metas = obj.getMetadataElement(idname);
 		MCRMetaLangText langtext = (MCRMetaLangText)metas.getElement(0);
 			
 		
 		String mcrname = langtext.getText();
 		
-			if(lastid.compareTo(cd.mysemcrid.getId())!=0)
+			if(lastid.compareTo(cd.mytfmcrid.getId())!=0)
 			{
-				lastid = cd.mysemcrid.getId();
+				lastid = cd.mytfmcrid.getId();
 				this.index = 0;
 			}
 		
@@ -115,14 +119,14 @@ public class MCRStartZoomifyServlet extends MCRStartEditorServlet{
 			//this.init is every time true, because of disabled init parameter
 		if(this.init) {
 
-		int numberofderivates = obj.getStructure().getDerivateSize();
-		for(int i=0;i<numberofderivates;i++)
-		{
-			MCRObjectID mcrid = obj.getStructure().getDerivate(i).getXLinkHrefID();
+		//int numberofderivates = obj.getStructure().getDerivateSize();
+		//for(int i=0;i<numberofderivates;i++)
+		//{
+			MCRObjectID mcrid = cd.mysemcrid;//obj.getStructure().getDerivate(i).getXLinkHrefID();
 			
 			if(getMetsFile(mcrid)!=null)
 			{
-				Document doc = MCRFile.getFile(getMetsFile(mcrid)).getContentAsJDOM();
+			    Document doc = MCRFile.getFile(getMetsFile(mcrid)).getContentAsJDOM();
 				ArrayList<MCRMetsModsPicture> list = MCRMetsModsUtil.getFileList(doc);
 				for(int j=0;j<list.size();j++)
 				{
@@ -133,7 +137,7 @@ public class MCRStartZoomifyServlet extends MCRStartEditorServlet{
 					
 			}
 			
-		}
+		//}
 			//this.init parameter is every time true, because of the update problem!
 //			this.init = false;
 		}
@@ -141,12 +145,14 @@ public class MCRStartZoomifyServlet extends MCRStartEditorServlet{
 		Properties params = new Properties();
 	    params.put("XSL.ImagePath", "/"+basedir+"/"+directories.get(this.index));
 	    params.put("XSL.Orderlabel", orderlabels.get(this.index));
-	    params.put("XSL.mcrid", cd.mysemcrid.getId());
+	    params.put("XSL.mcrid", cd.mytfmcrid.getId());
+	    params.put("XSL.semcrid", cd.mysemcrid.getId());
 	    params.put("XSL.remcrid", cd.myremcrid.getId());
 	    params.put("XSL.index", String.valueOf(this.index+1));
 	    params.put("XSL.max", String.valueOf(this.directories.size()));
 	    params.put("XSL.label", mcrname);
-	    params.put("mcrid", cd.mysemcrid.getId());
+	    params.put("mcrid", cd.mytfmcrid.getId());
+	    params.put("semcrid", cd.mysemcrid.getId());
 	    params.put("type", cd.mytype);
 	    params.put("step", cd.mystep);
 	    params.put("remcrid", cd.myremcrid.getId());

@@ -14,6 +14,7 @@
 <xsl:param name="Orderlabel" />
 <xsl:param name="mcrid"/>
 <xsl:param name="remcrid"/>
+<xsl:param name="semcrid" />
 <xsl:param name="index" />
 <xsl:param name="max" />
 <xsl:param name="label" />
@@ -32,7 +33,7 @@
 
 <xsl:template match="zoomify">
   <xsl:variable name="url"> 
-    <xsl:value-of select="concat($WebApplicationBaseURL,'servlets/MCRStartZoomifyServlet',$HttpSession,'?re_mcrid=',$remcrid,'&amp;se_mcrid=',$mcrid,'&amp;step=commit&amp;todo=showZoomify')"/>
+    <xsl:value-of select="concat($WebApplicationBaseURL,'servlets/MCRStartZoomifyServlet',$HttpSession,'?re_mcrid=',$remcrid,'&amp;se_mcrid=',$semcrid,'&amp;tf_mcrid=',$mcrid,'&amp;step=commit&amp;todo=showZoomify')"/>
   </xsl:variable>
   <xsl:variable name="zoomify.next"             select="concat($url,'&amp;mode=next')" />
   <xsl:variable name="zoomify.prev"             select="concat($url,'&amp;mode=prev')" />
@@ -80,12 +81,14 @@
   <table width="750" height="20">
 	<tr>
 		<td width="33%" align="left">
-			<a href="{$zoomify.prev}"><xsl:value-of select="i18n:translate('component.zoomify.page.zoomify.prev')" /></a>
+			<!--<xsl:if test="{$index}>0">-->
+            <a href="{$zoomify.prev}"><xsl:value-of select="i18n:translate('component.zoomify.page.zoomify.prev')" /></a>
+            <!--</xsl:if>-->
 		</td>
 		<td width="33%" align="center">
 			<a href="{$zoomify.back}"><xsl:value-of select="i18n:translate('component.zoomify.page.zoomify.back')" /></a>
 		</td>
-		<td width="33%" align="right">	
+		<td width="33%" align="right">
 			<a href="{$zoomify.next}"><xsl:value-of select="i18n:translate('component.zoomify.page.zoomify.next')" /></a>
 		</td>
 	</tr>
