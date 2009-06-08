@@ -31,6 +31,7 @@ import org.jdom.Element;
 import org.jdom.Namespace;
 import org.jdom.output.XMLOutputter;
 import org.mycore.common.MCRConstants;
+import org.mycore.common.MCRException;
 import org.mycore.common.xml.MCRURIResolver;
 
 /**
@@ -46,9 +47,11 @@ public class MCRFieldDef {
 
     private static Hashtable<String, MCRFieldDef> fieldTable = new Hashtable<String, MCRFieldDef>();
 
-    public final static Namespace xalanns = Namespace.getNamespace("xalan", "http://xml.apache.org/xalan");
+    public final static Namespace xalanns = Namespace.getNamespace("xalan",
+            "http://xml.apache.org/xalan");
 
-    public final static Namespace extns = Namespace.getNamespace("ext", "xalan://org.mycore.services.fieldquery.MCRData2Fields");
+    public final static Namespace extns = Namespace.getNamespace("ext",
+            "xalan://org.mycore.services.fieldquery.MCRData2Fields");
 
     private final static String configFile = "searchfields.xml";
 
@@ -102,7 +105,8 @@ public class MCRFieldDef {
     private String source;
 
     /**
-     * If true, the content of this field will be added by searcher as metadata in hit
+     * If true, the content of this field will be added by searcher as metadata
+     * in hit
      */
     private boolean addable = false;
 
@@ -123,7 +127,11 @@ public class MCRFieldDef {
         this.source = def.getAttributeValue("source");
         this.addable = "true".equals(def.getAttributeValue("addable"));
 
-        fieldTable.put(name, this);
+        if (!fieldTable.contains(name)) {
+            fieldTable.put(name, this);
+        } else {
+            throw new MCRException("Field \"" + name + "\" is defined repeatedly.");
+        }
         buildForEachXSL(def);
     }
 
