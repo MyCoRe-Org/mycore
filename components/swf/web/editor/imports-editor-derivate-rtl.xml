@@ -77,8 +77,8 @@
   </panel>
   
   <panel id="DDERtitleRep">
-    <cell col="1" row="1" anchor="WEST" ref="Slang" var="@lang" sortnr="2"/>
-    <cell col="1" row="2" anchor="NORTHWEST" sortnr="2">
+    <cell col="1" row="1" anchor="WEST" ref="Slang" var="@xml:lang" sortnr="2"/>
+    <cell col="1" row="2" anchor="NORTHWEST" sortnr="3">
       <textfield id="ZtitleRep" width="52" maxlength="1024"/>
     </cell>
   </panel>
