@@ -92,7 +92,7 @@ public class MCRWebCLIServlet extends MCRServlet {
         MCRSession session = MCRSessionMgr.getCurrentSession();
         String user = session.getCurrentUserID();
         if (!MCRAccessManager.checkPermission("use-webcli")) {
-            StringBuilder sb=new StringBuilder("Access denied: ");
+            StringBuilder sb = new StringBuilder("Access denied: ");
             sb.append(user).append("\nIP: ").append(session.getCurrentIP());
             generateErrorResponse(job.getRequest(), job.getResponse(), HttpServletResponse.SC_FORBIDDEN, sb.toString());
             return;
@@ -111,7 +111,8 @@ public class MCRWebCLIServlet extends MCRServlet {
                     printJSONObject(commandsJSON, job.getResponse());
                     return;
                 } else if (request.equals("getCommandQueue")) {
-                    printJSONObject(new JSONObject().put("commandQueue", new LinkedList<String>(getCurrentSessionContainer(true, hsession).getCommandQueue())), job.getResponse());
+                    printJSONObject(new JSONObject().put("commandQueue", new LinkedList<String>(getCurrentSessionContainer(true, hsession)
+                            .getCommandQueue())), job.getResponse());
                     return;
                 }
             }
@@ -162,13 +163,21 @@ public class MCRWebCLIServlet extends MCRServlet {
         ArrayList<MCRCommand> knownCommands = new ArrayList<MCRCommand>();
         knownCommands.add(new MCRCommand("process {0}", "org.mycore.frontend.cli.MCRCommandLineInterface.readCommandsFile String",
                 "Execute the commands listed in the text file {0}."));
-        knownCommands.add(new MCRCommand("show command statistics", "org.mycore.frontend.cli.MCRCommandLineInterface.showCommandStatistics",
+        knownCommands.add(new MCRCommand("show command statistics",
+                "org.mycore.frontend.cli.MCRCommandLineInterface.showCommandStatistics",
                 "Show statistics on number of commands processed and execution time needed per command"));
         addJSONCommand("Basic commands", knownCommands);
-        String classes = MCRConfiguration.instance().getString("MCR.CLI.Classes.Internal", "");
-        for (StringTokenizer st = new StringTokenizer(classes, ","); st.hasMoreTokens();) {
+        String internalClasses = MCRConfiguration.instance().getString("MCR.CLI.Classes.Internal", "");
+        String externalClasses = MCRConfiguration.instance().getString("MCR.CLI.Classes.External", "");
+        initializeCommands(knownCommands, internalClasses);
+        initializeCommands(knownCommands, externalClasses);
+        return knownCommands;
+    }
+
+    private static void initializeCommands(ArrayList<MCRCommand> knownCommands, String commandClasses) {
+        for (StringTokenizer st = new StringTokenizer(commandClasses, ","); st.hasMoreTokens();) {
             String classname = st.nextToken();
-            LOGGER.debug("Will load commands from class " + classname);
+            LOGGER.debug("Loading commands from class " + classname);
             Object obj;
             try {
                 obj = Class.forName(classname).newInstance();
@@ -180,7 +189,6 @@ public class MCRWebCLIServlet extends MCRServlet {
             knownCommands.addAll(commands);
             addJSONCommand(obj.getClass().getSimpleName(), commands);
         }
-        return knownCommands;
     }
 
     private static void addJSONCommand(String parent, Collection<MCRCommand> cmds) {
@@ -194,7 +202,8 @@ public class MCRWebCLIServlet extends MCRServlet {
         commandsJSON.getJSONArray("commands").put(item);
     }
 
-    private static void generateErrorResponse(HttpServletRequest request, HttpServletResponse response, int errorCode, String message) throws IOException {
+    private static void generateErrorResponse(HttpServletRequest request, HttpServletResponse response, int errorCode, String message)
+            throws IOException {
         response.setStatus(errorCode);
         response.setContentType("text/plain");
         response.getWriter().println(message);
