@@ -421,10 +421,6 @@ public class MCREditorOutValidator {
             root.addContent(service);
         }
         List<Element> servicelist = service.getChildren();
-        if (servicelist.size() == 0) {
-            setDefaultObjectACLs(service);
-            return;
-        }
         boolean hasacls = false;
         for (Element datatag : servicelist) {
             checkMetaTags(datatag);
@@ -445,6 +441,10 @@ public class MCREditorOutValidator {
      * @throws JDOMException 
      */
     private void setDefaultObjectACLs(org.jdom.Element service) throws JDOMException, IOException {
+        if (!MCRConfiguration.instance().getBoolean("MCR.Access.AddObjectDefaultRule", true)) {
+            LOGGER.info("Adding object default acl rule is disabled.");
+            return;
+        }
         String resourcetype = "/editor_default_acls_" + id.getTypeId() + ".xml";
         String resourcebase = "/editor_default_acls_" + id.getBase() + ".xml";
         // Read stylesheet and add user
