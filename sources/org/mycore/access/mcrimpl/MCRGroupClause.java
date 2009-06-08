@@ -34,6 +34,7 @@ import org.mycore.user.MCRUserFacade;
  * Implementation of a (group xy) clause
  * 
  * @author Matthias Kramm
+ * @author Mathias Fricke
  */
 class MCRGroupClause implements MCRCondition {
     private MCRGroup group;
@@ -48,6 +49,10 @@ class MCRGroupClause implements MCRCondition {
     }
 
     public boolean evaluate(Object o) {
+        MCRAccessData data = (MCRAccessData) o;
+        if (data.getUser() != null) {
+            return data.getUser().isMemberOf(group) ^ this.not;
+        }
         return MCRUserFacade.isUserInGroup(group.getID()) ^ this.not;
     }
 
