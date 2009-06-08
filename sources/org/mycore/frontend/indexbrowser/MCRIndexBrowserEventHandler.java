@@ -46,7 +46,6 @@ public class MCRIndexBrowserEventHandler extends MCREventHandlerBase {
      *            the MCRObject that caused the event
      */
     protected final void handleObjectCreated(MCREvent evt, MCRObject obj) {
-        MCRIndexBrowserData.deleteIndexCacheOfObjectType(getObjectType(obj));
         MCRIndexBrowserCache.deleteIndexCacheFromHashtable(getObjectType(obj));
     }
 
@@ -65,7 +64,6 @@ public class MCRIndexBrowserEventHandler extends MCREventHandlerBase {
      *            the MCRObject that caused the event
      */
     protected final void handleObjectUpdated(MCREvent evt, MCRObject obj) {
-        MCRIndexBrowserData.deleteIndexCacheOfObjectType(getObjectType(obj));
         MCRIndexBrowserCache.deleteIndexCacheFromHashtable(getObjectType(obj));
     }
 
@@ -79,7 +77,6 @@ public class MCRIndexBrowserEventHandler extends MCREventHandlerBase {
      *            the MCRObject that caused the event
      */
     protected final void handleObjectDeleted(MCREvent evt, MCRObject obj) {
-        MCRIndexBrowserData.deleteIndexCacheOfObjectType(getObjectType(obj));
         MCRIndexBrowserCache.deleteIndexCacheFromHashtable(getObjectType(obj));
     }
 
