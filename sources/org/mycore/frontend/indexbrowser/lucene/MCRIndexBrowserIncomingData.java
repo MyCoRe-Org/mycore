@@ -1,4 +1,4 @@
-package org.mycore.frontend.indexbrowser;
+package org.mycore.frontend.indexbrowser.lucene;
 
 /**
  * Contains all incoming data from the web browser.

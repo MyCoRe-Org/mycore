@@ -61,11 +61,11 @@
   </servlet>
   <servlet id="IndexBrowserServlet">
     <servlet-name>MCRIndexBrowserServlet</servlet-name>
-    <servlet-class>org.mycore.frontend.indexbrowser.MCRIndexBrowserServlet</servlet-class>
+    <servlet-class>org.mycore.frontend.indexbrowser.lucene.MCRIndexBrowserServlet</servlet-class>
   </servlet>
   <servlet id="IndexBrowser">
     <servlet-name>MCRIndexServlet</servlet-name>
-    <servlet-class>org.mycore.frontend.indexbrowser.MCRIndexServlet</servlet-class>
+    <servlet-class>org.mycore.frontend.indexbrowser.sql.MCRIndexServlet</servlet-class>
   </servlet>
   <servlet id="MCRObject">
     <servlet-name>MCRObjectServlet</servlet-name>

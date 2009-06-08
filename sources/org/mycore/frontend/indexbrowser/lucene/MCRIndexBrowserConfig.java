@@ -1,4 +1,4 @@
-package org.mycore.frontend.indexbrowser;
+package org.mycore.frontend.indexbrowser.lucene;
 
 import java.util.ArrayList;
 import java.util.List;
