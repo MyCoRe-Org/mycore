@@ -56,7 +56,7 @@ public class MCRIndexBrowserServlet extends MCRServlet {
         }
 
         incomingBrowserData = getIncomingBrowserData(job.getRequest());
-        config = new MCRIndexBrowserConfig(incomingBrowserData.getIndex());
+        config = new MCRIndexBrowserConfig(incomingBrowserData.getSearchclass());
 
         Document pageContent = null;
         // if init is true, then create an empty document, otherwise create
@@ -79,12 +79,13 @@ public class MCRIndexBrowserServlet extends MCRServlet {
      */
     protected Document createResultListDocument() {
         List<MCRIndexBrowserEntry> resultList = null;
-        if(MCRIndexBrowserCache.isCached(incomingBrowserData)) {
-            resultList = MCRIndexBrowserCache.getFromCache(incomingBrowserData);
+        String index = config.getIndex();
+        if(MCRIndexBrowserCache.isCached(index, incomingBrowserData)) {
+            resultList = MCRIndexBrowserCache.getFromCache(index, incomingBrowserData);
         } else {
             MCRIndexBrowserSearcher searcher = new MCRIndexBrowserSearcher(incomingBrowserData, config);
             resultList = searcher.doSearch();
-            MCRIndexBrowserCache.addToCache(incomingBrowserData, resultList);
+            MCRIndexBrowserCache.addToCache(incomingBrowserData, index, resultList);
         }
         MCRIndexBrowserXmlGenerator xmlGen = new MCRIndexBrowserXmlGenerator(resultList, incomingBrowserData, config);
         return xmlGen.getXMLContent();
@@ -103,11 +104,11 @@ public class MCRIndexBrowserServlet extends MCRServlet {
     protected MCRIndexBrowserIncomingData getIncomingBrowserData(HttpServletRequest request) {
         String search = request.getParameter("search");
         String mode = getMode(request);
-        String index = request.getParameter("searchclass");
+        String searchclass = request.getParameter("searchclass");
         String fromTo = request.getParameter("fromTo");
         String init = request.getParameter("init");
 
-        return new MCRIndexBrowserIncomingData(search, mode, index, fromTo, init);
+        return new MCRIndexBrowserIncomingData(search, mode, searchclass, fromTo, init);
     }
 
     private String getMode(HttpServletRequest request) {

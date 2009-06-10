@@ -26,10 +26,9 @@ public class MCRIndexBrowserCache {
      * Add a new list of index browser entries to the cache.
      * @param listToCache a list to cache
      */
-    public static void addToCache(MCRIndexBrowserIncomingData browseData, List<MCRIndexBrowserEntry> listToCache) {
-        if(browseData == null || listToCache == null)
+    public static void addToCache(MCRIndexBrowserIncomingData browseData, String index, List<MCRIndexBrowserEntry> listToCache) {
+        if(browseData == null || index == null || listToCache == null)
             return;
-        String index = browseData.getIndex();
 
         // adds a new mcr cache to the hash table
         MCRCache mcrCache = null;
@@ -39,7 +38,7 @@ public class MCRIndexBrowserCache {
             mcrCache = getIndexCache(index);
         }
         // add the index browser entry list to the mcr cache
-        String cacheKey = getCacheKey(browseData);
+        String cacheKey = getCacheKey(index, browseData);
         mcrCache.put(cacheKey, listToCache);
     }
 
@@ -77,13 +76,12 @@ public class MCRIndexBrowserCache {
      * Returns the cached index browser list.
      * @return the cached list.
      */
-    public static List<MCRIndexBrowserEntry> getFromCache(MCRIndexBrowserIncomingData browseData) {
+    public static List<MCRIndexBrowserEntry> getFromCache(String index, MCRIndexBrowserIncomingData browseData) {
         // if the list is not cached, return null
-        if(!isCached(browseData))
+        if(!isCached(index, browseData))
             return null;
 
-        String index = browseData.getIndex();
-        String cacheKey = getCacheKey(browseData);
+        String cacheKey = getCacheKey(index, browseData);
         // get the mcr cache from the hash table
         MCRCache mcrCache = getIndexCache(index);
         // get the cached list from the mcr cache
@@ -110,10 +108,10 @@ public class MCRIndexBrowserCache {
      * Returns the cache key from the incoming browser data.
      * @return the cache key in the form of index # search # mode
      */
-    protected static String getCacheKey(MCRIndexBrowserIncomingData browseData) {
+    protected static String getCacheKey(String index, MCRIndexBrowserIncomingData browseData) {
         String key = "";
-        if(browseData.getIndex() != null)
-            key += browseData.getIndex();
+        if(index != null)
+            key += index;
         key += "#";
         if(browseData.getSearch() != null)
             key += browseData.getSearch();
@@ -130,9 +128,8 @@ public class MCRIndexBrowserCache {
      * @return true if an entry in the hash table and in the MCRCache exists,
      * otherwise false
      */
-    public static boolean isCached(MCRIndexBrowserIncomingData browseData) {
-        String index = browseData.getIndex();
-        String cacheKey = getCacheKey(browseData);
+    public static boolean isCached(String index, MCRIndexBrowserIncomingData browseData) {
+        String cacheKey = getCacheKey(index, browseData);
         try {
             TYPE_CACHE_TABLE_LOCK.readLock().lock();
             MCRCache mcrCache = TYPE_CACHE_TABLE.get(index);

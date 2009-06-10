@@ -272,7 +272,7 @@ public class MCRIndexBrowserXmlGenerator {
         Element eIndex = new Element("index");
         page.addContent(eIndex);
 
-        eIndex.setAttribute("id", browseData.getIndex());
+        eIndex.setAttribute("id", browseData.getSearchclass());
         return page;
     }
 
