@@ -15,7 +15,7 @@ import org.mycore.common.MCRConfiguration;
  */
 public class MCRIndexBrowserConfig {
 
-    private String table;
+    private String index;
 
     private String browseField;
 
@@ -27,14 +27,14 @@ public class MCRIndexBrowserConfig {
 
     private int maxPerPage;
 
-    public MCRIndexBrowserConfig(String id) {
-        set(id);
+    public MCRIndexBrowserConfig(String searchclass) {
+        set(searchclass);
     }
 
-    public void set(String id) {
+    public void set(String searchclass) {
         MCRConfiguration config = MCRConfiguration.instance();
-        String prefix = "MCR.IndexBrowser." + id + ".";
-        table = config.getString(prefix + "Table");
+        String prefix = "MCR.IndexBrowser." + searchclass + ".";
+        index = config.getString(prefix + "Table");
         browseField = config.getString(prefix + "Searchfield");
         maxPerPage = config.getInt(prefix + "MaxPerPage");
         String fields = config.getString(prefix + "ExtraOutputFields", null);
@@ -54,8 +54,8 @@ public class MCRIndexBrowserConfig {
         return list;
     }
 
-    public String getTable() {
-        return table;
+    public String getIndex() {
+        return index;
     }
 
     public String getBrowseField() {

@@ -86,9 +86,9 @@ public class MCRIndexBrowserSearcher {
         MCRAndCondition cAnd = new MCRAndCondition();
         MCRFieldDef fieldproject;
         MCRFieldDef fieldtype;
-        if (indexConfig.getTable().indexOf(",") != -1) {
+        if (indexConfig.getIndex().indexOf(",") != -1) {
             MCROrCondition cOr = new MCROrCondition();
-            StringTokenizer st = new StringTokenizer(indexConfig.getTable(), ",");
+            StringTokenizer st = new StringTokenizer(indexConfig.getIndex(), ",");
             while (st.hasMoreTokens()) {
                 String next = st.nextToken();
                 int ilen = next.indexOf("_");
@@ -106,15 +106,15 @@ public class MCRIndexBrowserSearcher {
             }
             cAnd.addChild(cOr);
         } else {
-            int ilen = indexConfig.getTable().indexOf("_");
+            int ilen = indexConfig.getIndex().indexOf("_");
             if (ilen == -1) {
                 fieldtype = MCRFieldDef.getDef("objectType");
-                cAnd.addChild(new MCRQueryCondition(fieldtype, "=", indexConfig.getTable()));
+                cAnd.addChild(new MCRQueryCondition(fieldtype, "=", indexConfig.getIndex()));
             } else {
                 fieldtype = MCRFieldDef.getDef("objectType");
-                cAnd.addChild(new MCRQueryCondition(fieldtype, "=", indexConfig.getTable().substring(ilen + 1, indexConfig.getTable().length())));
+                cAnd.addChild(new MCRQueryCondition(fieldtype, "=", indexConfig.getIndex().substring(ilen + 1, indexConfig.getIndex().length())));
                 fieldproject = MCRFieldDef.getDef("objectProject");
-                cAnd.addChild(new MCRQueryCondition(fieldproject, "=", indexConfig.getTable().substring(0, ilen)));
+                cAnd.addChild(new MCRQueryCondition(fieldproject, "=", indexConfig.getIndex().substring(0, ilen)));
             }
         }
         if (browseData.getSearch() != null && browseData.getSearch().length() > 0) {
