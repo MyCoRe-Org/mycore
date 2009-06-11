@@ -1,0 +1,289 @@
+2009-06-11 09:59  mcrtchef
+
+	* .: Release 2.0.2
+
+2009-06-11 09:54  mcrtchef
+
+	* set target.version to "2.0"
+
+2009-06-10 13:22  mcrmeich
+
+	* fixed index browser alias cache bug
+
+2009-06-10 11:42  mcrtchef
+
+	* merged revision 15350 from trunk
+	  
+	  bugfix: handle ObjectNotFoundException on session.get()
+	  
+	  After updating hibernate to version 3.3.1 (revision 14573)
+	  session.get() behaves differently.
+	  Instead of returning null an ObjectNotFoundException is thrown if
+	  the object that would be retrieved was deleted before and is
+	  still associated with the session. This is the case if and object
+	  is updated (results in delete and create event).
+
+2009-06-08 15:03  mcrtchef
+
+	* merged revision 15339 from trunk
+	  
+	  fixed eventhandler path for index browser
+
+2009-06-08 15:03  mcrtchef
+
+	* merged revision 15319 and revision 15331 from trunk
+	  
+	  15319
+	  MCRFieldDef > avoidance of overiding of previously made
+	  searchfield definitions
+	  
+	  15331
+	  MCRFieldDef > avoidance of overiding of previously made
+	  searchfield definitions
+
+2009-06-08 14:55  mcrtchef
+
+	* merged revision 15321, revision 15337 from trunk
+	  
+	  15321
+	  fix bug 280110 - Can't find external commands
+	  
+	  15337
+	  removed redundant code from MCRWebCLIServlet
+
+2009-06-08 14:00  mcrtchef
+
+	* merged revision 15328
+	  
+	  added MCR.Access.AddObjectDefaultRule (default is true) property
+	  to trigger if default acl rules should be added automatically
+
+2009-06-08 13:58  mcrtchef
+
+	* merged revision 15314 from trunk
+	  
+	  aff bugfix from Mathias Fricke (bug #2798274
+	  checkPermission(String, String, MCRUSER) - MCRUser ignoriert)
+
+2009-06-08 13:56  mcrtchef
+
+	* merged revision 15312 from trunk
+	  
+	  fix bug with edit derivate titles
+
+2009-06-08 13:53  mcrtchef
+
+	* merged revision 15286, revision 15320, revision 15329 and
+	  revision 15330 from trunk
+	  
+	  15286
+	  added a more flexible and extendable index browser
+	  - split the old MCRIndexBrowserData in three logical separated
+	  units
+	  - replaced the array stuff ("this is kind of ugly") with
+	  ArrayLists
+	  - some other improvements
+	  - added java doc
+	  
+	  15320
+	  fixed that index browser servlet never used cache & removed
+	  alias, mcr cache uses now the index name as identifier
+	  
+	  15329
+	  removed old MCRIndexBrowserData
+	  
+	  15330
+	  changed package structure of index browser (sql & lucene)
+
+2009-06-02 13:32  mcrtchef
+
+	* merged revision 15315 from trunk
+	  
+	  bugfix: fixed bug #2799855 (Double ACL in workflow files)
+
+2009-06-02 12:41  mcrtchef
+
+	* merged revision 15310 from trunk
+	  
+	  bugfix: fixes NPE and gives better hint on what went wrong
+
+2009-05-29 13:17  mcrtchef
+
+	* merged revision 15295 from trunk
+	  
+	  bugfix: call setAdditionalNamespaces() in
+	  MCREditorSubmission(Element) contructor
+
+2009-05-28 12:18  mcrtchef
+
+	* partly merged revision 15203 from trunk
+	  
+	  MCREditorOutValidator.java was not completely removed during last
+	  merge attempt
+
+2009-05-27 11:52  mcrtchef
+
+	* merge revision 15284 from trunk
+	  
+	  bugfix: fixes namespace bug if @xlink:type and @type are both
+	  present in editor submission
+
+2009-05-27 10:08  mcrtchef
+
+	* merged revision 15274 and revision 15275 from trunk
+	  
+	  15274
+	  make method updateThisInDatastore() public
+	  
+	  15275
+	  add methods setXLinkLabel and setXLinkTitle
+
+2009-05-27 10:06  mcrtchef
+
+	* merged revision 15272 from trunk
+	  
+	  bugfix: fixes several IOException (Too many open files)
+
+2009-05-27 10:04  mcrtchef
+
+	* merged revision 15270 from trunk
+	  
+	  bugfix: fixed bug #2796440 (MalformedURLException with non ASCII
+	  characters in path name)
+	  
+	  replacing parseURI(String) with parseURI(URI) to ensure that
+	  valid URIs are used
+
+2009-05-27 10:02  mcrtchef
+
+	* merged revision 15268 from trunk
+	  
+	  empty search string led to an IllegalArgumentException, replaced
+	  the default value "null" by "*"
+
+2009-05-27 10:00  mcrtchef
+
+	* merged revision 15252 from trunk
+	  
+	  avoid javax.management.InstanceAlreadyExistsException
+	  which mostly happened after restart
+
+2009-05-19 14:35  mcrmeich
+
+	* increased performance for classifications by removing a not
+	  needed second db query
+
+2009-05-19 14:22  mcrtchef
+
+	* merges revision 15223, revision 15224 and revision 15225 from
+	  trunk
+	  
+	  15223
+	  bugfix: fixes bug #2792226 (Classification editor does not work
+	  properly)
+	  
+	  15224
+	  fixes hibernate test cases fail
+	  
+	  15225
+	  added more fixes to classification editor
+	  removed debug code
+
+2009-05-19 14:18  mcrtchef
+
+	* merged revision 15222 from trunk
+	  allow MCRNormalizer to be disabled by property
+
+2009-05-19 14:17  mcrtchef
+
+	* merged revision 15221 from trunk
+	  bugfix: if addable field contains more than one value, return
+	  every value
+
+2009-05-19 14:13  mcrtchef
+
+	* merged revision 15218 from trunk
+	  fixes bug #2787973 (problem with naming convention in JMX)
+
+2009-05-19 14:11  mcrtchef
+
+	* merged revision 15217 from trunk
+	  HQL Query for delete caused problems in long running sessions -
+	  new creation of formerly deleted links did not get persisted.
+	  Used Hibernate API for delete.
+
+2009-05-19 14:10  mcrtchef
+
+	* merged revision 15214 from trunk
+	  add log warning if namespace is missing in editor output
+
+2009-05-19 14:09  mcrtchef
+
+	* merged revision 15202 and revision 15203 from trunk
+	  
+	  15202
+	  do not keep a reference to MCRConfiguration instance open
+	  not really needed and blocks garbage collector
+	  
+	  15203
+	  added new MCREditorOutValidator
+	  is extensible like MCRURIResolver via mycore.properties
+
+2009-05-19 14:03  mcrtchef
+
+	* merged revsion 15201 from trunk
+	  fixed warnings
+
+2009-05-19 14:01  mcrtchef
+
+	* merged revision 15200 from trunk
+	  MCRSessionEvent make enum Type static
+
+2009-05-19 13:59  mcrtchef
+
+	* merged revision 15196 from trunk
+	  Fixed compile errors with java 5
+
+2009-05-15 13:53  mcrmeich
+
+	* point missed, could not resolve class
+
+2009-05-15 12:09  mcrmeich
+
+	* fixed bug that MCREditorOutValidator does not tests if a
+	  MCRMetaAddress-Tag has child elements.
+
+2009-05-14 14:18  mcrtchef
+
+	* merged revision 15189 from trunk
+	  version bump: log4j 1.2.13 -> 1.2.15
+
+2009-05-06 12:34  mcrtchef
+
+	* bugfix: if 1st sortField has no value set it to "???undefined???"
+	  
+	  fixes ArrayIndexOutOfBoundException
+
+2009-05-05 18:45  mcrtchef
+
+	* removed unneeded methods and queries that are replaced by
+	  MCRConfiguration.getSystemLastModified()
+
+2009-05-05 15:19  mcrtchef
+
+	* make classification URI resolver faster
+	  checking last modified date of MCRXMLTableManager does not fire a
+	  db query every time
+	  a file ".systemTime" in MCR.datadir is created by
+	  MCRConfiguration for that purpose
+	  checking File.lastModified() is fast enough for us.
+
+2009-05-05 11:58  mcrtchef
+
+	* bugfix: fixed bug #2786653 (RuntimeException in
+	  MCRLuceneSearcher)
+
+2009-05-01 14:36  mcrtchef
+
+	* Release branch 2.0
+
