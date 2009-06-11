@@ -38,7 +38,7 @@
   <property name="target.libs" location="${target.dir}/lib" />
   <property name="target.jarbase" location="${target.dir}/jarbase" />
   <property name="components.dir" location="${basedir}/components" />
-  <property name="target.version" value="2.0" />
+  <property name="target.version" value="2.0.2" />
 
   <condition property="ant1.7">
     <available classname="org.apache.tools.ant.taskdefs.condition.AntVersion" />
