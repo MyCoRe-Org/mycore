@@ -112,11 +112,5 @@ SELECT objectReference.objectID FROM MCRCategoryLink WHERE category.rootID=:root
 SELECT category.rootID, category.categID FROM MCRCategoryLink WHERE objectReference.objectID=:id
       ]]>
     </query>
-    <query name="hasLinks">
-      <![CDATA[
-SELECT 'true' FROM MCRCategoryLink WHERE category.internalID IN (:internalIDs)
-      ]]>
-    </query>
-    <!--  -->
   </class>
 </hibernate-mapping>

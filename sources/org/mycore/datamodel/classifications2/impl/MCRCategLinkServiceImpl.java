@@ -24,6 +24,7 @@
 package org.mycore.datamodel.classifications2.impl;
 
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -34,8 +35,8 @@ import org.apache.log4j.Logger;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.Session;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
-import org.hibernate.criterion.Restrictions;
 import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRConfiguration;
@@ -190,60 +191,45 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
         return categ;
     }
 
-    @SuppressWarnings("unchecked")
     public Map<MCRCategoryID, Boolean> hasLinks(MCRCategory category) {
-        //a rather simple implementation
-        boolean useSingleDBQuery = MCRConfiguration.instance()
-                .getBoolean("MCR.Classifications.LinkServiceImpl.HasLinks.SingleQuery", false);
-        Map<MCRCategoryID, Number> countMap = useSingleDBQuery ? countLinks(category, false) : null;
-        final Collection<MCRCategoryID> allCategIDs = getAllCategIDs(category);
-        HashMap<MCRCategoryID, Boolean> boolMap = new HashMap<MCRCategoryID, Boolean>(allCategIDs.size());
-        Session session = HIB_CONNECTION_INSTANCE.getSession();
-        for (MCRCategoryID categID : allCategIDs) {
-            if (useSingleDBQuery) {
-                boolMap.put(categID, countMap.get(categID).intValue() > 0 ? Boolean.TRUE : Boolean.FALSE);
-            } else {
-                LOGGER.debug("first fetch all internalID of all category under " + categID);
-                Criteria classCriteria = session.createCriteria(MCRCategoryImpl.class);
-                classCriteria.setProjection(Projections.property("internalID"));
-                classCriteria.add(Restrictions.eq("rootID", categID.getRootID()));
-                if (!categID.isRootID()) {
-                    MCRCategoryImpl categoryImpl = MCRCategoryDAOImpl.getByNaturalID(session, categID);
-                    if (categoryImpl == null) {
-                        LOGGER.warn("Category does not exist: " + categID);
-                        boolMap.put(categID, false);
-                        continue;
-                    }
-                    classCriteria.add(Restrictions.between("left", categoryImpl.getLeft(), categoryImpl.getRight()));
-                }
-                List<Number> internalIDs = classCriteria.list();
-                if (internalIDs.size() == 0) {
-                    LOGGER.warn("Category does not exist: " + categID);
-                    boolMap.put(categID, false);
-                    continue;
-                }
-                LOGGER.debug("check if a single linked category is part of " + categID);
-                Query linkQuery = HIB_CONNECTION_INSTANCE.getNamedQuery(LINK_CLASS.getName() + ".hasLinks");
-                /*
-                 * do query in chunks of 5000 internalIDs
-                 * this prevents StackOverflowErrors in hibernate 
-                 */
-                int size = internalIDs.size();
-                int maxSize = 5000;
-                LOGGER.debug("internalIDs size:" + size);
-                for (int i = 0; i < Math.ceil(size / (double) maxSize); i++) {
-                    int begin = i * maxSize;
-                    int end = i * maxSize + maxSize;
-                    if (end >= size)
-                        end = size;
-                    List<Number> idParam = internalIDs.subList(begin, end);
-                    linkQuery.setParameterList("internalIDs", idParam);
-                    linkQuery.setMaxResults(1);
-                    boolMap.put(categID, linkQuery.iterate().hasNext());
-                }
-            }
-        }
+        HashMap<MCRCategoryID, Boolean> boolMap = new HashMap<MCRCategoryID, Boolean>();
+        MCRCategoryImpl rootImpl = MCRCategoryDAOImpl.getByNaturalID(HIB_CONNECTION_INSTANCE.getSession(), category.getRoot().getId());
+        storeHasLinkValues(boolMap, getLinkedInternalIds(), rootImpl);
         return boolMap;
+    }
+
+    private void storeHasLinkValues(HashMap<MCRCategoryID, Boolean> boolMap, BitSet internalIds, MCRCategoryImpl parent) {
+        final int internalID = parent.getInternalID();
+        if (internalID < internalIds.size() && internalIds.get(internalID)) {
+            addParentHasValues(boolMap, parent);
+        } else {
+            boolMap.put(parent.getId(), false);
+        }
+        for (MCRCategory child : parent.getChildren()) {
+            storeHasLinkValues(boolMap, internalIds, (MCRCategoryImpl) child);
+        }
+    }
+
+    private void addParentHasValues(HashMap<MCRCategoryID, Boolean> boolMap, MCRCategory parent) {
+        boolMap.put(parent.getId(), true);
+        if (parent.isCategory() && !boolMap.get(parent.getParent().getId()).booleanValue()) {
+            addParentHasValues(boolMap, parent.getParent());
+        }
+    }
+
+    private BitSet getLinkedInternalIds() {
+        Session session = HIB_CONNECTION_INSTANCE.getSession();
+        Criteria criteria = session.createCriteria(LINK_CLASS);
+        criteria.setProjection(Projections.distinct(Projections.property("category.internalID")));
+        criteria.addOrder(Order.desc("category.internalID"));
+        @SuppressWarnings("unchecked")
+        List<Number> result = criteria.list();
+        int maxSize = result.size() == 0 ? 1 : result.get(0).intValue() + 1;
+        BitSet linkSet = new BitSet(maxSize);
+        for (Number internalID : result) {
+            linkSet.set(internalID.intValue(), true);
+        }
+        return linkSet;
     }
 
     private static Collection<MCRCategoryID> getAllCategIDs(MCRCategory category) {
