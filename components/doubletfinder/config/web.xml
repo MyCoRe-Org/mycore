@@ -1,0 +1,14 @@
+
+<!-- **************************************************************** -->
+<!-- Servlets and mappings of doubletfinder                           -->
+<!-- **************************************************************** -->
+
+<servlet id="MCRRedundancyMapServlet">
+    <servlet-name>MCRRedundancyMapServlet</servlet-name>
+    <servlet-class>org.mycore.frontend.redundancy.servlets.MCRRedundancyMapServlet</servlet-class>
+</servlet>
+
+<servlet-mapping>
+    <servlet-name>MCRRedundancyMapServlet</servlet-name>
+    <url-pattern>/servlets/MCRRedundancyMapServlet/*</url-pattern>
+</servlet-mapping>
