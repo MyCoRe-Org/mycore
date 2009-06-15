@@ -218,7 +218,7 @@ public class MCRCategoryTransformer {
         private boolean emptyLeaves;
 
         private Map<MCRCategoryID, Number> countMap = null;
-        
+
         private Map<MCRCategoryID, Boolean> linkedMap = null;
 
         private Element root;
@@ -242,7 +242,8 @@ public class MCRCategoryTransformer {
                     String objectType = countMatcher.group(2);
                     countMap = MCRCategLinkServiceFactory.getInstance().countLinksForType(cl, objectType, false);
                 }
-            } else if (!emptyLeaves) {
+            }
+            if (!emptyLeaves) {
                 linkedMap = MCRCategLinkServiceFactory.getInstance().hasLinks(cl);
             }
 
