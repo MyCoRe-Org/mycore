@@ -57,8 +57,8 @@ public class MCRHIBAccessStore extends MCRAccessStore {
     public String getRuleID(String objID, String ACPool) {
 
         Session session = MCRHIBConnection.instance().getSession();
-        Criteria c = session.createCriteria(MCRACCESS.class).setProjection(Projections.property("rule.rid")).add(Restrictions.eq("key.objid", objID)).add(
-                Restrictions.eq("key.acpool", ACPool));
+        Criteria c = session.createCriteria(MCRACCESS.class).setProjection(Projections.property("rule.rid")).add(
+                Restrictions.eq("key.objid", objID)).add(Restrictions.eq("key.acpool", ACPool));
         return (String) c.uniqueResult();
     }
 
@@ -82,7 +82,7 @@ public class MCRHIBAccessStore extends MCRAccessStore {
         if (!existAccessDefinition(rulemapping.getPool(), rulemapping.getObjId())) {
             Session session = MCRHIBConnection.instance().getSession();
             MCRACCESSRULE accessRule = getAccessRule(rulemapping.getRuleId());
-            if (accessRule==null){
+            if (accessRule == null) {
                 throw new NullPointerException("Cannot map a null rule.");
             }
             MCRACCESS accdef = new MCRACCESS();
@@ -122,12 +122,13 @@ public class MCRHIBAccessStore extends MCRAccessStore {
             return false;
         }
 
-        StringBuffer query = new StringBuffer("select count(*) from MCRACCESS ").append("where key.objid like '").append(objid).append("'");
+        Criteria criteria = session.createCriteria(MCRACCESS.class);
+        criteria.setProjection(Projections.rowCount());
+        criteria.add(Restrictions.eq("key.objid", objid));
         if (pool != null && !pool.equals("")) {
-            query.append(" and key.acpool like '").append(pool).append("'");
+            criteria.add(Restrictions.eq("key.acpool", pool));
         }
-
-        int count = ((Number) session.createQuery(query.toString()).iterate().next()).intValue();
+        int count = ((Number) criteria.uniqueResult()).intValue();
         if (count > 0) {
             return true;
         }
@@ -143,7 +144,8 @@ public class MCRHIBAccessStore extends MCRAccessStore {
     public void deleteAccessDefinition(MCRRuleMapping rulemapping) {
 
         Session session = MCRHIBConnection.instance().getSession();
-        session.createQuery("delete MCRACCESS " + "where ACPOOL = '" + rulemapping.getPool() + "'" + " AND OBJID = '" + rulemapping.getObjId() + "'")
+        session.createQuery(
+                "delete MCRACCESS " + "where ACPOOL = '" + rulemapping.getPool() + "'" + " AND OBJID = '" + rulemapping.getObjId() + "'")
                 .executeUpdate();
     }
 
@@ -153,7 +155,7 @@ public class MCRHIBAccessStore extends MCRAccessStore {
     public void updateAccessDefinition(MCRRuleMapping rulemapping) {
         Session session = MCRHIBConnection.instance().getSession();
         MCRACCESSRULE accessRule = getAccessRule(rulemapping.getRuleId());
-        if (accessRule==null){
+        if (accessRule == null) {
             throw new NullPointerException("Cannot map a null rule.");
         }
         // update
@@ -179,7 +181,8 @@ public class MCRHIBAccessStore extends MCRAccessStore {
 
         Session session = MCRHIBConnection.instance().getSession();
         MCRRuleMapping rulemapping = new MCRRuleMapping();
-        MCRACCESS data = ((MCRACCESS) session.createCriteria(MCRACCESS.class).add(Restrictions.eq("key", new MCRACCESSPK(pool, objid))).list().get(0));
+        MCRACCESS data = ((MCRACCESS) session.createCriteria(MCRACCESS.class).add(Restrictions.eq("key", new MCRACCESSPK(pool, objid)))
+                .list().get(0));
         if (data != null) {
             rulemapping.setCreationdate(data.getCreationdate());
             rulemapping.setCreator(data.getCreator());

@@ -296,7 +296,7 @@ public class MCRAccessManager {
      *            the access permission for the rule
      */
     public static boolean hasRule(String id, String permission) {
-        return getPermissionsForID(id).contains(permission);
+        return ACCESS_IMPL.hasRule(id, permission);
     }
 
 }
