@@ -219,6 +219,8 @@ public class MCRCategoryTransformer {
 
         private Map<MCRCategoryID, Number> countMap = null;
 
+        private Map<MCRCategoryID, Boolean> linkedMap = null;
+
         private Element root;
 
         ItemElementFactory(MCRCategory cl, String labelFormat, boolean sort, boolean emptyLeaves) {
@@ -240,8 +242,9 @@ public class MCRCategoryTransformer {
                     String objectType = countMatcher.group(2);
                     countMap = MCRCategLinkServiceFactory.getInstance().countLinksForType(cl, objectType, false);
                 }
-            } else if (!emptyLeaves) {
-                countMap = MCRCategLinkServiceFactory.getInstance().countLinks(cl, false);
+            }
+            if (!emptyLeaves) {
+                linkedMap = MCRCategLinkServiceFactory.getInstance().hasLinks(cl);
             }
 
             root = new Element("items");
@@ -260,7 +263,7 @@ public class MCRCategoryTransformer {
         }
 
         void addChildren(Element parent, MCRCategory category) {
-            if ((!emptyLeaves) && (countMap.get(category.getId()).intValue() < 1))
+            if ((!emptyLeaves) && (!linkedMap.get(category.getId()).booleanValue()))
                 return;
 
             Element ce = new Element("item");
