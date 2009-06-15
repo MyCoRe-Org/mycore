@@ -18,7 +18,17 @@ check user data consistency
     </antcall>
     <delete file="${commands.file}" />
   </target>
-
+	
+  <!-- - - - - - - - - - - - - - - - - - 
+	      target: config                      
+         - - - - - - - - - - - - - - - - - -->
+	  <target name="config">
+	  	<mcr-config action="addInclude"
+	  	                propertyfile="${build.config}/mycore.properties"
+	  	                key="MCR.URIResolver.xslIncludes.components"
+	  	                value="mcr-module-broadcasting.xsl" />
+	  </target>
+	
   <!-- - - - - - - - - - - - - - - - - - 
           target: create.default-rules                      
          - - - - - - - - - - - - - - - - -

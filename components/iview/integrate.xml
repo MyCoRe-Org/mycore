@@ -6,11 +6,21 @@
   <!-- - - - - - - - - - - - - - - - - - 
           target: config                      
          - - - - - - - - - - - - - - - - - -->
-  <target name="config" if="jai.available">
-    <mcr-config action="addInclude"
-                propertyfile="${build.config}/mycore.properties"
-                key="MCR.CLI.Classes.Internal"
-                value="org.mycore.services.imaging.MCRImgCacheCommands" />
+  <target name="config">
+  	<if>
+  		<istrue value="${jai.available}" />
+  		<then>
+  		    <mcr-config action="addInclude"
+  		                propertyfile="${build.config}/mycore.properties"
+  		                key="MCR.CLI.Classes.Internal"
+  		                value="org.mycore.services.imaging.MCRImgCacheCommands" />
+  		</then>
+  	</if>
+
+  	<mcr-config action="addInclude"
+  	            propertyfile="${build.config}/mycore.properties"
+  	            key="MCR.URIResolver.xslIncludes.components"
+  	            value="mcr-module-startIview.xsl" />
   </target>
 
   <!-- - - - - - - - - - - - - - - - - - 
