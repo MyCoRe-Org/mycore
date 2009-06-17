@@ -324,8 +324,11 @@
          - - - - - - - - - - - - - - - - - -->
   <target name="jar.copy-web">
     <mkdir dir="${target.jarbase}/web" />
-  	<copy todir="${target.jarbase}/web" file="${basedir}/lib/fckEditor.zip"/>
-    <mkdir dir="${target.jarbase}/web/fck" />
+  	<unzip dest="${target.jarbase}/web" src="${basedir}/lib/fckEditor.zip" overwrite="false">
+  		<patternset>
+  			<exclude name="fck/fckconfig.js"/>
+  		</patternset>
+  	</unzip>
   	<copy todir="${target.jarbase}/web/fck" file="${basedir}/config/fckconfig.js"/>
     <mkdir dir="${target.jarbase}/web/oai" />
   	<copy todir="${target.jarbase}/web/oai" file="${basedir}/xsl/oai2.xsl"/>
