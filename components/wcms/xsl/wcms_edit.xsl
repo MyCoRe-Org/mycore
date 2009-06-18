@@ -778,7 +778,6 @@
                 <script type="text/javascript">
                     function submitForm(){
                         var linkName = document.getElementById('linkName');
-                        var url = document.getElementById('hrefInput');
                         
                         var msg = '';
                         
@@ -786,7 +785,8 @@
                             msg = '<xsl:value-of select="concat('Name ', i18n:translate('wcms.msg.notEmpty'))" />\n';
                         }
                         
-                        if (url.value == null || url.value == ''){
+                        var url = document.getElementById('hrefInput');
+                        if (url != null &amp;&amp; (url.value == null || url.value == '')){
                             msg = msg + '<xsl:value-of select="concat('URL ', i18n:translate('wcms.msg.notEmpty'))" />';
                         } 
                         
