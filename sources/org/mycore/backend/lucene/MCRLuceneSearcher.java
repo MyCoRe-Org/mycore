@@ -616,9 +616,9 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
 
         private int maxIndexWriteActions;
 
-        private static ReadWriteLock IndexCloserLock = new ReentrantReadWriteLock(true);
+        private ReadWriteLock IndexCloserLock = new ReentrantReadWriteLock(true);
 
-        private static ThreadLocal<Lock> writeAccess = new ThreadLocal<Lock>() {
+        private ThreadLocal<Lock> writeAccess = new ThreadLocal<Lock>() {
 
             @Override
             protected Lock initialValue() {
