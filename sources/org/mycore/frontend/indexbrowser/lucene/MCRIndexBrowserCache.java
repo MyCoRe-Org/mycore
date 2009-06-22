@@ -76,7 +76,7 @@ public class MCRIndexBrowserCache {
      * Returns the cached index browser list.
      * @return the cached list.
      */
-    public static List<MCRIndexBrowserEntry> getFromCache(String index, MCRIndexBrowserIncomingData browseData) {
+	public static List<MCRIndexBrowserEntry> getFromCache(String index, MCRIndexBrowserIncomingData browseData) {
         // if the list is not cached, return null
         if(!isCached(index, browseData))
             return null;
@@ -85,6 +85,7 @@ public class MCRIndexBrowserCache {
         // get the mcr cache from the hash table
         MCRCache mcrCache = getIndexCache(index);
         // get the cached list from the mcr cache
+        @SuppressWarnings("unchecked")
         List<MCRIndexBrowserEntry> cachedList = ((List<MCRIndexBrowserEntry>)mcrCache.get(cacheKey));
         // return the list
         return cachedList;

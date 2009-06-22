@@ -1,6 +1,5 @@
 package org.mycore.frontend.indexbrowser.lucene;
 
-import org.mycore.common.MCRConfiguration;
 
 /**
  * Contains all incoming data from the web browser.
