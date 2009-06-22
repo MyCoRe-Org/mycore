@@ -12,6 +12,17 @@ fieldtypes.xsd">
 		<operator token="like"/>
 		<!-- allows wildcard search using * and ? -->
 	</type>
+	<type name="index" default="=">
+		<!-- exact string or id, should be indexed as lowercase -->
+		<operator token="="/>
+		<operator token="&gt;"/>
+		<operator token="&lt;"/>
+		<operator token="&gt;="/>
+		<operator token="&lt;="/>
+		<operator token="like"/>
+		<!-- allows wildcard search using * and ? -->
+	</type>
+
 	<type name="name" default="contains">
 		<!-- name of a person or place, umlauts etc. should be normalized -->
 		<operator token="="/>
