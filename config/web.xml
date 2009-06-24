@@ -83,6 +83,12 @@
     <servlet-name>MCRLinkServlet</servlet-name>
     <servlet-class>org.mycore.frontend.servlets.MCRLinkServlet</servlet-class>
   </servlet>
+  <servlet id="MCRDerivateLink">
+    <servlet-name>MCRDerivateLinkServlet</servlet-name>
+    <servlet-class>org.mycore.frontend.servlets.MCRDerivateLinkServlet</servlet-class>
+  </servlet>
+  
+  
   
   <filter-mapping>
     <filter-name>WebAppBaseFilter</filter-name>
@@ -200,6 +206,10 @@
   <servlet-mapping>
     <servlet-name>MCRLinkServlet</servlet-name>
     <url-pattern>/servlets/MCRLinkServlet</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>MCRDerivateLinkServlet</servlet-name>
+    <url-pattern>/servlets/MCRDerivateLinkServlet</url-pattern>
   </servlet-mapping>
 
   <!-- **************************************************************** -->
