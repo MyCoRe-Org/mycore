@@ -25,6 +25,8 @@ package org.mycore.frontend.indexbrowser.lucene;
 
 import java.util.Enumeration;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.jdom.Document;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
@@ -51,21 +53,41 @@ public class MCRIndexBrowserServlet extends MCRServlet {
             System.out.println("PARAM: " + param + " VALUE: " + job.getRequest().getParameter(param));
         }
 
-        incomingBrowserData = MCRIndexBrowserUtils.getIncomingBrowserData(job.getRequest());
+        incomingBrowserData = getIncomingBrowserData(job.getRequest());
         config = new MCRIndexBrowserConfig(incomingBrowserData.getSearchclass());
 
         Document pageContent = null;
         // if init is true, then create an empty document, otherwise create
         // the result list
         if(!incomingBrowserData.isInit()) {
-            pageContent = MCRIndexBrowserUtils.createResultListDocument(incomingBrowserData, config);
+            pageContent = createResultListDocument();
         } else {
-            pageContent = MCRIndexBrowserUtils.createEmptyDocument(incomingBrowserData);
+            pageContent = createEmptyDocument();
         }
 
         if (getProperty(job.getRequest(), "XSL.Style") == null) {
             job.getRequest().setAttribute("XSL.Style", job.getRequest().getParameter("searchclass"));
         }
         getLayoutService().doLayout(job.getRequest(), job.getResponse(), pageContent);
+    }
+
+    /**
+     * Creates a xml document with the results of the index browser.
+     * @return a new xml document with the result list
+     */
+    protected Document createResultListDocument() {
+        return MCRIndexBrowserUtils.createResultListDocument(incomingBrowserData, config);
+    }
+
+    /**
+     * Creates an empty xml index browser document.
+     * @return a new empty document
+     */
+    protected Document createEmptyDocument() {
+        return MCRIndexBrowserUtils.createEmptyDocument(incomingBrowserData);
+    }
+
+    protected MCRIndexBrowserIncomingData getIncomingBrowserData(HttpServletRequest request) {
+        return  MCRIndexBrowserUtils.getIncomingBrowserData(request);
     }
 }
