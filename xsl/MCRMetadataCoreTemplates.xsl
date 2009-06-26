@@ -138,6 +138,27 @@
   fixed="MCRMetaLinkID"/>
 </xsl:template>
 
+<!-- Template for the metadata MCRMetaDerivateLink -->
+
+<xsl:template match="mcrmetaderivatelink">
+<xsd:sequence>
+ <xsd:element name="{@name}" minOccurs="{@minOccurs}" maxOccurs="{@maxOccurs}">
+   <xsd:complexType>
+     <xsd:attribute name="inherited" use="optional" type="xsd:integer" />
+     <xsd:attribute name="type" use="optional" type="mcrdefaulttype" />
+     <xsd:attribute ref="xlink:type" />
+     <xsd:attribute ref="xlink:href" use="optional"/>
+     <xsd:attribute ref="xlink:title" use="optional"/>
+     <xsd:attribute ref="xlink:label" use="optional"/>
+     <xsd:attribute ref="xlink:from" use="optional"/>
+     <xsd:attribute ref="xlink:to" use="optional"/>
+   </xsd:complexType>
+  </xsd:element>
+</xsd:sequence>
+<xsd:attribute name="class" type="xsd:string" use="required" 
+  fixed="MCRMetaDerivateLink"/>
+</xsl:template>
+
 <!-- Template for the metadata MCRMetaClassification -->
 
 <xsl:template match="mcrmetaclassification">
