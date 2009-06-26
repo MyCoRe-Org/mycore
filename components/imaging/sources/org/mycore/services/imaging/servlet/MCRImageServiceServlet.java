@@ -1,21 +1,19 @@
 package org.mycore.services.imaging.servlet;
 
-import java.io.PrintWriter;
-
-import javax.servlet.ServletContext;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.mycore.common.MCRException;
 import org.mycore.datamodel.ifs.MCRDirectory;
 import org.mycore.datamodel.ifs.MCRFile;
-import org.mycore.datamodel.ifs.MCRFileNodeServlet;
 import org.mycore.datamodel.ifs.MCRFilesystemNode;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
-import org.mycore.services.imaging.MCRJAIManipBean;
+import org.mycore.services.imaging.JAI.MCRJAIManipBean;
+import org.mycore.services.imaging.JAI.MCRJAIResizeOp;
+import org.mycore.services.imaging.JAI.MCRJAIRotateOp;
+import org.mycore.services.imaging.JAI.MCRJAIScaleOp;
 
 public class MCRImageServiceServlet extends MCRServlet {
     private static Logger LOGGER = Logger.getLogger(MCRImageServiceServlet.class);
@@ -29,30 +27,39 @@ public class MCRImageServiceServlet extends MCRServlet {
     }
 
     private void sendImage(HttpServletRequest request, HttpServletResponse response) {
-        double magFactor = 0.0;
-        double rotAngle = 0.0;
 
-        String img = request.getParameter("img");
-        String rot = request.getParameter("rotAngle");
-        String mag = request.getParameter("magFactor");
+        String rot = request.getParameter("rot");
+        String mag = request.getParameter("mag");
+        String siz = request.getParameter("siz");
 
-        if (rot != null) {
-            rotAngle = Math.toRadians(Double.valueOf(rot).doubleValue());
-        }
+        MCRJAIManipBean imageBean = new MCRJAIManipBean();
 
         if (mag != null) {
-            magFactor = Math.toRadians(Double.valueOf(mag).doubleValue());
+            float magFactor = Float.parseFloat(mag) / 100;
+            imageBean.addManipOp(new MCRJAIScaleOp(magFactor));
+        }
+
+        if (siz != null && siz.contains("x")) {
+            String[] dimension = siz.split("x");
+            
+            if (dimension.length == 2) {
+                int width = Integer.parseInt(dimension[0]);
+                int height = Integer.parseInt(dimension[1]);
+                
+                imageBean.addManipOp(new MCRJAIResizeOp(width, height));
+            }
+        }
+        
+        if (rot != null) {
+            float rotAngle = (float) Math.toRadians(Float.parseFloat(rot));
+            imageBean.addManipOp(new MCRJAIRotateOp(rotAngle));
         }
 
         try {
             response.setContentType("image/jpeg");
-            ServletContext context = getServletContext();
             String pathInfo = request.getPathInfo();
             MCRFile image = getFileNode(pathInfo);
 
-            MCRJAIManipBean imageBean = new MCRJAIManipBean();
-            imageBean.setMagFactor(magFactor);
-            imageBean.setRotAngle(rotAngle);
             ServletOutputStream out = response.getOutputStream();
 
             imageBean.manipAndPost(image.getContentAsInputStream(), out);
