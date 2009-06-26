@@ -232,7 +232,7 @@ final public class MCRMetaBoolean extends MCRMetaDefault {
         }
 
         org.jdom.Element elm = new org.jdom.Element(subtag);
-        elm.setAttribute("lang", lang, Namespace.XML_NAMESPACE);
+//        elm.setAttribute("lang", lang, Namespace.XML_NAMESPACE);
         elm.setAttribute("inherited", Integer.toString(inherited));
 
         if ((type != null) && ((type = type.trim()).length() != 0)) {

@@ -5,7 +5,6 @@ import java.util.Map;
 
 import org.jdom.Document;
 import org.jdom.Element;
-import org.mycore.common.MCRConfiguration;
 import org.mycore.datamodel.common.MCRLinkTableManager;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
@@ -20,10 +19,8 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 public class MCRDerivateLinkServlet extends MCRServlet {
 
     private static final long serialVersionUID = 1L;
-    private static final MCRConfiguration CONFIG = MCRConfiguration.instance();
-    protected static String pagedir = MCRConfiguration.instance().getString("MCR.SWF.PageDir", "");
-
-    protected static String derivateLinkErrorPage = pagedir + CONFIG.getString("MCR.SWF.PageErrorExport", "error_derivatelink.xml");
+ 
+    protected static String derivateLinkErrorPage = "error_derivatelink.xml";
 
     @Override
     protected void doGetPost(MCRServletJob job) throws Exception {
