@@ -1,7 +1,8 @@
-package org.mycore.services.imaging.JAI;
+package org.mycore.services.imaging.JAI.imgOperation;
 
 import javax.media.jai.PlanarImage;
 import javax.media.jai.RenderedOp;
+
 
 public class MCRJAIResizeOp extends MCRJAIScaleOp implements MCRJAIImageOp {
     int newWidth;

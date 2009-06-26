@@ -1,4 +1,4 @@
-package org.mycore.services.imaging.JAI;
+package org.mycore.services.imaging.JAI.imgOperation;
 
 import java.awt.image.renderable.ParameterBlock;
 
@@ -6,6 +6,7 @@ import javax.media.jai.Interpolation;
 import javax.media.jai.JAI;
 import javax.media.jai.PlanarImage;
 import javax.media.jai.RenderedOp;
+
 
 public class MCRJAIScaleOp implements MCRJAIImageOp{
     protected float scaleFactor;
@@ -30,5 +31,9 @@ public class MCRJAIScaleOp implements MCRJAIImageOp{
     
     public RenderedOp executeOp(PlanarImage image){
         return scale(image, scaleFactor);
+    }
+
+    public int getOrder() {
+        return 0;
     }
 }

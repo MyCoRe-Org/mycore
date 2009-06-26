@@ -1,4 +1,4 @@
-package org.mycore.services.imaging.JAI;
+package org.mycore.services.imaging.JAI.imgOperation;
 
 import java.awt.image.renderable.ParameterBlock;
 
@@ -6,6 +6,7 @@ import javax.media.jai.Interpolation;
 import javax.media.jai.JAI;
 import javax.media.jai.PlanarImage;
 import javax.media.jai.RenderedOp;
+
 
 public class MCRJAIRotateOp implements MCRJAIImageOp {
     protected float rotAngle;
@@ -26,6 +27,10 @@ public class MCRJAIRotateOp implements MCRJAIImageOp {
     
     public RenderedOp executeOp(PlanarImage image) {
         return rotate(image, rotAngle);
+    }
+
+    public int getOrder() {
+        return 100;
     }
 
 }
