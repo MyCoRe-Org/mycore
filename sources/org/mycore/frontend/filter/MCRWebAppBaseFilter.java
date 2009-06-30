@@ -50,8 +50,9 @@ public class MCRWebAppBaseFilter implements Filter {
                 webappBase.append(proxyHost);
             } else {
                 webappBase.append(request.getServerName());
-                if (!(request.getLocalPort() == 80 || (request.isSecure() && request.getLocalPort() == 443))) {
-                    webappBase.append(':').append(request.getLocalPort());
+                int port = request.getServerPort();
+                if (!(port == 80 || (request.isSecure() && port == 443))) {
+                    webappBase.append(':').append(port);
                 }
             }
             webappBase.append(request.getContextPath()).append('/');
