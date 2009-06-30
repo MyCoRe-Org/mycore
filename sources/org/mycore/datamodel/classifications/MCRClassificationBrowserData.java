@@ -607,7 +607,9 @@ public class MCRClassificationBrowserData {
         while ((line = getTreeline(i++)) != null) {
 
             final String catid = line.getAttributeValue("ID");
-            boolean hasLinks = countMap.get(new MCRCategoryID(cl.getId().getRootID(), catid)).booleanValue();
+            final Boolean hasLinkValue = countMap.get(new MCRCategoryID(cl.getId().getRootID(), catid));
+            //new categories are not yet in countMap
+            boolean hasLinks = hasLinkValue != null ? hasLinkValue.booleanValue() : false;
             final String status = line.getAttributeValue("hasChildren");
 
             Element label = (Element) XPath.selectSingleNode(line, "label[lang('" + lang + "')]");
