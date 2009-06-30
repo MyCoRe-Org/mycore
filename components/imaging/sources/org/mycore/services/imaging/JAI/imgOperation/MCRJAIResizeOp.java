@@ -19,8 +19,8 @@ public class MCRJAIResizeOp extends MCRJAIScaleOp implements MCRJAIImageOp {
      * @see org.mycore.services.imaging.MCRJAIImageOp#executeOp(javax.media.jai.PlanarImage)
      */
     public RenderedOp executeOp(PlanarImage image){
-        float xScale = (float) newWidth / (float) image.getWidth();
-        float yScale = (float) newHeight / (float) image.getHeight();
+        float xScale = (newWidth <= 0 )? 1.0F : (float) newWidth / (float) image.getWidth();
+        float yScale = (newHeight <= 0)? 1.0F : (float) newHeight / (float) image.getHeight();
         scaleFactor = (yScale < xScale) ? yScale : xScale;
         
         return scale(image, scaleFactor);

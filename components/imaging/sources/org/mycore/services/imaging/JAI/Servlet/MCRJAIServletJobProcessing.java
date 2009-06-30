@@ -3,7 +3,6 @@ package org.mycore.services.imaging.JAI.Servlet;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Properties;
-import java.util.Set;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
@@ -25,9 +24,10 @@ public class MCRJAIServletJobProcessing implements MCRServletJobProcessing {
     public MCRJAIServletJobProcessing() {
         MCRConfiguration mcrConfig = MCRConfiguration.instance();
         Properties properties = mcrConfig.getProperties("MCR.Imaging.Servlet.Parameter.");
-        Set<String> stringPropertyNames = properties.stringPropertyNames();
+         Enumeration propertyNames = properties.propertyNames();
 
-        for (String property : stringPropertyNames) {
+        while (propertyNames.hasMoreElements()) {
+            String property = (String) propertyNames.nextElement();
             MCRJAIServletParam param = (MCRJAIServletParam) mcrConfig.getInstanceOf(property);
             paramMap.put(param.getParamName(), param);
         }
