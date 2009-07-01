@@ -84,30 +84,32 @@ public class MCRClassificationBrowser extends MCRServlet {
         LOGGER.debug("Browsing Path = " + uri);
         LOGGER.debug("Browsing  Mode = " + mode);
 
+        MCRClassificationBrowserData bData;
         try {
             LOGGER.debug("Creation of BData.");
             LOGGER.debug("URI: " + uri);
             LOGGER.debug("MODE: " + mode);
             LOGGER.debug("ACTCLID: " + actclid);
             LOGGER.debug("ACTCATEG: " + actcateg);
-            mcrSession.BData = new MCRClassificationBrowserData(uri, mode, actclid, actcateg);
+            bData = new MCRClassificationBrowserData(uri, mode, actclid, actcateg);
         } catch (MCRConfigurationException cErr) {
             generateErrorPage(job.getRequest(), job.getResponse(), HttpServletResponse.SC_INTERNAL_SERVER_ERROR, cErr.getMessage(), cErr,
                     false);
+            return;
         }
 
-        Document jdomFile = getEmbeddingPage(mcrSession.BData.getPageName());
+        Document jdomFile = getEmbeddingPage(bData.getPageName());
         Document jdom = null;
 
-        if (mode.equalsIgnoreCase("edit") && mcrSession.BData.getClassification() == null) {
+        if (mode.equalsIgnoreCase("edit") && bData.getClassification() == null) {
             // alle Klassifikationen auflisten (auch die nicht eingebundenen)
-            jdom = mcrSession.BData.createXmlTreeforAllClassifications();
+            jdom = bData.createXmlTreeforAllClassifications();
 
         } else {
-            jdom = mcrSession.BData.createXmlTree(lang);
+            jdom = bData.createXmlTree(lang);
         }
-        jdom = mcrSession.BData.loadTreeIntoSite(jdomFile, jdom);
-        doLayout(job, mcrSession.BData.getXslStyle(), jdom); // use the stylesheet-postfix from properties
+        jdom = bData.loadTreeIntoSite(jdomFile, jdom);
+        doLayout(job, bData.getXslStyle(), jdom); // use the stylesheet-postfix from properties
     }
 
     private org.jdom.Document getEmbeddingPage(String coverPage) throws Exception {
