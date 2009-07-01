@@ -42,7 +42,6 @@ import org.hibernate.Transaction;
 import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.common.events.MCRSessionEvent;
 import org.mycore.common.events.MCRSessionListener;
-import org.mycore.datamodel.classifications.MCRClassificationBrowserData;
 import org.mycore.frontend.servlets.MCRServletJob;
 
 /**
@@ -88,9 +87,6 @@ public class MCRSession implements Cloneable {
 
     /** The unique ID of this session */
     private String sessionID = null;
-
-    /** -ASC- for MCRClassificationBrowser Class session data */
-    public MCRClassificationBrowserData BData = null;
 
     private String FullName = null;
 

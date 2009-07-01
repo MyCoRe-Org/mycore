@@ -43,6 +43,7 @@ import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.datamodel.classifications2.MCRCategLinkService;
 import org.mycore.datamodel.classifications2.MCRCategory;
+import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.MCRObjectReference;
 
@@ -193,8 +194,9 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
 
     public Map<MCRCategoryID, Boolean> hasLinks(MCRCategory category) {
         HashMap<MCRCategoryID, Boolean> boolMap = new HashMap<MCRCategoryID, Boolean>();
-        MCRCategoryImpl rootImpl = MCRCategoryDAOImpl.getByNaturalID(HIB_CONNECTION_INSTANCE.getSession(), category.getRoot().getId());
-        storeHasLinkValues(boolMap, getLinkedInternalIds(), rootImpl);
+        final BitSet linkedInternalIds = getLinkedInternalIds();
+        MCRCategoryImpl rootImpl = (MCRCategoryImpl) MCRCategoryDAOFactory.getInstance().getCategory(category.getRoot().getId(), -1);
+        storeHasLinkValues(boolMap, linkedInternalIds, rootImpl);
         return boolMap;
     }
 

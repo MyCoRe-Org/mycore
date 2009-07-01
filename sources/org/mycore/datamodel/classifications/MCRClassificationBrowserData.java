@@ -25,7 +25,6 @@ package org.mycore.datamodel.classifications;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
@@ -406,20 +405,27 @@ public class MCRClassificationBrowserData {
                 browserClass = "default";
             }
             // set permissions
-            if (classificationPool.isEdited(classID) == false) {
+            if (classificationPool.isEdited(classID)) {
+                cli.setAttribute("edited", "true");
+                cli.setAttribute("userCanEdit", "false");
+                cli.setAttribute("userCanDelete", "false");
+            } else {
+                cli.setAttribute("edited", "false");
                 if (MCRAccessManager.checkPermission(classID.getRootID(), "writedb")) {
                     cli.setAttribute("userCanEdit", "true");
                 } else {
                     cli.setAttribute("userCanEdit", "false");
                 }
-                if (MCRAccessManager.checkPermission(classID.getRootID(), "deletedb")) {
+                final boolean mayDelete = MCRAccessManager.checkPermission(classID.getRootID(), "deletedb");
+                if (mayDelete) {
                     cli.setAttribute("userCanDelete", "true");
+                    LOGGER.debug("counting linked objects");
+                    boolean hasLinks = MCRCategLinkServiceFactory.getInstance().hasLinks(classif).get(classID).booleanValue();
+                    LOGGER.debug("counting linked objects ... done");
+                    cli.setAttribute("hasLinks", String.valueOf(hasLinks));
                 } else {
                     cli.setAttribute("userCanDelete", "false");
                 }
-            } else {
-                cli.setAttribute("userCanEdit", "true");
-                cli.setAttribute("userCanDelete", "true");
             }
             // set done flag
             if (ClassUserTable.containsKey(classID.getRootID())) {
@@ -438,17 +444,8 @@ public class MCRClassificationBrowserData {
                 cli.setAttribute("userEdited", "false");
             }
 
-            if (classificationPool.isEdited(classID)) {
-                cli.setAttribute("edited", "true");
-            } else {
-                cli.setAttribute("edited", "false");
-            }
             cli.setAttribute("browserClass", browserClass);
             setObjectTypes(browserClass);
-            LOGGER.debug("counting linked objects");
-            boolean hasLinks = MCRCategLinkServiceFactory.getInstance().hasLinks(classif).get(classID).booleanValue();
-            LOGGER.debug("counting linked objects ... done");
-            cli.setAttribute("hasLinks", String.valueOf(hasLinks));
             xNavtree.addContent(cli);
         }
         return new Document(xDocument);
