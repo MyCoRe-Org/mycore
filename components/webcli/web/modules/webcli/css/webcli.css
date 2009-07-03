@@ -1,5 +1,5 @@
-@import "../js/dijit/themes/tundra/tundra.css";
-@import "../js/dojo/resources/dojo.css"
+@import "http://o.aolcdn.com/dojo/1.3/dijit/themes/tundra/tundra.css";
+@import "http://o.aolcdn.com/dojo/1.3/dojo/resources/dojo.css"
 html, body {
 	width: 100%;
 	height: 100%;
