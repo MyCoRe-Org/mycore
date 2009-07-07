@@ -35,7 +35,6 @@ import java.util.List;
 import java.util.StringTokenizer;
 
 import org.apache.log4j.Logger;
-import org.jaxen.XPath;
 import org.jaxen.jdom.JDOMXPath;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -584,7 +583,7 @@ public class MCRSimpleWorkflowManager {
             File fi = new File(fn);
             if (fi.isFile() && fi.canRead()) {
                 Document wfDoc = MCRXMLHelper.parseURI(fi.toURI(), false);
-                XPath path = new JDOMXPath("/*/service/servacls/servacl[@permission='" + permission + "']/condition");
+                JDOMXPath path = new JDOMXPath("/*/service/servacls/servacl[@permission='" + permission + "']/condition");
                 @SuppressWarnings("unchecked")
                 List<Element> results = path.selectNodes(wfDoc);
                 if (results.size() > 0) {
