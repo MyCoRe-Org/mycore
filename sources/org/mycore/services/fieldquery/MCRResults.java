@@ -30,9 +30,9 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
-import org.apache.batik.dom.util.HashTable;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.mycore.common.MCRConstants;
@@ -58,7 +58,7 @@ public class MCRResults implements Iterable<MCRHit> {
     protected ArrayList<MCRHit> hits = new ArrayList<MCRHit>();
 
     /** The state of the connection */
-    private HashTable hostconnection = new HashTable();
+    private HashMap<String, String> hostconnection = new HashMap<String, String>();
 
     /**
      * A map containing MCRHit IDs used for and/or operations on two different
@@ -222,10 +222,10 @@ public class MCRResults implements Iterable<MCRHit> {
         results.setAttribute("sorted", Boolean.toString(isSorted()));
         results.setAttribute("numHits", String.valueOf(getNumHits()));
 
-        for (int i = 0; i < hostconnection.size(); i++) {
+        for (Map.Entry<String, String> entry : hostconnection.entrySet()) {
             Element connection = new Element("hostconnection", MCRConstants.MCR_NAMESPACE);
-            connection.setAttribute("host", (String) hostconnection.key(i));
-            String msg = (String) hostconnection.item(i);
+            connection.setAttribute("host", entry.getKey());
+            String msg = entry.getValue();
             if (msg == null)
                 msg = "";
             connection.setAttribute("message", msg);
