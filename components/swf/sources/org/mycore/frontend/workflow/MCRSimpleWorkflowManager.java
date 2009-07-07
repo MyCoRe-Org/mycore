@@ -24,6 +24,8 @@
 // package
 package org.mycore.frontend.workflow;
 
+import static org.mycore.common.MCRConstants.XLINK_NAMESPACE;
+
 import java.io.File;
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -35,14 +37,11 @@ import java.util.List;
 import java.util.StringTokenizer;
 
 import org.apache.log4j.Logger;
-import org.jaxen.jdom.JDOMXPath;
 import org.jdom.Document;
 import org.jdom.Element;
-
+import org.jdom.xpath.XPath;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
-
-import static org.mycore.common.MCRConstants.*;
 import org.mycore.common.MCRUtils;
 import org.mycore.common.xml.MCRXMLHelper;
 import org.mycore.datamodel.common.MCRActiveLinkException;
@@ -583,7 +582,7 @@ public class MCRSimpleWorkflowManager {
             File fi = new File(fn);
             if (fi.isFile() && fi.canRead()) {
                 Document wfDoc = MCRXMLHelper.parseURI(fi.toURI(), false);
-                JDOMXPath path = new JDOMXPath("/*/service/servacls/servacl[@permission='" + permission + "']/condition");
+                XPath path = XPath.newInstance("/*/service/servacls/servacl[@permission='" + permission + "']/condition");
                 @SuppressWarnings("unchecked")
                 List<Element> results = path.selectNodes(wfDoc);
                 if (results.size() > 0) {
