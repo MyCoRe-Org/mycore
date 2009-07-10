@@ -48,30 +48,32 @@ public class MCRXMLTransformer {
         final String classID = xml.getRootElement().getAttributeValue("ID");
         category.setLevel(0);
         category.setId(MCRCategoryID.rootID(classID));
-        category.setChildren(getChildCategories(classID, xml.getRootElement().getChild("categories").getChildren("category"), 1));
+        getChildCategories(classID, xml.getRootElement().getChild("categories").getChildren("category"), category);
         category.setLabels(getLabel(xml.getRootElement().getChildren("label")));
         return category;
     }
 
-    public static MCRCategory getCategory(String classID, Element e, int level) throws URISyntaxException {
+    public static MCRCategory getCategory(String classID, Element e, MCRCategory parent) throws URISyntaxException {
         MCRCategoryImpl category = new MCRCategoryImpl();
+        //setId must be called before setParent (info important)
         category.setId(new MCRCategoryID(classID, e.getAttributeValue("ID")));
+        category.setParent(parent);
         category.setLabels(getLabel(e.getChildren("label")));
-        category.setLevel(level);
+        category.setLevel(parent.getLevel()+1);
         if (e.getChild("url") != null) {
             final String uri = e.getChild("url").getAttributeValue("href", XLINK_NAMESPACE);
             if (uri != null)
                 category.setURI(new URI(uri));
         }
-        category.setChildren(getChildCategories(classID, e.getChildren("category"), level + 1));
+        getChildCategories(classID, e.getChildren("category"), category);
         return category;
     }
 
     @SuppressWarnings("unchecked")
-    private static List<MCRCategory> getChildCategories(String classID, List elements, int level) throws URISyntaxException {
+    private static List<MCRCategory> getChildCategories(String classID, List elements, MCRCategory parent) throws URISyntaxException {
         List<MCRCategory> children = new ArrayList<MCRCategory>(elements.size());
         for (Object o : elements) {
-            children.add(getCategory(classID, (Element) o, level));
+            children.add(getCategory(classID, (Element) o, parent));
         }
         return children;
     }

@@ -219,7 +219,7 @@ public class MCRCategoryImpl extends MCRAbstractCategoryImpl implements Serializ
             // remove old children
             catImpl.getChildren().clear();
             // add new wrapped children
-            catImpl.getChildren().addAll(wrapCategories(children, catImpl, root));
+            catImpl.getChildren().addAll(children);
             return catImpl;
         }
         LOGGER.debug("wrap Category: " + category.getId());
