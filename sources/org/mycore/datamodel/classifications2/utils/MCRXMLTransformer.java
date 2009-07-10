@@ -27,6 +27,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 
@@ -48,15 +49,20 @@ public class MCRXMLTransformer {
         final String classID = xml.getRootElement().getAttributeValue("ID");
         category.setLevel(0);
         category.setId(MCRCategoryID.rootID(classID));
-        getChildCategories(classID, xml.getRootElement().getChild("categories").getChildren("category"), category);
+        //setChildren has to be called before setParent (below) can be called without
+        //database access see: org.mycore.datamodel.classifications2.impl.MCRAbstractCategoryImpl.getChildren()
+        category.setChildren(new ArrayList<MCRCategory>());
+        buildChildCategories(classID, xml.getRootElement().getChild("categories").getChildren("category"), category);
         category.setLabels(getLabel(xml.getRootElement().getChildren("label")));
         return category;
     }
 
-    public static MCRCategory getCategory(String classID, Element e, MCRCategory parent) throws URISyntaxException {
+    public static MCRCategory buildCategory(String classID, Element e, MCRCategory parent) throws URISyntaxException {
         MCRCategoryImpl category = new MCRCategoryImpl();
         //setId must be called before setParent (info important)
         category.setId(new MCRCategoryID(classID, e.getAttributeValue("ID")));
+        category.setRoot(parent.getRoot());
+        category.setChildren(new ArrayList<MCRCategory>());
         category.setParent(parent);
         category.setLabels(getLabel(e.getChildren("label")));
         category.setLevel(parent.getLevel()+1);
@@ -65,15 +71,15 @@ public class MCRXMLTransformer {
             if (uri != null)
                 category.setURI(new URI(uri));
         }
-        getChildCategories(classID, e.getChildren("category"), category);
+        buildChildCategories(classID, e.getChildren("category"), category);
         return category;
     }
 
     @SuppressWarnings("unchecked")
-    private static List<MCRCategory> getChildCategories(String classID, List elements, MCRCategory parent) throws URISyntaxException {
+    private static List<MCRCategory> buildChildCategories(String classID, List elements, MCRCategory parent) throws URISyntaxException {
         List<MCRCategory> children = new ArrayList<MCRCategory>(elements.size());
         for (Object o : elements) {
-            children.add(getCategory(classID, (Element) o, parent));
+            children.add(buildCategory(classID, (Element) o, parent));
         }
         return children;
     }

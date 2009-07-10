@@ -36,7 +36,6 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
-import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
@@ -117,16 +116,14 @@ public class MCRClassificationEditor {
                     MCRCategory prevCateg = findCategory(classif, id);
                     LOGGER.debug("Previous Category: " + prevCateg.getId() + " found.");
 
-                    MCRCategory newCategory = MCRXMLTransformer.getCategory(id.getRootID(), newCateg, 1);
-                    prevCateg.getChildren().add(newCategory);
+                    MCRXMLTransformer.buildCategory(id.getRootID(), newCateg, prevCateg);
                     MCRClassificationBrowserData.getClassificationPool().updateClassification(classif);
                     String sessionID = MCRSessionMgr.getCurrentSession().getID();
                     MCRClassificationBrowserData.ClassUserTable.put(classif.getId().getRootID(), sessionID);
                     return true;
                 } else {
-                    MCRCategory newCategory = MCRXMLTransformer.getCategory(id.getRootID(), newCateg, 1);
+                    MCRCategory newCategory = MCRXMLTransformer.buildCategory(id.getRootID(), newCateg, classif);
                     LOGGER.debug("Adding category:" + newCategory.getId() + " to classification: " + classif.getId());
-                    classif.getChildren().add(newCategory);
                     MCRClassificationBrowserData.getClassificationPool().updateClassification(classif);
                     String sessionID = MCRSessionMgr.getCurrentSession().getID();
                     MCRClassificationBrowserData.ClassUserTable.put(classif.getId().getRootID(), sessionID);
@@ -175,7 +172,7 @@ public class MCRClassificationEditor {
                 return false;
             }
 
-            MCRCategory newCategory = MCRXMLTransformer.getCategory(id.getRootID(), newCateg, 1);
+            MCRCategory newCategory = MCRXMLTransformer.buildCategory(id.getRootID(), newCateg, oldCategory.getParent());
             //copy new values to old copy of category
             oldCategory.setURI(newCategory.getURI());
             oldCategory.getLabels().clear();
