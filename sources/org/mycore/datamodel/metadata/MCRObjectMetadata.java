@@ -265,23 +265,22 @@ public class MCRObjectMetadata {
      * 
      * @return true if set was succesful, otherwise false
      */
-    public final boolean removeMetadataElement(String tag) {
+    public final MCRMetaElement removeMetadataElement(String tag) {
         if ((tag == null) || ((tag = tag.trim()).length() == 0)) {
-            return false;
+            return null;
         }
 
         int len = tag_names.size();
 
         for (int i = 0; i < len; i++) {
             if (tag_names.get(i).equals(tag)) {
-                meta_list.remove(i);
                 tag_names.remove(i);
 
-                return true;
+                return meta_list.remove(i);
             }
         }
 
-        return false;
+        return null;
     }
 
     /**
@@ -289,15 +288,14 @@ public class MCRObjectMetadata {
      * 
      * @return true if set was succesful, otherwise false
      */
-    public final boolean removeMetadataElement(int index) {
+    public final MCRMetaElement removeMetadataElement(int index) {
         if ((index < 0) || (index > size())) {
-            return false;
+            return null;
         }
 
-        meta_list.remove(index);
         tag_names.remove(index);
 
-        return true;
+        return meta_list.remove(index);
     }
 
     /**
