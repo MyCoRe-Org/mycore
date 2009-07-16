@@ -23,6 +23,7 @@
  **/
 package org.mycore.common;
 
+import org.apache.log4j.Logger;
 import org.hibernate.HibernateException;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -33,7 +34,7 @@ import org.mycore.backend.hibernate.MCRHIBConnection;
 /**
  * @author Thomas Scheffler (yagee)
  * 
- * Need to insert some things here
+ *         Need to insert some things here
  * 
  */
 public abstract class MCRHibTestCase extends MCRTestCase {
@@ -52,13 +53,17 @@ public abstract class MCRHibTestCase extends MCRTestCase {
         if (setProperty) {
             CONFIG.configureLogging();
         }
-        System.setProperty("MCR.Hibernate.Configuration", "org/mycore/hibernate.cfg.xml");
-        final MCRHIBConnection connection = MCRHIBConnection.instance();
-        sessionFactory = connection.getSessionFactory();
-        SchemaExport export = new SchemaExport(connection.getConfiguration());
-        export.create(false, true);
-        beginTransaction();
-        sessionFactory.getCurrentSession().clear();
+        try {
+            final MCRHIBConnection connection = MCRHIBConnection.instance();
+            sessionFactory = connection.getSessionFactory();
+            SchemaExport export = new SchemaExport(connection.getConfiguration());
+            export.create(false, true);
+            beginTransaction();
+            sessionFactory.getCurrentSession().clear();
+        } catch (RuntimeException e) {
+            Logger.getLogger(MCRHibTestCase.class).error("Error while setting up hibernate JUnit test.", e);
+            throw e;
+        }
     }
 
     @Override

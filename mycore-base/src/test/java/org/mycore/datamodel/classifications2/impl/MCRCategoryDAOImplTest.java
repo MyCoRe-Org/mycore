@@ -44,9 +44,9 @@ import org.mycore.datamodel.classifications2.utils.MCRXMLTransformer;
 
 public class MCRCategoryDAOImplTest extends MCRHibTestCase {
 
-    static final String WORLD_CLASS_RESOURCE_NAME = "/org/mycore/datamodel/classifications2/impl/resources/worldclass.xml";
+    static final String WORLD_CLASS_RESOURCE_NAME = "/worldclass.xml";
 
-    private static final String WORLD_CLASS2_RESOURCE_NAME = "/org/mycore/datamodel/classifications2/impl/resources/worldclass2.xml";
+    private static final String WORLD_CLASS2_RESOURCE_NAME = "/worldclass2.xml";
 
     static final String CATEGORY_MAPPING_RESOURCE_NAME = "/org/mycore/datamodel/classifications2/impl/MCRCategoryImpl.hbm.xml";
 

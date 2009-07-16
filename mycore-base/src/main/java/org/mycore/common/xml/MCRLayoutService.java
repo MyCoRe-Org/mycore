@@ -24,7 +24,6 @@
 package org.mycore.common.xml;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -56,9 +55,11 @@ import javax.xml.transform.sax.SAXTransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
-import org.apache.avalon.framework.logger.Log4JLogger;
-import org.apache.fop.apps.Driver;
-import org.apache.fop.messaging.MessageHandler;
+import org.apache.commons.io.output.ByteArrayOutputStream;
+import org.apache.fop.apps.FOPException;
+import org.apache.fop.apps.Fop;
+import org.apache.fop.apps.FopFactory;
+import org.apache.fop.apps.MimeConstants;
 import org.apache.log4j.Logger;
 import org.apache.xalan.templates.ElemTemplate;
 import org.apache.xalan.templates.ElemTemplateElement;
@@ -105,12 +106,12 @@ public class MCRLayoutService implements org.apache.xalan.trace.TraceListener {
 
     /** The XSL transformer factory to use */
     private SAXTransformerFactory factory;
+    
+    private FopFactory fopFactory;
 
     /** The logger */
     private final static Logger LOGGER = Logger.getLogger(MCRLayoutService.class);
-
-    private final static org.apache.avalon.framework.logger.Logger FOPLOG = new Log4JLogger(LOGGER);
-
+    
     private static final MCRLayoutService singleton = new MCRLayoutService();
 
     public static MCRLayoutService instance() {
@@ -143,8 +144,9 @@ public class MCRLayoutService implements org.apache.xalan.trace.TraceListener {
                 LOGGER.warn(ex.getMessageAndLocation());
             }
         });
-
-        MessageHandler.setScreenLogger(FOPLOG);
+        
+        fopFactory=FopFactory.newInstance();
+        fopFactory.setURIResolver(MCRURIResolver.instance());
     }
 
     public void sendXML(HttpServletRequest req, HttpServletResponse res, org.jdom.Document jdom) throws IOException {
@@ -573,11 +575,12 @@ public class MCRLayoutService implements org.apache.xalan.trace.TraceListener {
         Result result = null;
 
         if ("application/pdf".equals(ct)) {
-            Driver driver = new Driver();
-            driver.setLogger(FOPLOG);
-            driver.setRenderer(Driver.RENDER_PDF);
-            driver.setOutputStream(out);
-            result = new SAXResult(driver.getContentHandler());
+            try {
+                Fop fop=fopFactory.newFop(MimeConstants.MIME_PDF, out);
+                result = new SAXResult(fop.getDefaultHandler());
+            } catch (FOPException e) {
+                throw new IOException(e);
+            }
         } else {
             result = new StreamResult(out);
         }

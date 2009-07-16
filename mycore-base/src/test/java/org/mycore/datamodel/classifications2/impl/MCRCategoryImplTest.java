@@ -40,7 +40,7 @@ import org.mycore.datamodel.classifications2.utils.MCRXMLTransformer;
  *
  */
 public class MCRCategoryImplTest extends MCRTestCase {
-    static final String WORLD_CLASS_RESOURCE_NAME = "/org/mycore/datamodel/classifications2/impl/resources/worldclass.xml";
+    static final String WORLD_CLASS_RESOURCE_NAME = "/worldclass.xml";
 
     private MCRCategoryImpl category;
 
