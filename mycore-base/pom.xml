@@ -4,7 +4,7 @@
     <artifactId>mycore-parent</artifactId>
     <groupId>org.mycore</groupId>
     <version>2.1</version>
-    <relativePath>../pom.xml</relativePath>
+    <relativePath>../mycore-parent/pom.xml</relativePath>
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.mycore</groupId>
@@ -12,14 +12,6 @@
   <packaging>jar</packaging>
   <version>${mycore.version}</version>
   <name>MyCoRe Base Components</name>
-  <url>http://www.mycore.org</url>
-  <licenses>
-    <license>
-      <name>GPL</name>
-      <url>http://www.gnu.org/licenses/gpl-2.0.txt</url>
-      <comments>v2 or higher</comments>
-    </license>
-  </licenses>
   <build>
     <resources>
       <resource>
@@ -31,7 +23,6 @@
       </resource>
     </resources>
     <plugins>
-      <!--
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>buildnumber-maven-plugin</artifactId>
@@ -48,7 +39,6 @@
           <doUpdate>true</doUpdate>
         </configuration>
       </plugin>
-    -->
       <plugin>
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
