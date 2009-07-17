@@ -14,6 +14,7 @@
   <version>${mycore.version}</version>
   <name>MyCoRe Base Components</name>
   <build>
+    <finalName>${project.artifactId}-${project.version}-r${buildNumber}</finalName>
     <resources>
       <resource>
         <filtering>true</filtering>
@@ -30,15 +31,6 @@
         </includes>
       </resource>
     </resources>
-    <testResources>
-      <testResource>
-        <filtering>false</filtering>
-        <directory>src/test/resources</directory>
-        <includes>
-          <include>**/*</include>
-        </includes>
-      </testResource>
-    </testResources>
     <plugins>
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
@@ -54,6 +46,7 @@
         <configuration>
           <doCheck>false</doCheck>
           <doUpdate>true</doUpdate>
+          <revisionOnScmFailure>0</revisionOnScmFailure>
         </configuration>
       </plugin>
       <plugin>
@@ -73,6 +66,22 @@
               org.mycore.datamodel.classifications2.impl.MCRCategLinkServiceImplTest#testHasLinks
             </value>
           </property>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <configuration>
+          <archive>
+            <manifest>
+              <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+              <mainClass>org.mycore.common.MCRCoreVersion</mainClass>
+              <addExtensions/>
+            </manifest>
+            <manifestEntries>
+              <Implementation-Build>${buildNumber}</Implementation-Build>
+            </manifestEntries>
+          </archive>
         </configuration>
       </plugin>
     </plugins>
