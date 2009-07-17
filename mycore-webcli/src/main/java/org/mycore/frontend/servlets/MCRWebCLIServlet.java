@@ -101,8 +101,10 @@ public class MCRWebCLIServlet extends MCRServlet {
             String request = getProperty(job.getRequest(), "request");
             HttpSession hsession = job.getRequest().getSession();
             if (request != null) {
+                JSONObject jsonObject = new JSONObject();
                 if (request.equals("getStatus")) {
-                    printJSONObject(new JSONObject().put("running", isRunning()), job.getResponse());
+                    jsonObject.put("running", isRunning());
+                    printJSONObject(jsonObject, job.getResponse());
                     return;
                 } else if (request.equals("getLogs")) {
                     printJSONObject(getCurrentSessionContainer(true, hsession).getLogs(), job.getResponse());
@@ -111,8 +113,8 @@ public class MCRWebCLIServlet extends MCRServlet {
                     printJSONObject(commandsJSON, job.getResponse());
                     return;
                 } else if (request.equals("getCommandQueue")) {
-                    printJSONObject(new JSONObject().put("commandQueue", new LinkedList<String>(getCurrentSessionContainer(true, hsession)
-                            .getCommandQueue())), job.getResponse());
+                    jsonObject.put("commandQueue", new LinkedList<String>(getCurrentSessionContainer(true, hsession).getCommandQueue()));
+                    printJSONObject(jsonObject, job.getResponse());
                     return;
                 }
             }
@@ -199,7 +201,7 @@ public class MCRWebCLIServlet extends MCRServlet {
         JSONObject item = new JSONObject();
         item.put("name", parent);
         item.put("commands", commands);
-        commandsJSON.getJSONArray("commands").put(item);
+        commandsJSON.getJSONArray("commands").add(item);
     }
 
     private static void generateErrorResponse(HttpServletRequest request, HttpServletResponse response, int errorCode, String message)

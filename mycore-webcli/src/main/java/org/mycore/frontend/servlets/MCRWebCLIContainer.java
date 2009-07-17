@@ -154,7 +154,7 @@ class MCRWebCLIContainer {
             }
             json.put("exception", exception);
             json.put("time", event.timeStamp);
-            array.put(json);
+            array.add(json);
         }
         return array;
     }
