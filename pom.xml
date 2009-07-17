@@ -22,6 +22,7 @@
     <module>mycore-parent</module>
     <!-- mycore-base MUST be always second entry -->
     <module>mycore-base</module>
+    <module>mycore-acl-editor</module>
     <module>mycore-webcli</module>
     <!-- mycore-complete MUST be always last entry -->
     <module>mycore-complete</module>
