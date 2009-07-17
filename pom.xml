@@ -20,5 +20,6 @@
   <modules>
     <module>mycore-parent</module>
     <module>mycore-base</module>
+    <module>mycore-webcli</module>
   </modules>
 </project>
