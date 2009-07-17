@@ -46,7 +46,8 @@
     <url>http://www.mycore.de/viewvc/viewvc.cgi/mycore/</url>
   </scm>
   <properties>
-    <mycore.version>2.1-SNAPSHOT</mycore.version>
+    <mycore.version>2.0.90</mycore.version>
+    <java.target.version>1.5</java.target.version>
   </properties>
   <build>
     <pluginManagement>
@@ -55,8 +56,8 @@
         <plugin>
           <artifactId>maven-compiler-plugin</artifactId>
           <configuration>
-            <target>1.5</target>
-            <source>1.5</source>
+            <target>${java.target.version}</target>
+            <source>${java.target.version}</source>
           </configuration>
         </plugin>
         <!-- JCR-704: Enable maven-source-plugin -->
@@ -75,7 +76,7 @@
         <plugin>
           <artifactId>maven-javadoc-plugin</artifactId>
           <configuration>
-            <source>1.5</source>
+            <source>${java.target.version}</source>
             <aggregate>true</aggregate>
             <links>
               <link>http://java.sun.com/j2se/1.5.0/docs/api/</link>
@@ -119,10 +120,9 @@
       <plugin>
         <!-- http://maven.apache.org/plugins/maven-idea-plugin/ -->
         <artifactId>maven-idea-plugin</artifactId>
-        <version>2.0</version>
         <configuration>
           <downloadSources>true</downloadSources>
-          <jdkLevel>1.4</jdkLevel>
+          <jdkLevel>${java.target.version}</jdkLevel>
         </configuration>
       </plugin>
       <plugin>
@@ -159,7 +159,6 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>findbugs-maven-plugin</artifactId>
-        <version>1.1.1</version>
         <configuration>
           <xmlOutput>true</xmlOutput>
           <findbugsXmlOutput>true</findbugsXmlOutput>
