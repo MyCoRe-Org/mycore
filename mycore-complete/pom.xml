@@ -1,0 +1,75 @@
+<?xml version="1.0"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <parent>
+    <artifactId>mycore-parent</artifactId>
+    <groupId>org.mycore</groupId>
+    <version>2.1</version>
+    <relativePath>../mycore-parent/pom.xml</relativePath>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.mycore</groupId>
+  <artifactId>mycore-complete</artifactId>
+  <packaging>jar</packaging>
+  <version>${mycore.version}</version>
+  <name>MyCoRe Complete JAR package</name>
+  <description>jar packaging of MyCoRe containing mycore-base and all components</description>
+  <url>http://www.mycore.org</url>
+  <licenses>
+    <license>
+      <name>GPL</name>
+      <url>http://www.gnu.org/licenses/gpl-2.0.txt</url>
+      <comments>v2 or higher</comments>
+    </license>
+  </licenses>
+  <build>
+    <plugins>
+      <plugin>
+        <artifactId>maven-jar-plugin</artifactId>
+        <configuration>
+          <archive>
+            <manifest>
+              <mainClass>org.apache.jackrabbit.standalone.Main</mainClass>
+            </manifest>
+          </archive>
+        </configuration>
+      </plugin>
+      <plugin>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>unpack-dependencies</id>
+            <phase>process-resources</phase>
+            <goals>
+              <goal>unpack-dependencies</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${project.build.directory}/classes</outputDirectory>
+	      <excludeTransitive>true</excludeTransitive>
+              <excludes>
+                LICENSE*, NOTICE*, META-INF/LICENSE*, META-INF/NOTICE*,
+                license, license/**/*, test, test/**/*,
+                WEB-INF/web.xml, WEB-INF/log4j.*,
+                WEB-INF/lib, WEB-INF/lib/**/*,
+                WEB-INF/classes, WEB-INF/classes/**/*
+              </excludes>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+  <dependencies>
+    <dependency>
+      <groupId>org.mycore</groupId>
+      <artifactId>mycore-base</artifactId>
+      <version>2.1-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>org.mycore</groupId>
+      <artifactId>mycore-webcli</artifactId>
+      <version>2.1-SNAPSHOT</version>
+    </dependency>
+  </dependencies>
+  <properties>
+  </properties>
+</project>

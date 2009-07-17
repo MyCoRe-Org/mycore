@@ -18,8 +18,12 @@
     <url>http://www.mycore.de/viewvc/viewvc.cgi/mycore/</url>
   </scm>
   <modules>
+    <!-- mycore-parent MUST be always first entry -->
     <module>mycore-parent</module>
+    <!-- mycore-base MUST be always second entry -->
     <module>mycore-base</module>
     <module>mycore-webcli</module>
+    <!-- mycore-complete MUST be always last entry -->
+    <module>mycore-complete</module>
   </modules>
 </project>
