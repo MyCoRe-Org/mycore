@@ -32,7 +32,9 @@
     <module>mycore-indexing</module>
     <module>mycore-iview</module>
     <module>mycore-metsmods</module>
+    <module>mycore-migration13-20</module>
     <module>mycore-swf</module>
+    <module>mycore-wcms</module>
     <module>mycore-webcli</module>
     <!-- mycore-complete MUST be always last entry -->
     <module>mycore-complete</module>
