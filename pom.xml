@@ -28,6 +28,7 @@
     <module>mycore-classbrowser</module>
     <module>mycore-classhandler</module>
     <module>mycore-doubletfinder</module>
+    <module>mycore-imaging</module>
     <module>mycore-webcli</module>
     <!-- mycore-complete MUST be always last entry -->
     <module>mycore-complete</module>
