@@ -55,10 +55,11 @@
                     <path refid="sources.path" />
                   </src>
                 </javac>
-                <copy file="${basedir}/src/main/resources/config/messages_de.MCRUploadApplet" tofile="${target.applet.classes}/messages_de.properties"
-                  preservelastmodified="true" />
-                <copy file="${basedir}/src/main/resources/config/messages_en.MCRUploadApplet" tofile="${target.applet.classes}/messages_en.properties"
-                  preservelastmodified="true" />
+                <copy todir="${target.applet.classes}">
+                  <fileset dir="${basedir}/src/main/applet-resources">
+                    <include name="**/*" />
+                  </fileset>
+                </copy>
                 <jar jarfile="${project.build.outputDirectory}/uploadApplet-unsigned.jar">
                   <fileset dir="${target.applet.classes}" />
                 </jar>
