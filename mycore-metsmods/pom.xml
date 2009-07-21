@@ -13,6 +13,50 @@
   <version>${mycore.version}</version>
   <name>MyCoRe METS/MODS</name>
   <url>http://www.mycore.org</url>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>compile</id>
+            <phase>compile</phase>
+            <configuration>
+              <tasks>
+                <path id="compile.classpath" refid="maven.compile.classpath" />
+                <property name="target.applet.classes" location="${project.build.directory}/applet-classes" />
+                <path id="sources.path">
+                  <dirset dir="${basedir}" includes="src/main/java" />
+                </path>
+                <echo message="compile classpath: ${compile.classpath}" />
+                <echo message="target directory: ${target.applet.classes}" />
+                <mkdir dir="${target.applet.classes}" />
+                <javac destdir="${target.applet.classes}" includes="org/mycore/frontend/metsmods/**" classpathref="compile.classpath"
+                  debug="true" optimize="true" target="${java.target.version}" source="${java.target.version}" encoding="ISO-8859-15" fork="yes"
+                  deprecation="off">
+                  <src>
+                    <path refid="sources.path" />
+                  </src>
+                </javac>
+                <copy todir="${target.applet.classes}">
+                  <fileset dir="${basedir}/src/main/applet-resources">
+                    <include name="**/*" />
+                  </fileset>
+                </copy>
+                <jar jarfile="${project.build.outputDirectory}/metsmodsApplet-unsigned.jar">
+                  <fileset dir="${target.applet.classes}" />
+                </jar>
+              </tasks>
+            </configuration>
+            <goals>
+              <goal>run</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
   <dependencies>
     <dependency>
       <groupId>org.mycore</groupId>
