@@ -255,14 +255,14 @@ public class MCRUserAjaxServlet extends MCRServlet {
         ArrayList members = group.getMemberUserIDs();
 
         if (!(Msg.equals(""))) {
-            error.put(Msg);
+            error.add(Msg);
         } else {
-            error.put("none");
+            error.add("none");
         }
 
         Iterator it = members.iterator();
         while (it.hasNext()) {
-            users.put(it.next());
+            users.add(it.next());
         }
         groupToUpdate.put("name", gruppe);
         groupToUpdate.put("desc", group.getDescription());
@@ -330,7 +330,7 @@ public class MCRUserAjaxServlet extends MCRServlet {
             Object idKey = (Object) iterator.next();
             JSONObject user = (JSONObject ) idMap.get(idKey);
             
-            users.put(user);
+            users.add(user);
         }
         
         for (String groupID : groupsIDs) {
@@ -340,17 +340,17 @@ public class MCRUserAjaxServlet extends MCRServlet {
             JSONObject group = new JSONObject();
             Iterator iter = memUsers.iterator();
             while (iter.hasNext()) {
-                memUserList.put(iter.next());
+                memUserList.add(iter.next());
             }
             group.put("name", groupID);
             group.put("desc", gruppe.getDescription());
             group.put("users", memUserList);
-            groups.put(group);
+            groups.add(group);
         }
         if (!(Msg.equals(""))) {
-            error.put(Msg);
+            error.add(Msg);
         } else {
-            error.put("none");
+            error.add("none");
         }
 
         json.put("users", users);
