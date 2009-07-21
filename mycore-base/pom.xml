@@ -32,6 +32,45 @@
     </resources>
     <plugins>
       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>compile</id>
+            <phase>compile</phase>
+            <configuration>
+              <tasks>
+                <path id="compile.classpath" refid="maven.compile.classpath" />
+                <property name="target.applet.classes" location="${project.build.directory}/applet-classes" />
+                <path id="sources.path">
+                  <dirset dir="${basedir}" includes="src/main/java" />
+                </path>
+                <echo message="compile classpath: ${compile.classpath}" />
+                <echo message="target directory: ${target.applet.classes}" />
+                <mkdir dir="${target.applet.classes}" />
+                <javac destdir="${target.applet.classes}" includes="org/mycore/frontend/fileupload/**"
+                  excludes="org/mycore/frontend/fileupload/*Handler* org/mycore/frontend/fileupload/*Servlet*" classpathref="compile.classpath"
+                  debug="true" optimize="true" target="1.4" source="1.4" encoding="ISO-8859-15" fork="yes" deprecation="off">
+                  <src>
+                    <path refid="sources.path" />
+                  </src>
+                </javac>
+                <copy file="${basedir}/src/main/resources/config/messages_de.MCRUploadApplet" tofile="${target.applet.classes}/messages_de.properties"
+                  preservelastmodified="true" />
+                <copy file="${basedir}/src/main/resources/config/messages_en.MCRUploadApplet" tofile="${target.applet.classes}/messages_en.properties"
+                  preservelastmodified="true" />
+                <jar jarfile="${project.build.outputDirectory}/uploadApplet-unsigned.jar">
+                  <fileset dir="${target.applet.classes}" />
+                </jar>
+              </tasks>
+            </configuration>
+            <goals>
+              <goal>run</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>buildnumber-maven-plugin</artifactId>
         <executions>
@@ -75,7 +114,7 @@
             <manifest>
               <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
               <mainClass>org.mycore.common.MCRCoreVersion</mainClass>
-              <addExtensions/>
+              <addExtensions />
             </manifest>
             <manifestEntries>
               <Implementation-Build>${buildNumber}</Implementation-Build>
