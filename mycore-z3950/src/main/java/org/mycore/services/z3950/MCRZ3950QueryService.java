@@ -20,7 +20,7 @@ import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 /**
- * Diese Klasse ist eine Implementierung eines Suchservice f�r die Z39.50-
+ * Diese Klasse ist eine Implementierung eines Suchservice fï¿½r die Z39.50-
  * Schnittstelle. Dabei werden nur Z39.50-Anfragen im Prefixformat
  * entgegengenommen.
  * @author Andreas de Azevedo
@@ -41,7 +41,7 @@ public class MCRZ3950QueryService implements MCRZ3950Query {
     // Das Ergebnis der Suche
     private MCRResults mycoreResults;
     
-    // Wir geben immer nur ein Ergebnis zur�ck, normalerweise das erste
+    // Wir geben immer nur ein Ergebnis zurï¿½ck, normalerweise das erste
     private int index;
     
 
@@ -62,7 +62,7 @@ public class MCRZ3950QueryService implements MCRZ3950Query {
     public void sort() {}
     
     /**
-     * Gibt alle Ergebnisse als Bytestrom zur�ck.
+     * Gibt alle Ergebnisse als Bytestrom zurï¿½ck.
      * @return Das Ergebnisdokument als Byte-Array, null falls es keine Ergebnisse gab.
      */
     public byte[] getDocumentAsByteArray() {
@@ -91,7 +91,7 @@ public class MCRZ3950QueryService implements MCRZ3950Query {
     }
     
     /**
-     * F�hrt eine Suchanfrage in MyCoRe aus.
+     * Fï¿½hrt eine Suchanfrage in MyCoRe aus.
      * @return True falls es Ergebnisse gab, sonst False.
      */
     public boolean search() {
@@ -112,20 +112,20 @@ public class MCRZ3950QueryService implements MCRZ3950Query {
      * Die Methode <code>fillClassificationsWithLabels</code> durchsucht alle
      * Metadaten und untersucht deren benutzte Klassifikationen. Da in den
      * Metadaten nur ein Verweis auf Klasse und Kategorie ist, wird dieser
-     * erg�nzt durch sein Label.
+     * ergï¿½nzt durch sein Label.
      */
     private void fillClassificationsWithLabels(org.jdom.Element result) {
         Element metadata = result.getChild("metadata");
         // Alle Kinder des Knotens, also alle Metadaten
         List metadataChildren = metadata.getChildren();
         Iterator itm = metadataChildren.iterator();
-        // Iteriere �ber alle Knoten
+        // Iteriere ï¿½ber alle Knoten
         while (itm.hasNext()) {
-            // Pr�fe, ob der Knoten eine Klassifikation benutzt
+            // Prï¿½fe, ob der Knoten eine Klassifikation benutzt
             Element parent = (Element) itm.next();
             String cl = parent.getAttributeValue("class");
             if (cl.equals("MCRMetaClassification")) {
-                // Iteriere �ber alle Kinder des Knotens (z.B. Subject)             
+                // Iteriere ï¿½ber alle Kinder des Knotens (z.B. Subject)             
                 List children = parent.getChildren();
                 Iterator it = children.iterator();
                 while (it.hasNext()) {
@@ -133,7 +133,7 @@ public class MCRZ3950QueryService implements MCRZ3950Query {
                     String classificationId = e.getAttributeValue("classid");
                     String categoryId = e.getAttributeValue("categid");
                     MCRCategory category = MCRCategoryDAOFactory.getInstance().getCategory(new MCRCategoryID(classificationId, categoryId), -1);
-//                  F�lle den Knoten mit dem Klassifiaktions-Label
+//                  Fülle den Knoten mit dem Klassifiaktions-Label
 //                  TODO: please change: language is random
                     e.setText(category.getLabels().iterator().next().getText());
                 }

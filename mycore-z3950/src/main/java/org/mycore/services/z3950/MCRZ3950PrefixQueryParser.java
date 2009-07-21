@@ -316,7 +316,7 @@ public class MCRZ3950PrefixQueryParser
   public static void main(String args[])
   {
     //OK    String pqfQuery = "@attrset bib-1 @and @attr 4=1 @attr 1=1 \"bob dylan\" @or @attr 1=4 or1 @attr 1=4 or2 xxx";
-    String pqfQuery = "@attrset bib-1 @not  @attr 4=1 @attr 1=1 \"bob dßylanä\" @attr 1=4 äöüWert3 ÄÖÜ?*";
+    String pqfQuery = "@attrset bib-1 @not  @attr 4=1 @attr 1=1 \"bob dÃŸylanÃ¤\" @attr 1=4 Ã¤Ã¶Ã¼Wert3 Ã„Ã–Ãœ?*";
     //OK    String pqfQuery = "@attrset bib-1 @and @attr 1=4 Wert1 @not @attr 1=4 Wert2    @attr 1=4 Wert3";
     //OK    String pqfQuery = "@attrset bib-1 @or @attr 1=4 Wert1 @not @attr 1=4 Wert2    @attr 1=4 Wert3";
     //OK    String pqfQuery = "@attrset bib-1 @or @attr 1=4 Wert1 @not @attr 1=4 Wert2    @attr 1=4 Wert3a Wert3b";

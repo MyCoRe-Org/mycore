@@ -2,7 +2,7 @@ package org.mycore.services.z3950;
 
 /**
  * Dieses Java-Interface beschreibt die Syntax der grundlegenen Funktionen
- * für den Z39.50-Suchservice. 
+ * fÃ¼r den Z39.50-Suchservice. 
  * @author Andreas de Azevedo
  * @version 1.0
  */
@@ -17,19 +17,19 @@ public interface MCRZ3950Query {
 	public void sort();
 	
 	/**
-	 * Gibt alle Ergebnisse als Bytestrom zurück.
+	 * Gibt alle Ergebnisse als Bytestrom zurÃ¼ck.
 	 * @return Das Ergebnisdokument als Byte-Array, null falls es keine Ergebnisse gab.
 	 */
 	public byte[] getDocumentAsByteArray();
 	
 	/**
-	 * Führt eine Suchanfrage in MyCoRe aus.
+	 * FÃ¼hrt eine Suchanfrage in MyCoRe aus.
 	 * @return True falls es Ergebnisse gab, sonst False.
 	 */
 	public boolean search();
 	
 	/**
-	 * Gibt die Anzahl der Ergebnisse zurück.
+	 * Gibt die Anzahl der Ergebnisse zurÃ¼ck.
 	 * @return Die Anzahl der Dokumente in der Ergebnisliste.
 	 */
 	public int getSize();
@@ -37,9 +37,9 @@ public interface MCRZ3950Query {
 	public int getIndex();
 	
 	/**
-	 * Verkürzt das Ergebnisdokument auf das Dokument mit einem bestimmten
+	 * VerkÃ¼rzt das Ergebnisdokument auf das Dokument mit einem bestimmten
 	 * Index.
-	 * @param index Der Index des gewünschten Ergebnisses.
+	 * @param index Der Index des gewÃ¼nschten Ergebnisses.
 	 */
 	public void setIndex(int index);
 	

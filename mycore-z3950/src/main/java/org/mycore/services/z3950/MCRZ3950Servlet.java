@@ -14,7 +14,7 @@ import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
 
 /**
- * Dieses Servlet implementiert eine MyCoRe-Schnittstelle für einen
+ * Dieses Servlet implementiert eine MyCoRe-Schnittstelle fÃ¼r einen
  * Z39.50-Server. Die Suche wird dabei an eine Serviceklasse
  * delegiert.
  * @author Andreas de Azevedo
@@ -39,13 +39,13 @@ public class MCRZ3950Servlet extends MCRServlet {
     // Index des Suchergebnisses, beginnend bei 1
     private int index;
 
-    // Größe des Resultats (nicht implementiert)
+    // GrÃ¶ÃŸe des Resultats (nicht implementiert)
     private int size;
     
-    // Ist true, wenn das Ergebnis gekürzt werden soll
+    // Ist true, wenn das Ergebnis gekÃ¼rzt werden soll
     private boolean cut;
     
-    // Property, dass die Serviceklasse enthält
+    // Property, dass die Serviceklasse enthÃ¤lt
     private static final String MCR_QUERYSERVICE = "MCR.z3950.queryservice";
     
     /**
@@ -74,10 +74,10 @@ public class MCRZ3950Servlet extends MCRServlet {
 	   // Ausgabe in UTF-8
 	   response.setContentType("text/xml; charset=UTF-8");
 	   
-	   // Parameter überprüfen
+	   // Parameter Ã¼berprÃ¼fen
 	   if (!checkInputParameter(request)) {
-		   logger.error("Es wurden nicht genügend Parameter angegeben!");
-           // Keine Ergebnisse, es wird "0" zurückgegeben
+		   logger.error("Es wurden nicht genÃ¼gend Parameter angegeben!");
+           // Keine Ergebnisse, es wird "0" zurÃ¼ckgegeben
 		   ServletOutputStream out = response.getOutputStream();
 		   out.write("0".getBytes("UTF-8"));
 		   out.close();		  
@@ -98,18 +98,18 @@ public class MCRZ3950Servlet extends MCRServlet {
 	
 	   if (service.search()) {
 		   /*
-		    * Wenn es Ergebnisse gab, dann sind zwei Fälle zu unterscheiden:
-		    * 1. Der Z39.50-Server hat eine search-Anfrage getätigt, in diesem
+		    * Wenn es Ergebnisse gab, dann sind zwei FÃ¤lle zu unterscheiden:
+		    * 1. Der Z39.50-Server hat eine search-Anfrage getÃ¤tigt, in diesem
 		    *    Fall ist nur die Anzahl der Ergebnisse relevant und wird in
 		    *    den Response-Output-Stream geschrieben.
-		    * 2. Der Z39.50-Server hat eine present-Anfrage getätigt, d.h. die
+		    * 2. Der Z39.50-Server hat eine present-Anfrage getÃ¤tigt, d.h. die
 		    *    Ergebnisse der Suchanfrage sollen nun angezeigt werden. Dann
-		    *    wird entsprechend ein Ergebnis-Dokument als Antwort zurück-
+		    *    wird entsprechend ein Ergebnis-Dokument als Antwort zurÃ¼ck-
 		    *    gegeben. Zur Zeit ist wird noch jedes Ergebnis einzeln
 		    *    abgefragt, daher wird das Ergebnis-Dokument immer auf ein
-		    *    einzelnes Ergebnis gekürzt. Außerdem werden noch alle Tags,
+		    *    einzelnes Ergebnis gekÃ¼rzt. AuÃŸerdem werden noch alle Tags,
 		    *    die vom Typ "MCRMetaClassification" sind mit ihrem Label
-		    *    gefüllt, da die IDs an sich wertlos sind.
+		    *    gefÃ¼llt, da die IDs an sich wertlos sind.
 		    */
 		   if (cut) {
 			   service.cutDownTo(index);
