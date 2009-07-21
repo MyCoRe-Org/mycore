@@ -36,6 +36,7 @@
     <module>mycore-session-listing</module>
     <module>mycore-swf</module>
     <module>mycore-useradmin</module>
+    <module>mycore-userlogin</module>
     <module>mycore-wcms</module>
     <module>mycore-webcli</module>
     <!-- mycore-complete MUST be always last entry -->
