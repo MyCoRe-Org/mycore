@@ -41,6 +41,7 @@
     <module>mycore-webcli</module>
     <module>mycore-webservices</module>
     <module>mycore-z3950</module>
+    <module>mycore-zoomify</module>
     <!-- mycore-complete MUST be always last entry -->
     <module>mycore-complete</module>
   </modules>
