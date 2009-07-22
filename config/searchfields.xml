@@ -17,6 +17,8 @@
     <!-- Search in all metadata fields (that have an xml:lang attribute) -->
     <field name="allMeta"       type="text"       source="objectMetadata" xpath="/mycoreobject/metadata/*/*" value="text()|@xlink:title" i18n="editor.search.metadata" />
 
+    <!-- Field for sorting by score -->
+    <field name="score" type="decimal" source="searcherHitMetadata" sortable="true" />
   </index>
 
   <!-- Search in MCRFile metadata and content -->  
