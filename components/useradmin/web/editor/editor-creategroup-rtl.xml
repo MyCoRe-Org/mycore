@@ -77,7 +77,7 @@
                 </list>
             </cell>
             <cell row="8" col="2" anchor="WEST">
-                <helpPopup id="HGroupAdminGroups" width="400px" height="200px" i18n="component.useradmin.group.admingroup.help" />
+                <helpPopup id="HGroupAdminGroup" width="400px" height="200px" i18n="component.useradmin.group.admingroup.help" />
             </cell>
             
             
@@ -93,7 +93,7 @@
                 </list>
             </cell>
             <cell row="10" col="2" anchor="WEST">
-                <helpPopup id="HGroupAdminUsers" width="400px" height="200px" i18n="component.useradmin.group.groupmember.help" />
+                <helpPopup id="HGroupAdminMembers" width="400px" height="200px" i18n="component.useradmin.group.groupmember.help" />
             </cell>                        
             
             <!-- *** Buttons *** -->
