@@ -336,7 +336,7 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
         if (LOGGER.isDebugEnabled()) {
             for (SortField sortField : sortList) {
                 String name = (SortField.FIELD_SCORE == sortField ? "score" : sortField.getField());
-                LOGGER.info("Sort by: " + name + (sortField.getReverse() ? " descending" : " accending"));
+                LOGGER.debug("Sort by: " + name + (sortField.getReverse() ? " descending" : " accending"));
             }
         }
         return new Sort(sortList.toArray(new SortField[0]));
