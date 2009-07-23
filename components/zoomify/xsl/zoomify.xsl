@@ -27,7 +27,7 @@
 <xsl:variable name="zoomify.id"               select="'theMovie'" />
 <xsl:variable name="zoomify.plugin"           select="'http://www.macromedia.com/shockwave/download/index.cgi?P1_Prod_Version=ShockWaveFlash'" />
 <xsl:variable name="zoomify.classid"          select="'clsid:D27CDB6E-AE6D-11cf-96B8-444553540000'" />
-<xsl:variable name="zoomify.path"             select="concat('zoomifyImagePath=',$WebApplicationBaseURL,'servlets/MCRFileNodeServlet',$ImagePath)" />
+<xsl:variable name="zoomify.path"             select="concat('zoomifyImagePath=',$WebApplicationBaseURL,'servlets/MCRZipFileNodeServlet',$ImagePath)" />
 <xsl:variable name="zoomify.app"              select="concat($WebApplicationBaseURL,'ZoomifyViewer.swf')" />
 <xsl:variable name="zoomify.back"             select="concat($WebApplicationBaseURL,'receive/',$remcrid)" />
 
@@ -37,6 +37,9 @@
   </xsl:variable>
   <xsl:variable name="zoomify.next"             select="concat($url,'&amp;mode=next')" />
   <xsl:variable name="zoomify.prev"             select="concat($url,'&amp;mode=prev')" />
+  <xsl:variable name="zoomify.first"            select="concat($url,'&amp;mode=first')" />
+  <xsl:variable name="zoomify.last"             select="concat($url,'&amp;mode=last')" />
+  
   <!--<xsl:variable name="httpSession"> 
     <xsl:value-of select="substring-after($JSessionID,'=')"/>
   </xsl:variable>-->
@@ -44,7 +47,7 @@
   <table width="750" height="20">
 	<tr>
 		<td width="33%" align="left"><xsl:value-of select="i18n:translate('component.zoomify.page.zoomify.source')" /><xsl:text>: </xsl:text><xsl:value-of select="$label" /></td>
-		<td width="33%" align="center"><xsl:value-of select="i18n:translate('component.zoomify.page.zoomify.orderlabel')" /><xsl:text>: </xsl:text><xsl:value-of select="$Orderlabel"></xsl:value-of></td>
+		<td width="33%" align="center"><xsl:value-of select="i18n:translate('component.zoomify.page.zoomify.orderlabel')" /><xsl:text></xsl:text><xsl:value-of select="$Orderlabel"></xsl:value-of></td>
 		<td width="33%" align="right"><xsl:value-of select="i18n:translate('component.zoomify.page.zoomify.page')" /><xsl:text> </xsl:text><xsl:value-of select="$index" /><xsl:text>/</xsl:text><xsl:value-of select="$max" /></td>
 	</tr>
   </table>
@@ -81,16 +84,22 @@
   <table width="750" height="20">
 	<tr>
 		<td width="33%" align="left">
-			<!--<xsl:if test="{$index}>0">-->
-            <a href="{$zoomify.prev}"><xsl:value-of select="i18n:translate('component.zoomify.page.zoomify.prev')" /></a>
-            <!--</xsl:if>-->
+			<xsl:if test="$index > 1">
+                <!--<a href="{$zoomify.prev}"><xsl:value-of select="i18n:translate('component.zoomify.page.zoomify.prev')" /></a>-->
+                <a href="{$zoomify.first}"><img src="../images/nav-first.gif" /></a>
+                <a href="{$zoomify.prev}"><img src="../images/nav-back.gif" /></a>
+            </xsl:if>
 		</td>
 		<td width="33%" align="center">
 			<a href="{$zoomify.back}"><xsl:value-of select="i18n:translate('component.zoomify.page.zoomify.back')" /></a>
 		</td>
 		<td width="33%" align="right">
-			<a href="{$zoomify.next}"><xsl:value-of select="i18n:translate('component.zoomify.page.zoomify.next')" /></a>
-		</td>
+            <xsl:if test="$index &lt; $max">
+                <!--<a href="{$zoomify.next}"><xsl:value-of select="i18n:translate('component.zoomify.page.zoomify.next')" /></a>-->
+                <a href="{$zoomify.next}"><img src="../images/nav-forward.gif" /></a>
+                <a href="{$zoomify.last}"><img src="../images/nav-last.gif" /></a>
+            </xsl:if>
+        </td>
 	</tr>
   </table>
 	

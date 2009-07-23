@@ -63,7 +63,6 @@ public class MCRStartZoomifyServlet extends MCRStartEditorServlet{
 			if(data.compareTo("mets.xml")==0)
 				return mcrwork.getChildren()[j].getID();
 		}
-		
 		return null;
 	}
 	
@@ -87,6 +86,16 @@ public class MCRStartZoomifyServlet extends MCRStartEditorServlet{
 				if(this.index>0)
 				this.index--;
 			}
+			
+			if(mode.compareTo("first")==0)
+			{
+			    this.index = 0;
+			}
+			
+			if(mode.compareTo("last")==0)
+			{
+			    this.index = this.directories.size()-1;
+			}
 		}
 		
 		cd.myfile = pagedir + "zoomify_commit.xml";
@@ -96,13 +105,11 @@ public class MCRStartZoomifyServlet extends MCRStartEditorServlet{
 				 
 		MCRObject obj = new MCRObject();
 		obj.receiveFromDatastore(cd.myremcrid);
-		
 		MCRConfiguration CONFIG = MCRConfiguration.instance();
 		String type = obj.getId().getTypeId();
 		String idname = CONFIG.getString("MCR.Component.Zoomify."+type+".identifier");
 		MCRMetaElement metas = obj.getMetadataElement(idname);
 		MCRMetaLangText langtext = (MCRMetaLangText)metas.getElement(0);
-			
 		
 		String mcrname = langtext.getText();
 		
