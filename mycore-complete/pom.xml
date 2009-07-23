@@ -31,6 +31,9 @@
             <manifest>
               <mainClass>org.mycore.common.MCRCoreVersion</mainClass>
             </manifest>
+            <manifestEntries>
+               <MCR-Version>${mycore.version}</MCR-Version>
+            </manifestEntries>
           </archive>
         </configuration>
       </plugin>
