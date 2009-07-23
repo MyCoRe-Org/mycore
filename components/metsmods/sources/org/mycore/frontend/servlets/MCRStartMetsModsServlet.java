@@ -26,6 +26,7 @@ package org.mycore.frontend.servlets;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Properties;
 
 import org.mycore.access.MCRAccessManager;
@@ -83,6 +84,14 @@ public class MCRStartMetsModsServlet extends MCRStartEditorServlet {
             return true;
         }
     }
+    
+    private boolean searchForZip(MCRDirectory dir) {
+        MCRFilesystemNode liste[] = dir.getChildren();
+        
+        for(int i=0;i<liste.length;i++)
+            if(liste[i].getName().contains("zip")) return true;
+        return false;
+    }
 
     public void seditmets(MCRServletJob job, CommonData cd) throws IOException {
         if (!MCRAccessManager.checkPermission(cd.myremcrid.getId(), "writedb")) {
@@ -108,7 +117,8 @@ public class MCRStartMetsModsServlet extends MCRStartEditorServlet {
         try {
             ArrayList<String> pic_list = new ArrayList<String>();
             addPicturesToList(dir, pic_list);
-
+            //possible code point for adding routine handling generate a mets-file in directorys with zip-files.
+            //if (searchForZip(dir)) throw new Exception("a zip file was detected!");
             if (searchForMets(dir) == false) {
                 // build the mets.file
                 String project = cd.myremcrid.getProjectId();
@@ -146,6 +156,9 @@ public class MCRStartMetsModsServlet extends MCRStartEditorServlet {
 
                 mets.addContent(amdSec);
 
+                    //sorting the pic_list
+                    Collections.sort(pic_list);
+                
                 Element mets2 = mmu.createMetsElement(pic_list, mets, getBaseURL() + "servlets/MCRFileNodeServlet");
 
                 XMLOutputter xmlout = new XMLOutputter();
