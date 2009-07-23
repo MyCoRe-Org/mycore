@@ -7,7 +7,6 @@ import java.io.OutputStream;
 import com.sun.media.jai.codec.ImageCodec;
 import com.sun.media.jai.codec.ImageEncoder;
 import com.sun.media.jai.codec.JPEGEncodeParam;
-import com.sun.org.apache.bcel.internal.generic.GOTO;
 
 public class MCRJAIJPEGEnc implements MCRJAIEncoder {
     protected JPEGEncodeParam param;
@@ -25,5 +24,4 @@ public class MCRJAIJPEGEnc implements MCRJAIEncoder {
         encoder.encode(image);
         out.close();
     }
-
 }
