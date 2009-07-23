@@ -255,8 +255,6 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
      * @see MCRSearcher#search(MCRCondition, int, List, boolean)
      */
     public MCRResults search(MCRCondition condition, int maxResults, List<MCRSortBy> sortBy, boolean addSortData) {
-        MCRResults results = new MCRResults();
-
         try {
             List<Element> f = new ArrayList<Element>();
             f.add(condition.toXML());
@@ -265,12 +263,11 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
             // required flag Term with AND (true) or OR (false) combined
             Query luceneQuery = MCRBuildLuceneQuery.buildLuceneQuery(null, reqf, f, analyzer);
             LOGGER.debug("Lucene Query: " + luceneQuery.toString());
-            results = getLuceneHits(luceneQuery, maxResults, sortBy, addSortData);
+            return getLuceneHits(luceneQuery, maxResults, sortBy, addSortData);
         } catch (Exception e) {
             LOGGER.error("Exception in MCRLuceneSearcher", e);
+            return new MCRResults();
         }
-
-        return results;
     }
 
     /**
@@ -314,8 +311,7 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
         TopFieldDocs topFieldDocs = (TopFieldDocs) collector.topDocs();
         LOGGER.info("Number of Objects found: " + topFieldDocs.scoreDocs.length + " Time for Search: "
                 + (System.currentTimeMillis() - start));
-        MCRResults result = new MCRLuceneResults(indexSearcher, topFieldDocs, addableFields);
-        return result;
+        return new MCRLuceneResults(indexSearcher, topFieldDocs, addableFields);
     }
 
     private Sort buildSortFields(List<MCRSortBy> sortBy) {
