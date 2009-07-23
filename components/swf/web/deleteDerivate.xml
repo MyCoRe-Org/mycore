@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE MyCoReWebPage>
+
+<MyCoReWebPage>
+
+<section i18n="component.swf.page.deletePopup.text" direction="ltr">
+  <deleteDerivate/>
+</section>
+
+<section i18n="component.swf.page.deletePopup.text" direction="rtl">
+  <deleteDerivate/>
+</section>
+
+</MyCoReWebPage>
+
