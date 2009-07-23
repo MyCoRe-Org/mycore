@@ -3,22 +3,14 @@
 
 <MyCoReWebPage>
 
-<section title="Editieren eines Benutzers" xml:lang="de">
+<section i18n="component.useradmin.page.modify.user.title" direction="ltr">
   <editor id="modifyuser-ltr"><include uri="webapp:editor/editor-modifyuser-ltr.xml" /></editor>
 </section>
 
-<section title="Modify an existing user account" xml:lang="en">
-  <editor id="modifyuser-ltr"><include uri="webapp:editor/editor-modifyuser-ltr.xml" /></editor>
-</section>
-
-<section title="Modify an existing user account" xml:lang="ar">
-	<div class="editorForm_rtl">
+<section i18n="component.useradmin.page.modify.user.title" direction="rtl">
+	<div class="editorForm-rtl">
 		<editor id="modifyuser-rtl"><include uri="webapp:editor/editor-modifyuser-rtl.xml" /></editor>
 	</div>	
-</section>
-
-<section title="Merubah account pemakai" xml:lang="id">
-  <editor id="modifyuser-ltr"><include uri="webapp:editor/editor-modifyuser-ltr.xml" /></editor>
 </section>
 
 </MyCoReWebPage>

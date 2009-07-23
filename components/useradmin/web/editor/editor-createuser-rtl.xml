@@ -6,9 +6,10 @@
     <target type="servlet" name="MCRUserEditorServlet" method="post" format="xml" /> 
     <cancel url="{cancelUrl}" />
 
-    <validationMessage i18n="component.useradmin.common.validationMessage" />
-
-    <components root="create-user-rtl" var="/mycoreuser">
+    <components root="create-user-rtl" var="/mycoreuser"
+	 xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+	 xmlns:xlink="http://www.w3.org/1999/xlink"
+     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
         <include uri="webapp:editor/imports-common-user.xml" />
         <headline anchor="CENTER">
             <text i18n="component.useradmin.common.headMessage" />
@@ -45,9 +46,7 @@
                 <text id="LPassword" i18n="component.useradmin.user.password.label" />
             </cell>
             <cell row="3" col="4" anchor="WEST" var="user/user.password" sortnr="2">
-                <password id="userpw" width="48" maxlength="128" >
-					<condition id="Cuserid" required="true" i18n="component.useradmin.user.password.condition"/>
-				</password>
+                <password width="48" maxlength="128" />
             </cell>
             
             <!-- *** Description *** -->
@@ -124,11 +123,7 @@
             <cell row="12" col="6" anchor="WEST">
                 <text id="LLastName" i18n="component.useradmin.user.lastname.label" />
             </cell>
-            <cell row="12" col="4" anchor="WEST" var="user/user.contact/contact.lastname" sortnr="7">
-				<textfield id="lastname" width="48" maxlength="48" >
-					<condition id="Clastname" required="true" i18n="component.useradmin.user.lastname.condition"/>
-				</textfield>
-            </cell>
+            <cell row="12" col="4" anchor="WEST" ref="TFzeile48" var="user/user.contact/contact.lastname" sortnr="7" />
 
             <!-- *** Street *** -->
             <cell row="13" col="6" anchor="WEST">
@@ -185,7 +180,7 @@
             <cell row="21" col="4" anchor="WEST" ref="TFzeile48" var="user/user.contact/contact.email" sortnr="16" />
 
             <!-- *** Telephone *** -->
-            <cell row="22" col="1" anchor="WEST">
+            <cell row="22" col="6" anchor="WEST">
                 <text id="LTelephone" i18n="component.useradmin.user.phone.label" />
             </cell>
             <cell row="22" col="4" anchor="WEST" ref="TFzeile20" var="user/user.contact/contact.telephone" sortnr="17" />
@@ -204,8 +199,8 @@
 
             <!-- *** Buttons *** -->
             <cell row="99"  col="1" anchor="WEST" />
-            <cell row="100" col="4" ref="BSubmit"  anchor="EAST" />
-            <cell row="100" col="4" ref="BCancel"  anchor="WEST" />
+            <cell row="100" col="3" ref="BSubmit"  anchor="EAST" />
+            <cell row="100" col="3" ref="BCancel"  anchor="EAST" />
             <cell row="101" col="1" anchor="WEST" />
         </panel>
     </components>

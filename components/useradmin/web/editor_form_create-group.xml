@@ -2,22 +2,15 @@
 <!DOCTYPE MyCoReWebPage>
 
 <MyCoReWebPage>
-<section title="Neuanlegen einer Gruppe" xml:lang="de">
+	
+<section i18n="component.useradmin.page.create.group.title" direction="ltr">
   <editor id="creategroup-ltr"><include uri="webapp:editor/editor-creategroup-ltr.xml" /></editor>
 </section>
 
-<section title="Create a new user group" xml:lang="en">
-  <editor id="creategroup-ltr"><include uri="webapp:editor/editor-creategroup-ltr.xml" /></editor>
-</section>
-
-<section title="Create a new user group" xml:lang="ar">
-	<div class="editorForm_rtl">
+<section i18n="component.useradmin.page.create.group.title" direction="rtl">
+	<div class="editorForm-rtl">
 		<editor id="creategroup-rtl"><include uri="webapp:editor/editor-creategroup-rtl.xml" /></editor>
 	</div>
-</section>
-
-<section title="Membuka group baru" xml:lang="id">
-  <editor id="creategroup-ltr"><include uri="webapp:editor/editor-creategroup-ltr.xml" /></editor>
 </section>
 
 </MyCoReWebPage>

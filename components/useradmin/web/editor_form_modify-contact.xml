@@ -3,22 +3,14 @@
 
 <MyCoReWebPage>
 
-<section title="Editieren der Kontaktdaten" xml:lang="de">
+<section i18n="component.useradmin.page.modify.contact.title" direction="ltr">
   <editor id="modifycontact-ltr"><include uri="webapp:editor/editor-modifycontact-ltr.xml" /></editor>
 </section>
 
-<section title="Modify contact data" xml:lang="en">
-  <editor id="modifycontact-ltr"><include uri="webapp:editor/editor-modifycontact-ltr.xml" /></editor>
-</section>
-
-<section title="تعديل بيانات المستخدم" xml:lang="ar">
-	<div class="editorForm_rtl">
+<section i18n="component.useradmin.page.modify.contact.title" direction="rtl">
+	<div class="editorForm-rtl">
 		  <editor id="modifycontact-rtl"><include uri="webapp:editor/editor-modifycontact-rtl.xml" /></editor>
 	</div>
-</section>
-
-<section title="Merubah data kontak" xml:lang="id">
-  <editor id="modifycontact-ltr"><include uri="webapp:editor/editor-modifycontact-ltr.xml" /></editor>
 </section>
 
 </MyCoReWebPage>

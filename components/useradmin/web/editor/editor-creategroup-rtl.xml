@@ -7,7 +7,10 @@
     <target type="servlet" name="MCRUserEditorServlet" method="post" format="xml" />
     <cancel url="{cancelUrl}" />
     
-    <components root="create-group-rtl" var="/mycoregroup">
+    <components root="create-group-rtl" var="/mycoregroup"
+	 xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+	 xmlns:xlink="http://www.w3.org/1999/xlink"
+     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
         <include uri="webapp:editor/imports-common-user.xml" />
         <headline anchor="CENTER">
             <text i18n="component.useradmin.common.headMessage" />
@@ -31,7 +34,7 @@
 			</cell>		
 			
             <!-- *** User group data *** -->
-            <cell row="2" col="3" anchor="WEST">
+            <cell row="2" col="6" anchor="WEST">
                 <text id="LAccount" i18n="component.useradmin.group.account.label" />
             </cell>
             <cell row="2" col="4" anchor="WEST" ref="TFzeile20" var="group/@ID" sortnr="1" />
@@ -74,7 +77,7 @@
                 </list>
             </cell>
             <cell row="8" col="2" anchor="WEST">
-                <helpPopup id="HGroupAdminGroups" width="400px" height="200px" i18n="component.useradmin.group.admingroup.help" />
+                <helpPopup id="HGroupAdminGroup" width="400px" height="200px" i18n="component.useradmin.group.admingroup.help" />
             </cell>
             
             
@@ -90,13 +93,13 @@
                 </list>
             </cell>
             <cell row="10" col="2" anchor="WEST">
-                <helpPopup id="HGroupMembers" width="400px" height="200px" i18n="component.useradmin.group.groupmember.help" />
+                <helpPopup id="HGroupAdminMembers" width="400px" height="200px" i18n="component.useradmin.group.groupmember.help" />
             </cell>                        
             
             <!-- *** Buttons *** -->
             <cell row="99"  col="1" anchor="WEST" />
-            <cell row="100" col="4" ref="BSubmit"  anchor="EAST" />
-            <cell row="100" col="4" ref="BCancel"  anchor="WEST" />
+            <cell row="100" col="3" ref="BSubmit"  anchor="EAST" />
+            <cell row="100" col="3" ref="BCancel"  anchor="EAST" />
             <cell row="101" col="1" anchor="WEST" />
         </panel>
     </components>

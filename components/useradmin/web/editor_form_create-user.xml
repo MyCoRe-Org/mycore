@@ -3,22 +3,14 @@
 
 <MyCoReWebPage>
 
-<section title="Neuanlegen eines Benutzers" xml:lang="de">
+<section i18n="component.useradmin.page.create.user.title" direction="ltr">
   <editor id="createuser-ltr"><include uri="webapp:editor/editor-createuser-ltr.xml" /></editor>
 </section>
 
-<section title="Create a new user account" xml:lang="en">
-  <editor id="createuser-ltr"><include uri="webapp:editor/editor-createuser-ltr.xml" /></editor>
-</section>
-
-<section title="Create a new user account" xml:lang="ar">
-	<div class="editorForm_rtl">	
+<section i18n="component.useradmin.page.create.user.title" direction="rtl">
+	<div class="editorForm-rtl">	
 		<editor id="createuser-rtl"><include uri="webapp:editor/editor-createuser-rtl.xml" /></editor>
 	</div>
-</section>
-
-<section title="Membuka account pemakai yang baru" xml:lang="id">
-  <editor id="createuser-ltr"><include uri="webapp:editor/editor-createuser-ltr.xml" /></editor>
 </section>
 
 </MyCoReWebPage>

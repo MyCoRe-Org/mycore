@@ -335,7 +335,8 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
         }
         if (LOGGER.isDebugEnabled()) {
             for (SortField sortField : sortList) {
-                LOGGER.info("Sort by: " + sortField.getField() + (sortField.getReverse() ? " descending" : " accending"));
+                String name = (SortField.FIELD_SCORE == sortField ? "score" : sortField.getField());
+                LOGGER.debug("Sort by: " + name + (sortField.getReverse() ? " descending" : " accending"));
             }
         }
         return new Sort(sortList.toArray(new SortField[0]));
@@ -963,25 +964,20 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
 
         private static void addSortDataToHit(org.apache.lucene.document.Document doc, MCRHit hit, String score, SortField[] sortFields) {
             for (SortField sortField : sortFields) {
-                String fieldName;
-                if (sortField.getField().endsWith(SORTABLE_SUFFIX))
-                    fieldName = sortField.getField().substring(0, sortField.getField().length() - SORTABLE_SUFFIX.length());
-                else
-                    fieldName = sortField.getField();
                 if (SortField.FIELD_SCORE == sortField || sortField.getField() == null) {
-                    if (null != score) {
-                        MCRFieldDef fd = MCRFieldDef.getDef("score");
-                        MCRFieldValue fv = new MCRFieldValue(fd, score);
-                        hit.addSortData(fv);
-                    }
+                    if (score != null)
+                        hit.addSortData(new MCRFieldValue(MCRFieldDef.getDef("score"), score));
                 } else {
-                    String values[] = doc.getValues(sortField.getField());
+                    String fieldName = sortField.getField();
+                    if (fieldName.endsWith(SORTABLE_SUFFIX))
+                        fieldName = fieldName.substring(0, fieldName.length() - SORTABLE_SUFFIX.length());
+
+                    String values[] = doc.getValues(fieldName);
                     for (int i = 0; i < values.length; i++) {
                         MCRFieldValue fv = new MCRFieldValue(MCRFieldDef.getDef(fieldName), values[i]);
                         hit.addSortData(fv);
                     }
                 }
-
             }
         }
 

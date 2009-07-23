@@ -7,7 +7,10 @@
     <target type="servlet" name="MCRUserEditorServlet" method="post" format="xml" /> 
     <cancel url="{cancelUrl}" />
     
-    <components root="modify-contact-rtl" var="/mycoreuser">
+    <components root="modify-contact-rtl" var="/mycoreuser"
+	 xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+	 xmlns:xlink="http://www.w3.org/1999/xlink"
+     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
         <include uri="webapp:editor/imports-common-user.xml" />
         <headline anchor="CENTER">
             <text i18n="component.useradmin.common.headMessage" />
@@ -141,8 +144,8 @@
 
             <!-- *** Buttons *** -->
             <cell row="99"  col="1" anchor="WEST" />
-            <cell row="100" col="4" ref="BSubmit"  anchor="EAST" />
-            <cell row="100" col="4" ref="BCancel"  anchor="WEST" />
+            <cell row="100" col="3" ref="BSubmit"  anchor="EAST" />
+            <cell row="100" col="3" ref="BCancel"  anchor="EAST" />
             <cell row="101" col="1" anchor="WEST" />
         </panel>
     </components>
