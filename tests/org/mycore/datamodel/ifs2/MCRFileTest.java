@@ -89,7 +89,7 @@ public class MCRFileTest extends MCRTestCase {
     @SuppressWarnings("deprecation")
     public void testSetLastModified() throws Exception {
         MCRFile file = col.createFile("foo.txt");
-        Date other = new Date(2009, 1, 1);
+        Date other = new Date(109, 1, 1);
         file.setLastModified(other);
         assertEquals(other, file.getLastModified());
     }
