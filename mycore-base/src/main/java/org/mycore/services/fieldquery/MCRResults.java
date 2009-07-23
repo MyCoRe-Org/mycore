@@ -193,16 +193,15 @@ public class MCRResults implements Iterable<MCRHit> {
 
                 for (int i = 0; (result == 0) && (i < sortByList.size()); i++) {
                     MCRSortBy sortBy = sortByList.get(i);
-                    result = a.compareTo(sortBy.getField(), b);
-                    if (sortBy.getSortOrder() == MCRSortBy.DESCENDING) {
-                        result *= -1;
-                    }
+                    if (sortBy.getSortOrder() == MCRSortBy.ASCENDING)
+                      result = a.compareTo(sortBy.getField(), b);
+                    else
+                      result = b.compareTo(sortBy.getField(), a);
                 }
 
                 return result;
             }
         });
-
         setSorted(true);
     }
 

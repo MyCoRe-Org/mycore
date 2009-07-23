@@ -139,7 +139,7 @@ public class MCRMetadataStoreTest extends MCRTestCase {
         Document xml2 = new Document(new Element("root"));
         sm.update(MCRContent.readFrom(xml2));
         assertTrue(sm.getLastModified().after(date2));
-        Date date = new Date(2009, 1, 1);
+        Date date = new Date(109, 1, 1);
         sm.setLastModified(date);
         sm = store.retrieve(sm.getID());
         assertEquals(date, sm.getLastModified());

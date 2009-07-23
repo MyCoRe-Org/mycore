@@ -60,7 +60,7 @@ public class MCRDirectoryTest extends MCRTestCase {
     @SuppressWarnings("deprecation")
     public void testSetLastModified() throws Exception {
         MCRDirectory dir = col.createDir("foo");
-        Date other = new Date(2009, 1, 1);
+        Date other = new Date(109, 1, 1);
         dir.setLastModified(other);
         assertEquals(other, dir.getLastModified());
     }

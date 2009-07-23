@@ -100,6 +100,8 @@ public class MCRFieldValue {
     public void setValue(String value) {
         if (field.getDataType().equals("text") || field.getDataType().equals("name"))
             this.value = MCRNormalizer.normalizeString(value);
+        if (field.getDataType().equals("decimal"))
+            this.value = value.replace(',','.');
         else
             this.value = value;
     }

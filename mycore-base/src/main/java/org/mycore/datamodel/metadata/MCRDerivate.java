@@ -348,6 +348,9 @@ final public class MCRDerivate extends MCRBase {
             LOGGER.info("IFS entries for MCRDerivate " + mcr_id.getId() + " are deleted.");
         } catch (Exception e) {
             if (getDerivate().getInternals() != null) {
+                if (LOGGER.isDebugEnabled()) {
+                    e.printStackTrace();
+                }
                 LOGGER.warn("Error while delete for ID " + mcr_id.getId() + " from IFS with ID " + getDerivate().getInternals().getIFSID());
             }
         }
