@@ -106,12 +106,12 @@ public class MCRLayoutService implements org.apache.xalan.trace.TraceListener {
 
     /** The XSL transformer factory to use */
     private SAXTransformerFactory factory;
-    
+
     private FopFactory fopFactory;
 
     /** The logger */
     private final static Logger LOGGER = Logger.getLogger(MCRLayoutService.class);
-    
+
     private static final MCRLayoutService singleton = new MCRLayoutService();
 
     public static MCRLayoutService instance() {
@@ -144,8 +144,8 @@ public class MCRLayoutService implements org.apache.xalan.trace.TraceListener {
                 LOGGER.warn(ex.getMessageAndLocation());
             }
         });
-        
-        fopFactory=FopFactory.newInstance();
+
+        fopFactory = FopFactory.newInstance();
         fopFactory.setURIResolver(MCRURIResolver.instance());
     }
 
@@ -576,10 +576,12 @@ public class MCRLayoutService implements org.apache.xalan.trace.TraceListener {
 
         if ("application/pdf".equals(ct)) {
             try {
-                Fop fop=fopFactory.newFop(MimeConstants.MIME_PDF, out);
+                Fop fop = fopFactory.newFop(MimeConstants.MIME_PDF, out);
                 result = new SAXResult(fop.getDefaultHandler());
             } catch (FOPException e) {
-                throw new IOException(e);
+                IOException ioe = new IOException();
+                ioe.initCause(e);
+                throw ioe;
             }
         } else {
             result = new StreamResult(out);
