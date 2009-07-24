@@ -25,6 +25,7 @@ package org.mycore.frontend.servlets;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.net.HttpURLConnection;
@@ -136,16 +137,10 @@ public class MCRStartEditorServlet extends MCRServlet {
         protected String extparm = null; // the extra parameter
     }
 
-    protected static int number_distance = 1;
-
     /** Initialisation of the servlet */
     public void init() throws ServletException {
         super.init();
-
-        // Workflow Manager
         WFM = MCRSimpleWorkflowManager.instance();
-        number_distance = MCRConfiguration.instance().getInt("MCR.Metadata.ObjectID.NumberDistance", 1);
-
     }
 
     /**
@@ -317,36 +312,22 @@ public class MCRStartEditorServlet extends MCRServlet {
             }
         }
 
-        MCRObjectID mcridnext = new MCRObjectID();
-        mcridnext.setNextFreeId(myproject + "_" + mytype);
-
-        String mytypeString = "_" + mytype + "_";
+        final String mytypeString = "_" + mytype + "_";
+        final String project = myproject;
         File workdir = MCRSimpleWorkflowManager.instance().getDirectoryPath(myproject + "_" + mytype);
-        String[] list = workdir.list();
-
-        for (int i = 0; i < list.length; i++) {
-            if (!list[i].startsWith(myproject)) {
-                continue;
+        String max = mytypeString + "0.xml";
+        for (String file : workdir.list(new FilenameFilter() {
+            public boolean accept(File dir, String name) {
+                return name.startsWith(project) && name.contains(mytypeString) && name.endsWith(".xml");
             }
-            if (list[i].indexOf(mytypeString) == -1) {
-                continue;
-            }
-
-            try {
-                MCRObjectID mcriddir = new MCRObjectID(list[i].substring(0, list[i].length() - 4));
-
-                if (mcridnext.getNumberAsInteger() <= mcriddir.getNumberAsInteger()) {
-                    int mylastnumber = mcriddir.getNumberAsInteger() + 1;
-                    while ((mylastnumber % number_distance) != 0) {
-                        mylastnumber += 1;
-                    }
-                    mcriddir.setNumber(mylastnumber);
-                    mcridnext = mcriddir;
-                }
-            } catch (Exception e) {
-            }
+        })) {
+            if (file.compareTo(max) > 0)
+                max = file;
         }
-
+        int maxIDinWorkflow = Integer.parseInt( max.substring( max.lastIndexOf( "_" ) + 1 ), max.length() - 4 );  
+            
+        MCRObjectID mcridnext = new MCRObjectID();
+        mcridnext.setNextFreeId(myproject + "_" + mytype, maxIDinWorkflow );
         return mcridnext.getId();
     }
 
@@ -1364,7 +1345,6 @@ public class MCRStartEditorServlet extends MCRServlet {
      */
     public void wnewder(MCRServletJob job, CommonData cd) throws IOException {
         if (!MCRAccessManager.checkPermission("create-" + cd.mytype)) {
-            (new MCRObjectID()).decrementOneFreeId((cd.mytfmcrid).getBase());
             job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + usererrorpage));
             return;
         }
@@ -1385,7 +1365,6 @@ public class MCRStartEditorServlet extends MCRServlet {
      */
     public void wnewobj(MCRServletJob job, CommonData cd) throws IOException {
         if ((!AI.checkPermission("create-" + cd.mytfmcrid.getBase())) && (!MCRAccessManager.checkPermission("create-" + cd.mytype))) {
-            (new MCRObjectID()).decrementOneFreeId((cd.mytfmcrid).getBase());
             job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + usererrorpage));
             return;
         }

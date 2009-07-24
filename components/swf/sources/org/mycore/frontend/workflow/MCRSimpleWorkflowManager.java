@@ -27,6 +27,7 @@ package org.mycore.frontend.workflow;
 import static org.mycore.common.MCRConstants.XLINK_NAMESPACE;
 
 import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -502,31 +503,26 @@ public class MCRSimpleWorkflowManager {
      * workflow directory and in the server.
      */
     public synchronized final MCRObjectID getNextDrivateID(MCRObjectID ID) {
-        String myproject = ID.getProjectId() + "_derivate";
+        final String myproject = ID.getProjectId() + "_derivate";
+
         MCRObjectID dmcridnext = new MCRObjectID();
         dmcridnext.setNextFreeId(myproject);
 
         File workdir = getDirectoryPath(ID.getBase());
-        if (workdir.isDirectory()) {
-            String[] list = workdir.list();
-            for (int i = 0; i < list.length; i++) {
-                if (!list[i].startsWith(myproject)) {
-                    continue;
-                }
-                if (!list[i].endsWith(".xml")) {
-                    continue;
-                }
-                try {
-                    MCRObjectID dmcriddir = new MCRObjectID(list[i].substring(0, list[i].length() - 4));
-                    if (dmcridnext.getNumberAsInteger() <= dmcriddir.getNumberAsInteger()) {
-                        dmcriddir.setNumber(dmcriddir.getNumberAsInteger() + 1);
-                        dmcridnext = dmcriddir;
-                    }
-                } catch (Exception e) {
-                }
+        String max = myproject + "_0.xml";
+        for (String file : workdir.list(new FilenameFilter() {
+            public boolean accept(File dir, String name) {
+                return name.startsWith(myproject) && name.endsWith(".xml");
             }
+        })) {
+            if (file.compareTo(max) > 0)
+                max = file;
         }
-        return dmcridnext;
+        int maxIDinWorkflow = Integer.parseInt( max.substring( max.lastIndexOf( "_" ) + 1 ), max.length() - 4 );  
+
+        MCRObjectID mcridnext = new MCRObjectID();
+        mcridnext.setNextFreeId(myproject, maxIDinWorkflow );
+        return mcridnext;
     }
 
     /**
