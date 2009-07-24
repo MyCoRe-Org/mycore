@@ -55,7 +55,7 @@
   <build>
     <pluginManagement>
       <plugins>
-        <!-- Use Java 1.4 everywhere -->
+        <!-- Use Java 1.5 everywhere -->
         <plugin>
           <artifactId>maven-compiler-plugin</artifactId>
           <configuration>
