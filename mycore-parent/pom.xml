@@ -52,6 +52,20 @@
     <mycore.version>2.0.90-SNAPSHOT</mycore.version>
     <java.target.version>1.5</java.target.version>
   </properties>
+  <distributionManagement>
+    <!-- use the following if you're not using a snapshot version. -->
+    <repository>
+      <id>MyCoRe HQ</id>
+      <name>MyCoRe Headquarters</name>
+      <url>scp://server.mycore.de/mcr/mycore.de/maven2</url>
+    </repository>
+    <!-- use the following if you ARE using a snapshot version. -->
+    <snapshotRepository>
+      <id>MyCoRe HQ</id>
+      <name>MyCoRe Headquarters</name>
+      <url>scp://server.mycore.de/mcr/mycore.de/maven2</url>
+    </snapshotRepository>
+  </distributionManagement>
   <build>
     <pluginManagement>
       <plugins>
