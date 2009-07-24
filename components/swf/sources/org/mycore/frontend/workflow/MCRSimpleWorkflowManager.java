@@ -518,7 +518,7 @@ public class MCRSimpleWorkflowManager {
             if (file.compareTo(max) > 0)
                 max = file;
         }
-        int maxIDinWorkflow = Integer.parseInt( max.substring( max.lastIndexOf( "_" ) + 1 ), max.length() - 4 );  
+        int maxIDinWorkflow = Integer.parseInt( max.substring( max.lastIndexOf( "_" ) + 1, max.length() - 4 ) );  
 
         MCRObjectID mcridnext = new MCRObjectID();
         mcridnext.setNextFreeId(myproject, maxIDinWorkflow );
