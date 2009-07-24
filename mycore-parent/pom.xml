@@ -51,6 +51,7 @@
   <properties>
     <mycore.version>2.0.90-SNAPSHOT</mycore.version>
     <java.target.version>1.5</java.target.version>
+    <uniqueVersion>false</uniqueVersion>
   </properties>
   <distributionManagement>
     <!-- use the following if you're not using a snapshot version. -->
