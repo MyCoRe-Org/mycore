@@ -155,6 +155,7 @@
       <groupId>com.jcraft</groupId>
       <artifactId>jsch</artifactId>
       <version>0.1.41</version>
+      <scope>runtime</scope>
     </dependency>
     <dependency>
       <groupId>org.hibernate</groupId>
