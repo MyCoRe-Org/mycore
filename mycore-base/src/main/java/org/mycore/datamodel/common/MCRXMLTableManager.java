@@ -64,8 +64,6 @@ public class MCRXMLTableManager {
 
     private Hashtable<String, MCRXMLTableInterface> tablelist;
 
-    private static int number_distance = 1;
-
     /**
      * Returns the link table manager singleton.
      */
@@ -83,7 +81,6 @@ public class MCRXMLTableManager {
     protected MCRXMLTableManager() {
         tablelist = new Hashtable<String, MCRXMLTableInterface>();
         jdomCache = new MCRCache(CONFIG.getInt("MCR.Persistence.XML.Store.CacheSize", 100), "XMLTable JDOMs");
-        number_distance = CONFIG.getInt("MCR.Metadata.ObjectID.NumberDistance", 1);
         List<String> objectTypes = getAllAllowedMCRObjectIDTypes();
         for (String type : objectTypes) {
             initXMLTable(type);
@@ -232,29 +229,21 @@ public class MCRXMLTableManager {
     }
 
     /**
-     * This method returns the next free ID number for a given MCRObjectID base.
-     * This method ensures that any invocation returns a new, exclusive ID by
-     * remembering the highest ID ever returned and comparing it with the
-     * highest ID stored in the related index class.
+     * This method returns the highest stored ID number for a given MCRObjectID base, 
+     * or 0 if no object is stored for this type and project.
      * 
-     * @param idproject
+     * @param project
      *            the project ID part of the MCRObjectID base
-     * @param idtype
+     * @param type
      *            the type ID part of the MCRObjectID base
      * 
      * @exception MCRPersistenceException
      *                if a persistence problem is occured
      * 
-     * @return the next free ID number as a String
+     * @return the highest stored ID number as a String
      */
-    public int getNextFreeIdInt(String idproject, String idtype) throws MCRPersistenceException {
-        int i = getXMLTable(idtype).getNextFreeIdInt(idproject, idtype);
-
-        while ((i % number_distance) != 0) {
-            i += 1;
-        }
-
-        return i;
+    public int getHighestStoredID(String idproject, String idtype) throws MCRPersistenceException {
+        return getXMLTable(idtype).getHighestStoredID(idproject, idtype);
     }
 
     /**

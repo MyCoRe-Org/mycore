@@ -101,10 +101,8 @@ public interface MCRXMLTableInterface {
     public InputStream retrieve(String mcrid, int version) throws MCRPersistenceException;
 
     /**
-     * This method returns the next free ID number for a given MCRObjectID base.
-     * This method ensures that any invocation returns a new, exclusive ID by
-     * remembering the highest ID ever returned and comparing it with the
-     * highest ID stored in the related index class.
+     * This method returns the highest stored ID number for a given MCRObjectID base, 
+     * or 0 if no object is stored for this type and project.
      * 
      * @param project
      *            the project ID part of the MCRObjectID base
@@ -114,9 +112,9 @@ public interface MCRXMLTableInterface {
      * @exception MCRPersistenceException
      *                if a persistence problem is occured
      * 
-     * @return the next free ID number as a String
+     * @return the highest stored ID number as a String
      */
-    public int getNextFreeIdInt(String project, String type) throws MCRPersistenceException;
+    public abstract int getHighestStoredID(String project, String type) throws MCRPersistenceException;
 
     /**
      * This method check that the MCRObjectID exist in this store.

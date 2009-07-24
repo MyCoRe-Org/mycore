@@ -178,8 +178,7 @@ public class MCRHIBXMLStore implements MCRXMLTableInterface {
     public final InputStream retrieve(String mcrid, int version) throws MCRPersistenceException {
         Session session = getSession();
         MCRXMLTABLEPK pk = new MCRXMLTABLEPK(mcrid, version);
-        Blob blob = (Blob) session.createCriteria(MCRXMLTABLE.class).setProjection(Projections.property("xml")).add(
-                Restrictions.eq("key", pk)).uniqueResult();
+        Blob blob = (Blob) session.createCriteria(MCRXMLTABLE.class).setProjection(Projections.property("xml")).add(Restrictions.eq("key", pk)).uniqueResult();
         try {
             return blob.getBinaryStream();
         } catch (Exception e) {
@@ -188,10 +187,8 @@ public class MCRHIBXMLStore implements MCRXMLTableInterface {
     }
 
     /**
-     * This method returns the next free ID number for a given MCRObjectID base.
-     * This method ensures that any invocation returns a new, exclusive ID by
-     * remembering the highest ID ever returned and comparing it with the
-     * highest ID stored in the related index class.
+     * This method returns the highest stored ID number for a given MCRObjectID base, 
+     * or 0 if no object is stored for this type and project.
      * 
      * @param project
      *            the project ID part of the MCRObjectID base
@@ -201,21 +198,18 @@ public class MCRHIBXMLStore implements MCRXMLTableInterface {
      * @exception MCRPersistenceException
      *                if a persistence problem is occured
      * 
-     * @return the next free ID number as a String
+     * @return the highest stored ID number as a String
      */
-    public final synchronized int getNextFreeIdInt(String project, String type) throws MCRPersistenceException {
+    public final synchronized int getHighestStoredID(String project, String type) throws MCRPersistenceException {
 
         Session session = getSession();
-        //TODO: SQL -> Criteria
-        List<?> l = session.createQuery("select max(key.id) from " + classname + " where MCRID like '" + project + "_" + type + "%'")
-                .list();
-        if (l.size() > 0 && l.get(0) != null) {
-            String max = (String) l.get(0);
-            if (max == null)
-                return 1;
-            return new MCRObjectID(max).getNumberAsInteger() + 1;
+        List<?> l = session.createQuery("select max(key.id) from " + classname + " where MCRID like '" + project + "_" + type + "%'").list();
+        if (l.size() == 0 || l.get(0) == null)
+            return 0;
+        else {
+            String last = (String) (l.get(0));
+            return Integer.parseInt(last.substring(last.lastIndexOf('_') + 1));
         }
-        return 1;
     }
 
     /**
@@ -286,8 +280,7 @@ public class MCRHIBXMLStore implements MCRXMLTableInterface {
 
     public List<MCRObjectIDDate> listObjectDates(String type) {
         Session session = getSession();
-        Criteria criteria = session.createCriteria(MCRXMLTABLE.class).add(Restrictions.eq("type", type)).setProjection(
-                Projections.projectionList().add(Projections.property("key.id")).add(Projections.property("lastModified")));
+        Criteria criteria = session.createCriteria(MCRXMLTABLE.class).add(Restrictions.eq("type", type)).setProjection(Projections.projectionList().add(Projections.property("key.id")).add(Projections.property("lastModified")));
         List<?> result = criteria.list();
         return new MCRObjectIDDateList(result);
     }

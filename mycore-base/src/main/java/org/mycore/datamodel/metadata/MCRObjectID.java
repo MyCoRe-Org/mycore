@@ -116,8 +116,7 @@ public final class MCRObjectID {
      *                MCRXMLTableManager.
      */
     public void setNextFreeId() throws MCRException {
-        String base_id = getBase();
-        manageFreeId(base_id, 1);
+        setNextFreeId(getBase());
     }
 
     /**
@@ -132,94 +131,28 @@ public final class MCRObjectID {
      *                if the given string is not valid or can't connect to the
      *                MCRXMLTableManager.
      */
-    public void setNextFreeId(String base_id) throws MCRException {
-        manageFreeId(base_id, 1);
+    public synchronized void setNextFreeId(String base_id) throws MCRException {
+        setNextFreeId(base_id, 0);
     }
-
-    /**
-     * The method decrement the temporary stored last number of a project ID
-     * with 1.
-     */
-    public void decrementOneFreeId(String base_id) throws MCRException {
-        manageFreeId(base_id, -1);
-    }
-
-    /**
-     * The method manage the MCRObjectID for a given base ID string. A base ID
-     * is <em>project_id</em>_<em>type_id</em>. The number was computed
-     * from this methode. If the step integer is higher than 0 it is the next
-     * free number of an item in the database for the given project ID and type
-     * ID. Otherwise the last temporary stored number for the base ID string
-     * will be decrement with the integer value.
-     * 
-     * @param base_id
-     *            the basic ID
-     * @exception MCRException
-     *                if the given string is not valid or can't connect to the
-     *                MCRXMLTableManager.
-     */
-    private synchronized void manageFreeId(String base_id, int dec) throws MCRException {
+    
+    public synchronized void setNextFreeId(String base_id, int maxInWorkflow) throws MCRException {
         // check the base_id
         mcr_valid_id = false;
-        StringBuffer mcrid = new StringBuffer(base_id).append('_').append(1);
-        if (!setID(mcrid.toString())) {
-            throw new MCRException("Error in project base string for the new ID:" + mcrid);
+
+        if( ! setID( base_id + "_1" ) ) {
+            throw new MCRException("Error in project base string:" + base_id );
         }
-        mcrid.deleteCharAt(mcrid.length() - 1);
 
-        if (dec > 0) {
-            // get the next number
-            try {
-                MCRXMLTableManager xmltable = MCRXMLTableManager.instance();
-                int i = xmltable.getNextFreeIdInt(mcr_project_id, mcr_type_id);
-                Integer j = (Integer) lastnumber.get(base_id);
-                int mylastnumber = -1;
-
-                if (j != null) {
-                    mylastnumber = j.intValue();
-                }
-
-                if (mylastnumber < i) {
-                    mcrid.append(i);
-                    mylastnumber = i;
-                } else {
-                    while ((mylastnumber % number_distance) != 0) {
-                        mylastnumber += 1;
-                    }
-                    mcrid.append(mylastnumber);
-                }
-
-                lastnumber.put(base_id, new Integer(mylastnumber));
-            } catch (Exception e) {
-                throw new MCRException(e.getMessage(), e);
-            }
-
-            if (!setID(mcrid.toString())) {
-                throw new MCRException("Error setting to new ID:" + mcrid);
-            }
-
-            mcr_valid_id = true;
-            return;
-        }
-        // decrement with dec
-        else {
-            try {
-                int j = ((Integer) lastnumber.get(base_id)).intValue();
-                if (j >= (-dec)) {
-                    j += dec;
-                }
-                lastnumber.put(base_id, new Integer(j));
-            } catch (Exception e) {
-                LOGGER.warn("Cant'd decrement last ID for project id " + base_id + " cause it's not initialized.");
-            }
-
-        }
+        int stored = MCRXMLTableManager.instance().getHighestStoredID(mcr_project_id, mcr_type_id);
+        int last = lastnumber.containsKey(base_id) ? lastnumber.get(base_id) : 0;
+        last = Math.max(Math.max(stored, maxInWorkflow), last) + 1;
+        int rest = last % number_distance;
+        if (rest != 0)
+            last += number_distance - rest;
+        lastnumber.put(base_id, last);
+        setID(base_id + "_" + String.valueOf(last));
     }
 
-    /**
-     * The method decrement the temporary stored last number of a project ID
-     * with 1.
-     */
     /**
      * This method set a new type in a existing MCRObjectID.
      * 
