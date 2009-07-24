@@ -151,6 +151,12 @@
       <optional>false</optional>
     </dependency>
     <dependency>
+      <!-- required for commons-vfs -->
+      <groupId>com.jcraft</groupId>
+      <artifactId>jsch</artifactId>
+      <version>0.1.41</version>
+    </dependency>
+    <dependency>
       <groupId>org.hibernate</groupId>
       <artifactId>jtidy-r8</artifactId>
       <version>21122004</version>
