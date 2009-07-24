@@ -6,7 +6,7 @@
   <taskdef classname="org.mycore.common.MCRConfigurationTask" name="mcr-config" classpathref="integration.classpath"/>
   <taskdef resource="net/sf/antcontrib/antcontrib.properties" classpathref="integration.classpath"/>
   <!-- for task is not included in antcontrib.properties by default -->
-  <taskdef name="for" classname="net.sf.antcontrib.logic.For" classpathref="integration.classpath"/>
+  <taskdef name="for" classname="net.sf.antcontrib.logic.ForTask" classpathref="integration.classpath"/>
   <taskdef name="xmltask" classname="com.oopsconsultancy.xmltask.ant.XmlTask" classpathref="integration.classpath"/>
   
   <macrodef name="componentPreHook">
