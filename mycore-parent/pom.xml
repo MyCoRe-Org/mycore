@@ -194,6 +194,10 @@
   </profiles>
   <repositories>
     <repository>
+      <id>MyCoRe HQ</id>
+      <url>http://www.mycore.de/maven2</url>
+    </repository>
+    <repository>
       <id>jboss</id>
       <url>http://repository.jboss.com/maven2</url>
     </repository>
