@@ -73,9 +73,9 @@ public class MCRHIBXMLStoreTest extends MCRHibTestCase {
      * Test method for {@link org.mycore.backend.hibernate.MCRHIBXMLStore#exist(java.lang.String, int)} .
      */
     public void testExist() {
-        assertTrue("Could not find " + entry.getId(), XMLSTORE.exist(entry.getId(), entry.getVersion()));
+        assertTrue("Could not find " + entry.getId(), XMLSTORE.exists(entry.getId()));
         String wrongID = entry.getId() + "1";
-        assertFalse("There should be no " + wrongID, XMLSTORE.exist(wrongID, entry.getVersion()));
+        assertFalse("There should be no " + wrongID, XMLSTORE.exists(wrongID));
     }
 
 }
