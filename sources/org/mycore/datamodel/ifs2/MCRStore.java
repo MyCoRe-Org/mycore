@@ -274,15 +274,18 @@ public abstract class MCRStore {
      * @return the next free ID that can be used to store data
      */
     public synchronized int getNextFreeID() {
+        lastID = Math.max(getHighestStoredID(), lastID);
+        lastID += (lastID > 0 ? offset : 1);
+        offset = 1;
+        return lastID;
+    }
+    
+    public synchronized int getHighestStoredID() {
         int found = 0;
         String max = findMaxID(dir, 0);
         if (max != null)
             found = slot2id(max);
-
-        lastID = Math.max(found, lastID);
-        lastID += (lastID > 0 ? offset : 1);
-        offset = 1;
-        return lastID;
+        return found;
     }
 
     /**
