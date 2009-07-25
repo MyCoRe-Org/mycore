@@ -125,24 +125,8 @@ public class MCRXMLTableManager {
      *                if the method arguments are not correct
      */
     public void create(MCRObjectID mcrid, org.jdom.Document xml, Date lastModified) throws MCRException {
-        getXMLTable(mcrid.getTypeId()).create(mcrid.getId(), MCRUtils.getByteArray(xml), 1, lastModified);
+        getXMLTable(mcrid.getTypeId()).create(mcrid.getId(), MCRUtils.getByteArray(xml), lastModified);
         jdomCache.put(mcrid, xml);
-        CONFIG.systemModified();
-    }
-
-    /**
-     * The method create a new item in the datastore.
-     * 
-     * @param mcrid
-     *            a MCRObjectID
-     * @param xml
-     *            a byte array with the XML file
-     * 
-     * @exception MCRException
-     *                if the method arguments are not correct
-     */
-    public void create(MCRObjectID mcrid, byte[] xml, Date lastModified) throws MCRException {
-        getXMLTable(mcrid.getTypeId()).create(mcrid.getId(), xml, 1, lastModified);
         CONFIG.systemModified();
     }
 
@@ -156,7 +140,7 @@ public class MCRXMLTableManager {
      *                if the method argument is not correct
      */
     public void delete(MCRObjectID mcrid) throws MCRException {
-        getXMLTable(mcrid.getTypeId()).delete(mcrid.getId(), 1);
+        getXMLTable(mcrid.getTypeId()).delete(mcrid.getId());
         jdomCache.remove(mcrid);
         CONFIG.systemModified();
     }
@@ -173,7 +157,7 @@ public class MCRXMLTableManager {
      *                if the method arguments are not correct
      */
     public void update(MCRObjectID mcrid, org.jdom.Document xml, Date lastModified) throws MCRException {
-        getXMLTable(mcrid.getTypeId()).update(mcrid.getId(), MCRUtils.getByteArray(xml), 1, lastModified);
+        getXMLTable(mcrid.getTypeId()).update(mcrid.getId(), MCRUtils.getByteArray(xml), lastModified);
         jdomCache.put(mcrid, xml);
         CONFIG.systemModified();
     }
@@ -190,7 +174,7 @@ public class MCRXMLTableManager {
      *                if the method arguments are not correct
      */
     public void update(MCRObjectID mcrid, byte[] xml, Date lastModified) throws MCRException {
-        getXMLTable(mcrid.getTypeId()).update(mcrid.getId(), xml, 1, lastModified);
+        getXMLTable(mcrid.getTypeId()).update(mcrid.getId(), xml, lastModified);
         jdomCache.remove(mcrid);
         CONFIG.systemModified();
     }
@@ -208,7 +192,7 @@ public class MCRXMLTableManager {
      */
     public byte[] retrieveAsXML(MCRObjectID mcrid) throws MCRException {
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        MCRUtils.copyStream(getXMLTable(mcrid.getTypeId()).retrieve(mcrid.getId(), 1), bos);
+        MCRUtils.copyStream(getXMLTable(mcrid.getTypeId()).retrieve(mcrid.getId()), bos);
         return bos.toByteArray();
     }
 
@@ -224,7 +208,7 @@ public class MCRXMLTableManager {
      *                if the method arguments are not correct
      */
     public Document retrieveAsJDOM(MCRObjectID mcrid) throws MCRException {
-        InputStream xml = getXMLTable(mcrid.getTypeId()).retrieve(mcrid.getId(), 1);
+        InputStream xml = getXMLTable(mcrid.getTypeId()).retrieve(mcrid.getId());
         return MCRXMLHelper.getParser().parseXML(xml, false);
     }
 
@@ -243,7 +227,7 @@ public class MCRXMLTableManager {
      * @return the highest stored ID number as a String
      */
     public int getHighestStoredID(String idproject, String idtype) throws MCRPersistenceException {
-        return getXMLTable(idtype).getHighestStoredID(idproject, idtype);
+        return getXMLTable(idtype).getHighestStoredID();
     }
 
     /**
@@ -255,7 +239,7 @@ public class MCRXMLTableManager {
      * @return true if the MCRObjectID exist, else return false
      */
     public boolean exist(MCRObjectID mcrid) {
-        return getXMLTable(mcrid.getTypeId()).exist(mcrid.getId(), 1);
+        return getXMLTable(mcrid.getTypeId()).exists(mcrid.getId());
     }
 
     /**
@@ -267,11 +251,11 @@ public class MCRXMLTableManager {
      * @return a ArrayList of MCRObjectID's
      */
     public List<String> retrieveAllIDs(String type) {
-        return getXMLTable(type).retrieveAllIDs(type);
+        return getXMLTable(type).retrieveAllIDs();
     }
 
     /**
-     * The method return a Array list with all stored MCRObjectID's of the XML
+     * The method return a list with all stored MCRObjectID's of the XML
      * table
      * 
      * @return a ArrayList of MCRObjectID's

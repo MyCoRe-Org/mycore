@@ -143,14 +143,23 @@ public final class MCRObjectID {
             throw new MCRException("Error in project base string:" + base_id );
         }
 
-        int stored = MCRXMLTableManager.instance().getHighestStoredID(mcr_project_id, mcr_type_id);
-        int last = lastnumber.containsKey(base_id) ? lastnumber.get(base_id) : 0;
-        last = Math.max(Math.max(stored, maxInWorkflow), last) + 1;
+        int last = Math.max(getLastID(base_id).getNumberAsInteger(), maxInWorkflow) + 1;
         int rest = last % number_distance;
         if (rest != 0)
             last += number_distance - rest;
         lastnumber.put(base_id, last);
         setID(base_id + "_" + String.valueOf(last));
+    }
+
+    /**
+     * Returns the last ID used or reserved for the given object base type.
+     */
+    public static MCRObjectID getLastID(String base_id) {
+        MCRObjectID oid = new MCRObjectID(base_id + "_1");
+        int last = lastnumber.containsKey(base_id) ? lastnumber.get(base_id) : 0;
+        int stored = MCRXMLTableManager.instance().getHighestStoredID(oid.getProjectId(), oid.getTypeId());
+        oid.setNumber(Math.max(last, stored));
+        return oid;
     }
 
     /**

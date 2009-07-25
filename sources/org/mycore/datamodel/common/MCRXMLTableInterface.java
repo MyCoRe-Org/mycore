@@ -54,24 +54,20 @@ public interface MCRXMLTableInterface {
      *            a MCRObjectID
      * @param xml
      *            a byte array with the XML file
-     * @param version
-     *            the version number as integer
      * @exception MCRPersistenceException
      *                if the method arguments are not correct
      */
-    public void create(String mcrid, byte[] xml, int version, Date lastModified) throws MCRPersistenceException;
+    public void create(String mcrid, byte[] xml, Date lastModified) throws MCRPersistenceException;
 
     /**
      * The method remove a item for the MCRObjectID from the datastore.
      * 
      * @param mcrid
      *            a MCRObjectID
-     * @param version
-     *            the version number as integer
      * @exception MCRPersistenceException
      *                if the method argument is not correct
      */
-    public void delete(String mcrid, int version) throws MCRPersistenceException;
+    public void delete(String mcrid) throws MCRPersistenceException;
 
     /**
      * The method update an item in the datastore.
@@ -80,12 +76,10 @@ public interface MCRXMLTableInterface {
      *            a MCRObjectID
      * @param xml
      *            a byte array with the XML file
-     * @param version
-     *            the version number as integer
      * @exception MCRPersistenceException
      *                if the method arguments are not correct
      */
-    public void update(String mcrid, byte[] xml, int version, Date lastModified) throws MCRPersistenceException;
+    public void update(String mcrid, byte[] xml, Date lastModified) throws MCRPersistenceException;
 
     /**
      * The method retrieve a dataset for the given MCRObjectID and returns the
@@ -93,49 +87,38 @@ public interface MCRXMLTableInterface {
      * 
      * @param mcrid
      *            a MCRObjectID
-     * @param version
-     *            the version number as integer
      * @exception MCRPersistenceException
      *                if the method arguments are not correct
      */
-    public InputStream retrieve(String mcrid, int version) throws MCRPersistenceException;
+    public InputStream retrieve(String mcrid) throws MCRPersistenceException;
 
     /**
-     * This method returns the highest stored ID number for a given MCRObjectID base, 
+     * This method returns the highest stored ID number, 
      * or 0 if no object is stored for this type and project.
-     * 
-     * @param project
-     *            the project ID part of the MCRObjectID base
-     * @param type
-     *            the type ID part of the MCRObjectID base
      * 
      * @exception MCRPersistenceException
      *                if a persistence problem is occured
      * 
      * @return the highest stored ID number as a String
      */
-    public abstract int getHighestStoredID(String project, String type) throws MCRPersistenceException;
+    public abstract int getHighestStoredID() throws MCRPersistenceException;
 
     /**
      * This method check that the MCRObjectID exist in this store.
      * 
      * @param mcrid
      *            a MCRObjectID
-     * @param version
-     *            the version number as integer
      * @return true if the MCRObjectID exist, else return false
      */
-    public boolean exist(String mcrid, int version);
+    public boolean exists(String mcrid);
 
     /**
      * The method return a Array list with all stored MCRObjectID's of the XML
-     * table of a MCRObjectID type.
+     * table.
      * 
-     * @param type
-     *            a MCRObjectID type string
      * @return a ArrayList of MCRObjectID's
      */
-    public List<String> retrieveAllIDs(String type);
+    public List<String> retrieveAllIDs();
     
     /**
      * lists objects of the specified <code>type</code> and their last modified date. 

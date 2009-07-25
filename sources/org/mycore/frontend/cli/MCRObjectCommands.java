@@ -639,15 +639,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      *            the MCRObjectID base string
      */
     public static final void getLastID(String base) {
-        MCRObjectID mcr_id = new MCRObjectID();
-
-        try {
-            mcr_id.setNextFreeId(base);
-            mcr_id.setNumber(mcr_id.getNumberAsInteger() - 1);
-            LOGGER.info(mcr_id.getId());
-        } catch (MCRException ex) {
-            LOGGER.error(ex.getMessage());
-        }
+        LOGGER.info(MCRObjectID.getLastID(base).getId());
     }
 
     /**
