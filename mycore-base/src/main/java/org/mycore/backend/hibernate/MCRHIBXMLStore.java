@@ -89,7 +89,7 @@ public class MCRHIBXMLStore implements MCRXMLTableInterface {
         }
 
         this.type = type;
-        this.project = config.getString("MCR.SWF.Project.ID");
+        this.project = config.getString("MCR.SWF.Project.ID", "MyCoRe");
         this.project = config.getString("MCR.SWF.Project.ID." + type, this.project );
     }
 
