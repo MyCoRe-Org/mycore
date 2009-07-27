@@ -13,12 +13,12 @@
     <dependency>
       <groupId>org.mycore</groupId>
       <artifactId>mycore-base</artifactId>
-      <version>${mycore.version}</version>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.mycore</groupId>
       <artifactId>mycore-imaging</artifactId>
-      <version>${mycore.version}</version>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>log4j</groupId>

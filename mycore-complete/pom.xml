@@ -28,7 +28,7 @@
               <mainClass>org.mycore.common.MCRCoreVersion</mainClass>
             </manifest>
             <manifestEntries>
-              <MCR-Version>${mycore.version}</MCR-Version>
+              <MCR-Version>${project.version}</MCR-Version>
             </manifestEntries>
           </archive>
         </configuration>
@@ -64,107 +64,107 @@
     <dependency>
       <groupId>org.mycore</groupId>
       <artifactId>mycore-base</artifactId>
-      <version>${mycore.version}</version>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.mycore</groupId>
       <artifactId>mycore-acl-editor</artifactId>
-      <version>${mycore.version}</version>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.mycore</groupId>
       <artifactId>mycore-broadcasting</artifactId>
-      <version>${mycore.version}</version>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.mycore</groupId>
       <artifactId>mycore-buildtools</artifactId>
-      <version>${mycore.version}</version>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.mycore</groupId>
       <artifactId>mycore-classbrowser</artifactId>
-      <version>${mycore.version}</version>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.mycore</groupId>
       <artifactId>mycore-classhandler</artifactId>
-      <version>${mycore.version}</version>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.mycore</groupId>
       <artifactId>mycore-doubletfinder</artifactId>
-      <version>${mycore.version}</version>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.mycore</groupId>
       <artifactId>mycore-imaging</artifactId>
-      <version>${mycore.version}</version>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.mycore</groupId>
       <artifactId>mycore-indexing</artifactId>
-      <version>${mycore.version}</version>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.mycore</groupId>
       <artifactId>mycore-iview</artifactId>
-      <version>${mycore.version}</version>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.mycore</groupId>
       <artifactId>mycore-metsmods</artifactId>
-      <version>${mycore.version}</version>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.mycore</groupId>
       <artifactId>mycore-migration13-20</artifactId>
-      <version>${mycore.version}</version>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.mycore</groupId>
       <artifactId>mycore-session-listing</artifactId>
-      <version>${mycore.version}</version>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.mycore</groupId>
       <artifactId>mycore-swf</artifactId>
-      <version>${mycore.version}</version>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.mycore</groupId>
       <artifactId>mycore-useradmin</artifactId>
-      <version>${mycore.version}</version>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.mycore</groupId>
       <artifactId>mycore-userlogin</artifactId>
-      <version>${mycore.version}</version>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.mycore</groupId>
       <artifactId>mycore-wcms</artifactId>
-      <version>${mycore.version}</version>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.mycore</groupId>
       <artifactId>mycore-webcli</artifactId>
-      <version>${mycore.version}</version>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.mycore</groupId>
       <artifactId>mycore-webservices</artifactId>
-      <version>${mycore.version}</version>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.mycore</groupId>
       <artifactId>mycore-z3950</artifactId>
-      <version>${mycore.version}</version>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.mycore</groupId>
       <artifactId>mycore-zoomify</artifactId>
-      <version>${mycore.version}</version>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>ant-contrib</groupId>

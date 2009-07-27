@@ -13,7 +13,7 @@
     <dependency>
       <groupId>org.mycore</groupId>
       <artifactId>mycore-base</artifactId>
-      <version>${mycore.version}</version>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>net.sf.json-lib</groupId>
