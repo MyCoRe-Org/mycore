@@ -98,12 +98,15 @@ public class MCRFieldValue {
      * @param value the value, whicht will be normalized
      */
     public void setValue(String value) {
-        if (field.getDataType().equals("text") || field.getDataType().equals("name"))
+        if (field.getDataType().equals("text") || field.getDataType().equals("name")){
             this.value = MCRNormalizer.normalizeString(value);
-        if (field.getDataType().equals("decimal"))
+            return;
+        }
+        if (field.getDataType().equals("decimal")){
             this.value = value.replace(',','.');
-        else
-            this.value = value;
+            return;
+        }
+        this.value = value;
     }
 
     /**
