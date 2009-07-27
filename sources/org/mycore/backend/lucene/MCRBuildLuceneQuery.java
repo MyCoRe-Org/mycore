@@ -103,11 +103,7 @@ public class MCRBuildLuceneQuery {
                 if ("name".equals(fieldtype)) {
                     fieldtype = "text";
                 }
-                if("index".equals(fieldtype)){
-                	fieldtype = "identifier";
-                	value = convertToGermanIndexString(value);
-                }
-
+               
                 x = handleCondition(field, operator, value, fieldtype, reqf, analyzer);
             }
 
@@ -365,15 +361,5 @@ public class MCRBuildLuceneQuery {
       boolean incl = Op.equals(">=") || Op.equals("<=") ? true : false;   
 //      return new RangeQuery( lower, upper, incl);
       return new ConstantScoreRangeQuery(fieldname, lower, upper, incl, incl);
-    }
-    
-    /**
-     * Converts the given string to lower case and replaces German Umlaute and SZ 
-     * @param s the input string
-     * @return the converted string
-     */
-    public static String convertToGermanIndexString(String s){
-    	return s.toLowerCase().replaceAll("ä", "ae").replaceAll("ö", "oe")
-    		.replaceAll("ü", "ue").replaceAll("ß", "ss");
     }
 }

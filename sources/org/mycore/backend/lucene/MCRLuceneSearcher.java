@@ -477,10 +477,7 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
                 if (type.equals("identifier")) {
                     doc.add(new Field(name, content, Field.Store.YES, Field.Index.NOT_ANALYZED));
                 }
-                if(type.equals("index")){
-                	doc.add(new Field(name, MCRBuildLuceneQuery.convertToGermanIndexString(content), Field.Store.YES, Field.Index.NOT_ANALYZED));
-                }
-
+             
                 if (type.equals("Text") || type.equals("name") || (type.equals("text") && field.getField().isSortable())) {
                     doc.add(new Field(name, content, Field.Store.YES, Field.Index.ANALYZED));
                     if (field.getField().isSortable())
