@@ -3,16 +3,12 @@
   <parent>
     <artifactId>mycore-parent</artifactId>
     <groupId>org.mycore</groupId>
-    <version>2.1</version>
+    <version>2.0.90-SNAPSHOT</version>
     <relativePath>../mycore-parent/pom.xml</relativePath>
   </parent>
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.mycore</groupId>
   <artifactId>mycore-imaging</artifactId>
-  <packaging>jar</packaging>
-  <version>${mycore.version}</version>
   <name>MyCoRe Image library</name>
-  <url>http://www.mycore.org</url>
   <dependencies>
     <dependency>
       <groupId>org.mycore</groupId>
