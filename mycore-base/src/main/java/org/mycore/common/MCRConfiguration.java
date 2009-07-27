@@ -452,10 +452,13 @@ public class MCRConfiguration {
      */
     public Object getInstanceOf(String name, String defaultname) throws MCRConfigurationException {
         String classname = getString(name, defaultname);
-        Class cl;
-
+        if (classname == null) {
+            throw new MCRConfigurationException("Configuration property missing: " + name);
+        }
+        
         Logger.getLogger(this.getClass()).debug("Loading Class: " + classname);
 
+        Class cl;
         try {
             cl = Class.forName(classname);
         } catch (Exception ex) {
