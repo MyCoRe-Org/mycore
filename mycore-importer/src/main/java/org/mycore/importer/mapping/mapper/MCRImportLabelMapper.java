@@ -10,7 +10,6 @@ public class MCRImportLabelMapper extends MCRImportAbstractMapper {
 
     protected MCRImportFieldValueResolver fieldResolver;
 
-    @Override
     public String getType() {
         return "label";
     }

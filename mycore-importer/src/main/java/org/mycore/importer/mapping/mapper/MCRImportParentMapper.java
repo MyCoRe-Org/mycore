@@ -8,7 +8,6 @@ import org.mycore.importer.mapping.resolver.metadata.MCRImportMetadataResolver;
 
 public class MCRImportParentMapper extends MCRImportAbstractMapper {
 
-    @Override
     public String getType() {
         return "parent";
     }

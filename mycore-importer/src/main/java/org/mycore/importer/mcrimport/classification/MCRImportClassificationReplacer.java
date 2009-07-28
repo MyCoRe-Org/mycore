@@ -60,7 +60,7 @@ public class MCRImportClassificationReplacer {
     }
 
     private class ClassificationFilter implements Filter {
-        @Override
+
         public boolean matches(Object arg0) {
             if(!(arg0 instanceof Element))
                 return false;

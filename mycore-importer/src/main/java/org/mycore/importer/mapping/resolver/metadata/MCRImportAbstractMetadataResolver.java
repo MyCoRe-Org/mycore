@@ -19,7 +19,6 @@ public abstract class MCRImportAbstractMetadataResolver implements MCRImportMeta
      */
     protected Element metadataChild;
 
-    @Override
     public Element resolve(Element map, List<MCRImportField> fieldList) {
         this.map = map;
         this.fieldResolver = new MCRImportFieldValueResolver(fieldList);
