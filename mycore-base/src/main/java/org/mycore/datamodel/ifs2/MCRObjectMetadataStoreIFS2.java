@@ -73,7 +73,7 @@ public class MCRObjectMetadataStoreIFS2
       throw new MCRConfigurationException( "The configuration property MCR.Metadata.Type." + type + " is not defined!" );
 
     this.store = MCRMetadataStore.getStore(type);
-    this.project = config.getString("MCR.SWF.Project.ID");
+    this.project = config.getString("MCR.SWF.Project.ID", "MyCoRe");
     this.project = config.getString("MCR.SWF.Project.ID." + type, this.project );
   }
 
