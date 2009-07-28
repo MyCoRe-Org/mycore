@@ -61,7 +61,8 @@ public class MCRImportMappingManager {
             } catch(JDOMException e) {
                 throw new JDOMException("Could not load datamodel " + dmPath, e);
             } catch(IOException e) {
-                throw new IOException("Could not load datamodel " + dmPath, e);
+                LOGGER.error(e);
+                throw new IOException("Could not load datamodel " + dmPath);
             }
         }
     }
