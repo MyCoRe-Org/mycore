@@ -1,0 +1,89 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <parent>
+    <artifactId>mycore-parent</artifactId>
+    <groupId>org.mycore</groupId>
+    <version>2.0.90-SNAPSHOT</version>
+    <relativePath>../mycore-parent/pom.xml</relativePath>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
+  <artifactId>mycore-metsmods</artifactId>
+  <name>MyCoRe METS/MODS</name>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>compile</id>
+            <phase>compile</phase>
+            <configuration>
+              <tasks>
+                <path id="compile.classpath" refid="maven.compile.classpath" />
+                <property name="target.applet.classes" location="${project.build.directory}/applet-classes" />
+                <path id="sources.path">
+                  <dirset dir="${basedir}" includes="src/main/java" />
+                </path>
+                <echo message="compile classpath: ${compile.classpath}" />
+                <echo message="target directory: ${target.applet.classes}" />
+                <mkdir dir="${target.applet.classes}" />
+                <javac destdir="${target.applet.classes}" includes="org/mycore/frontend/metsmods/**" classpathref="compile.classpath"
+                  debug="true" optimize="true" target="${java.target.version}" source="${java.target.version}" encoding="ISO-8859-15" fork="yes"
+                  deprecation="off">
+                  <src>
+                    <path refid="sources.path" />
+                  </src>
+                </javac>
+                <copy todir="${target.applet.classes}">
+                  <fileset dir="${basedir}/src/main/applet-resources">
+                    <include name="**/*" />
+                  </fileset>
+                </copy>
+                <jar jarfile="${project.build.outputDirectory}/metsmodsApplet-unsigned.jar">
+                  <fileset dir="${target.applet.classes}" />
+                </jar>
+              </tasks>
+            </configuration>
+            <goals>
+              <goal>run</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+  <dependencies>
+    <dependency>
+      <groupId>org.mycore</groupId>
+      <artifactId>mycore-base</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.mycore</groupId>
+      <artifactId>mycore-swf</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>log4j</groupId>
+      <artifactId>log4j</artifactId>
+      <version>1.2.15</version>
+      <exclusions>
+        <exclusion>
+          <groupId>com.sun.jdmk</groupId>
+          <artifactId>jmxtools</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>com.sun.jmx</groupId>
+          <artifactId>jmxri</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>servlet-api</artifactId>
+      <version>2.4</version>
+      <scope>provided</scope>
+    </dependency>
+  </dependencies>
+</project>

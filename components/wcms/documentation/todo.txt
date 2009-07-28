@@ -1,7 +1,0 @@
-Admin interface:
-=============
-1. abstract to be implemented
-2. content templates 
-3. acl's
-4. autom. forwarding
-
