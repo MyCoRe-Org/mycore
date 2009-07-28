@@ -7,7 +7,7 @@
     <relativePath>../mycore-parent/pom.xml</relativePath>
   </parent>
   <modelVersion>4.0.0</modelVersion>
-  <artifactId>mycore-import</artifactId>
+  <artifactId>mycore-importer</artifactId>
   <name>MyCoRe Import Framework</name>
   <dependencies>
     <dependency>
