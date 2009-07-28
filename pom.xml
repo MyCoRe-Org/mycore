@@ -16,9 +16,7 @@
     <url>http://www.mycore.de/viewvc/viewvc.cgi/mycore/</url>
   </scm>
   <modules>
-    <!-- mycore-parent MUST be always first entry -->
     <module>mycore-parent</module>
-    <!-- mycore-base MUST be always second entry -->
     <module>mycore-base</module>
     <module>mycore-acl-editor</module>
     <module>mycore-broadcasting</module>
@@ -27,6 +25,7 @@
     <module>mycore-classhandler</module>
     <module>mycore-doubletfinder</module>
     <module>mycore-imaging</module>
+    <module>mycore-importer</module>
     <module>mycore-indexing</module>
     <module>mycore-iview</module>
     <module>mycore-metsmods</module>
@@ -40,7 +39,6 @@
     <module>mycore-webservices</module>
     <module>mycore-z3950</module>
     <module>mycore-zoomify</module>
-    <!-- mycore-complete MUST be always last entry -->
     <module>mycore-complete</module>
   </modules>
 </project>
