@@ -24,7 +24,6 @@ public abstract class MCRImportAbstractMapper implements MCRImportMapper {
     protected MCRImportRecord record;
     protected List<MCRImportField> fields;
 
-    @Override
     public void map(MCRImportObject importObject, MCRImportRecord record, Element map) {
         this.importObject = importObject;
         this.record = record;

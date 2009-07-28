@@ -15,7 +15,6 @@ public class MCRImportIdMapper extends MCRImportAbstractMapper {
 
     protected MCRImportFieldValueResolver fieldResolver;
 
-    @Override
     public String getType() {
         return "id";
     }

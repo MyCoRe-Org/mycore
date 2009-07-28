@@ -8,7 +8,6 @@ package org.mycore.importer.mapping.resolver.uri;
  */
 public class MCRImportGermanDateURIResolver implements MCRImportURIResolver {
 
-    @Override
     public String resolve(String uri, String oldValue) {
         // resolve format DD.MM.YYYY
         String[] split = oldValue.split(".");

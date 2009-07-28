@@ -142,7 +142,6 @@ public class MCRImportImporter {
     private class LinkIdFilter implements Filter {
         private static final long serialVersionUID = 1L;
 
-        @Override
         public boolean matches(Object arg0) {
             // only elements
             if(!(arg0 instanceof Element))
