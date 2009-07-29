@@ -309,8 +309,7 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
         //Lucene 2.4.1 has a bug: be sure to call collector.topDocs() just once
         //see http://issues.apache.org/jira/browse/LUCENE-942
         TopFieldDocs topFieldDocs = (TopFieldDocs) collector.topDocs();
-        LOGGER.info("Number of Objects found: " + topFieldDocs.scoreDocs.length + " Time for Search: "
-                + (System.currentTimeMillis() - start));
+        LOGGER.info("Number of Objects found: " + topFieldDocs.scoreDocs.length + " Time for Search: " + (System.currentTimeMillis() - start));
         return new MCRLuceneResults(indexSearcher, topFieldDocs, addableFields);
     }
 
@@ -447,8 +446,7 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
                 if (PLUGIN_MANAGER.isSupported(mcrfile.getContentType())) {
                     LOGGER.debug("####### Index MCRFile: " + mcrfile.getPath());
 
-                    BufferedReader in = new BufferedReader(PLUGIN_MANAGER.transform(mcrfile.getContentType(), mcrfile
-                            .getContentAsInputStream()));
+                    BufferedReader in = new BufferedReader(PLUGIN_MANAGER.transform(mcrfile.getContentType(), mcrfile.getContentAsInputStream()));
                     String s;
                     StringBuffer text = new StringBuffer();
                     while ((s = in.readLine()) != null) {
@@ -477,7 +475,7 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
                 if (type.equals("identifier")) {
                     doc.add(new Field(name, content, Field.Store.YES, Field.Index.NOT_ANALYZED));
                 }
-             
+
                 if (type.equals("Text") || type.equals("name") || (type.equals("text") && field.getField().isSortable())) {
                     doc.add(new Field(name, content, Field.Store.YES, Field.Index.ANALYZED));
                     if (field.getField().isSortable())
@@ -643,9 +641,7 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
             if (closeModifierEarly || this.getCompletedTaskCount() % maxIndexWriteActions == 0)
                 closeIndexWriter();
             else {
-                if (delayedFuture != null && !delayedFuture.isDone()) {
-                    cancelDelayedIndexCloser();
-                }
+                cancelDelayedIndexCloser();
                 try {
                     delayedFuture = scheduler.schedule(delayedCloser, 2, TimeUnit.SECONDS);
                 } catch (RejectedExecutionException e) {
@@ -674,13 +670,13 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
         @Override
         public void shutdown() {
             cancelDelayedIndexCloser();
-            closeIndexWriter();
             scheduler.shutdown();
             try {
                 scheduler.awaitTermination(60 * 60, TimeUnit.SECONDS);
             } catch (InterruptedException e) {
                 LOGGER.warn("Error while closing DelayedIndexWriterCloser", e);
             }
+            closeIndexWriter();
             super.shutdown();
         }
 
