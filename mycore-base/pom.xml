@@ -140,6 +140,12 @@
       <artifactId>jaxen</artifactId>
       <version>1.1.1</version>
       <scope>runtime</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>jdom</groupId>
+          <artifactId>jdom</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>commons-vfs</groupId>
