@@ -63,12 +63,9 @@ public class MCRObjectMetadataStoreIFS2Test extends MCRTestCase {
     protected void setUp() throws Exception {
         super.setUp();
         createStore();
-        MyCoRe_document_00000001 = new XMLInfo("MyCoRe_document_00000001", "<object id=\"MyCoRe_document_00000001\"/>".getBytes(Charset
-                .forName("UTF-8")), new Date());
-        MyCoRe_document_00000001_new = new XMLInfo("MyCoRe_document_00000001", "<object id=\"MyCoRe_document_00000001\" update=\"true\"/>"
-                .getBytes(Charset.forName("UTF-8")), new Date());
-        MCR_document_00000001 = new XMLInfo("MCR_document_00000001", "<object id=\"MCR_document_00000001\"/>".getBytes(Charset
-                .forName("UTF-8")), new Date());
+        MyCoRe_document_00000001 = new XMLInfo("MyCoRe_document_00000001", "<object id=\"MyCoRe_document_00000001\"/>".getBytes("UTF-8"), new Date());
+        MyCoRe_document_00000001_new = new XMLInfo("MyCoRe_document_00000001", "<object id=\"MyCoRe_document_00000001\" update=\"true\"/>".getBytes("UTF-8"), new Date());
+        MCR_document_00000001 = new XMLInfo("MCR_document_00000001", "<object id=\"MCR_document_00000001\"/>".getBytes("UTF-8"), new Date());
     }
 
     protected void tearDown() throws Exception {
