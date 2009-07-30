@@ -28,6 +28,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Properties;
+import java.util.StringTokenizer;
 
 import org.mycore.access.MCRAccessManager;
 import org.mycore.backend.hibernate.MCRHIBConnection;
@@ -85,15 +86,20 @@ public class MCRStartMetsModsServlet extends MCRStartEditorServlet {
         }
     }
     
-    private boolean searchForZip(MCRDirectory dir) {
+    private boolean searchForDisallowed(MCRDirectory dir, String disallowed) {
+        if(disallowed.compareTo("")==0) return false;
+        
         MCRFilesystemNode liste[] = dir.getChildren();
         
         for(int i=0;i<liste.length;i++)
-            if(liste[i].getName().contains("zip")) return true;
+            if(liste[i].getName().contains(disallowed)) return true;
         return false;
     }
 
     public void seditmets(MCRServletJob job, CommonData cd) throws IOException {
+
+        boolean dawasfound=false;
+        
         if (!MCRAccessManager.checkPermission(cd.myremcrid.getId(), "writedb")) {
             job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + usererrorpage));
             return;
@@ -118,11 +124,20 @@ public class MCRStartMetsModsServlet extends MCRStartEditorServlet {
             ArrayList<String> pic_list = new ArrayList<String>();
             addPicturesToList(dir, pic_list);
             //possible code point for adding routine handling generate a mets-file in directorys with zip-files.
-            //if (searchForZip(dir)) throw new Exception("a zip file was detected!");
+            MCRConfiguration CONFIG = MCRConfiguration.instance();
+            
+            String disallowed = CONFIG.getString("MCR.Component.MetsMods.disallowed","");
+            if(disallowed.contains(",")) {
+                StringTokenizer st1 = new StringTokenizer(disallowed,",");
+                while(st1.hasMoreTokens())
+                    if (searchForDisallowed(dir,st1.nextToken())) dawasfound=true;
+            }
+            else 
+                if (searchForDisallowed(dir,disallowed)) dawasfound=true;
             if (searchForMets(dir) == false) {
                 // build the mets.file
                 String project = cd.myremcrid.getProjectId();
-                MCRConfiguration CONFIG = MCRConfiguration.instance();
+                
                 // owner
                 String owner = CONFIG.getString("MCR.Component.MetsMods." + project + ".owner", "");
                 if (owner.trim().length() == 0) {
@@ -166,6 +181,7 @@ public class MCRStartMetsModsServlet extends MCRStartEditorServlet {
 
                 // save the builded file to IFS
                 try {
+                    if(!dawasfound) {
                     LOGGER.debug("storing new mets file...");
                     // startTransaction();
                     MCRFile file = new MCRFile("mets.xml", dir);
@@ -175,7 +191,7 @@ public class MCRStartMetsModsServlet extends MCRStartEditorServlet {
                     // startTransaction();
                     file.storeContentChange(sizeDiff);
                     // commitTransaction();
-
+                    }
                 } catch (Exception e) {
                     LOGGER.error("Error while storing new mets file...", e);
                     // try {
@@ -210,7 +226,11 @@ public class MCRStartMetsModsServlet extends MCRStartEditorServlet {
         params.put("step", cd.mystep);
         params.put("remcrid", cd.myremcrid.getId());
         String base = getBaseURL() + cd.myfile;
-        job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(buildRedirectURL(base, params)));
+        if(dawasfound)
+            job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(buildRedirectURL(getBaseURL()+"servlets/MCRFileNodeServlet/"+cd.mysemcrid.getId()+"/?hosts=local", new Properties())));
+        else
+            job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(buildRedirectURL(base, params)));
+        
     }
 
     protected void startTransaction() {

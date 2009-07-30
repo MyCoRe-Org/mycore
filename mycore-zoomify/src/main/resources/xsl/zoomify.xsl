@@ -86,8 +86,9 @@
 		<td width="33%" align="left">
 			<xsl:if test="$index > 1">
                 <!--<a href="{$zoomify.prev}"><xsl:value-of select="i18n:translate('component.zoomify.page.zoomify.prev')" /></a>-->
-                <a href="{$zoomify.first}"><img src="../images/nav-first.gif" /></a>
-                <a href="{$zoomify.prev}"><img src="../images/nav-back.gif" /></a>
+                <a href="{$zoomify.first}" style="border: 0px;"><img src="../images/nav-first.gif" style="border: 0px;" /></a>
+                <xsl:text> </xsl:text>
+                <a href="{$zoomify.prev}" style="border: 0px;"><img src="../images/nav-back.gif" style="border: 0px;" /></a>
             </xsl:if>
 		</td>
 		<td width="33%" align="center">
@@ -96,8 +97,9 @@
 		<td width="33%" align="right">
             <xsl:if test="$index &lt; $max">
                 <!--<a href="{$zoomify.next}"><xsl:value-of select="i18n:translate('component.zoomify.page.zoomify.next')" /></a>-->
-                <a href="{$zoomify.next}"><img src="../images/nav-forward.gif" /></a>
-                <a href="{$zoomify.last}"><img src="../images/nav-last.gif" /></a>
+                <a href="{$zoomify.next}" style="border: 0px;"><img src="../images/nav-forward.gif" style="border: 0px;" /></a>
+                <xsl:text> </xsl:text>
+                <a href="{$zoomify.last}" style="border: 0px;"><img src="../images/nav-last.gif" style="border: 0px;" /></a>
             </xsl:if>
         </td>
 	</tr>

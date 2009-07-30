@@ -59,6 +59,7 @@ public class MCRMetsModsUtil {
             String pic = iter.next();
             String fn = pic.substring(pic.lastIndexOf("/") + 1, pic.lastIndexOf("."));
             pic = default_url + "/" + pic;
+            
             add_file(mets, fn, pic, i);
             i++;
         }
@@ -219,7 +220,17 @@ public class MCRMetsModsUtil {
         return structMap;
     }
 
-    public Element add_file(Element mets, String file_id, String url, int order) {
+    public Element add_file(Element mets, String file_id, String url, int order, String contentids)
+    {
+        return add_file_ext(mets,file_id,url,order,contentids);
+    }
+    
+    public Element add_file(Element mets, String file_id, String url, int order)
+    {
+        return add_file_ext(mets,file_id,url,order,null);
+    }
+    
+    public Element add_file_ext(Element mets, String file_id, String url, int order,String contentids) {
         Element fileGrp = mets.getChild("fileSec", MCRConstants.METS_NAMESPACE).getChild("fileGrp", MCRConstants.METS_NAMESPACE);
         Element div = mets.getChild("structMap", MCRConstants.METS_NAMESPACE).getChild("div", MCRConstants.METS_NAMESPACE);
 
@@ -240,8 +251,10 @@ public class MCRMetsModsUtil {
         div_.setAttribute("ORDER", String.valueOf(order));
             //The following line has changed in order to set the filename as orderlabel...
         div_.setAttribute("ORDERLABEL", file_id);//String.valueOf(order));
-        // The next line is commented out because of a changed behavior of the mets format.
+            //The next line is commented out because of a changed behavior of the mets format.
         // div_.setAttribute("type","page");
+            //The following line contains the CONTENTIDS, if is null then do nothing 
+        if(contentids!=null) div_.setAttribute("CONTENTIDS",contentids);
         Element fptr = new Element("fptr", MCRConstants.METS_NAMESPACE);
         fptr.setAttribute("FILEID", file_id + "_default");
         div_.addContent(fptr);

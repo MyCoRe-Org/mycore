@@ -25,6 +25,7 @@ package org.mycore.frontend.metsmods;
 
 
 import java.applet.AppletContext;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
@@ -93,8 +94,10 @@ public class MCRMetsModsApplet extends JApplet{
 		
 		panel.setLayout(null);
 								
-		save_btn.setBounds(10,370,100,20);
-		cancel_btn.setBounds(120,370,100,20);
+		save_btn.setBounds(10,370,120,20);
+		save_btn.setFont(new Font("Arial",Font.PLAIN,12));
+		cancel_btn.setBounds(140,370,120,20);
+		cancel_btn.setFont(new Font("Arial",Font.PLAIN,12));
 		
 		//((JPanel)this.getGlassPane()).add(sepa);
 		//this.getGlassPane().setVisible(true);

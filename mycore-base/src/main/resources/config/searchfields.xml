@@ -11,11 +11,11 @@
     <field name="objectType"    type="identifier" source="objectMetadata" xpath="/mycoreobject" value="substring-before(substring-after(@ID,'_'),'_')" />
     <field name="link"          type="identifier" source="objectMetadata" xpath="/mycoreobject/descendant::*[@xlink:href]" value="@xlink:href" />
     <field name="parent"        type="identifier" source="objectMetadata" xpath="/mycoreobject/structure/parents/parent" value="@xlink:href" />
-    <field name="modified"      type="timestamp"  source="objectMetadata" xpath="/mycoreobject/service/servdates/servdate[@type='modifydate']" value="concat(substring(.,1,10),' ',substring(.,12,8))" i18n="editor.search.document.datemod" />
+    <field name="modified"      type="timestamp"  source="objectMetadata" xpath="/mycoreobject/service/servdates/servdate[@type='modifydate']" value="concat(substring(.,1,10),' ',substring(.,12,8))" sortable="true" i18n="editor.search.document.datemod" />
     <field name="created"       type="timestamp"  source="objectMetadata" xpath="/mycoreobject/service/servdates/servdate[@type='createdate']" value="concat(substring(.,1,10),' ',substring(.,12,8))" sortable="true" />
 
     <!-- Search in all metadata fields (that have an xml:lang attribute) -->
-    <field name="allMeta"       type="text"       source="objectMetadata" xpath="/mycoreobject/metadata/*/*" value="text()|@xlink:title" i18n="editor.search.metadata" />
+    <field name="allMeta"       type="text"       source="objectMetadata" xpath="/mycoreobject/metadata/*/* | /mycoreobject/metadata/*/*/*" value="text()|@xlink:title" i18n="editor.search.metadata" />
 
     <!-- Field for sorting by score -->
     <field name="score" type="decimal" source="searcherHitMetadata" sortable="true" />

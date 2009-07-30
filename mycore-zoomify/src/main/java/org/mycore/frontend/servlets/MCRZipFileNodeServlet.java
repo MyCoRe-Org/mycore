@@ -141,10 +141,12 @@ public class MCRZipFileNodeServlet extends MCRServlet {
         if ((path.charAt(path.length() - 1) == '/') && path.length() > 1) {
             path.deleteCharAt(path.length() - 1);
         }
+
         MCRDirectory dir = (MCRDirectory) root;
+
         MCRFilesystemNode node = dir.getChildByPath(path.toString());
         LOGGER.debug("MCRFileNodeServlet: the requested path of the zip file is "+path.toString());
-
+        
         if (node == null) {
             String msg = "Error: No such file or directory " + path;
             LOGGER.error(msg);
