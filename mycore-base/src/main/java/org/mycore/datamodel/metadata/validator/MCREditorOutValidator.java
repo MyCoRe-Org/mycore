@@ -304,15 +304,21 @@ public class MCREditorOutValidator {
         public String checkDataSubTag(Element datasubtag) {
             @SuppressWarnings("unchecked")
             List<Element> children = datasubtag.getChildren("text");
-            if (children.size() == 0)
-                return "history date is empty";
             for (int i = 0; i < children.size(); i++) {
                 Element child = children.get(i);
+                String text = child.getTextTrim();
+                if ((text == null) || (text.length() == 0)) {
+                    datasubtag.removeContent(child);
+                    i--;
+                    continue;
+                }            
                 if (child.getAttribute("lang") != null) {
                     child.getAttribute("lang").setNamespace(XML_NAMESPACE);
                     LOGGER.warn("namespace add for xml:lang attribute in " + datasubtag.getName());
                 }
             }
+            if (children.size() == 0)
+                return "history date is empty";
             return checkMetaObjectWithLang(datasubtag, MCRMetaHistoryDate.class);
         }
     }
