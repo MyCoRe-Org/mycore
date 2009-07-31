@@ -3,6 +3,7 @@ package org.mycore.importer.mapping;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -10,40 +11,159 @@ import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.filter.ElementFilter;
+import org.jdom.input.SAXBuilder;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.mycore.importer.MCRImportConfig;
-import org.mycore.importer.MCRImportManager;
 import org.mycore.importer.MCRImportRecord;
+import org.mycore.importer.classification.MCRImportClassificationMappingManager;
+import org.mycore.importer.event.MCRImportStatusEvent;
+import org.mycore.importer.event.MCRImportStatusListener;
 import org.mycore.importer.mapping.datamodel.MCRImportDatamodel;
 import org.mycore.importer.mapping.datamodel.MCRImportDatamodelManager;
 import org.mycore.importer.mapping.mapper.MCRImportMapper;
-import org.mycore.importer.mapping.mapper.MCRImportMappingTable;
-
+import org.mycore.importer.mapping.mapper.MCRImportMapperManager;
+import org.mycore.importer.mapping.processing.MCRImportMappingProcessor;
+import org.mycore.importer.mapping.processing.MCRImportMappingProcessorBuilder;
+import org.mycore.importer.mapping.resolver.uri.MCRImportURIResolver;
+import org.mycore.importer.mapping.resolver.uri.MCRImportURIResolverMananger;
 
 /**
- * The mapping manager is the main class to map and save records to the
- * file system.
+ * This class manages and distributes all tasks associated with the
+ * import mapping.
+ * 
+ * @author Matthias Eichner
  */
 public class MCRImportMappingManager {
 
     private static final Logger LOGGER = Logger.getLogger(MCRImportMappingManager.class);
 
+    private static MCRImportMappingManager INSTANCE;
+
     protected XMLOutputter outputter;
 
+    protected ArrayList<MCRImportStatusListener> listenerList;
+
+    /**
+     * A list of all jdom mcrobject-Elements from the mapping part
+     * in the import file.
+     */
     protected List<Element> mcrObjectList;
 
     protected MCRImportConfig config;
 
-    public MCRImportMappingManager(Element importElement, MCRImportConfig config) throws IOException, JDOMException {
+    protected MCRImportMapperManager mapperManager;
+    protected MCRImportMetadataResolverManager metadataResolverManager;
+    protected MCRImportURIResolverMananger uriResolverManager;
+    protected MCRImportDatamodelManager datamodelManager;
+    protected MCRImportClassificationMappingManager classificationManager;
+
+    public MCRImportMappingManager()  {
         this.outputter = new XMLOutputter(Format.getPrettyFormat());
-        this.config = config;
-        Element mappingElement = importElement.getChild("mapping");
-        if(mappingElement != null) {
-            mcrObjectList = mappingElement.getContent(new ElementFilter("mcrobject"));
+        this.listenerList = new ArrayList<MCRImportStatusListener>();
+    }
+
+    /**
+     * Initialize the singleton instance with the xml import
+     * file. This method has to be called before mapping and
+     * saving the generated xml files is possible.
+     * 
+     * @param file the path to the mapping file
+     * @throws IOException
+     * @throws JDOMException
+     */
+    @SuppressWarnings("unchecked")
+    public boolean init(File file) throws IOException, JDOMException {
+        Element rootElement = getRootElement(file);
+        // load the configuration part of the mapping file
+        config = new MCRImportConfig(rootElement);
+
+        Element mappingElement = rootElement.getChild("mapping");
+        if(mappingElement == null) {
+            LOGGER.error("No mapping element found in " + rootElement.getDocument().getBaseURI());
+            return false;
         }
+
+        // get the mcrobject list
+        Element mcrobjectsElement = mappingElement.getChild("mcrobjects");
+        if(mcrobjectsElement == null) {
+            LOGGER.error("No mcrobjects element defined in mapping element at " + mappingElement.getDocument().getBaseURI());
+            return false;
+        }
+        this.mcrObjectList = mcrobjectsElement.getContent(new ElementFilter("mcrobject"));
+
+        // create all mappers
+        mapperManager = new MCRImportMapperManager();
+        // create all metadata resolvers
+        metadataResolverManager = new MCRImportMetadataResolverManager();
+        // create datamodel manager
+        datamodelManager = new MCRImportDatamodelManager();
+        // create the classification manager
+        if(config.isCreateClassificationMapping())
+            classificationManager = new MCRImportClassificationMappingManager(new File(config.getSaveToPath() + "classification/"));
+        // preload all uri resolvers from the mapping element
+        preloadUriResolvers(mappingElement);
         // preloads the datamodel files which are stated in the mcrobject elements
         preloadDatamodel();
+
+        return true;
+    }
+
+    /**
+     * Returns the jdom root element from the given file.
+     *  
+     * @param file the file which is parsed
+     * @return the root element of the file
+     * @throws IOException
+     * @throws JDOMException
+     */
+    private Element getRootElement(File file) throws IOException, JDOMException {
+        // load the mapping xml file document
+        SAXBuilder builder = new SAXBuilder();
+        Document document = builder.build(file);
+        // set the root element
+        return document.getRootElement();
+    }
+
+    /**
+     * Returns the singleton instance of this class.
+     * 
+     * @return instance of this class
+     */
+    public static MCRImportMappingManager getInstance() {
+        if(INSTANCE == null)
+            INSTANCE = new MCRImportMappingManager();
+        return INSTANCE;
+    }
+
+    @SuppressWarnings("unchecked")
+    protected void preloadUriResolvers(Element mappingElement) {
+        uriResolverManager = new MCRImportURIResolverMananger();
+
+        // load resolver
+        Element resolversElement = mappingElement.getChild("resolvers");
+        if(resolversElement == null)
+            return;
+        List<Element> resolverList = resolversElement.getContent(new ElementFilter());
+
+        for(Element resolver : resolverList) {
+            String prefix = resolver.getAttributeValue("prefix");
+            String className = resolver.getAttributeValue("class");
+
+            try {
+                // try to create a instance of the class
+                Class<?> c = Class.forName(className);
+                Object o = c.newInstance();
+                if(o instanceof MCRImportURIResolver) {
+                    // add it to the uri resolver manager
+                    uriResolverManager.addURIResolver(prefix, (MCRImportURIResolver)o);
+                } else {
+                    LOGGER.error("Class " + className + " doesnt extends MCRImportURIResolver!");
+                }
+            } catch(Exception exc) {
+                LOGGER.error(exc);
+            }
+        }
     }
 
     /**
@@ -53,11 +173,10 @@ public class MCRImportMappingManager {
      * @throws JDOMException
      */
     protected void preloadDatamodel() throws IOException, JDOMException {
-        MCRImportDatamodelManager dmManager = MCRImportDatamodelManager.getInstance();
         for(Element mcrObjectElement : mcrObjectList) {
             String dmPath = mcrObjectElement.getAttributeValue("datamodel");
             try {
-                dmManager.addDatamodel(config.getDatamodelPath() + dmPath);
+                getDatamodelManager().addDatamodel(config.getDatamodelPath() + dmPath);
             } catch(JDOMException e) {
                 throw new JDOMException("Could not load datamodel " + dmPath, e);
             } catch(IOException e) {
@@ -65,6 +184,23 @@ public class MCRImportMappingManager {
                 throw new IOException("Could not load datamodel " + dmPath);
             }
         }
+    }
+
+    /**
+     * This method start the whole mapping part of the importer.
+     * The given list of records will be mapped and saved to the
+     * file system. In addition, if the classification mapping
+     * is activated, these files will be also saved.
+     * 
+     * @param recordList a list of records which will be mapped
+     */
+    public void startMapping(List<MCRImportRecord> recordList) {
+        for(MCRImportRecord record : recordList) {
+            mapAndSaveRecord(record);
+        }
+
+        if(config.isCreateClassificationMapping())
+            classificationManager.saveAllClassificationMaps();
     }
 
     /**
@@ -76,8 +212,45 @@ public class MCRImportMappingManager {
         // do the mapping
         MCRImportObject importObject = createMCRObject(record);
         // save the new import object
-        saveImportObject(importObject, record.getName());
+        if(importObject != null) {
+            saveImportObject(importObject, record.getName());
+            StringBuffer buf = new StringBuffer();
+            buf.append(record.getName()).append(": ").append(importObject.getId());
+            fireRecordMapped(buf.toString());
+        }
     }
+
+    /**
+     * Use this method to register a listener and get informed
+     * about the mapping progress.
+     * 
+     * @param l the listener to add
+     */
+    public void addStatusListener(MCRImportStatusListener l) {
+        listenerList.add(l);
+    }
+
+    /**
+     * Remove a registerd listener.
+     * 
+     * @param l the listener to remove
+     */
+    public void removeStatusListener(MCRImportStatusListener l) {
+        listenerList.remove(l);
+    }
+
+    /**
+     * Sends all registerd listeners that a record is
+     * successfully mapped and saved to the file system.
+     * 
+     * @param record the record which is mapped
+     */
+    private void fireRecordMapped(String mappedString) {
+        for(MCRImportStatusListener l : listenerList) {
+            MCRImportStatusEvent e = new MCRImportStatusEvent(this, mappedString);
+            l.recordMapped(e);
+        }
+    }        
 
     /**
      * Saves an imports the object to the specified folder. The save path is
@@ -94,9 +267,9 @@ public class MCRImportMappingManager {
         // save the new mapped object
         String id = importObject.getId();
         try {
-            File folder = new File(savePath);
+            File folder = new File(savePath + "/");
             if(!folder.exists())
-                folder.mkdir();
+                folder.mkdirs();
             FileOutputStream output = new FileOutputStream(folder.getAbsolutePath() + "/" + id + ".xml");
             outputter.output(new Document(ioElement), output);
             output.close();
@@ -106,8 +279,9 @@ public class MCRImportMappingManager {
     }
 
     /**
-     * Creates an MCRImportObject instance, which is an abstraction of
-     * the mycore xml structure.
+     * This method does the whole mapping for one record. As a
+     * result a new instance of MCRImportObject will be created,
+     * which is an abstraction of the mycore xml structure.
      * 
      * @param record the record which have to be mapped
      * @return a new instance of MCRImportObject
@@ -115,6 +289,11 @@ public class MCRImportMappingManager {
     public MCRImportObject createMCRObject(MCRImportRecord record) {
         // get the right jdom mcrobject element from the mapping file
         Element mappedObject = getMappedObject(record.getName());
+
+        if(mappedObject == null) {
+            LOGGER.warn("Couldnt find match for mapping of mcrobject " + record.getName());
+            return null;
+        }
         // path to the datamodel
         String datamodelPath = mappedObject.getAttributeValue("datamodel");
 
@@ -122,11 +301,27 @@ public class MCRImportMappingManager {
         MCRImportObject mcrObject = new MCRImportObject();
         mcrObject.setDatamodelPath(datamodelPath);
 
+        // preprocessing
+        String preProcessingClass = mappedObject.getAttributeValue("preprocessing");
+        if(preProcessingClass != null) {
+            MCRImportMappingProcessor processor = MCRImportMappingProcessorBuilder.createProcessorInstance(preProcessingClass);
+            if(processor != null)
+                processor.preProcessing(mcrObject, record);
+        }
+
         // go through every map element and map the containing fields
         @SuppressWarnings("unchecked")
         List<Element> fieldMappings = mappedObject.getContent(new ElementFilter("map"));
         for(Element map : fieldMappings) {
             mapIt(mcrObject, record, map);
+        }
+
+        // postprocessing
+        String postProcessingClass = mappedObject.getAttributeValue("preprocessing");
+        if(postProcessingClass != null) {
+            MCRImportMappingProcessor processor = MCRImportMappingProcessorBuilder.createProcessorInstance(postProcessingClass);
+            if(processor != null)
+                processor.postProcessing(mcrObject, record);
         }
         return mcrObject;
     }
@@ -164,8 +359,8 @@ public class MCRImportMappingManager {
 
             // special case for classification
             String metadataName = map.getAttributeValue("to");
-            if(MCRImportManager.getInstance().getConfig().isCreateClassificationMapping() && metadataName != null && !metadataName.equals("")) {
-                MCRImportDatamodel dm = MCRImportDatamodelManager.getInstance().getDatamodel(mcrObject.getDatamodelPath());
+            if(config.isCreateClassificationMapping() && metadataName != null && !metadataName.equals("")) {
+                MCRImportDatamodel dm = getDatamodelManager().getDatamodel(mcrObject.getDatamodelPath());
                 String className = dm.getClassname(metadataName);
                 if(className.equals("MCRMetaClassification"))
                     type = "classification";
@@ -174,7 +369,7 @@ public class MCRImportMappingManager {
 
         try {
             // try to get a mapper instance depending on the type
-            MCRImportMapper mapper = MCRImportMappingTable.createMapperInstance(type);
+            MCRImportMapper mapper = mapperManager.createMapperInstance(type);
             if(mapper == null) {
                 LOGGER.error("Couldnt resolve mapper " + type);
                 return;
@@ -187,5 +382,58 @@ public class MCRImportMappingManager {
             LOGGER.error(iae);
         }
     }
+ 
+    /**
+     * Returns the mapper manager.
+     * 
+     * @return the mapper manager
+     */
+    public MCRImportMapperManager getMapperManager() {
+        return mapperManager;
+    }
+
+    /**
+     * Returns the metadata resolver manager.
+     * 
+     * @return the metadata resolver manager
+     */
+    public MCRImportMetadataResolverManager getMetadataResolverManager() {
+        return metadataResolverManager;
+    }
     
+    /**
+     * Returns the uri resolver manager.
+     * 
+     * @return the uri resolver manager
+     */
+    public MCRImportURIResolverMananger getURIResolverManager() {
+        return uriResolverManager;
+    }
+
+    /**
+     * Returns the datamodel manager.
+     * 
+     * @return the datamodel manager
+     */
+    public MCRImportDatamodelManager getDatamodelManager() {
+        return datamodelManager;
+    }
+
+    /**
+     * Returns the classification mapping manager.
+     * 
+     * @return the classification mapping manager
+     */
+    public MCRImportClassificationMappingManager getClassificationMappingManager() {
+        return classificationManager;
+    }
+    
+    /**
+     * Returns the configuration instance of this mapping mananager.
+     * 
+     * @return configuration instance
+     */
+    public MCRImportConfig getConfig() {
+        return config;
+    }
 }

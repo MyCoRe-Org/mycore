@@ -9,7 +9,6 @@ import org.apache.log4j.Logger;
 import org.jdom.Element;
 import org.mycore.common.MCRConstants;
 import org.mycore.importer.mapping.datamodel.MCRImportDatamodel;
-import org.mycore.importer.mapping.datamodel.MCRImportDatamodelManager;
 
 /**
  * The import object is an abstraction of the mycore object.
@@ -144,7 +143,7 @@ public class MCRImportObject {
     protected MCRImportMetadata createMetadata(String metadataName) {
         try {
             // receive the enclosingName, classname, heritable and notinherit from the datamodel
-            MCRImportDatamodel datamodel = MCRImportDatamodelManager.getInstance().getDatamodel(datamodelPath);
+            MCRImportDatamodel datamodel = MCRImportMappingManager.getInstance().getDatamodelManager().getDatamodel(datamodelPath);
             String className = datamodel.getClassname(metadataName);
             Boolean notInherit = datamodel.isNotinherit(metadataName);
             Boolean heritable = datamodel.isHeritable(metadataName);

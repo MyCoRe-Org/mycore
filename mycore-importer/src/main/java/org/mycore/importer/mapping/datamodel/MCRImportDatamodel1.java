@@ -50,19 +50,21 @@ public class MCRImportDatamodel1 extends MCRImportAbstractDatamodel {
         return metadataElement.getAttributeValue("class");
     }
 
-    protected boolean isCached(String metadataName) {
-        Element cachedMetadaElement = getCachedMetadataElement();
-        if( metadataName != null && !metadataName.equals("") &&
-            cachedMetadaElement != null &&
-            metadataName.equals(getCachedMetadataElement().getAttribute("name")))
-            return true;
-        return false;
-    }
+//    protected boolean isCached(String metadataName) {
+//        Element cachedMetadaElement = getCachedMetadataList();
+//        if( metadataName != null && !metadataName.equals("") &&
+//            cachedMetadaElement != null &&
+//            metadataName.equals(getCachedMetadataList().getAttribute("name")))
+//            return true;
+//        return false;
+//    }
 
     @SuppressWarnings("unchecked")
     protected Element findMetadataChild(String metadataName) {
-        if (isCached(metadataName))
-            return getCachedMetadataElement();
+        Element cachedElement = getCachedMetadataTable().get(metadataName);
+        if(cachedElement != null)
+            return cachedElement;
+
         Element rootElement = datamodel.getRootElement();
         Element metadataElement = rootElement.getChild("metadata");
         List<Element> metadataElements = metadataElement.getChildren("element");
@@ -72,7 +74,7 @@ public class MCRImportDatamodel1 extends MCRImportAbstractDatamodel {
             Element metadataChildElement = (Element) element.getContent(new ElementFilter()).get(0);
             if (metadataName.equals(metadataChildElement.getAttributeValue("name"))) {
                 // right child found -> cache & return it
-                setCachedMetadataElement(metadataChildElement);
+                addCachedMetadataElement(metadataName, metadataChildElement);
                 return metadataChildElement;
             }
         }

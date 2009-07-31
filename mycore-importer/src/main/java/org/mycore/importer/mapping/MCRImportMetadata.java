@@ -5,6 +5,13 @@ import java.util.List;
 
 import org.jdom.Element;
 
+/**
+ * This class is an abstraction of an surrounding metadata element. For example something
+ * like &lt;names class="MCRMetaPersonName" heritable="false" notinherit="false"&gt;.
+ * It saves the tag, the className, heritable, notinherit and a list of jdom child elements.
+ * 
+ * @author Matthias Eichner
+ */
 public class MCRImportMetadata {
 
     protected String tag;
@@ -15,11 +22,21 @@ public class MCRImportMetadata {
 
     protected List<Element> childList;
 
+    /**
+     * Creates a new metadata element.
+     * 
+     * @param tag the tag of the element
+     */
     public MCRImportMetadata(String tag) {
         this.tag = tag;
         this.childList = new ArrayList<Element>();
     }
 
+    /**
+     * Creates a jdom element from this instance.
+     * 
+     * @return a jdom element
+     */
     public Element createXML() {
         Element metadataElement = new Element(tag);
         metadataElement.setAttribute("class", className);

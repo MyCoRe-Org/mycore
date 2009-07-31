@@ -4,21 +4,33 @@ import java.util.List;
 
 import org.jdom.Element;
 import org.jdom.Namespace;
+import org.jdom.Text;
 import org.mycore.common.MCRConstants;
 import org.mycore.importer.MCRImportField;
+import org.mycore.importer.mapping.MCRImportMappingManager;
 import org.mycore.importer.mapping.resolver.MCRImportFieldValueResolver;
-import org.mycore.importer.mapping.resolver.uri.MCRImportURIResolverMananger;
 
+/**
+ * The abstract metadate resolver is the default implementation of a metadata resolver.
+ * It resolves text, attributes and children, furthermore a validation of the final
+ * metadata element is possible.
+ * 
+ * @author Matthias Eichner
+ */
 public abstract class MCRImportAbstractMetadataResolver implements MCRImportMetadataResolver {
 
     protected Element map;
     protected MCRImportFieldValueResolver fieldResolver;
-    
+
     /**
      * The return element.
      */
     protected Element metadataChild;
 
+    /*
+     * (non-Javadoc)
+     * @see org.mycore.importer.mapping.resolver.metadata.MCRImportMetadataResolver#resolve(org.jdom.Element, java.util.List)
+     */
     public Element resolve(Element map, List<MCRImportField> fieldList) {
         this.map = map;
         this.fieldResolver = new MCRImportFieldValueResolver(fieldList);
@@ -26,35 +38,68 @@ public abstract class MCRImportAbstractMetadataResolver implements MCRImportMeta
         // attributes
         if(hasAttributes());
             resolveAttributes(map, metadataChild);
-        // text
-        if(hasText())
-            resolveMainText();
         // children
         if(hasChildren())
             resolveChildren(map, metadataChild);
         // and additional stuff
         resolveAdditional();
+        // text
+        if(hasText())
+            resolveMainText();
         if(checkValidation())
             return metadataChild;
         return null;
     }
 
+    /**
+     * Do additional resolving to manipulate the metadata element.
+     */
     protected void resolveAdditional() {}
 
+    /**
+     * Checks if the metadata element is valid. If the element
+     * is not valid, the resolve method will be null return.
+     * 
+     * @return true if the metadata element is valid, otherwise false
+     */
     protected abstract boolean checkValidation();
 
+    /**
+     * Checks if the metadata element can have text.
+     * By default this is true.
+     * 
+     * @return true if the metadata element can have text.
+     */
     protected boolean hasText() {
         return true;
     }
+    
+    /**
+     * Checks if the metadata element can have attributes.
+     * By default this is true.
+     * 
+     * @return true if the metadata element can have attributes.
+     */
     protected boolean hasAttributes() {
         return true;
     }
+
+    /**
+     * Checks if the metadata element can have children.
+     * By default this is false.
+     * 
+     * @return true if the metadata element can have children.
+     */
     protected boolean hasChildren() {
         return false;
     }
 
     /**
-     * Pass through the attributes of the map.
+     * Pass through the attributes of the of the fromElement and tries
+     * to resolve them. The results are saved in the saveToElement.
+     * 
+     * @param fromElement the source element where the attribute mapping informations are set
+     * @param saveToElement where to save the resolved attributes
      */
     @SuppressWarnings("unchecked")
     public void resolveAttributes(Element fromElement, Element saveToElement) {
@@ -124,8 +169,10 @@ public abstract class MCRImportAbstractMetadataResolver implements MCRImportMeta
 
         // is a resolver defined?
         if(uri != null && !uri.equals("")) {
+            // maybe in the uri are some field values -> do a field resolve
+            String resolvedUri = fieldResolver.resolveFields(uri);
             // try to resolve the uri to get the new value
-            resolvedValue = MCRImportURIResolverMananger.getInstance().resolveURI(uri, resolvedValue);
+            resolvedValue = MCRImportMappingManager.getInstance().getURIResolverManager().resolveURI(resolvedUri, resolvedValue);
         }
         return resolvedValue;
     }
@@ -146,7 +193,10 @@ public abstract class MCRImportAbstractMetadataResolver implements MCRImportMeta
                 // add every field value to the text
                 textBuffer.append(field.getValue());
             }
-            metadataChild.setText(textBuffer.toString());
+            if(textBuffer.length() > 0) {
+                Text text = new Text(textBuffer.toString());
+                metadataChild.addContent(text);
+            }
             return;
         }
         // resolve by the text tag
@@ -167,8 +217,10 @@ public abstract class MCRImportAbstractMetadataResolver implements MCRImportMeta
         String uri = textElement.getAttributeValue("resolver");
         // resolve value
         String resolvedValue = resolveValue(value, uri);
-        if(resolvedValue != null && !resolvedValue.equals(""))
-            saveToElement.setText(resolvedValue);
+        if(resolvedValue != null && !resolvedValue.equals("")) {
+            Text text = new Text(resolvedValue);
+            saveToElement.addContent(text);
+        }
     }
 
     /**
@@ -181,7 +233,7 @@ public abstract class MCRImportAbstractMetadataResolver implements MCRImportMeta
      */
     @SuppressWarnings("unchecked")
     public void resolveChildren(Element fromElement, Element saveToElement) {
-        Element childsElement = fromElement.getChild("childs");
+        Element childsElement = fromElement.getChild("children");
         if(childsElement == null)
             return;
 

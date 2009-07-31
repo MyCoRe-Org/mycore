@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.jdom.Document;
 import org.jdom.Element;
-import org.mycore.importer.mapping.MCRImportMetadataResolverTable;
+import org.mycore.importer.mapping.MCRImportMappingManager;
 
 public class MCRImportDatamodel2 extends MCRImportAbstractDatamodel {
 
@@ -23,7 +23,7 @@ public class MCRImportDatamodel2 extends MCRImportAbstractDatamodel {
     public String getClassname(String metadataName) {
         Element metadataElement = findMetadataChild(metadataName);
         String type = metadataElement.getAttributeValue("type");
-        return MCRImportMetadataResolverTable.getClassNameByType(type);
+        return MCRImportMappingManager.getInstance().getMetadataResolverManager().getClassNameByType(type);
     }
 
     public Boolean isNotinherit(String metadataName) {
@@ -46,25 +46,28 @@ public class MCRImportDatamodel2 extends MCRImportAbstractDatamodel {
         Element metadataElement = findMetadataChild(metadataName);
         return metadataElement.getAttributeValue("type");
     }
-    
-    @Override
-    protected boolean isCached(String metadataName) {
-        if(metadataName.equals(getCachedMetadataElement().getAttribute("name")))
-            return true;
-        return false;
-    }
+
+//    @Override
+//    protected boolean isCached(String metadataName) {
+//        if(getCachedMetadataList() != null && metadataName.equals(getCachedMetadataList().getAttribute("name")))
+//            return true;
+//        return false;
+//    }
 
     @SuppressWarnings("unchecked")
     protected Element findMetadataChild(String metadataName) {
-        if (isCached(metadataName))
-            return getCachedMetadataElement();
+        Element cachedElement = getCachedMetadataTable().get(metadataName);
+        if(cachedElement != null)
+            return cachedElement;
+
         Element rootElement = datamodel.getRootElement();
-        List<Element> metadataElements = rootElement.getChildren("element");
+        Element metadata = rootElement.getChild("metadata");
+        List<Element> metadataElements = metadata.getChildren("element");
         // go through all elements
         for (Element metadataElement : metadataElements) {
             if (metadataName.equals(metadataElement.getAttributeValue("name"))) {
                 // right metadata found -> cache & return it
-                setCachedMetadataElement(metadataElement);
+                addCachedMetadataElement(metadataName, metadataElement);
                 return metadataElement;
             }
         }

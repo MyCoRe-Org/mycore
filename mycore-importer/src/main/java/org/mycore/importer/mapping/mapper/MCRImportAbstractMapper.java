@@ -7,18 +7,25 @@ import org.apache.log4j.Logger;
 import org.jdom.Element;
 import org.mycore.importer.MCRImportField;
 import org.mycore.importer.MCRImportRecord;
-import org.mycore.importer.mapping.MCRImportMetadataResolverTable;
+import org.mycore.importer.mapping.MCRImportMappingManager;
+import org.mycore.importer.mapping.MCRImportMetadataResolverManager;
 import org.mycore.importer.mapping.MCRImportObject;
 import org.mycore.importer.mapping.datamodel.MCRImportDatamodel;
 import org.mycore.importer.mapping.datamodel.MCRImportDatamodel1;
 import org.mycore.importer.mapping.datamodel.MCRImportDatamodel2;
-import org.mycore.importer.mapping.datamodel.MCRImportDatamodelManager;
 import org.mycore.importer.mapping.resolver.metadata.MCRImportMetadataResolver;
 
+/**
+ * This class provides default implementations for the <code>MCRImportMapper</code>
+ * interface. It supports field parsing and dynamic creation of
+ * <code>MCRImportMetadataResolver</code> instances.
+ * 
+ * @author Matthias Eichner
+ */
 public abstract class MCRImportAbstractMapper implements MCRImportMapper {
 
     private static final Logger LOGGER = Logger.getLogger(MCRImportAbstractMapper.class);
-    
+
     protected MCRImportObject importObject;
     protected Element map;
     protected MCRImportRecord record;
@@ -78,19 +85,28 @@ public abstract class MCRImportAbstractMapper implements MCRImportMapper {
         return null;
     }
 
-    protected MCRImportMetadataResolver createResolverInstance() {
+    /**
+     * Creates an instance of <code>MCRImportMetadataResolver</code>. 
+     * 
+     * @return a new instance of <code>MCRImportMetadataResolver</code>
+     */
+    protected MCRImportMetadataResolver createResolverInstance() {       
         // get the type of the metadata element from the datamodel
         String type = null;
         String dmPath = importObject.getDatamodelPath();
-        MCRImportDatamodel dm = MCRImportDatamodelManager.getInstance().getDatamodel(dmPath);
+        MCRImportDatamodel dm = MCRImportMappingManager.getInstance().getDatamodelManager().getDatamodel(dmPath);
         String metadataName = map.getAttributeValue("to");
         if(metadataName == null || metadataName.equals("")) {
             LOGGER.error("No 'to'-attribute set in record " + record.getName() + " for fields " + map.getAttributeValue("fields"));
             return null;
         }
+
+        // get the metadata resolver manager
+        MCRImportMetadataResolverManager mrm = MCRImportMappingManager.getInstance().getMetadataResolverManager();
+
         if(dm instanceof MCRImportDatamodel1) {
             String className = ((MCRImportDatamodel1)dm).getClassName(metadataName);
-            type = MCRImportMetadataResolverTable.getTypeByClassName(className);
+            type = mrm.getTypeByClassName(className);
         } else if(dm instanceof MCRImportDatamodel2) {
             type = ((MCRImportDatamodel2)dm).getType(metadataName);
         }
@@ -101,6 +117,6 @@ public abstract class MCRImportAbstractMapper implements MCRImportMapper {
         }
 
         // create a new instance of the resolver 
-        return MCRImportMetadataResolverTable.createInstance(type);
+        return mrm.createInstance(type);
     }
 }

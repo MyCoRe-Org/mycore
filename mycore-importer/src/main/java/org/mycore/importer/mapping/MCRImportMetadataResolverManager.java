@@ -23,35 +23,54 @@ import org.mycore.importer.mapping.resolver.metadata.MCRImportTextResolver;
  * 
  * @author Matthias Eichner
  */
-public abstract class MCRImportMetadataResolverTable {
+public class MCRImportMetadataResolverManager {
 
-    private static final Logger LOGGER = Logger.getLogger(MCRImportMetadataResolverTable.class);
-    
-    private static ArrayList<ResolverData<?>> resolverTable;
+    private static final Logger LOGGER = Logger.getLogger(MCRImportMetadataResolverManager.class);
 
-    static {
-        resolverTable = new ArrayList<ResolverData<?>>();
-        resolverTable.add( new ResolverData<MCRImportTextResolver>("text", "MCRMetaLangText", MCRImportTextResolver.class) );
-        resolverTable.add( new ResolverData<MCRImportBooleanResolver>("boolean", "MCRMetaBoolean", MCRImportBooleanResolver.class) );
-        resolverTable.add( new ResolverData<MCRImportClassificationResolver>("classification", "MCRMetaClassification", MCRImportClassificationResolver.class) );
-        resolverTable.add( new ResolverData<MCRImportISODataResolver>("date", "MCRMetaISO8601Date", MCRImportISODataResolver.class) );
-        resolverTable.add( new ResolverData<MCRImportLinkIDResolver>("link", "MCRMetaLinkID", MCRImportLinkIDResolver.class) );
-        resolverTable.add( new ResolverData<MCRImportLinkResolver>("href", "MCRMetaLink", MCRImportLinkResolver.class) );
-        resolverTable.add( new ResolverData<MCRImportDerivateLinkResolver>("derlink", "MCRMetaDerivateLink", MCRImportDerivateLinkResolver.class) );
-        resolverTable.add( new ResolverData<MCRImportMetaXMLResolver>("xml", "MCRMetaXML", MCRImportMetaXMLResolver.class) );
-        resolverTable.add( new ResolverData<MCRImportNumberResolver>("number", "MCRMetaNumber", MCRImportNumberResolver.class) );
+    /**
+     * List of resolver data. A resolver data is defined
+     * by a type, a classname, and class object of
+     * <code>MCRImportMetadataResolver</code>.
+     */
+    private ArrayList<ResolverData<?>> resolverList;
+
+    /**
+     * Creates a new instance to handle metadata resolvers. For each import is only
+     * one <code>MCRImportMetadataResolverManager</code> is required. This
+     * instance could be get by calling
+     * <code>MCRImportMappingManager.getInstance().getMetadataResolver()</code>.
+     * So it is in general not necessary, to create a second instance of this class.
+     */
+    public MCRImportMetadataResolverManager() {
+        addDefaultResolver();
     }
 
     /**
-     * Adds resolver to the table.
+     * Adds all default metadata resolvers to the resolver list.
+     */
+    private void addDefaultResolver() {
+        resolverList = new ArrayList<ResolverData<?>>();
+        resolverList.add( new ResolverData<MCRImportTextResolver>("text", "MCRMetaLangText", MCRImportTextResolver.class) );
+        resolverList.add( new ResolverData<MCRImportBooleanResolver>("boolean", "MCRMetaBoolean", MCRImportBooleanResolver.class) );
+        resolverList.add( new ResolverData<MCRImportClassificationResolver>("classification", "MCRMetaClassification", MCRImportClassificationResolver.class) );
+        resolverList.add( new ResolverData<MCRImportISODataResolver>("date", "MCRMetaISO8601Date", MCRImportISODataResolver.class) );
+        resolverList.add( new ResolverData<MCRImportLinkIDResolver>("link", "MCRMetaLinkID", MCRImportLinkIDResolver.class) );
+        resolverList.add( new ResolverData<MCRImportLinkResolver>("href", "MCRMetaLink", MCRImportLinkResolver.class) );
+        resolverList.add( new ResolverData<MCRImportDerivateLinkResolver>("derlink", "MCRMetaDerivateLink", MCRImportDerivateLinkResolver.class) );
+        resolverList.add( new ResolverData<MCRImportMetaXMLResolver>("xml", "MCRMetaXML", MCRImportMetaXMLResolver.class) );
+        resolverList.add( new ResolverData<MCRImportNumberResolver>("number", "MCRMetaNumber", MCRImportNumberResolver.class) );
+    }
+
+    /**
+     * Adds a new metadata resolver to the table.
      * 
      * @param type the type of the resolver, in general this is a shortcut
      * @param className the MyCoRe-classname which this resolver is connected to
      * @param resolverClass the real java implementation of the resolver
      */
     @SuppressWarnings("unchecked")
-    public static void addToResolverTable(String type, String className, Class<?> resolverClass) {
-        resolverTable.add( new ResolverData(type, className, resolverClass) );
+    public void addToResolverTable(String type, String className, Class<?> resolverClass) {
+        resolverList.add( new ResolverData(type, className, resolverClass) );
     }
 
     /**
@@ -60,22 +79,22 @@ public abstract class MCRImportMetadataResolverTable {
      * @param type the type of the resolver
      * @return the classname
      */
-    public static String getClassNameByType(String type) {
-        for(ResolverData<?> rd : resolverTable) {
+    public String getClassNameByType(String type) {
+        for(ResolverData<?> rd : resolverList) {
             if(type.equals(rd.getType()))
                 return rd.getClassName();
         }
         return null;
     }
-    
+
     /**
      * Returns the type shortcut of the given MyCoRe classname.
      * 
      * @param className the classname of the resolver
      * @return the type shortcut
      */
-    public static String getTypeByClassName(String className) {
-        for(ResolverData<?> rd : resolverTable) {
+    public String getTypeByClassName(String className) {
+        for(ResolverData<?> rd : resolverList) {
             if(className.equals(rd.getClassName()))
                 return rd.getType();
         }
@@ -86,10 +105,10 @@ public abstract class MCRImportMetadataResolverTable {
      * Tries to resolve the given type to create an MCRImportMetadataResolver 
      * instance. If no class for this type is defined, null will be returned.
      * 
-     * @param type
-     * @return
+     * @param type the shortcut
+     * @return a new instance of <code>MCRImportMetadataResolver</code>
      */
-    public static MCRImportMetadataResolver createInstance(String type) {
+    public MCRImportMetadataResolver createInstance(String type) {
         Class<?> c = getResolverClassByType(type);
         try {
             Object o = c.newInstance();
@@ -109,8 +128,8 @@ public abstract class MCRImportMetadataResolverTable {
      * Returns the java class object from the table by the
      * given type.
      */
-    protected static Class<?> getResolverClassByType(String type) {
-        for(ResolverData<?> rd : resolverTable) {
+    protected Class<?> getResolverClassByType(String type) {
+        for(ResolverData<?> rd : resolverList) {
             if(type.equals(rd.getType()))
                 return rd.getResolverClass();
         }
@@ -121,7 +140,7 @@ public abstract class MCRImportMetadataResolverTable {
      * Internal class to represent a resolver by its type,
      * MyCoRe classname and the java class.
      */
-    private static class ResolverData<T extends MCRImportMetadataResolver> {
+    private class ResolverData<T extends MCRImportMetadataResolver> {
         private String type;
         private String className;
         private Class<T> resolverClass;

@@ -18,8 +18,8 @@ import org.mycore.importer.MCRImportField;
  * </p>
  * <p>
  * <b>[]:</b> Use squared brackets to define a field condition. All data which
- * is set in squared brackes will be only used if the internal fields are
- * not null and not empty. For example "[hello {lastName}]" will be only resolved
+ * is set in squared brackes is only used if the internal fields are
+ * not null and not empty. For example "[hello {lastName}]" is only resolved
  * if the value of "lastName" is not null and not empty. 
  * </p>
  * <p>
@@ -56,7 +56,7 @@ public class MCRImportFieldValueResolver {
         return returnBuffer.toString();
     }
 
-    public int resolveFields(String incomingString, StringBuffer returnBuffer, int startPos) {
+    private int resolveFields(String incomingString, StringBuffer returnBuffer, int startPos) {
         StringBuffer currentVar = new StringBuffer();
         boolean isInVar = false;
         boolean varResolved = true;

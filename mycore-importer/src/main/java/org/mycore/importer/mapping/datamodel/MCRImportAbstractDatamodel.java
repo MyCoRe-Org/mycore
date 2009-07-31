@@ -1,5 +1,7 @@
 package org.mycore.importer.mapping.datamodel;
 
+import java.util.Hashtable;
+
 import org.jdom.Document;
 import org.jdom.Element;
 
@@ -8,22 +10,21 @@ public abstract class MCRImportAbstractDatamodel implements MCRImportDatamodel {
     protected Document datamodel;
 
     /**
-     * Temporary element to store the last metadata entry. Used to increase
-     * performance.
+     * A list of cached metadata elements
      */
-    protected Element cachedMetadataElement;
+    protected Hashtable<String, Element> cachedMetadataTable;
 
     public MCRImportAbstractDatamodel(Document datamodel) {
         this.datamodel = datamodel;
-        this.cachedMetadataElement = null;
+        this.cachedMetadataTable = new Hashtable<String, Element>();
     }
 
-    protected void setCachedMetadataElement(Element newCachedElement) {
-        this.cachedMetadataElement = newCachedElement;
+    protected void addCachedMetadataElement(String id, Element newCachedElement) {
+        this.cachedMetadataTable.put(id, newCachedElement);
     }
 
-    protected Element getCachedMetadataElement() {
-        return cachedMetadataElement;
+    protected Hashtable<String, Element> getCachedMetadataTable() {
+        return cachedMetadataTable;
     }
 
     public String getPath() {
@@ -36,6 +37,8 @@ public abstract class MCRImportAbstractDatamodel implements MCRImportDatamodel {
      * @param metadataName the name of the metadata element
      * @return true if the element is cached, otherwise false
      */
-    protected abstract boolean isCached(String metadataName);
+    protected boolean isCached(String metadataName) {
+        return cachedMetadataTable.containsKey(metadataName);
+    }
 
 }

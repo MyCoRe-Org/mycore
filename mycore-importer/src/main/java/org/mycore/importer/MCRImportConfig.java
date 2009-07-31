@@ -1,12 +1,7 @@
 package org.mycore.importer;
 
-import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.jdom.Element;
-import org.jdom.filter.ElementFilter;
-import org.mycore.importer.mapping.resolver.uri.MCRImportURIResolver;
-import org.mycore.importer.mapping.resolver.uri.MCRImportURIResolverMananger;
 
 /**
  * This class is an xml abstraction of the config part from the
@@ -40,31 +35,11 @@ public class MCRImportConfig {
         datamodelPath = configElement.getChildText("datamodelPath");
         // save to path
         saveToPath = configElement.getChildText("saveToPath");
-        // create a automatically classification mapping?
-        createClassificationMapping = Boolean.valueOf(configElement.getChildText("createClassificationMapping")); 
-
-        // load resolver
-        Element resolversElement = configElement.getChild("resolvers");
-        List<Element> resolverList = resolversElement.getContent(new ElementFilter());
-
-        for(Element resolver : resolverList) {
-            String prefix = resolver.getAttributeValue("prefix");
-            String className = resolver.getAttributeValue("class");
-
-            try {
-                // try to create a instance of the class
-                Class<?> c = Class.forName(className);
-                Object o = c.newInstance();
-                if(o instanceof MCRImportURIResolver) {
-                    // add it to the uri resolver manager
-                    MCRImportURIResolverMananger.getInstance().addURIResolver(prefix, (MCRImportURIResolver)o);
-                } else {
-                    LOGGER.error("Class " + className + " doesnt extends MCRImportURIResolver!");
-                }
-            } catch(Exception exc) {
-                LOGGER.error(exc);
-            }
-        }
+        // create a automatically classification mapping, default is true
+        createClassificationMapping = true;
+        String classString = configElement.getChildText("createClassificationMapping");
+        if(classString != null && !classString.equals(""))
+            createClassificationMapping = Boolean.valueOf(classString); 
     }
 
     /**
