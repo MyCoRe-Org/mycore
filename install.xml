@@ -40,12 +40,12 @@
 
     </echo>
     <antcall target="svn.checkout">
-      <param name="srcUrl"   value="http://server.mycore.de/svn/mycore/trunk" />
+      <param name="srcUrl"   value="http://server.mycore.de/svn/mycore/branches/release_2_0_fixes" />
       <param name="destPath" value="${destdir}/mycore" />
     </antcall>
 
     <antcall target="svn.export">
-      <param name="srcUrl"   value="http://server.mycore.de/svn/docportal/trunk" />
+      <param name="srcUrl"   value="http://server.mycore.de/svn/docportal/branches/release_2_0_fixes/" />
       <param name="destPath" value="${destdir}/docportal" />
     </antcall>
 
