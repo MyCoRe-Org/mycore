@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!-- ============================================== -->
-<!-- $Revision: 1.4 $ $Date: 2009/03/20 10:42:33 $ -->
+<!-- $Revision: 1.3 $ $Date: 2009/03/18 15:04:15 $ -->
 <!-- ============================================== -->
 
 <!-- +
@@ -65,7 +65,7 @@
     
     <xsl:choose>
       <xsl:when test="$direction = 'rtl' ">
-        <table cellpadding="0" cellspacing="0">
+        <table id="userMetaData-rtl" cellpadding="0" cellspacing="0">
           <tr>
             <th class="metahead" colspan="2">
               <xsl:copy-of select="i18n:translate('component.userlogin.contact.accountData')"/>
@@ -313,7 +313,7 @@
       </xsl:when>
       <xsl:otherwise>
         
-        <table cellpadding="0" cellspacing="0">
+        <table id="userMetaData" cellpadding="0" cellspacing="0">
           <tr>
             <th class="metahead" colspan="2">
               <xsl:copy-of select="i18n:translate('component.userlogin.contact.accountData')"/>

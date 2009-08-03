@@ -198,7 +198,7 @@ public class MCRHit {
         } else if ((vb == null) || (vb.trim().length() == 0)) {
             return (((va == null) || (va.trim().length() == 0)) ? 0 : 1);
         } else if ("decimal".equals(field.getDataType())) {
-            return (int) ((Double.parseDouble(va) - Double.parseDouble(vb)) * 10.0);
+            return (int) Math.signum(Double.parseDouble(va) - Double.parseDouble(vb));
         } else if ("integer".equals(field.getDataType())) {
             return (int) (Long.parseLong(va) - Long.parseLong(vb));
         } else {

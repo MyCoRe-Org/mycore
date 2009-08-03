@@ -37,7 +37,7 @@ public interface MCRExternalCommandInterface {
      * command has TWO Strings, a String of the user command syntax and a String
      * of the called method.
      * 
-     * @return a command pair RArrayList
+     * @return a command pair ArrayList
      */
     public ArrayList<MCRCommand> getPossibleCommands();
 }

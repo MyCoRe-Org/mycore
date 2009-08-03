@@ -25,13 +25,17 @@
 package org.mycore.frontend.workflow;
 
 import java.io.File;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Properties;
+import java.util.Set;
 import java.util.StringTokenizer;
 
 import org.apache.log4j.Logger;
@@ -504,33 +508,43 @@ public class MCRSimpleWorkflowManager {
      * workflow directory and in the server.
      */
     public synchronized final MCRObjectID getNextDrivateID(MCRObjectID ID) {
-        String myproject = ID.getProjectId() + "_derivate";
+        final String myproject = ID.getProjectId() + "_derivate";
+
         MCRObjectID dmcridnext = new MCRObjectID();
         dmcridnext.setNextFreeId(myproject);
 
-        File workdir = getDirectoryPath(ID.getBase());
-        if (workdir.isDirectory()) {
-            String[] list = workdir.list();
-            for (int i = 0; i < list.length; i++) {
-                if (!list[i].startsWith(myproject)) {
-                    continue;
-                }
-                if (!list[i].endsWith(".xml")) {
-                    continue;
-                }
-                try {
-                    MCRObjectID dmcriddir = new MCRObjectID(list[i].substring(0, list[i].length() - 4));
-                    if (dmcridnext.getNumberAsInteger() <= dmcriddir.getNumberAsInteger()) {
-                        dmcriddir.setNumber(dmcriddir.getNumberAsInteger() + 1);
-                        dmcridnext = dmcriddir;
-                    }
-                } catch (Exception e) {
-                }
-            }
+        Set<File> workdirs = new HashSet<File>();
+        workdirs.add(getDirectoryPath(ID.getBase()));
+        Properties propsWD = config.getProperties("MCR.SWF.Directory.");
+        for(Object key: propsWD.keySet()){
+        	File dir = new File(propsWD.getProperty((String)key));
+        	 if (!dir.exists()) {
+                 dir.mkdirs();
+             }
+        	 workdirs.add(dir);
         }
-        return dmcridnext;
-    }
+        
+        FilenameFilter derivateFilenameFilter = new FilenameFilter() {
+    		public boolean accept(File dir, String name) {
+    			return name.startsWith(myproject) && name.endsWith(".xml");
+    		}
+        };
+        
+        String max = myproject + "_0.xml";
+        for(File workdir: workdirs){
+        	for (String file : workdir.list(derivateFilenameFilter)){
+        		if (file.compareTo(max) > 0){
+        			max = file;
+        		}
+        	}
+        }        
+        int maxIDinWorkflow = Integer.parseInt( max.substring( max.lastIndexOf( "_" ) + 1 ), max.length() - 4 );  
 
+        MCRObjectID mcridnext = new MCRObjectID();
+        mcridnext.setNextFreeId(myproject, maxIDinWorkflow );
+        return mcridnext;    
+    }
+    
     /**
      * The method create a new MCRDerivate and store them to the directory of
      * the workflow that correspons with the type of the given object
