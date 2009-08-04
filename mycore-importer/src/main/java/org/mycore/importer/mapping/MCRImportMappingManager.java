@@ -58,7 +58,7 @@ public class MCRImportMappingManager {
     protected MCRImportDatamodelManager datamodelManager;
     protected MCRImportClassificationMappingManager classificationManager;
 
-    public MCRImportMappingManager()  {
+    private MCRImportMappingManager()  {
         this.outputter = new XMLOutputter(Format.getPrettyFormat());
         this.listenerList = new ArrayList<MCRImportStatusListener>();
     }
@@ -97,7 +97,7 @@ public class MCRImportMappingManager {
         // create all metadata resolvers
         metadataResolverManager = new MCRImportMetadataResolverManager();
         // create datamodel manager
-        datamodelManager = new MCRImportDatamodelManager();
+        datamodelManager = new MCRImportDatamodelManager(config.getDatamodelPath(), metadataResolverManager);
         // create the classification manager
         if(config.isCreateClassificationMapping())
             classificationManager = new MCRImportClassificationMappingManager(new File(config.getSaveToPath() + "classification/"));

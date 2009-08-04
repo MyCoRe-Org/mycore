@@ -4,18 +4,22 @@ import java.util.Hashtable;
 
 import org.jdom.Document;
 import org.jdom.Element;
+import org.mycore.importer.mapping.MCRImportMetadataResolverManager;
 
 public abstract class MCRImportAbstractDatamodel implements MCRImportDatamodel {
 
     protected Document datamodel;
 
+    protected MCRImportMetadataResolverManager metadataResolverManager;
+    
     /**
      * A list of cached metadata elements
      */
     protected Hashtable<String, Element> cachedMetadataTable;
 
-    public MCRImportAbstractDatamodel(Document datamodel) {
+    public MCRImportAbstractDatamodel(Document datamodel, MCRImportMetadataResolverManager metadataResolverManager) {
         this.datamodel = datamodel;
+        this.metadataResolverManager = metadataResolverManager;
         this.cachedMetadataTable = new Hashtable<String, Element>();
     }
 
@@ -29,6 +33,10 @@ public abstract class MCRImportAbstractDatamodel implements MCRImportDatamodel {
 
     public String getPath() {
         return datamodel.getBaseURI();
+    }
+
+    public MCRImportMetadataResolverManager getMetadataResolverManager() {
+        return metadataResolverManager;
     }
 
     /**

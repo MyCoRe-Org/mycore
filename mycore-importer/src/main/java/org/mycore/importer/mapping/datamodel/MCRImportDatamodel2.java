@@ -4,12 +4,12 @@ import java.util.List;
 
 import org.jdom.Document;
 import org.jdom.Element;
-import org.mycore.importer.mapping.MCRImportMappingManager;
+import org.mycore.importer.mapping.MCRImportMetadataResolverManager;
 
 public class MCRImportDatamodel2 extends MCRImportAbstractDatamodel {
 
-    public MCRImportDatamodel2(Document datamodel) {
-        super(datamodel);
+    public MCRImportDatamodel2(Document datamodel, MCRImportMetadataResolverManager metadataResolverManager) {
+        super(datamodel, metadataResolverManager);
     }
 
     public String getEnclosingName(String metadataName) {
@@ -23,7 +23,7 @@ public class MCRImportDatamodel2 extends MCRImportAbstractDatamodel {
     public String getClassname(String metadataName) {
         Element metadataElement = findMetadataChild(metadataName);
         String type = metadataElement.getAttributeValue("type");
-        return MCRImportMappingManager.getInstance().getMetadataResolverManager().getClassNameByType(type);
+        return getMetadataResolverManager().getClassNameByType(type);
     }
 
     public Boolean isNotinherit(String metadataName) {

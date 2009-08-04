@@ -6,13 +6,14 @@ import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.filter.ElementFilter;
+import org.mycore.importer.mapping.MCRImportMetadataResolverManager;
 
 public class MCRImportDatamodel1 extends MCRImportAbstractDatamodel {
 
     private static final Logger LOGGER = Logger.getLogger(MCRImportDatamodel1.class);
 
-    public MCRImportDatamodel1(Document datamodel) {
-        super(datamodel);
+    public MCRImportDatamodel1(Document datamodel, MCRImportMetadataResolverManager metadataResolverManager) {
+        super(datamodel, metadataResolverManager);
     }
 
     public String getEnclosingName(String metadataName) {

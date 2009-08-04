@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<import>
+    <config>
+        <projectName>sample</projectName>
+        <datamodelPath>src/test/resources/</datamodelPath>
+        <saveToPath>save/</saveToPath>
+        <createClassificationMapping>true</createClassificationMapping>
+    </config>
+
+    <mapping>
+        <resolvers>
+           <!--  <resolver prefix="volumeId" class="org.mycore.dataimport.pica.resolver.uri.MCRImportURIVolumeIdResolver" />-->
+        </resolvers>
+
+        <mcrobjects>
+        
+        </mcrobjects>
+        
+   </mapping>
+</import>

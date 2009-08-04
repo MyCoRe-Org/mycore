@@ -1,5 +1,6 @@
 package org.mycore.importer.mapping.datamodel;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Hashtable;
 
@@ -7,7 +8,7 @@ import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
-import org.mycore.importer.mapping.MCRImportMappingManager;
+import org.mycore.importer.mapping.MCRImportMetadataResolverManager;
 
 /**
  * This class holds a hash table of all datamodels from the current import.
@@ -22,7 +23,19 @@ public class MCRImportDatamodelManager {
 
     private Hashtable<String, MCRImportDatamodel> datamodelTable;
 
-    public MCRImportDatamodelManager() {
+    private String datamodelFolder = null;
+
+    private MCRImportMetadataResolverManager metadataResolverManager;
+
+    public MCRImportDatamodelManager(MCRImportMetadataResolverManager metadataResolverManager) {
+        this("", metadataResolverManager);
+    }
+
+    public MCRImportDatamodelManager(String datamodelFolder, MCRImportMetadataResolverManager metadataResolverManager) {
+        this.datamodelFolder = datamodelFolder;
+        this.metadataResolverManager = metadataResolverManager;
+        if(!datamodelFolder.endsWith("/"))
+            this.datamodelFolder += "/";
         datamodelTable = new Hashtable<String, MCRImportDatamodel>();
     }
 
@@ -35,15 +48,21 @@ public class MCRImportDatamodelManager {
      */
     public MCRImportDatamodel addDatamodel(String datamodelPath) throws IOException, JDOMException {
         SAXBuilder builder = new SAXBuilder();
-        Document document = builder.build(datamodelPath);
+        Document document = null;
+
+        try {
+            document = builder.build(datamodelPath);
+        } catch(FileNotFoundException fnfe) {
+            document = builder.build(datamodelFolder + datamodelPath);
+        }
 
         // if datamodel 1 or datamodel 2
         String rootTag = document.getRootElement().getName();
         MCRImportAbstractDatamodel datamodel = null;
         if(rootTag.equals("configuration"))
-            datamodel = new MCRImportDatamodel1(document);
+            datamodel = new MCRImportDatamodel1(document, metadataResolverManager);
         else if(rootTag.equals("objecttype"))
-            datamodel = new MCRImportDatamodel2(document);
+            datamodel = new MCRImportDatamodel2(document, metadataResolverManager);
         else
             return null;
         datamodelTable.put(datamodelPath, datamodel);
@@ -71,19 +90,18 @@ public class MCRImportDatamodelManager {
     public MCRImportDatamodel getDatamodel(String datamodelPath) {
         // first try with the path
         MCRImportDatamodel dm = datamodelTable.get(datamodelPath);
-        // if null second try with datamodel path of the mapping manager
-        if(dm == null) {
-            String absolutPath = MCRImportMappingManager.getInstance().getConfig().getDatamodelPath();
-            dm = datamodelTable.get(absolutPath + datamodelPath);
 
-            // if the second try is null - add it if its valid
-            if(dm == null)
-                try {
-                    dm = addDatamodel(datamodelPath);
-                } catch(Exception e) {
-                    LOGGER.error(e);
-                }                  
+        if(dm == null && datamodelFolder != null) {
+            dm = datamodelTable.get(datamodelFolder + datamodelPath);                
         }
+
+        // if the second try is null - add it if its valid
+        if(dm == null)
+            try {
+                dm = addDatamodel(datamodelPath);
+            } catch(Exception e) {
+                LOGGER.error(e);
+            }  
         return dm;
     }
 }

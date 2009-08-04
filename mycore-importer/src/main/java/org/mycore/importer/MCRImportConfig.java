@@ -24,10 +24,10 @@ public class MCRImportConfig {
     /**
      * Reads the config part of the mapping file.
      * 
-     * @param importElement
+     * @param rootElement
      */
-    public MCRImportConfig(Element importElement) {
-        Element configElement = importElement.getChild("config");
+    public MCRImportConfig(Element rootElement) {
+        Element configElement = rootElement.getChild("config");
 
         // project name
         projectName = configElement.getChildText("projectName");
