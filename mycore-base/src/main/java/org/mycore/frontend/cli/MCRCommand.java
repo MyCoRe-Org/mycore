@@ -42,7 +42,7 @@ import org.mycore.common.MCRConfigurationException;
  * 
  * @see MCRCommandLineInterface
  * 
- * @author Frank Lützenkirchen
+ * @author Frank Lï¿½tzenkirchen
  * @author Jens Kupferschmidt
  * @version $Revision$ $Date$
  */
@@ -54,7 +54,7 @@ public class MCRCommand {
     protected Method method;
 
     /** The types of the invocation parameters */
-    protected Class[] parameterTypes;
+    protected Class<?>[] parameterTypes;
 
     /** The number of invocation parameters */
     protected int numParameters;
@@ -70,6 +70,11 @@ public class MCRCommand {
 
     /** The help text String */
     protected String help;
+    
+    /**
+     * use this to overwrite this class.
+     */
+    protected MCRCommand(){};
 
     /**
      * Creates a new MCRCommand.
@@ -91,7 +96,7 @@ public class MCRCommand {
         className = token.substring(0, point);
         methodName = token.substring(point + 1);
         numParameters = st.countTokens();
-        parameterTypes = new Class[numParameters];
+        parameterTypes = new Class<?>[numParameters];
         messageFormat = new MessageFormat(format);
 
         for (int i = 0; i < numParameters; i++) {
