@@ -3,13 +3,8 @@ package org.mycore.frontend.servlets;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.LinkedList;
-import java.util.List;
-import java.util.StringTokenizer;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -17,12 +12,10 @@ import javax.servlet.http.HttpSession;
 import net.sf.json.JSONObject;
 
 import org.apache.log4j.Logger;
-
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.frontend.cli.MCRCommand;
 import org.mycore.frontend.cli.MCRExternalCommandInterface;
 
 /**
@@ -33,21 +26,9 @@ import org.mycore.frontend.cli.MCRExternalCommandInterface;
 public class MCRWebCLIServlet extends MCRServlet {
     private static final long serialVersionUID = 1L;
 
-    private static List<MCRCommand> knownCommands;
-
-    private static JSONObject commandsJSON;
-
     private static final Logger LOGGER = Logger.getLogger(MCRWebCLIServlet.class);
 
     private static final String SESSION_KEY = "MCRWebCLI";
-
-    @Override
-    public void init() throws ServletException {
-        super.init();
-        commandsJSON = new JSONObject();
-        commandsJSON.put("commands", new ArrayList<Object>());
-        knownCommands = getCommands();
-    }
 
     /**
      * Provides the access for the ajax gui.
@@ -110,7 +91,7 @@ public class MCRWebCLIServlet extends MCRServlet {
                     printJSONObject(getCurrentSessionContainer(true, hsession).getLogs(), job.getResponse());
                     return;
                 } else if (request.equals("getKnownCommands")) {
-                    printJSONObject(commandsJSON, job.getResponse());
+                    printJSONObject(MCRWebCLIContainer.getKnownCommands(), job.getResponse());
                     return;
                 } else if (request.equals("getCommandQueue")) {
                     jsonObject.put("commandQueue", new LinkedList<String>(getCurrentSessionContainer(true, hsession).getCommandQueue()));
@@ -154,54 +135,11 @@ public class MCRWebCLIServlet extends MCRServlet {
                 if (!create)
                     return null;
                 // create object
-                sessionValue = new MCRWebCLIContainer(knownCommands, hsession);
+                sessionValue = new MCRWebCLIContainer(hsession);
                 session.put(SESSION_KEY, sessionValue);
             }
         }
         return (MCRWebCLIContainer) sessionValue;
-    }
-
-    protected static List<MCRCommand> getCommands() {
-        ArrayList<MCRCommand> knownCommands = new ArrayList<MCRCommand>();
-        knownCommands.add(new MCRCommand("process {0}", "org.mycore.frontend.cli.MCRCommandLineInterface.readCommandsFile String",
-                "Execute the commands listed in the text file {0}."));
-        knownCommands.add(new MCRCommand("show command statistics",
-                "org.mycore.frontend.cli.MCRCommandLineInterface.showCommandStatistics",
-                "Show statistics on number of commands processed and execution time needed per command"));
-        addJSONCommand("Basic commands", knownCommands);
-        String internalClasses = MCRConfiguration.instance().getString("MCR.CLI.Classes.Internal", "");
-        String externalClasses = MCRConfiguration.instance().getString("MCR.CLI.Classes.External", "");
-        initializeCommands(knownCommands, internalClasses);
-        initializeCommands(knownCommands, externalClasses);
-        return knownCommands;
-    }
-
-    private static void initializeCommands(ArrayList<MCRCommand> knownCommands, String commandClasses) {
-        for (StringTokenizer st = new StringTokenizer(commandClasses, ","); st.hasMoreTokens();) {
-            String classname = st.nextToken();
-            LOGGER.debug("Loading commands from class " + classname);
-            Object obj;
-            try {
-                obj = Class.forName(classname).newInstance();
-            } catch (Exception e) {
-                String msg = "Could not instantiate class " + classname;
-                throw new org.mycore.common.MCRConfigurationException(msg, e);
-            }
-            ArrayList<MCRCommand> commands = ((MCRExternalCommandInterface) obj).getPossibleCommands();
-            knownCommands.addAll(commands);
-            addJSONCommand(obj.getClass().getSimpleName(), commands);
-        }
-    }
-
-    private static void addJSONCommand(String parent, Collection<MCRCommand> cmds) {
-        List<String> commands = new ArrayList<String>(cmds.size());
-        for (final MCRCommand cmd : cmds) {
-            commands.add(cmd.showSyntax());
-        }
-        JSONObject item = new JSONObject();
-        item.put("name", parent);
-        item.put("commands", commands);
-        commandsJSON.getJSONArray("commands").add(item);
     }
 
     private static void generateErrorResponse(HttpServletRequest request, HttpServletResponse response, int errorCode, String message)

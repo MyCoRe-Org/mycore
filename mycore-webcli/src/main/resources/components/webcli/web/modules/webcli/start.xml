@@ -28,6 +28,19 @@ webcli.logs.clear();
               ]]>
             </script>
           </div>
+          <div dojoType="dijit.form.Button" id="toolbar.refreshCmds" iconClass="dijitEditorIcon dijitEditorIconRedo">
+            Refresh Commands
+            <script type="dojo/method" event="onClick">
+              <![CDATA[
+dojo.xhrGet({
+	url: webCLIServlet,
+	load: webcli.commands._callbackKnownCommands,
+	error: webcli.servletError,
+	content: {request: "getKnownCommands"}
+});
+              ]]>
+            </script>
+          </div>
           <span dojoType="dijit.ToolbarSeparator" id="settings_seperator"></span>
           <button dojoType="dijit.form.Button" onclick="webcli.gui.showSettings()">Settings</button>
           <div dojoType="dijit.Dialog" id="settingsDialog" title="Settings"

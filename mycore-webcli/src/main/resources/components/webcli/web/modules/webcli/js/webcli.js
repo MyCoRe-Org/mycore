@@ -240,6 +240,10 @@ var webcli={
 	"gui"		:	{
 		"createCommandsMenu"	:	function(){
 			var menu = dijit.registry.byId("commandMenu");
+			dojo.forEach(menu.getChildren(), function(widget){
+				webcli.logDebug("removing "+" = "+widget);
+				menu.removeChild(widget);
+			});
 			dojo.forEach(webcli.commands.knownCommands, function(commandGroup){
 				var submenu= new dijit.Menu({});
 				var popup=new dijit.PopupMenuItem({

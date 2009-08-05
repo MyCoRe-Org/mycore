@@ -28,9 +28,14 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Queue;
+import java.util.StringTokenizer;
+import java.util.TreeMap;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
@@ -46,12 +51,15 @@ import org.apache.log4j.AppenderSkeleton;
 import org.apache.log4j.Logger;
 import org.apache.log4j.spi.LoggingEvent;
 import org.hibernate.Transaction;
-
 import org.mycore.backend.hibernate.MCRHIBConnection;
+import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUsageException;
 import org.mycore.frontend.cli.MCRCommand;
+import org.mycore.frontend.cli.MCRCommandPool;
+import org.mycore.frontend.cli.MCRExternalCommandInterface;
+import org.mycore.frontend.cli.command.MCRAddCommands;
 
 /**
  * Is a wrapper class around command execution.
@@ -66,9 +74,13 @@ import org.mycore.frontend.cli.MCRCommand;
 class MCRWebCLIContainer {
     Future<Boolean> curFuture;
 
-    private static List<MCRCommand> knownCommands;
+    private static Map<String, List<MCRCommand>> knownCommands;
 
     private final ProcessCallable processCallable;
+
+    private static final String JSON_POOL_NAME = "Pooled Commands";
+
+    private static long knownCommandsUpdateTime;
 
     private static final Logger LOGGER = Logger.getLogger(MCRWebCLIContainer.class);
 
@@ -83,8 +95,7 @@ class MCRWebCLIContainer {
      *            the current HttpSession of the usere using the gui.
      * 
      */
-    public MCRWebCLIContainer(List<MCRCommand> knownCommands, HttpSession session) {
-        MCRWebCLIContainer.knownCommands = knownCommands;
+    public MCRWebCLIContainer(HttpSession session) {
         processCallable = new ProcessCallable(MCRSessionMgr.getCurrentSession(), session);
     }
 
@@ -135,6 +146,70 @@ class MCRWebCLIContainer {
         JSONObject json = new JSONObject();
         json.put("logs", getJSONLogs(processCallable.logs));
         return json;
+    }
+
+    public static JSONObject getKnownCommands() {
+        updateKnownCommandsIfNeeded();
+        JSONObject commandsJSON = new JSONObject();
+        commandsJSON.put("commands", new ArrayList<Object>());
+        for (Map.Entry<String, List<MCRCommand>> entry : knownCommands.entrySet()) {
+            List<String> commands = new ArrayList<String>(entry.getValue().size());
+            for (final MCRCommand cmd : entry.getValue()) {
+                commands.add(cmd.showSyntax());
+            }
+            JSONObject item = new JSONObject();
+            item.put("name", entry.getKey());
+            item.put("commands", commands);
+            commandsJSON.getJSONArray("commands").add(item);
+        }
+        return commandsJSON;
+    }
+
+    protected static void initializeCommands() {
+        if (knownCommands == null) {
+            knownCommands = new TreeMap<String, List<MCRCommand>>();
+            ArrayList<MCRCommand> basicCommands = new ArrayList<MCRCommand>();
+            basicCommands.add(new MCRCommand("process {0}", "org.mycore.frontend.cli.MCRCommandLineInterface.readCommandsFile String",
+                    "Execute the commands listed in the text file {0}."));
+            basicCommands.add(new MCRCommand("show command statistics",
+                    "org.mycore.frontend.cli.MCRCommandLineInterface.showCommandStatistics",
+                    "Show statistics on number of commands processed and execution time needed per command"));
+            basicCommands.add(new MCRAddCommands());
+            LOGGER.warn("known commands:" + knownCommands);
+            knownCommands.put("Basic commands", basicCommands);
+            String internalClasses = MCRConfiguration.instance().getString("MCR.CLI.Classes.Internal", "");
+            String externalClasses = MCRConfiguration.instance().getString("MCR.CLI.Classes.External", "");
+            initializeCommands(knownCommands, internalClasses);
+            initializeCommands(knownCommands, externalClasses);
+        } else if (knownCommands.containsKey(JSON_POOL_NAME)) {
+            knownCommands.remove(JSON_POOL_NAME);
+        }
+        knownCommandsUpdateTime = MCRCommandPool.instance().getLastModified();
+        final ArrayList<MCRCommand> dynamicCommandList = MCRCommandPool.instance().getPossibleCommands();
+        if (dynamicCommandList.size() > 0) {
+            knownCommands.put(JSON_POOL_NAME, dynamicCommandList);
+        }
+    }
+
+    private static void updateKnownCommandsIfNeeded() {
+        if (knownCommands == null || knownCommandsUpdateTime < MCRCommandPool.instance().getLastModified())
+            initializeCommands();
+    }
+
+    private static void initializeCommands(Map<String, List<MCRCommand>> knownCommands, String commandClasses) {
+        for (StringTokenizer st = new StringTokenizer(commandClasses, ","); st.hasMoreTokens();) {
+            String classname = st.nextToken();
+            LOGGER.debug("Loading commands from class " + classname);
+            Object obj;
+            try {
+                obj = Class.forName(classname).newInstance();
+            } catch (Exception e) {
+                String msg = "Could not instantiate class " + classname;
+                throw new org.mycore.common.MCRConfigurationException(msg, e);
+            }
+            ArrayList<MCRCommand> commands = ((MCRExternalCommandInterface) obj).getPossibleCommands();
+            knownCommands.put(obj.getClass().getSimpleName(), commands);
+        }
     }
 
     private static JSONArray getJSONLogs(Queue<LoggingEvent> events) {
@@ -194,21 +269,15 @@ class MCRWebCLIContainer {
             LOGGER.info("Processing command:'" + command + "' (" + commands.size() + " left)");
             long start = System.currentTimeMillis();
             Transaction tx = MCRHIBConnection.instance().getSession().beginTransaction();
-            List<String> commandsReturned = null;
             try {
-                for (MCRCommand currentCommand : knownCommands) {
-                    commandsReturned = currentCommand.invoke(command, this.getClass().getClassLoader());
-                    if (commandsReturned != null) // Command was executed
-                    {
-                        // Add commands to queue
-                        if (commandsReturned.size() > 0) {
-                            LOGGER.info("Queueing " + commandsReturned.size() + " commands to process");
-                            commands.addAll(0, commandsReturned);
-                        }
-
+                List<String> commandsReturned = null;
+                for (List<MCRCommand> cmds : knownCommands.values()) {
+                    //previous attempt to run command was successful
+                    if (commandsReturned != null)
                         break;
-                    }
+                    commandsReturned = runCommand(command, cmds);
                 }
+                updateKnownCommandsIfNeeded();
                 tx.commit();
                 if (commandsReturned != null)
                     LOGGER.info("Command processed (" + (System.currentTimeMillis() - start) + " ms)");
@@ -232,6 +301,25 @@ class MCRWebCLIContainer {
                 tx.commit();
             }
             return true;
+        }
+
+        private List<String> runCommand(String command, List<MCRCommand> commandList) throws IllegalAccessException,
+                InvocationTargetException, ClassNotFoundException, NoSuchMethodException {
+            List<String> commandsReturned = null;
+            for (MCRCommand currentCommand : commandList) {
+                commandsReturned = currentCommand.invoke(command, this.getClass().getClassLoader());
+                if (commandsReturned != null) // Command was executed
+                {
+                    // Add commands to queue
+                    if (commandsReturned.size() > 0) {
+                        LOGGER.info("Queueing " + commandsReturned.size() + " commands to process");
+                        commands.addAll(0, commandsReturned);
+                    }
+
+                    break;
+                }
+            }
+            return commandsReturned;
         }
 
         protected void saveQueue(String lastCommand) throws IOException {
