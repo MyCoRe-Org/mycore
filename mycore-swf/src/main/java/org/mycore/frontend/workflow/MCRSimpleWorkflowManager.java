@@ -508,9 +508,6 @@ public class MCRSimpleWorkflowManager {
     public synchronized final MCRObjectID getNextDrivateID(MCRObjectID ID) {
         final String myproject = ID.getProjectId() + "_derivate";
 
-        MCRObjectID dmcridnext = new MCRObjectID();
-        dmcridnext.setNextFreeId(myproject);
-
         Set<File> workdirs = new HashSet<File>();
         workdirs.add(getDirectoryPath(ID.getBase()));
         Properties propsWD = config.getProperties("MCR.SWF.Directory.");
