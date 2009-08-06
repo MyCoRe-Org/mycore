@@ -13,8 +13,8 @@ public class MCRImportLinkIDResolver extends MCRImportAbstractMetadataResolver {
     }
 
     @Override
-    protected boolean checkValidation() {
-        String href = metadataChild.getAttributeValue("href", MCRConstants.XLINK_NAMESPACE);
+    protected boolean isValid() {
+        String href = saveToElement.getAttributeValue("href", MCRConstants.XLINK_NAMESPACE);
         if(href == null || href.equals("")) {
             return false;
         }
@@ -31,9 +31,9 @@ public class MCRImportLinkIDResolver extends MCRImportAbstractMetadataResolver {
 
     protected void setDefaultAttributes() {
         // default type is locator
-        String type = metadataChild.getAttributeValue("type", MCRConstants.XLINK_NAMESPACE); 
+        String type = saveToElement.getAttributeValue("type", MCRConstants.XLINK_NAMESPACE); 
         if(type == null || type.equals(""))
-            metadataChild.setAttribute("type", "locator", MCRConstants.XLINK_NAMESPACE);
+            saveToElement.setAttribute("type", "locator", MCRConstants.XLINK_NAMESPACE);
 
     }
 }

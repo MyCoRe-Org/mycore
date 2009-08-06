@@ -73,12 +73,14 @@ public class ImporterTestCase extends MCRTestCase {
         assertEquals(metadataResolverManager.getTypeByClassName("MCRTestMetadata"), "testMetadata");
 
         MCRImportMetadataResolver metadataResolver = metadataResolverManager.createInstance("testMetadata");
-        Element resolvedElement = metadataResolver.resolve(null, null);
-        assertEquals("test", resolvedElement.getName());
+        Element saveToElement = new Element("testRoot");
+        metadataResolver.resolve(null, null, saveToElement);
+        assertEquals("1", saveToElement.getAttributeValue("test"));
     }
     public static class TestMetadataResolver implements MCRImportMetadataResolver {
-        public Element resolve(Element map, List<MCRImportField> fieldList) {
-            return new Element("test");
+        public boolean resolve(Element map, List<MCRImportField> fieldList, Element saveToElement) {
+            saveToElement.setAttribute("test", "1");
+            return true;
         }
     }
 

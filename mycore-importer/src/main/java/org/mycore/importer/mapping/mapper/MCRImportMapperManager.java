@@ -25,8 +25,9 @@ public class MCRImportMapperManager {
         mapperTable.put("label", MCRImportLabelMapper.class);
         mapperTable.put("parent", MCRImportParentMapper.class);
         mapperTable.put("classification", MCRImportClassificationMapper.class);
+        mapperTable.put("derivate", MCRImportDerivateMapper.class);
     }
-    
+
     /**
      * Use this method to add your own external resolver.
      * 

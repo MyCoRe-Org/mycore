@@ -12,18 +12,18 @@ public class MCRImportTextResolver extends MCRImportAbstractMetadataResolver {
 
     protected void setDefaultAttributes() {
         // default lang is de
-        String lang = metadataChild.getAttributeValue("lang", Namespace.XML_NAMESPACE); 
+        String lang = saveToElement.getAttributeValue("lang", Namespace.XML_NAMESPACE); 
         if(lang == null || lang.equals(""))
-            metadataChild.setAttribute("lang", "de", Namespace.XML_NAMESPACE);
+            saveToElement.setAttribute("lang", "de", Namespace.XML_NAMESPACE);
 
         // default form is "plain"
-        String form = metadataChild.getAttributeValue("form"); 
+        String form = saveToElement.getAttributeValue("form"); 
         if(form == null || form.equals(""))
-            metadataChild.setAttribute("form", "plain");       
+            saveToElement.setAttribute("form", "plain");       
     }
 
-    protected boolean checkValidation() {
-        if(metadataChild.getText() == null || metadataChild.getText().equals(""))
+    protected boolean isValid() {
+        if(saveToElement.getText() == null || saveToElement.getText().equals(""))
             return false;
         return true;
     }

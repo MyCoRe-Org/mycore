@@ -20,8 +20,9 @@ public interface MCRImportMetadataResolver {
      * 
      * @param map describes the mapping
      * @param fieldList a list of <code>MCRImportField</code>s
-     * @return a new metadata element
+     * @param saveToElement the element where to resolve
+     * @return true if the resolving was successfull and the saveToElement is valid
      */
-    public Element resolve(Element map, List<MCRImportField> fieldList);
+    public boolean resolve(Element map, List<MCRImportField> fieldList, Element saveToElement);
 
 }

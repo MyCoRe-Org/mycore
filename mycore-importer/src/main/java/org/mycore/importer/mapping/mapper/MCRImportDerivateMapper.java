@@ -5,10 +5,10 @@ import org.mycore.importer.MCRImportRecord;
 import org.mycore.importer.mapping.MCRImportObject;
 import org.mycore.importer.mapping.resolver.metadata.MCRImportLinkIDResolver;
 
-public class MCRImportParentMapper extends MCRImportAbstractMapper {
+public class MCRImportDerivateMapper extends MCRImportAbstractMapper {
 
     public String getType() {
-        return "parent";
+        return "derivate";
     }
 
     @Override
@@ -16,9 +16,9 @@ public class MCRImportParentMapper extends MCRImportAbstractMapper {
         super.map(importObject, record, map);
         MCRImportLinkIDResolver linkIdResolver = new MCRImportLinkIDResolver();
 
-        if(linkIdResolver != null) {
-            Element parentElement = new Element("parent");
-            if(linkIdResolver.resolve(map, parseFields(), parentElement))
+        if (linkIdResolver != null) {
+            Element parentElement = new Element("derobject");
+            if (linkIdResolver.resolve(map, parseFields(), parentElement))
                 importObject.setParent(parentElement);
         }
     }

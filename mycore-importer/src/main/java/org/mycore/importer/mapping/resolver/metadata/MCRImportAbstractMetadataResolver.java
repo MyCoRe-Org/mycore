@@ -25,30 +25,30 @@ public abstract class MCRImportAbstractMetadataResolver implements MCRImportMeta
     /**
      * The return element.
      */
-    protected Element metadataChild;
+    protected Element saveToElement;
 
     /*
      * (non-Javadoc)
      * @see org.mycore.importer.mapping.resolver.metadata.MCRImportMetadataResolver#resolve(org.jdom.Element, java.util.List)
      */
-    public Element resolve(Element map, List<MCRImportField> fieldList) {
+    public boolean resolve(Element map, List<MCRImportField> fieldList, Element saveToElement) {
         this.map = map;
         this.fieldResolver = new MCRImportFieldValueResolver(fieldList);
-        this.metadataChild = new Element(map.getAttributeValue("to"));
+        this.saveToElement = saveToElement;
         // attributes
         if(hasAttributes());
-            resolveAttributes(map, metadataChild);
+            resolveAttributes(map, saveToElement);
         // children
         if(hasChildren())
-            resolveChildren(map, metadataChild);
+            resolveChildren(map, saveToElement);
         // and additional stuff
         resolveAdditional();
         // text
         if(hasText())
             resolveMainText();
-        if(checkValidation())
-            return metadataChild;
-        return null;
+        if(!isValid())
+            return false;
+        return true;
     }
 
     /**
@@ -62,7 +62,7 @@ public abstract class MCRImportAbstractMetadataResolver implements MCRImportMeta
      * 
      * @return true if the metadata element is valid, otherwise false
      */
-    protected abstract boolean checkValidation();
+    protected abstract boolean isValid();
 
     /**
      * Checks if the metadata element can have text.
@@ -195,12 +195,12 @@ public abstract class MCRImportAbstractMetadataResolver implements MCRImportMeta
             }
             if(textBuffer.length() > 0) {
                 Text text = new Text(textBuffer.toString());
-                metadataChild.addContent(text);
+                saveToElement.addContent(text);
             }
             return;
         }
         // resolve by the text tag
-        resolveText(map, metadataChild);
+        resolveText(map, saveToElement);
     }
 
     /**

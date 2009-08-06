@@ -26,12 +26,13 @@ public class MCRImportObject {
     protected MCRImportDatamodel datamodel;
 
     protected Element parentElement;
-    protected List<Element> childList;
+    protected List<Element> derivateList;
     protected Hashtable<String, MCRImportMetadata> metadataTable;
 
     public MCRImportObject(MCRImportDatamodel datamodel) {
-        this.childList = new ArrayList<Element>();
+        this.derivateList = new ArrayList<Element>();
         this.metadataTable = new Hashtable<String, MCRImportMetadata>();
+        this.datamodel = datamodel;
     }
 
     public Element createXML() {
@@ -54,13 +55,14 @@ public class MCRImportObject {
         if(parentElement != null) {
             Element parentsElement = new Element("parents");
             parentsElement.setAttribute("class", "MCRMetaLinkID");
-            structureElement.addContent(parentElement);
+            parentsElement.addContent(parentElement);
+            structureElement.addContent(parentsElement);
         }
-        if(childList.size() > 0) {
-            Element childrenElement = new Element("children");
-            childrenElement.setAttribute("class", "MCRMetaLinkID");
-            for(Element childElement : childList) {
-                childrenElement.addContent(childElement);
+        if(derivateList.size() > 0) {
+            Element derivatesElement = new Element("derobjects");
+            derivatesElement.setAttribute("class", "MCRMetaLinkID");
+            for(Element derivateElement : derivateList) {
+                derivatesElement.addContent(derivateElement);
             }
         }
 
@@ -113,16 +115,16 @@ public class MCRImportObject {
         this.parentElement = parent;
     }
 
-    public List<Element> getChildList() {
-        return childList;
+    public List<Element> getDerivateList() {
+        return derivateList;
     }
 
     public Collection<MCRImportMetadata> getMetadataList() {
         return metadataTable.values();
     }
 
-    public void addChild(Element child) {
-        childList.add(child);
+    public void addDerivate(Element derivateElement) {
+        derivateList.add(derivateElement);
     }
 
     public void addMetadataChild(Element metadataChild) {

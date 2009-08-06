@@ -3,8 +3,8 @@ package org.mycore.importer.mapping.resolver.metadata;
 public class MCRImportISODataResolver extends MCRImportAbstractMetadataResolver {
 
     @Override
-    protected boolean checkValidation() {
-        String date = metadataChild.getText();
+    protected boolean isValid() {
+        String date = saveToElement.getText();
         // only year
         if(!date.contains("-")) {
             return isYearValid(date);

@@ -16,8 +16,8 @@ public class MCRImportMetadataMapper extends MCRImportAbstractMapper {
         MCRImportMetadataResolver resolver = createResolverInstance();
 
         if(resolver != null) {
-            Element metadataChild = resolver.resolve(map, fields);
-            if(metadataChild != null)
+            Element metadataChild = new Element(map.getAttributeValue("to"));
+            if(resolver.resolve(map, fields, metadataChild))
                 importObject.addMetadataChild(metadataChild);
         }
     }
