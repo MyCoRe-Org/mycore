@@ -4,12 +4,15 @@ public class MCRImportFileStatus {
 
     private String importId;
     private String mycoreId;
+    
+    private MCRImportFileType type;
 
     private String filePath;
 
-    public MCRImportFileStatus(String importId, String filePath) {
+    public MCRImportFileStatus(String importId, String filePath, MCRImportFileType type) {
         this.importId = importId;
         this.filePath = filePath;
+        this.type = type;
     }
 
     public void setMycoreId(String mycoreId) {
@@ -23,6 +26,9 @@ public class MCRImportFileStatus {
     }
     public String getMycoreId() {
         return mycoreId;
+    }
+    public MCRImportFileType getType() {
+        return type;
     }
 
     public boolean isImported() {

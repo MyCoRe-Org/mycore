@@ -20,16 +20,16 @@ import org.mycore.importer.mapping.datamodel.MCRImportDatamodel;
 public class MCRImportObject {
 
     private static final Logger LOGGER = Logger.getLogger(MCRImportObject.class);
-    
+
     protected String id;
     protected String label;
-    protected String datamodelPath;
+    protected MCRImportDatamodel datamodel;
 
     protected Element parentElement;
     protected List<Element> childList;
     protected Hashtable<String, MCRImportMetadata> metadataTable;
 
-    public MCRImportObject() {
+    public MCRImportObject(MCRImportDatamodel datamodel) {
         this.childList = new ArrayList<Element>();
         this.metadataTable = new Hashtable<String, MCRImportMetadata>();
     }
@@ -83,18 +83,18 @@ public class MCRImportObject {
         this.id = id;
     }
 
-    public void setDatamodelPath(String datamodelPath) {
-        this.datamodelPath = datamodelPath;
+    public void setDatamodel(MCRImportDatamodel datamodel) {
+        this.datamodel = datamodel;
     }
 
-    public String getDatamodelPath() {
-        return datamodelPath;
+    public MCRImportDatamodel getDatamodel() {
+        return datamodel;
     }
     
     public String getSchemaLocation() {
-        int indexOfFS = datamodelPath.lastIndexOf("/") + 1;
-        int indexOfPoint = datamodelPath.lastIndexOf(".");
-        return datamodelPath.substring(indexOfFS, indexOfPoint) + ".xsd";        
+        int indexOfFS = datamodel.getPath().lastIndexOf("/") + 1;
+        int indexOfPoint = datamodel.getPath().lastIndexOf(".");
+        return datamodel.getPath().substring(indexOfFS, indexOfPoint) + ".xsd";        
     }
 
     public String getLabel() {
@@ -143,7 +143,6 @@ public class MCRImportObject {
     protected MCRImportMetadata createMetadata(String metadataName) {
         try {
             // receive the enclosingName, classname, heritable and notinherit from the datamodel
-            MCRImportDatamodel datamodel = MCRImportMappingManager.getInstance().getDatamodelManager().getDatamodel(datamodelPath);
             String className = datamodel.getClassname(metadataName);
             Boolean notInherit = datamodel.isNotinherit(metadataName);
             Boolean heritable = datamodel.isHeritable(metadataName);

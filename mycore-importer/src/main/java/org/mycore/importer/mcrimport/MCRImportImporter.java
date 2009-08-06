@@ -2,11 +2,12 @@ package org.mycore.importer.mcrimport;
 
 import java.io.File;
 import java.io.IOException;
-import java.text.DateFormat;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.Hashtable;
 import java.util.Iterator;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.jdom.Document;
@@ -16,10 +17,13 @@ import org.jdom.filter.Filter;
 import org.jdom.input.SAXBuilder;
 import org.mycore.common.MCRConstants;
 import org.mycore.datamodel.common.MCRActiveLinkException;
+import org.mycore.datamodel.ifs.MCRFileImportExport;
+import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.importer.MCRImportConfig;
 import org.mycore.importer.classification.MCRImportClassificationMappingManager;
+import org.mycore.importer.derivate.MCRImportDerivateFileManager;
 import org.mycore.importer.event.MCRImportStatusEvent;
 import org.mycore.importer.event.MCRImportStatusListener;
 
@@ -43,6 +47,8 @@ public class MCRImportImporter {
 
     protected MCRImportClassificationMappingManager classManager;
 
+    protected MCRImportDerivateFileManager derivateFileManager;
+
     public MCRImportImporter(File file) throws IOException, JDOMException {
         this.builder = new SAXBuilder();
         Element rootElement = getRootElement(file);
@@ -50,6 +56,8 @@ public class MCRImportImporter {
         this.config = new MCRImportConfig(rootElement);
         // create the classification manager
         this.classManager = new MCRImportClassificationMappingManager(new File(config.getSaveToPath() + "classification/"));
+        // loads the derivate file manager
+        derivateFileManager = new MCRImportDerivateFileManager(new File(config.getSaveToPath() + "derivates/"), false);
         // create the listener list
         this.listenerList = new ArrayList<MCRImportStatusListener>();
 
@@ -84,12 +92,19 @@ public class MCRImportImporter {
                     continue;
                 }
                 Element rE = doc.getRootElement();
-                if(!rE.getName().equals("mycoreobject"))
-                    continue;
-                String importId = rE.getAttributeValue("ID");
-                if(importId == null || importId.equals(""))
-                    continue;
-                idTable.put(importId, new MCRImportFileStatus(importId, file.getAbsolutePath()));
+                // mycore objects
+                if(rE.getName().equals("mycoreobject")) {
+                    String importId = rE.getAttributeValue("ID");
+                    if(importId == null || importId.equals(""))
+                        continue;
+                    idTable.put(importId, new MCRImportFileStatus(importId, file.getAbsolutePath(), MCRImportFileType.MCROBJECT));
+                } else if(config.isUseDerivates() && config.isImportToMycore() && rE.getName().equals("mycorederivate")) {
+                    // derivate objects
+                    String importId = rE.getAttributeValue("ID");
+                    if(importId == null || importId.equals(""))
+                        continue;
+                    idTable.put(importId, new MCRImportFileStatus(importId, file.getAbsolutePath(), MCRImportFileType.MCRDERIVATE));
+                }
             }
         }
     }
@@ -104,7 +119,15 @@ public class MCRImportImporter {
             if(fs.isImported())
                 continue;
             try {
-                importFile(fs.getFilePath());
+                if(fs.getType().equals(MCRImportFileType.MCROBJECT)) {
+                    String mcrId = importMCRObjectByFile(fs.getFilePath());
+                    fs.setMycoreId(mcrId);
+                }else if(fs.getType().equals(MCRImportFileType.MCRDERIVATE)) {
+                    String mcrId = importMCRDerivateByFile(fs.getFilePath());
+                    fs.setMycoreId(mcrId);
+                    if(config.isImportFilesToMycore())
+                        importInternalDerivateFiles(fs);
+                }
             } catch(Exception e) {
                 LOGGER.error(e);
             }
@@ -112,7 +135,7 @@ public class MCRImportImporter {
     }
 
     /**
-     * Imports a xml file to mycore by its path. All internal imports
+     * Imports a mycore object xml file to mycore by its path. All internal imports
      * ids and classifiaction mapping values (if enabled) are resolved.
      * 
      * @param filePath the path of the xml file which should be imported
@@ -120,7 +143,7 @@ public class MCRImportImporter {
      * @throws JDOMException
      * @throws MCRActiveLinkException
      */
-    protected void importFile(String filePath) throws IOException, JDOMException, MCRActiveLinkException {
+    protected String importMCRObjectByFile(String filePath) throws IOException, JDOMException, MCRActiveLinkException {
         Document doc = builder.build(filePath);
         // resolve links
         resolveLinks(doc);
@@ -132,7 +155,7 @@ public class MCRImportImporter {
         String type = doc.getRootElement().getAttributeValue("noNamespaceSchemaLocation", MCRConstants.XSI_NAMESPACE);
         if(type == null) {
             LOGGER.error("Couldnt get object type because there is no xsi:noNamespaceSchemaLocation defined for object " + doc.getBaseURI());
-            return;
+            return null;
         }
         type = type.substring(0, type.indexOf('.'));
         // create the next id
@@ -150,6 +173,29 @@ public class MCRImportImporter {
         mcrObject.createInDatastore();
 
         fireMCRObjectImported(mcrObjId.getId());
+
+        return mcrObjId.getId();
+    }
+
+    protected String importMCRDerivateByFile(String filePath) throws URISyntaxException {
+        // create the derivate
+        MCRDerivate derivate = new MCRDerivate();
+        derivate.setFromURI(new URI(filePath));
+
+        MCRObjectID mcrObjId = new MCRObjectID();
+        mcrObjId.setNextFreeId(config.getProjectName() + "_derivate");
+        derivate.setId(mcrObjId);
+        derivate.getService().addFlag("imported");
+        derivate.createInDatastore();
+        
+        return mcrObjId.getId();
+    }
+
+    protected void importInternalDerivateFiles(MCRImportFileStatus fs) {
+        List<String> pathList = derivateFileManager.getPathListOfDerivate(fs.getImportId());
+        for(String path : pathList) {
+            MCRFileImportExport.importFiles(new File(path), fs.getMycoreId());
+        }
     }
 
     /**
@@ -161,13 +207,14 @@ public class MCRImportImporter {
      * @throws JDOMException
      * @throws MCRActiveLinkException
      */
-    protected void importObject(String importId) throws IOException, JDOMException, MCRActiveLinkException {
+    protected void importObjectById(String importId) throws IOException, JDOMException, MCRActiveLinkException {
         MCRImportFileStatus fs = idTable.get(importId);
         if(fs == null) {
             LOGGER.error("there is no object with the id " + importId + " defined!");
             return;
         }
-        importFile(fs.getFilePath());
+        String mcrId = importMCRObjectByFile(fs.getFilePath());
+        fs.setMycoreId(mcrId);
     }
 
     /**
@@ -190,7 +237,7 @@ public class MCRImportImporter {
             MCRImportFileStatus fs = idTable.get(linkId);
             // if null -> the linked object is currently not imported -> do it
             if(fs.getMycoreId() == null)
-                importObject(linkId);
+                importObjectById(linkId);
             // set the new mycoreId
             if(fs.getMycoreId() != null) {
                 linkElement.setAttribute("href", fs.getMycoreId(), MCRConstants.XLINK_NAMESPACE);

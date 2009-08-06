@@ -49,6 +49,7 @@ public abstract class MCRImportAbstractMapper implements MCRImportMapper {
         String fieldsValue = map.getAttributeValue("fields");
         if(fieldsValue == null)
             return null;
+        fieldsValue = fieldsValue.replace(" ", "");
         String[] fieldArray = fieldsValue.split(",");
         for(String fieldId : fieldArray) {
             MCRImportField field = record.getFieldById(fieldId);
@@ -93,8 +94,7 @@ public abstract class MCRImportAbstractMapper implements MCRImportMapper {
     protected MCRImportMetadataResolver createResolverInstance() {       
         // get the type of the metadata element from the datamodel
         String type = null;
-        String dmPath = importObject.getDatamodelPath();
-        MCRImportDatamodel dm = MCRImportMappingManager.getInstance().getDatamodelManager().getDatamodel(dmPath);
+        MCRImportDatamodel dm = importObject.getDatamodel();
         String metadataName = map.getAttributeValue("to");
         if(metadataName == null || metadataName.equals("")) {
             LOGGER.error("No 'to'-attribute set in record " + record.getName() + " for fields " + map.getAttributeValue("fields"));
