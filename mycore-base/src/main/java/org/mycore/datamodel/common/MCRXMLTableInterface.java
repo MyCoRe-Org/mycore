@@ -96,12 +96,17 @@ public interface MCRXMLTableInterface {
      * This method returns the highest stored ID number, 
      * or 0 if no object is stored for this type and project.
      * 
+     * @param project
+     *            the project ID part of the MCRObjectID base
+     * @param type
+     *            the type ID part of the MCRObjectID base
+     * 
      * @exception MCRPersistenceException
-     *                if a persistence problem is occured
+     *                if a persistence problem is occurred
      * 
      * @return the highest stored ID number as a String
      */
-    public abstract int getHighestStoredID() throws MCRPersistenceException;
+    public abstract int getHighestStoredID(String project, String type) throws MCRPersistenceException;
 
     /**
      * This method check that the MCRObjectID exist in this store.

@@ -124,7 +124,7 @@ public class MCRObjectMetadataStoreIFS2
     { throw new MCRPersistenceException( "Exception retrieving XML of " + mcrid, ex ); }
   }
 
-  public synchronized int getHighestStoredID()
+  public synchronized int getHighestStoredID(String myproject, String mytype)
   {
     return store.getHighestStoredID();
   }

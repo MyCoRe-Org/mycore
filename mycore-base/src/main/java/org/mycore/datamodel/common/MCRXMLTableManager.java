@@ -222,12 +222,12 @@ public class MCRXMLTableManager {
      *            the type ID part of the MCRObjectID base
      * 
      * @exception MCRPersistenceException
-     *                if a persistence problem is occured
+     *                if a persistence problem is occurred
      * 
      * @return the highest stored ID number as a String
      */
-    public int getHighestStoredID(String idproject, String idtype) throws MCRPersistenceException {
-        return getXMLTable(idtype).getHighestStoredID();
+    public int getHighestStoredID(String project, String type) throws MCRPersistenceException {
+        return getXMLTable(type).getHighestStoredID(project, type);
     }
 
     /**

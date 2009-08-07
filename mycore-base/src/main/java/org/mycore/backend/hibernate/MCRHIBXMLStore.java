@@ -53,8 +53,6 @@ public class MCRHIBXMLStore implements MCRXMLTableInterface {
 
     private String type;
 
-    private String project;
-    
     /**
      * The constructor for the class MCRHIBXMLStore.
      */
@@ -89,8 +87,6 @@ public class MCRHIBXMLStore implements MCRXMLTableInterface {
         }
 
         this.type = type;
-        this.project = config.getString("MCR.SWF.Project.ID", "MyCoRe");
-        this.project = config.getString("MCR.SWF.Project.ID." + type, this.project );
     }
 
     /**
@@ -193,15 +189,20 @@ public class MCRHIBXMLStore implements MCRXMLTableInterface {
      * This method returns the highest stored ID number for a given MCRObjectID base, 
      * or 0 if no object is stored for this type and project.
      * 
+     * @param project
+     *            the project ID part of the MCRObjectID base
+     * @param type
+     *            the type ID part of the MCRObjectID base
+     * 
      * @exception MCRPersistenceException
-     *                if a persistence problem is occured
+     *                if a persistence problem is occurred
      * 
      * @return the highest stored ID number as a String
      */
-    public final synchronized int getHighestStoredID() throws MCRPersistenceException {
+    public final synchronized int getHighestStoredID(String myproject, String mytype) throws MCRPersistenceException {
 
         Session session = getSession();
-        List<?> l = session.createQuery("select max(key.id) from " + classname + " where MCRID like '" + project + "_" + type + "%'").list();
+        List<?> l = session.createQuery("select max(key.id) from " + classname + " where MCRID like '" + myproject + "_" + mytype + "%'").list();
         if (l.size() == 0 || l.get(0) == null)
             return 0;
         else {
