@@ -324,10 +324,10 @@ public class MCRStartEditorServlet extends MCRServlet {
             if (file.compareTo(max) > 0)
                 max = file;
         }
-        int maxIDinWorkflow = Integer.parseInt( max.substring( max.lastIndexOf( "_" ) + 1, max.length() - 4 ) );  
-            
+        int maxIDinWorkflow = Integer.parseInt(max.substring(max.lastIndexOf("_") + 1, max.length() - 4));
+
         MCRObjectID mcridnext = new MCRObjectID();
-        mcridnext.setNextFreeId(myproject + "_" + mytype, maxIDinWorkflow );
+        mcridnext.setNextFreeId(myproject + "_" + mytype, maxIDinWorkflow);
         return mcridnext.getId();
     }
 
@@ -760,35 +760,35 @@ public class MCRStartEditorServlet extends MCRServlet {
      *      
      * @param job   
      *            the MCRServletJob instance    
-     */     
-    public void deleteDedivate(MCRServletJob job, CommonData cd) throws IOException {   
-        if (!MCRAccessManager.checkPermission(cd.myremcrid.getId(), "writedb")) {   
-            job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + usererrorpage));      
-            return;     
-        }   
-        if (!cd.mysemcrid.isValid()) {      
-            job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + mcriderrorpage));     
-            return;     
-        }   
-    
-        StringBuffer sb = new StringBuffer();   
-        Properties params = new Properties();   
-        sb.append("request:receive/").append(cd.mysemcrid).append("?XSL.Style=editor");     
-        params.put("sourceUri", sb.toString());     
-        sb = new StringBuffer();    
-        sb.append(getBaseURL()).append("receive/").append(cd.myremcrid.getId());    
-    
-        params.put("cancelUrl", sb.toString());     
-        params.put("XSL.se_mcrid", cd.mysemcrid.getId());   
-        params.put("XSL.re_mcrid", cd.myremcrid.getId());   
-        params.put("XSL.tf_mcrid", cd.mytfmcrid.getId());   
-        params.put("type", cd.mytype);      
-        params.put("step", cd.mystep);      
-        sb = new StringBuffer();    
-        sb.append(getBaseURL()).append(pagedir).append("deleteDerivate.xml");   
-        job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(buildRedirectURL(sb.toString(), params)));   
-    }   
-    
+     */
+    public void deleteDedivate(MCRServletJob job, CommonData cd) throws IOException {
+        if (!MCRAccessManager.checkPermission(cd.myremcrid.getId(), "writedb")) {
+            job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + usererrorpage));
+            return;
+        }
+        if (!cd.mysemcrid.isValid()) {
+            job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + mcriderrorpage));
+            return;
+        }
+
+        StringBuffer sb = new StringBuffer();
+        Properties params = new Properties();
+        sb.append("request:receive/").append(cd.mysemcrid).append("?XSL.Style=editor");
+        params.put("sourceUri", sb.toString());
+        sb = new StringBuffer();
+        sb.append(getBaseURL()).append("receive/").append(cd.myremcrid.getId());
+
+        params.put("cancelUrl", sb.toString());
+        params.put("XSL.se_mcrid", cd.mysemcrid.getId());
+        params.put("XSL.re_mcrid", cd.myremcrid.getId());
+        params.put("XSL.tf_mcrid", cd.mytfmcrid.getId());
+        params.put("type", cd.mytype);
+        params.put("step", cd.mystep);
+        sb = new StringBuffer();
+        sb.append(getBaseURL()).append(pagedir).append("deleteDerivate.xml");
+        job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(buildRedirectURL(sb.toString(), params)));
+    }
+
     /**     
      * The method start the editor to modify a derivate object that is stored in    
      * the server. The method use the input parameter: <b>type</b>,<b>step</b>      
@@ -796,34 +796,34 @@ public class MCRStartEditorServlet extends MCRServlet {
      *      
      * @param job   
      *            the MCRServletJob instance    
-     */     
-    public void deleteObject(MCRServletJob job, CommonData cd) throws IOException {     
-        if (!MCRAccessManager.checkPermission(cd.myremcrid.getId(), "writedb")) {   
-            job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + usererrorpage));      
-            return;     
-        }   
-        if (!cd.mysemcrid.isValid()) {      
-            job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + mcriderrorpage));     
-            return;     
-        }   
-    
-        StringBuffer sb = new StringBuffer();   
-        Properties params = new Properties();   
-        sb.append("request:receive/").append(cd.mysemcrid).append("?XSL.Style=editor");     
-        params.put("sourceUri", sb.toString());     
-        sb = new StringBuffer();    
-        sb.append(getBaseURL()).append("receive/").append(cd.myremcrid.getId());    
-    
-        params.put("cancelUrl", sb.toString());     
-        params.put("XSL.se_mcrid", cd.mysemcrid.getId());   
-        params.put("XSL.re_mcrid", cd.myremcrid.getId());   
-        params.put("XSL.tf_mcrid", cd.mytfmcrid.getId());   
-        params.put("type", cd.mytype);      
-        params.put("step", cd.mystep);      
-        sb = new StringBuffer();    
-        sb.append(getBaseURL()).append(pagedir).append("deleteObject.xml");     
-        job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(buildRedirectURL(sb.toString(), params)));   
-    }   
+     */
+    public void deleteObject(MCRServletJob job, CommonData cd) throws IOException {
+        if (!MCRAccessManager.checkPermission(cd.myremcrid.getId(), "writedb")) {
+            job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + usererrorpage));
+            return;
+        }
+        if (!cd.mysemcrid.isValid()) {
+            job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + mcriderrorpage));
+            return;
+        }
+
+        StringBuffer sb = new StringBuffer();
+        Properties params = new Properties();
+        sb.append("request:receive/").append(cd.mysemcrid).append("?XSL.Style=editor");
+        params.put("sourceUri", sb.toString());
+        sb = new StringBuffer();
+        sb.append(getBaseURL()).append("receive/").append(cd.myremcrid.getId());
+
+        params.put("cancelUrl", sb.toString());
+        params.put("XSL.se_mcrid", cd.mysemcrid.getId());
+        params.put("XSL.re_mcrid", cd.myremcrid.getId());
+        params.put("XSL.tf_mcrid", cd.mytfmcrid.getId());
+        params.put("type", cd.mytype);
+        params.put("step", cd.mystep);
+        sb = new StringBuffer();
+        sb.append(getBaseURL()).append(pagedir).append("deleteObject.xml");
+        job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(buildRedirectURL(sb.toString(), params)));
+    }
 
     /**
      * The method start the editor to modify a metadata object that is stored in
