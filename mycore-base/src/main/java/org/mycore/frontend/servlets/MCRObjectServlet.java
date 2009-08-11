@@ -24,6 +24,8 @@
 package org.mycore.frontend.servlets;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.Hashtable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -102,8 +104,8 @@ public class MCRObjectServlet extends MCRServlet {
             } else
                 getLayoutService().doLayout(job.getRequest(), job.getResponse(), requestRemoteObject(job));
         } catch (MCRException e) {
-            generateErrorPage(job.getRequest(), job.getResponse(), HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error while retrieving MCRObject with ID: "
-                    + getObjectID(job.getRequest()), e, false);
+            generateErrorPage(job.getRequest(), job.getResponse(), HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+                    "Error while retrieving MCRObject with ID: " + getObjectID(job.getRequest()), e, false);
             return;
         }
     }
@@ -163,13 +165,15 @@ public class MCRObjectServlet extends MCRServlet {
                     // hit allocated
                     // search for next and previous object readable by user
                     for (int j = i - 1; j >= 0; j--) {
-                        if ((results.getHit(j).getHost() != MCRHit.LOCAL) || (MCRAccessManager.checkPermission(results.getHit(j).getID(), "read"))) {
+                        if ((results.getHit(j).getHost() != MCRHit.LOCAL)
+                                || (MCRAccessManager.checkPermission(results.getHit(j).getID(), "read"))) {
                             previousObject = results.getHit(j);
                             break;
                         }
                     }
                     for (int j = i + 1; j < numHits; j++) {
-                        if ((results.getHit(j).getHost() != MCRHit.LOCAL) || (MCRAccessManager.checkPermission(results.getHit(j).getID(), "read"))) {
+                        if ((results.getHit(j).getHost() != MCRHit.LOCAL)
+                                || (MCRAccessManager.checkPermission(results.getHit(j).getID(), "read"))) {
                             nextObject = results.getHit(j);
                             break;
                         }
@@ -213,14 +217,25 @@ public class MCRObjectServlet extends MCRServlet {
         if (referer != null) {
             return resolveEditorID(referer);
         }
-        referer = request.getHeader("Referer");
-        if (referer == null) {
-            return null;
-        }
+        referer = getReferer(request);
         if (-1 != referer.indexOf("MCRSearchServlet")) {
             return getEditorIDFromSearch(referer);
         }
         return getEditorIDFromObjectID(request, referer);
+    }
+
+    private String getReferer(HttpServletRequest request) {
+        String referer;
+        referer = request.getHeader("Referer");
+        if (referer == null) {
+            return null;
+        }
+        try {
+            return URLDecoder.decode(referer, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            LOGGER.warn("Unsupported encoding \"UTF-8\"?", e);
+        }
+        return referer;
     }
 
     protected static final String getEditorIDFromSearch(String referer) {
@@ -253,7 +268,8 @@ public class MCRObjectServlet extends MCRServlet {
     }
 
     protected final static String resolveEditorID(String objectID) {
-        Hashtable h = (Hashtable) MCRSessionMgr.getCurrentSession().get(EDITOR_ID_TABLE_KEY);
+        @SuppressWarnings("unchecked")
+        Hashtable<String, String> h = (Hashtable<String, String>) MCRSessionMgr.getCurrentSession().get(EDITOR_ID_TABLE_KEY);
         if (h == null) {
             return null;
         }
@@ -262,9 +278,10 @@ public class MCRObjectServlet extends MCRServlet {
     }
 
     protected final static void storeEditorID(String objectID, String editorID) {
-        Hashtable h = (Hashtable) MCRSessionMgr.getCurrentSession().get(EDITOR_ID_TABLE_KEY);
+        @SuppressWarnings("unchecked")
+        Hashtable<String, String> h = (Hashtable<String, String>) MCRSessionMgr.getCurrentSession().get(EDITOR_ID_TABLE_KEY);
         if (h == null) {
-            h = new Hashtable();
+            h = new Hashtable<String, String>();
             MCRSessionMgr.getCurrentSession().put(EDITOR_ID_TABLE_KEY, h);
         }
         LOGGER.debug("Storing editorID: " + editorID + " to MCRObjectID: " + objectID);
