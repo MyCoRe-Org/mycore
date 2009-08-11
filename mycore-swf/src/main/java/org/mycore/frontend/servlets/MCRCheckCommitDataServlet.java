@@ -23,6 +23,7 @@
 
 package org.mycore.frontend.servlets;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -107,6 +108,13 @@ public class MCRCheckCommitDataServlet extends MCRCheckDataBase {
      */
     protected boolean checkAccess(MCRObjectID ID) {
         if (MCRAccessManager.checkPermission(ID, "writedb")) {
+            return true;
+        }
+        Collection<String> col = MCRAccessManager.getPermissionsForID(ID.getId());
+        if (col == null || col.size() == 0) {
+            if ((!MCRAccessManager.checkPermission("create-" + ID.getBase())) && (!MCRAccessManager.checkPermission("create-" + ID.getTypeId()))) {
+                return false;
+            }
             return true;
         }
         return false;
