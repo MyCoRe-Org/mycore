@@ -513,35 +513,35 @@ public class MCRSimpleWorkflowManager {
         Set<File> workdirs = new HashSet<File>();
         workdirs.add(getDirectoryPath(ID.getBase()));
         Properties propsWD = config.getProperties("MCR.SWF.Directory.");
-        for(Object key: propsWD.keySet()){
-        	File dir = new File(propsWD.getProperty((String)key));
-        	 if (!dir.exists()) {
-                 dir.mkdirs();
-             }
-        	 workdirs.add(dir);
+        for (Object key : propsWD.keySet()) {
+            File dir = new File(propsWD.getProperty((String) key));
+            if (!dir.exists()) {
+                dir.mkdirs();
+            }
+            workdirs.add(dir);
         }
-        
+
         FilenameFilter derivateFilenameFilter = new FilenameFilter() {
-    		public boolean accept(File dir, String name) {
-    			return name.startsWith(myproject) && name.endsWith(".xml");
-    		}
+            public boolean accept(File dir, String name) {
+                return name.startsWith(myproject) && name.endsWith(".xml");
+            }
         };
-        
+
         String max = myproject + "_0.xml";
-        for(File workdir: workdirs){
-        	for (String file : workdir.list(derivateFilenameFilter)){
-        		if (file.compareTo(max) > 0){
-        			max = file;
-        		}
-        	}
-        }        
-        int maxIDinWorkflow = Integer.parseInt( max.substring( max.lastIndexOf( "_" ) + 1 ), max.length() - 4 );  
+        for (File workdir : workdirs) {
+            for (String file : workdir.list(derivateFilenameFilter)) {
+                if (file.compareTo(max) > 0) {
+                    max = file;
+                }
+            }
+        }
+        int maxIDinWorkflow = Integer.parseInt(max.substring(max.lastIndexOf("_") + 1, max.length() - 4));
 
         MCRObjectID mcridnext = new MCRObjectID();
-        mcridnext.setNextFreeId(myproject, maxIDinWorkflow );
-        return mcridnext;    
+        mcridnext.setNextFreeId(myproject, maxIDinWorkflow);
+        return mcridnext;
     }
-    
+
     /**
      * The method create a new MCRDerivate and store them to the directory of
      * the workflow that correspons with the type of the given object
