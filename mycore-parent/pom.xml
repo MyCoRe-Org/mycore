@@ -1,6 +1,5 @@
 <?xml version="1.0"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.mycore</groupId>
   <artifactId>mycore-parent</artifactId>
@@ -162,6 +161,9 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-pmd-plugin</artifactId>
+        <configuration>
+          <targetJdk>${java.target.version}</targetJdk>
+        </configuration>
       </plugin>
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
@@ -239,10 +241,29 @@
         <optional>false</optional>
       </dependency>
       <dependency>
+        <groupId>jaxen</groupId>
+        <artifactId>jaxen</artifactId>
+        <version>1.1.1</version>
+        <scope>runtime</scope>
+        <exclusions>
+          <exclusion>
+            <groupId>jdom</groupId>
+            <artifactId>jdom</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
         <groupId>commons-vfs</groupId>
         <artifactId>commons-vfs</artifactId>
         <version>1.0</version>
         <optional>false</optional>
+      </dependency>
+      <dependency>
+        <!-- required for commons-vfs -->
+        <groupId>com.jcraft</groupId>
+        <artifactId>jsch</artifactId>
+        <version>0.1.41</version>
+        <scope>runtime</scope>
       </dependency>
       <dependency>
         <groupId>org.hibernate</groupId>
@@ -481,6 +502,42 @@
         <version>3.11.0.GA</version>
         <scope>runtime</scope>
         <optional>false</optional>
+      </dependency>
+      <dependency>
+        <groupId>ant-contrib</groupId>
+        <artifactId>ant-contrib</artifactId>
+        <version>1.0b3</version>
+        <optional>true</optional>
+        <exclusions>
+          <exclusion>
+            <groupId>ant</groupId>
+            <artifactId>ant</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>commons-discovery</groupId>
+        <artifactId>commons-discovery</artifactId>
+        <version>0.4</version>
+        <scope>runtime</scope>
+      </dependency>
+      <dependency>
+        <groupId>wsdl4j</groupId>
+        <artifactId>wsdl4j</artifactId>
+        <version>1.6.2</version>
+        <scope>runtime</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.axis</groupId>
+        <artifactId>axis-saaj</artifactId>
+        <version>1.4</version>
+        <scope>runtime</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.axis</groupId>
+        <artifactId>axis-ant</artifactId>
+        <scope>runtime</scope>
+        <version>1.4</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
