@@ -135,7 +135,7 @@ public class MCRClassificationEditor {
             }
         } catch (Exception e1) {
             e1.printStackTrace();
-            LOGGER.error("Classification creation fails. Reason is:" + e1.getMessage());
+            LOGGER.error("Classification creation fails.", e1);
             return false;
         }
 
@@ -185,8 +185,7 @@ public class MCRClassificationEditor {
 
             return true;
         } catch (Exception e1) {
-            LOGGER.error("Category modify fails. Reason is:");
-            e1.printStackTrace();
+            LOGGER.error("Category modify fails.", e1);
             return false;
         }
     }
@@ -228,7 +227,7 @@ public class MCRClassificationEditor {
                 return false;
             }
         } catch (Exception e1) {
-            LOGGER.error("Classification import fails. Reason is:" + e1.getMessage());
+            LOGGER.error("Classification import fails.", e1);
             return false;
         }
 
@@ -277,7 +276,7 @@ public class MCRClassificationEditor {
             List<Element> tagList = clroot.getChildren("label");
             for (Element element : tagList) {
                 Element newE = new Element("label");
-                newE.setAttribute("lang", element.getAttributeValue("lang"), XML_NAMESPACE);
+                newE.setAttribute("lang", element.getAttributeValue("lang", XML_NAMESPACE), XML_NAMESPACE);
                 newE.setAttribute("text", element.getAttributeValue("text"));
                 if (element.getAttributeValue("description") != null) {
                     newE.setAttribute("description", element.getAttributeValue("description"));
@@ -294,7 +293,7 @@ public class MCRClassificationEditor {
             return true;
 
         } catch (Exception e1) {
-            LOGGER.error("Classification creation fails. Reason is:" + e1.getMessage());
+            LOGGER.error("Classification creation fails.", e1);
             return false;
         }
     }
@@ -319,7 +318,7 @@ public class MCRClassificationEditor {
             List<Element> tagList = clroot.getChildren("label");
             for (Element element : tagList) {
                 MCRLabel label = new MCRLabel();
-                label.setLang(element.getAttributeValue("lang"));
+                label.setLang(element.getAttributeValue("lang", XML_NAMESPACE));
                 label.setText(element.getAttributeValue("text"));
                 label.setDescription(element.getAttributeValue("description"));
                 classif.getLabels().add(label);
@@ -330,7 +329,7 @@ public class MCRClassificationEditor {
             MCRClassificationBrowserData.ClassUserTable.put(classif.getId().getRootID(), sessionID);
             return true;
         } catch (Exception e1) {
-            LOGGER.error("Classification modify fails. Reason is:" + e1.getMessage());
+            LOGGER.error("Classification modify fails.", e1);
             return false;
         }
     }
@@ -376,7 +375,7 @@ public class MCRClassificationEditor {
             }
             return bret;
         } catch (Exception e1) {
-            LOGGER.error("Classification modify failed - the Reason is:" + e1.getMessage(), e1);
+            LOGGER.error("Classification modify failed.", e1);
             return false;
         }
     }
@@ -487,7 +486,7 @@ public class MCRClassificationEditor {
 
             return cnt;
         } catch (Exception e1) {
-            LOGGER.error("Categorie delete failed - the Reason is:" + e1.getMessage() + " " + e1.toString());
+            LOGGER.error("Categorie delete failed.", e1);
             e1.printStackTrace();
             return 1;
         }
@@ -512,7 +511,7 @@ public class MCRClassificationEditor {
             LOGGER.debug("Classification: " + clid + " deleted.");
             return true;
         } catch (Exception e) {
-            LOGGER.error("Classification delete failed - the Reason is:" + e.getMessage() + " .");
+            LOGGER.error("Classification delete failed.", e);
             return false;
         }
     }
@@ -555,7 +554,7 @@ public class MCRClassificationEditor {
             fname = fout.getPath();
             LOGGER.info("Classification temporary stored under " + name);
         } catch (Exception allE) {
-            LOGGER.info("Error storing under " + fname + "  Error: " + allE.getMessage());
+            LOGGER.error("Error storing under " + fname, allE);
             fname = null;
         }
         return fname;
