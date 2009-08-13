@@ -250,6 +250,14 @@
             <groupId>jdom</groupId>
             <artifactId>jdom</artifactId>
           </exclusion>
+          <exclusion>
+            <groupId>xom</groupId>
+            <artifactId>xom</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>xml-apis</groupId>
+            <artifactId>xml-apis</artifactId>
+          </exclusion>
         </exclusions>
       </dependency>
       <dependency>
@@ -316,6 +324,12 @@
         <artifactId>dom4j</artifactId>
         <version>1.6.1</version>
         <optional>false</optional>
+        <exclusions>
+          <exclusion>
+            <groupId>xml-apis</groupId>
+            <artifactId>xml-apis</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
       <dependency>
         <groupId>commons-lang</groupId>
@@ -346,6 +360,12 @@
         <artifactId>xercesImpl</artifactId>
         <version>2.9.1</version>
         <optional>false</optional>
+        <exclusions>
+          <exclusion>
+            <groupId>xml-apis</groupId>
+            <artifactId>xml-apis</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
       <dependency>
         <groupId>com.ibm.icu</groupId>
@@ -370,12 +390,19 @@
         <artifactId>xalan</artifactId>
         <version>2.7.0</version>
         <optional>false</optional>
+        <exclusions>
+          <exclusion>
+            <groupId>xml-apis</groupId>
+            <artifactId>xml-apis</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
       <dependency>
         <groupId>org.apache.xerces</groupId>
         <artifactId>serializer</artifactId>
         <version>2.9.1</version>
         <optional>false</optional>
+        <scope>runtime</scope>
       </dependency>
       <dependency>
         <groupId>commons-fileupload</groupId>
@@ -424,6 +451,16 @@
         <artifactId>fop</artifactId>
         <version>0.95-1</version>
         <optional>false</optional>
+        <exclusions>
+          <exclusion>
+            <groupId>xml-apis</groupId>
+            <artifactId>xml-apis-ext</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>xml-apis</groupId>
+            <artifactId>xml-apis</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
       <dependency>
         <groupId>org.textmining</groupId>
