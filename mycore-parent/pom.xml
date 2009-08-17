@@ -1,5 +1,6 @@
 <?xml version="1.0"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.mycore</groupId>
   <artifactId>mycore-parent</artifactId>
@@ -52,6 +53,7 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <java.target.version>1.5</java.target.version>
     <uniqueVersion>false</uniqueVersion>
+    <hibernate.version>3.3.2.GA</hibernate.version>
   </properties>
   <distributionManagement>
     <!-- use the following if you're not using a snapshot version. -->
@@ -114,6 +116,14 @@
               <tag>
                 <name>hibernate.property</name>
                 <placement>X</placement>
+              </tag>
+              <tag>
+                <name>goal</name>
+                <placement>a</placement>
+              </tag>
+              <tag>
+                <name>phase</name>
+                <placement>a</placement>
               </tag>
             </tags>
             <links>
@@ -214,18 +224,30 @@
     <repository>
       <id>MyCoRe HQ</id>
       <url>http://www.mycore.de/maven2</url>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
     </repository>
     <repository>
       <id>jboss</id>
       <url>http://repository.jboss.com/maven2</url>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
     </repository>
     <repository>
       <id>dev.java.net</id>
       <url>http://download.java.net/maven/2/</url>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
     </repository>
     <repository>
       <id>internet2</id>
       <url>http://shibboleth.internet2.edu/downloads/maven2/</url>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
     </repository>
   </repositories>
   <dependencyManagement>
@@ -499,7 +521,7 @@
       <dependency>
         <groupId>org.hibernate</groupId>
         <artifactId>hibernate-core</artifactId>
-        <version>3.3.2.GA</version>
+        <version>${hibernate.version}</version>
         <optional>false</optional>
       </dependency>
       <dependency>
@@ -525,7 +547,7 @@
       <dependency>
         <groupId>org.hibernate</groupId>
         <artifactId>hibernate-jmx</artifactId>
-        <version>3.3.2.GA</version>
+        <version>${hibernate.version}</version>
         <optional>false</optional>
       </dependency>
       <dependency>
