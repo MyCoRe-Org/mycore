@@ -40,5 +40,6 @@
     <module>mycore-z3950</module>
     <module>mycore-zoomify</module>
     <module>mycore-complete</module>
+    <module>mycore-complete-plugin</module>
   </modules>
 </project>
