@@ -22,8 +22,8 @@
  */
 package org.mycore.plugins.depcollector;
 
-
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -43,13 +43,16 @@ import org.jdom.Namespace;
 import org.jdom.input.SAXBuilder;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
+import org.jdom.output.Format.TextMode;
 
 /**
  * Goal which adds dependencies of embedded artifacts.
+ * 
+ * ${basedir}/pom.xml is updated if dependencies has changed.
  *
  * @goal add-dependencies
  * 
- * @phase process-sources
+ * @phase process-classes
  * @author Thomas Scheffler (yagee)
  */
 public class MCRDependencyCollector extends AbstractMojo {
@@ -59,12 +62,14 @@ public class MCRDependencyCollector extends AbstractMojo {
      * @required
      */
     private File baseDir;
+
     /**
      * included pom file directory.
      * @parameter expression="${project.build.outputDirectory}/META-INF/maven"
      * @required
      */
     private File pomBaseDirectory;
+
     private static final SAXBuilder SAX_BUILDER = new SAXBuilder(false);
 
     private static final Namespace POM_NS = Namespace.getNamespace("", "http://maven.apache.org/POM/4.0.0");
@@ -81,18 +86,31 @@ public class MCRDependencyCollector extends AbstractMojo {
             for (File pomFile : pomFiles) {
                 dependencies.putAll(getDependencies(pomFile));
             }
-            List<Content> dependencyList=new ArrayList<Content>();
+            List<Content> dependencyList = new ArrayList<Content>();
             String abstractName = mainPom.getParentFile().getName() + "/pom.xml";
             dependencyList.add(new Comment("BEGIN of generated dependencies of " + abstractName));
-            XMLOutputter xout = new XMLOutputter(Format.getPrettyFormat());
+            Format outputFormat = Format.getPrettyFormat();
+            outputFormat.setTextMode(TextMode.TRIM_FULL_WHITE);
+            XMLOutputter xout = new XMLOutputter(outputFormat);
             for (Map.Entry<Artifact, Element> artifact : dependencies.entrySet()) {
                 dependencyList.add(artifact.getValue().detach());
             }
             dependencyList.add(new Comment("END of generated dependencies of " + abstractName));
-            Document newPom = removeGeneratedDependencies(mainPom);
-            Element newDependencies = newPom.getRootElement().getChild("dependencies", POM_NS);
+            Document pomDoc = SAX_BUILDER.build(mainPom);
+            Map<Artifact, Element> oldDependencies = removeGeneratedDependencies(pomDoc);
+            Element newDependencies = pomDoc.getRootElement().getChild("dependencies", POM_NS);
             newDependencies.addContent(dependencyList);
-            xout.output(newPom, System.out);
+            if (!isEqual(oldDependencies, dependencies)) {
+                getLog().info("Generating new " + mainPom);
+                FileOutputStream fout = new FileOutputStream(mainPom);
+                try {
+                    xout.output(pomDoc, fout);
+                } finally {
+                    fout.close();
+                }
+            } else {
+                getLog().info("Dependencies are not changed.");
+            }
         } catch (Exception e) {
             throw new MojoExecutionException("Could not collect dependencies.", e);
         }
@@ -124,37 +142,44 @@ public class MCRDependencyCollector extends AbstractMojo {
             @SuppressWarnings("unchecked")
             List<Element> dependenciesList = dependenciesElement.getChildren("dependency", POM_NS);
             for (Element dependency : dependenciesList) {
-                String groupId = dependency.getChildText("groupId", POM_NS);
-                if (groupId.equals(EXCLUDE_GROUPID))
+                Artifact artifact = getArtifact(dependency);
+                if (artifact.getGroupId().equals(EXCLUDE_GROUPID))
                     continue;
-                String artifactId = dependency.getChildText("artifactId", POM_NS);
-                Artifact artifact = new Artifact(groupId, artifactId);
                 dependencies.put(artifact, dependency);
             }
         }
         return dependencies;
     }
 
+    private static Artifact getArtifact(Element dependency) {
+        String groupId = dependency.getChildText("groupId", POM_NS);
+        String artifactId = dependency.getChildText("artifactId", POM_NS);
+        Artifact artifact = new Artifact(groupId, artifactId);
+        return artifact;
+    }
+
     private List<File> getPomFiles(File directory) {
-        getLog().info("Looking in directory: " + directory);
+        getLog().debug("Looking in directory: " + directory);
         if (!directory.isDirectory())
             return Collections.emptyList();
         ArrayList<File> pomFiles = new ArrayList<File>();
         for (File child : directory.listFiles()) {
             if (child.isDirectory())
                 pomFiles.addAll(getPomFiles(child));
-            else if (child.getName().equals("pom.xml"))
+            else if (child.getName().equals("pom.xml")) {
+                getLog().debug("Adding dependencies of " + child);
                 pomFiles.add(child);
+            }
         }
         return pomFiles;
     }
 
-    private Document removeGeneratedDependencies(File mainPom) throws JDOMException, IOException {
-        Document pomDoc = SAX_BUILDER.build(mainPom);
+    private Map<Artifact, Element> removeGeneratedDependencies(Document pomDoc) throws JDOMException, IOException {
         Element dependenciesElement = pomDoc.getRootElement().getChild("dependencies", POM_NS);
         @SuppressWarnings("unchecked")
         Iterator<Content> contents = dependenciesElement.getContent().iterator();
         boolean removableDependency = false;
+        TreeMap<Artifact, Element> dependencies = new TreeMap<Artifact, Element>();
         while (contents.hasNext()) {
             Content content = contents.next();
             if (content instanceof Comment) {
@@ -165,9 +190,28 @@ public class MCRDependencyCollector extends AbstractMojo {
                     contents.remove();
                 }
             }
-            if (removableDependency)
+            if (removableDependency) {
                 contents.remove();
+                if (content instanceof Element) {
+                    Element dependency = (Element) content;
+                    dependencies.put(getArtifact(dependency), dependency);
+                }
+            }
         }
-        return pomDoc;
+        return dependencies;
+    }
+
+    private boolean isEqual(Map<Artifact, Element> dep1, Map<Artifact, Element> dep2) {
+        if (dep1 == dep2)
+            return true;
+        if (dep1 == null || dep2 == null)
+            return false;
+        if (dep1.size() != dep2.size())
+            return false;
+        //same size, same artifacts?
+        TreeMap<Artifact, Element> dependencies = new TreeMap<Artifact, Element>();
+        dependencies.putAll(dep1);
+        dependencies.putAll(dep2);
+        return (dependencies.size() == dep1.size());
     }
 }
