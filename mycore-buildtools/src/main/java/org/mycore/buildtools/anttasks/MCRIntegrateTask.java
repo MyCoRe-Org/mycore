@@ -103,6 +103,10 @@ public class MCRIntegrateTask extends Task {
     public void setTarget(String target) {
         this.target = target;
     }
+    
+    public void setBuildDir(String buildDir) {
+			this.buildDir = new File(getProject().getBaseDir(), buildDir);
+    }
 
     private void getMyCoReJar() throws IOException {
         if (mycoreJarFile == null) {
@@ -171,8 +175,12 @@ public class MCRIntegrateTask extends Task {
     }
 
     private File getUnpackDir() {
-        File buildDir = new File(getProject().getBaseDir(), "build");
-        return new File(buildDir, "components");
+        if (this.buildDir == null) {
+			File buildDir = new File(getProject().getBaseDir(), "build");
+			return new File(buildDir, "components");
+		} else {
+			return this.buildDir;
+		}
     }
 
     private Set<String> getExcludedComponents() {
