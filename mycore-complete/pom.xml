@@ -1,6 +1,5 @@
-<?xml version="1.0"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <parent>
     <artifactId>mycore-parent</artifactId>
     <groupId>org.mycore</groupId>
@@ -181,6 +180,18 @@
           </execution>
         </executions>
       </plugin>
+      <plugin>
+        <groupId>org.mycore.plugins</groupId>
+        <artifactId>mycore-complete-plugin</artifactId>
+        <version>${project.version}</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>add-dependencies</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
   </build>
   <dependencies>
@@ -188,7 +199,7 @@
       <groupId>ant-contrib</groupId>
       <artifactId>ant-contrib</artifactId>
     </dependency>
-    <!--BEGIN of dependencies of mycore/pom.xml-->
+    <!--BEGIN of generated dependencies of mycore-complete/pom.xml-->
     <dependency>
       <groupId>javax.activation</groupId>
       <artifactId>activation</artifactId>
@@ -371,6 +382,7 @@
       <groupId>xerces</groupId>
       <artifactId>xercesImpl</artifactId>
     </dependency>
-    <!--END of dependencies of mycore/pom.xml-->
+    <!--END of generated dependencies of mycore-complete/pom.xml-->
   </dependencies>
 </project>
+
