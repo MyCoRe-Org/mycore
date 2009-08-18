@@ -193,10 +193,22 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
     }
 
     public Map<MCRCategoryID, Boolean> hasLinks(MCRCategory category) {
+        MCRCategoryImpl rootImpl = (MCRCategoryImpl) MCRCategoryDAOFactory.getInstance().getCategory(category.getRoot().getId(), -1);
+        if (rootImpl == null) {
+            //Category does not exist, so it has no links
+            return getNoLinksMap(category);
+        }
         HashMap<MCRCategoryID, Boolean> boolMap = new HashMap<MCRCategoryID, Boolean>();
         final BitSet linkedInternalIds = getLinkedInternalIds();
-        MCRCategoryImpl rootImpl = (MCRCategoryImpl) MCRCategoryDAOFactory.getInstance().getCategory(category.getRoot().getId(), -1);
         storeHasLinkValues(boolMap, linkedInternalIds, rootImpl);
+        return boolMap;
+    }
+
+    private Map<MCRCategoryID, Boolean> getNoLinksMap(MCRCategory category) {
+        HashMap<MCRCategoryID, Boolean> boolMap = new HashMap<MCRCategoryID, Boolean>();
+        for (MCRCategoryID categID : getAllCategIDs(category)) {
+            boolMap.put(categID, false);
+        }
         return boolMap;
     }
 
