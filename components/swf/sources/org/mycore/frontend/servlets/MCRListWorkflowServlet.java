@@ -362,6 +362,7 @@ public class MCRListWorkflowServlet extends MCRServlet {
                             derderid.remove(j);
                             dermain.remove(j);
                             derlabel.remove(j);
+                            dertitle.remove(j);
                             j--;
                         }
 

@@ -28,8 +28,6 @@ import java.io.FileOutputStream;
 import java.io.FilenameFilter;
 import java.io.IOException;
 import java.lang.reflect.Method;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -135,6 +133,19 @@ public class MCRStartEditorServlet extends MCRServlet {
         protected MCRObjectID myremcrid = null; // the metadata ID (redirect)
 
         protected String extparm = null; // the extra parameter
+        
+        void debug() {
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("mystep    : "+mystep);
+                LOGGER.debug("myproject : "+myproject);
+                LOGGER.debug("mytype    : "+mytype);
+                LOGGER.debug("myfile    : "+myfile);
+                LOGGER.debug("mytfmcrid : "+mytfmcrid);
+                LOGGER.debug("mysemcrid : "+mysemcrid);
+                LOGGER.debug("myremcrid : "+myremcrid);
+                LOGGER.debug("extparm   : "+extparm);
+            }
+        }
     }
 
     /** Initialisation of the servlet */
@@ -231,7 +242,7 @@ public class MCRStartEditorServlet extends MCRServlet {
         if ((cd.myproject == null) || (cd.myproject.length() == 0)) {
             cd.myproject = getProperty(job.getRequest(), "project");
         }
-        LOGGER.info("Project = " + cd.myproject);
+        LOGGER.debug("Project = " + cd.myproject);
 
         // get the MCRObjectID from the text filed (TF)
         String mytfmcrid = getProperty(job.getRequest(), "tf_mcrid");
@@ -260,7 +271,7 @@ public class MCRStartEditorServlet extends MCRServlet {
 
         // appending parameter
         cd.extparm = getProperty(job.getRequest(), "extparm");
-        LOGGER.info("EXTPARM = " + cd.extparm);
+        LOGGER.debug("EXTPARM = " + cd.extparm);
 
         LOGGER.debug("Base URL : " + getBaseURL());
 
@@ -324,10 +335,10 @@ public class MCRStartEditorServlet extends MCRServlet {
             if (file.compareTo(max) > 0)
                 max = file;
         }
-        int maxIDinWorkflow = Integer.parseInt(max.substring(max.lastIndexOf("_") + 1, max.length() - 4));
-
+        int maxIDinWorkflow = Integer.parseInt( max.substring( max.lastIndexOf( "_" ) + 1, max.length() - 4 ) );  
+            
         MCRObjectID mcridnext = new MCRObjectID();
-        mcridnext.setNextFreeId(myproject + "_" + mytype, maxIDinWorkflow);
+        mcridnext.setNextFreeId(myproject + "_" + mytype, maxIDinWorkflow );
         return mcridnext.getId();
     }
 
@@ -753,6 +764,78 @@ public class MCRStartEditorServlet extends MCRServlet {
         job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(buildRedirectURL(sb.toString(), params)));
     }
 
+    /**      
+     * The method start the editor to modify a derivate object that is stored in    
+     * the server. The method use the input parameter: <b>type</b>,<b>step</b>      
+     * <b>se_mcrid</b> and <b>se_mcrid</b>. Access rights must be 'writedb'.    
+     *      
+     * @param job   
+     *            the MCRServletJob instance    
+     */     
+    public void deleteDedivate(MCRServletJob job, CommonData cd) throws IOException {   
+        if (!MCRAccessManager.checkPermission(cd.myremcrid.getId(), "writedb")) {   
+            job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + usererrorpage));      
+            return;     
+        }   
+        if (!cd.mysemcrid.isValid()) {      
+            job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + mcriderrorpage));     
+            return;     
+        }   
+    
+        StringBuffer sb = new StringBuffer();   
+        Properties params = new Properties();   
+        sb.append("request:receive/").append(cd.mysemcrid).append("?XSL.Style=editor");     
+        params.put("sourceUri", sb.toString());     
+        sb = new StringBuffer();    
+        sb.append(getBaseURL()).append("receive/").append(cd.myremcrid.getId());    
+    
+        params.put("cancelUrl", sb.toString());     
+        params.put("XSL.se_mcrid", cd.mysemcrid.getId());   
+        params.put("XSL.re_mcrid", cd.myremcrid.getId());   
+        params.put("XSL.tf_mcrid", cd.mytfmcrid.getId());   
+        params.put("type", cd.mytype);      
+        params.put("step", cd.mystep);      
+        sb = new StringBuffer();    
+        sb.append(getBaseURL()).append(pagedir).append("deleteDerivate.xml");   
+        job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(buildRedirectURL(sb.toString(), params)));   
+    }   
+    
+    /**     
+     * The method start the editor to modify a derivate object that is stored in    
+     * the server. The method use the input parameter: <b>type</b>,<b>step</b>      
+     * <b>se_mcrid</b> and <b>se_mcrid</b>. Access rights must be 'writedb'.    
+     *      
+     * @param job   
+     *            the MCRServletJob instance    
+     */     
+    public void deleteObject(MCRServletJob job, CommonData cd) throws IOException {     
+        if (!MCRAccessManager.checkPermission(cd.myremcrid.getId(), "writedb")) {   
+            job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + usererrorpage));      
+            return;     
+        }   
+        if (!cd.mysemcrid.isValid()) {      
+            job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + mcriderrorpage));     
+            return;     
+        }   
+    
+        StringBuffer sb = new StringBuffer();   
+        Properties params = new Properties();   
+        sb.append("request:receive/").append(cd.mysemcrid).append("?XSL.Style=editor");     
+        params.put("sourceUri", sb.toString());     
+        sb = new StringBuffer();    
+        sb.append(getBaseURL()).append("receive/").append(cd.myremcrid.getId());    
+    
+        params.put("cancelUrl", sb.toString());     
+        params.put("XSL.se_mcrid", cd.mysemcrid.getId());   
+        params.put("XSL.re_mcrid", cd.myremcrid.getId());   
+        params.put("XSL.tf_mcrid", cd.mytfmcrid.getId());   
+        params.put("type", cd.mytype);      
+        params.put("step", cd.mystep);      
+        sb = new StringBuffer();    
+        sb.append(getBaseURL()).append(pagedir).append("deleteObject.xml");     
+        job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(buildRedirectURL(sb.toString(), params)));   
+    }   
+
     /**
      * The method start the editor to modify a metadata object that is stored in
      * the server. The method use the input parameter: <b>type</b>,<b>step</b>
@@ -847,18 +930,15 @@ public class MCRStartEditorServlet extends MCRServlet {
      *            the MCRServletJob instance
      */
     public void waddfile(MCRServletJob job, CommonData cd) throws IOException {
-        if (!MCRAccessManager.checkPermission("create-" + cd.myremcrid.getTypeId())) {
-            job.getResponse().sendRedirect(getBaseURL() + usererrorpage);
+        org.jdom.Element rule = WFM.getRuleFromFile(cd.myremcrid, "writewf");
+        if (rule != null && !AI.checkPermission(rule)) {
+            job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + usererrorpage));
             return;
         }
-
-        StringBuffer sb = new StringBuffer(pagedir);
-        sb.append("editor_").append(cd.myremcrid.getTypeId()).append("_editor.xml");
-
-        String fuhid = new MCRSWFUploadHandlerMyCoRe(cd.myremcrid.getId(), cd.mysemcrid.getId(), "new", getBaseURL() + sb.toString())
+        String wfurl = WFM.getWorkflowFile(pagedir, cd.myremcrid.getBase());
+        String fuhid = new MCRSWFUploadHandlerMyCoRe(cd.myremcrid.getId(), cd.mysemcrid.getId(), "new", getBaseURL() + wfurl)
                 .getID();
         cd.myfile = pagedir + "fileupload_new.xml";
-
         String base = getBaseURL() + cd.myfile;
         Properties params = new Properties();
         params.put("XSL.UploadID", fuhid);
@@ -956,9 +1036,7 @@ public class MCRStartEditorServlet extends MCRServlet {
             return;
         }
 
-        StringBuffer sb = new StringBuffer(pagedir);
-        sb.append("editor_").append(cd.myremcrid.getTypeId()).append("_editor.xml");
-
+        String wfurl = WFM.getWorkflowFile(pagedir, cd.myremcrid.getBase());
         WFM.deleteDerivateObject(cd.myremcrid, cd.mysemcrid);
 
         List<String> addr = WFM.getMailAddress(cd.myproject + "_" + cd.mytype, "wdelder");
@@ -980,7 +1058,7 @@ public class MCRStartEditorServlet extends MCRServlet {
                 LOGGER.error("Can't send a mail to " + addr);
             }
         }
-        job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + sb.toString()));
+        job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + wfurl));
     }
 
     /**
@@ -1035,9 +1113,8 @@ public class MCRStartEditorServlet extends MCRServlet {
             }
         }
 
-        StringBuffer sb = new StringBuffer();
-        sb.append(getBaseURL()).append(pagedir).append("editor_").append(cd.myremcrid.getTypeId()).append("_editor.xml");
-        job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(sb.toString()));
+        String wfurl = WFM.getWorkflowFile(pagedir, cd.myremcrid.getBase());
+        job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + wfurl));
     }
 
     /**
@@ -1059,7 +1136,7 @@ public class MCRStartEditorServlet extends MCRServlet {
             return;
         }
 
-        String wfurl = getWorkflowFile(pagedir, cd);
+        String wfurl = WFM.getWorkflowFile(pagedir, cd.mysemcrid.getBase());
 
         WFM.deleteMetadataObject(cd.mysemcrid);
 
@@ -1086,6 +1163,7 @@ public class MCRStartEditorServlet extends MCRServlet {
         job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + wfurl));
     }
 
+    /**
     private final String getWorkflowFile(String pagedir, CommonData cd) {
         StringBuffer sb = new StringBuffer();
         sb.append(pagedir).append("editor_").append(cd.myproject).append('_').append(cd.mytype).append("_editor.xml");
@@ -1113,6 +1191,7 @@ public class MCRStartEditorServlet extends MCRServlet {
 
         return sb.toString();
     }
+    */
 
     /**
      * The method start the editor to modify the metadata object ACL that is
@@ -1265,18 +1344,19 @@ public class MCRStartEditorServlet extends MCRServlet {
     /**
      * The method build a new derivate and start the file upload to add to the
      * metadata object that is stored in the workflow. The method use the input
-     * parameter: <b>type</b>, <b>step</b>, <b>re_mcrid</b> and <b>se_mcrid</b>.
-     * Access rights must be 'create-'type.
+     * parameter: <b>type</b>, <b>step</b> and <b>se_mcrid</b>.
+     * Access rights must be 'writewf' in the metadata object.
      * 
      * @param job
      *            the MCRServletJob instance
      */
     public void wnewder(MCRServletJob job, CommonData cd) throws IOException {
-        if (!MCRAccessManager.checkPermission("create-" + cd.mytype)) {
+        org.jdom.Element rule = WFM.getRuleFromFile(cd.mysemcrid, "writewf");
+        MCRUtils.writeElementToSysout(rule);
+        if (rule != null && !AI.checkPermission(rule)) {
             job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + usererrorpage));
             return;
         }
-
         cd.myremcrid = cd.mysemcrid;
         cd.mysemcrid = WFM.getNextDrivateID(cd.myremcrid);
         waddfile(job, cd);
@@ -1351,30 +1431,25 @@ public class MCRStartEditorServlet extends MCRServlet {
             return;
         }
 
-        File impex = new File(WFM.getDirectoryPath(cd.myproject + "_" + cd.mytype), cd.mysemcrid + ".xml");
-
-        MCRDerivate der = new MCRDerivate();
-        der.setFromURI(impex.toURI());
-
         if (cd.extparm.startsWith("####main####")) {
+            File impex = new File(WFM.getDirectoryPath(cd.myproject + "_" + cd.mytype), cd.mysemcrid + ".xml");
+            MCRDerivate der = new MCRDerivate();
+            der.setFromURI(impex.toURI());
             der.getDerivate().getInternals().setMainDoc(cd.extparm.substring(cd.mysemcrid.getId().length() + 1 + 12, cd.extparm.length()));
+            byte[] outxml = MCRUtils.getByteArray(der.createXML());
+            FileOutputStream out = new FileOutputStream(impex);
+            try {
+                out.write(outxml);
+                out.flush();
+            } catch (IOException ex) {
+                LOGGER.error("Exception while store to file " + impex);
+            } finally {
+                out.close();
+            }
         }
-
-        byte[] outxml = MCRUtils.getByteArray(der.createXML());
-
-        FileOutputStream out = new FileOutputStream(impex);
-        try {
-            out.write(outxml);
-            out.flush();
-        } catch (IOException ex) {
-            LOGGER.error("Exception while store to file " + impex);
-        } finally {
-            out.close();
-        }
-
-        StringBuilder sb = new StringBuilder();
-        sb.append(pagedir).append("editor_").append(cd.myremcrid.getTypeId()).append("_editor.xml");
-        job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + sb.toString()));
+        
+        String wfurl = WFM.getWorkflowFile(pagedir, cd.myremcrid.getBase());
+        job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + wfurl));
     }
 
     /**
