@@ -24,8 +24,6 @@
 // package
 package org.mycore.frontend.workflow;
 
-import static org.mycore.common.MCRConstants.XLINK_NAMESPACE;
-
 import java.io.File;
 import java.io.FilenameFilter;
 import java.io.IOException;
@@ -41,11 +39,15 @@ import java.util.Set;
 import java.util.StringTokenizer;
 
 import org.apache.log4j.Logger;
+import org.jaxen.XPath;
+import org.jaxen.jdom.JDOMXPath;
 import org.jdom.Document;
 import org.jdom.Element;
-import org.jdom.xpath.XPath;
+
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
+
+import static org.mycore.common.MCRConstants.*;
 import org.mycore.common.MCRUtils;
 import org.mycore.common.xml.MCRXMLHelper;
 import org.mycore.datamodel.common.MCRActiveLinkException;
@@ -511,35 +513,35 @@ public class MCRSimpleWorkflowManager {
         Set<File> workdirs = new HashSet<File>();
         workdirs.add(getDirectoryPath(ID.getBase()));
         Properties propsWD = config.getProperties("MCR.SWF.Directory.");
-        for(Object key: propsWD.keySet()){
-        	File dir = new File(propsWD.getProperty((String)key));
-        	 if (!dir.exists()) {
-                 dir.mkdirs();
-             }
-        	 workdirs.add(dir);
+        for (Object key : propsWD.keySet()) {
+            File dir = new File(propsWD.getProperty((String) key));
+            if (!dir.exists()) {
+                dir.mkdirs();
+            }
+            workdirs.add(dir);
         }
-        
+
         FilenameFilter derivateFilenameFilter = new FilenameFilter() {
-    		public boolean accept(File dir, String name) {
-    			return name.startsWith(myproject) && name.endsWith(".xml");
-    		}
+            public boolean accept(File dir, String name) {
+                return name.startsWith(myproject) && name.endsWith(".xml");
+            }
         };
-        
+
         String max = myproject + "_0.xml";
-        for(File workdir: workdirs){
-        	for (String file : workdir.list(derivateFilenameFilter)){
-        		if (file.compareTo(max) > 0){
-        			max = file;
-        		}
-        	}
-        }        
-        int maxIDinWorkflow = Integer.parseInt( max.substring( max.lastIndexOf( "_" ) + 1, max.length() - 4 ) );  
+        for (File workdir : workdirs) {
+            for (String file : workdir.list(derivateFilenameFilter)) {
+                if (file.compareTo(max) > 0) {
+                    max = file;
+                }
+            }
+        }
+        int maxIDinWorkflow = Integer.parseInt(max.substring(max.lastIndexOf("_") + 1, max.length() - 4));
 
         MCRObjectID mcridnext = new MCRObjectID();
-        mcridnext.setNextFreeId(myproject, maxIDinWorkflow );
-        return mcridnext;    
+        mcridnext.setNextFreeId(myproject, maxIDinWorkflow);
+        return mcridnext;
     }
-    
+
     /**
      * The method create a new MCRDerivate and store them to the directory of
      * the workflow that correspons with the type of the given object
@@ -593,7 +595,7 @@ public class MCRSimpleWorkflowManager {
             File fi = new File(fn);
             if (fi.isFile() && fi.canRead()) {
                 Document wfDoc = MCRXMLHelper.parseURI(fi.toURI(), false);
-                XPath path = XPath.newInstance("/*/service/servacls/servacl[@permission='" + permission + "']/condition");
+                XPath path = new JDOMXPath("/*/service/servacls/servacl[@permission='" + permission + "']/condition");
                 @SuppressWarnings("unchecked")
                 List<Element> results = path.selectNodes(wfDoc);
                 if (results.size() > 0) {

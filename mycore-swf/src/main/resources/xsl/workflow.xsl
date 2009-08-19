@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <!-- ============================================== -->
-<!-- $Revision: 1.5 $ $Date: 2009/03/27 14:23:11 $ -->
+<!-- $Revision: 1.4 $ $Date: 2009/03/25 07:28:37 $ -->
 <!-- ============================================== -->
 
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xalan="http://xml.apache.org/xalan"
-  xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation">
+  xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation" xmlns:encoder="xalan://java.net.URLEncoder">
   
   <!-- ======== Parameter from MyCoRe LayoutServlet ======== -->
   <!--
@@ -23,12 +23,10 @@
     <xsl:variable name="url">
       <xsl:choose>
         <xsl:when test="@base">
-          <xsl:value-of
-            select="concat($ServletsBaseURL,'MCRListWorkflowServlet',$JSessionID,'?XSL.Style=xml&amp;base=',@base,'&amp;step=',@step)"/>
+          <xsl:value-of select="concat($ServletsBaseURL,'MCRListWorkflowServlet',$JSessionID,'?XSL.Style=xml&amp;base=',@base,'&amp;step=',@step)"/>
         </xsl:when>
         <xsl:otherwise>
-          <xsl:value-of
-            select="concat($ServletsBaseURL,'MCRListWorkflowServlet',$JSessionID,'?XSL.Style=xml&amp;type=',@type,'&amp;step=',@step)"/>
+          <xsl:value-of select="concat($ServletsBaseURL,'MCRListWorkflowServlet',$JSessionID,'?XSL.Style=xml&amp;type=',@type,'&amp;step=',@step)"/>
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
@@ -90,38 +88,34 @@
                     <xsl:if test="$type = 'document'">
                       <td width="30" valign="top" align="center">
                         <a href="{$ServletsBaseURL}MCRStartEditorServlet{$HttpSession}?se_mcrid={$obj_id}&amp;step=author&amp;todo=wnewder">
-                          <img src="{$WebApplicationBaseURL}images/workflow_deradd.gif"
-                            title="{i18n:translate('component.swf.derivate.addDerivate')}" border="0"/>
+                          <img src="{$WebApplicationBaseURL}images/workflow_deradd.gif" title="{i18n:translate('component.swf.derivate.addDerivate')}" border="0"/>
                         </a>
                       </td>
                       <td width="10"/>
                     </xsl:if>
                     <td width="30" valign="top" align="center">
                       <a href="{$ServletsBaseURL}MCRStartEditorServlet{$HttpSession}?se_mcrid={$obj_id}&amp;step=editor&amp;todo=weditobj">
-                        <img src="{$WebApplicationBaseURL}images/workflow_objedit.gif"
-                          title="{i18n:translate('component.swf.object.editObject')}" border="0"/>
+                        <img src="{$WebApplicationBaseURL}images/workflow_objedit.gif" title="{i18n:translate('component.swf.object.editObject')}" border="0"/>
                       </a>
                     </td>
                     <td width="10"/>
                     <td width="30" valign="top" align="center">
                       <a href="{$ServletsBaseURL}MCRStartEditorServlet{$HttpSession}?se_mcrid={$obj_id}&amp;step=editor&amp;todo=wcopyobj">
-                        <img src="{$WebApplicationBaseURL}images/workflow_objcopy.gif"
-                          title="{i18n:translate('component.swf.object.copyObject')}" border="0"/>
+                        <img src="{$WebApplicationBaseURL}images/workflow_objcopy.gif" title="{i18n:translate('component.swf.object.copyObject')}" border="0"/>
                       </a>
                     </td>
                     <td width="10"/>
                     <td width="30" valign="top" align="center">
                       <a href="{$ServletsBaseURL}MCRStartEditorServlet{$HttpSession}?se_mcrid={$obj_id}&amp;step=editor&amp;todo=weditacl">
-                        <img src="{$WebApplicationBaseURL}images/workflow_acledit.gif"
-                          title="{i18n:translate('component.swf.object.editACL')}" border="0"/>
+                        <img src="{$WebApplicationBaseURL}images/workflow_acledit.gif" title="{i18n:translate('component.swf.object.editACL')}" border="0"/>
                       </a>
                     </td>
                     <td width="10"/>
                     <td width="30" valign="top" align="center">
                       <xsl:if test="$obj_writedb = 'true'">
                         <a href="{$ServletsBaseURL}MCRStartEditorServlet{$HttpSession}?se_mcrid={$obj_id}&amp;step=editor&amp;todo=wcommit">
-                          <img src="{$WebApplicationBaseURL}images/workflow_objcommit.gif"
-                            title="{i18n:translate('component.swf.object.commitObject')}" border="0"/>
+                          <img src="{$WebApplicationBaseURL}images/workflow_objcommit.gif" title="{i18n:translate('component.swf.object.commitObject')}"
+                            border="0"/>
                         </a>
                       </xsl:if>
                     </td>
@@ -129,8 +123,7 @@
                     <td width="30" valign="top" align="center">
                       <xsl:if test="$obj_deletewf = 'true'">
                         <a href="{$ServletsBaseURL}MCRStartEditorServlet{$HttpSession}?se_mcrid={$obj_id}&amp;step=editor&amp;todo=wdelobj">
-                          <img src="{$WebApplicationBaseURL}images/workflow_objdelete.gif"
-                            title="{i18n:translate('component.swf.object.delObject')}" border="0"/>
+                          <img src="{$WebApplicationBaseURL}images/workflow_objdelete.gif" title="{i18n:translate('component.swf.object.delObject')}" border="0"/>
                         </a>
                       </xsl:if>
                     </td>
@@ -155,27 +148,23 @@
                       </td>
                       <td width="10"/>
                       <td valign="top" width="30">
-                        <a
-                          href="{$ServletsBaseURL}MCRStartEditorServlet{$HttpSession}?se_mcrid={$obj_id}&amp;re_mcrid={$re_id}&amp;step=editor&amp;todo=waddfile">
-                          <img src="{$WebApplicationBaseURL}images/workflow_deradd.gif"
-                            title="{i18n:translate('component.swf.derivate.addFile')}" border="0"/>
+                        <a href="{$ServletsBaseURL}MCRStartEditorServlet{$HttpSession}?se_mcrid={@ID}&amp;re_mcrid={$obj_id}&amp;step=editor&amp;todo=waddfile">
+                          <img src="{$WebApplicationBaseURL}images/workflow_deradd.gif" title="{i18n:translate('component.swf.derivate.addFile')}" border="0"/>
                         </a>
                       </td>
                       <td width="10"/>
                       <td valign="top" width="30">
-                        <a
-                          href="{$ServletsBaseURL}MCRStartEditorServlet{$HttpSession}?se_mcrid={$obj_id}&amp;re_mcrid={$re_id}&amp;step=editor&amp;todo=weditder">
-                          <img src="{$WebApplicationBaseURL}images/workflow_deredit.gif"
-                            title="{i18n:translate('component.swf.derivate.editDerivate')}" border="0"/>
+                        <a href="{$ServletsBaseURL}MCRStartEditorServlet{$HttpSession}?se_mcrid={@ID}&amp;re_mcrid={$obj_id}&amp;step=editor&amp;todo=weditder">
+                          <img src="{$WebApplicationBaseURL}images/workflow_deredit.gif" title="{i18n:translate('component.swf.derivate.editDerivate')}"
+                            border="0"/>
                         </a>
                       </td>
                       <td width="10"/>
                       <td valign="top" width="30">
                         <xsl:if test="$obj_deletewf = 'true'">
-                          <a
-                            href="{$ServletsBaseURL}MCRStartEditorServlet{$HttpSession}?se_mcrid={$obj_id}&amp;re_mcrid={$re_id}&amp;step=editor&amp;todo=wdelder">
-                            <img src="{$WebApplicationBaseURL}images/workflow_derdelete.gif"
-                              title="{i18n:translate('component.swf.derivate.delDerivate')}" border="0"/>
+                          <a href="{$ServletsBaseURL}MCRStartEditorServlet{$HttpSession}?se_mcrid={@ID}&amp;re_mcrid={$obj_id}&amp;step=editor&amp;todo=wdelder">
+                            <img src="{$WebApplicationBaseURL}images/workflow_derdelete.gif" title="{i18n:translate('component.swf.derivate.delDerivate')}"
+                              border="0"/>
                           </a>
                         </xsl:if>
                       </td>
@@ -199,12 +188,12 @@
                                 </xsl:when>
                                 <xsl:otherwise>
                                   <xsl:variable name="extparm">
-                                    <xsl:value-of select="concat('####main####',.)"/>
+                                    <xsl:value-of select="encoder:encode( string(concat('####main####',.)))"/>
                                   </xsl:variable>
                                   <a
-                                    href="{$ServletsBaseURL}MCRStartEditorServlet{$HttpSession}?se_mcrid={$obj_id}&amp;re_mcrid={$re_id}&amp;step=editor&amp;todo=wsetfile&amp;extparm={$extparm}">
-                                    <img src="{$WebApplicationBaseURL}images/button_light.gif"
-                                      title="{i18n:translate('component.swf.derivate.setFile')}" border="0"/>
+                                    href="{$ServletsBaseURL}MCRStartEditorServlet{$HttpSession}?se_mcrid={../@ID}&amp;re_mcrid={$obj_id}&amp;step=editor&amp;todo=wsetfile&amp;extparm={$extparm}">
+                                    <img src="{$WebApplicationBaseURL}images/button_light.gif" title="{i18n:translate('component.swf.derivate.setFile')}"
+                                      border="0"/>
                                   </a>
                                 </xsl:otherwise>
                               </xsl:choose>
@@ -231,12 +220,12 @@
                               <xsl:if test="count(../file) != 1">
                                 <xsl:variable name="extparm">
                                   <xsl:value-of
-                                    select="concat('####nrall####',count(../file),'####nrthe####',position(),'####filename####',.)"/>
+                                    select="encoder:encode( string(concat('####nrall####',count(../file),'####nrthe####',position(),'####filename####',.)))"/>
                                 </xsl:variable>
                                 <a
-                                  href="{$ServletsBaseURL}MCRStartEditorServlet{$HttpSession}?se_mcrid={$obj_id}&amp;re_mcrid={$re_id}&amp;step=editor&amp;todo=wdelfile&amp;extparm={$extparm}">
-                                  <img src="{$WebApplicationBaseURL}images/button_delete.gif"
-                                    title="{i18n:translate('component.swf.derivate.delFile')}" border="0"/>
+                                  href="{$ServletsBaseURL}MCRStartEditorServlet{$HttpSession}?se_mcrid={../@ID}&amp;re_mcrid={$obj_id}&amp;step=editor&amp;todo=wdelfile&amp;extparm={$extparm}">
+                                  <img src="{$WebApplicationBaseURL}images/button_delete.gif" title="{i18n:translate('component.swf.derivate.delFile')}"
+                                    border="0"/>
                                 </a>
                               </xsl:if>
                             </td>
