@@ -1,6 +1,7 @@
 
 Version 2.1 (actual head tree)
 ==============================
+- Allow multiple format patterns when validating date/time values in editor forms, e.g. german and english date syntax
 - Removed JDOM implementation of metadata store and searcher, was for testing only
 - Use IFS2 to store MCRObject and MCRDerivate XML metadata, including integrated versioning via SVN
 - Use more than one Applet in the Application.
