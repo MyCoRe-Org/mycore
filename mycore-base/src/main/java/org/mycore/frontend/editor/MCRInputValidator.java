@@ -371,17 +371,11 @@ public class MCRInputValidator {
 
             return (dmin <= dval) && (dmax >= dval);
         } else if (type.equals("datetime")) {
-            DateFormat df = getDateTimeFormat(format);
+            String[] formats = format.split(";");
+            DateFormat df = getDateTimeFormat(formats[0].trim());
 
             Date dmin = null;
             Date dmax = null;
-            Date dval = null;
-
-            try {
-                dval = df.parse(input);
-            } catch (ParseException ex) {
-                return false;
-            }
 
             try {
                 if (min != null) {
@@ -396,6 +390,18 @@ public class MCRInputValidator {
                 throw new MCRConfigurationException(msg, ex);
             }
 
+            Date dval = null;
+
+            for (String dtf : formats) {
+                df = getDateTimeFormat(dtf.trim());
+                try {
+                    dval = df.parse(input);
+                } catch (ParseException ignored) {
+                }
+            }
+            if (dval == null)
+                return false;
+              
             if ((dmin != null) && (dmin.after(dval))) {
                 return false;
             }
