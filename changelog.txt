@@ -1,8 +1,10 @@
 
 Version 2.1 (actual head tree)
 ==============================
-- Use more then one Apllet in the Application.
-- Integrate the siple Mets/Mods Component.
+- Removed JDOM implementation of metadata store and searcher, was for testing only
+- Use IFS2 to store MCRObject and MCRDerivate XML metadata, including integrated versioning via SVN
+- Use more than one Applet in the Application.
+- Integrate the simple Mets/Mods Component.
 - Add a Zoomify component.
 
 Version 2.0
