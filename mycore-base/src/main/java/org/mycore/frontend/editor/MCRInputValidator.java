@@ -296,8 +296,7 @@ public class MCRInputValidator {
      *            tested
      * @param format
      *            for datetime input, a java.text.SimpleDateFormat pattern; for
-     *            decimal input, a ISO-639 language code. May contain multiple
-     *            patterns separated by semi-colon, e.g. "dd.MM.yyyy;yyyy-MM-dd"
+     *            decimal input, a ISO-639 language code
      * @return true if input matches the given data type, min, max value and
      *         date time format
      */
@@ -344,12 +343,11 @@ public class MCRInputValidator {
 
             return (lmin <= lval) && (lmax >= lval);
         } else if (type.equals("decimal")) {
-            String[] formats = format.split(";");
-           
-            Locale locale = ((format == null) ? Locale.getDefault() : new Locale(formats[0].trim()));
+            Locale locale = ((format == null) ? Locale.getDefault() : new Locale(format));
             NumberFormat nf = NumberFormat.getNumberInstance(locale);
 
             double dmin = Double.MIN_VALUE;
+            double dval = 0.0;
             double dmax = Double.MAX_VALUE;
 
             try {
@@ -365,18 +363,11 @@ public class MCRInputValidator {
                 throw new MCRConfigurationException(msg, ex);
             }
 
-            double dval = 0.0;
-            boolean parsed = false;
-            for (String df : formats) {
-                nf = NumberFormat.getNumberInstance(new Locale(df.trim()));
-                try {
-                    dval = nf.parse(input).doubleValue();
-                    parsed = true;
-                } catch (ParseException ignored) {
-                }
-            }
-            if (!parsed)
+            try {
+                dval = nf.parse(input).doubleValue();
+            } catch (ParseException e) {
                 return false;
+            }
 
             return (dmin <= dval) && (dmax >= dval);
         } else if (type.equals("datetime")) {
