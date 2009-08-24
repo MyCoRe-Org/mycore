@@ -39,10 +39,9 @@ import java.util.Set;
 import java.util.StringTokenizer;
 
 import org.apache.log4j.Logger;
-import org.jaxen.XPath;
-import org.jaxen.jdom.JDOMXPath;
 import org.jdom.Document;
 import org.jdom.Element;
+import org.jdom.xpath.XPath;
 
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
@@ -595,7 +594,7 @@ public class MCRSimpleWorkflowManager {
             File fi = new File(fn);
             if (fi.isFile() && fi.canRead()) {
                 Document wfDoc = MCRXMLHelper.parseURI(fi.toURI(), false);
-                XPath path = new JDOMXPath("/*/service/servacls/servacl[@permission='" + permission + "']/condition");
+                XPath path = XPath.newInstance("/*/service/servacls/servacl[@permission='" + permission + "']/condition");
                 @SuppressWarnings("unchecked")
                 List<Element> results = path.selectNodes(wfDoc);
                 if (results.size() > 0) {
