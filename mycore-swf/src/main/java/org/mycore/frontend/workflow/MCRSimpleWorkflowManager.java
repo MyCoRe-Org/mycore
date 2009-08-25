@@ -60,6 +60,7 @@ import org.mycore.datamodel.metadata.validator.MCREditorOutValidator;
 import org.mycore.frontend.cli.MCRDerivateCommands;
 import org.mycore.frontend.cli.MCRObjectCommands;
 import org.mycore.frontend.servlets.MCRServlet;
+import org.xml.sax.SAXParseException;
 
 /**
  * This class holds methods to manage the workflow file system of MyCoRe.
@@ -438,8 +439,10 @@ public class MCRSimpleWorkflowManager {
      *            the ID of the metadata object
      * @throws MCRActiveLinkException
      *             if links to the object exist prior loading
+     * @throws SAXParseException 
+     * @throws MCRException 
      */
-    public final boolean commitMetadataObject(MCRObjectID ID) throws MCRActiveLinkException {
+    public final boolean commitMetadataObject(MCRObjectID ID) throws MCRActiveLinkException, MCRException, SAXParseException {
         // commit metadata
         String fn = getDirectoryPath(ID.getBase()) + File.separator + ID + ".xml";
 

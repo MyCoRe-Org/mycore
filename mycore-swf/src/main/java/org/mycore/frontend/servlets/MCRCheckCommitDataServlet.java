@@ -29,10 +29,12 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRConfiguration;
+import org.mycore.common.MCRException;
 import org.mycore.common.MCRMailer;
 import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.workflow.MCRSimpleWorkflowManager;
+import org.xml.sax.SAXParseException;
 
 /**
  * The servlet store the MCREditorServlet output XML in a file of a MCR type
@@ -46,6 +48,7 @@ import org.mycore.frontend.workflow.MCRSimpleWorkflowManager;
 public class MCRCheckCommitDataServlet extends MCRCheckDataBase {
 
     private static final long serialVersionUID = 1L;
+
     private static Logger LOGGER = Logger.getLogger(MCRCheckCommitDataServlet.class);
 
     /**
@@ -60,7 +63,12 @@ public class MCRCheckCommitDataServlet extends MCRCheckDataBase {
     public final String getNextURL(MCRObjectID ID, boolean okay) throws MCRActiveLinkException {
         // commit to the server
         MCRSimpleWorkflowManager wfm = MCRSimpleWorkflowManager.instance();
-        okay = wfm.commitMetadataObject(ID);
+        try {
+            okay = okay && wfm.commitMetadataObject(ID);
+        } catch (Exception e) {
+            LOGGER.error("Error while commiting metadata object " + ID, e);
+            okay = false;
+        }
 
         StringBuffer sb = new StringBuffer();
         if (okay) {
@@ -81,7 +89,7 @@ public class MCRCheckCommitDataServlet extends MCRCheckDataBase {
      *            the MCRObjectID of the MCRObject
      */
     public final void sendMail(MCRObjectID ID) {
-        List <String> addr = WFM.getMailAddress(ID.getTypeId(), "wcommit");
+        List<String> addr = WFM.getMailAddress(ID.getTypeId(), "wcommit");
 
         if (addr.size() == 0) {
             return;
@@ -91,7 +99,8 @@ public class MCRCheckCommitDataServlet extends MCRCheckDataBase {
         String appl = MCRConfiguration.instance().getString("MCR.SWF.Mail.ApplicationID", "DocPortal");
         String subject = "Automatically generated message from " + appl;
         StringBuffer text = new StringBuffer();
-        text.append("An Object with type ").append(ID.getTypeId()).append(" and ID ").append(ID.getId()).append(" was stored in the system.");
+        text.append("An Object with type ").append(ID.getTypeId()).append(" and ID ").append(ID.getId()).append(
+                " was stored in the system.");
         LOGGER.info(text.toString());
 
         try {
@@ -112,7 +121,8 @@ public class MCRCheckCommitDataServlet extends MCRCheckDataBase {
         }
         Collection<String> col = MCRAccessManager.getPermissionsForID(ID.getId());
         if (col == null || col.size() == 0) {
-            if ((!MCRAccessManager.checkPermission("create-" + ID.getBase())) && (!MCRAccessManager.checkPermission("create-" + ID.getTypeId()))) {
+            if ((!MCRAccessManager.checkPermission("create-" + ID.getBase()))
+                    && (!MCRAccessManager.checkPermission("create-" + ID.getTypeId()))) {
                 return false;
             }
             return true;

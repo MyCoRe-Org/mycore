@@ -31,12 +31,14 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRConfiguration;
+import org.mycore.common.MCRException;
 import org.mycore.common.MCRMailer;
 import org.mycore.common.MCRUtils;
 import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.datamodel.metadata.MCRObjectService;
+import org.xml.sax.SAXParseException;
 
 /**
  * The servlet store the MCREditorServlet output XML in a file of a MCR type
@@ -112,8 +114,10 @@ public class MCRCheckEditACLServlet extends MCRCheckACLBase {
      *            the MCRServletJob instance
      * @param ID
      *            the MCRObjectID
+     * @throws SAXParseException 
+     * @throws MCRException 
      */
-    public final boolean storeService(org.jdom.Element outelm, MCRServletJob job, MCRObjectID ID) {
+    public final boolean storeService(org.jdom.Element outelm, MCRServletJob job, MCRObjectID ID) throws MCRException, SAXParseException {
         File impex = new File(WFM.getDirectoryPath(ID.getBase()), ID.getId() + ".xml");
         MCRObject obj = new MCRObject();
         obj.setFromURI(impex.toURI());

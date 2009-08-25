@@ -40,6 +40,7 @@ import org.mycore.common.MCRUtils;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.editor.MCREditorSubmission;
 import org.mycore.frontend.editor.MCRRequestParameters;
+import org.xml.sax.SAXParseException;
 
 /**
  * This class is a special to work wit the interactive input from the dialog of
@@ -125,8 +126,10 @@ abstract public class MCRCheckACLBase extends MCRCheckBase {
      *            the MCRServletJob instance
      * @param ID
      *            the MCRObjectID
+     * @throws SAXParseException 
+     * @throws MCRException 
      */
-    abstract public boolean storeService(Element outelm, MCRServletJob job, MCRObjectID ID);
+    abstract public boolean storeService(Element outelm, MCRServletJob job, MCRObjectID ID) throws MCRException, SAXParseException;
 
     /**
      * The method read the incoming servacls JDOM tree in a MCRService and

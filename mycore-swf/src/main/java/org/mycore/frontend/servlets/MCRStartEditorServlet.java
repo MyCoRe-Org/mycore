@@ -63,6 +63,7 @@ import org.mycore.frontend.fileupload.MCRSWFUploadHandlerIFS;
 import org.mycore.frontend.fileupload.MCRSWFUploadHandlerMyCoRe;
 import org.mycore.frontend.workflow.MCRSimpleWorkflowManager;
 import org.mycore.services.urn.MCRURNManager;
+import org.xml.sax.SAXParseException;
 
 /**
  * The servlet start the MyCoRe editor session or other workflow actions with
@@ -960,8 +961,9 @@ public class MCRStartEditorServlet extends MCRServlet {
      * 
      * @param job
      *            the MCRServletJob instance
+     * @throws SAXParseException 
      */
-    public void wcommit(MCRServletJob job, CommonData cd) throws IOException {
+    public void wcommit(MCRServletJob job, CommonData cd) throws IOException, SAXParseException {
         org.jdom.Element rule = WFM.getRuleFromFile(cd.mysemcrid, "writedb");
         if (rule != null && !AI.checkPermission(rule)) {
             job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + usererrorpage));
@@ -1284,8 +1286,10 @@ public class MCRStartEditorServlet extends MCRServlet {
      *            the common data stack
      * @param job
      *            the MCRServletJob instance
+     * @throws SAXParseException 
+     * @throws MCRException 
      */
-    public void wcopyobj(MCRServletJob job, CommonData cd) throws IOException {
+    public void wcopyobj(MCRServletJob job, CommonData cd) throws IOException, MCRException, SAXParseException {
         org.jdom.Element rule = WFM.getRuleFromFile(cd.mysemcrid, "writewf");
         if (rule != null && !AI.checkPermission(rule)) {
             job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + usererrorpage));
