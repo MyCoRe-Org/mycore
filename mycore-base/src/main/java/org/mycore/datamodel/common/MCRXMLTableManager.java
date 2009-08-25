@@ -42,6 +42,7 @@ import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.MCRUtils;
 import org.mycore.common.xml.MCRXMLHelper;
 import org.mycore.datamodel.metadata.MCRObjectID;
+import org.xml.sax.SAXParseException;
 
 /**
  * This class manage all accesses to the XML table database. This database holds
@@ -209,7 +210,11 @@ public class MCRXMLTableManager {
      */
     public Document retrieveAsJDOM(MCRObjectID mcrid) throws MCRException {
         InputStream xml = getXMLTable(mcrid.getTypeId()).retrieve(mcrid.getId());
-        return MCRXMLHelper.getParser().parseXML(xml, false);
+        try {
+            return MCRXMLHelper.getParser().parseXML(xml, false);
+        } catch (SAXParseException e) {
+            throw new MCRException("Error while parsing " + mcrid, e);
+        }
     }
 
     /**

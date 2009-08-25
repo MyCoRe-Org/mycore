@@ -28,6 +28,7 @@ import java.net.URI;
 
 import org.jdom.Document;
 import org.mycore.common.MCRException;
+import org.xml.sax.SAXParseException;
 
 /**
  * This interface is designed to choose the XML parser. To construct a JDOM you
@@ -47,8 +48,9 @@ public interface MCRParserInterface {
      * @exception MCRException
      *                general Exception of MyCoRe
      * @return a document object (DOM)
+     * @throws SAXParseException 
      */
-    public Document parseURI(URI uri) throws MCRException;
+    public Document parseURI(URI uri) throws MCRException, SAXParseException;
 
     /**
      * Parses an XML file from a URI and returns it as DOM. Use the given
@@ -61,8 +63,9 @@ public interface MCRParserInterface {
      * @throws MCRException
      *             if XML could not be parsed
      * @return the XML file as a DOM object
+     * @throws SAXParseException 
      */
-    public Document parseURI(URI uri, boolean valid) throws MCRException;
+    public Document parseURI(URI uri, boolean valid) throws MCRException, SAXParseException;
 
     /**
      * Parses an XML String and returns it as DOM. Use the validation value from
@@ -73,8 +76,9 @@ public interface MCRParserInterface {
      * @exception MCRException
      *                general Exception of MyCoRe
      * @return a document object (DOM)
+     * @throws SAXParseException 
      */
-    public Document parseXML(String xml) throws MCRException;
+    public Document parseXML(String xml) throws MCRException, SAXParseException;
 
     /**
      * Parses an XML String and returns it as DOM. Use the given validation
@@ -87,8 +91,9 @@ public interface MCRParserInterface {
      * @throws MCRException
      *             if XML could not be parsed
      * @return the XML file as a DOM object
+     * @throws SAXParseException 
      */
-    public Document parseXML(String xml, boolean valid) throws MCRException;
+    public Document parseXML(String xml, boolean valid) throws MCRException, SAXParseException;
 
     /**
      * Parses an Byte Array and returns it as DOM. Use the validation value from
@@ -99,8 +104,9 @@ public interface MCRParserInterface {
      * @throws MCRException
      *             if XML could not be parsed
      * @return the XML file as a DOM object
+     * @throws SAXParseException 
      */
-    public Document parseXML(byte[] xml) throws MCRException;
+    public Document parseXML(byte[] xml) throws MCRException, SAXParseException;
 
     /**
      * Parses an Byte Array and returns it as DOM. Use the given validation
@@ -113,8 +119,9 @@ public interface MCRParserInterface {
      * @throws MCRException
      *             if XML could not be parsed
      * @return the XML file as a DOM object
+     * @throws SAXParseException 
      */
-    public Document parseXML(byte[] xml, boolean valid) throws MCRException;
+    public Document parseXML(byte[] xml, boolean valid) throws MCRException, SAXParseException;
 
     /**
      * Parses an Byte Array and returns it as DOM. Use the validation value from
@@ -125,8 +132,9 @@ public interface MCRParserInterface {
      * @throws MCRException
      *             if XML could not be parsed
      * @return the XML file as a DOM object
+     * @throws SAXParseException 
      */
-    public Document parseXML(InputStream input) throws MCRException;
+    public Document parseXML(InputStream input) throws MCRException, SAXParseException;
 
     /**
      * Parses an Byte Array and returns it as DOM. Use the given validation
@@ -139,6 +147,7 @@ public interface MCRParserInterface {
      * @throws MCRException
      *             if XML could not be parsed
      * @return the XML file as a DOM object
+     * @throws SAXParseException 
      */
-    public Document parseXML(InputStream input, boolean validate) throws MCRException;
+    public Document parseXML(InputStream input, boolean validate) throws MCRException, SAXParseException;
 }

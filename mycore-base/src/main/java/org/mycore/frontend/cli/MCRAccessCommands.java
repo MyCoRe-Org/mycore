@@ -41,6 +41,7 @@ import org.mycore.access.MCRAccessInterface;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRException;
 import org.mycore.common.xml.MCRXMLHelper;
+import org.xml.sax.SAXParseException;
 
 /**
  * This class provides a set of commands for the org.mycore.access management
@@ -169,10 +170,12 @@ public class MCRAccessCommands extends MCRAbstractCommands {
      * 
      * @param filename
      *            the filename of the file that contains the mcrpermissions
+     * @throws SAXParseException 
+     * @throws MCRException 
      * 
      */
     @SuppressWarnings("unchecked")
-    public static void createPermissionsFromFile(String filename) {
+    public static void createPermissionsFromFile(String filename) throws MCRException, SAXParseException {
         MCRAccessInterface AI = MCRAccessManager.getAccessImpl();
         if (!checkFilename(filename)) {
             return;
@@ -296,7 +299,7 @@ public class MCRAccessCommands extends MCRAbstractCommands {
         out.output(doc, fos);
     }
 
-    private static Element getRuleFromFile(String fileName) {
+    private static Element getRuleFromFile(String fileName) throws MCRException, SAXParseException {
         if (!checkFilename(fileName)) {
             LOGGER.warn("Wrong file format or file doesn't exist");
             return null;
@@ -322,8 +325,10 @@ public class MCRAccessCommands extends MCRAbstractCommands {
      *            String the id of the object the rule is assigned to
      * @param strFileRule
      *            String the path to the xml file, that contains the rule
+     * @throws SAXParseException 
+     * @throws MCRException 
      */
-    public static void permissionUpdateForID(String permission, String id, String strFileRule) {
+    public static void permissionUpdateForID(String permission, String id, String strFileRule) throws MCRException, SAXParseException {
         permissionUpdateForID(permission, id, strFileRule, "");
     }
 
@@ -340,8 +345,10 @@ public class MCRAccessCommands extends MCRAbstractCommands {
      * @param description
      *            String give a special description, if the semantics of your
      *            rule is multiple used
+     * @throws SAXParseException 
+     * @throws MCRException 
      */
-    public static void permissionUpdateForID(String permission, String id, String strFileRule, String description) {
+    public static void permissionUpdateForID(String permission, String id, String strFileRule, String description) throws MCRException, SAXParseException {
         MCRAccessInterface AI = MCRAccessManager.getAccessImpl();
         Element rule = getRuleFromFile(strFileRule);
         if (rule == null)
@@ -360,8 +367,10 @@ public class MCRAccessCommands extends MCRAbstractCommands {
      *            String a MCRObjectID-Type like document, disshab, etc.
      * @param strFileRule
      *            String the path to the xml file, that contains the rule
+     * @throws SAXParseException 
+     * @throws MCRException 
      */
-    public static void permissionUpdateForSelected(String permission, String strFileRule) {
+    public static void permissionUpdateForSelected(String permission, String strFileRule) throws MCRException, SAXParseException {
         permissionUpdateForSelected(permission, strFileRule, "");
     }
 
@@ -378,8 +387,10 @@ public class MCRAccessCommands extends MCRAbstractCommands {
      * @param description
      *            String give a special description, if the semantics of your
      *            rule is multiple used
+     * @throws SAXParseException 
+     * @throws MCRException 
      */
-    public static void permissionUpdateForSelected(String permission, String strFileRule, String description) {
+    public static void permissionUpdateForSelected(String permission, String strFileRule, String description) throws MCRException, SAXParseException {
         MCRAccessInterface AI = MCRAccessManager.getAccessImpl();
         Element rule = getRuleFromFile(strFileRule);
         if (rule == null)

@@ -56,13 +56,24 @@ public class MCRAccessEventHandler extends MCREventHandlerBase {
     private static String strReadRule = MCRConfiguration.instance().getString("MCR.Access.Rule.STANDARD-READ-RULE",
             "<condition format=\"xml\"><boolean operator=\"true\" /></condition>");
 
-    private static Element readrule = (Element) MCRXMLHelper.parseXML(strReadRule, false).getRootElement().detach();
+    private static Element readrule;
 
     // get the standard edit rule from config or it's the true rule
     private static String strEditRule = MCRConfiguration.instance().getString("MCR.Access.Rule.STANDARD-EDIT-RULE",
             "<condition format=\"xml\"><boolean operator=\"true\" /></condition>");
 
-    private static Element editrule = (Element) MCRXMLHelper.parseXML(strEditRule, false).getRootElement().detach();
+    private static Element editrule;
+    static {
+        try {
+            readrule = (Element) MCRXMLHelper.parseXML(strReadRule, false).getRootElement().detach();
+            editrule = (Element) MCRXMLHelper.parseXML(strEditRule, false).getRootElement().detach();
+        } catch (Exception e) {
+            if (e instanceof RuntimeException)
+                throw (RuntimeException) e;
+            else
+                throw new ExceptionInInitializerError(e);
+        }
+    }
 
     /**
      * This method will be used to create the access rules for SWF for a
@@ -256,7 +267,7 @@ public class MCRAccessEventHandler extends MCREventHandlerBase {
     private void setDefaultPermissions(String id, boolean overwrite) {
         Collection<String> savedPermissions = MCRAccessManager.getPermissionsForID(id);
         Collection<String> configuredPermissions = AI.getAccessPermissionsFromConfiguration();
-        for (String permission: configuredPermissions) {
+        for (String permission : configuredPermissions) {
             if (storedrules.indexOf(permission) != -1) {
                 if (savedPermissions != null && savedPermissions.contains(permission)) {
                     if (overwrite) {

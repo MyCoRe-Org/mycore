@@ -29,6 +29,7 @@ import java.util.List;
 
 import org.jdom.Attribute;
 import org.jdom.Comment;
+import org.jdom.Content;
 import org.jdom.DocType;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -38,6 +39,7 @@ import org.jdom.Text;
 import org.jdom.Verifier;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
+import org.xml.sax.SAXParseException;
 
 /**
  * This class provides some static utility methods to deal with XML/DOM
@@ -45,7 +47,7 @@ import org.mycore.common.MCRException;
  * There is plenty left to do.
  * 
  * @author Detlev Degenhardt
- * @author Frank Lützenkirchen
+ * @author Frank Luetzenkirchen
  * @author Thomas Scheffler (yagee)
  * @version $Revision$ $Date$
  */
@@ -71,8 +73,9 @@ public class MCRXMLHelper {
      * @throws MCRException
      *             if XML could not be parsed
      * @return the XML file as a DOM object
+     * @throws SAXParseException 
      */
-    public static Document parseURI(URI uri) throws MCRException {
+    public static Document parseURI(URI uri) throws MCRException, SAXParseException {
         return getParser().parseURI(uri);
     }
 
@@ -87,8 +90,9 @@ public class MCRXMLHelper {
      * @throws MCRException
      *             if XML could not be parsed
      * @return the XML file as a DOM object
+     * @throws SAXParseException 
      */
-    public static Document parseURI(URI uri, boolean valid) throws MCRException {
+    public static Document parseURI(URI uri, boolean valid) throws MCRException, SAXParseException {
         return getParser().parseURI(uri, valid);
     }
 
@@ -101,8 +105,9 @@ public class MCRXMLHelper {
      * @throws MCRException
      *             if XML could not be parsed
      * @return the XML file as a DOM object
+     * @throws SAXParseException 
      */
-    public static Document parseXML(String xml) throws MCRException {
+    public static Document parseXML(String xml) throws MCRException, SAXParseException {
         return getParser().parseXML(xml);
     }
 
@@ -117,8 +122,9 @@ public class MCRXMLHelper {
      * @throws MCRException
      *             if XML could not be parsed
      * @return the XML file as a DOM object
+     * @throws SAXParseException 
      */
-    public static Document parseXML(String xml, boolean valid) throws MCRException {
+    public static Document parseXML(String xml, boolean valid) throws MCRException, SAXParseException {
         return getParser().parseXML(xml, valid);
     }
 
@@ -131,8 +137,9 @@ public class MCRXMLHelper {
      * @throws MCRException
      *             if XML could not be parsed
      * @return the XML file as a DOM object
+     * @throws SAXParseException 
      */
-    public static Document parseXML(byte[] xml) throws MCRException {
+    public static Document parseXML(byte[] xml) throws MCRException, SAXParseException {
         return getParser().parseXML(xml);
     }
 
@@ -147,8 +154,9 @@ public class MCRXMLHelper {
      * @throws MCRException
      *             if XML could not be parsed
      * @return the XML file as a DOM object
+     * @throws SAXParseException 
      */
-    public static Document parseXML(byte[] xml, boolean valid) throws MCRException {
+    public static Document parseXML(byte[] xml, boolean valid) throws MCRException, SAXParseException {
         return getParser().parseXML(xml, valid);
     }
 
@@ -201,6 +209,7 @@ public class MCRXMLHelper {
             return equivalentContent(d1, d2);
         }
 
+        @SuppressWarnings("unchecked")
         public static boolean equivalent(Element e1, Element e2) {
             return equivalentName(e1, e2) && equivalentAttributes(e1, e2) && equivalentContent(e1.getDescendants(), e2.getDescendants());
         }
@@ -237,16 +246,18 @@ public class MCRXMLHelper {
         }
 
         public static boolean equivalentAttributes(Element e1, Element e2) {
-            List aList1 = e1.getAttributes();
-            List aList2 = e2.getAttributes();
+            @SuppressWarnings("unchecked")
+            List<Attribute> aList1 = e1.getAttributes();
+            @SuppressWarnings("unchecked")
+            List<Attribute> aList2 = e2.getAttributes();
             if (aList1.size() != aList2.size()) {
                 return false;
             }
-            Iterator i1 = aList1.iterator();
-            Iterator i2 = aList2.iterator();
+            Iterator<Attribute> i1 = aList1.iterator();
+            Iterator<Attribute> i2 = aList2.iterator();
             while (i1.hasNext()) {
-                Attribute a1 = (Attribute) i1.next();
-                Attribute a2 = (Attribute) i2.next();
+                Attribute a1 = i1.next();
+                Attribute a2 = i2.next();
                 if (!equivalent(a1, a2)) {
                     return false;
                 }
@@ -254,17 +265,19 @@ public class MCRXMLHelper {
             return true;
         }
 
+        @SuppressWarnings("unchecked")
         public static boolean equivalentContent(Document d1, Document d2) {
             // XXX short circuit if content size1 != content size2
             return equivalentContent(d1.getDescendants(), d2.getDescendants());
         }
 
+        @SuppressWarnings("unchecked")
         public static boolean equivalentContent(Element e1, Element e2) {
             // XXX short circuit if content size1 != content size2
             return equivalentContent(e1.getDescendants(), e2.getDescendants());
         }
 
-        public static boolean equivalentContent(Iterator i1, Iterator i2) {
+        public static boolean equivalentContent(Iterator<Content> i1, Iterator<Content> i2) {
             boolean result = true;
             while (result && i1.hasNext() && i2.hasNext()) {
                 Object o1 = i1.next();

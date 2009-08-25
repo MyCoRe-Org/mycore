@@ -42,6 +42,7 @@ import org.jdom.Document;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 
+import org.mycore.common.MCRException;
 import org.mycore.common.xml.MCRURIResolver;
 import org.mycore.common.xml.MCRXMLHelper;
 import org.mycore.datamodel.classifications2.MCRCategory;
@@ -52,6 +53,7 @@ import org.mycore.datamodel.classifications2.impl.MCRCategoryDAOImpl;
 import org.mycore.datamodel.classifications2.utils.MCRCategoryTransformer;
 import org.mycore.datamodel.classifications2.utils.MCRXMLTransformer;
 import org.mycore.datamodel.common.MCRActiveLinkException;
+import org.xml.sax.SAXParseException;
 
 /**
  * Commands for the classification system.
@@ -108,9 +110,11 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
      * @param filname
      *            file in mcrclass xml format
      * @throws URISyntaxException 
+     * @throws SAXParseException 
+     * @throws MCRException 
      * @see MCRCategoryDAO#addCategory(MCRCategoryID, MCRCategory)
      */
-    public static void loadFromFile(String filename) throws URISyntaxException {
+    public static void loadFromFile(String filename) throws URISyntaxException, MCRException, SAXParseException {
         File file = new File(filename);
         Document xml = MCRXMLHelper.parseURI(file.toURI());
         MCRCategory category = MCRXMLTransformer.getCategory(xml);
@@ -123,9 +127,11 @@ public class MCRClassification2Commands extends MCRAbstractCommands {
      * @param filename
      *            file in mcrclass xml format
      * @throws URISyntaxException 
+     * @throws SAXParseException 
+     * @throws MCRException 
      * @see MCRCategoryDAO#replaceCategory(MCRCategory)
      */
-    public static void updateFromFile(String filename) throws URISyntaxException {
+    public static void updateFromFile(String filename) throws URISyntaxException, MCRException, SAXParseException {
         File file = new File(filename);
         Document xml = MCRXMLHelper.parseURI(file.toURI());
         MCRCategory category = MCRXMLTransformer.getCategory(xml);

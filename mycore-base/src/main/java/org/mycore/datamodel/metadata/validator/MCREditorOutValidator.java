@@ -49,6 +49,7 @@ import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUtils;
+import org.mycore.common.xml.MCRParserXerces;
 import org.mycore.datamodel.metadata.MCRMetaAccessRule;
 import org.mycore.datamodel.metadata.MCRMetaAddress;
 import org.mycore.datamodel.metadata.MCRMetaBoolean;
@@ -68,6 +69,7 @@ import org.mycore.datamodel.metadata.MCRMetaPersonName;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.user.MCRUserMgr;
+import org.xml.sax.SAXParseException;
 
 /**
  * @author Thomas Scheffler (yagee)
@@ -138,15 +140,9 @@ public class MCREditorOutValidator {
 
             // return the XML tree
             input = obj.createXML();
-        } catch (MCRException e) {
-            errorlog.add(e.getMessage());
-
-            Exception ex = e.getException();
-
-            if (ex != null) {
-                errorlog.add(ex.getMessage());
-            }
-        } catch (JDOMException e) {
+        } catch (SAXParseException e) {
+            errorlog.add(MCRParserXerces.getSAXErrorMessage(e));
+        } catch (Exception e) {
             errorlog.add(e.getMessage());
         }
         return input;
@@ -311,7 +307,7 @@ public class MCREditorOutValidator {
                     datasubtag.removeContent(child);
                     i--;
                     continue;
-                }            
+                }
                 if (child.getAttribute("lang") != null) {
                     child.getAttribute("lang").setNamespace(XML_NAMESPACE);
                     LOGGER.warn("namespace add for xml:lang attribute in " + datasubtag.getName());

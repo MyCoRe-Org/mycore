@@ -38,15 +38,17 @@ import org.apache.log4j.Logger;
 import org.jdom.Document;
 
 import org.mycore.common.MCRConfiguration;
+import org.mycore.common.MCRException;
 import org.mycore.common.MCRUtils;
 import org.mycore.common.xml.MCRXMLHelper;
 import org.mycore.frontend.editor.MCREditorServlet;
+import org.xml.sax.SAXParseException;
 
 /**
  * This servlet displays static *.xml files stored in the web application by
  * sending them to MCRLayoutService.
  * 
- * @author Frank Lützenkirchen
+ * @author Frank Lï¿½tzenkirchen
  * @version $Revision$ $Date$
  */
 public class MCRStaticXMLFileServlet extends MCRServlet {
@@ -59,7 +61,7 @@ public class MCRStaticXMLFileServlet extends MCRServlet {
 
     protected final static HashMap<String, String> docTypesMap = new HashMap<String, String>();
 
-    public void doGetPost(MCRServletJob job) throws java.io.IOException {
+    public void doGetPost(MCRServletJob job) throws java.io.IOException, MCRException, SAXParseException {
         final HttpServletRequest request = job.getRequest();
         final HttpServletResponse response = job.getResponse();
         String requestedPath = request.getServletPath();
@@ -78,7 +80,7 @@ public class MCRStaticXMLFileServlet extends MCRServlet {
     }
 
     static void processFile(final HttpServletRequest request, final HttpServletResponse response, File file) throws FileNotFoundException,
-            IOException, MalformedURLException {
+            IOException, MalformedURLException, MCRException, SAXParseException {
         request.setAttribute("XSL.StaticFilePath", request.getServletPath().substring(1));
         request.setAttribute("XSL.DocumentBaseURL", file.getParent() + File.separator);
         request.setAttribute("XSL.FileName", file.getName());

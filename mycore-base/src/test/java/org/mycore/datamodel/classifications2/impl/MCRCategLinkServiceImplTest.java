@@ -22,12 +22,14 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.jdom.Document;
+import org.mycore.common.MCRException;
 import org.mycore.common.MCRHibTestCase;
 import org.mycore.common.xml.MCRXMLHelper;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.MCRObjectReference;
 import org.mycore.datamodel.classifications2.utils.MCRXMLTransformer;
+import org.xml.sax.SAXParseException;
 
 /**
  * @author Thomas Scheffler (yagee) Need to insert some things here
@@ -56,7 +58,7 @@ public class MCRCategLinkServiceImplTest extends MCRHibTestCase {
         DAO.addCategory(null, category);
         testLinks = new ArrayList<MCRCategoryLink>();
         testLinks.add(new MCRCategoryLink(germany, new MCRObjectReference("Jena", "city")));
-        testLinks.add(new MCRCategoryLink(germany, new MCRObjectReference("Thüringen", "state")));
+        testLinks.add(new MCRCategoryLink(germany, new MCRObjectReference("Thï¿½ringen", "state")));
         testLinks.add(new MCRCategoryLink(germany, new MCRObjectReference("Hessen", "state")));
         testLinks.add(new MCRCategoryLink(germany, new MCRObjectReference("Saale", "river")));
         final MCRObjectReference northSeaReference = new MCRObjectReference("North Sea", "sea");
@@ -196,7 +198,7 @@ public class MCRCategLinkServiceImplTest extends MCRHibTestCase {
         assertTrue("Category should be in use", SERVICE.hasLinks(germany).get(germany.getId()).booleanValue());
     }
 
-    private void loadWorldClassification() throws URISyntaxException {
+    private void loadWorldClassification() throws URISyntaxException, MCRException, SAXParseException {
         URL worlClassUrl = this.getClass().getResource(WORLD_CLASS_RESOURCE_NAME);
         Document xml = MCRXMLHelper.parseURI(worlClassUrl.toURI());
         category = MCRXMLTransformer.getCategory(xml);

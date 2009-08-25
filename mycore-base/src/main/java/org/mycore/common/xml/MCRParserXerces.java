@@ -24,7 +24,6 @@
 package org.mycore.common.xml;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.net.URI;
@@ -37,7 +36,6 @@ import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 import org.xml.sax.ErrorHandler;
 import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
 
 /**
@@ -104,8 +102,9 @@ public class MCRParserXerces implements MCRParserInterface, ErrorHandler {
      * @throws MCRException
      *             if XML could not be parsed
      * @return the parsed XML stream as a DOM document
+     * @throws SAXParseException 
      */
-    public Document parseURI(URI uri) {
+    public Document parseURI(URI uri) throws SAXParseException {
         return parseURI(uri, FLAG_VALIDATION);
     }
 
@@ -120,10 +119,9 @@ public class MCRParserXerces implements MCRParserInterface, ErrorHandler {
      * @throws MCRException
      *             if XML could not be parsed
      * @return the parsed XML stream as a DOM document
-     * @throws IOException 
-     * @throws SAXException 
+     * @throws SAXParseException 
      */
-    public Document parseURI(URI uri, boolean validate) {
+    public Document parseURI(URI uri, boolean validate) throws SAXParseException {
         InputSource inputSource = null;
         try {
             //use uri as a SystemID
@@ -145,8 +143,9 @@ public class MCRParserXerces implements MCRParserInterface, ErrorHandler {
      * @throws MCRException
      *             if XML could not be parsed
      * @return the parsed XML stream as a DOM document
+     * @throws SAXParseException 
      */
-    public Document parseXML(String xml) {
+    public Document parseXML(String xml) throws SAXParseException {
         return parseXML(xml, FLAG_VALIDATION);
     }
 
@@ -161,8 +160,9 @@ public class MCRParserXerces implements MCRParserInterface, ErrorHandler {
      * @throws MCRException
      *             if XML could not be parsed
      * @return the parsed XML stream as a DOM document
+     * @throws SAXParseException 
      */
-    public Document parseXML(String xml, boolean validate) {
+    public Document parseXML(String xml, boolean validate) throws SAXParseException {
         InputSource source = new InputSource(new StringReader(xml));
 
         return parse(source, validate);
@@ -177,8 +177,9 @@ public class MCRParserXerces implements MCRParserInterface, ErrorHandler {
      * @throws MCRException
      *             if XML could not be parsed
      * @return the parsed XML stream as a DOM document
+     * @throws SAXParseException 
      */
-    public Document parseXML(byte[] xml) {
+    public Document parseXML(byte[] xml) throws SAXParseException {
         return parseXML(xml, FLAG_VALIDATION);
     }
 
@@ -193,17 +194,18 @@ public class MCRParserXerces implements MCRParserInterface, ErrorHandler {
      * @throws MCRException
      *             if XML could not be parsed
      * @return the parsed XML stream as a DOM document
+     * @throws SAXParseException 
      */
-    public Document parseXML(byte[] xml, boolean validate) {
+    public Document parseXML(byte[] xml, boolean validate) throws SAXParseException {
         InputSource source = new InputSource(new ByteArrayInputStream(xml));
         return parse(source, validate);
     }
 
-    public Document parseXML(InputStream input) throws MCRException {
+    public Document parseXML(InputStream input) throws MCRException, SAXParseException {
         return parseXML(input, FLAG_VALIDATION);
     }
 
-    public Document parseXML(InputStream input, boolean validate) throws MCRException {
+    public Document parseXML(InputStream input, boolean validate) throws MCRException, SAXParseException {
         InputSource source = new InputSource(input);
         return parse(source, validate);
     }
@@ -219,13 +221,16 @@ public class MCRParserXerces implements MCRParserInterface, ErrorHandler {
      * @throws MCRException
      *             if XML could not be parsed
      * @return the parsed XML stream as a DOM document
+     * @throws SAXParseException 
      */
-    private Document parse(InputSource source, boolean validate) {
+    private Document parse(InputSource source, boolean validate) throws SAXParseException {
         SAXBuilder builder = (validate ? this.builderValid : this.builder);
 
         try {
             return builder.build(source);
         } catch (Exception ex) {
+            if (ex instanceof SAXParseException)
+                throw (SAXParseException)ex;
             throw new MCRException(msg, ex);
         }
     }
@@ -244,7 +249,7 @@ public class MCRParserXerces implements MCRParserInterface, ErrorHandler {
      */
     public void error(SAXParseException ex) {
         LOGGER.error(getSAXErrorMessage(ex), ex);
-        throw new MCRException(msg + getSAXErrorMessage(ex), ex);
+        throw new RuntimeException(ex);
     }
 
     /**
@@ -252,7 +257,7 @@ public class MCRParserXerces implements MCRParserInterface, ErrorHandler {
      */
     public void fatalError(SAXParseException ex) {
         LOGGER.fatal(getSAXErrorMessage(ex));
-        throw new MCRException(msg + getSAXErrorMessage(ex), ex);
+        throw new RuntimeException(ex);
     }
 
     /**
@@ -262,7 +267,7 @@ public class MCRParserXerces implements MCRParserInterface, ErrorHandler {
      *            the SAXParseException exception
      * @return the location string
      */
-    private String getSAXErrorMessage(SAXParseException ex) {
+    public static String getSAXErrorMessage(SAXParseException ex) {
         StringBuffer str = new StringBuffer();
 
         String systemId = ex.getSystemId();

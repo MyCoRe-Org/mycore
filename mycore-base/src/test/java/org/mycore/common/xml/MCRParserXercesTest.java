@@ -27,6 +27,7 @@ import java.net.URI;
 
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRTestCase;
+import org.xml.sax.SAXParseException;
 
 /**
  * @author Thomas Scheffler (yagee)
@@ -57,8 +58,9 @@ public class MCRParserXercesTest extends MCRTestCase {
 
     /**
      * Test method for {@link org.mycore.common.xml.MCRParserXerces#parseURI(java.lang.String, boolean)}.
+     * @throws SAXParseException 
      */
-    public void testParseURIStringBoolean() {
+    public void testParseURIStringBoolean() throws SAXParseException {
         try {
             parser.parseURI(xmlResourceInvalid, true);
             fail("MCRParserXerces accepts invalid XML content when validation is requested");

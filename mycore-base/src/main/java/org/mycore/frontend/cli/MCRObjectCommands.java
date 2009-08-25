@@ -48,6 +48,7 @@ import org.mycore.services.fieldquery.MCRHit;
 import org.mycore.services.fieldquery.MCRResults;
 import org.mycore.services.fieldquery.MCRSearcher;
 import org.mycore.services.fieldquery.MCRSearcherFactory;
+import org.xml.sax.SAXParseException;
 
 /**
  * Provides static methods that implement commands for the MyCoRe command line interface.
@@ -311,8 +312,10 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      * @param file
      *            the location of the xml file
      * @throws MCRActiveLinkException
+     * @throws SAXParseException 
+     * @throws MCRException 
      */
-    public static final boolean loadFromFile(String file) throws MCRActiveLinkException {
+    public static final boolean loadFromFile(String file) throws MCRActiveLinkException, MCRException, SAXParseException {
         return loadFromFile(file, true);
     }
 
@@ -324,8 +327,10 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      * @param importMode
      *            if true, servdates are taken from xml file
      * @throws MCRActiveLinkException
+     * @throws SAXParseException 
+     * @throws MCRException 
      */
-    public static final boolean loadFromFile(String file, boolean importMode) throws MCRActiveLinkException {
+    public static final boolean loadFromFile(String file, boolean importMode) throws MCRActiveLinkException, MCRException, SAXParseException {
         return processFromFile(new File(file), false, importMode);
     }
 
@@ -335,8 +340,10 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      * @param file
      *            the location of the xml file
      * @throws MCRActiveLinkException
+     * @throws SAXParseException 
+     * @throws MCRException 
      */
-    public static final boolean updateFromFile(String file) throws MCRActiveLinkException {
+    public static final boolean updateFromFile(String file) throws MCRActiveLinkException, MCRException, SAXParseException {
         return updateFromFile(file, true);
     }
 
@@ -348,8 +355,10 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      * @param importMode
      *            if true, servdates are taken from xml file
      * @throws MCRActiveLinkException
+     * @throws SAXParseException 
+     * @throws MCRException 
      */
-    public static final boolean updateFromFile(String file, boolean importMode) throws MCRActiveLinkException {
+    public static final boolean updateFromFile(String file, boolean importMode) throws MCRActiveLinkException, MCRException, SAXParseException {
         return processFromFile(new File(file), true, importMode);
     }
 
@@ -363,8 +372,10 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      * @param importMode
      *            if true, servdates are taken from xml file
      * @throws MCRActiveLinkException
+     * @throws SAXParseException 
+     * @throws MCRException 
      */
-    private static final boolean processFromFile(File file, boolean update, boolean importMode) throws MCRActiveLinkException {
+    private static final boolean processFromFile(File file, boolean update, boolean importMode) throws MCRActiveLinkException, MCRException, SAXParseException {
         if (!file.getName().endsWith(".xml")) {
             LOGGER.warn(file + " ignored, does not end with *.xml");
             return false;
@@ -590,9 +601,11 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      * @throws FileNotFoundException
      * @throws TransformerException
      * @throws IOException
+     * @throws SAXParseException 
+     * @throws MCRException 
      */
     private static final boolean exportMCRObject(File dir, Transformer trans, MCRObjectID nid) throws FileNotFoundException,
-            TransformerException, IOException {
+            TransformerException, IOException, MCRException, SAXParseException {
         byte[] xml = null;
         try {
             // if object do'snt exist - no exception is catched!
@@ -647,8 +660,10 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      * 
      * @param fileName
      *            the location of the xml file
+     * @throws SAXParseException 
+     * @throws MCRException 
      */
-    public static final boolean checkXMLFile(String fileName) {
+    public static final boolean checkXMLFile(String fileName) throws MCRException, SAXParseException {
         if (!fileName.endsWith(".xml")) {
             LOGGER.warn(fileName + " ignored, does not end with *.xml");
 

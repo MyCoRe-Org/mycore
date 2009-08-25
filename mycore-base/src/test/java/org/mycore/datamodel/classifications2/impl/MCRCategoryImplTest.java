@@ -29,11 +29,13 @@ import java.util.Collections;
 import java.util.List;
 
 import org.jdom.Document;
+import org.mycore.common.MCRException;
 import org.mycore.common.MCRTestCase;
 import org.mycore.common.xml.MCRXMLHelper;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.utils.MCRXMLTransformer;
+import org.xml.sax.SAXParseException;
 
 /**
  * @author Thomas Scheffler (yagee)
@@ -74,7 +76,7 @@ public class MCRCategoryImplTest extends MCRTestCase {
         assertEquals(2, co4.getLevel());
     }
 
-    public void testGetLeftSiblingOrOfAncestor() throws URISyntaxException {
+    public void testGetLeftSiblingOrOfAncestor() throws URISyntaxException, MCRException, SAXParseException {
         loadWorldClassification();
         MCRCategory europe = category.getChildren().get(0);
         MCRCategoryImpl asia = (MCRCategoryImpl) category.getChildren().get(1);
@@ -88,7 +90,7 @@ public class MCRCategoryImplTest extends MCRTestCase {
                 .getId());
     }
 
-    public void testGetLeftSiblingOrParent() throws URISyntaxException {
+    public void testGetLeftSiblingOrParent() throws URISyntaxException, MCRException, SAXParseException {
         loadWorldClassification();
         MCRCategory europe = category.getChildren().get(0);
         MCRCategoryImpl asia = (MCRCategoryImpl) category.getChildren().get(1);
@@ -97,7 +99,7 @@ public class MCRCategoryImplTest extends MCRTestCase {
         assertEquals("Did not get Europa as left sibling or ancestor of Germany", europe.getId(), germany.getLeftSiblingOrParent().getId());
     }
 
-    public void testGetRightSiblingOrOfAncestor() throws URISyntaxException {
+    public void testGetRightSiblingOrOfAncestor() throws URISyntaxException, MCRException, SAXParseException {
         loadWorldClassification();
         MCRCategoryImpl europe = (MCRCategoryImpl) category.getChildren().get(0);
         MCRCategoryImpl asia = (MCRCategoryImpl) category.getChildren().get(1);
@@ -107,7 +109,7 @@ public class MCRCategoryImplTest extends MCRTestCase {
         assertEquals("Did not get World as right sibling or ancestor of Asia", category.getId(), asia.getRightSiblingOrOfAncestor().getId());
     }
 
-    public void testGetRightSiblingOrParent() throws URISyntaxException {
+    public void testGetRightSiblingOrParent() throws URISyntaxException, MCRException, SAXParseException {
         loadWorldClassification();
         MCRCategoryImpl europe = (MCRCategoryImpl) category.getChildren().get(0);
         MCRCategoryImpl asia = (MCRCategoryImpl) category.getChildren().get(1);
@@ -118,8 +120,10 @@ public class MCRCategoryImplTest extends MCRTestCase {
 
     /**
      * @throws URISyntaxException
+     * @throws SAXParseException 
+     * @throws MCRException 
      */
-    private void loadWorldClassification() throws URISyntaxException {
+    private void loadWorldClassification() throws URISyntaxException, MCRException, SAXParseException {
         URL worlClassUrl = this.getClass().getResource(WORLD_CLASS_RESOURCE_NAME);
         Document xml = MCRXMLHelper.parseURI(worlClassUrl.toURI());
         category = MCRCategoryImpl.wrapCategory(MCRXMLTransformer.getCategory(xml), null, null);

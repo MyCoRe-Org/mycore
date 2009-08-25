@@ -40,6 +40,7 @@ import org.mycore.common.xml.MCRXMLHelper;
 import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.common.MCRLinkTableManager;
 import org.mycore.datamodel.common.MCRXMLTableManager;
+import org.xml.sax.SAXParseException;
 
 /**
  * This class implements all methode for handling one metadata object. Methodes
@@ -186,8 +187,9 @@ final public class MCRObject extends MCRBase {
      *            an URI
      * @exception MCRException
      *                general Exception of MyCoRe
+     * @throws SAXParseException 
      */
-    public final void setFromURI(URI uri) throws MCRException {
+    public final void setFromURI(URI uri) throws MCRException, SAXParseException {
         setFromJDOM(MCRXMLHelper.parseURI(uri));
     }
 
@@ -199,8 +201,9 @@ final public class MCRObject extends MCRBase {
      *            a XML string
      * @exception MCRException
      *                general Exception of MyCoRe
+     * @throws SAXParseException 
      */
-    public final void setFromXML(byte[] xml, boolean valid) throws MCRException {
+    public final void setFromXML(byte[] xml, boolean valid) throws MCRException, SAXParseException {
         setFromJDOM(MCRXMLHelper.parseXML(xml, valid));
     }
 
@@ -430,7 +433,8 @@ final public class MCRObject extends MCRBase {
         Collection<String> sources = MCRLinkTableManager.instance().getSourceOf(mcr_id);
         LOGGER.debug("Sources size:" + sources.size());
         if (sources.size() > 0) {
-            MCRActiveLinkException activeLinks = new MCRActiveLinkException(new StringBuffer("Error while deleting object ").append(mcr_id.toString()).append(
+            MCRActiveLinkException activeLinks = new MCRActiveLinkException(new StringBuffer("Error while deleting object ").append(
+                    mcr_id.toString()).append(
                     ". This object is still referenced by other objects and can not be removed until all links are released.").toString());
             for (String curSource : sources) {
                 activeLinks.addLink(curSource, mcr_id.toString());
@@ -544,7 +548,7 @@ final public class MCRObject extends MCRBase {
      *                if a persistence problem is occured
      */
     public final void receiveFromDatastore(MCRObjectID id) throws MCRPersistenceException {
-        setFromXML(receiveXMLFromDatastore(id), false);
+        setFromJDOM(MCRXMLTableManager.instance().retrieveAsJDOM(id));
     }
 
     /**
@@ -600,8 +604,7 @@ final public class MCRObject extends MCRBase {
      *                if a persistence problem is occured
      */
     public final org.jdom.Document receiveJDOMFromDatastore(MCRObjectID id) throws MCRPersistenceException {
-        byte[] xml = receiveXMLFromDatastore(id);
-        return MCRXMLHelper.parseXML(xml, false);
+        return MCRXMLTableManager.instance().readDocument(id);
     }
 
     /**

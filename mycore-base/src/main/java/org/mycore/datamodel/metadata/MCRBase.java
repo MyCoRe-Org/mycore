@@ -34,6 +34,7 @@ import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.datamodel.common.MCRActiveLinkException;
+import org.xml.sax.SAXParseException;
 
 /**
  * This class is a abstract basic class for objects in the MyCoRe Project. It is
@@ -166,8 +167,9 @@ public abstract class MCRBase {
      *            an URI
      * @exception MCRException
      *                general Exception of MyCoRe
+     * @throws SAXParseException 
      */
-    public abstract void setFromURI(URI uri) throws MCRException;
+    public abstract void setFromURI(URI uri) throws MCRException, SAXParseException;
 
     /**
      * This methode read the XML input stream from a byte array into JDOM and
@@ -177,8 +179,9 @@ public abstract class MCRBase {
      *            a XML string
      * @exception MCRException
      *                general Exception of MyCoRe
+     * @throws SAXParseException 
      */
-    public abstract void setFromXML(byte[] xml, boolean valid) throws MCRException;
+    public abstract void setFromXML(byte[] xml, boolean valid) throws MCRException, SAXParseException;
 
     /**
      * This methode set the object ID.

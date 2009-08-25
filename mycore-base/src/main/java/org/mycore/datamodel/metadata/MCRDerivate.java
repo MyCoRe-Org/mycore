@@ -35,7 +35,6 @@ import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.events.MCREvent;
 import org.mycore.common.events.MCREventManager;
 import org.mycore.common.xml.MCRXMLHelper;
-import org.mycore.datamodel.common.MCRActiveLinkException;
 import org.mycore.datamodel.common.MCRXMLTableManager;
 import org.mycore.datamodel.ifs.MCRDirectory;
 import org.mycore.datamodel.ifs.MCRFileImportExport;
@@ -282,10 +281,10 @@ final public class MCRDerivate extends MCRBase {
         MCREvent evt;
         // restore original instance of MCRObject
         MCRObject obj = new MCRObject();
-        obj.setFromXML(backup, false);
         try {
+            obj.setFromXML(backup, false);
             obj.updateInDatastore();
-        } catch (MCRActiveLinkException e1) {
+        } catch (Exception e1) {
             LOGGER.warn("Error while restoring " + obj.getId(), e1);
         } finally {
             // delete from the XML table
@@ -501,7 +500,8 @@ final public class MCRDerivate extends MCRBase {
             File f = new File(getDerivate().getInternals().getSourcePath());
 
             if (!f.exists()) {
-                throw new MCRPersistenceException("The File or Directory " + getDerivate().getInternals().getSourcePath() + " was not found.");
+                throw new MCRPersistenceException("The File or Directory " + getDerivate().getInternals().getSourcePath()
+                        + " was not found.");
             }
 
             try {

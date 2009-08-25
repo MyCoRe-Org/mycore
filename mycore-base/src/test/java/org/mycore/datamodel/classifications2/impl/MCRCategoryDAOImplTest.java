@@ -41,6 +41,7 @@ import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.MCRLabel;
 import org.mycore.datamodel.classifications2.utils.MCRStringTransformer;
 import org.mycore.datamodel.classifications2.utils.MCRXMLTransformer;
+import org.xml.sax.SAXParseException;
 
 public class MCRCategoryDAOImplTest extends MCRHibTestCase {
 
@@ -214,7 +215,7 @@ public class MCRCategoryDAOImplTest extends MCRHibTestCase {
         assertEquals("Label count did not match.", labelCount - 1, labelNodeNew.getLabels().size());
     }
 
-    public void testReplaceCategory() throws URISyntaxException {
+    public void testReplaceCategory() throws URISyntaxException, MCRException, SAXParseException {
         loadWorldClassification2();
         addWorldClassification();
         DAO.replaceCategory(category2);
@@ -281,14 +282,16 @@ public class MCRCategoryDAOImplTest extends MCRHibTestCase {
 
     /**
      * @throws URISyntaxException
+     * @throws SAXParseException 
+     * @throws MCRException 
      */
-    private void loadWorldClassification() throws URISyntaxException {
+    private void loadWorldClassification() throws URISyntaxException, MCRException, SAXParseException {
         URL worlClassUrl = this.getClass().getResource(WORLD_CLASS_RESOURCE_NAME);
         Document xml = MCRXMLHelper.parseURI(worlClassUrl.toURI());
         category = MCRXMLTransformer.getCategory(xml);
     }
 
-    private void loadWorldClassification2() throws URISyntaxException {
+    private void loadWorldClassification2() throws URISyntaxException, MCRException, SAXParseException {
         URL worlClassUrl = this.getClass().getResource(WORLD_CLASS2_RESOURCE_NAME);
         Document xml = MCRXMLHelper.parseURI(worlClassUrl.toURI());
         category2 = MCRXMLTransformer.getCategory(xml);
