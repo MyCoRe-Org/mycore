@@ -31,14 +31,13 @@ import java.io.PrintStream;
  * the MyCoRe implementation classes.
  * 
  * @author Jens Kupferschmidt
- * @author Frank Lützenkirchen
+ * @author Frank Luetzenkirchen
  * @version $Revision$ $Date$
  * 
  * @see RuntimeException
  */
 public class MCRException extends RuntimeException {
-    /** the embedded exception that was thrown by an underlying system */
-    protected Exception exception;
+    private static final long serialVersionUID = -3396055962010289244L;
 
     /**
      * Creates a new MCRException with an error message
@@ -58,21 +57,21 @@ public class MCRException extends RuntimeException {
      * 
      * @param message
      *            the error message for this exception
-     * @param exception
-     *            the exception that was thrown by an underlying system
+     * @param cause
+     *            the cause (which is saved for later retrieval by the {@link Throwable#getCause()} method). (A null value is permitted, and indicates that the cause is nonexistent or unknown.)
      */
-    public MCRException(String message, Exception exception) {
-        this(message);
-        this.exception = exception;
+    public MCRException(String message, Throwable cause) {
+        super(message, cause);
     }
 
     /**
      * Returns the exception thrown by an underlying system
      * 
      * @return the exception thrown by an underlying system
+     * @deprecated use {@link Throwable#getCause()}
      */
     public Exception getException() {
-        return exception;
+        return (Exception) getCause();
     }
 
     /**
@@ -114,7 +113,7 @@ public class MCRException extends RuntimeException {
      * 
      * @return a String representation of this exception and all its properties
      */
-    public synchronized String toString() {
+    public String toString() {
         // Use counter to prevent a recursion between getStackTrace() and
         // toString()
         toStringInvocationCounter++;
@@ -123,7 +122,7 @@ public class MCRException extends RuntimeException {
             return super.toString();
         }
 
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
 
         sb.append("MyCoRe Exception: ").append(getClass().getName());
         sb.append("\n\n");
@@ -132,20 +131,20 @@ public class MCRException extends RuntimeException {
         sb.append("Stack trace:\n");
         sb.append(getStackTraceAsString());
 
-        if (exception != null) {
+        if (getCause() != null) {
             sb.append("\n");
             sb.append("This exception was thrown because of the following underlying exception:\n\n");
-            sb.append(exception.getClass().getName());
+            sb.append(getCause().getClass().getName());
             sb.append("\n\n");
 
-            String msg = exception.getLocalizedMessage();
+            String msg = getCause().getLocalizedMessage();
 
             if (msg != null) {
                 sb.append("Message:\n").append(msg).append("\n\n");
             }
 
             sb.append("Stack trace:\n");
-            sb.append(getStackTraceAsString(exception));
+            sb.append(getStackTraceAsString(getCause()));
         }
 
         toStringInvocationCounter--;
