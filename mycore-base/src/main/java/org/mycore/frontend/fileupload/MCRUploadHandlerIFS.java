@@ -57,6 +57,8 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
 
     protected MCRDirectory rootDir;
 
+    protected String derID, docID;
+
     protected boolean newDerivate = true;
 
     private Transaction tx;
@@ -76,21 +78,13 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
     }
 
     protected void init(String docId, String derId) {
-        if (derId == null) {
-            // create new derivate
-            LOGGER.debug("derId=null create derivate with next free ID");
-            createNewDerivate(docId, getFreeDerivateID());
-        } else {
-            if (MCRDerivate.existInDatastore(derId)) {
-                LOGGER.debug("Derivate allready exists: " + derId);
-                newDerivate = false;
-                derivate = new MCRDerivate();
-                derivate.receiveFromDatastore(derId);
-            } else {
-                // create new derivate with given ID
-                LOGGER.debug("derId='" + derId + "' create derivate with that ID");
-                createNewDerivate(docId, new MCRObjectID(derId));
-            }
+        this.derID = derId;
+        this.docID = docId;
+        if (derId != null && MCRDerivate.existInDatastore(derId)) {
+            LOGGER.debug("Derivate allready exists: " + derId);
+            newDerivate = false;
+            derivate = new MCRDerivate();
+            derivate.receiveFromDatastore(derId);
         }
     }
 
@@ -98,7 +92,16 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
      * Start Upload for MyCoRe
      */
     public void startUpload(int numFiles) throws Exception {
-        if (newDerivate) {
+        if (derivate == null) {
+            if (derID == null) {
+                // create new derivate
+                LOGGER.debug("derId=null create derivate with next free ID");
+                createNewDerivate(docID, getFreeDerivateID());
+            } else {
+                // create new derivate with given ID
+                LOGGER.debug("derId='" + derID + "' create derivate with that ID");
+                createNewDerivate(docID, new MCRObjectID(derID));
+            }
             LOGGER.debug("Create new derivate with id: " + derivate.getId());
             derivate.createInDatastore();
         }
@@ -147,11 +150,11 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
                 return 0;
             }
         } catch (Exception e) {
-            LOGGER.error("Error while uploading file: "+path,e);
+            LOGGER.error("Error while uploading file: " + path, e);
             try {
                 rollbackTransaction();
             } catch (Exception e2) {
-                LOGGER.debug("Error while rolling back transaction",e);
+                LOGGER.debug("Error while rolling back transaction", e);
             }
             return 0;
         }
