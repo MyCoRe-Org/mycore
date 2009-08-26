@@ -4,12 +4,16 @@ There are only a few steps to configure and use it in your mycore application.
 ##################################################
 # Step 1 - configure module properties
 #################################################
-The following properties are neccesary for creating a redundancy map for an object type. This redundancy map could later be edited to define which 
+The following properties are neccesary to creating a redundancy map for an object type. This redundancy map could later be edited to define which 
 records are really doublets and which are not.
 
 Possible properties for each object type:
 MCR.doubletFinder.{type}.fieldsToSort=xxx,xxx...        Sorting the results. This improves the speed of comparision, so its good to set sort fields.
+														It is neccesary that the attribute "sortable=true" is set for all fields in the searchfields.xml
+														which are defined here. 
 MCR.doubletFinder.{type}.fieldsToCompare=xxx,xxx...     All addable fields could be set here. This comparision is much faster then xpath compare.
+														The attribute "addable=true" has to be set in the searchfields.xml for each field which is defined
+														here.
 MCR.doubletFinder.{type}.xpathToCompare=xxx,xxx...      If a metadata is not accessible as a field, you can read the value with an xpath expression (very slow!)
 MCR.doubletFinder.{type}.tableHead=xxx,xxx...           not needed for comparision, will be later used as headline for the web editor
 
@@ -29,7 +33,7 @@ headingFirstName=Peter
 #################################################
 To create a redundancy map for an object type you can use the web cli. The command is "MCRRedundancyCommands -> generate redundancy map for type {0} with map generator {1}".
 The type has to be one of your predefined types in mycore.properties ('author' in docportal for example). The map generator is the implementation of how the redundancy map
-will be created. By default there are two possebilities:
+will be created. By default there are two possibilities:
 defaultGenerator: compares all objects of a type with each other
 fastGenerator: compares object n with n - 1 (fieldsToSort has to be set!)
 
