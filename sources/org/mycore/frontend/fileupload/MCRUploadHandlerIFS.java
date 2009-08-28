@@ -165,6 +165,12 @@ public class MCRUploadHandlerIFS extends MCRUploadHandler {
      * 
      */
     public void finishUpload() throws Exception {
+        // existing files
+        if (!rootDir.hasChildren()) {
+            derivate.deleteFromDatastore(derivate.getId().getId());
+            LOGGER.warn("No file were uploaded, delete entry in database for " + derivate.getId().getId() + " and return.");
+            return;
+        }
         String mainfile = getMainFilePath(rootDir);
         if (newDerivate) {
             derivate.getDerivate().getInternals().setMainDoc(mainfile);

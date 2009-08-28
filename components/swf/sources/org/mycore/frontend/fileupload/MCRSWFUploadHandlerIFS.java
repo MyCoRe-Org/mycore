@@ -24,8 +24,6 @@
 package org.mycore.frontend.fileupload;
 
 import org.apache.log4j.Logger;
-
-import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.frontend.workflow.MCRSimpleWorkflowManager;
 
@@ -55,51 +53,15 @@ public class MCRSWFUploadHandlerIFS extends MCRUploadHandlerIFS {
      */
     public MCRSWFUploadHandlerIFS(String docId, String derId, String url) {
         super(docId, derId, url);
-        init(docId, derId);
     }
 
     @Override
     protected void init(String docId, String derId) {
         LOGGER.debug("MCRUploadHandlerMyCoRe DocID: " + docId + " DerId: " + derId);
-
-        try {
-            new MCRObjectID(docId);
-        } catch (Exception e) {
-            LOGGER.debug("Error while creating MCRObjectID : " + docId, e);
-        }
-
         if (derId == null) {
             derId = MCRSimpleWorkflowManager.instance().getNextDrivateID(new MCRObjectID(docId)).getId();
-        } else {
-            try {
-                new MCRObjectID(derId);
-            } catch (Exception e) {
-                LOGGER.debug("Error while creating MCRObjectID : " + derId, e);
-            }
         }
-
-        newDerivate = true;
-        if (MCRDerivate.existInDatastore(derId)) {
-            LOGGER.debug("Derivate allready exists: " + derId);
-            newDerivate = false;
-            derivate = new MCRDerivate();
-            derivate.receiveFromDatastore(derId);
-        } else {
-            // create new derivate with given ID
-            LOGGER.debug("Create derivate with ID: " + derId);
-            createNewDerivate(docId, new MCRObjectID(derId));
-        }
-    }
-
-    @Override
-    public void finishUpload() throws Exception {
-        // existing files
-        if (!rootDir.hasChildren()) {
-            derivate.deleteFromDatastore(derivate.getId().getId());
-            LOGGER.warn("No file were uploaded, delete entry in database for " + derivate.getId().getId() + " and return.");
-            return;
-        }
-        super.finishUpload();
+        super.init(docId, derId);
     }
 
 }
