@@ -90,7 +90,7 @@ import org.xml.sax.SAXException;
  * Does the layout for other MyCoRe servlets by transforming XML input to
  * various output formats, using XSL stylesheets.
  * 
- * @author Frank L�tzenkirchen
+ * @author Frank Luetzenkirchen
  * @author Thomas Scheffler (yagee)
  * 
  * @version $Revision$ $Date: 2008-05-21 15:53:52 +0200 (Mi, 21. Mai
@@ -248,11 +248,16 @@ public class MCRLayoutService implements org.apache.xalan.trace.TraceListener {
         MCRServletJob job = (MCRServletJob) mcrSession.get("MCRServletJob");
         Templates stylesheet = buildCompiledStylesheet(stylesheetName);
         Transformer transformer = buildTransformer(stylesheet);
-        Properties parameters = new Properties();
+        Properties parameters;
         if (job != null) {
             parameters = buildXSLParameters(job.getRequest());
-            if (null != params)
-                parameters = new Properties();
+        } else {
+            parameters = new Properties();
+        }
+        if (params != null) {
+            for (Map.Entry<String, String> entry : params.entrySet()) {
+                parameters.put(entry.getKey(), entry.getValue());
+            }
         }
         setXSLParameters(transformer, parameters);
         JDOMResult out = new JDOMResult();
