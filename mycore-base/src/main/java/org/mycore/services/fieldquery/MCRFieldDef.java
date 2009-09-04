@@ -23,6 +23,7 @@
 package org.mycore.services.fieldquery;
 
 import java.util.ArrayList;
+
 import java.util.Hashtable;
 import java.util.List;
 
@@ -32,6 +33,7 @@ import org.jdom.Namespace;
 import org.jdom.output.XMLOutputter;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
+import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.xml.MCRURIResolver;
 
 /**
@@ -136,14 +138,17 @@ public class MCRFieldDef {
     }
 
     /**
-     * Returns the MCRFieldDef with the given name, or null if no such field is
-     * defined in searchfields.xml
+     * Returns the MCRFieldDef with the given name, or throws
+     * MCRConfigurationException if no such field is defined in searchfields.xml
      * 
      * @param name
      *            the name of the field
      * @return the MCRFieldDef instance representing this field
      */
     public static MCRFieldDef getDef(String name) {
+        if (!fieldTable.contains(name)) {
+            throw new MCRConfigurationException("Field \"" + name + "\" is not defined in searchfields.xml");
+        }
         return fieldTable.get(name);
     }
 
