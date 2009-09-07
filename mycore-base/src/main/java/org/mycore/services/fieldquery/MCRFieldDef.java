@@ -41,7 +41,7 @@ import org.mycore.common.xml.MCRURIResolver;
  * searchfields.xml there is one MCRFieldDef instance with attributes that
  * represent the configuration in the xml file.
  * 
- * @author Frank Lützenkirchen
+ * @author Frank Lï¿½tzenkirchen
  */
 public class MCRFieldDef {
     /** The logger */
@@ -146,7 +146,7 @@ public class MCRFieldDef {
      * @return the MCRFieldDef instance representing this field
      */
     public static MCRFieldDef getDef(String name) {
-        if (!fieldTable.contains(name)) {
+        if (!fieldTable.containsKey(name)) {
             throw new MCRConfigurationException("Field \"" + name + "\" is not defined in searchfields.xml");
         }
         return fieldTable.get(name);
