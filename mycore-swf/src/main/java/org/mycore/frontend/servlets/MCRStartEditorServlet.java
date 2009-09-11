@@ -571,7 +571,7 @@ public class MCRStartEditorServlet extends MCRServlet {
         if (addr.size() != 0) {
             String sender = WFM.getMailSender();
             String appl = MCRConfiguration.instance().getString("MCR.SWF.Mail.ApplicationID", "DocPortal");
-            String subject = "Automaticaly message from " + appl;
+            String subject = "Automatically generated message from " + appl;
             StringBuffer text = new StringBuffer();
             text.append("The object with type ").append(cd.mytype).append(" with ID ").append(cd.mytfmcrid).append(
                     " was removed from server.");
@@ -986,7 +986,7 @@ public class MCRStartEditorServlet extends MCRServlet {
                 if (addr.size() != 0) {
                     String sender = WFM.getMailSender();
                     String appl = MCRConfiguration.instance().getString("MCR.SWF.Mail.ApplicationID", "DocPortal");
-                    String subject = "Automaticaly message from " + appl;
+                    String subject = "Automatically generated message from " + appl;
                     StringBuffer text = new StringBuffer();
                     text.append("The object of type ").append(cd.mytype).append(" with ID ").append(cd.mysemcrid).append(
                             " was commited from workflow to the server.");
@@ -1049,7 +1049,7 @@ public class MCRStartEditorServlet extends MCRServlet {
         if (addr.size() != 0) {
             String sender = WFM.getMailSender();
             String appl = MCRConfiguration.instance().getString("MCR.SWF.Mail.ApplicationID", "DocPortal");
-            String subject = "Automaticaly message from " + appl;
+            String subject = "Automatically generated message from " + appl;
             StringBuffer text = new StringBuffer();
             text.append("The derivate with ID ").append(cd.mysemcrid).append(" was removed from workflow.");
             LOGGER.info(text.toString());
@@ -1150,7 +1150,7 @@ public class MCRStartEditorServlet extends MCRServlet {
         if (addr.size() != 0) {
             String sender = WFM.getMailSender();
             String appl = MCRConfiguration.instance().getString("MCR.SWF.Mail.ApplicationID", "MyCoRe");
-            String subject = "Automaticaly message from " + appl;
+            String subject = "Automatically generated message from " + appl;
             StringBuffer text = new StringBuffer();
             text.append("The object of type ").append(cd.mytype).append(" with ID ").append(cd.mysemcrid).append(
                     " was removed from the workflow.");
