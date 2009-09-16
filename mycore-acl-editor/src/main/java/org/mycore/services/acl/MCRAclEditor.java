@@ -6,6 +6,10 @@ import org.apache.log4j.Logger;
 import org.jdom.Element;
 import org.mycore.common.MCRConfiguration;
 
+/**
+ * @author "Huu Chi Vu"
+ *
+ */
 public abstract class MCRAclEditor {
     protected static Logger LOGGER = Logger.getLogger(MCRAclEditor.class);
 
