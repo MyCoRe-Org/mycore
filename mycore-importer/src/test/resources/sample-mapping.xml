@@ -5,6 +5,11 @@
         <datamodelPath>src/test/resources/</datamodelPath>
         <saveToPath>save/</saveToPath>
         <createClassificationMapping>true</createClassificationMapping>
+        <derivates use="true">
+          <createInImportDir>true</createInImportDir>
+          <importToMycore>true</importToMycore>
+          <importFilesToMycore>true</importFilesToMycore>
+        </derivates>
     </config>
 
     <mapping>

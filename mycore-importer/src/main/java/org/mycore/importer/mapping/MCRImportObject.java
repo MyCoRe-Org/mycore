@@ -28,19 +28,22 @@ public class MCRImportObject {
     protected Element parentElement;
     protected List<Element> derivateList;
     protected Hashtable<String, MCRImportMetadata> metadataTable;
+    protected Element serviceElement;
 
     public MCRImportObject(MCRImportDatamodel datamodel) {
         this.derivateList = new ArrayList<Element>();
         this.metadataTable = new Hashtable<String, MCRImportMetadata>();
         this.datamodel = datamodel;
+        this.serviceElement = new Element("service");
     }
 
     public Element createXML() {
         Element mcrObjectElement = new Element("mycoreobject");
         // some attributes
         mcrObjectElement.setAttribute("ID", id);
-        if(label != null)
-            mcrObjectElement.setAttribute("label", label);
+        if(label == null || label.equals(""))
+            label = id;
+        mcrObjectElement.setAttribute("label", label);
         mcrObjectElement.setAttribute("version", "2.0");
         String schemaLocation = getSchemaLocation();
         if(schemaLocation != null)
@@ -73,7 +76,8 @@ public class MCRImportObject {
         for(MCRImportMetadata metadata : metadataTable.values()) {
             metadataElement.addContent( metadata.createXML() );
         }
-
+        // service element
+        mcrObjectElement.addContent(serviceElement);
         return mcrObjectElement;
     }
 
@@ -92,7 +96,7 @@ public class MCRImportObject {
     public MCRImportDatamodel getDatamodel() {
         return datamodel;
     }
-    
+
     public String getSchemaLocation() {
         int indexOfFS = datamodel.getPath().lastIndexOf("/") + 1;
         int indexOfPoint = datamodel.getPath().lastIndexOf(".");
@@ -114,7 +118,17 @@ public class MCRImportObject {
     public void setParent(Element parent) {
         this.parentElement = parent;
     }
-
+    public void setServiceElement(Element serviceElement) {
+        if(!serviceElement.getName().equals("service")) {
+            LOGGER.error("Service element tag has to be 'service' and not '" + serviceElement.getName() + "'!");
+            return;
+        }
+        this.serviceElement = serviceElement;
+    }
+    public Element getServiceElement() {
+        return serviceElement;
+    }
+    
     public List<Element> getDerivateList() {
         return derivateList;
     }
@@ -124,6 +138,10 @@ public class MCRImportObject {
     }
 
     public void addDerivate(Element derivateElement) {
+        if(!derivateElement.getName().equals("derobject")) {
+            LOGGER.error("Derivate element tag has to be 'derobject' and not '" + derivateElement.getName() + "'!");
+            return;
+        }
         derivateList.add(derivateElement);
     }
 

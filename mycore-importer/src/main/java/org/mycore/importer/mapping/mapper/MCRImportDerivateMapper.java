@@ -17,9 +17,9 @@ public class MCRImportDerivateMapper extends MCRImportAbstractMapper {
         MCRImportLinkIDResolver linkIdResolver = new MCRImportLinkIDResolver();
 
         if (linkIdResolver != null) {
-            Element parentElement = new Element("derobject");
-            if (linkIdResolver.resolve(map, parseFields(), parentElement))
-                importObject.setParent(parentElement);
+            Element derElement = new Element("derobject");
+            if (linkIdResolver.resolve(map, parseFields(), derElement))
+                importObject.addDerivate(derElement);
         }
     }
 

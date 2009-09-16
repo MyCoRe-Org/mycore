@@ -142,7 +142,7 @@ public class MCRImportMappingManager {
     }
 
     @SuppressWarnings("unchecked")
-    protected void preloadUriResolvers(Element mappingElement) {
+    private void preloadUriResolvers(Element mappingElement) {
         uriResolverManager = new MCRImportURIResolverMananger();
 
         // load resolver
@@ -177,7 +177,7 @@ public class MCRImportMappingManager {
      * @throws IOException
      * @throws JDOMException
      */
-    protected void preloadDatamodel() throws IOException, JDOMException {
+    private void preloadDatamodel() throws IOException, JDOMException {
         for(Element mcrObjectElement : mcrObjectList) {
             String dmPath = mcrObjectElement.getAttributeValue("datamodel");
             try {

@@ -1,7 +1,10 @@
 package org.mycore.importer.classification;
 
+import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Map;
+import java.util.Set;
+import java.util.Map.Entry;
 
 import org.jdom.Element;
 
@@ -86,6 +89,37 @@ public class MCRImportClassificationMap {
      */
     public String getId() {
         return id;
+    }
+
+    /**
+     * Checks if all import- and mycore values are set. If a value
+     * is null or like "" false will be returned.
+     * 
+     * @return true if all values are set, otherwise false
+     */
+    public boolean isCompletelyFilled() {
+        for(Map.Entry<String, String> entry : table.entrySet()) {
+            if(entry.getKey() == null || entry.getKey().equals(""))
+                return false;
+            if(entry.getValue() == null || entry.getValue().equals(""))
+                return false;
+        }
+        return true;
+    }
+
+    /**
+     * Returns a string list of all import values where the connected
+     * mycore value is null or like "".
+     * 
+     * @return a list of import values
+     */
+    public ArrayList<String> getEmptyImportValues() {
+        ArrayList<String> emptyImportValueList = new ArrayList<String>();
+        for(Map.Entry<String, String> entry : table.entrySet()) {
+            if(entry.getValue() == null || entry.getValue().equals(""))
+                emptyImportValueList.add(entry.getKey());
+        }
+        return emptyImportValueList;
     }
 
     /**

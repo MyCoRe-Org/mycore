@@ -91,7 +91,11 @@ public class ImporterTestCase extends MCRTestCase {
 
         assertEquals("sample", config.getProjectName());
         assertEquals("save/", config.getSaveToPath());
-        assertEquals("true", config.isCreateClassificationMapping());
+        assertEquals(true, config.isCreateClassificationMapping());
+        assertEquals(true, config.isUseDerivates());
+        assertEquals(true, config.isCreateInImportDir());
+        assertEquals(true, config.isImportToMycore());
+        assertEquals(true, config.isImportFilesToMycore());
     }
 
 }

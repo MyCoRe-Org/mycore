@@ -87,7 +87,7 @@ public class MCRImportClassificationMappingManager {
         for(File file : files) {
             if(file.isDirectory())
                 buildClassificationMapDocumentList(file, documentList);
-            else {
+            else if(file.getName().endsWith(".xml")) {
                 try {
                     SAXBuilder builder = new SAXBuilder();
                     Document document = builder.build(file);
@@ -101,6 +101,22 @@ public class MCRImportClassificationMappingManager {
                 }
             }
         }
+    }
+
+    /**
+     * Checks if all import- and mycore values in all maps are set. If a value
+     * is null or like "" false will be returned.
+     * 
+     * @return true if all values are set, otherwise false
+     */
+    public boolean isCompletelyFilled() {
+        // go through all maps
+        for(MCRImportClassificationMap map : classificationMapTable.values()) {
+            // check if the map is completly filled
+            if(!map.isCompletelyFilled())
+                return false;
+        }
+        return true;
     }
 
     /**

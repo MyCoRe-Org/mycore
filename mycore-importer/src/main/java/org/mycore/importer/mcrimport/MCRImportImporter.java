@@ -22,6 +22,7 @@ import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.importer.MCRImportConfig;
+import org.mycore.importer.classification.MCRImportClassificationMap;
 import org.mycore.importer.classification.MCRImportClassificationMappingManager;
 import org.mycore.importer.derivate.MCRImportDerivateFileManager;
 import org.mycore.importer.event.MCRImportStatusEvent;
@@ -56,6 +57,18 @@ public class MCRImportImporter {
         this.config = new MCRImportConfig(rootElement);
         // create the classification manager
         this.classManager = new MCRImportClassificationMappingManager(new File(config.getSaveToPath() + "classification/"));
+
+        if(!classManager.isCompletelyFilled()) {
+            LOGGER.error("The following classification mapping keys are not set:");
+            for(MCRImportClassificationMap map : classManager.getClassificationMapList()) {
+                for(String emptyImportValue : map.getEmptyImportValues())
+                    LOGGER.error(" " + emptyImportValue);
+            }
+            LOGGER.error(   "Before the import can start, all mycore values have to be set or" +
+            		        "the classifcation mapping needs to be disabled!");
+            return;
+        }
+
         // loads the derivate file manager
         derivateFileManager = new MCRImportDerivateFileManager(new File(config.getSaveToPath() + "derivates/"), false);
         // create the listener list
@@ -72,7 +85,7 @@ public class MCRImportImporter {
         // set the root element
         return document.getRootElement();
     }
-    
+
     /**
      * Browses through the specified directory to add a valid import
      * xml file to the id hash table.
@@ -82,8 +95,9 @@ public class MCRImportImporter {
     protected void buildIdTable(File dir) {
         for(File file : dir.listFiles()) {
             if(file.isDirectory())
+                // call this method recursive if its a directory
                 buildIdTable(file);
-            else {
+            else if(file.getName().endsWith(".xml")) {
                 // if is a valid import file
                 Document doc = null;
                 try {
@@ -161,12 +175,12 @@ public class MCRImportImporter {
         // create the next id
         MCRObjectID mcrObjId = new MCRObjectID();
         mcrObjId.setNextFreeId(config.getProjectName() + "_" + type);
+        // set the new id in the xml document
+        doc.getRootElement().setAttribute("ID", mcrObjId.getId());
         // create a new mycore object
         MCRObject mcrObject = new MCRObject();
         // set the xml part
         mcrObject.setFromJDOM(doc);
-        // set the new id
-        mcrObject.setId(mcrObjId);
         // set a flag that this object was imported
         mcrObject.getService().addFlag("imported");
         // save it to the database
@@ -235,6 +249,11 @@ public class MCRImportImporter {
             String linkId = linkElement.getAttributeValue("href", MCRConstants.XLINK_NAMESPACE);
             // try to get the mycore id from the hashtable
             MCRImportFileStatus fs = idTable.get(linkId);
+            if(fs == null) {
+                LOGGER.error(   "Invalid id " + linkId + " found in file " + doc.getBaseURI() + 
+                                " at element " + linkElement.getName() + linkElement.getAttributes());
+                continue;
+            }
             // if null -> the linked object is currently not imported -> do it
             if(fs.getMycoreId() == null)
                 importObjectById(linkId);
@@ -243,6 +262,7 @@ public class MCRImportImporter {
                 linkElement.setAttribute("href", fs.getMycoreId(), MCRConstants.XLINK_NAMESPACE);
             } else {
                 LOGGER.error("Couldnt resolve reference for link " + linkId + " in " + doc.getBaseURI());
+                continue;
             }
         }
     }

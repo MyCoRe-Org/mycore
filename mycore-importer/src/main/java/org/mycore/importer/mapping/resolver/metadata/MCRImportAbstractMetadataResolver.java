@@ -5,6 +5,7 @@ import java.util.List;
 import org.jdom.Element;
 import org.jdom.Namespace;
 import org.jdom.Text;
+import org.jdom.filter.ElementFilter;
 import org.mycore.common.MCRConstants;
 import org.mycore.importer.MCRImportField;
 import org.mycore.importer.mapping.MCRImportMappingManager;
@@ -248,8 +249,24 @@ public abstract class MCRImportAbstractMetadataResolver implements MCRImportMeta
             resolveText(mapChild, metadataChild);
             // resolve recursive further childs of the current one
             resolveChildren(mapChild, metadataChild);
-            // add as child
-            saveToElement.addContent(metadataChild);
+            // add only childs with content
+            if(isValidChild(metadataChild))
+                saveToElement.addContent(metadataChild);
         }
+    }
+
+    @SuppressWarnings("unchecked")
+    protected boolean isValidChild(Element childElement) {
+        if(childElement.getText() != null && !childElement.getText().equals(""))
+            return true;
+        boolean valid = false;
+        List<Element> childList= (List<Element>)childElement.getContent(new ElementFilter());
+        for(int i = 0; i < childList.size(); i++) {
+           if(isValidChild(childList.get(i)))
+               valid = true;
+           else
+               childElement.removeContent(childList.get(i));
+        }
+        return valid;
     }
 }

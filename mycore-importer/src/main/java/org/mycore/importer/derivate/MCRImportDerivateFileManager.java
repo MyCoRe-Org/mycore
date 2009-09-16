@@ -35,7 +35,7 @@ public class MCRImportDerivateFileManager {
             derivateDirectory.mkdir();
         if(!derivateDirectory.isDirectory())
             LOGGER.error(derivateDirectory + " is not a directory");
-        this.linkedFile = new File(derivateDirectory.getAbsolutePath() + "derivateFileLinking.xml");
+        this.linkedFile = new File(derivateDirectory.getAbsolutePath() + "/derivateFileLinking.xml");
         loadDerivateFileLinkingFile(createNewFile);
     }
 
