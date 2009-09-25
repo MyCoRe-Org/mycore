@@ -29,6 +29,7 @@ import static org.mycore.common.MCRConstants.XSI_NAMESPACE;
 import java.io.File;
 import java.net.URI;
 
+import org.jdom.Document;
 import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
@@ -120,6 +121,19 @@ final public class MCRDerivate extends MCRBase {
         // get the service data of the object
         jdom_element = jdom_element_root.getChild("service");
         mcr_service.setFromDOM(jdom_element);
+    }
+
+    /**
+     * This methode gets a JDOM-Document to build up the Derivate-Object.
+     * 
+     * @param doc
+     *            an JDOM Object
+     * @exception MCRException
+     *                general Exception of MyCoRe
+     */
+    public final void setFromJDOM(Document doc) throws MCRException {
+        jdom_document = doc;
+        set();
     }
 
     /**
