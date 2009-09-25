@@ -67,6 +67,7 @@ public class MCRImportObject {
             for(Element derivateElement : derivateList) {
                 derivatesElement.addContent(derivateElement);
             }
+            structureElement.addContent(derivatesElement);
         }
 
         // metadata part

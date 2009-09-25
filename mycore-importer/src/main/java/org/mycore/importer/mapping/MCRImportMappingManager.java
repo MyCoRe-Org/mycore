@@ -52,6 +52,11 @@ public class MCRImportMappingManager {
      */
     private List<Element> mcrObjectList;
 
+    /**
+     * A list of all MCRImportDerivates which have to be saved.
+     */
+    private List<MCRImportDerivate> derivateList;
+    
     private MCRImportConfig config;
 
     private MCRImportMapperManager mapperManager;
@@ -192,14 +197,35 @@ public class MCRImportMappingManager {
     }
 
     /**
+     * Sets a list of <code>MCRImportDerivate</code>s. The whole list will be
+     * saved as xml files to the derivate folder at the import directory. So 
+     * call this method before start the mapping.
+     * 
+     * @param derivateList a list of MCRImportDerivates
+     */
+    public void setDerivateList(List<MCRImportDerivate> derivateList) {
+        this.derivateList = derivateList;
+    }
+
+    /**
+     * Returns a list of all <code>MCRImportDerivate</code>s.
+     * 
+     * @return a list of MCRImportDerivates
+     */
+    public List<MCRImportDerivate> getDerivateList() {
+        return derivateList;
+    }
+
+    /**
      * This method start the whole mapping part of the importer.
      * The given list of records will be mapped and saved to the
-     * file system. In addition, if the classification mapping
-     * is activated, these files will be also saved.
+     * file system. In addition, if classification mapping
+     * is activated, these files will be also saved. Furthermore,
+     * if a derivate list is set, these xml files are generated.
      * 
      * @param recordList a list of records which will be mapped
      */
-    public void startMapping(List<MCRImportRecord> recordList, List<MCRImportDerivate> derivateList) {
+    public void startMapping(List<MCRImportRecord> recordList) {
         // records
         for(MCRImportRecord record : recordList) {
             mapAndSaveRecord(record);

@@ -70,7 +70,7 @@ public class MCRImportDerivateFileManager {
         List<String> filepathList = new ArrayList<String>();
         List<Element> derivateList = rootElement.getChildren("derivate");
         for(Element derivateElement : derivateList) {
-            if(derivateId.equals(derivateElement.getAttribute("id"))) {
+            if(derivateId.equals(derivateElement.getAttributeValue("id"))) {
                 // correct element in list found -> save all path
                 List<Element> pathList = derivateElement.getChildren("path");
                 for(Element pathElement : pathList) {

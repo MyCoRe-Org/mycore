@@ -212,7 +212,7 @@ public class MCRImportClassificationMappingManager {
             return;
         Element rootElement = map.createXML();
         XMLOutputter outputter = new XMLOutputter(Format.getPrettyFormat());
-        FileOutputStream output = new FileOutputStream(classMappingDir.getAbsoluteFile() + "/" + classId);
+        FileOutputStream output = new FileOutputStream(classMappingDir.getAbsoluteFile() + "/" + classId + ".xml");
         outputter.output(new Document(rootElement), output);
     }
     
