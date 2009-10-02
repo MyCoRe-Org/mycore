@@ -122,7 +122,17 @@
                     <td width="10"/>
                     <td width="30" valign="top" align="center">
                       <xsl:if test="$obj_deletewf = 'true'">
-                        <a href="{$ServletsBaseURL}MCRStartEditorServlet{$HttpSession}?se_mcrid={$obj_id}&amp;step=editor&amp;todo=wdelobj">
+                        <xsl:variable name="delpath"
+                          select="concat($ServletsBaseURL,'MCRStartEditorServlet',$HttpSession,'?se_mcrid=',$obj_id,'&amp;step=editor&amp;todo=wdelobj')"/>
+                        <script language="javascript">
+                          function doDelObj()
+                            {
+                            strInput = confirm('<xsl:value-of select="i18n:translate('component.common-parts.isf.deleteMsg')"/>');
+                            if(strInput==true)
+                              window.location='<xsl:value-of select="$delpath"/>' 
+                            }         
+                        </script>
+                        <a href="javascript:doDelObj()">
                           <img src="{$WebApplicationBaseURL}images/workflow_objdelete.gif" title="{i18n:translate('component.swf.object.delObject')}" border="0"/>
                         </a>
                       </xsl:if>
@@ -162,7 +172,17 @@
                       <td width="10"/>
                       <td valign="top" width="30">
                         <xsl:if test="$obj_deletewf = 'true'">
-                          <a href="{$ServletsBaseURL}MCRStartEditorServlet{$HttpSession}?se_mcrid={@ID}&amp;re_mcrid={$obj_id}&amp;step=editor&amp;todo=wdelder">
+                          <xsl:variable name="delpath"
+                            select="concat($ServletsBaseURL,'MCRStartEditorServlet',$HttpSession,'?se_mcrid=',@ID,'&amp;re_mcrid=',$obj_id,'&amp;step=editor&amp;todo=wdelder')"/>
+                          <script language="javascript"> 
+                            function doDelDer() 
+                            { 
+                            strInput = confirm('<xsl:value-of select="i18n:translate('component.common-parts.isf.deleteMsg')"/>'); 
+                            if(strInput==true) 
+                              window.location='<xsl:value-of select="$delpath"/>' 
+                            } 
+                          </script>
+                          <a href="javascript:doDelDer()">
                             <img src="{$WebApplicationBaseURL}images/workflow_derdelete.gif" title="{i18n:translate('component.swf.derivate.delDerivate')}"
                               border="0"/>
                           </a>
@@ -222,8 +242,17 @@
                                   <xsl:value-of
                                     select="encoder:encode( string(concat('####nrall####',count(../file),'####nrthe####',position(),'####filename####',.)))"/>
                                 </xsl:variable>
-                                <a
-                                  href="{$ServletsBaseURL}MCRStartEditorServlet{$HttpSession}?se_mcrid={../@ID}&amp;re_mcrid={$obj_id}&amp;step=editor&amp;todo=wdelfile&amp;extparm={$extparm}">
+                                <xsl:variable name="delpath"
+                                  select="concat($ServletsBaseURL,'MCRStartEditorServlet',$HttpSession,'?se_mcrid=',../@ID,'&amp;re_mcrid=',$obj_id,'&amp;step=editor&amp;todo=wdelfile&amp;extparm=',$extparm)"/>
+                                <script language="javascript"> 
+                                  function doDelFile() 
+                                  { 
+                                  strInput = confirm('<xsl:value-of select="i18n:translate('component.common-parts.isf.deleteMsg')"/>');
+                                  if(strInput==true) 
+                                    window.location='<xsl:value-of select="$delpath"/>' 
+                                  } 
+                                </script>
+                                <a href="javascript:doDelFile()">
                                   <img src="{$WebApplicationBaseURL}images/button_delete.gif" title="{i18n:translate('component.swf.derivate.delFile')}"
                                     border="0"/>
                                 </a>
