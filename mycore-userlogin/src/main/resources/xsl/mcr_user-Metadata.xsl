@@ -527,12 +527,6 @@
           </tr>
         </table>
         
-        <div class="submitButton">
-          <a class="submitbutton" href="{$href-user}&amp;mode=Select">
-            <xsl:value-of select="i18n:translate('component.userlogin.button.next')"/>
-          </a>
-        </div>
-        
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
