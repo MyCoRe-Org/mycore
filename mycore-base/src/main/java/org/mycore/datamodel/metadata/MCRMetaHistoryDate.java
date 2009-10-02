@@ -437,6 +437,7 @@ public class MCRMetaHistoryDate extends MCRMetaDefault {
      * @param element
      *            a relevant JDOM element for the metadata
      */
+    @SuppressWarnings("unchecked")
     public void setFromDOM(org.jdom.Element element) {
         super.setFromDOM(element);
         texts.clear(); // clear
