@@ -250,7 +250,7 @@ public class MCRStartEditorServlet extends MCRServlet {
         try {
             cd.mytfmcrid = new MCRObjectID(mytfmcrid);
         } catch (Exception e) {
-            cd.mytfmcrid = new MCRObjectID();
+            mytfmcrid = null;
         }
         if ((mytfmcrid == null) || ((mytfmcrid = mytfmcrid.trim()).length() == 0)) {
             cd.mytfmcrid = new MCRObjectID(getNextMCRTFID(cd.myproject, cd.mytype));
@@ -764,78 +764,6 @@ public class MCRStartEditorServlet extends MCRServlet {
         sb.append(getBaseURL()).append(pagedir).append("editor_form_commit-derivate.xml");
         job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(buildRedirectURL(sb.toString(), params)));
     }
-
-    /**      
-     * The method start the editor to modify a derivate object that is stored in    
-     * the server. The method use the input parameter: <b>type</b>,<b>step</b>      
-     * <b>se_mcrid</b> and <b>se_mcrid</b>. Access rights must be 'writedb'.    
-     *      
-     * @param job   
-     *            the MCRServletJob instance    
-     */     
-    public void deleteDedivate(MCRServletJob job, CommonData cd) throws IOException {   
-        if (!MCRAccessManager.checkPermission(cd.myremcrid.getId(), "writedb")) {   
-            job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + usererrorpage));      
-            return;     
-        }   
-        if (!cd.mysemcrid.isValid()) {      
-            job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + mcriderrorpage));     
-            return;     
-        }   
-    
-        StringBuffer sb = new StringBuffer();   
-        Properties params = new Properties();   
-        sb.append("request:receive/").append(cd.mysemcrid).append("?XSL.Style=editor");     
-        params.put("sourceUri", sb.toString());     
-        sb = new StringBuffer();    
-        sb.append(getBaseURL()).append("receive/").append(cd.myremcrid.getId());    
-    
-        params.put("cancelUrl", sb.toString());     
-        params.put("XSL.se_mcrid", cd.mysemcrid.getId());   
-        params.put("XSL.re_mcrid", cd.myremcrid.getId());   
-        params.put("XSL.tf_mcrid", cd.mytfmcrid.getId());   
-        params.put("type", cd.mytype);      
-        params.put("step", cd.mystep);      
-        sb = new StringBuffer();    
-        sb.append(getBaseURL()).append(pagedir).append("deleteDerivate.xml");   
-        job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(buildRedirectURL(sb.toString(), params)));   
-    }   
-    
-    /**     
-     * The method start the editor to modify a derivate object that is stored in    
-     * the server. The method use the input parameter: <b>type</b>,<b>step</b>      
-     * <b>se_mcrid</b> and <b>se_mcrid</b>. Access rights must be 'writedb'.    
-     *      
-     * @param job   
-     *            the MCRServletJob instance    
-     */     
-    public void deleteObject(MCRServletJob job, CommonData cd) throws IOException {     
-        if (!MCRAccessManager.checkPermission(cd.myremcrid.getId(), "writedb")) {   
-            job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + usererrorpage));      
-            return;     
-        }   
-        if (!cd.mysemcrid.isValid()) {      
-            job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + mcriderrorpage));     
-            return;     
-        }   
-    
-        StringBuffer sb = new StringBuffer();   
-        Properties params = new Properties();   
-        sb.append("request:receive/").append(cd.mysemcrid).append("?XSL.Style=editor");     
-        params.put("sourceUri", sb.toString());     
-        sb = new StringBuffer();    
-        sb.append(getBaseURL()).append("receive/").append(cd.myremcrid.getId());    
-    
-        params.put("cancelUrl", sb.toString());     
-        params.put("XSL.se_mcrid", cd.mysemcrid.getId());   
-        params.put("XSL.re_mcrid", cd.myremcrid.getId());   
-        params.put("XSL.tf_mcrid", cd.mytfmcrid.getId());   
-        params.put("type", cd.mytype);      
-        params.put("step", cd.mystep);      
-        sb = new StringBuffer();    
-        sb.append(getBaseURL()).append(pagedir).append("deleteObject.xml");     
-        job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(buildRedirectURL(sb.toString(), params)));   
-    }   
 
     /**
      * The method start the editor to modify a metadata object that is stored in
