@@ -45,6 +45,23 @@ public class MCRMetsModsUtil {
     Element fileSec = new Element("fileSec", MCRConstants.METS_NAMESPACE);
     Element structMap = new Element("structMap", MCRConstants.METS_NAMESPACE);
 
+    
+    public Element createMetsElement(ArrayList<String> list, Element mets, String default_url, String ContentIDS) {
+        Iterator<String> iter = list.iterator();
+        int i = 1;
+        while (iter.hasNext()) {
+            String pic = iter.next();
+            String fn = pic.substring(pic.lastIndexOf("/") + 1, pic.lastIndexOf("."));
+            pic = default_url + "/" + pic;
+            
+            add_file(mets, fn, pic, i, ContentIDS, "page");
+            i++;
+        }
+
+        return mets;
+    }
+    
+    
     /**
      * Gets a list containing picture names including directories.
      * 
@@ -60,7 +77,7 @@ public class MCRMetsModsUtil {
             String fn = pic.substring(pic.lastIndexOf("/") + 1, pic.lastIndexOf("."));
             pic = default_url + "/" + pic;
             
-            add_file(mets, fn, pic, i);
+            add_file(mets, fn, pic, i, "page");
             i++;
         }
 
@@ -68,11 +85,7 @@ public class MCRMetsModsUtil {
     }
 
     private Element create_mets_head() {
-        // <mets:mets xmlns:mets="http://www.loc.gov/METS/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xlink="http://www.w3.org/1999/xlink"
-        // xsi:schemaLocation="http://www.loc.gov/METS/ http://www.loc.gov/mets/mets.xsd">
-        // String mets_head =
-        // "<mets:mets xmlns:mets=\"http://www.loc.gov/METS/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xsi:schemaLocation=\"http://www.loc.gov/METS/ http://www.loc.gov/mets/mets.xsd\"></mets:mets>";
-        String empty_mets_url = new String("../webapps/empty.mets.xml");
+       String empty_mets_url = new String("../webapps/empty.mets.xml");
 
         try {
             Document doc = new SAXBuilder().build(empty_mets_url);
@@ -81,8 +94,6 @@ public class MCRMetsModsUtil {
 
             return doc.getRootElement();
 
-            // XMLOutputter xmlout = new XMLOutputter();
-            // xmlout.output(doc.getRootElement(), System.out);
         } catch (JDOMException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -220,17 +231,17 @@ public class MCRMetsModsUtil {
         return structMap;
     }
 
-    public Element add_file(Element mets, String file_id, String url, int order, String contentids)
+    public Element add_file(Element mets, String file_id, String url, int order, String contentids, String type)
     {
-        return add_file_ext(mets,file_id,url,order,contentids);
+        return add_file_ext(mets,file_id,url,order,contentids, type);
     }
     
-    public Element add_file(Element mets, String file_id, String url, int order)
+    public Element add_file(Element mets, String file_id, String url, int order, String type)
     {
-        return add_file_ext(mets,file_id,url,order,null);
+        return add_file_ext(mets,file_id,url,order,null, type);
     }
     
-    public Element add_file_ext(Element mets, String file_id, String url, int order,String contentids) {
+    public Element add_file_ext(Element mets, String file_id, String url, int order, String contentids, String type) {
         Element fileGrp = mets.getChild("fileSec", MCRConstants.METS_NAMESPACE).getChild("fileGrp", MCRConstants.METS_NAMESPACE);
         Element div = mets.getChild("structMap", MCRConstants.METS_NAMESPACE).getChild("div", MCRConstants.METS_NAMESPACE);
 
@@ -251,8 +262,7 @@ public class MCRMetsModsUtil {
         div_.setAttribute("ORDER", String.valueOf(order));
             //The following line has changed in order to set the filename as orderlabel...
         div_.setAttribute("ORDERLABEL", file_id);//String.valueOf(order));
-            //The next line is commented out because of a changed behavior of the mets format.
-        // div_.setAttribute("type","page");
+        div_.setAttribute("type",type);
             //The following line contains the CONTENTIDS, if is null then do nothing 
         if(contentids!=null) div_.setAttribute("CONTENTIDS",contentids);
         Element fptr = new Element("fptr", MCRConstants.METS_NAMESPACE);

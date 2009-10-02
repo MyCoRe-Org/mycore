@@ -174,7 +174,11 @@ public class MCRStartMetsModsServlet extends MCRStartEditorServlet {
                     //sorting the pic_list
                     Collections.sort(pic_list);
                 
-                Element mets2 = mmu.createMetsElement(pic_list, mets, getBaseURL() + "servlets/MCRFileNodeServlet");
+                Element mets2;
+                if(CONFIG.getString("MCR.Component.MetsMods.activated","").contains("CONTENTIDS"))
+                    mets2 = mmu.createMetsElement(pic_list, mets, getBaseURL() + "servlets/MCRFileNodeServlet", getBaseURL()+"receive/"+cd.myremcrid.getId());
+                else
+                    mets2 = mmu.createMetsElement(pic_list, mets, getBaseURL() + "servlets/MCRFileNodeServlet");
 
                 XMLOutputter xmlout = new XMLOutputter();
                 String full_mets = xmlout.outputString(mets2);
