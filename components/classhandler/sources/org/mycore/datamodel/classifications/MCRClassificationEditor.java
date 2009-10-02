@@ -172,12 +172,15 @@ public class MCRClassificationEditor {
                 return false;
             }
 
-            MCRCategory newCategory = MCRXMLTransformer.buildCategory(id.getRootID(), newCateg, oldCategory.getParent());
+            MCRCategory parent = oldCategory.getParent();
+            MCRCategory newCategory = MCRXMLTransformer.buildCategory(id.getRootID(), newCateg, parent);
             //copy new values to old copy of category
             oldCategory.setURI(newCategory.getURI());
             oldCategory.getLabels().clear();
             Collection<MCRLabel> labels = newCategory.getLabels();
             oldCategory.getLabels().addAll(labels);
+            //added by MCRXMLTransformer
+            parent.getChildren().remove(newCategory);
 
             MCRClassificationBrowserData.getClassificationPool().updateClassification(classif);
             String sessionID = MCRSessionMgr.getCurrentSession().getID();
