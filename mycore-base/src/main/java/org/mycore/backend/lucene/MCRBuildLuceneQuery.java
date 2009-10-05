@@ -81,7 +81,6 @@ public class MCRBuildLuceneQuery {
             boolean reqfn = reqf;
             boolean prof = false;
 
-            LOGGER.info("NEW Code active");
             @SuppressWarnings("unchecked")
             List<Element> children = xEle.getChildren();
             if (name.equals("and")) {
@@ -114,7 +113,6 @@ public class MCRBuildLuceneQuery {
                     r = new BooleanQuery();
                 }
 
-                //BooleanClause bq = new BooleanClause(x, reqfn, prof);
                 BooleanClause.Occur occur = BooleanClause.Occur.MUST;
 
                 if (reqfn && !prof)
@@ -148,7 +146,6 @@ public class MCRBuildLuceneQuery {
                 if ((null != tq) && (null == bq)) // not first token
                 {
                     bq = new BooleanQuery();
-                    //bq.add(tq, reqf, false);
                     if (reqf)
                         bq.add(tq, BooleanClause.Occur.MUST);
                     else
@@ -158,7 +155,6 @@ public class MCRBuildLuceneQuery {
                 tq = new TermQuery(te);
 
                 if (null != bq) {
-                    //bq.add(tq, reqf, false);
                     if (reqf)
                         bq.add(tq, BooleanClause.Occur.MUST);
                     else
@@ -197,8 +193,7 @@ public class MCRBuildLuceneQuery {
 
             return pq;
         } else if ("text".equals(fieldtype) && "fuzzy".equals(operator)) // 1.9.05
-        // future
-        // use
+        // future use
         {
             Term te;
             value = fixQuery(value);
@@ -206,8 +201,7 @@ public class MCRBuildLuceneQuery {
 
             return new FuzzyQuery(te);
         } else if ("text".equals(fieldtype) && "range".equals(operator)) // 1.9.05
-        // future
-        // use
+        // future use
         {
             String lower = null;
             String upper = null;
@@ -237,11 +231,7 @@ public class MCRBuildLuceneQuery {
         } else if ("integer".equals(fieldtype)) {
             return NumberQuery(field, "integer", operator, Long.parseLong(value));
         } else if ("text".equals(fieldtype) && "lucene".equals(operator)) // value
-        // contains
-        // query
-        // for
-        // lucene,
-        // use query parser
+        // contains query for lucene, use query parser
         {
             QueryParser qp = new QueryParser(field, analyzer);
             Query query = qp.parse(fixQuery(value));
