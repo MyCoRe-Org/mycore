@@ -124,15 +124,16 @@
                       <xsl:if test="$obj_deletewf = 'true'">
                         <xsl:variable name="delpath"
                           select="concat($ServletsBaseURL,'MCRStartEditorServlet',$HttpSession,'?se_mcrid=',$obj_id,'&amp;step=editor&amp;todo=wdelobj')"/>
+                        <xsl:variable name="delscript" select="concat('doDelObj',$obj_id,'()')" />
                         <script language="javascript">
-                          function doDelObj()
+                          function <xsl:value-of select="$delscript"/>
                             {
                             strInput = confirm('<xsl:value-of select="i18n:translate('component.common-parts.isf.deleteMsg')"/>');
                             if(strInput==true)
                               window.location='<xsl:value-of select="$delpath"/>' 
                             }         
                         </script>
-                        <a href="javascript:doDelObj()">
+                        <a href="javascript:{$delscript}">
                           <img src="{$WebApplicationBaseURL}images/workflow_objdelete.gif" title="{i18n:translate('component.swf.object.delObject')}" border="0"/>
                         </a>
                       </xsl:if>
@@ -174,15 +175,16 @@
                         <xsl:if test="$obj_deletewf = 'true'">
                           <xsl:variable name="delpath"
                             select="concat($ServletsBaseURL,'MCRStartEditorServlet',$HttpSession,'?se_mcrid=',@ID,'&amp;re_mcrid=',$obj_id,'&amp;step=editor&amp;todo=wdelder')"/>
+                          <xsl:variable name="delscript" select="concat('doDelDer',@ID,'()')" />
                           <script language="javascript"> 
-                            function doDelDer() 
+                            function <xsl:value-of select="$delscript"/> 
                             { 
                             strInput = confirm('<xsl:value-of select="i18n:translate('component.common-parts.isf.deleteMsg')"/>'); 
                             if(strInput==true) 
                               window.location='<xsl:value-of select="$delpath"/>' 
                             } 
                           </script>
-                          <a href="javascript:doDelDer()">
+                          <a href="javascript:{$delscript}">
                             <img src="{$WebApplicationBaseURL}images/workflow_derdelete.gif" title="{i18n:translate('component.swf.derivate.delDerivate')}"
                               border="0"/>
                           </a>
@@ -244,15 +246,16 @@
                                 </xsl:variable>
                                 <xsl:variable name="delpath"
                                   select="concat($ServletsBaseURL,'MCRStartEditorServlet',$HttpSession,'?se_mcrid=',../@ID,'&amp;re_mcrid=',$obj_id,'&amp;step=editor&amp;todo=wdelfile&amp;extparm=',$extparm)"/>
+                                <xsl:variable name="delscript" select="concat('doDelDer',../@ID,'_',position(),'()')" />
                                 <script language="javascript"> 
-                                  function doDelFile() 
+                                  function <xsl:value-of select="$delscript"/> 
                                   { 
                                   strInput = confirm('<xsl:value-of select="i18n:translate('component.common-parts.isf.deleteMsg')"/>');
                                   if(strInput==true) 
                                     window.location='<xsl:value-of select="$delpath"/>' 
                                   } 
                                 </script>
-                                <a href="javascript:doDelFile()">
+                                <a href="javascript:{$delscript}">
                                   <img src="{$WebApplicationBaseURL}images/button_delete.gif" title="{i18n:translate('component.swf.derivate.delFile')}"
                                     border="0"/>
                                 </a>
