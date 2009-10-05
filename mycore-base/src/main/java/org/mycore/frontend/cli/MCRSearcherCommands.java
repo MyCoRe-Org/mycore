@@ -40,16 +40,15 @@ import org.hibernate.criterion.Restrictions;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
-import org.jdom.Namespace;
-
 import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.backend.hibernate.tables.MCRFSNODES;
-import org.mycore.backend.hibernate.tables.MCRXMLTABLE;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConstants;
 import org.mycore.common.xml.MCRXMLResource;
+import org.mycore.datamodel.common.MCRXMLTableManager;
 import org.mycore.datamodel.ifs.MCRFile;
 import org.mycore.datamodel.ifs.MCRFileMetadataManager;
+import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.services.fieldquery.MCRData2Fields;
 import org.mycore.services.fieldquery.MCRFieldDef;
 import org.mycore.services.fieldquery.MCRFieldValue;
@@ -99,16 +98,11 @@ public class MCRSearcherCommands extends MCRAbstractCommands {
             LOGGER.info("clearing index " + searcherID);
             searcher.clearIndex();
             searcher.notifySearcher("insert");
-            Session session = MCRHIBConnection.instance().getSession();
-            Criteria xmlCriteria = session.createCriteria(MCRXMLTABLE.class);
-            xmlCriteria.setCacheMode(CacheMode.IGNORE);
-            ScrollableResults results = xmlCriteria.scroll(ScrollMode.FORWARD_ONLY);
-            while (results.next()) {
-                MCRXMLTABLE xmlEntry = (MCRXMLTABLE) results.get(0);
-                if (xmlEntry.getType().equals("derivate"))
-                    continue;
-                addMetaToIndex(xmlEntry, false, searcher);
-                session.evict(xmlEntry);
+            //TODO: Code needs to be made fast again after IFS2 Metastore is matured
+            MCRXMLTableManager mcrxmlTableManager = MCRXMLTableManager.instance();
+            for(String id:mcrxmlTableManager.retrieveAllIDs()) {
+                MCRObjectID mcrid = new MCRObjectID(id);
+                addMetaToIndex(mcrid, mcrxmlTableManager.retrieveAsXML(mcrid), false, searcher);
             }
             searcher.notifySearcher("finish");
             LOGGER.info("Done building index " + searcherID);
@@ -181,12 +175,12 @@ public class MCRSearcherCommands extends MCRAbstractCommands {
         return false;
     }
 
-    private static void addMetaToIndex(MCRXMLTABLE xmlEntry, boolean update, MCRSearcher searcher) {
-        List<MCRFieldValue> fields = MCRData2Fields.buildFields(xmlEntry.getXmlByteArray(), searcher.getIndex(), MCRFieldDef.OBJECT_METADATA
-                + MCRFieldDef.OBJECT_CATEGORY, xmlEntry.getType());
+    private static void addMetaToIndex(MCRObjectID id, byte[] xml, boolean update, MCRSearcher searcher) {
+        List<MCRFieldValue> fields = MCRData2Fields.buildFields(xml, searcher.getIndex(), MCRFieldDef.OBJECT_METADATA
+                + MCRFieldDef.OBJECT_CATEGORY, id.getTypeId());
         if (update)
-            searcher.removeFromIndex(xmlEntry.getId());
-        searcher.addToIndex(xmlEntry.getId(), xmlEntry.getId(), fields);
+            searcher.removeFromIndex(id.getId());
+        searcher.addToIndex(id.getId(), id.getId(), fields);
     }
 
     private static void addFileToIndex(MCRFile file, boolean update, MCRSearcher searcher) {
