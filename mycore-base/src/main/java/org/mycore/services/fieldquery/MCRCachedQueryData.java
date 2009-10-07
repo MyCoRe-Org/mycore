@@ -74,10 +74,11 @@ public class MCRCachedQueryData
   /** The number of hits per page */
   private int numPerPage;
   
-  public static void cache(MCRResults results, Document query, MCRCondition condition) {
+  public static MCRCachedQueryData cache(MCRResults results, Document query, MCRCondition condition) {
     MCRCachedQueryData data = new MCRCachedQueryData(results, query, condition);
     cache.put( results.getID(), data );
     MCRSessionMgr.getCurrentSession().put( LAST_QUERY_IN_SESSION, data );
+    return data;
   }
   
   private MCRCachedQueryData( MCRResults results, Document query, MCRCondition condition )
