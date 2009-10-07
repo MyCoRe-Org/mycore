@@ -55,9 +55,6 @@ import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRPersistenceException;
-import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.events.MCRSessionEvent;
-import org.mycore.common.events.MCRSessionListener;
 import org.mycore.common.events.MCRShutdownHandler;
 import org.mycore.common.events.MCRShutdownHandler.Closeable;
 import org.mycore.services.mbeans.MCRJMXBridge;
@@ -68,7 +65,7 @@ import org.mycore.services.mbeans.MCRJMXBridge;
  * @author Thomas Scheffler (yagee)
  * 
  */
-public class MCRHIBConnection implements Closeable, MCRSessionListener {
+public class MCRHIBConnection implements Closeable {
     static Configuration HIBCFG;
 
     static SessionFactory SESSION_FACTORY;
@@ -107,7 +104,6 @@ public class MCRHIBConnection implements Closeable, MCRSessionListener {
             throw new MCRPersistenceException(msg, exc);
         } finally {
             MCRShutdownHandler.getInstance().addCloseable(this);
-            MCRSessionMgr.addSessionListener(this);
         }
     }
 
@@ -292,11 +288,6 @@ public class MCRHIBConnection implements Closeable, MCRSessionListener {
 
     public SessionFactory getSessionFactory() {
         return SESSION_FACTORY;
-    }
-
-    public void sessionEvent(MCRSessionEvent event) {
-        // TODO Auto-generated method stub
-
     }
 
     /**
