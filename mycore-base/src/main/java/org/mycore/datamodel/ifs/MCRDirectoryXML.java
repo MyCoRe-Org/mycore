@@ -144,7 +144,7 @@ public class MCRDirectoryXML {
             }
             
             try {
-              Document additional = null;
+              Document additional = children[i].getAllAdditionalData();
               if( additional != null )
                 node.addContent( additional.detachRootElement() );
             } catch(Exception ignored) {}
