@@ -24,7 +24,7 @@
 package org.mycore.datamodel.ifs;
 
 import java.util.GregorianCalendar;
-import java.util.Vector;
+import java.util.List;
 
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRConfiguration;
@@ -221,16 +221,15 @@ public class MCRFileMetadataManager {
     }
 
     /**
-     * Retrieves a list of all IDs of the child MCRFilesystemNodes of a given
+     * Retrieves a list of all child MCRFilesystemNodes of a given
      * MCRDirectory.
      * 
      * @param ID
      *            the ID of the parent MCRDirectory
-     * @return a Vector of String objects containing the IDs of all children of
-     *         that MCRDirectory
+     * @return a List of all children of that MCRDirectory
      */
-    Vector retrieveChildrenIDs(String ID) throws MCRPersistenceException {
-        return store.retrieveChildrenIDs(ID);
+    List<MCRFilesystemNode> retrieveChildren(String ID) throws MCRPersistenceException {
+        return store.retrieveChildren(ID);
     }
 
     /**

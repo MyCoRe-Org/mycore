@@ -24,9 +24,9 @@
 package org.mycore.backend.hibernate;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.List;
-import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.hibernate.Criteria;
@@ -161,21 +161,20 @@ public class MCRHIBFileMetadataStore implements MCRFileMetadataStore {
     }
 
     @SuppressWarnings("unchecked")
-    public Vector<String> retrieveChildrenIDs(String parentID) throws MCRPersistenceException {
+    public List<MCRFilesystemNode> retrieveChildren(String parentID) throws MCRPersistenceException {
         Session session = getSession();
         List<MCRFSNODES> l = session.createQuery("from MCRFSNODES where PID = '" + parentID + "'").list();
 
+        List<MCRFilesystemNode> list = new ArrayList<MCRFilesystemNode>(l.size());
         if (l.size() == 0) {
-            return new Vector<String>();
+            return list;
         }
-
-        Vector<String> v = new Vector<String>(l.size());
 
         for (int t = 0; t < l.size(); t++) {
-            v.add(t, l.get(t).getId());
+            list.add(buildNode(l.get(t)));
         }
 
-        return v;
+        return list;
     }
 
     public void deleteNode(String ID) throws MCRPersistenceException {
