@@ -241,6 +241,10 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
 
         long start = System.currentTimeMillis();
         final Sort sortFields = buildSortFields(sortBy);
+        if (sortFields.getSort().length == 0) {
+            //one sort criteria is needed for TopFieldCollector, using internal document id then
+            sortFields.setSort(SortField.FIELD_DOC);
+        }
         MCRLuceneResults results = new MCRLuceneResults(sharedIndexContext, addableFields, sortFields, luceneQuery, maxResults);
         LOGGER.info("Number of Objects found: " + results.getNumHits() + " Time for Search: " + (System.currentTimeMillis() - start));
         return results;
