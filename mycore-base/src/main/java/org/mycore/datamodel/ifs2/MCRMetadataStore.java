@@ -35,7 +35,7 @@ import org.mycore.common.MCRException;
  * 
  * MCR.IFS2.Store.DocPortal_document.Class=org.mycore.datamodel.ifs2.MCRMetadataStore 
  * MCR.IFS2.Store.DocPortal_document.BaseDir=/foo/bar
- * MCR.IFS2.Store.DocPortal_document.SlotLayout=4-2-2 MCR.IFS2.
+ * MCR.IFS2.Store.DocPortal_document.SlotLayout=4-2-2 
  * MCR.IFS2.Store.DocPortal_document.ForceXML=true (which is default)
  * 
  * @author Frank Lützenkirchen
@@ -51,7 +51,7 @@ public class MCRMetadataStore extends MCRStore {
     protected boolean forceXML = true;
     
     /**
-     * Returns the store for the given metadata document type
+     * Returns the store for the given metadata object type
      * 
      * @param type
      *            the type of metadata to store
