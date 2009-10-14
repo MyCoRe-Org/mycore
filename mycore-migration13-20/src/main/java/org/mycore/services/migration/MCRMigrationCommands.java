@@ -162,7 +162,7 @@ public class MCRMigrationCommands extends MCRAbstractCommands {
     public static List<String> migrateMCRXMLTable() {
         MCRXMLTableManager tm = MCRXMLTableManager.instance();
         LinkedList<String> commands = new LinkedList<String>();
-        for (String id : tm.retrieveAllIDs()) {
+        for (String id : tm.listIDs()) {
             commands.add("internal migrate MCRXMLTABLE entry " + id);
         }
         return commands;

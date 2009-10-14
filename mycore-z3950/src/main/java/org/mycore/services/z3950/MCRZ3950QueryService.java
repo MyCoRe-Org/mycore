@@ -72,7 +72,7 @@ public class MCRZ3950QueryService implements MCRZ3950Query {
                 MCRHit hit = mycoreResults.getHit(index);
                 String id = hit.getID();
                 // check the ID and retrieve the data
-                org.jdom.Document d = TM.readDocument(new MCRObjectID(id));
+                org.jdom.Document d = TM.retrieveXML(new MCRObjectID(id));
                 fillClassificationsWithLabels(d.getRootElement());
                 
                 // build old MCRXMLContainer so that stylesheets in jzkit package must not be changed

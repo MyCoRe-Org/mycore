@@ -20,9 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.hibernate.Session;
 
-import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 import org.mycore.datamodel.common.MCRXMLTableManager;
@@ -79,7 +77,7 @@ public class MCRImgCacheCommands extends MCRAbstractCommands {
 
     public static final List<String> createCache() {
         MCRXMLTableManager xmlTableManager = MCRXMLTableManager.instance();
-        List<String> derivateList = xmlTableManager.retrieveAllIDs("derivate");
+        List<String> derivateList = xmlTableManager.listIDsOfType("derivate");
         List<String> returns = new ArrayList<String>(derivateList.size());
         for (String derivateID : derivateList) {
             returns.add("create image cache for derivate " + derivateID);
@@ -89,7 +87,7 @@ public class MCRImgCacheCommands extends MCRAbstractCommands {
 
     public static List<String> deleteCache() {
         MCRXMLTableManager xmlTableManager = MCRXMLTableManager.instance();
-        List<String> derivateList = xmlTableManager.retrieveAllIDs("derivate");
+        List<String> derivateList = xmlTableManager.listIDsOfType("derivate");
         List<String> returns = new ArrayList<String>(derivateList.size());
         for (String derivateID : derivateList) {
             returns.add("delete image cache for derivate " + derivateID);

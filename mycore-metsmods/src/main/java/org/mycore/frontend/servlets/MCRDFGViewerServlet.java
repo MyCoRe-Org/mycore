@@ -165,7 +165,7 @@ public class MCRDFGViewerServlet extends MCRStartEditorServlet {
         try {
             LOGGER.warn("Use lang " + lang + " for get XPath element.");
             XPath xpathconf = XPath.newInstance(conf);
-            Document doc = tm.readDocument(ID);
+            Document doc = tm.retrieveXML(ID);
             List<Element> nodes = xpathconf.selectNodes(doc);
             for (Element node : nodes) {
                 System.out.println(node.getName() + ":" + node.getText());

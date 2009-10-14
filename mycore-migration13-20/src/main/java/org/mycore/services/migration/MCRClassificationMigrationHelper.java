@@ -47,11 +47,11 @@ public class MCRClassificationMigrationHelper {
     private static Logger LOGGER = Logger.getLogger(MCRClassificationMigrationHelper.class);
 
     static void createCategories() throws URISyntaxException {
-        List<String> classIds = MCRXMLTableManager.instance().retrieveAllIDs("class");
+        List<String> classIds = MCRXMLTableManager.instance().listIDsOfType("class");
         LOGGER.info("Migrating classifications and categories...");
         for (String classID : classIds) {
             MCRObjectID objID = new MCRObjectID(classID);
-            Document cl = MCRXMLTableManager.instance().readDocument(objID);
+            Document cl = MCRXMLTableManager.instance().retrieveXML(objID);
             MCRCategory cat = MCRXMLTransformer.getCategory(cl);
             DAO.addCategory(null, cat);
             MCRXMLTableManager.instance().delete(objID);
@@ -75,9 +75,9 @@ public class MCRClassificationMigrationHelper {
             pos++;
             LOGGER.debug("Processing object " + id);
             Collection<MCRCategoryID> categories = new HashSet<MCRCategoryID>();
-            if (XML_TABLE.exist(new MCRObjectID(id))) {
+            if (XML_TABLE.exists(new MCRObjectID(id))) {
                 LOGGER.debug("Parsing XML of object " + id);
-                Document obj = XML_TABLE.readDocument(new MCRObjectID(id));
+                Document obj = XML_TABLE.retrieveXML(new MCRObjectID(id));
                 LOGGER.debug("executing XPATH " + classSelector.getXPath());
                 List<Element> classElements = classSelector.selectNodes(obj);
                 int categoryCount = classElements.size();
