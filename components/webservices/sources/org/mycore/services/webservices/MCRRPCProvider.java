@@ -31,6 +31,7 @@ import org.apache.axis.providers.java.RPCProvider;
 import org.apache.log4j.Logger;
 import org.hibernate.Transaction;
 import org.mycore.backend.hibernate.MCRHIBConnection;
+import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 
 /**
@@ -71,7 +72,9 @@ public class MCRRPCProvider extends RPCProvider {
             throw ex;
         }
         finally{
-            MCRSessionMgr.getCurrentSession().close();
+            MCRSession session = MCRSessionMgr.getCurrentSession();
+            MCRSessionMgr.releaseCurrentSession();
+            session.close();
         }
 
         LOGGER.info("WebService call #" + count + " finished in " + (System.currentTimeMillis() - millis) + " ms");
