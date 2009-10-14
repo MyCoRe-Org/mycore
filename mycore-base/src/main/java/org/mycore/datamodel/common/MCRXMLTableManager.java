@@ -1,16 +1,24 @@
 /*
- * $Revision$ $Date$ This
- * file is part of *** M y C o R e *** See http://www.mycore.de/ for details.
- * This program is free software; you can use it, redistribute it and / or
- * modify it under the terms of the GNU General Public License (GPL) as
- * published by the Free Software Foundation; either version 2 of the License or
- * (at your option) any later version. This program is distributed in the hope
- * that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
- * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- * General Public License for more details. You should have received a copy of
- * the GNU General Public License along with this program, in a file called
- * gpl.txt or license.txt. If not, write to the Free Software Foundation Inc.,
- * 59 Temple Place - Suite 330, Boston, MA 02111-1307 USA
+ * $Revision$ 
+ * $Date$
+ *
+ * This file is part of ***  M y C o R e  ***
+ * See http://www.mycore.de/ for details.
+ *
+ * This program is free software; you can use it, redistribute it
+ * and / or modify it under the terms of the GNU General Public License
+ * (GPL) as published by the Free Software Foundation; either version 2
+ * of the License or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program, in a file called gpl.txt or license.txt.
+ * If not, write to the Free Software Foundation Inc.,
+ * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
  */
 
 package org.mycore.datamodel.common;
@@ -35,19 +43,54 @@ import org.mycore.datamodel.ifs2.MCRStoredMetadata;
 import org.mycore.datamodel.metadata.MCRObjectID;
 
 /**
+ * Manages persistence of MCRObject and MCRDerivate xml metadata.
+ * Provides methods to create, retrieve, update and delete object metadata
+ * using IFS2 MCRMetadataStore instances.
+ * 
+ * For configuration, at least the following properties must be set:
+ * 
+ * MCR.Metadata.Store.BaseDir=/path/to/metadata/dir 
+ * MCR.Metadata.Store.SVNBase=file:///path/to/local/svndir
+ * 
+ * Both directories will be created if they do not exist yet.
+ * For each project and type, a subdirectory will be created,
+ * for example %MCR.Metadata.Store.BaseDir%/DocPortal/document/.
+ * 
+ * The default IFS2 store is MCRVersioningMetadataStore, which
+ * versions metadata using SVN in local repositories below SVNBase.
+ * If you do not want versioning and would like to have better 
+ * performance, change the following property to
+ * 
+ * MCR.Metadata.Store.DefaultClass=org.mycore.datamodel.ifs2.MCRMetadataStore
+ * 
+ * It is also possible to change individual properties per project and object type
+ * and overwrite the defaults, for example
+ * 
+ * MCR.IFS2.Store.Class=org.mycore.datamodel.ifs2.MCRVersioningMetadataStore
+ * MCR.IFS2.Store.SVNRepositoryURL=file:///use/other/location/for/document/versions
+ * MCR.IFS2.Store.SlotLayout=2-2-2-2
+ * 
+ * See documentation of MCRStore and MCRMetadataStore for details.
+ * 
  * @author Frank Lützenkirchen
  * @author Jens Kupferschmidt
  * @author Thomas Scheffler (yagee)
  */
 public class MCRXMLTableManager {
+    
+    /** The singleton */
     private static MCRXMLTableManager SINGLETON;
 
+    /** Returns the singleton */
     public static synchronized MCRXMLTableManager instance() {
         if (SINGLETON == null)
             SINGLETON = new MCRXMLTableManager();
         return SINGLETON;
     }
 
+    /**
+     * Reads configuration properties, checks and creates base directories and builds the singleton
+     */
     protected MCRXMLTableManager() {
         MCRConfiguration config = MCRConfiguration.instance();
 
@@ -72,6 +115,10 @@ public class MCRXMLTableManager {
         }
     }
 
+    /**
+     * Checks the directory configured exists and is readable and writeable, or creates it
+     * if it does not exist yet. 
+     */
     private void checkDir(File dir, String type) {
         if (!dir.exists()) {
             try {
@@ -100,16 +147,39 @@ public class MCRXMLTableManager {
         }
     }
 
+    /**
+     * The default IFS2 Metadata store class to use, set by MCR.Metadata.Store.DefaultClass
+     */
     private String defaultClass;
 
+    /**
+     * The default subdirectory slot layout for IFS2 metadata store, is 4-2-2 for 8-digit IDs,
+     * that means DocPortal_document_0000001 will be stored in the file 
+     * DocPortal/document/0000/00/DocPortal_document_00000001.xml 
+     */
     private String defaultLayout;
 
+    /**
+     * The base directory for all IFS2 metadata stores used, set by MCR.Metadata.Store.BaseDir
+     */
     private File baseDir;
 
+    /**
+     * The local base directory for IFS2 versioned metadata using SVN, set URI by MCR.Metadata.Store.SVNBase
+     */
     private File svnDir;
 
+    /**
+     * The local file:// uri of all SVN versioned metadata, set URI by MCR.Metadata.Store.SVNBase
+     */
     private String svnBase;
 
+    /**
+     * Returns IFS2 MCRMetadataStore for the given project and object type
+     * 
+     * @param project the project, e.g. DocPortal
+     * @param type the object type, e.g. document
+     */
     private synchronized MCRMetadataStore getStore(String project, String type) {
         String prefix = "MCR.IFS2.Store." + project + "_" + type + ".";
         MCRConfiguration config = MCRConfiguration.instance();
@@ -154,15 +224,31 @@ public class MCRXMLTableManager {
         return MCRMetadataStore.getStore(project + "_" + type);
     }
 
+    /**
+     * Returns IFS2 MCRMetadataStore for the given MCRObjectID base, which is {project}_{type}
+     * 
+     * @param base the MCRObjectID base, e.g. DocPortal_document
+     */
     private MCRMetadataStore getStore(String base) {
         String[] split = base.split("_");
         return getStore(split[0], split[1]);
     }
 
+    /**
+     * Returns IFS2 MCRMetadataStore used to store metadata of the given MCRObjectID
+     */
     private MCRMetadataStore getStore(MCRObjectID mcrid) {
         return getStore(mcrid.getProjectId(), mcrid.getTypeId());
     }
 
+    /**
+     * Stores metadata of a new MCRObject in the persistent store. 
+     * 
+     * @param mcrid the MCRObjectID
+     * @param xml the xml metadata of the MCRObject 
+     * @param lastModified the date of last modification to set
+     * @return the stored metadata as IFS2 object
+     */
     public MCRStoredMetadata create(MCRObjectID mcrid, Document xml, Date lastModified) {
         try {
             return create(mcrid, MCRContent.readFrom(xml), lastModified);
@@ -174,6 +260,14 @@ public class MCRXMLTableManager {
         }
     }
 
+    /**
+     * Stores metadata of a new MCRObject in the persistent store. 
+     * 
+     * @param mcrid the MCRObjectID
+     * @param xml the xml metadata of the MCRObject 
+     * @param lastModified the date of last modification to set
+     * @return the stored metadata as IFS2 object
+     */
     public MCRStoredMetadata create(MCRObjectID mcrid, byte[] xml, Date lastModified) {
         try {
             return create(mcrid, MCRContent.readFrom(xml), lastModified);
@@ -185,6 +279,14 @@ public class MCRXMLTableManager {
         }
     }
 
+    /**
+     * Stores metadata of a new MCRObject in the persistent store. 
+     * 
+     * @param mcrid the MCRObjectID
+     * @param xml the xml metadata of the MCRObject 
+     * @param lastModified the date of last modification to set
+     * @return the stored metadata as IFS2 object
+     */
     public MCRStoredMetadata create(MCRObjectID mcrid, MCRContent xml, Date lastModified) {
         try {
             MCRStoredMetadata sm = getStore(mcrid).create(xml, mcrid.getNumberAsInteger());
@@ -216,6 +318,14 @@ public class MCRXMLTableManager {
         MCRConfiguration.instance().systemModified();
     }
 
+    /**
+     * Updates metadata of existing MCRObject in the persistent store. 
+     * 
+     * @param mcrid the MCRObjectID
+     * @param xml the xml metadata of the MCRObject 
+     * @param lastModified the date of last modification to set
+     * @return the stored metadata as IFS2 object
+     */
     public MCRStoredMetadata update(MCRObjectID mcrid, Document xml, Date lastModified) {
         try {
             return update(mcrid, MCRContent.readFrom(xml), lastModified);
@@ -227,6 +337,14 @@ public class MCRXMLTableManager {
         }
     }
 
+    /**
+     * Updates metadata of existing MCRObject in the persistent store. 
+     * 
+     * @param mcrid the MCRObjectID
+     * @param xml the xml metadata of the MCRObject 
+     * @param lastModified the date of last modification to set
+     * @return the stored metadata as IFS2 object
+     */
     public MCRStoredMetadata update(MCRObjectID mcrid, byte[] xml, Date lastModified) {
         try {
             return update(mcrid, MCRContent.readFrom(xml), lastModified);
@@ -238,6 +356,14 @@ public class MCRXMLTableManager {
         }
     }
 
+    /**
+     * Updates metadata of existing MCRObject in the persistent store. 
+     * 
+     * @param mcrid the MCRObjectID
+     * @param xml the xml metadata of the MCRObject 
+     * @param lastModified the date of last modification to set
+     * @return the stored metadata as IFS2 object
+     */
     public MCRStoredMetadata update(MCRObjectID mcrid, MCRContent xml, Date lastModified) {
         if (!exists(mcrid)) {
             String msg = "Object to update does not exist: " + mcrid;
@@ -258,6 +384,11 @@ public class MCRXMLTableManager {
         }
     }
 
+    /**
+     * Retrieves stored metadata xml as JDOM document
+     * 
+     * @param mcrid the MCRObjectID 
+     */
     public Document retrieveXML(MCRObjectID mcrid) {
         try {
             return retrieveStoredMetadata(mcrid).getMetadata().asXML();
@@ -269,6 +400,11 @@ public class MCRXMLTableManager {
         }
     }
 
+    /**
+     * Retrieves stored metadata xml as byte[] BLOB.
+     * 
+     * @param mcrid the MCRObjectID 
+     */
     public byte[] retrieveBLOB(MCRObjectID mcrid) {
         try {
             return retrieveStoredMetadata(mcrid).getMetadata().asByteArray();
@@ -280,6 +416,11 @@ public class MCRXMLTableManager {
         }
     }
 
+    /**
+     * Retrieves stored metadata xml as IFS2 metadata object.
+     * 
+     * @param mcrid the MCRObjectID 
+     */
     public MCRStoredMetadata retrieveStoredMetadata(MCRObjectID mcrid) {
         try {
             return getStore(mcrid).retrieve(mcrid.getNumberAsInteger());
@@ -307,6 +448,9 @@ public class MCRXMLTableManager {
         return getStore(project, type).getHighestStoredID();
     }
 
+    /**
+     * Checks if an object with the given MCRObjectID exists in the store.
+     */
     public boolean exists(MCRObjectID mcrid) {
         try {
             return getStore(mcrid).exists(mcrid.getNumberAsInteger());
@@ -318,6 +462,11 @@ public class MCRXMLTableManager {
         }
     }
 
+    /**
+     * Lists all MCRObjectIDs stored for the given base, which is {project}_{type}
+     * 
+     * @param base the MCRObjectID base, e.g. DocPortal_document
+     */
     public List<String> listIDsForBase(String base) {
         MCRMetadataStore store = getStore(base);
         List<String> list = new ArrayList<String>();
@@ -330,6 +479,11 @@ public class MCRXMLTableManager {
         return list;
     }
 
+    /**
+     * Lists all MCRObjectIDs stored for the given object type, for all projects
+     * 
+     * @param base the MCRObject type, e.g. document
+     */
     public List<String> listIDsOfType(String type) {
         List<String> list = new ArrayList<String>();
         for (File fProject : baseDir.listFiles()) {
@@ -344,6 +498,9 @@ public class MCRXMLTableManager {
         return list;
     }
 
+    /**
+     * Lists all MCRObjectIDs of all types and projects stored in any metadata store
+     */
     public List<String> listIDs() {
         List<String> list = new ArrayList<String>();
         for (File fProject : baseDir.listFiles()) {
@@ -357,6 +514,9 @@ public class MCRXMLTableManager {
         return list;
     }
 
+    /**
+     * Returns the time the store's content was last modified 
+     */
     public long getLastModified() {
         return MCRConfiguration.instance().getSystemLastModified();
     }
