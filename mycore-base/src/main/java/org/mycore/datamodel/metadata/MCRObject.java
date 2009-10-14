@@ -522,7 +522,7 @@ final public class MCRObject extends MCRBase {
      *                if a persistence problem is occured
      */
     public final static boolean existInDatastore(MCRObjectID id) throws MCRPersistenceException {
-        return MCRXMLTableManager.instance().exist(id);
+        return MCRXMLTableManager.instance().exists(id);
     }
 
     /**
@@ -548,7 +548,7 @@ final public class MCRObject extends MCRBase {
      *                if a persistence problem is occured
      */
     public final void receiveFromDatastore(MCRObjectID id) throws MCRPersistenceException {
-        setFromJDOM(MCRXMLTableManager.instance().retrieveAsJDOM(id));
+        setFromJDOM(MCRXMLTableManager.instance().retrieveXML(id));
     }
 
     /**
@@ -566,7 +566,7 @@ final public class MCRObject extends MCRBase {
     }
 
     /**
-     * The methode receive the object for the given MCRObjectID and returned it
+     * The method receives the object for the given MCRObjectID and returnes it
      * as XML stream.
      * 
      * @param id
@@ -576,7 +576,7 @@ final public class MCRObject extends MCRBase {
      *                if a persistence problem is occured
      */
     public static final byte[] receiveXMLFromDatastore(MCRObjectID id) throws MCRPersistenceException {
-        return MCRXMLTableManager.instance().retrieveAsXML(id);
+        return MCRXMLTableManager.instance().retrieveBLOB( id );
     }
 
     /**
@@ -604,7 +604,7 @@ final public class MCRObject extends MCRBase {
      *                if a persistence problem is occured
      */
     public final org.jdom.Document receiveJDOMFromDatastore(MCRObjectID id) throws MCRPersistenceException {
-        return MCRXMLTableManager.instance().readDocument(id);
+        return MCRXMLTableManager.instance().retrieveXML( id );
     }
 
     /**

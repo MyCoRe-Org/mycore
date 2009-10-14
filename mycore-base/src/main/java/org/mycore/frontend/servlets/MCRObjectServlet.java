@@ -137,7 +137,7 @@ public class MCRObjectServlet extends MCRServlet {
             return null;
         }
 
-        return TM.readDocument(mcrid);
+        return TM.retrieveXML(mcrid);
     }
 
     private void setBrowseParameters(MCRServletJob job, String mcrid, String host, String editorID) {

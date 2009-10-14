@@ -153,7 +153,7 @@ public class MCRZipServlet extends MCRServlet {
                 sendDerivate(id, path, out);
                 out.close();
             } else {
-                Document jdom = xmltable.readDocument(mcrid);
+                Document jdom = xmltable.retrieveXML(mcrid);
                 if (!MCRAccessManager.checkPermission(id, "read")) {
                     LOGGER.info("MCRFileNodeServlet: AccessForbidden to " + id);
                     res.sendRedirect(res.encodeRedirectURL(getBaseURL() + accessErrorPage));

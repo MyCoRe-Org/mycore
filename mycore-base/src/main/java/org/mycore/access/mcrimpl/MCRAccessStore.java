@@ -124,7 +124,7 @@ public abstract class MCRAccessStore {
             MCRAccessDefinition def = null;
 
             if (MCRConfiguration.instance().getBoolean("MCR.Metadata.Type." + type)) {
-                elements = MCRXMLTableManager.instance().retrieveAllIDs(type);
+                elements = MCRXMLTableManager.instance().listIDsOfType(type);
             } else
                 return Collections.emptySet();
 

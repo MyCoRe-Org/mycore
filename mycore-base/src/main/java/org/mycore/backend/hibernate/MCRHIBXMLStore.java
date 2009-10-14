@@ -40,12 +40,11 @@ import org.mycore.backend.hibernate.tables.MCRXMLTABLEPK;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.datamodel.common.MCRObjectIDDate;
-import org.mycore.datamodel.common.MCRXMLTableInterface;
 
 /**
  * This class implements the MCRXMLInterface.
  */
-public class MCRHIBXMLStore implements MCRXMLTableInterface {
+public class MCRHIBXMLStore {
     // logger
     static Logger logger = Logger.getLogger(MCRHIBXMLStore.class.getName());
 

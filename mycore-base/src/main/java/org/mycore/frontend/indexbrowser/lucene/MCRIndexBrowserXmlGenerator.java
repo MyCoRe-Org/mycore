@@ -152,7 +152,7 @@ public class MCRIndexBrowserXmlGenerator {
             for (int i = from; i < to; i++) {
                 MCRIndexBrowserEntry entry = resultList.get(i);
                 String id = entry.getObjectId();
-                Document jdomDoc = MCRXMLTableManager.instance().readDocument(new MCRObjectID(id));
+                Document jdomDoc = MCRXMLTableManager.instance().retrieveXML(new MCRObjectID(id));
                 // outputfields came only from metadataobject
                 setListeElm(jdomDoc, indexConfig.getOutputList(), entry);
             }

@@ -192,7 +192,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
      *            the type of the MCRObjects that should be deleted
      */
     public static final List<String> deleteAllObjects(String type) throws MCRActiveLinkException {
-        final List<String> objectIds = MCRXMLTableManager.instance().retrieveAllIDs(type);
+        final List<String> objectIds = MCRXMLTableManager.instance().listIDsOfType(type);
         List<String> cmds = new ArrayList<String>(objectIds.size());
         for (String id : objectIds) {
             cmds.add("delete object " + id);
@@ -527,7 +527,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
             LOGGER.error(dirname + " is not a dirctory.");
             return Collections.emptyList();
         }
-        List<String> objectIds = MCRXMLTableManager.instance().retrieveAllIDs(type);
+        List<String> objectIds = MCRXMLTableManager.instance().listIDsOfType(type);
         List<String> cmds = new ArrayList<String>(objectIds.size());
         for (String id : objectIds) {
             cmds.add(new StringBuilder("export object from ").append(id).append(" to ").append(id).append(" to directory ").append(dirname)
@@ -701,7 +701,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
             LOGGER.error("The type " + type + " was not found.");
             return Collections.emptyList();
         }
-        List<String> ar = (List<String>) MCRXMLTableManager.instance().retrieveAllIDs(type);
+        List<String> ar = (List<String>) MCRXMLTableManager.instance().listIDsOfType(type);
         if (ar.size() == 0) {
             LOGGER.warn("No ID's was found for type " + type + ".");
             return Collections.emptyList();
@@ -884,7 +884,7 @@ public class MCRObjectCommands extends MCRAbstractCommands {
             LOGGER.error("The type " + type + " was not found.");
             return;
         }
-        List<String> ar = (List<String>) MCRXMLTableManager.instance().retrieveAllIDs(type);
+        List<String> ar = (List<String>) MCRXMLTableManager.instance().listIDsOfType(type);
         if (ar.size() == 0) {
             LOGGER.warn("No ID's was found for type " + type + ".");
             return;

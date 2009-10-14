@@ -228,7 +228,7 @@ final public class MCRDerivate extends MCRBase {
             throw new MCRPersistenceException("The derivate " + mcr_id.getId() + " is not valid.");
         }
         String objid = mcr_derivate.getMetaLink().getXLinkHref();
-        if (!MCRXMLTableManager.instance().exist(new MCRObjectID(objid))) {
+        if (!MCRXMLTableManager.instance().exists(new MCRObjectID(objid))) {
             throw new MCRPersistenceException("The derivate " + mcr_id.getId() + " can't find metadata object " + objid + ", nothing done.");
         }
 
@@ -251,7 +251,7 @@ final public class MCRDerivate extends MCRBase {
         MCRMetaLinkID der = new MCRMetaLinkID();
         der.setReference(mcr_id.getId(), mcr_label, "");
         der.setSubTag("derobject");
-        byte[] backup = MCRXMLTableManager.instance().retrieveAsXML(meta.getXLinkHrefID());
+        byte[] backup = MCRXMLTableManager.instance().retrieveBLOB( meta.getXLinkHrefID() );
 
         try {
             MCRObject obj = new MCRObject();
@@ -399,7 +399,7 @@ final public class MCRDerivate extends MCRBase {
      *                if a persistence problem is occured
      */
     public final static boolean existInDatastore(MCRObjectID id) throws MCRPersistenceException {
-        return MCRXMLTableManager.instance().exist(id);
+        return MCRXMLTableManager.instance().exists(id);
     }
 
     /**
@@ -454,7 +454,7 @@ final public class MCRDerivate extends MCRBase {
      *                if a persistence problem is occured
      */
     public static final byte[] receiveXMLFromDatastore(MCRObjectID id) throws MCRPersistenceException {
-        return MCRXMLTableManager.instance().retrieveAsXML(id);
+        return MCRXMLTableManager.instance().retrieveBLOB(id);
     }
 
     /**

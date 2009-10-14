@@ -452,8 +452,6 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
     }
 
     private static class MCRObjectResolver implements MCRResolver {
-        protected static final SAXBuilder SAX_BUILDER = new org.jdom.input.SAXBuilder();
-
         /**
          * Reads local MCRObject with a given ID from the store.
          * 
@@ -466,7 +464,7 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
             LOGGER.debug("Reading MCRObject with ID " + id);
 
             MCRObjectID mcrid = new MCRObjectID(id);
-            Document doc = MCRXMLTableManager.instance().readDocument(mcrid);
+            Document doc = MCRXMLTableManager.instance().retrieveXML(mcrid);
 
             LOGGER.debug("end resolving " + uri);
             return doc.getRootElement();

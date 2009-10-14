@@ -63,7 +63,7 @@ public class MCRParentRuleStrategy implements MCRAccessCheckStrategy {
     }
 
     private static String getParentID(String objectID) {
-        Document parentDoc = MCRXMLTableManager.instance().readDocument(new MCRObjectID(objectID));
+        Document parentDoc = MCRXMLTableManager.instance().retrieveXML(new MCRObjectID(objectID));
         final Element parentElement = parentDoc.getRootElement().getChild("structure").getChild("parents");
         if (parentElement != null) {
             return parentElement.getChild("parent").getAttributeValue("href", XLINK_NAMESPACE);

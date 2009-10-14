@@ -1,338 +1,363 @@
 /*
- * 
- * $Revision$ $Date$
- *
- * This file is part of ***  M y C o R e  ***
- * See http://www.mycore.de/ for details.
- *
- * This program is free software; you can use it, redistribute it
- * and / or modify it under the terms of the GNU General Public License
- * (GPL) as published by the Free Software Foundation; either version 2
- * of the License or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program, in a file called gpl.txt or license.txt.
- * If not, write to the Free Software Foundation Inc.,
- * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
+ * $Revision$ $Date$ This
+ * file is part of *** M y C o R e *** See http://www.mycore.de/ for details.
+ * This program is free software; you can use it, redistribute it and / or
+ * modify it under the terms of the GNU General Public License (GPL) as
+ * published by the Free Software Foundation; either version 2 of the License or
+ * (at your option) any later version. This program is distributed in the hope
+ * that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License for more details. You should have received a copy of
+ * the GNU General Public License along with this program, in a file called
+ * gpl.txt or license.txt. If not, write to the Free Software Foundation Inc.,
+ * 59 Temple Place - Suite 330, Boston, MA 02111-1307 USA
  */
 
 package org.mycore.datamodel.common;
 
-import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
+import java.io.File;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
-import java.util.Enumeration;
-import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.List;
-import java.util.Properties;
 
-import org.apache.log4j.Logger;
 import org.jdom.Document;
-import org.mycore.common.MCRCache;
 import org.mycore.common.MCRConfiguration;
+import org.mycore.common.MCRConfigurationException;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
-import org.mycore.common.MCRUtils;
-import org.mycore.common.xml.MCRXMLHelper;
+import org.mycore.datamodel.ifs2.MCRContent;
+import org.mycore.datamodel.ifs2.MCRMetadataStore;
+import org.mycore.datamodel.ifs2.MCRStore;
+import org.mycore.datamodel.ifs2.MCRStoredMetadata;
 import org.mycore.datamodel.metadata.MCRObjectID;
-import org.xml.sax.SAXParseException;
 
 /**
- * This class manage all accesses to the XML table database. This database holds
- * all informations about the MCRObjectID and the corresponding XML file.
- * 
+ * @author Frank Lützenkirchen
  * @author Jens Kupferschmidt
  * @author Thomas Scheffler (yagee)
- * @version $Revision$ $Date$
  */
 public class MCRXMLTableManager {
-    /** The link table manager singleton */
     private static MCRXMLTableManager SINGLETON;
 
-    // logger
-    static Logger LOGGER = Logger.getLogger(MCRLinkTableManager.class);
-
-    static MCRConfiguration CONFIG = MCRConfiguration.instance();
-
-    static MCRCache jdomCache;
-
-    private Hashtable<String, MCRXMLTableInterface> tablelist;
-
-    /**
-     * Returns the link table manager singleton.
-     */
     public static synchronized MCRXMLTableManager instance() {
-        if (SINGLETON == null) {
+        if (SINGLETON == null)
             SINGLETON = new MCRXMLTableManager();
-        }
-
         return SINGLETON;
     }
 
-    /**
-     * The constructor of this class.
-     */
     protected MCRXMLTableManager() {
-        tablelist = new Hashtable<String, MCRXMLTableInterface>();
-        jdomCache = new MCRCache(CONFIG.getInt("MCR.Persistence.XML.Store.CacheSize", 100), "XMLTable JDOMs");
-        List<String> objectTypes = getAllAllowedMCRObjectIDTypes();
-        for (String type : objectTypes) {
-            initXMLTable(type);
+        MCRConfiguration config = MCRConfiguration.instance();
+
+        defaultClass = config.getString("MCR.Metadata.Store.DefaultClass", "org.mycore.datamodel.ifs2.MCRVersioningMetadataStore");
+
+        String pattern = config.getString("MCR.Metadata.ObjectID.NumberPattern", "0000000000");
+        defaultLayout = (pattern.length() - 4) + "-2-2";
+
+        String base = config.getString("MCR.Metadata.Store.BaseDir");
+        baseDir = new File(base);
+        checkDir(baseDir, "base");
+
+        svnBase = config.getString("MCR.Metadata.Store.SVNBase", null);
+        if ((svnBase != null) && (svnBase.startsWith("file:///"))) {
+            try {
+                svnDir = new File(new URI(svnBase));
+            } catch (URISyntaxException ex) {
+                String msg = "Syntax error in MCR.Metadata.Store.SVNBase property: " + svnBase;
+                throw new MCRConfigurationException(msg, ex);
+            }
+            checkDir(svnDir, "svn");
         }
     }
 
-    /**
-     * returns a MCRXMLTableInterface handling MyCoRe object of type
-     * <code>type</code>
-     * 
-     * @param type
-     *            the table type
-     */
-    private MCRXMLTableInterface getXMLTable(String type) {
-        if ((type == null) || (type.length() == 0)) {
-            throw new MCRException("The type is null or empty.");
-        } else if (tablelist.containsKey(type)) {
-            return tablelist.get(type);
+    private void checkDir(File dir, String type) {
+        if (!dir.exists()) {
+            try {
+                boolean created = dir.mkdirs();
+                if (!created) {
+                    String msg = "Unable to create metadata store " + type + " directory " + dir.getAbsolutePath();
+                    throw new MCRConfigurationException(msg);
+                }
+            } catch (Exception ex) {
+                String msg = "Exception while creating metadata store " + type + " directory " + dir.getAbsolutePath();
+                throw new MCRConfigurationException(msg, ex);
+            }
+        } else {
+            if (!dir.canRead()) {
+                String msg = "Metadata store " + type + " directory " + dir.getAbsolutePath() + " is not readable";
+                throw new MCRConfigurationException(msg);
+            }
+            if (!dir.canWrite()) {
+                String msg = "Metadata store " + type + " directory " + dir.getAbsolutePath() + " is not writeable";
+                throw new MCRConfigurationException(msg);
+            }
+            if (!dir.isDirectory()) {
+                String msg = "Metadata store " + type + " " + dir.getAbsolutePath() + " is a file, not a directory";
+                throw new MCRConfigurationException(msg);
+            }
+        }
+    }
+
+    private String defaultClass;
+
+    private String defaultLayout;
+
+    private File baseDir;
+
+    private File svnDir;
+
+    private String svnBase;
+
+    private synchronized MCRMetadataStore getStore(String project, String type) {
+        String prefix = "MCR.IFS2.Store." + project + "_" + type + ".";
+        MCRConfiguration config = MCRConfiguration.instance();
+
+        String forceXML = config.getString(prefix + "ForceXML", null);
+        if (forceXML == null) // store not configured yet
+        {
+            config.set(prefix + "ForceXML", true);
+
+            String clazz = config.getString(prefix + "Class", null);
+            if (clazz == null) {
+                config.set(prefix + "Class", defaultClass);
+                clazz = defaultClass;
+            }
+
+            if (clazz.equals("org.mycore.datamodel.ifs2.MCRVersioningMetadataStore")) {
+                String svnURL = config.getString(prefix + "SVNRepositoryURL", null);
+                if (svnURL == null) {
+                    config.set(prefix + "SVNRepositoryURL", svnBase + "/" + project + "/" + type);
+
+                    File projectDir = new File(svnDir, project);
+                    if (!projectDir.exists())
+                        projectDir.mkdirs();
+                }
+            }
+
+            String slotLayout = config.getString(prefix + "SlotLayout", null);
+            if (slotLayout == null)
+                config.set(prefix + "SlotLayout", defaultLayout);
+
+            File projectDir = new File(baseDir, project);
+            if (!projectDir.exists())
+                projectDir.mkdir();
+
+            File typeDir = new File(projectDir, type);
+            if (!typeDir.exists())
+                typeDir.mkdir();
+
+            config.set(prefix + "BaseDir", typeDir.getAbsolutePath());
         }
 
-        MCRXMLTableInterface inst = initXMLTable(type);
-
-        return inst;
+        return MCRMetadataStore.getStore(project + "_" + type);
     }
 
-    private MCRXMLTableInterface initXMLTable(String type) {
-        MCRXMLTableInterface inst = (MCRXMLTableInterface) CONFIG.getInstanceOf("MCR.Persistence.XML.Store.Class");
-        inst.init(type);
-        tablelist.put(type, inst);
-        return inst;
+    private MCRMetadataStore getStore(String base) {
+        String[] split = base.split("_");
+        return getStore(split[0], split[1]);
     }
 
-    /**
-     * The method create a new item in the datastore.
-     * 
-     * @param mcrid
-     *            a MCRObjectID
-     * @param xml
-     *            a JDOM Document
-     * 
-     * @exception MCRException
-     *                if the method arguments are not correct
-     */
-    public void create(MCRObjectID mcrid, org.jdom.Document xml, Date lastModified) throws MCRException {
-        getXMLTable(mcrid.getTypeId()).create(mcrid.getId(), MCRUtils.getByteArray(xml), lastModified);
-        jdomCache.put(mcrid, xml);
-        CONFIG.systemModified();
+    private MCRMetadataStore getStore(MCRObjectID mcrid) {
+        return getStore(mcrid.getProjectId(), mcrid.getTypeId());
     }
 
-    /**
-     * The method remove a item for the MCRObjectID from the datastore.
-     * 
-     * @param mcrid
-     *            a MCRObjectID
-     * 
-     * @exception MCRException
-     *                if the method argument is not correct
-     */
-    public void delete(MCRObjectID mcrid) throws MCRException {
-        getXMLTable(mcrid.getTypeId()).delete(mcrid.getId());
-        jdomCache.remove(mcrid);
-        CONFIG.systemModified();
-    }
-
-    /**
-     * The method update an item in the datastore.
-     * 
-     * @param mcrid
-     *            a MCRObjectID
-     * @param xml
-     *            a byte array with the XML file
-     * 
-     * @exception MCRException
-     *                if the method arguments are not correct
-     */
-    public void update(MCRObjectID mcrid, org.jdom.Document xml, Date lastModified) throws MCRException {
-        getXMLTable(mcrid.getTypeId()).update(mcrid.getId(), MCRUtils.getByteArray(xml), lastModified);
-        jdomCache.put(mcrid, xml);
-        CONFIG.systemModified();
-    }
-
-    /**
-     * The method update an item in the datastore.
-     * 
-     * @param mcrid
-     *            a MCRObjectID
-     * @param xml
-     *            a byte array with the XML file
-     * 
-     * @exception MCRException
-     *                if the method arguments are not correct
-     */
-    public void update(MCRObjectID mcrid, byte[] xml, Date lastModified) throws MCRException {
-        getXMLTable(mcrid.getTypeId()).update(mcrid.getId(), xml, lastModified);
-        jdomCache.remove(mcrid);
-        CONFIG.systemModified();
-    }
-
-    /**
-     * The method retrieve a dataset for the given MCRObjectID and returns the
-     * corresponding XML file as byte array.
-     * 
-     * @param mcrid
-     *            a MCRObjectID
-     * 
-     * @return the byte array of data or NULL
-     * @exception MCRException
-     *                if the method arguments are not correct
-     */
-    public byte[] retrieveAsXML(MCRObjectID mcrid) throws MCRException {
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        MCRUtils.copyStream(getXMLTable(mcrid.getTypeId()).retrieve(mcrid.getId()), bos);
-        return bos.toByteArray();
-    }
-
-    /**
-     * The method retrieve a dataset for the given MCRObjectID and returns the
-     * corresponding JDOM Document.
-     * 
-     * @param mcrid
-     *            a MCRObjectID
-     * 
-     * @return the JDOM Document of data or NULL
-     * @exception MCRException
-     *                if the method arguments are not correct
-     */
-    public Document retrieveAsJDOM(MCRObjectID mcrid) throws MCRException {
-        InputStream xml = getXMLTable(mcrid.getTypeId()).retrieve(mcrid.getId());
+    public MCRStoredMetadata create(MCRObjectID mcrid, Document xml, Date lastModified) {
         try {
-            return MCRXMLHelper.getParser().parseXML(xml, false);
-        } catch (SAXParseException e) {
-            throw new MCRException("Error while parsing " + mcrid, e);
+            return create(mcrid, MCRContent.readFrom(xml), lastModified);
+        } catch (Exception ex) {
+            if (ex instanceof MCRException)
+                throw (MCRException) ex;
+            String msg = "Exception while storing XML metadata of mcrobject " + mcrid.getId();
+            throw new MCRPersistenceException(msg, ex);
+        }
+    }
+
+    public MCRStoredMetadata create(MCRObjectID mcrid, byte[] xml, Date lastModified) {
+        try {
+            return create(mcrid, MCRContent.readFrom(xml), lastModified);
+        } catch (Exception ex) {
+            if (ex instanceof MCRException)
+                throw (MCRException) ex;
+            String msg = "Exception while storing XML metadata of mcrobject " + mcrid.getId();
+            throw new MCRPersistenceException(msg, ex);
+        }
+    }
+
+    public MCRStoredMetadata create(MCRObjectID mcrid, MCRContent xml, Date lastModified) {
+        try {
+            MCRStoredMetadata sm = getStore(mcrid).create(xml, mcrid.getNumberAsInteger());
+            sm.setLastModified(lastModified);
+            MCRConfiguration.instance().systemModified();
+            return sm;
+        } catch (Exception ex) {
+            if (ex instanceof MCRException)
+                throw (MCRException) ex;
+            String msg = "Exception while storing XML metadata of mcrobject " + mcrid.getId();
+            throw new MCRPersistenceException(msg, ex);
+        }
+    }
+
+    public void delete(String mcrid) {
+        delete(new MCRObjectID(mcrid));
+    }
+
+    public void delete(MCRObjectID mcrid) {
+        try {
+            if (exists(mcrid))
+                getStore(mcrid).delete(mcrid.getNumberAsInteger());
+        } catch (Exception ex) {
+            if (ex instanceof MCRException)
+                throw (MCRException) ex;
+            String msg = "Exception while deleting XML metadata of mcrobject " + mcrid.getId();
+            throw new MCRPersistenceException(msg, ex);
+        }
+        MCRConfiguration.instance().systemModified();
+    }
+
+    public MCRStoredMetadata update(MCRObjectID mcrid, Document xml, Date lastModified) {
+        try {
+            return update(mcrid, MCRContent.readFrom(xml), lastModified);
+        } catch (Exception ex) {
+            if (ex instanceof MCRException)
+                throw (MCRException) ex;
+            String msg = "Exception while updating XML metadata of mcrobject " + mcrid.getId();
+            throw new MCRPersistenceException(msg, ex);
+        }
+    }
+
+    public MCRStoredMetadata update(MCRObjectID mcrid, byte[] xml, Date lastModified) {
+        try {
+            return update(mcrid, MCRContent.readFrom(xml), lastModified);
+        } catch (Exception ex) {
+            if (ex instanceof MCRException)
+                throw (MCRException) ex;
+            String msg = "Exception while updating XML metadata of mcrobject " + mcrid.getId();
+            throw new MCRPersistenceException(msg, ex);
+        }
+    }
+
+    public MCRStoredMetadata update(MCRObjectID mcrid, MCRContent xml, Date lastModified) {
+        if (!exists(mcrid)) {
+            String msg = "Object to update does not exist: " + mcrid;
+            throw new MCRPersistenceException(msg);
+        }
+
+        try {
+            MCRStoredMetadata sm = getStore(mcrid).retrieve(mcrid.getNumberAsInteger());
+            sm.update(xml);
+            sm.setLastModified(lastModified);
+            MCRConfiguration.instance().systemModified();
+            return sm;
+        } catch (Exception ex) {
+            if (ex instanceof MCRException)
+                throw (MCRException) ex;
+            String msg = "Exception while updating XML metadata of mcrobject " + mcrid.getId();
+            throw new MCRPersistenceException(msg, ex);
+        }
+    }
+
+    public Document retrieveXML(MCRObjectID mcrid) {
+        try {
+            return retrieveStoredMetadata(mcrid).getMetadata().asXML();
+        } catch (Exception ex) {
+            if (ex instanceof MCRException)
+                throw (MCRException) ex;
+            String msg = "Exception while retrieving XML metadata of mcrobject " + mcrid.getId();
+            throw new MCRPersistenceException(msg, ex);
+        }
+    }
+
+    public byte[] retrieveBLOB(MCRObjectID mcrid) {
+        try {
+            return retrieveStoredMetadata(mcrid).getMetadata().asByteArray();
+        } catch (Exception ex) {
+            if (ex instanceof MCRException)
+                throw (MCRException) ex;
+            String msg = "Exception while retrieving XML metadata of mcrobject " + mcrid.getId();
+            throw new MCRPersistenceException(msg, ex);
+        }
+    }
+
+    public MCRStoredMetadata retrieveStoredMetadata(MCRObjectID mcrid) {
+        try {
+            return getStore(mcrid).retrieve(mcrid.getNumberAsInteger());
+        } catch (Exception ex) {
+            if (ex instanceof MCRException)
+                throw (MCRException) ex;
+            String msg = "Exception while retrieving XML metadata of mcrobject " + mcrid.getId();
+            throw new MCRPersistenceException(msg, ex);
         }
     }
 
     /**
-     * This method returns the highest stored ID number for a given MCRObjectID base, 
-     * or 0 if no object is stored for this type and project.
+     * This method returns the highest stored ID number for a given MCRObjectID
+     * base, or 0 if no object is stored for this type and project.
      * 
      * @param project
      *            the project ID part of the MCRObjectID base
      * @param type
      *            the type ID part of the MCRObjectID base
-     * 
      * @exception MCRPersistenceException
      *                if a persistence problem is occurred
-     * 
      * @return the highest stored ID number as a String
      */
-    public int getHighestStoredID(String project, String type) throws MCRPersistenceException {
-        return getXMLTable(type).getHighestStoredID(project, type);
+    public int getHighestStoredID(String project, String type) {
+        return getStore(project, type).getHighestStoredID();
     }
 
-    /**
-     * This method check that the MCRObjectID exist in this store.
-     * 
-     * @param mcrid
-     *            a MCRObjectID
-     * 
-     * @return true if the MCRObjectID exist, else return false
-     */
-    public boolean exist(MCRObjectID mcrid) {
-        return getXMLTable(mcrid.getTypeId()).exists(mcrid.getId());
-    }
-
-    /**
-     * The method return a Array list with all stored MCRObjectID's of the XML
-     * table of a MCRObjectID type.
-     * 
-     * @param type
-     *            a MCRObjectID type string
-     * @return a ArrayList of MCRObjectID's
-     */
-    public List<String> retrieveAllIDs(String type) {
-        return getXMLTable(type).retrieveAllIDs();
-    }
-
-    /**
-     * The method return a list with all stored MCRObjectID's of the XML
-     * table
-     * 
-     * @return a ArrayList of MCRObjectID's
-     */
-    public List<String> retrieveAllIDs() {
-        ArrayList<String> a = new ArrayList<String>();
-        for (String type : getAllAllowedMCRObjectIDTypes()) {
-            a.addAll(retrieveAllIDs(type));
+    public boolean exists(MCRObjectID mcrid) {
+        try {
+            return getStore(mcrid).exists(mcrid.getNumberAsInteger());
+        } catch (Exception ex) {
+            if (ex instanceof MCRException)
+                throw (MCRException) ex;
+            String msg = "Exception while checking existence of mcrobject " + mcrid.getId();
+            throw new MCRPersistenceException(msg, ex);
         }
-        Collections.sort(a);
-        return a;
     }
 
-    /**
-     * The method return a Array list with all MCRObjectID-Types, stored in the
-     * XML table. reads the mycore.properties-configuration for datamodel-types
-     * 
-     * @return a ArrayList of MCRObjectID-Types for which
-     *         MCR.Metadata.Type.{datamodel}=true
-     */
-    public List<String> getAllAllowedMCRObjectIDTypes() {
-        ArrayList<String> listTypes = new ArrayList<String>();
-        final String prefix = "MCR.Metadata.Type.";
-        Properties prop = MCRConfiguration.instance().getProperties(prefix);
-        Enumeration names = prop.propertyNames();
-        while (names.hasMoreElements()) {
-            String name = (String) (names.nextElement());
-            if (MCRConfiguration.instance().getBoolean(name)) {
-                listTypes.add(name.substring(prefix.length()));
+    public List<String> listIDsForBase(String base) {
+        MCRMetadataStore store = getStore(base);
+        List<String> list = new ArrayList<String>();
+        Iterator<Integer> it = store.listIDs(MCRStore.ASCENDING);
+        MCRObjectID oid = new MCRObjectID(base + "_1");
+        while (it.hasNext()) {
+            oid.setNumber(it.next());
+            list.add(oid.getId());
+        }
+        return list;
+    }
+
+    public List<String> listIDsOfType(String type) {
+        List<String> list = new ArrayList<String>();
+        for (File fProject : baseDir.listFiles()) {
+            String project = fProject.getName();
+            for (File fType : fProject.listFiles()) {
+                if (!type.equals(fType.getName()))
+                    continue;
+                String base = project + "_" + type;
+                list.addAll(listIDsForBase(base));
             }
         }
-        return listTypes;
+        return list;
     }
 
-    /**
-     * returns the JDOM-Document of the given MCRObjectID. This method uses
-     * caches to save database connections. Use this if you want to get a JDOM
-     * Document not just plain xml. Be aware that any changes done to the
-     * Document will be applied to the copy in the cache. So if you made any
-     * changes to the Document make a clone of the Document to avoid side
-     * effects.
-     * 
-     * @param id
-     *            ObjectID of MyCoRe Document
-     * @return MyCoRe Document as JDOM or NULL
-     */
-    public Document readDocument(MCRObjectID id) {
-        // use object if in cache
-        Document jDoc = (Document) jdomCache.get(id);
-
-        if (jDoc == null) {
-            jDoc = retrieveAsJDOM(id);
-            jdomCache.put(id, jDoc);
-            LOGGER.debug(new StringBuffer(id.toString()).append(" is now in MCRCache..."));
-        } else {
-            LOGGER.debug(new StringBuffer("read ").append(id).append(" from MCRCache..."));
+    public List<String> listIDs() {
+        List<String> list = new ArrayList<String>();
+        for (File fProject : baseDir.listFiles()) {
+            String project = fProject.getName();
+            for (File fType : fProject.listFiles()) {
+                String type = fType.getName();
+                String base = project + "_" + type;
+                list.addAll(listIDsForBase(base));
+            }
         }
-
-        return jDoc;
-    }
-
-    /**
-     * lists objects of the specified <code>type</code> and their last modified date. 
-     * @param type type of object
-     * @return
-     */
-    public List<MCRObjectIDDate> listObjectDates(String type) {
-        return getXMLTable(type).listObjectDates(type);
+        return list;
     }
 
     public long getLastModified() {
-        return CONFIG.getSystemLastModified();
+        return MCRConfiguration.instance().getSystemLastModified();
     }
-
 }

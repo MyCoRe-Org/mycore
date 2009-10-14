@@ -132,7 +132,7 @@ public class MCRLinkTableEventHandler extends MCREventHandlerBase {
                 }
                 if (inf instanceof MCRMetaLinkID) {
                     String destination = ((MCRMetaLinkID) inf).getXLinkHref();
-                    if (!MCRXMLTableManager.instance().exist(new MCRObjectID(destination))) {
+                    if (!MCRXMLTableManager.instance().exists(new MCRObjectID(destination))) {
                         continue;
                     }
                     MCRActiveLinkException activeLink = new MCRActiveLinkException("Failure while adding link!. Destination does not exist.");
