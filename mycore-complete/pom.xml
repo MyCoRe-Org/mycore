@@ -23,7 +23,7 @@
         <artifactId>maven-clean-plugin</artifactId>
         <executions>
           <execution>
-            <phase>process-resources</phase>
+            <phase>initialize</phase>
             <goals>
               <goal>clean</goal>
             </goals>
@@ -295,6 +295,10 @@
     <dependency>
       <groupId>net.sf.javamusictag</groupId>
       <artifactId>jid3lib</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>net.java.dev.jna</groupId>
+      <artifactId>jna</artifactId>
     </dependency>
     <dependency>
       <groupId>joda-time</groupId>
