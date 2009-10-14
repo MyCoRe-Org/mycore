@@ -312,11 +312,11 @@ public class MCRBuildLuceneQuery {
             float upper = Float.MAX_VALUE;
             if (Op.equals(">") || Op.equals(">=")) {
                 lower = valueNumber;
-                return NumericRangeQuery.newFloatRange(fieldname, lower, upper, Op.charAt(1) == '=', true);
+                return NumericRangeQuery.newFloatRange(fieldname, lower, upper, Op.length() == 2, true);
             }
             if (Op.equals("<") || Op.equals("<=")) {
                 upper = valueNumber;
-                return NumericRangeQuery.newFloatRange(fieldname, lower, upper, true, Op.charAt(1) == '=');
+                return NumericRangeQuery.newFloatRange(fieldname, lower, upper, true, Op.length() == 2);
             }
         }
         if (type.equals("integer")) {
@@ -325,11 +325,11 @@ public class MCRBuildLuceneQuery {
             long upper = Long.MAX_VALUE;
             if (Op.equals(">") || Op.equals(">=")) {
                 lower = valueNumber;
-                return NumericRangeQuery.newLongRange(fieldname, lower, upper, Op.charAt(1) == '=', true);
+                return NumericRangeQuery.newLongRange(fieldname, lower, upper, Op.length() == 2, true);
             }
             if (Op.equals("<") || Op.equals("<=")) {
                 upper = valueNumber;
-                return NumericRangeQuery.newLongRange(fieldname, lower, upper, true, Op.charAt(1) == '=');
+                return NumericRangeQuery.newLongRange(fieldname, lower, upper, true, Op.length() == 2);
             }
         }
         if (Op.equals("=")) {
