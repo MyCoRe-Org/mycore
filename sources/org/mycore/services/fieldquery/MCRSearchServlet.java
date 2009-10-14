@@ -50,7 +50,7 @@ import org.mycore.parsers.bool.MCRCondition;
 /**
  * This servlet executes queries and presents result pages.
  * 
- * @author Frank Lï¿½tzenkirchen
+ * @author Frank Lützenkirchen
  * @author Harald Richter
  */
 public class MCRSearchServlet extends MCRServlet {
@@ -109,7 +109,7 @@ public class MCRSearchServlet extends MCRServlet {
         MCRCachedQueryData qd = getQueryData(request);
         MCRResults results = qd.getResults();
 
-        // Effective number of hits per page
+        // Number of hits per page
         String snpp = request.getParameter("numPerPage");
         if (snpp == null)
             snpp = "0";
@@ -117,29 +117,30 @@ public class MCRSearchServlet extends MCRServlet {
         if (npp > results.getNumHits())
             npp = 0;
 
+        // Current page number
+        String spage = request.getParameter("page");
+        if (spage == null)
+            spage = "1";
+        int page = Integer.parseInt(spage);
+        
+        showResults( qd, page, npp, request, response );
+    }
+    
+    private void showResults(MCRCachedQueryData qd, int page, int npp, HttpServletRequest request, HttpServletResponse response) throws IOException {
+        MCRResults results = qd.getResults();
+
         // Total number of pages
         int numHits = Math.max(1, results.getNumHits());
         int numPages = 1;
         if (npp > 0)
             numPages = (int) (Math.ceil((double) numHits / (double) npp));
 
-        // Effective current page number
-        String spage = request.getParameter("page");
-        if (spage == null)
-            spage = "1";
-        int page = 0;
-        try
-        {
-          page = Integer.parseInt(spage);
-        } catch (NumberFormatException e)
-        {
-        }
         if (npp == 0)
             page = 1;
         else if (page > numPages)
-          page = numPages;
+            page = numPages;
         else if (page < 1)
-          page = 1;
+            page = 1;
 
         // Number of first and last hit to be shown
         int first = (page - 1) * npp;
@@ -155,8 +156,8 @@ public class MCRSearchServlet extends MCRServlet {
         xml.setAttribute("numPages", String.valueOf(numPages));
         xml.setAttribute("page", String.valueOf(page));
         // save some parameters
-        qd.setPage( page );
-        qd.setNumPerPage( npp );
+        qd.setPage(page);
+        qd.setNumPerPage(npp);
 
         // The URL of the search mask that was used
         xml.setAttribute("mask", qd.getQuery().getRootElement().getAttributeValue("mask"));
@@ -167,8 +168,7 @@ public class MCRSearchServlet extends MCRServlet {
         xml.addContent(new Element("condition").setAttribute("format", "xml").addContent(condition.toXML()));
 
         // Send output to LayoutServlet
-        sendToLayout(request, response, new Document(xml));        
-
+        sendToLayout(request, response, new Document(xml));
     }
 
     private String getReqParameter(HttpServletRequest req, String name, String defaultValue) {
@@ -305,10 +305,10 @@ public class MCRSearchServlet extends MCRServlet {
         String npp = root.getAttributeValue("numPerPage", "0");
 
         // Store query and results in cache
-        MCRCachedQueryData.cache( result, clonedQuery, cond );
+        MCRCachedQueryData qd = MCRCachedQueryData.cache( result, clonedQuery, cond );
 
         // Redirect browser to first results page
-        sendRedirect(request, response, result.getID(), npp);
+        showResults( qd, 1, Integer.parseInt( npp ), request, response );
     }
     
     /**
@@ -411,23 +411,6 @@ public class MCRSearchServlet extends MCRServlet {
         getLayoutService().doLayout(req, res, jdom);
     }
 
-    /**
-     * Redirect browser to results page
-     * 
-     * @author A.Schaar
-     * @see its overwritten in jspdocportal
-     */
-    protected void sendRedirect(HttpServletRequest req, HttpServletResponse res, String id, String numPerPage) throws IOException {
-        // Redirect browser to first results page
-        StringBuffer sb = new StringBuffer();
-        sb.append("MCRSearchServlet?mode=results&id=").append(id).append("&numPerPage=").append(numPerPage);
-        String style = req.getParameter("XSL.Style");
-        if ((style != null) && (style.trim().length() != 0)){
-            sb.append("&XSL.Style=").append(style);
-        }
-        res.sendRedirect(res.encodeRedirectURL(sb.toString()));
-    }
-    
     private class MCRSortfieldComparator implements Comparator {
       
       public int compare(Object arg0, Object arg1) {

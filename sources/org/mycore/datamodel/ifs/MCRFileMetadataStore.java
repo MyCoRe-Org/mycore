@@ -23,7 +23,7 @@
 
 package org.mycore.datamodel.ifs;
 
-import java.util.Vector;
+import java.util.List;
 
 import org.mycore.common.MCRPersistenceException;
 
@@ -83,14 +83,13 @@ public interface MCRFileMetadataStore {
     public String retrieveRootNodeID(String ownerID) throws MCRPersistenceException;
 
     /**
-     * Returns a list of the IDs of all children of a given parent MCRDirectory.
+     * Returns a list of the children of a given parent MCRDirectory.
      * 
      * @param parentID
      *            the ID of the parent MCRDirectory
-     * @return a Vector of String objects that are the IDs of all child nodes in
-     *         that directory
+     * @return a List of child nodes in that directory
      */
-    public Vector retrieveChildrenIDs(String parentID) throws MCRPersistenceException;
+    public List<MCRFilesystemNode> retrieveChildren(String parentID) throws MCRPersistenceException;
 
     /**
      * Deletes all data of a given MCRFilesystemNode in the persistent metadata

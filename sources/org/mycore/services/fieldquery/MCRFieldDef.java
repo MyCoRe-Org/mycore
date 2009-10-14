@@ -61,16 +61,18 @@ public class MCRFieldDef {
     static {
         Element def = getConfigFile();
 
-        List children = def.getChildren("index", MCRConstants.MCR_NAMESPACE);
+        @SuppressWarnings("unchecked")
+        List<Element> children = def.getChildren("index", MCRConstants.MCR_NAMESPACE);
 
         for (int i = 0; i < children.size(); i++) {
-            Element index = (Element) (children.get(i));
+            Element index = children.get(i);
             String id = index.getAttributeValue("id");
 
-            List fields = index.getChildren("field", MCRConstants.MCR_NAMESPACE);
+            @SuppressWarnings("unchecked")
+            List<Element> fields = index.getChildren("field", MCRConstants.MCR_NAMESPACE);
 
             for (int j = 0; j < fields.size(); j++)
-                new MCRFieldDef(id, (Element) fields.get(j));
+                new MCRFieldDef(id, fields.get(j));
         }
     }
 
@@ -121,7 +123,7 @@ public class MCRFieldDef {
     public MCRFieldDef(String index, Element def) {
         this.index = index;
         this.name = def.getAttributeValue("name");
-        this.dataType = def.getAttributeValue("type");
+        this.dataType = def.getAttributeValue("type").intern();
         this.sortable = "true".equals(def.getAttributeValue("sortable"));
         this.objects = def.getAttributeValue("objects", (String) null);
         this.source = def.getAttributeValue("source");
@@ -183,6 +185,8 @@ public class MCRFieldDef {
 
     /**
      * Returns the data type of this field as defined in fieldtypes.xml
+     * 
+     * The data type is internalized (see {@link String#intern()}
      * 
      * @return the data type
      */
@@ -341,6 +345,7 @@ public class MCRFieldDef {
 
         Element current = fieldDef;
         while (true) {
+            @SuppressWarnings("unchecked")
             List<Namespace> namespaces = current.getAdditionalNamespaces();
             for (Namespace ns : namespaces)
                 xsl.addNamespaceDeclaration(ns);

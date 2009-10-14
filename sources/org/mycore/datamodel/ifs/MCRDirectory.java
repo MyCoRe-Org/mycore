@@ -28,8 +28,8 @@ import org.mycore.common.MCRUsageException;
  * @version $Revision$ $Date$
  */
 public class MCRDirectory extends MCRFilesystemNode {
-    /** The IDs of all child nodes in this directory * */
-    private Vector childrenIDs;
+    /** The child nodes in this directory * */
+    private List<MCRFilesystemNode> children;
 
     /** The number of direct subdirectories here */
     private int numChildDirsHere = 0;
@@ -137,8 +137,8 @@ public class MCRDirectory extends MCRFilesystemNode {
                 this.numChildDirsHere++;
             }
 
-            if (childrenIDs != null) {
-                childrenIDs.addElement(child.getID());
+            if (children != null) {
+                children.add(child);
             }
         }
 
@@ -171,8 +171,8 @@ public class MCRDirectory extends MCRFilesystemNode {
                 this.numChildDirsHere--;
             }
 
-            if (childrenIDs != null) {
-                childrenIDs.removeElement(child.getID());
+            if (children != null) {
+                children.remove(child.getID());
             }
         }
 
@@ -199,18 +199,12 @@ public class MCRDirectory extends MCRFilesystemNode {
     public MCRFilesystemNode[] getChildren() {
         ensureNotDeleted();
 
-        if (childrenIDs == null) {
-            childrenIDs = manager.retrieveChildrenIDs(ID);
+        if (children == null) {
+            children = manager.retrieveChildren(ID);
         }
 
-        MCRFilesystemNode[] children = new MCRFilesystemNode[childrenIDs.size()];
-
-        for (int i = 0; i < children.length; i++) {
-            String childID = (String) (childrenIDs.get(i));
-            children[i] = manager.retrieveNode(childID);
-        }
-
-        return children;
+        MCRFilesystemNode[] out = new MCRFilesystemNode[children.size()];
+        return children.toArray(out);
     }
 
     /**
@@ -255,10 +249,10 @@ public class MCRDirectory extends MCRFilesystemNode {
     public MCRFilesystemNode getChild(int index) {
         ensureNotDeleted();
 
-        if (childrenIDs == null) {
+        if (children == null) {
             return getChildren()[index];
         }
-        return manager.retrieveNode((String) (childrenIDs.get(index)));
+        return children.get(index);
     }
 
     /**
@@ -422,7 +416,7 @@ public class MCRDirectory extends MCRFilesystemNode {
 
         super.delete();
 
-        this.childrenIDs = null;
+        this.children = null;
         this.numChildDirsHere = 0;
         this.numChildDirsTotal = 0;
         this.numChildFilesHere = 0;

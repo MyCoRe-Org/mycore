@@ -77,7 +77,7 @@ public class MCRDirectoryXML {
      * Sends the contents of an MCRDirectory as XML data to the client
      */
     protected Document getDirectoryXML(MCRDirectory dir){
-        LOGGER.info("MCRDirectoryXML: listing of directory " + dir.getName());
+        LOGGER.info("MCRDirectoryXML: start listing of directory " + dir.getName());
 
         Element root = new Element("mcr_directory");
         Document doc = new org.jdom.Document(root);
@@ -149,6 +149,8 @@ public class MCRDirectoryXML {
                 node.addContent( additional.detachRootElement() );
             } catch(Exception ignored) {}
         }
+
+        LOGGER.info("MCRDirectoryXML: end listing of directory " + dir.getName());
 
         return doc;
 
