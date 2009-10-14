@@ -83,6 +83,8 @@ class MCRLuceneResults extends MCRResults {
     private void reQuery() throws IOException {
         checkIndexSearcher();
         TopFieldCollector collector = TopFieldCollector.create(sortFields, maxResults, false, false, false, false);
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("Query: " + query);
         indexSearcher.search(query, collector);
         //Lucene 2.4.1 has a bug: be sure to call collector.topDocs() just once
         //see http://issues.apache.org/jira/browse/LUCENE-942

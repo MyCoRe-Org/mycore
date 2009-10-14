@@ -48,7 +48,7 @@ class MCRIndexWriterAction implements Runnable {
     private Term deleteTerm;
 
     private RAMDirectory ramDir;
-    
+
     private static Logger LOGGER = Logger.getLogger(MCRIndexWriterAction.class);
 
     private MCRIndexWriterAction(MCRIndexWriteExecutor executor) {
@@ -98,7 +98,9 @@ class MCRIndexWriterAction implements Runnable {
     }
 
     private void addDocument() throws IOException {
-        LOGGER.debug("add Document:" + toString());
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("add Document:" + toString());
+        }
         executor.getIndexWriter().addDocument(doc, analyzer);
         LOGGER.debug("adding done.");
     }
