@@ -318,6 +318,9 @@ public class MCRBuildLuceneQuery {
                 upper = valueNumber;
                 return NumericRangeQuery.newFloatRange(fieldname, lower, upper, true, Op.length() == 2);
             }
+            if (Op.equals("=")) {
+                return NumericRangeQuery.newFloatRange(fieldname, valueNumber, valueNumber, true, true);
+            }
         }
         if (type.equals("integer")) {
             long valueNumber = value.longValue();
@@ -331,14 +334,13 @@ public class MCRBuildLuceneQuery {
                 upper = valueNumber;
                 return NumericRangeQuery.newLongRange(fieldname, lower, upper, true, Op.length() == 2);
             }
+            if (Op.equals("=")) {
+                return NumericRangeQuery.newLongRange(fieldname, valueNumber, valueNumber, true, true);
+            }
         }
-        if (Op.equals("=")) {
-            return new TermQuery(new Term(fieldname, value.toString()));
-        } else {
-            LOGGER.info("Invalid operator for Number: " + Op);
+        LOGGER.info("Invalid operator for Number: " + Op);
 
-            return null;
-        }
+        return null;
     }
 
     /***************************************************************************
