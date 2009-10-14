@@ -44,6 +44,7 @@ import javax.xml.transform.stream.StreamResult;
 
 import org.jdom.Document;
 import org.jdom.Element;
+import org.jdom.Namespace;
 import org.jdom.transform.JDOMSource;
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRConfigurationException;
@@ -150,6 +151,10 @@ public class MCRInputValidator {
     private synchronized Document prepareStylesheet() {
         Element stylesheet = new Element("stylesheet").setAttribute("version", "1.0");
         stylesheet.setNamespace(MCRConstants.XSL_NAMESPACE);
+        
+        for (Namespace ns : MCRConstants.getStandardNamespaces())
+            if (!ns.equals(MCRConstants.XSL_NAMESPACE))
+                stylesheet.addNamespaceDeclaration(ns);
 
         Element output = new Element("output", MCRConstants.XSL_NAMESPACE);
         output.setAttribute("method", "text");

@@ -63,6 +63,7 @@ import org.jdom.transform.JDOMSource;
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRConfiguration;
+import org.mycore.common.MCRConstants;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRPersistenceException;
 import org.mycore.common.MCRSession;
@@ -1238,7 +1239,7 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
             } else {
                 params.remove("_rootName_");
             }
-            Element returns = new Element(baseElement);
+            Element returns = new Element(getLocalName(baseElement), getNamespace(baseElement));
             for (Map.Entry<String, String> entry : params.entrySet()) {
                 constructElement(returns, entry.getKey(), entry.getValue());
             }
@@ -1280,18 +1281,17 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
             i = xpath.indexOf('/');
             if (subname.startsWith("@")) {
                 if (i > 0) {
-                    subname = subname.substring(0, i);// attribute should be
-                    // the last
+                    subname = subname.substring(0, i); // attribute should be last
                 }
                 subname = subname.substring(1);// remove @
                 LOGGER.debug("Setting attribute " + subname + "=" + value);
-                current.setAttribute(subname, value);
+                current.setAttribute(getLocalName(subname), value, getNamespace(subname));
                 return;
             }
-            Element newcurrent = current.getChild(subname);
+            Element newcurrent = current.getChild(getLocalName(subname), getNamespace(subname));
             if (newcurrent == null) {
-                newcurrent = new Element(subname);
-                LOGGER.debug("Adding element " + newcurrent.getName() + " to " + current.getName());
+                newcurrent = new Element(getLocalName(subname), getNamespace(subname));
+                LOGGER.debug("Adding element " + subname + " to " + current.getName());
                 current.addContent(newcurrent);
             }
             if (subname == xpath) {
@@ -1301,6 +1301,21 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
                 return;
             }
             constructElement(newcurrent, xpath, value); // recursive call
+        }
+        
+        private static Namespace getNamespace(String name) {
+            if (!name.contains(":"))
+                return Namespace.NO_NAMESPACE;
+            String prefix = name.split(":")[0];
+            Namespace ns = MCRConstants.getStandardNamespace(prefix);
+            return (ns == null ? Namespace.NO_NAMESPACE : ns);
+        }
+        
+        private static String getLocalName(String name) {
+            if (!name.contains(":"))
+                return name;
+            else
+                return name.split(":")[1];
         }
     }
 }
