@@ -477,6 +477,13 @@
         <optional>false</optional>
       </dependency>
       <dependency>
+        <groupId>net.java.dev.jna</groupId>
+        <artifactId>jna</artifactId>
+        <version>3.2.3</version>
+        <optional>true</optional>
+        <scope>runtime</scope>
+      </dependency>
+      <dependency>
         <groupId>joda-time</groupId>
         <artifactId>joda-time</artifactId>
         <version>1.6</version>
