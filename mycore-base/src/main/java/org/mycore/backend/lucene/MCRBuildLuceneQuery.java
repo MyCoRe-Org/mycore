@@ -104,7 +104,12 @@ public class MCRBuildLuceneQuery {
                 if ("name".equals(fieldtype)) {
                     fieldtype = "text";
                 }
-
+                
+                if("index".equals(fieldtype)){
+                	fieldtype="identifier";
+                	value = MCRNormalizer.normalizeString(value, true);
+                }
+                
                 x = handleCondition(field, operator, value, fieldtype, reqf, analyzer);
             }
 

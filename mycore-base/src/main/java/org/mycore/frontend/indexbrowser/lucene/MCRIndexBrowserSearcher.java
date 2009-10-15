@@ -120,8 +120,9 @@ public class MCRIndexBrowserSearcher {
         if (browseData.getSearch() != null && browseData.getSearch().length() > 0) {
             MCRFieldDef field = MCRFieldDef.getDef(indexConfig.getBrowseField());
             String value = browseData.getSearch();
-            if("wraps".equals(browseData.getMode())){
-            	value="*"+value+"*";
+            if (browseData != null && browseData.getMode() != null && browseData.getMode().equalsIgnoreCase("contains")){
+            	if(!value.startsWith("\\*")){value="*"+value;}
+            	if(!value.endsWith("\\*")){value=value+"*";}
             }
             String operator = getOperator();
             cAnd.addChild(new MCRQueryCondition(field, operator, value));
@@ -197,7 +198,7 @@ public class MCRIndexBrowserSearcher {
             return "=";
         else if (browseData != null && browseData.getMode() != null && browseData.getMode().equalsIgnoreCase("prefix"))
             return "like";
-        else if (browseData != null && browseData.getMode() != null && browseData.getMode().equalsIgnoreCase("wraps"))
+        else if (browseData != null && browseData.getMode() != null && browseData.getMode().equalsIgnoreCase("contains"))
             return "like";
         else
             return "like";
