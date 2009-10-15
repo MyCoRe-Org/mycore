@@ -43,6 +43,7 @@ import org.apache.lucene.search.PrefixQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.WildcardQuery;
+import org.mycore.common.MCRNormalizer;
 import org.mycore.common.MCRUtils;
 import org.mycore.services.fieldquery.MCRFieldDef;
 
@@ -104,6 +105,11 @@ public class MCRBuildLuceneQuery {
                     fieldtype = "text";
                 }
 
+                if("index".equals(fieldtype)){
+                	fieldtype="identifier";
+                	//value = MCRLuceneSearcher.convertToGermanIndexString(value);
+                	value = MCRNormalizer.normalizeString(value, true);
+                }
                 x = handleCondition(field, operator, value, fieldtype, reqf, analyzer);
             }
 

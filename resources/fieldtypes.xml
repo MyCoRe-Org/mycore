@@ -24,6 +24,18 @@ fieldtypes.xsd">
 		<operator token="contains"/>
 		<!-- searches words at any position in the text -->
 	</type>
+
+	<type name="index" default="contains">
+		<!-- entry in index browser -->
+		<operator token="="/>
+		<operator token="&gt;"/>
+		<operator token="&lt;"/>
+		<operator token="&gt;="/>
+		<operator token="&lt;="/>
+		<operator token="like"/>
+		<!-- allows wildcard search using * and ? -->
+	</type>
+
 	<type name="text" default="contains">
 		<!-- free text like title, abstract ect., stemming and linguistic processing applied -->
 		<operator token="="/>
