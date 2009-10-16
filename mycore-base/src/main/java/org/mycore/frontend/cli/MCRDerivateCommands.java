@@ -221,7 +221,7 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
             return null;
         }
 
-        String[] list = dir.list();
+        File[] list = dir.listFiles();
 
         if (list.length == 0) {
             LOGGER.warn("No files found in directory " + directory);
@@ -229,9 +229,16 @@ public class MCRDerivateCommands extends MCRAbstractCommands {
         }
 
         List<String> cmds = new ArrayList<String>();
-        for (String file : list)
-            if (file.endsWith(".xml") && file.contains("derivate"))
-                cmds.add((update ? "update" : "load") + " derivate from file " + new File(dir, file).getAbsolutePath());
+        for (File file : list) {
+            String name = file.getName();
+            if (!(name.endsWith(".xml") && name.contains("derivate")))
+                continue;
+            name = name.substring(0, name.length() - 4); // remove ".xml"
+            File contentDir = new File(dir, name);
+            if (!(contentDir.exists() && contentDir.isDirectory()))
+                continue;
+            cmds.add((update ? "update" : "load") + " derivate from file " + file.getAbsolutePath());
+        }
 
         return cmds;
     }
