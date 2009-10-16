@@ -1293,7 +1293,7 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
             }
 
             if (name.startsWith("@")) {
-                name = xpath.substring(1);
+                name = name.substring(1);
                 String localName = getLocalName(name);
                 Namespace namespace = getNamespace(name);
                 current.setAttribute(localName, value, namespace);
