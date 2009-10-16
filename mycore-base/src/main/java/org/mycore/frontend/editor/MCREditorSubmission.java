@@ -655,7 +655,7 @@ public class MCREditorSubmission {
                 }
 
                 Namespace ns = getNamespace(name);
-                if (name.contains(":"))
+                if (! ns.equals(Namespace.NO_NAMESPACE))
                     name = name.substring(name.indexOf(":") + 1);
                 Element child = parent.getChild(name, ns);
                 
