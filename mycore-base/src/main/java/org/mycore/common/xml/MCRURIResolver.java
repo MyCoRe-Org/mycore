@@ -1220,8 +1220,13 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
      * 
      * This will return:
      * 
-     * <mycoreobject> <metadata> <parents> <parent href="'FooBar_Document_4711'"
-     * /> </parents> </metadata> </mycoreobject>
+     * &lt;mycoreobject&gt;
+     *   &lt;metadata&gt; 
+     *     &lt;parents&gt; 
+     *       &lt;parent href="FooBar_Document_4711" /&gt; 
+     *     &lt;/parents&gt; 
+     *   &lt;/metadata&gt; 
+     * &lt;/mycoreobject&gt;
      */
     private static class MCRBuildXMLResolver implements MCRResolver {
 
@@ -1230,26 +1235,26 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
          */
         public Element resolveElement(String uri) {
             String key = uri.substring(uri.indexOf(":") + 1);
-            LOGGER.debug("Reading xml from query result using key :" + key);
+            LOGGER.debug("Building xml from " + key);
 
             Hashtable<String, String> params = getParameterMap(key);
-            String baseElement = params.get("_rootName_");
-            if (baseElement == null) {
-                baseElement = "uriTemp";
-            } else {
+
+            Element defaultRoot = new Element("root");
+            Element root = defaultRoot;
+            String rootName = params.get("_rootName_");
+            if (rootName != null) {
+                root = new Element(getLocalName(rootName), getNamespace(rootName));
                 params.remove("_rootName_");
             }
-            Element returns = new Element(getLocalName(baseElement), getNamespace(baseElement));
+
             for (Map.Entry<String, String> entry : params.entrySet()) {
-                constructElement(returns, entry.getKey(), entry.getValue());
+                constructElement(root, entry.getKey(), entry.getValue());
             }
-            if (returns.getName().equals("uriTemp")) {
-                if (returns.getChildren().size() > 1) {
-                    LOGGER.warn("More than 1 root node defined, returning one");
-                    return (Element) ((Element) returns.getChildren().get(0)).detach();
-                }
+            if ((root == defaultRoot) && (root.getChildren().size() > 1)) {
+                LOGGER.warn("More than 1 root node defined, returning first");
+                return (Element) ((Element) root.getChildren().get(0)).detach();
             }
-            return returns;
+            return root;
         }
 
         private static Hashtable<String, String> getParameterMap(String key) {
@@ -1270,37 +1275,31 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
         }
 
         private static void constructElement(Element current, String xpath, String value) {
-            int i = xpath.indexOf('/');
-            LOGGER.debug("Processing xpath: " + xpath);
-            String subname = xpath;
-            if (i > 0) {
-                // construct new element name and xpath value
-                subname = xpath.substring(0, i);
-                xpath = xpath.substring(i + 1);
-            }
-            i = xpath.indexOf('/');
-            if (subname.startsWith("@")) {
-                if (i > 0) {
-                    subname = subname.substring(0, i); // attribute should be last
+            StringTokenizer st = new StringTokenizer(xpath,"/");
+            String name = null;
+            while (st.hasMoreTokens()) {
+                name = st.nextToken();
+                if( name.startsWith("@")) break;
+                
+                String localName = getLocalName(name);
+                Namespace namespace = getNamespace(name);
+
+                Element child = current.getChild(localName, namespace);
+                if (child == null) {
+                    child = new Element(localName, namespace);
+                    current.addContent(child);
                 }
-                subname = subname.substring(1);// remove @
-                LOGGER.debug("Setting attribute " + subname + "=" + value);
-                current.setAttribute(getLocalName(subname), value, getNamespace(subname));
-                return;
+                current = child;
             }
-            Element newcurrent = current.getChild(getLocalName(subname), getNamespace(subname));
-            if (newcurrent == null) {
-                newcurrent = new Element(getLocalName(subname), getNamespace(subname));
-                LOGGER.debug("Adding element " + subname + " to " + current.getName());
-                current.addContent(newcurrent);
+
+            if (name.startsWith("@")) {
+                name = xpath.substring(1);
+                String localName = getLocalName(name);
+                Namespace namespace = getNamespace(name);
+                current.setAttribute(localName, value, namespace);
+            } else {
+                current.setText(value);
             }
-            if (subname == xpath) {
-                // last element of xpath
-                LOGGER.debug("Setting text of element " + newcurrent.getName() + " to " + value);
-                newcurrent.setText(value);
-                return;
-            }
-            constructElement(newcurrent, xpath, value); // recursive call
         }
         
         private static Namespace getNamespace(String name) {
