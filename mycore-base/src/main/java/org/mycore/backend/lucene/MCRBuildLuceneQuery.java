@@ -24,6 +24,7 @@
 package org.mycore.backend.lucene;
 
 import java.io.StringReader;
+
 import java.text.ParseException;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -45,6 +46,7 @@ import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TermRangeQuery;
 import org.apache.lucene.search.WildcardQuery;
 import org.jdom.Element;
+import org.mycore.common.MCRNormalizer;
 import org.mycore.common.MCRUtils;
 import org.mycore.services.fieldquery.MCRFieldDef;
 
