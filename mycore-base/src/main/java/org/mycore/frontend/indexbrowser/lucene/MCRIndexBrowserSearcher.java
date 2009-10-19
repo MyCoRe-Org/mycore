@@ -17,7 +17,6 @@ import org.mycore.services.fieldquery.MCRFieldValue;
 import org.mycore.services.fieldquery.MCRHit;
 import org.mycore.services.fieldquery.MCRQuery;
 import org.mycore.services.fieldquery.MCRQueryCondition;
-import org.mycore.services.fieldquery.MCRQueryManager;
 import org.mycore.services.fieldquery.MCRResults;
 import org.mycore.services.fieldquery.MCRSortBy;
 
@@ -53,12 +52,12 @@ public class MCRIndexBrowserSearcher {
      */
     public List<MCRIndexBrowserEntry> doSearch() {
         query = buildQuery();
-        results = search();
-        LOGGER.debug("Results found hits:" + results.getNumHits());
-        hitList = createLinkedListfromSearch();
         // for further search and research (by refine and other posibilities
         // the query must be in the Cache
-        MCRCachedQueryData.cache(results, query.buildXML(), query.getCondition());
+        MCRCachedQueryData qd = MCRCachedQueryData.cache(query, query.buildXML());
+        MCRResults results = qd.getResults();
+        LOGGER.debug("Results found hits:" + results.getNumHits());
+        hitList = createLinkedListfromSearch();
         return hitList;
     }
 
@@ -146,10 +145,6 @@ public class MCRIndexBrowserSearcher {
                 LOGGER.error("MCRFieldDef not available: " + sortFieldValue);
         }
         return sortCriteria;
-    }
-
-    protected MCRResults search() {
-        return MCRQueryManager.search(query);
     }
 
     /**

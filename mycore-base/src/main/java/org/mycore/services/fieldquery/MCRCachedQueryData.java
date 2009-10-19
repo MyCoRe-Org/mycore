@@ -64,34 +64,39 @@ public class MCRCachedQueryData
     }        
   
   /** The query as XML, for later reloading into search mask editor form */
-  private Document query; 
+  private Document input; 
+  
   /** The result list */
-  private MCRResults results; 
-  /** The normalized query condition */
-  private MCRCondition condition;
+  private MCRResults results;
+  
+  /** The normalized query */
+  private MCRQuery query;
+  
   /** The page last displayed */
   private int page;
-  /** The number of hits per page */
+  
   private int numPerPage;
   
-  public static MCRCachedQueryData cache(MCRResults results, Document query, MCRCondition condition) {
-    MCRCachedQueryData data = new MCRCachedQueryData(results, query, condition);
+  public static MCRCachedQueryData cache(MCRQuery query, Document input) {
+    MCRResults results = MCRQueryManager.search(query);
+    MCRCachedQueryData data = new MCRCachedQueryData(results, input, query);
     cache.put( results.getID(), data );
     MCRSessionMgr.getCurrentSession().put( LAST_QUERY_IN_SESSION, data );
     return data;
   }
   
-  private MCRCachedQueryData( MCRResults results, Document query, MCRCondition condition )
+  private MCRCachedQueryData( MCRResults results, Document input, MCRQuery query )
   {
     this.results = results;
+    this.input = input;
     this.query = query;
-    this.condition = condition;
   }
+  
+  public MCRQuery getQuery()
+  { return query; }
 
   public int getNumPerPage()
-  {
-    return numPerPage;
-  }
+  { return numPerPage; }
 
   public void setNumPerPage( int numPerPage )
   {
@@ -108,18 +113,11 @@ public class MCRCachedQueryData
     this.page = page;
   }
 
-  public MCRCondition getCondition()
+  public Document getInput()
   {
-    return condition;
+    return input;
   }
-
-  public Document getQuery()
-  {
-    return query;
-  }
-
+  
   public MCRResults getResults()
-  {
-    return results;
-  }
+  { return results; }
 }
