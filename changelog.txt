@@ -7,6 +7,7 @@ Version 2.1 (actual head tree)
 - Use more than one Applet in the Application.
 - Integrate the simple Mets/Mods Component.
 - Add a Zoomify component.
+- Results lists from MCRSearchServlet now can be bookmarked. When query is not in cache any more, it will be re-executed. 
 
 Version 2.0
 =============
