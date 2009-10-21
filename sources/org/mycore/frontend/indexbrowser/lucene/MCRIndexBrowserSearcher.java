@@ -55,7 +55,7 @@ public class MCRIndexBrowserSearcher {
         // for further search and research (by refine and other posibilities
         // the query must be in the Cache
         MCRCachedQueryData qd = MCRCachedQueryData.cache(query, query.buildXML());
-        MCRResults results = qd.getResults();
+        results = qd.getResults();
         LOGGER.debug("Results found hits:" + results.getNumHits());
         hitList = createLinkedListfromSearch();
         return hitList;
