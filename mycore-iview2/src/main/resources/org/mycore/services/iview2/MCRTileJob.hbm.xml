@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN" "http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<hibernate-mapping package="org.mycore.services.iview2">
+  <class name="MCRTileJob">
+    <id name="id">
+      <generator class="native" />
+    </id>
+    <natural-id>
+      <property name="derivate" type="string" />
+      <property name="path" type="string" />
+    </natural-id>
+    <property name="status" type="char" />
+    <property name="added" type="java.util.Date" />
+    <property name="start" type="java.util.Date" />
+    <property name="finished" type="java.util.Date" />
+    <property name="tiles" type="long" />
+    <property name="width" type="long" />
+    <property name="height" type="long" />
+    <property name="zoomLevel" type="long" />
+  </class>
+</hibernate-mapping>

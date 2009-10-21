@@ -1,0 +1,120 @@
+---bei Verwendung der aktuellen Index---
+
+	#header:
+		--> Headerleiste mit verschiedenen Buttons und Seitenzahlangabe
+		--> enthält:
+				#cssChanger --> Design(CSS)-Change-Button
+							*onclick="changeCss();"*
+
+				#permalink --> kreiert Link, über den direkt der aktuell angezeigte Bildausschnitt zu erreichen ist
+							*onclick="displayURL();"*
+
+				#url --> Bereich in dem Link-Fenster angezeigt wird
+							*onclick="this.select();"* (--> selektiert Text)
+					.displayOut --> Button um Fenster zu schließen
+								*onclick="blendings.fadeOut($('url'), 5, 300,'$(\'url\').style.display = \'none\'');"*
+
+				#backwardsBehind --> Bereich für zurückblätter-Button, Button schwach im Hintergrund
+					#backwards --> Button um zurückzublättern
+								*onclick="navigatePage(--pagenumber);"*
+
+				#forwardBehind --> Bereich für vorblätter-Button, Button schwach im Hintergrund
+					#forward --> Button um vorzublättern
+								*onclick="navigatePage(++pagenumber);"*
+
+				#pageCounter --> Bereich mit max Seitenzahl
+
+				#inputPage --> Bereich für aktuelle Seitennummer
+					#iptPgNr --> Seitennummer-Formular
+								*onkeydown="input(event);"*
+
+				#openThumbs --> Button um Overview / Seitenübersicht zu öffnen
+							*onclick="showOverview();"*
+							
+				#chapterOpener --> Button um Kapitelübersicht zu öffnen
+							*onclick="openChapter();"*
+
+
+°	#viewer:
+		--> Main-Viewer
+		--> enthält:
+°				.well --> Anzeigebereich für Kacheln und Preload
+
+°				.surface --> Bereich auf dem Events zum Verschieben des Anzeigebereiches abgefangen werden
+
+°				.controls --> verschiedene Buttons:
+						.maximize --> allgemeine Angaben zu Voll-/Normalbild Buttons
+°							#zIn --> Maximier-Button
+									*onclick="maximizeHandler()"*
+°							#zOut --> Minimier-Button
+									*onclick="maximizeHandler()"*
+						#bayArea --> ZoomBar
+							#scrollZoom --> Image hinter ZoomBar
+^							#scale --> Skalenbereich für ZoomLevel
+								#bar --> ZoomBalken
+						.zoomIn --> Vergrößern-Button-Bereich
+							.zoomInButton --> Button für HineinZoomen
+									*onclick="zoomBarPos (- 1, true)"*
+						.zoomOut --> Verkleinern-Button-Bereich
+							.zoomOutButton --> Button für HerausZoomen
+									*onclick="zoomBarPos (+ 1, true)"*
+						#breite --> Button zum Anpassen des aktuell gezeigten Images an Bildschirmbreite
+								*onclick="pictureWidth()"*
+						#hoehe --> Button zum Anpassen des aktuell gezeigten Images an Bildschirmgroeße (Bild komplett sichtbar)
+								*onclick="pictureScreen()"*
+
+^				#thumb --> Bereich für Vorschau-Bild zur Navigation
+					#ausschnitt --> aktuell betrachteter Bildbereich
+					#thumbnail --> Vorschau-Bild
+
+				#damp --> Button um Vorschau-Bild (#thumb) ein- bzw. auszuklappen
+						*onclick="damper()"*
+					.hide --> unsichtbar machen
+					.show --> sichtbar machen
+
+§				#scrollH --> Scrollbar Horizontal
+					.start --> linker bzw. oberer Scroll-Button
+					.empty --> Scrollbar-Bereich
+						.spaceStart --> linker bzw. oberer Rand vor Balken-Bewegungsbereich
+						.eHorizontal --> Bereich-Hintergrund
+						.spaceEnd --> rechter bzw. unterer Rand nach Balken-Bewegungsbereich
+						#scrollHBar --> Scrollbalken
+							.barStart --> linker bzw. oberer Balken-Rand
+							.horizontal --> Balken-Mitte (wird passend gestreckt)
+							.barEnd --> rechter bzw. unterer Balken-Rand
+					.end --> rechter bzw. unterer Scroll-Button
+
+§				#scrollV --> Scrollbar Vertikal (siehe scrollH, außer statt horizontal --> vertical)
+
+
+§	#chapter1:
+		--> Kapitelübersicht
+		--> enthält:
+				#chapter1_content --> Bereich für Inhalt des Buches, also Kapiteleinträge
+					.chapter --> Kapiteleinträge
+						.pageImageSymbol --> Symbol vor Seiteneintrag
+						.chapterImageSymbolMinus --> "aufgeklappt" Symbol vor Kapitel
+						.chapterImageSymbolPlus --> "zugeklappt" Symbol vor Kapitel
+
+				#chapter1_chapSort --> Button um Kapitelübersicht zu sortieren, aktuell "entfernte" Kapitel zuzuklappen
+
+				#scrollChap --> Scrollleiste für Kapitel (siehe scrollV)
+
+				#chapterColors --> Farbangaben für das Hervorheben von Seiten
+
+
+	#overview:
+		--> Seitenübersicht
+		--> enthält:
+				#divBox --> Box für einzelne Seite
+					#previewImage --> Vorschaubild für Seite
+					#infoDiv --> Titelbox für Seite
+
+				#barOV --> Scrollleiste für Overview (siehe scrollV)
+
+
+
+° = essentiell wichtig
+^ = Veränderung nur bedingt sinnvoll (JavaScript-seitige Berechnung)
+§ = durch Klasse gesteuert
+*...* = Funktionen, die angebunden werden müssen

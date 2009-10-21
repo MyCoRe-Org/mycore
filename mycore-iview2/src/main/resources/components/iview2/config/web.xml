@@ -1,0 +1,13 @@
+<!-- **************************************************************** -->
+<!-- Servlets and mappings of iview                                   -->
+<!-- **************************************************************** -->
+
+<servlet id="MCRDirectoryXMLServlet">
+  <servlet-name>MCRDirectoryXMLServlet</servlet-name>
+  <servlet-class>org.mycore.frontend.iview2.MCRDirectoryXMLServlet</servlet-class>
+</servlet>
+
+<servlet-mapping>
+  <servlet-name>MCRDirectoryXMLServlet</servlet-name>
+  <url-pattern>/servlets/MCRDirectoryXMLServlet/*</url-pattern>
+</servlet-mapping>

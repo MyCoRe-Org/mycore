@@ -1,0 +1,157 @@
+Diese Klasse stellt eine Möglichkeit bereit anhand einer vordefinierten Mets-Datei eine Kapitelübersicht zu erzeugen.
+
+
+Folgende Funktionalitäten werden bereitgestellt:
+	- Auslesen der benötigten Informationen aus der Mets
+	- Informationen in Kapitelübersicht übertragen
+	- auf-/zuklappen der einzelnen Kapitel
+	- direkte Verlinkung über Seiteneinträge
+	- Hervorheben der aktuell betrachteten und auch der aktuell überfahrenen (hover) Seite
+	- Sortieren der Einträge (Zuklappen "entfernter" Kapitel)
+
+
+Einbinden der Klasse:
+
+	kapitelUebersicht = new chapter(chapterId, parentId);
+		--> Zuweisung der Klasse zu "kapitelUebersicht"
+
+	kapitelUebersicht.init();
+		--> Initialisierung der Kapitelübersicht (Erzeugen der benötigten Container, Laden der Css-Werte und des Mets-Inhaltes)
+
+	kapitelUebersicht.addListener(chapter.PAGE_NUMBER, new function() { 
+		this.change = function(value) {
+			*...*
+		}
+	});
+		--> ermöglicht bei klasseninterner Änderung der pagenumber die Benachrichtung nach außen mit Ausführung von *...*
+
+	kapitelUebersicht.addListener(chapter.ITEM_CLICK, new function() {
+		this.clicked = function(item) {
+			*...*
+		}
+	});
+		--> ermöglicht bei auf- & zuklappen der Kapiteleinträge die Benachrichtung nach außen mit Ausführung von *...*
+
+	kapitelUebersicht.displayOutNotUsedEntries($("kapitelUebersicht_content").firstChild, 0);
+		--> um anfänglich sämtliche Ebenen, bis auf die Buchebene (Ebene 1), einzuklappen (sonst alles aufgeklappt)
+
+
+Weiterhin sind folgende Funktionen verwendbar:
+
+	setPosition(top, bottom, left, right); 
+		--> um nachträglich Position der Kapitelübersicht zu ändern, bei fehlender Wertangabe "null" verwenden
+
+	getHeight();
+		--> gibt Offsethöhe des Content-Div's zurück
+
+	changePage(pagenumber);
+		--> ermöglicht die Anpassung der Kapitelübersicht auf Seitenwechsel von "außen" (sinnvoll für Hervorheben von Einträgen)
+
+	showCurrentPageCenter(pagenumber);
+		--> schiebt, wenn die Grenzen des Anzeigebereiches nicht verletzt sind, die aktuelle Seite in die Mitte (vertikal)
+
+	displayOutAllEntries(startPoint, layers);
+		--> klappt alle Kapiteleinträge unterhalb der "layers"-ten Ebene unter dem "startPoint" zu
+
+	pressEachChapterEntries(startPoint, layers);
+		--> führt auf alle Kapiteleinträge unterhalb der "layers"-ten Ebene unter dem "startPoint" einen onclick aus
+
+	useEffects(value);
+		--> schaltet die Verwendung von Effekten an bzw. ab
+
+	hasEffects();
+		--> gibt die aktuelle Festlegung bzgl. der Verwendung von Effekten zurück
+
+	dropListener(type, theListener);
+		--> entfernt den Listener "theListener" vom Typ "type" wieder, so das dieser bei Änderungen nicht mehr benachrichtigt wird
+
+
+CSS-Werte:
+
+/* Chapter Overview */
+/* Main Div*/
+#kapitelUebersicht {
+	position: absolute;
+	background-color: #bd876a;
+	top: 35px;
+	right: 0px;
+	width: 370px;
+	height: 500px; /* dynamic - setSize */
+	z-index: 35;
+	overflow: hidden;
+}
+
+/* Content */
+#kapitelUebersicht_content {
+	position: absolute;
+	top: 10px;
+	bottom: 10px;
+	left: 10px; /* gewisser Abstand besteht in jedem Fall (resultiert aus #chapter1 .chapter) */
+	right: 80px;
+	background-color: #ffffff;
+	font-size: 19px;
+	line-height: 22px;
+	font-family: Times;
+	cursor: pointer;
+	overflow: hidden;
+}
+
+/* Entries */
+#kapitelUebersicht .chapter {
+	position: relative;
+	display: none;
+	border-left: 1px solid #cccccc;
+	left: 10px;
+	right: 10px; /*Abstand zwischen Textende und dem rechten Rand des Content Div's ||| auch für Highlight ||| kein wirklicher Abstand nach rechts*/
+	background-color:#fffcfa;
+	overflow:hidden;
+	white-space:nowrap;
+	padding-left:3px;
+	color:#000000;
+}
+
+/* Entry Symbols */
+#kapitelUebersicht .pageImageSymbol {
+	position: relative;
+	top: 6px;
+	height: 11px;
+	width: 12px;
+	background-repeat: no-repeat;
+	background-image: url('../gfx/page2.png');
+	float: left;
+}
+#kapitelUebersicht .chapterImageSymbolMinus {
+	position: relative;
+	top: 6px;
+	height: 11px;
+	width: 12px;
+	background-repeat: no-repeat;
+	background-image: url('../gfx/minus2.png');
+	float: left;
+}
+#kapitelUebersicht .chapterImageSymbolPlus {
+	position: relative;
+	top: 6px;
+	height: 11px;
+	width: 12px;
+	background-repeat: no-repeat;
+	background-image: url('../gfx/plus2.png');
+	float: left;
+}
+
+/* chapter Sort Button */
+#kapitelUebersicht_chapSort {
+	position: absolute;
+	right: 50px;
+	top: 10px;
+	width: 20px;
+	height: 20px;
+	background-image: url('../gfx/empty.png');
+}
+
+/* color-declarations (Hover, Highlight, Normal) */
+#chapterColors {
+	color: #d9ae98; /* #0 --- Hintergrundfarbe der aktuell betrachteten Seite */
+	background-color: #fffcfa; /* #1 --- Hintergrundfarbe normal */
+	border-top-color: #f2dbce; /* #2 --- Hintergrundfarbe der aktuell gehoverten Seite */
+}

@@ -1,0 +1,28 @@
+<vars>
+  <area location="file:thumbnail">
+    <var name="baseUri" type="string">../images/Pics</var>
+    <var name="prefix" type="string" desc="Holds the Foldername where the displayed Picture is stored; is read per Javascript" />
+    <var name="tilesize" type="int" desc="Holds the tilesize of each tile, except of bordertiles all tiles are yxy in size">256</var>
+    <var name="maximized" type="bool" desc="Holds if the View is fullscreen or only partial">false</var>
+    <var name="zoomWidth" type="bool" desc="Defines if the Viewer is set so that the Image is displayed completely over width">false</var>
+    <var name="zoomScreen" type="bool"
+      desc="Defines if the Viewer is set so that the Image is displayed completely on the screen as big as possible">false</var>
+    <var name="blendEffects" type="bool" desc="Holds if Effects like Sliding and Fading will be used or not">true</var>
+  </area>
+  <area location="file:chapter">
+    <var name="chapHover" type="bool" desc="Defines the hover-modus: hover with slide Effect (true), standard hover (false)">true</var>
+    <var name="chapHoverDelay" type="int" desc="Defines the delay time for a single hover coloration">100</var>
+    <var name="chapHoverStep" type="int" desc="Defines color changing in each step of hover coloration">10</var>
+  </area>
+  <area location="area:Loading of XML">
+    <var name="book_uri" type="string" desc="Holds the path to a book xml File, which is used if none was per URL">../../images/Pics/Buch.xml</var>
+    <var name="pagenumber" type="int" desc="Holds the default Page which is displayed if no Page was entered through the URL">1</var>
+    <var name="mets_uri" type="string" desc="Holds the path to the METS XML File">../../images/Pics/Mets.xml</var>
+  </area>
+  <area location="area:general">
+    <var name="styleFolderUri" type="string" desc="Path to the Styles location folder. With closing /">gfx/</var>
+    <var name="styleNameMODDED" type="string"
+      desc="The actual Name of the Style which is used, is identical with the name of the Stylefoldername. Without closing /">standard</var>
+    <var name="language" type="string">de</var>
+  </area>
+</vars>

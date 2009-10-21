@@ -1,0 +1,34 @@
+<project name="iview2">
+  <import file="../../integrate.xml" />
+  <condition property="jai.available">
+    <available classname="javax.media.jai.JAI" classpathref="integration.classpath" />
+  </condition>
+  <!-- - - - - - - - - - - - - - - - - - 
+	          target: config                      
+	         - - - - - - - - - - - - - - - - - -->
+  <target name="config">
+    <mcr-config action="addInclude"
+                propertyfile="${build.config}/mycore.properties"
+                key="MCR.CLI.Classes.Internal"
+                value="org.mycore.frontend.iview2.MCRIView2Commands" />
+    <mcr-config action="addInclude"
+                propertyfile="${build.config}/mycore.properties"
+                key="MCR.URIResolver.xslIncludes.components"
+                value="mcr-module-startIview2.xsl" />
+    <AddHibernateMapping class="org.mycore.services.iview2.MCRTileJob" />
+  </target>
+  <!-- - - - - - - - - - - - - - - - - - 
+          target: checkJAI                      
+         - - - - - - - - - - - - - - - - - -->
+  <target name="checkJAI" unless="jai.available">
+    <delete dir="." failonerror="false">
+      <include name="config/**" />
+      <include name="web/**" />
+    </delete>
+  </target>
+
+  <target name="pre.config" depends="checkJAI" />
+  <target name="pre.i18n" depends="checkJAI" />
+  <target name="pre.webapp" depends="checkJAI" />
+  <target name="pre.scripts" depends="checkJAI" />
+</project>
