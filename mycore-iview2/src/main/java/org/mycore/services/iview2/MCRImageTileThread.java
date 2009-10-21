@@ -42,7 +42,6 @@ public class MCRImageTileThread implements Runnable {
             image.setWidth(picProps.width);
             image.setTiles(picProps.countTiles);
             image.setZoomLevel(picProps.zoomlevel);
-            MCRTilingQueue.getInstance().updateJob(image);
             transaction.commit();
         } catch (HibernateException e) {
             LOGGER.error("Error while getting next tiling job.", e);

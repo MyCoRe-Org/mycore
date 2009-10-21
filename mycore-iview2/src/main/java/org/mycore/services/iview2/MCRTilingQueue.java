@@ -1,6 +1,7 @@
 package org.mycore.services.iview2;
 
 import java.util.AbstractQueue;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -26,20 +27,26 @@ public class MCRTilingQueue extends AbstractQueue<MCRTileJob> implements Closeab
 
     private static Logger LOGGER = Logger.getLogger(MCRTilingQueue.class);
 
+    private boolean running;
+
     private MCRTilingQueue() {
         // periodische Ausführung von runProcess
         int waitTime = Integer.parseInt(MCRIview2Props.getProperty("TimeTillReset")) * 60;
         StalledJobScheduler = Executors.newSingleThreadScheduledExecutor();
-        final ScheduledFuture check = StalledJobScheduler.scheduleAtFixedRate(MCRStalledJobResetter.getInstance(), waitTime, waitTime,
-                TimeUnit.SECONDS);
+        StalledJobScheduler.scheduleAtFixedRate(MCRStalledJobResetter.getInstance(), waitTime, waitTime, TimeUnit.SECONDS);
+        running = true;
         MCRShutdownHandler.getInstance().addCloseable(this);
     }
 
     public static MCRTilingQueue getInstance() {
+        if (!instance.running)
+            return null;
         return instance;
     }
 
     public MCRTileJob poll() {
+        if (!running)
+            return null;
         MCRTileJob job = getElement();
         if (job != null) {
             job.setStart(new Date(System.currentTimeMillis()));
@@ -52,6 +59,8 @@ public class MCRTilingQueue extends AbstractQueue<MCRTileJob> implements Closeab
     }
 
     public MCRTileJob remove() throws NoSuchElementException {
+        if (!running)
+            return null;
         MCRTileJob job = poll();
         if (job == null) {
             throw new NoSuchElementException();
@@ -60,11 +69,15 @@ public class MCRTilingQueue extends AbstractQueue<MCRTileJob> implements Closeab
     }
 
     public MCRTileJob peek() {
+        if (!running)
+            return null;
         MCRTileJob job = getElement();
         return job;
     }
 
     public MCRTileJob element() throws NoSuchElementException {
+        if (!running)
+            return null;
         MCRTileJob job = peek();
         if (job == null) {
             throw new NoSuchElementException();
@@ -73,6 +86,8 @@ public class MCRTilingQueue extends AbstractQueue<MCRTileJob> implements Closeab
     }
 
     public boolean offer(MCRTileJob job) {
+        if (!running)
+            return false;
         MCRTileJob oldJob = getJob(job.getDerivate(), job.getPath());
         if (oldJob != null) {
             job = oldJob;
@@ -90,12 +105,18 @@ public class MCRTilingQueue extends AbstractQueue<MCRTileJob> implements Closeab
     }
 
     public void clear() {
+        if (!running)
+            return;
         Session session = MCRHIBConnection.instance().getSession();
         Query query = session.createQuery("DELETE FROM MCRTileJob");
         query.executeUpdate();
     }
 
     public Iterator<MCRTileJob> iterator() {
+        if (!running) {
+            List<MCRTileJob> empty = Collections.emptyList();
+            return empty.iterator();
+        }
         Session session = MCRHIBConnection.instance().getSession();
         Query query = session.createQuery("FROM MCRTileJob WHERE status='" + MCRJobState.NEW.toChar() + "' ORDER BY added ASC");
         @SuppressWarnings("unchecked")
@@ -104,12 +125,16 @@ public class MCRTilingQueue extends AbstractQueue<MCRTileJob> implements Closeab
     }
 
     public int size() {
+        if (!running)
+            return 0;
         Session session = MCRHIBConnection.instance().getSession();
         Query query = session.createQuery("SELECT count(*) FROM MCRTileJob WHERE status='" + MCRJobState.NEW.toChar() + "'");
         return ((Number) query.iterate().next()).intValue();
     }
 
     public MCRTileJob getElementOutOfOrder(String derivate, String path) throws NoSuchElementException {
+        if (!running)
+            return null;
         MCRTileJob job = getJob(derivate, path);
         if (job == null)
             return null;
@@ -122,6 +147,8 @@ public class MCRTilingQueue extends AbstractQueue<MCRTileJob> implements Closeab
     }
 
     private MCRTileJob getJob(String derivate, String path) {
+        if (!running)
+            return null;
         Session session = MCRHIBConnection.instance().getSession();
         Query query = session.createQuery("FROM MCRTileJob WHERE  derivate= :derivate AND path = :path");
         query.setParameter("derivate", derivate);
@@ -131,6 +158,8 @@ public class MCRTilingQueue extends AbstractQueue<MCRTileJob> implements Closeab
     }
 
     private MCRTileJob getElement() {
+        if (!running)
+            return null;
         Session session = MCRHIBConnection.instance().getSession();
         Query query = session.createQuery("FROM MCRTileJob WHERE status='" + MCRJobState.NEW.toChar() + "' ORDER BY added ASC")
                 .setMaxResults(1);
@@ -142,12 +171,16 @@ public class MCRTilingQueue extends AbstractQueue<MCRTileJob> implements Closeab
     }
 
     private boolean updateJob(MCRTileJob job) {
+        if (!running)
+            return false;
         Session session = MCRHIBConnection.instance().getSession();
         session.update(job);
         return true;
     }
 
     private boolean addJob(MCRTileJob job) {
+        if (!running)
+            return false;
         Session session = MCRHIBConnection.instance().getSession();
         session.save(job);
         return true;
@@ -160,6 +193,8 @@ public class MCRTilingQueue extends AbstractQueue<MCRTileJob> implements Closeab
     }
 
     public int remove(String derivate, String path) {
+        if (!running)
+            return 0;
         Session session = MCRHIBConnection.instance().getSession();
         Query query = session.createQuery("DELETE FROM MCRTileJOB WHERE derivate = :derivate AND path = :path");
         query.setParameter("derivate", derivate);
@@ -168,6 +203,8 @@ public class MCRTilingQueue extends AbstractQueue<MCRTileJob> implements Closeab
     }
 
     public int remove(String derivate) {
+        if (!running)
+            return 0;
         Session session = MCRHIBConnection.instance().getSession();
         Query query = session.createQuery("DELETE FROM MCRTileJOB WHERE derivate = :derivate");
         query.setParameter("derivate", derivate);
@@ -176,6 +213,7 @@ public class MCRTilingQueue extends AbstractQueue<MCRTileJob> implements Closeab
 
     public void prepareClose() {
         StalledJobScheduler.shutdownNow();
+        running = false;
         try {
             StalledJobScheduler.awaitTermination(60, TimeUnit.SECONDS);
         } catch (InterruptedException e) {
@@ -185,5 +223,10 @@ public class MCRTilingQueue extends AbstractQueue<MCRTileJob> implements Closeab
 
     public void close() {
         //nothing to be done in this phase
+    }
+
+    @Override
+    public String toString() {
+        return "MCRTilingQueue";
     }
 }
