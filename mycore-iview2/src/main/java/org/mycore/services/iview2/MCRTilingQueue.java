@@ -11,30 +11,28 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
-import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
 import org.mycore.backend.hibernate.MCRHIBConnection;
+import org.mycore.common.events.MCRShutdownHandler;
+import org.mycore.common.events.MCRShutdownHandler.Closeable;
 
-public class MCRTilingQueue extends AbstractQueue<MCRTileJob> {
+public class MCRTilingQueue extends AbstractQueue<MCRTileJob> implements Closeable {
     public char colours;
 
     private static MCRTilingQueue instance = new MCRTilingQueue();
 
-    private static ScheduledExecutorService scheduler;
+    private static ScheduledExecutorService StalledJobScheduler;
 
     private static Logger LOGGER = Logger.getLogger(MCRTilingQueue.class);
-
-    private SessionFactory sessionFactory;
 
     private MCRTilingQueue() {
         // periodische Ausführung von runProcess
         int waitTime = Integer.parseInt(MCRIview2Props.getProperty("TimeTillReset")) * 60;
-        scheduler = Executors.newSingleThreadScheduledExecutor();
-        final ScheduledFuture check = scheduler.scheduleAtFixedRate(MCRQueueExecutor.getInstance(), waitTime, waitTime, TimeUnit.SECONDS);
-        sessionFactory = MCRHIBConnection.instance().getSessionFactory();
+        StalledJobScheduler = Executors.newSingleThreadScheduledExecutor();
+        final ScheduledFuture check = StalledJobScheduler.scheduleAtFixedRate(MCRStalledJobResetter.getInstance(), waitTime, waitTime,
+                TimeUnit.SECONDS);
+        MCRShutdownHandler.getInstance().addCloseable(this);
     }
 
     public static MCRTilingQueue getInstance() {
@@ -75,7 +73,12 @@ public class MCRTilingQueue extends AbstractQueue<MCRTileJob> {
     }
 
     public boolean offer(MCRTileJob job) {
-        job.setAdded(new Date());
+        MCRTileJob oldJob = getJob(job.getDerivate(), job.getPath());
+        if (oldJob != null) {
+            job = oldJob;
+        } else {
+            job.setAdded(new Date());
+        }
         job.setStatus(MCRJobState.NEW);
         job.setStart(null);
         if (addJob(job)) {
@@ -107,25 +110,23 @@ public class MCRTilingQueue extends AbstractQueue<MCRTileJob> {
     }
 
     public MCRTileJob getElementOutOfOrder(String derivate, String path) throws NoSuchElementException {
-        Session session = MCRHIBConnection.instance().getSession();
-        Query query = session.createQuery(
-                "FROM MCRTileJob WHERE status='" + MCRJobState.NEW.toChar() + "' AND derivate='" + derivate + /*
-                                                                                                              * "' AND path='"+
-                                                                                                              * path +
-                                                                                                              */"'").setMaxResults(2);
-        LOGGER.info("bin in der gEOOO :) " + derivate);
-        LOGGER.info("query.list: " + query.list() + " " + query.list().size());
-        if (query.list() == null || query.list().size() != 1) {
-            LOGGER.info("Bin in der If-Anweisung");
-            throw new NoSuchElementException();
-        }
-        System.out.println("Und hier bin ich auch :)");
-        MCRTileJob job = (MCRTileJob) query.iterate().next();
+        MCRTileJob job = getJob(derivate, path);
+        if (job == null)
+            return null;
         job.setStart(new Date(System.currentTimeMillis()));
         job.setStatus(MCRJobState.PROCESS);
         if (!updateJob(job)) {
             throw new NoSuchElementException();
         }
+        return job;
+    }
+
+    private MCRTileJob getJob(String derivate, String path) {
+        Session session = MCRHIBConnection.instance().getSession();
+        Query query = session.createQuery("FROM MCRTileJob WHERE  derivate= :derivate AND path = :path");
+        query.setParameter("derivate", derivate);
+        query.setParameter("path", path);
+        MCRTileJob job = (MCRTileJob) query.iterate().next();
         return job;
     }
 
@@ -140,7 +141,7 @@ public class MCRTilingQueue extends AbstractQueue<MCRTileJob> {
         return (MCRTileJob) query.iterate().next();
     }
 
-    /* private */boolean updateJob(MCRTileJob job) {
+    private boolean updateJob(MCRTileJob job) {
         Session session = MCRHIBConnection.instance().getSession();
         session.update(job);
         return true;
@@ -171,5 +172,18 @@ public class MCRTilingQueue extends AbstractQueue<MCRTileJob> {
         Query query = session.createQuery("DELETE FROM MCRTileJOB WHERE derivate = :derivate");
         query.setParameter("derivate", derivate);
         return query.executeUpdate();
+    }
+
+    public void prepareClose() {
+        StalledJobScheduler.shutdownNow();
+        try {
+            StalledJobScheduler.awaitTermination(60, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            LOGGER.info("Could not wait for 60 seconds...");
+        }
+    }
+
+    public void close() {
+        //nothing to be done in this phase
     }
 }
