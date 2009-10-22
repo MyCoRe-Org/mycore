@@ -90,9 +90,13 @@ public class MCRImageTiling implements Runnable, Closeable {
                     tilingServe.execute(new MCRImageTileThread(job));
                 } else {
                     try {
-                        LOGGER.info("No Picture in TilingQueue going to sleep");
                         synchronized (tq) {
-                            tq.wait();
+                            if (running) {
+                                LOGGER.info("No Picture in TilingQueue going to sleep");
+                                //fixes a race conditioned deadlock situation
+                                //do not wait longer than 60 sec. for a new MCRTileJob
+                                tq.wait(60000);
+                            }
                         }
                     } catch (InterruptedException e) {
                         LOGGER.error("Image Tiling thread was interrupted.", e);
