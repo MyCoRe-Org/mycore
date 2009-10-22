@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
@@ -153,7 +152,11 @@ public class MCRTilingQueue extends AbstractQueue<MCRTileJob> implements Closeab
         Query query = session.createQuery("FROM MCRTileJob WHERE  derivate= :derivate AND path = :path");
         query.setParameter("derivate", derivate);
         query.setParameter("path", path);
-        MCRTileJob job = (MCRTileJob) query.iterate().next();
+        @SuppressWarnings("unchecked")
+        Iterator<MCRTileJob> results = query.iterate();
+        if (!results.hasNext())
+            return null;
+        MCRTileJob job = results.next();
         return job;
     }
 

@@ -28,10 +28,6 @@ public class MCRImageTileThread implements Runnable {
             MCRTiledPictureProps picProps = new MCRTiledPictureProps();
 
             try {
-                File storeDir = new File(MCRIview2Props.getProperty("DirectoryForTiles") + file.getOwnerID() + "/"
-                        + file.getName().substring(0, file.getName().lastIndexOf(".")) + "/");
-                storeDir.mkdir();
-                imgTiler.setOutputDirectory(storeDir);
                 picProps = imgTiler.tile();
             } catch (IOException e) {
                 LOGGER.error("IOException occured while Tiling a queued Picture", e);
