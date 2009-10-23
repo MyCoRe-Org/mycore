@@ -1,6 +1,9 @@
 <!-- **************************************************************** -->
-<!-- Servlets and mappings of iview                                   -->
+<!-- Servlets and mappings of iview2                                  -->
 <!-- **************************************************************** -->
+<listener>
+  <listener-class>org.mycore.common.events.MCRIView2ServletContextListener</listener-class>
+</listener>
 
 <servlet>
   <servlet-name>MCRDirectoryXMLServlet</servlet-name>

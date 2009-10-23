@@ -34,7 +34,6 @@ public class MCRImageTiling implements Runnable, Closeable {
     private MCRImageTiling() {
         MCRShutdownHandler.getInstance().addCloseable(this);
         runLock = new ReentrantLock();
-        Thread.currentThread().setName("TileMaster");
     }
 
     public static boolean isRunning() {
@@ -53,6 +52,7 @@ public class MCRImageTiling implements Runnable, Closeable {
     }
 
     public void run() {
+        Thread.currentThread().setName("TileMaster");
         tilingServe = Executors.newFixedThreadPool(Integer.parseInt(MCRIview2Props.getProperty("TilingThreads")), new ThreadFactory() {
             AtomicInteger tNum = new AtomicInteger();
 

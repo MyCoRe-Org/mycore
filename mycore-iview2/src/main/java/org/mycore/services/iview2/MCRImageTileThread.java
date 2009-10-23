@@ -1,6 +1,5 @@
 package org.mycore.services.iview2;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.Date;
 
@@ -26,13 +25,13 @@ public class MCRImageTileThread implements Runnable {
             MCRFile file = MCRIView2Tools.getMCRFile(image.getDerivate(), image.getPath());
             MCRImage imgTiler = new MCRImage(file);
             MCRTiledPictureProps picProps = new MCRTiledPictureProps();
-
+            image.setStart(new Date());
             try {
                 picProps = imgTiler.tile();
             } catch (IOException e) {
                 LOGGER.error("IOException occured while Tiling a queued Picture", e);
             }
-            image.setFinished(new Date(System.currentTimeMillis()));
+            image.setFinished(new Date());
             image.setStatus(MCRJobState.FIN);
             image.setHeight(picProps.height);
             image.setWidth(picProps.width);
