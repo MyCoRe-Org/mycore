@@ -63,7 +63,7 @@ import org.mycore.parsers.bool.MCRSetCondition;
  *   Search using name=value pairs
  * 4. MCRSearchServlet invocation from a search mask using editor XML input 
  * 
- * @author Frank Lützenkirchen
+ * @author Frank Lï¿½tzenkirchen
  * @author Harald Richter
  */
 public class MCRSearchServlet extends MCRServlet 
@@ -85,7 +85,7 @@ public class MCRSearchServlet extends MCRServlet
     /**
      * Search in default search field specified by MCR.SearchServlet.DefaultSearchField
      */
-    private MCRQuery buildDefaultQuery(String search) {
+    protected MCRQuery buildDefaultQuery(String search) {
         MCRFieldDef field = MCRFieldDef.getDef(defaultSearchField);
         String operator = MCRFieldType.getDefaultOperator(field.getDataType());
         MCRCondition condition = new MCRQueryCondition(field, operator, search);
@@ -95,14 +95,14 @@ public class MCRSearchServlet extends MCRServlet
     /**
      * Search using complex query expression given as text string
      */
-    private MCRQuery buildComplexQuery(String query) {
+    protected MCRQuery buildComplexQuery(String query) {
         return new MCRQuery(new MCRQueryParser().parse(query));
     }
 
     /**
      * Search using name=value pairs from HTTP request
      */
-    private MCRQuery buildNameValueQuery(HttpServletRequest req) {
+    protected MCRQuery buildNameValueQuery(HttpServletRequest req) {
         MCRAndCondition condition = new MCRAndCondition();
 
         for (Enumeration names = req.getParameterNames(); names.hasMoreElements();) {
@@ -170,7 +170,7 @@ public class MCRSearchServlet extends MCRServlet
     /**
      * Build MCRQuery from editor XML input
      */
-    private MCRQuery buildFormQuery(Element root) {
+    protected MCRQuery buildFormQuery(Element root) {
         Element conditions = root.getChild("conditions");
 
         if (conditions.getAttributeValue("format", "xml").equals("xml")) {
@@ -211,7 +211,7 @@ public class MCRSearchServlet extends MCRServlet
             return value.trim();
     }
   
-    private Document setQueryOptions(MCRQuery query, HttpServletRequest req) {
+    protected Document setQueryOptions(MCRQuery query, HttpServletRequest req) {
         String maxResults = getReqParameter(req, "maxResults", "0");
         query.setMaxResults(Integer.parseInt(maxResults));
 
@@ -388,7 +388,7 @@ public class MCRSearchServlet extends MCRServlet
      * Redirect browser to results page     
      *      
      * @author A.Schaar   
-     * @author Frank Lützenkirchen
+     * @author Frank Lï¿½tzenkirchen
      *   
      * @see its overwritten in jspdocportal     
      */     
