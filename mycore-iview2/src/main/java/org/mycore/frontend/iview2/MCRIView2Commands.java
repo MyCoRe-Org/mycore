@@ -36,6 +36,7 @@ import org.mycore.datamodel.ifs.MCRFilesystemNode;
 import org.mycore.frontend.cli.MCRAbstractCommands;
 import org.mycore.frontend.cli.MCRCommand;
 import org.mycore.services.iview2.MCRIView2Tools;
+import org.mycore.services.iview2.MCRImage;
 import org.mycore.services.iview2.MCRImageTiling;
 import org.mycore.services.iview2.MCRIview2Props;
 import org.mycore.services.iview2.MCRTileJob;
@@ -136,12 +137,14 @@ public class MCRIView2Commands extends MCRAbstractCommands {
     }
 
     public static void deleteDerivateTiles(String derivateID) {
-        //TODO: delete tile directory
+        File derivateDir = MCRImage.getTiledFile(derivateID, null);
+        deleteDirectory(derivateDir);
         TILE_QUEUE.remove(derivateID);
     }
 
     public static void deleteImageTiles(String derivate, String absoluteImagePath) {
-        //TODO: delete tile
+        File tileFile = MCRImage.getTiledFile(derivate, absoluteImagePath);
+        tileFile.delete();
         int removed = TILE_QUEUE.remove(derivate, absoluteImagePath);
         LOGGER.info("removed tiles from " + removed + " images");
     }

@@ -258,6 +258,12 @@ public class MCRImage {
         return image;
     }
 
+    /**
+     * returns a {@link File} object of the .iview2 file or the derivate folder.
+     * @param derivate derivateID
+     * @param imagePath absolute image path or <code>null</code>
+     * @return tile directory of derivate if <code>imagePath</code> is null or the tile file (.iview2)
+     */
     public static File getTiledFile(String derivate, String imagePath) {
         File tileDir = new File(MCRIview2Props.getProperty("DirectoryForTiles"));
         String[] idParts = derivate.split("_");
@@ -271,6 +277,8 @@ public class MCRImage {
         } else {
             tileDir = new File(tileDir, lastPart);
         }
+        if (imagePath == null)
+            return tileDir;
         String relPath = imagePath.substring(0, imagePath.lastIndexOf('.')) + ".iview2";
         return new File(tileDir.getAbsolutePath() + "/" + relPath);
     }

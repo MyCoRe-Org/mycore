@@ -199,7 +199,7 @@ public class MCRTilingQueue extends AbstractQueue<MCRTileJob> implements Closeab
         if (!running)
             return 0;
         Session session = MCRHIBConnection.instance().getSession();
-        Query query = session.createQuery("DELETE FROM MCRTileJOB WHERE derivate = :derivate AND path = :path");
+        Query query = session.createQuery("DELETE FROM " + MCRTileJob.class.getName() + " WHERE derivate = :derivate AND path = :path");
         query.setParameter("derivate", derivate);
         query.setParameter("path", path);
         return query.executeUpdate();
@@ -209,7 +209,7 @@ public class MCRTilingQueue extends AbstractQueue<MCRTileJob> implements Closeab
         if (!running)
             return 0;
         Session session = MCRHIBConnection.instance().getSession();
-        Query query = session.createQuery("DELETE FROM MCRTileJOB WHERE derivate = :derivate");
+        Query query = session.createQuery("DELETE FROM " + MCRTileJob.class.getName() + " WHERE derivate = :derivate");
         query.setParameter("derivate", derivate);
         return query.executeUpdate();
     }
