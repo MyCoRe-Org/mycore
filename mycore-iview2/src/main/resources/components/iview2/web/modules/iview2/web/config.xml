@@ -1,6 +1,6 @@
 <vars>
   <area location="file:thumbnail">
-    <var name="baseUri" type="string">../images/Pics</var>
+    <!-- <var name="baseUri" type="string">../images/Pics</var>-->
     <var name="prefix" type="string" desc="Holds the Foldername where the displayed Picture is stored; is read per Javascript" />
     <var name="tilesize" type="int" desc="Holds the tilesize of each tile, except of bordertiles all tiles are yxy in size">256</var>
     <var name="maximized" type="bool" desc="Holds if the View is fullscreen or only partial">false</var>
@@ -15,7 +15,7 @@
     <var name="chapHoverStep" type="int" desc="Defines color changing in each step of hover coloration">10</var>
   </area>
   <area location="area:Loading of XML">
-    <var name="book_uri" type="string" desc="Holds the path to a book xml File, which is used if none was per URL">../../images/Pics/Buch.xml</var>
+<!--    <var name="book_uri" type="string" desc="Holds the path to a book xml File, which is used if none was per URL">../../images/Pics/Buch.xml</var>-->
     <var name="pagenumber" type="int" desc="Holds the default Page which is displayed if no Page was entered through the URL">1</var>
     <var name="mets_uri" type="string" desc="Holds the path to the METS XML File">../../images/Pics/Mets.xml</var>
   </area>
@@ -23,6 +23,6 @@
     <var name="styleFolderUri" type="string" desc="Path to the Styles location folder. With closing /">gfx/</var>
     <var name="styleNameMODDED" type="string"
       desc="The actual Name of the Style which is used, is identical with the name of the Stylefoldername. Without closing /">standard</var>
-    <var name="language" type="string">de</var>
+<!--    <var name="language" type="string">de</var>-->
   </area>
 </vars>

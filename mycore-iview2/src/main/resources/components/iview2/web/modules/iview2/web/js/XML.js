@@ -62,6 +62,14 @@ function nodeProps(xmlfile, nodeName, getNode, absolute) {
 	}
 }
 
+function nodeAttributes(node) {
+	var attributes = new Array();
+	for (var i = 0; i < node.attributes.length; i++) {
+		attributes[node.attributes.item(i).nodeName] = node.attributes.item(i).value;
+	}
+	return attributes;
+}
+
 /*Gains the requested information from a given XML File.
 *@param xmlfile  XML file from which the data will be extruded.
 *@param nodeName the Node of the XML File which shall be gained, can be a group of nodes.

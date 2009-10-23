@@ -1,6 +1,7 @@
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" xmlns:xlink="http://www.w3.org/1999/xlink"
   xmlns:i18n="xalan://org.mycore.services.i18n.MCRTranslation" xmlns:mcrxml="xalan://org.mycore.common.xml.MCRXMLFunctions" version="1.0"
   exclude-result-prefixes="xlink i18n mcrxml">
+  <xsl:param name="MCR.Module-iview2.BaseURL" />
   <xsl:output method="html" indent="yes" encoding="UTF-8" media-type="text/html" />
   <xsl:template name="iview2.getViewer" mode="iview2">
     <xsl:param name="groupID" />
@@ -16,7 +17,7 @@
       addIviewProperty('<xsl:value-of select="$groupID" />', 'useChapter',<xsl:value-of select="$chapter" />);
       addIviewProperty('<xsl:value-of select="$groupID" />', 'useCutOut',<xsl:value-of select="$cutOut" />);
       addIviewProperty('<xsl:value-of select="$groupID" />', 'useOverview',<xsl:value-of select="$overview" />);
-      
+      addIviewProperty('<xsl:value-of select="$groupID" />', 'baseUri', '"<xsl:value-of select="$MCR.Module-iview2.BaseURL"/>/<xsl:value-of select="$groupID" />"');
       <xsl:choose>
         <xsl:when test="$details/mcr_directory/children/child/name[text()='mets.xml']">
           addIviewProperty('<xsl:value-of select="$groupID" />', 'hasMets', true);

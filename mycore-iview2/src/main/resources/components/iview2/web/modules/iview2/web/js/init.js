@@ -1,6 +1,6 @@
 loadVars("../modules/iview2/web/config.xml");
 function initializeGraphic(viewID) {
-	Iview[viewID].baseUri = baseUri + "/" + viewID;//TODO sicherlich andere bessere Lösung
+	//Iview[viewID].baseUri = baseUri + "/" + viewID;//TODO sicherlich andere bessere Lösung
 	Iview[viewID].zoomScale = 1;//init for the Zoomscale is changed within CalculateZoomProp
 	Iview[viewID].loaded = false;//indicates if the window is finally loaded
 	Iview[viewID].tilesize = tilesize;

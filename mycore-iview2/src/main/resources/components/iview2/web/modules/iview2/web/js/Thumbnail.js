@@ -46,9 +46,9 @@ function loadPage(pageData, viewID) {
 	}*/
 	// Preload wird zu spät verkleinert
 	$("preload"+viewID).style.visibility = "hidden";
-	
-	var imageProperties = loadXML(Iview[viewID].book_uri.substring(0, Iview[viewID].book_uri.lastIndexOf("/"))+"/"+pageData["name"].substring(0,pageData["name"].lastIndexOf("."))+"/ausmasze.xml", "xml");
-	var values = nodeProps(imageProperties, "properties", 0, true);
+
+	var imageProperties = loadXML(Iview[viewID].baseUri+"/"+pageData["name"]+"/imageinfo.xml", "xml");
+	var values = nodeAttributes(imageProperties.getElementsByTagName("imageinfo")[0]);
 	
 	Iview[viewID].tiles = parseInt(values['tiles']);
 	Iview[viewID].bildBreite = parseInt(values['width']);
@@ -75,7 +75,7 @@ function loadPage(pageData, viewID) {
 		}
 	}
 
-	Iview[viewID].zoomMax = parseInt(values['zoomlevel']);
+	Iview[viewID].zoomMax = parseInt(values['zoomLevel']);
 
 	if (!isNaN(parseInt(window.location.search.get("zoom")))) {
 		Iview[viewID].zoomInit = parseInt(window.location.search.get("zoom"));
@@ -88,7 +88,7 @@ function loadPage(pageData, viewID) {
 		Iview[viewID].zoomInit = Math.ceil((Iview[viewID].zoomMax + 1) / 2) - 1;
 	}
 
-	Iview[viewID].prefix  = pageData["name"].substring(0,pageData["name"].lastIndexOf("."));
+	Iview[viewID].prefix  = pageData["name"];
 	$("preload"+viewID).style.width = Iview[viewID].bildBreite / Math.pow(2, Iview[viewID].zoomMax - Iview[viewID].zoomInit) + "px";
 	$("preload"+viewID).style.height = Iview[viewID].bildHoehe / Math.pow(2, Iview[viewID].zoomMax - Iview[viewID].zoomInit) + "px";
 	if (viewerBean == null) {
@@ -776,17 +776,17 @@ function loading(viewID) {
 	var scrollBarX = Iview[viewID].scrollBarX;
 	scrollBarX.init(true);
 	scrollBarX.addListener(scrollBar.LIST_MOVE, new function() { this.moved = function(vector) { scrollMove(-vector.x, -vector.y, viewID);}});
-	scrollBarX.setParent("viewer"+viewID);
+	scrollBarX.setParent("viewerContainer"+viewID);
 	// vertically
 	Iview[viewID].scrollBarY = new scrollBar("scrollV"+viewID, "scroll");
 	var scrollBarY = Iview[viewID].scrollBarY;
 	scrollBarY.init(false);
 	scrollBarY.addListener(scrollBar.LIST_MOVE, new function() { this.moved = function(vector) { scrollMove(-vector.x, -vector.y, viewID);}});
-	scrollBarY.setParent("viewer"+viewID);
+	scrollBarY.setParent("viewerContainer"+viewID);
 
 	// Additional Events
 	// register to scroll into the viewer
-	EventUtils.addEventListener($("viewer"+viewID), 'mouseScroll', function(e) { viewerScroll(returnDelta(e), viewID);}, false);
+	EventUtils.addEventListener($("viewer"+viewID), 'mouseScroll', function(e) { viewerScroll(returnDelta(e), viewID); e = getEvent(e); e.preventDefault();}, false);
 	
 	//Edge-Element
 	//TODO: müsste beim import des CutOut entsprechend gesetzt werden, oder ähnlich
@@ -848,5 +848,5 @@ function loading(viewID) {
 	
 	// surface muss als Blank geladen werden, damit Ebene gefüllt und es im Vordergrund des Viewers liegt
 	// hauptsächlich wegen IE notwendig
-	getElementsByClassName("surface","viewer"+viewID,"div")[0].style.backgroundImage = "url("+baseUri+"/GSIV/gfx/blank.jpg"+")";
+	getElementsByClassName("surface","viewer"+viewID,"div")[0].style.backgroundImage = "url("+Iview[viewID].baseUri+"/GSIV/gfx/blank.jpg"+")";
 }

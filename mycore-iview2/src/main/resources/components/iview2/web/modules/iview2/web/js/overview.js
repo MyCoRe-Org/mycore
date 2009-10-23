@@ -278,7 +278,6 @@ function overview(newId, parent, identer) {
 	*/
 	function loadSingleImage(i, j) {
 		var pageName = nodeProps(book, "child", (((i + currentFirstRow) * amountWidth) + j), true)["name"];
-		pageName = pageName.substr(0,pageName.lastIndexOf("."));
 	
 		var source = baseUri+ "/"+pageName+"/0/0/0.jpg";
 		var preview = $("previewDiv" + viewID +((i * amountWidth) + j));
@@ -295,7 +294,7 @@ function overview(newId, parent, identer) {
 		origImage.src = source;
 		
 		// fill Info div
-		$("infoDiv" + viewID +((i * amountWidth) + j)).innerHTML = pageName+" "+(((i + currentFirstRow) * amountWidth) + j + 1); 
+		$("infoDiv" + viewID +((i * amountWidth) + j)).innerHTML = pageName/*+" "+(((i + currentFirstRow) * amountWidth) + j + 1)*/; 
 		// page 0 doesn't exist
 		
 		/*
