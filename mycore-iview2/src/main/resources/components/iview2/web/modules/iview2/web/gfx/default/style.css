@@ -1,0 +1,1361 @@
+/* Description for z-Index:
+	<10 outside the viewer (example: chapter -> 5);
+	10 - main viewerContainer
+	.
+	20 - viewer, base Index
+	.
+	30 - viewer-surface, so move the image through the window
+	.
+	.
+	50 - above viewer, for buttons or additional Moduls
+	60 - MODUL: overview, is alone in foreground
+*/
+
+/* Main Container to embedd in mycore */
+/* chapter above */
+.chapterContainer {
+	height:200px;
+	width:100%;
+	margin-bottom:5px;
+	z-index:5;
+}
+
+
+.viewerContainer {
+	position:relative;
+	width:100%;
+	left: 0px;
+	z-index: 10;
+}
+.viewerContainer.max {
+	position: fixed;
+	height: 100%;
+	top: 41px;
+}
+.viewerContainer.min {
+	position: relative;
+	height: 500px;
+	top: 0px;
+}
+
+/* viewer */
+.viewer {
+	position: absolute;
+	top: 0px;
+	bottom: 0px;
+	left: 0px;
+	width:100%;
+	/*height:100%;*/
+	/* NOTE: the size and width should be set dynamically when initialized */
+	background-color: #ffffff;
+	z-index:20;
+}
+.viewer .well, .viewer .surface {
+	margin: 0;
+	padding: 0;
+	width: 100%;
+	height: 100%;
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	/* FIXME: let's apply this in GSIV.js */
+	cursor: -moz-grab;
+		_cursor: url(cursor/grab.cur);
+}
+.viewer .surface {
+	z-index: 30;
+	/*background: url(../gfx/center.gif) no-repeat center center;*/
+		_background: url(../blank.gif) no-repeat center center; /* NOTE: required for IE to"see" the surface */
+}
+.viewer .well {
+	overflow: hidden;
+}
+.viewer .well .tile {
+	border: 0;
+	margin: 0;
+	padding: 0;
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	display: block;
+	/*-moz-outline: 1px dashed #FF0000;*/
+}
+/*.viewer .controls {
+	background-color: #FFFFFF;
+	position: absolute;
+	left: 0px;
+	top: 0px;
+	font-size: 0px;
+	margin: 0px;
+	padding: 0 0 0 0px;
+	z-index: 31;
+}
+.viewer .controls a
+{
+	color: #000000;
+	text-decoration: none;
+	-moz-outline: none;	
+}
+.viewer .controls a img {
+	border: 0;
+	vertical-align: middle;
+}
+.viewer .controls a:active {
+	color: #FF0000;
+}*/
+
+
+/*
+#body {
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	background-color: #ffffff;
+	height: 100%;
+	width: 100%;
+	margin: 0px;
+	padding: 0px;
+	color: #FFFFFF;
+	overflow: hidden;
+}*/
+
+/* ButtonSurface */
+.buttonSurface {
+	z-index: 10;
+}
+.buttonSurface.max {
+	position:fixed;
+	width:100%;
+	height:100%;
+	top:0px;
+	left:0px;
+}
+.buttonSurface.min {
+	position:relative;
+}
+/* Header */
+.buttonSurface .header/*, .BS_header*/ {
+	position: relative;
+	left: 0px;
+	top: 0px;
+	background-color: #c0c1c3;
+	width: 100%;
+	height: 44px;
+	border: 1px solid #000000;
+	z-index: 20;
+}
+.buttonSurface.max .header { /* needed by IE8 */
+	position: absolute;	
+}
+.buttonSurface .header .headerLeft {
+	position: relative;
+	top: 0px;
+	left: 0px;
+	height: 100%;
+	width: 80px;
+	background-color: #c0c1c3;
+	float: left;
+}
+.buttonSurface .header .headerLCBorder {
+	position: relative;
+	top: 0px;
+	height: 100%;
+	width: 1px;
+	padding-top: 4px;
+	padding-bottom: 4px;
+	background-color: #858688;
+	float: left;
+}
+.buttonSurface .header .headerCenter {
+	position: relative;
+	top:0px;
+	height: 100%;
+	width: 200px;
+	background-color: #c0c1c3;
+	float: left;
+}
+.buttonSurface.max .header .headerCenter {
+	width: 400px;
+}
+.buttonSurface .header .headerCRBorder {
+	position: relative;
+	top: 0px;
+	height: 100%;
+	width: 1px;
+	padding-top: 4px;
+	padding-bottom: 4px;
+	background-color: #858688;
+	float: left;
+}
+.buttonSurface .header .headerRight {
+	top: 0px;
+	right: 0px;
+	left: 0px;
+	height: 100%;
+	background-color: #c0c1c3;
+}
+
+/* HeaderElements */
+/*URL*/
+.buttonSurface.max .BSE_permalink {
+	position: absolute;
+	top: 10px;
+	background-image: url('image.png');
+	background-repeat: no-repeat;
+	background-position: -420px -0px;
+	height:24px;
+	width:22px;
+	left:630px;
+	z-index: 50;
+	cursor: pointer;
+}
+.buttonSurface .BSE_url {
+	position: absolute;
+	top: 10px;
+	left: 670px;
+	z-index: 50;
+	display: none;
+	visibility: hidden;
+}
+.buttonSurface.max .BSE_url {
+	visibility: visible;
+}
+.buttonSurface .BSE_permaUrl {
+	width:200px;
+	float: left;
+	border: 1px solid black;
+	background-color: #FCFEFF;
+	visibility: hidden;
+}
+.buttonSurface.max .BSE_permaUrl {
+	visibility: visible;
+}
+.buttonSurface.max .BSE_displayOut {
+	position:relative;
+	left:3px;
+	top:0px;
+	background-image: url('image.png');
+	background-repeat: no-repeat;
+	background-position: -450px -0px;
+	width:11px;
+	height:11px;
+	z-index: 50;
+	cursor: pointer;
+	float: left;
+}
+
+/* Page backwards*/
+.buttonSurface .BSE_backward {
+	position: absolute;
+	top: 0px;
+	background-image: url('image.png');
+	background-repeat: no-repeat;
+	background-position: -60px -0px;
+	height: 24px;
+	width: 15px;
+	left: 0px;
+	/*z-index: 32;*/
+	cursor: pointer;
+}
+.buttonSurface .BSE_backwardBehind {
+	position: absolute;
+	top: 10px;
+	background-image: url('image.png');
+	background-repeat: no-repeat;
+	background-position: -90px -0px;
+	height: 24px;
+	width: 15px;
+	left: 10px;
+	z-index: 50;
+}
+
+/* Page forward*/
+.buttonSurface .BSE_forward {
+	position: absolute;
+	top: 0px;
+	background-image: url('image.png');
+	background-repeat: no-repeat;
+	background-position: -120px -0px;
+	height: 24px;
+	width: 15px;
+	left: 0px;
+	z-index: 50;
+	cursor: pointer;
+}
+.buttonSurface .BSE_forwardBehind {
+	position: absolute;
+	top: 10px;
+	background-image: url('image.png');
+	background-repeat: no-repeat;
+	background-position: -150px -0px;
+	height: 24px;
+	width: 15px;
+	left: 50px;
+	z-index: 50;
+}
+
+/* MODUL: pageInput */
+/*.buttonSurface .BSE_pageInput1 {
+	position: absolute;
+	top: 5px;
+	left: 13%;
+	height: 20px;
+	width: 124px;
+	background-color: #FCFEFF;
+	border: 1px solid black;
+	z-index: 32;
+	visibility: hidden;
+}
+.buttonSurface.max .BSE_pageInput1 {
+	visibility: visible;
+}
+.buttonSurface.max .BSE_pageInput1 .input {
+	height: 20px;
+	width: 55px;
+	background-color: transparent;
+	border: 0px solid black;
+	overflow: hidden;
+	text-align: center;
+	font-size: 16px;
+	font-weight: bold;
+	margin: 0px;
+	padding: 0px;
+}
+.buttonSurface.max .BSE_pageInput1 .slash {	
+	height: 20px;
+	width: 14px;
+	background-color: transparent;
+	border: 0px solid black;
+	overflow: hidden;
+	text-align: center;
+	font-size: 16px;
+	font-weight: bold;
+	margin: 0px;
+	padding: 0px;
+}
+.buttonSurface.max .BSE_pageInput1 .amount {	
+	height: 20px;
+	width: 55px;
+	background-color: transparent;
+	border: 0px solid black;
+	overflow: hidden;
+	text-align: center;
+	font-size: 16px;
+	font-weight: bold;
+	margin: 0px;
+	padding: 0px;
+}*/
+
+/* MODUL: pageForm */
+.buttonSurface .BSE_pageForm1 {
+	position: absolute;
+	top: 8px;
+	left: 110px;
+	visibility: hidden;
+	z-index: 50;
+}
+.buttonSurface.max .BSE_pageForm1 {
+	visibility: visible;
+}
+.buttonSurface .BSE_pageFormSelect1 {
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	width: 124px;
+	height: 20px;
+}
+.buttonSurface .BSE_pageFormOption1 {
+	background-color: #FCFEFF;
+}
+
+/* Entrance-Buttons - Chapter & Overview */
+.buttonSurface .BSE_openThumbs {
+	position: absolute;
+	top: 10px;
+	background-image: url('image.png');
+	background-repeat: no-repeat;
+	background-position: -360px -0px;
+	height: 24px;
+	width: 22px;
+	left: 520px;
+	z-index: 50;
+	cursor: pointer;
+}
+.buttonSurface.max .BSE_chapterOpener {
+	position: absolute;
+	top: 8px;
+	background-image: url('image.png');
+	background-repeat: no-repeat;
+	background-position: -390px -0px;
+	height: 19px;
+	width: 25px;
+	left: 560px;
+	z-index: 50;
+	cursor: pointer;
+	display:none;
+}
+
+
+/* Navigation Elements */
+/* Vollbild-Button */
+/*.maximize {*/
+.buttonSurface .BSE_fullView, .buttonSurface .BSE_normalView {	
+	position: absolute;
+	top: 10px;
+	height: 17px;
+	width: 20px;
+	right: 10px;
+	margin: 0px;
+	padding: 0px;
+	cursor: pointer;
+	z-index: 50;
+}
+.buttonSurface .BSE_fullView {
+	display: block;
+	background-image: url('image.png');
+	background-repeat: no-repeat;
+	background-position: -0px -0px;
+}
+.buttonSurface .BSE_normalView {
+	display: none;
+	background-image: url('image.png');
+	background-repeat: no-repeat;
+	background-position: -30px -0px;
+}
+
+/* MODUL: ZoomBar */
+/* Main */
+.buttonSurface .zoomBar {
+	position: absolute;
+	top: 8px;
+	left: 340px;
+	height: 20px;
+	width: 124px;
+	z-index: 50;
+	visibility: hidden;
+}
+.buttonSurface.max .zoomBar {
+	visibility: visible;
+}
+
+/* Top-Button */
+.zoomBar .start {	
+	height: 20px;
+	width: 20px;
+	background-image: url('image.png');
+	background-repeat: no-repeat;
+	background-position: -1290px -0px;
+	/*z-index: 32;*/
+	cursor: pointer;
+	display: none;
+}
+.zoomBar .startBehind {	
+	height: 20px;
+	width: 20px;
+	margin: 0px;
+	padding: 0px;
+	border: 0px;
+	background-image: url('image.png');
+	background-repeat: no-repeat;
+	background-position: -1320px -0px;
+	/*z-index: 32;*/
+}
+/* Bottom-Button */
+.zoomBar .end {	
+	height: 20px;
+	width: 20px;
+	background-image: url('image.png');
+	background-repeat: no-repeat;
+	background-position: -1350px -0px;
+	/*z-index: 32;*/
+	cursor: pointer;
+	display: none;
+}
+.zoomBar .endBehind {	
+	height: 20px;
+	width: 20px;
+	margin: 0px;
+	padding: 0px;
+	border: 0px;
+	background-image: url('image.png');
+	background-repeat: no-repeat;
+	background-position: -1380px -0px;
+	/*z-index: 32;*/
+}
+/* Scroll-Area*/
+.zoomBar .center {
+	height: 20px;
+	width: 84px;
+	line-height: 0px;
+	margin: 0px;
+	padding: 0px;
+	/*z-index: 32;*/
+}
+.zoomBar .spaceStart {
+	height: 20px;
+	width: 5px;
+	background-image: url('image.png');
+	background-repeat: no-repeat;
+	background-position: -1440px -0px;
+}
+.zoomBar .spaceEnd {
+	height: 20px;
+	width: 5px;
+	background-image: url('image.png');
+	background-repeat: no-repeat;
+	background-position: -1470px -0px;
+}
+
+/* scaleLine */
+.zoomBar .scale {	
+	position: relative;
+	height:	20px;
+	width: 74px;
+	background-image: url('scaled/zoomBar/center.png');
+}
+
+/* single scaleLine */
+.zoomBar .scaleLine {
+	position: absolute;
+	background-color: #555555;
+	left:0px;
+	width: 4px;
+	height: 20px;
+}
+
+/* bar */
+.zoomBar .bar {
+	position: absolute;
+	left: -5000px;
+	top: -3px;
+	background-image: url('image.png');
+	background-repeat: no-repeat;
+	background-position: -1410px -0px;
+	height: 26px;
+	width: 14px;
+	/*z-index: 32;*/
+	line-height: 0px;
+}
+
+/* additional ZoomIn / ZoomOut (not integrated in Zoombar)*/
+.buttonSurface.min .BSE_zoomIn {	
+	position: absolute;
+	top: 0px;
+	right: 0px;
+	height: 24px;
+	width: 22px;
+	margin: 0px;
+	padding: 0px;
+	border: 0px;
+	background-image: url('image.png');
+	background-repeat: no-repeat;
+	background-position: -180px -0px;
+	/*z-index: 32;*/
+	cursor: pointer;
+}
+.buttonSurface.min .BSE_zoomInBehind {
+	position: absolute;
+	top: 10px;
+	left: 150px;
+	height: 24px;
+	width: 22px;
+	margin: 0px;
+	padding: 0px;
+	border: 0px;
+	background-image: url('image.png');
+	background-repeat: no-repeat;
+	background-position: -210px -0px;
+	z-index: 50;	
+}
+.buttonSurface.min .BSE_zoomOut {	
+	position: absolute;
+	top: 0px;
+	right: 0px;
+	height: 24px;
+	width: 22px;
+	margin: 0px;
+	padding: 0px;
+	border: 0px;
+	background-image: url('image.png');
+	background-repeat: no-repeat;
+	background-position: -240px -0px;
+	/*z-index: 32;*/
+	cursor: pointer;
+}
+.buttonSurface.min .BSE_zoomOutBehind {	
+	position: absolute;
+	top: 10px;
+	left: 200px;
+	height: 17px;
+	width: 17px;
+	margin: 0px;
+	padding: 0px;
+	border: 0px;
+	background-image: url('image.png');
+	background-repeat: no-repeat;
+	background-position: -270px -0px;
+	z-index: 50;
+}
+
+/* Buttons - fitToScreen & fitToWidth */
+.buttonSurface.max .BSE_toWidth {
+ 	position: absolute;
+	top: 10px;
+ 	background-image: url('image.png');
+	background-repeat: no-repeat;
+	background-position: -300px -0px;
+ 	height: 24px;
+ 	width: 22px;
+ 	left: 250px;
+ 	z-index: 50;
+ 	cursor: pointer;
+}
+.buttonSurface.max .BSE_toScreen {
+ 	position: absolute;
+ 	top: 8px;
+ 	background-image: url('image.png');
+	background-repeat: no-repeat;
+	background-position: -330px -0px;
+ 	height: 24px;
+ 	width: 22px;
+ 	left: 285px;
+ 	z-index: 50;
+ 	cursor: pointer;
+}
+
+/* Preview (current shown Image) */
+/* control Button */
+.viewerContainer .dampNormal {
+	position:absolute;
+	bottom: 0px;
+	right: 0px;
+	width: 16px;
+	height: 16px;
+	background-image: url('image.png');
+	background-repeat: no-repeat;
+	background-position: -1260px -0px;
+	z-index: 50;
+}
+.viewerContainer .dampNormal .hide {
+	width: 16px;
+	height: 16px;
+	background-image: url('image.png');
+	background-repeat: no-repeat;
+	background-position: -1230px -0px;
+}
+
+.viewerContainer .dampNormal .show {
+	width: 16px;
+	height: 16px;
+	background-image: url('image.png');
+	background-repeat: no-repeat;
+	background-position: -1200px -0px;
+	display: none;
+}
+
+/* image */
+.viewerContainer .thumbNormal {
+	background-color: #000000;
+	position: absolute;
+	right: 15px;
+	bottom: 15px;
+	vertical-align: middle;
+	font-weight: bold;
+	border: 0px solid #000000;
+	z-index: 50;
+}
+
+/* current Cut */
+.ausschnittNormal {
+	background-image: url('scaled/thumbnail/cutout.png');
+	position: absolute;
+	left:0px;
+	top:0px;
+	height:10px;
+	width:10px;
+	display: block;
+	border:1px solid #000000;
+	/*z-index:30;*/
+	cursor: pointer;
+}
+
+/* ScrollBar general */
+.start {
+	background-repeat:no-repeat;
+	padding: 0px;
+	margin: 0px;
+}
+.end {
+	background-repeat:no-repeat;
+	padding: 0px;
+	margin: 0px;
+}
+
+/* ScrollBar Horizontal */
+
+/* Main Container */
+.scrollH {
+	position: absolute;
+	height:16px;
+	width: 100%;
+	bottom: 0px;
+	left: 0px;
+	z-index:50;
+	cursor: pointer;
+}
+
+/* Start & End - Buttons */
+.scrollH .start {
+	background-image: url('image.png');
+	background-repeat: no-repeat;
+	background-position: -540px -0px;
+	width:16px;
+	height:16px;
+}
+.scrollH .end {
+	background-image: url('image.png');
+	background-repeat: no-repeat;
+	background-position: -570px -0px;
+	width:16px;
+	height:16px;
+}
+
+/* Scroll Area */
+.scrollH .empty { /* Main Container */
+	position:relative;
+	height:16px;
+}
+.scrollH .spaceStart {
+}
+.scrollH .eHorizontal {
+	background-repeat:repeat-x;
+	background-image: url('scaled/scrollbars/eHorizontal.png');
+	position:relative;
+	padding:0px;
+	margin:0px;
+	width:100%;
+	height: 16px;
+}
+.scrollH .spaceEnd {
+}
+.scrollHBar { /* contains ScrollBar */
+	position:absolute;
+	cursor: url('cursor/horizontal.cur'), pointer;
+}
+
+/* ScrollBar */
+.scrollHBar .barStart {
+	/*background-repeat:repeat-y;*/
+	background-image: url('image.png');
+	background-repeat: no-repeat;
+	background-position: -660px -0px;
+	position:relative;
+	float: left;
+	width: 1px;
+	height: 10px;
+	top: 3px;
+	margin: 0px;
+	padding: 0px;
+}
+.scrollHBar .horizontal {
+	background-repeat:repeat-x;
+	background-image: url('scaled/scrollbars/horizontal.png');
+	position:relative;
+	float: left;
+	top: 3px;
+	left:100%;
+	height:10px;
+	padding:0px;
+	margin:0px;
+}
+.scrollHBar .barEnd {
+	background-image: url('image.png');
+	background-repeat: no-repeat;
+	background-position: -690px -0px;
+	position:relative;
+	float: left;
+	width: 1px;
+	height: 10px;
+	top: 3px;
+	margin: 0px;
+	padding: 0px;
+}
+
+
+/* ScrollBar Vertical */
+/* Main Container */
+.scrollV {
+	width: 16px;
+	height: 100%;
+	position: absolute;
+	right: 0px;
+	top: 0px;
+	padding: 0px;
+	margin: 0px;
+	z-index: 50;
+	line-height: 0px;
+	cursor: pointer;
+}
+
+/* Start & End - Buttons */
+.scrollV .start {
+	background-image: url('image.png');
+	background-repeat: no-repeat;
+	background-position: -510px -0px;
+	width:16px;
+	height:16px;
+}
+.scrollV .end {
+	background-image: url('image.png');
+	background-repeat: no-repeat;
+	background-position: -480px -0px;
+	width:16px;
+	height:16px;
+}
+
+/* Scroll Area */
+.scrollV .empty {
+	position:relative;
+	width:16px;
+}
+.scrollV .spaceStart {
+	background-color:#000000;
+	width:0px;
+	height:0px;
+}
+.scrollV .eVertical {
+	position:relative;
+	background-repeat:repeat-y;
+	background-image: url('scaled/scrollbars/eVertical.png');
+	padding:0px;
+	margin:0px;
+ 	height:100%;
+ 	width:16px;
+	vertical-align: top;
+}
+.scrollV .spaceEnd {
+	background-color:#000000;
+	width:0px;
+	height:0px;
+}
+.scrollVBar {  /* contains ScrollBar */
+	position:absolute;
+	cursor: url('cursor/vertical.cur'), pointer;
+}
+
+/* ScrollBar */
+.scrollVBar .barStart {
+	background-image: url('image.png');
+	background-repeat: no-repeat;
+	background-position: -600px -0px;
+	position:relative;
+	height: 1px;
+	width: 10px;
+	left: 3px;
+	margin: 0px;
+	padding: 0px;
+}
+.scrollVBar .vertical {
+	background-repeat:repeat-y;
+	background-image: url('scaled/scrollbars/vertical.png');
+	position:relative;
+	height:100%;
+	width: 10px;
+	left: 3px;
+	margin: 0px;
+	padding: 0px;
+}
+.scrollVBar .barEnd {
+	background-image: url('image.png');
+	background-repeat: no-repeat;
+	background-position: -630px -0px;
+	position:relative;
+	height: 1px;
+	width: 10px;
+	left: 3px;
+	margin: 0px;
+	padding: 0px;
+}
+
+
+/* background Preload (current shown Image) */
+.preload {
+	position:absolute;
+	overflow:hidden;
+}
+
+
+/* Chapter Overview */
+/* Main Div*/
+.chapter1 {
+	position: relative;
+	top: 0px;
+	right: 0px;
+	background-color: #3A596D;
+	width: 730px;
+	height: 200px; /* also dynamic - setSize (design.xml) */
+	overflow: hidden;
+	text-align:left;
+	font-weight:normal;
+	visibility: visible;
+}
+
+.chapter1 .chapter1InPlace {
+	top: 0px;
+	right: 0px;
+}
+
+.chapter1 .chapter1OutPlace {
+	top: 0px;
+	right: 0px;
+}
+
+/* Content */
+.chapter1_content {
+	position: absolute;
+	top: 10px;
+	bottom: 10px;
+	left: 10px; /* gewisser Abstand besteht in jedem Fall (resultiert aus .chapter1 .chapter) */
+	right: 50px;
+	background-color: #fcfeff;
+	font-size: 19px;
+	line-height: 22px;
+	font-family: Times;
+	cursor: pointer;
+	overflow: hidden;
+}
+
+/* Entries */
+.chapter1 .chapter {
+	position: relative;
+	display: none;
+	border-left: 1px solid #cccccc;
+	left: 10px;
+	right: 10px; /* Abstand zwischen Textende und dem rechten Rand des Content Div's ||| auch fuer Highlight ||| kein wirklicher Abstand nach rechts*/
+/*	z-index: 40;*/
+	background-color:#fcfeff;
+	overflow:hidden;
+	/*width:auto;*/
+	white-space:nowrap;
+	padding-left:3px;
+	color:#000000;
+}
+
+/* Entry Symbols */
+.chapter1 .pageImageSymbol {
+	position: relative;
+	top: 6px;
+	height: 16px;
+	width: 15px;
+	background-image: url('image.png');
+	background-repeat: no-repeat;
+	background-position: -1170px -0px;
+	float: left;
+}
+.chapter1 .chapterImageSymbolMinus {
+	position: relative;
+	top: 6px;
+	height: 16px;
+	width: 15px;
+	background-image: url('image.png');
+	background-repeat: no-repeat;
+	background-position: -1140px -0px;
+	float: left;
+}
+.chapter1 .chapterImageSymbolPlus {
+	position: relative;
+	top: 6px;
+	height: 16px;
+	width: 15px;
+	background-image: url('image.png');
+	background-repeat: no-repeat;
+	background-position: -1110px -0px;
+	float: left;
+}
+
+/* hover & highlight */
+.chapter1 .hover {
+	background-color: #E2E6E9;
+}
+.chapter1 .highlight{
+	background-color: #85a6bc;
+}
+
+/* chapter Sort Button */
+.chapter1_chapSort {
+	position: absolute;
+	right: 29px;
+	top: 10px;
+	width: 13px;
+	height: 15px;
+	background-image: url('image.png');
+	background-repeat: no-repeat;
+	background-position: -1080px -0px;
+	cursor: pointer;
+}
+
+/* Chapter Scrollbar Y */
+/*Main Container*/
+.scrollChapV {
+	position: absolute;
+	right:0px;
+	top:0px;
+	width:16px;
+	cursor: pointer;
+}
+
+/* Up / Down - Buttons */
+.scrollChapV .start {
+	height:16px;
+	width:16px;
+	background-image: url('image.png');
+	background-repeat: no-repeat;
+	background-position: -930px -0px;
+}
+.scrollChapV .end {
+	height:16px;
+	width:16px;
+	background-image: url('image.png');
+	background-repeat: no-repeat;
+	background-position: -900px -0px;
+}
+
+/* ScrollArea Main */
+.scrollChapV .empty {
+	position:relative;
+	width:16px;
+}
+
+/* ScrollArea Single Parts */
+.scrollChapV .spaceStart {
+	height:0px;
+	width:0px;
+	background-image: url('image.png');
+	background-repeat: no-repeat;
+	background-position: -1050px -0px;
+}
+.scrollChapV .eVertical {
+	position:relative;
+	background-image: url('scaled/chapter/eVertical.png');
+	background-repeat:repeat-y;
+	padding:0px;
+	margin:0px;
+ 	height:100%;
+ 	width:16px;
+	vertical-align: top;
+}
+.scrollChapV .spaceEnd {
+	height:0px;
+	width:0px;
+	background-image: url('image.png');
+	background-repeat: no-repeat;
+	background-position: -1020px -0px;
+}
+
+/* ScrollBar Main */
+.scrollChapVBar {
+	position:absolute;
+	cursor: url('cursor/vertical.cur'), pointer;
+}
+
+/* ScrollBar Single Parts */
+.scrollChapVBar .barStart {
+	background-image: url('image.png');
+	background-repeat: no-repeat;
+	background-position: -990px -0px;
+	position:relative;
+	height: 1px;
+	left: 3px;
+	margin: 0px;
+	padding: 0px;
+}
+.scrollChapVBar .vertical {
+	position:relative;
+	background-image: url('scaled/chapter/vertical.png');
+	background-repeat:repeat-y;
+	height:100%;
+	width: 10px;
+	left: 3px;
+	margin: 0px;
+	padding: 0px;
+}
+.scrollChapVBar .barEnd {
+	background-image: url('image.png');
+	background-repeat: no-repeat;
+	background-position: -960px -0px;
+	position:relative;
+	height: 1px;
+	left: 3px;
+	margin: 0px;
+	padding: 0px;
+}
+
+/* Chapter Scrollbar Y */
+/*Main Container*/
+.scrollChapH {
+	position: absolute;
+	left:10px;
+	bottom:0px;
+	height:15px;
+	cursor: url('cursor/horizontal.cur'), pointer;
+}
+
+/* Up / Down - Buttons */
+.scrollChapH .start {
+	background-image: url('image.png');
+	background-repeat: no-repeat;
+	background-position: -540px -0px;
+	width:16px;
+	height:15px;
+}
+.scrollChapH .end {
+	background-image: url('image.png');
+	background-repeat: no-repeat;
+	background-position: -570px -0px;
+	width:16px;
+	height:15px;
+}
+
+/* Scroll Area */
+.scrollChapH .empty { /* Main Container */
+	position:relative;
+	height:15px;
+}
+.scrollChapH .spaceStart {
+}
+.scrollChapH .eHorizontal {
+	background-repeat:repeat-x;
+	background-image: url('scaled/scrollbars/eHorizontal.png');
+	position:relative;
+	padding:0px;
+	margin:0px;
+	width:100%;
+	height: 15px;
+}
+.scrollChapH .spaceEnd {
+}
+.scrollChapHBar { /* contains ScrollBar */
+	position:absolute;
+}
+
+/* ScrollBar */
+.scrollChapHBar .barStart {
+	/*background-repeat:repeat-y;*/
+	background-image: url('image.png');
+	background-repeat: no-repeat;
+	background-position: -660px -0px;
+	position:relative;
+	float: left;
+	width: 1px;
+	height: 9px;
+	top: 3px;
+	margin: 0px;
+	padding: 0px;
+}
+.scrollChapHBar .horizontal {
+	background-repeat:repeat-x;
+	background-image: url('scaled/scrollbars/horizontal.png');
+	position:relative;
+	float: left;
+	top: 3px;
+	left:100%;
+	height:9px;
+	padding:0px;
+	margin:0px;
+}
+.scrollChapHBar .barEnd {
+	background-image: url('image.png');
+	background-repeat: no-repeat;
+	background-position: -690px -0px;
+	position:relative;
+	float: left;
+	width: 1px;
+	height: 9px;
+	top: 3px;
+	margin: 0px;
+	padding: 0px;
+}
+
+/* Page Overview */
+/* Main Container */
+.overview {
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	height: 100%;
+	width: 100%;
+	border:0px solid #000000;
+	background-color: #3A596D;
+	z-index:60;
+}
+
+/* Single Page Div's */
+.overview #divBox { /* Main Div's with Image & Title Content */
+	position: absolute;
+	top: 3px;
+	height: 200px;
+	width: 200px; /* bei Werten um 150 rum, sind Bilder weg*/
+
+	border-top-style: solid;
+	border-bottom-style: solid;
+	border-left-style: solid;
+	border-right-style: solid;
+
+	border-top-width: 1px;
+	border-bottom-width: 1px;
+	border-left-width: 1px;
+	border-right-width: 1px;
+
+	border-top-color: #000000;
+	border-bottom-color: #000000;
+	border-left-color: #000000;
+	border-right-color: #000000;
+
+	background-color: #E2E6E9;
+}
+#previewImage {	
+	width: 150px;
+	height: 120px;
+}
+.overview .infoDiv {
+	width: 100px;
+	height: 20px;
+	bottom: 9px;
+
+	border-top-style: solid;
+	border-bottom-style: solid;
+	border-left-style: solid;
+	border-right-style: solid;
+
+	border-top-width: 1px;
+	border-bottom-width: 1px;
+	border-left-width: 1px;
+	border-right-width: 1px;
+
+	border-top-color: #000000;
+	border-bottom-color: #000000;
+	border-left-color: #000000;
+	border-right-color: #000000;
+
+	text-align: center;
+	vertical-align: middle;
+
+	font-weight: bold;
+	color: #ffffff;
+	background-color: #3A596D;
+}
+
+/* Overview ScrollBar */
+/* Main Container */
+.scrollOVV {
+	height: 100%;
+	width: 15px;
+	position: absolute;
+	right: 0px;
+	top: 0px;
+	padding: 0px;
+	margin: 0px;
+	/*z-index: 41;*/
+	line-height: 0px;
+	cursor: pointer;
+}
+
+/* Start & End - Buttons */
+.scrollOVV .start {
+	background-image: url('image.png');
+	background-repeat: no-repeat;
+	background-position: -750px -0px;
+	width:15px;
+	height:16px;
+}
+.scrollOVV .end {
+	background-image: url('image.png');
+	background-repeat: no-repeat;
+	background-position: -720px -0px;
+	width:15px;
+	height:16px;
+}
+
+/* Scroll Area */
+.scrollOVV .empty {
+	position:relative;
+	width:15px;
+}
+.scrollOVV .spaceStart {
+	background-image: url('image.png');
+	background-repeat: no-repeat;
+	background-position: -870px -0px;
+	width:0px;
+	height:0px;
+}
+.scrollOVV .eVertical {
+	position:relative;
+	background-repeat:repeat-y;
+	background-image: url('scaled/overview/eVertical.png');
+	padding:0px;
+	width:15px;
+	margin:0px;
+ 	height:100%;
+	vertical-align: top;
+	overflow: visible;
+}
+.scrollOVV .spaceEnd {
+	background-image: url('image.png');
+	background-repeat: no-repeat;
+	background-position: -840px -0px;
+	width:0px;
+	height:0px;	
+}
+.scrollOVVBar { /* contains ScrollBar */
+	position: absolute;
+	cursor: url('cursor/vertical.cur'), pointer;
+	/*top:0px;*/
+	/*margin-top:36px;*//*Needed to remove positioning Bug*/
+	/*left: -1px;*/
+	overflow: visible;
+}
+
+/* ScrollBar */
+.scrollOVV .barStart {
+	background-image: url('image.png');
+	background-repeat: no-repeat;
+	background-position: -810px -0px;
+	position:relative;
+	height: 1px;
+	left: 3px;
+	margin: 0px;
+	padding: 0px;
+}
+.scrollOVVBar .vertical {
+	background-repeat:repeat-y;
+	background-image: url('scaled/overview/vertical.png');
+	position:relative;
+	height:100%;
+	width: 9px;
+	left: 3px;
+	margin: 0px;
+	padding: 0px;
+}
+.scrollOVV .barEnd {
+	background-image: url('image.png');
+	background-repeat: no-repeat;
+	background-position: -780px -0px;
+	position:relative;
+	height: 1px;
+	left: 3px;
+	margin: 0px;
+	padding: 0px;
+}
+
+
+.blackBlank {
+	opacity:0;
+	position:absolute;
+	top:0px;
+	left:0px;
+	height:100%;
+	width:100%;
+	z-index:100;
+	background-color:black;
+	display:none;
+}
