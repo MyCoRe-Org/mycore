@@ -29,16 +29,16 @@ public class MCRStalledJobResetter implements Runnable {
 
     public void run() {
         boolean reset = false;
-        Session executorSession = sessionFactory.getCurrentSession();
+        Session session = sessionFactory.getCurrentSession();
         LOGGER.info("MCRTileJob is Checked for dead Entries");
 
-        Query query = executorSession.createQuery("FROM MCRTileJob WHERE status='" + MCRJobState.PROCESS.toChar() + "' ORDER BY id ASC");
+        Query query = session.createQuery("FROM MCRTileJob WHERE status='" + MCRJobState.PROCESS.toChar() + "' ORDER BY id ASC");
         long start = 0;
         long current = new Date(System.currentTimeMillis()).getTime() / 60000;
 
         @SuppressWarnings("unchecked")
         Iterator<MCRTileJob> result = query.iterate();
-        Transaction executorTransaction = executorSession.beginTransaction();
+        Transaction executorTransaction = session.beginTransaction();
         while (result.hasNext()) {
             MCRTileJob job = result.next();
             start = job.getStart().getTime() / 60000;
@@ -48,6 +48,7 @@ public class MCRStalledJobResetter implements Runnable {
 
                 job.setStatus(MCRJobState.NEW);
                 job.setStart(null);
+                session.update(job);
                 reset = true;
             } else {
                 LOGGER.debug("->ok");
@@ -68,7 +69,7 @@ public class MCRStalledJobResetter implements Runnable {
                 MCRTilingQueue.getInstance().notifyListener();
             }
         }
-        executorSession.close();
+        session.close();
         LOGGER.info("MCRTileJob checking is done");
     }
 }
