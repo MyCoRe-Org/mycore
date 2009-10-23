@@ -204,7 +204,17 @@ public class MCRQuery {
      */
     public static MCRQuery parseXML(Document doc) {
         Element xml = doc.getRootElement();
-        Element conditions = xml.getChild("conditions");
+        return parseXML(xml);
+    }
+
+    /**
+     * Parses a XML representation of a query.
+     * @param element
+     *            the XML element
+     * @return
+     */
+    public static MCRQuery parseXML(Element element) {
+        Element conditions = element .getChild("conditions");
         MCRQuery query = null;
         if (conditions.getAttributeValue("format", "xml").equals("xml")) {
             Element condElem = (Element) (conditions.getChildren().get(0));
@@ -214,12 +224,12 @@ public class MCRQuery {
             query = new MCRQuery(new MCRQueryParser().parse(queryString));
         }
 
-        String max = xml.getAttributeValue("maxResults", "");
+        String max = element.getAttributeValue("maxResults", "");
         if (max.length() > 0)
             query.setMaxResults(Integer.parseInt(max));
 
         List<MCRSortBy> sortBy = null;
-        Element sortByElem = xml.getChild("sortBy");
+        Element sortByElem = element.getChild("sortBy");
 
         if (sortByElem != null) {
             List children = sortByElem.getChildren();
@@ -240,7 +250,7 @@ public class MCRQuery {
 
         // List of remote hosts to query
         List<String> hostAliases = new ArrayList<String>();
-        Element hostsElem = xml.getChild("hosts");
+        Element hostsElem = element.getChild("hosts");
         if (hostsElem != null) {
             String target = hostsElem.getAttributeValue("target", "local");
             if ("all".equals(target)) // query all hosts
