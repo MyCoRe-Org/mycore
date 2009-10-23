@@ -374,7 +374,7 @@
                             </xsl:call-template>
                             <xsl:call-template name="iview2.start">
                               <xsl:with-param name="groupID" select="$deriv" />
-                              <xsl:with-param name="style" select="'orig'" />
+                              <xsl:with-param name="style" select="'default'" />
                             </xsl:call-template>
                           </xsl:when>
                         </xsl:choose>
