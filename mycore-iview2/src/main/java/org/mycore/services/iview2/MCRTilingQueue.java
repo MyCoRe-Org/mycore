@@ -57,6 +57,7 @@ public class MCRTilingQueue extends AbstractQueue<MCRTileJob> implements Closeab
         return job;
     }
 
+    @Override
     public MCRTileJob remove() throws NoSuchElementException {
         if (!running)
             return null;
@@ -74,6 +75,7 @@ public class MCRTilingQueue extends AbstractQueue<MCRTileJob> implements Closeab
         return job;
     }
 
+    @Override
     public MCRTileJob element() throws NoSuchElementException {
         if (!running)
             return null;
@@ -103,6 +105,7 @@ public class MCRTilingQueue extends AbstractQueue<MCRTileJob> implements Closeab
         }
     }
 
+    @Override
     public void clear() {
         if (!running)
             return;
@@ -111,6 +114,7 @@ public class MCRTilingQueue extends AbstractQueue<MCRTileJob> implements Closeab
         query.executeUpdate();
     }
 
+    @Override
     public Iterator<MCRTileJob> iterator() {
         if (!running) {
             List<MCRTileJob> empty = Collections.emptyList();
@@ -123,6 +127,7 @@ public class MCRTilingQueue extends AbstractQueue<MCRTileJob> implements Closeab
         return result.iterator();
     }
 
+    @Override
     public int size() {
         if (!running)
             return 0;

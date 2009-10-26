@@ -1,6 +1,6 @@
 package org.mycore.services.iview2;
 
-public class MCRTiledPictureProps {
+class MCRTiledPictureProps {
     int countTiles;
 
     int width;

@@ -37,7 +37,7 @@ import org.mycore.frontend.cli.MCRAbstractCommands;
 import org.mycore.frontend.cli.MCRCommand;
 import org.mycore.services.iview2.MCRIView2Tools;
 import org.mycore.services.iview2.MCRImage;
-import org.mycore.services.iview2.MCRImageTiling;
+import org.mycore.services.iview2.MCRImageTiler;
 import org.mycore.services.iview2.MCRIview2Props;
 import org.mycore.services.iview2.MCRTileJob;
 import org.mycore.services.iview2.MCRTilingQueue;
@@ -118,9 +118,9 @@ public class MCRIView2Commands extends MCRAbstractCommands {
     }
 
     private static void startMasterTilingThread() {
-        if (!MCRImageTiling.isRunning()) {
+        if (!MCRImageTiler.isRunning()) {
             LOGGER.info("Starting Tiling thread.");
-            final Thread tiling = new Thread(MCRImageTiling.getInstance());
+            final Thread tiling = new Thread(MCRImageTiler.getInstance());
             tiling.start();
         }
     }

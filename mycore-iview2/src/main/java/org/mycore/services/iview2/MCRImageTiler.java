@@ -16,12 +16,12 @@ import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.common.events.MCRShutdownHandler;
 import org.mycore.common.events.MCRShutdownHandler.Closeable;
 
-public class MCRImageTiling implements Runnable, Closeable {
+public class MCRImageTiler implements Runnable, Closeable {
     private static final SessionFactory sessionFactory = MCRHIBConnection.instance().getSessionFactory();
 
-    private static MCRImageTiling instance = null;
+    private static MCRImageTiler instance = null;
 
-    private static Logger LOGGER = Logger.getLogger(MCRImageTiling.class);
+    private static Logger LOGGER = Logger.getLogger(MCRImageTiler.class);
 
     private static MCRTilingQueue tq = MCRTilingQueue.getInstance();
 
@@ -31,7 +31,7 @@ public class MCRImageTiling implements Runnable, Closeable {
 
     private ReentrantLock runLock;
 
-    private MCRImageTiling() {
+    private MCRImageTiler() {
         MCRShutdownHandler.getInstance().addCloseable(this);
         runLock = new ReentrantLock();
     }
@@ -44,9 +44,9 @@ public class MCRImageTiling implements Runnable, Closeable {
         }
     }
 
-    public static MCRImageTiling getInstance() {
+    public static MCRImageTiler getInstance() {
         if (instance == null) {
-            instance = new MCRImageTiling();
+            instance = new MCRImageTiler();
         }
         return instance;
     }
@@ -74,7 +74,6 @@ public class MCRImageTiling implements Runnable, Closeable {
                 Transaction transaction = session.beginTransaction();
                 MCRTileJob job = null;
                 try {
-                    LOGGER.info("transaction is active: " + transaction.isActive());
                     job = tq.poll();
                     transaction.commit();
                 } catch (HibernateException e) {
@@ -87,12 +86,12 @@ public class MCRImageTiling implements Runnable, Closeable {
                 }
                 if (job != null && !tilingServe.isShutdown()) {
                     LOGGER.info("Creating:" + job.getPath());
-                    tilingServe.execute(new MCRImageTileThread(job));
+                    tilingServe.execute(new MCRTilingAction(job));
                 } else {
                     try {
                         synchronized (tq) {
                             if (running) {
-                                LOGGER.info("No Picture in TilingQueue going to sleep");
+                                LOGGER.debug("No Picture in TilingQueue going to sleep");
                                 //fixes a race conditioned deadlock situation
                                 //do not wait longer than 60 sec. for a new MCRTileJob
                                 tq.wait(60000);

@@ -14,6 +14,7 @@ public class MCRDirectoryXMLServlet extends MCRServlet {
 
     private static Logger LOGGER = Logger.getLogger(MCRDirectoryXMLServlet.class.getName());
 
+    @Override
     public void doGetPost(MCRServletJob job) throws IOException {
         LOGGER.info(job.getRequest().getPathInfo());
         //    	String[] data = job.getRequest().getPathInfo().split("/");

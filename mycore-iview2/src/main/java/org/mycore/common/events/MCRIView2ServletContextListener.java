@@ -27,7 +27,7 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
 import org.apache.log4j.Logger;
-import org.mycore.services.iview2.MCRImageTiling;
+import org.mycore.services.iview2.MCRImageTiler;
 
 /**
  * @author Thomas Scheffler (yagee)
@@ -47,9 +47,9 @@ public class MCRIView2ServletContextListener implements ServletContextListener {
      * @see javax.servlet.ServletContextListener#contextInitialized(javax.servlet.ServletContextEvent)
      */
     public void contextInitialized(ServletContextEvent sce) {
-        if (!MCRImageTiling.isRunning()) {
+        if (!MCRImageTiler.isRunning()) {
             LOGGER.info("Starting Tiling thread.");
-            tilingThread = new Thread(MCRImageTiling.getInstance());
+            tilingThread = new Thread(MCRImageTiler.getInstance());
             tilingThread.start();
         }
     }

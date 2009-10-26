@@ -11,12 +11,12 @@ import org.hibernate.Transaction;
 import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.datamodel.ifs.MCRFile;
 
-public class MCRImageTileThread implements Runnable {
+public class MCRTilingAction implements Runnable {
     private MCRTileJob image = null;
 
     private static SessionFactory sessionFactory = MCRHIBConnection.instance().getSessionFactory();
 
-    private static Logger LOGGER = Logger.getLogger(MCRImageTileThread.class);
+    private static Logger LOGGER = Logger.getLogger(MCRTilingAction.class);
 
     public void run() {
         Session session = sessionFactory.getCurrentSession();
@@ -49,7 +49,7 @@ public class MCRImageTileThread implements Runnable {
         }
     }
 
-    MCRImageTileThread(MCRTileJob image) {
+    MCRTilingAction(MCRTileJob image) {
         this.image = image;
     }
 }
