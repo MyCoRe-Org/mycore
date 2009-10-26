@@ -848,5 +848,5 @@ function loading(viewID) {
 	
 	// surface muss als Blank geladen werden, damit Ebene gefüllt und es im Vordergrund des Viewers liegt
 	// hauptsächlich wegen IE notwendig
-	getElementsByClassName("surface","viewer"+viewID,"div")[0].style.backgroundImage = "url("+Iview[viewID].baseUri+"/GSIV/gfx/blank.jpg"+")";
+	getElementsByClassName("surface","viewer"+viewID,"div")[0].style.backgroundImage = "url("+Iview[viewID].webappBaseUri+"/modules/iview2/web/gfx/blank.gif"+")";
 }
