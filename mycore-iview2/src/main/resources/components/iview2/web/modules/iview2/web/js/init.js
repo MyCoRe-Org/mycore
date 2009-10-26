@@ -19,6 +19,7 @@ function initializeGraphic(viewID) {
 			maxZoom: Iview[viewID].zoomMax,
 			initialZoom: Iview[viewID].zoomInit,//Anfangs-Zoomlevel
 			blankTile: "../modules/iview2/web/" + styleFolderUri + 'blank.gif',
+			loadingTile: "../modules/iview2/web/" + styleFolderUri + 'blank.gif',
 			viewID: viewID//Add Viewer ID mit übergeben damit der Viewer darauf arbeiten kann					
 		});
 		Iview[viewID].viewerBean.init();
