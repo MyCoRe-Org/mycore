@@ -751,11 +751,11 @@ function loading(viewID) {
 	loadVars("../modules/iview2/web/" + style + "design.xml");//Laden der Informationen je nach entsprechendem Design
 	// load and process XML-data
 	Iview[viewID].book_uri = "../images/Pics/" + viewID + "/";
-	Iview[viewID].book = loadXML(document.location.protocol + "//" + document.location.host + "/servlets/MCRFileNodeServlet/" + viewID + "/", "xml");
+	Iview[viewID].book = loadXML(Iview[viewID].webappBaseUri + "servlets/MCRFileNodeServlet/" + viewID + "/", "xml");
 
 	cleanBook(viewID);
 	//retrieves the mets File depending on the fact if it's exists or it request a simple one
-	var mets_uri = document.location.protocol + "//" + document.location.host + "/servlets/" + ((Iview[viewID].hasMets)? "MCRFileNodeServlet/": "MCRDirectoryXMLServlet/") + viewID + ((Iview[viewID].hasMets)? "/mets.xml":"");
+	var mets_uri = Iview[viewID].webappBaseUri + "servlets/" + ((Iview[viewID].hasMets)? "MCRFileNodeServlet/": "MCRDirectoryXMLServlet/") + viewID + ((Iview[viewID].hasMets)? "/mets.xml":"");
 	Iview[viewID].buchDaten = (Iview[viewID].hasMets)? loadXML(mets_uri):loadXML(mets_uri, "mets");
 	Iview[viewID].amountPages = getPageCount(Iview[viewID].buchDaten);
 
@@ -848,5 +848,5 @@ function loading(viewID) {
 	
 	// surface muss als Blank geladen werden, damit Ebene gefüllt und es im Vordergrund des Viewers liegt
 	// hauptsächlich wegen IE notwendig
-	getElementsByClassName("surface","viewer"+viewID,"div")[0].style.backgroundImage = "url("+Iview[viewID].webappBaseUri+"/modules/iview2/web/gfx/blank.gif"+")";
+	getElementsByClassName("surface","viewer"+viewID,"div")[0].style.backgroundImage = "url("+Iview[viewID].webappBaseUri+"modules/iview2/web/gfx/blank.gif"+")";
 }
