@@ -277,6 +277,7 @@ public class MCRImage {
         } else {
             tileDir = new File(tileDir, lastPart);
         }
+        tileDir = new File(tileDir, derivate);
         if (imagePath == null)
             return tileDir;
         String relPath = imagePath.substring(0, imagePath.lastIndexOf('.')) + ".iview2";
