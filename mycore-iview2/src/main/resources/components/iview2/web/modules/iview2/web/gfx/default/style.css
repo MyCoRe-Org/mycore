@@ -29,8 +29,8 @@
 }
 .viewerContainer.max {
 	position: fixed;
-	height: 100%;
-	top: 41px;
+	/*height: 100%;*/
+	top: 46px; /* header height + borderTop + borderBottom*/
 }
 .viewerContainer.min {
 	position: relative;
@@ -143,47 +143,45 @@
 	height: 44px;
 	border: 1px solid #000000;
 	z-index: 20;
+	/*display: none;*/
 }
 .buttonSurface.max .header { /* needed by IE8 */
-	position: absolute;	
+	position: absolute;
+	display: block;
 }
 .buttonSurface .header .headerLeft {
 	position: relative;
 	top: 0px;
 	left: 0px;
-	height: 100%;
-	width: 80px;
+	height: 44px;
+	width: 200px;
 	background-color: #c0c1c3;
 	float: left;
 }
 .buttonSurface .header .headerLCBorder {
 	position: relative;
-	top: 0px;
-	height: 100%;
-	width: 1px;
-	padding-top: 4px;
-	padding-bottom: 4px;
+	top: 4px;
+	height: 36px;
+	width: 2px;
 	background-color: #858688;
 	float: left;
 }
 .buttonSurface .header .headerCenter {
 	position: relative;
 	top:0px;
-	height: 100%;
+	height: 44px;
 	width: 200px;
 	background-color: #c0c1c3;
 	float: left;
 }
 .buttonSurface.max .header .headerCenter {
-	width: 400px;
+	width: 750px;
 }
 .buttonSurface .header .headerCRBorder {
 	position: relative;
-	top: 0px;
-	height: 100%;
-	width: 1px;
-	padding-top: 4px;
-	padding-bottom: 4px;
+	top: 4px;
+	height: 36px;
+	width: 2px;
 	background-color: #858688;
 	float: left;
 }
@@ -191,7 +189,7 @@
 	top: 0px;
 	right: 0px;
 	left: 0px;
-	height: 100%;
+	height: 44px;
 	background-color: #c0c1c3;
 }
 
@@ -205,14 +203,14 @@
 	background-position: -420px -0px;
 	height:24px;
 	width:22px;
-	left:630px;
+	left:970px;
 	z-index: 50;
 	cursor: pointer;
 }
 .buttonSurface .BSE_url {
 	position: absolute;
-	top: 10px;
-	left: 670px;
+	top: 11px;
+	left: 1000px;
 	z-index: 50;
 	display: none;
 	visibility: hidden;
@@ -222,8 +220,9 @@
 }
 .buttonSurface .BSE_permaUrl {
 	width:200px;
+	height: 16px;
 	float: left;
-	border: 1px solid black;
+	font-size: 12px;
 	background-color: #FCFEFF;
 	visibility: hidden;
 }
@@ -265,7 +264,7 @@
 	background-position: -90px -0px;
 	height: 24px;
 	width: 15px;
-	left: 10px;
+	left: 320px;
 	z-index: 50;
 }
 
@@ -290,7 +289,7 @@
 	background-position: -150px -0px;
 	height: 24px;
 	width: 15px;
-	left: 50px;
+	left: 364px;
 	z-index: 50;
 }
 
@@ -349,8 +348,8 @@
 /* MODUL: pageForm */
 .buttonSurface .BSE_pageForm1 {
 	position: absolute;
-	top: 8px;
-	left: 110px;
+	top: 10px;
+	left: 420px;
 	visibility: hidden;
 	z-index: 50;
 }
@@ -369,7 +368,7 @@
 }
 
 /* Entrance-Buttons - Chapter & Overview */
-.buttonSurface .BSE_openThumbs {
+.buttonSurface.max .BSE_openThumbs {
 	position: absolute;
 	top: 10px;
 	background-image: url('image.png');
@@ -377,22 +376,21 @@
 	background-position: -360px -0px;
 	height: 24px;
 	width: 22px;
-	left: 520px;
+	left: 218px;
 	z-index: 50;
 	cursor: pointer;
 }
 .buttonSurface.max .BSE_chapterOpener {
 	position: absolute;
-	top: 8px;
+	top: 10px;
 	background-image: url('image.png');
 	background-repeat: no-repeat;
 	background-position: -390px -0px;
-	height: 19px;
-	width: 25px;
-	left: 560px;
+	height: 24px;
+	width: 22px;
+	left: 262px;
 	z-index: 50;
 	cursor: pointer;
-	display:none;
 }
 
 
@@ -402,7 +400,7 @@
 .buttonSurface .BSE_fullView, .buttonSurface .BSE_normalView {	
 	position: absolute;
 	top: 10px;
-	height: 17px;
+	height: 24px;
 	width: 20px;
 	right: 10px;
 	margin: 0px;
@@ -538,7 +536,7 @@
 }
 
 /* additional ZoomIn / ZoomOut (not integrated in Zoombar)*/
-.buttonSurface.min .BSE_zoomIn {	
+.buttonSurface.max .BSE_zoomIn {	
 	position: absolute;
 	top: 0px;
 	right: 0px;
@@ -553,10 +551,10 @@
 	/*z-index: 32;*/
 	cursor: pointer;
 }
-.buttonSurface.min .BSE_zoomInBehind {
+.buttonSurface.max .BSE_zoomInBehind {
 	position: absolute;
 	top: 10px;
-	left: 150px;
+	left: 30px;
 	height: 24px;
 	width: 22px;
 	margin: 0px;
@@ -567,7 +565,7 @@
 	background-position: -210px -0px;
 	z-index: 50;	
 }
-.buttonSurface.min .BSE_zoomOut {	
+.buttonSurface.max .BSE_zoomOut {	
 	position: absolute;
 	top: 0px;
 	right: 0px;
@@ -582,10 +580,10 @@
 	/*z-index: 32;*/
 	cursor: pointer;
 }
-.buttonSurface.min .BSE_zoomOutBehind {	
+.buttonSurface.max .BSE_zoomOutBehind {	
 	position: absolute;
 	top: 10px;
-	left: 200px;
+	left: 74px;
 	height: 17px;
 	width: 17px;
 	margin: 0px;
@@ -606,19 +604,19 @@
 	background-position: -300px -0px;
  	height: 24px;
  	width: 22px;
- 	left: 250px;
+ 	left: 120px;
  	z-index: 50;
  	cursor: pointer;
 }
 .buttonSurface.max .BSE_toScreen {
  	position: absolute;
- 	top: 8px;
+ 	top: 10px;
  	background-image: url('image.png');
 	background-repeat: no-repeat;
 	background-position: -330px -0px;
  	height: 24px;
  	width: 22px;
- 	left: 285px;
+ 	left: 164px;
  	z-index: 50;
  	cursor: pointer;
 }
@@ -657,8 +655,8 @@
 .viewerContainer .thumbNormal {
 	background-color: #000000;
 	position: absolute;
-	right: 15px;
-	bottom: 15px;
+	right: 16px;
+	bottom: 16px;
 	vertical-align: middle;
 	font-weight: bold;
 	border: 0px solid #000000;
@@ -897,7 +895,7 @@
 	overflow: hidden;
 	text-align:left;
 	font-weight:normal;
-	visibility: visible;
+	visibility: hidden;
 }
 
 .chapter1 .chapter1InPlace {

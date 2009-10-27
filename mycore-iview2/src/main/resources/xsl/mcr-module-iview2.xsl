@@ -143,7 +143,7 @@
       </xsl:choose>
       <xsl:choose>
         <xsl:when test="$chapterOpener = 'true'">
-          <div class="BSE_chapterOpener {$groupID}" onclick="openChapter(true,'{$groupID}')" title="{i18n:translate('component.iview2.ChapterOpener')}">
+          <div class="BSE_chapterOpener {$groupID}" onclick="openChapter(true,'{$groupID}')" title="{i18n:translate('component.iview2.chapterOpener')}">
           </div>
         </xsl:when>
       </xsl:choose>

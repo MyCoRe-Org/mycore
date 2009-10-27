@@ -332,55 +332,55 @@
                 <table width="100%" border="0" cellspacing="0" cellpadding="0">
                   <xsl:variable name="deriv" select="@xlink:href" />
                   <!-- MCR IView2 ..start -->
-                  <!-- <xsl:if test="$jai.available">-->
-                  <tr>
-                    <td class="metanone" colspan="8">
-                      <xsl:variable name="supportedMainFile">
-                        <xsl:call-template name="iview2.getSupport">
-                          <xsl:with-param name="derivID" select="$deriv" />
-                        </xsl:call-template>
-                      </xsl:variable>
-                      <xsl:choose>
-                        <xsl:when test="$supportedMainFile != ''">
-                          <xsl:call-template name="iview2.init">
-                            <xsl:with-param name="groupID" select="$deriv" />
+                  <!--<xsl:if test="$jai.available">-->
+                    <tr>
+                      <td class="metanone" colspan="8">
+                        <xsl:variable name="supportedMainFile">
+                          <xsl:call-template name="iview2.getSupport">
+                            <xsl:with-param name="derivID" select="$deriv" />
                           </xsl:call-template>
-                          <xsl:value-of select="concat(i18n:translate('metaData.document.derivate'),' :')" />
-                          <xsl:call-template name="iview2.getThumbnail">
-                            <xsl:with-param name="groupID" select="$deriv" />
-                            <xsl:with-param name="parent" select="'viewer'" />
-                          </xsl:call-template>
-                          <xsl:call-template name="iview2.getChapter">
-                            <xsl:with-param name="groupID" select="$deriv" />
-                            <xsl:with-param name="parent" select="'here'" />
-                          </xsl:call-template>
-                          <xsl:call-template name="iview2.getZoomBar">
-                            <xsl:with-param name="groupID" select="$deriv" />
-                            <xsl:with-param name="direction" select="'true'" />
-                            <xsl:with-param name="horizontal" select="'true'" />
-                            <xsl:with-param name="parent" select="concat('buttonSurface',$deriv)" />
-                          </xsl:call-template>
-                          <xsl:call-template name="iview2.getToolbar">
-                            <xsl:with-param name="groupID" select="$deriv" />
-                            <xsl:with-param name="optOut" select="'true'" />
-                            <xsl:with-param name="create" select="'headerLeft,headerLCBorder,headerCenter,headerCRBorder,headerRight'" />
-                          </xsl:call-template>
-                          <xsl:call-template name="iview2.getViewer">
-                            <xsl:with-param name="groupID" select="$deriv" />
-                            <xsl:with-param name="zoomBar" select="'true'" />
-                            <xsl:with-param name="chapter" select="'true'" />
-                            <xsl:with-param name="cutOut" select="'true'" />
-                            <xsl:with-param name="overview" select="'true'" />
-                          </xsl:call-template>
-                          <xsl:call-template name="iview2.start">
-                            <xsl:with-param name="groupID" select="$deriv" />
-                            <xsl:with-param name="style" select="'default'" />
-                          </xsl:call-template>
-                        </xsl:when>
-                      </xsl:choose>
-                    </td>
-                  </tr>
-                  <!-- </xsl:if>-->
+                        </xsl:variable>
+                        <xsl:choose>
+                          <xsl:when test="$supportedMainFile != ''">
+                            <xsl:call-template name="iview2.init">
+                              <xsl:with-param name="groupID" select="$deriv" />
+                            </xsl:call-template>
+                            <xsl:value-of select="concat(i18n:translate('metaData.document.derivate'),' :')" />
+                            <xsl:call-template name="iview2.getThumbnail">
+                              <xsl:with-param name="groupID" select="$deriv" />
+                              <xsl:with-param name="parent" select="concat('viewerContainer',$deriv)" />
+                            </xsl:call-template>
+                            <xsl:call-template name="iview2.getChapter">
+                              <xsl:with-param name="groupID" select="$deriv" />
+                              <xsl:with-param name="parent" select="'viewer'" />
+                            </xsl:call-template>
+                            <!--<xsl:call-template name="iview2.getZoomBar">
+                              <xsl:with-param name="groupID" select="$deriv" />
+                              <xsl:with-param name="direction" select="'true'" />
+                              <xsl:with-param name="horizontal" select="'true'" />
+                              <xsl:with-param name="parent" select="concat('buttonSurface',$deriv)" />
+                            </xsl:call-template>-->
+                            <xsl:call-template name="iview2.getToolbar">
+                              <xsl:with-param name="groupID" select="$deriv" />
+                              <xsl:with-param name="optOut" select="'true'" />
+                              <xsl:with-param name="create" select="'headerLeft,headerLCBorder,headerCenter,headerCRBorder,headerRight'" />
+                            </xsl:call-template>
+                            <xsl:call-template name="iview2.getViewer">
+                              <xsl:with-param name="groupID" select="$deriv" />
+                              <xsl:with-param name="zoomBar" select="'false'" />
+                              <xsl:with-param name="chapter" select="'true'" />
+                              <xsl:with-param name="cutOut" select="'true'" />
+                              <xsl:with-param name="overview" select="'true'" />
+                            </xsl:call-template>
+                            <xsl:call-template name="iview2.start">
+                              <xsl:with-param name="groupID" select="$deriv" />
+                              <xsl:with-param name="style" select="'default'" />
+                            </xsl:call-template>
+                          </xsl:when>
+                        </xsl:choose>
+                      </td>
+                    </tr>
+                  <!--</xsl:if>-->
                   <!-- MCR IView2 ..end -->
                   <tr>
                     <xsl:variable name="deriv" select="@xlink:href" />

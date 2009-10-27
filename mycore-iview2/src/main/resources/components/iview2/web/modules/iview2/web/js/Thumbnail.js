@@ -369,14 +369,14 @@ function handleResizeScrollbars(viewID) {
 	// max scaling
 	scrollBarY.setMaxValue(curHoehe - viewerBean.height);
 	// size of the scrollbar
-	scrollBarY.setSize(viewerBean.height - 16);
+	scrollBarY.setSize(viewerBean.height);
 	// length of the bar
-	scrollBarY.setLength((viewerBean.height - ((Iview[viewID].useCutOut && DampInViewer)? toFloat(getStyle($("damp"+viewID), "height")):0))/ (curHoehe/viewerBean.height));
+	scrollBarY.setLength((viewerBean.height /*- ((Iview[viewID].useCutOut && DampInViewer)? toFloat(getStyle($("damp"+viewID), "height")):0)*/)/ (curHoehe/viewerBean.height));
 	
 	// horizontally
 	scrollBarX.setMaxValue(curBreite - viewerBean.width);
-	scrollBarX.setSize(viewerBean.width - 16);
-	scrollBarX.setLength((viewerBean.width - ((Iview[viewID].useCutOut && DampInViewer)? toFloat(getStyle($("damp"+viewID), "width")):0))/ (curBreite/viewerBean.width));	
+	scrollBarX.setSize(viewerBean.width);
+	scrollBarX.setLength((viewerBean.width /*- ((Iview[viewID].useCutOut && DampInViewer)? toFloat(getStyle($("damp"+viewID), "width")):0)*/)/ (curBreite/viewerBean.width));	
 }
 
 /*
@@ -468,7 +468,7 @@ function hideURL(element) {
 */
 function generateURL(viewID) {
 	var url = window.location.href.substring(0, ((window.location.href.indexOf("?") != -1)? window.location.href.indexOf(window.location.search): window.location.href.length))+ "?";
-	url += "book="+book_uri;
+	//url += "book="+book_uri;
 	url += "&page="+Iview[viewID].pagenumber;
 	url += "&zoom="+Iview[viewID].viewerBean.zoomLevel;
 	url += "&x="+Iview[viewID].viewerBean.x;
@@ -606,7 +606,7 @@ function importCutOut(viewID) {
 	Iview[viewID].ausschnitt = new cutOut(Iview[viewID]);
 	var ausschnitt = Iview[viewID].ausschnitt;
 	ausschnitt.setViewID(viewID);
-	ausschnitt.init("thumb"+viewID, "ausschnitt"+viewID, "thumbnail"+viewID, Iview[viewID].ausschnittParent, "damp"+viewID, "viewer"+viewID, "Normal");
+	ausschnitt.init("thumb"+viewID, "ausschnitt"+viewID, "thumbnail"+viewID, Iview[viewID].ausschnittParent, "damp"+viewID, Iview[viewID].ausschnittParent/*"viewer"+viewID*/, "Normal");
 	// Additional Listener
 	// also in zoom-Listener, but to early without onload
 	ausschnitt.addListener(cutOut.ONLOAD, function(viewID) {
@@ -627,7 +627,7 @@ function importCutOut(viewID) {
 				}, true);});
 	// Additional Events
 	EventUtils.addEventListener(document.getElementsByTagName("body")[0], 'mouseup', ausschnitt.mouseUp, false);
-	EventUtils.addEventListener($("viewer"+viewID), 'mousemove', ausschnitt.mouseMove, false);
+	EventUtils.addEventListener(/*$("viewer"+viewID)*/$(Iview[viewID].ausschnittParent), 'mousemove', ausschnitt.mouseMove, false);
 	// wird in Klasse für cutOut bzw. in loading für viewer gemacht
 	// EventUtils.addEventListener($("viewer"+viewID), 'mouseScroll', ausschnitt.scroll, false);
 }
@@ -750,7 +750,7 @@ function loading(viewID) {
 	style = styleFolderUri + styleName + "/";
 	loadVars("../modules/iview2/web/" + style + "design.xml");//Laden der Informationen je nach entsprechendem Design
 	// load and process XML-data
-	Iview[viewID].book_uri = "../images/Pics/" + viewID + "/";
+	//Iview[viewID].book_uri = "../images/Pics/" + viewID + "/";
 	Iview[viewID].book = loadXML(Iview[viewID].webappBaseUri + "servlets/MCRFileNodeServlet/" + viewID + "/", "xml");
 
 	cleanBook(viewID);
@@ -811,26 +811,19 @@ function loading(viewID) {
 	if (Iview[viewID].useChapter) {
 		importChapter(viewID);
 
-		if (!chapterEmbedded) {
+		//if (!chapterEmbedded) {
 			// actually be changed manually in CSS
-			if (classIsUsed("BSE_chapterOpener")) doForEachInClass("BSE_chapterOpener" ,".style.display = 'block';");
-		}
+			//if (classIsUsed("BSE_chapterOpener")) doForEachInClass("BSE_chapterOpener" ,".style.display = 'block';");
+		//}
 	}
 
+	// damit viewer über scrollBarX endet, fortan in reinitialize
+	$("viewer"+viewID).style.width = $("viewerContainer"+viewID).offsetWidth - Iview[viewID].scrollBarY.my.self.offsetWidth  + "px";
+	$("viewer"+viewID).style.height = $("viewerContainer"+viewID).offsetHeight - Iview[viewID].scrollBarX.my.self.offsetHeight  + "px";
 
 	// Load Page
 	navigatePage(Iview[viewID].pagenumber, viewID);
 	Iview[viewID].loaded = true;
-	
-	// PermaLink Handling
-	if (window.location.search.get("tosize") == "width") {
-		pictureWidth(viewID);
-	} else if (window.location.search.get("tosize") == "screen") {
-		pictureScreen(viewID);
-	}
-	if (window.location.search.get("maximized") == "true") {
-		GSIV.maximizeHandler();
-	}
 
 	// additional loadings - preloads
 	if (Iview[viewID].useOverview) {
@@ -849,4 +842,14 @@ function loading(viewID) {
 	// surface muss als Blank geladen werden, damit Ebene gefüllt und es im Vordergrund des Viewers liegt
 	// hauptsächlich wegen IE notwendig
 	getElementsByClassName("surface","viewer"+viewID,"div")[0].style.backgroundImage = "url("+Iview[viewID].webappBaseUri+"modules/iview2/web/gfx/blank.gif"+")";
+	
+	// PermaLink Handling
+	if (window.location.search.get("tosize") == "width") {
+		pictureWidth(viewID);
+	} else if (window.location.search.get("tosize") == "screen") {
+		pictureScreen(viewID);
+	}
+	if (window.location.search.get("maximized") == "true") {
+		maximizeHandler(viewID);
+	}
 }

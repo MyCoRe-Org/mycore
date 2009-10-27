@@ -41,12 +41,18 @@ function reinitializeGraphic(viewID) {
 		$("blackBlank"+viewID).style.height = $("viewerContainer"+viewID).offsetHeight + "px";
 	}
 	
+	// damit volle Höhe gewährleistet werden kann, height: 100% nicht verwendbar
 	if (Iview[viewID].maximized == true) {
-		$("viewer"+viewID).style.height = document.body.clientHeight - $("viewer"+viewID).parentNode.offsetTop + "px";
+		$("viewerContainer"+viewID).style.height = document.body.clientHeight - $("viewerContainer"+viewID).offsetTop + "px";
+		//$("viewer"+viewID).style.height = document.body.clientHeight - $("viewer"+viewID).parentNode.offsetTop - Iview[viewID].scrollBarX.my.self.offsetHeight  + "px";
+		
 	} else {
 		// Wert wieder aus CSS entnehmen
-		$("viewer"+viewID).style.height = "";
+		$("viewerContainer"+viewID).style.height = "";
+		//$("viewer"+viewID).style.height = "";
 	}
+	$("viewer"+viewID).style.height = $("viewerContainer"+viewID).offsetHeight - Iview[viewID].scrollBarX.my.self.offsetHeight  + "px";
+	$("viewer"+viewID).style.width = $("viewerContainer"+viewID).offsetWidth - Iview[viewID].scrollBarY.my.self.offsetWidth  + "px";
 	
 	viewerBean.width = $("viewer"+viewID).offsetWidth;
 	viewerBean.height = $("viewer"+viewID).offsetHeight;

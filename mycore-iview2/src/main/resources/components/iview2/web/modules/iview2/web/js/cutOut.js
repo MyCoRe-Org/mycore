@@ -83,8 +83,9 @@ function cutOut() {
 		EventUtils.addEventListener(complete, "mousemove", mouseMove, false);
 		EventUtils.addEventListener(damp, "mousedown", damper, false);
 		//TODO: wird aber glaub nicht mehr benötigt
+		
 		// Browser-Drag&Drop deaktiveren
-		//complete.onmousedown = function() { return false;};
+		complete.onmousedown = function() { return false;};
 		
 		my = {'self':complete, 'cutOut':ausschnitt, 'thumbnail':thumb, 'damp':damp};
 		this.my = my;
