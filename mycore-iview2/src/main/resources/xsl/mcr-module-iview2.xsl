@@ -14,11 +14,12 @@
     <xsl:variable name="derivxml" select="concat('ifs:/',@xlink:href)" />
     <xsl:variable name="details" select="document($derivxml)" />
     <script type="text/javascript">
+      var baseUris='["'+'<xsl:value-of select="$MCR.Module-iview2.BaseURL"/>'.split(',').join('","')+'"]';
       addIviewProperty('<xsl:value-of select="$groupID" />', 'useZoomBar',<xsl:value-of select="$zoomBar" />);
       addIviewProperty('<xsl:value-of select="$groupID" />', 'useChapter',<xsl:value-of select="$chapter" />);
       addIviewProperty('<xsl:value-of select="$groupID" />', 'useCutOut',<xsl:value-of select="$cutOut" />);
       addIviewProperty('<xsl:value-of select="$groupID" />', 'useOverview',<xsl:value-of select="$overview" />);
-      addIviewProperty('<xsl:value-of select="$groupID" />', 'baseUri', '"<xsl:value-of select="$MCR.Module-iview2.BaseURL"/>/<xsl:value-of select="$groupID" />"');
+      addIviewProperty('<xsl:value-of select="$groupID" />', 'baseUri', baseUris);
       addIviewProperty('<xsl:value-of select="$groupID" />', 'webappBaseUri', '"<xsl:value-of select="$WebApplicationBaseURL"/>"');
       <xsl:choose>
         <xsl:when test="$details/mcr_directory/children/child/name[text()='mets.xml']">

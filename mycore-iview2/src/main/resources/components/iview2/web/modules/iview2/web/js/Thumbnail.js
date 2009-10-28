@@ -47,7 +47,7 @@ function loadPage(pageData, viewID) {
 	// Preload wird zu spät verkleinert
 	$("preload"+viewID).style.visibility = "hidden";
 
-	var imageProperties = loadXML(Iview[viewID].baseUri+"/"+pageData["name"]+"/imageinfo.xml", "xml");
+	var imageProperties = loadXML(Iview[viewID].baseUri[0]+"/"+viewID+"/"+pageData["name"]+"/imageinfo.xml", "xml");
 	var values = nodeAttributes(imageProperties.getElementsByTagName("imageinfo")[0]);
 	
 	Iview[viewID].tiles = parseInt(values['tiles']);
@@ -137,10 +137,10 @@ function loadPage(pageData, viewID) {
 	preload.style.width = "100%";
 	preload.style.height = "100%";
 	$("preload"+viewID).appendChild(preload);
-	$("preload"+viewID).childNodes[0].src = Iview[viewID].baseUri + "/" + Iview[viewID].prefix + "/0/0/0.jpg";
+	$("preload"+viewID).childNodes[0].src = viewerBean.tileUrlProvider.assembleUrl(0,0,0);
 	$("preload"+viewID).style.visibility = "visible";
 	if (Iview[viewID].useCutOut) {
-		Iview[viewID].ausschnitt.setSRC(Iview[viewID].baseUri + "/" + Iview[viewID].prefix + "/0/0/0.jpg");
+		Iview[viewID].ausschnitt.setSRC(viewerBean.tileUrlProvider.assembleUrl(0,0,0));
 	}
 }
 

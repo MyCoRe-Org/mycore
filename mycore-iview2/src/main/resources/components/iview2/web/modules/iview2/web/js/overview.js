@@ -279,7 +279,7 @@ function overview(newId, parent, identer) {
 	function loadSingleImage(i, j) {
 		var pageName = nodeProps(book, "child", (((i + currentFirstRow) * amountWidth) + j), true)["name"];
 	
-		var source = baseUri+ "/"+pageName+"/0/0/0.jpg";
+		var source = Iview[viewID].viewerBean.tileUrlProvider.assembleUrl(0, 0, 0, pageName);
 		var preview = $("previewDiv" + viewID +((i * amountWidth) + j));
 		
 		// nicht sicher ob das so in allen Browsern funktioniert

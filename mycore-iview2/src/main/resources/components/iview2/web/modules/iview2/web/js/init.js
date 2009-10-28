@@ -108,8 +108,10 @@ function initializeGraphic(viewID) {
 	PanoJS.USE_LOADER_IMAGE = false;
 	// opera triggers the onload twice
 	var iviewTileUrlProvider = new PanoJS.TileUrlProvider(Iview[viewID].baseUri, Iview[viewID].prefix, 'jpg');
-	iviewTileUrlProvider.assembleUrl = function(xIndex, yIndex, zoom){
-	    return this.baseUri + '/' + this.prefix + '/' + zoom + '/' + yIndex + '/' + xIndex + '.' + this.extension +
+	iviewTileUrlProvider.derivate = viewID;
+	iviewTileUrlProvider.assembleUrl = function(xIndex, yIndex, zoom, image){
+	    return this.baseUri[(xIndex+yIndex) % this.baseUri.length] + '/'+ this.derivate+'/' + 
+	        ((image == null)? this.prefix : image) + '/' + zoom + '/' + yIndex + '/' + xIndex + '.' + this.extension +
 	        (PanoJS.REVISION_FLAG ? '?r=' + PanoJS.REVISION_FLAG : '');
 	};
 	if (Iview[viewID].viewerBean == null) {
