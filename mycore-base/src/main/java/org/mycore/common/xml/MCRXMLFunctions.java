@@ -36,6 +36,7 @@ import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.datamodel.metadata.MCRMetaISO8601Date;
+import org.mycore.datamodel.metadata.MCRObjectID;
 import org.mycore.parsers.bool.MCRCondition;
 import org.mycore.services.fieldquery.MCRQuery;
 import org.mycore.services.fieldquery.MCRQueryManager;
@@ -182,6 +183,55 @@ public class MCRXMLFunctions {
             LOGGER.error("Error while retrieving urn from database for object " + objId, ex);
             return false;
         }
+    }
+    
+    /**
+     * @return true if the given object is allowed for urn assignment
+     * */
+    public static boolean isAllowedObjectForURNAssignment(String objId) {
+        if (objId == null) {
+            return false;
+        }
+        try {
+            MCRObjectID obj = new MCRObjectID(objId);
+            String type = obj.getTypeId();
+            return isAllowedObject(type);
+
+        } catch (Exception ex) {
+            LOGGER.error("Error while checking object " + objId + " is allowed for urn assignment");
+            return false;
+        }
+    }
+
+    /**
+     * Reads the property "URN.Enabled.Objects".
+     * 
+     * @param givenType
+     *            the type of the mycore object to check
+     * @return <code>true</code> if the given type is in the list of allowed
+     *         objects, <code>false</code> otherwise
+     */
+    private static boolean isAllowedObject(String givenType) {
+        if (givenType == null)
+            return false;
+
+        String propertyName = "URN.Enabled.Objects";
+        String propertyValue = MCRConfiguration.instance().getString(propertyName);
+        if (propertyValue == null || propertyValue.length() == 0) {
+            LOGGER.warn("URN assignment disabled as the property \"" + propertyName
+                    + "\" is not set");
+            return false;
+        }
+
+        String[] allowedTypes = propertyValue.split(",");
+        for (String current : allowedTypes) {
+            if (current.trim().equals(givenType.trim())) {
+                return true;
+            }
+        }
+        LOGGER.warn("URN assignment disabled as the object type " + givenType
+                + " is not in the list of allowed objects. See property \"" + propertyName + "\"");
+        return false;
     }
     
     public static boolean classAvailable(String className){
