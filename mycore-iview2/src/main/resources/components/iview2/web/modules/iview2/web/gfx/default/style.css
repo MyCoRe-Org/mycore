@@ -627,24 +627,24 @@
 	position:absolute;
 	bottom: 0px;
 	right: 0px;
-	width: 16px;
-	height: 16px;
+	width: 15px;
+	height: 15px;
 	background-image: url('image.png');
 	background-repeat: no-repeat;
 	background-position: -1260px -0px;
 	z-index: 50;
 }
 .viewerContainer .dampNormal .hide {
-	width: 16px;
-	height: 16px;
+	width: 15px;
+	height: 15px;
 	background-image: url('image.png');
 	background-repeat: no-repeat;
 	background-position: -1230px -0px;
 }
 
 .viewerContainer .dampNormal .show {
-	width: 16px;
-	height: 16px;
+	width: 15px;
+	height: 15px;
 	background-image: url('image.png');
 	background-repeat: no-repeat;
 	background-position: -1200px -0px;
@@ -694,7 +694,7 @@
 /* Main Container */
 .scrollH {
 	position: absolute;
-	height:16px;
+	height:15px;
 	width: 100%;
 	bottom: 0px;
 	left: 0px;
@@ -707,21 +707,21 @@
 	background-image: url('image.png');
 	background-repeat: no-repeat;
 	background-position: -540px -0px;
-	width:16px;
-	height:16px;
+	width:15px;
+	height:15px;
 }
 .scrollH .end {
 	background-image: url('image.png');
 	background-repeat: no-repeat;
 	background-position: -570px -0px;
-	width:16px;
-	height:16px;
+	width:15px;
+	height:15px;
 }
 
 /* Scroll Area */
 .scrollH .empty { /* Main Container */
 	position:relative;
-	height:16px;
+	height:15px;
 }
 .scrollH .spaceStart {
 }
@@ -732,7 +732,7 @@
 	padding:0px;
 	margin:0px;
 	width:100%;
-	height: 16px;
+	height: 15px;
 }
 .scrollH .spaceEnd {
 }
@@ -749,9 +749,8 @@
 	background-position: -660px -0px;
 	position:relative;
 	float: left;
-	width: 1px;
-	height: 10px;
-	top: 3px;
+	width: 2px;
+	height: 15px;
 	margin: 0px;
 	padding: 0px;
 }
@@ -760,9 +759,8 @@
 	background-image: url('scaled/scrollbars/horizontal.png');
 	position:relative;
 	float: left;
-	top: 3px;
 	left:100%;
-	height:10px;
+	height:15px;
 	padding:0px;
 	margin:0px;
 }
@@ -772,9 +770,8 @@
 	background-position: -690px -0px;
 	position:relative;
 	float: left;
-	width: 1px;
-	height: 10px;
-	top: 3px;
+	width: 2px;
+	height: 15px;
 	margin: 0px;
 	padding: 0px;
 }
@@ -783,7 +780,7 @@
 /* ScrollBar Vertical */
 /* Main Container */
 .scrollV {
-	width: 16px;
+	width: 15px;
 	height: 100%;
 	position: absolute;
 	right: 0px;
@@ -800,21 +797,21 @@
 	background-image: url('image.png');
 	background-repeat: no-repeat;
 	background-position: -510px -0px;
-	width:16px;
-	height:16px;
+	width:15px;
+	height:15px;
 }
 .scrollV .end {
 	background-image: url('image.png');
 	background-repeat: no-repeat;
 	background-position: -480px -0px;
-	width:16px;
-	height:16px;
+	width:15px;
+	height:15px;
 }
 
 /* Scroll Area */
 .scrollV .empty {
 	position:relative;
-	width:16px;
+	width:15px;
 }
 .scrollV .spaceStart {
 	background-color:#000000;
@@ -828,7 +825,7 @@
 	padding:0px;
 	margin:0px;
  	height:100%;
- 	width:16px;
+ 	width:15px;
 	vertical-align: top;
 }
 .scrollV .spaceEnd {
@@ -847,9 +844,8 @@
 	background-repeat: no-repeat;
 	background-position: -600px -0px;
 	position:relative;
-	height: 1px;
-	width: 10px;
-	left: 3px;
+	height: 2px;
+	width: 15px;
 	margin: 0px;
 	padding: 0px;
 }
@@ -858,8 +854,7 @@
 	background-image: url('scaled/scrollbars/vertical.png');
 	position:relative;
 	height:100%;
-	width: 10px;
-	left: 3px;
+	width: 15px;
 	margin: 0px;
 	padding: 0px;
 }
@@ -868,9 +863,8 @@
 	background-repeat: no-repeat;
 	background-position: -630px -0px;
 	position:relative;
-	height: 1px;
-	width: 10px;
-	left: 3px;
+	height: 2px;
+	width: 15px;
 	margin: 0px;
 	padding: 0px;
 }
@@ -998,21 +992,21 @@
 	position: absolute;
 	right:0px;
 	top:0px;
-	width:16px;
+	width:15px;
 	cursor: pointer;
 }
 
 /* Up / Down - Buttons */
 .scrollChapV .start {
-	height:16px;
-	width:16px;
+	height:15px;
+	width:15px;
 	background-image: url('image.png');
 	background-repeat: no-repeat;
 	background-position: -930px -0px;
 }
 .scrollChapV .end {
-	height:16px;
-	width:16px;
+	height:15px;
+	width:15px;
 	background-image: url('image.png');
 	background-repeat: no-repeat;
 	background-position: -900px -0px;
@@ -1039,7 +1033,7 @@
 	padding:0px;
 	margin:0px;
  	height:100%;
- 	width:16px;
+ 	width:15px;
 	vertical-align: top;
 }
 .scrollChapV .spaceEnd {
@@ -1062,8 +1056,7 @@
 	background-repeat: no-repeat;
 	background-position: -990px -0px;
 	position:relative;
-	height: 1px;
-	left: 3px;
+	height: 2px;
 	margin: 0px;
 	padding: 0px;
 }
@@ -1072,8 +1065,7 @@
 	background-image: url('scaled/chapter/vertical.png');
 	background-repeat:repeat-y;
 	height:100%;
-	width: 10px;
-	left: 3px;
+	width: 15px;
 	margin: 0px;
 	padding: 0px;
 }
@@ -1082,8 +1074,7 @@
 	background-repeat: no-repeat;
 	background-position: -960px -0px;
 	position:relative;
-	height: 1px;
-	left: 3px;
+	height: 2px;
 	margin: 0px;
 	padding: 0px;
 }
@@ -1103,14 +1094,14 @@
 	background-image: url('image.png');
 	background-repeat: no-repeat;
 	background-position: -540px -0px;
-	width:16px;
+	width:15px;
 	height:15px;
 }
 .scrollChapH .end {
 	background-image: url('image.png');
 	background-repeat: no-repeat;
 	background-position: -570px -0px;
-	width:16px;
+	width:15px;
 	height:15px;
 }
 
@@ -1144,9 +1135,8 @@
 	background-position: -660px -0px;
 	position:relative;
 	float: left;
-	width: 1px;
-	height: 9px;
-	top: 3px;
+	width: 2px;
+	height: 15px;
 	margin: 0px;
 	padding: 0px;
 }
@@ -1155,9 +1145,8 @@
 	background-image: url('scaled/scrollbars/horizontal.png');
 	position:relative;
 	float: left;
-	top: 3px;
 	left:100%;
-	height:9px;
+	height:15px;
 	padding:0px;
 	margin:0px;
 }
@@ -1167,9 +1156,8 @@
 	background-position: -690px -0px;
 	position:relative;
 	float: left;
-	width: 1px;
-	height: 9px;
-	top: 3px;
+	width: 2px;
+	height: 15px;
 	margin: 0px;
 	padding: 0px;
 }

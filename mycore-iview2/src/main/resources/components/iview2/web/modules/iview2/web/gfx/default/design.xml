@@ -1,17 +1,17 @@
 <vars>
-	<area location="file:chapter">
-		<var name="chapterEmbedded" type="bool" desc="Defines if chapter-overview is always shown (embedded) in surface">false</var>
-		<var name="chapDynResize" type="bool" desc="Activates dynamic resizing of the chapter-overview">true</var>
-		<var name="chapResizeMul" type="float" desc="">1</var>
-		<var name="chapResizeAdd" type="float" desc="">0</var>
-		<var name="chapColor" type="array">a</var>
-		<var name="chapColor[0]" type="color" desc="Background-Color of currently viewed Entry">#85a6bc</var>
-		<var name="chapColor[1]" type="color" desc="Background-Color of currently not viewed Entry">#fcfeff</var>
-		<var name="chapColor[2]" type="color" desc="Background-Color of mouse-hovered (currently not viewed) Entry">#e2e6e9</var>
-	</area>
-	<area location="file:thumbnail">
-		<var name="ausschnittParentMODDED" type="string">body</var>
-		<var name="GESAMT_SCROLL" type="float">16</var>
-				<var name="DampInViewer" type="bool" desc="Defines if the Damper is located within the Viewer or somewhere else">true</var>
-	</area>
+  <area location="file:chapter">
+    <var name="chapterEmbedded" type="bool" desc="Defines if chapter-overview is always shown (embedded) in surface">false</var>
+    <var name="chapDynResize" type="bool" desc="Activates dynamic resizing of the chapter-overview">true</var>
+    <var name="chapResizeMul" type="float" desc="">1</var>
+    <var name="chapResizeAdd" type="float" desc="">0</var>
+    <var name="chapColor" type="array">a</var>
+    <var name="chapColor[0]" type="color" desc="Background-Color of currently viewed Entry">#85a6bc</var>
+    <var name="chapColor[1]" type="color" desc="Background-Color of currently not viewed Entry">#fcfeff</var>
+    <var name="chapColor[2]" type="color" desc="Background-Color of mouse-hovered (currently not viewed) Entry">#e2e6e9</var>
+  </area>
+  <area location="file:thumbnail">
+    <var name="ausschnittParentMODDED" type="string">body</var>
+    <var name="GESAMT_SCROLL" type="float">15</var>
+    <var name="DampInViewer" type="bool" desc="Defines if the Damper is located within the Viewer or somewhere else">true</var>
+  </area>
 </vars>
