@@ -1,4 +1,100 @@
 loadVars("../modules/iview2/web/config.xml");
+if (typeof IView2 == "undefined")
+	function IView2(){};
+
+IView2.Events = [];
+	
+IView2.findEvents = function(target, type, callback) {
+	// to allow differences in function call
+	if (type) type = type.toLowerCase();
+	
+	var i = IView2.Events.length;
+	if (!i) return;
+	
+	var selection = [];
+	
+	// Durchlaufe alle registrierten Events
+	while (i >= 1) {
+		 var item = IView2.Events[i - 1];
+		
+		// if some argument is left out
+		if (!target) {
+			var usedTarget = target;
+		} else {
+			var usedTarget = item[0];
+		}
+		if (!type) {
+			var usedType = type;
+		} else {
+			// because browser-differences
+			var usedType = item[1].toLowerCase();
+		}
+		if (!callback) {
+			var usedCallback = callback;
+		} else {
+			var usedCallback = item[2];
+		}
+		
+		// Wenn gefunden, dann gib Eintragsnummer zur�ck
+		if (EventUtils.objEquals(target, usedTarget) && type === usedType && callback === usedCallback)	{
+			selection[selection.length] = i-1;
+		}
+		i--;
+	}
+	
+	if (selection.length > 0) {
+		return selection;
+	} else {
+		// falls nicht gefunden
+		return false;
+	}
+}
+
+IView2.removeEventListener = function(target, type, callback, captures) {
+	// check if Event was registred in past
+	var selection = IView2.findEvents(target, type, callback);
+	if (selection) {
+		index = 0;
+		while (index < selection.length) {
+			var item = IView2.Events[selection[index]];
+			// item[3] ist der zugeh�rige Wrapper, den wir zum entfernen ben�tigen.
+			switch (item[1].toLowerCase()) {//Browser behave on some kinds of events totally different therefore its needed to find it out and take action correctly
+				case "mousescroll":
+					if (isBrowser(["IE", "Opera", "Safari"])) {
+						if (isBrowser("IE")) {
+							item[0].detachEvent("on" + item[1], item[3]);
+						} else {
+							item[0].removeEventListener("mousewheel", item[3], false);
+						}
+					} else {
+						item[0].removeEventListener("DOMMouseScroll",item[3], false);
+					}
+				break;
+				default://all Events which are just different in the function name to apply
+					if (item[0].removeEventListener) {
+						// W3C standard
+						item[0].removeEventListener(item[1], item[3], false);
+					} else if (item[0].attachEvent) {
+						// newer IE
+						item[0].detachEvent("on" + item[1], item[3]);
+					} else {
+						// IE 5 Mac and some others
+						// TODO: needs to be tested
+						item[0]['on'+item[1]] = "";
+					}
+					result = true;
+				break;
+			}
+			
+			// Das event wird gelöscht.
+			IView2.Events.splice(selection[index], 1);
+			
+			index++;
+		}
+	}
+}
+
+
 function initializeGraphic(viewID) {
 	//Iview[viewID].baseUri = baseUri + "/" + viewID;//TODO sicherlich andere bessere Lösung
 	Iview[viewID].zoomScale = 1;//init for the Zoomscale is changed within CalculateZoomProp
@@ -8,14 +104,19 @@ function initializeGraphic(viewID) {
 	// if the viewer started with an image with an single zoomLevel 0, because zoomMax = zoomInit & so initialZoom wont set
 	Iview[viewID].initialZoom = 0;
 	Iview[viewID].images = [];
+	PanoJS.USE_SLIDE = false;
+	PanoJS.USE_LOADER_IMAGE = false;
 	// opera triggers the onload twice
+	var iviewTileUrlProvider = new PanoJS.TileUrlProvider(Iview[viewID].baseUri, Iview[viewID].prefix, 'jpg');
+	iviewTileUrlProvider.assembleUrl = function(xIndex, yIndex, zoom){
+	    return this.baseUri + '/' + this.prefix + '/' + zoom + '/' + yIndex + '/' + xIndex + '.' + this.extension +
+	        (PanoJS.REVISION_FLAG ? '?r=' + PanoJS.REVISION_FLAG : '');
+	};
 	if (Iview[viewID].viewerBean == null) {
-		Iview[viewID].viewerBean = new GSIV("viewer"+viewID, {
-			tileBaseUri: Iview[viewID].baseUri,
-			tilePrefix: Iview[viewID].prefix,
+		Iview[viewID].viewerBean = new PanoJS("viewer"+viewID, {
 			initialPan: {'x' : 0, 'y' : 0 },//Koordianten der oberen linken Ecke
 			tileSize: Iview[viewID].tilesize,//Kachelgr��e
-			tileExtension: "jpg",
+			tileUrlProvider: iviewTileUrlProvider,
 			maxZoom: Iview[viewID].zoomMax,
 			initialZoom: Iview[viewID].zoomInit,//Anfangs-Zoomlevel
 			blankTile: "../modules/iview2/web/" + styleFolderUri + 'blank.gif',

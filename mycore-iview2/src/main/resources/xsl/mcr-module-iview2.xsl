@@ -179,32 +179,32 @@
   </xsl:template>
   <xsl:template name="iview2.init">
     <xsl:param name="groupID" />
-    <script type="text/javascript" language="JavaScript" src="{$WebApplicationBaseURL}/modules/iview2/web/js/EventUtils.js" />
-    <script type="text/javascript" language="JavaScript" src="{$WebApplicationBaseURL}/modules/iview2/web/js/GSIV.js" />
+    <script type="text/javascript" language="JavaScript" src="{$WebApplicationBaseURL}modules/iview2/web/js/EventUtils.js" />
+    <script type="text/javascript" language="JavaScript" src="{$WebApplicationBaseURL}modules/iview2/web/js/PanoJS.js" />
     <!-- Viewer -->
-    <script type="text/javascript" language="JavaScript" src="{$WebApplicationBaseURL}/modules/iview2/web/js/XML.js" />
+    <script type="text/javascript" language="JavaScript" src="{$WebApplicationBaseURL}modules/iview2/web/js/XML.js" />
     <!--XML Funktionen-->
-    <script type="text/javascript" language="JavaScript" src="{$WebApplicationBaseURL}/modules/iview2/web/js/Utils.js" />
+    <script type="text/javascript" language="JavaScript" src="{$WebApplicationBaseURL}modules/iview2/web/js/Utils.js" />
     <!--Allgemeine Util Funktionen-->
-    <script type="text/javascript" language="JavaScript" src="{$WebApplicationBaseURL}/modules/iview2/web/js/navigation.js" />
+    <script type="text/javascript" language="JavaScript" src="{$WebApplicationBaseURL}modules/iview2/web/js/navigation.js" />
     <!--Navigation Functions-->
-    <script type="text/javascript" language="JavaScript" src="{$WebApplicationBaseURL}/modules/iview2/web/js/scrollBars.js" />
+    <script type="text/javascript" language="JavaScript" src="{$WebApplicationBaseURL}modules/iview2/web/js/scrollBars.js" />
     <!--Scrollbar Klasse-->
-    <script type="text/javascript" language="JavaScript" src="{$WebApplicationBaseURL}/modules/iview2/web/js/blendWorks.js" />
+    <script type="text/javascript" language="JavaScript" src="{$WebApplicationBaseURL}modules/iview2/web/js/blendWorks.js" />
     <!--Blend Funktionen-->
-    <script type="text/javascript" language="JavaScript" src="{$WebApplicationBaseURL}/modules/iview2/web/js/cutOut.js" />
+    <script type="text/javascript" language="JavaScript" src="{$WebApplicationBaseURL}modules/iview2/web/js/cutOut.js" />
     <!--Ausschnittbildchen Klasse-->
-    <script type="text/javascript" language="JavaScript" src="{$WebApplicationBaseURL}/modules/iview2/web/js/chapter.js" />
+    <script type="text/javascript" language="JavaScript" src="{$WebApplicationBaseURL}modules/iview2/web/js/chapter.js" />
     <!--Chapter Klasse-->
-    <script type="text/javascript" language="JavaScript" src="{$WebApplicationBaseURL}/modules/iview2/web/js/overview.js" />
+    <script type="text/javascript" language="JavaScript" src="{$WebApplicationBaseURL}modules/iview2/web/js/overview.js" />
     <!--Overview Klasse-->
-    <script type="text/javascript" language="JavaScript" src="{$WebApplicationBaseURL}/modules/iview2/web/js/Thumbnail.js" />
+    <script type="text/javascript" language="JavaScript" src="{$WebApplicationBaseURL}modules/iview2/web/js/Thumbnail.js" />
     <!--Hauptdatei-->
-    <script type="text/javascript" language="JavaScript" src="{$WebApplicationBaseURL}/modules/iview2/web/js/zoomBar.js" />
+    <script type="text/javascript" language="JavaScript" src="{$WebApplicationBaseURL}modules/iview2/web/js/zoomBar.js" />
     <!--ZoomBar-->
-    <script type="text/javascript" language="JavaScript" src="{$WebApplicationBaseURL}/modules/iview2/web/js/pageInput.js" />
+    <script type="text/javascript" language="JavaScript" src="{$WebApplicationBaseURL}modules/iview2/web/js/pageInput.js" />
     <!--PageInput-->
-    <script type="text/javascript" language="JavaScript" src="{$WebApplicationBaseURL}/modules/iview2/web/js/pageForm.js" />
+    <script type="text/javascript" language="JavaScript" src="{$WebApplicationBaseURL}modules/iview2/web/js/pageForm.js" />
     <!--PageForm-->
     <script type="text/javascript">function startViewer(viewID) {
       if (Iview[viewID].started) return;

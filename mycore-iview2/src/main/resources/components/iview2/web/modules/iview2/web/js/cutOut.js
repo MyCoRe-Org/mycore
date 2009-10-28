@@ -190,12 +190,6 @@ function cutOut() {
 		my.thumbnail.onload = function() {notifyOnload();};
 		my.thumbnail.src = url;
 		my.thumbnail.style.verticalAlign = "bottom";
-		
-		/* onload ist über EventUtils so nicht realisierbar, ohne ständiges Neuregistrieren
-		if (!(EventUtils.findEvents(my.thumbnail,"load",""))) {
-			EventUtils.addEventListener(my.thumbnail, 'load', function() { notifyOnload();}, false);
-		}
-		*/
 	}
 
 	/*

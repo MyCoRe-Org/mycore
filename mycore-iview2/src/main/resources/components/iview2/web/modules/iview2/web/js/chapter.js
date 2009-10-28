@@ -606,22 +606,12 @@ function chapter(newId, parent) {
 		scrollY.setParent(id);
 		scrollY.setSize(main.style.height);
 		
-		/*scrollX.init(true);
-		scrollX.addListener(scrollBar.LIST_MOVE, new function() { this.moved = function(vector) {my.firstElement.style.left = -my.scrollBarX.getValue() + "px";}});
-		scrollX.setParent(id);
-		scrollX.setSize(main.style.width);*/
-	
 		//EventRegistrations
 		EventUtils.addEventListener(main, 'mousemove', scrollY.mouseMove, false);
 		EventUtils.addEventListener(main, 'mouseup', scrollY.mouseUp, false);
-		EventUtils.removeEventListener(getElementsByClassName("empty","scrollChap"+viewID,"div")[0], 'mouseScroll', scrollY.scroll, false);
+		IView2.removeEventListener(getElementsByClassName("empty","scrollChap"+viewID,"div")[0], 'mouseScroll', scrollY.scroll, false);
 		EventUtils.addEventListener(main, 'mouseScroll', function(e) { e = getEvent(e); scrollY.scroll(e); e.cancelBubble = true;}, false);
 		
-	/*	EventUtils.addEventListener(main, 'mousemove', scrollX.mouseMove, false);
-		EventUtils.addEventListener(main, 'mouseup', scrollX.mouseUp, false);
-		EventUtils.removeEventListener(getElementsByClassName("empty","scrollChap"+viewID,"div")[0], 'mouseScroll', scrollX.scroll, false);
-		*/
-
 	}
 
 	/*

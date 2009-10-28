@@ -108,7 +108,7 @@ function loadPage(pageData, viewID) {
 	}
 	// moves viewer to zoomLevel zoomInit
 	//viewerBean.zoom(Iview[viewID].zoomInit-viewerBean.zoomLevel);
-	viewerBean.setZoomMax(Iview[viewID].zoomMax);
+	viewerBean.maxZoomLevel=Iview[viewID].zoomMax;
 	// handle special Modi for new Page
 	if (Iview[viewID].initialModus[0] == true) {
 		// letzte Seite war in fitToWidth
@@ -383,9 +383,10 @@ function handleResizeScrollbars(viewID) {
 @description is called if viewer is zooming; handles the correct sizing and displaying of the preloadpicture,
 various buttons and positioning of the cutOut accordingly the zoomlevel
 */
-function listenerZoom() {
+function listenerZoom(viewID) {
+	this.viewID=viewID;
 	this.viewerZoomed = function (zoomEvent) {
-		var viewID = zoomEvent.viewID;
+		var viewID = this.viewID;
 		var viewerBean = Iview[viewID].viewerBean;
 		// handle special Modes, needs to close
 		if (Iview[viewID].zoomWidth) {
@@ -422,10 +423,11 @@ function listenerZoom() {
 /*
 @description is calling if the picture is moving in the viewer and handles the size of the cutout accordingly the size of the picture
 */
-function listenerMove() {
+function listenerMove(viewID) {
+	this.viewID=viewID;
 	this.viewerMoved = function (event) {
 		// calculate via zoomlevel to the preview the left top point
-		var viewID = event.viewID;
+		var viewID = this.viewID;
 		var newX = - (event.x / Math.pow(2, Iview[viewID].viewerBean.zoomLevel))/Iview[viewID].zoomScale;
 		var newY = - (event.y / Math.pow(2, Iview[viewID].viewerBean.zoomLevel))/Iview[viewID].zoomScale;
 
@@ -549,11 +551,11 @@ function updateModuls(viewID) {
 */
 function viewerScroll(delta, viewID) {
 	if (delta > 0) {
-		Iview[viewID].viewerBean.positionTiles({'x': 0,'y': GSIV.MOVE_THROTTLE*10}, true);
-		Iview[viewID].viewerBean.notifyViewerMoved({'x': 0,'y': GSIV.MOVE_THROTTLE*10});
+		Iview[viewID].viewerBean.positionTiles({'x': 0,'y': PanoJS.MOVE_THROTTLE*10}, true);
+		Iview[viewID].viewerBean.notifyViewerMoved({'x': 0,'y': PanoJS.MOVE_THROTTLE*10});
 	} else if (delta < 0)  {
-		Iview[viewID].viewerBean.positionTiles({'x': 0,'y': -GSIV.MOVE_THROTTLE*10}, true);
-		Iview[viewID].viewerBean.notifyViewerMoved({'x': 0,'y': -GSIV.MOVE_THROTTLE*10});
+		Iview[viewID].viewerBean.positionTiles({'x': 0,'y': -PanoJS.MOVE_THROTTLE*10}, true);
+		Iview[viewID].viewerBean.notifyViewerMoved({'x': 0,'y': -PanoJS.MOVE_THROTTLE*10});
 	}
 }
 

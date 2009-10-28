@@ -164,7 +164,7 @@ function overview(newId, parent, identer) {
 		EventUtils.addEventListener($(id), 'mousemove', scrollOverview.mouseMove, false);
 		EventUtils.addEventListener($(id), 'mouseup', scrollOverview.mouseUp, false);
 		// default mouseScroll event von Scrollbar entfernen, da sonst doppelt registriert
-		EventUtils.removeEventListener(getElementsByClassName("empty","scrollOV"+viewID,"div")[0], 'mouseScroll', scrollOverview.scroll, false);
+		IView2.removeEventListener(getElementsByClassName("empty","scrollOV"+viewID,"div")[0], 'mouseScroll', scrollOverview.scroll, false);
 		EventUtils.addEventListener($(id), 'mouseScroll', scrollOverview.scroll, false);
 	}
 
@@ -284,7 +284,7 @@ function overview(newId, parent, identer) {
 		
 		// nicht sicher ob das so in allen Browsern funktioniert
 		// linking the previews with the viewer, only if this wasen't done in past
-		if (!(EventUtils.findEvents($("previewDiv" + viewID +((i * amountWidth) + j)),"click",""))) {
+		if (!(IView2.findEvents($("previewDiv" + viewID +((i * amountWidth) + j)),"click",""))) {
 			EventUtils.addEventListener($("previewDiv" + viewID +((i * amountWidth) + j)), 'click', function(e) {notifyListenerClick((((i + currentFirstRow) * amountWidth) + j) + 1);}, true);
 		}
 		
@@ -296,13 +296,6 @@ function overview(newId, parent, identer) {
 		// fill Info div
 		$("infoDiv" + viewID +((i * amountWidth) + j)).innerHTML = pageName/*+" "+(((i + currentFirstRow) * amountWidth) + j + 1)*/; 
 		// page 0 doesn't exist
-		
-		/*
-		if (EventUtils.findEvents(origImage,"load","")) {
-			EventUtils.removeEventListener(origImage, 'load', "", false);
-		}
-		EventUtils.addEventListener(origImage, 'load', function(){trimImage(preview, source, origHeight, origWidth);}, true);
-		*/
 		
 		// nett anzuschaun ist es auch, wenn source bereits vor onload des origImage gesetzt wird, da die Bilder dann sichtbar zusammenschrumpfen
 		// Muss man gegebenenfalls zuerst das Bild unsichtbar machen und dann wieder einblenden sobald es fertig geladen & geschrumpft ist.

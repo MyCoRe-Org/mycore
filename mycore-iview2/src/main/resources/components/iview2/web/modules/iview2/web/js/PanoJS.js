@@ -1,5 +1,5 @@
 /**
- * Giant Scalable Image Viewer (GSIV) 1.0
+ * Panoramic JavaScript Image Viewer (PanoJS) 1.0.2
  *
  * Generates a draggable and zoomable viewer for images that would
  * be otherwise too large for a browser window.  Examples would include
@@ -24,7 +24,7 @@
  * The "surface" node is the transparent mouse-responsive layer of the
  * image viewer, and should match the well in size.
  *
- * var viewerBean = new GSIV(element, 'tiles', 256, 3, 1);
+ * var viewerBean = new PanoJS(element, 'tiles', 256, 3, 1);
  *
  * To disable the image toolbar in IE, be sure to add the following:
  * <meta http-equiv="imagetoolbar" content="no" />
@@ -57,7 +57,7 @@
  * TODO: additional jsdoc and package jsmin
  * TODO: Tile could be an object
  */
-function GSIV(viewer, options) {
+function PanoJS(viewer, options) {
 
 	// listeners that are notified on a move (pan) event
 	this.viewerMovedListeners = [];
@@ -76,30 +76,27 @@ function GSIV(viewer, options) {
 	}
 
 	if (typeof options.tileUrlProvider != 'undefined' &&
-		GSIV.isInstance(options.tileUrlProvider, GSIV.TileUrlProvider)) {
+		PanoJS.isInstance(options.tileUrlProvider, PanoJS.TileUrlProvider)) {
 		this.tileUrlProvider = options.tileUrlProvider;
 	}
 	else {
-		this.tileUrlProvider = new GSIV.TileUrlProvider(
-			options.tileBaseUri ? options.tileBaseUri : GSIV.TILE_BASE_URI,
-			options.tilePrefix ? options.tilePrefix : GSIV.TILE_PREFIX,
-			options.tileExtension ? options.tileExtension : GSIV.TILE_EXTENSION
+		this.tileUrlProvider = new PanoJS.TileUrlProvider(
+			options.tileBaseUri ? options.tileBaseUri : PanoJS.TILE_BASE_URI,
+			options.tilePrefix ? options.tilePrefix : PanoJS.TILE_PREFIX,
+			options.tileExtension ? options.tileExtension : PanoJS.TILE_EXTENSION
 		);
 	}
 
-	this.tileSize = (options.tileSize ? options.tileSize : GSIV.TILE_SIZE);	
+	this.tileSize = (options.tileSize ? options.tileSize : PanoJS.TILE_SIZE);
+
 	// assign and do some validation on the zoom levels to ensure sanity
 	this.zoomLevel = (typeof options.initialZoom == 'undefined' ? -1 : parseInt(options.initialZoom));
-//	this.maxZoomLevel = zoomMax//(typeof options.maxZoom == 'undefined' ? 0 : Math.abs(parseInt(options.maxZoom)));
-//	readd
 	this.maxZoomLevel = (typeof options.maxZoom == 'undefined' ? 0 : Math.abs(parseInt(options.maxZoom)));
-
-	this.viewID = options.viewID;	//add
 	if (this.zoomLevel > this.maxZoomLevel) {
 		this.zoomLevel = this.maxZoomLevel;
 	}
 
-	this.initialPan = (options.initialPan ? options.initialPan : GSIV.INITIAL_PAN);
+	this.initialPan = (options.initialPan ? options.initialPan : PanoJS.INITIAL_PAN);
 
 	this.initialized = false;
 	this.surface = null;
@@ -115,8 +112,8 @@ function GSIV(viewer, options) {
 	this.pressed = false;
 	this.tiles = [];
 	this.cache = {};
-	var blankTile = options.blankTile ? options.blankTile : GSIV.BLANK_TILE_IMAGE;
-	var loadingTile = options.loadingTile ? options.loadingTile : GSIV.LOADING_TILE_IMAGE;
+	var blankTile = options.blankTile ? options.blankTile : PanoJS.BLANK_TILE_IMAGE;
+	var loadingTile = options.loadingTile ? options.loadingTile : PanoJS.LOADING_TILE_IMAGE;
 	this.cache['blank'] = new Image();
 	this.cache['blank'].src = blankTile;
 	if (blankTile != loadingTile) {
@@ -132,52 +129,54 @@ function GSIV(viewer, options) {
 	this.moveCount = 0;
 	this.slideMonitor = 0;
 	this.slideAcceleration = 0;
+
 	// add to viewer registry
-	GSIV.VIEWERS[GSIV.VIEWERS.length] = this;
+	PanoJS.VIEWERS[PanoJS.VIEWERS.length] = this;
 }
 
 // project specific variables
-GSIV.PROJECT_NAME = 'GSIV';
-GSIV.PROJECT_VERSION = '1.0.0';
-GSIV.REVISION_FLAG = '';
+PanoJS.PROJECT_NAME = 'PanoJS';
+PanoJS.PROJECT_VERSION = '1.0.0';
+PanoJS.REVISION_FLAG = '';
 
 // CSS definition settings
-GSIV.SURFACE_STYLE_CLASS = 'surface';
-GSIV.WELL_STYLE_CLASS = 'well';
-GSIV.CONTROLS_STYLE_CLASS = 'controls'
-GSIV.TILE_STYLE_CLASS = 'tile';
+PanoJS.SURFACE_STYLE_CLASS = 'surface';
+PanoJS.WELL_STYLE_CLASS = 'well';
+PanoJS.CONTROLS_STYLE_CLASS = 'controls'
+PanoJS.TILE_STYLE_CLASS = 'tile';
 
 // language settings
-GSIV.MSG_BEYOND_MIN_ZOOM = 'Es kann nicht weiter herausgezoomt werden.';
-GSIV.MSG_BEYOND_MAX_ZOOM = 'Es kann nicht weiter hereingezoomt werden.';
+PanoJS.MSG_BEYOND_MIN_ZOOM = 'Cannot zoom out past the current level.';
+PanoJS.MSG_BEYOND_MAX_ZOOM = 'Cannot zoom in beyond the current level.';
 
 // defaults if not provided as constructor options
-GSIV.TILE_BASE_URI = 'tiles';
-GSIV.TILE_PREFIX = 'tile-';
-GSIV.TILE_EXTENSION = 'jpg';
-GSIV.TILE_SIZE = 256;
-GSIV.BLANK_TILE_IMAGE = 'blank.gif';
-GSIV.LOADING_TILE_IMAGE = 'blank.gif';//'progress.gif';
-GSIV.INITIAL_PAN = { 'x' : 0, 'y' : 0 };
-GSIV.USE_LOADER_IMAGE = false;
-GSIV.USE_SLIDE = false;
-GSIV.USE_KEYBOARD = true;
+PanoJS.TILE_BASE_URI = 'tiles';
+PanoJS.TILE_PREFIX = 'tile-';
+PanoJS.TILE_EXTENSION = 'jpg';
+PanoJS.TILE_SIZE = 256;
+PanoJS.BLANK_TILE_IMAGE = 'blank.gif';
+PanoJS.LOADING_TILE_IMAGE = 'blank.gif';
+PanoJS.INITIAL_PAN = { 'x' : .5, 'y' : .5 };
+PanoJS.USE_LOADER_IMAGE = true;
+PanoJS.USE_SLIDE = true;
+PanoJS.USE_KEYBOARD = true;
 
 // performance tuning variables
-GSIV.MOVE_THROTTLE = 3;
-GSIV.SLIDE_DELAY = 40;
-GSIV.SLIDE_ACCELERATION_FACTOR = 5;
+PanoJS.MOVE_THROTTLE = 3;
+PanoJS.SLIDE_DELAY = 40;
+PanoJS.SLIDE_ACCELERATION_FACTOR = 5;
 
 // the following are calculated settings
-GSIV.DOM_ONLOAD = (navigator.userAgent.indexOf('KHTML') >= 0 ? false : true);
-GSIV.GRAB_MOUSE_CURSOR = (navigator.userAgent.search(/KHTML|Opera/i) >= 0 ? 'pointer' : (document.attachEvent ? 'url(grab.cur)' : '-moz-grab'));
-GSIV.GRABBING_MOUSE_CURSOR = (navigator.userAgent.search(/KHTML|Opera/i) >= 0 ? 'move' : (document.attachEvent ? 'url(grabbing.cur)' : '-moz-grabbing'));
+PanoJS.DOM_ONLOAD = (navigator.userAgent.indexOf('KHTML') >= 0 ? false : true);
+PanoJS.GRAB_MOUSE_CURSOR = (navigator.userAgent.search(/KHTML|Opera/i) >= 0 ? 'pointer' : (document.attachEvent ? 'url(grab.cur)' : '-moz-grab'));
+PanoJS.GRABBING_MOUSE_CURSOR = (navigator.userAgent.search(/KHTML|Opera/i) >= 0 ? 'move' : (document.attachEvent ? 'url(grabbing.cur)' : '-moz-grabbing'));
 
 // registry of all known viewers
-GSIV.VIEWERS = [];
+PanoJS.VIEWERS = [];
 
 // utility functions
-GSIV.isInstance = function(object, clazz) {
+PanoJS.isInstance = function(object, clazz) {
+	// FIXME: can this just be replaced with instanceof operator? It has been reported that __proto__ is specific to Netscape
 	while (object != null) {
 		if (object == clazz.prototype) {
 			return true;
@@ -189,13 +188,7 @@ GSIV.isInstance = function(object, clazz) {
 	return false;
 }
 
-GSIV.prototype = {
-
-	//added
-	setZoomMax: function(maxZoom) {
-		this.maxZoomLevel = maxZoom;
-	},
-	//endadd
+PanoJS.prototype = {
 
 	/**
 	 * Resize the viewer to fit snug inside the browser window (or frame),
@@ -222,7 +215,7 @@ GSIV.prototype = {
 		}
 		
 		calcWidth = Math.max(calcWidth - 2 * border, 0);
-		calcHeight = (Math.max(calcHeight - 2 * border, 0)) - parseInt(getStyle("viewer","top")); // WICHTIG ÄNDERUNG Subtrahend aufgrund dem Header und der nun absoluten Position
+		calcHeight = Math.max(calcHeight - 2 * border, 0);
 		if (calcWidth % 2) {
 			calcWidth--;
 		}
@@ -235,7 +228,7 @@ GSIV.prototype = {
 		this.height = calcHeight;
 		this.viewer.style.width = this.width + 'px';
 		this.viewer.style.height = this.height + 'px';
-		this.viewer.style.top = border + parseInt(getStyle("viewer","top")) + 'px'; //ÄNDERUNG wegen Header
+		this.viewer.style.top = border + 'px';
 		this.viewer.style.left = border + 'px';
 	},
 
@@ -262,6 +255,12 @@ GSIV.prototype = {
 				this.zoomLevel += 1;
 				fullSize *= 2;
 			} while (fullSize < Math.max(this.width, this.height));
+			// take into account picture smaller than window size
+			if (this.zoomLevel > this.maxZoomLevel) {
+				var diff = this.zoomLevel - this.maxZoomLevel;
+				this.zoomLevel = this.maxZoomLevel;
+				fullSize /= Math.pow(2, diff);
+			}
 		}
 
 		// move top level up and to the left so that the image is centered
@@ -275,25 +274,25 @@ GSIV.prototype = {
 		}
 
 		for (var child = this.viewer.firstChild; child; child = child.nextSibling) {
-			if (child.className == GSIV.SURFACE_STYLE_CLASS) {
+			if (child.className == PanoJS.SURFACE_STYLE_CLASS) {
 				this.surface = child;
 				child.backingBean = this;
 			}
-			else if (child.className == GSIV.WELL_STYLE_CLASS) {
+			else if (child.className == PanoJS.WELL_STYLE_CLASS) {
 				this.well = child;
 				child.backingBean = this;
 			}
-			else if (child.className == GSIV.CONTROLS_STYLE_CLASS) {
+			else if (child.className == PanoJS.CONTROLS_STYLE_CLASS) {
 				for (var control = child.firstChild; control; control = control.nextSibling) {
 					if (control.className) {
-						control.onclick = GSIV[control.className + 'Handler'];
+						control.onclick = PanoJS[control.className + 'Handler'];
 					}
 				}
 			}
 		}
 
 		this.viewer.backingBean = this;
-		this.surface.style.cursor = GSIV.GRAB_MOUSE_CURSOR;
+		this.surface.style.cursor = PanoJS.GRAB_MOUSE_CURSOR;
 		this.prepareTiles();
 		this.initialized = true;
 	},
@@ -301,6 +300,7 @@ GSIV.prototype = {
 	prepareTiles : function() {
 		var rows = Math.ceil(this.height / this.tileSize) + 1;
 		var cols = Math.ceil(this.width / this.tileSize) + 1;
+
 		for (var c = 0; c < cols; c++) {
 			var tileCol = [];
 
@@ -326,26 +326,13 @@ GSIV.prototype = {
 		
 			this.tiles.push(tileCol);
 		}
-//		EventUtils.addEventListener(this.viewer, 'mousedown', function(e) {GSIV.mousePressedHandler(e);}, false);
-//		EventUtils.addEventListener(this.viewer, 'mouseup', function(e) {GSIV.mouseReleasedHandler(e);}, false);
-//		EventUtils.addEventListener(this.viewer, 'mouseout', function(e) {GSIV.mouseReleasedHandler(e);}, false);
-//		EventUtils.addEventListener(this.viewer, 'dblclick', function(e) {GSIV.doubleClickHandler(e);}, false);
 
-		this.surface.onmousedown = GSIV.mousePressedHandler;
-		this.surface.onmouseup = this.surface.onmouseout = GSIV.mouseReleasedHandler;
-		this.surface.ondblclick = GSIV.doubleClickHandler;
-	
-		// IE l�st Pfeiltasten Events bei onkeypress nicht aus
-		if (isBrowser("ie")) {
-			document.onkeydown = function(e) {
-				GSIV.keyboardMoveHandler(e);
-				GSIV.keyboardZoomHandler(e);
-			}
-		} else {
-			document.onkeypress = function(e) {
-				GSIV.keyboardMoveHandler(e);
-				GSIV.keyboardZoomHandler(e);
-			}
+		this.surface.onmousedown = PanoJS.mousePressedHandler;
+		this.surface.onmouseup = this.surface.onmouseout = PanoJS.mouseReleasedHandler;
+		this.surface.ondblclick = PanoJS.doubleClickHandler;
+		if (PanoJS.USE_KEYBOARD) {
+			window.onkeypress = PanoJS.keyboardMoveHandler;
+			window.onkeydown = PanoJS.keyboardZoomHandler;
 		}
 
 		this.positionTiles();
@@ -361,26 +348,7 @@ GSIV.prototype = {
 		if (typeof motion == 'undefined') {
 			motion = { 'x' : 0, 'y' : 0 };
 		}
-		var viewID = this.viewID;
-		//Changed to work for multiple Viewers
-//hinzugef�gt damit Bild nicht �ber die R�nderl�uft
-		if (-(this.x + motion.x) > ((Iview[viewID].bildBreite/Math.pow(2, Iview[viewID].zoomMax - this.zoomLevel))*Iview[viewID].zoomScale-this.width)) {
-			motion.x = 0;
-			this.x = -((Iview[viewID].bildBreite/Math.pow(2, Iview[viewID].zoomMax - this.zoomLevel))*Iview[viewID].zoomScale-this.width);
-		}
-		if (-(this.y + motion.y) > ((Iview[viewID].bildHoehe/Math.pow(2, Iview[viewID].zoomMax - this.zoomLevel))*Iview[viewID].zoomScale-this.height)) {
-			motion.y = 0;
-			this.y = -((Iview[viewID].bildHoehe/Math.pow(2, Iview[viewID].zoomMax - this.zoomLevel))*Iview[viewID].zoomScale-this.height);
-		}
-//endadd
-		if(this.x + motion.x > 0){
-			this.x = 0;
-			motion.x = 0;
-		}		
-		if(this.y + motion.y > 0){
-			this.y = 0;
-			motion.y = 0;
-		}
+
 		for (var c = 0; c < this.tiles.length; c++) {
 			for (var r = 0; r < this.tiles[c].length; r++) {
 				var tile = this.tiles[c][r];
@@ -458,16 +426,6 @@ GSIV.prototype = {
 			}
 		}
 
-//add
-/*verschieben des Preload bildes damit man eine grobe Vorschau sieht von dem was kommt
-wird nur ausgeführt wenn Seite geladen ist, da ansonsten die Eigenschaften noch nicht vorhanden sind*/
-		if(Iview[viewID].loaded) {
-			document.getElementById('preload'+viewID).style.left = (this.x + motion.x) + "px";
-			document.getElementById('preload'+viewID).style.top = (this.y + motion.y) + "px";
-
-		}
-//endadd
-
 		// reset the x, y coordinates of the viewer according to motion
 		if (reset) {
 			this.x += motion.x;
@@ -520,7 +478,7 @@ wird nur ausgeführt wenn Seite geladen ist, da ansonsten die Eigenschaften noch
 			tileImg = this.cache[tileImgId] = this.createPrototype(src);
 		}
 
-		if (useBlankImage || !GSIV.USE_LOADER_IMAGE || tileImg.complete || (tileImg.image && tileImg.image.complete)) {
+		if (useBlankImage || !PanoJS.USE_LOADER_IMAGE || tileImg.complete || (tileImg.image && tileImg.image.complete)) {
 			tileImg.onload = function() {};
 			if (tileImg.image) {
 				tileImg.image.onload = function() {};
@@ -556,32 +514,22 @@ wird nur ausgeführt wenn Seite geladen ist, da ansonsten die Eigenschaften noch
 
 			// konqueror only recognizes the onload event on an Image
 			// javascript object, so we must handle that case here
-			if (!GSIV.DOM_ONLOAD) {
+			if (!PanoJS.DOM_ONLOAD) {
 				tileImg.image = new Image();
 				tileImg.image.onload = tileImg.onload;
 				tileImg.image.src = tileImg.src;
 			}
 		}
-//additions	
-		isloaded(tileImg, this.viewID);
-		var viewID = this.viewID;
-		//changes all not available Tiles to the blank one, so that no ugly Image not Found Pics popup.
-		tileImg.onerror = function () {this.src = Iview[viewID].viewerBean.cache['blank'].src; return true;};
-//endadd
 	},
 
 	createPrototype : function(src) {
 		var img = document.createElement('img');
 		img.src = src;
 		img.relativeSrc = src;
-		img.className = GSIV.TILE_STYLE_CLASS;
-//		img.style.width = this.tileSize + 'px';
-//		img.style.height = this.tileSize + 'px';
-		try {
-			return img;
-		} finally {
-			img = null;
-		}
+		img.className = PanoJS.TILE_STYLE_CLASS;
+		img.style.width = this.tileSize + 'px';
+		img.style.height = this.tileSize + 'px';
+		return img;
 	},
 
 	addViewerMovedListener : function(listener) {
@@ -598,8 +546,8 @@ wird nur ausgeführt wenn Seite geladen ist, da ansonsten die Eigenschaften noch
 	notifyViewerZoomed : function() {
 		var percentage = (100/(this.maxZoomLevel + 1)) * (this.zoomLevel + 1);
 		for (var i = 0; i < this.viewerZoomedListeners.length; i++) {
-			this.viewerZoomedListeners[i].viewerZoomed(				//add\/
-				new GSIV.ZoomEvent(this.x, this.y, this.zoomLevel, percentage, this.viewID)
+			this.viewerZoomedListeners[i].viewerZoomed(
+				new PanoJS.ZoomEvent(this.x, this.y, this.zoomLevel, percentage)
 			);
 		}
 	},
@@ -608,29 +556,32 @@ wird nur ausgeführt wenn Seite geladen ist, da ansonsten die Eigenschaften noch
 	 * Notify listeners of a move event on the viewer.
 	 */
 	notifyViewerMoved : function(coords) {
-  		if (typeof coords == 'undefined') {
+		if (typeof coords == 'undefined') {
 			coords = { 'x' : 0, 'y' : 0 };
-  		}
+		}
 
-  		for (var i = 0; i < this.viewerMovedListeners.length; i++) {
+		for (var i = 0; i < this.viewerMovedListeners.length; i++) {
 			this.viewerMovedListeners[i].viewerMoved(
-    				new GSIV.MoveEvent(
-     					this.x + (coords.x - this.mark.x),
-     					this.y + (coords.y - this.mark.y),
-     					this.viewID//add
-    				)
-   			);
-  		}
- 	},
+				new PanoJS.MoveEvent(
+					this.x + (coords.x - this.mark.x),
+					this.y + (coords.y - this.mark.y)
+				)
+			);
+		}
+	},
 
 	zoom : function(direction) {
 		// ensure we are not zooming out of range
 		if (this.zoomLevel + direction < 0) {
-//			alert(GSIV.MSG_BEYOND_MIN_ZOOM);
+			if (PanoJS.MSG_BEYOND_MIN_ZOOM) {
+				alert(PanoJS.MSG_BEYOND_MIN_ZOOM);
+			}
 			return;
 		}
 		else if (this.zoomLevel + direction > this.maxZoomLevel) {
-//			alert(GSIV.MSG_BEYOND_MAX_ZOOM);
+			if (PanoJS.MSG_BEYOND_MAX_ZOOM) {
+				alert(PanoJS.MSG_BEYOND_MAX_ZOOM);
+			}
 			return;
 		}
 
@@ -716,7 +667,7 @@ wird nur ausgeführt wenn Seite geladen ist, da ansonsten die Eigenschaften noch
 			return;
 		}
 
-		if (GSIV.USE_SLIDE) {
+		if (PanoJS.USE_SLIDE) {
 			var target = motion;
 			var x, y;
 			// handle special case of vertical movement
@@ -739,7 +690,7 @@ wird nur ausgeführt wenn Seite geladen ist, da ansonsten die Eigenschaften noch
 		this.positionTiles(motion, true);
 		this.notifyViewerMoved();
 
-		if (!GSIV.USE_SLIDE) {
+		if (!PanoJS.USE_SLIDE) {
 			return;
 		}
 
@@ -751,8 +702,8 @@ wird nur ausgeführt wenn Seite geladen ist, da ansonsten die Eigenschaften noch
 		var self = this;
 		// TODO: use an exponential growth rather than linear (should also depend on how far we are going)
 		// FIXME: this could be optimized by calling positionTiles directly perhaps
-		this.slideAcceleration += GSIV.SLIDE_ACCELERATION_FACTOR;
-		this.slideMonitor = setTimeout(function() { self.recenter(newcoords); }, GSIV.SLIDE_DELAY );
+		this.slideAcceleration += PanoJS.SLIDE_ACCELERATION_FACTOR;
+		this.slideMonitor = setTimeout(function() { self.recenter(newcoords); }, PanoJS.SLIDE_DELAY );
 	},
 
 	resize : function() {
@@ -760,8 +711,11 @@ wird nur ausgeführt wenn Seite geladen ist, da ansonsten die Eigenschaften noch
 		if (!this.initialized) {
 			return;
 		}
-		//macht Probleme bei IE
-		//this.viewer.style.display = 'none';
+
+        var newWidth = this.viewer.offsetWidth;
+        var newHeight = this.viewer.offsetHeight;
+
+		this.viewer.style.display = 'none';
 		this.clear();
 
 		var before = {
@@ -772,6 +726,10 @@ wird nur ausgeführt wenn Seite geladen ist, da ansonsten die Eigenschaften noch
 		if (this.border >= 0) {
 			this.fitToWindow(this.border);
 		}
+		else {
+            this.width = newWidth;
+            this.height = newHeight;
+        }
 
 		this.prepareTiles();
 
@@ -780,8 +738,10 @@ wird nur ausgeführt wenn Seite geladen ist, da ansonsten die Eigenschaften noch
 			'y' : Math.floor(this.height / 2)
 		};
 
-		this.x += (after.x - before.x);
-		this.y += (after.y - before.y);
+		if (this.border >= 0) {
+			this.x += (after.x - before.x);
+			this.y += (after.y - before.y);
+		}
 		this.positionTiles();
 		this.viewer.style.display = '';
 		this.initialized = true;
@@ -824,8 +784,8 @@ wird nur ausgeführt wenn Seite geladen ist, da ansonsten die Eigenschaften noch
 	 */
 	activate : function(pressed) {
 		this.pressed = pressed;
-		this.surface.style.cursor = (pressed ? GSIV.GRABBING_MOUSE_CURSOR : GSIV.GRAB_MOUSE_CURSOR);		
-		this.surface.onmousemove = (pressed ? GSIV.mouseMovedHandler : function() {});
+		this.surface.style.cursor = (pressed ? PanoJS.GRABBING_MOUSE_CURSOR : PanoJS.GRAB_MOUSE_CURSOR);
+		this.surface.onmousemove = (pressed ? PanoJS.mouseMovedHandler : function() {});
 	},
 
 	/**
@@ -841,6 +801,7 @@ wird nur ausgeführt wenn Seite geladen ist, da ansonsten die Eigenschaften noch
 
 	// QUESTION: where is the best place for this method to be invoked?
 	resetSlideMotion : function() {
+		// QUESTION: should this be > 0 ?	
 		if (this.slideMonitor != 0) {
 			clearTimeout(this.slideMonitor);
 			this.slideMonitor = 0;
@@ -850,38 +811,39 @@ wird nur ausgeführt wenn Seite geladen ist, da ansonsten die Eigenschaften noch
 	}
 };
 
-GSIV.TileUrlProvider = function(baseUri, prefix, extension) {
+PanoJS.TileUrlProvider = function(baseUri, prefix, extension) {
 	this.baseUri = baseUri;
 	this.prefix = prefix;
 	this.extension = extension;
 }
 
-GSIV.TileUrlProvider.prototype = {
+PanoJS.TileUrlProvider.prototype = {
 	assembleUrl: function(xIndex, yIndex, zoom) {
-	return this.baseUri + '/' + this.prefix + '/' + zoom + '/' + yIndex + '/' + xIndex + '.' + this.extension +
-	   (GSIV.REVISION_FLAG ? '?r=' + GSIV.REVISION_FLAG : '');
+		return this.baseUri + '/' +
+			this.prefix + zoom + '-' + xIndex + '-' + yIndex + '.' + this.extension +
+			(PanoJS.REVISION_FLAG ? '?r=' + PanoJS.REVISION_FLAG : '');
 	}
 }
 
-GSIV.mousePressedHandler = function(e) {
+PanoJS.mousePressedHandler = function(e) {
 	e = e ? e : window.event;
 	// only grab on left-click
 	if (e.button < 2) {
 		var self = this.backingBean;
 		var coords = self.resolveCoordinates(e);
-//		if (self.pointExceedsBoundaries(coords)) {
-//			e.cancelBubble = true;
-//		}
-//		else {
+		if (self.pointExceedsBoundaries(coords)) {
+			e.cancelBubble = true;
+		}
+		else {
 			self.press(coords);
-//		}
+		}
 	}
 
 	// NOTE: MANDATORY! must return false so event does not propagate to well!
 	return false;
 };
 
-GSIV.mouseReleasedHandler = function(e) {
+PanoJS.mouseReleasedHandler = function(e) {
 	e = e ? e : window.event;
 	var self = this.backingBean;
 	if (self.pressed) {
@@ -890,30 +852,30 @@ GSIV.mouseReleasedHandler = function(e) {
 	}
 };
 
-GSIV.mouseMovedHandler = function(e) {
+PanoJS.mouseMovedHandler = function(e) {
 	e = e ? e : window.event;
 	var self = this.backingBean;
 	self.moveCount++;
-	if (self.moveCount % GSIV.MOVE_THROTTLE == 0) {
+	if (self.moveCount % PanoJS.MOVE_THROTTLE == 0) {
 		self.moveViewer(self.resolveCoordinates(e));
 	}
 };
 
-GSIV.zoomInHandler = function(e) {
+PanoJS.zoomInHandler = function(e) {
 	e = e ? e : window.event;
-	var self = this.backingBean;
+	var self = this.parentNode.parentNode.backingBean;
 	self.zoom(1);
 	return false;
 };
 
-GSIV.zoomOutHandler = function(e) {
+PanoJS.zoomOutHandler = function(e) {
 	e = e ? e : window.event;
-	var self = this.backingBean;
+	var self = this.parentNode.parentNode.backingBean;
 	self.zoom(-1);
 	return false;
 };
 
-GSIV.doubleClickHandler = function(e) {
+PanoJS.doubleClickHandler = function(e) {
 	e = e ? e : window.event;
 	var self = this.backingBean;
 	coords = self.resolveCoordinates(e);
@@ -923,66 +885,40 @@ GSIV.doubleClickHandler = function(e) {
 	}
 };
 
-GSIV.keyboardMoveHandler = function(e) {
+PanoJS.keyboardMoveHandler = function(e) {
 	e = e ? e : window.event;
-	for (var i = 0; i < GSIV.VIEWERS.length; i++) {
-		var viewer = GSIV.VIEWERS[i];
-		if (e.keyCode == 38){
-				viewer.positionTiles({'x': 0,'y': GSIV.MOVE_THROTTLE}, true);
-				viewer.notifyViewerMoved({'x': 0,'y': GSIV.MOVE_THROTTLE});//added
-				if (!(isBrowser("ie"))) e.preventDefault();
-		}
-		if (e.keyCode == 39){
-				viewer.positionTiles({'x': -GSIV.MOVE_THROTTLE,'y': 0}, true);
-				viewer.notifyViewerMoved({'x': -GSIV.MOVE_THROTTLE,'y': 0});//added
-				if (!(isBrowser("ie"))) e.preventDefault();
-		}
-		if (e.keyCode == 40){
-				viewer.positionTiles({'x': 0,'y': -GSIV.MOVE_THROTTLE}, true);
-				viewer.notifyViewerMoved({'x': 0,'y': -GSIV.MOVE_THROTTLE});//added
-				if (!(isBrowser("ie"))) e.preventDefault();
-		}
-		if (e.keyCode == 37){
-				viewer.positionTiles({'x': GSIV.MOVE_THROTTLE,'y': 0}, true);
-				viewer.notifyViewerMoved({'x': GSIV.MOVE_THROTTLE,'y': 0});//added
-				if (!(isBrowser("ie"))) e.preventDefault();
-		}
+	for (var i = 0; i < PanoJS.VIEWERS.length; i++) {
+		var viewer = PanoJS.VIEWERS[i];
+		if (e.keyCode == 38)
+				viewer.positionTiles({'x': 0,'y': -PanoJS.MOVE_THROTTLE}, true);
+		if (e.keyCode == 39)
+				viewer.positionTiles({'x': -PanoJS.MOVE_THROTTLE,'y': 0}, true);
+		if (e.keyCode == 40)
+				viewer.positionTiles({'x': 0,'y': PanoJS.MOVE_THROTTLE}, true);
+		if (e.keyCode == 37)
+				viewer.positionTiles({'x': PanoJS.MOVE_THROTTLE,'y': 0}, true);
 	}
 }
 
-GSIV.keyboardZoomHandler = function(e) {
+PanoJS.keyboardZoomHandler = function(e) {
 	e = e ? e : window.event;
-	for (var i = 0; i < GSIV.VIEWERS.length; i++) {
-		var viewer = GSIV.VIEWERS[i];//changed
-		// Opera auch bei "Einfg" --> 43
-		if (e.keyCode == 109 || (e.keyCode == 45 && isBrowser("opera"))|| e.charCode == 45) {
-			viewer.zoom(-1);
-			if (Iview[viewer.viewID].useZoombar) {
-				Iview[viewer.viewID].zoomBar.moveBarToLevel(viewer.zoomLevel);
-			}
-			if (!(isBrowser("ie"))) e.preventDefault();
-		}
-		if (e.keyCode == 107 || e.keyCode == 61 || (e.keyCode == 43 && isBrowser("opera")) || e.charCode == 43) {
-			viewer.zoom(1);
-			if (Iview[viewer.viewID].useZoombar) {
-				Iview[viewer.viewID].zoomBar.moveBarToLevel(viewer.zoomLevel);
-			}
-			if (!(isBrowser("ie"))) e.preventDefault();
-		}//end change;
+	for (var i = 0; i < PanoJS.VIEWERS.length; i++) {
+		var viewer = PanoJS.VIEWERS[i];
+		if (e.keyCode == 109)
+				viewer.zoom(-1);
+		if (e.keyCode == 107)
+				viewer.zoom(1);
 	}
 }
-//Param add viewID
-GSIV.MoveEvent = function(x, y, viewID) {
+
+PanoJS.MoveEvent = function(x, y) {
 	this.x = x;
 	this.y = y;
-	this.viewID = viewID;
 };
 
-//Param add viewID
-GSIV.ZoomEvent = function(x, y, level, percentage, viewID) {
+PanoJS.ZoomEvent = function(x, y, level, percentage) {
 	this.x = x;
 	this.y = y;
 	this.percentage = percentage;
 	this.level = level;
-	this.viewID = viewID;
 };

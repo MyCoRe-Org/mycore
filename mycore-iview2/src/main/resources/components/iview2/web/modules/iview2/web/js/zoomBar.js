@@ -22,7 +22,7 @@ function zoomBar(newId, parent, identer) {
 	
 	// visual Cursor
 	var zoomBarGrabCursor = (navigator.userAgent.search(/KHTML|Opera/i) >= 0 ? 'pointer' : (document.attachEvent ? 'url(grab.cur)' : '-moz-grab'));
-	var zoomBarGrabbingCursor = GSIV.GRABBING_MOUSE_CURSOR = (navigator.userAgent.search(/KHTML|Opera/i) >= 0 ? 'move' : (document.attachEvent ? 'url(grabbing.cur)' : '-moz-grabbing'));
+	var zoomBarGrabbingCursor = PanoJS.GRABBING_MOUSE_CURSOR = (navigator.userAgent.search(/KHTML|Opera/i) >= 0 ? 'move' : (document.attachEvent ? 'url(grabbing.cur)' : '-moz-grabbing'));
 
 	// Listener
 	var listener = [];
