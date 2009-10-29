@@ -1,0 +1,19 @@
+<project name="migration20-21">
+  <import file="../../integrate.xml" />
+  <!-- - - - - - - - - - - - - - - - - - 
+          target: config                      
+         - - - - - - - - - - - - - - - - -
+-->
+  <target name="config">
+    <mcr-config action="addInclude"
+                propertyfile="${build.config}/mycore.properties"
+                key="MCR.CLI.Classes.Internal"
+                value="org.mycore.services.migration.MCRMigrationCommands21" />
+    <for param="table.class"
+         list="MCRXMLTABLE">
+      <sequential>
+        <AddHibernateMapping class="org.mycore.backend.hibernate.tables.@{table.class}" />
+      </sequential>
+    </for>
+  </target>
+</project>
