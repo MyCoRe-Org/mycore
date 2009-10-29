@@ -38,6 +38,8 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.StringTokenizer;
 
+import javax.servlet.ServletContext;
+
 import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
@@ -614,32 +616,22 @@ public class MCRSimpleWorkflowManager {
 
     /**
      * The method return page name of the next URL of the workflow.
+     * 
+     * @param context the servlet context
      * @param pagedir the base directory of the WEB application
      * @param base the MCRObjectID base ID
      * @return the workflow URL
      */
-    public final String getWorkflowFile(String pagedir, String base) {
+    public final String getWorkflowFile(ServletContext context, String pagedir, String base) {
         StringBuffer sb = new StringBuffer();
         sb.append(pagedir).append("editor_").append(base).append("_editor.xml");
-        try {
-            URL url = new URL(MCRServlet.getBaseURL() + sb.toString());
-            HttpURLConnection http = (HttpURLConnection) url.openConnection();
-            if (http.getResponseCode() != 200) {
-                int i = base.indexOf('_');
-                sb = new StringBuffer();
-                sb.append(pagedir).append("editor_").append(base.substring(i + 1)).append("_editor.xml");
-                url = new URL(MCRServlet.getBaseURL() + sb.toString());
-                http = (HttpURLConnection) url.openConnection();
-                if (http.getResponseCode() != 200) {
-                    sb = new StringBuffer("");
-                }
-            }
-        } catch (MalformedURLException e) {
-            sb = new StringBuffer("");
-        } catch (IOException e) {
-            sb = new StringBuffer("");
+        if(!new File(context.getRealPath(sb.toString())).exists()) {
+            sb = new StringBuffer();
+            int i = base.indexOf('_');
+            sb.append(pagedir).append("editor_").append(base.substring(i + 1)).append("_editor.xml");
+            if(!new File(context.getRealPath(sb.toString())).exists())
+                sb = new StringBuffer("");
         }
         return sb.toString();
-    }
-
+    } 
 }

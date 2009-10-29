@@ -68,7 +68,7 @@ public class MCRCheckEditACLServlet extends MCRCheckACLBase {
     protected String getNextURL(MCRObjectID ID, boolean okay) throws MCRActiveLinkException {
         StringBuffer sb = new StringBuffer();
         if (okay) {
-            sb.append(WFM.getWorkflowFile(pagedir, ID.getBase()));
+            sb.append(WFM.getWorkflowFile(getServletContext(), pagedir, ID.getBase()));
         } else {
 
             sb.append(pagedir).append(MCRConfiguration.instance().getString("MCR.SWF.PageErrorStore", "editor_error_store.xml"));

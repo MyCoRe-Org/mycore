@@ -142,7 +142,7 @@ public class MCRCheckEditDerivateServlet extends MCRCheckBase {
         StringBuffer sb = new StringBuffer();
         if (okay) {
             // return all is ready
-            sb.append(WFM.getWorkflowFile(pagedir, ID.getBase()));
+            sb.append(WFM.getWorkflowFile(getServletContext(), pagedir, ID.getBase()));
         } else {
             sb.append(pagedir).append(MCRConfiguration.instance().getString("MCR.SWF.PageErrorStore", "editor_error_store.xml"));
         }

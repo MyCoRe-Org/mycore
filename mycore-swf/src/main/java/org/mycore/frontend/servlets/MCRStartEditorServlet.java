@@ -864,7 +864,7 @@ public class MCRStartEditorServlet extends MCRServlet {
             job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + usererrorpage));
             return;
         }
-        String wfurl = WFM.getWorkflowFile(pagedir, cd.myremcrid.getBase());
+        String wfurl = WFM.getWorkflowFile(getServletContext(), pagedir, cd.myremcrid.getBase());
         String fuhid = new MCRSWFUploadHandlerMyCoRe(cd.myremcrid.getId(), cd.mysemcrid.getId(), "new", getBaseURL() + wfurl)
                 .getID();
         cd.myfile = pagedir + "fileupload_new.xml";
@@ -966,7 +966,7 @@ public class MCRStartEditorServlet extends MCRServlet {
             return;
         }
 
-        String wfurl = WFM.getWorkflowFile(pagedir, cd.myremcrid.getBase());
+        String wfurl = WFM.getWorkflowFile(getServletContext(), pagedir, cd.myremcrid.getBase());
         WFM.deleteDerivateObject(cd.myremcrid, cd.mysemcrid);
 
         List<String> addr = WFM.getMailAddress(cd.myproject + "_" + cd.mytype, "wdelder");
@@ -1043,7 +1043,7 @@ public class MCRStartEditorServlet extends MCRServlet {
             }
         }
 
-        String wfurl = WFM.getWorkflowFile(pagedir, cd.myremcrid.getBase());
+        String wfurl = WFM.getWorkflowFile(getServletContext(), pagedir, cd.myremcrid.getBase());
         job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + wfurl));
     }
 
@@ -1066,7 +1066,7 @@ public class MCRStartEditorServlet extends MCRServlet {
             return;
         }
 
-        String wfurl = WFM.getWorkflowFile(pagedir, cd.mysemcrid.getBase());
+        String wfurl = WFM.getWorkflowFile(getServletContext(), pagedir, cd.mysemcrid.getBase());
 
         WFM.deleteMetadataObject(cd.mysemcrid);
 
@@ -1238,7 +1238,7 @@ public class MCRStartEditorServlet extends MCRServlet {
         copyobj.setLabel(cd.mytfmcrid.getId());
         MCRUtils.writeJDOMToFile(copyobj.createXML(), outFile);
 
-        String base = WFM.getWorkflowFile(pagedir, cd.mytfmcrid.getBase());
+        String base = WFM.getWorkflowFile(getServletContext(), pagedir, cd.mytfmcrid.getBase());
         Properties params = new Properties();
         job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(buildRedirectURL(getBaseURL() + base, params)));
     }
@@ -1379,8 +1379,7 @@ public class MCRStartEditorServlet extends MCRServlet {
                 out.close();
             }
         }
-        
-        String wfurl = WFM.getWorkflowFile(pagedir, cd.myremcrid.getBase());
+        String wfurl = WFM.getWorkflowFile(getServletContext(), pagedir, cd.myremcrid.getBase());
         job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + wfurl));
     }
 
