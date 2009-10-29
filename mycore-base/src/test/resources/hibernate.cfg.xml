@@ -22,7 +22,6 @@
     <mapping resource="org/mycore/datamodel/classifications2/impl/MCRCategoryLink.hbm.xml"/>
     <mapping resource="org/mycore/backend/hibernate/tables/MCRACCESSRULE.hbm.xml"/>
     <mapping resource="org/mycore/backend/hibernate/tables/MCRACCESS.hbm.xml"/>
-    <mapping resource="org/mycore/backend/hibernate/tables/MCRXMLTABLE.hbm.xml"/>
     <mapping resource="org/mycore/backend/hibernate/tables/MCRGROUPS.hbm.xml"/>
     <mapping resource="org/mycore/backend/hibernate/tables/MCRGROUPADMINS.hbm.xml"/>
     <mapping resource="org/mycore/backend/hibernate/tables/MCRGROUPMEMBERS.hbm.xml"/>
