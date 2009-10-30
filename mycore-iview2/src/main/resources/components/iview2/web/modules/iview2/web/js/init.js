@@ -106,6 +106,69 @@ function initializeGraphic(viewID) {
 	Iview[viewID].images = [];
 	PanoJS.USE_SLIDE = false;
 	PanoJS.USE_LOADER_IMAGE = false;
+	// press sonst nicht immer möglich, in PanoJS original merkwürdiges Verhalten
+	PanoJS.mousePressedHandler = function(e) {
+		e = e ? e : window.event;
+		// only grab on left-click
+		if (e.button < 2) {
+			var self = this.backingBean;
+			var coords = self.resolveCoordinates(e);
+			self.press(coords);
+		}
+	
+		// NOTE: MANDATORY! must return false so event does not propagate to well!
+		return false;
+	};
+	// Listener muessen benachrichtigt werden und Richtung korrekt gesetzt
+	PanoJS.keyboardMoveHandler = function(e) {
+		console.log("hier");
+		e = e ? e : window.event;
+		for (var i = 0; i < PanoJS.VIEWERS.length; i++) {
+			var viewer = PanoJS.VIEWERS[i];
+			if (e.keyCode == 38){
+					viewer.positionTiles({'x': 0,'y': PanoJS.MOVE_THROTTLE}, true);
+					viewer.notifyViewerMoved({'x': 0,'y': PanoJS.MOVE_THROTTLE});//added
+					if (!(isBrowser("ie"))) e.preventDefault();
+			}
+			if (e.keyCode == 39){
+					viewer.positionTiles({'x': -PanoJS.MOVE_THROTTLE,'y': 0}, true);
+					viewer.notifyViewerMoved({'x': -PanoJS.MOVE_THROTTLE,'y': 0});//added
+					if (!(isBrowser("ie"))) e.preventDefault();
+			}
+			if (e.keyCode == 40){
+					viewer.positionTiles({'x': 0,'y': -PanoJS.MOVE_THROTTLE}, true);
+					viewer.notifyViewerMoved({'x': 0,'y': -PanoJS.MOVE_THROTTLE});//added
+					if (!(isBrowser("ie"))) e.preventDefault();
+			}
+			if (e.keyCode == 37){
+					viewer.positionTiles({'x': PanoJS.MOVE_THROTTLE,'y': 0}, true);
+					viewer.notifyViewerMoved({'x': PanoJS.MOVE_THROTTLE,'y': 0});//added
+					if (!(isBrowser("ie"))) e.preventDefault();
+			}
+		}
+	}
+	// keys are different in Browsers
+	PanoJS.keyboardZoomHandler = function(e) {
+		e = e ? e : window.event;
+		for (var i = 0; i < PanoJS.VIEWERS.length; i++) {
+			var viewer = PanoJS.VIEWERS[i];
+			// Opera auch bei "Einfg" --> 43
+			if (e.keyCode == 109 || (e.keyCode == 45 && isBrowser("opera"))|| e.charCode == 45) {
+				viewer.zoom(-1);
+				if (Iview[viewer.viewID].useZoombar) {
+					Iview[viewer.viewID].zoomBar.moveBarToLevel(viewer.zoomLevel);
+				}
+				if (!(isBrowser("ie"))) e.preventDefault();
+			}
+			if (e.keyCode == 107 || e.keyCode == 61 || (e.keyCode == 43 && isBrowser("opera")) || e.charCode == 43) {
+				viewer.zoom(1);
+				if (Iview[viewer.viewID].useZoombar) {
+					Iview[viewer.viewID].zoomBar.moveBarToLevel(viewer.zoomLevel);
+				}
+				if (!(isBrowser("ie"))) e.preventDefault();
+			}
+		}
+	}
 	// opera triggers the onload twice
 	var iviewTileUrlProvider = new PanoJS.TileUrlProvider(Iview[viewID].baseUri, Iview[viewID].prefix, 'jpg');
 	iviewTileUrlProvider.derivate = viewID;
@@ -151,7 +214,24 @@ function initializeGraphic(viewID) {
 				motion.y = 0;
 			}
 			this.positionTilesOrig(motion, reset);
-		}
+			/*verschieben des Preload bildes damit man eine grobe Vorschau sieht von dem was kommt
+			  wird nur ausgeführt wenn Seite geladen ist, da ansonsten die Eigenschaften noch nicht vorhanden sind*/
+			if(Iview[viewID].loaded) {
+				$('preload'+viewID).style.left = (this.x + motion.x) + "px";
+				$('preload'+viewID).style.top = (this.y + motion.y) + "px";
+			}
+		};
+		Iview[viewID].viewerBean.createPrototype = function(src) {
+			var img = document.createElement('img');
+			img.src = src;
+			img.relativeSrc = src;
+			img.className = PanoJS.TILE_STYLE_CLASS;
+			try {
+				return img;
+			} finally {
+				img = null;
+			}
+		};
 		Iview[viewID].viewerBean.init();
 	}
 }
