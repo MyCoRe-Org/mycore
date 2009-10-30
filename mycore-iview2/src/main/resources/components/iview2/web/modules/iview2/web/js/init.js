@@ -331,6 +331,19 @@ function maximizeHandler(viewID) {
 		if (Iview[viewID].useChapter) {
 			openChapter(false, viewID);
 		}
+		
+		PanoJS.mousePressedHandler = function(e) {
+		e = e ? e : window.event;
+		// only grab on left-click
+		if (e.button < 2) {
+			var self = this.backingBean;
+			var coords = self.resolveCoordinates(e);
+			self.press(coords);
+		}
+	
+		// NOTE: MANDATORY! must return false so event does not propagate to well!
+		return false;
+		}
 	}
 
 	// IE löst resize bereits bei bei den Class-Wechsel (sicherlich wegen position rel <-> fix)
