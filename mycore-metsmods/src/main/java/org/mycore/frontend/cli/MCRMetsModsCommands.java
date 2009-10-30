@@ -30,7 +30,6 @@ import java.util.List;
 import java.util.StringTokenizer;
 
 import org.apache.log4j.Logger;
-import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.output.XMLOutputter;
 import org.mycore.common.MCRConfiguration;
@@ -156,7 +155,7 @@ public final class MCRMetsModsCommands extends MCRAbstractCommands {
     public static final void removeMets() throws Exception {
         LOGGER.debug("Remove METS file start.");
         final long start = System.currentTimeMillis();
-        List<String> derlist = MCRXMLTableManager.instance().retrieveAllIDs("derivate");
+        List<String> derlist = MCRXMLTableManager.instance().listIDsOfType("derivate");
         for (String der : derlist) {
             MCRDirectory difs = MCRDirectory.getRootDirectory(der);
             if (difs != null) {
@@ -178,7 +177,7 @@ public final class MCRMetsModsCommands extends MCRAbstractCommands {
     public static final void removeMetsByZoomify() throws Exception {
         LOGGER.debug("Remove METS file from zoomify derivates start.");
         final long start = System.currentTimeMillis();
-        List<String> derlist = MCRXMLTableManager.instance().retrieveAllIDs("derivate");
+        List<String> derlist = MCRXMLTableManager.instance().listIDsOfType("derivate");
         for (String der : derlist) {
             MCRDirectory difs = MCRDirectory.getRootDirectory(der);
             if (difs != null) {
@@ -423,7 +422,7 @@ public final class MCRMetsModsCommands extends MCRAbstractCommands {
         LOGGER.debug("Build METS file start.");
         final long start = System.currentTimeMillis();
         // get all derivates
-        List<String> derlist = MCRXMLTableManager.instance().retrieveAllIDs("derivate");
+        List<String> derlist = MCRXMLTableManager.instance().listIDsOfType("derivate");
         for (String der : derlist) {
             // get metadata MCRObjectID
             MCRDerivate derxml = new MCRDerivate();
@@ -455,7 +454,7 @@ public final class MCRMetsModsCommands extends MCRAbstractCommands {
         LOGGER.debug("Build METS file start.");
         final long start = System.currentTimeMillis();
         // get all derivates
-        List<String> derlist = MCRXMLTableManager.instance().retrieveAllIDs("derivate");
+        List<String> derlist = MCRXMLTableManager.instance().listIDsOfType("derivate");
         for (String der : derlist) {
             // get metadata MCRObjectID
             MCRDerivate derxml = new MCRDerivate();
