@@ -30,6 +30,7 @@ import java.util.List;
 
 import org.jdom.*;
 import org.jdom.input.SAXBuilder;
+import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.mycore.common.MCRConstants;
 
@@ -40,12 +41,9 @@ import org.mycore.common.MCRConstants;
 
 public class MCRMetsModsUtil {
 
-
-
     Element fileSec = new Element("fileSec", MCRConstants.METS_NAMESPACE);
     Element structMap = new Element("structMap", MCRConstants.METS_NAMESPACE);
 
-    
     public Element createMetsElement(ArrayList<String> list, Element mets, String default_url, String ContentIDS) {
         Iterator<String> iter = list.iterator();
         int i = 1;
@@ -53,15 +51,14 @@ public class MCRMetsModsUtil {
             String pic = iter.next();
             String fn = pic.substring(pic.lastIndexOf("/") + 1, pic.lastIndexOf("."));
             pic = default_url + "/" + pic;
-            
+
             add_file(mets, fn, pic, i, ContentIDS, "page");
             i++;
         }
 
         return mets;
     }
-    
-    
+
     /**
      * Gets a list containing picture names including directories.
      * 
@@ -76,7 +73,7 @@ public class MCRMetsModsUtil {
             String pic = iter.next();
             String fn = pic.substring(pic.lastIndexOf("/") + 1, pic.lastIndexOf("."));
             pic = default_url + "/" + pic;
-            
+
             add_file(mets, fn, pic, i, "page");
             i++;
         }
@@ -85,7 +82,7 @@ public class MCRMetsModsUtil {
     }
 
     private Element create_mets_head() {
-       String empty_mets_url = new String("../webapps/empty.mets.xml");
+        String empty_mets_url = new String("../webapps/empty.mets.xml");
 
         try {
             Document doc = new SAXBuilder().build(empty_mets_url);
@@ -135,9 +132,9 @@ public class MCRMetsModsUtil {
 
         Element originInfo = new Element("originInfo", MCRConstants.MODS_NAMESPACE);
         originInfo.addContent(new Element("place", MCRConstants.MODS_NAMESPACE).addContent(new Element("placeTerm", MCRConstants.MODS_NAMESPACE).setAttribute(
-                "type", "text").setText(place)));
+                        "type", "text").setText(place)));
         originInfo.addContent(new Element("dateIssued", MCRConstants.MODS_NAMESPACE).setAttribute("keyDate", "yes").setAttribute("encoding", "w3cdtf").setText(
-                date));
+                        date));
 
         mods.addContent(titleInfo);
         mods.addContent(name);
@@ -231,16 +228,14 @@ public class MCRMetsModsUtil {
         return structMap;
     }
 
-    public Element add_file(Element mets, String file_id, String url, int order, String contentids, String type)
-    {
-        return add_file_ext(mets,file_id,url,order,contentids, type);
+    public Element add_file(Element mets, String file_id, String url, int order, String contentids, String type) {
+        return add_file_ext(mets, file_id, url, order, contentids, type);
     }
-    
-    public Element add_file(Element mets, String file_id, String url, int order, String type)
-    {
-        return add_file_ext(mets,file_id,url,order,null, type);
+
+    public Element add_file(Element mets, String file_id, String url, int order, String type) {
+        return add_file_ext(mets, file_id, url, order, null, type);
     }
-    
+
     public Element add_file_ext(Element mets, String file_id, String url, int order, String contentids, String type) {
         Element fileGrp = mets.getChild("fileSec", MCRConstants.METS_NAMESPACE).getChild("fileGrp", MCRConstants.METS_NAMESPACE);
         Element div = mets.getChild("structMap", MCRConstants.METS_NAMESPACE).getChild("div", MCRConstants.METS_NAMESPACE);
@@ -260,11 +255,12 @@ public class MCRMetsModsUtil {
         Element div_ = new Element("div", MCRConstants.METS_NAMESPACE);
         div_.setAttribute("ID", file_id);
         div_.setAttribute("ORDER", String.valueOf(order));
-            //The following line has changed in order to set the filename as orderlabel...
-        div_.setAttribute("ORDERLABEL", file_id);//String.valueOf(order));
-        div_.setAttribute("type",type);
-            //The following line contains the CONTENTIDS, if is null then do nothing 
-        if(contentids!=null) div_.setAttribute("CONTENTIDS",contentids);
+        // The following line has changed in order to set the filename as orderlabel...
+        div_.setAttribute("ORDERLABEL", file_id);// String.valueOf(order));
+        div_.setAttribute("type", type);
+        // The following line contains the CONTENTIDS, if is null then do nothing
+        if (contentids != null)
+            div_.setAttribute("CONTENTIDS", contentids);
         Element fptr = new Element("fptr", MCRConstants.METS_NAMESPACE);
         fptr.setAttribute("FILEID", file_id + "_default");
         div_.addContent(fptr);
@@ -297,7 +293,7 @@ public class MCRMetsModsUtil {
         return piclist;
     }
 
-    public static Document getMetsFile(ArrayList<MCRMetsModsPicture> piclist, Document metsfile) {
+    public static String getMetsFile(ArrayList<MCRMetsModsPicture> piclist, Document metsfile) {
         Element root = metsfile.getRootElement();
         Element structMap = root.getChild("structMap", MCRConstants.METS_NAMESPACE);
         Element div = structMap.getChild("div", MCRConstants.METS_NAMESPACE);
@@ -310,18 +306,26 @@ public class MCRMetsModsUtil {
                 MCRMetsModsPicture mmp = piclist.get(j);
                 if (mmp.getPicture().compareTo(fileid) == 0) {
 
-                    // System.out.println("-fileid: "+fileid+" -j: "+j+" -mmp.getPicture: "+mmp.getPicture()+" -mmp.getOrder: "+mmp.getOrder());
+                    // System.out.println("-fileid: "+fileid+" -j: "+j+" -mmp.getPicture: "+mmp.getPicture()+" -mmp.getOrder: "+mmp.getOrder()+" -mmp.getOrderlabel: "+mmp.getOrderlabel());
 
                     e.setAttribute("ORDER", String.valueOf(mmp.getOrder()));
+                    e.removeAttribute("ORDERLABEL");
                     e.setAttribute("ORDERLABEL", mmp.getOrderlabel());
                     piclist.remove(j); // to get a little bit more speed
                 }
             }
-
         }
-
-        return metsfile;
+        String st = "";
+        try {
+            Format form = Format.getCompactFormat();
+            form.setEncoding("UTF-8");
+            form.setOmitEncoding(false);
+            XMLOutputter xmlout = new XMLOutputter(form);
+            st = xmlout.outputString(metsfile);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return st;
     }
-
 
 }

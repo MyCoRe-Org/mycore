@@ -21,53 +21,48 @@
  * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
  */
 
-
 package org.mycore.frontend.metsmods;
+
 /**
  * @author Stefan Freitag
  * @version $Revision: 1.1 $ $Date: 2009/01/13 08:41:14 $
  */
 public class MCRMetsModsPicture {
 
-	String picture;
-	int order;
-	String orderlabel;
-	
-	public MCRMetsModsPicture(String picture, int order, String orderlabel)
-	{
-		this.picture = picture;
-		this.order = order;
-		this.orderlabel = orderlabel;
-	}
-	
-	public int getOrder()
-	{
-		return this.order;
-	}
-	
-	public String getOrderlabel()
-	{
-		return this.orderlabel;
-	}
-	
-	public String getPicture()
-	{
-		return this.picture;
-	}
-	
-	public void setOrder(int i)
-	{
-		this.order = i;
-		this.orderlabel = String.valueOf(i);
-	}
-	
-	public void setOrderlabel(String i)
-	{
-		this.orderlabel = i;
-	}
-	
-	public void show()
-	{
-		System.out.println("Picture: "+picture+" Order: "+order+" Orderlabel: "+orderlabel);
-	}
+    String picture;
+    int order;
+    String orderlabel;
+
+    public MCRMetsModsPicture(String picture, int order, String orderlabel) {
+        this.picture = picture;
+        this.order = order;
+        this.orderlabel = orderlabel;
+    }
+
+    public int getOrder() {
+        return this.order;
+    }
+
+    public String getOrderlabel() {
+        return this.orderlabel;
+    }
+
+    public String getPicture() {
+        return this.picture;
+    }
+
+    public void setOrder(int i) {
+        this.order = i;
+        if ((orderlabel == null) || (orderlabel.length() == 0)) {
+            this.orderlabel = String.valueOf(i);
+        }
+    }
+
+    public void setOrderlabel(String i) {
+        this.orderlabel = i;
+    }
+
+    public void show() {
+        System.out.println("Picture: " + picture + " Order: " + order + " Orderlabel: " + orderlabel);
+    }
 }

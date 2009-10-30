@@ -44,6 +44,7 @@ import org.mycore.frontend.metsmods.MCRMetsModsUtil;
 import org.mycore.frontend.servlets.MCRServletJob;
 import org.hibernate.Transaction;
 import org.jdom.*;
+import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 
 /**
@@ -85,21 +86,23 @@ public class MCRStartMetsModsServlet extends MCRStartEditorServlet {
             return true;
         }
     }
-    
+
     private boolean searchForDisallowed(MCRDirectory dir, String disallowed) {
-        if(disallowed.compareTo("")==0) return false;
-        
+        if (disallowed.compareTo("") == 0)
+            return false;
+
         MCRFilesystemNode liste[] = dir.getChildren();
-        
-        for(int i=0;i<liste.length;i++)
-            if(liste[i].getName().contains(disallowed)) return true;
+
+        for (int i = 0; i < liste.length; i++)
+            if (liste[i].getName().contains(disallowed))
+                return true;
         return false;
     }
 
     public void seditmets(MCRServletJob job, CommonData cd) throws IOException {
 
-        boolean dawasfound=false;
-        
+        boolean dawasfound = false;
+
         if (!MCRAccessManager.checkPermission(cd.myremcrid.getId(), "writedb")) {
             job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(getBaseURL() + usererrorpage));
             return;
@@ -123,21 +126,21 @@ public class MCRStartMetsModsServlet extends MCRStartEditorServlet {
         try {
             ArrayList<String> pic_list = new ArrayList<String>();
             addPicturesToList(dir, pic_list);
-            //possible code point for adding routine handling generate a mets-file in directorys with zip-files.
+            // possible code point for adding routine handling generate a mets-file in directorys with zip-files.
             MCRConfiguration CONFIG = MCRConfiguration.instance();
-            
-            String disallowed = CONFIG.getString("MCR.Component.MetsMods.disallowed","");
-            if(disallowed.contains(",")) {
-                StringTokenizer st1 = new StringTokenizer(disallowed,",");
-                while(st1.hasMoreTokens())
-                    if (searchForDisallowed(dir,st1.nextToken())) dawasfound=true;
-            }
-            else 
-                if (searchForDisallowed(dir,disallowed)) dawasfound=true;
+
+            String disallowed = CONFIG.getString("MCR.Component.MetsMods.disallowed", "");
+            if (disallowed.contains(",")) {
+                StringTokenizer st1 = new StringTokenizer(disallowed, ",");
+                while (st1.hasMoreTokens())
+                    if (searchForDisallowed(dir, st1.nextToken()))
+                        dawasfound = true;
+            } else if (searchForDisallowed(dir, disallowed))
+                dawasfound = true;
             if (searchForMets(dir) == false) {
                 // build the mets.file
                 String project = cd.myremcrid.getProjectId();
-                
+
                 // owner
                 String owner = CONFIG.getString("MCR.Component.MetsMods." + project + ".owner", "");
                 if (owner.trim().length() == 0) {
@@ -171,30 +174,31 @@ public class MCRStartMetsModsServlet extends MCRStartEditorServlet {
 
                 mets.addContent(amdSec);
 
-                    //sorting the pic_list
-                    Collections.sort(pic_list);
-                
+                // sorting the pic_list
+                Collections.sort(pic_list);
+
                 Element mets2;
-                if(CONFIG.getString("MCR.Component.MetsMods.activated","").contains("CONTENTIDS"))
-                    mets2 = mmu.createMetsElement(pic_list, mets, getBaseURL() + "servlets/MCRFileNodeServlet", getBaseURL()+"receive/"+cd.myremcrid.getId());
+                if (CONFIG.getString("MCR.Component.MetsMods.activated", "").contains("CONTENTIDS"))
+                    mets2 = mmu.createMetsElement(pic_list, mets, getBaseURL() + "servlets/MCRFileNodeServlet", getBaseURL() + "receive/"
+                                    + cd.myremcrid.getId());
                 else
                     mets2 = mmu.createMetsElement(pic_list, mets, getBaseURL() + "servlets/MCRFileNodeServlet");
 
-                XMLOutputter xmlout = new XMLOutputter();
+                XMLOutputter xmlout = new XMLOutputter(Format.getRawFormat());
                 String full_mets = xmlout.outputString(mets2);
 
                 // save the builded file to IFS
                 try {
-                    if(!dawasfound) {
-                    LOGGER.debug("storing new mets file...");
-                    // startTransaction();
-                    MCRFile file = new MCRFile("mets.xml", dir);
-                    // commitTransaction();
-                    ByteArrayInputStream bais = new ByteArrayInputStream(full_mets.getBytes());
-                    long sizeDiff = file.setContentFrom(bais, false);
-                    // startTransaction();
-                    file.storeContentChange(sizeDiff);
-                    // commitTransaction();
+                    if (!dawasfound) {
+                        LOGGER.debug("storing new mets file...");
+                        // startTransaction();
+                        MCRFile file = new MCRFile("mets.xml", dir);
+                        // commitTransaction();
+                        ByteArrayInputStream bais = new ByteArrayInputStream(full_mets.getBytes());
+                        long sizeDiff = file.setContentFrom(bais, false);
+                        // startTransaction();
+                        file.storeContentChange(sizeDiff);
+                        // commitTransaction();
                     }
                 } catch (Exception e) {
                     LOGGER.error("Error while storing new mets file...", e);
@@ -230,11 +234,14 @@ public class MCRStartMetsModsServlet extends MCRStartEditorServlet {
         params.put("step", cd.mystep);
         params.put("remcrid", cd.myremcrid.getId());
         String base = getBaseURL() + cd.myfile;
-        if(dawasfound)
-            job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(buildRedirectURL(getBaseURL()+"servlets/MCRFileNodeServlet/"+cd.mysemcrid.getId()+"/?hosts=local", new Properties())));
+        if (dawasfound)
+            job.getResponse().sendRedirect(
+                            job.getResponse().encodeRedirectURL(
+                                            buildRedirectURL(getBaseURL() + "servlets/MCRFileNodeServlet/" + cd.mysemcrid.getId() + "/?hosts=local",
+                                                            new Properties())));
         else
             job.getResponse().sendRedirect(job.getResponse().encodeRedirectURL(buildRedirectURL(base, params)));
-        
+
     }
 
     protected void startTransaction() {

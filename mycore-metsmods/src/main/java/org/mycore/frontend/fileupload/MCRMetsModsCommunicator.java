@@ -25,31 +25,26 @@ import java.util.zip.Deflater;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+public class MCRMetsModsCommunicator {
 
-public class MCRMetsModsCommunicator{
-
-	protected String url;
+    protected String url;
     protected String uid;
     protected final static int bufferSize = 65536; // 64 KByte
 
-	public MCRMetsModsCommunicator(String url, String uploadId)
-	{
-		this.url = url;
-		this.uid = uploadId;
-	}
+    public MCRMetsModsCommunicator(String url, String uploadId) {
+        this.url = url;
+        this.uid = uploadId;
+    }
 
-	public void uploadMets(String mets_string) {
-		try{
-			startUploadSession(mets_string.length());
-				uploadFile("mets.xml", mets_string);
-			endUploadSession();
-		}catch(Exception e)
-		{
-			e.printStackTrace(System.out);
-		}
-	}
-	
-	
+    public void uploadMets(String mets_string) {
+        try {
+            startUploadSession(mets_string.length());
+            uploadFile("mets.xml", mets_string);
+            endUploadSession();
+        } catch (Exception e) {
+            e.printStackTrace(System.out);
+        }
+    }
 
     protected long countTotalBytes(Vector files) {
         long total = 0;
@@ -60,24 +55,23 @@ public class MCRMetsModsCommunicator{
         return total;
     }
 
-   
-    
     public void uploadFile(String path, String mets) throws Exception {
+        byte[] metsbytes = mets.getBytes("UTF-8");
         System.out.println("--- Starting filetransfer ---");
-        String md5 = buildMD5StringByString(mets);
+        String md5 = buildMD5StringByString(metsbytes);
         System.out.println("MD5 checksum is " + md5);
 
-        // TODO: Refactor method names in communication
-        Hashtable request = new Hashtable();
+        Hashtable<String, Object> request = new Hashtable<String, Object>();
         request.put("md5", md5);
         request.put("method", "uploadFile");
         request.put("path", path);
-        request.put("length", String.valueOf(mets.length()) );
-        
+        request.put("length", String.valueOf(metsbytes.length));
+        System.out.println("File length is " + metsbytes.length);
+
         System.out.println("Sending filename to server: " + path);
 
         String reply = (String) (send(request));
-        System.out.println("Received reply from server.");
+        System.out.println("Received reply from server: " + reply);
 
         if ("skip file".equals(reply)) {
             System.out.println("File skipped.");
@@ -91,23 +85,22 @@ public class MCRMetsModsCommunicator{
 
         System.out.println("Trying to create client socket...");
 
-        
         Socket socket = new Socket(host, port);
-        socket.setReceiveBufferSize(Math.max(socket.getReceiveBufferSize(),bufferSize));
-        socket.setSendBufferSize(Math.max(socket.getSendBufferSize(),bufferSize));
-        
+        socket.setReceiveBufferSize(Math.max(socket.getReceiveBufferSize(), bufferSize));
+        socket.setSendBufferSize(Math.max(socket.getSendBufferSize(), bufferSize));
+
         System.out.println("Socket created, connected to server.");
-        System.out.println("Socket send buffer size is " + socket.getSendBufferSize() );
+        System.out.println("Socket send buffer size is " + socket.getSendBufferSize());
 
         ZipOutputStream zos = new ZipOutputStream(socket.getOutputStream());
         DataInputStream din = new DataInputStream(socket.getInputStream());
 
         // Large files like video already are compressed somehow
-        zos.setLevel(Deflater.NO_COMPRESSION); 
+        zos.setLevel(Deflater.NO_COMPRESSION);
 
         ZipEntry ze = new ZipEntry(java.net.URLEncoder.encode(path, "UTF-8"));
         StringBuffer extra = new StringBuffer();
-        extra.append(md5).append(" ").append(mets.length()).append(" ").append(uid);
+        extra.append(md5).append(" ").append(metsbytes.length).append(" ").append(uid);
         ze.setExtra(extra.toString().getBytes("UTF-8"));
         zos.putNextEntry(ze);
 
@@ -116,27 +109,25 @@ public class MCRMetsModsCommunicator{
         byte[] buffer = new byte[bufferSize];
 
         System.out.println("Starting to send file content...");
-        
-        ByteArrayInputStream bais = new ByteArrayInputStream(mets.getBytes());
-        
-        InputStream source = new BufferedInputStream(bais,buffer.length);
+
+        ByteArrayInputStream bais = new ByteArrayInputStream(metsbytes);
+
+        InputStream source = new BufferedInputStream(bais, buffer.length);
 
         long lastPing = System.currentTimeMillis();
         while ((num = source.read(buffer)) != -1) {
-           
+
             zos.write(buffer, 0, num);
             sended += num;
-           
-            
+
             // Send a "ping" to MCRUploadServlet so that server keeps HTTP Session alive
-            if( ( System.currentTimeMillis() - lastPing ) > 10000 )
-            {
-              lastPing = System.currentTimeMillis();
-              Hashtable ping = new Hashtable();
-              ping.put("method", "ping");
-              System.out.println( "Sending ping to servlet..." );
-              String pong = (String)( send(ping) );
-              System.out.println( "Server responded with " + pong );
+            if ((System.currentTimeMillis() - lastPing) > 10000) {
+                lastPing = System.currentTimeMillis();
+                Hashtable<String, Object> ping = new Hashtable<String, Object>();
+                ping.put("method", "ping");
+                System.out.println("Sending ping to servlet...");
+                String pong = (String) (send(ping));
+                System.out.println("Server responded with " + pong);
             }
         }
 
@@ -147,14 +138,12 @@ public class MCRMetsModsCommunicator{
         System.out.println("Finished sending file content.");
 
         long numBytesStored = din.readLong();
-        System.out.println("Server reports that " + numBytesStored + " bytes have been stored." );
+        System.out.println("Server reports that " + numBytesStored + " bytes have been stored.");
 
         socket.close();
 
         System.out.println("Socket closed, file transfer successfully completed.");
     }
-    
-   
 
     /**
      * Creates a list of all files in the given directories
@@ -217,20 +206,20 @@ public class MCRMetsModsCommunicator{
     }
 
     protected void startUploadSession(int numFiles) throws IOException, MCRUploadException {
-        Hashtable request = new Hashtable();
+        Hashtable<String, Object> request = new Hashtable<String, Object>();
         request.put("method", "startUploadSession");
         request.put("numFiles", String.valueOf(numFiles));
         send(request);
     }
 
     protected void endUploadSession() throws IOException, MCRUploadException {
-        Hashtable request = new Hashtable();
+        Hashtable<String, Object> request = new Hashtable<String, Object>();
         request.put("method", "endUploadSession");
         send(request);
     }
 
     protected void cancelUploadSession() throws IOException, MCRUploadException {
-        Hashtable request = new Hashtable();
+        Hashtable<String, Object> request = new Hashtable<String, Object>();
         request.put("method", "cancelUploadSession");
         send(request);
     }
@@ -321,13 +310,12 @@ public class MCRMetsModsCommunicator{
 
         return response;
     }
+
     /** Calculates the MD5 checksum of the given mets file * */
-    protected String buildMD5StringByString(String mets) throws Exception {
+    protected String buildMD5StringByString(byte[] metsbytes) throws Exception {
         MessageDigest digest = MessageDigest.getInstance("MD5");
 
-        ByteArrayInputStream bais = new ByteArrayInputStream(mets.getBytes());
-                
-        InputStream fis = bais;
+        InputStream fis = new ByteArrayInputStream(metsbytes);
         BufferedInputStream bis = new BufferedInputStream(fis, bufferSize);
         DigestInputStream in = new DigestInputStream(bis, digest);
 
@@ -348,5 +336,5 @@ public class MCRMetsModsCommunicator{
 
         return sb.toString();
     }
-	
+
 }
