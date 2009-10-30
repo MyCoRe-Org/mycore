@@ -527,6 +527,10 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
         }
     }
 
+    public void prepareClose() {
+        //nothing to be done to prepare close()
+    }
+
     public void close() {
         sharedIndexContext.close();
         handleRamDir();

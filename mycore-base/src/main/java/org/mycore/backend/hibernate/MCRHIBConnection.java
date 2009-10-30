@@ -209,6 +209,10 @@ public class MCRHIBConnection implements Closeable {
         }
     }
 
+    public void prepareClose() {
+        //nothing to be done to prepare close()
+    }
+
     public void close() {
         if (SESSION_FACTORY == null)
             return;

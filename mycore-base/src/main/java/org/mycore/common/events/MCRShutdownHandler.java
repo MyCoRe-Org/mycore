@@ -62,6 +62,13 @@ public class MCRShutdownHandler {
      */
     public static interface Closeable {
         /**
+         * prepare for closing this object that implements <code>Closeable</code>.
+         * 
+         * This is the first part of the closing process. As a object may need database
+         * access to close cleanly this method can be used to be ahead of database outtake.
+         */
+        public void prepareClose();
+        /**
          * cleanly closes this object that implements <code>Closeable</code>.
          * 
          * You can provide some functionality to close open files and sockets or
@@ -111,6 +118,10 @@ public class MCRShutdownHandler {
         LOGGER.debug("requests: " + requests.toString());
         synchronized (requests) {
             shuttingDown = true;
+            for (Iterator<Closeable> it = requests.iterator(); it.hasNext();) {
+                MCRShutdownHandler.Closeable c = it.next();
+                c.prepareClose();
+            }
             for (Iterator<Closeable> it = requests.iterator(); it.hasNext();) {
                 MCRShutdownHandler.Closeable c = it.next();
                 LOGGER.debug("Closing: " + c.toString());

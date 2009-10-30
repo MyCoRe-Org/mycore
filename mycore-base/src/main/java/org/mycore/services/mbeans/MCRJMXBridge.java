@@ -101,6 +101,10 @@ public class MCRJMXBridge implements Closeable {
                 + type + ",component=" + component);
     }
 
+    public void prepareClose() {
+        //nothing to be done to prepare close()
+    }
+
     public void close() {
         LOGGER.debug("Shutting down " + MCRJMXBridge.class.getSimpleName());
         MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
