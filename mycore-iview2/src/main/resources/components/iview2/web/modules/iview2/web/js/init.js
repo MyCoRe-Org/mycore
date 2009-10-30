@@ -107,7 +107,7 @@ function initializeGraphic(viewID) {
 	PanoJS.USE_SLIDE = false;
 	PanoJS.USE_LOADER_IMAGE = false;
 	// press sonst nicht immer möglich, in PanoJS original merkwürdiges Verhalten
-	PanoJS.mousePressedHandler = function(e) {
+	/*PanoJS.mousePressedHandler = function(e) {
 		e = e ? e : window.event;
 		// only grab on left-click
 		if (e.button < 2) {
@@ -118,10 +118,13 @@ function initializeGraphic(viewID) {
 	
 		// NOTE: MANDATORY! must return false so event does not propagate to well!
 		return false;
-	};
+	};*/
+	// Funktionalität erst im Vollbild, vorher Wechsel dorthin
+	PanoJS.mousePressedHandler = function(e) {
+			maximizeHandler(viewID);
+	}
 	// Listener muessen benachrichtigt werden und Richtung korrekt gesetzt
 	PanoJS.keyboardMoveHandler = function(e) {
-		console.log("hier");
 		e = e ? e : window.event;
 		for (var i = 0; i < PanoJS.VIEWERS.length; i++) {
 			var viewer = PanoJS.VIEWERS[i];
@@ -306,6 +309,9 @@ function maximizeHandler(viewID) {
 			openChapter(false, viewID);
 		}
 		
+		PanoJS.mousePressedHandler = function(e) {
+			maximizeHandler(viewID);
+		}
 	} else {
 		Iview[viewID].maximized = true;
 		/*if (document.compatMode == "CSS1Compat") {
