@@ -113,8 +113,8 @@ public class MCRDFGViewerServlet extends MCRStartEditorServlet {
 
         if (mcrfile == null) {
             try {
-                generateErrorPage(job.getRequest(), job.getResponse(), HttpServletResponse.SC_BAD_REQUEST, "No Mets file was found!", new MCRException(
-                                "No mets file was found!"), false);
+                generateErrorPage(job.getRequest(), job.getResponse(), HttpServletResponse.SC_BAD_REQUEST, "No Mets file was found!",
+                        new MCRException("No mets file was found!"), false);
                 return;
             } catch (IOException e) {
                 // TODO Auto-generated catch block
@@ -165,7 +165,7 @@ public class MCRDFGViewerServlet extends MCRStartEditorServlet {
         try {
             LOGGER.warn("Use lang " + lang + " for get XPath element.");
             XPath xpathconf = XPath.newInstance(conf);
-            Document doc = tm.readDocument(ID);
+            Document doc = tm.retrieveXML(ID);
             List<Element> nodes = xpathconf.selectNodes(doc);
             for (Element node : nodes) {
                 System.out.println(node.getName() + ":" + node.getText());
