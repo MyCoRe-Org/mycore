@@ -584,8 +584,8 @@
 	position: absolute;
 	top: 10px;
 	left: 74px;
-	height: 17px;
-	width: 17px;
+	height: 24px;
+	width: 22px;
 	margin: 0px;
 	padding: 0px;
 	border: 0px;
@@ -1182,7 +1182,7 @@
 	height: 200px;
 	width: 200px; /* bei Werten um 150 rum, sind Bilder weg*/
 
-	border-top-style: solid;
+	/*border-top-style: solid;
 	border-bottom-style: solid;
 	border-left-style: solid;
 	border-right-style: solid;
@@ -1195,7 +1195,7 @@
 	border-top-color: #000000;
 	border-bottom-color: #000000;
 	border-left-color: #000000;
-	border-right-color: #000000;
+	border-right-color: #000000;*/
 
 	background-color: #E2E6E9;
 }
