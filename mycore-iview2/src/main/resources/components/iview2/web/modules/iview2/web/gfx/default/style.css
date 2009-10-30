@@ -306,6 +306,9 @@
 	width:100%;
 	height:100%;
 }
+.viewerContainer .header {
+	display:none;
+}
 .viewerContainer.min .buttonSurface {
 	visibility:visible;
 }
