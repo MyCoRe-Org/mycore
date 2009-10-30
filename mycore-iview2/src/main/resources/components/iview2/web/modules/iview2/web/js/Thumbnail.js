@@ -131,7 +131,7 @@ function loadPage(pageData, viewID) {
 	var initX = toFloat(window.location.search.get("x"));;
 	var initY = toFloat(window.location.search.get("y"));
 	viewerBean.positionTiles ({'x' : initX, 'y' : initY}, true);
-	$("preload"+viewID).removeChild($("preloadImg"+viewID).getElementsByTagName("img")[0]);
+	$("preload"+viewID).removeChild($("preloadImg"+viewID));
 	var preload = new Image();
 	preload.style.width = "100%";
 	preload.style.height = "100%";
@@ -235,6 +235,7 @@ function isloaded(img, viewID) {
 @param scrollBarSize the Height or Width of the ScrollBar which needs to be dropped from the ViewerSize
 @return boolean which tells if it was successfull to scale the picture in the current zoomlevel to the viewer Size
 */
+//TODO scrollBarSize kann aus Berechnung wieder rausgeschmissen werden, da jetzt extern
 function calculateZoomProp(level, totalSize, viewerSize, scrollBarSize, viewID) {
 	if ((totalSize / Math.pow(2, level)) <= viewerSize - scrollBarSize) {
 		var viewerBean = Iview[viewID].viewerBean;
@@ -276,11 +277,12 @@ function switchDisplayMode(screenZoom, stateBool, viewID) {
 		for (var i = 0; i <= Iview[viewID].zoomMax; i++) {
 			if(Iview[viewID].bildBreite/viewerBean.width > Iview[viewID].bildHoehe/$("viewer"+viewID).offsetHeight || (stateBool && !screenZoom)){
 			//Width > Height Or ZoomWidth is true
-				if (calculateZoomProp(i, Iview[viewID].bildBreite, viewerBean.width, toInt(getStyle("scrollV"+viewID, "width")), viewID)) {
+				//Siehe TODO oben
+				if (calculateZoomProp(i, Iview[viewID].bildBreite, viewerBean.width, /*toInt(getStyle("scrollV"+viewID, "width"))*/0, viewID)) {
 					break;
 				}
 			} else {
-				if (calculateZoomProp(i, Iview[viewID].bildHoehe, viewerBean.height, toInt(getStyle("scrollH"+viewID, "height")), viewID)) {
+				if (calculateZoomProp(i, Iview[viewID].bildHoehe, viewerBean.height, /*toInt(getStyle("scrollH"+viewID, "height"))*/0, viewID)) {
 					break;
 				}
 			}
