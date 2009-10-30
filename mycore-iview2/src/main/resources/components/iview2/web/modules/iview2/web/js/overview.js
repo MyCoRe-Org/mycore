@@ -294,7 +294,8 @@ function overview(newId, parent, identer) {
 		origImage.src = source;
 		
 		// fill Info div
-		$("infoDiv" + viewID +((i * amountWidth) + j)).innerHTML = pageName/*+" "+(((i + currentFirstRow) * amountWidth) + j + 1)*/; 
+		$("infoDiv" + viewID +((i * amountWidth) + j)).innerHTML = pageName;
+		$("infoDiv" + viewID +((i * amountWidth) + j)).title = pageName;
 		// page 0 doesn't exist
 		
 		// nett anzuschaun ist es auch, wenn source bereits vor onload des origImage gesetzt wird, da die Bilder dann sichtbar zusammenschrumpfen

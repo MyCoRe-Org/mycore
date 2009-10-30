@@ -131,11 +131,11 @@ function loadPage(pageData, viewID) {
 	var initX = toFloat(window.location.search.get("x"));;
 	var initY = toFloat(window.location.search.get("y"));
 	viewerBean.positionTiles ({'x' : initX, 'y' : initY}, true);
-	
-	$("preload"+viewID).removeChild($("preload"+viewID).childNodes[0]);
+	$("preload"+viewID).removeChild($("preloadImg"+viewID).getElementsByTagName("img")[0]);
 	var preload = new Image();
 	preload.style.width = "100%";
 	preload.style.height = "100%";
+	preload.id = "preloadImg" + viewID;
 	$("preload"+viewID).appendChild(preload);
 	$("preload"+viewID).childNodes[0].src = viewerBean.tileUrlProvider.assembleUrl(0,0,0);
 	$("preload"+viewID).style.visibility = "visible";
@@ -288,8 +288,9 @@ function switchDisplayMode(screenZoom, stateBool, viewID) {
 		viewerBean.init();//TODO not working here
 	} else {
 		Iview[viewID].zoomScale = 1;
-		viewerBean.tileSize = Iview[viewID].tilesize;
+		viewerBean.tileSize = /*Iview[viewID].*/tilesize;
 		viewerBean.init();
+		
 		//an infinite loop would arise if the repeal of the zoombar comes
 		if (typeof (arguments[3]) == "undefined" || arguments[3] == false) {
 			viewerBean.zoom(Iview[viewID].zoomBack - viewerBean.zoomLevel);
@@ -844,11 +845,12 @@ function loading(viewID) {
 	// surface muss als Blank geladen werden, damit Ebene gefüllt und es im Vordergrund des Viewers liegt
 	// hauptsächlich wegen IE notwendig
 	getElementsByClassName("surface","viewer"+viewID,"div")[0].style.backgroundImage = "url("+Iview[viewID].webappBaseUri+"modules/iview2/web/gfx/blank.gif"+")";
-	
 	// PermaLink Handling
 	if (window.location.search.get("tosize") == "width") {
 		pictureWidth(viewID);
 	} else if (window.location.search.get("tosize") == "screen") {
+		pictureScreen(viewID);
+	} else {
 		pictureScreen(viewID);
 	}
 	if (window.location.search.get("maximized") == "true") {

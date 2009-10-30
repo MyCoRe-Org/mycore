@@ -38,7 +38,14 @@
         </div>
         <div class="well">
           <div id="preload{$groupID}" class="preload">
-            <img height="100%" width="100%" alt="{i18n:translate('component.iview2.preview')}" />
+            <xsl:call-template name="iview2.getToolbar">
+              <xsl:with-param name="groupID" select="$groupID" />
+              <xsl:with-param name="idAdd" select="' ForBack'" />
+              <xsl:with-param name="optOut" select="'false'" />
+              <xsl:with-param name="forward" select="'true'" />
+              <xsl:with-param name="backward" select="'true'" />
+            </xsl:call-template>
+            <img height="100%" width="100%" id="preloadImg{$groupID}" alt="{i18n:translate('component.iview2.preview')}" />
           </div>
         </div>
       </div>

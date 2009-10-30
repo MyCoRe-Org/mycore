@@ -37,7 +37,12 @@
 	height: 500px;
 	top: 0px;
 }
-
+.viewerContainer.min .scrollH, .viewerContainer.min .scrollV {
+	visibility:hidden;
+}
+.viewerContainer.max .scrollH, .viewerContainer.max .scrollV {
+	visibility:visible;
+}
 /* viewer */
 .viewer {
 	position: absolute;
@@ -121,7 +126,7 @@
 
 /* ButtonSurface */
 .buttonSurface {
-	z-index: 10;
+/*	z-index: 10;*/
 }
 .buttonSurface.max {
 	position:fixed;
@@ -129,12 +134,14 @@
 	height:100%;
 	top:0px;
 	left:0px;
+	visibility:visible;
 }
 .buttonSurface.min {
 	position:relative;
+	visibility:hidden;
 }
 /* Header */
-.buttonSurface .header/*, .BS_header*/ {
+.buttonSurface .header {
 	position: relative;
 	left: 0px;
 	top: 0px;
@@ -145,6 +152,7 @@
 	z-index: 20;
 	/*display: none;*/
 }
+
 .buttonSurface.max .header { /* needed by IE8 */
 	position: absolute;
 	display: block;
@@ -289,10 +297,78 @@
 	background-position: -150px -0px;
 	height: 24px;
 	width: 15px;
-	left: 364px;
+	left: 470px;
 	z-index: 50;
 }
 
+.viewerContainer .buttonSurface {
+	width:100%;
+	height:100%;
+}
+.viewerContainer.min .buttonSurface {
+	visibility:visible;
+}
+
+.viewerContainer.max .buttonSurface {
+	visibility:hidden;
+}
+
+.viewerContainer .BSE_backward {
+	position: absolute;
+	top: 0px;
+	background-image: url('image.png');
+	background-repeat: no-repeat;
+	background-position: -60px -0px;
+	height: 24px;
+	width: 15px;
+	left: 0px;
+	z-index: 32;
+	cursor: pointer;
+}
+.viewerContainer .BSE_backwardBehind {
+	position: absolute;
+	top: 250px;
+	background-image: url('image.png');
+	background-repeat: no-repeat;
+	background-position: -90px -0px;
+	height: 24px;
+	width: 15px;
+	left: 0px;
+	z-index: 50;
+	visibility:hidden;
+}
+
+/* Page forward*/
+.viewerContainer .BSE_forward {
+	position: absolute;
+	top: 0px;
+	background-image: url('image.png');
+	background-repeat: no-repeat;
+	background-position: -120px -0px;
+	height: 24px;
+	width: 15px;
+	left: 0px;
+	z-index: 50;
+	cursor: pointer;
+}
+.viewerContainer .BSE_forwardBehind {
+	position: absolute;
+	top: 250px;
+	background-image: url('image.png');
+	background-repeat: no-repeat;
+	background-position: -150px -0px;
+	height: 24px;
+	width: 15px;
+	right:0px;
+	left:auto;
+	z-index: 50;
+	visibility:hidden;
+}
+
+.viewerContainer.min:hover .BSE_forwardBehind, .viewerContainer.min:hover .BSE_backwardBehind {
+	visibility:visible;
+}
+	
 /* MODUL: pageInput */
 /*.buttonSurface .BSE_pageInput1 {
 	position: absolute;
@@ -349,7 +425,7 @@
 .buttonSurface .BSE_pageForm1 {
 	position: absolute;
 	top: 10px;
-	left: 420px;
+	left: 340px;
 	visibility: hidden;
 	z-index: 50;
 }
@@ -408,6 +484,7 @@
 	cursor: pointer;
 	z-index: 50;
 }
+
 .buttonSurface .BSE_fullView {
 	display: block;
 	background-image: url('image.png');
@@ -662,7 +739,12 @@
 	border: 0px solid #000000;
 	z-index: 50;
 }
-
+.viewerContainer.min .thumbNormal, .viewerContainer.min .dampNormal {
+	visibility:hidden;
+}
+.viewerContainer.max .thumbNormal, .viewerContainer.max .dampNormal {
+	visibility:visible;
+}
 /* current Cut */
 .ausschnittNormal {
 	background-image: url('scaled/thumbnail/cutout.png');
@@ -1229,6 +1311,7 @@
 	font-weight: bold;
 	color: #ffffff;
 	background-color: #3A596D;
+	overflow:hidden;
 }
 
 .blackBlank {

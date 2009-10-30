@@ -223,6 +223,13 @@ function initializeGraphic(viewID) {
 				$('preload'+viewID).style.left = (this.x + motion.x) + "px";
 				$('preload'+viewID).style.top = (this.y + motion.y) + "px";
 			}
+			for (var c = 0; c < this.tiles.length; c++) {
+				for (var r = 0; r < this.tiles[c].length; r++) {
+					var tile = this.tiles[c][r];
+					tile.width = this.tileSize + "px";
+					tile.height = this.tileSize + "px";
+				}
+			}
 		};
 		Iview[viewID].viewerBean.createPrototype = function(src) {
 			var img = document.createElement('img');
@@ -235,6 +242,93 @@ function initializeGraphic(viewID) {
 				img = null;
 			}
 		};
+		//TODO gehts auch besser ohne komplettes Überschreiben
+		Iview[viewID].viewerBean.assignTileImage =  function(tile, forceBlankImage) {
+		var tileImgId, src;
+		var useBlankImage = (forceBlankImage ? true : false);
+
+		// check if image has been scrolled too far in any particular direction
+		// and if so, use the null tile image
+		if (!useBlankImage) {
+			var left = tile.xIndex < 0;
+			var high = tile.yIndex < 0;
+			var right = tile.xIndex >= Math.pow(2, this.zoomLevel);
+			var low = tile.yIndex >= Math.pow(2, this.zoomLevel);
+			if (high || left || low || right) {
+				useBlankImage = true;
+			}
+		}
+
+		if (useBlankImage) {
+			tileImgId = 'blank:' + tile.qx + ':' + tile.qy;
+			src = this.cache['blank'].src;
+		}
+		else {
+			tileImgId = src = this.tileUrlProvider.assembleUrl(tile.xIndex, tile.yIndex, this.zoomLevel);
+		}
+
+		// only remove tile if identity is changing
+		if (tile.element != null &&
+			tile.element.parentNode != null &&
+			tile.element.relativeSrc != src) {
+			this.well.removeChild(tile.element);
+		}
+
+		var tileImg = this.cache[tileImgId];
+		// create cache if not exist
+		if (tileImg == null) {
+			tileImg = this.cache[tileImgId] = this.createPrototype(src);
+		}
+
+		if (useBlankImage || !PanoJS.USE_LOADER_IMAGE || tileImg.complete || (tileImg.image && tileImg.image.complete)) {
+			tileImg.onload = function() {};
+			if (tileImg.image) {
+				tileImg.image.onload = function() {};
+			}
+
+			if (tileImg.parentNode == null) {
+				tile.element = this.well.appendChild(tileImg);
+			}
+		}
+		else {
+			var loadingImgId = 'loading:' + tile.qx + ':' + tile.qy;
+			var loadingImg = this.cache[loadingImgId];
+			if (loadingImg == null) {
+				loadingImg = this.cache[loadingImgId] = this.createPrototype(this.cache['loading'].src);
+			}
+
+			loadingImg.targetSrc = tileImgId;
+
+			var well = this.well;
+			tile.element = well.appendChild(loadingImg);
+			tileImg.onload = function() {
+				// make sure our destination is still present
+				if (loadingImg.parentNode && loadingImg.targetSrc == tileImgId) {
+					tileImg.style.top = loadingImg.style.top;
+					tileImg.style.left = loadingImg.style.left;
+					well.replaceChild(tileImg, loadingImg);
+					tile.element = tileImg;
+				}
+
+				tileImg.onload = function() {};
+				return false;
+			}
+
+			// konqueror only recognizes the onload event on an Image
+			// javascript object, so we must handle that case here
+			if (!PanoJS.DOM_ONLOAD) {
+				tileImg.image = new Image();
+				tileImg.image.onload = tileImg.onload;
+				tileImg.image.src = tileImg.src;
+			}
+		}
+//additions	
+		isloaded(tileImg, this.viewID);
+		var viewID = this.viewID;
+		//changes all not available Tiles to the blank one, so that no ugly Image not Found Pics popup.
+		tileImg.onerror = function () {this.src = Iview[viewID].viewerBean.cache['blank'].src; return true;};
+//endadd
+	}
 		Iview[viewID].viewerBean.init();
 	}
 }
@@ -303,8 +397,9 @@ function maximizeHandler(viewID) {
 		
 		// class-Wechsel löst im IE resize aus
 		$("viewerContainer"+viewID).className = "viewerContainer min";
-		$("buttonSurface"+viewID).className = "buttonSurface min";
-		
+		//$("buttonSurface"+viewID).className = "buttonSurface min";
+		//TODO nur auf Surfaces für bestimmen Viewer Anwenden
+		if (classIsUsed("buttonSurface")) doForEachInClass("buttonSurface", ".className = 'buttonSurface min';");
 		if (Iview[viewID].useChapter) {
 			openChapter(false, viewID);
 		}
@@ -326,7 +421,9 @@ function maximizeHandler(viewID) {
 		
 		// class-Wechsel löst im IE resize aus
 		$("viewerContainer"+viewID).className = "viewerContainer max";
-		$("buttonSurface"+viewID).className ="buttonSurface max";
+
+		doForEachInClass("buttonSurface", ".className = 'buttonSurface max';");
+//		$("buttonSurface"+viewID).className ="buttonSurface max";
 		
 		if (Iview[viewID].useChapter) {
 			openChapter(false, viewID);

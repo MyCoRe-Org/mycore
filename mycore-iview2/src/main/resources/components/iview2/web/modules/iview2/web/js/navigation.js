@@ -21,10 +21,9 @@ function navigatePage(pNum, viewID) {
 @return pNum which is in bounds
 */
 function checkLastNextControls(pNum, viewID) {
-	if(pNum < Iview[viewID].amountPages && pNum > 1){
-		if (classIsUsed("BSE_forward")) doForEachInClass("BSE_forward",".style.display = 'block';", viewID);
-		if (classIsUsed("BSE_backward")) doForEachInClass("BSE_backward",".style.display = 'block';", viewID);
-	}
+	if (classIsUsed("BSE_forward")) doForEachInClass("BSE_forward",".style.display = 'block';", viewID);
+	if (classIsUsed("BSE_backward")) doForEachInClass("BSE_backward",".style.display = 'block';", viewID);
+
 	if(pNum >= Iview[viewID].amountPages) {
 		pNum = Iview[viewID].amountPages;
 		if (classIsUsed("BSE_forward")) doForEachInClass("BSE_forward",".style.display = 'none';", viewID);
