@@ -117,14 +117,41 @@ function initializeGraphic(viewID) {
 	if (Iview[viewID].viewerBean == null) {
 		Iview[viewID].viewerBean = new PanoJS("viewer"+viewID, {
 			initialPan: {'x' : 0, 'y' : 0 },//Koordianten der oberen linken Ecke
-			tileSize: Iview[viewID].tilesize,//Kachelgr��e
+			tileSize: Iview[viewID].tilesize,//Kachelgroesse
 			tileUrlProvider: iviewTileUrlProvider,
 			maxZoom: Iview[viewID].zoomMax,
 			initialZoom: Iview[viewID].zoomInit,//Anfangs-Zoomlevel
 			blankTile: "../modules/iview2/web/" + styleFolderUri + 'blank.gif',
 			loadingTile: "../modules/iview2/web/" + styleFolderUri + 'blank.gif',
-			viewID: viewID//Add Viewer ID mit übergeben damit der Viewer darauf arbeiten kann					
 		});
+		Iview[viewID].viewerBean.viewID = viewID;//Add Viewer ID mit übergeben damit der Viewer darauf arbeiten kann
+		Iview[viewID].viewerBean.positionTilesOrig = Iview[viewID].viewerBean.positionTiles;
+		Iview[viewID].viewerBean.positionTiles = function(motion, reset) {
+			// default to no motion, just setup tiles
+			if (typeof motion == 'undefined') {
+				motion = { 'x' : 0, 'y' : 0 };
+			}
+			var viewID = this.viewID;
+			//Changed to work for multiple Viewers
+			//hinzugefuegt damit Bild nicht ueber die Raender laeuft
+			if (-(this.x + motion.x) > ((Iview[viewID].bildBreite/Math.pow(2, Iview[viewID].zoomMax - this.zoomLevel))*Iview[viewID].zoomScale-this.width)) {
+				motion.x = 0;
+				this.x = -((Iview[viewID].bildBreite/Math.pow(2, Iview[viewID].zoomMax - this.zoomLevel))*Iview[viewID].zoomScale-this.width);
+			}
+			if (-(this.y + motion.y) > ((Iview[viewID].bildHoehe/Math.pow(2, Iview[viewID].zoomMax - this.zoomLevel))*Iview[viewID].zoomScale-this.height)) {
+				motion.y = 0;
+				this.y = -((Iview[viewID].bildHoehe/Math.pow(2, Iview[viewID].zoomMax - this.zoomLevel))*Iview[viewID].zoomScale-this.height);
+			}
+			if(this.x + motion.x > 0){
+				this.x = 0;
+				motion.x = 0;
+			}		
+			if(this.y + motion.y > 0){
+				this.y = 0;
+				motion.y = 0;
+			}
+			this.positionTilesOrig(motion, reset);
+		}
 		Iview[viewID].viewerBean.init();
 	}
 }
