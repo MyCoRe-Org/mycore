@@ -338,16 +338,7 @@ function reinitializeGraphic(viewID) {
 	// --> eventuell sogar rausschieben falls sinnvoll - moeglich
 	viewerBean = Iview[viewID].viewerBean;
 	if (viewerBean == null) return;
-	if (Iview[viewID].useOverview) {
-		Iview[viewID].overview1.resize();
-		// Aktualisierung nur wenn Overview geoeffnet ist, sonst erst beim Oeffnen
-		if (Iview[viewID].overviewActive) {
-			Iview[viewID].overview1.actualize(pagenumber);
-		}
-		// Anpassung des Black-Blank (zum Faden)
-		$("blackBlank"+viewID).style.height = $("viewerContainer"+viewID).offsetHeight + "px";
-	}
-	
+
 	// damit volle Höhe gewährleistet werden kann, height: 100% nicht verwendbar
 	if (Iview[viewID].maximized == true) {
 		$("viewerContainer"+viewID).style.height = document.body.clientHeight - $("viewerContainer"+viewID).offsetTop + "px";
@@ -364,7 +355,17 @@ function reinitializeGraphic(viewID) {
 	viewerBean.width = $("viewer"+viewID).offsetWidth;
 	viewerBean.height = $("viewer"+viewID).offsetHeight;
 	viewerBean.resize();
-
+	
+	if (Iview[viewID].useOverview) {
+		Iview[viewID].overview1.resize();
+		// Aktualisierung nur wenn Overview geoeffnet ist, sonst erst beim Oeffnen
+		if (Iview[viewID].overviewActive) {
+			Iview[viewID].overview1.actualize(pagenumber);
+		}
+		// Anpassung des Black-Blank (zum Faden)
+		$("blackBlank"+viewID).style.height = $("viewerContainer"+viewID).offsetHeight + "px";
+	}
+	
 	handleResizeScrollbars(viewID);
 	
 	if (Iview[viewID].useCutOut) {

@@ -54,6 +54,7 @@
 	/* NOTE: the size and width should be set dynamically when initialized */
 	background-color: #ffffff;
 	z-index:20;
+	overflow: hidden;
 }
 .viewer .well, .viewer .surface {
 	margin: 0;
@@ -126,7 +127,7 @@
 
 /* ButtonSurface */
 .buttonSurface {
-/*	z-index: 10;*/
+	/*z-index: 10;*/
 }
 .buttonSurface.max {
 	position:fixed;
@@ -963,25 +964,28 @@
 /* Main Div*/
 .chapter1 {
 	position: relative;
-	top: 0px;
-	right: 0px;
-	background-color: #3A596D;
-	width: 730px;
+	background-color: #efefef;
+	top: -200px;
+	left: 260px;
+	width: 200px;
 	height: 200px; /* also dynamic - setSize (design.xml) */
 	overflow: hidden;
 	text-align:left;
 	font-weight:normal;
 	visibility: hidden;
+	z-index: 50;
+	opacity: 0.9;
+
 }
 
 .chapter1 .chapter1InPlace {
 	top: 0px;
-	right: 0px;
+	left: 260px;
 }
 
 .chapter1 .chapter1OutPlace {
-	top: 0px;
-	right: 0px;
+	top: -200px;
+	left: 260px;
 }
 
 /* Content */
@@ -991,7 +995,7 @@
 	bottom: 10px;
 	left: 10px; /* gewisser Abstand besteht in jedem Fall (resultiert aus .chapter1 .chapter) */
 	right: 50px;
-	background-color: #fcfeff;
+	background-color: #efefef;
 	font-size: 19px;
 	line-height: 22px;
 	font-family: Times;
@@ -1007,7 +1011,7 @@
 	left: 10px;
 	right: 10px; /* Abstand zwischen Textende und dem rechten Rand des Content Div's ||| auch fuer Highlight ||| kein wirklicher Abstand nach rechts*/
 /*	z-index: 40;*/
-	background-color:#fcfeff;
+	background-color:#efefef;
 	overflow:hidden;
 	/*width:auto;*/
 	white-space:nowrap;
@@ -1018,7 +1022,7 @@
 /* Entry Symbols */
 .chapter1 .pageImageSymbol {
 	position: relative;
-	top: 6px;
+	top: 3px;
 	height: 16px;
 	width: 15px;
 	background-image: url('image.png');
@@ -1028,7 +1032,7 @@
 }
 .chapter1 .chapterImageSymbolMinus {
 	position: relative;
-	top: 6px;
+	top: 3px;
 	height: 16px;
 	width: 15px;
 	background-image: url('image.png');
@@ -1038,7 +1042,7 @@
 }
 .chapter1 .chapterImageSymbolPlus {
 	position: relative;
-	top: 6px;
+	top: 3px;
 	height: 16px;
 	width: 15px;
 	background-image: url('image.png');

@@ -1,7 +1,7 @@
 <vars>
   <area location="file:chapter">
     <var name="chapterEmbedded" type="bool" desc="Defines if chapter-overview is always shown (embedded) in surface">false</var>
-    <var name="chapDynResize" type="bool" desc="Activates dynamic resizing of the chapter-overview">true</var>
+    <var name="chapDynResize" type="bool" desc="Activates dynamic resizing of the chapter-overview">false</var>
     <var name="chapResizeMul" type="float" desc="">1</var>
     <var name="chapResizeAdd" type="float" desc="">0</var>
     <var name="chapColor" type="array">a</var>

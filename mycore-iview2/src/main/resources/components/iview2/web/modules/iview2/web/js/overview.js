@@ -153,7 +153,7 @@ function overview(newId, parent, identer) {
 			};
 		});
 		scrollOverview.setParent(id);
-		scrollOverview.setSize(parseInt($(id).offsetHeight));
+		scrollOverview.setSize($(id).offsetHeight);
 		scrollOverview.setStepper(true);
 		// IE specific, remove absolute Value
 		if(window.attachEvent && !window.opera) {
@@ -284,9 +284,10 @@ function overview(newId, parent, identer) {
 		
 		// nicht sicher ob das so in allen Browsern funktioniert
 		// linking the previews with the viewer, only if this wasen't done in past
-		if (!(IView2.findEvents($("previewDiv" + viewID +((i * amountWidth) + j)),"click",""))) {
-			EventUtils.addEventListener($("previewDiv" + viewID +((i * amountWidth) + j)), 'click', function(e) {notifyListenerClick((((i + currentFirstRow) * amountWidth) + j) + 1);}, true);
-		}
+		//if (!(IView2.findEvents($("previewDiv" + viewID +((i * amountWidth) + j)),"click",""))) {
+			//EventUtils.addEventListener($("previewDiv" + viewID +((i * amountWidth) + j)), 'click', function(e) {notifyListenerClick((((i + currentFirstRow) * amountWidth) + j) + 1);}, true);
+			$("previewDiv" + viewID +((i * amountWidth) + j)).onclick =  function(e) {notifyListenerClick((((i + currentFirstRow) * amountWidth) + j) + 1);};
+		//}
 		
 		// original Values needs, because Img will scale automatic in each Props
 		var origImage = new Image;

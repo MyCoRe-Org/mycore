@@ -154,27 +154,34 @@ function openOverview(viewID) {
 		// update overview
 		Iview[viewID].overview1.actualize(Iview[viewID].pagenumber);
 
-		var doBefore = "setOpacity($('blackBlank"+viewID+"'),0); $('blackBlank"+viewID+"').style.display ='block'";
+		/*var doBefore = "setOpacity($('blackBlank"+viewID+"'),0); $('blackBlank"+viewID+"').style.display ='block'";
 		var doBetween = "$('overview1"+viewID+"').style.visibility ='visible'; $('viewer"+viewID+"').style.visibility = 'hidden';";
 		var doAfter = "$('blackBlank"+viewID+"').style.display ='none'";
+		*/
 
 		// im VollBild Header mit ausblenden
-		if (Iview[viewID].maximized) doBetween = doBetween + "$('viewer"+viewID+"').parentNode.style.top = '0px'";
+		//if (Iview[viewID].maximized) doBetween = doBetween + "$('viewer"+viewID+"').parentNode.style.top = '0px'";
 
-		blendings.blend(['blackBlank'+viewID], ['blackBlank'+viewID], 7, 100, doAfter, doBetween, doBefore);
+		$('overview1'+viewID).style.top = - ($("viewerContainer" + viewID).offsetHeight) + "px";
+		$('overview1'+viewID).style.visibility = 'visible';
+		blendings.slide("overview1"+viewID, new Array(0,- ($("viewerContainer" + viewID).offsetHeight),0,0),5,5,0,new Array(), "", "");
+		
+		//blendings.blend(['blackBlank'+viewID], ['blackBlank'+viewID], 7, 100, doAfter, doBetween, doBefore);
 
 		openChapter(false, viewID);
 	} else {
 		Iview[viewID].overviewActive = !Iview[viewID].overviewActive;
 		
-		var doBefore = "setOpacity($('blackBlank"+viewID+"'),0); $('blackBlank"+viewID+"').style.display ='block';";
+		/*var doBefore = "setOpacity($('blackBlank"+viewID+"'),0); $('blackBlank"+viewID+"').style.display ='block';";
 		var doBetween = "$('overview1"+viewID+"').style.visibility ='hidden'; $('viewer"+viewID+"').style.visibility = 'visible'; navigatePage("+Iview[viewID].pagenumber+",'"+viewID+"');";
 		var doAfter = "$('blackBlank"+viewID+"').style.display = 'none';";
+		*/
 		
 		// im VollBild Header wieder mit einblenden
-		if (Iview[viewID].maximized) doBetween = doBetween + "$('viewer"+viewID+"').parentNode.style.top = ''";
-		
-		blendings.blend(['blackBlank'+viewID],  ['blackBlank'+viewID], 7, 100, doAfter, doBetween, doBefore);
+		//if (Iview[viewID].maximized) doBetween = doBetween + "$('viewer"+viewID+"').parentNode.style.top = ''";
+	
+		blendings.slide("overview1"+viewID, new Array(0,0,0,- ($("viewerContainer" + viewID).offsetHeight)),5,5,0,new Array(), "", "$('overview1'+'"+viewID+"').style.visibility = 'hidden'");	
+		//blendings.blend(['blackBlank'+viewID],  ['blackBlank'+viewID], 7, 100, doAfter, doBetween, doBefore);
 	
 		openChapter(false, viewID);
 	}
@@ -503,19 +510,19 @@ function openChapter(major, viewID){
 		if ($("chapter1"+viewID).style.visibility == "hidden") {
 			$("chapter1"+viewID).style.visibility = "visible";
 			Iview[viewID].chapter1.showCurrentPageCenter(Iview[viewID].pagenumber);
-			blendings.slide("chapter1"+viewID,new Array(toFloat(getStyle($("chapter1"+viewID+"Out"), "left")) - toFloat(getStyle($("chapter1"+viewID+"Out"), "right")), toFloat(getStyle($("chapter1"+viewID+"Out"),"top")), toFloat(getStyle($("chapter1"+viewID+"In"), "left")) - toFloat(getStyle($("chapter1"+viewID+"In"), "right")), toFloat(getStyle($("chapter1"+viewID+"In"), "top"))),60,10,0,new Array("chapter1"+viewID+":in"));
+			blendings.slide("chapter1"+viewID,new Array(toFloat(getStyle($("chapter1"+viewID+"Out"), "left")) - toFloat(getStyle($("chapter1"+viewID+"Out"), "right")), toFloat(getStyle($("chapter1"+viewID+"Out"),"top")), toFloat(getStyle($("chapter1"+viewID+"In"), "left")) - toFloat(getStyle($("chapter1"+viewID+"In"), "right")), toFloat(getStyle($("chapter1"+viewID+"In"), "top"))),5,5,0,new Array("chapter1"+viewID+":in"));
 			Iview[viewID].chapterActive = true;
 		} else {
-			blendings.slide("chapter1"+viewID,new Array(toFloat(getStyle($("chapter1"+viewID+"In"), "left")) - toFloat(getStyle($("chapter1"+viewID+"In"), "right")), toFloat(getStyle($("chapter1"+viewID+"In"), "top")), toFloat(getStyle($("chapter1"+viewID+"Out"), "left")) - toFloat(getStyle($("chapter1"+viewID+"Out"), "right")), toFloat(getStyle($("chapter1"+viewID+"Out"), "top"))),60,10,0,new Array("chapter1"+viewID+":out"), "", "$('chapter1'+'"+viewID+"').style.visibility = 'hidden'");
+			blendings.slide("chapter1"+viewID,new Array(toFloat(getStyle($("chapter1"+viewID+"In"), "left")) - toFloat(getStyle($("chapter1"+viewID+"In"), "right")), toFloat(getStyle($("chapter1"+viewID+"In"), "top")), toFloat(getStyle($("chapter1"+viewID+"Out"), "left")) - toFloat(getStyle($("chapter1"+viewID+"Out"), "right")), toFloat(getStyle($("chapter1"+viewID+"Out"), "top"))),5,5,0,new Array("chapter1"+viewID+":out"), "", "$('chapter1'+'"+viewID+"').style.visibility = 'hidden'");
 			Iview[viewID].chapterActive = false;
 		}
 	} else {
 		// nur dann einblenden, wenn es durch Modus ausgeblendet wurde
-		if (Iview[viewID].chapterActive && !Iview[viewID].overviewActive && !Iview[viewID].maximized && $("chapter1"+viewID).style.visibility == "hidden") {
+		if (Iview[viewID].chapterActive && !Iview[viewID].overviewActive && Iview[viewID].maximized && $("chapter1"+viewID).style.visibility == "hidden") {
 			$("chapter1"+viewID).style.visibility = "visible";
 			Iview[viewID].chapter1.showCurrentPageCenter(Iview[viewID].pagenumber);
-			blendings.slide("chapter1"+viewID,new Array(toFloat(getStyle($("chapter1"+viewID+"Out"), "left")) - toFloat(getStyle($("chapter1"+viewID+"Out"), "right")), toFloat(getStyle($("chapter1"+viewID+"Out"),"top")), toFloat(getStyle($("chapter1"+viewID+"In"), "left")) - toFloat(getStyle($("chapter1"+viewID+"In"), "right")), toFloat(getStyle($("chapter1"+viewID+"In"), "top"))),60,10,0,new Array("chapter1"+viewID+":in"));
-		} else if (Iview[viewID].chapterActive && !Iview[viewID].overviewActive && !Iview[viewID].maximized && $("chapter1"+viewID).style.visibility == "visible") {
+			blendings.slide("chapter1"+viewID,new Array(toFloat(getStyle($("chapter1"+viewID+"Out"), "left")) - toFloat(getStyle($("chapter1"+viewID+"Out"), "right")), toFloat(getStyle($("chapter1"+viewID+"Out"),"top")), toFloat(getStyle($("chapter1"+viewID+"In"), "left")) - toFloat(getStyle($("chapter1"+viewID+"In"), "right")), toFloat(getStyle($("chapter1"+viewID+"In"), "top"))),5,5,0,new Array("chapter1"+viewID+":in"));
+		} else if (Iview[viewID].chapterActive && !Iview[viewID].overviewActive && Iview[viewID].maximized && $("chapter1"+viewID).style.visibility == "visible") {
 			// nothing to do
 		} else if ($("chapter1"+viewID).style.visibility == "visible" && Iview[viewID].overviewActive) {
 			// do nothing for Overview
@@ -650,7 +657,8 @@ function importChapter(viewID) {
 	chapter1.init("chapter1");
 	
 	// needed by IE
-	blendings.setOpacity($("chapter1"+viewID),100);
+	//TODO: muss wieder rein, wenn slide auch ohne fade geht
+	// blendings.setOpacity($("chapter1"+viewID),100);
 	if (chapDynResize) {
 		chapter1.setSize(null, chapter1.my.self.parentNode.offsetHeight * chapResizeMul + chapResizeAdd);
 	}
@@ -675,8 +683,9 @@ function importOverview(viewID) {
 	overview1.setNumberOfPages(Iview[viewID].amountPages);
 
 	overview1.addListener(overview.PAGE_NUMBER, new function() { this.click = function(value) {
-			Iview[viewID].pagenumber = value;
+			//Iview[viewID].pagenumber = value;
 			openOverview(viewID);
+			navigatePage(value, viewID);
 		}});
 	// should blend in via effect
 	$("overview1"+viewID).style.visibility = "hidden";
@@ -746,7 +755,7 @@ function cleanBook(viewID) {
 @param e Daten vom Load Event
 */
 function loading(viewID) {
-	Iview[viewID].chapterActive = true;
+	Iview[viewID].chapterActive = false;
 	Iview[viewID].overviewActive = false;
 	Iview[viewID].maximized = false;
 	//TODO gucken ob vars evtl wo anders geladen werden
@@ -858,4 +867,5 @@ function loading(viewID) {
 	if (window.location.search.get("maximized") == "true") {
 		maximizeHandler(viewID);
 	}
+	//EventUtils.addEventListener($("viewer"+viewID), 'mousedown', function() { maximizeHandler(viewID);}, false);
 }
