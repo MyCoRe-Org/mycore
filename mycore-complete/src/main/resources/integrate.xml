@@ -1,6 +1,6 @@
 <project name="MyCoRe Components integration">
   <property name="components.order"
-    value="acl-editor,broadcasting,buildtools,classbrowser,classhandler,doubletfinder,imaging,indexing,iview,migration13-20,session-listing,swf,metsmods,zoomify,useradmin,userlogin,wcms,webcli,webservices,z3950"/>
+    value="acl-editor,broadcasting,buildtools,classbrowser,classhandler,doubletfinder,imaging,indexing,iview,migration20-21,session-listing,swf,metsmods,zoomify,useradmin,userlogin,wcms,webcli,webservices,z3950"/>
   
   <import file="${integration.dir}/helper.xml"/>
   <taskdef classname="org.mycore.common.MCRConfigurationTask" name="mcr-config" classpathref="integration.classpath"/>
@@ -119,7 +119,7 @@
       </sequential>
     </for>
     <for param="table.class"
-      list="MCRACCESS,MCRACCESSRULE,MCRCSTORE,MCRFSNODES,MCRGROUPS,MCRGROUPADMINS,MCRGROUPMEMBERS,MCRLINKHREF,MCRRESUMPTIONTOKEN,MCRURN,MCRUSERS,MCRXMLTABLE">
+      list="MCRACCESS,MCRACCESSRULE,MCRCSTORE,MCRFSNODES,MCRGROUPS,MCRGROUPADMINS,MCRGROUPMEMBERS,MCRLINKHREF,MCRRESUMPTIONTOKEN,MCRURN,MCRUSERS">
       <sequential>
         <AddHibernateMapping class="org.mycore.backend.hibernate.tables.@{table.class}"/>
       </sequential>

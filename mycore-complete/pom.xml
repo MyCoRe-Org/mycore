@@ -127,7 +127,7 @@
                 </artifactItem>
                 <artifactItem>
                   <groupId>org.mycore</groupId>
-                  <artifactId>mycore-migration13-20</artifactId>
+                  <artifactId>mycore-migration20-21</artifactId>
                   <version>${project.version}</version>
                 </artifactItem>
                 <artifactItem>
