@@ -30,6 +30,11 @@ import org.apache.log4j.Logger;
 
 import org.jdom.Element;
 import org.mycore.common.MCRException;
+import org.mycore.datamodel.metadata.MCRMetaIFS;
+import org.mycore.datamodel.metadata.MCRMetaLangText;
+import org.mycore.datamodel.metadata.MCRMetaLink;
+import org.mycore.datamodel.metadata.MCRMetaLinkID;
+import org.mycore.datamodel.metadata.MCRObjectDerivate;
 
 /**
  * This class implements all methode for handling one derivate data.
@@ -52,6 +57,8 @@ public class MCRObjectDerivate {
     private ArrayList<MCRMetaLangText> titles = null;
 
     private ArrayList<Element> files;
+
+    private String derivateURN;
 
     /**
      * This is the constructor of the MCRObjectDerivate class. All data are set
@@ -127,6 +134,10 @@ public class MCRObjectDerivate {
         // fileset part
         Element filesetElements = derivate_element.getChild("fileset");
         if (filesetElements != null) {
+            String mainURN = filesetElements.getAttributeValue("urn");
+            if (mainURN != null) {
+                this.derivateURN = mainURN;
+            }
             List<Element> filesInList = filesetElements.getChildren();
             for (int i = 0; i < filesInList.size(); i++) {
                 Element currentFromList = filesInList.get(i);
@@ -134,13 +145,13 @@ public class MCRObjectDerivate {
                 Element urn = new Element("urn");
 
                 String value = currentFromList.getAttributeValue("name");
-                if (value != null){
+                if (value != null) {
                     file.setAttribute("name", value);
                     value = null;
                 }
-                
+
                 value = currentFromList.getAttributeValue("ifsid");
-                if (value != null){
+                if (value != null) {
                     file.setAttribute("ifsid", value);
                     value = null;
                 }
@@ -318,6 +329,11 @@ public class MCRObjectDerivate {
 
         if (files.size() != 0) {
             Element fileset = new Element("fileset");
+
+            if (this.derivateURN != null) {
+                fileset.setAttribute("urn", derivateURN);
+            }
+
             for (int i = 0; i < files.size(); i++) {
                 fileset.addContent(files.get(i));
             }
