@@ -243,7 +243,6 @@ PanoJS.prototype = {
 		}
 
 		var fullSize = this.tileSize;
-		console.log("daff",this.tileSize);
 		// explicit set of zoom level
 		if (this.zoomLevel >= 0 && this.zoomLevel <= this.maxZoomLevel) {
 			fullSize = this.tileSize * Math.pow(2, this.zoomLevel);
