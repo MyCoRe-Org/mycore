@@ -238,6 +238,15 @@
       </build>
     </profile>
   </profiles>
+  <pluginRepositories>
+    <pluginRepository>
+      <id>MyCoRe HQ</id>
+      <url>http://www.mycore.de/maven2</url>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+    </pluginRepository>
+  </pluginRepositories>
   <repositories>
     <repository>
       <id>MyCoRe HQ</id>
