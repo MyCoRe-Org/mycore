@@ -42,26 +42,44 @@ public class MCRIndexBrowserUtils{
     protected MCRIndexBrowserIncomingData incomingBrowserData;
 
     protected MCRIndexBrowserConfig config;
-    
-  
 
     /**
      * Creates a xml document with the results of the index browser.
      * @return 
      */
     public static Document createResultListDocument(MCRIndexBrowserIncomingData incomingBrowserData,
-    		MCRIndexBrowserConfig config) {
+            MCRIndexBrowserConfig config) {
         List<MCRIndexBrowserEntry> resultList = null;
         String index = config.getIndex();
-        if(MCRIndexBrowserCache.isCached(index, incomingBrowserData)) {
-            resultList = MCRIndexBrowserCache.getFromCache(index, incomingBrowserData);
+
+        String cacheKey = getCacheKey(index, incomingBrowserData);
+        if(MCRIndexBrowserCache.isCached(cacheKey, index)) {
+            resultList = MCRIndexBrowserCache.getFromCache(cacheKey, index);
         } else {
             MCRIndexBrowserSearcher searcher = new MCRIndexBrowserSearcher(incomingBrowserData, config);
             resultList = searcher.doSearch();
-            MCRIndexBrowserCache.addToCache(incomingBrowserData, index, resultList);
+            MCRIndexBrowserCache.addToCache(cacheKey, index, resultList);
         }
         MCRIndexBrowserXmlGenerator xmlGen = new MCRIndexBrowserXmlGenerator(resultList, incomingBrowserData, config);
         return xmlGen.getXMLContent();
+    }
+
+    /**
+     * Returns the cache key from the incoming browser data.
+     * 
+     * @return the cache key in the form of index # search # mode
+     */
+    protected static String getCacheKey(String index, MCRIndexBrowserIncomingData browseData) {
+        StringBuffer key = new StringBuffer("");
+        if(index != null)
+            key.append(index);
+        key.append("#");
+        if(browseData.getSearch() != null)
+            key.append(browseData.getSearch());
+        key.append("#");
+        if(browseData.getMode() != null)
+            key.append(browseData.getMode());
+        return key.toString();
     }
 
     /**
@@ -90,4 +108,5 @@ public class MCRIndexBrowserUtils{
         } else
             return "prefix";
     }
+
 }
