@@ -44,6 +44,7 @@ import javax.xml.transform.stream.StreamResult;
 
 import org.jdom.Document;
 import org.jdom.Element;
+import org.jdom.Namespace;
 import org.jdom.transform.JDOMSource;
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRConfigurationException;
@@ -150,6 +151,10 @@ public class MCRInputValidator {
     private synchronized Document prepareStylesheet() {
         Element stylesheet = new Element("stylesheet").setAttribute("version", "1.0");
         stylesheet.setNamespace(MCRConstants.XSL_NAMESPACE);
+        
+        for (Namespace ns : MCRConstants.getStandardNamespaces())
+            if (!ns.equals(MCRConstants.XSL_NAMESPACE))
+                stylesheet.addNamespaceDeclaration(ns);
 
         Element output = new Element("output", MCRConstants.XSL_NAMESPACE);
         output.setAttribute("method", "text");
@@ -371,17 +376,11 @@ public class MCRInputValidator {
 
             return (dmin <= dval) && (dmax >= dval);
         } else if (type.equals("datetime")) {
-            DateFormat df = getDateTimeFormat(format);
+            String[] formats = format.split(";");
+            DateFormat df = getDateTimeFormat(formats[0].trim());
 
             Date dmin = null;
             Date dmax = null;
-            Date dval = null;
-
-            try {
-                dval = df.parse(input);
-            } catch (ParseException ex) {
-                return false;
-            }
 
             try {
                 if (min != null) {
@@ -396,6 +395,18 @@ public class MCRInputValidator {
                 throw new MCRConfigurationException(msg, ex);
             }
 
+            Date dval = null;
+
+            for (String dtf : formats) {
+                df = getDateTimeFormat(dtf.trim());
+                try {
+                    dval = df.parse(input);
+                } catch (ParseException ignored) {
+                }
+            }
+            if (dval == null)
+                return false;
+              
             if ((dmin != null) && (dmin.after(dval))) {
                 return false;
             }

@@ -655,10 +655,10 @@ public class MCREditorSubmission {
                 }
 
                 Namespace ns = getNamespace(name);
-                if (ns != null)
+                if (! ns.equals(Namespace.NO_NAMESPACE))
                     name = name.substring(name.indexOf(":") + 1);
                 Element child = parent.getChild(name, ns);
-
+                
                 if (child == null) {
                     child = new Element(name, ns);
                     parent.addContent(child);
@@ -729,7 +729,7 @@ public class MCREditorSubmission {
         int pos1 = name.indexOf(":");
         int pos2 = name.indexOf(ATTR_SEP);
         if ((pos1 == -1) || ((pos1 > pos2) && (pos2 >= 0)))
-            return null;
+            return Namespace.NO_NAMESPACE;
         String prefix = name.substring(0, pos1);
         if (!nsMap.containsKey(prefix)) {
             String msg = "Namespace prefix " + prefix + " is used in editor variable, but not defined";
@@ -744,8 +744,9 @@ public class MCREditorSubmission {
      */
     private Element buildElement(String name) {
         Namespace ns = getNamespace(name);
-        if (ns != null)
+        if (! ns.equals(Namespace.NO_NAMESPACE)) {
             name = name.substring(name.indexOf(":") + 1);
+        }
         return new Element(name, ns);
     }
 
@@ -755,11 +756,10 @@ public class MCREditorSubmission {
      */
     private void setAttribute(Element parent, String name, String value) {
         Namespace ns = getNamespace(name);
-        if (ns != null) {
+        if (! ns.equals(Namespace.NO_NAMESPACE)) {
             name = name.substring(name.indexOf(":") + 1);
-            parent.setAttribute(name, value, ns);
-        } else
-            parent.setAttribute(name, value);
+        }
+        parent.setAttribute(name, value, ns);
     }
 
     private void renameRepeatedElements(Element element) {

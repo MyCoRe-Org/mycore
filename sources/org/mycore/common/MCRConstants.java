@@ -1,6 +1,7 @@
 /*
  * 
- * $Revision$ $Date$
+ * $Revision$ 
+ * $Date$
  *
  * This file is part of ***  M y C o R e  ***
  * See http://www.mycore.de/ for details.
@@ -24,7 +25,12 @@
 package org.mycore.common;
 
 import java.text.DateFormat;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Locale;
+import java.util.Properties;
 
 import org.jdom.Namespace;
 
@@ -35,6 +41,8 @@ import org.jdom.Namespace;
  * @author Jens Kupferschmidt
  * @author Thomas Scheffler (yagee)
  * @author Stefan Freitag (sasf)
+ * @author Frank Lützenkirchen
+ * 
  * @version $Revision$ $Date$
  */
 public final class MCRConstants {
@@ -69,6 +77,58 @@ public final class MCRConstants {
     private final static String MCR_URL = "http://www.mycore.org/";
     public final static Namespace MCR_NAMESPACE = Namespace.getNamespace("mcr", MCR_URL);
 
+    private final static List<Namespace> namespaces;
+    
+    private final static HashMap<String, Namespace> namespacesByPrefix;
+
+    static {
+        namespaces = new ArrayList<Namespace>();
+        namespaces.add(XLINK_NAMESPACE);
+        namespaces.add(XSI_NAMESPACE);
+        namespaces.add(XSL_NAMESPACE);
+        namespaces.add(METS_NAMESPACE);
+        namespaces.add(DV_NAMESPACE);
+        namespaces.add(MODS_NAMESPACE);
+        namespaces.add(MCR_NAMESPACE);
+
+        namespacesByPrefix = new HashMap<String, Namespace>();
+        namespacesByPrefix.put("xlink", XLINK_NAMESPACE);
+        namespacesByPrefix.put("xsi", XSI_NAMESPACE);
+        namespacesByPrefix.put("xsl", XSL_NAMESPACE);
+        namespacesByPrefix.put("mets", METS_NAMESPACE);
+        namespacesByPrefix.put("dv", DV_NAMESPACE);
+        namespacesByPrefix.put("mods", MODS_NAMESPACE);
+        namespacesByPrefix.put("mcr", MCR_NAMESPACE);
+        
+        Properties p = MCRConfiguration.instance().getProperties("MCR.Namespace");
+        for (Iterator it = p.keySet().iterator(); it.hasNext();) {
+            String prefix = (String) it.next();
+            String uri = p.getProperty(prefix);
+            prefix = prefix.substring(prefix.lastIndexOf(".") + 1);
+            Namespace ns = Namespace.getNamespace(prefix, uri);
+            namespacesByPrefix.put(prefix, ns);
+            namespaces.add(ns);
+        }
+    }
+
+    /**
+     * Returns a list of standard namespaces used in MyCoRe.
+     * Additional namespaces can be configured using properties like
+     * MCR.Namespace.<prefix>=<uri>
+     */
+    public static List<Namespace> getStandardNamespaces() {
+        return namespaces;
+    }
+    
+    /**
+     * Returns the namespace with the given standard prefix.
+     * Additional namespaces can be configured using properties like
+     * MCR.Namespace.<prefix>=<uri>
+     */
+    public static Namespace getStandardNamespace( String prefix ){ 
+        return namespacesByPrefix.get(prefix);
+    }
+    
     /** The default encoding */
     public final static String DEFAULT_ENCODING = "UTF-8";
 
