@@ -239,7 +239,6 @@ public class MCRImage {
                 //tile = addWatermark(scaleBufferedImage(tile));		
                 IIOImage iioImage=new IIOImage(tile, null, null);
                 imageWriter.write(null, iioImage, imageWriteParam);
-                imageOutputStream.close();
                 imageWriter.dispose();
                 imageTilesCount.incrementAndGet();
             } finally {
