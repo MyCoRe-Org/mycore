@@ -102,7 +102,7 @@ function pageInput(newId, parent, identer) {
 	
 	function actualize(pNum) {
 		for (i = 1; i <= amountInputs; i++) {
-			my[i].input.value = arabToRoem(pNum);
+			my[i].input.value = pNum;
 		}
 	}
 	
@@ -112,7 +112,7 @@ function pageInput(newId, parent, identer) {
 	
 	function setNumberOfPages(value) {
 		for (i = 1; i <= amountInputs; i++) {
-			my[i].amount.value = arabToRoem(value);
+			my[i].amount.value = value;
 		}
 	}
 }

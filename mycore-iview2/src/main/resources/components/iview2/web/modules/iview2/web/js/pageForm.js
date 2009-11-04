@@ -84,11 +84,11 @@ function pageForm(newId, parent, identer) {
 				}*/
 				option.value = i;
 				// TODO: eine Variable in XML die römische Ziffern ein bzw ausschaltet
-				//if (cur == 1) {
+				if (false) {
 					option.innerHTML = arabToRoem(i) + "  /  " + arabToRoem(numberOfPages);
-				/*} else {
+				} else {
 					option.innerHTML = i + "  /  " + numberOfPages;
-				}*/
+				}
 				my[cur].selection.appendChild(option);
 			}
 		}
