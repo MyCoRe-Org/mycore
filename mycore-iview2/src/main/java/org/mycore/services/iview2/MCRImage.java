@@ -32,12 +32,16 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Iterator;
+import java.util.Locale;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
+import javax.imageio.ImageWriter;
+import javax.imageio.plugins.jpeg.JPEGImageWriteParam;
 import javax.imageio.stream.FileImageInputStream;
 import javax.media.jai.JAI;
 import javax.media.jai.RenderedOp;
@@ -220,9 +224,21 @@ public class MCRImage {
             try {
                 zout.putNextEntry(ze);
                 BufferedImage tile = image.getSubimage(x * TILE_SIZE, y * TILE_SIZE, tileWidth, tileHeight);
+                ImageWriter imageWriter = ImageIO.getImageWritersBySuffix("jpeg").next();
+                JPEGImageWriteParam imageWriteParam = new JPEGImageWriteParam(Locale.getDefault());
+                try {
+                    imageWriteParam.setProgressiveMode(JPEGImageWriteParam.MODE_DEFAULT);
+                } catch (UnsupportedOperationException e) {
+                    LOGGER.warn("Your JPEG encoder does not support progressive JPEGs.");
+                }
+                imageWriteParam.setCompressionMode(JPEGImageWriteParam.MODE_EXPLICIT);
+                imageWriteParam.setCompressionQuality(0.8f);
+                imageWriter.setOutput(ImageIO.createImageOutputStream(zout));
+                IIOImage iioImage=new IIOImage(tile, null, null);
+                imageWriter.write(null, iioImage, imageWriteParam);
 
                 //tile = addWatermark(scaleBufferedImage(tile));		
-                JAI.create("encode", tile, zout, "JPEG");
+//                JAI.create("encode", tile, zout, "JPEG");
                 imageTilesCount.incrementAndGet();
             } finally {
                 zout.closeEntry();
