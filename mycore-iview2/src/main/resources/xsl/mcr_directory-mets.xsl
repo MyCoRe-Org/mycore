@@ -38,6 +38,7 @@
 
   <xsl:template match="children" mode="structMap">
     <xsl:for-each select="child">
+      <xsl:sort select="name" />
       <xsl:variable name="fileType">
         <xsl:call-template name="lastIndexOf">
           <xsl:with-param name="string" select="name" />
@@ -57,6 +58,7 @@
 
   <xsl:template match="children" mode="fileGrp">
     <xsl:for-each select="child">
+      <xsl:sort select="name" />
       <xsl:variable name="fileType">
         <xsl:call-template name="lastIndexOf">
           <xsl:with-param name="string" select="name" />
