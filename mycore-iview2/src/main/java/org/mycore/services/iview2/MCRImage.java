@@ -117,7 +117,7 @@ public class MCRImage {
                 LOGGER.warn("Your JPEG encoder does not support progressive JPEGs.");
             }
             imageWriteParam.setCompressionMode(JPEGImageWriteParam.MODE_EXPLICIT);
-            imageWriteParam.setCompressionQuality(0.8f);
+            imageWriteParam.setCompressionQuality(0.75f);
             //ImageWriter created
 
             int zoomLevels = getZoomLevels(image);
