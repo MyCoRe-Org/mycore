@@ -240,6 +240,8 @@ public class MCRImage {
                 IIOImage iioImage=new IIOImage(tile, null, null);
                 imageWriter.write(null, iioImage, imageWriteParam);
                 imageWriter.dispose();
+                //close imageOutputStream after disposing imageWriter or else application will hang
+                imageOutputStream.close();
                 imageTilesCount.incrementAndGet();
             } finally {
                 zout.closeEntry();
