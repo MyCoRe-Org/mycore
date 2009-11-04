@@ -242,19 +242,19 @@ function isloaded(img, viewID) {
 @param scrollBarSize the Height or Width of the ScrollBar which needs to be dropped from the ViewerSize
 @return boolean which tells if it was successfull to scale the picture in the current zoomlevel to the viewer Size
 */
-//TODO scrollBarSize kann aus Berechnung wieder rausgeschmissen werden, da jetzt extern
 function calculateZoomProp(level, totalSize, viewerSize, scrollBarSize, viewID) {
-	if ((totalSize / Math.pow(2, level)) <= viewerSize - scrollBarSize) {
+	if ((totalSize / Math.pow(2, level)) <= viewerSize) {
 		var viewerBean = Iview[viewID].viewerBean;
 		if (level != 0) {
 			level--;
 		}
-		var kachelzahl = Math.floor( (totalSize / Math.pow(2, level))/ Iview[viewID].tilesize);
-		var rest = totalSize / Math.pow(2, level) - kachelzahl * Iview[viewID].tilesize;
-		var verhaeltnis = (viewerSize - scrollBarSize) / (totalSize / Math.pow(2, level));
-		Iview[viewID].zoomScale = verhaeltnis;//determine the scaling ratio
+		var currentWidth = totalSize / Math.pow(2, level);
+		var viewerRatio = viewerSize / currentWidth;
+		var fullTileCount = Math.floor( currentWidth / Iview[viewID].tilesize);
+		var lastTileWidth = currentWidth - fullTileCount * Iview[viewID].tilesize;
+		Iview[viewID].zoomScale = viewerRatio;//determine the scaling ratio
 		level = Iview[viewID].zoomMax - level;
-		viewerBean.tileSize = (viewerSize - scrollBarSize - verhaeltnis * rest) / kachelzahl;
+		viewerBean.tileSize = Math.floor((viewerSize - viewerRatio * lastTileWidth) / fullTileCount);
 		Iview[viewID].zoomBack = viewerBean.zoomLevel;
 		viewerBean.zoom(level - viewerBean.zoomLevel);
 		if (Iview[viewID].useZoomBar) Iview[viewID].zoomBar.moveBarToLevel(level);
