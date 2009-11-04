@@ -159,7 +159,6 @@ public class MCRImage {
             zout.putNextEntry(ze);
             ImageOutputStream imageOutputStream = ImageIO.createImageOutputStream(zout);
             try {
-                imageWriter.setLocale(Locale.getDefault());
                 imageWriter.setOutput(imageOutputStream);
                 //tile = addWatermark(scaleBufferedImage(tile));        
                 IIOImage iioImage = new IIOImage(tile, null, null);
