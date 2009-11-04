@@ -43,6 +43,7 @@ import javax.imageio.ImageReader;
 import javax.imageio.ImageWriter;
 import javax.imageio.plugins.jpeg.JPEGImageWriteParam;
 import javax.imageio.stream.FileImageInputStream;
+import javax.imageio.stream.ImageOutputStream;
 import javax.media.jai.JAI;
 import javax.media.jai.RenderedOp;
 
@@ -233,12 +234,13 @@ public class MCRImage {
                 }
                 imageWriteParam.setCompressionMode(JPEGImageWriteParam.MODE_EXPLICIT);
                 imageWriteParam.setCompressionQuality(0.8f);
-                imageWriter.setOutput(ImageIO.createImageOutputStream(zout));
+                ImageOutputStream imageOutputStream = ImageIO.createImageOutputStream(zout);
+                imageWriter.setOutput(imageOutputStream);
+                //tile = addWatermark(scaleBufferedImage(tile));		
                 IIOImage iioImage=new IIOImage(tile, null, null);
                 imageWriter.write(null, iioImage, imageWriteParam);
-
-                //tile = addWatermark(scaleBufferedImage(tile));		
-//                JAI.create("encode", tile, zout, "JPEG");
+                imageOutputStream.close();
+                imageWriter.dispose();
                 imageTilesCount.incrementAndGet();
             } finally {
                 zout.closeEntry();
