@@ -970,14 +970,14 @@
 	background-color: #efefef;
 	top: -200px;
 	left: 260px;
-	width: 200px;
+	width: 400px;
 	height: 200px; /* also dynamic - setSize (design.xml) */
 	overflow: hidden;
 	text-align:left;
 	font-weight:normal;
 	visibility: hidden;
 	z-index: 50;
-	opacity: 0.9;
+	opacity: 0.85;
 
 }
 
@@ -998,10 +998,11 @@
 	bottom: 10px;
 	left: 10px; /* gewisser Abstand besteht in jedem Fall (resultiert aus .chapter1 .chapter) */
 	right: 50px;
-	background-color: #efefef;
+/*
 	font-size: 19px;
 	line-height: 22px;
 	font-family: Times;
+*/
 	cursor: pointer;
 	overflow: hidden;
 }
