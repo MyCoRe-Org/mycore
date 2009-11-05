@@ -28,15 +28,15 @@ public class MCRTilingAction implements Runnable {
             image.setStart(new Date());
             try {
                 picProps = imgTiler.tile();
+                image.setFinished(new Date());
+                image.setStatus(MCRJobState.FIN);
+                image.setHeight(picProps.height);
+                image.setWidth(picProps.width);
+                image.setTiles(picProps.countTiles);
+                image.setZoomLevel(picProps.zoomlevel);
             } catch (IOException e) {
-                LOGGER.error("IOException occured while Tiling a queued Picture", e);
+                LOGGER.error("IOException occured while tiling a queued picture", e);
             }
-            image.setFinished(new Date());
-            image.setStatus(MCRJobState.FIN);
-            image.setHeight(picProps.height);
-            image.setWidth(picProps.width);
-            image.setTiles(picProps.countTiles);
-            image.setZoomLevel(picProps.zoomlevel);
             session.update(image);
             transaction.commit();
         } catch (HibernateException e) {
