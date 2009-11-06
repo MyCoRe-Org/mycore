@@ -240,16 +240,20 @@ function isBrowser(browsers) {
 @return das mousedelta normalized
 */
 function returnDelta(e, prevent) {
-        e = getEvent(e);	
+        e = getEvent(e);
+        var delta = {x : 0, y : 0};
         if (e.wheelDelta) { /* IE/Opera. */
-                delta = e.wheelDelta/120;
+                delta.y = e.wheelDelta/120;
                 /** In Opera 9, delta differs in sign as compared to IE.
                  */
-	} else if (e.detail) { /** Mozilla case. */
+        } else if (e.detail) { /** Mozilla case. */
                 /** In Mozilla, sign of delta is different than in IE.
                  * Also, delta is multiple of 3.
                  */
-                delta = -e.detail/3;
+				if (e.axis && e.axis == e.HORIZONTAL_AXIS)
+					delta.x = -e.detail/3;
+				else
+					delta.y = -e.detail/3;
         }
 	
 	if (prevent) {

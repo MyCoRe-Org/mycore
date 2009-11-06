@@ -415,7 +415,7 @@ function scrollBar(newId) {
 		*/
 		function dbgMouseWheel(e) {
 			e = getEvent(e);
-			if (returnDelta(e, true) > 0) {
+			if (returnDelta(e, true).y > 0) {
 				moveUp();
 			} else {
 				moveDown();

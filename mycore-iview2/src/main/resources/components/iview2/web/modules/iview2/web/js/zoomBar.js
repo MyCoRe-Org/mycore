@@ -388,8 +388,8 @@ function zoomBar(newId, parent, identer) {
 	function mouseScrollZoombar(e) {
 		e = getEvent(e);
 		var delta = returnDelta(e, true);
-		if (delta != 0) {
-			if (delta < 0) {
+		if (delta.y != 0) {
+			if (delta.y < 0) {
 				eval(zoomFunction+"(-1)");
 			} else {
 				eval(zoomFunction+"(1)");				
