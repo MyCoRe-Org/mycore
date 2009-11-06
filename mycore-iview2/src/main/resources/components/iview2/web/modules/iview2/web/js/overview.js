@@ -161,11 +161,11 @@ function overview(newId, parent, identer) {
 		}
 
 		// register additional Events
-		EventUtils.addEventListener($(id), 'mousemove', scrollOverview.mouseMove, false);
-		EventUtils.addEventListener($(id), 'mouseup', scrollOverview.mouseUp, false);
+		ManageEvents.addEventListener($(id), 'mousemove', scrollOverview.mouseMove, false);
+		ManageEvents.addEventListener($(id), 'mouseup', scrollOverview.mouseUp, false);
 		// default mouseScroll event von Scrollbar entfernen, da sonst doppelt registriert
-		IView2.removeEventListener(getElementsByClassName("empty","scrollOV"+viewID,"div")[0], 'mouseScroll', scrollOverview.scroll, false);
-		EventUtils.addEventListener($(id), 'mouseScroll', scrollOverview.scroll, false);
+		ManageEvents.removeEventListener(getElementsByClassName("empty","scrollOV"+viewID,"div")[0], 'mouseScroll', scrollOverview.scroll, false);
+		ManageEvents.addEventListener($(id), 'mouseScroll', scrollOverview.scroll, false);
 	}
 
 	/*
@@ -284,8 +284,8 @@ function overview(newId, parent, identer) {
 		
 		// nicht sicher ob das so in allen Browsern funktioniert
 		// linking the previews with the viewer, only if this wasen't done in past
-		//if (!(IView2.findEvents($("previewDiv" + viewID +((i * amountWidth) + j)),"click",""))) {
-			//EventUtils.addEventListener($("previewDiv" + viewID +((i * amountWidth) + j)), 'click', function(e) {notifyListenerClick((((i + currentFirstRow) * amountWidth) + j) + 1);}, true);
+		//if (!(ManageEvents.findEvents($("previewDiv" + viewID +((i * amountWidth) + j)),"click",""))) {
+			//ManageEvents.addEventListener($("previewDiv" + viewID +((i * amountWidth) + j)), 'click', function(e) {notifyListenerClick((((i + currentFirstRow) * amountWidth) + j) + 1);}, true);
 			$("previewDiv" + viewID +((i * amountWidth) + j)).onclick =  function(e) {notifyListenerClick((((i + currentFirstRow) * amountWidth) + j) + 1);};
 		//}
 		

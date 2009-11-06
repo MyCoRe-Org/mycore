@@ -606,8 +606,8 @@ function importZoomBar(viewID) {
 		Iview[viewID].zoomScreen = screen;
 	}});
 	// additional Events
-	EventUtils.addEventListener($("viewer"+viewID), 'mouseup', zoombar.mouseUpZoombar, false);
-	EventUtils.addEventListener($("viewer"+viewID), 'mousemove', zoombar.mouseMoveZoombar, false);
+	ManageEvents.addEventListener($("viewer"+viewID), 'mouseup', zoombar.mouseUpZoombar, false);
+	ManageEvents.addEventListener($("viewer"+viewID), 'mousemove', zoombar.mouseMoveZoombar, false);
 }
 
 /*
@@ -639,10 +639,10 @@ function importCutOut(viewID) {
 				 'y' : (Iview[viewID].ausschnitt.getHeight()/2 + Iview[viewID].ausschnitt.getPosition().y)*Math.pow(2, Iview[viewID].viewerBean.zoomLevel)*Iview[viewID].zoomScale
 				}, true);});
 	// Additional Events
-	EventUtils.addEventListener(document.getElementsByTagName("body")[0], 'mouseup', ausschnitt.mouseUp, false);
-	EventUtils.addEventListener(/*$("viewer"+viewID)*/$(Iview[viewID].ausschnittParent), 'mousemove', ausschnitt.mouseMove, false);
+	ManageEvents.addEventListener(document.getElementsByTagName("body")[0], 'mouseup', ausschnitt.mouseUp, false);
+	ManageEvents.addEventListener(/*$("viewer"+viewID)*/$(Iview[viewID].ausschnittParent), 'mousemove', ausschnitt.mouseMove, false);
 	// wird in Klasse für cutOut bzw. in loading für viewer gemacht
-	// EventUtils.addEventListener($("viewer"+viewID), 'mouseScroll', ausschnitt.scroll, false);
+	// ManageEvents.addEventListener($("viewer"+viewID), 'mouseScroll', ausschnitt.scroll, false);
 }
 
 /*
@@ -801,7 +801,7 @@ function loading(viewID) {
 
 	// Additional Events
 	// register to scroll into the viewer
-	EventUtils.addEventListener($("viewer"+viewID), 'mouseScroll', function(e) { viewerScroll(returnDelta(e), viewID); e = getEvent(e); e.preventDefault();}, false);
+	ManageEvents.addEventListener($("viewer"+viewID), 'mouseScroll', function(e) { viewerScroll(returnDelta(e), viewID); e = getEvent(e); e.preventDefault();}, false);
 	
 	//Edge-Element
 	//TODO: müsste beim import des CutOut entsprechend gesetzt werden, oder ähnlich
@@ -851,7 +851,7 @@ function loading(viewID) {
 	if (isBrowser("IE")) {
 		$("viewer"+viewID).parentNode.onresize = function() {reinitializeGraphic(viewID)};
 	} else {
-		EventUtils.addEventListener(window, 'resize', function() { reinitializeGraphic(viewID);}, false);
+		ManageEvents.addEventListener(window, 'resize', function() { reinitializeGraphic(viewID);}, false);
 	}
 	
 	// surface muss als Blank geladen werden, damit Ebene gefüllt und es im Vordergrund des Viewers liegt
@@ -868,5 +868,5 @@ function loading(viewID) {
 	if (window.location.search.get("maximized") == "true") {
 		maximizeHandler(viewID);
 	}
-	//EventUtils.addEventListener($("viewer"+viewID), 'mousedown', function() { maximizeHandler(viewID);}, false);
+	//ManageEvents.addEventListener($("viewer"+viewID), 'mousedown', function() { maximizeHandler(viewID);}, false);
 }

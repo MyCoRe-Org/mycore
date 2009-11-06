@@ -40,7 +40,6 @@
           <div id="preload{$groupID}" class="preload">
             <xsl:call-template name="iview2.getToolbar">
               <xsl:with-param name="groupID" select="$groupID" />
-              <xsl:with-param name="idAdd" select="' ForBack'" />
               <xsl:with-param name="optOut" select="'false'" />
               <xsl:with-param name="forward" select="'true'" />
               <xsl:with-param name="backward" select="'true'" />
@@ -187,6 +186,7 @@
   </xsl:template>
   <xsl:template name="iview2.init">
     <xsl:param name="groupID" />
+    <script type="text/javascript" language="JavaScript" src="{$WebApplicationBaseURL}modules/iview2/web/js/ManageEvents.js" />
     <script type="text/javascript" language="JavaScript" src="{$WebApplicationBaseURL}modules/iview2/web/js/EventUtils.js" />
     <script type="text/javascript" language="JavaScript" src="{$WebApplicationBaseURL}modules/iview2/web/js/PanoJS.js" />
     <!-- Viewer -->

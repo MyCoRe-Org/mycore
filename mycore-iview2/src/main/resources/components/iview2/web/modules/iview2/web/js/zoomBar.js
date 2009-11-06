@@ -158,11 +158,11 @@ function zoomBar(newId, parent, identer) {
 					  getElementsByClassName("bar",id,"div")[0].offsetHeight;
 		}
 
-		EventUtils.addEventListener(getElementsByClassName("bar",id,"div")[0], 'mousedown', mouseDownZoombar, false);
-		EventUtils.addEventListener(main, 'mouseup', mouseUpZoombar, false);
-		EventUtils.addEventListener(main, 'mousemove', mouseMoveZoombar, false);
-		EventUtils.addEventListener(main, 'mouseScroll', mouseScrollZoombar, false);
-		EventUtils.addEventListener(getElementsByClassName("scale",id,"div")[0], 'dblclick', mouseDbClick, false);
+		ManageEvents.addEventListener(getElementsByClassName("bar",id,"div")[0], 'mousedown', mouseDownZoombar, false);
+		ManageEvents.addEventListener(main, 'mouseup', mouseUpZoombar, false);
+		ManageEvents.addEventListener(main, 'mousemove', mouseMoveZoombar, false);
+		ManageEvents.addEventListener(main, 'mouseScroll', mouseScrollZoombar, false);
+		ManageEvents.addEventListener(getElementsByClassName("scale",id,"div")[0], 'dblclick', mouseDbClick, false);
 		
 /*		if (active==true) {
 			this.createScale = createScale;

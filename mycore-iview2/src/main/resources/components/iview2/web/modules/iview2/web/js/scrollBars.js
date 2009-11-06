@@ -451,8 +451,8 @@ function scrollBar(newId) {
 		buttonUL.onmousedown = function() {return false;};
 		buttonUL.className = scrollBar.STARTCL;// + identer;
 		complete.appendChild(buttonUL);
-		EventUtils.addEventListener(buttonUL, "mousedown", upLeftMouseDown, false);
-		EventUtils.addEventListener(buttonUL, "mouseup", upLeftMouseUp, false);
+		ManageEvents.addEventListener(buttonUL, "mousedown", upLeftMouseDown, false);
+		ManageEvents.addEventListener(buttonUL, "mouseup", upLeftMouseUp, false);
 	//END
 		var wholeSpace = document.createElement("div");
 		wholeSpace.onmousedown = function() {return false;};
@@ -467,9 +467,9 @@ function scrollBar(newId) {
 		var spaceEnd = document.createElement("div");
 		spaceEnd.className = "spaceEnd";// + identer;
 		wholeSpace.appendChild(spaceEnd);
-		EventUtils.addEventListener(wholeSpace, "mousescroll", dbgMouseWheel, false);
-		EventUtils.addEventListener(wholeSpace, "mousedown", dbgMouseDown, false);
-		EventUtils.addEventListener(wholeSpace, "mouseup", dbgMouseUp, false);
+		ManageEvents.addEventListener(wholeSpace, "mousescroll", dbgMouseWheel, false);
+		ManageEvents.addEventListener(wholeSpace, "mousedown", dbgMouseDown, false);
+		ManageEvents.addEventListener(wholeSpace, "mouseup", dbgMouseUp, false);
 	//ScrollBar
 		var barScroll = document.createElement("div");
 		barScroll.onmousedown = function() {return false;};
@@ -482,10 +482,10 @@ function scrollBar(newId) {
 		barScroll.id = id + "Bar";
 		barScroll.className = complete.className + "Bar";//new
 		wholeSpace.appendChild(barScroll);
-		EventUtils.addEventListener(barScroll, "mousedown", divMouseDown, false);
-		EventUtils.addEventListener(barScroll, "mouseup", divMouseUp, false);
-		EventUtils.addEventListener(barScroll, "mousemove", divMouseMove, false);
-		EventUtils.addEventListener(barScroll, "mouseover", divMouseOver, false);
+		ManageEvents.addEventListener(barScroll, "mousedown", divMouseDown, false);
+		ManageEvents.addEventListener(barScroll, "mouseup", divMouseUp, false);
+		ManageEvents.addEventListener(barScroll, "mousemove", divMouseMove, false);
+		ManageEvents.addEventListener(barScroll, "mouseover", divMouseOver, false);
 		bar = barScroll;
 		barScroll.appendChild(scroll);
 		var barEnd = document.createElement("div");
@@ -497,8 +497,8 @@ function scrollBar(newId) {
 		var buttonDR = document.createElement("div");
 		buttonDR.onmousedown = function() {return false;};
 		buttonDR.className = scrollBar.ENDCL;// + identer;
-		EventUtils.addEventListener(buttonDR, "mousedown", downRightMouseDown, false);
-		EventUtils.addEventListener(buttonDR, "mouseup", downRightMouseUp, false);
+		ManageEvents.addEventListener(buttonDR, "mousedown", downRightMouseDown, false);
+		ManageEvents.addEventListener(buttonDR, "mouseup", downRightMouseUp, false);
 
 		if (horz) {
 			wholeSpace.style.cssFloat = "left";

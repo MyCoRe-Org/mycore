@@ -36,7 +36,7 @@ IView2.findEvents = function(target, type, callback) {
 		}
 		
 		// Wenn gefunden, dann gib Eintragsnummer zur�ck
-		if (EventUtils.objEquals(target, usedTarget) && type === usedType && callback === usedCallback)	{
+		if (ManageEvents.objEquals(target, usedTarget) && type === usedType && callback === usedCallback)	{
 			selection[selection.length] = i-1;
 		}
 		i--;

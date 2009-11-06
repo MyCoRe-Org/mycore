@@ -1,4 +1,4 @@
-// TODO: wird viewId überhaupt benötigt?
+// TODO: wird viewId ï¿½berhaupt benï¿½tigt?
 
 function pageInput(newId, parent, identer) {
 	// self calculated
@@ -77,8 +77,8 @@ function pageInput(newId, parent, identer) {
 		input.name = "input";
 		main.appendChild(input);
 
-		EventUtils.addEventListener(input, 'keypress', function(e){e.cancelBubble = true;}, false);
-		EventUtils.addEventListener(input, 'keyup', function(e){inputKey(e);}, false);
+		ManageEvents.addEventListener(input, 'keypress', function(e){e.cancelBubble = true;}, false);
+		ManageEvents.addEventListener(input, 'keyup', function(e){inputKey(e);}, false);
 		
 		var slash = document.createElement("textarea");
 		slash.className = "slash";

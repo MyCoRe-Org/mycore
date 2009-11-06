@@ -225,7 +225,7 @@ function chapter(newId, parent) {
 		parent.appendChild(TOC);
 
 		if (curNodes.length == 0) {
-			EventUtils.addEventListener(TOC, 'click', clickPage, false);
+			ManageEvents.addEventListener(TOC, 'click', clickPage, false);
 			var values = new Object();
 			var Page = document.createElement("div");
 
@@ -260,12 +260,12 @@ function chapter(newId, parent) {
 			//so that the click on the full width of the individual page will be catched
 			checkChapterEntry(TOC);
 
-			EventUtils.addEventListener(TOC, 'mouseover', function(e){hoverCurrentPage(e, true);}, false);
-			EventUtils.addEventListener(TOC, 'mouseout', function(e){hoverCurrentPage(e, false);}, false);
+			ManageEvents.addEventListener(TOC, 'mouseover', function(e){hoverCurrentPage(e, true);}, false);
+			ManageEvents.addEventListener(TOC, 'mouseout', function(e){hoverCurrentPage(e, false);}, false);
 
 			return values;
 		} else {
-			EventUtils.addEventListener(TOC, 'click', clickChap, false);
+			ManageEvents.addEventListener(TOC, 'click', clickChap, false);
 			var span = document.createElement("div");
 
 			var chapterImage = document.createElement("div");
@@ -563,7 +563,7 @@ function chapter(newId, parent) {
 		chapSort.id = id+"_chapSort";
 		chapSort.className = identer + "_chapSort";
 		//chapSort.onclick = function() {chapterSort();};
-		EventUtils.addEventListener(chapSort, 'click', function() {chapterSort();}, false);
+		ManageEvents.addEventListener(chapSort, 'click', function() {chapterSort();}, false);
 		main.appendChild(chapSort);
 
 		// to determine content-width
@@ -607,10 +607,10 @@ function chapter(newId, parent) {
 		scrollY.setSize(main.style.height);
 		
 		//EventRegistrations
-		EventUtils.addEventListener(main, 'mousemove', scrollY.mouseMove, false);
-		EventUtils.addEventListener(main, 'mouseup', scrollY.mouseUp, false);
-		IView2.removeEventListener(getElementsByClassName("empty","scrollChap"+viewID,"div")[0], 'mouseScroll', scrollY.scroll, false);
-		EventUtils.addEventListener(main, 'mouseScroll', function(e) { e = getEvent(e); scrollY.scroll(e); e.cancelBubble = true;}, false);
+		ManageEvents.addEventListener(main, 'mousemove', scrollY.mouseMove, false);
+		ManageEvents.addEventListener(main, 'mouseup', scrollY.mouseUp, false);
+		ManageEvents.removeEventListener(getElementsByClassName("empty","scrollChap"+viewID,"div")[0], 'mouseScroll', scrollY.scroll, false);
+		ManageEvents.addEventListener(main, 'mouseScroll', function(e) { e = getEvent(e); scrollY.scroll(e); e.cancelBubble = true;}, false);
 		
 	}
 

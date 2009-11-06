@@ -76,12 +76,12 @@ function cutOut() {
 		damp.appendChild(show);
 		$(parentD).appendChild(damp);
 
-		EventUtils.addEventListener(complete, "mouseScroll", mouseScroll, false);
-		EventUtils.addEventListener(complete, "dblclick", dblClick, false);
-		EventUtils.addEventListener(ausschnitt, "mousedown", mouseDown, false);
-		EventUtils.addEventListener(complete, "mouseup", mouseUp, false);
-		EventUtils.addEventListener(complete, "mousemove", mouseMove, false);
-		EventUtils.addEventListener(damp, "mousedown", damper, false);
+		ManageEvents.addEventListener(complete, "mouseScroll", mouseScroll, false);
+		ManageEvents.addEventListener(complete, "dblclick", dblClick, false);
+		ManageEvents.addEventListener(ausschnitt, "mousedown", mouseDown, false);
+		ManageEvents.addEventListener(complete, "mouseup", mouseUp, false);
+		ManageEvents.addEventListener(complete, "mousemove", mouseMove, false);
+		ManageEvents.addEventListener(damp, "mousedown", damper, false);
 		//TODO: wird aber glaub nicht mehr benötigt
 		
 		// Browser-Drag&Drop deaktiveren
