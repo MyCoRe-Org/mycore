@@ -785,7 +785,6 @@
 	bottom: 0px;
 	left: 0px;
 	z-index:50;
-	cursor: pointer;
 }
 
 /* Start & End - Buttons */
@@ -824,7 +823,6 @@
 }
 .scrollHBar { /* contains ScrollBar */
 	position:absolute;
-	cursor: url('cursor/horizontal.cur'), pointer;
 }
 
 /* ScrollBar */
@@ -875,7 +873,6 @@
 	margin: 0px;
 	z-index: 50;
 	line-height: 0px;
-	cursor: pointer;
 }
 
 /* Start & End - Buttons */
@@ -921,7 +918,6 @@
 }
 .scrollVBar, .scrollOVVBar {  /* contains ScrollBar */
 	position:absolute;
-	cursor: url('cursor/vertical.cur'), pointer;
 }
 
 /* ScrollBar */
@@ -1027,8 +1023,8 @@
 .chapter1 .pageImageSymbol {
 	position: relative;
 	top: 3px;
-	height: 16px;
-	width: 15px;
+	height: 10px;
+	width: 10px;
 	background-image: url('image.png');
 	background-repeat: no-repeat;
 	background-position: -1170px -0px;
@@ -1037,8 +1033,8 @@
 .chapter1 .chapterImageSymbolMinus {
 	position: relative;
 	top: 3px;
-	height: 16px;
-	width: 15px;
+	height: 10px;
+	width: 10px;
 	background-image: url('image.png');
 	background-repeat: no-repeat;
 	background-position: -1140px -0px;
@@ -1047,8 +1043,8 @@
 .chapter1 .chapterImageSymbolPlus {
 	position: relative;
 	top: 3px;
-	height: 16px;
-	width: 15px;
+	height: 10px;
+	width: 10px;
 	background-image: url('image.png');
 	background-repeat: no-repeat;
 	background-position: -1110px -0px;
@@ -1083,7 +1079,6 @@
 	right:0px;
 	top:0px;
 	width:15px;
-	cursor: pointer;
 }
 
 /* Up / Down - Buttons */
@@ -1137,7 +1132,6 @@
 /* ScrollBar Main */
 .scrollChapVBar {
 	position:absolute;
-	cursor: url('cursor/vertical.cur'), pointer;
 }
 
 /* ScrollBar Single Parts */
@@ -1176,7 +1170,6 @@
 	left:10px;
 	bottom:0px;
 	height:15px;
-	cursor: url('cursor/horizontal.cur'), pointer;
 }
 
 /* Up / Down - Buttons */
