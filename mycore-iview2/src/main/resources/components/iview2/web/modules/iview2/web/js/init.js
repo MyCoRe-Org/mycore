@@ -75,6 +75,11 @@ function initializeGraphic(viewID) {
 				}
 				preventDefault(e);
 			}
+			if (e.keyCode == e.DOM_VK_ESCAPE){
+				//ESC key pressed
+				if (Iview[viewer.viewID].maximized)
+					maximizeHandler(viewer.viewID);
+			}
 		}
 	}
 	// opera triggers the onload twice
