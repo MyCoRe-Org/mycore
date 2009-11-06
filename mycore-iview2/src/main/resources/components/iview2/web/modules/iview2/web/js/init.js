@@ -408,6 +408,7 @@ function maximizeHandler(viewID) {
 		PanoJS.mousePressedHandler = function(e) {
 			maximizeHandler(viewID);
 		}
+		pictureScreen(viewID);
 	} else {
 		Iview[viewID].maximized = true;
 		/*if (document.compatMode == "CSS1Compat") {

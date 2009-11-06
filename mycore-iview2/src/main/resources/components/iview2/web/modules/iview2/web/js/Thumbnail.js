@@ -136,8 +136,8 @@ function loadPage(pageData, viewID) {
 	preload.style.width = "100%";
 	preload.style.height = "100%";
 	preload.id = "preloadImg" + viewID;
+	preload.src = viewerBean.tileUrlProvider.assembleUrl(0,0,0);
 	$("preload"+viewID).appendChild(preload);
-	$("preload"+viewID).childNodes[0].src = viewerBean.tileUrlProvider.assembleUrl(0,0,0);
 	$("preload"+viewID).style.visibility = "visible";
 	if (Iview[viewID].useCutOut) {
 		Iview[viewID].ausschnitt.setSRC(viewerBean.tileUrlProvider.assembleUrl(0,0,0));
@@ -217,6 +217,7 @@ function isloaded(img, viewID) {
 		if (Iview[viewID].images[img.src]["scaled"] != true) {
 			img.style.display = "inline";
 			Iview[viewID].images[img.src]["scaled"] = true;//notice that this picture already was scaled
+			//TODO math Floor rein bauen bei Höhe und Breite
 			if (!isBrowser(["IE","Opera"])) {
 				img.style.width = Iview[viewID].zoomScale * img.naturalWidth + "px";
 				img.style.height = Iview[viewID].zoomScale * img.naturalHeight + "px";
