@@ -1,99 +1,4 @@
 loadVars("../modules/iview2/web/config.xml");
-if (typeof IView2 == "undefined")
-	function IView2(){};
-
-IView2.Events = [];
-	
-IView2.findEvents = function(target, type, callback) {
-	// to allow differences in function call
-	if (type) type = type.toLowerCase();
-	
-	var i = IView2.Events.length;
-	if (!i) return;
-	
-	var selection = [];
-	
-	// Durchlaufe alle registrierten Events
-	while (i >= 1) {
-		 var item = IView2.Events[i - 1];
-		
-		// if some argument is left out
-		if (!target) {
-			var usedTarget = target;
-		} else {
-			var usedTarget = item[0];
-		}
-		if (!type) {
-			var usedType = type;
-		} else {
-			// because browser-differences
-			var usedType = item[1].toLowerCase();
-		}
-		if (!callback) {
-			var usedCallback = callback;
-		} else {
-			var usedCallback = item[2];
-		}
-		
-		// Wenn gefunden, dann gib Eintragsnummer zur�ck
-		if (ManageEvents.objEquals(target, usedTarget) && type === usedType && callback === usedCallback)	{
-			selection[selection.length] = i-1;
-		}
-		i--;
-	}
-	
-	if (selection.length > 0) {
-		return selection;
-	} else {
-		// falls nicht gefunden
-		return false;
-	}
-}
-
-IView2.removeEventListener = function(target, type, callback, captures) {
-	// check if Event was registred in past
-	var selection = IView2.findEvents(target, type, callback);
-	if (selection) {
-		index = 0;
-		while (index < selection.length) {
-			var item = IView2.Events[selection[index]];
-			// item[3] ist der zugeh�rige Wrapper, den wir zum entfernen ben�tigen.
-			switch (item[1].toLowerCase()) {//Browser behave on some kinds of events totally different therefore its needed to find it out and take action correctly
-				case "mousescroll":
-					if (isBrowser(["IE", "Opera", "Safari"])) {
-						if (isBrowser("IE")) {
-							item[0].detachEvent("on" + item[1], item[3]);
-						} else {
-							item[0].removeEventListener("mousewheel", item[3], false);
-						}
-					} else {
-						item[0].removeEventListener("DOMMouseScroll",item[3], false);
-					}
-				break;
-				default://all Events which are just different in the function name to apply
-					if (item[0].removeEventListener) {
-						// W3C standard
-						item[0].removeEventListener(item[1], item[3], false);
-					} else if (item[0].attachEvent) {
-						// newer IE
-						item[0].detachEvent("on" + item[1], item[3]);
-					} else {
-						// IE 5 Mac and some others
-						// TODO: needs to be tested
-						item[0]['on'+item[1]] = "";
-					}
-					result = true;
-				break;
-			}
-			
-			// Das event wird gelöscht.
-			IView2.Events.splice(selection[index], 1);
-			
-			index++;
-		}
-	}
-}
-
 
 function initializeGraphic(viewID) {
 	//Iview[viewID].baseUri = baseUri + "/" + viewID;//TODO sicherlich andere bessere Lösung
@@ -395,7 +300,8 @@ function maximizeHandler(viewID) {
 		if (classIsUsed("BSE_normalView")) doForEachInClass("BSE_normalView", ".style.display = 'none';", viewID);
 		
 		document.body.style.overflow="";
-		
+		document.body.style.visibility = "visible";
+
 		// class-Wechsel löst im IE resize aus
 		$("viewerContainer"+viewID).className = "viewerContainer min";
 		//$("buttonSurface"+viewID).className = "buttonSurface min";
@@ -420,7 +326,8 @@ function maximizeHandler(viewID) {
 		if (classIsUsed("BSE_normalView")) doForEachInClass("BSE_normalView", ".style.display = 'block';", viewID);
 		
 		document.body.style.overflow="hidden";
-		
+		document.body.style.visibility = "hidden";
+
 		// class-Wechsel löst im IE resize aus
 		$("viewerContainer"+viewID).className = "viewerContainer max";
 

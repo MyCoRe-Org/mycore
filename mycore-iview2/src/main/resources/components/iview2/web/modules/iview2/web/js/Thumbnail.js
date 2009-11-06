@@ -511,10 +511,10 @@ function openChapter(major, viewID){
 		if ($("chapter1"+viewID).style.visibility == "hidden") {
 			$("chapter1"+viewID).style.visibility = "visible";
 			Iview[viewID].chapter1.showCurrentPageCenter(Iview[viewID].pagenumber);
-			blendings.slide("chapter1"+viewID,new Array(toFloat(getStyle($("chapter1"+viewID+"Out"), "left")) - toFloat(getStyle($("chapter1"+viewID+"Out"), "right")), toFloat(getStyle($("chapter1"+viewID+"Out"),"top")), toFloat(getStyle($("chapter1"+viewID+"In"), "left")) - toFloat(getStyle($("chapter1"+viewID+"In"), "right")), toFloat(getStyle($("chapter1"+viewID+"In"), "top"))),5,5,0,new Array("chapter1"+viewID+":in"));
+			blendings.slide("chapter1"+viewID, new Array(getStyle("chapter1"+viewID,"left"),0,getStyle("chapter1"+viewID,"left"),($("chapter1" + viewID).offsetHeight)),5,5,0,new Array(), "");
 			Iview[viewID].chapterActive = true;
 		} else {
-			blendings.slide("chapter1"+viewID,new Array(toFloat(getStyle($("chapter1"+viewID+"In"), "left")) - toFloat(getStyle($("chapter1"+viewID+"In"), "right")), toFloat(getStyle($("chapter1"+viewID+"In"), "top")), toFloat(getStyle($("chapter1"+viewID+"Out"), "left")) - toFloat(getStyle($("chapter1"+viewID+"Out"), "right")), toFloat(getStyle($("chapter1"+viewID+"Out"), "top"))),5,5,0,new Array("chapter1"+viewID+":out"), "", "$('chapter1'+'"+viewID+"').style.visibility = 'hidden'");
+			blendings.slide("chapter1"+viewID, new Array(getStyle("chapter1"+viewID,"left"),0,getStyle("chapter1"+viewID,"left"),- ($("chapter1" + viewID).offsetHeight)),5,5,0,new Array(), "",  "$('chapter1"+viewID+"').style.visibility = 'hidden';");
 			Iview[viewID].chapterActive = false;
 		}
 	} else {
