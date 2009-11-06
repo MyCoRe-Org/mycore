@@ -96,6 +96,17 @@ function initializeGraphic(viewID) {
 			loadingTile: "../modules/iview2/web/" + styleFolderUri + 'blank.gif',
 		});
 		Iview[viewID].viewerBean.viewID = viewID;//Add Viewer ID mit übergeben damit der Viewer darauf arbeiten kann
+		Iview[viewID].viewerBean.initOrig = Iview[viewID].viewerBean.init;
+		Iview[viewID].viewerBean.init = function(motion, reset) {
+			this.initOrig();
+			// offset of viewer in the window
+			this.top = 0;
+			this.left = 0;
+			for (var node = this.viewer; node; node = node.offsetParent) {
+				this.top += node.offsetTop;
+				this.left += node.offsetLeft;
+			}
+		}
 		Iview[viewID].viewerBean.positionTilesOrig = Iview[viewID].viewerBean.positionTiles;
 		Iview[viewID].viewerBean.positionTiles = function(motion, reset) {
 			// default to no motion, just setup tiles
@@ -313,7 +324,9 @@ function maximizeHandler(viewID) {
 		
 		PanoJS.mousePressedHandler = function(e) {
 			maximizeHandler(viewID);
-		}
+		};
+		PanoJS.doubleClickHandler = function(e) {
+		};
 		pictureScreen(viewID);
 	} else {
 		Iview[viewID].maximized = true;
@@ -339,17 +352,30 @@ function maximizeHandler(viewID) {
 		}
 		
 		PanoJS.mousePressedHandler = function(e) {
-		e = e ? e : window.event;
-		// only grab on left-click
-		if (e.button < 2) {
+			e = e ? e : window.event;
+			// only grab on left-click
+			if (e.button < 2) {
+				var self = this.backingBean;
+				var coords = self.resolveCoordinates(e);
+				self.press(coords);
+			};
+			// NOTE: MANDATORY! must return false so event does not propagate to well!
+			return false;
+		}		
+		// dblclick only if maximize and additional zoomInEvent
+		PanoJS.doubleClickHandler = function(e) {
+			e = e ? e : window.event;
 			var self = this.backingBean;
-			var coords = self.resolveCoordinates(e);
-			self.press(coords);
-		}
-	
-		// NOTE: MANDATORY! must return false so event does not propagate to well!
-		return false;
-		}
+			coords = self.resolveCoordinates(e);
+			if (!self.pointExceedsBoundaries(coords)) {
+				self.resetSlideMotion();
+				self.recenter(coords);
+			}
+			if (viewerBean.zoomLevel < viewerBean.maxZoomLevel) {
+				viewerBean.zoom(1);
+				if (Iview[viewID].useZoomBar) Iview[viewID].zoomBar.moveBarToLevel(Iview[viewID].viewerBean.zoomLevel);
+			}
+		};
 	}
 
 	// IE löst resize bereits bei bei den Class-Wechsel (sicherlich wegen position rel <-> fix)
