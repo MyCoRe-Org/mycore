@@ -81,8 +81,10 @@ function blendWorks() {
 					} else {
 						$(objList).style.bottom = toFloat($(objList).style.bottom) + stepY + "px";
 					}
-					for (var i = 0; i < fadings.length; i++) {
-						setOpacity($(fadings[i]), getOpacity($(fadings[i])) + fadeList[i]);
+					if (fadings != null) {
+						for (var i = 0; i < fadings.length; i++) {
+							setOpacity($(fadings[i]), getOpacity($(fadings[i])) + fadeList[i]);
+						}
 					}
 					steps--;
 					if (steps == 0) {
@@ -123,7 +125,7 @@ function blendWorks() {
 	@param steps the number of steps which shall happen between opacity = 0|1 is reached
 	*/
 	function makeFadeList(fadings, steps) {
-		if (fadeList.length == 0) {
+		if (fadeList.length == 0 && fadings != null) {
 			for (var i = 0; i < fadings.length; i++) {
 				var opacity = getOpacity($(fadings[i].substring(0,fadings[i].indexOf(":"))));
 				if (parseInt(opacity) == 0) {

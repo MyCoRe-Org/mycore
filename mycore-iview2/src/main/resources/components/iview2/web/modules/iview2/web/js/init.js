@@ -36,22 +36,22 @@ function initializeGraphic(viewID) {
 			if (e.keyCode == 38){
 					viewer.positionTiles({'x': 0,'y': PanoJS.MOVE_THROTTLE}, true);
 					viewer.notifyViewerMoved({'x': 0,'y': PanoJS.MOVE_THROTTLE});//added
-					if (!(isBrowser("ie"))) e.preventDefault();
+					preventDefault(e);
 			}
 			if (e.keyCode == 39){
 					viewer.positionTiles({'x': -PanoJS.MOVE_THROTTLE,'y': 0}, true);
 					viewer.notifyViewerMoved({'x': -PanoJS.MOVE_THROTTLE,'y': 0});//added
-					if (!(isBrowser("ie"))) e.preventDefault();
+					preventDefault(e);
 			}
 			if (e.keyCode == 40){
 					viewer.positionTiles({'x': 0,'y': -PanoJS.MOVE_THROTTLE}, true);
 					viewer.notifyViewerMoved({'x': 0,'y': -PanoJS.MOVE_THROTTLE});//added
-					if (!(isBrowser("ie"))) e.preventDefault();
+					preventDefault(e);
 			}
 			if (e.keyCode == 37){
 					viewer.positionTiles({'x': PanoJS.MOVE_THROTTLE,'y': 0}, true);
 					viewer.notifyViewerMoved({'x': PanoJS.MOVE_THROTTLE,'y': 0});//added
-					if (!(isBrowser("ie"))) e.preventDefault();
+					preventDefault(e);
 			}
 		}
 	}
@@ -66,14 +66,14 @@ function initializeGraphic(viewID) {
 				if (Iview[viewer.viewID].useZoombar) {
 					Iview[viewer.viewID].zoomBar.moveBarToLevel(viewer.zoomLevel);
 				}
-				if (!(isBrowser("ie"))) e.preventDefault();
+				preventDefault(e);
 			}
 			if (e.keyCode == 107 || e.keyCode == 61 || (e.keyCode == 43 && isBrowser("opera")) || e.charCode == 43) {
 				viewer.zoom(1);
 				if (Iview[viewer.viewID].useZoombar) {
 					Iview[viewer.viewID].zoomBar.moveBarToLevel(viewer.zoomLevel);
 				}
-				if (!(isBrowser("ie"))) e.preventDefault();
+				preventDefault(e);
 			}
 		}
 	}
@@ -327,7 +327,9 @@ function maximizeHandler(viewID) {
 		};
 		PanoJS.doubleClickHandler = function(e) {
 		};
-		pictureScreen(viewID);
+		if (Iview[viewID].zoomScreen == false) {
+			pictureScreen(viewID);
+		}
 	} else {
 		Iview[viewID].maximized = true;
 		/*if (document.compatMode == "CSS1Compat") {

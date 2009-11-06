@@ -253,10 +253,7 @@ function returnDelta(e, prevent) {
         }
 	
 	if (prevent) {
-        	if (e.preventDefault) {
-        	        e.preventDefault();
-		}
-		e.returnValue = false;
+        preventDefault(e);
 	}
 	return delta;
 }

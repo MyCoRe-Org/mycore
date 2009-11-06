@@ -236,3 +236,11 @@ function TextSelectionEvent(selectedText, mousePosition) {
 	this.x = mousePosition.x;
 	this.y = mousePosition.y;
 }
+
+function preventDefault(e) {
+	if (isBrowser("IE")) {
+		e.returnValue = false;
+	} else {
+		e.preventDefault();
+	}
+}

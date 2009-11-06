@@ -52,7 +52,7 @@ function pageInput(newId, parent, identer) {
 		// wenn keine Zahl kommt, nichts machen
 		//my.input.value = my.input.value.replace(/[^0-9]/g,'');
 		inputElement.value = inputElement.value.replace(/[^0-9]/g,'');
-		e.preventDefault();
+		preventDefault(e);
 
 		if(e.keyCode == 13) {//treatment, if "Enter"-Button was pressed
 			/*if(!isNaN(parseInt(my.input.value))){ 

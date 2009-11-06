@@ -801,7 +801,7 @@ function loading(viewID) {
 
 	// Additional Events
 	// register to scroll into the viewer
-	ManageEvents.addEventListener($("viewer"+viewID), 'mouseScroll', function(e) { viewerScroll(returnDelta(e), viewID); e = getEvent(e); e.preventDefault();}, false);
+	ManageEvents.addEventListener($("viewer"+viewID), 'mouseScroll', function(e) { viewerScroll(returnDelta(e), viewID); e = getEvent(e); preventDefault(e);}, false);
 	
 	//Edge-Element
 	//TODO: müsste beim import des CutOut entsprechend gesetzt werden, oder ähnlich
