@@ -352,6 +352,7 @@ public class MCRClassificationBrowserData {
         String browserClass = "";
 
         LOGGER.debug("query classification links");
+        Map<MCRCategoryID, Boolean> linkMap = linkService.hasLinks(null);
         for (MCRCategoryID classID : this.classificationPool.getAllIDs()) {
             MCRCategory classif = this.classificationPool.getClassificationAsPojo(classID, false);
             LOGGER.debug("get classification " + classID);
@@ -382,7 +383,8 @@ public class MCRClassificationBrowserData {
                     cli.setAttribute("userCanDelete", "true");
                     LOGGER.debug("counting linked objects");
                     //                    boolean hasLinks = MCRCategLinkServiceFactory.getInstance().hasLinks(classif).get(classID).booleanValue();
-                    boolean hasLinks = linkService.hasLink(classif.getId());
+//                    boolean hasLinks = linkService.hasLink(classif);
+                    boolean hasLinks = linkMap.get(classif);
                     LOGGER.debug("counting linked objects ... done");
                     cli.setAttribute("hasLinks", String.valueOf(hasLinks));
                 } else {

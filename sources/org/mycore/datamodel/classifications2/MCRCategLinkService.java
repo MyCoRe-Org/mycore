@@ -46,11 +46,11 @@ public interface MCRCategLinkService {
     /**
      * Checks if the category with the given id is liked with an object
      * 
-     * @param mcrCategoryID
+     * @param classif
      * @return
      *      true if is linked otherwise false
      */
-    public abstract boolean hasLink(MCRCategoryID mcrCategoryID);
+    public abstract boolean hasLink(MCRCategory classif);
 
     /**
      * Counts links to a collection of categories.
