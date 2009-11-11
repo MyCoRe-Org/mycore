@@ -226,7 +226,9 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
 //        criteria.add(Restrictions.between("leftvalue", mcrCategory.getLeft(), mcrCategory.getRight())).add(Restrictions.eq("classid", mcrCategory.getRootID()));
         
 //        String rootID = " and node.classid='" + category.getId().getRootID() +"' " + id;
-        String queryStringHasLink = "select distinct node.classid, node.categid from MCRCATEGORY as node, MCRCATEGORYLINK as link where node.leftvalue between " + mcrCategory.getLeft() + " and " + mcrCategory.getRight() + "and node.classid='" + mcrCategory.getRootID() + "' and node.internalid=link.category";
+        String queryString = "select distinct node.classid, node.categid from MCRCATEGORY as node, MCRCATEGORYLINK as link where node.leftvalue between " + mcrCategory.getLeft() + " and " + mcrCategory.getRight() + " and node.classid='" + mcrCategory.getRootID() + "' and node.internalid=link.category";
+        LOGGER.info("Has link query: " + queryString);
+		String queryStringHasLink = queryString;
         SQLQuery sqlQueryHasLink = session.createSQLQuery(queryStringHasLink);
         List<Object[]> categList = sqlQueryHasLink.list();
         
