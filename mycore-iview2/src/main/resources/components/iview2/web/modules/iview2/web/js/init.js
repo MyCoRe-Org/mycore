@@ -11,6 +11,7 @@ function initializeGraphic(viewID) {
 	Iview[viewID].images = [];
 	PanoJS.USE_SLIDE = false;
 	PanoJS.USE_LOADER_IMAGE = false;
+	PanoJS.MOVE_THROTTLE = 10;
 	// press sonst nicht immer möglich, in PanoJS original merkwürdiges Verhalten
 	/*PanoJS.mousePressedHandler = function(e) {
 		e = e ? e : window.event;
@@ -37,17 +38,17 @@ function initializeGraphic(viewID) {
 					viewer.positionTiles({'x': 0,'y': PanoJS.MOVE_THROTTLE}, true);
 					viewer.notifyViewerMoved({'x': 0,'y': PanoJS.MOVE_THROTTLE});//added
 					preventDefault(e);
-			}
+			} else
 			if (e.keyCode == 39){
 					viewer.positionTiles({'x': -PanoJS.MOVE_THROTTLE,'y': 0}, true);
 					viewer.notifyViewerMoved({'x': -PanoJS.MOVE_THROTTLE,'y': 0});//added
 					preventDefault(e);
-			}
+			} else
 			if (e.keyCode == 40){
 					viewer.positionTiles({'x': 0,'y': -PanoJS.MOVE_THROTTLE}, true);
 					viewer.notifyViewerMoved({'x': 0,'y': -PanoJS.MOVE_THROTTLE});//added
 					preventDefault(e);
-			}
+			} else
 			if (e.keyCode == 37){
 					viewer.positionTiles({'x': PanoJS.MOVE_THROTTLE,'y': 0}, true);
 					viewer.notifyViewerMoved({'x': PanoJS.MOVE_THROTTLE,'y': 0});//added
@@ -61,22 +62,22 @@ function initializeGraphic(viewID) {
 		for (var i = 0; i < PanoJS.VIEWERS.length; i++) {
 			var viewer = PanoJS.VIEWERS[i];
 			// Opera auch bei "Einfg" --> 43
-			if (e.keyCode == 109 || (e.keyCode == 45 && isBrowser("opera"))|| e.charCode == 45) {
+			if (e.keyCode == 109 || (e.keyCode == 45 && isBrowser("opera")) || e.keyCode== 189 || e.charCode == 45) {
 				viewer.zoom(-1);
 				if (Iview[viewer.viewID].useZoombar) {
 					Iview[viewer.viewID].zoomBar.moveBarToLevel(viewer.zoomLevel);
 				}
 				preventDefault(e);
-			}
-			if (e.keyCode == 107 || e.keyCode == 61 || (e.keyCode == 43 && isBrowser("opera")) || e.charCode == 43) {
+			} else
+			if (e.keyCode == 107 || e.keyCode == 61 || (e.keyCode == 43 && isBrowser("opera")) || e.keyCode == 187 ||e.charCode == 43) {
 				viewer.zoom(1);
 				if (Iview[viewer.viewID].useZoombar) {
 					Iview[viewer.viewID].zoomBar.moveBarToLevel(viewer.zoomLevel);
 				}
 				preventDefault(e);
-			}
-			if (e.keyCode == e.DOM_VK_ESCAPE){
-				//ESC key pressed
+			} else
+			if ((e.DOM_VK_ESCAPE && e.keyCode == e.DOM_VK_ESCAPE) || e.keyCode == 27){
+				//ESC key pressed, e.DOM_VK_ESCAPE is undefined in Apple Safari
 				if (Iview[viewer.viewID].maximized)
 					maximizeHandler(viewer.viewID);
 			}

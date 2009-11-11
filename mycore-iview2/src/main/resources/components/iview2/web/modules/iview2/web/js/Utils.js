@@ -242,8 +242,11 @@ function isBrowser(browsers) {
 function returnDelta(e, prevent) {
         e = getEvent(e);
         var delta = {x : 0, y : 0};
-        if (e.wheelDelta) { /* IE/Opera. */
-                delta.y = e.wheelDelta/120;
+        if (e.wheelDeltaX && e.wheelDeltaY) { /* fine in Safari */
+        	delta.x = e.wheelDeltaX/50;
+        	delta.y = e.wheelDeltaY/50;
+        } else if (e.wheelDelta) { /* IE/Opera. */
+                delta.y = e.wheelDelta/50;
                 /** In Opera 9, delta differs in sign as compared to IE.
                  */
         } else if (e.detail) { /** Mozilla case. */
@@ -251,9 +254,9 @@ function returnDelta(e, prevent) {
                  * Also, delta is multiple of 3.
                  */
 				if (e.axis && e.axis == e.HORIZONTAL_AXIS)
-					delta.x = -e.detail/3;
+					delta.x = -e.detail/2;
 				else
-					delta.y = -e.detail/3;
+					delta.y = -e.detail/2;
         }
 	
 	if (prevent) {

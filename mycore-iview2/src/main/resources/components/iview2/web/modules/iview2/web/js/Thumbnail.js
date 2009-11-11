@@ -561,14 +561,10 @@ function updateModuls(viewID) {
 @description handles if the scrollbar was moved up or down and calls the functions to load the corresponding tiles and movement
 */
 function viewerScroll(delta, viewID) {
-	if (delta.y != 0){
-		Iview[viewID].viewerBean.positionTiles({'x': 0,'y': ((delta.y<0)?-1:1)*PanoJS.MOVE_THROTTLE*10}, true);
-		Iview[viewID].viewerBean.notifyViewerMoved({'x': 0,'y': ((delta.y<0)?-1:1)*PanoJS.MOVE_THROTTLE*10});
-	}
-	else {
-		Iview[viewID].viewerBean.positionTiles({'x': ((delta.x<0)?-1:1)*PanoJS.MOVE_THROTTLE*10,'y': 0}, true);
-		Iview[viewID].viewerBean.notifyViewerMoved({'x': ((delta.x<0)?-1:1)*PanoJS.MOVE_THROTTLE*10,'y': 0});
-	}
+	Iview[viewID].viewerBean.positionTiles({'x': delta.x*PanoJS.MOVE_THROTTLE,
+											'y': delta.y*PanoJS.MOVE_THROTTLE}, true);
+	Iview[viewID].viewerBean.notifyViewerMoved({'x': delta.x*PanoJS.MOVE_THROTTLE,
+												'y': delta.y*PanoJS.MOVE_THROTTLE});
 }
 
 /*
