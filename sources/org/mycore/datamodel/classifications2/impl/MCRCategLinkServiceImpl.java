@@ -193,7 +193,8 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
         categCache.put(categID, categ);
         return categ;
     }
-
+    
+    // original implementation of hasLinks from Thomas
     public Map<MCRCategoryID, Boolean> hasLinks1(MCRCategory category) {
         MCRCategoryImpl rootImpl = (MCRCategoryImpl) MCRCategoryDAOFactory.getInstance().getCategory(category.getRoot().getId(), -1);
         if (rootImpl == null) {
@@ -215,10 +216,6 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
             }
         };
         
-//        Criteria criteria = session.createCriteria(MCRCategory.class);
-//        criteria.add(Restrictions.between("leftvalue", mcrCategory.getLeft(), mcrCategory.getRight())).add(Restrictions.eq("classid", mcrCategory.getRootID()));
-        
-//        String rootID = " and node.classid='" + category.getId().getRootID() +"' " + id;
         Session session = MCRHIBConnection.instance().getSession();
 		String queryString;
         if (category == null) {

@@ -384,7 +384,7 @@ public class MCRClassificationBrowserData {
                     LOGGER.debug("counting linked objects");
                     //                    boolean hasLinks = MCRCategLinkServiceFactory.getInstance().hasLinks(classif).get(classID).booleanValue();
 //                    boolean hasLinks = linkService.hasLink(classif);
-                    boolean hasLinks = linkMap.get(classif);
+                    boolean hasLinks = linkMap.get(classID);
                     LOGGER.debug("counting linked objects ... done");
                     cli.setAttribute("hasLinks", String.valueOf(hasLinks));
                 } else {
@@ -447,6 +447,10 @@ public class MCRClassificationBrowserData {
         MCRCategory classification = classificationPool.getClassificationAsPojo(getClassification().getId(), true);
         String rootID = classification.getId().getRootID();
         MCRLabel label = classification.getLabel(lang);
+        
+        if(label == null){
+        	label = classification.getCurrentLabel();
+        }
 
 
         Element docRoot = new Element("classificationBrowse");
