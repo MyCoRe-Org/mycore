@@ -34,9 +34,11 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
+import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Restrictions;
 import org.mycore.backend.hibernate.MCRHIBConnection;
 import org.mycore.common.MCRCache;
 import org.mycore.common.MCRConfiguration;
@@ -192,7 +194,7 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
         return categ;
     }
 
-    public Map<MCRCategoryID, Boolean> hasLinks(MCRCategory category) {
+    public Map<MCRCategoryID, Boolean> hasLinks1(MCRCategory category) {
         MCRCategoryImpl rootImpl = (MCRCategoryImpl) MCRCategoryDAOFactory.getInstance().getCategory(category.getRoot().getId(), -1);
         if (rootImpl == null) {
             //Category does not exist, so it has no links
@@ -202,6 +204,62 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
         final BitSet linkedInternalIds = getLinkedInternalIds();
         storeHasLinkValues(boolMap, linkedInternalIds, rootImpl);
         return boolMap;
+    }
+    
+    public Map<MCRCategoryID, Boolean> hasLinks(MCRCategory category) {
+        HashMap<MCRCategoryID, Boolean> boolMap = new HashMap<MCRCategoryID, Boolean>(){
+            @Override
+            public Boolean get(Object key) {
+                Boolean haslink = super.get(key);
+                return haslink == null ? false : haslink;
+            }
+        };
+        
+        String id = "";
+        if (!category.getId().isRootID()) {
+            id = " and parent.categid='" + category.getId().getID() +"' ";
+        }
+        
+        Session session = MCRHIBConnection.instance().getSession();
+        MCRCategoryImpl mcrCategory = (MCRCategoryImpl) category;
+//        Criteria criteria = session.createCriteria(MCRCategory.class);
+//        criteria.add(Restrictions.between("leftvalue", mcrCategory.getLeft(), mcrCategory.getRight())).add(Restrictions.eq("classid", mcrCategory.getRootID()));
+        
+//        String rootID = " and node.classid='" + category.getId().getRootID() +"' " + id;
+        String queryStringHasLink = "select distinct node.classid, node.categid from MCRCATEGORY as node, MCRCATEGORYLINK as link where node.leftvalue between " + mcrCategory.getLeft() + " and " + mcrCategory.getRight() + "and node.classid='" + mcrCategory.getRootID() + "' and node.internalid=link.category";
+        SQLQuery sqlQueryHasLink = session.createSQLQuery(queryStringHasLink);
+        List<Object[]> categList = sqlQueryHasLink.list();
+        
+        for (Object[] rootID_ID_Array : categList) {
+            MCRCategoryID categoryID = createID(rootID_ID_Array);
+            boolMap.put(categoryID, true);
+        }
+        
+//        String queryStringNoLink = "select distinct node.classid, node.categid from MCRCATEGORY as node, MCRCATEGORY as parent where node.leftvalue between parent.leftvalue and parent.rightvalue"+rootID+id;
+//        SQLQuery sqlQueryNoLink = session.createSQLQuery(queryStringNoLink);
+//        categList = sqlQueryNoLink.list();
+        
+//        for (Object[] rootID_ID_Array : categList) {
+//            MCRCategoryID categoryID = createID(rootID_ID_Array);
+//            
+//            if(!boolMap.containsKey(categoryID)) {
+//                boolMap.put(categoryID, false);
+//            }
+//        }
+        
+        return boolMap;
+    }
+
+    private MCRCategoryID createID(Object[] rootID_ID_Array) {
+        MCRCategoryID categoryID;
+        String classID = (String) rootID_ID_Array[0];
+        String categID = (String) rootID_ID_Array[1];
+        if (categID==null) {
+            categoryID = MCRCategoryID.rootID(classID);
+        } else {
+            categoryID = new MCRCategoryID(classID, categID);
+        }
+        return categoryID;
     }
 
     private Map<MCRCategoryID, Boolean> getNoLinksMap(MCRCategory category) {
@@ -261,5 +319,21 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
             ids.add(cat.getId());
         }
         return ids;
+    }
+
+    @Override
+    public boolean hasLink(MCRCategoryID mcrCategoryID) {
+        String id = "";
+        if (!mcrCategoryID.isRootID()) {
+            id = " and parent.categid='" + mcrCategoryID.getID() + "' ";
+        }
+
+        Session session = MCRHIBConnection.instance().getSession();
+        String rootID = " and node.classid='" + mcrCategoryID.getRootID() + "' " + id;
+        String queryStringHasLink = "select distinct node.classid, node.categid from MCRCATEGORY as node, MCRCATEGORY as parent, MCRCATEGORYLINK as link where node.leftvalue between parent.leftvalue and parent.rightvalue"
+                + rootID + id + " and node.internalid=link.category";
+        SQLQuery sqlQueryHasLink = session.createSQLQuery(queryStringHasLink);
+        List<Object[]> categList = sqlQueryHasLink.list();
+        return !categList.isEmpty();
     }
 }

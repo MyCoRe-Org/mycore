@@ -23,7 +23,7 @@
  **/
 package org.mycore.datamodel.classifications2;
 
-import org.mycore.datamodel.classifications2.impl.MCRCategoryDAOImpl;
+import org.mycore.common.MCRConfiguration;
 
 /**
  * @author Thomas Scheffler (yagee)
@@ -33,7 +33,8 @@ import org.mycore.datamodel.classifications2.impl.MCRCategoryDAOImpl;
  */
 public class MCRCategoryDAOFactory {
 
-    private static MCRCategoryDAO instance=new MCRCategoryDAOImpl();
+    private static final String STANDARD_DAO = "org.mycore.datamodel.classifications2.impl.MCRCategoryDAOImpl";
+    private static MCRCategoryDAO instance=(MCRCategoryDAO) MCRConfiguration.instance().getInstanceOf("MCR.Category.DAO", STANDARD_DAO);
 
     /**
      * Returns an instance of a MCRCategoryDAO implementator.
