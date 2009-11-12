@@ -128,8 +128,6 @@ public class MCRClassificationBrowserData {
         this.permissionTool = permissionTool;
         this.linkService = linkService;
         this.config = MCRConfiguration.instance();
-//        this.rowsCreator = new RowCreator_Lines(classificationPool, linkService, config);
-//        this.rowsCreator = new RowCreator_NoLines(classificationPool, linkService, config);
         this.rowsCreator = rowCreator;
         init(u, mode, actclid, actEditorCategid);
     }
