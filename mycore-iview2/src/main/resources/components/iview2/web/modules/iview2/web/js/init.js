@@ -59,6 +59,7 @@ function initializeGraphic(viewID) {
 	// keys are different in Browsers
 	PanoJS.keyboardZoomHandler = function(e) {
 		e = e ? e : window.event;
+		var eventHandled=false;
 		for (var i = 0; i < PanoJS.VIEWERS.length; i++) {
 			var viewer = PanoJS.VIEWERS[i];
 			// Opera auch bei "Einfg" --> 43
@@ -67,6 +68,7 @@ function initializeGraphic(viewID) {
 				if (Iview[viewer.viewID].useZoombar) {
 					Iview[viewer.viewID].zoomBar.moveBarToLevel(viewer.zoomLevel);
 				}
+				eventHandled=true;
 				preventDefault(e);
 			} else
 			if (e.keyCode == 107 || e.keyCode == 61 || (e.keyCode == 43 && isBrowser("opera")) || e.keyCode == 187 ||e.charCode == 43) {
@@ -74,13 +76,19 @@ function initializeGraphic(viewID) {
 				if (Iview[viewer.viewID].useZoombar) {
 					Iview[viewer.viewID].zoomBar.moveBarToLevel(viewer.zoomLevel);
 				}
+				eventHandled=true;
 				preventDefault(e);
 			} else
 			if ((e.DOM_VK_ESCAPE && e.keyCode == e.DOM_VK_ESCAPE) || e.keyCode == 27){
 				//ESC key pressed, e.DOM_VK_ESCAPE is undefined in Apple Safari
 				if (Iview[viewer.viewID].maximized)
 					maximizeHandler(viewer.viewID);
+				eventHandled=true;
 			}
+		}
+		//Safari does not support "onkeypress" for cursor keys but "onkeydown"
+		if (!eventHandled){
+			PanoJS.keyboardMoveHandler(e);
 		}
 	}
 	// opera triggers the onload twice
