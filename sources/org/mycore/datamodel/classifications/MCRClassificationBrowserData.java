@@ -88,9 +88,9 @@ public class MCRClassificationBrowserData {
     private String[] objectTypeArray = null;
 
     private String restriction = null;
-    
+
     private boolean comments = false;
-    
+
     private RowCreator rowsCreator;
 
     int totalNumOfDocs = 0;
@@ -123,7 +123,8 @@ public class MCRClassificationBrowserData {
     private MCRPermissionTool permissionTool;
 
     MCRClassificationBrowserData(final String u, final String mode, final String actclid, final String actEditorCategid,
-            MCRClassificationPool classificationPool, MCRPermissionTool permissionTool, MCRCategLinkService linkService, RowCreator rowCreator) throws Exception {
+            MCRClassificationPool classificationPool, MCRPermissionTool permissionTool, MCRCategLinkService linkService,
+            RowCreator rowCreator) throws Exception {
         this.classificationPool = classificationPool;
         this.permissionTool = permissionTool;
         this.linkService = linkService;
@@ -135,8 +136,8 @@ public class MCRClassificationBrowserData {
     public MCRClassificationBrowserData(final String u, final String mode, final String actclid, final String actEditorCategid)
             throws Exception {
         this(u, mode, actclid, actEditorCategid, getClassificationPool(), new MCRPermissionToolImpl(), MCRCategLinkServiceFactory
-                .getInstance(), new RowCreator_NoLines(getClassificationPool(), MCRCategLinkServiceFactory
-                        .getInstance(), MCRConfiguration.instance()));
+                .getInstance(), new RowCreator_NoLines(getClassificationPool(), MCRCategLinkServiceFactory.getInstance(), MCRConfiguration
+                .instance()));
     }
 
     private void init(final String u, final String mode, final String actclid, final String actEditorCategid) throws Exception {
@@ -194,14 +195,13 @@ public class MCRClassificationBrowserData {
         clearPath(uriParts);
         MCRCategoryID id = MCRCategoryID.rootID(classifID);
         setClassification(id);
-        
+
         rowsCreator.setBrowserClass(browserClass);
         rowsCreator.setUri(uri);
         rowsCreator.setView(view);
         rowsCreator.setCommented(comments);
         setActualPath(actEditorCategid);
-        
-        
+
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug(" SetClassification " + classifID);
             LOGGER.debug(" Empty nodes: " + emptyLeafs);
@@ -333,7 +333,7 @@ public class MCRClassificationBrowserData {
         }
     }
 
-    public org.jdom.Document createXmlTreeforAllClassifications() throws Exception {
+    public Document createXmlTreeforAllClassifications() throws Exception {
         LOGGER.debug("create XML tree for all classifications");
         final Element xDocument = new Element("classificationbrowse");
         final Element CreateClassButton = new Element("userCanCreate");
@@ -347,65 +347,22 @@ public class MCRClassificationBrowserData {
 
         final Element xNavtree = new Element("classificationlist");
         xDocument.addContent(xNavtree);
-        String browserClass = "";
 
         LOGGER.debug("query classification links");
         Map<MCRCategoryID, Boolean> linkMap = linkService.hasLinks(null);
+        
         for (MCRCategoryID classID : this.classificationPool.getAllIDs()) {
             MCRCategory classif = this.classificationPool.getClassificationAsPojo(classID, false);
             LOGGER.debug("get classification " + classID);
             LOGGER.debug("get browse element");
-            Element cli = getBrowseElement(classif);
-            LOGGER.debug("get browse element ... done");
-            String sessionID = MCRSessionMgr.getCurrentSession().getID();
-            // set browser type
-            try {
-                browserClass = config.getString("MCR.classeditor." + classif.getId().getRootID());
-            } catch (final Exception ignore) {
-                browserClass = "default";
-            }
-            // set permissions
-            if (this.classificationPool.isEdited(classID)) {
-                cli.setAttribute("edited", "true");
-                cli.setAttribute("userCanEdit", "false");
-                cli.setAttribute("userCanDelete", "false");
-            } else {
-                cli.setAttribute("edited", "false");
-                if (MCRAccessManager.checkPermission(classID.getRootID(), "writedb")) {
-                    cli.setAttribute("userCanEdit", "true");
-                } else {
-                    cli.setAttribute("userCanEdit", "false");
-                }
-                final boolean mayDelete = MCRAccessManager.checkPermission(classID.getRootID(), "deletedb");
-                if (mayDelete) {
-                    cli.setAttribute("userCanDelete", "true");
-                    LOGGER.debug("counting linked objects");
-                    //                    boolean hasLinks = MCRCategLinkServiceFactory.getInstance().hasLinks(classif).get(classID).booleanValue();
-//                    boolean hasLinks = linkService.hasLink(classif);
-                    boolean hasLinks = linkMap.get(classID);
-                    LOGGER.debug("counting linked objects ... done");
-                    cli.setAttribute("hasLinks", String.valueOf(hasLinks));
-                } else {
-                    cli.setAttribute("userCanDelete", "false");
-                }
-            }
-            // set done flag
-            if (ClassUserTable.containsKey(classID.getRootID())) {
-                if (ClassUserTable.get(classID.getRootID()) != sessionID) {
-                    MCRSession oldsession = MCRSessionMgr.getSession(ClassUserTable.get(classID.getRootID()));
-                    if (null != oldsession)
-                        cli.setAttribute("userEdited", oldsession.getCurrentUserID());
-                    else {
-                        ClassUserTable.remove(classID.getRootID());
-                        cli.setAttribute("userEdited", "false");
-                    }
-                } else {
-                    cli.setAttribute("userEdited", "false");
-                }
-            } else {
-                cli.setAttribute("userEdited", "false");
-            }
 
+            Element cli = getBrowseElement(classif);
+
+            setPermissions(linkMap, classID, cli);
+
+            setDoneFlag(classID, cli);
+
+            String browserClass = config.getString("MCR.classeditor." + classif.getId().getRootID(), "default");
             cli.setAttribute("browserClass", browserClass);
             setObjectTypes(browserClass);
             xNavtree.addContent(cli);
@@ -413,23 +370,78 @@ public class MCRClassificationBrowserData {
         return new Document(xDocument);
     }
 
+    private void setDoneFlag(MCRCategoryID classID, Element cli) {
+        LOGGER.debug("get browse element ... done");
+        String userEditedValue = "false";
+
+        String rootID = classID.getRootID();
+        String sessionID = MCRSessionMgr.getCurrentSession().getID();
+        String classUser = ClassUserTable.get(rootID);
+        
+        if (classUser != null && !classUser.equals(sessionID)) {
+            MCRSession oldsession = MCRSessionMgr.getSession(classUser);
+            if (null != oldsession) {
+                cli.setAttribute("userEdited", oldsession.getCurrentUserID());
+            } else {
+                ClassUserTable.remove(rootID);
+            }
+        }
+
+        cli.setAttribute("userEdited", userEditedValue);
+    }
+
+    private void setPermissions(Map<MCRCategoryID, Boolean> linkMap, MCRCategoryID classID, Element cli) {
+        String editedValue = "true";
+        String userCanEditValue = "false";
+        String userCanDeleteValue = "false";
+
+        if (!this.classificationPool.isEdited(classID)) {
+            editedValue = "false";
+            if (MCRAccessManager.checkPermission(classID.getRootID(), "writedb")) {
+                userCanEditValue = "true";
+            }
+
+            final boolean mayDelete = MCRAccessManager.checkPermission(classID.getRootID(), "deletedb");
+            if (mayDelete) {
+                userCanDeleteValue = "true";
+                LOGGER.debug("counting linked objects");
+                boolean hasLinks = linkMap.get(classID);
+                LOGGER.debug("counting linked objects ... done");
+                cli.setAttribute("hasLinks", String.valueOf(hasLinks));
+            }
+        }
+
+        cli.setAttribute("edited", editedValue);
+        cli.setAttribute("userCanEdit", userCanEditValue);
+        cli.setAttribute("userCanDelete", userCanDeleteValue);
+    }
+
     private static Element getBrowseElement(MCRCategory classif) {
         Element ce = new Element("classification");
         ce.setAttribute("ID", classif.getId().getRootID());
         for (MCRLabel label : classif.getLabels()) {
-            Element labelElement = new Element("label");
-            if (label.getLang() != null) {
-                labelElement.setAttribute("lang", label.getLang(), Namespace.XML_NAMESPACE);
-            }
-            if (label.getText() != null) {
-                labelElement.setAttribute("text", label.getText());
-            }
-            if (label.getDescription() != null) {
-                labelElement.setAttribute("description", label.getDescription());
-            }
-            ce.addContent(labelElement);
+            ce.addContent(createLabelElement(label));
         }
         return ce;
+    }
+
+    private static Element createLabelElement(MCRLabel label) {
+        Element labelElement = new Element("label");
+        String lang = label.getLang();
+        String text = label.getText();
+        String description = label.getDescription();
+
+        if (lang != null) {
+            labelElement.setAttribute("lang", lang, Namespace.XML_NAMESPACE);
+        }
+        if (text != null) {
+            labelElement.setAttribute("text", text);
+        }
+        if (description != null) {
+            labelElement.setAttribute("description", description);
+        }
+
+        return labelElement;
     }
 
     /**
@@ -445,11 +457,10 @@ public class MCRClassificationBrowserData {
         MCRCategory classification = classificationPool.getClassificationAsPojo(getClassification().getId(), true);
         String rootID = classification.getId().getRootID();
         MCRLabel label = classification.getLabel(lang);
-        
-        if(label == null){
-        	label = classification.getCurrentLabel();
-        }
 
+        if (label == null) {
+            label = classification.getCurrentLabel();
+        }
 
         Element docRoot = new Element("classificationBrowse");
         docRoot.addContent(createElement("classifID", rootID));
@@ -476,7 +487,7 @@ public class MCRClassificationBrowserData {
         rowsCreator.createRows(lang, xNavtree);
         stopWatch.stop();
         LOGGER.info("create rows time: " + stopWatch.getTime());
-        
+
         LOGGER.debug("Building XML document");
 
         docRoot.addContent(xNavtree);
@@ -574,7 +585,7 @@ public class MCRClassificationBrowserData {
     public boolean showComments() {
         return comments;
     }
-    
+
     // don't use it works not really good
 
     private final Element sortMyTree(final Element xDocument) {
