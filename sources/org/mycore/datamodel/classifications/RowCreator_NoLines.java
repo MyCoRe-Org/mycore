@@ -70,7 +70,6 @@ class RowCreator_NoLines implements RowCreator {
         for (MCRCategory mcrCategory : children) {
             MCRCategoryID categoryID = mcrCategory.getId();
 
-//            boolean hasLinks = linkService.hasLink(mcrCategory.getId());
             boolean hasLinks = linkMap.get(mcrCategory.getId());
             boolean hasChildren = mcrCategory.hasChildren();
 
@@ -168,16 +167,15 @@ class RowCreator_NoLines implements RowCreator {
         classif = classificationPool.getClassificationAsPojo(classifID, true);
         if (classif == null)
             return;
-        //        linesCateg = new LinkedList<MCRCategory>();
-        //        List<MCRCategory> childrenList = classif.getChildren();
-
-        //        putCategoriesintoLines(childrenList);
     }
 
     public void update(final String categID) throws Exception {
 
         MCRCategory parent = classificationPool.getClassificationAsPojo(classif.getId(), true);
         MCRCategory cat = MCRCategoryTools.findCategory(parent, categID);
+        if(cat == null) {
+            return;
+        }
 
         MCRCategoryID categoryID = cat.getId();
         String status = folderStatus.get(categoryID);

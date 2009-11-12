@@ -184,7 +184,6 @@ public class MCRClassificationPool {
      * @param cl
      */
     public void deleteClassification(MCRCategoryID cl) {
-        if (classifications.containsKey(cl))
             classifications.remove(cl);
     }
 
