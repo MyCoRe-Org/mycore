@@ -91,6 +91,8 @@ function initializeGraphic(viewID) {
 			PanoJS.keyboardMoveHandler(e);
 		}
 	}
+	//IsInstance doesn't recognizes the changed TileUrlProvider as the same in IE&Opera
+	PanoJS.isInstance = function () { return true;};
 	// opera triggers the onload twice
 	var iviewTileUrlProvider = new PanoJS.TileUrlProvider(Iview[viewID].baseUri, Iview[viewID].prefix, 'jpg');
 	iviewTileUrlProvider.derivate = viewID;

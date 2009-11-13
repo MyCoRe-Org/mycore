@@ -30,14 +30,17 @@ function loadXML(file) {
 		xmlDoc = null;
 	}
 }
-/*Gains the requested information from a given XML File.
-*@param xmlfile  XML file from which the data will be extruded.
-*@param nodeName the Node of the XML File which shall be gained, can be a group of nodes.
-*@param getNode  return the X Nodes values
-*@param absolute depending on this Value the getNode will be interpreted as absolute or relative value to the current curpage
-*@return  Associated(By Nodename) array with connected values
+//TODO renaming would be good, as the name of the function doesn't reflect the real intention of the function
+/*
+@description Gains the requested information from a given XML File.
+@param xmlfile  XML file from which the data will be extruded.
+@param nodeName the Node of the XML File which shall be gained, can be a group of nodes.
+@param getNode  return the X Nodes values
+@param absolute depending on this Value the getNode will be interpreted as absolute or relative value to the current curpage
+@return  Associated(By Nodename) array with connected values
 */
 function nodeProps(xmlfile, nodeName, getNode, absolute) {
+	nodeName = (isBrowser(["Opera","Firefox/2", "Safari"]) && nodeName.indexOf(":") != -1)? nodeName.substring(nodeName.indexOf(":")+1):nodeName; 
 	var child_nodes = xmlfile.getElementsByTagName(nodeName);
 	var Node = (absolute == true)? parseInt(getNode) : (pagenumber-1)+parseInt(getNode);
 	var values = new Array();
@@ -52,7 +55,8 @@ function nodeProps(xmlfile, nodeName, getNode, absolute) {
 	}
 	for (var i = 0; i < nodes.length; i++) {
 		if (nodes.item(i).tagName) {
-			values[nodes.item(i).tagName] = nodes.item(i).childNodes.item(0).nodeValue;
+			values[i] = nodeAttributes(nodes.item(i));
+			//values[nodes.item(i).tagName] = nodes.item(i).childNodes.item(0).nodeValue;
 		}
 	}
 	try {//ANTI Memory Leak
@@ -62,20 +66,28 @@ function nodeProps(xmlfile, nodeName, getNode, absolute) {
 	}
 }
 
+/*
+@description collects into an array all attributes of a supplied Node, where the name of the object attribute is the attributes name,
+ cleaned from any namespace things like regex: .*:
+@param node the node to collect all properties from
+@return an array with all Informations the node contained as attributes
+ */
 function nodeAttributes(node) {
 	var attributes = new Array();
 	for (var i = 0; i < node.attributes.length; i++) {
-		attributes[node.attributes.item(i).nodeName] = node.attributes.item(i).value;
+		//Remove the Namespace, as this is hindering access laterly
+		attributes[node.attributes.item(i).nodeName.replace(/^.*:/,"")] = node.attributes.item(i).value;
 	}
 	return attributes;
 }
 
-/*Gains the requested information from a given XML File.
-*@param xmlfile  XML file from which the data will be extruded.
-*@param nodeName the Node of the XML File which shall be gained, can be a group of nodes.
-*@param getNode  return the X Nodes values
-*@param absolute depending on this Value the getNode will be interpreted as absolute or relative value to the current curpage
-*@return  List of all Nodes with the given NodeName
+/*
+@description Gains the requested information from a given XML File.
+@param xmlfile  XML file from which the data will be extruded.
+@param nodeName the Node of the XML File which shall be gained, can be a group of nodes.
+@param getNode  return the X Nodes values
+@param absolute depending on this Value the getNode will be interpreted as absolute or relative value to the current curpage
+@return  List of all Nodes with the given NodeName
 */
 function getNodes(xmlfile, nodeName/*, getNode, absolute*/) {
 	if (isBrowser(["Opera", "Firefox/2", "Safari"]) && nodeName.indexOf(":") != -1) {

@@ -31,7 +31,16 @@ function resetFocus(){
 @param absolute inicator if the value shold be handled absolute or relative
 */
 function loadPageData(getPage, absolute, viewID) {
-	return nodeProps(Iview[viewID].book, "child", getPage, absolute);
+	//return nodeProps(Iview[viewID].book, "child", getPage, absolute);
+	return nodeProps(Iview[viewID].buchDaten, "mets:file", getPage, absolute);
+}
+
+function findMETSEntry(values, name, value) {
+	for (var i = 0; i < values.length; i++) {
+		if (values[i][name] == value) {
+			return values[i];
+		}
+	}
 }
 
 /*
@@ -46,8 +55,8 @@ function loadPage(pageData, viewID) {
 	}*/
 	// Preload wird zu spät verkleinert
 	$("preload"+viewID).style.visibility = "hidden";
-
-	var imageProperties = loadXML(Iview[viewID].baseUri[0]+"/"+viewID+"/"+pageData["name"]+"/imageinfo.xml", "xml");
+	//console.log(findMETSEntry(pageData,"LOCTYPE", "URL").href);
+	var imageProperties = loadXML(Iview[viewID].baseUri[0]+"/"+viewID+"/"+findMETSEntry(pageData,"LOCTYPE", "URL").href+"/imageinfo.xml", "xml");
 	var values = nodeAttributes(imageProperties.getElementsByTagName("imageinfo")[0]);
 	
 	Iview[viewID].tiles = parseInt(values['tiles']);
@@ -87,8 +96,7 @@ function loadPage(pageData, viewID) {
 		// zoomLevel 0 ist erstes Level
 		Iview[viewID].zoomInit = Math.ceil((Iview[viewID].zoomMax + 1) / 2) - 1;
 	}
-
-	Iview[viewID].prefix  = pageData["name"];
+	Iview[viewID].prefix  = findMETSEntry(pageData,"LOCTYPE", "URL").href;
 	$("preload"+viewID).style.width = Iview[viewID].bildBreite / Math.pow(2, Iview[viewID].zoomMax - Iview[viewID].zoomInit) + "px";
 	$("preload"+viewID).style.height = Iview[viewID].bildHoehe / Math.pow(2, Iview[viewID].zoomMax - Iview[viewID].zoomInit) + "px";
 	if (viewerBean == null) {
@@ -137,6 +145,7 @@ function loadPage(pageData, viewID) {
 	preload.style.height = "100%";
 	preload.id = "preloadImg" + viewID;
 	preload.src = viewerBean.tileUrlProvider.assembleUrl(0,0,0);
+	
 	$("preload"+viewID).appendChild(preload);
 	$("preload"+viewID).style.visibility = "visible";
 	if (Iview[viewID].useCutOut) {
@@ -675,7 +684,9 @@ function importOverview(viewID) {
 	Iview[viewID].overview1 = new overview("overview1"+viewID, "viewerContainer"+viewID, "");
 	var overview1 = Iview[viewID].overview1;
 	overview1.setViewID(viewID);
-	overview1.setBook(Iview[viewID].book);
+	//overview1.setBook(Iview[viewID].book);
+	//TODO wird hier lediglich Referenz gespeichert? Wenn ja ok ansonsten evtl unnötigen Kram entfernen und nur die Seiteninfos speichern
+	overview1.setBook(Iview[viewID].buchDaten)
 	overview1.setBaseUri(Iview[viewID].baseUri);
 	overview1.init();
 	overview1.setNumberOfPages(Iview[viewID].amountPages);
@@ -763,9 +774,9 @@ function loading(viewID) {
 	loadVars("../modules/iview2/web/" + style + "design.xml");//Laden der Informationen je nach entsprechendem Design
 	// load and process XML-data
 	//Iview[viewID].book_uri = "../images/Pics/" + viewID + "/";
-	Iview[viewID].book = loadXML(Iview[viewID].webappBaseUri + "servlets/MCRFileNodeServlet/" + viewID + "/", "xml");
+	//Iview[viewID].book = loadXML(Iview[viewID].webappBaseUri + "servlets/MCRFileNodeServlet/" + viewID + "/", "xml");
 
-	cleanBook(viewID);
+	//cleanBook(viewID);
 	//retrieves the mets File depending on the fact if it's exists or it request a simple one
 	var mets_uri = Iview[viewID].webappBaseUri + "servlets/" + ((Iview[viewID].hasMets)? "MCRFileNodeServlet/": "MCRDirectoryXMLServlet/") + viewID + ((Iview[viewID].hasMets)? "/mets.xml":"");
 	Iview[viewID].buchDaten = (Iview[viewID].hasMets)? loadXML(mets_uri):loadXML(mets_uri, "mets");

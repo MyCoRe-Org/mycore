@@ -277,8 +277,8 @@ function overview(newId, parent, identer) {
 	@description preloads the preview-image
 	*/
 	function loadSingleImage(i, j) {
-		var pageName = nodeProps(book, "child", (((i + currentFirstRow) * amountWidth) + j), true)["name"];
-	
+		var pageName = findMETSEntry(nodeProps(book, "mets:file", (((i + currentFirstRow) * amountWidth) + j), true), "LOCTYPE", "URL").href;
+
 		var source = Iview[viewID].viewerBean.tileUrlProvider.assembleUrl(0, 0, 0, pageName);
 		var preview = $("previewDiv" + viewID +((i * amountWidth) + j));
 		
