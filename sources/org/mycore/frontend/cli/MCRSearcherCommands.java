@@ -173,7 +173,7 @@ public class MCRSearcherCommands extends MCRAbstractCommands {
             if (indexE.getAttributeValue("id").equals(indexKey))
                 for (Object fieldElement : indexE.getChildren("field", MCRConstants.MCR_NAMESPACE)) {
                     String source = ((Element) fieldElement).getAttributeValue("source");
-                    if (source.startsWith(type)) {
+                    if (source != null && source.startsWith(type)) {
                         return true;
                     }
                 }
