@@ -146,7 +146,7 @@ public class MCRImportObject {
         derivateList.add(derivateElement);
     }
 
-    public void addMetadataChild(Element metadataChild) {
+    public MCRImportMetadata addMetadataChild(Element metadataChild) {
         String tag = metadataChild.getName();
         // Compare the tag with the metadata table.
         // If no metadata object exists create a new one,
@@ -159,6 +159,7 @@ public class MCRImportObject {
 
         // add child
         metadata.addChild(metadataChild);
+        return metadata;
     }
 
     protected MCRImportMetadata createMetadata(String metadataName) {

@@ -1,7 +1,9 @@
 package org.mycore.importer.mapping;
 
 import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 
 import org.jdom.Element;
 
@@ -20,6 +22,7 @@ public class MCRImportMetadata {
     protected Boolean heritable;
     protected Boolean notinherit;
 
+    protected Hashtable<String, String> attributeTable;
     protected List<Element> childList;
 
     /**
@@ -30,6 +33,7 @@ public class MCRImportMetadata {
     public MCRImportMetadata(String tag) {
         this.tag = tag;
         this.childList = new ArrayList<Element>();
+        this.attributeTable = new Hashtable<String, String>();
     }
 
     /**
@@ -47,6 +51,9 @@ public class MCRImportMetadata {
 
         for(Element childElement : childList) {
             metadataElement.addContent(childElement);
+        }
+        for(Map.Entry<String, String> entry : attributeTable.entrySet()) {
+            metadataElement.setAttribute(entry.getKey(), entry.getValue());
         }
         return metadataElement;
     }
@@ -76,5 +83,13 @@ public class MCRImportMetadata {
     public void setNotinherit(boolean notinherit) {
         this.notinherit = notinherit;
     }
-  
+    public void addAttributeMap(Map<String, String> attributeMap) {
+        attributeTable.putAll(attributeMap);
+    }
+    public void addAttribute(String attrName, String attrValue) {
+        attributeTable.put(attrName, attrValue);
+    }
+    public void removeAttribute(String attrName) {
+        attributeTable.remove(attrName);
+    }
 }

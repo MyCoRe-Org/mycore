@@ -1,7 +1,9 @@
 package org.mycore.importer.mapping.resolver.metadata;
 
+import java.util.Hashtable;
 import java.util.List;
 
+import org.jdom.Attribute;
 import org.jdom.Element;
 import org.jdom.Namespace;
 import org.jdom.Text;
@@ -23,6 +25,8 @@ public abstract class MCRImportAbstractMetadataResolver implements MCRImportMeta
     protected Element map;
     protected MCRImportFieldValueResolver fieldResolver;
 
+    protected Hashtable<String, String> parentAttributes;
+
     /**
      * The return element.
      */
@@ -36,6 +40,9 @@ public abstract class MCRImportAbstractMetadataResolver implements MCRImportMeta
         this.map = map;
         this.fieldResolver = new MCRImportFieldValueResolver(fieldList);
         this.saveToElement = saveToElement;
+        this.parentAttributes = new Hashtable<String, String>();
+        // parent attributes
+        resolveParentAttributes(map);
         // attributes
         if(hasAttributes());
             resolveAttributes(map, saveToElement);
@@ -96,6 +103,46 @@ public abstract class MCRImportAbstractMetadataResolver implements MCRImportMeta
     }
 
     /**
+     * Returns all attributes from the sourrounding metadata element.
+     * 
+     * @return a hastable of all attributes
+     */
+    public Hashtable<String, String> getParentAttributes() {
+        return parentAttributes;
+    }
+
+    /**
+     * Resolves the attributes of the surrounding metadata element. That could
+     * be something like:
+     * <p>
+     * &lt;names class="MCRMetaXML" <b>form="plain"</b>&gt;
+     * ...
+     * &lt;/names&gt;
+     * </p>
+     * To define a parent attribute in your mapping file use the 'parentAttributes'-
+     * and the 'attribute'-element. For example:
+     * <p>
+     * &lt;map fields="vorname,nachname" to="names"&gt;</br>
+     * <b>&nbsp;&nbsp;&lt;parentAttributes&gt</br>
+     * &nbsp;&nbsp;&nbsp;&nbsp;&lt;attribute name="form" value="plain" /&gt;</br>
+     * &nbsp;&nbsp;&lt;/parentAttributes&gt</b></br>
+     * &nbsp;&nbsp;&lt;text value="{nachname}, {vorname}" /&gt;</br>
+     * &lt;/map&gt;
+     * </p>
+     * 
+     * @param fromElement the source element where the attribute mapping informations are set
+     */
+    @SuppressWarnings("unchecked")
+    public void resolveParentAttributes(Element fromElement) {
+        Element parentAttributesElement = fromElement.getChild("parentAttributes");
+        List<Element> attributes = parentAttributesElement.getChildren("attribute");
+        for(Element attributeElement : attributes) {
+            Attribute attr = resolveAttribute(attributeElement);
+            parentAttributes.put(attr.getName(), attr.getValue());
+        }
+    }
+
+    /**
      * Pass through the attributes of the of the fromElement and tries
      * to resolve them. The results are saved in the saveToElement.
      * 
@@ -110,25 +157,29 @@ public abstract class MCRImportAbstractMetadataResolver implements MCRImportMeta
         List<Element> attributes = attributesElement.getChildren("attribute");
 
         for(Element attributeElement : attributes) {
-            String name = attributeElement.getAttributeValue("name");
-            String value = attributeElement.getAttributeValue("value");
-            String namespace = attributeElement.getAttributeValue("namespace");
-            String uri = attributeElement.getAttributeValue("resolver");
+            Attribute attr = resolveAttribute(attributeElement);
+            saveToElement.setAttribute(attr);
+        }
+    }
 
-            // resolve fields
-            String resolvedName = fieldResolver.resolveFields(name);
-            String resolvedValue = resolveValue(value, uri);
+    public Attribute resolveAttribute(Element attributeElement) {
+        String name = attributeElement.getAttributeValue("name");
+        String value = attributeElement.getAttributeValue("value");
+        String namespace = attributeElement.getAttributeValue("namespace");
+        String uri = attributeElement.getAttributeValue("resolver");
 
-            if(resolvedValue == null)
-                return;
+        // resolve fields
+        String resolvedName = fieldResolver.resolveFields(name);
+        String resolvedValue = resolveValue(value, uri);
 
-            // namespace
-            if(namespace == null || namespace.equals(""))
-                saveToElement.setAttribute(resolvedName, resolvedValue);
-            else {
-                Namespace ns = getNamespace(namespace);
-                saveToElement.setAttribute(resolvedName, resolvedValue, ns);
-            }
+        if(resolvedValue == null)
+            return null;
+        // namespace
+        if(namespace == null || namespace.equals(""))
+            return new Attribute(resolvedName, resolvedValue);
+        else {
+            Namespace ns = getNamespace(namespace);
+            return new Attribute(resolvedName, resolvedValue, ns);
         }
     }
 

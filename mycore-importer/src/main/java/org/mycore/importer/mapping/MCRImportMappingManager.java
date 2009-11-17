@@ -403,7 +403,7 @@ public class MCRImportMappingManager {
         }
 
         // postprocessing
-        String postProcessingClass = mappedObject.getAttributeValue("preprocessing");
+        String postProcessingClass = mappedObject.getAttributeValue("postprocessing");
         if(postProcessingClass != null) {
             MCRImportMappingProcessor processor = MCRImportMappingProcessorBuilder.createProcessorInstance(postProcessingClass);
             if(processor != null)

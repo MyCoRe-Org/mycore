@@ -1,11 +1,16 @@
 package org.mycore.importer.mapping.mapper;
 
+import java.util.Hashtable;
+
 import org.jdom.Element;
 import org.mycore.importer.MCRImportRecord;
+import org.mycore.importer.mapping.MCRImportMetadata;
 import org.mycore.importer.mapping.MCRImportObject;
+import org.mycore.importer.mapping.resolver.metadata.MCRImportAbstractMetadataResolver;
 import org.mycore.importer.mapping.resolver.metadata.MCRImportMetadataResolver;
 
 /**
+ * This class does the default metadata mapping.
  * 
  * @author Matthias Eichner
  */
@@ -17,8 +22,13 @@ public class MCRImportMetadataMapper extends MCRImportAbstractMapper {
 
         if(resolver != null) {
             Element metadataChild = new Element(map.getAttributeValue("to"));
-            if(resolver.resolve(map, fields, metadataChild))
-                importObject.addMetadataChild(metadataChild);
+            if(resolver.resolve(map, fields, metadataChild)) {
+                MCRImportMetadata metadataObject = importObject.addMetadataChild(metadataChild);
+                if(resolver instanceof MCRImportAbstractMetadataResolver) {
+                    Hashtable<String, String> parentAttributes = ((MCRImportAbstractMetadataResolver)resolver).getParentAttributes();
+                    metadataObject.addAttributeMap(parentAttributes);
+                }
+            }
         }
     }
 
