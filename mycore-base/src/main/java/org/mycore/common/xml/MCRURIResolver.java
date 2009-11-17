@@ -858,7 +858,7 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
 
     }
 
-    private static class MCRClassificationResolver implements MCRResolver {
+    protected static class MCRClassificationResolver implements MCRResolver {
 
         private static final Pattern EDITORFORMAT_PATTERN = Pattern.compile("(\\[)([^\\]]*)(\\])");
 
@@ -891,12 +891,17 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
          */
         public Element resolveElement(String uri) {
             LOGGER.debug("start resolving " + uri);
-            Element returns = (Element) categoryCache.getIfUpToDate(uri, getSystemLastModified());
+            String cacheKey = getCacheKey(uri);
+            Element returns = (Element) categoryCache.getIfUpToDate(cacheKey, getSystemLastModified());
             if (returns == null) {
                 returns = getClassElement(uri);
-                categoryCache.put(uri, returns);
+                categoryCache.put(cacheKey, returns);
             }
             return returns;
+        }
+
+        protected String getCacheKey(String uri) {
+            return uri;
         }
 
         private Element getClassElement(String uri) {
@@ -1077,13 +1082,15 @@ public final class MCRURIResolver implements javax.xml.transform.URIResolver, En
     }
 
     private static Hashtable<String, String> getParameterMap(String key) {
-        String[] param;
         StringTokenizer tok = new StringTokenizer(key, "&");
         Hashtable<String, String> params = new Hashtable<String, String>();
 
         while (tok.hasMoreTokens()) {
-            param = tok.nextToken().split("=");
-            params.put(param[0], param[1]);
+            String param = tok.nextToken();
+            int equalsSignIndex = param.indexOf('=');
+            String paramKey = param.substring(0, equalsSignIndex);
+            String paramValue = param.substring(equalsSignIndex + 1);
+            params.put(paramKey, paramValue);
         }
         return params;
     }

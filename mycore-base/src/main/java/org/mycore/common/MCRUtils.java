@@ -42,6 +42,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.HashSet;
+import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Locale;
 import java.util.Properties;
@@ -894,5 +895,4 @@ public class MCRUtils {
 
         return detected.getProperty("docType");
     }
-
 }
