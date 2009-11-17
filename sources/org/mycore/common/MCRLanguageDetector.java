@@ -32,7 +32,7 @@ import org.apache.log4j.Logger;
  * looking for typical words and word endings for each language.
  * German, englisch and french are currently supported.
  * 
- * @author Frank Lützenkirchen
+ * @author Frank Lï¿½tzenkirchen
  * @version $Revision$ $Date$
  */
 public class MCRLanguageDetector {
@@ -43,13 +43,13 @@ public class MCRLanguageDetector {
     private static Properties endings = new Properties();
 
     static {
-        words.put("de", "als am auch auf aus bei bis das dem den der deren derer des dessen die dies diese dieser dieses ein eine einer eines einem für hat im ist mit sich sie über und vom von vor wie zu zum zur");
+        words.put("de", "als am auch auf aus bei bis das dem den der deren derer des dessen die dies diese dieser dieses ein eine einer eines einem fï¿½r hat im ist mit sich Sie ï¿½ber und vom von vor wie zu zum zur");
         words.put("en", "a and are as at do for from has have how its like new of on or the their through to with you your");
-        words.put("fr", "la le les un une des, à aux de pour par sur comme aussi jusqu'à jusqu'aux quel quels quelles laquelle lequel lesquelles lesquelles auxquels auxquelles avec sans ont sont duquel desquels desquelles quand");
+        words.put("fr", "la le les un une des, ï¿½ aux de pour par sur comme aussi jusqu'ï¿½ jusqu'aux quel quels quelles laquelle lequel lesquelles lesquelles auxquels auxquelles avec sans ont sont duquel desquels desquelles quand");
 
         endings.put("en", "ar ble cal ce ced ed ent ic ies ing ive ness our ous ons ral th ure y");
         endings.put("de", "ag chen gen ger iche icht ig ige isch ische ischen kar ker keit ler mus nen ner rie rer ter ten trie tz ung yse");
-        endings.put("fr", "é, és, ée, ées, euse, euses, ème, euil, asme, isme, aux");
+        endings.put("fr", "ï¿½, ï¿½s, ï¿½e, ï¿½es, euse, euses, ï¿½me, euil, asme, isme, aux");
     }
 
     private static int buildScore(String text, String lang, String wordList, String endings) {
