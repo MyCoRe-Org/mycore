@@ -36,6 +36,22 @@ public class MCRTextResolverTest extends MCRTestCase {
         // resolving variables in an other variable
         assertEquals("value1", resolver.resolve("{x_{num}[_{add}]}"));
         assertEquals("value2", resolver.resolve("{x_{num}[_{add2}]}"));
+
+        // hashtable and list size tests
+        resolver.resolve("{f1}, {f3}, {notInTable}, {add}");
+        assertEquals(3, resolver.getResolvedVariables().size());
+        assertEquals(1, resolver.getUnresolvedVariables().size());
+        assertEquals(4, resolver.getUsedVariables().size());
+        assertEquals(7, resolver.getNotUsedVariables().size());
+        assertEquals(false, resolver.isCompletlyResolved());
+
+        resolver.resolveNext("{f3}, {f6}");
+        assertEquals(4, resolver.getResolvedVariables().size());
+        assertEquals(1, resolver.getUnresolvedVariables().size());
+        assertEquals(5, resolver.getUsedVariables().size());
+        assertEquals(6, resolver.getNotUsedVariables().size());
+        assertEquals(false, resolver.isCompletlyResolved());
+        
     }
 
 }

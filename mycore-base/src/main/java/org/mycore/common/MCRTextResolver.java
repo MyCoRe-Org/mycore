@@ -3,6 +3,7 @@ package org.mycore.common;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -32,7 +33,7 @@ public class MCRTextResolver {
 
     protected Hashtable<String, String> variablesTable;
 
-    protected List<String> resolvedVariables;
+    protected Hashtable<String, String> resolvedVariables;
     protected List<String> unresolvedVariables;
 
     /**
@@ -42,7 +43,7 @@ public class MCRTextResolver {
      */
     public MCRTextResolver(Hashtable<String, String> variablesTable) {
         this.variablesTable = variablesTable;
-        this.resolvedVariables = new ArrayList<String>();
+        this.resolvedVariables = new Hashtable<String, String>();
         this.unresolvedVariables = new ArrayList<String>();
     }
 
@@ -55,7 +56,7 @@ public class MCRTextResolver {
      * @return the resolved string
      */
     public String resolve(String text) {
-        this.resolvedVariables = new ArrayList<String>();
+        this.resolvedVariables = new Hashtable<String, String>();
         this.unresolvedVariables = new ArrayList<String>();
         return resolveText(text).getValue();
     }
@@ -131,14 +132,49 @@ public class MCRTextResolver {
     }
 
     /**
-     * Returns a list of all variables which are succesfully
+     * Returns a hashtable of all variables which are succesfully
      * resolved. This includes only variables the incoming string
      * contains.
      * 
-     * @return a list of resolved variables.
+     * @return a hashtable of resolved variables.
      */
-    public List<String> getResolvedVariables() {
+    public Hashtable<String, String> getResolvedVariables() {
         return resolvedVariables;
+    }
+
+    /**
+     * Returns a hashtable of variables that are used in the last <code>
+     * resolve</code> and all last <code>resolveNext</code> calls.
+     * This contains also variables that are not in the original
+     * variables table. The value stringof these variables is empty ("").
+     * 
+     * @return a hashtable of all variables that are used
+     */
+    public Hashtable<String, String> getUsedVariables() {
+        Hashtable<String, String> usedVars = new Hashtable<String, String>();
+        usedVars.putAll(resolvedVariables);
+        for(String varName : unresolvedVariables) {
+            usedVars.put(varName, "");
+        }
+        return usedVars;
+    }
+
+    /**
+     * Returns a hashtable of variables which are not used. Not used means
+     * that in the last <code>resolve</code> and <code>resolveNext</code>
+     * calls the variable doesnt occour.
+     * 
+     * @return a hashtable of not used fields
+     */
+    public Hashtable<String, String> getNotUsedVariables() {
+        Hashtable<String, String> usedVariables = getUsedVariables();
+        Hashtable<String, String> notUsedVariables = new Hashtable<String, String>();
+        for(Map.Entry<String, String> entry : variablesTable.entrySet()) {
+            if(!usedVariables.containsKey(entry.getKey())) {
+                notUsedVariables.put(entry.getKey(), entry.getValue());
+            }
+        }
+        return notUsedVariables;
     }
 
     /**
@@ -260,7 +296,7 @@ public class MCRTextResolver {
                     resolved = recursiveResolvedText.resolved;
                     // set the value of the variable
                     valueBuffer.append(recursiveResolvedText.getValue());
-                    resolvedVariables.add(termBuffer.toString());
+                    resolvedVariables.put(termBuffer.toString(), valueBuffer.toString());
                 } else {
                     unresolvedVariables.add(termBuffer.toString());
                     resolved = false;
