@@ -135,10 +135,13 @@ public abstract class MCRImportAbstractMetadataResolver implements MCRImportMeta
     @SuppressWarnings("unchecked")
     public void resolveParentAttributes(Element fromElement) {
         Element parentAttributesElement = fromElement.getChild("parentAttributes");
+        if(parentAttributesElement == null)
+            return;
         List<Element> attributes = parentAttributesElement.getChildren("attribute");
         for(Element attributeElement : attributes) {
             Attribute attr = resolveAttribute(attributeElement);
-            parentAttributes.put(attr.getName(), attr.getValue());
+            if(attr != null)
+                parentAttributes.put(attr.getName(), attr.getValue());
         }
     }
 
@@ -158,7 +161,8 @@ public abstract class MCRImportAbstractMetadataResolver implements MCRImportMeta
 
         for(Element attributeElement : attributes) {
             Attribute attr = resolveAttribute(attributeElement);
-            saveToElement.setAttribute(attr);
+            if(attr != null)
+                saveToElement.setAttribute(attr);
         }
     }
 

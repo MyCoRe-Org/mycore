@@ -3,6 +3,7 @@ package org.mycore.importer.mapping.resolver;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
 
 import org.mycore.common.MCRTextResolver;
 import org.mycore.importer.MCRImportField;
@@ -50,12 +51,10 @@ public class MCRImportFieldValueResolver {
      * @return a list of not used fields
      */
     public List<MCRImportField> getNotUsedFields() {
-        List<MCRImportField> notUsedField = new ArrayList<MCRImportField>();
-        for(String varName : variableResolver.getUnresolvedVariables()) {
-            MCRImportField field = new MCRImportField(varName, variableResolver.getValue(varName));
-            notUsedField.add(field);
+        List<MCRImportField> notUsedFields = new ArrayList<MCRImportField>();
+        for(Map.Entry<String, String> entry : variableResolver.getNotUsedVariables().entrySet()) {
+            notUsedFields.add(new MCRImportField(entry.getKey(), entry.getValue()));
         }
-        return notUsedField;
+        return notUsedFields;
     }
-
 }
