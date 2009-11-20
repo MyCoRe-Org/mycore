@@ -23,6 +23,8 @@
 
 package org.mycore.services.iview2;
 
+import java.io.File;
+
 import org.mycore.common.MCRConfiguration;
 import org.mycore.datamodel.ifs.MCRDirectory;
 import org.mycore.datamodel.ifs.MCRFile;
@@ -52,6 +54,16 @@ public class MCRIView2Tools {
         return "";
     }
 
+    public static File getFile(String derivateID, String absolutePath) {
+        MCRFile mcrFile = getMCRFile(derivateID, absolutePath);
+        return getFile(mcrFile);
+    }
+
+    public static String getFilePath(String derivateID, String absolutePath) {
+        MCRFile mcrFile = getMCRFile(derivateID, absolutePath);
+        return mcrFile.getStorageID();
+    }
+
     static MCRFile getMCRFile(String derivateID, String absolutePath) {
         MCRDirectory root = (MCRDirectory) MCRFilesystemNode.getRootNode(derivateID);
         // get main file
@@ -65,6 +77,14 @@ public class MCRIView2Tools {
 
     public static boolean isFileSupported(MCRFile file) {
         return SUPPORTED_CONTENT_TYPE.indexOf(file.getContentTypeID()) > -1;
+    }
+
+    static File getFile(MCRFile image) {
+        String storageID = image.getStorageID();
+        String storeID = image.getStoreID();
+        String baseDirName = MCRConfiguration.instance().getString("MCR.IFS.ContentStore." + storeID + ".URI");
+        File file = new File(baseDirName + File.separatorChar + storageID);
+        return file;
     }
 
 }

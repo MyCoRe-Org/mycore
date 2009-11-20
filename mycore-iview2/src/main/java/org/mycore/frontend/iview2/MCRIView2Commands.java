@@ -27,6 +27,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.xml.ws.Endpoint;
+
 import org.apache.log4j.Logger;
 import org.mycore.common.MCRException;
 import org.mycore.datamodel.common.MCRXMLTableManager;
@@ -41,6 +43,7 @@ import org.mycore.services.iview2.MCRImageTiler;
 import org.mycore.services.iview2.MCRIview2Props;
 import org.mycore.services.iview2.MCRTileJob;
 import org.mycore.services.iview2.MCRTilingQueue;
+import org.mycore.services.iview2.webservice.MCRIView2RemoteFunctions;
 
 /**
  * @author Thomas Scheffler (yagee)
@@ -52,6 +55,8 @@ public class MCRIView2Commands extends MCRAbstractCommands {
     private static final MCRTilingQueue TILE_QUEUE = MCRTilingQueue.getInstance();
 
     private static final Logger LOGGER = Logger.getLogger(MCRIView2Commands.class);
+
+    private static Endpoint tileService;
 
     public MCRIView2Commands() {
         command.add(new MCRCommand("tile images of all derivates", CMD_CLASS + "tileAll",
@@ -65,6 +70,9 @@ public class MCRIView2Commands extends MCRAbstractCommands {
                 "removes tiles of a specific file identified by its absolute path {0}"));
         command.add(new MCRCommand("delete tiles of image {0} {1}", CMD_CLASS + "deleteImageTiles String String",
                 "removes tiles of a specific file identified by its derivate {0} and absolute path {1}"));
+        command.add(new MCRCommand("start tile webservice on {0}", CMD_CLASS + "startTileWebService String",
+                "start a tile web service on adress {0}, e.g. 'http//localhost:8084/tileService', and stopping any other running service"));
+        command.add(new MCRCommand("stop tile webservice", CMD_CLASS + "stopTileWebService", "stops the tile web service'"));
     }
 
     public static List<String> tileAll() {
@@ -178,6 +186,20 @@ public class MCRIView2Commands extends MCRAbstractCommands {
             }
         }
         return files;
+    }
+
+    public static void startTileWebService(String address) {
+        stopTileWebService();
+        tileService = Endpoint.publish(address, new MCRIView2RemoteFunctions());
+    }
+
+    public static void stopTileWebService() {
+        if (tileService == null || !tileService.isPublished()) {
+            LOGGER.info("Currently there is no tiling service running");
+            return;
+        }
+        LOGGER.info("Closing web service.");
+        tileService.stop();
     }
 
 }

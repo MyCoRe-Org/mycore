@@ -52,7 +52,6 @@ import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
-import org.mycore.common.MCRConfiguration;
 import org.mycore.datamodel.ifs.MCRFile;
 
 import com.sun.media.jai.codec.MemoryCacheSeekableStream;
@@ -82,23 +81,15 @@ public class MCRImage {
     private String imagePath;
 
     public MCRImage(MCRFile image) {
-        this.imageFile = getFile(image);
-        this.derivate = image.getOwnerID();
-        this.imagePath = image.getAbsolutePath();
+        this(MCRIView2Tools.getFile(image),image.getOwnerID(),image.getPath());
+    }
+
+    public MCRImage(File file, String derivateID, String imagePath) {
+        this.imageFile = file;
+        this.derivate = derivateID;
+        this.imagePath = imagePath;
         LOGGER.info("MCRImage initialized");
     }
-
-    private File getFile(MCRFile image2) {
-        String storageID = image2.getStorageID();
-        String storeID = image2.getStoreID();
-        String baseDirName = MCRConfiguration.instance().getString("MCR.IFS.ContentStore." + storeID + ".URI");
-        File file = new File(baseDirName + File.separatorChar + storageID);
-        return file;
-    }
-
-    /*public void addWaterMark(File image) {
-    	this.waterMarkFile = image;
-    }*/
 
     public MCRTiledPictureProps tile() throws IOException {
         //the absolute Path is the docportal-directory, therefore the path "../mycore/..."
