@@ -60,6 +60,10 @@ public class MCRIView2RemoteFunctions {
 
     private static Logger LOGGER = Logger.getLogger(MCRIView2RemoteFunctions.class);
 
+    /**
+     * Asks web service to get next image in the tiling queue.
+     * @return Info about next image to be tiled
+     */
     @WebMethod(operationName = "next-tile-job")
     @WebResult(name = "tile-job")
     public MCRIView2RemoteJob getNextTileParameters() {
@@ -85,23 +89,27 @@ public class MCRIView2RemoteFunctions {
         }
     }
 
+    /**
+     * Tells web service that images is tiled and available in its directory.
+     * @param jobInfo complete info about the finished tiling job
+     */
     @WebMethod(operationName = "finish-tile-job")
-    public void finishTileJob(@WebParam(name = "job") MCRIView2RemoteJob pojo) {
+    public void finishTileJob(@WebParam(name = "job") MCRIView2RemoteJob jobInfo) {
         Session session = sessionFactory.getCurrentSession();
         Transaction transaction = session.beginTransaction();
         try {
             MCRTileJob image = null;
             Map<String, String> restrictions = new HashMap<String, String>();
-            restrictions.put("derivate", pojo.getDerivateID());
-            restrictions.put("path", pojo.getDerivatePath());
+            restrictions.put("derivate", jobInfo.getDerivateID());
+            restrictions.put("path", jobInfo.getDerivatePath());
             Criteria jobCriteria = session.createCriteria(MCRTileJob.class).add(Restrictions.allEq(restrictions));
             image = (MCRTileJob) jobCriteria.uniqueResult();
             image.setFinished(new Date());
             image.setStatus(MCRJobState.FIN);
-            image.setHeight(pojo.getHeight());
-            image.setWidth(pojo.getWidth());
-            image.setTiles(pojo.getTiles());
-            image.setZoomLevel(pojo.getZoomLevel());
+            image.setHeight(jobInfo.getHeight());
+            image.setWidth(jobInfo.getWidth());
+            image.setTiles(jobInfo.getTiles());
+            image.setZoomLevel(jobInfo.getZoomLevel());
             session.update(image);
             transaction.commit();
         } catch (HibernateException e) {

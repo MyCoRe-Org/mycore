@@ -40,6 +40,15 @@ public class MCRIView2Tools {
     private static final MCRConfiguration CONFIG = MCRConfiguration.instance();
 
     private static String SUPPORTED_CONTENT_TYPE = CONFIG.getString("MCR.Module-iview2.SupportedContentTypes", "");
+    
+    private static File TILE_DIR = new File(MCRIview2Props.getProperty("DirectoryForTiles"));
+
+    /**
+     * @return directory for tiles
+     */
+    public static File getTileDir() {
+        return TILE_DIR;
+    }
 
     public static String getSupportedMainFile(String derivateID) {
         MCRDerivate deriv = new MCRDerivate();

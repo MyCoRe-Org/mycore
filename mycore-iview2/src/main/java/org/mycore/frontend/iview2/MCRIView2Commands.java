@@ -145,13 +145,13 @@ public class MCRIView2Commands extends MCRAbstractCommands {
     }
 
     public static void deleteDerivateTiles(String derivateID) {
-        File derivateDir = MCRImage.getTiledFile(derivateID, null);
+        File derivateDir = MCRImage.getTiledFile(MCRIView2Tools.getTileDir(), derivateID, null);
         deleteDirectory(derivateDir);
         TILE_QUEUE.remove(derivateID);
     }
 
     public static void deleteImageTiles(String derivate, String absoluteImagePath) {
-        File tileFile = MCRImage.getTiledFile(derivate, absoluteImagePath);
+        File tileFile = MCRImage.getTiledFile(MCRIView2Tools.getTileDir(), derivate, absoluteImagePath);
         tileFile.delete();
         int removed = TILE_QUEUE.remove(derivate, absoluteImagePath);
         LOGGER.info("removed tiles from " + removed + " images");

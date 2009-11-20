@@ -37,6 +37,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 import org.mycore.common.MCRUtils;
+import org.mycore.services.iview2.MCRIView2Tools;
 import org.mycore.services.iview2.MCRImage;
 
 /**
@@ -117,7 +118,7 @@ public class MCRTileServlet extends HttpServlet {
     }
 
     private static File getTileFile(TileInfo tileInfo) {
-        return MCRImage.getTiledFile(tileInfo.derivate, tileInfo.imagePath);
+        return MCRImage.getTiledFile(MCRIView2Tools.getTileDir(), tileInfo.derivate, tileInfo.imagePath);
     }
 
     private static class TileInfo {

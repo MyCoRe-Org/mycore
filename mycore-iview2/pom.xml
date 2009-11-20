@@ -16,16 +16,9 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>javax.media</groupId>
-      <artifactId>jai-core</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>javax.media</groupId>
-      <artifactId>jai_imageio</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.sun.media</groupId>
-      <artifactId>jai-codec</artifactId>
+      <groupId>org.mycore.iview2</groupId>
+      <artifactId>image-tiler</artifactId>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>log4j</groupId>
