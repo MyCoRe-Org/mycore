@@ -51,7 +51,7 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-    <java.target.version>1.5</java.target.version>
+    <java.target.version>1.6</java.target.version>
     <uniqueVersion>false</uniqueVersion>
     <hibernate.version>3.3.2.GA</hibernate.version>
     <lucene.version>2.9.0</lucene.version>
@@ -73,7 +73,7 @@
   <build>
     <pluginManagement>
       <plugins>
-        <!-- Use Java 1.5 everywhere -->
+        <!-- Use Java 1.6 everywhere -->
         <plugin>
           <artifactId>maven-compiler-plugin</artifactId>
           <configuration>
