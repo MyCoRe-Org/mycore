@@ -71,7 +71,7 @@ function setHelpText()
       }
           else if (value == "add_extern") 
           {
-              var helpText_1 = document.createTextNode("Ein Link besteht nur aus einem Men�eintrag. Sie stellen also hier einen neuen Men�eintrag in das System ein, der beim Anklicken auf die von ihnen angegebene Link-Adresse verweist.");
+              var helpText_1 = document.createTextNode("Ein Link besteht nur aus einem Men�eintrag. Sie stellen also hier einen neuen Men�eintrag in das System ein, der beim Anklicken auf die von Ihnen angegebene Link-Adresse verweist.");
               var helpText_2 = document.createTextNode("Eine neuer Link wird immer unter einem bestimmtem Obermen�punkt eingestellt. W�hlen Sie also hier den Men�punkt aus, UNTER DEM die der Link angelegt werden soll. Hinweis: Einen Link als Hauptmen�punkt k�nnen Sie einstellen, indem Sie direkt das entsprechende Men� ausw�hlen.");             
           }   
               else if (value == "delete") 
