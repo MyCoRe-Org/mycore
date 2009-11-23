@@ -38,7 +38,6 @@ class RowCreator_Lines implements RowCreator {
         emptyLeafs = configuration.getString("MCR.ClassificationBrowser." + getBrowserClass() + ".EmptyLeafs", defaultEmptyLeafs);
     }
     
-    @Override
     public void createRows(String lang, Element xNavtree) {
         try {
             MCRCategory classification = classificationPool.getClassificationAsPojo(classif.getId(), true);
@@ -243,7 +242,6 @@ class RowCreator_Lines implements RowCreator {
         return lines.get(i);
     }
 
-    @Override
     public MCRCategory getClassification() {
         return classif;
     }

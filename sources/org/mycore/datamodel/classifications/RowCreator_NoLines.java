@@ -209,12 +209,10 @@ class RowCreator_NoLines implements RowCreator {
         return search;
     }
 
-    @Override
     public MCRCategory getClassification() {
         return classif;
     }
 
-    @Override
     public void setCommented(boolean commented) {
         this.commented = commented;
     }
@@ -223,17 +221,14 @@ class RowCreator_NoLines implements RowCreator {
         return commented;
     }
 
-    @Override
     public void setBrowserClass(String browserClass) {
         this.browserClass = browserClass;
     }
 
-    @Override
     public void setUri(String uri) {
         this.uri = uri;
     }
 
-    @Override
     public void setView(String view) {
         this.view = view;
     }

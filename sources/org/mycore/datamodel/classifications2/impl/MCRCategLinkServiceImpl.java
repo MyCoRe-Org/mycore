@@ -320,7 +320,6 @@ public class MCRCategLinkServiceImpl implements MCRCategLinkService {
         return ids;
     }
 
-    @Override
     public boolean hasLink(MCRCategory mcrCategory) {
         return !hasLinks(mcrCategory).isEmpty();
     }
