@@ -24,7 +24,7 @@
 package org.mycore.backend.lucene;
 
 import java.io.StringReader;
-import java.util.Hashtable;
+import java.text.ParseException;
 import java.util.List;
 import java.util.StringTokenizer;
 
@@ -43,13 +43,14 @@ import org.apache.lucene.search.PrefixQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.WildcardQuery;
+import org.jdom.Element;
 import org.mycore.common.MCRNormalizer;
 import org.mycore.common.MCRUtils;
 import org.mycore.services.fieldquery.MCRFieldDef;
 
 /**
  * This class builds a Lucene Query from XML query (specified by Frank
- * Lützenkirchen)
+ * Lï¿½tzenkirchen)
  * 
  * @author Harald Richter
  * 
@@ -59,12 +60,9 @@ import org.mycore.services.fieldquery.MCRFieldDef;
 public class MCRBuildLuceneQuery {
     private static final Logger LOGGER = Logger.getLogger(MCRBuildLuceneQuery.class);
 
-    static
-    {
-      BooleanQuery.setMaxClauseCount( 10000 );
+    static {
+        BooleanQuery.setMaxClauseCount(10000);
     }
-    
-    static Hashtable search = null;
 
     /**
      * Build Lucene Query from XML
@@ -72,25 +70,27 @@ public class MCRBuildLuceneQuery {
      * @return Lucene Query
      * 
      */
-    public static Query buildLuceneQuery(BooleanQuery r, boolean reqf, List f, Analyzer analyzer) throws Exception {
+    public static Query buildLuceneQuery(BooleanQuery r, boolean reqf, List<Element> f, Analyzer analyzer) throws Exception {
         for (int i = 0; i < f.size(); i++) {
-            org.jdom.Element xEle = (org.jdom.Element) (f.get(i));
+            org.jdom.Element xEle = f.get(i);
             String name = xEle.getName();
             if ("boolean".equals(name))
-              name = xEle.getAttributeValue("operator").toLowerCase();
+                name = xEle.getAttributeValue("operator").toLowerCase();
             Query x = null;
 
             boolean reqfn = reqf;
             boolean prof = false;
 
+            @SuppressWarnings("unchecked")
+            List<Element> children = xEle.getChildren();
             if (name.equals("and")) {
-                x = buildLuceneQuery(null, true, xEle.getChildren(), analyzer);
+                x = buildLuceneQuery(null, true, children, analyzer);
             } else if (name.equalsIgnoreCase("or")) {
-                x = buildLuceneQuery(null, false, xEle.getChildren(), analyzer);
+                x = buildLuceneQuery(null, false, children, analyzer);
             } else if (name.equalsIgnoreCase("not")) {
-                x = buildLuceneQuery(null, false, xEle.getChildren(), analyzer);
+                x = buildLuceneQuery(null, false, children, analyzer);
                 reqfn = false; // javadoc lucene: It is an error to specify a
-                                // clause as both required and prohibited
+                // clause as both required and prohibited
                 prof = true;
             } else if (name.equalsIgnoreCase("condition")) {
                 String field = xEle.getAttributeValue("field", "");
@@ -99,17 +99,17 @@ public class MCRBuildLuceneQuery {
 
                 LOGGER.debug("field: " + field + " operator: " + operator + " value: " + value);
 
-                String fieldtype = MCRFieldDef.getDef( field ).getDataType();
+                String fieldtype = MCRFieldDef.getDef(field).getDataType();
 
                 if ("name".equals(fieldtype)) {
                     fieldtype = "text";
                 }
-
+                
                 if("index".equals(fieldtype)){
                 	fieldtype="identifier";
-                	//value = MCRLuceneSearcher.convertToGermanIndexString(value);
                 	value = MCRNormalizer.normalizeString(value, true);
                 }
+                
                 x = handleCondition(field, operator, value, fieldtype, reqf, analyzer);
             }
 
@@ -118,15 +118,14 @@ public class MCRBuildLuceneQuery {
                     r = new BooleanQuery();
                 }
 
-                //BooleanClause bq = new BooleanClause(x, reqfn, prof);
                 BooleanClause.Occur occur = BooleanClause.Occur.MUST;
-                
-                if (reqfn && !prof )
-                  ;
-                else if ( !reqfn && !prof)
-                  occur = BooleanClause.Occur.SHOULD; 
-                else if ( !reqfn && prof)
-                  occur = BooleanClause.Occur.MUST_NOT; 
+
+                if (reqfn && !prof)
+                    ;
+                else if (!reqfn && !prof)
+                    occur = BooleanClause.Occur.SHOULD;
+                else if (!reqfn && prof)
+                    occur = BooleanClause.Occur.MUST_NOT;
                 BooleanClause bq = new BooleanClause(x, occur);
                 r.add(bq);
             }
@@ -135,7 +134,8 @@ public class MCRBuildLuceneQuery {
         return r;
     }
 
-    private static Query handleCondition(String field, String operator, String value, String fieldtype, boolean reqf, Analyzer analyzer) throws Exception {
+    private static Query handleCondition(String field, String operator, String value, String fieldtype, boolean reqf, Analyzer analyzer)
+            throws Exception {
         if ("text".equals(fieldtype) && "contains".equals(operator)) {
             BooleanQuery bq = null;
 
@@ -151,21 +151,19 @@ public class MCRBuildLuceneQuery {
                 if ((null != tq) && (null == bq)) // not first token
                 {
                     bq = new BooleanQuery();
-                    //bq.add(tq, reqf, false);
                     if (reqf)
-                      bq.add(tq, BooleanClause.Occur.MUST);
+                        bq.add(tq, BooleanClause.Occur.MUST);
                     else
-                      bq.add(tq, BooleanClause.Occur.SHOULD);
+                        bq.add(tq, BooleanClause.Occur.SHOULD);
                 }
 
                 tq = new TermQuery(te);
 
                 if (null != bq) {
-                    //bq.add(tq, reqf, false);
                     if (reqf)
-                      bq.add(tq, BooleanClause.Occur.MUST);
+                        bq.add(tq, BooleanClause.Occur.MUST);
                     else
-                      bq.add(tq, BooleanClause.Occur.SHOULD);
+                        bq.add(tq, BooleanClause.Occur.SHOULD);
                 }
             }
 
@@ -175,8 +173,8 @@ public class MCRBuildLuceneQuery {
             return tq;
         } else if (("text".equals(fieldtype) || "identifier".equals(fieldtype)) && "like".equals(operator)) {
             Term te;
-            
-            String help = value.endsWith("*") ? value.substring(0, value.length()-1) : value;
+
+            String help = value.endsWith("*") ? value.substring(0, value.length() - 1) : value;
 
             if ((-1 != help.indexOf("*")) || (-1 != help.indexOf("?"))) {
                 LOGGER.debug("WILDCARD");
@@ -200,8 +198,7 @@ public class MCRBuildLuceneQuery {
 
             return pq;
         } else if ("text".equals(fieldtype) && "fuzzy".equals(operator)) // 1.9.05
-                                                                            // future
-                                                                            // use
+        // future use
         {
             Term te;
             value = fixQuery(value);
@@ -209,8 +206,7 @@ public class MCRBuildLuceneQuery {
 
             return new FuzzyQuery(te);
         } else if ("text".equals(fieldtype) && "range".equals(operator)) // 1.9.05
-                                                                            // future
-                                                                            // use
+        // future use
         {
             String lower = null;
             String upper = null;
@@ -232,24 +228,20 @@ public class MCRBuildLuceneQuery {
             Term te = new Term(field, value);
 
             return new TermQuery(te);
-        } else if ("boolean".equals(fieldtype) ) {
+        } else if ("boolean".equals(fieldtype)) {
             Term te = new Term(field, "true".equals(value) ? "1" : "0");
 
             return new TermQuery(te);
-        } else if ("decimal".equals(fieldtype)) {  
-          return NumberQuery(field, "decimal", operator, value);
-        } else if ("integer".equals(fieldtype)) {  
-          return NumberQuery(field, "integer", operator, value);
+        } else if ("decimal".equals(fieldtype)) {
+            return NumberQuery(field, "decimal", operator, value);
+        } else if ("integer".equals(fieldtype)) {
+            return NumberQuery(field, "integer", operator, value);
         } else if ("text".equals(fieldtype) && "lucene".equals(operator)) // value
-                                                                            // contains
-                                                                            // query
-                                                                            // for
-                                                                            // lucene,
-        // use query parser
+        // contains query for lucene, use query parser
         {
             QueryParser qp = new QueryParser(field, analyzer);
-            Query query = qp.parse( fixQuery(value) );
-            
+            Query query = qp.parse(fixQuery(value));
+
             LOGGER.debug("Lucene query: " + query.toString());
 
             return query;
@@ -292,10 +284,10 @@ public class MCRBuildLuceneQuery {
         }
 
         String qu = _fixedQuery.toString();
-        qu = MCRUtils.replaceString(qu, "ä", "a");
-        qu = MCRUtils.replaceString(qu, "ö", "o");
-        qu = MCRUtils.replaceString(qu, "ü", "u");
-        qu = MCRUtils.replaceString(qu, "ß", "ss");
+        qu = MCRUtils.replaceString(qu, "ï¿½", "a");
+        qu = MCRUtils.replaceString(qu, "ï¿½", "o");
+        qu = MCRUtils.replaceString(qu, "ï¿½", "u");
+        qu = MCRUtils.replaceString(qu, "ï¿½", "ss");
 
         return qu;
     }
@@ -343,6 +335,7 @@ public class MCRBuildLuceneQuery {
     
     /***************************************************************************
      * DateQuery2 ()
+     * @throws ParseException 
      **************************************************************************/
     private static Query DateQuery2(String fieldname,  String Op, String value) {
         if (value.length() == 0) {
