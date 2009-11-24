@@ -40,7 +40,7 @@ import com.drew.metadata.Tag;
  * library from Drew Noakes in the com.drew.** packages. See
  * http://www.drewnoakes.com/code/exif/ for details.
  * 
- * @author Frank Lützenkirchen
+ * @author Frank LÃ¼tzenkirchen
  * @version $Revision$ $Date$
  */
 public class MCRDataExtractorJPEG extends MCRDataExtractor {

@@ -36,7 +36,7 @@ import org.mycore.common.MCRException;
  * MCR.IFS2.Store.ID.Class=org.mycore.datamodel.ifs2.MCRFileStore
  * MCR.IFS2.Store.ID.BaseDir=/foo/bar MCR.IFS2.Store.ID.SlotLayout=4-2-2
  * 
- * @author Frank Lützenkirchen
+ * @author Frank LÃ¼tzenkirchen
  */
 public class MCRFileStore extends MCRStore {
 

@@ -37,7 +37,7 @@ import org.mycore.frontend.servlets.MCRServlet;
 import org.mycore.frontend.servlets.MCRServletJob;
 
 /**
- * @author Frank Lützenkirchen
+ * @author Frank LÃ¼tzenkirchen
  * 
  * TODO: Refactoring Java, XML, XSL TODO: case insensitiv machen TODO:
  * Sortierung fixen

@@ -71,7 +71,7 @@ import org.mycore.common.MCRException;
  * 
  * MCR.IFS2.Store.ID.SlotLayout=4-2-2
  * 
- * @author Frank Lützenkirchen
+ * @author Frank LÃ¼tzenkirchen
  */
 public abstract class MCRStore {
 

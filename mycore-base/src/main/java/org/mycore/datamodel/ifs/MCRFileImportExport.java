@@ -21,7 +21,7 @@ import org.mycore.common.MCRUtils;
  * Imports or exports complete directory trees with all contained files and subdirectories between the local host's filesystem and the internal MCRDirectory
  * structures.
  * 
- * @author Frank Lützenkirchen
+ * @author Frank LÃ¼tzenkirchen
  * @version $Revision$ $Date$
  */
 public class MCRFileImportExport {

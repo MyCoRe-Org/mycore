@@ -44,7 +44,7 @@ import org.mycore.parsers.bool.MCRTrueCondition;
 /**
  * Executes queries on all configured searchers and returns query results.
  * 
- * @author Frank Lützenkirchen
+ * @author Frank LÃ¼tzenkirchen
  */
 public class MCRQueryManager {
 

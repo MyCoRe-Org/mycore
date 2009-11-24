@@ -22,7 +22,7 @@ import org.mycore.common.MCRUsageException;
 /**
  * Represents a stored file or directory node with its metadata and content.
  * 
- * @author Frank L\u00fctzenkirchen
+ * @author Frank Lützenkirchen
  * @version $Revision$ $Date$
  */
 public abstract class MCRFilesystemNode {

@@ -61,7 +61,7 @@ import org.mycore.datamodel.metadata.MCRObject;
  * using the text filter plug-ins, and any plain XML document.
  * 
  * @see MCRSearcher#addToIndex(String, List)
- * @author Frank L�tzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCRData2Fields {
 

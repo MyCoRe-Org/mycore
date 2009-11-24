@@ -64,8 +64,8 @@ import org.mycore.datamodel.ifs.MCRFileReader;
  *      for SFTP: controls the use of known_hosts file, default is "no"
  * </code>
  * 
- * @author Werner Greßhoff
- * @author Frank Lützenkirchen
+ * @author Werner GreÃŸhoff
+ * @author Frank LÃ¼tzenkirchen
  * 
  * @version $Revision$ $Date$
  */

@@ -28,7 +28,7 @@ import java.util.StringTokenizer;
 import org.mycore.common.MCRConfiguration;
 
 /**
- * @author Frank Lützenkirchen
+ * @author Frank LÃ¼tzenkirchen
  */
 class MCRIndexConfiguration {
     String table;

@@ -41,7 +41,7 @@ import org.mycore.common.events.MCREventManager;
  * Represents a stored file with its metadata and content. USED BY MILESS 1.3
  * ONLY!
  * 
- * @author Frank Lützenkirchen
+ * @author Frank LÃ¼tzenkirchen
  * @version $Revision$ $Date$
  * @deprecated use MCRFile
  */

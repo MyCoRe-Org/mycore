@@ -29,7 +29,7 @@ package org.mycore.common;
  * the datastore reports an error, for example.
  * 
  * @author Jens Kupferschmidt
- * @author Frank Lützenkirchen
+ * @author Frank LÃ¼tzenkirchen
  * @version $Revision$ $Date$
  */
 public class MCRPersistenceException extends MCRException {

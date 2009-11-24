@@ -27,7 +27,7 @@ import org.apache.log4j.Logger;
 import org.mycore.common.MCRCache;
 
 /**
- * @author Frank Lützenkirchen
+ * @author Frank LÃ¼tzenkirchen
  * @author Harald Richter
  * @author Jens Kupferschmidt
  * 

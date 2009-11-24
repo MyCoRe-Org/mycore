@@ -40,7 +40,7 @@ import org.tmatesoft.svn.core.io.SVNRepositoryFactory;
 /**
  * JUnit test for MCRVersioningMetadataStore
  * 
- * @author Frank Lützenkirchen
+ * @author Frank LÃ¼tzenkirchen
  */
 public class MCRVersioningMetadataStoreTest extends MCRTestCase {
 

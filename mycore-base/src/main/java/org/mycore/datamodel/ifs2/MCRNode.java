@@ -40,7 +40,7 @@ import org.apache.commons.vfs.util.RandomAccessMode;
  * and directories can be either really stored, or virtually existing as a child
  * node contained within a stored container file like zip or tar.
  * 
- * @author Frank Lützenkirchen
+ * @author Frank LÃ¼tzenkirchen
  */
 public abstract class MCRNode {
     /**

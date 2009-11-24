@@ -43,7 +43,7 @@ import org.mycore.common.MCRUtils;
  * content. It uses a storage ID and the store ID to identify the place where
  * the content of a file is stored.
  * 
- * @author Frank Lützenkirchen
+ * @author Frank LÃ¼tzenkirchen
  * @version $Revision$ $Date$
  */
 public abstract class MCRContentStore {

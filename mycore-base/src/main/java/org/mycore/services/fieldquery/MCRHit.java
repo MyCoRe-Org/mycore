@@ -48,7 +48,7 @@ import org.mycore.common.MCRException;
  * 
  * @see MCRResults
  * @author Arne Seifert
- * @author Frank Lützenkirchen
+ * @author Frank LÃ¼tzenkirchen
  */
 public class MCRHit {
     /** logger */

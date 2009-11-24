@@ -30,7 +30,7 @@ import org.mycore.parsers.bool.MCRCondition;
  * MCREventHandler. Indexers can easily be implemented by overwriting the two methods addToIndex and removeFromIndex. Searchers are implemented by overwriting
  * the method search. Searchers that do not need indexing or do this on their own can simply ignore the add/remove methods.
  * 
- * @author Frank Lützenkirchen
+ * @author Frank LÃ¼tzenkirchen
  */
 public abstract class MCRSearcher extends MCREventHandlerBase implements MCREventHandler {
     /** The logger */

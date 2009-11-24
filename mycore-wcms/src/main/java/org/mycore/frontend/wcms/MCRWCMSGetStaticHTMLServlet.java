@@ -88,9 +88,6 @@ public class MCRWCMSGetStaticHTMLServlet extends MCRWCMSServlet {
                 Element content = (Element) contentElementsIterator.next();
 
                 if (content.getAttributeValue("lang", ns) != null) {
-                    // System.out.println("�bergebene Sprache: "+ lang + "
-                    // gefundene Sprache " + content.getAttributeValue("lang",
-                    // ns));
                     contentList = content.getContent();
                     validXHTML = true;
 

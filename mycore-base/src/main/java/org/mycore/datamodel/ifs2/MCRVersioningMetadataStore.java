@@ -47,7 +47,7 @@ import org.tmatesoft.svn.core.io.SVNRepositoryFactory;
  * 
  * MCR.IFS2.Store.DocPortal_document.SVNRepositoryURL=file:///foo/svnroot/
  * 
- * @author Frank Lützenkirchen
+ * @author Frank LÃ¼tzenkirchen
  */
 public class MCRVersioningMetadataStore extends MCRMetadataStore {
 

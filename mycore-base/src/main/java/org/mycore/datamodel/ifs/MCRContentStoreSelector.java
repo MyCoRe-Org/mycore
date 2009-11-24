@@ -33,7 +33,7 @@ import org.mycore.common.MCRException;
  * implementation of this interface in the class MCRSimpleContentStoreSelector
  * that decides based on the file content type.
  * 
- * @author Frank Lützenkirchen
+ * @author Frank LÃ¼tzenkirchen
  * @author Thomas Scheffler (yagee)
  * @version $Revision$ $Date$
  */

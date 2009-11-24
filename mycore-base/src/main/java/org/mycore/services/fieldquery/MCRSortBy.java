@@ -28,7 +28,7 @@ package org.mycore.services.fieldquery;
  * Each MCRSortBy defines one field to sort by, and the order
  * (ascending or descending).
  *  
- * @author Frank Lützenkirchen
+ * @author Frank LÃ¼tzenkirchen
  */
 public class MCRSortBy {
     /** Sort this field in ascending order */

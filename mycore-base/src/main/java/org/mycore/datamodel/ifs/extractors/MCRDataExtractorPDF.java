@@ -39,7 +39,7 @@ import org.pdfbox.pdmodel.interactive.documentnavigation.outline.PDOutlineItem;
  * outline items (table of contents) are extracted. See http://www.pdfbox.org/
  * for details.
  * 
- * @author Frank Lützenkirchen
+ * @author Frank LÃ¼tzenkirchen
  * @version $Revision$ $Date$
  */
 public class MCRDataExtractorPDF extends MCRDataExtractor {

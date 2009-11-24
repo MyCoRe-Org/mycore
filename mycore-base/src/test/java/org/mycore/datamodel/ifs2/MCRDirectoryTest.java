@@ -12,7 +12,7 @@ import org.mycore.common.MCRTestCase;
 /**
  * JUnit test for MCRDirectory
  * 
- * @author Frank Lützenkirchen
+ * @author Frank LÃ¼tzenkirchen
  */
 public class MCRDirectoryTest extends MCRTestCase {
 

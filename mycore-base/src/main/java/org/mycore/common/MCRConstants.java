@@ -41,7 +41,7 @@ import org.jdom.Namespace;
  * @author Jens Kupferschmidt
  * @author Thomas Scheffler (yagee)
  * @author Stefan Freitag (sasf)
- * @author Frank Lützenkirchen
+ * @author Frank LÃ¼tzenkirchen
  * 
  * @version $Revision$ $Date$
  */

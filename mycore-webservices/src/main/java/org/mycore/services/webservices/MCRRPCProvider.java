@@ -37,7 +37,7 @@ import org.mycore.common.MCRSessionMgr;
 /**
  * Wraps WebService method invocation with hibernate transaction
  * 
- * @author Frank Lützenkirchen
+ * @author Frank LÃ¼tzenkirchen
  */
 public class MCRRPCProvider extends RPCProvider {
 

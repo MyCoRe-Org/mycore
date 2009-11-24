@@ -47,7 +47,7 @@ import org.xml.sax.SAXParseException;
  * There is plenty left to do.
  * 
  * @author Detlev Degenhardt
- * @author Frank Luetzenkirchen
+ * @author Frank Lützenkirchen
  * @author Thomas Scheffler (yagee)
  * @version $Revision$ $Date$
  */

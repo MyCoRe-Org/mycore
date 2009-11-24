@@ -35,7 +35,7 @@ import org.mycore.common.MCRUtils;
  * Represents a file stored in a file collection. This is a file that is
  * imported from outside the system, and may be updated and modified afterwards.
  * 
- * @author Frank Lützenkirchen
+ * @author Frank LÃ¼tzenkirchen
  * 
  */
 public class MCRFile extends MCRStoredNode {

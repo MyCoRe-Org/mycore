@@ -26,7 +26,7 @@ package org.mycore.user.authentication;
 /**
  * Authenticates a userID by checking a given password for that userID.
  * 
- * @author Frank Lützenkirchen
+ * @author Frank LÃ¼tzenkirchen
  * @version $Revision$ $Date$
  */
 public interface MCRAuthenticator

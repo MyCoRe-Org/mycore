@@ -54,7 +54,7 @@ import org.xml.sax.SAXParseException;
  * Provides static methods that implement commands for the MyCoRe command line interface.
  * 
  * @author Jens Kupferschmidt
- * @author Frank Luetzenkirchen
+ * @author Frank Lützenkirchen
  * @version $Revision$ $Date$
  */
 public class MCRObjectCommands extends MCRAbstractCommands {

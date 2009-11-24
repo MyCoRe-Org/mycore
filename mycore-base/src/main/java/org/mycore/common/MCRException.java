@@ -31,7 +31,7 @@ import java.io.PrintStream;
  * the MyCoRe implementation classes.
  * 
  * @author Jens Kupferschmidt
- * @author Frank Luetzenkirchen
+ * @author Frank Lützenkirchen
  * @version $Revision$ $Date$
  * 
  * @see RuntimeException

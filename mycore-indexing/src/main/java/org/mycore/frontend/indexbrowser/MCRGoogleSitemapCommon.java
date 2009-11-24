@@ -50,7 +50,7 @@ import org.mycore.datamodel.metadata.MCRObjectID;
 /**
  * This class implements all common methods to create the Google sitemap data.
  * 
- * @author Frank Luetzenkirchen
+ * @author Frank Lützenkirchen
  * @author Jens Kupferschmidt
  * @author Thomas Scheffler (yagee)
  * @version $Revision$ $Date$

@@ -57,7 +57,7 @@ import org.mycore.common.MCRConfigurationException;
  * MCR.URN.SubNamespace.[ConfigID].Prefix=[URNPrefix], for example
  * MCR.URN.SubNamespace.Essen.Prefix=urn.nbn.de:hbz:465-
  * 
- * @author Frank Lützenkirchen
+ * @author Frank LÃ¼tzenkirchen
  */
 public class MCRURNManager {
 

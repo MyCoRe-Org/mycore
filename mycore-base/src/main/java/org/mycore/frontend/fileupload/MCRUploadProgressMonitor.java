@@ -56,7 +56,7 @@ import javax.swing.WindowConstants;
  * message that should be displayed and to start, update and finish the progress
  * bar.
  * 
- * @author Frank Lützenkirchen
+ * @author Frank LÃ¼tzenkirchen
  * @author Jens Kupferschmidt
  * @version $Revision$ $Date$
  */
@@ -349,7 +349,7 @@ public class MCRUploadProgressMonitor extends JDialog {
             permilleTotal = 0;
         }
 
-        final String sFile = formatSize(bytesFile) + " von " + formatSize(sizeFile) + " übertragen";
+        final String sFile = formatSize(bytesFile) + " von " + formatSize(sizeFile) + " Ã¼bertragen";
 
         lastUpdate = System.currentTimeMillis();
         long now = (endTime > 0 ? endTime : lastUpdate);
@@ -362,7 +362,7 @@ public class MCRUploadProgressMonitor extends JDialog {
 
         int throughput = Math.round(bytesTotal / sec);
 
-        final String sTotal = formatSize(bytesTotal) + " von " + formatSize(sizeTotal) + " insgesamt übertragen";
+        final String sTotal = formatSize(bytesTotal) + " von " + formatSize(sizeTotal) + " insgesamt Ã¼bertragen";
         final String sThrough = formatSize(throughput) + " pro Sekunde";
         final String sName;
 
@@ -376,14 +376,14 @@ public class MCRUploadProgressMonitor extends JDialog {
         final String sTime;
 
         if (canceled) {
-            sCounter = "ABGEBROCHEN: " + fileCount + " von " + numFiles + " Dateien übertragen";
-            sTime = "Übertragung abgebrochen, Gesamtdauer " + formatTime(sec);
+            sCounter = "ABGEBROCHEN: " + fileCount + " von " + numFiles + " Dateien Ã¼bertragen";
+            sTime = "Ãœbertragung abgebrochen, Gesamtdauer " + formatTime(sec);
         } else if (bytesTotal < sizeTotal) {
-            sCounter = "Übertrage Datei " + fileCount + " von " + numFiles;
-            sTime = "Dauer bisher " + formatTime(sec) + " / geschätzt noch " + formatTime(rest);
+            sCounter = "Ãœbertrage Datei " + fileCount + " von " + numFiles;
+            sTime = "Dauer bisher " + formatTime(sec) + " / geschÃ¤tzt noch " + formatTime(rest);
         } else {
-            sCounter = "Alle " + numFiles + " Dateien übertragen";
-            sTime = "Übertragung beendet, Gesamtdauer " + formatTime(sec);
+            sCounter = "Alle " + numFiles + " Dateien Ã¼bertragen";
+            sTime = "Ãœbertragung beendet, Gesamtdauer " + formatTime(sec);
         }
 
         Runnable updater = new Runnable() {
@@ -473,7 +473,7 @@ public class MCRUploadProgressMonitor extends JDialog {
      *            the Exception to be shown
      */
     public static void reportException(Exception ex) {
-        String title = "Fehler bei der Übertragung";
+        String title = "Fehler bei der Ãœbertragung";
         StringBuffer msg = new StringBuffer();
         msg.append(title).append(":\n");
         msg.append(ex.getClass().getName()).append("\n");

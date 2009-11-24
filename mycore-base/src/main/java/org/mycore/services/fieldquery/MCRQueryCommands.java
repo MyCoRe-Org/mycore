@@ -46,7 +46,7 @@ import org.mycore.parsers.bool.MCRCondition;
 /**
  * Provides commands to test the query classes using the command line interface
  * 
- * @author Frank Lützenkirchen
+ * @author Frank LÃ¼tzenkirchen
  * @author Arne Seifert
  * @author Jens Kupferschmidt
  * @version $Revision$ $Date$

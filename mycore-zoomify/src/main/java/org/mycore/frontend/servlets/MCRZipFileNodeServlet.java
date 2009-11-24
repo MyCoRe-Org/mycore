@@ -50,7 +50,7 @@ import org.mycore.datamodel.ifs.MCRFilesystemNode;
  * 
  * @author Stefan Freitag
  * @author Jens Kupferschmidt
- * @author Frank L\u00fctzenkirchen
+ * @author Frank Lützenkirchen
  * @version $Revision: 15202 $ $Date: 2008-01-14 11:02:17 +0000 (Mo, 14 Jan 2008) $
  */
 public class MCRZipFileNodeServlet extends MCRServlet {

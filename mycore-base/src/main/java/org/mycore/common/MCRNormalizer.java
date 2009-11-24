@@ -67,7 +67,7 @@ import com.ibm.icu.text.Normalizer;
  * </li>
  * </ul>
  * 
- * @author Frank L\u00fctzenkirchen
+ * @author Frank Lützenkirchen
  * @author Thomas Scheffler (yagee)
  * @author Jens Kupferschmidt
  * @author Harald Richter

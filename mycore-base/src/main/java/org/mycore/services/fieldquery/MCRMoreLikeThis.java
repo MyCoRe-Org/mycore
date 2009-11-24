@@ -48,7 +48,7 @@ import org.mycore.services.fieldquery.MCRSearcherFactory;
  * <field name="score" type="decimal" source="searcherHitMetadata" />
  * 
  * @author Harald Richter
- * @author Frank Lützenkirchen
+ * @author Frank LÃ¼tzenkirchen
  */
 public class MCRMoreLikeThis {
 

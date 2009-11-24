@@ -41,7 +41,7 @@ import org.mycore.common.MCRUtils;
 /**
  * JUnit test for MCRFile
  * 
- * @author Frank Lützenkirchen
+ * @author Frank LÃ¼tzenkirchen
  */
 public class MCRFileTest extends MCRTestCase {
 

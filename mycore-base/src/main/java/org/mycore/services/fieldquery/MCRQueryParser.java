@@ -49,7 +49,7 @@ import org.mycore.parsers.bool.MCRSetCondition;
  * 
  * @see MCRSearcher
  * 
- * @author Frank L\u00fctzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCRQueryParser extends MCRBooleanClauseParser {
 

@@ -49,7 +49,7 @@ import org.mycore.user.MCRUserMgr;
  * which can be used by the command line interface.
  * 
  * @author Detlev Degenhardt
- * @author Frank L\u00fctzenkirchen
+ * @author Frank Lützenkirchen
  * @author Jens Kupferschmidt
  * @version $Revision$ $Date: 2007-12-19 17:31:52 +0100 (Mi, 19 Dez
  *          2007) $

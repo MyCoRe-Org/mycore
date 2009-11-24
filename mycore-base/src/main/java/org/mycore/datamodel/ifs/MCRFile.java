@@ -37,7 +37,7 @@ import org.mycore.datamodel.metadata.MCRMetaISO8601Date;
 /**
  * Represents a stored file with its metadata and content.
  * 
- * @author Frank Lützenkirchen
+ * @author Frank LÃ¼tzenkirchen
  * @version $Revision$ $Date$
  */
 public class MCRFile extends MCRFilesystemNode implements MCRFileReader {

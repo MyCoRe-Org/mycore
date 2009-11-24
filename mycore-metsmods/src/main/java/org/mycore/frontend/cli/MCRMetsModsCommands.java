@@ -52,7 +52,7 @@ import org.mycore.services.fieldquery.MCRResults;
 /**
  * This class builds a google sitemap containing links to all documents and store them to the webapps directory. This can be configured with property variable MCR.GoogleSitemap.Directory. The web.xml file should contain a mapping to /sitemap.xml See http://www.google.com/webmasters/sitemaps/docs/en/protocol.html
  * 
- * @author Frank Luetzenkirchen
+ * @author Frank Lützenkirchen
  * @author Jens Kupferschmidt
  * @author Thomas Scheffler (yagee)
  * @author Stefan Freitag (sasf)

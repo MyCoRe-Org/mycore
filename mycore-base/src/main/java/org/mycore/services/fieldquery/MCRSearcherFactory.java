@@ -37,7 +37,7 @@ import org.mycore.common.MCRConfigurationException;
  * instantiating and remembering the implementations of MCRSearcher used in the
  * system.
  * 
- * @author Frank Lützenkirchen
+ * @author Frank LÃ¼tzenkirchen
  * @version $Revision$ $Date$
  */
 public class MCRSearcherFactory {

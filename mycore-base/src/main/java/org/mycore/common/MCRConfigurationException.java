@@ -29,7 +29,7 @@ package org.mycore.common;
  * property that is required is not set or has an illegal value.
  * 
  * @author Jens Kupferschmidt
- * @author Frank Lützenkirchen
+ * @author Frank LÃ¼tzenkirchen
  * @version $Revision$ $Date$
  */
 public class MCRConfigurationException extends MCRException {

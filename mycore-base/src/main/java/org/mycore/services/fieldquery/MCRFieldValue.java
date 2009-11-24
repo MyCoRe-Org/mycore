@@ -35,7 +35,7 @@ import org.mycore.datamodel.ifs.MCRFile;
  * of the query results (hit sort data or meta data) or a value that is built
  * when data is indexed.
  * 
- * @author Frank Lützenkirchen
+ * @author Frank LÃ¼tzenkirchen
  */
 public class MCRFieldValue {
 

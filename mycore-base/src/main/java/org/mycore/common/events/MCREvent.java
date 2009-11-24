@@ -30,7 +30,7 @@ package org.mycore.common.events;
  * Events are automatically created by some MyCoRe components and are forwarded
  * to the handlers by MCREventManager.
  * 
- * @author Frank Luetzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCREvent extends java.util.Hashtable<String, Object> {
     /**

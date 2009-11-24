@@ -35,7 +35,7 @@ import org.mycore.parsers.bool.MCRCondition;
  * in a global cache. Additionally, the last query of search session is always 
  * stored within the MCRSession.
  * 
- * @author Frank Lützenkirchen
+ * @author Frank LÃ¼tzenkirchen
  */
 public class MCRCachedQueryData
 {

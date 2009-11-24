@@ -31,7 +31,7 @@ import org.jdom.Attribute;
 import org.jdom.Element;
 
 /**
- * @author Frank Lützenkirchen
+ * @author Frank LÃ¼tzenkirchen
  */
 public abstract class MCRSetCondition implements MCRCondition {
 

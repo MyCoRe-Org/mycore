@@ -45,7 +45,7 @@ import org.mycore.common.xml.MCRURIResolver;
  * the configuration property
  * <code>MCR.IFS.FileContentTypes.DetectorClass</code>.
  * 
- * @author Frank Lützenkirchen
+ * @author Frank LÃ¼tzenkirchen
  */
 public class MCRFileContentTypeFactory {
     /** Table for looking up all file content types by ID */

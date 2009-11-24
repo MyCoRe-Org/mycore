@@ -90,7 +90,7 @@ import org.xml.sax.SAXException;
  * Does the layout for other MyCoRe servlets by transforming XML input to
  * various output formats, using XSL stylesheets.
  * 
- * @author Frank Luetzenkirchen
+ * @author Frank Lützenkirchen
  * @author Thomas Scheffler (yagee)
  * 
  * @version $Revision$ $Date: 2008-05-21 15:53:52 +0200 (Mi, 21. Mai

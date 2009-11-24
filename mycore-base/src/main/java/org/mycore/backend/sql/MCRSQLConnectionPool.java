@@ -41,7 +41,7 @@ import org.mycore.common.xml.MCRURIResolver;
  * 
  * @see MCRSQLConnection
  * 
- * @author Frank L\u00fctzenkirchen
+ * @author Frank Lützenkirchen
  * @author Jens Kupferschmidt
  * 
  * @version $Revision$ $Date$

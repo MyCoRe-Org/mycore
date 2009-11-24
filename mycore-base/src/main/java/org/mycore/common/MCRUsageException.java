@@ -28,7 +28,7 @@ package org.mycore.common;
  * illegal way. For example, this could happen when you provide illegal
  * arguments to a method.
  * 
- * @author Frank Lützenkirchen
+ * @author Frank LÃ¼tzenkirchen
  * @version $Revision$ $Date$
  */
 public class MCRUsageException extends MCRException {

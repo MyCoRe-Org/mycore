@@ -66,7 +66,7 @@ import org.mycore.frontend.servlets.MCRServletJob;
  * applet. The content of the uploaded files are handled by a MCRUploadHandler
  * subclass.
  * 
- * @author Frank Lützenkirchen
+ * @author Frank LÃ¼tzenkirchen
  * @author Harald Richter
  * @author Thomas Scheffler (yagee)
  * @version $Revision$ $Date$

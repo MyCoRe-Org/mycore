@@ -37,7 +37,7 @@ import org.mycore.common.xml.MCRURIResolver;
  * operators allowed for a given type, to get the default search operator for
  * that type, and so on.
  * 
- * @author Frank Lützenkirchen
+ * @author Frank LÃ¼tzenkirchen
  */
 public class MCRFieldType {
     /** Default search operators by type */

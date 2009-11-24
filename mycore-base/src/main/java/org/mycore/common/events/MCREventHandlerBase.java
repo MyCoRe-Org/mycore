@@ -33,7 +33,7 @@ import org.mycore.datamodel.metadata.MCRObject;
  * Abstract helper class that can be subclassed to implement event handlers more
  * easily.
  * 
- * @author Frank Luetzenkirchen
+ * @author Frank Lützenkirchen
  * @author Jens Kupferschmidt
  */
 public abstract class MCREventHandlerBase implements MCREventHandler {

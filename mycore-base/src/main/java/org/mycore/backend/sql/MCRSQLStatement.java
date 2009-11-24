@@ -33,7 +33,7 @@ import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRUtils;
 
 /**
- * @author Frank Lützenkirchen
+ * @author Frank LÃ¼tzenkirchen
  * @author Thomas Scheffler (yagee)
  * 
  * @version $Revision$ $Date$

@@ -30,7 +30,7 @@ import org.apache.commons.vfs.FileObject;
  * file type like zip or tar. Such files can be browsed and read using this node
  * type.
  * 
- * @author Frank Lützenkirchen
+ * @author Frank LÃ¼tzenkirchen
  */
 public class MCRVirtualNode extends MCRNode {
     /**

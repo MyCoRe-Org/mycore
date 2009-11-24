@@ -53,7 +53,7 @@ import javax.swing.filechooser.FileFilter;
  * This applet displays a GUI to upload files and directories to the server.
  * 
  * @author Harald Richter
- * @author Frank Lützenkirchen
+ * @author Frank LÃ¼tzenkirchen
  * @author Jens Kupferschmidt
  * @author Thomas Scheffler (yagee)
  * 

@@ -35,7 +35,7 @@ import org.mycore.common.xml.MCRURIResolver;
  * Decides which MCRContentStore implementation should be used to store the
  * content of a given file, based on the content type of the file.
  * 
- * @author Frank Lützenkirchen
+ * @author Frank LÃ¼tzenkirchen
  * @author Thomas Scheffler (yagee)
  * @version $Revision$ $Date$
  */

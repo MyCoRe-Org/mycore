@@ -56,7 +56,7 @@ import java.util.zip.ZipOutputStream;
  * MCRUploadCommunicator does some marshalling etc. and sends the request to the
  * MCRUploadServlet servlet that does the job.
  * 
- * @author Frank Lützenkirchen
+ * @author Frank LÃ¼tzenkirchen
  * @author Harald Richter
  * @author Jens Kupferschmidt
  * @author Thomas Scheffler (yagee)
@@ -123,7 +123,7 @@ public class MCRUploadCommunicator {
 
     public void loadFiles(Vector[] list) throws Exception {
         if (list[0].size() == 0) {
-            throw new IllegalArgumentException("Sie haben keine Dateien ausgewählt!");
+            throw new IllegalArgumentException("Sie haben keine Dateien ausgewÃ¤hlt!");
         }
 
         for (int i = 0; i < list[0].size(); i++) {

@@ -34,7 +34,7 @@ import org.jdom.Element;
  * A single variable holding a value that was edited in a MyCoRe XML editor
  * form.
  * 
- * @author Frank Lützenkirchen
+ * @author Frank LÃ¼tzenkirchen
  * @version $Revision$ $Date$
  */
 public class MCREditorVariable implements Comparable {

@@ -32,7 +32,7 @@ import java.util.GregorianCalendar;
  * optimized for the nbn:de checksum algorithm. Only one NISS per second 
  * will be generated.
  * 
- * @author Frank Lützenkirchen
+ * @author Frank LÃ¼tzenkirchen
  */
 public class MCRNISSBuilderFL implements MCRNISSBuilder {
     private String last;

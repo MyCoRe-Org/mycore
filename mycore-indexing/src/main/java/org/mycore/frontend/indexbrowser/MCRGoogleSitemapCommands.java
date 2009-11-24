@@ -38,7 +38,7 @@ import org.mycore.frontend.cli.MCRCommand;
  * mapping to /sitemap.xml See
  * http://www.google.com/webmasters/sitemaps/docs/en/protocol.html
  * 
- * @author Frank Luetzenkirchen
+ * @author Frank Lützenkirchen
  * @author Jens Kupferschmidt
  * @author Thomas Scheffler (yagee)
  * @version $Revision$ $Date$

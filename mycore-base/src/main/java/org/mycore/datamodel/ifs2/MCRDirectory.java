@@ -33,7 +33,7 @@ import org.jdom.Element;
  * Represents a directory stored in a file collection, which may contain other
  * files and directories.
  * 
- * @author Frank Lützenkirchen
+ * @author Frank LÃ¼tzenkirchen
  */
 public class MCRDirectory extends MCRStoredNode {
 

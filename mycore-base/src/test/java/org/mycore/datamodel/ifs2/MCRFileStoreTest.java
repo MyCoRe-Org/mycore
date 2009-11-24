@@ -39,7 +39,7 @@ import org.mycore.common.MCRTestCase;
 /**
  * JUnit test for MCRFileStore
  * 
- * @author Frank Lützenkirchen
+ * @author Frank LÃ¼tzenkirchen
  */
 public class MCRFileStoreTest extends MCRTestCase {
 

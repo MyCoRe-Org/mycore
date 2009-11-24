@@ -40,7 +40,7 @@ import org.mycore.common.MCRSessionMgr;
  * A file or directory really stored by importing it from outside the system.
  * Can be modified, updated and deleted, in contrast to virtual nodes.
  * 
- * @author Frank Lützenkirchen
+ * @author Frank LÃ¼tzenkirchen
  */
 public abstract class MCRStoredNode extends MCRNode {
 

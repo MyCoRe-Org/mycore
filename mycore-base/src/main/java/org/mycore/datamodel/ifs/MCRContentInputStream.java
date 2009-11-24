@@ -41,7 +41,7 @@ import org.mycore.common.MCRException;
  * detection purposes, counts the number of bytes read and builds an MD5
  * checksum String while content goes through this input stream.
  * 
- * @author Frank Lützenkirchen
+ * @author Frank LÃ¼tzenkirchen
  * @version $Revision$ $Date$
  */
 public class MCRContentInputStream extends FilterInputStream {

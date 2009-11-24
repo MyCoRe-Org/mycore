@@ -51,8 +51,7 @@ import org.mycore.common.MCRUtils;
 import org.mycore.services.fieldquery.MCRFieldDef;
 
 /**
- * This class builds a Lucene Query from XML query (specified by Frank
- * L�tzenkirchen)
+ * This class builds a Lucene Query from XML query (specified by Frank Lützenkirchen)
  * 
  * @author Harald Richter
  * 
@@ -285,10 +284,10 @@ public class MCRBuildLuceneQuery {
         }
 
         String qu = _fixedQuery.toString();
-        qu = MCRUtils.replaceString(qu, "�", "a");
-        qu = MCRUtils.replaceString(qu, "�", "o");
-        qu = MCRUtils.replaceString(qu, "�", "u");
-        qu = MCRUtils.replaceString(qu, "�", "ss");
+        qu = MCRUtils.replaceString(qu, "ä", "a");
+        qu = MCRUtils.replaceString(qu, "ö", "o");
+        qu = MCRUtils.replaceString(qu, "ü", "u");
+        qu = MCRUtils.replaceString(qu, "ß", "ss");
 
         return qu;
     }

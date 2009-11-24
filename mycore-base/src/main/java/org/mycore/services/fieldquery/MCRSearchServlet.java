@@ -63,7 +63,7 @@ import org.mycore.parsers.bool.MCRSetCondition;
  *   Search using name=value pairs
  * 4. MCRSearchServlet invocation from a search mask using editor XML input 
  * 
- * @author Frank Lützenkirchen
+ * @author Frank LÃ¼tzenkirchen
  * @author Harald Richter
  */
 public class MCRSearchServlet extends MCRServlet 
@@ -388,7 +388,7 @@ public class MCRSearchServlet extends MCRServlet
      * Redirect browser to results page     
      *      
      * @author A.Schaar   
-     * @author Frank Lützenkirchen
+     * @author Frank LÃ¼tzenkirchen
      *   
      * @see its overwritten in jspdocportal     
      */     

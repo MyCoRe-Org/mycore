@@ -38,7 +38,7 @@ import org.mycore.common.MCRException;
  * MCR.IFS2.Store.DocPortal_document.SlotLayout=4-2-2 
  * MCR.IFS2.Store.DocPortal_document.ForceXML=true (which is default)
  * 
- * @author Frank Lützenkirchen
+ * @author Frank LÃ¼tzenkirchen
  */
 public class MCRMetadataStore extends MCRStore {
 

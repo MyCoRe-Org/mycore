@@ -1,11 +1,25 @@
-/**
- * $RCSfile$ $Revision$ $Date$ This file is part of ** M y C o R e ** Visit our homepage at http://www.mycore.de/ for details. This program is free software;
- * you can use it, redistribute it and / or modify it under the terms of the GNU General Public License (GPL) as published by the Free Software Foundation;
- * either version 2 of the License or (at your option) any later version. This program is distributed in the hope that it will be useful, but WITHOUT ANY
- * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details. You
- * should have received a copy of the GNU General Public License along with this program, normally in the file license.txt. If not, write to the Free Software
- * Foundation Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307 USA
- **/
+/*
+ * $RCSfile$
+ * $Revision: 15646 $ $Date: 2009-07-28 11:32:04 +0200 (Di, 28. Jul 2009) $
+ *
+ * This file is part of ***  M y C o R e  ***
+ * See http://www.mycore.de/ for details.
+ *
+ * This program is free software; you can use it, redistribute it
+ * and / or modify it under the terms of the GNU General Public License
+ * (GPL) as published by the Free Software Foundation; either version 2
+ * of the License or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program, in a file called gpl.txt or license.txt.
+ * If not, write to the Free Software Foundation Inc.,
+ * 59 Temple Place - Suite 330, Boston, MA  02111-1307 USA
+ */
 
 package org.mycore.services.oai;
 
@@ -60,7 +74,7 @@ import org.mycore.frontend.servlets.MCRServletJob;
 /**
  * This class implements an OAI Data Provider for MyCoRe and Miless
  * 
- * @author Werner Gre�hoff
+ * @author Werner Greßhoff
  * @author Heiko Helmbrecht
  * @version $Revision$ $Date$
  */
@@ -934,7 +948,7 @@ public class MCROAIProvider extends MCRServlet {
                     }
                     if (from[0].length() != until[0].length()) {
                         logger
-                                .info("Anfrage 'listIdentifiers' enthaelt fehlerhafte Parameter (Granularit�t von from und until muss gleich sein.)");
+                                .info("Anfrage 'listIdentifiers' enthaelt fehlerhafte Parameter (Granularität von from und until muss gleich sein.)");
                         return addError(document, "badArgument", ERR_ILLEGAL_ARGUMENT);
                     }
                 }
@@ -1229,7 +1243,7 @@ public class MCROAIProvider extends MCRServlet {
                     }
                     if (from[0].length() != until[0].length()) {
                         logger
-                                .info("Anfrage 'listIdentifiers' enthaelt fehlerhafte Parameter (Granularit�t von from und until muss gleich sein.)");
+                                .info("Anfrage 'listIdentifiers' enthaelt fehlerhafte Parameter (Granularität von from und until muss gleich sein.)");
                         return addError(document, "badArgument", ERR_ILLEGAL_ARGUMENT);
                     }
                 }
@@ -1415,7 +1429,7 @@ public class MCROAIProvider extends MCRServlet {
             throw new MCRException("Error in legalOAIIdentifier");
         }
 
-        String allowed = new String("1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ;/?:@&=+$,-_.!~*�()");
+        String allowed = new String("1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ;/?:@&=+$,-_.!~*'()");
         StringBuffer buffer = new StringBuffer(tokenizer.nextToken());
         while (tokenizer.hasMoreTokens()) {
             buffer.append(":").append(tokenizer.nextToken());
@@ -1495,7 +1509,7 @@ public class MCROAIProvider extends MCRServlet {
             parameters.put("ServletsBaseURL", servletsBaseURL);
             parameters.put("WebApplicationBaseURL", webApplicationBaseURL);
         }
-        // DNB erlaubt in Epicur-Beschreibung keinen Inhalt f�r das Element
+        // DNB erlaubt in Epicur-Beschreibung keinen Inhalt für das Element
         // <resupply>
         // String email = CONFIG.getString("MCR.oai.epicur.responseemail", "");
         // if(format.contains("epicur")&& !email.equals("")){

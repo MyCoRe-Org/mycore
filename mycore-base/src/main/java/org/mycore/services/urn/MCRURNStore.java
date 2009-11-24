@@ -26,7 +26,7 @@ package org.mycore.services.urn;
 /**
  * Stores the data of URNs and the document IDs assigned to them.
  * 
- * @author Frank Lützenkirchen
+ * @author Frank LÃ¼tzenkirchen
  */
 public interface MCRURNStore {
     /** Returns true if the given urn is assigned to a document ID */

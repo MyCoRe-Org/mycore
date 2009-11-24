@@ -42,7 +42,7 @@ import org.mycore.datamodel.ifs.MCRFile;
  * 
  * @see org.mycore.datamodel.ifs.MCRFilesystemNode#getAdditionalData()
  * 
- * @author Frank Lützenkirchen
+ * @author Frank LÃ¼tzenkirchen
  * @version $Revision$ $Date$
  */
 public abstract class MCRDataExtractor extends MCREventHandlerBase {

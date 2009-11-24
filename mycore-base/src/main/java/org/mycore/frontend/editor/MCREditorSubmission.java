@@ -49,7 +49,7 @@ import org.mycore.common.MCRConstants;
  * Container class that holds all data and files edited and submitted from an
  * HTML page that contains a MyCoRe XML editor form.
  * 
- * @author Frank Lützenkirchen
+ * @author Frank LÃ¼tzenkirchen
  * @version $Revision$ $Date$
  */
 public class MCREditorSubmission {

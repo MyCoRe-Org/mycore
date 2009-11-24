@@ -48,7 +48,7 @@ import org.xml.sax.SAXParseException;
  * This servlet displays static *.xml files stored in the web application by
  * sending them to MCRLayoutService.
  * 
- * @author Frank L�tzenkirchen
+ * @author Frank Lützenkirchen
  * @version $Revision$ $Date$
  */
 public class MCRStaticXMLFileServlet extends MCRServlet {

@@ -97,7 +97,7 @@ import org.xml.sax.InputSource;
  * declarations can read XML files from resource, webapp, file, session, http or
  * https, query, or mcrobject URIs.
  * 
- * @author Frank Luetzenkirchen
+ * @author Frank Lützenkirchen
  * @author Thomas Scheffler (yagee)
  */
 public final class MCRURIResolver implements javax.xml.transform.URIResolver, EntityResolver {

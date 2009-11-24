@@ -24,7 +24,7 @@
 package org.mycore.parsers.bool;
 
 /**
- * @author Frank Lützenkirchen
+ * @author Frank LÃ¼tzenkirchen
  */
 public class MCROrCondition extends MCRSetCondition {
 

@@ -47,7 +47,7 @@ import org.mycore.datamodel.metadata.MCRObjectID;
  * Provides static methods that implement commands for the MyCoRe command line interface.
  * 
  * @author Jens Kupferschmidt
- * @author Frank Luetzenkirchen
+ * @author Frank Lützenkirchen
  * @version $Revision$ $Date$
  */
 public class MCRDerivateCommands extends MCRAbstractCommands {

@@ -41,7 +41,7 @@ import org.jdom.input.DOMBuilder;
  * This class is the implementation for remote access via Webservices
  * 
  * @author Jens Kupferschmidt
- * @author Frank L\u00fctzenkirchen
+ * @author Frank Lützenkirchen
  */
 
 public class MCRQueryClientWebService extends MCRQueryClientBase {

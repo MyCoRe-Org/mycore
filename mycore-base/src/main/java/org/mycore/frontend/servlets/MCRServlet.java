@@ -58,10 +58,10 @@ import org.mycore.datamodel.common.MCRActiveLinkException;
 /**
  * This is the superclass of all MyCoRe servlets. It provides helper methods for
  * logging and managing the current session data. Part of the code has been
- * taken from MilessServlet.java written by Frank Lützenkirchen.
+ * taken from MilessServlet.java written by Frank LÃ¼tzenkirchen.
  * 
  * @author Detlev Degenhardt
- * @author Frank Lützenkirchen
+ * @author Frank LÃ¼tzenkirchen
  * @author Thomas Scheffler (yagee)
  * 
  * @version $Revision$ $Date: 2008-02-06 17:27:24 +0000 (Mi, 06 Feb

@@ -39,7 +39,7 @@ import org.mycore.common.MCRTestCase;
 /**
  * JUnit test for MCRMetadataStore
  * 
- * @author Frank Lützenkirchen
+ * @author Frank LÃ¼tzenkirchen
  */
 public class MCRMetadataStoreTest extends MCRTestCase {
 

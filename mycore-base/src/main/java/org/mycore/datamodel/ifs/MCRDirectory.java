@@ -24,7 +24,7 @@ import org.mycore.common.MCRUsageException;
 /**
  * Represents a directory node with its metadata and content.
  * 
- * @author Frank Lützenkirchen
+ * @author Frank LÃ¼tzenkirchen
  * @version $Revision$ $Date$
  */
 public class MCRDirectory extends MCRFilesystemNode {

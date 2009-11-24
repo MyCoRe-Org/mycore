@@ -24,7 +24,7 @@
 package org.mycore.frontend.indexbrowser.sql;
 
 /**
- * @author Frank Lützenkirchen
+ * @author Frank LÃ¼tzenkirchen
  */
 class MCRRangeDelim {
     int pos;

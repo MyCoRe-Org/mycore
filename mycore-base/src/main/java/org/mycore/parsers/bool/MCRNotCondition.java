@@ -27,7 +27,7 @@ import org.jdom.Attribute;
 import org.jdom.Element;
 
 /**
- * @author Frank Lützenkirchen
+ * @author Frank LÃ¼tzenkirchen
  */
 public class MCRNotCondition implements MCRCondition {
     private MCRCondition child;

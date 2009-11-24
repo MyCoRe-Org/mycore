@@ -26,7 +26,7 @@ package org.mycore.parsers.bool;
 import org.jdom.Element;
 
 /**
- * @author Frank Lützenkirchen
+ * @author Frank LÃ¼tzenkirchen
  */
 public interface MCRCondition {
     public String toString();

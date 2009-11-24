@@ -72,7 +72,7 @@ import org.mycore.datamodel.metadata.MCRObjectID;
  * 
  * See documentation of MCRStore and MCRMetadataStore for details.
  * 
- * @author Frank Lützenkirchen
+ * @author Frank LÃ¼tzenkirchen
  * @author Jens Kupferschmidt
  * @author Thomas Scheffler (yagee)
  */

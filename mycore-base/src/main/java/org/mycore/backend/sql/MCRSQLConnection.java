@@ -51,7 +51,7 @@ import org.mycore.common.MCRPersistenceException;
  * @see #doQuery( String)
  * @see java.sql.Connection
  * @see MCRSQLConnectionPool
- * @author Frank L\u00fctzenkirchen
+ * @author Frank Lützenkirchen
  * @author Johannes Buehler
  */
 public class MCRSQLConnection {

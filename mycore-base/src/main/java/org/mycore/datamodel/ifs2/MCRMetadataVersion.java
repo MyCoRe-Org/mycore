@@ -34,7 +34,7 @@ import org.tmatesoft.svn.core.io.SVNRepository;
  * Provides information about a stored version of metadata and allows to
  * retrieve that version from SVN
  * 
- * @author Frank Lützenkirchen
+ * @author Frank LÃ¼tzenkirchen
  */
 public class MCRMetadataVersion {
     /**

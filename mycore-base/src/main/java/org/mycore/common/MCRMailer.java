@@ -48,8 +48,8 @@ import org.jdom.Element;
  * This class provides methods to send emails from within a MyCoRe application.
  * 
  * @author Marc Schluepmann
- * @author Frank Lützenkirchen
- * @author Werner Greßhoff
+ * @author Frank LÃ¼tzenkirchen
+ * @author Werner GreÃŸhoff
  * 
  * @version $Revision$ $Date$
  */
@@ -189,8 +189,8 @@ public class MCRMailer {
      * <email><from>bingo@bongo.com</from>
      *   <to>jim.knopf@lummerland.de</to>
      *   <bcc>frau.waas@lummerland.de</bcc>
-     *   <subject>Grüße aus der Stadt der Drachen</subject>
-     *   <body>Es ist recht bewölkt. Alles Gute, Jim.</body>
+     *   <subject>GrÃ¼ÃŸe aus der Stadt der Drachen</subject>
+     *   <body>Es ist recht bewÃ¶lkt. Alles Gute, Jim.</body>
      *   <part>http://upload.wikimedia.org/wikipedia/de/f/f7/JimKnopf.jpg</part>
      * </email>
      *

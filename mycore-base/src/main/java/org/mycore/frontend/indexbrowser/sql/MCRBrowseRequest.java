@@ -28,7 +28,7 @@ import java.util.StringTokenizer;
 import javax.servlet.http.HttpServletRequest;
 
 /**
- * @author Frank Lützenkirchen
+ * @author Frank LÃ¼tzenkirchen
  */
 class MCRBrowseRequest {
     String index;

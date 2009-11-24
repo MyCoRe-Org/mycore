@@ -32,7 +32,7 @@ import org.mycore.parsers.bool.MCRParseException;
  * Represents a simple query condition, which consists of a search field,
  * a value and a comparison operator.
  * 
- * @author Frank Lützenkirchen
+ * @author Frank LÃ¼tzenkirchen
  */
 public class MCRQueryCondition extends MCRFieldValue implements MCRCondition {
     

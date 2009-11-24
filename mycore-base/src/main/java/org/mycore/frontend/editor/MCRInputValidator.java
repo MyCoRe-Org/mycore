@@ -54,7 +54,7 @@ import org.mycore.common.MCRException;
 /**
  * This class provides input validation methods for editor data.
  * 
- * @author Frank Lützenkirchen
+ * @author Frank LÃ¼tzenkirchen
  */
 public class MCRInputValidator {
     /** Template stylesheet for checking XSL conditions * */

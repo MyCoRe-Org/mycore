@@ -49,7 +49,7 @@ import org.tmatesoft.svn.core.io.diff.SVNDeltaGenerator;
  * store and in parallel in a Subversion repository to track and restore
  * changes.
  * 
- * @author Frank Lützenkirchen
+ * @author Frank LÃ¼tzenkirchen
  */
 public class MCRVersionedMetadata extends MCRStoredMetadata {
 

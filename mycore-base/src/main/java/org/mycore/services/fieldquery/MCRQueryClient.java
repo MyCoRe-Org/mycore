@@ -39,7 +39,7 @@ import org.mycore.common.xml.MCRURIResolver;
 /**
  * Executes a query on remote hosts using a webservice
  * 
- * @author Frank L�tzenkirchen 
+ * @author Frank Lützenkirchen 
  * @author Jens Kupferschmidt
  */
 public class MCRQueryClient {

@@ -34,7 +34,7 @@ import org.jdom.Element;
  * in a persistent MCRFileStore. A FileCollection has a unique ID within the
  * store, it is the root folder of all files and directories in the collection.
  * 
- * @author Frank Lützenkirchen
+ * @author Frank LÃ¼tzenkirchen
  */
 public class MCRFileCollection extends MCRDirectory {
 

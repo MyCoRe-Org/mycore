@@ -36,7 +36,7 @@ import org.mycore.common.MCRPersistenceException;
  * query is done using MCRSQLConnection. This is a wrapper around
  * java.sql.ResultSet that provides some convenience methods.
  * 
- * @author Frank Lützenkirchen
+ * @author Frank LÃ¼tzenkirchen
  * @version $Revision$ $Date$
  * @see java.sql.ResultSet
  * @see MCRSQLConnection#doQuery( String )

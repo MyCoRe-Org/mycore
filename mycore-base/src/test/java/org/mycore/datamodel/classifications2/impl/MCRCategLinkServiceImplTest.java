@@ -58,7 +58,7 @@ public class MCRCategLinkServiceImplTest extends MCRHibTestCase {
         DAO.addCategory(null, category);
         testLinks = new ArrayList<MCRCategoryLink>();
         testLinks.add(new MCRCategoryLink(germany, new MCRObjectReference("Jena", "city")));
-        testLinks.add(new MCRCategoryLink(germany, new MCRObjectReference("Th�ringen", "state")));
+        testLinks.add(new MCRCategoryLink(germany, new MCRObjectReference("Thüringen", "state")));
         testLinks.add(new MCRCategoryLink(germany, new MCRObjectReference("Hessen", "state")));
         testLinks.add(new MCRCategoryLink(germany, new MCRObjectReference("Saale", "river")));
         final MCRObjectReference northSeaReference = new MCRObjectReference("North Sea", "sea");

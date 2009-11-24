@@ -42,7 +42,7 @@ import org.mycore.common.MCRException;
  * handlers are called in the same order as they are registered in the
  * properties file.
  * 
- * @author Frank Lützenkirchen
+ * @author Frank LÃ¼tzenkirchen
  */
 public interface MCREventHandler {
     /**

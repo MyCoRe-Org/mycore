@@ -27,7 +27,7 @@ package org.mycore.datamodel.ifs;
  * Instances of this class represent information about the content type of a
  * file.
  * 
- * @author Frank Lützenkirchen
+ * @author Frank LÃ¼tzenkirchen
  */
 public class MCRFileContentType {
     /** The unique ID of this file content type */

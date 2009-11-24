@@ -41,7 +41,7 @@ import org.mycore.frontend.workflow.MCRSimpleWorkflowManager;
  * 
  * @author Harald Richter
  * @author Jens Kupferschmidt
- * @author Frank L\u00fctzenkirchen
+ * @author Frank Lützenkirchen
  * 
  * @version $Revision$ $Date$
  * 

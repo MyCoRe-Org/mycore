@@ -26,7 +26,7 @@ package org.mycore.services.fieldquery;
 /*
  * The interface for the remote access.
  * 
- * @author Jens Kupferschmidt @author Frank L�tzenkirchen
+ * @author Jens Kupferschmidt @author Frank Lützenkirchen
  */
 
 public interface MCRQueryClientInterface {

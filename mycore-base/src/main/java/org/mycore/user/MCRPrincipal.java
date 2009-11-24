@@ -30,7 +30,7 @@ package org.mycore.user;
  * role, e.g. being the owner of an object in the repository.
  * 
  * @author Detlev Degenhardt
- * @author Benno S�selbeck
+ * @author Benno Süselbeck
  * @version $Revision$ $Date$
  */
 public interface MCRPrincipal {

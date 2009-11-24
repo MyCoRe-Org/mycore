@@ -38,7 +38,7 @@ import org.mycore.common.MCRException;
  * the implementations of MCRContentStore and MCRAudioVideoExtender that are
  * used in the system.
  * 
- * @author Frank Lützenkirchen
+ * @author Frank LÃ¼tzenkirchen
  * @author Thomas Scheffler (yagee)
  * @version $Revision$ $Date$
  */

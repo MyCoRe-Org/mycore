@@ -30,7 +30,7 @@ package org.mycore.frontend.fileupload;
  * properties to find out what type of exception occured on the server side.
  * 
  * @see org.mycore.frontend.fileupload.MCRUploadCommunicator
- * @author Frank Lützenkirchen
+ * @author Frank LÃ¼tzenkirchen
  * @version $Revision$ $Date$
  */
 public class MCRUploadException extends Exception {

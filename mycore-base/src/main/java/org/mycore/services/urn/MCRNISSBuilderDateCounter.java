@@ -56,7 +56,7 @@ import org.mycore.common.MCRConfiguration;
  * A pattern might have no date part (only use counter)
  * or no counter part (only use date pattern)
  *  
- * @author Frank Lützenkirchen
+ * @author Frank LÃ¼tzenkirchen
  */
 public class MCRNISSBuilderDateCounter implements MCRNISSBuilder {
     

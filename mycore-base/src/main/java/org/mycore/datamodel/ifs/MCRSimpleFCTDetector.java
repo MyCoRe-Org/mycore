@@ -54,7 +54,7 @@ import org.xml.sax.helpers.DefaultHandler;
  * @see MCRFileContentType
  * @see MCRFileContentTypeFactory
  * 
- * @author Frank Lützenkirchen
+ * @author Frank LÃ¼tzenkirchen
  * @version $Revision$ $Date$
  */
 public class MCRSimpleFCTDetector implements MCRFileContentTypeDetector {

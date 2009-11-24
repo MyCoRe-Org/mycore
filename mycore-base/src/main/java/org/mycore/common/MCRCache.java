@@ -42,7 +42,7 @@ import org.mycore.services.mbeans.MCRJMXBridge;
  * 
  * @see java.util.Hashtable
  * 
- * @author Frank Lützenkirchen
+ * @author Frank LÃ¼tzenkirchen
  * @version $Revision$ $Date$
  */
 public class MCRCache {

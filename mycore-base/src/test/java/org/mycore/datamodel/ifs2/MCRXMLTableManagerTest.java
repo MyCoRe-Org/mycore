@@ -21,7 +21,7 @@ import org.tmatesoft.svn.core.io.SVNRepositoryFactory;
 
 /**
  * @author Thomas Scheffler (yagee)
- * @author Frank Lützenkirchen
+ * @author Frank LÃ¼tzenkirchen
  */
 public class MCRXMLTableManagerTest extends MCRTestCase {
 

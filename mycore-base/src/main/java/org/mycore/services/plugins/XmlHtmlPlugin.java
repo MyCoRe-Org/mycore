@@ -45,7 +45,7 @@ import org.w3c.tidy.Tidy;
 /**
  * Converts XML, XTHML and HTML to plain text for indexing
  * 
- * @author Frank Lützenkirchen
+ * @author Frank LÃ¼tzenkirchen
  * @author Harald Richter
  */
 public class XmlHtmlPlugin implements TextFilterPlugin {

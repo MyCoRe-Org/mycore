@@ -104,7 +104,7 @@ import org.mycore.services.plugins.FilterPluginInstantiationException;
  * @see #list(PrintStream)
  * @see #store
  * 
- * @author Frank Lützenkirchen
+ * @author Frank LÃ¼tzenkirchen
  * @version $Revision$ $Date$
  */
 public class MCRConfiguration {

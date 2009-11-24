@@ -42,7 +42,7 @@ import org.mycore.common.MCRUtils;
  * Lyrics3v1, Lyrics3v2, ID3v2.2, ID3v2.3, and ID3v2.4 tags. * See
  * http://sourceforge.net/projects/javamusictag/ for details.
  * 
- * @author Frank Lützenkirchen
+ * @author Frank LÃ¼tzenkirchen
  * @version $Revision$ $Date$
  */
 public class MCRDataExtractorMP3 extends MCRDataExtractor {

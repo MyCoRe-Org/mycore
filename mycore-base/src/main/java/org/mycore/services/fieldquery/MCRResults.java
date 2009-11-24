@@ -49,7 +49,7 @@ import org.mycore.common.MCRConstants;
  * @see MCRHit
  * 
  * @author Arne Seifert
- * @author Frank L\u00fctzenkirchen
+ * @author Frank Lützenkirchen
  * @author Jens Kupferschmidt
  * @version $Revision$ $Date$
  */

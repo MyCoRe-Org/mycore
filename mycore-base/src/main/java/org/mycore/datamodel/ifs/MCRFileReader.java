@@ -29,7 +29,7 @@ package org.mycore.datamodel.ifs;
  * that uses the new class MCRFile and current MILESS code that still uses the
  * class MCROldFile. The interface will be obsolete in the future.
  * 
- * @author Frank Lützenkirchen
+ * @author Frank LÃ¼tzenkirchen
  * @version $Revision$ $Date$
  */
 public interface MCRFileReader {

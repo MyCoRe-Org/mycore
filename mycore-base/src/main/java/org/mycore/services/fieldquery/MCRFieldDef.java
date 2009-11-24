@@ -41,7 +41,7 @@ import org.mycore.common.xml.MCRURIResolver;
  * searchfields.xml there is one MCRFieldDef instance with attributes that
  * represent the configuration in the xml file.
  * 
- * @author Frank L�tzenkirchen
+ * @author Frank Lützenkirchen
  */
 public class MCRFieldDef {
     /** The logger */

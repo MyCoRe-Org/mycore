@@ -43,7 +43,7 @@ import org.mycore.frontend.servlets.MCRServletJob;
  * property MCR.URN.Resolver.MasterURL.
  * 
  * 
- * @author Frank Lützenkirchen
+ * @author Frank LÃ¼tzenkirchen
  * @version $Revision$ $Date$
  */
 public class MCRURNResolver extends MCRServlet {

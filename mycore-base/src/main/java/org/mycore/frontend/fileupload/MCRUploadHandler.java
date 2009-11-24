@@ -36,7 +36,7 @@ import org.mycore.frontend.MCRWebsiteWriteProtection;
  * MCRUploadHandler handles one singe upload session with the applet.
  * 
  * @author Harald Richter
- * @author Frank Lützenkirchen
+ * @author Frank LÃ¼tzenkirchen
  * 
  * @version $Revision$ $Date$
  * 

@@ -53,7 +53,7 @@ import org.mycore.common.MCRUtils;
  * underlying input stream is closed after consumption, excepted you use
  * getInputStream(), of course.
  * 
- * @author Frank Lützenkirchen
+ * @author Frank LÃ¼tzenkirchen
  */
 public class MCRContent {
 

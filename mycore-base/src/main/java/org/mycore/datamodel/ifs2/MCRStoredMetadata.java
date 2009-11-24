@@ -31,7 +31,7 @@ import org.mycore.common.MCRUsageException;
 /**
  * Represents an XML metadata document that is stored in MCRMetadataStore.
  * 
- * @author Frank Lützenkirchen
+ * @author Frank LÃ¼tzenkirchen
  */
 public class MCRStoredMetadata {
 

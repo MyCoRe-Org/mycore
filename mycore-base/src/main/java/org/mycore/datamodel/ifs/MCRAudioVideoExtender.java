@@ -43,7 +43,7 @@ import org.mycore.common.MCRUtils;
  * provide methods to get technical metadata like bitrate, framerate, duration,
  * size etc. and to start a player to stream the asset to a browser.
  * 
- * @author Frank Lützenkirchen
+ * @author Frank LÃ¼tzenkirchen
  * @version $Revision$ $Date$
  */
 public abstract class MCRAudioVideoExtender {

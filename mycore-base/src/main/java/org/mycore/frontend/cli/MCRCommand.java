@@ -42,7 +42,7 @@ import org.mycore.common.MCRConfigurationException;
  * 
  * @see MCRCommandLineInterface
  * 
- * @author Frank L�tzenkirchen
+ * @author Frank Lützenkirchen
  * @author Jens Kupferschmidt
  * @version $Revision$ $Date$
  */

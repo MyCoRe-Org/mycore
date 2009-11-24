@@ -356,7 +356,7 @@ public class MCROldLuceneSearcher extends MCRSearcher {
             //org.apache.lucene.document.Document doc = searcher.doc(hits.scoreDocs[i].doc);
 
             String id = doc.get("returnid");
-            if (null == id)    // für miless
+            if (null == id)    // fÃ¼r miless
               id = doc.get("mcrid");
             MCRHit hit = new MCRHit(id);
             

@@ -64,7 +64,7 @@ import org.xml.sax.helpers.DefaultHandler;
  * programming API.
  * 
  * @author Jens Kupferschmidt
- * @author Frank L\u00fctzenkirchen
+ * @author Frank Lützenkirchen
  * @author Thomas Scheffler (yagee)
  * 
  * @version $Revision$ $Date$

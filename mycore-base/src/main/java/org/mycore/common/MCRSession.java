@@ -50,7 +50,7 @@ import org.mycore.frontend.servlets.MCRServletJob;
  * 
  * @author Detlev Degenhardt
  * @author Jens Kupferschmidt
- * @author Frank L\u00fctzenkirchen
+ * @author Frank Lützenkirchen
  * 
  * @version $Revision$ $Date: 2008-03-17 17:12:15 +0100 (Mo, 17 Mrz
  *          2008) $

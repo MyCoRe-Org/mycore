@@ -44,7 +44,7 @@ import org.mycore.services.fieldquery.MCRSearcherFactory;
  * @see MCREventHandler
  * @see MCREventHandlerBase
  * 
- * @author Frank Lützenkirchen
+ * @author Frank LÃ¼tzenkirchen
  */
 public class MCREventManager {
     private static Logger logger = Logger.getLogger(MCREventManager.class);

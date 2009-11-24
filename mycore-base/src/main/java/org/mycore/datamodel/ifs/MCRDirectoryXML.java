@@ -36,7 +36,7 @@ import org.mycore.common.MCRConfiguration;
 
 /**
  * @author Thomas Scheffler (yagee)
- * @author Frank Lützenkirchen
+ * @author Frank LÃ¼tzenkirchen
  * 
  * @version $Revision$ $Date$
  */

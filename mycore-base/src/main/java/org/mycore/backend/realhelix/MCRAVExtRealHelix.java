@@ -49,7 +49,7 @@ import org.mycore.datamodel.ifs.MCRFileReader;
  *   MCR.IFS.AVExtender.<StoreID>.MediaPlayerURL     Download URL for Microsoft Player
  * </code>
  * 
- * @author Frank Lützenkirchen
+ * @author Frank LÃ¼tzenkirchen
  * @version $Revision$ $Date$
  */
 public class MCRAVExtRealHelix extends MCRAudioVideoExtender {

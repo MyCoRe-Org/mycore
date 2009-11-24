@@ -32,7 +32,7 @@ package org.mycore.services.urn;
  * MCR.URN.SubNamespace.[ConfigID].NISSBuilder=[Class], for example
  * MCR.URN.SubNamespace.Essen.NISSBuilder=org.mycore.services.urn.MCRNISSBuilderDateCounter
  * 
- * @author Frank Lützenkirchen
+ * @author Frank LÃ¼tzenkirchen
  */
 public interface MCRNISSBuilder {
     /**

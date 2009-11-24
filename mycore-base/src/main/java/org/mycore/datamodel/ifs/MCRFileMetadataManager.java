@@ -51,7 +51,7 @@ import org.mycore.common.MCRPersistenceException;
  * @see MCRFilesystemNode
  * @see MCRFileMetadataStore
  * 
- * @author Frank Lützenkirchen
+ * @author Frank LÃ¼tzenkirchen
  * @version $Revision$ $Date$
  */
 public class MCRFileMetadataManager {

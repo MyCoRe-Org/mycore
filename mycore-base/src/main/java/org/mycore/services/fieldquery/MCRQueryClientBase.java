@@ -30,7 +30,7 @@ import org.apache.log4j.Logger;
  * all data for one host defined in the file hosts.xml. Default values are the
  * WebService data.
  * 
- * @author Jens Kupferschmidt @author Frank L�tzenkirchen
+ * @author Jens Kupferschmidt @author Frank Lützenkirchen
  */
 
 public class MCRQueryClientBase implements MCRQueryClientInterface {
