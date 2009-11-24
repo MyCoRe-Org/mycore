@@ -23,7 +23,7 @@
 
 package org.mycore.frontend.servlets;
 
-import org.mycore.datamodel.classifications.MCRClassificationBrowserData;
+import org.mycore.datamodel.classifications.MCRClassificationData;
 import org.mycore.frontend.servlets.MCRServlet;
 import org.apache.log4j.Logger;
 import org.mycore.common.*;
@@ -41,7 +41,7 @@ import java.io.File;
  * 
  * @author Anja Schaar
  * 
- * @see org.mycore.datamodel.classifications.MCRClassificationBrowserData
+ * @see org.mycore.datamodel.classifications.MCRClassificationData
  */
 public class MCRClassificationBrowser extends MCRServlet {
     /**
@@ -84,14 +84,14 @@ public class MCRClassificationBrowser extends MCRServlet {
         LOGGER.debug("Browsing Path = " + uri);
         LOGGER.debug("Browsing  Mode = " + mode);
 
-        MCRClassificationBrowserData bData;
+        MCRClassificationData bData;
         try {
             LOGGER.debug("Creation of BData.");
             LOGGER.debug("URI: " + uri);
             LOGGER.debug("MODE: " + mode);
             LOGGER.debug("ACTCLID: " + actclid);
             LOGGER.debug("ACTCATEG: " + actcateg);
-            bData = new MCRClassificationBrowserData(uri, mode, actclid, actcateg);
+            bData = new MCRClassificationData(uri, mode, actclid, actcateg);
         } catch (MCRConfigurationException cErr) {
             generateErrorPage(job.getRequest(), job.getResponse(), HttpServletResponse.SC_INTERNAL_SERVER_ERROR, cErr.getMessage(), cErr,
                     false);

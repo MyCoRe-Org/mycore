@@ -11,7 +11,6 @@ import org.apache.commons.lang.time.StopWatch;
 import org.apache.log4j.Logger;
 import org.jdom.Element;
 import org.mycore.common.MCRConfiguration;
-import org.mycore.datamodel.classifications2.MCRCategLinkService;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.MCRLabel;
@@ -24,8 +23,6 @@ class RowCreator_NoLines implements RowCreator {
     private MCRCategory classif;
 
     private MCRClassificationPool classificationPool;
-
-    private MCRCategLinkService linkService;
 
     private MCRConfiguration configuration;
 
@@ -40,10 +37,13 @@ class RowCreator_NoLines implements RowCreator {
     private Map<MCRCategoryID, String> folderStatus = new HashMap<MCRCategoryID, String>();
 
     private final Logger LOGGER = Logger.getLogger(RowCreator_NoLines.class);
+    
+    public RowCreator_NoLines() {
+        this(MCRClassificationPoolFactory.getInstance(), MCRConfiguration.instance());
+    }
 
-    public RowCreator_NoLines(MCRClassificationPool classificationPool, MCRCategLinkService linkService, MCRConfiguration configuration) {
+    public RowCreator_NoLines(MCRClassificationPool classificationPool, MCRConfiguration configuration) {
         this.classificationPool = classificationPool;
-        this.linkService = linkService;
         this.configuration = configuration;
         String defaultEmptyLeafs = configuration.getString("MCR.ClassificationBrowser.default.EmptyLeafs");
         emptyLeafs = configuration.getString("MCR.ClassificationBrowser." + getBrowserClass() + ".EmptyLeafs", defaultEmptyLeafs);
@@ -59,7 +59,7 @@ class RowCreator_NoLines implements RowCreator {
     public void createRows(String lang, Element xNavtree) {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
-        Map<MCRCategoryID, Boolean> linkMap = linkService.hasLinks(classif);
+        Map<MCRCategoryID, Boolean> linkMap = classificationPool.hasLinks(classif);
         stopWatch.stop();
         LOGGER.info("haslinks time: " + stopWatch.getTime());
         createRowsForCategory(lang, xNavtree, classif, linkMap);

@@ -24,8 +24,6 @@
 package org.mycore.datamodel.classifications;
 
 import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -40,8 +38,6 @@ import org.mycore.common.MCRSession;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.events.MCRSessionEvent;
 import org.mycore.common.events.MCRSessionListener;
-import org.mycore.datamodel.classifications2.MCRCategLinkService;
-import org.mycore.datamodel.classifications2.MCRCategLinkServiceFactory;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.MCRLabel;
@@ -55,7 +51,7 @@ import org.mycore.datamodel.classifications2.MCRLabel;
  * @author Anja Schaar
  * 
  */
-public class MCRClassificationBrowserData {
+public class MCRClassificationData {
 
     protected String pageName;
 
@@ -65,7 +61,7 @@ public class MCRClassificationBrowserData {
 
     private MCRConfiguration config;
 
-    private static final Logger LOGGER = Logger.getLogger(MCRClassificationBrowserData.class);
+    private static final Logger LOGGER = Logger.getLogger(MCRClassificationData.class);
 
     private String startPath = "";
 
@@ -95,14 +91,12 @@ public class MCRClassificationBrowserData {
 
     int totalNumOfDocs = 0;
 
-    public static Map<String, String> ClassUserTable = new Hashtable<String, String>();
-
     private static MCRSessionListener ClassUserTableCleaner = new MCRSessionListener() {
 
         public void sessionEvent(MCRSessionEvent event) {
             switch (event.getType()) {
             case destroyed:
-                clearUserClassTable(event.getSession());
+                ClassificationUserTableFactory.getInstance().clearUserClassTable(event.getSession());
                 break;
             default:
                 LOGGER.debug("Skipping event: " + event.getType());
@@ -118,26 +112,21 @@ public class MCRClassificationBrowserData {
 
     private MCRClassificationPool classificationPool;
 
-    private MCRCategLinkService linkService;
-
     private MCRPermissionTool permissionTool;
 
-    MCRClassificationBrowserData(final String u, final String mode, final String actclid, final String actEditorCategid,
-            MCRClassificationPool classificationPool, MCRPermissionTool permissionTool, MCRCategLinkService linkService,
+    MCRClassificationData(final String u, final String mode, final String actclid, final String actEditorCategid,
+            MCRClassificationPool classificationPool, MCRPermissionTool permissionTool,
             RowCreator rowCreator) throws Exception {
         this.classificationPool = classificationPool;
         this.permissionTool = permissionTool;
-        this.linkService = linkService;
         this.config = MCRConfiguration.instance();
         this.rowsCreator = rowCreator;
         init(u, mode, actclid, actEditorCategid);
     }
 
-    public MCRClassificationBrowserData(final String u, final String mode, final String actclid, final String actEditorCategid)
+    public MCRClassificationData(final String u, final String mode, final String actclid, final String actEditorCategid)
             throws Exception {
-        this(u, mode, actclid, actEditorCategid, getClassificationPool(), new MCRPermissionToolImpl(), MCRCategLinkServiceFactory
-                .getInstance(), new RowCreator_NoLines(getClassificationPool(), MCRCategLinkServiceFactory.getInstance(), MCRConfiguration
-                .instance()));
+        this(u, mode, actclid, actEditorCategid, MCRClassificationPoolFactory.getInstance(), new MCRPermissionToolImpl(), new RowCreator_NoLines());
     }
 
     private void init(final String u, final String mode, final String actclid, final String actEditorCategid) throws Exception {
@@ -349,10 +338,10 @@ public class MCRClassificationBrowserData {
         xDocument.addContent(xNavtree);
 
         LOGGER.debug("query classification links");
-        Map<MCRCategoryID, Boolean> linkMap = linkService.hasLinks(null);
+        Map<MCRCategoryID, Boolean> linkMap = getClassificationPool().hasLinks(null);
         
-        for (MCRCategoryID classID : this.classificationPool.getAllIDs()) {
-            MCRCategory classif = this.classificationPool.getClassificationAsPojo(classID, false);
+        for (MCRCategoryID classID : getClassificationPool().getAllIDs()) {
+            MCRCategory classif = getClassificationPool().getClassificationAsPojo(classID, false);
             LOGGER.debug("get classification " + classID);
             LOGGER.debug("get browse element");
 
@@ -376,14 +365,14 @@ public class MCRClassificationBrowserData {
 
         String rootID = classID.getRootID();
         String sessionID = MCRSessionMgr.getCurrentSession().getID();
-        String classUser = ClassUserTable.get(rootID);
+        String classUser = ClassificationUserTableFactory.getInstance().getSession(rootID);
         
         if (classUser != null && !classUser.equals(sessionID)) {
             MCRSession oldsession = MCRSessionMgr.getSession(classUser);
             if (null != oldsession) {
                 cli.setAttribute("userEdited", oldsession.getCurrentUserID());
             } else {
-                ClassUserTable.remove(rootID);
+                ClassificationUserTableFactory.getInstance().removeSession(rootID);
             }
         }
 
@@ -395,7 +384,7 @@ public class MCRClassificationBrowserData {
         String userCanEditValue = "false";
         String userCanDeleteValue = "false";
 
-        if (!this.classificationPool.isEdited(classID)) {
+        if (!getClassificationPool().isEdited(classID)) {
             editedValue = "false";
             if (MCRAccessManager.checkPermission(classID.getRootID(), "writedb")) {
                 userCanEditValue = "true";
@@ -454,7 +443,7 @@ public class MCRClassificationBrowserData {
 
         LOGGER.debug("Show tree for classification:" + getClassification().getId());
         LOGGER.debug("Got classification");
-        MCRCategory classification = classificationPool.getClassificationAsPojo(getClassification().getId(), true);
+        MCRCategory classification = getClassificationPool().getClassificationAsPojo(getClassification().getId(), true);
         String rootID = classification.getId().getRootID();
         MCRLabel label = classification.getLabel(lang);
 
@@ -538,7 +527,7 @@ public class MCRClassificationBrowserData {
         String writedbPerm = "true";
         String deletedbPerm = "true";
 
-        if (classificationPool.isEdited(getClassification().getId()) == false) {
+        if (getClassificationPool().isEdited(getClassification().getId()) == false) {
             createClassificationPerm = String.valueOf(permissionTool.checkPermission("create-classification"));
             writedbPerm = String.valueOf(permissionTool.checkPermission(rootID, "writedb"));
             deletedbPerm = String.valueOf(permissionTool.checkPermission(rootID, "deletedb"));
@@ -550,20 +539,21 @@ public class MCRClassificationBrowserData {
     }
 
     private Element createSessionTag(String rootID) {
-        String classUser = "";
-        if (ClassUserTable.containsKey(rootID)) {
-            classUser = ClassUserTable.get(rootID);
+        String classUser = ClassificationUserTableFactory.getInstance().getSession(rootID);
+        
+        if (classUser == null) {
+            classUser = "";
         }
 
         return createElement("session", classUser);
     }
 
     private Element createUserEditedTag(String rootID) {
-        String currentUserID;
-        if (ClassUserTable.containsKey(rootID)) {
-            currentUserID = MCRSessionMgr.getSession(ClassUserTable.get(rootID)).getCurrentUserID();
-        } else {
-            currentUserID = "false";
+        String classUser = ClassificationUserTableFactory.getInstance().getSession(rootID);
+        MCRSession session = MCRSessionMgr.getSession(classUser);
+        String currentUserID = "false";
+        if (session != null) {
+            currentUserID = session.getCurrentUserID();
         }
         return createElement("userEdited", currentUserID);
     }
@@ -680,26 +670,7 @@ public class MCRClassificationBrowserData {
     /**
      * @return Returns the pool.
      */
-    public static MCRClassificationPool getClassificationPool() {
-        MCRSession session = MCRSessionMgr.getCurrentSession();
-        Object cp = session.get("MCRClassificationPool.instance");
-        if (cp != null && cp instanceof MCRClassificationPool) {
-            return (MCRClassificationPool) cp;
-        }
-        MCRClassificationPool classPool = new MCRClassificationPool();
-        session.put("MCRClassificationPool.instance", classPool);
-        return classPool;
-    }
-
-    public static void clearUserClassTable(MCRSession session) {
-        final String curSessionID = session.getID();
-        final Iterator<Map.Entry<String, String>> it = ClassUserTable.entrySet().iterator();
-        while (it.hasNext()) {
-            Map.Entry<String, String> entry = it.next();
-            if (entry.getValue().equals(curSessionID)) {
-                LOGGER.info("Release classification " + entry.getKey() + " lock.");
-                it.remove();
-            }
-        }
+    private MCRClassificationPool getClassificationPool() {
+        return classificationPool;
     }
 }

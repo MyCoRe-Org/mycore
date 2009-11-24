@@ -32,15 +32,12 @@ import java.util.Properties;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.log4j.Logger;
 import org.jdom.Element;
-import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
-
 import org.mycore.access.MCRAccessManager;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRSessionMgr;
-import org.mycore.common.xml.MCRURIResolver;
-import org.mycore.datamodel.classifications.MCRClassificationBrowserData;
 import org.mycore.datamodel.classifications.MCRClassificationEditor;
+import org.mycore.datamodel.classifications.MCRClassificationEditorFactory;
 import org.mycore.datamodel.classifications2.MCRCategory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.MCRLabel;
@@ -78,8 +75,6 @@ public class MCRStartClassEditorServlet extends MCRServlet {
     private String categid = "";
 
     private String path = "";
-
-    private static MCRClassificationEditor clE = new MCRClassificationEditor();
 
     private static enum ReturnStatus {
         success, fail
@@ -176,15 +171,15 @@ public class MCRStartClassEditorServlet extends MCRServlet {
             if ("create-category".equals(todo2) || "modify-category".equals(todo2)) {
                 if ("create-category".equals(todo2)) {
                     // create
-                    if (!clE.isLocked(clid)) {
+                    if (!getClassificationEditor().isLocked(clid)) {
                         MCRCategoryID id = new MCRCategoryID(clid, categid);
-                        bret = clE.createCategoryInClassification(indoc, id);
+                        bret = getClassificationEditor().createCategoryInClassification(indoc, id);
                     }
                 } else {
                     // modify
-                    if (!clE.isLocked(clid)) {
+                    if (!getClassificationEditor().isLocked(clid)) {
                         MCRCategoryID id = new MCRCategoryID(clid, categid);
-                        bret = clE.modifyCategoryInClassification(indoc, id);
+                        bret = getClassificationEditor().modifyCategoryInClassification(indoc, id);
                     }
                 }
                 if (bret)
@@ -196,18 +191,18 @@ public class MCRStartClassEditorServlet extends MCRServlet {
                     path = path.substring(0, path.indexOf("&clid"));
                 }
                 if ("create-classification".equals(todo2)) {
-                    bret = clE.createNewClassification(indoc);
+                    bret = getClassificationEditor().createNewClassification(indoc);
                 } else if ("modify-classification".equals(todo2)) {
-                    if (!clE.isLocked(clid)) {
-                        bret = clE.modifyClassificationDescription(indoc, clid);
+                    if (!getClassificationEditor().isLocked(clid)) {
+                        bret = getClassificationEditor().modifyClassificationDescription(indoc, clid);
                     }
                 } else if ("import-classification".equals(todo2)) {
                     String fname = parms.getParameter("/mycoreclass/pathes/path").trim();
-                    fname = clE.setTempFile(fname, (FileItem) sub.getFiles().get(0));
+                    fname = getClassificationEditor().setTempFile(fname, (FileItem) sub.getFiles().get(0));
                     String sUpdate = parms.getParameter("/mycoreclass/update");
                     boolean update = sUpdate == null ? true : "true".equals(sUpdate);
-                    bret = clE.importClassification(update, fname);
-                    clE.deleteTempFile();
+                    bret = getClassificationEditor().importClassification(update, fname);
+                    getClassificationEditor().deleteTempFile();
                     if (!bret) {
                         setResponsePage(job, ReturnStatus.fail, getBaseURL() + imperrorpage);
                         return;
@@ -222,8 +217,8 @@ public class MCRStartClassEditorServlet extends MCRServlet {
 
         if ("up-category".equals(todo) || "down-category".equals(todo) || "left-category".equals(todo) || "right-category".equals(todo)) {
             boolean bret = false;
-            if (!clE.isLocked(clid)) {
-                bret = clE.moveCategoryInClassification(categid, clid, todo.substring(0, todo.indexOf("-")));
+            if (!getClassificationEditor().isLocked(clid)) {
+                bret = getClassificationEditor().moveCategoryInClassification(categid, clid, todo.substring(0, todo.indexOf("-")));
             }
             if (bret) {
                 setResponsePage(job, ReturnStatus.success, path + "&categid=" + categid + "&clid=" + clid);
@@ -235,8 +230,8 @@ public class MCRStartClassEditorServlet extends MCRServlet {
         // first call, direct without editor
         else if ("delete-category".equals(todo)) {
             // l?schen
-            if (!clE.isLocked(clid)) {
-                int cnt = clE.deleteCategoryInClassification(clid, categid);
+            if (!getClassificationEditor().isLocked(clid)) {
+                int cnt = getClassificationEditor().deleteCategoryInClassification(clid, categid);
 
                 if (cnt == 0) { // deleted, no more references
                     setResponsePage(job, ReturnStatus.success, path + "&clid=" + clid);
@@ -249,8 +244,8 @@ public class MCRStartClassEditorServlet extends MCRServlet {
 
         // first call, direct without editor
         else if ("delete-classification".equals(todo)) {
-            if (!clE.isLocked(clid)) {
-                boolean cnt = clE.deleteClassification(clid);
+            if (!getClassificationEditor().isLocked(clid)) {
+                boolean cnt = getClassificationEditor().deleteClassification(clid);
                 if (cnt) { // deleted, no more references
                     path = getBaseURL() + "browse?mode=edit";
                     setResponsePage(job, ReturnStatus.success, path);
@@ -275,13 +270,13 @@ public class MCRStartClassEditorServlet extends MCRServlet {
         }
 
         else if ("save-all".equals(todo)) {
-            if (clE.saveAll()) {
+            if (getClassificationEditor().saveAll()) {
                 setResponsePage(job, ReturnStatus.success, path + "&clid=" + clid);
             }
             setResponsePage(job, ReturnStatus.fail, getBaseURL() + isaveerrorpage);
             return;
         } else if ("purge-all".equals(todo)) {
-            if (clE.purgeAll()) {
+            if (getClassificationEditor().purgeAll()) {
                 setResponsePage(job, ReturnStatus.success, path + "&clid=" + clid);
             }
             setResponsePage(job, ReturnStatus.fail, getBaseURL() + ipurgeerrorpage);
@@ -295,10 +290,10 @@ public class MCRStartClassEditorServlet extends MCRServlet {
             final String sessionObjectID = "classificationEditor";
             Properties params = new Properties();
             StringBuffer sb = new StringBuffer();
-            boolean isEdited = MCRClassificationBrowserData.getClassificationPool().isEdited(MCRCategoryID.rootID(clid));
+            boolean isEdited = getClassificationEditor().isEdited(MCRCategoryID.rootID(clid));
             MCRCategory classif = null;
             if (isEdited) {
-                classif = MCRClassificationBrowserData.getClassificationPool().getClassificationAsPojo(MCRCategoryID.rootID(clid), false);
+                classif = getClassificationEditor().getClassification(MCRCategoryID.rootID(clid), false);
                 LOGGER.info("CLASSIF: " + classif.getId());
             }
 
@@ -342,7 +337,7 @@ public class MCRStartClassEditorServlet extends MCRServlet {
 
                     Element categs = new Element("categories");
                     MCRCategoryID id = new MCRCategoryID(classif.getId().getRootID(), categid);
-                    MCRCategory cat = clE.findCategory(classif, id);
+                    MCRCategory cat = getClassificationEditor().findCategory(classif, id);
                     categs.addContent(MCRCategoryTransformer.getMetaDataElement(cat, true));
                     classRoot.addContent(categs);
                     MCRSessionMgr.getCurrentSession().put(sessionObjectID, classRoot);
@@ -415,6 +410,10 @@ public class MCRStartClassEditorServlet extends MCRServlet {
             return true;
         }
         return false;
+    }
+
+    public MCRClassificationEditor getClassificationEditor() {
+        return MCRClassificationEditorFactory.getInstance();
     }
 
 }

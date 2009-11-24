@@ -31,21 +31,20 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.log4j.Logger;
 import org.jdom.Document;
 import org.jdom.Element;
-import org.jdom.output.XMLOutputter;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRException;
 import org.mycore.common.MCRSessionMgr;
 import org.mycore.common.MCRUtils;
 import org.mycore.common.xml.MCRXMLHelper;
+import org.mycore.datamodel.classifications.ClassificationUserTableFactory.ClassificationUserTable;
 import org.mycore.datamodel.classifications2.MCRCategLinkServiceFactory;
 import org.mycore.datamodel.classifications2.MCRCategory;
-import org.mycore.datamodel.classifications2.MCRCategoryDAO;
-import org.mycore.datamodel.classifications2.MCRCategoryDAOFactory;
 import org.mycore.datamodel.classifications2.MCRCategoryID;
 import org.mycore.datamodel.classifications2.MCRLabel;
 import org.mycore.datamodel.classifications2.utils.MCRXMLTransformer;
@@ -63,10 +62,6 @@ public class MCRClassificationEditor {
 
     // logger
     private static Logger LOGGER = Logger.getLogger(MCRClassificationEditor.class);
-
-    private MCRCategory classif;
-
-    private static MCRCategoryDAO DAO = MCRCategoryDAOFactory.getInstance();
 
     private MCRConfiguration CONFIG;
 
@@ -100,7 +95,7 @@ public class MCRClassificationEditor {
 
             Element newCateg = (Element) categories.getChild("category").clone();
             MCRCategoryID newID = new MCRCategoryID(id.getRootID(), newCateg.getAttributeValue("ID"));
-            classif = MCRClassificationBrowserData.getClassificationPool().getClassificationAsPojo(MCRCategoryID.rootID(id.getRootID()),
+            MCRCategory classif = getClassificationPool().getClassificationAsPojo(MCRCategoryID.rootID(id.getRootID()),
                     true);
 
             // check the new category entry
@@ -111,22 +106,23 @@ public class MCRClassificationEditor {
 
             final MCRCategory findCategory = findCategory(classif, newID);
             if (findCategory == null) {
+                MCRCategoryID classificationID = classif.getId();
                 if (!id.getID().equals("empty")) {
 
                     MCRCategory prevCateg = findCategory(classif, id);
                     LOGGER.debug("Previous Category: " + prevCateg.getId() + " found.");
 
                     MCRXMLTransformer.buildCategory(id.getRootID(), newCateg, prevCateg);
-                    MCRClassificationBrowserData.getClassificationPool().updateClassification(classif);
+                    getClassificationPool().updateClassification(classif);
                     String sessionID = MCRSessionMgr.getCurrentSession().getID();
-                    MCRClassificationBrowserData.ClassUserTable.put(classif.getId().getRootID(), sessionID);
+                    addClassUser(classificationID, sessionID);
                     return true;
                 } else {
                     MCRCategory newCategory = MCRXMLTransformer.buildCategory(id.getRootID(), newCateg, classif);
-                    LOGGER.debug("Adding category:" + newCategory.getId() + " to classification: " + classif.getId());
-                    MCRClassificationBrowserData.getClassificationPool().updateClassification(classif);
+                    LOGGER.debug("Adding category:" + newCategory.getId() + " to classification: " + classificationID);
+                    getClassificationPool().updateClassification(classif);
                     String sessionID = MCRSessionMgr.getCurrentSession().getID();
-                    MCRClassificationBrowserData.ClassUserTable.put(classif.getId().getRootID(), sessionID);
+                    addClassUser(classificationID, sessionID);
                     return true;
                 }
             } else {
@@ -139,6 +135,14 @@ public class MCRClassificationEditor {
             return false;
         }
 
+    }
+
+    private String addClassUser(MCRCategoryID classificationID, String sessionID) {
+        return ClassificationUserTableFactory.getInstance().addClassUser(classificationID.getRootID(), sessionID);
+    }
+
+    private MCRClassificationPool getClassificationPool() {
+        return MCRClassificationPoolFactory.getInstance();
     }
 
     /**
@@ -158,7 +162,7 @@ public class MCRClassificationEditor {
             Element clroot = indoc.getRootElement();
             Element newCateg = (Element) clroot.getChild("categories").getChild("category").clone();
             String newID = newCateg.getAttributeValue("ID");
-            classif = MCRClassificationBrowserData.getClassificationPool().getClassificationAsPojo(MCRCategoryID.rootID(id.getRootID()),
+            MCRCategory classif = getClassificationPool().getClassificationAsPojo(MCRCategoryID.rootID(id.getRootID()),
                     true);
             // check the category entry
             if (!newID.equalsIgnoreCase(id.getID())) {
@@ -182,9 +186,9 @@ public class MCRClassificationEditor {
             //added by MCRXMLTransformer
             parent.getChildren().remove(newCategory);
 
-            MCRClassificationBrowserData.getClassificationPool().updateClassification(classif);
+            getClassificationPool().updateClassification(classif);
             String sessionID = MCRSessionMgr.getCurrentSession().getID();
-            MCRClassificationBrowserData.ClassUserTable.put(classif.getId().getRootID(), sessionID);
+            addClassUser(classif.getId(), sessionID);
 
             return true;
         } catch (Exception e1) {
@@ -194,8 +198,9 @@ public class MCRClassificationEditor {
     }
 
     public boolean isLocked(String classid) {
-        if (MCRClassificationBrowserData.ClassUserTable.containsKey(classid)) {
-            String lockedSessionID = MCRClassificationBrowserData.ClassUserTable.get(classid);
+        ClassificationUserTable classificationUserTable = ClassificationUserTableFactory.getInstance();
+        String lockedSessionID = classificationUserTable.getSession(classid);
+        if (lockedSessionID != null) {
             String currentSessionID = MCRSessionMgr.getCurrentSession().getID();
             if (!lockedSessionID.equals(currentSessionID)) {
                 return true;
@@ -222,7 +227,7 @@ public class MCRClassificationEditor {
                 Document jdom = MCRXMLHelper.parseURI(file.toURI());
                 MCRCategory classification = MCRXMLTransformer.getCategory(jdom);
 
-                MCRClassificationBrowserData.getClassificationPool().updateClassification(classification);
+                getClassificationPool().updateClassification(classification);
 
                 return true;
             } catch (MCRException ex) {
@@ -262,7 +267,7 @@ public class MCRClassificationEditor {
             String submittedID = indoc.getRootElement().getAttributeValue("ID");
             MCRCategoryID cli = null;
 
-            if (!MCRClassificationBrowserData.getClassificationPool().getAllIDs().contains(MCRCategoryID.rootID(submittedID))) {
+            if (!getClassificationPool().getAllIDs().contains(MCRCategoryID.rootID(submittedID))) {
                 cli = MCRCategoryID.rootID(submittedID);
             } else {
                 LOGGER.error("Create an unique ID failed. " + submittedID);
@@ -288,7 +293,7 @@ public class MCRClassificationEditor {
             Document cljdom = new Document();
             cljdom.addContent(mycoreclass);
             MCRCategory classif = MCRXMLTransformer.getCategory(cljdom);
-            MCRClassificationBrowserData.getClassificationPool().updateClassification(classif);
+            getClassificationPool().updateClassification(classif);
             LOGGER.debug("Classification " + cli.toString() + " successfully created!");
             return true;
 
@@ -311,7 +316,7 @@ public class MCRClassificationEditor {
         try {
             LOGGER.debug("Start modify classification description for " + clid);
             Element clroot = indoc.getRootElement();
-            classif = MCRClassificationBrowserData.getClassificationPool().getClassificationAsPojo(MCRCategoryID.rootID(clid), true);
+            MCRCategory classif = getClassificationPool().getClassificationAsPojo(MCRCategoryID.rootID(clid), true);
             classif.getLabels().clear();
 
             @SuppressWarnings("unchecked")
@@ -324,9 +329,9 @@ public class MCRClassificationEditor {
                 classif.getLabels().add(label);
             }
 
-            MCRClassificationBrowserData.getClassificationPool().updateClassification(classif);
+            getClassificationPool().updateClassification(classif);
             String sessionID = MCRSessionMgr.getCurrentSession().getID();
-            MCRClassificationBrowserData.ClassUserTable.put(classif.getId().getRootID(), sessionID);
+            addClassUser(classif.getId(), sessionID);
             return true;
         } catch (Exception e1) {
             LOGGER.error("Classification modify fails.", e1);
@@ -351,7 +356,7 @@ public class MCRClassificationEditor {
             boolean bret = false;
 
             MCRCategoryID categoryId = new MCRCategoryID(clid, categid);
-            classif = MCRClassificationBrowserData.getClassificationPool().getClassificationAsPojo(MCRCategoryID.rootID(clid), true);
+            MCRCategory classif = getClassificationPool().getClassificationAsPojo(MCRCategoryID.rootID(clid), true);
 
             if (way.equalsIgnoreCase("up")) {
                 MCRCategory categ = findCategory(classif, categoryId);
@@ -368,9 +373,9 @@ public class MCRClassificationEditor {
             }
 
             if (bret) {
-                MCRClassificationBrowserData.getClassificationPool().updateClassification(classif);
+                getClassificationPool().updateClassification(classif);
                 String sessionID = MCRSessionMgr.getCurrentSession().getID();
-                MCRClassificationBrowserData.ClassUserTable.put(classif.getId().getRootID(), sessionID);
+                addClassUser(classif.getId(), sessionID);
                 bret = true;
             }
             return bret;
@@ -415,7 +420,7 @@ public class MCRClassificationEditor {
             index--;
         }
         parent.getChildren().get(index).getChildren().add(cat);
-        MCRClassificationBrowserData.getClassificationPool().getMovedCategories().add(cat.getId());
+        getClassificationPool().getMovedCategories().add(cat.getId());
         return true;
     }
 
@@ -428,7 +433,7 @@ public class MCRClassificationEditor {
 
         MCRCategory grandParent = parent.getParent();
         if (grandParent == null) {
-            grandParent = classif;
+            grandParent = cat;
         }
 
         int oldIndex = parent.getChildren().indexOf(cat);
@@ -436,19 +441,19 @@ public class MCRClassificationEditor {
         parent.getChildren().remove(oldIndex);
 
         grandParent.getChildren().add(newIndex + 1, cat);
-        MCRClassificationBrowserData.getClassificationPool().getMovedCategories().add(cat.getId());
+        getClassificationPool().getMovedCategories().add(cat.getId());
         return true;
     }
 
     public boolean saveAll() {
-        final boolean saveAll = MCRClassificationBrowserData.getClassificationPool().saveAll();
-        MCRClassificationBrowserData.clearUserClassTable(MCRSessionMgr.getCurrentSession());
+        final boolean saveAll = getClassificationPool().saveAll();
+        ClassificationUserTableFactory.getInstance().clearUserClassTable(MCRSessionMgr.getCurrentSession());
         return saveAll;
     }
 
     public boolean purgeAll() {
-        MCRClassificationBrowserData.clearUserClassTable(MCRSessionMgr.getCurrentSession());
-        return MCRClassificationBrowserData.getClassificationPool().purgeAll();
+        ClassificationUserTableFactory.getInstance().clearUserClassTable(MCRSessionMgr.getCurrentSession());
+        return getClassificationPool().purgeAll();
     }
 
     /**
@@ -465,19 +470,19 @@ public class MCRClassificationEditor {
             LOGGER.debug("Start delete in classification " + clid + " the category: " + categid);
             int cnt = 0;
 
-            classif = MCRClassificationBrowserData.getClassificationPool().getClassificationAsPojo(MCRCategoryID.rootID(clid), true);
+            MCRCategory classif = getClassificationPool().getClassificationAsPojo(MCRCategoryID.rootID(clid), true);
             MCRCategoryID id = new MCRCategoryID(clid, categid);
             MCRCategory categToDelete = findCategory(classif, id);
             MCRCategory parent = categToDelete.getParent();
 
             if (parent != null) {
-                Collection<String> links = MCRCategLinkServiceFactory.getInstance().getLinksFromCategory(id);
-                if (links.isEmpty()) {
+                Map<MCRCategoryID, Boolean> linkMap = getClassificationPool().hasLinks(categToDelete);
+                if (linkMap.isEmpty()) {
                     parent.getChildren().remove(categToDelete);
-                    MCRClassificationBrowserData.getClassificationPool().updateClassification(classif);
+                    getClassificationPool().updateClassification(classif);
                     String sessionID = MCRSessionMgr.getCurrentSession().getID();
-                    MCRClassificationBrowserData.ClassUserTable.put(classif.getId().getRootID(), sessionID);
-                    cnt = links.size();
+                    addClassUser(classif.getId(), sessionID);
+                    cnt = linkMap.size();
                     LOGGER.info("Classif: " + classif.getId().getRootID());
                 }
             } else {
@@ -503,11 +508,7 @@ public class MCRClassificationEditor {
         LOGGER.debug("Start delete classification " + clid);
         try {
             MCRCategoryID mcrclid = MCRCategoryID.rootID(clid);
-            //only delete with DAO if Classification really exists.
-            if (DAO.exist(mcrclid)) {
-                DAO.deleteCategory(mcrclid);
-            }
-            MCRClassificationBrowserData.getClassificationPool().deleteClassification(mcrclid);
+            getClassificationPool().deleteClassification(mcrclid);
             LOGGER.debug("Classification: " + clid + " deleted.");
             return true;
         } catch (Exception e) {
@@ -558,6 +559,14 @@ public class MCRClassificationEditor {
             fname = null;
         }
         return fname;
+    }
+
+    public boolean isEdited(MCRCategoryID classID) {
+        return getClassificationPool().isEdited(classID);
+    }
+
+    public MCRCategory getClassification(MCRCategoryID rootID, boolean writeAccess) {
+        return getClassificationPool().getClassificationAsPojo(rootID, writeAccess);
     }
 
 }
