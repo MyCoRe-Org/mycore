@@ -32,6 +32,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.hibernate.Criteria;
+import org.hibernate.FlushMode;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.criterion.Criterion;
@@ -186,16 +187,22 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
     @SuppressWarnings("unchecked")
     public List<MCRCategory> getChildren(MCRCategoryID cid) {
         LOGGER.debug("Get children of category: " + cid);
-        if (!exist(cid)) {
-            return new MCRCategoryChildList(null, null);
-        }
         Session session = getHibConnection().getSession();
-        Criteria c = session.createCriteria(CATEGRORY_CLASS).add(
-                Subqueries.propertyEq("parent", DetachedCriteria.forClass(CATEGRORY_CLASS)
-                        .setProjection(Projections.property("internalID")).add(getCategoryCriterion(cid))));
-        c.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
-        c.setCacheable(true);
-        return (List<MCRCategory>) c.list();
+        FlushMode fm = session.getFlushMode();
+        session.setFlushMode(FlushMode.MANUAL);
+        try {
+            if (!exist(cid)) {
+                return new MCRCategoryChildList(null, null);
+            }
+            Criteria c = session.createCriteria(CATEGRORY_CLASS).add(
+                    Subqueries.propertyEq("parent", DetachedCriteria.forClass(CATEGRORY_CLASS).setProjection(
+                            Projections.property("internalID")).add(getCategoryCriterion(cid))));
+            c.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
+            c.setCacheable(true);
+            return (List<MCRCategory>) c.list();
+        } finally {
+            session.setFlushMode(fm);
+        }
     }
 
     public List<MCRCategory> getParents(MCRCategoryID id) {
@@ -213,16 +220,22 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
     @SuppressWarnings("unchecked")
     public List<MCRCategoryID> getRootCategoryIDs() {
         Session session = getHibConnection().getSession();
-        Criteria c = session.createCriteria(CATEGRORY_CLASS);
-        c.add(Restrictions.eq("left", LEFT_START_VALUE));
-        c.setProjection(Projections.projectionList().add(Projections.property("rootID")).add(Projections.property("categID")));
-        c.setCacheable(true);
-        List<Object[]> result = c.list();
-        List<MCRCategoryID> classIds = new ArrayList<MCRCategoryID>(result.size());
-        for (Object[] cat : result) {
-            classIds.add(new MCRCategoryID(cat[0].toString(), cat[1].toString()));
+        FlushMode fm = session.getFlushMode();
+        session.setFlushMode(FlushMode.MANUAL);
+        try {
+            Criteria c = session.createCriteria(CATEGRORY_CLASS);
+            c.add(Restrictions.eq("left", LEFT_START_VALUE));
+            c.setProjection(Projections.projectionList().add(Projections.property("rootID")).add(Projections.property("categID")));
+            c.setCacheable(true);
+            List<Object[]> result = c.list();
+            List<MCRCategoryID> classIds = new ArrayList<MCRCategoryID>(result.size());
+            for (Object[] cat : result) {
+                classIds.add(new MCRCategoryID(cat[0].toString(), cat[1].toString()));
+            }
+            return classIds;
+        } finally {
+            session.setFlushMode(fm);
         }
-        return classIds;
     }
 
     @SuppressWarnings("unchecked")
@@ -245,29 +258,35 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
             return getCategory(baseID, childLevel);
         }
         Session session = getHibConnection().getSession();
-        List<MCRCategory> parents = getParents(baseID);
-        List<MCRCategoryImpl> parentsCopy = new ArrayList<MCRCategoryImpl>(parents.size());
-        for (int i = parents.size() - 1; i >= 0; i--) {
-            parentsCopy.add(copyDeep((MCRCategoryImpl) parents.get(i), 0));
+        FlushMode fm = session.getFlushMode();
+        session.setFlushMode(FlushMode.MANUAL);
+        try {
+            List<MCRCategory> parents = getParents(baseID);
+            List<MCRCategoryImpl> parentsCopy = new ArrayList<MCRCategoryImpl>(parents.size());
+            for (int i = parents.size() - 1; i >= 0; i--) {
+                parentsCopy.add(copyDeep((MCRCategoryImpl) parents.get(i), 0));
+            }
+            MCRCategoryImpl root = parentsCopy.get(0);
+            for (int i = 1; i < parentsCopy.size(); i++) {
+                parentsCopy.get(i).setRoot(root);
+                parentsCopy.get(i).setParent(parentsCopy.get(i - 1));
+            }
+            MCRCategoryImpl node = getByNaturalID(session, baseID);
+            // prepare a temporary copy for the deepCopy process
+            MCRCategoryImpl tempCopy = new MCRCategoryImpl();
+            tempCopy.setInternalID(node.getInternalID());
+            tempCopy.setId(node.getId());
+            tempCopy.setLabels(node.getLabels());
+            tempCopy.setLevel(node.getLevel());
+            tempCopy.children = node.children;
+            tempCopy.root = root;
+            // attach deep node copy to its parent
+            copyDeep(tempCopy, childLevel).setParent(parentsCopy.get(parentsCopy.size() - 1));
+            // return root node
+            return root;
+        } finally {
+            session.setFlushMode(fm);
         }
-        MCRCategoryImpl root = parentsCopy.get(0);
-        for (int i = 1; i < parentsCopy.size(); i++) {
-            parentsCopy.get(i).setRoot(root);
-            parentsCopy.get(i).setParent(parentsCopy.get(i - 1));
-        }
-        MCRCategoryImpl node = getByNaturalID(session, baseID);
-        // prepare a temporary copy for the deepCopy process
-        MCRCategoryImpl tempCopy = new MCRCategoryImpl();
-        tempCopy.setInternalID(node.getInternalID());
-        tempCopy.setId(node.getId());
-        tempCopy.setLabels(node.getLabels());
-        tempCopy.setLevel(node.getLevel());
-        tempCopy.children = node.children;
-        tempCopy.root = root;
-        // attach deep node copy to its parent
-        copyDeep(tempCopy, childLevel).setParent(parentsCopy.get(parentsCopy.size() - 1));
-        // return root node
-        return root;
     }
 
     /*
@@ -678,10 +697,16 @@ public class MCRCategoryDAOImpl implements MCRCategoryDAO {
 
     private static int getNumberOfChildren(MCRCategoryID id) {
         Session session = getHibConnection().getSession();
-        Criteria c = session.createCriteria(CATEGRORY_CLASS).setProjection(Projections.rowCount());
-        c.add(Subqueries.propertyEq("parent", DetachedCriteria.forClass(CATEGRORY_CLASS).setProjection(Projections.property("internalID"))
-                .add(getCategoryCriterion(id))));
-        return ((Number) c.uniqueResult()).intValue();
+        FlushMode fm = session.getFlushMode();
+        session.setFlushMode(FlushMode.MANUAL);
+        try {
+            Criteria c = session.createCriteria(CATEGRORY_CLASS).setProjection(Projections.rowCount());
+            c.add(Subqueries.propertyEq("parent", DetachedCriteria.forClass(CATEGRORY_CLASS).setProjection(
+                    Projections.property("internalID")).add(getCategoryCriterion(id))));
+            return ((Number) c.uniqueResult()).intValue();
+        } finally {
+            session.setFlushMode(fm);
+        }
     }
 
     /**
