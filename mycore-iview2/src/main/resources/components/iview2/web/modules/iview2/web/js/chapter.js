@@ -358,10 +358,14 @@ function chapter(newId, parent) {
 		if (isBrowser("IE")) {
 			distanceCur = distanceCur - parseInt(paddingLeft) - parseInt(borderLeftWidth);
 		}
+		
 		if (getTextWidth(curTxt, getStyle(id+"_content", "font-family"), getStyle(id+"_content", "font-size")) > 
 			distanceCur + pointsWidth) {
+				
+			// now the current Txt will cut with the help of the largest letter "A"
+			curTxt = curTxt.substring(0, Math.floor(distanceCur / getTextWidth("A", getStyle(id+"_content", "font-family"), getStyle(id+"_content", "font-size"))));
 			TOC.firstChild.innerHTML =  TOC.firstChild.innerHTML.substring(0, TOC.firstChild.innerHTML.lastIndexOf('>') + 1) +
-				cutTxtToWidth(curTxt, getStyle(id+"_content", "font-family"), getStyle(id+"_content", "font-size"), distanceCur) +
+				/*cutTxtToWidth(*/curTxt/*, getStyle(id+"_content", "font-family"), getStyle(id+"_content", "font-size"), distanceCur)*/ +
 				"...";
 		}
 	}
