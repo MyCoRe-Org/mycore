@@ -247,8 +247,6 @@ public class MCRClassificationEditor {
         try {
             LOGGER.debug("Start create a  new classification.");
             Element clroot = indoc.getRootElement();
-            XMLOutputter out = new XMLOutputter();
-            out.output(indoc, System.out);
 
             Element mycoreclass = new Element("mycoreclass");
             Element categories = new Element("categories");
@@ -289,7 +287,6 @@ public class MCRClassificationEditor {
             mycoreclass.addContent(categories);
             Document cljdom = new Document();
             cljdom.addContent(mycoreclass);
-            out.output(cljdom, System.out);
             MCRCategory classif = MCRXMLTransformer.getCategory(cljdom);
             MCRClassificationBrowserData.getClassificationPool().updateClassification(classif);
             LOGGER.debug("Classification " + cli.toString() + " successfully created!");

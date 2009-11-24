@@ -42,6 +42,15 @@ public interface MCRCategLinkService {
      * @return true if the classification is used
      */
     public abstract Map<MCRCategoryID, Boolean> hasLinks(MCRCategory category);
+    
+    /**
+     * Checks if the category with the given id is liked with an object
+     * 
+     * @param classif
+     * @return
+     *      true if is linked otherwise false
+     */
+    public abstract boolean hasLink(MCRCategory classif);
 
     /**
      * Counts links to a collection of categories.
@@ -90,7 +99,7 @@ public interface MCRCategLinkService {
      * 
      * @param id
      *            ID of the category
-     * @return Collection of Object IDs
+     * @return Collection of Object IDs, empty Collection when no links exist
      */
     public abstract Collection<String> getLinksFromCategory(MCRCategoryID id);
 

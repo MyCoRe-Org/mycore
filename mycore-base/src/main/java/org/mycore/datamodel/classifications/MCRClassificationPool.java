@@ -32,13 +32,21 @@ public class MCRClassificationPool {
 
     private HashSet<MCRCategoryID> movedCategories = new HashSet<MCRCategoryID>();
 
+
     static Logger LOGGER = Logger.getLogger(MCRClassificationPool.class);
 
-    private static MCRCategoryDAO DAO = MCRCategoryDAOFactory.getInstance();
+    private MCRCategoryDAO categoryDAO;
+    private MCRCategLinkService linkService;
 
     public MCRClassificationPool() {
+        this(MCRCategoryDAOFactory.getInstance(), MCRCategLinkServiceFactory.getInstance());
+    }
+
+    MCRClassificationPool(MCRCategoryDAO categoryDAO, MCRCategLinkService linkService) {
         //store reference of classifications in current session
         MCRSessionMgr.getCurrentSession().put("classifications", classifications); // Put
+        this.categoryDAO = categoryDAO;
+        this.linkService = linkService;
     }
 
     /**
@@ -49,7 +57,7 @@ public class MCRClassificationPool {
      */
     public Set<MCRCategoryID> getAllIDs() {
         Set<MCRCategoryID> ids = new HashSet<MCRCategoryID>();
-        ids.addAll(DAO.getRootCategoryIDs());
+        ids.addAll(categoryDAO.getRootCategoryIDs());
         ids.addAll(classifications.keySet());
         return ids;
     }
@@ -61,44 +69,65 @@ public class MCRClassificationPool {
      */
     public boolean saveAll() {
         synchronized (classifications) {
-            HashMap<MCRCategoryID, MCRCategory> classCopy = new HashMap<MCRCategoryID, MCRCategory>();
-            classCopy.putAll(classifications);
-            Iterator<MCRCategory> rootCategories = classifications.values().iterator();
+            HashSet<MCRCategoryID> modifiedCategories = getMovedLeftRightCategories();
+            
             try {
-                while (rootCategories.hasNext()) {
-                    MCRCategory clas = rootCategories.next();
-                    LOGGER.debug("Classification to be saved: " + clas.getId());
-                    if (DAO.exist(clas.getId())) {
-                        DAO.replaceCategory(clas);
-                    } else {
-                        DAO.addCategory(null, clas);
-                    }
-                    rootCategories.remove();
-                }
+                persistAllCategories();
             } catch (Exception e) {
                 LOGGER.warn("Error while saving all classifications.", e);
                 return false;
             }
-            LOGGER.debug("Getting all categories that where moved to left or right");
-            HashSet<MCRCategoryID> modifiedCategories = new HashSet<MCRCategoryID>();
-            for (MCRCategoryID categID : getMovedCategories()) {
-                LOGGER.debug("Getting sub categories of "+categID);
-                MCRCategory cat = findCategory(classCopy.get(MCRCategoryID.rootID(categID.getRootID())), categID);
-                modifiedCategories.addAll(getSubTree(cat));
-            }
-            LOGGER.debug("Getting all objects that where affected my category movements");
-            HashSet<String> linkedObjects = new HashSet<String>();
-            MCRCategLinkService linkService = MCRCategLinkServiceFactory.getInstance();
-            for (MCRCategoryID cat:modifiedCategories){
-                LOGGER.debug("Getting linked objects for "+cat);
-                linkedObjects.addAll(linkService.getLinksFromCategory(cat));
-            }
-            for (String objectID:linkedObjects){
-                MCRObjectCommands.repairMetadataSearchForID(objectID);
-            }
-            movedCategories.clear();
+            
+            updateSearchIndexForMovedCategories(modifiedCategories);
         }
         return true;
+    }
+
+    private void updateSearchIndexForMovedCategories(HashSet<MCRCategoryID> modifiedCategories) {
+        LOGGER.debug("Getting all objects that where affected my category movements");
+        for (MCRCategoryID cat:modifiedCategories){
+            LOGGER.debug("Getting linked objects for "+cat);
+            for (String objectID : linkService.getLinksFromCategory(cat)) {
+                MCRObjectCommands.repairMetadataSearchForID(objectID);
+            }
+        }
+        
+        movedCategories.clear();
+    }
+
+    /**
+     * Retrieve categories which are moved left or right
+     * 
+     * @return a map with category ids
+     */
+    private HashSet<MCRCategoryID> getMovedLeftRightCategories() {
+        LOGGER.debug("Getting all categories that where moved to left or right");
+        HashSet<MCRCategoryID> modifiedCategories = new HashSet<MCRCategoryID>();
+        for (MCRCategoryID categID : getMovedCategories()) {
+            LOGGER.info("Getting sub categories of "+categID);
+            MCRCategory cat = MCRCategoryTools.findCategory(classifications.get(MCRCategoryID.rootID(categID.getRootID())), categID);
+            modifiedCategories.addAll(getSubTree(cat));
+        }
+        return modifiedCategories;
+    }
+
+    /**
+     * make all changes persistent
+     * 
+     */
+    private void persistAllCategories() {
+        for (Iterator rootCategories = classifications.values().iterator(); rootCategories.hasNext();) {
+            MCRCategory classification = (MCRCategory) rootCategories.next();
+            LOGGER.debug("Classification to be saved: " + classification.getId());
+            
+            if (categoryDAO.exist(classification.getId())) {
+                categoryDAO.replaceCategory(classification);
+            } else {
+                categoryDAO.addCategory(null, classification);
+            }
+            
+            rootCategories.remove();
+        }
     }
 
     private static Collection<MCRCategoryID> getSubTree(MCRCategory subTreeNode) {
@@ -108,24 +137,6 @@ public class MCRClassificationPool {
             children.addAll(getSubTree(child));
         }
         return children;
-    }
-
-    private static MCRCategory findCategory(MCRCategory parent, MCRCategoryID id) {
-        MCRCategory found = null;
-        for (MCRCategory cat : parent.getChildren()) {
-            if (cat.getId().equals(id)) {
-                found = cat;
-                LOGGER.debug("Found Category: " + found.getId().getID());
-                break;
-            }
-            MCRCategory rFound = findCategory(cat, id);
-            if (rFound != null) {
-                found = rFound;
-                break;
-            }
-        }
-
-        return found;
     }
 
     /**
@@ -173,7 +184,6 @@ public class MCRClassificationPool {
      * @param cl
      */
     public void deleteClassification(MCRCategoryID cl) {
-        if (classifications.containsKey(cl))
             classifications.remove(cl);
     }
 
@@ -192,7 +202,7 @@ public class MCRClassificationPool {
         if (classif != null) {
             return classif;
         } else {
-            MCRCategory cl = DAO.getCategory(clid, writeAccess ? -1 : 0);
+            MCRCategory cl = categoryDAO.getCategory(clid, writeAccess ? -1 : 0);
             return cl;
         }
     }

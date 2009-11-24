@@ -160,7 +160,6 @@ public abstract class MCRAbstractCategoryImpl implements MCRCategory {
         MCRLabel label = getLabel(MCRSessionMgr.getCurrentSession().getCurrentLanguage());
         if (label != null)
             return label;
-        System.out.println("current Language:" + defaultLang);
         label = getLabel(defaultLang);
         if (label != null)
             return label;
