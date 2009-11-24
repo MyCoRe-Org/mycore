@@ -61,23 +61,23 @@ function setHelpText()
   
   if ( value == "edit") 
   {
-      var helpText_1 = document.createTextNode("Vorhandenen Inhalt bearbeiten heißt, dass sie schon bestehende Webseiten verändern können. Sie haben also hier die Möglichkeit den HTML-Quelltext der gewählten Seite direkt anzupassen.");  
-      var helpText_2 = document.createTextNode("Bitte wählen sie hier die Seite aus, die sie bearbeiten wollen.");        
+      var helpText_1 = document.createTextNode("Vorhandenen Inhalt bearbeiten heiï¿½t, dass Sie schon bestehende Webseiten verï¿½ndern kï¿½nnen. Sie haben also hier die Mï¿½glichkeit den HTML-Quelltext der gewï¿½hlten Seite direkt anzupassen.");  
+      var helpText_2 = document.createTextNode("Bitte wï¿½hlen Sie hier die Seite aus, die Sie bearbeiten wollen.");        
   }
       else if (value == "add_intern") 
       {
-          var helpText_1 = document.createTextNode("Eine neue Webseite besteht aus einem Menüeintrag und zugehörigem HTML-Inhalt. Sie stellen also einen eigenen neuen Menüeintrag und die dazu gehörige HTML-Seite in das System ein.");
-          var helpText_2 = document.createTextNode("Eine neue Webseite wird immer unter einem bestimmtem Obermenüpunkt eingestellt. Wählen sie also hier den Menüpunkt aus, UNTER DEM die Seite angelegt werden soll. Hinweis: Einen Hauptmenüpunkt können sie einstellen, indem sie direkt das entsprechende Menü auswählen.");
+          var helpText_1 = document.createTextNode("Eine neue Webseite besteht aus einem Menï¿½eintrag und zugehï¿½rigem HTML-Inhalt. Sie stellen also einen eigenen neuen Menï¿½eintrag und die dazu gehï¿½rige HTML-Seite in das System ein.");
+          var helpText_2 = document.createTextNode("Eine neue Webseite wird immer unter einem bestimmtem Obermenï¿½punkt eingestellt. Wï¿½hlen Sie also hier den Menï¿½punkt aus, UNTER DEM die Seite angelegt werden soll. Hinweis: Einen Hauptmenï¿½punkt kï¿½nnen Sie einstellen, indem Sie direkt das entsprechende Menï¿½ auswï¿½hlen.");
       }
           else if (value == "add_extern") 
           {
-              var helpText_1 = document.createTextNode("Ein Link besteht nur aus einem Menüeintrag. Sie stellen also hier einen neuen Menüeintrag in das System ein, der beim Anklicken auf die von ihnen angegebene Link-Adresse verweist.");
-              var helpText_2 = document.createTextNode("Eine neuer Link wird immer unter einem bestimmtem Obermenüpunkt eingestellt. Wählen sie also hier den Menüpunkt aus, UNTER DEM die der Link angelegt werden soll. Hinweis: Einen Link als Hauptmenüpunkt können sie einstellen, indem sie direkt das entsprechende Menü auswählen.");             
+              var helpText_1 = document.createTextNode("Ein Link besteht nur aus einem Menï¿½eintrag. Sie stellen also hier einen neuen Menï¿½eintrag in das System ein, der beim Anklicken auf die von ihnen angegebene Link-Adresse verweist.");
+              var helpText_2 = document.createTextNode("Eine neuer Link wird immer unter einem bestimmtem Obermenï¿½punkt eingestellt. Wï¿½hlen Sie also hier den Menï¿½punkt aus, UNTER DEM die der Link angelegt werden soll. Hinweis: Einen Link als Hauptmenï¿½punkt kï¿½nnen Sie einstellen, indem Sie direkt das entsprechende Menï¿½ auswï¿½hlen.");             
           }   
               else if (value == "delete") 
               {
-                  var helpText_1 = document.createTextNode("Vorhandener Inhalt löschen bedeutet, dass sie einen bestimmten Menüpunkt nebst Inhalt löschen. Hinweis: Wenn sie einen Link löschen wird natürlich nur der Menüpunkt gelöscht, da in dem Fall kein Inhalt existiert. ");
-                  var helpText_2 = document.createTextNode("Wählen sie hier den Inhalt aus, den sie löschen möchten.");               
+                  var helpText_1 = document.createTextNode("Vorhandener Inhalt lï¿½schen bedeutet, dass Sie einen bestimmten Menï¿½punkt nebst Inhalt lï¿½schen. Hinweis: Wenn Sie einen Link lï¿½schen wird natï¿½rlich nur der Menï¿½punkt gelï¿½scht, da in dem Fall kein Inhalt existiert. ");
+                  var helpText_2 = document.createTextNode("Wï¿½hlen Sie hier den Inhalt aus, den Sie lï¿½schen mï¿½chten.");               
               }           
               
    document.getElementById("helpText.chooseAction").replaceChild(helpText_1, document.getElementById("helpText.chooseAction").firstChild);
@@ -195,7 +195,7 @@ function schreibeDatum() {
     var Monat = Datum.getMonth();
     var Jahr = Datum.getFullYear();
     var Tagname = new Array("So","Mo","Di","Mi","Do","Fr","Sa");
-    var Monatname = new Array("Januar","Februar","März","April","Mai","Juni","Juli","August","September","Oktober","November","Dezember");
+    var Monatname = new Array("Januar","Februar","Mï¿½rz","April","Mai","Juni","Juli","August","September","Oktober","November","Dezember");
     var Stunde = Datum.getHours();
     var Minute = Datum.getMinutes();
     var Sekunde = Datum.getSeconds();
