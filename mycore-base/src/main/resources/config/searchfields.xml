@@ -45,5 +45,15 @@
     <field name="avMediaType"       type="identifier" source="fileMetadata" xpath="file/@mediaType" value="." />
 
   </index>
+  
+  <index id="urn">
+    <!-- field for retrieving all objects where the derivates have urn -->
+    <field name="objectsWithURN" type="boolean" />
+  </index>
+  
+  <index id="derivate">
+    <!-- field for for quering the modification date of an derivate in the database -->
+    <field name="derivateModificationDate" type="timestamp" />
+  </index>
 
 </searchfields>
