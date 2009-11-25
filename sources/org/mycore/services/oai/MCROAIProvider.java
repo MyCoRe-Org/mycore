@@ -489,8 +489,14 @@ public class MCROAIProvider extends MCRServlet {
                         } else {
                             Element eRecord = new Element("record", ns);
                             eRecord.addContent(eHeader);
-                            MCRObject object = new MCRObject();
-                            object.receiveFromDatastore(identifier[3]);
+                            String mcrid = identifier[3];
+                            MCRBase object = null;
+                            if (mcrid.toLowerCase().indexOf("derivate") != -1) {
+                                object = new MCRDerivate();
+                            } else {
+                                object = new MCRObject();
+                            }
+                            object.receiveFromDatastore(mcrid);
                             Element eMetadata = (Element) object.createXML().getRootElement()
                                     .clone();
                             eRecord.addContent(eMetadata);
@@ -517,10 +523,11 @@ public class MCROAIProvider extends MCRServlet {
             list.addContent(eResumptionToken);
             return list;
         } catch (Exception ex) {
-            ex.printStackTrace();
+            logger.error(
+                    "An exception occured while returning results by using a resumption token. Used token was : '"
+                            + resumptionToken + "'", ex);
             return null;
         }
-
     }
 
     /**

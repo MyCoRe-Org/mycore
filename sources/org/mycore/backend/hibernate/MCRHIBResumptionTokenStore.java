@@ -34,6 +34,8 @@ import org.hibernate.criterion.Restrictions;
 import org.mycore.backend.hibernate.tables.MCRRESUMPTIONTOKEN;
 import org.mycore.common.MCRConfiguration;
 import org.mycore.common.MCRConfigurationException;
+import org.mycore.datamodel.metadata.MCRBase;
+import org.mycore.datamodel.metadata.MCRDerivate;
 import org.mycore.datamodel.metadata.MCRObject;
 import org.mycore.services.oai.MCROAIProvider;
 import org.mycore.services.oai.MCROAIResumptionTokenStore;
@@ -123,7 +125,7 @@ public class MCRHIBResumptionTokenStore implements MCROAIResumptionTokenStore {
 
         String[] arHitBlob = (new String(byteHitBlob)).split(sepOAIHIT);
 
-        MCRObject object = new MCRObject();
+        MCRBase object = null;
         List<String[]> resultList = new ArrayList<String[]>();
 
         for (int i = hitNrFrom; i <= maxLoop; i++) {
@@ -135,6 +137,11 @@ public class MCRHIBResumptionTokenStore implements MCROAIResumptionTokenStore {
             String specName = "";
             if (!prefix.equals("set")) {
                 String objectId = arHitBlob[i];
+                if(objectId.toLowerCase().indexOf("derivate") != -1){
+                    object =  new MCRDerivate();
+                }else{
+                    object = new MCRObject();
+                }
                 object.receiveFromDatastore(objectId);
                 String[] header = MCROAIProvider.getHeader(object, objectId, repositoryID, instance);
                 oaiID = header[0];
