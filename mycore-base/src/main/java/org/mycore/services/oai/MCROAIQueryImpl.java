@@ -107,9 +107,13 @@ public class MCROAIQueryImpl implements MCROAIQuery {
      *            the Servletinstance
      * @return List a list that contains an array of three Strings: the category
      *         id, the label and a description
+     *         or NULL, if the server does not support sets
      */
     public List<String[]> listSets(String instance) {
         String[] classifications = MCROAIProvider.getConfigBean(instance).getClassificationIDs();
+        if(classifications.length==0){
+        	return null;
+        }
         List<String[]> list = new ArrayList<String[]>();
         for (int i = 0; i < classifications.length; i++) {
             MCRCategory cl = MCRCategoryDAOFactory.getInstance().getCategory(
