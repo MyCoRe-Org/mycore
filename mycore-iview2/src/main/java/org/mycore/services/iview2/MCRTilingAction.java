@@ -23,7 +23,8 @@ public class MCRTilingAction implements Runnable {
         Transaction transaction = session.beginTransaction();
         try {
             MCRFile file = MCRIView2Tools.getMCRFile(image.getDerivate(), image.getPath());
-            MCRImage imgTiler = new MCRImage(MCRIView2Tools.getFile(file), file.getOwnerID(), file.getPath());
+            MCRImage imgTiler = new MCRImage(MCRIView2Tools.getFile(file), file.getOwnerID(), file.getAbsolutePath());
+            imgTiler.setTileDir(MCRIView2Tools.getTileDir());
             MCRTiledPictureProps picProps = new MCRTiledPictureProps();
             image.setStart(new Date());
             try {
