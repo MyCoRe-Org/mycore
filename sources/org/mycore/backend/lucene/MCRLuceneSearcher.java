@@ -285,7 +285,7 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
         return results;
     }
 
-    private Sort buildSortFields(List<MCRSortBy> sortBy) {
+    static Sort buildSortFields(List<MCRSortBy> sortBy) {
         ArrayList<SortField> sortList = new ArrayList<SortField>(sortBy.size());
         for (MCRSortBy sortByElement : sortBy) {
             SortField sortField;
@@ -464,7 +464,7 @@ public class MCRLuceneSearcher extends MCRSearcher implements MCRShutdownHandler
         return doc;
     }
 
-    private boolean isTokenized(MCRFieldDef fieldDef) {
+    static boolean isTokenized(MCRFieldDef fieldDef) {
         String type = fieldDef.getDataType();
         if (type.equals("Text") || type.equals("name") || type.equals("text"))
             return true;

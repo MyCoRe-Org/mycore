@@ -24,15 +24,37 @@
 package org.mycore.backend.lucene;
 
 import java.io.IOException;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.Term;
+import org.apache.lucene.search.HitCollector;
 import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.Query;
+import org.apache.lucene.search.Sort;
+import org.apache.lucene.search.SortField;
+import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.store.Directory;
+import org.mycore.common.MCRConfiguration;
+import org.mycore.common.MCRException;
+import org.mycore.services.fieldquery.MCRFieldDef;
+import org.mycore.services.fieldquery.MCRSortBy;
 
 class MCRSharedLuceneIndexContext {
+    private static final class NoOpCollector extends HitCollector {
+        @Override
+        public void collect(int arg0, float arg1) {
+        }
+    }
+
     Directory indexDir;
 
     IndexReader reader;
@@ -41,58 +63,30 @@ class MCRSharedLuceneIndexContext {
 
     String ID;
 
-    ReentrantReadWriteLock indexLock;
-
     Logger LOGGER = Logger.getLogger(MCRSharedLuceneIndexContext.class);
+
+    ScheduledThreadPoolExecutor executorService;
+
+    private String index;
 
     public MCRSharedLuceneIndexContext(Directory indexDir, String ID) throws CorruptIndexException, IOException {
         this.indexDir = indexDir;
         this.ID = ID;
-        this.indexLock = new ReentrantReadWriteLock();
-        initReaderIfNeeded();
-    }
-
-    private void initReaderIfNeeded() throws CorruptIndexException, IOException {
-        indexLock.readLock().lock();
-        try {
-            if (reader == null && searcher == null) {
-                indexLock.readLock().unlock();
-                indexLock.writeLock().lock();
-                reader = IndexReader.open(indexDir);
-                searcher = new IndexSearcher(reader);
-                indexLock.readLock().lock();
-                indexLock.writeLock().unlock();
-            } else {
-                if (!reader.isCurrent()) {
-                    IndexReader newReader = reader.reopen();
-                    if (newReader != reader) {
-                        LOGGER.info("new Searcher for index: " + ID);
-                        indexLock.readLock().unlock();
-                        indexLock.writeLock().lock();
-                        reader.close();
-                        searcher.close();
-                        reader = newReader;
-                        searcher = new IndexSearcher(reader);
-                        indexLock.readLock().lock();
-                        indexLock.writeLock().unlock();
-                    }
-                }
+        this.index = MCRConfiguration.instance().getString("MCR.Searcher." + ID + "." + "Index");
+        this.executorService = new ScheduledThreadPoolExecutor(1, new ThreadFactory() {
+            public Thread newThread(Runnable r) {
+                return new Thread("Index." + index + ".Refresher");
             }
-        } finally {
-            indexLock.readLock().unlock();
-            if (indexLock.isWriteLockedByCurrentThread()) {
-                indexLock.writeLock().unlock();
-            }
-        }
+        });
+        RefreshIndexSearcher refreshIndexSearcher = new RefreshIndexSearcher(this);
+        refreshIndexSearcher.run();
     }
 
     public IndexReader getReader() throws CorruptIndexException, IOException {
-        initReaderIfNeeded();
         return reader;
     }
 
     public IndexSearcher getSearcher() throws CorruptIndexException, IOException {
-        initReaderIfNeeded();
         return searcher;
     }
 
@@ -112,6 +106,94 @@ class MCRSharedLuceneIndexContext {
                 searcher.close();
         } catch (IOException e1) {
             LOGGER.warn("Error while closing indexreader " + toString(), e1);
+        }
+    }
+
+    public String getIndex() {
+        return index;
+    }
+
+    /**
+     * refreshes IndexSearcher if needed with a warm up for optimal query performance.
+     * @author Thomas Scheffler (yagee)
+     *
+     */
+    private static class RefreshIndexSearcher implements Runnable {
+        private MCRSharedLuceneIndexContext context;
+
+        public RefreshIndexSearcher(MCRSharedLuceneIndexContext context) {
+            this.context = context;
+        }
+
+        public void run() {
+            try {
+                Long start = System.currentTimeMillis();
+                initReaderIfNeeded();
+                Long end = System.currentTimeMillis();
+                long nextCheck = Math.max((end - start), 60 * 1000);
+                if (context.LOGGER.isDebugEnabled()) {
+                    context.LOGGER.debug("Scheduling next index refresh in " + nextCheck + " ms.");
+                }
+                context.executorService.schedule(this, nextCheck, TimeUnit.MILLISECONDS);
+            } catch (Exception e) {
+                throw new MCRException("Error while opening Lucene index.", e);
+            }
+        }
+
+        private void initReaderIfNeeded() throws CorruptIndexException, IOException {
+            if (context.reader == null && context.searcher == null) {
+                context.reader = IndexReader.open(context.indexDir);
+                context.searcher = new IndexSearcher(context.reader);
+                warmUpSearcher(context.searcher);
+            } else {
+                if (!context.reader.isCurrent()) {
+                    IndexReader newReader = context.reader.reopen();
+                    if (newReader != context.reader) {
+                        context.LOGGER.info("new Searcher for index: " + context.index);
+                        IndexSearcher newSearcher = new IndexSearcher(newReader);
+                        warmUpSearcher(newSearcher);
+                        context.reader.close();
+                        context.searcher.close();
+                        context.reader = newReader;
+                        context.searcher = newSearcher;
+                    }
+                }
+            }
+        }
+
+        private void warmUpSearcher(IndexSearcher newSearcher) throws IOException {
+            long start = System.currentTimeMillis();
+            context.LOGGER.debug("Warming up IndexSearcher for index " + context.ID);
+            List<MCRFieldDef> fieldDefs = MCRFieldDef.getFieldDefs(context.getIndex());
+            HashSet<String> fieldNames=new HashSet<String>();
+            @SuppressWarnings("unchecked")
+            Collection<String> fldNames = newSearcher.getIndexReader().getFieldNames(IndexReader.FieldOption.ALL);
+            fieldNames.addAll(fldNames);
+            for (MCRFieldDef fieldDef : fieldDefs) {
+                if (!fieldNames.contains(fieldDef.getName()))
+                    continue;
+                if (fieldDef.isSortable()) {
+                    Query query;
+                    if (MCRLuceneSearcher.isTokenized(fieldDef)) {
+                        query = new TermQuery(new Term(fieldDef.getName() + MCRLuceneSearcher.getSortableSuffix()));
+                    }
+                    query = new TermQuery(new Term(fieldDef.getName()));
+                    Sort sortFields = MCRLuceneSearcher.buildSortFields(Collections.nCopies(1, new MCRSortBy(fieldDef, true)));
+                    if (context.LOGGER.isDebugEnabled()){
+                        for (SortField sortField : sortFields.getSort()) {
+                            String name = (SortField.FIELD_SCORE == sortField ? "score" : sortField.getField());
+                            context.LOGGER.debug("Sort by: " + name + (sortField.getReverse() ? " descending" : " accending"));
+                        }
+                    }
+                    newSearcher.search(query, null, newSearcher.maxDoc(), sortFields);
+                } else {
+                    Query query = new TermQuery(new Term(fieldDef.getName()));
+                    newSearcher.search(query, new NoOpCollector());
+                }
+            }
+            if (context.LOGGER.isDebugEnabled()) {
+                context.LOGGER.debug("Warming up IndexSearcher " + context.ID + " took " + (System.currentTimeMillis() - start) + " ms.");
+            }
         }
     }
 }
