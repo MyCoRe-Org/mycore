@@ -368,30 +368,16 @@ public class MCRServlet extends HttpServlet {
     protected void handleException(Exception ex) {
         try {
             reportException(ex);
-
-            if (ex instanceof MCRException) {
-                ex = ((MCRException) ex).getException();
-
-                if (ex != null) {
-                    handleException(ex);
-                }
-            }
         } catch (Exception ignored) {
         }
     }
 
     /** Reports an exception to the log */
     protected void reportException(Exception ex) throws Exception {
-        String msg = ((ex.getMessage() == null) ? "" : ex.getMessage());
-        String type = ex.getClass().getName();
         String cname = this.getClass().getName();
         String servlet = cname.substring(cname.lastIndexOf(".") + 1);
-        String trace = MCRException.getStackTraceAsString(ex);
 
-        LOGGER.warn("Exception caught in : " + servlet);
-        LOGGER.warn("Exception type      : " + type);
-        LOGGER.warn("Exception message   : " + msg);
-        LOGGER.debug(trace);
+        LOGGER.warn("Exception caught in : " + servlet, ex);
     }
 
     protected void generateErrorPage(HttpServletRequest request, HttpServletResponse response, int error, String msg, Exception ex,
