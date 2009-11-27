@@ -851,9 +851,16 @@ public class MCROAIProvider extends MCRServlet {
             return addError(document, "badResumptionToken", mcrx.getMessage());
         }
 
-        List<String[]> sets = new ArrayList<String[]>(query.listSets(getServletName()));
+        List<String[]> sets = query.listSets(getServletName());
 
-        if (sets != null) {
+        if (sets == null) {
+        	// server does not support sets
+        	Element eError = new Element("error", ns);
+        	eError.setAttribute("code", "noSetHierarchy");
+        	eError.setText("This repository does not support sets");
+        	eRoot.addContent(eError);
+        }
+        else{
             int elementCounter = 0;
             String sResumptionToken = null;
             List<String[]> resumptionList = new ArrayList<String[]>();

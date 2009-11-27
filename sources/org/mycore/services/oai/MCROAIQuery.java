@@ -52,6 +52,7 @@ public interface MCROAIQuery {
      *            the Servletinstance
      * @return List A list that contains an array of three Strings: the category
      *         id, the label and a description
+     *         or NULL, if the server does not support sets
      */
     public List<String[]> listSets(String instance);
 
