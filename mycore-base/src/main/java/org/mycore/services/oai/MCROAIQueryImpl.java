@@ -291,7 +291,8 @@ public class MCROAIQueryImpl implements MCROAIQuery {
         }
 
         MCRFieldDef fileDateModified = MCRFieldDef.getDef("derivateModificationDate");
-        if (from != null) {
+
+        if (from != null && fileDateModified!=null) {
             String date = getTimeStamp(from[0]);
             dateFrom.addChild(new MCRQueryCondition(fileDateModified, ">=", date));
         }
@@ -304,7 +305,7 @@ public class MCROAIQueryImpl implements MCROAIQuery {
             dateUntil.addChild(new MCRQueryCondition(field, "<=", date));
         }
 
-        if (until != null) {
+        if (until != null && fileDateModified != null) {
             String date = getUntilTimeStamp(until[0]);
             dateUntil.addChild(new MCRQueryCondition(fileDateModified, "<=", date));
         }
