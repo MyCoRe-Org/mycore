@@ -23,12 +23,16 @@
  **/
 package org.mycore.common.events;
 
+import java.util.Enumeration;
+import java.util.Properties;
+
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
 import org.apache.log4j.Logger;
 
 import org.mycore.common.MCRConfiguration;
+import org.mycore.services.fieldquery.MCRSearcherFactory;
 
 /**
  * is a shutdown hook for the current <code>ServletContext</code>.
@@ -54,6 +58,21 @@ public class MCRServletContextListener implements ServletContextListener {
         // register to MCRShutdownHandler
         LOGGER.info("Register ServletContextListener to MCRShutdownHandler");
         MCRShutdownHandler.getInstance().isWebAppRunning = true;
+        // initialize Indexes
+        String prefix = "MCR.Searcher.";
+        String suffix = ".Index";
+
+        Properties props = MCRConfiguration.instance().getProperties(prefix);
+        Enumeration<Object> names = props.keys();
+        while (names.hasMoreElements()) {
+            String name = names.nextElement().toString();
+            if (name.endsWith(suffix)) {
+                String searcherID = name.substring(prefix.length(), name.indexOf(suffix));
+                LOGGER.info("Initilize Searcher: " + searcherID);
+                MCRSearcherFactory.getSearcher(searcherID);
+            }
+        }
+
     }
 
     public void contextDestroyed(ServletContextEvent sce) {
