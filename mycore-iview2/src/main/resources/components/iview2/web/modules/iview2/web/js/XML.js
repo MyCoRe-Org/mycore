@@ -46,6 +46,7 @@ function nodeProps(xmlfile, nodeName, getNode, absolute) {
 	var values = new Array();
 	var child = null;
 	var nodes = null;
+	var count = 0;
 	try {
 		child = document.importNode( child_nodes.item(Node), true);
 		nodes = child.childNodes;
@@ -55,7 +56,7 @@ function nodeProps(xmlfile, nodeName, getNode, absolute) {
 	}
 	for (var i = 0; i < nodes.length; i++) {
 		if (nodes.item(i).tagName) {
-			values[i] = nodeAttributes(nodes.item(i));
+			values[count++] = nodeAttributes(nodes.item(i));
 			//values[nodes.item(i).tagName] = nodes.item(i).childNodes.item(0).nodeValue;
 		}
 	}
@@ -73,7 +74,7 @@ function nodeProps(xmlfile, nodeName, getNode, absolute) {
 @return an array with all Informations the node contained as attributes
  */
 function nodeAttributes(node) {
-	var attributes = new Array();
+	var attributes = new Object();
 	for (var i = 0; i < node.attributes.length; i++) {
 		//Remove the Namespace, as this is hindering access laterly
 		attributes[node.attributes.item(i).nodeName.replace(/^.*:/,"")] = node.attributes.item(i).value;
