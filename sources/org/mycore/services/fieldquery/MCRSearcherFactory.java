@@ -42,7 +42,7 @@ import org.mycore.common.MCRConfigurationException;
  */
 public class MCRSearcherFactory {
     /** Hashtable SearcherID to MCRSearcher instance */
-    protected static Hashtable<String,MCRSearcher> table = new Hashtable<String,MCRSearcher>();
+    protected static Hashtable<String, MCRSearcher> table = new Hashtable<String, MCRSearcher>();
 
     /** The logger */
     private static final Logger LOGGER = Logger.getLogger(MCRSearcherFactory.class);
@@ -59,22 +59,24 @@ public class MCRSearcherFactory {
      *             if no MCRSearcher implementation is configured for this ID
      */
     public static MCRSearcher getSearcher(String searcherID) {
-        if (!table.containsKey(searcherID)) {
-            try {
-                String searcherClass = "MCR.Searcher." + searcherID + ".Class";
-                LOGGER.debug("Reading searcher implementation for ID " + searcherID + ": " + searcherClass);
+        if (!table.containsKey(searcherID))
+            synchronized (table) {
+                if (!table.containsKey(searcherID)) {
+                    try {
+                        String searcherClass = "MCR.Searcher." + searcherID + ".Class";
+                        LOGGER.debug("Reading searcher implementation for ID " + searcherID + ": " + searcherClass);
 
-                Object obj = MCRConfiguration.instance().getSingleInstanceOf(searcherClass);
-                MCRSearcher s = (MCRSearcher) (obj);
-                s.init(searcherID);
+                        Object obj = MCRConfiguration.instance().getInstanceOf(searcherClass);
+                        MCRSearcher s = (MCRSearcher) (obj);
+                        s.init(searcherID);
 
-                table.put(searcherID, s);
-            } catch (Exception ex) {
-                String msg = "Could not load MCRSearcher with searcher ID = " + searcherID;
-                throw new MCRConfigurationException(msg, ex);
+                        table.put(searcherID, s);
+                    } catch (Exception ex) {
+                        String msg = "Could not load MCRSearcher with searcher ID = " + searcherID;
+                        throw new MCRConfigurationException(msg, ex);
+                    }
+                }
             }
-        }
-
         return table.get(searcherID);
     }
 
